@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cb7HZ-0006EB-IK
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:02:18 -0500
+	(envelope-from <stenavin@gmail.com>) id 1cb6iN-00036f-2j
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 09:25:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cb7HT-0002zt-TB
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:02:13 -0500
-Received: from 4.mo179.mail-out.ovh.net ([46.105.36.149]:51535)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cb7HT-0002yY-NO
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:02:07 -0500
-Received: from player732.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 467BF21A5D
-	for <qemu-devel@nongnu.org>; Tue,  7 Feb 2017 16:02:04 +0100 (CET)
-Date: Tue, 7 Feb 2017 16:02:01 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170207160201.0310ef7a@bahia.lan>
-In-Reply-To: <20170207135211.15870-4-marcandre.lureau@redhat.com>
-References: <20170207135211.15870-1-marcandre.lureau@redhat.com>
-	<20170207135211.15870-4-marcandre.lureau@redhat.com>
+	(envelope-from <stenavin@gmail.com>) id 1cb6iM-0005iM-BA
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 09:25:51 -0500
+Received: from mail-qk0-x234.google.com ([2607:f8b0:400d:c09::234]:34980)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stenavin@gmail.com>) id 1cb6iM-0005eh-6X
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 09:25:50 -0500
+Received: by mail-qk0-x234.google.com with SMTP id u25so89061750qki.2
+	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 06:25:48 -0800 (PST)
 MIME-Version: 1.0
+From: Nikolay Ivanets <stenavin@gmail.com>
+Date: Tue, 7 Feb 2017 16:25:27 +0200
+Message-ID: <CAHwdxNf8CZ2x-UdFWUJ2BhgZQC6yKPnbM6T7FNGwow-=ez+rvw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 03/28] tests: fix leaks in
- test-io-channel-command
+Subject: [Qemu-devel] How to find backing file for qemu-nbd?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,47 +25,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Tue,  7 Feb 2017 17:51:46 +0400
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+Is there any way to find source file supplied for qemu-nbd similar to loop
+device:
 
-> No need for strdup, fix leaks when socat is missing.
->=20
-> Spotted by ASAN.
->=20
-> Cc: "Daniel P. Berrange" <berrange@redhat.com>
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
+cat /sys/block/loop0/loop/backing_file
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+?
 
->  tests/test-io-channel-command.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
->=20
-> diff --git a/tests/test-io-channel-command.c b/tests/test-io-channel-comm=
-and.c
-> index 1d1f461bed..46ce1ff01c 100644
-> --- a/tests/test-io-channel-command.c
-> +++ b/tests/test-io-channel-command.c
-> @@ -29,8 +29,8 @@ static void test_io_channel_command_fifo(bool async)
->  #define TEST_FIFO "tests/test-io-channel-command.fifo"
->      QIOChannel *src, *dst;
->      QIOChannelTest *test;
-> -    char *srcfifo =3D g_strdup_printf("PIPE:%s,wronly", TEST_FIFO);
-> -    char *dstfifo =3D g_strdup_printf("PIPE:%s,rdonly", TEST_FIFO);
-> +    const char *srcfifo =3D "PIPE:" TEST_FIFO ",wronly";
-> +    const char *dstfifo =3D "PIPE:" TEST_FIFO ",rdonly";
->      const char *srcargv[] =3D {
->          "/bin/socat", "-", srcfifo, NULL,
->      };
-> @@ -59,8 +59,6 @@ static void test_io_channel_command_fifo(bool async)
->      object_unref(OBJECT(src));
->      object_unref(OBJECT(dst));
-> =20
-> -    g_free(srcfifo);
-> -    g_free(dstfifo);
->      unlink(TEST_FIFO);
->  }
-> =20
+--
+    Nikolay Ivanets
+    Mobile: +380979184774
+    Skype: n_ivanets
