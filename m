@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cb58c-0005Na-Q2
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 07:44:51 -0500
+	(envelope-from <bounces@canonical.com>) id 1cb5IT-0000qG-1H
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 07:55:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cb58b-00056P-PU
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 07:44:50 -0500
-References: <1479837270-79005-1-git-send-email-vsementsov@virtuozzo.com>
-	<1479837270-79005-12-git-send-email-vsementsov@virtuozzo.com>
-	<8760l4aiwb.fsf@emacs.mitica>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <8323e47e-6981-c702-f98b-a63de839eff8@virtuozzo.com>
-Date: Tue, 7 Feb 2017 15:44:34 +0300
+	(envelope-from <bounces@canonical.com>) id 1cb5IP-0000lC-Ug
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 07:55:01 -0500
+Received: from indium.canonical.com ([91.189.90.7]:52054)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cb5IP-0000ks-Oj
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 07:54:57 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cb5IN-0004lV-JP
+	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 12:54:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7C41E2E80CE
+	for <qemu-devel@nongnu.org>; Tue,  7 Feb 2017 12:54:55 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <8760l4aiwb.fsf@emacs.mitica>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 11/17] migration: add is_active_iterate
- handler
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 07 Feb 2017 12:42:30 -0000
+From: Thomas Huth <709584@bugs.launchpad.net>
+Reply-To: Bug 709584 <709584@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20110129011958.31878.27278.malonedeb@wampee.canonical.com>
+Message-Id: <20170207124230.29623.17633.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 709584] Re: Fullscreen mode splits screen over
+ monitor boundaries on dual-monitor system
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,63 +37,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
+To: qemu-devel@nongnu.org
 
-24.01.2017 12:48, Juan Quintela wrote:
-> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
->> Only-postcopy savevm states (dirty-bitmap) don't need live iteration, so
->> to disable them and stop transporting empty sections there is a new
->> savevm handler.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   include/migration/vmstate.h | 1 +
->>   migration/savevm.c          | 5 +++++
->>   2 files changed, 6 insertions(+)
->>
->> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
->> index dc656be..2c53d0b 100644
->> --- a/include/migration/vmstate.h
->> +++ b/include/migration/vmstate.h
->> @@ -47,6 +47,7 @@ typedef struct SaveVMHandlers {
->>       /* This runs both outside and inside the iothread lock.  */
->>       bool (*is_active)(void *opaque);
->>       bool (*has_postcopy)(void *opaque);
->> +    bool (*is_active_iterate)(void *opaque);
->>   
->>       /* This runs outside the iothread lock in the migration case, and
->>        * within the lock in the savevm case.  The callback had better only
->> diff --git a/migration/savevm.c b/migration/savevm.c
->> index c58b9f9..4eb1640 100644
->> --- a/migration/savevm.c
->> +++ b/migration/savevm.c
->> @@ -988,6 +988,11 @@ int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy)
->>                   continue;
->>               }
->>           }
->> +        if (se->ops && se->ops->is_active_iterate) {
->> +            if (!se->ops->is_active_iterate(se->opaque)) {
->> +                continue;
->> +            }
->> +        }
->>           /*
->>            * In the postcopy phase, any device that doesn't know how to
->>            * do postcopy should have saved it's state in the _complete
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
->
-> I still don't see cleary why you can't "reuse" the is_active(), but
-> well, it will have to add magic there, so ....
+QEMU 0.12 is completely outdated nowadays ... can you still reproduce
+this issue with the latest version of QEMU (currently v2.8)? If yes,
+which graphical backend are you using? SDL1? SDL2? GTK?
 
-is_active_iterate=false blocks only qemu_savevm_state_iterate from 
-handling the migration entity. Other qemu_savevm_state_* functions 
-handle it, as is_active=true.
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
->
-> BTW, in hindsight, this "is_active" functions are used mainly to check
-> if the thing is "not active" O:-)
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/709584
 
--- 
-Best regards,
-Vladimir
+Title:
+  Fullscreen mode splits screen over monitor boundaries on dual-monitor
+  system
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  I originally reported this for the Android SDK emulator, which is
+  built on QEMU: http://code.google.com/p/android/issues/detail?id=3D14336
+
+  Can confirm that this bug is present in stock QEMU shipped with Ubuntu 10=
+.10:
+  QEMU PC emulator version 0.12.5 (qemu-kvm-0.12.5), Copyright (c) 2003-200=
+8 Fabrice Bellard
+
+  Steps to reproduce:
+  - get a Linux machine with multiple-monitor setup (tested using NVidia pr=
+oprietary driver on Ubuntu 10.10 x86_64, with two monitors side-by-side in =
+'TwinView' configuration)
+  - launch qemu
+  - hit ctrl+alt+f to go into fullscreen mode
+
+  Expected behavior:
+  - emulator should take over one screen (either the first screen, largest =
+screen, or screen the emulator is presently on)
+  - emulator's display should center or scale to fit within available area =
+of the taken-over screen
+
+  Actual behavior:
+  - emulator takes over both screens
+  - emulator's display is split over the boundary between the two screens
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/709584/+subscriptions
