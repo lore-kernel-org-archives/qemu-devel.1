@@ -1,36 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cb8DO-0006rQ-AV
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:02:03 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cb8GQ-0000qX-DO
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:05:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cb8DJ-00080e-Fx
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:01:58 -0500
-Received: from indium.canonical.com ([91.189.90.7]:36230)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cb8DJ-000805-7m
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:01:53 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cb8DG-0002YZ-0e
-	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 16:01:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 877782E80E3
-	for <qemu-devel@nongnu.org>; Tue,  7 Feb 2017 16:01:46 +0000 (UTC)
+	(envelope-from <imammedo@redhat.com>) id 1cb8GL-0001Pa-FV
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:05:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50482)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cb8GL-0001Ow-Al
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:05:01 -0500
+Date: Tue, 7 Feb 2017 17:04:56 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170207170456.77fd16d7@Igors-MacBook-Pro.local>
+In-Reply-To: <20170207173429-mutt-send-email-mst@kernel.org>
+References: <cover.1486285434.git.ben@skyportsystems.com>
+	<28ff6ff023dd041fc7557955dea916adce72efea.1486285434.git.ben@skyportsystems.com>
+	<20170206170455-mutt-send-email-mst@kernel.org>
+	<E609277C-1E60-48F6-B83E-2A6AEFB242F3@skyportsystems.com>
+	<20170206193300-mutt-send-email-mst@kernel.org>
+	<20170207150032.2807d29f@nial.brq.redhat.com>
+	<20170207173429-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Feb 2017 15:50:04 -0000
-From: "Matwey V. Kornilov" <matwey.kornilov@gmail.com>
-Reply-To: Bug 1661386 <1661386@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170202204510.26617.69309.malonedeb@wampee.canonical.com>
-	<20170206180523.5557.56952.malone@wampee.canonical.com>
-	<CAJs94EbfKZKVnR97-EuVfjMmhDhG=zwxGhdHGE_OjPCjLCXj2A@mail.gmail.com>
-Message-Id: <CAJs94EbeCMnggzSGJ7o4Hs=6UOe_A2nODyp-SQieQ_VxxrH9ZA@mail.gmail.com>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1661386] Re: Assertion `ret ==
- cpu->kvm_msr_buf->nmsrs' failed
+Subject: Re: [Qemu-devel] [PATCH v5 05/10] ACPI: Add Virtual Machine
+ Generation ID support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,225 +33,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Ben Warren <ben@skyportsystems.com>, qemu-devel@nongnu.org, lersek@redhat.com
 
-2017-02-06 22:38 GMT+03:00 Matwey V. Kornilov <matwey.kornilov@gmail.com>:
-> 2017-02-06 21:05 GMT+03:00 Dr. David Alan Gilbert <dgilbert@redhat.com>:
->>>> So you didn't mention this was running inside VMWare; it looks to me a=
-s if that's rejecting the PMU MSR accesses.
->>>> For reference which version of VMWare are you using?
->>
->>>ESXi 6.0.0 Build 2494585
->>
->>>I also find that enabling perf counters in VMWare configuration also
->> helps.
->>
->> OK, so that suggests the problem is that with PMU disabled in VMWare
->> config, it's not giving the right info to the guest to know it's
->> disabled.
->
-> How should it provide info? Can we check it?
->
+On Tue, 7 Feb 2017 17:35:19 +0200
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-Hi,
-
-I've found the following doc:
-
-https://software.intel.com/sites/default/files/m/5/2/c/f/1/30320
--Nehalem-PMU-Programming-Guide-Core.pdf
-
-I am not sure how up-to-date it is. Does qemu follow recommendations
-from secton 4.3?
-I use msr-tools package and rdmsr tool to check some registers from table 2=
-6...
-IA32_MISC_ENABLE =3D 0
-IA32_PERF_CAPABILITIES =3D 0
-in my case.
-
->>
->>>But why did it just work before 48e1a45c3166 with perf counters
->> disabled?
->>
->> Before that bug it ignored the failure to write/read the PMU MSRs - but
->> also lost all the MSRs after the PMU access and we'd found that if we
->> ever had that happen we'd get lots of weird bugs related to the other
->> MSRs.
->>
->>>>
->>>> My colleague suggested that '-cpu host,pmu=3Doff'  might work instead =
-of
->>>> having to hack around with the source.
->>
->>> Indeed, this also helps.
->>
->> --
->> You received this bug notification because you are subscribed to the bug
->> report.
->> https://bugs.launchpad.net/bugs/1661386
->>
->> Title:
->>   Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed
->>
->> Status in QEMU:
->>   New
->>
->> Bug description:
->>   Hello,
->>
->>
->>   I see the following when try to run qemu from master as the following:
->>
->>   # ./x86_64-softmmu/qemu-system-x86_64 --version
->>   QEMU emulator version 2.8.50 (v2.8.0-1006-g4e9f524)
->>   Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
->>   # ./x86_64-softmmu/qemu-system-x86_64 -machine accel=3Dkvm -nodefaults
->>   -no-reboot -nographic -cpu host -vga none  -kernel .build.kernel.kvm
->>   -initrd .build.initrd.kvm -append 'panic=3D1 no-kvmclock console=3Dtty=
-S0
->>   loglevel=3D7' -m 1024 -serial stdio
->>   qemu-system-x86_64: /home/matwey/lab/qemu/target/i386/kvm.c:1849:
->>   kvm_put_msrs: Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
->>
->>   First broken commit has been bisected:
->>
->>   commit 48e1a45c3166d659f781171a47dabf4a187ed7a5
->>   Author: Paolo Bonzini <pbonzini@redhat.com>
->>   Date:   Wed Mar 30 22:55:29 2016 +0200
->>
->>       target-i386: assert that KVM_GET/SET_MSRS can set all requested MS=
-Rs
->>
->>       This would have caught the bug in the previous patch.
->>
->>       Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->>
->>   My cpuinfo is the following:
->>
->>   processor       : 0
->>   vendor_id       : GenuineIntel
->>   cpu family      : 6
->>   model           : 44
->>   model name      : Intel(R) Xeon(R) CPU           X5675  @ 3.07GHz
->>   stepping        : 2
->>   microcode       : 0x14
->>   cpu MHz         : 3066.775
->>   cache size      : 12288 KB
->>   physical id     : 0
->>   siblings        : 2
->>   core id         : 0
->>   cpu cores       : 2
->>   apicid          : 0
->>   initial apicid  : 0
->>   fpu             : yes
->>   fpu_exception   : yes
->>   cpuid level     : 11
->>   wp              : yes
->>   flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge=
- mca cmov pat pse36 clflush dts mmx fxsr sse sse2 ss ht syscall nx rdtscp l=
-m constant_tsc arch_perfmon pebs bts nopl xtopology tsc_reliable nonstop_ts=
-c aperfmperf pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 popcnt aes hypervis=
-or lahf_lm ida arat epb dtherm tpr_shadow vnmi ept vpid
->>   bugs            :
->>   bogomips        : 6133.55
->>   clflush size    : 64
->>   cache_alignment : 64
->>   address sizes   : 40 bits physical, 48 bits virtual
->>   power management:
->>
->> To manage notifications about this bug go to:
->> https://bugs.launchpad.net/qemu/+bug/1661386/+subscriptions
->
->
->
-> --
-> With best regards,
-> Matwey V. Kornilov
-> http://blog.matwey.name
-> xmpp://0x2207@jabber.ru
-
-
--- =
-
-With best regards,
-Matwey V. Kornilov
-http://blog.matwey.name
-xmpp://0x2207@jabber.ru
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1661386
-
-Title:
-  Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello,
-
-  =
-
-  I see the following when try to run qemu from master as the following:
-
-  # ./x86_64-softmmu/qemu-system-x86_64 --version
-  QEMU emulator version 2.8.50 (v2.8.0-1006-g4e9f524)
-  Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
-  # ./x86_64-softmmu/qemu-system-x86_64 -machine accel=3Dkvm -nodefaults
-  -no-reboot -nographic -cpu host -vga none  -kernel .build.kernel.kvm
-  -initrd .build.initrd.kvm -append 'panic=3D1 no-kvmclock console=3DttyS0
-  loglevel=3D7' -m 1024 -serial stdio
-  qemu-system-x86_64: /home/matwey/lab/qemu/target/i386/kvm.c:1849:
-  kvm_put_msrs: Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
-
-  First broken commit has been bisected:
-
-  commit 48e1a45c3166d659f781171a47dabf4a187ed7a5
-  Author: Paolo Bonzini <pbonzini@redhat.com>
-  Date:   Wed Mar 30 22:55:29 2016 +0200
-
-      target-i386: assert that KVM_GET/SET_MSRS can set all requested MSRs
-      =
-
-      This would have caught the bug in the previous patch.
-      =
-
-      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-  My cpuinfo is the following:
-
-  processor       : 0
-  vendor_id       : GenuineIntel
-  cpu family      : 6
-  model           : 44
-  model name      : Intel(R) Xeon(R) CPU           X5675  @ 3.07GHz
-  stepping        : 2
-  microcode       : 0x14
-  cpu MHz         : 3066.775
-  cache size      : 12288 KB
-  physical id     : 0
-  siblings        : 2
-  core id         : 0
-  cpu cores       : 2
-  apicid          : 0
-  initial apicid  : 0
-  fpu             : yes
-  fpu_exception   : yes
-  cpuid level     : 11
-  wp              : yes
-  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
-a cmov pat pse36 clflush dts mmx fxsr sse sse2 ss ht syscall nx rdtscp lm c=
-onstant_tsc arch_perfmon pebs bts nopl xtopology tsc_reliable nonstop_tsc a=
-perfmperf pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 popcnt aes hypervisor =
-lahf_lm ida arat epb dtherm tpr_shadow vnmi ept vpid
-  bugs            :
-  bogomips        : 6133.55
-  clflush size    : 64
-  cache_alignment : 64
-  address sizes   : 40 bits physical, 48 bits virtual
-  power management:
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1661386/+subscriptions
+> On Tue, Feb 07, 2017 at 03:00:32PM +0100, Igor Mammedov wrote:
+> > On Mon, 6 Feb 2017 19:41:36 +0200
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >=20
+> > > On Mon, Feb 06, 2017 at 09:29:30AM -0800, Ben Warren wrote:
+> > > >=20
+> > > >     On Feb 6, 2017, at 8:15 AM, Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
+> > > >=20
+> > > >     On Sun, Feb 05, 2017 at 01:12:00AM -0800, ben@skyportsystems.co=
+m wrote:
+> > > >=20
+> > > >         From: Ben Warren <ben@skyportsystems.com>
+> > > >=20
+> > > >         This implements the VM Generation ID feature by passing a 1=
+28-bit
+> > > >         GUID to the guest via a fw_cfg blob.
+> > > >         Any time the GUID changes, an ACPI notify event is sent to =
+the guest
+> > > >=20
+> > > >         The user interface is a simple device with one parameter:
+> > > >         - guid (string, must be "auto" or in UUID format
+> > > >           xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+> > > >=20
+> > > >         Signed-off-by: Ben Warren <ben@skyportsystems.com>
+> > > >=20
+> > [...]
+> >=20
+> > > >=20
+> > > > This variable name was suggested by Laszlo.  the =E2=80=98a=E2=80=
+=99 in =E2=80=98vgia=E2=80=99 refers to
+> > > > address, but I=E2=80=99ll add some comments. =20
+> > >=20
+> > > vmgenid_addr_le?
+> > >=20
+> > >=20
+> > > >     How about we make it 8 byte so it's future proof?
+> > > >=20
+> > > > I can do that, but a previous conversation we had made it clear tha=
+t guests
+> > > > would never allocate above 4GB so 64 bits wasn=E2=80=99t necessary.=
+ =20
+> > >=20
+> > > Right, it's just very painful to change once we make it 32 bit.
+> > I'd keep it 32 bit since it's in variable in global AML context and our
+> > table revision is 1, so per spec OSPM should handle it as 32 number.
+> > Chances of guest survival on boot would depend on AML interpreter toler=
+ance
+> > to AML errors, which for windows usually is 0 and leads to non obvious =
+BSOD.
+> > If we leave DWORD, even XP will be able to boot fine and only report
+> > unknown device.
+>=20
+> AML reports 2 DWORDS per spec, no issue there. I guess it's exactly for
+> XP compatibility.=20
+=20
+it's only ADDR method thought but we are talking about
+Named DWORD vs QWORD VGIA variable which is patched by linker command=20
+=20
