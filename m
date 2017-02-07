@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cb8s8-0001iT-Hl
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:44:05 -0500
+	(envelope-from <eblake@redhat.com>) id 1cb8za-0005Jb-MD
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:51:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cb8s3-0007PI-GR
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:44:04 -0500
-Received: from 4.mo179.mail-out.ovh.net ([46.105.36.149]:33681)
+	(envelope-from <eblake@redhat.com>) id 1cb8zW-0003cM-M2
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:51:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45074)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cb8s3-0007OZ-A7
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:43:59 -0500
-Received: from player732.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id BFE0621A49
-	for <qemu-devel@nongnu.org>; Tue,  7 Feb 2017 17:43:57 +0100 (CET)
-Date: Tue, 7 Feb 2017 17:43:54 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170207174354.65427c59@bahia.lan>
-In-Reply-To: <20170207135211.15870-21-marcandre.lureau@redhat.com>
-References: <20170207135211.15870-1-marcandre.lureau@redhat.com>
-	<20170207135211.15870-21-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cb8zW-0003bs-Fr
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 11:51:42 -0500
+References: <20170207155956.21573-1-pbonzini@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b7fc7007-1663-b41d-422a-9600e44d7b38@redhat.com>
+Date: Tue, 7 Feb 2017 10:51:39 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 20/28] tests: fix virtio-scsi-test leak
+In-Reply-To: <20170207155956.21573-1-pbonzini@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="wGvt5Lhdg1s3Hvks3S1TORXFTD1Nurav7"
+Subject: Re: [Qemu-devel] [PATCH] link to .xz files to save some bandwidth
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +27,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com
 
-On Tue,  7 Feb 2017 17:52:03 +0400
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--wGvt5Lhdg1s3Hvks3S1TORXFTD1Nurav7
+From: Eric Blake <eblake@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com
+Message-ID: <b7fc7007-1663-b41d-422a-9600e44d7b38@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] link to .xz files to save some bandwidth
+References: <20170207155956.21573-1-pbonzini@redhat.com>
+In-Reply-To: <20170207155956.21573-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Spotted by ASAN.
+On 02/07/2017 09:59 AM, Paolo Bonzini wrote:
+> I have converted all .gz and .bz2 files to .xz on download.qemu.org
+> and this patch would change the links in the website.  This would save
+> about 5 GB of bandwidth every day (about 20% savings).
 >=20
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
+> xz should be available for all platforms.  Besides providing better
+> compression ratios, decompression of .xz files is about twice as fast
+> compared to bzip2.  Compression instead is about 5.5 times slower.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+I agree that bzip2 is pointless these days; .gz is a bit more important
+when targetting older platforms but I think that does not describe
+qemu's target audience.  Do we want to even enter the xz vs. lzma
+controversy, or are we okay with being xz-only?
 
->  tests/virtio-scsi-test.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/tests/virtio-scsi-test.c b/tests/virtio-scsi-test.c
-> index 69220ef07b..0eabd56fd9 100644
-> --- a/tests/virtio-scsi-test.c
-> +++ b/tests/virtio-scsi-test.c
-> @@ -63,7 +63,7 @@ static void qvirtio_scsi_pci_free(QVirtIOSCSI *vs)
->          qvirtqueue_cleanup(vs->dev->bus, vs->vq[i], vs->qs->alloc);
->      }
->      qvirtio_pci_device_disable(container_of(vs->dev, QVirtioPCIDevice, v=
-dev));
-> -    g_free(vs->dev);
-> +    qvirtio_pci_device_free((QVirtioPCIDevice *)vs->dev);
->      qvirtio_scsi_stop(vs->qs);
->      g_free(vs);
->  }
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--wGvt5Lhdg1s3Hvks3S1TORXFTD1Nurav7
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYmfsbAAoJEKeha0olJ0Nq/yMH/3MG31kSLjLITFI4xljytKJ8
+Z9jgtDS5MQPpDVwPiD2sh24hpvtkt8RfzdrSkdXnlTJ2WkZVmkFhhzxjr2UoiaeF
+dpG6pgElkcuIiPO55HBXP3GQ5XCrOMiotQoGdnyWe1wAS4MrtTDVh2TTdvcyozcD
+dBFrmSPdVr3eITa0POKFizbSPMmZ2btHMKUsod1iYmHI07nj/O91PGiezXO375A6
+fy9YdFRHSfoRyzF6L9AJfliyo0W2ftMOzz1W0bPpm192ykZyjEQNPHGAWc0eh9hR
+2/RMViWg7dodZ4m1lZ4Os65DRFQfs5siwVco0Fk8Yu9HSOClOR4jbEetiTs3kPI=
+=nSZR
+-----END PGP SIGNATURE-----
+
+--wGvt5Lhdg1s3Hvks3S1TORXFTD1Nurav7--
