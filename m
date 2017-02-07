@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36686)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cb7he-0004JF-Pu
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:29:14 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cb7i4-0004fN-WB
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:29:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cb7hY-00084J-Pd
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:29:10 -0500
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20170127094154.19778-1-berto@igalia.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5370d078-6f29-3d56-635b-5871a6b95983@redhat.com>
-Date: Tue, 7 Feb 2017 16:28:55 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1cb7i3-0008P8-Vq
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:29:37 -0500
+Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:34932)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cb7i3-0008Ow-Q0
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:29:35 -0500
+Received: by mail-wr0-x235.google.com with SMTP id 89so40948812wrr.2
+	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 07:29:35 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20170127094154.19778-1-berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qemu-doc: Clarify that -vga std is now the
- default
+In-Reply-To: <20170207023229.29431-1-rth@twiddle.net>
+References: <20170207023229.29431-1-rth@twiddle.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 7 Feb 2017 15:29:14 +0000
+Message-ID: <CAFEAcA8=mwGoNn070RiCwDgHacO_VU6KZbyv9qb6E65UO=2CGw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 0/5] target/hppa patch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,42 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
+To: Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
+On 7 February 2017 at 02:32, Richard Henderson <rth@twiddle.net> wrote:
+> Nothing complicated here.  Two bugs from Laurent, two noticed
+> by Coverity (through multiple channels).
+>
+>
+> r~
+>
+>
+>
+> The following changes since commit 7d2c6c95511e42dffe2b263275e09957723d0ff4:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/pull-usb-20170206-1' into staging (2017-02-06 11:44:08 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/rth7680/qemu.git tags/pull-hppa-20170206
+>
+> for you to fetch changes up to 6836a8fb96963a29f309d49873062bbca9ab0e28:
+>
+>   target/hppa: Fix gdb_write_register (2017-02-06 18:25:31 -0800)
+>
+> ----------------------------------------------------------------
+> Misc hppa fixes.
+>
+> ----------------------------------------------------------------
 
+Applied, thanks.
 
-On 27/01/2017 10:41, Alberto Garcia wrote:
-> The QEMU manual page states that Cirrus Logic is the default video
-> card if the user doesn't specify any. However this is not true since
-> QEMU 2.2.
-> 
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  qemu-options.hx | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 80df52651a..66ee562821 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -1195,12 +1195,12 @@ Select type of VGA card to emulate. Valid values for @var{type} are
->  Cirrus Logic GD5446 Video card. All Windows versions starting from
->  Windows 95 should recognize and use this graphic card. For optimal
->  performances, use 16 bit color depth in the guest and the host OS.
-> -(This one is the default)
-> +(This card was the default before QEMU 2.2)
->  @item std
->  Standard VGA card with Bochs VBE extensions.  If your guest OS
->  supports the VESA 2.0 VBE extensions (e.g. Windows XP) and if you want
->  to use high resolution modes (>= 1280x1024x16) then you should use
-> -this option.
-> +this option. (This card is the default since QEMU 2.2)
->  @item vmware
->  VMWare SVGA-II compatible adapter. Use it if you have sufficiently
->  recent XFree86/XOrg server or Windows guest with a driver for this
-> 
-
-Queued, thanks.
-
-Paolo
+-- PMM
