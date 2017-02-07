@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cavaP-0003Ih-7m
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:32:54 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cavaT-0003L2-HK
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:32:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cavaM-0005Ng-L6
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:32:53 -0500
-Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:34862)
+	(envelope-from <rth7680@gmail.com>) id 1cavaS-0005Qq-Ko
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:32:57 -0500
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:33663)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cavaM-0005NJ-Fw
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:32:50 -0500
-Received: by mail-it0-x243.google.com with SMTP id 203so10996445ith.2
-	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 18:32:50 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cavaS-0005QY-HE
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:32:56 -0500
+Received: by mail-it0-x244.google.com with SMTP id e137so10948591itc.0
+	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 18:32:56 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Mon,  6 Feb 2017 18:32:24 -0800
-Message-Id: <20170207023229.29431-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 0/5] target/hppa patch queue
+Date: Mon,  6 Feb 2017 18:32:25 -0800
+Message-Id: <20170207023229.29431-2-rth@twiddle.net>
+In-Reply-To: <20170207023229.29431-1-rth@twiddle.net>
+References: <20170207023229.29431-1-rth@twiddle.net>
+Subject: [Qemu-devel] [PULL 1/5] linux-user: add hppa magic numbers in
+ qemu-binfmt-conf.sh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,44 +28,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+Cc: peter.maydell@linaro.org, Laurent Vivier <laurent@vivier.eu>
 
-Nothing complicated here.  Two bugs from Laurent, two noticed
-by Coverity (through multiple channels).
+From: Laurent Vivier <laurent@vivier.eu>
 
+As we have now a linux-user HPPA target, we can add it to the list of
+supported targets in qemu-binfmt-conf.sh
 
-r~
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Message-Id: <20170126080449.28255-2-laurent@vivier.eu>
+Signed-off-by: Richard Henderson <rth@twiddle.net>
+---
+ scripts/qemu-binfmt-conf.sh | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-
-
-The following changes since commit 7d2c6c95511e42dffe2b263275e09957723d0ff4:
-
-  Merge remote-tracking branch 'remotes/kraxel/tags/pull-usb-20170206-1' into staging (2017-02-06 11:44:08 +0000)
-
-are available in the git repository at:
-
-  git://github.com/rth7680/qemu.git tags/pull-hppa-20170206
-
-for you to fetch changes up to 6836a8fb96963a29f309d49873062bbca9ab0e28:
-
-  target/hppa: Fix gdb_write_register (2017-02-06 18:25:31 -0800)
-
-----------------------------------------------------------------
-Misc hppa fixes.
-
-----------------------------------------------------------------
-Laurent Vivier (3):
-      linux-user: add hppa magic numbers in qemu-binfmt-conf.sh
-      linux-user: fix "apt-get update" on linux-user hppa
-      linux-user: define correct UTS machine name for hppa
-
-Richard Henderson (2):
-      target/hppa: Tidy do_cbranch
-      target/hppa: Fix gdb_write_register
-
- linux-user/hppa/target_syscall.h |  2 +-
- linux-user/syscall.c             |  1 -
- scripts/qemu-binfmt-conf.sh      |  9 +++++++--
- target/hppa/gdbstub.c            |  1 +
- target/hppa/translate.c          | 17 +++++------------
- 5 files changed, 14 insertions(+), 16 deletions(-)
+diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
+index de4d1c1..0f1aa63 100755
+--- a/scripts/qemu-binfmt-conf.sh
++++ b/scripts/qemu-binfmt-conf.sh
+@@ -1,9 +1,10 @@
+ #!/bin/sh
+-# enable automatic i386/ARM/M68K/MIPS/SPARC/PPC/s390 program execution by the kernel
++# enable automatic i386/ARM/M68K/MIPS/SPARC/PPC/s390/HPPA
++# program execution by the kernel
+ 
+ qemu_target_list="i386 i486 alpha arm sparc32plus ppc ppc64 ppc64le m68k \
+ mips mipsel mipsn32 mipsn32el mips64 mips64el \
+-sh4 sh4eb s390x aarch64"
++sh4 sh4eb s390x aarch64 hppa"
+ 
+ i386_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00'
+ i386_mask='\xff\xff\xff\xff\xff\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
+@@ -91,6 +92,10 @@ aarch64_magic='\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x
+ aarch64_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
+ aarch64_family=arm
+ 
++hppa_magic='\x7f\x45\x4c\x46\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x0f'
++hppa_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
++hppa_family=hppa
++
+ qemu_get_family() {
+     cpu=${HOST_ARCH:-$(uname -m)}
+     case "$cpu" in
+-- 
+2.9.3
