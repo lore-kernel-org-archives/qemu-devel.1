@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cau95-0005E3-Rb
+	(envelope-from <laurent@vivier.eu>) id 1cau95-0005E2-RJ
 	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 20:00:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cau90-0006BT-Vc
+	(envelope-from <laurent@vivier.eu>) id 1cau91-0006Bd-Hu
 	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 20:00:35 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:52800)
+Received: from mout.kundenserver.de ([212.227.126.134]:61872)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cau90-0006As-JQ
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 20:00:30 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cau91-0006BA-6J
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 20:00:31 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue,  7 Feb 2017 01:59:23 +0100
-Message-Id: <20170207005930.28327-10-laurent@vivier.eu>
+Date: Tue,  7 Feb 2017 01:59:25 +0100
+Message-Id: <20170207005930.28327-12-laurent@vivier.eu>
 In-Reply-To: <20170207005930.28327-1-laurent@vivier.eu>
 References: <20170207005930.28327-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v3 09/16] target-m68k: add fmovem
+Subject: [Qemu-devel] [PATCH v3 11/16] target-m68k: add fmovecr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,162 +26,105 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>
 
+fmovecr moves a floating point constant from the
+FPU ROM to a floating point register.
+
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- target/m68k/fpu_helper.c |  6 +++
+ target/m68k/fpu_helper.c | 31 +++++++++++++++++++++++++++++++
  target/m68k/helper.h     |  1 +
- target/m68k/translate.c  | 99 +++++++++++++++++++++++++++++++++++-------------
- 3 files changed, 80 insertions(+), 26 deletions(-)
+ target/m68k/translate.c  | 12 +++++++++++-
+ 3 files changed, 43 insertions(+), 1 deletion(-)
 
 diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
-index 1e68c41..aadfc82 100644
+index aadfc82..d8145e0 100644
 --- a/target/m68k/fpu_helper.c
 +++ b/target/m68k/fpu_helper.c
-@@ -421,3 +421,9 @@ void HELPER(update_fpstatus)(CPUM68KState *env)
+@@ -24,6 +24,31 @@
+ #include "exec/helper-proto.h"
+ #include "exec/exec-all.h"
  
-     set_float_exception_flags(flags, &env->fp_status);
++static const floatx80 fpu_rom[128] = {
++    [0x00] = floatx80_pi,                                   /* Pi */
++    [0x0b] = make_floatx80(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
++    [0x0c] = make_floatx80(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
++    [0x0d] = make_floatx80(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
++    [0x0e] = make_floatx80(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
++    [0x0f] = floatx80_zero,                                 /* Zero     */
++    [0x30] = floatx80_ln2,                                  /* ln(2)    */
++    [0x31] = make_floatx80(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
++    [0x32] = floatx80_one,                                  /* 10^0     */
++    [0x33] = make_floatx80(0x4002, 0xa000000000000000ULL),  /* 10^1     */
++    [0x34] = make_floatx80(0x4005, 0xc800000000000000ULL),  /* 10^2     */
++    [0x35] = make_floatx80(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
++    [0x36] = make_floatx80(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
++    [0x37] = make_floatx80(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
++    [0x38] = make_floatx80(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
++    [0x39] = make_floatx80(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
++    [0x3a] = make_floatx80(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
++    [0x3b] = make_floatx80(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
++    [0x3c] = make_floatx80(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
++    [0x3d] = make_floatx80(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
++    [0x3e] = make_floatx80(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
++    [0x3f] = make_floatx80(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
++};
++
+ static floatx80 FP0_to_floatx80(CPUM68KState *env)
+ {
+     return (floatx80){ .low = env->fp0l, .high = env->fp0h };
+@@ -427,3 +452,9 @@ void HELPER(fmovem)(CPUM68KState *env, uint32_t opsize,
+ {
+     fprintf(stderr, "MISSING HELPER fmovem\n");
  }
 +
-+void HELPER(fmovem)(CPUM68KState *env, uint32_t opsize,
-+                    uint32_t mode, uint32_t mask)
++void HELPER(const_FP0)(CPUM68KState *env, uint32_t offset)
 +{
-+    fprintf(stderr, "MISSING HELPER fmovem\n");
++    env->fp0l = fpu_rom[offset].low;
++    env->fp0h = fpu_rom[offset].high;
 +}
 diff --git a/target/m68k/helper.h b/target/m68k/helper.h
-index 072a6d0..58bc273 100644
+index 58bc273..4927324 100644
 --- a/target/m68k/helper.h
 +++ b/target/m68k/helper.h
-@@ -31,6 +31,7 @@ DEF_HELPER_1(cmp_FP0_FP1, void, env)
- DEF_HELPER_2(set_fpcr, void, env, i32)
+@@ -32,6 +32,7 @@ DEF_HELPER_2(set_fpcr, void, env, i32)
  DEF_HELPER_1(tst_FP0, void, env)
  DEF_HELPER_1(update_fpstatus, void, env)
-+DEF_HELPER_4(fmovem, void, env, i32, i32, i32)
+ DEF_HELPER_4(fmovem, void, env, i32, i32, i32)
++DEF_HELPER_2(const_FP0, void, env, i32)
  
  DEF_HELPER_3(mac_move, void, env, i32, i32)
  DEF_HELPER_3(macmulf, i64, env, i32, i32)
 diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index f9c64ff..ac60f1a 100644
+index 3fdb672..23eac63 100644
 --- a/target/m68k/translate.c
 +++ b/target/m68k/translate.c
-@@ -4483,13 +4483,79 @@ static void gen_op_fmove_fcr(CPUM68KState *env, DisasContext *s,
-     tcg_temp_free_i32(addr);
- }
- 
-+static void gen_op_fmovem(CPUM68KState *env, DisasContext *s,
-+                          uint32_t insn, uint32_t ext)
-+{
-+    int opsize;
-+    uint16_t mask;
-+    int i;
-+    uint32_t mode;
-+    int32_t incr;
-+    TCGv addr, tmp;
-+    int is_load;
-+
-+    if (m68k_feature(s->env, M68K_FEATURE_FPU)) {
-+        opsize = OS_EXTENDED;
-+    } else {
-+        opsize = OS_DOUBLE;  /* FIXME */
-+    }
-+
-+    mode = (ext >> 11) & 0x3;
-+    if ((mode & 0x1) == 1) {
-+        gen_helper_fmovem(cpu_env, tcg_const_i32(opsize),
-+                          tcg_const_i32(mode), DREG(ext, 0));
-+        return;
-+    }
-+
-+    tmp = gen_lea(env, s, insn, opsize);
-+    if (IS_NULL_QREG(tmp)) {
-+        gen_addr_fault(s);
-+        return;
-+    }
-+
-+    addr = tcg_temp_new();
-+    tcg_gen_mov_i32(addr, tmp);
-+    is_load = ((ext & 0x2000) == 0);
-+    incr = opsize_bytes(opsize);
-+    mask = ext & 0x00FF;
-+
-+    if (!is_load && (mode & 2) == 0) {
-+        for (i = 7; i >= 0; i--, mask <<= 1) {
-+            if (mask & 0x80) {
-+                gen_op_load_fpr_FP0(i);
-+                gen_store_FP0(s, opsize, addr);
-+                if ((mask & 0xff) != 0x80) {
-+                    tcg_gen_subi_i32(addr, addr, incr);
-+                }
-+            }
-+        }
-+        tcg_gen_mov_i32(AREG(insn, 0), addr);
-+    } else {
-+        for (i = 0; i < 8; i++, mask <<= 1) {
-+            if (mask & 0x80) {
-+                if (is_load) {
-+                    gen_load_FP0(s, opsize, addr);
-+                    gen_op_store_fpr_FP0(i);
-+                } else {
-+                    gen_op_load_fpr_FP0(i);
-+                    gen_store_FP0(s, opsize, addr);
-+                }
-+                tcg_gen_addi_i32(addr, addr, incr);
-+            }
-+        }
-+        if ((insn & 070) == 030) {
-+            tcg_gen_mov_i32(AREG(insn, 0), addr);
-+        }
-+    }
-+    tcg_temp_free_i32(addr);
-+}
-+
- /* ??? FP exceptions are not implemented.  Most exceptions are deferred until
-    immediately before the next FP instruction is executed.  */
+@@ -4555,16 +4555,26 @@ static void gen_op_fmovem(CPUM68KState *env, DisasContext *s,
  DISAS_INSN(fpu)
  {
      uint16_t ext;
++    uint8_t rom_offset;
      int opmode;
--    TCGv tmp32;
      int opsize;
  
      ext = read_im16(env, s);
-@@ -4514,32 +4580,13 @@ DISAS_INSN(fpu)
-         return;
-     case 6: /* fmovem */
-     case 7:
--        {
--            TCGv addr;
--            uint16_t mask;
--            int i;
--            if ((ext & 0x1f00) != 0x1000 || (ext & 0xff) == 0)
--                goto undef;
--            tmp32 = gen_lea(env, s, insn, OS_LONG);
--            if (IS_NULL_QREG(tmp32)) {
--                gen_addr_fault(s);
--                return;
--            }
--            addr = tcg_temp_new_i32();
--            tcg_gen_mov_i32(addr, tmp32);
--            mask = 0x80;
--            for (i = 0; i < 8; i++) {
--                if (ext & mask) {
--                    gen_op_load_fpr_FP0(REG(i, 0));
--                    gen_ldst_FP0(s, OS_DOUBLE, addr, (ext & (1 << 13)) ?
--                                                     EA_STORE : EA_LOADS);
--                    if (ext & (mask - 1))
--                        tcg_gen_addi_i32(addr, addr, 8);
--                }
--                mask >>= 1;
--            }
--            tcg_temp_free_i32(addr);
-+        if ((ext & 0xf00) != 0 || (ext & 0xff) == 0) {
-+            goto undef;
+     opmode = ext & 0x7f;
+     switch ((ext >> 13) & 7) {
+-    case 0: case 2:
++    case 0:
+         break;
+     case 1:
+         goto undef;
++    case 2:
++        if (insn == 0xf200 && (ext & 0xfc00) == 0x5c00) {
++            /* fmovecr */
++            rom_offset = ext & 0x7f;
++            gen_helper_const_FP0(cpu_env, tcg_const_i32(rom_offset));
++            gen_op_store_fpr_FP0(REG(ext, 7));
++            return;
 +        }
-+        if ((ext & 0x1000) == 0 && !m68k_feature(s->env, M68K_FEATURE_FPU)) {
-+            goto undef;
-         }
-+        gen_op_fmovem(env, s, insn, ext);
-         return;
-     }
-     if (ext & (1 << 14)) {
++        break;
+     case 3: /* fmove out */
+         gen_op_load_fpr_FP0(REG(ext, 7));
+         opsize = ext_opsize(ext, 10);
 -- 
 2.9.3
