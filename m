@@ -1,16 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57884)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cb7LC-0000YJ-GY
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:06:05 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cb7LA-0000Wf-BS
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:06:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cb7L5-00079a-0N
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:05:58 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cb7L4-00079Q-VY
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:05:56 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue,  7 Feb 2017 18:05:34 +0300
-Message-Id: <1486479940-163258-12-git-send-email-vsementsov@virtuozzo.com>
-In-Reply-To: <1486479940-163258-1-git-send-email-vsementsov@virtuozzo.com>
-References: <1486479940-163258-1-git-send-email-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 11/17] migration: add is_active_iterate handler
+Date: Tue,  7 Feb 2017 18:05:23 +0300
+Message-Id: <1486479940-163258-1-git-send-email-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v5 00/17] Dirty bitmaps postcopy migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,44 +20,224 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, vsementsov@virtuozzo.com, lirans@il.ibm.com
 
-Only-postcopy savevm states (dirty-bitmap) don't need live iteration, so
-to disable them and stop transporting empty sections there is a new
-savevm handler.
+Hi all!
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
----
- include/migration/vmstate.h | 1 +
- migration/savevm.c          | 5 +++++
- 2 files changed, 6 insertions(+)
+There is a new version of dirty bitmap postcopy migration series.
 
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index da62a73..6049deb 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -47,6 +47,7 @@ typedef struct SaveVMHandlers {
-     /* This runs both outside and inside the iothread lock.  */
-     bool (*is_active)(void *opaque);
-     bool (*has_postcopy)(void *opaque);
-+    bool (*is_active_iterate)(void *opaque);
- 
-     /* This runs outside the iothread lock in the migration case, and
-      * within the lock in the savevm case.  The callback had better only
-diff --git a/migration/savevm.c b/migration/savevm.c
-index d1bab59..94783e5 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1034,6 +1034,11 @@ int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy)
-                 continue;
-             }
-         }
-+        if (se->ops && se->ops->is_active_iterate) {
-+            if (!se->ops->is_active_iterate(se->opaque)) {
-+                continue;
-+            }
-+        }
-         /*
-          * In the postcopy phase, any device that doesn't know how to
-          * do postcopy should have saved it's state in the _complete
+v5:
+
+clone: tag postcopy-v5 from https://src.openvz.org/scm/~vsementsov/qemu.git
+online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=postcopy-v5
+
+- move 'signed-off' over 'reviewed-by' in patches.
+
+03,04 - add comments. Hope they will be ok for you, so add Juan's r-b.
+    If not ok - let me know and I'll resend.
+
+06,08,12 - add Max's r-b
+07,09,10,11,12 - add Juan's r-b
+
+14 - used last version of this patch from qcow2-bitmap series with 
+     Max's r-b. It has contextual changes due to different base.
+
+15 - fix 041 iotest, add default node-name only if path is specified and
+     node-name is not specified
+16 - handle whitespaces
+       s/"exec: cat " + fifo/"exec: cat '" + fifo + "'"/
+     fix indentation
+     add Max's r-b
+17 - fix typos, wrong size in comment, s/md5/sha256/
+     add Max's r-b
+
+v4:
+
+clone: tag postcopy-v4 from https://src.openvz.org/scm/~vsementsov/qemu.git
+online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=postcopy-v4
+
+reroll, to fix "failed automatic build test"
+
+rebase on master!
+
+07: since 2.8 -> since 2.9
+14: fix build of test-hbitmap
+    since 2.8 -> since 2.9 and small rewording of comment (this change was not done for
+    same patch in may parallels series about qcow2 bitmap extension)
+
+v3:
+
+rebased on Max's block branch: https://github.com/XanClic/qemu/commits/block
+clone: tag postcopy-v3 from https://src.openvz.org/scm/~vsementsov/qemu.git
+online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=postcopy-v3
+
+01  - r-b by Juan
+02  - r-b by Juan and David
+04  - fix indent
+07  - s/since 2.6/since 2.8/
+10  - change variable name s/buf/str/
+12  - improve copyright message and move it up
+      fix memory loss (thanks to Juan)
+      switch from DPRINTF to trace events
+14* - switch to sha256 and qcrypto_hash_*
+      separate qmp command x-debug-block-dirty-bitmap-sha256
+16  - use path_suffix for multi-vm test
+      fix indent
+      fix copyright
+      use x-debug-block-dirty-bitmap-sha256 instead of md5
+17  - use x-debug-block-dirty-bitmap-sha256 instead of md5
+      remove not existing 170 test from qemu-iotests/group
+
+*Note: patch 14 is also used in my second series 'qcow2 persistent dirty bitmaps'
+
+
+v2:
+some bugs fixed, iotests a bit changed and merged into one test.
+based on block-next (https://github.com/XanClic/qemu/commits/block-next)
+clone: tag postcopy-v2 from https://src.openvz.org/scm/~vsementsov/qemu.git
+online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=refs%2Ftags%2Fpostcopy-v2
+
+v1:
+
+These series are derived from my 'Dirty bitmaps migration' series. The
+core idea is switch to postcopy migration and drop usage of meta
+bitmaps.
+
+These patches provide dirty bitmap postcopy migration feature. Only
+named dirty bitmaps are to be migrated. Migration may be enabled using
+migration capabilities.
+
+The overall method (thanks to John Snow):
+
+1. migrate bitmaps meta data in .save_live_setup
+   - create/find related bitmaps on target
+   - disable them
+   - create successors (anonimous children) only for enabled migrated
+     bitmaps
+2. do nothing in precopy stage
+3. just before target vm start: enable successors, created in (1)
+4. migrate bitmap data
+5. reclaime bitmaps (merge successors to their parents)
+6. enable bitmaps (only bitmaps, which was enabled in source)
+
+
+Some patches are unchnaged from (v7) of 'Dirty bitmaps migration'
+(DBMv7). I've left Reviewed-by's for them, if you don't like it, say me
+and I'll drop them in the following version.
+
+So, relatively to last DBMv7: 
+
+01-04: new patches, splitting common postcopy migration out of ram
+       postcopy migration
+   05: equal to DBMv7.05
+   06: new
+   07: equal to DBMv7.06
+   08: new
+   09: equal to DBMv7.07
+   10: new
+   11: derived from DBMv7.08, see below
+12-15: equal to DBMv7.09-12
+   16: derived from DBMv7.13
+       - switch from fifo to socket, as postcopy don't work with fifo
+         for now
+       - change parameters: size, granularity, regions
+       - add time.sleep, to wait for postcopy migration phase (bad
+         temporary solution.
+       - drop Reviewed-by
+   17: new
+
+   11: the core patch of the series, it is derived from
+       [DBMv7.08: migration: add migration_block-dirty-bitmap.c]
+       There are a lot of changes related to switching from precopy to
+       postcopy, but functions related to migration stream itself
+       (structs, send/load sequences) are mostly unchnaged.
+
+       So, changes, to switch from precopy to postcopy:
+       - removed all staff related to meta bitmaps and dirty phase!!!
+       - add dirty_bitmap_mig_enable_successors, and call it before
+         target vm start in loadvm_postcopy_handle_run
+       - add enabled_bitmaps list of bitmaps for
+         dirty_bitmap_mig_enable_successors
+
+       - enabled flag is send with start bitmap chunk instead of
+         completion chunk
+       - sectors_per_chunk is calculated directly from CHUNK_SIZE, not
+         using meta bitmap granularity
+
+       - dirty_bitmap_save_iterate: remove dirty_phase, move bulk_phase
+         to postcopy stage
+       - dirty_bitmap_save_pending: remove dirty phase related pending,
+         switch pending to non-postcopyable
+       - dirty_bitmap_load_start: get enabled flag and prepare
+         successors for enabled bitmaps, also add them to
+         enabled_bitmaps list
+       - dirty_bitmap_load_complete: for enabled bitmaps: merge them
+         with successors and enable
+
+       - savevm handlers:
+         * remove separate savevm_dirty_bitmap_live_iterate_handlers state
+           (it was bad idea, any way), and move its save_live_iterate to
+           savevm_dirty_bitmap_handlers
+         * add is_active_iterate savevm handler, which allows iterations
+           only in postcopy stage (after stopping source vm)
+         * add has_postcopy savevm handler. (ofcourse, just returning true)
+         * use save_live_complete_postcopy instead of
+           save_live_complete_precopy
+
+       Other changes:
+       - some debug output changed
+       - remove MIN_LIVE_SIZE, is_live_iterative and related staff (it
+         was needed to omit iterations if bitmap data is small, possibly
+         this should be reimplemented)
+
+Vladimir Sementsov-Ogievskiy (17):
+  migration: add has_postcopy savevm handler
+  migration: fix ram_save_pending
+  migration: split common postcopy out of ram postcopy
+  migration: introduce postcopy-only pending
+  block: add bdrv_next_dirty_bitmap()
+  block: add bdrv_dirty_bitmap_enable_successor()
+  qapi: add dirty-bitmaps migration capability
+  block/dirty-bitmap: add bdrv_dirty_bitmap_release_successor
+  migration: include migrate_dirty_bitmaps in migrate_postcopy
+  migration/qemu-file: add qemu_put_counted_string()
+  migration: add is_active_iterate handler
+  migration: add postcopy migration of dirty bitmaps
+  iotests: add add_incoming_migration to VM class
+  qmp: add x-debug-block-dirty-bitmap-sha256
+  iotests: add default node-name
+  iotests: add dirty bitmap migration test
+  iotests: add dirty bitmap postcopy test
+
+ block/dirty-bitmap.c           |  30 ++
+ blockdev.c                     |  29 ++
+ include/block/dirty-bitmap.h   |   8 +
+ include/migration/block.h      |   1 +
+ include/migration/migration.h  |   6 +
+ include/migration/qemu-file.h  |   2 +
+ include/migration/vmstate.h    |  19 +-
+ include/qemu/hbitmap.h         |   8 +
+ include/sysemu/sysemu.h        |   5 +-
+ migration/Makefile.objs        |   2 +-
+ migration/block-dirty-bitmap.c | 679 +++++++++++++++++++++++++++++++++++++++++
+ migration/block.c              |   7 +-
+ migration/migration.c          |  66 ++--
+ migration/postcopy-ram.c       |   4 +-
+ migration/qemu-file.c          |  13 +
+ migration/ram.c                |  19 +-
+ migration/savevm.c             |  75 +++--
+ migration/trace-events         |  16 +-
+ qapi-schema.json               |   4 +-
+ qapi/block-core.json           |  27 ++
+ tests/Makefile.include         |   2 +-
+ tests/qemu-iotests/169         | 140 +++++++++
+ tests/qemu-iotests/169.out     |   5 +
+ tests/qemu-iotests/group       |   1 +
+ tests/qemu-iotests/iotests.py  |  15 +-
+ util/hbitmap.c                 |  11 +
+ vl.c                           |   1 +
+ 27 files changed, 1142 insertions(+), 53 deletions(-)
+ create mode 100644 migration/block-dirty-bitmap.c
+ create mode 100755 tests/qemu-iotests/169
+ create mode 100644 tests/qemu-iotests/169.out
+
 -- 
 1.8.3.1
