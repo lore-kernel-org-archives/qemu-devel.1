@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cb9ag-0004L7-5g
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 12:30:12 -0500
+	(envelope-from <bounces@canonical.com>) id 1cb9bO-0004kc-4e
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 12:30:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cb9af-0004Uq-8z
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 12:30:06 -0500
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:32786)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cb9af-0004Ud-2d
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 12:30:05 -0500
-Received: by mail-wr0-x22c.google.com with SMTP id i10so42585373wrb.0
-	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 09:30:04 -0800 (PST)
+	(envelope-from <bounces@canonical.com>) id 1cb9bL-0004y1-Ci
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 12:30:50 -0500
+Received: from indium.canonical.com ([91.189.90.7]:49103)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cb9bK-0004vf-VI
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 12:30:47 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cb9bI-0004w4-Gr
+	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 17:30:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 729EE2E80C1
+	for <qemu-devel@nongnu.org>; Tue,  7 Feb 2017 17:30:44 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170131122416.10284-1-ppandit@redhat.com>
-References: <20170131122416.10284-1-ppandit@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 7 Feb 2017 17:29:43 +0000
-Message-ID: <CAFEAcA_GoD3h2tfM7R5mBQPV9V4bCkA5oKL9EYXiaGq2Gbd3DQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 0/2] sd: sdhci: correct transfer mode
- register usage
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 07 Feb 2017 17:20:49 -0000
+From: Corey Olson <1662600@bugs.launchpad.net>
+Reply-To: Bug 1662600 <1662600@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170207172049.29850.43816.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1662600] [NEW] error while building from source
+ on Ubuntu 16.04
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,24 +36,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Wjjzhang <wjjzhang@tencent.com>, Jiang Xin <jiangxin1@huawei.com>, Prasad J Pandit <pjp@fedoraproject.org>, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: qemu-devel@nongnu.org
 
-On 31 January 2017 at 12:24, P J P <ppandit@redhat.com> wrote:
-> From: Prasad J Pandit <pjp@fedoraproject.org>
->
-> Hello,
->
-> In SDHCI emulation, the 'Block Count Enable' bit of the Transfer Mode
-> register is used to control 's->blkcnt' value. One, this bit is not
-> relevant in single block transfers. Second, Transfer Mode register
-> value could be set such that 's->blkcnt' would not see an update
-> during multi block transfers. Thus leading to an infinite loop.
->
-> This patch set attempts to correct 'Block Count Enable' bit usage.
+Public bug reported:
 
-Edgar, Alistair: the zynq models are our major SDHCI user -- would
-you like to have a look at this patchset, please?
+I'm trying to build Qemu from source (from git) as specified here:
+http://www.qemu-project.org/download/#source
 
-thanks
--- PMM
+Here is the git commit hash for the source:
+7d2c6c95511e42dffe2b263275e09957723d0ff4
+
+During the 'make' step, I get the following error:
+
+migration/rdma.c: In function =E2=80=98qemu_rdma_dump_id=E2=80=99:
+migration/rdma.c:749:21: error: =E2=80=98struct ibv_port_attr=E2=80=99 has =
+no member named =E2=80=98link_layer=E2=80=99
+migration/rdma.c:750:22: error: =E2=80=98struct ibv_port_attr=E2=80=99 has =
+no member named =E2=80=98link_layer=E2=80=99
+migration/rdma.c:750:37: error: =E2=80=98IBV_LINK_LAYER_INFINIBAND=E2=80=99=
+ undeclared (first use in this function)
+migration/rdma.c:750:37: note: each undeclared identifier is reported only =
+once for each function it appears in
+migration/rdma.c:751:24: error: =E2=80=98struct ibv_port_attr=E2=80=99 has =
+no member named =E2=80=98link_layer=E2=80=99
+migration/rdma.c:751:39: error: =E2=80=98IBV_LINK_LAYER_ETHERNET=E2=80=99 u=
+ndeclared (first use in this function)
+migration/rdma.c: In function =E2=80=98qemu_rdma_broken_ipv6_kernel=E2=80=
+=99:
+migration/rdma.c:850:26: error: =E2=80=98struct ibv_port_attr=E2=80=99 has =
+no member named =E2=80=98link_layer=E2=80=99
+migration/rdma.c:850:41: error: =E2=80=98IBV_LINK_LAYER_INFINIBAND=E2=80=99=
+ undeclared (first use in this function)
+migration/rdma.c:852:33: error: =E2=80=98struct ibv_port_attr=E2=80=99 has =
+no member named =E2=80=98link_layer=E2=80=99
+migration/rdma.c:852:48: error: =E2=80=98IBV_LINK_LAYER_ETHERNET=E2=80=99 u=
+ndeclared (first use in this function)
+migration/rdma.c:891:18: error: =E2=80=98struct ibv_port_attr=E2=80=99 has =
+no member named =E2=80=98link_layer=E2=80=99
+make: *** [migration/rdma.o] Error 1
+
+I searched around a bit, my problem seems related to this:
+https://patchwork.kernel.org/patch/992952/
+
+That issue makes me think my libibverbs may be out of date, but I
+checked and I have libibverbs-dev installed.  Is that the correct
+version?
+
+FYI, I installed libibverbs-dev as suggested here: http://wiki.qemu-
+project.org/index.php/Hosts/Linux#Recommended_additional_packages
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1662600
+
+Title:
+  error while building from source on Ubuntu 16.04
+
+Status in QEMU:
+  New
+
+Bug description:
+  I'm trying to build Qemu from source (from git) as specified here:
+  http://www.qemu-project.org/download/#source
+
+  Here is the git commit hash for the source:
+  7d2c6c95511e42dffe2b263275e09957723d0ff4
+
+  During the 'make' step, I get the following error:
+
+  migration/rdma.c: In function =E2=80=98qemu_rdma_dump_id=E2=80=99:
+  migration/rdma.c:749:21: error: =E2=80=98struct ibv_port_attr=E2=80=99 ha=
+s no member named =E2=80=98link_layer=E2=80=99
+  migration/rdma.c:750:22: error: =E2=80=98struct ibv_port_attr=E2=80=99 ha=
+s no member named =E2=80=98link_layer=E2=80=99
+  migration/rdma.c:750:37: error: =E2=80=98IBV_LINK_LAYER_INFINIBAND=E2=80=
+=99 undeclared (first use in this function)
+  migration/rdma.c:750:37: note: each undeclared identifier is reported onl=
+y once for each function it appears in
+  migration/rdma.c:751:24: error: =E2=80=98struct ibv_port_attr=E2=80=99 ha=
+s no member named =E2=80=98link_layer=E2=80=99
+  migration/rdma.c:751:39: error: =E2=80=98IBV_LINK_LAYER_ETHERNET=E2=80=99=
+ undeclared (first use in this function)
+  migration/rdma.c: In function =E2=80=98qemu_rdma_broken_ipv6_kernel=E2=80=
+=99:
+  migration/rdma.c:850:26: error: =E2=80=98struct ibv_port_attr=E2=80=99 ha=
+s no member named =E2=80=98link_layer=E2=80=99
+  migration/rdma.c:850:41: error: =E2=80=98IBV_LINK_LAYER_INFINIBAND=E2=80=
+=99 undeclared (first use in this function)
+  migration/rdma.c:852:33: error: =E2=80=98struct ibv_port_attr=E2=80=99 ha=
+s no member named =E2=80=98link_layer=E2=80=99
+  migration/rdma.c:852:48: error: =E2=80=98IBV_LINK_LAYER_ETHERNET=E2=80=99=
+ undeclared (first use in this function)
+  migration/rdma.c:891:18: error: =E2=80=98struct ibv_port_attr=E2=80=99 ha=
+s no member named =E2=80=98link_layer=E2=80=99
+  make: *** [migration/rdma.o] Error 1
+
+  I searched around a bit, my problem seems related to this:
+  https://patchwork.kernel.org/patch/992952/
+
+  That issue makes me think my libibverbs may be out of date, but I
+  checked and I have libibverbs-dev installed.  Is that the correct
+  version?
+
+  FYI, I installed libibverbs-dev as suggested here: http://wiki.qemu-
+  project.org/index.php/Hosts/Linux#Recommended_additional_packages
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1662600/+subscriptions
