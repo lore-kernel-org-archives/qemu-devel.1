@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cbB1P-00044m-Nn
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 14:01:49 -0500
+	(envelope-from <ppandit@redhat.com>) id 1cbBBj-0006Xb-HA
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 14:12:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cbB1M-0004Hi-KB
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 14:01:47 -0500
-Resent-Message-Id: <E1cbB1M-0004Hi-KB@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21326)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cbB1M-0004Gh-DE
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 14:01:44 -0500
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <1486492645-27803-1-git-send-email-peter.maydell@linaro.org>
-Message-ID: <148649409606.42.7168455069817387854@eba24e3a0d7f>
+	(envelope-from <ppandit@redhat.com>) id 1cbBBe-0008DP-Jp
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 14:12:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56472)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1cbBBe-0008Cy-En
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 14:12:22 -0500
+Date: Wed, 8 Feb 2017 00:42:13 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+In-Reply-To: <CAFEAcA_GoD3h2tfM7R5mBQPV9V4bCkA5oKL9EYXiaGq2Gbd3DQ@mail.gmail.com>
+Message-ID: <alpine.LFD.2.20.1702080036340.11236@wniryva>
+References: <20170131122416.10284-1-ppandit@redhat.com>
+	<CAFEAcA_GoD3h2tfM7R5mBQPV9V4bCkA5oKL9EYXiaGq2Gbd3DQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 7 Feb 2017 11:01:36 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/13] target-arm queue
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH 0/2] sd: sdhci: correct transfer mode
+ register usage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,82 +27,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Wjjzhang <wjjzhang@tencent.com>, Jiang Xin <jiangxin1@huawei.com>, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwMC8xM10gdGFyZ2V0LWFybSBxdWV1ZQpNZXNzYWdl
-LWlkOiAxNDg2NDkyNjQ1LTI3ODAzLTEtZ2l0LXNlbmQtZW1haWwtcGV0ZXIubWF5ZGVsbEBsaW5h
-cm8ub3JnCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UK
-bj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoK
-IyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxv
-ZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwog
-ICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1h
-dD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3Jp
-cHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAg
-ICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRF
-U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
-YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUK
-IC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8xNDg2NDU0Njc2LTI5MTEyLTEtZ2l0LXNlbmQt
-ZW1haWwtYmhhcmF0YUBsaW51eC52bmV0LmlibS5jb20gLT4gcGF0Y2hldy8xNDg2NDU0Njc2LTI5
-MTEyLTEtZ2l0LXNlbmQtZW1haWwtYmhhcmF0YUBsaW51eC52bmV0LmlibS5jb20KICogW25ldyB0
-YWddICAgICAgICAgcGF0Y2hldy8xNDg2NDkyNjQ1LTI3ODAzLTEtZ2l0LXNlbmQtZW1haWwtcGV0
-ZXIubWF5ZGVsbEBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMTQ4NjQ5MjY0NS0yNzgwMy0xLWdpdC1z
-ZW5kLWVtYWlsLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwogLSBbdGFnIHVwZGF0ZV0gICAgICBw
-YXRjaGV3LzIwMTcwMjAzMTYwNjUxLjE5OTE3LTEtZGdpbGJlcnRAcmVkaGF0LmNvbSAtPiBwYXRj
-aGV3LzIwMTcwMjAzMTYwNjUxLjE5OTE3LTEtZGdpbGJlcnRAcmVkaGF0LmNvbQogLSBbdGFnIHVw
-ZGF0ZV0gICAgICBwYXRjaGV3LzIwMTcwMjA2MTEyOTUzLjE2OTkzLTEtYmVycmFuZ2VAcmVkaGF0
-LmNvbSAtPiBwYXRjaGV3LzIwMTcwMjA2MTEyOTUzLjE2OTkzLTEtYmVycmFuZ2VAcmVkaGF0LmNv
-bQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMTcwMjA3MTM1MjExLjE1ODcwLTEtbWFy
-Y2FuZHJlLmx1cmVhdUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxNzAyMDcxMzUyMTEuMTU4NzAt
-MS1tYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
-ZXN0Jwo0MmQ2YWRjIHN0ZWxsYXJpczogVXNlIHRoZSAndW5pbXBsZW1lbnRlZCcgZGV2aWNlIGZv
-ciBwYXJ0cyB3ZSBkb24ndCBpbXBsZW1lbnQKNDM3ZGMzOSBody9taXNjOiBOZXcgInVuaW1wbGVt
-ZW50ZWQiIHN5c2J1cyBkZXZpY2UKY2Y3NjNhMCBzdGVsbGFyaXM6IERvY3VtZW50IG1lbW9yeSBt
-YXAgYW5kIHdoaWNoIFNvQyBkZXZpY2VzIGFyZSB1bmltcGxlbWVudGVkCmY5ZDgxNzkgdGFyZ2V0
-L2FybTogQTMyLCBUMzI6IENyZWF0ZSBJbnN0cnVjdGlvbiBTeW5kcm9tZXMgZm9yIERhdGEgQWJv
-cnRzCjlhN2FhOWUgdGFyZ2V0L2FybTogQWJzdHJhY3Qgb3V0IHBiaXQvd2JpdCB0ZXN0cyBpbiBB
-Uk0gbGRyL3N0ciBkZWNvZGUKOWQzNjJjNSBhcm06IENvcnJlY3RseSBoYW5kbGUgd2F0Y2hwb2lu
-dHMgZm9yIEJFMzIgQ1BVcwphNDU0ODY1IEZpeCBUaHVtYi0xIEJFMzIgZXhlY3V0aW9uIGFuZCBk
-aXNhc3NlbWJseS4KNzUzYTFkMiB0YXJnZXQvYXJtOiBBZGQgY2ZnZW5kIHBhcmFtZXRlciBmb3Ig
-QVJNIENQVSBzZWxlY3Rpb24uCjdkZGIzYzQgaHcvYXJtL2ludGVncmF0b3JjcDogU3VwcG9ydCBz
-cGVjaWZ5aW5nIGZlYXR1cmVzIHZpYSAtY3B1CjQ5YjAzNGQgc2Q6IHNkaGNpOiBjaGVjayBkYXRh
-IGxlbmd0aCBkdXJpbmcgZG1hX21lbW9yeV9yZWFkCjBhZTgxZTQgYXNwZWVkOiBhZGQgYSB3YXRj
-aGRvZyBjb250cm9sbGVyCmQ3ZTlkZTUgd2R0OiBBZGQgQXNwZWVkIHdhdGNoZG9nIGRldmljZSBt
-b2RlbAplNjc3ODA5IGludGVncmF0b3JjcDogYWRkaW5nIHZtc3RhdGUgZm9yIHNhdmUvcmVzdG9y
-ZQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xMzogaW50ZWdyYXRvcmNw
-OiBhZGRpbmcgdm1zdGF0ZSBmb3Igc2F2ZS9yZXN0b3JlLi4uCkNoZWNraW5nIFBBVENIIDIvMTM6
-IHdkdDogQWRkIEFzcGVlZCB3YXRjaGRvZyBkZXZpY2UgbW9kZWwuLi4KQ2hlY2tpbmcgUEFUQ0gg
-My8xMzogYXNwZWVkOiBhZGQgYSB3YXRjaGRvZyBjb250cm9sbGVyLi4uCkNoZWNraW5nIFBBVENI
-IDQvMTM6IHNkOiBzZGhjaTogY2hlY2sgZGF0YSBsZW5ndGggZHVyaW5nIGRtYV9tZW1vcnlfcmVh
-ZC4uLgpDaGVja2luZyBQQVRDSCA1LzEzOiBody9hcm0vaW50ZWdyYXRvcmNwOiBTdXBwb3J0IHNw
-ZWNpZnlpbmcgZmVhdHVyZXMgdmlhIC1jcHUuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8xMzogdGFyZ2V0
-L2FybTogQWRkIGNmZ2VuZCBwYXJhbWV0ZXIgZm9yIEFSTSBDUFUgc2VsZWN0aW9uLi4uLgpDaGVj
-a2luZyBQQVRDSCA3LzEzOiBGaXggVGh1bWItMSBCRTMyIGV4ZWN1dGlvbiBhbmQgZGlzYXNzZW1i
-bHkuLi4uCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQ0OiBGSUxF
-OiBpbmNsdWRlL2Rpc2FzL2JmZC5oOjI5ODoKKyNkZWZpbmUgSU5TTl9BUk1fQkUzMl5JMHgwMDAx
-MDAwMCQKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNzcgbGluZXMgY2hlY2tlZAoKWW91
-ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggOC8xMzog
-YXJtOiBDb3JyZWN0bHkgaGFuZGxlIHdhdGNocG9pbnRzIGZvciBCRTMyIENQVXMuLi4KRVJST1I6
-IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhl
-c2lzICcoJwojNDk6IEZJTEU6IGluY2x1ZGUvcW9tL2NwdS5oOjIwMDoKKyAgICB2YWRkciAoKmFk
-anVzdF93YXRjaHBvaW50X2FkZHJlc3MpKENQVVN0YXRlICpjcHUsIHZhZGRyIGFkZHIsIGludCBs
-ZW4pOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA4OCBsaW5lcyBjaGVja2VkCgpZb3Vy
-IHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA5LzEzOiB0
-YXJnZXQvYXJtOiBBYnN0cmFjdCBvdXQgcGJpdC93Yml0IHRlc3RzIGluIEFSTSBsZHIvc3RyIGRl
-Y29kZS4uLgpDaGVja2luZyBQQVRDSCAxMC8xMzogdGFyZ2V0L2FybTogQTMyLCBUMzI6IENyZWF0
-ZSBJbnN0cnVjdGlvbiBTeW5kcm9tZXMgZm9yIERhdGEgQWJvcnRzLi4uCkNoZWNraW5nIFBBVENI
-IDExLzEzOiBzdGVsbGFyaXM6IERvY3VtZW50IG1lbW9yeSBtYXAgYW5kIHdoaWNoIFNvQyBkZXZp
-Y2VzIGFyZSB1bmltcGxlbWVudGVkLi4uCkNoZWNraW5nIFBBVENIIDEyLzEzOiBody9taXNjOiBO
-ZXcgInVuaW1wbGVtZW50ZWQiIHN5c2J1cyBkZXZpY2UuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvMTM6
-IHN0ZWxsYXJpczogVXNlIHRoZSAndW5pbXBsZW1lbnRlZCcgZGV2aWNlIGZvciBwYXJ0cyB3ZSBk
-b24ndCBpbXBsZW1lbnQuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
-IHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
-aGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
-YXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
++-- On Tue, 7 Feb 2017, Peter Maydell wrote --+
+| On 31 January 2017 at 12:24, P J P <ppandit@redhat.com> wrote:
+| > In SDHCI emulation, the 'Block Count Enable' bit of the Transfer Mode
+| > register is used to control 's->blkcnt' value. One, this bit is not
+| > relevant in single block transfers. Second, Transfer Mode register
+| > value could be set such that 's->blkcnt' would not see an update
+| > during multi block transfers. Thus leading to an infinite loop.
+| >
+| > This patch set attempts to correct 'Block Count Enable' bit usage.
+| 
+| Edgar, Alistair: the zynq models are our major SDHCI user -- would
+| you like to have a look at this patchset, please?
+
+I suspect following patch would also be required along with the two in this 
+series, not sure.
+
+===
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index d921423..7f3d547 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -1019,7 +1019,11 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t val, 
+unsigned size)
+         /* Writing to last byte of sdmasysad might trigger transfer */
+         if (!(mask & 0xFF000000) && TRANSFERRING_DATA(s->prnsts) && s->blkcnt 
+&&
+                 s->blksize && SDHC_DMA_TYPE(s->hostctl) == SDHC_CTRL_SDMA) {
+-            sdhci_sdma_transfer_multi_blocks(s);
++            if (!(s->trnmod & SDHC_TRNS_MULTI)) {
++                sdhci_sdma_transfer_single_block(s);
++            } else {
++                sdhci_sdma_transfer_multi_blocks(s);
++            }
+         }
+         break;
+     case SDHC_BLKSIZE:
+===
+
+Could you please have a look this one too?
+
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
