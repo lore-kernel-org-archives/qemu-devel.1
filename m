@@ -1,40 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cb5Ud-0007M6-Fg
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 08:07:36 -0500
+	(envelope-from <lprosek@redhat.com>) id 1cb5dJ-0002d4-EW
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 08:16:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cb5UY-0006bu-BL
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 08:07:35 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52121)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cb5UY-0006b5-1v
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 08:07:30 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v17Crtuq053060
-	for <qemu-devel@nongnu.org>; Tue, 7 Feb 2017 08:07:27 -0500
-Received: from e06smtp06.uk.ibm.com (e06smtp06.uk.ibm.com [195.75.94.102])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28eupj58j1-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 08:07:27 -0500
-Received: from localhost
-	by e06smtp06.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Tue, 7 Feb 2017 13:07:20 -0000
-Date: Tue, 7 Feb 2017 14:07:10 +0100
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <62a99d8e-1735-0838-4067-bce401c86526@linux.vnet.ibm.com>
-References: <1484727757-41240-1-git-send-email-arei.gonglei@huawei.com>
-	<1484727757-41240-2-git-send-email-arei.gonglei@huawei.com>
-	<62a99d8e-1735-0838-4067-bce401c86526@linux.vnet.ibm.com>
+	(envelope-from <lprosek@redhat.com>) id 1cb5dE-0007Oc-PJ
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 08:16:33 -0500
+Received: from mail-vk0-f47.google.com ([209.85.213.47]:35740)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1cb5dE-0007NL-JN
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 08:16:28 -0500
+Received: by mail-vk0-f47.google.com with SMTP id x75so77180430vke.2
+	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 05:16:28 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170207140710.01e4b694.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v16 1/2] virtio-crypto: Add
- virtio crypto device specification
+In-Reply-To: <HE1PR0802MB2265F12CE6DF970BC8D0D252AD400@HE1PR0802MB2265.eurprd08.prod.outlook.com>
+References: <1485943606-13998-1-git-send-email-lprosek@redhat.com>
+	<20170201102013.GC3232@redhat.com>
+	<CABdb735fGM9r4tirfOTyK1Jv8oC868nW5rCsNk_X5acoiav1iA@mail.gmail.com>
+	<20170201110320.GD3232@redhat.com>
+	<CABdb737yd8ookNxet=Rp7b6-fux6iiBiS7KrrddtZ2EZVPFKqg@mail.gmail.com>
+	<a03be6ea-a7bd-3b99-a94b-f180ef6f9e0a@openvz.org>
+	<CABdb736+iGndMmYTVcrwRzEwGX9A8uizPthM3_-TYw34-+up_w@mail.gmail.com>
+	<HE1PR0802MB2265F12CE6DF970BC8D0D252AD400@HE1PR0802MB2265.eurprd08.prod.outlook.com>
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Tue, 7 Feb 2017 14:16:27 +0100
+Message-ID: <CABdb735GNrspfp1PSCoHJFPiBQ-OQbo=NLrsY7oBXe00Z-d96g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] qga: implement guest-file-ioctl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,158 +34,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Gonglei <arei.gonglei@huawei.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, luonengjun@huawei.com, mst@redhat.com, stefanha@redhat.com, denglingli@chinamobile.com, Jani.Kokkonen@huawei.com, Ola.Liljedahl@arm.com, Varun.Sethi@freescale.com, xin.zeng@intel.com, brian.a.keating@intel.com, liang.j.ma@intel.com, john.griffin@intel.com, weidong.huang@huawei.com, mike.caraman@nxp.com, agraf@suse.de, claudio.fontana@huawei.com, jianjay.zhou@huawei.com, nmorey@kalray.eu, vincent.jardin@6wind.com, wu.wubin@huawei.com, longpeng2@huawei.com, arei.gonglei@hotmail.com
+To: Alexey Kostyushko <aleksko@virtuozzo.com>
+Cc: Denis Lunev <den@virtuozzo.com>, "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Tue, 7 Feb 2017 12:39:44 +0100
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+On Mon, Feb 6, 2017 at 5:10 PM, Alexey Kostyushko <aleksko@virtuozzo.com> wrote:
+> This info is more about pvpanic patch, but may be relevant here also.
+>
+> Consider that KeInitializeCrashDumpHeader is not enough to create dumps
+> because it copy only primary header
 
-> On 01/18/2017 09:22 AM, Gonglei wrote:
+You mean that the secondary data area is missing? That's by design -
+again, the OS is running, we're not really crashing it so
+BugCheckSecondaryDumpDataCallback's are not invoked.
 
-> > +\section{Crypto Device}\label{sec:Device Types / Crypto Device}
-> > +
-> > +The virtio crypto device is a virtual cryptography device as well as a kind of
-> > +virtual hardware accelerator for virtual machines. The encryption and
-> > +decryption requests are placed in any of the data active queues and are ultimately handled by the
-> 
-> Am I the only one having a problem with 'data active queues'?
+For the actual "crash" crash dumps, we can experiment with
+BugCheckDumpIoCallback which would let us push out the header as well
+as secondary data but that's a non-goal at the moment.
 
-No. I think it looks weird.
+> and doesn't copy KdDebuggerBlock.
 
-(...)
+It contains the pointers from KdDebuggerBlock: PsLoadedModuleList,
+PsActiveProcessHead, and more. In my testing, the dump created from
+KeInitializeCrashDumpHeader and the raw memory image was fully
+functional. If there's anything specific you're concerned about, I can
+check it.
 
-> > +The value of the \field{status} field is VIRTIO_CRYPTO_S_HW_READY or ~VIRTIO_CRYPTO_S_HW_READY.
-> 
-> Not entirely happy with this. What you want to say is reserved
-> for future use, or? Would it make sense to have a general note
-> -- in a similar fashion like for 'sizes are in bytes' -- for
-> reserved for future use? 
-> 
-> One possible formulation would be:
-> 
-> "In this specification, unless explicitly stated otherwise,
-> fields and bits reserved for future use shall be zeroed out.
-> Both the a device or a driver device and the driver should
-> detect violations of this rule, and deny the requested
-> operation in an appropriate way if possible."
+> Look to combine info from KeCapturePersistentThreadState.
 
-If we go with reserved-and-must-be-zero, we need to make rejecting
-non-zero for reserved value a MUST, or we may run into problems later.
+This looks like an undocumented API and I'd like to avoid those if possible.
 
-In this case, I'd opt for a specific formulation, though; like
+> Also whenever amount of RAM is changed (memory hot-plug) you need to
+> recreate headers.
 
-"The \field{status} field can be either zero or have one or more flags
-set. Valid flags are listed below."
+That would be a maybe. We could just patch the memory regions in the
+header to reflect the current memory layout. And there's a chance we
+may need to do it anyways - the physical memory layout that QEMU works
+with doesn't match what Windows sees for some reason. That's one thing
+I need to take a close look at. Thanks!
 
-And then state that non-valid flags MUST NOT be set resp. MUST be
-rejected in a normative statement.
-
-(...)
-
-> > +The following services are defined:
-> > +
-> > +\begin{lstlisting}
-> > +/* CIPHER service */
-> > +#define VIRTIO_CRYPTO_SERVICE_CIPHER 0
-> > +/* HASH service */
-> > +#define VIRTIO_CRYPTO_SERVICE_HASH   1
-> > +/* MAC (Message Authentication Codes) service */
-> > +#define VIRTIO_CRYPTO_SERVICE_MAC    2
-> > +/* AEAD (Authenticated Encryption with Associated Data) service */
-> > +#define VIRTIO_CRYPTO_SERVICE_AEAD   3
-> > +\end{lstlisting}
-> > +
-> > +The last driver-read-only fields specify detailed algorithms masks 
-> > +the device offers for corresponding services. The following CIPHER algorithms
-> > +are defined:
-> 
-> You do not establish an explicit relationship between the fields and the
-> macros for the flags. These are flags or? It seems quite common in the
-> spec to use _F_ in flag names. Would it be appropriate here?
-
-The values as specified do not look very flaggy to me...
-
-> 
-> > +
-> > +\begin{lstlisting}
-> > +#define VIRTIO_CRYPTO_NO_CIPHER                 0
-> > +#define VIRTIO_CRYPTO_CIPHER_ARC4               1
-> > +#define VIRTIO_CRYPTO_CIPHER_AES_ECB            2
-> > +#define VIRTIO_CRYPTO_CIPHER_AES_CBC            3
-> > +#define VIRTIO_CRYPTO_CIPHER_AES_CTR            4
-> > +#define VIRTIO_CRYPTO_CIPHER_DES_ECB            5
-> > +#define VIRTIO_CRYPTO_CIPHER_DES_CBC            6
-> > +#define VIRTIO_CRYPTO_CIPHER_3DES_ECB           7
-> > +#define VIRTIO_CRYPTO_CIPHER_3DES_CBC           8
-> > +#define VIRTIO_CRYPTO_CIPHER_3DES_CTR           9
-> > +#define VIRTIO_CRYPTO_CIPHER_KASUMI_F8          10
-> > +#define VIRTIO_CRYPTO_CIPHER_SNOW3G_UEA2        11
-> > +#define VIRTIO_CRYPTO_CIPHER_AES_F8             12
-> > +#define VIRTIO_CRYPTO_CIPHER_AES_XTS            13
-> > +#define VIRTIO_CRYPTO_CIPHER_ZUC_EEA3           14
-> > +\end{lstlisting}
-> > +
-> > +The following HASH algorithms are defined:
-> > +
-> > +\begin{lstlisting}
-> > +#define VIRTIO_CRYPTO_NO_HASH            0
-> > +#define VIRTIO_CRYPTO_HASH_MD5           1
-> > +#define VIRTIO_CRYPTO_HASH_SHA1          2
-> > +#define VIRTIO_CRYPTO_HASH_SHA_224       3
-> > +#define VIRTIO_CRYPTO_HASH_SHA_256       4
-> > +#define VIRTIO_CRYPTO_HASH_SHA_384       5
-> > +#define VIRTIO_CRYPTO_HASH_SHA_512       6
-> > +#define VIRTIO_CRYPTO_HASH_SHA3_224      7
-> > +#define VIRTIO_CRYPTO_HASH_SHA3_256      8
-> > +#define VIRTIO_CRYPTO_HASH_SHA3_384      9
-> > +#define VIRTIO_CRYPTO_HASH_SHA3_512      10
-> > +#define VIRTIO_CRYPTO_HASH_SHA3_SHAKE128      11
-> > +#define VIRTIO_CRYPTO_HASH_SHA3_SHAKE256      12
-> > +\end{lstlisting}
-> > +
-> > +The following MAC algorithms are defined:
-> > +
-> > +\begin{lstlisting}
-> > +#define VIRTIO_CRYPTO_NO_MAC                       0
-> > +#define VIRTIO_CRYPTO_MAC_HMAC_MD5                 1
-> > +#define VIRTIO_CRYPTO_MAC_HMAC_SHA1                2
-> > +#define VIRTIO_CRYPTO_MAC_HMAC_SHA_224             3
-> > +#define VIRTIO_CRYPTO_MAC_HMAC_SHA_256             4
-> > +#define VIRTIO_CRYPTO_MAC_HMAC_SHA_384             5
-> > +#define VIRTIO_CRYPTO_MAC_HMAC_SHA_512             6
-> > +#define VIRTIO_CRYPTO_MAC_CMAC_3DES                25
-> > +#define VIRTIO_CRYPTO_MAC_CMAC_AES                 26
-> > +#define VIRTIO_CRYPTO_MAC_KASUMI_F9                27
-> > +#define VIRTIO_CRYPTO_MAC_SNOW3G_UIA2              28
-> > +#define VIRTIO_CRYPTO_MAC_GMAC_AES                 41
-> > +#define VIRTIO_CRYPTO_MAC_GMAC_TWOFISH             42
-> > +#define VIRTIO_CRYPTO_MAC_CBCMAC_AES               49
-> > +#define VIRTIO_CRYPTO_MAC_CBCMAC_KASUMI_F9         50
-> > +#define VIRTIO_CRYPTO_MAC_XCBC_AES                 53
-> > +#define VIRTIO_CRYPTO_MAC_ZUC_EIA3                 54
-> > +\end{lstlisting}
-> > +
-> > +The following AEAD algorithms are defined:
-> > +
-> > +\begin{lstlisting}
-> > +#define VIRTIO_CRYPTO_NO_AEAD     0
-> > +#define VIRTIO_CRYPTO_AEAD_GCM    1
-> > +#define VIRTIO_CRYPTO_AEAD_CCM    2
-> > +#define VIRTIO_CRYPTO_AEAD_CHACHA20_POLY1305  3
-> > +\end{lstlisting}
-> > +
-> 
-> Would it make sense to interleave the flag definition
-> with the struct virtio_crypto_config?
-> 
-> > +\begin{note}
-> > +Any other values are reserved for future use.
-> 
-> Are these flags or values? I do not think values is appropriate here.
-
-These look like values to me and not flags.
-
-The more I stare at this, the more confused I become. Is the device
-supposed to indicate exactly one algorithm only? Or are these supposed
-to be bit numbers? (If yes, it would make sense to either call them
-that or specify flags in the (1 << bit_num) notation.)
+> I think that there should be virtio direct channel for general purposes of
+> dumping and guest-agent channel may be usefull for obtainin varoius
+>
+> info from guest drivers through ioctls and providing live-dump feature.
+>
+> ________________________________
+> From: Ladi Prosek <lprosek@redhat.com>
+> Sent: Monday, February 6, 2017 6:50:43 PM
+> To: Denis Lunev
+> Cc: Daniel P. Berrange; qemu-devel; Michael Roth; Alexey Kostyushko
+> Subject: Re: [Qemu-devel] [PATCH] qga: implement guest-file-ioctl
+>
+> On Mon, Feb 6, 2017 at 4:37 PM, Denis V. Lunev <den@openvz.org> wrote:
+>> On 02/01/2017 04:41 PM, Ladi Prosek wrote:
+>>> On Wed, Feb 1, 2017 at 12:03 PM, Daniel P. Berrange <berrange@redhat.com>
+>>> wrote:
+>>>> On Wed, Feb 01, 2017 at 11:50:43AM +0100, Ladi Prosek wrote:
+>>>>> On Wed, Feb 1, 2017 at 11:20 AM, Daniel P. Berrange
+>>>>> <berrange@redhat.com> wrote:
+>>>>>> On Wed, Feb 01, 2017 at 11:06:46AM +0100, Ladi Prosek wrote:
+>>>>>>> Analogous to guest-file-read and guest-file-write, this commit adds
+>>>>>>> support for issuing IOCTLs to files in the guest. With the goal of
+>>>>>>> abstracting away the differences between Posix ioctl() and Win32
+>>>>>>> DeviceIoControl() to provide one unified API, the schema
+>>>>>>> distinguishes
+>>>>>>> between input and output buffer sizes (as required by Win32) and
+>>>>>>> allows the caller to supply either a 'buffer', pointer to which will
+>>>>>>> be passed to the Posix ioctl(), or an integer argument, passed to
+>>>>>>> ioctl() directly.
+>>>>>> What is the intended usage scenario for this ?
+>>>>> My specific case is extracting a piece of data from Windows guests.
+>>>>> Guest driver exposes a file object with a well-known IOCTL code to
+>>>>> return a data structure from the kernel.
+>>>> Please provide more information about what you're trying to do.
+>>>>
+>>>> If we can understand the full details it might suggest a different
+>>>> approach that exposing a generic ioctl passthrough facility.
+>>> The end goal is to be able to create a Window crash dump file from a
+>>> running (or crashed, but running is more interesting because Windows
+>>> can't do that by itself) Windows VM. To do that without resorting to
+>>> hacks, the host application driving this needs to get the crash dump
+>>> header, which Windows provides in its KeInitializeCrashDumpHeader
+>>> kernel API.
+>>>
+>>> I believe that the most natural way to do this is to have
+>>> 1) a driver installed in the guest providing a way to call
+>>> KeInitializeCrashDumpHeader from user space
+>>> 2) an agent in the guest, running in user space, calling the driver
+>>> and passing the result back to the host
+>>>
+>>> Now 2) may as well be an existing agent, such as the QEMU guest agent,
+>>> and that's why I am here :)
+>>>
+>>> KeInitializeCrashDumpHeader returns an opaque byte array, happens to
+>>> be 8192 bytes at the moment. My first choice for the kernel-user
+>>> interface in the guest is IOCTL because what I'm trying to get across
+>>> is a block, a "datagram", not a stream, and I have the option for
+>>> easily adding more functionality later by adding more IOCTL codes with
+>>> the file object still representing "the driver".
+>>>
+>>> I could use regular file I/O as well. I would either have to devise a
+>>> protocol for talking to the driver, have a way of delimiting messages,
+>>> re-syncing the channel etc., or make a slight semantic shift and
+>>> instead of the file object representing the driver, it would represent
+>>> this one particular function of the driver. Opening the file and
+>>> reading from it until eof would yield the crash dump header.
+>> I think that this is not as good as can be for the whole design of the
+>> feature.
+>> The problem here is that userspace starts toooooooooo late and is not
+>> accessible when the guest BSODS and we do need a dump for analysis.
+>>
+>> May be it worth to push this header to QEMU at boot time through virtio
+>> bus?
+>
+> Yes, definitely an option. I believe that having the ability to create
+> a dump out of a live system, i.e. without crashing it, is what adds
+> the most value here. And that would most likely happen on an
+> up-and-running guest so the difference between being able to do it
+> after a kernel driver loads and after a user space service starts is
+> not that significant.
+>
+> Still, the sooner the better, for sure. I think I've seen
+> virtio-pstore suggested as a possible channel to use to push the
+> header.
+>
+> Thanks!
+>
+>> Den
