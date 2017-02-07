@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42024)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cb7zs-0002K8-40
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:48:01 -0500
+	(envelope-from <eblake@redhat.com>) id 1cb82m-0004VC-Ls
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:51:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cb7zp-0008WI-2l
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:48:00 -0500
-References: <cover.1486436185.git.sam.bobroff@au1.ibm.com>
-	<900ea185630c17f315c4984b2a595b2d3fba7c9a.1486436186.git.sam.bobroff@au1.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <981353e3-1ca7-6fcb-ef5e-86b9a335b6ed@redhat.com>
-Date: Tue, 7 Feb 2017 16:47:53 +0100
+	(envelope-from <eblake@redhat.com>) id 1cb82i-0001Sp-JW
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:51:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36536)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cb82i-0001SQ-BD
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:50:56 -0500
+References: <1483596532-14552-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1483596532-14552-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7fd43c21-f16c-e9ef-7a3b-90b4e2949eed@redhat.com>
+Date: Tue, 7 Feb 2017 09:50:53 -0600
 MIME-Version: 1.0
-In-Reply-To: <900ea185630c17f315c4984b2a595b2d3fba7c9a.1486436186.git.sam.bobroff@au1.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH 1/9] spapr: fix off-by-one
- error in spapr_ovec_populate_dt()
+In-Reply-To: <1483596532-14552-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ICXe3CeckdTvjI1PLoXgmHifWcxKTF2UI"
+Subject: Re: [Qemu-devel] [PATCH V6 2/2] Add a new qmp command to do
+ checkpoint, query xen replication status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,36 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sam Bobroff <sam.bobroff@au1.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
+Cc: Jason Wang <jasowang@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Bian Naimeng <biannm@cn.fujitsu.com>, "eddie . dong" <eddie.dong@intel.com>, Wen Congyang <wencongyang@gmail.com>
 
-On 07.02.2017 03:56, Sam Bobroff wrote:
-> The last byte of the option vector was missing due to an off-by-one
-> error. Without this fix, client architecture support negotiation will
-> fail because the last byte of option vector 5, which contains the MMU
-> support, will be missed.
-> 
-> Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ICXe3CeckdTvjI1PLoXgmHifWcxKTF2UI
+From: Eric Blake <eblake@redhat.com>
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>,
+ qemu devel <qemu-devel@nongnu.org>
+Cc: Jason Wang <jasowang@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>,
+ Bian Naimeng <biannm@cn.fujitsu.com>, "eddie . dong" <eddie.dong@intel.com>,
+ Wen Congyang <wencongyang@gmail.com>
+Message-ID: <7fd43c21-f16c-e9ef-7a3b-90b4e2949eed@redhat.com>
+Subject: Re: [PATCH V6 2/2] Add a new qmp command to do checkpoint, query xen
+ replication status
+References: <1483596532-14552-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+ <1483596532-14552-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+In-Reply-To: <1483596532-14552-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 01/05/2017 12:08 AM, Zhang Chen wrote:
+> We can call this qmp command to do checkpoint outside of qemu.
+> Xen colo will need this function.
+>=20
+> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+> Signed-off-by: Wen Congyang <wencongyang@gmail.com>
 > ---
->  hw/ppc/spapr_ovec.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/ppc/spapr_ovec.c b/hw/ppc/spapr_ovec.c
-> index 4f4c090a29..18dbc4a9ac 100644
-> --- a/hw/ppc/spapr_ovec.c
-> +++ b/hw/ppc/spapr_ovec.c
-> @@ -251,7 +251,7 @@ int spapr_ovec_populate_dt(void *fdt, int fdt_offset,
->          }
->      }
->  
-> -    return fdt_setprop(fdt, fdt_offset, name, vec, vec_len);
-> +    return fdt_setprop(fdt, fdt_offset, name, vec, vec_len + 1);
->  }
+>  docs/qmp-commands.txt | 24 ++++++++++++++++++++++++
 
-It took a while 'til I understood the encoding / length calculation of
-the property here, but I think you're right. According to LoPAPR the
-total length of the property is n+2 where n is the value of the first
-byte. Since n is vec_len-1 in the QEMU code, vec_len+1 is the right
-value for the property length.
+This file no longer exists since commit 4d8bb958; can you please rebase
+this and post a v7? (The docs now live directly in the qapi-schema.json
+file).
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+>  migration/colo.c      | 17 +++++++++++++++++
+>  qapi-schema.json      | 50 +++++++++++++++++++++++++++++++++++++++++++=
++++++++
+>  3 files changed, 91 insertions(+)
+
+It looks like you have addressed all my concerns from earlier versions,
+though, so the API seems reasonable.
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--ICXe3CeckdTvjI1PLoXgmHifWcxKTF2UI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYmezdAAoJEKeha0olJ0NqaJ8H/2sHLeplcWBvVKeiSZeTlmxd
+h2eZsCoZv2qOhU4t9STYJVpVh9yZyMV1tyuWbQqtfBcNCqwiotvqtLCebVIt2Bqx
+vsHOTTi7kqP9zV/sKeBNQGfejy4iGT3FfX+PpRpWYVp7P1oo4WcRvLLLsXwifjQK
+uYNuGBERMzAGRswZKHwWJ3i8jBqFZx3glP5rx8qE4AjmdD/1cOitps/zJR96yd8b
+mMN4FSITUFalqBdzaa27mKhqrYX7eDiGhg5noJKJOwsaY+U0ssbp81Sv/0FC5oHp
+P6Jb37hOtTSx/KMmDdoCpvvscL0CNIi3pKGAWNYsnuksSVIvjfDXxLeyjeh2HRo=
+=7wfG
+-----END PGP SIGNATURE-----
+
+--ICXe3CeckdTvjI1PLoXgmHifWcxKTF2UI--
