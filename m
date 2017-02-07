@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cauHk-0003vx-Hl
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 20:09:33 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cauXj-0006Z7-Cc
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 20:26:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cauHg-0000QZ-Ie
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 20:09:32 -0500
-Received: from [45.249.212.189] (port=2387 helo=dggrg03-dlp.huawei.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cauHX-0007OJ-Vx
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 20:09:28 -0500
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Tue, 7 Feb 2017 00:59:42 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA1AF46A@DGGEMA505-MBX.china.huawei.com>
-References: <1484727757-41240-1-git-send-email-arei.gonglei@huawei.com>
-	<1484727757-41240-2-git-send-email-arei.gonglei@huawei.com>
-	<20170203103316.GA29200@stefanha-x1.localdomain>
-	<33183CC9F5247A488A2544077AF19020DA1AED04@DGGEMA505-MBX.china.huawei.com>
-	<20170206154625.GB32590@stefanha-x1.localdomain>
-	<20170206201814-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20170206201814-mutt-send-email-mst@kernel.org>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <no-reply@patchew.org>) id 1cauXf-00055b-Dg
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 20:26:03 -0500
+Resent-Message-Id: <E1cauXf-00055b-Dg@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21308)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cauXf-00053j-7E
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 20:25:59 -0500
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20170207005930.28327-1-laurent@vivier.eu>
+Message-ID: <148643073646.42.17325505123021550845@eba24e3a0d7f>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v16 1/2] virtio-crypto: Add virtio crypto
- device specification
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 6 Feb 2017 17:25:37 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3 00/16] target-m68k: implement 680x0 FPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,59 +28,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Huangweidong (C)" <weidong.huang@huawei.com>, "john.griffin@intel.com" <john.griffin@intel.com>, "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "Varun.Sethi@freescale.com" <Varun.Sethi@freescale.com>, "denglingli@chinamobile.com" <denglingli@chinamobile.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>, "agraf@suse.de" <agraf@suse.de>, "nmorey@kalray.eu" <nmorey@kalray.eu>, longpeng <longpeng2@huawei.com>, "vincent.jardin@6wind.com" <vincent.jardin@6wind.com>, "Ola.Liljedahl@arm.com" <Ola.Liljedahl@arm.com>, Luonengjun <luonengjun@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "liang.j.ma@intel.com" <liang.j.ma@intel.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>, "brian.a.keating@intel.com" <brian.a.keating@intel.com>, "claudio.fontana@huawei.com" <claudio.fontana@huawei.com>, "mike.caraman@nxp.com" <mike.caraman@nxp.com>, "Wubin (H)" <wu.wubin@huawei.com>
+To: laurent@vivier.eu
+Cc: famz@redhat.com, qemu-devel@nongnu.org, aurelien@aurel32.net, rth@twiddle.net
 
-Hi,
-
-> From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> Sent: Tuesday, February 07, 2017 2:20 AM
-> Subject: Re: [Qemu-devel] [PATCH v16 1/2] virtio-crypto: Add virtio crypt=
-o
-> device specification
->=20
-> On Mon, Feb 06, 2017 at 03:46:25PM +0000, Stefan Hajnoczi wrote:
-> > On Mon, Feb 06, 2017 at 01:48:09AM +0000, Gonglei (Arei) wrote:
-> > > > > +\item The device MUST set \field{max_size} to show the maximum s=
-ize
-> of
-> > > > crypto request the device supports.
-> > > >
-> > > > In bytes?
-> > > >
-> > > > > +\item The device MUST set \field{max_cipher_key_len} to show the
-> > > > maximum length of cipher key if the device supports CIPHER service.
-> > > >
-> > > > In bits or bytes?
-> > > >
-> > > > > +\item The device MUST set \field{max_auth_key_len} to show the
-> maximum
-> > > > length of authenticated key if the device supports MAC service.
-> > > >
-> > > > In bits or bytes?
-> > > >
-> > >
-> > > All lengths in virtio crypto spec are bytes.
-> >
-> > Please move this before the first length field is defined:
-> >
-> >   +\begin{note}
-> >   +The basic unit of all data length the byte.
-> >   +\end{note}
->=20
-> And I'd rewrite as
->=20
->    All data length fields specify the length in bytes.
->=20
-
-Okay, will do it.
-
-BTW if no other objections or comments,=20
-I'd like to send v17 as the final version to ballot, can I?
-
-Thanks,
--Gonglei
-
-> >
-> > It should be at the beginning of the spec.
->=20
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMDAvMTZdIHRhcmdldC1tNjhrOiBpbXBsZW1l
+bnQgNjgweDAgRlBVCk1lc3NhZ2UtaWQ6IDIwMTcwMjA3MDA1OTMwLjI4MzI3LTEtbGF1cmVudEB2
+aXZpZXIuZXUKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFz
+ZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0w
+CgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
+dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQg
+bG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRv
+CiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9y
+bWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Nj
+cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQog
+ICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0g
+VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
+NDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVt
+dQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTcwMjA3MDA1OTMwLjI4MzI3LTEtbGF1
+cmVudEB2aXZpZXIuZXUgLT4gcGF0Y2hldy8yMDE3MDIwNzAwNTkzMC4yODMyNy0xLWxhdXJlbnRA
+dml2aWVyLmV1ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMjRmZWYwOSB0YXJnZXQt
+bTY4azogYWRkIGZzaW5jb3MKMzE5MzZlNiB0YXJnZXQtbTY4azogYWRkIG1vcmUgRlBVIGluc3Ry
+dWN0aW9ucwowNGY1YTI5IHRhcmdldC1tNjhrOiBhZGQgZXhwbGljaXQgc2luZ2xlIGFuZCBkb3Vi
+bGUgcHJlY2lzaW9uIG9wZXJhdGlvbnMKODExN2I5ZCB0YXJnZXQtbTY4azogYWRkIGZzZ2xtdWwg
+YW5kIGZzZ2xkaXYKYTExNDAwZSB0YXJnZXQtbTY4azogYWRkIGZzY2FsZSwgZmdldG1hbiwgZmdl
+dGV4cCBhbmQgZm1vZAoyMmE4NjI0IHRhcmdldC1tNjhrOiBhZGQgZm1vdmVjcgo4NWQ5ODMzIHRh
+cmdldC1tNjhrOiBhZGQgZnNjYy4KNDAzYWE4NyB0YXJnZXQtbTY4azogYWRkIGZtb3ZlbQpmNTM3
+MjVlIHRhcmdldC1tNjhrOiBkZWZpbmUgOTZiaXQgRlAgcmVnaXN0ZXJzIGZvciBnZGIgb24gNjgw
+eDAKMGEwMTIxNSB0YXJnZXQtbTY4azogbWFuYWdlIEZQVSBleGNlcHRpb25zCjE5NGQ5NTQgdGFy
+Z2V0LW02OGs6IGFkZCBGUENSIGFuZCBGUFNSCjJhZTMwMTAgdGFyZ2V0LW02OGs6IHVzZSBmbG9h
+dHg4MCBpbnRlcm5hbGx5Cjc4MzNkMjQgdGFyZ2V0LW02OGs6IGRlZmluZSBleHRfb3BzaXplCjk3
+MWMzZmQgdGFyZ2V0LW02OGs6IG1vdmUgRlBVIGhlbHBlcnMgdG8gZnB1X2hlbHBlci5jCjIxNGFm
+MWUgc29mdGxvYXQ6IGRpc2FibGUgZmxvYXR4ODBfaW52YWxpZF9lbmNvZGluZygpIGZvciBtNjhr
+CjcxYTNhODAgc29mdGZsb2F0OiBkZWZpbmUgNjgweDAgc3BlY2lmaWMgdmFsdWVzCgo9PT0gT1VU
+UFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE2OiBzb2Z0ZmxvYXQ6IGRlZmluZSA2ODB4
+MCBzcGVjaWZpYyB2YWx1ZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xNjogc29mdGxvYXQ6IGRpc2Fi
+bGUgZmxvYXR4ODBfaW52YWxpZF9lbmNvZGluZygpIGZvciBtNjhrLi4uCkNoZWNraW5nIFBBVENI
+IDMvMTY6IHRhcmdldC1tNjhrOiBtb3ZlIEZQVSBoZWxwZXJzIHRvIGZwdV9oZWxwZXIuYy4uLgpD
+aGVja2luZyBQQVRDSCA0LzE2OiB0YXJnZXQtbTY4azogZGVmaW5lIGV4dF9vcHNpemUuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggNS8xNjogdGFyZ2V0LW02OGs6IHVzZSBmbG9hdHg4MCBpbnRlcm5hbGx5Li4u
+CkVSUk9SOiBzdG9yYWdlIGNsYXNzIHNob3VsZCBiZSBhdCB0aGUgYmVnaW5uaW5nIG9mIHRoZSBk
+ZWNsYXJhdGlvbgojNDU3OiBGSUxFOiB0YXJnZXQvbTY4ay90cmFuc2xhdGUuYzozOToKKyNkZWZp
+bmUgREVGRjk2KG5hbWUsIG9mZnNldCkgc3RhdGljIFRDR3ZfaTMyIFFSRUdfIyNuYW1lIyNIOyBc
+Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDEyMDQgbGluZXMgY2hlY2tlZAoKWW91ciBw
+YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
+ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
+IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNi8xNjogdGFy
+Z2V0LW02OGs6IGFkZCBGUENSIGFuZCBGUFNSLi4uCkNoZWNraW5nIFBBVENIIDcvMTY6IHRhcmdl
+dC1tNjhrOiBtYW5hZ2UgRlBVIGV4Y2VwdGlvbnMuLi4KQ2hlY2tpbmcgUEFUQ0ggOC8xNjogdGFy
+Z2V0LW02OGs6IGRlZmluZSA5NmJpdCBGUCByZWdpc3RlcnMgZm9yIGdkYiBvbiA2ODB4MC4uLgpD
+aGVja2luZyBQQVRDSCA5LzE2OiB0YXJnZXQtbTY4azogYWRkIGZtb3ZlbS4uLgpDaGVja2luZyBQ
+QVRDSCAxMC8xNjogdGFyZ2V0LW02OGs6IGFkZCBmc2NjLi4uLgpDaGVja2luZyBQQVRDSCAxMS8x
+NjogdGFyZ2V0LW02OGs6IGFkZCBmbW92ZWNyLi4uCkNoZWNraW5nIFBBVENIIDEyLzE2OiB0YXJn
+ZXQtbTY4azogYWRkIGZzY2FsZSwgZmdldG1hbiwgZmdldGV4cCBhbmQgZm1vZC4uLgpDaGVja2lu
+ZyBQQVRDSCAxMy8xNjogdGFyZ2V0LW02OGs6IGFkZCBmc2dsbXVsIGFuZCBmc2dsZGl2Li4uCkNo
+ZWNraW5nIFBBVENIIDE0LzE2OiB0YXJnZXQtbTY4azogYWRkIGV4cGxpY2l0IHNpbmdsZSBhbmQg
+ZG91YmxlIHByZWNpc2lvbiBvcGVyYXRpb25zLi4uCkNoZWNraW5nIFBBVENIIDE1LzE2OiB0YXJn
+ZXQtbTY4azogYWRkIG1vcmUgRlBVIGluc3RydWN0aW9ucy4uLgpDaGVja2luZyBQQVRDSCAxNi8x
+NjogdGFyZ2V0LW02OGs6IGFkZCBmc2luY29zLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBj
+b21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
+Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
+ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
