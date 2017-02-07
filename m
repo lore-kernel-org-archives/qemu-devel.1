@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1caz4z-0007Pq-En
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 01:16:43 -0500
+	(envelope-from <famz@redhat.com>) id 1caz7J-0000FP-0S
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 01:19:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1caz4w-0004J9-BI
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 01:16:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60638)
+	(envelope-from <famz@redhat.com>) id 1caz7F-0005lU-UW
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 01:19:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40198)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1caz4w-0004Iv-67
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 01:16:38 -0500
-Date: Tue, 7 Feb 2017 14:16:30 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170207061630.GV5151@pxdev.xzpeter.org>
-References: <1486110164-13797-1-git-send-email-peterx@redhat.com>
-	<1486110164-13797-7-git-send-email-peterx@redhat.com>
-	<c72ca105-fad5-4200-fc6f-6ec3e15bc7f7@redhat.com>
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1caz7F-0005kx-Oo
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 01:19:01 -0500
+Date: Tue, 7 Feb 2017 14:18:56 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170207061856.GB19280@lemon.lan>
+References: <1486123043-26493-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1486123043-26493-2-git-send-email-pradeep.jagadeesh@huawei.com>
+	<71b1733d-7638-5e27-e828-fad57f76f507@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c72ca105-fad5-4200-fc6f-6ec3e15bc7f7@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 06/18] intel_iommu: renaming gpa to iova
- where proper
+In-Reply-To: <71b1733d-7638-5e27-e828-fad57f76f507@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2 v16] fsdev: add IO throttle support to
+ fsdev devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +29,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, David Gibson <david@gibson.dropbear.id.au>, alex.williamson@redhat.com, bd.aviv@gmail.com
+To: Eric Blake <eblake@redhat.com>
+Cc: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>, Alberto Garcia <berto@igalia.com>, Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, qemu-devel@nongnu.org
 
-On Tue, Feb 07, 2017 at 01:27:37PM +0800, Jason Wang wrote:
->=20
->=20
-> On 2017=E5=B9=B402=E6=9C=8803=E6=97=A5 16:22, Peter Xu wrote:
-> >There are lots of places in current intel_iommu.c codes that named
-> >"iova" as "gpa". It is really confusing to use a name "gpa" in these
-> >places (which is very easily to be understood as "Guest Physical
-> >Address", while it's not). To make the codes (much) easier to be read,=
- I
-> >decided to do this once and for all.
-> >
-> >No functional change is made. Only literal ones.
-> >
-> >Signed-off-by: Peter Xu <peterx@redhat.com>
->=20
-> Reviewed-by: Jason Wang <jasowang@redhat.com>
->=20
-> Actually, there's one more left:
->=20
-> $git grep gpa hw/i386/intel_iommu.c
-> hw/i386/intel_iommu.c:static int vtd_gpa_to_slpte(VTDContextEntry *ce,
-> uint64_t iova, bool is_write,
-> hw/i386/intel_iommu.c:    ret_fr =3D vtd_gpa_to_slpte(&ce, addr, is_wri=
-te,
-> &slpte, &level,
+On Mon, 02/06 13:36, Eric Blake wrote:
+> On 02/03/2017 05:57 AM, Pradeep Jagadeesh wrote:
+> > This patchset adds the throttle support for the 9p-local driver.
+> > For now this functionality can be enabled only through qemu cli options.
+> > QMP interface and support to other drivers need further extensions.
+> 
+> This part is a bit scary - if 2.9 is released with just the cli option
+> and not the QMP interface, then how does someone like libvirt introspect
+> whether the feature is available for use?
 
-Yes, will fix this as well. Thanks,
+Not that I want to make an unconstructive point, but just for understanding
+this: if libvirt does introspect via QMP, is it technically okay to release CLI
+in 2.9 and QMP in 2.10? libvirt can just ignore the possible existence of CLI
+options if QMP is not there, no?
 
--- peterx
+Fam
