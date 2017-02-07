@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cbAe1-0007XM-Up
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 13:37:39 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cbAe4-0007ZY-88
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 13:37:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cbAe0-0002jz-Jx
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 13:37:37 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cbAe3-0002lR-5q
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 13:37:40 -0500
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48440)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cbAe0-0002gg-Cf
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 13:37:36 -0500
+	id 1cbAe2-0002gg-VL
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 13:37:39 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1cbAdv-0005Vs-Ss
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 18:37:31 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1cbAdu-0005Uk-Gt
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 18:37:30 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue,  7 Feb 2017 18:37:24 +0000
-Message-Id: <1486492645-27803-13-git-send-email-peter.maydell@linaro.org>
+Date: Tue,  7 Feb 2017 18:37:21 +0000
+Message-Id: <1486492645-27803-10-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1486492645-27803-1-git-send-email-peter.maydell@linaro.org>
 References: <1486492645-27803-1-git-send-email-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 12/13] hw/misc: New "unimplemented" sysbus device
+Subject: [Qemu-devel] [PULL 09/13] target/arm: Abstract out pbit/wbit tests
+ in ARM ldr/str decode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,194 +30,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Create a new "unimplemented" sysbus device, which simply accepts
-all read and write accesses, and implements them as read-as-zero,
-write-ignored, with logging of the access as LOG_UNIMP.
-
-This is useful for stubbing out bits of an SoC or board model
-which haven't been written yet.
+In the ARM ldr/str decode path, rather than directly testing
+"insn & (1 << 21)" and "insn & (1 << 24)", abstract these
+bits out into wbit and pbit local flags. (We will want to
+do more tests against them to determine whether we need to
+provide syndrome information.)
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Message-id: 1484247815-15279-3-git-send-email-peter.maydell@linaro.org
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- hw/misc/Makefile.objs   |   2 +
- include/hw/misc/unimp.h |  39 ++++++++++++++++++
- hw/misc/unimp.c         | 107 ++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 148 insertions(+)
- create mode 100644 include/hw/misc/unimp.h
- create mode 100644 hw/misc/unimp.c
+ target/arm/translate.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 1a89615..898e4cc 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -6,6 +6,8 @@ common-obj-$(CONFIG_SGA) += sga.o
- common-obj-$(CONFIG_ISA_TESTDEV) += pc-testdev.o
- common-obj-$(CONFIG_PCI_TESTDEV) += pci-testdev.o
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 493c627..175b4c1 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -8782,6 +8782,8 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+             } else {
+                 int address_offset;
+                 bool load = insn & (1 << 20);
++                bool wbit = insn & (1 << 21);
++                bool pbit = insn & (1 << 24);
+                 bool doubleword = false;
+                 /* Misc load/store */
+                 rn = (insn >> 16) & 0xf;
+@@ -8799,8 +8801,9 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+                 }
  
-+common-obj-y += unimp.o
-+
- obj-$(CONFIG_VMPORT) += vmport.o
+                 addr = load_reg(s, rn);
+-                if (insn & (1 << 24))
++                if (pbit) {
+                     gen_add_datah_offset(s, insn, 0, addr);
++                }
+                 address_offset = 0;
  
- # ARM devices
-diff --git a/include/hw/misc/unimp.h b/include/hw/misc/unimp.h
-new file mode 100644
-index 0000000..3462d85
---- /dev/null
-+++ b/include/hw/misc/unimp.h
-@@ -0,0 +1,39 @@
-+/*
-+ * "Unimplemented" device
-+ *
-+ * Copyright Linaro Limited, 2017
-+ * Written by Peter Maydell
-+ */
-+
-+#ifndef HW_MISC_UNIMP_H
-+#define HW_MISC_UNIMP_H
-+
-+#define TYPE_UNIMPLEMENTED_DEVICE "unimplemented-device"
-+
-+/**
-+ * create_unimplemented_device: create and map a dummy device
-+ * @name: name of the device for debug logging
-+ * @base: base address of the device's MMIO region
-+ * @size: size of the device's MMIO region
-+ *
-+ * This utility function creates and maps an instance of unimplemented-device,
-+ * which is a dummy device which simply logs all guest accesses to
-+ * it via the qemu_log LOG_UNIMP debug log.
-+ * The device is mapped at priority -1000, which means that you can
-+ * use it to cover a large region and then map other devices on top of it
-+ * if necessary.
-+ */
-+static inline void create_unimplemented_device(const char *name,
-+                                               hwaddr base,
-+                                               hwaddr size)
-+{
-+    DeviceState *dev = qdev_create(NULL, TYPE_UNIMPLEMENTED_DEVICE);
-+
-+    qdev_prop_set_string(dev, "name", name);
-+    qdev_prop_set_uint64(dev, "size", size);
-+    qdev_init_nofail(dev);
-+
-+    sysbus_mmio_map_overlap(SYS_BUS_DEVICE(dev), 0, base, -1000);
-+}
-+
-+#endif
-diff --git a/hw/misc/unimp.c b/hw/misc/unimp.c
-new file mode 100644
-index 0000000..bcbb585
---- /dev/null
-+++ b/hw/misc/unimp.c
-@@ -0,0 +1,107 @@
-+/* "Unimplemented" device
-+ *
-+ * This is a dummy device which accepts and logs all accesses.
-+ * It's useful for stubbing out regions of an SoC or board
-+ * map which correspond to devices that have not yet been
-+ * implemented. This is often sufficient to placate initial
-+ * guest device driver probing such that the system will
-+ * come up.
-+ *
-+ * Copyright Linaro Limited, 2017
-+ * Written by Peter Maydell
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/hw.h"
-+#include "hw/sysbus.h"
-+#include "hw/misc/unimp.h"
-+#include "qemu/log.h"
-+#include "qapi/error.h"
-+
-+#define UNIMPLEMENTED_DEVICE(obj) \
-+    OBJECT_CHECK(UnimplementedDeviceState, (obj), TYPE_UNIMPLEMENTED_DEVICE)
-+
-+typedef struct {
-+    SysBusDevice parent_obj;
-+    MemoryRegion iomem;
-+    char *name;
-+    uint64_t size;
-+} UnimplementedDeviceState;
-+
-+static uint64_t unimp_read(void *opaque, hwaddr offset, unsigned size)
-+{
-+    UnimplementedDeviceState *s = UNIMPLEMENTED_DEVICE(opaque);
-+
-+    qemu_log_mask(LOG_UNIMP, "%s: unimplemented device read "
-+                  "(size %d, offset 0x%" HWADDR_PRIx ")\n",
-+                  s->name, size, offset);
-+    return 0;
-+}
-+
-+static void unimp_write(void *opaque, hwaddr offset,
-+                        uint64_t value, unsigned size)
-+{
-+    UnimplementedDeviceState *s = UNIMPLEMENTED_DEVICE(opaque);
-+
-+    qemu_log_mask(LOG_UNIMP, "%s: unimplemented device write "
-+                  "(size %d, value 0x%" PRIx64
-+                  ", offset 0x%" HWADDR_PRIx ")\n",
-+                  s->name, size, value, offset);
-+}
-+
-+static const MemoryRegionOps unimp_ops = {
-+    .read = unimp_read,
-+    .write = unimp_write,
-+    .impl.min_access_size = 1,
-+    .impl.max_access_size = 8,
-+    .valid.min_access_size = 1,
-+    .valid.max_access_size = 8,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+};
-+
-+static void unimp_realize(DeviceState *dev, Error **errp)
-+{
-+    UnimplementedDeviceState *s = UNIMPLEMENTED_DEVICE(dev);
-+
-+    if (s->size == 0) {
-+        error_setg(errp, "property 'size' not specified or zero");
-+        return;
-+    }
-+
-+    if (s->name == NULL) {
-+        error_setg(errp, "property 'name' not specified");
-+        return;
-+    }
-+
-+    memory_region_init_io(&s->iomem, OBJECT(s), &unimp_ops, s,
-+                          s->name, s->size);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->iomem);
-+}
-+
-+static Property unimp_properties[] = {
-+    DEFINE_PROP_UINT64("size", UnimplementedDeviceState, size, 0),
-+    DEFINE_PROP_STRING("name", UnimplementedDeviceState, name),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void unimp_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = unimp_realize;
-+    dc->props = unimp_properties;
-+}
-+
-+static const TypeInfo unimp_info = {
-+    .name = TYPE_UNIMPLEMENTED_DEVICE,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(UnimplementedDeviceState),
-+    .class_init = unimp_class_init,
-+};
-+
-+static void unimp_register_types(void)
-+{
-+    type_register_static(&unimp_info);
-+}
-+
-+type_init(unimp_register_types)
+                 if (doubleword) {
+@@ -8849,10 +8852,10 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+                    ensure correct behavior with overlapping index registers.
+                    ldrd with base writeback is undefined if the
+                    destination and index registers overlap.  */
+-                if (!(insn & (1 << 24))) {
++                if (!pbit) {
+                     gen_add_datah_offset(s, insn, address_offset, addr);
+                     store_reg(s, rn, addr);
+-                } else if (insn & (1 << 21)) {
++                } else if (wbit) {
+                     if (address_offset)
+                         tcg_gen_addi_i32(addr, addr, address_offset);
+                     store_reg(s, rn, addr);
 -- 
 2.7.4
