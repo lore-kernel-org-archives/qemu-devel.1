@@ -1,39 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39078)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1cb2pp-0005Oe-Hq
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 05:17:18 -0500
+	(envelope-from <famz@redhat.com>) id 1cb2r4-0006MD-NK
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 05:18:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1cb2pl-0003n6-I9
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 05:17:17 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58496
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1cb2pl-0003k8-Cq
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 05:17:13 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v17ADkFa088235
-	for <qemu-devel@nongnu.org>; Tue, 7 Feb 2017 05:17:11 -0500
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28fah9nj9n-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 05:17:11 -0500
-Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 7 Feb 2017 05:17:11 -0500
-References: <20170204143245.15974-1-famz@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 7 Feb 2017 11:17:07 +0100
+	(envelope-from <famz@redhat.com>) id 1cb2r3-0004ue-O8
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 05:18:34 -0500
+Date: Tue, 7 Feb 2017 18:18:23 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170207101823.GF19280@lemon.lan>
+References: <cover.1485365834.git.jcody@redhat.com>
+	<ef9a3b39f69b5fb09be970edd1b03659d90d3207.1485365834.git.jcody@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170204143245.15974-1-famz@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Message-Id: <68083444-6c53-5802-6ad7-549d2da26714@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] Makefile: Make "install" depend on
- "trace-events-all"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ef9a3b39f69b5fb09be970edd1b03659d90d3207.1485365834.git.jcody@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 4/7] iscsi: Add header-digest option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,34 +23,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: stefanha@redhat.com
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, pbonzini@redhat.com, qemu-block@nongnu.org
 
-On 02/04/2017 03:32 PM, Fam Zheng wrote:
-> We install this file to data dir but since 0ab8ed18 it's no longer
-> required by any objects during "make". List it explicitly as a depended
-> target of install and fix the broken "make install" command.
+On Wed, 01/25 12:42, Jeff Cody wrote:
+> From: Kevin Wolf <kwolf@redhat.com>
 > 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-
-Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
-
-
+> This was previously only available with -iscsi. Again, after this patch,
+> the -iscsi option only takes effect if an URL is given. New users are
+> supposed to use the new driver-specific option.
+> 
+> Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Signed-off-by: Jeff Cody <jcody@redhat.com>
 > ---
->  Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  block/iscsi.c | 39 +++++++++++++++------------------------
+>  1 file changed, 15 insertions(+), 24 deletions(-)
 > 
-> diff --git a/Makefile b/Makefile
-> index 4b72a4c..b993741 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -589,7 +589,7 @@ endif
->  endif
+> diff --git a/block/iscsi.c b/block/iscsi.c
+> index 3401b7e..a989b52 100644
+> --- a/block/iscsi.c
+> +++ b/block/iscsi.c
+> @@ -1274,32 +1274,15 @@ static void apply_chap(struct iscsi_context *iscsi, QemuOpts *opts,
+>      g_free(secret);
+>  }
+>  
+> -static void parse_header_digest(struct iscsi_context *iscsi, const char *target,
+> +static void apply_header_digest(struct iscsi_context *iscsi, QemuOpts *opts,
+>                                  Error **errp)
+>  {
+> -    QemuOptsList *list;
+> -    QemuOpts *opts;
+>      const char *digest = NULL;
+>  
+> -    list = qemu_find_opts("iscsi");
+> -    if (!list) {
+> -        return;
+> -    }
+> -
+> -    opts = qemu_opts_find(list, target);
+> -    if (opts == NULL) {
+> -        opts = QTAILQ_FIRST(&list->head);
+> -        if (!opts) {
+> -            return;
+> -        }
+> -    }
+> -
+>      digest = qemu_opt_get(opts, "header-digest");
+>      if (!digest) {
+> -        return;
+> -    }
+> -
+> -    if (!strcmp(digest, "CRC32C")) {
+> +        iscsi_set_header_digest(iscsi, ISCSI_HEADER_DIGEST_NONE_CRC32C);
+> +    } else if (!strcmp(digest, "CRC32C")) {
+>          iscsi_set_header_digest(iscsi, ISCSI_HEADER_DIGEST_CRC32C);
+>      } else if (!strcmp(digest, "NONE")) {
+>          iscsi_set_header_digest(iscsi, ISCSI_HEADER_DIGEST_NONE);
+> @@ -1565,7 +1548,8 @@ static void iscsi_parse_iscsi_option(const char *target, QDict *options)
+>  {
+>      QemuOptsList *list;
+>      QemuOpts *opts;
+> -    const char *user, *password, *password_secret, *initiator_name;
+> +    const char *user, *password, *password_secret, *initiator_name,
+> +               *header_digest;
+>  
+>      list = qemu_find_opts("iscsi");
+>      if (!list) {
+> @@ -1599,6 +1583,11 @@ static void iscsi_parse_iscsi_option(const char *target, QDict *options)
+>      if (initiator_name) {
+>          qdict_set_default_str(options, "initiator-name", initiator_name);
+>      }
+> +
+> +    header_digest = qemu_opt_get(opts, "header-digest");
+> +    if (header_digest) {
+> +        qdict_set_default_str(options, "header-digest", header_digest);
+> +    }
+>  }
+>  
+>  /*
+> @@ -1687,6 +1676,10 @@ static QemuOptsList runtime_opts = {
+>              .name = "initiator-name",
+>              .type = QEMU_OPT_STRING,
+>          },
+> +        {
+> +            .name = "header-digest",
+> +            .type = QEMU_OPT_STRING,
+> +        },
+>          { /* end of list */ }
+>      },
+>  };
+> @@ -1778,10 +1771,8 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
+>          goto out;
+>      }
+>  
+> -    iscsi_set_header_digest(iscsi, ISCSI_HEADER_DIGEST_NONE_CRC32C);
+> -
+>      /* check if we got HEADER_DIGEST via the options */
+> -    parse_header_digest(iscsi, target, &local_err);
+> +    apply_header_digest(iscsi, opts, &local_err);
+>      if (local_err != NULL) {
+>          error_propagate(errp, local_err);
+>          ret = -EINVAL;
+> -- 
+> 2.9.3
 > 
 > 
-> -install: all $(if $(BUILD_DOCS),install-doc) \
-> +install: all $(if $(BUILD_DOCS),install-doc) $(BUILD_DIR)/trace-events-all \
->  install-datadir install-localstatedir
->  ifneq ($(TOOLS),)
->  	$(call install-prog,$(subst qemu-ga,qemu-ga$(EXESUF),$(TOOLS)),$(DESTDIR)$(bindir))
-> 
+
+Reviewed-by: Fam Zheng <famz@redhat.com>
