@@ -1,32 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cb11g-00081c-Pc
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 03:21:26 -0500
+	(envelope-from <peterx@redhat.com>) id 1cb18e-0001L8-VB
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 03:28:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cb11c-0007LU-QB
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 03:21:24 -0500
-Received: from szxga01-in.huawei.com ([58.251.152.64]:62598)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cb11b-0007GA-Lt
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 03:21:20 -0500
-References: <1485266748-15340-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1485266748-15340-2-git-send-email-zhang.zhanghailiang@huawei.com>
-	<4d0b52bc-bcdd-5b96-465c-f0e624cb4add@redhat.com>
-	<58983015.40300@huawei.com>
-	<0b5891cc-0170-0773-a4b2-31cf3ff2b6d7@redhat.com>
-	<589859CA.5030903@huawei.com>
-	<3c6e13ab-4f5a-fbe3-ef95-196c6b3e59c9@redhat.com>
-	<58997D40.60604@huawei.com>
-	<e8c2510f-f755-3ec1-f085-e3053480b772@redhat.com>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <5899831D.30005@huawei.com>
-Date: Tue, 7 Feb 2017 16:19:41 +0800
-MIME-Version: 1.0
-In-Reply-To: <e8c2510f-f755-3ec1-f085-e3053480b772@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] colo-compare: reconstruct the mutex
- lock usage
+	(envelope-from <peterx@redhat.com>) id 1cb18a-0003f8-Uz
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 03:28:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60432)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cb18a-0003e8-NL
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 03:28:32 -0500
+From: Peter Xu <peterx@redhat.com>
+Date: Tue,  7 Feb 2017 16:28:02 +0800
+Message-Id: <1486456099-7345-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v7 00/17] VT-d: vfio enablement and misc
+ enhances
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,150 +22,233 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, zhangchen.fnst@cn.fujitsu.com
-Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, lizhijian@cn.fujitsu.com
+To: qemu-devel@nongnu.org
+Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, peterx@redhat.com, David Gibson <david@gibson.dropbear.id.au>, alex.williamson@redhat.com, bd.aviv@gmail.com
 
-On 2017/2/7 15:57, Jason Wang wrote:
->
->
-> On 2017年02月07日 15:54, Hailiang Zhang wrote:
->> Hi Jason,
->>
->> On 2017/2/6 20:53, Jason Wang wrote:
->>>
->>>
->>> On 2017年02月06日 19:11, Hailiang Zhang wrote:
->>>> On 2017/2/6 17:35, Jason Wang wrote:
->>>>>
->>>>>
->>>>> On 2017年02月06日 16:13, Hailiang Zhang wrote:
->>>>>> On 2017/2/3 11:47, Jason Wang wrote:
->>>>>>>
->>>>>>>
->>>>>>> On 2017年01月24日 22:05, zhanghailiang wrote:
->>>>>>>> The original 'timer_check_lock' mutex lock of struct CompareState
->>>>>>>> is used to protect the 'conn_list' queue and its child queues which
->>>>>>>> are 'primary_list' and 'secondary_list', which is a little abused
->>>>>>>> and confusing
->>>>>>>>
->>>>>>>> To make it clearer, we rename 'timer_check_lock' to
->>>>>>>> 'conn_list_lock'
->>>>>>>> which is used to protect 'conn_list' queue, use another 'conn_lock'
->>>>>>>> to protect 'primary_list' and 'secondary_list'.
->>>>>>>>
->>>>>>>> Besides, fix some missing places which need these mutex lock.
->>>>>>>>
->>>>>>>> Signed-off-by: zhanghailiang<zhang.zhanghailiang@huawei.com>
->>>>>>>
->>>>>>> Instead of sticking to such kind of mutex, I think it's time to make
->>>>>>> colo timer run in colo thread (there's a TODO in the code).
->>>>>>>
->>>>>>
->>>>>> Er, it seems that, we still need these mutex locks even we make colo
->>>>>> timer and colo thread run in the same thread, because we may access
->>>>>> the connect/primary/secondary list from colo (migratioin) thread
->>>>>> concurrently.
->>>>>
->>>>> Just make sure I understand the issue, why need it access the list?
->>>>>
->>>>>>
->>>>>> Besides, it seems to be a little complex to make colo timer run in
->>>>>> colo
->>>>>> compare thread, and it is not this series' goal.
->>>>>
->>>>> Seems not by just looking at how it was implemented in main loop, but
->>>>> maybe I was wrong.
->>>>>
->>>>>> This series is preparing
->>>>>> work for integrating COLO compare with COLO frame and it is
->>>>>> prerequisite.
->>>>>>
->>>>>> So, we may consider implementing it later in another series.
->>>>>> Zhang Chen, what's your opinion ?
->>>>>
->>>>> The problem is this patch make things even worse, it introduces one
->>>>> more
->>>>> mutex.
->>>>>
->>>>
->>>> Hmm, for most cases, we need to get these two locks at the same time.
->>>> We can use one lock to protect conn_list/primary_list/secondary_list,
->>>> (We need to get this lock before operate all these lists, as you can
->>>> see
->>>> in patch 2, while do checkpoint, we may operate these lists in
->>>> COLO checkpoint thread concurrently.)
->>>>
->>>> But for the original codes, we didn't got timer_check_lock in
->>>> packet_enqueue() while operate conn_list/primary_list/secondary_list,
->>>> and didn't got this lock in colo_compare_connection while operate
->>>> secondary_list either.
->>>>
->>>> So, is it OK to use the conn_lock instead of timer_check_lock, and
->>>> add the lock where it is need ?
->>>
->>> I'd like to know if timer were run in colo thread (this looks as simple
->>> as a g_timeout_source_new() followed by a g_source_attach()), why do we
->>> still need a mutex. And if we need it now but plan to remove it in the
->>> future, I'd like to use big lock to simplify the codes.
->>>
->>
->> After investigated your above suggestion, I think it works by using
->> g_timeout_source_new() and g_source_attach(), but I'm not sure
->> if it is a good idea to use the big lock to protect the possible
->> concurrent cases which seem to only happen between COLO migration
->> thread and COLO compare thread, any further suggestions ?
->
-> I think I need first understand why migration thread need to access the
-> list?
->
+This is v7 of vt-d vfio enablement series.
 
-Er, sorry to confuse you here, to be exactly, it is COLO checkpoint thread,
-we reuse the migration thread to realize checkpoint process for COLO,
-Because qemu enters into COLO state after a complete migration, so we reuse it.
+v7:
+- for the two traces patches: Change subjects. Remove vtd_err() and
+  vtd_err_nonzero_rsvd() tracers, instead using standalone trace for
+  each of the places. Don't remove any DPRINTF() if there is no
+  replacement. [Jason]
+- add r-b and a-b for Alex/David/Jason.
+- in patch "intel_iommu: renaming gpa to iova where proper", convert
+  one more place where I missed [Jason]
+- fix the place where I should use "~0ULL" not "~0" [Jason]
+- squash patch 16 into 18 [Jason]
 
-While do checkpoint, we need to release all the buffered packets that have not
-yet been compared, so we need to access the list in COLO checkpoint thread.
+v6:
+- do unmap in all cases when replay [Jason]
+- do global replay even if context entry is invalidated [Jason]
+- when iommu reset, send unmap to all registered notifiers [Jason]
+- use rcu read lock to protect the whole vfio_iommu_map_notify()
+  [Alex, Paolo]
 
-Thanks.
+v5:
+- fix patch 4 subject too long, and error spelling [Eric]
+- add ack-by for alex in patch 1 [Alex]
+- squashing patch 19/20 into patch 18 [Jason]
+- fix comments in vtd_page_walk() [Jason]
+- remove all error_report() [Jason]
+- add comment for patch 18, mention about that enabled vhost without
+  ATS as well [Jason]
+- remove skipped debug thing during page walk [Jason]
+- remove duplicated page walk trace [Jason]
+- some tunings in vtd_address_space_unmap(), to provide correct iova
+  and addr_mask. For this, I tuned this patch as well a bit:
+  "memory: add section range info for IOMMU notifier"
+  to loosen the range check
 
-> Thanks
->
->>
->> Thanks,
->> Hailiang
->>
->>
->>> Thanks
->>>
->>>>
->>>> Thanks.
->>>> Hailiang
->>>>
->>>>> Thanks
->>>>>
->>>>>>
->>>>>>
->>>>>> Thanks,
->>>>>> Hailiang
->>>>>>
->>>>>>> Thought?
->>>>>>>
->>>>>>> Thanks
->>>>>>>
->>>>>>> .
->>>>>>>
->>>>>>
->>>>>
->>>>>
->>>>> .
->>>>>
->>>>
->>>
->>>
->>> .
->>>
->>
->
->
-> .
->
+v4:
+- convert all error_report()s into traces (in the two patches that did
+  that)
+- rebased to Jason's DMAR series (master + one more patch:
+  "[PATCH V4 net-next] vhost_net: device IOTLB support")
+- let vhost use the new api iommu_notifier_init() so it won't break
+  vhost dmar [Jason]
+- touch commit message of the patch:
+  "intel_iommu: provide its own replay() callback"
+  old replay is not a dead loop, but it will just consume lots of time
+  [Jason]
+- add comment for patch:
+  "intel_iommu: do replay when context invalidate"
+  telling why replay won't be a problem even without CM=1 [Jason]
+- remove a useless comment line [Jason]
+- remove dmar_enabled parameter for vtd_switch_address_space() and
+  vtd_switch_address_space_all() [Mst, Jason]
+- merged the vfio patches in, to support unmap of big ranges at the
+  beginning ("[PATCH RFC 0/3] vfio: allow to notify unmap for very big
+  region")
+- using caching_mode instead of cache_mode_enabled, and "caching-mode"
+  instead of "cache-mode" [Kevin]
+- when receive context entry invalidation, we unmap the entire region
+  first, then replay [Alex]
+- fix commit message for patch:
+  "intel_iommu: simplify irq region translation" [Kevin]
+- handle domain/global invalidation, and notify where proper [Jason,
+  Kevin]
+
+v3:
+- fix style error reported by patchew
+- fix comment in domain switch patch: use "IOMMU address space" rather
+  than "IOMMU region" [Kevin]
+- add ack-by for Paolo in patch:
+  "memory: add section range info for IOMMU notifier"
+  (this is seperately collected besides this thread)
+- remove 3 patches which are merged already (from Jason)
+- rebase to master b6c0897
+
+v2:
+- change comment for "end" parameter in vtd_page_walk() [Tianyu]
+- change comment for "a iova" to "an iova" [Yi]
+- fix fault printed val for GPA address in vtd_page_walk_level (debug
+  only)
+- rebased to master (rather than Aviv's v6 series) and merged Aviv's
+  series v6: picked patch 1 (as patch 1 in this series), dropped patch
+  2, re-wrote patch 3 (as patch 17 of this series).
+- picked up two more bugfix patches from Jason's DMAR series
+- picked up the following patch as well:
+  "[PATCH v3] intel_iommu: allow dynamic switch of IOMMU region"
+
+This RFC series is a re-work for Aviv B.D.'s vfio enablement series
+with vt-d:
+
+  https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg01452.html
+
+Aviv has done a great job there, and what we still lack there are
+mostly the following:
+
+(1) VFIO got duplicated IOTLB notifications due to splitted VT-d IOMMU
+    memory region.
+
+(2) VT-d still haven't provide a correct replay() mechanism (e.g.,
+    when IOMMU domain switches, things will broke).
+
+This series should have solved the above two issues.
+
+Online repo:
+
+  https://github.com/xzpeter/qemu/tree/vtd-vfio-enablement-v7
+
+I would be glad to hear about any review comments for above patches.
+
+=========
+Test Done
+=========
+
+Build test passed for x86_64/arm/ppc64.
+
+Simply tested with x86_64, assigning two PCI devices to a single VM,
+boot the VM using:
+
+bin=x86_64-softmmu/qemu-system-x86_64
+$bin -M q35,accel=kvm,kernel-irqchip=split -m 1G \
+     -device intel-iommu,intremap=on,eim=off,caching-mode=on \
+     -netdev user,id=net0,hostfwd=tcp::5555-:22 \
+     -device virtio-net-pci,netdev=net0 \
+     -device vfio-pci,host=03:00.0 \
+     -device vfio-pci,host=02:00.0 \
+     -trace events=".trace.vfio" \
+     /var/lib/libvirt/images/vm1.qcow2
+
+pxdev:bin [vtd-vfio-enablement]# cat .trace.vfio
+vtd_page_walk*
+vtd_replay*
+vtd_inv_desc*
+
+Then, in the guest, run the following tool:
+
+  https://github.com/xzpeter/clibs/blob/master/gpl/userspace/vfio-bind-group/vfio-bind-group.c
+
+With parameter:
+
+  ./vfio-bind-group 00:03.0 00:04.0
+
+Check host side trace log, I can see pages are replayed and mapped in
+00:04.0 device address space, like:
+
+...
+vtd_replay_ce_valid replay valid context device 00:04.00 hi 0x401 lo 0x38fe1001
+vtd_page_walk Page walk for ce (0x401, 0x38fe1001) iova range 0x0 - 0x8000000000
+vtd_page_walk_level Page walk (base=0x38fe1000, level=3) iova range 0x0 - 0x8000000000
+vtd_page_walk_level Page walk (base=0x35d31000, level=2) iova range 0x0 - 0x40000000
+vtd_page_walk_level Page walk (base=0x34979000, level=1) iova range 0x0 - 0x200000
+vtd_page_walk_one Page walk detected map level 0x1 iova 0x0 -> gpa 0x22dc3000 mask 0xfff perm 3
+vtd_page_walk_one Page walk detected map level 0x1 iova 0x1000 -> gpa 0x22e25000 mask 0xfff perm 3
+vtd_page_walk_one Page walk detected map level 0x1 iova 0x2000 -> gpa 0x22e12000 mask 0xfff perm 3
+vtd_page_walk_one Page walk detected map level 0x1 iova 0x3000 -> gpa 0x22e2d000 mask 0xfff perm 3
+vtd_page_walk_one Page walk detected map level 0x1 iova 0x4000 -> gpa 0x12a49000 mask 0xfff perm 3
+vtd_page_walk_one Page walk detected map level 0x1 iova 0x5000 -> gpa 0x129bb000 mask 0xfff perm 3
+vtd_page_walk_one Page walk detected map level 0x1 iova 0x6000 -> gpa 0x128db000 mask 0xfff perm 3
+vtd_page_walk_one Page walk detected map level 0x1 iova 0x7000 -> gpa 0x12a80000 mask 0xfff perm 3
+vtd_page_walk_one Page walk detected map level 0x1 iova 0x8000 -> gpa 0x12a7e000 mask 0xfff perm 3
+vtd_page_walk_one Page walk detected map level 0x1 iova 0x9000 -> gpa 0x12b22000 mask 0xfff perm 3
+vtd_page_walk_one Page walk detected map level 0x1 iova 0xa000 -> gpa 0x12b41000 mask 0xfff perm 3
+...
+
+=========
+Todo List
+=========
+
+- error reporting for the assigned devices (as Tianyu has mentioned)
+
+- per-domain address-space: A better solution in the future may be -
+  we maintain one address space per IOMMU domain in the guest (so
+  multiple devices can share a same address space if they are sharing
+  the same IOMMU domains in the guest), rather than one address space
+  per device (which is current implementation of vt-d). However that's
+  a step further than this series, and let's see whether we can first
+  provide a workable version of device assignment with vt-d
+  protection.
+
+- don't need to notify IOTLB (psi/gsi/global) invalidations to devices
+  that with ATS enabled
+
+- investigate when guest map page while mask contains existing mapped
+  pages (e.g. map 12k-16k first, then map 0-12k)
+
+- coalesce unmap during page walk (currently, we send it once per
+  page)
+
+- when do PSI for unmap, whether we can send one notify directly
+  instead of walking over the page table?
+
+- more to come...
+
+Thanks,
+
+Aviv Ben-David (1):
+  intel_iommu: add "caching-mode" option
+
+Peter Xu (16):
+  vfio: trace map/unmap for notify as well
+  vfio: introduce vfio_get_vaddr()
+  vfio: allow to notify unmap for very large region
+  intel_iommu: simplify irq region translation
+  intel_iommu: renaming gpa to iova where proper
+  intel_iommu: convert dbg macros to traces for inv
+  intel_iommu: convert dbg macros to trace for trans
+  intel_iommu: vtd_slpt_level_shift check level
+  memory: add section range info for IOMMU notifier
+  memory: provide IOMMU_NOTIFIER_FOREACH macro
+  memory: provide iommu_replay_all()
+  memory: introduce memory_region_notify_one()
+  memory: add MemoryRegionIOMMUOps.replay() callback
+  intel_iommu: provide its own replay() callback
+  intel_iommu: allow dynamic switch of IOMMU region
+  intel_iommu: enable vfio devices
+
+ hw/i386/intel_iommu.c          | 669 +++++++++++++++++++++++++++++++----------
+ hw/i386/intel_iommu_internal.h |   2 +
+ hw/i386/trace-events           |  36 +++
+ hw/vfio/common.c               |  77 +++--
+ hw/vfio/trace-events           |   2 +-
+ hw/virtio/vhost.c              |   4 +-
+ include/exec/memory.h          |  49 ++-
+ include/hw/i386/intel_iommu.h  |  12 +
+ memory.c                       |  52 +++-
+ 9 files changed, 710 insertions(+), 193 deletions(-)
+
+-- 
+2.7.4
