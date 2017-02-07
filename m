@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cb2jc-0001uU-PX
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 05:10:53 -0500
+	(envelope-from <berto@igalia.com>) id 1cb2mF-00035V-LZ
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 05:13:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cb2jY-00061w-Mo
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 05:10:52 -0500
-Received: from indium.canonical.com ([91.189.90.7]:34662)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cb2jY-00061i-Gg
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 05:10:48 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cb2jX-0006eH-MY
-	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 10:10:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A2EFA2E80C7
-	for <qemu-devel@nongnu.org>; Tue,  7 Feb 2017 10:10:47 +0000 (UTC)
+	(envelope-from <berto@igalia.com>) id 1cb2mB-00086Z-Mu
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 05:13:35 -0500
+Date: Tue, 7 Feb 2017 11:13:29 +0100
+From: Alberto Garcia <berto@igalia.com>
+Message-ID: <20170207101329.GA22703@igalia.com>
+References: <20170127094154.19778-1-berto@igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Feb 2017 10:03:02 -0000
-From: Christophe de Dinechin <christophe@dinechin.org>
-Reply-To: Bug 1662468 <1662468@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20170207100302.3995.67911.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1662468] [NEW] [feature request] qemu-img convert
- should respond to control-T like dd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170127094154.19778-1-berto@igalia.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-doc: Clarify that -vga std is now the
+ default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,36 +24,15 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org
 
-Public bug reported:
+On Fri, Jan 27, 2017 at 11:41:54AM +0200, Alberto Garcia wrote:
+> The QEMU manual page states that Cirrus Logic is the default video
+> card if the user doesn't specify any. However this is not true since
+> QEMU 2.2.
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
 
-Since qemu-img convert is a long-running operation, it would be nice if
-it reported progress in response to control-T (SIGINFO) to show progress
-information, much like dd, fsck, dump, cp, etc.
+Ping
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: feature-request qemu
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1662468
-
-Title:
-  [feature request] qemu-img convert should respond to control-T like dd
-
-Status in QEMU:
-  New
-
-Bug description:
-  Since qemu-img convert is a long-running operation, it would be nice
-  if it reported progress in response to control-T (SIGINFO) to show
-  progress information, much like dd, fsck, dump, cp, etc.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1662468/+subscriptions
+Berto
