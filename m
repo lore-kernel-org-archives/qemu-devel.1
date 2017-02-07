@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cavaf-0003R0-Mm
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:33:10 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cavao-0003WO-4h
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:33:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cavaf-0005Ub-07
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:33:09 -0500
-Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:34924)
+	(envelope-from <rth7680@gmail.com>) id 1caval-0005X3-IJ
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:33:18 -0500
+Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:34655)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cavae-0005UU-SX
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:33:08 -0500
-Received: by mail-io0-x243.google.com with SMTP id m98so11535577iod.2
-	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 18:33:08 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1caval-0005Wt-DZ
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:33:15 -0500
+Received: by mail-it0-x243.google.com with SMTP id o185so10989079itb.1
+	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 18:33:15 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Mon,  6 Feb 2017 18:32:27 -0800
-Message-Id: <20170207023229.29431-4-rth@twiddle.net>
+Date: Mon,  6 Feb 2017 18:32:28 -0800
+Message-Id: <20170207023229.29431-5-rth@twiddle.net>
 In-Reply-To: <20170207023229.29431-1-rth@twiddle.net>
 References: <20170207023229.29431-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 3/5] linux-user: define correct UTS machine name
- for hppa
+Subject: [Qemu-devel] [PULL 4/5] target/hppa: Tidy do_cbranch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +27,71 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Laurent Vivier <laurent@vivier.eu>
+Cc: peter.maydell@linaro.org
 
-From: Laurent Vivier <laurent@vivier.eu>
+Removes some dead code detected by Covarity.
 
-the correct UTS machine name (as expected by systemd) is "parisc",
-not "hppa".
-
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20170126080449.28255-4-laurent@vivier.eu>
+Reported-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- linux-user/hppa/target_syscall.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/hppa/translate.c | 17 +++++------------
+ 1 file changed, 5 insertions(+), 12 deletions(-)
 
-diff --git a/linux-user/hppa/target_syscall.h b/linux-user/hppa/target_syscall.h
-index ac18a9c..e2f3668 100644
---- a/linux-user/hppa/target_syscall.h
-+++ b/linux-user/hppa/target_syscall.h
-@@ -19,7 +19,7 @@ struct target_pt_regs {
-     target_ulong ipsw;
- };
+diff --git a/target/hppa/translate.c b/target/hppa/translate.c
+index 4d243f7..5d571f0 100644
+--- a/target/hppa/translate.c
++++ b/target/hppa/translate.c
+@@ -1433,7 +1433,6 @@ static ExitStatus do_cbranch(DisasContext *ctx, target_long disp, bool is_n,
+     target_ulong dest = iaoq_dest(ctx, disp);
+     TCGLabel *taken = NULL;
+     TCGCond c = cond->c;
+-    int which = 0;
+     bool n;
  
--#define UNAME_MACHINE "hppa"
-+#define UNAME_MACHINE "parisc"
- #define UNAME_MINIMUM_RELEASE "2.6.32"
- #define TARGET_CLONE_BACKWARDS
- #define TARGET_MINSIGSTKSZ       2048
+     assert(ctx->null_cond.c == TCG_COND_NEVER);
+@@ -1455,14 +1454,14 @@ static ExitStatus do_cbranch(DisasContext *ctx, target_long disp, bool is_n,
+     n = is_n && disp < 0;
+     if (n && use_nullify_skip(ctx)) {
+         nullify_set(ctx, 0);
+-        gen_goto_tb(ctx, which++, ctx->iaoq_n, ctx->iaoq_n + 4);
++        gen_goto_tb(ctx, 0, ctx->iaoq_n, ctx->iaoq_n + 4);
+     } else {
+         if (!n && ctx->null_lab) {
+             gen_set_label(ctx->null_lab);
+             ctx->null_lab = NULL;
+         }
+         nullify_set(ctx, n);
+-        gen_goto_tb(ctx, which++, ctx->iaoq_b, ctx->iaoq_n);
++        gen_goto_tb(ctx, 0, ctx->iaoq_b, ctx->iaoq_n);
+     }
+ 
+     gen_set_label(taken);
+@@ -1471,23 +1470,17 @@ static ExitStatus do_cbranch(DisasContext *ctx, target_long disp, bool is_n,
+     n = is_n && disp >= 0;
+     if (n && use_nullify_skip(ctx)) {
+         nullify_set(ctx, 0);
+-        gen_goto_tb(ctx, which++, dest, dest + 4);
++        gen_goto_tb(ctx, 1, dest, dest + 4);
+     } else {
+         nullify_set(ctx, n);
+-        gen_goto_tb(ctx, which++, ctx->iaoq_b, dest);
++        gen_goto_tb(ctx, 1, ctx->iaoq_b, dest);
+     }
+ 
+     /* Not taken: the branch itself was nullified.  */
+     if (ctx->null_lab) {
+         gen_set_label(ctx->null_lab);
+         ctx->null_lab = NULL;
+-        if (which < 2) {
+-            nullify_set(ctx, 0);
+-            gen_goto_tb(ctx, which, ctx->iaoq_b, ctx->iaoq_n);
+-            return EXIT_GOTO_TB;
+-        } else {
+-            return EXIT_IAQ_N_STALE;
+-        }
++        return EXIT_IAQ_N_STALE;
+     } else {
+         return EXIT_GOTO_TB;
+     }
 -- 
 2.9.3
