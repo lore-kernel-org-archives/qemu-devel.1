@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cauXj-0006Z7-Cc
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 20:26:07 -0500
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cav5w-0004Zu-KS
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:01:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cauXf-00055b-Dg
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 20:26:03 -0500
-Resent-Message-Id: <E1cauXf-00055b-Dg@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21308)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cauXf-00053j-7E
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 20:25:59 -0500
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20170207005930.28327-1-laurent@vivier.eu>
-Message-ID: <148643073646.42.17325505123021550845@eba24e3a0d7f>
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cav5s-0005aj-Kl
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:01:24 -0500
+Received: from [59.151.112.132] (port=60031 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cav5s-0005a1-7b
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:01:20 -0500
+References: <1483596532-14552-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<6a928d63-59c5-a763-0156-40e5958512c5@cn.fujitsu.com>
+	<71bda662-8a14-01d4-9db6-ce96640dfee9@cn.fujitsu.com>
+	<61ae330c-b431-fff3-dd58-ba24b081dc60@redhat.com>
+	<20170206131352.GD2524@work-vm>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <999a7054-4229-661d-502d-9d3e79f3d197@cn.fujitsu.com>
+Date: Tue, 7 Feb 2017 10:01:03 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 6 Feb 2017 17:25:37 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 00/16] target-m68k: implement 680x0 FPU
+In-Reply-To: <20170206131352.GD2524@work-vm>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH V6 0/2] Add new qmp commands to suppurt Xen
+ COLO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,65 +31,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: laurent@vivier.eu
-Cc: famz@redhat.com, qemu-devel@nongnu.org, aurelien@aurel32.net, rth@twiddle.net
+To: Eric Blake <eblake@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu devel <qemu-devel@nongnu.org>, "eddie . dong" <eddie.dong@intel.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Bian Naimeng <biannm@cn.fujitsu.com>
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMDAvMTZdIHRhcmdldC1tNjhrOiBpbXBsZW1l
-bnQgNjgweDAgRlBVCk1lc3NhZ2UtaWQ6IDIwMTcwMjA3MDA1OTMwLjI4MzI3LTEtbGF1cmVudEB2
-aXZpZXIuZXUKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFz
-ZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0w
-CgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQg
-bG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRv
-CiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9y
-bWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Nj
-cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQog
-ICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0g
-VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
-NDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVt
-dQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTcwMjA3MDA1OTMwLjI4MzI3LTEtbGF1
-cmVudEB2aXZpZXIuZXUgLT4gcGF0Y2hldy8yMDE3MDIwNzAwNTkzMC4yODMyNy0xLWxhdXJlbnRA
-dml2aWVyLmV1ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMjRmZWYwOSB0YXJnZXQt
-bTY4azogYWRkIGZzaW5jb3MKMzE5MzZlNiB0YXJnZXQtbTY4azogYWRkIG1vcmUgRlBVIGluc3Ry
-dWN0aW9ucwowNGY1YTI5IHRhcmdldC1tNjhrOiBhZGQgZXhwbGljaXQgc2luZ2xlIGFuZCBkb3Vi
-bGUgcHJlY2lzaW9uIG9wZXJhdGlvbnMKODExN2I5ZCB0YXJnZXQtbTY4azogYWRkIGZzZ2xtdWwg
-YW5kIGZzZ2xkaXYKYTExNDAwZSB0YXJnZXQtbTY4azogYWRkIGZzY2FsZSwgZmdldG1hbiwgZmdl
-dGV4cCBhbmQgZm1vZAoyMmE4NjI0IHRhcmdldC1tNjhrOiBhZGQgZm1vdmVjcgo4NWQ5ODMzIHRh
-cmdldC1tNjhrOiBhZGQgZnNjYy4KNDAzYWE4NyB0YXJnZXQtbTY4azogYWRkIGZtb3ZlbQpmNTM3
-MjVlIHRhcmdldC1tNjhrOiBkZWZpbmUgOTZiaXQgRlAgcmVnaXN0ZXJzIGZvciBnZGIgb24gNjgw
-eDAKMGEwMTIxNSB0YXJnZXQtbTY4azogbWFuYWdlIEZQVSBleGNlcHRpb25zCjE5NGQ5NTQgdGFy
-Z2V0LW02OGs6IGFkZCBGUENSIGFuZCBGUFNSCjJhZTMwMTAgdGFyZ2V0LW02OGs6IHVzZSBmbG9h
-dHg4MCBpbnRlcm5hbGx5Cjc4MzNkMjQgdGFyZ2V0LW02OGs6IGRlZmluZSBleHRfb3BzaXplCjk3
-MWMzZmQgdGFyZ2V0LW02OGs6IG1vdmUgRlBVIGhlbHBlcnMgdG8gZnB1X2hlbHBlci5jCjIxNGFm
-MWUgc29mdGxvYXQ6IGRpc2FibGUgZmxvYXR4ODBfaW52YWxpZF9lbmNvZGluZygpIGZvciBtNjhr
-CjcxYTNhODAgc29mdGZsb2F0OiBkZWZpbmUgNjgweDAgc3BlY2lmaWMgdmFsdWVzCgo9PT0gT1VU
-UFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE2OiBzb2Z0ZmxvYXQ6IGRlZmluZSA2ODB4
-MCBzcGVjaWZpYyB2YWx1ZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xNjogc29mdGxvYXQ6IGRpc2Fi
-bGUgZmxvYXR4ODBfaW52YWxpZF9lbmNvZGluZygpIGZvciBtNjhrLi4uCkNoZWNraW5nIFBBVENI
-IDMvMTY6IHRhcmdldC1tNjhrOiBtb3ZlIEZQVSBoZWxwZXJzIHRvIGZwdV9oZWxwZXIuYy4uLgpD
-aGVja2luZyBQQVRDSCA0LzE2OiB0YXJnZXQtbTY4azogZGVmaW5lIGV4dF9vcHNpemUuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggNS8xNjogdGFyZ2V0LW02OGs6IHVzZSBmbG9hdHg4MCBpbnRlcm5hbGx5Li4u
-CkVSUk9SOiBzdG9yYWdlIGNsYXNzIHNob3VsZCBiZSBhdCB0aGUgYmVnaW5uaW5nIG9mIHRoZSBk
-ZWNsYXJhdGlvbgojNDU3OiBGSUxFOiB0YXJnZXQvbTY4ay90cmFuc2xhdGUuYzozOToKKyNkZWZp
-bmUgREVGRjk2KG5hbWUsIG9mZnNldCkgc3RhdGljIFRDR3ZfaTMyIFFSRUdfIyNuYW1lIyNIOyBc
-Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDEyMDQgbGluZXMgY2hlY2tlZAoKWW91ciBw
-YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
-ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
-IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNi8xNjogdGFy
-Z2V0LW02OGs6IGFkZCBGUENSIGFuZCBGUFNSLi4uCkNoZWNraW5nIFBBVENIIDcvMTY6IHRhcmdl
-dC1tNjhrOiBtYW5hZ2UgRlBVIGV4Y2VwdGlvbnMuLi4KQ2hlY2tpbmcgUEFUQ0ggOC8xNjogdGFy
-Z2V0LW02OGs6IGRlZmluZSA5NmJpdCBGUCByZWdpc3RlcnMgZm9yIGdkYiBvbiA2ODB4MC4uLgpD
-aGVja2luZyBQQVRDSCA5LzE2OiB0YXJnZXQtbTY4azogYWRkIGZtb3ZlbS4uLgpDaGVja2luZyBQ
-QVRDSCAxMC8xNjogdGFyZ2V0LW02OGs6IGFkZCBmc2NjLi4uLgpDaGVja2luZyBQQVRDSCAxMS8x
-NjogdGFyZ2V0LW02OGs6IGFkZCBmbW92ZWNyLi4uCkNoZWNraW5nIFBBVENIIDEyLzE2OiB0YXJn
-ZXQtbTY4azogYWRkIGZzY2FsZSwgZmdldG1hbiwgZmdldGV4cCBhbmQgZm1vZC4uLgpDaGVja2lu
-ZyBQQVRDSCAxMy8xNjogdGFyZ2V0LW02OGs6IGFkZCBmc2dsbXVsIGFuZCBmc2dsZGl2Li4uCkNo
-ZWNraW5nIFBBVENIIDE0LzE2OiB0YXJnZXQtbTY4azogYWRkIGV4cGxpY2l0IHNpbmdsZSBhbmQg
-ZG91YmxlIHByZWNpc2lvbiBvcGVyYXRpb25zLi4uCkNoZWNraW5nIFBBVENIIDE1LzE2OiB0YXJn
-ZXQtbTY4azogYWRkIG1vcmUgRlBVIGluc3RydWN0aW9ucy4uLgpDaGVja2luZyBQQVRDSCAxNi8x
-NjogdGFyZ2V0LW02OGs6IGFkZCBmc2luY29zLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBj
-b21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
-Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
-ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+Hi~ Eric.
+
+If you have time, please give me some comments.
+
+This series has been sent for a long time.
+
+
+Thanks
+
+Zhang Chen
+
+
+On 02/06/2017 09:13 PM, Dr. David Alan Gilbert wrote:
+> * Jason Wang (jasowang@redhat.com) wrote:
+>>
+>> On 2017年01月26日 11:04, Zhang Chen wrote:
+>>> Hi~
+>>>
+>>> No news for a week.
+>>>
+>>> We need comments ~~
+>>>
+>>> Ping...
+>>>
+>> Cc David who is one of the maintainer of migration.
+> My difficulty is I don't know any Xen and I don't understand
+> the block replication code much either; so I hadn't really looked at it.
+>
+> Dave
+>
+>>> Thanks
+>>>
+>>> Zhang Chen
+>>>
+>>>
+>>> On 01/19/2017 05:57 PM, Zhang Chen wrote:
+>>>> Hi~~
+>>>>
+>>>> Anyone have any comments?
+>>>>
+>>>> Ping....
+>>>>
+>>>>
+>>>> Thanks
+>>>>
+>>>> Zhang Chen
+>>>>
+>>>>
+>>>> On 01/05/2017 02:08 PM, Zhang Chen wrote:
+>>>>> Xen COLO depend on qemu COLO replication function.
+>>>>> So, We need new qmp commands for Xen to use qemu replication.
+>>>>>
+>>>>> Corresponding libxl patches already in xen.git.
+>>>>> Commit ID:
+>>>>>
+>>>>> ed37ef1f91c20f0ab162ce60f8c38400b917fa64
+>>>>> COLO: introduce new API to prepare/start/do/get_error/stop replication
+>>>>>
+>>>>> a0ddc0b359375b2418213966dfbdbfab593ecc6f
+>>>>> tools/libxl: introduction of libxl__qmp_restore to load qemu state
+>>>>>
+>>>>>
+>>>>> Zhang Chen (2):
+>>>>>     Add a new qmp command to start/stop replication
+>>>>>     Add a new qmp command to do checkpoint, query xen replication status
+>>>>>
+>>>>>    docs/qmp-commands.txt | 42 +++++++++++++++++++++++++++++++
+>>>>>    migration/colo.c      | 40 +++++++++++++++++++++++++++++
+>>>>>    qapi-schema.json      | 69
+>>>>> +++++++++++++++++++++++++++++++++++++++++++++++++++
+>>>>>    3 files changed, 151 insertions(+)
+>>>>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+>
+> .
+>
+
+-- 
+Thanks
+Zhang Chen
