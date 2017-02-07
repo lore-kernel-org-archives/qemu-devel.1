@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cbAab-0004tO-UN
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 13:34:07 -0500
+	(envelope-from <laurent@vivier.eu>) id 1cbAac-0004tR-Ob
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 13:34:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cbAaX-0001Td-ON
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 13:34:05 -0500
-Received: from mout.kundenserver.de ([212.227.126.133]:50666)
+	(envelope-from <laurent@vivier.eu>) id 1cbAaY-0001US-H0
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 13:34:06 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:56858)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cbAaX-0001Rz-E4
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 13:34:01 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cbAaY-0001TJ-5Z
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 13:34:02 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue,  7 Feb 2017 19:33:51 +0100
-Message-Id: <20170207183356.17840-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH 0/5] risu: add m68k target support
+Date: Tue,  7 Feb 2017 19:33:54 +0100
+Message-Id: <20170207183356.17840-4-laurent@vivier.eu>
+In-Reply-To: <20170207183356.17840-1-laurent@vivier.eu>
+References: <20170207183356.17840-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH 3/5] m68k: add risufile with m68k instructions.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,33 +26,260 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>
 
-This series add the files needed to test the m68k target.
+Add a set of instructions working only on registers.
 
-For the moment, it doesn't support FPU instructions.
-
-Laurent Vivier (5):
-  m68k: implement risugen module
-  m68k: implement server and client side
-  m68k: add risufile with m68k instructions.
-  m68k: add instruction needing an extended word
-  m68k: manage memory block
-
- configure           |   6 +-
- m68k.risu           | 369 +++++++++++++++++++++++++++++++++++++++++++++++++
- risu.h              |   1 +
- risu_m68k.c         | 158 +++++++++++++++++++++
- risu_reginfo_m68k.c | 151 ++++++++++++++++++++
- risu_reginfo_m68k.h |  32 +++++
- risugen             |   2 +-
- risugen_m68k.pm     | 390 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- test_m68k.s         |  28 ++++
- 9 files changed, 1134 insertions(+), 3 deletions(-)
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ m68k.risu | 241 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 241 insertions(+)
  create mode 100644 m68k.risu
- create mode 100644 risu_m68k.c
- create mode 100644 risu_reginfo_m68k.c
- create mode 100644 risu_reginfo_m68k.h
- create mode 100644 risugen_m68k.pm
- create mode 100644 test_m68k.s
 
+diff --git a/m68k.risu b/m68k.risu
+new file mode 100644
+index 0000000..3317005
+--- /dev/null
++++ b/m68k.risu
+@@ -0,0 +1,241 @@
++###############################################################################
++# Copyright (c) 2016 Laurent Vivier
++# All rights reserved. This program and the accompanying materials
++# are made available under the terms of the Eclipse Public License v1.0
++# which accompanies this distribution, and is available at
++# http://www.eclipse.org/legal/epl-v10.html
++###############################################################################
++
++.mode m68k
++
++# abcd $dx,$dy
++ABCD  M68000 1100 Dx:3 10000 0 Dy:3 \
++                 !constraints { \
++                        write_movb_di($Dx, rand(10) | (rand(10) << 4)); \
++                        write_movb_di($Dy, rand(10) | (rand(10) << 4)); \
++                        1;\
++                      }
++# add $dx,$dy
++ADD   M68000 1101 Dx:3 0 opmode:2 000 Dy:3 \
++                 !constraints { $opmode != 0b11; }
++# adda $dx, $ay
++ADDA  M68000 1101 Ax:3 size:1 11 000 Dy:3
++# addi #Imm, $dx
++ADDIB M68000 00000110 00 000 Dx:3 00000000 data:8
++ADDIW M68000 00000110 01 000 Dx:3 data:16
++# addq #Imm3, $dx
++ADDQ  M68000 0101 imm:3 0 size:2 000 Dx:3 \
++                 !constraints { $size != 0b11; }
++# addx $dx,$dy
++ADDX  M68000 1101 Dx:3 1 size:2 00 0 Dy:3 \
++                 !constraints { $size != 0b11; }
++# and $dx, $dy
++AND   M68000 1100 Dx:3 0 opmode:2 000 Dy:3 \
++                 !constraints { $opmode != 0b11; }
++# andi #Imm,$dx
++ANDIB M68000 00000010 00 000 Dx:3 00000000 data:8
++ANDIW M68000 00000010 01 000 Dx:3 data:16
++# andi #imm,ccr
++ANDICCR M68000 0000001000111100 data:16 \
++                 !constraints { write_mov_ccr(rand(0x100)); 1; }
++# asl/asr $dx,$dy , asl/asr #im3,$r
++ASx   M68000 1110 count:3 d:1 size:2 i:1 00 r:3 \
++                 !constraints { $size != 0b11; }
++# bchg $dx,$dy
++BCHG  M68000 0000 Dx:3 101 000 Dy:3
++BCHGI M68000 0000 100  001 000 Dx:3 0000000 data:9
++# blcr $dx,$dy
++BCLR  M68000 0000 Dx:3 110 000 Dy:3
++BCLRI M68000 0000 100  010 000 Dx:3 0000000 data:9
++# bfchg $dx,offset:width
++BFCHG M68020 1110101011 000 Dx:3 0000 Do:1 offset:5 Dw:1 width:5 \
++                !constraints { (!$Do || $offset < 8) &&          \
++                               (!$Dw || $width < 8);             \
++                             }
++# bfclr $dx,offset:width
++BFCLR M68020 1110110011 000 Dx:3 0000 Do:1 offset:5 Dw:1 width:5 \
++                !constraints { (!$Do || $offset < 8) &&          \
++                               (!$Dw || $width < 8);             \
++                             }
++# bfexts $dx,offset:width,$dy
++BFEXTS M68020 1110101111 000 Dx:3 0 Dy:3 Do:1 offset:5 Dw:1 width:5 \
++                !constraints { (!$Do || $offset < 8) &&          \
++                               (!$Dw || $width < 8);             \
++                             }
++# bfextu $dx,offset:width,$dy
++BFEXTU M68020 1110100111 000 Dx:3 0 Dy:3 Do:1 offset:5 Dw:1 width:5 \
++                !constraints { (!$Do || $offset < 8) &&          \
++                               (!$Dw || $width < 8);             \
++                             }
++# bfffo $dx,offset:width,$dy
++# there is a bug in 68040 with offset > 31
++BFFFO M68020 1110110111 000 Dx:3 0 Dy:3 Do:1 offset:5 Dw:1 width:5    \
++                !constraints {                                        \
++                               if ($Dw == 1) { $width &= 0x7; ;}      \
++                               if ($Do == 1) {                        \
++                                   $offset &= 0x7;                    \
++                                   write_mov_di($offset, rand(0x20)); \
++                               }                                      \
++                               1;                                     \
++                             }
++# bfins $dx,offset:width,$dy
++BFINS M68020 1110111111 000 Dx:3 0 Dy:3 Do:1 offset:5 Dw:1 width:5 \
++                !constraints { (!$Do || $offset < 8) &&          \
++                               (!$Dw || $width < 8);             \
++                             }
++# bfset $dx,offset:width
++BFSET M68020 1110111011 000 Dx:3 0000 Do:1 offset:5 Dw:1 width:5 \
++                !constraints { (!$Do || $offset < 8) &&          \
++                               (!$Dw || $width < 8);             \
++                             }
++# bftst $dx,offset:width
++BFTST M68020 1110100011 000 Dx:3 0000 Do:1 offset:5 Dw:1 width:5 \
++                !constraints { (!$Do || $offset < 8) &&          \
++                               (!$Dw || $width < 8);             \
++                             }
++# bset $dx,$dy
++BSET  M68000 0000 Dx:3 111 000 Dy:3
++BSETI M68000 0000 100  011 000 Dx:3 0000000 data:9
++# btst $dx,$dy
++BTST  M68000 0000 Dx:3 100 000 Dy:3
++BTSTI M68000 0000 100  000 000 Dx:3 0000000 data:9
++# clr $dx
++CLR   M68000 01000010 size:2 000 Dx:3 \
++                 !constraints { $size != 0b11; }
++# cmp $dx,$dy
++CMP   M68000 1011 Dx:3 0 size:2 000 Dy:3 \
++                 !constraints { $size != 0b11; }
++# cmpa $dx,$ay
++CMPA  M68000 1011 Ax:3 size:1 11 000 Dy:3
++# cmpi #Imm, $dx
++CMPIB M68000 00001100 00 000 Dx:3 00000000 data:8
++CMPIW M68000 00001100 01 000 Dx:3 data:16
++# divs $dx,$dy
++DIVS  M68000 1000 Dy:3 111 000 Dx:3 \
++                 !constraints { \
++                        write_mov_di($Dx, rand(0xffffffff) + 1); \
++                        1;                                       \
++                      }
++# divsl $dx,$dr:$dq
++DIVSL M68020 0100110001 000 Dx:3  0 Dq:3 1 size:1 0000000 Dr:3 \
++                 !constraints { \
++                        write_mov_di($Dx, rand(0xffffffff) + 1); \
++                        1;                                       \
++                      }
++# divu $dx,$dy
++DIVU  M68000 1000 Dy:3 011 000 Dx:3 \
++                 !constraints { \
++                        write_mov_di($Dx, rand(0xffffffff) + 1); \
++                        1;                                       \
++                      }
++# divul $dx,$dr:$dq
++DIVUL M68020 0100110001 000 Dx:3  0 Dq:3 0 size:1 0000000 Dr:3 \
++                 !constraints { \
++                        write_mov_di($Dx, rand(0xffffffff) + 1); \
++                        1;                                       \
++                      }
++# eor $dx,$dy
++EOR   M68000 1011 Dx:3 1 size:2 000 Dy:3 \
++                 !constraints { $size != 0b11; }
++# eori #Imm, $dx
++EORIB M68000 00001010 00 000 Dx:3 00000000 data:8
++EORIW M68000 00001010 01 000 Dx:3 data:16
++# eori #imm,ccr
++EORICCR M68000 0000101000111100 data:16 \
++                 !constraints { write_mov_ccr(rand(0x100)); 1; }
++# exg $dx,$dy
++EXG_d M68000 1100 Dx:3 1 01000 Dy:3
++# exg $ax,$ay
++EXG_a M68000 1100 Ax:3 1 01000 Ay:3
++# exg $dx,$ay
++EXG   M68000 1100 Dx:3 1 01000 Ay:3
++# ext $dx
++EXT   M68000 0100100 opmode:3 000 Dx:3 \
++                 !constraints { $opmode == 0b010 || $opmode == 0b011 }
++EXTB  M68020 0100100 111 000 Dx:3
++# lsl/lsr $dx,$dy , lsl/lsr #im3,$r
++LSx   M68000 1110 count:3 d:1 size:2 i:1 01 r:3 \
++                 !constraints { $size != 0b11; }
++# move $dx,$dy
++MOVE  M68000 00 size:2 Dy:3 000 000 Dx:3 \
++                 !constraints { $size != 0b00; }
++# movea $dx,$ay
++MOVEA M68000 00 size:2 Ay:3 001 000 Dx:3 \
++                 !constraints { $size != 0b00 && $size != 0b01; }
++# move ccr,$dx
++MOVEFROMCCR  M68010 0100001011 000 Dx:3
++# move $dx,ccr
++MOVETOCCR M68000 0100010011 000 Dx:3
++# moveq #Imm8, $dx
++MOVEQ M68000 0111 Dx:3 0 data:8
++# muls $dx,$dy
++MULS  M68000 1100 Dy:3 111 000 Dx:3
++# mulsl $dx, $dh:$dl
++MULSL M68020 0100110000 000 Dx:3 0 Dl:3 1 size:1 0000000 Dh:3
++# mulu $dx,$dy
++MULU  M68000 1100 Dy:3 011 000 Dx:3
++# mulul $dx, $dh:$dl
++MULUL M68020 0100110000 000 Dx:3 0 Dl:3 0 size:1 0000000 Dh:3
++# nbcd $dx
++NBCD  M68000 0100100000 000 Dx:3 \
++                 !constraints { \
++                        write_movb_di($Dx, rand(10) | (rand(10) << 4)); \
++                        1;                                              \
++                      }
++# neg $dx
++NEG   M68000 01000100 size:2 000 Dx:3 \
++                 !constraints { $size != 0b11; }
++# negx $dx
++NEGX  M68000 01000000 size:2 000 Dx:3 \
++                 !constraints { $size != 0b11; }
++# nop
++NOP   M68000 0100111001110001
++# not $dx
++NOT   M68000 01000110 size:2 000 Dx:3 \
++                 !constraints { $size != 0b11; }
++# or $dx,$dy
++OR    M68000 1000 Dy:3 0 size:2 000 Dx:3 \
++                 !constraints { $size != 0b11; }
++# ori #Imm, $dx
++ORIB M68000 00000000 00 000 Dx:3 00000000 data:8
++ORIW M68000 00000000 01 000 Dx:3 data:16
++# ori #imm,ccr
++ORICCR M68000 0000000000111100 data:16 \
++                 !constraints { write_mov_ccr(rand(0x100)); 1; }
++# rol/ror $dx,$dy , rol/ror #im3,$r
++ROx   M68000 1110 count:3 d:1 size:2 i:1 11 r:3 \
++                 !constraints { $size != 0b11; }
++# roxl/roxr $dx,$dy , roxl/roxr #im3,$r
++ROXx  M68000 1110 count:3 d:1 size:2 i:1 10 r:3 \
++                 !constraints { $size != 0b11; }
++# sbcd $dx,$dy
++SBCD  M68000 1000 Dx:3 10000 0 Dy:3 \
++                 !constraints { \
++                        write_movb_di($Dx, rand(10) | (rand(10) << 4)); \
++                        write_movb_di($Dy, rand(10) | (rand(10) << 4)); \
++                        1;                                              \
++                      }
++# Scc $dx
++SCC M68000 0101 cond:4 11 000 dx:3 \
++                 !constraints { write_mov_ccr(rand(0x100)); 1; }
++# sub $dx,$dy
++SUB   M68000 1001 Dx:3 0 opmode:2 000 Dy:3 \
++                 !constraints { $opmode != 0b11; }
++# suba $dx, $ay
++SUBA  M68000 1001 Ax:3 size:1 11 000 Dy:3
++# subi #Imm, $dx
++SUBIB M68000 00000100 00 000 Dx:3 00000000 data:8
++SUBIW M68000 00000100 01 000 Dx:3 data:16
++# subq #Imm3n $dx
++SUBQ  M68000 0101 imm:3 1 size:2 000 Dx:3 \
++                 !constraints { $size != 0b11; }
++# subx $dx,$dy
++SUBX  M68000 1001 Dx:3 1 size:2 00 0 Dy:3 \
++                 !constraints { $size != 0b11; }
++# swap $dx
++SWAP  M68000 0100100001000 Dx:3
++# tas $dx
++TAS   M68000 0100101011 000 Dx:3
++# tst $dx
++TST   M68000 01001010 size:2 000 Dx:3 \
++                 !constraints { $size != 0b11; }
 -- 
 2.9.3
