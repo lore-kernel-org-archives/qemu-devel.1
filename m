@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sam.bobroff@au1.ibm.com>) id 1cawMg-0001f9-Oe
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 22:22:47 -0500
+	(envelope-from <bounces@canonical.com>) id 1cawUV-0003v6-8D
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 22:30:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sam.bobroff@au1.ibm.com>) id 1cawMc-0000cB-Pp
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 22:22:46 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44067
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <bounces@canonical.com>) id 1cawUR-0003NU-98
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 22:30:51 -0500
+Received: from indium.canonical.com ([91.189.90.7]:40132)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sam.bobroff@au1.ibm.com>)
-	id 1cawMc-0000by-Jd
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 22:22:42 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v173JqFr138262
-	for <qemu-devel@nongnu.org>; Mon, 6 Feb 2017 22:22:41 -0500
-Received: from e23smtp06.au.ibm.com (e23smtp06.au.ibm.com [202.81.31.148])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28euqw7131-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 22:22:41 -0500
-Received: from localhost
-	by e23smtp06.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <sam.bobroff@au1.ibm.com>;
-	Tue, 7 Feb 2017 13:22:38 +1000
-From: Sam Bobroff <sam.bobroff@au1.ibm.com>
-Date: Tue,  7 Feb 2017 14:21:39 +1100
-Message-Id: <7c016bdc97ed45dc2eb5002db98efcee26c4d8bf.1486437689.git.sam.bobroff@au1.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 1/1] target-ppc,
- tcg: fix usermode segfault with pthread_create()
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cawUQ-0003NI-Ps
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 22:30:46 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cawUO-0004H3-V1
+	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 03:30:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id DFE2C2E8029
+	for <qemu-devel@nongnu.org>; Tue,  7 Feb 2017 03:30:44 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 07 Feb 2017 03:21:19 -0000
+From: wayen <1662050@bugs.launchpad.net>
+Reply-To: Bug 1662050 <1662050@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170206024535.14624.3001.malonedeb@soybean.canonical.com>
+Message-Id: <20170207032120.4151.79250.launchpad@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1662050] Re: qemu-img convert a overlay qcow2
+ image into a entire image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,52 +37,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org
-Cc: benh@kernel.crashing.org, david@gibson.dropbear.id.au, peter.maydell@linaro.org, laurent@vivier.eu, anibal.limon@linux.intel.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-Programs run under qemu-ppc64 on an x86_64 host currently segfault
-if they use pthread_create() due to the adjustment made to the NIP in
-commit bd6fefe71cec5a0c7d2be4ac96307f25db56abf9.
+** Description changed:
 
-This patch changes cpu_loop() to set the NIP back to the
-pre-incremented value before calling do_syscall(), which causes the
-correct address to be used for the new thread and corrects the fault.
+  I have a base image file "base.qcow2" and a delta qcow2 image file
+  "delta.qcow2" whose backing file is "base.qcow2".
+  =
 
-Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
----
+  Now I use qemu-img to convert "delta.qcow2" and will get a new image
+  file "new.qcow2" which is entire and equivalent to combination of
+  "base.qcow2" and "delta.qcow2".
+  =
 
-v2:
+- In fact, i just want to convert the delta qcow2 image file and get a New
+- delta overlay qcow2 image file. So the "new.qcow2" is not what i want. I
+- have to admit that this is not bug. Could you please take this as a new
+- feature and enable qemu-img to convert qcow2 overlay itself?
++ In fact,I don't want to get a complete image.I just want to convert
++ delta qcow2 image file "A" to a New delta overlay qcow2 image "B" which
++ is equivalent to "A". So the "new.qcow2" is not what i want. I have to
++ admit that this is not bug. Could you please take this as a new feature
++ and enable qemu-img to convert qcow2 overlay itself?
 
-* Remove the NIP adjustment from the -TARGET_QEMU_ESIGRETURN case, it must
-break out with the same NIP as do_syscall().
+-- =
 
- linux-user/main.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1662050
 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 30049581ef..4ea49f68be 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -1712,10 +1712,12 @@ void cpu_loop(CPUPPCState *env)
-              * in syscalls.
-              */
-             env->crf[0] &= ~0x1;
-+            env->nip += 4;
-             ret = do_syscall(env, env->gpr[0], env->gpr[3], env->gpr[4],
-                              env->gpr[5], env->gpr[6], env->gpr[7],
-                              env->gpr[8], 0, 0);
-             if (ret == -TARGET_ERESTARTSYS) {
-+                env->nip -= 4;
-                 break;
-             }
-             if (ret == (target_ulong)(-TARGET_QEMU_ESIGRETURN)) {
-@@ -1723,7 +1725,6 @@ void cpu_loop(CPUPPCState *env)
-                    Avoid corrupting register state.  */
-                 break;
-             }
--            env->nip += 4;
-             if (ret > (target_ulong)(-515)) {
-                 env->crf[0] |= 0x1;
-                 ret = -ret;
--- 
-2.11.0
+Title:
+  qemu-img convert a overlay qcow2 image into a entire image
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  I have a base image file "base.qcow2" and a delta qcow2 image file
+  "delta.qcow2" whose backing file is "base.qcow2".
+
+  Now I use qemu-img to convert "delta.qcow2" and will get a new image
+  file "new.qcow2" which is entire and equivalent to combination of
+  "base.qcow2" and "delta.qcow2".
+
+  In fact,I don't want to get a complete image.I just want to convert
+  delta qcow2 image file "A" to a New delta overlay qcow2 image "B"
+  which is equivalent to "A". So the "new.qcow2" is not what i want. I
+  have to admit that this is not bug. Could you please take this as a
+  new feature and enable qemu-img to convert qcow2 overlay itself?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1662050/+subscriptions
