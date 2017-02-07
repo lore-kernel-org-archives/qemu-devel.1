@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cb7L9-0000WI-RI
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cb7L9-0000WE-Nu
 	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:06:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cb7L4-000793-Rn
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cb7L5-00079L-08
 	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 10:05:55 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue,  7 Feb 2017 18:05:39 +0300
-Message-Id: <1486479940-163258-17-git-send-email-vsementsov@virtuozzo.com>
+Date: Tue,  7 Feb 2017 18:05:26 +0300
+Message-Id: <1486479940-163258-4-git-send-email-vsementsov@virtuozzo.com>
 In-Reply-To: <1486479940-163258-1-git-send-email-vsementsov@virtuozzo.com>
 References: <1486479940-163258-1-git-send-email-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 16/17] iotests: add dirty bitmap migration test
+Subject: [Qemu-devel] [PATCH 03/17] migration: split common postcopy out of
+ ram postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,134 +23,231 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, vsementsov@virtuozzo.com, lirans@il.ibm.com
 
-The test starts two vms (vm_a, vm_b), create dirty bitmap in
-the first one, do several writes to corresponding device and
-then migrate vm_a to vm_b with dirty bitmaps.
+Split common postcopy staff from ram postcopy staff.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 ---
- tests/qemu-iotests/169     | 86 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/169.out |  5 +++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 92 insertions(+)
- create mode 100755 tests/qemu-iotests/169
- create mode 100644 tests/qemu-iotests/169.out
+ include/migration/migration.h |  1 +
+ migration/migration.c         | 39 ++++++++++++++++++++++++-----------
+ migration/postcopy-ram.c      |  4 +++-
+ migration/savevm.c            | 48 +++++++++++++++++++++++++++++++++++--------
+ 4 files changed, 70 insertions(+), 22 deletions(-)
 
-diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/169
-new file mode 100755
-index 0000000..ec6cd46
---- /dev/null
-+++ b/tests/qemu-iotests/169
-@@ -0,0 +1,86 @@
-+#!/usr/bin/env python
-+#
-+# Tests for dirty bitmaps migration.
-+#
-+# Copyright (C) Vladimir Sementsov-Ogievskiy 2015-2016
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index af9135f..3aa228c 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -305,6 +305,7 @@ int migrate_add_blocker(Error *reason, Error **errp);
+  */
+ void migrate_del_blocker(Error *reason);
+ 
++bool migrate_postcopy(void);
+ bool migrate_postcopy_ram(void);
+ bool migrate_zero_blocks(void);
+ 
+diff --git a/migration/migration.c b/migration/migration.c
+index 2766d2f..0a5fd38 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1310,6 +1310,11 @@ bool migrate_postcopy_ram(void)
+     return s->enabled_capabilities[MIGRATION_CAPABILITY_POSTCOPY_RAM];
+ }
+ 
++bool migrate_postcopy(void)
++{
++    return migrate_postcopy_ram();
++}
 +
-+import os
-+import iotests
-+import time
-+from iotests import qemu_img
+ bool migrate_auto_converge(void)
+ {
+     MigrationState *s;
+@@ -1637,9 +1642,11 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
+      * need to tell the destination to throw any pages it's already received
+      * that are dirty
+      */
+-    if (ram_postcopy_send_discard_bitmap(ms)) {
+-        error_report("postcopy send discard bitmap failed");
+-        goto fail;
++    if (migrate_postcopy_ram()) {
++        if (ram_postcopy_send_discard_bitmap(ms)) {
++            error_report("postcopy send discard bitmap failed");
++            goto fail;
++        }
+     }
+ 
+     /*
+@@ -1648,8 +1655,10 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
+      * wrap their state up here
+      */
+     qemu_file_set_rate_limit(ms->to_dst_file, INT64_MAX);
+-    /* Ping just for debugging, helps line traces up */
+-    qemu_savevm_send_ping(ms->to_dst_file, 2);
++    if (migrate_postcopy_ram()) {
++        /* Ping just for debugging, helps line traces up */
++        qemu_savevm_send_ping(ms->to_dst_file, 2);
++    }
+ 
+     /*
+      * While loading the device state we may trigger page transfer
+@@ -1674,7 +1683,9 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
+     qemu_savevm_send_postcopy_listen(fb);
+ 
+     qemu_savevm_state_complete_precopy(fb, false);
+-    qemu_savevm_send_ping(fb, 3);
++    if (migrate_postcopy_ram()) {
++        qemu_savevm_send_ping(fb, 3);
++    }
+ 
+     qemu_savevm_send_postcopy_run(fb);
+ 
+@@ -1697,11 +1708,13 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
+ 
+     qemu_mutex_unlock_iothread();
+ 
+-    /*
+-     * Although this ping is just for debug, it could potentially be
+-     * used for getting a better measurement of downtime at the source.
+-     */
+-    qemu_savevm_send_ping(ms->to_dst_file, 4);
++    if (migrate_postcopy_ram()) {
++        /*
++         * Although this ping is just for debug, it could potentially be
++         * used for getting a better measurement of downtime at the source.
++         */
++        qemu_savevm_send_ping(ms->to_dst_file, 4);
++    }
+ 
+     ret = qemu_file_get_error(ms->to_dst_file);
+     if (ret) {
+@@ -1857,7 +1870,9 @@ static void *migration_thread(void *opaque)
+ 
+         /* And do a ping that will make stuff easier to debug */
+         qemu_savevm_send_ping(s->to_dst_file, 1);
++    }
+ 
++    if (migrate_postcopy()) {
+         /*
+          * Tell the destination that we *might* want to do postcopy later;
+          * if the other end can't do postcopy it should fail now, nice and
+@@ -1891,7 +1906,7 @@ static void *migration_thread(void *opaque)
+             if (pending_size && pending_size >= max_size) {
+                 /* Still a significant amount to transfer */
+ 
+-                if (migrate_postcopy_ram() &&
++                if (migrate_postcopy() &&
+                     s->state != MIGRATION_STATUS_POSTCOPY_ACTIVE &&
+                     pend_nonpost <= max_size &&
+                     atomic_read(&s->start_postcopy)) {
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index a40dddb..aef5690 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -339,7 +339,9 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
+     }
+ 
+     postcopy_state_set(POSTCOPY_INCOMING_END);
+-    migrate_send_rp_shut(mis, qemu_file_get_error(mis->from_src_file) != 0);
++    if (migrate_postcopy_ram()) {
++        migrate_send_rp_shut(mis, qemu_file_get_error(mis->from_src_file) != 0);
++    }
+ 
+     if (mis->postcopy_tmp_page) {
+         munmap(mis->postcopy_tmp_page, getpagesize());
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 5235833..965a58c 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -73,7 +73,7 @@ static struct mig_cmd_args {
+     [MIG_CMD_INVALID]          = { .len = -1, .name = "INVALID" },
+     [MIG_CMD_OPEN_RETURN_PATH] = { .len =  0, .name = "OPEN_RETURN_PATH" },
+     [MIG_CMD_PING]             = { .len = sizeof(uint32_t), .name = "PING" },
+-    [MIG_CMD_POSTCOPY_ADVISE]  = { .len = 16, .name = "POSTCOPY_ADVISE" },
++    [MIG_CMD_POSTCOPY_ADVISE]  = { .len = -1, .name = "POSTCOPY_ADVISE" },
+     [MIG_CMD_POSTCOPY_LISTEN]  = { .len =  0, .name = "POSTCOPY_LISTEN" },
+     [MIG_CMD_POSTCOPY_RUN]     = { .len =  0, .name = "POSTCOPY_RUN" },
+     [MIG_CMD_POSTCOPY_RAM_DISCARD] = {
+@@ -82,6 +82,23 @@ static struct mig_cmd_args {
+     [MIG_CMD_MAX]              = { .len = -1, .name = "MAX" },
+ };
+ 
++/* Note for MIG_CMD_POSTCOPY_ADVISE:
++ * The format of arguments is depending on postcopy mode:
++ * - postcopy RAM only
++ *   uint64_t host page size
++ *   uint64_t taget page size
++ *
++ * - postcopy RAM and postcopy dirty bitmaps
++ *   format is the same as for postcopy RAM only
++ *
++ * - postcopy dirty bitmaps only
++ *   Nothing. Command length field is 0.
++ *
++ * Be careful: adding a new postcopy entity with some other parameters should
++ * not break format self-description ability. Good way is to introduce some
++ * generic extendable format with an exception for two old entities.
++ */
 +
-+disk_a = os.path.join(iotests.test_dir, 'disk_a')
-+disk_b = os.path.join(iotests.test_dir, 'disk_b')
-+fifo = os.path.join(iotests.test_dir, 'mig_fifo')
+ static int announce_self_create(uint8_t *buf,
+                                 uint8_t *mac_addr)
+ {
+@@ -856,12 +873,17 @@ int qemu_savevm_send_packaged(QEMUFile *f, const uint8_t *buf, size_t len)
+ /* Send prior to any postcopy transfer */
+ void qemu_savevm_send_postcopy_advise(QEMUFile *f)
+ {
+-    uint64_t tmp[2];
+-    tmp[0] = cpu_to_be64(getpagesize());
+-    tmp[1] = cpu_to_be64(1ul << qemu_target_page_bits());
++    if (migrate_postcopy_ram()) {
++        uint64_t tmp[2];
++        tmp[0] = cpu_to_be64(getpagesize());
++        tmp[1] = cpu_to_be64(1ul << qemu_target_page_bits());
+ 
+-    trace_qemu_savevm_send_postcopy_advise();
+-    qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE, 16, (uint8_t *)tmp);
++        trace_qemu_savevm_send_postcopy_advise();
++        qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE,
++                                 16, (uint8_t *)tmp);
++    } else {
++        qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE, 0, NULL);
++    }
+ }
+ 
+ /* Sent prior to starting the destination running in postcopy, discard pages
+@@ -1344,6 +1366,10 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
+         return -1;
+     }
+ 
++    if (!migrate_postcopy_ram()) {
++        return 0;
++    }
 +
-+class TestDirtyBitmapMigration(iotests.QMPTestCase):
-+
-+    def setUp(self):
-+        size = 0x400000000 # 1G
-+        os.mkfifo(fifo)
-+        qemu_img('create', '-f', iotests.imgfmt, disk_a, str(size))
-+        qemu_img('create', '-f', iotests.imgfmt, disk_b, str(size))
-+        self.vm_a = iotests.VM(path_suffix='a').add_drive(disk_a)
-+        self.vm_b = iotests.VM(path_suffix='b').add_drive(disk_b)
-+        self.vm_b.add_incoming_migration("exec: cat '" + fifo + "'")
-+        self.vm_a.launch()
-+        self.vm_b.launch()
-+
-+    def tearDown(self):
-+        self.vm_a.shutdown()
-+        self.vm_b.shutdown()
-+        os.remove(disk_a)
-+        os.remove(disk_b)
-+        os.remove(fifo)
-+
-+    def test_migration(self):
-+        granularity = 512
-+        regions = [
-+            { 'start': 0,           'count': 0x100000 },
-+            { 'start': 0x100000000, 'count': 0x200000  },
-+            { 'start': 0x399900000, 'count': 0x100000  }
-+            ]
-+
-+        result = self.vm_a.qmp('block-dirty-bitmap-add', node='drive0',
-+                               name='bitmap', granularity=granularity)
-+        self.assert_qmp(result, 'return', {});
-+
-+        for r in regions:
-+            self.vm_a.hmp_qemu_io('drive0',
-+                                  'write %d %d' % (r['start'], r['count']))
-+
-+        result = self.vm_a.qmp('x-debug-block-dirty-bitmap-sha256',
-+                               node='drive0', name='bitmap')
-+        sha256 = result['return']['sha256']
-+
-+        result = self.vm_a.qmp('migrate-set-capabilities',
-+                               capabilities=[{'capability': 'dirty-bitmaps',
-+                                              'state': True}])
-+        self.assert_qmp(result, 'return', {})
-+
-+        result = self.vm_a.qmp('migrate', uri='exec:cat>' + fifo)
-+        self.assertNotEqual(self.vm_a.event_wait("STOP"), None)
-+        self.assertNotEqual(self.vm_b.event_wait("RESUME"), None)
-+        time.sleep(2)
-+
-+        result = self.vm_b.qmp('x-debug-block-dirty-bitmap-sha256',
-+                               node='drive0', name='bitmap')
-+        self.assert_qmp(result, 'return/sha256', sha256);
-+
-+
-+if __name__ == '__main__':
-+    iotests.main()
-diff --git a/tests/qemu-iotests/169.out b/tests/qemu-iotests/169.out
-new file mode 100644
-index 0000000..ae1213e
---- /dev/null
-+++ b/tests/qemu-iotests/169.out
-@@ -0,0 +1,5 @@
-+.
-+----------------------------------------------------------------------
-+Ran 1 tests
-+
-+OK
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 866c1a0..5dc75ef 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -162,6 +162,7 @@
- 159 rw auto quick
- 160 rw auto quick
- 162 auto quick
-+169 rw auto quick
- 170 rw auto quick
- 171 rw auto quick
- 172 auto
+     if (!postcopy_ram_supported_by_host()) {
+         return -1;
+     }
+@@ -1544,7 +1570,9 @@ static int loadvm_postcopy_handle_listen(MigrationIncomingState *mis)
+          * A rare case, we entered listen without having to do any discards,
+          * so do the setup that's normally done at the time of the 1st discard.
+          */
+-        postcopy_ram_prepare_discard(mis);
++        if (migrate_postcopy_ram()) {
++            postcopy_ram_prepare_discard(mis);
++        }
+     }
+ 
+     /*
+@@ -1552,8 +1580,10 @@ static int loadvm_postcopy_handle_listen(MigrationIncomingState *mis)
+      * However, at this point the CPU shouldn't be running, and the IO
+      * shouldn't be doing anything yet so don't actually expect requests
+      */
+-    if (postcopy_ram_enable_notify(mis)) {
+-        return -1;
++    if (migrate_postcopy_ram()) {
++        if (postcopy_ram_enable_notify(mis)) {
++            return -1;
++        }
+     }
+ 
+     if (mis->have_listen_thread) {
 -- 
 1.8.3.1
