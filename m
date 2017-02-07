@@ -1,37 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cavdr-0005rJ-4p
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:36:27 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cavkM-0002QY-0j
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:43:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cavdn-0006Kl-2b
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:36:27 -0500
-Received: from mail-yw0-x244.google.com ([2607:f8b0:4002:c05::244]:33975)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cavdm-0006Kd-VO
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:36:23 -0500
-Received: by mail-yw0-x244.google.com with SMTP id v73so8491148ywg.1
-	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 18:36:22 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <d27b7c60-a9fe-e92e-a937-d2d13b78f290@twiddle.net>
-	<20170124102625.GF7836@lianli.shorne-pla.net>
-	<01f7a18d-f4f5-18f3-0932-b32c06ad0b0c@twiddle.net>
-	<20170125123430.GG7836@lianli.shorne-pla.net>
-	<39f927aa-26fe-0e43-7c6b-efe1b70bc5fa@twiddle.net>
-	<20170126131229.GB16014@lianli.shorne-pla.net>
-	<ddb9c656-aa3e-5d90-c8fc-0058af5b603b@twiddle.net>
-	<20170201100423.GE21641@lianli.shorne-pla.net>
-	<c840eff0-2be7-07d7-eae9-4cded569d146@twiddle.net>
-	<20170202143455.GB32144@lianli.shorne-pla.net>
-	<20170203151449.GC32144@lianli.shorne-pla.net>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <fbaa2670-fa68-4c31-6197-bef2b5eb752c@twiddle.net>
-Date: Mon, 6 Feb 2017 18:36:04 -0800
+	(envelope-from <no-reply@patchew.org>) id 1cavkH-00005B-U7
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:43:10 -0500
+Resent-Message-Id: <E1cavkH-00005B-U7@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21430)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cavkH-0008WT-Mi
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:43:05 -0500
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20170207023229.29431-1-rth@twiddle.net>
+Message-ID: <148643537388.42.7004700064168762288@eba24e3a0d7f>
 MIME-Version: 1.0
-In-Reply-To: <20170203151449.GC32144@lianli.shorne-pla.net>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target-openrisc: Fix exception handling
- status registers
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 6 Feb 2017 18:42:54 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 0/5] target/hppa patch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,13 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stafford Horne <shorne@gmail.com>
-Cc: Jia Liu <proljc@gmail.com>, qemu-devel@nongnu.org, openrisc@lists.librecores.org
+To: rth@twiddle.net
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-On 02/03/2017 07:14 AM, Stafford Horne wrote:
-> I tried your tgt-or1k-2 branch with my latest kernel and have no issues.
-
-Ok, excellent, thanks.  I'll send a pull for that branch then.
-
-
-r~
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwLzVdIHRhcmdldC9ocHBhIHBhdGNoIHF1ZXVlCk1l
+c3NhZ2UtaWQ6IDIwMTcwMjA3MDIzMjI5LjI5NDMxLTEtcnRoQHR3aWRkbGUubmV0Cgo9PT0gVEVT
+VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0
+IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9w
+dGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAt
+LXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tp
+bmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAg
+ICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gu
+cGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBm
+aQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9
+PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJv
+bSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIC0gW3RhZyB1cGRhdGVd
+ICAgICAgcGF0Y2hldy8xNDg2MTEwMTY0LTEzNzk3LTEtZ2l0LXNlbmQtZW1haWwtcGV0ZXJ4QHJl
+ZGhhdC5jb20gLT4gcGF0Y2hldy8xNDg2MTEwMTY0LTEzNzk3LTEtZ2l0LXNlbmQtZW1haWwtcGV0
+ZXJ4QHJlZGhhdC5jb20KICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDE3MDIwNzAyMzIy
+OS4yOTQzMS0xLXJ0aEB0d2lkZGxlLm5ldCAtPiBwYXRjaGV3LzIwMTcwMjA3MDIzMjI5LjI5NDMx
+LTEtcnRoQHR3aWRkbGUubmV0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKY2UyZGI2
+YiB0YXJnZXQvaHBwYTogRml4IGdkYl93cml0ZV9yZWdpc3RlcgpkZmI0YjljIHRhcmdldC9ocHBh
+OiBUaWR5IGRvX2NicmFuY2gKYjE3ZWE1MyBsaW51eC11c2VyOiBkZWZpbmUgY29ycmVjdCBVVFMg
+bWFjaGluZSBuYW1lIGZvciBocHBhCjg0ZTRhZTIgbGludXgtdXNlcjogZml4ICJhcHQtZ2V0IHVw
+ZGF0ZSIgb24gbGludXgtdXNlciBocHBhCmEyY2IxNTYgbGludXgtdXNlcjogYWRkIGhwcGEgbWFn
+aWMgbnVtYmVycyBpbiBxZW11LWJpbmZtdC1jb25mLnNoCgo9PT0gT1VUUFVUIEJFR0lOID09PQpD
+aGVja2luZyBQQVRDSCAxLzU6IGxpbnV4LXVzZXI6IGFkZCBocHBhIG1hZ2ljIG51bWJlcnMgaW4g
+cWVtdS1iaW5mbXQtY29uZi5zaC4uLgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzM2
+OiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYuc2g6OTU6CitocHBhX21hZ2ljPSdceDdm
+XHg0NVx4NGNceDQ2XHgwMVx4MDJceDAxXHgwMFx4MDBceDAwXHgwMFx4MDBceDAwXHgwMFx4MDBc
+eDAwXHgwMFx4MDJceDAwXHgwZicKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMzc6
+IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDo5NjoKK2hwcGFfbWFzaz0nXHhmZlx4
+ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4MDBceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhm
+Zlx4ZmZceGZlXHhmZlx4ZmYnCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDIyIGxpbmVz
+IGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
+SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
+IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5n
+IFBBVENIIDIvNTogbGludXgtdXNlcjogZml4ICJhcHQtZ2V0IHVwZGF0ZSIgb24gbGludXgtdXNl
+ciBocHBhLi4uCkNoZWNraW5nIFBBVENIIDMvNTogbGludXgtdXNlcjogZGVmaW5lIGNvcnJlY3Qg
+VVRTIG1hY2hpbmUgbmFtZSBmb3IgaHBwYS4uLgpDaGVja2luZyBQQVRDSCA0LzU6IHRhcmdldC9o
+cHBhOiBUaWR5IGRvX2NicmFuY2guLi4KQ2hlY2tpbmcgUEFUQ0ggNS81OiB0YXJnZXQvaHBwYTog
+Rml4IGdkYl93cml0ZV9yZWdpc3Rlci4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
+ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
+IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
+YWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
