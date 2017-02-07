@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cbAab-0004tQ-Ve
+	(envelope-from <laurent@vivier.eu>) id 1cbAab-0004tP-Ub
 	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 13:34:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cbAaY-0001Ue-Oy
+	(envelope-from <laurent@vivier.eu>) id 1cbAaX-0001Tq-PM
 	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 13:34:05 -0500
-Received: from mout.kundenserver.de ([212.227.126.133]:57003)
+Received: from mout.kundenserver.de ([212.227.126.133]:56465)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cbAaY-0001TT-EM
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 13:34:02 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cbAaX-0001S4-Dz
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 13:34:01 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue,  7 Feb 2017 19:33:55 +0100
-Message-Id: <20170207183356.17840-5-laurent@vivier.eu>
+Date: Tue,  7 Feb 2017 19:33:52 +0100
+Message-Id: <20170207183356.17840-2-laurent@vivier.eu>
 In-Reply-To: <20170207183356.17840-1-laurent@vivier.eu>
 References: <20170207183356.17840-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH 4/5] m68k: add instruction needing an extended
- word
+Subject: [Qemu-devel] [PATCH 1/5] m68k: implement risugen module
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,158 +26,311 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>
 
-Some instructions are encoded on more than 32 bits.
-
-To be able to add this word, we introduce a new keyword: "post".
-This keyword adds a block to be executed after the instruction
-generation.
-
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- m68k.risu       | 42 ++++++++++++++++++++++++++++++++++++------
- risugen         |  2 +-
- risugen_m68k.pm |  4 ++++
- 3 files changed, 41 insertions(+), 7 deletions(-)
+ risugen_m68k.pm | 295 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 295 insertions(+)
+ create mode 100644 risugen_m68k.pm
 
-diff --git a/m68k.risu b/m68k.risu
-index 3317005..4297283 100644
---- a/m68k.risu
-+++ b/m68k.risu
-@@ -23,6 +23,8 @@ ADDA  M68000 1101 Ax:3 size:1 11 000 Dy:3
- # addi #Imm, $dx
- ADDIB M68000 00000110 00 000 Dx:3 00000000 data:8
- ADDIW M68000 00000110 01 000 Dx:3 data:16
-+ADDIL M68000 00000110 10 000 Dx:3 \
-+                 !post { insn32(rand(0xffffffff)); }
- # addq #Imm3, $dx
- ADDQ  M68000 0101 imm:3 0 size:2 000 Dx:3 \
-                  !constraints { $size != 0b11; }
-@@ -35,6 +37,8 @@ AND   M68000 1100 Dx:3 0 opmode:2 000 Dy:3 \
- # andi #Imm,$dx
- ANDIB M68000 00000010 00 000 Dx:3 00000000 data:8
- ANDIW M68000 00000010 01 000 Dx:3 data:16
-+ANDIL M68000 00000010 10 000 Dx:3 \
-+                 !post { insn32(rand(0xffffffff)); }
- # andi #imm,ccr
- ANDICCR M68000 0000001000111100 data:16 \
-                  !constraints { write_mov_ccr(rand(0x100)); 1; }
-@@ -68,15 +72,13 @@ BFEXTU M68020 1110100111 000 Dx:3 0 Dy:3 Do:1 offset:5 Dw:1 width:5 \
-                                (!$Dw || $width < 8);             \
-                              }
- # bfffo $dx,offset:width,$dy
--# there is a bug in 68040 with offset > 31
-+# there is a bug in 68040 with D(offset) > 31
- BFFFO M68020 1110110111 000 Dx:3 0 Dy:3 Do:1 offset:5 Dw:1 width:5    \
--                !constraints {                                        \
--                               if ($Dw == 1) { $width &= 0x7; ;}      \
--                               if ($Do == 1) {                        \
--                                   $offset &= 0x7;                    \
-+                !constraints { if ($Do == 1 && $offset < 8) {         \
-                                    write_mov_di($offset, rand(0x20)); \
-                                }                                      \
--                               1;                                     \
-+                               (!$Do || $offset < 8) &&          \
-+                               (!$Dw || $width < 8);             \
-                              }
- # bfins $dx,offset:width,$dy
- BFINS M68020 1110111111 000 Dx:3 0 Dy:3 Do:1 offset:5 Dw:1 width:5 \
-@@ -110,6 +112,8 @@ CMPA  M68000 1011 Ax:3 size:1 11 000 Dy:3
- # cmpi #Imm, $dx
- CMPIB M68000 00001100 00 000 Dx:3 00000000 data:8
- CMPIW M68000 00001100 01 000 Dx:3 data:16
-+CMPIL M68000 00001100 10 000 Dx:3 \
-+                 !post { insn32(rand(0xffffffff)); }
- # divs $dx,$dy
- DIVS  M68000 1000 Dy:3 111 000 Dx:3 \
-                  !constraints { \
-@@ -140,6 +144,8 @@ EOR   M68000 1011 Dx:3 1 size:2 000 Dy:3 \
- # eori #Imm, $dx
- EORIB M68000 00001010 00 000 Dx:3 00000000 data:8
- EORIW M68000 00001010 01 000 Dx:3 data:16
-+EORIL M68000 00001010 10 000 Dx:3 \
-+                 !post { insn32(rand(0xffffffff)); }
- # eori #imm,ccr
- EORICCR M68000 0000101000111100 data:16 \
-                  !constraints { write_mov_ccr(rand(0x100)); 1; }
-@@ -153,6 +159,26 @@ EXG   M68000 1100 Dx:3 1 01000 Ay:3
- EXT   M68000 0100100 opmode:3 000 Dx:3 \
-                  !constraints { $opmode == 0b010 || $opmode == 0b011 }
- EXTB  M68020 0100100 111 000 Dx:3
-+# lea <ea> (XXX: must test full extension word format)
-+LEA   M68000 0100 Ax:3 111 mode:3 reg:3 \
-+                 !constraints { $reg != 6 && $reg != 7 &&                    \
-+                                ($mode == 0b010 || $mode == 0b101 ||         \
-+                                $mode == 0b110 ||                            \
-+                                ($mode == 0b111 && $reg == 0b000) ||         \
-+                                ($mode == 0b111 && $reg == 0b001));          \
-+                              }                                              \
-+                 !post        { if ($mode == 0b101) {                        \
-+                                    insn16(rand(0x10000));                   \
-+                                } elsif ($mode == 0b110) {                   \
-+                                    insn16(((rand(0x80) & 0b1000111) |       \
-+                                            (rand(6) << 3)) << 9 |           \
-+                                           rand(0x100));                     \
-+                                } elsif ($mode == 0b111 && $reg == 0b000) {  \
-+                                    insn16(rand(0x10000));                   \
-+                                } elsif ($mode == 0b111 && $reg == 0b001) {  \
-+                                    insn32(rand(0xffffffff));                \
-+                                }                                            \
-+                              }
- # lsl/lsr $dx,$dy , lsl/lsr #im3,$r
- LSx   M68000 1110 count:3 d:1 size:2 i:1 01 r:3 \
-                  !constraints { $size != 0b11; }
-@@ -199,6 +225,8 @@ OR    M68000 1000 Dy:3 0 size:2 000 Dx:3 \
- # ori #Imm, $dx
- ORIB M68000 00000000 00 000 Dx:3 00000000 data:8
- ORIW M68000 00000000 01 000 Dx:3 data:16
-+ORIL M68000 00000000 10 000 Dx:3 \
-+                 !post { insn32(rand(0xffffffff)); }
- # ori #imm,ccr
- ORICCR M68000 0000000000111100 data:16 \
-                  !constraints { write_mov_ccr(rand(0x100)); 1; }
-@@ -226,6 +254,8 @@ SUBA  M68000 1001 Ax:3 size:1 11 000 Dy:3
- # subi #Imm, $dx
- SUBIB M68000 00000100 00 000 Dx:3 00000000 data:8
- SUBIW M68000 00000100 01 000 Dx:3 data:16
-+SUBIL M68000 00000100 10 000 Dx:3 \
-+                 !post { insn32(rand(0xffffffff)); }
- # subq #Imm3n $dx
- SUBQ  M68000 0101 imm:3 1 size:2 000 Dx:3 \
-                  !constraints { $size != 0b11; }
-diff --git a/risugen b/risugen
-index 77a550b..b46567c 100755
---- a/risugen
-+++ b/risugen
-@@ -34,7 +34,7 @@ my @pattern_re = ();            # include pattern
- my @not_pattern_re = ();        # exclude pattern
- 
- # Valid block names (keys in blocks hash)
--my %valid_blockname = ( constraints => 1, memory => 1 );
-+my %valid_blockname = ( constraints => 1, memory => 1, post => 1 );
- 
- my $lastprog;
- my $proglen;
 diff --git a/risugen_m68k.pm b/risugen_m68k.pm
-index a9a4341..60223f0 100644
---- a/risugen_m68k.pm
+new file mode 100644
+index 0000000..a9a4341
+--- /dev/null
 +++ b/risugen_m68k.pm
-@@ -161,6 +161,7 @@ sub gen_one_insn($$)
-         my $fixedbits = $rec->{fixedbits};
-         my $fixedbitmask = $rec->{fixedbitmask};
-         my $constraint = $rec->{blocks}{"constraints"};
-+        my $post = $rec->{blocks}{"post"};
-         my $memblock = $rec->{blocks}{"memory"};
- 
-         $insn &= ~$fixedbitmask;
-@@ -194,6 +195,9 @@ sub gen_one_insn($$)
-         if ($insnwidth == 32) {
-             insn16($insn & 0xffff);
-         }
-+        if (defined $post) {
-+            eval_with_fields($insnname, $insn, $rec, "post", $post);
+@@ -0,0 +1,295 @@
++#!/usr/bin/perl -w
++###############################################################################
++# Copyright (c) 2016 Laurent Vivier
++# All rights reserved. This program and the accompanying materials
++# are made available under the terms of the Eclipse Public License v1.0
++# which accompanies this distribution, and is available at
++# http://www.eclipse.org/legal/epl-v10.html
++###############################################################################
++
++
++# risugen -- generate a test binary file for use with risu
++# See 'risugen --help' for usage information.
++package risugen_m68k;
++
++use strict;
++use warnings;
++
++require Exporter;
++
++our @ISA    = qw(Exporter);
++our @EXPORT = qw(write_test_code);
++
++my $periodic_reg_random = 1;
++
++my $bytecount;
++#
++# Maximum alignment restriction permitted for a memory op.
++my $MAXALIGN = 64;
++
++sub open_bin
++{
++    my ($fname) = @_;
++    open(BIN, ">", $fname) or die "can't open %fname: $!";
++    $bytecount = 0;
++}
++
++sub close_bin
++{
++    close(BIN) or die "can't close output file: $!";
++}
++
++sub insn32($)
++{
++    my ($insn) = @_;
++    print BIN pack("N", $insn);
++    $bytecount += 4;
++}
++
++sub insn16($)
++{
++    my ($insn) = @_;
++    print BIN pack("n", $insn);
++    $bytecount += 2;
++}
++
++sub write_risuop($)
++{
++    my ($op) = @_;
++    insn32(0x4afc7000 | $op);
++}
++
++sub write_mov_ccr($)
++{
++    my ($imm) = @_;
++    insn16(0x44fc);
++    insn16($imm);
++}
++
++sub write_movb_di($$)
++{
++    my ($r, $imm) = @_;
++
++    # move.b #imm,%dr
++    insn16(0x103c | ($r << 9));
++    insn16($imm)
++}
++
++sub write_mov_di($$)
++{
++    my ($r, $imm) = @_;
++
++    # move.l #imm,%dr
++    insn16(0x203c | ($r << 9));
++    insn32($imm)
++}
++
++sub write_mov_ai($$)
++{
++    my ($r, $imm) = @_;
++
++    # movea.l #imm,%ar
++    insn16(0x207c | ($r << 9));
++    insn32($imm)
++}
++
++sub write_mov_ri($$)
++{
++    my ($r, $imm) = @_;
++
++    if ($r < 8) {
++        write_mov_di($r, $imm);
++    } else {
++        write_mov_ai($r - 8, $imm);
++    }
++}
++
++sub write_random_regdata()
++{
++    # general purpose registers (except A6 (FP) and A7 (SP))
++    for (my $i = 0; $i < 14; $i++) {
++        write_mov_ri($i, rand(0xffffffff));
++    }
++    # initialize condition register
++    write_mov_ccr(rand(0x10000));
++}
++
++my $OP_COMPARE = 0;        # compare registers
++my $OP_TESTEND = 1;        # end of test, stop
++my $OP_SETMEMBLOCK = 2;    # r0 is address of memory block (8192 bytes)
++my $OP_GETMEMBLOCK = 3;    # add the address of memory block to r0
++my $OP_COMPAREMEM = 4;     # compare memory block
++
++sub write_random_register_data()
++{
++    write_random_regdata();
++    write_risuop($OP_COMPARE);
++}
++
++sub eval_with_fields($$$$$) {
++    # Evaluate the given block in an environment with Perl variables
++    # set corresponding to the variable fields for the insn.
++    # Return the result of the eval; we die with a useful error
++    # message in case of syntax error.
++    my ($insnname, $insn, $rec, $blockname, $block) = @_;
++    my $evalstr = "{ ";
++    for my $tuple (@{ $rec->{fields} }) {
++        my ($var, $pos, $mask) = @$tuple;
++        my $val = ($insn >> $pos) & $mask;
++        $evalstr .= "my (\$$var) = $val; ";
++    }
++    $evalstr .= $block;
++    $evalstr .= "}";
++    my $v = eval $evalstr;
++    if ($@) {
++        print "Syntax error detected evaluating $insnname $blockname string:\n$block\n$@";
++        exit(1);
++    }
++    return $v;
++}
++
++sub gen_one_insn($$)
++{
++    # Given an instruction-details array, generate an instruction
++    my $constraintfailures = 0;
++
++    INSN: while(1) {
++        my ($forcecond, $rec) = @_;
++        my $insn = int(rand(0xffffffff));
++        my $insnname = $rec->{name};
++        my $insnwidth = $rec->{width};
++        my $fixedbits = $rec->{fixedbits};
++        my $fixedbitmask = $rec->{fixedbitmask};
++        my $constraint = $rec->{blocks}{"constraints"};
++        my $memblock = $rec->{blocks}{"memory"};
++
++        $insn &= ~$fixedbitmask;
++        $insn |= $fixedbits;
++
++        for my $tuple (@{ $rec->{fields} }) {
++            my ($var, $pos, $mask) = @$tuple;
++            my $val = ($insn >> $pos) & $mask;
++            # Check constraints here:
++            # not allowed to use or modify sp (A7) or fp (A6)
++            next INSN if ($var =~ /^A/ && (($val == 6) || ($val == 7)));
 +        }
- 
-         return;
-     }
++        if (defined $constraint) {
++            # user-specified constraint: evaluate in an environment
++            # with variables set corresponding to the variable fields.
++            my $v = eval_with_fields($insnname, $insn, $rec, "constraints", $constraint);
++            if (!$v) {
++                $constraintfailures++;
++                if ($constraintfailures > 10000) {
++                    print "10000 consecutive constraint failures for $insnname constraints string:\n$constraint\n";
++                    exit (1);
++                }
++                next INSN;
++            }
++        }
++
++        # OK, we got a good one
++        $constraintfailures = 0;
++
++        insn16($insn >> 16);
++        if ($insnwidth == 32) {
++            insn16($insn & 0xffff);
++        }
++
++        return;
++    }
++}
++
++my $lastprog;
++my $proglen;
++my $progmax;
++
++sub progress_start($$)
++{
++    ($proglen, $progmax) = @_;
++    $proglen -= 2; # allow for [] chars
++    $| = 1;        # disable buffering so we can see the meter...
++    print "[" . " " x $proglen . "]\r";
++    $lastprog = 0;
++}
++
++sub progress_update($)
++{
++    # update the progress bar with current progress
++    my ($done) = @_;
++    my $barlen = int($proglen * $done / $progmax);
++    if ($barlen != $lastprog) {
++        $lastprog = $barlen;
++        print "[" . "-" x $barlen . " " x ($proglen - $barlen) . "]\r";
++    }
++}
++
++sub progress_end()
++{
++    print "[" . "-" x $proglen . "]\n";
++    $| = 0;
++}
++
++sub write_test_code($)
++{
++    my ($params) = @_;
++
++    my $condprob = $params->{ 'condprob' };
++    my $numinsns = $params->{ 'numinsns' };
++    my $outfile = $params->{ 'outfile' };
++
++    my @pattern_re = @{ $params->{ 'pattern_re' } };
++    my @not_pattern_re = @{ $params->{ 'not_pattern_re' } };
++    my %insn_details = %{ $params->{ 'details' } };
++
++    open_bin($outfile);
++
++    # convert from probability that insn will be conditional to
++    # probability of forcing insn to unconditional
++    $condprob = 1 - $condprob;
++
++    # TODO better random number generator?
++    srand(0);
++
++    # Get a list of the insn keys which are permitted by the re patterns
++    my @keys = sort keys %insn_details;
++    if (@pattern_re) {
++        my $re = '\b((' . join(')|(',@pattern_re) . '))\b';
++        @keys = grep /$re/, @keys;
++    }
++    # exclude any specifics
++    if (@not_pattern_re) {
++        my $re = '\b((' . join(')|(',@not_pattern_re) . '))\b';
++        @keys = grep !/$re/, @keys;
++    }
++    if (!@keys) {
++        print STDERR "No instruction patterns available! (bad config file or --pattern argument?)\n";
++        exit(1);
++    }
++    print "Generating code using patterns: @keys...\n";
++    progress_start(78, $numinsns);
++
++    if (grep { defined($insn_details{$_}->{blocks}->{"memory"}) } @keys) {
++        write_memblock_setup();
++    }
++
++    # memblock setup doesn't clean its registers, so this must come afterwards.
++    write_random_register_data();
++
++    for my $i (1..$numinsns) {
++        my $insn_enc = $keys[int rand (@keys)];
++        my $forcecond = (rand() < $condprob) ? 1 : 0;
++        gen_one_insn($forcecond, $insn_details{$insn_enc});
++        write_risuop($OP_COMPARE);
++        # Rewrite the registers periodically. This avoids the tendency
++        # for the VFP registers to decay to NaNs and zeroes.
++        if ($periodic_reg_random && ($i % 100) == 0) {
++            write_random_register_data();
++        }
++        progress_update($i);
++    }
++    write_risuop($OP_TESTEND);
++    progress_end();
++    close_bin();
++}
++
++1;
 -- 
 2.9.3
