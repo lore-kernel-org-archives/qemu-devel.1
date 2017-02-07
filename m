@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cb9g9-0006xr-84
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 12:35:46 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cb9iy-0007yS-Bq
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 12:38:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cb9g6-0007OX-GW
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 12:35:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:50375)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cb9g6-0007OB-9X
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 12:35:42 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cb9g4-0005mf-GP
-	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 17:35:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B101D2E80DE
-	for <qemu-devel@nongnu.org>; Tue,  7 Feb 2017 17:35:38 +0000 (UTC)
+	(envelope-from <peter.maydell@linaro.org>) id 1cb9ix-0000TN-54
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 12:38:40 -0500
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:38064)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cb9iw-0000SZ-U4
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 12:38:39 -0500
+Received: by mail-wm0-x229.google.com with SMTP id r141so161427593wmg.1
+	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 09:38:38 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CAFEAcA_ihju_3vZmPtbhxkSoc+dj+cghwXQnQFAAi2XEsw+ixQ@mail.gmail.com>
+References: <1484247815-15279-1-git-send-email-peter.maydell@linaro.org>
+	<1484247815-15279-2-git-send-email-peter.maydell@linaro.org>
+	<87wpdg8uec.fsf@linaro.org>
+	<CAFEAcA_ihju_3vZmPtbhxkSoc+dj+cghwXQnQFAAi2XEsw+ixQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 7 Feb 2017 17:38:16 +0000
+Message-ID: <CAFEAcA-OJj2sqh3aV5frvH3zKfZWGNbbc4t0Ywp5f8wZ12FREA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Feb 2017 17:26:22 -0000
-From: Corey Olson <1662600@bugs.launchpad.net>
-Reply-To: Bug 1662600 <1662600@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170207172049.29850.43816.malonedeb@gac.canonical.com>
-Message-Id: <20170207172622.5740.17278.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1662600] Re: error while building from source on
- Ubuntu 16.04
+Subject: Re: [Qemu-devel] [PATCH 1/3] stellaris: Document memory map and
+ which SoC devices are unimplemented
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,68 +33,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-Since libibverbs was optional, I uninstalled it.  After doing so, my
-build seems to have progressed past this error.
+On 27 January 2017 at 14:17, Peter Maydell <peter.maydell@linaro.org> wrote=
+:
+> On 27 January 2017 at 14:11, Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
+ote:
+>>
+>> Peter Maydell <peter.maydell@linaro.org> writes:
+>> Can we at least have the title of the document these came from for
+>> future reference?
+>
+> Good idea; it's
+> Stellaris LM3S6965 Microcontroller Data Sheet (rev H)
 
--- =
+Added these lines to the comment:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1662600
++    /* Memory map of SoC devices, from
++     * Stellaris LM3S6965 Microcontroller Data Sheet (rev I)
++     * http://www.ti.com/lit/ds/symlink/lm3s6965.pdf
++     *
 
-Title:
-  error while building from source on Ubuntu 16.04
+I've put the series into target-arm.next, since that seems
+trivial enough not to merit a respin.
 
-Status in QEMU:
-  New
-
-Bug description:
-  I'm trying to build Qemu from source (from git) as specified here:
-  http://www.qemu-project.org/download/#source
-
-  Here is the git commit hash for the source:
-  7d2c6c95511e42dffe2b263275e09957723d0ff4
-
-  During the 'make' step, I get the following error:
-
-  migration/rdma.c: In function =E2=80=98qemu_rdma_dump_id=E2=80=99:
-  migration/rdma.c:749:21: error: =E2=80=98struct ibv_port_attr=E2=80=99 ha=
-s no member named =E2=80=98link_layer=E2=80=99
-  migration/rdma.c:750:22: error: =E2=80=98struct ibv_port_attr=E2=80=99 ha=
-s no member named =E2=80=98link_layer=E2=80=99
-  migration/rdma.c:750:37: error: =E2=80=98IBV_LINK_LAYER_INFINIBAND=E2=80=
-=99 undeclared (first use in this function)
-  migration/rdma.c:750:37: note: each undeclared identifier is reported onl=
-y once for each function it appears in
-  migration/rdma.c:751:24: error: =E2=80=98struct ibv_port_attr=E2=80=99 ha=
-s no member named =E2=80=98link_layer=E2=80=99
-  migration/rdma.c:751:39: error: =E2=80=98IBV_LINK_LAYER_ETHERNET=E2=80=99=
- undeclared (first use in this function)
-  migration/rdma.c: In function =E2=80=98qemu_rdma_broken_ipv6_kernel=E2=80=
-=99:
-  migration/rdma.c:850:26: error: =E2=80=98struct ibv_port_attr=E2=80=99 ha=
-s no member named =E2=80=98link_layer=E2=80=99
-  migration/rdma.c:850:41: error: =E2=80=98IBV_LINK_LAYER_INFINIBAND=E2=80=
-=99 undeclared (first use in this function)
-  migration/rdma.c:852:33: error: =E2=80=98struct ibv_port_attr=E2=80=99 ha=
-s no member named =E2=80=98link_layer=E2=80=99
-  migration/rdma.c:852:48: error: =E2=80=98IBV_LINK_LAYER_ETHERNET=E2=80=99=
- undeclared (first use in this function)
-  migration/rdma.c:891:18: error: =E2=80=98struct ibv_port_attr=E2=80=99 ha=
-s no member named =E2=80=98link_layer=E2=80=99
-  make: *** [migration/rdma.o] Error 1
-
-  I searched around a bit, my problem seems related to this:
-  https://patchwork.kernel.org/patch/992952/
-
-  That issue makes me think my libibverbs may be out of date, but I
-  checked and I have libibverbs-dev installed.  Is that the correct
-  version?
-
-  FYI, I installed libibverbs-dev as suggested here: http://wiki.qemu-
-  project.org/index.php/Hosts/Linux#Recommended_additional_packages
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1662600/+subscriptions
+thanks
+-- PMM
