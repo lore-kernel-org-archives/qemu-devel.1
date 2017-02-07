@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37418)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1caxPm-0002Jj-9s
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 23:30:03 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cayG4-00010M-CW
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 00:24:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1caxPj-0000YS-8B
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 23:30:02 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55036)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1caxPj-0000Y4-2a
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 23:29:59 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1caxPh-00030c-J6
-	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 04:29:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 765EF2E80DB
-	for <qemu-devel@nongnu.org>; Tue,  7 Feb 2017 04:29:53 +0000 (UTC)
+	(envelope-from <jasowang@redhat.com>) id 1cayG1-0006wp-6u
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 00:24:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50420)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cayG1-0006wK-1L
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 00:24:01 -0500
+References: <1486110164-13797-1-git-send-email-peterx@redhat.com>
+	<1486110164-13797-6-git-send-email-peterx@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <33d2cae8-2e45-d1ce-43a2-95cb31266684@redhat.com>
+Date: Tue, 7 Feb 2017 13:23:52 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1486110164-13797-6-git-send-email-peterx@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Feb 2017 04:17:26 -0000
-From: Launchpad Bug Tracker <920772@bugs.launchpad.net>
-Reply-To: Bug 920772 <920772@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20120124014831.2874.7900.malonedeb@wampee.canonical.com>
-Message-Id: <20170207041726.8669.48752.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 920772] Re: Win98SE glitches RHEL6.2/CentOS6.2
- QEMU
+Subject: Re: [Qemu-devel] [PATCH v6 05/18] intel_iommu: simplify irq region
+ translation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,61 +28,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, David Gibson <david@gibson.dropbear.id.au>, alex.williamson@redhat.com, bd.aviv@gmail.com
 
-[Expired for QEMU because there has been no activity for 60 days.]
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
 
--- =
+On 2017=E5=B9=B402=E6=9C=8803=E6=97=A5 16:22, Peter Xu wrote:
+> Now we have a standalone memory region for MSI, all the irq region
+> requests should be redirected there. Cleaning up the block with an
+> assertion instead.
+>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/920772
+Reviewed-by: Jason Wang <jasowang@redhat.com>
 
-Title:
-  Win98SE glitches RHEL6.2/CentOS6.2 QEMU
-
-Status in QEMU:
-  Expired
-
-Bug description:
-  I'm not sure if this is something anyone will be interested in,
-  but I ran into some glitches setting up a Windows 98 SE
-  QEMU VM with a relatively recent version.  Needed this
-  to restore an ancient backup and got it working well
-  enough to get the job done.
-
-  Versions
-  =3D=3D=3D=3D=3D=3D=3D=3D
-
-  Distro: CentOS 6.2
-
-  Kernel: upstream 3.1.8
-
-  QEMU:
-  gpxe-roms-qemu-0.9.7-6.9.el6.noarch
-  qemu-img-0.12.1.2-2.209.el6_2.1.x86_64
-  qemu-kvm-0.12.1.2-2.209.el6_2.1.x86_64
-
-  Glitches:
-
-  1) Doesn't work in KVM mode, screen goes black
-  just after installer is finishing up and switching to
-  Win98.  Saw this issue has been around for awhile.
-
-  2) Got it working in QEMU mode, but BIOS plug-n-play
-  driver fails.  This prevents other devices from working.
-
-  a) CDROM not recognized
-
-  b) Realtek 8139C driver (installed separately after
-  Win98) not recognized.
-
-  I don't need these issues fixed, just reporting the
-  in case it's of interest and/or helpful.  Can provide
-  more detail on request.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/920772/+subscriptions
+> ---
+>   hw/i386/intel_iommu.c | 28 ++++++----------------------
+>   1 file changed, 6 insertions(+), 22 deletions(-)
+>
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 50251c3..86d19bb 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -818,28 +818,12 @@ static void vtd_do_iommu_translate(VTDAddressSpac=
+e *vtd_as, PCIBus *bus,
+>       bool writes =3D true;
+>       VTDIOTLBEntry *iotlb_entry;
+>  =20
+> -    /* Check if the request is in interrupt address range */
+> -    if (vtd_is_interrupt_addr(addr)) {
+> -        if (is_write) {
+> -            /* FIXME: since we don't know the length of the access her=
+e, we
+> -             * treat Non-DWORD length write requests without PASID as
+> -             * interrupt requests, too. Withoud interrupt remapping su=
+pport,
+> -             * we just use 1:1 mapping.
+> -             */
+> -            VTD_DPRINTF(MMU, "write request to interrupt address "
+> -                        "gpa 0x%"PRIx64, addr);
+> -            entry->iova =3D addr & VTD_PAGE_MASK_4K;
+> -            entry->translated_addr =3D addr & VTD_PAGE_MASK_4K;
+> -            entry->addr_mask =3D ~VTD_PAGE_MASK_4K;
+> -            entry->perm =3D IOMMU_WO;
+> -            return;
+> -        } else {
+> -            VTD_DPRINTF(GENERAL, "error: read request from interrupt a=
+ddress "
+> -                        "gpa 0x%"PRIx64, addr);
+> -            vtd_report_dmar_fault(s, source_id, addr, VTD_FR_READ, is_=
+write);
+> -            return;
+> -        }
+> -    }
+> +    /*
+> +     * We have standalone memory region for interrupt addresses, we
+> +     * should never receive translation requests in this region.
+> +     */
+> +    assert(!vtd_is_interrupt_addr(addr));
+> +
+>       /* Try to fetch slpte form IOTLB */
+>       iotlb_entry =3D vtd_lookup_iotlb(s, source_id, addr);
+>       if (iotlb_entry) {
