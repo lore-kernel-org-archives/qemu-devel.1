@@ -1,25 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cayYV-0007gG-1r
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 00:43:08 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cayif-00019M-82
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 00:53:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cayYR-0006v7-Tn
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 00:43:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53498)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cayYR-0006ux-OR
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 00:43:03 -0500
-References: <1486110164-13797-1-git-send-email-peterx@redhat.com>
-	<1486110164-13797-10-git-send-email-peterx@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <9b7fb7a7-611b-abfe-4b9c-e803782379cd@redhat.com>
-Date: Tue, 7 Feb 2017 13:42:55 +0800
+	(envelope-from <rth7680@gmail.com>) id 1cayic-0002H1-6Q
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 00:53:37 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:34982)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cayib-0002Gs-VU
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 00:53:34 -0500
+Received: by mail-pg0-x242.google.com with SMTP id 204so11122870pge.2
+	for <qemu-devel@nongnu.org>; Mon, 06 Feb 2017 21:53:33 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <CAJBMM-sX4fGckYy-eNRdZ9dKamOoJoK2fQ4TLS80T5n6jCkpFg@mail.gmail.com>
+	<20170114080435.GF25986@lianli.shorne-pla.net>
+	<20170120163918.GD7836@lianli.shorne-pla.net>
+	<d27b7c60-a9fe-e92e-a937-d2d13b78f290@twiddle.net>
+	<20170124102625.GF7836@lianli.shorne-pla.net>
+	<01f7a18d-f4f5-18f3-0932-b32c06ad0b0c@twiddle.net>
+	<20170125123430.GG7836@lianli.shorne-pla.net>
+	<39f927aa-26fe-0e43-7c6b-efe1b70bc5fa@twiddle.net>
+	<20170126131229.GB16014@lianli.shorne-pla.net>
+	<ddb9c656-aa3e-5d90-c8fc-0058af5b603b@twiddle.net>
+	<20170201100423.GE21641@lianli.shorne-pla.net>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <d3dac109-ad39-8bb9-2012-f7a6824139eb@twiddle.net>
+Date: Mon, 6 Feb 2017 21:53:26 -0800
 MIME-Version: 1.0
-In-Reply-To: <1486110164-13797-10-git-send-email-peterx@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 09/18] intel_iommu: vtd_slpt_level_shift
- check level
+In-Reply-To: <20170201100423.GE21641@lianli.shorne-pla.net>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target-openrisc: Fix exception handling
+ status registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +40,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, David Gibson <david@gibson.dropbear.id.au>, alex.williamson@redhat.com, bd.aviv@gmail.com
+To: Stafford Horne <shorne@gmail.com>
+Cc: Jia Liu <proljc@gmail.com>, qemu-devel@nongnu.org, openrisc@lists.librecores.org
 
-
-
-On 2017=E5=B9=B402=E6=9C=8803=E6=97=A5 16:22, Peter Xu wrote:
-> This helps in debugging incorrect level passed in.
+On 02/01/2017 02:04 AM, Stafford Horne wrote:
+> For kernel builds I have created toolchain binaries here:
 >
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->   hw/i386/intel_iommu.c | 1 +
->   1 file changed, 1 insertion(+)
+>   http://shorne.noip.me/crosstool/files/bin/x86_64/5.4.0/
 >
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index c672621..d74aa27 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -168,6 +168,7 @@ static gboolean vtd_hash_remove_by_domain(gpointer =
-key, gpointer value,
->   /* The shift of an addr for a certain level of paging structure */
->   static inline uint32_t vtd_slpt_level_shift(uint32_t level)
->   {
-> +    assert(level !=3D 0);
->       return VTD_PAGE_SHIFT_4K + (level - 1) * VTD_SL_LEVEL_BITS;
->   }
->  =20
+> These should work.
 
-No harm but not sure we really need this.
+This gdb crashes on the first "stepi" that I issue.  To reproduce,
 
-Reviewed-by: Jason Wang <jasowang@redhat.com>
+$ cat z.c
+int main() { return 0; }
+$ or1k-musl-linux-gcc -g z.c
+$ qemu-or32 -g 10001 ./a.out
+
+// another window
+
+$ or1k-musl-linux-gdb ./a.out
+(gdb) target remote localhost:10001
+// should see that the pc is at _start
+(gdb) stepi
+// crash
+
+I won't be able to debug this myself until I can build my own gdb.
+
+
+r~
