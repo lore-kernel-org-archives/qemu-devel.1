@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cau9C-0005Ig-90
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 20:00:49 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1cauHk-0003vx-Hl
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 20:09:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cau96-0006EK-QZ
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 20:00:42 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:56688)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cau96-0006Ck-Fb
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 20:00:36 -0500
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue,  7 Feb 2017 01:59:24 +0100
-Message-Id: <20170207005930.28327-11-laurent@vivier.eu>
-In-Reply-To: <20170207005930.28327-1-laurent@vivier.eu>
-References: <20170207005930.28327-1-laurent@vivier.eu>
+	(envelope-from <arei.gonglei@huawei.com>) id 1cauHg-0000QZ-Ie
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 20:09:32 -0500
+Received: from [45.249.212.189] (port=2387 helo=dggrg03-dlp.huawei.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1cauHX-0007OJ-Vx
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 20:09:28 -0500
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Tue, 7 Feb 2017 00:59:42 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA1AF46A@DGGEMA505-MBX.china.huawei.com>
+References: <1484727757-41240-1-git-send-email-arei.gonglei@huawei.com>
+	<1484727757-41240-2-git-send-email-arei.gonglei@huawei.com>
+	<20170203103316.GA29200@stefanha-x1.localdomain>
+	<33183CC9F5247A488A2544077AF19020DA1AED04@DGGEMA505-MBX.china.huawei.com>
+	<20170206154625.GB32590@stefanha-x1.localdomain>
+	<20170206201814-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20170206201814-mutt-send-email-mst@kernel.org>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 10/16] target-m68k: add fscc.
+Subject: Re: [Qemu-devel] [PATCH v16 1/2] virtio-crypto: Add virtio crypto
+ device specification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,319 +33,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Huangweidong (C)" <weidong.huang@huawei.com>, "john.griffin@intel.com" <john.griffin@intel.com>, "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "Varun.Sethi@freescale.com" <Varun.Sethi@freescale.com>, "denglingli@chinamobile.com" <denglingli@chinamobile.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>, "agraf@suse.de" <agraf@suse.de>, "nmorey@kalray.eu" <nmorey@kalray.eu>, longpeng <longpeng2@huawei.com>, "vincent.jardin@6wind.com" <vincent.jardin@6wind.com>, "Ola.Liljedahl@arm.com" <Ola.Liljedahl@arm.com>, Luonengjun <luonengjun@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "liang.j.ma@intel.com" <liang.j.ma@intel.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>, "brian.a.keating@intel.com" <brian.a.keating@intel.com>, "claudio.fontana@huawei.com" <claudio.fontana@huawei.com>, "mike.caraman@nxp.com" <mike.caraman@nxp.com>, "Wubin (H)" <wu.wubin@huawei.com>
 
-use DisasCompare with FPU conditions in fscc and fbcc.
+Hi,
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- target/m68k/translate.c | 228 ++++++++++++++++++++++++++++++++----------------
- 1 file changed, 153 insertions(+), 75 deletions(-)
+> From: Michael S. Tsirkin [mailto:mst@redhat.com]
+> Sent: Tuesday, February 07, 2017 2:20 AM
+> Subject: Re: [Qemu-devel] [PATCH v16 1/2] virtio-crypto: Add virtio crypt=
+o
+> device specification
+>=20
+> On Mon, Feb 06, 2017 at 03:46:25PM +0000, Stefan Hajnoczi wrote:
+> > On Mon, Feb 06, 2017 at 01:48:09AM +0000, Gonglei (Arei) wrote:
+> > > > > +\item The device MUST set \field{max_size} to show the maximum s=
+ize
+> of
+> > > > crypto request the device supports.
+> > > >
+> > > > In bytes?
+> > > >
+> > > > > +\item The device MUST set \field{max_cipher_key_len} to show the
+> > > > maximum length of cipher key if the device supports CIPHER service.
+> > > >
+> > > > In bits or bytes?
+> > > >
+> > > > > +\item The device MUST set \field{max_auth_key_len} to show the
+> maximum
+> > > > length of authenticated key if the device supports MAC service.
+> > > >
+> > > > In bits or bytes?
+> > > >
+> > >
+> > > All lengths in virtio crypto spec are bytes.
+> >
+> > Please move this before the first length field is defined:
+> >
+> >   +\begin{note}
+> >   +The basic unit of all data length the byte.
+> >   +\end{note}
+>=20
+> And I'd rewrite as
+>=20
+>    All data length fields specify the length in bytes.
+>=20
 
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index ac60f1a..3fdb672 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -4654,139 +4654,215 @@ undef:
-     disas_undef_fpu(env, s, insn);
- }
- 
--DISAS_INSN(fbcc)
-+static void gen_fcc_cond(DisasCompare *c, DisasContext *s, int cond)
- {
--    uint32_t offset;
--    uint32_t addr;
--    TCGLabel *l1;
--    TCGv tmp;
--
--    addr = s->pc;
--    offset = cpu_ldsw_code(env, s->pc);
--    s->pc += 2;
--    if (insn & (1 << 6)) {
--        offset = (offset << 16) | read_im16(env, s);
--    }
--
--    l1 = gen_new_label();
-+    c->g1 = 0;
-+    c->v2 = tcg_const_i32(0);
-+    c->g2 = 1;
-     /* TODO: Raise BSUN exception.  */
--    /* Jump to l1 if condition is true.  */
--    switch (insn & 0x3f)  {
-+    switch (cond) {
-     case 0:  /* False */
-     case 16: /* Signaling False */
-+        c->v1 = c->v2;
-+        c->tcond = TCG_COND_NEVER;
-         break;
-     case 1:  /* EQual Z */
-     case 17: /* Signaling EQual Z */
--        tmp = tcg_temp_new();
--        tcg_gen_andi_i32(tmp, QREG_FPSR, FPSR_CC_Z);
--        tcg_gen_brcondi_i32(TCG_COND_NE, tmp, 0, l1);
-+        c->v1 = tcg_temp_new();
-+        c->g1 = 1;
-+        tcg_gen_andi_i32(c->v1, QREG_FPSR, FPSR_CC_Z);
-+        c->tcond = TCG_COND_NE;
-         break;
-     case 2:  /* Ordered Greater Than !(A || Z || N) */
-     case 18: /* Greater Than !(A || Z || N) */
--        tmp = tcg_temp_new();
--        tcg_gen_andi_i32(tmp, QREG_FPSR,
-+        c->v1 = tcg_temp_new();
-+        c->g1 = 1;
-+        tcg_gen_andi_i32(c->v1, QREG_FPSR,
-                          FPSR_CC_A | FPSR_CC_Z | FPSR_CC_N);
--        tcg_gen_brcondi_i32(TCG_COND_EQ, tmp, 0, l1);
-+        c->tcond = TCG_COND_EQ;
-         break;
-     case 3:  /* Ordered Greater than or Equal Z || !(A || N) */
-     case 19: /* Greater than or Equal Z || !(A || N) */
-         assert(FPSR_CC_A == (FPSR_CC_N >> 3));
--        tmp = tcg_temp_new();
--        tcg_gen_shli_i32(tmp, QREG_FPSR, 3);
--        tcg_gen_or_i32(tmp, tmp, QREG_FPSR);
--        tcg_gen_xori_i32(tmp, tmp, FPSR_CC_N);
--        tcg_gen_andi_i32(tmp, tmp, FPSR_CC_N | FPSR_CC_Z);
--        tcg_gen_brcondi_i32(TCG_COND_NE, tmp, 0, l1);
-+        c->v1 = tcg_temp_new();
-+        c->g1 = 1;
-+        tcg_gen_shli_i32(c->v1, QREG_FPSR, 3);
-+        tcg_gen_or_i32(c->v1, c->v1, QREG_FPSR);
-+        tcg_gen_xori_i32(c->v1, c->v1, FPSR_CC_N);
-+        tcg_gen_andi_i32(c->v1, c->v1, FPSR_CC_N | FPSR_CC_Z);
-+        c->tcond = TCG_COND_NE;
-         break;
-     case 4:  /* Ordered Less Than !(!N || A || Z); */
-     case 20: /* Less Than !(!N || A || Z); */
--        tmp = tcg_temp_new();
--        tcg_gen_xori_i32(tmp, QREG_FPSR, FPSR_CC_N);
--        tcg_gen_andi_i32(tmp, tmp, FPSR_CC_N | FPSR_CC_A | FPSR_CC_Z);
--        tcg_gen_brcondi_i32(TCG_COND_EQ, tmp, 0, l1);
-+        c->v1 = tcg_temp_new();
-+        c->g1 = 1;
-+        tcg_gen_xori_i32(c->v1, QREG_FPSR, FPSR_CC_N);
-+        tcg_gen_andi_i32(c->v1, c->v1, FPSR_CC_N | FPSR_CC_A | FPSR_CC_Z);
-+        c->tcond = TCG_COND_EQ;
-         break;
-     case 5:  /* Ordered Less than or Equal Z || (N && !A) */
-     case 21: /* Less than or Equal Z || (N && !A) */
-         assert(FPSR_CC_A == (FPSR_CC_N >> 3));
--        tmp = tcg_temp_new();
--        tcg_gen_xori_i32(tmp, QREG_FPSR, FPSR_CC_A);
--        tcg_gen_shli_i32(tmp, tmp, 3);
--        tcg_gen_ori_i32(tmp, tmp, FPSR_CC_Z);
--        tcg_gen_and_i32(tmp, tmp, QREG_FPSR);
--        tcg_gen_brcondi_i32(TCG_COND_NE, tmp, 0, l1);
-+        c->v1 = tcg_temp_new();
-+        c->g1 = 1;
-+        tcg_gen_xori_i32(c->v1, QREG_FPSR, FPSR_CC_A);
-+        tcg_gen_shli_i32(c->v1, c->v1, 3);
-+        tcg_gen_ori_i32(c->v1, c->v1, FPSR_CC_Z);
-+        tcg_gen_and_i32(c->v1, c->v1, QREG_FPSR);
-+        c->tcond = TCG_COND_NE;
-         break;
-     case 6:  /* Ordered Greater or Less than !(A || Z) */
-     case 22: /* Greater or Less than !(A || Z) */
--        tmp = tcg_temp_new();
--        tcg_gen_andi_i32(tmp, QREG_FPSR, FPSR_CC_A | FPSR_CC_Z);
--        tcg_gen_brcondi_i32(TCG_COND_EQ, tmp, 0, l1);
-+        c->v1 = tcg_temp_new();
-+        c->g1 = 1;
-+        tcg_gen_andi_i32(c->v1, QREG_FPSR, FPSR_CC_A | FPSR_CC_Z);
-+        c->tcond = TCG_COND_EQ;
-         break;
-     case 7:  /* Ordered !A */
-     case 23: /* Greater, Less or Equal !A */
--        tmp = tcg_temp_new();
--        tcg_gen_andi_i32(tmp, QREG_FPSR, FPSR_CC_A);
--        tcg_gen_brcondi_i32(TCG_COND_EQ, tmp, 0, l1);
-+        c->v1 = tcg_temp_new();
-+        c->g1 = 1;
-+        tcg_gen_andi_i32(c->v1, QREG_FPSR, FPSR_CC_A);
-+        c->tcond = TCG_COND_EQ;
-         break;
-     case 8:  /* Unordered A */
-     case 24: /* Not Greater, Less or Equal A */
--        tmp = tcg_temp_new();
--        tcg_gen_andi_i32(tmp, QREG_FPSR, FPSR_CC_A);
--        tcg_gen_brcondi_i32(TCG_COND_NE, tmp, 0, l1);
-+        c->v1 = tcg_temp_new();
-+        c->g1 = 1;
-+        tcg_gen_andi_i32(c->v1, QREG_FPSR, FPSR_CC_A);
-+        c->tcond = TCG_COND_NE;
-         break;
-     case 9:  /* Unordered or Equal A || Z */
-     case 25: /* Not Greater or Less then A || Z */
--        tmp = tcg_temp_new();
--        tcg_gen_andi_i32(tmp, QREG_FPSR, FPSR_CC_A | FPSR_CC_Z);
--        tcg_gen_brcondi_i32(TCG_COND_NE, tmp, 0, l1);
-+        c->v1 = tcg_temp_new();
-+        c->g1 = 1;
-+        tcg_gen_andi_i32(c->v1, QREG_FPSR, FPSR_CC_A | FPSR_CC_Z);
-+        c->tcond = TCG_COND_NE;
-         break;
-     case 10: /* Unordered or Greater Than A || !(N || Z)) */
-     case 26: /* Not Less or Equal A || !(N || Z)) */
-         assert(FPSR_CC_Z == (FPSR_CC_N >> 1));
--        tmp = tcg_temp_new();
--        tcg_gen_shli_i32(tmp, QREG_FPSR, 1);
--        tcg_gen_or_i32(tmp, tmp, QREG_FPSR);
--        tcg_gen_xori_i32(tmp, tmp, FPSR_CC_N);
--        tcg_gen_andi_i32(tmp, tmp, FPSR_CC_N | FPSR_CC_A);
--        tcg_gen_brcondi_i32(TCG_COND_NE, tmp, 0, l1);
-+        c->v1 = tcg_temp_new();
-+        c->g1 = 1;
-+        tcg_gen_shli_i32(c->v1, QREG_FPSR, 1);
-+        tcg_gen_or_i32(c->v1, c->v1, QREG_FPSR);
-+        tcg_gen_xori_i32(c->v1, c->v1, FPSR_CC_N);
-+        tcg_gen_andi_i32(c->v1, c->v1, FPSR_CC_N | FPSR_CC_A);
-+        c->tcond = TCG_COND_NE;
-         break;
-     case 11: /* Unordered or Greater or Equal A || Z || !N */
-     case 27: /* Not Less Than A || Z || !N */
--        tmp = tcg_temp_new();
--        tcg_gen_andi_i32(tmp, QREG_FPSR, FPSR_CC_A | FPSR_CC_Z | FPSR_CC_N);
--        tcg_gen_xori_i32(tmp, tmp, FPSR_CC_N);
--        tcg_gen_brcondi_i32(TCG_COND_NE, tmp, 0, l1);
-+        c->v1 = tcg_temp_new();
-+        c->g1 = 1;
-+        tcg_gen_andi_i32(c->v1, QREG_FPSR, FPSR_CC_A | FPSR_CC_Z | FPSR_CC_N);
-+        tcg_gen_xori_i32(c->v1, c->v1, FPSR_CC_N);
-+        c->tcond = TCG_COND_NE;
-         break;
-     case 12: /* Unordered or Less Than A || (N && !Z) */
-     case 28: /* Not Greater than or Equal A || (N && !Z) */
-         assert(FPSR_CC_Z == (FPSR_CC_N >> 1));
--        tmp = tcg_temp_new();
--        tcg_gen_xori_i32(tmp, QREG_FPSR, FPSR_CC_Z);
--        tcg_gen_shli_i32(tmp, tmp, 1);
--        tcg_gen_ori_i32(tmp, tmp, FPSR_CC_A);
--        tcg_gen_and_i32(tmp, tmp, QREG_FPSR);
--        tcg_gen_andi_i32(tmp, tmp, FPSR_CC_A | FPSR_CC_N);
--        tcg_gen_brcondi_i32(TCG_COND_NE, tmp, 0, l1);
-+        c->v1 = tcg_temp_new();
-+        c->g1 = 1;
-+        tcg_gen_xori_i32(c->v1, QREG_FPSR, FPSR_CC_Z);
-+        tcg_gen_shli_i32(c->v1, c->v1, 1);
-+        tcg_gen_ori_i32(c->v1, c->v1, FPSR_CC_A);
-+        tcg_gen_and_i32(c->v1, c->v1, QREG_FPSR);
-+        tcg_gen_andi_i32(c->v1, c->v1, FPSR_CC_A | FPSR_CC_N);
-+        c->tcond = TCG_COND_NE;
-         break;
-     case 13: /* Unordered or Less or Equal A || Z || N */
-     case 29: /* Not Greater Than A || Z || N */
--        tmp = tcg_temp_new();
--        tcg_gen_andi_i32(tmp, QREG_FPSR, FPSR_CC_A | FPSR_CC_Z | FPSR_CC_N);
--        tcg_gen_brcondi_i32(TCG_COND_NE, tmp, 0, l1);
-+        c->v1 = tcg_temp_new();
-+        c->g1 = 1;
-+        tcg_gen_andi_i32(c->v1, QREG_FPSR, FPSR_CC_A | FPSR_CC_Z | FPSR_CC_N);
-+        c->tcond = TCG_COND_NE;
-         break;
-     case 14: /* Not Equal !Z */
-     case 30: /* Signaling Not Equal !Z */
--        tmp = tcg_temp_new();
--        tcg_gen_andi_i32(tmp, QREG_FPSR, FPSR_CC_Z);
--        tcg_gen_brcondi_i32(TCG_COND_EQ, tmp, 0, l1);
-+        c->v1 = tcg_temp_new();
-+        c->g1 = 1;
-+        tcg_gen_andi_i32(c->v1, QREG_FPSR, FPSR_CC_Z);
-+        c->tcond = TCG_COND_EQ;
-         break;
-     case 15: /* True */
-     case 31: /* Signaling True */
--        tcg_gen_br(l1);
-+        c->v1 = c->v2;
-+        c->tcond = TCG_COND_ALWAYS;
-         break;
-     }
-+}
-+
-+static void gen_fjmpcc(DisasContext *s, int cond, TCGLabel *l1)
-+{
-+    DisasCompare c;
-+
-+    gen_fcc_cond(&c, s, cond);
-+    tcg_gen_brcond_i32(c.tcond, c.v1, c.v2, l1);
-+    free_cond(&c);
-+}
-+
-+DISAS_INSN(fbcc)
-+{
-+    uint32_t offset;
-+    uint32_t base;
-+    TCGLabel *l1;
-+
-+    base = s->pc;
-+    offset = (int16_t)read_im16(env, s);
-+    if (insn & (1 << 6)) {
-+        offset = (offset << 16) | read_im16(env, s);
-+    }
-+
-+    l1 = gen_new_label();
-+    update_cc_op(s);
-+    gen_fjmpcc(s, insn & 0x3f, l1);
-     gen_jmp_tb(s, 0, s->pc);
-     gen_set_label(l1);
--    gen_jmp_tb(s, 1, addr + offset);
-+    gen_jmp_tb(s, 1, base + offset);
-+}
-+
-+DISAS_INSN(fscc_mem)
-+{
-+    TCGLabel *l1, *l2;
-+    TCGv taddr;
-+    TCGv addr;
-+    uint16_t ext;
-+
-+    ext = read_im16(env, s);
-+
-+    taddr = gen_lea(env, s, insn, OS_BYTE);
-+    if (IS_NULL_QREG(taddr)) {
-+        gen_addr_fault(s);
-+        return;
-+    }
-+    addr = tcg_temp_local_new();
-+    tcg_gen_mov_i32(addr, taddr);
-+    l1 = gen_new_label();
-+    l2 = gen_new_label();
-+    gen_fjmpcc(s, ext & 0x3f, l1);
-+    gen_store(s, OS_BYTE, addr, tcg_const_i32(0x00));
-+    tcg_gen_br(l2);
-+    gen_set_label(l1);
-+    gen_store(s, OS_BYTE, addr, tcg_const_i32(0xff));
-+    gen_set_label(l2);
-+    tcg_temp_free(addr);
-+}
-+
-+DISAS_INSN(fscc_reg)
-+{
-+    TCGLabel *l1;
-+    TCGv reg;
-+    uint16_t ext;
-+
-+    ext = read_im16(env, s);
-+
-+    reg = DREG(insn, 0);
-+
-+    l1 = gen_new_label();
-+    tcg_gen_ori_i32(reg, reg, 0x000000ff);
-+    gen_fjmpcc(s, ext & 0x3f, l1);
-+    tcg_gen_andi_i32(reg, reg, 0xffffff00);
-+    gen_set_label(l1);
- }
- 
- DISAS_INSN(frestore)
-@@ -5366,6 +5442,8 @@ void register_m68k_insns (CPUM68KState *env)
-     INSN(frestore,  f340, ffc0, CF_FPU);
-     INSN(fsave,     f300, ffc0, CF_FPU);
-     INSN(fpu,       f200, ffc0, FPU);
-+    INSN(fscc_mem,  f240, ffc0, FPU);
-+    INSN(fscc_reg,  f240, fff8, FPU);
-     INSN(fbcc,      f280, ff80, FPU);
-     INSN(frestore,  f340, ffc0, FPU);
-     INSN(fsave,     f300, ffc0, FPU);
--- 
-2.9.3
+Okay, will do it.
+
+BTW if no other objections or comments,=20
+I'd like to send v17 as the final version to ballot, can I?
+
+Thanks,
+-Gonglei
+
+> >
+> > It should be at the beginning of the spec.
+>=20
