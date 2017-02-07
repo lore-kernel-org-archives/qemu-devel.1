@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cav5w-0004Zu-KS
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:01:25 -0500
+	(envelope-from <bounces@canonical.com>) id 1cavTX-0008AV-IP
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:25:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cav5s-0005aj-Kl
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:01:24 -0500
-Received: from [59.151.112.132] (port=60031 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cav5s-0005a1-7b
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:01:20 -0500
-References: <1483596532-14552-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<6a928d63-59c5-a763-0156-40e5958512c5@cn.fujitsu.com>
-	<71bda662-8a14-01d4-9db6-ce96640dfee9@cn.fujitsu.com>
-	<61ae330c-b431-fff3-dd58-ba24b081dc60@redhat.com>
-	<20170206131352.GD2524@work-vm>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <999a7054-4229-661d-502d-9d3e79f3d197@cn.fujitsu.com>
-Date: Tue, 7 Feb 2017 10:01:03 +0800
+	(envelope-from <bounces@canonical.com>) id 1cavTU-00045V-VF
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:25:47 -0500
+Received: from indium.canonical.com ([91.189.90.7]:58692)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cavTU-00045G-OV
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:25:44 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cavTT-0007tU-Ai
+	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 02:25:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 15E302E80D2
+	for <qemu-devel@nongnu.org>; Tue,  7 Feb 2017 02:25:43 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170206131352.GD2524@work-vm>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH V6 0/2] Add new qmp commands to suppurt Xen
- COLO
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 07 Feb 2017 02:12:25 -0000
+From: wayen <1662050@bugs.launchpad.net>
+Reply-To: Bug 1662050 <1662050@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170206024535.14624.3001.malonedeb@soybean.canonical.com>
+Message-Id: <20170207021226.5332.28761.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1662050] Re: qemu-img convert a overlay qcow2
+ image into a entire image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,88 +37,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu devel <qemu-devel@nongnu.org>, "eddie . dong" <eddie.dong@intel.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Bian Naimeng <biannm@cn.fujitsu.com>
+To: qemu-devel@nongnu.org
 
-Hi~ Eric.
+@Eric Blake, Thanks very much for your help. In your way, I have
+verified that this feature already exists.
 
-If you have time, please give me some comments.
+** Changed in: qemu
+       Status: New =3D> Invalid
 
-This series has been sent for a long time.
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1662050
 
-Thanks
+Title:
+  qemu-img convert a overlay qcow2 image into a entire image
 
-Zhang Chen
+Status in QEMU:
+  Incomplete
 
+Bug description:
+  I have a base image file "base.qcow2" and a delta qcow2 image file
+  "delta.qcow2" whose backing file is "base.qcow2".
 
-On 02/06/2017 09:13 PM, Dr. David Alan Gilbert wrote:
-> * Jason Wang (jasowang@redhat.com) wrote:
->>
->> On 2017年01月26日 11:04, Zhang Chen wrote:
->>> Hi~
->>>
->>> No news for a week.
->>>
->>> We need comments ~~
->>>
->>> Ping...
->>>
->> Cc David who is one of the maintainer of migration.
-> My difficulty is I don't know any Xen and I don't understand
-> the block replication code much either; so I hadn't really looked at it.
->
-> Dave
->
->>> Thanks
->>>
->>> Zhang Chen
->>>
->>>
->>> On 01/19/2017 05:57 PM, Zhang Chen wrote:
->>>> Hi~~
->>>>
->>>> Anyone have any comments?
->>>>
->>>> Ping....
->>>>
->>>>
->>>> Thanks
->>>>
->>>> Zhang Chen
->>>>
->>>>
->>>> On 01/05/2017 02:08 PM, Zhang Chen wrote:
->>>>> Xen COLO depend on qemu COLO replication function.
->>>>> So, We need new qmp commands for Xen to use qemu replication.
->>>>>
->>>>> Corresponding libxl patches already in xen.git.
->>>>> Commit ID:
->>>>>
->>>>> ed37ef1f91c20f0ab162ce60f8c38400b917fa64
->>>>> COLO: introduce new API to prepare/start/do/get_error/stop replication
->>>>>
->>>>> a0ddc0b359375b2418213966dfbdbfab593ecc6f
->>>>> tools/libxl: introduction of libxl__qmp_restore to load qemu state
->>>>>
->>>>>
->>>>> Zhang Chen (2):
->>>>>     Add a new qmp command to start/stop replication
->>>>>     Add a new qmp command to do checkpoint, query xen replication status
->>>>>
->>>>>    docs/qmp-commands.txt | 42 +++++++++++++++++++++++++++++++
->>>>>    migration/colo.c      | 40 +++++++++++++++++++++++++++++
->>>>>    qapi-schema.json      | 69
->>>>> +++++++++++++++++++++++++++++++++++++++++++++++++++
->>>>>    3 files changed, 151 insertions(+)
->>>>>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->
->
-> .
->
+  Now I use qemu-img to convert "delta.qcow2" and will get a new image
+  file "new.qcow2" which is entire and equivalent to combination of
+  "base.qcow2" and "delta.qcow2".
 
--- 
-Thanks
-Zhang Chen
+  In fact, i just want to convert the delta qcow2 image file and get a
+  new delta overlay qcow2 image file. So the "new.qcow2" is not what i
+  want. I have to admit that this is not bug. Could you please take this
+  as a new feature and enable qemu-img to convert images in-place?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1662050/+subscriptions
