@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cb6Ch-00087j-QU
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 08:53:11 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cb6Co-0008EG-PX
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 08:53:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cb6Cg-0008De-Pp
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 08:53:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47592)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cb6Cn-0008Hh-Oh
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 08:53:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35930)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cb6Cg-0008Cv-HB
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 08:53:06 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	id 1cb6Cn-0008HK-G2
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 08:53:13 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9F76EC049D59
-	for <qemu-devel@nongnu.org>; Tue,  7 Feb 2017 13:53:06 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 93F78E0739
+	for <qemu-devel@nongnu.org>; Tue,  7 Feb 2017 13:53:13 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue,  7 Feb 2017 17:51:57 +0400
-Message-Id: <20170207135211.15870-15-marcandre.lureau@redhat.com>
+Date: Tue,  7 Feb 2017 17:51:59 +0400
+Message-Id: <20170207135211.15870-17-marcandre.lureau@redhat.com>
 In-Reply-To: <20170207135211.15870-1-marcandre.lureau@redhat.com>
 References: <20170207135211.15870-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 14/28] pc: pcihp: avoid adding
- ACPI_PCIHP_PROP_BSEL twice
+Subject: [Qemu-devel] [PATCH 16/28] tests: fix tco-test leaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,99 +34,152 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Igor Mammedov <imammedo@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-From: Igor Mammedov <imammedo@redhat.com>
+Spotted by ASAN.
 
-PCI hotplug for bridges was introduced only since 2.0 however
-  acpi_set_bsel()->object_property_add_uint32_ptr(bus, ACPI_PCIHP_PROP_BS=
-EL)
-didn't take in account that for legacy mode (1.7) when
-PCI hotplug for bridges is unavailable and ACPI_PCIHP_PROP_BSEL property
-the only bus "PCI.0' has been created earlier at acpi_pcihp_init() time.
-
-We managed to live with it only because of error rised by adding
-a duplicate property in acpi_set_bsel() has been ignored which
-resulted in useless leaking of just allocated (int)bus_bsel.
-
-Issue affects only 1.7 machine type as ACPI tables supported by
-QEMU were introduced at that time, but there wasn't PCI hotplug
-for bridges till the next release (2.0).
-
-Fix it by removing duplicate ACPI_PCIHP_PROP_BSEL intialization
-in acpi_pcihp_init() and doing it only in one place acpi_set_pci_info().
-
-PS:
-do not ignore error returned by object_property_add_uint32_ptr()
-and abort QEMU since it's programming error which should be fixed
-instead of being ignored.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reported-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <1470211497-116801-1-git-send-email-imammedo@redhat.com>
-Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-[ Marc-Andr=C3=A9 - Remove now unused ACPI_PCIHP_LEGACY_SIZE ]
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- hw/acpi/pcihp.c      | 11 -----------
- hw/i386/acpi-build.c |  4 ++--
- 2 files changed, 2 insertions(+), 13 deletions(-)
+ tests/tco-test.c | 35 +++++++++++++++++++++--------------
+ 1 file changed, 21 insertions(+), 14 deletions(-)
 
-diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
-index d957d1e30d..2b0f3e1bfb 100644
---- a/hw/acpi/pcihp.c
-+++ b/hw/acpi/pcihp.c
-@@ -49,7 +49,6 @@
+diff --git a/tests/tco-test.c b/tests/tco-test.c
+index ef02ec5903..c4c264eb3d 100644
+--- a/tests/tco-test.c
++++ b/tests/tco-test.c
+@@ -42,11 +42,18 @@ typedef struct {
+     bool noreboot;
+     QPCIDevice *dev;
+     QPCIBar tco_io_bar;
++    QPCIBus *bus;
+ } TestData;
 =20
- #define ACPI_PCIHP_ADDR 0xae00
- #define ACPI_PCIHP_SIZE 0x0014
--#define ACPI_PCIHP_LEGACY_SIZE 0x000f
- #define PCI_UP_BASE 0x0000
- #define PCI_DOWN_BASE 0x0004
- #define PCI_EJ_BASE 0x0008
-@@ -302,16 +301,6 @@ void acpi_pcihp_init(Object *owner, AcpiPciHpState *=
-s, PCIBus *root_bus,
-     s->root=3D root_bus;
-     s->legacy_piix =3D !bridges_enabled;
-=20
--    if (s->legacy_piix) {
--        unsigned *bus_bsel =3D g_malloc(sizeof *bus_bsel);
--
--        s->io_len =3D ACPI_PCIHP_LEGACY_SIZE;
--
--        *bus_bsel =3D ACPI_PCIHP_BSEL_DEFAULT;
--        object_property_add_uint32_ptr(OBJECT(root_bus), ACPI_PCIHP_PROP=
-_BSEL,
--                                       bus_bsel, NULL);
--    }
--
-     memory_region_init_io(&s->io, owner, &acpi_pcihp_io_ops, s,
-                           "acpi-pci-hotplug", s->io_len);
-     memory_region_add_subregion(address_space_io, s->io_base, &s->io);
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 1c928abb28..f44767b9be 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -462,7 +462,7 @@ static void *acpi_set_bsel(PCIBus *bus, void *opaque)
-=20
-         *bus_bsel =3D (*bsel_alloc)++;
-         object_property_add_uint32_ptr(OBJECT(bus), ACPI_PCIHP_PROP_BSEL=
-,
--                                       bus_bsel, NULL);
-+                                       bus_bsel, &error_abort);
-     }
-=20
-     return bsel_alloc;
-@@ -471,7 +471,7 @@ static void *acpi_set_bsel(PCIBus *bus, void *opaque)
- static void acpi_set_pci_info(void)
++static void test_end(TestData *d)
++{
++    g_free(d->dev);
++    qpci_free_pc(d->bus);
++    qtest_end();
++}
++
+ static void test_init(TestData *d)
  {
-     PCIBus *bus =3D find_i440fx(); /* TODO: Q35 support */
--    unsigned bsel_alloc =3D 0;
-+    unsigned bsel_alloc =3D ACPI_PCIHP_BSEL_DEFAULT;
+-    QPCIBus *bus;
+     QTestState *qs;
+     char *s;
 =20
-     if (bus) {
-         /* Scan all PCI buses. Set property to enable acpi based hotplug=
-. */
+@@ -57,8 +64,8 @@ static void test_init(TestData *d)
+     qtest_irq_intercept_in(qs, "ioapic");
+     g_free(s);
+=20
+-    bus =3D qpci_init_pc(NULL);
+-    d->dev =3D qpci_device_find(bus, QPCI_DEVFN(0x1f, 0x00));
++    d->bus =3D qpci_init_pc(NULL);
++    d->dev =3D qpci_device_find(d->bus, QPCI_DEVFN(0x1f, 0x00));
+     g_assert(d->dev !=3D NULL);
+=20
+     qpci_device_enable(d->dev);
+@@ -148,7 +155,7 @@ static void test_tco_defaults(void)
+                     SW_IRQ_GEN_DEFAULT);
+     g_assert_cmpint(qpci_io_readw(d.dev, d.tco_io_bar, TCO_TMR), =3D=3D,
+                     TCO_TMR_DEFAULT);
+-    qtest_end();
++    test_end(&d);
+ }
+=20
+ static void test_tco_timeout(void)
+@@ -192,7 +199,7 @@ static void test_tco_timeout(void)
+     g_assert(ret =3D=3D 1);
+=20
+     stop_tco(&d);
+-    qtest_end();
++    test_end(&d);
+ }
+=20
+ static void test_tco_max_timeout(void)
+@@ -225,7 +232,7 @@ static void test_tco_max_timeout(void)
+     g_assert(ret =3D=3D 1);
+=20
+     stop_tco(&d);
+-    qtest_end();
++    test_end(&d);
+ }
+=20
+ static QDict *get_watchdog_action(void)
+@@ -262,7 +269,7 @@ static void test_tco_second_timeout_pause(void)
+     QDECREF(ad);
+=20
+     stop_tco(&td);
+-    qtest_end();
++    test_end(&td);
+ }
+=20
+ static void test_tco_second_timeout_reset(void)
+@@ -287,7 +294,7 @@ static void test_tco_second_timeout_reset(void)
+     QDECREF(ad);
+=20
+     stop_tco(&td);
+-    qtest_end();
++    test_end(&td);
+ }
+=20
+ static void test_tco_second_timeout_shutdown(void)
+@@ -312,7 +319,7 @@ static void test_tco_second_timeout_shutdown(void)
+     QDECREF(ad);
+=20
+     stop_tco(&td);
+-    qtest_end();
++    test_end(&td);
+ }
+=20
+ static void test_tco_second_timeout_none(void)
+@@ -337,7 +344,7 @@ static void test_tco_second_timeout_none(void)
+     QDECREF(ad);
+=20
+     stop_tco(&td);
+-    qtest_end();
++    test_end(&td);
+ }
+=20
+ static void test_tco_ticks_counter(void)
+@@ -365,7 +372,7 @@ static void test_tco_ticks_counter(void)
+     } while (!(qpci_io_readw(d.dev, d.tco_io_bar, TCO1_STS) & TCO_TIMEOU=
+T));
+=20
+     stop_tco(&d);
+-    qtest_end();
++    test_end(&d);
+ }
+=20
+ static void test_tco1_control_bits(void)
+@@ -383,7 +390,7 @@ static void test_tco1_control_bits(void)
+     qpci_io_writew(d.dev, d.tco_io_bar, TCO1_CNT, val);
+     g_assert_cmpint(qpci_io_readw(d.dev, d.tco_io_bar, TCO1_CNT), =3D=3D=
+,
+                     TCO_LOCK);
+-    qtest_end();
++    test_end(&d);
+ }
+=20
+ static void test_tco1_status_bits(void)
+@@ -412,7 +419,7 @@ static void test_tco1_status_bits(void)
+     g_assert(ret =3D=3D 1);
+     qpci_io_writew(d.dev, d.tco_io_bar, TCO1_STS, val);
+     g_assert_cmpint(qpci_io_readw(d.dev, d.tco_io_bar, TCO1_STS), =3D=3D=
+, 0);
+-    qtest_end();
++    test_end(&d);
+ }
+=20
+ static void test_tco2_status_bits(void)
+@@ -439,7 +446,7 @@ static void test_tco2_status_bits(void)
+     g_assert(ret =3D=3D 1);
+     qpci_io_writew(d.dev, d.tco_io_bar, TCO2_STS, val);
+     g_assert_cmpint(qpci_io_readw(d.dev, d.tco_io_bar, TCO2_STS), =3D=3D=
+, 0);
+-    qtest_end();
++    test_end(&d);
+ }
+=20
+ int main(int argc, char **argv)
 --=20
 2.11.0.295.gd7dffce1c.dirty
