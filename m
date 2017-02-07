@@ -1,29 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cb2SA-0002lO-Ai
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 04:52:51 -0500
+	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1cb2Yr-0004fp-Ts
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 04:59:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cb2S5-0006i1-Ek
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 04:52:50 -0500
-Received: from greensocs.com ([193.104.36.180]:36824)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cb2S5-0006gh-1p
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 04:52:45 -0500
-References: <1486141597-13941-1-git-send-email-fred.konrad@greensocs.com>
-	<1486141597-13941-5-git-send-email-fred.konrad@greensocs.com>
-	<d64a7dfd-cb55-ba59-9731-282bb98cf20e@redhat.com>
-	<1673015b-b059-8094-1b8c-b7039a45cf8e@greensocs.com>
-	<14c737f4-b965-a1b8-ba3c-003e5fa9e3fd@redhat.com>
-	<d81969f9-1e64-22ff-80eb-e5da72f8ad76@greensocs.com>
-From: Frederic Konrad <fred.konrad@greensocs.com>
-Message-ID: <6a49f6e2-2429-9e2a-cc6b-7366dc4d32c5@greensocs.com>
-Date: Tue, 7 Feb 2017 10:52:41 +0100
+	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1cb2Yn-0001FE-2L
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 04:59:46 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54421
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imbrenda@linux.vnet.ibm.com>)
+	id 1cb2Ym-0001Ei-Sm
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 04:59:41 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v179wfZu112666
+	for <qemu-devel@nongnu.org>; Tue, 7 Feb 2017 04:59:39 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28euqwmqa5-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 04:59:39 -0500
+Received: from localhost
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <imbrenda@linux.vnet.ibm.com>;
+	Tue, 7 Feb 2017 09:59:37 -0000
+References: <1485540693-31723-1-git-send-email-imbrenda@linux.vnet.ibm.com>
+	<1485540693-31723-3-git-send-email-imbrenda@linux.vnet.ibm.com>
+	<63aaa3cc-6623-374d-8f8f-4e48fbbc21ce@redhat.com>
+From: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+Date: Tue, 7 Feb 2017 10:59:33 +0100
 MIME-Version: 1.0
-In-Reply-To: <d81969f9-1e64-22ff-80eb-e5da72f8ad76@greensocs.com>
+In-Reply-To: <63aaa3cc-6623-374d-8f8f-4e48fbbc21ce@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 4/5] exec: allow to get a pointer for some
- mmio memory region
+Message-Id: <db1dcc0a-61fe-652b-b994-12fb3dc10780@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v7 2/2] gdbstub: Fix vCont behaviour
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,105 +44,97 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: edgar.iglesias@xilinx.com, peter.maydell@linaro.org, mark.burton@greensocs.com, qemu-devel@nongnu.org, alistair.francis@xilinx.com, clg@kaod.org
+Cc: borntraeger@de.ibm.com, qemu-devel@nongnu.org, palves@redhat.com, alex.bennee@linaro.org
 
-On 02/04/2017 02:59 PM, Frederic Konrad wrote:
-> On 02/04/2017 01:41 PM, Paolo Bonzini wrote:
->>
-> ...
->>>
->>> Doesn't hotplug use dynamic MemoryRegion? In which case we better
->>> make that work with MTTCG. I wonder if we can't simply handle that
->>> with a safe_work for this case?
->>
->> Hot-unplug works because the backing memory is only freed when the
->> device gets instance_finalize, so at that point the region cannot have
->> any references.
->>
->> What can go wrong is the following (from the docs):
->>
->> - the memory region's owner had a reference taken via memory_region_ref
->>   (for example by address_space_map)
->>
->> - the region is unparented, and has no owner anymore
->>
->> - when address_space_unmap is called, the reference to the memory
->>   region's owner is leaked.
+On 06/02/17 11:00, Paolo Bonzini wrote:
 > 
-> true.
 > 
->>
->> In your case you have phys_section_add/phys_section_destroy instead of
->> address_space_map/unmap, but the problem is the same.
->>
->> I am a bit unsure about using the same lqspi_buf for caching different
->> addresses, and about using the same buffer for MMIO execution and read.
->> What if you allocate a different buffer every time
->> lqspi_request_mmio_ptr is called (adding a char* argument to
->> lqspi_load_cache) and free the old one from the safe_work item, after a
->> global TLB flush?  Then you don't need the Notifiers which were the
->> complicated and handwavy part of my proposal.
+> On 27/01/2017 19:11, Claudio Imbrenda wrote:
+>> +    /* mark valid CPUs with 1 */
+>> +    CPU_FOREACH(cpu) {
+>> +        newstates[cpu_index(cpu) - 1] = 1;
+>> +    }
 > 
-> Actually this was just because it was the way xilinx_qspi worked.
-> It load 1K of SPI data and fill the buffer.
-> 
-> In some other case we don't want to free the pointer at all, just make
-> it not accessible for execution / read.
-> (BTW I'll add the read-only property to this).
-> 
-> What about a simple Object eg: mmio-execution-interface which has a
-> MemoryRegion? Instead of creating the MemoryRegion in request_pointer,
-> We create a mmio-execution-interface object which create and map the
-> region on the subregion.
-> Then in invalidate: we unplug the mmio-execution-interface, unref it and
-> it is freed all by magic when the map doesn't need it.
-> 
-> This avoid the reference issue and probably the bug with MTTCG.
+> Sorry I didn't notice this before: CPU indices are zero-based in QEMU,
+> so you are probably overwriting newstates[-1].  I can adjust it myself,
+> but can you please double check?
 
-Does that make sense?
+they are zero based in the struct, but the already existing cpu_index
+function (include/exec/gdbstub.h) does this:
 
-Thanks,
-Fred
+static inline int cpu_index(CPUState *cpu)
+{
+#if defined(CONFIG_USER_ONLY)
+    return cpu->host_tid;
+#else
+    return cpu->cpu_index + 1;
+#endif
+}
 
+
+maybe that can just become  newstates[cpu->cpu_index] = 1  ?
+(since we're not in CONFIG_USER_ONLY anyway)
+
+
+> Paolo
 > 
-> Fred
-> 
->>
->> Paolo
->>
->>>
->>> BTW the tests I have seems to pass without issues.
->>>
->>>>
->>>> An alternative design could be:
->>>>
->>>> - memory_region_request_mmio_ptr returns a MemoryRegionCache instead of
->>>> a pointer, so that the device can map a subset of the device (e.g. a
->>>> single page)
->>>
->>> I'm not aware of this MemoryRegionCache yet, it seems pretty new.
->>> I'll take a look.
->>>
->>> Thanks,
->>> Fred
->>>
->>>>
->>>> - memory_region_request_mmio_ptr and MemoryRegionOps.request_ptr accept
->>>> a Notifier
->>>>
->>>> - the device adds the Notifier to a NotifierList.  Before invalidating,
->>>> it invokes the Notifier and empties the NotifierList.
->>>>
->>>> - for the TLB case, the Notifier calls tlb_flush_page.
->>>>
->>>> I like the general idea though!
->>>>
->>>> Paolo
->>>>
->>>>> +    }
->>>>> +}
->>>
->>>
->>>
-> 
+>> +
+>> +    /*
+>> +     * res keeps track of what error we are returning, with -1 meaning
+>> +     * that the command is unknown or unsupported, and thus returning
+>> +     * an empty packet, while -22 returns an E22 packet due to
+>> +     * invalid or incorrect parameters passed.
+>> +     */
+>> +    res = 0;
+>> +    while (*p) {
+>> +        if (*p++ != ';') {
+>> +            res = -ENOTSUP;
+>> +            goto out;
+>> +        }
+>> +
+>> +        cur_action = *p++;
+>> +        if (cur_action == 'C' || cur_action == 'S') {
+>> +            cur_action = tolower(cur_action);
+>> +            res = qemu_strtoul(p + 1, &p, 16, &tmp);
+>> +            if (res) {
+>> +                goto out;
+>> +            }
+>> +            signal = gdb_signal_to_target(tmp);
+>> +        } else if (cur_action != 'c' && cur_action != 's') {
+>> +            /* unknown/invalid/unsupported command */
+>> +            res = -ENOTSUP;
+>> +            goto out;
+>> +        }
+>> +        /* thread specification. special values: (none), -1 = all; 0 = any */
+>> +        if ((p[0] == ':' && p[1] == '-' && p[2] == '1') || (p[0] != ':')) {
+>> +            if (*p == ':') {
+>> +                p += 3;
+>> +            }
+>> +            for (idx = 0; idx < max_cpus; idx++) {
+>> +                if (newstates[idx] == 1) {
+>> +                    newstates[idx] = cur_action;
+>> +                }
+>> +            }
+>> +        } else if (*p == ':') {
+>> +            p++;
+>> +            res = qemu_strtoul(p, &p, 16, &tmp);
+>> +            if (res) {
+>> +                goto out;
+>> +            }
+>> +            idx = tmp;
+>> +            /* 0 means any thread, so we pick the first valid CPU */
+>> +            if (!idx) {
+>> +                idx = cpu_index(first_cpu);
+>> +            }
+>> +
+>> +            /* invalid CPU specified */
+>> +            if (!idx || idx > max_cpus || !newstates[idx - 1]) {
+>> +                res = -EINVAL;
+>> +                goto out;
+>> +            }
+>> +            /* only use if no previous match occourred */
+>> +            if (newstates[idx - 1] == 1) {
+>> +                newstates[idx - 1] = cur_action;
+>> +            }
+>> +        }
 > 
