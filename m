@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49816)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cavkM-0002QY-0j
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:43:11 -0500
+	(envelope-from <bounces@canonical.com>) id 1cavn4-0003Rf-6W
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:45:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cavkH-00005B-U7
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:43:10 -0500
-Resent-Message-Id: <E1cavkH-00005B-U7@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21430)
+	(envelope-from <bounces@canonical.com>) id 1cavn0-0000lR-4y
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:45:58 -0500
+Received: from indium.canonical.com ([91.189.90.7]:35308)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cavkH-0008WT-Mi
-	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:43:05 -0500
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20170207023229.29431-1-rth@twiddle.net>
-Message-ID: <148643537388.42.7004700064168762288@eba24e3a0d7f>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cavmz-0000lN-Uq
+	for qemu-devel@nongnu.org; Mon, 06 Feb 2017 21:45:54 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cavmw-0002a1-Sp
+	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 02:45:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D830A2E8019
+	for <qemu-devel@nongnu.org>; Tue,  7 Feb 2017 02:45:50 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 6 Feb 2017 18:42:54 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 0/5] target/hppa patch queue
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 07 Feb 2017 02:33:44 -0000
+From: wayen <1662050@bugs.launchpad.net>
+Reply-To: Bug 1662050 <1662050@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170206024535.14624.3001.malonedeb@soybean.canonical.com>
+Message-Id: <20170207023344.30329.9147.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1662050] Re: qemu-img convert a overlay qcow2
+ image into a entire image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +37,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: rth@twiddle.net
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwLzVdIHRhcmdldC9ocHBhIHBhdGNoIHF1ZXVlCk1l
-c3NhZ2UtaWQ6IDIwMTcwMjA3MDIzMjI5LjI5NDMxLTEtcnRoQHR3aWRkbGUubmV0Cgo9PT0gVEVT
-VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0
-IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9w
-dGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAt
-LXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tp
-bmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAg
-ICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gu
-cGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBm
-aQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9
-PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJv
-bSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIC0gW3RhZyB1cGRhdGVd
-ICAgICAgcGF0Y2hldy8xNDg2MTEwMTY0LTEzNzk3LTEtZ2l0LXNlbmQtZW1haWwtcGV0ZXJ4QHJl
-ZGhhdC5jb20gLT4gcGF0Y2hldy8xNDg2MTEwMTY0LTEzNzk3LTEtZ2l0LXNlbmQtZW1haWwtcGV0
-ZXJ4QHJlZGhhdC5jb20KICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDE3MDIwNzAyMzIy
-OS4yOTQzMS0xLXJ0aEB0d2lkZGxlLm5ldCAtPiBwYXRjaGV3LzIwMTcwMjA3MDIzMjI5LjI5NDMx
-LTEtcnRoQHR3aWRkbGUubmV0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKY2UyZGI2
-YiB0YXJnZXQvaHBwYTogRml4IGdkYl93cml0ZV9yZWdpc3RlcgpkZmI0YjljIHRhcmdldC9ocHBh
-OiBUaWR5IGRvX2NicmFuY2gKYjE3ZWE1MyBsaW51eC11c2VyOiBkZWZpbmUgY29ycmVjdCBVVFMg
-bWFjaGluZSBuYW1lIGZvciBocHBhCjg0ZTRhZTIgbGludXgtdXNlcjogZml4ICJhcHQtZ2V0IHVw
-ZGF0ZSIgb24gbGludXgtdXNlciBocHBhCmEyY2IxNTYgbGludXgtdXNlcjogYWRkIGhwcGEgbWFn
-aWMgbnVtYmVycyBpbiBxZW11LWJpbmZtdC1jb25mLnNoCgo9PT0gT1VUUFVUIEJFR0lOID09PQpD
-aGVja2luZyBQQVRDSCAxLzU6IGxpbnV4LXVzZXI6IGFkZCBocHBhIG1hZ2ljIG51bWJlcnMgaW4g
-cWVtdS1iaW5mbXQtY29uZi5zaC4uLgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzM2
-OiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYuc2g6OTU6CitocHBhX21hZ2ljPSdceDdm
-XHg0NVx4NGNceDQ2XHgwMVx4MDJceDAxXHgwMFx4MDBceDAwXHgwMFx4MDBceDAwXHgwMFx4MDBc
-eDAwXHgwMFx4MDJceDAwXHgwZicKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMzc6
-IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDo5NjoKK2hwcGFfbWFzaz0nXHhmZlx4
-ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4MDBceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhm
-Zlx4ZmZceGZlXHhmZlx4ZmYnCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDIyIGxpbmVz
-IGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
-SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
-IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5n
-IFBBVENIIDIvNTogbGludXgtdXNlcjogZml4ICJhcHQtZ2V0IHVwZGF0ZSIgb24gbGludXgtdXNl
-ciBocHBhLi4uCkNoZWNraW5nIFBBVENIIDMvNTogbGludXgtdXNlcjogZGVmaW5lIGNvcnJlY3Qg
-VVRTIG1hY2hpbmUgbmFtZSBmb3IgaHBwYS4uLgpDaGVja2luZyBQQVRDSCA0LzU6IHRhcmdldC9o
-cHBhOiBUaWR5IGRvX2NicmFuY2guLi4KQ2hlY2tpbmcgUEFUQ0ggNS81OiB0YXJnZXQvaHBwYTog
-Rml4IGdkYl93cml0ZV9yZWdpc3Rlci4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
-ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
-IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
-YWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+@Eric Blake. Sorry, I didn't make it clear. In fact, I don't want to get
+a complete image. I just want to convert qcow2 overlay and get a new
+qcow2 overlay. Maybe you think my intention is meaningless=EF=BC=8C but thi=
+s is
+what I want.
+
+** Changed in: qemu
+       Status: Invalid =3D> Incomplete
+
+** Description changed:
+
+  I have a base image file "base.qcow2" and a delta qcow2 image file
+  "delta.qcow2" whose backing file is "base.qcow2".
+  =
+
+  Now I use qemu-img to convert "delta.qcow2" and will get a new image
+  file "new.qcow2" which is entire and equivalent to combination of
+  "base.qcow2" and "delta.qcow2".
+  =
+
+- In fact, i just want to convert the delta qcow2 image file and get a new
++ In fact, i just want to convert the delta qcow2 image file and get a New
+  delta overlay qcow2 image file. So the "new.qcow2" is not what i want. I
+  have to admit that this is not bug. Could you please take this as a new
+- feature and enable qemu-img to convert images in-place?
++ feature and enable qemu-img to convert qcow2 overlay itself?
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1662050
+
+Title:
+  qemu-img convert a overlay qcow2 image into a entire image
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  I have a base image file "base.qcow2" and a delta qcow2 image file
+  "delta.qcow2" whose backing file is "base.qcow2".
+
+  Now I use qemu-img to convert "delta.qcow2" and will get a new image
+  file "new.qcow2" which is entire and equivalent to combination of
+  "base.qcow2" and "delta.qcow2".
+
+  In fact, i just want to convert the delta qcow2 image file and get a
+  New delta overlay qcow2 image file. So the "new.qcow2" is not what i
+  want. I have to admit that this is not bug. Could you please take this
+  as a new feature and enable qemu-img to convert qcow2 overlay itself?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1662050/+subscriptions
