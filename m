@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cbBJt-00014a-RS
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 14:20:55 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cbBi5-0006yz-U5
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 14:45:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cbBJo-0003WD-W7
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 14:20:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48674)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cbBJo-0003Vo-Oj
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 14:20:48 -0500
-References: <20161202210152.6880-1-lersek@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <eaa65150-d42b-caa7-0666-9ab018646fc1@redhat.com>
-Date: Tue, 7 Feb 2017 13:20:44 -0600
+	(envelope-from <pm215@archaic.org.uk>) id 1cbBi4-00069O-Ln
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 14:45:54 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48441)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1cbBi4-00068L-Di
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 14:45:52 -0500
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
+	(envelope-from <pm215@archaic.org.uk>) id 1cbBi1-0005ZG-Lc
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 19:45:49 +0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue,  7 Feb 2017 19:45:48 +0000
+Message-Id: <1486496748-15674-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20161202210152.6880-1-lersek@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="MtIeNNHlgHeUsbharwgJHrJHRwV4ntRTt"
-Subject: Re: [Qemu-devel] [PATCH v2] scripts: add "git.orderfile" for
- ordering diff hunks by pathname patterns
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v2 00/13] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,82 +28,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, qemu devel list <qemu-devel@nongnu.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Fam Zheng <famz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---MtIeNNHlgHeUsbharwgJHrJHRwV4ntRTt
-From: Eric Blake <eblake@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>, qemu devel list <qemu-devel@nongnu.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Fam Zheng <famz@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, John Snow <jsnow@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <eaa65150-d42b-caa7-0666-9ab018646fc1@redhat.com>
-Subject: Re: [PATCH v2] scripts: add "git.orderfile" for ordering diff hunks
- by pathname patterns
-References: <20161202210152.6880-1-lersek@redhat.com>
-In-Reply-To: <20161202210152.6880-1-lersek@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+A random mix of items here, nothing very major. v2 is just
+squashing in the fix for the clang unused-function error.
 
-On 12/02/2016 03:01 PM, Laszlo Ersek wrote:
-> When passed to git-diff (and to every other git command producing diffs=
-
-> and/or diffstats) with "-O" or "diff.orderFile", this list of patterns
-> will place the more declarative / abstract hunks first, while changes t=
-o
-> imperative code / details will be near the end of the patches. This sav=
-es
-> on scrolling / searching and makes for easier reviewing.
->=20
-> We intend to advise contributors in the Wiki to run
->=20
->   git config diff.orderFile scripts/git.orderfile
->=20
-> once, as part of their initial setup, before formatting their first (or=
-,
-> for repeat contributors, next) patches.
-
-Presumably, we'd also want this to be mentioned in HACKING?
-
->=20
-> See the "-O" option and the "diff.orderFile" configuration variable in
-> git-diff(1) and git-config(1).
->=20
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Eric Blake <eblake@redhat.com>
-> Cc: Fam Zheng <famz@redhat.com>
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Cc: John Snow <jsnow@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> Cc: Stefan Hajnoczi <stefanha@gmail.com>
-> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
-> ---
-
-Is it time to revive this patch?
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+thanks
+-- PMM
 
 
---MtIeNNHlgHeUsbharwgJHrJHRwV4ntRTt
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+The following changes since commit d0dff238a87fa81393ed72754d4dc8b09e50b08b:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+  Merge remote-tracking branch 'remotes/juanquintela/tags/migration/20170206' into staging (2017-02-07 15:29:26 +0000)
 
-iQEcBAEBCAAGBQJYmh4MAAoJEKeha0olJ0Nq6BYIAJF1lcOMwLhv3Ud7o6y/rmrI
-brIakvrXN4YfUP/u0eXsrxqRc5/zylsK/e+LRhLQXsa5rnrnavJH3v2vfjxfx3oe
-JO1lmR05CqsIbnsSNhH0nlQVHpkK1buYUFWtd9YpF7etOoc//YLOrpCaL4bjEhVG
-9G1JZpD3s8tnSyoyHAdCPXvnTyRqOc21Y5S7xsXyw6Zq6JOqm+1egQDGYmDCttGg
-iPU2Kkz9OzD1i9vqkNys7bo202X2BdYVguQv2E+rnCepM6uzr2hyHqgJg2SHkctO
-LujvDgbMORZFq3pWgeR6tUBhQN5NcDpc6vU5LJz5GJ/yu9Kp14RrEw9ufphLJyQ=
-=V64y
------END PGP SIGNATURE-----
+are available in the git repository at:
 
---MtIeNNHlgHeUsbharwgJHrJHRwV4ntRTt--
+  git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20170207-1
+
+for you to fetch changes up to aecfbbc97a2e52bbee34a53c32f961a182046a95:
+
+  stellaris: Use the 'unimplemented' device for parts we don't implement (2017-02-07 18:55:15 +0000)
+
+----------------------------------------------------------------
+target-arm:
+ * new "unimplemented" device for stubbing out devices in a
+   system model so accesses can be logged
+ * stellaris: document the SoC memory map
+ * arm: create instruction syndromes for AArch32 data aborts
+ * arm: Correctly handle watchpoints for BE32 CPUs
+ * Fix Thumb-1 BE32 execution and disassembly
+ * arm: Add cfgend parameter for ARM CPU selection
+ * sd: sdhci: check data length during dma_memory_read
+ * aspeed: add a watchdog controller
+ * integratorcp: adding vmstate for save/restore
+
+----------------------------------------------------------------
+Cédric Le Goater (2):
+      wdt: Add Aspeed watchdog device model
+      aspeed: add a watchdog controller
+
+Julian Brown (4):
+      hw/arm/integratorcp: Support specifying features via -cpu
+      target/arm: Add cfgend parameter for ARM CPU selection.
+      Fix Thumb-1 BE32 execution and disassembly.
+      arm: Correctly handle watchpoints for BE32 CPUs
+
+Pavel Dovgalyuk (1):
+      integratorcp: adding vmstate for save/restore
+
+Peter Maydell (5):
+      target/arm: Abstract out pbit/wbit tests in ARM ldr/str decode
+      target/arm: A32, T32: Create Instruction Syndromes for Data Aborts
+      stellaris: Document memory map and which SoC devices are unimplemented
+      hw/misc: New "unimplemented" sysbus device
+      stellaris: Use the 'unimplemented' device for parts we don't implement
+
+Prasad J Pandit (1):
+      sd: sdhci: check data length during dma_memory_read
+
+ hw/misc/Makefile.objs            |   2 +
+ hw/watchdog/Makefile.objs        |   1 +
+ include/disas/bfd.h              |   7 ++
+ include/hw/arm/aspeed_soc.h      |   2 +
+ include/hw/misc/unimp.h          |  39 +++++++
+ include/hw/watchdog/wdt_aspeed.h |  32 ++++++
+ include/qom/cpu.h                |   3 +
+ target/arm/arm_ldst.h            |  10 +-
+ target/arm/cpu.h                 |   7 ++
+ target/arm/internals.h           |   5 +
+ target/arm/translate.h           |  14 +++
+ disas.c                          |   1 +
+ exec.c                           |   1 +
+ hw/arm/aspeed_soc.c              |  13 +++
+ hw/arm/integratorcp.c            |  78 +++++++++++++-
+ hw/arm/stellaris.c               |  48 +++++++++
+ hw/misc/unimp.c                  | 107 +++++++++++++++++++
+ hw/sd/sdhci.c                    |   2 +-
+ hw/watchdog/wdt_aspeed.c         | 225 +++++++++++++++++++++++++++++++++++++++
+ qom/cpu.c                        |   6 ++
+ target/arm/cpu.c                 |  39 +++++++
+ target/arm/op_helper.c           |  22 ++++
+ target/arm/translate-a64.c       |  14 ---
+ target/arm/translate.c           | 193 ++++++++++++++++++++++++---------
+ 24 files changed, 801 insertions(+), 70 deletions(-)
+ create mode 100644 include/hw/misc/unimp.h
+ create mode 100644 include/hw/watchdog/wdt_aspeed.h
+ create mode 100644 hw/misc/unimp.c
+ create mode 100644 hw/watchdog/wdt_aspeed.c
