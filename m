@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cbSgS-00078k-TB
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:53:22 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cbShP-0007v1-La
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:54:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cbSgP-0002QQ-NK
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:53:21 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cbShK-0002xT-86
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:54:19 -0500
 References: <20170208080900.4092-1-marcandre.lureau@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3dccbc96-1ba2-5cd5-041c-4ed071fddfcb@redhat.com>
-Date: Wed, 8 Feb 2017 07:53:14 -0600
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <58a6feee-8828-d159-daf9-b460a6c0c7c4@redhat.com>
+Date: Wed, 8 Feb 2017 14:54:10 +0100
 MIME-Version: 1.0
 In-Reply-To: <20170208080900.4092-1-marcandre.lureau@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="m2k6SrU6K9TT8IDNnBVsDTeWTRruX23jr"
+	boundary="bUdXavUBbbQPOfDvjod3tAO3tBkAaD3wE"
 Subject: Re: [Qemu-devel] [PATCH] qcow2: remove useless NULL check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -27,28 +27,25 @@ To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel
 Cc: kwolf@redhat.com, qemu-trivial@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---m2k6SrU6K9TT8IDNnBVsDTeWTRruX23jr
-From: Eric Blake <eblake@redhat.com>
+--bUdXavUBbbQPOfDvjod3tAO3tBkAaD3wE
+From: Max Reitz <mreitz@redhat.com>
 To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
  qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, qemu-trivial@nongnu.org
-Message-ID: <3dccbc96-1ba2-5cd5-041c-4ed071fddfcb@redhat.com>
+Message-ID: <58a6feee-8828-d159-daf9-b460a6c0c7c4@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH] qcow2: remove useless NULL check
 References: <20170208080900.4092-1-marcandre.lureau@redhat.com>
 In-Reply-To: <20170208080900.4092-1-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 02/08/2017 02:09 AM, Marc-Andr=C3=A9 Lureau wrote:
+On 08.02.2017 09:09, Marc-Andr=C3=A9 Lureau wrote:
 > g_strdup() already handles the case where the argument is NULL.
 >=20
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
 >  block/qcow2.c | 4 ++--
 >  1 file changed, 2 insertions(+), 2 deletions(-)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
 >=20
 > diff --git a/block/qcow2.c b/block/qcow2.c
 > index 96fb8a8f16..9114218030 100644
@@ -65,33 +62,37 @@ tate *bs,
 mat) : NULL;
 > +    s->image_backing_file =3D g_strdup(bs->backing_file);
 > +    s->image_backing_format =3D g_strdup(bs->backing_format);
+
+bs->backing_file and bs->backing_format are arrays. They will never be NU=
+LL.
+
+The ternary operator tests backing_file and backing_fmt which instead
+are pointers. So this is not an equivalent conversion.
+
+Max
+
 > =20
 >      return qcow2_update_header(bs);
 >  }
 >=20
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
 
 
---m2k6SrU6K9TT8IDNnBVsDTeWTRruX23jr
+--bUdXavUBbbQPOfDvjod3tAO3tBkAaD3wE
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYmyLKAAoJEKeha0olJ0Nqt9YH/3G+n/+rDGknCLDDOHHwGtaV
-TXsfLNqITpUpyhsKAcdwNaqiTNBDaE9fkJ+D/EnGVn8a+qP6foLqOAtJflH6C51L
-O06I337v36e2hba9AO/lJVy3cK9aM76cK/+c2of+OEcjXArpu2DwIDRkyQwytai2
-IM2Klz4s9bf3FxYeMAUNJmxz2btD4zageARb7kaf6J4qSutZzOMXeCEKKMx1F6YJ
-yG+hqLoUS6XVpCEp/QwrSHtjMdwIMlcN/D0gGpzyMaO3vW2bGG5syHJfsO6F1T73
-yM1yXXg/ssY9L4MJ+m7MWW+FUYt5OVRVoR6jo2RmP9UgtOiLuiatUmKAwq2Nj90=
-=6gTy
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlibIwISHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AbcUIAIlKr9DwOEPllHrl+mxot3CwLSfzS4lV
+dlgqj84NIeqdaKJmqA1z1+2zj7QhZsO6ZXiH4vbfGZY4vN0u/vdeBc5M/6h4B9ut
+rmJqnVLycSi1aJ1Ar0J1gxhRenkcGa1CzskhWIWTMzTVp5a4ulZctW00a2RFUdDa
+bokFc36KAvYoPA6vowyRAewr6438fDBP8RNBmbQ4x1Qrjya5/5qRB53b0iRdwuiK
+02o0p25JKKS0DZMWzlMpiy927tReuDffY6fOmqxTCMIKhRhekDM23pfzQVf4u0Zz
+OkaI82a/Snrtmnkhxjvr1Cf1/Z/xs5FTiEiWzV1COHd+iIQ2ZkP9Q2E=
+=w3B5
 -----END PGP SIGNATURE-----
 
---m2k6SrU6K9TT8IDNnBVsDTeWTRruX23jr--
+--bUdXavUBbbQPOfDvjod3tAO3tBkAaD3wE--
