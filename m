@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54691)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cbTJH-0001VU-06
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 09:33:28 -0500
+	(envelope-from <bounces@canonical.com>) id 1cbTLk-0002oK-BJ
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 09:36:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cbTJF-0007Wm-S8
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 09:33:27 -0500
-References: <20170123123056.30383-1-famz@redhat.com>
-	<20170123123056.30383-16-famz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <20d35345-34de-db04-d6d4-59a0babda81e@redhat.com>
-Date: Wed, 8 Feb 2017 15:33:15 +0100
+	(envelope-from <bounces@canonical.com>) id 1cbTLg-0008GA-CX
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 09:36:00 -0500
+Received: from indium.canonical.com ([91.189.90.7]:59010)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cbTLg-0008Fq-70
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 09:35:56 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cbTLc-0005TY-Vf
+	for <qemu-devel@nongnu.org>; Wed, 08 Feb 2017 14:35:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 572632E80E0
+	for <qemu-devel@nongnu.org>; Wed,  8 Feb 2017 14:35:52 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170123123056.30383-16-famz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="EbjUXJcOutmvQTXrlFoh2rL0cOsPJrf1X"
-Subject: Re: [Qemu-devel] [PATCH v12 15/16] qcow2: Force "no other writer"
- lock on bs->file
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 08 Feb 2017 14:30:22 -0000
+From: Cameron Kaiser <1657538@bugs.launchpad.net>
+Reply-To: Bug 1657538 <1657538@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170118175149.27340.89188.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170208143022.30362.56904.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1657538] Re: qemu 2.7.x 2.8 softmmu dont work on
+ BE machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,98 +37,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-block@nongnu.org, eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, rjones@redhat.com
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---EbjUXJcOutmvQTXrlFoh2rL0cOsPJrf1X
-From: Max Reitz <mreitz@redhat.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-block@nongnu.org,
- eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, rjones@redhat.com
-Message-ID: <20d35345-34de-db04-d6d4-59a0babda81e@redhat.com>
-Subject: Re: [PATCH v12 15/16] qcow2: Force "no other writer" lock on bs->file
-References: <20170123123056.30383-1-famz@redhat.com>
- <20170123123056.30383-16-famz@redhat.com>
-In-Reply-To: <20170123123056.30383-16-famz@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
+I can reproduce the same problem on 2.7.0 on a PowerPC G5 for the x86,
+x86_64 and ppc softmmu targets (minus the Gtk problem, since I use this
+ported to Cocoa). As with Luigi this seems to be a regression from
+2.6.2. There is no change with -nographic.
 
-On 23.01.2017 13:30, Fam Zheng wrote:
-> Writing to the same qcow2 file from two QEMU processes at the same time=
+See also: https://bugzilla.redhat.com/show_bug.cgi?id=3D1332449
 
-> will never work correctly, so disable it even when the caller specifies=
+The commenter indicates several BE issues were detected. I have not yet
+heard from him regarding his patches or whether they were upstreamed
+here.
 
-> BDRV_O_RDWR.
->=20
-> Other formats are less vulnerable because they don't have internal
-> snapshots thus qemu-img is less often misused to create live snapshot.
+** Bug watch added: Red Hat Bugzilla #1332449
+   https://bugzilla.redhat.com/show_bug.cgi?id=3D1332449
 
-Hm, OK, reasonable. Also reasonable since we can just wait with those
-until we have op blockers.
+-- =
 
-Which brings me to the op blocker point. I don't know the exact
-influence Kevin's patches will have on this series, but I'd imagine they
-mostly change where the BDRV_O_SHARE_RW flag comes from or whether we
-need that flag at all. Therefore, I personally don't mind the order in
-which your series land in master.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1657538
 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  block/qcow2.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
->=20
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 96fb8a8..879361a 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -1177,6 +1177,17 @@ static int qcow2_open(BlockDriverState *bs, QDic=
-t *options, int flags,
->          }
->      }
-> =20
-> +    if ((flags & BDRV_O_SHARE_RW) && (flags & BDRV_O_RDWR)) {
-> +        /* Shared write is never a good idea for qcow2, override it.
-> +         * XXX: Use permission propagation and masking mechanism in op=
- blockers
-> +         * API once it's there. */
-> +        ret =3D bdrv_reopen(bs->file->bs, flags & ~BDRV_O_SHARE_RW, &l=
-ocal_err);
-> +        if (ret) {
-> +            error_propagate(errp, local_err);
-> +            goto fail;
-> +        }
-> +    }
-> +
+Title:
+  qemu 2.7.x 2.8 softmmu dont work on BE machine
 
-Good in principle, but I don't think it should be at the bottom of this
-function, especially not after "Repair image if dirty". I think it would
-be good to put this right at the start of qcow2_open(), actually.
+Status in QEMU:
+  New
 
-Max
+Bug description:
+  Build on Be machine qemu 2.7.1 and 2.8 in pure softmmu (tgc) dont work on=
+ big endian hardware .
+  tested with ppc-softmmu,i386-softmmu,arm-softmmu same result:
 
->  #ifdef DEBUG_ALLOC
->      {
->          BdrvCheckResult result =3D {0};
->=20
+  with :
+   ./qemu-system-i386 =
 
+  Gtk-Message: Failed to load module "overlay-scrollbar"
+  qemu-system-i386: Trying to execute code outside RAM or ROM at 0x000a0000
+  This usually means one of the following happened:
 
+  (1) You told QEMU to execute a kernel for the wrong machine type, and it =
+crashed on startup (eg trying to run a raspberry pi kernel on a versatilepb=
+ QEMU machine)
+  (2) You didn't give QEMU a kernel or BIOS filename at all, and QEMU execu=
+ted a ROM full of no-op instructions until it fell off the end
+  (3) Your guest kernel has a bug and crashed by jumping off into nowhere
 
---EbjUXJcOutmvQTXrlFoh2rL0cOsPJrf1X
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  This is almost always one of the first two, so check your command line an=
+d that you are using the right type of kernel for this machine.
+  If you think option (3) is likely then you can try debugging your guest w=
+ith the -d debug options; in particular -d guest_errors will cause the log =
+to include a dump of the guest register state at this point.
 
------BEGIN PGP SIGNATURE-----
+  Execution cannot continue; stopping here.
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlibLCsSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A29YH/AwxdFx6wLRq9gYiLt5KHtM7HkUrzq9I
-P+c3euHIE8gwdp10hxbRKZo3JghuWIM44+1gdlhS9guxbhAQcm49d/5U1WxrZA+m
-3YIWcF2DNAl98qe8mEulzjqeHnIYKH0IycmNam3FMK4KmZB2fTzzFqbjwbvRo3ho
-QAmxTEhi4zlsoQkH+AYSgVu0ZzMNBtu+9SHaQvaFGhdj7hJfnSwSOIo5ho68dJxF
-atJ0RdrgRhyDW0cZ8PfKbtDCBGivXuYxAwwTOVv+t1h7L02/evilTHJQLdAqxzjW
-4U1M9RKSbEz4tvmOSG/XbTY3vEArIDocf5QVzfWyt9WRDuk4iqc6vlM=
-=k0Wg
------END PGP SIGNATURE-----
+  =
 
---EbjUXJcOutmvQTXrlFoh2rL0cOsPJrf1X--
+  I try to add the -L option with ../pc-bios/bios.bin =
+
+  and have the same result.
+
+  note the ppc-softmmu and ppc64-softmmu work in kvm mode only emulated
+  mode have issue.
+
+  =
+
+  tested on my hardware a  Qriq P5040 and G5 4x970MP with Ubuntu Mate 16.10 =
+
+  thanks
+  Luigi
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1657538/+subscriptions
