@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashmit602@gmail.com>) id 1cbZhl-0000iu-Uq
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 16:23:13 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cbZnq-00029q-MV
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 16:29:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashmit602@gmail.com>) id 1cbZhl-0001fK-8l
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 16:23:09 -0500
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:36547)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cbZnn-0006us-J2
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 16:29:26 -0500
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:32998)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ashmit602@gmail.com>) id 1cbZhl-0001eo-3X
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 16:23:09 -0500
-Received: by mail-io0-x244.google.com with SMTP id q20so212077ioi.3
-	for <qemu-devel@nongnu.org>; Wed, 08 Feb 2017 13:23:09 -0800 (PST)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cbZnn-0006uT-Ew
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 16:29:23 -0500
+Received: by mail-qk0-x244.google.com with SMTP id 11so19716356qkl.0
+	for <qemu-devel@nongnu.org>; Wed, 08 Feb 2017 13:29:21 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1486571580-16417-1-git-send-email-yongbok.kim@imgtec.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <cac44178-6a4a-6d6a-c1d9-2081fe60688a@gmail.com>
+Date: Wed, 8 Feb 2017 18:29:17 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170202100856.GA22164@stefanha-x1.localdomain>
-References: <20161115124417.GC9226@lemon>
-	<20161115144551.GB17672@stefanha-x1.localdomain>
-	<20161115150016.GD9226@lemon>
-	<20161115192026.GA26428@stefanha-x1.localdomain>
-	<CAAo6VWN9uO9-jjEfHxLHCBE5V5tr5Sx52tGY5vu3g8JgcCRqvQ@mail.gmail.com>
-	<87eg2bokx0.fsf@dusky.pond.sub.org> <20161116094901.GA31999@lemon>
-	<CAJSP0QWvsO8480gsOa=1jiY-8WLwTt6cgPtP6O-CAOfehZab3A@mail.gmail.com>
-	<CAAo6VWNMw2GdR-MznT5np7ov+hSGZZ-6t69bm5+TqAjmHZJZPQ@mail.gmail.com>
-	<CAAo6VWM26xdQhjX9YGiPAXBBxzUNwSi+AUohWyO1HEXxfPv+LQ@mail.gmail.com>
-	<20170202100856.GA22164@stefanha-x1.localdomain>
-From: ashish mittal <ashmit602@gmail.com>
-Date: Wed, 8 Feb 2017 13:23:07 -0800
-Message-ID: <CAAo6VWMY4rcKOpb7zYzKYMLM5o_BNVhhUvy-gg+CDkmvenB3Kw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v6 1/2] block/vxhs.c: Add support for a new
- block device type called "vxhs"
+In-Reply-To: <1486571580-16417-1-git-send-email-yongbok.kim@imgtec.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 4/8] target-mips: Provide function to
+ test if a CPU supports an ISA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,44 +34,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Ashish Mittal <ashish.mittal@veritas.com>, Jeff Cody <jcody@redhat.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>, Paolo Bonzini <pbonzini@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, John Ferlan <jferlan@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Peter Krempa <pkrempa@redhat.com>
-
-We have retained the original syntax in v7 per the following
-suggestion on libvirt thread -
-
->> That is correct. Above syntax would also work for us. I will pose this
->> suggestion to the qemu community and update with their response.
->>
-
-It's not that important... I was looking for a simplification and
-generation of only what's required. You can continue using the server
-syntax - perhaps just leave a note/comment in the code indicating the
-decision point and move on.
+To: qemu-devel@nongnu.org
+Cc: Yongbok Kim <yongbok.kim@imgtec.com>, aurelien@aurel32.net, Paul Burton <paul.burton@imgtec.com>paul.burton@imgtec.com
 
 
-On Thu, Feb 2, 2017 at 2:08 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> On Tue, Jan 31, 2017 at 05:55:47PM -0800, ashish mittal wrote:
->> Hi,
->>
->> There has been some work going on on the VxHS libvirt patches and we
->> are making good progress.
->>
->> A suggestion has been made on the libvirt community to check if we can
->> change the qemu VxHS device specification syntax as follows.
->>
->> Replace
->>
->> (a) +file.server.host=192.168.0.1,file.server.port=9999
->>
->> with
->>
->> (b) +file.host=192.168.0.1,file.port=9999
->>
->> The reasoning being that since we have only one host (true as the
->> failover is now being handled completely/transparently) within the
->> libqnio library), the "server" part is redundant.
+
+On 02/08/2017 01:33 PM, Yongbok Kim wrote:
+> From: Paul Burton <paul.burton@imgtec.com>
 >
-> Sounds good to me.
+> Provide a new cpu_supports_isa function which allows callers to
+> determine whether a CPU supports one of the ISA_ flags, by testing
+> whether the associated struct mips_def_t sets the ISA flags in its
+> insn_flags field.
 >
-> Stefan
+> An example use of this is to allow boards which generate bootloader code
+> to determine the properties of the CPU that will be used, for example
+> whether the CPU is 64 bit or which architecture revision it implements.
+>
+> Signed-off-by: Paul Burton <paul.burton@imgtec.com>
+> Reviewed-by: Leon Alrae <leon.alrae@imgtec.com>
+> Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
+> ---
+>  target/mips/cpu.h       |  1 +
+>  target/mips/translate.c | 10 ++++++++++
+>  2 files changed, 11 insertions(+)
+>
+> diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+> index e1c78f5..4a4747a 100644
+> --- a/target/mips/cpu.h
+> +++ b/target/mips/cpu.h
+> @@ -815,6 +815,7 @@ int cpu_mips_signal_handler(int host_signum, void *pinfo, void *puc);
+>
+>  #define cpu_init(cpu_model) CPU(cpu_mips_init(cpu_model))
+>  bool cpu_supports_cps_smp(const char *cpu_model);
+> +bool cpu_supports_isa(const char *cpu_model, unsigned int isa);
+>  void cpu_set_exception_base(int vp_index, target_ulong address);
+>
+>  /* TODO QOM'ify CPU reset and remove */
+> diff --git a/target/mips/translate.c b/target/mips/translate.c
+> index 7f8ecf4..8b4a072 100644
+> --- a/target/mips/translate.c
+> +++ b/target/mips/translate.c
+> @@ -20233,6 +20233,16 @@ bool cpu_supports_cps_smp(const char *cpu_model)
+>      return (def->CP0_Config3 & (1 << CP0C3_CMGCR)) != 0;
+>  }
+>
+> +bool cpu_supports_isa(const char *cpu_model, unsigned int isa)
+> +{
+> +    const mips_def_t *def = cpu_mips_find_by_name(cpu_model);
+> +    if (!def) {
+> +        return false;
+> +    }
+> +
+> +    return (def->insn_flags & isa) != 0;
+> +}
+> +
+>  void cpu_set_exception_base(int vp_index, target_ulong address)
+>  {
+>      MIPSCPU *vp = MIPS_CPU(qemu_get_cpu(vp_index));
+>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
