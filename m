@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cbHu7-0003bX-V1
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 21:22:45 -0500
+	(envelope-from <liq3ea@gmail.com>) id 1cbIDs-0006Oq-LF
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 21:43:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cbHu4-0008Na-OR
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 21:22:43 -0500
-Received: from [59.151.112.132] (port=59789 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cbHu4-0008L2-Cd
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 21:22:40 -0500
-References: <1483596532-14552-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1483596532-14552-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<7fd43c21-f16c-e9ef-7a3b-90b4e2949eed@redhat.com>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <e7a9073c-f91a-8952-fdbe-85ad81046215@cn.fujitsu.com>
-Date: Wed, 8 Feb 2017 10:22:10 +0800
-MIME-Version: 1.0
-In-Reply-To: <7fd43c21-f16c-e9ef-7a3b-90b4e2949eed@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V6 2/2] Add a new qmp command to do
- checkpoint, query xen replication status
+	(envelope-from <liq3ea@gmail.com>) id 1cbIDp-0005mt-JZ
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 21:43:08 -0500
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:36712)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1cbIDp-0005mV-DS
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 21:43:05 -0500
+Received: by mail-ot0-x244.google.com with SMTP id 36so16539863otx.3
+	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 18:43:05 -0800 (PST)
+Message-ID: <589a85b8.3c2b9d0a.b8e6.1434@mx.google.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Tue,  7 Feb 2017 18:42:55 -0800
+Subject: [Qemu-devel] [PATCH] usb: ehci: fix memory leak in ehci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +23,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu devel <qemu-devel@nongnu.org>
-Cc: Jason Wang <jasowang@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Bian Naimeng <biannm@cn.fujitsu.com>, "eddie . dong" <eddie.dong@intel.com>, Wen Congyang <wencongyang@gmail.com>
+To: kraxel@redhat.com, qemu-devel@nongnu.org
+Cc: Li Qiang <liqiang6-s@360.cn>
 
+From: Li Qiang <liqiang6-s@360.cn>
 
+In usb_ehci_init function, it initializes 's->ipacket', but there
+is no corresponding function to free this. As the ehci can be hotplug
+and unplug, this will leak host memory leak. In order to make the
+hierarchy clean, we should add a ehci pci finalize function, then call
+the clean function in ehci device.
 
-On 02/07/2017 11:50 PM, Eric Blake wrote:
-> On 01/05/2017 12:08 AM, Zhang Chen wrote:
->> We can call this qmp command to do checkpoint outside of qemu.
->> Xen colo will need this function.
->>
->> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
->> Signed-off-by: Wen Congyang <wencongyang@gmail.com>
->> ---
->>   docs/qmp-commands.txt | 24 ++++++++++++++++++++++++
-> This file no longer exists since commit 4d8bb958; can you please rebase
-> this and post a v7? (The docs now live directly in the qapi-schema.json
-> file).
+Signed-off-by: Li Qiang <liqiang6-s@360.cn>
+---
+ hw/usb/hcd-ehci-pci.c | 9 +++++++++
+ hw/usb/hcd-ehci.c     | 5 +++++
+ hw/usb/hcd-ehci.h     | 1 +
+ 3 files changed, 15 insertions(+)
 
-OK, I will send a V7.
-
->>   migration/colo.c      | 17 +++++++++++++++++
->>   qapi-schema.json      | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
->>   3 files changed, 91 insertions(+)
-> It looks like you have addressed all my concerns from earlier versions,
-> though, so the API seems reasonable.
-
-
-Thanks
-Zhang Chen
-
->
-
+diff --git a/hw/usb/hcd-ehci-pci.c b/hw/usb/hcd-ehci-pci.c
+index 5657705..6dedcb8 100644
+--- a/hw/usb/hcd-ehci-pci.c
++++ b/hw/usb/hcd-ehci-pci.c
+@@ -89,6 +89,14 @@ static void usb_ehci_pci_init(Object *obj)
+     usb_ehci_init(s, DEVICE(obj));
+ }
+ 
++static void usb_ehci_pci_finalize(Object *obj)
++{
++    EHCIPCIState *i = PCI_EHCI(obj);
++    EHCIState *s = &i->ehci;
++
++    usb_ehci_finalize(s);
++}
++
+ static void usb_ehci_pci_exit(PCIDevice *dev)
+ {
+     EHCIPCIState *i = PCI_EHCI(dev);
+@@ -159,6 +167,7 @@ static const TypeInfo ehci_pci_type_info = {
+     .parent = TYPE_PCI_DEVICE,
+     .instance_size = sizeof(EHCIPCIState),
+     .instance_init = usb_ehci_pci_init,
++    .instance_finalize = usb_ehci_pci_finalize,
+     .abstract = true,
+     .class_init = ehci_class_init,
+ };
+diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
+index 7622a3a..50ef817 100644
+--- a/hw/usb/hcd-ehci.c
++++ b/hw/usb/hcd-ehci.c
+@@ -2545,6 +2545,11 @@ void usb_ehci_init(EHCIState *s, DeviceState *dev)
+                                 &s->mem_ports);
+ }
+ 
++void usb_ehci_finalize(EHCIState *s)
++{
++    usb_packet_cleanup(&s->ipacket);
++}
++
+ /*
+  * vim: expandtab ts=4
+  */
+diff --git a/hw/usb/hcd-ehci.h b/hw/usb/hcd-ehci.h
+index 3fd7038..938d8aa 100644
+--- a/hw/usb/hcd-ehci.h
++++ b/hw/usb/hcd-ehci.h
+@@ -323,6 +323,7 @@ struct EHCIState {
+ extern const VMStateDescription vmstate_ehci;
+ 
+ void usb_ehci_init(EHCIState *s, DeviceState *dev);
++void usb_ehci_finalize(EHCIState *s);
+ void usb_ehci_realize(EHCIState *s, DeviceState *dev, Error **errp);
+ void usb_ehci_unrealize(EHCIState *s, DeviceState *dev, Error **errp);
+ void ehci_reset(void *opaque);
 -- 
-Thanks
-Zhang Chen
+1.8.3.1
