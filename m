@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57565)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1cbYiF-0002Wl-6n
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 15:19:38 -0500
+	(envelope-from <ben@skyportsystems.com>) id 1cbYmn-0004lR-UG
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 15:24:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1cbYiB-0004gj-1t
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 15:19:35 -0500
-Received: from mail-it0-x22d.google.com ([2607:f8b0:4001:c0b::22d]:37666)
+	(envelope-from <ben@skyportsystems.com>) id 1cbYmj-0006M4-Qd
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 15:24:17 -0500
+Received: from mail-io0-x22a.google.com ([2607:f8b0:4001:c06::22a]:36284)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
-	id 1cbYiA-0004gM-M1
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 15:19:30 -0500
-Received: by mail-it0-x22d.google.com with SMTP id r185so112357196ita.0
-	for <qemu-devel@nongnu.org>; Wed, 08 Feb 2017 12:19:27 -0800 (PST)
+	id 1cbYmj-0006Ly-Hw
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 15:24:13 -0500
+Received: by mail-io0-x22a.google.com with SMTP id j13so125759374iod.3
+	for <qemu-devel@nongnu.org>; Wed, 08 Feb 2017 12:24:13 -0800 (PST)
 From: Ben Warren <ben@skyportsystems.com>
-Message-Id: <6E23D270-9A6C-4C3F-9092-AA67873AD534@skyportsystems.com>
+Message-Id: <E5164ADC-BF50-4052-BA38-DE05D7CFEAC8@skyportsystems.com>
 Content-Type: multipart/signed;
-	boundary="Apple-Mail=_789E9632-EC20-4C38-BFE2-3C4AD87E191C";
+	boundary="Apple-Mail=_4219616D-3493-43EC-A854-0093E45D96E4";
 	protocol="application/pkcs7-signature"; micalg=sha1
 Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Date: Wed, 8 Feb 2017 12:19:24 -0800
-In-Reply-To: <20170207144822.70b7a014@nial.brq.redhat.com>
+Date: Wed, 8 Feb 2017 12:24:10 -0800
+In-Reply-To: <9a6c7225-0b57-fdc6-4a43-49068b175842@redhat.com>
 References: <cover.1486285434.git.ben@skyportsystems.com>
-	<28ff6ff023dd041fc7557955dea916adce72efea.1486285434.git.ben@skyportsystems.com>
-	<20170207144822.70b7a014@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 05/10] ACPI: Add Virtual Machine
- Generation ID support
+	<e531606c10f3c40dbc10d0fa4a4a5d806d7946d9.1486285434.git.ben@skyportsystems.com>
+	<20170207145151.42fb0cc6@nial.brq.redhat.com>
+	<b0dac808-e617-616e-6a1b-11c242b9250a@redhat.com>
+	<20170208114347.2bc8ae2b@nial.brq.redhat.com>
+	<9a6c7225-0b57-fdc6-4a43-49068b175842@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 01/10] ACPI: Add a function for building
+ named qword entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,467 +36,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, lersek@redhat.com, mst@redhat.com
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com
 
 
---Apple-Mail=_789E9632-EC20-4C38-BFE2-3C4AD87E191C
+--Apple-Mail=_4219616D-3493-43EC-A854-0093E45D96E4
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain;
 	charset=utf-8
 
-Thanks for reviewing Igor.
 
-> On Feb 7, 2017, at 5:48 AM, Igor Mammedov <imammedo@redhat.com> wrote:
+> On Feb 8, 2017, at 2:53 AM, Laszlo Ersek <lersek@redhat.com> wrote:
 >=20
-> On Sun,  5 Feb 2017 01:12:00 -0800
-> ben@skyportsystems.com <mailto:ben@skyportsystems.com> wrote:
->=20
->> From: Ben Warren <ben@skyportsystems.com>
+> On 02/08/17 11:43, Igor Mammedov wrote:
+>> On Tue, 7 Feb 2017 21:09:27 +0100
+>> Laszlo Ersek <lersek@redhat.com> wrote:
 >>=20
->> This implements the VM Generation ID feature by passing a 128-bit
->> GUID to the guest via a fw_cfg blob.
->> Any time the GUID changes, an ACPI notify event is sent to the guest
+>>> On 02/07/17 14:51, Igor Mammedov wrote:
+>>>> On Sun,  5 Feb 2017 01:11:56 -0800
+>>>> ben@skyportsystems.com wrote:
+>>>>=20
+>>>>> From: Ben Warren <ben@skyportsystems.com>
+>>>>>=20
+>>>>> This is initially used to patch a 64-bit address into
+>>>>> the VM Generation ID SSDT
+>>>>>=20
+>>>>> Signed-off-by: Ben Warren <ben@skyportsystems.com>
+>>>>> --- =20
+>>>> ... =20
+>>>>> +int
+>>>>> +build_append_named_qword(GArray *array, const char *name_format, =
+...) =20
+>>>> it ain't used anywhere, I'd just drop this patch. =20
+>>>=20
+>>> Ben and I discussed this under
+>>> - msgid <6E25852D-224A-4BDC-AA83-8DC87DB4D0F0@skyportsystems.com>
+>>>  https://www.mail-archive.com/qemu-devel@nongnu.org/msg425496.html
+>>> - msgid <a93a6be3-cbed-5afe-7c72-96410fbfce41@redhat.com>
+>>>  https://www.mail-archive.com/qemu-devel@nongnu.org/msg425519.html
+>>>=20
+>>> On 01/26/17 06:35, Ben Warren wrote:
+>>>> I propose to still include this patch but touch up the comments as
+>>>> requested by Laszlo.  This way it will be in the toolbox for future
+>>>> users and has been tested.  [...] =20
+>>>=20
+>>> I generally agree that dead code is undesirable, but this function =
+has
+>>> surfaced several times until now, and we get to review it every =
+single
+>>> time. Ben tested it, I support its inclusion.
+>>>=20
+>>> OTOH I also pointed it out to Ben
+>>>=20
+>>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg425218.html
+>>>=20
+>>> that he should expect disagreement between his reviewers :) Given =
+that
+>>> I'm observing this series more from the sidelines and you maintain /
+>>> support ACPI gen in QEMU, I certainly defer to you on this.
+>> It's not only dead, having patchable QWORD ready for use in QEMU
+>> would tempt someone to use it and that would lead to XP BSOD
+>> if it slips screening at review time.
+>=20
+> Good point.
+>=20
+>> I'd delay this patch until
+>> we announce that ACPI 1.0 (XP based) guest no more supported by
+>> new QEMU.
 >>=20
->> The user interface is a simple device with one parameter:
->> - guid (string, must be "auto" or in UUID format
->>   xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
->>=20
->> Signed-off-by: Ben Warren <ben@skyportsystems.com>
->> ---
->> default-configs/i386-softmmu.mak     |   1 +
->> default-configs/x86_64-softmmu.mak   |   1 +
->> hw/acpi/Makefile.objs                |   1 +
->> hw/acpi/vmgenid.c                    | 206 =
-+++++++++++++++++++++++++++++++++++
->> hw/i386/acpi-build.c                 |  10 ++
->> include/hw/acpi/acpi_dev_interface.h |   1 +
->> include/hw/acpi/vmgenid.h            |  37 +++++++
->> 7 files changed, 257 insertions(+)
->> create mode 100644 hw/acpi/vmgenid.c
->> create mode 100644 include/hw/acpi/vmgenid.h
->>=20
->> diff --git a/default-configs/i386-softmmu.mak =
-b/default-configs/i386-softmmu.mak
->> index 384cefb..1a43542 100644
->> --- a/default-configs/i386-softmmu.mak
->> +++ b/default-configs/i386-softmmu.mak
->> @@ -58,3 +58,4 @@ CONFIG_I82801B11=3Dy
->> CONFIG_SMBIOS=3Dy
->> CONFIG_HYPERV_TESTDEV=3D$(CONFIG_KVM)
->> CONFIG_PXB=3Dy
->> +CONFIG_ACPI_VMGENID=3Dy
->> diff --git a/default-configs/x86_64-softmmu.mak =
-b/default-configs/x86_64-softmmu.mak
->> index 491a191..aee8b08 100644
->> --- a/default-configs/x86_64-softmmu.mak
->> +++ b/default-configs/x86_64-softmmu.mak
->> @@ -58,3 +58,4 @@ CONFIG_I82801B11=3Dy
->> CONFIG_SMBIOS=3Dy
->> CONFIG_HYPERV_TESTDEV=3D$(CONFIG_KVM)
->> CONFIG_PXB=3Dy
->> +CONFIG_ACPI_VMGENID=3Dy
->> diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
->> index 6acf798..11c35bc 100644
->> --- a/hw/acpi/Makefile.objs
->> +++ b/hw/acpi/Makefile.objs
->> @@ -5,6 +5,7 @@ common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) +=3D =
-cpu_hotplug.o
->> common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) +=3D memory_hotplug.o
->> common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) +=3D cpu.o
->> common-obj-$(CONFIG_ACPI_NVDIMM) +=3D nvdimm.o
->> +common-obj-$(CONFIG_ACPI_VMGENID) +=3D vmgenid.o
->> common-obj-$(call lnot,$(CONFIG_ACPI_X86)) +=3D acpi-stub.o
->>=20
->> common-obj-y +=3D acpi_interface.o
->> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
->> new file mode 100644
->> index 0000000..6c9ecfd
->> --- /dev/null
->> +++ b/hw/acpi/vmgenid.c
->> @@ -0,0 +1,206 @@
->> +/*
->> + *  Virtual Machine Generation ID Device
->> + *
->> + *  Copyright (C) 2017 Skyport Systems.
->> + *
->> + *  Author: Ben Warren <ben@skyportsystems.com>
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2 =
-or later.
->> + * See the COPYING file in the top-level directory.
->> + *
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "qmp-commands.h"
->> +#include "hw/acpi/acpi.h"
->> +#include "hw/acpi/aml-build.h"
->> +#include "hw/acpi/vmgenid.h"
->> +#include "hw/nvram/fw_cfg.h"
->> +#include "sysemu/sysemu.h"
->> +
->> +void vmgenid_build_acpi(GArray *table_data, GArray *guid, BIOSLinker =
-*linker)
->> +{
->> +    Object *obj;
->> +    VmGenIdState *s;
->> +    Aml *ssdt, *dev, *scope, *method, *addr, *if_ctx;
->> +    uint32_t vgia_offset;
->> +
->> +    obj =3D find_vmgenid_dev(NULL);
-> get obj from caller
+>> Anyway I won't object to merging this if you insist and give it your =
+RB.
 >=20
->> +    assert(obj);
->> +    s =3D VMGENID(obj);
->> +
->> +    /* Fill in the GUID values */
->> +    if (guid->len !=3D VMGENID_FW_CFG_SIZE) {
->> +        g_array_set_size(guid, VMGENID_FW_CFG_SIZE);
-> does it have to be conditional?
+> No, you are entirely right. As long as we consider Windows XP guests
+> first class citizens (i.e., we even reject the idea of additional
+> command line options), then keeping QWORD "out of sight" is safer.
 >=20
-No, I guess not.
->> +    }
->> +    g_array_insert_vals(guid, VMGENID_GUID_OFFSET, s->guid.data, =
-16);
->> +
->> +    /* Put this in a separate SSDT table */
->> +    ssdt =3D init_aml_allocator();
->> +
->> +    /* Reserve space for header */
->> +    acpi_data_push(ssdt->buf, sizeof(AcpiTableHeader));
->> +
->> +    /* Storage for the GUID address */
->> +    vgia_offset =3D table_data->len +
->> +        build_append_named_dword(ssdt->buf, "VGIA");
->> +    scope =3D aml_scope("\\_SB");
->> +    dev =3D aml_device("VGEN");
->> +    aml_append(dev, aml_name_decl("_HID", aml_string("QEMUVGID")));
->> +    aml_append(dev, aml_name_decl("_CID", =
-aml_string("VM_Gen_Counter")));
->> +    aml_append(dev, aml_name_decl("_DDN", =
-aml_string("VM_Gen_Counter")));
->> +
->> +    /* Simple status method to check that address is linked and =
-non-zero */
->> +    method =3D aml_method("_STA", 0, AML_NOTSERIALIZED);
->> +    addr =3D aml_local(0);
->> +    aml_append(method, aml_store(aml_int(0xf), addr));
->> +    if_ctx =3D aml_if(aml_equal(aml_name("VGIA"), aml_int(0)));
->> +    aml_append(if_ctx, aml_store(aml_int(0), addr));
->> +    aml_append(method, if_ctx);
->> +    aml_append(method, aml_return(addr));
->> +    aml_append(dev, method);
->> +
->> +    /* the ADDR method returns two 32-bit words representing the =
-lower and
->> +     * upper halves * of the physical address of the fw_cfg blob
->> +     * (holding the GUID) */
->> +    method =3D aml_method("ADDR", 0, AML_NOTSERIALIZED);
->> +
->> +    addr =3D aml_local(0);
->> +    aml_append(method, aml_store(aml_package(2), addr));
->> +
->> +    aml_append(method, aml_store(aml_add(aml_name("VGIA"),
->> +                                         =
-aml_int(VMGENID_GUID_OFFSET), NULL),
->> +                                 aml_index(addr, aml_int(0))));
->> +    aml_append(method, aml_store(aml_int(0), aml_index(addr, =
-aml_int(1))));
-> I'd rather have "VGIA" patched wit address to GUID and not the blob =
-start,
-> see next comment about how.
+> Follow up question: when are we going to drop Windows XP? Do we have a
+> plan? :) It's quite a struggle to support both ends of the spectrum =
+with
+> the same machine types and options (decades-old DOS and Windows XP vs.
+> supercomputer-class NUMA setups). I think this limits development.
 >=20
-> Also usage aml_index() looks a bit confusing, how about:
+> (Just curious; I'm not suggesting to drop Windows XP "soon".)
 >=20
-> pkg =3D aml_local(0)
-> aml_store(aml_package(2), pkg)
-> aml_append(pkg, aml_name("VGIA"))
-> aml_append(pkg, aml_int(0))
+> Thanks!
+> Laszlo
 >=20
-I=E2=80=99ll try that, it does look simpler.  I thought I tried this and =
-couldn=E2=80=99t get it to work, but will try again.
->> +    aml_append(method, aml_return(addr));
->> +
->> +    aml_append(dev, method);
->> +    aml_append(scope, dev);
->> +    aml_append(ssdt, scope);
->> +
->> +    /* attach an ACPI notify */
->> +    method =3D aml_method("\\_GPE._E05", 0, AML_NOTSERIALIZED);
->> +    aml_append(method, aml_notify(aml_name("\\_SB.VGEN"), =
-aml_int(0x80)));
->> +    aml_append(ssdt, method);
->> +
->> +    g_array_append_vals(table_data, ssdt->buf->data, =
-ssdt->buf->len);
->> +
->> +    /* Allocate guest memory for the Data fw_cfg blob */
->> +    bios_linker_loader_alloc(linker, VMGENID_GUID_FW_CFG_FILE, guid, =
-4096,
->> +                             false /* page boundary, high memory =
-*/);
-> does it guaranties that blob will be allocated in cacheable page?
-> (SeaBIOS/OVMF)
+OK, I=E2=80=99ll drop this patch from the set.  I guess it will always =
+be around if we want to resurrect.
 >=20
->> +
->> +    /* Patch address of GUID fw_cfg blob into the ADDR fw_cfg blob =
-*/
->> +    bios_linker_loader_add_pointer(linker,
->> +        VMGENID_ADDR_FW_CFG_FILE, 0, sizeof(uint32_t),
->> +        VMGENID_GUID_FW_CFG_FILE, 0, true);
->> +
->> +    /* Patch address of GUID fw_cfg blob into the AML */
->> +    bios_linker_loader_add_pointer(linker,
->> +        ACPI_BUILD_TABLE_FILE, vgia_offset, sizeof(uint32_t),
->> +        VMGENID_GUID_FW_CFG_FILE, 0, false);
-> see @src_offset argument description,
-> putting VMGENID_GUID_OFFSET would make patched place point directly to =
-GUID
->=20
->> +
->> +    build_header(linker, table_data,
->> +        (void *)(table_data->data + table_data->len - =
-ssdt->buf->len),
->> +        "SSDT", ssdt->buf->len, 1, NULL, "VMGENID");
->> +    free_aml_allocator();
->> +}
->> +
->> +void vmgenid_add_fw_cfg(FWCfgState *s, GArray *guid)
->> +{
->> +    Object *obj =3D find_vmgenid_dev(NULL);
->> +    assert(obj);
->> +    VmGenIdState *vms =3D VMGENID(obj);
->> +
->> +    /* Create a read-only fw_cfg file for GUID */
->> +    fw_cfg_add_file(s, VMGENID_GUID_FW_CFG_FILE, guid->data,
->> +                    VMGENID_FW_CFG_SIZE);
->> +    /* Create a read-write fw_cfg file for Address */
->> +    fw_cfg_add_file_callback(s, VMGENID_ADDR_FW_CFG_FILE, NULL, =
-NULL,
->> +                             vms->vgia_le, sizeof(uint32_t), false);
->> +}
->> +
->> +static void vmgenid_update_guest(VmGenIdState *s)
->> +{
->> +    Object *obj =3D object_resolve_path_type("", =
-TYPE_ACPI_DEVICE_IF, NULL);
->> +    uint32_t vgia;
->> +
->> +    if (obj) {
->> +        /* Write the GUID to guest memory */
->> +        memcpy(&vgia, s->vgia_le, sizeof(vgia));
->> +        vgia =3D le32_to_cpu(vgia);
->> +        if (vgia) {
->> +            cpu_physical_memory_write(vgia + VMGENID_GUID_OFFSET,
->> +                                      s->guid.data, =
-sizeof(s->guid.data));
->> +            /* Send _GPE.E05 event */
->> +            acpi_send_event(DEVICE(obj), =
-ACPI_VMGENID_CHANGE_STATUS);
->> +        }
->> +    }
->> +}
->> +
->> +static void vmgenid_set_guid(Object *obj, const char *value, Error =
-**errp)
->> +{
->> +    VmGenIdState *s =3D VMGENID(obj);
->> +
->> +    if (!strncmp(value, "auto", 4)) {
->> +        qemu_uuid_generate(&s->guid);
->> +    } else if (qemu_uuid_parse(value, &s->guid) < 0) {
->> +        error_setg(errp, "'%s. %s': Failed to parse GUID string: =
-%s",
->> +                   object_get_typename(OBJECT(s)), VMGENID_GUID, =
-value);
->> +        return;
->> +    }
->> +    /* QemuUUID has the first three words as big-endian, and expect =
-that any
->> +     * GUIDs passed in will always be BE.  The guest, however will =
-expect
->> +     * the fields to be little-endian, so store that way internally. =
- Make
->> +     * sure to swap back whenever reporting via monitor */
->> +    qemu_uuid_bswap(&s->guid);
->> +
->> +    /* Send the ACPI notify */
->> +    vmgenid_update_guest(s);
->> +}
->> +
->> +/* After restoring an image, we need to update the guest memory and =
-notify
->> + * it of a potential change to VM Generation ID */
->> +static int vmgenid_post_load(void *opaque, int version_id)
->> +{
->> +    VmGenIdState *s =3D opaque;
->> +    vmgenid_update_guest(s);
->> +    return 0;
->> +}
->> +
->> +static const VMStateDescription vmstate_vmgenid =3D {
->> +    .name =3D "vmgenid",
->> +    .version_id =3D 1,
->> +    .minimum_version_id =3D 1,
->> +    .post_load =3D vmgenid_post_load,
->> +    .fields =3D (VMStateField[]) {
->> +        VMSTATE_UINT8_ARRAY(vgia_le, VmGenIdState, =
-sizeof(uint32_t)),
-> file with address could be memory region and migrated automatically,
-> ex: rsdp_mr + acpi_add_rom_blob + acpi_ram_update
->=20
-I don=E2=80=99t follow.  Can you please elaborate?
->> +        VMSTATE_END_OF_LIST()
->> +    },
->> +};
->> +
->> +static void vmgenid_initfn(Object *obj)
->> +{
->> +    object_property_add_str(obj, VMGENID_GUID, NULL, =
-vmgenid_set_guid, NULL);
->> +}
->> +
->> +static void vmgenid_device_class_init(ObjectClass *klass, void =
-*data)
->> +{
->> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
->> +
->> +    dc->vmsd =3D &vmstate_vmgenid;
->> +}
->> +
->> +static const TypeInfo vmgenid_device_info =3D {
->> +    .name          =3D VMGENID_DEVICE,
->> +    .parent        =3D TYPE_SYS_BUS_DEVICE,
->> +    .instance_size =3D sizeof(VmGenIdState),
->> +    .instance_init =3D vmgenid_initfn,
->> +    .class_init    =3D vmgenid_device_class_init,
->> +};
->> +
->> +static void vmgenid_register_types(void)
->> +{
->> +    type_register_static(&vmgenid_device_info);
->> +}
->> +
->> +type_init(vmgenid_register_types)
->> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
->> index 78a1d84..4c40f76 100644
->> --- a/hw/i386/acpi-build.c
->> +++ b/hw/i386/acpi-build.c
->> @@ -42,6 +42,7 @@
->> #include "hw/acpi/memory_hotplug.h"
->> #include "sysemu/tpm.h"
->> #include "hw/acpi/tpm.h"
->> +#include "hw/acpi/vmgenid.h"
->> #include "sysemu/tpm_backend.h"
->> #include "hw/timer/mc146818rtc_regs.h"
->> #include "sysemu/numa.h"
->> @@ -2653,6 +2654,11 @@ void acpi_build(AcpiBuildTables *tables, =
-MachineState *machine)
->>     acpi_add_table(table_offsets, tables_blob);
->>     build_madt(tables_blob, tables->linker, pcms);
->>=20
->> +    if (find_vmgenid_dev(NULL)) {
->> +        acpi_add_table(table_offsets, tables_blob);
->> +        vmgenid_build_acpi(tables_blob, tables->vmgenid, =
-tables->linker);
-> pass find_vmgenid_dev(NULL) result as an argument to =
-vmgenid_build_acpi()
-> so it won't have to do lookup again.
->=20
-OK
->> +    }
->> +
->>     if (misc.has_hpet) {
->>         acpi_add_table(table_offsets, tables_blob);
->>         build_hpet(tables_blob, tables->linker);
->> @@ -2859,6 +2865,10 @@ void acpi_setup(void)
->>     fw_cfg_add_file(pcms->fw_cfg, ACPI_BUILD_TPMLOG_FILE,
->>                     tables.tcpalog->data, =
-acpi_data_len(tables.tcpalog));
->>=20
->> +    if (find_vmgenid_dev(NULL)) {
-> it's second lookup, cache result of the 1st call and reuse it here
->=20
-OK
->> +        vmgenid_add_fw_cfg(pcms->fw_cfg, tables.vmgenid);
->> +    }
->> +
->>     if (!pcmc->rsdp_in_ram) {
->>         /*
->>          * Keep for compatibility with old machine types.
->> diff --git a/include/hw/acpi/acpi_dev_interface.h =
-b/include/hw/acpi/acpi_dev_interface.h
->> index 71d3c48..3c2e4e9 100644
->> --- a/include/hw/acpi/acpi_dev_interface.h
->> +++ b/include/hw/acpi/acpi_dev_interface.h
->> @@ -11,6 +11,7 @@ typedef enum {
->>     ACPI_CPU_HOTPLUG_STATUS =3D 4,
->>     ACPI_MEMORY_HOTPLUG_STATUS =3D 8,
->>     ACPI_NVDIMM_HOTPLUG_STATUS =3D 16,
->> +    ACPI_VMGENID_CHANGE_STATUS =3D 32,
->> } AcpiEventStatusBits;
->>=20
->> #define TYPE_ACPI_DEVICE_IF "acpi-device-interface"
->> diff --git a/include/hw/acpi/vmgenid.h b/include/hw/acpi/vmgenid.h
->> new file mode 100644
->> index 0000000..b60437a
->> --- /dev/null
->> +++ b/include/hw/acpi/vmgenid.h
->> @@ -0,0 +1,37 @@
->> +#ifndef ACPI_VMGENID_H
->> +#define ACPI_VMGENID_H
->> +
->> +#include "hw/acpi/bios-linker-loader.h"
->> +#include "hw/sysbus.h"
->> +#include "qemu/uuid.h"
->> +
->> +#define VMGENID_DEVICE           "vmgenid"
->> +#define VMGENID_GUID             "guid"
->> +#define VMGENID_GUID_FW_CFG_FILE      "etc/vmgenid"
->> +#define VMGENID_ADDR_FW_CFG_FILE      "etc/vmgenid_addr"
->> +
->> +#define VMGENID_FW_CFG_SIZE      4096 /* Occupy a page of memory */
->> +#define VMGENID_GUID_OFFSET      40   /* allow space for
->> +                                       * OVMF SDT Header Probe =
-Supressor */
->> +
->> +void vmgenid_add_fw_cfg(FWCfgState *s, GArray *guid);
->> +void vmgenid_build_acpi(GArray *table_data, GArray *guid, BIOSLinker =
-*linker);
->> +
->> +#define VMGENID(obj) OBJECT_CHECK(VmGenIdState, (obj), =
-VMGENID_DEVICE)
->> +
->> +typedef struct VmGenIdState {
->> +    SysBusDevice parent_obj;
-> Could it work with just plain Device parent?
-> If it works then you can drop patch:
->  [PATCH v5 08/10] PC: Support dynamic sysbus on pc_i440fx
->=20
-Huh, I was sure I tried that originally and couldn=E2=80=99t make it =
-work, but it turns out it does.  Definitely better.
->> +    QemuUUID guid;
->> +    uint8_t vgia_le[4];
->> +} VmGenIdState;
->> +
->> +static Object *find_vmgenid_dev(Error **errp)
->> +{
->> +    Object *obj =3D object_resolve_path_type("", VMGENID_DEVICE, =
-NULL);
->> +    if (!obj && errp) {
-> all callers pass NULL as errp, I'd just drop errp altogether.
->=20
-OK
->> +        error_setg(errp, "%s is not found", VMGENID_DEVICE);
->> +    }
->> +    return obj;
->> +}
->> +
->> +#endif
+>>>=20
+>>>=20
+>>>>> +{
+>>>>> +    int offset;
+>>>>> +    va_list ap;
+>>>>> +
+>>>>> +    build_append_byte(array, 0x08); /* NameOp */
+>>>>> +    va_start(ap, name_format);
+>>>>> +    build_append_namestringv(array, name_format, ap);
+>>>>> +    va_end(ap);
+>>>>> +
+>>>>> +    build_append_byte(array, 0x0E); /* QWordPrefix */
+>>>>> +
+>>>>> +    offset =3D array->len;
+>>>>> +    build_append_int_noprefix(array, 0x0000000000000000, 8);
+>>>>> +    assert(array->len =3D=3D offset + 8);
+>>>>> +
+>>>>> +    return offset;
+>>>>> +}
+>>>>> +
+>>>>> static GPtrArray *alloc_list;
+>>>>>=20
+>>>>> static Aml *aml_alloc(void)
+>>>>> diff --git a/include/hw/acpi/aml-build.h =
+b/include/hw/acpi/aml-build.h
+>>>>> index 559326c..dbf63cf 100644
+>>>>> --- a/include/hw/acpi/aml-build.h
+>>>>> +++ b/include/hw/acpi/aml-build.h
+>>>>> @@ -385,6 +385,10 @@ int
+>>>>> build_append_named_dword(GArray *array, const char *name_format, =
+...)
+>>>>> GCC_FMT_ATTR(2, 3);
+>>>>>=20
+>>>>> +int
+>>>>> +build_append_named_qword(GArray *array, const char *name_format, =
+...)
+>>>>> +GCC_FMT_ATTR(2, 3);
+>>>>> +
+>>>>> void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t =
+base,
+>>>>>                        uint64_t len, int node, MemoryAffinityFlags =
+flags);
 
 
---Apple-Mail=_789E9632-EC20-4C38-BFE2-3C4AD87E191C
+--Apple-Mail=_4219616D-3493-43EC-A854-0093E45D96E4
 Content-Disposition: attachment;
 	filename=smime.p7s
 Content-Type: application/pkcs7-signature;
@@ -550,7 +226,7 @@ gZsxCzAJBgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1Nh
 bGZvcmQxGjAYBgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1
 NiBDbGllbnQgQXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z
 8eMx7JswCQYFKw4DAhoFAKCCAekwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0B
-CQUxDxcNMTcwMjA4MjAxOTI1WjAjBgkqhkiG9w0BCQQxFgQUkfVhCMw1tL5DP4DO+dxUZIurzLgw
+CQUxDxcNMTcwMjA4MjAyNDExWjAjBgkqhkiG9w0BCQQxFgQU84smOb1qoZ77b5IFRuMagqRKwrIw
 gcIGCSsGAQQBgjcQBDGBtDCBsTCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFu
 Y2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxQTA/
 BgNVBAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVt
@@ -558,9 +234,9 @@ YWlsIENBAhEAljnjFZYn8wPj7xnx4zHsmzCBxAYLKoZIhvcNAQkQAgsxgbSggbEwgZsxCzAJBgNV
 BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
 BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1NiBDbGllbnQg
 QXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z8eMx7JswDQYJ
-KoZIhvcNAQEBBQAEggEATd75X5Z2uK3M7T7KjtFLzB4d2SUXwbqYM6lRIGSwnacIV5Mq1BmkaoEH
-qmfDn/mWb6VVlBbX+7EKaxEBOchrL4XSa5h12kcqo7t+hJ92Q4ezK9zyVmS50jWRb+8bOUFk6Uep
-sYVNltQ2T5Ftj4x23RbuHc974KMxdPBXO1uLEPs45LIQ1mDm2XHBJyJX0s5/mkcZtewhLPdgbRCC
-f2TJHCwFHHJBRdLEOLDy7wE62Ei1HBjD/ZVojvxPTdjqK/qKbSXYF7LwC2eCrYsSb2vFtX7l8IbJ
-At7xpfqT9Mrn45XvDVZDKsShDgGmBFCIjTRTWvqObpb4O+ZV0qooBBKR2QAAAAAAAA==
---Apple-Mail=_789E9632-EC20-4C38-BFE2-3C4AD87E191C--
+KoZIhvcNAQEBBQAEggEAq0lZDtx/IFC5erycnSwAk9D//Ng9IJWXlNElSHf1H+GaeEROsED1Sl1M
+J44usfCsd/NflEp5tgSXbJVx1yHKx+ry0PEkKlmzJQGPVjWNFLBPbYV+59fU1uZkC/TrF3dVMCTA
+WN21tOTZdkUFerGyiTKf7Bkap24j23bw4jrbKWdtobcKIyJjWDp/ycdL0x3+XTBCANHKaZRkziUB
+1ukaSRlF4a7UcOkMAHplPBDQtayQPEzK6TupPj2DtG6AwLgqQ0Ua3sbkT+lF1XqQv194owoKXWo7
+4s5DWzkHp4g60vmHZN8dKyRLxMcoSgPtseUbTuAD0KrI9jTjKOXg2zfrVgAAAAAAAA==
+--Apple-Mail=_4219616D-3493-43EC-A854-0093E45D96E4--
