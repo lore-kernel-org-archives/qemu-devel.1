@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45336)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cbNJQ-0005EP-2g
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 03:09:13 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cbNLG-0006Os-94
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 03:11:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cbNJL-0004Ax-4G
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 03:09:12 -0500
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed,  8 Feb 2017 12:09:00 +0400
-Message-Id: <20170208080900.4092-1-marcandre.lureau@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] qcow2: remove useless NULL check
+	(envelope-from <pbonzini@redhat.com>) id 1cbNLB-0004UW-BJ
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 03:11:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51500)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cbNLB-0004UM-5H
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 03:11:01 -0500
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed,  8 Feb 2017 09:10:58 +0100
+Message-Id: <20170208081058.27512-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [qemu-web PATCH] releases: update 2.7 branch for 2.7.1
+ release
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,32 +23,28 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-trivial@nongnu.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: mdroth@linux.vnet.ibm.com
 
-g_strdup() already handles the case where the argument is NULL.
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Suggested-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block/qcow2.c | 4 ++--
+ _data/releases.yml | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 96fb8a8f16..9114218030 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2016,8 +2016,8 @@ static int qcow2_change_backing_file(BlockDriverSta=
-te *bs,
-     g_free(s->image_backing_file);
-     g_free(s->image_backing_format);
-=20
--    s->image_backing_file =3D backing_file ? g_strdup(bs->backing_file) =
-: NULL;
--    s->image_backing_format =3D backing_fmt ? g_strdup(bs->backing_forma=
-t) : NULL;
-+    s->image_backing_file =3D g_strdup(bs->backing_file);
-+    s->image_backing_format =3D g_strdup(bs->backing_format);
-=20
-     return qcow2_update_header(bs);
- }
---=20
-2.11.0.295.gd7dffce1c.dirty
+diff --git a/_data/releases.yml b/_data/releases.yml
+index 883cab3..db02a39 100644
+--- a/_data/releases.yml
++++ b/_data/releases.yml
+@@ -2,8 +2,8 @@
+   patch: 0
+   date: "Dec 20 2016"
+ - branch: 2.7
+-  patch: 0
+-  date: "Sep 2 2016"
++  patch: 1
++  date: "Dec 23 2016"
+ - branch: 2.6
+   patch: 2
+   date: "Sep 29 2016"
+-- 
+2.9.3
