@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cbPgJ-0007VZ-9d
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 05:41:00 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cbPj9-0000Md-7z
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 05:43:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cbPgE-0000di-OD
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 05:40:59 -0500
-References: <20170208061602.17666-1-david@gibson.dropbear.id.au>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <46d64512-1085-6d22-1e0f-660757ff7131@redhat.com>
-Date: Wed, 8 Feb 2017 11:40:50 +0100
+	(envelope-from <imammedo@redhat.com>) id 1cbPj4-0001TD-RQ
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 05:43:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59378)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cbPj4-0001St-JD
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 05:43:50 -0500
+Date: Wed, 8 Feb 2017 11:43:47 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170208114347.2bc8ae2b@nial.brq.redhat.com>
+In-Reply-To: <b0dac808-e617-616e-6a1b-11c242b9250a@redhat.com>
+References: <cover.1486285434.git.ben@skyportsystems.com>
+	<e531606c10f3c40dbc10d0fa4a4a5d806d7946d9.1486285434.git.ben@skyportsystems.com>
+	<20170207145151.42fb0cc6@nial.brq.redhat.com>
+	<b0dac808-e617-616e-6a1b-11c242b9250a@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170208061602.17666-1-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] virtio-pci: Allow PCIe virtio devices on
- root bus
+Subject: Re: [Qemu-devel] [PATCH v5 01/10] ACPI: Add a function for building
+ named qword entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,93 +30,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, marcel@redhat.com, abologna@redhat.com
-Cc: lvivier@redhat.com, thuth@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: ben@skyportsystems.com, qemu-devel@nongnu.org, mst@redhat.com
 
-On 02/08/17 07:16, David Gibson wrote:
-> Marcel,
+On Tue, 7 Feb 2017 21:09:27 +0100
+Laszlo Ersek <lersek@redhat.com> wrote:
+
+> On 02/07/17 14:51, Igor Mammedov wrote:
+> > On Sun,  5 Feb 2017 01:11:56 -0800
+> > ben@skyportsystems.com wrote:
+> >   
+> >> From: Ben Warren <ben@skyportsystems.com>
+> >>
+> >> This is initially used to patch a 64-bit address into
+> >> the VM Generation ID SSDT
+> >>
+> >> Signed-off-by: Ben Warren <ben@skyportsystems.com>
+> >> ---  
+> > ...  
+> >> +int
+> >> +build_append_named_qword(GArray *array, const char *name_format, ...)  
+> > it ain't used anywhere, I'd just drop this patch.  
 > 
-> Your original patch adding PCIe support to virtio-pci.c has the
-> limitation noted below that PCIe won't be enabled if the device is on
-> the root bus (rather than under a root or downstream port).  As
-> reasoned below, I think removing the check is correct, even for x86
-> (though it would rarely be useful there).  But I could well have
-> missed something.  Let me know if so...
+> Ben and I discussed this under
+> - msgid <6E25852D-224A-4BDC-AA83-8DC87DB4D0F0@skyportsystems.com>
+>   https://www.mail-archive.com/qemu-devel@nongnu.org/msg425496.html
+> - msgid <a93a6be3-cbed-5afe-7c72-96410fbfce41@redhat.com>
+>   https://www.mail-archive.com/qemu-devel@nongnu.org/msg425519.html
+> 
+> On 01/26/17 06:35, Ben Warren wrote:
+> > I propose to still include this patch but touch up the comments as
+> > requested by Laszlo.  This way it will be in the toolbox for future
+> > users and has been tested.  [...]  
+> 
+> I generally agree that dead code is undesirable, but this function has
+> surfaced several times until now, and we get to review it every single
+> time. Ben tested it, I support its inclusion.
+> 
+> OTOH I also pointed it out to Ben
+> 
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg425218.html
+> 
+> that he should expect disagreement between his reviewers :) Given that
+> I'm observing this series more from the sidelines and you maintain /
+> support ACPI gen in QEMU, I certainly defer to you on this.
+It's not only dead, having patchable QWORD ready for use in QEMU
+would tempt someone to use it and that would lead to XP BSOD
+if it slips screening at review time. I'd delay this patch until
+we announce that ACPI 1.0 (XP based) guest no more supported by
+new QEMU.
+
+Anyway I won't object to merging this if you insist and give it your RB.
+
+
+> Thanks
+> Laszlo
 > 
 > 
-> 
-> Virtio devices can appear as either vanilla PCI or PCI-Express devices
-> depending on the bus they're connected to.  At the moment it will only
-> appear as vanilla PCI if connected to the root bus of a PCIe host bridge.
-> 
-> Presumably this is to reflect the fact that PCIe devices usually need to
-> be connected to a root (or further downstream) port rather than directly
-> on the root bus.  However, due to the odd requirements of the PAPR spec on the 'pseries'
-> machine type, it's normal for PCIe devices to appear on the root bus
-> without root ports.
-> 
-> Further, even on x86, there's no inherent reason we couldn't present a
-> virtio device as an "integrated device" (typically used for things built
-> into the PCI chipset), and those devices *do* typically appear on the root
-> bus.
-
-I'm not personally making a counter-argument, just qouting some of the relevant parts of "docs/pcie.txt" ("PCI EXPRESS GUIDELINES"):
-
-> Place only the following kinds of devices directly on the Root Complex:
->     (1) PCI Devices (e.g. network card, graphics card, IDE controller),
->         not controllers. Place only legacy PCI devices on
->         the Root Complex. These will be considered Integrated Endpoints.
->         Note: Integrated Endpoints are not hot-pluggable.
->
->         Although the PCI Express spec does not forbid PCI Express devices as
->         Integrated Endpoints, existing hardware mostly integrates legacy PCI
->         devices with the Root Complex. Guest OSes are suspected to behave
->         strangely when PCI Express devices are integrated
->         with the Root Complex.
->
->     [...]
->
-> 2.2 PCI Express only hierarchy
-> ==============================
-> Always use PCI Express Root Ports to start PCI Express hierarchies.
-
-Above you mention "it's normal for PCIe devices to appear on the root bus without root ports".
-
-Let me turn the question around: is it a *problem* for "pseries" if we require root ports? If so, why exactly?
-
-On 02/08/17 07:16, David Gibson wrote:
-> 
-> pcie_endpoint_cap_init() already automatically adjusts to advertise as
-> an integrated device rather than a "normal" PCIe endpoint when attached to
-> a root bus.  So we can remove the check for root bus within virtio and
-> allow (at the user's discretion) a PCIe virtio bus to be attached to a
-> root bus.
-
-If Marcel thinks this is a good change, then I think we should go through "docs/pcie.txt" with a fine-toothed comb, and update all relevant spots. (If Marcel agrees, perhaps you can include such hunks in your patch at once.)
-
-It also may have consequences for libvirt (but I see you addressed Andrea at once, which is great).
-
-Thanks,
-Laszlo
-
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/virtio/virtio-pci.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-> index 5ce42af..caea44c 100644
-> --- a/hw/virtio/virtio-pci.c
-> +++ b/hw/virtio/virtio-pci.c
-> @@ -1737,8 +1737,7 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
->  {
->      VirtIOPCIProxy *proxy = VIRTIO_PCI(pci_dev);
->      VirtioPCIClass *k = VIRTIO_PCI_GET_CLASS(pci_dev);
-> -    bool pcie_port = pci_bus_is_express(pci_dev->bus) &&
-> -                     !pci_bus_is_root(pci_dev->bus);
-> +    bool pcie_port = pci_bus_is_express(pci_dev->bus);
->  
->      if (!kvm_has_many_ioeventfds()) {
->          proxy->flags &= ~VIRTIO_PCI_FLAG_USE_IOEVENTFD;
+> >> +{
+> >> +    int offset;
+> >> +    va_list ap;
+> >> +
+> >> +    build_append_byte(array, 0x08); /* NameOp */
+> >> +    va_start(ap, name_format);
+> >> +    build_append_namestringv(array, name_format, ap);
+> >> +    va_end(ap);
+> >> +
+> >> +    build_append_byte(array, 0x0E); /* QWordPrefix */
+> >> +
+> >> +    offset = array->len;
+> >> +    build_append_int_noprefix(array, 0x0000000000000000, 8);
+> >> +    assert(array->len == offset + 8);
+> >> +
+> >> +    return offset;
+> >> +}
+> >> +
+> >>  static GPtrArray *alloc_list;
+> >>  
+> >>  static Aml *aml_alloc(void)
+> >> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+> >> index 559326c..dbf63cf 100644
+> >> --- a/include/hw/acpi/aml-build.h
+> >> +++ b/include/hw/acpi/aml-build.h
+> >> @@ -385,6 +385,10 @@ int
+> >>  build_append_named_dword(GArray *array, const char *name_format, ...)
+> >>  GCC_FMT_ATTR(2, 3);
+> >>  
+> >> +int
+> >> +build_append_named_qword(GArray *array, const char *name_format, ...)
+> >> +GCC_FMT_ATTR(2, 3);
+> >> +
+> >>  void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
+> >>                         uint64_t len, int node, MemoryAffinityFlags flags);
+> >>    
+> > 
+> >   
 > 
