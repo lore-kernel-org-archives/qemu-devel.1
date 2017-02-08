@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58217)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cbQGA-0000Nl-6v
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 06:18:03 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cbQJ9-0001c7-Po
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 06:21:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cbQG6-0001Zj-W2
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 06:18:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40356)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cbQG6-0001Xg-NG
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 06:17:58 -0500
-References: <cover.1486285434.git.ben@skyportsystems.com>
-	<28ff6ff023dd041fc7557955dea916adce72efea.1486285434.git.ben@skyportsystems.com>
-	<14f224ed-08e2-cbad-9d1d-8f559cd399a6@redhat.com>
-	<20170208120436.2f4736ab@nial.brq.redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <41b280d9-a6d4-50cf-fc00-bc46ad51ab1b@redhat.com>
-Date: Wed, 8 Feb 2017 12:17:54 +0100
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cbQJ6-0002Im-JZ
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 06:21:07 -0500
+Received: from szxga01-in.huawei.com ([58.251.152.64]:33692)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cbQJ5-0002Hv-7M
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 06:21:04 -0500
+References: <1484657864-21708-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1484657864-21708-2-git-send-email-zhang.zhanghailiang@huawei.com>
+	<20170208103820.GB2341@work-vm>
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <589AFE8A.2000304@huawei.com>
+Date: Wed, 8 Feb 2017 19:18:34 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170208120436.2f4736ab@nial.brq.redhat.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20170208103820.GB2341@work-vm>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 05/10] ACPI: Add Virtual Machine
- Generation ID support
+Subject: Re: [Qemu-devel] [PATCH 1/3] COLO: fix setting checkpoint-delay not
+ working properly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +29,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: ben@skyportsystems.com, mst@redhat.com, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, quintela@redhat.com, eddie.dong@intel.com, lizhijian@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com
 
-On 02/08/17 12:04, Igor Mammedov wrote:
-> On Wed, 8 Feb 2017 01:48:42 +0100
-> Laszlo Ersek <lersek@redhat.com> wrote:
-
-[snip]
-
->> (2) Structure of the vmgenid fw_cfg blob, AKA "why that darn offset 40
->> decimal".
+On 2017/2/8 18:38, Dr. David Alan Gilbert wrote:
+> * zhanghailiang (zhang.zhanghailiang@huawei.com) wrote:
+>> If we set checkpoint-delay through command 'migrate-set-parameters',
+>> It will not take effect until we finish last sleep chekpoint-delay,
+>> That's will be offensive espeically when we want to change its value
+>> from an extreme big one to a proper value.
 >>
->> I explained it under points (6) and (7) in the following message:
+>> Fix it by using timer to realize checkpoint-delay.
+>
+> Yes, I think this works; you only kick the timer in COLO state,
+> and you create the timer before going into COLO state and clean it up
+> after we leave, so it feels safe.
+>
+> Are you also going to kick this semaphore when doing a failover to
+> cause this thread to exit quickly?
+>
+
+Ha, good suggestion! I think it will work.
+Accepted, thanks very much.
+
+>
+>> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+>
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>
+> Dave
+>> ---
+>>   include/migration/colo.h      |  2 ++
+>>   include/migration/migration.h |  5 +++++
+>>   migration/colo.c              | 33 +++++++++++++++++++++++----------
+>>   migration/migration.c         |  3 +++
+>>   4 files changed, 33 insertions(+), 10 deletions(-)
 >>
->> Message-Id: <c16a03d5-820a-f719-81ea-43858f903395@redhat.com>
->> URL: https://www.mail-archive.com/qemu-devel@nongnu.org/msg425226.html
+>> diff --git a/include/migration/colo.h b/include/migration/colo.h
+>> index e32eef4..2bbff9e 100644
+>> --- a/include/migration/colo.h
+>> +++ b/include/migration/colo.h
+>> @@ -35,4 +35,6 @@ COLOMode get_colo_mode(void);
 >>
->> The story is that *wherever* an ADD_POINTER command points to -- that
->> is, at the *exact* target address --, OVMF will look for an ACPI table
->> header, somewhat heuristically. If it finds a byte pattern that (a) fits
->> into the remaining blob and (b) passes some superficial ACPI table
->> header checks, such as length and checksum, then OVMF assumes that the
->> blob contains an ACPI table there, and passes the address (again, the
->> exact, relocated, absolute target address of ADD_POINTER) to
->> EFI_ACPI_TABLE_PROTOCOL.InstallAcpiTable().
+>>   /* failover */
+>>   void colo_do_failover(MigrationState *s);
+>> +
+>> +void colo_checkpoint_notify(void *opaque);
+>>   #endif
+>> diff --git a/include/migration/migration.h b/include/migration/migration.h
+>> index c309d23..487ac1e 100644
+>> --- a/include/migration/migration.h
+>> +++ b/include/migration/migration.h
+>> @@ -183,6 +183,11 @@ struct MigrationState
+>>       /* The RAMBlock used in the last src_page_request */
+>>       RAMBlock *last_req_rb;
 >>
->> We want to disable this heuristic for the vmgenid blob. *If* the blob
->> contained only 16 bytes (for the GUID), then the heuristic would
->> automatically disable itself, because the ACPI table header (36 bytes)
->> is larger than 16 bytes, so OVMF wouldn't even look. However, for the
->> caching and other VMGENID requirements, we need to allocate a full page
->> with the blob (4KB), hence OVMF *will* look. If we placed the GUID right
->> at the start of the page, then OVMF would sanity-check it as an ACPI
->> table header. The check would *most likely* not pass, so things would be
->> fine in practice, but we can do better than that: just put 40 zero bytes
->> at the front of the blob.
+>> +    /* The semaphore is used to notify COLO thread to do checkpoint */
+>> +    QemuSemaphore colo_checkpoint_sem;
+>> +    int64_t colo_checkpoint_time;
+>> +    QEMUTimer *colo_delay_timer;
+>> +
+>>       /* The last error that occurred */
+>>       Error *error;
+>>   };
+>> diff --git a/migration/colo.c b/migration/colo.c
+>> index 93c85c5..08b2e46 100644
+>> --- a/migration/colo.c
+>> +++ b/migration/colo.c
+>> @@ -302,7 +302,7 @@ static void colo_process_checkpoint(MigrationState *s)
+>>   {
+>>       QIOChannelBuffer *bioc;
+>>       QEMUFile *fb = NULL;
+>> -    int64_t current_time, checkpoint_time = qemu_clock_get_ms(QEMU_CLOCK_HOST);
+>> +    int64_t current_time = qemu_clock_get_ms(QEMU_CLOCK_HOST);
+>>       Error *local_err = NULL;
+>>       int ret;
 >>
->> And this is why the ADD_POINTER command has to point to the beginning of
->> the blob (i.e., 36 zero bytes), to "suppress the OVMF ACPI SDT header
->> detection". (The other 4 bytes are for arriving at an address divisible
->> by 8, which is a VMGENID requirement for the GUID.)
-> that's deserves a comment in code/doc as it's non obvious to someone
-> who is not familiar with OVMF.
-
-It is mentioned in the document "docs/specs/vmgenid.txt", added in patch 3.
-
-I didn't want to push for more details there, but if you think it's
-helpful or even required, then Ben should please simply add a
-
-Rationale for padding at the front (OVMF SDT Header probe suppressor)
----------------------------------------------------------------------
-
-subsection under the
-
-GUID Storage Format
--------------------
-
-section, and just dump the above into it.
-
-Maybe tone down the over-use of *bold*. :)
-
-> 
-> 
->> The consequence is that both the ADDR method and QEMU's guest memory
->> access code have to add 40 manually.
+>> @@ -332,26 +332,21 @@ static void colo_process_checkpoint(MigrationState *s)
+>>       qemu_mutex_unlock_iothread();
+>>       trace_colo_vm_state_change("stop", "run");
+>>
+>> +    timer_mod(s->colo_delay_timer,
+>> +            current_time + s->parameters.x_checkpoint_delay);
+>> +
+>>       while (s->state == MIGRATION_STATUS_COLO) {
+>>           if (failover_get_state() != FAILOVER_STATUS_NONE) {
+>>               error_report("failover request");
+>>               goto out;
+>>           }
+>>
+>> -        current_time = qemu_clock_get_ms(QEMU_CLOCK_HOST);
+>> -        if (current_time - checkpoint_time <
+>> -            s->parameters.x_checkpoint_delay) {
+>> -            int64_t delay_ms;
+>> +        qemu_sem_wait(&s->colo_checkpoint_sem);
+>>
+>> -            delay_ms = s->parameters.x_checkpoint_delay -
+>> -                       (current_time - checkpoint_time);
+>> -            g_usleep(delay_ms * 1000);
+>> -        }
+>>           ret = colo_do_checkpoint_transaction(s, bioc, fb);
+>>           if (ret < 0) {
+>>               goto out;
+>>           }
+>> -        checkpoint_time = qemu_clock_get_ms(QEMU_CLOCK_HOST);
+>>       }
+>>
+>>   out:
+>> @@ -364,14 +359,32 @@ out:
+>>           qemu_fclose(fb);
+>>       }
+>>
+>> +    timer_del(s->colo_delay_timer);
+>> +
+>>       if (s->rp_state.from_dst_file) {
+>>           qemu_fclose(s->rp_state.from_dst_file);
+>>       }
+>>   }
+>>
+>> +void colo_checkpoint_notify(void *opaque)
+>> +{
+>> +    MigrationState *s = opaque;
+>> +    int64_t next_notify_time;
+>> +
+>> +    qemu_sem_post(&s->colo_checkpoint_sem);
+>> +    s->colo_checkpoint_time = qemu_clock_get_ms(QEMU_CLOCK_HOST);
+>> +    next_notify_time = s->colo_checkpoint_time +
+>> +                    s->parameters.x_checkpoint_delay;
+>> +    timer_mod(s->colo_delay_timer, next_notify_time);
+>> +}
+>> +
+>>   void migrate_start_colo_process(MigrationState *s)
+>>   {
+>>       qemu_mutex_unlock_iothread();
+>> +    qemu_sem_init(&s->colo_checkpoint_sem, 0);
+>> +    s->colo_delay_timer =  timer_new_ms(QEMU_CLOCK_HOST,
+>> +                                colo_checkpoint_notify, s);
+>> +
+>>       migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
+>>                         MIGRATION_STATUS_COLO);
+>>       colo_process_checkpoint(s);
+>> diff --git a/migration/migration.c b/migration/migration.c
+>> index f498ab8..a4861da 100644
+>> --- a/migration/migration.c
+>> +++ b/migration/migration.c
+>> @@ -895,6 +895,9 @@ void qmp_migrate_set_parameters(MigrationParameters *params, Error **errp)
+>>
+>>       if (params->has_x_checkpoint_delay) {
+>>           s->parameters.x_checkpoint_delay = params->x_checkpoint_delay;
+>> +        if (migration_in_colo_state()) {
+>> +            colo_checkpoint_notify(s);
+>> +        }
+>>       }
+>>   }
+>>
+>> --
+>> 1.8.3.1
 >>
 >>
->> (3) Whether the VGIA named object should be a DWORD or a QWORD in ACPI.
->> Personally, I'm fine with either, but I see that DWORD is more
->> compatible with old OSes.
-> It's not only old OSes, but newer ones as well (32 bit and to some degree 64-bit).
-> We should not put QWORD objects in global scope until we switch
-> DSDT rev to 2.0 or higher AND ready to drop support for ACPI 1.0 guests.
-> DSDT rev is important for 64-bit guests as well as OSPM chooses
-> supported integer length based on it.
-
-Good point. DWORD is fine with me.
-
-[snipping the rest, nothing for me to add there, it seems]
-
-Thanks!
-Laszlo
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+> .
+>
