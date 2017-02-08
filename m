@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1cbRxq-0005D9-SL
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:07:16 -0500
+	(envelope-from <eblake@redhat.com>) id 1cbS3k-0006Zw-M7
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:13:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1cbRxm-00009A-Ep
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:07:14 -0500
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:35177)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ashijeetacharya@gmail.com>)
-	id 1cbRxm-00008X-AV
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:07:10 -0500
-Received: by mail-ot0-x244.google.com with SMTP id 65so17867582otq.2
-	for <qemu-devel@nongnu.org>; Wed, 08 Feb 2017 05:07:08 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1cbS3g-0002LB-98
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:13:20 -0500
+References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
+	<20170203154757.36140-12-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <11389742-4861-eb11-422d-4dd19fdaf57c@redhat.com>
+Date: Wed, 8 Feb 2017 07:13:01 -0600
 MIME-Version: 1.0
-In-Reply-To: <20170208112542.GC2341@work-vm>
-References: <1486118198-8965-1-git-send-email-ashijeetacharya@gmail.com>
-	<20170208112542.GC2341@work-vm>
-From: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Date: Wed, 8 Feb 2017 18:37:07 +0530
-Message-ID: <CAC2QTZYwyHoHx5K7b4RNiHccCTWq_sc-LuwNNoQE_QnDfR64Pg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2] migrate: Introduce zero RAM checks to
- skip RAM migration
+In-Reply-To: <20170203154757.36140-12-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="QDutftdAF0kV1gs7TK6ipViLpfxhAAH3u"
+Subject: Re: [Qemu-devel] [PATCH 11/18] nbd: BLOCK_STATUS for bitmap export:
+ server part
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,112 +25,253 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Juan Quintela <quintela@redhat.com>, Amit Shah <amit.shah@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Greg Kurz <groug@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, armbru@redhat.com, den@virtuozzo.com, stefanha@redhat.com
 
-On Wed, Feb 8, 2017 at 4:55 PM, Dr. David Alan Gilbert
-<dgilbert@redhat.com> wrote:
-> * Ashijeet Acharya (ashijeetacharya@gmail.com) wrote:
->> Migration of a "none" machine with no RAM crashes abruptly as
->> bitmap_new() fails and thus aborts. Instead place zero RAM checks at
->> appropriate places to skip migration of RAM in this case and complete
->> migration successfully for devices only.
->>
->> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
->
-> Yes it seems to work, but there is a small bug,
-> if we look at:
->
-> static void ram_migration_cleanup(void *opaque)
-> {
->     /* caller have hold iothread lock or is in a bh, so there is
->      * no writing race against this migration_bitmap
->      */
->     struct BitmapRcu *bitmap = migration_bitmap_rcu;
->     atomic_rcu_set(&migration_bitmap_rcu, NULL);
->     if (bitmap) {
->         memory_global_dirty_log_stop();
->         call_rcu(bitmap, migration_bitmap_free, rcu);
->     }
->
->
-> we see it doesn't cause memory_global_dirty_log_stop
-> if migration_bitmap_rcu is NULL; so we end up
-> still calling dirty_log_start in ram_save_init but
-> never call stop.
->
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--QDutftdAF0kV1gs7TK6ipViLpfxhAAH3u
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com,
+ pbonzini@redhat.com, armbru@redhat.com, den@virtuozzo.com,
+ stefanha@redhat.com
+Message-ID: <11389742-4861-eb11-422d-4dd19fdaf57c@redhat.com>
+Subject: Re: [PATCH 11/18] nbd: BLOCK_STATUS for bitmap export: server part
+References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
+ <20170203154757.36140-12-vsementsov@virtuozzo.com>
+In-Reply-To: <20170203154757.36140-12-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Exactly. This is what kept bugging me too, which is why I asked you on
-the IRC the other day (if you vaguely remember) about whether I will
-have to handle cleanup separately...Maybe I didn't frame it well that
-day.
+On 02/03/2017 09:47 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Only one meta context type is defined: qemu-bitmap:<bitmap-name>.
 
-> I suggest you change it to:
->
->     migration_bitmap_rcu = g_new0(struct BitmapRcu, 1);
->     if (ram_bytes_total()) {
->         ram_bitmap_pages = last_ram_offset() >> TARGET_PAGE_BITS;
->         migration_bitmap_rcu->bmap = bitmap_new(ram_bitmap_pages);
->         bitmap_set(migration_bitmap_rcu->bmap, 0, ram_bitmap_pages);
->
-> The cleanup routine still causes the dirty_log_stop() then.
+Why 'qemu-bitmap:' instead of 'qemu:' for our namespace?  I guess it's
+okay, though.
 
-Right, I will do that.
+> Maximum one query is allowed for NBD_OPT_{SET,LIST}_META_CONTEXT,
+> NBD_REP_ERR_TOO_BIG is returned otherwise.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
 
-Ashijeet
+This is only a high-level review; I may come back and look more closely
+at details (and compare against the proposed spec) when I have more time.=
 
-> Dave
->
->> ---
->> Changes in v2:
->> - try to migrate successfully by skipping RAM (Paolo, Greg)
->> - drop the idea of erroring out and failing nicely
->>  migration/ram.c | 22 +++++++++++++++-------
->>  1 file changed, 15 insertions(+), 7 deletions(-)
->>
->> diff --git a/migration/ram.c b/migration/ram.c
->> index ef8fadf..2f19566 100644
->> --- a/migration/ram.c
->> +++ b/migration/ram.c
->> @@ -1325,6 +1325,11 @@ static int ram_find_and_save_block(QEMUFile *f, bool last_stage,
->>      ram_addr_t dirty_ram_abs; /* Address of the start of the dirty page in
->>                                   ram_addr_t space */
->>
->> +    /* No dirty page as there is zero RAM */
->> +    if (!ram_bytes_total()) {
->> +        return pages;
->> +    }
->> +
->>      pss.block = last_seen_block;
->>      pss.offset = last_offset;
->>      pss.complete_round = false;
->> @@ -1912,14 +1917,17 @@ static int ram_save_init_globals(void)
->>      bytes_transferred = 0;
->>      reset_ram_globals();
->>
->> -    ram_bitmap_pages = last_ram_offset() >> TARGET_PAGE_BITS;
->> -    migration_bitmap_rcu = g_new0(struct BitmapRcu, 1);
->> -    migration_bitmap_rcu->bmap = bitmap_new(ram_bitmap_pages);
->> -    bitmap_set(migration_bitmap_rcu->bmap, 0, ram_bitmap_pages);
->> +    /* Skip setting bitmap if there is no RAM */
->> +    if (ram_bytes_total()) {
->> +        ram_bitmap_pages = last_ram_offset() >> TARGET_PAGE_BITS;
->> +        migration_bitmap_rcu = g_new0(struct BitmapRcu, 1);
->> +        migration_bitmap_rcu->bmap = bitmap_new(ram_bitmap_pages);
->> +        bitmap_set(migration_bitmap_rcu->bmap, 0, ram_bitmap_pages);
->>
->> -    if (migrate_postcopy_ram()) {
->> -        migration_bitmap_rcu->unsentmap = bitmap_new(ram_bitmap_pages);
->> -        bitmap_set(migration_bitmap_rcu->unsentmap, 0, ram_bitmap_pages);
->> +        if (migrate_postcopy_ram()) {
->> +            migration_bitmap_rcu->unsentmap = bitmap_new(ram_bitmap_pages);
->> +            bitmap_set(migration_bitmap_rcu->unsentmap, 0, ram_bitmap_pages);
->> +        }
->>      }
->>
->>      /*
->> --
->> 2.6.2
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+>  /* Request flags, sent from client to server during transmission phase=
+ */
+>  #define NBD_CMD_FLAG_FUA        (1 << 0) /* 'force unit access' during=
+ write */
+> @@ -142,6 +155,7 @@ enum {
+>      NBD_CMD_TRIM =3D 4,
+>      /* 5 reserved for failed experiment NBD_CMD_CACHE */
+>      NBD_CMD_WRITE_ZEROES =3D 6,
+> +    NBD_CMD_BLOCK_STATUS =3D 7
+>  };
+
+Please keep the trailing comma (it makes it easier for later patches to
+add new values without having to modify existing lines).
+
+> =20
+>  #define NBD_DEFAULT_PORT	10809
+> @@ -163,6 +177,7 @@ enum {
+>  #define NBD_REPLY_TYPE_NONE 0
+>  #define NBD_REPLY_TYPE_OFFSET_DATA 1
+>  #define NBD_REPLY_TYPE_OFFSET_HOLE 2
+> +#define NBD_REPLY_TYPE_BLOCK_STATUS 5
+>  #define NBD_REPLY_TYPE_ERROR ((1 << 15) + 1)
+>  #define NBD_REPLY_TYPE_ERROR_OFFSET ((1 << 15) + 2)
+
+Might be worth formatting these so that the definitions all start in the
+same column (if so, it affects an earlier patch in the series as well).
+
+> =20
+> diff --git a/nbd/nbd-internal.h b/nbd/nbd-internal.h
+> index 3284bfc85a..fbbcf69925 100644
+> --- a/nbd/nbd-internal.h
+> +++ b/nbd/nbd-internal.h
+> @@ -83,6 +83,10 @@
+>  #define NBD_OPT_PEEK_EXPORT     (4)
+>  #define NBD_OPT_STARTTLS        (5)
+>  #define NBD_OPT_STRUCTURED_REPLY (8)
+> +#define NBD_OPT_LIST_META_CONTEXT (9)
+> +#define NBD_OPT_SET_META_CONTEXT  (10)
+> +
+> +#define NBD_META_NS_BITMAPS "qemu-dirty-bitmap"
+
+I still find it odd that we've split our #defines across two different
+headers, not your fault.
+
+This name does not match your commit message.  Why can't we use just
+'qemu:' as our namespace?
+
+> =20
+>  /* NBD errors are based on errno numbers, so there is a 1:1 mapping,
+>   * but only a limited set of errno values is specified in the protocol=
+=2E
+> @@ -105,6 +109,8 @@ static inline const char *nbd_opt_name(int opt)
+>      case NBD_OPT_PEEK_EXPORT: return "peek_export";
+>      case NBD_OPT_STARTTLS: return "tls";
+>      case NBD_OPT_STRUCTURED_REPLY: return "structured_reply";
+> +    case NBD_OPT_LIST_META_CONTEXT: return "list_meta_context";
+> +    case NBD_OPT_SET_META_CONTEXT: return "set_meta_context";
+
+Same question as earlier as to whether this violates checkpatch
+formatting, and whether it belongs in a .c instead of inline in the heade=
+r.
+
+>=20
+> =20
+> +static int nbd_negotiate_read_size_string(QIOChannel *ioc, char **str,=
+
+> +                                          uint32_t max_len)
+
+I probably would have split the creation of this helper function into
+its own patch.  Also, can it be utilized in any of the existing code, or
+is the new code the only client?
+
+> +
+> +/* start handle LIST_META_CONTEXT and SET_META_CONTEXT requests
+> + * @opt          should be NBD_OPT_LIST_META_CONTEXT or NBD_OPT_SET_ME=
+TA_CONTEXT
+> + * @length       related option data to read
+> + * @nb_queries   out parameter, number of queries specified by client
+> + * @bs           out parameter, bs for export, selected by client
+> + *               will be zero if some not critical error occured and e=
+rror reply
+> + *               was sent.
+
+Wrong spelling of 'occurred', and awkward grammar.  How about:
+
+will be zero if an error reply is successfully sent
+
+> + *
+> + * Returns:
+> + *   Err. code < 0 on critical error
+
+s/Err./Error/
+
+> + *   Number of bytes read otherwise (will be equal to length on non cr=
+itical
+> + *     error or if there no queries in request)
+
+will be equal to length if there were no errors, or no queries in the
+request
+
+> + */
+> +static int nbd_negotiate_opt_meta_context_start(NBDClient *client, uin=
+t32_t opt,
+> +                                                uint32_t length,
+> +                                                uint32_t *nb_queries,
+> +                                                BlockDriverState **bs)=
+
+> +{
+> +    int ret;
+> +    NBDExport *exp;
+> +    char *export_name;
+
+Uninitialized...[1]
+
+> +    int nb_read =3D 0;
+> +
+> +    if (!client->structured_reply) {
+> +        uint32_t tail =3D length - nb_read;
+> +        LOG("Structured reply is not negotiated");
+
+This LOG() is redundant...[2]
+
+> +
+> +        if (nbd_negotiate_drop_sync(client->ioc, tail) !=3D tail) {
+> +            return -EIO;
+> +        }
+> +        ret =3D nbd_negotiate_send_rep_err(client->ioc, NBD_REP_ERR_IN=
+VALID, opt,
+> +                                         "Structured reply is not nego=
+tiated");
+
+[2]...because this function also calls LOG().
+
+> +        g_free(export_name);
+
+[1]...so this crashes.  Oops.
+
+> +
+> +        if (ret < 0) {
+> +            return ret;
+> +        } else {
+> +            *bs =3D NULL;
+> +            *nb_queries =3D 0;
+> +            return length;
+> +        }
+> +    }
+> +
+
+
+> +static int nbd_negotiate_set_meta_context(NBDClient *client, uint32_t =
+length)
+> +{
+> +    int ret;
+> +    BlockDriverState *bs;
+> +    uint32_t nb_queries;
+> +    int nb_read;
+> +
+> +    nb_read =3D nbd_negotiate_opt_meta_context_start(client,
+> +                                                   NBD_OPT_SET_META_CO=
+NTEXT,
+> +                                                   length, &nb_queries=
+, &bs);
+> +    if (nb_read < 0) {
+> +        return nb_read;
+> +    }
+> +    if (bs =3D=3D NULL) {
+> +        /* error reply was already sent by nbd_negotiate_opt_meta_cont=
+ext_start
+> +         * */
+> +        return 0;
+> +    }
+> +
+> +    if (nb_queries =3D=3D 0) {
+> +        return nbd_negotiate_send_rep(client->ioc, NBD_REP_ACK,
+> +                                      NBD_OPT_SET_META_CONTEXT);
+> +    }
+> +
+> +    if (nb_queries > 1) {
+> +        return nbd_negotiate_send_rep_err(client->ioc, NBD_REP_ERR_TOO=
+_BIG,
+> +                                          NBD_OPT_SET_META_CONTEXT,
+> +                                          "Only one exporting context =
+is"
+> +                                          "supported");
+
+Why only one? What's wrong with supporting both 'qemu:xyz' (the dirty
+bitmap, with whatever prefix name we actually settle on) and
+'base:allocation' at the same time?
+
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--QDutftdAF0kV1gs7TK6ipViLpfxhAAH3u
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYmxldAAoJEKeha0olJ0Nq2kcH/0FEWpNR1rjhWHvLryIj5tHi
+cSrcD9dfqeCH5yBAebAA9Wa/5zGqvO5dmjqsS/zgfPEAVMgrskugTQc5pXp/WSaT
+rwge9kLSztOR79/sJD1P8lKqTpgPbBKz82xsDmKjpdmSkDXumPa8t6xzOTnwnkpw
+tu7quJhzEBdFMh9q2zMqHnQq8/8DIg64XRUOCeZpNkjfVFt5VrUC6bocmn2yRqu7
+Qa9zxwlAo+wvpXcqhE8YOL5P4cXsFQiIh6r8xIzvTSISOsfXC8Q0dtbcmFb7nJgS
+5IEhMwGtrG+Df+sJFsgSb6lZ4oqKIvC54y/ZHnDKdar+S6g8GWMvBkE+YFwnJLo=
+=r0Yr
+-----END PGP SIGNATURE-----
+
+--QDutftdAF0kV1gs7TK6ipViLpfxhAAH3u--
