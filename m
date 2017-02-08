@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58693)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eswierk@skyportsystems.com>) id 1cbVBo-0002EE-AY
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 11:33:53 -0500
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cbVD6-0003ER-OD
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 11:35:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eswierk@skyportsystems.com>) id 1cbVBk-0005Z4-Cz
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 11:33:52 -0500
-Received: from mail-ua0-x234.google.com ([2607:f8b0:400c:c08::234]:36289)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <eswierk@skyportsystems.com>)
-	id 1cbVBk-0005Yf-85
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 11:33:48 -0500
-Received: by mail-ua0-x234.google.com with SMTP id 96so113377207uaq.3
-	for <qemu-devel@nongnu.org>; Wed, 08 Feb 2017 08:33:46 -0800 (PST)
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cbVD3-00068r-0r
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 11:35:12 -0500
+Received: from mailapp01.imgtec.com ([195.59.15.196]:36911)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cbVD2-00068P-SM
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 11:35:08 -0500
+From: Yongbok Kim <yongbok.kim@imgtec.com>
+Date: Wed, 8 Feb 2017 16:34:54 +0000
+Message-ID: <1486571694-16484-1-git-send-email-yongbok.kim@imgtec.com>
 MIME-Version: 1.0
-From: Ed Swierk <eswierk@skyportsystems.com>
-Date: Wed, 8 Feb 2017 08:33:05 -0800
-Message-ID: <CAO_EM_m9Z7WcxRZthAGgeDgJ6UuwKXwAOEH7NC2=hL8Cd4jABg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: [Qemu-devel] virtio-scsi-pci iothread spins at 100%
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3 5/8] dtc: Update requirement to v1.4.2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,26 +23,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, stefanha@redhat.com
+To: qemu-devel@nongnu.org
+Cc: paul.burton@imgtec.com, aurelien@aurel32.net, peter.maydell@linaro.org
 
-Recently I noticed that when I configure a virtio-scsi-pci device
-using an iothread, as soon as the guest virtio-scsi driver loads, the
-iothread spins at 100%:
+From: Paul Burton <paul.burton@imgtec.com>
 
-  -object iothread,id=iothread1 -device virtio-scsi-pci,iothread=iothread1
+In order to obtain fdt_first_subnode & fdt_next_subnode symbols from
+libfdt for use by a later patch, bump the requirement for dtc to v1.4.2
+& the submodule to that same version.
 
-This occurs whether or not a disk is attached, with either
-poll-max-ns=0 or poll-max-ns=32768, and with Linux 3.13, 4.1 and 4.4
-guests. The iothread stops spinning as soon as the guest driver is
-unloaded.
+Signed-off-by: Paul Burton <paul.burton@imgtec.com>
+Reviewed-by: Yongbok Kim <yongbok.kim@imgtec.com>
+Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
+---
+ configure | 6 +++---
+ dtc       | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-I bisected the issue to commit 684e508c23d28af8d6ed2c62738a0f60447c8274:
-
-  aio: add .io_poll_begin/end() callbacks
-
-It doesn't seem to affect performance, but obviously consuming CPU
-cycles when there's no disk attached is undesirable. Is this an
-expected side effect of implementing iothread polling? Is there a way
-to revert to the old non-polling behavior?
-
---Ed
+diff --git a/configure b/configure
+index 86fd833..3efef91 100755
+--- a/configure
++++ b/configure
+@@ -3396,11 +3396,11 @@ fi
+ if test "$fdt" != "no" ; then
+   fdt_libs="-lfdt"
+   # explicitly check for libfdt_env.h as it is missing in some stable installs
+-  # and test for required functions to make sure we are on a version >= 1.4.0
++  # and test for required functions to make sure we are on a version >= 1.4.2
+   cat > $TMPC << EOF
+ #include <libfdt.h>
+ #include <libfdt_env.h>
+-int main(void) { fdt_get_property_by_offset(0, 0, 0); return 0; }
++int main(void) { fdt_first_subnode(0, 0); return 0; }
+ EOF
+   if compile_prog "" "$fdt_libs" ; then
+     # system DTC is good - use it
+@@ -3418,7 +3418,7 @@ EOF
+     fdt_libs="-L\$(BUILD_DIR)/dtc/libfdt $fdt_libs"
+   elif test "$fdt" = "yes" ; then
+     # have neither and want - prompt for system/submodule install
+-    error_exit "DTC (libfdt) version >= 1.4.0 not present. Your options:" \
++    error_exit "DTC (libfdt) version >= 1.4.2 not present. Your options:" \
+         "  (1) Preferred: Install the DTC (libfdt) devel package" \
+         "  (2) Fetch the DTC submodule, using:" \
+         "      git submodule update --init dtc"
+diff --git a/dtc b/dtc
+index 65cc4d2..ec02b34 160000
+--- a/dtc
++++ b/dtc
+@@ -1 +1 @@
+-Subproject commit 65cc4d2748a2c2e6f27f1cf39e07a5dbabd80ebf
++Subproject commit ec02b34c05be04f249ffaaca4b666f5246877dea
+-- 
+2.7.4
