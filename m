@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <adrian@eitrsystems.com>) id 1cbXTL-0000V9-Mm
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 14:00:09 -0500
+	(envelope-from <eblake@redhat.com>) id 1cbXo3-0006AZ-Ak
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 14:21:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <adrian@eitrsystems.com>) id 1cbXTK-0005Gj-Au
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 14:00:07 -0500
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:36324)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <adrian@eitrsystems.com>)
-	id 1cbXTJ-0005Fz-Vh
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 14:00:06 -0500
-Received: by mail-wm0-x22b.google.com with SMTP id c85so209228294wmi.1
-	for <qemu-devel@nongnu.org>; Wed, 08 Feb 2017 11:00:05 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1cbXny-0004RZ-FS
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 14:21:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48746)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cbXny-0004Qw-6a
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 14:21:26 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A59FB80488
+	for <qemu-devel@nongnu.org>; Wed,  8 Feb 2017 19:21:24 +0000 (UTC)
+References: <1486569864-17005-1-git-send-email-armbru@redhat.com>
+	<1486569864-17005-2-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6aa70c19-2c6a-a865-756d-3c10f47bbd35@redhat.com>
+Date: Wed, 8 Feb 2017 13:21:22 -0600
 MIME-Version: 1.0
-In-Reply-To: <20170208143008.GC22807@lemon.lan>
-References: <CACSixLr14Lhx_4OdVw36DjsjsgHZdk3jxxJ4pZWQ2EXK36p2hw@mail.gmail.com>
-	<08b13ba8-5e66-5fd9-3c4f-b567e87137d8@redhat.com>
-	<20170208143008.GC22807@lemon.lan>
-From: Adrian Suarez <adrian@eitrsystems.com>
-Date: Wed, 8 Feb 2017 11:00:04 -0800
-Message-ID: <CACSixLqwwEw+oPPJzg=Z=NAAN8WBDiynhbvbAhY-MbPBnHqWnQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Question about QEMU's threading model and stacking
- multiple block drivers
+In-Reply-To: <1486569864-17005-2-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="eVCKt0ANaerf1GiqA072lhgeQHblp2NtH"
+Subject: Re: [Qemu-devel] [PATCH 1/2] numa: Turn simple union NumaOptions
+ into a flat union
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,107 +35,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
->
-> Do you only start submitting request to B (step 3) after the fast device
-> I/O
-> completes (step 2.a)? The fact that they are serialized incurs extra
-> latency.
-> Have you tried to do 2 and 3 in parallel with AIO?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--eVCKt0ANaerf1GiqA072lhgeQHblp2NtH
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <6aa70c19-2c6a-a865-756d-3c10f47bbd35@redhat.com>
+Subject: Re: [PATCH 1/2] numa: Turn simple union NumaOptions into a flat union
+References: <1486569864-17005-1-git-send-email-armbru@redhat.com>
+ <1486569864-17005-2-git-send-email-armbru@redhat.com>
+In-Reply-To: <1486569864-17005-2-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 02/08/2017 10:04 AM, Markus Armbruster wrote:
+> Simple unions are simpler than flat unions in the schema, but more
+> complicated in C and on the QMP wire: there's extra indirection in C
+> and extra nesting on the wire, both pointless.  They're best avoided
+> in new code.
+>=20
+> NumaOptions isn't new, but it's only used internally, not in QMP.
+> Convert it to a flat union.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  numa.c           | 4 ++--
+>  qapi-schema.json | 8 ++++++++
+>  2 files changed, 10 insertions(+), 2 deletions(-)
+>=20
+
+> +++ b/qapi-schema.json
+> @@ -5545,6 +5545,12 @@
+>              'events' : [ 'InputEvent' ] } }
+> =20
+>  ##
+> +# @NumaOptionsType:
+> +##
+
+Do we want a 'Since: 2.1' designation (since the enum has effectively
+existed, even if implicitly, for as long as NumaOptions has been around)?=
 
 
-In step 2, we perform an asynchronous call to the fast device, supplying a
-callback that calls aio_bh_schedule_oneshot() to schedule the completion in
-the AioContext of the block driver. Step 3 uses bdrv_aio_writev(), but I'm
-not sure if this is actually causing the write to be performed
-synchronously to the backing device. What I'm expecting is that
-bdrv_aio_writev() issues the write and then yields so that we don't
-serialize all writes to the backing device.
+With or without that extra line,
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Thanks,
-Adrian
 
-On Wed, Feb 8, 2017 at 6:30 AM, Fam Zheng <famz@redhat.com> wrote:
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-> On Wed, 02/08 14:59, Max Reitz wrote:
-> > CC-ing qemu-block, Stefan, Fam.
-> >
-> >
-> > On 08.02.2017 03:38, Adrian Suarez wrote:
-> > > We=E2=80=99ve implemented a block driver that exposes storage to QEMU=
- VMs. Our
-> > > block driver (O) is interposing on writes to some other type of stora=
-ge
-> > > (B). O performs low latency replication and then asynchronously issue=
-s
-> the
-> > > write to the backing block driver, B, using bdrv_aio_writev(). Our
-> problem
-> > > is that the write latencies seen by the workload in the guest should =
-be
-> > > those imposed by O plus the guest I/O and QEMU stack (around 25us tot=
-al
-> > > based on our measurements), but we=E2=80=99re actually seeing much hi=
-gher
-> latencies
-> > > (around 120us). We suspect that this is due to the backing block
-> driver B=E2=80=99s
-> > > coroutines blocking our coroutines. The sequence of events is as
-> follows
-> > > (see diagram:
-> > > https://docs.google.com/drawings/d/12h1QbecvxzlKxSFvGKYAzvAJ18kTW
-> 6AVTwDR6VA8hkw/pub?w=3D576&h=3D565
->
-> I cannot open this, so just trying to understand from steps below..
->
-> > > ):
-> > >
-> > > 1. Write is issued to our block driver O using the asynchronous
-> interface
-> > > for QEMU block driver.
-> > > 2. Write is replicated to a fast device asynchronously.
-> > > 2.a. In a different thread, the fast device invokes a callback on
-> > > completion that causes a coroutine to be scheduled to run in the QEMU
-> > > iothread that acknowledges completion of the write to the guest OS.
-> > > 2.b. The coroutine scheduled in (2.a) is executed.
-> > > 3. Write is issued asynchronously to the backing block driver, B.
-> > > 3.a. The backing block driver, B, invokes the completion function
-> supplied
-> > > by us, which frees any memory associated with the write (e.g. copies
-> of IO
-> > > vectors).
->
-> Do you only start submitting request to B (step 3) after the fast device
-> I/O
-> completes (step 2.a)? The fact that they are serialized incurs extra
-> latency.
-> Have you tried to do 2 and 3 in parallel with AIO?
->
-> > >
-> > > Steps (1), (2), and (3) are performed in the same coroutine (our
-> driver's
-> > > bdrv_aio_writev() implementation). (2.a) is executed in a thread that
-> is
-> > > part of our transport library linked by O, and (2.b) and (3.a) are
-> executed
-> > > as coroutines in the QEMU iothread.
-> > >
-> > > We've tried improving the performance by using separate iothreads for
-> the
-> > > two devices, but this only shaved about lowered the latency to around
-> 100us
-> > > and caused stability issues. What's the best way to create a separate
-> > > iothread for the backing driver to do all of its work in?
-> >
-> > I don't think it's possible to use different AioContexts for
-> > BlockDriverStates in the same BDS chain, at least not currently. But
-> > others may know more about this.
->
-> This may change in the future but currently all the BDSes in a chain need
-> to
-> stay on the same AioContext.
->
-> Fam
->
+
+--eVCKt0ANaerf1GiqA072lhgeQHblp2NtH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYm2+yAAoJEKeha0olJ0NqvfUIAKq+1bmGXr+Ew5RcAeoDl47S
+fmS9AusguTRnw9Ffl60BtNU2ET+xPxearaIs51m0nFPWTqsIHI0sWK/TwAiMj75U
+FMdX2THlwA7DI/hQslB60yAe7dHGuHiKLyvFskD84f+eC7FO2llawSFKMog+5mq7
+a2nh00hyXO0unlQy6GGsg2ThCY+KM9cZBnRpSigiLORuiv117Y9iPP4FTxe/OvPS
+uE3l/SSZcFomS3E/yyB8zxQpbY+/Luu6+e4peXo58vJIGNBXD0OlMu+fmg5//Nyv
+LIr8qXngRagT54uaIoS66/MqIUF2NfwYIEWupl3o63F3Jl9UfNbX0ulkgcoBirE=
+=JbDU
+-----END PGP SIGNATURE-----
+
+--eVCKt0ANaerf1GiqA072lhgeQHblp2NtH--
