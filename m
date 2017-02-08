@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cbTGF-0007eD-IU
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 09:30:21 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cbTJH-0001VU-06
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 09:33:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cbTGE-0006gO-3z
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 09:30:19 -0500
-Date: Wed, 8 Feb 2017 22:30:08 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170208143008.GC22807@lemon.lan>
-References: <CACSixLr14Lhx_4OdVw36DjsjsgHZdk3jxxJ4pZWQ2EXK36p2hw@mail.gmail.com>
-	<08b13ba8-5e66-5fd9-3c4f-b567e87137d8@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1cbTJF-0007Wm-S8
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 09:33:27 -0500
+References: <20170123123056.30383-1-famz@redhat.com>
+	<20170123123056.30383-16-famz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <20d35345-34de-db04-d6d4-59a0babda81e@redhat.com>
+Date: Wed, 8 Feb 2017 15:33:15 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <08b13ba8-5e66-5fd9-3c4f-b567e87137d8@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Question about QEMU's threading model and stacking
- multiple block drivers
+In-Reply-To: <20170123123056.30383-16-famz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="EbjUXJcOutmvQTXrlFoh2rL0cOsPJrf1X"
+Subject: Re: [Qemu-devel] [PATCH v12 15/16] qcow2: Force "no other writer"
+ lock on bs->file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,83 +25,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Adrian Suarez <adrian@eitrsystems.com>
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-block@nongnu.org, eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, rjones@redhat.com
 
-On Wed, 02/08 14:59, Max Reitz wrote:
-> CC-ing qemu-block, Stefan, Fam.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--EbjUXJcOutmvQTXrlFoh2rL0cOsPJrf1X
+From: Max Reitz <mreitz@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-block@nongnu.org,
+ eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, rjones@redhat.com
+Message-ID: <20d35345-34de-db04-d6d4-59a0babda81e@redhat.com>
+Subject: Re: [PATCH v12 15/16] qcow2: Force "no other writer" lock on bs->file
+References: <20170123123056.30383-1-famz@redhat.com>
+ <20170123123056.30383-16-famz@redhat.com>
+In-Reply-To: <20170123123056.30383-16-famz@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
+
+On 23.01.2017 13:30, Fam Zheng wrote:
+> Writing to the same qcow2 file from two QEMU processes at the same time=
+
+> will never work correctly, so disable it even when the caller specifies=
+
+> BDRV_O_RDWR.
 >=20
+> Other formats are less vulnerable because they don't have internal
+> snapshots thus qemu-img is less often misused to create live snapshot.
+
+Hm, OK, reasonable. Also reasonable since we can just wait with those
+until we have op blockers.
+
+Which brings me to the op blocker point. I don't know the exact
+influence Kevin's patches will have on this series, but I'd imagine they
+mostly change where the BDRV_O_SHARE_RW flag comes from or whether we
+need that flag at all. Therefore, I personally don't mind the order in
+which your series land in master.
+
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  block/qcow2.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
 >=20
-> On 08.02.2017 03:38, Adrian Suarez wrote:
-> > We=E2=80=99ve implemented a block driver that exposes storage to QEMU=
- VMs. Our
-> > block driver (O) is interposing on writes to some other type of stora=
-ge
-> > (B). O performs low latency replication and then asynchronously issue=
-s the
-> > write to the backing block driver, B, using bdrv_aio_writev(). Our pr=
-oblem
-> > is that the write latencies seen by the workload in the guest should =
-be
-> > those imposed by O plus the guest I/O and QEMU stack (around 25us tot=
-al
-> > based on our measurements), but we=E2=80=99re actually seeing much hi=
-gher latencies
-> > (around 120us). We suspect that this is due to the backing block driv=
-er B=E2=80=99s
-> > coroutines blocking our coroutines. The sequence of events is as foll=
-ows
-> > (see diagram:
-> > https://docs.google.com/drawings/d/12h1QbecvxzlKxSFvGKYAzvAJ18kTW6AVT=
-wDR6VA8hkw/pub?w=3D576&h=3D565
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 96fb8a8..879361a 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -1177,6 +1177,17 @@ static int qcow2_open(BlockDriverState *bs, QDic=
+t *options, int flags,
+>          }
+>      }
+> =20
+> +    if ((flags & BDRV_O_SHARE_RW) && (flags & BDRV_O_RDWR)) {
+> +        /* Shared write is never a good idea for qcow2, override it.
+> +         * XXX: Use permission propagation and masking mechanism in op=
+ blockers
+> +         * API once it's there. */
+> +        ret =3D bdrv_reopen(bs->file->bs, flags & ~BDRV_O_SHARE_RW, &l=
+ocal_err);
+> +        if (ret) {
+> +            error_propagate(errp, local_err);
+> +            goto fail;
+> +        }
+> +    }
+> +
 
-I cannot open this, so just trying to understand from steps below..
+Good in principle, but I don't think it should be at the bottom of this
+function, especially not after "Repair image if dirty". I think it would
+be good to put this right at the start of qcow2_open(), actually.
 
-> > ):
-> >=20
-> > 1. Write is issued to our block driver O using the asynchronous inter=
-face
-> > for QEMU block driver.
-> > 2. Write is replicated to a fast device asynchronously.
-> > 2.a. In a different thread, the fast device invokes a callback on
-> > completion that causes a coroutine to be scheduled to run in the QEMU
-> > iothread that acknowledges completion of the write to the guest OS.
-> > 2.b. The coroutine scheduled in (2.a) is executed.
-> > 3. Write is issued asynchronously to the backing block driver, B.
-> > 3.a. The backing block driver, B, invokes the completion function sup=
-plied
-> > by us, which frees any memory associated with the write (e.g. copies =
-of IO
-> > vectors).
+Max
 
-Do you only start submitting request to B (step 3) after the fast device =
-I/O
-completes (step 2.a)? The fact that they are serialized incurs extra late=
-ncy.
-Have you tried to do 2 and 3 in parallel with AIO?
-
-> >=20
-> > Steps (1), (2), and (3) are performed in the same coroutine (our driv=
-er's
-> > bdrv_aio_writev() implementation). (2.a) is executed in a thread that=
- is
-> > part of our transport library linked by O, and (2.b) and (3.a) are ex=
-ecuted
-> > as coroutines in the QEMU iothread.
-> >=20
-> > We've tried improving the performance by using separate iothreads for=
- the
-> > two devices, but this only shaved about lowered the latency to around=
- 100us
-> > and caused stability issues. What's the best way to create a separate
-> > iothread for the backing driver to do all of its work in?
+>  #ifdef DEBUG_ALLOC
+>      {
+>          BdrvCheckResult result =3D {0};
 >=20
-> I don't think it's possible to use different AioContexts for
-> BlockDriverStates in the same BDS chain, at least not currently. But
-> others may know more about this.
 
-This may change in the future but currently all the BDSes in a chain need=
- to
-stay on the same AioContext.
 
-Fam
+
+--EbjUXJcOutmvQTXrlFoh2rL0cOsPJrf1X
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlibLCsSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A29YH/AwxdFx6wLRq9gYiLt5KHtM7HkUrzq9I
+P+c3euHIE8gwdp10hxbRKZo3JghuWIM44+1gdlhS9guxbhAQcm49d/5U1WxrZA+m
+3YIWcF2DNAl98qe8mEulzjqeHnIYKH0IycmNam3FMK4KmZB2fTzzFqbjwbvRo3ho
+QAmxTEhi4zlsoQkH+AYSgVu0ZzMNBtu+9SHaQvaFGhdj7hJfnSwSOIo5ho68dJxF
+atJ0RdrgRhyDW0cZ8PfKbtDCBGivXuYxAwwTOVv+t1h7L02/evilTHJQLdAqxzjW
+4U1M9RKSbEz4tvmOSG/XbTY3vEArIDocf5QVzfWyt9WRDuk4iqc6vlM=
+=k0Wg
+-----END PGP SIGNATURE-----
+
+--EbjUXJcOutmvQTXrlFoh2rL0cOsPJrf1X--
