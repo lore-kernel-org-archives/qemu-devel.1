@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cbSmc-0003Pj-P9
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:59:44 -0500
+	(envelope-from <mlureau@redhat.com>) id 1cbSnh-00044D-Ju
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 09:00:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cbSmb-0004t8-JU
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:59:42 -0500
-References: <CACSixLr14Lhx_4OdVw36DjsjsgHZdk3jxxJ4pZWQ2EXK36p2hw@mail.gmail.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <08b13ba8-5e66-5fd9-3c4f-b567e87137d8@redhat.com>
-Date: Wed, 8 Feb 2017 14:59:32 +0100
+	(envelope-from <mlureau@redhat.com>) id 1cbSnc-00059X-5J
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 09:00:49 -0500
+Date: Wed, 8 Feb 2017 09:00:37 -0500 (EST)
+From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>
+Message-ID: <1904417137.1617199.1486562437768.JavaMail.zimbra@redhat.com>
+In-Reply-To: <58a6feee-8828-d159-daf9-b460a6c0c7c4@redhat.com>
+References: <20170208080900.4092-1-marcandre.lureau@redhat.com>
+	<58a6feee-8828-d159-daf9-b460a6c0c7c4@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CACSixLr14Lhx_4OdVw36DjsjsgHZdk3jxxJ4pZWQ2EXK36p2hw@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="k3gSgCjn5HM0w75kmJdp8x9nWq4umlK7Q"
-Subject: Re: [Qemu-devel] Question about QEMU's threading model and stacking
- multiple block drivers
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] qcow2: remove useless NULL check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,106 +23,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Adrian Suarez <adrian@eitrsystems.com>, qemu-devel@nongnu.org, Qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-trivial@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---k3gSgCjn5HM0w75kmJdp8x9nWq4umlK7Q
-From: Max Reitz <mreitz@redhat.com>
-To: Adrian Suarez <adrian@eitrsystems.com>, qemu-devel@nongnu.org,
- Qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- Fam Zheng <famz@redhat.com>
-Message-ID: <08b13ba8-5e66-5fd9-3c4f-b567e87137d8@redhat.com>
-Subject: Re: [Qemu-devel] Question about QEMU's threading model and stacking
- multiple block drivers
-References: <CACSixLr14Lhx_4OdVw36DjsjsgHZdk3jxxJ4pZWQ2EXK36p2hw@mail.gmail.com>
-In-Reply-To: <CACSixLr14Lhx_4OdVw36DjsjsgHZdk3jxxJ4pZWQ2EXK36p2hw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi
 
-CC-ing qemu-block, Stefan, Fam.
-
-
-On 08.02.2017 03:38, Adrian Suarez wrote:
-> We=E2=80=99ve implemented a block driver that exposes storage to QEMU V=
-Ms. Our
-> block driver (O) is interposing on writes to some other type of storage=
-
-> (B). O performs low latency replication and then asynchronously issues =
-the
-> write to the backing block driver, B, using bdrv_aio_writev(). Our prob=
-lem
-> is that the write latencies seen by the workload in the guest should be=
-
-> those imposed by O plus the guest I/O and QEMU stack (around 25us total=
-
-> based on our measurements), but we=E2=80=99re actually seeing much high=
-er latencies
-> (around 120us). We suspect that this is due to the backing block driver=
- B=E2=80=99s
-> coroutines blocking our coroutines. The sequence of events is as follow=
-s
-> (see diagram:
-> https://docs.google.com/drawings/d/12h1QbecvxzlKxSFvGKYAzvAJ18kTW6AVTwD=
-R6VA8hkw/pub?w=3D576&h=3D565
-> ):
+----- Original Message -----
+> On 08.02.2017 09:09, Marc-Andr=C3=A9 Lureau wrote:
+> > g_strdup() already handles the case where the argument is NULL.
+> >=20
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  block/qcow2.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/block/qcow2.c b/block/qcow2.c
+> > index 96fb8a8f16..9114218030 100644
+> > --- a/block/qcow2.c
+> > +++ b/block/qcow2.c
+> > @@ -2016,8 +2016,8 @@ static int qcow2_change_backing_file(BlockDriverS=
+tate
+> > *bs,
+> >      g_free(s->image_backing_file);
+> >      g_free(s->image_backing_format);
+> > =20
+> > -    s->image_backing_file =3D backing_file ? g_strdup(bs->backing_file=
+) :
+> > NULL;
+> > -    s->image_backing_format =3D backing_fmt ? g_strdup(bs->backing_for=
+mat) :
+> > NULL;
+> > +    s->image_backing_file =3D g_strdup(bs->backing_file);
+> > +    s->image_backing_format =3D g_strdup(bs->backing_format);
 >=20
-> 1. Write is issued to our block driver O using the asynchronous interfa=
-ce
-> for QEMU block driver.
-> 2. Write is replicated to a fast device asynchronously.
-> 2.a. In a different thread, the fast device invokes a callback on
-> completion that causes a coroutine to be scheduled to run in the QEMU
-> iothread that acknowledges completion of the write to the guest OS.
-> 2.b. The coroutine scheduled in (2.a) is executed.
-> 3. Write is issued asynchronously to the backing block driver, B.
-> 3.a. The backing block driver, B, invokes the completion function suppl=
-ied
-> by us, which frees any memory associated with the write (e.g. copies of=
- IO
-> vectors).
+> bs->backing_file and bs->backing_format are arrays. They will never be NU=
+LL.
 >=20
-> Steps (1), (2), and (3) are performed in the same coroutine (our driver=
-'s
-> bdrv_aio_writev() implementation). (2.a) is executed in a thread that i=
-s
-> part of our transport library linked by O, and (2.b) and (3.a) are exec=
-uted
-> as coroutines in the QEMU iothread.
->=20
-> We've tried improving the performance by using separate iothreads for t=
-he
-> two devices, but this only shaved about lowered the latency to around 1=
-00us
-> and caused stability issues. What's the best way to create a separate
-> iothread for the backing driver to do all of its work in?
+> The ternary operator tests backing_file and backing_fmt which instead
+> are pointers. So this is not an equivalent conversion.
 
-I don't think it's possible to use different AioContexts for
-BlockDriverStates in the same BDS chain, at least not currently. But
-others may know more about this.
+oops my bad, ignore ;P a bit uncommon code though, could deserve a comment.
 
-Max
 
 >=20
-> -Adrian
+> Max
 >=20
-
-
-
---k3gSgCjn5HM0w75kmJdp8x9nWq4umlK7Q
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlibJEQSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AAIwH/1aFxEi07PxdJwHbyTzZWqNNN0Adrfyp
-NONeJBBW2YlxkAicYJLK2OsukFMegWePzRa07r9IJxN3gqCu+oECOS8ay+2WHYzr
-wStYWurBfbOPW8B4tTT91yAgmXPKKZ7KUU4KFq73frIjJjUMKGlBN1UQJjeXS0w9
-nhNEvxDH7A4ElBchbFUkc7PQPDTTHey7mLKB01c/Ebk7nN/U1I36YWsoIwUlaqPt
-OUqkYNmY8NQN+0AKkK2tpnDuPg53Lq/zGL7lI5axstEA1fqzNi16QLnlvFuCO6Dq
-fe3WuCoMhHqEBQOFoNYyHUK4K1sDzA2y6KT4GJzkdCzaPTFcwd1V4Kg=
-=ZkfQ
------END PGP SIGNATURE-----
-
---k3gSgCjn5HM0w75kmJdp8x9nWq4umlK7Q--
+> > =20
+> >      return qcow2_update_header(bs);
+> >  }
+> >=20
+>=20
+>=20
+>=20
