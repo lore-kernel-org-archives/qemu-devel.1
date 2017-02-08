@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cbWid-0005xJ-JM
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 13:11:56 -0500
+	(envelope-from <jsnow@redhat.com>) id 1cbWmo-00079q-7p
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 13:16:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cbWia-0008B7-EO
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 13:11:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54344)
+	(envelope-from <jsnow@redhat.com>) id 1cbWml-0000cS-2S
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 13:16:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35166)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cbWia-0008Ap-5x
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 13:11:48 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1cbWmk-0000cO-IF
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 13:16:06 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4276D51451
-	for <qemu-devel@nongnu.org>; Wed,  8 Feb 2017 18:11:48 +0000 (UTC)
-References: <1486575331-14455-1-git-send-email-abologna@redhat.com>
-	<1486575331-14455-3-git-send-email-abologna@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <3fa3d4b8-3e3a-d6c4-a2c1-affef7361576@redhat.com>
-Date: Wed, 8 Feb 2017 19:11:42 +0100
+	by mx1.redhat.com (Postfix) with ESMTPS id C83237FB7D
+	for <qemu-devel@nongnu.org>; Wed,  8 Feb 2017 18:16:06 +0000 (UTC)
+References: <20170207135211.15870-1-marcandre.lureau@redhat.com>
+	<20170207135211.15870-10-marcandre.lureau@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <ce3e8aa6-3004-55d7-36a5-f03d58a9662b@redhat.com>
+Date: Wed, 8 Feb 2017 13:16:05 -0500
 MIME-Version: 1.0
-In-Reply-To: <1486575331-14455-3-git-send-email-abologna@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 2/2] mach-virt: Provide sample
- configuration files
+In-Reply-To: <20170207135211.15870-10-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 09/28] tests: fix ide-test leaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,108 +33,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>, qemu-devel@nongnu.org
-Cc: marcel@redhat.com, drjones@redhat.com, kraxel@redhat.com
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
 
-Thanks for the CC!
 
-On 02/08/17 18:35, Andrea Bolognani wrote:
 
-> +# Firmware configuration
-> +# =========================================================
-> +#
-> +# There are two parts to the firmware: a read-only image
-> +# containing the executable code, which is shared between
-> +# guests, and a read/write variable store that is used by
+On 02/07/2017 08:51 AM, Marc-Andr=C3=A9 Lureau wrote:
+> Spotted by ASAN.
+>=20
+> Cc: John Snow <jsnow@redhat.com>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  tests/ide-test.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+>=20
+> diff --git a/tests/ide-test.c b/tests/ide-test.c
+> index fb541f88b5..2fa97bc36b 100644
+> --- a/tests/ide-test.c
+> +++ b/tests/ide-test.c
+> @@ -339,6 +339,7 @@ static void test_bmdma_simple_rw(void)
+>      g_assert(memcmp(buf, cmpbuf, len) =3D=3D 0);
+> =20
+> =20
+> +    free_pci_device(dev);
+>      g_free(buf);
+>      g_free(cmpbuf);
+>  }
+> @@ -369,6 +370,7 @@ static void test_bmdma_short_prdt(void)
+>                                prdt, ARRAY_SIZE(prdt), NULL);
+>      g_assert_cmphex(status, =3D=3D, 0);
+>      assert_bit_clear(qpci_io_readb(dev, ide_bar, reg_status), DF | ERR=
+);
+> +    free_pci_device(dev);
+>  }
+> =20
+>  static void test_bmdma_one_sector_short_prdt(void)
+> @@ -398,6 +400,7 @@ static void test_bmdma_one_sector_short_prdt(void)
+>                                prdt, ARRAY_SIZE(prdt), NULL);
+>      g_assert_cmphex(status, =3D=3D, 0);
+>      assert_bit_clear(qpci_io_readb(dev, ide_bar, reg_status), DF | ERR=
+);
+> +    free_pci_device(dev);
+>  }
+> =20
+>  static void test_bmdma_long_prdt(void)
+> @@ -426,6 +429,7 @@ static void test_bmdma_long_prdt(void)
+>                                prdt, ARRAY_SIZE(prdt), NULL);
+>      g_assert_cmphex(status, =3D=3D, BM_STS_INTR);
+>      assert_bit_clear(qpci_io_readb(dev, ide_bar, reg_status), DF | ERR=
+);
+> +    free_pci_device(dev);
+>  }
+> =20
+>  static void test_bmdma_no_busmaster(void)
+> @@ -449,6 +453,7 @@ static void test_bmdma_no_busmaster(void)
+>       * in practice. At least we want to be aware of any changes. */
+>      g_assert_cmphex(status, =3D=3D, BM_STS_ACTIVE | BM_STS_INTR);
+>      assert_bit_clear(qpci_io_readb(dev, ide_bar, reg_status), DF | ERR=
+);
+> +    free_pci_device(dev);
+>  }
+> =20
+>  static void test_bmdma_setup(void)
+> @@ -525,6 +530,7 @@ static void test_identify(void)
+>      assert_bit_set(buf[85], 0x20);
+> =20
+>      ide_test_quit();
+> +    free_pci_device(dev);
+>  }
+> =20
+>  /*
+> @@ -562,6 +568,7 @@ static void make_dirty(uint8_t device)
+>      assert_bit_clear(qpci_io_readb(dev, ide_bar, reg_status), DF | ERR=
+);
+> =20
+>      g_free(buf);
+> +    free_pci_device(dev);
+>  }
+> =20
+>  static void test_flush(void)
+> @@ -608,6 +615,7 @@ static void test_flush(void)
+>      assert_bit_clear(data, BSY | DF | ERR | DRQ);
+> =20
+>      ide_test_quit();
+> +    free_pci_device(dev);
+>  }
+> =20
+>  static void test_retry_flush(const char *machine)
+> @@ -658,6 +666,7 @@ static void test_retry_flush(const char *machine)
+>      assert_bit_clear(data, BSY | DF | ERR | DRQ);
+> =20
+>      ide_test_quit();
+> +    free_pci_device(dev);
+>  }
+> =20
+>  static void test_flush_nodev(void)
+> @@ -675,6 +684,7 @@ static void test_flush_nodev(void)
+> =20
+>      /* Just testing that qemu doesn't crash... */
+> =20
+> +    free_pci_device(dev);
+>      ide_test_quit();
+>  }
+> =20
+> @@ -741,6 +751,7 @@ static uint8_t ide_wait_clear(uint8_t flag)
+>      while (true) {
+>          data =3D qpci_io_readb(dev, ide_bar, reg_status);
+>          if (!(data & flag)) {
+> +            free_pci_device(dev);
+>              return data;
+>          }
+>          if (difftime(time(NULL), st) > 5.0) {
+> @@ -850,6 +861,7 @@ static void cdrom_pio_impl(int nblocks)
+>      g_free(pattern);
+>      g_free(rx);
+>      test_bmdma_teardown();
+> +    free_pci_device(dev);
+>  }
+> =20
+>  static void test_cdrom_pio(void)
+>=20
 
-Apparently omitted:
+Reviewed-by: John Snow <jsnow@redhat.com>
 
-  one specific virtual machine, exclusively,
+And since valgrind yelled at me when I went to test it, I sent a related
+patch out too.
 
-Also, I would recommend replacing "used" with "owned".
-
-> +# to record information such as the boot device. An empty
-
-s/boot device/UEFI boot order/
-
-> +# variable store can be created by simply copying a
-> +# template provided as part of AAVMF.
-
-How about:
-
-  For any new guest, its permanent, private variable store should
-  initially be copied from the template file provided as part of the
-  ArmVirtQemu firmware platform (which is occasionally distributed
-  under the AAVMF package).
-
-> +#
-> +# Depending on the distribution you're using on the host,
-
-I recommend "OS distribution", "Linux distribution", or "GNU/Linux
-distribution", as you prefer.
-
-> +# paths to the firmware itself and variable store template
-
-s/firmware/firmware binary/
-
-> +# will be different. Some examples:
-> +#
-> +# Fedora:
-> +#   /usr/share/edk2/aarch64/QEMU_EFI.fd
-> +#   /usr/share/edk2/aarch64/QEMU_VARS.fd
-
-Please annotate each as firmware binary & variable store template.
-
-Also, I can't verify the exact pathnames for Fedora.
-
-> +# RHEL:
-> +#   /usr/share/AAVMF/AAVMF_CODE.fd
-> +#   /usr/share/AAVMF/AAVMF_VARS.fd
-
-Looks legit. (Might want to call "RHEL" "RHELSA" though, in this context
--- no clue. Ask Drew :))
-
-> +
-> +[drive "aavmf-code"]
-
-Heh, I never specify "id" for these "-drive"s, but I definitely
-appreciate the attention to detail. Let's call it "uefi-binary" though.
-
-> +  file = "/usr/share/edk2/aarch64/QEMU_EFI.fd"  # CHANGE ME
-
-Please replace the comment with
-
-  CHANGE ME ACCORDING TO HOST LINUX DISTRO
-
-or some such
-
-> +  format = "raw"
-> +  if = "pflash"
-> +  unit = "0"
-> +  readonly = "on"
-> +
-> +[drive "aavmf-vars"]
-
-Let's call this "uefi-varstore".
-
-> +  file = "guest_VARS.fd"                        # CHANGE ME
-
-Many bonus points for providing a file name example that is *different*
-from (QEMU|AAVMF)_VARS.fd. It should (and thankfully, does) reflect that
-it's already a copy.
-
-Please expand the comment:
-
-  CHANGE ME TO THE NAME OF THE FILE THAT YOU CREATED AS A COPY of THE
-  VARSTORE TEMPLATE
-
-> +  format = "raw"
-> +  if = "pflash"
-> +  unit = "1"
-
-Yes!
-
-I apologize for being too detailed / pedantic about this.
-
-Thanks!
-Laszlo
+--js
