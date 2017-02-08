@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cbIKb-0000Er-6O
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 21:50:06 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cbIa5-0002qq-SL
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 22:06:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cbIKY-0008OL-2N
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 21:50:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39990)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cbIKX-0008O5-Po
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 21:50:01 -0500
-References: <1486456099-7345-1-git-send-email-peterx@redhat.com>
-	<1486456099-7345-9-git-send-email-peterx@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <b8281b60-fd4d-06a5-145b-815000f34847@redhat.com>
-Date: Wed, 8 Feb 2017 10:49:54 +0800
+	(envelope-from <mreitz@redhat.com>) id 1cbIa3-0005Py-Qj
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 22:06:05 -0500
+References: <20170123123056.30383-1-famz@redhat.com>
+	<20170123123056.30383-15-famz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <f20385ca-81d1-df52-31e5-283c0c2fac0a@redhat.com>
+Date: Wed, 8 Feb 2017 04:05:52 +0100
 MIME-Version: 1.0
-In-Reply-To: <1486456099-7345-9-git-send-email-peterx@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 08/17] intel_iommu: convert dbg macros
- to trace for trans
+In-Reply-To: <20170123123056.30383-15-famz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="BHpmBsheOB5cQBD24Spu776RXBgVMx9A2"
+Subject: Re: [Qemu-devel] [PATCH v12 14/16] file-posix: Implement image
+ locking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,260 +25,527 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, alex.williamson@redhat.com, bd.aviv@gmail.com, David Gibson <david@gibson.dropbear.id.au>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-block@nongnu.org, eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, rjones@redhat.com
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--BHpmBsheOB5cQBD24Spu776RXBgVMx9A2
+From: Max Reitz <mreitz@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-block@nongnu.org,
+ eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, rjones@redhat.com
+Message-ID: <f20385ca-81d1-df52-31e5-283c0c2fac0a@redhat.com>
+Subject: Re: [PATCH v12 14/16] file-posix: Implement image locking
+References: <20170123123056.30383-1-famz@redhat.com>
+ <20170123123056.30383-15-famz@redhat.com>
+In-Reply-To: <20170123123056.30383-15-famz@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-
-On 2017=E5=B9=B402=E6=9C=8807=E6=97=A5 16:28, Peter Xu wrote:
-> Another patch to convert the DPRINTF() stuffs. This patch focuses on th=
-e
-> address translation path and caching.
->
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+On 23.01.2017 13:30, Fam Zheng wrote:
+> This implements open flag sensible image locking for local file
+> and host device protocol.
+>=20
+> virtlockd in libvirt locks the first byte, so we start looking at the
+> file bytes from 1.
+>=20
+> Quoting what was proposed by Kevin Wolf <kwolf@redhat.com>, there are
+> four locking modes by combining two bits (BDRV_O_RDWR and
+> BDRV_O_SHARE_RW), and implemented by taking two locks.
+>=20
+> The complication is in the transactional reopen.  To make the reopen
+> logic managable, and allow better reuse, the code is internally
+> organized with a table from old mode to the new one.
+>=20
+> Signed-off-by: Fam Zheng <famz@redhat.com>
 > ---
->   hw/i386/intel_iommu.c | 69 ++++++++++++++++++------------------------=
----------
->   hw/i386/trace-events  | 10 ++++++++
->   2 files changed, 34 insertions(+), 45 deletions(-)
+>  block/file-posix.c | 681 +++++++++++++++++++++++++++++++++++++++++++++=
++++++++-
+>  1 file changed, 678 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 28b47d9..a8c76d6 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -131,8 +131,45 @@ do { \
+> =20
+>  #define MAX_BLOCKSIZE	4096
+> =20
+> +/* Posix file locking bytes. Libvirt takes byte 0, we start from byte =
+0x10,
+> + * leaving a few more bytes for its future use. */
+> +#define RAW_LOCK_BYTE_MIN             0x10
+> +#define RAW_LOCK_BYTE_NO_OTHER_WRITER 0x10
+> +#define RAW_LOCK_BYTE_WRITE           0x11
+> +#ifdef F_OFD_SETLK
+> +#define RAW_LOCK_SUPPORTED 1
+> +#else
+> +#define RAW_LOCK_SUPPORTED 0
+> +#endif
+> +
+> +/*
+> + ** reader that can tolerate writers: Don't do anything
+> + *
+> + ** reader that can't tolerate writers: Take shared lock on byte 1. Te=
+st
+> + *  byte 2 is unlocked.
 
-Reviewed-by: Jason Wang <jasowang@redhat.com>
+Byte 0x10 and 0x11 now -- or you call them byte 0 and byte 1. Or "the
+first byte" and "the second byte".
 
->
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 08e43b6..ad304f6 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -260,11 +260,9 @@ static void vtd_update_iotlb(IntelIOMMUState *s, u=
-int16_t source_id,
->       uint64_t *key =3D g_malloc(sizeof(*key));
->       uint64_t gfn =3D vtd_get_iotlb_gfn(addr, level);
->  =20
-> -    VTD_DPRINTF(CACHE, "update iotlb sid 0x%"PRIx16 " iova 0x%"PRIx64
-> -                " slpte 0x%"PRIx64 " did 0x%"PRIx16, source_id, addr, =
-slpte,
-> -                domain_id);
-> +    trace_vtd_iotlb_page_update(source_id, addr, slpte, domain_id);
->       if (g_hash_table_size(s->iotlb) >=3D VTD_IOTLB_MAX_SIZE) {
-> -        VTD_DPRINTF(CACHE, "iotlb exceeds size limit, forced to reset"=
+Also, it should probably be "Test whether byte 2 is unlocked" or "Affirm
+that byte 2 is unlocked" (this is what my sense of the English language
+is telling me, may be wrong).
+
+> + *
+> + ** shared writer: Take shared lock on byte 2. Test byte 1 is unlocked=
+=2E
+> + *
+> + ** exclusive writer: Take exclusive locks on both bytes.
+> + */
+> +
+> +typedef enum {
+> +    /* Read only and accept other writers. */
+> +    RAW_L_READ_SHARE_RW,
+> +    /* Read only and try to forbid other writers. */
+> +    RAW_L_READ,
+> +    /* Read write and accept other writers. */
+> +    RAW_L_WRITE_SHARE_RW,
+> +    /* Read write and try to forbid other writers. */
+
+While fully comprehensible and I didn't nag about this in the last
+revision, it isn't real English so let me complain now: May be better as
+"Read+write", "Read & write" or "Read/write".
+
+("Read and write" is kind of bad because of the immediate "and" afterward=
+s.)
+
+> +    RAW_L_WRITE,
+> +} BDRVRawLockMode;
+> +
+>  typedef struct BDRVRawState {
+>      int fd;
+> +    /* A dup of @fd to make manipulating lock easier, especially durin=
+g reopen,
+> +     * where this will accept BDRVRawReopenState.lock_fd. */
+> +    int lock_fd;
+> +    bool disable_lock;
+>      int type;
+>      int open_flags;
+>      size_t buf_align;
+
+[...]
+
+> @@ -393,10 +487,88 @@ static QemuOptsList raw_runtime_opts =3D {
+
+[...]
+
+> +static int raw_apply_image_lock(BlockDriverState *bs, int bdrv_flags,
+> +                                Error **errp)
+> +{
+> +    int ret;
+> +    BDRVRawState *s =3D bs->opaque;
+> +    BDRVRawLockMode lock_mode;
+> +
+> +    if (!raw_lock_enabled(bs)) {
+> +        return 0;
+> +    }
+> +    assert(s->cur_lock_mode =3D=3D RAW_L_READ_SHARE_RW);
+> +    lock_mode =3D raw_get_lock_mode(bdrv_flags);
+> +    ret =3D raw_open_lockfd(bs->exact_filename, s->open_flags, &lock_m=
+ode,
+> +                          errp);
+> +    if (ret < 0) {
+> +        return ret;
+> +    }
+> +    s->lock_fd =3D ret;
+> +    if (lock_mode =3D=3D RAW_L_READ_SHARE_RW) {
+> +        return 0;
+> +    }
+
+Not really sure why this needs to be special-cased. It doesn't hurt, but
+it doesn't really improve anything either, does it?
+
+> +    ret =3D raw_lock_fd(s->lock_fd, lock_mode, errp);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +    s->cur_lock_mode =3D lock_mode;
+> +    return 0;
+> +}
+> +
+>  static int raw_open_common(BlockDriverState *bs, QDict *options,
+>                             int bdrv_flags, int open_flags, Error **err=
+p)
+>  {
+
+[...]
+
+> @@ -538,6 +720,465 @@ static int raw_open(BlockDriverState *bs, QDict *=
+options, int flags,
+>      return raw_open_common(bs, options, flags, 0, errp);
+>  }
+> =20
+> +typedef enum {
+> +    RAW_LT_PREPARE,
+> +    RAW_LT_COMMIT,
+> +    RAW_LT_ABORT
+> +} RawLockTransOp;
+> +
+> +typedef int (*RawReopenFunc)(RawLockTransOp op,
+> +                             int old_lock_fd, int new_lock_fd,
+> +                             BDRVRawLockMode old_lock,
+> +                             BDRVRawLockMode new_lock,
+> +                             Error **errp);
+> +
+> +static int raw_lt_nop(RawLockTransOp op,
+> +                      int old_lock_fd, int new_lock_fd,
+> +                      BDRVRawLockMode old_lock,
+> +                      BDRVRawLockMode new_lock,
+> +                      Error **errp)
+> +{
+> +    assert(old_lock =3D=3D new_lock || new_lock =3D=3D RAW_L_READ_SHAR=
+E_RW);
+> +    return 0;
+> +}
+> +
+> +static int raw_lt_from_unlock(RawLockTransOp op,
+> +                              int old_lock_fd, int new_lock_fd,
+> +                              BDRVRawLockMode old_lock,
+> +                              BDRVRawLockMode new_lock,
+> +                              Error **errp)
+> +{
+> +    assert(old_lock !=3D new_lock);
+> +    assert(old_lock =3D=3D RAW_L_READ_SHARE_RW);
+> +    switch (op) {
+> +    case RAW_LT_PREPARE:
+> +        return raw_lock_fd(new_lock_fd, new_lock, errp);
+> +    case RAW_LT_COMMIT:
+> +        break;
+
+Ah, that's what the break was meant for.
+
+(It was one line above in v10.)
+
+> +    case RAW_LT_ABORT:
+> +        break;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static int raw_lt_read_to_write_share(RawLockTransOp op,
+> +                                      int old_lock_fd, int new_lock_fd=
+,
+> +                                      BDRVRawLockMode old_lock,
+> +                                      BDRVRawLockMode new_lock,
+> +                                      Error **errp)
+> +{
+> +    int ret =3D 0;
+> +
+> +    assert(old_lock =3D=3D RAW_L_READ);
+> +    assert(new_lock =3D=3D RAW_L_WRITE_SHARE_RW);
+> +
+> +    /*
+> +     *        lock byte "no other writer"      lock byte "write"
+> +     * old                S                           0
+> +     * new                0                           S
+> +     *
+> +     * (0 =3D unlocked; S =3D shared; X =3D exclusive.)
+> +     */
+
+Thanks, these comments are nice.
+
+> +    switch (op) {
+> +    case RAW_LT_PREPARE:
+> +        ret =3D qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_WRITE, 1, true=
 );
-> +        trace_vtd_iotlb_reset("iotlb exceeds size limit");
->           vtd_reset_iotlb(s);
->       }
->  =20
-> @@ -505,8 +503,7 @@ static int vtd_get_root_entry(IntelIOMMUState *s, u=
-int8_t index,
->  =20
->       addr =3D s->root + index * sizeof(*re);
->       if (dma_memory_read(&address_space_memory, addr, re, sizeof(*re))=
-) {
-> -        VTD_DPRINTF(GENERAL, "error: fail to access root-entry at 0x%"=
-PRIx64
-> -                    " + %"PRIu8, s->root, index);
-> +        trace_vtd_re_invalid(re->rsvd, re->val);
->           re->val =3D 0;
->           return -VTD_FR_ROOT_TABLE_INV;
->       }
-> @@ -524,15 +521,10 @@ static int vtd_get_context_entry_from_root(VTDRoo=
-tEntry *root, uint8_t index,
->   {
->       dma_addr_t addr;
->  =20
-> -    if (!vtd_root_entry_present(root)) {
-> -        VTD_DPRINTF(GENERAL, "error: root-entry is not present");
-> -        return -VTD_FR_ROOT_ENTRY_P;
-> -    }
-> +    /* we have checked that root entry is present */
->       addr =3D (root->val & VTD_ROOT_ENTRY_CTP) + index * sizeof(*ce);
->       if (dma_memory_read(&address_space_memory, addr, ce, sizeof(*ce))=
-) {
-> -        VTD_DPRINTF(GENERAL, "error: fail to access context-entry at 0=
-x%"PRIx64
-> -                    " + %"PRIu8,
-> -                    (uint64_t)(root->val & VTD_ROOT_ENTRY_CTP), index)=
-;
-> +        trace_vtd_re_invalid(root->rsvd, root->val);
->           return -VTD_FR_CONTEXT_TABLE_INV;
->       }
->       ce->lo =3D le64_to_cpu(ce->lo);
-> @@ -704,12 +696,11 @@ static int vtd_dev_to_context_entry(IntelIOMMUSta=
-te *s, uint8_t bus_num,
->       }
->  =20
->       if (!vtd_root_entry_present(&re)) {
-> -        VTD_DPRINTF(GENERAL, "error: root-entry #%"PRIu8 " is not pres=
-ent",
-> -                    bus_num);
-> +        /* Not error - it's okay we don't have root entry. */
-> +        trace_vtd_re_not_present(bus_num);
->           return -VTD_FR_ROOT_ENTRY_P;
->       } else if (re.rsvd || (re.val & VTD_ROOT_ENTRY_RSVD)) {
-> -        VTD_DPRINTF(GENERAL, "error: non-zero reserved field in root-e=
-ntry "
-> -                    "hi 0x%"PRIx64 " lo 0x%"PRIx64, re.rsvd, re.val);
-> +        trace_vtd_re_invalid(re.rsvd, re.val);
->           return -VTD_FR_ROOT_ENTRY_RSVD;
->       }
->  =20
-> @@ -719,22 +710,17 @@ static int vtd_dev_to_context_entry(IntelIOMMUSta=
-te *s, uint8_t bus_num,
->       }
->  =20
->       if (!vtd_context_entry_present(ce)) {
-> -        VTD_DPRINTF(GENERAL,
-> -                    "error: context-entry #%"PRIu8 "(bus #%"PRIu8 ") "
-> -                    "is not present", devfn, bus_num);
-> +        /* Not error - it's okay we don't have context entry. */
-> +        trace_vtd_ce_not_present(bus_num, devfn);
->           return -VTD_FR_CONTEXT_ENTRY_P;
->       } else if ((ce->hi & VTD_CONTEXT_ENTRY_RSVD_HI) ||
->                  (ce->lo & VTD_CONTEXT_ENTRY_RSVD_LO)) {
-> -        VTD_DPRINTF(GENERAL,
-> -                    "error: non-zero reserved field in context-entry "
-> -                    "hi 0x%"PRIx64 " lo 0x%"PRIx64, ce->hi, ce->lo);
-> +        trace_vtd_ce_invalid(ce->hi, ce->lo);
->           return -VTD_FR_CONTEXT_ENTRY_RSVD;
->       }
->       /* Check if the programming of context-entry is valid */
->       if (!vtd_is_level_supported(s, vtd_get_level_from_context_entry(c=
-e))) {
-> -        VTD_DPRINTF(GENERAL, "error: unsupported Address Width value i=
-n "
-> -                    "context-entry hi 0x%"PRIx64 " lo 0x%"PRIx64,
-> -                    ce->hi, ce->lo);
-> +        trace_vtd_ce_invalid(ce->hi, ce->lo);
->           return -VTD_FR_CONTEXT_ENTRY_INV;
->       } else {
->           switch (ce->lo & VTD_CONTEXT_ENTRY_TT) {
-> @@ -743,9 +729,7 @@ static int vtd_dev_to_context_entry(IntelIOMMUState=
- *s, uint8_t bus_num,
->           case VTD_CONTEXT_TT_DEV_IOTLB:
->               break;
->           default:
-> -            VTD_DPRINTF(GENERAL, "error: unsupported Translation Type =
-in "
-> -                        "context-entry hi 0x%"PRIx64 " lo 0x%"PRIx64,
-> -                        ce->hi, ce->lo);
-> +            trace_vtd_ce_invalid(ce->hi, ce->lo);
->               return -VTD_FR_CONTEXT_ENTRY_INV;
->           }
->       }
-> @@ -825,9 +809,8 @@ static void vtd_do_iommu_translate(VTDAddressSpace =
-*vtd_as, PCIBus *bus,
->       /* Try to fetch slpte form IOTLB */
->       iotlb_entry =3D vtd_lookup_iotlb(s, source_id, addr);
->       if (iotlb_entry) {
-> -        VTD_DPRINTF(CACHE, "hit iotlb sid 0x%"PRIx16 " iova 0x%"PRIx64
-> -                    " slpte 0x%"PRIx64 " did 0x%"PRIx16, source_id, ad=
-dr,
-> -                    iotlb_entry->slpte, iotlb_entry->domain_id);
-> +        trace_vtd_iotlb_page_hit(source_id, addr, iotlb_entry->slpte,
-> +                                 iotlb_entry->domain_id);
->           slpte =3D iotlb_entry->slpte;
->           reads =3D iotlb_entry->read_flags;
->           writes =3D iotlb_entry->write_flags;
-> @@ -836,10 +819,9 @@ static void vtd_do_iommu_translate(VTDAddressSpace=
- *vtd_as, PCIBus *bus,
->       }
->       /* Try to fetch context-entry from cache first */
->       if (cc_entry->context_cache_gen =3D=3D s->context_cache_gen) {
-> -        VTD_DPRINTF(CACHE, "hit context-cache bus %d devfn %d "
-> -                    "(hi %"PRIx64 " lo %"PRIx64 " gen %"PRIu32 ")",
-> -                    bus_num, devfn, cc_entry->context_entry.hi,
-> -                    cc_entry->context_entry.lo, cc_entry->context_cach=
-e_gen);
-> +        trace_vtd_iotlb_cc_hit(bus_num, devfn, cc_entry->context_entry=
-.hi,
-> +                               cc_entry->context_entry.lo,
-> +                               cc_entry->context_cache_gen);
->           ce =3D cc_entry->context_entry;
->           is_fpd_set =3D ce.lo & VTD_CONTEXT_ENTRY_FPD;
->       } else {
-> @@ -848,19 +830,16 @@ static void vtd_do_iommu_translate(VTDAddressSpac=
-e *vtd_as, PCIBus *bus,
->           if (ret_fr) {
->               ret_fr =3D -ret_fr;
->               if (is_fpd_set && vtd_is_qualified_fault(ret_fr)) {
-> -                VTD_DPRINTF(FLOG, "fault processing is disabled for DM=
-A "
-> -                            "requests through this context-entry "
-> -                            "(with FPD Set)");
-> +                trace_vtd_fault_disabled();
->               } else {
->                   vtd_report_dmar_fault(s, source_id, addr, ret_fr, is_=
-write);
->               }
->               return;
->           }
->           /* Update context-cache */
-> -        VTD_DPRINTF(CACHE, "update context-cache bus %d devfn %d "
-> -                    "(hi %"PRIx64 " lo %"PRIx64 " gen %"PRIu32 "->%"PR=
-Iu32 ")",
-> -                    bus_num, devfn, ce.hi, ce.lo,
-> -                    cc_entry->context_cache_gen, s->context_cache_gen)=
-;
-> +        trace_vtd_iotlb_cc_update(bus_num, devfn, ce.hi, ce.lo,
-> +                                  cc_entry->context_cache_gen,
-> +                                  s->context_cache_gen);
->           cc_entry->context_entry =3D ce;
->           cc_entry->context_cache_gen =3D s->context_cache_gen;
->       }
-> @@ -870,8 +849,7 @@ static void vtd_do_iommu_translate(VTDAddressSpace =
-*vtd_as, PCIBus *bus,
->       if (ret_fr) {
->           ret_fr =3D -ret_fr;
->           if (is_fpd_set && vtd_is_qualified_fault(ret_fr)) {
-> -            VTD_DPRINTF(FLOG, "fault processing is disabled for DMA re=
-quests "
-> -                        "through this context-entry (with FPD Set)");
-> +            trace_vtd_fault_disabled();
->           } else {
->               vtd_report_dmar_fault(s, source_id, addr, ret_fr, is_writ=
+> +        if (ret) {
+> +            error_setg_errno(errp, -ret, "Failed to lock new fd (write=
+ byte)");
+> +            break;
+> +        }
+> +        ret =3D qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITE=
+R, 1, false);
+> +        if (ret) {
+> +            error_setg_errno(errp, -ret, "Failed to lock new fd (share=
+ byte)");
+> +            break;
+> +        }
+> +        ret =3D qemu_unlock_fd(old_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRI=
+TER, 1);
+> +        if (ret) {
+> +            error_setg_errno(errp, -ret, "Failed to unlock old fd (sha=
+re byte)");
+> +            break;
+> +        }
+> +        ret =3D qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITE=
+R, 1, true);
+> +        if (ret) {
+> +            error_setg_errno(errp, -ret, "Failed to upgrade new fd (sh=
+are byte)");
+> +            break;
+> +        }
+> +        ret =3D qemu_unlock_fd(new_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRI=
+TER, 1);
+> +        if (ret) {
+> +            /* This is very unlikely, but catch it anyway. */
+> +            error_setg_errno(errp, -ret, "Failed to unlock new fd (sha=
+re byte)");
+
+Let's say we fail here, however unlikely it is...
+
+> +            break;
+> +        }
+> +        ret =3D qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_WRITE, 1, fals=
 e);
->           }
-> @@ -1031,6 +1009,7 @@ static uint64_t vtd_context_cache_invalidate(Inte=
-lIOMMUState *s, uint64_t val)
->  =20
->   static void vtd_iotlb_global_invalidate(IntelIOMMUState *s)
->   {
-> +    trace_vtd_iotlb_reset("global invalidation recved");
->       vtd_reset_iotlb(s);
->   }
->  =20
-> diff --git a/hw/i386/trace-events b/hw/i386/trace-events
-> index 02aeaab..88ad5e4 100644
-> --- a/hw/i386/trace-events
-> +++ b/hw/i386/trace-events
-> @@ -20,6 +20,16 @@ vtd_inv_desc_wait_sw(uint64_t addr, uint32_t data) "=
-wait invalidate status write
->   vtd_inv_desc_wait_irq(const char *msg) "%s"
->   vtd_inv_desc_wait_invalid(uint64_t hi, uint64_t lo) "invalid wait des=
-c hi 0x%"PRIx64" lo 0x%"PRIx64
->   vtd_inv_desc_wait_write_fail(uint64_t hi, uint64_t lo) "write fail fo=
-r wait desc hi 0x%"PRIx64" lo 0x%"PRIx64
-> +vtd_re_not_present(uint8_t bus) "Root entry bus %"PRIu8" not present"
-> +vtd_re_invalid(uint64_t hi, uint64_t lo) "invalid root entry hi 0x%"PR=
-Ix64" lo 0x%"PRIx64
-> +vtd_ce_not_present(uint8_t bus, uint8_t devfn) "Context entry bus %"PR=
-Iu8" devfn %"PRIu8" not present"
-> +vtd_ce_invalid(uint64_t hi, uint64_t lo) "invalid context entry hi 0x%=
-"PRIx64" lo 0x%"PRIx64
-> +vtd_iotlb_page_hit(uint16_t sid, uint64_t addr, uint64_t slpte, uint16=
-_t domain) "IOTLB page hit sid 0x%"PRIx16" iova 0x%"PRIx64" slpte 0x%"PRI=
-x64" domain 0x%"PRIx16
-> +vtd_iotlb_page_update(uint16_t sid, uint64_t addr, uint64_t slpte, uin=
-t16_t domain) "IOTLB page update sid 0x%"PRIx16" iova 0x%"PRIx64" slpte 0=
-x%"PRIx64" domain 0x%"PRIx16
-> +vtd_iotlb_cc_hit(uint8_t bus, uint8_t devfn, uint64_t high, uint64_t l=
-ow, uint32_t gen) "IOTLB context hit bus 0x%"PRIx8" devfn 0x%"PRIx8" high=
- 0x%"PRIx64" low 0x%"PRIx64" gen %"PRIu32
-> +vtd_iotlb_cc_update(uint8_t bus, uint8_t devfn, uint64_t high, uint64_=
-t low, uint32_t gen1, uint32_t gen2) "IOTLB context update bus 0x%"PRIx8"=
- devfn 0x%"PRIx8" high 0x%"PRIx64" low 0x%"PRIx64" gen %"PRIu32" -> gen %=
-"PRIu32
-> +vtd_iotlb_reset(const char *reason) "IOTLB reset (reason: %s)"
-> +vtd_fault_disabled(void) "Fault processing disabled for context entry"
->  =20
->   # hw/i386/amd_iommu.c
->   amdvi_evntlog_fail(uint64_t addr, uint32_t head) "error: fail to writ=
-e at addr 0x%"PRIx64" +  offset 0x%"PRIx32
+> +        if (ret) {
+> +            error_setg_errno(errp, -ret, "Failed to downgrade new fd (=
+write byte)");
+> +            break;
+> +        }
+> +        break;
+> +    case RAW_LT_COMMIT:
+> +        break;
+> +    case RAW_LT_ABORT:
+> +        ret =3D qemu_lock_fd(old_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITE=
+R, 1, false);
+> +        if (ret) {
+> +            error_report("Failed to restore lock on old fd (share byte=
+)");
+> +        }
+
+=2E..will this not fail then?
+
+(exclusive lock is still present on new_lock_fd.)
+
+> +        break;
+> +    }
+> +    return ret;
+
+By the way, couldn't this function use the same logic as
+raw_lt_write_share_to_read()? (i.e. lock old_lock_fd's
+RAW_LOCK_BYTE_NO_OTHER_WRITER exclusively and then lock new_lock_fd's
+RAW_LOCK_BYTE_WRITE in shared mode)
+
+> +}
+
+[...]
+
+> +static int raw_lt_write_share_to_read(RawLockTransOp op,
+> +                                      int old_lock_fd, int new_lock_fd=
+,
+> +                                      BDRVRawLockMode old_lock,
+> +                                      BDRVRawLockMode new_lock,
+> +                                      Error **errp)
+> +{
+> +    int ret =3D 0;
+> +
+> +    assert(old_lock =3D=3D RAW_L_WRITE_SHARE_RW);
+> +    assert(new_lock =3D=3D RAW_L_READ);
+> +    /*
+> +     *        lock byte "no other writer"      lock byte "write"
+> +     * old                0                           S
+> +     * new                S                           0
+> +     *
+> +     * (0 =3D unlocked; S =3D shared; X =3D exclusive.)
+> +     */
+> +    switch (op) {
+> +    case RAW_LT_PREPARE:
+> +        /* Make sure there are no other writers. */
+> +        ret =3D qemu_lock_fd(old_lock_fd, RAW_LOCK_BYTE_WRITE, 1, true=
+);
+> +        if (ret) {
+> +            error_setg_errno(errp, -ret, "Failed to lock old fd (write=
+ byte)");
+> +            break;
+> +        }
+> +        ret =3D qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITE=
+R, 1, false);
+> +        if (ret) {
+> +            error_setg_errno(errp, -ret, "Failed to lock new fd (share=
+ byte)");
+> +            break;
+> +        }
+> +        break;
+> +    case RAW_LT_COMMIT:
+> +        break;
+> +    case RAW_LT_ABORT:
+> +        break;
+
+Shouldn't the abort path downgrade the exclusive lock on old_lock_fd to
+a shared lock?
+
+> +    }
+> +    return ret;
+> +}
+
+[...]
+
+> +static int raw_lt_write_to_read(RawLockTransOp op,
+> +                                int old_lock_fd, int new_lock_fd,
+> +                                BDRVRawLockMode old_lock,
+> +                                BDRVRawLockMode new_lock,
+> +                                Error **errp)
+> +{
+> +    int ret =3D 0;
+> +
+> +    assert(old_lock =3D=3D RAW_L_WRITE);
+> +    assert(new_lock =3D=3D RAW_L_READ);
+> +    /*
+> +     *        lock byte "no other writer"      lock byte "write"
+> +     * old                X                           X
+> +     * new                S                           0
+> +     *
+> +     * (0 =3D unlocked; S =3D shared; X =3D exclusive.)
+> +     */
+> +    switch (op) {
+> +    case RAW_LT_PREPARE:
+> +        ret =3D qemu_lock_fd(old_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITE=
+R, 1, false);
+> +        if (ret) {
+> +            error_setg_errno(errp, -ret, "Failed to downgrade old fd (=
+share byte)");
+> +            break;
+> +        }
+> +        ret =3D qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITE=
+R, 1, false);
+> +        if (ret) {
+> +            error_setg_errno(errp, -ret, "Failed to lock new fd (share=
+ byte)");
+> +            break;
+> +        }
+> +        break;
+> +    case RAW_LT_COMMIT:
+> +        break;
+> +    case RAW_LT_ABORT:
+> +        ret =3D qemu_lock_fd(old_lock_fd, RAW_LOCK_BYTE_NO_OTHER_WRITE=
+R, 1, true);
+> +        if (ret) {
+> +            error_setg_errno(errp, -ret, "Failed to restore old fd (sh=
+are byte)");
+> +        }
+
+I think you should release the lock on new_lock_fd first.
+
+> +        break;
+> +    }
+> +    return ret;
+> +}
+> +
+> +static int raw_lt_write_to_write_share(RawLockTransOp op,
+> +                                       int old_lock_fd, int new_lock_f=
+d,
+> +                                       BDRVRawLockMode old_lock,
+> +                                       BDRVRawLockMode new_lock,
+> +                                       Error **errp)
+> +{
+> +    int ret =3D 0;
+> +
+> +    assert(old_lock =3D=3D RAW_L_WRITE);
+> +    assert(new_lock =3D=3D RAW_L_WRITE_SHARE_RW);
+> +    /*
+> +     *        lock byte "no other writer"      lock byte "write"
+> +     * old                X                           X
+> +     * new                0                           S
+> +     *
+> +     * (0 =3D unlocked; S =3D shared; X =3D exclusive.)
+> +     */
+> +    switch (op) {
+> +    case RAW_LT_PREPARE:
+> +        break;
+> +    case RAW_LT_COMMIT:
+> +        ret =3D qemu_lock_fd(old_lock_fd, RAW_LOCK_BYTE_WRITE, 1, fals=
+e);
+> +        if (ret) {
+> +            error_report("Failed to downgrade old fd (share byte)");
+> +            break;
+> +        }
+> +        ret =3D qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_WRITE, 1, fals=
+e);
+> +        if (ret) {
+> +            error_report("Failed to unlock new fd (share byte)");
+> +            break;
+> +        }
+
+The second one is not an "unlock", but a new shared lock. Which brings
+me to the point that both of these commands can fail and thus should be
+in the prepare path.
+
+(This function should be a mirror of raw_lt_write_to_read, if I'm not
+mistaken.)
+
+> +        break;
+> +    case RAW_LT_ABORT:
+> +        break;
+> +    }
+> +    return ret;
+> +}
+> +
+> +/**
+> + * Transactionally moving between possible locking states is tricky an=
+d must be
+> + * done carefully. That is mostly because downgrading an exclusive loc=
+k to
+> + * shared or unlocked is not guaranteed to be revertible. As a result,=
+ in such
+
+Interesting. Wiktionary says "revertible" means "able to be reverted",
+which sounds reasonable, albeit I'm not sure I have ever heard
+"revertible" before.
+
+However, my favorite online dictionary gave me a German word I have
+never heard before.
+
+Note that Wiktionary also has the word "revertable" with the same
+definition. Of course, it also has "reversible". Now I understand there
+is a difference between "to revert" and "to reverse", but maybe
+"reversible" is still the better choice considering it has a unique
+meaning and scores more than thousand times as many results on Google.
+
+(For anyone wondering, the German word is "heimf=E4llig" and it means
+"designated to go back to the original owner" (e.g. after death). It's
+apparently related to "anheimfallen", which I do know, which means "to
+become someone's property" or "to become a victim of something"
+("something" being a process of some sorts, usually, such as a mishap).)
+
+((Apparently "heimf=E4llig" is used in Austria and Swiss, mostly.))
+
+Max
+
+> + * cases we have to defer the downgrading to "commit", given that no r=
+evert will
+> + * happen after that point, and that downgrading a lock should never f=
+ail.
+> + *
+> + * On the other hand, upgrading a lock (e.g. from unlocked or shared t=
+o
+> + * exclusive lock) must happen in "prepare" because it may fail.
+> + *
+> + * Manage the operation matrix with this state transition table to mak=
+e
+> + * fulfilling above conditions easier.
+> + */
+
+[...]
+
+
+
+--BHpmBsheOB5cQBD24Spu776RXBgVMx9A2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliaixASHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AnfUH/1bP9JSjuZ6HQ9tAsAHUvuAM+5T28ex4
++goPJNi8OskiYQqUF/AlmgCidSLiqDBvsKp5xfDaA+ZPhclABDDcmN+iVbFaRBHE
+to/UZWIzR4L4OCfNS+ysgEuGBuijgADEHBpCbMqGBPyVA3CsUtfclP0MIVKuya6B
+usH/7ao9ARzl3MlwulpRBekIIvELfUBPMBjHhEj/y4vvtO0JdoP18sD+i8gmVt4y
+bpPVUu1bLxorXN5UeCLfreU0YfrOBv1WDk9HWnoDkrbWNefB5jEFfrJ2XY2p0XxV
+cxnzQVR/N/PeArpHKtTl/B48nG7sW7gjKcMgyEHhLNHbIHGxWCrHL+g=
+=4tkx
+-----END PGP SIGNATURE-----
+
+--BHpmBsheOB5cQBD24Spu776RXBgVMx9A2--
