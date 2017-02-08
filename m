@@ -1,13 +1,13 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stephane.chazelas@gmail.com>) id 1cbSta-0000DG-S0
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 09:06:58 -0500
+	(envelope-from <stephane.chazelas@gmail.com>) id 1cbT7D-0003HK-IN
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 09:21:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stephane.chazelas@gmail.com>) id 1cbStX-0007ag-MM
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 09:06:54 -0500
-Date: Wed, 8 Feb 2017 14:06:46 +0000
+	(envelope-from <stephane.chazelas@gmail.com>) id 1cbT78-0003pJ-J2
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 09:20:59 -0500
+Date: Wed, 8 Feb 2017 14:20:51 +0000
 From: Stephane Chazelas <stephane.chazelas@gmail.com>
-Message-ID: <20170208140646.GA19518@chaz.gmail.com>
+Message-ID: <20170208142051.GB19518@chaz.gmail.com>
 References: <20170202123045.GA24714@chaz.gmail.com>
 	<f8a93c01-682e-fbcb-7b81-012f6df97465@redhat.com>
 MIME-Version: 1.0
@@ -29,39 +29,18 @@ Cc: qemu-devel@nongnu.org, Qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf
 
 2017-02-08 00:43:18 +0100, Max Reitz:
 [...]
-> OTOH, it may make sense to offer a way for the user to disable
-> lseek(SEEK_{DATA,HOLE}) in our "file" block driver. That way your issue
-> would be solved, too, I guess. I'll look into it.
+> Therefore, the patch as it is makes sense. The fact that said lseek() is
+> slow on ZFS is (in my humble opinion) the ZFS driver's problem that
+> needs to be fixed there.
 [...]
 
-Thanks Max,
+For the record, I've mentioned the qemu performance implication at
+https://github.com/zfsonlinux/zfs/issues/4306#issuecomment-277000682
 
-Yes, that would work for me and other users of ZFS. What I do
-for now is recompile with those lseek(SEEK_{DATA,HOLE}) disabled
-in the code and it's working fine.
+Not much more I can do at that point.
 
-As I already hinted, something that would also possibly work for
-me and could benefit everyone (well at least Linux users on
-filesystems supporting hole punching), is instead of checking
-beforehand if the file is allocated, do a
-fallocate(FALLOC_FL_PUNCH_HOLE), or IOW, tell the underlying
-layer to deallocate the data.
-
-That would be those two lseek() replaced by a fallocate(), and
-some extra disk space being saved.
-
-One may argue that's what one would expect would be done when
-using detect-zeroes=unmap. 
-
-I suppose that would be quite significant work as that would
-imply a framework to pass those "deallocates" down and you'd
-probably have to differenciate "deallocates" that zero (like
-hole punching in a reguar file), and those that don't (like
-BLKDISCARD on a SSD)
-
-I also suppose that could cause fragmentation that  would be
-unwanted in some contexts, so maybe it should be tunable as
-well.
+That issue was raised a year ago and has not been assigned any
+milestone yet.
 
 -- 
 Stephane
