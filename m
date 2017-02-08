@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dmitry@daynix.com>) id 1cbRac-0000Eo-8S
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 07:43:15 -0500
+	(envelope-from <ashijeetacharya@gmail.com>) id 1cbRxq-0005D9-SL
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:07:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dmitry@daynix.com>) id 1cbRaZ-0000qU-5m
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 07:43:14 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:35876)
+	(envelope-from <ashijeetacharya@gmail.com>) id 1cbRxm-00009A-Ep
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:07:14 -0500
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:35177)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dmitry@daynix.com>) id 1cbRaY-0000qO-Ri
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 07:43:11 -0500
-Received: by mail-wm0-x244.google.com with SMTP id r18so33116757wmd.3
-	for <qemu-devel@nongnu.org>; Wed, 08 Feb 2017 04:43:10 -0800 (PST)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-From: Dmitry Fleytman <dmitry@daynix.com>
-In-Reply-To: <CAKXe6SJzf5AMG2+9AW__oT7n549ufCZBrkpH6Q8XPdUiDGpufw@mail.gmail.com>
-Date: Wed, 8 Feb 2017 14:43:06 +0200
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <FF08E4FC-A10A-4453-9939-35C33625C2EB@daynix.com>
-References: <589996bb.02482e0a.10629.5b0e@mx.google.com>
-	<809ED5C6-3D96-4D94-A7D3-5DCB9B2A4DED@daynix.com>
-	<CAKXe6SKB2VpBsVmSPE5DnZiNduKvc=SJPsOobrwcrYqqDJbNeg@mail.gmail.com>
-	<7DE30DA8-6CD0-4E51-8558-9DBD0279FDF6@daynix.com>
-	<CAKXe6SJzf5AMG2+9AW__oT7n549ufCZBrkpH6Q8XPdUiDGpufw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] net: e1000e: fix an infinite loop issue
+	(Exim 4.71) (envelope-from <ashijeetacharya@gmail.com>)
+	id 1cbRxm-00008X-AV
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:07:10 -0500
+Received: by mail-ot0-x244.google.com with SMTP id 65so17867582otq.2
+	for <qemu-devel@nongnu.org>; Wed, 08 Feb 2017 05:07:08 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20170208112542.GC2341@work-vm>
+References: <1486118198-8965-1-git-send-email-ashijeetacharya@gmail.com>
+	<20170208112542.GC2341@work-vm>
+From: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Date: Wed, 8 Feb 2017 18:37:07 +0530
+Message-ID: <CAC2QTZYwyHoHx5K7b4RNiHccCTWq_sc-LuwNNoQE_QnDfR64Pg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2] migrate: Introduce zero RAM checks to
+ skip RAM migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,175 +30,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>
-Cc: Jason Wang <jasowang@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Li Qiang <liqiang6-s@360.cn>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Juan Quintela <quintela@redhat.com>, Amit Shah <amit.shah@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Greg Kurz <groug@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>
 
+On Wed, Feb 8, 2017 at 4:55 PM, Dr. David Alan Gilbert
+<dgilbert@redhat.com> wrote:
+> * Ashijeet Acharya (ashijeetacharya@gmail.com) wrote:
+>> Migration of a "none" machine with no RAM crashes abruptly as
+>> bitmap_new() fails and thus aborts. Instead place zero RAM checks at
+>> appropriate places to skip migration of RAM in this case and complete
+>> migration successfully for devices only.
+>>
+>> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+>
+> Yes it seems to work, but there is a small bug,
+> if we look at:
+>
+> static void ram_migration_cleanup(void *opaque)
+> {
+>     /* caller have hold iothread lock or is in a bh, so there is
+>      * no writing race against this migration_bitmap
+>      */
+>     struct BitmapRcu *bitmap = migration_bitmap_rcu;
+>     atomic_rcu_set(&migration_bitmap_rcu, NULL);
+>     if (bitmap) {
+>         memory_global_dirty_log_stop();
+>         call_rcu(bitmap, migration_bitmap_free, rcu);
+>     }
+>
+>
+> we see it doesn't cause memory_global_dirty_log_stop
+> if migration_bitmap_rcu is NULL; so we end up
+> still calling dirty_log_start in ram_save_init but
+> never call stop.
+>
 
-> On 8 Feb 2017, at 12:17 PM, Li Qiang <liq3ea@gmail.com> wrote:
->=20
-> Hello Dmitry,
->=20
->=20
-> 2017-02-08 18:01 GMT+08:00 Dmitry Fleytman <dmitry@daynix.com>:
->=20
->> On 8 Feb 2017, at 11:30 AM, Li Qiang <liq3ea@gmail.com> wrote:
->>=20
->> Hello,=20
->>=20
->> 2017-02-08 16:38 GMT+08:00 Dmitry Fleytman <dmitry@daynix.com>:
->> Hello,
->>=20
->> Thanks for the patch!
->>=20
->> The problem of infinite loop indeed exists in e1000e, however it is =
-different from the one fixed in e1000.
->> Please find my comments inline.
->>=20
->>=20
->> If I read the code correctly, I think this issue is the same. Could =
-you please explain more? Thanks.
->=20
-> I meant that code changes needed to fix it are slightly different.
->=20
-> Got.
-> =20
->=20
->> =20
->> ~Dmitry
->>=20
->> > On 7 Feb 2017, at 11:43 AM, Li Qiang <liq3ea@gmail.com> wrote:
->> >
->> > From: Li Qiang <liqiang6-s@360.cn>
->> >
->> > This issue is the same as e1000 network card in this commit:
->> > e1000: eliminate infinite loops on out-of-bounds transfer start.
->> >
->> > Signed-off-by: Li Qiang <liqiang6-s@360.cn>
->> > ---
->> > hw/net/e1000e_core.c | 17 ++++++++++++++++-
->> > 1 file changed, 16 insertions(+), 1 deletion(-)
->> >
->> > diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
->> > index 2b11499..53f2b1d 100644
->> > --- a/hw/net/e1000e_core.c
->> > +++ b/hw/net/e1000e_core.c
->> > @@ -914,7 +914,8 @@ e1000e_start_xmit(E1000ECore *core, const =
-E1000E_TxRing *txr)
->> >     struct e1000_tx_desc desc;
->> >     bool ide =3D false;
->> >     const E1000E_RingInfo *txi =3D txr->i;
->> > -    uint32_t cause =3D E1000_ICS_TXQE;
->> > +    uint32_t tdh_start =3D core->mac[txi->dh], cause =3D =
-E1000_ICS_TXQE;
->> > +
->> >
->> >     if (!(core->mac[TCTL] & E1000_TCTL_EN)) {
->> >         trace_e1000e_tx_disabled();
->> > @@ -933,6 +934,14 @@ e1000e_start_xmit(E1000ECore *core, const =
-E1000E_TxRing *txr)
->> >         cause |=3D e1000e_txdesc_writeback(core, base, &desc, &ide, =
-txi->idx);
->> >
->> >         e1000e_ring_advance(core, txi, 1);
->> > +
->> > +        /*
->> > +         * The following avoid infinite loop, just as the e1000
->> > +         */
->> > +        if (core->mac[txi->dh] =3D=3D tdh_start ||
->> > +            tdh_start >=3D core->mac[txi->dlen] / =
-E1000_RING_DESC_LEN) {
->> > +            break;
->> > +            }
->>=20
->> Part of this validity check, namely
->> tdh_start >=3D core->mac[txi->dlen] / E1000_RING_DESC_LEN)
->> already done by e1000e_ring_advance(), therefore not needed here.
->>=20
->>=20
->> e1000e_ring_advance() check the added r->dh. Not the original one.
->=20
-> Oh, I see now. Right, it does not make sense to check for wraparound =
-in case original TDH was out of bounds.
->=20
-> Now I see there is one more problem - in case TDH is out of the ring, =
-e1000e_ring_head_descr()
-> called from e1000e_start_xmit() will do out of bounds read, so TDH =
-should be validated prior to
-> reading the descriptor as well.
->=20
->=20
-> IIUC you mean pci_dma_read will do oob read, right? I think this is =
-not a issue as this is reading data from guest
-> And guest can provide arbitrary data. For example, just provide 10 =
-bytes buffer, but tell the qemu it has 1000.
+Exactly. This is what kept bugging me too, which is why I asked you on
+the IRC the other day (if you vaguely remember) about whether I will
+have to handle cleanup separately...Maybe I didn't frame it well that
+day.
 
-Agree.
+> I suggest you change it to:
+>
+>     migration_bitmap_rcu = g_new0(struct BitmapRcu, 1);
+>     if (ram_bytes_total()) {
+>         ram_bitmap_pages = last_ram_offset() >> TARGET_PAGE_BITS;
+>         migration_bitmap_rcu->bmap = bitmap_new(ram_bitmap_pages);
+>         bitmap_set(migration_bitmap_rcu->bmap, 0, ram_bitmap_pages);
+>
+> The cleanup routine still causes the dirty_log_stop() then.
 
-> =20
-> Similar problem exists on RX also.
->=20
-> Besides that, as I see now, e1000e_ring_empty() is not called on RX
-> so validation should be done separately for TX and RX rings.
->=20
-> A function like e1000e_ring_validate() is needed...
->=20
->> =20
->> The second part - full wraparound protection is relevant, but it =
-fixes more symptoms than the cause.
->> The only possible cause for full wraparound is r->dt (tail) value =
-bigger or equal to r->dlen (length),
->> so I would suggest to check for this in e1000e_ring_empty() and cover =
-both TX and RX cases at once.
->>=20
->>=20
->> Do you mean 'core->mac[r->dt] >=3D core->mac[r->dlen]' indicate an =
-empty ring?
->> =20
->=20
-> So I still confused by this 'full wrapparound', any more explain?=20
+Right, I will do that.
 
-Yes, I would indicate an empty ring when r->dt in invalid. That would do =
-the job.
+Ashijeet
 
-Having e1000e_ring_empty() fixed, you might call it from
-e1000e_write_packet_to_guest() to fix RX issues as well.
-
-> =20
->> >     }
->> >
->> >     if (!ide || !e1000e_intrmgr_delay_tx_causes(core, &cause)) {
->> > @@ -1500,6 +1509,7 @@ e1000e_write_packet_to_guest(E1000ECore =
-*core, struct NetRxPkt *pkt,
->> >     size_t desc_size;
->> >     size_t desc_offset =3D 0;
->> >     size_t iov_ofs =3D 0;
->> > +    uint32_t rdh_start;
->> >
->> >     struct iovec *iov =3D net_rx_pkt_get_iovec(pkt);
->> >     size_t size =3D net_rx_pkt_get_total_len(pkt);
->> > @@ -1509,6 +1519,7 @@ e1000e_write_packet_to_guest(E1000ECore =
-*core, struct NetRxPkt *pkt,
->> >     bool do_ps =3D e1000e_do_ps(core, pkt, &ps_hdr_len);
->> >
->> >     rxi =3D rxr->i;
->> > +    rdh_start =3D core->mac[rxi->dh];
->> >
->> >     do {
->> >         hwaddr ba[MAX_PS_BUFFERS];
->> > @@ -1605,6 +1616,10 @@ e1000e_write_packet_to_guest(E1000ECore =
-*core, struct NetRxPkt *pkt,
->> >         e1000e_ring_advance(core, rxi,
->> >                             core->rx_desc_len / =
-E1000_MIN_RX_DESC_LEN);
->> >
->> > +        if (core->mac[rxi->dh] =3D=3D rdh_start ||
->> > +            rdh_start >=3D core->mac[rxi->dlen] / =
-E1000_RING_DESC_LEN) {
->> > +            break;
->> > +            }
->> >     } while (desc_offset < total_size);
->> >
->> >     e1000e_update_rx_stats(core, size, total_size);
->> > --
->> > 1.8.3.1
->> >
+> Dave
+>
+>> ---
+>> Changes in v2:
+>> - try to migrate successfully by skipping RAM (Paolo, Greg)
+>> - drop the idea of erroring out and failing nicely
+>>  migration/ram.c | 22 +++++++++++++++-------
+>>  1 file changed, 15 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/migration/ram.c b/migration/ram.c
+>> index ef8fadf..2f19566 100644
+>> --- a/migration/ram.c
+>> +++ b/migration/ram.c
+>> @@ -1325,6 +1325,11 @@ static int ram_find_and_save_block(QEMUFile *f, bool last_stage,
+>>      ram_addr_t dirty_ram_abs; /* Address of the start of the dirty page in
+>>                                   ram_addr_t space */
+>>
+>> +    /* No dirty page as there is zero RAM */
+>> +    if (!ram_bytes_total()) {
+>> +        return pages;
+>> +    }
+>> +
+>>      pss.block = last_seen_block;
+>>      pss.offset = last_offset;
+>>      pss.complete_round = false;
+>> @@ -1912,14 +1917,17 @@ static int ram_save_init_globals(void)
+>>      bytes_transferred = 0;
+>>      reset_ram_globals();
+>>
+>> -    ram_bitmap_pages = last_ram_offset() >> TARGET_PAGE_BITS;
+>> -    migration_bitmap_rcu = g_new0(struct BitmapRcu, 1);
+>> -    migration_bitmap_rcu->bmap = bitmap_new(ram_bitmap_pages);
+>> -    bitmap_set(migration_bitmap_rcu->bmap, 0, ram_bitmap_pages);
+>> +    /* Skip setting bitmap if there is no RAM */
+>> +    if (ram_bytes_total()) {
+>> +        ram_bitmap_pages = last_ram_offset() >> TARGET_PAGE_BITS;
+>> +        migration_bitmap_rcu = g_new0(struct BitmapRcu, 1);
+>> +        migration_bitmap_rcu->bmap = bitmap_new(ram_bitmap_pages);
+>> +        bitmap_set(migration_bitmap_rcu->bmap, 0, ram_bitmap_pages);
+>>
+>> -    if (migrate_postcopy_ram()) {
+>> -        migration_bitmap_rcu->unsentmap = bitmap_new(ram_bitmap_pages);
+>> -        bitmap_set(migration_bitmap_rcu->unsentmap, 0, ram_bitmap_pages);
+>> +        if (migrate_postcopy_ram()) {
+>> +            migration_bitmap_rcu->unsentmap = bitmap_new(ram_bitmap_pages);
+>> +            bitmap_set(migration_bitmap_rcu->unsentmap, 0, ram_bitmap_pages);
+>> +        }
+>>      }
+>>
+>>      /*
+>> --
+>> 2.6.2
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
