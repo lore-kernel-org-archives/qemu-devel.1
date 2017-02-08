@@ -1,22 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cbGMK-0004rz-Rc
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 19:43:46 -0500
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cbGMp-0005BY-QO
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 19:44:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cbGMJ-0004aq-GV
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 19:43:44 -0500
-References: <20170123123056.30383-1-famz@redhat.com>
-	<20170123123056.30383-12-famz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <34c5d39e-6a1e-304d-f0ea-4e4b6b3ee764@redhat.com>
-Date: Wed, 8 Feb 2017 01:43:33 +0100
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cbGMm-0004wP-Nk
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 19:44:15 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37544)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
+	id 1cbGMm-0004wA-E7
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 19:44:12 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v180hY3t091441
+	for <qemu-devel@nongnu.org>; Tue, 7 Feb 2017 19:44:11 -0500
+Received: from e28smtp04.in.ibm.com (e28smtp04.in.ibm.com [125.16.236.4])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28faw8qk5m-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 19:44:11 -0500
+Received: from localhost
+	by e28smtp04.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
+	Wed, 8 Feb 2017 06:14:08 +0530
+Date: Wed, 8 Feb 2017 06:14:03 +0530
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Reply-To: bharata@linux.vnet.ibm.com
+References: <1486454676-29112-1-git-send-email-bharata@linux.vnet.ibm.com>
+	<1486454676-29112-3-git-send-email-bharata@linux.vnet.ibm.com>
+	<6dac1bb1-bb4c-9dc5-ff6e-020db8a4bcd5@twiddle.net>
 MIME-Version: 1.0
-In-Reply-To: <20170123123056.30383-12-famz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="OkFuLDTkgjIPkumaeriNGHkXuaFl6f0Dh"
-Subject: Re: [Qemu-devel] [PATCH v12 11/16] iotests: 172: Use separate
- images for multiple devices
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6dac1bb1-bb4c-9dc5-ff6e-020db8a4bcd5@twiddle.net>
+Message-Id: <20170208004403.GI12744@in.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v1 2/2] softfloat: Add
+ float128_to_uint32_round_to_zero()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,137 +44,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-block@nongnu.org, eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, rjones@redhat.com
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, nikunj@linux.vnet.ibm.com, peter.maydell@linaro.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---OkFuLDTkgjIPkumaeriNGHkXuaFl6f0Dh
-From: Max Reitz <mreitz@redhat.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-block@nongnu.org,
- eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, rjones@redhat.com
-Message-ID: <34c5d39e-6a1e-304d-f0ea-4e4b6b3ee764@redhat.com>
-Subject: Re: [PATCH v12 11/16] iotests: 172: Use separate images for multiple
- devices
-References: <20170123123056.30383-1-famz@redhat.com>
- <20170123123056.30383-12-famz@redhat.com>
-In-Reply-To: <20170123123056.30383-12-famz@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
+On Tue, Feb 07, 2017 at 02:10:04PM -0800, Richard Henderson wrote:
+> On 02/07/2017 12:04 AM, Bharata B Rao wrote:
+> > +    int64_t v;
+> > +    uint32_t res;
+> > +    int old_exc_flags = get_float_exception_flags(status);
+> > +
+> > +    v = float128_to_uint64_round_to_zero(a, status);
+> > +    if (v > 0xffffffff) {
+> 
+> v should be uint64_t.
 
-On 23.01.2017 13:30, Fam Zheng wrote:
-> To avoid image lock failures.
->=20
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  tests/qemu-iotests/172     | 53 ++++++++++++++++++++++++--------------=
---------
->  tests/qemu-iotests/172.out | 50 ++++++++++++++++++++++----------------=
------
->  2 files changed, 54 insertions(+), 49 deletions(-)
->=20
-> diff --git a/tests/qemu-iotests/172 b/tests/qemu-iotests/172
-> index 1b7d3a1..f9d4cff 100755
-> --- a/tests/qemu-iotests/172
-> +++ b/tests/qemu-iotests/172
-> @@ -86,6 +86,9 @@ size=3D720k
-> =20
->  _make_test_img $size
-> =20
-> +TEST_IMG=3D"$TEST_IMG.2" _make_test_img $size
-> +TEST_IMG=3D"$TEST_IMG.3" _make_test_img $size
+Right, here is the updated patch...
 
-These images should be removed in _cleanup.
+Peter/David - If you want both the patches to be posted afresh, let me know.
+(These patches apply on David's ppc-for-2.9 branch)
 
-Alternatively, you could use the good old driver=3Dnull-co,size=3D$size.
+>From 24afd78beb5f5742f9da76cf5330ea465697be7b Mon Sep 17 00:00:00 2001
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Date: Mon, 30 Jan 2017 15:23:04 +0530
+Subject: [PATCH v2 2/2] softfloat: Add float128_to_uint32_round_to_zero()
 
-(btw, I'm amazed that size=3D720k works. Not sure if that is intended, bu=
-t
-I won't complain. It even works in JSON (with 'size': '720k').)
+float128_to_uint32_round_to_zero() is needed by xscvqpuwz instruction
+of PowerPC ISA 3.0.
 
-> +
->  # Default drive semantics:
->  #
->  # By default you get a single empty floppy drive. You can override it =
-with
-> @@ -105,7 +108,7 @@ echo =3D=3D=3D Using -fda/-fdb options =3D=3D=3D
-> =20
->  check_floppy_qtree -fda "$TEST_IMG"
->  check_floppy_qtree -fdb "$TEST_IMG"
-> -check_floppy_qtree -fda "$TEST_IMG" -fdb "$TEST_IMG"
-> +check_floppy_qtree -fda "$TEST_IMG" -fdb "$TEST_IMG.2"
-> =20
-> =20
->  echo
-> @@ -114,7 +117,7 @@ echo =3D=3D=3D Using -drive options =3D=3D=3D
-> =20
->  check_floppy_qtree -drive if=3Dfloppy,file=3D"$TEST_IMG"
->  check_floppy_qtree -drive if=3Dfloppy,file=3D"$TEST_IMG",index=3D1
-> -check_floppy_qtree -drive if=3Dfloppy,file=3D"$TEST_IMG" -drive if=3Df=
-loppy,file=3D"$TEST_IMG",index=3D1
-> +check_floppy_qtree -drive if=3Dfloppy,file=3D"$TEST_IMG" -drive if=3Df=
-loppy,file=3D"$TEST_IMG.2",index=3D1
-> =20
->  echo
->  echo
-> @@ -122,7 +125,7 @@ echo =3D=3D=3D Using -drive if=3Dnone and -global =3D=
-=3D=3D
-> =20
->  check_floppy_qtree -drive if=3Dnone,file=3D"$TEST_IMG" -global isa-fdc=
-=2EdriveA=3Dnone0
->  check_floppy_qtree -drive if=3Dnone,file=3D"$TEST_IMG" -global isa-fdc=
-=2EdriveB=3Dnone0
-> -check_floppy_qtree -drive if=3Dnone,file=3D"$TEST_IMG" -drive if=3Dnon=
-e,file=3D"$TEST_IMG" \
-> +check_floppy_qtree -drive if=3Dnone,file=3D"$TEST_IMG" -drive if=3Dnon=
-e,file=3D"$TEST_IMG.2" \
->                     -global isa-fdc.driveA=3Dnone0 -global isa-fdc.driv=
-eB=3Dnone1
-> =20
->  echo
-> @@ -131,7 +134,7 @@ echo =3D=3D=3D Using -drive if=3Dnone and -device =3D=
-=3D=3D
-> =20
->  check_floppy_qtree -drive if=3Dnone,file=3D"$TEST_IMG" -device floppy,=
-drive=3Dnone0
->  check_floppy_qtree -drive if=3Dnone,file=3D"$TEST_IMG" -device floppy,=
-drive=3Dnone0,unit=3D1
-> -check_floppy_qtree -drive if=3Dnone,file=3D"$TEST_IMG" -drive if=3Dnon=
-e,file=3D"$TEST_IMG" \
-> +check_floppy_qtree -drive if=3Dnone,file=3D"$TEST_IMG",file.disable-lo=
-ck=3Don -drive if=3Dnone,file=3D"$TEST_IMG.2" \
+Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ fpu/softfloat.c         | 28 ++++++++++++++++++++++++++++
+ include/fpu/softfloat.h |  1 +
+ 2 files changed, 29 insertions(+)
 
-disable-lock is not yet available, and also I don't know why you are
-using it here. Is it just an artifact from an earlier version, perhaps?
-
-Rest looks good.
-
-Max
-
->                     -device floppy,drive=3Dnone0 -device floppy,drive=3D=
-none1,unit=3D1
-> =20
->  echo
-
-[...]
-
-
-
---OkFuLDTkgjIPkumaeriNGHkXuaFl6f0Dh
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliaabUSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9Ai1oIAJEWgig14QKzQN8sCba15F0nzE34ZMTw
-VxSh9FxQ0J57S2Sa2mlFgXnR9oRBnPQVImNWq0TQ+x0+HKaf5geIjog60y/guW6k
-rdjpIumsvtzG67PtoyZiKBFNSmOxu/Yl+miATCqJI5mRgsf/SdoiOOBrxykVRiSJ
-1KiQrqfYK+ijUzPAhZf0Gjvp6AzpHD0eABaUn3pN+JPz2rdXB7lv+CKZ+CtpiZf0
-7ZBsOU+8z/A5meiik3JKlz2niNgyLbx3IiB8dRT2o+qnqeXfsLWt9pDVU1Jna6OB
-59iJRa2NbN8D/Oky7+aN0/haz4h/RQDC9kd7UcNHQ5H5/cUjnof8hOE=
-=WMn4
------END PGP SIGNATURE-----
-
---OkFuLDTkgjIPkumaeriNGHkXuaFl6f0Dh--
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index 4a4b50b..c2f0de0 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -6169,6 +6169,34 @@ uint64_t float128_to_uint64_round_to_zero(float128 a, float_status *status)
+ 
+ /*----------------------------------------------------------------------------
+ | Returns the result of converting the quadruple-precision floating-point
++| value `a' to the 32-bit unsigned integer format.  The conversion
++| is performed according to the IEC/IEEE Standard for Binary Floating-Point
++| Arithmetic except that the conversion is always rounded toward zero.
++| If `a' is a NaN, the largest positive integer is returned.  Otherwise,
++| if the conversion overflows, the largest unsigned integer is returned.
++| If 'a' is negative, the value is rounded and zero is returned; negative
++| values that do not round to zero will raise the inexact exception.
++*----------------------------------------------------------------------------*/
++
++uint32_t float128_to_uint32_round_to_zero(float128 a, float_status *status)
++{
++    uint64_t v;
++    uint32_t res;
++    int old_exc_flags = get_float_exception_flags(status);
++
++    v = float128_to_uint64_round_to_zero(a, status);
++    if (v > 0xffffffff) {
++        res = 0xffffffff;
++    } else {
++        return v;
++    }
++    set_float_exception_flags(old_exc_flags, status);
++    float_raise(float_flag_invalid, status);
++    return res;
++}
++
++/*----------------------------------------------------------------------------
++| Returns the result of converting the quadruple-precision floating-point
+ | value `a' to the single-precision floating-point format.  The conversion
+ | is performed according to the IEC/IEEE Standard for Binary Floating-Point
+ | Arithmetic.
+diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+index 4e99253..9eb5a6b 100644
+--- a/include/fpu/softfloat.h
++++ b/include/fpu/softfloat.h
+@@ -714,6 +714,7 @@ int64_t float128_to_int64(float128, float_status *status);
+ int64_t float128_to_int64_round_to_zero(float128, float_status *status);
+ uint64_t float128_to_uint64(float128, float_status *status);
+ uint64_t float128_to_uint64_round_to_zero(float128, float_status *status);
++uint32_t float128_to_uint32_round_to_zero(float128, float_status *status);
+ float32 float128_to_float32(float128, float_status *status);
+ float64 float128_to_float64(float128, float_status *status);
+ floatx80 float128_to_floatx80(float128, float_status *status);
+-- 
+2.7.4
