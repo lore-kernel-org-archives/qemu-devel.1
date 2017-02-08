@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56891)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cbS3k-0006Zw-M7
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:13:22 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cbS6d-0007g9-8a
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:16:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cbS3g-0002LB-98
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:13:20 -0500
-References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
-	<20170203154757.36140-12-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <11389742-4861-eb11-422d-4dd19fdaf57c@redhat.com>
-Date: Wed, 8 Feb 2017 07:13:01 -0600
+	(envelope-from <mreitz@redhat.com>) id 1cbS6b-0003AF-He
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:16:19 -0500
+References: <20170126123530.GB23095@lemon.Home>
+	<20170126132708.GB29127@redhat.com>
+	<6a9aeec8-d4ee-a0aa-7e04-0ee4295fef80@redhat.com>
+	<8a13c995-c094-2704-c770-214132b2d6cf@redhat.com>
+	<20170201121658.GF3232@redhat.com>
+	<c4d38998-b862-90e6-6c4b-4b96a8d17bb4@redhat.com>
+	<20170201122854.GG3232@redhat.com>
+	<37f445c0-c174-bca4-7073-7aa6c64046b0@redhat.com>
+	<87bmul9hfc.fsf@dusky.pond.sub.org>
+	<d03de140-db6b-26ed-6cc9-958591843483@redhat.com>
+	<20170206103104.GD3029@redhat.com>
+	<c7b5df9b-f235-ee36-4ab1-3023245b9cd1@redhat.com>
+	<87inolujjv.fsf@dusky.pond.sub.org>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <26984f4a-074d-a25c-6182-8d179204acd0@redhat.com>
+Date: Wed, 8 Feb 2017 14:16:06 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170203154757.36140-12-vsementsov@virtuozzo.com>
+In-Reply-To: <87inolujjv.fsf@dusky.pond.sub.org>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="QDutftdAF0kV1gs7TK6ipViLpfxhAAH3u"
-Subject: Re: [Qemu-devel] [PATCH 11/18] nbd: BLOCK_STATUS for bitmap export:
- server part
+	boundary="WclMICb7LVJVPm5CRmHQVFmwvMrxF2oBE"
+Subject: Re: [Qemu-devel] [PATCH v1 3/6] qemu-img: add support for -n arg to
+ dd command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,253 +36,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, armbru@redhat.com, den@virtuozzo.com, stefanha@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---QDutftdAF0kV1gs7TK6ipViLpfxhAAH3u
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com,
- pbonzini@redhat.com, armbru@redhat.com, den@virtuozzo.com,
- stefanha@redhat.com
-Message-ID: <11389742-4861-eb11-422d-4dd19fdaf57c@redhat.com>
-Subject: Re: [PATCH 11/18] nbd: BLOCK_STATUS for bitmap export: server part
-References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
- <20170203154757.36140-12-vsementsov@virtuozzo.com>
-In-Reply-To: <20170203154757.36140-12-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
+--WclMICb7LVJVPm5CRmHQVFmwvMrxF2oBE
+From: Max Reitz <mreitz@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf
+ <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org
+Message-ID: <26984f4a-074d-a25c-6182-8d179204acd0@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 3/6] qemu-img: add support for -n arg to
+ dd command
+References: <20170126123530.GB23095@lemon.Home>
+ <20170126132708.GB29127@redhat.com>
+ <6a9aeec8-d4ee-a0aa-7e04-0ee4295fef80@redhat.com>
+ <8a13c995-c094-2704-c770-214132b2d6cf@redhat.com>
+ <20170201121658.GF3232@redhat.com>
+ <c4d38998-b862-90e6-6c4b-4b96a8d17bb4@redhat.com>
+ <20170201122854.GG3232@redhat.com>
+ <37f445c0-c174-bca4-7073-7aa6c64046b0@redhat.com>
+ <87bmul9hfc.fsf@dusky.pond.sub.org>
+ <d03de140-db6b-26ed-6cc9-958591843483@redhat.com>
+ <20170206103104.GD3029@redhat.com>
+ <c7b5df9b-f235-ee36-4ab1-3023245b9cd1@redhat.com>
+ <87inolujjv.fsf@dusky.pond.sub.org>
+In-Reply-To: <87inolujjv.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=iso-8859-15
 Content-Transfer-Encoding: quoted-printable
 
-On 02/03/2017 09:47 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Only one meta context type is defined: qemu-bitmap:<bitmap-name>.
-
-Why 'qemu-bitmap:' instead of 'qemu:' for our namespace?  I guess it's
-okay, though.
-
-> Maximum one query is allowed for NBD_OPT_{SET,LIST}_META_CONTEXT,
-> NBD_REP_ERR_TOO_BIG is returned otherwise.
+On 08.02.2017 10:19, Markus Armbruster wrote:
+> Max Reitz <mreitz@redhat.com> writes:
 >=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
+>> First, because this is perhaps the most important thing: I think I
+>> remembered what the original proposal to solve all this mess, or at
+>> least move it to a later point:
+>>
+>> We wanted to just disallow overwriting existing files without
+>> conv=3Dnotrunc. I think.
+>>
+>> The thing is that it's pretty much impossible with the qemu block laye=
+r
+>> to determine whether a file exists or not. Maybe you cannot open it bu=
+t
+>> it would be possible to overwrite it. This is the reason the patches f=
+or
+>> this did not make it into 2.8.
+>=20
+> The only sane way to do "create unless it already exists" is
+> O_CREAT|O_EXCL.  Either you can do that, or you can't.
 
-This is only a high-level review; I may come back and look more closely
-at details (and compare against the proposed spec) when I have more time.=
+All the more reason why we couldn't implement it in time.
 
+(Also, implementing that just for qemu-img dd... Well, no.)
 
->  /* Request flags, sent from client to server during transmission phase=
- */
->  #define NBD_CMD_FLAG_FUA        (1 << 0) /* 'force unit access' during=
- write */
-> @@ -142,6 +155,7 @@ enum {
->      NBD_CMD_TRIM =3D 4,
->      /* 5 reserved for failed experiment NBD_CMD_CACHE */
->      NBD_CMD_WRITE_ZEROES =3D 6,
-> +    NBD_CMD_BLOCK_STATUS =3D 7
->  };
+>> On 06.02.2017 11:31, Daniel P. Berrange wrote:
+>>> On Fri, Feb 03, 2017 at 07:56:11PM +0100, Max Reitz wrote:
+>>>>> In case you say that's inconvenient: pretty much everything about d=
+d's
+>>>>> archaic user interface is inconvenient.  If you want convenient, ro=
+ll
+>>>>> your own.  If you want familiar, stick to the original.
+>>>>
+>>>> I agree. But qemu-img dd already is not dd. It interprets disk image=
 
-Please keep the trailing comma (it makes it easier for later patches to
-add new values without having to modify existing lines).
-
-> =20
->  #define NBD_DEFAULT_PORT	10809
-> @@ -163,6 +177,7 @@ enum {
->  #define NBD_REPLY_TYPE_NONE 0
->  #define NBD_REPLY_TYPE_OFFSET_DATA 1
->  #define NBD_REPLY_TYPE_OFFSET_HOLE 2
-> +#define NBD_REPLY_TYPE_BLOCK_STATUS 5
->  #define NBD_REPLY_TYPE_ERROR ((1 << 15) + 1)
->  #define NBD_REPLY_TYPE_ERROR_OFFSET ((1 << 15) + 2)
-
-Might be worth formatting these so that the definitions all start in the
-same column (if so, it affects an earlier patch in the series as well).
-
-> =20
-> diff --git a/nbd/nbd-internal.h b/nbd/nbd-internal.h
-> index 3284bfc85a..fbbcf69925 100644
-> --- a/nbd/nbd-internal.h
-> +++ b/nbd/nbd-internal.h
-> @@ -83,6 +83,10 @@
->  #define NBD_OPT_PEEK_EXPORT     (4)
->  #define NBD_OPT_STARTTLS        (5)
->  #define NBD_OPT_STRUCTURED_REPLY (8)
-> +#define NBD_OPT_LIST_META_CONTEXT (9)
-> +#define NBD_OPT_SET_META_CONTEXT  (10)
-> +
-> +#define NBD_META_NS_BITMAPS "qemu-dirty-bitmap"
-
-I still find it odd that we've split our #defines across two different
-headers, not your fault.
-
-This name does not match your commit message.  Why can't we use just
-'qemu:' as our namespace?
-
-> =20
->  /* NBD errors are based on errno numbers, so there is a 1:1 mapping,
->   * but only a limited set of errno values is specified in the protocol=
+>>>> files as virtual disks instead of as plain files. The question is
+>>>> whether virtual disks are to be treated as block devices or as files=
 =2E
-> @@ -105,6 +109,8 @@ static inline const char *nbd_opt_name(int opt)
->      case NBD_OPT_PEEK_EXPORT: return "peek_export";
->      case NBD_OPT_STARTTLS: return "tls";
->      case NBD_OPT_STRUCTURED_REPLY: return "structured_reply";
-> +    case NBD_OPT_LIST_META_CONTEXT: return "list_meta_context";
-> +    case NBD_OPT_SET_META_CONTEXT: return "set_meta_context";
+>>>>
+>>>> I don't have a strong opinion on the matter. Either way will surpris=
+e
+>>>> some people. The original issue was whether to make nocreat/notrunc =
+a
+>>>> mandatory option, so if we didn't have any backwards compatibility
+>>>> issues, it would be the following two surprises:
+>>>>
+>>>> (1) Don't make nocreat/notrunc mandatory (as it is now). Then people=
 
-Same question as earlier as to whether this violates checkpatch
-formatting, and whether it belongs in a .c instead of inline in the heade=
-r.
+>>>>     who expect qemu-img dd to treat image files as block devices wil=
+l
+>>>>     be surprised that all their data is gone. Bad.
+>>>
+>>> I don't think people really expect qemu-img to treat image file as if=
 
+>>> they were block devices when operating on the host.
+>>>
+>>> It is like saying people expect /usr/bin/dd to treat a plain file
+>>> as a block device, because they might use it with losetup later.
+>>
+>> That's not a good comparison. Disk images are meant to be used with qe=
+mu
+>> (or some other VMM, or, yes, with losetup if it's a raw image). Plain
+>> files can be anything. No, dd does not look into the file to determine=
+
+>> whether it may be a raw disk image or not, but it does execute fstat()=
+
+>> to find out whether it's a plain file or a block device.
 >=20
-> =20
-> +static int nbd_negotiate_read_size_string(QIOChannel *ioc, char **str,=
+> Actually, it doesn't.  coreutils-8.26/src/dd.c:
+>=20
+>       mode_t perms =3D MODE_RW_UGO;
+>       int opts
+>         =3D (output_flags
+>            | (conversions_mask & C_NOCREAT ? 0 : O_CREAT)
+>            | (conversions_mask & C_EXCL ? O_EXCL : 0)
+>            | (seek_records || (conversions_mask & C_NOTRUNC) ? 0 : O_TR=
+UNC));
+>=20
+>       /* Open the output file with *read* access only if we might
+>          need to read to satisfy a 'seek=3D' request.  If we can't read=
 
-> +                                          uint32_t max_len)
+>          the file, go ahead with write-only access; it might work.  */
+>       if ((! seek_records
+>            || ifd_reopen (STDOUT_FILENO, output_file, O_RDWR | opts, pe=
+rms) < 0)
+>           && (ifd_reopen (STDOUT_FILENO, output_file, O_WRONLY | opts, =
+perms)
+>               < 0))
+>         die (EXIT_FAILURE, errno, _("failed to open %s"),
+>              quoteaf (output_file));
+>=20
+> ifd_reopen() is a wrapper around open() that forces the file descriptor=
 
-I probably would have split the creation of this helper function into
-its own patch.  Also, can it be utilized in any of the existing code, or
-is the new code the only client?
+> to a desired value (here: STDOUT_FILENO) and protects against EINTR.
+>=20
+> If this doesn't truncate block special for you, it's simply because you=
+r
+> OS interprets it that way, under license from POSIX:
+>=20
+>     O_TRUNC
+>         If the file exists and is a regular file, and the file is
+>         successfully opened O_RDWR or O_WRONLY, its length is truncated=
 
-> +
-> +/* start handle LIST_META_CONTEXT and SET_META_CONTEXT requests
-> + * @opt          should be NBD_OPT_LIST_META_CONTEXT or NBD_OPT_SET_ME=
-TA_CONTEXT
-> + * @length       related option data to read
-> + * @nb_queries   out parameter, number of queries specified by client
-> + * @bs           out parameter, bs for export, selected by client
-> + *               will be zero if some not critical error occured and e=
-rror reply
-> + *               was sent.
+>         to 0 and the mode and owner are unchanged.  It will have no
+>         effect on FIFO special files or terminal device files.  Its
+>         effect on other file types is implementation-dependent.  The
+>         result of using O_TRUNC with O_RDONLY is undefined.
+>=20
+>     http://pubs.opengroup.org/onlinepubs/7990989775/xsh/open.html
+>=20
+> Ignoring O_TRUNC is the traditional behavior.  But the OS is free to
+> surprise its applications and users with non-traditional behavior.
 
-Wrong spelling of 'occurred', and awkward grammar.  How about:
+Interesting. Thanks for the insight.
 
-will be zero if an error reply is successfully sent
+Well, then I have less issues about auto-truncate. "What? Your OS does
+not truncate your hard disk?"
 
-> + *
-> + * Returns:
-> + *   Err. code < 0 on critical error
+Not that this changes my course of action (not going to change the
+default at this point), but maybe this will help me sleep better.
 
-s/Err./Error/
+(Although arguing with what tools on POSIX-compatible OS are technically
+allowed to do compared to what they are usually expected to do is a bit
+of an issue still...)
 
-> + *   Number of bytes read otherwise (will be equal to length on non cr=
-itical
-> + *     error or if there no queries in request)
-
-will be equal to length if there were no errors, or no queries in the
-request
-
-> + */
-> +static int nbd_negotiate_opt_meta_context_start(NBDClient *client, uin=
-t32_t opt,
-> +                                                uint32_t length,
-> +                                                uint32_t *nb_queries,
-> +                                                BlockDriverState **bs)=
-
-> +{
-> +    int ret;
-> +    NBDExport *exp;
-> +    char *export_name;
-
-Uninitialized...[1]
-
-> +    int nb_read =3D 0;
-> +
-> +    if (!client->structured_reply) {
-> +        uint32_t tail =3D length - nb_read;
-> +        LOG("Structured reply is not negotiated");
-
-This LOG() is redundant...[2]
-
-> +
-> +        if (nbd_negotiate_drop_sync(client->ioc, tail) !=3D tail) {
-> +            return -EIO;
-> +        }
-> +        ret =3D nbd_negotiate_send_rep_err(client->ioc, NBD_REP_ERR_IN=
-VALID, opt,
-> +                                         "Structured reply is not nego=
-tiated");
-
-[2]...because this function also calls LOG().
-
-> +        g_free(export_name);
-
-[1]...so this crashes.  Oops.
-
-> +
-> +        if (ret < 0) {
-> +            return ret;
-> +        } else {
-> +            *bs =3D NULL;
-> +            *nb_queries =3D 0;
-> +            return length;
-> +        }
-> +    }
-> +
+Max
 
 
-> +static int nbd_negotiate_set_meta_context(NBDClient *client, uint32_t =
-length)
-> +{
-> +    int ret;
-> +    BlockDriverState *bs;
-> +    uint32_t nb_queries;
-> +    int nb_read;
-> +
-> +    nb_read =3D nbd_negotiate_opt_meta_context_start(client,
-> +                                                   NBD_OPT_SET_META_CO=
-NTEXT,
-> +                                                   length, &nb_queries=
-, &bs);
-> +    if (nb_read < 0) {
-> +        return nb_read;
-> +    }
-> +    if (bs =3D=3D NULL) {
-> +        /* error reply was already sent by nbd_negotiate_opt_meta_cont=
-ext_start
-> +         * */
-> +        return 0;
-> +    }
-> +
-> +    if (nb_queries =3D=3D 0) {
-> +        return nbd_negotiate_send_rep(client->ioc, NBD_REP_ACK,
-> +                                      NBD_OPT_SET_META_CONTEXT);
-> +    }
-> +
-> +    if (nb_queries > 1) {
-> +        return nbd_negotiate_send_rep_err(client->ioc, NBD_REP_ERR_TOO=
-_BIG,
-> +                                          NBD_OPT_SET_META_CONTEXT,
-> +                                          "Only one exporting context =
-is"
-> +                                          "supported");
-
-Why only one? What's wrong with supporting both 'qemu:xyz' (the dirty
-bitmap, with whatever prefix name we actually settle on) and
-'base:allocation' at the same time?
-
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---QDutftdAF0kV1gs7TK6ipViLpfxhAAH3u
+--WclMICb7LVJVPm5CRmHQVFmwvMrxF2oBE
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYmxldAAoJEKeha0olJ0Nq2kcH/0FEWpNR1rjhWHvLryIj5tHi
-cSrcD9dfqeCH5yBAebAA9Wa/5zGqvO5dmjqsS/zgfPEAVMgrskugTQc5pXp/WSaT
-rwge9kLSztOR79/sJD1P8lKqTpgPbBKz82xsDmKjpdmSkDXumPa8t6xzOTnwnkpw
-tu7quJhzEBdFMh9q2zMqHnQq8/8DIg64XRUOCeZpNkjfVFt5VrUC6bocmn2yRqu7
-Qa9zxwlAo+wvpXcqhE8YOL5P4cXsFQiIh6r8xIzvTSISOsfXC8Q0dtbcmFb7nJgS
-5IEhMwGtrG+Df+sJFsgSb6lZ4oqKIvC54y/ZHnDKdar+S6g8GWMvBkE+YFwnJLo=
-=r0Yr
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlibGhYSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9Af2IH/0toPe1KVMZF3mDN+DcAp0wJQNV8BsUi
+eCwWczdaEYLy2hcFtdLBCxcUgPgPz4itYCw+76hS/KCoSxGhMWroiTwe1vsVtBvn
+rtcWAt8M2AUG9XwIotGounTVjxUA4+vN6SkLR3vEUwV6D60NFUUemL8XDJImPzJT
+zmb+8pxOgiSKG8lK/sMnq8hkVdxEaneLz6rlyath3qNiyUhQ3RUUp69IB7QvcRE4
+q10jc/I+1o/BU9DzVlI8jX3oOsF2TQ5z3md9S/u4jYFHFDpQ1nnAvp9CLpOwdFIj
+zVop3Iu7bNkxf6aqTG7F0v1gLmQSUh0YVY9ZfFZLUBkeKbFSPcUB6ag=
+=6/hE
 -----END PGP SIGNATURE-----
 
---QDutftdAF0kV1gs7TK6ipViLpfxhAAH3u--
+--WclMICb7LVJVPm5CRmHQVFmwvMrxF2oBE--
