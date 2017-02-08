@@ -1,37 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cbGMG-0004rJ-Sg
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 19:43:42 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cbGMK-0004rz-Rc
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 19:43:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cbGMD-0004YA-Pt
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 19:43:40 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53516)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cbGMD-0004Y0-GM
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 19:43:37 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v180hYtk100841
-	for <qemu-devel@nongnu.org>; Tue, 7 Feb 2017 19:43:35 -0500
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28fr07t4c8-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 19:43:31 -0500
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 7 Feb 2017 17:43:28 -0700
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <mreitz@redhat.com>) id 1cbGMJ-0004aq-GV
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 19:43:44 -0500
+References: <20170123123056.30383-1-famz@redhat.com>
+	<20170123123056.30383-12-famz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <34c5d39e-6a1e-304d-f0ea-4e4b6b3ee764@redhat.com>
+Date: Wed, 8 Feb 2017 01:43:33 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-References: <20170207155956.21573-1-pbonzini@redhat.com>
-In-Reply-To: <20170207155956.21573-1-pbonzini@redhat.com>
-Date: Tue, 07 Feb 2017 18:43:18 -0600
-Message-Id: <148651459898.3978.14777421131469511630@loki>
-Subject: Re: [Qemu-devel] [PATCH] link to .xz files to save some bandwidth
+In-Reply-To: <20170123123056.30383-12-famz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="OkFuLDTkgjIPkumaeriNGHkXuaFl6f0Dh"
+Subject: Re: [Qemu-devel] [PATCH v12 11/16] iotests: 172: Use separate
+ images for multiple devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,79 +25,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-block@nongnu.org, eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, rjones@redhat.com
 
-Quoting Paolo Bonzini (2017-02-07 09:59:56)
-> I have converted all .gz and .bz2 files to .xz on download.qemu.org
-> and this patch would change the links in the website.  This would save
-> about 5 GB of bandwidth every day (about 20% savings).
-> =
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--OkFuLDTkgjIPkumaeriNGHkXuaFl6f0Dh
+From: Max Reitz <mreitz@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-block@nongnu.org,
+ eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, rjones@redhat.com
+Message-ID: <34c5d39e-6a1e-304d-f0ea-4e4b6b3ee764@redhat.com>
+Subject: Re: [PATCH v12 11/16] iotests: 172: Use separate images for multiple
+ devices
+References: <20170123123056.30383-1-famz@redhat.com>
+ <20170123123056.30383-12-famz@redhat.com>
+In-Reply-To: <20170123123056.30383-12-famz@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-> xz should be available for all platforms.  Besides providing better
-> compression ratios, decompression of .xz files is about twice as fast
-
-> compared to bzip2.  Compression instead is about 5.5 times slower.
-
-I suppose that's a fair enough trade. :)
-
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-
-> ---
->  _download/source.html   | 4 ++--
->  _includes/releases.html | 4 ++--
-
-Somewhat related: I think _data/releases.yml needs to be updated as it's
-still referencing 2.7.0 instead of 2.7.1. Would one just start updating
-that file with each new release, or is there some other process?
-
->  2 files changed, 4 insertions(+), 4 deletions(-)
-> =
-
-> diff --git a/_download/source.html b/_download/source.html
-> index 1ac8f4f..d090a5e 100644
-> --- a/_download/source.html
-> +++ b/_download/source.html
-> @@ -15,8 +15,8 @@
-> =
-
->         {% for release in site.data.releases offset: 0 limit: 1 %}
->         <p>To download and build QEMU {{release.branch}}.{{release.patch}=
-}:</p>
-> -<pre>wget http://download.qemu-project.org/qemu-{{release.branch}}.{{rel=
-ease.patch}}.tar.bz2
-> -tar xvjf qemu-{{release.branch}}.{{release.patch}}.tar.bz2
-> +<pre>wget http://download.qemu-project.org/qemu-{{release.branch}}.{{rel=
-ease.patch}}.tar.xz
-> +tar xvJf qemu-{{release.branch}}.{{release.patch}}.tar.xz
->  cd qemu-{{release.branch}}.{{release.patch}}
->  ./configure
->  make
-> diff --git a/_includes/releases.html b/_includes/releases.html
-> index 2caab8d..226c719 100644
-> --- a/_includes/releases.html
-> +++ b/_includes/releases.html
-> @@ -1,9 +1,9 @@
->  <ul>
->  {% for release in site.data.releases offset: 0 limit: 4 %}
->  <li><strong><a
-> -  href=3D"http://download.qemu-project.org/qemu-{{release.branch}}.{{rel=
-ease.patch}}.tar.bz2">{{release.branch}}.{{release.patch}}</a></strong>
-> +  href=3D"http://download.qemu-project.org/qemu-{{release.branch}}.{{rel=
-ease.patch}}.tar.xz">{{release.branch}}.{{release.patch}}</a></strong>
->    {{release.date}}<br><a
-> -  href=3D"http://download.qemu-project.org/qemu-{{release.branch}}.{{rel=
-ease.patch}}.tar.bz2.sig">signature</a> &mdash; <a
-> +  href=3D"http://download.qemu-project.org/qemu-{{release.branch}}.{{rel=
-ease.patch}}.tar.xz.sig">signature</a> &mdash; <a
->    href=3D"http://wiki.qemu-project.org/ChangeLog/{{release.branch}}">cha=
-nges</a></li>
->  {% endfor %}
->  </ul>
-> -- =
-
-> 2.9.3
-> =
-
+On 23.01.2017 13:30, Fam Zheng wrote:
+> To avoid image lock failures.
 >=20
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  tests/qemu-iotests/172     | 53 ++++++++++++++++++++++++--------------=
+--------
+>  tests/qemu-iotests/172.out | 50 ++++++++++++++++++++++----------------=
+-----
+>  2 files changed, 54 insertions(+), 49 deletions(-)
+>=20
+> diff --git a/tests/qemu-iotests/172 b/tests/qemu-iotests/172
+> index 1b7d3a1..f9d4cff 100755
+> --- a/tests/qemu-iotests/172
+> +++ b/tests/qemu-iotests/172
+> @@ -86,6 +86,9 @@ size=3D720k
+> =20
+>  _make_test_img $size
+> =20
+> +TEST_IMG=3D"$TEST_IMG.2" _make_test_img $size
+> +TEST_IMG=3D"$TEST_IMG.3" _make_test_img $size
+
+These images should be removed in _cleanup.
+
+Alternatively, you could use the good old driver=3Dnull-co,size=3D$size.
+
+(btw, I'm amazed that size=3D720k works. Not sure if that is intended, bu=
+t
+I won't complain. It even works in JSON (with 'size': '720k').)
+
+> +
+>  # Default drive semantics:
+>  #
+>  # By default you get a single empty floppy drive. You can override it =
+with
+> @@ -105,7 +108,7 @@ echo =3D=3D=3D Using -fda/-fdb options =3D=3D=3D
+> =20
+>  check_floppy_qtree -fda "$TEST_IMG"
+>  check_floppy_qtree -fdb "$TEST_IMG"
+> -check_floppy_qtree -fda "$TEST_IMG" -fdb "$TEST_IMG"
+> +check_floppy_qtree -fda "$TEST_IMG" -fdb "$TEST_IMG.2"
+> =20
+> =20
+>  echo
+> @@ -114,7 +117,7 @@ echo =3D=3D=3D Using -drive options =3D=3D=3D
+> =20
+>  check_floppy_qtree -drive if=3Dfloppy,file=3D"$TEST_IMG"
+>  check_floppy_qtree -drive if=3Dfloppy,file=3D"$TEST_IMG",index=3D1
+> -check_floppy_qtree -drive if=3Dfloppy,file=3D"$TEST_IMG" -drive if=3Df=
+loppy,file=3D"$TEST_IMG",index=3D1
+> +check_floppy_qtree -drive if=3Dfloppy,file=3D"$TEST_IMG" -drive if=3Df=
+loppy,file=3D"$TEST_IMG.2",index=3D1
+> =20
+>  echo
+>  echo
+> @@ -122,7 +125,7 @@ echo =3D=3D=3D Using -drive if=3Dnone and -global =3D=
+=3D=3D
+> =20
+>  check_floppy_qtree -drive if=3Dnone,file=3D"$TEST_IMG" -global isa-fdc=
+=2EdriveA=3Dnone0
+>  check_floppy_qtree -drive if=3Dnone,file=3D"$TEST_IMG" -global isa-fdc=
+=2EdriveB=3Dnone0
+> -check_floppy_qtree -drive if=3Dnone,file=3D"$TEST_IMG" -drive if=3Dnon=
+e,file=3D"$TEST_IMG" \
+> +check_floppy_qtree -drive if=3Dnone,file=3D"$TEST_IMG" -drive if=3Dnon=
+e,file=3D"$TEST_IMG.2" \
+>                     -global isa-fdc.driveA=3Dnone0 -global isa-fdc.driv=
+eB=3Dnone1
+> =20
+>  echo
+> @@ -131,7 +134,7 @@ echo =3D=3D=3D Using -drive if=3Dnone and -device =3D=
+=3D=3D
+> =20
+>  check_floppy_qtree -drive if=3Dnone,file=3D"$TEST_IMG" -device floppy,=
+drive=3Dnone0
+>  check_floppy_qtree -drive if=3Dnone,file=3D"$TEST_IMG" -device floppy,=
+drive=3Dnone0,unit=3D1
+> -check_floppy_qtree -drive if=3Dnone,file=3D"$TEST_IMG" -drive if=3Dnon=
+e,file=3D"$TEST_IMG" \
+> +check_floppy_qtree -drive if=3Dnone,file=3D"$TEST_IMG",file.disable-lo=
+ck=3Don -drive if=3Dnone,file=3D"$TEST_IMG.2" \
+
+disable-lock is not yet available, and also I don't know why you are
+using it here. Is it just an artifact from an earlier version, perhaps?
+
+Rest looks good.
+
+Max
+
+>                     -device floppy,drive=3Dnone0 -device floppy,drive=3D=
+none1,unit=3D1
+> =20
+>  echo
+
+[...]
+
+
+
+--OkFuLDTkgjIPkumaeriNGHkXuaFl6f0Dh
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliaabUSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9Ai1oIAJEWgig14QKzQN8sCba15F0nzE34ZMTw
+VxSh9FxQ0J57S2Sa2mlFgXnR9oRBnPQVImNWq0TQ+x0+HKaf5geIjog60y/guW6k
+rdjpIumsvtzG67PtoyZiKBFNSmOxu/Yl+miATCqJI5mRgsf/SdoiOOBrxykVRiSJ
+1KiQrqfYK+ijUzPAhZf0Gjvp6AzpHD0eABaUn3pN+JPz2rdXB7lv+CKZ+CtpiZf0
+7ZBsOU+8z/A5meiik3JKlz2niNgyLbx3IiB8dRT2o+qnqeXfsLWt9pDVU1Jna6OB
+59iJRa2NbN8D/Oky7+aN0/haz4h/RQDC9kd7UcNHQ5H5/cUjnof8hOE=
+=WMn4
+-----END PGP SIGNATURE-----
+
+--OkFuLDTkgjIPkumaeriNGHkXuaFl6f0Dh--
