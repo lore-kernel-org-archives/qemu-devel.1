@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cbZws-0000yR-Ca
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 16:38:50 -0500
+	(envelope-from <eblake@redhat.com>) id 1cba26-0005XC-MK
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 16:44:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cbZwp-0000rT-AY
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 16:38:46 -0500
-Resent-Message-Id: <E1cbZwp-0000rT-AY@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21494)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cbZwp-0000r6-1s
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 16:38:43 -0500
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <1486589255-24577-1-git-send-email-juro.bystricky@intel.com>
-Message-ID: <148658988109.42.7504136076926934310@eba24e3a0d7f>
+	(envelope-from <eblake@redhat.com>) id 1cba22-0002kI-29
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 16:44:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38610)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cba21-0002kB-Rs
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 16:44:05 -0500
+References: <1486571506-16242-1-git-send-email-yongbok.kim@imgtec.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8eca7e34-da8c-f44a-1d97-b2b7299a8a92@redhat.com>
+Date: Wed, 8 Feb 2017 15:44:03 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 8 Feb 2017 13:38:01 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] nios2: Add Altera JTAG UART emulation
+In-Reply-To: <1486571506-16242-1-git-send-email-yongbok.kim@imgtec.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="xuLdJwMPWxe3TXX3sfXvn5THQQKhftIVe"
+Subject: Re: [Qemu-devel] [PATCH v3 1/8] hw/mips_cmgcr: allow GCR base to be
+ moved
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +28,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: juro.bystricky@intel.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, marex@denx.de, jurobystricky@hotmail.com, crwulff@gmail.com
+To: Yongbok Kim <yongbok.kim@imgtec.com>, qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net, paul.burton@imgtec.com
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSF0gbmlvczI6IEFkZCBBbHRlcmEgSlRBRyBVQVJUIGVtdWxhdGlvbgpUeXBl
-OiBzZXJpZXMKTWVzc2FnZS1pZDogMTQ4NjU4OTI1NS0yNDU3Ny0xLWdpdC1zZW5kLWVtYWlsLWp1
-cm8uYnlzdHJpY2t5QGludGVsLmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
-YmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3
-YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpj
-b21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBp
-biAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQg
-bG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1h
-dD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAg
-ICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhp
-dCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
-ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
-ZXctcHJvamVjdC9xZW11CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMTQ4NjU2OTg2NC0x
-NzAwNS0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMTQ4NjU2
-OTg2NC0xNzAwNS0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tCiAqIFtuZXcgdGFn
-XSAgICAgICAgIHBhdGNoZXcvMTQ4NjU4OTI1NS0yNDU3Ny0xLWdpdC1zZW5kLWVtYWlsLWp1cm8u
-YnlzdHJpY2t5QGludGVsLmNvbSAtPiBwYXRjaGV3LzE0ODY1ODkyNTUtMjQ1NzctMS1naXQtc2Vu
-ZC1lbWFpbC1qdXJvLmJ5c3RyaWNreUBpbnRlbC5jb20KIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0
-Y2hldy8yMDE3MDIwNzAwNTkzMC4yODMyNy0xLWxhdXJlbnRAdml2aWVyLmV1IC0+IHBhdGNoZXcv
-MjAxNzAyMDcwMDU5MzAuMjgzMjctMS1sYXVyZW50QHZpdmllci5ldQpTd2l0Y2hlZCB0byBhIG5l
-dyBicmFuY2ggJ3Rlc3QnCjlkNzAyNjUgbmlvczI6IEFkZCBBbHRlcmEgSlRBRyBVQVJUIGVtdWxh
-dGlvbgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBuaW9zMjogQWRk
-IEFsdGVyYSBKVEFHIFVBUlQgZW11bGF0aW9uLi4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFj
-dGVycwojNTI6IEZJTEU6IGh3L2NoYXIvYWx0ZXJhX2p1YXJ0LmM6MTU6CisgKiBodHRwczovL3d3
-dy5hbHRlcmEuY29tLmNuL2NvbnRlbnQvZGFtL2FsdGVyYS13d3cvZ2xvYmFsL3poX0NOL3BkZnMv
-bGl0ZXJhdHVyZS91Zy91Z19lbWJlZGRlZF9pcC5wZGYKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJu
-aW5ncywgMzIxIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
-IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
-TkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6
-IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDov
-L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
-bEBmcmVlbGlzdHMub3Jn
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--xuLdJwMPWxe3TXX3sfXvn5THQQKhftIVe
+From: Eric Blake <eblake@redhat.com>
+To: Yongbok Kim <yongbok.kim@imgtec.com>, qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net, paul.burton@imgtec.com
+Message-ID: <8eca7e34-da8c-f44a-1d97-b2b7299a8a92@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/8] hw/mips_cmgcr: allow GCR base to be
+ moved
+References: <1486571506-16242-1-git-send-email-yongbok.kim@imgtec.com>
+In-Reply-To: <1486571506-16242-1-git-send-email-yongbok.kim@imgtec.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 02/08/2017 10:31 AM, Yongbok Kim wrote:
+> From: Paul Burton <paul.burton@imgtec.com>
+
+The 0/8 cover letter was sent with this header:
+Message-ID: <1486571463-16183-1-git-send-email-yongbok.kim@imgtec.com>
+
+but your individual patches were sent with no In-Reply-To: or
+References: headers; therefore, each message appears as its own
+top-level thread. When reposting, please make sure your series is
+properly threaded.
+
+>=20
+> Support moving the GCR base address & updating the CPU's CP0 CMGCRBase
+> register appropriately. This is required if a platform needs to move it=
+s
+> GCRs away from other memory, as the MIPS Boston development board does
+> to avoid its flash memory.
+>=20
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--xuLdJwMPWxe3TXX3sfXvn5THQQKhftIVe
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYm5EjAAoJEKeha0olJ0NqkVwH/iATSvpiYqXXwafAady9wSe0
+Ii0gkK5ILTLMSZIeU67yebe9J53VOFoiG7I+ptVCNem6ZGODLIxwn+8d+2BRkRsC
+UwwnGWjibE4wtXHQ/SHWg5JuNDCDKtUNR2HDtRPWoXXnMiQkeDXao3r0BucT8YWE
+rJ9GvI9g82KIn5j4yh1SL74Dt6zuI6+x5YwlmfoB0clDvqPFrfJvoDtP3mdEkSzs
+vH2Idh/RQ0x8gY0F+gWP2SevNZiJsk+TOgzsBx/uZc6F9QURpZ2CEdVQTSQlrYZb
+fVJGcmXh//IOuZyNyu1t28ZmCW2bu7ukvSRGLZIeUONeA4VF2y+GnvHuXPByuQ8=
+=SSnc
+-----END PGP SIGNATURE-----
+
+--xuLdJwMPWxe3TXX3sfXvn5THQQKhftIVe--
