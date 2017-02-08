@@ -1,15 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cbX2B-00061Y-AU
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 13:32:04 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cbX3G-0006cd-RL
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 13:33:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cbX28-0004o8-7w
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 13:32:03 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed,  8 Feb 2017 19:31:57 +0100
-Message-Id: <1486578717-30324-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] hw/ppc/pnv: Remove superfluous "qemu" prefix
- from error strings
+	(envelope-from <peter.maydell@linaro.org>) id 1cbX3F-0005BA-K6
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 13:33:10 -0500
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:35851)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cbX3F-0005Az-Db
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 13:33:09 -0500
+Received: by mail-wr0-x22d.google.com with SMTP id k90so65505175wrc.3
+	for <qemu-devel@nongnu.org>; Wed, 08 Feb 2017 10:33:09 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <1486575331-14455-3-git-send-email-abologna@redhat.com>
+References: <1486575331-14455-1-git-send-email-abologna@redhat.com>
+	<1486575331-14455-3-git-send-email-abologna@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 8 Feb 2017 18:32:47 +0000
+Message-ID: <CAFEAcA8+wfPQXXhoYZDv8LAOS6=4_P9kyaHONuMQcb7VmkVyxw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v5 2/2] mach-virt: Provide sample
+ configuration files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,49 +30,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org
-Cc: qemu-devel@nongnu.org
+To: Andrea Bolognani <abologna@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>, Andrew Jones <drjones@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-error_report() already puts a prefix with the program name in front
-of the error strings, so the "qemu:" prefix is not necessary here
-anymore.
+On 8 February 2017 at 17:35, Andrea Bolognani <abologna@redhat.com> wrote:
+> These are very much like the sample configuration files
+> for q35, and can be used both as documentation and as
+> a starting point for creating your own guest.
 
-Reported-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/ppc/pnv.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+> --- /dev/null
+> +++ b/docs/mach-virt-graphical.cfg
+> @@ -0,0 +1,245 @@
+> +# mach-virt - VirtIO guest (graphical console)
+> +# =========================================================
+> +#
+> +# You will probably need to tweak the lines marked as
+> +# CHANGE ME before being able to use this configuration!
+> +#
+> +# Usage:
+> +#
+> +#   $ qemu-system-aarch64 \
+> +#     -nodefaults \
+> +#     -readconfig mach-virt-graphical.cfg \
+> +#     -cpu host
 
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 4fab5c0..09f0d22 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -381,7 +381,7 @@ static void ppc_powernv_init(MachineState *machine)
- 
-     fw_size = load_image_targphys(fw_filename, FW_LOAD_ADDR, FW_MAX_SIZE);
-     if (fw_size < 0) {
--        error_report("qemu: could not load OPAL '%s'", fw_filename);
-+        error_report("Could not load OPAL '%s'", fw_filename);
-         exit(1);
-     }
-     g_free(fw_filename);
-@@ -393,7 +393,7 @@ static void ppc_powernv_init(MachineState *machine)
-         kernel_size = load_image_targphys(machine->kernel_filename,
-                                           KERNEL_LOAD_ADDR, 0x2000000);
-         if (kernel_size < 0) {
--            error_report("qemu: could not load kernel'%s'",
-+            error_report("Could not load kernel '%s'",
-                          machine->kernel_filename);
-             exit(1);
-         }
-@@ -405,7 +405,7 @@ static void ppc_powernv_init(MachineState *machine)
-         pnv->initrd_size = load_image_targphys(machine->initrd_filename,
-                                   pnv->initrd_base, 0x10000000); /* 128MB max */
-         if (pnv->initrd_size < 0) {
--            error_report("qemu: could not load initial ram disk '%s'",
-+            error_report("Could not load initial ram disk '%s'",
-                          machine->initrd_filename);
-             exit(1);
-         }
--- 
-1.8.3.1
+What does nodefaults disable on the virt board?
+(I've never looked into exactly what nodefaults does...)
+
+There doesn't seem to be any specification of the GIC
+version (unless I missed it in the config file); you
+probably want -machine gic-version=host if you're using
+-cpu host.
+
+> +# Using -nodefaults is required to have full control over
+> +# the virtual hardware: when it's specified, QEMU will
+> +# create a bare machine with just the very essential
+> +# chipset devices being present:
+
+The theory of 'virt' is it only has the essential
+devices anyway.
+
+> +#   00:00.0 Host bridge
+
+I'm pretty sure -nodefaults isn't going to disable
+the GIC, the UART, the flash devices, etc etc that
+the virt board has. Not everything in the world is
+a PCI device :-)
+
+> +#
+> +# This configuration file adds a number of other useful
+> +# devices, more specifically:
+> +#
+> +#   00:01.0 Display controller
+> +#   00.1c.* PCI bridge (PCI Express Root Ports)
+> +#   01:00.0 SCSI storage controller
+> +#   02:00.0 Ethernet controller
+> +#   03:00.0 USB controller
+> +#
+> +# More information about these devices is available below.
+> +
+
+> +# Firmware configuration
+> +# =========================================================
+> +#
+> +# There are two parts to the firmware: a read-only image
+> +# containing the executable code, which is shared between
+> +# guests, and a read/write variable store that is used by
+> +# to record information such as the boot device. An empty
+> +# variable store can be created by simply copying a
+> +# template provided as part of AAVMF.
+> +#
+> +# Depending on the distribution you're using on the host,
+> +# paths to the firmware itself and variable store template
+> +# will be different. Some examples:
+> +#
+> +# Fedora:
+> +#   /usr/share/edk2/aarch64/QEMU_EFI.fd
+> +#   /usr/share/edk2/aarch64/QEMU_VARS.fd
+> +# RHEL:
+> +#   /usr/share/AAVMF/AAVMF_CODE.fd
+> +#   /usr/share/AAVMF/AAVMF_VARS.fd
+
+It's a shame that we've ended up with different
+firmware names (even between RHEL and Fedora, without
+getting to Debian or SUSE). Would making UEFI a
+more "official" rom image in pc-bios/ help to
+harmonise things, or just introduce yet another
+possibility to the mix?
+
+> +# Communication controller (serial console)
+> +# =========================================================
+> +#
+> +# We use virtconsole along with virtio-serial, and connect
+> +# it with the host's standard input / output channels. In
+> +# this configuration, the guest will behave pretty much
+> +# like any other Unix utility: that includes terminating
+> +# as soon as Ctrl-C is pressed, so caution is advised.
+> +#
+> +# If you want to use the platform's native serial console
+> +# instead, you should comment out this section and append
+> +#
+> +#   -serial stdio
+> +#
+> +# to the QEMU command line. Doing so might be needed to be
+> +# able to access the GRUB menu or see the output from the
+> +# boot process.
+> +
+> +[chardev "hostconsole"]
+> +  backend = "stdio"
+> +
+> +[device "serial"]
+> +  driver = "virtio-serial-pci"
+> +  bus = "pci.3"
+> +  addr = "00.0"
+> +
+> +[device "console"]
+> +  driver = "virtconsole"
+> +  chardev = "hostconsole"
+
+Won't most guests expect serial to be the default
+PL011 UART ?
+
+thanks
+-- PMM
