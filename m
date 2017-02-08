@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47686)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1cbKd5-0006FJ-UG
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 00:17:20 -0500
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cbKks-0007vx-Uz
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 00:25:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1cbKd2-0004M3-Q8
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 00:17:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45288)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1cbKd2-0004Lu-KI
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 00:17:16 -0500
-Date: Wed, 8 Feb 2017 10:47:08 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-In-Reply-To: <CAKmqyKNerMUco=iokdcWLMu14mFRvxkO81VV=JfqfHOOD_CVfQ@mail.gmail.com>
-Message-ID: <alpine.LFD.2.20.1702081040410.17258@wniryva>
-References: <20170131122416.10284-1-ppandit@redhat.com>
-	<20170131122416.10284-2-ppandit@redhat.com>
-	<CAKmqyKNerMUco=iokdcWLMu14mFRvxkO81VV=JfqfHOOD_CVfQ@mail.gmail.com>
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cbKkp-0000VK-Ja
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 00:25:22 -0500
+Received: from [59.151.112.132] (port=28101 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cbKkp-0000T2-5M
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 00:25:19 -0500
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Date: Wed, 8 Feb 2017 13:24:20 +0800
+Message-ID: <1486531462-13882-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH 1/2] sd: sdhci: check transfer mode
- register in multi block transfer
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH V7 0/2] Add new qmp commands to suppurt Xen COLO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +23,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Wjjzhang <wjjzhang@tencent.com>, Jiang Xin <jiangxin1@huawei.com>
+To: qemu devel <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>
 
-  Hello Alistair,
+Xen COLO depend on qemu COLO replication function.
+So, We need new qmp commands for Xen to use qemu replication.
 
-+-- On Tue, 7 Feb 2017, Alistair Francis wrote --+
-| As it doesn't look like we have ever supported an infinite transfer
-| and we don't want infinite loops occurring I think we should add an
-| unsupported print statement here saying that we don't support infinite
-| transfers and then I'm ok with this patch.
+Corresponding libxl patches already in xen.git.
+Commit ID:
 
-  Okay, will do.
- 
-| > -        MASKED_WRITE(s->trnmod, mask, value);
-| > +        MASKED_WRITE(s->trnmod, mask, value & 0x0037);
-| 
-| What is this change doing?
+ed37ef1f91c20f0ab162ce60f8c38400b917fa64
+COLO: introduce new API to prepare/start/do/get_error/stop replication
 
-  It is possible to set 's->trnmod' to an invalid value(> 6 bits). Above 
-mask(0x0037) would limit 'value' to the 6 bits mentioned in the spec.
+a0ddc0b359375b2418213966dfbdbfab593ecc6f
+tools/libxl: introduction of libxl__qmp_restore to load qemu state
 
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+
+Zhang Chen (2):
+  Add a new qmp command to start/stop replication
+  Add a new qmp command to do checkpoint, query xen replication status
+
+ migration/colo.c | 40 ++++++++++++++++++++++++++
+ qapi-schema.json | 85 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 125 insertions(+)
+
+-- 
+2.7.4
