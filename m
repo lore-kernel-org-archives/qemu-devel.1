@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cbSey-0005tn-TJ
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:51:53 -0500
+	(envelope-from <eblake@redhat.com>) id 1cbSgS-00078k-TB
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:53:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cbSev-0001za-S1
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:51:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55558)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cbSev-0001z3-Mu
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:51:45 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 21ECE804E5
-	for <qemu-devel@nongnu.org>; Wed,  8 Feb 2017 13:51:45 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed,  8 Feb 2017 14:51:33 +0100
-Message-Id: <1486561893-26470-2-git-send-email-kraxel@redhat.com>
-In-Reply-To: <1486561893-26470-1-git-send-email-kraxel@redhat.com>
-References: <1486561893-26470-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] cirrus: replace debug printf with trace
- points
+	(envelope-from <eblake@redhat.com>) id 1cbSgP-0002QQ-NK
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:53:21 -0500
+References: <20170208080900.4092-1-marcandre.lureau@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3dccbc96-1ba2-5cd5-041c-4ed071fddfcb@redhat.com>
+Date: Wed, 8 Feb 2017 07:53:14 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170208080900.4092-1-marcandre.lureau@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="m2k6SrU6K9TT8IDNnBVsDTeWTRruX23jr"
+Subject: Re: [Qemu-devel] [PATCH] qcow2: remove useless NULL check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,77 +23,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-trivial@nongnu.org
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/display/cirrus_vga.c | 11 +++++------
- hw/display/trace-events |  6 ++++++
- 2 files changed, 11 insertions(+), 6 deletions(-)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--m2k6SrU6K9TT8IDNnBVsDTeWTRruX23jr
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-trivial@nongnu.org
+Message-ID: <3dccbc96-1ba2-5cd5-041c-4ed071fddfcb@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qcow2: remove useless NULL check
+References: <20170208080900.4092-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20170208080900.4092-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
-index 16f27e8..b272a70 100644
---- a/hw/display/cirrus_vga.c
-+++ b/hw/display/cirrus_vga.c
-@@ -28,6 +28,7 @@
-  */
- #include "qemu/osdep.h"
- #include "qapi/error.h"
-+#include "trace.h"
- #include "hw/hw.h"
- #include "hw/pci/pci.h"
- #include "ui/console.h"
-@@ -1852,12 +1853,14 @@ static uint8_t cirrus_mmio_blt_read(CirrusVGAState * s, unsigned address)
- 	break;
-     }
- 
-+    trace_vga_cirrus_write_blt(address, value);
-     return (uint8_t) value;
- }
- 
- static void cirrus_mmio_blt_write(CirrusVGAState * s, unsigned address,
- 				  uint8_t value)
- {
-+    trace_vga_cirrus_write_blt(address, value);
-     switch (address) {
-     case (CIRRUS_MMIO_BLTBGCOLOR + 0):
- 	cirrus_vga_write_gr(s, 0x00, value);
-@@ -2607,9 +2610,7 @@ static uint64_t cirrus_vga_ioport_read(void *opaque, hwaddr addr,
- 	    break;
- 	}
-     }
--#if defined(DEBUG_VGA)
--    printf("VGA: read addr=0x%04x data=0x%02x\n", addr, val);
--#endif
-+    trace_vga_cirrus_read_io(addr, val);
-     return val;
- }
- 
-@@ -2626,9 +2627,7 @@ static void cirrus_vga_ioport_write(void *opaque, hwaddr addr, uint64_t val,
-     if (vga_ioport_invalid(s, addr)) {
- 	return;
-     }
--#ifdef DEBUG_VGA
--    printf("VGA: write addr=0x%04x data=0x%02x\n", addr, val);
--#endif
-+    trace_vga_cirrus_write_io(addr, val);
- 
-     switch (addr) {
-     case 0x3c0:
-diff --git a/hw/display/trace-events b/hw/display/trace-events
-index 26910e2..3e896d2 100644
---- a/hw/display/trace-events
-+++ b/hw/display/trace-events
-@@ -125,3 +125,9 @@ vga_std_read_io(uint32_t addr, uint32_t val) "addr 0x%x, val 0x%x"
- vga_std_write_io(uint32_t addr, uint32_t val) "addr 0x%x, val 0x%x"
- vga_vbe_read(uint32_t index, uint32_t val) "index 0x%x, val 0x%x"
- vga_vbe_write(uint32_t index, uint32_t val) "index 0x%x, val 0x%x"
-+
-+# hw/display/cirrus_vga.c
-+vga_cirrus_read_io(uint32_t addr, uint32_t val) "addr 0x%x, val 0x%x"
-+vga_cirrus_write_io(uint32_t addr, uint32_t val) "addr 0x%x, val 0x%x"
-+vga_cirrus_read_blt(uint32_t offset, uint32_t val) "offset 0x%x, val 0x%x"
-+vga_cirrus_write_blt(uint32_t offset, uint32_t val) "offset 0x%x, val 0x%x"
--- 
-1.8.3.1
+On 02/08/2017 02:09 AM, Marc-Andr=C3=A9 Lureau wrote:
+> g_strdup() already handles the case where the argument is NULL.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  block/qcow2.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+>=20
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 96fb8a8f16..9114218030 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -2016,8 +2016,8 @@ static int qcow2_change_backing_file(BlockDriverS=
+tate *bs,
+>      g_free(s->image_backing_file);
+>      g_free(s->image_backing_format);
+> =20
+> -    s->image_backing_file =3D backing_file ? g_strdup(bs->backing_file=
+) : NULL;
+> -    s->image_backing_format =3D backing_fmt ? g_strdup(bs->backing_for=
+mat) : NULL;
+> +    s->image_backing_file =3D g_strdup(bs->backing_file);
+> +    s->image_backing_format =3D g_strdup(bs->backing_format);
+> =20
+>      return qcow2_update_header(bs);
+>  }
+>=20
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--m2k6SrU6K9TT8IDNnBVsDTeWTRruX23jr
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYmyLKAAoJEKeha0olJ0Nqt9YH/3G+n/+rDGknCLDDOHHwGtaV
+TXsfLNqITpUpyhsKAcdwNaqiTNBDaE9fkJ+D/EnGVn8a+qP6foLqOAtJflH6C51L
+O06I337v36e2hba9AO/lJVy3cK9aM76cK/+c2of+OEcjXArpu2DwIDRkyQwytai2
+IM2Klz4s9bf3FxYeMAUNJmxz2btD4zageARb7kaf6J4qSutZzOMXeCEKKMx1F6YJ
+yG+hqLoUS6XVpCEp/QwrSHtjMdwIMlcN/D0gGpzyMaO3vW2bGG5syHJfsO6F1T73
+yM1yXXg/ssY9L4MJ+m7MWW+FUYt5OVRVoR6jo2RmP9UgtOiLuiatUmKAwq2Nj90=
+=6gTy
+-----END PGP SIGNATURE-----
+
+--m2k6SrU6K9TT8IDNnBVsDTeWTRruX23jr--
