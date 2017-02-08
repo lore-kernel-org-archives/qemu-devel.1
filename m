@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46439)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cbXuc-0001nh-8M
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 14:28:19 -0500
+	(envelope-from <eblake@redhat.com>) id 1cbXvt-0002dh-0D
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 14:29:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cbXuY-0006cG-97
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 14:28:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52228)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1cbXuY-0006cA-0f
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 14:28:14 -0500
-Message-ID: <1486582091.3641.32.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Wed, 08 Feb 2017 20:28:11 +0100
-In-Reply-To: <CAFEAcA8+wfPQXXhoYZDv8LAOS6=4_P9kyaHONuMQcb7VmkVyxw@mail.gmail.com>
-References: <1486575331-14455-1-git-send-email-abologna@redhat.com>
-	<1486575331-14455-3-git-send-email-abologna@redhat.com>
-	<CAFEAcA8+wfPQXXhoYZDv8LAOS6=4_P9kyaHONuMQcb7VmkVyxw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 2/2] mach-virt: Provide sample
- configuration files
+	(envelope-from <eblake@redhat.com>) id 1cbXvs-000764-1X
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 14:29:37 -0500
+References: <20170126101827.22378-1-berrange@redhat.com>
+	<20170126101827.22378-5-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1cf91704-5c4d-705c-7681-99ec8cc567bd@redhat.com>
+Date: Wed, 8 Feb 2017 13:29:27 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170126101827.22378-5-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="QNAdwNSv4H3DWoPk1pfnJoHDe3Q7PJEWk"
+Subject: Re: [Qemu-devel] [PATCH v3 04/18] qcow: require image size to be >
+ 1 for new images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,102 +25,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>, Andrew Jones <drjones@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Wed, 2017-02-08 at 18:32 +0000, Peter Maydell wrote:
-> What does nodefaults disable on the virt board?
-> (I've never looked into exactly what nodefaults does...)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--QNAdwNSv4H3DWoPk1pfnJoHDe3Q7PJEWk
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <1cf91704-5c4d-705c-7681-99ec8cc567bd@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 04/18] qcow: require image size to be > 1
+ for new images
+References: <20170126101827.22378-1-berrange@redhat.com>
+ <20170126101827.22378-5-berrange@redhat.com>
+In-Reply-To: <20170126101827.22378-5-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-When -nodefaults is missing, a default virtio-net-pci
-plugged into 00:01.0 is automatically added.
+On 01/26/2017 04:18 AM, Daniel P. Berrange wrote:
+> The qcow driver refuses to open images which are less than
+> 2 bytes in size, but will happily create such images. Add
+> a check in the create path to avoid this discrepancy.
 
-> There doesn't seem to be any specification of the GIC
-> version (unless I missed it in the config file); you
-> probably want -machine gic-version=3Dhost if you're using
-> -cpu host.
+I agree that we have the 2-byte limit:
 
-Very good point! I've added it.
+static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
+=2E..
+    if (header.size <=3D 1) {
+        error_setg(errp, "Image size is too small (must be at least 2
+bytes)");
+        ret =3D -EINVAL;
+        goto fail;
+    }
 
-I would really, really like to be able to specify the
-CPU model in the configuration file as well, but I haven't
-found a way to do so :(
+But why 2 bytes? That's a weird limit from history.  Oh well, no one
+should be creating many new qcow images when we have qcow2, so I see no
+problem with your patch as-is.
 
-On the other hand, I just realized that I can add
+>=20
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  block/qcow.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>=20
 
-=C2=A0 [machine]
-=C2=A0=C2=A0=C2=A0=C2=A0graphics =3D "off"
+> +++ b/block/qcow.c
+> @@ -799,6 +799,12 @@ static int qcow_create(const char *filename, QemuO=
+pts *opts, Error **errp)
+>      /* Read out options */
+>      total_size =3D ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE=
+, 0),
+>                            BDRV_SECTOR_SIZE);
+> +    if (total_size <=3D 1) {
 
-to get rid of -nographic on the command line! \o/
+It will never be 1 because of the ROUND_UP (it will either be 0 or a
+sector size), but your code is defensive to match the open check.
 
-> > +# Using -nodefaults is required to have full control over
-> > +# the virtual hardware: when it's specified, QEMU will
-> > +# create a bare machine with just the very essential
-> > +# chipset devices being present:
->=C2=A0
-> The theory of 'virt' is it only has the essential
-> devices anyway.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-See above ;)
+> +        error_setg(errp, "Image size is too small, cannot be zero leng=
+th");
+> +        ret =3D -EINVAL;
+> +        goto cleanup;
+> +    }
+> +
+>      backing_file =3D qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FILE);
+>      if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
+>          flags |=3D BLOCK_FLAG_ENCRYPT;
+>=20
 
-The use of -nodefaults is there mostly to guarantee that we
-always start from a clean slate, like for example add the
-Ethernet adapter ourselves (giving us a chance to comment
-on its usage) instead of using the default one.
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-Another goal is to be consistent with the q35 sample
-configuration files: ideally comparing mach-virt-serial.cfg
-and q35-virtio-serial.cfg, for example, should yield a
-very minimal diff.
 
-> > +#=C2=A0=C2=A0=C2=A000:00.0 Host bridge
->=C2=A0
-> I'm pretty sure -nodefaults isn't going to disable
-> the GIC, the UART, the flash devices, etc etc that
-> the virt board has. Not everything in the world is
-> a PCI device :-)
+--QNAdwNSv4H3DWoPk1pfnJoHDe3Q7PJEWk
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Right. So far I've basically stuck with PCI devices: even
-the device listing, as you can see, is modeled after the
-output of lspci.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-That said, I'm not against documenting more devices.
+iQEcBAEBCAAGBQJYm3GYAAoJEKeha0olJ0Nq7yMIAIWmaVSg46SYN4PJuhnIuEH1
+kSt65bnhSWrk6fiLm7iGMAQGUm/Q18Obg2WFIZs1oGLTDrWUHS+WMuhjb0DYlP9b
+6mv4xealN14liCDJdlYG+HRbB+mHhusUs0xAIFN0AKEJKGHNAHdAczpheKGN6yiy
+RHIVKXnbH/8CS42MVXHmI4jq8nHHIaWNI699RrD2i3oBZmFTFU6CiRv90+KyDjvc
+i1ZOEuYmTfv5Ei/vPmNEDDajhhJGMuHOutbuQacFD9axe037Qjq1iADN8LpLk1rN
+1fvgSeHS7RUvyMhVuoE/IbMsX32PO26QlwXw5w9WvVKBAfFmP1Y9K8E5QzGPFNU=
+=CIoV
+-----END PGP SIGNATURE-----
 
-[...]
-> It's a shame that we've ended up with different
-> firmware names (even between RHEL and Fedora, without
-> getting to Debian or SUSE).
-
-Yeah, it's pretty unfortunate :(
-
-> Would making UEFI a
-> more "official" rom image in pc-bios/ help to
-> harmonise things, or just introduce yet another
-> possibility to the mix?
-
-Sorry, no idea. I'll let someone else comment on this one.
-
-[...]
-> > +[device "console"]
-> > +=C2=A0=C2=A0driver =3D "virtconsole"
-> > +=C2=A0=C2=A0chardev =3D "hostconsole"
->=C2=A0
-> Won't most guests expect serial to be the default
-> PL011 UART ?
-
-Possibly. I'm using virtconsole here (and in q35*serial.cfg)
-mostly to have as much VirtIO as possible, but I also
-document the fact that you might want or need to use the
-native serial console instead.
-
-Moreover, something that I haven't been able to do on
-mach-virt (even though I could on q35, but again, I want the
-files to be as close as possible) is to configure the serial
-console from the configuration file.
-
-Seeing as we have an alternative, I'd rather keep it this
-way and minimize the number of command line arguments the
-user needs to specify.
-
---=C2=A0
-Andrea Bolognani / Red Hat / Virtualization
+--QNAdwNSv4H3DWoPk1pfnJoHDe3Q7PJEWk--
