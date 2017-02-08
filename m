@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cbSUq-0000pO-OB
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:41:24 -0500
+	(envelope-from <eblake@redhat.com>) id 1cbSXf-0002lp-3k
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:44:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cbSUp-0007fL-JC
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:41:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43648)
+	(envelope-from <eblake@redhat.com>) id 1cbSXc-0000XW-1e
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:44:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44860)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cbSUp-0007f7-BJ
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:41:19 -0500
-References: <20170206024535.14624.3001.malonedeb@soybean.canonical.com>
-	<20170208081618.29788.55361.malone@gac.canonical.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cbSXb-0000X1-Pc
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:44:11 -0500
+References: <20170207155956.21573-1-pbonzini@redhat.com>
+	<b7fc7007-1663-b41d-422a-9600e44d7b38@redhat.com>
+	<87zihxukx2.fsf@dusky.pond.sub.org>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <c0117585-f104-14ee-ba85-f2426c1553e0@redhat.com>
-Date: Wed, 8 Feb 2017 07:41:16 -0600
+Message-ID: <6b2917c1-c591-85dc-849f-558212d22adc@redhat.com>
+Date: Wed, 8 Feb 2017 07:44:09 -0600
 MIME-Version: 1.0
-In-Reply-To: <20170208081618.29788.55361.malone@gac.canonical.com>
+In-Reply-To: <87zihxukx2.fsf@dusky.pond.sub.org>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="JPu7J5kiN5KRGe8lQ4sKSnJGmN2XCObCk"
-Subject: Re: [Qemu-devel] [Bug 1662050] Re: qemu-img convert a overlay qcow2
- image into a entire image
+	boundary="ixReQglkqTAM22CBSqO3Av8l46uKQjomw"
+Subject: Re: [Qemu-devel] [PATCH] link to .xz files to save some bandwidth
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,47 +29,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1662050 <1662050@bugs.launchpad.net>, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JPu7J5kiN5KRGe8lQ4sKSnJGmN2XCObCk
+--ixReQglkqTAM22CBSqO3Av8l46uKQjomw
 From: Eric Blake <eblake@redhat.com>
-To: Bug 1662050 <1662050@bugs.launchpad.net>, qemu-devel@nongnu.org
-Message-ID: <c0117585-f104-14ee-ba85-f2426c1553e0@redhat.com>
-Subject: Re: [Qemu-devel] [Bug 1662050] Re: qemu-img convert a overlay qcow2
- image into a entire image
-References: <20170206024535.14624.3001.malonedeb@soybean.canonical.com>
- <20170208081618.29788.55361.malone@gac.canonical.com>
-In-Reply-To: <20170208081618.29788.55361.malone@gac.canonical.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ mdroth@linux.vnet.ibm.com
+Message-ID: <6b2917c1-c591-85dc-849f-558212d22adc@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] link to .xz files to save some bandwidth
+References: <20170207155956.21573-1-pbonzini@redhat.com>
+ <b7fc7007-1663-b41d-422a-9600e44d7b38@redhat.com>
+ <87zihxukx2.fsf@dusky.pond.sub.org>
+In-Reply-To: <87zihxukx2.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 02/08/2017 02:16 AM, wayen wrote:
-> @Thomas Huth, I just want to reduce the file size of qcow2 overlay imag=
+On 02/08/2017 02:49 AM, Markus Armbruster wrote:
+> Eric Blake <eblake@redhat.com> writes:
+>=20
+>> On 02/07/2017 09:59 AM, Paolo Bonzini wrote:
+>>> I have converted all .gz and .bz2 files to .xz on download.qemu.org
+>>> and this patch would change the links in the website.  This would sav=
 e
-> by this conversion.
+>>> about 5 GB of bandwidth every day (about 20% savings).
+>>>
+>>> xz should be available for all platforms.  Besides providing better
+>>> compression ratios, decompression of .xz files is about twice as fast=
 
-Are you merely trying to sparsify the file (punch holes on the portion
-of the file that is not mapped to disk), so that the apparent file size
-is unchanged, but the actual disk usage is minimized? That's probably
-already possible (virt-sparsify from libguestfs seems to be able to do
-it; look at what steps it uses).
+>>> compared to bzip2.  Compression instead is about 5.5 times slower.
+>>
+>> I agree that bzip2 is pointless these days; .gz is a bit more importan=
+t
+>> when targetting older platforms but I think that does not describe
+>> qemu's target audience.  Do we want to even enter the xz vs. lzma
+>> controversy, or are we okay with being xz-only?
+>=20
+> Pointer to / summary of the controversy, so that folks can decide
+> whether they care?
 
-Or are you asking for a way to defragment the file, so that the apparent
-size shrinks because all occupied clusters are now contiguous, so that
-there are no longer any need for holes?  The end result is the same
-amount of disk usage, but right now, the only way to defragment is to
-convert from one image to a copy; we don't support in-place
-defragmentation yet.  So far, no one has come up with a compelling
-reason why it is needed, or a patch to implement it, but there's no
-technical reason why it can't be done.
+Here's a big thread on the coreutils list, where I proposed a patch to
+add lzip distribution alongside xz, but where the patch was more-or-less
+dropped due to the debate that ensued:
+
+https://lists.gnu.org/archive/html/coreutils/2017-01/threads.html#00008
 
 --=20
 Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---JPu7J5kiN5KRGe8lQ4sKSnJGmN2XCObCk
+--ixReQglkqTAM22CBSqO3Av8l46uKQjomw
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -79,13 +91,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYmx/8AAoJEKeha0olJ0Nq6BkH/0t2Iw5HlEHzauv0QFAvZMYg
-OFccQAybPwT2PrGhk9/FaEPD3+lfOjAXRl0XTWj929VgLXsH9OfOgAGuGtkstNgC
-adTVVs7q2C0XRI+f+fZyYM0zGHMvbbt2uR3c3sqaC9KVY5yYLlnVMci1I0D1a6w8
-Sxxl11mkX0kW1uWi2DaQi7+9+Da7fAUnaqL5+UXjiONlOh82gl9aD72sEgP57WaK
-ir/mKJ0LEOvYWufFjWnVj+XlA0K1bG5cGsZzwPvReivOptlI9fgiExqOiDUP+ZjA
-Cs7H3CZXU6gs9fTJczJPUyQlQ6H3iip+yvjm+fBEeEXdnyb+CYaFXeDmtsD7kvg=
-=O2oy
+iQEcBAEBCAAGBQJYmyCpAAoJEKeha0olJ0NqCgIH/3tv2n4ONdYJ5I4Rvw2R58f0
+7ZTYcJB7jNRR4Z8NfnjeOqtTdUivsWY8hK9sbjOcRgHNe6irEeXau8Rjlg72nxDO
+NvEP6R/fvLW1Zps+HKk/fV8MqLoFbocV8OMkTd0RumUQ6zpStf4GvvgPIuijo1O/
+f9ZrPxuRCTc708XNUCXSyzvsteGeYmIMr8k3dNoSIVWP4PrdspCPgFeBV7arV0nH
+9KZ30a4fETf6ymPCgsOmTEkTSdb1onoKIech0mIfzciIGDQsEQwLaobqm+fiTXGo
+0dHZHeMzPbLqlqioUrMjOB4XBEgewfrbb7QAZwjEfl3r9fn7wOdVyDDdiizIjG4=
+=cmKu
 -----END PGP SIGNATURE-----
 
---JPu7J5kiN5KRGe8lQ4sKSnJGmN2XCObCk--
+--ixReQglkqTAM22CBSqO3Av8l46uKQjomw--
