@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cbXIx-0005SI-0j
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 13:49:24 -0500
+	(envelope-from <adrian@eitrsystems.com>) id 1cbXTL-0000V9-Mm
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 14:00:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cbXIt-0001qX-Ua
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 13:49:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54146)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1cbXIt-0001qL-MH
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 13:49:19 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C9E2B2E604E
-	for <qemu-devel@nongnu.org>; Wed,  8 Feb 2017 18:49:19 +0000 (UTC)
-Message-ID: <1486579756.3641.30.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Wed, 08 Feb 2017 19:49:16 +0100
-In-Reply-To: <3fa3d4b8-3e3a-d6c4-a2c1-affef7361576@redhat.com>
-References: <1486575331-14455-1-git-send-email-abologna@redhat.com>
-	<1486575331-14455-3-git-send-email-abologna@redhat.com>
-	<3fa3d4b8-3e3a-d6c4-a2c1-affef7361576@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+	(envelope-from <adrian@eitrsystems.com>) id 1cbXTK-0005Gj-Au
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 14:00:07 -0500
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:36324)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <adrian@eitrsystems.com>)
+	id 1cbXTJ-0005Fz-Vh
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 14:00:06 -0500
+Received: by mail-wm0-x22b.google.com with SMTP id c85so209228294wmi.1
+	for <qemu-devel@nongnu.org>; Wed, 08 Feb 2017 11:00:05 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20170208143008.GC22807@lemon.lan>
+References: <CACSixLr14Lhx_4OdVw36DjsjsgHZdk3jxxJ4pZWQ2EXK36p2hw@mail.gmail.com>
+	<08b13ba8-5e66-5fd9-3c4f-b567e87137d8@redhat.com>
+	<20170208143008.GC22807@lemon.lan>
+From: Adrian Suarez <adrian@eitrsystems.com>
+Date: Wed, 8 Feb 2017 11:00:04 -0800
+Message-ID: <CACSixLqwwEw+oPPJzg=Z=NAAN8WBDiynhbvbAhY-MbPBnHqWnQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 2/2] mach-virt: Provide sample
- configuration files
+Subject: Re: [Qemu-devel] Question about QEMU's threading model and stacking
+ multiple block drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,99 +32,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
-Cc: marcel@redhat.com, drjones@redhat.com, kraxel@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Wed, 2017-02-08 at 19:11 +0100, Laszlo Ersek wrote:
-> How about:
->=C2=A0
->=C2=A0=C2=A0=C2=A0For any new guest, its permanent, private variable sto=
-re should
->=C2=A0=C2=A0=C2=A0initially be copied from the template file provided as=
- part of the
->=C2=A0=C2=A0=C2=A0ArmVirtQemu firmware platform (which is occasionally d=
-istributed
->=C2=A0=C2=A0=C2=A0under the AAVMF package).
-
-The naming is confusing enough as it is, no need to drag
-ArmVirtQemu into this I think ;)
-
-> > +# Fedora:
-> > +#=C2=A0=C2=A0=C2=A0/usr/share/edk2/aarch64/QEMU_EFI.fd
-> > +#=C2=A0=C2=A0=C2=A0/usr/share/edk2/aarch64/QEMU_VARS.fd
->=C2=A0
-> Please annotate each as firmware binary & variable store template.
-
-I had such annotations at some points, I got rid of them
-because they seemed a bit redundant. Added them back in.
-
-> Also, I can't verify the exact pathnames for Fedora.
-
-https://koji.fedoraproject.org/koji/rpminfo?rpmID=3D8491933 ;)
-
-[...]
-> > +# RHEL:
-> > +#=C2=A0=C2=A0=C2=A0/usr/share/AAVMF/AAVMF_CODE.fd
-> > +#=C2=A0=C2=A0=C2=A0/usr/share/AAVMF/AAVMF_VARS.fd
->=C2=A0
-> Looks legit. (Might want to call "RHEL" "RHELSA" though, in this contex=
-t
-> -- no clue. Ask Drew :))
-
-Yeah, you're probably right.
-
-[...]
-> Please expand the comment:
->=C2=A0
->=C2=A0=C2=A0=C2=A0CHANGE ME TO THE NAME OF THE FILE THAT YOU CREATED AS =
-A COPY of THE
->=C2=A0=C2=A0=C2=A0VARSTORE TEMPLATE
-
-Nope. The line would get waaay too long, and I trust the
-user to understand the basic idea after having gone through
-the paragraphs above.
-
-Here's an updated version, what do you think about it?
+>
+> Do you only start submitting request to B (step 3) after the fast device
+> I/O
+> completes (step 2.a)? The fact that they are serialized incurs extra
+> latency.
+> Have you tried to do 2 and 3 in parallel with AIO?
 
 
-# Firmware configuration
-# =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
-#
-# There are two parts to the firmware: a read-only image
-# containing the executable code, which is shared between
-# guests, and a read/write variable store that is owned
-# by one specific guest, exclusively, and is used to record
-# information such as the UEFI boot order.
-#
-# For any new guest, its permanent, private variable store
-# should initially be copied from the template file
-# provided along with the firmware binary.
-#
-# Depending on the OS distribution you're using on the
-# host, the name of the package containing the firmware
-# binary and variable store, as well as the paths to the
-# files themselves, will be different. Some examples:
-#
-# Fedora:
-#=C2=A0=C2=A0=C2=A0edk2-aarch64=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(package)
-#=C2=A0=C2=A0=C2=A0/usr/share/edk2/aarch64/QEMU_EFI.fd=C2=A0=C2=A0=C2=A0(=
-binary)
-#=C2=A0=C2=A0=C2=A0/usr/share/edk2/aarch64/QEMU_VARS.fd=C2=A0=C2=A0(templ=
-ate)
-#
-# RHELSA:
-#=C2=A0=C2=A0=C2=A0AAVMF=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(=
-package)
-#=C2=A0=C2=A0=C2=A0/usr/share/AAVMF/AAVMF_CODE.fd=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0(binary)
-#=C2=A0=C2=A0=C2=A0/usr/share/AAVMF/AAVMF_VARS.fd=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0(varstore)
+In step 2, we perform an asynchronous call to the fast device, supplying a
+callback that calls aio_bh_schedule_oneshot() to schedule the completion in
+the AioContext of the block driver. Step 3 uses bdrv_aio_writev(), but I'm
+not sure if this is actually causing the write to be performed
+synchronously to the backing device. What I'm expecting is that
+bdrv_aio_writev() issues the write and then yields so that we don't
+serialize all writes to the backing device.
 
---=C2=A0
-Andrea Bolognani / Red Hat / Virtualization
+Thanks,
+Adrian
+
+On Wed, Feb 8, 2017 at 6:30 AM, Fam Zheng <famz@redhat.com> wrote:
+
+> On Wed, 02/08 14:59, Max Reitz wrote:
+> > CC-ing qemu-block, Stefan, Fam.
+> >
+> >
+> > On 08.02.2017 03:38, Adrian Suarez wrote:
+> > > We=E2=80=99ve implemented a block driver that exposes storage to QEMU=
+ VMs. Our
+> > > block driver (O) is interposing on writes to some other type of stora=
+ge
+> > > (B). O performs low latency replication and then asynchronously issue=
+s
+> the
+> > > write to the backing block driver, B, using bdrv_aio_writev(). Our
+> problem
+> > > is that the write latencies seen by the workload in the guest should =
+be
+> > > those imposed by O plus the guest I/O and QEMU stack (around 25us tot=
+al
+> > > based on our measurements), but we=E2=80=99re actually seeing much hi=
+gher
+> latencies
+> > > (around 120us). We suspect that this is due to the backing block
+> driver B=E2=80=99s
+> > > coroutines blocking our coroutines. The sequence of events is as
+> follows
+> > > (see diagram:
+> > > https://docs.google.com/drawings/d/12h1QbecvxzlKxSFvGKYAzvAJ18kTW
+> 6AVTwDR6VA8hkw/pub?w=3D576&h=3D565
+>
+> I cannot open this, so just trying to understand from steps below..
+>
+> > > ):
+> > >
+> > > 1. Write is issued to our block driver O using the asynchronous
+> interface
+> > > for QEMU block driver.
+> > > 2. Write is replicated to a fast device asynchronously.
+> > > 2.a. In a different thread, the fast device invokes a callback on
+> > > completion that causes a coroutine to be scheduled to run in the QEMU
+> > > iothread that acknowledges completion of the write to the guest OS.
+> > > 2.b. The coroutine scheduled in (2.a) is executed.
+> > > 3. Write is issued asynchronously to the backing block driver, B.
+> > > 3.a. The backing block driver, B, invokes the completion function
+> supplied
+> > > by us, which frees any memory associated with the write (e.g. copies
+> of IO
+> > > vectors).
+>
+> Do you only start submitting request to B (step 3) after the fast device
+> I/O
+> completes (step 2.a)? The fact that they are serialized incurs extra
+> latency.
+> Have you tried to do 2 and 3 in parallel with AIO?
+>
+> > >
+> > > Steps (1), (2), and (3) are performed in the same coroutine (our
+> driver's
+> > > bdrv_aio_writev() implementation). (2.a) is executed in a thread that
+> is
+> > > part of our transport library linked by O, and (2.b) and (3.a) are
+> executed
+> > > as coroutines in the QEMU iothread.
+> > >
+> > > We've tried improving the performance by using separate iothreads for
+> the
+> > > two devices, but this only shaved about lowered the latency to around
+> 100us
+> > > and caused stability issues. What's the best way to create a separate
+> > > iothread for the backing driver to do all of its work in?
+> >
+> > I don't think it's possible to use different AioContexts for
+> > BlockDriverStates in the same BDS chain, at least not currently. But
+> > others may know more about this.
+>
+> This may change in the future but currently all the BDSes in a chain need
+> to
+> stay on the same AioContext.
+>
+> Fam
+>
