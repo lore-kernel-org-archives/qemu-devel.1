@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <juro.bystricky@intel.com>) id 1cba59-0008Ch-Mm
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 16:47:21 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cba6G-0000Sn-S6
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 16:48:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <juro.bystricky@intel.com>) id 1cba55-0003I6-2T
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 16:47:19 -0500
-Received: from mga07.intel.com ([134.134.136.100]:35319)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <juro.bystricky@intel.com>)
-	id 1cba54-0003Hg-NX
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 16:47:15 -0500
-From: Juro Bystricky <juro.bystricky@intel.com>
-Date: Wed,  8 Feb 2017 13:43:11 -0800
-Message-Id: <1486590191-10949-2-git-send-email-juro.bystricky@intel.com>
-In-Reply-To: <1486590191-10949-1-git-send-email-juro.bystricky@intel.com>
-References: <1486590191-10949-1-git-send-email-juro.bystricky@intel.com>
-Subject: [Qemu-devel] [PATCH v2 1/1] nios2: Add Altera JTAG UART emulation
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cba6C-0003r8-0l
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 16:48:28 -0500
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:36341)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cba6B-0003qy-Sk
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 16:48:23 -0500
+Received: by mail-qk0-x243.google.com with SMTP id i34so19724603qkh.3
+	for <qemu-devel@nongnu.org>; Wed, 08 Feb 2017 13:48:23 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1486564125-31366-1-git-send-email-ashijeetacharya@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <edbe0ae7-8727-5e5c-1d08-b4a1bafd6eff@gmail.com>
+Date: Wed, 8 Feb 2017 18:48:19 -0300
+MIME-Version: 1.0
+In-Reply-To: <1486564125-31366-1-git-send-email-ashijeetacharya@gmail.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3] migrate: Introduce zero RAM checks to
+ skip RAM migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,361 +35,69 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: marex@denx.de, crwulff@gmail.com, jurobystricky@hotmail.com, Juro Bystricky <juro.bystricky@intel.com>
+Cc: Ashijeet Acharya <ashijeetacharya@gmail.com>, thuth@redhat.com, quintela@redhat.com, groug@kaod.org, pbonzini@redhat.com, dgilbert@redhat.com
 
-Hardware emulation based on:
-https://www.altera.com/en_US/pdfs/literature/ug/ug_embedded_ip.pdf
 
-Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
----
- default-configs/nios2-softmmu.mak |   1 +
- hw/char/Makefile.objs             |   1 +
- hw/char/altera_juart.c            | 265 ++++++++++++++++++++++++++++++++++++++
- include/hw/char/altera_juart.h    |  44 +++++++
- 4 files changed, 311 insertions(+)
- create mode 100644 hw/char/altera_juart.c
- create mode 100644 include/hw/char/altera_juart.h
 
-diff --git a/default-configs/nios2-softmmu.mak b/default-configs/nios2-softmmu.mak
-index 74dc70c..6159846 100644
---- a/default-configs/nios2-softmmu.mak
-+++ b/default-configs/nios2-softmmu.mak
-@@ -4,3 +4,4 @@ CONFIG_NIOS2=y
- CONFIG_SERIAL=y
- CONFIG_PTIMER=y
- CONFIG_ALTERA_TIMER=y
-+CONFIG_ALTERA_JUART=y
-diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
-index 6ea76fe..f0d0e25 100644
---- a/hw/char/Makefile.objs
-+++ b/hw/char/Makefile.objs
-@@ -27,5 +27,6 @@ common-obj-$(CONFIG_LM32) += lm32_juart.o
- common-obj-$(CONFIG_LM32) += lm32_uart.o
- common-obj-$(CONFIG_MILKYMIST) += milkymist-uart.o
- common-obj-$(CONFIG_SCLPCONSOLE) += sclpconsole.o sclpconsole-lm.o
-+common-obj-$(CONFIG_ALTERA_JUART) += altera_juart.o
- 
- obj-$(CONFIG_VIRTIO) += virtio-serial-bus.o
-diff --git a/hw/char/altera_juart.c b/hw/char/altera_juart.c
-new file mode 100644
-index 0000000..87d0fc8
---- /dev/null
-+++ b/hw/char/altera_juart.c
-@@ -0,0 +1,265 @@
-+/*
-+ * QEMU model of the Altera JTAG UART.
-+ *
-+ * Copyright (c) 2016-2017 Intel Corporation.
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version
-+ * 2 of the License, or (at your option) any later version.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/char/altera_juart.h"
-+#include "sysemu/sysemu.h"
-+#include "qemu/error-report.h"
-+
-+/* Data register */
-+#define R_DATA      0
-+#define DATA_RVALID     BIT(15)
-+#define DATA_RAVAIL     0xFFFF0000
-+
-+/* Control register */
-+#define R_CONTROL   1
-+#define CONTROL_RE      BIT(0)
-+#define CONTROL_WE      BIT(1)
-+#define CONTROL_RI      BIT(8)
-+#define CONTROL_WI      BIT(9)
-+#define CONTROL_AC      BIT(10)
-+#define CONTROL_WSPACE  0xFFFF0000
-+
-+#define CONTROL_WMASK (CONTROL_RE | CONTROL_WE | CONTROL_AC)
-+
-+#define TYPE_ALTERA_JUART "altera-juart"
-+#define ALTERA_JUART(obj) \
-+    OBJECT_CHECK(AlteraJUARTState, (obj), TYPE_ALTERA_JUART)
-+
-+/*
-+ * The JTAG UART core generates an interrupt when either of the individual
-+ * interrupt conditions is pending and enabled.
-+ */
-+static void altera_juart_update_irq(AlteraJUARTState *s)
-+{
-+    unsigned int irq;
-+
-+    irq = ((s->jcontrol & CONTROL_WE) && (s->jcontrol & CONTROL_WI)) ||
-+          ((s->jcontrol & CONTROL_RE) && (s->jcontrol & CONTROL_RI));
-+
-+    qemu_set_irq(s->irq, irq);
-+}
-+
-+static uint64_t altera_juart_read(void *opaque, hwaddr addr, unsigned int size)
-+{
-+    AlteraJUARTState *s = opaque;
-+    uint32_t r;
-+
-+    addr >>= 2;
-+
-+    switch (addr) {
-+    case R_DATA:
-+        r = s->rx_fifo[(s->rx_fifo_pos - s->rx_fifo_len) & (FIFO_LENGTH - 1)];
-+        if (s->rx_fifo_len) {
-+            s->rx_fifo_len--;
-+            qemu_chr_fe_accept_input(&s->chr);
-+            s->jdata = r | DATA_RVALID | (s->rx_fifo_len << 16);
-+            s->jcontrol |= CONTROL_RI;
-+        } else {
-+            s->jdata = 0;
-+            s->jcontrol &= ~CONTROL_RI;
-+        }
-+
-+        altera_juart_update_irq(s);
-+        return s->jdata;
-+
-+    case R_CONTROL:
-+        return s->jcontrol;
-+    }
-+
-+    return 0;
-+}
-+
-+static void altera_juart_write(void *opaque, hwaddr addr,
-+                       uint64_t val64, unsigned int size)
-+{
-+    AlteraJUARTState *s = opaque;
-+    uint32_t value = val64;
-+    unsigned char c;
-+
-+    addr >>= 2;
-+
-+    switch (addr) {
-+    case R_DATA:
-+        c = value & 0xFF;
-+        /*
-+         * We do not decrement the write fifo,
-+         * we "tranmsmit" instanteniously, CONTROL_WI always asserted
-+         */
-+        s->jcontrol |= CONTROL_WI;
-+        s->jdata = c;
-+        qemu_chr_fe_write(&s->chr, &c, 1);
-+        altera_juart_update_irq(s);
-+        break;
-+
-+    case R_CONTROL:
-+        /* Only RE and WE are writable */
-+        value &= CONTROL_WMASK;
-+        s->jcontrol &= ~(CONTROL_WMASK);
-+        s->jcontrol |= value;
-+
-+        /* Writing 1 to AC clears it to 0 */
-+        if (value & CONTROL_AC) {
-+            s->jcontrol &= ~CONTROL_AC;
-+        }
-+        altera_juart_update_irq(s);
-+        break;
-+    }
-+}
-+
-+static void altera_juart_receive(void *opaque, const uint8_t *buf, int size)
-+{
-+    int i;
-+    AlteraJUARTState *s = opaque;
-+
-+    if (s->rx_fifo_len >= FIFO_LENGTH) {
-+        fprintf(stderr, "WARNING: UART dropped char.\n");
-+        return;
-+    }
-+
-+    for (i = 0; i < size; i++) {
-+        s->rx_fifo[s->rx_fifo_pos] = buf[i];
-+        s->rx_fifo_pos++;
-+        s->rx_fifo_pos &= (FIFO_LENGTH - 1);
-+        s->rx_fifo_len++;
-+    }
-+    s->jcontrol |= CONTROL_RI;
-+    altera_juart_update_irq(s);
-+}
-+
-+static int altera_juart_can_receive(void *opaque)
-+{
-+    AlteraJUARTState *s = opaque;
-+    return FIFO_LENGTH - s->rx_fifo_len;
-+}
-+
-+static void altera_juart_reset(DeviceState *d)
-+{
-+    AlteraJUARTState *s = ALTERA_JUART(d);
-+
-+    s->jdata = 0;
-+
-+    /* The number of spaces available in the write FIFO */
-+    s->jcontrol = FIFO_LENGTH << 16;
-+    s->rx_fifo_pos = 0;
-+    s->rx_fifo_len = 0;
-+}
-+
-+static const MemoryRegionOps juart_ops = {
-+    .read = altera_juart_read,
-+    .write = altera_juart_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 4
-+    }
-+};
-+
-+static void altera_juart_init(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    AlteraJUARTState *s = ALTERA_JUART(obj);
-+
-+    memory_region_init_io(&s->mmio,  OBJECT(s), &juart_ops, s,
-+                          TYPE_ALTERA_JUART, 2 * 4);
-+    sysbus_init_mmio(sbd, &s->mmio);
-+    sysbus_init_irq(sbd, &s->irq);
-+}
-+
-+void altera_juart_create(int channel, const hwaddr addr, qemu_irq irq)
-+{
-+    DeviceState *dev;
-+    SysBusDevice *bus;
-+    Chardev *chr;
-+    const char chr_name[] = "juart";
-+    char label[ARRAY_SIZE(chr_name) + 1];
-+
-+    dev = qdev_create(NULL, TYPE_ALTERA_JUART);
-+
-+    if (channel >= MAX_SERIAL_PORTS) {
-+        error_report("Only %d serial ports are supported by QEMU",
-+                     MAX_SERIAL_PORTS);
-+        exit(1);
-+    }
-+
-+    chr = serial_hds[channel];
-+    if (!chr) {
-+        snprintf(label, ARRAY_SIZE(label), "%s%d", chr_name, channel);
-+        chr = qemu_chr_new(label, "null");
-+        if (!(chr)) {
-+            error_report("Can't assign serial port to altera juart%d", channel);
-+            exit(1);
-+        }
-+    }
-+
-+    qdev_prop_set_chr(dev, "chardev", chr);
-+    bus = SYS_BUS_DEVICE(dev);
-+    qdev_init_nofail(dev);
-+
-+    if (addr != (hwaddr)-1) {
-+        sysbus_mmio_map(bus, 0, addr);
-+    }
-+
-+    sysbus_connect_irq(bus, 0, irq);
-+}
-+
-+static const VMStateDescription vmstate_altera_juart = {
-+    .name = "altera-juart" ,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(jdata, AlteraJUARTState),
-+        VMSTATE_UINT32(jcontrol, AlteraJUARTState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void altera_juart_realize(DeviceState *dev, Error **errp)
-+{
-+    AlteraJUARTState *s = ALTERA_JUART(dev);
-+    qemu_chr_fe_set_handlers(&s->chr, altera_juart_can_receive,
-+                             altera_juart_receive, NULL, s, NULL, true);
-+}
-+
-+static Property altera_juart_props[] = {
-+    DEFINE_PROP_CHR("chardev", AlteraJUARTState, chr),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void altera_juart_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+
-+    dc->realize = altera_juart_realize;
-+    dc->props = altera_juart_props;
-+    dc->vmsd = &vmstate_altera_juart;
-+    dc->reset = altera_juart_reset;
-+    dc->desc = "Altera JTAG UART";
-+}
-+
-+static const TypeInfo altera_juart_info = {
-+    .name          = TYPE_ALTERA_JUART,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(AlteraJUARTState),
-+    .instance_init = altera_juart_init,
-+    .class_init    = altera_juart_class_init,
-+};
-+
-+static void altera_juart_register(void)
-+{
-+    type_register_static(&altera_juart_info);
-+}
-+
-+type_init(altera_juart_register)
-diff --git a/include/hw/char/altera_juart.h b/include/hw/char/altera_juart.h
-new file mode 100644
-index 0000000..8a9c892
---- /dev/null
-+++ b/include/hw/char/altera_juart.h
-@@ -0,0 +1,44 @@
-+/*
-+ * Altera JTAG UART emulation
-+ *
-+ * Copyright (c) 2016-2017 Intel Corporation.
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version
-+ * 2 of the License, or (at your option) any later version.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef ALTERA_JUART_H
-+#define ALTERA_JUART_H
-+
-+#include "hw/sysbus.h"
-+#include "sysemu/char.h"
-+
-+/*
-+ * The read and write FIFO depths can be set from 8 to 32,768 bytes.
-+ * Only powers of two are allowed. A depth of 64 is generally optimal for
-+ * performance, and larger values are rarely necessary.
-+ */
-+
-+#define FIFO_LENGTH 64
-+
-+typedef struct AlteraJUARTState {
-+    SysBusDevice busdev;
-+    MemoryRegion mmio;
-+    CharBackend chr;
-+    qemu_irq irq;
-+
-+    unsigned int rx_fifo_pos;
-+    unsigned int rx_fifo_len;
-+    uint32_t jdata;
-+    uint32_t jcontrol;
-+    uint8_t rx_fifo[FIFO_LENGTH];
-+} AlteraJUARTState;
-+
-+void altera_juart_create(int channel, const hwaddr addr, qemu_irq irq);
-+
-+#endif /* ALTERA_JUART_H */
--- 
-2.7.4
+On 02/08/2017 11:28 AM, Ashijeet Acharya wrote:
+> Migration of a "none" machine with no RAM crashes abruptly as
+> bitmap_new() fails and thus aborts. Instead place zero RAM checks at
+> appropriate places to skip migration of RAM in this case and complete
+> migration successfully for devices only.
+>
+> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> ---
+> Changes in v3:
+> - handle migration cleanup appropriately (Dave)
+> Changes in v2:
+> - try to migrate successfully by skipping RAM (Paolo, Greg)
+> - drop the idea of erroring out and failing nicely
+> ---
+>  migration/ram.c | 22 +++++++++++++++-------
+>  1 file changed, 15 insertions(+), 7 deletions(-)
+>
+> diff --git a/migration/ram.c b/migration/ram.c
+> index ef8fadf..faff5ab 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -1325,6 +1325,11 @@ static int ram_find_and_save_block(QEMUFile *f, bool last_stage,
+>      ram_addr_t dirty_ram_abs; /* Address of the start of the dirty page in
+>                                   ram_addr_t space */
+>
+> +    /* No dirty page as there is zero RAM */
+> +    if (!ram_bytes_total()) {
+> +        return pages;
+> +    }
+> +
+>      pss.block = last_seen_block;
+>      pss.offset = last_offset;
+>      pss.complete_round = false;
+> @@ -1912,14 +1917,17 @@ static int ram_save_init_globals(void)
+>      bytes_transferred = 0;
+>      reset_ram_globals();
+>
+> -    ram_bitmap_pages = last_ram_offset() >> TARGET_PAGE_BITS;
+>      migration_bitmap_rcu = g_new0(struct BitmapRcu, 1);
+> -    migration_bitmap_rcu->bmap = bitmap_new(ram_bitmap_pages);
+> -    bitmap_set(migration_bitmap_rcu->bmap, 0, ram_bitmap_pages);
+> -
+> -    if (migrate_postcopy_ram()) {
+> -        migration_bitmap_rcu->unsentmap = bitmap_new(ram_bitmap_pages);
+> -        bitmap_set(migration_bitmap_rcu->unsentmap, 0, ram_bitmap_pages);
+> +    /* Skip setting bitmap if there is no RAM */
+> +    if (ram_bytes_total()) {
+> +        ram_bitmap_pages = last_ram_offset() >> TARGET_PAGE_BITS;
+> +        migration_bitmap_rcu->bmap = bitmap_new(ram_bitmap_pages);
+> +        bitmap_set(migration_bitmap_rcu->bmap, 0, ram_bitmap_pages);
+> +
+> +        if (migrate_postcopy_ram()) {
+> +            migration_bitmap_rcu->unsentmap = bitmap_new(ram_bitmap_pages);
+> +            bitmap_set(migration_bitmap_rcu->unsentmap, 0, ram_bitmap_pages);
+> +        }
+>      }
+>
+>      /*
+>
