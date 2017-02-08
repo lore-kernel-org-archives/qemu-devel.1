@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35869)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cbTpa-0005Bi-33
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 10:06:55 -0500
+	(envelope-from <berto@igalia.com>) id 1cbU9W-0000lT-HT
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 10:27:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cbTpW-00019r-VN
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 10:06:50 -0500
-Received: from greensocs.com ([193.104.36.180]:41091)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cbTpW-00019l-Kv
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 10:06:46 -0500
-References: <1876928241.4705653.1486475589080.ref@mail.yahoo.com>
-	<1876928241.4705653.1486475589080@mail.yahoo.com>
-From: Frederic Konrad <fred.konrad@greensocs.com>
-Message-ID: <900df216-b5ca-3997-7c6b-7047af0da003@greensocs.com>
-Date: Wed, 8 Feb 2017 16:06:41 +0100
+	(envelope-from <berto@igalia.com>) id 1cbU9R-0007OL-Js
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 10:27:26 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170126101827.22378-2-berrange@redhat.com>
+References: <20170126101827.22378-1-berrange@redhat.com>
+	<20170126101827.22378-2-berrange@redhat.com>
+Date: Wed, 08 Feb 2017 16:26:42 +0100
+Message-ID: <w51poissnyl.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <1876928241.4705653.1486475589080@mail.yahoo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] question about binary translation on qemu
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 01/18] block: expose crypto
+ option names / defs to other drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,26 +23,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: oussema ben khedher <oussemakeder@yahoo.fr>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 02/07/2017 02:53 PM, oussema ben khedher wrote:
-> hi=20
-> in my academic project i needed to know how qemu exactly translate an a=
-rm instruction to the host assembly (in my case x86) so if you can help m=
-e to know the function in the source code of qemu that tdo this work=20
-> thank you
->=20
+On Thu 26 Jan 2017 11:18:10 AM CET, Daniel P. Berrange wrote:
+> The block/crypto.c defines a set of QemuOpts that provide
+> parameters for encryption. This will also be needed by
+> the qcow/qcow2 integration, so expose the relevant pieces
+> in a new block/crypto.h header.
+>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 
-Hi,
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
-There is a lot of code involved in the whole translation:
-The guest instructions are not directly translated to the host
-assembly but they are first translated in some intermediate OPs
-(named TCG).
-
-This translation takes place here:
-void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
-In target/arm/translate.c
-
-Fred
+Berto
