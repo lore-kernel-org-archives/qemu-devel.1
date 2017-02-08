@@ -1,22 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cbGBa-0002Rj-E6
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 19:32:39 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cbGMG-0004rJ-Sg
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 19:43:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cbGBZ-000898-G9
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 19:32:38 -0500
-References: <20170123123056.30383-1-famz@redhat.com>
-	<20170123123056.30383-11-famz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <3ec2e40a-c0ff-c347-7ee7-7c90cc97ab00@redhat.com>
-Date: Wed, 8 Feb 2017 01:32:27 +0100
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cbGMD-0004YA-Pt
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 19:43:40 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53516)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1cbGMD-0004Y0-GM
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 19:43:37 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v180hYtk100841
+	for <qemu-devel@nongnu.org>; Tue, 7 Feb 2017 19:43:35 -0500
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28fr07t4c8-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 07 Feb 2017 19:43:31 -0500
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Tue, 7 Feb 2017 17:43:28 -0700
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20170123123056.30383-11-famz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Bqo2SWJsdSha7ciqm2ahmSqqSkMW0BtBU"
-Subject: Re: [Qemu-devel] [PATCH v12 10/16] iotests: 091: Quit QEMU before
- checking image
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+References: <20170207155956.21573-1-pbonzini@redhat.com>
+In-Reply-To: <20170207155956.21573-1-pbonzini@redhat.com>
+Date: Tue, 07 Feb 2017 18:43:18 -0600
+Message-Id: <148651459898.3978.14777421131469511630@loki>
+Subject: Re: [Qemu-devel] [PATCH] link to .xz files to save some bandwidth
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,73 +40,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-block@nongnu.org, eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, rjones@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Bqo2SWJsdSha7ciqm2ahmSqqSkMW0BtBU
-From: Max Reitz <mreitz@redhat.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-block@nongnu.org,
- eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, rjones@redhat.com
-Message-ID: <3ec2e40a-c0ff-c347-7ee7-7c90cc97ab00@redhat.com>
-Subject: Re: [PATCH v12 10/16] iotests: 091: Quit QEMU before checking image
-References: <20170123123056.30383-1-famz@redhat.com>
- <20170123123056.30383-11-famz@redhat.com>
-In-Reply-To: <20170123123056.30383-11-famz@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
+Quoting Paolo Bonzini (2017-02-07 09:59:56)
+> I have converted all .gz and .bz2 files to .xz on download.qemu.org
+> and this patch would change the links in the website.  This would save
+> about 5 GB of bandwidth every day (about 20% savings).
+> =
 
-On 23.01.2017 13:30, Fam Zheng wrote:
-> Signed-off-by: Fam Zheng <famz@redhat.com>
+> xz should be available for all platforms.  Besides providing better
+> compression ratios, decompression of .xz files is about twice as fast
+
+> compared to bzip2.  Compression instead is about 5.5 times slower.
+
+I suppose that's a fair enough trade. :)
+
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+
 > ---
->  tests/qemu-iotests/091 | 2 ++
->  1 file changed, 2 insertions(+)
+>  _download/source.html   | 4 ++--
+>  _includes/releases.html | 4 ++--
+
+Somewhat related: I think _data/releases.yml needs to be updated as it's
+still referencing 2.7.0 instead of 2.7.1. Would one just start updating
+that file with each new release, or is there some other process?
+
+>  2 files changed, 4 insertions(+), 4 deletions(-)
+> =
+
+> diff --git a/_download/source.html b/_download/source.html
+> index 1ac8f4f..d090a5e 100644
+> --- a/_download/source.html
+> +++ b/_download/source.html
+> @@ -15,8 +15,8 @@
+> =
+
+>         {% for release in site.data.releases offset: 0 limit: 1 %}
+>         <p>To download and build QEMU {{release.branch}}.{{release.patch}=
+}:</p>
+> -<pre>wget http://download.qemu-project.org/qemu-{{release.branch}}.{{rel=
+ease.patch}}.tar.bz2
+> -tar xvjf qemu-{{release.branch}}.{{release.patch}}.tar.bz2
+> +<pre>wget http://download.qemu-project.org/qemu-{{release.branch}}.{{rel=
+ease.patch}}.tar.xz
+> +tar xvJf qemu-{{release.branch}}.{{release.patch}}.tar.xz
+>  cd qemu-{{release.branch}}.{{release.patch}}
+>  ./configure
+>  make
+> diff --git a/_includes/releases.html b/_includes/releases.html
+> index 2caab8d..226c719 100644
+> --- a/_includes/releases.html
+> +++ b/_includes/releases.html
+> @@ -1,9 +1,9 @@
+>  <ul>
+>  {% for release in site.data.releases offset: 0 limit: 4 %}
+>  <li><strong><a
+> -  href=3D"http://download.qemu-project.org/qemu-{{release.branch}}.{{rel=
+ease.patch}}.tar.bz2">{{release.branch}}.{{release.patch}}</a></strong>
+> +  href=3D"http://download.qemu-project.org/qemu-{{release.branch}}.{{rel=
+ease.patch}}.tar.xz">{{release.branch}}.{{release.patch}}</a></strong>
+>    {{release.date}}<br><a
+> -  href=3D"http://download.qemu-project.org/qemu-{{release.branch}}.{{rel=
+ease.patch}}.tar.bz2.sig">signature</a> &mdash; <a
+> +  href=3D"http://download.qemu-project.org/qemu-{{release.branch}}.{{rel=
+ease.patch}}.tar.xz.sig">signature</a> &mdash; <a
+>    href=3D"http://wiki.qemu-project.org/ChangeLog/{{release.branch}}">cha=
+nges</a></li>
+>  {% endfor %}
+>  </ul>
+> -- =
+
+> 2.9.3
+> =
+
 >=20
-> diff --git a/tests/qemu-iotests/091 b/tests/qemu-iotests/091
-> index 32bbd56..10ac4a8 100755
-> --- a/tests/qemu-iotests/091
-> +++ b/tests/qemu-iotests/091
-> @@ -95,7 +95,9 @@ echo "vm2: qemu process running successfully"
->  echo "vm2: flush io, and quit"
->  _send_qemu_cmd $h2 'qemu-io disk flush' "(qemu)"
->  _send_qemu_cmd $h2 'quit' ""
-> +_send_qemu_cmd $h1 'quit' ""
-> =20
-> +wait
-
-And to think I added $wait for _cleanup_qemu when it was so simple...
-
-Well:
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-(...maybe _cleanup_qemu's output redirection ability is still useful? I
-don't know.)
-
->  echo "Check image pattern"
->  ${QEMU_IO} -c "read -P 0x22 0 4M" "${TEST_IMG}" | _filter_testdir | _f=
-ilter_qemu_io
-> =20
->=20
-
-
-
---Bqo2SWJsdSha7ciqm2ahmSqqSkMW0BtBU
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliaZxsSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9Ae8YH/iURIsEj/NalSERPTtv0jBVrJZHuwPrj
-h9DwTd3oj27RYfu9hvCiK23LMZJv0Nb2tszXhd5iBiR6DB4KR01TYBwnXyaGHDkr
-YwuFTXZh/Ls4uyrfMRfCQ5qVh4ma+0s4OcJwF7TiiujfjQom8ucoc3QGETESs6Gv
-ULbJkYHBk7CAhtYgrQ4oVLB1Fc+ahKLlmm+QhYaFgLUkPE9C8wSnrqV+oOxWQjID
-GR00sydvJ2aWls5frPmTdw8vaaMRt2zxr/LRcPB6oqQwtLF2GyxKPmr+j6uaooBR
-XE68/mDwA0lY/RXzKA+2HZLDJpwnhcMe2mmwWtBFCE0cy6WVta404YE=
-=E6Gv
------END PGP SIGNATURE-----
-
---Bqo2SWJsdSha7ciqm2ahmSqqSkMW0BtBU--
