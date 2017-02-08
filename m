@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58917)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cbSBL-0001oA-EN
+	(envelope-from <bounces@canonical.com>) id 1cbSBL-0001o9-Dk
 	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:21:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cbSBG-0008GA-IL
+	(envelope-from <bounces@canonical.com>) id 1cbSBG-0008G8-IU
 	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:21:11 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33546)
+Received: from indium.canonical.com ([91.189.90.7]:33548)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cbSBG-0008ET-CM
+	id 1cbSBG-0008EV-Cm
 	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:21:06 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cbSBE-0000l2-2t
+	id 1cbSBD-0000SE-UY
 	for <qemu-devel@nongnu.org>; Wed, 08 Feb 2017 13:21:04 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E65AC2E817B
+	by loganberry.canonical.com (Postfix) with ESMTP id 6CC792E80E5
 	for <qemu-devel@nongnu.org>; Wed,  8 Feb 2017 13:20:57 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 08 Feb 2017 13:15:26 -0000
+Date: Wed, 08 Feb 2017 13:14:54 -0000
 From: "Matwey V. Kornilov" <matwey.kornilov@gmail.com>
 Reply-To: Bug 1661386 <1661386@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20170202204510.26617.69309.malonedeb@wampee.canonical.com>
-Message-Id: <20170208131526.4101.87457.malone@chaenomeles.canonical.com>
+Message-Id: <20170208131455.5112.64377.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1661386] Re: Assertion `ret ==
  cpu->kvm_msr_buf->nmsrs' failed
@@ -39,9 +39,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Attachment added: "x86info.txt"
-   https://bugs.launchpad.net/qemu/+bug/1661386/+attachment/4815388/+files/=
-x86info.txt
+** Attachment added: "dmesg-loglevel9"
+   https://bugs.launchpad.net/qemu/+bug/1661386/+attachment/4815387/+files/=
+dmesg-loglevel9
 
 -- =
 
