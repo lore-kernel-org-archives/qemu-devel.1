@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cbbBQ-0006Eb-Po
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 17:57:53 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cbbBw-0006Vi-0a
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 17:58:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cbbBQ-0007Am-5e
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 17:57:52 -0500
-References: <20170126101827.22378-1-berrange@redhat.com>
-	<20170126101827.22378-9-berrange@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <a169f2b7-1e12-dfb1-8990-ab335be491ea@redhat.com>
-Date: Wed, 8 Feb 2017 23:57:42 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1cbbBv-0007TC-0S
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 17:58:24 -0500
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:35624)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cbbBu-0007SZ-Or
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 17:58:22 -0500
+Received: by mail-wr0-x22d.google.com with SMTP id 89so70416655wrr.2
+	for <qemu-devel@nongnu.org>; Wed, 08 Feb 2017 14:58:22 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20170126101827.22378-9-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="oQmkX0qT4OihS2a7LQT2daqqmqT14rl7m"
-Subject: Re: [Qemu-devel] [PATCH v3 08/18] qcow: make encrypt_sectors
- encrypt in place
+In-Reply-To: <20170207005930.28327-3-laurent@vivier.eu>
+References: <20170207005930.28327-1-laurent@vivier.eu>
+	<20170207005930.28327-3-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 8 Feb 2017 22:58:00 +0000
+Message-ID: <CAFEAcA9dRrmY+86t6uzqnaRynvV4AW3vcCfaqRJKT1gt=E_OJg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 02/16] softloat: disable
+ floatx80_invalid_encoding() for m68k
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,52 +31,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Andreas Schwab <schwab@linux-m68k.org>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---oQmkX0qT4OihS2a7LQT2daqqmqT14rl7m
-From: Max Reitz <mreitz@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <a169f2b7-1e12-dfb1-8990-ab335be491ea@redhat.com>
-Subject: Re: [PATCH v3 08/18] qcow: make encrypt_sectors encrypt in place
-References: <20170126101827.22378-1-berrange@redhat.com>
- <20170126101827.22378-9-berrange@redhat.com>
-In-Reply-To: <20170126101827.22378-9-berrange@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
-
-On 26.01.2017 11:18, Daniel P. Berrange wrote:
-> Instead of requiring separate input/output buffers for
-> encrypting data, change encrypt_sectors() to assume
-> use of a single buffer, encrypting in place. One current
-> caller uses the same buffer for input/output already
-> and the other two callers are easily converted to do so.
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+On 7 February 2017 at 00:59, Laurent Vivier <laurent@vivier.eu> wrote:
+> According to the comment, this definition of invalid encoding is given
+> by intel developer's manual, and doesn't work with the behavior
+> of 680x0 FPU.
+>
+> CC: Andreas Schwab <schwab@linux-m68k.org>
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 > ---
->  block/qcow.c | 44 +++++++++++++++-----------------------------
->  1 file changed, 15 insertions(+), 29 deletions(-)
+>  fpu/softfloat.c         | 31 +++++++++++++++++++++++++++++++
+>  include/fpu/softfloat.h | 15 ---------------
+>  2 files changed, 31 insertions(+), 15 deletions(-)
+>
+> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+> index c295f31..f95b19f 100644
+> --- a/fpu/softfloat.c
+> +++ b/fpu/softfloat.c
+> @@ -4799,6 +4799,37 @@ int float64_unordered_quiet(float64 a, float64 b, =
+float_status *status)
+>  }
+>
+>  /*----------------------------------------------------------------------=
+------
+> +| Return whether the given value is an invalid floatx80 encoding.
+> +| Invalid floatx80 encodings arise when the integer bit is not set, but
+> +| the exponent is not zero. The only times the integer bit is permitted =
+to
+> +| be zero is in subnormal numbers and the value zero.
+> +| This includes what the Intel software developer's manual calls pseudo-=
+NaNs,
+> +| pseudo-infinities and un-normal numbers. It does not include
+> +| pseudo-denormals, which must still be correctly handled as inputs even
+> +| if they are never generated as outputs.
+> +*-----------------------------------------------------------------------=
+-----*/
+> +static inline bool floatx80_invalid_encoding(floatx80 a)
+> +{
+> +#if defined(TARGET_M68K)
+> +    /*------------------------------------------------------------------=
+-------
+> +    |  M68000 FAMILY PROGRAMMER=E2=80=99S REFERENCE MANUAL
+> +    |  1.6.2 Denormalized Numbers
+> +    |  Since the extended-precision data format has an explicit integer =
+bit,
+> +    |  a number can be formatted with a nonzero exponent, less than the =
+maximum
+> +    |  value, and a zero integer bit.  The IEEE 754 standard does not de=
+fine a
+> +    |  zero integer bit. Such a number is an unnormalized number. Hardwa=
+re does
+> +    |  not directly support denormalized and unnormalized numbers, but
+> +    |  implicitly supports them by trapping them as unimplemented data t=
+ypes,
+> +    |  allowing efficient conversion in software.
+> +    *-------------------------------------------------------------------=
+-----*/
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+This comment says that numbers of the form that this function
+identifies (zero integer bit and nonzero exponent) are
+supposed to trap on m68k. That suggests that the target/m68k code
+is going to need to catch this case before it calls softfloat
+code. So (a) we don't care what the softfloat code does
+with these representations because they'll never get to it
+and (b) the m68k code could probably use floatx80_invalid_encoding()
+as a function to identify where it needs to trap, which it
+can't do if it's moved out of softfloat.h.
 
+Either way this change doesn't seem right given what the
+comment describes...
 
---oQmkX0qT4OihS2a7LQT2daqqmqT14rl7m
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlibomYSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AgxwH/0BuDOhxQmL8MROzcz+eBcEZcA1q++4U
-GFwwaC9q0MarN21nDwaM8W1STnqufJHNSZpQR4XocVg8CzJx1CpgYyAUpnvBZahm
-WWIBeRdAnnkg1NQHi8DVfhYcrL/YrW7w/ZuppUnDf7zmUbwMLrHNfPQw8JN0ZpfJ
-7zLyiA3iiwBAtYDGnaHq6J5Lp5zZZ5QuXYsNLsU6r7dMkRkgDhWN2fh7WjLdyMeJ
-vsidXrnnLz1TP4k/heiRcRTe6AbefMdk6Q14RkEFOCkTrFS0eWXUYnrztjhg1nor
-uCsATuXUImsKI/wzXx95p2DCtqo2XRQN4zU2/hujUHq6n3zRM1RS6Po=
-=N1KI
------END PGP SIGNATURE-----
-
---oQmkX0qT4OihS2a7LQT2daqqmqT14rl7m--
+thanks
+-- PMM
