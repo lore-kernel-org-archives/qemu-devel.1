@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47975)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cbHim-0000HL-Fo
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 21:11:01 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cbHlQ-0001Vg-C8
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 21:13:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cbHii-0004Ht-E9
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 21:11:00 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57938)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cbHii-0004Hl-8H
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 21:10:56 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cbHig-0004iJ-PT
-	for <qemu-devel@nongnu.org>; Wed, 08 Feb 2017 02:10:54 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B7DB12E80C4
-	for <qemu-devel@nongnu.org>; Wed,  8 Feb 2017 02:10:54 +0000 (UTC)
+	(envelope-from <rth7680@gmail.com>) id 1cbHlP-0005Hl-9H
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 21:13:44 -0500
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1486360515-22989-1-git-send-email-bharata@linux.vnet.ibm.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <59baf91a-458a-5160-4849-1dbc142d1efd@twiddle.net>
+Date: Tue, 7 Feb 2017 18:13:28 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 08 Feb 2017 02:04:29 -0000
-From: wayen <1662050@bugs.launchpad.net>
-Reply-To: Bug 1662050 <1662050@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170206024535.14624.3001.malonedeb@soybean.canonical.com>
-Message-Id: <20170208020429.6409.26519.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1662050] Re: qemu-img convert a overlay qcow2
- image into a entire image
+In-Reply-To: <1486360515-22989-1-git-send-email-bharata@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3] softfloat: Add round-to-odd rounding
+ mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,39 +24,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, nikunj@linux.vnet.ibm.com, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-@Thomas Huth, when we use qemu-img to convert a image "A" and will get a
-new image "B" which is equivalent to "A" . But "B" may be a lot
-different from "A",such as file size. The file size of "B" is usually
-less than "A" and this is very valuable to me. So I can't simply do a
-"cp delta.qcow2 new.qcow2" ?
+On 02/05/2017 09:55 PM, Bharata B Rao wrote:
+> Power ISA 3.0 introduces a few quadruple precision floating point
+> instructions that support round-to-odd rounding mode. The
+> round-to-odd mode is explained as under:
+>
+> Let Z be the intermediate arithmetic result or the operand of a convert
+> operation. If Z can be represented exactly in the target format, the
+> result is Z. Otherwise the result is either Z1 or Z2 whichever is odd.
+> Here Z1 and Z2 are the next larger and smaller numbers representable
+> in the target format respectively.
+>
+> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> Tested the corner cases for round-to-odd and the default round-to-nearest-even
+> by comparing the results of QEMU with a known good implementation of
+> PowerPC ISA 3.0 for the following instructions: xsaddqp[o], xsdivqp[o],
+> xsmulqp[o] and xscvqpdp[o].
+>
+> Changes in v3:
+>
+> - Limited the recalculation of roundIncrement in 64bit rounding only
+>   to round-to-odd case and hence dropped the separate patch which
+>   did this for all rounding modes earlier. (Peter Maydell)
+> - Resorted to QEMU codying style in softfloat.c
 
--- =
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1662050
 
-Title:
-  qemu-img convert a overlay qcow2 image into a entire image
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  I have a base image file "base.qcow2" and a delta qcow2 image file
-  "delta.qcow2" whose backing file is "base.qcow2".
-
-  Now I use qemu-img to convert "delta.qcow2" and will get a new image
-  file "new.qcow2" which is entire and equivalent to combination of
-  "base.qcow2" and "delta.qcow2".
-
-  In fact,I don't want to get a complete image.I just want to convert
-  delta qcow2 image file "A" to a New delta overlay qcow2 image "B"
-  which is equivalent to "A". So the "new.qcow2" is not what i want. I
-  have to admit that this is not bug. Could you please take this as a
-  new feature and enable qemu-img to convert qcow2 overlay itself?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1662050/+subscriptions
+r~
