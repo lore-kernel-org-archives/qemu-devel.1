@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cbWmo-00079q-7p
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 13:16:11 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cbWuK-0000i1-PF
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 13:23:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cbWml-0000cS-2S
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 13:16:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35166)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1cbWmk-0000cO-IF
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 13:16:06 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C83237FB7D
-	for <qemu-devel@nongnu.org>; Wed,  8 Feb 2017 18:16:06 +0000 (UTC)
-References: <20170207135211.15870-1-marcandre.lureau@redhat.com>
-	<20170207135211.15870-10-marcandre.lureau@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <ce3e8aa6-3004-55d7-36a5-f03d58a9662b@redhat.com>
-Date: Wed, 8 Feb 2017 13:16:05 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cbWuK-000376-2c
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 13:23:56 -0500
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:37966)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cbWuJ-00036b-SG
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 13:23:56 -0500
+Received: by mail-wm0-x22d.google.com with SMTP id r141so197196382wmg.1
+	for <qemu-devel@nongnu.org>; Wed, 08 Feb 2017 10:23:53 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20170207135211.15870-10-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 09/28] tests: fix ide-test leaks
+In-Reply-To: <C4E1DF44-1626-425D-880E-0053AD688422@linaro.org>
+References: <1486560712-44171-1-git-send-email-agraf@suse.de>
+	<ef6b903b-5224-b4eb-1080-a3689fcec70a@redhat.com>
+	<f2f119bc-9c22-ad52-ff26-7d6ecc213a3c@suse.de>
+	<c1ff3829-b068-881a-1523-317ef0d31689@redhat.com>
+	<C4E1DF44-1626-425D-880E-0053AD688422@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 8 Feb 2017 18:23:32 +0000
+Message-ID: <CAFEAcA8rjjzgvN-RuNPVHM53R9V9xry1Uj_ArmF1va-Y920eBQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] target-arm: Declare virtio-mmio
+ as dma-coherent in dt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,129 +33,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Laszlo Ersek <lersek@redhat.com>, Shannon Zhao <shannon.zhao@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>
 
+On 8 February 2017 at 16:27, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> The _CCA property is mandatory on arm64, and there is no default.
 
+Is there a tool that can check this kind of requirement
+and complain about issues in the ACPI tables (and
+ditto, device tree)? It's really easy to produce a
+dt or ACPI table that works with current kernels and
+then turns out to have a problem six or twelve
+months down the line :-(
 
-On 02/07/2017 08:51 AM, Marc-Andr=C3=A9 Lureau wrote:
-> Spotted by ASAN.
->=20
-> Cc: John Snow <jsnow@redhat.com>
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  tests/ide-test.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
->=20
-> diff --git a/tests/ide-test.c b/tests/ide-test.c
-> index fb541f88b5..2fa97bc36b 100644
-> --- a/tests/ide-test.c
-> +++ b/tests/ide-test.c
-> @@ -339,6 +339,7 @@ static void test_bmdma_simple_rw(void)
->      g_assert(memcmp(buf, cmpbuf, len) =3D=3D 0);
-> =20
-> =20
-> +    free_pci_device(dev);
->      g_free(buf);
->      g_free(cmpbuf);
->  }
-> @@ -369,6 +370,7 @@ static void test_bmdma_short_prdt(void)
->                                prdt, ARRAY_SIZE(prdt), NULL);
->      g_assert_cmphex(status, =3D=3D, 0);
->      assert_bit_clear(qpci_io_readb(dev, ide_bar, reg_status), DF | ERR=
-);
-> +    free_pci_device(dev);
->  }
-> =20
->  static void test_bmdma_one_sector_short_prdt(void)
-> @@ -398,6 +400,7 @@ static void test_bmdma_one_sector_short_prdt(void)
->                                prdt, ARRAY_SIZE(prdt), NULL);
->      g_assert_cmphex(status, =3D=3D, 0);
->      assert_bit_clear(qpci_io_readb(dev, ide_bar, reg_status), DF | ERR=
-);
-> +    free_pci_device(dev);
->  }
-> =20
->  static void test_bmdma_long_prdt(void)
-> @@ -426,6 +429,7 @@ static void test_bmdma_long_prdt(void)
->                                prdt, ARRAY_SIZE(prdt), NULL);
->      g_assert_cmphex(status, =3D=3D, BM_STS_INTR);
->      assert_bit_clear(qpci_io_readb(dev, ide_bar, reg_status), DF | ERR=
-);
-> +    free_pci_device(dev);
->  }
-> =20
->  static void test_bmdma_no_busmaster(void)
-> @@ -449,6 +453,7 @@ static void test_bmdma_no_busmaster(void)
->       * in practice. At least we want to be aware of any changes. */
->      g_assert_cmphex(status, =3D=3D, BM_STS_ACTIVE | BM_STS_INTR);
->      assert_bit_clear(qpci_io_readb(dev, ide_bar, reg_status), DF | ERR=
-);
-> +    free_pci_device(dev);
->  }
-> =20
->  static void test_bmdma_setup(void)
-> @@ -525,6 +530,7 @@ static void test_identify(void)
->      assert_bit_set(buf[85], 0x20);
-> =20
->      ide_test_quit();
-> +    free_pci_device(dev);
->  }
-> =20
->  /*
-> @@ -562,6 +568,7 @@ static void make_dirty(uint8_t device)
->      assert_bit_clear(qpci_io_readb(dev, ide_bar, reg_status), DF | ERR=
-);
-> =20
->      g_free(buf);
-> +    free_pci_device(dev);
->  }
-> =20
->  static void test_flush(void)
-> @@ -608,6 +615,7 @@ static void test_flush(void)
->      assert_bit_clear(data, BSY | DF | ERR | DRQ);
-> =20
->      ide_test_quit();
-> +    free_pci_device(dev);
->  }
-> =20
->  static void test_retry_flush(const char *machine)
-> @@ -658,6 +666,7 @@ static void test_retry_flush(const char *machine)
->      assert_bit_clear(data, BSY | DF | ERR | DRQ);
-> =20
->      ide_test_quit();
-> +    free_pci_device(dev);
->  }
-> =20
->  static void test_flush_nodev(void)
-> @@ -675,6 +684,7 @@ static void test_flush_nodev(void)
-> =20
->      /* Just testing that qemu doesn't crash... */
-> =20
-> +    free_pci_device(dev);
->      ide_test_quit();
->  }
-> =20
-> @@ -741,6 +751,7 @@ static uint8_t ide_wait_clear(uint8_t flag)
->      while (true) {
->          data =3D qpci_io_readb(dev, ide_bar, reg_status);
->          if (!(data & flag)) {
-> +            free_pci_device(dev);
->              return data;
->          }
->          if (difftime(time(NULL), st) > 5.0) {
-> @@ -850,6 +861,7 @@ static void cdrom_pio_impl(int nblocks)
->      g_free(pattern);
->      g_free(rx);
->      test_bmdma_teardown();
-> +    free_pci_device(dev);
->  }
-> =20
->  static void test_cdrom_pio(void)
->=20
-
-Reviewed-by: John Snow <jsnow@redhat.com>
-
-And since valgrind yelled at me when I went to test it, I sent a related
-patch out too.
-
---js
+thanks
+-- PMM
