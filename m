@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52134)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cbYDG-000397-08
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 14:47:35 -0500
+	(envelope-from <lersek@redhat.com>) id 1cbYFM-0004Il-Is
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 14:49:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cbYDC-0004pr-UL
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 14:47:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34020)
+	(envelope-from <lersek@redhat.com>) id 1cbYFJ-0005YY-Hg
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 14:49:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47836)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1cbYDC-0004pl-Op
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 14:47:30 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B70B47E9CE
-	for <qemu-devel@nongnu.org>; Wed,  8 Feb 2017 19:47:30 +0000 (UTC)
-Message-ID: <1486583247.3641.34.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Wed, 08 Feb 2017 20:47:27 +0100
-In-Reply-To: <7952cdc6-9852-7a5e-27bd-2d2d1a859866@redhat.com>
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cbYFJ-0005YN-Bl
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 14:49:41 -0500
 References: <1486575331-14455-1-git-send-email-abologna@redhat.com>
 	<1486575331-14455-3-git-send-email-abologna@redhat.com>
-	<3fa3d4b8-3e3a-d6c4-a2c1-affef7361576@redhat.com>
-	<1486579756.3641.30.camel@redhat.com>
-	<7952cdc6-9852-7a5e-27bd-2d2d1a859866@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+	<CAFEAcA8+wfPQXXhoYZDv8LAOS6=4_P9kyaHONuMQcb7VmkVyxw@mail.gmail.com>
+	<1486582091.3641.32.camel@redhat.com>
+	<CAFEAcA_txm4n6U1k3ZsTqb=91j5bm9H1i4FtzR92ybnFy-WJ_Q@mail.gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <a3ae8f50-30cf-f576-7b02-ba3646cb5a56@redhat.com>
+Date: Wed, 8 Feb 2017 20:49:37 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA_txm4n6U1k3ZsTqb=91j5bm9H1i4FtzR92ybnFy-WJ_Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH v5 2/2] mach-virt: Provide sample
  configuration files
 List-Id: <qemu-devel.nongnu.org>
@@ -37,71 +31,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
-Cc: marcel@redhat.com, drjones@redhat.com, kraxel@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>, Andrea Bolognani <abologna@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>, Andrew Jones <drjones@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On Wed, 2017-02-08 at 20:34 +0100, Laszlo Ersek wrote:
-> > > Also, I can't verify the exact pathnames for Fedora.
-> >=C2=A0
-> > https://koji.fedoraproject.org/koji/rpminfo?rpmID=3D8491933 ;)
->=C2=A0
-> Ahhh, it's *very* good that you provided this reference, because now I
-> see that the file names below are incorrect. Namely, for aarch64 guests=
-,
-> you have to use the files that are padded to 64MB, *not* the files as
-> they fall out of the edk2 build process.
+On 02/08/17 20:36, Peter Maydell wrote:
+> On 8 February 2017 at 19:28, Andrea Bolognani <abologna@redhat.com> wrote:
+>> On Wed, 2017-02-08 at 18:32 +0000, Peter Maydell wrote:
 
-Go figure... Thanks for spotting that!
+>>> Won't most guests expect serial to be the default
+>>> PL011 UART ?
+>>
+>> Possibly. I'm using virtconsole here (and in q35*serial.cfg)
+>> mostly to have as much VirtIO as possible, but I also
+>> document the fact that you might want or need to use the
+>> native serial console instead.
+>>
+>> Moreover, something that I haven't been able to do on
+>> mach-virt (even though I could on q35, but again, I want the
+>> files to be as close as possible) is to configure the serial
+>> console from the configuration file.
+> 
+> If there's stuff we can fix in the virt board to make
+> this work the way it does on the PC model I'm happy
+> to make fixes to help.
+> 
+>> Seeing as we have an alternative, I'd rather keep it this
+>> way and minimize the number of command line arguments the
+>> user needs to specify.
+> 
+> The trouble with using virtconsole is that you have to
+> get quite a long way forward (probing and setting up
+> PCI, etc) before you can get any kind of console output.
+> "System doesn't boot and doesn't produce any output"
+> is a common and really annoying failure mode in the
+> ARM world, and I think that using virtconsole is
+> asking for that kind of thing to happen more rather
+> than less often.
 
-[...]
-> > # Depending on the OS distribution you're using on the
-> > # host, the name of the package containing the firmware
-> > # binary and variable store, as well as the paths to the
->=C2=A0
-> red flag: please say "variable store *template*"
+My point exactly.
+Thanks
+Laszlo
 
-Right. Missed it, sorry.
-
-[...]
-> > # Fedora:
-> > #=C2=A0=C2=A0=C2=A0edk2-aarch64=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(package)
-> > #=C2=A0=C2=A0=C2=A0/usr/share/edk2/aarch64/QEMU_EFI.fd=C2=A0=C2=A0=C2=
-=A0(binary)
-> > #=C2=A0=C2=A0=C2=A0/usr/share/edk2/aarch64/QEMU_VARS.fd=C2=A0=C2=A0(t=
-emplate)
-> > #
-> > # RHELSA:
-> > #=C2=A0=C2=A0=C2=A0AAVMF=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0(package)
-> > #=C2=A0=C2=A0=C2=A0/usr/share/AAVMF/AAVMF_CODE.fd=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0(binary)
-> > #=C2=A0=C2=A0=C2=A0/usr/share/AAVMF/AAVMF_VARS.fd=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0(varstore)
->=C2=A0
-> Two comments:
->=C2=A0
-> - Under Fedora, you have (template), which is cool, (varstore) is bad. =
-:)
-
-That just shows that I'm getting really tired and I should
-step away from the keyboard for the day :/
-
-> - Again, the files you note above for Fedora are 2MB and 768KB in size,
-> respectively, which is wrong. The files you note for RHELSA are both
-> 64MB in size, which is right. Fedora ships the according files as well,
-> but their names are different:
->=C2=A0
-> /usr/share/edk2/aarch64/QEMU_EFI-pflash.raw=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0(binary)
-> /usr/share/edk2/aarch64/vars-template-pflash.raw (varstore template)
-
-Consider it fixed!
-
-(Those filenames, though... Ewww.)
-
---=C2=A0
-Andrea Bolognani / Red Hat / Virtualization
+> (Plus having two different serial
+> ports in the guest means that now the user has to
+> configure where both of them are supposed to output.)
+> 
+> thanks
+> -- PMM
+> 
