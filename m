@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60946)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cbOZb-0001ZU-9M
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 04:30:00 -0500
+	(envelope-from <liq3ea@gmail.com>) id 1cbOZm-0001hV-7J
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 04:30:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cbOZX-0002Bd-7b
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 04:29:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35712)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cbOZX-0002BL-25
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 04:29:55 -0500
-References: <20170207155956.21573-1-pbonzini@redhat.com>
-	<b7fc7007-1663-b41d-422a-9600e44d7b38@redhat.com>
-	<87zihxukx2.fsf@dusky.pond.sub.org>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <fbeb5f1b-add8-855f-5430-51705e3c5333@redhat.com>
-Date: Wed, 8 Feb 2017 10:29:50 +0100
+	(envelope-from <liq3ea@gmail.com>) id 1cbOZj-0002Fs-55
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 04:30:10 -0500
+Received: from mail-io0-x233.google.com ([2607:f8b0:4001:c06::233]:33105)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1cbOZi-0002FO-V8
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 04:30:07 -0500
+Received: by mail-io0-x233.google.com with SMTP id v96so111515596ioi.0
+	for <qemu-devel@nongnu.org>; Wed, 08 Feb 2017 01:30:06 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <87zihxukx2.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] link to .xz files to save some bandwidth
+In-Reply-To: <809ED5C6-3D96-4D94-A7D3-5DCB9B2A4DED@daynix.com>
+References: <589996bb.02482e0a.10629.5b0e@mx.google.com>
+	<809ED5C6-3D96-4D94-A7D3-5DCB9B2A4DED@daynix.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Wed, 8 Feb 2017 17:30:05 +0800
+Message-ID: <CAKXe6SKB2VpBsVmSPE5DnZiNduKvc=SJPsOobrwcrYqqDJbNeg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] net: e1000e: fix an infinite loop issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +28,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
+To: Dmitry Fleytman <dmitry@daynix.com>
+Cc: Jason Wang <jasowang@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Li Qiang <liqiang6-s@360.cn>
 
-On 02/08/17 09:49, Markus Armbruster wrote:
-> Eric Blake <eblake@redhat.com> writes:
-> 
->> On 02/07/2017 09:59 AM, Paolo Bonzini wrote:
->>> I have converted all .gz and .bz2 files to .xz on download.qemu.org
->>> and this patch would change the links in the website.  This would save
->>> about 5 GB of bandwidth every day (about 20% savings).
->>>
->>> xz should be available for all platforms.  Besides providing better
->>> compression ratios, decompression of .xz files is about twice as fast
->>> compared to bzip2.  Compression instead is about 5.5 times slower.
->>
->> I agree that bzip2 is pointless these days; .gz is a bit more important
->> when targetting older platforms but I think that does not describe
->> qemu's target audience.  Do we want to even enter the xz vs. lzma
->> controversy, or are we okay with being xz-only?
-> 
-> Pointer to / summary of the controversy, so that folks can decide
-> whether they care?
-> 
+Hello,
 
-http://www.nongnu.org/lzip/xz_inadequate.html
+2017-02-08 16:38 GMT+08:00 Dmitry Fleytman <dmitry@daynix.com>:
 
-https://www.reddit.com/r/linux/comments/58swzc/xz_format_inadequate_for_longterm_archiving/
+> Hello,
+>
+> Thanks for the patch!
+>
+> The problem of infinite loop indeed exists in e1000e, however it is
+> different from the one fixed in e1000.
+> Please find my comments inline.
+>
+>
+If I read the code correctly, I think this issue is the same. Could you
+please explain more? Thanks.
+
+
+> ~Dmitry
+>
+> > On 7 Feb 2017, at 11:43 AM, Li Qiang <liq3ea@gmail.com> wrote:
+> >
+> > From: Li Qiang <liqiang6-s@360.cn>
+> >
+> > This issue is the same as e1000 network card in this commit:
+> > e1000: eliminate infinite loops on out-of-bounds transfer start.
+> >
+> > Signed-off-by: Li Qiang <liqiang6-s@360.cn>
+> > ---
+> > hw/net/e1000e_core.c | 17 ++++++++++++++++-
+> > 1 file changed, 16 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+> > index 2b11499..53f2b1d 100644
+> > --- a/hw/net/e1000e_core.c
+> > +++ b/hw/net/e1000e_core.c
+> > @@ -914,7 +914,8 @@ e1000e_start_xmit(E1000ECore *core, const
+> E1000E_TxRing *txr)
+> >     struct e1000_tx_desc desc;
+> >     bool ide = false;
+> >     const E1000E_RingInfo *txi = txr->i;
+> > -    uint32_t cause = E1000_ICS_TXQE;
+> > +    uint32_t tdh_start = core->mac[txi->dh], cause = E1000_ICS_TXQE;
+> > +
+> >
+> >     if (!(core->mac[TCTL] & E1000_TCTL_EN)) {
+> >         trace_e1000e_tx_disabled();
+> > @@ -933,6 +934,14 @@ e1000e_start_xmit(E1000ECore *core, const
+> E1000E_TxRing *txr)
+> >         cause |= e1000e_txdesc_writeback(core, base, &desc, &ide,
+> txi->idx);
+> >
+> >         e1000e_ring_advance(core, txi, 1);
+> > +
+> > +        /*
+> > +         * The following avoid infinite loop, just as the e1000
+> > +         */
+> > +        if (core->mac[txi->dh] == tdh_start ||
+> > +            tdh_start >= core->mac[txi->dlen] / E1000_RING_DESC_LEN) {
+> > +            break;
+> > +            }
+>
+> Part of this validity check, namely
+> tdh_start >= core->mac[txi->dlen] / E1000_RING_DESC_LEN)
+> already done by e1000e_ring_advance(), therefore not needed here.
+>
+>
+e1000e_ring_advance() check the added r->dh. Not the original one.
+
+
+> The second part - full wraparound protection is relevant, but it fixes
+> more symptoms than the cause.
+> The only possible cause for full wraparound is r->dt (tail) value bigger
+> or equal to r->dlen (length),
+> so I would suggest to check for this in e1000e_ring_empty() and cover both
+> TX and RX cases at once.
+>
+>
+Do you mean 'core->mac[r->dt] >= core->mac[r->dlen]' indicate an empty ring?
+
+
+> >     }
+> >
+> >     if (!ide || !e1000e_intrmgr_delay_tx_causes(core, &cause)) {
+> > @@ -1500,6 +1509,7 @@ e1000e_write_packet_to_guest(E1000ECore *core,
+> struct NetRxPkt *pkt,
+> >     size_t desc_size;
+> >     size_t desc_offset = 0;
+> >     size_t iov_ofs = 0;
+> > +    uint32_t rdh_start;
+> >
+> >     struct iovec *iov = net_rx_pkt_get_iovec(pkt);
+> >     size_t size = net_rx_pkt_get_total_len(pkt);
+> > @@ -1509,6 +1519,7 @@ e1000e_write_packet_to_guest(E1000ECore *core,
+> struct NetRxPkt *pkt,
+> >     bool do_ps = e1000e_do_ps(core, pkt, &ps_hdr_len);
+> >
+> >     rxi = rxr->i;
+> > +    rdh_start = core->mac[rxi->dh];
+> >
+> >     do {
+> >         hwaddr ba[MAX_PS_BUFFERS];
+> > @@ -1605,6 +1616,10 @@ e1000e_write_packet_to_guest(E1000ECore *core,
+> struct NetRxPkt *pkt,
+> >         e1000e_ring_advance(core, rxi,
+> >                             core->rx_desc_len / E1000_MIN_RX_DESC_LEN);
+> >
+> > +        if (core->mac[rxi->dh] == rdh_start ||
+> > +            rdh_start >= core->mac[rxi->dlen] / E1000_RING_DESC_LEN) {
+> > +            break;
+> > +            }
+> >     } while (desc_offset < total_size);
+> >
+> >     e1000e_update_rx_stats(core, size, total_size);
+> > --
+> > 1.8.3.1
+> >
+>
+>
