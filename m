@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cbGRF-00009H-S6
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 19:48:51 -0500
+	(envelope-from <lersek@redhat.com>) id 1cbGV2-00029y-Hl
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 19:52:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cbGRC-00072e-Ng
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 19:48:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44618)
+	(envelope-from <lersek@redhat.com>) id 1cbGUz-0000Z2-7j
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 19:52:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44092)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cbGRC-000723-FL
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 19:48:46 -0500
-References: <cover.1486285434.git.ben@skyportsystems.com>
-	<28ff6ff023dd041fc7557955dea916adce72efea.1486285434.git.ben@skyportsystems.com>
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cbGUy-0000Xs-Uz
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 19:52:41 -0500
+References: <1484739954-86833-1-git-send-email-phil@philjordan.eu>
+	<20170118175335-mutt-send-email-mst@kernel.org>
+	<20170118181918.783cb7bd@nial.brq.redhat.com>
+	<CAAibmn0OEBsZUyxuKcssk-4V-=fA94QWFCk04Lt9rbFN66OgEg@mail.gmail.com>
+	<20170131165802-mutt-send-email-mst@kernel.org>
+	<fe787fcc-0c92-5842-1a67-b50466b6f38f@redhat.com>
+	<CAAibmn1eEFMdn_-hcaFudOO8D7crkfYYw+k88=CGJfJ0fmU6JA@mail.gmail.com>
+	<58a49e30-7e64-9d0f-3a45-f0ff19e72210@redhat.com>
+	<CAAibmn1teqEghW0C5qSKL3zJXkH9obkLfKZ3VtBjuu4U2V99kw@mail.gmail.com>
 From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <14f224ed-08e2-cbad-9d1d-8f559cd399a6@redhat.com>
-Date: Wed, 8 Feb 2017 01:48:42 +0100
+Message-ID: <19398592-8b69-9fd3-5532-c53234a07837@redhat.com>
+Date: Wed, 8 Feb 2017 01:52:36 +0100
 MIME-Version: 1.0
-In-Reply-To: <28ff6ff023dd041fc7557955dea916adce72efea.1486285434.git.ben@skyportsystems.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <CAAibmn1teqEghW0C5qSKL3zJXkH9obkLfKZ3VtBjuu4U2V99kw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 05/10] ACPI: Add Virtual Machine
- Generation ID support
+Subject: Re: [Qemu-devel] [PATCH RFC] acpi: add reset register to fadt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,200 +34,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ben@skyportsystems.com, imammedo@redhat.com, mst@redhat.com
-Cc: qemu-devel@nongnu.org
+To: Phil Dennis-Jordan <phil@philjordan.eu>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 02/05/17 10:12, ben@skyportsystems.com wrote:
-> From: Ben Warren <ben@skyportsystems.com>
+On 02/07/17 22:02, Phil Dennis-Jordan wrote:
+> On 7 February 2017 at 20:54, Laszlo Ersek <lersek@redhat.com> wrote:
+
+>> I filed <https://bugzilla.tianocore.org/show_bug.cgi?id=368>.
 > 
-> This implements the VM Generation ID feature by passing a 128-bit
-> GUID to the guest via a fw_cfg blob.
-> Any time the GUID changes, an ACPI notify event is sent to the guest
+> That looks nice and thorough.
 > 
-> The user interface is a simple device with one parameter:
->  - guid (string, must be "auto" or in UUID format
->    xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+>>> Your EDK2 patch
+>>
+>> For the record:
+>> [1] https://lists.01.org/pipermail/edk2-devel/2017-February/007072.html
+>>
+>>> fixes the problem with values OVMF writes to
+>>> DSDT/X_DSDT, but the issue of it refusing Qemu's linker commands for
+>>> those two still needs to be solved so that SeaBIOS can boot a wide
+>>> range of OSes.
+>>>
+>>> I'd be happy to give writing the memoising patch a go myself if that
+>>> helps. Looks like setting up an ORDERED_COLLECTION during phase 2
+>>> might be the simplest solution?
+>>
+>> Thanks for the offer. :)
+>>
+>> * If you'd like to help me with my load and reach a good "development
+>>   throughput", then I prefer to write the patch myself. On this
+>>   *specific* occasion, I think it will be faster.
+>>
+>>   I intend to send an OVMF series this week that addresses both
+>>   TianoCore#368 (see above) and TianoCore#359 too (mentioned earlier).
+>>   Both are for OvmfPkg/AcpiPlatformDxe, and it makes sense to round
+>>   them up.
+>>
+>>   I plan to CC the QEMU stakeholders as appropriate. Your feedback
+>>   would be greatly appreciated; the same way as [1] is very helpful
+>>   (thanks again for it!)
+>>
+>> * If your main interest is rather to get into OVMF development, then I
+>>   positively welcome that, and encourage you to send the patch.
+>>   Completing the patch will likely take longer (the edk2 coding style
+>>   is... arcane... and your reviewer is somewhat pedantic :)), but if
+>>   you plan to get into OVMF development, then it's worth both our times.
+>>
+>> (The above should not be misunderstood as "Laszlo doesn't value one-off
+>> contributions" -- it really depends on feature size and area. Hence the
+>> emphasis on "specific" above.)
+>>
+>> Your call :) If possible, please let me know it tomorrow.
 > 
-> Signed-off-by: Ben Warren <ben@skyportsystems.com>
-> ---
->  default-configs/i386-softmmu.mak     |   1 +
->  default-configs/x86_64-softmmu.mak   |   1 +
->  hw/acpi/Makefile.objs                |   1 +
->  hw/acpi/vmgenid.c                    | 206 +++++++++++++++++++++++++++++++++++
->  hw/i386/acpi-build.c                 |  10 ++
->  include/hw/acpi/acpi_dev_interface.h |   1 +
->  include/hw/acpi/vmgenid.h            |  37 +++++++
->  7 files changed, 257 insertions(+)
->  create mode 100644 hw/acpi/vmgenid.c
->  create mode 100644 include/hw/acpi/vmgenid.h
+> I actually ended up writing said pointer memoisation patch yesterday,
+> and it appears to work fine in initial tests. I still need to fully
+> work my way through the edk2 coding and contribution guidelines, so
+> I'll need to re-visit that patch with a fine tooth comb before
+> submitting it. In any case, here it is so far:
+> https://github.com/pmj/edk2/commit/58e0510c6da62d5a985b97e9bff84bc53442d3fe
+> 
+> I am intending to submit more patches to edk2 over time - like this
+> one, they'll mostly be based on Reza Jelveh's GSoC project from a few
+> years ago. Some of his work on getting OS X/macOS guests working in
+> Qemu/OVMF have got upstreamed, most of it has not. I'm hoping I can
+> improve the ratio a little.
+> 
+> I've also written an EFI framebuffer driver for the VMware virtual
+> SVGA adapter in Qemu, which again I need to tidy up to conform with
+> the coding conventions before submitting. (The only advantage of this
+> vs. QXL or virtio-gpu being that there are OSes, including OSX/macOS
+> for which there exist drivers for neither QXL nor virtio-gpu.)
+> 
+> So I guess I may as well get some practice. :-)
+> 
+> 
+> I anticipate submitting the memoisation patch for review on Thursday
+> or Friday as I'll be out tomorrow.
 
-[snip code]
+Sounds good to me!
 
-So, I'm late to the game. I can't possibly comment on all the concerns
-that have been raised scattered around the thread, exactly *where* they
-have been raised. However, I will try to collect the concerns here.
-
-
-(1) Byte swapping for the UUID.
-
-The idea of QemuUUID is that wherever it is stored in a non-ephemeral
-fashion, it is in BE representation. The guest needs it in LE, so we
-should convert it temporarily -- using a local variable -- just before
-writing it to guest memory, and then forget about the LE representation
-promptly.
-
-As far as I understand, we all agree on this (Michael, Ben, myself -- I
-think Igor hasn't commented on this).
-
-
-(2) Structure of the vmgenid fw_cfg blob, AKA "why that darn offset 40
-decimal".
-
-I explained it under points (6) and (7) in the following message:
-
-Message-Id: <c16a03d5-820a-f719-81ea-43858f903395@redhat.com>
-URL: https://www.mail-archive.com/qemu-devel@nongnu.org/msg425226.html
-
-The story is that *wherever* an ADD_POINTER command points to -- that
-is, at the *exact* target address --, OVMF will look for an ACPI table
-header, somewhat heuristically. If it finds a byte pattern that (a) fits
-into the remaining blob and (b) passes some superficial ACPI table
-header checks, such as length and checksum, then OVMF assumes that the
-blob contains an ACPI table there, and passes the address (again, the
-exact, relocated, absolute target address of ADD_POINTER) to
-EFI_ACPI_TABLE_PROTOCOL.InstallAcpiTable().
-
-We want to disable this heuristic for the vmgenid blob. *If* the blob
-contained only 16 bytes (for the GUID), then the heuristic would
-automatically disable itself, because the ACPI table header (36 bytes)
-is larger than 16 bytes, so OVMF wouldn't even look. However, for the
-caching and other VMGENID requirements, we need to allocate a full page
-with the blob (4KB), hence OVMF *will* look. If we placed the GUID right
-at the start of the page, then OVMF would sanity-check it as an ACPI
-table header. The check would *most likely* not pass, so things would be
-fine in practice, but we can do better than that: just put 40 zero bytes
-at the front of the blob.
-
-And this is why the ADD_POINTER command has to point to the beginning of
-the blob (i.e., 36 zero bytes), to "suppress the OVMF ACPI SDT header
-detection". (The other 4 bytes are for arriving at an address divisible
-by 8, which is a VMGENID requirement for the GUID.)
-
-The consequence is that both the ADDR method and QEMU's guest memory
-access code have to add 40 manually.
-
-
-(3) Whether the VGIA named object should be a DWORD or a QWORD in ACPI.
-Personally, I'm fine with either, but I see that DWORD is more
-compatible with old OSes.
-
-What I really care about though is the new WRITE_POINTER command
-structure. That should support 8 bytes as well.
-
-So this is exactly how Michael summarized it ultimately:
-- use a DWORD for VGIA in ACPI,
-- with a matching 4-byte wide ADD_POINTER command;
-- write the address with a 4-byte wide WRITE_POINTER command into
-  fw_cfg,
-- *but* the WRITE_POINTER command struct should support 8-byte as well,
-- and the fw_cfg file that is written (vmgenid_addr) should have size 8
-  from the start. (The guest will simply write offsets 0..3 inclusive,
-  in LE byte order.)
-
-
-(4) IIRC Igor asked if sizing the blob to 4KB would guarantee that the
-GUID ends up in a cacheable page -- yes (see also Michael's followup).
-This size guarantees that the GUID will have a full page to itself, and
-its allocated from normal guest RAM, as Reserved memory (SeaBIOS, IIRC)
-or EfiACPIMemoryNVS memory (OVMF).
-
-Note that the VMGENID spec says, in ACPI terms, "It must not be in
-ranges reported as AddressRangeMemory or AddressRangeACPI", but that's fine:
-
-ACPI speak           UEFI speak            suitable for VMGENID?
-------------------   --------------------- ---------------------
-AddressRangeMemory   EfiConventionalMemory no
-AddressRangeACPI     EfiACPIReclaimMemory  no
-AddressRangeNVS      EfiACPIMemoryNVS      yes, used by OVMF
-AddressRangeReserved EfiReservedMemoryType yes, used by SeaBIOS
-
-
-(5) The race and fw_cfg callbacks.
-
-(a) Michael and Ben identified a problem where
-- QEMU places the initial GUID in the "vmgenid" fw_cfg blob,
-- the guest downloads it,
-- the host admin changes the GUID via the monitor,
-- and the guest writes the address to "vmgenid_addr" *only* after that.
-
-In other words, the monitor action occurs between the guest's processing
-of the ALLOCATE and WRITE_POINTER linker/loader commands.
-
-(b) A similar problem is rebooting the guest.
-- The guest starts up fine,
-- the OS runs,
-- the host admin changes the GUID via the monitor,
-- and the guest sees the update fine.
-- At this point the guest is rebooted (within the same QEMU instance).
-
-Since the fw_cfg blob is not rebuilt -- more precisely, the blob *is*
-rebuilt, but it is then thrown away in acpi_build_update() --, the guest
-will see a different GUID from the last value set on the monitor. (And
-querying the monitor will actually return that last-set value, which is
-no longer known by the guest.)
-
-
-The suggestion for these problems was to add a callback to "one" of the
-fw_cfg files in question.
-
-Let's investigate the writeable "vmgenid_addr" file first. Here the idea
-is to rewrite the GUID in guest RAM as soon as the address is known from
-the guest, regardless of what GUID the guest placed there originally,
-through downloading the "vmgenid" blob.
-
-(i) We have no write callbacks at the moment. Before we removed the data
-port based write support in QEMU 2.4, the write callback used to be
-invoked when the end of the fw_cfg blob was reached. Since we intend to
-pack several addresses in the same writeable fw_cfg blob down the road,
-at different offsets, this method wouldn't work; the final offset in the
-blob might not be reached at all. (Another thing that wouldn't work is
-an 8-byte writeable fw_cfg blob, and a 4-byte WRITE_POINTER command that
-only rewrites offsets 0..3 inclusve -- see (3) above.)
-
-So I don't think that a write callback is viable, at least with the
-"many addresses at different offsets in the same blob" feature. Unless
-we want to register different callbacks (or different callback
-arguments) for different offsets. And then a large write could trigger a
-series of callbacks, even, if it covers several special offsets. This
-looks too complex to me.
-
-(ii) What we do have now is a select callback. Unfortunately, the guest
-is not required to select the item and atomically rewrite the blob, in
-the same fw_cfg DMA operation. The guest is allowed to do the selection
-with the IO port method, and then write the blob separately with DMA.
-(This is what OVMF does.) IOW, when we'd get the callback (for the
-select), the address would not have been written yet.
-
-So I don't think that a select callback for the writeable "vmgenid_addr"
-file is viable either.
-
-(iii) Let's see a select callback for the "vmgenid" blob itself! The
-idea is, whenever the guest selects this blob, immediately refresh the
-blob from the last set GUID. Then let the guest download the
-just-refreshed blob.
-
-The main observation here is that we can *fail* QMP commands. That's
-good enough if we can tell *when* to fail them.
-
-Under this idea, we would fail the "set-vm-generation-id" QMP command
-with "EAGAIN" if the quest had selected the "vmgenid" blob since machine
-reset -- this can be tracked with a latch -- *but* the particular offset
-range in the "vmgenid_addr" blob were still zero.
-
-This is exactly the window between the ALLOCATE and WRITE_POINTER
-commands where updates from the monitor would be lost. So let's just
-tell the management layer to try again later (like 1 second later). By
-that time, any sane guest will have written the address into "vmgenid_addr".
-
-Thanks
+Thanks,
 Laszlo
