@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cbPsh-0002wo-9k
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 05:53:50 -0500
+	(envelope-from <lersek@redhat.com>) id 1cbPsz-00033F-Rw
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 05:54:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cbPsd-0003Ot-Ii
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 05:53:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58088)
+	(envelope-from <lersek@redhat.com>) id 1cbPsv-0003UG-DF
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 05:54:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43804)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cbPsd-0003Of-Aj
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 05:53:43 -0500
-Date: Wed, 8 Feb 2017 10:53:36 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170208105336.GH3129@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <58733617.3050503@huawei.com>
-	<20170109134310.GE30228@stefanha-x1.localdomain>
-	<20170109162504.GH29989@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA182982@DGGEMA505-MBX.china.huawei.com>
-	<20170110100355.GD27720@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA182ADA@DGGEMA505-MBX.china.huawei.com>
-	<20170110120354.GH27720@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA182B4A@DGGEMA505-MBX.china.huawei.com>
-	<20170110133019.GJ27720@redhat.com> <589AF6EC.5050803@huawei.com>
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cbPsv-0003Tx-5I
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 05:54:01 -0500
+References: <cover.1486285434.git.ben@skyportsystems.com>
+	<e531606c10f3c40dbc10d0fa4a4a5d806d7946d9.1486285434.git.ben@skyportsystems.com>
+	<20170207145151.42fb0cc6@nial.brq.redhat.com>
+	<b0dac808-e617-616e-6a1b-11c242b9250a@redhat.com>
+	<20170208114347.2bc8ae2b@nial.brq.redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <9a6c7225-0b57-fdc6-4a43-49068b175842@redhat.com>
+Date: Wed, 8 Feb 2017 11:53:57 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <589AF6EC.5050803@huawei.com>
-Subject: Re: [Qemu-devel] Question about add AF_ALG backend for virtio-crypto
+In-Reply-To: <20170208114347.2bc8ae2b@nial.brq.redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 01/10] ACPI: Add a function for building
+ named qword entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,114 +31,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Longpeng (Mike)" <longpeng2@huawei.com>
-Cc: "Gonglei (Arei)" <arei.gonglei@huawei.com>, QEMU-DEV <qemu-devel@nongnu.org>, "Wubin (H)" <wu.wubin@huawei.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: ben@skyportsystems.com, qemu-devel@nongnu.org, mst@redhat.com
 
-On Wed, Feb 08, 2017 at 06:46:04PM +0800, Longpeng (Mike) wrote:
-> Hi Daniel,
+On 02/08/17 11:43, Igor Mammedov wrote:
+> On Tue, 7 Feb 2017 21:09:27 +0100
+> Laszlo Ersek <lersek@redhat.com> wrote:
 > 
-> I was writing AF_ALG-backed for QEMU crypto these days, I think there're more
-> than two ways to implements it.
-> 
-> The first one look likes below:
-> [ cipher.c ]
-> qcrypto_cipher_new(...)
-> {
-> 	if (...) { /* use AF_ALG */
-> 		cipher = afalg_cipher_new(...)
-> 		if (cipher) {
-> 			return cipher;
-> 		}
-> 	}
-> 	
-> 	/* disabled AF_ALG or AF_ALG failed, then back to
-> 	 * using 'builtin'(gcrypt/nettle/...)
-> 	 */
-> 	cipher = __qcrypto_cipher_new(...)
-> }
-> 
-> [ cipher-afalg.c ]
-> afalg_cipher_new(...) {....}
-> afalg_cipher_encrypt(...) {...}
-> ......
-> 
-> [ cipher-gcrypt.c ]
-> __qcrypto_cipher_new(...) {...}
-> __qcrypto_cipher_encrypt(...) {...}
-> ......
-> 
-> [ cipher-nettle.c ]
-> __qcrypto_cipher_new(...) {...}
-> __qcrypto_cipher_encrypt(...) {...}
-> ......
-> 
-> In this way, I think I need to rename most functions in
-> cipher-gcrypt.c/cipher-nettle.c with a prefixion(such as '__')
-> 
-> 
-> Alternative way is:
-> [ cipher-afalg.c ]
-> afalg_cipher_new(...) {....}
-> afalg_cipher_encrypt(...) {...}
-> ......
-> 
-> [ cipher-gcrypt.c ]
-> qcrypto_cipher_new(...)
-> {
-> 	if (...) { /* use AF_ALG */
-> 		cipher = afalg_cipher_new(...)
-> 		if (cipher) {
-> 			return cipher;
-> 		}
-> 	}
-> 	
-> 	/* disabled AF_ALG or AF_ALG failed, then back to
-> 	 * using 'builtin'
-> 	 */
-> 	.......( the existing code )
-> }
-> ......
-> 
-> [ cipher-nettle.c ]
-> qcrypto_cipher_new(...)
-> {
-> 	if (...) { /* use AF_ALG */
-> 		cipher = afalg_cipher_new(...)
-> 		if (cipher) {
-> 			return cipher;
-> 		}
-> 	}
-> 	
-> 	/* disabled AF_ALG or AF_ALG failed, then back to
-> 	 * using 'builtin'
-> 	 */
-> 	.......( the existing code )
-> }
-> ......
-> 
-> In this way, we should add AF_ALG-backed code in most functions in
-> cipher-gcrypt.c/cipher-nettle.c, I'm afraid this would introduce lots of
-> duplicate code because the same AF_ALG-backed code must in both gcrypt-backed
-> impls and nettle-backed impls as above.
-> 
-> I'm confusing about which way you'd prefer, or do you have any better
-> suggestion?
+>> On 02/07/17 14:51, Igor Mammedov wrote:
+>>> On Sun,  5 Feb 2017 01:11:56 -0800
+>>> ben@skyportsystems.com wrote:
+>>>   
+>>>> From: Ben Warren <ben@skyportsystems.com>
+>>>>
+>>>> This is initially used to patch a 64-bit address into
+>>>> the VM Generation ID SSDT
+>>>>
+>>>> Signed-off-by: Ben Warren <ben@skyportsystems.com>
+>>>> ---  
+>>> ...  
+>>>> +int
+>>>> +build_append_named_qword(GArray *array, const char *name_format, ...)  
+>>> it ain't used anywhere, I'd just drop this patch.  
+>>
+>> Ben and I discussed this under
+>> - msgid <6E25852D-224A-4BDC-AA83-8DC87DB4D0F0@skyportsystems.com>
+>>   https://www.mail-archive.com/qemu-devel@nongnu.org/msg425496.html
+>> - msgid <a93a6be3-cbed-5afe-7c72-96410fbfce41@redhat.com>
+>>   https://www.mail-archive.com/qemu-devel@nongnu.org/msg425519.html
+>>
+>> On 01/26/17 06:35, Ben Warren wrote:
+>>> I propose to still include this patch but touch up the comments as
+>>> requested by Laszlo.  This way it will be in the toolbox for future
+>>> users and has been tested.  [...]  
+>>
+>> I generally agree that dead code is undesirable, but this function has
+>> surfaced several times until now, and we get to review it every single
+>> time. Ben tested it, I support its inclusion.
+>>
+>> OTOH I also pointed it out to Ben
+>>
+>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg425218.html
+>>
+>> that he should expect disagreement between his reviewers :) Given that
+>> I'm observing this series more from the sidelines and you maintain /
+>> support ACPI gen in QEMU, I certainly defer to you on this.
+> It's not only dead, having patchable QWORD ready for use in QEMU
+> would tempt someone to use it and that would lead to XP BSOD
+> if it slips screening at review time.
 
-Yeah, both approaches have some reasonably significant downsides. Approach
-1 is sort of like providing a virtual driver table, except it is hardcoded
-to switch between 2 impls only.
+Good point.
 
-A variant on approach 1 is to actually setup a proper driver-table dispatch
-layer. eg define a struct that contains callbacks for each public api
-operation. The qcrypto_cipher_new() method will then either setup callbacks
-for AF_ALG, or for the library impl.
+> I'd delay this patch until
+> we announce that ACPI 1.0 (XP based) guest no more supported by
+> new QEMU.
+> 
+> Anyway I won't object to merging this if you insist and give it your RB.
 
-This is the design we took in crypto/{ivgen.c,ivgenpriv.h}
+No, you are entirely right. As long as we consider Windows XP guests
+first class citizens (i.e., we even reject the idea of additional
+command line options), then keeping QWORD "out of sight" is safer.
+
+Follow up question: when are we going to drop Windows XP? Do we have a
+plan? :) It's quite a struggle to support both ends of the spectrum with
+the same machine types and options (decades-old DOS and Windows XP vs.
+supercomputer-class NUMA setups). I think this limits development.
+
+(Just curious; I'm not suggesting to drop Windows XP "soon".)
+
+Thanks!
+Laszlo
 
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+>>
+>>
+>>>> +{
+>>>> +    int offset;
+>>>> +    va_list ap;
+>>>> +
+>>>> +    build_append_byte(array, 0x08); /* NameOp */
+>>>> +    va_start(ap, name_format);
+>>>> +    build_append_namestringv(array, name_format, ap);
+>>>> +    va_end(ap);
+>>>> +
+>>>> +    build_append_byte(array, 0x0E); /* QWordPrefix */
+>>>> +
+>>>> +    offset = array->len;
+>>>> +    build_append_int_noprefix(array, 0x0000000000000000, 8);
+>>>> +    assert(array->len == offset + 8);
+>>>> +
+>>>> +    return offset;
+>>>> +}
+>>>> +
+>>>>  static GPtrArray *alloc_list;
+>>>>  
+>>>>  static Aml *aml_alloc(void)
+>>>> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+>>>> index 559326c..dbf63cf 100644
+>>>> --- a/include/hw/acpi/aml-build.h
+>>>> +++ b/include/hw/acpi/aml-build.h
+>>>> @@ -385,6 +385,10 @@ int
+>>>>  build_append_named_dword(GArray *array, const char *name_format, ...)
+>>>>  GCC_FMT_ATTR(2, 3);
+>>>>  
+>>>> +int
+>>>> +build_append_named_qword(GArray *array, const char *name_format, ...)
+>>>> +GCC_FMT_ATTR(2, 3);
+>>>> +
+>>>>  void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
+>>>>                         uint64_t len, int node, MemoryAffinityFlags flags);
+>>>>    
+>>>
+>>>   
+>>
+> 
