@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1cbV6K-0007bu-Lp
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 11:28:13 -0500
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cbV9g-0000dV-8B
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 11:31:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1cbV6G-00041T-Ko
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 11:28:12 -0500
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:36449)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
-	id 1cbV6G-00040q-EP
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 11:28:08 -0500
-Received: by mail-wm0-x235.google.com with SMTP id c85so204183151wmi.1
-	for <qemu-devel@nongnu.org>; Wed, 08 Feb 2017 08:28:06 -0800 (PST)
-Content-Type: text/plain;
-	charset=us-ascii
-Mime-Version: 1.0 (1.0)
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-In-Reply-To: <c1ff3829-b068-881a-1523-317ef0d31689@redhat.com>
-Date: Wed, 8 Feb 2017 16:27:54 +0000
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <C4E1DF44-1626-425D-880E-0053AD688422@linaro.org>
-References: <1486560712-44171-1-git-send-email-agraf@suse.de>
-	<ef6b903b-5224-b4eb-1080-a3689fcec70a@redhat.com>
-	<f2f119bc-9c22-ad52-ff26-7d6ecc213a3c@suse.de>
-	<c1ff3829-b068-881a-1523-317ef0d31689@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] target-arm: Declare virtio-mmio as
- dma-coherent in dt
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cbV9c-0005AJ-7J
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 11:31:40 -0500
+Received: from mailapp01.imgtec.com ([195.59.15.196]:17949)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cbV9c-0005A8-22
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 11:31:36 -0500
+From: Yongbok Kim <yongbok.kim@imgtec.com>
+Date: Wed, 8 Feb 2017 16:31:03 +0000
+Message-ID: <1486571463-16183-1-git-send-email-yongbok.kim@imgtec.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3 0/8] MIPS Boston board support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,81 +23,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, mst@redhat.com, Shannon Zhao <shannon.zhao@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: paul.burton@imgtec.com, aurelien@aurel32.net, alistair23@gmail.com
 
+This series introduces support for the MIPS Boston development board. It begins
+by introducing support for moving MIPS Coherence Manager GCRs which Boston
+software typically does to avoid conflicting with its flash memory region. An
+API is then added to retrieve the emulated MIPS GIC timer frequency, which is
+used to report system clock frequency to software via "platform registers"
+which the Boston board provides. An issue with the MIPS GIC that current Boston
+Linux kernels encounter is fixed, and an API introduced to allow the board to
+determine whether the MIPS CPS hardware is supported.
 
-> On 8 Feb 2017, at 16:17, Laszlo Ersek <lersek@redhat.com> wrote:
->=20
->> On 02/08/17 17:12, Alexander Graf wrote:
->>> On 02/08/2017 04:29 PM, Laszlo Ersek wrote:
->>> CC'ing Ard and Shannon (I recall this property from earlier):
->>>=20
->>>> On 02/08/17 14:31, Alexander Graf wrote:
->>>> QEMU emulated hardware is always dma coherent with its guest. We do
->>>> annotate that correctly on the PCI host controller, but left out
->>>> virtio-mmio.
->>> I recommend to reference the following commit here:
->>>=20
->>> commit 5d636e21c44ecf982a22a7bc4ca89186079ac283
->>> Author: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->>> Date:   Mon Jul 4 13:06:36 2016 +0100
->>>=20
->>>     hw/arm/virt: mark the PCIe host controller as DMA coherent in the DT=
+The last 3 patches are more extensive, providing support for the FIT image
+format used with Boston, the Xilinx PCIe controller which Boston boards include
+3 of, and finally the Boston board support itself.
 
->>>          Since QEMU performs cacheable accesses to guest memory when
->>> doing DMA
->>>     as part of the implementation of emulated PCI devices, guest drivers=
+This can be tested with either U-Boot or Linux if desired. U-Boot support is
+available in the following patchset:
 
->>>     should use cacheable accesses as well when running under KVM.
->>> Since this
->>>     essentially means that emulated PCI devices are DMA coherent, set
->>> the
->>>     'dma-coherent' DT property on the PCIe host controller DT node.
->>>          This brings the DT description into line with the ACPI
->>> description,
->>>     which already marks the PCI bridge as cache coherent (see commit
->>>     bc64b96c984abf).
->>>          Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->>>     Message-id:
->>> 1467134090-5099-1-git-send-email-ard.biesheuvel@linaro.org
->>>     Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
->>>     Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->>>=20
->>>> Recent kernels have started to interpret that flag rather than take
->>>> dma coherency as granted with virtio-mmio. While that is considered
->>>> a kernel bug, as it breaks previously working systems, it showed that
->>>> our dt description is incomplete.
->>>>=20
->>>> This patch adds the respective marker that allows guest OSs to evaluate=
+  https://www.mail-archive.com/u-boot@lists.denx.de/msg221003.html
 
->>>> that our virtio-mmio devices are indeed cache coherent.
->>> As noted above, commit bc64b96c984a ("hw/arm/virt-acpi-build: _CCA
->>> attribute is compulsory", 2015-11-03) had done the same in the ACPI
->>> description of the PCIe host controller.
->>>=20
->>> Thus, do we need _CCA in the ACPI description of the virtio-mmio
->>> transports, to parallel the DT change? See the LNRO0005 device in
->>> acpi_dsdt_add_virtio().
->>=20
->> Yes, we should also annotate it correctly in the DSDT. Today it's not a
->> deal breaker as Linux always assumes virtio-mmio to be dma coherent, but
->> it would make our platform description more accurate.
->>=20
+Linux kernel support can be found as part of the generic kernel patchset:
 
-The _CCA property is mandatory on arm64, and there is no default. So this is=
- a bug nonetheless, even if the de facto default matches the platform. So ye=
-s, let's get this fixed please.
+  https://www.linux-mips.org/archives/linux-mips/2016-08/msg00456.html
 
+Hopefully this will be merged for v4.9, but it can also be found in a
+downstream kernel from Imagination Technologies in the "eng" branch of:
 
->>> If that's the case, then I propose that either the patch please fix
->>> both DT and ACPI, or that at least we file a bug "somewhere", for
->>> adding _CCA in acpi_dsdt_add_virtio().
->>=20
->> I agree that it should happen in the same patch (set). While I don't
->> care a lot about ACPI right now (since dt is preferred on upstream
->> kernels), I can take a look.
->=20
-> Thank you!
-> Laszlo
->=20
+  git://git.linux-mips.org/pub/scm/linux-mti.git
+
+Linux may be built with:
+
+  $ make 64r6el_defconfig
+  $ make
+
+The arch/mips/boot/vmlinux.gz.itb image may then be provided to QEMU's -kernel
+argument, for example:
+
+  $ qemu-system-mips64el -M boston -kernel vmlinux.gz.itb -serial stdio
+
+v3:
+Yongbok Kim:
+  loader-fit
+    fixed potential memory leaks.
+  xlinix-pcie
+    added descriptions for macros. (Alistair)
+    removed returning on !level. (Alistair)
+    updated IRQ connection with GPIO logic (Alistair)
+    moved xilinx_pcie_init() to boston.c (Alistair)
+    replaced stw_le_p() with pci_set_word()
+  boston
+    isolated boston machine support for mips64el.
+    updated for recent Chardev changes.
+  and other cosmetic changes.
+
+v1, v2:
+Paul Burton (8):
+  hw/mips_cmgcr: allow GCR base to be moved
+  hw/mips_gictimer: provide API for retrieving frequency
+  hw/mips_gic: Update pin state on mask changes
+  target-mips: Provide function to test if a CPU supports an ISA
+  dtc: Update requirement to v1.4.2
+  loader: Support Flattened Image Trees (FIT images)
+  hw: xilinx-pcie: Add support for Xilinx AXI PCIe Controller
+  hw/mips: MIPS Boston board support
+
+ configure                            |   8 +-
+ default-configs/mips64el-softmmu.mak |   2 +
+ dtc                                  |   2 +-
+ hw/core/Makefile.objs                |   1 +
+ hw/core/loader-fit.c                 | 325 ++++++++++++++++++++
+ hw/core/loader.c                     |   7 +-
+ hw/intc/mips_gic.c                   |  56 ++--
+ hw/mips/Makefile.objs                |   1 +
+ hw/mips/boston.c                     | 575 +++++++++++++++++++++++++++++++++++
+ hw/misc/mips_cmgcr.c                 |  17 ++
+ hw/pci-host/Makefile.objs            |   1 +
+ hw/pci-host/xilinx-pcie.c            | 328 ++++++++++++++++++++
+ hw/timer/mips_gictimer.c             |   5 +
+ include/hw/loader-fit.h              |  41 +++
+ include/hw/loader.h                  |   6 +
+ include/hw/misc/mips_cmgcr.h         |   3 +
+ include/hw/pci-host/xilinx-pcie.h    |  68 +++++
+ include/hw/timer/mips_gictimer.h     |   1 +
+ target/mips/cpu.h                    |   1 +
+ target/mips/translate.c              |  10 +
+ 20 files changed, 1422 insertions(+), 36 deletions(-)
+ create mode 100644 hw/core/loader-fit.c
+ create mode 100644 hw/mips/boston.c
+ create mode 100644 hw/pci-host/xilinx-pcie.c
+ create mode 100644 include/hw/loader-fit.h
+ create mode 100644 include/hw/pci-host/xilinx-pcie.h
+
+-- 
+2.7.4
