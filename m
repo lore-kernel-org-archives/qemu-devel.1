@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cbUku-0005xt-7I
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 11:06:07 -0500
+	(envelope-from <agraf@suse.de>) id 1cbUr2-0001Km-3Z
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 11:12:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cbUkr-0005Uu-2C
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 11:06:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41664)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cbUkq-0005Uq-TX
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 11:06:01 -0500
-References: <20170207155956.21573-1-pbonzini@redhat.com>
-	<20170208102949.GD3129@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c3a5fcfa-9736-a294-0aab-cd8214c9e6af@redhat.com>
-Date: Wed, 8 Feb 2017 17:05:57 +0100
+	(envelope-from <agraf@suse.de>) id 1cbUr0-0007gQ-W6
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 11:12:24 -0500
+References: <1486560712-44171-1-git-send-email-agraf@suse.de>
+	<ef6b903b-5224-b4eb-1080-a3689fcec70a@redhat.com>
+From: Alexander Graf <agraf@suse.de>
+Message-ID: <f2f119bc-9c22-ad52-ff26-7d6ecc213a3c@suse.de>
+Date: Wed, 8 Feb 2017 17:12:14 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170208102949.GD3129@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] link to .xz files to save some bandwidth
+In-Reply-To: <ef6b903b-5224-b4eb-1080-a3689fcec70a@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target-arm: Declare virtio-mmio as
+ dma-coherent in dt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,21 +24,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
+To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, mst@redhat.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Shannon Zhao <shannon.zhao@linaro.org>
+
+On 02/08/2017 04:29 PM, Laszlo Ersek wrote:
+> CC'ing Ard and Shannon (I recall this property from earlier):
+>
+> On 02/08/17 14:31, Alexander Graf wrote:
+>> QEMU emulated hardware is always dma coherent with its guest. We do
+>> annotate that correctly on the PCI host controller, but left out
+>> virtio-mmio.
+> I recommend to reference the following commit here:
+>
+> commit 5d636e21c44ecf982a22a7bc4ca89186079ac283
+> Author: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Date:   Mon Jul 4 13:06:36 2016 +0100
+>
+>      hw/arm/virt: mark the PCIe host controller as DMA coherent in the DT
+>      
+>      Since QEMU performs cacheable accesses to guest memory when doing DMA
+>      as part of the implementation of emulated PCI devices, guest drivers
+>      should use cacheable accesses as well when running under KVM. Since this
+>      essentially means that emulated PCI devices are DMA coherent, set the
+>      'dma-coherent' DT property on the PCIe host controller DT node.
+>      
+>      This brings the DT description into line with the ACPI description,
+>      which already marks the PCI bridge as cache coherent (see commit
+>      bc64b96c984abf).
+>      
+>      Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>      Message-id: 1467134090-5099-1-git-send-email-ard.biesheuvel@linaro.org
+>      Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>      Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>
+>> Recent kernels have started to interpret that flag rather than take
+>> dma coherency as granted with virtio-mmio. While that is considered
+>> a kernel bug, as it breaks previously working systems, it showed that
+>> our dt description is incomplete.
+>>
+>> This patch adds the respective marker that allows guest OSs to evaluate
+>> that our virtio-mmio devices are indeed cache coherent.
+> As noted above, commit bc64b96c984a ("hw/arm/virt-acpi-build: _CCA attribute is compulsory", 2015-11-03) had done the same in the ACPI description of the PCIe host controller.
+>
+> Thus, do we need _CCA in the ACPI description of the virtio-mmio transports, to parallel the DT change? See the LNRO0005 device in acpi_dsdt_add_virtio().
+
+Yes, we should also annotate it correctly in the DSDT. Today it's not a 
+deal breaker as Linux always assumes virtio-mmio to be dma coherent, but 
+it would make our platform description more accurate.
+
+> If that's the case, then I propose that either the patch please fix both DT and ACPI, or that at least we file a bug "somewhere", for adding _CCA in acpi_dsdt_add_virtio().
+
+I agree that it should happen in the same patch (set). While I don't 
+care a lot about ACPI right now (since dt is preferred on upstream 
+kernels), I can take a look.
 
 
-
-On 08/02/2017 11:29, Daniel P. Berrange wrote:
->=20
-> Saving GB's of bandwidth a day for our hosting site is a compelling
-> benefit, if that has direct impact on project running costs.
-
-It doesn't but only because we're well within what the host is willing
-to donate to QEMU.
-
-Paolo
-
-> Shorter
-> download times are nice, if you have a very slow internet link too,
-> but for most people they'll again be lost in the noise.=20
+Alex
