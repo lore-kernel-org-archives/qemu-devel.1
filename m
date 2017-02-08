@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cbHlQ-0001Vg-C8
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 21:13:45 -0500
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cbHu7-0003bX-V1
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 21:22:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cbHlP-0005Hl-9H
-	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 21:13:44 -0500
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1486360515-22989-1-git-send-email-bharata@linux.vnet.ibm.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <59baf91a-458a-5160-4849-1dbc142d1efd@twiddle.net>
-Date: Tue, 7 Feb 2017 18:13:28 -0800
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cbHu4-0008Na-OR
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 21:22:43 -0500
+Received: from [59.151.112.132] (port=59789 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cbHu4-0008L2-Cd
+	for qemu-devel@nongnu.org; Tue, 07 Feb 2017 21:22:40 -0500
+References: <1483596532-14552-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1483596532-14552-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<7fd43c21-f16c-e9ef-7a3b-90b4e2949eed@redhat.com>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <e7a9073c-f91a-8952-fdbe-85ad81046215@cn.fujitsu.com>
+Date: Wed, 8 Feb 2017 10:22:10 +0800
 MIME-Version: 1.0
-In-Reply-To: <1486360515-22989-1-git-send-email-bharata@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <7fd43c21-f16c-e9ef-7a3b-90b4e2949eed@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] softfloat: Add round-to-odd rounding
- mode
+Subject: Re: [Qemu-devel] [PATCH V6 2/2] Add a new qmp command to do
+ checkpoint, query xen replication status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,36 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, nikunj@linux.vnet.ibm.com, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
-
-On 02/05/2017 09:55 PM, Bharata B Rao wrote:
-> Power ISA 3.0 introduces a few quadruple precision floating point
-> instructions that support round-to-odd rounding mode. The
-> round-to-odd mode is explained as under:
->
-> Let Z be the intermediate arithmetic result or the operand of a convert
-> operation. If Z can be represented exactly in the target format, the
-> result is Z. Otherwise the result is either Z1 or Z2 whichever is odd.
-> Here Z1 and Z2 are the next larger and smaller numbers representable
-> in the target format respectively.
->
-> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> Tested the corner cases for round-to-odd and the default round-to-nearest-even
-> by comparing the results of QEMU with a known good implementation of
-> PowerPC ISA 3.0 for the following instructions: xsaddqp[o], xsdivqp[o],
-> xsmulqp[o] and xscvqpdp[o].
->
-> Changes in v3:
->
-> - Limited the recalculation of roundIncrement in 64bit rounding only
->   to round-to-odd case and hence dropped the separate patch which
->   did this for all rounding modes earlier. (Peter Maydell)
-> - Resorted to QEMU codying style in softfloat.c
-
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+To: Eric Blake <eblake@redhat.com>, qemu devel <qemu-devel@nongnu.org>
+Cc: Jason Wang <jasowang@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Bian Naimeng <biannm@cn.fujitsu.com>, "eddie . dong" <eddie.dong@intel.com>, Wen Congyang <wencongyang@gmail.com>
 
 
-r~
+
+On 02/07/2017 11:50 PM, Eric Blake wrote:
+> On 01/05/2017 12:08 AM, Zhang Chen wrote:
+>> We can call this qmp command to do checkpoint outside of qemu.
+>> Xen colo will need this function.
+>>
+>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+>> Signed-off-by: Wen Congyang <wencongyang@gmail.com>
+>> ---
+>>   docs/qmp-commands.txt | 24 ++++++++++++++++++++++++
+> This file no longer exists since commit 4d8bb958; can you please rebase
+> this and post a v7? (The docs now live directly in the qapi-schema.json
+> file).
+
+OK, I will send a V7.
+
+>>   migration/colo.c      | 17 +++++++++++++++++
+>>   qapi-schema.json      | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>>   3 files changed, 91 insertions(+)
+> It looks like you have addressed all my concerns from earlier versions,
+> though, so the API seems reasonable.
+
+
+Thanks
+Zhang Chen
+
+>
+
+-- 
+Thanks
+Zhang Chen
