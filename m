@@ -1,21 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51234)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stephane.chazelas@gmail.com>) id 1cbT7D-0003HK-IN
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 09:21:00 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cbTAj-0004V5-D3
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 09:24:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stephane.chazelas@gmail.com>) id 1cbT78-0003pJ-J2
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 09:20:59 -0500
-Date: Wed, 8 Feb 2017 14:20:51 +0000
-From: Stephane Chazelas <stephane.chazelas@gmail.com>
-Message-ID: <20170208142051.GB19518@chaz.gmail.com>
-References: <20170202123045.GA24714@chaz.gmail.com>
-	<f8a93c01-682e-fbcb-7b81-012f6df97465@redhat.com>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cbTAf-0004YV-Cd
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 09:24:37 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43313
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1cbTAf-0004YD-1e
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 09:24:33 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v18EO63J068318
+	for <qemu-devel@nongnu.org>; Wed, 8 Feb 2017 09:24:32 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28g1dhhdfd-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 08 Feb 2017 09:24:32 -0500
+Received: from localhost
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Wed, 8 Feb 2017 14:24:29 -0000
+References: <1484727757-41240-1-git-send-email-arei.gonglei@huawei.com>
+	<1484727757-41240-2-git-send-email-arei.gonglei@huawei.com>
+	<62a99d8e-1735-0838-4067-bce401c86526@linux.vnet.ibm.com>
+	<20170207140710.01e4b694.cornelia.huck@de.ibm.com>
+	<33183CC9F5247A488A2544077AF19020DA1AFF1E@DGGEMA505-MBX.china.huawei.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Wed, 8 Feb 2017 15:24:21 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f8a93c01-682e-fbcb-7b81-012f6df97465@redhat.com>
-Subject: Re: [Qemu-devel] [qcow2] how to avoid qemu doing
- lseek(SEEK_DATA/SEEK_HOLE)?
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA1AFF1E@DGGEMA505-MBX.china.huawei.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Message-Id: <a80c3f48-e3c9-dd7e-643b-a54bdde54882@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v16 1/2] virtio-crypto: Add
+ virtio crypto device specification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,23 +46,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-devel@nongnu.org, Qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, Luonengjun <luonengjun@huawei.com>, "mst@redhat.com" <mst@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "denglingli@chinamobile.com" <denglingli@chinamobile.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "Ola.Liljedahl@arm.com" <Ola.Liljedahl@arm.com>, "Varun.Sethi@freescale.com" <Varun.Sethi@freescale.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "brian.a.keating@intel.com" <brian.a.keating@intel.com>, "liang.j.ma@intel.com" <liang.j.ma@intel.com>, "john.griffin@intel.com" <john.griffin@intel.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "mike.caraman@nxp.com" <mike.caraman@nxp.com>, "agraf@suse.de" <agraf@suse.de>, "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "nmorey@kalray.eu" <nmorey@kalray.eu>, "vincent.jardin@6wind.com" <vincent.jardin@6wind.com>, "Wubin (H)" <wu.wubin@huawei.com>, longpeng <longpeng2@huawei.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>
 
-2017-02-08 00:43:18 +0100, Max Reitz:
-[...]
-> Therefore, the patch as it is makes sense. The fact that said lseek() is
-> slow on ZFS is (in my humble opinion) the ZFS driver's problem that
-> needs to be fixed there.
-[...]
 
-For the record, I've mentioned the qemu performance implication at
-https://github.com/zfsonlinux/zfs/issues/4306#issuecomment-277000682
 
-Not much more I can do at that point.
+On 02/08/2017 04:46 AM, Gonglei (Arei) wrote:
+> Hi Cornelia,
+> 
+>>
+>> On Tue, 7 Feb 2017 12:39:44 +0100
+>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+>>
+>>> On 01/18/2017 09:22 AM, Gonglei wrote:
+>>
+>>>> +\section{Crypto Device}\label{sec:Device Types / Crypto Device}
+>>>> +
+>>>> +The virtio crypto device is a virtual cryptography device as well as a kind of
+>>>> +virtual hardware accelerator for virtual machines. The encryption and
+>>>> +decryption requests are placed in any of the data active queues and are
+>> ultimately handled by the
+>>>
+>>> Am I the only one having a problem with 'data active queues'?
+>>
+>> No. I think it looks weird.
+>>
+>> (...)
+>>
+>>>> +The value of the \field{status} field is VIRTIO_CRYPTO_S_HW_READY or
+>> ~VIRTIO_CRYPTO_S_HW_READY.
+>>>
+>>> Not entirely happy with this. What you want to say is reserved
+>>> for future use, or? Would it make sense to have a general note
+>>> -- in a similar fashion like for 'sizes are in bytes' -- for
+>>> reserved for future use?
+>>>
+>>> One possible formulation would be:
+>>>
+>>> "In this specification, unless explicitly stated otherwise,
+>>> fields and bits reserved for future use shall be zeroed out.
+>>> Both the a device or a driver device and the driver should
+>>> detect violations of this rule, and deny the requested
+>>> operation in an appropriate way if possible."
+>>
+>> If we go with reserved-and-must-be-zero, we need to make rejecting
+>> non-zero for reserved value a MUST, or we may run into problems later.
+>>
+>> In this case, I'd opt for a specific formulation, though; like
+>>
+>> "The \field{status} field can be either zero or have one or more flags
+>> set. Valid flags are listed below."
+>>
+>> And then state that non-valid flags MUST NOT be set resp. MUST be
+>> rejected in a normative statement.
+>>
+> Sounds good.
+> 
 
-That issue was raised a year ago and has not been assigned any
-milestone yet.
+This is not only about \field{status} but about the algo mask fields
+too. If we go down this path we should make sure to have a specific statement
+in each case we reserve something for future use.
 
--- 
-Stephane
+The part about the 'normative statement' is very important in my opinion too.
+
+>> (...)
+>>
+>>>> +The following services are defined:
+>>>> +
+>>>> +\begin{lstlisting}
+>>>> +/* CIPHER service */
+>>>> +#define VIRTIO_CRYPTO_SERVICE_CIPHER 0
+>>>> +/* HASH service */
+>>>> +#define VIRTIO_CRYPTO_SERVICE_HASH   1
+>>>> +/* MAC (Message Authentication Codes) service */
+>>>> +#define VIRTIO_CRYPTO_SERVICE_MAC    2
+>>>> +/* AEAD (Authenticated Encryption with Associated Data) service */
+>>>> +#define VIRTIO_CRYPTO_SERVICE_AEAD   3
+>>>> +\end{lstlisting}
+>>>> +
+>>>> +The last driver-read-only fields specify detailed algorithms masks
+>>>> +the device offers for corresponding services. The following CIPHER
+>> algorithms
+>>>> +are defined:
+>>>
+>>> You do not establish an explicit relationship between the fields and the
+>>> macros for the flags. These are flags or? It seems quite common in the
+>>> spec to use _F_ in flag names. Would it be appropriate here?
+>>
+>> The values as specified do not look very flaggy to me...
+>>
+>>>
+>>>> +
+>>>> +\begin{lstlisting}
+>>>> +#define VIRTIO_CRYPTO_NO_CIPHER                 0
+>>>> +#define VIRTIO_CRYPTO_CIPHER_ARC4               1
+>>>> +#define VIRTIO_CRYPTO_CIPHER_AES_ECB            2
+>>>> +#define VIRTIO_CRYPTO_CIPHER_AES_CBC            3
+>>>> +#define VIRTIO_CRYPTO_CIPHER_AES_CTR            4
+>>>> +#define VIRTIO_CRYPTO_CIPHER_DES_ECB            5
+>>>> +#define VIRTIO_CRYPTO_CIPHER_DES_CBC            6
+>>>> +#define VIRTIO_CRYPTO_CIPHER_3DES_ECB           7
+>>>> +#define VIRTIO_CRYPTO_CIPHER_3DES_CBC           8
+>>>> +#define VIRTIO_CRYPTO_CIPHER_3DES_CTR           9
+>>>> +#define VIRTIO_CRYPTO_CIPHER_KASUMI_F8          10
+>>>> +#define VIRTIO_CRYPTO_CIPHER_SNOW3G_UEA2        11
+>>>> +#define VIRTIO_CRYPTO_CIPHER_AES_F8             12
+>>>> +#define VIRTIO_CRYPTO_CIPHER_AES_XTS            13
+>>>> +#define VIRTIO_CRYPTO_CIPHER_ZUC_EEA3           14
+>>>> +\end{lstlisting}
+>>>> +
+>>>> +
+>>>
+>>> Would it make sense to interleave the flag definition
+>>> with the struct virtio_crypto_config?
+>>>
+>>>> +\begin{note}
+>>>> +Any other values are reserved for future use.
+>>>
+>>> Are these flags or values? I do not think values is appropriate here.
+>>
+>> These look like values to me and not flags.
+>>
+>> The more I stare at this, the more confused I become. Is the device
+>> supposed to indicate exactly one algorithm only? Or are these supposed
+>> to be bit numbers? (If yes, it would make sense to either call them
+>> that or specify flags in the (1 << bit_num) notation.)
+> 
+> Actually these are both bit numbers and values.
+> 
+> On the one hand, the device can set algorithms by '1 << bit_num' notation to tell the driver what
+> algorithms are supported. On the other hand, the driver can set the value to tell
+> the device a virtio crypto request's algorithm in struct virtio_crypto_op_header.algo.
+> 
+> Pls see cryptodev-builtin.c:: cryptodev_buitlin_init()
+> 
+> backend->conf.crypto_services =
+>                          1u << VIRTIO_CRYPTO_SERVICE_CIPHER |
+>                          1u << VIRTIO_CRYPTO_SERVICE_HASH |
+>                          1u << VIRTIO_CRYPTO_SERVICE_MAC;
+> backend->conf.cipher_algo_l = 1u << VIRTIO_CRYPTO_CIPHER_AES_CBC;
+> backend->conf.hash_algo = 1u << VIRTIO_CRYPTO_HASH_SHA1;
+> 
+> Perhaps I should add a specific formulation about them.
+
+
+Thanks for the clarification. I think a 'specific formulation' is a good idea.
+I suggest to define the constants elsewhere, that is at the site where the
+algorithms are defined, and only reference that (or those) definition(s).
+
+Obviously we criteria for valid/invalid for the both usages.
+so you will have to describe that separately for the distinct usages.
+
+Concentrate on the fields you are describing and their semantic.
+
+Cheers,
+Halil
