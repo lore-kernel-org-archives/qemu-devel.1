@@ -1,15 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32975)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1cbSLd-0006j9-Gz
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:31:52 -0500
+	(envelope-from <famz@redhat.com>) id 1cbSUN-0000bn-Bs
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:40:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1cbSLY-0003xg-Id
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:31:49 -0500
-From: Alexander Graf <agraf@suse.de>
-Date: Wed,  8 Feb 2017 14:31:52 +0100
-Message-Id: <1486560712-44171-1-git-send-email-agraf@suse.de>
-Subject: [Qemu-devel] [PATCH] target-arm: Declare virtio-mmio as
- dma-coherent in dt
+	(envelope-from <famz@redhat.com>) id 1cbSUM-0007Tv-Ah
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 08:40:51 -0500
+Date: Wed, 8 Feb 2017 21:40:41 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170208134041.GB22807@lemon.lan>
+References: <20170123123056.30383-1-famz@redhat.com>
+	<20170123123056.30383-15-famz@redhat.com>
+	<f20385ca-81d1-df52-31e5-283c0c2fac0a@redhat.com>
+	<20170208060033.GC13286@lemon.lan>
+	<3e4b256b-caed-82d5-6ab6-5ee7396c788d@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3e4b256b-caed-82d5-6ab6-5ee7396c788d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v12 14/16] file-posix: Implement image
+ locking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,50 +27,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, mst@redhat.com
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>, qemu-block@nongnu.org, eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, rjones@redhat.com
 
-QEMU emulated hardware is always dma coherent with its guest. We do
-annotate that correctly on the PCI host controller, but left out
-virtio-mmio.
+On Wed, 02/08 14:18, Max Reitz wrote:
+> On 08.02.2017 07:00, Fam Zheng wrote:
+> > On Wed, 02/08 04:05, Max Reitz wrote:
+> >>> +static int raw_lt_write_to_write_share(RawLockTransOp op,
+> >>> +                                       int old_lock_fd, int new_lock_fd,
+> >>> +                                       BDRVRawLockMode old_lock,
+> >>> +                                       BDRVRawLockMode new_lock,
+> >>> +                                       Error **errp)
+> >>> +{
+> >>> +    int ret = 0;
+> >>> +
+> >>> +    assert(old_lock == RAW_L_WRITE);
+> >>> +    assert(new_lock == RAW_L_WRITE_SHARE_RW);
+> >>> +    /*
+> >>> +     *        lock byte "no other writer"      lock byte "write"
+> >>> +     * old                X                           X
+> >>> +     * new                0                           S
+> >>> +     *
+> >>> +     * (0 = unlocked; S = shared; X = exclusive.)
+> >>> +     */
+> >>> +    switch (op) {
+> >>> +    case RAW_LT_PREPARE:
+> >>> +        break;
+> >>> +    case RAW_LT_COMMIT:
+> >>> +        ret = qemu_lock_fd(old_lock_fd, RAW_LOCK_BYTE_WRITE, 1, false);
+> >>> +        if (ret) {
+> >>> +            error_report("Failed to downgrade old fd (share byte)");
+> >>> +            break;
+> >>> +        }
+> >>> +        ret = qemu_lock_fd(new_lock_fd, RAW_LOCK_BYTE_WRITE, 1, false);
+> >>> +        if (ret) {
+> >>> +            error_report("Failed to unlock new fd (share byte)");
+> >>> +            break;
+> >>> +        }
+> >>
+> >> The second one is not an "unlock", but a new shared lock.
+> > 
+> > You are right.
+> > 
+> >> Which brings
+> >> me to the point that both of these commands can fail and thus should be
+> >> in the prepare path.
+> > 
+> > We cannot. If we lose the exclusive lock already in prepare, and some other
+> > things fail later in the transaction, abort() may not be able to restore that
+> > lock (another process took a shared lock in between).
+> > 
+> > The reason for my code is, the lock semantics implies both of these commands can
+> > succeed, so it doesn't hurt if we ignore ret codes here. I'm just trying to
+> > catch the very unlikely abnormalities.
+> 
+> Indeed. Well, then raw_lt_write_to_read() should do the same, though.
+> 
+> Max
 
-Recent kernels have started to interpret that flag rather than take
-dma coherency as granted with virtio-mmio. While that is considered
-a kernel bug, as it breaks previously working systems, it showed that
-our dt description is incomplete.
+Right, will fix!
 
-This patch adds the respective marker that allows guest OSs to evaluate
-that our virtio-mmio devices are indeed cache coherent.
-
-Signed-off-by: Alexander Graf <agraf@suse.de>
----
- hw/arm/vexpress.c | 1 +
- hw/arm/virt.c     | 1 +
- 2 files changed, 2 insertions(+)
-
-diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
-index 58760f4..e057568 100644
---- a/hw/arm/vexpress.c
-+++ b/hw/arm/vexpress.c
-@@ -452,6 +452,7 @@ static int add_virtio_mmio_node(void *fdt, uint32_t acells, uint32_t scells,
-                                        acells, addr, scells, size);
-     qemu_fdt_setprop_cells(fdt, nodename, "interrupt-parent", intc);
-     qemu_fdt_setprop_cells(fdt, nodename, "interrupts", 0, irq, 1);
-+    qemu_fdt_setprop(fdt, nodename, "dma-coherent", NULL, 0);
-     g_free(nodename);
-     if (rc) {
-         return -1;
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 1f216cf..14881fa 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -797,6 +797,7 @@ static void create_virtio_devices(const VirtMachineState *vms, qemu_irq *pic)
-         qemu_fdt_setprop_cells(vms->fdt, nodename, "interrupts",
-                                GIC_FDT_IRQ_TYPE_SPI, irq,
-                                GIC_FDT_IRQ_FLAGS_EDGE_LO_HI);
-+        qemu_fdt_setprop(vms->fdt, nodename, "dma-coherent", NULL, 0);
-         g_free(nodename);
-     }
- }
--- 
-2.10.0
+Fam
