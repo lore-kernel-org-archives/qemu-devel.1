@@ -1,14 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38148)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cbVgY-00033V-OH
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 12:05:39 -0500
+	(envelope-from <stephane.chazelas@gmail.com>) id 1cbVrE-0006Gt-Tq
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 12:16:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cbVgW-0005v8-4C
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 12:05:38 -0500
-From: John Snow <jsnow@redhat.com>
-Date: Wed,  8 Feb 2017 12:05:33 -0500
-Message-Id: <20170208170533.28822-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH] ide: remove undefined behavior in ide-test
+	(envelope-from <stephane.chazelas@gmail.com>) id 1cbVrA-0000Xd-PJ
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 12:16:40 -0500
+Date: Wed, 8 Feb 2017 17:16:33 +0000
+From: Stephane Chazelas <stephane.chazelas@gmail.com>
+Message-ID: <20170208171633.GC19518@chaz.gmail.com>
+References: <20170202123045.GA24714@chaz.gmail.com>
+	<f8a93c01-682e-fbcb-7b81-012f6df97465@redhat.com>
+	<20170208140646.GA19518@chaz.gmail.com>
+	<11bfda2a-7799-a5d5-4ba0-37b2b9dd92f6@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <11bfda2a-7799-a5d5-4ba0-37b2b9dd92f6@redhat.com>
+Subject: Re: [Qemu-devel] [qcow2] how to avoid qemu doing
+ lseek(SEEK_DATA/SEEK_HOLE)?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,28 +26,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-trivial@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Qemu-block <qemu-block@nongnu.org>
 
-trivial: initialize the dirty buffer with a random-ish byte.
-Stops valgrind from whining about uninitialized buffers.
+2017-02-08 15:27:11 +0100, Max Reitz:
+[...]
+> A bit of a stupid question, but: How is your performance when using
+> detect-zeroes=off?
+[...]
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- tests/ide-test.c | 1 +
- 1 file changed, 1 insertion(+)
+I did try that. See:
 
-diff --git a/tests/ide-test.c b/tests/ide-test.c
-index 2fa97bc..139ebc0 100644
---- a/tests/ide-test.c
-+++ b/tests/ide-test.c
-@@ -550,6 +550,7 @@ static void make_dirty(uint8_t device)
- 
-     guest_buf = guest_alloc(guest_malloc, len);
-     buf = g_malloc(len);
-+    memset(buf, rand() % 255 + 1, len);
-     g_assert(guest_buf);
-     g_assert(buf);
- 
+} Note that passing detect-zeroes=off or detect-zeroes=unmap (with
+} discard) doesn't help (even though FALLOC_FL_PUNCH_HOLE is
+} supported on ZFS on Linux).
+
+In my original message. It makes no difference, I still see
+those lseek()s being done.
+
 -- 
-2.9.3
+Stephane
