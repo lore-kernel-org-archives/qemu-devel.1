@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cbPVf-0004AY-3X
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 05:30:00 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cbPdv-0006MT-HH
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 05:38:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cbPVb-0005lU-VO
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 05:29:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60920)
+	(envelope-from <dgilbert@redhat.com>) id 1cbPds-0000Dk-D2
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 05:38:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57988)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cbPVb-0005lN-MQ
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 05:29:55 -0500
-Date: Wed, 8 Feb 2017 10:29:49 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170208102949.GD3129@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170207155956.21573-1-pbonzini@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cbPds-0000BY-46
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 05:38:28 -0500
+Date: Wed, 8 Feb 2017 10:38:21 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170208103820.GB2341@work-vm>
+References: <1484657864-21708-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1484657864-21708-2-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170207155956.21573-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] link to .xz files to save some bandwidth
+In-Reply-To: <1484657864-21708-2-git-send-email-zhang.zhanghailiang@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH 1/3] COLO: fix setting checkpoint-delay not
+ working properly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,77 +28,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
+To: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, eddie.dong@intel.com, lizhijian@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, xuquan8@huawei.com
 
-On Tue, Feb 07, 2017 at 04:59:56PM +0100, Paolo Bonzini wrote:
-> I have converted all .gz and .bz2 files to .xz on download.qemu.org
-> and this patch would change the links in the website.  This would save
-> about 5 GB of bandwidth every day (about 20% savings).
+* zhanghailiang (zhang.zhanghailiang@huawei.com) wrote:
+> If we set checkpoint-delay through command 'migrate-set-parameters',
+> It will not take effect until we finish last sleep chekpoint-delay,
+> That's will be offensive espeically when we want to change its value
+> from an extreme big one to a proper value.
 > 
-> xz should be available for all platforms.  Besides providing better
-> compression ratios, decompression of .xz files is about twice as fast
-> compared to bzip2.  Compression instead is about 5.5 times slower.
+> Fix it by using timer to realize checkpoint-delay.
 
-I'm not disagreeing with the proposal, but decompression time is
-largely irrelevant, IMHO, as any speed up is lost in the noise
-once you consider the time to actually build the QEMU after
-unpacking it.
+Yes, I think this works; you only kick the timer in COLO state,
+and you create the timer before going into COLO state and clean it up
+after we leave, so it feels safe.
 
-Saving GB's of bandwidth a day for our hosting site is a compelling
-benefit, if that has direct impact on project running costs. Shorter
-download times are nice, if you have a very slow internet link too,
-but for most people they'll again be lost in the noise. As discussed
-on IRC, a follow up effort would be to change our releases so we only
-include QEMU source and ship pre-built ROMs in a separate tar.xz
-which would make downloads massively smaller IIUC.
+Are you also going to kick this semaphore when doing a failover to
+cause this thread to exit quickly?
 
 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+Dave
 > ---
->  _download/source.html   | 4 ++--
->  _includes/releases.html | 4 ++--
->  2 files changed, 4 insertions(+), 4 deletions(-)
+>  include/migration/colo.h      |  2 ++
+>  include/migration/migration.h |  5 +++++
+>  migration/colo.c              | 33 +++++++++++++++++++++++----------
+>  migration/migration.c         |  3 +++
+>  4 files changed, 33 insertions(+), 10 deletions(-)
 > 
-> diff --git a/_download/source.html b/_download/source.html
-> index 1ac8f4f..d090a5e 100644
-> --- a/_download/source.html
-> +++ b/_download/source.html
-> @@ -15,8 +15,8 @@
+> diff --git a/include/migration/colo.h b/include/migration/colo.h
+> index e32eef4..2bbff9e 100644
+> --- a/include/migration/colo.h
+> +++ b/include/migration/colo.h
+> @@ -35,4 +35,6 @@ COLOMode get_colo_mode(void);
 >  
->  	{% for release in site.data.releases offset: 0 limit: 1 %}
->  	<p>To download and build QEMU {{release.branch}}.{{release.patch}}:</p>
-> -<pre>wget http://download.qemu-project.org/qemu-{{release.branch}}.{{release.patch}}.tar.bz2
-> -tar xvjf qemu-{{release.branch}}.{{release.patch}}.tar.bz2
-> +<pre>wget http://download.qemu-project.org/qemu-{{release.branch}}.{{release.patch}}.tar.xz
-> +tar xvJf qemu-{{release.branch}}.{{release.patch}}.tar.xz
->  cd qemu-{{release.branch}}.{{release.patch}}
->  ./configure
->  make
-> diff --git a/_includes/releases.html b/_includes/releases.html
-> index 2caab8d..226c719 100644
-> --- a/_includes/releases.html
-> +++ b/_includes/releases.html
-> @@ -1,9 +1,9 @@
->  <ul>
->  {% for release in site.data.releases offset: 0 limit: 4 %}
->  <li><strong><a
-> -  href="http://download.qemu-project.org/qemu-{{release.branch}}.{{release.patch}}.tar.bz2">{{release.branch}}.{{release.patch}}</a></strong>
-> +  href="http://download.qemu-project.org/qemu-{{release.branch}}.{{release.patch}}.tar.xz">{{release.branch}}.{{release.patch}}</a></strong>
->    {{release.date}}<br><a
-> -  href="http://download.qemu-project.org/qemu-{{release.branch}}.{{release.patch}}.tar.bz2.sig">signature</a> &mdash; <a
-> +  href="http://download.qemu-project.org/qemu-{{release.branch}}.{{release.patch}}.tar.xz.sig">signature</a> &mdash; <a
->    href="http://wiki.qemu-project.org/ChangeLog/{{release.branch}}">changes</a></li>
->  {% endfor %}
->  </ul>
+>  /* failover */
+>  void colo_do_failover(MigrationState *s);
+> +
+> +void colo_checkpoint_notify(void *opaque);
+>  #endif
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index c309d23..487ac1e 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -183,6 +183,11 @@ struct MigrationState
+>      /* The RAMBlock used in the last src_page_request */
+>      RAMBlock *last_req_rb;
+>  
+> +    /* The semaphore is used to notify COLO thread to do checkpoint */
+> +    QemuSemaphore colo_checkpoint_sem;
+> +    int64_t colo_checkpoint_time;
+> +    QEMUTimer *colo_delay_timer;
+> +
+>      /* The last error that occurred */
+>      Error *error;
+>  };
+> diff --git a/migration/colo.c b/migration/colo.c
+> index 93c85c5..08b2e46 100644
+> --- a/migration/colo.c
+> +++ b/migration/colo.c
+> @@ -302,7 +302,7 @@ static void colo_process_checkpoint(MigrationState *s)
+>  {
+>      QIOChannelBuffer *bioc;
+>      QEMUFile *fb = NULL;
+> -    int64_t current_time, checkpoint_time = qemu_clock_get_ms(QEMU_CLOCK_HOST);
+> +    int64_t current_time = qemu_clock_get_ms(QEMU_CLOCK_HOST);
+>      Error *local_err = NULL;
+>      int ret;
+>  
+> @@ -332,26 +332,21 @@ static void colo_process_checkpoint(MigrationState *s)
+>      qemu_mutex_unlock_iothread();
+>      trace_colo_vm_state_change("stop", "run");
+>  
+> +    timer_mod(s->colo_delay_timer,
+> +            current_time + s->parameters.x_checkpoint_delay);
+> +
+>      while (s->state == MIGRATION_STATUS_COLO) {
+>          if (failover_get_state() != FAILOVER_STATUS_NONE) {
+>              error_report("failover request");
+>              goto out;
+>          }
+>  
+> -        current_time = qemu_clock_get_ms(QEMU_CLOCK_HOST);
+> -        if (current_time - checkpoint_time <
+> -            s->parameters.x_checkpoint_delay) {
+> -            int64_t delay_ms;
+> +        qemu_sem_wait(&s->colo_checkpoint_sem);
+>  
+> -            delay_ms = s->parameters.x_checkpoint_delay -
+> -                       (current_time - checkpoint_time);
+> -            g_usleep(delay_ms * 1000);
+> -        }
+>          ret = colo_do_checkpoint_transaction(s, bioc, fb);
+>          if (ret < 0) {
+>              goto out;
+>          }
+> -        checkpoint_time = qemu_clock_get_ms(QEMU_CLOCK_HOST);
+>      }
+>  
+>  out:
+> @@ -364,14 +359,32 @@ out:
+>          qemu_fclose(fb);
+>      }
+>  
+> +    timer_del(s->colo_delay_timer);
+> +
+>      if (s->rp_state.from_dst_file) {
+>          qemu_fclose(s->rp_state.from_dst_file);
+>      }
+>  }
+>  
+> +void colo_checkpoint_notify(void *opaque)
+> +{
+> +    MigrationState *s = opaque;
+> +    int64_t next_notify_time;
+> +
+> +    qemu_sem_post(&s->colo_checkpoint_sem);
+> +    s->colo_checkpoint_time = qemu_clock_get_ms(QEMU_CLOCK_HOST);
+> +    next_notify_time = s->colo_checkpoint_time +
+> +                    s->parameters.x_checkpoint_delay;
+> +    timer_mod(s->colo_delay_timer, next_notify_time);
+> +}
+> +
+>  void migrate_start_colo_process(MigrationState *s)
+>  {
+>      qemu_mutex_unlock_iothread();
+> +    qemu_sem_init(&s->colo_checkpoint_sem, 0);
+> +    s->colo_delay_timer =  timer_new_ms(QEMU_CLOCK_HOST,
+> +                                colo_checkpoint_notify, s);
+> +
+>      migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
+>                        MIGRATION_STATUS_COLO);
+>      colo_process_checkpoint(s);
+> diff --git a/migration/migration.c b/migration/migration.c
+> index f498ab8..a4861da 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -895,6 +895,9 @@ void qmp_migrate_set_parameters(MigrationParameters *params, Error **errp)
+>  
+>      if (params->has_x_checkpoint_delay) {
+>          s->parameters.x_checkpoint_delay = params->x_checkpoint_delay;
+> +        if (migration_in_colo_state()) {
+> +            colo_checkpoint_notify(s);
+> +        }
+>      }
+>  }
+>  
 > -- 
-> 2.9.3
+> 1.8.3.1
 > 
 > 
-
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
