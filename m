@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cbVBI-0001q9-8n
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 11:33:22 -0500
+	(envelope-from <eswierk@skyportsystems.com>) id 1cbVBo-0002EE-AY
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 11:33:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cbVBE-0005SH-7O
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 11:33:20 -0500
-Received: from mailapp01.imgtec.com ([195.59.15.196]:58556)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cbVBE-0005Rx-1o
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 11:33:16 -0500
-From: Yongbok Kim <yongbok.kim@imgtec.com>
-Date: Wed, 8 Feb 2017 16:33:00 +0000
-Message-ID: <1486571580-16417-1-git-send-email-yongbok.kim@imgtec.com>
+	(envelope-from <eswierk@skyportsystems.com>) id 1cbVBk-0005Z4-Cz
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 11:33:52 -0500
+Received: from mail-ua0-x234.google.com ([2607:f8b0:400c:c08::234]:36289)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <eswierk@skyportsystems.com>)
+	id 1cbVBk-0005Yf-85
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 11:33:48 -0500
+Received: by mail-ua0-x234.google.com with SMTP id 96so113377207uaq.3
+	for <qemu-devel@nongnu.org>; Wed, 08 Feb 2017 08:33:46 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 4/8] target-mips: Provide function to test
- if a CPU supports an ISA
+From: Ed Swierk <eswierk@skyportsystems.com>
+Date: Wed, 8 Feb 2017 08:33:05 -0800
+Message-ID: <CAO_EM_m9Z7WcxRZthAGgeDgJ6UuwKXwAOEH7NC2=hL8Cd4jABg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: [Qemu-devel] virtio-scsi-pci iothread spins at 100%
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,60 +26,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: paul.burton@imgtec.com, aurelien@aurel32.net
+To: qemu-devel@nongnu.org, stefanha@redhat.com
 
-From: Paul Burton <paul.burton@imgtec.com>
+Recently I noticed that when I configure a virtio-scsi-pci device
+using an iothread, as soon as the guest virtio-scsi driver loads, the
+iothread spins at 100%:
 
-Provide a new cpu_supports_isa function which allows callers to
-determine whether a CPU supports one of the ISA_ flags, by testing
-whether the associated struct mips_def_t sets the ISA flags in its
-insn_flags field.
+  -object iothread,id=iothread1 -device virtio-scsi-pci,iothread=iothread1
 
-An example use of this is to allow boards which generate bootloader code
-to determine the properties of the CPU that will be used, for example
-whether the CPU is 64 bit or which architecture revision it implements.
+This occurs whether or not a disk is attached, with either
+poll-max-ns=0 or poll-max-ns=32768, and with Linux 3.13, 4.1 and 4.4
+guests. The iothread stops spinning as soon as the guest driver is
+unloaded.
 
-Signed-off-by: Paul Burton <paul.burton@imgtec.com>
-Reviewed-by: Leon Alrae <leon.alrae@imgtec.com>
-Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
----
- target/mips/cpu.h       |  1 +
- target/mips/translate.c | 10 ++++++++++
- 2 files changed, 11 insertions(+)
+I bisected the issue to commit 684e508c23d28af8d6ed2c62738a0f60447c8274:
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index e1c78f5..4a4747a 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -815,6 +815,7 @@ int cpu_mips_signal_handler(int host_signum, void *pinfo, void *puc);
- 
- #define cpu_init(cpu_model) CPU(cpu_mips_init(cpu_model))
- bool cpu_supports_cps_smp(const char *cpu_model);
-+bool cpu_supports_isa(const char *cpu_model, unsigned int isa);
- void cpu_set_exception_base(int vp_index, target_ulong address);
- 
- /* TODO QOM'ify CPU reset and remove */
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 7f8ecf4..8b4a072 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -20233,6 +20233,16 @@ bool cpu_supports_cps_smp(const char *cpu_model)
-     return (def->CP0_Config3 & (1 << CP0C3_CMGCR)) != 0;
- }
- 
-+bool cpu_supports_isa(const char *cpu_model, unsigned int isa)
-+{
-+    const mips_def_t *def = cpu_mips_find_by_name(cpu_model);
-+    if (!def) {
-+        return false;
-+    }
-+
-+    return (def->insn_flags & isa) != 0;
-+}
-+
- void cpu_set_exception_base(int vp_index, target_ulong address)
- {
-     MIPSCPU *vp = MIPS_CPU(qemu_get_cpu(vp_index));
--- 
-2.7.4
+  aio: add .io_poll_begin/end() callbacks
+
+It doesn't seem to affect performance, but obviously consuming CPU
+cycles when there's no disk attached is undesirable. Is this an
+expected side effect of implementing iothread polling? Is there a way
+to revert to the old non-polling behavior?
+
+--Ed
