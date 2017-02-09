@@ -1,23 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cbgiM-00020U-Ju
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 23:52:15 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cbgiT-00025Z-FY
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 23:52:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cbgiL-0007iu-Jl
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 23:52:14 -0500
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:35878)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cbgiL-0007il-CB
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 23:52:13 -0500
-Received: by mail-pg0-x241.google.com with SMTP id 75so16789762pgf.3
-	for <qemu-devel@nongnu.org>; Wed, 08 Feb 2017 20:52:13 -0800 (PST)
+	(envelope-from <rth7680@gmail.com>) id 1cbgiP-0007jN-60
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 23:52:21 -0500
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Wed,  8 Feb 2017 20:51:35 -0800
-Message-Id: <20170209045154.16868-4-rth@twiddle.net>
+Date: Wed,  8 Feb 2017 20:51:36 -0800
+Message-Id: <20170209045154.16868-5-rth@twiddle.net>
 In-Reply-To: <20170209045154.16868-1-rth@twiddle.net>
 References: <20170209045154.16868-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH 03/22] linux-user: Fix openrisc cpu_loop
+Subject: [Qemu-devel] [PATCH 04/22] target/openrisc: Fix exception handling
+ status registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,146 +22,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: shorne@gmail.com
+Cc: shorne@gmail.com, qemu-trivial@nongnu.org, openrisc@lists.librecores.org
 
-We need to handle EXCP_DEBUG and EXCP_INTERRUPT.
-We need to send signals to the guest using queue_signal.
+From: Stafford Horne <shorne@gmail.com>
 
+I am working on testing instruction emulation patches for the linux
+kernel. During testing I found these 2 issues:
+
+ - sets DSX (delay slot exception) but never clears it
+ - EEAR for illegal insns should point to the bad exception (as per
+   openrisc spec) but its not
+
+This patch fixes these two issues by clearing the DSX flag when not in a
+delay slot and by setting EEAR to exception PC when handling illegal
+instruction exceptions.
+
+After this patch the openrisc kernel with latest patches boots great on
+qemu and instruction emulation works.
+
+Cc: qemu-trivial@nongnu.org
+Cc: openrisc@lists.librecores.org
+Signed-off-by: Stafford Horne <shorne@gmail.com>
+Message-Id: <20170113220028.29687-1-shorne@gmail.com>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- linux-user/main.c | 95 ++++++++++++++++++++++++-------------------------------
- 1 file changed, 41 insertions(+), 54 deletions(-)
+ target/openrisc/interrupt.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index e588f58..001f71c 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -2574,52 +2574,17 @@ kuser_fail:
- void cpu_loop(CPUOpenRISCState *env)
- {
-     CPUState *cs = CPU(openrisc_env_get_cpu(env));
--    int trapnr, gdbsig;
-+    int trapnr;
-     abi_long ret;
-+    target_siginfo_t info;
- 
-     for (;;) {
-         cpu_exec_start(cs);
-         trapnr = cpu_exec(cs);
-         cpu_exec_end(cs);
-         process_queued_cpu_work(cs);
--        gdbsig = 0;
- 
-         switch (trapnr) {
--        case EXCP_RESET:
--            qemu_log_mask(CPU_LOG_INT, "\nReset request, exit, pc is %#x\n", env->pc);
--            exit(EXIT_FAILURE);
--            break;
--        case EXCP_BUSERR:
--            qemu_log_mask(CPU_LOG_INT, "\nBus error, exit, pc is %#x\n", env->pc);
--            gdbsig = TARGET_SIGBUS;
--            break;
--        case EXCP_DPF:
--        case EXCP_IPF:
--            cpu_dump_state(cs, stderr, fprintf, 0);
--            gdbsig = TARGET_SIGSEGV;
--            break;
--        case EXCP_TICK:
--            qemu_log_mask(CPU_LOG_INT, "\nTick time interrupt pc is %#x\n", env->pc);
--            break;
--        case EXCP_ALIGN:
--            qemu_log_mask(CPU_LOG_INT, "\nAlignment pc is %#x\n", env->pc);
--            gdbsig = TARGET_SIGBUS;
--            break;
--        case EXCP_ILLEGAL:
--            qemu_log_mask(CPU_LOG_INT, "\nIllegal instructionpc is %#x\n", env->pc);
--            gdbsig = TARGET_SIGILL;
--            break;
--        case EXCP_INT:
--            qemu_log_mask(CPU_LOG_INT, "\nExternal interruptpc is %#x\n", env->pc);
--            break;
--        case EXCP_DTLBMISS:
--        case EXCP_ITLBMISS:
--            qemu_log_mask(CPU_LOG_INT, "\nTLB miss\n");
--            break;
--        case EXCP_RANGE:
--            qemu_log_mask(CPU_LOG_INT, "\nRange\n");
--            gdbsig = TARGET_SIGSEGV;
--            break;
-         case EXCP_SYSCALL:
-             env->pc += 4;   /* 0xc00; */
-             ret = do_syscall(env,
-@@ -2636,32 +2601,54 @@ void cpu_loop(CPUOpenRISCState *env)
-                 env->gpr[11] = ret;
-             }
-             break;
-+        case EXCP_DPF:
-+        case EXCP_IPF:
-+        case EXCP_RANGE:
-+            info.si_signo = TARGET_SIGSEGV;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_SEGV_MAPERR;
-+            info._sifields._sigfault._addr = env->pc;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+        case EXCP_ALIGN:
-+            info.si_signo = TARGET_SIGBUS;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_BUS_ADRALN;
-+            info._sifields._sigfault._addr = env->pc;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+        case EXCP_ILLEGAL:
-+            info.si_signo = TARGET_SIGILL;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_ILL_ILLOPC;
-+            info._sifields._sigfault._addr = env->pc;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-         case EXCP_FPE:
--            qemu_log_mask(CPU_LOG_INT, "\nFloating point error\n");
-+            info.si_signo = TARGET_SIGFPE;
-+            info.si_errno = 0;
-+            info.si_code = 0;
-+            info._sifields._sigfault._addr = env->pc;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-             break;
--        case EXCP_TRAP:
--            qemu_log_mask(CPU_LOG_INT, "\nTrap\n");
--            gdbsig = TARGET_SIGTRAP;
-+        case EXCP_INTERRUPT:
-+            /* We processed the pending cpu work above.  */
-             break;
--        case EXCP_NR:
--            qemu_log_mask(CPU_LOG_INT, "\nNR\n");
-+        case EXCP_DEBUG:
-+            trapnr = gdb_handlesig(cs, TARGET_SIGTRAP);
-+            if (trapnr) {
-+                info.si_signo = trapnr;
-+                info.si_errno = 0;
-+                info.si_code = TARGET_TRAP_BRKPT;
-+                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            }
-             break;
-         case EXCP_ATOMIC:
-             cpu_exec_step_atomic(cs);
-             break;
-         default:
--            EXCP_DUMP(env, "\nqemu: unhandled CPU exception %#x - aborting\n",
--                     trapnr);
--            gdbsig = TARGET_SIGILL;
--            break;
--        }
--        if (gdbsig) {
--            gdb_handlesig(cs, gdbsig);
--            if (gdbsig != TARGET_SIGTRAP) {
--                exit(EXIT_FAILURE);
--            }
-+            g_assert_not_reached();
-         }
--
-         process_pending_signals(env);
+diff --git a/target/openrisc/interrupt.c b/target/openrisc/interrupt.c
+index e43fc84..a243eb2 100644
+--- a/target/openrisc/interrupt.c
++++ b/target/openrisc/interrupt.c
+@@ -38,10 +38,17 @@ void openrisc_cpu_do_interrupt(CPUState *cs)
+         env->flags &= ~D_FLAG;
+         env->sr |= SR_DSX;
+         env->epcr -= 4;
++    } else {
++        env->sr &= ~SR_DSX;
      }
- }
+     if (cs->exception_index == EXCP_SYSCALL) {
+         env->epcr += 4;
+     }
++    /* When we have an illegal instruction the error effective address
++       shall be set to the illegal instruction address.  */
++    if (cs->exception_index == EXCP_ILLEGAL) {
++        env->eear = env->pc;
++    }
+ 
+     /* For machine-state changed between user-mode and supervisor mode,
+        we need flush TLB when we enter&exit EXCP.  */
 -- 
 2.9.3
