@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cbmv3-0005kZ-CC
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 06:29:46 -0500
+	(envelope-from <berto@igalia.com>) id 1cbmvg-00069u-Ci
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 06:30:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cbmuz-00058w-FP
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 06:29:45 -0500
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:34578)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cbmuz-00057v-7q
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 06:29:41 -0500
-Received: by mail-wr0-x231.google.com with SMTP id o16so81568595wra.1
-	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 03:29:39 -0800 (PST)
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 09 Feb 2017 11:29:49 +0000
-Message-ID: <8760kjy53m.fsf@linaro.org>
+	(envelope-from <berto@igalia.com>) id 1cbmvc-0005Tx-FS
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 06:30:24 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <1cf91704-5c4d-705c-7681-99ec8cc567bd@redhat.com>
+References: <20170126101827.22378-1-berrange@redhat.com>
+	<20170126101827.22378-5-berrange@redhat.com>
+	<1cf91704-5c4d-705c-7681-99ec8cc567bd@redhat.com>
+Date: Thu, 09 Feb 2017 12:30:15 +0100
+Message-ID: <w51r3378uuw.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] How can I exercise the CPU reset code for iMX boards?
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 04/18] qcow: require image
+ size to be > 1 for new images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +24,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jean-Christophe Dubois <jcd@tribudubois.net>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU-DEV <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
+On Wed 08 Feb 2017 08:29:27 PM CET, Eric Blake wrote:
+>> The qcow driver refuses to open images which are less than 2 bytes in
+>> size, but will happily create such images. Add a check in the create
+>> path to avoid this discrepancy.
+>
+> I agree that we have the 2-byte limit:
+  [...]
+> But why 2 bytes? That's a weird limit from history.
 
-Hi Jean-Christophe,
+I also don't see what's the point, considering that in qcow_open()
 
-As part of the MTTCG work I've been tweaking the reset handling code in
-imx6_src.c to handle the fact the reset is now asynchronous:
+    bs->total_sectors = header.size / 512;
 
-  https://github.com/stsquad/qemu/commit/ef8e78e7adccb8c881a1772ac01cd78c6b436de3
+So anything smaller than 512 is an empty image in practice. Maybe it's
+worth increasing the lower limit in qcow_open(), and/or rejecting to
+open images with a size that is not multiple of 512. But that would be
+for a different patch.
 
-The only image I currently have is from Peter's image zoo which is a
-simple kernel and initrd. I can successfully offline/online CPUs but
-with printfs I can see this never causes them to be reset. So a couple
-of questions:
+This one is fine as it is. I think that the condition can be simply
+(total_size == 0) because it can never have a value between 0 and
+BDRV_SECTOR_SIZE, but either way
 
-  - does Linux even exercise the reset bit?
-  - if not are there any test OS images that do?
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
-and a follow-up bonus questions:
-
-  - what's the QEMU invocation for the iMX boards with a SD card?
-  - are there any full images you suggest with a more complete rootfs?
-
-Regards,
-
---
-Alex Bennée
+Berto
