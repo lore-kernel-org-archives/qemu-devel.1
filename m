@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59203)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1cboDz-0002c0-Fn
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 07:53:24 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cboLr-0008RR-LA
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:01:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1cboDy-0007QS-GS
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 07:53:23 -0500
-From: Alexander Graf <agraf@suse.de>
-Date: Thu,  9 Feb 2017 13:53:27 +0100
-Message-Id: <1486644810-33181-2-git-send-email-agraf@suse.de>
-In-Reply-To: <1486644810-33181-1-git-send-email-agraf@suse.de>
-References: <1486644810-33181-1-git-send-email-agraf@suse.de>
-Subject: [Qemu-devel] [PATCH v2 1/4] target-arm: Declare virtio-mmio as
- dma-coherent in dt
+	(envelope-from <kraxel@redhat.com>) id 1cboLn-00020s-Rj
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:01:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36636)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cboLn-00020f-Mx
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:01:27 -0500
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu,  9 Feb 2017 14:01:08 +0100
+Message-Id: <1486645277-4724-2-git-send-email-kraxel@redhat.com>
+In-Reply-To: <1486645277-4724-1-git-send-email-kraxel@redhat.com>
+References: <1486645277-4724-1-git-send-email-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 01/10] ui/vnc: Drop unused vnc_has_job() and
+ vnc_jobs_clear()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,49 +25,68 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, mst@redhat.com, Laszlo Ersek <lersek@redhat.com>, Shannon Zhao <shannon.zhao@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-QEMU emulated hardware is always dma coherent with its guest. We do
-annotate that correctly on the PCI host controller, but left out
-virtio-mmio.
+From: Peter Maydell <peter.maydell@linaro.org>
 
-Recent kernels have started to interpret that flag rather than take
-dma coherency as granted with virtio-mmio. While that is considered
-a kernel bug, as it breaks previously working systems, it showed that
-our dt description is incomplete.
+The functions vnc_has_job() and vnc_jobs_clear() are
+never used; remove them.
 
-This patch adds the respective marker that allows guest OSs to evaluate
-that our virtio-mmio devices are indeed cache coherent.
-
-Signed-off-by: Alexander Graf <agraf@suse.de>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Gonglei <arei.gonglei@huawei.com>
+Message-id: 1486146260-8092-1-git-send-email-peter.maydell@linaro.org
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/arm/vexpress.c | 1 +
- hw/arm/virt.c     | 1 +
- 2 files changed, 2 insertions(+)
+ ui/vnc-jobs.c | 23 -----------------------
+ ui/vnc-jobs.h |  2 --
+ 2 files changed, 25 deletions(-)
 
-diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
-index 58760f4..e057568 100644
---- a/hw/arm/vexpress.c
-+++ b/hw/arm/vexpress.c
-@@ -452,6 +452,7 @@ static int add_virtio_mmio_node(void *fdt, uint32_t acells, uint32_t scells,
-                                        acells, addr, scells, size);
-     qemu_fdt_setprop_cells(fdt, nodename, "interrupt-parent", intc);
-     qemu_fdt_setprop_cells(fdt, nodename, "interrupts", 0, irq, 1);
-+    qemu_fdt_setprop(fdt, nodename, "dma-coherent", NULL, 0);
-     g_free(nodename);
-     if (rc) {
-         return -1;
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 1f216cf..14881fa 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -797,6 +797,7 @@ static void create_virtio_devices(const VirtMachineState *vms, qemu_irq *pic)
-         qemu_fdt_setprop_cells(vms->fdt, nodename, "interrupts",
-                                GIC_FDT_IRQ_TYPE_SPI, irq,
-                                GIC_FDT_IRQ_FLAGS_EDGE_LO_HI);
-+        qemu_fdt_setprop(vms->fdt, nodename, "dma-coherent", NULL, 0);
-         g_free(nodename);
-     }
+diff --git a/ui/vnc-jobs.c b/ui/vnc-jobs.c
+index 98ca978..f786777 100644
+--- a/ui/vnc-jobs.c
++++ b/ui/vnc-jobs.c
+@@ -128,29 +128,6 @@ static bool vnc_has_job_locked(VncState *vs)
+     return false;
  }
+ 
+-bool vnc_has_job(VncState *vs)
+-{
+-    bool ret;
+-
+-    vnc_lock_queue(queue);
+-    ret = vnc_has_job_locked(vs);
+-    vnc_unlock_queue(queue);
+-    return ret;
+-}
+-
+-void vnc_jobs_clear(VncState *vs)
+-{
+-    VncJob *job, *tmp;
+-
+-    vnc_lock_queue(queue);
+-    QTAILQ_FOREACH_SAFE(job, &queue->jobs, next, tmp) {
+-        if (job->vs == vs || !vs) {
+-            QTAILQ_REMOVE(&queue->jobs, job, next);
+-        }
+-    }
+-    vnc_unlock_queue(queue);
+-}
+-
+ void vnc_jobs_join(VncState *vs)
+ {
+     vnc_lock_queue(queue);
+diff --git a/ui/vnc-jobs.h b/ui/vnc-jobs.h
+index 044bf9f..59f66bc 100644
+--- a/ui/vnc-jobs.h
++++ b/ui/vnc-jobs.h
+@@ -34,8 +34,6 @@
+ VncJob *vnc_job_new(VncState *vs);
+ int vnc_job_add_rect(VncJob *job, int x, int y, int w, int h);
+ void vnc_job_push(VncJob *job);
+-bool vnc_has_job(VncState *vs);
+-void vnc_jobs_clear(VncState *vs);
+ void vnc_jobs_join(VncState *vs);
+ 
+ void vnc_jobs_consume_buffer(VncState *vs);
 -- 
-2.10.0
+1.8.3.1
