@@ -1,31 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35044)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cbmXH-000082-FN
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 06:05:15 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cbmak-0001cU-Ga
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 06:08:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cbmXE-0007rG-Au
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 06:05:11 -0500
-Received: from szxga02-in.huawei.com ([119.145.14.65]:31148)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cbmXD-0007YO-Or
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 06:05:08 -0500
-Message-ID: <589C4C9D.3000008@huawei.com>
-Date: Thu, 9 Feb 2017 19:03:57 +0800
-From: "Longpeng (Mike)" <longpeng2@huawei.com>
-MIME-Version: 1.0
-References: <20170109162504.GH29989@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA182982@DGGEMA505-MBX.china.huawei.com>
-	<20170110100355.GD27720@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA182ADA@DGGEMA505-MBX.china.huawei.com>
-	<20170110120354.GH27720@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA182B4A@DGGEMA505-MBX.china.huawei.com>
-	<20170110133019.GJ27720@redhat.com> <589AF6EC.5050803@huawei.com>
-	<20170208105336.GH3129@redhat.com> <589BDAEF.8000703@huawei.com>
-	<20170209101114.GA4742@redhat.com>
-In-Reply-To: <20170209101114.GA4742@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Question about add AF_ALG backend for virtio-crypto
+	(envelope-from <imammedo@redhat.com>) id 1cbmah-0003zt-Aw
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 06:08:46 -0500
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Thu,  9 Feb 2017 12:08:31 +0100
+Message-Id: <1486638518-171446-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/7] pc/spapr: unify handling of possible CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,105 +17,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: "Gonglei (Arei)" <arei.gonglei@huawei.com>, QEMU-DEV <qemu-devel@nongnu.org>
-
-Hi Daniel,
-
-On 2017/2/9 18:11, Daniel P. Berrange wrote:
-
-> On Thu, Feb 09, 2017 at 10:58:55AM +0800, Longpeng (Mike) wrote:
->> Hi Daniel,
+To: qemu-devel@nongnu.org
+Cc: David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, ehabkost@redhat.com, drjones@redhat.com, Marcel Apfelbaum <marcel@redhat.com>
 
 
->>
->> So...you prefer approach 1 with a driver-table dispatch layer, right?
->> And this implies that we must either rename some public methods in
->> cipher-gcrypt.c/cipher-nettle.c, or change them to 'static'.
-> 
-> I'd suggest both - renaming them to have 'gcrypt' or 'nettle' in their
-> name, and also make them static.
-> 
+Series is prerequsite split of from NUMA cpu mapping
+refactoring and includes only possible_cpus[] generalization
+to make it reusable for SPAPR and virt-arm targets as
+has been requested by Eduardo [1].
+
+Since virt-arm doesn't support -device based CPUs, ARM
+patches are not included here and will be posted separately as
+ 'hw/arm/virt: -device cpu support'
+series with dependency on this series.
+
+This series doesn't include any of NUMA refactoring patches,
+which will be posted on top once SPAPR and virt-arm would use
+possible_cpus[].
+
+Hence goal of this series is to make x86 specific possible_cpus[]
+more generic, move it to MachineState and reuse it in SPAPR
+machine so we could use it as common storage for topology
+information when parsing -smp/-numa and then follow
+the same/similar CPU creation pattern across the affected targets.
+
+As result of this series:
+  * possible_cpus[] becomes part of MachineState
+  * SPAPR machine reuses it for persistent topololy storage
+    and core bookkeeping
+  * target specific query_hotpluggable_cpus() callbacks are
+    generalized into common machine_query_hotpluggable_cpus()
+
+Series depends on:
+  [PATCH 0/3] spapr: fix cpu core hotunplug call flow
+  https://www.mail-archive.com/qemu-devel@nongnu.org/msg427214.html
+which is staged for next pull req in SPAPR tree.
+
+git tree for testing:
+  git@github.com:imammedo/qemu.git unify_poissible_cpus_v1
+
+Regression tested CPU hotplug with ppc fedora25 guest on ppc host
+with kvm enabled.
+
+ 1) "[RFC 00/13] numa: add '-numa cpu' option"
+    https://www.mail-archive.com/qemu-devel@nongnu.org/msg423883.html
+
+CC: David Gibson <david@gibson.dropbear.id.au> (supporter:sPAPR)
+CC: Alexander Graf <agraf@suse.de> (supporter:sPAPR)
+CC: qemu-ppc@nongnu.org 
+CC: Bharata B Rao <bharata@linux.vnet.ibm.com>
+CC: ehabkost@redhat.com
+CC: drjones@redhat.com
+CC: Marcel Apfelbaum <marcel@redhat.com>
 
 
-OK.
+Igor Mammedov (7):
+  machine: move possible_cpus to MachineState
+  pc: move pcms->possible_cpus init out of pc_cpus_init()
+  pc: calculate topology only once when possible_cpus is initialised
+  pc: pass apic_id to pc_find_cpu_slot() directly so lookup could be
+    done without CPU object
+  change CPUArchId.cpu type to Object*
+  spapr: reuse machine->possible_cpus instead of cores[]
+  machine: unify [pc_|spapr_]query_hotpluggable_cpus() callbacks
 
->> I also have some other ideas:
->>
-
->> 2) *maybe we need a heuristic policy*
->>
->> I added some speed test in test-crypto-cipher/hash and found that for big
->> packets AF_ALG is much faster than library-impl while library-impl is better
->> when the packets is small:
->>
->> packet(bytes)	AF_ALG(MB/sec, intel QAT)	Library-impl(MB/sec)
->> 512		53.68				127.82
->> 1024		98.39				133.21
->> 2048		167.56				134.62
->> 4096		276.21				135.10
->> 8192		410.80				135.82
->> 16384		545.08				136.01
->> 32768		654.49				136.30
->> 65536		723.00				136.29
->>
->> If a @alg is both supported by AF_ALG and library-impl, I think we should decide
->> to use which one dynamically.
-> 
-> What exactly are you measuring here?
-> 
-> Is this comparing encryption of a fixed total size of data, and
-> varying the packet size. ie sending 1024 * 512 byte packets against
-> 256  * 2048 byte packages.
-> 
-> Or is it sending a constant number of packets eg 1024 * 512 byte
-> packets against 1024 * 2048 byte packets ?
-> 
-
-
-The testcase encrypts data for 5 seconds and then calculates how many MBs it can
-encrypt per second, as below:
-
-    g_test_timer_start();
-    do {
-        g_assert(qcrypto_cipher_setiv(cipher,
-                                      iv, niv,
-                                      &err) == 0);
-
-        g_assert(qcrypto_cipher_encrypt(cipher,
-                                        plaintext,
-                                        ciphertext,
-                                        chunk_size,
-                                        &err) == 0);
-        total += chunk_size;
-    } while (g_test_timer_elapsed() < 5.0);
-
-    total /= 1024 * 1024; /* to MB */
-    g_print("Testing cbc(aes128): ");
-    g_print("Encrypting in chunks of %ld bytes: ", chunk_size);
-    g_print("done. %.2f MB in %.2f secs: ", total, g_test_timer_last());
-    g_print("%.2f MB/sec\t", total / g_test_timer_last());
-
-chunk_size = 512/1024/2048/.../65536 bytes.
-
-Some other projects (ie. cryptodev-linux, libkcapi) also use this way to test speed.
-
-> The problem is that when constructing the cipher initially, we have no
-> about the intended usage pattern, so can't decide which impl to use as
-> is
-> 
-
-
-Yep, I wanted to allocate both af_alg and library-impl objects and then we can
-choose dynamically before, but now it seems too stupid. :)
-
-Thanks.
-
-> 
-> Regards,
-> Daniel
-
+ include/hw/boards.h    |   8 +++-
+ include/hw/i386/pc.h   |   1 -
+ include/hw/ppc/spapr.h |   1 -
+ hw/acpi/cpu.c          |   2 +-
+ hw/core/machine.c      |  31 +++++++++++++
+ hw/i386/pc.c           | 124 +++++++++++++++++++++----------------------------
+ hw/ppc/spapr.c         | 117 +++++++++++++++++++++++++++-------------------
+ 7 files changed, 162 insertions(+), 122 deletions(-)
 
 -- 
-Regards,
-Longpeng(Mike)
+2.7.4
