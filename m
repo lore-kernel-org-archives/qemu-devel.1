@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cbrsg-0003jP-VP
+	(envelope-from <kraxel@redhat.com>) id 1cbrsg-0003jQ-Vo
 	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 11:47:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cbrsf-0003Cr-Bz
+	(envelope-from <kraxel@redhat.com>) id 1cbrse-0003CG-Ar
 	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 11:47:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54308)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cbrse-0003Bu-5O
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 11:47:36 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu,  9 Feb 2017 17:47:14 +0100
-Message-Id: <1486658842-7143-3-git-send-email-kraxel@redhat.com>
+Date: Thu,  9 Feb 2017 17:47:13 +0100
+Message-Id: <1486658842-7143-2-git-send-email-kraxel@redhat.com>
 In-Reply-To: <1486658842-7143-1-git-send-email-kraxel@redhat.com>
 References: <1486658842-7143-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL v2 02/10] vnc: do not disconnect on EAGAIN
+Subject: [Qemu-devel] [PULL v2 01/10] ui/vnc: Drop unused vnc_has_job() and
+ vnc_jobs_clear()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,79 +25,68 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Michael Tokarev <mjt@tls.msk.ru>, "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-stable@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-From: Michael Tokarev <mjt@tls.msk.ru>
+From: Peter Maydell <peter.maydell@linaro.org>
 
-When qemu vnc server is trying to send large update to clients,
-there might be a situation when system responds with something
-like EAGAIN, indicating that there's no system memory to send
-that much data (depending on the network speed, client and server
-and what is happening).  In this case, something like this happens
-on qemu side (from strace):
+The functions vnc_has_job() and vnc_jobs_clear() are
+never used; remove them.
 
-sendmsg(16, {msg_name(0)=NULL,
-        msg_iov(1)=[{"\244\"..., 729186}],
-        msg_controllen=0, msg_flags=0}, 0) = 103950
-sendmsg(16, {msg_name(0)=NULL,
-        msg_iov(1)=[{"lz\346"..., 1559618}],
-        msg_controllen=0, msg_flags=0}, 0) = -1 EAGAIN
-sendmsg(-1, {msg_name(0)=NULL,
-        msg_iov(1)=[{"lz\346"..., 1559618}],
-        msg_controllen=0, msg_flags=0}, 0) = -1 EBADF
-
-qemu closes the socket before the retry, and obviously it gets EBADF
-when trying to send to -1.
-
-This is because there WAS a special handling for EAGAIN, but now it doesn't
-work anymore, after commit 04d2529da27db512dcbd5e99d0e26d333f16efcc, because
-now in all error-like cases we initiate vnc disconnect.
-
-This change were introduced in qemu 2.6, and caused numerous grief for many
-people, resulting in their vnc clients reporting sporadic random disconnects
-from vnc server.
-
-Fix that by doing the disconnect only when necessary, i.e. omitting this
-very case of EAGAIN.
-
-Hopefully the existing condition (comparing with QIO_CHANNEL_ERR_BLOCK)
-is sufficient, as the original code (before the above commit) were
-checking for other errno values too.
-
-Apparently there's another (semi?)bug exist somewhere here, since the
-code tries to write to fd# -1, it probably should check if the connection
-is open before. But this isn't important.
-
-Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 1486115549-9398-1-git-send-email-mjt@msgid.tls.msk.ru
-Fixes: 04d2529da27db512dcbd5e99d0e26d333f16efcc
-Cc: Daniel P. Berrange <berrange@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-stable@nongnu.org
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Gonglei <arei.gonglei@huawei.com>
+Message-id: 1486146260-8092-1-git-send-email-peter.maydell@linaro.org
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- ui/vnc.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ ui/vnc-jobs.c | 23 -----------------------
+ ui/vnc-jobs.h |  2 --
+ 2 files changed, 25 deletions(-)
 
-diff --git a/ui/vnc.c b/ui/vnc.c
-index cdeb79c..f2701e5 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -1256,12 +1256,13 @@ ssize_t vnc_client_io_error(VncState *vs, ssize_t ret, Error **errp)
-     if (ret <= 0) {
-         if (ret == 0) {
-             VNC_DEBUG("Closing down client sock: EOF\n");
-+            vnc_disconnect_start(vs);
-         } else if (ret != QIO_CHANNEL_ERR_BLOCK) {
-             VNC_DEBUG("Closing down client sock: ret %zd (%s)\n",
-                       ret, errp ? error_get_pretty(*errp) : "Unknown");
-+            vnc_disconnect_start(vs);
-         }
+diff --git a/ui/vnc-jobs.c b/ui/vnc-jobs.c
+index 98ca978..f786777 100644
+--- a/ui/vnc-jobs.c
++++ b/ui/vnc-jobs.c
+@@ -128,29 +128,6 @@ static bool vnc_has_job_locked(VncState *vs)
+     return false;
+ }
  
--        vnc_disconnect_start(vs);
-         if (errp) {
-             error_free(*errp);
-             *errp = NULL;
+-bool vnc_has_job(VncState *vs)
+-{
+-    bool ret;
+-
+-    vnc_lock_queue(queue);
+-    ret = vnc_has_job_locked(vs);
+-    vnc_unlock_queue(queue);
+-    return ret;
+-}
+-
+-void vnc_jobs_clear(VncState *vs)
+-{
+-    VncJob *job, *tmp;
+-
+-    vnc_lock_queue(queue);
+-    QTAILQ_FOREACH_SAFE(job, &queue->jobs, next, tmp) {
+-        if (job->vs == vs || !vs) {
+-            QTAILQ_REMOVE(&queue->jobs, job, next);
+-        }
+-    }
+-    vnc_unlock_queue(queue);
+-}
+-
+ void vnc_jobs_join(VncState *vs)
+ {
+     vnc_lock_queue(queue);
+diff --git a/ui/vnc-jobs.h b/ui/vnc-jobs.h
+index 044bf9f..59f66bc 100644
+--- a/ui/vnc-jobs.h
++++ b/ui/vnc-jobs.h
+@@ -34,8 +34,6 @@
+ VncJob *vnc_job_new(VncState *vs);
+ int vnc_job_add_rect(VncJob *job, int x, int y, int w, int h);
+ void vnc_job_push(VncJob *job);
+-bool vnc_has_job(VncState *vs);
+-void vnc_jobs_clear(VncState *vs);
+ void vnc_jobs_join(VncState *vs);
+ 
+ void vnc_jobs_consume_buffer(VncState *vs);
 -- 
 1.8.3.1
