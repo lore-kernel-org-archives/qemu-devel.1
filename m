@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59197)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1cboDy-0002be-Su
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 07:53:23 -0500
+	(envelope-from <agraf@suse.de>) id 1cboDz-0002bh-7F
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 07:53:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1cboDy-0007Q8-9d
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 07:53:22 -0500
+	(envelope-from <agraf@suse.de>) id 1cboDy-0007QI-Bc
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 07:53:23 -0500
 From: Alexander Graf <agraf@suse.de>
-Date: Thu,  9 Feb 2017 13:53:28 +0100
-Message-Id: <1486644810-33181-3-git-send-email-agraf@suse.de>
-In-Reply-To: <1486644810-33181-1-git-send-email-agraf@suse.de>
-References: <1486644810-33181-1-git-send-email-agraf@suse.de>
-Subject: [Qemu-devel] [PATCH v2 2/4] hw/arm/virt: Declare virtio-mmio as dma
- cache coherent in ACPI
+Date: Thu,  9 Feb 2017 13:53:26 +0100
+Message-Id: <1486644810-33181-1-git-send-email-agraf@suse.de>
+Subject: [Qemu-devel] [PATCH v2 0/4] target-arm: Add some omitted dma cache
+ coherency flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,25 +21,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org, mst@redhat.com, Laszlo Ersek <lersek@redhat.com>, Shannon Zhao <shannon.zhao@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-Virtio-mmio devices can directly access guest memory and do so in cache
-coherent fashion. Tell the guest about that fact when it's using ACPI.
+ARM is amazing when it comes to cache coherency and VMs. While any sane
+architecture allows the host to override the guest's caching attributes,
+that's very hard to do on ARM.
 
-Signed-off-by: Alexander Graf <agraf@suse.de>
----
- hw/arm/virt-acpi-build.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 07a10ac..8955a9d 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -135,6 +135,7 @@ static void acpi_dsdt_add_virtio(Aml *scope,
-         Aml *dev = aml_device("VR%02u", i);
-         aml_append(dev, aml_name_decl("_HID", aml_string("LNRO0005")));
-         aml_append(dev, aml_name_decl("_UID", aml_int(i)));
-+        aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
+That means that the guest may directly access guest memory bypassing the
+cache while QEMU happily writes to / reads from cache. The end result is
+very nasty, because both sides see very different views of the world.
  
-         Aml *crs = aml_resource_template();
-         aml_append(crs, aml_memory32_fixed(base, size, AML_READ_WRITE));
+That means that we need to be very cautious to tell guests that devices
+that QEMU emulates are going to use data in the cache rather than directly
+on memory.
+
+We added this to PCI a while back for DT (5d636e21 "hw/arm/virt: mark the PCIe
+host controller as DMA coherent in the DT") and ACPI (bc64b96 "hw/arm/virt-
+acpi-build: _CCA attribute is compulsory") but never updated virtio-mmio or
+fw-cfg in DT or ACPI tables.
+
+This patch set adds the respective cache coherency flags for them in both DT and
+ACPI.
+
+Fortunately, no guests except for Linux 4.9.7 and 4.9.8 are broken because of
+this. Upstream realized quickly enough that every user of virtio-mmio out there
+describes its cache coherency incorrectly and reverted the patch that would
+require said dma coherency flag. But we should be safe for the future and "do
+the right thing".
+
+Alexander Graf (4):
+  target-arm: Declare virtio-mmio as dma-coherent in dt
+  hw/arm/virt: Declare virtio-mmio as dma cache coherent in ACPI
+  hw/arm/virt: Declare fwcfg as dma cache coherent in ACPI
+  hw/arm/virt: Declare fwcfg as dma cache coherent in dt
+
+ hw/arm/vexpress.c        | 1 +
+ hw/arm/virt-acpi-build.c | 2 ++
+ hw/arm/virt.c            | 2 ++
+ 3 files changed, 5 insertions(+)
+
 -- 
 2.10.0
