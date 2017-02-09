@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cbd6V-0005dt-O2
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 20:01:01 -0500
+	(envelope-from <heyi.guo@linaro.org>) id 1cbnT8-0007cl-Nl
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 07:04:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cbd6P-0003vv-VO
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 20:00:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60604)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cbd6P-0003vP-Q3
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 20:00:49 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cbd6N-0003L8-99
-	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 01:00:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2E6722E80C0
-	for <qemu-devel@nongnu.org>; Thu,  9 Feb 2017 01:00:47 +0000 (UTC)
+	(envelope-from <heyi.guo@linaro.org>) id 1cbnT5-000195-Jt
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 07:04:58 -0500
+Received: from mail-pf0-x233.google.com ([2607:f8b0:400e:c00::233]:36517)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <heyi.guo@linaro.org>) id 1cbnT5-00018Y-C0
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 07:04:55 -0500
+Received: by mail-pf0-x233.google.com with SMTP id 189so372782pfu.3
+	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 04:04:53 -0800 (PST)
+References: <1486560712-44171-1-git-send-email-agraf@suse.de>
+	<ef6b903b-5224-b4eb-1080-a3689fcec70a@redhat.com>
+	<f2f119bc-9c22-ad52-ff26-7d6ecc213a3c@suse.de>
+	<c1ff3829-b068-881a-1523-317ef0d31689@redhat.com>
+	<C4E1DF44-1626-425D-880E-0053AD688422@linaro.org>
+	<CAFEAcA8rjjzgvN-RuNPVHM53R9V9xry1Uj_ArmF1va-Y920eBQ@mail.gmail.com>
+	<991fc2e7-e483-c7bc-fc45-3d32d9d37857@redhat.com>
+From: Heyi Guo <heyi.guo@linaro.org>
+Message-ID: <374fb64f-9590-2b23-871a-90bbf08ce70d@linaro.org>
+Date: Thu, 9 Feb 2017 20:04:45 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 09 Feb 2017 00:55:38 -0000
-From: Paco <manuel.arguelles@gmail.com>
-Reply-To: Bug 1663079 <1663079@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20170209005538.4996.16948.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1663079] [NEW] socket network not working
+In-Reply-To: <991fc2e7-e483-c7bc-fc45-3d32d9d37857@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] target-arm: Declare virtio-mmio
+ as dma-coherent in dt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,76 +35,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Shannon Zhao <shannon.zhao@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, Alex Hung <alex.hung@canonical.com>
 
-Public bug reported:
+Hi all,
 
-The socket network type is no longer working in 2.8.0.
+Just to confirm that FWTS is supporting aarch64.
 
-When trying to establish a network between 2 qemu instances:
+Alex is the maintainer of FWTS and may provide more information.
 
-The listening host:
-qemu-system-x86_64 -netdev socket,id=3Din0,listen=3D127.0.0.1:9999 -device =
-virtio-net-pci,netdev=3Din0
+Regards,
 
-works fine, but for the second one:
+Gary (Heyi Guo)
 
-qemu-system-x86_64 -netdev socket,id=3Din0,connect=3D127.0.0.1:9999 -device
-virtio-net-pci,netdev=3Din0
 
-It fails with:
-
-qemu-system-x86_64: -device virtio-net-pci,netdev=3Din0: Property 'virtio-
-net-device.netdev' can't find value 'in0'
-
-netstat shows a new connection to port 9999 in time_wait state every
-time.
-
-host: kernel 4.4.38, 64bits.
-
-It was working fine with previous version.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1663079
-
-Title:
-  socket network not working
-
-Status in QEMU:
-  New
-
-Bug description:
-  The socket network type is no longer working in 2.8.0.
-
-  When trying to establish a network between 2 qemu instances:
-
-  The listening host:
-  qemu-system-x86_64 -netdev socket,id=3Din0,listen=3D127.0.0.1:9999 -devic=
-e virtio-net-pci,netdev=3Din0
-
-  works fine, but for the second one:
-
-  qemu-system-x86_64 -netdev socket,id=3Din0,connect=3D127.0.0.1:9999
-  -device virtio-net-pci,netdev=3Din0
-
-  It fails with:
-
-  qemu-system-x86_64: -device virtio-net-pci,netdev=3Din0: Property
-  'virtio-net-device.netdev' can't find value 'in0'
-
-  netstat shows a new connection to port 9999 in time_wait state every
-  time.
-
-  host: kernel 4.4.38, 64bits.
-
-  It was working fine with previous version.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1663079/+subscriptions
+在 2/9/2017 2:47 AM, Laszlo Ersek 写道:
+> On 02/08/17 19:23, Peter Maydell wrote:
+>> On 8 February 2017 at 16:27, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+>>> The _CCA property is mandatory on arm64, and there is no default.
+>> Is there a tool that can check this kind of requirement
+>> and complain about issues in the ACPI tables (and
+>> ditto, device tree)? It's really easy to produce a
+>> dt or ACPI table that works with current kernels and
+>> then turns out to have a problem six or twelve
+>> months down the line :-(
+> I think the "bios bits" project or the FWTS (firmware test suite)
+> project might do some ACPI sanity checks. They could be run in guests.
+>
+> https://biosbits.org/
+> https://wiki.ubuntu.com/FirmwareTestSuite
+>
+> However, I'm unsure if they support aarch64. Also... it's not like those
+> projects are stationary. Even the ACPI spec is a moving target (and
+> spec-level regressions exist).
+>
+> I believe Heyi Guo @ Linaro used to work with FWTS on aarch64. CC'd.
+>
+> No clue about DT conformance testing. Is there an industry standard or a
+> working group behind DT?
+>
+> Thanks
+> Laszlo
+>
