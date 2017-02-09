@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cbsDY-0006Q5-Ij
+	(envelope-from <alex.bennee@linaro.org>) id 1cbsDb-0006Tp-Ho
 	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:09:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cbsDW-0002XW-Q5
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:09:12 -0500
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:34987)
+	(envelope-from <alex.bennee@linaro.org>) id 1cbsDZ-0002ZK-SK
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:09:15 -0500
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:34375)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cbsDW-0002We-GB
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:09:10 -0500
-Received: by mail-wr0-x22e.google.com with SMTP id 89so88213560wrr.2
-	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 09:09:10 -0800 (PST)
+	id 1cbsDZ-0002Yi-HU
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:09:13 -0500
+Received: by mail-wr0-x231.google.com with SMTP id o16so88307214wra.1
+	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 09:09:13 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu,  9 Feb 2017 17:08:59 +0000
-Message-Id: <20170209170904.5713-20-alex.bennee@linaro.org>
+Date: Thu,  9 Feb 2017 17:08:58 +0000
+Message-Id: <20170209170904.5713-19-alex.bennee@linaro.org>
 In-Reply-To: <20170209170904.5713-1-alex.bennee@linaro.org>
 References: <20170209170904.5713-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v11 19/24] cputlb: introduce
- tlb_flush_*_all_cpus[_synced]
+Subject: [Qemu-devel] [PATCH v11 18/24] cputlb: atomically update tlb fields
+ used by tlb_reset_dirty
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,351 +33,245 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, rth@twiddle.net
 Cc: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-This introduces support to the cputlb API for flushing all CPUs TLBs
-with one call. This avoids the need for target helpers to iterate
-through the vCPUs themselves.
+The main use case for tlb_reset_dirty is to set the TLB_NOTDIRTY flags
+in TLB entries to force the slow-path on writes. This is used to mark
+page ranges containing code which has been translated so it can be
+invalidated if written to. To do this safely we need to ensure the TLB
+entries in question for all vCPUs are updated before we attempt to run
+the code otherwise a race could be introduced.
 
-An additional variant of the API (_synced) will cause the source vCPUs
-work to be scheduled as "safe work". The result will be all the flush
-operations will be complete by the time the originating vCPU executes
-its safe work. The calling implementation can either end the TB
-straight away (which will then pick up the cpu->exit_request on
-entering the next block) or defer the exit until the architectural
-sync point (usually a barrier instruction).
+To achieve this we atomically set the flag in tlb_reset_dirty_range and
+take care when setting it when the TLB entry is filled.
+
+On 32 bit systems attempting to emulate 64 bit guests we don't even
+bother as we might not have the atomic primitives available. MTTCG is
+disabled in this case and can't be forced on. The copy_tlb_helper
+function helps keep the atomic semantics in one place to avoid
+confusion.
+
+The dirty helper function is made static as it isn't used outside of
+cputlb.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
-
 ---
+v6
+  - use TARGET_PAGE_BITS_MIN
+  - use run_on_cpu helpers
 v7
-  - some checkpatch long line fixes
-v8
-  - change from varg to bitmap calling convention
-  - add _synced variants, re-factored helper
-v9
-  - add r-b tags
-v10
- - rm QEMU_NORETURN (leave it to the guests)
- - rm cpu_loop_exit (as above)
- - fixup tlb_flush_all_cpus() to use fn pattern like the rest
- - update documentation of _synced() function
+  - fix tlb_debug fmt for 32bit build
+  - un-merged the mmuidx async work which got mashed in last round
+  - introduced copy_tlb_helper function and made TCG_OVERSIZED_GUEST aware
 ---
- cputlb.c                | 108 +++++++++++++++++++++++++++++++++++++++++---
- include/exec/exec-all.h | 116 ++++++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 215 insertions(+), 9 deletions(-)
+ cputlb.c              | 120 +++++++++++++++++++++++++++++++++++++++-----------
+ include/exec/cputlb.h |   2 -
+ 2 files changed, 95 insertions(+), 27 deletions(-)
 
 diff --git a/cputlb.c b/cputlb.c
-index 65003350e3..7fa7fefa05 100644
+index c50254be26..65003350e3 100644
 --- a/cputlb.c
 +++ b/cputlb.c
-@@ -73,6 +73,25 @@ QEMU_BUILD_BUG_ON(sizeof(target_ulong) > sizeof(run_on_cpu_data));
- QEMU_BUILD_BUG_ON(NB_MMU_MODES > 16);
- #define ALL_MMUIDX_BITS ((1 << NB_MMU_MODES) - 1)
+@@ -342,32 +342,90 @@ void tlb_unprotect_code(ram_addr_t ram_addr)
+     cpu_physical_memory_set_dirty_flag(ram_addr, DIRTY_MEMORY_CODE);
+ }
  
-+/* flush_all_helper: run fn across all cpus
+-static bool tlb_is_dirty_ram(CPUTLBEntry *tlbe)
+-{
+-    return (tlbe->addr_write & (TLB_INVALID_MASK|TLB_MMIO|TLB_NOTDIRTY)) == 0;
+-}
+ 
+-void tlb_reset_dirty_range(CPUTLBEntry *tlb_entry, uintptr_t start,
++/*
++ * Dirty write flag handling
 + *
-+ * If the wait flag is set then the src cpu's helper will be queued as
-+ * "safe" work and the loop exited creating a synchronisation point
-+ * where all queued work will be finished before execution starts
-+ * again.
++ * When the TCG code writes to a location it looks up the address in
++ * the TLB and uses that data to compute the final address. If any of
++ * the lower bits of the address are set then the slow path is forced.
++ * There are a number of reasons to do this but for normal RAM the
++ * most usual is detecting writes to code regions which may invalidate
++ * generated code.
++ *
++ * Because we want other vCPUs to respond to changes straight away we
++ * update the te->addr_write field atomically. If the TLB entry has
++ * been changed by the vCPU in the mean time we skip the update.
++ *
++ * As this function uses atomic accesses we also need to ensure
++ * updates to tlb_entries follow the same access rules. We don't need
++ * to worry about this for oversized guests as MTTCG is disabled for
++ * them.
 + */
-+static void flush_all_helper(CPUState *src, run_on_cpu_func fn,
-+                             run_on_cpu_data d)
-+{
-+    CPUState *cpu;
 +
-+    CPU_FOREACH(cpu) {
-+        if (cpu != src) {
-+            async_run_on_cpu(cpu, fn, d);
++static void tlb_reset_dirty_range(CPUTLBEntry *tlb_entry, uintptr_t start,
+                            uintptr_t length)
+ {
+-    uintptr_t addr;
++#if TCG_OVERSIZED_GUEST
++    uintptr_t addr = tlb_entry->addr_write;
+ 
+-    if (tlb_is_dirty_ram(tlb_entry)) {
+-        addr = (tlb_entry->addr_write & TARGET_PAGE_MASK) + tlb_entry->addend;
++    if ((addr & (TLB_INVALID_MASK | TLB_MMIO | TLB_NOTDIRTY)) == 0) {
++        addr &= TARGET_PAGE_MASK;
++        addr += tlb_entry->addend;
+         if ((addr - start) < length) {
+             tlb_entry->addr_write |= TLB_NOTDIRTY;
+         }
+     }
++#else
++    /* paired with atomic_mb_set in tlb_set_page_with_attrs */
++    uintptr_t orig_addr = atomic_mb_read(&tlb_entry->addr_write);
++    uintptr_t addr = orig_addr;
++
++    if ((addr & (TLB_INVALID_MASK | TLB_MMIO | TLB_NOTDIRTY)) == 0) {
++        addr &= TARGET_PAGE_MASK;
++        addr += atomic_read(&tlb_entry->addend);
++        if ((addr - start) < length) {
++            uintptr_t notdirty_addr = orig_addr | TLB_NOTDIRTY;
++            atomic_cmpxchg(&tlb_entry->addr_write, orig_addr, notdirty_addr);
 +        }
 +    }
++#endif
 +}
 +
- /* statistics */
- int tlb_flush_count;
- 
-@@ -128,6 +147,20 @@ void tlb_flush(CPUState *cpu)
-     }
++/* For atomic correctness when running MTTCG we need to use the right
++ * primitives when copying entries */
++static inline void copy_tlb_helper(CPUTLBEntry *d, CPUTLBEntry *s,
++                                   bool atomic_set)
++{
++#if TCG_OVERSIZED_GUEST
++    *d = *s;
++#else
++    if (atomic_set) {
++        d->addr_read = s->addr_read;
++        d->addr_code = s->addr_code;
++        atomic_set(&d->addend, atomic_read(&s->addend));
++        /* Pairs with flag setting in tlb_reset_dirty_range */
++        atomic_mb_set(&d->addr_write, atomic_read(&s->addr_write));
++    } else {
++        d->addr_read = s->addr_read;
++        d->addr_write = atomic_read(&s->addr_write);
++        d->addr_code = s->addr_code;
++        d->addend = atomic_read(&s->addend);
++    }
++#endif
  }
  
-+void tlb_flush_all_cpus(CPUState *src_cpu)
-+{
-+    const run_on_cpu_func fn = tlb_flush_global_async_work;
-+    flush_all_helper(src_cpu, fn, RUN_ON_CPU_NULL);
-+    fn(src_cpu, RUN_ON_CPU_NULL);
-+}
-+
-+void tlb_flush_all_cpus_synced(CPUState *src_cpu)
-+{
-+    const run_on_cpu_func fn = tlb_flush_global_async_work;
-+    flush_all_helper(src_cpu, fn, RUN_ON_CPU_NULL);
-+    async_safe_run_on_cpu(src_cpu, fn, RUN_ON_CPU_NULL);
-+}
-+
- static void tlb_flush_by_mmuidx_async_work(CPUState *cpu, run_on_cpu_data data)
++/* This is a cross vCPU call (i.e. another vCPU resetting the flags of
++ * the target vCPU). As such care needs to be taken that we don't
++ * dangerously race with another vCPU update. The only thing actually
++ * updated is the target TLB entry ->addr_write flags.
++ */
+ void tlb_reset_dirty(CPUState *cpu, ram_addr_t start1, ram_addr_t length)
  {
-     CPUArchState *env = cpu->env_ptr;
-@@ -178,6 +211,29 @@ void tlb_flush_by_mmuidx(CPUState *cpu, uint16_t idxmap)
-     }
- }
+     CPUArchState *env;
  
-+void tlb_flush_by_mmuidx_all_cpus(CPUState *src_cpu, uint16_t idxmap)
-+{
-+    const run_on_cpu_func fn = tlb_flush_by_mmuidx_async_work;
-+
-+    tlb_debug("mmu_idx: 0x%"PRIx16"\n", idxmap);
-+
-+    flush_all_helper(src_cpu, fn, RUN_ON_CPU_HOST_INT(idxmap));
-+    fn(src_cpu, RUN_ON_CPU_HOST_INT(idxmap));
-+}
-+
-+void tlb_flush_by_mmuidx_all_cpus_synced(CPUState *src_cpu,
-+                                                       uint16_t idxmap)
-+{
-+    const run_on_cpu_func fn = tlb_flush_by_mmuidx_async_work;
-+
-+    tlb_debug("mmu_idx: 0x%"PRIx16"\n", idxmap);
-+
-+    flush_all_helper(src_cpu, fn, RUN_ON_CPU_HOST_INT(idxmap));
-+    async_safe_run_on_cpu(src_cpu, fn, RUN_ON_CPU_HOST_INT(idxmap));
-+}
-+
-+
-+
- static inline void tlb_flush_entry(CPUTLBEntry *tlb_entry, target_ulong addr)
- {
-     if (addr == (tlb_entry->addr_read &
-@@ -317,14 +373,54 @@ void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr, uint16_t idxmap)
-     }
- }
+     int mmu_idx;
  
--void tlb_flush_page_all(target_ulong addr)
-+void tlb_flush_page_by_mmuidx_all_cpus(CPUState *src_cpu, target_ulong addr,
-+                                       uint16_t idxmap)
- {
--    CPUState *cpu;
-+    const run_on_cpu_func fn = tlb_check_page_and_flush_by_mmuidx_async_work;
-+    target_ulong addr_and_mmu_idx;
- 
--    CPU_FOREACH(cpu) {
--        async_run_on_cpu(cpu, tlb_flush_page_async_work,
--                         RUN_ON_CPU_TARGET_PTR(addr));
--    }
-+    tlb_debug("addr: "TARGET_FMT_lx" mmu_idx:%"PRIx16"\n", addr, idxmap);
-+
-+    /* This should already be page aligned */
-+    addr_and_mmu_idx = addr & TARGET_PAGE_MASK;
-+    addr_and_mmu_idx |= idxmap;
-+
-+    flush_all_helper(src_cpu, fn, RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
-+    fn(src_cpu, RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
-+}
-+
-+void tlb_flush_page_by_mmuidx_all_cpus_synced(CPUState *src_cpu,
-+                                                            target_ulong addr,
-+                                                            uint16_t idxmap)
-+{
-+    const run_on_cpu_func fn = tlb_check_page_and_flush_by_mmuidx_async_work;
-+    target_ulong addr_and_mmu_idx;
-+
-+    tlb_debug("addr: "TARGET_FMT_lx" mmu_idx:%"PRIx16"\n", addr, idxmap);
-+
-+    /* This should already be page aligned */
-+    addr_and_mmu_idx = addr & TARGET_PAGE_MASK;
-+    addr_and_mmu_idx |= idxmap;
-+
-+    flush_all_helper(src_cpu, fn, RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
-+    async_safe_run_on_cpu(src_cpu, fn, RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
-+}
-+
-+void tlb_flush_page_all_cpus(CPUState *src, target_ulong addr)
-+{
-+    const run_on_cpu_func fn = tlb_flush_page_async_work;
-+
-+    flush_all_helper(src, fn, RUN_ON_CPU_TARGET_PTR(addr));
-+    fn(src, RUN_ON_CPU_TARGET_PTR(addr));
-+}
-+
-+void tlb_flush_page_all_cpus_synced(CPUState *src,
-+                                                  target_ulong addr)
-+{
-+    const run_on_cpu_func fn = tlb_flush_page_async_work;
-+
-+    flush_all_helper(src, fn, RUN_ON_CPU_TARGET_PTR(addr));
-+    async_safe_run_on_cpu(src, fn, RUN_ON_CPU_TARGET_PTR(addr));
- }
- 
- /* update the TLBs so that writes to code in the virtual page 'addr'
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index a6c17ed74a..068b0119ae 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -93,6 +93,27 @@ void cpu_address_space_init(CPUState *cpu, AddressSpace *as, int asidx);
-  */
- void tlb_flush_page(CPUState *cpu, target_ulong addr);
- /**
-+ * tlb_flush_page_all_cpus:
-+ * @cpu: src CPU of the flush
-+ * @addr: virtual address of page to be flushed
-+ *
-+ * Flush one page from the TLB of the specified CPU, for all
-+ * MMU indexes.
-+ */
-+void tlb_flush_page_all_cpus(CPUState *src, target_ulong addr);
-+/**
-+ * tlb_flush_page_all_cpus_synced:
-+ * @cpu: src CPU of the flush
-+ * @addr: virtual address of page to be flushed
-+ *
-+ * Flush one page from the TLB of the specified CPU, for all MMU
-+ * indexes like tlb_flush_page_all_cpus except the source vCPUs work
-+ * is scheduled as safe work meaning all flushes will be complete once
-+ * the source vCPUs safe work is complete. This will depend on when
-+ * the guests translation ends the TB.
-+ */
-+void tlb_flush_page_all_cpus_synced(CPUState *src, target_ulong addr);
-+/**
-  * tlb_flush:
-  * @cpu: CPU whose TLB should be flushed
-  *
-@@ -103,6 +124,21 @@ void tlb_flush_page(CPUState *cpu, target_ulong addr);
-  */
- void tlb_flush(CPUState *cpu);
- /**
-+ * tlb_flush_all_cpus:
-+ * @cpu: src CPU of the flush
-+ */
-+void tlb_flush_all_cpus(CPUState *src_cpu);
-+/**
-+ * tlb_flush_all_cpus_synced:
-+ * @cpu: src CPU of the flush
-+ *
-+ * Like tlb_flush_all_cpus except this except the source vCPUs work is
-+ * scheduled as safe work meaning all flushes will be complete once
-+ * the source vCPUs safe work is complete. This will depend on when
-+ * the guests translation ends the TB.
-+ */
-+void tlb_flush_all_cpus_synced(CPUState *src_cpu);
-+/**
-  * tlb_flush_page_by_mmuidx:
-  * @cpu: CPU whose TLB should be flushed
-  * @addr: virtual address of page to be flushed
-@@ -114,8 +150,34 @@ void tlb_flush(CPUState *cpu);
- void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr,
-                               uint16_t idxmap);
- /**
-+ * tlb_flush_page_by_mmuidx_all_cpus:
-+ * @cpu: Originating CPU of the flush
-+ * @addr: virtual address of page to be flushed
-+ * @idxmap: bitmap of MMU indexes to flush
-+ *
-+ * Flush one page from the TLB of all CPUs, for the specified
-+ * MMU indexes.
-+ */
-+void tlb_flush_page_by_mmuidx_all_cpus(CPUState *cpu, target_ulong addr,
-+                                       uint16_t idxmap);
-+/**
-+ * tlb_flush_page_by_mmuidx_all_cpus_synced:
-+ * @cpu: Originating CPU of the flush
-+ * @addr: virtual address of page to be flushed
-+ * @idxmap: bitmap of MMU indexes to flush
-+ *
-+ * Flush one page from the TLB of all CPUs, for the specified MMU
-+ * indexes like tlb_flush_page_by_mmuidx_all_cpus except the source
-+ * vCPUs work is scheduled as safe work meaning all flushes will be
-+ * complete once  the source vCPUs safe work is complete. This will
-+ * depend on when the guests translation ends the TB.
-+ */
-+void tlb_flush_page_by_mmuidx_all_cpus_synced(CPUState *cpu, target_ulong addr,
-+                                              uint16_t idxmap);
-+/**
-  * tlb_flush_by_mmuidx:
-  * @cpu: CPU whose TLB should be flushed
-+ * @wait: If true ensure synchronisation by exiting the cpu_loop
-  * @idxmap: bitmap of MMU indexes to flush
-  *
-  * Flush all entries from the TLB of the specified CPU, for the specified
-@@ -123,6 +185,27 @@ void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr,
-  */
- void tlb_flush_by_mmuidx(CPUState *cpu, uint16_t idxmap);
- /**
-+ * tlb_flush_by_mmuidx_all_cpus:
-+ * @cpu: Originating CPU of the flush
-+ * @idxmap: bitmap of MMU indexes to flush
-+ *
-+ * Flush all entries from all TLBs of all CPUs, for the specified
-+ * MMU indexes.
-+ */
-+void tlb_flush_by_mmuidx_all_cpus(CPUState *cpu, uint16_t idxmap);
-+/**
-+ * tlb_flush_by_mmuidx_all_cpus_synced:
-+ * @cpu: Originating CPU of the flush
-+ * @idxmap: bitmap of MMU indexes to flush
-+ *
-+ * Flush all entries from all TLBs of all CPUs, for the specified
-+ * MMU indexes like tlb_flush_by_mmuidx_all_cpus except except the source
-+ * vCPUs work is scheduled as safe work meaning all flushes will be
-+ * complete once  the source vCPUs safe work is complete. This will
-+ * depend on when the guests translation ends the TB.
-+ */
-+void tlb_flush_by_mmuidx_all_cpus_synced(CPUState *cpu, uint16_t idxmap);
-+/**
-  * tlb_set_page_with_attrs:
-  * @cpu: CPU to add this TLB entry for
-  * @vaddr: virtual address of page to add entry for
-@@ -159,16 +242,26 @@ void tlb_set_page(CPUState *cpu, target_ulong vaddr,
- void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr);
- void probe_write(CPUArchState *env, target_ulong addr, int mmu_idx,
-                  uintptr_t retaddr);
--void tlb_flush_page_all(target_ulong addr);
- #else
- static inline void tlb_flush_page(CPUState *cpu, target_ulong addr)
- {
- }
+-    assert_cpu_is_self(cpu);
 -
-+static inline void tlb_flush_page_all_cpus(CPUState *src, target_ulong addr)
-+{
-+}
-+static inline void tlb_flush_page_all_cpus_synced(CPUState *src,
-+                                                  target_ulong addr)
-+{
-+}
- static inline void tlb_flush(CPUState *cpu)
- {
- }
+     env = cpu->env_ptr;
+     for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
+         unsigned int i;
+@@ -455,7 +513,7 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
+     target_ulong address;
+     target_ulong code_address;
+     uintptr_t addend;
+-    CPUTLBEntry *te;
++    CPUTLBEntry *te, *tv, tn;
+     hwaddr iotlb, xlat, sz;
+     unsigned vidx = env->vtlb_index++ % CPU_VTLB_SIZE;
+     int asidx = cpu_asidx_from_attrs(cpu, attrs);
+@@ -490,41 +548,50 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
+ 
+     index = (vaddr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
+     te = &env->tlb_table[mmu_idx][index];
 -
-+static inline void tlb_flush_all_cpus(CPUState *src_cpu)
-+{
-+}
-+static inline void tlb_flush_all_cpus_synced(CPUState *src_cpu)
-+{
-+}
- static inline void tlb_flush_page_by_mmuidx(CPUState *cpu,
-                                             target_ulong addr, uint16_t idxmap)
- {
-@@ -177,6 +270,23 @@ static inline void tlb_flush_page_by_mmuidx(CPUState *cpu,
- static inline void tlb_flush_by_mmuidx(CPUState *cpu, uint16_t idxmap)
- {
+     /* do not discard the translation in te, evict it into a victim tlb */
+-    env->tlb_v_table[mmu_idx][vidx] = *te;
++    tv = &env->tlb_v_table[mmu_idx][vidx];
++
++    /* addr_write can race with tlb_reset_dirty_range */
++    copy_tlb_helper(tv, te, true);
++
+     env->iotlb_v[mmu_idx][vidx] = env->iotlb[mmu_idx][index];
+ 
+     /* refill the tlb */
+     env->iotlb[mmu_idx][index].addr = iotlb - vaddr;
+     env->iotlb[mmu_idx][index].attrs = attrs;
+-    te->addend = addend - vaddr;
++
++    /* Now calculate the new entry */
++    tn.addend = addend - vaddr;
+     if (prot & PAGE_READ) {
+-        te->addr_read = address;
++        tn.addr_read = address;
+     } else {
+-        te->addr_read = -1;
++        tn.addr_read = -1;
+     }
+ 
+     if (prot & PAGE_EXEC) {
+-        te->addr_code = code_address;
++        tn.addr_code = code_address;
+     } else {
+-        te->addr_code = -1;
++        tn.addr_code = -1;
+     }
++
++    tn.addr_write = -1;
+     if (prot & PAGE_WRITE) {
+         if ((memory_region_is_ram(section->mr) && section->readonly)
+             || memory_region_is_romd(section->mr)) {
+             /* Write access calls the I/O callback.  */
+-            te->addr_write = address | TLB_MMIO;
++            tn.addr_write = address | TLB_MMIO;
+         } else if (memory_region_is_ram(section->mr)
+                    && cpu_physical_memory_is_clean(
+                         memory_region_get_ram_addr(section->mr) + xlat)) {
+-            te->addr_write = address | TLB_NOTDIRTY;
++            tn.addr_write = address | TLB_NOTDIRTY;
+         } else {
+-            te->addr_write = address;
++            tn.addr_write = address;
+         }
+-    } else {
+-        te->addr_write = -1;
+     }
++
++    /* Pairs with flag setting in tlb_reset_dirty_range */
++    copy_tlb_helper(te, &tn, true);
++    /* atomic_mb_set(&te->addr_write, write_address); */
  }
-+static inline void tlb_flush_page_by_mmuidx_all_cpus(CPUState *cpu,
-+                                                     target_ulong addr,
-+                                                     uint16_t idxmap)
-+{
-+}
-+static inline void tlb_flush_page_by_mmuidx_all_cpus_synced(CPUState *cpu,
-+                                                            target_ulong addr,
-+                                                            uint16_t idxmap)
-+{
-+}
-+static inline void tlb_flush_by_mmuidx_all_cpus(CPUState *cpu, uint16_t idxmap)
-+{
-+}
-+static inline void tlb_flush_by_mmuidx_all_cpus_synced(CPUState *cpu,
-+                                                       uint16_t idxmap)
-+{
-+}
+ 
+ /* Add a new TLB entry, but without specifying the memory
+@@ -687,10 +754,13 @@ static bool victim_tlb_hit(CPUArchState *env, size_t mmu_idx, size_t index,
+         if (cmp == page) {
+             /* Found entry in victim tlb, swap tlb and iotlb.  */
+             CPUTLBEntry tmptlb, *tlb = &env->tlb_table[mmu_idx][index];
++
++            copy_tlb_helper(&tmptlb, tlb, false);
++            copy_tlb_helper(tlb, vtlb, true);
++            copy_tlb_helper(vtlb, &tmptlb, true);
++
+             CPUIOTLBEntry tmpio, *io = &env->iotlb[mmu_idx][index];
+             CPUIOTLBEntry *vio = &env->iotlb_v[mmu_idx][vidx];
+-
+-            tmptlb = *tlb; *tlb = *vtlb; *vtlb = tmptlb;
+             tmpio = *io; *io = *vio; *vio = tmpio;
+             return true;
+         }
+diff --git a/include/exec/cputlb.h b/include/exec/cputlb.h
+index d454c005b7..3f941783c5 100644
+--- a/include/exec/cputlb.h
++++ b/include/exec/cputlb.h
+@@ -23,8 +23,6 @@
+ /* cputlb.c */
+ void tlb_protect_code(ram_addr_t ram_addr);
+ void tlb_unprotect_code(ram_addr_t ram_addr);
+-void tlb_reset_dirty_range(CPUTLBEntry *tlb_entry, uintptr_t start,
+-                           uintptr_t length);
+ extern int tlb_flush_count;
+ 
  #endif
- 
- #define CODE_GEN_ALIGN           16 /* must be >= of the size of a icache line */
 -- 
 2.11.0
