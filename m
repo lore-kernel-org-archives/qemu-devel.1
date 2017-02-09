@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55450)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cbsAt-0003jc-EN
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:06:28 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cbsDL-0006Bn-62
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:09:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cbsAo-00013R-CO
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:06:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58802)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1cbsAo-00013L-6P
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:06:22 -0500
-Message-ID: <1486659979.3641.51.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Thu, 09 Feb 2017 18:06:19 +0100
-In-Reply-To: <20170209163626.rfrwk2mt6gtoc3lb@kamzik.brq.redhat.com>
-References: <1486575331-14455-1-git-send-email-abologna@redhat.com>
-	<1486575331-14455-3-git-send-email-abologna@redhat.com>
-	<20170209094259.nmli6yd5swxdujkm@kamzik.brq.redhat.com>
-	<CAFEAcA8bRHuF_to0+whEhNF5oXp5_O63H8EV2JTXBngffufz9Q@mail.gmail.com>
-	<1486637473.3641.36.camel@redhat.com>
-	<20170209122819.ajgatpsnxj7cdjq2@kamzik.brq.redhat.com>
-	<1486653043.3641.47.camel@redhat.com>
-	<20170209153535.tnhhy3bvxocqwnzv@kamzik.brq.redhat.com>
-	<1486656698.3641.49.camel@redhat.com>
-	<20170209163626.rfrwk2mt6gtoc3lb@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 2/2] mach-virt: Provide sample
- configuration files
+	(envelope-from <alex.bennee@linaro.org>) id 1cbsDI-0002NX-1T
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:08:59 -0500
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:38475)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cbsDH-0002Mx-P4
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:08:55 -0500
+Received: by mail-wm0-x234.google.com with SMTP id r141so25971394wmg.1
+	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 09:08:55 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Thu,  9 Feb 2017 17:08:42 +0000
+Message-Id: <20170209170904.5713-3-alex.bennee@linaro.org>
+In-Reply-To: <20170209170904.5713-1-alex.bennee@linaro.org>
+References: <20170209170904.5713-1-alex.bennee@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v11 02/24] mttcg: translate-all: Enable locking
+ debug in a debug build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,54 +30,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: peter.maydell@linaro.org, rth@twiddle.net
+Cc: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-On Thu, 2017-02-09 at 17:36 +0100, Andrew Jones wrote:
-> On Thu, Feb 09, 2017 at 05:11:38PM +0100, Andrea Bolognani wrote:
-> >=C2=A0
-> > On Thu, 2017-02-09 at 16:35 +0100, Andrew Jones wrote:
-> > >=C2=A0
-> > > >=C2=A0
-> > > > Please propose the alternative wording you'd like to see
-> > > > so we can discuss it :)
-> > >=C2=A0=C2=A0
-> > > I guess I did above with "... -nodefaults ensures no non-builtin
-> > > peripherals are automatically added, but builtin peripherals,
-> > > such as the PL011, will remain..."
-> >=C2=A0
-> > Trying to work your proposal into my most recent stab at
-> > this, I ended up with:
-> >=C2=A0
-> >=C2=A0=C2=A0=C2=A0Using -nodefaults is required to have full control o=
-ver
-> >=C2=A0=C2=A0=C2=A0the virtual hardware: when it's specified, QEMU will
-> >=C2=A0=C2=A0=C2=A0populate the board with only the builtin peripherals=
-,
-> >=C2=A0=C2=A0=C2=A0such as the PL011 UART, plus a small selection of co=
-re
-> >=C2=A0=C2=A0=C2=A0PCI devices and controllers; the user will then have=
- to
->=C2=A0
-> Well, mach-virt doesn't currently add any pci devices with
-> -nodefault; just the host bridge. Personally, I'd state it that
-> way to avoid confusion, but I know you're trying to keep the
-> paragraph similar to the q35 one, and you're not technically
-> wrong...
+From: Pranith Kumar <bobby.prani@gmail.com>
 
-Okay, one more try! ;)
+Enable tcg lock debug asserts in a debug build by default instead of
+relying on DEBUG_LOCKING. None of the other DEBUG_* macros have
+asserts, so this patch removes DEBUG_LOCKING and enable these asserts
+in a debug build.
 
-=C2=A0 Using -nodefaults is required to have full control over
-=C2=A0 the virtual hardware: when it's specified, QEMU will
-=C2=A0 populate the board with only the builtin peripherals,
-=C2=A0 such as the PL011 UART, plus a PCI Express Root Bus; the
-=C2=A0 user will then have to explicitly add further devices.
+CC: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+[AJB: tweak ifdefs so can be early in series]
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+---
+ translate-all.c | 52 ++++++++++++++++------------------------------------
+ 1 file changed, 16 insertions(+), 36 deletions(-)
 
-=C2=A0 The PCI Express Root Bus shows up in the guest as:
-
-=C2=A0=C2=A0=C2=A0=C2=A000:00.0 Host bridge
-
-=C2=A0 This configuration file adds a number of...
-
---=C2=A0
-Andrea Bolognani / Red Hat / Virtualization
+diff --git a/translate-all.c b/translate-all.c
+index 5f44ec844e..8a861cb583 100644
+--- a/translate-all.c
++++ b/translate-all.c
+@@ -59,7 +59,6 @@
+ 
+ /* #define DEBUG_TB_INVALIDATE */
+ /* #define DEBUG_TB_FLUSH */
+-/* #define DEBUG_LOCKING */
+ /* make various TB consistency checks */
+ /* #define DEBUG_TB_CHECK */
+ 
+@@ -74,20 +73,10 @@
+  * access to the memory related structures are protected with the
+  * mmap_lock.
+  */
+-#ifdef DEBUG_LOCKING
+-#define DEBUG_MEM_LOCKS 1
+-#else
+-#define DEBUG_MEM_LOCKS 0
+-#endif
+-
+ #ifdef CONFIG_SOFTMMU
+ #define assert_memory_lock() do { /* nothing */ } while (0)
+ #else
+-#define assert_memory_lock() do {               \
+-        if (DEBUG_MEM_LOCKS) {                  \
+-            g_assert(have_mmap_lock());         \
+-        }                                       \
+-    } while (0)
++#define assert_memory_lock() tcg_debug_assert(have_mmap_lock())
+ #endif
+ 
+ #define SMC_BITMAP_USE_THRESHOLD 10
+@@ -169,10 +158,18 @@ static void page_table_config_init(void)
+     assert(v_l2_levels >= 0);
+ }
+ 
++#ifdef CONFIG_USER_ONLY
++#define assert_tb_locked() tcg_debug_assert(have_tb_lock)
++#define assert_tb_unlocked() tcg_debug_assert(!have_tb_lock)
++#else
++#define assert_tb_locked()  do { /* nothing */ } while (0)
++#define assert_tb_unlocked()  do { /* nothing */ } while (0)
++#endif
++
+ void tb_lock(void)
+ {
+ #ifdef CONFIG_USER_ONLY
+-    assert(!have_tb_lock);
++    assert_tb_unlocked();
+     qemu_mutex_lock(&tcg_ctx.tb_ctx.tb_lock);
+     have_tb_lock++;
+ #endif
+@@ -181,7 +178,7 @@ void tb_lock(void)
+ void tb_unlock(void)
+ {
+ #ifdef CONFIG_USER_ONLY
+-    assert(have_tb_lock);
++    assert_tb_locked();
+     have_tb_lock--;
+     qemu_mutex_unlock(&tcg_ctx.tb_ctx.tb_lock);
+ #endif
+@@ -197,23 +194,6 @@ void tb_lock_reset(void)
+ #endif
+ }
+ 
+-#ifdef DEBUG_LOCKING
+-#define DEBUG_TB_LOCKS 1
+-#else
+-#define DEBUG_TB_LOCKS 0
+-#endif
+-
+-#ifdef CONFIG_SOFTMMU
+-#define assert_tb_lock() do { /* nothing */ } while (0)
+-#else
+-#define assert_tb_lock() do {               \
+-        if (DEBUG_TB_LOCKS) {               \
+-            g_assert(have_tb_lock);         \
+-        }                                   \
+-    } while (0)
+-#endif
+-
+-
+ static TranslationBlock *tb_find_pc(uintptr_t tc_ptr);
+ 
+ void cpu_gen_init(void)
+@@ -847,7 +827,7 @@ static TranslationBlock *tb_alloc(target_ulong pc)
+ {
+     TranslationBlock *tb;
+ 
+-    assert_tb_lock();
++    assert_tb_locked();
+ 
+     if (tcg_ctx.tb_ctx.nb_tbs >= tcg_ctx.code_gen_max_blocks) {
+         return NULL;
+@@ -862,7 +842,7 @@ static TranslationBlock *tb_alloc(target_ulong pc)
+ /* Called with tb_lock held.  */
+ void tb_free(TranslationBlock *tb)
+ {
+-    assert_tb_lock();
++    assert_tb_locked();
+ 
+     /* In practice this is mostly used for single use temporary TB
+        Ignore the hard cases and just back up if this TB happens to
+@@ -1104,7 +1084,7 @@ void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr)
+     uint32_t h;
+     tb_page_addr_t phys_pc;
+ 
+-    assert_tb_lock();
++    assert_tb_locked();
+ 
+     atomic_set(&tb->invalid, true);
+ 
+@@ -1421,7 +1401,7 @@ static void tb_invalidate_phys_range_1(tb_page_addr_t start, tb_page_addr_t end)
+ #ifdef CONFIG_SOFTMMU
+ void tb_invalidate_phys_range(tb_page_addr_t start, tb_page_addr_t end)
+ {
+-    assert_tb_lock();
++    assert_tb_locked();
+     tb_invalidate_phys_range_1(start, end);
+ }
+ #else
+@@ -1464,7 +1444,7 @@ void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t end,
+ #endif /* TARGET_HAS_PRECISE_SMC */
+ 
+     assert_memory_lock();
+-    assert_tb_lock();
++    assert_tb_locked();
+ 
+     p = page_find(start >> TARGET_PAGE_BITS);
+     if (!p) {
+-- 
+2.11.0
