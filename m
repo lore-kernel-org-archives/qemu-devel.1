@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cbtLd-0004nw-E6
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 13:21:38 -0500
+	(envelope-from <agraf@suse.de>) id 1cbtRE-0007Nv-DL
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 13:27:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cbtLa-0004rb-0p
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 13:21:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34608)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cbtLZ-0004rV-P8
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 13:21:33 -0500
-Date: Thu, 9 Feb 2017 20:21:31 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170209201918-mutt-send-email-mst@kernel.org>
-References: <cover.1486285434.git.ben@skyportsystems.com>
-	<28ff6ff023dd041fc7557955dea916adce72efea.1486285434.git.ben@skyportsystems.com>
-	<14f224ed-08e2-cbad-9d1d-8f559cd399a6@redhat.com>
-	<20170209182316.71d5df5f@nial.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170209182316.71d5df5f@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 05/10] ACPI: Add Virtual Machine
- Generation ID support
+	(envelope-from <agraf@suse.de>) id 1cbtRD-0006HX-E1
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 13:27:24 -0500
+Content-Type: text/plain;
+	charset=us-ascii
+Mime-Version: 1.0 (1.0)
+From: Alexander Graf <agraf@suse.de>
+In-Reply-To: <20170209201301-mutt-send-email-mst@kernel.org>
+Date: Thu, 9 Feb 2017 19:27:15 +0100
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <B93CA3EA-D7F6-4395-BFBD-6362FAAE2822@suse.de>
+References: <1486644810-33181-1-git-send-email-agraf@suse.de>
+	<70829774-a0c4-79ae-2eaf-cfac19e9dd7d@redhat.com>
+	<20170209201301-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] target-arm: Add some omitted dma
+ cache coherency flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +26,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, ben@skyportsystems.com, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Shannon Zhao <shannon.zhao@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-On Thu, Feb 09, 2017 at 06:23:16PM +0100, Igor Mammedov wrote:
-> On Wed, 8 Feb 2017 01:48:42 +0100
-> Laszlo Ersek <lersek@redhat.com> wrote:
-> 
-> > On 02/05/17 10:12, ben@skyportsystems.com wrote:
-> > > From: Ben Warren <ben@skyportsystems.com>
-> [...]
-> 
-> > (2) Structure of the vmgenid fw_cfg blob, AKA "why that darn offset 40
-> > decimal".
-> > 
-> > I explained it under points (6) and (7) in the following message:
-> > 
-> > Message-Id: <c16a03d5-820a-f719-81ea-43858f903395@redhat.com>
-> > URL: https://www.mail-archive.com/qemu-devel@nongnu.org/msg425226.html
-> > 
-> > The story is that *wherever* an ADD_POINTER command points to -- that
-> > is, at the *exact* target address --, OVMF will look for an ACPI table
-> > header, somewhat heuristically. If it finds a byte pattern that (a) fits
-> > into the remaining blob and (b) passes some superficial ACPI table
-> > header checks, such as length and checksum, then OVMF assumes that the
-> > blob contains an ACPI table there, and passes the address (again, the
-> > exact, relocated, absolute target address of ADD_POINTER) to
-> > EFI_ACPI_TABLE_PROTOCOL.InstallAcpiTable().
-> > 
-> > We want to disable this heuristic for the vmgenid blob. *If* the blob
-> > contained only 16 bytes (for the GUID), then the heuristic would
-> > automatically disable itself, because the ACPI table header (36 bytes)
-> > is larger than 16 bytes, so OVMF wouldn't even look. However, for the
-> > caching and other VMGENID requirements, we need to allocate a full page
-> > with the blob (4KB), hence OVMF *will* look. If we placed the GUID right
-> > at the start of the page, then OVMF would sanity-check it as an ACPI
-> > table header. The check would *most likely* not pass, so things would be
-> > fine in practice, but we can do better than that: just put 40 zero bytes
-> > at the front of the blob.
-> > 
-> > And this is why the ADD_POINTER command has to point to the beginning of
-> > the blob (i.e., 36 zero bytes), to "suppress the OVMF ACPI SDT header
-> > detection". (The other 4 bytes are for arriving at an address divisible
-> > by 8, which is a VMGENID requirement for the GUID.)
-> > 
-> > The consequence is that both the ADDR method and QEMU's guest memory
-> > access code have to add 40 manually.
-> The longer I look "suppress the OVMF ACPI SDT header detection",
-> the less I like approach.
-> 
-> It looks somewhat backwards where a firmware forces QEMU
-> to use non obvious offsets to workaround OVMF ACPI table detection
-> heuristics.
-> Can we add and use explicit flag to mark blobs as ACPI tables,
-> so that OVMF won't have to guess whether to hand off table
-> as ACPI to UEFI stack or just keep it to yourself?
 
-Seems like the minor enough hack.
 
-At this stage I'm inclined to say let's merge with the current approach,
-and we can do a patch on top if we have the time.
+> Am 09.02.2017 um 19:13 schrieb Michael S. Tsirkin <mst@redhat.com>:
+>=20
+>> On Thu, Feb 09, 2017 at 02:15:36PM +0100, Laszlo Ersek wrote:
+>>> On 02/09/17 13:53, Alexander Graf wrote:
+>>> ARM is amazing when it comes to cache coherency and VMs. While any sane
+>>> architecture allows the host to override the guest's caching attributes,=
 
-> 
-> [...]
-> > Thanks
-> > Laszlo
-> > 
+>>> that's very hard to do on ARM.
+>>>=20
+>>> That means that the guest may directly access guest memory bypassing the=
+
+>>> cache while QEMU happily writes to / reads from cache. The end result is=
+
+>>> very nasty, because both sides see very different views of the world.
+>>>=20
+>>> That means that we need to be very cautious to tell guests that devices
+>>> that QEMU emulates are going to use data in the cache rather than direct=
+ly
+>>> on memory.
+>>>=20
+>>> We added this to PCI a while back for DT (5d636e21 "hw/arm/virt: mark th=
+e PCIe
+>>> host controller as DMA coherent in the DT") and ACPI (bc64b96 "hw/arm/vi=
+rt-
+>>> acpi-build: _CCA attribute is compulsory") but never updated virtio-mmio=
+ or
+>>> fw-cfg in DT or ACPI tables.
+>>>=20
+>>> This patch set adds the respective cache coherency flags for them in bot=
+h DT and
+>>> ACPI.
+>>>=20
+>>> Fortunately, no guests except for Linux 4.9.7 and 4.9.8 are broken becau=
+se of
+>>> this. Upstream realized quickly enough that every user of virtio-mmio ou=
+t there
+>>> describes its cache coherency incorrectly and reverted the patch that wo=
+uld
+>>> require said dma coherency flag. But we should be safe for the future an=
+d "do
+>>> the right thing".
+>>>=20
+>>> Alexander Graf (4):
+>>>  target-arm: Declare virtio-mmio as dma-coherent in dt
+>>>  hw/arm/virt: Declare virtio-mmio as dma cache coherent in ACPI
+>>>  hw/arm/virt: Declare fwcfg as dma cache coherent in ACPI
+>>>  hw/arm/virt: Declare fwcfg as dma cache coherent in dt
+>>>=20
+>>> hw/arm/vexpress.c        | 1 +
+>>> hw/arm/virt-acpi-build.c | 2 ++
+>>> hw/arm/virt.c            | 2 ++
+>>> 3 files changed, 5 insertions(+)
+>>>=20
+>>=20
+>> Famous last words:
+>> series
+>> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+>>=20
+>> Should we replicate patch #3 to QEMU0002 / FWCF in
+>> "hw/i386/acpi-build.c" too? Or is it that we couldn't care less about
+>> _CCA on x86? :) (Can't really muster the energy right now to look it up
+>> in the ACPI spec, sorry!)
+>>=20
+>> Thanks
+>> Laszlo
+>=20
+> ACPI spec says:
+> On platforms for which existing default cache-coherency behavior of the OS=
+ is not adequate, _CCA
+> enables the OS to adapt to the differences
+>=20
+> So I think we don't need it on x86.
+
+According to acpi 6.1, x86 explicitly defaults to dma coherent if _CCA is om=
+itted. It's only illegal for ARM.
+
+Alex
