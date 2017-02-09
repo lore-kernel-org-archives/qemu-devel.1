@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cbsDa-0006SX-KT
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:09:16 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cbsDj-0006cX-MR
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:09:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cbsDY-0002Yb-Ne
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:09:14 -0500
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:36409)
+	(envelope-from <alex.bennee@linaro.org>) id 1cbsDe-0002av-TA
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:09:23 -0500
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:35382)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cbsDY-0002Xz-FU
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:09:12 -0500
-Received: by mail-wm0-x231.google.com with SMTP id c85so237596180wmi.1
-	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 09:09:12 -0800 (PST)
+	id 1cbsDe-0002aY-Bp
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:09:18 -0500
+Received: by mail-wm0-x232.google.com with SMTP id v186so87645822wmd.0
+	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 09:09:18 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu,  9 Feb 2017 17:08:57 +0000
-Message-Id: <20170209170904.5713-18-alex.bennee@linaro.org>
+Date: Thu,  9 Feb 2017 17:09:03 +0000
+Message-Id: <20170209170904.5713-24-alex.bennee@linaro.org>
 In-Reply-To: <20170209170904.5713-1-alex.bennee@linaro.org>
 References: <20170209170904.5713-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v11 17/24] cputlb: add tlb_flush_by_mmuidx
- async routines
+Subject: [Qemu-devel] [PATCH v11 23/24] hw/misc/imx6_src: defer clearing of
+ SRC_SCR reset bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,222 +31,134 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, rth@twiddle.net
-Cc: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Chubb <peter.chubb@nicta.com.au>, "open list:i.MX31" <qemu-arm@nongnu.org>
 
-This converts the remaining TLB flush routines to use async work when
-detecting a cross-vCPU flush. The only minor complication is having to
-serialise the var_list of MMU indexes into a form that can be punted
-to an asynchronous job.
-
-The pending_tlb_flush field on QOM's CPU structure also becomes a
-bitfield rather than a boolean.
+The arm_reset_cpu/set_cpu_on/set_cpu_off() functions do their work
+asynchronously in the target vCPUs context. As a result we need to
+ensure the SRC_SCR reset bits correctly report the reset status at the
+right time. To do this we defer the clearing of the bit with an async
+job which will run after the work queued by ARM powerctl functions.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
-v7
-  - un-merged from the atomic cputlb patch in the last series
-  - fix long line reported by checkpatch
-v8
-  - re-base merge/fixes
----
- cputlb.c          | 110 +++++++++++++++++++++++++++++++++++++++++++-----------
- include/qom/cpu.h |   2 +-
- 2 files changed, 89 insertions(+), 23 deletions(-)
+ hw/misc/imx6_src.c | 58 +++++++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 49 insertions(+), 9 deletions(-)
 
-diff --git a/cputlb.c b/cputlb.c
-index 97e5c12de8..c50254be26 100644
---- a/cputlb.c
-+++ b/cputlb.c
-@@ -68,6 +68,11 @@
-  * target_ulong even on 32 bit builds */
- QEMU_BUILD_BUG_ON(sizeof(target_ulong) > sizeof(run_on_cpu_data));
+diff --git a/hw/misc/imx6_src.c b/hw/misc/imx6_src.c
+index 55b817b8d7..f7c1d94a3e 100644
+--- a/hw/misc/imx6_src.c
++++ b/hw/misc/imx6_src.c
+@@ -14,6 +14,7 @@
+ #include "qemu/bitops.h"
+ #include "qemu/log.h"
+ #include "arm-powerctl.h"
++#include "qom/cpu.h"
  
-+/* We currently can't handle more than 16 bits in the MMUIDX bitmask.
-+ */
-+QEMU_BUILD_BUG_ON(NB_MMU_MODES > 16);
-+#define ALL_MMUIDX_BITS ((1 << NB_MMU_MODES) - 1)
-+
- /* statistics */
- int tlb_flush_count;
- 
-@@ -102,7 +107,7 @@ static void tlb_flush_nocheck(CPUState *cpu)
- 
-     tb_unlock();
- 
--    atomic_mb_set(&cpu->pending_tlb_flush, false);
-+    atomic_mb_set(&cpu->pending_tlb_flush, 0);
+ #ifndef DEBUG_IMX6_SRC
+ #define DEBUG_IMX6_SRC 0
+@@ -113,6 +114,45 @@ static uint64_t imx6_src_read(void *opaque, hwaddr offset, unsigned size)
+     return value;
  }
  
- static void tlb_flush_global_async_work(CPUState *cpu, run_on_cpu_data data)
-@@ -113,7 +118,8 @@ static void tlb_flush_global_async_work(CPUState *cpu, run_on_cpu_data data)
- void tlb_flush(CPUState *cpu)
++
++/* The reset is asynchronous so we need to defer clearing the reset
++ * bit until the work is completed.
++ */
++
++struct src_scr_reset_info {
++    IMX6SRCState *s;
++    unsigned long reset_bit;
++};
++
++static void imx6_clear_reset_bit(CPUState *cpu, run_on_cpu_data data)
++{
++    struct src_scr_reset_info *ri = data.host_ptr;
++    IMX6SRCState *s = ri->s;
++
++    assert(qemu_mutex_iothread_locked());
++
++    s->regs[SRC_SCR] = deposit32(s->regs[SRC_SCR], ri->reset_bit, 1, 0);
++    DPRINTF("reg[%s] <= 0x%" PRIx32 "\n",
++            imx6_src_reg_name(SRC_SCR), s->regs[SRC_SCR]);
++
++    g_free(ri);
++}
++
++static void imx6_defer_clear_reset_bit(int cpuid,
++                                       IMX6SRCState *s,
++                                       unsigned long reset_shift)
++{
++    struct src_scr_reset_info *ri;
++
++    ri = g_malloc(sizeof(struct src_scr_reset_info));
++    ri->s = s;
++    ri->reset_bit = reset_shift;
++
++    async_run_on_cpu(arm_get_cpu_by_id(cpuid), imx6_clear_reset_bit,
++                     RUN_ON_CPU_HOST_PTR(ri));
++}
++
++
+ static void imx6_src_write(void *opaque, hwaddr offset, uint64_t value,
+                            unsigned size)
  {
-     if (cpu->created && !qemu_cpu_is_self(cpu)) {
--        if (atomic_cmpxchg(&cpu->pending_tlb_flush, false, true) == true) {
-+        if (atomic_mb_read(&cpu->pending_tlb_flush) != ALL_MMUIDX_BITS) {
-+            atomic_mb_set(&cpu->pending_tlb_flush, ALL_MMUIDX_BITS);
-             async_run_on_cpu(cpu, tlb_flush_global_async_work,
-                              RUN_ON_CPU_NULL);
+@@ -153,7 +193,7 @@ static void imx6_src_write(void *opaque, hwaddr offset, uint64_t value,
+                 arm_set_cpu_off(3);
+             }
+             /* We clear the reset bits as the processor changed state */
+-            clear_bit(CORE3_RST_SHIFT, &current_value);
++            imx6_defer_clear_reset_bit(3, s, CORE3_RST_SHIFT);
+             clear_bit(CORE3_RST_SHIFT, &change_mask);
          }
-@@ -122,17 +128,18 @@ void tlb_flush(CPUState *cpu)
-     }
- }
- 
--static inline void v_tlb_flush_by_mmuidx(CPUState *cpu, uint16_t idxmap)
-+static void tlb_flush_by_mmuidx_async_work(CPUState *cpu, run_on_cpu_data data)
- {
-     CPUArchState *env = cpu->env_ptr;
--    unsigned long mmu_idx_bitmask = idxmap;
-+    unsigned long mmu_idx_bitmask = data.host_int;
-     int mmu_idx;
- 
-     assert_cpu_is_self(cpu);
--    tlb_debug("start\n");
- 
-     tb_lock();
- 
-+    tlb_debug("start: mmu_idx:0x%04lx\n", mmu_idx_bitmask);
-+
-     for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
- 
-         if (test_bit(mmu_idx, &mmu_idx_bitmask)) {
-@@ -145,12 +152,30 @@ static inline void v_tlb_flush_by_mmuidx(CPUState *cpu, uint16_t idxmap)
- 
-     memset(cpu->tb_jmp_cache, 0, sizeof(cpu->tb_jmp_cache));
- 
-+    tlb_debug("done\n");
-+
-     tb_unlock();
- }
- 
- void tlb_flush_by_mmuidx(CPUState *cpu, uint16_t idxmap)
- {
--    v_tlb_flush_by_mmuidx(cpu, idxmap);
-+    tlb_debug("mmu_idx: 0x%" PRIx16 "\n", idxmap);
-+
-+    if (!qemu_cpu_is_self(cpu)) {
-+        uint16_t pending_flushes = idxmap;
-+        pending_flushes &= ~atomic_mb_read(&cpu->pending_tlb_flush);
-+
-+        if (pending_flushes) {
-+            tlb_debug("reduced mmu_idx: 0x%" PRIx16 "\n", pending_flushes);
-+
-+            atomic_or(&cpu->pending_tlb_flush, pending_flushes);
-+            async_run_on_cpu(cpu, tlb_flush_by_mmuidx_async_work,
-+                             RUN_ON_CPU_HOST_INT(pending_flushes));
-+        }
-+    } else {
-+        tlb_flush_by_mmuidx_async_work(cpu,
-+                                       RUN_ON_CPU_HOST_INT(idxmap));
-+    }
- }
- 
- static inline void tlb_flush_entry(CPUTLBEntry *tlb_entry, target_ulong addr)
-@@ -215,27 +240,26 @@ void tlb_flush_page(CPUState *cpu, target_ulong addr)
-     }
- }
- 
--void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr, uint16_t idxmap)
-+/* As we are going to hijack the bottom bits of the page address for a
-+ * mmuidx bit mask we need to fail to build if we can't do that
-+ */
-+QEMU_BUILD_BUG_ON(NB_MMU_MODES > TARGET_PAGE_BITS_MIN);
-+
-+static void tlb_flush_page_by_mmuidx_async_work(CPUState *cpu,
-+                                                run_on_cpu_data data)
- {
-     CPUArchState *env = cpu->env_ptr;
--    unsigned long mmu_idx_bitmap = idxmap;
--    int i, page, mmu_idx;
-+    target_ulong addr_and_mmuidx = (target_ulong) data.target_ptr;
-+    target_ulong addr = addr_and_mmuidx & TARGET_PAGE_MASK;
-+    unsigned long mmu_idx_bitmap = addr_and_mmuidx & ALL_MMUIDX_BITS;
-+    int page = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
-+    int mmu_idx;
-+    int i;
- 
-     assert_cpu_is_self(cpu);
--    tlb_debug("addr "TARGET_FMT_lx"\n", addr);
--
--    /* Check if we need to flush due to large pages.  */
--    if ((addr & env->tlb_flush_mask) == env->tlb_flush_addr) {
--        tlb_debug("forced full flush ("
--                  TARGET_FMT_lx "/" TARGET_FMT_lx ")\n",
--                  env->tlb_flush_addr, env->tlb_flush_mask);
--
--        v_tlb_flush_by_mmuidx(cpu, idxmap);
--        return;
--    }
- 
--    addr &= TARGET_PAGE_MASK;
--    page = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
-+    tlb_debug("page:%d addr:"TARGET_FMT_lx" mmu_idx:0x%lx\n",
-+              page, addr, mmu_idx_bitmap);
- 
-     for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
-         if (test_bit(mmu_idx, &mmu_idx_bitmap)) {
-@@ -251,6 +275,48 @@ void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr, uint16_t idxmap)
-     tb_flush_jmp_cache(cpu, addr);
- }
- 
-+static void tlb_check_page_and_flush_by_mmuidx_async_work(CPUState *cpu,
-+                                                          run_on_cpu_data data)
-+{
-+    CPUArchState *env = cpu->env_ptr;
-+    target_ulong addr_and_mmuidx = (target_ulong) data.target_ptr;
-+    target_ulong addr = addr_and_mmuidx & TARGET_PAGE_MASK;
-+    unsigned long mmu_idx_bitmap = addr_and_mmuidx & ALL_MMUIDX_BITS;
-+
-+    tlb_debug("addr:"TARGET_FMT_lx" mmu_idx: %04lx\n", addr, mmu_idx_bitmap);
-+
-+    /* Check if we need to flush due to large pages.  */
-+    if ((addr & env->tlb_flush_mask) == env->tlb_flush_addr) {
-+        tlb_debug("forced full flush ("
-+                  TARGET_FMT_lx "/" TARGET_FMT_lx ")\n",
-+                  env->tlb_flush_addr, env->tlb_flush_mask);
-+
-+        tlb_flush_by_mmuidx_async_work(cpu,
-+                                       RUN_ON_CPU_HOST_INT(mmu_idx_bitmap));
-+    } else {
-+        tlb_flush_page_by_mmuidx_async_work(cpu, data);
-+    }
-+}
-+
-+void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr, uint16_t idxmap)
-+{
-+    target_ulong addr_and_mmu_idx;
-+
-+    tlb_debug("addr: "TARGET_FMT_lx" mmu_idx:%" PRIx16 "\n", addr, idxmap);
-+
-+    /* This should already be page aligned */
-+    addr_and_mmu_idx = addr & TARGET_PAGE_MASK;
-+    addr_and_mmu_idx |= idxmap;
-+
-+    if (!qemu_cpu_is_self(cpu)) {
-+        async_run_on_cpu(cpu, tlb_check_page_and_flush_by_mmuidx_async_work,
-+                         RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
-+    } else {
-+        tlb_check_page_and_flush_by_mmuidx_async_work(
-+            cpu, RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
-+    }
-+}
-+
- void tlb_flush_page_all(target_ulong addr)
- {
-     CPUState *cpu;
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index 7f1d6a81a0..d996e5a0f4 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -403,7 +403,7 @@ struct CPUState {
-      * avoid potential races. The aim of the flag is to avoid
-      * unnecessary flushes.
-      */
--    bool pending_tlb_flush;
-+    uint16_t pending_tlb_flush;
- };
- 
- QTAILQ_HEAD(CPUTailQ, CPUState);
+         if (EXTRACT(change_mask, CORE2_ENABLE)) {
+@@ -162,11 +202,11 @@ static void imx6_src_write(void *opaque, hwaddr offset, uint64_t value,
+                 arm_set_cpu_on(2, s->regs[SRC_GPR5], s->regs[SRC_GPR6],
+                                3, false);
+             } else {
+-                /* CORE 3 is shut down */
++                /* CORE 2 is shut down */
+                 arm_set_cpu_off(2);
+             }
+             /* We clear the reset bits as the processor changed state */
+-            clear_bit(CORE2_RST_SHIFT, &current_value);
++            imx6_defer_clear_reset_bit(2, s, CORE2_RST_SHIFT);
+             clear_bit(CORE2_RST_SHIFT, &change_mask);
+         }
+         if (EXTRACT(change_mask, CORE1_ENABLE)) {
+@@ -175,28 +215,28 @@ static void imx6_src_write(void *opaque, hwaddr offset, uint64_t value,
+                 arm_set_cpu_on(1, s->regs[SRC_GPR3], s->regs[SRC_GPR4],
+                                3, false);
+             } else {
+-                /* CORE 3 is shut down */
++                /* CORE 1 is shut down */
+                 arm_set_cpu_off(1);
+             }
+             /* We clear the reset bits as the processor changed state */
+-            clear_bit(CORE1_RST_SHIFT, &current_value);
++            imx6_defer_clear_reset_bit(1, s, CORE1_RST_SHIFT);
+             clear_bit(CORE1_RST_SHIFT, &change_mask);
+         }
+         if (EXTRACT(change_mask, CORE0_RST)) {
+             arm_reset_cpu(0);
+-            clear_bit(CORE0_RST_SHIFT, &current_value);
++            imx6_defer_clear_reset_bit(0, s, CORE0_RST_SHIFT);
+         }
+         if (EXTRACT(change_mask, CORE1_RST)) {
+             arm_reset_cpu(1);
+-            clear_bit(CORE1_RST_SHIFT, &current_value);
++            imx6_defer_clear_reset_bit(1, s, CORE1_RST_SHIFT);
+         }
+         if (EXTRACT(change_mask, CORE2_RST)) {
+             arm_reset_cpu(2);
+-            clear_bit(CORE2_RST_SHIFT, &current_value);
++            imx6_defer_clear_reset_bit(2, s, CORE2_RST_SHIFT);
+         }
+         if (EXTRACT(change_mask, CORE3_RST)) {
+             arm_reset_cpu(3);
+-            clear_bit(CORE3_RST_SHIFT, &current_value);
++            imx6_defer_clear_reset_bit(3, s, CORE3_RST_SHIFT);
+         }
+         if (EXTRACT(change_mask, SW_IPU2_RST)) {
+             /* We pretend the IPU2 is reset */
 -- 
 2.11.0
