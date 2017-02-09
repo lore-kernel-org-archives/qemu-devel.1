@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cbf6q-0005lQ-QT
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 22:09:28 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1cbfIH-0006jQ-Hl
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 22:21:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cbf6m-00047i-O4
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 22:09:24 -0500
-Received: from [45.249.212.187] (port=2533 helo=dggrg01-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cbf6k-00040o-Ny
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 22:09:20 -0500
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Thu, 9 Feb 2017 03:08:30 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA1B3162@DGGEMA505-MBX.china.huawei.com>
-References: <1484727757-41240-1-git-send-email-arei.gonglei@huawei.com>
-	<1484727757-41240-2-git-send-email-arei.gonglei@huawei.com>
-	<62a99d8e-1735-0838-4067-bce401c86526@linux.vnet.ibm.com>
-	<33183CC9F5247A488A2544077AF19020DA1AFFB2@DGGEMA505-MBX.china.huawei.com>
-	<ee910162-d6ff-4648-752e-fbb3d6077a37@linux.vnet.ibm.com>
-In-Reply-To: <ee910162-d6ff-4648-752e-fbb3d6077a37@linux.vnet.ibm.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <aik@ozlabs.ru>) id 1cbfID-0006yJ-Fm
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 22:21:13 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:33268)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1cbfID-0006xz-5n
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 22:21:09 -0500
+Received: by mail-pg0-x242.google.com with SMTP id 194so16572304pgd.0
+	for <qemu-devel@nongnu.org>; Wed, 08 Feb 2017 19:21:07 -0800 (PST)
+References: <cover.1486436185.git.sam.bobroff@au1.ibm.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <10156236-ffaa-4899-b0d9-89b6527e1122@ozlabs.ru>
+Date: Thu, 9 Feb 2017 14:21:01 +1100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] [PATCH v16 1/2]
- virtio-crypto: Add virtio crypto device specification
+In-Reply-To: <cover.1486436185.git.sam.bobroff@au1.ibm.com>
+Content-Type: text/plain; charset=koi8-r
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 0/9] ISA 3.00 KVM guest support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,870 +28,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>
-Cc: Luonengjun <luonengjun@huawei.com>, "mst@redhat.com" <mst@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "denglingli@chinamobile.com" <denglingli@chinamobile.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "Ola.Liljedahl@arm.com" <Ola.Liljedahl@arm.com>, "Varun.Sethi@freescale.com" <Varun.Sethi@freescale.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "brian.a.keating@intel.com" <brian.a.keating@intel.com>, "liang.j.ma@intel.com" <liang.j.ma@intel.com>, "john.griffin@intel.com" <john.griffin@intel.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "mike.caraman@nxp.com" <mike.caraman@nxp.com>, "agraf@suse.de" <agraf@suse.de>, "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "nmorey@kalray.eu" <nmorey@kalray.eu>, "vincent.jardin@6wind.com" <vincent.jardin@6wind.com>, "Wubin (H)" <wu.wubin@huawei.com>, longpeng <longpeng2@huawei.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>
+To: Sam Bobroff <sam.bobroff@au1.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-Hi,
-
->=20
->=20
-> On 02/08/2017 07:24 AM, Gonglei (Arei) wrote:
-> > Hi Halil,
-> >
-> > Thanks for your comments firstly.
-> >
->=20
-> You are welcome :). Sorry it took so long -- I'm currently
-> quite busy.
->=20
-It's fine.=20
-
-> >>
-> >> On 01/18/2017 09:22 AM, Gonglei wrote:
-> >>> The virtio crypto device is a virtual crypto device (ie. hardware
-> >>> crypto accelerator card). Currently, the virtio crypto device provide=
-s
-> >>> the following crypto services: CIPHER, MAC, HASH, and AEAD.
-> >>>
-> >>> In this patch, CIPHER, MAC, HASH, AEAD services are introduced.
-> >>>
-> >>> VIRTIO-153
-> >>>
-> >>> Signed-off-by: Gonglei <arei.gonglei@huawei.com>
-> >>> CC: Michael S. Tsirkin <mst@redhat.com>
-> >>> CC: Cornelia Huck <cornelia.huck@de.ibm.com>
-> >>> CC: Stefan Hajnoczi <stefanha@redhat.com>
-> >>> CC: Lingli Deng <denglingli@chinamobile.com>
-> >>> CC: Jani Kokkonen <Jani.Kokkonen@huawei.com>
-> >>> CC: Ola Liljedahl <Ola.Liljedahl@arm.com>
-> >>> CC: Varun Sethi <Varun.Sethi@freescale.com>
-> >>> CC: Zeng Xin <xin.zeng@intel.com>
-> >>> CC: Keating Brian <brian.a.keating@intel.com>
-> >>> CC: Ma Liang J <liang.j.ma@intel.com>
-> >>> CC: Griffin John <john.griffin@intel.com>
-> >>> CC: Mihai Claudiu Caraman <mike.caraman@nxp.com>
-> >>> ---
-> >>>  content.tex       |    2 +
-> >>>  virtio-crypto.tex | 1245
-> >> +++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >>>  2 files changed, 1247 insertions(+)
-> >>>  create mode 100644 virtio-crypto.tex
-> >>>
-> >>> diff --git a/content.tex b/content.tex
-> >>> index 4b45678..ab75f78 100644
-> >>> --- a/content.tex
-> >>> +++ b/content.tex
-> >>> @@ -5750,6 +5750,8 @@ descriptor for the \field{sense_len},
-> >> \field{residual},
-> >>>  \field{status_qualifier}, \field{status}, \field{response} and
-> >>>  \field{sense} fields.
-> >>>
-> >>> +\input{virtio-crypto.tex}
-> >>> +
-> >>>  \chapter{Reserved Feature Bits}\label{sec:Reserved Feature Bits}
-> >>>
-> >>>  Currently there are three device-independent feature bits defined:
-> >>> diff --git a/virtio-crypto.tex b/virtio-crypto.tex
-> >>> new file mode 100644
-> >>> index 0000000..732cd30
-> >>> --- /dev/null
-> >>> +++ b/virtio-crypto.tex
-> >>> @@ -0,0 +1,1245 @@
-> >>> +\section{Crypto Device}\label{sec:Device Types / Crypto Device}
-> >>> +
-> >>> +The virtio crypto device is a virtual cryptography device as well as=
- a kind of
-> >>> +virtual hardware accelerator for virtual machines. The encryption an=
-d
-> >>> +decryption requests are placed in any of the data active queues and =
-are
-> >> ultimately handled by the
-> >>
-> >> Am I the only one having a problem with 'data active queues'?
-> >
-> > Maybe 'data queues' here is enough?
-> >
->=20
-> I guess 'active' came from virtio-net. For virtio-crypto you do not defin=
-e
-> active and passive queues, and my guess is there is no intention/reason
-> to do this in the future either. Thus yes 'data queues' is fine. And
-> 'active data queues' would be grammatically correct, but substantially
-> confusing and wrong.
->=20
-OK.
-
-> >> I have objected on this before.
-> >>
-> >>> +backend crypto accelerators. The second kind of queue is the control
-> queue
-> >> used to create
-> >>> +or destroy sessions for symmetric algorithms and will control some
-> >> advanced
-> >>> +features in the future. The virtio crypto device provides the follow=
-ing
-> crypto
-> >>> +services: CIPHER, MAC, HASH, and AEAD.
-> >>> +
-> >>> +
-> >>> +\subsection{Device ID}\label{sec:Device Types / Crypto Device / Devi=
-ce
-> ID}
-> >>> +
-> >>> +20
-> >>> +
-> >>> +\subsection{Virtqueues}\label{sec:Device Types / Crypto Device /
-> >> Virtqueues}
-> >>> +
-> >>> +\begin{description}
-> >>> +\item[0] dataq1
-> >>> +\item[\ldots]
-> >>> +\item[N-1] dataqN
-> >>> +\item[N] controlq
-> >>> +\end{description}
-> >>> +
-> >>> +N is set by \field{max_dataqueues}.
-> >>> +
-> >>> +\subsection{Feature bits}\label{sec:Device Types / Crypto Device /
-> Feature
-> >> bits}
-> >>> +
-> >>> +VIRTIO_CRYPTO_F_NON_SESSION_MODE (0) non-session mode is
-> available.
-> >>> +VIRTIO_CRYPTO_F_CIPHER_NON_SESSION_MODE (1) non-session mode
-> is
-> >> available for CIPHER service.
-> >>> +VIRTIO_CRYPTO_F_HASH_NON_SESSION_MODE (2) non-session mode is
-> >> available for HASH service.
-> >>> +VIRTIO_CRYPTO_F_MAC_NON_SESSION_MODE (3) non-session mode is
-> >> available for MAC service.
-> >>> +VIRTIO_CRYPTO_F_AEAD_NON_SESSION_MODE (4) non-session mode is
-> >> available for AEAD service.
-> >>> +
-> >>
-> >> I'm not sure that "non-session" entirely correct grammatically. I woul=
-d
-> >> prefer sessionless as alternatively proposed by Stefan, or even statel=
-ess.
-> >> I think stateless is the phrase most frequently used to describe what
-> >> we want to introduce -- that is basically response =3D f(request) and
-> >> not response =3D f(request, server_state) where the server_state is
-> >> a is determined by a series of previous interactions between the serve=
-r
-> >> and the client).
-> >>
-> > Makes sense. I discussed with Xin about this on call meeting two weeks =
-ago.
-> > I decide to use stateless mode instead of non-session mode here.
-> >
-> >>> +\subsubsection{Feature bit requirements}\label{sec:Device Types / Cr=
-ypto
-> >> Device / Feature bits}
-> >>> +
-> >>> +Some crypto feature bits require other crypto feature bits
-> >>> +(see \ref{drivernormative:Basic Facilities of a Virtio Device / Feat=
-ure
-> Bits}):
-> >>> +
-> >>> +\begin{description}
-> >>> +\item[VIRTIO_CRYPTO_F_CIPHER_NON_SESSION_MODE] Requires
-> >> VIRTIO_CRYPTO_F_NON_SESSION_MODE.
-> >>> +\item[VIRTIO_CRYPTO_F_HASH_NON_SESSION_MODE] Requires
-> >> VIRTIO_CRYPTO_F_NON_SESSION_MODE.
-> >>> +\item[VIRTIO_CRYPTO_F_MAC_NON_SESSION_MODE] Requires
-> >> VIRTIO_CRYPTO_F_NON_SESSION_MODE.
-> >>> +\item[VIRTIO_CRYPTO_F_AEAD_NON_SESSION_MODE] Requires
-> >> VIRTIO_CRYPTO_F_NON_SESSION_MODE.
-> >>> +\end{description}
-> >>> +
-> >>> +\subsection{Device configuration layout}\label{sec:Device Types / Cr=
-ypto
-> >> Device / Device configuration layout}
-> >>> +
-> >>> +The following driver-read-only configuration fields are defined:
-> >>> +
-> >>> +\begin{lstlisting}
-> >>> +struct virtio_crypto_config {
-> >>> +    le32 status;
-> >>> +    le32 max_dataqueues;
-> >>> +    le32 crypto_services;
-> >>> +    /* Detailed algorithms mask */
-> >>> +    le32 cipher_algo_l;
-> >>> +    le32 cipher_algo_h;
-> >>> +    le32 hash_algo;
-> >>> +    le32 mac_algo_l;
-> >>> +    le32 mac_algo_h;
-> >>> +    le32 aead_algo;
-> >>> +    /* Maximum length of cipher key */
-> >>> +    le32 max_cipher_key_len;
-> >>> +    /* Maximum length of authenticated key */
-> >>> +    le32 max_auth_key_len;
-> >>> +    le32 reserved;
-> >>> +    /* Maximum size of each crypto request's content */
-> >>> +    le64 max_size;
-> >>> +};
-> >>> +\end{lstlisting}
-> >>> +
-> >>> +The value of the \field{status} field is VIRTIO_CRYPTO_S_HW_READY or
-> >> ~VIRTIO_CRYPTO_S_HW_READY.
-> >>
-> >> Not entirely happy with this. What you want to say is reserved
-> >> for future use, or? Would it make sense to have a general note
-> >> -- in a similar fashion like for 'sizes are in bytes' -- for
-> >> reserved for future use?
-> >>
-> >> One possible formulation would be:
-> >>
-> >> "In this specification, unless explicitly stated otherwise,
-> >> fields and bits reserved for future use shall be zeroed out.
-> >> Both the a device or a driver device and the driver should
-> >> detect violations of this rule, and deny the requested
-> >> operation in an appropriate way if possible."
-> >>
-> >>
-> > Cornelia also provided a good suggestion about this. :)
-> >
->=20
-> Yeah.
->=20
-> >>> +
-> >>> +\begin{lstlisting}
-> >>> +#define VIRTIO_CRYPTO_S_HW_READY  (1 << 0)
-> >>> +\end{lstlisting}
-> >>> +
-> >>> +The VIRTIO_CRYPTO_S_HW_READY flag is used to show whether the
-> >> hardware is ready to work or not.
-> >>
-> >> I do not like hardware here.
-> >>
-> > Sorry about that, but it has existed in both Qemu and Linux driver. :(
-> >
->=20
-> This is a spec, that's an implementation. You could theoretically use
-> different names, but I would not go that far. I would keep the constant
-> name but reword the sentence stating the semantic.
->=20
-> You seem to use "hardware", "accelerator", "backend", "hardware-backend",
-> "backend accelerator", "backend crypto accelerator(s)" interchangeably --=
- as
-> if these had the same meaning. Moreover I do not remember seeing a (preci=
-se)
-> definition for any of these phrases. Or am I wrong?
->=20
-> AFAIK, while avoiding word repetition (by using synonyms for example) is
-> considered good style in general, technical writing and especially
-> specifications are a prominent exception. In specifications consistent wo=
-rding
-> should be preferred over avoiding repetition, and IMHO this is
-> especially important that the concepts of the domain under specification
-> are referred to in a consistent way (e.g. called always the same).
->=20
-> Do you agree? If you do, could we consolidate the virtio crypto spec
-> in this sense?
->=20
-Yes, I do. I'll try my best to perfect the spec.
-
-> >>> +
-> >>> +The following driver-read-only fields include \field{max_dataqueues}=
-,
-> which
-> >> specifies the
-> >>
-> >> Why following?
-> >>
-> > Er, I used 'following' at here and there... It's just an auxiliary word=
-.
-> >
->=20
-> Well, I wanted to say 'following' and 'include' together make this
-> sentence look very strange to me.
->=20
-OK. Will fix them.
-
-> AFAIU your answer 'following' is meant to be kind of ornamental here.
-> I also think we should drop any elements (words, sentences) having
-> purely ornamental function.
->=20
-> >>> +maximum number of data virtqueues (dataq1\ldots dataqN), and
-> >> \field{crypto_services},
-> >>> +which indicates the crypto services the virtio crypto supports.
-> >>> +
-> >>> +The following services are defined:
-> >>> +
-> >>> +\begin{lstlisting}
-> >>> +/* CIPHER service */
-> >>> +#define VIRTIO_CRYPTO_SERVICE_CIPHER 0
-> >>> +/* HASH service */
-> >>> +#define VIRTIO_CRYPTO_SERVICE_HASH   1
-> >>> +/* MAC (Message Authentication Codes) service */
-> >>> +#define VIRTIO_CRYPTO_SERVICE_MAC    2
-> >>> +/* AEAD (Authenticated Encryption with Associated Data) service */
-> >>> +#define VIRTIO_CRYPTO_SERVICE_AEAD   3
-> >>> +\end{lstlisting}
-> >>> +
-> >>> +The last driver-read-only fields specify detailed algorithms masks
-> >>> +the device offers for corresponding services. The following CIPHER
-> >> algorithms
-> >>> +are defined:
-> >>
-> >> You do not establish an explicit relationship between the fields and t=
-he
-> >> macros for the flags. These are flags or? It seems quite common in the
-> >> spec to use _F_ in flag names. Would it be appropriate here?
-> >>
-> >>> +
-> >>> +\begin{lstlisting}
-> >>> +#define VIRTIO_CRYPTO_NO_CIPHER                 0
-> >>> +#define VIRTIO_CRYPTO_CIPHER_ARC4               1
-> >>> +#define VIRTIO_CRYPTO_CIPHER_AES_ECB            2
-> >>> +#define VIRTIO_CRYPTO_CIPHER_AES_CBC            3
-> >>> +#define VIRTIO_CRYPTO_CIPHER_AES_CTR            4
-> >>> +#define VIRTIO_CRYPTO_CIPHER_DES_ECB            5
-> >>> +#define VIRTIO_CRYPTO_CIPHER_DES_CBC            6
-> >>> +#define VIRTIO_CRYPTO_CIPHER_3DES_ECB           7
-> >>> +#define VIRTIO_CRYPTO_CIPHER_3DES_CBC           8
-> >>> +#define VIRTIO_CRYPTO_CIPHER_3DES_CTR           9
-> >>> +#define VIRTIO_CRYPTO_CIPHER_KASUMI_F8          10
-> >>> +#define VIRTIO_CRYPTO_CIPHER_SNOW3G_UEA2        11
-> >>> +#define VIRTIO_CRYPTO_CIPHER_AES_F8             12
-> >>> +#define VIRTIO_CRYPTO_CIPHER_AES_XTS            13
-> >>> +#define VIRTIO_CRYPTO_CIPHER_ZUC_EEA3           14
-> >>> +\end{lstlisting}
-> >>> +
-> >>> +The following HASH algorithms are defined:
-> >>> +
-> >>> +\begin{lstlisting}
-> >>> +#define VIRTIO_CRYPTO_NO_HASH            0
-> >>> +#define VIRTIO_CRYPTO_HASH_MD5           1
-> >>> +#define VIRTIO_CRYPTO_HASH_SHA1          2
-> >>> +#define VIRTIO_CRYPTO_HASH_SHA_224       3
-> >>> +#define VIRTIO_CRYPTO_HASH_SHA_256       4
-> >>> +#define VIRTIO_CRYPTO_HASH_SHA_384       5
-> >>> +#define VIRTIO_CRYPTO_HASH_SHA_512       6
-> >>> +#define VIRTIO_CRYPTO_HASH_SHA3_224      7
-> >>> +#define VIRTIO_CRYPTO_HASH_SHA3_256      8
-> >>> +#define VIRTIO_CRYPTO_HASH_SHA3_384      9
-> >>> +#define VIRTIO_CRYPTO_HASH_SHA3_512      10
-> >>> +#define VIRTIO_CRYPTO_HASH_SHA3_SHAKE128      11
-> >>> +#define VIRTIO_CRYPTO_HASH_SHA3_SHAKE256      12
-> >>> +\end{lstlisting}
-> >>> +
-> >>> +The following MAC algorithms are defined:
-> >>> +
-> >>> +\begin{lstlisting}
-> >>> +#define VIRTIO_CRYPTO_NO_MAC                       0
-> >>> +#define VIRTIO_CRYPTO_MAC_HMAC_MD5                 1
-> >>> +#define VIRTIO_CRYPTO_MAC_HMAC_SHA1                2
-> >>> +#define VIRTIO_CRYPTO_MAC_HMAC_SHA_224             3
-> >>> +#define VIRTIO_CRYPTO_MAC_HMAC_SHA_256             4
-> >>> +#define VIRTIO_CRYPTO_MAC_HMAC_SHA_384             5
-> >>> +#define VIRTIO_CRYPTO_MAC_HMAC_SHA_512             6
-> >>> +#define VIRTIO_CRYPTO_MAC_CMAC_3DES                25
-> >>> +#define VIRTIO_CRYPTO_MAC_CMAC_AES                 26
-> >>> +#define VIRTIO_CRYPTO_MAC_KASUMI_F9                27
-> >>> +#define VIRTIO_CRYPTO_MAC_SNOW3G_UIA2              28
-> >>> +#define VIRTIO_CRYPTO_MAC_GMAC_AES                 41
-> >>> +#define VIRTIO_CRYPTO_MAC_GMAC_TWOFISH             42
-> >>> +#define VIRTIO_CRYPTO_MAC_CBCMAC_AES               49
-> >>> +#define VIRTIO_CRYPTO_MAC_CBCMAC_KASUMI_F9         50
-> >>> +#define VIRTIO_CRYPTO_MAC_XCBC_AES                 53
-> >>> +#define VIRTIO_CRYPTO_MAC_ZUC_EIA3                 54
-> >>> +\end{lstlisting}
-> >>> +
-> >>> +The following AEAD algorithms are defined:
-> >>> +
-> >>> +\begin{lstlisting}
-> >>> +#define VIRTIO_CRYPTO_NO_AEAD     0
-> >>> +#define VIRTIO_CRYPTO_AEAD_GCM    1
-> >>> +#define VIRTIO_CRYPTO_AEAD_CCM    2
-> >>> +#define VIRTIO_CRYPTO_AEAD_CHACHA20_POLY1305  3
-> >>> +\end{lstlisting}
-> >>> +
-> >>
-> >> Would it make sense to interleave the flag definition
-> >> with the struct virtio_crypto_config?
-> >>
-> >>> +\begin{note}
-> >>> +Any other values are reserved for future use.
-> >>
-> >> Are these flags or values? I do not think values is appropriate here.
-> >>
-> > Please refer to my reply in another thread.
-> >
->=20
-> Will answer there.
->=20
-> >>> +\end{note}
-> >>> +
-> >>
-> >> Some fields are missing here. This is inconsistent. Either
-> >> you should describe all or none (here).
-> >>
-> > Ok, will add other fields.
-> >
->=20
-> Thx.
->=20
-> >>> +\devicenormative{\subsubsection}{Device configuration layout}{Device
-> Types
-> >> / Crypto Device / Device configuration layout}
-> >>> +
-> >>> +\begin{itemize*}
-> >>> +\item The device MUST set \field{max_dataqueues} to between 1 and
-> 65535
-> >> inclusive.
-> >>> +\item The device MUST set \field{status} based on the status of the
-> >> hardware-backed implementation.
-> >>
-> >> What is a hardware-backend?
-> >>
-> > I meant the cryptodev backend, cryptodev-builtin, cryptodev-vhost-user =
-for
-> example.
-> >
->=20
-> See above. This was a rhetorical question. Many of my question
-> are rhetorical, and are meant to be a gentle indicator of
-> concern -- in opposition to saying something is straight-out
-> incomprehensible or wrong.
->=20
-Sorry for misunderstanding. :(
-
-> I understood what hardware-backend means because I'm familiar with your
-> Linux/QEMU implementation. Please keep in mind, this specification
-> should make clean-room implementations possible (I mean, with
-> no looking at the linux kernel, or qemu code or whatherver).
->=20
-You are right.
-
-> >>> +\item The device MUST accept and handle requests after \field{status=
-} is
-> set
-> >> to VIRTIO_CRYPTO_S_HW_READY.
-> >>
-> >> Shouldn't this be the other way around (if VIRTIO_CRYPTO_S_HW_READY
->=20
-> Sorry, of course I have meant if ~VIRTIO_CRYPTO_S_HW_READY then reject!
->=20
-> >> then reject). Is a not well formed request or a backend failure consid=
-ered?
-> >> What does handle mean? What should happen if requests are submitted
-> >> before VIRTIO_CRYPTO_S_HW_READY is set?
-> >>
-> > The requests MUST not be transmitted before
-> VIRTIO_CRYPTO_S_HW_READY is set.
-> > Which is stated by the driver requirements. Otherwise the requests will=
- be
-> dropped.
->=20
-> This ('Otherwise the requests will be dropped.') ain't specified or?
-> Should not we specify this? How exactly are they 'dropped'?
->=20
-Hmm, we should add those explanation.
-
-> >
-> > The handle means execute crypto operations.
-> >
->=20
-> But things can fail, you have a status
-> (VIRTIO_CRYPT_(ERR|NOTSUPP|BADMSG))
-> for that. If that happens, does the device violate this point?
->=20
-> Do (all) other virtio devices have a similar conformance statement on whe=
-n
-> they 'MUST accept and handle' requests or packets? If not what do you thi=
-nk,
-> should they?
->=20
-Take virtio-net as an example, there is only one requirement about VIRTIO_N=
-ET_S_LINK_UP:
-
-Section 5.1.5
-6. If the VIRTIO_NET_F_STATUS feature bit is negotiated, the link status co=
-mes from the bottom bit of
-status. Otherwise, the driver assumes it's active.
-
-It didn't tell us what will be happen if the link isn't active. And what wi=
-ll be happen if the driver still
-transmit packets to the device if the link isn't active.
-
-So I think the potential mean is the driver MUST not transmit packets if th=
-e link isn't active.
+On 07/02/17 13:56, Sam Bobroff wrote:
+> Because KVM will soon provide the necessary infrastructure for KVM guests to
+> run on POWER9 CPUs, we can now start exploiting this new functionality from
+> QEMU. See:
+> https://lists.ozlabs.org/pipermail/linuxppc-dev/2017-January/153433.html
+> 
+> This work is not yet complete but it is functional and is presented for early
+> review. It overlaps in some places with current work supporting the same guests
+> under full emulation.
+> 
+> This set aims to support only the following scenarios:
+> * A POWER9 host running in radix mode, running a guest in radix mode.
+> * A POWER9 host running in hash mode, running a guest in hash mode.
+> * A POWER9 host running in hash mode, running a guest in legacy(+) mode.
+> (+) Where legacy means that the guest does not support ISA 3.00.
+> 
+> Hash or radix mode for the host is controlled via the "disable_radix" kernel
+> command line parameter: the host will use radix unless disable_radix is given.
+> For the guest it should be automatically selected to match the host.
+> 
+> Bad legacy guests: There are some recent kernels (e.g. 4.9) that will, when run
+> as a KVM guest and if the ibm,pa-features entry in the device tree has the
+> Radix MMU bit set, attempt to initialize the MMU as if they were a host (which
+> will cause them to crash). To avoid exposing this problem, the Radix MMU bit
+> is removed from ibm,pa-features when a legacy guest is detected.
+> 
+> Prerequsites:
+> * This set is based on current QEMU master, but relies on some work already posted here:
+> https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg02527.html
+> Specifically patches 1..4 which set up the new CPU and MMU models.
 
 
-> >>> +\item The device MUST set \field{crypto_services} based on the crypt=
-o
-> >> services the device offers.
-> >>> +\item The device MUST set detailed algorithms masks based on the
-> >> \field{crypto_services} field.
-> >>> +\item The device MUST set \field{max_size} to show the maximum size =
-of
-> >> crypto request the device supports.
-> >>> +\item The device MUST set \field{max_cipher_key_len} to show the
-> >> maximum length of cipher key if the device supports CIPHER service.
-> >>> +\item The device MUST set \field{max_auth_key_len} to show the
-> maximum
-> >> length of authenticated key if the device supports MAC service.
-> >>> +\end{itemize*}
-> >>> +
-> >>> +\drivernormative{\subsubsection}{Device configuration layout}{Device
-> Types
-> >> / Crypto Device / Device configuration layout}
-> >>> +
-> >>> +\begin{itemize*}
-> >>> +\item The driver MUST read the ready \field{status} from the bottom =
-bit
-> of
-> >> status to check whether the hardware-backed
-> >>> +      implementation is ready or not, and the driver MUST reread it
-> after
-> >> the device reset.
-> >>> +\item The driver MUST NOT transmit any packets to the device if the
-> ready
-> >> \field{status} is not set.
-> >>> +\item The driver MUST read \field{max_dataqueues} field to discover =
-the
-> >> number of data queues the device supports.
-> >>> +\item The driver MUST read \field{crypto_services} field to discover=
- which
-> >> services the device is able to offer.
-> >>> +\item The driver MUST read the detailed algorithms fields based on
-> >> \field{crypto_services} field.
-> >>> +\item The driver SHOULD read \field{max_size} to discover the maximu=
-m
-> >> size of crypto request the device supports.
-> >>> +\item The driver SHOULD read \field{max_cipher_key_len} to discover =
-the
-> >> maximum length of cipher key the device supports.
-> >>> +\item The driver SHOULD read \field{max_auth_key_len} to discover th=
-e
-> >> maximum length of authenticated key the device supports.
-> >>> +\end{itemize*}
-> >>> +
-> >>> +\subsection{Device Initialization}\label{sec:Device Types / Crypto D=
-evice /
-> >> Device Initialization}
-> >>> +
-> >>> +\drivernormative{\subsubsection}{Device Initialization}{Device Types=
- /
-> >> Crypto Device / Device Initialization}
-> >>> +
-> >>> +\begin{itemize*}
-> >>> +\item The driver MUST identify and initialize the control virtqueue.
-> >>
-> >> But does not have to identify and initialize any data virtqueues?
-> >>
-> > Good catch. Both controlq and dataq.
-> >
-> >>> +\item The driver MUST read the supported crypto services from bits o=
-f
-> >> \field{crypto_services}.
-> >>> +\item The driver MUST read the supported algorithms based on
-> >> \field{crypto_services} field.
-> >>> +\end{itemize*}
-> >>> +
-> >>> +\devicenormative{\subsubsection}{Device Initialization}{Device Types=
- /
-> >> Crypto Device / Device Initialization}
-> >>> +
-> >>> +\begin{itemize*}
-> >>> +\item The device MUST be configured with at least one accelerator wh=
-ich
-> >> executes backend crypto operations.
-> >>
-> >> What does configured mean here? Is this initialization requirement.
-> >>
-> > It means the virtio crypto device MUST attach cryptodev backend.
-> > Yes, it's a requirement.
->=20
-> What happens if an implementation fails to fulfill this requirement?
-> What is the benefit of having this requirement?
->=20
-Let me drop it. We only care about the 'status' field. if an implementation
-fails to fulfill this requirement the VIRTIO_CRYPTO_S_HW_READY bit doesn't =
-be set.
+It would help if you pushed this as a tree with all prerequisites somewhere
+(github?); same about the kernel which has bits which this patchset is
+using. Thanks.
 
-> >
-> >>> +\item The device MUST write the \field{crypto_services} field based =
-on the
-> >> capacities of the backend accelerator.
-> >>> +\end{itemize*}
-> >>> +
-> >>
-> >> How do 'Initialization' and 'Configuration Layout' requirements relate=
- to
-> >> each-other.
-> >>
-> > Basically they do the same things. But 'configuration layout' can't sta=
-te the
-> > specific time.
-> >
-> >>> +\subsection{Device Operation}\label{sec:Device Types / Crypto Device=
- /
-> >> Device Operation}
-> >>> +
-> >>> +Packets can be transmitted by placing them in both the controlq and
-> dataq.
-> >>> +Packets consist of a general header and a service-specific request.
-> >>
-> >> Are packets and requests synonyms?
-> >>
-> > Yes, they are in virtio crypto spec.
-> >
->=20
-> See above regarding consistent naming.
->=20
-> >>> +Where 'general header' is for all crypto requests, and 'service spec=
-ific
-> >> requests'
-> >>
-> >> From below it seems you have two types of 'general header', but up unt=
-il
-> this
-> >> point it seems there is a single definition. Of course, this does not
-> >> really matter.
-> >>
-> > I distinguish it based on controlq and dataq in following statement.
-> >
->=20
-> How about 'request header' or 'queue header'? Or something like
-> 'Packets consist of a queue-type specific header specifying among
-> others the operation, and an operation specific payload.'
->=20
-Sounds good.
 
-> I do not like 'general' here.
->=20
-> >>> +are composed of operation parameter + output data + input data in
-> general.
-> >>> +Operation parameters are algorithm-specific parameters, output data =
-is
-> the
-> >>> +data that should be utilized in operations, and input data is equal =
-to
-> >>> +"operation result + result data".
-> >>> +
-> >>> +The device can support both session mode (See \ref{sec:Device Types =
-/
-> >> Crypto Device / Device Operation / Control Virtqueue / Session operati=
-on})
-> and
-> >> non-session mode, for example,
-> >>> +As VIRTIO_CRYPTO_F_CIPHER_NON_SESSION_MODE feature bit is
-> >> negotiated, the driver can use non-session mode for CIPHER service,
-> otherwise
-> >> it can only use session mode.
-> >>
-> >> Grammar: Does not seem right to me. 'As' seems off and this could be t=
-wo
-> >> sentences.
-> >>
-> > OK. Let me s/As/If the/ here.
-> >
->=20
-> Capital won't do due to the 'for example, ' in the previous line.
-> Otherwise OK.
->=20
-Yes.
+> 
+> Notes:
+>     * Migration/snapshots are not yet investigated.
+>     * If the host cannot support the guest (e.g. radix host and a legacy guest)
+>       then the guest will crash but QEMU should probably terminate with a
+>       descriptive message.
+> 
+> 
+> Sam Bobroff (9):
+>   spapr: fix off-by-one error in spapr_ovec_populate_dt()
+>   Update headers using update-linux-headers.sh
+>   spapr: Add ibm,processor-radix-AP-encodings to the device tree
+>   target-ppc: support KVM_CAP_PPC_MMU_RADIX, KVM_CAP_PPC_MMU_HASH_V3
+>   spapr: Only setup HTP if necessary.
+>   spapr: Add h_register_process_table() hypercall
+>   spapr: Set ISA 3.00 radix and hash bits in OV5
+>   spapr: Advertise ISA 3.0 MMU features in pa_features
+>   spapr: Small cleanup of PPC MMU enums
+> 
+>  hw/ppc/spapr.c                                     | 152 +++++---
+>  hw/ppc/spapr_hcall.c                               |  52 ++-
+>  hw/ppc/spapr_ovec.c                                |   2 +-
+>  include/hw/ppc/spapr.h                             |   4 +-
+>  include/hw/ppc/spapr_ovec.h                        |   6 +
+>  include/standard-headers/linux/input-event-codes.h |   2 +-
+>  include/standard-headers/linux/pci_regs.h          |   8 +
+>  include/standard-headers/linux/virtio_ids.h        |   1 +
+>  linux-headers/asm-arm/kvm.h                        |   2 +
+>  linux-headers/asm-arm/unistd.h                     | 419 +--------------------
+>  linux-headers/asm-powerpc/kvm.h                    |  25 ++
+>  linux-headers/asm-powerpc/unistd.h                 |   1 +
+>  linux-headers/asm-x86/kvm_para.h                   |   4 +-
+>  linux-headers/linux/kvm.h                          |  11 +-
+>  linux-headers/linux/vfio.h                         |  10 +
+>  target/ppc/cpu-qom.h                               |  12 +-
+>  target/ppc/cpu.h                                   |   5 +
+>  target/ppc/kvm.c                                   |  66 +++-
+>  target/ppc/kvm_ppc.h                               |  13 +
+>  target/ppc/mmu-hash64.c                            |  10 +-
+>  target/ppc/mmu_helper.c                            |  67 ++--
+>  target/ppc/translate.c                             |  12 +-
+>  22 files changed, 346 insertions(+), 538 deletions(-)
+> 
 
-> >>
-> >>> +
-> >>> +\begin{note}
-> >>> +The basic unit of all data length the byte.
-> >>> +\end{note}
-> >>> +
-> >>> +The general header for controlq is as follows:
-> >>> +
-> >>> +\begin{lstlisting}
-> >>> +#define VIRTIO_CRYPTO_OPCODE(service, op)   (((service) << 8) | (op)=
-)
-> >>> +
-> >>> +struct virtio_crypto_ctrl_header {
-> >>> +#define VIRTIO_CRYPTO_CIPHER_CREATE_SESSION \
-> >>> +       VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_CIPHER,
-> >> 0x02)
-> >>> +#define VIRTIO_CRYPTO_CIPHER_DESTROY_SESSION \
-> >>> +       VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_CIPHER,
-> >> 0x03)
-> >>> +#define VIRTIO_CRYPTO_HASH_CREATE_SESSION \
-> >>> +       VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_HASH,
-> 0x02)
-> >>> +#define VIRTIO_CRYPTO_HASH_DESTROY_SESSION \
-> >>> +       VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_HASH,
-> 0x03)
-> >>> +#define VIRTIO_CRYPTO_MAC_CREATE_SESSION \
-> >>> +       VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_MAC,
-> 0x02)
-> >>> +#define VIRTIO_CRYPTO_MAC_DESTROY_SESSION \
-> >>> +       VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_MAC,
-> 0x03)
-> >>> +#define VIRTIO_CRYPTO_AEAD_CREATE_SESSION \
-> >>> +       VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_AEAD,
-> 0x02)
-> >>> +#define VIRTIO_CRYPTO_AEAD_DESTROY_SESSION \
-> >>> +       VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_AEAD,
-> 0x03)
-> >>> +    le32 opcode;
-> >>> +    le32 algo;
-> >>> +    le32 flag;
-> >>> +    /* data virtqueue id */
-> >>> +    le32 queue_id;
-> >>> +};
-> >>> +\end{lstlisting}
-> >>> +
-> >>> +The general header of dataq:
-> >>> +
-> >>> +\begin{lstlisting}
-> >>> +struct virtio_crypto_op_header {
-> >>> +#define VIRTIO_CRYPTO_CIPHER_ENCRYPT \
-> >>> +    VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_CIPHER, 0x00)
-> >>> +#define VIRTIO_CRYPTO_CIPHER_DECRYPT \
-> >>> +    VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_CIPHER, 0x01)
-> >>> +#define VIRTIO_CRYPTO_HASH \
-> >>> +    VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_HASH, 0x00)
-> >>> +#define VIRTIO_CRYPTO_MAC \
-> >>> +    VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_MAC, 0x00)
-> >>> +#define VIRTIO_CRYPTO_AEAD_ENCRYPT \
-> >>> +    VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_AEAD, 0x00)
-> >>> +#define VIRTIO_CRYPTO_AEAD_DECRYPT \
-> >>> +    VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_AEAD, 0x01)
-> >>> +    le32 opcode;
-> >>> +    /* algo should be service-specific algorithms */
-> >>> +    le32 algo;
-> >>> +    /* session_id should be service-specific algorithms */
-> >>> +    le64 session_id;
-> >>> +#define VIRTIO_CRYPTO_FLAG_SESSION_MODE 1
-> >>> +#define VIRTIO_CRYPTO_FLAG_NON_SESSION_MODE 2
-> >>
-> >> Use _F_ istead of _FLAG_?
-> >>
-> > I'm afraid they are confused with the feature bits.
-> >
->=20
-> Have a look at the desc flags (for example VIRTQ_DESC_F_INDIRECT).
->=20
-But in virtio crypto spec, we have the following feature bits:
 
-VIRTIO_CRYPTO_F_NON_SESSION_MODE (0) non-session mode is available.
-VIRTIO_CRYPTO_F_CIPHER_NON_SESSION_MODE (1) non-session mode is available f=
-or CIPHER service.
-VIRTIO_CRYPTO_F_HASH_NON_SESSION_MODE (2) non-session mode is available for=
- HASH service.
-VIRTIO_CRYPTO_F_MAC_NON_SESSION_MODE (3) non-session mode is available for =
-MAC service.
-VIRTIO_CRYPTO_F_AEAD_NON_SESSION_MODE (4) non-session mode is available for=
- AEAD service.
-
-They are too similar.
-
-> It is your call in the end.
->=20
-> >>> +    /* control flag to control the request */
-> >>> +    le32 flag;
-> >>> +    le32 padding;
-> >>> +};
-> >>> +\end{lstlisting}
-> >>> +
-> >>> +The device can set the operation status as follows: VIRTIO_CRYPTO_OK=
-:
-> >> success;
-> >>> +VIRTIO_CRYPTO_ERR: failure or device error; VIRTIO_CRYPTO_NOTSUPP:
-> >> not supported;
-> >>> +VIRTIO_CRYPTO_INVSESS: invalid session ID when executing crypto
-> >> operations.
-> >>> +
-> >>> +\begin{lstlisting}
-> >>> +enum VIRITO_CRYPTO_STATUS {
-> >>> +    VIRTIO_CRYPTO_OK =3D 0,
-> >>> +    VIRTIO_CRYPTO_ERR =3D 1,
-> >>> +    VIRTIO_CRYPTO_BADMSG =3D 2,
-> >>> +    VIRTIO_CRYPTO_NOTSUPP =3D 3,
-> >>> +    VIRTIO_CRYPTO_INVSESS =3D 4,
-> >>> +    VIRTIO_CRYPTO_MAX
-> >>> +};
-> >>> +\end{lstlisting}
-> >>> +
-> >>> +\subsubsection{Control Virtqueue}\label{sec:Device Types / Crypto De=
-vice
-> /
-> >> Device Operation / Control Virtqueue}
-> >>> +
-> >>> +The driver uses the control virtqueue to send control commands to th=
-e
-> >>> +device which handles the non-data plane operations, such as session
-> >>
-> >> What is a 'non-data plane'?
-> >>
-> > I named controlling plane as the non-data plane. Maybe it's superfluous=
-.
-> >
->=20
-> Again consisten naming. I would prefer avoiding introducing this extra
-> name.
->=20
-Yes. Let me drop it.
-
-> >>> +operations (See \ref{sec:Device Types / Crypto Device / Device Opera=
-tion
-> /
-> >> Control Virtqueue / Session operation}).
-> >>
-> >> Reviewed up until here. Depending on how things evolve will try to
-> >> review the rest too in the following days.
-> >>
-> > I knew it's a hard and time-consuming work to review such long spec.
-> >
-> > Great thanks for your reviewing. :)
-> >
->=20
-> I know, its annoying to deal with my comments ;). IMHO as spec
-> without a certain quantity of rigor is not really a spec. I think
-> it's very hard to write a good spec, so be patient.
->=20
-Yes, I agree. Please join me when you have a leisure if possible, haha...
-I invited you too in other thread. ;)
-
-> >> A question and a remark as a closing word:
-> >> * Are there already some kernel and qemu patches for this 'non-session=
-'
-> stuff?
-> >
-> > THB currently I have a patch for virtio_crypto.h.
-> >
-> > Attaching it for better review.
-> >
->=20
-> I would prefer having an implementation of the new features on the list,
-> before voting on the spec itself.
->=20
-As we reach a general consensus, I'll start coding.
-
-Thanks,
--Gonglei
-
-> >> * I think some proofreading (and eventually also touch-up) by a native
-> speaker
-> >> would really benefit us. Sadly my grammar skills are very questionable=
-, so
-> >> I can't help much. Nevertheless since it is a spec, I think we sould s=
-trive
-> >> for high standards in language usage too.
-> >>
-> > I agree and I actually asked a native speaker in my company to review i=
-t
-> > several months ago. When all comments are handled, I'll do it again.
->=20
-> Thats cool.
->=20
-> Regards,
-> Halil
->=20
-> >
-> > Thanks,
-> > -Gonglei
-> >
->=20
->=20
-> ---------------------------------------------------------------------
-> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
-> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+-- 
+Alexey
