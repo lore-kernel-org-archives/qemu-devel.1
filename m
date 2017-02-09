@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cboVx-00018o-5G
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:11:58 -0500
+	(envelope-from <lersek@redhat.com>) id 1cboZf-0004N7-Qx
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:15:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cboVv-0005uJ-SO
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:11:57 -0500
-References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
-	<20170202051445.5735-96-david@gibson.dropbear.id.au>
-	<922cc254-3d39-c21e-3ac6-7f8bd3b95d90@ilande.co.uk>
-	<b8c77dc9-6083-bf26-3750-f0847ad1d6ed@redhat.com>
-	<83f44e87-d1aa-3c9f-f383-e06717dfa54c@ilande.co.uk>
-	<999b15a2-2388-4397-64f4-06875f7f6d92@redhat.com>
-	<824f7332-4893-fa64-d61d-7cb9497e5371@ilande.co.uk>
-	<ff33796b-742b-f54c-a3c7-ee19b9d23759@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <6d995fa3-f699-8f00-740c-5d622d8df08a@ilande.co.uk>
-Date: Thu, 9 Feb 2017 13:11:26 +0000
+	(envelope-from <lersek@redhat.com>) id 1cboZf-0007Fv-0I
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:15:47 -0500
+References: <1486644810-33181-1-git-send-email-agraf@suse.de>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <70829774-a0c4-79ae-2eaf-cfac19e9dd7d@redhat.com>
+Date: Thu, 9 Feb 2017 14:15:36 +0100
 MIME-Version: 1.0
-In-Reply-To: <ff33796b-742b-f54c-a3c7-ee19b9d23759@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 095/107] spapr: clock should count only if
- vm is running
+In-Reply-To: <1486644810-33181-1-git-send-email-agraf@suse.de>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] target-arm: Add some omitted dma
+ cache coherency flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,81 +23,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, peter.maydell@linaro.org
-Cc: thuth@redhat.com, qemu-devel@nongnu.org, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, agraf@suse.de, qemu-ppc@nongnu.org
+To: Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, mst@redhat.com, Shannon Zhao <shannon.zhao@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-On 07/02/17 15:46, Laurent Vivier wrote:
+On 02/09/17 13:53, Alexander Graf wrote:
+> ARM is amazing when it comes to cache coherency and VMs. While any sane
+> architecture allows the host to override the guest's caching attributes,
+> that's very hard to do on ARM.
+> 
+> That means that the guest may directly access guest memory bypassing the
+> cache while QEMU happily writes to / reads from cache. The end result is
+> very nasty, because both sides see very different views of the world.
+>  
+> That means that we need to be very cautious to tell guests that devices
+> that QEMU emulates are going to use data in the cache rather than directly
+> on memory.
+> 
+> We added this to PCI a while back for DT (5d636e21 "hw/arm/virt: mark the PCIe
+> host controller as DMA coherent in the DT") and ACPI (bc64b96 "hw/arm/virt-
+> acpi-build: _CCA attribute is compulsory") but never updated virtio-mmio or
+> fw-cfg in DT or ACPI tables.
+> 
+> This patch set adds the respective cache coherency flags for them in both DT and
+> ACPI.
+> 
+> Fortunately, no guests except for Linux 4.9.7 and 4.9.8 are broken because of
+> this. Upstream realized quickly enough that every user of virtio-mmio out there
+> describes its cache coherency incorrectly and reverted the patch that would
+> require said dma coherency flag. But we should be safe for the future and "do
+> the right thing".
+> 
+> Alexander Graf (4):
+>   target-arm: Declare virtio-mmio as dma-coherent in dt
+>   hw/arm/virt: Declare virtio-mmio as dma cache coherent in ACPI
+>   hw/arm/virt: Declare fwcfg as dma cache coherent in ACPI
+>   hw/arm/virt: Declare fwcfg as dma cache coherent in dt
+> 
+>  hw/arm/vexpress.c        | 1 +
+>  hw/arm/virt-acpi-build.c | 2 ++
+>  hw/arm/virt.c            | 2 ++
+>  3 files changed, 5 insertions(+)
+> 
 
->> If you do this enough times (maybe 10 or so?) you'll see the progress
->> bars stop working correctly and get out of sync, i.e. it will freeze for
->> long periods of time and then "jump" to catch-up but not all the way.
->>
->> With my above patch applied to include the decrementer in the migration,
->> the bug was no longer visible in my tests.
-> 
-> Thank you for all these details.
-> 
-> I've been able to reproduce the problem, and I think the proposition you
-> did in:
-> 
->    https://lists.gnu.org/archive/html/qemu-devel/2016-01/msg01114.html
-> 
-> is the good one:
-> 
-> diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-> index df9f7a4..1dc95b8 100644
-> --- a/target/ppc/machine.c
-> +++ b/target/ppc/machine.c
-> @@ -172,6 +172,7 @@ static void cpu_pre_save(void *opaque)
->      env->spr[SPR_CFAR] = env->cfar;
->  #endif
->      env->spr[SPR_BOOKE_SPEFSCR] = env->spe_fscr;
-> +    env->spr[SPR_DECR] = cpu_ppc_load_decr(env);
-> 
->      for (i = 0; (i < 4) && (i < env->nb_BATs); i++) {
->          env->spr[SPR_DBAT0U + 2*i] = env->DBAT[0][i];
-> @@ -214,6 +215,7 @@ static int cpu_post_load(void *opaque, int version_id)
->      env->cfar = env->spr[SPR_CFAR];
->  #endif
->      env->spe_fscr = env->spr[SPR_BOOKE_SPEFSCR];
-> +    cpu_ppc_store_decr(env, env->spr[SPR_DECR]);
-> 
->      for (i = 0; (i < 4) && (i < env->nb_BATs); i++) {
->          env->DBAT[0][i] = env->spr[SPR_DBAT0U + 2*i];
-> 
-> 
-> It's interesting because it doesn't break migration between different
-> qemu releases as the register is already part of the migration stream.
-> It was just not updated in the case of TCG (KVM is keeping it alive).
-> And in case of KVM, calling cpu_ppc_load_decr()/cpu_ppc_store_decr()
-> will not break anything as:
-> 
-> - cpu_ppc_load_decr() returns "env->spr[SPR_DECR]",
-> - cpu_ppc_store_decr() does nothing.
-> 
-> Could you re-send this patch with your S-o-b, please?
+Famous last words:
+series
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 
-Hi Laurent,
+Should we replicate patch #3 to QEMU0002 / FWCF in
+"hw/i386/acpi-build.c" too? Or is it that we couldn't care less about
+_CCA on x86? :) (Can't really muster the energy right now to look it up
+in the ACPI spec, sorry!)
 
-No problem, and thanks for the analysis. In fact, I have a couple of
-other patches up on github which should fix up the remainder of the
-issues and make g3beige migrateable (I would add the mac99 is currently
-fairly close, however Ben has several WIP patches that change the mac99
-model so I don't think it's worth making that machine officially
-migrateable yet).
-
-The one question I would ask is that if cpu_ppc_store_decr() does
-nothing on KVM then would this causes issues attempting a migration
-between TCG and KVM? In theory I believe I would still need to add
-VMSTATE_PPC_TIMEBASE_V to the vmstate and encode the decrementer offset
-relative to the timebase for this to work correctly as per the original
-thread.
-
-I'm just thinking if we are close to finalising the g3beige vmstate then
-it would make sense to get it right so a KVM<>TCG migration can happen
-if at all feasible.
-
-
-ATB,
-
-Mark.
+Thanks
+Laszlo
