@@ -1,45 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cbhlL-0003KW-0f
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 00:59:23 -0500
+	(envelope-from <hangaohuai@huawei.com>) id 1cbi4G-0001Jz-R0
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 01:18:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cbhlH-0002yQ-NT
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 00:59:23 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59690)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cbhlH-0002yI-Cq
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 00:59:19 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v195wT01127469
-	for <qemu-devel@nongnu.org>; Thu, 9 Feb 2017 00:59:17 -0500
-Received: from e28smtp05.in.ibm.com (e28smtp05.in.ibm.com [125.16.236.5])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28g0fkbs6q-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 00:59:17 -0500
-Received: from localhost
-	by e28smtp05.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Thu, 9 Feb 2017 11:29:14 +0530
-Received: from d28relay03.in.ibm.com (d28relay03.in.ibm.com [9.184.220.60])
-	by d28dlp01.in.ibm.com (Postfix) with ESMTP id 7F47CE0024
-	for <qemu-devel@nongnu.org>; Thu,  9 Feb 2017 11:30:38 +0530 (IST)
-Received: from d28av06.in.ibm.com (d28av06.in.ibm.com [9.184.220.48])
-	by d28relay03.in.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	v195xBZn36765830
-	for <qemu-devel@nongnu.org>; Thu, 9 Feb 2017 11:29:11 +0530
-Received: from d28av06.in.ibm.com (localhost [127.0.0.1])
-	by d28av06.in.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
-	v195x9Ub012428
-	for <qemu-devel@nongnu.org>; Thu, 9 Feb 2017 11:29:10 +0530
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Date: Thu,  9 Feb 2017 11:28:50 +0530
-In-Reply-To: <1486619931-1086-1-git-send-email-nikunj@linux.vnet.ibm.com>
-References: <1486619931-1086-1-git-send-email-nikunj@linux.vnet.ibm.com>
-Message-Id: <1486619931-1086-3-git-send-email-nikunj@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 2/3] risu_ppc64le: zero the xer register
+	(envelope-from <hangaohuai@huawei.com>) id 1cbi4D-0007hK-M6
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 01:18:56 -0500
+Received: from szxga03-in.huawei.com ([119.145.14.66]:15626)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <hangaohuai@huawei.com>) id 1cbi4D-0007gQ-2n
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 01:18:53 -0500
+Message-ID: <589C099A.9090605@huawei.com>
+Date: Thu, 9 Feb 2017 14:18:02 +0800
+From: hangaohuai <hangaohuai@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [Help] Windows2012 as Guest 64+cores on KVM Halts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,30 +24,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, joserz@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org, kvm@vger.kernel.org
 
-Observed failures running with P9 mambo model, and figured out that the
-xer wasn't initialized.
+Dear all:
+I try to boot windows2012R2 (more than 64 cores)on kvm platform with hyper-v on*<relaxed state='on'/>*.
+the guest halts on the starting time.
+Also tested in these cases:
+<topology sockets='64' cores='1' threads='1'/>  - boot sucess
+<topology sockets='1' cores='64' threads='1'/>  - boot sucess
+<topology sockets='1' cores='1' threads='64'/>  - boot sucess
+<topology sockets='1' cores='68' threads='1'/>  - boot failed
+<topology sockets='68' cores='1' threads='1'/>  - boot sucess(in Guest we can found 64)
+<topology sockets='1' cores='1' threads='68'/>  - boot failed
 
-Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
----
- risugen_ppc64.pm | 3 +++
- 1 file changed, 3 insertions(+)
+Environment:
+GUEST:
+  windows2012R2
+HOST:
+    kernel version:4.10.0-rc4
+    QEMU version:QEMU emulator version 2.8.50 (v2.8.0-664-gd1c82f7-dirty)
+part of GuestXML:
+  <vcpu placement='static'>68</vcpu>
+  <resource>
+    <partition>/machine</partition>
+  </resource>
+  <os>
+    <type arch='x86_64' machine='pc-i440fx-2.3'>hvm</type>
+    <boot dev='hd'/>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+    <pae/>
+    <hyperv>
+      <relaxed state='on'/>
+    </hyperv>
+  </features>
+  <cpu>
+    <topology sockets='1' cores='68' threads='1'/>
+  </cpu>
 
-diff --git a/risugen_ppc64.pm b/risugen_ppc64.pm
-index 0532e3a..03f9317 100644
---- a/risugen_ppc64.pm
-+++ b/risugen_ppc64.pm
-@@ -168,6 +168,9 @@ sub clear_vr_registers()
-     insn32(0x3ac10020);
-     # li r23, 0
-     write_mov_ri(23, 0);
-+    # zero the xer register
-+    # mtxer   r23
-+    insn32(0x7ee103a6);
-     # std r23, 0(r22)
-     insn32(0xfaf60000);
- 
--- 
-2.7.4
+//////////////////////////////////
+debug info:
+virsh qemu-monitor-command win2012 --hmp "info cpus"
+  CPU #61: pc=0xfffff8031296a21c thread_id=21410
+  CPU #62: pc=0xfffff8031296a21c thread_id=21411
+  CPU #63: pc=0xfffff8031296a21c thread_id=21414
+  CPU #64: pc=0x00000000000fd31c (halted) thread_id=21415
+  CPU #65: pc=0x00000000000fd31c (halted) thread_id=21416
+  CPU #66: pc=0x00000000000fd31c (halted) thread_id=21417
+  CPU #67: pc=0x00000000000fd31c (halted) thread_id=21418
+
+
+Any suggestions?
+
+Thanks a lot.
+
+Gaohuai Han
