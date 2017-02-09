@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cbpFU-0004Mu-7i
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:59:05 -0500
+	(envelope-from <drjones@redhat.com>) id 1cbpOP-0007X8-JR
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 09:08:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cbpFO-0004jM-8T
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:59:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38270)
+	(envelope-from <drjones@redhat.com>) id 1cbpOK-0007w7-ID
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 09:08:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36264)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cbpFO-0004jG-0r
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:58:54 -0500
-Date: Thu, 9 Feb 2017 13:58:51 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170209135851.GC4742@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1486645277-4724-1-git-send-email-kraxel@redhat.com>
-	<CAFEAcA_3end4WrkELu9LBxL8jnUWt0SKRwMJtuMh_1QeVQy4=g@mail.gmail.com>
+	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1cbpOK-0007vU-AU
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 09:08:08 -0500
+Date: Thu, 9 Feb 2017 15:08:04 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20170209140804.onpj3pniqim3qxr4@kamzik.brq.redhat.com>
+References: <1486575331-14455-1-git-send-email-abologna@redhat.com>
+	<1486575331-14455-3-git-send-email-abologna@redhat.com>
+	<20170209094259.nmli6yd5swxdujkm@kamzik.brq.redhat.com>
+	<CAFEAcA8bRHuF_to0+whEhNF5oXp5_O63H8EV2JTXBngffufz9Q@mail.gmail.com>
+	<1486637473.3641.36.camel@redhat.com>
+	<20170209122819.ajgatpsnxj7cdjq2@kamzik.brq.redhat.com>
+	<1486646865.3641.41.camel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA_3end4WrkELu9LBxL8jnUWt0SKRwMJtuMh_1QeVQy4=g@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 00/10] vnc: add support for multiple
- listening sockets.
+In-Reply-To: <1486646865.3641.41.camel@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 2/2] mach-virt: Provide sample
+ configuration files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,104 +34,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Andrea Bolognani <abologna@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-On Thu, Feb 09, 2017 at 01:15:52PM +0000, Peter Maydell wrote:
-> On 9 February 2017 at 13:01, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> >   Hi,
-> >
-> > Here comes the UI patch queue, carrying only vnc updates this time.  Big
-> > chunk is the multiple sockets support patch series, but there are also
-> > some smaller fixes and cleanups.
-> >
-> > please pull,
-> >   Gerd
-> >
-> > The following changes since commit d0dff238a87fa81393ed72754d4dc8b09e50b08b:
-> >
-> >   Merge remote-tracking branch 'remotes/juanquintela/tags/migration/20170206' into staging (2017-02-07 15:29:26 +0000)
-> >
-> > are available in the git repository at:
-> >
-> >
-> >   git://git.kraxel.org/qemu tags/pull-ui-20170209-1
-> >
-> > for you to fetch changes up to 7448e761356799d4e445e6ea3891a8067233465d:
-> >
-> >   ui: add ability to specify multiple VNC listen addresses (2017-02-08 14:59:40 +0100)
-> >
-> > ----------------------------------------------------------------
-> > vnc: add support for multiple listening sockets.
-> > vnc: misc fixes and cleanups.
-> 
-> Build failure on clang/OSX:
-> 
-> /Users/pm215/src/qemu-for-merges/ui/vnc.c:3566:21: error: variable
-> 'baseport' is used uninitialized whenever 'if' condition is false
-> [-Werror,-Wsometimes-uninitialized]
->                 if (displaynum == -1) {
->                     ^~~~~~~~~~~~~~~~
-> /Users/pm215/src/qemu-for-merges/ui/vnc.c:3603:15: note: uninitialized
-> use occurs here
->         ret = baseport;
->               ^~~~~~~~
->   CC      ui/vnc-enc-hextile.o
-> /Users/pm215/src/qemu-for-merges/ui/vnc.c:3566:17: note: remove the
-> 'if' if its condition is always true
->                 if (displaynum == -1) {
->                 ^~~~~~~~~~~~~~~~~~~~~~
-> /Users/pm215/src/qemu-for-merges/ui/vnc.c:3564:17: error: variable
-> 'baseport' is used uninitialized whenever 'if' condition is false
-> [-Werror,-Wsometimes-uninitialized]
->             if (g_str_equal(addrstr, "") ||
->                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-> /Users/pm215/src/qemu-for-merges/ui/vnc.c:3603:15: note: uninitialized
-> use occurs here
->         ret = baseport;
->               ^~~~~~~~
-> /Users/pm215/src/qemu-for-merges/ui/vnc.c:3564:13: note: remove the
-> 'if' if its condition is always true
->             if (g_str_equal(addrstr, "") ||
->             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> /Users/pm215/src/qemu-for-merges/ui/vnc.c:3533:36: note: initialize
-> the variable 'baseport' to silence this warning
->         unsigned long long baseport;
->                                    ^
->                                     = 0
-> 
-> That's slightly confused, but what it's saying is that in
-> vnc_display_get_address() we don't set baseport in the
-> if (websocket) codepath, but we use it unconditionally.
+On Thu, Feb 09, 2017 at 02:27:45PM +0100, Andrea Bolognani wrote:
+> On Thu, 2017-02-09 at 10:42 +0100, Andrew Jones wrote:
+> > > +[machine]
+> > > +=A0=A0type =3D "virt"
+> > > +=A0=A0accel =3D "kvm"
+> > > +
+> > > +[memory]
+> > > +=A0=A0size =3D "1024"
+> >=A0
+> > So I'm not sure about providing this, at least not in this
+> > config file. I think we should expect the user to provide ram
+> > size explicitly, as this depends on what they want to do with
+> > the guest. Even accel is debatable, as many users may want to
+> > use tcg from their x86 machines.
+> >=A0
+> > How about focusing this config on the PCIe topology and default
+> > devices? Additional config defaults like accel and ram could
+> > be added to an additional config, if we want.
+>=20
+> Well, this is a sample configuration, not a one-size-fits-all
+> solution. It's okay for it to be opinionated.
+>=20
+> The way I expect this file to be consumed is that people will
+> copy it over[1] to some location, tweak it to their liking by
+> adding and removing devices and altering settings such as
+> memory size, then use it to start a specific guest from that
+> moment on. When they need another guest, they can make another
+> copy of the sample and start over.
+>=20
+> So the least parameters the user will have to specify outside
+> of the configuration file, the better. We actually moved *away*
+> from the idea of including multiple configuration files (one
+> for the "common" parts such as PCIe controllers, one for other
+> devices such as the video card as opposed to the serial
+> console) because it's much easier to have everything in one
+> place, for usability and for documentation purposes.
+>=20
+> It's not a framework, just a decent starting point.
 
-Yes, a huge list of messages for a single missed initialization.
+OK, if that's the consensus on how they should be used, then
+that's fine by me. I've actually never used files like these,
+but I was imagining they'd be great to use like this
 
-Gerd, just squash
+ qemu -nodefaults -readconfig configfile -more -params \
+      -that -may -override -stuff -in -the -configfile
 
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 77f2a99..bffc650 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -3529,7 +3529,7 @@ static int vnc_display_get_address(const char *addrstr,
-     } else {
-         const char *port;
-         size_t hostlen;
--        unsigned long long baseport;
-+        unsigned long long baseport = 0;
-         InetSocketAddress *inet;
- 
-         port = strrchr(addrstr, ':');
+Actually, I don't think anything is stopping me from using this
+file that way. I'll have to try the file name override that I
+suggested below, but
 
+ qemu -nodefaults -readconfig configfile -m $MEM -machine accel=3Dtcg
 
-Into this commit:
+should certainly override correctly.
 
-    ui: refactor code for populating SocketAddress from vnc_display_open
+>=20
+> [...]
+> > > +[drive "aavmf-code"]
+> > > +=A0=A0file =3D "/usr/share/edk2/aarch64/QEMU_EFI.fd"=A0=A0# CHANGE=
+ ME
+> > > +=A0=A0format =3D "raw"
+> > > +=A0=A0if =3D "pflash"
+> > > +=A0=A0unit =3D "0"
+> > > +=A0=A0readonly =3D "on"
+> > > +
+> > > +[drive "aavmf-vars"]
+> > > +=A0=A0file =3D "guest_VARS.fd"=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0# CHANGE ME
+> > > +=A0=A0format =3D "raw"
+> > > +=A0=A0if =3D "pflash"
+> > > +=A0=A0unit =3D "1"
+> >=A0
+> > The fact these entries need 'CHANGE ME' comments make me think they
+> > should also be removed from this config and required explicitly,
+> > or provided by other configs. Perhaps we can create a config for
+> > each firmware path we know of? Or, is there any way for a user
+> > to override the file path from the command line? Does
+> >=A0
+> >=A0=A0-readconfig config -drive id=3Daavmf-vars,file=3Dnew-path
+> >=A0
+> > work? If so, then we can document how CHANGEME's can be easily
+> > changed without touching the file.
+>=20
+> See above.
+>=20
+> [...]
+> > > +# Display controller
+> > > +# =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > +#
+> > > +# We use virtio-gpu because the legacy VGA framebuffer is
+> > > +# very troublesome on aarch64, and virtio-gpu is the only
+> >=A0
+> > We use virtio-gpu because emulating a legacy VGA framebuffer
+> > is not possible on AArch64 KVM guests due to unavoidable
+> > stage1 / stage2 page table cache mode mismatches.
+> >=A0
+> > Or just leave the troublesome comment...
+>=20
+> I guess that depends a lot on how low-level we want them
+> be... Overall, I kept them fairly high-level, not least
+> because that's pretty much as far my knowledge goes.
+>=20
+> In other words, your take on the description is certainly
+> 100% accurate but also 100% flying way over my head ;)
+>=20
+> [...]
+> > I agree with the comments of others that we should be using
+> > the PL011 instead. We should also set it up such that the
+> > monitor is multiplexed, so ^C won't terminate the guest and
+> > ^A will allow us to go to the monitor.
+>=20
+> That sounds awesome, how do I actually make it work from
+> the configuration file though?
 
-Just confirmed this fixes it with a local clang build
+Sorry, dunno :-)
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+>=20
+>=20
+> [1] Looks like these files are not being installed on the
+> =A0=A0=A0=A0system by 'make install'. I'd argue having them in
+> =A0=A0=A0=A0/usr/share/doc/qemu/examples would be nice for users.
+
+I agree.
+
+Thanks,
+drew
