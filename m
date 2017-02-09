@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46761)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cbepp-0007cV-LN
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 21:51:50 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cbepl-0007Vz-JT
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 21:51:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cbepn-0006yh-R4
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 21:51:49 -0500
-Date: Thu, 9 Feb 2017 13:24:09 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1cbepk-0006x0-Fs
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 21:51:45 -0500
+Date: Thu, 9 Feb 2017 13:16:29 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170209022409.GS17644@umbus.fritz.box>
+Message-ID: <20170209021629.GR17644@umbus.fritz.box>
 References: <cover.1486436185.git.sam.bobroff@au1.ibm.com>
-	<f04bb6a57aa50c7c75762e3479252f2ee3fa385a.1486436186.git.sam.bobroff@au1.ibm.com>
+	<a8621842537496c91b6d021ad329e6fa6404cc17.1486436186.git.sam.bobroff@au1.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="JWOY2/vB4uO4FuME"
+	protocol="application/pgp-signature"; boundary="hCenlVgnDQUGHXTR"
 Content-Disposition: inline
-In-Reply-To: <f04bb6a57aa50c7c75762e3479252f2ee3fa385a.1486436186.git.sam.bobroff@au1.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 5/9] spapr: Only setup HTP if necessary.
+In-Reply-To: <a8621842537496c91b6d021ad329e6fa6404cc17.1486436186.git.sam.bobroff@au1.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 4/9] target-ppc: support
+ KVM_CAP_PPC_MMU_RADIX, KVM_CAP_PPC_MMU_HASH_V3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +29,100 @@ To: Sam Bobroff <sam.bobroff@au1.ibm.com>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---JWOY2/vB4uO4FuME
+--hCenlVgnDQUGHXTR
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 07, 2017 at 01:56:48PM +1100, Sam Bobroff wrote:
-> Because KVM cannot support radix and hash modes concurrently, QEMU can
-> avoid allocating a hash page table if KVM supports radix mode.
+On Tue, Feb 07, 2017 at 01:56:47PM +1100, Sam Bobroff wrote:
+> Query and cache the value of two new KVM capabilities that indicate
+> KVM's support for new radix and hash modes of the MMU.
 >=20
 > Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
-
-This isn't quite right, it's doing the HPT handling based on whether
-or not we *can* do RPT rather than whether we *are* doing RPT.
-
-It'll mostly work for now, while only radix-on-radix and hash-on-hash
-are supported, but that won't be true forever.
-
-It will already be wrong if, for example, you tried to run a POWER8
-TCG guest on a host that happened to be a POWER9 in radix mode.
-
 > ---
->  hw/ppc/spapr.c | 14 ++++++++------
->  1 file changed, 8 insertions(+), 6 deletions(-)
+>  target/ppc/kvm.c     | 14 ++++++++++++++
+>  target/ppc/kvm_ppc.h | 12 ++++++++++++
+>  2 files changed, 26 insertions(+)
 >=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index d629e2630c..1411e470c0 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1150,15 +1150,17 @@ static void ppc_spapr_reset(void)
->      /* Check for unknown sysbus devices */
->      foreach_dynamic_sysbus_device(find_unknown_sysbus_device, NULL);
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 390d6342cc..8d6fd1b067 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -81,6 +81,8 @@ static int cap_papr;
+>  static int cap_htab_fd;
+>  static int cap_fixup_hcalls;
+>  static int cap_htm;             /* Hardware transactional memory support=
+ */
+> +static int cap_mmu_radix;
+> +static int cap_mmu_hash;
+
+Please rename this cap_mmu_hashv3 to avoid confusion.
+
+Apart from that,
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
 > =20
-> -    /* Allocate and/or reset the hash page table */
-> -    spapr_reallocate_hpt(spapr,
-> +    if (!kvmppc_has_cap_mmu_radix()) {
-> +        /* Allocate and/or reset the hash page table */
-> +        spapr_reallocate_hpt(spapr,
->                           spapr_hpt_shift_for_ramsize(machine->maxram_siz=
-e),
->                           &error_fatal);
+>  static uint32_t debug_inst_opcode;
 > =20
-> -    /* Update the RMA size if necessary */
-> -    if (spapr->vrma_adjust) {
-> -        spapr->rma_size =3D kvmppc_rma_size(spapr_node0_size(),
-> -                                          spapr->htab_shift);
-> +        /* Update the RMA size if necessary */
-> +        if (spapr->vrma_adjust) {
-> +            spapr->rma_size =3D kvmppc_rma_size(spapr_node0_size(),
-> +                                              spapr->htab_shift);
-> +        }
->      }
+> @@ -134,6 +136,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>      cap_htab_fd =3D kvm_check_extension(s, KVM_CAP_PPC_HTAB_FD);
+>      cap_fixup_hcalls =3D kvm_check_extension(s, KVM_CAP_PPC_FIXUP_HCALL);
+>      cap_htm =3D kvm_vm_check_extension(s, KVM_CAP_PPC_HTM);
+> +    cap_mmu_radix =3D kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_RADIX);
+> +    cap_mmu_hash =3D kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_HASH_V3);
 > =20
->      qemu_devices_reset();
+>      if (!cap_interrupt_level) {
+>          fprintf(stderr, "KVM: Couldn't find level irq capability. Expect=
+ the "
+> @@ -2408,6 +2412,16 @@ bool kvmppc_has_cap_htm(void)
+>      return cap_htm;
+>  }
+> =20
+> +bool kvmppc_has_cap_mmu_radix(void)
+> +{
+> +    return cap_mmu_radix;
+> +}
+> +
+> +bool kvmppc_has_cap_mmu_hash(void)
+> +{
+> +    return cap_mmu_hash;
+> +}
+> +
+>  static PowerPCCPUClass *ppc_cpu_get_family_class(PowerPCCPUClass *pcc)
+>  {
+>      ObjectClass *oc =3D OBJECT_CLASS(pcc);
+> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+> index 4b43283913..1c1b94847c 100644
+> --- a/target/ppc/kvm_ppc.h
+> +++ b/target/ppc/kvm_ppc.h
+> @@ -56,6 +56,8 @@ void kvmppc_hash64_write_pte(CPUPPCState *env, target_u=
+long pte_index,
+>                               target_ulong pte0, target_ulong pte1);
+>  bool kvmppc_has_cap_fixup_hcalls(void);
+>  bool kvmppc_has_cap_htm(void);
+> +bool kvmppc_has_cap_mmu_radix(void);
+> +bool kvmppc_has_cap_mmu_hash(void);
+>  int kvmppc_enable_hwrng(void);
+>  int kvmppc_put_books_sregs(PowerPCCPU *cpu);
+>  PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
+> @@ -255,6 +257,16 @@ static inline bool kvmppc_has_cap_htm(void)
+>      return false;
+>  }
+> =20
+> +static inline bool kvmppc_has_cap_mmu_radix(void)
+> +{
+> +    return false;
+> +}
+> +
+> +static inline bool kvmppc_has_cap_mmu_hash(void)
+> +{
+> +    return false;
+> +}
+> +
+>  static inline int kvmppc_enable_hwrng(void)
+>  {
+>      return -1;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -88,25 +130,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---JWOY2/vB4uO4FuME
+--hCenlVgnDQUGHXTR
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYm9LJAAoJEGw4ysog2bOSTOAQALQBgFv+UNyirOsxJposJL6C
-i+9x6LjBs+sYhF++PjKAT76Ijsh7DNhi2f466WLroUkd1/1Jz3dWa1ctlDCKUjOe
-69tjOBc91KL/p2eyoVNg1X/1Hwu9Hq6auVRZt7Zxzq2L/h3XqtYFU/XqIRcRCZKK
-iG/DKezO3XJsjN4FBZU7H0UZQdn5z2RE3g/zsVKqm2gBepMqDyns+TUNFoxawsrp
-Hm6ljo7MupMIosPMDMOZUyHjCRDDh4e3UQxVNzevnnBhm6wEU5W/RFKvDnQFjKMM
-f4/MHA7+nojvFBVBrL2itCgpfZbQQCwpgJ4ccvFBZnOk0JDltZtQ6ws1Nt9WjIxY
-oNH3Pa7CdAnufpp1FV0fOp7AQGq/e+3T+q8WnWYYSD3YzrP4fK74p502Zk3sEwqK
-hhTDoild1SuI/kvk6uR1oHbOV8Ofpss7q9C+XEnqqqR7/v4/nevVg+l9wVAI/wor
-Mrj6bryK/US2H1wZgY46cVZ7E0z4Chlzn7APKDAZ9a+y9dsgA/MSoogToWtr4tuR
-TFmSoN9JAsf5d/IXnBcxmGkBpDChX25gmJQQaKCUARRfr8Shyg3YdLIdDxfoR9uq
-GsPQXKGfxtQ4OE43ps+bcHP0EWUhERPdEhLg81Aw8EQjBDSx/6rG3Xv7o30sOhQs
-BFVBnyKsiLem2lP5zjj2
-=9rj1
+iQIcBAEBCAAGBQJYm9D9AAoJEGw4ysog2bOSqwQQALql8k93CrUOZlT87VoGbiyD
+0bS+XH7eD8JpTty5yAPDUFXg+UuyIZI9GALLaSh24s6mAbPfjEnwikzhXCjnzEv2
+fVgkJnRfs3hJ/9zPN28plqy2GW6bhnD4skYE+wpHR9Kfeg1slh5Eit1kYyqL9P4E
+SdqVpYtwO084r330qVqrh1i4tu7VO/o2qf1Xly/vYQ8qR52QSbxyRuPvcQjccsyz
+wh2FDaXPlCwXRvDJf4pBf0HrpDkBhKimIQ6zxDQaiKm8+un9ijghQZujwB8T0WFi
+Zu8BmdtJIKZQRyQ1KmRYBlf64OyVykxZhSgVwKdSXIQB/lrP6K7i1ohEWTKs2tCE
+EvbVtTvw+9E0SjM7ScsUMeUw3qWDdFuw8gAyR+iLqQdHd1tDuU5kqfQFL8cyJNz+
+kpwd/kZQdo/+2op6fQ+X3jhZl5n4ipDa1MkWQIYvUkPkrXxAenDZyrlgXzrlDAMT
+ZRDuTNELq0UwSRB0kh8MXLerNZBPxhRv2SvnFL/1ejQMK8inphhu5aD3TnUKSy4v
+7ngS4cr3a2T7LI3bXxE+JoEuyVEDDlJK4WF6fuSjF2U6gisWoWxtZsKvVf9qKVte
+m1tXr0y1rMlxd/7a2tSplbweYusQ8Y+rdzR8Sem2gc1ah3slx6jn5MjxMiMnbOBQ
+8vsr+jiwdjUjCTHETAQc
+=Yaxw
 -----END PGP SIGNATURE-----
 
---JWOY2/vB4uO4FuME--
+--hCenlVgnDQUGHXTR--
