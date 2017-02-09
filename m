@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cbvKF-0003hG-IR
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 15:28:20 -0500
+	(envelope-from <den@virtuozzo.com>) id 1cbvMq-0005E3-3n
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 15:31:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cbvKE-0000F3-JR
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 15:28:19 -0500
-References: <1486644810-33181-1-git-send-email-agraf@suse.de>
-	<70829774-a0c4-79ae-2eaf-cfac19e9dd7d@redhat.com>
-	<20170209201301-mutt-send-email-mst@kernel.org>
-	<B93CA3EA-D7F6-4395-BFBD-6362FAAE2822@suse.de>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <a01f5eaf-eed6-ad49-2ba1-e63b2d61b082@redhat.com>
-Date: Thu, 9 Feb 2017 21:28:08 +0100
+	(envelope-from <den@virtuozzo.com>) id 1cbvMm-00012m-VO
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 15:31:00 -0500
+Received: from mail-ve1eur01on0124.outbound.protection.outlook.com
+	([104.47.1.124]:57503
+	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1cbvMm-00011z-96
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 15:30:56 -0500
+References: <1486653206-14553-1-git-send-email-den@openvz.org>
+	<20170209155143.GA28593@lemon.lan>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <35a66eb3-f268-7802-4ab9-e56dd5e2475d@openvz.org>
+Date: Thu, 9 Feb 2017 18:55:51 +0300
 MIME-Version: 1.0
-In-Reply-To: <B93CA3EA-D7F6-4395-BFBD-6362FAAE2822@suse.de>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] target-arm: Add some omitted dma
- cache coherency flags
+In-Reply-To: <20170209155143.GA28593@lemon.lan>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] kvm: report available guest crash
+ parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,75 +30,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Graf <agraf@suse.de>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Shannon Zhao <shannon.zhao@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Anton Nefedov <anton.nefedov@virtuozzo.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 02/09/17 19:27, Alexander Graf wrote:
-> 
-> 
->> Am 09.02.2017 um 19:13 schrieb Michael S. Tsirkin <mst@redhat.com>:
+On 02/09/2017 06:51 PM, Fam Zheng wrote:
+> On Thu, 02/09 18:13, Denis V. Lunev wrote:
+>> Windows reports BSOD parameters through Hyper-V crash MSRs. This
+>> information is very useful for initial crash analysis and thus
+>> it would be nice to see it in the QEMU log file. There is suitable
+>> log mask for the purpose.
 >>
->>> On Thu, Feb 09, 2017 at 02:15:36PM +0100, Laszlo Ersek wrote:
->>>> On 02/09/17 13:53, Alexander Graf wrote:
->>>> ARM is amazing when it comes to cache coherency and VMs. While any sane
->>>> architecture allows the host to override the guest's caching attributes,
->>>> that's very hard to do on ARM.
->>>>
->>>> That means that the guest may directly access guest memory bypassing the
->>>> cache while QEMU happily writes to / reads from cache. The end result is
->>>> very nasty, because both sides see very different views of the world.
->>>>
->>>> That means that we need to be very cautious to tell guests that devices
->>>> that QEMU emulates are going to use data in the cache rather than directly
->>>> on memory.
->>>>
->>>> We added this to PCI a while back for DT (5d636e21 "hw/arm/virt: mark the PCIe
->>>> host controller as DMA coherent in the DT") and ACPI (bc64b96 "hw/arm/virt-
->>>> acpi-build: _CCA attribute is compulsory") but never updated virtio-mmio or
->>>> fw-cfg in DT or ACPI tables.
->>>>
->>>> This patch set adds the respective cache coherency flags for them in both DT and
->>>> ACPI.
->>>>
->>>> Fortunately, no guests except for Linux 4.9.7 and 4.9.8 are broken because of
->>>> this. Upstream realized quickly enough that every user of virtio-mmio out there
->>>> describes its cache coherency incorrectly and reverted the patch that would
->>>> require said dma coherency flag. But we should be safe for the future and "do
->>>> the right thing".
->>>>
->>>> Alexander Graf (4):
->>>>  target-arm: Declare virtio-mmio as dma-coherent in dt
->>>>  hw/arm/virt: Declare virtio-mmio as dma cache coherent in ACPI
->>>>  hw/arm/virt: Declare fwcfg as dma cache coherent in ACPI
->>>>  hw/arm/virt: Declare fwcfg as dma cache coherent in dt
->>>>
->>>> hw/arm/vexpress.c        | 1 +
->>>> hw/arm/virt-acpi-build.c | 2 ++
->>>> hw/arm/virt.c            | 2 ++
->>>> 3 files changed, 5 insertions(+)
->>>>
->>>
->>> Famous last words:
->>> series
->>> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
->>>
->>> Should we replicate patch #3 to QEMU0002 / FWCF in
->>> "hw/i386/acpi-build.c" too? Or is it that we couldn't care less about
->>> _CCA on x86? :) (Can't really muster the energy right now to look it up
->>> in the ACPI spec, sorry!)
->>>
->>> Thanks
->>> Laszlo
+>> Linux guest does not provide this information, but still it would
+>> be nice to log that we have crashed.
 >>
->> ACPI spec says:
->> On platforms for which existing default cache-coherency behavior of the OS is not adequate, _CCA
->> enables the OS to adapt to the differences
->>
->> So I think we don't need it on x86.
-> 
-> According to acpi 6.1, x86 explicitly defaults to dma coherent if _CCA is omitted. It's only illegal for ARM.
+>> Changes since v1:
+>> - patches resplit
+>> - created property to query crash parameters
+>> - crash parameters added to panic event
+> This has a compiling error:
+>
+> /var/tmp/patchew-tester-tmp-fmkso1x2/src/hw/ppc/spapr_rtas.c: In function=
+ =E2=80=98rtas_ibm_os_term=E2=80=99:
+> /var/tmp/patchew-tester-tmp-fmkso1x2/src/hw/ppc/spapr_rtas.c:337:5: error=
+: the address of =E2=80=98error_abort=E2=80=99 will always evaluate as =E2=
+=80=98true=E2=80=99 [-Werror=3Daddress]
+>      qapi_event_send_guest_panicked(GUEST_PANIC_ACTION_PAUSE, &error_abor=
+t);
+>      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> /var/tmp/patchew-tester-tmp-fmkso1x2/src/hw/ppc/spapr_rtas.c:337:5: error=
+: too few arguments to function =E2=80=98qapi_event_send_guest_panicked=E2=
+=80=99
+> In file included from /var/tmp/patchew-tester-tmp-fmkso1x2/src/hw/ppc/spa=
+pr_rtas.c:42:0:
+> ../qapi-event.h:48:6: note: declared here
+>  void qapi_event_send_guest_panicked(GuestPanicAction action, bool has_in=
+fo, GuestPanicInformation *info, Error **errp);
+>       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> cc1: all warnings being treated as errors
+> /var/tmp/patchew-tester-tmp-fmkso1x2/src/rules.mak:69: recipe for target =
+'hw/ppc/spapr_rtas.o' failed
+> make[1]: *** [hw/ppc/spapr_rtas.o] Error 1
+> Makefile:318: recipe for target 'subdir-ppc64-softmmu' failed
+>
+oops. will check other arches and resubmit. My fault.
 
-Incredible; a finding that, for a change, does not create more work.
-
-Thanks.
-Laszlo
+Den
