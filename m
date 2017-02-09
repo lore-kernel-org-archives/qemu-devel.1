@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hangaohuai@huawei.com>) id 1cbi4G-0001Jz-R0
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 01:18:57 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cbi5j-00029f-0B
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 01:20:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hangaohuai@huawei.com>) id 1cbi4D-0007hK-M6
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 01:18:56 -0500
-Received: from szxga03-in.huawei.com ([119.145.14.66]:15626)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <hangaohuai@huawei.com>) id 1cbi4D-0007gQ-2n
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 01:18:53 -0500
-Message-ID: <589C099A.9090605@huawei.com>
-Date: Thu, 9 Feb 2017 14:18:02 +0800
-From: hangaohuai <hangaohuai@huawei.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cbi5h-00080R-Uy
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 01:20:26 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:16771 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1cbi5h-0007yq-Hh
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 01:20:25 -0500
+References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
+	<20170203154757.36140-5-vsementsov@virtuozzo.com>
+	<7b79d03c-0fba-ddb8-4295-b155cb26a206@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <829007b8-d8a4-652c-7a23-59fbb5476cd2@virtuozzo.com>
+Date: Thu, 9 Feb 2017 09:20:13 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
+In-Reply-To: <7b79d03c-0fba-ddb8-4295-b155cb26a206@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [Help] Windows2012 as Guest 64+cores on KVM Halts
+Subject: Re: [Qemu-devel] [PATCH 04/18] nbd/client: refactor
+ nbd_receive_starttls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,60 +30,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, kvm@vger.kernel.org
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, armbru@redhat.com, den@virtuozzo.com, stefanha@redhat.com
 
-Dear all:
-I try to boot windows2012R2 (more than 64 cores)on kvm platform with hyper-v on*<relaxed state='on'/>*.
-the guest halts on the starting time.
-Also tested in these cases:
-<topology sockets='64' cores='1' threads='1'/>  - boot sucess
-<topology sockets='1' cores='64' threads='1'/>  - boot sucess
-<topology sockets='1' cores='1' threads='64'/>  - boot sucess
-<topology sockets='1' cores='68' threads='1'/>  - boot failed
-<topology sockets='68' cores='1' threads='1'/>  - boot sucess(in Guest we can found 64)
-<topology sockets='1' cores='1' threads='68'/>  - boot failed
+07.02.2017 19:32, Eric Blake wrote:
+> On 02/03/2017 09:47 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Split out nbd_receive_simple_option to be reused for structured reply
+>> option.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   nbd/client.c       | 54 +++++++++++++++++++++++++++++++++++-------------------
+>>   nbd/nbd-internal.h | 14 ++++++++++++++
+>>   2 files changed, 49 insertions(+), 19 deletions(-)
+>>
+>> +++ b/nbd/nbd-internal.h
+>> @@ -96,6 +96,20 @@
+>>   #define NBD_ENOSPC     28
+>>   #define NBD_ESHUTDOWN  108
+>>   
+>> +static inline const char *nbd_opt_name(int opt)
+>> +{
+>> +    switch (opt) {
+>> +    case NBD_OPT_EXPORT_NAME: return "export_name";
+> Does this really get past checkpatch?
+>
+>> +    case NBD_OPT_ABORT: return "abort";
+>> +    case NBD_OPT_LIST: return "list";
+>> +    case NBD_OPT_PEEK_EXPORT: return "peek_export";
+>> +    case NBD_OPT_STARTTLS: return "tls";
+> Why just 'tls' instead of 'starttls'?
+>
+>> +    case NBD_OPT_STRUCTURED_REPLY: return "structured_reply";
+>> +    }
+>> +
+>> +    return "<unknown option>";
+> Can you please consider making this include the %d representation of the
+> unknown option; perhaps by snprintf'ing into static storage?  While it
 
-Environment:
-GUEST:
-  windows2012R2
-HOST:
-    kernel version:4.10.0-rc4
-    QEMU version:QEMU emulator version 2.8.50 (v2.8.0-664-gd1c82f7-dirty)
-part of GuestXML:
-  <vcpu placement='static'>68</vcpu>
-  <resource>
-    <partition>/machine</partition>
-  </resource>
-  <os>
-    <type arch='x86_64' machine='pc-i440fx-2.3'>hvm</type>
-    <boot dev='hd'/>
-  </os>
-  <features>
-    <acpi/>
-    <apic/>
-    <pae/>
-    <hyperv>
-      <relaxed state='on'/>
-    </hyperv>
-  </features>
-  <cpu>
-    <topology sockets='1' cores='68' threads='1'/>
-  </cpu>
+Hmm.. The caller should free it in this case. Currently, the 
+get_opt_name is called only on error path or if tracing enabled. How to 
+achieve this with variable string return value not complicating the code 
+a lot? When there is unknown message there should be other mechanism to 
+inform user
 
-//////////////////////////////////
-debug info:
-virsh qemu-monitor-command win2012 --hmp "info cpus"
-  CPU #61: pc=0xfffff8031296a21c thread_id=21410
-  CPU #62: pc=0xfffff8031296a21c thread_id=21411
-  CPU #63: pc=0xfffff8031296a21c thread_id=21414
-  CPU #64: pc=0x00000000000fd31c (halted) thread_id=21415
-  CPU #65: pc=0x00000000000fd31c (halted) thread_id=21416
-  CPU #66: pc=0x00000000000fd31c (halted) thread_id=21417
-  CPU #67: pc=0x00000000000fd31c (halted) thread_id=21418
+> is unlikely that a well-behaved server will respond to a client with an
+> option the client doesn't recognize, it is much more likely that this
+> reverse lookup function will be used in a server to respond to an
+> unknown option from a client.
+>
+> In fact, I might have split this into two patches: one providing
+> nbd_opt_name() and using it throughout the code base where appropriate,
+> and the other refactoring starttls in the client.
+>
+> I'm not sure if the reverse lookup function needs to be inline in the
+> header; it could reasonably live in nbd/common.c, particularly if you
+> are going to take my advice to have it format a message for unknown values.
+>
 
 
-Any suggestions?
-
-Thanks a lot.
-
-Gaohuai Han
+-- 
+Best regards,
+Vladimir
