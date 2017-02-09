@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cbcxH-0008GO-Ak
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 19:51:24 -0500
+	(envelope-from <juro.bystricky@intel.com>) id 1cbd0r-0002Wp-5K
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 19:55:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cbcxG-00060c-NT
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 19:51:23 -0500
-References: <20170126101827.22378-1-berrange@redhat.com>
-	<20170126101827.22378-19-berrange@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <c509caaf-9045-3009-833a-bf0c56df7216@redhat.com>
-Date: Thu, 9 Feb 2017 01:51:13 +0100
+	(envelope-from <juro.bystricky@intel.com>) id 1cbd0V-00015K-Oo
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 19:55:05 -0500
+Received: from mga14.intel.com ([192.55.52.115]:46500)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <juro.bystricky@intel.com>)
+	id 1cbd0V-00013X-Cb
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 19:54:43 -0500
+From: "Bystricky, Juro" <juro.bystricky@intel.com>
+Date: Thu, 9 Feb 2017 00:54:40 +0000
+Message-ID: <6E51916E4A1F32428260031F4C7CD2B6118FB1B4@ORSMSX112.amr.corp.intel.com>
+References: <1486595166-34097-1-git-send-email-juro.bystricky@intel.com>
+	<1486595166-34097-2-git-send-email-juro.bystricky@intel.com>
+	<4c51c959-fe9c-b27f-552a-84d8a2fe68c1@denx.de>
+In-Reply-To: <4c51c959-fe9c-b27f-552a-84d8a2fe68c1@denx.de>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20170126101827.22378-19-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Kb4Lj9CeBGj4T9KSVqx5PI54Tt9Br4282"
-Subject: Re: [Qemu-devel] [PATCH v3 18/18] block: pass option prefix down to
- crypto layer
+Subject: Re: [Qemu-devel] [PATCH v3 1/1] nios2: Add Altera JTAG UART
+ emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,65 +31,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Marek Vasut <marex@denx.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "crwulff@gmail.com" <crwulff@gmail.com>, "jurobystricky@hotmail.com" <jurobystricky@hotmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Kb4Lj9CeBGj4T9KSVqx5PI54Tt9Br4282
-From: Max Reitz <mreitz@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <c509caaf-9045-3009-833a-bf0c56df7216@redhat.com>
-Subject: Re: [PATCH v3 18/18] block: pass option prefix down to crypto layer
-References: <20170126101827.22378-1-berrange@redhat.com>
- <20170126101827.22378-19-berrange@redhat.com>
-In-Reply-To: <20170126101827.22378-19-berrange@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
-
-On 26.01.2017 11:18, Daniel P. Berrange wrote:
-> While the crypto layer uses a fixed option name "key-secret",
-> the upper block layer may have a prefix on the options. e.g.
-> "luks-key-secret", "aes-key-secret", in order to avoid clashes
-> between crypto option names & other block option names. To
-> ensure the crypto layer can report accurate error messages,
-> we must tell it what option name prefix was used.
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  block/crypto.c         |  4 ++--
->  block/qcow.c           |  7 ++++---
->  block/qcow2.c          | 15 +++++++++------
->  crypto/block-luks.c    |  8 ++++++--
->  crypto/block-qcow.c    |  8 ++++++--
->  crypto/block.c         |  6 ++++--
->  crypto/blockpriv.h     |  2 ++
->  include/crypto/block.h |  6 +++++-
->  8 files changed, 38 insertions(+), 18 deletions(-)
-
-Thanks a lot!
-
-Alas I'm afraid tests/test-crypto-block.c will need a couple of changes,
-too (trivial ones, though, just a couple of NULL parameters).
-
-Max
-
-
---Kb4Lj9CeBGj4T9KSVqx5PI54Tt9Br4282
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlibvQESHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A72EH/RsVBnjySAHhUzLpWAUYpR0ulPKNCoEd
-BfKOEQl4NGwx1eXMN0N9zJbXY1HCoJCsJ8tGdAPhARtpcYjsJ0tb83B6da5fqM5y
-lx/opRe7s2qLFLj1iPglNlgGsaPxz9yyA80CPctdGIet0xprCIBywKN3BdDZ6rcw
-0KMVjkPxjY1ARWTNXTasa7nw7CevTfz8qvTv1//iSgY16TkhAw9N5Yv3V4Z0D+3K
-8qHZu/MM7GWa7eZetmiBVlMiSX6EfuvmY8UnwKl0yzoC5ntfk0y9oPAc/EuYN04w
-NaccZNLzKnsdW0RyHRM/aU3nZTDLaXlQidtxMsVHuI2Px1+4xGEeWQY=
-=7BkD
------END PGP SIGNATURE-----
-
---Kb4Lj9CeBGj4T9KSVqx5PI54Tt9Br4282--
+PiBQbGVhc2UgbWFrZSB0aGUgY29tbWl0IG1lc3NhZ2UgYSBiaXQgbW9yZSB2ZXJib3NlLCBsb29r
+aW5nIGp1c3QgYXQgdGhlDQo+IGNvbW1pdCBtZXNzYWdlLCBJIGhhdmUgbm8gY2x1ZSB3aGF0IHBh
+dGNoIEknbSBsb29raW5nIGF0LiBUaGUgZW1iZWRkZWQNCj4gSVAgVUcgYWxzbyBoYXMgbGlrZSAz
+MCBjb3JlcyBpbiBpdCwgc28gc29tZSBkZXRhaWwgb24gd2hpY2ggY29yZSBhbmQgaW4NCj4gd2hp
+Y2ggY2hhcHRlci9wYWdlIHdvdWxkIGhlbHAuDQoNCk9LLCB3aWxsIGRvDQoNCj4gPiArICogVGhl
+IEFsdGVyYSBKVEFHIFVBUlQgaGFyZHdhcmUgcmVnaXN0ZXJzIGFyZSBkZXNjcmliZWQgaW46DQo+
+ID4gKyAqIGh0dHBzOi8vd3d3LmFsdGVyYS5jb20vZW5fVVMvcGRmcy9saXRlcmF0dXJlL3VnL3Vn
+X2VtYmVkZGVkX2lwLnBkZg0KPiA+ICsgKg0KPiANCj4gRHJvcCB0aGUgdHJhaWxpbmcgbmV3bGlu
+ZQ0KPiANCg0KT0ssIHdpbGwgZG8NCg0KPiA+ICtzdGF0aWMgdWludDY0X3QgYWx0ZXJhX2p1YXJ0
+X3JlYWQodm9pZCAqb3BhcXVlLCBod2FkZHIgYWRkciwgdW5zaWduZWQNCj4gaW50IHNpemUpDQo+
+ID4gK3sNCj4gPiArICAgIEFsdGVyYUpVQVJUU3RhdGUgKnMgPSBvcGFxdWU7DQo+ID4gKyAgICB1
+aW50MzJfdCByOw0KPiA+ICsNCj4gPiArICAgIGFkZHIgPj49IDI7DQo+IA0KPiBIbW1tbW0sIGhv
+dyB3aWxsIHVuYWxpZ25lZCByZWFkIGZyb20gb25lIG9mIHRoZXNlIHJlZ2lzdGVycyBiZSBoYW5k
+bGVkDQo+IG9uIHJlYWwgSFcgPyBpZS4gcmVhZCBmcm9tIGFkZHJlc3MgMHgzID8gV2hhdCBhYm91
+dCB3cml0ZXMgPw0KPiANCg0KdGhlcmUgaXMgbm8gcmVhZGluZy93cml0aW5nIGdvaW5nIG9uIHZp
+YSAiYWRkciIuIA0KVGhpcyBqdXN0IG1hcHMgdGhlIGh3IGFkZHJlc3MgaW50byByZWdpc3RlciBu
+dW1iZXIsIHdoZXJlIHJlZ2lzdGVycyBhcmUgYXQNCjQgYnl0ZXMgYm91bmRhcmllcyAoc28gdGhl
+eSBhcmUgYWxpZ25lZCBhcyBuZWVkZWQpIGJ1dCBpbmRleGVkIGFzIDEsMiwzLi4uLiANCihQcmV0
+dHkgY29tbW9uIGNvZGUgaW4gb3RoZXIgZHJpdmVycy4pDQpCdXQgd2lsbCByZWRvIHRoZSBjb2Rl
+IGFueXdheSBzbyB0aGVyZSBhcmUgbm8gc2hpZnRzLg0KDQoNCj4gPiArc3RhdGljIHZvaWQgYWx0
+ZXJhX2p1YXJ0X3dyaXRlKHZvaWQgKm9wYXF1ZSwgaHdhZGRyIGFkZHIsDQo+ID4gKyAgICAgICAg
+ICAgICAgICAgICAgICAgdWludDY0X3QgdmFsNjQsIHVuc2lnbmVkIGludCBzaXplKQ0KPiA+ICt7
+DQo+ID4gKyAgICBBbHRlcmFKVUFSVFN0YXRlICpzID0gb3BhcXVlOw0KPiA+ICsgICAgdWludDMy
+X3QgdmFsdWUgPSB2YWw2NDsNCj4gDQo+IElzIHRoaXMgbmVlZGVkID8NCg0KR29vZCBxdWVzdGlv
+bi4gTGVnYWN5IGNvZGUsIHByb2JhYmx5IG5vdCBuZWVkZWQgYW55bW9yZS4gU2FtZSBpbg0KZXh0
+cmF4ZnNfc2VyLmMsIFhpbGlueF91YXJ0bGl0ZS5jLCBzdG0zMmYyeHhfdXNhcnQuYy4NCkkgc3Vz
+cGVjdCBpbiB0aGUgcGFzdCBzb21lIGNvbXBpbGVyIGdlbmVyYXRlZCB3YXJuaW5ncyBhYm91dCB0
+eXBlIG1pc21hdGNoICgzMi82NCkuIFdpbGwgcmVtb3ZlLg0KDQo+IA0KPiA+ICsgICAgdW5zaWdu
+ZWQgY2hhciBjOw0KPiA+ICsNCj4gPiArICAgIGFkZHIgPj49IDI7DQo+ID4gKw0KPiA+ICsgICAg
+c3dpdGNoIChhZGRyKSB7DQo+ID4gKyAgICBjYXNlIFJfREFUQToNCj4gPiArICAgICAgICBjID0g
+dmFsdWUgJiAweEZGOw0KPiA+ICsgICAgICAgIC8qDQo+ID4gKyAgICAgICAgICogV2UgZG8gbm90
+IGRlY3JlbWVudCB0aGUgd3JpdGUgZmlmbywNCj4gPiArICAgICAgICAgKiB3ZSAidHJhbm1zbWl0
+IiBpbnN0YW50ZW5pb3VzbHksIENPTlRST0xfV0kgYWx3YXlzIGFzc2VydGVkDQo+ID4gKyAgICAg
+ICAgICovDQo+ID4gKyAgICAgICAgcy0+amNvbnRyb2wgfD0gQ09OVFJPTF9XSTsNCj4gPiArICAg
+ICAgICBzLT5qZGF0YSA9IGM7DQo+ID4gKyAgICAgICAgcWVtdV9jaHJfZmVfd3JpdGUoJnMtPmNo
+ciwgJmMsIDEpOw0KPiA+ICsgICAgICAgIGFsdGVyYV9qdWFydF91cGRhdGVfaXJxKHMpOw0KPiA+
+ICsgICAgICAgIGJyZWFrOw0KPiA+ICsNCj4gPiArICAgIGNhc2UgUl9DT05UUk9MOg0KPiA+ICsg
+ICAgICAgIC8qIE9ubHkgUkUgYW5kIFdFIGFyZSB3cml0YWJsZSAqLw0KPiA+ICsgICAgICAgIHZh
+bHVlICY9IENPTlRST0xfV01BU0s7DQo+ID4gKyAgICAgICAgcy0+amNvbnRyb2wgJj0gfihDT05U
+Uk9MX1dNQVNLKTsNCj4gDQo+IFRoZSBwYXJlbnRoZXNpcyBhcmUgbm90IG5lZWRlZC4NCg0KT0ss
+IHdpbGwgcmVtb3ZlIHRoZW0NCg0KPiANCj4gPiArc3RhdGljIHZvaWQgYWx0ZXJhX2p1YXJ0X3Jl
+Y2VpdmUodm9pZCAqb3BhcXVlLCBjb25zdCB1aW50OF90ICpidWYsIGludA0KPiBzaXplKQ0KPiA+
+ICt7DQo+ID4gKyAgICBpbnQgaTsNCj4gPiArICAgIEFsdGVyYUpVQVJUU3RhdGUgKnMgPSBvcGFx
+dWU7DQo+ID4gKw0KPiA+ICsgICAgaWYgKHMtPnJ4X2ZpZm9fbGVuID49IEZJRk9fTEVOR1RIKSB7
+DQo+ID4gKyAgICAgICAgZnByaW50ZihzdGRlcnIsICJXQVJOSU5HOiBVQVJUIGRyb3BwZWQgY2hh
+ci5cbiIpOw0KPiANCj4gQ2FuIHRoaXMgZXZlciBoYXBwZW4gPyBjYW5fcmVjZWl2ZSB3aWxsIElN
+TyBwcmV2ZW50IHRoaXMgY2FzZS4NCj4gDQoNCkZhaXIgcXVlc3Rpb24uIEkgZGlkIG5vdCBnbyB0
+aHJvdWdoIGFsbCBRRU1VIGNvZGUgdG8gc2VlIHdoZW4vd2hlcmUNCmluIHRoZSBib3dlbHMgb2Yg
+UUVNVSBjYW5fcmVjZWl2ZSBpcyBhY3R1YWxseSBjYWxsZWQuIElmIGl0IGlzIGFsd2F5cyBjYWxs
+ZWQgcHJpb3IgInJlY2VpdmUiLCB0aGVuIHRoaXMgY2hlY2sgbWF5IGJlIHJlZHVuZGFudC4gQWdh
+aW4sIHRoZXJlIGFyZQ0Kb3RoZXIgc2VyaWFsIGRyaXZlcnMgdGhhdCBkbyB0aGlzIGNoZWNrIGFz
+IHdlbGwgKGV0cmF4ZnMsIFhpbGlueCwuLi4pDQpCdXQgbW9zdCBkb24ndCwgc28gSSdsbCBmb2xs
+b3cgdGhlIG1ham9yaXR5IGFuZCByZW1vdmUgaXQuDQoNCj4gPiBkaWZmIC0tZ2l0IGEvaW5jbHVk
+ZS9ody9jaGFyL2FsdGVyYV9qdWFydC5oDQo+IGIvaW5jbHVkZS9ody9jaGFyL2FsdGVyYV9qdWFy
+dC5oDQo+ID4gbmV3IGZpbGUgbW9kZSAxMDA2NDQNCj4gPiBpbmRleCAwMDAwMDAwLi44YTljODky
+DQo+ID4gLS0tIC9kZXYvbnVsbA0KPiA+ICsrKyBiL2luY2x1ZGUvaHcvY2hhci9hbHRlcmFfanVh
+cnQuaA0KPiA+IEBAIC0wLDAgKzEsNDQgQEANCj4gPiArLyoNCj4gPiArICogQWx0ZXJhIEpUQUcg
+VUFSVCBlbXVsYXRpb24NCj4gPiArICoNCj4gPiArICogQ29weXJpZ2h0IChjKSAyMDE2LTIwMTcg
+SW50ZWwgQ29ycG9yYXRpb24uDQo+ID4gKyAqDQo+ID4gKyAqIFRoaXMgcHJvZ3JhbSBpcyBmcmVl
+IHNvZnR3YXJlOyB5b3UgY2FuIHJlZGlzdHJpYnV0ZSBpdCBhbmQvb3INCj4gPiArICogbW9kaWZ5
+IGl0IHVuZGVyIHRoZSB0ZXJtcyBvZiB0aGUgR05VIEdlbmVyYWwgUHVibGljIExpY2Vuc2UNCj4g
+PiArICogYXMgcHVibGlzaGVkIGJ5IHRoZSBGcmVlIFNvZnR3YXJlIEZvdW5kYXRpb247IGVpdGhl
+ciB2ZXJzaW9uDQo+ID4gKyAqIDIgb2YgdGhlIExpY2Vuc2UsIG9yIChhdCB5b3VyIG9wdGlvbikg
+YW55IGxhdGVyIHZlcnNpb24uDQo+ID4gKyAqDQo+ID4gKyAqIFlvdSBzaG91bGQgaGF2ZSByZWNl
+aXZlZCBhIGNvcHkgb2YgdGhlIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlDQo+IGFsb25nDQo+
+ID4gKyAqIHdpdGggdGhpcyBwcm9ncmFtOyBpZiBub3QsIHNlZSA8aHR0cDovL3d3dy5nbnUub3Jn
+L2xpY2Vuc2VzLz4uDQo+ID4gKyAqLw0KPiA+ICsNCj4gPiArI2lmbmRlZiBBTFRFUkFfSlVBUlRf
+SA0KPiA+ICsjZGVmaW5lIEFMVEVSQV9KVUFSVF9IDQo+ID4gKw0KPiA+ICsjaW5jbHVkZSAiaHcv
+c3lzYnVzLmgiDQo+ID4gKyNpbmNsdWRlICJzeXNlbXUvY2hhci5oIg0KPiA+ICsNCj4gPiArLyoN
+Cj4gPiArICogVGhlIHJlYWQgYW5kIHdyaXRlIEZJRk8gZGVwdGhzIGNhbiBiZSBzZXQgZnJvbSA4
+IHRvIDMyLDc2OCBieXRlcy4NCj4gPiArICogT25seSBwb3dlcnMgb2YgdHdvIGFyZSBhbGxvd2Vk
+LiBBIGRlcHRoIG9mIDY0IGlzIGdlbmVyYWxseSBvcHRpbWFsDQo+IGZvcg0KPiA+ICsgKiBwZXJm
+b3JtYW5jZSwgYW5kIGxhcmdlciB2YWx1ZXMgYXJlIHJhcmVseSBuZWNlc3NhcnkuDQo+ID4gKyAq
+Lw0KPiA+ICsNCj4gPiArI2RlZmluZSBGSUZPX0xFTkdUSCA2NA0KPiANCj4gU2hvdWxkIHByb2Jh
+Ymx5IGJlIGEgUU9NIHByb3BlcnR5LCBubyA/DQoNCkRpZCBub3Qgd2FudCB0byBtZXNzIHdpdGgg
+ZHluYW1pYyBGSUZPIGJ1ZmZlciBhbGxvY2F0aW9uLg0KDQoNCj4gDQo+ID4gK3R5cGVkZWYgc3Ry
+dWN0IEFsdGVyYUpVQVJUU3RhdGUgew0KPiA+ICsgICAgU3lzQnVzRGV2aWNlIGJ1c2RldjsNCj4g
+PiArICAgIE1lbW9yeVJlZ2lvbiBtbWlvOw0KPiA+ICsgICAgQ2hhckJhY2tlbmQgY2hyOw0KPiA+
+ICsgICAgcWVtdV9pcnEgaXJxOw0KPiA+ICsNCj4gPiArICAgIHVuc2lnbmVkIGludCByeF9maWZv
+X3BvczsNCj4gPiArICAgIHVuc2lnbmVkIGludCByeF9maWZvX2xlbjsNCj4gPiArICAgIHVpbnQz
+Ml90IGpkYXRhOw0KPiA+ICsgICAgdWludDMyX3QgamNvbnRyb2w7DQo+ID4gKyAgICB1aW50OF90
+IHJ4X2ZpZm9bRklGT19MRU5HVEhdOw0KPiA+ICt9IEFsdGVyYUpVQVJUU3RhdGU7DQo+ID4gKw0K
+PiA+ICt2b2lkIGFsdGVyYV9qdWFydF9jcmVhdGUoaW50IGNoYW5uZWwsIGNvbnN0IGh3YWRkciBh
+ZGRyLCBxZW11X2lycSBpcnEpOw0KPiA+ICsNCj4gPiArI2VuZGlmIC8qIEFMVEVSQV9KVUFSVF9I
+ICovDQo+ID4NCj4gYnR3IGZvciB0cml2aWFsIHBhdGNoZXMgbGlrZSB0aGlzLCBjb3ZlciBsZXR0
+ZXIgaXMgbm90IG5lY2Vzc2FyeSAuDQoNClRoYW5rcywgZ29vZCB0byBrbm93LCBtYWtlcyBsaWZl
+IGVhc2llcg0KSnVybw0K
