@@ -1,40 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40777)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41201)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cbgvj-00068M-D7
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 00:06:04 -0500
+	(envelope-from <sam.bobroff@au1.ibm.com>) id 1cbgyS-0000Q9-PW
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 00:08:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cbgvf-0003d4-Bc
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 00:06:03 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55753
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <sam.bobroff@au1.ibm.com>) id 1cbgyO-0004kk-LN
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 00:08:52 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44435)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cbgvf-0003cc-6g
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 00:05:59 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1950T7i139752
-	for <qemu-devel@nongnu.org>; Thu, 9 Feb 2017 00:05:58 -0500
-Received: from e28smtp03.in.ibm.com (e28smtp03.in.ibm.com [125.16.236.3])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28gcrj9xy7-1
+	(Exim 4.71) (envelope-from <sam.bobroff@au1.ibm.com>)
+	id 1cbgyO-0004kH-BO
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 00:08:48 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1951OuT118920
+	for <qemu-devel@nongnu.org>; Thu, 9 Feb 2017 00:08:47 -0500
+Received: from e23smtp05.au.ibm.com (e23smtp05.au.ibm.com [202.81.31.147])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28gcn7jma5-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 00:05:58 -0500
+	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 00:08:47 -0500
 Received: from localhost
-	by e28smtp03.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e23smtp05.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Thu, 9 Feb 2017 10:35:54 +0530
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <20170209012033.GM17644@umbus.fritz.box>
-References: <1486377000-25701-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<1486377000-25701-2-git-send-email-nikunj@linux.vnet.ibm.com>
-	<20170209012033.GM17644@umbus.fritz.box>
-Date: Thu, 09 Feb 2017 10:35:48 +0530
+	for <qemu-devel@nongnu.org> from <sam.bobroff@au1.ibm.com>;
+	Thu, 9 Feb 2017 15:08:44 +1000
+Date: Thu, 9 Feb 2017 16:07:44 +1100
+From: Sam Bobroff <sam.bobroff@au1.ibm.com>
+References: <cover.1486436185.git.sam.bobroff@au1.ibm.com>
+	<0de3d80bc7658aac7dc5f6b271045463b572c7ff.1486436186.git.sam.bobroff@au1.ibm.com>
+	<20170209021408.GQ17644@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain
-Message-Id: <87zihwdkcz.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH 1/4] target-ppc: implement load atomic
- instruction
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170209021408.GQ17644@umbus.fritz.box>
+Message-Id: <20170209050744.GD6905@tungsten.ozlabs.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 3/9] spapr: Add ibm,
+ processor-radix-AP-encodings to the device tree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,106 +44,164 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, rth@twiddle.net, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, Balamuruhan S <bala24@linux.vnet.ibm.com>, Harish S <harisrir@linux.vnet.ibm.com>, Athira Rajeev <atrajeev@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-David Gibson <david@gibson.dropbear.id.au> writes:
+On Thu, Feb 09, 2017 at 01:14:08PM +1100, David Gibson wrote:
+> On Tue, Feb 07, 2017 at 01:56:46PM +1100, Sam Bobroff wrote:
+> > Use the new ioctl, KVM_PPC_GET_RMMU_INFO, to fetch radix MMU
+> > information from KVM and present the page encodings in the device tree
+> > under ibm,processor-radix-AP-encodings. This provides page size
+> > information to the guest which is necessary for it to use radix mode.
+> > 
+> > Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
+> > ---
+> >  hw/ppc/spapr.c   |  7 +++++++
+> >  target/ppc/cpu.h |  5 +++++
+> >  target/ppc/kvm.c | 32 +++++++++++++++++++++++++++++++-
+> >  3 files changed, 43 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index a642e663d4..d629e2630c 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -496,6 +496,13 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
+> >  
+> >      _FDT(spapr_fixup_cpu_smt_dt(fdt, offset, cpu,
+> >                                  ppc_get_compat_smt_threads(cpu)));
+> > +
+> > +    if (env->radix_page_info.count) {
+> > +        _FDT((fdt_setprop(fdt, offset, "ibm,processor-radix-AP-encodings",
+> > +                          env->radix_page_info.entries,
+> > +                          env->radix_page_info.count *
+> > +                          sizeof(env->radix_page_info.entries[0]))));
+> > +    }
+> >  }
+> >  
+> >  static void spapr_populate_cpus_dt_node(void *fdt, sPAPRMachineState *spapr)
+> > diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> > index afb7ddbdd0..5a96d98b6f 100644
+> > --- a/target/ppc/cpu.h
+> > +++ b/target/ppc/cpu.h
+> > @@ -914,6 +914,10 @@ struct ppc_segment_page_sizes {
+> >      struct ppc_one_seg_page_size sps[PPC_PAGE_SIZES_MAX_SZ];
+> >  };
+> >  
+> > +struct ppc_radix_page_info {
+> > +    uint32_t count;
+> > +    uint32_t entries[PPC_PAGE_SIZES_MAX_SZ];
+> 
+> IIUC this info is ready for direct inclusion in the device tree:
+> i.e. it's big-endian.  That absolutely needs a comment in the
+> structure.  I'm also not sure it's a good idea, since I assume the TCG
+> POWER9 code will eventually need to access this information directly
+> to implement the radix MMU.
+> 
+> Might be clearer to make this data structure native and do the BE
+> conversion when generating the device tree.
 
-> [ Unknown signature status ]
-> On Mon, Feb 06, 2017 at 03:59:57PM +0530, Nikunj A Dadhania wrote:
->> From: Balamuruhan S <bala24@linux.vnet.ibm.com>
->> 
->> lwat: Load Word Atomic
->> ldat: Load Doubleword Atomic
->> 
->> The instruction includes as function code (5 bits) which gives a detail
->> on the operation to be performed. The patch implements five such
->> functions.
->> 
->> Signed-off-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
->> Signed-off-by: Harish S <harisrir@linux.vnet.ibm.com>
->> Signed-off-by: Athira Rajeev <atrajeev@linux.vnet.ibm.com>
->> [ combine both lwat/ldat implementation using macro ]
->> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
->> ---
->>  target/ppc/internal.h  |  2 ++
->>  target/ppc/translate.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
->>  2 files changed, 52 insertions(+)
->> 
->> diff --git a/target/ppc/internal.h b/target/ppc/internal.h
->> index 5b5b180..1f441c6 100644
->> --- a/target/ppc/internal.h
->> +++ b/target/ppc/internal.h
->> @@ -133,6 +133,8 @@ EXTRACT_HELPER(UIMM4, 16, 4);
->>  EXTRACT_HELPER(NB, 11, 5);
->>  /* Shift count */
->>  EXTRACT_HELPER(SH, 11, 5);
->> +/* lwat/stwat/ldat/lwat */
->> +EXTRACT_HELPER(FC, 11, 5);
->>  /* Vector shift count */
->>  EXTRACT_HELPER(VSH, 6, 4);
->>  /* Mask start */
->> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
->> index b48abae..f59184f 100644
->> --- a/target/ppc/translate.c
->> +++ b/target/ppc/translate.c
->> @@ -2976,6 +2976,54 @@ LARX(lbarx, DEF_MEMOP(MO_UB))
->>  LARX(lharx, DEF_MEMOP(MO_UW))
->>  LARX(lwarx, DEF_MEMOP(MO_UL))
->>  
->> +#define LD_ATOMIC(name, memop, tp, op, eop)                             \
->> +static void gen_##name(DisasContext *ctx)                               \
->> +{                                                                       \
->> +    int len = MEMOP_GET_SIZE(memop);                                    \
->> +    uint32_t gpr_FC = FC(ctx->opcode);                                  \
->> +    TCGv EA = tcg_temp_local_new();                                     \
->> +    TCGv_##tp t0, t1;                                                   \
->> +                                                                        \
->> +    gen_addr_register(ctx, EA);                                         \
->> +    if (len > 1) {                                                      \
->> +        gen_check_align(ctx, EA, len - 1);                              \
->> +    }                                                                   \
->> +    t0 = tcg_temp_new_##tp();                                           \
->> +    t1 = tcg_temp_new_##tp();                                           \
->> +    tcg_gen_##op(t0, cpu_gpr[rD(ctx->opcode) + 1]);                     \
->> +                                                                        \
->> +    switch (gpr_FC) {                                                   \
->> +    case 0: /* Fetch and add */                                         \
->> +        tcg_gen_atomic_fetch_add_##tp(t1, EA, t0, ctx->mem_idx, memop); \
->> +        break;                                                          \
->> +    case 1: /* Fetch and xor */                                         \
->> +        tcg_gen_atomic_fetch_xor_##tp(t1, EA, t0, ctx->mem_idx, memop); \
->> +        break;                                                          \
->> +    case 2: /* Fetch and or */                                          \
->> +        tcg_gen_atomic_fetch_or_##tp(t1, EA, t0, ctx->mem_idx, memop);  \
->> +        break;                                                          \
->> +    case 3: /* Fetch and 'and' */                                       \
->> +        tcg_gen_atomic_fetch_and_##tp(t1, EA, t0, ctx->mem_idx, memop); \
->> +        break;                                                          \
->> +    case 8: /* Swap */                                                  \
->> +        tcg_gen_atomic_xchg_##tp(t1, EA, t0, ctx->mem_idx, memop);      \
->> +        break;                                                          \
->> +    default:                                                            \
->> +        /* invoke data storage error handler */                         \
->> +        gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);             \
->
-> Both your comment and the ISA say that an invalid FC will result in a
-> data storage (0x300) exception, but here you seem to be invoking an
-> invalid instruction exception (0x700).  Which is correct?
+Sounds good, I'll try it.
 
-Ah ok, as there are other FC that is not implemented yet in this
-version, it was set as INVALID. Let me separate it out as:
+> > +};
+> >  
+> >  /*****************************************************************************/
+> >  /* The whole PowerPC CPU context */
+> > @@ -1053,6 +1057,7 @@ struct CPUPPCState {
+> >      ppc_slb_t vrma_slb;
+> >      target_ulong rmls;
+> >      bool ci_large_pages;
+> > +    struct ppc_radix_page_info radix_page_info;
+> 
+> I'm not sure this belongs in CPUPPCState.  New fields should generally
+> be added to PowerPCCPU ("cpu") rather than to CPUPPCState ("env")
+> unless they need to be directly accessed from TCG generated code.
+> 
+> But even more, AFAICT this should vary only with the CPU type/model,
+> not with the individual CPU instance.  So this information could
+> probably go into the CPU class structure instead of the instance.
+> 
+> Yes, there are a lot of things that don't obey those rules already -
+> that's because a lot of stuff hasn't been converted since the new QOM
+> stuff was introduced.  But we shouldn't make it any worse with new
+> patches.
 
-case 4:
-case 5:
-[...]
-        gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);
-        break;
-default:
-        /* invoke data storage error handler */
-        gen_exception_err(ctx, POWERPC_EXCP_DSI, 0);
-}
+Agreed, I'll move it.
 
-Will send updated patch.
+> >  #endif
+> >  
+> >  #if defined(TARGET_PPC64) && !defined(CONFIG_USER_ONLY)
+> > diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> > index ec92c64159..390d6342cc 100644
+> > --- a/target/ppc/kvm.c
+> > +++ b/target/ppc/kvm.c
+> > @@ -328,6 +328,18 @@ static void kvm_get_smmu_info(PowerPCCPU *cpu, struct kvm_ppc_smmu_info *info)
+> >      kvm_get_fallback_smmu_info(cpu, info);
+> >  }
+> >  
+> > +static bool kvm_get_rmmu_info(PowerPCCPU *cpu, struct kvm_ppc_rmmu_info *info)
+> > +{
+> > +    CPUState *cs = CPU(cpu);
+> > +    int ret;
+> > +
+> > +    if (kvm_check_extension(cs->kvm_state, KVM_CAP_PPC_MMU_RADIX)) {
+> > +        ret = kvm_vm_ioctl(cs->kvm_state, KVM_PPC_GET_RMMU_INFO, info);
+> > +        return (ret == 0);
+> > +    }
+> > +    return false;
+> > +}
+> > +
+> >  static long gethugepagesize(const char *mem_path)
+> >  {
+> >      struct statfs fs;
+> > @@ -441,9 +453,11 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
+> >  {
+> >      static struct kvm_ppc_smmu_info smmu_info;
+> >      static bool has_smmu_info;
+> > +    static struct kvm_ppc_rmmu_info rmmu_info;
+> > +    static bool has_rmmu_info;
+> >      CPUPPCState *env = &cpu->env;
+> >      long rampagesize;
+> > -    int iq, ik, jq, jk;
+> > +    int iq, ik, jq, jk, i;
+> >      bool has_64k_pages = false;
+> >  
+> >      /* We only handle page sizes for 64-bit server guests for now */
+> > @@ -508,6 +522,22 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
+> >      if (!has_64k_pages) {
+> >          env->mmu_model &= ~POWERPC_MMU_64K;
+> >      }
+> > +
+> > +    /* Collect radix page info from kernel if not already */
+> > +    if (!has_rmmu_info) {
+> 
+> Putting the data in the class would avoid this ugly messing with a
+> static local, for one thing.
 
-Regards
-Nikunj
+Yeah, that will be nice :-)
+
+> > +        env->radix_page_info.count = 0;
+> > +        if (kvm_get_rmmu_info(cpu, &rmmu_info)) {
+> > +            for (i = 0; i < 8; i++) {
+> 
+> s/8/PPC_PAGE_SIZES_MAX_SZ/ ?
+
+Yes!
+
+> > +                if (rmmu_info.ap_encodings[i]) {
+> > +                    env->radix_page_info.entries[i] =
+> > +                        cpu_to_be32(rmmu_info.ap_encodings[i]);
+> > +                    env->radix_page_info.count++;
+> > +                }
+> > +            }
+> > +        }
+> > +        has_rmmu_info = true;
+> > +    }
+> > +
+> >  }
+> >  #else /* defined (TARGET_PPC64) */
+> >  
+> 
+> -- 
+> David Gibson			| I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+> 				| _way_ _around_!
+> http://www.ozlabs.org/~dgibson
