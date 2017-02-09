@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59347)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cbket-00016R-Q2
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 04:04:57 -0500
+	(envelope-from <ashmit602@gmail.com>) id 1cbkyO-0005A5-GN
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 04:25:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cbkeq-0005S7-Jd
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 04:04:55 -0500
-References: <20170208061602.17666-1-david@gibson.dropbear.id.au>
-	<46d64512-1085-6d22-1e0f-660757ff7131@redhat.com>
-	<20170209041634.GC14524@umbus>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <95706652-0a80-92fc-951b-7a454d496ddf@redhat.com>
-Date: Thu, 9 Feb 2017 10:04:47 +0100
+	(envelope-from <ashmit602@gmail.com>) id 1cbkyL-0002Kb-1w
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 04:25:04 -0500
+Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:35309)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ashmit602@gmail.com>) id 1cbkyK-0002K4-QH
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 04:25:00 -0500
+Received: by mail-it0-x242.google.com with SMTP id 203so1681195ith.2
+	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 01:25:00 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20170209041634.GC14524@umbus>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] virtio-pci: Allow PCIe virtio devices on
- root bus
+In-Reply-To: <20170209062928.GI27752@localhost.localdomain>
+References: <1486617814-5420-1-git-send-email-Ashish.Mittal@veritas.com>
+	<20170209062928.GI27752@localhost.localdomain>
+From: ashish mittal <ashmit602@gmail.com>
+Date: Thu, 9 Feb 2017 01:24:58 -0800
+Message-ID: <CAAo6VWNGtLvbN4ktxRQ9SsobNCgJWcaa_zvdA-9q2Pp3YK27gg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
+ block device type called "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,179 +29,835 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: marcel@redhat.com, abologna@redhat.com, lvivier@redhat.com, thuth@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <ashish.mittal@veritas.com>, Stefan Hajnoczi <stefanha@gmail.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>
 
-On 02/09/17 05:16, David Gibson wrote:
-> On Wed, Feb 08, 2017 at 11:40:50AM +0100, Laszlo Ersek wrote:
->> On 02/08/17 07:16, David Gibson wrote:
->>> Marcel,
->>>
->>> Your original patch adding PCIe support to virtio-pci.c has the
->>> limitation noted below that PCIe won't be enabled if the device is on
->>> the root bus (rather than under a root or downstream port).  As
->>> reasoned below, I think removing the check is correct, even for x86
->>> (though it would rarely be useful there).  But I could well have
->>> missed something.  Let me know if so...
->>>
->>>
->>>
->>> Virtio devices can appear as either vanilla PCI or PCI-Express devices
->>> depending on the bus they're connected to.  At the moment it will only
->>> appear as vanilla PCI if connected to the root bus of a PCIe host bridge.
->>>
->>> Presumably this is to reflect the fact that PCIe devices usually need to
->>> be connected to a root (or further downstream) port rather than directly
->>> on the root bus.  However, due to the odd requirements of the PAPR spec on the 'pseries'
->>> machine type, it's normal for PCIe devices to appear on the root bus
->>> without root ports.
->>>
->>> Further, even on x86, there's no inherent reason we couldn't present a
->>> virtio device as an "integrated device" (typically used for things built
->>> into the PCI chipset), and those devices *do* typically appear on the root
->>> bus.
+On Wed, Feb 8, 2017 at 10:29 PM, Jeff Cody <jcody@redhat.com> wrote:
+> On Wed, Feb 08, 2017 at 09:23:33PM -0800, Ashish Mittal wrote:
+>> From: Ashish Mittal <ashish.mittal@veritas.com>
 >>
->> I'm not personally making a counter-argument, just qouting some of
->> the relevant parts of "docs/pcie.txt" ("PCI EXPRESS GUIDELINES"):
-> 
-> So, an earlier discussion more or less concluded that the PCIe
-> guidelines don't really work with PAPR guests.  That comes because
-> PAPR was designed with PowerVM in mind which allows PCI passthrough
-> but doesn't do any emulated PCI devices.  So they wanted to present
-> passed through devices (virtual or phyical) to the guest without
-> inserting virtual root ports.
-> 
-> Now, you can argue that this was a silly decision in PAPR, and you
-> could well be right, but there it is.
-
-I can totally accept this, but then we should state it as a fact near
-the top of "docs/pcie.txt".
-
-> 
->>> Place only the following kinds of devices directly on the Root Complex:
->>>     (1) PCI Devices (e.g. network card, graphics card, IDE controller),
->>>         not controllers. Place only legacy PCI devices on
->>>         the Root Complex. These will be considered Integrated Endpoints.
->>>         Note: Integrated Endpoints are not hot-pluggable.
->>>
->>>         Although the PCI Express spec does not forbid PCI Express devices as
->>>         Integrated Endpoints, existing hardware mostly integrates legacy PCI
->>>         devices with the Root Complex.
-> 
-> "Mostly".. on my laptop at least the GPU shows up as an integrated PCI
-> Express endpoint, so it's certainly not the case that *all* root bus
-> devices are legacy.
-> 
->> Guest OSes are suspected to behave
->>>         strangely when PCI Express devices are integrated
->>>         with the Root Complex.
-> 
-> Clearly not that strangely, that often, since my laptop works just fine.
-> 
->>>
->>>     [...]
->>>
->>> 2.2 PCI Express only hierarchy
->>> ==============================
->>> Always use PCI Express Root Ports to start PCI Express hierarchies.
+>> Source code for the qnio library that this code loads can be downloaded from:
+>> https://github.com/VeritasHyperScale/libqnio.git
 >>
->> Above you mention "it's normal for PCIe devices to appear on the root bus without root ports".
-> 
-> Well "normal" perhaps wasn't the right word.  Let's say precedented,
-> if uncommon.
-> 
->> Let me turn the question around: is it a *problem* for "pseries" if
->> we require root ports? If so, why exactly?
-> 
-> That's.. a complex question.  At least Linux guests (and we don't
-> support any others yet) might cope with the addition of root ports.
-> Maybe.  I have discussed this option with BenH and others.
-> 
-> However it is gratuitously different from how PCIe devices will
-> typically appear for the same guest running under PowerVM.  Although I
-> suspect Linux would cope with the "normal standard" rather than "PAPR
-> standard" presentation, I'm not as confident about it as I would like.
-> 
-> Another consideration here is that other PCIe capable qemu emulated
-> devices, such as XHCI, will present fine as PCIe integrated endpoints
-> when attached to the root bus.  Libvirt won't do that usually, of
-> course, and it may not be the recommended way of doing things (on PC)
-> but it's possible.  I don't see any particular reason that virtio-pci
-> should enforce the root port requirement more so than any other
-> device.
-> 
->> On 02/08/17 07:16, David Gibson wrote:
->>>
->>> pcie_endpoint_cap_init() already automatically adjusts to advertise as
->>> an integrated device rather than a "normal" PCIe endpoint when attached to
->>> a root bus.  So we can remove the check for root bus within virtio and
->>> allow (at the user's discretion) a PCIe virtio bus to be attached to a
->>> root bus.
+>> Sample command line using JSON syntax:
+>> ./x86_64-softmmu/qemu-system-x86_64 -name instance-00000008 -S -vnc 0.0.0.0:0
+>> -k en-us -vga cirrus -device virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x5
+>> -msg timestamp=on
+>> 'json:{"driver":"vxhs","vdisk-id":"c3e9095a-a5ee-4dce-afeb-2a59fb387410",
+>> "server":{"host":"172.172.17.4","port":"9999"}}'
 >>
->> If Marcel thinks this is a good change, then I think we should go
->> through "docs/pcie.txt" with a fine-toothed comb, and update all
->> relevant spots. (If Marcel agrees, perhaps you can include such
->> hunks in your patch at once.)
-> 
-> Actually, I think that would be a neverending process.  Maybe better
-> to put in a whole different spapr-pcie.txt with the assorted ways that
-> PAPR violates PCIe conventions.
-
-That works for me too, but I think it would be a lot more work for you
-and others.
-
-I plan on consulting "docs/pcie.txt" frequently; among other things, for
-deciding debates. Thus, improving the scope of "docs/pcie.txt" is very
-welcome IMO.
-
-> 
->> It also may have consequences for libvirt (but I see you addressed
->> Andrea at once, which is great).
-> 
-> Right, I've been discussed this with Andrea all along.  We're working
-> on a proposed PAPR specific way of allocating PCI and PCIe addresses
-> (different from the PCIe normal way, but the same as each other).
-> That will simplify adding PCIe support to PAPR, and also has some
-> other advantages for PAPR guests (related to the platform specific
-> isolation, hotplug  and error recovery mechanisms - also different
-> from the normal PCIe ones).
-
-Great, if Andrea is aware, that's a relief.
-
-Can you resubmit this patch with a small hunk for "docs/pcie.txt" that
-removes PAPR from the scope? A short list of actual machine types would
-be appreciated too, if that makes sense. (By default we aim at
-multi-arch / multi-target with this document; we may not have stated it
-explicitly, but AFAIR we intend to cover aarch64 / "virt" too.)
-
-Thanks!
-Laszlo
-
-> 
+>> Sample command line using URI syntax:
+>> qemu-img convert -f raw -O raw -n
+>> /var/lib/nova/instances/_base/0c5eacd5ebea5ed914b6a3e7b18f1ce734c386ad
+>> vxhs://192.168.0.1:9999/c6718f6b-0401-441d-a8c3-1f0064d75ee0
 >>
->> Thanks,
->> Laszlo
+>
+> I don't know if I am using the qnio_server test server correctly or not, but
+> when I run qemu-io from the command line I get an i/o error.  When I run the
+> qemu-iotests, I get a segfault.
+>
+> Were you able to run qemu-iotests with these patches?
+>
+> Here is how I am invoking qnio_server:
+>
+> # qnio_server  -d /home/jcody/work/redhat/upstream/qemu-kvm/tests/qemu-iotests/scratch -v
+>
+>
+
+I ran full qemu-iotests and qemu-io manually with the test server on
+version 7 patches. Ran qemu-io manually with the test server on
+version 8, but the libvxhs code is undergoing a lot of checkins. Will
+test again tomorrow and get back.
+
+>
+>> Signed-off-by: Ashish Mittal <ashish.mittal@veritas.com>
+>> ---
+>> TODO:
+>> (1) valgrind report to follow soon.
 >>
->>>
->>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->>> ---
->>>  hw/virtio/virtio-pci.c | 3 +--
->>>  1 file changed, 1 insertion(+), 2 deletions(-)
->>>
->>> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
->>> index 5ce42af..caea44c 100644
->>> --- a/hw/virtio/virtio-pci.c
->>> +++ b/hw/virtio/virtio-pci.c
->>> @@ -1737,8 +1737,7 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
->>>  {
->>>      VirtIOPCIProxy *proxy = VIRTIO_PCI(pci_dev);
->>>      VirtioPCIClass *k = VIRTIO_PCI_GET_CLASS(pci_dev);
->>> -    bool pcie_port = pci_bus_is_express(pci_dev->bus) &&
->>> -                     !pci_bus_is_root(pci_dev->bus);
->>> +    bool pcie_port = pci_bus_is_express(pci_dev->bus);
->>>  
->>>      if (!kvm_has_many_ioeventfds()) {
->>>          proxy->flags &= ~VIRTIO_PCI_FLAG_USE_IOEVENTFD;
->>>
+>> v8 changelog:
+>> (1) Security implementation for libqnio present in branch 'securify'.
+>>     Please use 'securify' branch for building libqnio and testing
+>>     with this patch.
+>> (2) Renamed libqnio to libvxhs.
+>> (3) Pass instance ID to libvxhs for SSL authentication.
 >>
-> 
+>> v7 changelog:
+>> (1) IO failover code has moved out to the libqnio library.
+>> (2) Fixes for issues reported by Stefan on v6.
+>> (3) Incorporated the QEMUBH patch provided by Stefan.
+>>     This is a replacement for the pipe mechanism used earlier.
+>> (4) Fixes to the buffer overflows reported in libqnio.
+>> (5) Input validations in vxhs.c to prevent any buffer overflows for
+>>     arguments passed to libqnio.
+>>
+>> v6 changelog:
+>> (1) Added qemu-iotests for VxHS as a new patch in the series.
+>> (2) Replaced release version from 2.8 to 2.9 in block-core.json.
+>>
+>> v5 changelog:
+>> (1) Incorporated v4 review comments.
+>>
+>> v4 changelog:
+>> (1) Incorporated v3 review comments on QAPI changes.
+>> (2) Added refcounting for device open/close.
+>>     Free library resources on last device close.
+>>
+>> v3 changelog:
+>> (1) Added QAPI schema for the VxHS driver.
+>>
+>> v2 changelog:
+>> (1) Changes done in response to v1 comments.
+>>
+>>  block/Makefile.objs  |   2 +
+>>  block/trace-events   |  16 ++
+>>  block/vxhs.c         | 499 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  configure            |  41 +++++
+>>  qapi/block-core.json |  20 ++-
+>>  5 files changed, 576 insertions(+), 2 deletions(-)
+>>  create mode 100644 block/vxhs.c
+>>
+>> diff --git a/block/Makefile.objs b/block/Makefile.objs
+>> index c6bd14e..75675b4 100644
+>> --- a/block/Makefile.objs
+>> +++ b/block/Makefile.objs
+>> @@ -19,6 +19,7 @@ block-obj-$(CONFIG_LIBNFS) += nfs.o
+>>  block-obj-$(CONFIG_CURL) += curl.o
+>>  block-obj-$(CONFIG_RBD) += rbd.o
+>>  block-obj-$(CONFIG_GLUSTERFS) += gluster.o
+>> +block-obj-$(CONFIG_VXHS) += vxhs.o
+>>  block-obj-$(CONFIG_ARCHIPELAGO) += archipelago.o
+>>  block-obj-$(CONFIG_LIBSSH2) += ssh.o
+>>  block-obj-y += accounting.o dirty-bitmap.o
+>> @@ -39,6 +40,7 @@ rbd.o-cflags       := $(RBD_CFLAGS)
+>>  rbd.o-libs         := $(RBD_LIBS)
+>>  gluster.o-cflags   := $(GLUSTERFS_CFLAGS)
+>>  gluster.o-libs     := $(GLUSTERFS_LIBS)
+>> +vxhs.o-libs        := $(VXHS_LIBS)
+>>  ssh.o-cflags       := $(LIBSSH2_CFLAGS)
+>>  ssh.o-libs         := $(LIBSSH2_LIBS)
+>>  archipelago.o-libs := $(ARCHIPELAGO_LIBS)
+>> diff --git a/block/trace-events b/block/trace-events
+>> index 0bc5c0a..d5eca93 100644
+>> --- a/block/trace-events
+>> +++ b/block/trace-events
+>> @@ -110,3 +110,19 @@ qed_aio_write_data(void *s, void *acb, int ret, uint64_t offset, size_t len) "s
+>>  qed_aio_write_prefill(void *s, void *acb, uint64_t start, size_t len, uint64_t offset) "s %p acb %p start %"PRIu64" len %zu offset %"PRIu64
+>>  qed_aio_write_postfill(void *s, void *acb, uint64_t start, size_t len, uint64_t offset) "s %p acb %p start %"PRIu64" len %zu offset %"PRIu64
+>>  qed_aio_write_main(void *s, void *acb, int ret, uint64_t offset, size_t len) "s %p acb %p ret %d offset %"PRIu64" len %zu"
+>> +
+>> +# block/vxhs.c
+>> +vxhs_iio_callback(int error) "ctx is NULL: error %d"
+>> +vxhs_iio_callback_chnfail(int err, int error) "QNIO channel failed, no i/o %d, %d"
+>> +vxhs_iio_callback_unknwn(int opcode, int err) "unexpected opcode %d, errno %d"
+>> +vxhs_aio_rw_invalid(int req) "Invalid I/O request iodir %d"
+>> +vxhs_aio_rw_ioerr(char *guid, int iodir, uint64_t size, uint64_t off, void *acb, int ret, int err) "IO ERROR (vDisk %s) FOR : Read/Write = %d size = %lu offset = %lu ACB = %p. Error = %d, errno = %d"
+>> +vxhs_get_vdisk_stat_err(char *guid, int ret, int err) "vDisk (%s) stat ioctl failed, ret = %d, errno = %d"
+>> +vxhs_get_vdisk_stat(char *vdisk_guid, uint64_t vdisk_size) "vDisk %s stat ioctl returned size %lu"
+>> +vxhs_qnio_iio_open(const char *ip) "Failed to connect to storage agent on host-ip %s"
+>> +vxhs_complete_aio(void *acb, uint64_t ret) "aio failed acb %p ret %ld"
+>> +vxhs_parse_uri_filename(const char *filename) "URI passed via bdrv_parse_filename %s"
+>> +vxhs_qemu_init_vdisk(const char *vdisk_id) "vdisk-id from json %s"
+>> +vxhs_parse_uri_hostinfo(int num, char *host, int port) "Host %d: IP %s, Port %d"
+>> +vxhs_qemu_init(char *of_vsa_addr, int port) "Adding host %s:%d to BDRVVXHSState"
+>> +vxhs_close(char *vdisk_guid) "Closing vdisk %s"
+>> diff --git a/block/vxhs.c b/block/vxhs.c
+>> new file mode 100644
+>> index 0000000..f1b5f1c
+>> --- /dev/null
+>> +++ b/block/vxhs.c
+>> @@ -0,0 +1,499 @@
+>> +/*
+>> + * QEMU Block driver for Veritas HyperScale (VxHS)
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+>> + * See the COPYING file in the top-level directory.
+>> + *
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include <qnio/qnio_api.h>
+>> +#include <sys/param.h>
+>> +#include "block/block_int.h"
+>> +#include "qapi/qmp/qerror.h"
+>> +#include "qapi/qmp/qdict.h"
+>> +#include "qapi/qmp/qstring.h"
+>> +#include "trace.h"
+>> +#include "qemu/uri.h"
+>> +#include "qapi/error.h"
+>> +#include "qemu/uuid.h"
+>> +
+>> +#define VXHS_OPT_FILENAME           "filename"
+>> +#define VXHS_OPT_VDISK_ID           "vdisk-id"
+>> +#define VXHS_OPT_SERVER             "server"
+>> +#define VXHS_OPT_HOST               "host"
+>> +#define VXHS_OPT_PORT               "port"
+>> +#define VXHS_UUID_DEF "12345678-1234-1234-1234-123456789012"
+>
+> What is this?  It is not a valid UUID; is the value significant?
+>
+
+This value gets passed to libvxhs for binaries like qemu-io, qemu-img
+that do not have an Instance ID. We can use this default ID to control
+access to specific vdisks by these binaries. qemu-kvm will pass the
+actual instance ID, and therefore will not use this default value.
+
+Will reply to other queries soon.
+
+>> +
+>> +QemuUUID qemu_uuid __attribute__ ((weak));
+>
+> I have questions on this later, at [1]
+>
+>> +
+>> +static int lib_init_failed;
+>
+> With a ref count, I think this can go away.
+>
+>> +
+>> +typedef enum {
+>> +    VDISK_AIO_READ,
+>> +    VDISK_AIO_WRITE,
+>> +} VDISKAIOCmd;
+>> +
+>> +/*
+>> + * HyperScale AIO callbacks structure
+>> + */
+>> +typedef struct VXHSAIOCB {
+>> +    BlockAIOCB common;
+>> +    int err;
+>> +    QEMUIOVector *qiov;
+>> +} VXHSAIOCB;
+>> +
+>> +typedef struct VXHSvDiskHostsInfo {
+>> +    void *dev_handle; /* Device handle */
+>> +    char *host; /* Host name or IP */
+>> +    int port; /* Host's port number */
+>> +} VXHSvDiskHostsInfo;
+>> +
+>> +/*
+>> + * Structure per vDisk maintained for state
+>> + */
+>> +typedef struct BDRVVXHSState {
+>> +    VXHSvDiskHostsInfo vdisk_hostinfo; /* Per host info */
+>> +    char *vdisk_guid;
+>> +} BDRVVXHSState;
+>> +
+>> +static void vxhs_complete_aio_bh(void *opaque)
+>> +{
+>> +    VXHSAIOCB *acb = opaque;
+>> +    BlockCompletionFunc *cb = acb->common.cb;
+>> +    void *cb_opaque = acb->common.opaque;
+>> +    int ret = 0;
+>> +
+>> +    if (acb->err != 0) {
+>> +        trace_vxhs_complete_aio(acb, acb->err);
+>> +        ret = (-EIO);
+>> +    }
+>> +
+>> +    qemu_aio_unref(acb);
+>> +    cb(cb_opaque, ret);
+>> +}
+>> +
+>> +/*
+>> + * Called from a libqnio thread
+>> + */
+>> +static void vxhs_iio_callback(void *ctx, uint32_t opcode, uint32_t error)
+>> +{
+>> +    VXHSAIOCB *acb = NULL;
+>> +
+>> +    switch (opcode) {
+>> +    case IRP_READ_REQUEST:
+>> +    case IRP_WRITE_REQUEST:
+>> +
+>> +        /*
+>> +         * ctx is VXHSAIOCB*
+>> +         * ctx is NULL if error is QNIOERROR_CHANNEL_HUP
+>> +         */
+>> +        if (ctx) {
+>> +            acb = ctx;
+>> +        } else {
+>> +            trace_vxhs_iio_callback(error);
+>> +            goto out;
+>> +        }
+>> +
+>> +        if (error) {
+>> +            if (!acb->err) {
+>> +                acb->err = error;
+>> +            }
+>> +            trace_vxhs_iio_callback(error);
+>> +        }
+>> +
+>> +        aio_bh_schedule_oneshot(bdrv_get_aio_context(acb->common.bs),
+>> +                                vxhs_complete_aio_bh, acb);
+>> +        break;
+>> +
+>> +    default:
+>> +        if (error == QNIOERROR_HUP) {
+>> +            /*
+>> +             * Channel failed, spontaneous notification,
+>> +             * not in response to I/O
+>> +             */
+>> +            trace_vxhs_iio_callback_chnfail(error, errno);
+>> +        } else {
+>> +            trace_vxhs_iio_callback_unknwn(opcode, error);
+>> +        }
+>> +        break;
+>> +    }
+>> +out:
+>> +    return;
+>> +}
+>> +
+>> +static QemuOptsList runtime_opts = {
+>> +    .name = "vxhs",
+>> +    .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
+>> +    .desc = {
+>> +        {
+>> +            .name = VXHS_OPT_FILENAME,
+>> +            .type = QEMU_OPT_STRING,
+>> +            .help = "URI to the Veritas HyperScale image",
+>> +        },
+>> +        {
+>> +            .name = VXHS_OPT_VDISK_ID,
+>> +            .type = QEMU_OPT_STRING,
+>> +            .help = "UUID of the VxHS vdisk",
+>> +        },
+>> +        { /* end of list */ }
+>> +    },
+>> +};
+>> +
+>> +static QemuOptsList runtime_tcp_opts = {
+>> +    .name = "vxhs_tcp",
+>> +    .head = QTAILQ_HEAD_INITIALIZER(runtime_tcp_opts.head),
+>> +    .desc = {
+>> +        {
+>> +            .name = VXHS_OPT_HOST,
+>> +            .type = QEMU_OPT_STRING,
+>> +            .help = "host address (ipv4 addresses)",
+>> +        },
+>> +        {
+>> +            .name = VXHS_OPT_PORT,
+>> +            .type = QEMU_OPT_NUMBER,
+>> +            .help = "port number on which VxHSD is listening (default 9999)",
+>> +            .def_value_str = "9999"
+>> +        },
+>> +        { /* end of list */ }
+>> +    },
+>> +};
+>> +
+>> +/*
+>> + * Parse the incoming URI and populate *options with the host information.
+>> + * URI syntax has the limitation of supporting only one host info.
+>> + * To pass multiple host information, use the JSON syntax.
+>> + */
+>> +static int vxhs_parse_uri(const char *filename, QDict *options)
+>> +{
+>> +    URI *uri = NULL;
+>> +    char *hoststr, *portstr;
+>> +    char *port;
+>> +    int ret = 0;
+>> +
+>> +    trace_vxhs_parse_uri_filename(filename);
+>> +    uri = uri_parse(filename);
+>> +    if (!uri || !uri->server || !uri->path) {
+>> +        uri_free(uri);
+>> +        return -EINVAL;
+>> +    }
+>> +
+>> +    hoststr = g_strdup(VXHS_OPT_SERVER".host");
+>> +    qdict_put(options, hoststr, qstring_from_str(uri->server));
+>> +    g_free(hoststr);
+>> +
+>> +    portstr = g_strdup(VXHS_OPT_SERVER".port");
+>> +    if (uri->port) {
+>> +        port = g_strdup_printf("%d", uri->port);
+>> +        qdict_put(options, portstr, qstring_from_str(port));
+>> +        g_free(port);
+>> +    }
+>> +    g_free(portstr);
+>> +
+>> +    if (strstr(uri->path, "vxhs") == NULL) {
+>> +        qdict_put(options, "vdisk-id", qstring_from_str(uri->path));
+>> +    }
+>> +
+>> +    trace_vxhs_parse_uri_hostinfo(1, uri->server, uri->port);
+>> +    uri_free(uri);
+>> +
+>> +    return ret;
+>> +}
+>> +
+>> +static void vxhs_parse_filename(const char *filename, QDict *options,
+>> +                                Error **errp)
+>> +{
+>> +    if (qdict_haskey(options, "vdisk-id") || qdict_haskey(options, "server")) {
+>> +        error_setg(errp, "vdisk-id/server and a file name may not be specified "
+>> +                         "at the same time");
+>> +        return;
+>> +    }
+>> +
+>> +    if (strstr(filename, "://")) {
+>> +        int ret = vxhs_parse_uri(filename, options);
+>> +        if (ret < 0) {
+>> +            error_setg(errp, "Invalid URI. URI should be of the form "
+>> +                       "  vxhs://<host_ip>:<port>/<vdisk-id>");
+>> +        }
+>> +    }
+>> +}
+>> +
+>> +static int vxhs_open(BlockDriverState *bs, QDict *options,
+>> +                     int bdrv_flags, Error **errp)
+>> +{
+>> +    BDRVVXHSState *s = bs->opaque;
+>> +    void *dev_handlep = NULL;
+>> +    QDict *backing_options = NULL;
+>> +    QemuOpts *opts, *tcp_opts;
+>> +    char *of_vsa_addr = NULL;
+>> +    Error *local_err = NULL;
+>> +    const char *vdisk_id_opt;
+>> +    const char *server_host_opt;
+>> +    char *str = NULL;
+>> +    int ret = 0;
+>> +
+>> +    if (lib_init_failed) {
+>> +        return -ENODEV;
+>> +    }
+>
+> Since you can't call iio_init() in the bdrv_vxhs_init() function [1],
+> instead of the above you can just use a refcnt, and call iio_init when the
+> refcnt is 0.
+>
+>
+>> +    opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+>> +    qemu_opts_absorb_qdict(opts, options, &local_err);
+>> +    if (local_err) {
+>> +        ret = -EINVAL;
+>> +        goto out;
+>> +    }
+>> +
+>> +    /* vdisk-id is the disk UUID */
+>> +    vdisk_id_opt = qemu_opt_get(opts, VXHS_OPT_VDISK_ID);
+>> +    if (!vdisk_id_opt) {
+>> +        error_setg(&local_err, QERR_MISSING_PARAMETER, VXHS_OPT_VDISK_ID);
+>> +        ret = -EINVAL;
+>> +        goto out;
+>> +    }
+>> +
+>> +    /* vdisk-id may contain a leading '/' */
+>> +    if (strlen(vdisk_id_opt) > UUID_FMT_LEN + 1) {
+>> +        error_setg(errp, "vdisk-id cannot be more than %d characters",
+>
+> You are propagating local_err in the error handler "out:" via
+> error_propagate() for all the other cases, but setting errp directly here.
+> That will happen to work out, because local_err will be NULL and
+> error_propagate() will be a NOOP in that case, but it probably isn't what
+> you intended.  You should set &local_err, like in the other error cases.
+>
+>> +                   UUID_FMT_LEN);
+>> +        ret = -EINVAL;
+>> +        goto out;
+>> +    }
+>> +
+>> +    s->vdisk_guid = g_strdup(vdisk_id_opt);
+>> +    trace_vxhs_qemu_init_vdisk(vdisk_id_opt);
+>> +
+>> +    str = g_strdup_printf(VXHS_OPT_SERVER".");
+>> +    qdict_extract_subqdict(options, &backing_options, str);
+>> +
+>> +    /* Create opts info from runtime_tcp_opts list */
+>> +    tcp_opts = qemu_opts_create(&runtime_tcp_opts, NULL, 0, &error_abort);
+>> +    qemu_opts_absorb_qdict(tcp_opts, backing_options, &local_err);
+>> +    if (local_err) {
+>> +        qdict_del(backing_options, str);
+>> +        qemu_opts_del(tcp_opts);
+>> +        ret = -EINVAL;
+>> +        goto out;
+>> +    }
+>> +
+>> +    server_host_opt = qemu_opt_get(tcp_opts, VXHS_OPT_HOST);
+>> +    if (!server_host_opt) {
+>> +        error_setg(&local_err, QERR_MISSING_PARAMETER,
+>> +                   VXHS_OPT_SERVER"."VXHS_OPT_HOST);
+>> +        ret = -EINVAL;
+>> +        goto out;
+>> +    }
+>> +
+>> +    if (strlen(server_host_opt) > MAXHOSTNAMELEN) {
+>> +        error_setg(errp, "server.host cannot be more than %d characters",
+>> +                   MAXHOSTNAMELEN);
+>> +        ret = -EINVAL;
+>> +        goto out;
+>> +    }
+>> +
+>> +    s->vdisk_hostinfo.host = g_strdup(server_host_opt);
+>> +
+>> +    s->vdisk_hostinfo.port = g_ascii_strtoll(qemu_opt_get(tcp_opts,
+>> +                                                          VXHS_OPT_PORT),
+>> +                                                          NULL, 0);
+>> +
+>> +    trace_vxhs_qemu_init(s->vdisk_hostinfo.host,
+>> +                         s->vdisk_hostinfo.port);
+>> +
+>> +    qdict_del(backing_options, str);
+>> +    qemu_opts_del(tcp_opts);
+>> +
+>> +    of_vsa_addr = g_strdup_printf("of://%s:%d",
+>> +                                s->vdisk_hostinfo.host,
+>> +                                s->vdisk_hostinfo.port);
+>> +
+>> +    /*
+>> +     * Open qnio channel to storage agent if not opened before.
+>> +     */
+>> +    dev_handlep = iio_open(of_vsa_addr, s->vdisk_guid, 0);
+>> +    if (dev_handlep == NULL) {
+>> +        trace_vxhs_qnio_iio_open(of_vsa_addr);
+>> +        ret = -ENODEV;
+>> +        goto out;
+>> +    }
+>> +    s->vdisk_hostinfo.dev_handle = dev_handlep;
+>> +
+>> +out:
+>> +    g_free(str);
+>> +    g_free(of_vsa_addr);
+>> +    QDECREF(backing_options);
+>> +    qemu_opts_del(opts);
+>> +
+>> +    if (ret < 0) {
+>> +        error_propagate(errp, local_err);
+>> +        g_free(s->vdisk_hostinfo.host);
+>> +        g_free(s->vdisk_guid);
+>> +        s->vdisk_guid = NULL;
+>> +        errno = -ret;
+>> +    }
+>> +
+>> +    return ret;
+>> +}
+>> +
+>> +static const AIOCBInfo vxhs_aiocb_info = {
+>> +    .aiocb_size = sizeof(VXHSAIOCB)
+>> +};
+>> +
+>> +/*
+>> + * This allocates QEMU-VXHS callback for each IO
+>> + * and is passed to QNIO. When QNIO completes the work,
+>> + * it will be passed back through the callback.
+>> + */
+>> +static BlockAIOCB *vxhs_aio_rw(BlockDriverState *bs, int64_t sector_num,
+>> +                               QEMUIOVector *qiov, int nb_sectors,
+>> +                               BlockCompletionFunc *cb, void *opaque,
+>> +                               VDISKAIOCmd iodir)
+>> +{
+>> +    VXHSAIOCB *acb = NULL;
+>> +    BDRVVXHSState *s = bs->opaque;
+>> +    size_t size;
+>> +    uint64_t offset;
+>> +    int iio_flags = 0;
+>> +    int ret = 0;
+>> +    void *dev_handle = s->vdisk_hostinfo.dev_handle;
+>> +
+>> +    offset = sector_num * BDRV_SECTOR_SIZE;
+>> +    size = nb_sectors * BDRV_SECTOR_SIZE;
+>> +    acb = qemu_aio_get(&vxhs_aiocb_info, bs, cb, opaque);
+>> +
+>> +    /*
+>> +     * Initialize VXHSAIOCB.
+>> +     */
+>> +    acb->err = 0;
+>> +    acb->qiov = qiov;
+>> +
+>> +    iio_flags = IIO_FLAG_ASYNC;
+>> +
+>> +    switch (iodir) {
+>> +    case VDISK_AIO_WRITE:
+>> +            ret = iio_writev(dev_handle, acb, qiov->iov, qiov->niov,
+>> +                             offset, (uint64_t)size, iio_flags);
+>> +            break;
+>> +    case VDISK_AIO_READ:
+>> +            ret = iio_readv(dev_handle, acb, qiov->iov, qiov->niov,
+>> +                            offset, (uint64_t)size, iio_flags);
+>> +            break;
+>> +    default:
+>> +            trace_vxhs_aio_rw_invalid(iodir);
+>> +            goto errout;
+>> +    }
+>> +
+>> +    if (ret != 0) {
+>> +        trace_vxhs_aio_rw_ioerr(s->vdisk_guid, iodir, size, offset,
+>> +                                acb, ret, errno);
+>> +        goto errout;
+>> +    }
+>> +    return &acb->common;
+>> +
+>> +errout:
+>> +    qemu_aio_unref(acb);
+>> +    return NULL;
+>> +}
+>> +
+>> +static BlockAIOCB *vxhs_aio_readv(BlockDriverState *bs,
+>> +                                   int64_t sector_num, QEMUIOVector *qiov,
+>> +                                   int nb_sectors,
+>> +                                   BlockCompletionFunc *cb, void *opaque)
+>> +{
+>> +    return vxhs_aio_rw(bs, sector_num, qiov, nb_sectors, cb,
+>> +                       opaque, VDISK_AIO_READ);
+>> +}
+>> +
+>> +static BlockAIOCB *vxhs_aio_writev(BlockDriverState *bs,
+>> +                                   int64_t sector_num, QEMUIOVector *qiov,
+>> +                                   int nb_sectors,
+>> +                                   BlockCompletionFunc *cb, void *opaque)
+>> +{
+>> +    return vxhs_aio_rw(bs, sector_num, qiov, nb_sectors,
+>> +                       cb, opaque, VDISK_AIO_WRITE);
+>> +}
+>> +
+>> +static void vxhs_close(BlockDriverState *bs)
+>> +{
+>> +    BDRVVXHSState *s = bs->opaque;
+>> +
+>> +    trace_vxhs_close(s->vdisk_guid);
+>> +
+>> +    g_free(s->vdisk_guid);
+>> +    s->vdisk_guid = NULL;
+>> +
+>> +    /*
+>> +     * Close vDisk device
+>> +     */
+>> +    if (s->vdisk_hostinfo.dev_handle) {
+>> +        iio_close(s->vdisk_hostinfo.dev_handle);
+>> +        s->vdisk_hostinfo.dev_handle = NULL;
+>> +    }
+>> +
+>> +    /*
+>> +     * Free the dynamically allocated host string
+>> +     */
+>> +    g_free(s->vdisk_hostinfo.host);
+>> +    s->vdisk_hostinfo.host = NULL;
+>> +    s->vdisk_hostinfo.port = 0;
+>
+> If you use a static vxhs iio refcnt, you can decrement it here and call
+> iio_fini (which is now currently never called) to free resources.
+>
+>
+>> +}
+>> +
+>> +static int64_t vxhs_get_vdisk_stat(BDRVVXHSState *s)
+>> +{
+>> +    int64_t vdisk_size = -1;
+>> +    int ret = 0;
+>> +    void *dev_handle = s->vdisk_hostinfo.dev_handle;
+>> +
+>> +    ret = iio_ioctl(dev_handle, IOR_VDISK_STAT, &vdisk_size, 0);
+>> +    if (ret < 0) {
+>> +        trace_vxhs_get_vdisk_stat_err(s->vdisk_guid, ret, errno);
+>> +        return -EIO;
+>> +    }
+>> +
+>> +    trace_vxhs_get_vdisk_stat(s->vdisk_guid, vdisk_size);
+>> +    return vdisk_size;
+>> +}
+>> +
+>> +/*
+>> + * Returns the size of vDisk in bytes. This is required
+>> + * by QEMU block upper block layer so that it is visible
+>> + * to guest.
+>> + */
+>> +static int64_t vxhs_getlength(BlockDriverState *bs)
+>> +{
+>> +    BDRVVXHSState *s = bs->opaque;
+>> +    int64_t vdisk_size;
+>> +
+>> +    vdisk_size = vxhs_get_vdisk_stat(s);
+>> +    if (vdisk_size < 0) {
+>> +        return -EIO;
+>> +    }
+>> +
+>> +    return vdisk_size;
+>> +}
+>> +
+>> +static BlockDriver bdrv_vxhs = {
+>> +    .format_name                  = "vxhs",
+>> +    .protocol_name                = "vxhs",
+>> +    .instance_size                = sizeof(BDRVVXHSState),
+>> +    .bdrv_file_open               = vxhs_open,
+>> +    .bdrv_parse_filename          = vxhs_parse_filename,
+>> +    .bdrv_close                   = vxhs_close,
+>> +    .bdrv_getlength               = vxhs_getlength,
+>> +    .bdrv_aio_readv               = vxhs_aio_readv,
+>> +    .bdrv_aio_writev              = vxhs_aio_writev,
+>> +};
+>> +
+>> +static void bdrv_vxhs_init(void)
+>> +{
+>> +    char out[37];
+>> +
+>> +    if (qemu_uuid_is_null(&qemu_uuid)) {
+>> +        lib_init_failed = iio_init(QNIO_VERSION, vxhs_iio_callback, VXHS_UUID_DEF);
+>> +    } else {
+>> +        qemu_uuid_unparse(&qemu_uuid, out);
+>> +        lib_init_failed = iio_init(QNIO_VERSION, vxhs_iio_callback, out);
+>> +    }
+>> +
+>
+> [1]
+>
+> Can you explain what is going on here with the qemu_uuid check?
+>
+>
+> You also can't do this here.  This init function is just to register the
+> driver (e.g. populate the BlockDriver list).  You shouldn't be doing
+> anything other than the bdrv_register() call here.
+>
+> Since you want to run this iio_init only once, I would recommend doing it in
+> the vxhs_open() call, and using a ref counter.  That way, you can also call
+> iio_fini() to finish releasing resources once the last device is closed.
+>
+> This was actually a suggestion I had before, which you then incorporated
+> into v6, but it appears all the refcnt code has gone away for v7/v8.
+>
+>
+>> +    bdrv_register(&bdrv_vxhs);
+>> +}
+>> +
+>> +block_init(bdrv_vxhs_init);
+>> diff --git a/configure b/configure
+>> index 6325339..c3ccf02 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -321,6 +321,7 @@ numa=""
+>>  tcmalloc="no"
+>>  jemalloc="no"
+>>  replication="yes"
+>> +vxhs=""
+>>
+>>  # parse CC options first
+>>  for opt do
+>> @@ -1170,6 +1171,10 @@ for opt do
+>>    ;;
+>>    --enable-replication) replication="yes"
+>>    ;;
+>> +  --disable-vxhs) vxhs="no"
+>> +  ;;
+>> +  --enable-vxhs) vxhs="yes"
+>> +  ;;
+>>    *)
+>>        echo "ERROR: unknown option $opt"
+>>        echo "Try '$0 --help' for more information"
+>> @@ -1403,6 +1408,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+>>    tcmalloc        tcmalloc support
+>>    jemalloc        jemalloc support
+>>    replication     replication support
+>> +  vxhs            Veritas HyperScale vDisk backend support
+>>
+>>  NOTE: The object files are built at the place where configure is launched
+>>  EOF
+>> @@ -4748,6 +4754,34 @@ if test "$modules" = "yes" && test "$LD_REL_FLAGS" = ""; then
+>>  fi
+>>
+>>  ##########################################
+>> +# Veritas HyperScale block driver VxHS
+>> +# Check if libvxhs is installed
+>> +
+>> +if test "$vxhs" != "no" ; then
+>> +  cat > $TMPC <<EOF
+>> +#include <stdint.h>
+>> +#include <qnio/qnio_api.h>
+>> +
+>> +#define VXHS_UUID "12345678-1234-1234-1234-123456789012"
+>> +void *vxhs_callback;
+>> +
+>> +int main(void) {
+>> +    iio_init(QNIO_VERSION, vxhs_callback, VXHS_UUID);
+>> +    return 0;
+>> +}
+>> +EOF
+>> +  vxhs_libs="-lvxhs -lssl"
+>> +  if compile_prog "" "$vxhs_libs" ; then
+>> +    vxhs=yes
+>> +  else
+>> +    if test "$vxhs" = "yes" ; then
+>> +      feature_not_found "vxhs block device" "Install libvxhs See github"
+>> +    fi
+>> +    vxhs=no
+>> +  fi
+>> +fi
+>> +
+>> +##########################################
+>>  # End of CC checks
+>>  # After here, no more $cc or $ld runs
+>>
+>> @@ -5114,6 +5148,7 @@ echo "tcmalloc support  $tcmalloc"
+>>  echo "jemalloc support  $jemalloc"
+>>  echo "avx2 optimization $avx2_opt"
+>>  echo "replication support $replication"
+>> +echo "VxHS block device $vxhs"
+>>
+>>  if test "$sdl_too_old" = "yes"; then
+>>  echo "-> Your SDL version is too old - please upgrade to have SDL support"
+>> @@ -5729,6 +5764,12 @@ if test "$pthread_setname_np" = "yes" ; then
+>>    echo "CONFIG_PTHREAD_SETNAME_NP=y" >> $config_host_mak
+>>  fi
+>>
+>> +if test "$vxhs" = "yes" ; then
+>> +  echo "CONFIG_VXHS=y" >> $config_host_mak
+>> +  echo "VXHS_CFLAGS=$vxhs_cflags" >> $config_host_mak
+>> +  echo "VXHS_LIBS=$vxhs_libs" >> $config_host_mak
+>> +fi
+>> +
+>>  if test "$tcg_interpreter" = "yes"; then
+>>    QEMU_INCLUDES="-I\$(SRC_PATH)/tcg/tci $QEMU_INCLUDES"
+>>  elif test "$ARCH" = "sparc64" ; then
+>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> index 932f5bb..f37df56 100644
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -2110,6 +2110,7 @@
+>>  # @nfs: Since 2.8
+>>  # @replication: Since 2.8
+>>  # @ssh: Since 2.8
+>> +# @vxhs: Since 2.9
+>>  #
+>>  # Since: 2.0
+>>  ##
+>> @@ -2119,7 +2120,7 @@
+>>              'host_device', 'http', 'https', 'luks', 'nbd', 'nfs', 'null-aio',
+>>              'null-co', 'parallels', 'qcow', 'qcow2', 'qed', 'quorum', 'raw',
+>>              'replication', 'ssh', 'vdi', 'vhdx', 'vmdk', 'vpc',
+>> -            'vvfat' ] }
+>> +            'vvfat','vxhs' ] }
+>>
+>>  ##
+>>  # @BlockdevOptionsFile:
+>> @@ -2744,6 +2745,20 @@
+>>    'data': { '*offset': 'int', '*size': 'int' } }
+>>
+>>  ##
+>> +# @BlockdevOptionsVxHS:
+>> +#
+>> +# Driver specific block device options for VxHS
+>> +#
+>> +# @vdisk-id:    UUID of VxHS volume
+>> +# @server:      vxhs server IP, port
+>> +#
+>> +# Since: 2.9
+>> +##
+>> +{ 'struct': 'BlockdevOptionsVxHS',
+>> +  'data': { 'vdisk-id': 'str',
+>> +            'server': 'InetSocketAddress' } }
+>> +
+>> +##
+>>  # @BlockdevOptions:
+>>  #
+>>  # Options for creating a block device.  Many options are available for all
+>> @@ -2806,7 +2821,8 @@
+>>        'vhdx':       'BlockdevOptionsGenericFormat',
+>>        'vmdk':       'BlockdevOptionsGenericCOWFormat',
+>>        'vpc':        'BlockdevOptionsGenericFormat',
+>> -      'vvfat':      'BlockdevOptionsVVFAT'
+>> +      'vvfat':      'BlockdevOptionsVVFAT',
+>> +      'vxhs':       'BlockdevOptionsVxHS'
+>>    } }
+>>
+>>  ##
+>> --
+>> 1.8.3.1
+>>
