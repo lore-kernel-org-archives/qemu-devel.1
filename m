@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <juro.bystricky@intel.com>) id 1cbd0r-0002Wp-5K
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 19:55:12 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cbd23-0003F9-OW
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 19:56:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <juro.bystricky@intel.com>) id 1cbd0V-00015K-Oo
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 19:55:05 -0500
-Received: from mga14.intel.com ([192.55.52.115]:46500)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <juro.bystricky@intel.com>)
-	id 1cbd0V-00013X-Cb
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 19:54:43 -0500
-From: "Bystricky, Juro" <juro.bystricky@intel.com>
-Date: Thu, 9 Feb 2017 00:54:40 +0000
-Message-ID: <6E51916E4A1F32428260031F4C7CD2B6118FB1B4@ORSMSX112.amr.corp.intel.com>
-References: <1486595166-34097-1-git-send-email-juro.bystricky@intel.com>
-	<1486595166-34097-2-git-send-email-juro.bystricky@intel.com>
-	<4c51c959-fe9c-b27f-552a-84d8a2fe68c1@denx.de>
-In-Reply-To: <4c51c959-fe9c-b27f-552a-84d8a2fe68c1@denx.de>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <dgibson@ozlabs.org>) id 1cbd22-0001o2-Hu
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 19:56:19 -0500
+Date: Thu, 9 Feb 2017 11:56:09 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170209005609.GK17644@umbus.fritz.box>
+References: <1486578717-30324-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 1/1] nios2: Add Altera JTAG UART
- emulation
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="tBhgiDt8dP1efIIJ"
+Content-Disposition: inline
+In-Reply-To: <1486578717-30324-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/ppc/pnv: Remove superfluous "qemu"
+ prefix from error strings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,93 +24,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marek Vasut <marex@denx.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "crwulff@gmail.com" <crwulff@gmail.com>, "jurobystricky@hotmail.com" <jurobystricky@hotmail.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-PiBQbGVhc2UgbWFrZSB0aGUgY29tbWl0IG1lc3NhZ2UgYSBiaXQgbW9yZSB2ZXJib3NlLCBsb29r
-aW5nIGp1c3QgYXQgdGhlDQo+IGNvbW1pdCBtZXNzYWdlLCBJIGhhdmUgbm8gY2x1ZSB3aGF0IHBh
-dGNoIEknbSBsb29raW5nIGF0LiBUaGUgZW1iZWRkZWQNCj4gSVAgVUcgYWxzbyBoYXMgbGlrZSAz
-MCBjb3JlcyBpbiBpdCwgc28gc29tZSBkZXRhaWwgb24gd2hpY2ggY29yZSBhbmQgaW4NCj4gd2hp
-Y2ggY2hhcHRlci9wYWdlIHdvdWxkIGhlbHAuDQoNCk9LLCB3aWxsIGRvDQoNCj4gPiArICogVGhl
-IEFsdGVyYSBKVEFHIFVBUlQgaGFyZHdhcmUgcmVnaXN0ZXJzIGFyZSBkZXNjcmliZWQgaW46DQo+
-ID4gKyAqIGh0dHBzOi8vd3d3LmFsdGVyYS5jb20vZW5fVVMvcGRmcy9saXRlcmF0dXJlL3VnL3Vn
-X2VtYmVkZGVkX2lwLnBkZg0KPiA+ICsgKg0KPiANCj4gRHJvcCB0aGUgdHJhaWxpbmcgbmV3bGlu
-ZQ0KPiANCg0KT0ssIHdpbGwgZG8NCg0KPiA+ICtzdGF0aWMgdWludDY0X3QgYWx0ZXJhX2p1YXJ0
-X3JlYWQodm9pZCAqb3BhcXVlLCBod2FkZHIgYWRkciwgdW5zaWduZWQNCj4gaW50IHNpemUpDQo+
-ID4gK3sNCj4gPiArICAgIEFsdGVyYUpVQVJUU3RhdGUgKnMgPSBvcGFxdWU7DQo+ID4gKyAgICB1
-aW50MzJfdCByOw0KPiA+ICsNCj4gPiArICAgIGFkZHIgPj49IDI7DQo+IA0KPiBIbW1tbW0sIGhv
-dyB3aWxsIHVuYWxpZ25lZCByZWFkIGZyb20gb25lIG9mIHRoZXNlIHJlZ2lzdGVycyBiZSBoYW5k
-bGVkDQo+IG9uIHJlYWwgSFcgPyBpZS4gcmVhZCBmcm9tIGFkZHJlc3MgMHgzID8gV2hhdCBhYm91
-dCB3cml0ZXMgPw0KPiANCg0KdGhlcmUgaXMgbm8gcmVhZGluZy93cml0aW5nIGdvaW5nIG9uIHZp
-YSAiYWRkciIuIA0KVGhpcyBqdXN0IG1hcHMgdGhlIGh3IGFkZHJlc3MgaW50byByZWdpc3RlciBu
-dW1iZXIsIHdoZXJlIHJlZ2lzdGVycyBhcmUgYXQNCjQgYnl0ZXMgYm91bmRhcmllcyAoc28gdGhl
-eSBhcmUgYWxpZ25lZCBhcyBuZWVkZWQpIGJ1dCBpbmRleGVkIGFzIDEsMiwzLi4uLiANCihQcmV0
-dHkgY29tbW9uIGNvZGUgaW4gb3RoZXIgZHJpdmVycy4pDQpCdXQgd2lsbCByZWRvIHRoZSBjb2Rl
-IGFueXdheSBzbyB0aGVyZSBhcmUgbm8gc2hpZnRzLg0KDQoNCj4gPiArc3RhdGljIHZvaWQgYWx0
-ZXJhX2p1YXJ0X3dyaXRlKHZvaWQgKm9wYXF1ZSwgaHdhZGRyIGFkZHIsDQo+ID4gKyAgICAgICAg
-ICAgICAgICAgICAgICAgdWludDY0X3QgdmFsNjQsIHVuc2lnbmVkIGludCBzaXplKQ0KPiA+ICt7
-DQo+ID4gKyAgICBBbHRlcmFKVUFSVFN0YXRlICpzID0gb3BhcXVlOw0KPiA+ICsgICAgdWludDMy
-X3QgdmFsdWUgPSB2YWw2NDsNCj4gDQo+IElzIHRoaXMgbmVlZGVkID8NCg0KR29vZCBxdWVzdGlv
-bi4gTGVnYWN5IGNvZGUsIHByb2JhYmx5IG5vdCBuZWVkZWQgYW55bW9yZS4gU2FtZSBpbg0KZXh0
-cmF4ZnNfc2VyLmMsIFhpbGlueF91YXJ0bGl0ZS5jLCBzdG0zMmYyeHhfdXNhcnQuYy4NCkkgc3Vz
-cGVjdCBpbiB0aGUgcGFzdCBzb21lIGNvbXBpbGVyIGdlbmVyYXRlZCB3YXJuaW5ncyBhYm91dCB0
-eXBlIG1pc21hdGNoICgzMi82NCkuIFdpbGwgcmVtb3ZlLg0KDQo+IA0KPiA+ICsgICAgdW5zaWdu
-ZWQgY2hhciBjOw0KPiA+ICsNCj4gPiArICAgIGFkZHIgPj49IDI7DQo+ID4gKw0KPiA+ICsgICAg
-c3dpdGNoIChhZGRyKSB7DQo+ID4gKyAgICBjYXNlIFJfREFUQToNCj4gPiArICAgICAgICBjID0g
-dmFsdWUgJiAweEZGOw0KPiA+ICsgICAgICAgIC8qDQo+ID4gKyAgICAgICAgICogV2UgZG8gbm90
-IGRlY3JlbWVudCB0aGUgd3JpdGUgZmlmbywNCj4gPiArICAgICAgICAgKiB3ZSAidHJhbm1zbWl0
-IiBpbnN0YW50ZW5pb3VzbHksIENPTlRST0xfV0kgYWx3YXlzIGFzc2VydGVkDQo+ID4gKyAgICAg
-ICAgICovDQo+ID4gKyAgICAgICAgcy0+amNvbnRyb2wgfD0gQ09OVFJPTF9XSTsNCj4gPiArICAg
-ICAgICBzLT5qZGF0YSA9IGM7DQo+ID4gKyAgICAgICAgcWVtdV9jaHJfZmVfd3JpdGUoJnMtPmNo
-ciwgJmMsIDEpOw0KPiA+ICsgICAgICAgIGFsdGVyYV9qdWFydF91cGRhdGVfaXJxKHMpOw0KPiA+
-ICsgICAgICAgIGJyZWFrOw0KPiA+ICsNCj4gPiArICAgIGNhc2UgUl9DT05UUk9MOg0KPiA+ICsg
-ICAgICAgIC8qIE9ubHkgUkUgYW5kIFdFIGFyZSB3cml0YWJsZSAqLw0KPiA+ICsgICAgICAgIHZh
-bHVlICY9IENPTlRST0xfV01BU0s7DQo+ID4gKyAgICAgICAgcy0+amNvbnRyb2wgJj0gfihDT05U
-Uk9MX1dNQVNLKTsNCj4gDQo+IFRoZSBwYXJlbnRoZXNpcyBhcmUgbm90IG5lZWRlZC4NCg0KT0ss
-IHdpbGwgcmVtb3ZlIHRoZW0NCg0KPiANCj4gPiArc3RhdGljIHZvaWQgYWx0ZXJhX2p1YXJ0X3Jl
-Y2VpdmUodm9pZCAqb3BhcXVlLCBjb25zdCB1aW50OF90ICpidWYsIGludA0KPiBzaXplKQ0KPiA+
-ICt7DQo+ID4gKyAgICBpbnQgaTsNCj4gPiArICAgIEFsdGVyYUpVQVJUU3RhdGUgKnMgPSBvcGFx
-dWU7DQo+ID4gKw0KPiA+ICsgICAgaWYgKHMtPnJ4X2ZpZm9fbGVuID49IEZJRk9fTEVOR1RIKSB7
-DQo+ID4gKyAgICAgICAgZnByaW50ZihzdGRlcnIsICJXQVJOSU5HOiBVQVJUIGRyb3BwZWQgY2hh
-ci5cbiIpOw0KPiANCj4gQ2FuIHRoaXMgZXZlciBoYXBwZW4gPyBjYW5fcmVjZWl2ZSB3aWxsIElN
-TyBwcmV2ZW50IHRoaXMgY2FzZS4NCj4gDQoNCkZhaXIgcXVlc3Rpb24uIEkgZGlkIG5vdCBnbyB0
-aHJvdWdoIGFsbCBRRU1VIGNvZGUgdG8gc2VlIHdoZW4vd2hlcmUNCmluIHRoZSBib3dlbHMgb2Yg
-UUVNVSBjYW5fcmVjZWl2ZSBpcyBhY3R1YWxseSBjYWxsZWQuIElmIGl0IGlzIGFsd2F5cyBjYWxs
-ZWQgcHJpb3IgInJlY2VpdmUiLCB0aGVuIHRoaXMgY2hlY2sgbWF5IGJlIHJlZHVuZGFudC4gQWdh
-aW4sIHRoZXJlIGFyZQ0Kb3RoZXIgc2VyaWFsIGRyaXZlcnMgdGhhdCBkbyB0aGlzIGNoZWNrIGFz
-IHdlbGwgKGV0cmF4ZnMsIFhpbGlueCwuLi4pDQpCdXQgbW9zdCBkb24ndCwgc28gSSdsbCBmb2xs
-b3cgdGhlIG1ham9yaXR5IGFuZCByZW1vdmUgaXQuDQoNCj4gPiBkaWZmIC0tZ2l0IGEvaW5jbHVk
-ZS9ody9jaGFyL2FsdGVyYV9qdWFydC5oDQo+IGIvaW5jbHVkZS9ody9jaGFyL2FsdGVyYV9qdWFy
-dC5oDQo+ID4gbmV3IGZpbGUgbW9kZSAxMDA2NDQNCj4gPiBpbmRleCAwMDAwMDAwLi44YTljODky
-DQo+ID4gLS0tIC9kZXYvbnVsbA0KPiA+ICsrKyBiL2luY2x1ZGUvaHcvY2hhci9hbHRlcmFfanVh
-cnQuaA0KPiA+IEBAIC0wLDAgKzEsNDQgQEANCj4gPiArLyoNCj4gPiArICogQWx0ZXJhIEpUQUcg
-VUFSVCBlbXVsYXRpb24NCj4gPiArICoNCj4gPiArICogQ29weXJpZ2h0IChjKSAyMDE2LTIwMTcg
-SW50ZWwgQ29ycG9yYXRpb24uDQo+ID4gKyAqDQo+ID4gKyAqIFRoaXMgcHJvZ3JhbSBpcyBmcmVl
-IHNvZnR3YXJlOyB5b3UgY2FuIHJlZGlzdHJpYnV0ZSBpdCBhbmQvb3INCj4gPiArICogbW9kaWZ5
-IGl0IHVuZGVyIHRoZSB0ZXJtcyBvZiB0aGUgR05VIEdlbmVyYWwgUHVibGljIExpY2Vuc2UNCj4g
-PiArICogYXMgcHVibGlzaGVkIGJ5IHRoZSBGcmVlIFNvZnR3YXJlIEZvdW5kYXRpb247IGVpdGhl
-ciB2ZXJzaW9uDQo+ID4gKyAqIDIgb2YgdGhlIExpY2Vuc2UsIG9yIChhdCB5b3VyIG9wdGlvbikg
-YW55IGxhdGVyIHZlcnNpb24uDQo+ID4gKyAqDQo+ID4gKyAqIFlvdSBzaG91bGQgaGF2ZSByZWNl
-aXZlZCBhIGNvcHkgb2YgdGhlIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlDQo+IGFsb25nDQo+
-ID4gKyAqIHdpdGggdGhpcyBwcm9ncmFtOyBpZiBub3QsIHNlZSA8aHR0cDovL3d3dy5nbnUub3Jn
-L2xpY2Vuc2VzLz4uDQo+ID4gKyAqLw0KPiA+ICsNCj4gPiArI2lmbmRlZiBBTFRFUkFfSlVBUlRf
-SA0KPiA+ICsjZGVmaW5lIEFMVEVSQV9KVUFSVF9IDQo+ID4gKw0KPiA+ICsjaW5jbHVkZSAiaHcv
-c3lzYnVzLmgiDQo+ID4gKyNpbmNsdWRlICJzeXNlbXUvY2hhci5oIg0KPiA+ICsNCj4gPiArLyoN
-Cj4gPiArICogVGhlIHJlYWQgYW5kIHdyaXRlIEZJRk8gZGVwdGhzIGNhbiBiZSBzZXQgZnJvbSA4
-IHRvIDMyLDc2OCBieXRlcy4NCj4gPiArICogT25seSBwb3dlcnMgb2YgdHdvIGFyZSBhbGxvd2Vk
-LiBBIGRlcHRoIG9mIDY0IGlzIGdlbmVyYWxseSBvcHRpbWFsDQo+IGZvcg0KPiA+ICsgKiBwZXJm
-b3JtYW5jZSwgYW5kIGxhcmdlciB2YWx1ZXMgYXJlIHJhcmVseSBuZWNlc3NhcnkuDQo+ID4gKyAq
-Lw0KPiA+ICsNCj4gPiArI2RlZmluZSBGSUZPX0xFTkdUSCA2NA0KPiANCj4gU2hvdWxkIHByb2Jh
-Ymx5IGJlIGEgUU9NIHByb3BlcnR5LCBubyA/DQoNCkRpZCBub3Qgd2FudCB0byBtZXNzIHdpdGgg
-ZHluYW1pYyBGSUZPIGJ1ZmZlciBhbGxvY2F0aW9uLg0KDQoNCj4gDQo+ID4gK3R5cGVkZWYgc3Ry
-dWN0IEFsdGVyYUpVQVJUU3RhdGUgew0KPiA+ICsgICAgU3lzQnVzRGV2aWNlIGJ1c2RldjsNCj4g
-PiArICAgIE1lbW9yeVJlZ2lvbiBtbWlvOw0KPiA+ICsgICAgQ2hhckJhY2tlbmQgY2hyOw0KPiA+
-ICsgICAgcWVtdV9pcnEgaXJxOw0KPiA+ICsNCj4gPiArICAgIHVuc2lnbmVkIGludCByeF9maWZv
-X3BvczsNCj4gPiArICAgIHVuc2lnbmVkIGludCByeF9maWZvX2xlbjsNCj4gPiArICAgIHVpbnQz
-Ml90IGpkYXRhOw0KPiA+ICsgICAgdWludDMyX3QgamNvbnRyb2w7DQo+ID4gKyAgICB1aW50OF90
-IHJ4X2ZpZm9bRklGT19MRU5HVEhdOw0KPiA+ICt9IEFsdGVyYUpVQVJUU3RhdGU7DQo+ID4gKw0K
-PiA+ICt2b2lkIGFsdGVyYV9qdWFydF9jcmVhdGUoaW50IGNoYW5uZWwsIGNvbnN0IGh3YWRkciBh
-ZGRyLCBxZW11X2lycSBpcnEpOw0KPiA+ICsNCj4gPiArI2VuZGlmIC8qIEFMVEVSQV9KVUFSVF9I
-ICovDQo+ID4NCj4gYnR3IGZvciB0cml2aWFsIHBhdGNoZXMgbGlrZSB0aGlzLCBjb3ZlciBsZXR0
-ZXIgaXMgbm90IG5lY2Vzc2FyeSAuDQoNClRoYW5rcywgZ29vZCB0byBrbm93LCBtYWtlcyBsaWZl
-IGVhc2llcg0KSnVybw0K
+
+--tBhgiDt8dP1efIIJ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Feb 08, 2017 at 07:31:57PM +0100, Thomas Huth wrote:
+> error_report() already puts a prefix with the program name in front
+> of the error strings, so the "qemu:" prefix is not necessary here
+> anymore.
+>=20
+> Reported-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+
+Applied to ppc-for-2.9, thanks.
+
+> ---
+>  hw/ppc/pnv.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index 4fab5c0..09f0d22 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -381,7 +381,7 @@ static void ppc_powernv_init(MachineState *machine)
+> =20
+>      fw_size =3D load_image_targphys(fw_filename, FW_LOAD_ADDR, FW_MAX_SI=
+ZE);
+>      if (fw_size < 0) {
+> -        error_report("qemu: could not load OPAL '%s'", fw_filename);
+> +        error_report("Could not load OPAL '%s'", fw_filename);
+>          exit(1);
+>      }
+>      g_free(fw_filename);
+> @@ -393,7 +393,7 @@ static void ppc_powernv_init(MachineState *machine)
+>          kernel_size =3D load_image_targphys(machine->kernel_filename,
+>                                            KERNEL_LOAD_ADDR, 0x2000000);
+>          if (kernel_size < 0) {
+> -            error_report("qemu: could not load kernel'%s'",
+> +            error_report("Could not load kernel '%s'",
+>                           machine->kernel_filename);
+>              exit(1);
+>          }
+> @@ -405,7 +405,7 @@ static void ppc_powernv_init(MachineState *machine)
+>          pnv->initrd_size =3D load_image_targphys(machine->initrd_filenam=
+e,
+>                                    pnv->initrd_base, 0x10000000); /* 128M=
+B max */
+>          if (pnv->initrd_size < 0) {
+> -            error_report("qemu: could not load initial ram disk '%s'",
+> +            error_report("Could not load initial ram disk '%s'",
+>                           machine->initrd_filename);
+>              exit(1);
+>          }
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--tBhgiDt8dP1efIIJ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYm74nAAoJEGw4ysog2bOSjqkP/0+z4MFTXn735ibeT44u863p
+P86IvDIPRviHSbM3zUyFTPUUtNs3VwZ5K3DNekIFVsSXfKBBe4MtOHfwaiLym66y
+2yef2spa3/MFcOnylW9p0N9It2SA3b9+OkwSXyw4C/POumF+R8LicE2sWqq7ONuD
+zkxrsAeGUeP4i1TDHyOu8ZrttpCPfaawa6SdN0c/bdvfHIpvr7LRmXR5GLXxe+oP
+WVgp0CUwnMqnL22PziYnF50MSqiz1shEPtCCyPjvaYuTOTH3u8KXptEQuS3e0rIi
+ehorr5bKKhHgPnGvbRtv/QyR3BZl1aX2lneGH9wMu5rv5yNkWkuXH3MvjzTAvGSB
+RWHDKcrWER1CozsptPJEE5NZ9EiJgJAk81HxrNw2K7d8n9XR1YQazgmwIMTwG+vI
+Jbu+igO1WCarVbtT9qPSHfE9YgnKVn4Wkthb6A4VX610ZIqD0VChlICdBDnYmu26
+f2/DloHmd28kuePNW51FZZTiJjrxXWbZFLU2GEJfSAyXkYZmSrFttuXnl91A83PS
+/OYINTEGUL2m12wUZ4gOshPIxUmCO9szeonIUxK6g5c5i1QV3Z3DFrO/0KBAczvE
+zZv1hHC+D0ddfGJCj6hjm4DwJWGVdL7+ezmoi1h+j3GmtA5t8LFWSTOyKcH/dVfV
+yrKCxR+bQMJWhP+KNqKc
+=ZmU2
+-----END PGP SIGNATURE-----
+
+--tBhgiDt8dP1efIIJ--
