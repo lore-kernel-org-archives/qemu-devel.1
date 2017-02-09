@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cboLw-0008UK-R4
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:01:40 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cboLu-0008Sl-VI
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:01:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cboLs-00022i-UP
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:01:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40180)
+	(envelope-from <kraxel@redhat.com>) id 1cboLu-00023E-19
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:01:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36700)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cboLs-00022L-NE
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:01:32 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cboLt-00022q-SD
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:01:33 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CF989469
-	for <qemu-devel@nongnu.org>; Thu,  9 Feb 2017 13:01:32 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id EECD38553E
+	for <qemu-devel@nongnu.org>; Thu,  9 Feb 2017 13:01:33 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu,  9 Feb 2017 14:01:15 +0100
-Message-Id: <1486645277-4724-9-git-send-email-kraxel@redhat.com>
+Date: Thu,  9 Feb 2017 14:01:16 +0100
+Message-Id: <1486645277-4724-10-git-send-email-kraxel@redhat.com>
 In-Reply-To: <1486645277-4724-1-git-send-email-kraxel@redhat.com>
 References: <1486645277-4724-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 08/10] ui: let VNC server listen on all resolved
- IP addresses
+Subject: [Qemu-devel] [PULL 09/10] util: add iterators for QemuOpts values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,95 +34,76 @@ Cc: "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com
 
 From: "Daniel P. Berrange" <berrange@redhat.com>
 
-Remove the limitation that the VNC server can only listen on
-a single resolved IP address. This uses the new DNS resolver
-API to resolve a SocketAddress struct into an array of
-SocketAddress structs containing raw IP addresses. The VNC
-server will then attempt to listen on all resolved IP addresses.
-The server must successfully listen on at least one of the
-resolved IP addresses, otherwise an error will be reported.
+To iterate over all QemuOpts currently requires using a callback
+function which is inconvenient for control flow. Add support for
+using iterator functions more directly
+
+  QemuOptsIter iter;
+  QemuOpt *opt;
+
+  qemu_opts_iter_init(&iter, opts, "repeated-key");
+  while ((opt = qemu_opts_iter_next(&iter)) != NULL) {
+      ....do something...
+  }
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20170203120649.15637-7-berrange@redhat.com
+Message-id: 20170203120649.15637-8-berrange@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- ui/vnc.c | 52 +++++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 43 insertions(+), 9 deletions(-)
+ include/qemu/option.h |  9 +++++++++
+ util/qemu-option.c    | 19 +++++++++++++++++++
+ 2 files changed, 28 insertions(+)
 
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 49ce19a..36e50e7 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -45,6 +45,7 @@
- #include "crypto/tlscredsx509.h"
- #include "qom/object_interfaces.h"
- #include "qemu/cutils.h"
-+#include "io/dns-resolver.h"
+diff --git a/include/qemu/option.h b/include/qemu/option.h
+index 1f9e3f9..e786df0 100644
+--- a/include/qemu/option.h
++++ b/include/qemu/option.h
+@@ -100,6 +100,15 @@ typedef int (*qemu_opt_loopfunc)(void *opaque,
+ int qemu_opt_foreach(QemuOpts *opts, qemu_opt_loopfunc func, void *opaque,
+                      Error **errp);
  
- #define VNC_REFRESH_INTERVAL_BASE GUI_REFRESH_INTERVAL_DEFAULT
- #define VNC_REFRESH_INTERVAL_INC  50
-@@ -3698,19 +3699,52 @@ static int vnc_display_listen_addr(VncDisplay *vd,
-                                    size_t *nlsock,
-                                    Error **errp)
- {
--    *nlsock = 1;
--    *lsock = g_new0(QIOChannelSocket *, 1);
--    *lsock_tag = g_new0(guint, 1);
-+    QIODNSResolver *resolver = qio_dns_resolver_get_instance();
-+    SocketAddress **rawaddrs = NULL;
-+    size_t nrawaddrs = 0;
-+    Error *listenerr = NULL;
-+    size_t i;
- 
--    (*lsock)[0] = qio_channel_socket_new();
--    qio_channel_set_name(QIO_CHANNEL((*lsock)[0]), name);
--    if (qio_channel_socket_listen_sync((*lsock)[0], addr, errp) < 0) {
-+    if (qio_dns_resolver_lookup_sync(resolver, addr, &nrawaddrs,
-+                                     &rawaddrs, errp) < 0) {
-         return -1;
-     }
- 
--    (*lsock_tag)[0] = qio_channel_add_watch(
--        QIO_CHANNEL((*lsock)[0]),
--        G_IO_IN, vnc_listen_io, vd, NULL);
-+    for (i = 0; i < nrawaddrs; i++) {
-+        QIOChannelSocket *sioc = qio_channel_socket_new();
++typedef struct {
++    QemuOpts *opts;
++    QemuOpt *opt;
++    const char *name;
++} QemuOptsIter;
 +
-+        qio_channel_set_name(QIO_CHANNEL(sioc), name);
-+        if (qio_channel_socket_listen_sync(
-+                sioc, rawaddrs[i], listenerr == NULL ? &listenerr : NULL) < 0) {
-+            continue;
-+        }
-+        (*nlsock)++;
-+        *lsock = g_renew(QIOChannelSocket *, *lsock, *nlsock);
-+        *lsock_tag = g_renew(guint, *lsock_tag, *nlsock);
++void qemu_opt_iter_init(QemuOptsIter *iter, QemuOpts *opts, const char *name);
++const char *qemu_opt_iter_next(QemuOptsIter *iter);
 +
-+        (*lsock)[*nlsock - 1] = sioc;
-+        (*lsock_tag)[*nlsock - 1] = 0;
-+    }
-+
-+    for (i = 0; i < nrawaddrs; i++) {
-+        qapi_free_SocketAddress(rawaddrs[i]);
-+    }
-+    g_free(rawaddrs);
-+
-+    if (listenerr) {
-+        if (*nlsock == 0) {
-+            error_propagate(errp, listenerr);
-+            return -1;
-+        } else {
-+            error_free(listenerr);
-+        }
-+    }
-+
-+    for (i = 0; i < *nlsock; i++) {
-+        (*lsock_tag)[i] = qio_channel_add_watch(
-+            QIO_CHANNEL((*lsock)[i]),
-+            G_IO_IN, vnc_listen_io, vd, NULL);
-+    }
- 
-     return 0;
+ QemuOpts *qemu_opts_find(QemuOptsList *list, const char *id);
+ QemuOpts *qemu_opts_create(QemuOptsList *list, const char *id,
+                            int fail_if_exists, Error **errp);
+diff --git a/util/qemu-option.c b/util/qemu-option.c
+index 3467dc2..d611946 100644
+--- a/util/qemu-option.c
++++ b/util/qemu-option.c
+@@ -332,6 +332,25 @@ const char *qemu_opt_get(QemuOpts *opts, const char *name)
+     return opt ? opt->str : NULL;
  }
+ 
++void qemu_opt_iter_init(QemuOptsIter *iter, QemuOpts *opts, const char *name)
++{
++    iter->opts = opts;
++    iter->opt = QTAILQ_FIRST(&opts->head);
++    iter->name = name;
++}
++
++const char *qemu_opt_iter_next(QemuOptsIter *iter)
++{
++    QemuOpt *ret = iter->opt;
++    if (iter->name) {
++        while (ret && !g_str_equal(iter->name, ret->name)) {
++            ret = QTAILQ_NEXT(ret, next);
++        }
++    }
++    iter->opt = ret ? QTAILQ_NEXT(ret, next) : NULL;
++    return ret ? ret->str : NULL;
++}
++
+ /* Get a known option (or its default) and remove it from the list
+  * all in one action. Return a malloced string of the option value.
+  * Result must be freed by caller with g_free().
 -- 
 1.8.3.1
