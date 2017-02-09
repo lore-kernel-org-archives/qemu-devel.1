@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53396)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cbtDo-0000e4-Q0
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 13:13:33 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cbtI1-0003Db-FZ
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 13:17:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cbtDn-0001nt-LS
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 13:13:32 -0500
-Date: Thu, 9 Feb 2017 20:13:21 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170209201301-mutt-send-email-mst@kernel.org>
-References: <1486644810-33181-1-git-send-email-agraf@suse.de>
-	<70829774-a0c4-79ae-2eaf-cfac19e9dd7d@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <70829774-a0c4-79ae-2eaf-cfac19e9dd7d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] target-arm: Add some omitted dma
- cache coherency flags
+	(envelope-from <dgilbert@redhat.com>) id 1cbtHy-0003If-3E
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 13:17:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56218)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cbtHx-0003HO-Re
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 13:17:50 -0500
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Thu,  9 Feb 2017 18:17:46 +0000
+Message-Id: <20170209181746.29896-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH] migration: Update docs to discourage version
+ bumps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,66 +22,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Shannon Zhao <shannon.zhao@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: qemu-devel@nongnu.org, quintela@redhat.com
+Cc: peter.maydell@linaro.org
 
-On Thu, Feb 09, 2017 at 02:15:36PM +0100, Laszlo Ersek wrote:
-> On 02/09/17 13:53, Alexander Graf wrote:
-> > ARM is amazing when it comes to cache coherency and VMs. While any sane
-> > architecture allows the host to override the guest's caching attributes,
-> > that's very hard to do on ARM.
-> > 
-> > That means that the guest may directly access guest memory bypassing the
-> > cache while QEMU happily writes to / reads from cache. The end result is
-> > very nasty, because both sides see very different views of the world.
-> >  
-> > That means that we need to be very cautious to tell guests that devices
-> > that QEMU emulates are going to use data in the cache rather than directly
-> > on memory.
-> > 
-> > We added this to PCI a while back for DT (5d636e21 "hw/arm/virt: mark the PCIe
-> > host controller as DMA coherent in the DT") and ACPI (bc64b96 "hw/arm/virt-
-> > acpi-build: _CCA attribute is compulsory") but never updated virtio-mmio or
-> > fw-cfg in DT or ACPI tables.
-> > 
-> > This patch set adds the respective cache coherency flags for them in both DT and
-> > ACPI.
-> > 
-> > Fortunately, no guests except for Linux 4.9.7 and 4.9.8 are broken because of
-> > this. Upstream realized quickly enough that every user of virtio-mmio out there
-> > describes its cache coherency incorrectly and reverted the patch that would
-> > require said dma coherency flag. But we should be safe for the future and "do
-> > the right thing".
-> > 
-> > Alexander Graf (4):
-> >   target-arm: Declare virtio-mmio as dma-coherent in dt
-> >   hw/arm/virt: Declare virtio-mmio as dma cache coherent in ACPI
-> >   hw/arm/virt: Declare fwcfg as dma cache coherent in ACPI
-> >   hw/arm/virt: Declare fwcfg as dma cache coherent in dt
-> > 
-> >  hw/arm/vexpress.c        | 1 +
-> >  hw/arm/virt-acpi-build.c | 2 ++
-> >  hw/arm/virt.c            | 2 ++
-> >  3 files changed, 5 insertions(+)
-> > 
-> 
-> Famous last words:
-> series
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-> 
-> Should we replicate patch #3 to QEMU0002 / FWCF in
-> "hw/i386/acpi-build.c" too? Or is it that we couldn't care less about
-> _CCA on x86? :) (Can't really muster the energy right now to look it up
-> in the ACPI spec, sorry!)
-> 
-> Thanks
-> Laszlo
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-ACPI spec says:
-On platforms for which existing default cache-coherency behavior of the OS is not adequate, _CCA
-enables the OS to adapt to the differences
+Version bumps break backwards migration; update the docs
+to explain to people that's bad and how to avoid it.
 
-So I think we don't need it on x86.
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ docs/migration.txt | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
+diff --git a/docs/migration.txt b/docs/migration.txt
+index b462ead..f375f4b 100644
+--- a/docs/migration.txt
++++ b/docs/migration.txt
+@@ -161,6 +161,11 @@ include/hw/hw.h.
+ 
+ === More about versions ===
+ 
++Version numbers are intended for major incompatible changes to the
++migration of a device, and using them breaks backwards-migration
++compatibility; in general most changes can be made by adding Subsections
++(see below) or _TEST macros (see below) which won't break compatibility.
++
+ You can see that there are several version fields:
+ 
+ - version_id: the maximum version_id supported by VMState for that device.
+@@ -175,6 +180,9 @@ version_id.  And the function load_state_old() (if present) is able to
+ load state from minimum_version_id_old to minimum_version_id.  This
+ function is deprecated and will be removed when no more users are left.
+ 
++The VMState with the 'version_id' value will always be generated and thus
++can't be loaded by any older QEMU.
++
+ ===  Massaging functions ===
+ 
+ Sometimes, it is not enough to be able to save the state directly
+@@ -292,6 +300,40 @@ save/send this state when we are in the middle of a pio operation
+ not enabled, the values on that fields are garbage and don't need to
+ be sent.
+ 
++Using a condition function that checks a 'property' to determine whether
++to send a subsection allows backwards migration compatibility.
++For example;
++   a) Add a new property using DEFINE_PROP_BOOL - e.g. support-foo and
++      default it to true.
++   b) Add an entry to the HW_COMPAT_ for the previous version
++      that sets the property to false.
++   c) Add a static bool  support_foo function
++   d) Add a subsection with a .needed set to the support_foo function
++   e) (potentially) Add a pre_load that sets up a default value for 'foo'
++      to be used if the subsection isn't loaded.
++
++Now that subsection will not be generated when using an older
++machine type and the migration stream will be accepted by older
++QEMU versions.
++
++= Not sending existing elements =
++
++Sometimes members of the VMState are no longer needed;
++  removing them will break migration compatibility
++  making them version dependent and bumping the version will break backwards
++   migration compatibility.
++
++The best way is to:
++  a) Add a new property/compatibility/function in the same way for subsections
++    above.
++  b) replace the VMSTATE macro with the _TEST version of the macro, e.g.:
++     VMSTATE_UINT32(foo, barstruct)
++   becomes
++     VMSTATE_UINT32_TEST(foo, barstruct, pre_version_baz)
++
++  Sometime in the future when we no longer care about the ancient
++versions these can be killed off.
++
+ = Return path =
+ 
+ In most migration scenarios there is only a single data path that runs
 -- 
-MST
+2.9.3
