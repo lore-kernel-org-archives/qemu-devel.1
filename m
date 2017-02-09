@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cbzFD-0002Ml-2L
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 19:39:24 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cbzF6-0002Jh-TP
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 19:39:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cbzF9-000675-31
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 19:39:23 -0500
-Date: Fri, 10 Feb 2017 11:28:57 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1cbzF6-00064w-4Y
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 19:39:16 -0500
+Date: Fri, 10 Feb 2017 10:58:33 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170210002857.GO27610@umbus.fritz.box>
-References: <1486636445-24109-1-git-send-email-nikunj@linux.vnet.ibm.com>
+Message-ID: <20170209235833.GI27610@umbus.fritz.box>
+References: <1486618411-7018-1-git-send-email-nikunj@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="xexMVKTdXPhpRiVT"
+	protocol="application/pgp-signature"; boundary="svExV93C05KqedWb"
 Content-Disposition: inline
-In-Reply-To: <1486636445-24109-1-git-send-email-nikunj@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 0/6] POWER9 TCG enablements - part15
+In-Reply-To: <1486618411-7018-1-git-send-email-nikunj@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v1 0/2] POWER9 TCG enablements - part14
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +27,31 @@ To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 Cc: qemu-ppc@nongnu.org, rth@twiddle.net, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
 
---xexMVKTdXPhpRiVT
+--svExV93C05KqedWb
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 09, 2017 at 04:03:59PM +0530, Nikunj A Dadhania wrote:
-> This series contains 6 new instructions for POWER9 ISA3.0
-
-I've merged 1-4, 5 has comments.
-
+On Thu, Feb 09, 2017 at 11:03:29AM +0530, Nikunj A Dadhania wrote:
+> This series contains 4 new instructions for POWER9 ISA3.0
+>     Load/Store Atomic instructions
 >=20
-> Nikunj A Dadhania (6):
->   target-ppc: generate exception for copy/paste
->   target-ppc: add slbieg instruction
->   target-ppc: add slbsync implementation
->   target-ppc: add wait instruction
->   target-ppc: support for 32-bit carry and overflow
->   target-ppc: add mcrxrx instruction
+> Changelog:
+> v0:
+>    Raise invalid execption for function codes that are not implemented,=
+=20
+>    and data storage execption for invalid function codes.
 >=20
->  target/ppc/cpu.h        | 26 ++++++++++++++++++
->  target/ppc/helper.h     |  1 +
->  target/ppc/mmu-hash64.c | 16 +++++++++--
->  target/ppc/translate.c  | 72 +++++++++++++++++++++++++++++++++++++++++++=
+> Balamuruhan S (2):
+>   target-ppc: implement load atomic instruction
+>   target-ppc: implement store atomic instruction
+>=20
+>  target/ppc/internal.h  |   2 +
+>  target/ppc/translate.c | 111 +++++++++++++++++++++++++++++++++++++++++++=
 ++++++
->  4 files changed, 113 insertions(+), 2 deletions(-)
->=20
+>  2 files changed, 113 insertions(+)
+
+Applied to ppc-for-2.9.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -60,25 +59,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---xexMVKTdXPhpRiVT
+--svExV93C05KqedWb
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYnQlIAAoJEGw4ysog2bOS0QQP/0+lNne2z9Nc6QGTvQihxhSI
-kgairn7AlH5OKY5wxlAy8rBWnYYtCbWEF3UG6qy2J2mbOtfSyM9rrt3lhcJwQ3C/
-pc4qfTKzBwPPf4XgIVtREYU8IVb5S7OVUF63sUMT7THof2hyGVyfj0fsgV97bx0o
-6nPFJVLYhdHG3riBZooIf4NLlvg0ghOA0fUZU5fMS65z3e4LNj54GXJj65IbAex5
-AJXKTWceu+muIkmmb7GQ71RrvZe6YQRw0ITa/Bpb3+OX5UL7MjCOCZagti3BrUi6
-oj9LelwZLF68U704jOJXMLd8wMbE4u+PBTOe1cNA4m7dGXf6ng87vEwknvdlEBQn
-ko5zeVeAW0Ah8yldk6qif7aX8oHJewcScg0Ace107cZpNvFkl/ormYyuDU+HuGU2
-NXstMBOg/5X6reXPwwlQCovqoCFZHmB5B0i6IKgT67vSQbzKstBj7sSaAbfcHbTl
-ee9jRRLpuWo6PDzUN3aTNLE/ExVNZt40e+0cif0y4dqEpbj047RDwToDrjBx4HY8
-aNJA4qenLVMtvRD2rW6JeOE88+0IyD2AbUsqMd97X0uuzvBhriZ1JrumLyGzT/m8
-+wU5ClHtrmNmHynegQB7IfsdtfNOpho99Vm9IFIdinCLnO6J2n6a/pBjncNORLdg
-4p78R7/WKzpDN2OakCDh
-=dBCn
+iQIcBAEBCAAGBQJYnQIpAAoJEGw4ysog2bOST4kQAIRfFyfppktSGet0rtJKl5tY
+7FiJLeppByDUohZQqy2yIuEF3oy6UNuDdjAdM0OBRpxcUYkk6eLn4+PzRfW+5HRE
+gSYqr76/3AUUD5s1OW/5RoPVm8cBNhkjO5h/QMIOye4736yImgzOJ7y4zhRuNxfC
+YjA6VPbxiVfL0TLmk3Z3YFAhgm2x1m7RpxK+PwQrsDJq8quIRtXjTyTNmsrBS093
+TWrX9dCVgACBfa68Pg7d076kYkv5YBu3hlBJzUXAxupJZI+GSg5eLliAIFh5heK1
+1de9MDiaLMi3uLKPVfhtb0bkSKdep0V9keT/68TckCnHjIBkXAdBe3hctt0ljxNI
+7zq6Sc3/bTnQ/yBBTijHDTS3eraAg33ZeDBKwg/JYDEZlJmKwAqDUO9FdTVCO7nI
+yp09puqRWVAIRzBNBliggYz1uMqN4Ue75Tpk7dN7rhKfxWIt5MuLliHf9hlDx5VV
+KVA+JmxWTMVGe2VRP0U2gl5uTG2Vtr8WBoD/sUDfHm3R1OQX+IEWm2fH7HhWGuUj
+pT3scK0cGWJbx36AtsGPVQBSLK8D0Td9Wh8r/E5gNmfI6BN+7282UYFqbE7WmxE2
+3mFhPMaUr/FL/WrBWUjk/NynhyyF3kVKuN4TPLbsO5ITFWDxzdHknkWL3+EhqgS+
+CxXW+wYjC2SXakbz5AFp
+=LaMG
 -----END PGP SIGNATURE-----
 
---xexMVKTdXPhpRiVT--
+--svExV93C05KqedWb--
