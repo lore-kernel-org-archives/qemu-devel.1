@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33899)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cboM3-0000AO-Cl
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:01:48 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cboM7-0000DD-GL
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:01:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cboLy-00024y-Iu
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:01:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47640)
+	(envelope-from <kraxel@redhat.com>) id 1cboM3-00025w-BZ
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:01:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55908)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cboLy-00024s-9w
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:01:38 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cboM3-00025Y-2K
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:01:43 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 69C0DD1FF6
-	for <qemu-devel@nongnu.org>; Thu,  9 Feb 2017 13:01:38 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 14590274877
+	for <qemu-devel@nongnu.org>; Thu,  9 Feb 2017 13:01:43 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu,  9 Feb 2017 14:01:13 +0100
-Message-Id: <1486645277-4724-7-git-send-email-kraxel@redhat.com>
+Date: Thu,  9 Feb 2017 14:01:11 +0100
+Message-Id: <1486645277-4724-5-git-send-email-kraxel@redhat.com>
 In-Reply-To: <1486645277-4724-1-git-send-email-kraxel@redhat.com>
 References: <1486645277-4724-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 06/10] ui: refactor code for populating
- SocketAddress from vnc_display_open
+Subject: [Qemu-devel] [PULL 04/10] ui: fix reporting of VNC auth in
+ query-vnc-servers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,408 +31,292 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
 From: "Daniel P. Berrange" <berrange@redhat.com>
 
-The code which interprets the CLI args to populate the SocketAddress
-objects for plain & websockets VNC is quite complex already and will
-need further enhancements shortly. Refactor it into separate methods
-to avoid vnc_display_open getting even larger. As a side effect of
-the refactoring, it is now possible to specify a listen address for
-the websocket server explicitly. e.g,
+Currently the VNC authentication info is emitted at the
+top level of the query-vnc-servers data. This is wrong
+because the authentication scheme differs between plain
+and websockets when TLS is enabled. We should instead
+report auth against the individual servers. e.g.
 
-  -vnc localhost:5900,websockets=0.0.0.0:8080
+(QEMU) query-vnc-servers
+{
+    "return": [
+        {
+            "clients": [],
+            "id": "default",
+            "auth": "vencrypt",
+            "vencrypt": "x509-vnc",
+            "server": [
+                {
+                    "host": "127.0.0.1"
+                    "service": "5901",
+                    "websocket": false,
+                    "family": "ipv4",
+                    "auth": "vencrypt",
+                    "vencrypt": "x509-vnc"
+                },
+                {
+                    "host": "127.0.0.1",
+                    "service": "5902",
+                    "websocket": true,
+                    "family": "ipv4",
+                    "auth": "vnc"
+                }
+            ]
+        }
+    ]
+}
 
-will listen on localhost for the plain VNC server, but expose the
-websockets VNC server on the public interface. This refactoring
-also removes the restriction that prevents enabling websockets
-when the plain VNC server is listening on a UNIX socket.
+This also future proofs the QMP schema so that we can
+cope with multiple VNC server instances, listening on
+different interfaces or ports, with different auth
+setup.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20170203120649.15637-5-berrange@redhat.com
+Message-id: 20170203120649.15637-3-berrange@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- qemu-options.hx |  12 ++-
- ui/vnc.c        | 282 ++++++++++++++++++++++++++++++++++++--------------------
- 2 files changed, 189 insertions(+), 105 deletions(-)
+ qapi-schema.json | 28 ++++++++++++++++---
+ ui/vnc.c         | 85 +++++++++++++++++++++++++++++++++-----------------------
+ 2 files changed, 74 insertions(+), 39 deletions(-)
 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index ad2f8fc..ac036b4 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -1296,10 +1296,14 @@ is a TCP port number, not a display number.
- @item websocket
+diff --git a/qapi-schema.json b/qapi-schema.json
+index cbdffdd..61151f3 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -1506,7 +1506,8 @@
+ #
+ # The network connection information for server
+ #
+-# @auth: #optional authentication method
++# @auth: #optional authentication method used for
++#        the plain (non-websocket) VNC server
+ #
+ # Since: 2.1
+ ##
+@@ -1597,6 +1598,25 @@
+             'tls-plain', 'x509-plain',
+             'tls-sasl',  'x509-sasl' ] }
  
- Opens an additional TCP listening port dedicated to VNC Websocket connections.
--By definition the Websocket port is 5700+@var{display}. If @var{host} is
--specified connections will only be allowed from this host.
--As an alternative the Websocket port could be specified by using
--@code{websocket}=@var{port}.
-+If a bare @var{websocket} option is given, the Websocket port is
-+5700+@var{display}. An alternative port can be specified with the
-+syntax @code{websocket}=@var{port}.
 +
-+If @var{host} is specified connections will only be allowed from this host.
-+It is possible to control the websocket listen address independently, using
-+the syntax @code{websocket}=@var{host}:@var{port}.
++##
++# @VncServerInfo2:
++#
++# The network connection information for server
++#
++# @auth: The current authentication type used by the servers
++#
++# @vencrypt: #optional The vencrypt sub authentication type used by the
++#            servers, only specified in case auth == vencrypt.
++#
++# Since: 2.9
++##
++{ 'struct': 'VncServerInfo2',
++  'base': 'VncBasicInfo',
++  'data': { 'auth'      : 'VncPrimaryAuth',
++            '*vencrypt' : 'VncVencryptSubAuth' } }
 +
- If no TLS credentials are provided, the websocket connection runs in
- unencrypted mode. If TLS credentials are provided, the websocket connection
- requires encrypted client connections.
++
+ ##
+ # @VncInfo2:
+ #
+@@ -1612,9 +1632,9 @@
+ # @clients: A list of @VncClientInfo of all currently connected clients.
+ #           The list can be empty, for obvious reasons.
+ #
+-# @auth: The current authentication type used by the server
++# @auth: The current authentication type used by the non-websockets servers
+ #
+-# @vencrypt: #optional The vencrypt sub authentication type used by the server,
++# @vencrypt: #optional The vencrypt authentication type used by the servers,
+ #            only specified in case auth == vencrypt.
+ #
+ # @display: #optional The display device the vnc server is linked to.
+@@ -1623,7 +1643,7 @@
+ ##
+ { 'struct': 'VncInfo2',
+   'data': { 'id'        : 'str',
+-            'server'    : ['VncBasicInfo'],
++            'server'    : ['VncServerInfo2'],
+             'clients'   : ['VncClientInfo'],
+             'auth'      : 'VncPrimaryAuth',
+             '*vencrypt' : 'VncVencryptSubAuth',
 diff --git a/ui/vnc.c b/ui/vnc.c
-index 52df32d..2f444ba 100644
+index b0889b1..d0a08a7 100644
 --- a/ui/vnc.c
 +++ b/ui/vnc.c
-@@ -3495,6 +3495,178 @@ vnc_display_create_creds(bool x509,
+@@ -429,12 +429,20 @@ out_error:
+     return NULL;
  }
  
- 
-+static int vnc_display_get_address(const char *addrstr,
-+                                   bool websocket,
-+                                   int displaynum,
-+                                   int to,
-+                                   bool has_ipv4,
-+                                   bool has_ipv6,
-+                                   bool ipv4,
-+                                   bool ipv6,
-+                                   SocketAddress **retaddr,
-+                                   Error **errp)
-+{
-+    int ret = -1;
-+    SocketAddress *addr = NULL;
+-static VncBasicInfoList *qmp_query_server_entry(QIOChannelSocket *ioc,
+-                                                bool websocket,
+-                                                VncBasicInfoList *prev)
 +
-+    addr = g_new0(SocketAddress, 1);
++static void qmp_query_auth(int auth, int subauth,
++                           VncPrimaryAuth *qmp_auth,
++                           VncVencryptSubAuth *qmp_vencrypt,
++                           bool *qmp_has_vencrypt);
 +
-+    if (strncmp(addrstr, "unix:", 5) == 0) {
-+        addr->type = SOCKET_ADDRESS_KIND_UNIX;
-+        addr->u.q_unix.data = g_new0(UnixSocketAddress, 1);
-+        addr->u.q_unix.data->path = g_strdup(addrstr + 5);
-+
-+        if (websocket) {
-+            error_setg(errp, "UNIX sockets not supported with websock");
-+            goto cleanup;
-+        }
-+
-+        if (to) {
-+            error_setg(errp, "Port range not support with UNIX socket");
-+            goto cleanup;
-+        }
-+        ret = 0;
-+    } else {
-+        const char *port;
-+        size_t hostlen;
-+        unsigned long long baseport;
-+        InetSocketAddress *inet;
-+
-+        port = strrchr(addrstr, ':');
-+        if (!port) {
-+            if (websocket) {
-+                hostlen = 0;
-+                port = addrstr;
-+            } else {
-+                error_setg(errp, "no vnc port specified");
-+                goto cleanup;
-+            }
-+        } else {
-+            hostlen = port - addrstr;
-+            port++;
-+            if (*port == '\0') {
-+                error_setg(errp, "vnc port cannot be empty");
-+                goto cleanup;
-+            }
-+        }
-+
-+        addr->type = SOCKET_ADDRESS_KIND_INET;
-+        inet = addr->u.inet.data = g_new0(InetSocketAddress, 1);
-+        if (addrstr[0] == '[' && addrstr[hostlen - 1] == ']') {
-+            inet->host = g_strndup(addrstr + 1, hostlen - 2);
-+        } else {
-+            inet->host = g_strndup(addrstr, hostlen);
-+        }
-+        /* plain VNC port is just an offset, for websocket
-+         * port is absolute */
-+        if (websocket) {
-+            if (g_str_equal(addrstr, "") ||
-+                g_str_equal(addrstr, "on")) {
-+                inet->port = g_strdup_printf(
-+                    "%d", displaynum + 5700);
-+                if (to) {
-+                    inet->has_to = true;
-+                    inet->to = to + 5700;
-+                }
-+            } else {
-+                inet->port = g_strdup(port);
-+            }
-+        } else {
-+            if (parse_uint_full(port, &baseport, 10) < 0) {
-+                error_setg(errp, "can't convert to a number: %s", port);
-+                goto cleanup;
-+            }
-+            if (baseport > 65535 ||
-+                baseport + 5900 > 65535) {
-+                error_setg(errp, "port %s out of range", port);
-+                goto cleanup;
-+            }
-+            inet->port = g_strdup_printf(
-+                "%d", (int)baseport + 5900);
-+
-+            if (to) {
-+                inet->has_to = true;
-+                inet->to = to + 5900;
-+            }
-+        }
-+
-+        inet->ipv4 = ipv4;
-+        inet->has_ipv4 = has_ipv4;
-+        inet->ipv6 = ipv6;
-+        inet->has_ipv6 = has_ipv6;
-+
-+        ret = baseport;
-+    }
-+
-+    *retaddr = addr;
-+
-+ cleanup:
-+    if (ret < 0) {
-+        qapi_free_SocketAddress(addr);
-+    }
-+    return ret;
-+}
-+
-+static int vnc_display_get_addresses(QemuOpts *opts,
-+                                     SocketAddress **retsaddr,
-+                                     SocketAddress **retwsaddr,
-+                                     Error **errp)
-+{
-+    SocketAddress *saddr = NULL;
-+    SocketAddress *wsaddr = NULL;
-+    const char *saddrstr = qemu_opt_get(opts, "vnc");
-+    const char *wsaddrstr = qemu_opt_get(opts, "websocket");
-+    int to = qemu_opt_get_number(opts, "to", 0);
-+    bool has_ipv4 = qemu_opt_get(opts, "ipv4");
-+    bool has_ipv6 = qemu_opt_get(opts, "ipv6");
-+    bool ipv4 = qemu_opt_get_bool(opts, "ipv4", false);
-+    bool ipv6 = qemu_opt_get_bool(opts, "ipv6", false);
-+
-+    if (!saddrstr || strcmp(saddrstr, "none") == 0) {
-+        *retsaddr = NULL;
-+        *retwsaddr = NULL;
-+        return 0;
-+    }
-+
-+    if (wsaddrstr &&
-+        !qcrypto_hash_supports(QCRYPTO_HASH_ALG_SHA1)) {
-+        error_setg(errp,
-+                   "SHA1 hash support is required for websockets");
-+        goto error;
-+    }
-+
-+    int displaynum = vnc_display_get_address(saddrstr, false, 0, to,
-+                                             has_ipv4, has_ipv6,
-+                                             ipv4, ipv6,
-+                                             &saddr, errp);
-+    if (displaynum < 0) {
-+        goto error;
-+    }
-+    if (wsaddrstr) {
-+        if (vnc_display_get_address(wsaddrstr, true, displaynum, to,
-+                                    has_ipv4, has_ipv6,
-+                                    ipv4, ipv6,
-+                                    &wsaddr, errp) < 0) {
-+            goto error;
-+        }
-+        if (saddr->type == SOCKET_ADDRESS_KIND_INET &&
-+            wsaddr->type == SOCKET_ADDRESS_KIND_INET &&
-+            g_str_equal(wsaddr->u.inet.data->host, "") &&
-+            !g_str_equal(saddr->u.inet.data->host, "")) {
-+            g_free(wsaddr->u.inet.data->host);
-+            wsaddr->u.inet.data->host = g_strdup(saddr->u.inet.data->host);
-+        }
-+    }
-+    *retsaddr = saddr;
-+    *retwsaddr = wsaddr;
-+    return 0;
-+
-+ error:
-+    qapi_free_SocketAddress(saddr);
-+    qapi_free_SocketAddress(wsaddr);
-+    return -1;
-+}
-+
- void vnc_display_open(const char *id, Error **errp)
++static VncServerInfo2List *qmp_query_server_entry(QIOChannelSocket *ioc,
++                                                  bool websocket,
++                                                  int auth,
++                                                  int subauth,
++                                                  VncServerInfo2List *prev)
  {
-     VncDisplay *vd = vnc_display_find(id);
-@@ -3504,10 +3676,7 @@ void vnc_display_open(const char *id, Error **errp)
-     QemuConsole *con;
-     bool password = false;
-     bool reverse = false;
--    const char *vnc;
--    char *h;
-     const char *credid;
--    int show_vnc_port = 0;
-     bool sasl = false;
- #ifdef CONFIG_VNC_SASL
-     int saslErr;
-@@ -3515,7 +3684,6 @@ void vnc_display_open(const char *id, Error **errp)
-     int acl = 0;
-     int lock_key_sync = 1;
-     int key_delay_ms;
--    bool ws_enabled = false;
+-    VncBasicInfoList *list;
+-    VncBasicInfo *info;
++    VncServerInfo2List *list;
++    VncServerInfo2 *info;
+     Error *err = NULL;
+     SocketAddress *addr;
  
-     if (!vd) {
-         error_setg(errp, "VNC display not active");
-@@ -3526,102 +3694,15 @@ void vnc_display_open(const char *id, Error **errp)
-     if (!opts) {
-         return;
-     }
--    vnc = qemu_opt_get(opts, "vnc");
--    if (!vnc || strcmp(vnc, "none") == 0) {
--        return;
--    }
- 
--    h = strrchr(vnc, ':');
--    if (h) {
--        size_t hlen = h - vnc;
--
--        const char *websocket = qemu_opt_get(opts, "websocket");
--        int to = qemu_opt_get_number(opts, "to", 0);
--        bool has_ipv4 = qemu_opt_get(opts, "ipv4");
--        bool has_ipv6 = qemu_opt_get(opts, "ipv6");
--        bool ipv4 = qemu_opt_get_bool(opts, "ipv4", false);
--        bool ipv6 = qemu_opt_get_bool(opts, "ipv6", false);
--
--        saddr = g_new0(SocketAddress, 1);
--        if (websocket) {
--            if (!qcrypto_hash_supports(QCRYPTO_HASH_ALG_SHA1)) {
--                error_setg(errp,
--                           "SHA1 hash support is required for websockets");
--                goto fail;
--            }
--
--            wsaddr = g_new0(SocketAddress, 1);
--            ws_enabled = true;
--        }
--
--        if (strncmp(vnc, "unix:", 5) == 0) {
--            saddr->type = SOCKET_ADDRESS_KIND_UNIX;
--            saddr->u.q_unix.data = g_new0(UnixSocketAddress, 1);
--            saddr->u.q_unix.data->path = g_strdup(vnc + 5);
--
--            if (ws_enabled) {
--                error_setg(errp, "UNIX sockets not supported with websock");
--                goto fail;
--            }
--        } else {
--            unsigned long long baseport;
--            InetSocketAddress *inet;
--            saddr->type = SOCKET_ADDRESS_KIND_INET;
--            inet = saddr->u.inet.data = g_new0(InetSocketAddress, 1);
--            if (vnc[0] == '[' && vnc[hlen - 1] == ']') {
--                inet->host = g_strndup(vnc + 1, hlen - 2);
--            } else {
--                inet->host = g_strndup(vnc, hlen);
--            }
--            if (parse_uint_full(h + 1, &baseport, 10) < 0) {
--                error_setg(errp, "can't convert to a number: %s", h + 1);
--                goto fail;
--            }
--            if (baseport > 65535 ||
--                baseport + 5900 > 65535) {
--                error_setg(errp, "port %s out of range", h + 1);
--                goto fail;
--            }
--            inet->port = g_strdup_printf(
--                "%d", (int)baseport + 5900);
--
--            if (to) {
--                inet->has_to = true;
--                inet->to = to + 5900;
--                show_vnc_port = 1;
--            }
--            inet->ipv4 = ipv4;
--            inet->has_ipv4 = has_ipv4;
--            inet->ipv6 = ipv6;
--            inet->has_ipv6 = has_ipv6;
--
--            if (ws_enabled) {
--                wsaddr->type = SOCKET_ADDRESS_KIND_INET;
--                inet = wsaddr->u.inet.data = g_new0(InetSocketAddress, 1);
--                inet->host = g_strdup(saddr->u.inet.data->host);
--                if (g_str_equal(websocket, "") ||
--                    g_str_equal(websocket, "on")) {
--                    inet->port = g_strdup_printf(
--                        "%d", (int)baseport + 5700);
--                } else {
--                    inet->port = g_strdup(websocket);
--                }
--
--                if (to) {
--                    inet->has_to = true;
--                    inet->to = to;
--                }
--                inet->ipv4 = ipv4;
--                inet->has_ipv4 = has_ipv4;
--                inet->ipv6 = ipv6;
--                inet->has_ipv6 = has_ipv6;
--            }
--        }
--    } else {
--        error_setg(errp, "no vnc port specified");
-+    if (vnc_display_get_addresses(opts, &saddr, &wsaddr, errp) < 0) {
-         goto fail;
+@@ -444,85 +452,91 @@ static VncBasicInfoList *qmp_query_server_entry(QIOChannelSocket *ioc,
+         return prev;
      }
  
-+    if (saddr == NULL) {
-+        return;
-+    }
+-    info = g_new0(VncBasicInfo, 1);
+-    vnc_init_basic_info(addr, info, &err);
++    info = g_new0(VncServerInfo2, 1);
++    vnc_init_basic_info(addr, qapi_VncServerInfo2_base(info), &err);
+     qapi_free_SocketAddress(addr);
+     if (err) {
+-        qapi_free_VncBasicInfo(info);
++        qapi_free_VncServerInfo2(info);
+         error_free(err);
+         return prev;
+     }
+     info->websocket = websocket;
+ 
+-    list = g_new0(VncBasicInfoList, 1);
++    qmp_query_auth(auth, subauth, &info->auth,
++                   &info->vencrypt, &info->has_vencrypt);
 +
-     password = qemu_opt_get_bool(opts, "password", false);
-     if (password) {
-         if (fips_get_state()) {
-@@ -3810,7 +3891,7 @@ void vnc_display_open(const char *id, Error **errp)
-     if (reverse) {
-         /* connect to viewer */
-         QIOChannelSocket *sioc = NULL;
--        if (ws_enabled) {
-+        if (wsaddr) {
-             error_setg(errp, "Cannot use websockets in reverse mode");
-             goto fail;
-         }
-@@ -3834,7 +3915,7 @@ void vnc_display_open(const char *id, Error **errp)
-         }
-         vd->is_unix = saddr->type == SOCKET_ADDRESS_KIND_UNIX;
- 
--        if (ws_enabled) {
-+        if (wsaddr) {
-             vd->nlwebsock = 1;
-             vd->lwebsock = g_new0(QIOChannelSocket *, 1);
-             vd->lwebsock_tag = g_new0(guint, 1);
-@@ -3850,14 +3931,14 @@ void vnc_display_open(const char *id, Error **errp)
-         vd->lsock_tag[0] = qio_channel_add_watch(
-             QIO_CHANNEL(vd->lsock[0]),
-             G_IO_IN, vnc_listen_io, vd, NULL);
--        if (ws_enabled) {
-+        if (wsaddr) {
-             vd->lwebsock_tag[0] = qio_channel_add_watch(
-                 QIO_CHANNEL(vd->lwebsock[0]),
-                 G_IO_IN, vnc_listen_io, vd, NULL);
-         }
-     }
- 
--    if (show_vnc_port) {
-+    if (qemu_opt_get(opts, "to")) {
-         vnc_display_print_local_addr(vd);
-     }
- 
-@@ -3869,7 +3950,6 @@ fail:
-     vnc_display_close(vd);
-     qapi_free_SocketAddress(saddr);
-     qapi_free_SocketAddress(wsaddr);
--    ws_enabled = false;
++    list = g_new0(VncServerInfo2List, 1);
+     list->value = info;
+     list->next = prev;
+     return list;
  }
  
- void vnc_display_add_client(const char *id, int csock, bool skipauth)
+-static void qmp_query_auth(VncDisplay *vd, VncInfo2 *info)
++static void qmp_query_auth(int auth, int subauth,
++                           VncPrimaryAuth *qmp_auth,
++                           VncVencryptSubAuth *qmp_vencrypt,
++                           bool *qmp_has_vencrypt)
+ {
+-    switch (vd->auth) {
++    switch (auth) {
+     case VNC_AUTH_VNC:
+-        info->auth = VNC_PRIMARY_AUTH_VNC;
++        *qmp_auth = VNC_PRIMARY_AUTH_VNC;
+         break;
+     case VNC_AUTH_RA2:
+-        info->auth = VNC_PRIMARY_AUTH_RA2;
++        *qmp_auth = VNC_PRIMARY_AUTH_RA2;
+         break;
+     case VNC_AUTH_RA2NE:
+-        info->auth = VNC_PRIMARY_AUTH_RA2NE;
++        *qmp_auth = VNC_PRIMARY_AUTH_RA2NE;
+         break;
+     case VNC_AUTH_TIGHT:
+-        info->auth = VNC_PRIMARY_AUTH_TIGHT;
++        *qmp_auth = VNC_PRIMARY_AUTH_TIGHT;
+         break;
+     case VNC_AUTH_ULTRA:
+-        info->auth = VNC_PRIMARY_AUTH_ULTRA;
++        *qmp_auth = VNC_PRIMARY_AUTH_ULTRA;
+         break;
+     case VNC_AUTH_TLS:
+-        info->auth = VNC_PRIMARY_AUTH_TLS;
++        *qmp_auth = VNC_PRIMARY_AUTH_TLS;
+         break;
+     case VNC_AUTH_VENCRYPT:
+-        info->auth = VNC_PRIMARY_AUTH_VENCRYPT;
+-        info->has_vencrypt = true;
+-        switch (vd->subauth) {
++        *qmp_auth = VNC_PRIMARY_AUTH_VENCRYPT;
++        *qmp_has_vencrypt = true;
++        switch (subauth) {
+         case VNC_AUTH_VENCRYPT_PLAIN:
+-            info->vencrypt = VNC_VENCRYPT_SUB_AUTH_PLAIN;
++            *qmp_vencrypt = VNC_VENCRYPT_SUB_AUTH_PLAIN;
+             break;
+         case VNC_AUTH_VENCRYPT_TLSNONE:
+-            info->vencrypt = VNC_VENCRYPT_SUB_AUTH_TLS_NONE;
++            *qmp_vencrypt = VNC_VENCRYPT_SUB_AUTH_TLS_NONE;
+             break;
+         case VNC_AUTH_VENCRYPT_TLSVNC:
+-            info->vencrypt = VNC_VENCRYPT_SUB_AUTH_TLS_VNC;
++            *qmp_vencrypt = VNC_VENCRYPT_SUB_AUTH_TLS_VNC;
+             break;
+         case VNC_AUTH_VENCRYPT_TLSPLAIN:
+-            info->vencrypt = VNC_VENCRYPT_SUB_AUTH_TLS_PLAIN;
++            *qmp_vencrypt = VNC_VENCRYPT_SUB_AUTH_TLS_PLAIN;
+             break;
+         case VNC_AUTH_VENCRYPT_X509NONE:
+-            info->vencrypt = VNC_VENCRYPT_SUB_AUTH_X509_NONE;
++            *qmp_vencrypt = VNC_VENCRYPT_SUB_AUTH_X509_NONE;
+             break;
+         case VNC_AUTH_VENCRYPT_X509VNC:
+-            info->vencrypt = VNC_VENCRYPT_SUB_AUTH_X509_VNC;
++            *qmp_vencrypt = VNC_VENCRYPT_SUB_AUTH_X509_VNC;
+             break;
+         case VNC_AUTH_VENCRYPT_X509PLAIN:
+-            info->vencrypt = VNC_VENCRYPT_SUB_AUTH_X509_PLAIN;
++            *qmp_vencrypt = VNC_VENCRYPT_SUB_AUTH_X509_PLAIN;
+             break;
+         case VNC_AUTH_VENCRYPT_TLSSASL:
+-            info->vencrypt = VNC_VENCRYPT_SUB_AUTH_TLS_SASL;
++            *qmp_vencrypt = VNC_VENCRYPT_SUB_AUTH_TLS_SASL;
+             break;
+         case VNC_AUTH_VENCRYPT_X509SASL:
+-            info->vencrypt = VNC_VENCRYPT_SUB_AUTH_X509_SASL;
++            *qmp_vencrypt = VNC_VENCRYPT_SUB_AUTH_X509_SASL;
+             break;
+         default:
+-            info->has_vencrypt = false;
++            *qmp_has_vencrypt = false;
+             break;
+         }
+         break;
+     case VNC_AUTH_SASL:
+-        info->auth = VNC_PRIMARY_AUTH_SASL;
++        *qmp_auth = VNC_PRIMARY_AUTH_SASL;
+         break;
+     case VNC_AUTH_NONE:
+     default:
+-        info->auth = VNC_PRIMARY_AUTH_NONE;
++        *qmp_auth = VNC_PRIMARY_AUTH_NONE;
+         break;
+     }
+ }
+@@ -538,7 +552,8 @@ VncInfo2List *qmp_query_vnc_servers(Error **errp)
+         info = g_new0(VncInfo2, 1);
+         info->id = g_strdup(vd->id);
+         info->clients = qmp_query_client_list(vd);
+-        qmp_query_auth(vd, info);
++        qmp_query_auth(vd->auth, vd->subauth, &info->auth,
++                       &info->vencrypt, &info->has_vencrypt);
+         if (vd->dcl.con) {
+             dev = DEVICE(object_property_get_link(OBJECT(vd->dcl.con),
+                                                   "device", NULL));
+@@ -547,11 +562,11 @@ VncInfo2List *qmp_query_vnc_servers(Error **errp)
+         }
+         if (vd->lsock != NULL) {
+             info->server = qmp_query_server_entry(
+-                vd->lsock, false, info->server);
++                vd->lsock, false, vd->auth, vd->subauth, info->server);
+         }
+         if (vd->lwebsock != NULL) {
+             info->server = qmp_query_server_entry(
+-                vd->lwebsock, true, info->server);
++                vd->lwebsock, true, vd->ws_auth, vd->ws_subauth, info->server);
+         }
+ 
+         item = g_new0(VncInfo2List, 1);
 -- 
 1.8.3.1
