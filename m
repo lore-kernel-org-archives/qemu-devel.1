@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cbpAb-00006X-AI
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:53:58 -0500
+	(envelope-from <berrange@redhat.com>) id 1cbpFU-0004Mu-7i
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:59:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cbpAa-0003Y0-BS
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:53:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47462)
+	(envelope-from <berrange@redhat.com>) id 1cbpFO-0004jM-8T
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:59:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38270)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1cbpAa-0003Xu-2N
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:53:56 -0500
-Message-ID: <1486648432.3641.43.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Thu, 09 Feb 2017 14:53:52 +0100
-In-Reply-To: <CAFEAcA_txm4n6U1k3ZsTqb=91j5bm9H1i4FtzR92ybnFy-WJ_Q@mail.gmail.com>
-References: <1486575331-14455-1-git-send-email-abologna@redhat.com>
-	<1486575331-14455-3-git-send-email-abologna@redhat.com>
-	<CAFEAcA8+wfPQXXhoYZDv8LAOS6=4_P9kyaHONuMQcb7VmkVyxw@mail.gmail.com>
-	<1486582091.3641.32.camel@redhat.com>
-	<CAFEAcA_txm4n6U1k3ZsTqb=91j5bm9H1i4FtzR92ybnFy-WJ_Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 2/2] mach-virt: Provide sample
- configuration files
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cbpFO-0004jG-0r
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:58:54 -0500
+Date: Thu, 9 Feb 2017 13:58:51 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170209135851.GC4742@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1486645277-4724-1-git-send-email-kraxel@redhat.com>
+	<CAFEAcA_3end4WrkELu9LBxL8jnUWt0SKRwMJtuMh_1QeVQy4=g@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_3end4WrkELu9LBxL8jnUWt0SKRwMJtuMh_1QeVQy4=g@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 00/10] vnc: add support for multiple
+ listening sockets.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,91 +30,103 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>, Andrew Jones <drjones@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, 2017-02-08 at 19:36 +0000, Peter Maydell wrote:
-> > When -nodefaults is missing, a default virtio-net-pci
-> > plugged into 00:01.0 is automatically added.
->=C2=A0
-> Ah, right, default -net commands. Is that it?
+On Thu, Feb 09, 2017 at 01:15:52PM +0000, Peter Maydell wrote:
+> On 9 February 2017 at 13:01, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> >   Hi,
+> >
+> > Here comes the UI patch queue, carrying only vnc updates this time.  Big
+> > chunk is the multiple sockets support patch series, but there are also
+> > some smaller fixes and cleanups.
+> >
+> > please pull,
+> >   Gerd
+> >
+> > The following changes since commit d0dff238a87fa81393ed72754d4dc8b09e50b08b:
+> >
+> >   Merge remote-tracking branch 'remotes/juanquintela/tags/migration/20170206' into staging (2017-02-07 15:29:26 +0000)
+> >
+> > are available in the git repository at:
+> >
+> >
+> >   git://git.kraxel.org/qemu tags/pull-ui-20170209-1
+> >
+> > for you to fetch changes up to 7448e761356799d4e445e6ea3891a8067233465d:
+> >
+> >   ui: add ability to specify multiple VNC listen addresses (2017-02-08 14:59:40 +0100)
+> >
+> > ----------------------------------------------------------------
+> > vnc: add support for multiple listening sockets.
+> > vnc: misc fixes and cleanups.
+> 
+> Build failure on clang/OSX:
+> 
+> /Users/pm215/src/qemu-for-merges/ui/vnc.c:3566:21: error: variable
+> 'baseport' is used uninitialized whenever 'if' condition is false
+> [-Werror,-Wsometimes-uninitialized]
+>                 if (displaynum == -1) {
+>                     ^~~~~~~~~~~~~~~~
+> /Users/pm215/src/qemu-for-merges/ui/vnc.c:3603:15: note: uninitialized
+> use occurs here
+>         ret = baseport;
+>               ^~~~~~~~
+>   CC      ui/vnc-enc-hextile.o
+> /Users/pm215/src/qemu-for-merges/ui/vnc.c:3566:17: note: remove the
+> 'if' if its condition is always true
+>                 if (displaynum == -1) {
+>                 ^~~~~~~~~~~~~~~~~~~~~~
+> /Users/pm215/src/qemu-for-merges/ui/vnc.c:3564:17: error: variable
+> 'baseport' is used uninitialized whenever 'if' condition is false
+> [-Werror,-Wsometimes-uninitialized]
+>             if (g_str_equal(addrstr, "") ||
+>                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+> /Users/pm215/src/qemu-for-merges/ui/vnc.c:3603:15: note: uninitialized
+> use occurs here
+>         ret = baseport;
+>               ^~~~~~~~
+> /Users/pm215/src/qemu-for-merges/ui/vnc.c:3564:13: note: remove the
+> 'if' if its condition is always true
+>             if (g_str_equal(addrstr, "") ||
+>             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> /Users/pm215/src/qemu-for-merges/ui/vnc.c:3533:36: note: initialize
+> the variable 'baseport' to silence this warning
+>         unsigned long long baseport;
+>                                    ^
+>                                     = 0
+> 
+> That's slightly confused, but what it's saying is that in
+> vnc_display_get_address() we don't set baseport in the
+> if (websocket) codepath, but we use it unconditionally.
 
-I believe so, but double checking is never the wrong thing
-to do ;)
+Yes, a huge list of messages for a single missed initialization.
 
-> > On the other hand, I just realized that I can add
-> >=C2=A0
-> >=C2=A0=C2=A0=C2=A0[machine]
-> >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0graphics =3D "off"
-> >=C2=A0
-> > to get rid of -nographic on the command line! \o/
+Gerd, just squash
 
-... and after writing this, I actually tested it and
-realized that it doesn't quite do what I want it to :(
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 77f2a99..bffc650 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -3529,7 +3529,7 @@ static int vnc_display_get_address(const char *addrstr,
+     } else {
+         const char *port;
+         size_t hostlen;
+-        unsigned long long baseport;
++        unsigned long long baseport = 0;
+         InetSocketAddress *inet;
+ 
+         port = strrchr(addrstr, ':');
 
-> -nographic is kind of odd if you're taking the
-> "use -nodefaults and specify everything manually"
-> because it wraps up a whole pile of default config
-> in one oddball legacy config switch. I would have
-> expected -display none and whatever other options
-> you wanted.
 
--nographic is just what libvirt uses: if there's a better
-way to achieve the same result then I'm all for it!
+Into this commit:
 
-Seems like '-display none' behaves the same as -nographic,
-at least for my purposes. Unfortunately I still can't have
-it inside the configuration file, it has to be on the
-command line :(
+    ui: refactor code for populating SocketAddress from vnc_display_open
 
-[...]
-> > Moreover, something that I haven't been able to do on
-> > mach-virt (even though I could on q35, but again, I want the
-> > files to be as close as possible) is to configure the serial
-> > console from the configuration file.
->=C2=A0
-> If there's stuff we can fix in the virt board to make
-> this work the way it does on the PC model I'm happy
-> to make fixes to help.
+Just confirmed this fixes it with a local clang build
 
-Well, with a q35 guest I can just add
-
-=C2=A0 [chardev "hostconsole"]
-=C2=A0=C2=A0=C2=A0=C2=A0backend =3D "stdio"
-
-=C2=A0 [device "console"]
-=C2=A0=C2=A0=C2=A0=C2=A0driver =3D "isa-serial"
-=C2=A0=C2=A0=C2=A0=C2=A0chardev =3D "hostconsole"
-
-to the configuration file and get the same behavior I would
-get by adding '-serial stdio' to the command line, but I
-haven't been able to find any device that I can use the same
-way as isa-serial on mach-virt. Maybe I just missed it?
-
-[...]
-> The trouble with using virtconsole is that you have to
-> get quite a long way forward (probing and setting up
-> PCI, etc) before you can get any kind of console output.
-> "System doesn't boot and doesn't produce any output"
-> is a common and really annoying failure mode in the
-> ARM world, and I think that using virtconsole is
-> asking for that kind of thing to happen more rather
-> than less often. (Plus having two different serial
-> ports in the guest means that now the user has to
-> configure where both of them are supposed to output.)
-
-You don't get one unless you use '-serial stdio' or
-something like that in my experience, so if you use the
-sample configuration file as I posted it you will only
-get one serial console, the VirtIO-based one.
-
-I agree though that the lack of boot output and especially
-GRUB menu access in virtconsole is less then ideal, because
-even though the users will eventually get a login prompt,
-the first few seconds without any output at all might lead
-them to believe the guest is not working properly.
-
-I just wish there were a way to add the default serial
-console straight from the configuration file...
-
---=C2=A0
-Andrea Bolognani / Red Hat / Virtualization
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
