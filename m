@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cbsKI-0004ZZ-2D
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:16:11 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cbsKo-00052m-2U
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:16:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cbsKD-0004ok-Qw
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:16:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36594)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cbsKD-0004oS-LH
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:16:05 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CD041693C8
-	for <qemu-devel@nongnu.org>; Thu,  9 Feb 2017 17:16:05 +0000 (UTC)
-References: <20170202145141.17138-1-marcandre.lureau@redhat.com>
-	<20170202145141.17138-7-marcandre.lureau@redhat.com>
-	<3ce84650-5d49-4db3-b71a-b71a37c0bd98@redhat.com>
-	<1174725609.1298917.1486497835239.JavaMail.zimbra@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <637397de-f396-c8f4-fb23-b5387d2077d0@redhat.com>
-Date: Thu, 9 Feb 2017 18:16:03 +0100
+	(envelope-from <alex.bennee@linaro.org>) id 1cbsKk-00055n-6Y
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:16:42 -0500
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:33308)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cbsKk-00054x-1X
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:16:38 -0500
+Received: by mail-wr0-x22a.google.com with SMTP id i10so88415119wrb.0
+	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 09:16:37 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Thu,  9 Feb 2017 17:09:04 +0000
+Message-Id: <20170209170904.5713-25-alex.bennee@linaro.org>
+In-Reply-To: <20170209170904.5713-1-alex.bennee@linaro.org>
+References: <20170209170904.5713-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1174725609.1298917.1486497835239.JavaMail.zimbra@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 06/22] char: add a /chardevs container
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v11 24/24] tcg: enable MTTCG by default for ARM
+ on x86 hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,46 +30,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <mlureau@redhat.com>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, eblake@redhat.com
+To: peter.maydell@linaro.org, rth@twiddle.net
+Cc: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
+This enables the multi-threaded system emulation by default for ARMv7
+and ARMv8 guests using the x86_64 TCG backend. This is because on the
+guest side:
 
+  - The ARM translate.c/translate-64.c have been converted to
+    - use MTTCG safe atomic primitives
+    - emit the appropriate barrier ops
+  - The ARM machine has been updated to
+    - hold the BQL when modifying shared cross-vCPU state
+    - defer powerctl changes to async safe work
 
-On 07/02/2017 21:03, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> ----- Original Message -----
->>
->>
->> On 02/02/2017 15:51, Marc-Andr=C3=A9 Lureau wrote:
->>> +    if (QTAILQ_IN_USE(chr, next)) {
->>> +        QTAILQ_REMOVE(&chardevs, chr, next);
->>> +    }
->>> +    if (OBJECT(chr)->parent) {
->>> +        object_unparent(OBJECT(chr));
->>> +    } else {
->>> +        object_unref(OBJECT(chr));
->>> +    }
->>
->> What's the case where the "else" is used?  Probably qemu_chr_delete
->> callers should be changed to use object_unparent or object_unref direc=
-tly.
->=20
-> I thought about that, but calling object_unparent() seems weird,
-> since callers aren't much aware of the fact that chardev are added or n=
-ot to a
-> container (useless distinction imho). I wish the last object_unref()
-> would automatically unparent, if the object has a parent. Would that be
-> acceptable?
+All the host backends support the barrier and atomic primitives but
+need to provide same-or-better support for normal load/store
+operations.
 
-There is a distinction between the two.  The idea is that unparent
-removes all persistent references in the object tree, while unref only
-removes transient references.  So for example unparent will detach a
-device from its bus.  Unparent is basically exploiting the object tree
-in order to simplify the handling of reference cycles.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Acked-by: Peter Maydell <peter.maydell@linaro.org>
+Tested-by: Pranith Kumar <bobby.prani@gmail.com>
+Reviewed-by: Pranith Kumar <bobby.prani@gmail.com>
 
-Once you add an object with object_property_add_child, you probably
-should remove any transient references you have (such as the one you got
-with object_new) and from that point on use object_unparent only.
+---
+v7
+  - drop configure check for backend
+  - declare backend memory order for x86
+  - declare guest memory order for ARM
+  - add configure snippet to set TARGET_SUPPORTS_MTTCG
+v8
+  - TCG_DEFAULT_MO -> TCG_GUEST_DEFAULT_MO
+  - ~TCG_MO_LD_ST -> ~TCG_MO_ST_LD
+v10
+  - moved TCG_DEFAULT_MO -> TCG_GUEST_DEFAULT_MO to original commit
+v11
+  - add Pranith's tested/review-by tags
+  - s/defer reset/defer powerctl/ in commit message
+---
+ configure             |  6 ++++++
+ target/arm/cpu.h      |  3 +++
+ tcg/i386/tcg-target.h | 11 +++++++++++
+ 3 files changed, 20 insertions(+)
 
-Paolo
+diff --git a/configure b/configure
+index 86fd833feb..9f2a665f5b 100755
+--- a/configure
++++ b/configure
+@@ -5879,6 +5879,7 @@ mkdir -p $target_dir
+ echo "# Automatically generated by configure - do not modify" > $config_target_mak
+ 
+ bflt="no"
++mttcg="no"
+ interp_prefix1=$(echo "$interp_prefix" | sed "s/%M/$target_name/g")
+ gdb_xml_files=""
+ 
+@@ -5897,11 +5898,13 @@ case "$target_name" in
+   arm|armeb)
+     TARGET_ARCH=arm
+     bflt="yes"
++    mttcg="yes"
+     gdb_xml_files="arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
+   ;;
+   aarch64)
+     TARGET_BASE_ARCH=arm
+     bflt="yes"
++    mttcg="yes"
+     gdb_xml_files="aarch64-core.xml aarch64-fpu.xml arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
+   ;;
+   cris)
+@@ -6066,6 +6069,9 @@ if test "$target_bigendian" = "yes" ; then
+ fi
+ if test "$target_softmmu" = "yes" ; then
+   echo "CONFIG_SOFTMMU=y" >> $config_target_mak
++  if test "$mttcg" = "yes" ; then
++    echo "TARGET_SUPPORTS_MTTCG=y" >> $config_target_mak
++  fi
+ fi
+ if test "$target_user_only" = "yes" ; then
+   echo "CONFIG_USER_ONLY=y" >> $config_target_mak
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index f881d1101b..b753463471 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -30,6 +30,9 @@
+ #  define TARGET_LONG_BITS 32
+ #endif
+ 
++/* ARM processors have a weak memory model */
++#define TCG_GUEST_DEFAULT_MO      (0)
++
+ #define CPUArchState struct CPUARMState
+ 
+ #include "qemu-common.h"
+diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
+index 21d96ec35c..4275787db9 100644
+--- a/tcg/i386/tcg-target.h
++++ b/tcg/i386/tcg-target.h
+@@ -165,4 +165,15 @@ static inline void flush_icache_range(uintptr_t start, uintptr_t stop)
+ {
+ }
+ 
++/* This defines the natural memory order supported by this
++ * architecture before guarantees made by various barrier
++ * instructions.
++ *
++ * The x86 has a pretty strong memory ordering which only really
++ * allows for some stores to be re-ordered after loads.
++ */
++#include "tcg-mo.h"
++
++#define TCG_TARGET_DEFAULT_MO (TCG_MO_ALL & ~TCG_MO_ST_LD)
++
+ #endif
+-- 
+2.11.0
