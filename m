@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cbsDL-0006Bn-62
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:09:00 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cbsDL-0006C0-PE
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:09:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cbsDI-0002NX-1T
+	(envelope-from <alex.bennee@linaro.org>) id 1cbsDK-0002Ou-Ip
 	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:08:59 -0500
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:38475)
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:36304)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cbsDH-0002Mx-P4
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:08:55 -0500
-Received: by mail-wm0-x234.google.com with SMTP id r141so25971394wmg.1
-	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 09:08:55 -0800 (PST)
+	id 1cbsDK-0002OR-CZ
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:08:58 -0500
+Received: by mail-wm0-x232.google.com with SMTP id c85so237588338wmi.1
+	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 09:08:58 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu,  9 Feb 2017 17:08:42 +0000
-Message-Id: <20170209170904.5713-3-alex.bennee@linaro.org>
+Date: Thu,  9 Feb 2017 17:08:46 +0000
+Message-Id: <20170209170904.5713-7-alex.bennee@linaro.org>
 In-Reply-To: <20170209170904.5713-1-alex.bennee@linaro.org>
 References: <20170209170904.5713-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v11 02/24] mttcg: translate-all: Enable locking
- debug in a debug build
+Subject: [Qemu-devel] [PATCH v11 06/24] tcg: add kick timer for
+ single-threaded vCPU emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,153 +33,130 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, rth@twiddle.net
 Cc: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-From: Pranith Kumar <bobby.prani@gmail.com>
+Currently we rely on the side effect of the main loop grabbing the
+iothread_mutex to give any long running basic block chains a kick to
+ensure the next vCPU is scheduled. As this code is being re-factored and
+rationalised we now do it explicitly here.
 
-Enable tcg lock debug asserts in a debug build by default instead of
-relying on DEBUG_LOCKING. None of the other DEBUG_* macros have
-asserts, so this patch removes DEBUG_LOCKING and enable these asserts
-in a debug build.
-
-CC: Richard Henderson <rth@twiddle.net>
-Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
-[AJB: tweak ifdefs so can be early in series]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
----
- translate-all.c | 52 ++++++++++++++++------------------------------------
- 1 file changed, 16 insertions(+), 36 deletions(-)
+Reviewed-by: Pranith Kumar <bobby.prani@gmail.com>
 
-diff --git a/translate-all.c b/translate-all.c
-index 5f44ec844e..8a861cb583 100644
---- a/translate-all.c
-+++ b/translate-all.c
-@@ -59,7 +59,6 @@
- 
- /* #define DEBUG_TB_INVALIDATE */
- /* #define DEBUG_TB_FLUSH */
--/* #define DEBUG_LOCKING */
- /* make various TB consistency checks */
- /* #define DEBUG_TB_CHECK */
- 
-@@ -74,20 +73,10 @@
-  * access to the memory related structures are protected with the
-  * mmap_lock.
-  */
--#ifdef DEBUG_LOCKING
--#define DEBUG_MEM_LOCKS 1
--#else
--#define DEBUG_MEM_LOCKS 0
--#endif
--
- #ifdef CONFIG_SOFTMMU
- #define assert_memory_lock() do { /* nothing */ } while (0)
- #else
--#define assert_memory_lock() do {               \
--        if (DEBUG_MEM_LOCKS) {                  \
--            g_assert(have_mmap_lock());         \
--        }                                       \
--    } while (0)
-+#define assert_memory_lock() tcg_debug_assert(have_mmap_lock())
- #endif
- 
- #define SMC_BITMAP_USE_THRESHOLD 10
-@@ -169,10 +158,18 @@ static void page_table_config_init(void)
-     assert(v_l2_levels >= 0);
+---
+v2
+  - re-base fixes
+  - get_ticks_per_sec() -> NANOSECONDS_PER_SEC
+v3
+  - add define for TCG_KICK_FREQ
+  - fix checkpatch warning
+v4
+  - wrap next calc in inline qemu_tcg_next_kick() instead of macro
+v5
+  - move all kick code into own section
+  - use global for timer
+  - add helper functions to start/stop timer
+  - stop timer when all cores paused
+v7
+  - checkpatch > 80 char fix
+---
+ cpus.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 61 insertions(+)
+
+diff --git a/cpus.c b/cpus.c
+index ab18725e8a..6a15f9dc47 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -768,6 +768,53 @@ void configure_icount(QemuOpts *opts, Error **errp)
  }
  
-+#ifdef CONFIG_USER_ONLY
-+#define assert_tb_locked() tcg_debug_assert(have_tb_lock)
-+#define assert_tb_unlocked() tcg_debug_assert(!have_tb_lock)
-+#else
-+#define assert_tb_locked()  do { /* nothing */ } while (0)
-+#define assert_tb_unlocked()  do { /* nothing */ } while (0)
-+#endif
+ /***********************************************************/
++/* TCG vCPU kick timer
++ *
++ * The kick timer is responsible for moving single threaded vCPU
++ * emulation on to the next vCPU. If more than one vCPU is running a
++ * timer event with force a cpu->exit so the next vCPU can get
++ * scheduled.
++ *
++ * The timer is removed if all vCPUs are idle and restarted again once
++ * idleness is complete.
++ */
 +
- void tb_lock(void)
++static QEMUTimer *tcg_kick_vcpu_timer;
++
++static void qemu_cpu_kick_no_halt(void);
++
++#define TCG_KICK_PERIOD (NANOSECONDS_PER_SECOND / 10)
++
++static inline int64_t qemu_tcg_next_kick(void)
++{
++    return qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + TCG_KICK_PERIOD;
++}
++
++static void kick_tcg_thread(void *opaque)
++{
++    timer_mod(tcg_kick_vcpu_timer, qemu_tcg_next_kick());
++    qemu_cpu_kick_no_halt();
++}
++
++static void start_tcg_kick_timer(void)
++{
++    if (!tcg_kick_vcpu_timer && CPU_NEXT(first_cpu)) {
++        tcg_kick_vcpu_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
++                                           kick_tcg_thread, NULL);
++        timer_mod(tcg_kick_vcpu_timer, qemu_tcg_next_kick());
++    }
++}
++
++static void stop_tcg_kick_timer(void)
++{
++    if (tcg_kick_vcpu_timer) {
++        timer_del(tcg_kick_vcpu_timer);
++        tcg_kick_vcpu_timer = NULL;
++    }
++}
++
++
++/***********************************************************/
+ void hw_error(const char *fmt, ...)
  {
- #ifdef CONFIG_USER_ONLY
--    assert(!have_tb_lock);
-+    assert_tb_unlocked();
-     qemu_mutex_lock(&tcg_ctx.tb_ctx.tb_lock);
-     have_tb_lock++;
- #endif
-@@ -181,7 +178,7 @@ void tb_lock(void)
- void tb_unlock(void)
+     va_list ap;
+@@ -1021,9 +1068,12 @@ static void qemu_wait_io_event_common(CPUState *cpu)
+ static void qemu_tcg_wait_io_event(CPUState *cpu)
  {
- #ifdef CONFIG_USER_ONLY
--    assert(have_tb_lock);
-+    assert_tb_locked();
-     have_tb_lock--;
-     qemu_mutex_unlock(&tcg_ctx.tb_ctx.tb_lock);
- #endif
-@@ -197,23 +194,6 @@ void tb_lock_reset(void)
- #endif
+     while (all_cpu_threads_idle()) {
++        stop_tcg_kick_timer();
+         qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
+     }
+ 
++    start_tcg_kick_timer();
++
+     while (iothread_requesting_mutex) {
+         qemu_cond_wait(&qemu_io_proceeded_cond, &qemu_global_mutex);
+     }
+@@ -1223,6 +1273,15 @@ static void deal_with_unplugged_cpus(void)
+     }
  }
  
--#ifdef DEBUG_LOCKING
--#define DEBUG_TB_LOCKS 1
--#else
--#define DEBUG_TB_LOCKS 0
--#endif
--
--#ifdef CONFIG_SOFTMMU
--#define assert_tb_lock() do { /* nothing */ } while (0)
--#else
--#define assert_tb_lock() do {               \
--        if (DEBUG_TB_LOCKS) {               \
--            g_assert(have_tb_lock);         \
--        }                                   \
--    } while (0)
--#endif
--
--
- static TranslationBlock *tb_find_pc(uintptr_t tc_ptr);
- 
- void cpu_gen_init(void)
-@@ -847,7 +827,7 @@ static TranslationBlock *tb_alloc(target_ulong pc)
++/* Single-threaded TCG
++ *
++ * In the single-threaded case each vCPU is simulated in turn. If
++ * there is more than a single vCPU we create a simple timer to kick
++ * the vCPU and ensure we don't get stuck in a tight loop in one vCPU.
++ * This is done explicitly rather than relying on side-effects
++ * elsewhere.
++ */
++
+ static void *qemu_tcg_cpu_thread_fn(void *arg)
  {
-     TranslationBlock *tb;
+     CPUState *cpu = arg;
+@@ -1249,6 +1308,8 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+         }
+     }
  
--    assert_tb_lock();
-+    assert_tb_locked();
++    start_tcg_kick_timer();
++
+     /* process any pending work */
+     atomic_mb_set(&exit_request, 1);
  
-     if (tcg_ctx.tb_ctx.nb_tbs >= tcg_ctx.code_gen_max_blocks) {
-         return NULL;
-@@ -862,7 +842,7 @@ static TranslationBlock *tb_alloc(target_ulong pc)
- /* Called with tb_lock held.  */
- void tb_free(TranslationBlock *tb)
- {
--    assert_tb_lock();
-+    assert_tb_locked();
- 
-     /* In practice this is mostly used for single use temporary TB
-        Ignore the hard cases and just back up if this TB happens to
-@@ -1104,7 +1084,7 @@ void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr)
-     uint32_t h;
-     tb_page_addr_t phys_pc;
- 
--    assert_tb_lock();
-+    assert_tb_locked();
- 
-     atomic_set(&tb->invalid, true);
- 
-@@ -1421,7 +1401,7 @@ static void tb_invalidate_phys_range_1(tb_page_addr_t start, tb_page_addr_t end)
- #ifdef CONFIG_SOFTMMU
- void tb_invalidate_phys_range(tb_page_addr_t start, tb_page_addr_t end)
- {
--    assert_tb_lock();
-+    assert_tb_locked();
-     tb_invalidate_phys_range_1(start, end);
- }
- #else
-@@ -1464,7 +1444,7 @@ void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t end,
- #endif /* TARGET_HAS_PRECISE_SMC */
- 
-     assert_memory_lock();
--    assert_tb_lock();
-+    assert_tb_locked();
- 
-     p = page_find(start >> TARGET_PAGE_BITS);
-     if (!p) {
 -- 
 2.11.0
