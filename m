@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cbm4b-0002Mi-Ry
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 05:35:37 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cbmCI-0000ws-TH
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 05:43:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cbm4Y-00026M-QJ
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 05:35:33 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37630)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cbm4Y-00024X-HS
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 05:35:30 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v19AXh6v053877
-	for <qemu-devel@nongnu.org>; Thu, 9 Feb 2017 05:35:29 -0500
-Received: from e23smtp01.au.ibm.com (e23smtp01.au.ibm.com [202.81.31.143])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28g3w96eqv-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 05:35:29 -0500
-Received: from localhost
-	by e23smtp01.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Thu, 9 Feb 2017 20:35:27 +1000
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Date: Thu,  9 Feb 2017 16:04:05 +0530
-In-Reply-To: <1486636445-24109-1-git-send-email-nikunj@linux.vnet.ibm.com>
-References: <1486636445-24109-1-git-send-email-nikunj@linux.vnet.ibm.com>
-Message-Id: <1486636445-24109-7-git-send-email-nikunj@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 6/6] target-ppc: add mcrxrx instruction
+	(envelope-from <peter.maydell@linaro.org>) id 1cbmCI-0003nK-5O
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 05:43:30 -0500
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:38470)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cbmCH-0003ll-W6
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 05:43:30 -0500
+Received: by mail-wm0-x231.google.com with SMTP id r141so14844515wmg.1
+	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 02:43:29 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <f296fbdf-67c3-8891-e5ca-a25570e3e12f@redhat.com>
+References: <1486399909-16338-1-git-send-email-quintela@redhat.com>
+	<CAFEAcA-yFVYzwxt4FG9D3g3BwEJFPnmNrr-pJOzYV-h5Y6bu7A@mail.gmail.com>
+	<87lgti1lta.fsf@emacs.mitica>
+	<CAFEAcA9RXeubPXZhTS+FHyYVARvb=gVFOQxK8ZYt8OQnhe9WXw@mail.gmail.com>
+	<f296fbdf-67c3-8891-e5ca-a25570e3e12f@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 9 Feb 2017 10:43:08 +0000
+Message-ID: <CAFEAcA9d9aoS=SaOghevNKTaX2V7Zu=jUev7UH1G4iSovT=_jA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 0/6] Migration pull
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,57 +32,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
-Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-mcrxrx: Move to CR from XER Extended
+On 8 February 2017 at 08:47, Thomas Huth <thuth@redhat.com> wrote:
+> How fast is that aarch64 machine?
 
-Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
----
- target/ppc/translate.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+It's a juno board, so it's not very fast, but I wouldn't
+have expected it to hit a 100 second timeout assuming
+the test isn't trying to do a ludicrous amount of work.
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 724ad17..72c8a46 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -3761,6 +3761,29 @@ static void gen_mcrxr(DisasContext *ctx)
-     tcg_gen_movi_tl(cpu_ca, 0);
- }
- 
-+#ifdef TARGET_PPC64
-+/* mcrxrx */
-+static void gen_mcrxrx(DisasContext *ctx)
-+{
-+    TCGv_i32 t0 = tcg_temp_new_i32();
-+    TCGv_i32 t1 = tcg_temp_new_i32();
-+    TCGv_i32 dst = cpu_crf[crfD(ctx->opcode)];
-+
-+    /* copy OV and OV32 */
-+    tcg_gen_trunc_tl_i32(t0, cpu_so);
-+    tcg_gen_shli_i32(dst, t0, 1);
-+    tcg_gen_or_i32(dst, dst, t0);
-+    tcg_gen_shli_i32(dst, dst, 2);
-+    /* copy CA and CA32 */
-+    tcg_gen_trunc_tl_i32(t0, cpu_ca);
-+    tcg_gen_shli_i32(t1, t0, 1);
-+    tcg_gen_or_i32(t1, t1, t0);
-+    tcg_gen_or_i32(dst, dst, t1);
-+    tcg_temp_free_i32(t0);
-+    tcg_temp_free_i32(t1);
-+}
-+#endif
-+
- /* mfcr mfocrf */
- static void gen_mfcr(DisasContext *ctx)
- {
-@@ -6430,6 +6453,7 @@ GEN_HANDLER(mtcrf, 0x1F, 0x10, 0x04, 0x00000801, PPC_MISC),
- #if defined(TARGET_PPC64)
- GEN_HANDLER(mtmsrd, 0x1F, 0x12, 0x05, 0x001EF801, PPC_64B),
- GEN_HANDLER_E(setb, 0x1F, 0x00, 0x04, 0x0003F801, PPC_NONE, PPC2_ISA300),
-+GEN_HANDLER_E(mcrxrx, 0x1F, 0x00, 0x12, 0x007FF801, PPC_NONE, PPC2_ISA300),
- #endif
- GEN_HANDLER(mtmsr, 0x1F, 0x12, 0x04, 0x001EF801, PPC_MISC),
- GEN_HANDLER(mtspr, 0x1F, 0x13, 0x0E, 0x00000000, PPC_MISC),
--- 
-2.7.4
+> The timeout of the prom-env test is
+> already 100 seconds, so that seems to be plenty to me (the test normally
+> finishes here on my laptop within 15 seconds).
+> OTOH, if it helps with the aarch64 machine, I'm also fine if we increase
+> the timeout further - but what value would be appropriate then? Could you
+> please run the following on that slow machine:
+>
+>  time QTEST_QEMU_BINARY=ppc64-softmmu/qemu-system-ppc64 tests/prom-env-test
+
+/ppc64/prom-env/mac99: OK
+/ppc64/prom-env/g3beige: OK
+/ppc64/prom-env/pseries: OK
+
+real    1m37.657s
+user    1m36.748s
+sys     0m1.440s
+
+Breaking that down per testcase:
+
+<tmmu/qemu-system-ppc64 tests/prom-env-test -v -p /ppc64/prom-env/mac99
+/ppc64/prom-env/mac99: OK
+
+real    0m9.836s
+user    0m9.584s
+sys     0m0.424s
+<u/qemu-system-ppc64 tests/prom-env-test -v -p /ppc64/prom-env/g3beige
+/ppc64/prom-env/g3beige: OK
+
+real    0m9.099s
+user    0m8.988s
+sys     0m0.144s
+<qemu-system-ppc64 tests/prom-env-test -v -p /ppc64/prom-env/pseries
+/ppc64/prom-env/pseries: OK
+
+real    1m24.362s
+user    1m23.572s
+sys     0m1.144s
+
+pseries is much slower than the other two and at 85 seconds is
+not all that much below the 100s. Something's odd here.
+
+thanks
+-- PMM
