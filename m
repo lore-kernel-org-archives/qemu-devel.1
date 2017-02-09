@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33725)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cboLr-0008RR-LA
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:01:32 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cboLq-0008RP-Rh
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:01:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cboLn-00020s-Rj
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:01:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36636)
+	(envelope-from <kraxel@redhat.com>) id 1cboLo-000210-3P
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:01:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55616)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cboLn-00020f-Mx
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:01:27 -0500
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cboLn-00020m-Ue
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:01:28 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0D3644E03F
+	for <qemu-devel@nongnu.org>; Thu,  9 Feb 2017 13:01:28 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu,  9 Feb 2017 14:01:08 +0100
-Message-Id: <1486645277-4724-2-git-send-email-kraxel@redhat.com>
+Date: Thu,  9 Feb 2017 14:01:10 +0100
+Message-Id: <1486645277-4724-4-git-send-email-kraxel@redhat.com>
 In-Reply-To: <1486645277-4724-1-git-send-email-kraxel@redhat.com>
 References: <1486645277-4724-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 01/10] ui/vnc: Drop unused vnc_has_job() and
- vnc_jobs_clear()
+Subject: [Qemu-devel] [PULL 03/10] ui: fix regression handling bare
+ 'websocket' option to -vnc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,68 +31,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+From: "Daniel P. Berrange" <berrange@redhat.com>
 
-The functions vnc_has_job() and vnc_jobs_clear() are
-never used; remove them.
+The -vnc argument is documented as accepting two syntaxes for
+the 'websocket' option, either a bare option name, or a port
+number. If using the bare option name, it is supposed to apply
+the display number as an offset to base port 5700. e.g.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Gonglei <arei.gonglei@huawei.com>
-Message-id: 1486146260-8092-1-git-send-email-peter.maydell@linaro.org
+  -vnc localhost:3,websocket
+
+should listen on port 5703, however, this was broken in 2.3.0 since
+
+  commit 4db14629c38611061fc19ec6927405923de84f08
+  Author: Gerd Hoffmann <kraxel@redhat.com>
+  Date:   Tue Sep 16 12:33:03 2014 +0200
+
+    vnc: switch to QemuOpts, allow multiple servers
+
+instead qemu tries to listen on port "on" which gets looked up in
+/etc/services and fails.
+
+Fixes bug: #1455912
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Message-id: 20170203120649.15637-2-berrange@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- ui/vnc-jobs.c | 23 -----------------------
- ui/vnc-jobs.h |  2 --
- 2 files changed, 25 deletions(-)
+ ui/vnc.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/ui/vnc-jobs.c b/ui/vnc-jobs.c
-index 98ca978..f786777 100644
---- a/ui/vnc-jobs.c
-+++ b/ui/vnc-jobs.c
-@@ -128,29 +128,6 @@ static bool vnc_has_job_locked(VncState *vs)
-     return false;
- }
+diff --git a/ui/vnc.c b/ui/vnc.c
+index f2701e5..b0889b1 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -3558,7 +3558,13 @@ void vnc_display_open(const char *id, Error **errp)
+                 wsaddr->type = SOCKET_ADDRESS_KIND_INET;
+                 inet = wsaddr->u.inet.data = g_new0(InetSocketAddress, 1);
+                 inet->host = g_strdup(saddr->u.inet.data->host);
+-                inet->port = g_strdup(websocket);
++                if (g_str_equal(websocket, "") ||
++                    g_str_equal(websocket, "on")) {
++                    inet->port = g_strdup_printf(
++                        "%d", (int)baseport + 5700);
++                } else {
++                    inet->port = g_strdup(websocket);
++                }
  
--bool vnc_has_job(VncState *vs)
--{
--    bool ret;
--
--    vnc_lock_queue(queue);
--    ret = vnc_has_job_locked(vs);
--    vnc_unlock_queue(queue);
--    return ret;
--}
--
--void vnc_jobs_clear(VncState *vs)
--{
--    VncJob *job, *tmp;
--
--    vnc_lock_queue(queue);
--    QTAILQ_FOREACH_SAFE(job, &queue->jobs, next, tmp) {
--        if (job->vs == vs || !vs) {
--            QTAILQ_REMOVE(&queue->jobs, job, next);
--        }
--    }
--    vnc_unlock_queue(queue);
--}
--
- void vnc_jobs_join(VncState *vs)
- {
-     vnc_lock_queue(queue);
-diff --git a/ui/vnc-jobs.h b/ui/vnc-jobs.h
-index 044bf9f..59f66bc 100644
---- a/ui/vnc-jobs.h
-+++ b/ui/vnc-jobs.h
-@@ -34,8 +34,6 @@
- VncJob *vnc_job_new(VncState *vs);
- int vnc_job_add_rect(VncJob *job, int x, int y, int w, int h);
- void vnc_job_push(VncJob *job);
--bool vnc_has_job(VncState *vs);
--void vnc_jobs_clear(VncState *vs);
- void vnc_jobs_join(VncState *vs);
- 
- void vnc_jobs_consume_buffer(VncState *vs);
+                 if (to) {
+                     inet->has_to = true;
 -- 
 1.8.3.1
