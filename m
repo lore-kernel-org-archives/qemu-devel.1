@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cboa7-0004he-Ks
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:16:16 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cbod5-0007CA-DA
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:19:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cboa6-0007Kn-Nz
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:16:15 -0500
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:35581)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cbod0-0000Bt-Fg
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:19:19 -0500
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:36219)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cboa6-0007Ki-GV
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:16:14 -0500
-Received: by mail-wm0-x230.google.com with SMTP id v186so80392230wmd.0
-	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 05:16:14 -0800 (PST)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cbod0-0000Bo-BP
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:19:14 -0500
+Received: by mail-qt0-x242.google.com with SMTP id h53so438179qth.3
+	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 05:19:14 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1486046099-17726-1-git-send-email-batuzovk@ispras.ru>
+	<1486046099-17726-11-git-send-email-batuzovk@ispras.ru>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <8fbd2d96-b855-4db8-ad90-443b4bc56faa@amsat.org>
+Date: Thu, 9 Feb 2017 10:19:09 -0300
 MIME-Version: 1.0
-In-Reply-To: <1486645277-4724-1-git-send-email-kraxel@redhat.com>
-References: <1486645277-4724-1-git-send-email-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 9 Feb 2017 13:15:52 +0000
-Message-ID: <CAFEAcA_3end4WrkELu9LBxL8jnUWt0SKRwMJtuMh_1QeVQy4=g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 00/10] vnc: add support for multiple
- listening sockets.
+In-Reply-To: <1486046099-17726-11-git-send-email-batuzovk@ispras.ru>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2.1 10/21] target/arm: use vector opcode
+ to handle vadd.<size> instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +35,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Kirill Batuzov <batuzovk@ispras.ru>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
 
-On 9 February 2017 at 13:01, Gerd Hoffmann <kraxel@redhat.com> wrote:
->   Hi,
->
-> Here comes the UI patch queue, carrying only vnc updates this time.  Big
-> chunk is the multiple sockets support patch series, but there are also
-> some smaller fixes and cleanups.
->
-> please pull,
->   Gerd
->
-> The following changes since commit d0dff238a87fa81393ed72754d4dc8b09e50b08b:
->
->   Merge remote-tracking branch 'remotes/juanquintela/tags/migration/20170206' into staging (2017-02-07 15:29:26 +0000)
->
-> are available in the git repository at:
->
->
->   git://git.kraxel.org/qemu tags/pull-ui-20170209-1
->
-> for you to fetch changes up to 7448e761356799d4e445e6ea3891a8067233465d:
->
->   ui: add ability to specify multiple VNC listen addresses (2017-02-08 14:59:40 +0100)
->
-> ----------------------------------------------------------------
-> vnc: add support for multiple listening sockets.
-> vnc: misc fixes and cleanups.
 
-Build failure on clang/OSX:
 
-/Users/pm215/src/qemu-for-merges/ui/vnc.c:3566:21: error: variable
-'baseport' is used uninitialized whenever 'if' condition is false
-[-Werror,-Wsometimes-uninitialized]
-                if (displaynum == -1) {
-                    ^~~~~~~~~~~~~~~~
-/Users/pm215/src/qemu-for-merges/ui/vnc.c:3603:15: note: uninitialized
-use occurs here
-        ret = baseport;
-              ^~~~~~~~
-  CC      ui/vnc-enc-hextile.o
-/Users/pm215/src/qemu-for-merges/ui/vnc.c:3566:17: note: remove the
-'if' if its condition is always true
-                if (displaynum == -1) {
-                ^~~~~~~~~~~~~~~~~~~~~~
-/Users/pm215/src/qemu-for-merges/ui/vnc.c:3564:17: error: variable
-'baseport' is used uninitialized whenever 'if' condition is false
-[-Werror,-Wsometimes-uninitialized]
-            if (g_str_equal(addrstr, "") ||
-                ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-/Users/pm215/src/qemu-for-merges/ui/vnc.c:3603:15: note: uninitialized
-use occurs here
-        ret = baseport;
-              ^~~~~~~~
-/Users/pm215/src/qemu-for-merges/ui/vnc.c:3564:13: note: remove the
-'if' if its condition is always true
-            if (g_str_equal(addrstr, "") ||
-            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/Users/pm215/src/qemu-for-merges/ui/vnc.c:3533:36: note: initialize
-the variable 'baseport' to silence this warning
-        unsigned long long baseport;
-                                   ^
-                                    = 0
+On 02/02/2017 11:34 AM, Kirill Batuzov wrote:
+> Signed-off-by: Kirill Batuzov <batuzovk@ispras.ru>
+> ---
+>  target/arm/translate.c | 31 +++++++++++++++++++++++++++++++
+>  1 file changed, 31 insertions(+)
+>
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index d7578e2..90e14df 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -5628,6 +5628,37 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+>              return 1;
+>          }
+>
+> +        /* Use vector ops to handle what we can */
+> +        switch (op) {
+> +        case NEON_3R_VADD_VSUB:
+> +            if (!u) {
+> +                void (* const gen_add_v128[])(TCGv_v128, TCGv_v128,
+> +                                             TCGv_v128) = {
+> +                    tcg_gen_add_i8x16,
+> +                    tcg_gen_add_i16x8,
+> +                    tcg_gen_add_i32x4,
+> +                    tcg_gen_add_i64x2
+> +                };
 
-That's slightly confused, but what it's saying is that in
-vnc_display_get_address() we don't set baseport in the
-if (websocket) codepath, but we use it unconditionally.
+I'd rather prefer to have gen_add_v128 'static const'.
 
-thanks
--- PMM
+> +                void (* const gen_add_v64[])(TCGv_v64, TCGv_v64,
+> +                                             TCGv_v64) = {
+> +                    tcg_gen_add_i8x8,
+> +                    tcg_gen_add_i16x4,
+> +                    tcg_gen_add_i32x2,
+> +                    tcg_gen_add_i64x1
+> +                };
+
+same with gen_add_v64.
+
+> +                if (q) {
+> +                    gen_add_v128[size](cpu_Q[rd >> 1], cpu_Q[rn >> 1],
+> +                                       cpu_Q[rm >> 1]);
+> +                } else {
+> +                    gen_add_v64[size](cpu_D[rd], cpu_D[rn], cpu_D[rm]);
+> +                }
+> +                return 0;
+> +            }
+> +            break;
+> +        default:
+> +            break;
+> +        }
+> +
+>          for (pass = 0; pass < (q ? 4 : 2); pass++) {
+>
+>          if (pairwise) {
+>
