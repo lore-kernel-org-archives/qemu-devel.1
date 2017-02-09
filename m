@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59391)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cbr8t-0008Uh-AD
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 11:00:20 -0500
+	(envelope-from <juro.bystricky@intel.com>) id 1cbrGW-0002at-35
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 11:08:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cbr8r-0004nU-Uy
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 11:00:19 -0500
-References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
-	<20170203154757.36140-19-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <01d5a5fd-3ac8-0122-a07a-859bef4f3deb@redhat.com>
-Date: Thu, 9 Feb 2017 10:00:07 -0600
+	(envelope-from <juro.bystricky@intel.com>) id 1cbrGQ-0006kt-58
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 11:08:12 -0500
+Received: from mga03.intel.com ([134.134.136.65]:26428)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <juro.bystricky@intel.com>)
+	id 1cbrGP-0006iT-Qz
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 11:08:06 -0500
+From: "Bystricky, Juro" <juro.bystricky@intel.com>
+Date: Thu, 9 Feb 2017 16:07:53 +0000
+Message-ID: <6E51916E4A1F32428260031F4C7CD2B6118FBCB0@ORSMSX112.amr.corp.intel.com>
+References: <1486595166-34097-1-git-send-email-juro.bystricky@intel.com>
+	<1486595166-34097-2-git-send-email-juro.bystricky@intel.com>
+	<4c51c959-fe9c-b27f-552a-84d8a2fe68c1@denx.de>
+	<6E51916E4A1F32428260031F4C7CD2B6118FB1B4@ORSMSX112.amr.corp.intel.com>
+	<ad0b171b-ae9d-11f9-15e8-c500cd4ef5c2@denx.de>
+	<6E51916E4A1F32428260031F4C7CD2B6118FB84B@ORSMSX112.amr.corp.intel.com>
+	<8a5c3932-5ca6-6127-35b4-b8b8f57d923f@denx.de>
+In-Reply-To: <8a5c3932-5ca6-6127-35b4-b8b8f57d923f@denx.de>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20170203154757.36140-19-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="IgplMgtOM0RF1i2sOhSuuadS5g8sAFSOU"
-Subject: Re: [Qemu-devel] [PATCH 18/18] nbd: BLOCK_STATUS for standard
- get_block_status function: client part
+Subject: Re: [Qemu-devel] [PATCH v3 1/1] nios2: Add Altera JTAG UART
+ emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,159 +35,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, armbru@redhat.com, den@virtuozzo.com, stefanha@redhat.com
+To: Marek Vasut <marex@denx.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "crwulff@gmail.com" <crwulff@gmail.com>, "jurobystricky@hotmail.com" <jurobystricky@hotmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---IgplMgtOM0RF1i2sOhSuuadS5g8sAFSOU
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com,
- pbonzini@redhat.com, armbru@redhat.com, den@virtuozzo.com,
- stefanha@redhat.com
-Message-ID: <01d5a5fd-3ac8-0122-a07a-859bef4f3deb@redhat.com>
-Subject: Re: [PATCH 18/18] nbd: BLOCK_STATUS for standard get_block_status
- function: client part
-References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
- <20170203154757.36140-19-vsementsov@virtuozzo.com>
-In-Reply-To: <20170203154757.36140-19-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 02/03/2017 09:47 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Minimal realization: only first extent from the answer is used.
-
-If you're only going to use one extent, should you implement
-NBD_CMD_FLAG_REQ_ONE support to save the server some effort?
-
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/nbd-client.c  | 41 ++++++++++++++++++++++++++++++++++++++++-
->  block/nbd-client.h  |  5 +++++
->  block/nbd.c         |  3 +++
->  include/block/nbd.h |  2 +-
->  nbd/client.c        | 23 ++++++++++++++++-------
->  qemu-nbd.c          |  2 +-
->  6 files changed, 66 insertions(+), 10 deletions(-)
-
-> +int64_t coroutine_fn nbd_client_co_get_block_status(BlockDriverState *=
-bs,
-> +                                                    int64_t sector_num=
-,
-> +                                                    int nb_sectors, in=
-t *pnum,
-> +                                                    BlockDriverState *=
-*file)
-> +{
-> +    int64_t ret;
-> +    uint32_t nb_extents;
-> +    NBDExtent *extents;
-> +    NBDClientSession *client =3D nbd_get_client_session(bs);
-> +
-> +    if (!client->block_status_ok) {
-> +        *pnum =3D nb_sectors;
-> +        ret =3D BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED;
-> +        if (bs->drv->protocol_name) {
-> +            ret |=3D BDRV_BLOCK_OFFSET_VALID | (sector_num * BDRV_SECT=
-OR_SIZE);
-> +        }
-> +        return ret;
-> +    }
-
-Looks like a sane fallback when we don't have anything more accurate.
-
-> +
-> +    ret =3D nbd_client_co_cmd_block_status(bs, sector_num << BDRV_SECT=
-OR_BITS,
-> +                                         nb_sectors << BDRV_SECTOR_BIT=
-S,
-> +                                         &extents, &nb_extents);
-> +    if (ret < 0) {
-> +        return ret;
-> +    }
-> +
-> +    *pnum =3D extents[0].length >> BDRV_SECTOR_BITS;
-> +    ret =3D (extents[0].flags & NBD_STATE_HOLE ? 0 : BDRV_BLOCK_ALLOCA=
-TED) |
-> +          (extents[0].flags & NBD_STATE_ZERO ? BDRV_BLOCK_ZERO : 0);
-> +
-> +    if ((ret & BDRV_BLOCK_ALLOCATED) && !(ret & BDRV_BLOCK_ZERO)) {
-> +        ret |=3D BDRV_BLOCK_DATA;
-> +    }
-
-And this conversion looks correct.
-
-> @@ -579,7 +617,8 @@ int nbd_client_init(BlockDriverState *bs,
->                                  &client->size,
->                                  &client->structured_reply,
->                                  bitmap_name,
-> -                                &client->bitmap_ok, errp);
-> +                                &client->bitmap_ok,
-> +                                &client->block_status_ok, errp);
-
-That's a lot of parameters we're adding; I'm wondering if its smarter to
-start passing things through via a struct.  In fact, I have posted
-patches previously (and need to rebase and repost them) that introduce
-such a struct, in order to make the INFO extension viable.
-
-> @@ -681,11 +681,19 @@ int nbd_receive_negotiate(QIOChannel *ioc, const =
-char *name, uint16_t *flags,
->                                                false, NULL) =3D=3D 0;
->              }
-> =20
-> -            if (!!structured_reply && *structured_reply && !!bitmap_na=
-me) {
-> +            if (!!structured_reply && *structured_reply) {
->                  int ret;
-> -                assert(!!bitmap_ok);
-> -                ret =3D nbd_receive_query_bitmap(ioc, name, bitmap_nam=
-e,
-> -                                               bitmap_ok, errp) =3D=3D=
- 0;
-> +
-> +                if (!!bitmap_name) {
-> +                    assert(!!bitmap_ok);
-> +                    ret =3D nbd_receive_query_bitmap(ioc, name, bitmap=
-_name,
-> +                                                   bitmap_ok, errp) =3D=
-=3D 0;
-> +                } else {
-> +                    ret =3D nbd_receive_query_meta_context(ioc, name,
-> +                                                         "base:allocat=
-ion",
-> +                                                         block_status_=
-ok,
-> +                                                         errp);
-> +                }
-
-This looks weird trying to grab 'base:allocation' only if bitmap_name is
-not provided.  The logic will probably have to be different if we want
-to allow a client to track both pieces of information at once.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---IgplMgtOM0RF1i2sOhSuuadS5g8sAFSOU
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYnJIHAAoJEKeha0olJ0NqWzsH/0YnnkmcMjcRbFwtdPVe5WBg
-jS2fYXG0X0SpOj+V24bJ+jM+Cm7yhwwo2cWn/W1qXZZ5wSJ4cS5qWmPUPUAyCcpk
-WYZjiDj5yVrMfjTBAEjV63aLAR6uObiCQCYhWdKEmkJzh/2wIzHQNRVgzqNGSitM
-RAadyOR46UvxIicQcgJ0P9j6RgaiZMQSyj1tO0T35BRHCON7qOpGsw7rMT9WnyZh
-utwp1oyJiNRTBgENaOu29EbKHnm5AhjR4AOit/DL1c+Qr7k/yxU5Dn/b0/Gr+ulb
-zEuWOpmPOPFdp7DoBr68+pgy9iBXm+2VxBmjycfr8Nx1WNWaCOB+x/8Xv6dNIS0=
-=Z/sS
------END PGP SIGNATURE-----
-
---IgplMgtOM0RF1i2sOhSuuadS5g8sAFSOU--
+PiA+PiBbLi4uXQ0KPiA+Pg0KPiA+Pj4+PiArc3RhdGljIHVpbnQ2NF90IGFsdGVyYV9qdWFydF9y
+ZWFkKHZvaWQgKm9wYXF1ZSwgaHdhZGRyIGFkZHIsDQo+IHVuc2lnbmVkDQo+ID4+Pj4gaW50IHNp
+emUpDQo+ID4+Pj4+ICt7DQo+ID4+Pj4+ICsgICAgQWx0ZXJhSlVBUlRTdGF0ZSAqcyA9IG9wYXF1
+ZTsNCj4gPj4+Pj4gKyAgICB1aW50MzJfdCByOw0KPiA+Pj4+PiArDQo+ID4+Pj4+ICsgICAgYWRk
+ciA+Pj0gMjsNCj4gPj4+Pg0KPiA+Pj4+IEhtbW1tbSwgaG93IHdpbGwgdW5hbGlnbmVkIHJlYWQg
+ZnJvbSBvbmUgb2YgdGhlc2UgcmVnaXN0ZXJzIGJlIGhhbmRsZWQNCj4gPj4+PiBvbiByZWFsIEhX
+ID8gaWUuIHJlYWQgZnJvbSBhZGRyZXNzIDB4MyA/IFdoYXQgYWJvdXQgd3JpdGVzID8NCj4gPj4+
+Pg0KPiA+Pj4NCj4gPj4+IHRoZXJlIGlzIG5vIHJlYWRpbmcvd3JpdGluZyBnb2luZyBvbiB2aWEg
+ImFkZHIiLg0KPiA+Pj4gVGhpcyBqdXN0IG1hcHMgdGhlIGh3IGFkZHJlc3MgaW50byByZWdpc3Rl
+ciBudW1iZXIsIHdoZXJlIHJlZ2lzdGVycyBhcmUNCj4gPj4gYXQNCj4gPj4+IDQgYnl0ZXMgYm91
+bmRhcmllcyAoc28gdGhleSBhcmUgYWxpZ25lZCBhcyBuZWVkZWQpIGJ1dCBpbmRleGVkIGFzDQo+
+ID4+IDEsMiwzLi4uLg0KPiA+Pj4gKFByZXR0eSBjb21tb24gY29kZSBpbiBvdGhlciBkcml2ZXJz
+LikNCj4gPj4+IEJ1dCB3aWxsIHJlZG8gdGhlIGNvZGUgYW55d2F5IHNvIHRoZXJlIGFyZSBubyBz
+aGlmdHMuDQo+ID4+DQo+ID4+IFRoaXMgZG9lc24ndCBhbnN3ZXIgbXkgcXVlc3Rpb24gYXQgYWxs
+LiBIb3cgZG9lcyByZWFsIGhhcmR3YXJlIGJlaGF2ZSBpZg0KPiA+PiB5b3UgcmVhZCBmcm9tIHVu
+YWxpZ25lZCBhZGRyZXNzIGluIHRoZSByZWdpc3RlciBzcGFjZSAsIGllLiBvZmZzZXQgMHgzID8N
+Cj4gPj4NCj4gPg0KPiA+IE5vdCBzdXJlIEkgdW5kZXJzdGFuZCB0aGUgcXVlc3Rpb24gaGVyZS4g
+V2hpY2ggInJlYWwgaGFyZHdhcmUiIGFyZSB3ZQ0KPiB0YWxraW5nIGFib3V0Pw0KPiANCj4gQnkg
+cmVhbCBoYXJkd2FyZSBJIG1lYW4gcmVhbCBOaW9zMiBzeXN0ZW0gLi4uDQo+IA0KPiA+IElmICJy
+ZWFsIGhhcmR3YXJlIiBjb250YWlucyBNTVUgb3IgTVBVIHRoZW4gYW4gZXhjZXB0aW9uIGlzIGdl
+bmVyYXRlZCBvbg0KPiBtaXNhbGlnbiBhY2Nlc3MuDQo+IA0KPiBJcyB0aGlzIGhhbmRsZWQgaGVy
+ZSBvciBub3QgPw0KPiANCg0KU29ycnksIEkgYW0gbm90IHN1cmUgSSB1bmRlcnN0YW5kIHRoZSBx
+dWVzdGlvbi4NCkV4Y2VwdGlvbnMgYXJlIGhhbmRsZWQgYnkgaW50ZXJydXB0IGNvbnRyb2xsZXIu
+DQpUaGlzIGNvZGUgZm9yIEpUQUcgVUFSVCBkb2VzIG5vdCBoYXZlIGFueSBtaXNhbGlnbmVkIGFj
+Y2Vzc2VzLg0KDQoNCg==
