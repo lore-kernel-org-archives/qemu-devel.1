@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cbpOP-0007X8-JR
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 09:08:14 -0500
+	(envelope-from <programmingkidx@gmail.com>) id 1cbpR8-0000Ki-HQ
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 09:11:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cbpOK-0007w7-ID
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 09:08:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36264)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1cbpOK-0007vU-AU
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 09:08:08 -0500
-Date: Thu, 9 Feb 2017 15:08:04 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20170209140804.onpj3pniqim3qxr4@kamzik.brq.redhat.com>
-References: <1486575331-14455-1-git-send-email-abologna@redhat.com>
-	<1486575331-14455-3-git-send-email-abologna@redhat.com>
-	<20170209094259.nmli6yd5swxdujkm@kamzik.brq.redhat.com>
-	<CAFEAcA8bRHuF_to0+whEhNF5oXp5_O63H8EV2JTXBngffufz9Q@mail.gmail.com>
-	<1486637473.3641.36.camel@redhat.com>
-	<20170209122819.ajgatpsnxj7cdjq2@kamzik.brq.redhat.com>
-	<1486646865.3641.41.camel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <1486646865.3641.41.camel@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 2/2] mach-virt: Provide sample
- configuration files
+	(envelope-from <programmingkidx@gmail.com>) id 1cbpR4-0000Mh-51
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 09:11:02 -0500
+Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:35055)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1cbpR3-0000MI-Vs
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 09:10:58 -0500
+Received: by mail-io0-x242.google.com with SMTP id m98so2133696iod.2
+	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 06:10:56 -0800 (PST)
+In-Reply-To: <mailman.51026.1486615955.22738.qemu-devel@nongnu.org>
+References: <mailman.51026.1486615955.22738.qemu-devel@nongnu.org>
+Mime-Version: 1.0 (Apple Message framework v753.1)
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Message-Id: <8C14E9D0-F376-4CDC-BF24-A0609A329977@gmail.com>
+Content-Transfer-Encoding: 7bit
+From: G 3 <programmingkidx@gmail.com>
+Date: Thu, 9 Feb 2017 09:10:51 -0500
+Subject: Re: [Qemu-devel] [PATCH 00/22] target/openrisc updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,133 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-On Thu, Feb 09, 2017 at 02:27:45PM +0100, Andrea Bolognani wrote:
-> On Thu, 2017-02-09 at 10:42 +0100, Andrew Jones wrote:
-> > > +[machine]
-> > > +=A0=A0type =3D "virt"
-> > > +=A0=A0accel =3D "kvm"
-> > > +
-> > > +[memory]
-> > > +=A0=A0size =3D "1024"
-> >=A0
-> > So I'm not sure about providing this, at least not in this
-> > config file. I think we should expect the user to provide ram
-> > size explicitly, as this depends on what they want to do with
-> > the guest. Even accel is debatable, as many users may want to
-> > use tcg from their x86 machines.
-> >=A0
-> > How about focusing this config on the PCIe topology and default
-> > devices? Additional config defaults like accel and ram could
-> > be added to an additional config, if we want.
->=20
-> Well, this is a sample configuration, not a one-size-fits-all
-> solution. It's okay for it to be opinionated.
->=20
-> The way I expect this file to be consumed is that people will
-> copy it over[1] to some location, tweak it to their liking by
-> adding and removing devices and altering settings such as
-> memory size, then use it to start a specific guest from that
-> moment on. When they need another guest, they can make another
-> copy of the sample and start over.
->=20
-> So the least parameters the user will have to specify outside
-> of the configuration file, the better. We actually moved *away*
-> from the idea of including multiple configuration files (one
-> for the "common" parts such as PCIe controllers, one for other
-> devices such as the video card as opposed to the serial
-> console) because it's much easier to have everything in one
-> place, for usability and for documentation purposes.
->=20
-> It's not a framework, just a decent starting point.
 
-OK, if that's the consensus on how they should be used, then
-that's fine by me. I've actually never used files like these,
-but I was imagining they'd be great to use like this
+On Feb 8, 2017, at 11:52 PM, qemu-devel-request@nongnu.org wrote:
 
- qemu -nodefaults -readconfig configfile -more -params \
-      -that -may -override -stuff -in -the -configfile
+> Message: 6
+> Date: Wed,  8 Feb 2017 20:51:32 -0800
+> From: Richard Henderson <rth@twiddle.net>
+> To: qemu-devel@nongnu.org
+> Cc: shorne@gmail.com
+> Subject: [Qemu-devel] [PATCH 00/22] target/openrisc updates
+> Message-ID: <20170209045154.16868-1-rth@twiddle.net>
+>
+> The bulk of this patch set is 2-3 years old, and was mostly
+> reviewed by Bastian Koppelmann.  But it languished because
+> there were reports of it not booting kernel images, and I
+> had problems putting together a set of tools that could even
+> build a kernel.
+>
+> The OpenRISC community has picked up activity recently,
+> with Stafford Horne upstreaming some of the compiler tools.
+> He has even done some testing for me of this patch set.
+>
+>
+> r~
 
-Actually, I don't think anything is stopping me from using this
-file that way. I'll have to try the file name override that I
-suggested below, but
+I see you are working on OpenRISC. Would you be able to help
+me improve its wiki page?
 
- qemu -nodefaults -readconfig configfile -m $MEM -machine accel=3Dtcg
+http://wiki.qemu-project.org/Documentation/Platforms/OpenRISC
 
-should certainly override correctly.
+Right now there isn't much information on OpenRISC here. I'm
+hoping to make it a lot useful to anyone who is interesting in this
+platform.
 
->=20
-> [...]
-> > > +[drive "aavmf-code"]
-> > > +=A0=A0file =3D "/usr/share/edk2/aarch64/QEMU_EFI.fd"=A0=A0# CHANGE=
- ME
-> > > +=A0=A0format =3D "raw"
-> > > +=A0=A0if =3D "pflash"
-> > > +=A0=A0unit =3D "0"
-> > > +=A0=A0readonly =3D "on"
-> > > +
-> > > +[drive "aavmf-vars"]
-> > > +=A0=A0file =3D "guest_VARS.fd"=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0# CHANGE ME
-> > > +=A0=A0format =3D "raw"
-> > > +=A0=A0if =3D "pflash"
-> > > +=A0=A0unit =3D "1"
-> >=A0
-> > The fact these entries need 'CHANGE ME' comments make me think they
-> > should also be removed from this config and required explicitly,
-> > or provided by other configs. Perhaps we can create a config for
-> > each firmware path we know of? Or, is there any way for a user
-> > to override the file path from the command line? Does
-> >=A0
-> >=A0=A0-readconfig config -drive id=3Daavmf-vars,file=3Dnew-path
-> >=A0
-> > work? If so, then we can document how CHANGEME's can be easily
-> > changed without touching the file.
->=20
-> See above.
->=20
-> [...]
-> > > +# Display controller
-> > > +# =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +#
-> > > +# We use virtio-gpu because the legacy VGA framebuffer is
-> > > +# very troublesome on aarch64, and virtio-gpu is the only
-> >=A0
-> > We use virtio-gpu because emulating a legacy VGA framebuffer
-> > is not possible on AArch64 KVM guests due to unavoidable
-> > stage1 / stage2 page table cache mode mismatches.
-> >=A0
-> > Or just leave the troublesome comment...
->=20
-> I guess that depends a lot on how low-level we want them
-> be... Overall, I kept them fairly high-level, not least
-> because that's pretty much as far my knowledge goes.
->=20
-> In other words, your take on the description is certainly
-> 100% accurate but also 100% flying way over my head ;)
->=20
-> [...]
-> > I agree with the comments of others that we should be using
-> > the PL011 instead. We should also set it up such that the
-> > monitor is multiplexed, so ^C won't terminate the guest and
-> > ^A will allow us to go to the monitor.
->=20
-> That sounds awesome, how do I actually make it work from
-> the configuration file though?
+Would you know of any links to software that works in OpenRISC?
 
-Sorry, dunno :-)
+Pictures of the OpenRISC target running anything would be great also.
 
->=20
->=20
-> [1] Looks like these files are not being installed on the
-> =A0=A0=A0=A0system by 'make install'. I'd argue having them in
-> =A0=A0=A0=A0/usr/share/doc/qemu/examples would be nice for users.
+What is your suggested command-line for using OpenRISC?
 
-I agree.
+If you have any suggestions on how to improve the page place don't
+hesitate to let me know.
 
-Thanks,
-drew
+Thank you.
