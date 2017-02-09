@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cbgj5-0002XA-9g
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 23:53:00 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cbgj8-0002Zp-0T
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 23:53:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cbgj4-0007w8-31
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 23:52:59 -0500
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:36058)
+	(envelope-from <rth7680@gmail.com>) id 1cbgj6-0007zb-Ni
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 23:53:02 -0500
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:35960)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cbgj3-0007vq-Qu
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 23:52:57 -0500
-Received: by mail-pf0-x242.google.com with SMTP id 19so12928697pfo.3
-	for <qemu-devel@nongnu.org>; Wed, 08 Feb 2017 20:52:57 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cbgj6-0007ye-G1
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 23:53:00 -0500
+Received: by mail-pg0-x243.google.com with SMTP id 75so16791742pgf.3
+	for <qemu-devel@nongnu.org>; Wed, 08 Feb 2017 20:53:00 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Wed,  8 Feb 2017 20:51:50 -0800
-Message-Id: <20170209045154.16868-19-rth@twiddle.net>
+Date: Wed,  8 Feb 2017 20:51:51 -0800
+Message-Id: <20170209045154.16868-20-rth@twiddle.net>
 In-Reply-To: <20170209045154.16868-1-rth@twiddle.net>
 References: <20170209045154.16868-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH 18/22] target/openrisc: Implement muld, muldu,
- macu, msbu
+Subject: [Qemu-devel] [PATCH 19/22] target/openrisc: Fix madd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,165 +29,177 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: shorne@gmail.com
 
+Note that the specification for lf.madd.s is confused.  It's
+the only mention of supposed FPMADDHI/FPMADDLO special registers.
+On the other hand, or1ksim implements a somewhat normal non-fused
+multiply and add.  Mirror that.
+
 Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/openrisc/translate.c | 108 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 108 insertions(+)
+ target/openrisc/cpu.h        |  3 --
+ target/openrisc/fpu_helper.c | 68 ++++++++++++++++----------------------------
+ target/openrisc/helper.h     |  7 ++---
+ target/openrisc/translate.c  | 13 +++------
+ 4 files changed, 30 insertions(+), 61 deletions(-)
 
+diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
+index 1ee1210..6426e32 100644
+--- a/target/openrisc/cpu.h
++++ b/target/openrisc/cpu.h
+@@ -279,9 +279,6 @@ typedef struct CPUOpenRISCState {
+ 
+     uint64_t mac;             /* Multiply registers MACHI:MACLO */
+ 
+-    target_ulong fpmaddhi;    /* Multiply and add float register FPMADDHI */
+-    target_ulong fpmaddlo;    /* Multiply and add float register FPMADDLO */
+-
+     target_ulong epcr;        /* Exception PC register */
+     target_ulong eear;        /* Exception EA register */
+ 
+diff --git a/target/openrisc/fpu_helper.c b/target/openrisc/fpu_helper.c
+index c54404b..1375cea 100644
+--- a/target/openrisc/fpu_helper.c
++++ b/target/openrisc/fpu_helper.c
+@@ -146,52 +146,32 @@ FLOAT_CALC(div)
+ FLOAT_CALC(rem)
+ #undef FLOAT_CALC
+ 
+-#define FLOAT_TERNOP(name1, name2)                                        \
+-uint64_t helper_float_ ## name1 ## name2 ## _d(CPUOpenRISCState *env,     \
+-                                               uint64_t fdt0,             \
+-                                               uint64_t fdt1)             \
+-{                                                                         \
+-    uint64_t result, temp, hi, lo;                                        \
+-    uint32_t val1, val2;                                                  \
+-    OpenRISCCPU *cpu = openrisc_env_get_cpu(env);                         \
+-    hi = env->fpmaddhi;                                                   \
+-    lo = env->fpmaddlo;                                                   \
+-    set_float_exception_flags(0, &cpu->env.fp_status);                    \
+-    result = float64_ ## name1(fdt0, fdt1, &cpu->env.fp_status);          \
+-    lo &= 0xffffffff;                                                     \
+-    hi &= 0xffffffff;                                                     \
+-    temp = (hi << 32) | lo;                                               \
+-    result = float64_ ## name2(result, temp, &cpu->env.fp_status);        \
+-    val1 = result >> 32;                                                  \
+-    val2 = (uint32_t) (result & 0xffffffff);                              \
+-    update_fpcsr(cpu);                                                    \
+-    cpu->env.fpmaddlo = val2;                                             \
+-    cpu->env.fpmaddhi = val1;                                             \
+-    return 0;                                                             \
+-}                                                                         \
+-                                                                          \
+-uint32_t helper_float_ ## name1 ## name2 ## _s(CPUOpenRISCState *env,     \
+-                                            uint32_t fdt0, uint32_t fdt1) \
+-{                                                                         \
+-    uint64_t result, temp, hi, lo;                                        \
+-    uint32_t val1, val2;                                                  \
+-    OpenRISCCPU *cpu = openrisc_env_get_cpu(env);                         \
+-    hi = cpu->env.fpmaddhi;                                               \
+-    lo = cpu->env.fpmaddlo;                                               \
+-    set_float_exception_flags(0, &cpu->env.fp_status);                    \
+-    result = float64_ ## name1(fdt0, fdt1, &cpu->env.fp_status);          \
+-    temp = (hi << 32) | lo;                                               \
+-    result = float64_ ## name2(result, temp, &cpu->env.fp_status);        \
+-    val1 = result >> 32;                                                  \
+-    val2 = (uint32_t) (result & 0xffffffff);                              \
+-    update_fpcsr(cpu);                                                    \
+-    cpu->env.fpmaddlo = val2;                                             \
+-    cpu->env.fpmaddhi = val1;                                             \
+-    return 0;                                                             \
++
++uint64_t helper_float_madd_d(CPUOpenRISCState *env, uint64_t a,
++                             uint64_t b, uint64_t c)
++{
++    OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
++    uint64_t result;
++    set_float_exception_flags(0, &cpu->env.fp_status);
++    /* Note that or1ksim doesn't use merged operation.  */
++    result = float64_mul(b, c, &cpu->env.fp_status);
++    result = float64_add(result, a, &cpu->env.fp_status);
++    update_fpcsr(cpu);
++    return result;
+ }
+ 
+-FLOAT_TERNOP(mul, add)
+-#undef FLOAT_TERNOP
++uint32_t helper_float_madd_s(CPUOpenRISCState *env, uint32_t a,
++                             uint32_t b, uint32_t c)
++{
++    OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
++    uint32_t result;
++    set_float_exception_flags(0, &cpu->env.fp_status);
++    /* Note that or1ksim doesn't use merged operation.  */
++    result = float32_mul(b, c, &cpu->env.fp_status);
++    result = float32_add(result, a, &cpu->env.fp_status);
++    update_fpcsr(cpu);
++    return result;
++}
+ 
+ 
+ #define FLOAT_CMP(name)                                                   \
+diff --git a/target/openrisc/helper.h b/target/openrisc/helper.h
+index 78a123d..4fd1a6b 100644
+--- a/target/openrisc/helper.h
++++ b/target/openrisc/helper.h
+@@ -29,11 +29,8 @@ DEF_HELPER_FLAGS_2(itofs, TCG_CALL_NO_WG, i32, env, i32)
+ DEF_HELPER_FLAGS_2(ftoid, TCG_CALL_NO_WG, i64, env, i64)
+ DEF_HELPER_FLAGS_2(ftois, TCG_CALL_NO_WG, i32, env, i32)
+ 
+-#define FOP_MADD(op)                                             \
+-DEF_HELPER_FLAGS_3(float_ ## op ## _s, TCG_CALL_NO_WG, i32, env, i32, i32) \
+-DEF_HELPER_FLAGS_3(float_ ## op ## _d, TCG_CALL_NO_WG, i64, env, i64, i64)
+-FOP_MADD(muladd)
+-#undef FOP_MADD
++DEF_HELPER_FLAGS_4(float_madd_s, TCG_CALL_NO_WG, i32, env, i32, i32, i32)
++DEF_HELPER_FLAGS_4(float_madd_d, TCG_CALL_NO_WG, i64, env, i64, i64, i64)
+ 
+ #define FOP_CALC(op)                                            \
+ DEF_HELPER_FLAGS_3(float_ ## op ## _s, TCG_CALL_NO_WG, i32, env, i32, i32) \
 diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-index 82b8bec..ce9672e 100644
+index ce9672e..66064e1 100644
 --- a/target/openrisc/translate.c
 +++ b/target/openrisc/translate.c
-@@ -362,6 +362,56 @@ static void gen_divu(DisasContext *dc, TCGv dest, TCGv srca, TCGv srcb)
-     gen_ove_cy(dc);
- }
+@@ -61,7 +61,6 @@ static TCGv cpu_lock_addr;
+ static TCGv cpu_lock_value;
+ static TCGv_i32 fpcsr;
+ static TCGv_i64 cpu_mac;        /* MACHI:MACLO */
+-static TCGv fpmaddhi, fpmaddlo;
+ static TCGv_i32 env_flags;
+ #include "exec/gen-icount.h"
  
-+static void gen_muld(DisasContext *dc, TCGv srca, TCGv srcb)
-+{
-+    TCGv_i64 t1 = tcg_temp_new_i64();
-+    TCGv_i64 t2 = tcg_temp_new_i64();
-+
-+    tcg_gen_ext_tl_i64(t1, srca);
-+    tcg_gen_ext_tl_i64(t2, srcb);
-+    if (TARGET_LONG_BITS == 32) {
-+        tcg_gen_mul_i64(cpu_mac, t1, t2);
-+        tcg_gen_movi_tl(cpu_sr_ov, 0);
-+    } else {
-+        TCGv_i64 high = tcg_temp_new_i64();
-+
-+        tcg_gen_muls2_i64(cpu_mac, high, t1, t2);
-+        tcg_gen_sari_i64(t1, cpu_mac, 63);
-+        tcg_gen_setcond_i64(TCG_COND_NE, t1, t1, high);
-+        tcg_temp_free_i64(high);
-+        tcg_gen_trunc_i64_tl(cpu_sr_ov, t1);
-+        tcg_gen_neg_tl(cpu_sr_ov, cpu_sr_ov);
-+
-+        gen_ove_ov(dc);
-+    }
-+    tcg_temp_free_i64(t1);
-+    tcg_temp_free_i64(t2);
-+}
-+
-+static void gen_muldu(DisasContext *dc, TCGv srca, TCGv srcb)
-+{
-+    TCGv_i64 t1 = tcg_temp_new_i64();
-+    TCGv_i64 t2 = tcg_temp_new_i64();
-+
-+    tcg_gen_extu_tl_i64(t1, srca);
-+    tcg_gen_extu_tl_i64(t2, srcb);
-+    if (TARGET_LONG_BITS == 32) {
-+        tcg_gen_mul_i64(cpu_mac, t1, t2);
-+        tcg_gen_movi_tl(cpu_sr_cy, 0);
-+    } else {
-+        TCGv_i64 high = tcg_temp_new_i64();
-+
-+        tcg_gen_mulu2_i64(cpu_mac, high, t1, t2);
-+        tcg_gen_setcondi_i64(TCG_COND_NE, high, high, 0);
-+        tcg_gen_trunc_i64_tl(cpu_sr_cy, high);
-+        tcg_temp_free_i64(high);
-+
-+        gen_ove_cy(dc);
-+    }
-+    tcg_temp_free_i64(t1);
-+    tcg_temp_free_i64(t2);
-+}
-+
- static void gen_mac(DisasContext *dc, TCGv srca, TCGv srcb)
- {
-     TCGv_i64 t1 = tcg_temp_new_i64();
-@@ -388,6 +438,25 @@ static void gen_mac(DisasContext *dc, TCGv srca, TCGv srcb)
-     gen_ove_ov(dc);
- }
+@@ -108,12 +107,6 @@ void openrisc_translate_init(void)
+     cpu_mac = tcg_global_mem_new_i64(cpu_env,
+                                      offsetof(CPUOpenRISCState, mac),
+                                      "mac");
+-    fpmaddhi = tcg_global_mem_new(cpu_env,
+-                                  offsetof(CPUOpenRISCState, fpmaddhi),
+-                                  "fpmaddhi");
+-    fpmaddlo = tcg_global_mem_new(cpu_env,
+-                                  offsetof(CPUOpenRISCState, fpmaddlo),
+-                                  "fpmaddlo");
+     for (i = 0; i < 32; i++) {
+         cpu_R[i] = tcg_global_mem_new(cpu_env,
+                                       offsetof(CPUOpenRISCState, gpr[i]),
+@@ -1324,7 +1317,8 @@ static void dec_float(DisasContext *dc, uint32_t insn)
  
-+static void gen_macu(DisasContext *dc, TCGv srca, TCGv srcb)
-+{
-+    TCGv_i64 t1 = tcg_temp_new_i64();
-+    TCGv_i64 t2 = tcg_temp_new_i64();
-+
-+    tcg_gen_extu_tl_i64(t1, srca);
-+    tcg_gen_extu_tl_i64(t2, srcb);
-+    tcg_gen_mul_i64(t1, t1, t2);
-+    tcg_temp_free_i64(t2);
-+
-+    /* Note that overflow is only computed during addition stage.  */
-+    tcg_gen_add_i64(cpu_mac, cpu_mac, t1);
-+    tcg_gen_setcond_i64(TCG_COND_LTU, t1, cpu_mac, t1);
-+    tcg_gen_trunc_i64_tl(cpu_sr_cy, t1);
-+    tcg_temp_free_i64(t1);
-+
-+    gen_ove_cy(dc);
-+}
-+
- static void gen_msb(DisasContext *dc, TCGv srca, TCGv srcb)
- {
-     TCGv_i64 t1 = tcg_temp_new_i64();
-@@ -414,6 +483,25 @@ static void gen_msb(DisasContext *dc, TCGv srca, TCGv srcb)
-     gen_ove_ov(dc);
- }
- 
-+static void gen_msbu(DisasContext *dc, TCGv srca, TCGv srcb)
-+{
-+    TCGv_i64 t1 = tcg_temp_new_i64();
-+    TCGv_i64 t2 = tcg_temp_new_i64();
-+
-+    tcg_gen_extu_tl_i64(t1, srca);
-+    tcg_gen_extu_tl_i64(t2, srcb);
-+    tcg_gen_mul_i64(t1, t1, t2);
-+
-+    /* Note that overflow is only computed during subtraction stage.  */
-+    tcg_gen_setcond_i64(TCG_COND_LTU, t2, cpu_mac, t1);
-+    tcg_gen_sub_i64(cpu_mac, cpu_mac, t1);
-+    tcg_gen_trunc_i64_tl(cpu_sr_cy, t2);
-+    tcg_temp_free_i64(t2);
-+    tcg_temp_free_i64(t1);
-+
-+    gen_ove_cy(dc);
-+}
-+
- static void gen_lwa(DisasContext *dc, TCGv rd, TCGv ra, int32_t ofs)
- {
-     TCGv ea = tcg_temp_new();
-@@ -590,6 +678,11 @@ static void dec_calc(DisasContext *dc, uint32_t insn)
-             gen_mul(dc, cpu_R[rd], cpu_R[ra], cpu_R[rb]);
-             return;
- 
-+        case 0x7: /* l.muld */
-+            LOG_DIS("l.muld r%d, r%d\n", ra, rb);
-+            gen_muld(dc, cpu_R[ra], cpu_R[rb]);
-+            break;
-+
-         case 0x9: /* l.div */
-             LOG_DIS("l.div r%d, r%d, r%d\n", rd, ra, rb);
-             gen_div(dc, cpu_R[rd], cpu_R[ra], cpu_R[rb]);
-@@ -604,6 +697,11 @@ static void dec_calc(DisasContext *dc, uint32_t insn)
-             LOG_DIS("l.mulu r%d, r%d, r%d\n", rd, ra, rb);
-             gen_mulu(dc, cpu_R[rd], cpu_R[ra], cpu_R[rb]);
-             return;
-+
-+        case 0xc: /* l.muldu */
-+            LOG_DIS("l.muldu r%d, r%d\n", ra, rb);
-+            gen_muldu(dc, cpu_R[ra], cpu_R[rb]);
-+            return;
-         }
-         break;
-     }
-@@ -916,6 +1014,16 @@ static void dec_mac(DisasContext *dc, uint32_t insn)
-         gen_msb(dc, cpu_R[ra], cpu_R[rb]);
+     case 0x07:    /* lf.madd.s */
+         LOG_DIS("lf.madd.s r%d, r%d, r%d\n", rd, ra, rb);
+-        gen_helper_float_muladd_s(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
++        gen_helper_float_madd_s(cpu_R[rd], cpu_env, cpu_R[rd],
++                                cpu_R[ra], cpu_R[rb]);
          break;
  
-+    case 0x0003:    /* l.macu */
-+        LOG_DIS("l.macu r%d, r%d\n", ra, rb);
-+        gen_macu(dc, cpu_R[ra], cpu_R[rb]);
-+        break;
-+
-+    case 0x0004:    /* l.msbu */
-+        LOG_DIS("l.msbu r%d, r%d\n", ra, rb);
-+        gen_msbu(dc, cpu_R[ra], cpu_R[rb]);
-+        break;
-+
-     default:
-         gen_illegal_exception(dc);
+     case 0x08:    /* lf.sfeq.s */
+@@ -1409,7 +1403,8 @@ static void dec_float(DisasContext *dc, uint32_t insn)
+     case 0x17:     lf.madd.d
+         LOG_DIS("lf.madd.d r%d, r%d, r%d\n", rd, ra, rb);
+         check_of64s(dc);
+-        gen_helper_float_muladd_d(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
++        gen_helper_float_madd_d(cpu_R[rd], cpu_env, cpu_R[rd],
++                                cpu_R[ra], cpu_R[rb]);
          break;
+ 
+     case 0x18:     lf.sfeq.d
 -- 
 2.9.3
