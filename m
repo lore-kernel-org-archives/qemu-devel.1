@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cbpuL-0000ym-Kb
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 09:41:14 -0500
+	(envelope-from <berrange@redhat.com>) id 1cbpw6-0002ZE-7c
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 09:43:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cbpuK-0000gp-LZ
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 09:41:13 -0500
-References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
-	<20170203154757.36140-5-vsementsov@virtuozzo.com>
-	<7b79d03c-0fba-ddb8-4295-b155cb26a206@redhat.com>
-	<829007b8-d8a4-652c-7a23-59fbb5476cd2@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <de548107-dbff-36ca-96ba-fead03589fde@redhat.com>
-Date: Thu, 9 Feb 2017 08:41:03 -0600
+	(envelope-from <berrange@redhat.com>) id 1cbpw5-0004Eg-24
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 09:43:02 -0500
+Date: Thu, 9 Feb 2017 14:42:53 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170209144253.GA26192@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170124115748.21473-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <829007b8-d8a4-652c-7a23-59fbb5476cd2@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="uPhXwJikslRs8xhnjv7hisK2lKkJxjX4D"
-Subject: Re: [Qemu-devel] [PATCH 04/18] nbd/client: refactor
- nbd_receive_starttls
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170124115748.21473-1-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] Improve I/O tests coverage of LUKS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,70 +23,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, armbru@redhat.com, den@virtuozzo.com, stefanha@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---uPhXwJikslRs8xhnjv7hisK2lKkJxjX4D
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com,
- pbonzini@redhat.com, armbru@redhat.com, den@virtuozzo.com,
- stefanha@redhat.com
-Message-ID: <de548107-dbff-36ca-96ba-fead03589fde@redhat.com>
-Subject: Re: [PATCH 04/18] nbd/client: refactor nbd_receive_starttls
-References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
- <20170203154757.36140-5-vsementsov@virtuozzo.com>
- <7b79d03c-0fba-ddb8-4295-b155cb26a206@redhat.com>
- <829007b8-d8a4-652c-7a23-59fbb5476cd2@virtuozzo.com>
-In-Reply-To: <829007b8-d8a4-652c-7a23-59fbb5476cd2@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+ping ?
 
-On 02/09/2017 12:20 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 07.02.2017 19:32, Eric Blake wrote:
->> On 02/03/2017 09:47 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> Split out nbd_receive_simple_option to be reused for structured reply=
+On Tue, Jan 24, 2017 at 11:57:43AM +0000, Daniel P. Berrange wrote:
+> The main goal of this series is to get the I/O tests passing
+> 100% with LUKS when run with './check -luks'. It also adds a
+> few more combinations to the LUKS/dmcrypt interoperability
+> test.
+> 
+> To make LUKS testing not quite as slow, we drop the PBKDF
+> iteration count down to a very small value. This doesn't
+> remove all overhead, as formatting the volume will always
+> measure PBKDF timing over a 1 second interval.
+> 
+> Changed in v3:
+> 
+>  - Fix some typos in commit message(s) (Eric)
+> 
+> Changed in v2:
+> 
+>  - Split off patch that change check.time recording since
+>    it was not a direct dependancy
+>  - Skip new 159 & 170 tests which don't work due to qemu-img
+>    dd limitations
+> 
+> Daniel P. Berrange (5):
+>   iotests: skip 159 & 170 with luks format
+>   iotests: fix remainining tests to work with LUKS
+>   iotests: reduce PBKDF iterations when testing LUKS
+>   iotests: add more LUKS hash combination tests
+>   iotests: chown LUKS device before qemu-io launches
+> 
+>  tests/qemu-iotests/033           |   16 +-
+>  tests/qemu-iotests/120           |   25 +-
+>  tests/qemu-iotests/140           |   15 +-
+>  tests/qemu-iotests/145           |   18 +-
+>  tests/qemu-iotests/149           |   26 +-
+>  tests/qemu-iotests/149.out       | 1002 ++++++++++++++++++++++++++++----------
+>  tests/qemu-iotests/157           |   17 +-
+>  tests/qemu-iotests/157.out       |   16 +-
+>  tests/qemu-iotests/159           |    2 +-
+>  tests/qemu-iotests/170           |    2 +-
+>  tests/qemu-iotests/common.filter |    3 +-
+>  tests/qemu-iotests/common.rc     |    3 +
+>  12 files changed, 847 insertions(+), 298 deletions(-)
+> 
+> -- 
+> 2.9.3
+> 
 
->>> option.
-
->>> +    return "<unknown option>";
->> Can you please consider making this include the %d representation of t=
-he
->> unknown option; perhaps by snprintf'ing into static storage?  While it=
-
->=20
-> Hmm.. The caller should free it in this case.
-
-Only if you print it into malloc'd space. I think that printing it into
-static storage may be sufficient (although then we have a race if more
-than one thread is trying to use that static storage at the same time -
-but do we ever have more than one thread trying to handle an error at
-the same time?).
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---uPhXwJikslRs8xhnjv7hisK2lKkJxjX4D
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYnH9/AAoJEKeha0olJ0NqaBoH/2i6zz8pWtMFHQkgyEeX+Ikz
-wv6eqe9xdv1TTO1RIfHDOickpG5ETbjw+4xczvuFQq1ryul0vvXIrINSxmlBbR1H
-p9dPST3+7CanM8brgGF8yJ+APA2CVrRH7HNxqO9KWyue6xfuV3XKv1vsauqTXG8/
-6fnQDgV+FK4b3YU/hmvkRsmwzr4ccpLE+tcsnm8x4EBDLlAhKLKdqhop/n0C+0qY
-FAhROxaed1BkS0dUTfpGdmRdOmWrO+e31gaEimkRyxpy+Bh3OHauTRUUCrLpiD6c
-NWX1MlW1NDEF7w1np/1UvrjHjqkAP4C+zpl/RrANtg2G7ihaNsA6AO7QiTN3hIU=
-=qznI
------END PGP SIGNATURE-----
-
---uPhXwJikslRs8xhnjv7hisK2lKkJxjX4D--
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
