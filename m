@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1cbnsJ-0008Na-6y
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 07:31:00 -0500
+	(envelope-from <ard.biesheuvel@linaro.org>) id 1cbnsv-0000KK-Dp
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 07:31:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1cbnsH-0000En-PT
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 07:30:59 -0500
-Received: from mail-it0-x235.google.com ([2607:f8b0:4001:c0b::235]:35974)
+	(envelope-from <ard.biesheuvel@linaro.org>) id 1cbnsu-0000Wf-Az
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 07:31:37 -0500
+Received: from mail-it0-x230.google.com ([2607:f8b0:4001:c0b::230]:34699)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
-	id 1cbnsH-0000EX-Ir
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 07:30:57 -0500
-Received: by mail-it0-x235.google.com with SMTP id c7so123858875itd.1
-	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 04:30:57 -0800 (PST)
+	id 1cbnsu-0000W8-6t
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 07:31:36 -0500
+Received: by mail-it0-x230.google.com with SMTP id k200so39893270itb.1
+	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 04:31:36 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <a5d47ced-527e-9fa5-9c31-5ffe7981b42c@suse.de>
+In-Reply-To: <52f06298-6ddb-2ff7-a213-d5738bdcfbc5@suse.de>
 References: <1486560712-44171-1-git-send-email-agraf@suse.de>
 	<ef6b903b-5224-b4eb-1080-a3689fcec70a@redhat.com>
 	<f2f119bc-9c22-ad52-ff26-7d6ecc213a3c@suse.de>
 	<c1ff3829-b068-881a-1523-317ef0d31689@redhat.com>
-	<a5d47ced-527e-9fa5-9c31-5ffe7981b42c@suse.de>
+	<52f06298-6ddb-2ff7-a213-d5738bdcfbc5@suse.de>
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Thu, 9 Feb 2017 12:30:56 +0000
-Message-ID: <CAKv+Gu_mtaczzEP4SenfiQ8qB0M3mfmDvzHObSrCMwUYLuFgdQ@mail.gmail.com>
+Date: Thu, 9 Feb 2017 12:31:34 +0000
+Message-ID: <CAKv+Gu-ZZQDMG7CEcYs4ep6jXMBrgDDOJx8vQ--7f16voUHxsw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Subject: Re: [Qemu-devel] [PATCH] target-arm: Declare virtio-mmio as
  dma-coherent in dt
@@ -36,7 +36,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alexander Graf <agraf@suse.de>
 Cc: Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhao@linaro.org>
 
-On 9 February 2017 at 12:24, Alexander Graf <agraf@suse.de> wrote:
+On 9 February 2017 at 12:29, Alexander Graf <agraf@suse.de> wrote:
 >
 >
 > On 08/02/2017 17:17, Laszlo Ersek wrote:
@@ -114,76 +114,8 @@ On 9 February 2017 at 12:24, Alexander Graf <agraf@suse.de> wrote:
 >> Thank you!
 >
 >
-> Is ACPI boot supposed to work at all with 4.9?
+> In fact, don't some other devices also suffer from this? Fw-cfg is now DMA
+> capable IIUC, so that should also get a _CCA attribute for example.
 >
 
-Yes, but only if you boot via UEFI
-
-> Booting Linux on physical CPU 0x0
-> Linux version 4.9.6-00018-g13e39d5 (agraf@achrid) (gcc version 6.1.1
-> 20160711 (Linaro GCC 6.1-2016.08) ) #68 SMP PREEMPT Wed Feb 8 13:25:23 CET
-> 2017
-> Boot CPU: AArch64 Processor [500f0001]
-> efi: Getting EFI parameters from FDT:
-> efi: UEFI not found.
-> cma: Reserved 16 MiB at 0x00000000bf000000
-> ACPI: Early table checksum verification disabled
-> fACPI: Failed to init ACPI tables
-> On node 0 totalpages: 524288
->   DMA zone: 8192 pages used for memmap
->   DMA zone: 0 pages reserved
->   DMA zone: 524288 pages, LIFO batch:31
-> psci: is not implemented in ACPI.
-> ACPI: APIC not present
-> fmissing boot CPU MPIDR, not enabling secondaries
-> percpu: Embedded 21 pages/cpu @ffff80007efdd000 s47896 r8192 d29928 u86016
-> pcpu-alloc: s47896 r8192 d29928 u86016 alloc=21*4096
-> pcpu-alloc: [0] 0
-> Detected PIPT I-cache on CPU0
-> Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 516096
-> Kernel command line: acpi=force console=ttyAMA0
-> PID hash table entries: 4096 (order: 3, 32768 bytes)
-> Dentry cache hash table entries: 262144 (order: 9, 2097152 bytes)
-> Inode-cache hash table entries: 131072 (order: 8, 1048576 bytes)
-> Memory: 2030472K/2097152K available (8380K kernel code, 858K rwdata, 3632K
-> rodata, 1024K init, 280K bss, 50296K reserved, 16384K cma-reserved)
-> Virtual kernel memory layout:
->     modules : 0xffff000000000000 - 0xffff000008000000   (   128 MB)
->     vmalloc : 0xffff000008000000 - 0xffff7dffbfff0000   (129022 GB)
->       .text : 0xffff000008080000 - 0xffff0000088b0000   (  8384 KB)
->     .rodata : 0xffff0000088b0000 - 0xffff000008c40000   (  3648 KB)
->       .init : 0xffff000008c40000 - 0xffff000008d40000   (  1024 KB)
->       .data : 0xffff000008d40000 - 0xffff000008e16a00   (   859 KB)
->        .bss : 0xffff000008e16a00 - 0xffff000008e5cc3c   (   281 KB)
->     fixed   : 0xffff7dfffe7fd000 - 0xffff7dfffec00000   (  4108 KB)
->     PCI I/O : 0xffff7dfffee00000 - 0xffff7dffffe00000   (    16 MB)
->     vmemmap : 0xffff7e0000000000 - 0xffff800000000000   (  2048 GB maximum)
->               0xffff7e0000000000 - 0xffff7e0002000000   (    32 MB actual)
->     memory  : 0xffff800000000000 - 0xffff800080000000   (  2048 MB)
-> SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
-> Preemptible hierarchical RCU implementation.
->         Build-time adjustment of leaf fanout to 64.
->         RCU restricting CPUs from NR_CPUS=64 to nr_cpu_ids=1.
-> RCU: Adjusting geometry for rcu_fanout_leaf=64, nr_cpu_ids=1
-> NR_IRQS:64 nr_irqs:64 0
-> ACPI: APIC not present
-> ACPI: APIC not present
-> ACPI: APIC not present
-> ACPI: APIC not present
-> ACPI: APIC not present
-> Kernel panic - not syncing: No interrupt controller found.
-> CPU: 0 PID: 0 Comm: swapper/0 Not tainted 4.9.6-00018-g13e39d5 #68
-> Hardware name: linux,dummy-virt (DT)
-> Call trace:
-> [<ffff000008088500>] dump_backtrace+0x0/0x1a0
-> [<ffff0000080886b4>] show_stack+0x14/0x20
-> [<ffff000008374e54>] dump_stack+0x94/0xb8
-> [<ffff0000081658fc>] panic+0x110/0x278
-> [<ffff000008c424a8>] init_IRQ+0x24/0x2c
-> [<ffff000008c409f0>] start_kernel+0x230/0x38c
-> [<ffff000008c401d8>] __primary_switched+0x5c/0x64
-> ---[ end Kernel panic - not syncing: No interrupt controller found.
-> linux,dummy-virt (DT)
->
->
-> Alex
+Correct. Any described DMA capable device should have a _CCA attribute
