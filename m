@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cbpWM-0004MP-Kh
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 09:16:30 -0500
+	(envelope-from <eswierk@skyportsystems.com>) id 1cbpYY-0006Bd-D6
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 09:18:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cbpWI-0001nw-C8
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 09:16:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50864)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cbpWI-0001nP-6f
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 09:16:22 -0500
-Date: Thu, 9 Feb 2017 22:16:18 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170209141618.GL22807@lemon.lan>
-References: <CAO_EM_m9Z7WcxRZthAGgeDgJ6UuwKXwAOEH7NC2=hL8Cd4jABg@mail.gmail.com>
-	<20170209014728.GF22807@lemon.lan>
-	<CAO_EM_mJYNoxTLjKmTy18JhrL_zs_VLA32Y=Cw+LYqAGPzLN=w@mail.gmail.com>
-	<20170209025212.GG22807@lemon.lan>
-	<CAO_EM_kh1mQZNhjRKi458u15kj0G6t=UEFBvM+wWhOX1fyi6VQ@mail.gmail.com>
-	<20170209101240.GJ22807@lemon.lan>
-	<CAO_EM_mhnd9-2B3vpLDa5eCyMh17e4UCYqe6nu-UqSDfhNAivA@mail.gmail.com>
+	(envelope-from <eswierk@skyportsystems.com>) id 1cbpYW-0002Zw-Kg
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 09:18:42 -0500
+Received: from mail-vk0-x231.google.com ([2607:f8b0:400c:c05::231]:35884)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <eswierk@skyportsystems.com>)
+	id 1cbpYW-0002Zp-E4
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 09:18:40 -0500
+Received: by mail-vk0-x231.google.com with SMTP id t8so3417700vke.3
+	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 06:18:40 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAO_EM_mhnd9-2B3vpLDa5eCyMh17e4UCYqe6nu-UqSDfhNAivA@mail.gmail.com>
-Subject: Re: [Qemu-devel] virtio-scsi-pci iothread spins at 100%
+In-Reply-To: <20170209084047.7897-1-famz@redhat.com>
+References: <20170209084047.7897-1-famz@redhat.com>
+From: Ed Swierk <eswierk@skyportsystems.com>
+Date: Thu, 9 Feb 2017 06:17:59 -0800
+Message-ID: <CAO_EM_k6jzM_A9-SS+7dNO7EL0Xmwm=FWuBmdkwHQ1B-pdo7bw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] virtio: Report real progress in VQ aio
+ poll handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,19 +29,329 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ed Swierk <eswierk@skyportsystems.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Thu, 02/09 05:52, Ed Swierk wrote:
-> On Thu, Feb 9, 2017 at 2:12 AM, Fam Zheng <famz@redhat.com> wrote:
-> > This should fix it:
-> >
-> > https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg01874.html
-> 
-> I tested this patch and found it fixes the problem. Thanks for the
-> speedy response!
+On Thu, Feb 9, 2017 at 12:40 AM, Fam Zheng <famz@redhat.com> wrote:
+> In virtio_queue_host_notifier_aio_poll, not all "!virtio_queue_empty()"
+> cases are making true progress.
+>
+> Currently the offending one is virtio-scsi event queue, whose handler
+> does nothing if no event is pending. As a result aio_poll() will spin on
+> the "non-empty" VQ and take 100% host CPU.
+>
+> Fix this by reporting actual progress from virtio queue aio handlers.
+>
+> Reported-by: Ed Swierk <eswierk@skyportsystems.com>
+> Signed-off-by: Fam Zheng <famz@redhat.com>
 
-Thanks for the testing! If you could reply to the patch with a "Tested-by:" line
-that would be even better. :)
+Tested-by: Ed Swierk <eswierk@skyportsystems.com>
 
-Fam
+> ---
+>  hw/block/dataplane/virtio-blk.c |  4 ++--
+>  hw/block/virtio-blk.c           | 12 ++++++++++--
+>  hw/scsi/virtio-scsi-dataplane.c | 14 +++++++-------
+>  hw/scsi/virtio-scsi.c           | 14 +++++++++++---
+>  hw/virtio/virtio.c              | 15 +++++++++------
+>  include/hw/virtio/virtio-blk.h  |  2 +-
+>  include/hw/virtio/virtio-scsi.h |  6 +++---
+>  include/hw/virtio/virtio.h      |  4 ++--
+>  8 files changed, 45 insertions(+), 26 deletions(-)
+>
+> diff --git a/hw/block/dataplane/virtio-blk.c b/hw/block/dataplane/virtio-blk.c
+> index d1f9f63..5556f0e 100644
+> --- a/hw/block/dataplane/virtio-blk.c
+> +++ b/hw/block/dataplane/virtio-blk.c
+> @@ -147,7 +147,7 @@ void virtio_blk_data_plane_destroy(VirtIOBlockDataPlane *s)
+>      g_free(s);
+>  }
+>
+> -static void virtio_blk_data_plane_handle_output(VirtIODevice *vdev,
+> +static bool virtio_blk_data_plane_handle_output(VirtIODevice *vdev,
+>                                                  VirtQueue *vq)
+>  {
+>      VirtIOBlock *s = (VirtIOBlock *)vdev;
+> @@ -155,7 +155,7 @@ static void virtio_blk_data_plane_handle_output(VirtIODevice *vdev,
+>      assert(s->dataplane);
+>      assert(s->dataplane_started);
+>
+> -    virtio_blk_handle_vq(s, vq);
+> +    return virtio_blk_handle_vq(s, vq);
+>  }
+>
+>  /* Context: QEMU global mutex held */
+> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+> index 702eda8..baaa195 100644
+> --- a/hw/block/virtio-blk.c
+> +++ b/hw/block/virtio-blk.c
+> @@ -581,10 +581,11 @@ static int virtio_blk_handle_request(VirtIOBlockReq *req, MultiReqBuffer *mrb)
+>      return 0;
+>  }
+>
+> -void virtio_blk_handle_vq(VirtIOBlock *s, VirtQueue *vq)
+> +bool virtio_blk_handle_vq(VirtIOBlock *s, VirtQueue *vq)
+>  {
+>      VirtIOBlockReq *req;
+>      MultiReqBuffer mrb = {};
+> +    bool progress = false;
+>
+>      blk_io_plug(s->blk);
+>
+> @@ -592,6 +593,7 @@ void virtio_blk_handle_vq(VirtIOBlock *s, VirtQueue *vq)
+>          virtio_queue_set_notification(vq, 0);
+>
+>          while ((req = virtio_blk_get_request(s, vq))) {
+> +            progress = true;
+>              if (virtio_blk_handle_request(req, &mrb)) {
+>                  virtqueue_detach_element(req->vq, &req->elem, 0);
+>                  virtio_blk_free_request(req);
+> @@ -607,6 +609,12 @@ void virtio_blk_handle_vq(VirtIOBlock *s, VirtQueue *vq)
+>      }
+>
+>      blk_io_unplug(s->blk);
+> +    return progress;
+> +}
+> +
+> +static void virtio_blk_handle_output_do(VirtIOBlock *s, VirtQueue *vq)
+> +{
+> +    virtio_blk_handle_vq(s, vq);
+>  }
+>
+>  static void virtio_blk_handle_output(VirtIODevice *vdev, VirtQueue *vq)
+> @@ -622,7 +630,7 @@ static void virtio_blk_handle_output(VirtIODevice *vdev, VirtQueue *vq)
+>              return;
+>          }
+>      }
+> -    virtio_blk_handle_vq(s, vq);
+> +    virtio_blk_handle_output_do(s, vq);
+>  }
+>
+>  static void virtio_blk_dma_restart_bh(void *opaque)
+> diff --git a/hw/scsi/virtio-scsi-dataplane.c b/hw/scsi/virtio-scsi-dataplane.c
+> index 6b8d0f0..74c95e0 100644
+> --- a/hw/scsi/virtio-scsi-dataplane.c
+> +++ b/hw/scsi/virtio-scsi-dataplane.c
+> @@ -49,35 +49,35 @@ void virtio_scsi_dataplane_setup(VirtIOSCSI *s, Error **errp)
+>      }
+>  }
+>
+> -static void virtio_scsi_data_plane_handle_cmd(VirtIODevice *vdev,
+> +static bool virtio_scsi_data_plane_handle_cmd(VirtIODevice *vdev,
+>                                                VirtQueue *vq)
+>  {
+>      VirtIOSCSI *s = (VirtIOSCSI *)vdev;
+>
+>      assert(s->ctx && s->dataplane_started);
+> -    virtio_scsi_handle_cmd_vq(s, vq);
+> +    return virtio_scsi_handle_cmd_vq(s, vq);
+>  }
+>
+> -static void virtio_scsi_data_plane_handle_ctrl(VirtIODevice *vdev,
+> +static bool virtio_scsi_data_plane_handle_ctrl(VirtIODevice *vdev,
+>                                                 VirtQueue *vq)
+>  {
+>      VirtIOSCSI *s = VIRTIO_SCSI(vdev);
+>
+>      assert(s->ctx && s->dataplane_started);
+> -    virtio_scsi_handle_ctrl_vq(s, vq);
+> +    return virtio_scsi_handle_ctrl_vq(s, vq);
+>  }
+>
+> -static void virtio_scsi_data_plane_handle_event(VirtIODevice *vdev,
+> +static bool virtio_scsi_data_plane_handle_event(VirtIODevice *vdev,
+>                                                  VirtQueue *vq)
+>  {
+>      VirtIOSCSI *s = VIRTIO_SCSI(vdev);
+>
+>      assert(s->ctx && s->dataplane_started);
+> -    virtio_scsi_handle_event_vq(s, vq);
+> +    return virtio_scsi_handle_event_vq(s, vq);
+>  }
+>
+>  static int virtio_scsi_vring_init(VirtIOSCSI *s, VirtQueue *vq, int n,
+> -                                  void (*fn)(VirtIODevice *vdev, VirtQueue *vq))
+> +                                  VirtIOHandleAIOOutput fn)
+>  {
+>      BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(s)));
+>      int rc;
+> diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+> index ce19eff..b01030b 100644
+> --- a/hw/scsi/virtio-scsi.c
+> +++ b/hw/scsi/virtio-scsi.c
+> @@ -436,13 +436,16 @@ static inline void virtio_scsi_release(VirtIOSCSI *s)
+>      }
+>  }
+>
+> -void virtio_scsi_handle_ctrl_vq(VirtIOSCSI *s, VirtQueue *vq)
+> +bool virtio_scsi_handle_ctrl_vq(VirtIOSCSI *s, VirtQueue *vq)
+>  {
+>      VirtIOSCSIReq *req;
+> +    bool progress = false;
+>
+>      while ((req = virtio_scsi_pop_req(s, vq))) {
+> +        progress = true;
+>          virtio_scsi_handle_ctrl_req(s, req);
+>      }
+> +    return progress;
+>  }
+>
+>  static void virtio_scsi_handle_ctrl(VirtIODevice *vdev, VirtQueue *vq)
+> @@ -591,10 +594,11 @@ static void virtio_scsi_handle_cmd_req_submit(VirtIOSCSI *s, VirtIOSCSIReq *req)
+>      scsi_req_unref(sreq);
+>  }
+>
+> -void virtio_scsi_handle_cmd_vq(VirtIOSCSI *s, VirtQueue *vq)
+> +bool virtio_scsi_handle_cmd_vq(VirtIOSCSI *s, VirtQueue *vq)
+>  {
+>      VirtIOSCSIReq *req, *next;
+>      int ret = 0;
+> +    bool progress = false;
+>
+>      QTAILQ_HEAD(, VirtIOSCSIReq) reqs = QTAILQ_HEAD_INITIALIZER(reqs);
+>
+> @@ -602,6 +606,7 @@ void virtio_scsi_handle_cmd_vq(VirtIOSCSI *s, VirtQueue *vq)
+>          virtio_queue_set_notification(vq, 0);
+>
+>          while ((req = virtio_scsi_pop_req(s, vq))) {
+> +            progress = true;
+>              ret = virtio_scsi_handle_cmd_req_prepare(s, req);
+>              if (!ret) {
+>                  QTAILQ_INSERT_TAIL(&reqs, req, next);
+> @@ -624,6 +629,7 @@ void virtio_scsi_handle_cmd_vq(VirtIOSCSI *s, VirtQueue *vq)
+>      QTAILQ_FOREACH_SAFE(req, &reqs, next, next) {
+>          virtio_scsi_handle_cmd_req_submit(s, req);
+>      }
+> +    return progress;
+>  }
+>
+>  static void virtio_scsi_handle_cmd(VirtIODevice *vdev, VirtQueue *vq)
+> @@ -752,11 +758,13 @@ out:
+>      virtio_scsi_release(s);
+>  }
+>
+> -void virtio_scsi_handle_event_vq(VirtIOSCSI *s, VirtQueue *vq)
+> +bool virtio_scsi_handle_event_vq(VirtIOSCSI *s, VirtQueue *vq)
+>  {
+>      if (s->events_dropped) {
+>          virtio_scsi_push_event(s, NULL, VIRTIO_SCSI_T_NO_EVENT, 0);
+> +        return true;
+>      }
+> +    return false;
+>  }
+>
+>  static void virtio_scsi_handle_event(VirtIODevice *vdev, VirtQueue *vq)
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index 6365706..2461c06 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -97,7 +97,7 @@ struct VirtQueue
+>
+>      uint16_t vector;
+>      VirtIOHandleOutput handle_output;
+> -    VirtIOHandleOutput handle_aio_output;
+> +    VirtIOHandleAIOOutput handle_aio_output;
+>      VirtIODevice *vdev;
+>      EventNotifier guest_notifier;
+>      EventNotifier host_notifier;
+> @@ -1287,14 +1287,16 @@ void virtio_queue_set_align(VirtIODevice *vdev, int n, int align)
+>      virtio_queue_update_rings(vdev, n);
+>  }
+>
+> -static void virtio_queue_notify_aio_vq(VirtQueue *vq)
+> +static bool virtio_queue_notify_aio_vq(VirtQueue *vq)
+>  {
+>      if (vq->vring.desc && vq->handle_aio_output) {
+>          VirtIODevice *vdev = vq->vdev;
+>
+>          trace_virtio_queue_notify(vdev, vq - vdev->vq, vq);
+> -        vq->handle_aio_output(vdev, vq);
+> +        return vq->handle_aio_output(vdev, vq);
+>      }
+> +
+> +    return false;
+>  }
+>
+>  static void virtio_queue_notify_vq(VirtQueue *vq)
+> @@ -2125,16 +2127,17 @@ static bool virtio_queue_host_notifier_aio_poll(void *opaque)
+>  {
+>      EventNotifier *n = opaque;
+>      VirtQueue *vq = container_of(n, VirtQueue, host_notifier);
+> +    bool progress;
+>
+>      if (virtio_queue_empty(vq)) {
+>          return false;
+>      }
+>
+> -    virtio_queue_notify_aio_vq(vq);
+> +    progress = virtio_queue_notify_aio_vq(vq);
+>
+>      /* In case the handler function re-enabled notifications */
+>      virtio_queue_set_notification(vq, 0);
+> -    return true;
+> +    return progress;
+>  }
+>
+>  static void virtio_queue_host_notifier_aio_poll_end(EventNotifier *n)
+> @@ -2146,7 +2149,7 @@ static void virtio_queue_host_notifier_aio_poll_end(EventNotifier *n)
+>  }
+>
+>  void virtio_queue_aio_set_host_notifier_handler(VirtQueue *vq, AioContext *ctx,
+> -                                                VirtIOHandleOutput handle_output)
+> +                                                VirtIOHandleAIOOutput handle_output)
+>  {
+>      if (handle_output) {
+>          vq->handle_aio_output = handle_output;
+> diff --git a/include/hw/virtio/virtio-blk.h b/include/hw/virtio/virtio-blk.h
+> index 9734b4c..d3c8a6f 100644
+> --- a/include/hw/virtio/virtio-blk.h
+> +++ b/include/hw/virtio/virtio-blk.h
+> @@ -80,6 +80,6 @@ typedef struct MultiReqBuffer {
+>      bool is_write;
+>  } MultiReqBuffer;
+>
+> -void virtio_blk_handle_vq(VirtIOBlock *s, VirtQueue *vq);
+> +bool virtio_blk_handle_vq(VirtIOBlock *s, VirtQueue *vq);
+>
+>  #endif
+> diff --git a/include/hw/virtio/virtio-scsi.h b/include/hw/virtio/virtio-scsi.h
+> index 7375196..f536f77 100644
+> --- a/include/hw/virtio/virtio-scsi.h
+> +++ b/include/hw/virtio/virtio-scsi.h
+> @@ -126,9 +126,9 @@ void virtio_scsi_common_realize(DeviceState *dev, Error **errp,
+>                                  VirtIOHandleOutput cmd);
+>
+>  void virtio_scsi_common_unrealize(DeviceState *dev, Error **errp);
+> -void virtio_scsi_handle_event_vq(VirtIOSCSI *s, VirtQueue *vq);
+> -void virtio_scsi_handle_cmd_vq(VirtIOSCSI *s, VirtQueue *vq);
+> -void virtio_scsi_handle_ctrl_vq(VirtIOSCSI *s, VirtQueue *vq);
+> +bool virtio_scsi_handle_event_vq(VirtIOSCSI *s, VirtQueue *vq);
+> +bool virtio_scsi_handle_cmd_vq(VirtIOSCSI *s, VirtQueue *vq);
+> +bool virtio_scsi_handle_ctrl_vq(VirtIOSCSI *s, VirtQueue *vq);
+>  void virtio_scsi_init_req(VirtIOSCSI *s, VirtQueue *vq, VirtIOSCSIReq *req);
+>  void virtio_scsi_free_req(VirtIOSCSIReq *req);
+>  void virtio_scsi_push_event(VirtIOSCSI *s, SCSIDevice *dev,
+> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+> index 525da24..0863a25 100644
+> --- a/include/hw/virtio/virtio.h
+> +++ b/include/hw/virtio/virtio.h
+> @@ -154,6 +154,7 @@ void virtio_error(VirtIODevice *vdev, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
+>  void virtio_device_set_child_bus_name(VirtIODevice *vdev, char *bus_name);
+>
+>  typedef void (*VirtIOHandleOutput)(VirtIODevice *, VirtQueue *);
+> +typedef bool (*VirtIOHandleAIOOutput)(VirtIODevice *, VirtQueue *);
+>
+>  VirtQueue *virtio_add_queue(VirtIODevice *vdev, int queue_size,
+>                              VirtIOHandleOutput handle_output);
+> @@ -284,8 +285,7 @@ bool virtio_device_ioeventfd_enabled(VirtIODevice *vdev);
+>  EventNotifier *virtio_queue_get_host_notifier(VirtQueue *vq);
+>  void virtio_queue_host_notifier_read(EventNotifier *n);
+>  void virtio_queue_aio_set_host_notifier_handler(VirtQueue *vq, AioContext *ctx,
+> -                                                void (*fn)(VirtIODevice *,
+> -                                                           VirtQueue *));
+> +                                                VirtIOHandleAIOOutput handle_output);
+>  VirtQueue *virtio_vector_first_queue(VirtIODevice *vdev, uint16_t vector);
+>  VirtQueue *virtio_vector_next_queue(VirtQueue *vq);
+>
+> --
+> 2.9.3
+>
