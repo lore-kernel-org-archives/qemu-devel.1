@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53489)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cbnpq-0006m3-L1
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 07:28:27 -0500
+	(envelope-from <agraf@suse.de>) id 1cbnr6-0007U4-3H
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 07:29:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cbnpn-000835-Id
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 07:28:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52394)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1cbnpn-00082p-DC
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 07:28:23 -0500
-Date: Thu, 9 Feb 2017 13:28:19 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20170209122819.ajgatpsnxj7cdjq2@kamzik.brq.redhat.com>
-References: <1486575331-14455-1-git-send-email-abologna@redhat.com>
-	<1486575331-14455-3-git-send-email-abologna@redhat.com>
-	<20170209094259.nmli6yd5swxdujkm@kamzik.brq.redhat.com>
-	<CAFEAcA8bRHuF_to0+whEhNF5oXp5_O63H8EV2JTXBngffufz9Q@mail.gmail.com>
-	<1486637473.3641.36.camel@redhat.com>
+	(envelope-from <agraf@suse.de>) id 1cbnr5-0008Nt-3q
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 07:29:44 -0500
+References: <1486560712-44171-1-git-send-email-agraf@suse.de>
+	<ef6b903b-5224-b4eb-1080-a3689fcec70a@redhat.com>
+	<f2f119bc-9c22-ad52-ff26-7d6ecc213a3c@suse.de>
+	<c1ff3829-b068-881a-1523-317ef0d31689@redhat.com>
+From: Alexander Graf <agraf@suse.de>
+Message-ID: <52f06298-6ddb-2ff7-a213-d5738bdcfbc5@suse.de>
+Date: Thu, 9 Feb 2017 13:29:36 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <1486637473.3641.36.camel@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 2/2] mach-virt: Provide sample
- configuration files
+In-Reply-To: <c1ff3829-b068-881a-1523-317ef0d31689@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target-arm: Declare virtio-mmio as
+ dma-coherent in dt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,59 +26,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, mst@redhat.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Shannon Zhao <shannon.zhao@linaro.org>
 
-On Thu, Feb 09, 2017 at 11:51:13AM +0100, Andrea Bolognani wrote:
-> On Thu, 2017-02-09 at 09:57 +0000, Peter Maydell wrote:
-> > > I see Peter and you are discussing what to document here. IMO,
-> > > we should simply state -nodefaults provides us a base mach-virt
-> > > board with no peripherals.
-> >=A0
-> > The thing about saying that is that it's not actually
-> > correct -- you get the UART, etc etc peripherals whether
-> > you say -nodefaults or not. I agree that listing them
-> > in multiple places isn't a good idea though. Maybe
-> > there's some wording that will work here.
->=20
-> Agreed, we just have to find the right wording. Would
-> something like
->=20
-> =A0 Using -nodefaults is required to have full control over
-> =A0 the virtual hardware: when it's specified, QEMU will
-> =A0 only automatically add a small selection of core PCI
-> =A0 devices, and leave the user in charge of adding more as
-> =A0 they see fit. More specifically, the PCI devices that
-> =A0 will always be present are:
->=20
-> =A0=A0=A0=A000:00.0 Host bridge
->=20
-> =A0 This configuration file adds a number of other...
->=20
-> work for you? Please keep in mind that I want to be able
-> to use the very same paragraph both for q35 and mach-virt.
 
-I'm not sure having the exact same paragraph is a reasonable
-goal. Does q35 have platform devices like mach-virt? The
-devices we get on a 'qemu -nodefaults -machine virt' instance
-are MMIO driven devices on the board, rather than devices
-hung off the pcie host bridge.
 
-Perhaps we can list the uart as an example; I don't suppose
-it'll ever be removed. If we use wording such as "such as",
-then it allows expansion to the board without a commitment to
-update the list.
+On 08/02/2017 17:17, Laszlo Ersek wrote:
+> On 02/08/17 17:12, Alexander Graf wrote:
+>> On 02/08/2017 04:29 PM, Laszlo Ersek wrote:
+>>> CC'ing Ard and Shannon (I recall this property from earlier):
+>>>
+>>> On 02/08/17 14:31, Alexander Graf wrote:
+>>>> QEMU emulated hardware is always dma coherent with its guest. We do
+>>>> annotate that correctly on the PCI host controller, but left out
+>>>> virtio-mmio.
+>>> I recommend to reference the following commit here:
+>>>
+>>> commit 5d636e21c44ecf982a22a7bc4ca89186079ac283
+>>> Author: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>>> Date:   Mon Jul 4 13:06:36 2016 +0100
+>>>
+>>>      hw/arm/virt: mark the PCIe host controller as DMA coherent in the DT
+>>>           Since QEMU performs cacheable accesses to guest memory when
+>>> doing DMA
+>>>      as part of the implementation of emulated PCI devices, guest drivers
+>>>      should use cacheable accesses as well when running under KVM.
+>>> Since this
+>>>      essentially means that emulated PCI devices are DMA coherent, set
+>>> the
+>>>      'dma-coherent' DT property on the PCIe host controller DT node.
+>>>           This brings the DT description into line with the ACPI
+>>> description,
+>>>      which already marks the PCI bridge as cache coherent (see commit
+>>>      bc64b96c984abf).
+>>>           Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>>>      Message-id:
+>>> 1467134090-5099-1-git-send-email-ard.biesheuvel@linaro.org
+>>>      Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>>>      Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>>>
+>>>> Recent kernels have started to interpret that flag rather than take
+>>>> dma coherency as granted with virtio-mmio. While that is considered
+>>>> a kernel bug, as it breaks previously working systems, it showed that
+>>>> our dt description is incomplete.
+>>>>
+>>>> This patch adds the respective marker that allows guest OSs to evaluate
+>>>> that our virtio-mmio devices are indeed cache coherent.
+>>> As noted above, commit bc64b96c984a ("hw/arm/virt-acpi-build: _CCA
+>>> attribute is compulsory", 2015-11-03) had done the same in the ACPI
+>>> description of the PCIe host controller.
+>>>
+>>> Thus, do we need _CCA in the ACPI description of the virtio-mmio
+>>> transports, to parallel the DT change? See the LNRO0005 device in
+>>> acpi_dsdt_add_virtio().
+>>
+>> Yes, we should also annotate it correctly in the DSDT. Today it's not a
+>> deal breaker as Linux always assumes virtio-mmio to be dma coherent, but
+>> it would make our platform description more accurate.
+>>
+>>> If that's the case, then I propose that either the patch please fix
+>>> both DT and ACPI, or that at least we file a bug "somewhere", for
+>>> adding _CCA in acpi_dsdt_add_virtio().
+>>
+>> I agree that it should happen in the same patch (set). While I don't
+>> care a lot about ACPI right now (since dt is preferred on upstream
+>> kernels), I can take a look.
+>
+> Thank you!
 
-BTW, when I stated "-nodefaults provides us a base mach-virt
-board with no peripherals.", I meant no _additional_
-peripherals plugged into the board's virtio-mmio transports,
-nor hung off the host bridge. Is there a word for those?
-Maybe just non-builtin peripherals?
+In fact, don't some other devices also suffer from this? Fw-cfg is now 
+DMA capable IIUC, so that should also get a _CCA attribute for example.
 
-Thanks,
-drew
 
->=20
-> --=A0
-> Andrea Bolognani / Red Hat / Virtualization
->=20
+Alex
