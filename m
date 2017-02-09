@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cbwb6-0008Cr-J9
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 16:49:49 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cbwjw-0004AY-61
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 16:58:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cbwb1-0002Ra-NK
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 16:49:48 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1486648058-520-1-git-send-email-clg@kaod.org>
-	<1486648058-520-5-git-send-email-clg@kaod.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c3edd594-8feb-a06f-d239-2d7580cfb883@amsat.org>
-Date: Thu, 9 Feb 2017 18:49:39 -0300
+	(envelope-from <peter.maydell@linaro.org>) id 1cbwjv-00051z-5h
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 16:58:56 -0500
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:33926)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cbwju-00050N-Te
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 16:58:55 -0500
+Received: by mail-wr0-x234.google.com with SMTP id o16so93923897wra.1
+	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 13:58:53 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1486648058-520-5-git-send-email-clg@kaod.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 4/4] aspeed/smc: use a modulo to
- check segment limits
+In-Reply-To: <9fd4e2f7-c2e3-2354-028e-f7ee6c2801e3@twiddle.net>
+References: <1486668676-24680-1-git-send-email-peter.maydell@linaro.org>
+	<9fd4e2f7-c2e3-2354-028e-f7ee6c2801e3@twiddle.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 9 Feb 2017 21:58:31 +0000
+Message-ID: <CAFEAcA9VxHUo42n5wojx0yBL_Fj7oz0i_xA-MfYTF9D2ab7nnA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] cputlb: Don't assume
+ do_unassigned_access() never returns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +30,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+To: Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-On 02/09/2017 10:47 AM, Cédric Le Goater wrote:
-> The size of a segment is not necessarily a power of 2.
->
-> Signed-off-by: Cédric Le Goater <clg@kaod.org>
+On 9 February 2017 at 20:03, Richard Henderson <rth@twiddle.net> wrote:
+> On 02/09/2017 11:31 AM, Peter Maydell wrote:
+>> Review from somebody who understands how the unassigned_access
+>> hooks are supposed to work appreciated.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> The unassigned_access hook was (unfortunately) designed after the
+> unaligned_access hook.  The later *can* usefully return to indicate that the
+> cpu bit that enforces alignment traps is off.
+>
+> Any unassigned_access hook that doesn't longjmp could be
+> considered buggy.
 
-> ---
->  hw/ssi/aspeed_smc.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
-> index 70177078a8f2..cb515730c5ad 100644
-> --- a/hw/ssi/aspeed_smc.c
-> +++ b/hw/ssi/aspeed_smc.c
-> @@ -475,15 +475,15 @@ static uint32_t aspeed_smc_check_segment_addr(const AspeedSMCFlash *fl,
->      AspeedSegments seg;
->
->      aspeed_smc_reg_to_segment(s->regs[R_SEG_ADDR0 + fl->id], &seg);
-> -    if ((addr & (seg.size - 1)) != addr) {
-> +    if ((addr % seg.size) != addr) {
->          qemu_log_mask(LOG_GUEST_ERROR,
->                        "%s: invalid address 0x%08x for CS%d segment : "
->                        "[ 0x%"HWADDR_PRIx" - 0x%"HWADDR_PRIx" ]\n",
->                        s->ctrl->name, addr, fl->id, seg.addr,
->                        seg.addr + seg.size);
-> +        addr %= seg.size;
->      }
->
-> -    addr &= seg.size - 1;
->      return addr;
->  }
->
->
+I use the M profile unassigned_access hook to implement
+the "high addresses are magic, but only if you're in
+Handler mode" behaviour. So for Thread mode I want the
+default handling. You could argue that this is kind
+of abusing the hook, though.
+
+Microblaze returns from the hook in the case where the
+processor version register bit says "this CPU doesn't
+generate exceptions for instruction/data aborts".
+Since it looks like you can have a CPU config that
+chooses to generate an exception for insn abort
+but not data abort (or vice-versa), this looks like
+a valid case for allowing the hook to return (you
+need the hook for the case which you want to have
+throw exceptions, but it gets called for the other
+case too and needs to be able to say "nope" there).
+
+The sparc code is too complicated for me to be able
+to judge whether its non-longjmping codepaths are
+valid or bugs.
+
+thanks
+-- PMM
