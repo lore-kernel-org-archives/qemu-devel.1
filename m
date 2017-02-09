@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cbepn-0007c3-JC
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 21:51:49 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cbepo-0007cO-Jv
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 21:51:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cbepk-0006x5-GG
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 21:51:47 -0500
-Date: Thu, 9 Feb 2017 12:20:33 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1cbepn-0006xt-5k
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 21:51:48 -0500
+Date: Thu, 9 Feb 2017 13:32:19 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170209012033.GM17644@umbus.fritz.box>
-References: <1486377000-25701-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<1486377000-25701-2-git-send-email-nikunj@linux.vnet.ibm.com>
+Message-ID: <20170209023219.GT17644@umbus.fritz.box>
+References: <cover.1486436185.git.sam.bobroff@au1.ibm.com>
+	<fe7cb0c915e6c88f090e7167410165bf0e7d14bc.1486436186.git.sam.bobroff@au1.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="JvUS8mwutKMHKosv"
+	protocol="application/pgp-signature"; boundary="BVQ1RKc6+nLPB5pT"
 Content-Disposition: inline
-In-Reply-To: <1486377000-25701-2-git-send-email-nikunj@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/4] target-ppc: implement load atomic
- instruction
+In-Reply-To: <fe7cb0c915e6c88f090e7167410165bf0e7d14bc.1486436186.git.sam.bobroff@au1.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 6/9] spapr: Add
+ h_register_process_table() hypercall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,132 +25,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Cc: qemu-ppc@nongnu.org, rth@twiddle.net, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, Balamuruhan S <bala24@linux.vnet.ibm.com>, Harish S <harisrir@linux.vnet.ibm.com>, Athira Rajeev <atrajeev@linux.vnet.ibm.com>
+To: Sam Bobroff <sam.bobroff@au1.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---JvUS8mwutKMHKosv
+--BVQ1RKc6+nLPB5pT
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 06, 2017 at 03:59:57PM +0530, Nikunj A Dadhania wrote:
-> From: Balamuruhan S <bala24@linux.vnet.ibm.com>
+On Tue, Feb 07, 2017 at 01:56:49PM +1100, Sam Bobroff wrote:
+> Both radix and hash modes require guests to use
+> h_register_process_table() to set up the MMU. Implement it using the
+> new KVM ioctl KVM_PPC_CONFIGURE_V3_MMU.
 >=20
-> lwat: Load Word Atomic
-> ldat: Load Doubleword Atomic
->=20
-> The instruction includes as function code (5 bits) which gives a detail
-> on the operation to be performed. The patch implements five such
-> functions.
->=20
-> Signed-off-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
-> Signed-off-by: Harish S <harisrir@linux.vnet.ibm.com>
-> Signed-off-by: Athira Rajeev <atrajeev@linux.vnet.ibm.com>
-> [ combine both lwat/ldat implementation using macro ]
-> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+> This hypercall is also necessary for fully emulated guests, so it will
+> need to be reworked to integrate with Suraj's TCG patchset.
 > ---
->  target/ppc/internal.h  |  2 ++
->  target/ppc/translate.c | 50 ++++++++++++++++++++++++++++++++++++++++++++=
-++++++
->  2 files changed, 52 insertions(+)
+>  hw/ppc/spapr_hcall.c   | 48 ++++++++++++++++++++++++++++++++++++++++++++=
+++++
+>  include/hw/ppc/spapr.h |  3 ++-
+>  target/ppc/kvm.c       | 12 ++++++++++++
+>  target/ppc/kvm_ppc.h   |  1 +
+>  4 files changed, 63 insertions(+), 1 deletion(-)
 >=20
-> diff --git a/target/ppc/internal.h b/target/ppc/internal.h
-> index 5b5b180..1f441c6 100644
-> --- a/target/ppc/internal.h
-> +++ b/target/ppc/internal.h
-> @@ -133,6 +133,8 @@ EXTRACT_HELPER(UIMM4, 16, 4);
->  EXTRACT_HELPER(NB, 11, 5);
->  /* Shift count */
->  EXTRACT_HELPER(SH, 11, 5);
-> +/* lwat/stwat/ldat/lwat */
-> +EXTRACT_HELPER(FC, 11, 5);
->  /* Vector shift count */
->  EXTRACT_HELPER(VSH, 6, 4);
->  /* Mask start */
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index b48abae..f59184f 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -2976,6 +2976,54 @@ LARX(lbarx, DEF_MEMOP(MO_UB))
->  LARX(lharx, DEF_MEMOP(MO_UW))
->  LARX(lwarx, DEF_MEMOP(MO_UL))
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index c9bb6624c4..4de511c386 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1049,6 +1049,50 @@ static target_ulong h_client_architecture_support(=
+PowerPCCPU *cpu_,
+>      return H_SUCCESS;
+>  }
 > =20
-> +#define LD_ATOMIC(name, memop, tp, op, eop)                             \
-> +static void gen_##name(DisasContext *ctx)                               \
-> +{                                                                       \
-> +    int len =3D MEMOP_GET_SIZE(memop);                                  =
-  \
-> +    uint32_t gpr_FC =3D FC(ctx->opcode);                                =
-  \
-> +    TCGv EA =3D tcg_temp_local_new();                                   =
-  \
-> +    TCGv_##tp t0, t1;                                                   \
-> +                                                                        \
-> +    gen_addr_register(ctx, EA);                                         \
-> +    if (len > 1) {                                                      \
-> +        gen_check_align(ctx, EA, len - 1);                              \
-> +    }                                                                   \
-> +    t0 =3D tcg_temp_new_##tp();                                         =
-  \
-> +    t1 =3D tcg_temp_new_##tp();                                         =
-  \
-> +    tcg_gen_##op(t0, cpu_gpr[rD(ctx->opcode) + 1]);                     \
-> +                                                                        \
-> +    switch (gpr_FC) {                                                   \
-> +    case 0: /* Fetch and add */                                         \
-> +        tcg_gen_atomic_fetch_add_##tp(t1, EA, t0, ctx->mem_idx, memop); \
-> +        break;                                                          \
-> +    case 1: /* Fetch and xor */                                         \
-> +        tcg_gen_atomic_fetch_xor_##tp(t1, EA, t0, ctx->mem_idx, memop); \
-> +        break;                                                          \
-> +    case 2: /* Fetch and or */                                          \
-> +        tcg_gen_atomic_fetch_or_##tp(t1, EA, t0, ctx->mem_idx, memop);  \
-> +        break;                                                          \
-> +    case 3: /* Fetch and 'and' */                                       \
-> +        tcg_gen_atomic_fetch_and_##tp(t1, EA, t0, ctx->mem_idx, memop); \
-> +        break;                                                          \
-> +    case 8: /* Swap */                                                  \
-> +        tcg_gen_atomic_xchg_##tp(t1, EA, t0, ctx->mem_idx, memop);      \
-> +        break;                                                          \
-> +    default:                                                            \
-> +        /* invoke data storage error handler */                         \
-> +        gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);             \
+> +static target_ulong h_register_process_table(PowerPCCPU *cpu,
+> +                                             sPAPRMachineState *spapr,
+> +                                             target_ulong opcode,
+> +                                             target_ulong *args)
+> +{
+> +    static target_ulong last_process_table;
 
-Both your comment and the ISA say that an invalid FC will result in a
-data storage (0x300) exception, but here you seem to be invoking an
-invalid instruction exception (0x700).  Which is correct?
+Ewwww.. a static local?  Store this info in sPAPRMachineState instead;
+chances are you'll want it in other places eventually anyway (even if
+only for debugging).
 
-> +        break;                                                          \
-> +    }                                                                   \
-> +    tcg_gen_##eop(cpu_gpr[rD(ctx->opcode)], t1);                        \
-> +    tcg_temp_free_##tp(t0);                                             \
-> +    tcg_temp_free_##tp(t1);                                             \
-> +    tcg_temp_free(EA);                                                  \
+
+> +    target_ulong flags =3D args[0];
+> +    target_ulong proc_tbl =3D args[1];
+> +    target_ulong page_size =3D args[2];
+> +    target_ulong table_size =3D args[3];
+> +    uint64_t cflags, cproc;
+> +
+> +    cflags =3D (flags & 4) ? KVM_PPC_MMUV3_RADIX : 0;
+
+No #defines for the bits in the hcall arguments?
+
+> +    cflags |=3D (flags & 1) ? KVM_PPC_MMUV3_GTSE : 0;
+> +    cproc =3D (flags & 4) ? (1ul << 63) : 0;
+> +    if (!(flags & 0x10)) {
+> +        if ((last_process_table & (1ul << 63)) !=3D cproc) {
+> +            return H_PARAMETER;
+> +        }
+> +        cproc =3D last_process_table;
+> +    } else if (!(flags & 0x8)) {
+> +        ; /* do nothing */
+> +    } else if (flags & 4) {
+> +        /* radix */
+> +        if (table_size > 24 || (proc_tbl & 0xfff) || (proc_tbl >> 60)) {
+> +            return H_PARAMETER;
+> +        }
+> +        cproc |=3D proc_tbl | table_size;
+> +    } else {
+> +        /* hash, possibly with process table */
+> +        if (table_size > 24 || (proc_tbl >> 38) || page_size > 7) {
+> +            return H_PARAMETER;
+> +        }
+> +        cproc =3D (proc_tbl << 25) | (page_size << 5) | table_size;
+> +    }
+> +    last_process_table =3D cproc;
+> +    fprintf(stderr, "calling config mmu flags=3D%lx proctbl=3D%lx\n",
+> +            cflags, cproc);
+> +    if  (!kvmppc_configure_v3_mmu(cpu, cflags, cproc)) {
+> +        return H_HARDWARE;
+> +    }
+> +    return H_SUCCESS;
 > +}
 > +
-> +LD_ATOMIC(lwat, DEF_MEMOP(MO_UL), i32, trunc_tl_i32, extu_i32_tl)
-> +#if defined(TARGET_PPC64)
-> +LD_ATOMIC(ldat, DEF_MEMOP(MO_Q), i64, mov_i64, mov_i64)
-> +#endif
+>  static spapr_hcall_fn papr_hypercall_table[(MAX_HCALL_OPCODE / 4) + 1];
+>  static spapr_hcall_fn kvmppc_hypercall_table[KVMPPC_HCALL_MAX - KVMPPC_H=
+CALL_BASE + 1];
+> =20
+> @@ -1136,6 +1180,10 @@ static void hypercall_register_types(void)
+> =20
+>      /* ibm,client-architecture-support support */
+>      spapr_register_hypercall(KVMPPC_H_CAS, h_client_architecture_support=
+);
 > +
->  #if defined(CONFIG_USER_ONLY)
->  static void gen_conditional_store(DisasContext *ctx, TCGv EA,
->                                    int reg, int memop)
-> @@ -6230,10 +6278,12 @@ GEN_HANDLER(isync, 0x13, 0x16, 0x04, 0x03FFF801, =
-PPC_MEM),
->  GEN_HANDLER_E(lbarx, 0x1F, 0x14, 0x01, 0, PPC_NONE, PPC2_ATOMIC_ISA206),
->  GEN_HANDLER_E(lharx, 0x1F, 0x14, 0x03, 0, PPC_NONE, PPC2_ATOMIC_ISA206),
->  GEN_HANDLER(lwarx, 0x1F, 0x14, 0x00, 0x00000000, PPC_RES),
-> +GEN_HANDLER_E(lwat, 0x1F, 0x06, 0x12, 0x00000001, PPC_NONE, PPC2_ISA300),
->  GEN_HANDLER_E(stbcx_, 0x1F, 0x16, 0x15, 0, PPC_NONE, PPC2_ATOMIC_ISA206),
->  GEN_HANDLER_E(sthcx_, 0x1F, 0x16, 0x16, 0, PPC_NONE, PPC2_ATOMIC_ISA206),
->  GEN_HANDLER2(stwcx_, "stwcx.", 0x1F, 0x16, 0x04, 0x00000000, PPC_RES),
->  #if defined(TARGET_PPC64)
-> +GEN_HANDLER_E(ldat, 0x1F, 0x06, 0x13, 0x00000001, PPC_NONE, PPC2_ISA300),
->  GEN_HANDLER(ldarx, 0x1F, 0x14, 0x02, 0x00000000, PPC_64B),
->  GEN_HANDLER_E(lqarx, 0x1F, 0x14, 0x08, 0, PPC_NONE, PPC2_LSQ_ISA207),
->  GEN_HANDLER2(stdcx_, "stdcx.", 0x1F, 0x16, 0x06, 0x00000000, PPC_64B),
+> +    /* Power9 MMU support */
+> +    spapr_register_hypercall(H_REGISTER_PROCESS_TABLE,
+> +                             h_register_process_table);
+>  }
+> =20
+>  type_init(hypercall_register_types)
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index bd5bcf70de..92bda0f36d 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -347,7 +347,8 @@ struct sPAPRMachineState {
+>  #define H_XIRR_X                0x2FC
+>  #define H_RANDOM                0x300
+>  #define H_SET_MODE              0x31C
+> -#define MAX_HCALL_OPCODE        H_SET_MODE
+> +#define H_REGISTER_PROCESS_TABLE 0x37C
+> +#define MAX_HCALL_OPCODE        H_REGISTER_PROCESS_TABLE
+> =20
+>  /* The hcalls above are standardized in PAPR and implemented by pHyp
+>   * as well.
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 8d6fd1b067..0d1443616c 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -344,6 +344,18 @@ static bool kvm_get_rmmu_info(PowerPCCPU *cpu, struc=
+t kvm_ppc_rmmu_info *info)
+>      return false;
+>  }
+> =20
+> +bool kvmppc_configure_v3_mmu(PowerPCCPU *cpu, uint64_t flags, uint64_t p=
+roc_tbl)
+> +{
+> +    CPUState *cs =3D CPU(cpu);
+> +    int ret;
+> +    struct kvm_ppc_mmuv3_cfg cfg;
+> +
+> +    cfg.flags =3D flags;
+> +    cfg.process_table =3D proc_tbl;
+> +    ret =3D kvm_vm_ioctl(cs->kvm_state, KVM_PPC_CONFIGURE_V3_MMU, &cfg);
+> +    return ret =3D=3D 0;
+> +}
+> +
+>  static long gethugepagesize(const char *mem_path)
+>  {
+>      struct statfs fs;
+> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+> index 1c1b94847c..0b8b77583a 100644
+> --- a/target/ppc/kvm_ppc.h
+> +++ b/target/ppc/kvm_ppc.h
+> @@ -33,6 +33,7 @@ int kvmppc_clear_tsr_bits(PowerPCCPU *cpu, uint32_t tsr=
+_bits);
+>  int kvmppc_or_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits);
+>  int kvmppc_set_tcr(PowerPCCPU *cpu);
+>  int kvmppc_booke_watchdog_enable(PowerPCCPU *cpu);
+> +bool kvmppc_configure_v3_mmu(PowerPCCPU *cpu, uint64_t flags, uint64_t p=
+roctbl);
+>  #ifndef CONFIG_USER_ONLY
+>  off_t kvmppc_alloc_rma(void **rma);
+>  bool kvmppc_spapr_use_multitce(void);
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -158,25 +187,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---JvUS8mwutKMHKosv
+--BVQ1RKc6+nLPB5pT
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYm8PfAAoJEGw4ysog2bOSNnwQAJsdGUGccr5lR7LFkLXr4m1X
-IZzkqQRfKDqpYvn2261u9dbOZq8Y5lH0FhluCz/7vNIJjKfl7TRrO6qnJjeuoJ0Y
-lk3iSvznZmmiJaAmwmEf7s8/ALGNYjMlZYSqwAGJy+xlU8MSel9qyeSBvbmYfrEZ
-v9QhBBz2fxEtmtXDIsxBpVwyIyit0MHhrX8HgGFFesXoh1tRWbqAekSTkDmVgy1s
-uByOtN+8gx36bFOlV6djmGCxqn4R46ypMR5Wo3MZ5XYZ9XazlLOeYEak40QJGGEx
-t9iE/6h38Cmj2AGhfu7XGeCOuer1Me6Q8CF49TnEtKBu1gHxJyyD+H9yJDEgZ+Rq
-R/gsxj2kvE5YI159LPkCk6rF8imo3H7g17l38PW0XN5xtGnywu5K4IvZT8A0hQ7R
-vnSyjXNT2c2gk37KB5tPawmhrNZrQpW+QZrNGZMJvdC/FUQNFUCR4fcMlKZc3x59
-uTcLcHmsjuxEmcFGIYWiYD6jnh61Kj0mLOL2ewieC1p40AYQFAT3RkXENAWO0I1B
-V9vymZaOC27/j7zDj0JgJEYIHSnAIG9Q53GQco4YgfMGXQP0DF3+Wv6TYiK/UnyU
-zbvareeoF7lqvuUiR452Bh+WnyZpKKvqAvNYAEA3hA7vQzwCOpsIAef8MadCoRWZ
-0idylQDpb9U4uTDR+eFm
-=Is9q
+iQIcBAEBCAAGBQJYm9SzAAoJEGw4ysog2bOSvNkP/3fLVHbZ5vxBJVYHyUBn2oQS
+6/Hba3TjK/420RiyttaUniKU1Auyc6EspvOtvEG94CcC9FRkI1TgxW+JNekQRfJE
+5AF7699geMmlBPAWXcKEi/wmikTvZBfi0nAkt68nwXeSStmkWKCqXRuo4XUS51+T
+HtqxZWvVag7pkzKPtmY4eQNmQZ3Ps7SEeAtsV22BWr82/zNy7vmr8N4N2BqxKvCm
+BDnYNi1w2LixLKAoZK79t7EmAeBMMwM2dZWN0ulpPxs2sHSd+1pZCQd6GlETZZUf
+nWndOaLDh3cC7mCWHHNYYc+mZiHbKwqdOTImQTwV8BSwnxrGRuULjnhbmDQvTMfh
+J1moXjEI7vxsNe1P+BscNTTUd0Dx3VHiGRCG/hbxVppD9IdN++9V+JOynDgnzSFK
+HKr3MSLnAxHxsWvflJf89GaZxKrX6vqsbuFAHuWe7qgaHByOMiJLABob4O1HjpOL
+pToOB0nkdPe+EUIjerBOfsDmktR2TIczOS1hHDQBrvH4DiaZSEU88NrnSmRGh708
+ZjCiVErPSA20brsHpfJhA65+zvhI9mUVAYW4OhchpokluDPXZ8yhnwLC+2a1wxgI
+47hfpxTORbFE6UjfoLFtQhJM3V20fcLhnR/8jSHCHSajBQzoFSmsJrfvNIHMBRSP
+YT9+snBUmlEuTlswUjYH
+=4cxQ
 -----END PGP SIGNATURE-----
 
---JvUS8mwutKMHKosv--
+--BVQ1RKc6+nLPB5pT--
