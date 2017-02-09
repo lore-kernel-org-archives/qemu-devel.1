@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cbsWS-0008Rb-8Y
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:28:45 -0500
+	(envelope-from <ard.biesheuvel@linaro.org>) id 1cbssQ-0002Sz-9t
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:51:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cbsWP-0002oo-0q
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:28:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42678)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cbsWO-0002oY-Rn
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:28:40 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 10782935F7
-	for <qemu-devel@nongnu.org>; Thu,  9 Feb 2017 17:28:41 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <03f9756e-971f-3b30-36d6-4b65d859479e@redhat.com> (Eric Blake's
-	message of "Thu, 2 Feb 2017 09:06:11 -0600")
-References: <1485207141-1941-1-git-send-email-quintela@redhat.com>
-	<1485207141-1941-7-git-send-email-quintela@redhat.com>
-	<03f9756e-971f-3b30-36d6-4b65d859479e@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Thu, 09 Feb 2017 18:28:37 +0100
-Message-ID: <87vasjnuii.fsf@emacs.mitica>
+	(envelope-from <ard.biesheuvel@linaro.org>) id 1cbssP-0001NV-Fv
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:51:26 -0500
+Received: from mail-io0-x232.google.com ([2607:f8b0:4001:c06::232]:35961)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
+	id 1cbssP-0001NE-C0
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 12:51:25 -0500
+Received: by mail-io0-x232.google.com with SMTP id j13so22981600iod.3
+	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 09:51:23 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 06/17] migration: Create x-multifd-threads
- parameter
+In-Reply-To: <1486644810-33181-1-git-send-email-agraf@suse.de>
+References: <1486644810-33181-1-git-send-email-agraf@suse.de>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Thu, 9 Feb 2017 17:51:22 +0000
+Message-ID: <CAKv+Gu_jrB4eJiR-j+no3OcHi68wusne5HosVL+Ri_y2Mowe_g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] target-arm: Add some omitted dma
+ cache coherency flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,37 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, dgilbert@redhat.com
+To: Alexander Graf <agraf@suse.de>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Shannon Zhao <shannon.zhao@linaro.org>
 
-Eric Blake <eblake@redhat.com> wrote:
-> On 01/23/2017 03:32 PM, Juan Quintela wrote:
->> Indicates the number of threads that we would create.  By default we
->> create 2 threads.
->> 
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> ---
+On 9 February 2017 at 12:53, Alexander Graf <agraf@suse.de> wrote:
+> ARM is amazing when it comes to cache coherency and VMs. While any sane
+> architecture allows the host to override the guest's caching attributes,
+> that's very hard to do on ARM.
 >
->> +++ b/qapi-schema.json
->> @@ -981,13 +981,17 @@
->>  # @x-checkpoint-delay: The delay time (in ms) between two COLO checkpoints in
->>  #          periodic mode. (Since 2.8)
->>  #
->> +# @x-multifd-threads: Number of threads used to migrate data in parallel
->> +#                     The default value is 2 (since 2.9)
+> That means that the guest may directly access guest memory bypassing the
+> cache while QEMU happily writes to / reads from cache. The end result is
+> very nasty, because both sides see very different views of the world.
 >
+> That means that we need to be very cautious to tell guests that devices
+> that QEMU emulates are going to use data in the cache rather than directly
+> on memory.
 >
->> +#
->> +# @x-multifd-threads: Number of threads used to migrate data in parallel
->> +#                     The default value is 1 (since 2.9)
+> We added this to PCI a while back for DT (5d636e21 "hw/arm/virt: mark the PCIe
+> host controller as DMA coherent in the DT") and ACPI (bc64b96 "hw/arm/virt-
+> acpi-build: _CCA attribute is compulsory") but never updated virtio-mmio or
+> fw-cfg in DT or ACPI tables.
 >
-> So which is it? I understand why you document it twice (one for setting
-> the value, and one for listing the current setting), but not why you
-> have two different defaults.
+> This patch set adds the respective cache coherency flags for them in both DT and
+> ACPI.
+>
+> Fortunately, no guests except for Linux 4.9.7 and 4.9.8 are broken because of
+> this. Upstream realized quickly enough that every user of virtio-mmio out there
+> describes its cache coherency incorrectly and reverted the patch that would
+> require said dma coherency flag. But we should be safe for the future and "do
+> the right thing".
+>
+> Alexander Graf (4):
+>   target-arm: Declare virtio-mmio as dma-coherent in dt
+>   hw/arm/virt: Declare virtio-mmio as dma cache coherent in ACPI
+>   hw/arm/virt: Declare fwcfg as dma cache coherent in ACPI
+>   hw/arm/virt: Declare fwcfg as dma cache coherent in dt
+>
 
-Because of copy & paste, and only updating one of the places.
+This looks correct to me.
 
-Move both of them to 2.
-
-Thanks, Juan.
+Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
