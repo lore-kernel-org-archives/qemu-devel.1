@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cbcjJ-0003bt-Rt
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 19:36:58 -0500
+	(envelope-from <lersek@redhat.com>) id 1cbcjn-0003p6-Vq
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 19:37:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cbcjI-0001sw-Hg
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 19:36:57 -0500
-References: <20170126101827.22378-1-berrange@redhat.com>
-	<20170126101827.22378-15-berrange@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <d22bc91d-0344-7839-3786-61080a0bcc4d@redhat.com>
-Date: Thu, 9 Feb 2017 01:36:48 +0100
+	(envelope-from <lersek@redhat.com>) id 1cbcjl-00020P-E1
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 19:37:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50142)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cbcjl-000206-8S
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 19:37:25 -0500
+References: <cover.1486285434.git.ben@skyportsystems.com>
+	<28ff6ff023dd041fc7557955dea916adce72efea.1486285434.git.ben@skyportsystems.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <a6cf75ec-d4b3-02c1-682f-6c1e701b9643@redhat.com>
+Date: Thu, 9 Feb 2017 01:37:22 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170126101827.22378-15-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="MsNq3ecmvhK7LjO5ESqr0TwDS91C7MRq2"
-Subject: Re: [Qemu-devel] [PATCH v3 14/18] qcow2: add iotests to cover LUKS
- encryption support
+In-Reply-To: <28ff6ff023dd041fc7557955dea916adce72efea.1486285434.git.ben@skyportsystems.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 05/10] ACPI: Add Virtual Machine
+ Generation ID support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,108 +28,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: ben@skyportsystems.com, qemu-devel@nongnu.org
+Cc: imammedo@redhat.com, mst@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---MsNq3ecmvhK7LjO5ESqr0TwDS91C7MRq2
-From: Max Reitz <mreitz@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <d22bc91d-0344-7839-3786-61080a0bcc4d@redhat.com>
-Subject: Re: [PATCH v3 14/18] qcow2: add iotests to cover LUKS encryption
- support
-References: <20170126101827.22378-1-berrange@redhat.com>
- <20170126101827.22378-15-berrange@redhat.com>
-In-Reply-To: <20170126101827.22378-15-berrange@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
-
-On 26.01.2017 11:18, Daniel P. Berrange wrote:
-> This extends the 087 iotest to cover LUKS encryption when doing
-> blockdev-add.
->=20
-> Two further tests are added to validate read/write of LUKS
-> encrypted images with a single file and with a backing file.
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+On 02/05/17 10:12, ben@skyportsystems.com wrote:
+> From: Ben Warren <ben@skyportsystems.com>
+> 
+> This implements the VM Generation ID feature by passing a 128-bit
+> GUID to the guest via a fw_cfg blob.
+> Any time the GUID changes, an ACPI notify event is sent to the guest
+> 
+> The user interface is a simple device with one parameter:
+>  - guid (string, must be "auto" or in UUID format
+>    xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+> 
+> Signed-off-by: Ben Warren <ben@skyportsystems.com>
 > ---
->  tests/qemu-iotests/087     | 32 ++++++++++++++++-
->  tests/qemu-iotests/087.out | 14 +++++++-
->  tests/qemu-iotests/174     | 76 ++++++++++++++++++++++++++++++++++++++=
-++
->  tests/qemu-iotests/174.out | 19 ++++++++++
->  tests/qemu-iotests/175     | 86 ++++++++++++++++++++++++++++++++++++++=
-++++++++
->  tests/qemu-iotests/175.out | 26 ++++++++++++++
->  tests/qemu-iotests/group   |  2 ++
->  7 files changed, 253 insertions(+), 2 deletions(-)
->  create mode 100755 tests/qemu-iotests/174
->  create mode 100644 tests/qemu-iotests/174.out
->  create mode 100755 tests/qemu-iotests/175
->  create mode 100644 tests/qemu-iotests/175.out
+>  default-configs/i386-softmmu.mak     |   1 +
+>  default-configs/x86_64-softmmu.mak   |   1 +
+>  hw/acpi/Makefile.objs                |   1 +
+>  hw/acpi/vmgenid.c                    | 206 +++++++++++++++++++++++++++++++++++
+>  hw/i386/acpi-build.c                 |  10 ++
+>  include/hw/acpi/acpi_dev_interface.h |   1 +
+>  include/hw/acpi/vmgenid.h            |  37 +++++++
+>  7 files changed, 257 insertions(+)
+>  create mode 100644 hw/acpi/vmgenid.c
+>  create mode 100644 include/hw/acpi/vmgenid.h
 
-[...]
+[snip]
 
-> diff --git a/tests/qemu-iotests/174.out b/tests/qemu-iotests/174.out
-> new file mode 100644
-> index 0000000..bf1a23a
-> --- /dev/null
-> +++ b/tests/qemu-iotests/174.out
-> @@ -0,0 +1,19 @@
-> +QA output created by 174
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D16777216 encryptio=
-n-format=3Dluks luks-key-secret=3Dsec0 luks-iter-time=3D10
+
+> +static void vmgenid_device_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
 > +
-> +=3D=3D reading whole image =3D=3D
-> +read 16777216/16777216 bytes at offset 0
-> +16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +=3D=3D rewriting whole image =3D=3D
-> +wrote 16777216/16777216 bytes at offset 0
-> +16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +=3D=3D verify pattern =3D=3D
-> +read 16777216/16777216 bytes at offset 0
-> +16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +=3D=3D verify open failure with wrong password =3D=3D
-> +can't open: Invalid password, cannot unlock any keyslot
-> +no file open, try 'help open'
+> +    dc->vmsd = &vmstate_vmgenid;
+> +}
 
-This line will need to be removed because of:
-https://github.com/XanClic/qemu/commit/d943be0de2168543a3ada81c292f6ff379=
-e71590
+I think in this function, you should set up a dc->realize member as
+well. And, in that dc->realize member, you should call
+qemu_register_reset().
 
-Also, the test numbers need to be bumped up (173 and 174 are taken), but
-all of these are things the maintainer can fix, so:
+Because, as it stands now, the "vgia_le" field is not cleared on reset.
+It should be; when the guest is rebooted, we should forget any address
+returned by its firmware.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+In this reset callback, you should also clear the (new) latch that
+tracks whether the "vmgenid" blob was selected since reset. (The latch
+is for approach (iii) against the race.)
 
-
-[...]
-
-> +SECRET0=3D"secret,id=3Dsec0,data=3Dastrochicken"
-> +SECRET1=3D"secret,id=3Dsec1,data=3Dfurby"
-
-You always have the best passwords.
-
-
---MsNq3ecmvhK7LjO5ESqr0TwDS91C7MRq2
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlibuaASHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AdtUIAJf5AbsN8nqwSCjmBoBgjWBakBaEzMVQ
-pc0awJYfXSSXdjkUdmgw02PCLiudGVuxr+JGVrcNoqrMFPVrzaeR1homrKuA9hT0
-UZEGccqlLi29xomiLGVmbOYmbyEAvVoavwoD9E1vSVtp0SkZri1BG9nHr86kkFvm
-bK+nV3MWY3zzjm2sI4rxghzwyJd4916a1mJcWcuIYFhc4l93P8scaCAfYCakmeoA
-Y1acxE5fjRYUyglCYH0NAUC7ZUGK50KHvs4mwPbouZrbEMPoS4PjbO3Y6dRp2AEO
-sVYr6eq6e4ygV/xuEnFtlaE+WfOo2qPtg48+/hEtPKiq2cJM3U8h1h0=
-=TJTw
------END PGP SIGNATURE-----
-
---MsNq3ecmvhK7LjO5ESqr0TwDS91C7MRq2--
+Thanks,
+Laszlo
