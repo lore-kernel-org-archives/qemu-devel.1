@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cbrJw-00052D-AW
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 11:11:45 -0500
+	(envelope-from <marex@denx.de>) id 1cbrLU-0006Gt-Gj
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 11:13:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cbrJt-0007oX-6p
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 11:11:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60318)
+	(envelope-from <marex@denx.de>) id 1cbrLP-00088D-Ie
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 11:13:20 -0500
+Received: from mail-out.m-online.net ([212.18.0.10]:47527)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1cbrJt-0007oQ-1G
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 11:11:41 -0500
-Message-ID: <1486656698.3641.49.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Thu, 09 Feb 2017 17:11:38 +0100
-In-Reply-To: <20170209153535.tnhhy3bvxocqwnzv@kamzik.brq.redhat.com>
-References: <1486575331-14455-1-git-send-email-abologna@redhat.com>
-	<1486575331-14455-3-git-send-email-abologna@redhat.com>
-	<20170209094259.nmli6yd5swxdujkm@kamzik.brq.redhat.com>
-	<CAFEAcA8bRHuF_to0+whEhNF5oXp5_O63H8EV2JTXBngffufz9Q@mail.gmail.com>
-	<1486637473.3641.36.camel@redhat.com>
-	<20170209122819.ajgatpsnxj7cdjq2@kamzik.brq.redhat.com>
-	<1486653043.3641.47.camel@redhat.com>
-	<20170209153535.tnhhy3bvxocqwnzv@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 2/2] mach-virt: Provide sample
- configuration files
+	(Exim 4.71) (envelope-from <marex@denx.de>) id 1cbrLP-000887-Ba
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 11:13:15 -0500
+References: <1486595166-34097-1-git-send-email-juro.bystricky@intel.com>
+	<1486595166-34097-2-git-send-email-juro.bystricky@intel.com>
+	<4c51c959-fe9c-b27f-552a-84d8a2fe68c1@denx.de>
+	<6E51916E4A1F32428260031F4C7CD2B6118FB1B4@ORSMSX112.amr.corp.intel.com>
+	<ad0b171b-ae9d-11f9-15e8-c500cd4ef5c2@denx.de>
+	<6E51916E4A1F32428260031F4C7CD2B6118FB84B@ORSMSX112.amr.corp.intel.com>
+	<8a5c3932-5ca6-6127-35b4-b8b8f57d923f@denx.de>
+	<6E51916E4A1F32428260031F4C7CD2B6118FBCB0@ORSMSX112.amr.corp.intel.com>
+From: Marek Vasut <marex@denx.de>
+Message-ID: <55a9d36b-c848-fd5f-623d-0456bfcaae40@denx.de>
+Date: Thu, 9 Feb 2017 17:13:10 +0100
+MIME-Version: 1.0
+In-Reply-To: <6E51916E4A1F32428260031F4C7CD2B6118FBCB0@ORSMSX112.amr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/1] nios2: Add Altera JTAG UART
+ emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,35 +34,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: "Bystricky, Juro" <juro.bystricky@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "crwulff@gmail.com" <crwulff@gmail.com>, "jurobystricky@hotmail.com" <jurobystricky@hotmail.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>
 
-On Thu, 2017-02-09 at 16:35 +0100, Andrew Jones wrote:
-> > Please propose the alternative wording you'd like to see
-> > so we can discuss it :)
->=C2=A0
-> I guess I did above with "... -nodefaults ensures no non-builtin
-> peripherals are automatically added, but builtin peripherals,
-> such as the PL011, will remain..."
+On 02/09/2017 05:07 PM, Bystricky, Juro wrote:
+>>>> [...]
+>>>>
+>>>>>>> +static uint64_t altera_juart_read(void *opaque, hwaddr addr,
+>> unsigned
+>>>>>> int size)
+>>>>>>> +{
+>>>>>>> +    AlteraJUARTState *s = opaque;
+>>>>>>> +    uint32_t r;
+>>>>>>> +
+>>>>>>> +    addr >>= 2;
+>>>>>>
+>>>>>> Hmmmmm, how will unaligned read from one of these registers be handled
+>>>>>> on real HW ? ie. read from address 0x3 ? What about writes ?
+>>>>>>
+>>>>>
+>>>>> there is no reading/writing going on via "addr".
+>>>>> This just maps the hw address into register number, where registers are
+>>>> at
+>>>>> 4 bytes boundaries (so they are aligned as needed) but indexed as
+>>>> 1,2,3....
+>>>>> (Pretty common code in other drivers.)
+>>>>> But will redo the code anyway so there are no shifts.
+>>>>
+>>>> This doesn't answer my question at all. How does real hardware behave if
+>>>> you read from unaligned address in the register space , ie. offset 0x3 ?
+>>>>
+>>>
+>>> Not sure I understand the question here. Which "real hardware" are we
+>> talking about?
+>>
+>> By real hardware I mean real Nios2 system ...
+>>
+>>> If "real hardware" contains MMU or MPU then an exception is generated on
+>> misalign access.
+>>
+>> Is this handled here or not ?
+>>
+> 
+> Sorry, I am not sure I understand the question.
+> Exceptions are handled by interrupt controller.
+> This code for JTAG UART does not have any misaligned accesses.
+> 
+> 
+The code running on nios2 can issue unaligned access to the jtag uart
+registers, yes ? If that happens, what happens on real HW and how is
+this emulated ?
 
-Trying to work your proposal into my most recent stab at
-this, I ended up with:
-
-=C2=A0 Using -nodefaults is required to have full control over
-=C2=A0 the virtual hardware: when it's specified, QEMU will
-=C2=A0 populate the board with only the builtin peripherals,
-=C2=A0 such as the PL011 UART, plus a small selection of core
-=C2=A0 PCI devices and controllers; the user will then have to
-=C2=A0 esplicitly add further devices.
-
-=C2=A0 More specifically, the PCI devices that will always be
-=C2=A0 present in the guest are:
-
-=C2=A0=C2=A0=C2=A0=C2=A000:00.0 Host bridge
-
-=C2=A0 This configuration file adds a number of other...
-
-Does it look acceptable?
-
---=C2=A0
-Andrea Bolognani / Red Hat / Virtualization
+-- 
+Best regards,
+Marek Vasut
