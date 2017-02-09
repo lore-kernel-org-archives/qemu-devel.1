@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60632)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cbmJr-0004ke-Sk
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 05:51:20 -0500
+	(envelope-from <abologna@redhat.com>) id 1cbmLI-0005cW-7K
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 05:52:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cbmJo-0005oG-SG
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 05:51:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45336)
+	(envelope-from <abologna@redhat.com>) id 1cbmLF-0007W9-4e
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 05:52:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47886)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1cbmJo-0005nl-MD
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 05:51:16 -0500
-Message-ID: <1486637473.3641.36.camel@redhat.com>
+	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1cbmLE-0007VE-Uq
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 05:52:45 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 010AA3DBD7
+	for <qemu-devel@nongnu.org>; Thu,  9 Feb 2017 10:52:45 +0000 (UTC)
+Message-ID: <1486637562.3641.38.camel@redhat.com>
 From: Andrea Bolognani <abologna@redhat.com>
-Date: Thu, 09 Feb 2017 11:51:13 +0100
-In-Reply-To: <CAFEAcA8bRHuF_to0+whEhNF5oXp5_O63H8EV2JTXBngffufz9Q@mail.gmail.com>
+Date: Thu, 09 Feb 2017 11:52:42 +0100
+In-Reply-To: <20170209094910.mrfhyjixmwr5kofb@kamzik.brq.redhat.com>
 References: <1486575331-14455-1-git-send-email-abologna@redhat.com>
 	<1486575331-14455-3-git-send-email-abologna@redhat.com>
-	<20170209094259.nmli6yd5swxdujkm@kamzik.brq.redhat.com>
-	<CAFEAcA8bRHuF_to0+whEhNF5oXp5_O63H8EV2JTXBngffufz9Q@mail.gmail.com>
+	<3fa3d4b8-3e3a-d6c4-a2c1-affef7361576@redhat.com>
+	<20170209094910.mrfhyjixmwr5kofb@kamzik.brq.redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -30,36 +36,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: Andrew Jones <drjones@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-devel@nongnu.org, marcel@redhat.com, kraxel@redhat.com
 
-On Thu, 2017-02-09 at 09:57 +0000, Peter Maydell wrote:
-> > I see Peter and you are discussing what to document here. IMO,
-> > we should simply state -nodefaults provides us a base mach-virt
-> > board with no peripherals.
+On Thu, 2017-02-09 at 10:49 +0100, Andrew Jones wrote:
+> > > +# RHEL:
+> > > +#=C2=A0=C2=A0=C2=A0/usr/share/AAVMF/AAVMF_CODE.fd
+> > > +#=C2=A0=C2=A0=C2=A0/usr/share/AAVMF/AAVMF_VARS.fd
+> >=C2=A0
+> > Looks legit. (Might want to call "RHEL" "RHELSA" though, in this cont=
+ext
+> > -- no clue. Ask Drew :))
 >=C2=A0
-> The thing about saying that is that it's not actually
-> correct -- you get the UART, etc etc peripherals whether
-> you say -nodefaults or not. I agree that listing them
-> in multiple places isn't a good idea though. Maybe
-> there's some wording that will work here.
+> The first choice "RHEL" is correct. "RHELSA" still exists today,
+> but eventually that name should be phased out (IIUC), as AArch64
+> will be "just another RHEL arch", requiring no special name.
 
-Agreed, we just have to find the right wording. Would
-something like
-
-=C2=A0 Using -nodefaults is required to have full control over
-=C2=A0 the virtual hardware: when it's specified, QEMU will
-=C2=A0 only automatically add a small selection of core PCI
-=C2=A0 devices, and leave the user in charge of adding more as
-=C2=A0 they see fit. More specifically, the PCI devices that
-=C2=A0 will always be present are:
-
-=C2=A0=C2=A0=C2=A0=C2=A000:00.0 Host bridge
-
-=C2=A0 This configuration file adds a number of other...
-
-work for you? Please keep in mind that I want to be able
-to use the very same paragraph both for q35 and mach-virt.
+Can't wait for that day! I'll leave it unchanged then :)
 
 --=C2=A0
 Andrea Bolognani / Red Hat / Virtualization
