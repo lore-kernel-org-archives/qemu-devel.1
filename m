@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cbpUH-0002qB-DO
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 09:14:23 -0500
+	(envelope-from <famz@redhat.com>) id 1cbpWM-0004MP-Kh
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 09:16:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cbpUD-0001Iy-Av
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 09:14:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58876)
+	(envelope-from <famz@redhat.com>) id 1cbpWI-0001nw-C8
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 09:16:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50864)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1cbpUD-0001If-5H
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 09:14:13 -0500
-Date: Thu, 9 Feb 2017 15:14:09 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20170209141409.jouhevc75qtfrozx@kamzik.brq.redhat.com>
-References: <1486575331-14455-1-git-send-email-abologna@redhat.com>
-	<1486575331-14455-3-git-send-email-abologna@redhat.com>
-	<CAFEAcA8+wfPQXXhoYZDv8LAOS6=4_P9kyaHONuMQcb7VmkVyxw@mail.gmail.com>
-	<1486582091.3641.32.camel@redhat.com>
-	<CAFEAcA_txm4n6U1k3ZsTqb=91j5bm9H1i4FtzR92ybnFy-WJ_Q@mail.gmail.com>
-	<1486648432.3641.43.camel@redhat.com>
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cbpWI-0001nP-6f
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 09:16:22 -0500
+Date: Thu, 9 Feb 2017 22:16:18 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170209141618.GL22807@lemon.lan>
+References: <CAO_EM_m9Z7WcxRZthAGgeDgJ6UuwKXwAOEH7NC2=hL8Cd4jABg@mail.gmail.com>
+	<20170209014728.GF22807@lemon.lan>
+	<CAO_EM_mJYNoxTLjKmTy18JhrL_zs_VLA32Y=Cw+LYqAGPzLN=w@mail.gmail.com>
+	<20170209025212.GG22807@lemon.lan>
+	<CAO_EM_kh1mQZNhjRKi458u15kj0G6t=UEFBvM+wWhOX1fyi6VQ@mail.gmail.com>
+	<20170209101240.GJ22807@lemon.lan>
+	<CAO_EM_mhnd9-2B3vpLDa5eCyMh17e4UCYqe6nu-UqSDfhNAivA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1486648432.3641.43.camel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 2/2] mach-virt: Provide sample
- configuration files
+In-Reply-To: <CAO_EM_mhnd9-2B3vpLDa5eCyMh17e4UCYqe6nu-UqSDfhNAivA@mail.gmail.com>
+Subject: Re: [Qemu-devel] virtio-scsi-pci iothread spins at 100%
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,32 +32,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: Ed Swierk <eswierk@skyportsystems.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com
 
-On Thu, Feb 09, 2017 at 02:53:52PM +0100, Andrea Bolognani wrote:
-> On Wed, 2017-02-08 at 19:36 +0000, Peter Maydell wrote:
-> > The trouble with using virtconsole is that you have to
-> > get quite a long way forward (probing and setting up
-> > PCI, etc) before you can get any kind of console output.
-> > "System doesn't boot and doesn't produce any output"
-> > is a common and really annoying failure mode in the
-> > ARM world, and I think that using virtconsole is
-> > asking for that kind of thing to happen more rather
-> > than less often. (Plus having two different serial
-> > ports in the guest means that now the user has to
-> > configure where both of them are supposed to output.)
+On Thu, 02/09 05:52, Ed Swierk wrote:
+> On Thu, Feb 9, 2017 at 2:12 AM, Fam Zheng <famz@redhat.com> wrote:
+> > This should fix it:
+> >
+> > https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg01874.html
 > 
-> You don't get one unless you use '-serial stdio' or
-> something like that in my experience, so if you use the
-> sample configuration file as I posted it you will only
-> get one serial console, the VirtIO-based one.
+> I tested this patch and found it fixes the problem. Thanks for the
+> speedy response!
 
-The emulated UART is there no matter what, it's built-in on
-the board. Whether it gets wired up to the console, stdio in
-this case, depends on the '-serial stdio'. Adding the virtio-
-console introduces another serial port, but OSes can still
-discover the PL011 and try to use that in addition.
+Thanks for the testing! If you could reply to the patch with a "Tested-by:" line
+that would be even better. :)
 
-Thanks,
-drew
+Fam
