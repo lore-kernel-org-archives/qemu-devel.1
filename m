@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cbepl-0007Vz-JT
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 21:51:47 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cbepn-0007bw-Ia
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 21:51:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cbepk-0006x0-Fs
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 21:51:45 -0500
-Date: Thu, 9 Feb 2017 13:16:29 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1cbepk-0006wq-FR
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 21:51:47 -0500
+Date: Thu, 9 Feb 2017 12:53:52 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170209021629.GR17644@umbus.fritz.box>
+Message-ID: <20170209015352.GO17644@umbus.fritz.box>
 References: <cover.1486436185.git.sam.bobroff@au1.ibm.com>
-	<a8621842537496c91b6d021ad329e6fa6404cc17.1486436186.git.sam.bobroff@au1.ibm.com>
+	<900ea185630c17f315c4984b2a595b2d3fba7c9a.1486436186.git.sam.bobroff@au1.ibm.com>
+	<981353e3-1ca7-6fcb-ef5e-86b9a335b6ed@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="hCenlVgnDQUGHXTR"
+	protocol="application/pgp-signature"; boundary="p/1JFEOz/hVXxMAZ"
 Content-Disposition: inline
-In-Reply-To: <a8621842537496c91b6d021ad329e6fa6404cc17.1486436186.git.sam.bobroff@au1.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 4/9] target-ppc: support
- KVM_CAP_PPC_MMU_RADIX, KVM_CAP_PPC_MMU_HASH_V3
+In-Reply-To: <981353e3-1ca7-6fcb-ef5e-86b9a335b6ed@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH 1/9] spapr: fix off-by-one
+ error in spapr_ovec_populate_dt()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,104 +26,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sam Bobroff <sam.bobroff@au1.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: Sam Bobroff <sam.bobroff@au1.ibm.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---hCenlVgnDQUGHXTR
+--p/1JFEOz/hVXxMAZ
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 07, 2017 at 01:56:47PM +1100, Sam Bobroff wrote:
-> Query and cache the value of two new KVM capabilities that indicate
-> KVM's support for new radix and hash modes of the MMU.
+On Tue, Feb 07, 2017 at 04:47:53PM +0100, Thomas Huth wrote:
+> On 07.02.2017 03:56, Sam Bobroff wrote:
+> > The last byte of the option vector was missing due to an off-by-one
+> > error. Without this fix, client architecture support negotiation will
+> > fail because the last byte of option vector 5, which contains the MMU
+> > support, will be missed.
+> >=20
+> > Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
+> > ---
+> >  hw/ppc/spapr_ovec.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >=20
+> > diff --git a/hw/ppc/spapr_ovec.c b/hw/ppc/spapr_ovec.c
+> > index 4f4c090a29..18dbc4a9ac 100644
+> > --- a/hw/ppc/spapr_ovec.c
+> > +++ b/hw/ppc/spapr_ovec.c
+> > @@ -251,7 +251,7 @@ int spapr_ovec_populate_dt(void *fdt, int fdt_offse=
+t,
+> >          }
+> >      }
+> > =20
+> > -    return fdt_setprop(fdt, fdt_offset, name, vec, vec_len);
+> > +    return fdt_setprop(fdt, fdt_offset, name, vec, vec_len + 1);
+> >  }
 >=20
-> Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
-> ---
->  target/ppc/kvm.c     | 14 ++++++++++++++
->  target/ppc/kvm_ppc.h | 12 ++++++++++++
->  2 files changed, 26 insertions(+)
+> It took a while 'til I understood the encoding / length calculation of
+> the property here, but I think you're right. According to LoPAPR the
+> total length of the property is n+2 where n is the value of the first
+> byte. Since n is vec_len-1 in the QEMU code, vec_len+1 is the right
+> value for the property length.
 >=20
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 390d6342cc..8d6fd1b067 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -81,6 +81,8 @@ static int cap_papr;
->  static int cap_htab_fd;
->  static int cap_fixup_hcalls;
->  static int cap_htm;             /* Hardware transactional memory support=
- */
-> +static int cap_mmu_radix;
-> +static int cap_mmu_hash;
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-Please rename this cap_mmu_hashv3 to avoid confusion.
+This is a correct fix regardless of the rest of the series, so I've
+applied it to ppc-for-2.9.
 
-Apart from that,
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
-> =20
->  static uint32_t debug_inst_opcode;
-> =20
-> @@ -134,6 +136,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->      cap_htab_fd =3D kvm_check_extension(s, KVM_CAP_PPC_HTAB_FD);
->      cap_fixup_hcalls =3D kvm_check_extension(s, KVM_CAP_PPC_FIXUP_HCALL);
->      cap_htm =3D kvm_vm_check_extension(s, KVM_CAP_PPC_HTM);
-> +    cap_mmu_radix =3D kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_RADIX);
-> +    cap_mmu_hash =3D kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_HASH_V3);
-> =20
->      if (!cap_interrupt_level) {
->          fprintf(stderr, "KVM: Couldn't find level irq capability. Expect=
- the "
-> @@ -2408,6 +2412,16 @@ bool kvmppc_has_cap_htm(void)
->      return cap_htm;
->  }
-> =20
-> +bool kvmppc_has_cap_mmu_radix(void)
-> +{
-> +    return cap_mmu_radix;
-> +}
-> +
-> +bool kvmppc_has_cap_mmu_hash(void)
-> +{
-> +    return cap_mmu_hash;
-> +}
-> +
->  static PowerPCCPUClass *ppc_cpu_get_family_class(PowerPCCPUClass *pcc)
->  {
->      ObjectClass *oc =3D OBJECT_CLASS(pcc);
-> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-> index 4b43283913..1c1b94847c 100644
-> --- a/target/ppc/kvm_ppc.h
-> +++ b/target/ppc/kvm_ppc.h
-> @@ -56,6 +56,8 @@ void kvmppc_hash64_write_pte(CPUPPCState *env, target_u=
-long pte_index,
->                               target_ulong pte0, target_ulong pte1);
->  bool kvmppc_has_cap_fixup_hcalls(void);
->  bool kvmppc_has_cap_htm(void);
-> +bool kvmppc_has_cap_mmu_radix(void);
-> +bool kvmppc_has_cap_mmu_hash(void);
->  int kvmppc_enable_hwrng(void);
->  int kvmppc_put_books_sregs(PowerPCCPU *cpu);
->  PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
-> @@ -255,6 +257,16 @@ static inline bool kvmppc_has_cap_htm(void)
->      return false;
->  }
-> =20
-> +static inline bool kvmppc_has_cap_mmu_radix(void)
-> +{
-> +    return false;
-> +}
-> +
-> +static inline bool kvmppc_has_cap_mmu_hash(void)
-> +{
-> +    return false;
-> +}
-> +
->  static inline int kvmppc_enable_hwrng(void)
->  {
->      return -1;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -130,25 +78,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---hCenlVgnDQUGHXTR
+--p/1JFEOz/hVXxMAZ
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYm9D9AAoJEGw4ysog2bOSqwQQALql8k93CrUOZlT87VoGbiyD
-0bS+XH7eD8JpTty5yAPDUFXg+UuyIZI9GALLaSh24s6mAbPfjEnwikzhXCjnzEv2
-fVgkJnRfs3hJ/9zPN28plqy2GW6bhnD4skYE+wpHR9Kfeg1slh5Eit1kYyqL9P4E
-SdqVpYtwO084r330qVqrh1i4tu7VO/o2qf1Xly/vYQ8qR52QSbxyRuPvcQjccsyz
-wh2FDaXPlCwXRvDJf4pBf0HrpDkBhKimIQ6zxDQaiKm8+un9ijghQZujwB8T0WFi
-Zu8BmdtJIKZQRyQ1KmRYBlf64OyVykxZhSgVwKdSXIQB/lrP6K7i1ohEWTKs2tCE
-EvbVtTvw+9E0SjM7ScsUMeUw3qWDdFuw8gAyR+iLqQdHd1tDuU5kqfQFL8cyJNz+
-kpwd/kZQdo/+2op6fQ+X3jhZl5n4ipDa1MkWQIYvUkPkrXxAenDZyrlgXzrlDAMT
-ZRDuTNELq0UwSRB0kh8MXLerNZBPxhRv2SvnFL/1ejQMK8inphhu5aD3TnUKSy4v
-7ngS4cr3a2T7LI3bXxE+JoEuyVEDDlJK4WF6fuSjF2U6gisWoWxtZsKvVf9qKVte
-m1tXr0y1rMlxd/7a2tSplbweYusQ8Y+rdzR8Sem2gc1ah3slx6jn5MjxMiMnbOBQ
-8vsr+jiwdjUjCTHETAQc
-=Yaxw
+iQIcBAEBCAAGBQJYm8uuAAoJEGw4ysog2bOSbjIP/jiUH3btzco1T/5d9rUz03Ly
+CPVYGv4eDCHgYj8ckstXI62iBI0xbLanxDAXEZD4VCuTFGRNKEdapYAKhaxfM48Q
+6lmzl2R5Iye0YTB2VWwPVr1AidLXWlR3RFrmL7lRsaRnaSF0Y8QpaQZEN4T8HstN
+Xhx/RnHaDKquJZ5f+Wd4idfs0PKuXLPFhiioKIJEkv5qdk7Hspuigtl2hBfuNIPS
+9HGFmCRiW7Gi3Po7lXUI+AXO4qwcYRjXn51/KF3V3O5d+yyekfF/VeuaGgpoa2fD
+osjRMB9eNGWeqOpYHDFB3u4DbILnNmAR0xxhOu1fc8grkCSKlGlYQiz8SnuaInRr
+ECSqkVGiS1BNEWAFCVNj946rkxyoKHVb8Q1HhuP3+6PMQodi8epwwiwr1y3gHUWD
+Z7u1E/0l8zGhEhUsUQpUmmYLJiQwHCJkIbzonAbMtc9VtxIzVGQpO3B7SIvgyXnO
+AIvALl7dPL7druYBGK49Fx1YlejxLiWtqKs9aUImhgizC9iWDX5d7qkTaN0469vS
+I5EDX6mSMVrgwuGzuu/CWNUwFHSAGKBB3Lnf8hO1TvW0JXhT89fxTOMEtQA/x09/
+jaCZ7FlFZRQf1ml0LAsiHAq4HBKBFyv6kJ2X8WW/ubA9ioTXu/WioWYwNpPot7VE
+Q4lF4SvKYa7Agrs2RHSS
+=zJRm
 -----END PGP SIGNATURE-----
 
---hCenlVgnDQUGHXTR--
+--p/1JFEOz/hVXxMAZ--
