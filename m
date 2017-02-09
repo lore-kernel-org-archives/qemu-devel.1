@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cbf2h-00025H-LE
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 22:05:09 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1cbf6M-0005MU-8r
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 22:08:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cbf2g-0002rm-9H
-	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 22:05:07 -0500
-Message-ID: <1486609492.2498.79.camel@gmail.com>
+	(envelope-from <sjitindarsingh@gmail.com>) id 1cbf6J-0003x0-VF
+	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 22:08:54 -0500
+Message-ID: <1486609721.2498.83.camel@gmail.com>
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Thu, 09 Feb 2017 14:04:52 +1100
-In-Reply-To: <20170201042310.GP30639@umbus.fritz.box>
+Date: Thu, 09 Feb 2017 14:08:41 +1100
+In-Reply-To: <20170201042819.GQ30639@umbus.fritz.box>
 References: <1484288903-18807-1-git-send-email-sjitindarsingh@gmail.com>
-	<1484288903-18807-11-git-send-email-sjitindarsingh@gmail.com>
-	<20170201042310.GP30639@umbus.fritz.box>
+	<1484288903-18807-12-git-send-email-sjitindarsingh@gmail.com>
+	<20170201042819.GQ30639@umbus.fritz.box>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH 10/17] target/ppc/POWER9: Add POWER9
- mmu fault handler
+Subject: Re: [Qemu-devel] [RFC PATCH 11/17] target/ppc/POWER9: Update to new
+ pte format for POWER9 accesses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,199 +28,369 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, agraf@suse.de, qemu-devel@nongnu.org
 
-On Wed, 2017-02-01 at 15:23 +1100, David Gibson wrote:
-> On Fri, Jan 13, 2017 at 05:28:16PM +1100, Suraj Jitindar Singh wrote:
+On Wed, 2017-02-01 at 15:28 +1100, David Gibson wrote:
+> On Fri, Jan 13, 2017 at 05:28:17PM +1100, Suraj Jitindar Singh wrote:
 > > 
-> > Add a new mmu fault handler for the POWER9 cpu and add it as the
-> > handler
-> > for the POWER9 cpu definition.
+> > The page table entry format was updated for the POWER9 processor.
 > > 
-> > This handler checks if the guest is radix or hash based on the
-> > value in the
-> > partition table entry and calls the correct fault handler
+> > It was decided that kernels would used the old format irrespective
+> > with the translation occuring at the hypervisor level. Thus we
+> > convert
+> > between the old and new format when accessing the ptes. Since we
+> > need the
+> > whole pte to perform this conversion, we remove the old functions
+> > which
+> > accessed either the first or second doubleword and introduce a new
+> > functions which access the entire pte, returning the entry
+> > converted
+> > back to the old format (if required). Update call sites
 > > accordingly.
-> > 
-> > The hash fault handling code has also been updated to check if the
-> > partition is using segment tables.
-> > 
-> > Currently only legacy hash (no segment tables) is supported.
 > > 
 > > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 > > ---
-> >  target/ppc/mmu-hash64.c     |  8 ++++++++
-> >  target/ppc/mmu.h            |  8 ++++++++
-> >  target/ppc/mmu_helper.c     | 47
-> > +++++++++++++++++++++++++++++++++++++++++++++
-> >  target/ppc/translate_init.c |  2 +-
-> >  4 files changed, 64 insertions(+), 1 deletion(-)
+> >  hw/ppc/spapr_hcall.c    | 51 ++++++++++++++++++-----------------
+> >  target/ppc/mmu-hash64.c | 13 +++++----
+> >  target/ppc/mmu-hash64.h | 71 ++++++++++++++++++++++++++++++++++++-
+> > ------------
+> >  3 files changed, 86 insertions(+), 49 deletions(-)
 > > 
-> > diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-> > index b9d4f4e..b476b3f 100644
-> > --- a/target/ppc/mmu-hash64.c
-> > +++ b/target/ppc/mmu-hash64.c
-> > @@ -73,6 +73,14 @@ static ppc_slb_t *slb_lookup(PowerPCCPU *cpu,
-> > target_ulong eaddr)
+> > diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> > index 9a9bedf..9f0c20d 100644
+> > --- a/hw/ppc/spapr_hcall.c
+> > +++ b/hw/ppc/spapr_hcall.c
+> > @@ -125,7 +125,8 @@ static target_ulong h_enter(PowerPCCPU *cpu,
+> > sPAPRMachineState *spapr,
+> >          pte_index &= ~7ULL;
+> >          token = ppc_hash64_start_access(cpu, pte_index);
+> >          for (; index < 8; index++) {
+> > -            if (!(ppc_hash64_load_hpte0(cpu, token, index) &
+> > HPTE64_V_VALID)) {
+> > +            ppc_hash_pte64_t pte = ppc_hash64_load_hpte(cpu,
+> > token, index);
+> > +            if (!(pte.pte0 & HPTE64_V_VALID)) {
+> >                  break;
+> >              }
 > >          }
+> > @@ -134,8 +135,10 @@ static target_ulong h_enter(PowerPCCPU *cpu,
+> > sPAPRMachineState *spapr,
+> >              return H_PTEG_FULL;
+> >          }
+> >      } else {
+> > +        ppc_hash_pte64_t pte;
+> >          token = ppc_hash64_start_access(cpu, pte_index);
+> IIRC the only reason for the clumsy start_access / stop_access stuff
+> was because we wanted to do the two loads separately (to avoid
+> loading
+> word1 in cases we don't need it).  Since you're combining both loads
+> into a single helper, I think you can put the start_access /
+> stop_access into the same helper.
+> 
+> Or have I missed something.
+> 
+Yeah these functions can probably be merged together...
+> > 
+> > -        if (ppc_hash64_load_hpte0(cpu, token, 0) & HPTE64_V_VALID)
+> > {
+> > +        pte = ppc_hash64_load_hpte(cpu, token, 0);
+> > +        if (pte.pte0 & HPTE64_V_VALID) {
+> >              ppc_hash64_stop_access(cpu, token);
+> >              return H_PTEG_FULL;
+> >          }
+> > @@ -163,26 +166,25 @@ static RemoveResult remove_hpte(PowerPCCPU
+> > *cpu, target_ulong ptex,
+> >  {
+> >      CPUPPCState *env = &cpu->env;
+> >      uint64_t token;
+> > -    target_ulong v, r;
+> > +    ppc_hash_pte64_t pte;
+> >  
+> >      if (!valid_pte_index(env, ptex)) {
+> >          return REMOVE_PARM;
 > >      }
 > >  
-> > +    /* Check if in-memory segment tables are in use */
-> > +    if (ppc64_use_proc_tbl(cpu)) {
-> > +        /* TODO - Unsupported */
-> > +        qemu_log_mask(LOG_UNIMP, "%s: unimplemented - segment
-> > table support\n",
-> > +                      __func__);
-> > +        /* Not much we can do here, caller will generate a segment
-> > interrupt */
-> > +    }
-> I think this logic would be better in the fault handler.  For the
-> fault path in the segment table case, I don't think we want to even
-> model the SLB (in hardware the SLB is an important optimization, but
-> I
-> don't think the software SLB will be notably better than just looking
-> up the seg table directly).  I think the other users of slb_lookup()
-> are in contexts that only make sense in the context of a software
-> managed SLB anyway.
-> 
-The mmu looks up the slb before it looks in the segment tables, so we
-still need to model and search the slb before we search segment tables.
-We could call slb lookup and if that fails we can then call a
-search_seg_tbl() or something from the fault handler.
-> > 
-> >      return NULL;
+> >      token = ppc_hash64_start_access(cpu, ptex);
+> > -    v = ppc_hash64_load_hpte0(cpu, token, 0);
+> > -    r = ppc_hash64_load_hpte1(cpu, token, 0);
+> > +    pte = ppc_hash64_load_hpte(cpu, token, 0);
+> >      ppc_hash64_stop_access(cpu, token);
+> >  
+> > -    if ((v & HPTE64_V_VALID) == 0 ||
+> > -        ((flags & H_AVPN) && (v & ~0x7fULL) != avpn) ||
+> > -        ((flags & H_ANDCOND) && (v & avpn) != 0)) {
+> > +    if ((pte.pte0 & HPTE64_V_VALID) == 0 ||
+> > +        ((flags & H_AVPN) && (pte.pte0 & ~0x7fULL) != avpn) ||
+> > +        ((flags & H_ANDCOND) && (pte.pte0 & avpn) != 0)) {
+> >          return REMOVE_NOT_FOUND;
+> >      }
+> > -    *vp = v;
+> > -    *rp = r;
+> > +    *vp = pte.pte0;
+> > +    *rp = pte.pte1;
+> >      ppc_hash64_store_hpte(cpu, ptex, HPTE64_V_HPTE_DIRTY, 0);
+> > -    ppc_hash64_tlb_flush_hpte(cpu, ptex, v, r);
+> > +    ppc_hash64_tlb_flush_hpte(cpu, ptex, pte.pte0, pte.pte1);
+> >      return REMOVE_SUCCESS;
 > >  }
 > >  
-> > diff --git a/target/ppc/mmu.h b/target/ppc/mmu.h
-> > index c7967c3..e07b128 100644
-> > --- a/target/ppc/mmu.h
-> > +++ b/target/ppc/mmu.h
-> > @@ -3,6 +3,10 @@
+> > @@ -293,35 +295,36 @@ static target_ulong h_protect(PowerPCCPU
+> > *cpu, sPAPRMachineState *spapr,
+> >      target_ulong flags = args[0];
+> >      target_ulong pte_index = args[1];
+> >      target_ulong avpn = args[2];
+> > +    ppc_hash_pte64_t pte;
+> >      uint64_t token;
+> > -    target_ulong v, r;
 > >  
-> >  #ifndef CONFIG_USER_ONLY
+> >      if (!valid_pte_index(env, pte_index)) {
+> >          return H_PARAMETER;
+> >      }
 > >  
-> > +/* Common Partition Table Entry Fields */
-> > +#define PATBE0_HR                0x8000000000000000
-> > +#define PATBE1_GR                0x8000000000000000
-> > +
-> >  /* Partition Table Entry */
-> >  struct patb_entry {
-> >      uint64_t patbe0, patbe1;
-> > @@ -11,6 +15,10 @@ struct patb_entry {
-> >  #ifdef TARGET_PPC64
+> >      token = ppc_hash64_start_access(cpu, pte_index);
+> > -    v = ppc_hash64_load_hpte0(cpu, token, 0);
+> > -    r = ppc_hash64_load_hpte1(cpu, token, 0);
+> > +    pte = ppc_hash64_load_hpte(cpu, token, 0);
+> >      ppc_hash64_stop_access(cpu, token);
 > >  
-> >  void ppc64_set_external_patb(PowerPCCPU *cpu, void *patb, Error
-> > **errp);
-> > +bool ppc64_use_proc_tbl(PowerPCCPU *cpu);
-> > +bool ppc64_radix_guest(PowerPCCPU *cpu);
-> > +int ppc64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
-> > +                           int mmu_idx);
+> > -    if ((v & HPTE64_V_VALID) == 0 ||
+> > -        ((flags & H_AVPN) && (v & ~0x7fULL) != avpn)) {
+> > +    if ((pte.pte0 & HPTE64_V_VALID) == 0 ||
+> > +        ((flags & H_AVPN) && (pte.pte0 & ~0x7fULL) != avpn)) {
+> >          return H_NOT_FOUND;
+> >      }
 > >  
-> >  #endif /* TARGET_PPC64 */
-> >  
-> > diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
-> > index bc6c117..612f407 100644
-> > --- a/target/ppc/mmu_helper.c
-> > +++ b/target/ppc/mmu_helper.c
-> > @@ -28,6 +28,7 @@
-> >  #include "exec/cpu_ldst.h"
-> >  #include "exec/log.h"
-> >  #include "helper_regs.h"
-> > +#include "qemu/error-report.h"
-> >  #include "mmu.h"
-> >  
-> >  //#define DEBUG_MMU
-> > @@ -1281,6 +1282,17 @@ void dump_mmu(FILE *f, fprintf_function
-> > cpu_fprintf, CPUPPCState *env)
-> >      case POWERPC_MMU_2_07a:
-> >          dump_slb(f, cpu_fprintf, ppc_env_get_cpu(env));
-> >          break;
-> > +    case POWERPC_MMU_3_00:
-> > +        if (ppc64_radix_guest(ppc_env_get_cpu(env))) {
-> > +            /* TODO - Unsupported */
-> > +        } else {
-> > +            if (ppc64_use_proc_tbl(ppc_env_get_cpu(env))) {
-> > +                /* TODO - Unsupported */
-> > +            } else {
-> > +                dump_slb(f, cpu_fprintf, ppc_env_get_cpu(env));
-> > +                break;
-> > +            }
-> > +        }
-> >  #endif
-> >      default:
-> >          qemu_log_mask(LOG_UNIMP, "%s: unimplemented\n", __func__);
-> > @@ -1422,6 +1434,17 @@ hwaddr ppc_cpu_get_phys_page_debug(CPUState
-> > *cs, vaddr addr)
-> >      case POWERPC_MMU_2_07:
-> >      case POWERPC_MMU_2_07a:
-> >          return ppc_hash64_get_phys_page_debug(cpu, addr);
-> > +    case POWERPC_MMU_3_00:
-> > +        if (ppc64_radix_guest(ppc_env_get_cpu(env))) {
-> > +            /* TODO - Unsupported */
-> > +        } else {
-> > +            if (ppc64_use_proc_tbl(ppc_env_get_cpu(env))) {
-> > +                /* TODO - Unsupported */
-> > +            } else {
-> > +                return ppc_hash64_get_phys_page_debug(cpu, addr);
-> > +            }
-> > +        }
-> > +        break;
-> >  #endif
-> >  
-> >      case POWERPC_MMU_32B:
-> > @@ -2919,3 +2942,27 @@ void ppc64_set_external_patb(PowerPCCPU
-> > *cpu, void *patb, Error **errp)
-> >  
-> >      env->external_patbe = (struct patb_entry *) patb;
+> > -    r &= ~(HPTE64_R_PP0 | HPTE64_R_PP | HPTE64_R_N |
+> > -           HPTE64_R_KEY_HI | HPTE64_R_KEY_LO);
+> > -    r |= (flags << 55) & HPTE64_R_PP0;
+> > -    r |= (flags << 48) & HPTE64_R_KEY_HI;
+> > -    r |= flags & (HPTE64_R_PP | HPTE64_R_N | HPTE64_R_KEY_LO);
+> > +    pte.pte1 &= ~(HPTE64_R_PP0 | HPTE64_R_PP | HPTE64_R_N |
+> > +                  HPTE64_R_KEY_HI | HPTE64_R_KEY_LO);
+> > +    pte.pte1 |= (flags << 55) & HPTE64_R_PP0;
+> > +    pte.pte1 |= (flags << 48) & HPTE64_R_KEY_HI;
+> > +    pte.pte1 |= flags & (HPTE64_R_PP | HPTE64_R_N |
+> > HPTE64_R_KEY_LO);
+> >      ppc_hash64_store_hpte(cpu, pte_index,
+> > -                          (v & ~HPTE64_V_VALID) |
+> > HPTE64_V_HPTE_DIRTY, 0);
+> > -    ppc_hash64_tlb_flush_hpte(cpu, pte_index, v, r);
+> > +                          (pte.pte0 & ~HPTE64_V_VALID) |
+> > HPTE64_V_HPTE_DIRTY,
+> > +                          0);
+> > +    ppc_hash64_tlb_flush_hpte(cpu, pte_index, pte.pte0, pte.pte1);
+> >      /* Flush the tlb */
+> >      check_tlb_flush(env, true);
+> >      /* Don't need a memory barrier, due to qemu's global lock */
+> > -    ppc_hash64_store_hpte(cpu, pte_index, v | HPTE64_V_HPTE_DIRTY,
+> > r);
+> > +    ppc_hash64_store_hpte(cpu, pte_index, pte.pte0 |
+> > HPTE64_V_HPTE_DIRTY,
+> > +                          pte.pte1);
+> >      return H_SUCCESS;
 > >  }
-> > +
-> > +inline bool ppc64_use_proc_tbl(PowerPCCPU *cpu)
-> There's basically no point putting an inline on functions that are in
-> a .c rather than a .h (it will only be inlined for callers in this
-> .o,
-> not elsewhere).  These are simple enough that I think they do belong
-> in the .h instead.
-I'll move these into the .h
+> >  
+> > diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+> > index b476b3f..03607d5 100644
+> > --- a/target/ppc/mmu-hash64.c
+> > +++ b/target/ppc/mmu-hash64.c
+> > @@ -515,7 +515,6 @@ static hwaddr ppc_hash64_pteg_search(PowerPCCPU
+> > *cpu, hwaddr hash,
+> >      CPUPPCState *env = &cpu->env;
+> >      int i;
+> >      uint64_t token;
+> > -    target_ulong pte0, pte1;
+> >      target_ulong pte_index;
+> >  
+> >      pte_index = (hash & env->htab_mask) * HPTES_PER_GROUP;
+> > @@ -524,12 +523,11 @@ static hwaddr
+> > ppc_hash64_pteg_search(PowerPCCPU *cpu, hwaddr hash,
+> >          return -1;
+> >      }
+> >      for (i = 0; i < HPTES_PER_GROUP; i++) {
+> > -        pte0 = ppc_hash64_load_hpte0(cpu, token, i);
+> > -        pte1 = ppc_hash64_load_hpte1(cpu, token, i);
+> > +        ppc_hash_pte64_t entry = ppc_hash64_load_hpte(cpu, token,
+> > i);
+> Hm.  So the hypercalls using the access helpers which include format
+> conversion makes sense to me - the hypercalls are defined to use the
+> old format, even on POWER9 AIUI.
 > 
-> > 
-> > +{
-> > +    return !!(cpu->env.spr[SPR_LPCR] & LPCR_UPRT);
-> > +}
-> > +
-> > +inline bool ppc64_radix_guest(PowerPCCPU *cpu)
-> > +{
-> > +    struct patb_entry *patbe = cpu->env.external_patbe;
-> > +
-> > +    return patbe && (patbe->patbe1 & PATBE1_GR);
-> > +}
-> > +
-> > +int ppc64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
-> > +                           int mmu_idx)
-> I think this name is too generic, since it's really only right for
-> POWER9 / MMU v3.
-Ok, how about ppc64_v3_handle_mmu_fault?
+> It doesn't really make sense to me here, in what is essentially the
+> physical implementation of the HPT lookup.  Shouldn't that be using
+> the new format natively?
 > 
+> Basically it seems odd that you store things in the new format in
+> memory, but convert to the old format on *all* accesses, not just the
+> hypercall ones which are defined that way.
+> 
+It seemed easier to just do the conversion rather than updating the
+code in all places. That said since this is modelling the hardware and
+should probably use the new format instead of just converting it and
+pretenting nothing changed.
 > > 
-> > +{
-> > +    if (ppc64_radix_guest(cpu)) { /* Guest uses radix */
-> > +        /* TODO - Unsupported */
-> > +        error_report("Guest Radix Support Unimplemented\n");
-> > +        abort();
-> > +    } else { /* Guest uses hash */
-> > +        return ppc_hash64_handle_mmu_fault(cpu, eaddr, rwx,
-> > mmu_idx);
+> >          /* This compares V, B, H (secondary) and the AVPN */
+> > -        if (HPTE64_V_COMPARE(pte0, ptem)) {
+> > -            *pshift = hpte_page_shift(sps, pte0, pte1);
+> > +        if (HPTE64_V_COMPARE(entry.pte0, ptem)) {
+> > +            *pshift = hpte_page_shift(sps, entry.pte0,
+> > entry.pte1);
+> >              /*
+> >               * If there is no match, ignore the PTE, it could
+> > simply
+> >               * be for a different segment size encoding and the
+> > @@ -543,8 +541,7 @@ static hwaddr ppc_hash64_pteg_search(PowerPCCPU
+> > *cpu, hwaddr hash,
+> >              /* We don't do anything with pshift yet as qemu TLB
+> > only deals
+> >               * with 4K pages anyway
+> >               */
+> > -            pte->pte0 = pte0;
+> > -            pte->pte1 = pte1;
+> > +            *pte = entry;
+> >              ppc_hash64_stop_access(cpu, token);
+> >              return (pte_index + i) * HASH_PTE_SIZE_64;
+> >          }
+> > @@ -924,6 +921,8 @@ void ppc_hash64_store_hpte(PowerPCCPU *cpu,
+> >  {
+> >      CPUPPCState *env = &cpu->env;
+> >  
+> > +    ppc_hash64_hpte_old_to_new(env, &pte0, &pte1);
+> > +
+> >      if (env->external_htab == MMU_HASH64_KVM_MANAGED_HPT) {
+> >          kvmppc_hash64_write_pte(env, pte_index, pte0, pte1);
+> >          return;
+> > diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
+> > index ab5d347..73d7ce4 100644
+> > --- a/target/ppc/mmu-hash64.h
+> > +++ b/target/ppc/mmu-hash64.h
+> > @@ -60,6 +60,7 @@ void ppc_hash64_update_rmls(CPUPPCState *env);
+> >  #define HASH_PTE_SIZE_64        16
+> >  #define HASH_PTEG_SIZE_64       (HASH_PTE_SIZE_64 *
+> > HPTES_PER_GROUP)
+> >  
+> > +#define HPTE64_V_3_00_COMMON    0x000fffffffffffffULL
+> >  #define HPTE64_V_SSIZE_SHIFT    62
+> >  #define HPTE64_V_AVPN_SHIFT     7
+> >  #define HPTE64_V_AVPN           0x3fffffffffffff80ULL
+> > @@ -69,9 +70,12 @@ void ppc_hash64_update_rmls(CPUPPCState *env);
+> >  #define HPTE64_V_SECONDARY      0x0000000000000002ULL
+> >  #define HPTE64_V_VALID          0x0000000000000001ULL
+> >  
+> > +#define HPTE64_R_3_00_COMMON    0xf1ffffffffffffffULL
+> >  #define HPTE64_R_PP0            0x8000000000000000ULL
+> >  #define HPTE64_R_TS             0x4000000000000000ULL
+> >  #define HPTE64_R_KEY_HI         0x3000000000000000ULL
+> > +#define HPTE64_R_SSIZE_SHIFT    58
+> > +#define HPTE64_R_SSIZE_MASK     (3ULL << HPTE64_R_SSIZE_SHIFT)
+> >  #define HPTE64_R_RPN_SHIFT      12
+> >  #define HPTE64_R_RPN            0x0ffffffffffff000ULL
+> >  #define HPTE64_R_FLAGS          0x00000000000003ffULL
+> > @@ -91,6 +95,10 @@ void ppc_hash64_update_rmls(CPUPPCState *env);
+> >  #define HPTE64_V_1TB_SEG        0x4000000000000000ULL
+> >  #define HPTE64_V_VRMA_MASK      0x4001ffffff000000ULL
+> >  
+> > +typedef struct {
+> > +    uint64_t pte0, pte1;
+> > +} ppc_hash_pte64_t;
+> > +
+> >  void ppc_hash64_set_sdr1(PowerPCCPU *cpu, target_ulong value,
+> >                           Error **errp);
+> >  void ppc_hash64_set_external_hpt(PowerPCCPU *cpu, void *hpt, int
+> > shift,
+> > @@ -99,37 +107,64 @@ void ppc_hash64_set_external_hpt(PowerPCCPU
+> > *cpu, void *hpt, int shift,
+> >  uint64_t ppc_hash64_start_access(PowerPCCPU *cpu, target_ulong
+> > pte_index);
+> >  void ppc_hash64_stop_access(PowerPCCPU *cpu, uint64_t token);
+> >  
+> > -static inline target_ulong ppc_hash64_load_hpte0(PowerPCCPU *cpu,
+> > -                                                 uint64_t token,
+> > int index)
+> > +static inline void ppc_hash64_hpte_old_to_new(CPUPPCState *env,
+> > +                                              target_ulong *pte0,
+> > +                                              target_ulong *pte1)
+> >  {
+> > -    CPUPPCState *env = &cpu->env;
+> > -    uint64_t addr;
+> > +    switch (env->mmu_model) {
+> > +    case POWERPC_MMU_3_00:
+> > +        /*
+> > +         * v3.00 of the ISA moved the B field to the second
+> > doubleword and
+> > +         * shortened the abbreviated virtual address and
+> > abbreviated real page
+> > +         * number fields
+> > +         */
+> > +        *pte1 = (*pte1 & HPTE64_R_3_00_COMMON) |
+> > +                ((*pte0 >> HPTE64_V_SSIZE_SHIFT) <<
+> > HPTE64_R_SSIZE_SHIFT);
+> > +        *pte0 = *pte0 & HPTE64_V_3_00_COMMON;
+> > +    default:
+> > +        ;
 > > +    }
 > > +}
-> > diff --git a/target/ppc/translate_init.c
-> > b/target/ppc/translate_init.c
-> > index c771ba3..87297a7 100644
-> > --- a/target/ppc/translate_init.c
-> > +++ b/target/ppc/translate_init.c
-> > @@ -8850,7 +8850,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void
-> > *data)
-> >                      (1ull << MSR_LE);
-> >      pcc->mmu_model = POWERPC_MMU_3_00;
-> >  #if defined(CONFIG_SOFTMMU)
-> > -    pcc->handle_mmu_fault = ppc_hash64_handle_mmu_fault;
-> > +    pcc->handle_mmu_fault = ppc64_handle_mmu_fault;
-> >      /* segment page size remain the same */
-> >      pcc->sps = &POWER7_POWER8_sps;
-> >  #endif
+> >  
+> > -    addr = token + (index * HASH_PTE_SIZE_64);
+> > -    if (env->external_htab) {
+> > -        return  ldq_p((const void *)(uintptr_t)addr);
+> > -    } else {
+> > -        return ldq_phys(CPU(cpu)->as, addr);
+> > +static inline void ppc_hash64_hpte_new_to_old(CPUPPCState *env,
+> > +                                              target_ulong *pte0,
+> > +                                              target_ulong *pte1)
+> > +{
+> > +    switch (env->mmu_model) {
+> > +    case POWERPC_MMU_3_00:
+> > +        /*
+> > +         * v3.00 of the ISA moved the B field to the second
+> > doubleword and
+> > +         * shortened the abbreviated virtual address and
+> > abbreviated real page
+> > +         * number fields
+> > +         */
+> > +        *pte0 = (*pte0 & HPTE64_V_3_00_COMMON) | ((*pte1 &
+> > HPTE64_R_SSIZE_MASK)
+> > +                << (HPTE64_V_SSIZE_SHIFT - HPTE64_R_SSIZE_SHIFT));
+> > +        *pte1 = *pte1 & HPTE64_R_3_00_COMMON;
+> > +    default:
+> > +        ;
+> >      }
+> >  }
+> >  
+> > -static inline target_ulong ppc_hash64_load_hpte1(PowerPCCPU *cpu,
+> > -                                                 uint64_t token,
+> > int index)
+> > +static inline ppc_hash_pte64_t ppc_hash64_load_hpte(PowerPCCPU
+> > *cpu,
+> > +                                                    uint64_t
+> > token,
+> > +                                                    int index)
+> >  {
+> >      CPUPPCState *env = &cpu->env;
+> > +    ppc_hash_pte64_t pte;
+> >      uint64_t addr;
+> >  
+> > -    addr = token + (index * HASH_PTE_SIZE_64) +
+> > HASH_PTE_SIZE_64/2;
+> > +    addr = token + (index * HASH_PTE_SIZE_64);
+> >      if (env->external_htab) {
+> > -        return  ldq_p((const void *)(uintptr_t)addr);
+> > +        pte.pte0 = ldq_p((const void *)(uintptr_t)addr);
+> > +        pte.pte1 = ldq_p((const void *)(uintptr_t)addr +
+> > HASH_PTE_SIZE_64/2);
+> >      } else {
+> > -        return ldq_phys(CPU(cpu)->as, addr);
+> > +        pte.pte0 = ldq_phys(CPU(cpu)->as, addr);
+> > +        pte.pte1 = ldq_phys(CPU(cpu)->as, addr +
+> > HASH_PTE_SIZE_64/2);
+> >      }
+> > -}
+> >  
+> > -typedef struct {
+> > -    uint64_t pte0, pte1;
+> > -} ppc_hash_pte64_t;
+> > +    ppc_hash64_hpte_new_to_old(env, &pte.pte0, &pte.pte1);
+> > +    return pte;
+> > +}
+> >  
+> >  #endif /* CONFIG_USER_ONLY */
+> >  
