@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1cbm4Z-0002Jx-3U
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 05:35:32 -0500
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cbm4Z-0002Jv-3Q
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 05:35:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1cbm4Y-00025d-D0
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 05:35:31 -0500
-Received: from mail-io0-x22e.google.com ([2607:f8b0:4001:c06::22e]:34693)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
-	id 1cbm4Y-00024V-7y
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cbm4V-00021S-GJ
 	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 05:35:30 -0500
-Received: by mail-io0-x22e.google.com with SMTP id l66so13406469ioi.1
-	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 02:35:30 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8rjjzgvN-RuNPVHM53R9V9xry1Uj_ArmF1va-Y920eBQ@mail.gmail.com>
-References: <1486560712-44171-1-git-send-email-agraf@suse.de>
-	<ef6b903b-5224-b4eb-1080-a3689fcec70a@redhat.com>
-	<f2f119bc-9c22-ad52-ff26-7d6ecc213a3c@suse.de>
-	<c1ff3829-b068-881a-1523-317ef0d31689@redhat.com>
-	<C4E1DF44-1626-425D-880E-0053AD688422@linaro.org>
-	<CAFEAcA8rjjzgvN-RuNPVHM53R9V9xry1Uj_ArmF1va-Y920eBQ@mail.gmail.com>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Thu, 9 Feb 2017 10:35:28 +0000
-Message-ID: <CAKv+Gu_HJ-MNZ+GPsroodWGNVm4z++CSWLUkPR6tro8jUh2zzA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] target-arm: Declare virtio-mmio
- as dma-coherent in dt
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37602)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1cbm4V-0001zx-72
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 05:35:27 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v19AXtuc004240
+	for <qemu-devel@nongnu.org>; Thu, 9 Feb 2017 05:35:26 -0500
+Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28gj2ucper-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 05:35:25 -0500
+Received: from localhost
+	by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Thu, 9 Feb 2017 20:35:23 +1000
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Date: Thu,  9 Feb 2017 16:04:03 +0530
+In-Reply-To: <1486636445-24109-1-git-send-email-nikunj@linux.vnet.ibm.com>
+References: <1486636445-24109-1-git-send-email-nikunj@linux.vnet.ibm.com>
+Message-Id: <1486636445-24109-5-git-send-email-nikunj@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 4/6] target-ppc: add wait instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,22 +37,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Laszlo Ersek <lersek@redhat.com>, Shannon Zhao <shannon.zhao@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
+Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
 
-(+Leif, Graeme)
+Use the available wait instruction implementation.
 
-On 8 February 2017 at 18:23, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 8 February 2017 at 16:27, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->> The _CCA property is mandatory on arm64, and there is no default.
->
-> Is there a tool that can check this kind of requirement
-> and complain about issues in the ACPI tables (and
-> ditto, device tree)? It's really easy to produce a
-> dt or ACPI table that works with current kernels and
-> then turns out to have a problem six or twelve
-> months down the line :-(
->
+Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+---
+ target/ppc/translate.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Perhaps Graeme or Leif could shed some light on this? I know this is
-on our roadmap, but I am not up to date with the latest status.
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index b1a6aee..3ba2616 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -6391,6 +6391,7 @@ GEN_HANDLER_E(stqcx_, 0x1F, 0x16, 0x05, 0, PPC_NONE, PPC2_LSQ_ISA207),
+ #endif
+ GEN_HANDLER(sync, 0x1F, 0x16, 0x12, 0x039FF801, PPC_MEM_SYNC),
+ GEN_HANDLER(wait, 0x1F, 0x1E, 0x01, 0x03FFF801, PPC_WAIT),
++GEN_HANDLER_E(wait, 0x1F, 0x1E, 0x00, 0x039FF801, PPC_NONE, PPC2_ISA300),
+ GEN_HANDLER(b, 0x12, 0xFF, 0xFF, 0x00000000, PPC_FLOW),
+ GEN_HANDLER(bc, 0x10, 0xFF, 0xFF, 0x00000000, PPC_FLOW),
+ GEN_HANDLER(bcctr, 0x13, 0x10, 0x10, 0x00000000, PPC_FLOW),
+-- 
+2.7.4
