@@ -1,20 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44433)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cbnFg-0003v4-Rk
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 06:51:05 -0500
+	(envelope-from <thuth@redhat.com>) id 1cbnYR-00006y-J4
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 07:10:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cbnFd-0004ou-Np
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 06:51:04 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20170126101827.22378-7-berrange@redhat.com>
-References: <20170126101827.22378-1-berrange@redhat.com>
-	<20170126101827.22378-7-berrange@redhat.com>
-Date: Thu, 09 Feb 2017 12:50:59 +0100
-Message-ID: <w51lgtf8twc.fsf@maestria.local.igalia.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 06/18] iotests: skip 048
- with qcow which doesn't support resize
+	(envelope-from <thuth@redhat.com>) id 1cbnYQ-0002lY-PA
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 07:10:27 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Thu,  9 Feb 2017 13:10:18 +0100
+Message-Id: <1486642218-18520-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] qemu-options: Fix broken sheepdog URL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,17 +17,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Liu Yuan <namei.unix@gmail.com>, Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-On Thu 26 Jan 2017 11:18:15 AM CET, Daniel P. Berrange wrote:
-> Test 048 is designed to verify data preservation during an
-> image resize. The qcow (v1) format impl has never supported
-> resize so always fails.
->
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+The sheepdog URL is broken twice: First it uses a duplicated
+http:// prefix, second the website seems to have moved to
+https://sheepdog.github.io/sheepdog/ instead.
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ qemu-options.hx | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Berto
+diff --git a/qemu-options.hx b/qemu-options.hx
+index ad2f8fc..38113b9 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -2583,7 +2583,7 @@ Example
+ qemu-system-i386 --drive file=sheepdog://192.0.2.1:30000/MyVirtualMachine
+ @end example
+ 
+-See also @url{http://http://www.osrg.net/sheepdog/}.
++See also @url{https://sheepdog.github.io/sheepdog/}.
+ 
+ @item GlusterFS
+ GlusterFS is a user space distributed file system.
+-- 
+1.8.3.1
