@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46746)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cbepp-0007cR-Ak
+	(envelope-from <dgibson@ozlabs.org>) id 1cbepp-0007cS-Gd
 	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 21:51:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cbepn-0006y0-Cq
+	(envelope-from <dgibson@ozlabs.org>) id 1cbepn-0006yb-RW
 	for qemu-devel@nongnu.org; Wed, 08 Feb 2017 21:51:49 -0500
-Date: Thu, 9 Feb 2017 13:49:45 +1100
+Date: Thu, 9 Feb 2017 13:14:08 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170209024945.GW17644@umbus.fritz.box>
+Message-ID: <20170209021408.GQ17644@umbus.fritz.box>
 References: <cover.1486436185.git.sam.bobroff@au1.ibm.com>
-	<02c42ec7c0d07633c974e2ecd30054cc82e3d1c6.1486436186.git.sam.bobroff@au1.ibm.com>
+	<0de3d80bc7658aac7dc5f6b271045463b572c7ff.1486436186.git.sam.bobroff@au1.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ulNsWUvGrZAj8PMr"
+	protocol="application/pgp-signature"; boundary="CVXKxAdNG2kQIXaJ"
 Content-Disposition: inline
-In-Reply-To: <02c42ec7c0d07633c974e2ecd30054cc82e3d1c6.1486436186.git.sam.bobroff@au1.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 9/9] spapr: Small cleanup of PPC MMU
- enums
+In-Reply-To: <0de3d80bc7658aac7dc5f6b271045463b572c7ff.1486436186.git.sam.bobroff@au1.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 3/9] spapr: Add ibm,
+ processor-radix-AP-encodings to the device tree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,340 +29,161 @@ To: Sam Bobroff <sam.bobroff@au1.ibm.com>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---ulNsWUvGrZAj8PMr
+--CVXKxAdNG2kQIXaJ
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 07, 2017 at 01:56:52PM +1100, Sam Bobroff wrote:
-> The PPC MMU types are sometimes treated as if they were a bit field
-> and sometime as if they were an enum which causes maintenance
-> problems: flipping bits in the MMU type (which is done on both the 1TB
-> segment and 64K segment bits) currently produces new MMU type
-> values that are not handled in every "switch" on it, sometimes causing
-> an abort().
->=20
-> This patch provides some macros that can be used to filter out the
-> "bit field-like" bits so that the remainder of the value can be
-> switched on, like an enum. This allows removal of all of the
-> "degraded" types from the list and should ease maintenance.
+On Tue, Feb 07, 2017 at 01:56:46PM +1100, Sam Bobroff wrote:
+> Use the new ioctl, KVM_PPC_GET_RMMU_INFO, to fetch radix MMU
+> information from KVM and present the page encodings in the device tree
+> under ibm,processor-radix-AP-encodings. This provides page size
+> information to the guest which is necessary for it to use radix mode.
 >=20
 > Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
-This looks like a good fix independent of the POWER9 stuff.  Can you
-move this to the front of the series (which will require fixing some
-rebase conflicts) so I can apply it without waiting on the rest?
-
 > ---
->  hw/ppc/spapr.c          | 10 +++-----
->  target/ppc/cpu-qom.h    | 12 ++++-----
->  target/ppc/kvm.c        |  8 +++---
->  target/ppc/mmu-hash64.c | 10 ++++----
->  target/ppc/mmu_helper.c | 67 ++++++++++++++++++++-----------------------=
-------
->  target/ppc/translate.c  | 12 ++++-----
->  6 files changed, 51 insertions(+), 68 deletions(-)
+>  hw/ppc/spapr.c   |  7 +++++++
+>  target/ppc/cpu.h |  5 +++++
+>  target/ppc/kvm.c | 32 +++++++++++++++++++++++++++++++-
+>  3 files changed, 43 insertions(+), 1 deletion(-)
 >=20
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 325a9c587b..f9de02759a 100644
+> index a642e663d4..d629e2630c 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -222,18 +222,16 @@ static int spapr_populate_pa_features(CPUPPCState *=
-env, void *fdt, int offset,
->      uint8_t *pa_features;
->      size_t pa_size;
+> @@ -496,6 +496,13 @@ static void spapr_populate_cpu_dt(CPUState *cs, void=
+ *fdt, int offset,
 > =20
-> -    switch (env->mmu_model) {
-> -    case POWERPC_MMU_2_06:
-> -    case POWERPC_MMU_2_06a:
-> +    switch (POWERPC_MMU_VER(env->mmu_model)) {
-> +    case POWERPC_MMU_VER_2_06:
->          pa_features =3D pa_features_206;
->          pa_size =3D sizeof(pa_features_206);
->          break;
-> -    case POWERPC_MMU_2_07:
-> -    case POWERPC_MMU_2_07a:
-> +    case POWERPC_MMU_VER_2_07:
->          pa_features =3D pa_features_207;
->          pa_size =3D sizeof(pa_features_207);
->          break;
-> -    case POWERPC_MMU_3_00:
-> +    case POWERPC_MMU_VER_3_00:
->          pa_features =3D pa_features_300;
->          pa_size =3D sizeof(pa_features_300);
->          break;
-> diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-> index 1577cc8224..8ea055c18d 100644
-> --- a/target/ppc/cpu-qom.h
-> +++ b/target/ppc/cpu-qom.h
-> @@ -79,21 +79,21 @@ enum powerpc_mmu_t {
->      POWERPC_MMU_2_06       =3D POWERPC_MMU_64 | POWERPC_MMU_1TSEG
->                               | POWERPC_MMU_64K
->                               | POWERPC_MMU_AMR | 0x00000003,
-> -    /* Architecture 2.06 "degraded" (no 1T segments)           */
-> -    POWERPC_MMU_2_06a      =3D POWERPC_MMU_64 | POWERPC_MMU_AMR
-> -                             | 0x00000003,
->      /* Architecture 2.07 variant                               */
->      POWERPC_MMU_2_07       =3D POWERPC_MMU_64 | POWERPC_MMU_1TSEG
->                               | POWERPC_MMU_64K
->                               | POWERPC_MMU_AMR | 0x00000004,
-> -    /* Architecture 2.07 "degraded" (no 1T segments)           */
-> -    POWERPC_MMU_2_07a      =3D POWERPC_MMU_64 | POWERPC_MMU_AMR
-> -                             | 0x00000004,
->      /* Architecture 3.00 variant                               */
->      POWERPC_MMU_3_00       =3D POWERPC_MMU_64 | POWERPC_MMU_1TSEG
->                               | POWERPC_MMU_64K
->                               | POWERPC_MMU_AMR | 0x00000005,
+>      _FDT(spapr_fixup_cpu_smt_dt(fdt, offset, cpu,
+>                                  ppc_get_compat_smt_threads(cpu)));
+> +
+> +    if (env->radix_page_info.count) {
+> +        _FDT((fdt_setprop(fdt, offset, "ibm,processor-radix-AP-encodings=
+",
+> +                          env->radix_page_info.entries,
+> +                          env->radix_page_info.count *
+> +                          sizeof(env->radix_page_info.entries[0]))));
+> +    }
+>  }
+> =20
+>  static void spapr_populate_cpus_dt_node(void *fdt, sPAPRMachineState *sp=
+apr)
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index afb7ddbdd0..5a96d98b6f 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -914,6 +914,10 @@ struct ppc_segment_page_sizes {
+>      struct ppc_one_seg_page_size sps[PPC_PAGE_SIZES_MAX_SZ];
 >  };
-> +#define POWERPC_MMU_VER(x) ((x) & (POWERPC_MMU_64 | 0xFFFF))
-> +#define POWERPC_MMU_VER_64B POWERPC_MMU_VER(POWERPC_MMU_64B)
-> +#define POWERPC_MMU_VER_2_03 POWERPC_MMU_VER(POWERPC_MMU_2_03)
-> +#define POWERPC_MMU_VER_2_06 POWERPC_MMU_VER(POWERPC_MMU_2_06)
-> +#define POWERPC_MMU_VER_2_07 POWERPC_MMU_VER(POWERPC_MMU_2_07)
-> +#define POWERPC_MMU_VER_3_00 POWERPC_MMU_VER(POWERPC_MMU_3_00)
+> =20
+> +struct ppc_radix_page_info {
+> +    uint32_t count;
+> +    uint32_t entries[PPC_PAGE_SIZES_MAX_SZ];
+
+IIUC this info is ready for direct inclusion in the device tree:
+i.e. it's big-endian.  That absolutely needs a comment in the
+structure.  I'm also not sure it's a good idea, since I assume the TCG
+POWER9 code will eventually need to access this information directly
+to implement the radix MMU.
+
+Might be clearer to make this data structure native and do the BE
+conversion when generating the device tree.
+
+> +};
 > =20
 >  /***********************************************************************=
 ******/
->  /* Exception model                                                      =
-     */
+>  /* The whole PowerPC CPU context */
+> @@ -1053,6 +1057,7 @@ struct CPUPPCState {
+>      ppc_slb_t vrma_slb;
+>      target_ulong rmls;
+>      bool ci_large_pages;
+> +    struct ppc_radix_page_info radix_page_info;
+
+I'm not sure this belongs in CPUPPCState.  New fields should generally
+be added to PowerPCCPU ("cpu") rather than to CPUPPCState ("env")
+unless they need to be directly accessed from TCG generated code.
+
+But even more, AFAICT this should vary only with the CPU type/model,
+not with the individual CPU instance.  So this information could
+probably go into the CPU class structure instead of the instance.
+
+Yes, there are a lot of things that don't obey those rules already -
+that's because a lot of stuff hasn't been converted since the new QOM
+stuff was introduced.  But we shouldn't make it any worse with new
+patches.
+
+>  #endif
+> =20
+>  #if defined(TARGET_PPC64) && !defined(CONFIG_USER_ONLY)
 > diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 0d1443616c..1687d8e47e 100644
+> index ec92c64159..390d6342cc 100644
 > --- a/target/ppc/kvm.c
 > +++ b/target/ppc/kvm.c
-> @@ -285,8 +285,8 @@ static void kvm_get_fallback_smmu_info(PowerPCCPU *cp=
-u,
->              info->flags |=3D KVM_PPC_1T_SEGMENTS;
->          }
-> =20
-> -        if (env->mmu_model =3D=3D POWERPC_MMU_2_06 ||
-> -            env->mmu_model =3D=3D POWERPC_MMU_2_07) {
-> +        if (POWERPC_MMU_VER(env->mmu_model) =3D=3D POWERPC_MMU_VER_2_06 =
-||
-> +           POWERPC_MMU_VER(env->mmu_model) =3D=3D POWERPC_MMU_VER_2_07) {
->              info->slb_size =3D 32;
->          } else {
->              info->slb_size =3D 64;
-> @@ -300,8 +300,8 @@ static void kvm_get_fallback_smmu_info(PowerPCCPU *cp=
-u,
->          i++;
-> =20
->          /* 64K on MMU 2.06 and later */
-> -        if (env->mmu_model =3D=3D POWERPC_MMU_2_06 ||
-> -            env->mmu_model =3D=3D POWERPC_MMU_2_07) {
-> +        if (POWERPC_MMU_VER(env->mmu_model) =3D=3D POWERPC_MMU_VER_2_06 =
-||
-> +            POWERPC_MMU_VER(env->mmu_model) =3D=3D POWERPC_MMU_VER_2_07)=
- {
->              info->sps[i].page_shift =3D 16;
->              info->sps[i].slb_enc =3D 0x110;
->              info->sps[i].enc[0].page_shift =3D 16;
-> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-> index 0efc8c63fa..7f0b7b3df5 100644
-> --- a/target/ppc/mmu-hash64.c
-> +++ b/target/ppc/mmu-hash64.c
-> @@ -1004,8 +1004,8 @@ void helper_store_lpcr(CPUPPCState *env, target_ulo=
-ng val)
->      uint64_t lpcr =3D 0;
-> =20
->      /* Filter out bits */
-> -    switch (env->mmu_model) {
-> -    case POWERPC_MMU_64B: /* 970 */
-> +    switch (POWERPC_MMU_VER(env->mmu_model)) {
-> +    case POWERPC_MMU_VER_64B: /* 970 */
->          if (val & 0x40) {
->              lpcr |=3D LPCR_LPES0;
->          }
-> @@ -1031,19 +1031,19 @@ void helper_store_lpcr(CPUPPCState *env, target_u=
-long val)
->           * to dig HRMOR out of HID5
->           */
->          break;
-> -    case POWERPC_MMU_2_03: /* P5p */
-> +    case POWERPC_MMU_VER_2_03: /* P5p */
->          lpcr =3D val & (LPCR_RMLS | LPCR_ILE |
->                        LPCR_LPES0 | LPCR_LPES1 |
->                        LPCR_RMI | LPCR_HDICE);
->          break;
-> -    case POWERPC_MMU_2_06: /* P7 */
-> +    case POWERPC_MMU_VER_2_06: /* P7 */
->          lpcr =3D val & (LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_DPFD |
->                        LPCR_VRMASD | LPCR_RMLS | LPCR_ILE |
->                        LPCR_P7_PECE0 | LPCR_P7_PECE1 | LPCR_P7_PECE2 |
->                        LPCR_MER | LPCR_TC |
->                        LPCR_LPES0 | LPCR_LPES1 | LPCR_HDICE);
->          break;
-> -    case POWERPC_MMU_2_07: /* P8 */
-> +    case POWERPC_MMU_VER_2_07: /* P8 */
->          lpcr =3D val & (LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_KBV |
->                        LPCR_DPFD | LPCR_VRMASD | LPCR_RMLS | LPCR_ILE |
->                        LPCR_AIL | LPCR_ONL | LPCR_P8_PECE0 | LPCR_P8_PECE=
-1 |
-> diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
-> index 172a305e0f..e65e4d337f 100644
-> --- a/target/ppc/mmu_helper.c
-> +++ b/target/ppc/mmu_helper.c
-> @@ -1260,7 +1260,7 @@ static void mmu6xx_dump_mmu(FILE *f, fprintf_functi=
-on cpu_fprintf,
-> =20
->  void dump_mmu(FILE *f, fprintf_function cpu_fprintf, CPUPPCState *env)
->  {
-> -    switch (env->mmu_model) {
-> +    switch (POWERPC_MMU_VER(env->mmu_model)) {
->      case POWERPC_MMU_BOOKE:
->          mmubooke_dump_mmu(f, cpu_fprintf, env);
->          break;
-> @@ -1272,12 +1272,10 @@ void dump_mmu(FILE *f, fprintf_function cpu_fprin=
-tf, CPUPPCState *env)
->          mmu6xx_dump_mmu(f, cpu_fprintf, env);
->          break;
->  #if defined(TARGET_PPC64)
-> -    case POWERPC_MMU_64B:
-> -    case POWERPC_MMU_2_03:
-> -    case POWERPC_MMU_2_06:
-> -    case POWERPC_MMU_2_06a:
-> -    case POWERPC_MMU_2_07:
-> -    case POWERPC_MMU_2_07a:
-> +    case POWERPC_MMU_VER_64B:
-> +    case POWERPC_MMU_VER_2_03:
-> +    case POWERPC_MMU_VER_2_06:
-> +    case POWERPC_MMU_VER_2_07:
->          dump_slb(f, cpu_fprintf, ppc_env_get_cpu(env));
->          break;
->  #endif
-> @@ -1412,14 +1410,12 @@ hwaddr ppc_cpu_get_phys_page_debug(CPUState *cs, =
-vaddr addr)
->      CPUPPCState *env =3D &cpu->env;
->      mmu_ctx_t ctx;
-> =20
-> -    switch (env->mmu_model) {
-> +    switch (POWERPC_MMU_VER(env->mmu_model)) {
->  #if defined(TARGET_PPC64)
-> -    case POWERPC_MMU_64B:
-> -    case POWERPC_MMU_2_03:
-> -    case POWERPC_MMU_2_06:
-> -    case POWERPC_MMU_2_06a:
-> -    case POWERPC_MMU_2_07:
-> -    case POWERPC_MMU_2_07a:
-> +    case POWERPC_MMU_VER_64B:
-> +    case POWERPC_MMU_VER_2_03:
-> +    case POWERPC_MMU_VER_2_06:
-> +    case POWERPC_MMU_VER_2_07:
->          return ppc_hash64_get_phys_page_debug(cpu, addr);
->  #endif
-> =20
-> @@ -1904,6 +1900,12 @@ void ppc_tlb_invalidate_all(CPUPPCState *env)
->  {
->      PowerPCCPU *cpu =3D ppc_env_get_cpu(env);
-> =20
-> +#if defined(TARGET_PPC64)
-> +    if (env->mmu_model & POWERPC_MMU_64) {
-> +        env->tlb_need_flush =3D 0;
-> +        tlb_flush(CPU(cpu));
-> +    } else
-> +#endif /* defined(TARGET_PPC64) */
->      switch (env->mmu_model) {
->      case POWERPC_MMU_SOFT_6xx:
->      case POWERPC_MMU_SOFT_74xx:
-> @@ -1928,21 +1930,12 @@ void ppc_tlb_invalidate_all(CPUPPCState *env)
->          break;
->      case POWERPC_MMU_32B:
->      case POWERPC_MMU_601:
-> -#if defined(TARGET_PPC64)
-> -    case POWERPC_MMU_64B:
-> -    case POWERPC_MMU_2_03:
-> -    case POWERPC_MMU_2_06:
-> -    case POWERPC_MMU_2_06a:
-> -    case POWERPC_MMU_2_07:
-> -    case POWERPC_MMU_2_07a:
-> -    case POWERPC_MMU_3_00:
-> -#endif /* defined(TARGET_PPC64) */
->          env->tlb_need_flush =3D 0;
->          tlb_flush(CPU(cpu));
->          break;
->      default:
->          /* XXX: TODO */
-> -        cpu_abort(CPU(cpu), "Unknown MMU model %d\n", env->mmu_model);
-> +        cpu_abort(CPU(cpu), "Unknown MMU model %x\n", env->mmu_model);
->          break;
->      }
+> @@ -328,6 +328,18 @@ static void kvm_get_smmu_info(PowerPCCPU *cpu, struc=
+t kvm_ppc_smmu_info *info)
+>      kvm_get_fallback_smmu_info(cpu, info);
 >  }
-> @@ -1951,6 +1944,16 @@ void ppc_tlb_invalidate_one(CPUPPCState *env, targ=
-et_ulong addr)
->  {
->  #if !defined(FLUSH_ALL_TLBS)
->      addr &=3D TARGET_PAGE_MASK;
-> +#if defined(TARGET_PPC64)
-> +    if (env->mmu_model & POWERPC_MMU_64) {
-> +        /* tlbie invalidate TLBs for all segments */
-> +        /* XXX: given the fact that there are too many segments to inval=
-idate,
-> +         *      and we still don't have a tlb_flush_mask(env, n, mask) i=
-n QEMU,
-> +         *      we just invalidate all TLBs
-> +         */
-> +        env->tlb_need_flush |=3D TLB_NEED_LOCAL_FLUSH;
-> +    } else
-> +#endif /* defined(TARGET_PPC64) */
->      switch (env->mmu_model) {
->      case POWERPC_MMU_SOFT_6xx:
->      case POWERPC_MMU_SOFT_74xx:
-> @@ -1968,22 +1971,6 @@ void ppc_tlb_invalidate_one(CPUPPCState *env, targ=
-et_ulong addr)
->           */
->          env->tlb_need_flush |=3D TLB_NEED_LOCAL_FLUSH;
->          break;
-> -#if defined(TARGET_PPC64)
-> -    case POWERPC_MMU_64B:
-> -    case POWERPC_MMU_2_03:
-> -    case POWERPC_MMU_2_06:
-> -    case POWERPC_MMU_2_06a:
-> -    case POWERPC_MMU_2_07:
-> -    case POWERPC_MMU_2_07a:
-> -    case POWERPC_MMU_3_00:
-> -        /* tlbie invalidate TLBs for all segments */
-> -        /* XXX: given the fact that there are too many segments to inval=
-idate,
-> -         *      and we still don't have a tlb_flush_mask(env, n, mask) i=
-n QEMU,
-> -         *      we just invalidate all TLBs
-> -         */
-> -        env->tlb_need_flush |=3D TLB_NEED_LOCAL_FLUSH;
-> -        break;
-> -#endif /* defined(TARGET_PPC64) */
->      default:
->          /* Should never reach here with other MMU models */
->          assert(0);
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index 121218087f..1edf3f2133 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -6910,18 +6910,16 @@ void ppc_cpu_dump_state(CPUState *cs, FILE *f, fp=
-rintf_function cpu_fprintf,
->      }
->  #endif
 > =20
-> -    switch (env->mmu_model) {
-> +    switch (POWERPC_MMU_VER(env->mmu_model)) {
->      case POWERPC_MMU_32B:
->      case POWERPC_MMU_601:
->      case POWERPC_MMU_SOFT_6xx:
->      case POWERPC_MMU_SOFT_74xx:
->  #if defined(TARGET_PPC64)
-> -    case POWERPC_MMU_64B:
-> -    case POWERPC_MMU_2_03:
-> -    case POWERPC_MMU_2_06:
-> -    case POWERPC_MMU_2_06a:
-> -    case POWERPC_MMU_2_07:
-> -    case POWERPC_MMU_2_07a:
-> +    case POWERPC_MMU_VER_64B:
-> +    case POWERPC_MMU_VER_2_03:
-> +    case POWERPC_MMU_VER_2_06:
-> +    case POWERPC_MMU_VER_2_07:
->  #endif
->          cpu_fprintf(f, " SDR1 " TARGET_FMT_lx "   DAR " TARGET_FMT_lx
->                         "  DSISR " TARGET_FMT_lx "\n", env->spr[SPR_SDR1],
+> +static bool kvm_get_rmmu_info(PowerPCCPU *cpu, struct kvm_ppc_rmmu_info =
+*info)
+> +{
+> +    CPUState *cs =3D CPU(cpu);
+> +    int ret;
+> +
+> +    if (kvm_check_extension(cs->kvm_state, KVM_CAP_PPC_MMU_RADIX)) {
+> +        ret =3D kvm_vm_ioctl(cs->kvm_state, KVM_PPC_GET_RMMU_INFO, info);
+> +        return (ret =3D=3D 0);
+> +    }
+> +    return false;
+> +}
+> +
+>  static long gethugepagesize(const char *mem_path)
+>  {
+>      struct statfs fs;
+> @@ -441,9 +453,11 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
+>  {
+>      static struct kvm_ppc_smmu_info smmu_info;
+>      static bool has_smmu_info;
+> +    static struct kvm_ppc_rmmu_info rmmu_info;
+> +    static bool has_rmmu_info;
+>      CPUPPCState *env =3D &cpu->env;
+>      long rampagesize;
+> -    int iq, ik, jq, jk;
+> +    int iq, ik, jq, jk, i;
+>      bool has_64k_pages =3D false;
+> =20
+>      /* We only handle page sizes for 64-bit server guests for now */
+> @@ -508,6 +522,22 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
+>      if (!has_64k_pages) {
+>          env->mmu_model &=3D ~POWERPC_MMU_64K;
+>      }
+> +
+> +    /* Collect radix page info from kernel if not already */
+> +    if (!has_rmmu_info) {
+
+Putting the data in the class would avoid this ugly messing with a
+static local, for one thing.
+
+> +        env->radix_page_info.count =3D 0;
+> +        if (kvm_get_rmmu_info(cpu, &rmmu_info)) {
+> +            for (i =3D 0; i < 8; i++) {
+
+s/8/PPC_PAGE_SIZES_MAX_SZ/ ?
+
+> +                if (rmmu_info.ap_encodings[i]) {
+> +                    env->radix_page_info.entries[i] =3D
+> +                        cpu_to_be32(rmmu_info.ap_encodings[i]);
+> +                    env->radix_page_info.count++;
+> +                }
+> +            }
+> +        }
+> +        has_rmmu_info =3D true;
+> +    }
+> +
+>  }
+>  #else /* defined (TARGET_PPC64) */
+> =20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -370,25 +191,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---ulNsWUvGrZAj8PMr
+--CVXKxAdNG2kQIXaJ
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYm9jIAAoJEGw4ysog2bOSG0cQAMCNA5YFOfyCZOTRbjUBqY/u
-QIlbZXmQdtP20SyA2b+MSGYCxhIiGGXpXxwGkVWRPCcUN/lvsrepgL0YaqkjVxdi
-SQpsSb+/CAHsq/89e8fWQ0efzk608TeM6v9rumuE2fJOerBy/4ZC1ohRjM3QR1cX
-m6Qkwuyh9sOhpXQLfqFWTvamEt4aqPD2xs7NX9eH/RlM4bKtwWB8B1Yl7u6zytx5
-EDoyu0dHB2Wiz1JruJ6X2/vBM+81PeeKqXQy6HtNfyb+9QppiIVXSs8up292vh4y
-GGXgo7SiryjHBEuLQ+yGMawjR2zZfAMD1KZwvqVGO/cRqAYcenGCjXvLriSFiac5
-DiGd+FIZnY70h39SGKIhs3B/VAZLA6R/bi9yNgE7dIJPGNdpDm48W8BG8CFy+xFS
-r+BQJV5OFm2eMLbn8GPxplmgLbyFAVXf2k/bbti8l5UAas4l/fbc21BAM1IhaZHC
-5zCVaMFhgPN9+0VcoBJf28a7dahiO0/z0kusOOVEHgOt1cK47mmRPFv3gKq87FYg
-rjQtk2EzCO8VM8zGFt338XQ4VF8oUyLtQs4evvjFMukAZA1/6R1NEPJODfC8UVnM
-SXhU+v6uNnc4YCbre1uG2n4UtceL/ZYoVEUTlW2V3rnNCOislouYmM5ncDn5lp/Z
-VdK5BmW9c6qhGM+6+esY
-=9DlB
+iQIcBAEBCAAGBQJYm9BuAAoJEGw4ysog2bOSnRAQAMsckTH5Rq8Iudk6W3PqRvyz
+iKG+vmTx7HoIvF+jXaiuBMSWrds/ijwmtoSIUSewNpIuhcsNN0EizTMafUv9XlBp
+l93E0KHX70t/Kgjq8BdRCdm/n303Mg2DYBy25egdaR3DaxbveMmGr36X3tq3ibE2
+QNWAHG+48j6yoX1jQKZiRyr013+4dS9JQtPkM1UGnQ1Qrrk31fJNM1U7xPAc4Dq8
+gP++YOiG3cBtXq9eyiuo7fZS1KbIz/EZGmDc3HmKuT5UHGE+/Apt1Zsa1qNIROVm
+n3wZhPe0Oq3L+wx+kGYTzGiT9C1LsN6n/+UJnup0eoTmulH5OKIdv/4UNQly9sEW
+IagPkOWiWuyeF0NFAMpXvGJPkyFz+xsKeWvP86AYlSBI0/OVVIlBIzmIuGR3XR72
+IPRlJt4xHLMZ334cav3/AeMoAm/qpDZAEqcY0QGX5NFcRY0W2ZvRQ/Y9RH5fRNKJ
+UF7QGi/c3KhMbqPu0tbTsXKZE7iv4o39aa+JMgsIYNnbd+kwg4Nezae4fwtXMm/F
+DHCGoRffOmDgaPZGgjtZoD6h9+hm9AOB3OSfDCKPaAFhSAW3DaINcX7Od8/TnxEZ
+/G18MaZMYqOgZXnpHN6o1w4qJprfT6lO09QoStdR7y1kI12yGHG3M4QZzXJV66/v
+Tl4fuh6wqOimgXTHgiwJ
+=jOap
 -----END PGP SIGNATURE-----
 
---ulNsWUvGrZAj8PMr--
+--CVXKxAdNG2kQIXaJ--
