@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35054)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cboQT-00049A-Uv
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:06:18 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cboVx-00018o-5G
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:11:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cboQQ-0003QI-OL
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:06:17 -0500
-References: <1486399909-16338-1-git-send-email-quintela@redhat.com>
-	<CAFEAcA-yFVYzwxt4FG9D3g3BwEJFPnmNrr-pJOzYV-h5Y6bu7A@mail.gmail.com>
-	<87lgti1lta.fsf@emacs.mitica>
-	<CAFEAcA9RXeubPXZhTS+FHyYVARvb=gVFOQxK8ZYt8OQnhe9WXw@mail.gmail.com>
-	<f296fbdf-67c3-8891-e5ca-a25570e3e12f@redhat.com>
-	<CAFEAcA9d9aoS=SaOghevNKTaX2V7Zu=jUev7UH1G4iSovT=_jA@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <750291e6-5520-c7af-ffce-fb7c5f848761@redhat.com>
-Date: Thu, 9 Feb 2017 14:06:11 +0100
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cboVv-0005uJ-SO
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 08:11:57 -0500
+References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
+	<20170202051445.5735-96-david@gibson.dropbear.id.au>
+	<922cc254-3d39-c21e-3ac6-7f8bd3b95d90@ilande.co.uk>
+	<b8c77dc9-6083-bf26-3750-f0847ad1d6ed@redhat.com>
+	<83f44e87-d1aa-3c9f-f383-e06717dfa54c@ilande.co.uk>
+	<999b15a2-2388-4397-64f4-06875f7f6d92@redhat.com>
+	<824f7332-4893-fa64-d61d-7cb9497e5371@ilande.co.uk>
+	<ff33796b-742b-f54c-a3c7-ee19b9d23759@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <6d995fa3-f699-8f00-740c-5d622d8df08a@ilande.co.uk>
+Date: Thu, 9 Feb 2017 13:11:26 +0000
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9d9aoS=SaOghevNKTaX2V7Zu=jUev7UH1G4iSovT=_jA@mail.gmail.com>
+In-Reply-To: <ff33796b-742b-f54c-a3c7-ee19b9d23759@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc]  [PULL 0/6] Migration pull
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 095/107] spapr: clock should count only if
+ vm is running
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,43 +30,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, peter.maydell@linaro.org
+Cc: thuth@redhat.com, qemu-devel@nongnu.org, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, agraf@suse.de, qemu-ppc@nongnu.org
 
-On 09.02.2017 11:43, Peter Maydell wrote:
-> On 8 February 2017 at 08:47, Thomas Huth <thuth@redhat.com> wrote:
->> How fast is that aarch64 machine?
-> 
-> It's a juno board, so it's not very fast, but I wouldn't
-> have expected it to hit a 100 second timeout assuming
-> the test isn't trying to do a ludicrous amount of work.
-> 
->> The timeout of the prom-env test is
->> already 100 seconds, so that seems to be plenty to me (the test normally
->> finishes here on my laptop within 15 seconds).
->> OTOH, if it helps with the aarch64 machine, I'm also fine if we increase
->> the timeout further - but what value would be appropriate then? Could you
->> please run the following on that slow machine:
+On 07/02/17 15:46, Laurent Vivier wrote:
+
+>> If you do this enough times (maybe 10 or so?) you'll see the progress
+>> bars stop working correctly and get out of sync, i.e. it will freeze for
+>> long periods of time and then "jump" to catch-up but not all the way.
 >>
->>  time QTEST_QEMU_BINARY=ppc64-softmmu/qemu-system-ppc64 tests/prom-env-test
-[....]
-> <qemu-system-ppc64 tests/prom-env-test -v -p /ppc64/prom-env/pseries
-> /ppc64/prom-env/pseries: OK
+>> With my above patch applied to include the decrementer in the migration,
+>> the bug was no longer visible in my tests.
 > 
-> real    1m24.362s
-> user    1m23.572s
-> sys     0m1.144s
+> Thank you for all these details.
 > 
-> pseries is much slower than the other two and at 85 seconds is
-> not all that much below the 100s. Something's odd here.
+> I've been able to reproduce the problem, and I think the proposition you
+> did in:
+> 
+>    https://lists.gnu.org/archive/html/qemu-devel/2016-01/msg01114.html
+> 
+> is the good one:
+> 
+> diff --git a/target/ppc/machine.c b/target/ppc/machine.c
+> index df9f7a4..1dc95b8 100644
+> --- a/target/ppc/machine.c
+> +++ b/target/ppc/machine.c
+> @@ -172,6 +172,7 @@ static void cpu_pre_save(void *opaque)
+>      env->spr[SPR_CFAR] = env->cfar;
+>  #endif
+>      env->spr[SPR_BOOKE_SPEFSCR] = env->spe_fscr;
+> +    env->spr[SPR_DECR] = cpu_ppc_load_decr(env);
+> 
+>      for (i = 0; (i < 4) && (i < env->nb_BATs); i++) {
+>          env->spr[SPR_DBAT0U + 2*i] = env->DBAT[0][i];
+> @@ -214,6 +215,7 @@ static int cpu_post_load(void *opaque, int version_id)
+>      env->cfar = env->spr[SPR_CFAR];
+>  #endif
+>      env->spe_fscr = env->spr[SPR_BOOKE_SPEFSCR];
+> +    cpu_ppc_store_decr(env, env->spr[SPR_DECR]);
+> 
+>      for (i = 0; (i < 4) && (i < env->nb_BATs); i++) {
+>          env->DBAT[0][i] = env->spr[SPR_DBAT0U + 2*i];
+> 
+> 
+> It's interesting because it doesn't break migration between different
+> qemu releases as the register is already part of the migration stream.
+> It was just not updated in the case of TCG (KVM is keeping it alive).
+> And in case of KVM, calling cpu_ppc_load_decr()/cpu_ppc_store_decr()
+> will not break anything as:
+> 
+> - cpu_ppc_load_decr() returns "env->spr[SPR_DECR]",
+> - cpu_ppc_store_decr() does nothing.
+> 
+> Could you re-send this patch with your S-o-b, please?
 
-SLOF (the firmware of the pseries machine) is known to perform quite bad
-when running under TCG ... maybe it is even worse with the ARM version
-of TCG? Or did you by any chance accidentially compile that version of
-QEMU with "--enable-debug"?
+Hi Laurent,
 
-Anyway, I've got some ideas how to speed up the test... and to be sure,
-I'll also increase the timeout to 120 seconds instead. I'll send a patch
-when it is ready...
+No problem, and thanks for the analysis. In fact, I have a couple of
+other patches up on github which should fix up the remainder of the
+issues and make g3beige migrateable (I would add the mac99 is currently
+fairly close, however Ben has several WIP patches that change the mac99
+model so I don't think it's worth making that machine officially
+migrateable yet).
 
- Thomas
+The one question I would ask is that if cpu_ppc_store_decr() does
+nothing on KVM then would this causes issues attempting a migration
+between TCG and KVM? In theory I believe I would still need to add
+VMSTATE_PPC_TIMEBASE_V to the vmstate and encode the decrementer offset
+relative to the timebase for this to work correctly as per the original
+thread.
+
+I'm just thinking if we are close to finalising the g3beige vmstate then
+it would make sense to get it right so a KVM<>TCG migration can happen
+if at all feasible.
+
+
+ATB,
+
+Mark.
