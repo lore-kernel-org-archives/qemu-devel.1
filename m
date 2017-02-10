@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cc3jO-0006tx-U6
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 00:26:54 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1cc3jU-00076P-16
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 00:26:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cc3jO-0001h5-3X
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 00:26:50 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1cc3jT-0001is-Ca
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 00:26:56 -0500
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Fri, 10 Feb 2017 16:25:59 +1100
-Message-Id: <1486704360-27361-10-git-send-email-sjitindarsingh@gmail.com>
+Date: Fri, 10 Feb 2017 16:26:00 +1100
+Message-Id: <1486704360-27361-11-git-send-email-sjitindarsingh@gmail.com>
 In-Reply-To: <1486704360-27361-1-git-send-email-sjitindarsingh@gmail.com>
 References: <1486704360-27361-1-git-send-email-sjitindarsingh@gmail.com>
-Subject: [Qemu-devel] [QEMU-PPC] [PATCH V2 09/10] target/ppc/POWER9: Add
- cpu_has_work function for POWER9
+Subject: [Qemu-devel] [QEMU-PPC] [PATCH V2 10/10] hw/ppc/spapr: Add POWER9
+ to pseries cpu models
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,82 +23,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org
 Cc: david@gibson.dropbear.id.au, agraf@suse.de, qemu-devel@nongnu.org, sam.bobroff@au1.ibm.com, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-The cpu has work function is used to mask interrupts used to determine
-if there is work for the cpu based on the LPCR. Add a function to do this
-for POWER9 and add it to the POWER9 cpu definition. This is similar to that
-for POWER8 except using the LPCR bits as defined for POWER9.
+Add POWER9 cpu to list of spapr core models which allows it to be specified
+as the cpu model for a pseries guest (e.g. -machine pseries -cpu POWER9).
+
+This now allows a POWER9 cpu to boot to userspace in tcg emulation for a
+pseries machine with a legacy kernel.
 
 Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 ---
- target/ppc/translate_init.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 45 insertions(+)
+ hw/ppc/spapr_cpu_core.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index a3a23d8..cc8ab1f 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -8776,10 +8776,54 @@ static bool ppc_pvr_match_power9(PowerPCCPUClass *pcc, uint32_t pvr)
-     return false;
- }
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index 9dddaeb..71253f9 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -360,6 +360,9 @@ static const char *spapr_core_models[] = {
  
-+static bool cpu_has_work_POWER9(CPUState *cs)
-+{
-+    PowerPCCPU *cpu = POWERPC_CPU(cs);
-+    CPUPPCState *env = &cpu->env;
+     /* POWER8NVL */
+     "POWER8NVL_v1.0",
 +
-+    if (cs->halted) {
-+        if (!(cs->interrupt_request & CPU_INTERRUPT_HARD)) {
-+            return false;
-+        }
-+        /* External Exception */
-+        if ((env->pending_interrupts & (1u << PPC_INTERRUPT_EXT)) &&
-+            (env->spr[SPR_LPCR] & LPCR_EEE)) {
-+            return true;
-+        }
-+        /* Decrementer Exception */
-+        if ((env->pending_interrupts & (1u << PPC_INTERRUPT_DECR)) &&
-+            (env->spr[SPR_LPCR] & LPCR_DEE)) {
-+            return true;
-+        }
-+        /* Machine Check or Hypervisor Maintenance Exception */
-+        if ((env->pending_interrupts & (1u << PPC_INTERRUPT_MCK |
-+            1u << PPC_INTERRUPT_HMI)) && (env->spr[SPR_LPCR] & LPCR_OEE)) {
-+            return true;
-+        }
-+        /* Privileged Doorbell Exception */
-+        if ((env->pending_interrupts & (1u << PPC_INTERRUPT_DOORBELL)) &&
-+            (env->spr[SPR_LPCR] & LPCR_PDEE)) {
-+            return true;
-+        }
-+        /* Hypervisor Doorbell Exception */
-+        if ((env->pending_interrupts & (1u << PPC_INTERRUPT_HDOORBELL)) &&
-+            (env->spr[SPR_LPCR] & LPCR_HDEE)) {
-+            return true;
-+        }
-+        if (env->pending_interrupts & (1u << PPC_INTERRUPT_RESET)) {
-+            return true;
-+        }
-+        return false;
-+    } else {
-+        return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
-+    }
-+}
-+
- POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(oc);
-     PowerPCCPUClass *pcc = POWERPC_CPU_CLASS(oc);
-+    CPUClass *cc = CPU_CLASS(oc);
++    /* POWER9 */
++    "POWER9_v1.0",
+ };
  
-     dc->fw_name = "PowerPC,POWER9";
-     dc->desc = "POWER9";
-@@ -8790,6 +8834,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
-                          PCR_COMPAT_2_05;
-     pcc->init_proc = init_proc_POWER9;
-     pcc->check_pow = check_pow_nocheck;
-+    cc->has_work = cpu_has_work_POWER9;
-     pcc->insns_flags = PPC_INSNS_BASE | PPC_ISEL | PPC_STRING | PPC_MFTB |
-                        PPC_FLOAT | PPC_FLOAT_FSEL | PPC_FLOAT_FRES |
-                        PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |
+ void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
 -- 
 2.5.5
