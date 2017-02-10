@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38197)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ccAO4-0008Bb-V1
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:33:18 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ccAcy-0004V2-8X
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:48:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ccAO1-0003Bx-Sa
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:33:17 -0500
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:35972)
+	(envelope-from <peter.maydell@linaro.org>) id 1ccAcx-00088I-Do
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:48:40 -0500
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:38489)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ccAO1-0003BU-LQ
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:33:13 -0500
-Received: by mail-wm0-x233.google.com with SMTP id c85so258822838wmi.1
-	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 04:33:13 -0800 (PST)
-References: <20170210014519.12413-1-bobby.prani@gmail.com>
-	<871sv6xmzk.fsf@linaro.org>
-	<0ec07664-fa06-8f09-33ce-ca15448c7851@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <0ec07664-fa06-8f09-33ce-ca15448c7851@redhat.com>
-Date: Fri, 10 Feb 2017 12:33:24 +0000
-Message-ID: <87y3xew7hn.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ccAcx-000880-7O
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:48:39 -0500
+Received: by mail-wm0-x22d.google.com with SMTP id r141so47425425wmg.1
+	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 04:48:38 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] tcg: handle EXCP_ATOMIC exception properly
+In-Reply-To: <20170209231517.GA27610@umbus.fritz.box>
+References: <1486649607-31248-1-git-send-email-thuth@redhat.com>
+	<CAFEAcA8U9Y9X87o_79ogmo7cY3-a3o=80GhtWyv74UkNE2MjSg@mail.gmail.com>
+	<20170209231517.GA27610@umbus.fritz.box>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 10 Feb 2017 12:48:17 +0000
+Message-ID: <CAFEAcA8XvwRdYZp9v4radG2unWk3VAyuKL4asG+9BTVzU+=1vg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] tests/prom-env: Ease time-out problems on
+ slow hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +31,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Pranith Kumar <bobby.prani@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "open list:Overall" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
 
-
-Paolo Bonzini <pbonzini@redhat.com> writes:
-
-> On 10/02/2017 13:13, Alex Bennée wrote:
->>> +        if (atomic_read(&other_cpu->running) &&
->>> !qemu_cpu_is_self(other_cpu)) {
->> The comment above reads:
+On 9 February 2017 at 23:15, David Gibson <david@gibson.dropbear.id.au> wrote:
+> On Thu, Feb 09, 2017 at 02:37:26PM +0000, Peter Maydell wrote:
+>> On 9 February 2017 at 14:13, Thomas Huth <thuth@redhat.com> wrote:
+>> > Peter Maydell recently ran into time-out problems with the
+>> > prom-env test on a rather slow ARM board. To tackle this issue,
+>> > we can speed up the test by running QEMU with "-nodefaults" here,
+>> > so that SLOF has less devices to scan during boot, and by using
+>> > the "nvramrc" environment variable instead of "boot-command",
+>> > since this variable is evaluated earlier in the boot process.
+>> > And to be really sure that we do not face such time out problems
+>> > again, let's also increase the time out value from 100s to 120s
+>> > instead.
+>> >
+>> > Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> > ---
+>> >  tests/prom-env-test.c | 8 +++++---
+>> >  1 file changed, 5 insertions(+), 3 deletions(-)
 >>
->>   Must only be called from outside cpu_exec.
+>> Seems to cut the elapsed realtime for the pseries board
+>> down from about 90s to 55s. Hopefully that plus the
+>> boosted timeout will help.
 >>
->> So we need to revise this comment. Is this really a limitation or was it
->> originally the design goal?
+>> Tested-by: Peter Maydell <peter.maydell@linaro.org>
 >
-> If you want to call it within cpu_exec, you can always use
-> cpu_exec_end/start around it.
->
-> I think we should first of all get rid of the iothread lock within
-> cpu_exec, and then look at this patch again.
+> Peter, will you merge this directly, or do you want me to take it
+> through my tree?
 
-What to do with the MTTCG series in the meantime?
+I just did a full test with the intention of merging it into
+master, and I noticed it causes new warnings on the sparc
+prom tests:
 
-I'm hesitant to hold up the whole series for a potentially messy
-re-factor of the cpu loop code to push out the BQL which could take some
-time, although of course I don't want to merge something that makes that
-harder.
+TEST: tests/prom-env-test... (pid=17171)
+  /sparc/prom-env/SPARCbook:
+Warning: nic
+ lance.0 has no peer
+OK
+  /sparc/prom-env/Voyager:
+Warning: nic
+ lance.0 has no peer
+OK
+  /sparc/prom-env/SS-20:
+Warning: nic
+ lance.0 has no peer
+OK
+PASS: tests/prom-env-test
 
-That said for TCG system emulation EXCP_ATOMIC is currently broken with
-respect to debugging. However for the initial guests/host combination of
-ARMv7/8 on x86_64 we don't need the fallback with pretty much 99% of
-deployed hosts. How about the following:
+So it needs some tweaking, I think.
 
-  - drop Pranith's patch for the current MTTCG series
-  - replace with an error/abort on EXCP_ATOMIC
-  - proceed with merge as plan
-  - tackle the BQL lock next (along with more MTTCG guest/targets enablement)
-
-Richard/Peter,
-
-Any thoughts/opinions on this?
-
---
-Alex Bennée
+thanks
+-- PMM
