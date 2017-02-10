@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ccCEY-0006RA-8a
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 09:31:35 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ccCKI-00008p-AV
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 09:37:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ccCEV-0000zZ-3K
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 09:31:34 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1486065742-28639-1-git-send-email-peter.maydell@linaro.org>
-	<1486065742-28639-10-git-send-email-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7a95b49b-83af-019d-b480-f26d69f0fe7d@amsat.org>
-Date: Fri, 10 Feb 2017 11:31:24 -0300
+	(envelope-from <alex.bennee@linaro.org>) id 1ccCKF-0002eg-6Z
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 09:37:30 -0500
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:36237)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ccCKE-0002e9-Vc
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 09:37:27 -0500
+Received: by mail-wm0-x22b.google.com with SMTP id c85so261912114wmi.1
+	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 06:37:26 -0800 (PST)
+References: <20170210014519.12413-1-bobby.prani@gmail.com>
+	<871sv6xmzk.fsf@linaro.org>
+	<0ec07664-fa06-8f09-33ce-ca15448c7851@redhat.com>
+	<87y3xew7hn.fsf@linaro.org>
+	<3f702266-1ac2-57c5-e0f8-3dec07b450d2@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <3f702266-1ac2-57c5-e0f8-3dec07b450d2@redhat.com>
+Date: Fri, 10 Feb 2017 14:37:38 +0000
+Message-ID: <87vasiw1ql.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1486065742-28639-10-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 9/9] armv7m: VECTCLRACTIVE and VECTRESET
- are UNPREDICTABLE
+Subject: Re: [Qemu-devel] [PATCH] tcg: handle EXCP_ATOMIC exception properly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +33,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: Liviu Ionescu <ilg@livius.net>, Michael Davidsaver <mdavidsaver@gmail.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, patches@linaro.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Pranith Kumar <bobby.prani@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "open list:Overall" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
 
-On 02/02/2017 05:02 PM, Peter Maydell wrote:
-> From: Michael Davidsaver <mdavidsaver@gmail.com>
->
-> The VECTCLRACTIVE and VECTRESET bits in the AIRCR are both
-> documented as UNPREDICTABLE if you write a 1 to them when
-> the processor is not halted in Debug state (ie stopped
-> and under the control of an external JTAG debugger).
-> Since we don't implement Debug state or emulated JTAG
-> these bits are always UNPREDICTABLE for us. Instead of
-> logging them as unimplemented we can simply log writes
-> as guest errors and ignore them.
->
-> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
-> [PMM: change extracted from another patch; commit message
->  constructed from scratch]
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Reviewed-by: Philippe Mathieu-Daud� <f4bug@amsat.org>
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-> ---
->  hw/intc/armv7m_nvic.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
+> On 10/02/2017 13:33, Alex Bennée wrote:
+>> That said for TCG system emulation EXCP_ATOMIC is currently broken with
+>> respect to debugging. However for the initial guests/host combination of
+>> ARMv7/8 on x86_64 we don't need the fallback with pretty much 99% of
+>> deployed hosts. How about the following:
+>>
+>>   - drop Pranith's patch for the current MTTCG series
+>>   - replace with an error/abort on EXCP_ATOMIC
 >
-> diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-> index 7b61fe6..18c0e60 100644
-> --- a/hw/intc/armv7m_nvic.c
-> +++ b/hw/intc/armv7m_nvic.c
-> @@ -698,10 +698,14 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value)
->                  qemu_irq_pulse(s->sysresetreq);
->              }
->              if (value & 2) {
-> -                qemu_log_mask(LOG_UNIMP, "VECTCLRACTIVE unimplemented\n");
-> +                qemu_log_mask(LOG_GUEST_ERROR,
-> +                              "Setting VECTCLRACTIVE when not in DEBUG mode "
-> +                              "is UNPREDICTABLE\n");
->              }
->              if (value & 1) {
-> -                qemu_log_mask(LOG_UNIMP, "AIRCR system reset unimplemented\n");
-> +                qemu_log_mask(LOG_GUEST_ERROR,
-> +                              "Setting VECTRESET when not in DEBUG mode "
-> +                              "is UNPREDICTABLE\n");
->              }
->              s->prigroup = extract32(value, 8, 3);
->              nvic_irq_update(s);
+> Don't even replace it? :)
+
+I guess - the failure mode is only when we single step? Should we not
+try to emit a warning like we do for the mismatched MOs?
+
 >
+> Paolo
+>
+>>   - proceed with merge as plan
+>>   - tackle the BQL lock next (along with more MTTCG guest/targets enablement)
+
+
+--
+Alex Bennée
