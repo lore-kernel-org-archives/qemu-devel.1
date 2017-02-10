@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cc3EW-00078f-8u
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 23:54:57 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1cc3iv-00064Z-3m
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 00:26:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cc3EV-00017b-BH
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 23:54:56 -0500
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:36295)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1cc3EV-00017U-6D
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 23:54:55 -0500
-Received: by mail-oi0-x244.google.com with SMTP id u143so1802838oif.3
-	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 20:54:55 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20170210014519.12413-1-bobby.prani@gmail.com>
-References: <20170210014519.12413-1-bobby.prani@gmail.com>
-From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Thu, 9 Feb 2017 23:54:24 -0500
-Message-ID: <CAJhHMCBNYHMcgz50s+sWgp0O6Y2=L6yzT8KmeEhzs9a9G_aODw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tcg: handle EXCP_ATOMIC exception properly
+	(envelope-from <sjitindarsingh@gmail.com>) id 1cc3iu-0001Ud-2V
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 00:26:21 -0500
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Date: Fri, 10 Feb 2017 16:25:51 +1100
+Message-Id: <1486704360-27361-2-git-send-email-sjitindarsingh@gmail.com>
+In-Reply-To: <1486704360-27361-1-git-send-email-sjitindarsingh@gmail.com>
+References: <1486704360-27361-1-git-send-email-sjitindarsingh@gmail.com>
+Subject: [Qemu-devel] [QEMU-PPC] [PATCH V2 01/10] target/ppc/POWER9: Add
+ ISAv3.00 MMU definition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,59 +20,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "open list:Overall" <qemu-devel@nongnu.org>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: qemu-ppc@nongnu.org
+Cc: david@gibson.dropbear.id.au, agraf@suse.de, qemu-devel@nongnu.org, sam.bobroff@au1.ibm.com, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-On Thu, Feb 9, 2017 at 8:45 PM, Pranith Kumar <bobby.prani@gmail.com> wrote=
-:
->
-> The current method of executing atomic code in a guest uses
-> cpu_exec_step_atomic() from the outermost loop. This causes an abort()
-> when single stepping over atomic code since debug exception longjmp
-> will point to the the setlongjmp in cpu_exec(). Another issue with
-> this mechanism is that the flags which were set in atomic execution
-> will be lost since we do not call cpu_exec_enter().
->
-> The following patch moves atomic exception handling to the exception
-> handler where all these issues are taken care of. The change in
-> start_exclusive() is necessary since now the cpu in atomic execution
-> will have its running flag set, but we do not want to count it as
-> pending.
->
-> Thanks to Alex for helping me debug the issue.
->
-> CC: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> CC: Richard Henderson <rth@twiddle.net>
-> CC: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
-> ---
->  cpu-exec.c    | 2 ++
->  cpus-common.c | 2 +-
->  cpus.c        | 4 ----
->  3 files changed, 3 insertions(+), 5 deletions(-)
->
-> diff --git a/cpu-exec.c b/cpu-exec.c
-> index b0ddada8c1..dceacfc5dd 100644
-> --- a/cpu-exec.c
-> +++ b/cpu-exec.c
-> @@ -427,6 +427,8 @@ static inline bool cpu_handle_exception(CPUState *cpu=
-, int *ret)
->              *ret =3D cpu->exception_index;
->              if (*ret =3D=3D EXCP_DEBUG) {
->                  cpu_handle_debug_exception(cpu);
-> +            } else if (*ret =3D=3D EXCP_ATOMIC) {
-> +                cpu_exec_step_atomic(cpu);
->              }
->              cpu->exception_index =3D -1;
->              return true;
+POWER9 processors implement the mmu as defined in version 3.00 of the ISA.
 
+Add a definition for this mmu model and set the POWER9 cpu model to use
+this mmu model.
 
-Looks like this is going to be a problem since we should not call
-start_exclusive() from cpu_exec() (doh', I just read the comment for
-this :-/).
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+---
+ target/ppc/cpu-qom.h        | 5 ++++-
+ target/ppc/mmu_helper.c     | 2 ++
+ target/ppc/translate_init.c | 3 +--
+ 3 files changed, 7 insertions(+), 3 deletions(-)
 
-It'll be great if we can make it callable from there. Thoughts?
-
-Thanks,
---=20
-Pranith
+diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+index b7977ba..4e3132b 100644
+--- a/target/ppc/cpu-qom.h
++++ b/target/ppc/cpu-qom.h
+@@ -86,10 +86,13 @@ enum powerpc_mmu_t {
+     POWERPC_MMU_2_07       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
+                              | POWERPC_MMU_64K
+                              | POWERPC_MMU_AMR | 0x00000004,
+-    /* FIXME Add POWERPC_MMU_3_OO defines */
+     /* Architecture 2.07 "degraded" (no 1T segments)           */
+     POWERPC_MMU_2_07a      = POWERPC_MMU_64 | POWERPC_MMU_AMR
+                              | 0x00000004,
++    /* Architecture 3.00 variant                               */
++    POWERPC_MMU_3_00       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
++                             | POWERPC_MMU_64K
++                             | POWERPC_MMU_AMR | 0x00000005,
+ };
+ 
+ /*****************************************************************************/
+diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
+index f746f53..172a305 100644
+--- a/target/ppc/mmu_helper.c
++++ b/target/ppc/mmu_helper.c
+@@ -1935,6 +1935,7 @@ void ppc_tlb_invalidate_all(CPUPPCState *env)
+     case POWERPC_MMU_2_06a:
+     case POWERPC_MMU_2_07:
+     case POWERPC_MMU_2_07a:
++    case POWERPC_MMU_3_00:
+ #endif /* defined(TARGET_PPC64) */
+         env->tlb_need_flush = 0;
+         tlb_flush(CPU(cpu));
+@@ -1974,6 +1975,7 @@ void ppc_tlb_invalidate_one(CPUPPCState *env, target_ulong addr)
+     case POWERPC_MMU_2_06a:
+     case POWERPC_MMU_2_07:
+     case POWERPC_MMU_2_07a:
++    case POWERPC_MMU_3_00:
+         /* tlbie invalidate TLBs for all segments */
+         /* XXX: given the fact that there are too many segments to invalidate,
+          *      and we still don't have a tlb_flush_mask(env, n, mask) in QEMU,
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 76f79fa..84bf125 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -8816,8 +8816,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
+                     (1ull << MSR_PMM) |
+                     (1ull << MSR_RI) |
+                     (1ull << MSR_LE);
+-    /* Using 2.07 defines until new radix model is added. */
+-    pcc->mmu_model = POWERPC_MMU_2_07;
++    pcc->mmu_model = POWERPC_MMU_3_00;
+ #if defined(CONFIG_SOFTMMU)
+     pcc->handle_mmu_fault = ppc_hash64_handle_mmu_fault;
+     /* segment page size remain the same */
+-- 
+2.5.5
