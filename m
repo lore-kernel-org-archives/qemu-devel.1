@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1ccGM5-0001fV-4x
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:55:38 -0500
+	(envelope-from <jsnow@redhat.com>) id 1ccHke-0007fg-E2
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 15:25:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1ccGM4-0000ZE-41
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:55:37 -0500
-References: <1486504171-26807-1-git-send-email-wei@redhat.com>
-	<CAFEAcA8+3+ZwOeA0cNXF_BRs-kivTye5bj7pcRsDAsJ4S1HwTg@mail.gmail.com>
-	<CAFEAcA8QFWi8-XmJyiWM15y8dUqFCbaqt9wuZ70Y7_Qgsa=CyQ@mail.gmail.com>
-From: Wei Huang <wei@redhat.com>
-Message-ID: <513c93db-34fc-ab17-aa12-fb956f8f1467@redhat.com>
-Date: Fri, 10 Feb 2017 12:55:28 -0600
+	(envelope-from <jsnow@redhat.com>) id 1ccHkc-0006qK-UW
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 15:25:04 -0500
+References: <20170203094018.15493-1-vsementsov@virtuozzo.com>
+	<20170203094018.15493-8-vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <b90e3f05-18de-0b39-96ba-3a7012cb9608@redhat.com>
+Date: Fri, 10 Feb 2017 15:24:51 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8QFWi8-XmJyiWM15y8dUqFCbaqt9wuZ70Y7_Qgsa=CyQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170203094018.15493-8-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V3 0/4] Add vPMU vPMU support under TCG mode
+Subject: Re: [Qemu-devel] [PATCH 07/24] qcow2: add bitmaps extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,61 +23,279 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
 
 
 
-On 02/10/2017 09:11 AM, Peter Maydell wrote:
-> On 10 February 2017 at 15:00, Peter Maydell <peter.maydell@linaro.org> wrote:
->> On 7 February 2017 at 21:49, Wei Huang <wei@redhat.com> wrote:
->>> QEMU has implemented cycle count support for guest VM under TCG mode.
->>> But this feature is not complete. In fact using perf inside a
->>> 64-bit Linux guest VM (under TCG) can cause the following kernel panic
->>> because some PMU registers are not implemented.
->>>
->>> [  329.445970] [<fffffe000009e600>] armv8pmu_enable_event+0x58/0x8c
->>> [  329.446713] [<fffffe0000621e74>] armpmu_start+0x4c/0x74
->>>
->>> This patchset solves the problem by adding support for missing vPMU
->>> registers. Basic perf test can work (both ACPI and DT) now under TCG
->>> by applying this patchset.
->>>
->>> address@hidden ~]# perf stat ls
->>>  Performance counter stats for 'ls':
->>>
->>>         226.740256      task-clock (msec)         #    0.312 CPUs utilized
->>>                 76      context-switches          #    0.335 K/sec
->>>                  0      cpu-migrations            #    0.000 K/sec
->>>                 64      page-faults               #    0.282 K/sec
->>>        186,031,410      cycles                    #    0.820 GHz      (36.40%)
->>>    <not supported>      stalled-cycles-frontend
->>>    <not supported>      stalled-cycles-backend
->>>      <not counted>      instructions               (0.00%)
->>>    <not supported>      branches
->>>      <not counted>      branch-misses              (0.00%)
->>>
->>> V2->V3:
->>>  * Remove PMXEVCNTR_EL0 support
->>>  * Add read access support for PMXEVTYPER and change the CONSTRAINED
->>>    UNPREDICTABLE behavior of PMXEVTYPER to RAZ/WI.
->>>
->>> V1->V2:
->>>   * Change most PMU registers to 64bit and the behavior of PMXEVTYPER
->>>   * Add support for PMXEVCNTR_EL0
->>>   * Misc fixes (DT, ID_AA64DFR0_EL1, ...) under TCG mod
->>
->> Applied to target-arm.next, thanks.
+On 02/03/2017 04:40 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Add bitmap extension as specified in docs/specs/qcow2.txt.
+> For now, just mirror extension header into Qcow2 state and check
+> constraints.
 > 
-> ...though patch 1 breaks compilation of linux-user targets. I've
-> fixed it up by moving the #ifndef CONFIG_USER_ONLY to the right
-> place to cover the new regdefs.
-
-My bad. I normally did compilation for all targets + "make check" before
-sending patches out. But on that particular machine, qemu was configured
-for aarch64-softmmu only, thus missing this compilation error ...
-
+> For now, disable image resize if it has bitmaps. It will be fixed later.
 > 
-> thanks
-> -- PMM
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/qcow2.c | 127 +++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+>  block/qcow2.h |  24 +++++++++++
+>  2 files changed, 145 insertions(+), 6 deletions(-)
 > 
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 96fb8a8f16..d263ab1ed7 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -63,6 +63,7 @@ typedef struct {
+>  #define  QCOW2_EXT_MAGIC_END 0
+>  #define  QCOW2_EXT_MAGIC_BACKING_FORMAT 0xE2792ACA
+>  #define  QCOW2_EXT_MAGIC_FEATURE_TABLE 0x6803f857
+> +#define  QCOW2_EXT_MAGIC_BITMAPS 0x23852875
+>  
+>  static int qcow2_probe(const uint8_t *buf, int buf_size, const char *filename)
+>  {
+> @@ -86,12 +87,17 @@ static int qcow2_probe(const uint8_t *buf, int buf_size, const char *filename)
+>   */
+>  static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
+>                                   uint64_t end_offset, void **p_feature_table,
+> -                                 Error **errp)
+> +                                 bool *need_update_header, Error **errp)
+>  {
+>      BDRVQcow2State *s = bs->opaque;
+>      QCowExtension ext;
+>      uint64_t offset;
+>      int ret;
+> +    Qcow2BitmapHeaderExt bitmaps_ext;
+> +
+> +    if (need_update_header != NULL) {
+> +        *need_update_header = false;
+> +    }
+>  
+>  #ifdef DEBUG_EXT
+>      printf("qcow2_read_extensions: start=%ld end=%ld\n", start_offset, end_offset);
+> @@ -162,6 +168,85 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
+>              }
+>              break;
+>  
+> +        case QCOW2_EXT_MAGIC_BITMAPS:
+> +            if (ext.len != sizeof(bitmaps_ext)) {
+> +                error_setg_errno(errp, -ret, "bitmaps_ext: "
+> +                                 "Invalid extension length");
+> +                return -EINVAL;
+> +            }
+> +
+> +            if (!(s->autoclear_features & QCOW2_AUTOCLEAR_BITMAPS)) {
+> +                fprintf(stderr,
+> +                        "WARNING: a program lacking bitmap support modified "
+> +                        "this file, so all bitmaps are now considered "
+> +                        "inconsistent. Some clusters may be leaked, run "
+> +                        "'qemu-img check -r' on the image file to fix.");
+> +                if (need_update_header != NULL) {
+> +                    *need_update_header = true;
+> +                }
+> +                break;
+> +            }
+> +
+> +            ret = bdrv_pread(bs->file, offset, &bitmaps_ext, ext.len);
+> +            if (ret < 0) {
+> +                error_setg_errno(errp, -ret, "bitmaps_ext: "
+> +                                 "Could not read ext header");
+> +                return ret;
+> +            }
+> +
+> +            if (bitmaps_ext.reserved32 != 0) {
+> +                error_setg_errno(errp, -ret, "bitmaps_ext: "
+> +                                 "Reserved field is not zero");
+> +                return -EINVAL;
+> +            }
+> +
+> +            be32_to_cpus(&bitmaps_ext.nb_bitmaps);
+> +            be64_to_cpus(&bitmaps_ext.bitmap_directory_size);
+> +            be64_to_cpus(&bitmaps_ext.bitmap_directory_offset);
+> +
+> +            if (bitmaps_ext.nb_bitmaps > QCOW2_MAX_BITMAPS) {
+> +                error_setg(errp,
+> +                           "bitmaps_ext: File %s has %" PRIu32 " bitmaps, "
+> +                           "exceeding the QEMU supported maximum of %d",
+> +                           bs->filename, bitmaps_ext.nb_bitmaps,
+> +                           QCOW2_MAX_BITMAPS);
+> +                return -EINVAL;
+> +            }
+> +
+> +            if (bitmaps_ext.nb_bitmaps == 0) {
+> +                error_setg(errp, "found bitmaps extension with zero bitmaps");
+> +                return -EINVAL;
+> +            }
+> +
+> +            if (bitmaps_ext.bitmap_directory_offset & (s->cluster_size - 1)) {
+> +                error_setg(errp, "bitmaps_ext: "
+> +                                 "invalid bitmap directory offset");
+> +                return -EINVAL;
+> +            }
+> +
+> +            if (bitmaps_ext.bitmap_directory_size >
+> +                QCOW2_MAX_BITMAP_DIRECTORY_SIZE) {
+> +                error_setg(errp, "bitmaps_ext: "
+> +                                 "bitmap directory size (%" PRIu64 ") exceeds "
+> +                                 "the maximum supported size (%d)",
+> +                                 bitmaps_ext.bitmap_directory_size,
+> +                                 QCOW2_MAX_BITMAP_DIRECTORY_SIZE);
+> +                return -EINVAL;
+> +            }
+> +
+> +            s->nb_bitmaps = bitmaps_ext.nb_bitmaps;
+> +            s->bitmap_directory_offset =
+> +                    bitmaps_ext.bitmap_directory_offset;
+> +            s->bitmap_directory_size =
+> +                    bitmaps_ext.bitmap_directory_size;
+> +
+> +#ifdef DEBUG_EXT
+> +            printf("Qcow2: Got bitmaps extension: "
+> +                   "offset=%" PRIu64 " nb_bitmaps=%" PRIu32 "\n",
+> +                   s->bitmap_directory_offset, s->nb_bitmaps);
+> +#endif
+> +            break;
+> +
+>          default:
+>              /* unknown magic - save it in case we need to rewrite the header */
+>              {
+> @@ -824,6 +909,7 @@ static int qcow2_open(BlockDriverState *bs, QDict *options, int flags,
+>      Error *local_err = NULL;
+>      uint64_t ext_end;
+>      uint64_t l1_vm_state_index;
+> +    bool need_update_header = false;
+>  
+>      ret = bdrv_pread(bs->file, 0, &header, sizeof(header));
+>      if (ret < 0) {
+> @@ -929,7 +1015,7 @@ static int qcow2_open(BlockDriverState *bs, QDict *options, int flags,
+>      if (s->incompatible_features & ~QCOW2_INCOMPAT_MASK) {
+>          void *feature_table = NULL;
+>          qcow2_read_extensions(bs, header.header_length, ext_end,
+> -                              &feature_table, NULL);
+> +                              &feature_table, NULL, NULL);
+>          report_unsupported_feature(errp, feature_table,
+>                                     s->incompatible_features &
+>                                     ~QCOW2_INCOMPAT_MASK);
+> @@ -1116,7 +1202,7 @@ static int qcow2_open(BlockDriverState *bs, QDict *options, int flags,
+>  
+>      /* read qcow2 extensions */
+>      if (qcow2_read_extensions(bs, header.header_length, ext_end, NULL,
+> -        &local_err)) {
+> +        &need_update_header, &local_err)) {
+>          error_propagate(errp, local_err);
+>          ret = -EINVAL;
+>          goto fail;
+> @@ -1151,9 +1237,13 @@ static int qcow2_open(BlockDriverState *bs, QDict *options, int flags,
+>          goto fail;
+>      }
+>  
+> -    /* Clear unknown autoclear feature bits */
+> -    if (!bs->read_only && !(flags & BDRV_O_INACTIVE) && s->autoclear_features) {
+> -        s->autoclear_features = 0;
+> +    if (!need_update_header) {
+> +        /* Clear unknown autoclear feature bits */
+> +        need_update_header = s->autoclear_features & ~QCOW2_AUTOCLEAR_MASK;
+> +    }
+> +
+> +    if (need_update_header && !bs->read_only && !(flags & BDRV_O_INACTIVE)) {
+> +        s->autoclear_features &= QCOW2_AUTOCLEAR_MASK;
+>          ret = qcow2_update_header(bs);
+>          if (ret < 0) {
+>              error_setg_errno(errp, -ret, "Could not update qcow2 header");
+> @@ -1953,6 +2043,24 @@ int qcow2_update_header(BlockDriverState *bs)
+>          buflen -= ret;
+>      }
+>  
+> +    if (s->nb_bitmaps > 0) {
+> +        Qcow2BitmapHeaderExt bitmaps_header = {
+> +            .nb_bitmaps = cpu_to_be32(s->nb_bitmaps),
+> +            .bitmap_directory_size =
+> +                    cpu_to_be64(s->bitmap_directory_size),
+> +            .bitmap_directory_offset =
+> +                    cpu_to_be64(s->bitmap_directory_offset)
+> +        };
+> +        ret = header_ext_add(buf, QCOW2_EXT_MAGIC_BITMAPS,
+> +                             &bitmaps_header, sizeof(bitmaps_header),
+> +                             buflen);
+> +        if (ret < 0) {
+> +            goto fail;
+> +        }
+> +        buf += ret;
+> +        buflen -= ret;
+> +    }
+> +
+>      /* Keep unknown header extensions */
+>      QLIST_FOREACH(uext, &s->unknown_header_ext, next) {
+>          ret = header_ext_add(buf, uext->magic, uext->data, uext->len, buflen);
+> @@ -2528,6 +2636,13 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset)
+>          return -ENOTSUP;
+>      }
+>  
+> +    /* cannot proceed if image has bitmaps */
+> +    if (s->nb_bitmaps) {
+> +        /* TODO: resize bitmaps in the image */
+> +        error_report("Can't resize an image which has bitmaps");
+> +        return -ENOTSUP;
+> +    }
+> +
+>      /* shrinking is currently not supported */
+>      if (offset < bs->total_sectors * 512) {
+>          error_report("qcow2 doesn't support shrinking images yet");
+> diff --git a/block/qcow2.h b/block/qcow2.h
+> index 182341483a..861b5011dd 100644
+> --- a/block/qcow2.h
+> +++ b/block/qcow2.h
+> @@ -52,6 +52,10 @@
+>   * space for snapshot names and IDs */
+>  #define QCOW_MAX_SNAPSHOTS_SIZE (1024 * QCOW_MAX_SNAPSHOTS)
+>  
+> +/* Bitmap header extension constraints */
+> +#define QCOW2_MAX_BITMAPS 65535
+> +#define QCOW2_MAX_BITMAP_DIRECTORY_SIZE (1024 * QCOW2_MAX_BITMAPS)
+> +
+>  /* indicate that the refcount of the referenced cluster is exactly one. */
+>  #define QCOW_OFLAG_COPIED     (1ULL << 63)
+>  /* indicate that the cluster is compressed (they never have the copied flag) */
+> @@ -195,6 +199,15 @@ enum {
+>      QCOW2_COMPAT_FEAT_MASK            = QCOW2_COMPAT_LAZY_REFCOUNTS,
+>  };
+>  
+> +/* Autoclear feature bits */
+> +enum {
+> +    QCOW2_AUTOCLEAR_BITMAPS_BITNR = 0,
+> +    QCOW2_AUTOCLEAR_BITMAPS       =
+> +        1 << QCOW2_AUTOCLEAR_BITMAPS_BITNR,
+> +
+> +    QCOW2_AUTOCLEAR_MASK                = QCOW2_AUTOCLEAR_BITMAPS,
+> +};
+> +
+>  enum qcow2_discard_type {
+>      QCOW2_DISCARD_NEVER = 0,
+>      QCOW2_DISCARD_ALWAYS,
+> @@ -222,6 +235,13 @@ typedef uint64_t Qcow2GetRefcountFunc(const void *refcount_array,
+>  typedef void Qcow2SetRefcountFunc(void *refcount_array,
+>                                    uint64_t index, uint64_t value);
+>  
+> +typedef struct Qcow2BitmapHeaderExt {
+> +    uint32_t nb_bitmaps;
+> +    uint32_t reserved32;
+> +    uint64_t bitmap_directory_size;
+> +    uint64_t bitmap_directory_offset;
+> +} QEMU_PACKED Qcow2BitmapHeaderExt;
+> +
+>  typedef struct BDRVQcow2State {
+>      int cluster_bits;
+>      int cluster_size;
+> @@ -263,6 +283,10 @@ typedef struct BDRVQcow2State {
+>      unsigned int nb_snapshots;
+>      QCowSnapshot *snapshots;
+>  
+> +    uint32_t nb_bitmaps;
+> +    uint64_t bitmap_directory_size;
+> +    uint64_t bitmap_directory_offset;
+> +
+>      int flags;
+>      int qcow_version;
+>      bool use_lazy_refcounts;
+> 
+
+Reviewed-by: John Snow <jsnow@redhat.com>
