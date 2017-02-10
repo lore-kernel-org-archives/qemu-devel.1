@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cc17q-0000iS-5y
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 21:39:55 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cc17r-0000jF-9l
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 21:39:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cc17h-0007cF-Jp
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 21:39:49 -0500
-Received: from ozlabs.org ([103.22.144.67]:36701)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1cc17g-0007aT-VK
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 21:39:45 -0500
-Date: Fri, 10 Feb 2017 13:29:34 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1cc17k-0007dZ-FJ
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 21:39:51 -0500
+Date: Fri, 10 Feb 2017 13:24:42 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170210022934.GZ27610@umbus.fritz.box>
-References: <1486456099-7345-1-git-send-email-peterx@redhat.com>
-	<1486456099-7345-11-git-send-email-peterx@redhat.com>
+Message-ID: <20170210022442.GY27610@umbus.fritz.box>
+References: <1484288903-18807-1-git-send-email-sjitindarsingh@gmail.com>
+	<1484288903-18807-12-git-send-email-sjitindarsingh@gmail.com>
+	<20170201042819.GQ30639@umbus.fritz.box>
+	<1486609721.2498.83.camel@gmail.com>
+	<1486684035.4230.1.camel@gmail.com>
+	<20170210002129.GN27610@umbus.fritz.box>
+	<1486688738.4230.6.camel@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="/cFG30PKHi9lwv6o"
+	protocol="application/pgp-signature"; boundary="8a48p4KKsB+A/3VY"
 Content-Disposition: inline
-In-Reply-To: <1486456099-7345-11-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 10/17] memory: add section range info
- for IOMMU notifier
+In-Reply-To: <1486688738.4230.6.camel@gmail.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 11/17] target/ppc/POWER9: Update to new
+ pte format for POWER9 accesses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,151 +30,582 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: qemu-ppc@nongnu.org, agraf@suse.de, qemu-devel@nongnu.org
 
 
---/cFG30PKHi9lwv6o
-Content-Type: text/plain; charset=us-ascii
+--8a48p4KKsB+A/3VY
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 07, 2017 at 04:28:12PM +0800, Peter Xu wrote:
-> In this patch, IOMMUNotifier.{start|end} are introduced to store section
-> information for a specific notifier. When notification occurs, we not
-> only check the notification type (MAP|UNMAP), but also check whether the
-> notified iova range overlaps with the range of specific IOMMU notifier,
-> and skip those notifiers if not in the listened range.
+On Fri, Feb 10, 2017 at 12:05:38PM +1100, Suraj Jitindar Singh wrote:
+> On Fri, 2017-02-10 at 11:21 +1100, David Gibson wrote:
+> > On Fri, Feb 10, 2017 at 10:47:15AM +1100, Suraj Jitindar Singh wrote:
+> > >=20
+> > > On Thu, 2017-02-09 at 14:08 +1100, Suraj Jitindar Singh wrote:
+> > > >=20
+> > > > On Wed, 2017-02-01 at 15:28 +1100, David Gibson wrote:
+> > > > >=20
+> > > > >=20
+> > > > > On Fri, Jan 13, 2017 at 05:28:17PM +1100, Suraj Jitindar Singh
+> > > > > wrote:
+> > > > > >=20
+> > > > > >=20
+> > > > > >=20
+> > > > > > The page table entry format was updated for the POWER9
+> > > > > > processor.
+> > > > > >=20
+> > > > > > It was decided that kernels would used the old format
+> > > > > > irrespective
+> > > > > > with the translation occuring at the hypervisor level. Thus
+> > > > > > we
+> > > > > > convert
+> > > > > > between the old and new format when accessing the ptes. Since
+> > > > > > we
+> > > > > > need the
+> > > > > > whole pte to perform this conversion, we remove the old
+> > > > > > functions
+> > > > > > which
+> > > > > > accessed either the first or second doubleword and introduce
+> > > > > > a
+> > > > > > new
+> > > > > > functions which access the entire pte, returning the entry
+> > > > > > converted
+> > > > > > back to the old format (if required). Update call sites
+> > > > > > accordingly.
+> > > > > >=20
+> > > > > > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com
+> > > > > > >
+> > > > > > ---
+> > > > > > =A0hw/ppc/spapr_hcall.c=A0=A0=A0=A0| 51 ++++++++++++++++++-----=
+--------
+> > > > > > ----
+> > > > > > =A0target/ppc/mmu-hash64.c | 13 +++++----
+> > > > > > =A0target/ppc/mmu-hash64.h | 71
+> > > > > > ++++++++++++++++++++++++++++++++++++-
+> > > > > > ------------
+> > > > > > =A03 files changed, 86 insertions(+), 49 deletions(-)
+> > > > > >=20
+> > > > > > diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> > > > > > index 9a9bedf..9f0c20d 100644
+> > > > > > --- a/hw/ppc/spapr_hcall.c
+> > > > > > +++ b/hw/ppc/spapr_hcall.c
+> > > > > > @@ -125,7 +125,8 @@ static target_ulong h_enter(PowerPCCPU
+> > > > > > *cpu,
+> > > > > > sPAPRMachineState *spapr,
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0pte_index &=3D ~7ULL;
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0token =3D ppc_hash64_start_access(cp=
+u, pte_index);
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0for (; index < 8; index++) {
+> > > > > > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0if (!(ppc_hash64_load_hpte=
+0(cpu, token, index) &
+> > > > > > HPTE64_V_VALID)) {
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0ppc_hash_pte64_t pte =3D p=
+pc_hash64_load_hpte(cpu,
+> > > > > > token, index);
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0if (!(pte.pte0 & HPTE64_V_=
+VALID)) {
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0break;
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0}
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0}
+> > > > > > @@ -134,8 +135,10 @@ static target_ulong h_enter(PowerPCCPU
+> > > > > > *cpu,
+> > > > > > sPAPRMachineState *spapr,
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0return H_PTEG_FULL;
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0}
+> > > > > > =A0=A0=A0=A0=A0} else {
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0ppc_hash_pte64_t pte;
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0token =3D ppc_hash64_start_access(cp=
+u, pte_index);
+> > > > > IIRC the only reason for the clumsy start_access / stop_access
+> > > > > stuff
+> > > > > was because we wanted to do the two loads separately (to avoid
+> > > > > loading
+> > > > > word1 in cases we don't need it).=A0=A0Since you're combining both
+> > > > > loads
+> > > > > into a single helper, I think you can put the start_access /
+> > > > > stop_access into the same helper.
+> > > > >=20
+> > > > > Or have I missed something.
+> > > > >=20
+> > > > Yeah these functions can probably be merged together...
+> > > Actually, it looks like we need the start access and stop access
+> > > stuff
+> > > for kvm-hv where we load the pte into a buffer on start access and
+> > > free
+> > > it on stop access. So I think we still need to keep these two
+> > > functions
+> > > separate.
+> > Well, the question is are there any instances where we do more than
+> > just a load word0 + load word1 within the start/stop pair.=A0=A0I don't
+> > remember off hand.
+> >=20
+> Yeah, so the start/stop access gives you a whole page table entry group
+> and so on KVM this loads the whole pteg into a buffer. We then access
+> any number of the ptes within that group, meaning we need the
+> start/stop because otherwise we would be calling into kvm and copying
+> the ptes 8 times (once per pte in the group) to read a whole group
+> rather than read it once, access all 8 ptes and then free it.
 >=20
-> When removing an region, we need to make sure we removed the correct
-> VFIOGuestIOMMU by checking the IOMMUNotifier.start address as well.
->=20
-> Suggested-by: David Gibson <david@gibson.dropbear.id.au>
-> Acked-by: Alex Williamson <alex.williamson@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+> I can't see a nice way of just having the load without the start/stop
+> access which doesn't require either multiple calls into kvm to read a
+> whole group or which requires you to keep a pointer to the group buffer
+> which is read in on the first access and freed on the last. But this
+> causes problems when you only access one pte from the group instead of
+> reading every single one, which does happen, so I think we really need
+> to leave it as is.
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Ok, fair enough.
 
-> ---
->  hw/vfio/common.c      | 12 +++++++++---
->  hw/virtio/vhost.c     |  4 ++--
->  include/exec/memory.h | 19 ++++++++++++++++++-
->  memory.c              |  9 +++++++++
->  4 files changed, 38 insertions(+), 6 deletions(-)
+> > >=20
+> > > >=20
+> > > > >=20
+> > > > >=20
+> > > > > >=20
+> > > > > >=20
+> > > > > >=20
+> > > > > > -=A0=A0=A0=A0=A0=A0=A0=A0if (ppc_hash64_load_hpte0(cpu, token, =
+0) &
+> > > > > > HPTE64_V_VALID)
+> > > > > > {
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0pte =3D ppc_hash64_load_hpte(cpu, toke=
+n, 0);
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0if (pte.pte0 & HPTE64_V_VALID) {
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0ppc_hash64_stop_access(c=
+pu, token);
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0return H_PTEG_FULL;
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0}
+> > > > > > @@ -163,26 +166,25 @@ static RemoveResult
+> > > > > > remove_hpte(PowerPCCPU
+> > > > > > *cpu, target_ulong ptex,
+> > > > > > =A0{
+> > > > > > =A0=A0=A0=A0=A0CPUPPCState *env =3D &cpu->env;
+> > > > > > =A0=A0=A0=A0=A0uint64_t token;
+> > > > > > -=A0=A0=A0=A0target_ulong v, r;
+> > > > > > +=A0=A0=A0=A0ppc_hash_pte64_t pte;
+> > > > > > =A0
+> > > > > > =A0=A0=A0=A0=A0if (!valid_pte_index(env, ptex)) {
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0return REMOVE_PARM;
+> > > > > > =A0=A0=A0=A0=A0}
+> > > > > > =A0
+> > > > > > =A0=A0=A0=A0=A0token =3D ppc_hash64_start_access(cpu, ptex);
+> > > > > > -=A0=A0=A0=A0v =3D ppc_hash64_load_hpte0(cpu, token, 0);
+> > > > > > -=A0=A0=A0=A0r =3D ppc_hash64_load_hpte1(cpu, token, 0);
+> > > > > > +=A0=A0=A0=A0pte =3D ppc_hash64_load_hpte(cpu, token, 0);
+> > > > > > =A0=A0=A0=A0=A0ppc_hash64_stop_access(cpu, token);
+> > > > > > =A0
+> > > > > > -=A0=A0=A0=A0if ((v & HPTE64_V_VALID) =3D=3D 0 ||
+> > > > > > -=A0=A0=A0=A0=A0=A0=A0=A0((flags & H_AVPN) && (v & ~0x7fULL) !=
+=3D avpn) ||
+> > > > > > -=A0=A0=A0=A0=A0=A0=A0=A0((flags & H_ANDCOND) && (v & avpn) !=
+=3D 0)) {
+> > > > > > +=A0=A0=A0=A0if ((pte.pte0 & HPTE64_V_VALID) =3D=3D 0 ||
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0((flags & H_AVPN) && (pte.pte0 & ~0x7f=
+ULL) !=3D avpn)
+> > > > > > ||
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0((flags & H_ANDCOND) && (pte.pte0 & av=
+pn) !=3D 0)) {
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0return REMOVE_NOT_FOUND;
+> > > > > > =A0=A0=A0=A0=A0}
+> > > > > > -=A0=A0=A0=A0*vp =3D v;
+> > > > > > -=A0=A0=A0=A0*rp =3D r;
+> > > > > > +=A0=A0=A0=A0*vp =3D pte.pte0;
+> > > > > > +=A0=A0=A0=A0*rp =3D pte.pte1;
+> > > > > > =A0=A0=A0=A0=A0ppc_hash64_store_hpte(cpu, ptex, HPTE64_V_HPTE_D=
+IRTY,
+> > > > > > 0);
+> > > > > > -=A0=A0=A0=A0ppc_hash64_tlb_flush_hpte(cpu, ptex, v, r);
+> > > > > > +=A0=A0=A0=A0ppc_hash64_tlb_flush_hpte(cpu, ptex, pte.pte0,
+> > > > > > pte.pte1);
+> > > > > > =A0=A0=A0=A0=A0return REMOVE_SUCCESS;
+> > > > > > =A0}
+> > > > > > =A0
+> > > > > > @@ -293,35 +295,36 @@ static target_ulong
+> > > > > > h_protect(PowerPCCPU
+> > > > > > *cpu, sPAPRMachineState *spapr,
+> > > > > > =A0=A0=A0=A0=A0target_ulong flags =3D args[0];
+> > > > > > =A0=A0=A0=A0=A0target_ulong pte_index =3D args[1];
+> > > > > > =A0=A0=A0=A0=A0target_ulong avpn =3D args[2];
+> > > > > > +=A0=A0=A0=A0ppc_hash_pte64_t pte;
+> > > > > > =A0=A0=A0=A0=A0uint64_t token;
+> > > > > > -=A0=A0=A0=A0target_ulong v, r;
+> > > > > > =A0
+> > > > > > =A0=A0=A0=A0=A0if (!valid_pte_index(env, pte_index)) {
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0return H_PARAMETER;
+> > > > > > =A0=A0=A0=A0=A0}
+> > > > > > =A0
+> > > > > > =A0=A0=A0=A0=A0token =3D ppc_hash64_start_access(cpu, pte_index=
+);
+> > > > > > -=A0=A0=A0=A0v =3D ppc_hash64_load_hpte0(cpu, token, 0);
+> > > > > > -=A0=A0=A0=A0r =3D ppc_hash64_load_hpte1(cpu, token, 0);
+> > > > > > +=A0=A0=A0=A0pte =3D ppc_hash64_load_hpte(cpu, token, 0);
+> > > > > > =A0=A0=A0=A0=A0ppc_hash64_stop_access(cpu, token);
+> > > > > > =A0
+> > > > > > -=A0=A0=A0=A0if ((v & HPTE64_V_VALID) =3D=3D 0 ||
+> > > > > > -=A0=A0=A0=A0=A0=A0=A0=A0((flags & H_AVPN) && (v & ~0x7fULL) !=
+=3D avpn)) {
+> > > > > > +=A0=A0=A0=A0if ((pte.pte0 & HPTE64_V_VALID) =3D=3D 0 ||
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0((flags & H_AVPN) && (pte.pte0 & ~0x7f=
+ULL) !=3D avpn))
+> > > > > > {
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0return H_NOT_FOUND;
+> > > > > > =A0=A0=A0=A0=A0}
+> > > > > > =A0
+> > > > > > -=A0=A0=A0=A0r &=3D ~(HPTE64_R_PP0 | HPTE64_R_PP | HPTE64_R_N |
+> > > > > > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0HPTE64_R_KEY_HI | HPTE64_R_KE=
+Y_LO);
+> > > > > > -=A0=A0=A0=A0r |=3D (flags << 55) & HPTE64_R_PP0;
+> > > > > > -=A0=A0=A0=A0r |=3D (flags << 48) & HPTE64_R_KEY_HI;
+> > > > > > -=A0=A0=A0=A0r |=3D flags & (HPTE64_R_PP | HPTE64_R_N |
+> > > > > > HPTE64_R_KEY_LO);
+> > > > > > +=A0=A0=A0=A0pte.pte1 &=3D ~(HPTE64_R_PP0 | HPTE64_R_PP | HPTE6=
+4_R_N |
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0HPTE64_R=
+_KEY_HI | HPTE64_R_KEY_LO);
+> > > > > > +=A0=A0=A0=A0pte.pte1 |=3D (flags << 55) & HPTE64_R_PP0;
+> > > > > > +=A0=A0=A0=A0pte.pte1 |=3D (flags << 48) & HPTE64_R_KEY_HI;
+> > > > > > +=A0=A0=A0=A0pte.pte1 |=3D flags & (HPTE64_R_PP | HPTE64_R_N |
+> > > > > > HPTE64_R_KEY_LO);
+> > > > > > =A0=A0=A0=A0=A0ppc_hash64_store_hpte(cpu, pte_index,
+> > > > > > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0(v & ~HPTE64_V_VALID) |
+> > > > > > HPTE64_V_HPTE_DIRTY, 0);
+> > > > > > -=A0=A0=A0=A0ppc_hash64_tlb_flush_hpte(cpu, pte_index, v, r);
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0(pte.pte0 & ~HPTE64_V_VALID) |
+> > > > > > HPTE64_V_HPTE_DIRTY,
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A00);
+> > > > > > +=A0=A0=A0=A0ppc_hash64_tlb_flush_hpte(cpu, pte_index, pte.pte0,
+> > > > > > pte.pte1);
+> > > > > > =A0=A0=A0=A0=A0/* Flush the tlb */
+> > > > > > =A0=A0=A0=A0=A0check_tlb_flush(env, true);
+> > > > > > =A0=A0=A0=A0=A0/* Don't need a memory barrier, due to qemu's gl=
+obal
+> > > > > > lock */
+> > > > > > -=A0=A0=A0=A0ppc_hash64_store_hpte(cpu, pte_index, v |
+> > > > > > HPTE64_V_HPTE_DIRTY,
+> > > > > > r);
+> > > > > > +=A0=A0=A0=A0ppc_hash64_store_hpte(cpu, pte_index, pte.pte0 |
+> > > > > > HPTE64_V_HPTE_DIRTY,
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0pte.pte1);
+> > > > > > =A0=A0=A0=A0=A0return H_SUCCESS;
+> > > > > > =A0}
+> > > > > > =A0
+> > > > > > diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-
+> > > > > > hash64.c
+> > > > > > index b476b3f..03607d5 100644
+> > > > > > --- a/target/ppc/mmu-hash64.c
+> > > > > > +++ b/target/ppc/mmu-hash64.c
+> > > > > > @@ -515,7 +515,6 @@ static hwaddr
+> > > > > > ppc_hash64_pteg_search(PowerPCCPU
+> > > > > > *cpu, hwaddr hash,
+> > > > > > =A0=A0=A0=A0=A0CPUPPCState *env =3D &cpu->env;
+> > > > > > =A0=A0=A0=A0=A0int i;
+> > > > > > =A0=A0=A0=A0=A0uint64_t token;
+> > > > > > -=A0=A0=A0=A0target_ulong pte0, pte1;
+> > > > > > =A0=A0=A0=A0=A0target_ulong pte_index;
+> > > > > > =A0
+> > > > > > =A0=A0=A0=A0=A0pte_index =3D (hash & env->htab_mask) * HPTES_PE=
+R_GROUP;
+> > > > > > @@ -524,12 +523,11 @@ static hwaddr
+> > > > > > ppc_hash64_pteg_search(PowerPCCPU *cpu, hwaddr hash,
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0return -1;
+> > > > > > =A0=A0=A0=A0=A0}
+> > > > > > =A0=A0=A0=A0=A0for (i =3D 0; i < HPTES_PER_GROUP; i++) {
+> > > > > > -=A0=A0=A0=A0=A0=A0=A0=A0pte0 =3D ppc_hash64_load_hpte0(cpu, to=
+ken, i);
+> > > > > > -=A0=A0=A0=A0=A0=A0=A0=A0pte1 =3D ppc_hash64_load_hpte1(cpu, to=
+ken, i);
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0ppc_hash_pte64_t entry =3D ppc_hash64_=
+load_hpte(cpu,
+> > > > > > token,
+> > > > > > i);
+> > > > > Hm.=A0=A0So the hypercalls using the access helpers which include
+> > > > > format
+> > > > > conversion makes sense to me - the hypercalls are defined to
+> > > > > use
+> > > > > the
+> > > > > old format, even on POWER9 AIUI.
+> > > > >=20
+> > > > > It doesn't really make sense to me here, in what is essentially
+> > > > > the
+> > > > > physical implementation of the HPT lookup.=A0=A0Shouldn't that be
+> > > > > using
+> > > > > the new format natively?
+> > > > >=20
+> > > > > Basically it seems odd that you store things in the new format
+> > > > > in
+> > > > > memory, but convert to the old format on *all* accesses, not
+> > > > > just
+> > > > > the
+> > > > > hypercall ones which are defined that way.
+> > > > >=20
+> > > > It seemed easier to just do the conversion rather than updating
+> > > > the
+> > > > code in all places. That said since this is modelling the
+> > > > hardware
+> > > > and
+> > > > should probably use the new format instead of just converting it
+> > > > and
+> > > > pretenting nothing changed.
+> > > > >=20
+> > > > >=20
+> > > > > >=20
+> > > > > >=20
+> > > > > >=20
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0/* This compares V, B, H (secondary)=
+ and the AVPN */
+> > > > > > -=A0=A0=A0=A0=A0=A0=A0=A0if (HPTE64_V_COMPARE(pte0, ptem)) {
+> > > > > > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0*pshift =3D hpte_page_shif=
+t(sps, pte0, pte1);
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0if (HPTE64_V_COMPARE(entry.pte0, ptem)=
+) {
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0*pshift =3D hpte_page_shif=
+t(sps, entry.pte0,
+> > > > > > entry.pte1);
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0/*
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0* If there is no matc=
+h, ignore the PTE, it
+> > > > > > could
+> > > > > > simply
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0* be for a different =
+segment size encoding and
+> > > > > > the
+> > > > > > @@ -543,8 +541,7 @@ static hwaddr
+> > > > > > ppc_hash64_pteg_search(PowerPCCPU
+> > > > > > *cpu, hwaddr hash,
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0/* We don't do anything =
+with pshift yet as qemu
+> > > > > > TLB
+> > > > > > only deals
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0* with 4K pages anyway
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0*/
+> > > > > > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0pte->pte0 =3D pte0;
+> > > > > > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0pte->pte1 =3D pte1;
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0*pte =3D entry;
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0ppc_hash64_stop_access(c=
+pu, token);
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0return (pte_index + i) *=
+ HASH_PTE_SIZE_64;
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0}
+> > > > > > @@ -924,6 +921,8 @@ void ppc_hash64_store_hpte(PowerPCCPU
+> > > > > > *cpu,
+> > > > > > =A0{
+> > > > > > =A0=A0=A0=A0=A0CPUPPCState *env =3D &cpu->env;
+> > > > > > =A0
+> > > > > > +=A0=A0=A0=A0ppc_hash64_hpte_old_to_new(env, &pte0, &pte1);
+> > > > > > +
+> > > > > > =A0=A0=A0=A0=A0if (env->external_htab =3D=3D MMU_HASH64_KVM_MAN=
+AGED_HPT) {
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0kvmppc_hash64_write_pte(env, pte_ind=
+ex, pte0, pte1);
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0return;
+> > > > > > diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-
+> > > > > > hash64.h
+> > > > > > index ab5d347..73d7ce4 100644
+> > > > > > --- a/target/ppc/mmu-hash64.h
+> > > > > > +++ b/target/ppc/mmu-hash64.h
+> > > > > > @@ -60,6 +60,7 @@ void ppc_hash64_update_rmls(CPUPPCState
+> > > > > > *env);
+> > > > > > =A0#define HASH_PTE_SIZE_64=A0=A0=A0=A0=A0=A0=A0=A016
+> > > > > > =A0#define HASH_PTEG_SIZE_64=A0=A0=A0=A0=A0=A0=A0(HASH_PTE_SIZE=
+_64 *
+> > > > > > HPTES_PER_GROUP)
+> > > > > > =A0
+> > > > > > +#define HPTE64_V_3_00_COMMON=A0=A0=A0=A00x000fffffffffffffULL
+> > > > > > =A0#define HPTE64_V_SSIZE_SHIFT=A0=A0=A0=A062
+> > > > > > =A0#define HPTE64_V_AVPN_SHIFT=A0=A0=A0=A0=A07
+> > > > > > =A0#define HPTE64_V_AVPN=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A00x3fff=
+ffffffffff80ULL
+> > > > > > @@ -69,9 +70,12 @@ void ppc_hash64_update_rmls(CPUPPCState
+> > > > > > *env);
+> > > > > > =A0#define HPTE64_V_SECONDARY=A0=A0=A0=A0=A0=A00x00000000000000=
+02ULL
+> > > > > > =A0#define HPTE64_V_VALID=A0=A0=A0=A0=A0=A0=A0=A0=A0=A00x000000=
+0000000001ULL
+> > > > > > =A0
+> > > > > > +#define HPTE64_R_3_00_COMMON=A0=A0=A0=A00xf1ffffffffffffffULL
+> > > > > > =A0#define HPTE64_R_PP0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A00x80=
+00000000000000ULL
+> > > > > > =A0#define HPTE64_R_TS=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A00x=
+4000000000000000ULL
+> > > > > > =A0#define HPTE64_R_KEY_HI=A0=A0=A0=A0=A0=A0=A0=A0=A00x30000000=
+00000000ULL
+> > > > > > +#define HPTE64_R_SSIZE_SHIFT=A0=A0=A0=A058
+> > > > > > +#define HPTE64_R_SSIZE_MASK=A0=A0=A0=A0=A0(3ULL <<
+> > > > > > HPTE64_R_SSIZE_SHIFT)
+> > > > > > =A0#define HPTE64_R_RPN_SHIFT=A0=A0=A0=A0=A0=A012
+> > > > > > =A0#define HPTE64_R_RPN=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A00x0f=
+fffffffffff000ULL
+> > > > > > =A0#define HPTE64_R_FLAGS=A0=A0=A0=A0=A0=A0=A0=A0=A0=A00x000000=
+00000003ffULL
+> > > > > > @@ -91,6 +95,10 @@ void ppc_hash64_update_rmls(CPUPPCState
+> > > > > > *env);
+> > > > > > =A0#define HPTE64_V_1TB_SEG=A0=A0=A0=A0=A0=A0=A0=A00x4000000000=
+000000ULL
+> > > > > > =A0#define HPTE64_V_VRMA_MASK=A0=A0=A0=A0=A0=A00x4001ffffff0000=
+00ULL
+> > > > > > =A0
+> > > > > > +typedef struct {
+> > > > > > +=A0=A0=A0=A0uint64_t pte0, pte1;
+> > > > > > +} ppc_hash_pte64_t;
+> > > > > > +
+> > > > > > =A0void ppc_hash64_set_sdr1(PowerPCCPU *cpu, target_ulong
+> > > > > > value,
+> > > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0Error **errp);
+> > > > > > =A0void ppc_hash64_set_external_hpt(PowerPCCPU *cpu, void *hpt,
+> > > > > > int
+> > > > > > shift,
+> > > > > > @@ -99,37 +107,64 @@ void
+> > > > > > ppc_hash64_set_external_hpt(PowerPCCPU
+> > > > > > *cpu, void *hpt, int shift,
+> > > > > > =A0uint64_t ppc_hash64_start_access(PowerPCCPU *cpu,
+> > > > > > target_ulong
+> > > > > > pte_index);
+> > > > > > =A0void ppc_hash64_stop_access(PowerPCCPU *cpu, uint64_t
+> > > > > > token);
+> > > > > > =A0
+> > > > > > -static inline target_ulong ppc_hash64_load_hpte0(PowerPCCPU
+> > > > > > *cpu,
+> > > > > > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0uint64_t
+> > > > > > token,
+> > > > > > int index)
+> > > > > > +static inline void ppc_hash64_hpte_old_to_new(CPUPPCState
+> > > > > > *env,
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0target_ulong
+> > > > > > *pte0,
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0target_ulong
+> > > > > > *pte1)
+> > > > > > =A0{
+> > > > > > -=A0=A0=A0=A0CPUPPCState *env =3D &cpu->env;
+> > > > > > -=A0=A0=A0=A0uint64_t addr;
+> > > > > > +=A0=A0=A0=A0switch (env->mmu_model) {
+> > > > > > +=A0=A0=A0=A0case POWERPC_MMU_3_00:
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0/*
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0* v3.00 of the ISA moved the B fiel=
+d to the second
+> > > > > > doubleword and
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0* shortened the abbreviated virtual=
+ address and
+> > > > > > abbreviated real page
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0* number fields
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0*/
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0*pte1 =3D (*pte1 & HPTE64_R_3_00_COMMO=
+N) |
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0((*pte0 >> HPT=
+E64_V_SSIZE_SHIFT) <<
+> > > > > > HPTE64_R_SSIZE_SHIFT);
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0*pte0 =3D *pte0 & HPTE64_V_3_00_COMMON;
+> > > > > > +=A0=A0=A0=A0default:
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0;
+> > > > > > +=A0=A0=A0=A0}
+> > > > > > +}
+> > > > > > =A0
+> > > > > > -=A0=A0=A0=A0addr =3D token + (index * HASH_PTE_SIZE_64);
+> > > > > > -=A0=A0=A0=A0if (env->external_htab) {
+> > > > > > -=A0=A0=A0=A0=A0=A0=A0=A0return=A0=A0ldq_p((const void *)(uintp=
+tr_t)addr);
+> > > > > > -=A0=A0=A0=A0} else {
+> > > > > > -=A0=A0=A0=A0=A0=A0=A0=A0return ldq_phys(CPU(cpu)->as, addr);
+> > > > > > +static inline void ppc_hash64_hpte_new_to_old(CPUPPCState
+> > > > > > *env,
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0target_ulong
+> > > > > > *pte0,
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0target_ulong
+> > > > > > *pte1)
+> > > > > > +{
+> > > > > > +=A0=A0=A0=A0switch (env->mmu_model) {
+> > > > > > +=A0=A0=A0=A0case POWERPC_MMU_3_00:
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0/*
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0* v3.00 of the ISA moved the B fiel=
+d to the second
+> > > > > > doubleword and
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0* shortened the abbreviated virtual=
+ address and
+> > > > > > abbreviated real page
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0* number fields
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0*/
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0*pte0 =3D (*pte0 & HPTE64_V_3_00_COMMO=
+N) | ((*pte1 &
+> > > > > > HPTE64_R_SSIZE_MASK)
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0<< (HPTE64_V_S=
+SIZE_SHIFT -
+> > > > > > HPTE64_R_SSIZE_SHIFT));
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0*pte1 =3D *pte1 & HPTE64_R_3_00_COMMON;
+> > > > > > +=A0=A0=A0=A0default:
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0;
+> > > > > > =A0=A0=A0=A0=A0}
+> > > > > > =A0}
+> > > > > > =A0
+> > > > > > -static inline target_ulong ppc_hash64_load_hpte1(PowerPCCPU
+> > > > > > *cpu,
+> > > > > > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0uint64_t
+> > > > > > token,
+> > > > > > int index)
+> > > > > > +static inline ppc_hash_pte64_t
+> > > > > > ppc_hash64_load_hpte(PowerPCCPU
+> > > > > > *cpu,
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0uint64_t
+> > > > > > token,
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0int
+> > > > > > index)
+> > > > > > =A0{
+> > > > > > =A0=A0=A0=A0=A0CPUPPCState *env =3D &cpu->env;
+> > > > > > +=A0=A0=A0=A0ppc_hash_pte64_t pte;
+> > > > > > =A0=A0=A0=A0=A0uint64_t addr;
+> > > > > > =A0
+> > > > > > -=A0=A0=A0=A0addr =3D token + (index * HASH_PTE_SIZE_64) +
+> > > > > > HASH_PTE_SIZE_64/2;
+> > > > > > +=A0=A0=A0=A0addr =3D token + (index * HASH_PTE_SIZE_64);
+> > > > > > =A0=A0=A0=A0=A0if (env->external_htab) {
+> > > > > > -=A0=A0=A0=A0=A0=A0=A0=A0return=A0=A0ldq_p((const void *)(uintp=
+tr_t)addr);
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0pte.pte0 =3D ldq_p((const void *)(uint=
+ptr_t)addr);
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0pte.pte1 =3D ldq_p((const void *)(uint=
+ptr_t)addr +
+> > > > > > HASH_PTE_SIZE_64/2);
+> > > > > > =A0=A0=A0=A0=A0} else {
+> > > > > > -=A0=A0=A0=A0=A0=A0=A0=A0return ldq_phys(CPU(cpu)->as, addr);
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0pte.pte0 =3D ldq_phys(CPU(cpu)->as, ad=
+dr);
+> > > > > > +=A0=A0=A0=A0=A0=A0=A0=A0pte.pte1 =3D ldq_phys(CPU(cpu)->as, ad=
+dr +
+> > > > > > HASH_PTE_SIZE_64/2);
+> > > > > > =A0=A0=A0=A0=A0}
+> > > > > > -}
+> > > > > > =A0
+> > > > > > -typedef struct {
+> > > > > > -=A0=A0=A0=A0uint64_t pte0, pte1;
+> > > > > > -} ppc_hash_pte64_t;
+> > > > > > +=A0=A0=A0=A0ppc_hash64_hpte_new_to_old(env, &pte.pte0, &pte.pt=
+e1);
+> > > > > > +=A0=A0=A0=A0return pte;
+> > > > > > +}
+> > > > > > =A0
+> > > > > > =A0#endif /* CONFIG_USER_ONLY */
+> > > > > > =A0
 >=20
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index f3ba9b9..6b33b9f 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -478,8 +478,13 @@ static void vfio_listener_region_add(MemoryListener =
-*listener,
->          giommu->iommu_offset =3D section->offset_within_address_space -
->                                 section->offset_within_region;
->          giommu->container =3D container;
-> -        giommu->n.notify =3D vfio_iommu_map_notify;
-> -        giommu->n.notifier_flags =3D IOMMU_NOTIFIER_ALL;
-> +        llend =3D int128_add(int128_make64(section->offset_within_region=
-),
-> +                           section->size);
-> +        llend =3D int128_sub(llend, int128_one());
-> +        iommu_notifier_init(&giommu->n, vfio_iommu_map_notify,
-> +                            IOMMU_NOTIFIER_ALL,
-> +                            section->offset_within_region,
-> +                            int128_get64(llend));
->          QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
-> =20
->          memory_region_register_iommu_notifier(giommu->iommu, &giommu->n);
-> @@ -550,7 +555,8 @@ static void vfio_listener_region_del(MemoryListener *=
-listener,
->          VFIOGuestIOMMU *giommu;
-> =20
->          QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
-> -            if (giommu->iommu =3D=3D section->mr) {
-> +            if (giommu->iommu =3D=3D section->mr &&
-> +                giommu->n.start =3D=3D section->offset_within_region) {
->                  memory_region_unregister_iommu_notifier(giommu->iommu,
->                                                          &giommu->n);
->                  QLIST_REMOVE(giommu, giommu_next);
-> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> index febe519..ccf8b2e 100644
-> --- a/hw/virtio/vhost.c
-> +++ b/hw/virtio/vhost.c
-> @@ -1244,8 +1244,8 @@ int vhost_dev_init(struct vhost_dev *hdev, void *op=
-aque,
->          .priority =3D 10
->      };
-> =20
-> -    hdev->n.notify =3D vhost_iommu_unmap_notify;
-> -    hdev->n.notifier_flags =3D IOMMU_NOTIFIER_UNMAP;
-> +    iommu_notifier_init(&hdev->n, vhost_iommu_unmap_notify,
-> +                        IOMMU_NOTIFIER_UNMAP, 0, ~0ULL);
-> =20
->      if (hdev->migration_blocker =3D=3D NULL) {
->          if (!(hdev->features & (0x1ULL << VHOST_F_LOG_ALL))) {
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index 987f925..805a88a 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -77,13 +77,30 @@ typedef enum {
-> =20
->  #define IOMMU_NOTIFIER_ALL (IOMMU_NOTIFIER_MAP | IOMMU_NOTIFIER_UNMAP)
-> =20
-> +struct IOMMUNotifier;
-> +typedef void (*IOMMUNotify)(struct IOMMUNotifier *notifier,
-> +                            IOMMUTLBEntry *data);
-> +
->  struct IOMMUNotifier {
-> -    void (*notify)(struct IOMMUNotifier *notifier, IOMMUTLBEntry *data);
-> +    IOMMUNotify notify;
->      IOMMUNotifierFlag notifier_flags;
-> +    /* Notify for address space range start <=3D addr <=3D end */
-> +    hwaddr start;
-> +    hwaddr end;
->      QLIST_ENTRY(IOMMUNotifier) node;
->  };
->  typedef struct IOMMUNotifier IOMMUNotifier;
-> =20
-> +static inline void iommu_notifier_init(IOMMUNotifier *n, IOMMUNotify fn,
-> +                                       IOMMUNotifierFlag flags,
-> +                                       hwaddr start, hwaddr end)
-> +{
-> +    n->notify =3D fn;
-> +    n->notifier_flags =3D flags;
-> +    n->start =3D start;
-> +    n->end =3D end;
-> +}
-> +
->  /* New-style MMIO accessors can indicate that the transaction failed.
->   * A zero (MEMTX_OK) response means success; anything else is a failure
->   * of some kind. The memory subsystem will bitwise-OR together results
-> diff --git a/memory.c b/memory.c
-> index 6c58373..4900bbf 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -1610,6 +1610,7 @@ void memory_region_register_iommu_notifier(MemoryRe=
-gion *mr,
-> =20
->      /* We need to register for at least one bitfield */
->      assert(n->notifier_flags !=3D IOMMU_NOTIFIER_NONE);
-> +    assert(n->start <=3D n->end);
->      QLIST_INSERT_HEAD(&mr->iommu_notify, n, node);
->      memory_region_update_iommu_notify_flags(mr);
->  }
-> @@ -1671,6 +1672,14 @@ void memory_region_notify_iommu(MemoryRegion *mr,
->      }
-> =20
->      QLIST_FOREACH(iommu_notifier, &mr->iommu_notify, node) {
-> +        /*
-> +         * Skip the notification if the notification does not overlap
-> +         * with registered range.
-> +         */
-> +        if (iommu_notifier->start > entry.iova + entry.addr_mask + 1 ||
-> +            iommu_notifier->end < entry.iova) {
-> +            continue;
-> +        }
->          if (iommu_notifier->notifier_flags & request_flags) {
->              iommu_notifier->notify(iommu_notifier, &entry);
->          }
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -181,25 +613,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---/cFG30PKHi9lwv6o
+--8a48p4KKsB+A/3VY
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYnSWOAAoJEGw4ysog2bOS7WsQANBQEJRF/lDWeaoo4sJVF4IO
-5e/2mDIHTKV397ZcueMt1VQsHQFpOlFTTN8KW8PAj2JDsbibYUUelZvs+RLKcfik
-fyJ1Ij97LQHbktSz4bDbYJgY86NKPiO/UIQ8zpLA5Spk1AURD5ryIKeasOH0xpSu
-eblYqXOuxefeCp05pQH3xMwDBWWT58c1yqYYIlJ3QnkcPwQZNZMu2VCLBpAF4cS+
-IHEBhUrNKM/B+jhHFOb7vzXXdpzZtP12R4ZOZbeSSnjVzxRYvcupHsVifs5ytXK0
-bjHnIecn7lwhi67JXdTPW7VYziFQOwQzL0DvGPmE6Xl08v5qgqH2M5YqIMFB7+wF
-/souO5fRQ87nLh2CTthXItfqcP9VMyO99fRdFxF8/gMl20UnJLlqNaQjqSvxqtws
-dzG2go2H64Nagyydh3dG2kCqJr7RP4+qaHGg+05dokrDD4DJcR5SDgAChnGnp5Ib
-AfWiviJgw3WKLw22wps7B5kKRoum0Y8eawxMY50DqGz55rDNRTDWR0Sy5wBNQjZ/
-ImgWFhOBKwFHmUWDuakNCEXhZLcgjhjQDr/0Q/dr/ZGP7BfG9BKoJK0oYyc8dV3q
-j9GsH/peTxD05URjF7wqBQjt1PtoZI/oAT9uaes+wJxI4KTvw85ace7tDw/4JwlA
-ej4nMIU6d8JpA53J1XY6
-=cvsI
+iQIcBAEBCAAGBQJYnSRnAAoJEGw4ysog2bOSJp0QAI6XsVkMzb6asw2r7Os023zk
+5Hxbw9aSeJnRGPsk2Sjov9Z6wtG4Y85Fnr8YDEziPb8FWVNuCcEHu/eUDBeSSqDE
+vFWfzFEKtC65fJTv3MaJ93MINi3n3iQNsBpRm1p0vsZ1BDQMzcOiTBqAUgCaHlmP
+YpqPV+yG+qRFzFy6yv5UKUlsp+lDEY+no5+nIWAGgiLwPUvSCYhpge0vJywC4vnK
+/dx/ogQINasnKvDsf+WE2BjLHfy41uYFOmPaifph98XBduAYztVqbmkmQuhl+Mo5
+Zwa30RZLCYYKAmVCY1O9Yr26v6hBu7rnr5adHrfj1p2UTgbuPyggdRhDZD2sfuOb
+f3TmyXQg+1Zb872msZ70i33uHvFiVFZcUhtYD7LDFPjFGibKQtEdnqnX/lRupsrA
+c3lT65d7ry1WwL9HBVp1lCcOFztOEnh3/wut9LNP0OQP5YMudzVBm6qeTLW4jSDb
+tDIJVgRaQTrpgC4hkQkjcuTWihgv/ZOIIJ6R8Foo2iNOXFCj2qfdqsr45G4+nKmh
++N8LktID2H1KHKDWk+SEGiTNX//PfmEfk0I1GNfRp4S1S3PiEFA91P+15NvTvn2X
+PT+UdoRSVSVd9IgsDaiLszZlu2WnTNoFQISpeLGzlHk4eRwwFhMUxlY94aP99aiV
+gAcfwWys9v3aG9VtL28Z
+=aXa2
 -----END PGP SIGNATURE-----
 
---/cFG30PKHi9lwv6o--
+--8a48p4KKsB+A/3VY--
