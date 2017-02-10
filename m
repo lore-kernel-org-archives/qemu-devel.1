@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ccA4e-0004mp-O4
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:13:13 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1ccA62-0005RB-26
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:14:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ccA4a-0004VX-NT
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:13:12 -0500
-Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:36422)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1ccA60-000536-Nz
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:14:38 -0500
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:33936)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ccA4a-0004V8-Fd
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:13:08 -0500
-Received: by mail-wr0-x229.google.com with SMTP id k90so106185364wrc.3
-	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 04:13:06 -0800 (PST)
-References: <20170210014519.12413-1-bobby.prani@gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170210014519.12413-1-bobby.prani@gmail.com>
-Date: Fri, 10 Feb 2017 12:13:19 +0000
-Message-ID: <871sv6xmzk.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1ccA60-0004za-BO
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:14:36 -0500
+Received: by mail-lf0-x243.google.com with SMTP id q89so2799703lfi.1
+	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 04:14:34 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] tcg: handle EXCP_ATOMIC exception properly
+References: <20170202145141.17138-1-marcandre.lureau@redhat.com>
+	<20170202145141.17138-7-marcandre.lureau@redhat.com>
+	<3ce84650-5d49-4db3-b71a-b71a37c0bd98@redhat.com>
+	<1174725609.1298917.1486497835239.JavaMail.zimbra@redhat.com>
+	<637397de-f396-c8f4-fb23-b5387d2077d0@redhat.com>
+In-Reply-To: <637397de-f396-c8f4-fb23-b5387d2077d0@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 10 Feb 2017 12:14:22 +0000
+Message-ID: <CAJ+F1CKa2GiJbYycLEuykFkSc5bRi6OsSK4Fd0tK=bTQ4F8c2w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 06/22] char: add a /chardevs container
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,96 +33,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pranith Kumar <bobby.prani@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "open list:Overall" <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+Hi
 
-Pranith Kumar <bobby.prani@gmail.com> writes:
+On Fri, Feb 10, 2017 at 4:18 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-> The current method of executing atomic code in a guest uses
-> cpu_exec_step_atomic() from the outermost loop. This causes an abort()
-> when single stepping over atomic code since debug exception longjmp
-> will point to the the setlongjmp in cpu_exec(). Another issue with
-> this mechanism is that the flags which were set in atomic execution
-> will be lost since we do not call cpu_exec_enter().
-
-I should not the original patch (which is still in my tree so I guess I
-should squash it) says:
-
-  The patch enables handling atomic code in the guest. This should be
-  preferably done in cpu_handle_exception(), but the current assumptions
-  regarding when we can execute atomic sections cause a deadlock.
-
-
-> The following patch moves atomic exception handling to the exception
-> handler where all these issues are taken care of. The change in
-> start_exclusive() is necessary since now the cpu in atomic execution
-> will have its running flag set, but we do not want to count it as
-> pending.
 >
-> Thanks to Alex for helping me debug the issue.
 >
-> CC: Alex Bennée <alex.bennee@linaro.org>
-> CC: Richard Henderson <rth@twiddle.net>
-> CC: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
-> ---
->  cpu-exec.c    | 2 ++
->  cpus-common.c | 2 +-
->  cpus.c        | 4 ----
->  3 files changed, 3 insertions(+), 5 deletions(-)
+> On 07/02/2017 21:03, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi
+> >
+> > ----- Original Message -----
+> >>
+> >>
+> >> On 02/02/2017 15:51, Marc-Andr=C3=A9 Lureau wrote:
+> >>> +    if (QTAILQ_IN_USE(chr, next)) {
+> >>> +        QTAILQ_REMOVE(&chardevs, chr, next);
+> >>> +    }
+> >>> +    if (OBJECT(chr)->parent) {
+> >>> +        object_unparent(OBJECT(chr));
+> >>> +    } else {
+> >>> +        object_unref(OBJECT(chr));
+> >>> +    }
+> >>
+> >> What's the case where the "else" is used?  Probably qemu_chr_delete
+> >> callers should be changed to use object_unparent or object_unref
+> directly.
+> >
+> > I thought about that, but calling object_unparent() seems weird,
+> > since callers aren't much aware of the fact that chardev are added or
+> not to a
+> > container (useless distinction imho). I wish the last object_unref()
+> > would automatically unparent, if the object has a parent. Would that be
+> > acceptable?
 >
-> diff --git a/cpu-exec.c b/cpu-exec.c
-> index b0ddada8c1..dceacfc5dd 100644
-> --- a/cpu-exec.c
-> +++ b/cpu-exec.c
-> @@ -427,6 +427,8 @@ static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
->              *ret = cpu->exception_index;
->              if (*ret == EXCP_DEBUG) {
->                  cpu_handle_debug_exception(cpu);
-> +            } else if (*ret == EXCP_ATOMIC) {
-> +                cpu_exec_step_atomic(cpu);
->              }
->              cpu->exception_index = -1;
->              return true;
-> diff --git a/cpus-common.c b/cpus-common.c
-> index 59f751ecf9..7b859752ea 100644
-> --- a/cpus-common.c
-> +++ b/cpus-common.c
-> @@ -192,7 +192,7 @@ void start_exclusive(void)
->      smp_mb();
->      running_cpus = 0;
->      CPU_FOREACH(other_cpu) {
-> -        if (atomic_read(&other_cpu->running)) {
-> +        if (atomic_read(&other_cpu->running) &&
-> !qemu_cpu_is_self(other_cpu)) {
+> There is a distinction between the two.  The idea is that unparent
+> removes all persistent references in the object tree, while unref only
+> removes transient references.  So for example unparent will detach a
+> device from its bus.  Unparent is basically exploiting the object tree
+> in order to simplify the handling of reference cycles.
+>
+> Once you add an object with object_property_add_child, you probably
+> should remove any transient references you have (such as the one you got
+> with object_new) and from that point on use object_unparent only.
+>
 
-The comment above reads:
+But if you unparent with the last ref, you remove the burden of knowing if
+the object has been parented from the user. I don't see why that would
+conflict with object_unparent(), you could still unparent(), and keep the
+object referenced somewhere else. The two are not incompatible to me.
+Afaik, most widget/hierarchy API work like that, the last unref will
+implicitely unparent.
 
-  Must only be called from outside cpu_exec.
-
-So we need to revise this comment. Is this really a limitation or was it
-originally the design goal?
-
->              other_cpu->has_waiter = true;
->              running_cpus++;
->              qemu_cpu_kick(other_cpu);
-> diff --git a/cpus.c b/cpus.c
-> index e1b82bcd49..981f23d52b 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -1461,10 +1461,6 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
->                   */
->                  g_assert(cpu->halted);
->                  break;
-> -            case EXCP_ATOMIC:
-> -                qemu_mutex_unlock_iothread();
-> -                cpu_exec_step_atomic(cpu);
-> -                qemu_mutex_lock_iothread();
->              default:
->                  /* Ignore everything else? */
->                  break;
-
-
---
-Alex Bennée
+--=20
+Marc-Andr=C3=A9 Lureau
