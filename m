@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ccMDX-00061N-Gs
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 20:11:12 -0500
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1ccN9q-0004dW-Vc
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 21:11:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ccMDW-0006TG-HQ
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 20:11:11 -0500
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1ccN9n-0004Uh-Hp
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 21:11:26 -0500
+Received: from mail-db5eur01on0111.outbound.protection.outlook.com
+	([104.47.2.111]:19013
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbutsykin@virtuozzo.com>)
+	id 1ccN9m-0004U8-Vl
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 21:11:23 -0500
+From: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Date: Fri, 10 Feb 2017 17:36:51 +0300
+Message-ID: <20170210143651.24046-1-pbutsykin@virtuozzo.com>
+In-Reply-To: <20170210122523.GC3567@work-vm>
+References: <20170210122523.GC3567@work-vm>
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <87r337ako2.fsf@dusky.pond.sub.org>
-References: <1486576658-29719-1-git-send-email-thuth@redhat.com>
-	<87r337ako2.fsf@dusky.pond.sub.org>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 10 Feb 2017 17:10:37 -0800
-Message-ID: <CAKmqyKPDj2XNsRA+7H4zhL2f4xuG0uZLrFPh5E7WnMAiP0=iCw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v3] hw/core/register: Mark the device with
- cannot_instantiate_with_device_add_yet
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] migration: madvise error_report fixup!
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,24 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>
+To: dgilbert@redhat.com
+Cc: den@virtuozzo.com, armbru@redhat.com, qemu-devel@nongnu.org, quintela@redhat.com
 
-On Wed, Feb 8, 2017 at 11:27 PM, Markus Armbruster <armbru@redhat.com> wrote:
-> Thomas Huth <thuth@redhat.com> writes:
->
->> The "qemu,register" device needs to be wired up in source code, there
->> is no way the user can make any real use of this device with the
->> "-device" parameter or the "device_add" monitor command yet.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
+---
+ migration/qemu-file.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-
-Thanks,
-
-Alistair
-
->
+diff --git a/migration/qemu-file.c b/migration/qemu-file.c
+index 82dbef3c86..195fa94fcf 100644
+--- a/migration/qemu-file.c
++++ b/migration/qemu-file.c
+@@ -156,13 +156,13 @@ static void qemu_iovec_release_ram(QEMUFile *f)
+             continue;
+         }
+         if (qemu_madvise(iov.iov_base, iov.iov_len, QEMU_MADV_DONTNEED) < 0) {
+-            error_report("migrate: madvise DONTNEED failed %p %ld: %s",
++            error_report("migrate: madvise DONTNEED failed %p %zd: %s",
+                          iov.iov_base, iov.iov_len, strerror(errno));
+         }
+         iov = f->iov[idx];
+     }
+     if (qemu_madvise(iov.iov_base, iov.iov_len, QEMU_MADV_DONTNEED) < 0) {
+-            error_report("migrate: madvise DONTNEED failed %p %ld: %s",
++            error_report("migrate: madvise DONTNEED failed %p %zd: %s",
+                          iov.iov_base, iov.iov_len, strerror(errno));
+     }
+     memset(f->may_free, 0, sizeof(f->may_free));
+-- 
+2.11.0
