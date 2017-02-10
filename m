@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cc9tJ-0001K3-Lp
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:01:30 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ccA4e-0004mp-O4
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:13:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cc9tF-0001Py-RB
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:01:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47932)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cc9tF-0001Pg-LZ
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:01:25 -0500
-References: <589C099A.9090605@huawei.com>
-	<AF60004D-7133-44D1-8A9F-7DB9822D84AF@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA1B4379@DGGEMA505-MBX.china.huawei.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <105e5774-38c3-0683-ca08-64f6ed53c643@redhat.com>
-Date: Fri, 10 Feb 2017 13:01:22 +0100
+	(envelope-from <alex.bennee@linaro.org>) id 1ccA4a-0004VX-NT
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:13:12 -0500
+Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:36422)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ccA4a-0004V8-Fd
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:13:08 -0500
+Received: by mail-wr0-x229.google.com with SMTP id k90so106185364wrc.3
+	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 04:13:06 -0800 (PST)
+References: <20170210014519.12413-1-bobby.prani@gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170210014519.12413-1-bobby.prani@gmail.com>
+Date: Fri, 10 Feb 2017 12:13:19 +0000
+Message-ID: <871sv6xmzk.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DA1B4379@DGGEMA505-MBX.china.huawei.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Help] Windows2012 as Guest 64+cores on KVM Halts
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] tcg: handle EXCP_ATOMIC exception properly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +29,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, Yan Vugenfirer <yvugenfi@redhat.com>, Hangaohuai <hangaohuai@huawei.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Radim Krcmar <rkrcmar@redhat.com>, "vrozenfe@redhat.com" <vrozenfe@redhat.com>
+To: Pranith Kumar <bobby.prani@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "open list:Overall" <qemu-devel@nongnu.org>
 
 
+Pranith Kumar <bobby.prani@gmail.com> writes:
 
-On 10/02/2017 10:31, Gonglei (Arei) wrote:
-> But We tested the same cases on Xen platform and VMware, and
-> the guest booted successfully.
+> The current method of executing atomic code in a guest uses
+> cpu_exec_step_atomic() from the outermost loop. This causes an abort()
+> when single stepping over atomic code since debug exception longjmp
+> will point to the the setlongjmp in cpu_exec(). Another issue with
+> this mechanism is that the flags which were set in atomic execution
+> will be lost since we do not call cpu_exec_enter().
 
-Were these two also tested with enlightenments enabled?  TCG surely isn't.
+I should not the original patch (which is still in my tree so I guess I
+should squash it) says:
 
-Paolo
+  The patch enables handling atomic code in the guest. This should be
+  preferably done in cpu_handle_exception(), but the current assumptions
+  regarding when we can execute atomic sections cause a deadlock.
 
-> Today I also tested on tcg, the guest also boots successfully.
-> 
-> BTW, if we disable hyper-v, there isn't problem on boot for the case.
-> 
-> QEMU command line (enable hyper-v with hv_relaxed):
-> 
-> # ./qemu-system-x86_64 -name win2012 -machine accel=kvm,usb=off -cpu qemu64,hv_relaxed -m 4001 -realtime mlock=off -smp 68,sockets=1,cores=68,threads=1 \
-> -drive file=/mnt/sdb/gonglei/win2012_r2_dc_64_raw,if=none,id=drive-ide0-0-0 -device ide-hd,bus=ide.0,unit=0,drive=drive-ide0-0-0,id=ide0-0-0,bootindex=1 \
-> -boot menu=on -device piix3-usb-uhci,id=uhci -chardev file,id=seabios,path=/home/seabios.log -device isa-debugcon,iobase=0x402,chardev=seabios \
-> -monitor stdio -device cirrus-vga,id=video0,vgamem_mb=16 -vnc 0.0.0.0:10
-> 
-> So, I think it's possible a KVM bug on Hyper-V enlightenments support. 
-> 
-> Any help will be appreciated!
-> 
-> CC'ing Paolo, Radim and Vadim.
+
+> The following patch moves atomic exception handling to the exception
+> handler where all these issues are taken care of. The change in
+> start_exclusive() is necessary since now the cpu in atomic execution
+> will have its running flag set, but we do not want to count it as
+> pending.
+>
+> Thanks to Alex for helping me debug the issue.
+>
+> CC: Alex Bennée <alex.bennee@linaro.org>
+> CC: Richard Henderson <rth@twiddle.net>
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+> ---
+>  cpu-exec.c    | 2 ++
+>  cpus-common.c | 2 +-
+>  cpus.c        | 4 ----
+>  3 files changed, 3 insertions(+), 5 deletions(-)
+>
+> diff --git a/cpu-exec.c b/cpu-exec.c
+> index b0ddada8c1..dceacfc5dd 100644
+> --- a/cpu-exec.c
+> +++ b/cpu-exec.c
+> @@ -427,6 +427,8 @@ static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
+>              *ret = cpu->exception_index;
+>              if (*ret == EXCP_DEBUG) {
+>                  cpu_handle_debug_exception(cpu);
+> +            } else if (*ret == EXCP_ATOMIC) {
+> +                cpu_exec_step_atomic(cpu);
+>              }
+>              cpu->exception_index = -1;
+>              return true;
+> diff --git a/cpus-common.c b/cpus-common.c
+> index 59f751ecf9..7b859752ea 100644
+> --- a/cpus-common.c
+> +++ b/cpus-common.c
+> @@ -192,7 +192,7 @@ void start_exclusive(void)
+>      smp_mb();
+>      running_cpus = 0;
+>      CPU_FOREACH(other_cpu) {
+> -        if (atomic_read(&other_cpu->running)) {
+> +        if (atomic_read(&other_cpu->running) &&
+> !qemu_cpu_is_self(other_cpu)) {
+
+The comment above reads:
+
+  Must only be called from outside cpu_exec.
+
+So we need to revise this comment. Is this really a limitation or was it
+originally the design goal?
+
+>              other_cpu->has_waiter = true;
+>              running_cpus++;
+>              qemu_cpu_kick(other_cpu);
+> diff --git a/cpus.c b/cpus.c
+> index e1b82bcd49..981f23d52b 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -1461,10 +1461,6 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+>                   */
+>                  g_assert(cpu->halted);
+>                  break;
+> -            case EXCP_ATOMIC:
+> -                qemu_mutex_unlock_iothread();
+> -                cpu_exec_step_atomic(cpu);
+> -                qemu_mutex_lock_iothread();
+>              default:
+>                  /* Ignore everything else? */
+>                  break;
+
+
+--
+Alex Bennée
