@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ccKAC-0001eN-0H
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 17:59:37 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ccKKn-0005FR-Me
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 18:10:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ccKAB-0005de-7V
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 17:59:36 -0500
-References: <20170203094018.15493-1-vsementsov@virtuozzo.com>
-	<20170203094018.15493-11-vsementsov@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <b32e331c-5b74-dab1-6d2a-19f3cf841ebb@redhat.com>
-Date: Fri, 10 Feb 2017 17:59:27 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ccKKm-0000XG-8Y
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 18:10:33 -0500
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:33279)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1ccKKm-0000XB-4Q
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 18:10:32 -0500
+Received: by mail-ot0-x242.google.com with SMTP id f9so5256010otd.0
+	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 15:10:32 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20170203094018.15493-11-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 10/24] block/dirty-bitmap: add autoload
- field to BdrvDirtyBitmap
+In-Reply-To: <20170208064212.25307-3-ppandit@redhat.com>
+References: <20170208064212.25307-1-ppandit@redhat.com>
+	<20170208064212.25307-3-ppandit@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 10 Feb 2017 15:10:00 -0800
+Message-ID: <CAKmqyKPav7yy6mPDWLQLOSwYT0qgOss1DAhtNC_Yn9Cvrp7pYg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] sd: sdhci: conditionally invoke
+ multi block transfer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,96 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: P J P <ppandit@redhat.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Wjjzhang <wjjzhang@tencent.com>, Jiang Xin <jiangxin1@huawei.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
-
-
-On 02/03/2017 04:40 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Mirror AUTO flag from Qcow2 bitmap in BdrvDirtyBitmap. This will be
-> needed in future, to save this flag back to Qcow2 for persistent
-> bitmaps.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
+On Tue, Feb 7, 2017 at 10:42 PM, P J P <ppandit@redhat.com> wrote:
+> From: Prasad J Pandit <pjp@fedoraproject.org>
+>
+> In sdhci_write invoke multi block transfer if it is enabled
+> in the transfer mode register 's->trnmod'.
+>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 > ---
->  block/dirty-bitmap.c         | 16 ++++++++++++++++
->  block/qcow2-bitmap.c         |  2 ++
->  include/block/dirty-bitmap.h |  2 ++
->  3 files changed, 20 insertions(+)
-> 
-> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-> index 90af37287f..2d27494dc7 100644
-> --- a/block/dirty-bitmap.c
-> +++ b/block/dirty-bitmap.c
-> @@ -44,6 +44,8 @@ struct BdrvDirtyBitmap {
->      int64_t size;               /* Size of the bitmap (Number of sectors) */
->      bool disabled;              /* Bitmap is read-only */
->      int active_iterators;       /* How many iterators are active */
-> +    bool autoload;              /* For persistent bitmaps: bitmap must be
-> +                                   autoloaded on image opening */
->      QLIST_ENTRY(BdrvDirtyBitmap) list;
->  };
->  
-> @@ -70,6 +72,8 @@ void bdrv_dirty_bitmap_make_anon(BdrvDirtyBitmap *bitmap)
->      assert(!bdrv_dirty_bitmap_frozen(bitmap));
->      g_free(bitmap->name);
->      bitmap->name = NULL;
-> +
-> +    bitmap->autoload = false;
->  }
->  
+>  hw/sd/sdhci.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+> index cf400c8..532ef87 100644
+> --- a/hw/sd/sdhci.c
+> +++ b/hw/sd/sdhci.c
+> @@ -1022,7 +1022,11 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
+>          /* Writing to last byte of sdmasysad might trigger transfer */
+>          if (!(mask & 0xFF000000) && TRANSFERRING_DATA(s->prnsts) && s->blkcnt &&
+>                  s->blksize && SDHC_DMA_TYPE(s->hostctl) == SDHC_CTRL_SDMA) {
+> -            sdhci_sdma_transfer_multi_blocks(s);
+> +            if (!(s->trnmod & SDHC_TRNS_MULTI)) {
 
-No real need for the extra line.
+You should test if true first.
 
->  BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriverState *bs,
-> @@ -238,6 +242,8 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriverState *bs,
->      bitmap->name = NULL;
->      successor->name = name;
->      bitmap->successor = NULL;
-> +    successor->autoload = bitmap->autoload;
-> +    bitmap->autoload = false;
->      bdrv_release_dirty_bitmap(bs, bitmap);
->  
->      return successor;
-> @@ -540,3 +546,13 @@ int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap)
->  {
->      return hbitmap_count(bitmap->meta);
->  }
-> +
-> +void bdrv_dirty_bitmap_set_autoload(BdrvDirtyBitmap *bitmap, bool autoload)
-> +{
-> +    bitmap->autoload = autoload;
-> +}
-> +
-> +bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap)
-> +{
-> +    return bitmap->autoload;
-> +}
-> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-> index eeeec1aa7f..bcbb0491ee 100644
-> --- a/block/qcow2-bitmap.c
-> +++ b/block/qcow2-bitmap.c
-> @@ -706,6 +706,8 @@ void qcow2_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp)
->              if (bitmap == NULL) {
->                  goto fail;
->              }
-> +
-> +            bdrv_dirty_bitmap_set_autoload(bitmap, true);
->              bm->flags |= BME_FLAG_IN_USE;
->              created_dirty_bitmaps =
->                      g_slist_append(created_dirty_bitmaps, bitmap);
-> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-> index 1e17729ac2..45a389a20a 100644
-> --- a/include/block/dirty-bitmap.h
-> +++ b/include/block/dirty-bitmap.h
-> @@ -75,4 +75,6 @@ void bdrv_dirty_bitmap_deserialize_ones(BdrvDirtyBitmap *bitmap,
->                                          bool finish);
->  void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap);
->  
-> +void bdrv_dirty_bitmap_set_autoload(BdrvDirtyBitmap *bitmap, bool autoload);
-> +bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap);
->  #endif
-> 
+Thanks,
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+Alistair
+
+> +                sdhci_sdma_transfer_single_block(s);
+> +            } else {
+> +                sdhci_sdma_transfer_multi_blocks(s);
+> +            }
+>          }
+>          break;
+>      case SDHC_BLKSIZE:
+> --
+> 2.9.3
+>
