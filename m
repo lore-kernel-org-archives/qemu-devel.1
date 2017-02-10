@@ -1,26 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ccECn-0004Yb-Ny
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 11:37:54 -0500
+	(envelope-from <jsnow@redhat.com>) id 1ccEN6-0000JF-OO
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 11:48:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ccECm-0006Xb-Ve
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 11:37:53 -0500
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:37908)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ccECm-0006XQ-Os
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 11:37:52 -0500
-Received: by mail-wm0-x235.google.com with SMTP id r141so53219444wmg.1
-	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 08:37:52 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <1486739699-1076-1-git-send-email-thuth@redhat.com>
-References: <1486739699-1076-1-git-send-email-thuth@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 10 Feb 2017 16:37:31 +0000
-Message-ID: <CAFEAcA8GHjg6mmfHQm56rLA0outk=CKg-c0bpE4c575KVTkr5g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2] tests/prom-env: Ease time-out problems
- on slow hosts
+	(envelope-from <jsnow@redhat.com>) id 1ccEN2-0001Sy-3G
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 11:48:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50626)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1ccEN1-0001Sb-TY
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 11:48:28 -0500
+From: John Snow <jsnow@redhat.com>
+Date: Fri, 10 Feb 2017 11:48:24 -0500
+Message-Id: <20170210164825.9241-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PULL 0/1] Ide patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +21,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, jsnow@redhat.com
 
-On 10 February 2017 at 15:14, Thomas Huth <thuth@redhat.com> wrote:
-> Peter Maydell recently ran into time-out problems with the
-> prom-env test on a rather slow ARM board. To tackle this issue,
-> we can speed up the test by running QEMU with "-nodefaults" for
-> the pseries machine, so that SLOF has less devices to scan during
-> boot, and by using the "nvramrc" environment variable instead of
-> "boot-command", since this variable is evaluated earlier in the
-> boot process.
-> And to be really sure that we do not face such time out problems
-> again, let's also increase the time out value from 100s to 120s
-> instead.
->
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  v2: Use "-nodefaults" only for the pseries machine, since the
->      sparc machines have a built-in ethernet controller and spill
->      out a warning otherwise.
->
->  tests/prom-env-test.c | 13 +++++++++----
->  1 file changed, 9 insertions(+), 4 deletions(-)
+The following changes since commit 61eedf7aec0e2395aabd628cc055096909a3ea15:
 
-Applied to master, thanks.
+  tests/prom-env: Ease time-out problems on slow hosts (2017-02-10 15:44:53 +0000)
 
--- PMM
+are available in the git repository at:
+
+  https://github.com/jnsnow/qemu.git tags/ide-pull-request
+
+for you to fetch changes up to 98cb5dccb192b0082626080890dac413473573c6:
+
+  ahci: advertise HOST_CAP_64 (2017-02-10 11:47:11 -0500)
+
+----------------------------------------------------------------
+
+----------------------------------------------------------------
+
+Ladi Prosek (1):
+  ahci: advertise HOST_CAP_64
+
+ hw/ide/ahci.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+-- 
+2.9.3
