@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43216)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <martin@c-home.cz>) id 1cbyuC-00051s-BL
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 19:17:42 -0500
+	(envelope-from <ashmit602@gmail.com>) id 1cbz3O-00072U-IA
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 19:27:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <martin@c-home.cz>) id 1cbyu7-0005ez-Vf
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 19:17:40 -0500
-Received: from gw.c-home.cz ([89.24.150.100]:51229 helo=dmz.c-home.cz)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <martin@c-home.cz>) id 1cbyu7-0005dM-Ci
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 19:17:35 -0500
-Date: Fri, 10 Feb 2017 01:17:17 +0100 (CET)
-From: Martin Cerveny <martin@c-home.cz>
-Reply-To: Martin Cerveny <M.Cerveny@computer.org>
-In-Reply-To: <alpine.GSO.2.00.1702031147000.5901@dmz.c-home.cz>
-Message-ID: <alpine.GSO.2.00.1702100115320.15492@dmz.c-home.cz>
-References: <1486104705-13761-1-git-send-email-kraxel@redhat.com>
-	<alpine.GSO.2.00.1702031147000.5901@dmz.c-home.cz>
+	(envelope-from <ashmit602@gmail.com>) id 1cbz3N-0000iC-4v
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 19:27:10 -0500
+Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:36385)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ashmit602@gmail.com>) id 1cbz3M-0000i0-Vq
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 19:27:09 -0500
+Received: by mail-io0-x244.google.com with SMTP id q20so4455682ioi.3
+	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 16:27:08 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH] xhci: fix event queue IRQ handling
+In-Reply-To: <CAAo6VWP3O+CUfd4JQ+oBvnvut9+w6Es7TgQFxb74fJ3aSr0Whg@mail.gmail.com>
+References: <1486617814-5420-1-git-send-email-Ashish.Mittal@veritas.com>
+	<20170209062928.GI27752@localhost.localdomain>
+	<CAAo6VWNGtLvbN4ktxRQ9SsobNCgJWcaa_zvdA-9q2Pp3YK27gg@mail.gmail.com>
+	<20170209143208.GL27752@localhost.localdomain>
+	<CAAo6VWMn4ZTuVh=C-Er9Cer2b2edfH2mrowbN4H_atWp7pf3TQ@mail.gmail.com>
+	<20170209165025.GO30111@localhost.localdomain>
+	<CAAo6VWNactZLt93rSSMtVJPAGQpr6E1od-+700VdJ=wY32V5Og@mail.gmail.com>
+	<CAAo6VWP3O+CUfd4JQ+oBvnvut9+w6Es7TgQFxb74fJ3aSr0Whg@mail.gmail.com>
+From: ashish mittal <ashmit602@gmail.com>
+Date: Thu, 9 Feb 2017 16:27:07 -0800
+Message-ID: <CAAo6VWNVfHcwODL+vbeSvxSK7yOJ-hz3O-zYG7n4O6GRPAEJtw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
+ block device type called "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,150 +35,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <ashish.mittal@veritas.com>, Stefan Hajnoczi <stefanha@gmail.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>
 
-Hello.
-
-Ok. Not more bugs. The problem was in qemu-xen-4.8 missing "usb-redir: allocate buffers before waking up the host adapter"
-
-Martin
-
-On Fri, 3 Feb 2017, Martin Cerveny wrote:
-
-> Hello.
->
-> Thanks for patch. I tested it.
->
-> Good news, does not assert() :-)
-> Bad news, not all works as expected (trace + pcap for usbredir attached), 
-> maybe loosing some "interrupts".
->
-> ------------------------------------------- EVENT description
-> @1486115814.426976
-> - guest (win7+renesas v2.1.39) boots ok (monitoring over RDP)
->
-> @1486115984.087097
-> - usbredir attach keyboard
-> - guest start recognize device - "usb compound" and 3x "usb hid" but NOT HID 
-> keyboard
->
-> @14955@1486115985.022026
-> - recognitions stops/hungs *** 1 ***
->
-> - I try to "press" key but no activity on network "usbredir" channel or 
-> "xhci" (10 minutes)
->
-> @1486116641.063441
-> - disconnect USB keyboard
->
-> @1486116654.757221
-> - reconnect USB keyboard
-> - guest start recognize device - "usb compound" and 4x "usb hid" and HID 
-> keyboard !
->
-> @1486116786.752275 (frame 143-145 of pcap)
-> - press + release key "enter"
-> - BUT there is no corresponding activity in xhci driver (no trace) *** 2 ***
->
-> @1486116990.347841
-> - shutdown guest
-> -------------------------------------------
->
-> I see two problems/questions:
-> *** 1 *** - Why recognition stopped ? Need some "hw" reset ? (no problem with 
-> UHCI/EHCI emulation)
->            Sometimes (1:5) it attaches ok.
-> *** 2 *** - Recognized successfully but does not work. Problem with INTR 
-> transfers ?
->
-> Mouse works with the same problems.
->
-> I try attach USB-flash disk, all seems to work ok (read files, write files) 
-> and 2x faster then UHCI/EHCI emulation (and probably reached limit of 
-> RaspberryPI).
->
-> Any hint to debug (maybe qemu/usbredir - usbredir/libusb bindings) ?
->
-> Thanks, Martin Cerveny
->
-> On Fri, 3 Feb 2017, Gerd Hoffmann wrote:
->
->> The qemu xhci emulation doesn't handle the ERDP_EHB flag correctly.
->> 
->> When the host adapter queues a new event the ERDP_EHB flag is set.  The
->> flag is cleared (via w1c) by the guest when it updates the ERDP (event
->> ring dequeue pointer) register to notify the host adapter which events
->> it has fetched.
->> 
->> An IRQ must raised in case the ERDP_EHB flag flips from clear to set.
->> If the flag is set already (which implies there are events queued up
->> which are not yet processed by the guest) xhci must *not* raise a IRQ.
->> 
->> Qemu got that wrong and raised an IRQ on every event, thereby generating
->> suspious interrupts in case we've queued events faster than the guest
->> processed them.  This patch fixes that.
->> 
->> With that change in place we also have to check ERDP updates, to see
->> whenever the guest has fetched all queued events.  In case there are
->> still pending events set ERDP_EHB and raise an IRQ again, to make sure
->> the events don't linger unseen forever.
->> 
->> The linux kernel driver and the microsoft windows driver (shipped with
->> win8+) can deal with the suspious interrupts without problems.  The
->> renesas windows driver (v2.1.39) which can be used on older windows
->> versions is quite upset though.  It does suspious ERDP updates now and
->> then (not every time, seems we must hit a race window for this to
->> happen), which in turn makes the qemu xhci emulation think the event
->> ring is full.  Things go south from here ...
->> 
->> tl;dr: This is the "fix xhci on win7" patch.
->> 
->> Cc: M.Cerveny@computer.org
->> Cc: 1373228@bugs.launchpad.net
->> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
->> ---
->> hw/usb/hcd-xhci.c | 13 +++++++++++++
->> 1 file changed, 13 insertions(+)
->> 
->> diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
->> index df75907..4f05747 100644
->> --- a/hw/usb/hcd-xhci.c
->> +++ b/hw/usb/hcd-xhci.c
->> @@ -789,11 +789,15 @@ static void xhci_msix_update(XHCIState *xhci, int v)
->> static void xhci_intr_raise(XHCIState *xhci, int v)
->> {
->>     PCIDevice *pci_dev = PCI_DEVICE(xhci);
->> +    bool pending = (xhci->intr[v].erdp_low & ERDP_EHB);
+On Thu, Feb 9, 2017 at 10:45 AM, ashish mittal <ashmit602@gmail.com> wrote:
+> On Thu, Feb 9, 2017 at 10:08 AM, ashish mittal <ashmit602@gmail.com> wrote:
+>> On Thu, Feb 9, 2017 at 8:50 AM, Jeff Cody <jcody@redhat.com> wrote:
+>>> On Thu, Feb 09, 2017 at 08:14:38AM -0800, ashish mittal wrote:
+>>>> On Thu, Feb 9, 2017 at 6:32 AM, Jeff Cody <jcody@redhat.com> wrote:
+>>>> > On Thu, Feb 09, 2017 at 01:24:58AM -0800, ashish mittal wrote:
+>>>> >> On Wed, Feb 8, 2017 at 10:29 PM, Jeff Cody <jcody@redhat.com> wrote:
+>>>> >> > On Wed, Feb 08, 2017 at 09:23:33PM -0800, Ashish Mittal wrote:
+>>>> >> >> From: Ashish Mittal <ashish.mittal@veritas.com>
+>>>> >> >>
+>>>> >> >> Source code for the qnio library that this code loads can be downloaded from:
+>>>> >> >> https://github.com/VeritasHyperScale/libqnio.git
+>>>> >> >>
+>>>> >> >> Sample command line using JSON syntax:
+>>>> >> >> ./x86_64-softmmu/qemu-system-x86_64 -name instance-00000008 -S -vnc 0.0.0.0:0
+>>>> >> >> -k en-us -vga cirrus -device virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x5
+>>>> >> >> -msg timestamp=on
+>>>> >> >> 'json:{"driver":"vxhs","vdisk-id":"c3e9095a-a5ee-4dce-afeb-2a59fb387410",
+>>>> >> >> "server":{"host":"172.172.17.4","port":"9999"}}'
+>>>> >> >>
+>>>> >> >> Sample command line using URI syntax:
+>>>> >> >> qemu-img convert -f raw -O raw -n
+>>>> >> >> /var/lib/nova/instances/_base/0c5eacd5ebea5ed914b6a3e7b18f1ce734c386ad
+>>>> >> >> vxhs://192.168.0.1:9999/c6718f6b-0401-441d-a8c3-1f0064d75ee0
+>>>> >> >>
+>>>> >> >
+>>>> >> > I don't know if I am using the qnio_server test server correctly or not, but
+>>>> >> > when I run qemu-io from the command line I get an i/o error.  When I run the
+>>>> >> > qemu-iotests, I get a segfault.
+>>>> >> >
+>>>> >> > Were you able to run qemu-iotests with these patches?
+>>>> >> >
+>>>> >> > Here is how I am invoking qnio_server:
+>>>> >> >
+>>>> >> > # qnio_server  -d /home/jcody/work/redhat/upstream/qemu-kvm/tests/qemu-iotests/scratch -v
+>>>> >> >
+>>>> >> >
+>>>> >>
+>>>> >> I ran full qemu-iotests and qemu-io manually with the test server on
+>>>> >> version 7 patches. Ran qemu-io manually with the test server on
+>>>> >> version 8, but the libvxhs code is undergoing a lot of checkins. Will
+>>>> >> test again tomorrow and get back.
+>>>> >>
+>>>> >
+>>>> > Does my invocation above look correct, for running the qemu-iotests?
+>>>>
+>>>> qemu-iotest starts the server internally. The server does not have to
+>>>> be started explicitly before running qemu-iotest. The server must not
+>>>> be running before you begin the test  because then the tests would
+>>>> find port 9999 busy.
+>>>> Running make install on libvxhs copies the test server to the location
+>>>> where the qemu-iotests expect to find it.
+>>>
+>>>
+>>> OK, thanks.  I tried that too, and I also tried against the branch
+>>> "ashish_securify_changes" for libqnio.  I still have qemu-iotests giving me
+>>> a segfault.
+>>>
+>>>
 >>
->>     xhci->intr[v].erdp_low |= ERDP_EHB;
->>     xhci->intr[v].iman |= IMAN_IP;
->>     xhci->usbsts |= USBSTS_EINT;
->> 
->> +    if (pending) {
->> +        return;
->> +    }
->>     if (!(xhci->intr[v].iman & IMAN_IE)) {
->>         return;
->>     }
->> @@ -3352,6 +3356,15 @@ static void xhci_runtime_write(void *ptr, hwaddr 
->> reg,
->>             intr->erdp_low &= ~ERDP_EHB;
->>         }
->>         intr->erdp_low = (val & ~ERDP_EHB) | (intr->erdp_low & ERDP_EHB);
->> +        if (val & ERDP_EHB) {
->> +            dma_addr_t erdp = xhci_addr64(intr->erdp_low, 
->> intr->erdp_high);
->> +            unsigned int dp_idx = (erdp - intr->er_start) / TRB_SIZE;
->> +            if (erdp >= intr->er_start &&
->> +                erdp < (intr->er_start + TRB_SIZE * intr->er_size) &&
->> +                dp_idx != intr->er_ep_idx) {
->> +                xhci_intr_raise(xhci, v);
->> +            }
->> +        }
->>         break;
->>     case 0x1c: /* ERDP high */
->>         intr->erdp_high = val;
->> -- 
->> 1.8.3.1
+>> Qemu patch v7 and v8 do not have many changes. I did successfully run
+>> iotests with v7 and libqnio master. I'm guessing there could be
+>> something in the 'securify' library branch that's causing this. I will
+>> rebuild and retest.
 >
+> Confirmed that there is a problem and qemu-iotest is segfaulting. Will
+> get back with a fix.
+
+Checked in some changes to libqnio. Could you please try it again with
+the latest 'securify' branch?
+Thanks!
