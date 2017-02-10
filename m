@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cc7cj-0000RM-Jz
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 04:36:17 -0500
+	(envelope-from <phrdina@redhat.com>) id 1cc7hk-0003XY-Q3
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 04:41:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cc7ch-0001dV-Mn
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 04:36:13 -0500
-Resent-Message-Id: <E1cc7ch-0001dV-Mn@eggs.gnu.org>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20170210092724.6470-1-lvivier@redhat.com>
-Message-ID: <148671936015.57.11103321999455503256@eba24e3a0d7f>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 10 Feb 2017 01:36:00 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/3] ppc: replace debug printf with trace
- points
+	(envelope-from <phrdina@redhat.com>) id 1cc7hg-00037i-S4
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 04:41:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34986)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <phrdina@redhat.com>) id 1cc7hg-00037F-Ml
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 04:41:20 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EC55C201FB
+	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 09:41:19 +0000 (UTC)
+From: Pavel Hrdina <phrdina@redhat.com>
+Date: Fri, 10 Feb 2017 10:41:17 +0100
+Message-Id: <3163c16d6ab4257f7be9ad44fe9cc0ce8c359e5a.1486718555.git.phrdina@redhat.com>
+Subject: [Qemu-devel] [PATCH] monitor: add poll-* properties into
+ query-iothreads result
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,28 +28,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: lvivier@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, agraf@suse.de, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, eblake@redhat.com, armbru@redhat.com
 
-SGksCgpZb3VyIHNlcmllcyBmYWlsZWQgYXV0b21hdGljIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5k
-IHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZl
-IGRvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHku
-CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvM10gcHBjOiByZXBsYWNlIGRlYnVnIHBy
-aW50ZiB3aXRoIHRyYWNlIHBvaW50cwpNZXNzYWdlLWlkOiAyMDE3MDIxMDA5MjcyNC42NDcwLTEt
-bHZpdmllckByZWRoYXQuY29tClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09
-PQojIS9iaW4vYmFzaApzZXQgLWUKZ2l0IHN1Ym1vZHVsZSB1cGRhdGUgLS1pbml0IGR0YwojIExl
-dCBkb2NrZXIgdGVzdHMgZHVtcCBlbnZpcm9ubWVudCBpbmZvCmV4cG9ydCBTSE9XX0VOVj0xCmV4
-cG9ydCBKPTE2Cm1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNgptYWtlIGRvY2tlci10ZXN0
-LW1pbmd3QGZlZG9yYQptYWtlIGRvY2tlci10ZXN0LWJ1aWxkQG1pbi1nbGliCj09PSBURVNUIFND
-UklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4
-NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNzJjMjNjNCBzcGFwcjogcmVw
-bGFjZSBkZWJ1ZyBwcmludGYgd2l0aCB0cmFjZSBwb2ludHMKMTlhNTE3OSBwcGM0eHg6IHJlcGxh
-Y2UgZGVidWcgcHJpbnRmIHdpdGggdHJhY2UgcG9pbnRzCjYzYTk1YmQgbWFjOTk6IHJlcGxhY2Ug
-ZGVidWcgcHJpbnRmIHdpdGggdHJhY2UgcG9pbnRzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpTdWJt
-b2R1bGUgJ2R0YycgKGdpdDovL2dpdC5xZW11LXByb2plY3Qub3JnL2R0Yy5naXQpIHJlZ2lzdGVy
-ZWQgZm9yIHBhdGggJ2R0YycKZmF0YWw6IHJlYWQgZXJyb3I6IENvbm5lY3Rpb24gcmVzZXQgYnkg
-cGVlcgpDbG9uaW5nIGludG8gJ2R0YycuLi4KQ2xvbmUgb2YgJ2dpdDovL2dpdC5xZW11LXByb2pl
-Y3Qub3JnL2R0Yy5naXQnIGludG8gc3VibW9kdWxlIHBhdGggJ2R0YycgZmFpbGVkCj09PSBPVVRQ
-VVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwg
-Z2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10u
-ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+IOthreads were recently extended by new properties that can
+enable/disable and configure aio polling.  This will also allow
+other tools that uses QEMU to probe for existence of those new
+properties via query-qmp-schema.
+
+Signed-off-by: Pavel Hrdina <phrdina@redhat.com>
+---
+
+The other possible way would be to introduce object-list-properties
+which I think would be good in general for the same reason why
+device-list-properties exists.
+
+ hmp.c            |  9 +++++++--
+ iothread.c       |  3 +++
+ qapi-schema.json | 15 ++++++++++++++-
+ 3 files changed, 24 insertions(+), 3 deletions(-)
+
+diff --git a/hmp.c b/hmp.c
+index 2bc4f062bb..d713151cbc 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -2148,10 +2148,15 @@ void hmp_info_iothreads(Monitor *mon, const QDict *qdict)
+ {
+     IOThreadInfoList *info_list = qmp_query_iothreads(NULL);
+     IOThreadInfoList *info;
++    IOThreadInfo *value;
+ 
+     for (info = info_list; info; info = info->next) {
+-        monitor_printf(mon, "%s: thread_id=%" PRId64 "\n",
+-                       info->value->id, info->value->thread_id);
++        value = info->value;
++        monitor_printf(mon, "%s:\n", value->id);
++        monitor_printf(mon, "  thread_id=%" PRId64 "\n", value->thread_id);
++        monitor_printf(mon, "  poll-max-ns=%" PRId64 "\n", value->poll_max_ns);
++        monitor_printf(mon, "  poll-grow=%" PRId64 "\n", value->poll_grow);
++        monitor_printf(mon, "  poll-shrink=%" PRId64 "\n", value->poll_shrink);
+     }
+ 
+     qapi_free_IOThreadInfoList(info_list);
+diff --git a/iothread.c b/iothread.c
+index 257b01d5f1..beeb870534 100644
+--- a/iothread.c
++++ b/iothread.c
+@@ -268,6 +268,9 @@ static int query_one_iothread(Object *object, void *opaque)
+     info = g_new0(IOThreadInfo, 1);
+     info->id = iothread_get_id(iothread);
+     info->thread_id = iothread->thread_id;
++    info->poll_max_ns = iothread->poll_max_ns;
++    info->poll_grow = iothread->poll_grow;
++    info->poll_shrink = iothread->poll_shrink;
+ 
+     elem = g_new0(IOThreadInfoList, 1);
+     elem->value = info;
+diff --git a/qapi-schema.json b/qapi-schema.json
+index cbdffddbc6..a97a054c81 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -1422,10 +1422,23 @@
+ #
+ # @thread-id: ID of the underlying host thread
+ #
++# @poll-max-ns: maximum polling time in ns, 0 means polling is disabled
++#               (since 2.9)
++#
++# @poll-grow: how many ns will be added to polling time, 0 means that it's not
++#             configured (since 2.9)
++#
++# @poll-shrink: how many ns will be removed from polling time, 0 means that
++#               it's not configured (since 2.9)
++#
+ # Since: 2.0
+ ##
+ { 'struct': 'IOThreadInfo',
+-  'data': {'id': 'str', 'thread-id': 'int'} }
++  'data': {'id': 'str',
++           'thread-id': 'int',
++           'poll-max-ns': 'int',
++           'poll-grow': 'int',
++           'poll-shrink': 'int' } }
+ 
+ ##
+ # @query-iothreads:
+-- 
+2.11.1
