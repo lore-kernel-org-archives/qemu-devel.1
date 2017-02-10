@@ -1,14 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcinch7@gmail.com>) id 1ccFaN-0001Ev-KN
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:06:20 -0500
+	(envelope-from <marcinch7@gmail.com>) id 1ccIRb-0003ru-9D
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 16:09:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcinch7@gmail.com>) id 1ccFaM-0002oc-Ay
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:06:19 -0500
+	(envelope-from <marcinch7@gmail.com>) id 1ccIRZ-0001kh-JJ
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 16:09:27 -0500
 From: Marcin Chojnacki <marcinch7@gmail.com>
-Date: Fri, 10 Feb 2017 19:06:00 +0100
-Message-Id: <20170210180600.45797-1-marcinch7@gmail.com>
-Subject: [Qemu-devel] [PATCH] target-arm: Implement BCM2835 hardware RNG
+Date: Fri, 10 Feb 2017 22:08:57 +0100
+Message-Id: <20170210210857.47893-1-marcinch7@gmail.com>
+Subject: [Qemu-devel] [PATCH v2] target-arm: Implement BCM2835 hardware RNG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,14 +29,20 @@ This patch implements a trivial BCM2835 compatible RNG,
 and adds it as a peripheral to BCM2835 platform, which
 allows to boot a vanilla Raspberry Pi kernel under Qemu.
 
+Changes since v1:
+ * Prevented guest from writing [31..20] bits in rng_status
+ * Removed redundant minimum_version_id_old
+ * Added field entries for the state
+ * Changed realize function to reset
+
 Signed-off-by: Marcin Chojnacki <marcinch7@gmail.com>
 ---
  hw/arm/bcm2835_peripherals.c         |  15 +++++
  hw/misc/Makefile.objs                |   1 +
- hw/misc/bcm2835_rng.c                | 115 +++++++++++++++++++++++++++++++++++
+ hw/misc/bcm2835_rng.c                | 124 +++++++++++++++++++++++++++++++++++
  include/hw/arm/bcm2835_peripherals.h |   2 +
- include/hw/misc/bcm2835_rng.h        |  23 +++++++
- 5 files changed, 156 insertions(+)
+ include/hw/misc/bcm2835_rng.h        |  27 ++++++++
+ 5 files changed, 169 insertions(+)
  create mode 100644 hw/misc/bcm2835_rng.c
  create mode 100644 include/hw/misc/bcm2835_rng.h
 
@@ -87,13 +93,17 @@ index 898e4cc..57a4406 100644
  obj-$(CONFIG_ZYNQ) += zynq-xadc.o
 diff --git a/hw/misc/bcm2835_rng.c b/hw/misc/bcm2835_rng.c
 new file mode 100644
-index 0000000..00fb083
+index 0000000..d9a5acf
 --- /dev/null
 +++ b/hw/misc/bcm2835_rng.c
-@@ -0,0 +1,115 @@
+@@ -0,0 +1,124 @@
 +/*
-+ * Raspberry Pi emulation (c) 2017 Marcin Chojnacki
-+ * This code is licensed under the GNU GPLv2 and later.
++ * BCM2835 Random Number Generator emulation
++ *
++ * Copyright (C) 2017 Marcin Chojnacki <marcinch7@gmail.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
 + */
 +
 +#include "qemu/osdep.h"
@@ -101,7 +111,7 @@ index 0000000..00fb083
 +#include "hw/misc/bcm2835_rng.h"
 +
 +static uint64_t bcm2835_rng_read(void *opaque, hwaddr offset,
-+    unsigned size)
++                                 unsigned size)
 +{
 +    BCM2835RngState *s = (BCM2835RngState *)opaque;
 +    uint32_t res = 0;
@@ -121,7 +131,8 @@ index 0000000..00fb083
 +
 +    default:
 +        qemu_log_mask(LOG_GUEST_ERROR,
-+            "bcm2835_rng_read: Bad offset %x\n", (int)offset);
++                      "bcm2835_rng_read: Bad offset %x\n",
++                      (int)offset);
 +        res = 0;
 +        break;
 +    }
@@ -130,7 +141,7 @@ index 0000000..00fb083
 +}
 +
 +static void bcm2835_rng_write(void *opaque, hwaddr offset,
-+    uint64_t value, unsigned size)
++                              uint64_t value, unsigned size)
 +{
 +    BCM2835RngState *s = (BCM2835RngState *)opaque;
 +
@@ -141,12 +152,15 @@ index 0000000..00fb083
 +        s->rng_ctrl = value;
 +        break;
 +    case 0x4:    /* rng_status */
-+        s->rng_status = value;
++        /* we shouldn't let the guest write to bits [31..20] */
++        s->rng_status &= ~0xFFFFF;        /* clear 20 lower bits */
++        s->rng_status |= value & 0xFFFFF; /* set them to new value */
 +        break;
 +
 +    default:
 +        qemu_log_mask(LOG_GUEST_ERROR,
-+            "bcm2835_rng_write: Bad offset %x\n", (int)offset);
++                      "bcm2835_rng_write: Bad offset %x\n",
++                      (int)offset);
 +        break;
 +    }
 +}
@@ -161,8 +175,9 @@ index 0000000..00fb083
 +    .name = TYPE_BCM2835_RNG,
 +    .version_id = 1,
 +    .minimum_version_id = 1,
-+    .minimum_version_id_old = 1,
-+    .fields      = (VMStateField[]) {
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32(rng_ctrl, BCM2835RngState),
++        VMSTATE_UINT32(rng_status, BCM2835RngState),
 +        VMSTATE_END_OF_LIST()
 +    }
 +};
@@ -176,7 +191,7 @@ index 0000000..00fb083
 +    sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->iomem);
 +}
 +
-+static void bcm2835_rng_realize(DeviceState *dev, Error **errp)
++static void bcm2835_rng_reset(DeviceState *dev)
 +{
 +    BCM2835RngState *s = BCM2835_RNG(dev);
 +
@@ -188,7 +203,7 @@ index 0000000..00fb083
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +
-+    dc->realize = bcm2835_rng_realize;
++    dc->reset = bcm2835_rng_reset;
 +    dc->vmsd = &vmstate_bcm2835_rng;
 +}
 +
@@ -228,13 +243,17 @@ index e12ae37..31241c7 100644
  } BCM2835PeripheralState;
 diff --git a/include/hw/misc/bcm2835_rng.h b/include/hw/misc/bcm2835_rng.h
 new file mode 100644
-index 0000000..3ef816e
+index 0000000..41a531b
 --- /dev/null
 +++ b/include/hw/misc/bcm2835_rng.h
-@@ -0,0 +1,23 @@
+@@ -0,0 +1,27 @@
 +/*
-+ * Raspberry Pi emulation (c) 2017 Marcin Chojnacki
-+ * This code is licensed under the GNU GPLv2 and later.
++ * BCM2835 Random Number Generator emulation
++ *
++ * Copyright (C) 2017 Marcin Chojnacki <marcinch7@gmail.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
 + */
 +
 +#ifndef BCM2835_RNG_H
