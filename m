@@ -1,15 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ccFqY-0007Gu-UW
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:23:03 -0500
+	(envelope-from <afaerber@suse.de>) id 1ccFup-0002E9-7L
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:27:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ccFqV-0002Q7-QI
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:23:02 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Fri, 10 Feb 2017 19:22:57 +0100
-Message-Id: <1486750977-15211-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] tests/prom-env: Enable the test for the sun4u
- machine, too
+	(envelope-from <afaerber@suse.de>) id 1ccFum-0004XI-1x
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:27:27 -0500
+Received: from mx2.suse.de ([195.135.220.15]:38698)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <afaerber@suse.de>) id 1ccFul-0004Vm-PH
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:27:23 -0500
+References: <cover.1486285434.git.ben@skyportsystems.com>
+	<88aaebda-29dd-a77a-1b78-7d0d6f911a76@redhat.com>
+	<20170210172107-mutt-send-email-mst@kernel.org>
+	<20170210171659.111aedda@nial.brq.redhat.com>
+	<20170210181852.zp6sg2d4k2p3xhbd@hawk.localdomain>
+From: =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
+Message-ID: <d902a6b9-4a46-9010-b597-5e98388d10f4@suse.de>
+Date: Fri, 10 Feb 2017 19:27:21 +0100
+MIME-Version: 1.0
+In-Reply-To: <20170210181852.zp6sg2d4k2p3xhbd@hawk.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 00/10] Add support for VM Generation ID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,47 +30,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
-Cc: Artyom Tarasenko <atar4qemu@gmail.com>, qemu-trivial@nongnu.org
+To: Andrew Jones <drjones@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, ben@skyportsystems.com
 
-The 32-bit TCG bug has been fixed a while ago, so we can enable
-this test for sparc64 now, too. Unfortunately, OpenBIOS does not
-work with the sun4v machine anymore (it needs to catch up with the
-improved emulation), so we can only enable this test for the sun4u
-machine right now.
+Am 10.02.2017 um 19:18 schrieb Andrew Jones:
+> On Fri, Feb 10, 2017 at 05:16:59PM +0100, Igor Mammedov wrote:
+>> On Fri, 10 Feb 2017 17:31:33 +0200
+>> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+>>
+>>> On Fri, Feb 10, 2017 at 11:12:13AM +0100, Laszlo Ersek wrote:
+>>>> On 02/05/17 10:11, ben@skyportsystems.com wrote: =20
+>>>>> From: Ben Warren <ben@skyportsystems.com>
+>> [...]
+>>
+>>>>
+>>>> - or else, add another boolean property to vmgenid, one that paralle=
+ls
+>>>> "dma-enabled" of "fw-cfg" precisely, in HW_COMPAT*. Then simply fail
+>>>> realize() when this property is false. =20
+>>>
+>>> That's probably the easiest way. x-fw-cfg-dma-enabled.
+>>> Won't delay merging because of this, can be done with
+>>> patch on top.
+>> (not related to this series)
+>>
+>> I've thought that there still were no consensus on x-foo prefix,
+>> not to mention that x- might be legitimate prefix for some properties.
+>>
+>> Maybe we should add a flag to property like INTERNAL_PROPERTY
+>> and then set it explicitly on for internal stuff.
+>>
+>> That way we could cleanly exclude internal properties from
+>>  -device foo,help and make sure that user won't set them from CLI.
+>> I'd even volunteer to add this API to Object
+>=20
+> Yes, please. I know of a property or two where it would be nice to
+> have that flag.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/Makefile.include | 3 +--
- tests/prom-env-test.c  | 2 +-
- 2 files changed, 2 insertions(+), 3 deletions(-)
+Apart from documentation, what effect would such a flag have?
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 634394a..af99696 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -304,8 +304,7 @@ check-qtest-sparc-y = tests/prom-env-test$(EXESUF)
- check-qtest-sparc64-y = tests/endianness-test$(EXESUF)
- #check-qtest-sparc64-y += tests/m48t59-test$(EXESUF)
- #gcov-files-sparc64-y += hw/timer/m48t59.c
--#Disabled for now, triggers a TCG bug on 32-bit hosts
--#check-qtest-sparc64-y += tests/prom-env-test$(EXESUF)
-+check-qtest-sparc64-y += tests/prom-env-test$(EXESUF)
- 
- check-qtest-arm-y = tests/tmp105-test$(EXESUF)
- check-qtest-arm-y += tests/ds1338-test$(EXESUF)
-diff --git a/tests/prom-env-test.c b/tests/prom-env-test.c
-index bd33bc3..eac207b 100644
---- a/tests/prom-env-test.c
-+++ b/tests/prom-env-test.c
-@@ -76,7 +76,7 @@ static void add_tests(const char *machines[])
- int main(int argc, char *argv[])
- {
-     const char *sparc_machines[] = { "SPARCbook", "Voyager", "SS-20", NULL };
--    const char *sparc64_machines[] = { "sun4u", "sun4v", NULL };
-+    const char *sparc64_machines[] = { "sun4u", NULL };
-     const char *ppc_machines[] = { "mac99", "g3beige", NULL };
-     const char *ppc64_machines[] = { "mac99", "g3beige", "pseries", NULL };
-     const char *arch = qtest_get_arch();
--- 
-1.8.3.1
+With QOM I don't really see "internal" as being a thing: Besides -device
+and the likes, we expose qom-set operation and -global option, and I
+don't think it makes sense to restrict the latter two. For -device,
+"realized" is a property I would classify as non-user maybe.
+
+Regards,
+Andreas
+
+--=20
+SUSE Linux GmbH, Maxfeldstr. 5, 90409 N=FCrnberg, Germany
+GF: Felix Imend=F6rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N=FCrnberg)
