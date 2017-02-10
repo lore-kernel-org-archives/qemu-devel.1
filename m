@@ -1,18 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44049)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1ccAnU-0001Vx-W4
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:59:34 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ccB01-00063E-S9
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 08:12:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1ccAnT-0003Uv-2p
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:59:33 -0500
-Received: from mail-lf0-x22c.google.com ([2a00:1450:4010:c07::22c]:36669)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1ccAnS-0003U2-GI
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:59:30 -0500
-Received: by mail-lf0-x22c.google.com with SMTP id z134so20793311lff.3
-	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 04:59:30 -0800 (PST)
-MIME-Version: 1.0
+	(envelope-from <pbonzini@redhat.com>) id 1ccAzx-00007y-S0
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 08:12:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37442)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ccAzx-00007o-MP
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 08:12:25 -0500
 References: <20170202145141.17138-1-marcandre.lureau@redhat.com>
 	<20170202145141.17138-7-marcandre.lureau@redhat.com>
 	<3ce84650-5d49-4db3-b71a-b71a37c0bd98@redhat.com>
@@ -20,11 +16,13 @@ References: <20170202145141.17138-1-marcandre.lureau@redhat.com>
 	<637397de-f396-c8f4-fb23-b5387d2077d0@redhat.com>
 	<CAJ+F1CKa2GiJbYycLEuykFkSc5bRi6OsSK4Fd0tK=bTQ4F8c2w@mail.gmail.com>
 	<1fdabefe-a492-3c1c-3387-20ad1bc52f9f@redhat.com>
-In-Reply-To: <1fdabefe-a492-3c1c-3387-20ad1bc52f9f@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 10 Feb 2017 12:59:15 +0000
-Message-ID: <CAJ+F1C+akemEHSGSiy9ym4hs2KqiU4dGU3JCMoJMpKoXp_+s1g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+	<CAJ+F1C+akemEHSGSiy9ym4hs2KqiU4dGU3JCMoJMpKoXp_+s1g@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <351188b2-37a4-6a01-37e3-126e186e016d@redhat.com>
+Date: Fri, 10 Feb 2017 14:12:23 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAJ+F1C+akemEHSGSiy9ym4hs2KqiU4dGU3JCMoJMpKoXp_+s1g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH 06/22] char: add a /chardevs container
 List-Id: <qemu-devel.nongnu.org>
@@ -35,60 +33,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
 Cc: qemu-devel@nongnu.org
 
-Hi
-
-On Fri, Feb 10, 2017 at 4:26 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
-
->
-> >
-> > But if you unparent with the last ref, you remove the burden of knowing
-> > if the object has been parented from the user. I don't see why that
-> > would conflict with object_unparent(), you could still unparent(), and
-> > keep the object referenced somewhere else.
->
-> Isn't that exactly why you want them to be different?  unparent can do
-> much more than unref, for example in the case of a device it will also
-> unrealize it and destroy all buses underneath it.  Because the device
->
-
-Shouldn't the last unref also unrealize/destroy everything?
 
 
-> and bus have a circular reference, you cannot trigger the magic unparent
-> behavior just by unref'ing the device.
->
+On 10/02/2017 13:59, Marc-Andr=C3=A9 Lureau wrote:
+>     > But if you unparent with the last ref, you remove the burden of k=
+nowing
+>     > if the object has been parented from the user. I don't see why th=
+at
+>     > would conflict with object_unparent(), you could still unparent()=
+, and
+>     > keep the object referenced somewhere else.
+>=20
+>     Isn't that exactly why you want them to be different?  unparent can=
+ do
+>     much more than unref, for example in the case of a device it will a=
+lso
+>     unrealize it and destroy all buses underneath it.  Because the devi=
+ce
+>=20
+> Shouldn't the last unref also unrealize/destroy everything?
 
-Whoo, we have circular references on purposes? Is this lifecycle documented
-somewhere? I wonder the rationale behind it.
+How could someone say they have the "last unref"?  They didn't get that
+reference from anywhere, the reference is owned by the parent object's
+child property.
 
+>     and bus have a circular reference, you cannot trigger the magic unp=
+arent
+>     behavior just by unref'ing the device.
+>=20
+> Whoo, we have circular references on purposes? Is this lifecycle
+> documented somewhere? I wonder the rationale behind it.
 
->
-> There are just two cases:
->
-> - destruction immediately after creation, e.g. on error: new/unref
->
-> - successful creation: new/add_child/unref, unparent when deleting
->
+The same as Libreoffice: we had a model with no reference counting (just
+"qdev_free") and we tried to adapt it to QOM's reference counting model,
+in our case by exploiting the object tree.
 
-> and it's simpler to remember these two than to add magic behavior.
->
->
-That doesn't change the problem, the user may not know if the object is
-parented. So you have to pass this information along.
+>     There are just two cases:
+>=20
+>     - destruction immediately after creation, e.g. on error: new/unref
+>=20
+>     - successful creation: new/add_child/unref, unparent when deleting
+>=20
+>     and it's simpler to remember these two than to add magic behavior.
+>=20
+> That doesn't change the problem, the user may not know if the object is
+> parented.
 
+If the user got a reference for himself via object_ref or object_new, it
+must use object_unref.
 
+If the user wants to remove public knowledge of an object, then they
+must use object_unparent.  If the object is not parented, there's a
+violation of QOM rules somewhere.
 
-> > The two are not incompatible
-> > to me. Afaik, most widget/hierarchy API work like that, the last unref
-> > will implicitely unparent.
->
-> LibreOffice's has some similarity with QOM, search for "dispose" at
-> https://people.gnome.org/~michael/blog/2015-08-05-under-the-hood-5-0.html
->
-> I don't see much parallel with the discussion here except that they had a
-complicated model and tried to simplify it. That's what I also try to do.
---=20
-Marc-Andr=C3=A9 Lureau
+Paolo
