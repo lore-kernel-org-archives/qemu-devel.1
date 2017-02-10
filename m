@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ccFcA-00022q-FY
+	(envelope-from <pm215@archaic.org.uk>) id 1ccFc9-00022O-Vg
 	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:08:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ccFc9-0003zQ-CL
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:08:10 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48480)
+	(envelope-from <pm215@archaic.org.uk>) id 1ccFc9-0003z9-3m
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:08:09 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48481)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ccFc9-0003sU-4n
+	id 1ccFc8-0003vW-Sp
 	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:08:09 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1ccFc8-0007df-9R
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 18:08:08 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1ccFc5-0007b9-0F
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 18:08:05 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 10 Feb 2017 18:07:59 +0000
-Message-Id: <1486750082-12324-10-git-send-email-peter.maydell@linaro.org>
+Date: Fri, 10 Feb 2017 18:07:52 +0000
+Message-Id: <1486750082-12324-3-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1486750082-12324-1-git-send-email-peter.maydell@linaro.org>
 References: <1486750082-12324-1-git-send-email-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 09/12] aspeed: check for negative values
- returned by blk_getlength()
+Subject: [Qemu-devel] [PULL 02/12] target-arm: Add support for AArch64 PMU
+ register PMXEVTYPER_EL0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,47 +30,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Cédric Le Goater <clg@kaod.org>
+From: Wei Huang <wei@redhat.com>
 
-write_boot_rom() does not check for negative values. This is more a
-problem for coverity than the actual code as the size of the flash
-device is checked when the m25p80 object is created. If there is
-anything wrong with the backing file, we should not even reach that
-path.
+In order to support Linux perf, which uses PMXEVTYPER register,
+this patch adds read/write access support for PMXEVTYPER. The access
+is CONSTRAINED UNPREDICTABLE when PMSELR is not 0x1f. Additionally
+this patch adds support for PMXEVTYPER_EL0.
 
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Message-id: 1486648058-520-2-git-send-email-clg@kaod.org
+Signed-off-by: Wei Huang <wei@redhat.com>
+Message-id: 1486504171-26807-3-git-send-email-wei@redhat.com
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/aspeed.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ target/arm/cpu.h    |  1 -
+ target/arm/helper.c | 30 +++++++++++++++++++++++++-----
+ 2 files changed, 25 insertions(+), 6 deletions(-)
 
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index a92c2f1..ac9cbd6 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -113,9 +113,19 @@ static void write_boot_rom(DriveInfo *dinfo, hwaddr addr, size_t rom_size,
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 7e609f7..edc1f76 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -307,7 +307,6 @@ typedef struct CPUARMState {
+         uint64_t c9_pmcr; /* performance monitor control register */
+         uint64_t c9_pmcnten; /* perf monitor counter enables */
+         uint32_t c9_pmovsr; /* perf monitor overflow status */
+-        uint32_t c9_pmxevtyper; /* perf monitor event type */
+         uint32_t c9_pmuserenr; /* perf monitor user enable */
+         uint64_t c9_pmselr; /* perf monitor counter selection register */
+         uint32_t c9_pminten; /* perf monitor interrupt enables */
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 42803d4..b837d36 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -1054,7 +1054,25 @@ static void pmovsr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+ static void pmxevtyper_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                              uint64_t value)
  {
-     BlockBackend *blk = blk_by_legacy_dinfo(dinfo);
-     uint8_t *storage;
-+    int64_t size;
- 
--    if (rom_size > blk_getlength(blk)) {
--        rom_size = blk_getlength(blk);
-+    /* The block backend size should have already been 'validated' by
-+     * the creation of the m25p80 object.
+-    env->cp15.c9_pmxevtyper = value & 0xff;
++    /* Attempts to access PMXEVTYPER are CONSTRAINED UNPREDICTABLE when
++     * PMSELR value is equal to or greater than the number of implemented
++     * counters, but not equal to 0x1f. We opt to behave as a RAZ/WI.
 +     */
-+    size = blk_getlength(blk);
-+    if (size <= 0) {
-+        error_setg(errp, "failed to get flash size");
-+        return;
++    if (env->cp15.c9_pmselr == 0x1f) {
++        pmccfiltr_write(env, ri, value);
 +    }
++}
 +
-+    if (rom_size > size) {
-+        rom_size = size;
-     }
++static uint64_t pmxevtyper_read(CPUARMState *env, const ARMCPRegInfo *ri)
++{
++    /* We opt to behave as a RAZ/WI when attempts to access PMXEVTYPER
++     * are CONSTRAINED UNPREDICTABLE. See comments in pmxevtyper_write().
++     */
++    if (env->cp15.c9_pmselr == 0x1f) {
++        return env->cp15.pmccfiltr_el0;
++    } else {
++        return 0;
++    }
+ }
  
-     storage = g_new0(uint8_t, rom_size);
+ static void pmuserenr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+@@ -1234,10 +1252,12 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
+       .fieldoffset = offsetof(CPUARMState, cp15.pmccfiltr_el0),
+       .resetvalue = 0, },
+     { .name = "PMXEVTYPER", .cp = 15, .crn = 9, .crm = 13, .opc1 = 0, .opc2 = 1,
+-      .access = PL0_RW,
+-      .fieldoffset = offsetof(CPUARMState, cp15.c9_pmxevtyper),
+-      .accessfn = pmreg_access, .writefn = pmxevtyper_write,
+-      .raw_writefn = raw_write },
++      .access = PL0_RW, .type = ARM_CP_NO_RAW, .accessfn = pmreg_access,
++      .writefn = pmxevtyper_write, .readfn = pmxevtyper_read },
++    { .name = "PMXEVTYPER_EL0", .state = ARM_CP_STATE_AA64,
++      .opc0 = 3, .opc1 = 3, .crn = 9, .crm = 13, .opc2 = 1,
++      .access = PL0_RW, .type = ARM_CP_NO_RAW, .accessfn = pmreg_access,
++      .writefn = pmxevtyper_write, .readfn = pmxevtyper_read },
+     /* Unimplemented, RAZ/WI. */
+     { .name = "PMXEVCNTR", .cp = 15, .crn = 9, .crm = 13, .opc1 = 0, .opc2 = 2,
+       .access = PL0_RW, .type = ARM_CP_CONST, .resetvalue = 0,
 -- 
 2.7.4
