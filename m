@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1cbzur-0007MH-Hc
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 20:22:26 -0500
+	(envelope-from <bobby.prani@gmail.com>) id 1cc0H8-0004Mm-4H
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 20:45:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1cbzup-000424-DR
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 20:22:25 -0500
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:33484)
+	(envelope-from <bobby.prani@gmail.com>) id 1cc0H5-0006ip-2R
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 20:45:26 -0500
+Received: from mail-yb0-x241.google.com ([2607:f8b0:4002:c09::241]:35543)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1cbzup-00040i-7w
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 20:22:23 -0500
-Received: by mail-io0-x244.google.com with SMTP id 101so4578144iom.0
-	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 17:22:20 -0800 (PST)
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1cc0H4-0006iB-TA
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 20:45:22 -0500
+Received: by mail-yb0-x241.google.com with SMTP id j82so853275ybg.2
+	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 17:45:21 -0800 (PST)
+From: Pranith Kumar <bobby.prani@gmail.com>
+Date: Thu,  9 Feb 2017 20:45:19 -0500
+Message-Id: <20170210014519.12413-1-bobby.prani@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <cfca49ad-7eec-5b04-7cdd-e52bd32f38ea@redhat.com>
-References: <1486623844-13140-1-git-send-email-liqiang6-s@360.cn>
-	<1486623844-13140-2-git-send-email-liqiang6-s@360.cn>
-	<cfca49ad-7eec-5b04-7cdd-e52bd32f38ea@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Fri, 10 Feb 2017 09:22:19 +0800
-Message-ID: <CAKXe6SJbYjUCphByCAtyVJiUfLk-XUSJQa3+BjbwsPFMOT5w6A@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 1/2] ide: core: add cleanup function
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] tcg: handle EXCP_ATOMIC exception properly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,95 +27,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, pbonzini@redhat.com
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Li Qiang <liqiang6-s@360.cn>
+To: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "open list:Overall" <qemu-devel@nongnu.org>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Hello John,
+The current method of executing atomic code in a guest uses
+cpu_exec_step_atomic() from the outermost loop. This causes an abort()
+when single stepping over atomic code since debug exception longjmp
+will point to the the setlongjmp in cpu_exec(). Another issue with
+this mechanism is that the flags which were set in atomic execution
+will be lost since we do not call cpu_exec_enter().
 
-2017-02-10 3:42 GMT+08:00 John Snow <jsnow@redhat.com>:
+The following patch moves atomic exception handling to the exception
+handler where all these issues are taken care of. The change in
+start_exclusive() is necessary since now the cpu in atomic execution
+will have its running flag set, but we do not want to count it as
+pending.
 
->
->
-> On 02/09/2017 02:04 AM, Li Qiang wrote:
-> > As the pci ahci can be hotplug and unplug, in the ahci unrealize
-> > function it should free all the resource once allocated in the
-> > realized function. This patch adds two cleanup function.
-> >
-> > Signed-off-by: Li Qiang <liqiang6-s@360.cn>
-> > ---
-> >  hw/ide/core.c             | 21 +++++++++++++++++++++
-> >  include/hw/ide/internal.h |  2 ++
-> >  2 files changed, 23 insertions(+)
-> >
-> > diff --git a/hw/ide/core.c b/hw/ide/core.c
-> > index 43709e5..8fe5896 100644
-> > --- a/hw/ide/core.c
-> > +++ b/hw/ide/core.c
-> > @@ -2586,6 +2586,13 @@ void ide_register_restart_cb(IDEBus *bus)
-> >      }
-> >  }
-> >
-> > +void ide_unregister_restart_cb(IDEBus *bus)
-> > +{
-> > +    if (bus->dma->ops->restart_dma) {
-> > +        qemu_del_vm_change_state_handler(bus->vmstate);
-> > +    }
-> > +}
-> > +
->
-> Doesn't this conflict with qdev.c's idebus_unrealize call?
+Thanks to Alex for helping me debug the issue.
 
+CC: Alex Bennée <alex.bennee@linaro.org>
+CC: Richard Henderson <rth@twiddle.net>
+CC: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+---
+ cpu-exec.c    | 2 ++
+ cpus-common.c | 2 +-
+ cpus.c        | 4 ----
+ 3 files changed, 3 insertions(+), 5 deletions(-)
 
-As far as I can see, No conflict. Let's get a confirmation.
-
-Hello Paolo,
-
-Does this patch have any conflict/affect with the qdev?
-
-Thanks.
-
-
-
-> >  static IDEDMA ide_dma_nop = {
-> >      .ops = &ide_dma_nop_ops,
-> >      .aiocb = NULL,
-> > @@ -2603,6 +2610,20 @@ void ide_init2(IDEBus *bus, qemu_irq irq)
-> >      bus->dma = &ide_dma_nop;
-> >  }
-> >
-> > +void ide_exit(IDEBus *bus)
-> > +{
-> > +    int i;
-> > +
-> > +    for (i = 0; i < 2; i++) {
-> > +        IDEState *s = &bus->ifs[i];
-> > +
-> > +        timer_del(s->sector_write_timer);
-> > +        timer_free(s->sector_write_timer);
-> > +        qemu_vfree(s->smart_selftest_data);
-> > +        qemu_vfree(s->io_buffer);
-> > +    }
-> > +}
-> > +
-> >  static const MemoryRegionPortio ide_portio_list[] = {
-> >      { 0, 8, 1, .read = ide_ioport_read, .write = ide_ioport_write },
-> >      { 0, 1, 2, .read = ide_data_readw, .write = ide_data_writew },
-> > diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
-> > index 88dc118..09b0404 100644
-> > --- a/include/hw/ide/internal.h
-> > +++ b/include/hw/ide/internal.h
-> > @@ -607,8 +607,10 @@ int ide_init_drive(IDEState *s, BlockBackend *blk,
-> IDEDriveKind kind,
-> >                     uint32_t cylinders, uint32_t heads, uint32_t secs,
-> >                     int chs_trans);
-> >  void ide_init2(IDEBus *bus, qemu_irq irq);
-> > +void ide_exit(IDEBus *bus);
-> >  void ide_init_ioport(IDEBus *bus, ISADevice *isa, int iobase, int
-> iobase2);
-> >  void ide_register_restart_cb(IDEBus *bus);
-> > +void ide_unregister_restart_cb(IDEBus *bus);
-> >
-> >  void ide_exec_cmd(IDEBus *bus, uint32_t val);
-> >
-> >
->
+diff --git a/cpu-exec.c b/cpu-exec.c
+index b0ddada8c1..dceacfc5dd 100644
+--- a/cpu-exec.c
++++ b/cpu-exec.c
+@@ -427,6 +427,8 @@ static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
+             *ret = cpu->exception_index;
+             if (*ret == EXCP_DEBUG) {
+                 cpu_handle_debug_exception(cpu);
++            } else if (*ret == EXCP_ATOMIC) {
++                cpu_exec_step_atomic(cpu);
+             }
+             cpu->exception_index = -1;
+             return true;
+diff --git a/cpus-common.c b/cpus-common.c
+index 59f751ecf9..7b859752ea 100644
+--- a/cpus-common.c
++++ b/cpus-common.c
+@@ -192,7 +192,7 @@ void start_exclusive(void)
+     smp_mb();
+     running_cpus = 0;
+     CPU_FOREACH(other_cpu) {
+-        if (atomic_read(&other_cpu->running)) {
++        if (atomic_read(&other_cpu->running) && !qemu_cpu_is_self(other_cpu)) {
+             other_cpu->has_waiter = true;
+             running_cpus++;
+             qemu_cpu_kick(other_cpu);
+diff --git a/cpus.c b/cpus.c
+index e1b82bcd49..981f23d52b 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1461,10 +1461,6 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+                  */
+                 g_assert(cpu->halted);
+                 break;
+-            case EXCP_ATOMIC:
+-                qemu_mutex_unlock_iothread();
+-                cpu_exec_step_atomic(cpu);
+-                qemu_mutex_lock_iothread();
+             default:
+                 /* Ignore everything else? */
+                 break;
+-- 
+2.11.0
