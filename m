@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ccCkd-000657-Th
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:04:44 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ccCkd-000659-UP
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:04:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ccCkZ-0002Cf-Rm
+	(envelope-from <alex.bennee@linaro.org>) id 1ccCkb-0002DK-Km
 	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:04:43 -0500
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:38115)
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:33558)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ccCkZ-0002CT-LH
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:04:39 -0500
-Received: by mail-wm0-x231.google.com with SMTP id r141so50795663wmg.1
-	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 07:04:39 -0800 (PST)
+	id 1ccCkb-0002D6-Ei
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:04:41 -0500
+Received: by mail-wm0-x229.google.com with SMTP id t18so65257538wmt.0
+	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 07:04:41 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 10 Feb 2017 15:04:51 +0000
-Message-Id: <20170210150452.21550-2-alex.bennee@linaro.org>
+Date: Fri, 10 Feb 2017 15:04:52 +0000
+Message-Id: <20170210150452.21550-3-alex.bennee@linaro.org>
 In-Reply-To: <20170210150452.21550-1-alex.bennee@linaro.org>
 References: <20170210150452.21550-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 1/2] .travis.yml: don't specify CONFIG twice
+Subject: [Qemu-devel] [PULL 2/2] .travis.yml: split VM based builds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,24 +32,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
+The Trusty based builds run a little slower than the main container
+based ones. This is also true for the latest version of Clang. The
+builds are getting very close (and occasionally run over) the 50 minute
+timeout. Rather than partitioning by target I just split them into
+linux-user and system builds.
+
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- .travis.yml | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ .travis.yml | 38 ++++++++++++++++++++++++++++++++++----
+ 1 file changed, 34 insertions(+), 4 deletions(-)
 
 diff --git a/.travis.yml b/.travis.yml
-index d83e2d493b..3dc1e6439d 100644
+index 3dc1e6439d..9008a796f0 100644
 --- a/.travis.yml
 +++ b/.travis.yml
-@@ -104,8 +104,7 @@ matrix:
-         - wget -O - http://people.linaro.org/~alex.bennee/qemu-submodule-git-seed.tar.xz | tar -xvJ
-         - git submodule update --init --recursive
-     # Trusty build with latest stable clang
+@@ -92,8 +92,19 @@ matrix:
+     - env: CONFIG=""
+       os: osx
+       compiler: clang
+-    # Plain Trusty Build
 -    - env: CONFIG=""
--      sudo: required
-+    - sudo: required
++    # Plain Trusty System Build
++    - env: CONFIG="--disable-linux-user"
++      sudo: required
++      addons:
++      dist: trusty
++      compiler: gcc
++      before_install:
++        - sudo apt-get update -qq
++        - sudo apt-get build-dep -qq qemu
++        - wget -O - http://people.linaro.org/~alex.bennee/qemu-submodule-git-seed.tar.xz | tar -xvJ
++        - git submodule update --init --recursive
++    # Plain Trusty Linux User Build
++    - env: CONFIG="--disable-system"
+       sudo: required
        addons:
        dist: trusty
-       language: generic
+@@ -103,7 +114,26 @@ matrix:
+         - sudo apt-get build-dep -qq qemu
+         - wget -O - http://people.linaro.org/~alex.bennee/qemu-submodule-git-seed.tar.xz | tar -xvJ
+         - git submodule update --init --recursive
+-    # Trusty build with latest stable clang
++    # Trusty System build with latest stable clang
++    - sudo: required
++      addons:
++      dist: trusty
++      language: generic
++      compiler: none
++      env:
++        - COMPILER_NAME=clang CXX=clang++-3.9 CC=clang-3.9
++        - CONFIG="--disable-linux-user --cc=clang-3.9 --cxx=clang++-3.9"
++      before_install:
++        - wget -nv -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
++        - sudo apt-add-repository -y 'deb http://llvm.org/apt/trusty llvm-toolchain-trusty-3.9 main'
++        - sudo apt-get update -qq
++        - sudo apt-get install -qq -y clang-3.9
++        - sudo apt-get build-dep -qq qemu
++        - wget -O - http://people.linaro.org/~alex.bennee/qemu-submodule-git-seed.tar.xz | tar -xvJ
++        - git submodule update --init --recursive
++      before_script:
++        - ./configure ${CONFIG} || cat config.log
++    # Trusty Linux User build with latest stable clang
+     - sudo: required
+       addons:
+       dist: trusty
+@@ -111,7 +141,7 @@ matrix:
+       compiler: none
+       env:
+         - COMPILER_NAME=clang CXX=clang++-3.9 CC=clang-3.9
+-        - CONFIG="--cc=clang-3.9 --cxx=clang++-3.9"
++        - CONFIG="--disable-system --cc=clang-3.9 --cxx=clang++-3.9"
+       before_install:
+         - wget -nv -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
+         - sudo apt-add-repository -y 'deb http://llvm.org/apt/trusty llvm-toolchain-trusty-3.9 main'
 -- 
 2.11.0
