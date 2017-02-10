@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ccB0Z-0006GZ-4d
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 08:13:07 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ccBLr-0004qm-9t
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 08:35:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ccB0Y-0000XS-0t
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 08:13:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44726)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ccB0X-0000XI-Qu
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 08:13:01 -0500
-References: <20170210014519.12413-1-bobby.prani@gmail.com>
-	<871sv6xmzk.fsf@linaro.org>
-	<0ec07664-fa06-8f09-33ce-ca15448c7851@redhat.com>
-	<87y3xew7hn.fsf@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3f702266-1ac2-57c5-e0f8-3dec07b450d2@redhat.com>
-Date: Fri, 10 Feb 2017 14:12:58 +0100
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ccBLq-0006q4-6c
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 08:35:03 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170210092724.6470-1-lvivier@redhat.com>
+	<20170210092724.6470-2-lvivier@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <cc618750-13dd-f673-05c6-a8b9fc45c058@amsat.org>
+Date: Fri, 10 Feb 2017 10:34:45 -0300
 MIME-Version: 1.0
-In-Reply-To: <87y3xew7hn.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tcg: handle EXCP_ATOMIC exception properly
+In-Reply-To: <20170210092724.6470-2-lvivier@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/3] mac99: replace debug printf with trace
+ points
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,25 +28,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: Pranith Kumar <bobby.prani@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "open list:Overall" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
 
+On 02/10/2017 06:27 AM, Laurent Vivier wrote:
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-On 10/02/2017 13:33, Alex Benn=C3=A9e wrote:
-> That said for TCG system emulation EXCP_ATOMIC is currently broken with
-> respect to debugging. However for the initial guests/host combination o=
-f
-> ARMv7/8 on x86_64 we don't need the fallback with pretty much 99% of
-> deployed hosts. How about the following:
->=20
->   - drop Pranith's patch for the current MTTCG series
->   - replace with an error/abort on EXCP_ATOMIC
-
-Don't even replace it? :)
-
-Paolo
-
->   - proceed with merge as plan
->   - tackle the BQL lock next (along with more MTTCG guest/targets enabl=
-ement)
+> ---
+>  hw/ppc/mac_newworld.c | 15 +++------------
+>  hw/ppc/trace-events   |  4 ++++
+>  2 files changed, 7 insertions(+), 12 deletions(-)
+>
+> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+> index 2bfdb64..3702dd1 100644
+> --- a/hw/ppc/mac_newworld.c
+> +++ b/hw/ppc/mac_newworld.c
+> @@ -72,6 +72,7 @@
+>  #include "exec/address-spaces.h"
+>  #include "hw/sysbus.h"
+>  #include "qemu/cutils.h"
+> +#include "trace.h"
+>
+>  #define MAX_IDE_BUS 2
+>  #define CFG_ADDR 0xf0000510
+> @@ -79,21 +80,11 @@
+>  #define CLOCKFREQ (266UL * 1000UL * 1000UL)
+>  #define BUSFREQ (100UL * 1000UL * 1000UL)
+>
+> -/* debug UniNorth */
+> -//#define DEBUG_UNIN
+> -
+> -#ifdef DEBUG_UNIN
+> -#define UNIN_DPRINTF(fmt, ...)                                  \
+> -    do { printf("UNIN: " fmt , ## __VA_ARGS__); } while (0)
+> -#else
+> -#define UNIN_DPRINTF(fmt, ...)
+> -#endif
+> -
+>  /* UniN device */
+>  static void unin_write(void *opaque, hwaddr addr, uint64_t value,
+>                         unsigned size)
+>  {
+> -    UNIN_DPRINTF("write addr " TARGET_FMT_plx " val %"PRIx64"\n", addr, value);
+> +    trace_mac99_uninorth_write(addr, value);
+>      if (addr == 0x0) {
+>          *(int*)opaque = value;
+>      }
+> @@ -109,7 +100,7 @@ static uint64_t unin_read(void *opaque, hwaddr addr, unsigned size)
+>          value = *(int*)opaque;
+>      }
+>
+> -    UNIN_DPRINTF("readl addr " TARGET_FMT_plx " val %x\n", addr, value);
+> +    trace_mac99_uninorth_read(addr, value);
+>
+>      return value;
+>  }
+> diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
+> index f46995c..6122a12 100644
+> --- a/hw/ppc/trace-events
+> +++ b/hw/ppc/trace-events
+> @@ -85,3 +85,7 @@ rs6000mc_presence_read(uint32_t addr, uint32_t val) "read addr=%x val=%x"
+>  rs6000mc_size_read(uint32_t addr, uint32_t val) "read addr=%x val=%x"
+>  rs6000mc_size_write(uint32_t addr, uint32_t val) "write addr=%x val=%x"
+>  rs6000mc_parity_read(uint32_t addr, uint32_t val) "read addr=%x val=%x"
+> +
+> +# hw/ppc/mac_newworld.c
+> +mac99_uninorth_write(uint64_t addr, uint64_t value) "addr=0x%" PRIx64 " val=0x%"PRIx64
+> +mac99_uninorth_read(uint64_t addr, uint64_t value) "addr=0x%" PRIx64 " val=0x%"PRIx64
+>
