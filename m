@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1ccGCM-0004Ak-J6
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:45:35 -0500
+	(envelope-from <jsnow@redhat.com>) id 1ccGDa-0005W6-4u
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:46:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1ccGCI-0004ph-Ic
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:45:34 -0500
-Received: from mail-yw0-x242.google.com ([2607:f8b0:4002:c05::242]:36104)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1ccGCI-0004pO-E8
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:45:30 -0500
-Received: by mail-yw0-x242.google.com with SMTP id q71so3159902ywg.3
-	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 10:45:30 -0800 (PST)
-From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Fri, 10 Feb 2017 13:45:25 -0500
-Message-Id: <20170210184525.10966-3-bobby.prani@gmail.com>
-In-Reply-To: <20170210184525.10966-1-bobby.prani@gmail.com>
-References: <20170210184525.10966-1-bobby.prani@gmail.com>
+	(envelope-from <jsnow@redhat.com>) id 1ccGDX-0005Ss-3R
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:46:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60808)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1ccGDW-0005SG-T8
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:46:47 -0500
+References: <20170210164825.9241-1-jsnow@redhat.com>
+	<CAFEAcA9KV77e=fFkopiw9jC-ZVgKADQUC5=f8KGWOVcAU0cU3w@mail.gmail.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <345b5ebd-6c7b-8234-c4bd-fb4c7ff0d0ec@redhat.com>
+Date: Fri, 10 Feb 2017 13:46:45 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 2/2] tcg: Set jmp_env for exceptions from
- atomic execution
+In-Reply-To: <CAFEAcA9KV77e=fFkopiw9jC-ZVgKADQUC5=f8KGWOVcAU0cU3w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 0/1] Ide patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +27,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "open list:Overall" <qemu-devel@nongnu.org>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Ladi Prosek <lprosek@redhat.com>
 
-The current method of executing atomic code in a guest uses
-cpu_exec_step_atomic() from the outermost loop. This causes an abort()
-when single stepping over atomic code since debug exception longjmp
-will point to the the setlongjmp in cpu_exec(). Properly set jmp_env
-so that it jumps back here on an exception.
 
-CC: Alex Bennée <alex.bennee@linaro.org>
-CC: Richard Henderson <rth@twiddle.net>
-CC: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
----
- cpu-exec.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/cpu-exec.c b/cpu-exec.c
-index 9200c643c2..e61f5747c8 100644
---- a/cpu-exec.c
-+++ b/cpu-exec.c
-@@ -242,9 +242,12 @@ static void cpu_exec_step(CPUState *cpu)
-     tb_unlock();
- 
-     cc->cpu_exec_enter(cpu);
--    /* execute the generated code */
--    trace_exec_tb_nocache(tb, pc);
--    cpu_tb_exec(cpu, tb);
-+
-+    if (sigsetjmp(cpu->jmp_env, 0) == 0) {
-+        /* execute the generated code */
-+        trace_exec_tb_nocache(tb, pc);
-+        cpu_tb_exec(cpu, tb);
-+    }
- 
-     cc->cpu_exec_exit(cpu);
-     tb_lock();
--- 
-2.11.0
+On 02/10/2017 12:49 PM, Peter Maydell wrote:
+> On 10 February 2017 at 16:48, John Snow <jsnow@redhat.com> wrote:
+>> The following changes since commit 61eedf7aec0e2395aabd628cc055096909a3ea15:
+>>
+>>   tests/prom-env: Ease time-out problems on slow hosts (2017-02-10 15:44:53 +0000)
+>>
+>> are available in the git repository at:
+>>
+>>   https://github.com/jnsnow/qemu.git tags/ide-pull-request
+>>
+>> for you to fetch changes up to 98cb5dccb192b0082626080890dac413473573c6:
+>>
+>>   ahci: advertise HOST_CAP_64 (2017-02-10 11:47:11 -0500)
+>>
+>> ----------------------------------------------------------------
+>>
+>> ----------------------------------------------------------------
+> 
+> gpg: Signature made Fri 10 Feb 2017 16:47:54 GMT
+> gpg:                using RSA key 0x7DEF8106AAFC390E
+> gpg: Good signature from "John Snow (John Huston) <jsnow@redhat.com>"
+> gpg: Note: This key has expired!
+> Primary key fingerprint: FAEB 9711 A12C F475 812F  18F2 88A9 064D 1835 61EB
+>      Subkey fingerprint: F9B7 ABDB BCAC DF95 BE76  CBD0 7DEF 8106 AAFC 390E
+> 
+> ...?
+> 
+> thanks
+> -- PMM
+> 
+
+[Discussed on IRC, but for the benefit of list archives;]
+
+My key expired after the holidays, but I've redone the expiry and
+re-pushed to public keyservers. Please refresh from the public keys list
+and let me know if you have further problems.
+
+Thanks,
+--John
