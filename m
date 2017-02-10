@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cc3iv-00064b-4k
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 00:26:22 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1cc3ix-000673-KQ
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 00:26:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cc3iu-0001Ur-4Y
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 00:26:21 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1cc3iw-0001W5-O9
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 00:26:23 -0500
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Fri, 10 Feb 2017 16:25:50 +1100
-Message-Id: <1486704360-27361-1-git-send-email-sjitindarsingh@gmail.com>
-Subject: [Qemu-devel] [QEMU-PPC] [PATCH V2 00/10] target/ppc: Implement
- POWER9 pseries tcg
+Date: Fri, 10 Feb 2017 16:25:52 +1100
+Message-Id: <1486704360-27361-3-git-send-email-sjitindarsingh@gmail.com>
+In-Reply-To: <1486704360-27361-1-git-send-email-sjitindarsingh@gmail.com>
+References: <1486704360-27361-1-git-send-email-sjitindarsingh@gmail.com>
+Subject: [Qemu-devel] [QEMU-PPC] [PATCH V2 02/10] target/ppc: Fix LPCR DPFD
+ mask define
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,66 +23,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org
 Cc: david@gibson.dropbear.id.au, agraf@suse.de, qemu-devel@nongnu.org, sam.bobroff@au1.ibm.com, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-This is V2 of the patch series to implement tcg emulation support for a
-POWER9 cpu model for the pseries machine type running a legacy kernel.
-That is a kernel which doesn't use the new radix mmu mode or the new hash
-mmu mode with segment tables.
+The DPFD field in the LPCR is 3 bits wide. This has always been defined
+as 0x3 << shift which indicates a 2 bit field, which is incorrect.
+Correct this.
 
-To use a POWER9 cpu provide the command line option "-cpu POWER9".
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+---
+ target/ppc/cpu.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This series attempts to avoid precluding KVM-HV support for the POWER9
-cpu model but doesn't attempt to support KVM-PR or the powernv machine
-for the POWER9 cpu model as these aren't currently supported or
-implemented and further code changes will be required in the event these
-are implemented.
-
-This series will be followed shortly by one to implement radix support and
-currently trying to boot a kernel with support for radix with this series
-will fail on the H_REGISTER_PROCESS_TABLE hcall.
-
-The changes from V1 are as follows:
-
- - Drop patches which have already been merged.
- - Instead of allocating a whole partition table we allocate a single
-   entry in the sPAPRMachineState and access it via the virtual hypv.
- - Changes to how we handle SDR1 and renaming of associated functions.
- - Drop patch to use the new pte format, guest kernels expect the old
-   format anyway, so this will only be applicable when POWER9 powernv
-   support is added, so delay adding support for this until then.
- - Rename the mmu fault handler to ppc64_v3_handle_mmu_fault.
- - Move segment table searching into the fault handler instead of in
-   slb_lookup().
- - Move adding the POWER9 pseries cpu model to the end of the series.
-
-Suraj Jitindar Singh (10):
-  target/ppc/POWER9: Add ISAv3.00 MMU definition
-  target/ppc: Fix LPCR DPFD mask define
-  target/ppc/POWER9: Adapt LPCR handling for POWER9
-  target/ppc/POWER9: Direct all instr and data storage interrupts to the
-    hypv
-  target/ppc: Add patb_entry to sPAPRMachineState
-  target/ppc: Don't use SDR1 when running under a POWER9 cpu model
-  target/ppc/POWER9: Add POWER9 mmu fault handler
-  target/ppc/POWER9: Add POWER9 pa-features definition
-  target/ppc/POWER9: Add cpu_has_work function for POWER9
-  hw/ppc/spapr: Add POWER9 to pseries cpu models
-
- hw/ppc/spapr.c              | 37 ++++++++++++++++++
- hw/ppc/spapr_cpu_core.c     |  3 ++
- include/hw/ppc/spapr.h      |  1 +
- target/ppc/cpu-qom.h        |  5 ++-
- target/ppc/cpu.h            | 24 +++++++++++-
- target/ppc/kvm.c            |  2 +-
- target/ppc/machine.c        |  4 +-
- target/ppc/misc_helper.c    |  3 +-
- target/ppc/mmu-hash64.c     | 49 +++++++++++++++++++++---
- target/ppc/mmu-hash64.h     |  2 +-
- target/ppc/mmu.h            | 50 +++++++++++++++++++++++++
- target/ppc/mmu_helper.c     | 54 +++++++++++++++++++++++++--
- target/ppc/translate.c      |  7 +++-
- target/ppc/translate_init.c | 91 +++++++++++++++++++++++++++++++++++++++------
- 14 files changed, 302 insertions(+), 30 deletions(-)
- create mode 100644 target/ppc/mmu.h
-
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index bc2a2ce..bb96dd5 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -381,7 +381,7 @@ struct ppc_slb_t {
+ #define LPCR_ISL          (1ull << (63 - 2))
+ #define LPCR_KBV          (1ull << (63 - 3))
+ #define LPCR_DPFD_SHIFT   (63 - 11)
+-#define LPCR_DPFD         (0x3ull << LPCR_DPFD_SHIFT)
++#define LPCR_DPFD         (0x7ull << LPCR_DPFD_SHIFT)
+ #define LPCR_VRMASD_SHIFT (63 - 16)
+ #define LPCR_VRMASD       (0x1full << LPCR_VRMASD_SHIFT)
+ #define LPCR_RMLS_SHIFT   (63 - 37)
 -- 
 2.5.5
