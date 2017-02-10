@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cc9mI-00076i-Ow
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 06:54:17 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cc9tJ-0001K3-Lp
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:01:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cc9mD-000847-UU
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 06:54:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35488)
+	(envelope-from <pbonzini@redhat.com>) id 1cc9tF-0001Py-RB
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:01:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47932)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cc9mD-00083v-Ly
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 06:54:09 -0500
-Date: Fri, 10 Feb 2017 11:54:04 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170210115403.GA3567@work-vm>
-References: <20170203152321.19739-1-pbutsykin@virtuozzo.com>
-	<20170203152321.19739-2-pbutsykin@virtuozzo.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cc9tF-0001Pg-LZ
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:01:25 -0500
+References: <589C099A.9090605@huawei.com>
+	<AF60004D-7133-44D1-8A9F-7DB9822D84AF@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA1B4379@DGGEMA505-MBX.china.huawei.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <105e5774-38c3-0683-ca08-64f6ed53c643@redhat.com>
+Date: Fri, 10 Feb 2017 13:01:22 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170203152321.19739-2-pbutsykin@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] migration: add MigrationState arg
- for ram_save_/compressed_/page()
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA1B4379@DGGEMA505-MBX.china.huawei.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Help] Windows2012 as Guest 64+cores on KVM Halts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, armbru@redhat.com, amit.shah@redhat.com, den@openvz.org
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, Yan Vugenfirer <yvugenfi@redhat.com>, Hangaohuai <hangaohuai@huawei.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Radim Krcmar <rkrcmar@redhat.com>, "vrozenfe@redhat.com" <vrozenfe@redhat.com>
 
-* Pavel Butsykin (pbutsykin@virtuozzo.com) wrote:
-> Cosmetic patch. The use of ms variable instead of migrate_get_current()
-> looks nicer, especially when there reuse.
-> 
-> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-> ---
->  migration/ram.c | 15 ++++++++-------
->  1 file changed, 8 insertions(+), 7 deletions(-)
+On 10/02/2017 10:31, Gonglei (Arei) wrote:
+> But We tested the same cases on Xen platform and VMware, and
+> the guest booted successfully.
+
+Were these two also tested with enlightenments enabled?  TCG surely isn't.
+
+Paolo
+
+> Today I also tested on tcg, the guest also boots successfully.
 > 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index a683f4bb9e..d866b6518b 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -734,13 +734,14 @@ static int save_zero_page(QEMUFile *f, RAMBlock *block, ram_addr_t offset,
->   *          >=0 - Number of pages written - this might legally be 0
->   *                if xbzrle noticed the page was the same.
->   *
-> + * @ms: The current migration state.
->   * @f: QEMUFile where to send the data
->   * @block: block that contains the page we want to send
->   * @offset: offset inside the block for the page
->   * @last_stage: if we are at the completion stage
->   * @bytes_transferred: increase it with the number of transferred bytes
->   */
-> -static int ram_save_page(QEMUFile *f, PageSearchStatus *pss,
-> +static int ram_save_page(MigrationState *ms, QEMUFile *f, PageSearchStatus *pss,
->                           bool last_stage, uint64_t *bytes_transferred)
->  {
->      int pages = -1;
-> @@ -786,8 +787,7 @@ static int ram_save_page(QEMUFile *f, PageSearchStatus *pss,
->               */
->              xbzrle_cache_zero_page(current_addr);
->          } else if (!ram_bulk_stage &&
-> -                   !migration_in_postcopy(migrate_get_current()) &&
-> -                   migrate_use_xbzrle()) {
-> +                   !migration_in_postcopy(ms) && migrate_use_xbzrle()) {
->              pages = save_xbzrle_page(f, &p, current_addr, block,
->                                       offset, last_stage, bytes_transferred);
->              if (!last_stage) {
-> @@ -914,14 +914,15 @@ static int compress_page_with_multi_thread(QEMUFile *f, RAMBlock *block,
->   *
->   * Returns: Number of pages written.
->   *
-> + * @ms: The current migration state.
->   * @f: QEMUFile where to send the data
->   * @block: block that contains the page we want to send
->   * @offset: offset inside the block for the page
->   * @last_stage: if we are at the completion stage
->   * @bytes_transferred: increase it with the number of transferred bytes
->   */
-> -static int ram_save_compressed_page(QEMUFile *f, PageSearchStatus *pss,
-> -                                    bool last_stage,
-> +static int ram_save_compressed_page(MigrationState *ms, QEMUFile *f,
-> +                                    PageSearchStatus *pss, bool last_stage,
->                                      uint64_t *bytes_transferred)
->  {
->      int pages = -1;
-> @@ -1252,11 +1253,11 @@ static int ram_save_target_page(MigrationState *ms, QEMUFile *f,
->      if (migration_bitmap_clear_dirty(dirty_ram_abs)) {
->          unsigned long *unsentmap;
->          if (compression_switch && migrate_use_compression()) {
-> -            res = ram_save_compressed_page(f, pss,
-> +            res = ram_save_compressed_page(ms, f, pss,
->                                             last_stage,
->                                             bytes_transferred);
->          } else {
-> -            res = ram_save_page(f, pss, last_stage,
-> +            res = ram_save_page(ms, f, pss, last_stage,
->                                  bytes_transferred);
->          }
->  
-> -- 
-> 2.11.0
+> BTW, if we disable hyper-v, there isn't problem on boot for the case.
 > 
+> QEMU command line (enable hyper-v with hv_relaxed):
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> # ./qemu-system-x86_64 -name win2012 -machine accel=kvm,usb=off -cpu qemu64,hv_relaxed -m 4001 -realtime mlock=off -smp 68,sockets=1,cores=68,threads=1 \
+> -drive file=/mnt/sdb/gonglei/win2012_r2_dc_64_raw,if=none,id=drive-ide0-0-0 -device ide-hd,bus=ide.0,unit=0,drive=drive-ide0-0-0,id=ide0-0-0,bootindex=1 \
+> -boot menu=on -device piix3-usb-uhci,id=uhci -chardev file,id=seabios,path=/home/seabios.log -device isa-debugcon,iobase=0x402,chardev=seabios \
+> -monitor stdio -device cirrus-vga,id=video0,vgamem_mb=16 -vnc 0.0.0.0:10
+> 
+> So, I think it's possible a KVM bug on Hyper-V enlightenments support. 
+> 
+> Any help will be appreciated!
+> 
+> CC'ing Paolo, Radim and Vadim.
