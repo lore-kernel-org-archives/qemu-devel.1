@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45135)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ccFKj-0002jr-JE
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 12:50:10 -0500
+	(envelope-from <thuth@redhat.com>) id 1ccFLg-0003Dt-Hy
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 12:51:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ccFKi-0001jV-S9
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 12:50:09 -0500
-Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:33535)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ccFKi-0001i2-KV
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 12:50:08 -0500
-Received: by mail-wr0-x229.google.com with SMTP id i10so113495142wrb.0
-	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 09:50:08 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1ccFLc-0002Cu-J7
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 12:51:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53508)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ccFLc-0002CN-Cp
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 12:51:04 -0500
+References: <10f23e13-dfdc-bbb1-2b31-e698d722a984@redhat.com>
+	<8b4be5a0-7b07-dbc4-a899-f6b2192d5e5d@redhat.com>
+	<CACXAS8CYXY=QgDCt9EYXBKzsrLwWq3HxFmXd5yXZrALZrBJDgw@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <70befbdc-ab71-0261-3015-8b73dbbaf2cb@redhat.com>
+Date: Fri, 10 Feb 2017 18:51:00 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170210164825.9241-1-jsnow@redhat.com>
-References: <20170210164825.9241-1-jsnow@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 10 Feb 2017 17:49:46 +0000
-Message-ID: <CAFEAcA9KV77e=fFkopiw9jC-ZVgKADQUC5=f8KGWOVcAU0cU3w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 0/1] Ide patches
+In-Reply-To: <CACXAS8CYXY=QgDCt9EYXBKzsrLwWq3HxFmXd5yXZrALZrBJDgw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Sparc sun4v machine currently broken?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <rth@twiddle.net>
 
-On 10 February 2017 at 16:48, John Snow <jsnow@redhat.com> wrote:
-> The following changes since commit 61eedf7aec0e2395aabd628cc055096909a3ea15:
->
->   tests/prom-env: Ease time-out problems on slow hosts (2017-02-10 15:44:53 +0000)
->
-> are available in the git repository at:
->
->   https://github.com/jnsnow/qemu.git tags/ide-pull-request
->
-> for you to fetch changes up to 98cb5dccb192b0082626080890dac413473573c6:
->
->   ahci: advertise HOST_CAP_64 (2017-02-10 11:47:11 -0500)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
+On 10.02.2017 18:43, Artyom Tarasenko wrote:
+> On Fri, Feb 10, 2017 at 6:29 PM, Thomas Huth <thuth@redhat.com> wrote:
+>> On 10.02.2017 14:49, Thomas Huth wrote:
+>>>  Hi,
+>>>
+>>> is it just me, or could it be that the sun4v machine is currently broken?
+>>> I get the following error when I try to run QEMU with this machine:
+>>>
+>>> qemu-system-sparc64 -nographic -M sun4v
+>>> qemu: fatal: Trap 0x0010 while trap level (6) >= MAXTL (6), Error state
+[...]
+>>> It works for when I use an older version of QEMU (version 2.7)...
+>>
+>> FWIW, it's also still working when I use QEMU 2.8, so this must be a
+>> recent regression...
+> 
+> Oh. This is surprising. Sun4v practically wasn't implemented before my
+> niagara series.
+> So, OpenBIOS worked because -M sun4v was like -M sun4u with some sun4v
+> instructions.
+> Now sun4v is closer to a real sun4v - it has sun4v MMU, so OpenBIOS is
+> not compatible with it anymore.
+> The proper fix would be adding sun4v support to OpenBIOS, but it may
+> take some time.
 
-gpg: Signature made Fri 10 Feb 2017 16:47:54 GMT
-gpg:                using RSA key 0x7DEF8106AAFC390E
-gpg: Good signature from "John Snow (John Huston) <jsnow@redhat.com>"
-gpg: Note: This key has expired!
-Primary key fingerprint: FAEB 9711 A12C F475 812F  18F2 88A9 064D 1835 61EB
-     Subkey fingerprint: F9B7 ABDB BCAC DF95 BE76  CBD0 7DEF 8106 AAFC 390E
+Ah, ok, thanks for the explanation! I was considering to finally enable
+the prom-env-test for sparc64 (since the 32-bit TCG problem was solved
+at one point in time, IIRC) when I ran into this problem. So I guess I
+should only enable it for the sun4u machine initially...
 
-...?
-
-thanks
--- PMM
+ Thomas
