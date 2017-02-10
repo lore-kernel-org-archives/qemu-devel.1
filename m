@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ccCge-0002ad-3u
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:00:37 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ccCjF-00052G-RR
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:03:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ccCgd-0000pC-CJ
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:00:36 -0500
-Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:35471)
+	(envelope-from <peter.maydell@linaro.org>) id 1ccCjF-0001en-0o
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:03:17 -0500
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:35999)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ccCgc-0000ow-Tg
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:00:35 -0500
-Received: by mail-wr0-x233.google.com with SMTP id 89so109880512wrr.2
-	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 07:00:34 -0800 (PST)
+	id 1ccCjE-0001e5-RZ
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:03:16 -0500
+Received: by mail-wm0-x22f.google.com with SMTP id c85so262592535wmi.1
+	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 07:03:16 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1486504171-26807-1-git-send-email-wei@redhat.com>
-References: <1486504171-26807-1-git-send-email-wei@redhat.com>
+In-Reply-To: <1486644810-33181-1-git-send-email-agraf@suse.de>
+References: <1486644810-33181-1-git-send-email-agraf@suse.de>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 10 Feb 2017 15:00:13 +0000
-Message-ID: <CAFEAcA8+3+ZwOeA0cNXF_BRs-kivTye5bj7pcRsDAsJ4S1HwTg@mail.gmail.com>
+Date: Fri, 10 Feb 2017 15:02:54 +0000
+Message-ID: <CAFEAcA-m+gKBg69xBSe4NTVkEhpdBKMDT-6+qECh=ARH6v9fyw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH V3 0/4] Add vPMU vPMU support under TCG mode
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 0/4] target-arm: Add some
+ omitted dma cache coherency flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +29,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Huang <wei@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Alexander Graf <agraf@suse.de>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, Laszlo Ersek <lersek@redhat.com>, Shannon Zhao <shannon.zhao@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 7 February 2017 at 21:49, Wei Huang <wei@redhat.com> wrote:
-> QEMU has implemented cycle count support for guest VM under TCG mode.
-> But this feature is not complete. In fact using perf inside a
-> 64-bit Linux guest VM (under TCG) can cause the following kernel panic
-> because some PMU registers are not implemented.
+On 9 February 2017 at 12:53, Alexander Graf <agraf@suse.de> wrote:
+> ARM is amazing when it comes to cache coherency and VMs. While any sane
+> architecture allows the host to override the guest's caching attributes,
+> that's very hard to do on ARM.
 >
-> [  329.445970] [<fffffe000009e600>] armv8pmu_enable_event+0x58/0x8c
-> [  329.446713] [<fffffe0000621e74>] armpmu_start+0x4c/0x74
+> That means that the guest may directly access guest memory bypassing the
+> cache while QEMU happily writes to / reads from cache. The end result is
+> very nasty, because both sides see very different views of the world.
 >
-> This patchset solves the problem by adding support for missing vPMU
-> registers. Basic perf test can work (both ACPI and DT) now under TCG
-> by applying this patchset.
+> That means that we need to be very cautious to tell guests that devices
+> that QEMU emulates are going to use data in the cache rather than directly
+> on memory.
 >
-> address@hidden ~]# perf stat ls
->  Performance counter stats for 'ls':
+> We added this to PCI a while back for DT (5d636e21 "hw/arm/virt: mark the PCIe
+> host controller as DMA coherent in the DT") and ACPI (bc64b96 "hw/arm/virt-
+> acpi-build: _CCA attribute is compulsory") but never updated virtio-mmio or
+> fw-cfg in DT or ACPI tables.
 >
->         226.740256      task-clock (msec)         #    0.312 CPUs utilized
->                 76      context-switches          #    0.335 K/sec
->                  0      cpu-migrations            #    0.000 K/sec
->                 64      page-faults               #    0.282 K/sec
->        186,031,410      cycles                    #    0.820 GHz      (36.40%)
->    <not supported>      stalled-cycles-frontend
->    <not supported>      stalled-cycles-backend
->      <not counted>      instructions               (0.00%)
->    <not supported>      branches
->      <not counted>      branch-misses              (0.00%)
+> This patch set adds the respective cache coherency flags for them in both DT and
+> ACPI.
 >
-> V2->V3:
->  * Remove PMXEVCNTR_EL0 support
->  * Add read access support for PMXEVTYPER and change the CONSTRAINED
->    UNPREDICTABLE behavior of PMXEVTYPER to RAZ/WI.
+> Fortunately, no guests except for Linux 4.9.7 and 4.9.8 are broken because of
+> this. Upstream realized quickly enough that every user of virtio-mmio out there
+> describes its cache coherency incorrectly and reverted the patch that would
+> require said dma coherency flag. But we should be safe for the future and "do
+> the right thing".
 >
-> V1->V2:
->   * Change most PMU registers to 64bit and the behavior of PMXEVTYPER
->   * Add support for PMXEVCNTR_EL0
->   * Misc fixes (DT, ID_AA64DFR0_EL1, ...) under TCG mod
+> Alexander Graf (4):
+>   target-arm: Declare virtio-mmio as dma-coherent in dt
+>   hw/arm/virt: Declare virtio-mmio as dma cache coherent in ACPI
+>   hw/arm/virt: Declare fwcfg as dma cache coherent in ACPI
+>   hw/arm/virt: Declare fwcfg as dma cache coherent in dt
+>
+>  hw/arm/vexpress.c        | 1 +
+>  hw/arm/virt-acpi-build.c | 2 ++
+>  hw/arm/virt.c            | 2 ++
+>  3 files changed, 5 insertions(+)
 
-Applied to target-arm.next, thanks.
+The patches in this series have more lines of Reviewed-by: tags than
+they do actual code changes :-)
+
+Thanks, applied to target-arm.next.
 
 -- PMM
