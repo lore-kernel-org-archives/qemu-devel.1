@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38197)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ccAL1-0005tp-AY
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:30:08 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ccAO4-0008Bb-V1
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:33:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ccAKy-0001Z5-69
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:30:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52340)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ccAKx-0001XX-Pv
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:30:04 -0500
-Date: Fri, 10 Feb 2017 12:29:58 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170210122958.GD3567@work-vm>
-References: <20170203152321.19739-1-pbutsykin@virtuozzo.com>
-	<20170203152321.19739-4-pbutsykin@virtuozzo.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1ccAO1-0003Bx-Sa
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:33:17 -0500
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:35972)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ccAO1-0003BU-LQ
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:33:13 -0500
+Received: by mail-wm0-x233.google.com with SMTP id c85so258822838wmi.1
+	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 04:33:13 -0800 (PST)
+References: <20170210014519.12413-1-bobby.prani@gmail.com>
+	<871sv6xmzk.fsf@linaro.org>
+	<0ec07664-fa06-8f09-33ce-ca15448c7851@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <0ec07664-fa06-8f09-33ce-ca15448c7851@redhat.com>
+Date: Fri, 10 Feb 2017 12:33:24 +0000
+Message-ID: <87y3xew7hn.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170203152321.19739-4-pbutsykin@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] migration: discard non-dirty ram
- pages after the start of postcopy
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] tcg: handle EXCP_ATOMIC exception properly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,84 +31,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, armbru@redhat.com, den@openvz.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Pranith Kumar <bobby.prani@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "open list:Overall" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
 
-* Pavel Butsykin (pbutsykin@virtuozzo.com) wrote:
-> After the start of postcopy migration there are some non-dirty pages which have
-> already been migrated. These pages are no longer needed on the source vm so that
-> we can free them and it doen't hurt to complete the migration.
-> 
-> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-> ---
->  include/migration/migration.h |  1 +
->  migration/migration.c         |  4 ++++
->  migration/ram.c               | 19 +++++++++++++++++++
->  3 files changed, 24 insertions(+)
-> 
-> diff --git a/include/migration/migration.h b/include/migration/migration.h
-> index 401fbe1f77..3a5f8c469e 100644
-> --- a/include/migration/migration.h
-> +++ b/include/migration/migration.h
-> @@ -288,6 +288,7 @@ int ram_postcopy_send_discard_bitmap(MigrationState *ms);
->  int ram_discard_range(MigrationIncomingState *mis, const char *block_name,
->                        uint64_t start, size_t length);
->  int ram_postcopy_incoming_init(MigrationIncomingState *mis);
-> +void ram_postcopy_migrated_memory_release(MigrationState *ms);
->  
->  /**
->   * @migrate_add_blocker - prevent migration from proceeding
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 8d5a5f8a6e..a9aa6a0f8b 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1713,6 +1713,10 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
->       */
->      qemu_savevm_send_ping(ms->to_dst_file, 4);
->  
-> +    if (migrate_release_ram()) {
-> +        ram_postcopy_migrated_memory_release(ms);
-> +    }
-> +
->      ret = qemu_file_get_error(ms->to_dst_file);
->      if (ret) {
->          error_report("postcopy_start: Migration stream errored");
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 5a43f716d1..ae1f10b145 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -1562,6 +1562,25 @@ void ram_debug_dump_bitmap(unsigned long *todump, bool expected)
->  
->  /* **** functions for postcopy ***** */
->  
-> +void ram_postcopy_migrated_memory_release(MigrationState *ms)
-> +{
-> +    struct RAMBlock *block;
-> +    unsigned long *bitmap = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
-> +
-> +    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +        unsigned long first = block->offset >> TARGET_PAGE_BITS;
-> +        unsigned long range = first + (block->used_length >> TARGET_PAGE_BITS);
-> +        unsigned long run_start = find_next_zero_bit(bitmap, range, first);
-> +
-> +        while (run_start < range) {
-> +            unsigned long run_end = find_next_bit(bitmap, range, run_start + 1);
-> +            ram_discard_range(NULL, block->idstr, run_start << TARGET_PAGE_BITS,
-> +                              (run_end - run_start) << TARGET_PAGE_BITS);
-> +            run_start = find_next_zero_bit(bitmap, range, run_end + 1);
-> +        }
-> +    }
-> +}
-> +
->  /*
->   * Callback from postcopy_each_ram_send_discard for each RAMBlock
->   * Note: At this point the 'unsentmap' is the processed bitmap combined
-> -- 
-> 2.11.0
-> 
-> 
+> On 10/02/2017 13:13, Alex Bennée wrote:
+>>> +        if (atomic_read(&other_cpu->running) &&
+>>> !qemu_cpu_is_self(other_cpu)) {
+>> The comment above reads:
+>>
+>>   Must only be called from outside cpu_exec.
+>>
+>> So we need to revise this comment. Is this really a limitation or was it
+>> originally the design goal?
+>
+> If you want to call it within cpu_exec, you can always use
+> cpu_exec_end/start around it.
+>
+> I think we should first of all get rid of the iothread lock within
+> cpu_exec, and then look at this patch again.
+
+What to do with the MTTCG series in the meantime?
+
+I'm hesitant to hold up the whole series for a potentially messy
+re-factor of the cpu loop code to push out the BQL which could take some
+time, although of course I don't want to merge something that makes that
+harder.
+
+That said for TCG system emulation EXCP_ATOMIC is currently broken with
+respect to debugging. However for the initial guests/host combination of
+ARMv7/8 on x86_64 we don't need the fallback with pretty much 99% of
+deployed hosts. How about the following:
+
+  - drop Pranith's patch for the current MTTCG series
+  - replace with an error/abort on EXCP_ATOMIC
+  - proceed with merge as plan
+  - tackle the BQL lock next (along with more MTTCG guest/targets enablement)
+
+Richard/Peter,
+
+Any thoughts/opinions on this?
+
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Alex Bennée
