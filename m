@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44885)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cc46l-0008IX-Kz
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 00:51:00 -0500
+	(envelope-from <vapier@gentoo.org>) id 1cc4RJ-0006UI-14
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 01:12:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cc46i-0001yc-GK
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 00:50:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44406)
+	(envelope-from <vapier@gentoo.org>) id 1cc4RF-0008Gy-TK
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 01:12:12 -0500
+Received: from smtp.gentoo.org ([140.211.166.183]:58606)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cc46i-0001xw-A4
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 00:50:56 -0500
-Date: Fri, 10 Feb 2017 13:50:50 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170210055050.GF22153@pxdev.xzpeter.org>
-References: <1486456099-7345-1-git-send-email-peterx@redhat.com>
-	<1486456099-7345-3-git-send-email-peterx@redhat.com>
-	<20170210011222.GA19188@umbus>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170210011222.GA19188@umbus>
-Subject: Re: [Qemu-devel] [PATCH v7 02/17] vfio: introduce vfio_get_vaddr()
+	(Exim 4.71) (envelope-from <vapier@gentoo.org>) id 1cc4RF-0008Gl-Mi
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 01:12:09 -0500
+From: Mike Frysinger <vapier@gentoo.org>
+Date: Fri, 10 Feb 2017 01:12:00 -0500
+Message-Id: <20170210061200.15373-1-vapier@gentoo.org>
+Subject: [Qemu-devel] [PATCH] osdep.h: pull in sys/sysmacros.h for
+ major/minor/makedev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +22,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
+To: qemu-devel@nongnu.org
 
-On Fri, Feb 10, 2017 at 12:12:22PM +1100, David Gibson wrote:
-> On Tue, Feb 07, 2017 at 04:28:04PM +0800, Peter Xu wrote:
-> > A cleanup for vfio_iommu_map_notify(). Now we will fetch vaddr even if
-> > the operation is unmap, but it won't hurt much.
-> > 
-> > One thing to mention is that we need the RCU read lock to protect the
-> > whole translation and map/unmap procedure.
-> > 
-> > Acked-by: Alex Williamson <alex.williamson@redhat.com>
-> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> 
-> So, I know I reviewed this already, but looking again I'm confused.
-> 
-> I'm not sure how the original code ever worked: if this is an unmap
-> (perm == IOMMU_NONE), then I wouldn't even expect
-> iotlb->translated_addr to have a valid value, but we're passing it to
-> address_space_translate() and failing if it it doesn't give us
-> sensible results.
+Linux C libs are moving away from implicit header pollution with
+sys/types.h
 
-Hmm, right.
+Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+---
+ include/qemu/osdep.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Looks like it is just because we have accidentally inited
-iotlb->translated_addr in all the callers of
-memory_region_notify_iommu (one is put_tce_emu(), the other one is
-rpcit_service_call()). If so, patch 3 (maybe, along with this one)
-would be more essential imho to make sure we don't have such an
-assumption.
-
-Thanks,
-
--- peterx
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 56c9e22405ec..6aaace6cf37f 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -85,6 +85,10 @@ extern int daemon(int, int);
+ #include <setjmp.h>
+ #include <signal.h>
+ 
++#ifdef __linux__
++#include <sys/sysmacros.h>
++#endif
++
+ #ifdef __OpenBSD__
+ #include <sys/signal.h>
+ #endif
+-- 
+2.11.0
