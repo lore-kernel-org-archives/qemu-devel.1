@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cc3iv-00064Z-3m
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 00:26:21 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1cc3iv-00064b-4k
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 00:26:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cc3iu-0001Ud-2V
+	(envelope-from <sjitindarsingh@gmail.com>) id 1cc3iu-0001Ur-4Y
 	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 00:26:21 -0500
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Fri, 10 Feb 2017 16:25:51 +1100
-Message-Id: <1486704360-27361-2-git-send-email-sjitindarsingh@gmail.com>
-In-Reply-To: <1486704360-27361-1-git-send-email-sjitindarsingh@gmail.com>
-References: <1486704360-27361-1-git-send-email-sjitindarsingh@gmail.com>
-Subject: [Qemu-devel] [QEMU-PPC] [PATCH V2 01/10] target/ppc/POWER9: Add
- ISAv3.00 MMU definition
+Date: Fri, 10 Feb 2017 16:25:50 +1100
+Message-Id: <1486704360-27361-1-git-send-email-sjitindarsingh@gmail.com>
+Subject: [Qemu-devel] [QEMU-PPC] [PATCH V2 00/10] target/ppc: Implement
+ POWER9 pseries tcg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,70 +21,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org
 Cc: david@gibson.dropbear.id.au, agraf@suse.de, qemu-devel@nongnu.org, sam.bobroff@au1.ibm.com, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-POWER9 processors implement the mmu as defined in version 3.00 of the ISA.
+This is V2 of the patch series to implement tcg emulation support for a
+POWER9 cpu model for the pseries machine type running a legacy kernel.
+That is a kernel which doesn't use the new radix mmu mode or the new hash
+mmu mode with segment tables.
 
-Add a definition for this mmu model and set the POWER9 cpu model to use
-this mmu model.
+To use a POWER9 cpu provide the command line option "-cpu POWER9".
 
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
----
- target/ppc/cpu-qom.h        | 5 ++++-
- target/ppc/mmu_helper.c     | 2 ++
- target/ppc/translate_init.c | 3 +--
- 3 files changed, 7 insertions(+), 3 deletions(-)
+This series attempts to avoid precluding KVM-HV support for the POWER9
+cpu model but doesn't attempt to support KVM-PR or the powernv machine
+for the POWER9 cpu model as these aren't currently supported or
+implemented and further code changes will be required in the event these
+are implemented.
 
-diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-index b7977ba..4e3132b 100644
---- a/target/ppc/cpu-qom.h
-+++ b/target/ppc/cpu-qom.h
-@@ -86,10 +86,13 @@ enum powerpc_mmu_t {
-     POWERPC_MMU_2_07       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
-                              | POWERPC_MMU_64K
-                              | POWERPC_MMU_AMR | 0x00000004,
--    /* FIXME Add POWERPC_MMU_3_OO defines */
-     /* Architecture 2.07 "degraded" (no 1T segments)           */
-     POWERPC_MMU_2_07a      = POWERPC_MMU_64 | POWERPC_MMU_AMR
-                              | 0x00000004,
-+    /* Architecture 3.00 variant                               */
-+    POWERPC_MMU_3_00       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
-+                             | POWERPC_MMU_64K
-+                             | POWERPC_MMU_AMR | 0x00000005,
- };
- 
- /*****************************************************************************/
-diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
-index f746f53..172a305 100644
---- a/target/ppc/mmu_helper.c
-+++ b/target/ppc/mmu_helper.c
-@@ -1935,6 +1935,7 @@ void ppc_tlb_invalidate_all(CPUPPCState *env)
-     case POWERPC_MMU_2_06a:
-     case POWERPC_MMU_2_07:
-     case POWERPC_MMU_2_07a:
-+    case POWERPC_MMU_3_00:
- #endif /* defined(TARGET_PPC64) */
-         env->tlb_need_flush = 0;
-         tlb_flush(CPU(cpu));
-@@ -1974,6 +1975,7 @@ void ppc_tlb_invalidate_one(CPUPPCState *env, target_ulong addr)
-     case POWERPC_MMU_2_06a:
-     case POWERPC_MMU_2_07:
-     case POWERPC_MMU_2_07a:
-+    case POWERPC_MMU_3_00:
-         /* tlbie invalidate TLBs for all segments */
-         /* XXX: given the fact that there are too many segments to invalidate,
-          *      and we still don't have a tlb_flush_mask(env, n, mask) in QEMU,
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 76f79fa..84bf125 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -8816,8 +8816,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
-                     (1ull << MSR_PMM) |
-                     (1ull << MSR_RI) |
-                     (1ull << MSR_LE);
--    /* Using 2.07 defines until new radix model is added. */
--    pcc->mmu_model = POWERPC_MMU_2_07;
-+    pcc->mmu_model = POWERPC_MMU_3_00;
- #if defined(CONFIG_SOFTMMU)
-     pcc->handle_mmu_fault = ppc_hash64_handle_mmu_fault;
-     /* segment page size remain the same */
+This series will be followed shortly by one to implement radix support and
+currently trying to boot a kernel with support for radix with this series
+will fail on the H_REGISTER_PROCESS_TABLE hcall.
+
+The changes from V1 are as follows:
+
+ - Drop patches which have already been merged.
+ - Instead of allocating a whole partition table we allocate a single
+   entry in the sPAPRMachineState and access it via the virtual hypv.
+ - Changes to how we handle SDR1 and renaming of associated functions.
+ - Drop patch to use the new pte format, guest kernels expect the old
+   format anyway, so this will only be applicable when POWER9 powernv
+   support is added, so delay adding support for this until then.
+ - Rename the mmu fault handler to ppc64_v3_handle_mmu_fault.
+ - Move segment table searching into the fault handler instead of in
+   slb_lookup().
+ - Move adding the POWER9 pseries cpu model to the end of the series.
+
+Suraj Jitindar Singh (10):
+  target/ppc/POWER9: Add ISAv3.00 MMU definition
+  target/ppc: Fix LPCR DPFD mask define
+  target/ppc/POWER9: Adapt LPCR handling for POWER9
+  target/ppc/POWER9: Direct all instr and data storage interrupts to the
+    hypv
+  target/ppc: Add patb_entry to sPAPRMachineState
+  target/ppc: Don't use SDR1 when running under a POWER9 cpu model
+  target/ppc/POWER9: Add POWER9 mmu fault handler
+  target/ppc/POWER9: Add POWER9 pa-features definition
+  target/ppc/POWER9: Add cpu_has_work function for POWER9
+  hw/ppc/spapr: Add POWER9 to pseries cpu models
+
+ hw/ppc/spapr.c              | 37 ++++++++++++++++++
+ hw/ppc/spapr_cpu_core.c     |  3 ++
+ include/hw/ppc/spapr.h      |  1 +
+ target/ppc/cpu-qom.h        |  5 ++-
+ target/ppc/cpu.h            | 24 +++++++++++-
+ target/ppc/kvm.c            |  2 +-
+ target/ppc/machine.c        |  4 +-
+ target/ppc/misc_helper.c    |  3 +-
+ target/ppc/mmu-hash64.c     | 49 +++++++++++++++++++++---
+ target/ppc/mmu-hash64.h     |  2 +-
+ target/ppc/mmu.h            | 50 +++++++++++++++++++++++++
+ target/ppc/mmu_helper.c     | 54 +++++++++++++++++++++++++--
+ target/ppc/translate.c      |  7 +++-
+ target/ppc/translate_init.c | 91 +++++++++++++++++++++++++++++++++++++++------
+ 14 files changed, 302 insertions(+), 30 deletions(-)
+ create mode 100644 target/ppc/mmu.h
+
 -- 
 2.5.5
