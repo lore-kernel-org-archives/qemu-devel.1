@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44834)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashmit602@gmail.com>) id 1cbz3O-00072U-IA
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 19:27:11 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cbzF7-0002Ji-6s
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 19:39:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashmit602@gmail.com>) id 1cbz3N-0000iC-4v
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 19:27:10 -0500
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:36385)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ashmit602@gmail.com>) id 1cbz3M-0000i0-Vq
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 19:27:09 -0500
-Received: by mail-io0-x244.google.com with SMTP id q20so4455682ioi.3
-	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 16:27:08 -0800 (PST)
+	(envelope-from <dgibson@ozlabs.org>) id 1cbzF6-000651-49
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 19:39:17 -0500
+Date: Fri, 10 Feb 2017 11:10:35 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170210001035.GJ27610@umbus.fritz.box>
+References: <1486636445-24109-1-git-send-email-nikunj@linux.vnet.ibm.com>
+	<1486636445-24109-6-git-send-email-nikunj@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <CAAo6VWP3O+CUfd4JQ+oBvnvut9+w6Es7TgQFxb74fJ3aSr0Whg@mail.gmail.com>
-References: <1486617814-5420-1-git-send-email-Ashish.Mittal@veritas.com>
-	<20170209062928.GI27752@localhost.localdomain>
-	<CAAo6VWNGtLvbN4ktxRQ9SsobNCgJWcaa_zvdA-9q2Pp3YK27gg@mail.gmail.com>
-	<20170209143208.GL27752@localhost.localdomain>
-	<CAAo6VWMn4ZTuVh=C-Er9Cer2b2edfH2mrowbN4H_atWp7pf3TQ@mail.gmail.com>
-	<20170209165025.GO30111@localhost.localdomain>
-	<CAAo6VWNactZLt93rSSMtVJPAGQpr6E1od-+700VdJ=wY32V5Og@mail.gmail.com>
-	<CAAo6VWP3O+CUfd4JQ+oBvnvut9+w6Es7TgQFxb74fJ3aSr0Whg@mail.gmail.com>
-From: ashish mittal <ashmit602@gmail.com>
-Date: Thu, 9 Feb 2017 16:27:07 -0800
-Message-ID: <CAAo6VWNVfHcwODL+vbeSvxSK7yOJ-hz3O-zYG7n4O6GRPAEJtw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
- block device type called "vxhs"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="GlnCQLZWzqLRJED8"
+Content-Disposition: inline
+In-Reply-To: <1486636445-24109-6-git-send-email-nikunj@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 5/6] target-ppc: support for 32-bit carry
+ and overflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,77 +25,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <ashish.mittal@veritas.com>, Stefan Hajnoczi <stefanha@gmail.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Cc: qemu-ppc@nongnu.org, rth@twiddle.net, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
-On Thu, Feb 9, 2017 at 10:45 AM, ashish mittal <ashmit602@gmail.com> wrote:
-> On Thu, Feb 9, 2017 at 10:08 AM, ashish mittal <ashmit602@gmail.com> wrote:
->> On Thu, Feb 9, 2017 at 8:50 AM, Jeff Cody <jcody@redhat.com> wrote:
->>> On Thu, Feb 09, 2017 at 08:14:38AM -0800, ashish mittal wrote:
->>>> On Thu, Feb 9, 2017 at 6:32 AM, Jeff Cody <jcody@redhat.com> wrote:
->>>> > On Thu, Feb 09, 2017 at 01:24:58AM -0800, ashish mittal wrote:
->>>> >> On Wed, Feb 8, 2017 at 10:29 PM, Jeff Cody <jcody@redhat.com> wrote:
->>>> >> > On Wed, Feb 08, 2017 at 09:23:33PM -0800, Ashish Mittal wrote:
->>>> >> >> From: Ashish Mittal <ashish.mittal@veritas.com>
->>>> >> >>
->>>> >> >> Source code for the qnio library that this code loads can be downloaded from:
->>>> >> >> https://github.com/VeritasHyperScale/libqnio.git
->>>> >> >>
->>>> >> >> Sample command line using JSON syntax:
->>>> >> >> ./x86_64-softmmu/qemu-system-x86_64 -name instance-00000008 -S -vnc 0.0.0.0:0
->>>> >> >> -k en-us -vga cirrus -device virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x5
->>>> >> >> -msg timestamp=on
->>>> >> >> 'json:{"driver":"vxhs","vdisk-id":"c3e9095a-a5ee-4dce-afeb-2a59fb387410",
->>>> >> >> "server":{"host":"172.172.17.4","port":"9999"}}'
->>>> >> >>
->>>> >> >> Sample command line using URI syntax:
->>>> >> >> qemu-img convert -f raw -O raw -n
->>>> >> >> /var/lib/nova/instances/_base/0c5eacd5ebea5ed914b6a3e7b18f1ce734c386ad
->>>> >> >> vxhs://192.168.0.1:9999/c6718f6b-0401-441d-a8c3-1f0064d75ee0
->>>> >> >>
->>>> >> >
->>>> >> > I don't know if I am using the qnio_server test server correctly or not, but
->>>> >> > when I run qemu-io from the command line I get an i/o error.  When I run the
->>>> >> > qemu-iotests, I get a segfault.
->>>> >> >
->>>> >> > Were you able to run qemu-iotests with these patches?
->>>> >> >
->>>> >> > Here is how I am invoking qnio_server:
->>>> >> >
->>>> >> > # qnio_server  -d /home/jcody/work/redhat/upstream/qemu-kvm/tests/qemu-iotests/scratch -v
->>>> >> >
->>>> >> >
->>>> >>
->>>> >> I ran full qemu-iotests and qemu-io manually with the test server on
->>>> >> version 7 patches. Ran qemu-io manually with the test server on
->>>> >> version 8, but the libvxhs code is undergoing a lot of checkins. Will
->>>> >> test again tomorrow and get back.
->>>> >>
->>>> >
->>>> > Does my invocation above look correct, for running the qemu-iotests?
->>>>
->>>> qemu-iotest starts the server internally. The server does not have to
->>>> be started explicitly before running qemu-iotest. The server must not
->>>> be running before you begin the test  because then the tests would
->>>> find port 9999 busy.
->>>> Running make install on libvxhs copies the test server to the location
->>>> where the qemu-iotests expect to find it.
->>>
->>>
->>> OK, thanks.  I tried that too, and I also tried against the branch
->>> "ashish_securify_changes" for libqnio.  I still have qemu-iotests giving me
->>> a segfault.
->>>
->>>
->>
->> Qemu patch v7 and v8 do not have many changes. I did successfully run
->> iotests with v7 and libqnio master. I'm guessing there could be
->> something in the 'securify' library branch that's causing this. I will
->> rebuild and retest.
->
-> Confirmed that there is a problem and qemu-iotest is segfaulting. Will
-> get back with a fix.
 
-Checked in some changes to libqnio. Could you please try it again with
-the latest 'securify' branch?
-Thanks!
+--GlnCQLZWzqLRJED8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Feb 09, 2017 at 04:04:04PM +0530, Nikunj A Dadhania wrote:
+> POWER ISA 3.0 adds CA32 and OV32 status in 64-bit mode. Add the flags
+> and corresponding defines. Moreover, CA32 is set when CA is set and
+> OV32 is set when OV is set, there is no need to have a new
+> fields in the CPUPPCState structure.
+>=20
+> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+
+Um.. I don't quite understand this.  If CA always has the same value
+as CA32, what's the point?
+
+> ---
+>  target/ppc/cpu.h       | 26 ++++++++++++++++++++++++++
+>  target/ppc/translate.c |  6 ++++++
+>  2 files changed, 32 insertions(+)
+>=20
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index bc2a2ce..181919b 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1354,11 +1354,15 @@ int ppc_compat_max_threads(PowerPCCPU *cpu);
+>  #define XER_SO  31
+>  #define XER_OV  30
+>  #define XER_CA  29
+> +#define XER_OV32  19
+> +#define XER_CA32  18
+>  #define XER_CMP  8
+>  #define XER_BC   0
+>  #define xer_so  (env->so)
+>  #define xer_ov  (env->ov)
+>  #define xer_ca  (env->ca)
+> +#define xer_ov32  (env->ov)
+> +#define xer_ca32  (env->ca)
+>  #define xer_cmp ((env->xer >> XER_CMP) & 0xFF)
+>  #define xer_bc  ((env->xer >> XER_BC)  & 0x7F)
+> =20
+> @@ -2325,11 +2329,21 @@ enum {
+> =20
+>  /***********************************************************************=
+******/
+> =20
+> +#ifndef TARGET_PPC64
+>  static inline target_ulong cpu_read_xer(CPUPPCState *env)
+>  {
+>      return env->xer | (env->so << XER_SO) | (env->ov << XER_OV) | (env->=
+ca << XER_CA);
+>  }
+> +#else
+> +static inline target_ulong cpu_read_xer(CPUPPCState *env)
+> +{
+> +    return env->xer | (env->so << XER_SO) |
+> +        (env->ov << XER_OV) | (env->ca << XER_CA) |
+> +        (env->ov << XER_OV32) | (env->ca << XER_CA32);
+> +}
+> +#endif
+> =20
+> +#ifndef TARGET_PPC64
+>  static inline void cpu_write_xer(CPUPPCState *env, target_ulong xer)
+>  {
+>      env->so =3D (xer >> XER_SO) & 1;
+> @@ -2337,6 +2351,18 @@ static inline void cpu_write_xer(CPUPPCState *env,=
+ target_ulong xer)
+>      env->ca =3D (xer >> XER_CA) & 1;
+>      env->xer =3D xer & ~((1u << XER_SO) | (1u << XER_OV) | (1u << XER_CA=
+));
+>  }
+> +#else
+> +static inline void cpu_write_xer(CPUPPCState *env, target_ulong xer)
+> +{
+> +    env->so =3D (xer >> XER_SO) & 1;
+> +    env->ov =3D ((xer >> XER_OV) & 1) | ((xer >> XER_OV32) & 1);
+> +    env->ca =3D ((xer >> XER_CA) & 1) | ((xer >> XER_CA32) & 1);
+> +    env->xer =3D xer & ~((1ul << XER_SO) |
+> +                       (1ul << XER_OV) | (1ul << XER_CA) |
+> +                       (1ul << XER_OV32) | (1ul << XER_CA32));
+> +}
+> +#endif
+> +
+> =20
+>  static inline void cpu_get_tb_cpu_state(CPUPPCState *env, target_ulong *=
+pc,
+>                                          target_ulong *cs_base, uint32_t =
+*flags)
+> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> index 3ba2616..724ad17 100644
+> --- a/target/ppc/translate.c
+> +++ b/target/ppc/translate.c
+> @@ -3715,6 +3715,12 @@ static void gen_read_xer(TCGv dst)
+>      tcg_gen_or_tl(t0, t0, t1);
+>      tcg_gen_or_tl(dst, dst, t2);
+>      tcg_gen_or_tl(dst, dst, t0);
+> +#ifdef TARGET_PPC64
+> +    tcg_gen_shli_tl(t0, cpu_ov, XER_OV32);
+> +    tcg_gen_or_tl(dst, dst, t0);
+> +    tcg_gen_shli_tl(t0, cpu_ca, XER_CA32);
+> +    tcg_gen_or_tl(dst, dst, t0);
+> +#endif
+>      tcg_temp_free(t0);
+>      tcg_temp_free(t1);
+>      tcg_temp_free(t2);
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--GlnCQLZWzqLRJED8
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYnQT4AAoJEGw4ysog2bOS2kkP/0tVK3CztNUrnpt5LB6zyioq
+phkAxMstFYwM/69J7q/DcXquKqrILgRAEHLCSMtu+efCAe3x+ljdLPcMXxeGM4IB
+peWitoVCUelqtf3xjsuGVeKz0r431jbTPmx8215tgRDRZtf1bpP35GWVcdHD18bH
+gNlE0yfQAWoRV2C9GmBJRWcV4MHkuaHn/EQr2RBSIntNmU3LWMIaFhtKPsVdCIy2
+J5WvnhbfVHWi4HC0/EoBfBJFqTYJ6ihGj7FVYf6u2zIBYv713t36u8K1r9Hcrt9C
+GKlQBxF3UIj+NiELOgwCSN/PyN5v3He/d42EEIj2M+hd54/KCIVE3FagSTySwJgm
+m/aLrroIiW7SkElP21fqxnNcNRzJx5VUUXiVLhnzgMA+O3RndsheDH0O/Z1gNmuH
+I5tPvFfA656/Mb85s/6RM3sw7vhX2ufz7ZOqBIZgiUfXA2vbwmTcZC688BtevY4M
+2bibrrecm5qk46azvTNLZ3O7qP9ilE+0uv4DpazTpQZvlWiEwLY4q8D0ENXLF5lM
+0uI9Ci6lgt0eKToXSNlU3CX4ScWs81m/ZSptFji0C/MgI0Loy16NFeFklef0iZQJ
+tf3XhYJCCsnseGzHrSndc26NB9pPlcByxZ5pps5ERgSCwIzsjZGY+xKDHRD5FqRI
+Uya556SlvAXz0p0ikyPZ
+=zkHF
+-----END PGP SIGNATURE-----
+
+--GlnCQLZWzqLRJED8--
