@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34726)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ccA9U-0007iY-Vs
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:18:13 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ccADi-0000XC-Qk
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:22:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ccA9R-0006FX-Qt
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:18:12 -0500
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:35222)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ccA9R-0006EZ-IK
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:18:09 -0500
-Received: by mail-wm0-x233.google.com with SMTP id v186so108499863wmd.0
-	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 04:18:09 -0800 (PST)
-References: <20170210014519.12413-1-bobby.prani@gmail.com>
-	<52c93dcc-2577-e81f-867c-6159c1f61e91@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <52c93dcc-2577-e81f-867c-6159c1f61e91@redhat.com>
-Date: Fri, 10 Feb 2017 12:18:21 +0000
-Message-ID: <87zihuw86q.fsf@linaro.org>
+	(envelope-from <dgilbert@redhat.com>) id 1ccADf-00078j-Hh
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:22:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49912)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ccADf-00078d-8l
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 07:22:31 -0500
+Date: Fri, 10 Feb 2017 12:22:26 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170210122225.GB3567@work-vm>
+References: <20170203152321.19739-1-pbutsykin@virtuozzo.com>
+	<20170203152321.19739-3-pbutsykin@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] tcg: handle EXCP_ATOMIC exception properly
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170203152321.19739-3-pbutsykin@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] add 'release-ram' migrate capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,95 +27,295 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Pranith Kumar <bobby.prani@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "open list:Overall" <qemu-devel@nongnu.org>
+To: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, armbru@redhat.com, den@openvz.org
 
+* Pavel Butsykin (pbutsykin@virtuozzo.com) wrote:
+> This feature frees the migrated memory on the source during postcopy-ram
+> migration. In the second step of postcopy-ram migration when the source vm
+> is put on pause we can free unnecessary memory. It will allow, in particular,
+> to start relaxing the memory stress on the source host in a load-balancing
+> scenario.
+> 
+> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-> On 10/02/2017 02:45, Pranith Kumar wrote:
->> The current method of executing atomic code in a guest uses
->> cpu_exec_step_atomic() from the outermost loop. This causes an abort()
->> when single stepping over atomic code since debug exception longjmp
->> will point to the the setlongjmp in cpu_exec(). Another issue with
->> this mechanism is that the flags which were set in atomic execution
->> will be lost since we do not call cpu_exec_enter().
->>
->> The following patch moves atomic exception handling to the exception
->> handler where all these issues are taken care of. The change in
->> start_exclusive() is necessary since now the cpu in atomic execution
->> will have its running flag set, but we do not want to count it as
->> pending.
->>
->> Thanks to Alex for helping me debug the issue.
->>
->> CC: Alex Bennée <alex.bennee@linaro.org>
->> CC: Richard Henderson <rth@twiddle.net>
->> CC: Paolo Bonzini <pbonzini@redhat.com>
->> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
->> ---
->>  cpu-exec.c    | 2 ++
->>  cpus-common.c | 2 +-
->>  cpus.c        | 4 ----
->>  3 files changed, 3 insertions(+), 5 deletions(-)
->>
->> diff --git a/cpu-exec.c b/cpu-exec.c
->> index b0ddada8c1..dceacfc5dd 100644
->> --- a/cpu-exec.c
->> +++ b/cpu-exec.c
->> @@ -427,6 +427,8 @@ static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
->>              *ret = cpu->exception_index;
->>              if (*ret == EXCP_DEBUG) {
->>                  cpu_handle_debug_exception(cpu);
->> +            } else if (*ret == EXCP_ATOMIC) {
->> +                cpu_exec_step_atomic(cpu);
->
-> I think you can unlock/lock the iothread here, and also call
-
-The iothread is already unlocked by this point (see tcg_cpu_exec).
-
-> cpu_exec_end/start to work around the limitation in start_exclusive.
-
-While that seems right it also seems very messy as it inverts the calls
-so far. I fear we may end up very confused in special casing. Is there a
-cleaner way we can unwind this?
-
->
-> Paolo
->
->>              }
->>              cpu->exception_index = -1;
->>              return true;
->> diff --git a/cpus-common.c b/cpus-common.c
->> index 59f751ecf9..7b859752ea 100644
->> --- a/cpus-common.c
->> +++ b/cpus-common.c
->> @@ -192,7 +192,7 @@ void start_exclusive(void)
->>      smp_mb();
->>      running_cpus = 0;
->>      CPU_FOREACH(other_cpu) {
->> -        if (atomic_read(&other_cpu->running)) {
->> +        if (atomic_read(&other_cpu->running) && !qemu_cpu_is_self(other_cpu)) {
->>              other_cpu->has_waiter = true;
->>              running_cpus++;
->>              qemu_cpu_kick(other_cpu);
->> diff --git a/cpus.c b/cpus.c
->> index e1b82bcd49..981f23d52b 100644
->> --- a/cpus.c
->> +++ b/cpus.c
->> @@ -1461,10 +1461,6 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
->>                   */
->>                  g_assert(cpu->halted);
->>                  break;
->> -            case EXCP_ATOMIC:
->> -                qemu_mutex_unlock_iothread();
->> -                cpu_exec_step_atomic(cpu);
->> -                qemu_mutex_lock_iothread();
->>              default:
->>                  /* Ignore everything else? */
->>                  break;
->>
-
-
+> ---
+>  include/migration/migration.h |  1 +
+>  include/migration/qemu-file.h |  3 ++-
+>  migration/migration.c         |  9 +++++++
+>  migration/qemu-file.c         | 59 ++++++++++++++++++++++++++++++++++++++-----
+>  migration/ram.c               | 22 +++++++++++++++-
+>  qapi-schema.json              |  5 +++-
+>  6 files changed, 89 insertions(+), 10 deletions(-)
+> 
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index bd399fc0df..401fbe1f77 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -307,6 +307,7 @@ int migrate_add_blocker(Error *reason, Error **errp);
+>   */
+>  void migrate_del_blocker(Error *reason);
+>  
+> +bool migrate_release_ram(void);
+>  bool migrate_postcopy_ram(void);
+>  bool migrate_zero_blocks(void);
+>  
+> diff --git a/include/migration/qemu-file.h b/include/migration/qemu-file.h
+> index abedd466c9..0cd648a733 100644
+> --- a/include/migration/qemu-file.h
+> +++ b/include/migration/qemu-file.h
+> @@ -132,7 +132,8 @@ void qemu_put_byte(QEMUFile *f, int v);
+>   * put_buffer without copying the buffer.
+>   * The buffer should be available till it is sent asynchronously.
+>   */
+> -void qemu_put_buffer_async(QEMUFile *f, const uint8_t *buf, size_t size);
+> +void qemu_put_buffer_async(QEMUFile *f, const uint8_t *buf, size_t size,
+> +                           bool may_free);
+>  bool qemu_file_mode_is_not_valid(const char *mode);
+>  bool qemu_file_is_writable(QEMUFile *f);
+>  
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 1ae68be0c7..8d5a5f8a6e 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1302,6 +1302,15 @@ void qmp_migrate_set_downtime(double value, Error **errp)
+>      qmp_migrate_set_parameters(&p, errp);
+>  }
+>  
+> +bool migrate_release_ram(void)
+> +{
+> +    MigrationState *s;
+> +
+> +    s = migrate_get_current();
+> +
+> +    return s->enabled_capabilities[MIGRATION_CAPABILITY_RELEASE_RAM];
+> +}
+> +
+>  bool migrate_postcopy_ram(void)
+>  {
+>      MigrationState *s;
+> diff --git a/migration/qemu-file.c b/migration/qemu-file.c
+> index e9fae31158..82dbef3c86 100644
+> --- a/migration/qemu-file.c
+> +++ b/migration/qemu-file.c
+> @@ -49,6 +49,7 @@ struct QEMUFile {
+>      int buf_size; /* 0 when writing */
+>      uint8_t buf[IO_BUF_SIZE];
+>  
+> +    DECLARE_BITMAP(may_free, MAX_IOV_SIZE);
+>      struct iovec iov[MAX_IOV_SIZE];
+>      unsigned int iovcnt;
+>  
+> @@ -132,6 +133,41 @@ bool qemu_file_is_writable(QEMUFile *f)
+>      return f->ops->writev_buffer;
+>  }
+>  
+> +static void qemu_iovec_release_ram(QEMUFile *f)
+> +{
+> +    struct iovec iov;
+> +    unsigned long idx;
+> +
+> +    /* Find and release all the contiguous memory ranges marked as may_free. */
+> +    idx = find_next_bit(f->may_free, f->iovcnt, 0);
+> +    if (idx >= f->iovcnt) {
+> +        return;
+> +    }
+> +    iov = f->iov[idx];
+> +
+> +    /* The madvise() in the loop is called for iov within a continuous range and
+> +     * then reinitialize the iov. And in the end, madvise() is called for the
+> +     * last iov.
+> +     */
+> +    while ((idx = find_next_bit(f->may_free, f->iovcnt, idx + 1)) < f->iovcnt) {
+> +        /* check for adjacent buffer and coalesce them */
+> +        if (iov.iov_base + iov.iov_len == f->iov[idx].iov_base) {
+> +            iov.iov_len += f->iov[idx].iov_len;
+> +            continue;
+> +        }
+> +        if (qemu_madvise(iov.iov_base, iov.iov_len, QEMU_MADV_DONTNEED) < 0) {
+> +            error_report("migrate: madvise DONTNEED failed %p %ld: %s",
+> +                         iov.iov_base, iov.iov_len, strerror(errno));
+> +        }
+> +        iov = f->iov[idx];
+> +    }
+> +    if (qemu_madvise(iov.iov_base, iov.iov_len, QEMU_MADV_DONTNEED) < 0) {
+> +            error_report("migrate: madvise DONTNEED failed %p %ld: %s",
+> +                         iov.iov_base, iov.iov_len, strerror(errno));
+> +    }
+> +    memset(f->may_free, 0, sizeof(f->may_free));
+> +}
+> +
+>  /**
+>   * Flushes QEMUFile buffer
+>   *
+> @@ -151,6 +187,8 @@ void qemu_fflush(QEMUFile *f)
+>      if (f->iovcnt > 0) {
+>          expect = iov_size(f->iov, f->iovcnt);
+>          ret = f->ops->writev_buffer(f->opaque, f->iov, f->iovcnt, f->pos);
+> +
+> +        qemu_iovec_release_ram(f);
+>      }
+>  
+>      if (ret >= 0) {
+> @@ -304,13 +342,19 @@ int qemu_fclose(QEMUFile *f)
+>      return ret;
+>  }
+>  
+> -static void add_to_iovec(QEMUFile *f, const uint8_t *buf, size_t size)
+> +static void add_to_iovec(QEMUFile *f, const uint8_t *buf, size_t size,
+> +                         bool may_free)
+>  {
+>      /* check for adjacent buffer and coalesce them */
+>      if (f->iovcnt > 0 && buf == f->iov[f->iovcnt - 1].iov_base +
+> -        f->iov[f->iovcnt - 1].iov_len) {
+> +        f->iov[f->iovcnt - 1].iov_len &&
+> +        may_free == test_bit(f->iovcnt - 1, f->may_free))
+> +    {
+>          f->iov[f->iovcnt - 1].iov_len += size;
+>      } else {
+> +        if (may_free) {
+> +            set_bit(f->iovcnt, f->may_free);
+> +        }
+>          f->iov[f->iovcnt].iov_base = (uint8_t *)buf;
+>          f->iov[f->iovcnt++].iov_len = size;
+>      }
+> @@ -320,14 +364,15 @@ static void add_to_iovec(QEMUFile *f, const uint8_t *buf, size_t size)
+>      }
+>  }
+>  
+> -void qemu_put_buffer_async(QEMUFile *f, const uint8_t *buf, size_t size)
+> +void qemu_put_buffer_async(QEMUFile *f, const uint8_t *buf, size_t size,
+> +                           bool may_free)
+>  {
+>      if (f->last_error) {
+>          return;
+>      }
+>  
+>      f->bytes_xfer += size;
+> -    add_to_iovec(f, buf, size);
+> +    add_to_iovec(f, buf, size, may_free);
+>  }
+>  
+>  void qemu_put_buffer(QEMUFile *f, const uint8_t *buf, size_t size)
+> @@ -345,7 +390,7 @@ void qemu_put_buffer(QEMUFile *f, const uint8_t *buf, size_t size)
+>          }
+>          memcpy(f->buf + f->buf_index, buf, l);
+>          f->bytes_xfer += l;
+> -        add_to_iovec(f, f->buf + f->buf_index, l);
+> +        add_to_iovec(f, f->buf + f->buf_index, l, false);
+>          f->buf_index += l;
+>          if (f->buf_index == IO_BUF_SIZE) {
+>              qemu_fflush(f);
+> @@ -366,7 +411,7 @@ void qemu_put_byte(QEMUFile *f, int v)
+>  
+>      f->buf[f->buf_index] = v;
+>      f->bytes_xfer++;
+> -    add_to_iovec(f, f->buf + f->buf_index, 1);
+> +    add_to_iovec(f, f->buf + f->buf_index, 1, false);
+>      f->buf_index++;
+>      if (f->buf_index == IO_BUF_SIZE) {
+>          qemu_fflush(f);
+> @@ -647,7 +692,7 @@ ssize_t qemu_put_compression_data(QEMUFile *f, const uint8_t *p, size_t size,
+>      }
+>      qemu_put_be32(f, blen);
+>      if (f->ops->writev_buffer) {
+> -        add_to_iovec(f, f->buf + f->buf_index, blen);
+> +        add_to_iovec(f, f->buf + f->buf_index, blen, false);
+>      }
+>      f->buf_index += blen;
+>      if (f->buf_index == IO_BUF_SIZE) {
+> diff --git a/migration/ram.c b/migration/ram.c
+> index d866b6518b..5a43f716d1 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -726,6 +726,16 @@ static int save_zero_page(QEMUFile *f, RAMBlock *block, ram_addr_t offset,
+>      return pages;
+>  }
+>  
+> +static void ram_release_pages(MigrationState *ms, const char *block_name,
+> +                              uint64_t offset, int pages)
+> +{
+> +    if (!migrate_release_ram() || !migration_in_postcopy(ms)) {
+> +        return;
+> +    }
+> +
+> +    ram_discard_range(NULL, block_name, offset, pages << TARGET_PAGE_BITS);
+> +}
+> +
+>  /**
+>   * ram_save_page: Send the given page to the stream
+>   *
+> @@ -786,6 +796,7 @@ static int ram_save_page(MigrationState *ms, QEMUFile *f, PageSearchStatus *pss,
+>               * page would be stale
+>               */
+>              xbzrle_cache_zero_page(current_addr);
+> +            ram_release_pages(ms, block->idstr, pss->offset, pages);
+>          } else if (!ram_bulk_stage &&
+>                     !migration_in_postcopy(ms) && migrate_use_xbzrle()) {
+>              pages = save_xbzrle_page(f, &p, current_addr, block,
+> @@ -804,7 +815,9 @@ static int ram_save_page(MigrationState *ms, QEMUFile *f, PageSearchStatus *pss,
+>          *bytes_transferred += save_page_header(f, block,
+>                                                 offset | RAM_SAVE_FLAG_PAGE);
+>          if (send_async) {
+> -            qemu_put_buffer_async(f, p, TARGET_PAGE_SIZE);
+> +            qemu_put_buffer_async(f, p, TARGET_PAGE_SIZE,
+> +                                  migrate_release_ram() &
+> +                                  migration_in_postcopy(ms));
+>          } else {
+>              qemu_put_buffer(f, p, TARGET_PAGE_SIZE);
+>          }
+> @@ -834,6 +847,8 @@ static int do_compress_ram_page(QEMUFile *f, RAMBlock *block,
+>          error_report("compressed data failed!");
+>      } else {
+>          bytes_sent += blen;
+> +        ram_release_pages(migrate_get_current(), block->idstr,
+> +                          offset & TARGET_PAGE_MASK, 1);
+>      }
+>  
+>      return bytes_sent;
+> @@ -973,12 +988,17 @@ static int ram_save_compressed_page(MigrationState *ms, QEMUFile *f,
+>                      error_report("compressed data failed!");
+>                  }
+>              }
+> +            if (pages > 0) {
+> +                ram_release_pages(ms, block->idstr, pss->offset, pages);
+> +            }
+>          } else {
+>              offset |= RAM_SAVE_FLAG_CONTINUE;
+>              pages = save_zero_page(f, block, offset, p, bytes_transferred);
+>              if (pages == -1) {
+>                  pages = compress_page_with_multi_thread(f, block, offset,
+>                                                          bytes_transferred);
+> +            } else {
+> +                ram_release_pages(ms, block->idstr, pss->offset, pages);
+>              }
+>          }
+>      }
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 82fabc6e24..e58228d083 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -865,11 +865,14 @@
+>  #        side, this process is called COarse-Grain LOck Stepping (COLO) for
+>  #        Non-stop Service. (since 2.8)
+>  #
+> +# @release-ram: if enabled, qemu will free the migrated ram pages on the source
+> +#        during postcopy-ram migration. (since 2.9)
+> +#
+>  # Since: 1.2
+>  ##
+>  { 'enum': 'MigrationCapability',
+>    'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
+> -           'compress', 'events', 'postcopy-ram', 'x-colo'] }
+> +           'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram'] }
+>  
+>  ##
+>  # @MigrationCapabilityStatus:
+> -- 
+> 2.11.0
+> 
+> 
 --
-Alex Bennée
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
