@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ccF13-0003oO-JD
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 12:30:02 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ccF4K-0006tS-2q
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 12:33:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ccF0v-00010o-MY
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 12:29:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59826)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ccF0v-00010d-F7
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 12:29:41 -0500
-References: <10f23e13-dfdc-bbb1-2b31-e698d722a984@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <8b4be5a0-7b07-dbc4-a899-f6b2192d5e5d@redhat.com>
-Date: Fri, 10 Feb 2017 18:29:38 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1ccF4I-0002hY-Vi
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 12:33:12 -0500
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:38880)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ccF4I-0002hN-PN
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 12:33:10 -0500
+Received: by mail-wm0-x231.google.com with SMTP id r141so54599098wmg.1
+	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 09:33:10 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <10f23e13-dfdc-bbb1-2b31-e698d722a984@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <5d8f2613-4f41-0780-059a-3f5cb4bef83c@vivier.eu>
+References: <20170207183356.17840-1-laurent@vivier.eu>
+	<CAFEAcA_XuEA01Cnsdd7Wq-ueH0zqjcinNasW-wkJ-Us3M_MkRg@mail.gmail.com>
+	<5d8f2613-4f41-0780-059a-3f5cb4bef83c@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 10 Feb 2017 17:32:49 +0000
+Message-ID: <CAFEAcA_G8ns3orbxcPpXGaHvk7z-W7DYfshugYTgsiYiOv98Vg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Sparc sun4v machine currently broken?
+Subject: Re: [Qemu-devel] [PATCH 0/5] risu: add m68k target support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,63 +31,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Artyom Tarasenko <atar4qemu@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <rth@twiddle.net>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-On 10.02.2017 14:49, Thomas Huth wrote:
->  Hi,
->=20
-> is it just me, or could it be that the sun4v machine is currently broke=
-n?
-> I get the following error when I try to run QEMU with this machine:
->=20
-> qemu-system-sparc64 -nographic -M sun4v
-> qemu: fatal: Trap 0x0010 while trap level (6) >=3D MAXTL (6), Error sta=
-te
-> pc: 0000000000000200  npc: 0000000000000204
-> %g0-3: 0000000000000000 0000000000000000 0000000000000000 0000000000000=
-000
-> %g4-7: 0000000000000000 0000000000000000 0000000000000000 0000000000000=
-000
-> %o0-3: 0000000000000000 0000000000000000 0000000000000000 0000000000000=
-000=20
-> %o4-7: 0000000000000000 0000000000000000 0000000000000000 0000000000000=
-000=20
-> %l0-3: 0000000007f00000 000001ff00000000 000001fff0080000 0000000000000=
-000=20
-> %l4-7: 0000000000000000 0000000000000000 0000000000000000 0000000000000=
-000=20
-> %i0-3: 0000000000000000 0000000000000000 0000000000000000 0000000000000=
-000=20
-> %i4-7: 0000000000000000 0000000000000000 0000000000000000 0000000000000=
-000=20
-> %f00:  0000000000000000 0000000000000000 0000000000000000 0000000000000=
-000
-> %f08:  0000000000000000 0000000000000000 0000000000000000 0000000000000=
-000
-> %f16:  0000000000000000 0000000000000000 0000000000000000 0000000000000=
-000
-> %f24:  0000000000000000 0000000000000000 0000000000000000 0000000000000=
-000
-> %f32:  0000000000000000 0000000000000000 0000000000000000 0000000000000=
-000
-> %f40:  0000000000000000 0000000000000000 0000000000000000 0000000000000=
-000
-> %f48:  0000000000000000 0000000000000000 0000000000000000 0000000000000=
-000
-> %f56:  0000000000000000 0000000000000000 0000000000000000 0000000000000=
-000
-> pstate: 00000014 ccr: 44 (icc: -Z-- xcc: -Z--) asi: 00 tl: 6 pil: 0 gl:=
- 8
-> tbr: 0000000000000000 hpstate: 0000000000000004 htba: 0000000000000000
-> cansave: 6 canrestore: 0 otherwin: 0 wstate: 0 cleanwin: 6 cwp: 7
-> fsr: 0000000000000000 y: 0000000000000000 fprs: 0000000000000000
->=20
-> Aborted (core dumped)
->=20
-> It works for when I use an older version of QEMU (version 2.7)...
+On 10 February 2017 at 15:33, Laurent Vivier <laurent@vivier.eu> wrote:
+> Le 10/02/2017 =C3=A0 16:25, Peter Maydell a =C3=A9crit :
+>> Thanks for this; I think patches 1-3 are good, and have
+>> applied them to risu master. For 4 I wonder if we can
+>> find a better way of handling variable-length instruction
+>> sets than !post, and I haven't yet looked at 5.
+>
+> I think it should be possible but I don't know perl well enough to
+> propose a better solution.
 
-FWIW, it's also still working when I use QEMU 2.8, so this must be a
-recent regression...
+Yeah; I'll have a think about it.
 
- Thomas
+I got bored with the repetition between all the CPU backends,
+by the way, so I've created a risugen_common.pm and moved
+a bunch of the identical utility functions too it. (We can
+probably share more, but this seemed like a good start.)
+
+thanks
+-- PMM
