@@ -1,20 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ccHke-0007fg-E2
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 15:25:05 -0500
+	(envelope-from <marcinch7@gmail.com>) id 1ccFaN-0001Ev-KN
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:06:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ccHkc-0006qK-UW
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 15:25:04 -0500
-References: <20170203094018.15493-1-vsementsov@virtuozzo.com>
-	<20170203094018.15493-8-vsementsov@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <b90e3f05-18de-0b39-96ba-3a7012cb9608@redhat.com>
-Date: Fri, 10 Feb 2017 15:24:51 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170203094018.15493-8-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 07/24] qcow2: add bitmaps extension
+	(envelope-from <marcinch7@gmail.com>) id 1ccFaM-0002oc-Ay
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:06:19 -0500
+From: Marcin Chojnacki <marcinch7@gmail.com>
+Date: Fri, 10 Feb 2017 19:06:00 +0100
+Message-Id: <20170210180600.45797-1-marcinch7@gmail.com>
+Subject: [Qemu-devel] [PATCH] target-arm: Implement BCM2835 hardware RNG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,279 +17,243 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: qemu-arm@nongnu.org
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, Marcin Chojnacki <marcinch7@gmail.com>
 
+Recent vanilla Raspberry Pi kernels started to make use of
+the hardware random number generator in BCM2835 SoC. As a
+result, those kernels wouldn't work anymore under QEMU
+but rather just freeze during the boot process.
 
+This patch implements a trivial BCM2835 compatible RNG,
+and adds it as a peripheral to BCM2835 platform, which
+allows to boot a vanilla Raspberry Pi kernel under Qemu.
 
-On 02/03/2017 04:40 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Add bitmap extension as specified in docs/specs/qcow2.txt.
-> For now, just mirror extension header into Qcow2 state and check
-> constraints.
-> 
-> For now, disable image resize if it has bitmaps. It will be fixed later.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/qcow2.c | 127 +++++++++++++++++++++++++++++++++++++++++++++++++++++++---
->  block/qcow2.h |  24 +++++++++++
->  2 files changed, 145 insertions(+), 6 deletions(-)
-> 
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 96fb8a8f16..d263ab1ed7 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -63,6 +63,7 @@ typedef struct {
->  #define  QCOW2_EXT_MAGIC_END 0
->  #define  QCOW2_EXT_MAGIC_BACKING_FORMAT 0xE2792ACA
->  #define  QCOW2_EXT_MAGIC_FEATURE_TABLE 0x6803f857
-> +#define  QCOW2_EXT_MAGIC_BITMAPS 0x23852875
->  
->  static int qcow2_probe(const uint8_t *buf, int buf_size, const char *filename)
->  {
-> @@ -86,12 +87,17 @@ static int qcow2_probe(const uint8_t *buf, int buf_size, const char *filename)
->   */
->  static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
->                                   uint64_t end_offset, void **p_feature_table,
-> -                                 Error **errp)
-> +                                 bool *need_update_header, Error **errp)
->  {
->      BDRVQcow2State *s = bs->opaque;
->      QCowExtension ext;
->      uint64_t offset;
->      int ret;
-> +    Qcow2BitmapHeaderExt bitmaps_ext;
-> +
-> +    if (need_update_header != NULL) {
-> +        *need_update_header = false;
-> +    }
->  
->  #ifdef DEBUG_EXT
->      printf("qcow2_read_extensions: start=%ld end=%ld\n", start_offset, end_offset);
-> @@ -162,6 +168,85 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
->              }
->              break;
->  
-> +        case QCOW2_EXT_MAGIC_BITMAPS:
-> +            if (ext.len != sizeof(bitmaps_ext)) {
-> +                error_setg_errno(errp, -ret, "bitmaps_ext: "
-> +                                 "Invalid extension length");
-> +                return -EINVAL;
-> +            }
-> +
-> +            if (!(s->autoclear_features & QCOW2_AUTOCLEAR_BITMAPS)) {
-> +                fprintf(stderr,
-> +                        "WARNING: a program lacking bitmap support modified "
-> +                        "this file, so all bitmaps are now considered "
-> +                        "inconsistent. Some clusters may be leaked, run "
-> +                        "'qemu-img check -r' on the image file to fix.");
-> +                if (need_update_header != NULL) {
-> +                    *need_update_header = true;
-> +                }
-> +                break;
-> +            }
-> +
-> +            ret = bdrv_pread(bs->file, offset, &bitmaps_ext, ext.len);
-> +            if (ret < 0) {
-> +                error_setg_errno(errp, -ret, "bitmaps_ext: "
-> +                                 "Could not read ext header");
-> +                return ret;
-> +            }
-> +
-> +            if (bitmaps_ext.reserved32 != 0) {
-> +                error_setg_errno(errp, -ret, "bitmaps_ext: "
-> +                                 "Reserved field is not zero");
-> +                return -EINVAL;
-> +            }
-> +
-> +            be32_to_cpus(&bitmaps_ext.nb_bitmaps);
-> +            be64_to_cpus(&bitmaps_ext.bitmap_directory_size);
-> +            be64_to_cpus(&bitmaps_ext.bitmap_directory_offset);
-> +
-> +            if (bitmaps_ext.nb_bitmaps > QCOW2_MAX_BITMAPS) {
-> +                error_setg(errp,
-> +                           "bitmaps_ext: File %s has %" PRIu32 " bitmaps, "
-> +                           "exceeding the QEMU supported maximum of %d",
-> +                           bs->filename, bitmaps_ext.nb_bitmaps,
-> +                           QCOW2_MAX_BITMAPS);
-> +                return -EINVAL;
-> +            }
-> +
-> +            if (bitmaps_ext.nb_bitmaps == 0) {
-> +                error_setg(errp, "found bitmaps extension with zero bitmaps");
-> +                return -EINVAL;
-> +            }
-> +
-> +            if (bitmaps_ext.bitmap_directory_offset & (s->cluster_size - 1)) {
-> +                error_setg(errp, "bitmaps_ext: "
-> +                                 "invalid bitmap directory offset");
-> +                return -EINVAL;
-> +            }
-> +
-> +            if (bitmaps_ext.bitmap_directory_size >
-> +                QCOW2_MAX_BITMAP_DIRECTORY_SIZE) {
-> +                error_setg(errp, "bitmaps_ext: "
-> +                                 "bitmap directory size (%" PRIu64 ") exceeds "
-> +                                 "the maximum supported size (%d)",
-> +                                 bitmaps_ext.bitmap_directory_size,
-> +                                 QCOW2_MAX_BITMAP_DIRECTORY_SIZE);
-> +                return -EINVAL;
-> +            }
-> +
-> +            s->nb_bitmaps = bitmaps_ext.nb_bitmaps;
-> +            s->bitmap_directory_offset =
-> +                    bitmaps_ext.bitmap_directory_offset;
-> +            s->bitmap_directory_size =
-> +                    bitmaps_ext.bitmap_directory_size;
-> +
-> +#ifdef DEBUG_EXT
-> +            printf("Qcow2: Got bitmaps extension: "
-> +                   "offset=%" PRIu64 " nb_bitmaps=%" PRIu32 "\n",
-> +                   s->bitmap_directory_offset, s->nb_bitmaps);
-> +#endif
-> +            break;
-> +
->          default:
->              /* unknown magic - save it in case we need to rewrite the header */
->              {
-> @@ -824,6 +909,7 @@ static int qcow2_open(BlockDriverState *bs, QDict *options, int flags,
->      Error *local_err = NULL;
->      uint64_t ext_end;
->      uint64_t l1_vm_state_index;
-> +    bool need_update_header = false;
->  
->      ret = bdrv_pread(bs->file, 0, &header, sizeof(header));
->      if (ret < 0) {
-> @@ -929,7 +1015,7 @@ static int qcow2_open(BlockDriverState *bs, QDict *options, int flags,
->      if (s->incompatible_features & ~QCOW2_INCOMPAT_MASK) {
->          void *feature_table = NULL;
->          qcow2_read_extensions(bs, header.header_length, ext_end,
-> -                              &feature_table, NULL);
-> +                              &feature_table, NULL, NULL);
->          report_unsupported_feature(errp, feature_table,
->                                     s->incompatible_features &
->                                     ~QCOW2_INCOMPAT_MASK);
-> @@ -1116,7 +1202,7 @@ static int qcow2_open(BlockDriverState *bs, QDict *options, int flags,
->  
->      /* read qcow2 extensions */
->      if (qcow2_read_extensions(bs, header.header_length, ext_end, NULL,
-> -        &local_err)) {
-> +        &need_update_header, &local_err)) {
->          error_propagate(errp, local_err);
->          ret = -EINVAL;
->          goto fail;
-> @@ -1151,9 +1237,13 @@ static int qcow2_open(BlockDriverState *bs, QDict *options, int flags,
->          goto fail;
->      }
->  
-> -    /* Clear unknown autoclear feature bits */
-> -    if (!bs->read_only && !(flags & BDRV_O_INACTIVE) && s->autoclear_features) {
-> -        s->autoclear_features = 0;
-> +    if (!need_update_header) {
-> +        /* Clear unknown autoclear feature bits */
-> +        need_update_header = s->autoclear_features & ~QCOW2_AUTOCLEAR_MASK;
-> +    }
-> +
-> +    if (need_update_header && !bs->read_only && !(flags & BDRV_O_INACTIVE)) {
-> +        s->autoclear_features &= QCOW2_AUTOCLEAR_MASK;
->          ret = qcow2_update_header(bs);
->          if (ret < 0) {
->              error_setg_errno(errp, -ret, "Could not update qcow2 header");
-> @@ -1953,6 +2043,24 @@ int qcow2_update_header(BlockDriverState *bs)
->          buflen -= ret;
->      }
->  
-> +    if (s->nb_bitmaps > 0) {
-> +        Qcow2BitmapHeaderExt bitmaps_header = {
-> +            .nb_bitmaps = cpu_to_be32(s->nb_bitmaps),
-> +            .bitmap_directory_size =
-> +                    cpu_to_be64(s->bitmap_directory_size),
-> +            .bitmap_directory_offset =
-> +                    cpu_to_be64(s->bitmap_directory_offset)
-> +        };
-> +        ret = header_ext_add(buf, QCOW2_EXT_MAGIC_BITMAPS,
-> +                             &bitmaps_header, sizeof(bitmaps_header),
-> +                             buflen);
-> +        if (ret < 0) {
-> +            goto fail;
-> +        }
-> +        buf += ret;
-> +        buflen -= ret;
-> +    }
-> +
->      /* Keep unknown header extensions */
->      QLIST_FOREACH(uext, &s->unknown_header_ext, next) {
->          ret = header_ext_add(buf, uext->magic, uext->data, uext->len, buflen);
-> @@ -2528,6 +2636,13 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset)
->          return -ENOTSUP;
->      }
->  
-> +    /* cannot proceed if image has bitmaps */
-> +    if (s->nb_bitmaps) {
-> +        /* TODO: resize bitmaps in the image */
-> +        error_report("Can't resize an image which has bitmaps");
-> +        return -ENOTSUP;
-> +    }
-> +
->      /* shrinking is currently not supported */
->      if (offset < bs->total_sectors * 512) {
->          error_report("qcow2 doesn't support shrinking images yet");
-> diff --git a/block/qcow2.h b/block/qcow2.h
-> index 182341483a..861b5011dd 100644
-> --- a/block/qcow2.h
-> +++ b/block/qcow2.h
-> @@ -52,6 +52,10 @@
->   * space for snapshot names and IDs */
->  #define QCOW_MAX_SNAPSHOTS_SIZE (1024 * QCOW_MAX_SNAPSHOTS)
->  
-> +/* Bitmap header extension constraints */
-> +#define QCOW2_MAX_BITMAPS 65535
-> +#define QCOW2_MAX_BITMAP_DIRECTORY_SIZE (1024 * QCOW2_MAX_BITMAPS)
-> +
->  /* indicate that the refcount of the referenced cluster is exactly one. */
->  #define QCOW_OFLAG_COPIED     (1ULL << 63)
->  /* indicate that the cluster is compressed (they never have the copied flag) */
-> @@ -195,6 +199,15 @@ enum {
->      QCOW2_COMPAT_FEAT_MASK            = QCOW2_COMPAT_LAZY_REFCOUNTS,
->  };
->  
-> +/* Autoclear feature bits */
-> +enum {
-> +    QCOW2_AUTOCLEAR_BITMAPS_BITNR = 0,
-> +    QCOW2_AUTOCLEAR_BITMAPS       =
-> +        1 << QCOW2_AUTOCLEAR_BITMAPS_BITNR,
-> +
-> +    QCOW2_AUTOCLEAR_MASK                = QCOW2_AUTOCLEAR_BITMAPS,
-> +};
-> +
->  enum qcow2_discard_type {
->      QCOW2_DISCARD_NEVER = 0,
->      QCOW2_DISCARD_ALWAYS,
-> @@ -222,6 +235,13 @@ typedef uint64_t Qcow2GetRefcountFunc(const void *refcount_array,
->  typedef void Qcow2SetRefcountFunc(void *refcount_array,
->                                    uint64_t index, uint64_t value);
->  
-> +typedef struct Qcow2BitmapHeaderExt {
-> +    uint32_t nb_bitmaps;
-> +    uint32_t reserved32;
-> +    uint64_t bitmap_directory_size;
-> +    uint64_t bitmap_directory_offset;
-> +} QEMU_PACKED Qcow2BitmapHeaderExt;
-> +
->  typedef struct BDRVQcow2State {
->      int cluster_bits;
->      int cluster_size;
-> @@ -263,6 +283,10 @@ typedef struct BDRVQcow2State {
->      unsigned int nb_snapshots;
->      QCowSnapshot *snapshots;
->  
-> +    uint32_t nb_bitmaps;
-> +    uint64_t bitmap_directory_size;
-> +    uint64_t bitmap_directory_offset;
-> +
->      int flags;
->      int qcow_version;
->      bool use_lazy_refcounts;
-> 
+Signed-off-by: Marcin Chojnacki <marcinch7@gmail.com>
+---
+ hw/arm/bcm2835_peripherals.c         |  15 +++++
+ hw/misc/Makefile.objs                |   1 +
+ hw/misc/bcm2835_rng.c                | 115 +++++++++++++++++++++++++++++++++++
+ include/hw/arm/bcm2835_peripherals.h |   2 +
+ include/hw/misc/bcm2835_rng.h        |  23 +++++++
+ 5 files changed, 156 insertions(+)
+ create mode 100644 hw/misc/bcm2835_rng.c
+ create mode 100644 include/hw/misc/bcm2835_rng.h
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
+index 2e641a3..9ed22d5 100644
+--- a/hw/arm/bcm2835_peripherals.c
++++ b/hw/arm/bcm2835_peripherals.c
+@@ -86,6 +86,11 @@ static void bcm2835_peripherals_init(Object *obj)
+     object_property_add_const_link(OBJECT(&s->property), "dma-mr",
+                                    OBJECT(&s->gpu_bus_mr), &error_abort);
+ 
++    /* Random Number Generator */
++    object_initialize(&s->rng, sizeof(s->rng), TYPE_BCM2835_RNG);
++    object_property_add_child(obj, "rng", OBJECT(&s->rng), NULL);
++    qdev_set_parent_bus(DEVICE(&s->rng), sysbus_get_default());
++
+     /* Extended Mass Media Controller */
+     object_initialize(&s->sdhci, sizeof(s->sdhci), TYPE_SYSBUS_SDHCI);
+     object_property_add_child(obj, "sdhci", OBJECT(&s->sdhci), NULL);
+@@ -226,6 +231,16 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
+     sysbus_connect_irq(SYS_BUS_DEVICE(&s->property), 0,
+                       qdev_get_gpio_in(DEVICE(&s->mboxes), MBOX_CHAN_PROPERTY));
+ 
++    /* Random Number Generator */
++    object_property_set_bool(OBJECT(&s->rng), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    memory_region_add_subregion(&s->peri_mr, RNG_OFFSET,
++                sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->rng), 0));
++
+     /* Extended Mass Media Controller */
+     object_property_set_int(OBJECT(&s->sdhci), BCM2835_SDHC_CAPAREG, "capareg",
+                             &err);
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index 898e4cc..57a4406 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -42,6 +42,7 @@ obj-$(CONFIG_OMAP) += omap_sdrc.o
+ obj-$(CONFIG_OMAP) += omap_tap.o
+ obj-$(CONFIG_RASPI) += bcm2835_mbox.o
+ obj-$(CONFIG_RASPI) += bcm2835_property.o
++obj-$(CONFIG_RASPI) += bcm2835_rng.o
+ obj-$(CONFIG_SLAVIO) += slavio_misc.o
+ obj-$(CONFIG_ZYNQ) += zynq_slcr.o
+ obj-$(CONFIG_ZYNQ) += zynq-xadc.o
+diff --git a/hw/misc/bcm2835_rng.c b/hw/misc/bcm2835_rng.c
+new file mode 100644
+index 0000000..00fb083
+--- /dev/null
++++ b/hw/misc/bcm2835_rng.c
+@@ -0,0 +1,115 @@
++/*
++ * Raspberry Pi emulation (c) 2017 Marcin Chojnacki
++ * This code is licensed under the GNU GPLv2 and later.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "hw/misc/bcm2835_rng.h"
++
++static uint64_t bcm2835_rng_read(void *opaque, hwaddr offset,
++    unsigned size)
++{
++    BCM2835RngState *s = (BCM2835RngState *)opaque;
++    uint32_t res = 0;
++
++    assert(size == 4);
++
++    switch (offset) {
++    case 0x0:    /* rng_ctrl */
++        res = s->rng_ctrl;
++        break;
++    case 0x4:    /* rng_status */
++        res = s->rng_status | (1 << 24);
++        break;
++    case 0x8:    /* rng_data */
++        res = rand();
++        break;
++
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR,
++            "bcm2835_rng_read: Bad offset %x\n", (int)offset);
++        res = 0;
++        break;
++    }
++
++    return res;
++}
++
++static void bcm2835_rng_write(void *opaque, hwaddr offset,
++    uint64_t value, unsigned size)
++{
++    BCM2835RngState *s = (BCM2835RngState *)opaque;
++
++    assert(size == 4);
++
++    switch (offset) {
++    case 0x0:    /* rng_ctrl */
++        s->rng_ctrl = value;
++        break;
++    case 0x4:    /* rng_status */
++        s->rng_status = value;
++        break;
++
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR,
++            "bcm2835_rng_write: Bad offset %x\n", (int)offset);
++        break;
++    }
++}
++
++static const MemoryRegionOps bcm2835_rng_ops = {
++    .read = bcm2835_rng_read,
++    .write = bcm2835_rng_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++};
++
++static const VMStateDescription vmstate_bcm2835_rng = {
++    .name = TYPE_BCM2835_RNG,
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .minimum_version_id_old = 1,
++    .fields      = (VMStateField[]) {
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void bcm2835_rng_init(Object *obj)
++{
++    BCM2835RngState *s = BCM2835_RNG(obj);
++
++    memory_region_init_io(&s->iomem, obj, &bcm2835_rng_ops, s,
++                          TYPE_BCM2835_RNG, 0x10);
++    sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->iomem);
++}
++
++static void bcm2835_rng_realize(DeviceState *dev, Error **errp)
++{
++    BCM2835RngState *s = BCM2835_RNG(dev);
++
++    s->rng_ctrl = 0;
++    s->rng_status = 0;
++}
++
++static void bcm2835_rng_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->realize = bcm2835_rng_realize;
++    dc->vmsd = &vmstate_bcm2835_rng;
++}
++
++static TypeInfo bcm2835_rng_info = {
++    .name          = TYPE_BCM2835_RNG,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(BCM2835RngState),
++    .class_init    = bcm2835_rng_class_init,
++    .instance_init = bcm2835_rng_init,
++};
++
++static void bcm2835_rng_register_types(void)
++{
++    type_register_static(&bcm2835_rng_info);
++}
++
++type_init(bcm2835_rng_register_types)
+diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm2835_peripherals.h
+index e12ae37..31241c7 100644
+--- a/include/hw/arm/bcm2835_peripherals.h
++++ b/include/hw/arm/bcm2835_peripherals.h
+@@ -19,6 +19,7 @@
+ #include "hw/dma/bcm2835_dma.h"
+ #include "hw/intc/bcm2835_ic.h"
+ #include "hw/misc/bcm2835_property.h"
++#include "hw/misc/bcm2835_rng.h"
+ #include "hw/misc/bcm2835_mbox.h"
+ #include "hw/sd/sdhci.h"
+ 
+@@ -41,6 +42,7 @@ typedef struct BCM2835PeripheralState {
+     BCM2835DMAState dma;
+     BCM2835ICState ic;
+     BCM2835PropertyState property;
++    BCM2835RngState rng;
+     BCM2835MboxState mboxes;
+     SDHCIState sdhci;
+ } BCM2835PeripheralState;
+diff --git a/include/hw/misc/bcm2835_rng.h b/include/hw/misc/bcm2835_rng.h
+new file mode 100644
+index 0000000..3ef816e
+--- /dev/null
++++ b/include/hw/misc/bcm2835_rng.h
+@@ -0,0 +1,23 @@
++/*
++ * Raspberry Pi emulation (c) 2017 Marcin Chojnacki
++ * This code is licensed under the GNU GPLv2 and later.
++ */
++
++#ifndef BCM2835_RNG_H
++#define BCM2835_RNG_H
++
++#include "hw/sysbus.h"
++
++#define TYPE_BCM2835_RNG "bcm2835-rng"
++#define BCM2835_RNG(obj) \
++        OBJECT_CHECK(BCM2835RngState, (obj), TYPE_BCM2835_RNG)
++
++typedef struct {
++    SysBusDevice busdev;
++    MemoryRegion iomem;
++
++    uint32_t rng_ctrl;
++    uint32_t rng_status;
++} BCM2835RngState;
++
++#endif
+-- 
+2.10.1 (Apple Git-78)
