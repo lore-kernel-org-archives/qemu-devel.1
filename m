@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52015)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ccJYE-0003Ie-Em
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 17:20:23 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ccJwy-0003oS-0J
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 17:45:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1ccJYD-0002zs-Dm
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 17:20:22 -0500
+	(envelope-from <alistair23@gmail.com>) id 1ccJww-0007VE-4z
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 17:45:55 -0500
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:33106)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1ccJww-0007Sd-0f
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 17:45:54 -0500
+Received: by mail-oi0-x243.google.com with SMTP id j15so3482653oih.0
+	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 14:45:51 -0800 (PST)
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <20170206233931.14921-3-f4bug@amsat.org>
-References: <20170206233931.14921-1-f4bug@amsat.org>
-	<20170206233931.14921-3-f4bug@amsat.org>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 10 Feb 2017 14:19:46 -0800
-Message-ID: <CAKmqyKMYmNeOOogS4+yv14M2CWTbBNtBP0jnO0DQEuScSp8eYw@mail.gmail.com>
+In-Reply-To: <20170208064212.25307-2-ppandit@redhat.com>
+References: <20170208064212.25307-1-ppandit@redhat.com>
+	<20170208064212.25307-2-ppandit@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 10 Feb 2017 14:45:20 -0800
+Message-ID: <CAKmqyKNHmzKx6npTEQXN9Hzscc5sBmj159gBkaGx6WLzCOJBYQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/2] register: fix incorrect read mask
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] sd: sdhci: check transfer mode
+ register in multi block transfer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,58 +30,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Peter Crosthwaite <peter.crosthwaite@xilinx.com>, Alistair Francis <alistair.francis@xilinx.com>, QEMU Trivial <qemu-trivial@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: P J P <ppandit@redhat.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Wjjzhang <wjjzhang@tencent.com>, Jiang Xin <jiangxin1@huawei.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
-On Mon, Feb 6, 2017 at 3:39 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g> wrote:
-> The register_read() function expects a bitmask argument.
+On Tue, Feb 7, 2017 at 10:42 PM, P J P <ppandit@redhat.com> wrote:
+> From: Prasad J Pandit <pjp@fedoraproject.org>
 >
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> In SDHCI device emulation the transfer mode register value
+> is used during multi block transfer to check if block count
+> register is enabled and should be updated. Transfer mode
+> register could be set such that, block count register would
+> not be updated, thus leading to an infinite loop. Add check
+> to avoid it.
+>
+> Reported-by: Wjjzhang <wjjzhang@tencent.com>
+> Reported-by: Jiang Xin <jiangxin1@huawei.com>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> ---
+>  hw/sd/sdhci.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>
+> Update per: print an error message before return
+>   -> https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg01567.html
+>
+> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+> index 5bd5ab6..cf400c8 100644
+> --- a/hw/sd/sdhci.c
+> +++ b/hw/sd/sdhci.c
+> @@ -486,6 +486,11 @@ static void sdhci_sdma_transfer_multi_blocks(SDHCIState *s)
+>      uint32_t boundary_chk = 1 << (((s->blksize & 0xf000) >> 12) + 12);
+>      uint32_t boundary_count = boundary_chk - (s->sdmasysad % boundary_chk);
+>
+> +    if (!(s->trnmod & SDHC_TRNS_BLK_CNT_EN) || !s->blkcnt) {
+> +        ERRPRINT("Infinite transfers are not supported\n");
+> +        return;
+> +    }
 
-The functionality of these two patches looks good to me.
+You should use the qemu_log_mask() function. It'll look something like this:
 
-I think it's weird that we convert the write function in one patch
-(when we add the function) and the read in another.
+qemu_log_mask(LOG_UNIMP, ....
 
-I think both patches should just be squashed together. It's a pretty
-small change.
+> +
+>      /* XXX: Some sd/mmc drivers (for example, u-boot-slp) do not account for
+>       * possible stop at page boundary if initial address is not page aligned,
+>       * allow them to work properly */
+> @@ -797,11 +802,6 @@ static void sdhci_data_transfer(void *opaque)
+>      if (s->trnmod & SDHC_TRNS_DMA) {
+>          switch (SDHC_DMA_TYPE(s->hostctl)) {
+>          case SDHC_CTRL_SDMA:
+> -            if ((s->trnmod & SDHC_TRNS_MULTI) &&
+> -                    (!(s->trnmod & SDHC_TRNS_BLK_CNT_EN) || s->blkcnt == 0)) {
+> -                break;
+> -            }
+> -
+>              if ((s->blkcnt == 1) || !(s->trnmod & SDHC_TRNS_MULTI)) {
+>                  sdhci_sdma_transfer_single_block(s);
+>              } else {
+> @@ -1050,7 +1050,7 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
+>          if (!(s->capareg & SDHC_CAN_DO_DMA)) {
+>              value &= ~SDHC_TRNS_DMA;
+>          }
+> -        MASKED_WRITE(s->trnmod, mask, value);
+> +        MASKED_WRITE(s->trnmod, mask, value & 0x0037);
+
+Maybe this is worth being in a separate patch with an explanation.
 
 Thanks,
 
 Alistair
 
-> ---
->  hw/core/register.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+>          MASKED_WRITE(s->cmdreg, mask >> 16, value >> 16);
 >
-> diff --git a/hw/core/register.c b/hw/core/register.c
-> index 12f4c1e62d..482e3f827a 100644
-> --- a/hw/core/register.c
-> +++ b/hw/core/register.c
-> @@ -213,6 +213,7 @@ uint64_t register_read_memory(void *opaque, hwaddr ad=
-dr,
->      RegisterInfoArray *reg_array =3D opaque;
->      RegisterInfo *reg =3D NULL;
->      uint64_t read_val;
-> +    uint64_t re;
->      int i;
->
->      for (i =3D 0; i < reg_array->num_elements; i++) {
-> @@ -228,7 +229,10 @@ uint64_t register_read_memory(void *opaque, hwaddr a=
-ddr,
->          return 0;
->      }
->
-> -    read_val =3D register_read(reg, size * 8, reg_array->prefix,
-> +    /* Generate appropriate read enable mask */
-> +    re =3D register_enabled_mask(reg->data_size, size);
-> +
-> +    read_val =3D register_read(reg, re, reg_array->prefix,
->                               reg_array->debug);
->
->      return extract64(read_val, 0, size * 8);
+>          /* Writing to the upper byte of CMDREG triggers SD command generation */
 > --
-> 2.11.0
->
+> 2.9.3
 >
