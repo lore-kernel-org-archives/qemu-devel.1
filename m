@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49333)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cc4UF-0007cO-4M
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 01:15:16 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cc4cy-0001jg-Ph
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 01:24:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cc4UA-0000dC-C6
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 01:15:15 -0500
-Resent-Message-Id: <E1cc4UA-0000dC-C6@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21455)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cc4UA-0000cd-51
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 01:15:10 -0500
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20170210061200.15373-1-vapier@gentoo.org>
-Message-ID: <148670730031.57.15552361064492617951@eba24e3a0d7f>
+	(envelope-from <jasowang@redhat.com>) id 1cc4cv-0002tb-Kw
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 01:24:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38832)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cc4cv-0002tP-FG
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 01:24:13 -0500
+References: <1486456099-7345-1-git-send-email-peterx@redhat.com>
+	<1486456099-7345-18-git-send-email-peterx@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <c5dc0cbd-9dec-bd37-d809-9d84d50f523d@redhat.com>
+Date: Fri, 10 Feb 2017 14:24:02 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 9 Feb 2017 22:15:00 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] osdep.h: pull in sys/sysmacros.h for
- major/minor/makedev
+In-Reply-To: <1486456099-7345-18-git-send-email-peterx@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 17/17] intel_iommu: enable vfio devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +27,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: vapier@gentoo.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com
+Cc: tianyu.lan@intel.com, kevin.tian@intel.com, jan.kiszka@siemens.com, David Gibson <david@gibson.dropbear.id.au>, alex.williamson@redhat.com, bd.aviv@gmail.com
 
-SGksCgpZb3VyIHNlcmllcyBmYWlsZWQgYXV0b21hdGljIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5k
-IHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZl
-IGRvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHku
-CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBvc2RlcC5oOiBwdWxsIGluIHN5cy9zeXNt
-YWNyb3MuaCBmb3IgbWFqb3IvbWlub3IvbWFrZWRldgpNZXNzYWdlLWlkOiAyMDE3MDIxMDA2MTIw
-MC4xNTM3My0xLXZhcGllckBnZW50b28ub3JnClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBU
-IEJFR0lOID09PQojIS9iaW4vYmFzaApzZXQgLWUKZ2l0IHN1Ym1vZHVsZSB1cGRhdGUgLS1pbml0
-IGR0YwojIExldCBkb2NrZXIgdGVzdHMgZHVtcCBlbnZpcm9ubWVudCBpbmZvCmV4cG9ydCBTSE9X
-X0VOVj0xCmV4cG9ydCBKPTE2Cm1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNgptYWtlIGRv
-Y2tlci10ZXN0LW1pbmd3QGZlZG9yYQptYWtlIGRvY2tlci10ZXN0LWJ1aWxkQG1pbi1nbGliCj09
-PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
-N2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNThiNGQ4ZSBv
-c2RlcC5oOiBwdWxsIGluIHN5cy9zeXNtYWNyb3MuaCBmb3IgbWFqb3IvbWlub3IvbWFrZWRldgoK
-PT09IE9VVFBVVCBCRUdJTiA9PT0KU3VibW9kdWxlICdkdGMnIChnaXQ6Ly9naXQucWVtdS1wcm9q
-ZWN0Lm9yZy9kdGMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdkdGMnCmZhdGFsOiByZWFkIGVy
-cm9yOiBDb25uZWN0aW9uIHJlc2V0IGJ5IHBlZXIKQ2xvbmluZyBpbnRvICdkdGMnLi4uCkNsb25l
-IG9mICdnaXQ6Ly9naXQucWVtdS1wcm9qZWN0Lm9yZy9kdGMuZ2l0JyBpbnRvIHN1Ym1vZHVsZSBw
-YXRoICdkdGMnIGZhaWxlZAo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQg
-d2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
-ZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBh
-dGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+
+
+On 2017=E5=B9=B402=E6=9C=8807=E6=97=A5 16:28, Peter Xu wrote:
+> This patch is based on Aviv Ben-David (<bd.aviv@gmail.com>)'s patch
+> upstream:
+>
+>    "IOMMU: enable intel_iommu map and unmap notifiers"
+>    https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg01453.html
+>
+> However I removed/fixed some content, and added my own codes.
+>
+> Instead of translate() every page for iotlb invalidations (which is
+> slower), we walk the pages when needed and notify in a hook function.
+>
+> This patch enables vfio devices for VT-d emulation.
+>
+> And, since we already have vhost DMAR support via device-iotlb, a
+> natural benefit that this patch brings is that vt-d enabled vhost can
+> live even without ATS capability now. Though more tests are needed.
+
+Michael, if you want to apply this series, I would propose a better=20
+title for this patch e.g "cowork with remote IOMMU/IOTLB"
+
+Thanks
+
+>
+> Reviewed-by: Jason Wang <jasowang@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>   hw/i386/intel_iommu.c          | 191 ++++++++++++++++++++++++++++++++=
+++++++---
+>   hw/i386/intel_iommu_internal.h |   1 +
+>   hw/i386/trace-events           |   1 +
+>   include/hw/i386/intel_iommu.h  |   8 ++
+>   4 files changed, 188 insertions(+), 13 deletions(-)
+
+[...]
