@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ccCkd-000658-UA
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:04:44 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ccCrp-0003Si-Q4
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:12:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ccCka-0002Cw-Lg
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:04:43 -0500
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:34779)
+	(envelope-from <peter.maydell@linaro.org>) id 1ccCro-0004Gg-Rc
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:12:09 -0500
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:37812)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ccCka-0002Cc-Fj
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:04:40 -0500
-Received: by mail-wr0-x22d.google.com with SMTP id o16so110046175wra.1
-	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 07:04:40 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 10 Feb 2017 15:04:50 +0000
-Message-Id: <20170210150452.21550-1-alex.bennee@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ccCro-0004GS-Kg
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:12:08 -0500
+Received: by mail-wm0-x22b.google.com with SMTP id v77so50741770wmv.0
+	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 07:12:08 -0800 (PST)
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA8+3+ZwOeA0cNXF_BRs-kivTye5bj7pcRsDAsJ4S1HwTg@mail.gmail.com>
+References: <1486504171-26807-1-git-send-email-wei@redhat.com>
+	<CAFEAcA8+3+ZwOeA0cNXF_BRs-kivTye5bj7pcRsDAsJ4S1HwTg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 10 Feb 2017 15:11:47 +0000
+Message-ID: <CAFEAcA8QFWi8-XmJyiWM15y8dUqFCbaqt9wuZ70Y7_Qgsa=CyQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 0/2] Travis updates
+Subject: Re: [Qemu-devel] [PATCH V3 0/4] Add vPMU vPMU support under TCG mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Wei Huang <wei@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-The following changes since commit 7d2c6c95511e42dffe2b263275e09957723d0ff4:
+On 10 February 2017 at 15:00, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 7 February 2017 at 21:49, Wei Huang <wei@redhat.com> wrote:
+>> QEMU has implemented cycle count support for guest VM under TCG mode.
+>> But this feature is not complete. In fact using perf inside a
+>> 64-bit Linux guest VM (under TCG) can cause the following kernel panic
+>> because some PMU registers are not implemented.
+>>
+>> [  329.445970] [<fffffe000009e600>] armv8pmu_enable_event+0x58/0x8c
+>> [  329.446713] [<fffffe0000621e74>] armpmu_start+0x4c/0x74
+>>
+>> This patchset solves the problem by adding support for missing vPMU
+>> registers. Basic perf test can work (both ACPI and DT) now under TCG
+>> by applying this patchset.
+>>
+>> address@hidden ~]# perf stat ls
+>>  Performance counter stats for 'ls':
+>>
+>>         226.740256      task-clock (msec)         #    0.312 CPUs utilized
+>>                 76      context-switches          #    0.335 K/sec
+>>                  0      cpu-migrations            #    0.000 K/sec
+>>                 64      page-faults               #    0.282 K/sec
+>>        186,031,410      cycles                    #    0.820 GHz      (36.40%)
+>>    <not supported>      stalled-cycles-frontend
+>>    <not supported>      stalled-cycles-backend
+>>      <not counted>      instructions               (0.00%)
+>>    <not supported>      branches
+>>      <not counted>      branch-misses              (0.00%)
+>>
+>> V2->V3:
+>>  * Remove PMXEVCNTR_EL0 support
+>>  * Add read access support for PMXEVTYPER and change the CONSTRAINED
+>>    UNPREDICTABLE behavior of PMXEVTYPER to RAZ/WI.
+>>
+>> V1->V2:
+>>   * Change most PMU registers to 64bit and the behavior of PMXEVTYPER
+>>   * Add support for PMXEVCNTR_EL0
+>>   * Misc fixes (DT, ID_AA64DFR0_EL1, ...) under TCG mod
+>
+> Applied to target-arm.next, thanks.
 
-  Merge remote-tracking branch 'remotes/kraxel/tags/pull-usb-20170206-1' into staging (2017-02-06 11:44:08 +0000)
+...though patch 1 breaks compilation of linux-user targets. I've
+fixed it up by moving the #ifndef CONFIG_USER_ONLY to the right
+place to cover the new regdefs.
 
-are available in the git repository at:
-
-  https://github.com/stsquad/qemu.git tags/pull-travis-10022017-1
-
-for you to fetch changes up to 78a22af040b8ea7c26d52755facdc332ac7bac46:
-
-  .travis.yml: split VM based builds (2017-02-10 13:19:56 +0000)
-
-----------------------------------------------------------------
-One minor fix and a build split to reduce timeouts.
-
-----------------------------------------------------------------
-Alex Bennée (2):
-      .travis.yml: don't specify CONFIG twice
-      .travis.yml: split VM based builds
-
- .travis.yml | 39 ++++++++++++++++++++++++++++++++++-----
- 1 file changed, 34 insertions(+), 5 deletions(-)
-
--- 
-2.11.0
+thanks
+-- PMM
