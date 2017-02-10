@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48321)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51332)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1cbzJr-0006if-5X
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 19:44:12 -0500
+	(envelope-from <lersek@redhat.com>) id 1cbzV7-0007ki-1O
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 19:55:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1cbzJn-0008Ji-V1
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 19:44:11 -0500
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:35445)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1cbzJn-0008J5-Pv
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 19:44:07 -0500
-Received: by mail-pf0-x242.google.com with SMTP id b145so324244pfb.2
-	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 16:44:07 -0800 (PST)
-Date: Fri, 10 Feb 2017 09:44:04 +0900
-From: Stafford Horne <shorne@gmail.com>
-Message-ID: <20170210004404.GM32144@lianli.shorne-pla.net>
-References: <20170209045154.16868-1-rth@twiddle.net>
-	<20170210000122.4173-1-rth@twiddle.net>
+	(envelope-from <lersek@redhat.com>) id 1cbzV3-0006O2-Qb
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 19:55:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50260)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cbzV3-0006NR-IC
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 19:55:45 -0500
+References: <cover.1486285434.git.ben@skyportsystems.com>
+	<9a2d2cb01e42d6e61c6198356781dbb2919aca05.1486285434.git.ben@skyportsystems.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <b471e6fa-2381-8f11-3c35-adceb8b8ca15@redhat.com>
+Date: Fri, 10 Feb 2017 01:55:41 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170210000122.4173-1-rth@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH 23/22] linux-user: Honor CLONE_SETTLS for
- openrisc
+In-Reply-To: <9a2d2cb01e42d6e61c6198356781dbb2919aca05.1486285434.git.ben@skyportsystems.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 03/10] docs: VM Generation ID device
+ description
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +28,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, Openrisc <openrisc@lists.librecores.org>
+To: ben@skyportsystems.com, qemu-devel@nongnu.org
+Cc: Gal Hammer <ghammer@redhat.com>, imammedo@redhat.com, mst@redhat.com
 
-23/22 ?
+On 02/05/17 10:11, ben@skyportsystems.com wrote:
 
-:)
-
-On Fri, Feb 10, 2017 at 10:01:22AM +1000, Richard Henderson wrote:
-> Threads work much better when you set the TLS register.
-> This was fixed in the upstream kernel for Linux 4.9.
-> 
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
-> ---
->  linux-user/openrisc/target_cpu.h | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
-> 
-> diff --git a/linux-user/openrisc/target_cpu.h b/linux-user/openrisc/target_cpu.h
-> index a21ed1a..f283d96 100644
-> --- a/linux-user/openrisc/target_cpu.h
-> +++ b/linux-user/openrisc/target_cpu.h
-> @@ -30,9 +30,7 @@ static inline void cpu_clone_regs(CPUOpenRISCState *env, target_ulong newsp)
->  
->  static inline void cpu_set_tls(CPUOpenRISCState *env, target_ulong newtls)
->  {
-> -    /* Linux kernel 3.10 does not pay any attention to CLONE_SETTLS
-> -     * in copy_thread(), so QEMU need not do so either.
-> -     */
-> +    env->gpr[10] = newtls;
->  }
->  
->  #endif
-> -- 
-> 2.9.3
+> +Or to change guid in runtime use:
+> +
+> + set-vm-generation-id guid=124e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87
+> + set-vm-generation-id guid=auto
 > 
 
-Reviewed-by: Stafford Horne <shorne@gmail.com>
+Please drop the "guid=" prefix from the examples; the HMP command
+doesn't need it / chokes on it. It only takes "auto" or a UUID.
+
+Thanks
+Laszlo
