@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ccCeS-000154-8E
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 09:58:20 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ccCg8-0002En-Ro
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:00:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ccCeN-0008KB-8R
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 09:58:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49910)
+	(envelope-from <dgilbert@redhat.com>) id 1ccCg8-0000em-32
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:00:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47526)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ccCeN-0008K1-2W
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 09:58:15 -0500
-Date: Fri, 10 Feb 2017 14:58:10 +0000
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ccCg7-0000eR-Tt
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:00:04 -0500
+Date: Fri, 10 Feb 2017 14:59:59 +0000
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170210145810.GA13357@work-vm>
-References: <1486120416-11566-1-git-send-email-amit.shah@redhat.com>
+Message-ID: <20170210145958.GB13357@work-vm>
+References: <1486120433-11628-1-git-send-email-amit.shah@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1486120416-11566-1-git-send-email-amit.shah@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] migration: remove myself as maintainer
+In-Reply-To: <1486120433-11628-1-git-send-email-amit.shah@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: update my email address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,32 +26,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu list <qemu-devel@nongnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Juan Quintela <quintela@redhat.com>
+To: Amit Shah <amit@kernel.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Juan Quintela <quintela@redhat.com>, qemu list <qemu-devel@nongnu.org>
 
 * Amit Shah (amit.shah@redhat.com) wrote:
-> I'm switching jobs, and I'm not sure I can continue maintaining migration.
+> I'm leaving my job at Red Hat, this email address will stop working next week.
+> Update it to one that I will have access to later.
 > 
 > Signed-off-by: Amit Shah <amit.shah@redhat.com>
 
-Queued.
+Queued (while I'm doing the maintainer removal anyway).
+
+Dave
 
 > ---
->  MAINTAINERS | 1 -
->  1 file changed, 1 deletion(-)
+>  MAINTAINERS | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
 > diff --git a/MAINTAINERS b/MAINTAINERS
-> index 00b81f1..4382bcc 100644
+> index 4382bcc..d69549f 100644
 > --- a/MAINTAINERS
 > +++ b/MAINTAINERS
-> @@ -1431,7 +1431,6 @@ F: scripts/checkpatch.pl
+> @@ -1034,7 +1034,7 @@ F: hw/input/virtio-input*.c
+>  F: include/hw/virtio/virtio-input.h
 >  
->  Migration
->  M: Juan Quintela <quintela@redhat.com>
+>  virtio-serial
 > -M: Amit Shah <amit.shah@redhat.com>
->  M: Dr. David Alan Gilbert <dgilbert@redhat.com>
->  S: Maintained
->  F: include/migration/
+> +M: Amit Shah <amit@kernel.org>
+>  S: Supported
+>  F: hw/char/virtio-serial-bus.c
+>  F: hw/char/virtio-console.c
+> @@ -1043,7 +1043,7 @@ F: tests/virtio-console-test.c
+>  F: tests/virtio-serial-test.c
+>  
+>  virtio-rng
+> -M: Amit Shah <amit.shah@redhat.com>
+> +M: Amit Shah <amit@kernel.org>
+>  S: Supported
+>  F: hw/virtio/virtio-rng.c
+>  F: include/hw/virtio/virtio-rng.h
 > -- 
 > 1.8.3.1
 > 
