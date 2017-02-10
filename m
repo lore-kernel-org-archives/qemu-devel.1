@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cc0rc-00065g-CT
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 21:23:10 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cc0rd-00066f-VP
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 21:23:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cc0ra-00026m-Up
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 21:23:08 -0500
-Received: from ozlabs.org ([103.22.144.67]:36743)
+	(envelope-from <dgibson@ozlabs.org>) id 1cc0rb-00028Q-Ij
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 21:23:09 -0500
+Received: from ozlabs.org ([2401:3900:2:1::2]:41283)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1cc0ra-00024F-9t
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 21:23:06 -0500
-Date: Fri, 10 Feb 2017 12:17:06 +1100
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1cc0ra-00024H-SC
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 21:23:07 -0500
+Date: Fri, 10 Feb 2017 12:19:09 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170210011706.GU27610@umbus.fritz.box>
+Message-ID: <20170210011909.GV27610@umbus.fritz.box>
 References: <1486456099-7345-1-git-send-email-peterx@redhat.com>
-	<1486456099-7345-7-git-send-email-peterx@redhat.com>
+	<1486456099-7345-8-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="5Dr6Wqe9hdyl7LAI"
+	protocol="application/pgp-signature"; boundary="GGxZz/e2pmGePzrA"
 Content-Disposition: inline
-In-Reply-To: <1486456099-7345-7-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 06/17] intel_iommu: renaming gpa to iova
- where proper
+In-Reply-To: <1486456099-7345-8-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v7 07/17] intel_iommu: convert dbg macros
+ to traces for inv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,174 +33,363 @@ To: Peter Xu <peterx@redhat.com>
 Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
 
 
---5Dr6Wqe9hdyl7LAI
+--GGxZz/e2pmGePzrA
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 07, 2017 at 04:28:08PM +0800, Peter Xu wrote:
-> There are lots of places in current intel_iommu.c codes that named
-> "iova" as "gpa". It is really confusing to use a name "gpa" in these
-> places (which is very easily to be understood as "Guest Physical
-> Address", while it's not). To make the codes (much) easier to be read, I
-> decided to do this once and for all.
+On Tue, Feb 07, 2017 at 04:28:09PM +0800, Peter Xu wrote:
+> VT-d codes are still using static DEBUG_INTEL_IOMMU macro. That's not
+> good, and we should end the day when we need to recompile the code
+> before getting useful debugging information for vt-d. Time to switch to
+> the trace system. This is the first patch to do it.
 >=20
-> No functional change is made. Only literal ones.
->=20
-> Reviewed-by: Jason Wang <jasowang@redhat.com>
 > Signed-off-by: Peter Xu <peterx@redhat.com>
 
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
-Sounds like a good idea, that would certainly confuse me.
-
 > ---
->  hw/i386/intel_iommu.c | 44 ++++++++++++++++++++++----------------------
->  1 file changed, 22 insertions(+), 22 deletions(-)
+>  hw/i386/intel_iommu.c | 95 +++++++++++++++++++++------------------------=
+------
+>  hw/i386/trace-events  | 18 ++++++++++
+>  2 files changed, 56 insertions(+), 57 deletions(-)
 >=20
 > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 86d19bb..0c94b79 100644
+> index 0c94b79..08e43b6 100644
 > --- a/hw/i386/intel_iommu.c
 > +++ b/hw/i386/intel_iommu.c
-> @@ -259,7 +259,7 @@ static void vtd_update_iotlb(IntelIOMMUState *s, uint=
-16_t source_id,
->      uint64_t *key =3D g_malloc(sizeof(*key));
->      uint64_t gfn =3D vtd_get_iotlb_gfn(addr, level);
+> @@ -35,6 +35,7 @@
+>  #include "sysemu/kvm.h"
+>  #include "hw/i386/apic_internal.h"
+>  #include "kvm_i386.h"
+> +#include "trace.h"
 > =20
-> -    VTD_DPRINTF(CACHE, "update iotlb sid 0x%"PRIx16 " gpa 0x%"PRIx64
-> +    VTD_DPRINTF(CACHE, "update iotlb sid 0x%"PRIx16 " iova 0x%"PRIx64
->                  " slpte 0x%"PRIx64 " did 0x%"PRIx16, source_id, addr, sl=
-pte,
->                  domain_id);
->      if (g_hash_table_size(s->iotlb) >=3D VTD_IOTLB_MAX_SIZE) {
-> @@ -575,12 +575,12 @@ static uint64_t vtd_get_slpte(dma_addr_t base_addr,=
- uint32_t index)
->      return slpte;
->  }
-> =20
-> -/* Given a gpa and the level of paging structure, return the offset of c=
-urrent
-> - * level.
-> +/* Given an iova and the level of paging structure, return the offset
-> + * of current level.
->   */
-> -static inline uint32_t vtd_gpa_level_offset(uint64_t gpa, uint32_t level)
-> +static inline uint32_t vtd_iova_level_offset(uint64_t iova, uint32_t lev=
-el)
+>  /*#define DEBUG_INTEL_IOMMU*/
+>  #ifdef DEBUG_INTEL_IOMMU
+> @@ -474,22 +475,19 @@ static void vtd_handle_inv_queue_error(IntelIOMMUSt=
+ate *s)
+>  /* Set the IWC field and try to generate an invalidation completion inte=
+rrupt */
+>  static void vtd_generate_completion_event(IntelIOMMUState *s)
 >  {
-> -    return (gpa >> vtd_slpt_level_shift(level)) &
-> +    return (iova >> vtd_slpt_level_shift(level)) &
->              ((1ULL << VTD_SL_LEVEL_BITS) - 1);
->  }
-> =20
-> @@ -628,12 +628,12 @@ static bool vtd_slpte_nonzero_rsvd(uint64_t slpte, =
-uint32_t level)
+> -    VTD_DPRINTF(INV, "completes an invalidation wait command with "
+> -                "Interrupt Flag");
+>      if (vtd_get_long_raw(s, DMAR_ICS_REG) & VTD_ICS_IWC) {
+> -        VTD_DPRINTF(INV, "there is a previous interrupt condition to be "
+> -                    "serviced by software, "
+> -                    "new invalidation event is not generated");
+> +        trace_vtd_inv_desc_wait_irq("One pending, skip current");
+>          return;
 >      }
->  }
+>      vtd_set_clear_mask_long(s, DMAR_ICS_REG, 0, VTD_ICS_IWC);
+>      vtd_set_clear_mask_long(s, DMAR_IECTL_REG, 0, VTD_IECTL_IP);
+>      if (vtd_get_long_raw(s, DMAR_IECTL_REG) & VTD_IECTL_IM) {
+> -        VTD_DPRINTF(INV, "IM filed in IECTL_REG is set, new invalidation=
+ "
+> -                    "event is not generated");
+> +        trace_vtd_inv_desc_wait_irq("IM in IECTL_REG is set, "
+> +                                    "new event not generated");
+>          return;
+>      } else {
+>          /* Generate the interrupt event */
+> +        trace_vtd_inv_desc_wait_irq("Generating complete event");
+>          vtd_generate_interrupt(s, DMAR_IEADDR_REG, DMAR_IEDATA_REG);
+>          vtd_set_clear_mask_long(s, DMAR_IECTL_REG, VTD_IECTL_IP, 0);
+>      }
+> @@ -923,6 +921,7 @@ static void vtd_interrupt_remap_table_setup(IntelIOMM=
+UState *s)
 > =20
-> -/* Given the @gpa, get relevant @slptep. @slpte_level will be the last l=
-evel
-> +/* Given the @iova, get relevant @slptep. @slpte_level will be the last =
-level
->   * of the translation, can be used for deciding the size of large page.
->   */
-> -static int vtd_gpa_to_slpte(VTDContextEntry *ce, uint64_t gpa, bool is_w=
-rite,
-> -                            uint64_t *slptep, uint32_t *slpte_level,
-> -                            bool *reads, bool *writes)
-> +static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is=
-_write,
-> +                             uint64_t *slptep, uint32_t *slpte_level,
-> +                             bool *reads, bool *writes)
+>  static void vtd_context_global_invalidate(IntelIOMMUState *s)
 >  {
->      dma_addr_t addr =3D vtd_get_slpt_base_from_context(ce);
->      uint32_t level =3D vtd_get_level_from_context_entry(ce);
-> @@ -642,11 +642,11 @@ static int vtd_gpa_to_slpte(VTDContextEntry *ce, ui=
-nt64_t gpa, bool is_write,
->      uint32_t ce_agaw =3D vtd_get_agaw_from_context_entry(ce);
->      uint64_t access_right_check;
+> +    trace_vtd_inv_desc_cc_global();
+>      s->context_cache_gen++;
+>      if (s->context_cache_gen =3D=3D VTD_CONTEXT_CACHE_GEN_MAX) {
+>          vtd_reset_context_cache(s);
+> @@ -962,9 +961,11 @@ static void vtd_context_device_invalidate(IntelIOMMU=
+State *s,
+>      uint16_t mask;
+>      VTDBus *vtd_bus;
+>      VTDAddressSpace *vtd_as;
+> -    uint16_t devfn;
+> +    uint8_t bus_n, devfn;
+>      uint16_t devfn_it;
 > =20
-> -    /* Check if @gpa is above 2^X-1, where X is the minimum of MGAW in C=
-AP_REG
-> -     * and AW in context-entry.
-> +    /* Check if @iova is above 2^X-1, where X is the minimum of MGAW
-> +     * in CAP_REG and AW in context-entry.
->       */
-> -    if (gpa & ~((1ULL << MIN(ce_agaw, VTD_MGAW)) - 1)) {
-> -        VTD_DPRINTF(GENERAL, "error: gpa 0x%"PRIx64 " exceeds limits", g=
-pa);
-> +    if (iova & ~((1ULL << MIN(ce_agaw, VTD_MGAW)) - 1)) {
-> +        VTD_DPRINTF(GENERAL, "error: iova 0x%"PRIx64 " exceeds limits", =
-iova);
->          return -VTD_FR_ADDR_BEYOND_MGAW;
+> +    trace_vtd_inv_desc_cc_devices(source_id, func_mask);
+> +
+>      switch (func_mask & 3) {
+>      case 0:
+>          mask =3D 0;   /* No bits in the SID field masked */
+> @@ -980,16 +981,16 @@ static void vtd_context_device_invalidate(IntelIOMM=
+UState *s,
+>          break;
 >      }
-> =20
-> @@ -654,13 +654,13 @@ static int vtd_gpa_to_slpte(VTDContextEntry *ce, ui=
-nt64_t gpa, bool is_write,
->      access_right_check =3D is_write ? VTD_SL_W : VTD_SL_R;
-> =20
->      while (true) {
-> -        offset =3D vtd_gpa_level_offset(gpa, level);
-> +        offset =3D vtd_iova_level_offset(iova, level);
->          slpte =3D vtd_get_slpte(addr, offset);
-> =20
->          if (slpte =3D=3D (uint64_t)-1) {
->              VTD_DPRINTF(GENERAL, "error: fail to access second-level pag=
-ing "
-> -                        "entry at level %"PRIu32 " for gpa 0x%"PRIx64,
-> -                        level, gpa);
-> +                        "entry at level %"PRIu32 " for iova 0x%"PRIx64,
-> +                        level, iova);
->              if (level =3D=3D vtd_get_level_from_context_entry(ce)) {
->                  /* Invalid programming of context-entry */
->                  return -VTD_FR_CONTEXT_ENTRY_INV;
-> @@ -672,8 +672,8 @@ static int vtd_gpa_to_slpte(VTDContextEntry *ce, uint=
-64_t gpa, bool is_write,
->          *writes =3D (*writes) && (slpte & VTD_SL_W);
->          if (!(slpte & access_right_check)) {
->              VTD_DPRINTF(GENERAL, "error: lack of %s permission for "
-> -                        "gpa 0x%"PRIx64 " slpte 0x%"PRIx64,
-> -                        (is_write ? "write" : "read"), gpa, slpte);
-> +                        "iova 0x%"PRIx64 " slpte 0x%"PRIx64,
-> +                        (is_write ? "write" : "read"), iova, slpte);
->              return is_write ? -VTD_FR_WRITE : -VTD_FR_READ;
+>      mask =3D ~mask;
+> -    VTD_DPRINTF(INV, "device-selective invalidation source 0x%"PRIx16
+> -                    " mask %"PRIu16, source_id, mask);
+> -    vtd_bus =3D vtd_find_as_from_bus_num(s, VTD_SID_TO_BUS(source_id));
+> +
+> +    bus_n =3D VTD_SID_TO_BUS(source_id);
+> +    vtd_bus =3D vtd_find_as_from_bus_num(s, bus_n);
+>      if (vtd_bus) {
+>          devfn =3D VTD_SID_TO_DEVFN(source_id);
+>          for (devfn_it =3D 0; devfn_it < X86_IOMMU_PCI_DEVFN_MAX; ++devfn=
+_it) {
+>              vtd_as =3D vtd_bus->dev_as[devfn_it];
+>              if (vtd_as && ((devfn_it & mask) =3D=3D (devfn & mask))) {
+> -                VTD_DPRINTF(INV, "invalidate context-cahce of devfn 0x%"=
+PRIx16,
+> -                            devfn_it);
+> +                trace_vtd_inv_desc_cc_device(bus_n, VTD_PCI_SLOT(devfn_i=
+t),
+> +                                             VTD_PCI_FUNC(devfn_it));
+>                  vtd_as->context_cache_entry.context_cache_gen =3D 0;
+>              }
 >          }
->          if (vtd_slpte_nonzero_rsvd(slpte, level)) {
-> @@ -827,7 +827,7 @@ static void vtd_do_iommu_translate(VTDAddressSpace *v=
-td_as, PCIBus *bus,
->      /* Try to fetch slpte form IOTLB */
->      iotlb_entry =3D vtd_lookup_iotlb(s, source_id, addr);
->      if (iotlb_entry) {
-> -        VTD_DPRINTF(CACHE, "hit iotlb sid 0x%"PRIx16 " gpa 0x%"PRIx64
-> +        VTD_DPRINTF(CACHE, "hit iotlb sid 0x%"PRIx16 " iova 0x%"PRIx64
->                      " slpte 0x%"PRIx64 " did 0x%"PRIx16, source_id, addr,
->                      iotlb_entry->slpte, iotlb_entry->domain_id);
->          slpte =3D iotlb_entry->slpte;
-> @@ -867,8 +867,8 @@ static void vtd_do_iommu_translate(VTDAddressSpace *v=
-td_as, PCIBus *bus,
->          cc_entry->context_cache_gen =3D s->context_cache_gen;
+> @@ -1302,9 +1303,7 @@ static bool vtd_process_wait_desc(IntelIOMMUState *=
+s, VTDInvDesc *inv_desc)
+>  {
+>      if ((inv_desc->hi & VTD_INV_DESC_WAIT_RSVD_HI) ||
+>          (inv_desc->lo & VTD_INV_DESC_WAIT_RSVD_LO)) {
+> -        VTD_DPRINTF(GENERAL, "error: non-zero reserved field in Invalida=
+tion "
+> -                    "Wait Descriptor hi 0x%"PRIx64 " lo 0x%"PRIx64,
+> -                    inv_desc->hi, inv_desc->lo);
+> +        trace_vtd_inv_desc_wait_invalid(inv_desc->hi, inv_desc->lo);
+>          return false;
+>      }
+>      if (inv_desc->lo & VTD_INV_DESC_WAIT_SW) {
+> @@ -1316,21 +1315,18 @@ static bool vtd_process_wait_desc(IntelIOMMUState=
+ *s, VTDInvDesc *inv_desc)
+> =20
+>          /* FIXME: need to be masked with HAW? */
+>          dma_addr_t status_addr =3D inv_desc->hi;
+> -        VTD_DPRINTF(INV, "status data 0x%x, status addr 0x%"PRIx64,
+> -                    status_data, status_addr);
+> +        trace_vtd_inv_desc_wait_sw(status_addr, status_data);
+>          status_data =3D cpu_to_le32(status_data);
+>          if (dma_memory_write(&address_space_memory, status_addr, &status=
+_data,
+>                               sizeof(status_data))) {
+> -            VTD_DPRINTF(GENERAL, "error: fail to perform a coherent writ=
+e");
+> +            trace_vtd_inv_desc_wait_write_fail(inv_desc->hi, inv_desc->l=
+o);
+>              return false;
+>          }
+>      } else if (inv_desc->lo & VTD_INV_DESC_WAIT_IF) {
+>          /* Interrupt flag */
+> -        VTD_DPRINTF(INV, "Invalidation Wait Descriptor interrupt complet=
+ion");
+>          vtd_generate_completion_event(s);
+>      } else {
+> -        VTD_DPRINTF(GENERAL, "error: invalid Invalidation Wait Descripto=
+r: "
+> -                    "hi 0x%"PRIx64 " lo 0x%"PRIx64, inv_desc->hi, inv_de=
+sc->lo);
+> +        trace_vtd_inv_desc_wait_invalid(inv_desc->hi, inv_desc->lo);
+>          return false;
+>      }
+>      return true;
+> @@ -1339,30 +1335,29 @@ static bool vtd_process_wait_desc(IntelIOMMUState=
+ *s, VTDInvDesc *inv_desc)
+>  static bool vtd_process_context_cache_desc(IntelIOMMUState *s,
+>                                             VTDInvDesc *inv_desc)
+>  {
+> +    uint16_t sid, fmask;
+> +
+>      if ((inv_desc->lo & VTD_INV_DESC_CC_RSVD) || inv_desc->hi) {
+> -        VTD_DPRINTF(GENERAL, "error: non-zero reserved field in Context-=
+cache "
+> -                    "Invalidate Descriptor");
+> +        trace_vtd_inv_desc_cc_invalid(inv_desc->hi, inv_desc->lo);
+>          return false;
+>      }
+>      switch (inv_desc->lo & VTD_INV_DESC_CC_G) {
+>      case VTD_INV_DESC_CC_DOMAIN:
+> -        VTD_DPRINTF(INV, "domain-selective invalidation domain 0x%"PRIx1=
+6,
+> -                    (uint16_t)VTD_INV_DESC_CC_DID(inv_desc->lo));
+> +        trace_vtd_inv_desc_cc_domain(
+> +            (uint16_t)VTD_INV_DESC_CC_DID(inv_desc->lo));
+>          /* Fall through */
+>      case VTD_INV_DESC_CC_GLOBAL:
+> -        VTD_DPRINTF(INV, "global invalidation");
+>          vtd_context_global_invalidate(s);
+>          break;
+> =20
+>      case VTD_INV_DESC_CC_DEVICE:
+> -        vtd_context_device_invalidate(s, VTD_INV_DESC_CC_SID(inv_desc->l=
+o),
+> -                                      VTD_INV_DESC_CC_FM(inv_desc->lo));
+> +        sid =3D VTD_INV_DESC_CC_SID(inv_desc->lo);
+> +        fmask =3D VTD_INV_DESC_CC_FM(inv_desc->lo);
+> +        vtd_context_device_invalidate(s, sid, fmask);
+>          break;
+> =20
+>      default:
+> -        VTD_DPRINTF(GENERAL, "error: invalid granularity in Context-cach=
+e "
+> -                    "Invalidate Descriptor hi 0x%"PRIx64  " lo 0x%"PRIx6=
+4,
+> -                    inv_desc->hi, inv_desc->lo);
+> +        trace_vtd_inv_desc_cc_invalid(inv_desc->hi, inv_desc->lo);
+>          return false;
+>      }
+>      return true;
+> @@ -1376,22 +1371,19 @@ static bool vtd_process_iotlb_desc(IntelIOMMUStat=
+e *s, VTDInvDesc *inv_desc)
+> =20
+>      if ((inv_desc->lo & VTD_INV_DESC_IOTLB_RSVD_LO) ||
+>          (inv_desc->hi & VTD_INV_DESC_IOTLB_RSVD_HI)) {
+> -        VTD_DPRINTF(GENERAL, "error: non-zero reserved field in IOTLB "
+> -                    "Invalidate Descriptor hi 0x%"PRIx64 " lo 0x%"PRIx64,
+> -                    inv_desc->hi, inv_desc->lo);
+> +        trace_vtd_inv_desc_iotlb_invalid(inv_desc->hi, inv_desc->lo);
+>          return false;
 >      }
 > =20
-> -    ret_fr =3D vtd_gpa_to_slpte(&ce, addr, is_write, &slpte, &level,
-> -                              &reads, &writes);
-> +    ret_fr =3D vtd_iova_to_slpte(&ce, addr, is_write, &slpte, &level,
-> +                               &reads, &writes);
->      if (ret_fr) {
->          ret_fr =3D -ret_fr;
->          if (is_fpd_set && vtd_is_qualified_fault(ret_fr)) {
-> @@ -2033,7 +2033,7 @@ static IOMMUTLBEntry vtd_iommu_translate(MemoryRegi=
-on *iommu, hwaddr addr,
->                             is_write, &ret);
->      VTD_DPRINTF(MMU,
->                  "bus %"PRIu8 " slot %"PRIu8 " func %"PRIu8 " devfn %"PRI=
-u8
-> -                " gpa 0x%"PRIx64 " hpa 0x%"PRIx64, pci_bus_num(vtd_as->b=
-us),
-> +                " iova 0x%"PRIx64 " hpa 0x%"PRIx64, pci_bus_num(vtd_as->=
-bus),
->                  VTD_PCI_SLOT(vtd_as->devfn), VTD_PCI_FUNC(vtd_as->devfn),
->                  vtd_as->devfn, addr, ret.translated_addr);
->      return ret;
+>      switch (inv_desc->lo & VTD_INV_DESC_IOTLB_G) {
+>      case VTD_INV_DESC_IOTLB_GLOBAL:
+> -        VTD_DPRINTF(INV, "global invalidation");
+> +        trace_vtd_inv_desc_iotlb_global();
+>          vtd_iotlb_global_invalidate(s);
+>          break;
+> =20
+>      case VTD_INV_DESC_IOTLB_DOMAIN:
+>          domain_id =3D VTD_INV_DESC_IOTLB_DID(inv_desc->lo);
+> -        VTD_DPRINTF(INV, "domain-selective invalidation domain 0x%"PRIx1=
+6,
+> -                    domain_id);
+> +        trace_vtd_inv_desc_iotlb_domain(domain_id);
+>          vtd_iotlb_domain_invalidate(s, domain_id);
+>          break;
+> =20
+> @@ -1399,20 +1391,16 @@ static bool vtd_process_iotlb_desc(IntelIOMMUStat=
+e *s, VTDInvDesc *inv_desc)
+>          domain_id =3D VTD_INV_DESC_IOTLB_DID(inv_desc->lo);
+>          addr =3D VTD_INV_DESC_IOTLB_ADDR(inv_desc->hi);
+>          am =3D VTD_INV_DESC_IOTLB_AM(inv_desc->hi);
+> -        VTD_DPRINTF(INV, "page-selective invalidation domain 0x%"PRIx16
+> -                    " addr 0x%"PRIx64 " mask %"PRIu8, domain_id, addr, a=
+m);
+> +        trace_vtd_inv_desc_iotlb_pages(domain_id, addr, am);
+>          if (am > VTD_MAMV) {
+> -            VTD_DPRINTF(GENERAL, "error: supported max address mask valu=
+e is "
+> -                        "%"PRIu8, (uint8_t)VTD_MAMV);
+> +            trace_vtd_inv_desc_iotlb_invalid(inv_desc->hi, inv_desc->lo);
+>              return false;
+>          }
+>          vtd_iotlb_page_invalidate(s, domain_id, addr, am);
+>          break;
+> =20
+>      default:
+> -        VTD_DPRINTF(GENERAL, "error: invalid granularity in IOTLB Invali=
+date "
+> -                    "Descriptor hi 0x%"PRIx64 " lo 0x%"PRIx64,
+> -                    inv_desc->hi, inv_desc->lo);
+> +        trace_vtd_inv_desc_iotlb_invalid(inv_desc->hi, inv_desc->lo);
+>          return false;
+>      }
+>      return true;
+> @@ -1511,33 +1499,28 @@ static bool vtd_process_inv_desc(IntelIOMMUState =
+*s)
+> =20
+>      switch (desc_type) {
+>      case VTD_INV_DESC_CC:
+> -        VTD_DPRINTF(INV, "Context-cache Invalidate Descriptor hi 0x%"PRI=
+x64
+> -                    " lo 0x%"PRIx64, inv_desc.hi, inv_desc.lo);
+> +        trace_vtd_inv_desc("context-cache", inv_desc.hi, inv_desc.lo);
+>          if (!vtd_process_context_cache_desc(s, &inv_desc)) {
+>              return false;
+>          }
+>          break;
+> =20
+>      case VTD_INV_DESC_IOTLB:
+> -        VTD_DPRINTF(INV, "IOTLB Invalidate Descriptor hi 0x%"PRIx64
+> -                    " lo 0x%"PRIx64, inv_desc.hi, inv_desc.lo);
+> +        trace_vtd_inv_desc("iotlb", inv_desc.hi, inv_desc.lo);
+>          if (!vtd_process_iotlb_desc(s, &inv_desc)) {
+>              return false;
+>          }
+>          break;
+> =20
+>      case VTD_INV_DESC_WAIT:
+> -        VTD_DPRINTF(INV, "Invalidation Wait Descriptor hi 0x%"PRIx64
+> -                    " lo 0x%"PRIx64, inv_desc.hi, inv_desc.lo);
+> +        trace_vtd_inv_desc("wait", inv_desc.hi, inv_desc.lo);
+>          if (!vtd_process_wait_desc(s, &inv_desc)) {
+>              return false;
+>          }
+>          break;
+> =20
+>      case VTD_INV_DESC_IEC:
+> -        VTD_DPRINTF(INV, "Invalidation Interrupt Entry Cache "
+> -                    "Descriptor hi 0x%"PRIx64 " lo 0x%"PRIx64,
+> -                    inv_desc.hi, inv_desc.lo);
+> +        trace_vtd_inv_desc("iec", inv_desc.hi, inv_desc.lo);
+>          if (!vtd_process_inv_iec_desc(s, &inv_desc)) {
+>              return false;
+>          }
+> @@ -1552,9 +1535,7 @@ static bool vtd_process_inv_desc(IntelIOMMUState *s)
+>          break;
+> =20
+>      default:
+> -        VTD_DPRINTF(GENERAL, "error: unkonw Invalidation Descriptor type=
+ "
+> -                    "hi 0x%"PRIx64 " lo 0x%"PRIx64 " type %"PRIu8,
+> -                    inv_desc.hi, inv_desc.lo, desc_type);
+> +        trace_vtd_inv_desc_invalid(inv_desc.hi, inv_desc.lo);
+>          return false;
+>      }
+>      s->iq_head++;
+> diff --git a/hw/i386/trace-events b/hw/i386/trace-events
+> index 1cc4a10..02aeaab 100644
+> --- a/hw/i386/trace-events
+> +++ b/hw/i386/trace-events
+> @@ -3,6 +3,24 @@
+>  # hw/i386/x86-iommu.c
+>  x86_iommu_iec_notify(bool global, uint32_t index, uint32_t mask) "Notify=
+ IEC invalidation: global=3D%d index=3D%" PRIu32 " mask=3D%" PRIu32
+> =20
+> +# hw/i386/intel_iommu.c
+> +vtd_switch_address_space(uint8_t bus, uint8_t slot, uint8_t fn, bool on)=
+ "Device %02x:%02x.%x switching address space (iommu enabled=3D%d)"
+> +vtd_inv_desc(const char *type, uint64_t hi, uint64_t lo) "invalidate des=
+c type %s high 0x%"PRIx64" low 0x%"PRIx64
+> +vtd_inv_desc_invalid(uint64_t hi, uint64_t lo) "invalid inv desc hi 0x%"=
+PRIx64" lo 0x%"PRIx64
+> +vtd_inv_desc_cc_domain(uint16_t domain) "context invalidate domain 0x%"P=
+RIx16
+> +vtd_inv_desc_cc_global(void) "context invalidate globally"
+> +vtd_inv_desc_cc_device(uint8_t bus, uint8_t dev, uint8_t fn) "context in=
+validate device %02"PRIx8":%02"PRIx8".%02"PRIx8
+> +vtd_inv_desc_cc_devices(uint16_t sid, uint16_t fmask) "context invalidat=
+e devices sid 0x%"PRIx16" fmask 0x%"PRIx16
+> +vtd_inv_desc_cc_invalid(uint64_t hi, uint64_t lo) "invalid context-cache=
+ desc hi 0x%"PRIx64" lo 0x%"PRIx64
+> +vtd_inv_desc_iotlb_global(void) "iotlb invalidate global"
+> +vtd_inv_desc_iotlb_domain(uint16_t domain) "iotlb invalidate whole domai=
+n 0x%"PRIx16
+> +vtd_inv_desc_iotlb_pages(uint16_t domain, uint64_t addr, uint8_t mask) "=
+iotlb invalidate domain 0x%"PRIx16" addr 0x%"PRIx64" mask 0x%"PRIx8
+> +vtd_inv_desc_iotlb_invalid(uint64_t hi, uint64_t lo) "invalid iotlb desc=
+ hi 0x%"PRIx64" lo 0x%"PRIx64
+> +vtd_inv_desc_wait_sw(uint64_t addr, uint32_t data) "wait invalidate stat=
+us write addr 0x%"PRIx64" data 0x%"PRIx32
+> +vtd_inv_desc_wait_irq(const char *msg) "%s"
+> +vtd_inv_desc_wait_invalid(uint64_t hi, uint64_t lo) "invalid wait desc h=
+i 0x%"PRIx64" lo 0x%"PRIx64
+> +vtd_inv_desc_wait_write_fail(uint64_t hi, uint64_t lo) "write fail for w=
+ait desc hi 0x%"PRIx64" lo 0x%"PRIx64
+> +
+>  # hw/i386/amd_iommu.c
+>  amdvi_evntlog_fail(uint64_t addr, uint32_t head) "error: fail to write a=
+t addr 0x%"PRIx64" +  offset 0x%"PRIx32
+>  amdvi_cache_update(uint16_t domid, uint8_t bus, uint8_t slot, uint8_t fu=
+nc, uint64_t gpa, uint64_t txaddr) " update iotlb domid 0x%"PRIx16" devid: =
+%02x:%02x.%x gpa 0x%"PRIx64" hpa 0x%"PRIx64
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -208,25 +397,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---5Dr6Wqe9hdyl7LAI
+--GGxZz/e2pmGePzrA
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYnRSSAAoJEGw4ysog2bOSW9oQAJZBGZ4LoOIR+IeLloqCMrP9
-BcuZub9ZoyCGLox0xCCG2eA4m+f3Av6II12ycDsCqODeGhbzQzUKbrXIwn++9lDu
-KURriJuWMv76RT+NcAL//cr8oXNA2YAsgtpIt+ArFDD4N9VlA2387pilJ/vMeX3R
-jwkT3N8Z5ZTHS+IggN4p9Y/EvwpGNcRlNdH/PVzMbelBHKAEKYu/d2ITiM6G9ACY
-2/TNVblYriYwylxWQNJ91W6o1F0YKMxdkxNnK6inYS2MV2Gpoc7fOzUESfB2qTRq
-gSypik9qCE5YgqxQ7lOO5H9jOvcRaryth/yIJYyKzF89a19jCoetcjvF/UewNMJm
-J8uJLcMfebtIw0elWymR4yonr8lsB39zFYQXZldoD5Jtb5JQTFXBQ8L74sPpmbGl
-k7B4e1VkH0s+PjUAfZiEcEEQqTQDTsVT3Hkd+VaYU6DoFj9ikDy889X2rtUFGHB3
-Y9HB+Kc/jzYnRGlf7ZxhOTkCYKAkmrSKkITKn5JY6nodJ4OIncs7H9muadOKQ7Hl
-omRbg+K7Lrg98wdbRvHq8dCukQyBQMeX3VUrfPtRzrkhvjOmKVxxp4+SwNMvISXQ
-fWSrTOAOGJmhtSZzbma8xHarFdb8L3hDBghtaNc/bqdCDQoiufCOozH4LxhZldAp
-0hhNUY/+URt2XzFkbU8N
-=sQgr
+iQIcBAEBCAAGBQJYnRUNAAoJEGw4ysog2bOSSu4P/R3jOUqZc1UKS1dCOih+EtsJ
+7nRX9WVURvwTW+ES8b+2q1sh9g2zg22I4l3p6rlDsuM3bW3IqpV/j0bF1YpGec3n
+d4gvZjb0sDNpEVrGCG1km05sJ2I6JvPU/Kq+rSfOjd2PtGVAneA8L2MG8trdZfGZ
+TfeOvKoIKjxs8djpwqYc6qBgPYRZ90eWaGGk/Vb5C+IF4hB+nj18vOcs9Opk2Rko
+mW9PtlnVokdiKlcyxQ+DeFCu/uAUx5G8FFYqSoR66B40HcBYOcLivvXsnVNLeJbh
+2H7u5H8A2MnKtLpw7qNVTLLfpzcQyoI45HQnC+rtjq4dB+AjFBqJptOhWJ7Jdx0O
+kOJRkLTEzEfIU+Ht5x7AmlIzql2qerh1F1S/lwX3g74Jw8wUMNO9KpV0v8+UIJ6B
+GRwZJy4Wslx6QDV3snT+GwsFhXhtPep+BU8EGxYb4os6MidRfy6nHkE0P8yGzVSJ
+GF08vEZ2EBZIG/8T+2FG4RRd+m37VadinCYtyYyuQtCwRfbXGrfVVmuUx4GJtJ97
+tHDGvvGJOvm4+Op/TDs2inzcDlFVm6NIx2ensebhdNO4qVN4U6Uc2PUqOfMChBB7
+10s3FSFKTWNJVcgy2GQIVSMum9lYjApS+S4Hv3zP9RiOQMSjWffqSTq93g0MNGzK
+GsqVTSRjnNXHyM9MtLgM
+=fRc2
 -----END PGP SIGNATURE-----
 
---5Dr6Wqe9hdyl7LAI--
+--GGxZz/e2pmGePzrA--
