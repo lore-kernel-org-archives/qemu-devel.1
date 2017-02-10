@@ -1,15 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55766)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ccCuh-0005XE-Oa
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:15:08 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ccCw5-0006b8-Jx
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:16:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ccCud-0005RW-LB
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:15:07 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Fri, 10 Feb 2017 16:14:59 +0100
-Message-Id: <1486739699-1076-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] tests/prom-env: Ease time-out problems on
- slow hosts
+	(envelope-from <dgilbert@redhat.com>) id 1ccCw2-0005hX-ER
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:16:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52606)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ccCw2-0005hH-8f
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:16:30 -0500
+Date: Fri, 10 Feb 2017 15:16:25 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170210151624.GE13357@work-vm>
+References: <1486564125-31366-1-git-send-email-ashijeetacharya@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1486564125-31366-1-git-send-email-ashijeetacharya@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v3] migrate: Introduce zero RAM checks to
+ skip RAM migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,60 +27,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Cc: thuth@redhat.com, quintela@redhat.com, berrange@redhat.com, pbonzini@redhat.com, groug@kaod.org, qemu-devel@nongnu.org
 
-Peter Maydell recently ran into time-out problems with the
-prom-env test on a rather slow ARM board. To tackle this issue,
-we can speed up the test by running QEMU with "-nodefaults" for
-the pseries machine, so that SLOF has less devices to scan during
-boot, and by using the "nvramrc" environment variable instead of
-"boot-command", since this variable is evaluated earlier in the
-boot process.
-And to be really sure that we do not face such time out problems
-again, let's also increase the time out value from 100s to 120s
-instead.
+* Ashijeet Acharya (ashijeetacharya@gmail.com) wrote:
+> Migration of a "none" machine with no RAM crashes abruptly as
+> bitmap_new() fails and thus aborts. Instead place zero RAM checks at
+> appropriate places to skip migration of RAM in this case and complete
+> migration successfully for devices only.
+> 
+> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- v2: Use "-nodefaults" only for the pseries machine, since the
-     sparc machines have a built-in ethernet controller and spill
-     out a warning otherwise.
+Queued.
 
- tests/prom-env-test.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
-
-diff --git a/tests/prom-env-test.c b/tests/prom-env-test.c
-index 0ba6f48..bd33bc3 100644
---- a/tests/prom-env-test.c
-+++ b/tests/prom-env-test.c
-@@ -30,8 +30,8 @@ static void check_guest_memory(void)
-     uint32_t signature;
-     int i;
- 
--    /* Poll until code has run and modified memory. Wait at most 30 seconds */
--    for (i = 0; i < 10000; ++i) {
-+    /* Poll until code has run and modified memory. Wait at most 120 seconds */
-+    for (i = 0; i < 12000; ++i) {
-         signature = readl(ADDRESS);
-         if (signature == MAGIC) {
-             break;
-@@ -45,9 +45,14 @@ static void check_guest_memory(void)
- static void test_machine(const void *machine)
- {
-     char *args;
-+    const char *extra_args;
- 
--    args = g_strdup_printf("-M %s,accel=tcg -prom-env 'boot-command=%x %x l!'",
--                           (const char *)machine, MAGIC, ADDRESS);
-+    /* The pseries firmware boots much faster without the default devices */
-+    extra_args = strcmp(machine, "pseries") == 0 ? "-nodefaults" : "";
-+
-+    args = g_strdup_printf("-M %s,accel=tcg %s -prom-env 'use-nvramrc?=true' "
-+                           "-prom-env 'nvramrc=%x %x l!' ",
-+                           (const char *)machine, extra_args, MAGIC, ADDRESS);
- 
-     qtest_start(args);
-     check_guest_memory();
--- 
-1.8.3.1
+> ---
+> Changes in v3:
+> - handle migration cleanup appropriately (Dave)
+> Changes in v2:
+> - try to migrate successfully by skipping RAM (Paolo, Greg)
+> - drop the idea of erroring out and failing nicely
+> ---
+>  migration/ram.c | 22 +++++++++++++++-------
+>  1 file changed, 15 insertions(+), 7 deletions(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index ef8fadf..faff5ab 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -1325,6 +1325,11 @@ static int ram_find_and_save_block(QEMUFile *f, bool last_stage,
+>      ram_addr_t dirty_ram_abs; /* Address of the start of the dirty page in
+>                                   ram_addr_t space */
+>  
+> +    /* No dirty page as there is zero RAM */
+> +    if (!ram_bytes_total()) {
+> +        return pages;
+> +    }
+> +
+>      pss.block = last_seen_block;
+>      pss.offset = last_offset;
+>      pss.complete_round = false;
+> @@ -1912,14 +1917,17 @@ static int ram_save_init_globals(void)
+>      bytes_transferred = 0;
+>      reset_ram_globals();
+>  
+> -    ram_bitmap_pages = last_ram_offset() >> TARGET_PAGE_BITS;
+>      migration_bitmap_rcu = g_new0(struct BitmapRcu, 1);
+> -    migration_bitmap_rcu->bmap = bitmap_new(ram_bitmap_pages);
+> -    bitmap_set(migration_bitmap_rcu->bmap, 0, ram_bitmap_pages);
+> -
+> -    if (migrate_postcopy_ram()) {
+> -        migration_bitmap_rcu->unsentmap = bitmap_new(ram_bitmap_pages);
+> -        bitmap_set(migration_bitmap_rcu->unsentmap, 0, ram_bitmap_pages);
+> +    /* Skip setting bitmap if there is no RAM */
+> +    if (ram_bytes_total()) {
+> +        ram_bitmap_pages = last_ram_offset() >> TARGET_PAGE_BITS;
+> +        migration_bitmap_rcu->bmap = bitmap_new(ram_bitmap_pages);
+> +        bitmap_set(migration_bitmap_rcu->bmap, 0, ram_bitmap_pages);
+> +
+> +        if (migrate_postcopy_ram()) {
+> +            migration_bitmap_rcu->unsentmap = bitmap_new(ram_bitmap_pages);
+> +            bitmap_set(migration_bitmap_rcu->unsentmap, 0, ram_bitmap_pages);
+> +        }
+>      }
+>  
+>      /*
+> -- 
+> 2.6.2
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
