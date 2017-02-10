@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cc45U-0007an-8n
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 00:49:41 -0500
+	(envelope-from <peterx@redhat.com>) id 1cc46l-0008IX-Kz
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 00:51:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cc45T-0001Uw-BZ
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 00:49:40 -0500
-Message-ID: <1486705767.4230.8.camel@gmail.com>
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Fri, 10 Feb 2017 16:49:27 +1100
-In-Reply-To: <1486704514.4230.7.camel@gmail.com>
-References: <1486704360-27361-1-git-send-email-sjitindarsingh@gmail.com>
-	<1486704514.4230.7.camel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH V2 00/10] target/ppc: Implement
- POWER9 pseries tcg
+	(envelope-from <peterx@redhat.com>) id 1cc46i-0001yc-GK
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 00:50:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44406)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cc46i-0001xw-A4
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 00:50:56 -0500
+Date: Fri, 10 Feb 2017 13:50:50 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170210055050.GF22153@pxdev.xzpeter.org>
+References: <1486456099-7345-1-git-send-email-peterx@redhat.com>
+	<1486456099-7345-3-git-send-email-peterx@redhat.com>
+	<20170210011222.GA19188@umbus>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170210011222.GA19188@umbus>
+Subject: Re: [Qemu-devel] [PATCH v7 02/17] vfio: introduce vfio_get_vaddr()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,94 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org
-Cc: david@gibson.dropbear.id.au, agraf@suse.de, qemu-devel@nongnu.org, sam.bobroff@au1.ibm.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
 
-On Fri, 2017-02-10 at 16:28 +1100, Suraj Jitindar Singh wrote:
-> On Fri, 2017-02-10 at 16:25 +1100, Suraj Jitindar Singh wrote:
+On Fri, Feb 10, 2017 at 12:12:22PM +1100, David Gibson wrote:
+> On Tue, Feb 07, 2017 at 04:28:04PM +0800, Peter Xu wrote:
+> > A cleanup for vfio_iommu_map_notify(). Now we will fetch vaddr even if
+> > the operation is unmap, but it won't hurt much.
 > > 
-> > This is V2 of the patch series to implement tcg emulation support
-> > for
-> > a
-> > POWER9 cpu model for the pseries machine type running a legacy
-> > kernel.
-> > That is a kernel which doesn't use the new radix mmu mode or the
-> > new
-> > hash
-> > mmu mode with segment tables.
-> FWIW tree available here:
-> https://gitlab.ozlabs.ibm.com/surajjs/qemu/tree/POWER9-LEGACY
-Scratch that, this:
-https://github.ibm.com/surajjs/qemu/tree/POWER9-LEGACY
+> > One thing to mention is that we need the RCU read lock to protect the
+> > whole translation and map/unmap procedure.
 > > 
-> > 
-> > To use a POWER9 cpu provide the command line option "-cpu POWER9".
-> > 
-> > This series attempts to avoid precluding KVM-HV support for the
-> > POWER9
-> > cpu model but doesn't attempt to support KVM-PR or the powernv
-> > machine
-> > for the POWER9 cpu model as these aren't currently supported or
-> > implemented and further code changes will be required in the event
-> > these
-> > are implemented.
-> > 
-> > This series will be followed shortly by one to implement radix
-> > support and
-> > currently trying to boot a kernel with support for radix with this
-> > series
-> > will fail on the H_REGISTER_PROCESS_TABLE hcall.
-> > 
-> > The changes from V1 are as follows:
-> > 
-> >  - Drop patches which have already been merged.
-> >  - Instead of allocating a whole partition table we allocate a
-> > single
-> >    entry in the sPAPRMachineState and access it via the virtual
-> > hypv.
-> >  - Changes to how we handle SDR1 and renaming of associated
-> > functions.
-> >  - Drop patch to use the new pte format, guest kernels expect the
-> > old
-> >    format anyway, so this will only be applicable when POWER9
-> > powernv
-> >    support is added, so delay adding support for this until then.
-> >  - Rename the mmu fault handler to ppc64_v3_handle_mmu_fault.
-> >  - Move segment table searching into the fault handler instead of
-> > in
-> >    slb_lookup().
-> >  - Move adding the POWER9 pseries cpu model to the end of the
-> > series.
-> > 
-> > Suraj Jitindar Singh (10):
-> >   target/ppc/POWER9: Add ISAv3.00 MMU definition
-> >   target/ppc: Fix LPCR DPFD mask define
-> >   target/ppc/POWER9: Adapt LPCR handling for POWER9
-> >   target/ppc/POWER9: Direct all instr and data storage interrupts
-> > to
-> > the
-> >     hypv
-> >   target/ppc: Add patb_entry to sPAPRMachineState
-> >   target/ppc: Don't use SDR1 when running under a POWER9 cpu model
-> >   target/ppc/POWER9: Add POWER9 mmu fault handler
-> >   target/ppc/POWER9: Add POWER9 pa-features definition
-> >   target/ppc/POWER9: Add cpu_has_work function for POWER9
-> >   hw/ppc/spapr: Add POWER9 to pseries cpu models
-> > 
-> >  hw/ppc/spapr.c              | 37 ++++++++++++++++++
-> >  hw/ppc/spapr_cpu_core.c     |  3 ++
-> >  include/hw/ppc/spapr.h      |  1 +
-> >  target/ppc/cpu-qom.h        |  5 ++-
-> >  target/ppc/cpu.h            | 24 +++++++++++-
-> >  target/ppc/kvm.c            |  2 +-
-> >  target/ppc/machine.c        |  4 +-
-> >  target/ppc/misc_helper.c    |  3 +-
-> >  target/ppc/mmu-hash64.c     | 49 +++++++++++++++++++++---
-> >  target/ppc/mmu-hash64.h     |  2 +-
-> >  target/ppc/mmu.h            | 50 +++++++++++++++++++++++++
-> >  target/ppc/mmu_helper.c     | 54 +++++++++++++++++++++++++--
-> >  target/ppc/translate.c      |  7 +++-
-> >  target/ppc/translate_init.c | 91
-> > +++++++++++++++++++++++++++++++++++++++------
-> >  14 files changed, 302 insertions(+), 30 deletions(-)
-> >  create mode 100644 target/ppc/mmu.h
+> > Acked-by: Alex Williamson <alex.williamson@redhat.com>
+> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> 
+> So, I know I reviewed this already, but looking again I'm confused.
+> 
+> I'm not sure how the original code ever worked: if this is an unmap
+> (perm == IOMMU_NONE), then I wouldn't even expect
+> iotlb->translated_addr to have a valid value, but we're passing it to
+> address_space_translate() and failing if it it doesn't give us
+> sensible results.
+
+Hmm, right.
+
+Looks like it is just because we have accidentally inited
+iotlb->translated_addr in all the callers of
+memory_region_notify_iommu (one is put_tce_emu(), the other one is
+rpcit_service_call()). If so, patch 3 (maybe, along with this one)
+would be more essential imho to make sure we don't have such an
+assumption.
+
+Thanks,
+
+-- peterx
