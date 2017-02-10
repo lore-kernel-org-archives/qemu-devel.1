@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ccDDc-0001kS-P5
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:34:41 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ccDNA-0005WN-35
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:44:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ccDDb-00035a-Nc
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:34:40 -0500
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:37033)
+	(envelope-from <peter.maydell@linaro.org>) id 1ccDN8-0006HL-Pn
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:44:32 -0500
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:36011)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ccDDb-00034t-G9
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:34:39 -0500
-Received: by mail-wm0-x234.google.com with SMTP id v77so51324871wmv.0
-	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 07:34:39 -0800 (PST)
+	id 1ccDN8-0006H7-JW
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 10:44:30 -0500
+Received: by mail-wr0-x234.google.com with SMTP id k90so110553193wrc.3
+	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 07:44:30 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <87tw82vzt6.fsf@linaro.org>
-References: <20170209170904.5713-1-alex.bennee@linaro.org>
-	<20170209170904.5713-24-alex.bennee@linaro.org>
-	<CAFEAcA8_UNip6QooREop-T5RBpdo1me0piEAscJRC+G7tGcNrA@mail.gmail.com>
-	<87tw82vzt6.fsf@linaro.org>
+In-Reply-To: <20170210150452.21550-1-alex.bennee@linaro.org>
+References: <20170210150452.21550-1-alex.bennee@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 10 Feb 2017 15:34:17 +0000
-Message-ID: <CAFEAcA-cwEAEq_upkAF49S7cbN43a7PPgs733DXD-Kykz--CUQ@mail.gmail.com>
+Date: Fri, 10 Feb 2017 15:44:08 +0000
+Message-ID: <CAFEAcA8dvvz8cgx4ejXB0Ldibh7P4Q3rCmwdLP0Qr0E-23_EMA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v11 23/24] hw/misc/imx6_src: defer clearing
- of SRC_SCR reset bits
+Subject: Re: [Qemu-devel] [PULL 0/2] Travis updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,23 +30,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Richard Henderson <rth@twiddle.net>, MTTCG Devel <mttcg@listserver.greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?S09OUkFEIEZyw6lkw6lyaWM=?= <fred.konrad@greensocs.com>, Alvise Rigo <a.rigo@virtualopensystems.com>, "Emilio G. Cota" <cota@braap.org>, Pranith Kumar <bobby.prani@gmail.com>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Mark Burton <mark.burton@greensocs.com>, Paolo Bonzini <pbonzini@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Fedorov Sergey <serge.fdrv@gmail.com>, Bamvor Zhang Jian <bamvor.zhangjian@linaro.org>, Peter Chubb <peter.chubb@nicta.com.au>, "open list:i.MX31" <qemu-arm@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 10 February 2017 at 15:19, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+On 10 February 2017 at 15:04, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
 te:
-> Peter Maydell <peter.maydell@linaro.org> writes:
->> I guess a malloc-and-free is OK since the guest isn't going to be
->> bouncing CPUs through reset very often, though it's a bit ugly to
->> see in device code.
+> The following changes since commit 7d2c6c95511e42dffe2b263275e09957723d0f=
+f4:
 >
-> Previous patches had expanded the run_on_cpu code to have things like
-> CPUState and a single field to avoid malloc where we can. However I need
-> the IMX6SRCState and I don't know if I can get that in the work
-> function. Will there only ever be one on the system?
+>   Merge remote-tracking branch 'remotes/kraxel/tags/pull-usb-20170206-1' =
+into staging (2017-02-06 11:44:08 +0000)
+>
+> are available in the git repository at:
+>
+>   https://github.com/stsquad/qemu.git tags/pull-travis-10022017-1
+>
+> for you to fetch changes up to 78a22af040b8ea7c26d52755facdc332ac7bac46:
+>
+>   .travis.yml: split VM based builds (2017-02-10 13:19:56 +0000)
+>
+> ----------------------------------------------------------------
+> One minor fix and a build split to reduce timeouts.
+>
+> ----------------------------------------------------------------
+> Alex Benn=C3=A9e (2):
+>       .travis.yml: don't specify CONFIG twice
+>       .travis.yml: split VM based builds
+>
+>  .travis.yml | 39 ++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 34 insertions(+), 5 deletions(-)
 
-In practice there will be only one but I don't think we should
-rely on that. malloc/free is probably better than overly
-convoluted code at this point.
+Applied, thanks.
 
-thanks
 -- PMM
