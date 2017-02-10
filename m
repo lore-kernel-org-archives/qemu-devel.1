@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ccFc6-00021T-T8
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:08:07 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ccFc8-00021Z-2Q
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:08:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ccFc5-0003uI-VF
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:08:06 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ccFc6-0003vz-Qm
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:08:08 -0500
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48480)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ccFc5-0003sU-OL
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:08:05 -0500
+	id 1ccFc6-0003sU-J0
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 13:08:06 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1ccFc4-0007aa-36
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 18:08:04 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1ccFc5-0007bW-FB
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 18:08:05 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 10 Feb 2017 18:07:50 +0000
-Message-Id: <1486750082-12324-1-git-send-email-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 00/12] target-arm queue
+Date: Fri, 10 Feb 2017 18:07:53 +0000
+Message-Id: <1486750082-12324-4-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1486750082-12324-1-git-send-email-peter.maydell@linaro.org>
+References: <1486750082-12324-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PULL 03/12] target-arm: Add support for PMU register
+ PMINTENSET_EL1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +30,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-ARM queue: nothing particularly exciting here, but no
-reason to sit on them for another week.
+From: Wei Huang <wei@redhat.com>
 
-thanks
--- PMM
+This patch adds access support for PMINTENSET_EL1.
 
-The following changes since commit 61eedf7aec0e2395aabd628cc055096909a3ea15:
+Signed-off-by: Wei Huang <wei@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 1486504171-26807-4-git-send-email-wei@redhat.com
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/cpu.h    |  2 +-
+ target/arm/helper.c | 10 +++++++++-
+ 2 files changed, 10 insertions(+), 2 deletions(-)
 
-  tests/prom-env: Ease time-out problems on slow hosts (2017-02-10 15:44:53 +0000)
-
-are available in the git repository at:
-
-  git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20170210
-
-for you to fetch changes up to b4cc583f0285a2e1e78621dfba142f00ca47414a:
-
-  aspeed/smc: use a modulo to check segment limits (2017-02-10 17:40:30 +0000)
-
-----------------------------------------------------------------
-target-arm queue:
- * aspeed: minor fixes
- * virt: declare fwcfg and virtio-mmio as DMA coherent in DT & ACPI
- * arm: enable basic TCG emulation of PMU for AArch64
-
-----------------------------------------------------------------
-Alexander Graf (4):
-      target-arm: Declare virtio-mmio as dma-coherent in dt
-      hw/arm/virt: Declare virtio-mmio as dma cache coherent in ACPI
-      hw/arm/virt: Declare fwcfg as dma cache coherent in ACPI
-      hw/arm/virt: Declare fwcfg as dma cache coherent in dt
-
-Cédric Le Goater (4):
-      aspeed: check for negative values returned by blk_getlength()
-      aspeed: remove useless comment on controller segment size
-      aspeed/smc: handle dummies only in fast read mode
-      aspeed/smc: use a modulo to check segment limits
-
-Wei Huang (4):
-      target-arm: Add support for PMU register PMSELR_EL0
-      target-arm: Add support for AArch64 PMU register PMXEVTYPER_EL0
-      target-arm: Add support for PMU register PMINTENSET_EL1
-      target-arm: Enable vPMU support under TCG mode
-
- target/arm/cpu.h         |  4 +--
- hw/arm/aspeed.c          | 22 +++++++++-----
- hw/arm/vexpress.c        |  1 +
- hw/arm/virt-acpi-build.c |  2 ++
- hw/arm/virt.c            |  4 ++-
- hw/ssi/aspeed_smc.c      | 13 +++++----
- target/arm/cpu.c         |  2 +-
- target/arm/helper.c      | 74 ++++++++++++++++++++++++++++++++++++------------
- 8 files changed, 88 insertions(+), 34 deletions(-)
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index edc1f76..0956a54 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -309,7 +309,7 @@ typedef struct CPUARMState {
+         uint32_t c9_pmovsr; /* perf monitor overflow status */
+         uint32_t c9_pmuserenr; /* perf monitor user enable */
+         uint64_t c9_pmselr; /* perf monitor counter selection register */
+-        uint32_t c9_pminten; /* perf monitor interrupt enables */
++        uint64_t c9_pminten; /* perf monitor interrupt enables */
+         union { /* Memory attribute redirection */
+             struct {
+ #ifdef HOST_WORDS_BIGENDIAN
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index b837d36..5358ac6 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -1275,9 +1275,17 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
+       .writefn = pmuserenr_write, .raw_writefn = raw_write },
+     { .name = "PMINTENSET", .cp = 15, .crn = 9, .crm = 14, .opc1 = 0, .opc2 = 1,
+       .access = PL1_RW, .accessfn = access_tpm,
+-      .fieldoffset = offsetof(CPUARMState, cp15.c9_pminten),
++      .type = ARM_CP_ALIAS,
++      .fieldoffset = offsetoflow32(CPUARMState, cp15.c9_pminten),
+       .resetvalue = 0,
+       .writefn = pmintenset_write, .raw_writefn = raw_write },
++    { .name = "PMINTENSET_EL1", .state = ARM_CP_STATE_AA64,
++      .opc0 = 3, .opc1 = 0, .crn = 9, .crm = 14, .opc2 = 1,
++      .access = PL1_RW, .accessfn = access_tpm,
++      .type = ARM_CP_IO,
++      .fieldoffset = offsetof(CPUARMState, cp15.c9_pminten),
++      .writefn = pmintenset_write, .raw_writefn = raw_write,
++      .resetvalue = 0x0 },
+     { .name = "PMINTENCLR", .cp = 15, .crn = 9, .crm = 14, .opc1 = 0, .opc2 = 2,
+       .access = PL1_RW, .accessfn = access_tpm, .type = ARM_CP_ALIAS,
+       .fieldoffset = offsetof(CPUARMState, cp15.c9_pminten),
+-- 
+2.7.4
