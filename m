@@ -1,40 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cc2gx-0006E8-Aw
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 23:20:16 -0500
+	(envelope-from <bobby.prani@gmail.com>) id 1cc3EW-00078f-8u
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 23:54:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cc2gu-0007rE-6H
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 23:20:15 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58156
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cc2gu-0007qw-0R
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 23:20:12 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1A4JDYZ042736
-	for <qemu-devel@nongnu.org>; Thu, 9 Feb 2017 23:20:11 -0500
-Received: from e28smtp07.in.ibm.com (e28smtp07.in.ibm.com [125.16.236.7])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28h2t4f2r3-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 23:20:11 -0500
-Received: from localhost
-	by e28smtp07.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Fri, 10 Feb 2017 09:49:40 +0530
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <20170210001035.GJ27610@umbus.fritz.box>
-References: <1486636445-24109-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<1486636445-24109-6-git-send-email-nikunj@linux.vnet.ibm.com>
-	<20170210001035.GJ27610@umbus.fritz.box>
-Date: Fri, 10 Feb 2017 09:49:17 +0530
+	(envelope-from <bobby.prani@gmail.com>) id 1cc3EV-00017b-BH
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 23:54:56 -0500
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:36295)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1cc3EV-00017U-6D
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 23:54:55 -0500
+Received: by mail-oi0-x244.google.com with SMTP id u143so1802838oif.3
+	for <qemu-devel@nongnu.org>; Thu, 09 Feb 2017 20:54:55 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Message-Id: <87k28yekze.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH 5/6] target-ppc: support for 32-bit carry
- and overflow
+In-Reply-To: <20170210014519.12413-1-bobby.prani@gmail.com>
+References: <20170210014519.12413-1-bobby.prani@gmail.com>
+From: Pranith Kumar <bobby.prani@gmail.com>
+Date: Thu, 9 Feb 2017 23:54:24 -0500
+Message-ID: <CAJhHMCBNYHMcgz50s+sWgp0O6Y2=L6yzT8KmeEhzs9a9G_aODw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] tcg: handle EXCP_ATOMIC exception properly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,46 +29,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, rth@twiddle.net, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
+To: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "open list:Overall" <qemu-devel@nongnu.org>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-David Gibson <david@gibson.dropbear.id.au> writes:
-
-> [ Unknown signature status ]
-> On Thu, Feb 09, 2017 at 04:04:04PM +0530, Nikunj A Dadhania wrote:
->> POWER ISA 3.0 adds CA32 and OV32 status in 64-bit mode. Add the flags
->> and corresponding defines. Moreover, CA32 is set when CA is set and
->> OV32 is set when OV is set, there is no need to have a new
->> fields in the CPUPPCState structure.
->> 
->> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+On Thu, Feb 9, 2017 at 8:45 PM, Pranith Kumar <bobby.prani@gmail.com> wrote=
+:
 >
-> Um.. I don't quite understand this.  If CA always has the same value
-> as CA32, what's the point?
+> The current method of executing atomic code in a guest uses
+> cpu_exec_step_atomic() from the outermost loop. This causes an abort()
+> when single stepping over atomic code since debug exception longjmp
+> will point to the the setlongjmp in cpu_exec(). Another issue with
+> this mechanism is that the flags which were set in atomic execution
+> will be lost since we do not call cpu_exec_enter().
+>
+> The following patch moves atomic exception handling to the exception
+> handler where all these issues are taken care of. The change in
+> start_exclusive() is necessary since now the cpu in atomic execution
+> will have its running flag set, but we do not want to count it as
+> pending.
+>
+> Thanks to Alex for helping me debug the issue.
+>
+> CC: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> CC: Richard Henderson <rth@twiddle.net>
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+> ---
+>  cpu-exec.c    | 2 ++
+>  cpus-common.c | 2 +-
+>  cpus.c        | 4 ----
+>  3 files changed, 3 insertions(+), 5 deletions(-)
+>
+> diff --git a/cpu-exec.c b/cpu-exec.c
+> index b0ddada8c1..dceacfc5dd 100644
+> --- a/cpu-exec.c
+> +++ b/cpu-exec.c
+> @@ -427,6 +427,8 @@ static inline bool cpu_handle_exception(CPUState *cpu=
+, int *ret)
+>              *ret =3D cpu->exception_index;
+>              if (*ret =3D=3D EXCP_DEBUG) {
+>                  cpu_handle_debug_exception(cpu);
+> +            } else if (*ret =3D=3D EXCP_ATOMIC) {
+> +                cpu_exec_step_atomic(cpu);
+>              }
+>              cpu->exception_index =3D -1;
+>              return true;
 
-I am not clear either. I think that as CA was set for both 32/64-bit
-mode, that couldn't be changed for backward compatibility. CA32 should
-have affected only the instructions working one word variants.
 
-Re-scanning the ISA 3.0, found this in 3.3.9 Fixed-Point Arithmetic
-Instructions:
+Looks like this is going to be a problem since we should not call
+start_exclusive() from cpu_exec() (doh', I just read the comment for
+this :-/).
 
-=================================================================
-addic, addic., subfic, addc, subfc, adde, subfe,
-addme, subfme, addze, and subfze always set CA, to
-reflect the carry out of bit 0 in 64-bit mode and out of bit
-32 in 32-bit mode. These instructions also always set
-CA32 to reflect the carry out of bit 32.
-=================================================================
+It'll be great if we can make it callable from there. Thoughts?
 
-Which is conflicting to what is said in 3.2.2 Fixed-Point Exception
-Register:
-=================================================================
-Carry32 (CA32)
-CA32 is set whenever CA is set, and is set to
-the same value that CA is defined to be set to
-in 32-bit mode.
-=================================================================
-
-Regards
-Nikunj
+Thanks,
+--=20
+Pranith
