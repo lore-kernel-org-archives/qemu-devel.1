@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cc17r-0000jD-8R
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 21:39:57 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cc17q-0000iS-5y
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 21:39:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cc17k-0007dR-9c
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 21:39:50 -0500
-Received: from ozlabs.org ([103.22.144.67]:34245)
+	(envelope-from <dgibson@ozlabs.org>) id 1cc17h-0007cF-Jp
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 21:39:49 -0500
+Received: from ozlabs.org ([103.22.144.67]:36701)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1cc17j-0007cV-Je
-	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 21:39:48 -0500
-Date: Fri, 10 Feb 2017 13:36:46 +1100
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1cc17g-0007aT-VK
+	for qemu-devel@nongnu.org; Thu, 09 Feb 2017 21:39:45 -0500
+Date: Fri, 10 Feb 2017 13:29:34 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170210023646.GE27610@umbus.fritz.box>
+Message-ID: <20170210022934.GZ27610@umbus.fritz.box>
 References: <1486456099-7345-1-git-send-email-peterx@redhat.com>
-	<1486456099-7345-16-git-send-email-peterx@redhat.com>
+	<1486456099-7345-11-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="NJ3lxSTgSwfmyg6j"
+	protocol="application/pgp-signature"; boundary="/cFG30PKHi9lwv6o"
 Content-Disposition: inline
-In-Reply-To: <1486456099-7345-16-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 15/17] intel_iommu: provide its own
- replay() callback
+In-Reply-To: <1486456099-7345-11-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v7 10/17] memory: add section range info
+ for IOMMU notifier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,324 +33,147 @@ To: Peter Xu <peterx@redhat.com>
 Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
 
 
---NJ3lxSTgSwfmyg6j
+--/cFG30PKHi9lwv6o
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 07, 2017 at 04:28:17PM +0800, Peter Xu wrote:
-> The default replay() don't work for VT-d since vt-d will have a huge
-> default memory region which covers address range 0-(2^64-1). This will
-> normally consumes a lot of time (which looks like a dead loop).
+On Tue, Feb 07, 2017 at 04:28:12PM +0800, Peter Xu wrote:
+> In this patch, IOMMUNotifier.{start|end} are introduced to store section
+> information for a specific notifier. When notification occurs, we not
+> only check the notification type (MAP|UNMAP), but also check whether the
+> notified iova range overlaps with the range of specific IOMMU notifier,
+> and skip those notifiers if not in the listened range.
 >=20
-> The solution is simple - we don't walk over all the regions. Instead, we
-> jump over the regions when we found that the page directories are empty.
-> It'll greatly reduce the time to walk the whole region.
+> When removing an region, we need to make sure we removed the correct
+> VFIOGuestIOMMU by checking the IOMMUNotifier.start address as well.
 >=20
-> To achieve this, we provided a page walk helper to do that, invoking
-> corresponding hook function when we found an page we are interested in.
-> vtd_page_walk_level() is the core logic for the page walking. It's
-> interface is designed to suite further use case, e.g., to invalidate a
-> range of addresses.
->=20
-> Reviewed-by: Jason Wang <jasowang@redhat.com>
+> Suggested-by: David Gibson <david@gibson.dropbear.id.au>
+> Acked-by: Alex Williamson <alex.williamson@redhat.com>
 > Signed-off-by: Peter Xu <peterx@redhat.com>
-
-For small values of reviewed:
 
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
-The concept is sensible and there's nothing obviously wrong.  But, I'm
-not familiar enough with the VT-d page table format to check the code
-in detail.
-
 > ---
->  hw/i386/intel_iommu.c | 182 ++++++++++++++++++++++++++++++++++++++++++++=
-++++--
->  hw/i386/trace-events  |   7 ++
->  include/exec/memory.h |   2 +
->  3 files changed, 186 insertions(+), 5 deletions(-)
+>  hw/vfio/common.c      | 12 +++++++++---
+>  hw/virtio/vhost.c     |  4 ++--
+>  include/exec/memory.h | 19 ++++++++++++++++++-
+>  memory.c              |  9 +++++++++
+>  4 files changed, 38 insertions(+), 6 deletions(-)
 >=20
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 22d8226..f8d5713 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -595,6 +595,22 @@ static inline uint32_t vtd_get_agaw_from_context_ent=
-ry(VTDContextEntry *ce)
->      return 30 + (ce->hi & VTD_CONTEXT_ENTRY_AW) * 9;
->  }
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index f3ba9b9..6b33b9f 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -478,8 +478,13 @@ static void vfio_listener_region_add(MemoryListener =
+*listener,
+>          giommu->iommu_offset =3D section->offset_within_address_space -
+>                                 section->offset_within_region;
+>          giommu->container =3D container;
+> -        giommu->n.notify =3D vfio_iommu_map_notify;
+> -        giommu->n.notifier_flags =3D IOMMU_NOTIFIER_ALL;
+> +        llend =3D int128_add(int128_make64(section->offset_within_region=
+),
+> +                           section->size);
+> +        llend =3D int128_sub(llend, int128_one());
+> +        iommu_notifier_init(&giommu->n, vfio_iommu_map_notify,
+> +                            IOMMU_NOTIFIER_ALL,
+> +                            section->offset_within_region,
+> +                            int128_get64(llend));
+>          QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
 > =20
-> +static inline uint64_t vtd_iova_limit(VTDContextEntry *ce)
-> +{
-> +    uint32_t ce_agaw =3D vtd_get_agaw_from_context_entry(ce);
-> +    return 1ULL << MIN(ce_agaw, VTD_MGAW);
-> +}
-> +
-> +/* Return true if IOVA passes range check, otherwise false. */
-> +static inline bool vtd_iova_range_check(uint64_t iova, VTDContextEntry *=
-ce)
-> +{
-> +    /*
-> +     * Check if @iova is above 2^X-1, where X is the minimum of MGAW
-> +     * in CAP_REG and AW in context-entry.
-> +     */
-> +    return !(iova & ~(vtd_iova_limit(ce) - 1));
-> +}
-> +
->  static const uint64_t vtd_paging_entry_rsvd_field[] =3D {
->      [0] =3D ~0ULL,
->      /* For not large page */
-> @@ -630,13 +646,9 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, ui=
-nt64_t iova, bool is_write,
->      uint32_t level =3D vtd_get_level_from_context_entry(ce);
->      uint32_t offset;
->      uint64_t slpte;
-> -    uint32_t ce_agaw =3D vtd_get_agaw_from_context_entry(ce);
->      uint64_t access_right_check;
+>          memory_region_register_iommu_notifier(giommu->iommu, &giommu->n);
+> @@ -550,7 +555,8 @@ static void vfio_listener_region_del(MemoryListener *=
+listener,
+>          VFIOGuestIOMMU *giommu;
 > =20
-> -    /* Check if @iova is above 2^X-1, where X is the minimum of MGAW
-> -     * in CAP_REG and AW in context-entry.
-> -     */
-> -    if (iova & ~((1ULL << MIN(ce_agaw, VTD_MGAW)) - 1)) {
-> +    if (!vtd_iova_range_check(iova, ce)) {
->          VTD_DPRINTF(GENERAL, "error: iova 0x%"PRIx64 " exceeds limits", =
-iova);
->          return -VTD_FR_ADDR_BEYOND_MGAW;
->      }
-> @@ -684,6 +696,134 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, u=
-int64_t iova, bool is_write,
->      }
->  }
+>          QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
+> -            if (giommu->iommu =3D=3D section->mr) {
+> +            if (giommu->iommu =3D=3D section->mr &&
+> +                giommu->n.start =3D=3D section->offset_within_region) {
+>                  memory_region_unregister_iommu_notifier(giommu->iommu,
+>                                                          &giommu->n);
+>                  QLIST_REMOVE(giommu, giommu_next);
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index febe519..ccf8b2e 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -1244,8 +1244,8 @@ int vhost_dev_init(struct vhost_dev *hdev, void *op=
+aque,
+>          .priority =3D 10
+>      };
 > =20
-> +typedef int (*vtd_page_walk_hook)(IOMMUTLBEntry *entry, void *private);
-> +
-> +/**
-> + * vtd_page_walk_level - walk over specific level for IOVA range
-> + *
-> + * @addr: base GPA addr to start the walk
-> + * @start: IOVA range start address
-> + * @end: IOVA range end address (start <=3D addr < end)
-> + * @hook_fn: hook func to be called when detected page
-> + * @private: private data to be passed into hook func
-> + * @read: whether parent level has read permission
-> + * @write: whether parent level has write permission
-> + * @notify_unmap: whether we should notify invalid entries
-> + */
-> +static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
-> +                               uint64_t end, vtd_page_walk_hook hook_fn,
-> +                               void *private, uint32_t level,
-> +                               bool read, bool write, bool notify_unmap)
-> +{
-> +    bool read_cur, write_cur, entry_valid;
-> +    uint32_t offset;
-> +    uint64_t slpte;
-> +    uint64_t subpage_size, subpage_mask;
-> +    IOMMUTLBEntry entry;
-> +    uint64_t iova =3D start;
-> +    uint64_t iova_next;
-> +    int ret =3D 0;
-> +
-> +    trace_vtd_page_walk_level(addr, level, start, end);
-> +
-> +    subpage_size =3D 1ULL << vtd_slpt_level_shift(level);
-> +    subpage_mask =3D vtd_slpt_level_page_mask(level);
-> +
-> +    while (iova < end) {
-> +        iova_next =3D (iova & subpage_mask) + subpage_size;
-> +
-> +        offset =3D vtd_iova_level_offset(iova, level);
-> +        slpte =3D vtd_get_slpte(addr, offset);
-> +
-> +        if (slpte =3D=3D (uint64_t)-1) {
-> +            trace_vtd_page_walk_skip_read(iova, iova_next);
-> +            goto next;
-> +        }
-> +
-> +        if (vtd_slpte_nonzero_rsvd(slpte, level)) {
-> +            trace_vtd_page_walk_skip_reserve(iova, iova_next);
-> +            goto next;
-> +        }
-> +
-> +        /* Permissions are stacked with parents' */
-> +        read_cur =3D read && (slpte & VTD_SL_R);
-> +        write_cur =3D write && (slpte & VTD_SL_W);
-> +
-> +        /*
-> +         * As long as we have either read/write permission, this is a
-> +         * valid entry. The rule works for both page entries and page
-> +         * table entries.
-> +         */
-> +        entry_valid =3D read_cur | write_cur;
-> +
-> +        if (vtd_is_last_slpte(slpte, level)) {
-> +            entry.target_as =3D &address_space_memory;
-> +            entry.iova =3D iova & subpage_mask;
-> +            /* NOTE: this is only meaningful if entry_valid =3D=3D true =
-*/
-> +            entry.translated_addr =3D vtd_get_slpte_addr(slpte);
-> +            entry.addr_mask =3D ~subpage_mask;
-> +            entry.perm =3D IOMMU_ACCESS_FLAG(read_cur, write_cur);
-> +            if (!entry_valid && !notify_unmap) {
-> +                trace_vtd_page_walk_skip_perm(iova, iova_next);
-> +                goto next;
-> +            }
-> +            trace_vtd_page_walk_one(level, entry.iova, entry.translated_=
-addr,
-> +                                    entry.addr_mask, entry.perm);
-> +            if (hook_fn) {
-> +                ret =3D hook_fn(&entry, private);
-> +                if (ret < 0) {
-> +                    return ret;
-> +                }
-> +            }
-> +        } else {
-> +            if (!entry_valid) {
-> +                trace_vtd_page_walk_skip_perm(iova, iova_next);
-> +                goto next;
-> +            }
-> +            ret =3D vtd_page_walk_level(vtd_get_slpte_addr(slpte), iova,
-> +                                      MIN(iova_next, end), hook_fn, priv=
-ate,
-> +                                      level - 1, read_cur, write_cur,
-> +                                      notify_unmap);
-> +            if (ret < 0) {
-> +                return ret;
-> +            }
-> +        }
-> +
-> +next:
-> +        iova =3D iova_next;
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +/**
-> + * vtd_page_walk - walk specific IOVA range, and call the hook
-> + *
-> + * @ce: context entry to walk upon
-> + * @start: IOVA address to start the walk
-> + * @end: IOVA range end address (start <=3D addr < end)
-> + * @hook_fn: the hook that to be called for each detected area
-> + * @private: private data for the hook function
-> + */
-> +static int vtd_page_walk(VTDContextEntry *ce, uint64_t start, uint64_t e=
-nd,
-> +                         vtd_page_walk_hook hook_fn, void *private)
-> +{
-> +    dma_addr_t addr =3D vtd_get_slpt_base_from_context(ce);
-> +    uint32_t level =3D vtd_get_level_from_context_entry(ce);
-> +
-> +    if (!vtd_iova_range_check(start, ce)) {
-> +        return -VTD_FR_ADDR_BEYOND_MGAW;
-> +    }
-> +
-> +    if (!vtd_iova_range_check(end, ce)) {
-> +        /* Fix end so that it reaches the maximum */
-> +        end =3D vtd_iova_limit(ce);
-> +    }
-> +
-> +    return vtd_page_walk_level(addr, start, end, hook_fn, private,
-> +                               level, true, true, false);
-> +}
-> +
->  /* Map a device to its corresponding domain (context-entry) */
->  static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
->                                      uint8_t devfn, VTDContextEntry *ce)
-> @@ -2402,6 +2542,37 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *=
-s, PCIBus *bus, int devfn)
->      return vtd_dev_as;
->  }
+> -    hdev->n.notify =3D vhost_iommu_unmap_notify;
+> -    hdev->n.notifier_flags =3D IOMMU_NOTIFIER_UNMAP;
+> +    iommu_notifier_init(&hdev->n, vhost_iommu_unmap_notify,
+> +                        IOMMU_NOTIFIER_UNMAP, 0, ~0ULL);
 > =20
-> +static int vtd_replay_hook(IOMMUTLBEntry *entry, void *private)
-> +{
-> +    memory_region_notify_one((IOMMUNotifier *)private, entry);
-> +    return 0;
-> +}
-> +
-> +static void vtd_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n)
-> +{
-> +    VTDAddressSpace *vtd_as =3D container_of(mr, VTDAddressSpace, iommu);
-> +    IntelIOMMUState *s =3D vtd_as->iommu_state;
-> +    uint8_t bus_n =3D pci_bus_num(vtd_as->bus);
-> +    VTDContextEntry ce;
-> +
-> +    if (vtd_dev_to_context_entry(s, bus_n, vtd_as->devfn, &ce) =3D=3D 0)=
- {
-> +        /*
-> +         * Scanned a valid context entry, walk over the pages and
-> +         * notify when needed.
-> +         */
-> +        trace_vtd_replay_ce_valid(bus_n, PCI_SLOT(vtd_as->devfn),
-> +                                  PCI_FUNC(vtd_as->devfn),
-> +                                  VTD_CONTEXT_ENTRY_DID(ce.hi),
-> +                                  ce.hi, ce.lo);
-> +        vtd_page_walk(&ce, 0, ~0ULL, vtd_replay_hook, (void *)n);
-> +    } else {
-> +        trace_vtd_replay_ce_invalid(bus_n, PCI_SLOT(vtd_as->devfn),
-> +                                    PCI_FUNC(vtd_as->devfn));
-> +    }
-> +
-> +    return;
-> +}
-> +
->  /* Do the initialization. It will also be called when reset, so pay
->   * attention when adding new initialization stuff.
->   */
-> @@ -2416,6 +2587,7 @@ static void vtd_init(IntelIOMMUState *s)
-> =20
->      s->iommu_ops.translate =3D vtd_iommu_translate;
->      s->iommu_ops.notify_flag_changed =3D vtd_iommu_notify_flag_changed;
-> +    s->iommu_ops.replay =3D vtd_iommu_replay;
->      s->root =3D 0;
->      s->root_extended =3D false;
->      s->dmar_enabled =3D false;
-> diff --git a/hw/i386/trace-events b/hw/i386/trace-events
-> index 88ad5e4..463db0d 100644
-> --- a/hw/i386/trace-events
-> +++ b/hw/i386/trace-events
-> @@ -30,6 +30,13 @@ vtd_iotlb_cc_hit(uint8_t bus, uint8_t devfn, uint64_t =
-high, uint64_t low, uint32
->  vtd_iotlb_cc_update(uint8_t bus, uint8_t devfn, uint64_t high, uint64_t =
-low, uint32_t gen1, uint32_t gen2) "IOTLB context update bus 0x%"PRIx8" dev=
-fn 0x%"PRIx8" high 0x%"PRIx64" low 0x%"PRIx64" gen %"PRIu32" -> gen %"PRIu32
->  vtd_iotlb_reset(const char *reason) "IOTLB reset (reason: %s)"
->  vtd_fault_disabled(void) "Fault processing disabled for context entry"
-> +vtd_replay_ce_valid(uint8_t bus, uint8_t dev, uint8_t fn, uint16_t domai=
-n, uint64_t hi, uint64_t lo) "replay valid context device %02"PRIx8":%02"PR=
-Ix8".%02"PRIx8" domain 0x%"PRIx16" hi 0x%"PRIx64" lo 0x%"PRIx64
-> +vtd_replay_ce_invalid(uint8_t bus, uint8_t dev, uint8_t fn) "replay inva=
-lid context device %02"PRIx8":%02"PRIx8".%02"PRIx8
-> +vtd_page_walk_level(uint64_t addr, uint32_t level, uint64_t start, uint6=
-4_t end) "walk (base=3D0x%"PRIx64", level=3D%"PRIu32") iova range 0x%"PRIx6=
-4" - 0x%"PRIx64
-> +vtd_page_walk_one(uint32_t level, uint64_t iova, uint64_t gpa, uint64_t =
-mask, int perm) "detected page level 0x%"PRIx32" iova 0x%"PRIx64" -> gpa 0x=
-%"PRIx64" mask 0x%"PRIx64" perm %d"
-> +vtd_page_walk_skip_read(uint64_t iova, uint64_t next) "Page walk skip io=
-va 0x%"PRIx64" - 0x%"PRIx64" due to unable to read"
-> +vtd_page_walk_skip_perm(uint64_t iova, uint64_t next) "Page walk skip io=
-va 0x%"PRIx64" - 0x%"PRIx64" due to perm empty"
-> +vtd_page_walk_skip_reserve(uint64_t iova, uint64_t next) "Page walk skip=
- iova 0x%"PRIx64" - 0x%"PRIx64" due to rsrv set"
-> =20
->  # hw/i386/amd_iommu.c
->  amdvi_evntlog_fail(uint64_t addr, uint32_t head) "error: fail to write a=
-t addr 0x%"PRIx64" +  offset 0x%"PRIx32
+>      if (hdev->migration_blocker =3D=3D NULL) {
+>          if (!(hdev->features & (0x1ULL << VHOST_F_LOG_ALL))) {
 > diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index 30b2a74..267f399 100644
+> index 987f925..805a88a 100644
 > --- a/include/exec/memory.h
 > +++ b/include/exec/memory.h
-> @@ -55,6 +55,8 @@ typedef enum {
->      IOMMU_RW   =3D 3,
->  } IOMMUAccessFlags;
+> @@ -77,13 +77,30 @@ typedef enum {
 > =20
-> +#define IOMMU_ACCESS_FLAG(r, w) (((r) ? IOMMU_RO : 0) | ((w) ? IOMMU_WO =
-: 0))
+>  #define IOMMU_NOTIFIER_ALL (IOMMU_NOTIFIER_MAP | IOMMU_NOTIFIER_UNMAP)
+> =20
+> +struct IOMMUNotifier;
+> +typedef void (*IOMMUNotify)(struct IOMMUNotifier *notifier,
+> +                            IOMMUTLBEntry *data);
 > +
->  struct IOMMUTLBEntry {
->      AddressSpace    *target_as;
->      hwaddr           iova;
+>  struct IOMMUNotifier {
+> -    void (*notify)(struct IOMMUNotifier *notifier, IOMMUTLBEntry *data);
+> +    IOMMUNotify notify;
+>      IOMMUNotifierFlag notifier_flags;
+> +    /* Notify for address space range start <=3D addr <=3D end */
+> +    hwaddr start;
+> +    hwaddr end;
+>      QLIST_ENTRY(IOMMUNotifier) node;
+>  };
+>  typedef struct IOMMUNotifier IOMMUNotifier;
+> =20
+> +static inline void iommu_notifier_init(IOMMUNotifier *n, IOMMUNotify fn,
+> +                                       IOMMUNotifierFlag flags,
+> +                                       hwaddr start, hwaddr end)
+> +{
+> +    n->notify =3D fn;
+> +    n->notifier_flags =3D flags;
+> +    n->start =3D start;
+> +    n->end =3D end;
+> +}
+> +
+>  /* New-style MMIO accessors can indicate that the transaction failed.
+>   * A zero (MEMTX_OK) response means success; anything else is a failure
+>   * of some kind. The memory subsystem will bitwise-OR together results
+> diff --git a/memory.c b/memory.c
+> index 6c58373..4900bbf 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -1610,6 +1610,7 @@ void memory_region_register_iommu_notifier(MemoryRe=
+gion *mr,
+> =20
+>      /* We need to register for at least one bitfield */
+>      assert(n->notifier_flags !=3D IOMMU_NOTIFIER_NONE);
+> +    assert(n->start <=3D n->end);
+>      QLIST_INSERT_HEAD(&mr->iommu_notify, n, node);
+>      memory_region_update_iommu_notify_flags(mr);
+>  }
+> @@ -1671,6 +1672,14 @@ void memory_region_notify_iommu(MemoryRegion *mr,
+>      }
+> =20
+>      QLIST_FOREACH(iommu_notifier, &mr->iommu_notify, node) {
+> +        /*
+> +         * Skip the notification if the notification does not overlap
+> +         * with registered range.
+> +         */
+> +        if (iommu_notifier->start > entry.iova + entry.addr_mask + 1 ||
+> +            iommu_notifier->end < entry.iova) {
+> +            continue;
+> +        }
+>          if (iommu_notifier->notifier_flags & request_flags) {
+>              iommu_notifier->notify(iommu_notifier, &entry);
+>          }
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -358,25 +181,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---NJ3lxSTgSwfmyg6j
+--/cFG30PKHi9lwv6o
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYnSc+AAoJEGw4ysog2bOSlyAQAN8XBm1Xwt7eELrlWvfIY9mL
-mYpsZbsUTrs1tOctLikNvlrwnplIu7CiDgQ/meLgG5F89Cvu8WEZFYi4djA++KMK
-CUl90TZGm4bdWI9Qvp4znodX8mJW34npRLGzH7nC/wWhX/HjkKIxutD/2PV8nIa0
-er9WT0FdvCxzDQAbyk9ooDzZT/o0kFnKlLcmFEBXd7wPdbp5ZlPbr3DQw2mlGGmp
-P6GDP78khiQa0Njus8W5F5HGqUkh7mNJPcSqeMGf7dI2xdhqMc8npsvLGi9S9jdC
-bHHSC0GVgiQpaTuOwv5SdbSh9KwZo3xNK4fWVklVCkv2tjyCthfYhQk37wADAFL9
-KEeIcv6O6T/HthfwGVLcf3NngB2mAqkd4hnEkiSFo3KnoVllS1XLNivbyoUFY9YD
-E2dsZ2EdVng60Qr7FScAIh510pFxudUM+bUs27/5JZDvuYvkGZBLJUypCsuvoTQP
-kXZHY7JHUnOr+RqpyiNjho6Q3gr7sYme/0IL2BneOf7orxuVtcLsJMnvgk66zB0o
-C4nFncdKjWF5ddZESFR7W+ydMdmV6Gq8ITumNUyRvqqBCa3nXEpdGrVESQQpDzUJ
-zMllC+ukRgxaSC2SslEFvdwrUbNZQ1GMg+w9lnmAHwLHZ3tRfgiSCUXjU3jSOx+5
-sOQucxcYESfxBbhneI9b
-=jdod
+iQIcBAEBCAAGBQJYnSWOAAoJEGw4ysog2bOS7WsQANBQEJRF/lDWeaoo4sJVF4IO
+5e/2mDIHTKV397ZcueMt1VQsHQFpOlFTTN8KW8PAj2JDsbibYUUelZvs+RLKcfik
+fyJ1Ij97LQHbktSz4bDbYJgY86NKPiO/UIQ8zpLA5Spk1AURD5ryIKeasOH0xpSu
+eblYqXOuxefeCp05pQH3xMwDBWWT58c1yqYYIlJ3QnkcPwQZNZMu2VCLBpAF4cS+
+IHEBhUrNKM/B+jhHFOb7vzXXdpzZtP12R4ZOZbeSSnjVzxRYvcupHsVifs5ytXK0
+bjHnIecn7lwhi67JXdTPW7VYziFQOwQzL0DvGPmE6Xl08v5qgqH2M5YqIMFB7+wF
+/souO5fRQ87nLh2CTthXItfqcP9VMyO99fRdFxF8/gMl20UnJLlqNaQjqSvxqtws
+dzG2go2H64Nagyydh3dG2kCqJr7RP4+qaHGg+05dokrDD4DJcR5SDgAChnGnp5Ib
+AfWiviJgw3WKLw22wps7B5kKRoum0Y8eawxMY50DqGz55rDNRTDWR0Sy5wBNQjZ/
+ImgWFhOBKwFHmUWDuakNCEXhZLcgjhjQDr/0Q/dr/ZGP7BfG9BKoJK0oYyc8dV3q
+j9GsH/peTxD05URjF7wqBQjt1PtoZI/oAT9uaes+wJxI4KTvw85ace7tDw/4JwlA
+ej4nMIU6d8JpA53J1XY6
+=cvsI
 -----END PGP SIGNATURE-----
 
---NJ3lxSTgSwfmyg6j--
+--/cFG30PKHi9lwv6o--
