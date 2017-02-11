@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1ccZGs-0008KB-9k
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 10:07:31 -0500
+	(envelope-from <ppandit@redhat.com>) id 1ccZGw-0008Uw-3P
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 10:07:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1ccZGr-00072U-2j
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 10:07:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36312)
+	(envelope-from <ppandit@redhat.com>) id 1ccZGu-00073E-Vc
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 10:07:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49272)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1ccZGq-00072Q-Sk
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 10:07:28 -0500
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1ccZGu-00073A-PX
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 10:07:32 -0500
 From: P J P <ppandit@redhat.com>
-Date: Sat, 11 Feb 2017 20:37:00 +0530
-Message-Id: <20170211150701.23391-4-ppandit@redhat.com>
+Date: Sat, 11 Feb 2017 20:37:01 +0530
+Message-Id: <20170211150701.23391-5-ppandit@redhat.com>
 In-Reply-To: <20170211150701.23391-1-ppandit@redhat.com>
 References: <20170211150701.23391-1-ppandit@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 3/4] sd: sdhci: conditionally invoke multi
- block transfer
+Subject: [Qemu-devel] [PATCH v3 4/4] sd: sdhci: Remove block count enable
+ check in single block transfers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +29,38 @@ Cc: Alistair Francis <alistair23@gmail.com>, Peter Maydell <peter.maydell@linaro
 
 From: Prasad J Pandit <pjp@fedoraproject.org>
 
-In sdhci_write invoke multi block transfer if it is enabled
-in the transfer mode register 's->trnmod'.
+In SDHCI protocol, the 'Block count enable' bit of the Transfer
+Mode register is relevant only in multi block transfers. We need
+not check it in single block transfers.
 
 Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 ---
- hw/sd/sdhci.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-Update: test if (s->trnmod & SDHC_TRNS_MULTI) is true
-  -> https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg02357.html
+ hw/sd/sdhci.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
 diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index 0307b8c..99fa0c7 100644
+index 99fa0c7..d612a80 100644
 --- a/hw/sd/sdhci.c
 +++ b/hw/sd/sdhci.c
-@@ -1022,7 +1022,11 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
-         /* Writing to last byte of sdmasysad might trigger transfer */
-         if (!(mask & 0xFF000000) && TRANSFERRING_DATA(s->prnsts) && s->blkcnt &&
-                 s->blksize && SDHC_DMA_TYPE(s->hostctl) == SDHC_CTRL_SDMA) {
--            sdhci_sdma_transfer_multi_blocks(s);
-+            if (s->trnmod & SDHC_TRNS_MULTI) {
-+                sdhci_sdma_transfer_multi_blocks(s);
-+            } else {
-+                sdhci_sdma_transfer_single_block(s);
-+            }
+@@ -569,7 +569,6 @@ static void sdhci_sdma_transfer_multi_blocks(SDHCIState *s)
+ }
+ 
+ /* single block SDMA transfer */
+-
+ static void sdhci_sdma_transfer_single_block(SDHCIState *s)
+ {
+     int n;
+@@ -588,10 +587,7 @@ static void sdhci_sdma_transfer_single_block(SDHCIState *s)
+             sdbus_write_data(&s->sdbus, s->fifo_buffer[n]);
          }
-         break;
-     case SDHC_BLKSIZE:
+     }
+-
+-    if (s->trnmod & SDHC_TRNS_BLK_CNT_EN) {
+-        s->blkcnt--;
+-    }
++    s->blkcnt--;
+ 
+     sdhci_end_transfer(s);
+ }
 -- 
 2.9.3
