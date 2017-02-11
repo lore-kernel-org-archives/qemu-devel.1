@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ccZlv-0003zk-H4
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 10:39:36 -0500
+	(envelope-from <deller@gmx.de>) id 1ccfts-00017M-QE
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 17:12:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ccZlq-0006Fe-KZ
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 10:39:35 -0500
-Received: from mx4-phx2.redhat.com ([209.132.183.25]:47453)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ccZlq-0006Eb-Bk
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 10:39:30 -0500
-Date: Sat, 11 Feb 2017 10:39:19 -0500 (EST)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2127602137.20489688.1486827559449.JavaMail.zimbra@redhat.com>
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DA1B6988@DGGEMA505-MBX.china.huawei.com>
-References: <589C099A.9090605@huawei.com>
-	<AF60004D-7133-44D1-8A9F-7DB9822D84AF@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA1B4379@DGGEMA505-MBX.china.huawei.com>
-	<105e5774-38c3-0683-ca08-64f6ed53c643@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA1B6988@DGGEMA505-MBX.china.huawei.com>
+	(envelope-from <deller@gmx.de>) id 1ccftp-0002Y1-K4
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 17:12:12 -0500
+Received: from mout.gmx.net ([212.227.15.19]:58406)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <deller@gmx.de>) id 1ccftp-0002Xa-8b
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 17:12:09 -0500
+Date: Sat, 11 Feb 2017 23:11:48 +0100
+From: Helge Deller <deller@gmx.de>
+Message-ID: <20170211221148.GA2924@ls3530.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Help] Windows2012 as Guest 64+cores on KVM Halts
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH] linux-user: Add sockopts for IPv6 ping and
+ IPv6 traceroute
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,23 +25,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Cc: Yan Vugenfirer <yvugenfi@redhat.com>, Hangaohuai <hangaohuai@huawei.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, Radim Krcmar <rkrcmar@redhat.com>, vrozenfe@redhat.com
+To: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
+Cc: Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>
 
-> 
-> > On 10/02/2017 10:31, Gonglei (Arei) wrote:
-> > > But We tested the same cases on Xen platform and VMware, and
-> > > the guest booted successfully.
-> > 
-> > Were these two also tested with enlightenments enabled?  TCG surely isn't.
-> 
-> About TCG, I just remove ' accel=kvm,' and 'hy_releaxed' from the below QEMU
-> Command line, I thought the hyper-V enabled then. Sorry about that.
-> 
-> But for Xen, we set 'viridian=1' which be thought the Hyper-V is enabled.
-> 
-> For VMWare we also enabled the Hyper-V enlightenments.
+Add the neccessary sockopts for ping and traceroute on IPv6.
 
-Ok, thanks for the clarifications!
+This fixes the following qemu warnings with IPv6:
+Unsupported ancillary data: 0/2
+Unsupported ancillary data: 0/11
+Unsupported ancillary data: 41/25
+Unsupported setsockopt level=0 optname=12 
+Unsupported setsockopt level=41 optname=16
+Unsupported setsockopt level=41 optname=25
+Unsupported setsockopt level=41 optname=51
+Unsupported setsockopt level=41 optname=8
+Unsupported setsockopt level=58 optname=1
 
-Paolo
+Tested on hppa-linux-user.
+
+Signed-off-by: Helge Deller <deller@gmx.de>
+
+
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 9be8e95..222a85e 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -57,6 +57,8 @@ int __clone2(int (*fn)(void *), void *child_stack_base,
+ #include <netinet/tcp.h>
+ #include <linux/wireless.h>
+ #include <linux/icmp.h>
++#include <linux/icmpv6.h>
++#include <linux/errqueue.h>
+ #include "qemu-common.h"
+ #ifdef CONFIG_TIMERFD
+ #include <sys/timerfd.h>
+@@ -1839,6 +1841,78 @@ static inline abi_long host_to_target_cmsg(struct target_msghdr *target_msgh,
+             }
+             break;
+ 
++        case SOL_IP:
++            switch (cmsg->cmsg_type) {
++            case IP_TTL:
++            {
++                goto copy_word;
++            }
++            case IP_RECVERR:
++            {
++                struct errhdr_t {
++                   struct sock_extended_err ee;
++                   struct sockaddr_in offender;
++                };
++                struct errhdr_t *errh = (struct errhdr_t *)data;
++                struct errhdr_t *target_errh =
++                    (struct errhdr_t *)target_data;
++
++                __put_user(errh->ee.ee_errno, &target_errh->ee.ee_errno);
++                __put_user(errh->ee.ee_origin, &target_errh->ee.ee_origin);
++                __put_user(errh->ee.ee_type,  &target_errh->ee.ee_type);
++                __put_user(errh->ee.ee_code, &target_errh->ee.ee_code);
++                __put_user(errh->ee.ee_pad, &target_errh->ee.ee_pad);
++                __put_user(errh->ee.ee_info, &target_errh->ee.ee_info);
++                __put_user(errh->ee.ee_data, &target_errh->ee.ee_data);
++                host_to_target_sockaddr((unsigned long) &target_errh->offender,
++                    (void *) &errh->offender, sizeof(errh->offender));
++		break;
++            }
++            default:
++                goto unimplemented;
++            }
++            break;
++
++        case SOL_IPV6:
++            switch (cmsg->cmsg_type) {
++            case IPV6_HOPLIMIT:
++            copy_word:
++            {
++                uint32_t *v = (uint32_t *)data;
++                uint32_t *t_int = (uint32_t *)target_data;
++                if (tgt_len != CMSG_LEN(0))
++                    goto unimplemented;
++
++                __put_user(*v, t_int);
++		break;
++            }
++            case IPV6_RECVERR:
++            {
++                struct errhdr6_t {
++                   struct sock_extended_err ee;
++                   struct sockaddr_in6 offender;
++                };
++                struct errhdr6_t *errh = (struct errhdr6_t *)data;
++                struct errhdr6_t *target_errh =
++                    (struct errhdr6_t *)target_data;
++
++                __put_user(errh->ee.ee_errno, &target_errh->ee.ee_errno);
++                __put_user(errh->ee.ee_origin, &target_errh->ee.ee_origin);
++                __put_user(errh->ee.ee_type,  &target_errh->ee.ee_type);
++                __put_user(errh->ee.ee_code, &target_errh->ee.ee_code);
++                __put_user(errh->ee.ee_pad, &target_errh->ee.ee_pad);
++                __put_user(errh->ee.ee_info, &target_errh->ee.ee_info);
++                __put_user(errh->ee.ee_data, &target_errh->ee.ee_data);
++                target_errh->offender = errh->offender;
++                __put_user(errh->offender.sin6_family, &target_errh->offender.sin6_family);
++                __put_user(errh->offender.sin6_scope_id, &target_errh->offender.sin6_scope_id);
++		break;
++            }
++            default:
++                goto unimplemented;
++            }
++            break;
++
+         default:
+         unimplemented:
+             gemu_log("Unsupported ancillary data: %d/%d\n",
+@@ -2766,6 +2840,7 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
+         case IP_PKTINFO:
+         case IP_MTU_DISCOVER:
+         case IP_RECVERR:
++        case IP_RECVTTL:
+         case IP_RECVTOS:
+ #ifdef IP_FREEBIND
+         case IP_FREEBIND:
+@@ -2815,6 +2890,10 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
+         case IPV6_MTU:
+         case IPV6_V6ONLY:
+         case IPV6_RECVPKTINFO:
++        case IPV6_UNICAST_HOPS:
++        case IPV6_RECVERR:
++        case IPV6_RECVHOPLIMIT:
++        case IPV6_2292HOPLIMIT:
+             val = 0;
+             if (optlen < sizeof(uint32_t)) {
+                 return -TARGET_EINVAL;
+@@ -2829,9 +2908,21 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
+             goto unimplemented;
+         }
+         break;
++    case SOL_ICMPV6:
++        switch(optname) {
++        case ICMPV6_FILTER:
++        case IPV6_CHECKSUM:
++            goto icmp_filter;
++            break;
++        default:
++            goto unimplemented;
++        }
++        break;
+     case SOL_RAW:
+         switch (optname) {
+         case ICMP_FILTER:
++        case IPV6_CHECKSUM:
++            icmp_filter:
+             /* struct icmp_filter takes an u32 value */
+             if (optlen < sizeof(uint32_t)) {
+                 return -TARGET_EINVAL;
