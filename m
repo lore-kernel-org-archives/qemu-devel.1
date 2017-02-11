@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ccUHV-0006bF-Ho
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 04:47:51 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1ccUhb-0004bi-7P
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 05:14:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ccUHS-0006ew-Bb
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 04:47:49 -0500
-Received: from 8.mo179.mail-out.ovh.net ([46.105.75.26]:45987)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ccUHS-0006bQ-1N
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 04:47:46 -0500
-Received: from player732.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 387A4217A4
-	for <qemu-devel@nongnu.org>; Sat, 11 Feb 2017 10:47:36 +0100 (CET)
-Date: Sat, 11 Feb 2017 10:47:32 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170211104732.3e5f4569@bahia.lan>
-In-Reply-To: <c5731fb9-3768-499b-d5ae-d1087f47619c@amsat.org>
-References: <148640163738.20116.15256467457494672940.stgit@bahia>
-	<c5731fb9-3768-499b-d5ae-d1087f47619c@amsat.org>
+	(envelope-from <arei.gonglei@huawei.com>) id 1ccUhY-0004dU-3K
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 05:14:47 -0500
+Received: from [45.249.212.188] (port=2465 helo=dggrg02-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1ccUhW-0004cp-SS
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 05:14:44 -0500
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Sat, 11 Feb 2017 10:12:47 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA1B6988@DGGEMA505-MBX.china.huawei.com>
+References: <589C099A.9090605@huawei.com>
+	<AF60004D-7133-44D1-8A9F-7DB9822D84AF@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA1B4379@DGGEMA505-MBX.china.huawei.com>
+	<105e5774-38c3-0683-ca08-64f6ed53c643@redhat.com>
+In-Reply-To: <105e5774-38c3-0683-ca08-64f6ed53c643@redhat.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/v_4Z_HJUqUdxJ4IQqvPnpqx";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH] 9pfs: proxy: assert if unmarshal fails
+Subject: Re: [Qemu-devel] [Help] Windows2012 as Guest 64+cores on KVM Halts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,174 +30,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Yan Vugenfirer <yvugenfi@redhat.com>, Hangaohuai <hangaohuai@huawei.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Radim Krcmar <rkrcmar@redhat.com>, "vrozenfe@redhat.com" <vrozenfe@redhat.com>
 
---Sig_/v_4Z_HJUqUdxJ4IQqvPnpqx
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Hi Paolo,
 
-On Sat, 11 Feb 2017 01:25:17 -0300
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
-
-> Hi Greg,
 >=20
+>=20
+> On 10/02/2017 10:31, Gonglei (Arei) wrote:
+> > But We tested the same cases on Xen platform and VMware, and
+> > the guest booted successfully.
+>=20
+> Were these two also tested with enlightenments enabled?  TCG surely isn't=
+.
+>=20
+About TCG, I just remove ' accel=3Dkvm,' and 'hy_releaxed' from the below Q=
+EMU
+Command line, I thought the hyper-V enabled then. Sorry about that.
 
-Hi Philippe,
+But for Xen, we set 'viridian=3D1' which be thought the Hyper-V is enabled.
 
-> On 02/06/2017 02:20 PM, Greg Kurz wrote:
-> > Replies from the virtfs proxy are made up of a fixed-size header (8 byt=
-es)
-> > and a payload of variable size (maximum 64kb). When receiving a reply,
-> > the proxy backend first reads the whole header and then unmarshals it.
-> > If the header is okay, it then does the same operation with the payload.
+For VMWare we also enabled the Hyper-V enlightenments.
+
+Thanks,
+-Gonglei
+
+> Paolo
+>=20
+> > Today I also tested on tcg, the guest also boots successfully.
 > >
-> > Since the proxy backend uses a pre-allocated buffer which has enough ro=
-om
-> > for a header and the maximum payload size, marshalling should never fail
-> > with fixed size arguments. Let's make this clear with assertions.
+> > BTW, if we disable hyper-v, there isn't problem on boot for the case.
 > >
-> > This should also address Coverity's complaints CID 1348519 and CID 1348=
-520,
-> > about not always checking the return value of proxy_unmarshal().
+> > QEMU command line (enable hyper-v with hv_relaxed):
 > >
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> >  hw/9pfs/9p-proxy.c |   22 +++++++++++-----------
-> >  1 file changed, 11 insertions(+), 11 deletions(-)
+> > # ./qemu-system-x86_64 -name win2012 -machine accel=3Dkvm,usb=3Doff -cp=
+u
+> qemu64,hv_relaxed -m 4001 -realtime mlock=3Doff -smp
+> 68,sockets=3D1,cores=3D68,threads=3D1 \
+> > -drive
+> file=3D/mnt/sdb/gonglei/win2012_r2_dc_64_raw,if=3Dnone,id=3Ddrive-ide0-0-=
+0
+> -device ide-hd,bus=3Dide.0,unit=3D0,drive=3Ddrive-ide0-0-0,id=3Dide0-0-0,=
+bootindex=3D1 \
+> > -boot menu=3Don -device piix3-usb-uhci,id=3Duhci -chardev
+> file,id=3Dseabios,path=3D/home/seabios.log -device
+> isa-debugcon,iobase=3D0x402,chardev=3Dseabios \
+> > -monitor stdio -device cirrus-vga,id=3Dvideo0,vgamem_mb=3D16 -vnc 0.0.0=
+.0:10
 > >
-> > diff --git a/hw/9pfs/9p-proxy.c b/hw/9pfs/9p-proxy.c
-> > index f4aa7a9d70f8..4ad42a1ad158 100644
-> > --- a/hw/9pfs/9p-proxy.c
-> > +++ b/hw/9pfs/9p-proxy.c
-> > @@ -165,7 +165,8 @@ static int v9fs_receive_response(V9fsProxy *proxy, =
-int type,
-> >          return retval;
-> >      }
-> >      reply->iov_len =3D PROXY_HDR_SZ;
-> > -    proxy_unmarshal(reply, 0, "dd", &header.type, &header.size);
-> > +    retval =3D proxy_unmarshal(reply, 0, "dd", &header.type, &header.s=
-ize);
-> > +    assert(retval =3D=3D 8); =20
->=20
-> I'd be more specific:
->=20
-> assert(retval =3D=3D PROXY_HDR_SZ);
->=20
-
-I deliberately chose to open code values according to the format string. No
-matter what could happen to the code, "dd" means two 32-bit integers, i.e.
-8 bytes... and to be honest, I don't find this PROXY_HDR_SZ macro that
-useful, the code should use 8 as well, the same way we use 7 for the size
-of the 9P header (size[4] type[1] tag[2]).
-
-> >      /*
-> >       * if response size > PROXY_MAX_IO_SZ, read the response but ignor=
-e it and
-> >       * return -ENOBUFS
-> > @@ -194,9 +195,7 @@ static int v9fs_receive_response(V9fsProxy *proxy, =
-int type,
-> >      if (header.type =3D=3D T_ERROR) {
-> >          int ret;
-> >          ret =3D proxy_unmarshal(reply, PROXY_HDR_SZ, "d", status);
-> > -        if (ret < 0) {
-> > -            *status =3D ret;
-> > -        }
-> > +        assert(ret =3D=3D 4); =20
->=20
-> assert(ret =3D=3D sizeof(status));
->=20
-
-If status is converted to a larger type, this assertion will trigger, even
-though 4 is really what we expect when passing "d".
-
-Cheers.
-
---
-Greg
-
-> >          return 0;
-> >      }
+> > So, I think it's possible a KVM bug on Hyper-V enlightenments support.
 > >
-> > @@ -213,6 +212,7 @@ static int v9fs_receive_response(V9fsProxy *proxy, =
-int type,
-> >                                   &prstat.st_atim_sec, &prstat.st_atim_=
-nsec,
-> >                                   &prstat.st_mtim_sec, &prstat.st_mtim_=
-nsec,
-> >                                   &prstat.st_ctim_sec, &prstat.st_ctim_=
-nsec);
-> > +        assert(retval =3D=3D sizeof(prstat));
-> >          prstat_to_stat(response, &prstat);
-> >          break;
-> >      }
-> > @@ -225,6 +225,7 @@ static int v9fs_receive_response(V9fsProxy *proxy, =
-int type,
-> >                                   &prstfs.f_files, &prstfs.f_ffree,
-> >                                   &prstfs.f_fsid[0], &prstfs.f_fsid[1],
-> >                                   &prstfs.f_namelen, &prstfs.f_frsize);
-> > +        assert(retval =3D=3D sizeof(prstfs));
-> >          prstatfs_to_statfs(response, &prstfs);
-> >          break;
-> >      }
-> > @@ -246,7 +247,8 @@ static int v9fs_receive_response(V9fsProxy *proxy, =
-int type,
-> >          break;
-> >      }
-> >      case T_GETVERSION:
-> > -        proxy_unmarshal(reply, PROXY_HDR_SZ, "q", response);
-> > +        retval =3D proxy_unmarshal(reply, PROXY_HDR_SZ, "q", response);
-> > +        assert(retval =3D=3D 8); =20
->=20
-> assert(retval =3D=3D PROXY_HDR_SZ);
->=20
-> >          break;
-> >      default:
-> >          return -1;
-> > @@ -274,18 +276,16 @@ static int v9fs_receive_status(V9fsProxy *proxy,
-> >          return retval;
-> >      }
-> >      reply->iov_len =3D PROXY_HDR_SZ;
-> > -    proxy_unmarshal(reply, 0, "dd", &header.type, &header.size);
-> > -    if (header.size !=3D sizeof(int)) {
-> > -        *status =3D -ENOBUFS;
-> > -        return 0;
-> > -    }
-> > +    retval =3D proxy_unmarshal(reply, 0, "dd", &header.type, &header.s=
-ize);
-> > +    assert(retval =3D=3D 8); =20
->=20
-> same
->=20
-> >      retval =3D socket_read(proxy->sockfd,
-> >                           reply->iov_base + PROXY_HDR_SZ, header.size);
-> >      if (retval < 0) {
-> >          return retval;
-> >      }
-> >      reply->iov_len +=3D header.size;
-> > -    proxy_unmarshal(reply, PROXY_HDR_SZ, "d", status);
-> > +    retval =3D proxy_unmarshal(reply, PROXY_HDR_SZ, "d", status);
-> > +    assert(retval =3D=3D 4); =20
->=20
-> assert(ret =3D=3D sizeof(status));
->=20
-> >      return 0;
-> >  }
+> > Any help will be appreciated!
 > >
-> >
-> > =20
-
-
---Sig_/v_4Z_HJUqUdxJ4IQqvPnpqx
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlie3bQACgkQAvw66wEB28KoLwCfYe8O0FkVaWZPsb2zUyEJ1V7H
-pwYAoKSzzsG2vDAIhyw1fFOAQMQXzzPl
-=sjwo
------END PGP SIGNATURE-----
-
---Sig_/v_4Z_HJUqUdxJ4IQqvPnpqx--
+> > CC'ing Paolo, Radim and Vadim.
