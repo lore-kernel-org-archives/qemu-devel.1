@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ccfwX-00027T-7d
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 17:14:58 -0500
+	(envelope-from <deller@gmx.de>) id 1ccg7e-0005ee-Uk
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 17:26:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ccfwU-0003BI-30
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 17:14:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50180)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ccfwT-0003BB-TM
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 17:14:54 -0500
-Date: Sat, 11 Feb 2017 23:14:49 +0100
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170211221449.GA18702@thinpad.lan.raisama.net>
-References: <1485916178-17838-1-git-send-email-douly.fnst@cn.fujitsu.com>
+	(envelope-from <deller@gmx.de>) id 1ccg7X-0005mG-Lt
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 17:26:26 -0500
+Received: from mout.gmx.net ([212.227.17.21]:52576)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <deller@gmx.de>) id 1ccg7X-0005ke-Ae
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 17:26:19 -0500
+Date: Sat, 11 Feb 2017 23:26:02 +0100
+From: Helge Deller <deller@gmx.de>
+Message-ID: <20170211222602.GA6399@ls3530.fritz.box>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1485916178-17838-1-git-send-email-douly.fnst@cn.fujitsu.com>
-Subject: Re: [Qemu-devel] [PATCH v3] vl: Move the
- cpu_synchronize_all_post_init() after generic devices initialization
+Subject: [Qemu-devel] [PATCH v2] linux-user: Add FICLONE and FICLONERANGE
+ ioctls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,71 +25,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Cc: pbonzini@redhat.com, alex.bennee@linaro.org, rth@twiddle.net, crosthwaite.peter@gmail.com, izumi.taku@jp.fujitsu.com, caoj.fnst@cn.fujitsu.com, fanc.fnst@cn.fujitsu.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
+Cc: Laurent Vivier <laurent@vivier.eu>, Richard Henderson <rth@twiddle.net>
 
-On Wed, Feb 01, 2017 at 10:29:38AM +0800, Dou Liyang wrote:
-> At the Qemu initialization, we call the cpu_synchronize_all_post_init()
-> to synchronize All CPU states to KVM in the ./vl.c::main().
-> 
-> Currently, it is called before we initialize the CPUs, which is created
-> by "-device" command and parsed by generic devices initialization, So,
-> these CPUs may be ignored to synchronize.
-> 
-> The patch moves the cpu_synchronize_all_post_init func after generic
-> devices initialization to make sure that all the CPUs can be included.
-> 
-> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Add missing FICLONE and FICLONERANGE ioctls.
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Changes to v1:
+- Added STRUCT_file_clone_range as suggested by Laurent Vivier
 
-I will be away from work during the next 10 days, so anybody
-willing to merge this gets my:
+Signed-off-by: Helge Deller <deller@gmx.de>
 
-Acked-by: Eduardo Habkost <ehabkost@redhat.com>
-
-
-> ---
-> Change log:
-> v2-> v3:
-> 1. Rebase the patch.
-> 2. Rewrite the log
-> v1-> v2:
-> 1. Split it from
-> https://lists.nongnu.org/archive/html/qemu-devel/2017-01/msg03354.html
-> 2. Rewrite the log.
-> 
->  vl.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/vl.c b/vl.c
-> index 0b72b12..bceb835 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -4490,8 +4490,6 @@ int main(int argc, char **argv, char **envp)
->  
->      audio_init();
->  
-> -    cpu_synchronize_all_post_init();
-> -
->      if (hax_enabled()) {
->          hax_sync_vcpus();
->      }
-> @@ -4517,6 +4515,8 @@ int main(int argc, char **argv, char **envp)
->          exit(1);
->      }
->  
-> +    cpu_synchronize_all_post_init();
-> +
->      numa_post_machine_init();
->  
->      rom_reset_order_override();
-> -- 
-> 2.5.5
-> 
-> 
-> 
-> 
-
--- 
-Eduardo
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index 2f6e85b..e6997ff 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -112,6 +112,11 @@
+ #ifdef FIBMAP
+      IOCTL(FIBMAP, IOC_W | IOC_R, MK_PTR(TYPE_LONG))
+ #endif
++#ifdef FICLONE
++     IOCTL(FICLONE, IOC_W, TYPE_INT)
++     IOCTL(FICLONERANGE, IOC_W, MK_PTR(MK_STRUCT(STRUCT_file_clone_range)))
++#endif
++
+ #ifdef FIGETBSZ
+      IOCTL(FIGETBSZ, IOC_R, MK_PTR(TYPE_LONG))
+ #endif
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 4442c22..72ca5b1 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -1086,6 +1086,10 @@ struct target_pollfd {
+ 
+ #define TARGET_FIBMAP     TARGET_IO(0x00,1)  /* bmap access */
+ #define TARGET_FIGETBSZ   TARGET_IO(0x00,2)  /* get the block size used for bmap */
++
++#define TARGET_FICLONE    TARGET_IOW(0x94, 9, int)
++#define TARGET_FICLONERANGE TARGET_IOW(0x94, 13, struct file_clone_range)
++
+ /* Note that the ioctl numbers claim type "long" but the actual type
+  * used by the kernel is "int".
+  */
+diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
+index 2b8c0c6..24631b0 100644
+--- a/linux-user/syscall_types.h
++++ b/linux-user/syscall_types.h
+@@ -232,6 +232,12 @@ STRUCT(dm_target_versions,
+ STRUCT(dm_target_msg,
+        TYPE_ULONGLONG) /* sector */
+ 
++STRUCT(file_clone_range,
++       TYPE_LONGLONG, /* src_fd */
++       TYPE_ULONGLONG, /* src_offset */
++       TYPE_ULONGLONG, /* src_length */
++       TYPE_ULONGLONG) /* dest_offset */
++
+ STRUCT(fiemap_extent,
+        TYPE_ULONGLONG, /* fe_logical */
+        TYPE_ULONGLONG, /* fe_physical */
