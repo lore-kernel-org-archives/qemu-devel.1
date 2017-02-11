@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cdJmq-0003c2-2I
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:47:38 -0500
+	(envelope-from <eblake@redhat.com>) id 1cdJrL-00065H-4j
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:52:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cdJmm-0002z7-5a
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:47:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58928)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cdJml-0002yz-Sc
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:47:32 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EA8107E9D9
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 16:47:31 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170203105430.GB3208@work-vm> (David Alan Gilbert's message of
-	"Fri, 3 Feb 2017 10:54:30 +0000")
-References: <1485207141-1941-1-git-send-email-quintela@redhat.com>
-	<1485207141-1941-13-git-send-email-quintela@redhat.com>
-	<20170203105430.GB3208@work-vm>
-Reply-To: quintela@redhat.com
-Date: Mon, 13 Feb 2017 17:47:22 +0100
-Message-ID: <87shni3un9.fsf@emacs.mitica>
+	(envelope-from <eblake@redhat.com>) id 1cdJrJ-0004AZ-T1
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:52:15 -0500
+References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
+	<20170203154757.36140-5-vsementsov@virtuozzo.com>
+	<7b79d03c-0fba-ddb8-4295-b155cb26a206@redhat.com>
+	<829007b8-d8a4-652c-7a23-59fbb5476cd2@virtuozzo.com>
+	<de548107-dbff-36ca-96ba-fead03589fde@redhat.com>
+	<e0ec9530-a87d-0f10-262d-4b2af4516eed@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <14aa4b87-54d4-1faa-8453-5e5dea2e346a@redhat.com>
+Date: Sat, 11 Feb 2017 13:30:22 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 12/17] migration: really use multiple pages
- at a time
+In-Reply-To: <e0ec9530-a87d-0f10-262d-4b2af4516eed@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="d98S1qPA9CkekA8G4TaSiuVrgRqkmIbvX"
+Subject: Re: [Qemu-devel] [PATCH 04/18] nbd/client: refactor
+ nbd_receive_starttls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,85 +29,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, amit.shah@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, armbru@redhat.com, den@virtuozzo.com, stefanha@redhat.com
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> * Juan Quintela (quintela@redhat.com) wrote:
->> We now send several pages at a time each time that we wakeup a thread.
->> 
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> ---
->>  migration/ram.c | 44 ++++++++++++++++++++++++++++++++++++++------
->>  1 file changed, 38 insertions(+), 6 deletions(-)
->> 
->> diff --git a/migration/ram.c b/migration/ram.c
->> index 9d7bc64..1267730 100644
->> --- a/migration/ram.c
->> +++ b/migration/ram.c
->> @@ -391,6 +391,13 @@ void migrate_compress_threads_create(void)
->> 
->>  /* Multiple fd's */
->> 
->> +
->> +typedef struct {
->> +    int num;
->> +    int size;
->> +    uint8_t **address;
->> +} multifd_pages_t;
->
-> The naming is odd for QEMU; should be MultiFDPages ?
-> You might want to make num & size unsigned.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--d98S1qPA9CkekA8G4TaSiuVrgRqkmIbvX
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com,
+ pbonzini@redhat.com, armbru@redhat.com, den@virtuozzo.com,
+ stefanha@redhat.com
+Message-ID: <14aa4b87-54d4-1faa-8453-5e5dea2e346a@redhat.com>
+Subject: Re: [PATCH 04/18] nbd/client: refactor nbd_receive_starttls
+References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
+ <20170203154757.36140-5-vsementsov@virtuozzo.com>
+ <7b79d03c-0fba-ddb8-4295-b155cb26a206@redhat.com>
+ <829007b8-d8a4-652c-7a23-59fbb5476cd2@virtuozzo.com>
+ <de548107-dbff-36ca-96ba-fead03589fde@redhat.com>
+ <e0ec9530-a87d-0f10-262d-4b2af4516eed@virtuozzo.com>
+In-Reply-To: <e0ec9530-a87d-0f10-262d-4b2af4516eed@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-ok.
+On 02/10/2017 05:23 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 09.02.2017 17:41, Eric Blake wrote:
+>> On 02/09/2017 12:20 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>> 07.02.2017 19:32, Eric Blake wrote:
+>>>> On 02/03/2017 09:47 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>>>> Split out nbd_receive_simple_option to be reused for structured rep=
+ly
+>>>>> option.
+>>>>> +    return "<unknown option>";
+>>>> Can you please consider making this include the %d representation of=
 
-> I was trying to understand why you store 'size' - is that because you worry about
-> someone changing the size parameter while we're running?  But given that we call
-> init in a few places I'm not sure it covers it.
+>>>> the
+>>>> unknown option; perhaps by snprintf'ing into static storage?  While =
+it
+>>> Hmm.. The caller should free it in this case.
+>> Only if you print it into malloc'd space. I think that printing it int=
+o
+>> static storage may be sufficient (although then we have a race if more=
 
-No.  I am planning to chang the code so I call:
+>> than one thread is trying to use that static storage at the same time =
+-
+>> but do we ever have more than one thread trying to handle an error at
+>> the same time?).
+>>
+>=20
+> This race would be if one thread decides to print two option names in
+> one message. Or save one option in a var, then print other, then print =
+var.
 
-ram_save_block(&multifd_pages, &size,...)
+NBD_OPT_ are supposed to be handled sequentially. The NBD spec does NOT
+allow for a single client to send a second NBD_OPT_ until after the
+first one has received a final response.  So the only time we would have
+two threads dealing with things in nbd/client.c during handshake is if
+we have a single qemu process connecting as client to two different NBD
+servers in parallel, where both servers issue an otherwise unknown opt
+response at the same time, which I don't see as likely enough to be
+worth avoiding static storage.
 
-And it returns at most "size" pages, depending on whatever it is easy to
-do.  Plan is not to change blocks, or do any expensive operation.  Just
-return the next "size" pages available that are easy to pick.
+If you're still worried about the race (I'm not), to the point that you
+don't want to use static storage just to avoid g_malloc(), then another
+option is to make nbd_opt_name() take an input parameter for a buffer
+and max size, and let the caller provide stack-based storage for
+computing the resulting message (similar to how strerror_r does things).
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
->> +    pages->num = 0;
->> +    pages->size = migrate_multifd_group();
->> +    pages->address = g_malloc0(pages->size * sizeof(uint8_t *));
->
-> g_new0(uint8_t *, pages->size)
+--d98S1qPA9CkekA8G4TaSiuVrgRqkmIbvX
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-changing it, I don't  really care O:-)
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
->> +}
->> +
->>  void migrate_multifd_send_threads_create(void)
->>  {
->>      int i, thread_count;
->> @@ -491,7 +505,7 @@ void migrate_multifd_send_threads_create(void)
->>          multifd_send[i].quit = false;
->>          multifd_send[i].started = false;
->>          multifd_send[i].done = true;
->> -        multifd_send[i].address = 0;
->> +        multifd_init_group(&multifd_send[i].pages);
->>          multifd_send[i].c = socket_send_channel_create();
->>          if(!multifd_send[i].c) {
->>              error_report("Error creating a send channel");
->> @@ -511,8 +525,22 @@ void migrate_multifd_send_threads_create(void)
->> 
->>  static int multifd_send_page(uint8_t *address)
->
-> Can you comment multifd_send_page to explain what it returns.
->
-> (Do we really need u16 for fd number? More than 256 streams would seem
-> surprising).
+iQEcBAEBCAAGBQJYn2ZOAAoJEKeha0olJ0NqJdMH/3nuJy8AOT5ZjViUgiDMTpr+
+n1zNO8cqcA5Un2RBqjzj0G/f40dBxQAaX9XHoN0s7I+tmZaTCWtdACiFZ4eSsj7y
+NEDcqr2MAMQ4M+yr2EOrqF/tR2R3+lTX9tw7Ce+xAaFD1CcrSxjXpYKnEnEobsKt
+KlRZrG4agQ3H1KOlVNrfEuii3S/koGpZOQ2O1WzD9P4iz1rdxxgfCbFKuMypkYIX
+Xu5eu9LHS04Efygf1lOzmWtT/2YOXWVX7TF0Pm3M1XGyQ4ci7SIvGvMM/byXGZSU
+jyqQXAN6QFHELvZKfMYz9Q6ew4jXIHm15T3P9SkF0mqL+hlbrL2uJkM3sd7ksI4=
+=90ih
+-----END PGP SIGNATURE-----
 
-I *guess*, (big guess) that people are going to use the same number of
-threads than cpus.  And we are going to have more than 256 in the near
-future, su it looked more future proof to use uint16_t.  I don't really
-care though.
-
-Thanks, Juan.
+--d98S1qPA9CkekA8G4TaSiuVrgRqkmIbvX--
