@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1ccZGi-00086m-4U
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 10:07:21 -0500
+	(envelope-from <ppandit@redhat.com>) id 1ccZGk-00087H-3s
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 10:07:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1ccZGe-000703-Vu
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 10:07:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41140)
+	(envelope-from <ppandit@redhat.com>) id 1ccZGi-00070W-1L
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 10:07:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40588)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1ccZGe-0006zn-PS
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 10:07:16 -0500
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1ccZGh-00070Q-R2
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 10:07:19 -0500
 From: P J P <ppandit@redhat.com>
-Date: Sat, 11 Feb 2017 20:36:57 +0530
-Message-Id: <20170211150701.23391-1-ppandit@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 0/4] sd: sdhci: correct transfer mode
- register usage
+Date: Sat, 11 Feb 2017 20:36:58 +0530
+Message-Id: <20170211150701.23391-2-ppandit@redhat.com>
+In-Reply-To: <20170211150701.23391-1-ppandit@redhat.com>
+References: <20170211150701.23391-1-ppandit@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 1/4] sd: sdhci: check transfer mode register
+ in multi block transfer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +29,50 @@ Cc: Alistair Francis <alistair23@gmail.com>, Peter Maydell <peter.maydell@linaro
 
 From: Prasad J Pandit <pjp@fedoraproject.org>
 
-Hello,
+In the SDHCI protocol, the transfer mode register value
+is used during multi block transfer to check if block count
+register is enabled and should be updated. Transfer mode
+register could be set such that, block count register would
+not be updated, thus leading to an infinite loop. Add check
+to avoid it.
 
-In SDHCI protocol, the 'Block Count Enable' bit of the Transfer Mode
-register is used to control 's->blkcnt' value. This bit is not relevant
-in single block transfers. Also, Transfer Mode register value could be
-set such that 's->blkcnt' would not see an update during multi block
-transfers. Thus leading to an infinite loop.
+Reported-by: Wjjzhang <wjjzhang@tencent.com>
+Reported-by: Jiang Xin <jiangxin1@huawei.com>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
+ hw/sd/sdhci.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-This patch set attempts to correct 'Block Count Enable' bit usage.
+Update: use qemu_log_mask(LOG_UNIMP, ...)
+  -> https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg02354.html
 
-This series incorporates changes suggested in patch set v2:
-  -> https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg01608.html
-
-Thank you.
---
-Prasad J Pandit (4):
-  sd: sdhci: check transfer mode register in multi block transfer
-  sd: sdhci: mask transfer mode register value
-  sd: sdhci: conditionally invoke multi block transfer
-  sd: sdhci: Remove block count enable check in single block transfers
-
- hw/sd/sdhci.c | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
-
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index 5bd5ab6..a9c744b 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -486,6 +486,11 @@ static void sdhci_sdma_transfer_multi_blocks(SDHCIState *s)
+     uint32_t boundary_chk = 1 << (((s->blksize & 0xf000) >> 12) + 12);
+     uint32_t boundary_count = boundary_chk - (s->sdmasysad % boundary_chk);
+ 
++    if (!(s->trnmod & SDHC_TRNS_BLK_CNT_EN) || !s->blkcnt) {
++        qemu_log_mask(LOG_UNIMP, "infinite transfer is not supported\n");
++        return;
++    }
++
+     /* XXX: Some sd/mmc drivers (for example, u-boot-slp) do not account for
+      * possible stop at page boundary if initial address is not page aligned,
+      * allow them to work properly */
+@@ -797,11 +802,6 @@ static void sdhci_data_transfer(void *opaque)
+     if (s->trnmod & SDHC_TRNS_DMA) {
+         switch (SDHC_DMA_TYPE(s->hostctl)) {
+         case SDHC_CTRL_SDMA:
+-            if ((s->trnmod & SDHC_TRNS_MULTI) &&
+-                    (!(s->trnmod & SDHC_TRNS_BLK_CNT_EN) || s->blkcnt == 0)) {
+-                break;
+-            }
+-
+             if ((s->blkcnt == 1) || !(s->trnmod & SDHC_TRNS_MULTI)) {
+                 sdhci_sdma_transfer_single_block(s);
+             } else {
 -- 
 2.9.3
