@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <deller@gmx.de>) id 1ccfts-00017M-QE
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 17:12:14 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ccfwX-00027T-7d
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 17:14:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <deller@gmx.de>) id 1ccftp-0002Y1-K4
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 17:12:12 -0500
-Received: from mout.gmx.net ([212.227.15.19]:58406)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <deller@gmx.de>) id 1ccftp-0002Xa-8b
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 17:12:09 -0500
-Date: Sat, 11 Feb 2017 23:11:48 +0100
-From: Helge Deller <deller@gmx.de>
-Message-ID: <20170211221148.GA2924@ls3530.fritz.box>
+	(envelope-from <ehabkost@redhat.com>) id 1ccfwU-0003BI-30
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 17:14:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50180)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ccfwT-0003BB-TM
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 17:14:54 -0500
+Date: Sat, 11 Feb 2017 23:14:49 +0100
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170211221449.GA18702@thinpad.lan.raisama.net>
+References: <1485916178-17838-1-git-send-email-douly.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Subject: [Qemu-devel] [PATCH] linux-user: Add sockopts for IPv6 ping and
- IPv6 traceroute
+In-Reply-To: <1485916178-17838-1-git-send-email-douly.fnst@cn.fujitsu.com>
+Subject: Re: [Qemu-devel] [PATCH v3] vl: Move the
+ cpu_synchronize_all_post_init() after generic devices initialization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,157 +27,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
-Cc: Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>
+To: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Cc: pbonzini@redhat.com, alex.bennee@linaro.org, rth@twiddle.net, crosthwaite.peter@gmail.com, izumi.taku@jp.fujitsu.com, caoj.fnst@cn.fujitsu.com, fanc.fnst@cn.fujitsu.com, qemu-devel@nongnu.org
 
-Add the neccessary sockopts for ping and traceroute on IPv6.
+On Wed, Feb 01, 2017 at 10:29:38AM +0800, Dou Liyang wrote:
+> At the Qemu initialization, we call the cpu_synchronize_all_post_init()
+> to synchronize All CPU states to KVM in the ./vl.c::main().
+> 
+> Currently, it is called before we initialize the CPUs, which is created
+> by "-device" command and parsed by generic devices initialization, So,
+> these CPUs may be ignored to synchronize.
+> 
+> The patch moves the cpu_synchronize_all_post_init func after generic
+> devices initialization to make sure that all the CPUs can be included.
+> 
+> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
 
-This fixes the following qemu warnings with IPv6:
-Unsupported ancillary data: 0/2
-Unsupported ancillary data: 0/11
-Unsupported ancillary data: 41/25
-Unsupported setsockopt level=0 optname=12 
-Unsupported setsockopt level=41 optname=16
-Unsupported setsockopt level=41 optname=25
-Unsupported setsockopt level=41 optname=51
-Unsupported setsockopt level=41 optname=8
-Unsupported setsockopt level=58 optname=1
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
-Tested on hppa-linux-user.
+I will be away from work during the next 10 days, so anybody
+willing to merge this gets my:
 
-Signed-off-by: Helge Deller <deller@gmx.de>
+Acked-by: Eduardo Habkost <ehabkost@redhat.com>
 
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 9be8e95..222a85e 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -57,6 +57,8 @@ int __clone2(int (*fn)(void *), void *child_stack_base,
- #include <netinet/tcp.h>
- #include <linux/wireless.h>
- #include <linux/icmp.h>
-+#include <linux/icmpv6.h>
-+#include <linux/errqueue.h>
- #include "qemu-common.h"
- #ifdef CONFIG_TIMERFD
- #include <sys/timerfd.h>
-@@ -1839,6 +1841,78 @@ static inline abi_long host_to_target_cmsg(struct target_msghdr *target_msgh,
-             }
-             break;
- 
-+        case SOL_IP:
-+            switch (cmsg->cmsg_type) {
-+            case IP_TTL:
-+            {
-+                goto copy_word;
-+            }
-+            case IP_RECVERR:
-+            {
-+                struct errhdr_t {
-+                   struct sock_extended_err ee;
-+                   struct sockaddr_in offender;
-+                };
-+                struct errhdr_t *errh = (struct errhdr_t *)data;
-+                struct errhdr_t *target_errh =
-+                    (struct errhdr_t *)target_data;
-+
-+                __put_user(errh->ee.ee_errno, &target_errh->ee.ee_errno);
-+                __put_user(errh->ee.ee_origin, &target_errh->ee.ee_origin);
-+                __put_user(errh->ee.ee_type,  &target_errh->ee.ee_type);
-+                __put_user(errh->ee.ee_code, &target_errh->ee.ee_code);
-+                __put_user(errh->ee.ee_pad, &target_errh->ee.ee_pad);
-+                __put_user(errh->ee.ee_info, &target_errh->ee.ee_info);
-+                __put_user(errh->ee.ee_data, &target_errh->ee.ee_data);
-+                host_to_target_sockaddr((unsigned long) &target_errh->offender,
-+                    (void *) &errh->offender, sizeof(errh->offender));
-+		break;
-+            }
-+            default:
-+                goto unimplemented;
-+            }
-+            break;
-+
-+        case SOL_IPV6:
-+            switch (cmsg->cmsg_type) {
-+            case IPV6_HOPLIMIT:
-+            copy_word:
-+            {
-+                uint32_t *v = (uint32_t *)data;
-+                uint32_t *t_int = (uint32_t *)target_data;
-+                if (tgt_len != CMSG_LEN(0))
-+                    goto unimplemented;
-+
-+                __put_user(*v, t_int);
-+		break;
-+            }
-+            case IPV6_RECVERR:
-+            {
-+                struct errhdr6_t {
-+                   struct sock_extended_err ee;
-+                   struct sockaddr_in6 offender;
-+                };
-+                struct errhdr6_t *errh = (struct errhdr6_t *)data;
-+                struct errhdr6_t *target_errh =
-+                    (struct errhdr6_t *)target_data;
-+
-+                __put_user(errh->ee.ee_errno, &target_errh->ee.ee_errno);
-+                __put_user(errh->ee.ee_origin, &target_errh->ee.ee_origin);
-+                __put_user(errh->ee.ee_type,  &target_errh->ee.ee_type);
-+                __put_user(errh->ee.ee_code, &target_errh->ee.ee_code);
-+                __put_user(errh->ee.ee_pad, &target_errh->ee.ee_pad);
-+                __put_user(errh->ee.ee_info, &target_errh->ee.ee_info);
-+                __put_user(errh->ee.ee_data, &target_errh->ee.ee_data);
-+                target_errh->offender = errh->offender;
-+                __put_user(errh->offender.sin6_family, &target_errh->offender.sin6_family);
-+                __put_user(errh->offender.sin6_scope_id, &target_errh->offender.sin6_scope_id);
-+		break;
-+            }
-+            default:
-+                goto unimplemented;
-+            }
-+            break;
-+
-         default:
-         unimplemented:
-             gemu_log("Unsupported ancillary data: %d/%d\n",
-@@ -2766,6 +2840,7 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
-         case IP_PKTINFO:
-         case IP_MTU_DISCOVER:
-         case IP_RECVERR:
-+        case IP_RECVTTL:
-         case IP_RECVTOS:
- #ifdef IP_FREEBIND
-         case IP_FREEBIND:
-@@ -2815,6 +2890,10 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
-         case IPV6_MTU:
-         case IPV6_V6ONLY:
-         case IPV6_RECVPKTINFO:
-+        case IPV6_UNICAST_HOPS:
-+        case IPV6_RECVERR:
-+        case IPV6_RECVHOPLIMIT:
-+        case IPV6_2292HOPLIMIT:
-             val = 0;
-             if (optlen < sizeof(uint32_t)) {
-                 return -TARGET_EINVAL;
-@@ -2829,9 +2908,21 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
-             goto unimplemented;
-         }
-         break;
-+    case SOL_ICMPV6:
-+        switch(optname) {
-+        case ICMPV6_FILTER:
-+        case IPV6_CHECKSUM:
-+            goto icmp_filter;
-+            break;
-+        default:
-+            goto unimplemented;
-+        }
-+        break;
-     case SOL_RAW:
-         switch (optname) {
-         case ICMP_FILTER:
-+        case IPV6_CHECKSUM:
-+            icmp_filter:
-             /* struct icmp_filter takes an u32 value */
-             if (optlen < sizeof(uint32_t)) {
-                 return -TARGET_EINVAL;
+> ---
+> Change log:
+> v2-> v3:
+> 1. Rebase the patch.
+> 2. Rewrite the log
+> v1-> v2:
+> 1. Split it from
+> https://lists.nongnu.org/archive/html/qemu-devel/2017-01/msg03354.html
+> 2. Rewrite the log.
+> 
+>  vl.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/vl.c b/vl.c
+> index 0b72b12..bceb835 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4490,8 +4490,6 @@ int main(int argc, char **argv, char **envp)
+>  
+>      audio_init();
+>  
+> -    cpu_synchronize_all_post_init();
+> -
+>      if (hax_enabled()) {
+>          hax_sync_vcpus();
+>      }
+> @@ -4517,6 +4515,8 @@ int main(int argc, char **argv, char **envp)
+>          exit(1);
+>      }
+>  
+> +    cpu_synchronize_all_post_init();
+> +
+>      numa_post_machine_init();
+>  
+>      rom_reset_order_override();
+> -- 
+> 2.5.5
+> 
+> 
+> 
+> 
+
+-- 
+Eduardo
