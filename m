@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52917)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ccP6J-0000k8-Aa
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 23:15:56 -0500
+	id 1ccPFU-0005Mm-7h
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 23:25:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ccP6G-0000uw-7J
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 23:15:55 -0500
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:34131)
+	id 1ccPFR-0003SA-3J
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 23:25:24 -0500
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:34517)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ccP6G-0000ul-3N
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 23:15:52 -0500
-Received: by mail-qk0-x241.google.com with SMTP id e1so7553162qkh.1
-	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 20:15:52 -0800 (PST)
+	id 1ccPFQ-0003Rx-Vg
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 23:25:21 -0500
+Received: by mail-qk0-x241.google.com with SMTP id e1so7566137qkh.1
+	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 20:25:20 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <1486249715-5513-1-git-send-email-peter.maydell@linaro.org>
-	<1486249715-5513-4-git-send-email-peter.maydell@linaro.org>
+References: <148640163738.20116.15256467457494672940.stgit@bahia>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <9d25c855-3604-ae54-aab9-832d722f1882@amsat.org>
-Date: Sat, 11 Feb 2017 01:15:47 -0300
+Message-ID: <c5731fb9-3768-499b-d5ae-d1087f47619c@amsat.org>
+Date: Sat, 11 Feb 2017 01:25:17 -0300
 MIME-Version: 1.0
-In-Reply-To: <1486249715-5513-4-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 3/3] slirp: tcp_listen(): Don't try to
- close() an fd we never opened
+In-Reply-To: <148640163738.20116.15256467457494672940.stgit@bahia>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] 9pfs: proxy: assert if unmarshal fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,38 +33,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>, patches@linaro.org
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
 
-On 02/04/2017 08:08 PM, Peter Maydell wrote:
-> Coverity points out (CID 1005725) that an error-exit path in tcp_listen()
-> will try to close(s) even if the reason it got there was that the
-> qemu_socket() failed and s was never opened.  Not only that, this isn't even
-> the right function to use, because we need closesocket() to do the right
-> thing on Windows.  Change to using the right function and only calling it if
-> needed.
+Hi Greg,
+
+On 02/06/2017 02:20 PM, Greg Kurz wrote:
+> Replies from the virtfs proxy are made up of a fixed-size header (8 bytes)
+> and a payload of variable size (maximum 64kb). When receiving a reply,
+> the proxy backend first reads the whole header and then unmarshals it.
+> If the header is okay, it then does the same operation with the payload.
 >
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
+> Since the proxy backend uses a pre-allocated buffer which has enough room
+> for a header and the maximum payload size, marshalling should never fail
+> with fixed size arguments. Let's make this clear with assertions.
+>
+> This should also address Coverity's complaints CID 1348519 and CID 1348520,
+> about not always checking the return value of proxy_unmarshal().
+>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
->  slirp/socket.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>  hw/9pfs/9p-proxy.c |   22 +++++++++++-----------
+>  1 file changed, 11 insertions(+), 11 deletions(-)
 >
-> diff --git a/slirp/socket.c b/slirp/socket.c
-> index 6c18971..8692772 100644
-> --- a/slirp/socket.c
-> +++ b/slirp/socket.c
-> @@ -713,7 +713,9 @@ tcp_listen(Slirp *slirp, uint32_t haddr, u_int hport, uint32_t laddr,
->  	    (listen(s,1) < 0)) {
->  		int tmperrno = errno; /* Don't clobber the real reason we failed */
+> diff --git a/hw/9pfs/9p-proxy.c b/hw/9pfs/9p-proxy.c
+> index f4aa7a9d70f8..4ad42a1ad158 100644
+> --- a/hw/9pfs/9p-proxy.c
+> +++ b/hw/9pfs/9p-proxy.c
+> @@ -165,7 +165,8 @@ static int v9fs_receive_response(V9fsProxy *proxy, int type,
+>          return retval;
+>      }
+>      reply->iov_len = PROXY_HDR_SZ;
+> -    proxy_unmarshal(reply, 0, "dd", &header.type, &header.size);
+> +    retval = proxy_unmarshal(reply, 0, "dd", &header.type, &header.size);
+> +    assert(retval == 8);
+
+I'd be more specific:
+
+assert(retval == PROXY_HDR_SZ);
+
+>      /*
+>       * if response size > PROXY_MAX_IO_SZ, read the response but ignore it and
+>       * return -ENOBUFS
+> @@ -194,9 +195,7 @@ static int v9fs_receive_response(V9fsProxy *proxy, int type,
+>      if (header.type == T_ERROR) {
+>          int ret;
+>          ret = proxy_unmarshal(reply, PROXY_HDR_SZ, "d", status);
+> -        if (ret < 0) {
+> -            *status = ret;
+> -        }
+> +        assert(ret == 4);
+
+assert(ret == sizeof(status));
+
+>          return 0;
+>      }
 >
-> -		close(s);
-> +                if (s >= 0) {
-> +                    closesocket(s);
-> +                }
->  		sofree(so);
->  		/* Restore the real errno */
->  #ifdef _WIN32
+> @@ -213,6 +212,7 @@ static int v9fs_receive_response(V9fsProxy *proxy, int type,
+>                                   &prstat.st_atim_sec, &prstat.st_atim_nsec,
+>                                   &prstat.st_mtim_sec, &prstat.st_mtim_nsec,
+>                                   &prstat.st_ctim_sec, &prstat.st_ctim_nsec);
+> +        assert(retval == sizeof(prstat));
+>          prstat_to_stat(response, &prstat);
+>          break;
+>      }
+> @@ -225,6 +225,7 @@ static int v9fs_receive_response(V9fsProxy *proxy, int type,
+>                                   &prstfs.f_files, &prstfs.f_ffree,
+>                                   &prstfs.f_fsid[0], &prstfs.f_fsid[1],
+>                                   &prstfs.f_namelen, &prstfs.f_frsize);
+> +        assert(retval == sizeof(prstfs));
+>          prstatfs_to_statfs(response, &prstfs);
+>          break;
+>      }
+> @@ -246,7 +247,8 @@ static int v9fs_receive_response(V9fsProxy *proxy, int type,
+>          break;
+>      }
+>      case T_GETVERSION:
+> -        proxy_unmarshal(reply, PROXY_HDR_SZ, "q", response);
+> +        retval = proxy_unmarshal(reply, PROXY_HDR_SZ, "q", response);
+> +        assert(retval == 8);
+
+assert(retval == PROXY_HDR_SZ);
+
+>          break;
+>      default:
+>          return -1;
+> @@ -274,18 +276,16 @@ static int v9fs_receive_status(V9fsProxy *proxy,
+>          return retval;
+>      }
+>      reply->iov_len = PROXY_HDR_SZ;
+> -    proxy_unmarshal(reply, 0, "dd", &header.type, &header.size);
+> -    if (header.size != sizeof(int)) {
+> -        *status = -ENOBUFS;
+> -        return 0;
+> -    }
+> +    retval = proxy_unmarshal(reply, 0, "dd", &header.type, &header.size);
+> +    assert(retval == 8);
+
+same
+
+>      retval = socket_read(proxy->sockfd,
+>                           reply->iov_base + PROXY_HDR_SZ, header.size);
+>      if (retval < 0) {
+>          return retval;
+>      }
+>      reply->iov_len += header.size;
+> -    proxy_unmarshal(reply, PROXY_HDR_SZ, "d", status);
+> +    retval = proxy_unmarshal(reply, PROXY_HDR_SZ, "d", status);
+> +    assert(retval == 4);
+
+assert(ret == sizeof(status));
+
+>      return 0;
+>  }
+>
+>
 >
