@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51567)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ccOoN-0003pg-4d
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 22:57:24 -0500
+	id 1ccP5u-0000X2-HZ
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 23:15:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ccOoK-0004Uz-21
-	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 22:57:23 -0500
+	id 1ccP5r-0000rT-CN
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 23:15:30 -0500
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:36643)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ccP5r-0000rP-6l
+	for qemu-devel@nongnu.org; Fri, 10 Feb 2017 23:15:27 -0500
+Received: by mail-qk0-x241.google.com with SMTP id i34so7526387qkh.3
+	for <qemu-devel@nongnu.org>; Fri, 10 Feb 2017 20:15:27 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <1486744104-15590-1-git-send-email-peter.maydell@linaro.org>
-	<1486744104-15590-3-git-send-email-peter.maydell@linaro.org>
+References: <1486249715-5513-1-git-send-email-peter.maydell@linaro.org>
+	<1486249715-5513-2-git-send-email-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6cf32b36-2efd-4f06-3a81-8eb00b88878f@amsat.org>
-Date: Sat, 11 Feb 2017 00:57:12 -0300
+Message-ID: <cac53afa-c1b1-e219-628f-76239ca22fff@amsat.org>
+Date: Sat, 11 Feb 2017 01:15:21 -0300
 MIME-Version: 1.0
-In-Reply-To: <1486744104-15590-3-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1486249715-5513-2-git-send-email-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] qemu-img: Avoid setting ret to unused
- value in img_convert()
+Subject: Re: [Qemu-devel] [PATCH 1/3] slirp: Check qemu_socket() return
+ value in udp_listen()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +36,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, patches@linaro.org
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>, patches@linaro.org
 
-On 02/10/2017 01:28 PM, Peter Maydell wrote:
-> Coverity points out that we assign the return value from
-> bdrv_snapshot_load_tmp() to 'ret' in img_convert(), but then
-> never use that variable. (We check for failure by looking
-> at local_err instead.) Drop the unused assignment, bringing
-> the call into line with the following call to
-> bdrv_snapshot_laod_tmp_by_id_or_name().
->
-> (Fixes CID 1247240.)
+On 02/04/2017 08:08 PM, Peter Maydell wrote:
+> Check the return value from qemu_socket() rather than trying to
+> pass it to bind() as an fd argument even if it's negative.
+> This wouldn't have caused any negative consequences, because
+> it won't be a valid fd number and the bind call will fail;
+> but Coverity complains (CID 1005723).
 >
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  qemu-img.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>  slirp/udp.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 >
-> diff --git a/qemu-img.c b/qemu-img.c
-> index aa71588..9227d3a 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -1966,10 +1966,10 @@ static int img_convert(int argc, char **argv)
->      }
+> diff --git a/slirp/udp.c b/slirp/udp.c
+> index 93d7224..227d779 100644
+> --- a/slirp/udp.c
+> +++ b/slirp/udp.c
+> @@ -335,6 +335,10 @@ udp_listen(Slirp *slirp, uint32_t haddr, u_int hport, uint32_t laddr,
+>  	    return NULL;
+>  	}
+>  	so->s = qemu_socket(AF_INET,SOCK_DGRAM,0);
+> +        if (so->s < 0) {
+> +            sofree(so);
+> +            return NULL;
+> +        }
+>  	so->so_expire = curtime + SO_EXPIRE;
+>  	insque(so, &slirp->udb);
 >
->      if (sn_opts) {
-> -        ret = bdrv_snapshot_load_tmp(bs[0],
-> -                                     qemu_opt_get(sn_opts, SNAPSHOT_OPT_ID),
-> -                                     qemu_opt_get(sn_opts, SNAPSHOT_OPT_NAME),
-> -                                     &local_err);
-> +        bdrv_snapshot_load_tmp(bs[0],
-> +                               qemu_opt_get(sn_opts, SNAPSHOT_OPT_ID),
-> +                               qemu_opt_get(sn_opts, SNAPSHOT_OPT_NAME),
-> +                               &local_err);
->      } else if (snapshot_name != NULL) {
->          if (bs_n > 1) {
->              error_report("No support for concatenating multiple snapshot");
 >
