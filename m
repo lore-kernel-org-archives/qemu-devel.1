@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ccXWF-00045C-4N
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 08:15:16 -0500
+	(envelope-from <ppandit@redhat.com>) id 1ccZGi-00086m-4U
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 10:07:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ccXWD-0004zO-VE
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 08:15:15 -0500
-Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:34802)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ccXWD-0004yg-MF
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 08:15:13 -0500
-Received: by mail-wr0-x235.google.com with SMTP id o16so125596636wra.1
-	for <qemu-devel@nongnu.org>; Sat, 11 Feb 2017 05:15:12 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <8737flj70j.fsf@linaro.org>
-References: <20170210210857.47893-1-marcinch7@gmail.com>
-	<8737flj70j.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 11 Feb 2017 13:14:50 +0000
-Message-ID: <CAFEAcA-_wAWiewc2NX7RrfBN3UFc=9dY2tDri-rkNTs2=pFs2Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2] target-arm: Implement
- BCM2835 hardware RNG
+	(envelope-from <ppandit@redhat.com>) id 1ccZGe-000703-Vu
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 10:07:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41140)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1ccZGe-0006zn-PS
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 10:07:16 -0500
+From: P J P <ppandit@redhat.com>
+Date: Sat, 11 Feb 2017 20:36:57 +0530
+Message-Id: <20170211150701.23391-1-ppandit@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/4] sd: sdhci: correct transfer mode
+ register usage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,26 +22,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Marcin Chojnacki <marcinch7@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Qemu Developers <qemu-devel@nongnu.org>
+Cc: Alistair Francis <alistair23@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Wjjzhang <wjjzhang@tencent.com>, Jiang Xin <jiangxin1@huawei.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
-On 11 February 2017 at 11:34, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-> I know we are running under emulation but is rand() the right call to
-> feed data to the guest? There is the virtio rng and PPC spar RNG which
-> both use rng_backend_request_entropy() to collect random data. We should
-> probably make the Pi RNG as good as the other guests.
+Hello,
 
-See discussion on v1 of this patch -- the rng backend is probably
-the right idea but its API is a huge pain in the neck. I suggested
-Marcin do a v2 which still uses rand() so we can get everything
-else reviewed, and then deal with the rng stuff separately.
+In SDHCI protocol, the 'Block Count Enable' bit of the Transfer Mode
+register is used to control 's->blkcnt' value. This bit is not relevant
+in single block transfers. Also, Transfer Mode register value could be
+set such that 's->blkcnt' would not see an update during multi block
+transfers. Thus leading to an infinite loop.
 
-(Notably I think that for the rng backend you have to on the
-command line create and wire up a backend, which is a lot
-of pain. There doesn't seem to be any kind of "use a sane
-default" available :-( )
+This patch set attempts to correct 'Block Count Enable' bit usage.
 
-thanks
--- PMM
+This series incorporates changes suggested in patch set v2:
+  -> https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg01608.html
+
+Thank you.
+--
+Prasad J Pandit (4):
+  sd: sdhci: check transfer mode register in multi block transfer
+  sd: sdhci: mask transfer mode register value
+  sd: sdhci: conditionally invoke multi block transfer
+  sd: sdhci: Remove block count enable check in single block transfers
+
+ hw/sd/sdhci.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
+
+-- 
+2.9.3
