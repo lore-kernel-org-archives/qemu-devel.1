@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cchZI-0004ig-I5
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 18:59:05 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cchgw-0007Yf-07
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 19:07:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cchZH-0006rQ-Hh
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 18:59:04 -0500
-References: <1486744104-15590-1-git-send-email-peter.maydell@linaro.org>
+	(envelope-from <mreitz@redhat.com>) id 1cchgu-0002YF-Qu
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 19:06:57 -0500
+References: <20170124115748.21473-1-berrange@redhat.com>
+	<20170124115748.21473-2-berrange@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <6693f54a-77ed-fd63-d865-756839e7ecd2@redhat.com>
-Date: Sun, 12 Feb 2017 00:58:51 +0100
+Message-ID: <072d7d6f-d5ad-efe3-db77-364647593a81@redhat.com>
+Date: Sun, 12 Feb 2017 01:06:47 +0100
 MIME-Version: 1.0
-In-Reply-To: <1486744104-15590-1-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <20170124115748.21473-2-berrange@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="Rl8CqhrVBRRSb0jeh9jWDWNE2JPgtSOS1"
-Subject: Re: [Qemu-devel] [PATCH 0/2] qemu-img: fix coverity nits
+	boundary="GBc0Rgjm1sRA5nHNDJjQfPV3AlJsLuInQ"
+Subject: Re: [Qemu-devel] [PATCH v3 1/5] iotests: skip 159 & 170 with luks
+ format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,57 +25,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Rl8CqhrVBRRSb0jeh9jWDWNE2JPgtSOS1
+--GBc0Rgjm1sRA5nHNDJjQfPV3AlJsLuInQ
 From: Max Reitz <mreitz@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Message-ID: <6693f54a-77ed-fd63-d865-756839e7ecd2@redhat.com>
-Subject: Re: [PATCH 0/2] qemu-img: fix coverity nits
-References: <1486744104-15590-1-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1486744104-15590-1-git-send-email-peter.maydell@linaro.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>
+Message-ID: <072d7d6f-d5ad-efe3-db77-364647593a81@redhat.com>
+Subject: Re: [PATCH v3 1/5] iotests: skip 159 & 170 with luks format
+References: <20170124115748.21473-1-berrange@redhat.com>
+ <20170124115748.21473-2-berrange@redhat.com>
+In-Reply-To: <20170124115748.21473-2-berrange@redhat.com>
 Content-Type: text/plain; charset=iso-8859-15
 Content-Transfer-Encoding: quoted-printable
 
-On 10.02.2017 17:28, Peter Maydell wrote:
-> Coverity points out a couple of nits in qemu-img:
->  * misuse of strtoul()
->  * variable set but not used
+On 24.01.2017 12:57, Daniel P. Berrange wrote:
+> While the qemu-img dd command does accept --image-opts
+> this is not sufficient to make it work with the LUKS
+> image yet. This is because bdrv_create() still always
+> requires the non-image-opts syntax.
 >=20
-> These patches fix the issues.
+> Thus we must skip 159/170 with luks for now
 >=20
-> Peter Maydell (2):
->   qemu-img: Use qemu_strtoul() rather than raw strtoul()
->   qemu-img: Avoid setting ret to unused value in img_convert()
->=20
->  qemu-img.c | 40 ++++++++++++++++++++--------------------
->  1 file changed, 20 insertions(+), 20 deletions(-)
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  tests/qemu-iotests/159 | 2 +-
+>  tests/qemu-iotests/170 | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 
-Thanks, applied to my block tree:
+https://github.com/XanClic/qemu/commit/b4a2caa4bd5ad4e3cd6dd7eb1c0067d920=
+5280cb
+introduces _unsupported_fmt. Would that be a better fit?
 
-https://github.com/XanClic/qemu/commits/block
+(Yes, I'll send a pull request today.)
 
 Max
 
 
---Rl8CqhrVBRRSb0jeh9jWDWNE2JPgtSOS1
+--GBc0Rgjm1sRA5nHNDJjQfPV3AlJsLuInQ
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlifpTwSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ALBIH/RcqE0ZHXNgtY8TrUIhL9SGlanBvZaCF
-9IsTL1L2I3Om1RqQmXoXsnWXaZKrgyeNT4PMBO88BGCugspoDWuwBncixaiVANb1
-+gLUz27JBn/0N1H7b+F306OFPx8R6I+U0uL5LIyytXrBpJz//HyW3OCIborbmAxJ
-Lo57Roc3Won/tvKP+RPnnbfMXdXQuzpjZSLYTtXDCuFAR51jVRiYa3CtdgesUXhI
-XSRgdX059D6WpBLQrOk/JhSM0iHr/7+IIlWBETEhZTRveYdn2LpQVROuk5F75XJY
-xltuCiasl+7GI/9d53Xcp7fGqjxvzcqc6yOEwfH4iHJr8VZL4NivDuI=
-=padt
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlifpxcSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AOlsH/1aY/IY5VuR1r7SgbaiDOMwgUKUk52m4
+V/xmXt/hkrcn9RGOU0GLcbZi4wF0VzbuuUJjUjW3AiEMGHQYVWoYoEKIM5S0xW2Z
+gfei7erhHNad7fclQVaLQ9mHHbqZc1HhiJMpwGz+fPHuFG6Qg5boaoj2ydCrXX6j
+uUdoNmarTZKt82Gsp92Kh7eOevPGmXspZLqJKD6HqOmz4YMWZjSaxT8wuUSiXE9O
+munegi8KrGweBMBu9KV+EzU1nLWS6iARCM+CCIoP1GOG1Uf9l1Wq/O50h3VIVr6O
+TRD4tDglvDlfc+VjWfrk/n/CvAlk/kF/Bi6h8CXkuWo/HcfLHavwln4=
+=GzDZ
 -----END PGP SIGNATURE-----
 
---Rl8CqhrVBRRSb0jeh9jWDWNE2JPgtSOS1--
+--GBc0Rgjm1sRA5nHNDJjQfPV3AlJsLuInQ--
