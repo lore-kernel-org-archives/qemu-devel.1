@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ccj6K-00056l-P7
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 20:37:20 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ccj6O-0005Ie-Rd
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 20:37:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ccj6J-000763-LG
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 20:37:16 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ccj6L-00076R-HQ
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 20:37:20 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Sun, 12 Feb 2017 02:36:48 +0100
-Message-Id: <20170212013704.6378-3-mreitz@redhat.com>
+Date: Sun, 12 Feb 2017 02:36:49 +0100
+Message-Id: <20170212013704.6378-4-mreitz@redhat.com>
 In-Reply-To: <20170212013704.6378-1-mreitz@redhat.com>
 References: <20170212013440.5919-1-mreitz@redhat.com>
 	<20170212013704.6378-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 05/21] iotests: record separate timings per
- format, protocol pair
+Subject: [Qemu-devel] [PULL 06/21] block/vmdk: Fix the endian problem of
+ buf_len and lba
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,100 +24,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-From: "Daniel P. Berrange" <berrange@redhat.com>
+From: QingFeng Hao <haoqf@linux.vnet.ibm.com>
 
-The 'check' program records timings for each test that
-is run. These timings are only valid, however, for a
-particular format/protocol combination. So if frequently
-running 'check' with a variety of different formats or
-protocols, the times printed can be very misleading.
+The problem was triggered by qemu-iotests case 055. It failed when it
+was comparing the compressed vmdk image with original test.img.
 
-Instead of having a single 'check.time' file, maintain
-multiple 'check.time-$IMGPROTO-$IMGFMT' files.
+The cause is that buf_len in vmdk_write_extent wasn't converted to
+little-endian before it was stored to disk. But later vmdk_read_extent
+read it and converted it from little-endian to cpu endian.
+If the cpu is big-endian like s390, the problem will happen and
+the data length read by vmdk_read_extent will become invalid!
+The fix is to add the conversion in vmdk_write_extent, meanwhile,
+repair the endianness problem of lba field which shall also be converted
+to little-endian before storing to disk.
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20170103160556.9895-1-berrange@redhat.com
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Cc: qemu-stable@nongnu.org
+Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+Signed-off-by: Jing Liu <liujbjl@linux.vnet.ibm.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
+Message-id: 20161216052040.53067-2-haoqf@linux.vnet.ibm.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/Makefile   |  2 +-
- tests/qemu-iotests/.gitignore |  2 +-
- tests/qemu-iotests/check      | 12 +++++++-----
- 3 files changed, 9 insertions(+), 7 deletions(-)
+ block/vmdk.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qemu-iotests/Makefile b/tests/qemu-iotests/Makefile
-index 2fb527c5b5..27380e60c1 100644
---- a/tests/qemu-iotests/Makefile
-+++ b/tests/qemu-iotests/Makefile
-@@ -1,5 +1,5 @@
+diff --git a/block/vmdk.c b/block/vmdk.c
+index 7750212969..393c84d8b1 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -1361,8 +1361,8 @@ static int vmdk_write_extent(VmdkExtent *extent, int64_t cluster_offset,
+             goto out;
+         }
  
--CLEANFILES= *.out.bad *.notrun check.log check.time
-+CLEANFILES= *.out.bad *.notrun check.log check.time*
+-        data->lba = offset >> BDRV_SECTOR_BITS;
+-        data->size = buf_len;
++        data->lba = cpu_to_le64(offset >> BDRV_SECTOR_BITS);
++        data->size = cpu_to_le32(buf_len);
  
- # no default target
- default:
-diff --git a/tests/qemu-iotests/.gitignore b/tests/qemu-iotests/.gitignore
-index 0711cbdbf3..da62054000 100644
---- a/tests/qemu-iotests/.gitignore
-+++ b/tests/qemu-iotests/.gitignore
-@@ -1,5 +1,5 @@
- check.log
--check.time
-+check.time*
- common.env
- *.out.bad
- *.notrun
-diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-index 4cba2151e4..4b1c6749b7 100755
---- a/tests/qemu-iotests/check
-+++ b/tests/qemu-iotests/check
-@@ -129,6 +129,8 @@ fi
- #    exit 1
- #fi
- 
-+TIMESTAMP_FILE=check.time-$IMGPROTO-$IMGFMT
-+
- tmp="${TEST_DIR}"/$$
- 
- _wallclock()
-@@ -155,9 +157,9 @@ _wrapup()
-         :
-     elif $needwrap
-     then
--        if [ -f check.time -a -f $tmp.time ]
-+        if [ -f $TIMESTAMP_FILE -a -f $tmp.time ]
-         then
--            cat check.time $tmp.time \
-+            cat $TIMESTAMP_FILE $tmp.time \
-             | $AWK_PROG '
-         { t[$1] = $2 }
- END        { if (NR > 0) {
-@@ -165,7 +167,7 @@ END        { if (NR > 0) {
-           }
-         }' \
-             | sort -n >$tmp.out
--            mv $tmp.out check.time
-+            mv $tmp.out $TIMESTAMP_FILE
-         fi
- 
-         if [ -f $tmp.expunged ]
-@@ -223,7 +225,7 @@ echo "preamble" > "${TEST_DIR}"/check.sts
- # don't leave old full output behind on a clean run
- rm -f check.full
- 
--[ -f check.time ] || touch check.time
-+[ -f $TIMESTAMP_FILE ] || touch $TIMESTAMP_FILE
- 
- FULL_IMGFMT_DETAILS=`_full_imgfmt_details`
- FULL_IMGPROTO_DETAILS=`_full_imgproto_details`
-@@ -277,7 +279,7 @@ do
-         # really going to try and run this one
-         #
-         rm -f $seq.out.bad
--        lasttime=`sed -n -e "/^$seq /s/.* //p" <check.time`
-+        lasttime=`sed -n -e "/^$seq /s/.* //p" <$TIMESTAMP_FILE`
-         if [ "X$lasttime" != X ]; then
-                 echo -n " ${lasttime}s ..."
-         else
+         n_bytes = buf_len + sizeof(VmdkGrainMarker);
+         iov = (struct iovec) {
 -- 
 2.11.0
