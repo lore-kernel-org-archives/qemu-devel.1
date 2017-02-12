@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ccj3z-0003KQ-DA
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 20:34:52 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ccj3z-0003Ka-JD
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 20:34:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ccj3y-0006fd-DE
+	(envelope-from <mreitz@redhat.com>) id 1ccj3y-0006fi-H4
 	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 20:34:51 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Sun, 12 Feb 2017 02:34:20 +0100
-Message-Id: <20170212013440.5919-2-mreitz@redhat.com>
-In-Reply-To: <20170212013440.5919-1-mreitz@redhat.com>
-References: <20170212013440.5919-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 01/21] iotests: Fix a problem in common.filter
+Date: Sun, 12 Feb 2017 02:34:19 +0100
+Message-Id: <20170212013440.5919-1-mreitz@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/21] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,36 +23,110 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-From: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+The following changes since commit 98b2faeaee96ab084d0b1669918688d8895c15=
+5f:
 
-If TEST_DIR is set to /tmp, test case 144 will fail. The reason is that
-TEST_DIR resembles 144's test image name tmp.qcow2.
-When 144 is testing $TEST_DIR/tmp.qcow2, it wants to replace
-$TEST_DIR/tmp.qcow2 to TEST_DIR/tmp.qcow2, but actually it will fail
-and get TEST_DIRTEST_DIR.qcow2 in this case.
-The fix is just to modify the code to replace $TEST_DIR/ with TEST_DIR/.
+  Merge remote-tracking branch 'remotes/jnsnow/tags/ide-pull-request' int=
+o staging (2017-02-10 18:07:02 +0000)
 
-Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-Message-id: 20161216054723.96055-2-haoqf@linux.vnet.ibm.com
-Reviewed-by: Eric Blake <eblake@redhat.com>
-[mreitz: Fixed commit message and dropped superfluous escaping]
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/common.filter | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+are available in the git repository at:
 
-diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.filter
-index 240ed0697a..4befd865f4 100644
---- a/tests/qemu-iotests/common.filter
-+++ b/tests/qemu-iotests/common.filter
-@@ -35,7 +35,7 @@ _filter_generated_node_ids()
- # replace occurrences of the actual TEST_DIR value with TEST_DIR
- _filter_testdir()
- {
--    sed -e "s#$TEST_DIR#TEST_DIR#g"
-+    sed -e "s#$TEST_DIR/#TEST_DIR/#g"
- }
- 
- # replace occurrences of the actual IMGFMT value with IMGFMT
--- 
-2.11.0
+  git://github.com/XanClic/qemu.git tags/pull-block-2017-02-12
+
+for you to fetch changes up to 10d6eda1926804a09aa0710ca62933087813de0b:
+
+  qemu-img: Avoid setting ret to unused value in img_convert() (2017-02-1=
+2 00:56:32 +0100)
+
+----------------------------------------------------------------
+Block patches
+
+----------------------------------------------------------------
+Alberto Garcia (2):
+      qcow2: Optimize the refcount-block overlap check
+      qemu-io: don't allow I/O operations larger than BDRV_REQUEST_MAX_BY=
+TES
+
+Daniel P. Berrange (1):
+      iotests: record separate timings per format,protocol pair
+
+Dou Liyang (2):
+      block/qapi: reduce the coupling between the bdrv_query_stats and bd=
+rv_query_bds_stats
+      block/qapi: reduce the execution time of qmp_query_blockstats
+
+Fam Zheng (2):
+      qapi: Tweak error message of bdrv_query_image_info
+      iotests: Fix reference output for 059
+
+Jeff Cody (3):
+      block: check full backing filename when searching protocol filename=
+s
+      qemu-iotests: Don't create fifos / pidfiles with protocol paths
+      qemu-iotest: test to lookup protocol-based image with relative back=
+ing
+
+Max Reitz (1):
+      qemu-img: Improve commit invalid base message
+
+Nir Soffer (3):
+      qemu-io: Return non-zero exit code on failure
+      qemu-iotests: Add _unsupported_fmt helper
+      qemu-io: Add failure regression tests
+
+Peter Lieven (2):
+      block/nfs: fix NULL pointer dereference in URI parsing
+      block/nfs: fix naming of runtime opts
+
+Peter Maydell (2):
+      qemu-img: Use qemu_strtoul() rather than raw strtoul()
+      qemu-img: Avoid setting ret to unused value in img_convert()
+
+QingFeng Hao (2):
+      iotests: Fix a problem in common.filter
+      block/vmdk: Fix the endian problem of buf_len and lba
+
+Vladimir Sementsov-Ogievskiy (1):
+      block: bdrv_invalidate_cache: invalidate children first
+
+ tests/qemu-iotests/Makefile      |  2 +-
+ block/qcow2.h                    |  1 +
+ block.c                          | 24 +++++++---
+ block/nfs.c                      | 49 ++++++++++----------
+ block/qapi.c                     | 99 +++++++++++++++++-----------------=
+------
+ block/qcow2-refcount.c           | 24 +++++++++-
+ block/qcow2.c                    |  1 +
+ block/vmdk.c                     |  4 +-
+ qemu-img.c                       | 44 +++++++++---------
+ qemu-io-cmds.c                   | 20 +++++---
+ qemu-io.c                        |  8 +++-
+ tests/qemu-iotests/.gitignore    |  2 +-
+ tests/qemu-iotests/059.out       |  5 +-
+ tests/qemu-iotests/070.out       |  1 -
+ tests/qemu-iotests/075.out       |  7 ---
+ tests/qemu-iotests/076.out       |  3 --
+ tests/qemu-iotests/078.out       |  6 ---
+ tests/qemu-iotests/080.out       | 18 --------
+ tests/qemu-iotests/083.out       | 17 -------
+ tests/qemu-iotests/088.out       |  6 ---
+ tests/qemu-iotests/092.out       | 12 -----
+ tests/qemu-iotests/116.out       |  7 ---
+ tests/qemu-iotests/131.out       |  1 -
+ tests/qemu-iotests/140.out       |  1 -
+ tests/qemu-iotests/173           | 97 ++++++++++++++++++++++++++++++++++=
++++++
+ tests/qemu-iotests/173.out       | 12 +++++
+ tests/qemu-iotests/174           | 59 ++++++++++++++++++++++++
+ tests/qemu-iotests/174.out       |  7 +++
+ tests/qemu-iotests/check         | 12 +++--
+ tests/qemu-iotests/common.config |  6 ++-
+ tests/qemu-iotests/common.filter |  2 +-
+ tests/qemu-iotests/common.qemu   | 10 ++--
+ tests/qemu-iotests/common.rc     | 17 +++++--
+ tests/qemu-iotests/group         |  2 +
+ 34 files changed, 366 insertions(+), 220 deletions(-)
+ create mode 100755 tests/qemu-iotests/173
+ create mode 100644 tests/qemu-iotests/173.out
+ create mode 100755 tests/qemu-iotests/174
+ create mode 100644 tests/qemu-iotests/174.out
