@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54321)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cck5A-0000g2-Rb
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 21:40:09 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cckZi-0002wA-K0
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 22:11:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cck59-0003ZS-SE
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 21:40:08 -0500
-References: <20170210170910.8867-1-berrange@redhat.com>
-	<20170210170910.8867-19-berrange@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1cckZh-0001aX-Ep
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 22:11:42 -0500
+References: <20170203094018.15493-1-vsementsov@virtuozzo.com>
+	<20170203094018.15493-8-vsementsov@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <d9b7aefd-890c-afb8-d3b4-02d22eebdf6e@redhat.com>
-Date: Sun, 12 Feb 2017 03:39:58 +0100
+Message-ID: <32953738-a060-f3e8-bb36-e427fcfb48ad@redhat.com>
+Date: Sun, 12 Feb 2017 04:11:30 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170210170910.8867-19-berrange@redhat.com>
+In-Reply-To: <20170203094018.15493-8-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="Nfa9QnmjJ40GBv1Dg1mIqpIVK1hCtAhHt"
-Subject: Re: [Qemu-devel] [PATCH v4 18/18] block: pass option prefix down to
- crypto layer
+	boundary="kpJuhxVcT7raxFcddEgQUwqHDDpwcfkAp"
+Subject: Re: [Qemu-devel] [PATCH 07/24] qcow2: add bitmaps extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,62 +24,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Nfa9QnmjJ40GBv1Dg1mIqpIVK1hCtAhHt
+--kpJuhxVcT7raxFcddEgQUwqHDDpwcfkAp
 From: Max Reitz <mreitz@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Alberto Garcia <berto@igalia.com>, Eric Blake <eblake@redhat.com>
-Message-ID: <d9b7aefd-890c-afb8-d3b4-02d22eebdf6e@redhat.com>
-Subject: Re: [PATCH v4 18/18] block: pass option prefix down to crypto layer
-References: <20170210170910.8867-1-berrange@redhat.com>
- <20170210170910.8867-19-berrange@redhat.com>
-In-Reply-To: <20170210170910.8867-19-berrange@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
+ famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+Message-ID: <32953738-a060-f3e8-bb36-e427fcfb48ad@redhat.com>
+Subject: Re: [PATCH 07/24] qcow2: add bitmaps extension
+References: <20170203094018.15493-1-vsementsov@virtuozzo.com>
+ <20170203094018.15493-8-vsementsov@virtuozzo.com>
+In-Reply-To: <20170203094018.15493-8-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=iso-8859-15
 Content-Transfer-Encoding: quoted-printable
 
-On 10.02.2017 18:09, Daniel P. Berrange wrote:
-> While the crypto layer uses a fixed option name "key-secret",
-> the upper block layer may have a prefix on the options. e.g.
-> "luks-key-secret", "aes-key-secret", in order to avoid clashes
-> between crypto option names & other block option names. To
-> ensure the crypto layer can report accurate error messages,
-> we must tell it what option name prefix was used.
+On 03.02.2017 10:40, Vladimir Sementsov-Ogievskiy wrote:
+> Add bitmap extension as specified in docs/specs/qcow2.txt.
+> For now, just mirror extension header into Qcow2 state and check
+> constraints.
 >=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> For now, disable image resize if it has bitmaps. It will be fixed later=
+=2E
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  block/crypto.c            |  4 ++--
->  block/qcow.c              |  7 ++++---
->  block/qcow2.c             | 15 +++++++++------
->  crypto/block-luks.c       |  8 ++++++--
->  crypto/block-qcow.c       |  8 ++++++--
->  crypto/block.c            |  6 ++++--
->  crypto/blockpriv.h        |  2 ++
->  include/crypto/block.h    |  6 +++++-
->  tests/test-crypto-block.c |  8 ++++----
->  9 files changed, 42 insertions(+), 22 deletions(-)
+>  block/qcow2.c | 127 ++++++++++++++++++++++++++++++++++++++++++++++++++=
++++++---
+>  block/qcow2.h |  24 +++++++++++
+>  2 files changed, 145 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 96fb8a8f16..d263ab1ed7 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+
+[...]
+
+> @@ -1151,9 +1237,13 @@ static int qcow2_open(BlockDriverState *bs, QDic=
+t *options, int flags,
+>          goto fail;
+>      }
+> =20
+> -    /* Clear unknown autoclear feature bits */
+> -    if (!bs->read_only && !(flags & BDRV_O_INACTIVE) && s->autoclear_f=
+eatures) {
+> -        s->autoclear_features =3D 0;
+> +    if (!need_update_header) {
+> +        /* Clear unknown autoclear feature bits */
+> +        need_update_header =3D s->autoclear_features & ~QCOW2_AUTOCLEA=
+R_MASK;
+> +    }
+
+Alternatively,
+
+need_update_header |=3D s->autoclear_features & ~QCOW2_AUTOCLEAR_MASK;
+
+would have worked just as well and might have been a bit easier to read.
+
+Anyway:
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 
+> +
+> +    if (need_update_header && !bs->read_only && !(flags & BDRV_O_INACT=
+IVE)) {
+> +        s->autoclear_features &=3D QCOW2_AUTOCLEAR_MASK;
+>          ret =3D qcow2_update_header(bs);
+>          if (ret < 0) {
+>              error_setg_errno(errp, -ret, "Could not update qcow2 heade=
+r");
 
---Nfa9QnmjJ40GBv1Dg1mIqpIVK1hCtAhHt
+
+--kpJuhxVcT7raxFcddEgQUwqHDDpwcfkAp
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlifyv8SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AftUH+gP+379x/cgJAUHWJ63fCjkd6RrdzSWR
-yksnKf9/HgZXw0wYM5oa/MrgIdWw0njGb5uSuAYh65icX+5iyWlltRasGL4pZVXF
-380DMV5z0MDeIYDX3fV5yJUUi6W6JmtqVGb0Iz21bqHY7NI9nwEVZRh/OtfR1Sck
-lMRwIk2ilIU56AqZ+Ym+MXmr2OLdpxbztMtAiswDd7NfLsOIxHMph5MXwriikDxe
-iXDtEDuU/kPFyyl2CWVCEdEOuYupJsS7+j7Bkxsl+VGG1f9mHtvTuvVdwmiTkxdv
-3HsKfEABR6lwOe8uSKTYHVpR70XrnTXsluHdH9KMAR7CpWRgrME5mXs=
-=MrQI
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlif0mISHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A8r4IAIHe4i8v0YVaqJSORRy5wkA39DZm7RIZ
+/ySNHL9K31ainwsZDBML1VXqVydVMkY22oxL8N5bpNdVEGgaA5Pq299xNOPTD4Lt
+/PKQmG7PbATmU7NeoiryuSEAihZbc3N5cqP/U3V+mCW0CAbHSic2kBbPSbwZHcZF
+tpGNz1o2Bt/2QzHsOvur0lkSimMEapjv2zENBQl/QLHF5AXiDjAANhL7O6dSzoSf
+huSeKyhSA8s064a6h9W9xKa7RStwakHpl6/9vHZVZC2u8P9Xx0d8keIe//ZVpWBG
+2ewKtMXaGIkahmh5BcnknhaTGI+NCIhaln2tQCivGJJKlnrkxEFGcxs=
+=7TEc
 -----END PGP SIGNATURE-----
 
---Nfa9QnmjJ40GBv1Dg1mIqpIVK1hCtAhHt--
+--kpJuhxVcT7raxFcddEgQUwqHDDpwcfkAp--
