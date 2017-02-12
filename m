@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <juro.bystricky@intel.com>) id 1cczJ5-0000Wf-7h
-	for qemu-devel@nongnu.org; Sun, 12 Feb 2017 13:55:33 -0500
+	(envelope-from <marcel@redhat.com>) id 1cczTO-0003HG-H7
+	for qemu-devel@nongnu.org; Sun, 12 Feb 2017 14:06:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <juro.bystricky@intel.com>) id 1cczJ1-0006eJ-QP
-	for qemu-devel@nongnu.org; Sun, 12 Feb 2017 13:55:31 -0500
-Received: from mga05.intel.com ([192.55.52.43]:30482)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <juro.bystricky@intel.com>)
-	id 1cczJ1-0006e0-G1
-	for qemu-devel@nongnu.org; Sun, 12 Feb 2017 13:55:27 -0500
-From: Juro Bystricky <juro.bystricky@intel.com>
-Date: Sun, 12 Feb 2017 10:55:22 -0800
-Message-Id: <1486925722-19264-1-git-send-email-juro.bystricky@intel.com>
-Subject: [Qemu-devel] [PATCH] nios2: Add Altera JTAG UART emulation
+	(envelope-from <marcel@redhat.com>) id 1cczTJ-0000Yy-Fq
+	for qemu-devel@nongnu.org; Sun, 12 Feb 2017 14:06:10 -0500
+References: <20170208061602.17666-1-david@gibson.dropbear.id.au>
+	<46d64512-1085-6d22-1e0f-660757ff7131@redhat.com>
+	<20170209041634.GC14524@umbus>
+	<95706652-0a80-92fc-951b-7a454d496ddf@redhat.com>
+	<20170210003746.GP27610@umbus.fritz.box>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <5ea3785c-b979-8b8c-3ab0-243d69384697@redhat.com>
+Date: Sun, 12 Feb 2017 21:05:46 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170210003746.GP27610@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] virtio-pci: Allow PCIe virtio devices on
+ root bus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,397 +27,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: marex@denx.de, crwulff@gmail.com, jurobystricky@hotmail.com, fred.konrad@greensocs.com, Juro Bystricky <juro.bystricky@intel.com>
+To: David Gibson <david@gibson.dropbear.id.au>, Laszlo Ersek <lersek@redhat.com>
+Cc: abologna@redhat.com, lvivier@redhat.com, thuth@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-Add the Altera JTAG UART model.
+On 02/10/2017 02:37 AM, David Gibson wrote:
+> On Thu, Feb 09, 2017 at 10:04:47AM +0100, Laszlo Ersek wrote:
+>> On 02/09/17 05:16, David Gibson wrote:
+>>> On Wed, Feb 08, 2017 at 11:40:50AM +0100, Laszlo Ersek wrote:
+>>>> On 02/08/17 07:16, David Gibson wrote:
+>>>>> Marcel,
+>>>>>
+>>>>> Your original patch adding PCIe support to virtio-pci.c has the
+>>>>> limitation noted below that PCIe won't be enabled if the device is on
+>>>>> the root bus (rather than under a root or downstream port).  As
+>>>>> reasoned below, I think removing the check is correct, even for x86
+>>>>> (though it would rarely be useful there).  But I could well have
+>>>>> missed something.  Let me know if so...
+>>>>>
+>>>>>
+>>>>>
+>>>>> Virtio devices can appear as either vanilla PCI or PCI-Express devices
+>>>>> depending on the bus they're connected to.  At the moment it will only
+>>>>> appear as vanilla PCI if connected to the root bus of a PCIe host bridge.
+>>>>>
+>>>>> Presumably this is to reflect the fact that PCIe devices usually need to
+>>>>> be connected to a root (or further downstream) port rather than directly
+>>>>> on the root bus.  However, due to the odd requirements of the PAPR spec on the 'pseries'
+>>>>> machine type, it's normal for PCIe devices to appear on the root bus
+>>>>> without root ports.
+>>>>>
+>>>>> Further, even on x86, there's no inherent reason we couldn't present a
+>>>>> virtio device as an "integrated device" (typically used for things built
+>>>>> into the PCI chipset), and those devices *do* typically appear on the root
+>>>>> bus.
+>>>>
+>>>> I'm not personally making a counter-argument, just qouting some of
+>>>> the relevant parts of "docs/pcie.txt" ("PCI EXPRESS GUIDELINES"):
+>>>
+>>> So, an earlier discussion more or less concluded that the PCIe
+>>> guidelines don't really work with PAPR guests.  That comes because
+>>> PAPR was designed with PowerVM in mind which allows PCI passthrough
+>>> but doesn't do any emulated PCI devices.  So they wanted to present
+>>> passed through devices (virtual or phyical) to the guest without
+>>> inserting virtual root ports.
+>>>
+>>> Now, you can argue that this was a silly decision in PAPR, and you
+>>> could well be right, but there it is.
+>>
+>> I can totally accept this, but then we should state it as a fact near
+>> the top of "docs/pcie.txt".
+>>
+>>>
+>>>>> Place only the following kinds of devices directly on the Root Complex:
+>>>>>     (1) PCI Devices (e.g. network card, graphics card, IDE controller),
+>>>>>         not controllers. Place only legacy PCI devices on
+>>>>>         the Root Complex. These will be considered Integrated Endpoints.
+>>>>>         Note: Integrated Endpoints are not hot-pluggable.
+>>>>>
+>>>>>         Although the PCI Express spec does not forbid PCI Express devices as
+>>>>>         Integrated Endpoints, existing hardware mostly integrates legacy PCI
+>>>>>         devices with the Root Complex.
+>>>
+>>> "Mostly".. on my laptop at least the GPU shows up as an integrated PCI
+>>> Express endpoint, so it's certainly not the case that *all* root bus
+>>> devices are legacy.
+>>>
+>>>> Guest OSes are suspected to behave
+>>>>>         strangely when PCI Express devices are integrated
+>>>>>         with the Root Complex.
+>>>
+>>> Clearly not that strangely, that often, since my laptop works just fine.
+>>>
+>>>>>
+>>>>>     [...]
+>>>>>
+>>>>> 2.2 PCI Express only hierarchy
+>>>>> ==============================
+>>>>> Always use PCI Express Root Ports to start PCI Express hierarchies.
+>>>>
+>>>> Above you mention "it's normal for PCIe devices to appear on the root bus without root ports".
+>>>
+>>> Well "normal" perhaps wasn't the right word.  Let's say precedented,
+>>> if uncommon.
+>>>
+>>>> Let me turn the question around: is it a *problem* for "pseries" if
+>>>> we require root ports? If so, why exactly?
+>>>
+>>> That's.. a complex question.  At least Linux guests (and we don't
+>>> support any others yet) might cope with the addition of root ports.
+>>> Maybe.  I have discussed this option with BenH and others.
+>>>
+>>> However it is gratuitously different from how PCIe devices will
+>>> typically appear for the same guest running under PowerVM.  Although I
+>>> suspect Linux would cope with the "normal standard" rather than "PAPR
+>>> standard" presentation, I'm not as confident about it as I would like.
+>>>
+>>> Another consideration here is that other PCIe capable qemu emulated
+>>> devices, such as XHCI, will present fine as PCIe integrated endpoints
+>>> when attached to the root bus.  Libvirt won't do that usually, of
+>>> course, and it may not be the recommended way of doing things (on PC)
+>>> but it's possible.  I don't see any particular reason that virtio-pci
+>>> should enforce the root port requirement more so than any other
+>>> device.
+>>>
+>>>> On 02/08/17 07:16, David Gibson wrote:
+>>>>>
+>>>>> pcie_endpoint_cap_init() already automatically adjusts to advertise as
+>>>>> an integrated device rather than a "normal" PCIe endpoint when attached to
+>>>>> a root bus.  So we can remove the check for root bus within virtio and
+>>>>> allow (at the user's discretion) a PCIe virtio bus to be attached to a
+>>>>> root bus.
+>>>>
+>>>> If Marcel thinks this is a good change, then I think we should go
+>>>> through "docs/pcie.txt" with a fine-toothed comb, and update all
+>>>> relevant spots. (If Marcel agrees, perhaps you can include such
+>>>> hunks in your patch at once.)
+>>>
+>>> Actually, I think that would be a neverending process.  Maybe better
+>>> to put in a whole different spapr-pcie.txt with the assorted ways that
+>>> PAPR violates PCIe conventions.
+>>
+>> That works for me too, but I think it would be a lot more work for you
+>> and others.
+>>
+>> I plan on consulting "docs/pcie.txt" frequently; among other things, for
+>> deciding debates. Thus, improving the scope of "docs/pcie.txt" is very
+>> welcome IMO.
+>>
+>>>
+>>>> It also may have consequences for libvirt (but I see you addressed
+>>>> Andrea at once, which is great).
+>>>
+>>> Right, I've been discussed this with Andrea all along.  We're working
+>>> on a proposed PAPR specific way of allocating PCI and PCIe addresses
+>>> (different from the PCIe normal way, but the same as each other).
+>>> That will simplify adding PCIe support to PAPR, and also has some
+>>> other advantages for PAPR guests (related to the platform specific
+>>> isolation, hotplug  and error recovery mechanisms - also different
+>>> from the normal PCIe ones).
+>>
+>> Great, if Andrea is aware, that's a relief.
+>>
+>> Can you resubmit this patch with a small hunk for "docs/pcie.txt" that
+>> removes PAPR from the scope?
+>
 
-Hardware emulation based on:
-https://www.altera.com/en_US/pdfs/literature/ug/ug_embedded_ip.pdf
-(Please see "Register Map" on page 65)
+Hi David,
+Sorry for the delay, I just came back from PTO.
 
-Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
----
-V2: - Removed link to hw specs(checkpatch: line over 90 characters)
-V3: - New link to do hw specs
-V4: - Modified check for correct fifo size
-    - Made fifo_size a property
-    - Use register offsets instead of register indeces
-    - Removed redundant test for fifo overflow
-    - Modified commit message
-V5: - definine ALTERA_JTAG_UART_REGS_MEM_SIZE 
-    - Modified commit message
-    - Replaced DEFAULT_FIFO_SIZE by ALTERA_JUART_DEFAULT_FIFO_SIZE
-    - Modified test for fifo size
-    - Simplified error message in altera_juart_create().
----
- default-configs/nios2-softmmu.mak |   1 +
- hw/char/Makefile.objs             |   1 +
- hw/char/altera_juart.c            | 282 ++++++++++++++++++++++++++++++++++++++
- include/hw/char/altera_juart.h    |  46 +++++++
- 4 files changed, 330 insertions(+)
- create mode 100644 hw/char/altera_juart.c
- create mode 100644 include/hw/char/altera_juart.h
+> Well, first I'd like to see if Marcel knows of some reason I didn't
+> think of why this test is important for virtio particularly here.  But
+> assuming the basic idea is acceptable, then yes, I'll update pcie.txt.
+>
 
-diff --git a/default-configs/nios2-softmmu.mak b/default-configs/nios2-softmmu.mak
-index 74dc70c..6159846 100644
---- a/default-configs/nios2-softmmu.mak
-+++ b/default-configs/nios2-softmmu.mak
-@@ -4,3 +4,4 @@ CONFIG_NIOS2=y
- CONFIG_SERIAL=y
- CONFIG_PTIMER=y
- CONFIG_ALTERA_TIMER=y
-+CONFIG_ALTERA_JUART=y
-diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
-index 6ea76fe..f0d0e25 100644
---- a/hw/char/Makefile.objs
-+++ b/hw/char/Makefile.objs
-@@ -27,5 +27,6 @@ common-obj-$(CONFIG_LM32) += lm32_juart.o
- common-obj-$(CONFIG_LM32) += lm32_uart.o
- common-obj-$(CONFIG_MILKYMIST) += milkymist-uart.o
- common-obj-$(CONFIG_SCLPCONSOLE) += sclpconsole.o sclpconsole-lm.o
-+common-obj-$(CONFIG_ALTERA_JUART) += altera_juart.o
- 
- obj-$(CONFIG_VIRTIO) += virtio-serial-bus.o
-diff --git a/hw/char/altera_juart.c b/hw/char/altera_juart.c
-new file mode 100644
-index 0000000..584f73b
---- /dev/null
-+++ b/hw/char/altera_juart.c
-@@ -0,0 +1,282 @@
-+/*
-+ * QEMU model of the Altera JTAG UART.
-+ *
-+ * Copyright (c) 2016-2017 Intel Corporation.
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version
-+ * 2 of the License, or (at your option) any later version.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ * The Altera JTAG UART hardware registers are described in:
-+ * https://www.altera.com/en_US/pdfs/literature/ug/ug_embedded_ip.pdf
-+ * (In particular "Register Map" on page 65)
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/char/altera_juart.h"
-+#include "sysemu/sysemu.h"
-+#include "qemu/error-report.h"
-+
-+/* Data register */
-+#define OFFSET_R_DATA   0
-+#define DATA_RVALID     BIT(15)
-+#define DATA_RAVAIL     0xFFFF0000
-+
-+/* Control register */
-+#define OFFSET_R_CONTROL 4
-+#define CONTROL_RE      BIT(0)
-+#define CONTROL_WE      BIT(1)
-+#define CONTROL_RI      BIT(8)
-+#define CONTROL_WI      BIT(9)
-+#define CONTROL_AC      BIT(10)
-+#define CONTROL_WSPACE  0xFFFF0000
-+
-+#define CONTROL_WMASK (CONTROL_RE | CONTROL_WE | CONTROL_AC)
-+
-+#define TYPE_ALTERA_JUART "altera-juart"
-+#define ALTERA_JUART(obj) \
-+    OBJECT_CHECK(AlteraJUARTState, (obj), TYPE_ALTERA_JUART)
-+
-+/* Two registers 4 bytes wide each */
-+#define ALTERA_JTAG_UART_REGS_MEM_SIZE  (2 * 4)
-+
-+/*
-+ * The JTAG UART core generates an interrupt when either of the individual
-+ * interrupt conditions is pending and enabled.
-+ */
-+static void altera_juart_update_irq(AlteraJUARTState *s)
-+{
-+    unsigned int irq;
-+
-+    irq = ((s->jcontrol & CONTROL_WE) && (s->jcontrol & CONTROL_WI)) ||
-+          ((s->jcontrol & CONTROL_RE) && (s->jcontrol & CONTROL_RI));
-+
-+    qemu_set_irq(s->irq, irq);
-+}
-+
-+static uint64_t altera_juart_read(void *opaque, hwaddr addr, unsigned int size)
-+{
-+    AlteraJUARTState *s = opaque;
-+    uint32_t r;
-+
-+    switch (addr) {
-+    case OFFSET_R_DATA:
-+        r = s->rx_fifo[(s->rx_fifo_pos - s->rx_fifo_len) & (s->rx_fifo_size - 1)];
-+        if (s->rx_fifo_len) {
-+            s->rx_fifo_len--;
-+            qemu_chr_fe_accept_input(&s->chr);
-+            s->jdata = r | DATA_RVALID | (s->rx_fifo_len << 16);
-+            s->jcontrol |= CONTROL_RI;
-+        } else {
-+            s->jdata = 0;
-+            s->jcontrol &= ~CONTROL_RI;
-+        }
-+
-+        altera_juart_update_irq(s);
-+        return s->jdata;
-+
-+    case OFFSET_R_CONTROL:
-+        return s->jcontrol;
-+    }
-+
-+    return 0;
-+}
-+
-+static void altera_juart_write(void *opaque, hwaddr addr,
-+                       uint64_t value, unsigned int size)
-+{
-+    AlteraJUARTState *s = opaque;
-+    unsigned char c;
-+
-+    switch (addr) {
-+    case OFFSET_R_DATA:
-+        c = value & 0xFF;
-+        /*
-+         * We do not decrement the write fifo,
-+         * we "tranmsmit" instanteniously, CONTROL_WI always asserted
-+         */
-+        s->jcontrol |= CONTROL_WI;
-+        s->jdata = c;
-+        qemu_chr_fe_write(&s->chr, &c, 1);
-+        altera_juart_update_irq(s);
-+        break;
-+
-+    case OFFSET_R_CONTROL:
-+        /* Only RE and WE are writable */
-+        value &= CONTROL_WMASK;
-+        s->jcontrol &= ~CONTROL_WMASK;
-+        s->jcontrol |= value;
-+
-+        /* Writing 1 to AC clears it to 0 */
-+        if (value & CONTROL_AC) {
-+            s->jcontrol &= ~CONTROL_AC;
-+        }
-+        altera_juart_update_irq(s);
-+        break;
-+    }
-+}
-+
-+static void altera_juart_receive(void *opaque, const uint8_t *buf, int size)
-+{
-+    int i;
-+    AlteraJUARTState *s = opaque;
-+
-+    for (i = 0; i < size; i++) {
-+        s->rx_fifo[s->rx_fifo_pos] = buf[i];
-+        s->rx_fifo_pos++;
-+        s->rx_fifo_pos &= (s->rx_fifo_size - 1);
-+        s->rx_fifo_len++;
-+    }
-+    s->jcontrol |= CONTROL_RI;
-+    altera_juart_update_irq(s);
-+}
-+
-+static int altera_juart_can_receive(void *opaque)
-+{
-+    AlteraJUARTState *s = opaque;
-+    return s->rx_fifo_size - s->rx_fifo_len;
-+}
-+
-+static void altera_juart_reset(DeviceState *d)
-+{
-+    AlteraJUARTState *s = ALTERA_JUART(d);
-+
-+    s->jdata = 0;
-+
-+    /* The number of spaces available in the write FIFO */
-+    s->jcontrol = s->rx_fifo_size << 16;
-+    s->rx_fifo_pos = 0;
-+    s->rx_fifo_len = 0;
-+}
-+
-+static const MemoryRegionOps juart_ops = {
-+    .read = altera_juart_read,
-+    .write = altera_juart_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 4
-+    }
-+};
-+
-+static void altera_juart_init(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    AlteraJUARTState *s = ALTERA_JUART(obj);
-+
-+    memory_region_init_io(&s->mmio, OBJECT(s), &juart_ops, s,
-+                    TYPE_ALTERA_JUART, ALTERA_JTAG_UART_REGS_MEM_SIZE);
-+    sysbus_init_mmio(sbd, &s->mmio);
-+    sysbus_init_irq(sbd, &s->irq);
-+}
-+
-+void altera_juart_create(int channel, const hwaddr addr, qemu_irq irq, uint32_t fifo_size)
-+{
-+    DeviceState *dev;
-+    SysBusDevice *bus;
-+    Chardev *chr;
-+    const char chr_name[] = "juart";
-+    char label[ARRAY_SIZE(chr_name) + 1];
-+
-+    dev = qdev_create(NULL, TYPE_ALTERA_JUART);
-+
-+    if (channel >= MAX_SERIAL_PORTS) {
-+        error_report("Only %d serial ports are supported by QEMU",
-+                     MAX_SERIAL_PORTS);
-+        exit(1);
-+    }
-+
-+    chr = serial_hds[channel];
-+    if (!chr) {
-+        snprintf(label, ARRAY_SIZE(label), "%s%d", chr_name, channel);
-+        chr = qemu_chr_new(label, "null");
-+        if (!chr) {
-+            error_report("Failed to assign serial port to altera %s", label);
-+            exit(1);
-+        }
-+    }
-+    qdev_prop_set_chr(dev, "chardev", chr);
-+
-+    /*
-+     * FIFO size can be set from 8 to 32,768 bytes.
-+     * Only powers of two are allowed.
-+     */
-+    if (fifo_size < 8 || fifo_size > 3276 || (fifo_size & ~(1 << ctz32(fifo_size)))) {
-+        error_report("juart%d: Invalid FIFO size. [%u]", channel, fifo_size);
-+        exit(1);
-+    }
-+
-+    qdev_prop_set_uint32(dev, "fifo-size", fifo_size);
-+    bus = SYS_BUS_DEVICE(dev);
-+    qdev_init_nofail(dev);
-+
-+    if (addr != (hwaddr)-1) {
-+        sysbus_mmio_map(bus, 0, addr);
-+    }
-+
-+    sysbus_connect_irq(bus, 0, irq);
-+}
-+
-+static const VMStateDescription vmstate_altera_juart = {
-+    .name = "altera-juart" ,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(jdata, AlteraJUARTState),
-+        VMSTATE_UINT32(jcontrol, AlteraJUARTState),
-+        VMSTATE_VBUFFER_UINT32(rx_fifo, AlteraJUARTState, 1, NULL, 0, rx_fifo_size),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void altera_juart_realize(DeviceState *dev, Error **errp)
-+{
-+    AlteraJUARTState *s = ALTERA_JUART(dev);
-+    qemu_chr_fe_set_handlers(&s->chr, altera_juart_can_receive,
-+                             altera_juart_receive, NULL, s, NULL, true);
-+    s->rx_fifo = g_malloc(s->rx_fifo_size);
-+}
-+
-+static void altera_juart_unrealize(DeviceState *dev, Error **errp)
-+{
-+    AlteraJUARTState *s = ALTERA_JUART(dev);
-+    g_free(s->rx_fifo);
-+}
-+
-+static Property altera_juart_props[] = {
-+    DEFINE_PROP_CHR("chardev", AlteraJUARTState, chr),
-+    DEFINE_PROP_UINT32("fifo-size", AlteraJUARTState, rx_fifo_size,
-+                                        ALTERA_JUART_DEFAULT_FIFO_SIZE),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void altera_juart_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+
-+    dc->realize = altera_juart_realize;
-+    dc->unrealize = altera_juart_unrealize;
-+    dc->props = altera_juart_props;
-+    dc->vmsd = &vmstate_altera_juart;
-+    dc->reset = altera_juart_reset;
-+    dc->desc = "Altera JTAG UART";
-+}
-+
-+static const TypeInfo altera_juart_info = {
-+    .name          = TYPE_ALTERA_JUART,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(AlteraJUARTState),
-+    .instance_init = altera_juart_init,
-+    .class_init    = altera_juart_class_init,
-+};
-+
-+static void altera_juart_register(void)
-+{
-+    type_register_static(&altera_juart_info);
-+}
-+
-+type_init(altera_juart_register)
-diff --git a/include/hw/char/altera_juart.h b/include/hw/char/altera_juart.h
-new file mode 100644
-index 0000000..972984e
---- /dev/null
-+++ b/include/hw/char/altera_juart.h
-@@ -0,0 +1,46 @@
-+/*
-+ * Altera JTAG UART emulation
-+ *
-+ * Copyright (c) 2016-2017 Intel Corporation.
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version
-+ * 2 of the License, or (at your option) any later version.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef ALTERA_JUART_H
-+#define ALTERA_JUART_H
-+
-+#include "hw/sysbus.h"
-+#include "sysemu/char.h"
-+
-+/*
-+ * The read and write FIFO depths can be set from 8 to 32,768 bytes.
-+ * Only powers of two are allowed. A depth of 64 is generally optimal for
-+ * performance, and larger values are rarely necessary.
-+ */
-+
-+#define ALTERA_JUART_DEFAULT_FIFO_SIZE 64
-+
-+typedef struct AlteraJUARTState {
-+    SysBusDevice busdev;
-+    MemoryRegion mmio;
-+    CharBackend chr;
-+    qemu_irq irq;
-+
-+    unsigned int rx_fifo_size;
-+    unsigned int rx_fifo_pos;
-+    unsigned int rx_fifo_len;
-+    uint32_t jdata;
-+    uint32_t jcontrol;
-+    uint8_t *rx_fifo;
-+} AlteraJUARTState;
-+
-+void altera_juart_create(int channel, const hwaddr addr, qemu_irq irq,
-+                                                        uint32_t fifo_size);
-+
-+#endif /* ALTERA_JUART_H */
--- 
-2.7.4
+There are two reasons for keeping virtio Integrated Endpoints as PCI devices.
+1. The first point is generic; even if having PCIe devices as Integrated Endpoints should be OK,
+    is not recommended because some guests may miss-behave (*). X86 arch supports a large number
+    of guests and we don't want to check and fix everything if *we don't have to*.
+    Even if is not written anywhere and there are actually some PCI Express Integrated Endpoints,
+    most of them are legacy PCI devices (I actually think this is why we have Integrated Endpoints
+    at all, but I might be wrong).
+2. The second point is virtio specific. Not all the guests have virtio 1.0 support (e.g RHEL 6) and we allow them
+    to use legacy virtio devices as Integrated Endpoints (following the thought that this is why we have Integrated Endpoints)
+    Making the virtio devices PCI Express, but not virtio 1.0 is also problematic since now we will have too much
+    types of virtio devices. We want to keep it simple: virtio legacy -> PCI, virtio modern -> PCIe.
+
+
+(*) A while ago Alex Williamson found such of issue, I think is this one:
+0282ab (vfio/pci: Hide device PCIe capability on non-express buses for PCIe VMs)
+
+>> be appreciated too, if that makes sense. (By default we aim at
+>> multi-arch / multi-target with this document; we may not have stated it
+>> explicitly, but AFAIR we intend to cover aarch64 / "virt" too.)
+>
+> Right, that was my understanding as well.
+>
+
+Indeed, we want the document to support them all. If PAPR is different, we should mention it.
+
+Thanks,
+Marcel
