@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47015)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ccj6R-0005LU-8s
+	(envelope-from <mreitz@redhat.com>) id 1ccj6R-0005NN-N1
 	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 20:37:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ccj6Q-00077D-Bq
+	(envelope-from <mreitz@redhat.com>) id 1ccj6Q-00077I-KR
 	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 20:37:23 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Sun, 12 Feb 2017 02:36:50 +0100
-Message-Id: <20170212013704.6378-5-mreitz@redhat.com>
+Date: Sun, 12 Feb 2017 02:36:51 +0100
+Message-Id: <20170212013704.6378-6-mreitz@redhat.com>
 In-Reply-To: <20170212013704.6378-1-mreitz@redhat.com>
 References: <20170212013440.5919-1-mreitz@redhat.com>
 	<20170212013704.6378-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 07/21] block: check full backing filename when
- searching protocol filenames
+Subject: [Qemu-devel] [PULL 08/21] qemu-iotests: Don't create fifos /
+ pidfiles with protocol paths
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,61 +26,99 @@ Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.m
 
 From: Jeff Cody <jcody@redhat.com>
 
-In bdrv_find_backing_image(), if we are searching an image for a backing
-file that contains a protocol, we currently only compare unmodified
-paths.
+Trying to create, use, and remove fifos and pidfiles on protocol paths
+(e.g. nfs://localhost/scratch/qemu-nbd.pid) is obviously broken.
 
-However, some management software will change the backing filename to be
-a relative filename in a path.  QEMU is able to handle this fine,
-because internally it will use path_combine to put together the full
-protocol URI.
-
-However, this can lead to an inability to match an image during a QAPI
-command that needs to use bdrv_find_backing_image() to find the image,
-when it is searched by the full URI.
-
-When searching for a protocol filename, if the straight comparison
-fails, this patch will also compare against the full backing filename to
-see if that is a match.
+Use the local $TEST_DIR path before it is 'protocolized' for these
+files.
 
 Signed-off-by: Jeff Cody <jcody@redhat.com>
-Message-id: c2d025adca8a2b665189e6f4cf080f44126d0b6b.1485392617.git.jcody@redhat.com
+Message-id: bb4a731a35bc4ac81fe3db17479dd686315317c7.1485392617.git.jcody@redhat.com
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ tests/qemu-iotests/common.config |  6 ++++--
+ tests/qemu-iotests/common.qemu   | 10 +++++-----
+ tests/qemu-iotests/common.rc     |  6 +++---
+ 3 files changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/block.c b/block.c
-index 1dbc060c3f..b8bc2a1c68 100644
---- a/block.c
-+++ b/block.c
-@@ -3145,6 +3145,7 @@ BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
-     int is_protocol = 0;
-     BlockDriverState *curr_bs = NULL;
-     BlockDriverState *retval = NULL;
-+    Error *local_error = NULL;
+diff --git a/tests/qemu-iotests/common.config b/tests/qemu-iotests/common.config
+index f6384fbae7..55527aac87 100644
+--- a/tests/qemu-iotests/common.config
++++ b/tests/qemu-iotests/common.config
+@@ -109,7 +109,7 @@ _qemu_wrapper()
+ {
+     (
+         if [ -n "${QEMU_NEED_PID}" ]; then
+-            echo $BASHPID > "${TEST_DIR}/qemu-${_QEMU_HANDLE}.pid"
++            echo $BASHPID > "${QEMU_TEST_DIR}/qemu-${_QEMU_HANDLE}.pid"
+         fi
+         exec "$QEMU_PROG" $QEMU_OPTIONS "$@"
+     )
+@@ -151,7 +151,7 @@ _qemu_io_wrapper()
+ _qemu_nbd_wrapper()
+ {
+     (
+-        echo $BASHPID > "${TEST_DIR}/qemu-nbd.pid"
++        echo $BASHPID > "${QEMU_TEST_DIR}/qemu-nbd.pid"
+         exec "$QEMU_NBD_PROG" $QEMU_NBD_OPTIONS "$@"
+     )
+ }
+@@ -186,6 +186,8 @@ if [ -z "$TEST_DIR" ]; then
+         TEST_DIR=`pwd`/scratch
+ fi
  
-     if (!bs || !bs->drv || !backing_file) {
-         return NULL;
-@@ -3165,6 +3166,18 @@ BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
-                 retval = curr_bs->backing->bs;
-                 break;
-             }
-+            /* Also check against the full backing filename for the image */
-+            bdrv_get_full_backing_filename(curr_bs, backing_file_full, PATH_MAX,
-+                                           &local_error);
-+            if (local_error == NULL) {
-+                if (strcmp(backing_file, backing_file_full) == 0) {
-+                    retval = curr_bs->backing->bs;
-+                    break;
-+                }
-+            } else {
-+                error_free(local_error);
-+                local_error = NULL;
-+            }
-         } else {
-             /* If not an absolute filename path, make it relative to the current
-              * image's filename path */
++QEMU_TEST_DIR="${TEST_DIR}"
++
+ if [ ! -e "$TEST_DIR" ]; then
+         mkdir "$TEST_DIR"
+ fi
+diff --git a/tests/qemu-iotests/common.qemu b/tests/qemu-iotests/common.qemu
+index e657361790..42787896af 100644
+--- a/tests/qemu-iotests/common.qemu
++++ b/tests/qemu-iotests/common.qemu
+@@ -27,8 +27,8 @@
+ 
+ QEMU_COMM_TIMEOUT=10
+ 
+-QEMU_FIFO_IN="${TEST_DIR}/qmp-in-$$"
+-QEMU_FIFO_OUT="${TEST_DIR}/qmp-out-$$"
++QEMU_FIFO_IN="${QEMU_TEST_DIR}/qmp-in-$$"
++QEMU_FIFO_OUT="${QEMU_TEST_DIR}/qmp-out-$$"
+ 
+ QEMU_HANDLE=0
+ 
+@@ -204,9 +204,9 @@ function _cleanup_qemu()
+     for i in "${!QEMU_OUT[@]}"
+     do
+         local QEMU_PID
+-        if [ -f "${TEST_DIR}/qemu-${i}.pid" ]; then
+-            read QEMU_PID < "${TEST_DIR}/qemu-${i}.pid"
+-            rm -f "${TEST_DIR}/qemu-${i}.pid"
++        if [ -f "${QEMU_TEST_DIR}/qemu-${i}.pid" ]; then
++            read QEMU_PID < "${QEMU_TEST_DIR}/qemu-${i}.pid"
++            rm -f "${QEMU_TEST_DIR}/qemu-${i}.pid"
+             if [ -z "${wait}" ] && [ -n "${QEMU_PID}" ]; then
+                 kill -KILL ${QEMU_PID} 2>/dev/null
+             fi
+diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+index 3213765f4e..4bb9b77807 100644
+--- a/tests/qemu-iotests/common.rc
++++ b/tests/qemu-iotests/common.rc
+@@ -193,11 +193,11 @@ _cleanup_test_img()
+     case "$IMGPROTO" in
+ 
+         nbd)
+-            if [ -f "${TEST_DIR}/qemu-nbd.pid" ]; then
++            if [ -f "${QEMU_TEST_DIR}/qemu-nbd.pid" ]; then
+                 local QEMU_NBD_PID
+-                read QEMU_NBD_PID < "${TEST_DIR}/qemu-nbd.pid"
++                read QEMU_NBD_PID < "${QEMU_TEST_DIR}/qemu-nbd.pid"
+                 kill ${QEMU_NBD_PID}
+-                rm -f "${TEST_DIR}/qemu-nbd.pid"
++                rm -f "${QEMU_TEST_DIR}/qemu-nbd.pid"
+             fi
+             rm -f "$TEST_IMG_FILE"
+             ;;
 -- 
 2.11.0
