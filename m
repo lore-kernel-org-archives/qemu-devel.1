@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ccj8d-0007gh-Qa
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 20:39:41 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ccj8g-0007j0-19
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 20:39:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ccj8c-0007Uo-FC
-	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 20:39:39 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ccj8e-0007VW-Nq
+	for qemu-devel@nongnu.org; Sat, 11 Feb 2017 20:39:42 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Sun, 12 Feb 2017 02:39:27 +0100
-Message-Id: <20170212013929.6793-2-mreitz@redhat.com>
+Date: Sun, 12 Feb 2017 02:39:28 +0100
+Message-Id: <20170212013929.6793-3-mreitz@redhat.com>
 In-Reply-To: <20170212013440.5919-1-mreitz@redhat.com>
 References: <20170212013440.5919-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 19/21] qemu-io: don't allow I/O operations
- larger than BDRV_REQUEST_MAX_BYTES
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 20/21] qemu-img: Use qemu_strtoul() rather than
+ raw strtoul()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,72 +26,99 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-From: Alberto Garcia <berto@igalia.com>
+From: Peter Maydell <peter.maydell@linaro.org>
 
-Passing a request size larger than BDRV_REQUEST_MAX_BYTES to any of the
-I/O commands results in an error. While 'read' and 'write' handle the
-error correctly, 'aio_read' and 'aio_write' hit an assertion:
+Some of the argument parsing in qemu-img uses strtoul() to parse
+integer arguments.  This is tricky to get correct and in fact the
+code does not get it right, because it assigns the result of
+strtoul() to an 'int' variable and then tries to check for > INT_MAX.
+Coverity correctly complains that the comparison is always false.
 
-blk_aio_read_entry: Assertion `rwco->qiov->size == acb->bytes' failed.
+Rewrite to use qemu_strtoul(), which has a saner convention for
+reporting conversion failures.
 
-The reason is that the QEMU I/O code cannot handle request sizes
-larger than BDRV_REQUEST_MAX_BYTES, so this patch makes qemu-io check
-that all values are within range.
+(Fixes CID 1356421, CID 1356422, CID 1356423.)
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Message-id: 79f66648c685929a144396bda24d13a207131dcf.1485878688.git.berto@igalia.com
-[mreitz: Use BDRV_REQUEST_MAX_BYTES instead of INT_MAX]
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 1486744104-15590-2-git-send-email-peter.maydell@linaro.org
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qemu-io-cmds.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
+ qemu-img.c | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index 95bcde1d88..e415b03cd0 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -388,9 +388,15 @@ create_iovec(BlockBackend *blk, QEMUIOVector *qiov, char **argv, int nr_iov,
-             goto fail;
-         }
- 
--        if (len > SIZE_MAX) {
--            printf("Argument '%s' exceeds maximum size %llu\n", arg,
--                   (unsigned long long)SIZE_MAX);
-+        if (len > BDRV_REQUEST_MAX_BYTES) {
-+            printf("Argument '%s' exceeds maximum size %" PRIu64 "\n", arg,
-+                   (uint64_t)BDRV_REQUEST_MAX_BYTES);
-+            goto fail;
-+        }
+diff --git a/qemu-img.c b/qemu-img.c
+index 933876cfe1..38266e56b0 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -3623,24 +3623,24 @@ static int img_bench(int argc, char **argv)
+             break;
+         case 'c':
+         {
+-            char *end;
+-            errno =3D 0;
+-            count =3D strtoul(optarg, &end, 0);
+-            if (errno || *end || count > INT_MAX) {
++            unsigned long res;
 +
-+        if (count > BDRV_REQUEST_MAX_BYTES - len) {
-+            printf("The total number of bytes exceed the maximum size %" PRIu64
-+                   "\n", (uint64_t)BDRV_REQUEST_MAX_BYTES);
-             goto fail;
++            if (qemu_strtoul(optarg, NULL, 0, &res) < 0 || res > INT_MAX=
+) {
+                 error_report("Invalid request count specified");
+                 return 1;
+             }
++            count =3D res;
+             break;
          }
- 
-@@ -682,9 +688,9 @@ static int read_f(BlockBackend *blk, int argc, char **argv)
-     if (count < 0) {
-         print_cvtnum_err(count, argv[optind]);
-         return 0;
--    } else if (count > SIZE_MAX) {
-+    } else if (count > BDRV_REQUEST_MAX_BYTES) {
-         printf("length cannot exceed %" PRIu64 ", given %s\n",
--               (uint64_t) SIZE_MAX, argv[optind]);
-+               (uint64_t)BDRV_REQUEST_MAX_BYTES, argv[optind]);
-         return 0;
-     }
- 
-@@ -1004,9 +1010,9 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
-     if (count < 0) {
-         print_cvtnum_err(count, argv[optind]);
-         return 0;
--    } else if (count > SIZE_MAX) {
-+    } else if (count > BDRV_REQUEST_MAX_BYTES) {
-         printf("length cannot exceed %" PRIu64 ", given %s\n",
--               (uint64_t) SIZE_MAX, argv[optind]);
-+               (uint64_t)BDRV_REQUEST_MAX_BYTES, argv[optind]);
-         return 0;
-     }
- 
--- 
+         case 'd':
+         {
+-            char *end;
+-            errno =3D 0;
+-            depth =3D strtoul(optarg, &end, 0);
+-            if (errno || *end || depth > INT_MAX) {
++            unsigned long res;
++
++            if (qemu_strtoul(optarg, NULL, 0, &res) < 0 || res > INT_MAX=
+) {
+                 error_report("Invalid queue depth specified");
+                 return 1;
+             }
++            depth =3D res;
+             break;
+         }
+         case 'f':
+@@ -3707,24 +3707,24 @@ static int img_bench(int argc, char **argv)
+             break;
+         case OPTION_PATTERN:
+         {
+-            char *end;
+-            errno =3D 0;
+-            pattern =3D strtoul(optarg, &end, 0);
+-            if (errno || *end || pattern > 0xff) {
++            unsigned long res;
++
++            if (qemu_strtoul(optarg, NULL, 0, &res) < 0 || res > 0xff) {
+                 error_report("Invalid pattern byte specified");
+                 return 1;
+             }
++            pattern =3D res;
+             break;
+         }
+         case OPTION_FLUSH_INTERVAL:
+         {
+-            char *end;
+-            errno =3D 0;
+-            flush_interval =3D strtoul(optarg, &end, 0);
+-            if (errno || *end || flush_interval > INT_MAX) {
++            unsigned long res;
++
++            if (qemu_strtoul(optarg, NULL, 0, &res) < 0 || res > INT_MAX=
+) {
+                 error_report("Invalid flush interval specified");
+                 return 1;
+             }
++            flush_interval =3D res;
+             break;
+         }
+         case OPTION_NO_DRAIN:
+--=20
 2.11.0
