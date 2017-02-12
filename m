@@ -1,21 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1cd1Uf-0005tE-UR
-	for qemu-devel@nongnu.org; Sun, 12 Feb 2017 16:15:40 -0500
+	(envelope-from <atar4qemu@gmail.com>) id 1cd1cd-0000Gw-9p
+	for qemu-devel@nongnu.org; Sun, 12 Feb 2017 16:23:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1cd1Ud-0004YG-Fc
-	for qemu-devel@nongnu.org; Sun, 12 Feb 2017 16:15:37 -0500
+	(envelope-from <atar4qemu@gmail.com>) id 1cd1cc-0007JM-3k
+	for qemu-devel@nongnu.org; Sun, 12 Feb 2017 16:23:51 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170202051445.5735-51-david@gibson.dropbear.id.au>
-References: <20170202051445.5735-1-david@gibson.dropbear.id.au>
-	<20170202051445.5735-51-david@gibson.dropbear.id.au>
 From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Sun, 12 Feb 2017 22:15:12 +0100
-Message-ID: <CACXAS8D4n00aTL3ALrCDAxPx4SEG3wJvxCyRQKeZfgpdCQiBXw@mail.gmail.com>
+Date: Sun, 12 Feb 2017 22:23:28 +0100
+Message-ID: <CACXAS8CBg-tuCeuv0GKwjbDKASUTQjr44R9fuZHr7XaPVTKm6w@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 050/107] prep: add IBM RS/6000 7020 (40p)
- machine emulation
+Subject: [Qemu-devel] AIX KDB under 40p
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,339 +19,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, mdroth@linux.vnet.ibm.com, Alexander Graf <agraf@suse.de>, aik@ozlabs.ru, qemu-ppc@nongnu.org
+To: qemu-devel <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org, =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>
 
-On Thu, Feb 2, 2017 at 6:13 AM, David Gibson
-<david@gibson.dropbear.id.au> wrote:
-> From: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
->
-> Machine supports both Open Hack'Ware and OpenBIOS.
-> Open Hack'Ware is the default because OpenBIOS is currently unable to boo=
-t
-> PReP boot partitions or PReP kernels.
->
-> Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
-> [dwg: Correct compile failure with KVM located by Thomas Huth]
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  default-configs/ppc-softmmu.mak |   1 +
->  hw/ppc/prep.c                   | 230 ++++++++++++++++++++++++++++++++++=
-++++++
->  2 files changed, 231 insertions(+)
->
-> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmm=
-u.mak
-> index e567658..7dd004e 100644
-> --- a/default-configs/ppc-softmmu.mak
-> +++ b/default-configs/ppc-softmmu.mak
-> @@ -18,6 +18,7 @@ CONFIG_I82378=3Dy
->  CONFIG_PC87312=3Dy
->  CONFIG_MACIO=3Dy
->  CONFIG_PCSPK=3Dy
-> +CONFIG_CS4231A=3Dy
->  CONFIG_CUDA=3Dy
->  CONFIG_ADB=3Dy
->  CONFIG_MAC_NVRAM=3Dy
-> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-> index 9fb89d3..ca7959c 100644
-> --- a/hw/ppc/prep.c
-> +++ b/hw/ppc/prep.c
-> @@ -2,6 +2,7 @@
->   * QEMU PPC PREP hardware System Emulator
->   *
->   * Copyright (c) 2003-2007 Jocelyn Mayer
-> + * Copyright (c) 2017 Herv=C3=A9 Poussineau
->   *
->   * Permission is hereby granted, free of charge, to any person obtaining=
- a copy
->   * of this software and associated documentation files (the "Software"),=
- to deal
-> @@ -43,17 +44,21 @@
->  #include "hw/isa/pc87312.h"
->  #include "sysemu/block-backend.h"
->  #include "sysemu/arch_init.h"
-> +#include "sysemu/kvm.h"
->  #include "sysemu/qtest.h"
->  #include "exec/address-spaces.h"
->  #include "trace.h"
->  #include "elf.h"
->  #include "qemu/cutils.h"
-> +#include "kvm_ppc.h"
->
->  /* SMP is not enabled, for now */
->  #define MAX_CPUS 1
->
->  #define MAX_IDE_BUS 2
->
-> +#define CFG_ADDR 0xf0000510
-> +
->  #define BIOS_SIZE (1024 * 1024)
->  #define BIOS_FILENAME "ppc_rom.bin"
->  #define KERNEL_LOAD_ADDR 0x01000000
-> @@ -316,6 +321,12 @@ static uint32_t PREP_io_800_readb (void *opaque, uin=
-t32_t addr)
->
->  #define NVRAM_SIZE        0x2000
->
-> +static void fw_cfg_boot_set(void *opaque, const char *boot_device,
-> +                            Error **errp)
-> +{
-> +    fw_cfg_modify_i16(opaque, FW_CFG_BOOT_DEVICE, boot_device[0]);
-> +}
-> +
->  static void ppc_prep_reset(void *opaque)
->  {
->      PowerPCCPU *cpu =3D opaque;
-> @@ -677,4 +688,223 @@ static void prep_machine_init(MachineClass *mc)
->      mc->default_boot_order =3D "cad";
->  }
->
-> +static int prep_set_cmos_checksum(DeviceState *dev, void *opaque)
-> +{
-> +    uint16_t checksum =3D *(uint16_t *)opaque;
-> +    ISADevice *rtc;
-> +
-> +    if (object_dynamic_cast(OBJECT(dev), "mc146818rtc")) {
-> +        rtc =3D ISA_DEVICE(dev);
-> +        rtc_set_memory(rtc, 0x2e, checksum & 0xff);
-> +        rtc_set_memory(rtc, 0x3e, checksum & 0xff);
-> +        rtc_set_memory(rtc, 0x2f, checksum >> 8);
-> +        rtc_set_memory(rtc, 0x3f, checksum >> 8);
-> +    }
-> +    return 0;
-> +}
-> +
-> +static void ibm_40p_init(MachineState *machine)
-> +{
-> +    CPUPPCState *env =3D NULL;
-> +    uint16_t cmos_checksum;
-> +    PowerPCCPU *cpu;
-> +    DeviceState *dev;
-> +    SysBusDevice *pcihost;
-> +    Nvram *m48t59 =3D NULL;
-> +    PCIBus *pci_bus;
-> +    ISABus *isa_bus;
-> +    void *fw_cfg;
-> +    int i;
-> +    uint32_t kernel_base =3D 0, initrd_base =3D 0;
-> +    long kernel_size =3D 0, initrd_size =3D 0;
-> +    char boot_device;
-> +
-> +    /* init CPU */
-> +    if (!machine->cpu_model) {
-> +        machine->cpu_model =3D "604";
-> +    }
-> +    cpu =3D cpu_ppc_init(machine->cpu_model);
-> +    if (!cpu) {
-> +        error_report("could not initialize CPU '%s'",
-> +                     machine->cpu_model);
-> +        exit(1);
-> +    }
-> +    env =3D &cpu->env;
-> +    if (PPC_INPUT(env) !=3D PPC_FLAGS_INPUT_6xx) {
-> +        error_report("only 6xx bus is supported on this machine");
-> +        exit(1);
-> +    }
-> +
-> +    if (env->flags & POWERPC_FLAG_RTC_CLK) {
-> +        /* POWER / PowerPC 601 RTC clock frequency is 7.8125 MHz */
-> +        cpu_ppc_tb_init(env, 7812500UL);
+With -cpu 601 it's slow, but interesting:
 
-Is this necessary? Looks like it sets both decrementer and cpu
-frequency to 7.8125 MHz,
-so the machine with -cpu 601 is working very slow.
+qemu-system-ppc -M 40p -bios p12h0456.img -hda aix-5.1-cd1.iso -cpu 601
 
-> +    } else {
-> +        /* Set time-base frequency to 100 Mhz */
-> +        cpu_ppc_tb_init(env, 100UL * 1000UL * 1000UL);
-> +    }
-> +    qemu_register_reset(ppc_prep_reset, cpu);
-> +
-> +    /* PCI host */
-> +    dev =3D qdev_create(NULL, "raven-pcihost");
-> +    if (!bios_name) {
-> +        bios_name =3D BIOS_FILENAME;
-> +    }
-> +    qdev_prop_set_string(dev, "bios-name", bios_name);
-> +    qdev_prop_set_uint32(dev, "elf-machine", PPC_ELF_MACHINE);
-> +    pcihost =3D SYS_BUS_DEVICE(dev);
-> +    object_property_add_child(qdev_get_machine(), "raven", OBJECT(dev), =
-NULL);
-> +    qdev_init_nofail(dev);
-> +    pci_bus =3D PCI_BUS(qdev_get_child_bus(dev, "pci.0"));
-> +    if (!pci_bus) {
-> +        error_report("could not create PCI host controller");
-> +        exit(1);
-> +    }
-> +
-> +    /* PCI -> ISA bridge */
-> +    dev =3D DEVICE(pci_create_simple(pci_bus, PCI_DEVFN(11, 0), "i82378"=
-));
-> +    qdev_connect_gpio_out(dev, 0,
-> +                          cpu->env.irq_inputs[PPC6xx_INPUT_INT]);
-> +    sysbus_connect_irq(pcihost, 0, qdev_get_gpio_in(dev, 15));
-> +    sysbus_connect_irq(pcihost, 1, qdev_get_gpio_in(dev, 13));
-> +    sysbus_connect_irq(pcihost, 2, qdev_get_gpio_in(dev, 15));
-> +    sysbus_connect_irq(pcihost, 3, qdev_get_gpio_in(dev, 13));
-> +    isa_bus =3D ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
-> +
-> +    /* Memory controller */
-> +    dev =3D DEVICE(isa_create(isa_bus, "rs6000-mc"));
-> +    qdev_prop_set_uint32(dev, "ram-size", machine->ram_size);
-> +    qdev_init_nofail(dev);
-> +
-> +    /* initialize CMOS checksums */
-> +    cmos_checksum =3D 0x6aa9;
-> +    qbus_walk_children(BUS(isa_bus), prep_set_cmos_checksum, NULL, NULL,=
- NULL,
-> +                       &cmos_checksum);
-> +
-> +    /* initialize audio subsystem */
-> +    audio_init();
-> +
-> +    /* add some more devices */
-> +    if (defaults_enabled()) {
-> +        isa_create_simple(isa_bus, "i8042");
-> +        m48t59 =3D NVRAM(isa_create_simple(isa_bus, "isa-m48t59"));
-> +
-> +        dev =3D DEVICE(isa_create(isa_bus, "cs4231a"));
-> +        qdev_prop_set_uint32(dev, "iobase", 0x830);
-> +        qdev_prop_set_uint32(dev, "irq", 10);
-> +        qdev_init_nofail(dev);
-> +
-> +        dev =3D DEVICE(isa_create(isa_bus, "pc87312"));
-> +        qdev_prop_set_uint32(dev, "config", 12);
-> +        qdev_init_nofail(dev);
-> +
-> +        dev =3D DEVICE(isa_create(isa_bus, "prep-systemio"));
-> +        qdev_prop_set_uint32(dev, "ibm-planar-id", 0xfc);
-> +        qdev_prop_set_uint32(dev, "equipment", 0xc0);
-> +        qdev_init_nofail(dev);
-> +
-> +        pci_create_simple(pci_bus, PCI_DEVFN(1, 0), "lsi53c810");
-> +
-> +        /* XXX: s3-trio at PCI_DEVFN(2, 0) */
-> +        pci_vga_init(pci_bus);
-> +
-> +        for (i =3D 0; i < nb_nics; i++) {
-> +            pci_nic_init_nofail(&nd_table[i], pci_bus, "pcnet",
-> +                                i =3D=3D 0 ? "3" : NULL);
-> +        }
-> +    }
-> +
-> +    /* Prepare firmware configuration for OpenBIOS */
-> +    fw_cfg =3D fw_cfg_init_mem(CFG_ADDR, CFG_ADDR + 2);
-> +
-> +    if (machine->kernel_filename) {
-> +        /* load kernel */
-> +        kernel_base =3D KERNEL_LOAD_ADDR;
-> +        kernel_size =3D load_image_targphys(machine->kernel_filename,
-> +                                          kernel_base,
-> +                                          machine->ram_size - kernel_bas=
-e);
-> +        if (kernel_size < 0) {
-> +            error_report("could not load kernel '%s'",
-> +                         machine->kernel_filename);
-> +            exit(1);
-> +        }
-> +        fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, kernel_base);
-> +        fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, kernel_size);
-> +        /* load initrd */
-> +        if (machine->initrd_filename) {
-> +            initrd_base =3D INITRD_LOAD_ADDR;
-> +            initrd_size =3D load_image_targphys(machine->initrd_filename=
-,
-> +                                              initrd_base,
-> +                                              machine->ram_size - initrd=
-_base);
-> +            if (initrd_size < 0) {
-> +                error_report("could not load initial ram disk '%s'",
-> +                             machine->initrd_filename);
-> +                exit(1);
-> +            }
-> +            fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_ADDR, initrd_base);
-> +            fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_SIZE, initrd_size);
-> +        }
-> +        if (machine->kernel_cmdline && *machine->kernel_cmdline) {
-> +            fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_CMDLINE, CMDLINE_ADDR);
-> +            pstrcpy_targphys("cmdline", CMDLINE_ADDR, TARGET_PAGE_SIZE,
-> +                             machine->kernel_cmdline);
-> +            fw_cfg_add_string(fw_cfg, FW_CFG_CMDLINE_DATA,
-> +                              machine->kernel_cmdline);
-> +            fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_SIZE,
-> +                           strlen(machine->kernel_cmdline) + 1);
-> +        }
-> +        boot_device =3D 'm';
-> +    } else {
-> +        boot_device =3D machine->boot_order[0];
-> +    }
-> +
-> +    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)max_cpus);
-> +    fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)machine->ram_size)=
-;
-> +    fw_cfg_add_i16(fw_cfg, FW_CFG_MACHINE_ID, ARCH_PREP);
-> +
-> +    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_WIDTH, graphic_width);
-> +    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_HEIGHT, graphic_height);
-> +    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_DEPTH, graphic_depth);
-> +
-> +    fw_cfg_add_i32(fw_cfg, FW_CFG_PPC_IS_KVM, kvm_enabled());
-> +    if (kvm_enabled()) {
-> +#ifdef CONFIG_KVM
-> +        uint8_t *hypercall;
-> +
-> +        fw_cfg_add_i32(fw_cfg, FW_CFG_PPC_TBFREQ, kvmppc_get_tbfreq());
-> +        hypercall =3D g_malloc(16);
-> +        kvmppc_get_hypercall(env, hypercall, 16);
-> +        fw_cfg_add_bytes(fw_cfg, FW_CFG_PPC_KVM_HC, hypercall, 16);
-> +        fw_cfg_add_i32(fw_cfg, FW_CFG_PPC_KVM_PID, getpid());
-> +#endif
-> +    } else {
-> +        fw_cfg_add_i32(fw_cfg, FW_CFG_PPC_TBFREQ, NANOSECONDS_PER_SECOND=
-);
-> +    }
-> +    fw_cfg_add_i16(fw_cfg, FW_CFG_BOOT_DEVICE, boot_device);
-> +    qemu_register_boot_set(fw_cfg_boot_set, fw_cfg);
-> +
-> +    /* Prepare firmware configuration for Open Hack'Ware */
-> +    if (m48t59) {
-> +        PPC_NVRAM_set_params(m48t59, NVRAM_SIZE, "PREP", ram_size,
-> +                             boot_device,
-> +                             kernel_base, kernel_size,
-> +                             machine->kernel_cmdline,
-> +                             initrd_base, initrd_size,
-> +                             /* XXX: need an option to load a NVRAM imag=
-e */
-> +                             0,
-> +                             graphic_width, graphic_height, graphic_dept=
-h);
-> +    }
-> +}
-> +
-> +static void ibm_40p_machine_init(MachineClass *mc)
-> +{
-> +    mc->desc =3D "IBM RS/6000 7020 (40p)",
-> +    mc->init =3D ibm_40p_init;
-> +    mc->max_cpus =3D 1;
-> +    mc->pci_allow_0_address =3D true;
-> +    mc->default_ram_size =3D 128 * M_BYTE;
-> +    mc->block_default_type =3D IF_SCSI;
-> +    mc->default_boot_order =3D "c";
-> +}
-> +
-> +DEFINE_MACHINE("40p", ibm_40p_machine_init)
->  DEFINE_MACHINE("prep", prep_machine_init)
-> --
-> 2.9.3
->
->
+^^^ -cpu 601 is crucial. With the default CPU (604) it just hangs
+after a greeting.
+
+ And after 90 minutes,  on the serial line....
+
+AIX Version pinmore.c, s.@(#)65 1.1
+Instruction Storage Interrupt - PROC
+[kdb_get_virtual_memory] no real storage @ 646E6D60
+KDB(0)> f
+pvthread+000000 STACK:
+WARNING: bad IAR: 646E6D60, display stack from LR: 646E6D5D
+KDB(0)>
+KDB(0)> dr
+r0  : 00000000  r1  : 00595910  r2  : 00595C58  r3  : 00000001  r4  : 01C08180
+r5  : 00000000  r6  : 00000000  r7  : 00000000  r8  : 00000000  r9  : 00000000
+r10 : 00000000  r11 : 00000000  r12 : 646E6D61  r13 : 00606178  r14 : 000000B8
+r15 : 00000020  r16 : 00000020  r17 : 0803004D  r18 : 005AF0BC  r19 : 003FED04
+r20 : 00606178  r21 : 00000020  r22 : 00606000  r23 : 00003F50  r24 : 00003F48
+r25 : 00003F3C  r26 : 00000000  r27 : 63683A2C  r28 : 00003A24  r29 : 00003A20
+r30 : 00590C70  r31 : 00000000
+KDB(0)>
 
 
 
---=20
+-- 
 Regards,
 Artyom Tarasenko
 
-SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/q=
-emu
+SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
