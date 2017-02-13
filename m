@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cd8RY-0002Qk-ND
-	for qemu-devel@nongnu.org; Sun, 12 Feb 2017 23:40:54 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cd8Ra-0002Qn-Ep
+	for qemu-devel@nongnu.org; Sun, 12 Feb 2017 23:40:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cd8RX-00026J-Bp
-	for qemu-devel@nongnu.org; Sun, 12 Feb 2017 23:40:52 -0500
-Date: Mon, 13 Feb 2017 15:40:39 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1cd8RX-00026P-Cb
+	for qemu-devel@nongnu.org; Sun, 12 Feb 2017 23:40:54 -0500
+Date: Mon, 13 Feb 2017 15:34:33 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170213044039.GX25381@umbus>
+Message-ID: <20170213043433.GV25381@umbus>
 References: <1486704360-27361-1-git-send-email-sjitindarsingh@gmail.com>
+	<1486704360-27361-10-git-send-email-sjitindarsingh@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="hEi834+foqWOL7fK"
+	protocol="application/pgp-signature"; boundary="WN2ELtqJJ9aZ3yHj"
 Content-Disposition: inline
-In-Reply-To: <1486704360-27361-1-git-send-email-sjitindarsingh@gmail.com>
-Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH V2 00/10] target/ppc: Implement
- POWER9 pseries tcg
+In-Reply-To: <1486704360-27361-10-git-send-email-sjitindarsingh@gmail.com>
+Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH V2 09/10] target/ppc/POWER9: Add
+ cpu_has_work function for POWER9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,79 +29,98 @@ To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 Cc: qemu-ppc@nongnu.org, agraf@suse.de, qemu-devel@nongnu.org, sam.bobroff@au1.ibm.com
 
 
---hEi834+foqWOL7fK
+--WN2ELtqJJ9aZ3yHj
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 10, 2017 at 04:25:50PM +1100, Suraj Jitindar Singh wrote:
-> This is V2 of the patch series to implement tcg emulation support for a
-> POWER9 cpu model for the pseries machine type running a legacy kernel.
-> That is a kernel which doesn't use the new radix mmu mode or the new hash
-> mmu mode with segment tables.
+On Fri, Feb 10, 2017 at 04:25:59PM +1100, Suraj Jitindar Singh wrote:
+> The cpu has work function is used to mask interrupts used to determine
+> if there is work for the cpu based on the LPCR. Add a function to do this
+> for POWER9 and add it to the POWER9 cpu definition. This is similar to th=
+at
+> for POWER8 except using the LPCR bits as defined for POWER9.
 >=20
-> To use a POWER9 cpu provide the command line option "-cpu POWER9".
->=20
-> This series attempts to avoid precluding KVM-HV support for the POWER9
-> cpu model but doesn't attempt to support KVM-PR or the powernv machine
-> for the POWER9 cpu model as these aren't currently supported or
-> implemented and further code changes will be required in the event these
-> are implemented.
->=20
-> This series will be followed shortly by one to implement radix support and
-> currently trying to boot a kernel with support for radix with this series
-> will fail on the H_REGISTER_PROCESS_TABLE hcall.
+> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-I've applied 1-4 to ppc-for-2.9.  That leaves something rather
-incomplete, but then that's pretty much already true for our POWER9
-support.
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
+> ---
+>  target/ppc/translate_init.c | 45 +++++++++++++++++++++++++++++++++++++++=
+++++++
+>  1 file changed, 45 insertions(+)
 >=20
-> The changes from V1 are as follows:
->=20
->  - Drop patches which have already been merged.
->  - Instead of allocating a whole partition table we allocate a single
->    entry in the sPAPRMachineState and access it via the virtual hypv.
->  - Changes to how we handle SDR1 and renaming of associated functions.
->  - Drop patch to use the new pte format, guest kernels expect the old
->    format anyway, so this will only be applicable when POWER9 powernv
->    support is added, so delay adding support for this until then.
->  - Rename the mmu fault handler to ppc64_v3_handle_mmu_fault.
->  - Move segment table searching into the fault handler instead of in
->    slb_lookup().
->  - Move adding the POWER9 pseries cpu model to the end of the series.
->=20
-> Suraj Jitindar Singh (10):
->   target/ppc/POWER9: Add ISAv3.00 MMU definition
->   target/ppc: Fix LPCR DPFD mask define
->   target/ppc/POWER9: Adapt LPCR handling for POWER9
->   target/ppc/POWER9: Direct all instr and data storage interrupts to the
->     hypv
->   target/ppc: Add patb_entry to sPAPRMachineState
->   target/ppc: Don't use SDR1 when running under a POWER9 cpu model
->   target/ppc/POWER9: Add POWER9 mmu fault handler
->   target/ppc/POWER9: Add POWER9 pa-features definition
->   target/ppc/POWER9: Add cpu_has_work function for POWER9
->   hw/ppc/spapr: Add POWER9 to pseries cpu models
->=20
->  hw/ppc/spapr.c              | 37 ++++++++++++++++++
->  hw/ppc/spapr_cpu_core.c     |  3 ++
->  include/hw/ppc/spapr.h      |  1 +
->  target/ppc/cpu-qom.h        |  5 ++-
->  target/ppc/cpu.h            | 24 +++++++++++-
->  target/ppc/kvm.c            |  2 +-
->  target/ppc/machine.c        |  4 +-
->  target/ppc/misc_helper.c    |  3 +-
->  target/ppc/mmu-hash64.c     | 49 +++++++++++++++++++++---
->  target/ppc/mmu-hash64.h     |  2 +-
->  target/ppc/mmu.h            | 50 +++++++++++++++++++++++++
->  target/ppc/mmu_helper.c     | 54 +++++++++++++++++++++++++--
->  target/ppc/translate.c      |  7 +++-
->  target/ppc/translate_init.c | 91 +++++++++++++++++++++++++++++++++++++++=
-------
->  14 files changed, 302 insertions(+), 30 deletions(-)
->  create mode 100644 target/ppc/mmu.h
->=20
+> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> index a3a23d8..cc8ab1f 100644
+> --- a/target/ppc/translate_init.c
+> +++ b/target/ppc/translate_init.c
+> @@ -8776,10 +8776,54 @@ static bool ppc_pvr_match_power9(PowerPCCPUClass =
+*pcc, uint32_t pvr)
+>      return false;
+>  }
+> =20
+> +static bool cpu_has_work_POWER9(CPUState *cs)
+> +{
+> +    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> +    CPUPPCState *env =3D &cpu->env;
+> +
+> +    if (cs->halted) {
+> +        if (!(cs->interrupt_request & CPU_INTERRUPT_HARD)) {
+> +            return false;
+> +        }
+> +        /* External Exception */
+> +        if ((env->pending_interrupts & (1u << PPC_INTERRUPT_EXT)) &&
+> +            (env->spr[SPR_LPCR] & LPCR_EEE)) {
+> +            return true;
+> +        }
+> +        /* Decrementer Exception */
+> +        if ((env->pending_interrupts & (1u << PPC_INTERRUPT_DECR)) &&
+> +            (env->spr[SPR_LPCR] & LPCR_DEE)) {
+> +            return true;
+> +        }
+> +        /* Machine Check or Hypervisor Maintenance Exception */
+> +        if ((env->pending_interrupts & (1u << PPC_INTERRUPT_MCK |
+> +            1u << PPC_INTERRUPT_HMI)) && (env->spr[SPR_LPCR] & LPCR_OEE)=
+) {
+> +            return true;
+> +        }
+> +        /* Privileged Doorbell Exception */
+> +        if ((env->pending_interrupts & (1u << PPC_INTERRUPT_DOORBELL)) &&
+> +            (env->spr[SPR_LPCR] & LPCR_PDEE)) {
+> +            return true;
+> +        }
+> +        /* Hypervisor Doorbell Exception */
+> +        if ((env->pending_interrupts & (1u << PPC_INTERRUPT_HDOORBELL)) =
+&&
+> +            (env->spr[SPR_LPCR] & LPCR_HDEE)) {
+> +            return true;
+> +        }
+> +        if (env->pending_interrupts & (1u << PPC_INTERRUPT_RESET)) {
+> +            return true;
+> +        }
+> +        return false;
+> +    } else {
+> +        return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
+> +    }
+> +}
+> +
+>  POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(oc);
+>      PowerPCCPUClass *pcc =3D POWERPC_CPU_CLASS(oc);
+> +    CPUClass *cc =3D CPU_CLASS(oc);
+> =20
+>      dc->fw_name =3D "PowerPC,POWER9";
+>      dc->desc =3D "POWER9";
+> @@ -8790,6 +8834,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
+>                           PCR_COMPAT_2_05;
+>      pcc->init_proc =3D init_proc_POWER9;
+>      pcc->check_pow =3D check_pow_nocheck;
+> +    cc->has_work =3D cpu_has_work_POWER9;
+>      pcc->insns_flags =3D PPC_INSNS_BASE | PPC_ISEL | PPC_STRING | PPC_MF=
+TB |
+>                         PPC_FLOAT | PPC_FLOAT_FSEL | PPC_FLOAT_FRES |
+>                         PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -108,25 +128,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---hEi834+foqWOL7fK
+--WN2ELtqJJ9aZ3yHj
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYoTjGAAoJEGw4ysog2bOS+UcQALb/txiDg1UFuJgZa4ld9wYR
-h7WVdhQBNJc8KlZylSKJ2oVID9J30NGRcylHe14Fc4SvG5os8l98byFNEkE4/AQ1
-3ZFoGVSlWlj1Sbgl6p/Hp0K5VCAwMRCGi+LHQIUvr+PsuIeRQ5xhZFavC6OpfQkS
-KaSU2VOMguqzetyX/Iqbdk+SW6kCJbRrzg4mmoEc23uc9rkfkCKgCvBJ/JNko9Js
-4iGd86Lw+RVtpZRdErIKLulRduNQUGq6/Q7bC/86HJ+39wUEr9tA8htn3eQsOsjh
-GeDRZnpGX3raV0E2GZEeYj7bbhMLw6d2b7O1N84cJdrpLvCfDKISwEVZoiDvWf3p
-EzDRmPEy7TnMqqZO9UGf2z9vr471M+iUO9HLrFVj9zgBWF3BBW+k8dYtc7WiJK2+
-mZOiQqEt9ClbPltN670KYh8fV8wubr1prMN1RQ+KQNAEo3dEAMjaaDhDg0OTIq9t
-bo4aFjP3j2uIziihEzZaWbBlI5eWjULy9xdzM90TquvrQOA776COUxsHNZ6n5d02
-sxQai61t4N7Ni76v2lIJ9fjOB/RJJISuyfip1f4yZlIfDZO4wl8m/5QqkqK88CL4
-6zBnXCfu2l3IBYlnTOUozicCesZkm28qTw4xFjw9GsyFs5/wtEQbZn9OEHu9PKja
-51xRC140TLNxQzaC/dZK
-=qnTm
+iQIcBAEBCAAGBQJYoTdZAAoJEGw4ysog2bOSsVIQAJr1F/shUYJP1p/FnuQD+Xp8
+LIIpL997+mVNUJbqr3edNPlWFY/vC+E/rubcgY4Gbi16SBikGZP513vyX/GVIrYF
+B8xS0Fa393TRXfpNAh/5HiYbz7tCoQRVUOfjkjlvYCIOwXBGMgshi/x506eJdZ7X
+Ml/HTWedZrlQiHUPYoC1FF3lJn9WkG7QJl5605qloE6A1DntpXy4ofnhDbHCXR8q
+CBfoT1MM7kOdXL6AQsFutA1KAuKJIpGYK1s7zSTVo2Mk1mf6rUmupXGjXh82Cz4H
+B3YNmziQBkhB/d1d5Y559figgmTPm5AY6Y8ijYFTKNAnK15CPfI6Z+B3/fnorAP1
+bU9fmXe1JD6xNcMB2/xKSgyac9Q/X9qNzU0uCTZGbu9lMYmC1r5lT9pYkY3lrEvH
+zh5KLmkOe8lzmgT0WbGMluhB5z47d8PtZtBQh2jeQkYB3ioFdvkObgn+KPnubzkc
+vSFLi7zE/ySJi8wxE0wnkZ4RIfSROAtWjL33JzMevy32MnYLHRU6mjX0INMQ7s4B
+hToVh0XChNvw8kCCZt/+gJ7t4oM5ZNkw7wAtFM/Vz0f0wHhZ/eSyPzATKuhXpCRX
+gdpolmzeicRE29wfOT30f9NLoeRppYHF5/HCVFojTGxFdpiHsaZs4Lu5hmBH2dM+
+PCundMs4zEEFp22Kp9LR
+=6V6L
 -----END PGP SIGNATURE-----
 
---hEi834+foqWOL7fK--
+--WN2ELtqJJ9aZ3yHj--
