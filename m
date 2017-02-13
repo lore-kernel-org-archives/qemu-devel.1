@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45712)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cdO95-0005E0-Fe
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 16:26:53 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cdO97-0005Ft-Cx
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 16:26:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cdO93-0001i6-Nn
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 16:26:51 -0500
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:32962)
+	(envelope-from <rth7680@gmail.com>) id 1cdO95-0001jD-NA
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 16:26:53 -0500
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:34359)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cdO93-0001hw-IN
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 16:26:49 -0500
-Received: by mail-qt0-x242.google.com with SMTP id n13so15082764qtc.0
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 13:26:49 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cdO95-0001iw-Hp
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 16:26:51 -0500
+Received: by mail-qk0-x241.google.com with SMTP id e1so16762822qkh.1
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 13:26:51 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue, 14 Feb 2017 08:25:34 +1100
-Message-Id: <20170213212536.31871-23-rth@twiddle.net>
+Date: Tue, 14 Feb 2017 08:25:35 +1100
+Message-Id: <20170213212536.31871-24-rth@twiddle.net>
 In-Reply-To: <20170213212536.31871-1-rth@twiddle.net>
 References: <20170213212536.31871-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 22/24] target/openrisc: Tidy ppc/npc
- implementation
+Subject: [Qemu-devel] [PULL 23/24] target/openrisc: Tidy handling of delayed
+ branches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,305 +30,216 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-The NPC SPR is really only supposed to be used for FPGA debugging.
-It contains the same contents as PC, unless one plays games.  Follow
-the or1ksim implementation in flushing delayed branch state when it
-is changed.
-
-The PPC SPR need not be updated every instruction, merely when we
-exit the TB or attempt to read its contents.
-
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/openrisc/cpu.h              |  2 +-
- target/openrisc/gdbstub.c          | 13 +++++++----
- target/openrisc/interrupt_helper.c |  1 -
- target/openrisc/machine.c          |  5 ++---
- target/openrisc/sys_helper.c       | 44 ++++++++++++++------------------------
- target/openrisc/translate.c        | 29 ++++++++++---------------
- 6 files changed, 39 insertions(+), 55 deletions(-)
+ target/openrisc/cpu.h        | 12 +++++-------
+ target/openrisc/gdbstub.c    |  2 +-
+ target/openrisc/interrupt.c  |  4 ++--
+ target/openrisc/sys_helper.c |  2 +-
+ target/openrisc/translate.c  | 40 ++++++++++++++++------------------------
+ 5 files changed, 25 insertions(+), 35 deletions(-)
 
 diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
-index 0694038..8294636 100644
+index 8294636..50a36ba 100644
 --- a/target/openrisc/cpu.h
 +++ b/target/openrisc/cpu.h
-@@ -58,6 +58,7 @@ typedef struct OpenRISCCPUClass {
- } OpenRISCCPUClass;
+@@ -83,9 +83,6 @@ enum {
+ /* Version Register */
+ #define SPR_VR 0xFFFF003F
  
- #define NB_MMU_MODES    3
-+#define TARGET_INSN_START_EXTRA_WORDS 1
+-/* Internal flags, delay slot flag */
+-#define D_FLAG    1
+-
+ /* Interrupt */
+ #define NR_IRQS  32
  
- enum {
-     MMU_NOMMU_IDX = 0,
-@@ -273,7 +274,6 @@ typedef struct CPUOpenRISCTLBContext {
- typedef struct CPUOpenRISCState {
-     target_ulong gpr[32];     /* General registers */
-     target_ulong pc;          /* Program counter */
--    target_ulong npc;         /* Next PC */
-     target_ulong ppc;         /* Prev PC */
-     target_ulong jmp_pc;      /* Jump PC */
+@@ -298,8 +295,7 @@ typedef struct CPUOpenRISCState {
+     target_ulong lock_addr;
+     target_ulong lock_value;
  
+-    uint32_t flags;           /* cpu_flags, we only use it for exception
+-                                 in solt so far.  */
++    uint32_t dflag;           /* In delay slot (boolean) */
+ 
+     /* Fields up to this point are cleared by a CPU reset */
+     struct {} end_reset_fields;
+@@ -392,14 +388,16 @@ int cpu_openrisc_get_phys_data(OpenRISCCPU *cpu,
+ 
+ #include "exec/cpu-all.h"
+ 
++#define TB_FLAGS_DFLAG 1
++#define TB_FLAGS_OVE   SR_OVE
++
+ static inline void cpu_get_tb_cpu_state(CPUOpenRISCState *env,
+                                         target_ulong *pc,
+                                         target_ulong *cs_base, uint32_t *flags)
+ {
+     *pc = env->pc;
+     *cs_base = 0;
+-    /* D_FLAG -- branch instruction exception, OVE overflow trap enable.  */
+-    *flags = (env->flags & D_FLAG) | (env->sr & SR_OVE);
++    *flags = env->dflag | (env->sr & SR_OVE);
+ }
+ 
+ static inline int cpu_mmu_index(CPUOpenRISCState *env, bool ifetch)
 diff --git a/target/openrisc/gdbstub.c b/target/openrisc/gdbstub.c
-index 31ea013..2a4821f 100644
+index 2a4821f..b18c7e9 100644
 --- a/target/openrisc/gdbstub.c
 +++ b/target/openrisc/gdbstub.c
-@@ -34,8 +34,8 @@ int openrisc_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
-         case 32:    /* PPC */
-             return gdb_get_reg32(mem_buf, env->ppc);
- 
--        case 33:    /* NPC */
--            return gdb_get_reg32(mem_buf, env->npc);
-+        case 33:    /* NPC (equals PC) */
-+            return gdb_get_reg32(mem_buf, env->pc);
- 
-         case 34:    /* SR */
-             return gdb_get_reg32(mem_buf, cpu_get_sr(env));
-@@ -68,8 +68,13 @@ int openrisc_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
-             env->ppc = tmp;
+@@ -73,7 +73,7 @@ int openrisc_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
+                also clear delayed branch status.  */
+             if (env->pc != tmp) {
+                 env->pc = tmp;
+-                env->flags = 0;
++                env->dflag = 0;
+             }
              break;
  
--        case 33: /* NPC */
--            env->npc = tmp;
-+        case 33: /* NPC (equals PC) */
-+            /* If setting PC to something different,
-+               also clear delayed branch status.  */
-+            if (env->pc != tmp) {
-+                env->pc = tmp;
-+                env->flags = 0;
-+            }
-             break;
+diff --git a/target/openrisc/interrupt.c b/target/openrisc/interrupt.c
+index 042506f..a2eec6f 100644
+--- a/target/openrisc/interrupt.c
++++ b/target/openrisc/interrupt.c
+@@ -34,8 +34,8 @@ void openrisc_cpu_do_interrupt(CPUState *cs)
+     CPUOpenRISCState *env = &cpu->env;
  
-         case 34: /* SR */
-diff --git a/target/openrisc/interrupt_helper.c b/target/openrisc/interrupt_helper.c
-index c7fa97a..56620e0 100644
---- a/target/openrisc/interrupt_helper.c
-+++ b/target/openrisc/interrupt_helper.c
-@@ -32,7 +32,6 @@ void HELPER(rfe)(CPUOpenRISCState *env)
-                          (cpu->env.esr & (SR_SM | SR_IME | SR_DME));
- #endif
-     cpu->env.pc = cpu->env.epcr;
--    cpu->env.npc = cpu->env.epcr;
-     cpu_set_sr(&cpu->env, cpu->env.esr);
-     cpu->env.lock_addr = -1;
- 
-diff --git a/target/openrisc/machine.c b/target/openrisc/machine.c
-index 4100957..686eaa3 100644
---- a/target/openrisc/machine.c
-+++ b/target/openrisc/machine.c
-@@ -47,12 +47,11 @@ static const VMStateInfo vmstate_sr = {
- 
- static const VMStateDescription vmstate_env = {
-     .name = "env",
--    .version_id = 3,
--    .minimum_version_id = 3,
-+    .version_id = 4,
-+    .minimum_version_id = 4,
-     .fields = (VMStateField[]) {
-         VMSTATE_UINTTL_ARRAY(gpr, CPUOpenRISCState, 32),
-         VMSTATE_UINTTL(pc, CPUOpenRISCState),
--        VMSTATE_UINTTL(npc, CPUOpenRISCState),
-         VMSTATE_UINTTL(ppc, CPUOpenRISCState),
-         VMSTATE_UINTTL(jmp_pc, CPUOpenRISCState),
-         VMSTATE_UINTTL(lock_addr, CPUOpenRISCState),
+     env->epcr = env->pc;
+-    if (env->flags & D_FLAG) {
+-        env->flags &= ~D_FLAG;
++    if (env->dflag) {
++        env->dflag = 0;
+         env->sr |= SR_DSX;
+         env->epcr -= 4;
+     } else {
 diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
-index 9841a5b..0968901 100644
+index 0968901..60c3193 100644
 --- a/target/openrisc/sys_helper.c
 +++ b/target/openrisc/sys_helper.c
-@@ -29,11 +29,10 @@ void HELPER(mtspr)(CPUOpenRISCState *env,
-                    target_ulong ra, target_ulong rb, target_ulong offset)
- {
- #ifndef CONFIG_USER_ONLY
--    int spr = (ra | offset);
--    int idx;
--
-     OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
-     CPUState *cs = CPU(cpu);
-+    int spr = (ra | offset);
-+    int idx;
- 
-     switch (spr) {
-     case TO_SPR(0, 0): /* VR */
-@@ -41,7 +40,14 @@ void HELPER(mtspr)(CPUOpenRISCState *env,
+@@ -45,7 +45,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env,
+            when "jumping" to the current instruction.  */
+         if (env->pc != rb) {
+             env->pc = rb;
+-            env->flags = 0;
++            env->dflag = 0;
+             cpu_loop_exit(cs);
+         }
          break;
- 
-     case TO_SPR(0, 16): /* NPC */
--        env->npc = rb;
-+        cpu_restore_state(cs, GETPC());
-+        /* ??? Mirror or1ksim in not trashing delayed branch state
-+           when "jumping" to the current instruction.  */
-+        if (env->pc != rb) {
-+            env->pc = rb;
-+            env->flags = 0;
-+            cpu_loop_exit(cs);
-+        }
-         break;
- 
-     case TO_SPR(0, 17): /* SR */
-@@ -170,7 +176,6 @@ void HELPER(mtspr)(CPUOpenRISCState *env,
-         cpu_openrisc_timer_update(cpu);
-         break;
-     default:
--
-         break;
-     }
- #endif
-@@ -180,11 +185,11 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env,
-                            target_ulong rd, target_ulong ra, uint32_t offset)
- {
- #ifndef CONFIG_USER_ONLY
-+    OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
-+    CPUState *cs = CPU(cpu);
-     int spr = (ra | offset);
-     int idx;
- 
--    OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
--
-     switch (spr) {
-     case TO_SPR(0, 0): /* VR */
-         return env->vr & SPR_VR;
-@@ -201,13 +206,15 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env,
-     case TO_SPR(0, 4): /* IMMUCFGR */
-         return env->immucfgr;
- 
--    case TO_SPR(0, 16): /* NPC */
--        return env->npc;
-+    case TO_SPR(0, 16): /* NPC (equals PC) */
-+        cpu_restore_state(cs, GETPC());
-+        return env->pc;
- 
-     case TO_SPR(0, 17): /* SR */
-         return cpu_get_sr(env);
- 
-     case TO_SPR(0, 18): /* PPC */
-+        cpu_restore_state(cs, GETPC());
-         return env->ppc;
- 
-     case TO_SPR(0, 32): /* EPCR */
-@@ -276,25 +283,6 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env,
-     }
- #endif
- 
--/*If we later need to add tracepoints (or debug printfs) for the return
--value, it may be useful to structure the code like this:
--
--target_ulong ret = 0;
--
--switch() {
--case x:
-- ret = y;
-- break;
--case z:
-- ret = 42;
-- break;
--...
--}
--
--later something like trace_spr_read(ret);
--
--return ret;*/
--
-     /* for rd is passed in, if rd unchanged, just keep it back.  */
-     return rd;
- }
 diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-index cda84b6..10f0633 100644
+index 10f0633..313dae2 100644
 --- a/target/openrisc/translate.c
 +++ b/target/openrisc/translate.c
-@@ -39,7 +39,7 @@
- 
+@@ -40,11 +40,11 @@
  typedef struct DisasContext {
      TranslationBlock *tb;
--    target_ulong pc, ppc, npc;
-+    target_ulong pc;
-     uint32_t tb_flags, synced_flags, flags;
+     target_ulong pc;
+-    uint32_t tb_flags, synced_flags, flags;
      uint32_t is_jmp;
      uint32_t mem_idx;
-@@ -52,7 +52,6 @@ static TCGv cpu_sr;
- static TCGv cpu_R[32];
- static TCGv cpu_pc;
- static TCGv jmp_pc;            /* l.jr/l.jalr temp pc */
--static TCGv cpu_npc;
- static TCGv cpu_ppc;
- static TCGv cpu_sr_f;           /* bf/bnf, F flag taken */
- static TCGv cpu_sr_cy;          /* carry (unsigned overflow) */
-@@ -83,8 +82,6 @@ void openrisc_translate_init(void)
-                                        "flags");
+-    int singlestep_enabled;
++    uint32_t tb_flags;
+     uint32_t delayed_branch;
++    bool singlestep_enabled;
+ } DisasContext;
+ 
+ static TCGv_env cpu_env;
+@@ -60,7 +60,7 @@ static TCGv cpu_lock_addr;
+ static TCGv cpu_lock_value;
+ static TCGv_i32 fpcsr;
+ static TCGv_i64 cpu_mac;        /* MACHI:MACLO */
+-static TCGv_i32 env_flags;
++static TCGv_i32 cpu_dflag;
+ #include "exec/gen-icount.h"
+ 
+ void openrisc_translate_init(void)
+@@ -77,9 +77,9 @@ void openrisc_translate_init(void)
+     tcg_ctx.tcg_env = cpu_env;
+     cpu_sr = tcg_global_mem_new(cpu_env,
+                                 offsetof(CPUOpenRISCState, sr), "sr");
+-    env_flags = tcg_global_mem_new_i32(cpu_env,
+-                                       offsetof(CPUOpenRISCState, flags),
+-                                       "flags");
++    cpu_dflag = tcg_global_mem_new_i32(cpu_env,
++                                       offsetof(CPUOpenRISCState, dflag),
++                                       "dflag");
      cpu_pc = tcg_global_mem_new(cpu_env,
                                  offsetof(CPUOpenRISCState, pc), "pc");
--    cpu_npc = tcg_global_mem_new(cpu_env,
--                                 offsetof(CPUOpenRISCState, npc), "npc");
      cpu_ppc = tcg_global_mem_new(cpu_env,
-                                  offsetof(CPUOpenRISCState, ppc), "ppc");
-     jmp_pc = tcg_global_mem_new(cpu_env,
-@@ -1514,7 +1511,6 @@ void gen_intermediate_code(CPUOpenRISCState *env, struct TranslationBlock *tb)
-     dc->tb = tb;
+@@ -111,15 +111,6 @@ void openrisc_translate_init(void)
+     }
+ }
+ 
+-static inline void gen_sync_flags(DisasContext *dc)
+-{
+-    /* Sync the tb dependent flag between translate and runtime.  */
+-    if ((dc->tb_flags ^ dc->synced_flags) & D_FLAG) {
+-        tcg_gen_movi_tl(env_flags, dc->tb_flags & D_FLAG);
+-        dc->synced_flags = dc->tb_flags;
+-    }
+-}
+-
+ static void gen_exception(DisasContext *dc, unsigned int excp)
+ {
+     TCGv_i32 tmp = tcg_const_i32(excp);
+@@ -230,8 +221,6 @@ static void gen_jump(DisasContext *dc, int32_t n26, uint32_t reg, uint32_t op0)
+     }
+ 
+     dc->delayed_branch = 2;
+-    dc->tb_flags |= D_FLAG;
+-    gen_sync_flags(dc);
+ }
+ 
+ static void gen_ove_cy(DisasContext *dc)
+@@ -1512,10 +1501,9 @@ void gen_intermediate_code(CPUOpenRISCState *env, struct TranslationBlock *tb)
  
      dc->is_jmp = DISAS_NEXT;
--    dc->ppc = pc_start;
      dc->pc = pc_start;
-     dc->flags = cpu->env.cpucfgr;
+-    dc->flags = cpu->env.cpucfgr;
      dc->mem_idx = cpu_mmu_index(&cpu->env, false);
-@@ -1543,7 +1539,7 @@ void gen_intermediate_code(CPUOpenRISCState *env, struct TranslationBlock *tb)
+-    dc->synced_flags = dc->tb_flags = tb->flags;
+-    dc->delayed_branch = (dc->tb_flags & D_FLAG) != 0;
++    dc->tb_flags = tb->flags;
++    dc->delayed_branch = (dc->tb_flags & TB_FLAGS_DFLAG) != 0;
+     dc->singlestep_enabled = cs->singlestep_enabled;
+ 
+     next_page_start = (pc_start & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
+@@ -1539,7 +1527,8 @@ void gen_intermediate_code(CPUOpenRISCState *env, struct TranslationBlock *tb)
      gen_tb_start(tb);
  
      do {
--        tcg_gen_insn_start(dc->pc);
-+        tcg_gen_insn_start(dc->pc, num_insns != 0);
+-        tcg_gen_insn_start(dc->pc, num_insns != 0);
++        tcg_gen_insn_start(dc->pc, (dc->delayed_branch ? 1 : 0)
++			   | (num_insns ? 2 : 0));
          num_insns++;
  
          if (unlikely(cpu_breakpoint_test(cs, dc->pc, BP_ANY))) {
-@@ -1561,12 +1557,9 @@ void gen_intermediate_code(CPUOpenRISCState *env, struct TranslationBlock *tb)
-         if (num_insns == max_insns && (tb->cflags & CF_LAST_IO)) {
-             gen_io_start();
-         }
--        dc->ppc = dc->pc - 4;
--        dc->npc = dc->pc + 4;
--        tcg_gen_movi_tl(cpu_ppc, dc->ppc);
--        tcg_gen_movi_tl(cpu_npc, dc->npc);
-         disas_openrisc_insn(dc, cpu);
--        dc->pc = dc->npc;
-+        dc->pc = dc->pc + 4;
-+
-         /* delay slot */
+@@ -1564,8 +1553,6 @@ void gen_intermediate_code(CPUOpenRISCState *env, struct TranslationBlock *tb)
          if (dc->delayed_branch) {
              dc->delayed_branch--;
-@@ -1574,10 +1567,8 @@ void gen_intermediate_code(CPUOpenRISCState *env, struct TranslationBlock *tb)
-                 dc->tb_flags &= ~D_FLAG;
-                 gen_sync_flags(dc);
+             if (!dc->delayed_branch) {
+-                dc->tb_flags &= ~D_FLAG;
+-                gen_sync_flags(dc);
                  tcg_gen_mov_tl(cpu_pc, jmp_pc);
--                tcg_gen_mov_tl(cpu_npc, jmp_pc);
--                tcg_gen_movi_tl(jmp_pc, 0);
--                tcg_gen_exit_tb(0);
--                dc->is_jmp = DISAS_JUMP;
-+                tcg_gen_discard_tl(jmp_pc);
-+                dc->is_jmp = DISAS_UPDATE;
-                 break;
-             }
-         }
-@@ -1591,14 +1582,13 @@ void gen_intermediate_code(CPUOpenRISCState *env, struct TranslationBlock *tb)
-     if (tb->cflags & CF_LAST_IO) {
+                 tcg_gen_discard_tl(jmp_pc);
+                 dc->is_jmp = DISAS_UPDATE;
+@@ -1583,6 +1570,10 @@ void gen_intermediate_code(CPUOpenRISCState *env, struct TranslationBlock *tb)
          gen_io_end();
      }
+ 
++    if ((dc->tb_flags & TB_FLAGS_DFLAG ? 1 : 0) != (dc->delayed_branch != 0)) {
++        tcg_gen_movi_i32(cpu_dflag, dc->delayed_branch != 0);
++    }
 +
-+    tcg_gen_movi_tl(cpu_ppc, dc->pc - 4);
+     tcg_gen_movi_tl(cpu_ppc, dc->pc - 4);
      if (dc->is_jmp == DISAS_NEXT) {
          dc->is_jmp = DISAS_UPDATE;
-         tcg_gen_movi_tl(cpu_pc, dc->pc);
-     }
-     if (unlikely(cs->singlestep_enabled)) {
--        if (dc->is_jmp == DISAS_NEXT) {
--            tcg_gen_movi_tl(cpu_pc, dc->pc);
--        }
-         gen_exception(dc, EXCP_DEBUG);
-     } else {
-         switch (dc->is_jmp) {
-@@ -1651,4 +1641,7 @@ void restore_state_to_opc(CPUOpenRISCState *env, TranslationBlock *tb,
+@@ -1641,7 +1632,8 @@ void restore_state_to_opc(CPUOpenRISCState *env, TranslationBlock *tb,
                            target_ulong *data)
  {
      env->pc = data[0];
-+    if (data[1]) {
-+        env->ppc = env->pc - 4;
-+    }
+-    if (data[1]) {
++    env->dflag = data[1] & 1;
++    if (data[1] & 2) {
+         env->ppc = env->pc - 4;
+     }
  }
 -- 
 2.9.3
