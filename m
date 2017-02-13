@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51868)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cdHEk-0003xC-Th
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 09:04:16 -0500
+	(envelope-from <clg@kaod.org>) id 1cdHK9-0000Ip-3M
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 09:09:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cdHEg-0006do-TJ
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 09:04:14 -0500
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:35863)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cdHEg-0006dd-O8
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 09:04:10 -0500
-Received: by mail-wr0-x242.google.com with SMTP id k90so24218607wrc.3
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 06:04:10 -0800 (PST)
-Date: Mon, 13 Feb 2017 14:04:07 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170213140407.GF10361@stefanha-x1.localdomain>
-References: <20170204143245.15974-1-famz@redhat.com>
-	<20170207151455.GH8583@stefanha-x1.localdomain>
-	<982135c3-51c5-d6d4-d3f1-328ec766a07e@imgtec.com>
+	(envelope-from <clg@kaod.org>) id 1cdHK5-00089W-RU
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 09:09:49 -0500
+Received: from 10.mo4.mail-out.ovh.net ([188.165.33.109]:49541)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cdHK5-00089B-Kw
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 09:09:45 -0500
+Received: from player772.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 8810C48E90
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 15:09:43 +0100 (CET)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Mon, 13 Feb 2017 15:09:15 +0100
+Message-Id: <1486994957-20400-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="z0eOaCaDLjvTGF2l"
-Content-Disposition: inline
-In-Reply-To: <982135c3-51c5-d6d4-d3f1-328ec766a07e@imgtec.com>
-Subject: Re: [Qemu-devel] [PATCH] Makefile: Make "install" depend on
- "trace-events-all"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/2] ppc/xics: simplify ICS and ICP creation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,54 +27,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Doug Gilmore <Doug.Gilmore@imgtec.com>
-Cc: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
+Hello,
 
---z0eOaCaDLjvTGF2l
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This series moves the creation of the ICS and ICP objects from the
+XICS object to the sPAPR machine. This simplifies the code
+significantly and prepares ground for future changes on the XICS object.
 
-On Tue, Feb 07, 2017 at 02:25:31PM -0800, Doug Gilmore wrote:
-> On 02/07/2017 07:14 AM, Stefan Hajnoczi wrote:
-> > On Sat, Feb 04, 2017 at 10:32:45PM +0800, Fam Zheng wrote:
-> >> We install this file to data dir but since 0ab8ed18 it's no longer
-> >> required by any objects during "make". List it explicitly as a depended
-> >> target of install and fix the broken "make install" command.
-> >>
-> >> Signed-off-by: Fam Zheng <famz@redhat.com>
-> >> ---
-> >>  Makefile | 2 +-
-> >>  1 file changed, 1 insertion(+), 1 deletion(-)
-> >=20
-> > Thanks, applied to my tracing tree:
-> > https://github.com/stefanha/qemu/commits/tracing
-> >=20
-> > Stefan
-> >=20
-> Are there plans to commit this change?
->=20
-> AFAICS, ToT builds are broken without this change.
+The goal is to reduce XICS to a set of Interfaces of the machine
+providing accessors to the ICS and ICPs objects.=20
 
-Hi Doug,
-I've been mostly offline due to illness but am back now.  The pull
-request will be sent today.
+Thanks,
 
-Stefan
+C.
 
---z0eOaCaDLjvTGF2l
-Content-Type: application/pgp-signature; name="signature.asc"
+C=C3=A9dric Le Goater (2):
+  ppc/xics: remove set_nr_irqs() handler from XICSStateClass
+  ppc/xics: remove set_nr_servers() handler from XICSStateClass
 
------BEGIN PGP SIGNATURE-----
+ hw/intc/xics.c        | 78 ++++-----------------------------------------=
+------
+ hw/intc/xics_kvm.c    | 55 +-----------------------------------
+ hw/intc/xics_spapr.c  | 60 ---------------------------------------
+ hw/ppc/spapr.c        | 60 ++++++++++++++++++++++++++++++---------
+ include/hw/ppc/xics.h |  2 --
+ 5 files changed, 53 insertions(+), 202 deletions(-)
 
-iQEcBAEBAgAGBQJYobzXAAoJEJykq7OBq3PIM6MIAJIzEzX1F9CLW2FmNn49s+Rt
-ZQdXMOq9Uw3bFQjqpOF0hQwsz/cGb4CFDFzOhIsru0/mwKa/tm12HjJjgJPjZslu
-GEsZfN/Q8WwckvN+k2JbSEiuCGJWFKSZKvZj/PZRIh2qJZHFl48jaPZ5xwmDXg0L
-mlIFML7riaJW3YgZFOYkNw55JteDSoTw5IDWEoSAQpRH0wAbKTErurirJTziGh6O
-6ptzvwdKftcu3MlcwaALzWQoDzd9U4kThC63RNXNyJFBbFeTRm57Faorr4f//ppP
-RMxtHUIhbq3t9OMkqAxVGCVCb3k6+Vs8vegLlD1gNXAGwN8otGG6fgeWOLrTKYo=
-=L7kU
------END PGP SIGNATURE-----
-
---z0eOaCaDLjvTGF2l--
+--=20
+2.7.4
