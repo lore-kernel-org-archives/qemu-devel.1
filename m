@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cdDLZ-0002nA-6U
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cdDLZ-0002n4-4W
 	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 04:55:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cdDLW-0004LF-Cj
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cdDLW-0004LV-EH
 	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 04:55:01 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 13 Feb 2017 12:54:43 +0300
-Message-Id: <1486979689-230770-12-git-send-email-vsementsov@virtuozzo.com>
+Date: Mon, 13 Feb 2017 12:54:38 +0300
+Message-Id: <1486979689-230770-7-git-send-email-vsementsov@virtuozzo.com>
 In-Reply-To: <1486979689-230770-1-git-send-email-vsementsov@virtuozzo.com>
 References: <1486979689-230770-1-git-send-email-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 11/17] migration: add is_active_iterate handler
+Subject: [Qemu-devel] [PATCH 06/17] block: add
+ bdrv_dirty_bitmap_enable_successor()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,44 +23,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, vsementsov@virtuozzo.com, lirans@il.ibm.com
 
-Only-postcopy savevm states (dirty-bitmap) don't need live iteration, so
-to disable them and stop transporting empty sections there is a new
-savevm handler.
+Enabling bitmap successor is necessary to enable successors of bitmaps
+being migrated before target vm start.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- include/migration/vmstate.h | 1 +
- migration/savevm.c          | 5 +++++
+ block/dirty-bitmap.c         | 5 +++++
+ include/block/dirty-bitmap.h | 1 +
  2 files changed, 6 insertions(+)
 
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index 1047a29..a8add46 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -47,6 +47,7 @@ typedef struct SaveVMHandlers {
-     /* This runs both outside and inside the iothread lock.  */
-     bool (*is_active)(void *opaque);
-     bool (*has_postcopy)(void *opaque);
-+    bool (*is_active_iterate)(void *opaque);
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 7547c78..ab2c7f5 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -217,6 +217,11 @@ int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
+     return 0;
+ }
  
-     /* This runs outside the iothread lock in the migration case, and
-      * within the lock in the savevm case.  The callback had better only
-diff --git a/migration/savevm.c b/migration/savevm.c
-index b5c49bf..54572ef 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1046,6 +1046,11 @@ int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy)
-                 continue;
-             }
-         }
-+        if (se->ops && se->ops->is_active_iterate) {
-+            if (!se->ops->is_active_iterate(se->opaque)) {
-+                continue;
-+            }
-+        }
-         /*
-          * In the postcopy phase, any device that doesn't know how to
-          * do postcopy should have saved it's state in the _complete
++void bdrv_dirty_bitmap_enable_successor(BdrvDirtyBitmap *bitmap)
++{
++    bdrv_enable_dirty_bitmap(bitmap->successor);
++}
++
+ /**
+  * For a bitmap with a successor, yield our name to the successor,
+  * delete the old bitmap, and return a handle to the new bitmap.
+diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+index 1a457d5..57b476c 100644
+--- a/include/block/dirty-bitmap.h
++++ b/include/block/dirty-bitmap.h
+@@ -20,6 +20,7 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriverState *bs,
+ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BlockDriverState *bs,
+                                            BdrvDirtyBitmap *bitmap,
+                                            Error **errp);
++void bdrv_dirty_bitmap_enable_successor(BdrvDirtyBitmap *bitmap);
+ BdrvDirtyBitmap *bdrv_find_dirty_bitmap(BlockDriverState *bs,
+                                         const char *name);
+ void bdrv_dirty_bitmap_make_anon(BdrvDirtyBitmap *bitmap);
 -- 
 1.8.3.1
