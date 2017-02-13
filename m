@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59467)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cdKM6-0003Q4-0N
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:24:03 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cdKM7-0003SH-Qh
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:24:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cdKM3-0006Bq-AO
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:24:01 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cdKM6-0006DL-3g
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:24:03 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 13 Feb 2017 18:22:43 +0100
-Message-Id: <1487006583-24350-22-git-send-email-kwolf@redhat.com>
+Date: Mon, 13 Feb 2017 18:22:44 +0100
+Message-Id: <1487006583-24350-23-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
 References: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 21/41] blockjob: Add permissions to
- block_job_create()
+Subject: [Qemu-devel] [RFC PATCH 22/41] block: Add
+ BdrvChildRole.get_link_name()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,163 +23,102 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-This functions creates a BlockBackend internally, so the block jobs need
-to tell it what they want to do with the BB.
+For meaningful error messages in the permission system, we want to allow
+the parent of a BdrvChild to generate some kind of human-readable
+identifier for the link represented by the BdrvChild.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/backup.c               | 5 +++--
- block/commit.c               | 5 +++--
- block/mirror.c               | 5 +++--
- block/stream.c               | 5 +++--
- blockjob.c                   | 6 +++---
- include/block/blockjob_int.h | 4 +++-
- tests/test-blockjob-txn.c    | 6 +++---
- tests/test-blockjob.c        | 5 +++--
- 8 files changed, 24 insertions(+), 17 deletions(-)
+ block.c                   |  8 ++++++++
+ block/block-backend.c     | 20 ++++++++++++++++++++
+ include/block/block_int.h |  4 ++++
+ 3 files changed, 32 insertions(+)
 
-diff --git a/block/backup.c b/block/backup.c
-index 42e8e99..12ab25c 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -618,8 +618,9 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-         goto error;
-     }
+diff --git a/block.c b/block.c
+index fd06549..2116542 100644
+--- a/block.c
++++ b/block.c
+@@ -800,6 +800,13 @@ const BdrvChildRole child_format = {
+     .drained_end     = bdrv_child_cb_drained_end,
+ };
  
--    job = block_job_create(job_id, &backup_job_driver, bs, speed,
--                           creation_flags, cb, opaque, errp);
-+    /* FIXME Use real permissions */
-+    job = block_job_create(job_id, &backup_job_driver, bs, 0, BLK_PERM_ALL,
-+                           speed, creation_flags, cb, opaque, errp);
-     if (!job) {
-         goto error;
-     }
-diff --git a/block/commit.c b/block/commit.c
-index 2ad8138..60d29a9 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -235,8 +235,9 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-         return;
-     }
- 
--    s = block_job_create(job_id, &commit_job_driver, bs, speed,
--                         BLOCK_JOB_DEFAULT, NULL, NULL, errp);
-+    /* FIXME Use real permissions */
-+    s = block_job_create(job_id, &commit_job_driver, bs, 0, BLK_PERM_ALL,
-+                         speed, BLOCK_JOB_DEFAULT, NULL, NULL, errp);
-     if (!s) {
-         return;
-     }
-diff --git a/block/mirror.c b/block/mirror.c
-index 630e5ef..22680d7 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -983,8 +983,9 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
-         buf_size = DEFAULT_MIRROR_BUF_SIZE;
-     }
- 
--    s = block_job_create(job_id, driver, bs, speed, creation_flags,
--                         cb, opaque, errp);
-+    /* FIXME Use real permissions */
-+    s = block_job_create(job_id, driver, bs, 0, BLK_PERM_ALL, speed,
-+                         creation_flags, cb, opaque, errp);
-     if (!s) {
-         return;
-     }
-diff --git a/block/stream.c b/block/stream.c
-index 1523ba7..7f49279 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -229,8 +229,9 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-     BlockDriverState *iter;
-     int orig_bs_flags;
- 
--    s = block_job_create(job_id, &stream_job_driver, bs, speed,
--                         BLOCK_JOB_DEFAULT, NULL, NULL, errp);
-+    /* FIXME Use real permissions */
-+    s = block_job_create(job_id, &stream_job_driver, bs, 0, BLK_PERM_ALL,
-+                         speed, BLOCK_JOB_DEFAULT, NULL, NULL, errp);
-     if (!s) {
-         return;
-     }
-diff --git a/blockjob.c b/blockjob.c
-index 72b7d4c..27833c7 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -123,7 +123,8 @@ void block_job_add_bdrv(BlockJob *job, BlockDriverState *bs)
++static char *bdrv_backing_link_name(BdrvChild *c)
++{
++    BlockDriverState *parent = c->opaque;
++    return g_strdup_printf("backing file link from %s",
++                           bdrv_get_device_or_node_name(parent));
++}
++
+ /*
+  * Returns the options and flags that bs->backing should get, based on the
+  * given options and flags for the parent BDS
+@@ -825,6 +832,7 @@ static void bdrv_backing_options(int *child_flags, QDict *child_options,
  }
  
- void *block_job_create(const char *job_id, const BlockJobDriver *driver,
--                       BlockDriverState *bs, int64_t speed, int flags,
-+                       BlockDriverState *bs, uint64_t perm,
-+                       uint64_t shared_perm, int64_t speed, int flags,
-                        BlockCompletionFunc *cb, void *opaque, Error **errp)
+ static const BdrvChildRole child_backing = {
++    .get_link_name   = bdrv_backing_link_name,
+     .inherit_options = bdrv_backing_options,
+     .drained_begin   = bdrv_child_cb_drained_begin,
+     .drained_end     = bdrv_child_cb_drained_end,
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 0c23add..a314284 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -80,6 +80,7 @@ static const AIOCBInfo block_backend_aiocb_info = {
+ 
+ static void drive_info_del(DriveInfo *dinfo);
+ static BlockBackend *bdrv_first_blk(BlockDriverState *bs);
++static char *blk_get_attached_dev_id(BlockBackend *blk);
+ 
+ /* All BlockBackends */
+ static QTAILQ_HEAD(, BlockBackend) block_backends =
+@@ -102,6 +103,24 @@ static void blk_root_drained_end(BdrvChild *child);
+ static void blk_root_change_media(BdrvChild *child, bool load);
+ static void blk_root_resize(BdrvChild *child);
+ 
++static char *blk_root_get_link_name(BdrvChild *child)
++{
++    BlockBackend *blk = child->opaque;
++    char *dev_id;
++
++    if (blk->name) {
++        return g_strdup(blk->name);
++    }
++
++    dev_id = blk_get_attached_dev_id(blk);
++    if (*dev_id) {
++        return dev_id;
++    } else {
++        g_free(dev_id);
++        return g_strdup("a block device");
++    }
++}
++
+ static const char *blk_root_get_name(BdrvChild *child)
  {
-     BlockBackend *blk;
-@@ -160,8 +161,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-         }
-     }
+     return blk_name(child->opaque);
+@@ -113,6 +132,7 @@ static const BdrvChildRole child_root = {
+     .change_media       = blk_root_change_media,
+     .resize             = blk_root_resize,
+     .get_name           = blk_root_get_name,
++    .get_link_name      = blk_root_get_link_name,
  
--    /* FIXME Use real permissions */
--    blk = blk_new(0, BLK_PERM_ALL);
-+    blk = blk_new(perm, shared_perm);
-     ret = blk_insert_bs(blk, bs, errp);
-     if (ret < 0) {
-         blk_unref(blk);
-diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-index 8223822..3f86cc5 100644
---- a/include/block/blockjob_int.h
-+++ b/include/block/blockjob_int.h
-@@ -119,6 +119,7 @@ struct BlockJobDriver {
-  * generated automatically.
-  * @job_type: The class object for the newly-created job.
-  * @bs: The block
-+ * @perm, @shared_perm: Permissions to request for @bs
-  * @speed: The maximum speed, in bytes per second, or 0 for unlimited.
-  * @cb: Completion function for the job.
-  * @opaque: Opaque pointer value passed to @cb.
-@@ -134,7 +135,8 @@ struct BlockJobDriver {
-  * called from a wrapper that is specific to the job type.
-  */
- void *block_job_create(const char *job_id, const BlockJobDriver *driver,
--                       BlockDriverState *bs, int64_t speed, int flags,
-+                       BlockDriverState *bs, uint64_t perm,
-+                       uint64_t shared_perm, int64_t speed, int flags,
-                        BlockCompletionFunc *cb, void *opaque, Error **errp);
+     .drained_begin      = blk_root_drained_begin,
+     .drained_end        = blk_root_drained_end,
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 7558f99..a5557b1 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -438,6 +438,10 @@ struct BdrvChildRole {
+      * name), or NULL if the parent can't provide a better name. */
+     const char* (*get_name)(BdrvChild *child);
  
- /**
-diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
-index f6dfd08..4ccbda1 100644
---- a/tests/test-blockjob-txn.c
-+++ b/tests/test-blockjob-txn.c
-@@ -101,9 +101,9 @@ static BlockJob *test_block_job_start(unsigned int iterations,
-     g_assert_nonnull(bs);
- 
-     snprintf(job_id, sizeof(job_id), "job%u", counter++);
--    s = block_job_create(job_id, &test_block_job_driver, bs, 0,
--                         BLOCK_JOB_DEFAULT, test_block_job_cb,
--                         data, &error_abort);
-+    s = block_job_create(job_id, &test_block_job_driver, bs,
-+                         0, BLK_PERM_ALL, 0, BLOCK_JOB_DEFAULT,
-+                         test_block_job_cb, data, &error_abort);
-     s->iterations = iterations;
-     s->use_timer = use_timer;
-     s->rc = rc;
-diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
-index 143ce96..1afe17b 100644
---- a/tests/test-blockjob.c
-+++ b/tests/test-blockjob.c
-@@ -30,8 +30,9 @@ static BlockJob *do_test_id(BlockBackend *blk, const char *id,
-     BlockJob *job;
-     Error *errp = NULL;
- 
--    job = block_job_create(id, &test_block_job_driver, blk_bs(blk), 0,
--                           BLOCK_JOB_DEFAULT, block_job_cb, NULL, &errp);
-+    job = block_job_create(id, &test_block_job_driver, blk_bs(blk),
-+                           0, BLK_PERM_ALL, 0, BLOCK_JOB_DEFAULT, block_job_cb,
-+                           NULL, &errp);
-     if (should_succeed) {
-         g_assert_null(errp);
-         g_assert_nonnull(job);
++    /* Returns a malloced name that describes the link from the parent to the
++     * child. The caller is responsible for freeing the memory. */
++    char* (*get_link_name)(BdrvChild *child);
++
+     /*
+      * If this pair of functions is implemented, the parent doesn't issue new
+      * requests after returning from .drained_begin() until .drained_end() is
 -- 
 1.8.3.1
