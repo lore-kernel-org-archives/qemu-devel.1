@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46138)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cd7ya-0004Xa-UR
-	for qemu-devel@nongnu.org; Sun, 12 Feb 2017 23:10:58 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cd81s-00064X-Kr
+	for qemu-devel@nongnu.org; Sun, 12 Feb 2017 23:14:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cd7yX-0003t0-P2
-	for qemu-devel@nongnu.org; Sun, 12 Feb 2017 23:10:56 -0500
-Date: Mon, 13 Feb 2017 15:10:42 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170213041042.GS25381@umbus>
-References: <1486956627-11123-1-git-send-email-sjitindarsingh@gmail.com>
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cd81p-0004L4-Cx
+	for qemu-devel@nongnu.org; Sun, 12 Feb 2017 23:14:20 -0500
+Received: from szxga02-in.huawei.com ([119.145.14.65]:52514)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cd81o-0004KW-Gt
+	for qemu-devel@nongnu.org; Sun, 12 Feb 2017 23:14:17 -0500
+References: <1484657864-21708-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1484657864-21708-3-git-send-email-zhang.zhanghailiang@huawei.com>
+	<20170118110153.GA2085@work-vm> <589AFD8D.3090900@huawei.com>
+	<20170208195348.GN2341@work-vm>
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <58A13261.9020202@huawei.com>
+Date: Mon, 13 Feb 2017 12:13:21 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Cbvl/UgeRTPlujdB"
-Content-Disposition: inline
-In-Reply-To: <1486956627-11123-1-git-send-email-sjitindarsingh@gmail.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc: Stop parsing pvr
- list in H_CAS when exact match found
+In-Reply-To: <20170208195348.GN2341@work-vm>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/3] COLO: Shutdown related socket fd while
+ do failover
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,90 +30,220 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, agraf@suse.de
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: xuquan8@huawei.com, zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com, quintela@redhat.com, eddie.dong@intel.com, qemu-devel@nongnu.org, amit.shah@redhat.com
+
+On 2017/2/9 3:53, Dr. David Alan Gilbert wrote:
+> * Hailiang Zhang (zhang.zhanghailiang@huawei.com) wrote:
+>> On 2017/1/18 19:01, Dr. David Alan Gilbert wrote:
+>>> * zhanghailiang (zhang.zhanghailiang@huawei.com) wrote:
+>>>> If the net connection between primary host and secondary host breaks
+>>>> while COLO/COLO incoming threads are doing read() or write().
+>>>> It will block until connection is timeout, and the failover process
+>>>> will be blocked because of it.
+>>>>
+>>>> So it is necessary to shutdown all the socket fds used by COLO
+>>>> to avoid this situation. Besides, we should close the corresponding
+>>>> file descriptors after failvoer BH shutdown them,
+>>>> Or there will be an error.
+>>>
+>>> Hi,
+>>>     There are two parts to this patch:
+>>>      a) Add some semaphores to sequence failover
+>>>      b) Use shutdown()
+>>>
+>>>     At first I wondered if perhaps they should be split; but I see
+>>> the reason for the semaphores is mostly to stop the race between
+>>> the fd's getting closed and the shutdown() calls; so I think it's
+>>> OK.
+>>>
+>>
+>> Hi,
+>>
+>> Yes, you are right, maybe i should add some comments about that.
+>> Will do in next version.
+>>
+>>> Do you have any problems with these semaphores during powering off the
+>>> guest?
+>>>
+>>
+>> No, we didn't encounter any problems or trigger any bugs in our test
+>> with this semaphores. In what places do you doubt it may has problems ? :)
+>
+> I just wondered about other exit cases other than failover; e.g. what
+> if the guest shutdown or something like that, would it get stuck
+> waiting for the colo_incoming_sem.
+>
+
+Sorry for the late reply, too busy with our project these days ...
+
+Your worry makes sense, we have processed the shutdown case specially,
+Let qemu does a checkpoint process (It seems that, we should kick colo
+thread which might be waiting for colo_checkpoint_sem.) before exit colo therad.
+And for the secondary sides, if it receives shutdown request, it will exit
+colo incoming thread after some cleanup works.
 
 
---Cbvl/UgeRTPlujdB
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thanks.
+Hailiang
 
-On Mon, Feb 13, 2017 at 02:30:27PM +1100, Suraj Jitindar Singh wrote:
-> The pvr-list passed in H_Client_Architecture_Support is used to
-> communicate the supported pvrs of the client program. When an
-> exact match is found you are allowed to stop parsing the list and continue
-> the boot process.
->=20
-> Currently while explicit_match is set when we find an exact match, we sti=
-ll
-> set a compat mode based on best_compat irrespective of whether an exact
-> match was found or not. This is wrong since it means we can only ever run
-> in an architected state, not a raw state since we always set a compat mod=
-e.
-> We are basically ignoring the case were we find an exact match.
->=20
-> Fix the code to stop parsing the pvr list when an exact match is found.
-> This means that best_compat will always be zero in the case of an exact
-> match which means we will not set a compat mode an thus run in raw mode,
-> which is the desired functionality when we have an exact match.
->=20
-> Fixes: 152ef803ceb1 ("pseries: Rewrite CAS PVR compatibility logic")
->=20
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-Nack.  That change was deliberately intended to prefer compatibility
-modes, only ever using a "raw" mode if there's no matching
-compatibility mode.
-
-Using compatibility modes as often as possible makes migration across
-different host types substantially easier to handle and more likely to
-succeed.
-
->=20
-> ---
->  hw/ppc/spapr_hcall.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 590105a..215c385 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1028,6 +1028,7 @@ static target_ulong h_client_architecture_support(P=
-owerPCCPU *cpu,
-> =20
->          if ((cpu->env.spr[SPR_PVR] & pvr_mask) =3D=3D (pvr & pvr_mask)) {
->              explicit_match =3D true;
-> +            break;
->          } else {
->              if (ppc_check_compat(cpu, pvr, best_compat, max_compat)) {
->                  best_compat =3D pvr;
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---Cbvl/UgeRTPlujdB
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJYoTHCAAoJEGw4ysog2bOSSq0P/R3DBeB8B3NHYYW9ocvm1sjJ
-mItCfC0eN+uvyU3er7JzX44L1EoP5b/SWIyjT08fp6cND7+Jk3pKSKhMG6IGkiOb
-70CPGojLDjBJVTvOpx9Y9+BnoVbhzCuCjQI/entU8C29KQP5MJ2JdqrhfNio5f7f
-ZuZCCcwH5KNj9J5Oc3D+r0cGa+I0Y1yk/w+vD7dfJfroHzTqY2ur4zhoVxlbHPzN
-GrkLLXiMF2Iw2cqfHsracNj7/juYhIOwEK+dPf+9p4GbnLjv4dT04cMWUJ4l4ArQ
-t8RTYcpe9BmspCCgr/92laYXIJc3Sjo2zM/uPbSL+fqf7H/zVh6RhpSnroef5OwL
-cfL86C8gRJ/H+1m4EmLNHSnSJDWCbD528EkwP98VA31xYx5NrjUp5dmD62Asw+JV
-LmtrjS7CBNJxKgtc6Ly8SHlhThkaCQUBlDKdPenOVIAl2TqWb5bErmF+9FzA5PbC
-i46Zw7XWuf72VJKCCGG9RBtZEiRp7qtRylAPkFHROYudcUsKTPVBftfwBm9MO0dG
-L6eZ6IGXfdyFhf3dlU96Ti9iPveOxFuVFV5glyGWhraQbpvkQo9k4xlw0DL/9iYR
-MnJtKn8p7b8P6QRYnGey5XfPADC22xFe9PAaq7FPhJRGQPFmpbCmAl2roDQ7JIAd
-EN2yTHjoI2EQM/7kHqWV
-=/uDQ
------END PGP SIGNATURE-----
-
---Cbvl/UgeRTPlujdB--
+> Dave
+>
+>> Thanks,
+>> Hailiang
+>>
+>>> Dave
+>>>
+>>>
+>>>
+>>>
+>>>> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+>>>> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+>>>> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>>> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>>> ---
+>>>>    include/migration/migration.h |  3 +++
+>>>>    migration/colo.c              | 43 +++++++++++++++++++++++++++++++++++++++++++
+>>>>    2 files changed, 46 insertions(+)
+>>>>
+>>>> diff --git a/include/migration/migration.h b/include/migration/migration.h
+>>>> index 487ac1e..7cac877 100644
+>>>> --- a/include/migration/migration.h
+>>>> +++ b/include/migration/migration.h
+>>>> @@ -113,6 +113,7 @@ struct MigrationIncomingState {
+>>>>        QemuThread colo_incoming_thread;
+>>>>        /* The coroutine we should enter (back) after failover */
+>>>>        Coroutine *migration_incoming_co;
+>>>> +    QemuSemaphore colo_incoming_sem;
+>>>>
+>>>>        /* See savevm.c */
+>>>>        LoadStateEntry_Head loadvm_handlers;
+>>>> @@ -182,6 +183,8 @@ struct MigrationState
+>>>>        QSIMPLEQ_HEAD(src_page_requests, MigrationSrcPageRequest) src_page_requests;
+>>>>        /* The RAMBlock used in the last src_page_request */
+>>>>        RAMBlock *last_req_rb;
+>>>> +    /* The semaphore is used to notify COLO thread that failover is finished */
+>>>> +    QemuSemaphore colo_exit_sem;
+>>>>
+>>>>        /* The semaphore is used to notify COLO thread to do checkpoint */
+>>>>        QemuSemaphore colo_checkpoint_sem;
+>>>> diff --git a/migration/colo.c b/migration/colo.c
+>>>> index 08b2e46..3222812 100644
+>>>> --- a/migration/colo.c
+>>>> +++ b/migration/colo.c
+>>>> @@ -59,6 +59,18 @@ static void secondary_vm_do_failover(void)
+>>>>            /* recover runstate to normal migration finish state */
+>>>>            autostart = true;
+>>>>        }
+>>>> +    /*
+>>>> +     * Make sure COLO incoming thread not block in recv or send,
+>>>> +     * If mis->from_src_file and mis->to_src_file use the same fd,
+>>>> +     * The second shutdown() will return -1, we ignore this value,
+>>>> +     * It is harmless.
+>>>> +     */
+>>>> +    if (mis->from_src_file) {
+>>>> +        qemu_file_shutdown(mis->from_src_file);
+>>>> +    }
+>>>> +    if (mis->to_src_file) {
+>>>> +        qemu_file_shutdown(mis->to_src_file);
+>>>> +    }
+>>>>
+>>>>        old_state = failover_set_state(FAILOVER_STATUS_ACTIVE,
+>>>>                                       FAILOVER_STATUS_COMPLETED);
+>>>> @@ -67,6 +79,8 @@ static void secondary_vm_do_failover(void)
+>>>>                         "secondary VM", FailoverStatus_lookup[old_state]);
+>>>>            return;
+>>>>        }
+>>>> +    /* Notify COLO incoming thread that failover work is finished */
+>>>> +    qemu_sem_post(&mis->colo_incoming_sem);
+>>>>        /* For Secondary VM, jump to incoming co */
+>>>>        if (mis->migration_incoming_co) {
+>>>>            qemu_coroutine_enter(mis->migration_incoming_co);
+>>>> @@ -81,6 +95,18 @@ static void primary_vm_do_failover(void)
+>>>>        migrate_set_state(&s->state, MIGRATION_STATUS_COLO,
+>>>>                          MIGRATION_STATUS_COMPLETED);
+>>>>
+>>>> +    /*
+>>>> +     * Wake up COLO thread which may blocked in recv() or send(),
+>>>> +     * The s->rp_state.from_dst_file and s->to_dst_file may use the
+>>>> +     * same fd, but we still shutdown the fd for twice, it is harmless.
+>>>> +     */
+>>>> +    if (s->to_dst_file) {
+>>>> +        qemu_file_shutdown(s->to_dst_file);
+>>>> +    }
+>>>> +    if (s->rp_state.from_dst_file) {
+>>>> +        qemu_file_shutdown(s->rp_state.from_dst_file);
+>>>> +    }
+>>>> +
+>>>>        old_state = failover_set_state(FAILOVER_STATUS_ACTIVE,
+>>>>                                       FAILOVER_STATUS_COMPLETED);
+>>>>        if (old_state != FAILOVER_STATUS_ACTIVE) {
+>>>> @@ -88,6 +114,8 @@ static void primary_vm_do_failover(void)
+>>>>                         FailoverStatus_lookup[old_state]);
+>>>>            return;
+>>>>        }
+>>>> +    /* Notify COLO thread that failover work is finished */
+>>>> +    qemu_sem_post(&s->colo_exit_sem);
+>>>>    }
+>>>>
+>>>>    void colo_do_failover(MigrationState *s)
+>>>> @@ -361,6 +389,14 @@ out:
+>>>>
+>>>>        timer_del(s->colo_delay_timer);
+>>>>
+>>>> +    /* Hope this not to be too long to wait here */
+>>>> +    qemu_sem_wait(&s->colo_exit_sem);
+>>>> +    qemu_sem_destroy(&s->colo_exit_sem);
+>>>> +    /*
+>>>> +     * Must be called after failover BH is completed,
+>>>> +     * Or the failover BH may shutdown the wrong fd that
+>>>> +     * re-used by other threads after we release here.
+>>>> +     */
+>>>>        if (s->rp_state.from_dst_file) {
+>>>>            qemu_fclose(s->rp_state.from_dst_file);
+>>>>        }
+>>>> @@ -385,6 +421,7 @@ void migrate_start_colo_process(MigrationState *s)
+>>>>        s->colo_delay_timer =  timer_new_ms(QEMU_CLOCK_HOST,
+>>>>                                    colo_checkpoint_notify, s);
+>>>>
+>>>> +    qemu_sem_init(&s->colo_exit_sem, 0);
+>>>>        migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
+>>>>                          MIGRATION_STATUS_COLO);
+>>>>        colo_process_checkpoint(s);
+>>>> @@ -423,6 +460,8 @@ void *colo_process_incoming_thread(void *opaque)
+>>>>        uint64_t value;
+>>>>        Error *local_err = NULL;
+>>>>
+>>>> +    qemu_sem_init(&mis->colo_incoming_sem, 0);
+>>>> +
+>>>>        migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
+>>>>                          MIGRATION_STATUS_COLO);
+>>>>
+>>>> @@ -533,6 +572,10 @@ out:
+>>>>            qemu_fclose(fb);
+>>>>        }
+>>>>
+>>>> +    /* Hope this not to be too long to loop here */
+>>>> +    qemu_sem_wait(&mis->colo_incoming_sem);
+>>>> +    qemu_sem_destroy(&mis->colo_incoming_sem);
+>>>> +    /* Must be called after failover BH is completed */
+>>>>        if (mis->to_src_file) {
+>>>>            qemu_fclose(mis->to_src_file);
+>>>>        }
+>>>> --
+>>>> 1.8.3.1
+>>>>
+>>>>
+>>> --
+>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>>
+>>> .
+>>>
+>>
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+> .
+>
