@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52935)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cd8ov-0002lJ-5p
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 00:05:02 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cd8px-0003VD-Fo
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 00:06:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cd8or-0006R3-NR
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 00:05:01 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:60286)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cd8or-0006Py-Bn
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 00:04:57 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20170131115926.7132.9645.stgit@PASHA-ISP>
-In-Reply-To: <20170131115926.7132.9645.stgit@PASHA-ISP>
-Date: Mon, 13 Feb 2017 08:04:54 +0300
-Message-ID: <000e01d285b6$b7073290$251597b0$@ru>
+	(envelope-from <jasowang@redhat.com>) id 1cd8pu-0006gR-Ak
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 00:06:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37044)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cd8pu-0006fy-5I
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 00:06:02 -0500
+References: <1486693159-29029-1-git-send-email-liqiang6-s@360.cn>
+	<45B33FB3-E4F3-4BAD-974D-B914B234E97C@daynix.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <c82ec3f6-a7a2-931a-2ae5-8b38996213da@redhat.com>
+Date: Mon, 13 Feb 2017 13:05:53 +0800
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH] replay: add record/replay for audio
- passthrough
+In-Reply-To: <45B33FB3-E4F3-4BAD-974D-B914B234E97C@daynix.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] net: e1000e: fix an infinite loop issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,277 +27,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, kraxel@redhat.com
-
-Ping?
-
-Pavel Dovgalyuk
+To: Dmitry Fleytman <dmitry@daynix.com>, Li Qiang <liq3ea@gmail.com>
+Cc: qemu-devel@nongnu.org, Li Qiang <liqiang6-s@360.cn>
 
 
-> -----Original Message-----
-> From: Pavel Dovgalyuk [mailto:pavel.dovgaluk@ispras.ru]
-> Sent: Tuesday, January 31, 2017 2:59 PM
-> To: qemu-devel@nongnu.org
-> Cc: pbonzini@redhat.com; dovgaluk@ispras.ru; kraxel@redhat.com
-> Subject: [PATCH] replay: add record/replay for audio passthrough
-> 
-> This patch adds recording and replaying audio data. Is saves synchronization
-> information for audio out and inputs from the microphone.
-> 
-> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-> ---
->  audio/audio.c            |   11 +++++-
->  audio/audio.h            |    5 +++
->  audio/mixeng.c           |   31 ++++++++++++++++++
->  docs/replay.txt          |    7 ++++
->  include/sysemu/replay.h  |    7 ++++
->  replay/Makefile.objs     |    1 +
->  replay/replay-audio.c    |   79 ++++++++++++++++++++++++++++++++++++++++++++++
->  replay/replay-internal.h |    4 ++
->  8 files changed, 142 insertions(+), 3 deletions(-)
->  create mode 100644 replay/replay-audio.c
-> 
-> diff --git a/audio/audio.c b/audio/audio.c
-> index 1ee95a5..79c0788 100644
-> --- a/audio/audio.c
-> +++ b/audio/audio.c
-> @@ -28,6 +28,7 @@
->  #include "qemu/timer.h"
->  #include "sysemu/sysemu.h"
->  #include "qemu/cutils.h"
-> +#include "sysemu/replay.h"
-> 
->  #define AUDIO_CAP "audio"
->  #include "audio_int.h"
-> @@ -1113,7 +1114,7 @@ static void audio_reset_timer (AudioState *s)
->  {
->      if (audio_is_timer_needed ()) {
->          if (!timer_pending(s->ts)) {
-> -            timer_mod (s->ts,
-> +            timer_mod(s->ts,
->                  qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + conf.period.ticks);
->          }
->      }
-> @@ -1389,6 +1390,7 @@ static void audio_run_out (AudioState *s)
-> 
->          prev_rpos = hw->rpos;
->          played = hw->pcm_ops->run_out (hw, live);
-> +        replay_audio_out(&played);
->          if (audio_bug (AUDIO_FUNC, hw->rpos >= hw->samples)) {
->              dolog ("hw->rpos=%d hw->samples=%d played=%d\n",
->                     hw->rpos, hw->samples, played);
-> @@ -1452,9 +1454,12 @@ static void audio_run_in (AudioState *s)
-> 
->      while ((hw = audio_pcm_hw_find_any_enabled_in (hw))) {
->          SWVoiceIn *sw;
-> -        int captured, min;
-> +        int captured = 0, min;
-> 
-> -        captured = hw->pcm_ops->run_in (hw);
-> +        if (replay_mode != REPLAY_MODE_PLAY) {
-> +            captured = hw->pcm_ops->run_in(hw);
-> +        }
-> +        replay_audio_in(&captured, hw->conv_buf, &hw->wpos, hw->samples);
-> 
->          min = audio_pcm_hw_find_min_in (hw);
->          hw->total_samples_captured += captured - min;
-> diff --git a/audio/audio.h b/audio/audio.h
-> index c3c5198..f4339a1 100644
-> --- a/audio/audio.h
-> +++ b/audio/audio.h
-> @@ -166,4 +166,9 @@ int wav_start_capture (CaptureState *s, const char *path, int freq,
->  bool audio_is_cleaning_up(void);
->  void audio_cleanup(void);
-> 
-> +void audio_sample_to_uint64(void *samples, int pos,
-> +                            uint64_t *left, uint64_t *right);
-> +void audio_sample_from_uint64(void *samples, int pos,
-> +                            uint64_t left, uint64_t right);
-> +
->  #endif /* QEMU_AUDIO_H */
-> diff --git a/audio/mixeng.c b/audio/mixeng.c
-> index 66c0328..c23508e 100644
-> --- a/audio/mixeng.c
-> +++ b/audio/mixeng.c
-> @@ -267,6 +267,37 @@ f_sample *mixeng_clip[2][2][2][3] = {
->      }
->  };
-> 
-> +
-> +void audio_sample_to_uint64(void *samples, int pos,
-> +                            uint64_t *left, uint64_t *right)
-> +{
-> +    struct st_sample *sample = samples;
-> +    sample += pos;
-> +#ifdef FLOAT_MIXENG
-> +    error_report(
-> +        "Coreaudio and floating point samples are not supported by replay yet");
-> +    abort();
-> +#else
-> +    *left = sample->l;
-> +    *right = sample->r;
-> +#endif
-> +}
-> +
-> +void audio_sample_from_uint64(void *samples, int pos,
-> +                            uint64_t left, uint64_t right)
-> +{
-> +    struct st_sample *sample = samples;
-> +    sample += pos;
-> +#ifdef FLOAT_MIXENG
-> +    error_report(
-> +        "Coreaudio and floating point samples are not supported by replay yet");
-> +    abort();
-> +#else
-> +    sample->l = left;
-> +    sample->r = right;
-> +#endif
-> +}
-> +
->  /*
->   * August 21, 1998
->   * Copyright 1998 Fabrice Bellard.
-> diff --git a/docs/replay.txt b/docs/replay.txt
-> index 03e1931..486c1e0 100644
-> --- a/docs/replay.txt
-> +++ b/docs/replay.txt
-> @@ -225,3 +225,10 @@ recording the virtual machine this filter puts all packets coming from
->  the outer world into the log. In replay mode packets from the log are
->  injected into the network device. All interactions with network backend
->  in replay mode are disabled.
-> +
-> +Audio devices
-> +-------------
-> +
-> +Audio data is recorded and replay automatically. The command line for recording
-> +and replaying must contain identical specifications of audio hardware, e.g.:
-> + -soundhw ac97
-> diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-> index 7aad20b..f1c0712 100644
-> --- a/include/sysemu/replay.h
-> +++ b/include/sysemu/replay.h
-> @@ -152,6 +152,13 @@ void replay_unregister_net(ReplayNetState *rns);
->  void replay_net_packet_event(ReplayNetState *rns, unsigned flags,
->                               const struct iovec *iov, int iovcnt);
-> 
-> +/* Audio */
-> +
-> +/*! Saves/restores number of played samples of audio out operation. */
-> +void replay_audio_out(int *played);
-> +/*! Saves/restores recorded samples of audio in operation. */
-> +void replay_audio_in(int *recorded, void *samples, int *wpos, int size);
-> +
->  /* VM state operations */
-> 
->  /*! Called at the start of execution.
-> diff --git a/replay/Makefile.objs b/replay/Makefile.objs
-> index b2afd40..cee6539 100644
-> --- a/replay/Makefile.objs
-> +++ b/replay/Makefile.objs
-> @@ -6,3 +6,4 @@ common-obj-y += replay-input.o
->  common-obj-y += replay-char.o
->  common-obj-y += replay-snapshot.o
->  common-obj-y += replay-net.o
-> +common-obj-y += replay-audio.o
-> \ No newline at end of file
-> diff --git a/replay/replay-audio.c b/replay/replay-audio.c
-> new file mode 100644
-> index 0000000..3d83743
-> --- /dev/null
-> +++ b/replay/replay-audio.c
-> @@ -0,0 +1,79 @@
-> +/*
-> + * replay-audio.c
-> + *
-> + * Copyright (c) 2010-2017 Institute for System Programming
-> + *                         of the Russian Academy of Sciences.
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + *
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
-> +#include "sysemu/replay.h"
-> +#include "replay-internal.h"
-> +#include "sysemu/sysemu.h"
-> +#include "audio/audio.h"
-> +
-> +void replay_audio_out(int *played)
-> +{
-> +    if (replay_mode == REPLAY_MODE_RECORD) {
-> +        replay_save_instructions();
-> +        replay_mutex_lock();
-> +        replay_put_event(EVENT_AUDIO_OUT);
-> +        replay_put_dword(*played);
-> +        replay_mutex_unlock();
-> +    } else if (replay_mode == REPLAY_MODE_PLAY) {
-> +        replay_account_executed_instructions();
-> +        replay_mutex_lock();
-> +        if (replay_next_event_is(EVENT_AUDIO_OUT)) {
-> +            *played = replay_get_dword();
-> +            replay_finish_event();
-> +            replay_mutex_unlock();
-> +        } else {
-> +            replay_mutex_unlock();
-> +            error_report("Missing audio out event in the replay log");
-> +            abort();
-> +        }
-> +    }
-> +}
-> +
-> +void replay_audio_in(int *recorded, void *samples, int *wpos, int size)
-> +{
-> +    int pos;
-> +    uint64_t left, right;
-> +    if (replay_mode == REPLAY_MODE_RECORD) {
-> +        replay_save_instructions();
-> +        replay_mutex_lock();
-> +        replay_put_event(EVENT_AUDIO_IN);
-> +        replay_put_dword(*recorded);
-> +        replay_put_dword(*wpos);
-> +        for (pos = (*wpos - *recorded + size) % size ; pos != *wpos
-> +             ; pos = (pos + 1) % size) {
-> +            audio_sample_to_uint64(samples, pos, &left, &right);
-> +            replay_put_qword(left);
-> +            replay_put_qword(right);
-> +        }
-> +        replay_mutex_unlock();
-> +    } else if (replay_mode == REPLAY_MODE_PLAY) {
-> +        replay_account_executed_instructions();
-> +        replay_mutex_lock();
-> +        if (replay_next_event_is(EVENT_AUDIO_IN)) {
-> +            *recorded = replay_get_dword();
-> +            *wpos = replay_get_dword();
-> +            for (pos = (*wpos - *recorded + size) % size ; pos != *wpos
-> +                 ; pos = (pos + 1) % size) {
-> +                left = replay_get_qword();
-> +                right = replay_get_qword();
-> +                audio_sample_from_uint64(samples, pos, left, right);
-> +            }
-> +            replay_finish_event();
-> +            replay_mutex_unlock();
-> +        } else {
-> +            replay_mutex_unlock();
-> +            error_report("Missing audio in event in the replay log");
-> +            abort();
-> +        }
-> +    }
-> +}
-> diff --git a/replay/replay-internal.h b/replay/replay-internal.h
-> index c26d079..ed66ed8 100644
-> --- a/replay/replay-internal.h
-> +++ b/replay/replay-internal.h
-> @@ -29,6 +29,10 @@ enum ReplayEvents {
->      /* for character device read all event */
->      EVENT_CHAR_READ_ALL,
->      EVENT_CHAR_READ_ALL_ERROR,
-> +    /* for audio out event */
-> +    EVENT_AUDIO_OUT,
-> +    /* for audio in event */
-> +    EVENT_AUDIO_IN,
->      /* for clock read/writes */
->      /* some of greater codes are reserved for clocks */
->      EVENT_CLOCK,
+
+On 2017=E5=B9=B402=E6=9C=8812=E6=97=A5 19:38, Dmitry Fleytman wrote:
+> Reviewed-by: Dmitry Fleytman <dmitry@daynix.com=20
+> <mailto:dmitry@daynix.com>>
+>
+
+Applied.
+
+Thanks
+
+>> On 10 Feb 2017, at 04:19 AM, Li Qiang <liq3ea@gmail.com=20
+>> <mailto:liq3ea@gmail.com>> wrote:
+>>
+>> This issue is like the issue in e1000 network card addressed in
+>> this commit:
+>> e1000: eliminate infinite loops on out-of-bounds transfer start.
+>>
+>> Signed-off-by: Li Qiang <liqiang6-s@360.cn <mailto:liqiang6-s@360.cn>>
+>> ---
+>>
+>> Change since v2:
+>> fix error in e1000e_ring_empty
+>> eliminate unnecessory detect code in loop
+>>
+>> Changes since v1:
+>> make wraparound detect in e1000e_ring_empty
+>>
+>> hw/net/e1000e_core.c | 7 ++++++-
+>> 1 file changed, 6 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+>> index 2b11499..dc94188 100644
+>> --- a/hw/net/e1000e_core.c
+>> +++ b/hw/net/e1000e_core.c
+>> @@ -806,7 +806,8 @@ typedef struct E1000E_RingInfo_st {
+>> static inline bool
+>> e1000e_ring_empty(E1000ECore *core, const E1000E_RingInfo *r)
+>> {
+>> -    return core->mac[r->dh] =3D=3D core->mac[r->dt];
+>> +    return core->mac[r->dh] =3D=3D core->mac[r->dt] ||
+>> +                core->mac[r->dt] >=3D core->mac[r->dlen] /=20
+>> E1000_RING_DESC_LEN;
+>> }
+>>
+>> static inline uint64_t
+>> @@ -1522,6 +1523,10 @@ e1000e_write_packet_to_guest(E1000ECore *core,=20
+>> struct NetRxPkt *pkt,
+>>             desc_size =3D core->rx_desc_buf_size;
+>>         }
+>>
+>> +        if (e1000e_ring_empty(core, rxi)) {
+>> +            return;
+>> +        }
+>> +
+>>         base =3D e1000e_ring_head_descr(core, rxi);
+>>
+>>         pci_dma_read(d, base, &desc, core->rx_desc_len);
+>> --=20
+>> 1.8.3.1
+>>
+>
