@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60565)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cdHcJ-0008Hp-R0
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 09:28:37 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cdHcK-0008Hq-7w
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 09:28:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cdHcI-0005IY-Nx
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 09:28:35 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cdHcI-0005Id-Ov
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 09:28:36 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 13 Feb 2017 14:28:15 +0000
-Message-Id: <1486996099-15820-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 0/4] cpu: Implement cpu_generic_new()
+Date: Mon, 13 Feb 2017 14:28:16 +0000
+Message-Id: <1486996099-15820-2-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1486996099-15820-1-git-send-email-peter.maydell@linaro.org>
+References: <1486996099-15820-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 1/4] cpu: add cpu_generic_new()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,53 +22,112 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Eduardo Habkost <ehabkost@redhat.com>
 
-This patchset adds a new function cpu_generic_new()
-which is similar to cpu_generic_init() except that it
-does not realize the created CPU object. This means that
-board code can do a "new cpu; set QOM properties; realize"
-sequence without having to do all the work of splitting
-the CPU model string and calling parse_features by hand.
+From: Michael Davidsaver <mdavidsaver@gmail.com>
 
-Patch 2 clarifies a TODO comment, hopefully correctly,
-based on an email conversation I had with Eduardo a
-little while back.
+Add a new API cpu_generic_new() which creates a QOM CPU object
+(including calling the CPU class parse_features method) but
+does not realize it, and reimplement cpu_generic_init() to
+simply call cpu_generic_new() and then immediately realize.
+the CPU.
 
-Patches 3 and 4 change the ARM boards which currently
-call parse_features by hand to use the new function.
+The motivation for this is that there is currently no
+way for board code to take advantage of the cpu_generic_init()
+convenience function if it needs to set QOM properties
+on the created CPU. Instead it has to do it all manually, which
+is prone to bugs like that fixed in commit 00909b585861 (where
+a board code forgot to call parse_features which meant that
+command line +feature,-feature flags were ignored).
 
+Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+[PMM: renamed new function to cpu_generic_new(), rewrote
+ commit message]
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ include/qom/cpu.h | 17 +++++++++++++++++
+ qom/cpu.c         | 27 ++++++++++++++++++---------
+ 2 files changed, 35 insertions(+), 9 deletions(-)
 
-If there's consensus that this is the right general
-direction to go in, then I think that some other
-architectures could also make cleanups to use this:
- * cpu_s390x_create() is almost exactly this function,
-   give or take some fine detail of error handling
- * ppc_cpu_parse_features is almost the same thing,
-   except that it doesn't actually create the CPU object,
-   it only calls parse_features
- * hw/i386/pc.c does a manual parse_features
-
-I'm not strongly attached to this particular approach
-(though it seems like a reasonable one, especially given
-the proliferation of different arch-specific helpers
-listed above and the bugs in boards which don't call
-parse_features when they should), but I would like us to
-figure out and document what the right way for a board
-to create and configure its CPU objects is...
-
-
-Michael Davidsaver (1):
-  cpu: add cpu_generic_new()
-
-Peter Maydell (3):
-  cpu: Clarify TODO comment in cpu_generic_new()
-  hw/arm/integrator: Use new cpu_generic_new()
-  hw/arm/virt: Use new cpu_generic_new()
-
- include/qom/cpu.h     | 17 +++++++++++++++++
- hw/arm/integratorcp.c | 22 ++--------------------
- hw/arm/virt.c         | 24 ++----------------------
- qom/cpu.c             | 37 ++++++++++++++++++++++++++-----------
- 4 files changed, 47 insertions(+), 53 deletions(-)
-
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 45bcf21..e900586 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -599,11 +599,28 @@ void cpu_reset(CPUState *cpu);
+ ObjectClass *cpu_class_by_name(const char *typename, const char *cpu_model);
+ 
+ /**
++ * cpu_generic_new:
++ * @typename: The CPU base type.
++ * @cpu_model: The model string including optional parameters.
++ *
++ * Instantiates a CPU, processes optional parameters but does not realize it.
++ * This is the recommended way to create a CPU object which needs to be
++ * configured by then setting QOM properties on it. The configured CPU can
++ * then be realized in the usual way by calling
++ *    object_property_set_bool(cpuobj, true, "realized", &err);
++ *
++ * Returns: A #CPUState or %NULL if an error occurred.
++ */
++CPUState *cpu_generic_new(const char *typename, const char *cpu_model);
++
++/**
+  * cpu_generic_init:
+  * @typename: The CPU base type.
+  * @cpu_model: The model string including optional parameters.
+  *
+  * Instantiates a CPU, processes optional parameters and realizes the CPU.
++ * This is equivalent to calling cpu_generic_new() and then immediately
++ * realizing the CPU object.
+  *
+  * Returns: A #CPUState or %NULL if an error occurred.
+  */
+diff --git a/qom/cpu.c b/qom/cpu.c
+index 0e19b1a..a783aec 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -47,6 +47,22 @@ bool cpu_exists(int64_t id)
+ 
+ CPUState *cpu_generic_init(const char *typename, const char *cpu_model)
+ {
++    CPUState *cpu = cpu_generic_new(typename, cpu_model);
++    if (cpu) {
++        Error *err = NULL;
++        object_property_set_bool(OBJECT(cpu), true, "realized", &err);
++
++        if (err != NULL) {
++            error_report_err(err);
++            object_unref(OBJECT(cpu));
++            return NULL;
++        }
++    }
++    return cpu;
++}
++
++CPUState *cpu_generic_new(const char *typename, const char *cpu_model)
++{
+     char *str, *name, *featurestr;
+     CPUState *cpu = NULL;
+     ObjectClass *oc;
+@@ -70,19 +86,12 @@ CPUState *cpu_generic_init(const char *typename, const char *cpu_model)
+     cc->parse_features(object_class_get_name(oc), featurestr, &err);
+     g_free(str);
+     if (err != NULL) {
+-        goto out;
+-    }
+-
+-    cpu = CPU(object_new(object_class_get_name(oc)));
+-    object_property_set_bool(OBJECT(cpu), true, "realized", &err);
+-
+-out:
+-    if (err != NULL) {
+         error_report_err(err);
+-        object_unref(OBJECT(cpu));
+         return NULL;
+     }
+ 
++    cpu = CPU(object_new(object_class_get_name(oc)));
++
+     return cpu;
+ }
+ 
 -- 
 2.7.4
