@@ -1,46 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37983)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41515)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cdCUg-0006Ae-4L
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 04:00:23 -0500
+	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1cdClW-0004iO-Cj
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 04:17:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cdCUa-00070k-83
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 04:00:22 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45773)
+	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1cdClT-0003Ab-8h
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 04:17:46 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46890)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cdCUZ-000704-Ub
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 04:00:16 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <haoqf@linux.vnet.ibm.com>)
+	id 1cdClS-0003AK-VN
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 04:17:43 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1D8rvjb024888
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 04:00:14 -0500
-Received: from e23smtp06.au.ibm.com (e23smtp06.au.ibm.com [202.81.31.148])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28hxta7pbm-1
+	v1D9DkuZ004253
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 04:17:40 -0500
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28k7ja5kwc-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 04:00:14 -0500
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 04:17:40 -0500
 Received: from localhost
-	by e23smtp06.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Mon, 13 Feb 2017 19:00:10 +1000
-Received: from d23relay09.au.ibm.com (d23relay09.au.ibm.com [9.185.63.181])
-	by d23dlp01.au.ibm.com (Postfix) with ESMTP id 684BD2CE8054
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 20:00:09 +1100 (EST)
-Received: from d23av05.au.ibm.com (d23av05.au.ibm.com [9.190.234.119])
-	by d23relay09.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	v1D901c521627120
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 20:00:09 +1100
-Received: from d23av05.au.ibm.com (localhost [127.0.0.1])
-	by d23av05.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
-	v1D8xaPa016457
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 19:59:37 +1100
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Date: Mon, 13 Feb 2017 14:29:12 +0530
-In-Reply-To: <1486976352-549-1-git-send-email-nikunj@linux.vnet.ibm.com>
-References: <1486976352-549-1-git-send-email-nikunj@linux.vnet.ibm.com>
-Message-Id: <1486976352-549-2-git-send-email-nikunj@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 2/2] risu_ppc64le: distinguish real illegal
- instruction
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <haoqf@linux.vnet.ibm.com>;
+	Mon, 13 Feb 2017 02:17:39 -0700
+References: <20161216052040.53067-1-haoqf@linux.vnet.ibm.com>
+	<20161216052040.53067-2-haoqf@linux.vnet.ibm.com>
+	<be77cb51-c3ad-d7a0-9c85-cb7aeaed31b0@redhat.com>
+From: Hao QingFeng <haoqf@linux.vnet.ibm.com>
+Date: Mon, 13 Feb 2017 17:17:32 +0800
+MIME-Version: 1.0
+In-Reply-To: <be77cb51-c3ad-d7a0-9c85-cb7aeaed31b0@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Message-Id: <54271058-3366-fbe0-d314-3b6d1b0030ad@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 1/1] block/vmdk: Fix the
+ endian problem of buf_len and lba
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,62 +43,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, joserz@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-stable@nongnu.org, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com
 
-While executing qemu_ppc64le, found an issue that the real illegal
-instructions are handled as risu_op which results in wrong info at the
-master end. Even the master needs to distinguish real illegal
-instructions versus risu_op.
 
-Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
----
- risu_ppc64le.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/risu_ppc64le.c b/risu_ppc64le.c
-index 9c1fafd..54a9bcb 100644
---- a/risu_ppc64le.c
-+++ b/risu_ppc64le.c
-@@ -55,7 +55,6 @@ int send_register_info(int sock, void *uc)
-     switch (op) {
-     case OP_COMPARE:
-     case OP_TESTEND:
--    default:
-         return send_data_pkt(sock, &ri, sizeof(ri));
-     case OP_SETMEMBLOCK:
-         memblock = (void*)ri.gregs[0];
-@@ -66,6 +65,11 @@ int send_register_info(int sock, void *uc)
-     case OP_COMPAREMEM:
-         return send_data_pkt(sock, memblock, MEMBLOCKLEN);
-         break;
-+    default:
-+      fprintf(stderr, "apprentice: Unhandled instruction\n");
-+      fprintf(stderr, "  faulting insn        0x%x\n", ri.faulting_insn);
-+      fprintf(stderr, "  insn addr            0x%" PRIx64 "\n\n", ri.nip);
-+      return -1;
-     }
-     return 0;
- }
-@@ -85,7 +89,6 @@ int recv_and_compare_register_info(int sock, void *uc)
-     switch (op) {
-     case OP_COMPARE:
-     case OP_TESTEND:
--    default:
-         if (recv_data_pkt(sock, &apprentice_ri, sizeof(apprentice_ri))) {
-             packet_mismatch = 1;
-             resp = 2;
-@@ -113,6 +116,11 @@ int recv_and_compare_register_info(int sock, void *uc)
-         }
-         send_response_byte(sock, resp);
-         break;
-+    default:
-+      fprintf(stderr, "master: Unhandled instruction\n");
-+      fprintf(stderr, "  faulting insn    0x%x\n", master_ri.faulting_insn);
-+      fprintf(stderr, "  insn addr        0x%" PRIx64 "\n\n", master_ri.nip);
-+      return -1;
-     }
-     return resp;
- }
--- 
-2.7.4
+=E5=9C=A8 2017-01-26 0:25, Max Reitz =E5=86=99=E9=81=93:
+> On 16.12.2016 06:20, QingFeng Hao wrote:
+>> The problem was triggered by qemu-iotests case 055. It failed when it
+>> was comparing the compressed vmdk image with original test.img.
+>>
+>> The cause is that buf_len in vmdk_write_extent wasn't converted to
+>> little-endian before it was stored to disk. But later vmdk_read_extent
+>> read it and converted it from little-endian to cpu endian.
+>> If the cpu is big-endian like s390, the problem will happen and
+>> the data length read by vmdk_read_extent will become invalid!
+>> The fix is to add the conversion in vmdk_write_extent, meanwhile,
+>> repair the endianness problem of lba field which shall also be convert=
+ed
+>> to little-endian before storing to disk.
+>>
+>> Cc: qemu-stable@nongnu.org
+>> Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+>> Signed-off-by: Jing Liu <liujbjl@linux.vnet.ibm.com>
+>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>> Reviewed-by: Fam Zheng <famz@redhat.com>
+>> ---
+>>   block/vmdk.c | 4 ++--
+>>   1 file changed, 2 insertions(+), 2 deletions(-)
+> Thanks, I've applied the patch to my block tree:
+>
+> https://github.com/XanClic/qemu/commits/block
+Thanks Max!
+>
+> Max
+>
+
+--=20
+QingFeng Hao(Robin)
