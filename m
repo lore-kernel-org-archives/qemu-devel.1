@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cdGox-0002Zw-9A
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 08:37:39 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cdGrU-0003xr-Ua
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 08:40:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cdGot-0000DE-2D
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 08:37:35 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:34738)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cdGos-0000Cp-S5
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 08:37:30 -0500
-Received: by mail-wm0-x241.google.com with SMTP id c85so19564079wmi.1
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 05:37:29 -0800 (PST)
-Date: Mon, 13 Feb 2017 13:37:25 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170213133725.GA10361@stefanha-x1.localdomain>
-References: <1478566785-4002-1-git-send-email-ashish.mittal@veritas.com>
-	<1478566785-4002-3-git-send-email-ashish.mittal@veritas.com>
-	<20161108204413.GA6353@localhost.localdomain>
-	<CAAo6VWMyTjV1Fn8-BSex7Fx8OcEcuEyK2rQJ6L=wZZXDiB5A4w@mail.gmail.com>
+	(envelope-from <imammedo@redhat.com>) id 1cdGrQ-0000qs-Gc
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 08:40:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53386)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cdGrQ-0000pb-8J
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 08:40:08 -0500
+Date: Mon, 13 Feb 2017 14:40:02 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170213144002.65b8f81d@nial.brq.redhat.com>
+In-Reply-To: <20170213145827-mutt-send-email-mst@kernel.org>
+References: <cover.1486285434.git.ben@skyportsystems.com>
+	<88aaebda-29dd-a77a-1b78-7d0d6f911a76@redhat.com>
+	<20170210172107-mutt-send-email-mst@kernel.org>
+	<20170210171659.111aedda@nial.brq.redhat.com>
+	<20170210181852.zp6sg2d4k2p3xhbd@hawk.localdomain>
+	<d902a6b9-4a46-9010-b597-5e98388d10f4@suse.de>
+	<20170213120036.7712fccb@nial.brq.redhat.com>
+	<20170213145827-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="UugvWAfsgieZRqgk"
-Content-Disposition: inline
-In-Reply-To: <CAAo6VWMyTjV1Fn8-BSex7Fx8OcEcuEyK2rQJ6L=wZZXDiB5A4w@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v6 2/2] block/vxhs.c: Add qemu-iotests for
- new block device type "vxhs"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 00/10] Add support for VM Generation ID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,75 +33,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ashish mittal <ashmit602@gmail.com>
-Cc: Jeff Cody <jcody@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <ashish.mittal@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, ben@skyportsystems.com, qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>, Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>, Paolo Bonzini <pbonzini@redhat.com>
 
+On Mon, 13 Feb 2017 15:00:22 +0200
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
---UugvWAfsgieZRqgk
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Mon, Feb 13, 2017 at 12:00:36PM +0100, Igor Mammedov wrote:
+> > On Fri, 10 Feb 2017 19:27:21 +0100
+> > Andreas F=C3=A4rber <afaerber@suse.de> wrote:
+> >  =20
+> > > Am 10.02.2017 um 19:18 schrieb Andrew Jones: =20
+> > > > On Fri, Feb 10, 2017 at 05:16:59PM +0100, Igor Mammedov wrote:   =20
+> > > >> On Fri, 10 Feb 2017 17:31:33 +0200
+> > > >> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > >>   =20
+> > > >>> On Fri, Feb 10, 2017 at 11:12:13AM +0100, Laszlo Ersek wrote:   =
+=20
+> > > >>>> On 02/05/17 10:11, ben@skyportsystems.com wrote:     =20
+> > > >>>>> From: Ben Warren <ben@skyportsystems.com>   =20
+> > > >> [...]
+> > > >>   =20
+> > > >>>>
+> > > >>>> - or else, add another boolean property to vmgenid, one that par=
+allels
+> > > >>>> "dma-enabled" of "fw-cfg" precisely, in HW_COMPAT*. Then simply =
+fail
+> > > >>>> realize() when this property is false.     =20
+> > > >>>
+> > > >>> That's probably the easiest way. x-fw-cfg-dma-enabled.
+> > > >>> Won't delay merging because of this, can be done with
+> > > >>> patch on top.   =20
+> > > >> (not related to this series)
+> > > >>
+> > > >> I've thought that there still were no consensus on x-foo prefix,
+> > > >> not to mention that x- might be legitimate prefix for some propert=
+ies.
+*1
 
-On Tue, Feb 07, 2017 at 03:12:36PM -0800, ashish mittal wrote:
-> On Tue, Nov 8, 2016 at 12:44 PM, Jeff Cody <jcody@redhat.com> wrote:
-> > On Mon, Nov 07, 2016 at 04:59:45PM -0800, Ashish Mittal wrote:
-> >> These changes use a vxhs test server that is a part of the following
-> >> repository:
-> >> https://github.com/MittalAshish/libqnio.git
-> >>
-> >> Signed-off-by: Ashish Mittal <ashish.mittal@veritas.com>
-> >> ---
-> >> v6 changelog:
-> >> (1) Added iotests for VxHS block device.
-> >>
-> >>  tests/qemu-iotests/common        |  6 ++++++
-> >>  tests/qemu-iotests/common.config | 13 +++++++++++++
-> >>  tests/qemu-iotests/common.filter |  1 +
-> >>  tests/qemu-iotests/common.rc     | 19 +++++++++++++++++++
-> >>  4 files changed, 39 insertions(+)
-> >>
-> >> diff --git a/tests/qemu-iotests/common b/tests/qemu-iotests/common
-> >> index d60ea2c..41430d8 100644
-> >> --- a/tests/qemu-iotests/common
-> >> +++ b/tests/qemu-iotests/common
-> >
-> > When using raw format, I was able to run the test successfully for all
-> > supported test cases (26 of them).
-> >
-> > With qcow2, they fail - but not the fault of this patch, I think; but
-> > rather, the fault of the test server.  Can qnio_server be modified so t=
-hat
-> > it does not work on just raw files?
-> >
-> >
+> > > >>
+> > > >> Maybe we should add a flag to property like INTERNAL_PROPERTY
+> > > >> and then set it explicitly on for internal stuff.
+> > > >>
+> > > >> That way we could cleanly exclude internal properties from
+> > > >>  -device foo,help and make sure that user won't set them from CLI.
+> > > >> I'd even volunteer to add this API to Object   =20
+> > > >=20
+> > > > Yes, please. I know of a property or two where it would be nice to
+> > > > have that flag.   =20
+> > >=20
+> > > Apart from documentation, what effect would such a flag have?
+> > >=20
+> > > With QOM I don't really see "internal" as being a thing: Besides -dev=
+ice
+> > > and the likes, we expose qom-set operation and -global option, and I
+> > > don't think it makes sense to restrict the latter two. For -device,
+> > > "realized" is a property I would classify as non-user maybe. =20
+> > I'd propose to start with this flag hiding/forbiding usage of
+> > property in following interfaces:
+> >=20
+> >   * -device
+> >   * -device foo,help
+> >   * device_add
+> >=20
+> > With docs mentioning that usage of hidden properties with
+> >  -globals/qom-set isn't recommended. =20
 >=20
-> VxHS supports and uses only the raw format.
+> I'm not sure I agree. These properties can be useful e.g. for debugging,
+> the only issue is we don't guarantee to support them across QEMU
+> releases. If you won't want something exposed to users, don't make it a
+> property at all.
+Property approach is cleaner especially in cases where
+it's used to tie together generic with target-specific code
++ automatically makes feature introspect-able via qom-get
+(I've used it for debugging to poke into object properties
+without need for gdb).
+Replacing property with direct function call makes one
+to create stubs (I've seen Paolo working on removing stubs)
+for targets that do not implement it or uglifying headers with
+target specific ifdefs.
 
-That's like saying only ext4 guest file systems are supported on VxHS
-and not ZFS.  The VxHS driver should not care what file system is used,
-it just does block I/O without interpreting the data.
+> Producing a warning when a property starting with x- is set
+> might not be a bad idea.
+I don't like x- prefix for above [1] and
+we already have a bunch of properties that shouldn't be
+user settable that makes x- convention inconsistent.
+so how about following:
+   * -device foo,help:
+       * hide non user flagged properties or
+       *less preferable mark them as non stable/supportable
+   * issue warning in case such property is used
+     with -device/device_add
+   * since it's warning we could probably put it in -globals as well
+     so user would notice probable misuse
+ =20
 
-It must be possible to use any format on top of the VxHS protocol.
-After all, the image format drivers just do block I/O.  If there is a
-case where qcow2 on VxHS fails then it needs to be investigated.
-
-The VxHS driver can't be merged until we at least understand the cause
-of the qcow2 test failures.
-
-Stefan
-
---UugvWAfsgieZRqgk
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYobaVAAoJEJykq7OBq3PIlxAH/RC2KfapNrIuBxpz+i6yVKBB
-jSkkZInfqRZWaO8mF/QLx8+bXddsdOXZ+AlfOLeaEQM8+D0WWsbfpYjeExzrUX7z
-F/SyOiwPJyUDlCBV/3ck20AfrtPhOtwyqX1OXxb1ddYhs5BM2+4DoOxH7MPG2+fB
-pwpuRzgVUkKHLy2d6WRYV3NFbR/vDonnI4WAp2995djch9gNz8IEczHtRzDIiMM1
-s7gN0qjSeKUXXVSAr9VINMq+oaave/P3TNINFFOzjZnPqsCjbyModbQqfGJZ7lbH
-IdHIfDfirZjUg6HI+TZTzQH4eMTwzWYEhAtTldf8037zqIvhy7KOAwkHgHsK+uM=
-=02C6
------END PGP SIGNATURE-----
-
---UugvWAfsgieZRqgk--
+> > >=20
+> > > Regards,
+> > > Andreas
+> > >  =20
+>=20
