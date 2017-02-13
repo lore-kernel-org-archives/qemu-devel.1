@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <juro.bystricky@intel.com>) id 1cd4wl-0006qR-4F
-	for qemu-devel@nongnu.org; Sun, 12 Feb 2017 19:56:53 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cd6Jr-0004QL-2H
+	for qemu-devel@nongnu.org; Sun, 12 Feb 2017 21:24:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <juro.bystricky@intel.com>) id 1cd4wh-0008O3-5h
-	for qemu-devel@nongnu.org; Sun, 12 Feb 2017 19:56:51 -0500
-Received: from mga14.intel.com ([192.55.52.115]:45164)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <juro.bystricky@intel.com>)
-	id 1cd4wg-0008Nv-PH
-	for qemu-devel@nongnu.org; Sun, 12 Feb 2017 19:56:47 -0500
-From: Juro Bystricky <juro.bystricky@intel.com>
-Date: Sun, 12 Feb 2017 16:56:43 -0800
-Message-Id: <1486947403-22548-1-git-send-email-juro.bystricky@intel.com>
-Subject: [Qemu-devel] [PATCH v6] nios2: Add Altera JTAG UART emulation
+	(envelope-from <dgibson@ozlabs.org>) id 1cd6Jp-0007v8-Pc
+	for qemu-devel@nongnu.org; Sun, 12 Feb 2017 21:24:47 -0500
+Date: Mon, 13 Feb 2017 12:59:53 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170213015953.GO25381@umbus>
+References: <1486704360-27361-1-git-send-email-sjitindarsingh@gmail.com>
+	<1486704360-27361-3-git-send-email-sjitindarsingh@gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="iEWWOZ/QYGWEaBRW"
+Content-Disposition: inline
+In-Reply-To: <1486704360-27361-3-git-send-email-sjitindarsingh@gmail.com>
+Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH V2 02/10] target/ppc: Fix LPCR
+ DPFD mask define
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,396 +25,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: marex@denx.de, crwulff@gmail.com, jurobystricky@hotmail.com, fred.konrad@greensocs.com, Juro Bystricky <juro.bystricky@intel.com>
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: qemu-ppc@nongnu.org, agraf@suse.de, qemu-devel@nongnu.org, sam.bobroff@au1.ibm.com
 
-Add the Altera JTAG UART model.
 
-Hardware emulation based on:
-https://www.altera.com/en_US/pdfs/literature/ug/ug_embedded_ip.pdf
-(Please see "Register Map" on page 65)
+--iEWWOZ/QYGWEaBRW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
----
-V2: - Removed link to hw specs(checkpatch: line over 90 characters)
-V3: - New link to do hw specs
-V4: - Modified check for correct fifo size
-    - Made fifo_size a property
-    - Use register offsets instead of register indeces
-    - Removed redundant test for fifo overflow
-    - Modified commit message
-V5: - definine ALTERA_JTAG_UART_REGS_MEM_SIZE 
-    - Modified commit message
-    - Replaced DEFAULT_FIFO_SIZE by ALTERA_JUART_DEFAULT_FIFO_SIZE
-    - Modified test for fifo size
-    - Simplified error message in altera_juart_create().
-V6: - Removed confusing comments in altera_juart_write()
-    - Fixed error in altera_juart_create: max fifo size is 32768 not 3276
-    - altera_juart.h: fixed function prototype alignment
----
- default-configs/nios2-softmmu.mak |   1 +
- hw/char/Makefile.objs             |   1 +
- hw/char/altera_juart.c            | 278 ++++++++++++++++++++++++++++++++++++++
- include/hw/char/altera_juart.h    |  46 +++++++
- 4 files changed, 326 insertions(+)
- create mode 100644 hw/char/altera_juart.c
- create mode 100644 include/hw/char/altera_juart.h
+On Fri, Feb 10, 2017 at 04:25:52PM +1100, Suraj Jitindar Singh wrote:
+> The DPFD field in the LPCR is 3 bits wide. This has always been defined
+> as 0x3 << shift which indicates a 2 bit field, which is incorrect.
+> Correct this.
+>=20
+> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-diff --git a/default-configs/nios2-softmmu.mak b/default-configs/nios2-softmmu.mak
-index 74dc70c..6159846 100644
---- a/default-configs/nios2-softmmu.mak
-+++ b/default-configs/nios2-softmmu.mak
-@@ -4,3 +4,4 @@ CONFIG_NIOS2=y
- CONFIG_SERIAL=y
- CONFIG_PTIMER=y
- CONFIG_ALTERA_TIMER=y
-+CONFIG_ALTERA_JUART=y
-diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
-index 6ea76fe..f0d0e25 100644
---- a/hw/char/Makefile.objs
-+++ b/hw/char/Makefile.objs
-@@ -27,5 +27,6 @@ common-obj-$(CONFIG_LM32) += lm32_juart.o
- common-obj-$(CONFIG_LM32) += lm32_uart.o
- common-obj-$(CONFIG_MILKYMIST) += milkymist-uart.o
- common-obj-$(CONFIG_SCLPCONSOLE) += sclpconsole.o sclpconsole-lm.o
-+common-obj-$(CONFIG_ALTERA_JUART) += altera_juart.o
- 
- obj-$(CONFIG_VIRTIO) += virtio-serial-bus.o
-diff --git a/hw/char/altera_juart.c b/hw/char/altera_juart.c
-new file mode 100644
-index 0000000..21baf66
---- /dev/null
-+++ b/hw/char/altera_juart.c
-@@ -0,0 +1,278 @@
-+/*
-+ * QEMU model of the Altera JTAG UART.
-+ *
-+ * Copyright (c) 2016-2017 Intel Corporation.
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version
-+ * 2 of the License, or (at your option) any later version.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ * The Altera JTAG UART hardware registers are described in:
-+ * https://www.altera.com/en_US/pdfs/literature/ug/ug_embedded_ip.pdf
-+ * (In particular "Register Map" on page 65)
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/char/altera_juart.h"
-+#include "sysemu/sysemu.h"
-+#include "qemu/error-report.h"
-+
-+/* Data register */
-+#define OFFSET_R_DATA   0
-+#define DATA_RVALID     BIT(15)
-+#define DATA_RAVAIL     0xFFFF0000
-+
-+/* Control register */
-+#define OFFSET_R_CONTROL 4
-+#define CONTROL_RE      BIT(0)
-+#define CONTROL_WE      BIT(1)
-+#define CONTROL_RI      BIT(8)
-+#define CONTROL_WI      BIT(9)
-+#define CONTROL_AC      BIT(10)
-+#define CONTROL_WSPACE  0xFFFF0000
-+
-+#define CONTROL_WMASK (CONTROL_RE | CONTROL_WE | CONTROL_AC)
-+
-+#define TYPE_ALTERA_JUART "altera-juart"
-+#define ALTERA_JUART(obj) \
-+    OBJECT_CHECK(AlteraJUARTState, (obj), TYPE_ALTERA_JUART)
-+
-+/* Two registers 4 bytes wide each */
-+#define ALTERA_JTAG_UART_REGS_MEM_SIZE  (2 * 4)
-+
-+/*
-+ * The JTAG UART core generates an interrupt when either of the individual
-+ * interrupt conditions is pending and enabled.
-+ */
-+static void altera_juart_update_irq(AlteraJUARTState *s)
-+{
-+    unsigned int irq;
-+
-+    irq = ((s->jcontrol & CONTROL_WE) && (s->jcontrol & CONTROL_WI)) ||
-+          ((s->jcontrol & CONTROL_RE) && (s->jcontrol & CONTROL_RI));
-+
-+    qemu_set_irq(s->irq, irq);
-+}
-+
-+static uint64_t altera_juart_read(void *opaque, hwaddr addr, unsigned int size)
-+{
-+    AlteraJUARTState *s = opaque;
-+    uint32_t r;
-+
-+    switch (addr) {
-+    case OFFSET_R_DATA:
-+        r = s->rx_fifo[(s->rx_fifo_pos - s->rx_fifo_len) & (s->rx_fifo_size - 1)];
-+        if (s->rx_fifo_len) {
-+            s->rx_fifo_len--;
-+            qemu_chr_fe_accept_input(&s->chr);
-+            s->jdata = r | DATA_RVALID | (s->rx_fifo_len << 16);
-+            s->jcontrol |= CONTROL_RI;
-+        } else {
-+            s->jdata = 0;
-+            s->jcontrol &= ~CONTROL_RI;
-+        }
-+
-+        altera_juart_update_irq(s);
-+        return s->jdata;
-+
-+    case OFFSET_R_CONTROL:
-+        return s->jcontrol;
-+    }
-+
-+    return 0;
-+}
-+
-+static void altera_juart_write(void *opaque, hwaddr addr,
-+                               uint64_t value, unsigned int size)
-+{
-+    AlteraJUARTState *s = opaque;
-+    unsigned char c;
-+
-+    switch (addr) {
-+    case OFFSET_R_DATA:
-+        c = value & 0xFF;
-+        s->jcontrol |= CONTROL_WI;
-+        s->jdata = c;
-+        qemu_chr_fe_write(&s->chr, &c, 1);
-+        altera_juart_update_irq(s);
-+        break;
-+
-+    case OFFSET_R_CONTROL:
-+        /* Only RE and WE are writable */
-+        value &= CONTROL_WMASK;
-+        s->jcontrol &= ~CONTROL_WMASK;
-+        s->jcontrol |= value;
-+
-+        /* Writing 1 to AC clears it to 0 */
-+        if (value & CONTROL_AC) {
-+            s->jcontrol &= ~CONTROL_AC;
-+        }
-+        altera_juart_update_irq(s);
-+        break;
-+    }
-+}
-+
-+static void altera_juart_receive(void *opaque, const uint8_t *buf, int size)
-+{
-+    int i;
-+    AlteraJUARTState *s = opaque;
-+
-+    for (i = 0; i < size; i++) {
-+        s->rx_fifo[s->rx_fifo_pos] = buf[i];
-+        s->rx_fifo_pos++;
-+        s->rx_fifo_pos &= (s->rx_fifo_size - 1);
-+        s->rx_fifo_len++;
-+    }
-+    s->jcontrol |= CONTROL_RI;
-+    altera_juart_update_irq(s);
-+}
-+
-+static int altera_juart_can_receive(void *opaque)
-+{
-+    AlteraJUARTState *s = opaque;
-+    return s->rx_fifo_size - s->rx_fifo_len;
-+}
-+
-+static void altera_juart_reset(DeviceState *d)
-+{
-+    AlteraJUARTState *s = ALTERA_JUART(d);
-+
-+    s->jdata = 0;
-+
-+    /* The number of spaces available in the write FIFO */
-+    s->jcontrol = s->rx_fifo_size << 16;
-+    s->rx_fifo_pos = 0;
-+    s->rx_fifo_len = 0;
-+}
-+
-+static const MemoryRegionOps juart_ops = {
-+    .read = altera_juart_read,
-+    .write = altera_juart_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 4
-+    }
-+};
-+
-+static void altera_juart_init(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    AlteraJUARTState *s = ALTERA_JUART(obj);
-+
-+    memory_region_init_io(&s->mmio, OBJECT(s), &juart_ops, s,
-+                    TYPE_ALTERA_JUART, ALTERA_JTAG_UART_REGS_MEM_SIZE);
-+    sysbus_init_mmio(sbd, &s->mmio);
-+    sysbus_init_irq(sbd, &s->irq);
-+}
-+
-+void altera_juart_create(int channel, const hwaddr addr, qemu_irq irq, uint32_t fifo_sz)
-+{
-+    DeviceState *dev;
-+    SysBusDevice *bus;
-+    Chardev *chr;
-+    const char chr_name[] = "juart";
-+    char label[ARRAY_SIZE(chr_name) + 1];
-+
-+    dev = qdev_create(NULL, TYPE_ALTERA_JUART);
-+
-+    if (channel >= MAX_SERIAL_PORTS) {
-+        error_report("Only %d serial ports are supported by QEMU",
-+                     MAX_SERIAL_PORTS);
-+        exit(1);
-+    }
-+
-+    chr = serial_hds[channel];
-+    if (!chr) {
-+        snprintf(label, ARRAY_SIZE(label), "%s%d", chr_name, channel);
-+        chr = qemu_chr_new(label, "null");
-+        if (!chr) {
-+            error_report("Failed to assign serial port to altera %s", label);
-+            exit(1);
-+        }
-+    }
-+    qdev_prop_set_chr(dev, "chardev", chr);
-+
-+    /*
-+     * FIFO size can be set from 8 to 32,768 bytes.
-+     * Only powers of two are allowed.
-+     */
-+    if (fifo_sz < 8 || fifo_sz > 32768 || (fifo_sz & ~(1 << ctz32(fifo_sz)))) {
-+        error_report("juart%d: Invalid FIFO size. [%u]", channel, fifo_sz);
-+        exit(1);
-+    }
-+
-+    qdev_prop_set_uint32(dev, "fifo-size", fifo_sz);
-+    bus = SYS_BUS_DEVICE(dev);
-+    qdev_init_nofail(dev);
-+
-+    if (addr != (hwaddr)-1) {
-+        sysbus_mmio_map(bus, 0, addr);
-+    }
-+
-+    sysbus_connect_irq(bus, 0, irq);
-+}
-+
-+static const VMStateDescription vmstate_altera_juart = {
-+    .name = "altera-juart" ,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(jdata, AlteraJUARTState),
-+        VMSTATE_UINT32(jcontrol, AlteraJUARTState),
-+        VMSTATE_VBUFFER_UINT32(rx_fifo, AlteraJUARTState, 1, NULL, 0, rx_fifo_size),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void altera_juart_realize(DeviceState *dev, Error **errp)
-+{
-+    AlteraJUARTState *s = ALTERA_JUART(dev);
-+    qemu_chr_fe_set_handlers(&s->chr, altera_juart_can_receive,
-+                             altera_juart_receive, NULL, s, NULL, true);
-+    s->rx_fifo = g_malloc(s->rx_fifo_size);
-+}
-+
-+static void altera_juart_unrealize(DeviceState *dev, Error **errp)
-+{
-+    AlteraJUARTState *s = ALTERA_JUART(dev);
-+    g_free(s->rx_fifo);
-+}
-+
-+static Property altera_juart_props[] = {
-+    DEFINE_PROP_CHR("chardev", AlteraJUARTState, chr),
-+    DEFINE_PROP_UINT32("fifo-size", AlteraJUARTState, rx_fifo_size,
-+                                        ALTERA_JUART_DEFAULT_FIFO_SIZE),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void altera_juart_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+
-+    dc->realize = altera_juart_realize;
-+    dc->unrealize = altera_juart_unrealize;
-+    dc->props = altera_juart_props;
-+    dc->vmsd = &vmstate_altera_juart;
-+    dc->reset = altera_juart_reset;
-+    dc->desc = "Altera JTAG UART";
-+}
-+
-+static const TypeInfo altera_juart_info = {
-+    .name          = TYPE_ALTERA_JUART,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(AlteraJUARTState),
-+    .instance_init = altera_juart_init,
-+    .class_init    = altera_juart_class_init,
-+};
-+
-+static void altera_juart_register(void)
-+{
-+    type_register_static(&altera_juart_info);
-+}
-+
-+type_init(altera_juart_register)
-diff --git a/include/hw/char/altera_juart.h b/include/hw/char/altera_juart.h
-new file mode 100644
-index 0000000..705aa60
---- /dev/null
-+++ b/include/hw/char/altera_juart.h
-@@ -0,0 +1,46 @@
-+/*
-+ * Altera JTAG UART emulation
-+ *
-+ * Copyright (c) 2016-2017 Intel Corporation.
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version
-+ * 2 of the License, or (at your option) any later version.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef ALTERA_JUART_H
-+#define ALTERA_JUART_H
-+
-+#include "hw/sysbus.h"
-+#include "sysemu/char.h"
-+
-+/*
-+ * The read and write FIFO depths can be set from 8 to 32,768 bytes.
-+ * Only powers of two are allowed. A depth of 64 is generally optimal for
-+ * performance, and larger values are rarely necessary.
-+ */
-+
-+#define ALTERA_JUART_DEFAULT_FIFO_SIZE 64
-+
-+typedef struct AlteraJUARTState {
-+    SysBusDevice busdev;
-+    MemoryRegion mmio;
-+    CharBackend chr;
-+    qemu_irq irq;
-+
-+    unsigned int rx_fifo_size;
-+    unsigned int rx_fifo_pos;
-+    unsigned int rx_fifo_len;
-+    uint32_t jdata;
-+    uint32_t jcontrol;
-+    uint8_t *rx_fifo;
-+} AlteraJUARTState;
-+
-+void altera_juart_create(int channel, const hwaddr addr, qemu_irq irq,
-+                         uint32_t fifo_size);
-+
-+#endif /* ALTERA_JUART_H */
--- 
-2.7.4
+Since this is a correct fix all on its own, I've applied it to
+ppc-for-2.9.
+
+> ---
+>  target/ppc/cpu.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index bc2a2ce..bb96dd5 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -381,7 +381,7 @@ struct ppc_slb_t {
+>  #define LPCR_ISL          (1ull << (63 - 2))
+>  #define LPCR_KBV          (1ull << (63 - 3))
+>  #define LPCR_DPFD_SHIFT   (63 - 11)
+> -#define LPCR_DPFD         (0x3ull << LPCR_DPFD_SHIFT)
+> +#define LPCR_DPFD         (0x7ull << LPCR_DPFD_SHIFT)
+>  #define LPCR_VRMASD_SHIFT (63 - 16)
+>  #define LPCR_VRMASD       (0x1full << LPCR_VRMASD_SHIFT)
+>  #define LPCR_RMLS_SHIFT   (63 - 37)
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--iEWWOZ/QYGWEaBRW
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYoRMZAAoJEGw4ysog2bOS+0IP/1hcpsvAo5AFe9Lstv267Z0K
+WBLzaLBnEbylmkfsXkRtOSIaccKWkW8/c3JQEMMTvcc5uKAm8uapbXuCqoc28BkV
+qcXzxoLcEylSSmmL0EyrOiz7HObGlCFg3d5DMLojHRH2DSeVmIHE2G2nyvz8bsg7
+s1Pjn8oWC3t5kIX9TI90HIj3qDS1wdGYy4r1CwmmeoV5nghL6Go1w1yF7DDRZjRL
+l510gwlxT4JXQaMUjh9canEUa6crFVqUbAgQOXgdIT5vVzFlBY0r7Lm3MiTrg0zI
+2uucdj8m3gVxrpgarS5+RXcvNkK3mFpdJeK2JcLXEdVG+nmK5J+XS7h4x5c6XLFE
+XcPGcyTCvvz7MKd3+Gcfwn/hp9l07fQcwFUdhKidwbPfVQ0RakcVkoPJ7kTQiFE7
+2hxIAV6zUepCh4S2Fj50fvNtQfJC/tOzLp6khAQ3KWOggsDPtYVLDVeHLijS0clg
+U68+sSesWneUjKGDMtkXy+wyQsrJgqHfQEhdJOp5oOgUtggYCLcvrSIgVYuxeGUB
+I2HeJPUk3VQd04sMnIafKDXDf3MDkClD+pnUwR1tcUEMYl23h6Y8+ecE4+Iq81P0
+axK3cQSXQzITjZgamM7ddppzhp7BqpEotd3YuanSHT0dlCN8prZvUYQrWo8Qmz0n
+aZRceEaMhXLgpAVy6z0f
+=HC3J
+-----END PGP SIGNATURE-----
+
+--iEWWOZ/QYGWEaBRW--
