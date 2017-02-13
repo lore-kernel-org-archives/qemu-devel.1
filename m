@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49761)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cd8RZ-0002Qm-OV
+	(envelope-from <dgibson@ozlabs.org>) id 1cd8Ra-0002Qp-Es
 	for qemu-devel@nongnu.org; Sun, 12 Feb 2017 23:40:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cd8RX-00026e-EU
-	for qemu-devel@nongnu.org; Sun, 12 Feb 2017 23:40:53 -0500
-Date: Mon, 13 Feb 2017 15:33:07 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1cd8RX-00026R-D6
+	for qemu-devel@nongnu.org; Sun, 12 Feb 2017 23:40:54 -0500
+Date: Mon, 13 Feb 2017 15:33:51 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170213043307.GT25381@umbus>
-References: <20170208061602.17666-1-david@gibson.dropbear.id.au>
-	<46d64512-1085-6d22-1e0f-660757ff7131@redhat.com>
-	<20170209041634.GC14524@umbus>
-	<95706652-0a80-92fc-951b-7a454d496ddf@redhat.com>
-	<20170210003746.GP27610@umbus.fritz.box>
-	<5ea3785c-b979-8b8c-3ab0-243d69384697@redhat.com>
+Message-ID: <20170213043351.GU25381@umbus>
+References: <1486704360-27361-1-git-send-email-sjitindarsingh@gmail.com>
+	<1486704360-27361-9-git-send-email-sjitindarsingh@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="6axCafNXXMM8qu6Q"
+	protocol="application/pgp-signature"; boundary="qpPEP5KwiTnADq8L"
 Content-Disposition: inline
-In-Reply-To: <5ea3785c-b979-8b8c-3ab0-243d69384697@redhat.com>
-Subject: Re: [Qemu-devel] [RFC] virtio-pci: Allow PCIe virtio devices on
- root bus
+In-Reply-To: <1486704360-27361-9-git-send-email-sjitindarsingh@gmail.com>
+Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH V2 08/10] target/ppc/POWER9: Add
+ POWER9 pa-features definition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,264 +25,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, abologna@redhat.com, lvivier@redhat.com, thuth@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: qemu-ppc@nongnu.org, agraf@suse.de, qemu-devel@nongnu.org, sam.bobroff@au1.ibm.com
 
 
---6axCafNXXMM8qu6Q
+--qpPEP5KwiTnADq8L
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Feb 12, 2017 at 09:05:46PM +0200, Marcel Apfelbaum wrote:
-> On 02/10/2017 02:37 AM, David Gibson wrote:
-> > On Thu, Feb 09, 2017 at 10:04:47AM +0100, Laszlo Ersek wrote:
-> > > On 02/09/17 05:16, David Gibson wrote:
-> > > > On Wed, Feb 08, 2017 at 11:40:50AM +0100, Laszlo Ersek wrote:
-> > > > > On 02/08/17 07:16, David Gibson wrote:
-> > > > > > Marcel,
-> > > > > >=20
-> > > > > > Your original patch adding PCIe support to virtio-pci.c has the
-> > > > > > limitation noted below that PCIe won't be enabled if the device=
- is on
-> > > > > > the root bus (rather than under a root or downstream port).  As
-> > > > > > reasoned below, I think removing the check is correct, even for=
- x86
-> > > > > > (though it would rarely be useful there).  But I could well have
-> > > > > > missed something.  Let me know if so...
-> > > > > >=20
-> > > > > >=20
-> > > > > >=20
-> > > > > > Virtio devices can appear as either vanilla PCI or PCI-Express =
-devices
-> > > > > > depending on the bus they're connected to.  At the moment it wi=
-ll only
-> > > > > > appear as vanilla PCI if connected to the root bus of a PCIe ho=
-st bridge.
-> > > > > >=20
-> > > > > > Presumably this is to reflect the fact that PCIe devices usuall=
-y need to
-> > > > > > be connected to a root (or further downstream) port rather than=
- directly
-> > > > > > on the root bus.  However, due to the odd requirements of the P=
-APR spec on the 'pseries'
-> > > > > > machine type, it's normal for PCIe devices to appear on the roo=
-t bus
-> > > > > > without root ports.
-> > > > > >=20
-> > > > > > Further, even on x86, there's no inherent reason we couldn't pr=
-esent a
-> > > > > > virtio device as an "integrated device" (typically used for thi=
-ngs built
-> > > > > > into the PCI chipset), and those devices *do* typically appear =
-on the root
-> > > > > > bus.
-> > > > >=20
-> > > > > I'm not personally making a counter-argument, just qouting some of
-> > > > > the relevant parts of "docs/pcie.txt" ("PCI EXPRESS GUIDELINES"):
-> > > >=20
-> > > > So, an earlier discussion more or less concluded that the PCIe
-> > > > guidelines don't really work with PAPR guests.  That comes because
-> > > > PAPR was designed with PowerVM in mind which allows PCI passthrough
-> > > > but doesn't do any emulated PCI devices.  So they wanted to present
-> > > > passed through devices (virtual or phyical) to the guest without
-> > > > inserting virtual root ports.
-> > > >=20
-> > > > Now, you can argue that this was a silly decision in PAPR, and you
-> > > > could well be right, but there it is.
-> > >=20
-> > > I can totally accept this, but then we should state it as a fact near
-> > > the top of "docs/pcie.txt".
-> > >=20
-> > > >=20
-> > > > > > Place only the following kinds of devices directly on the Root =
-Complex:
-> > > > > >     (1) PCI Devices (e.g. network card, graphics card, IDE cont=
-roller),
-> > > > > >         not controllers. Place only legacy PCI devices on
-> > > > > >         the Root Complex. These will be considered Integrated E=
-ndpoints.
-> > > > > >         Note: Integrated Endpoints are not hot-pluggable.
-> > > > > >=20
-> > > > > >         Although the PCI Express spec does not forbid PCI Expre=
-ss devices as
-> > > > > >         Integrated Endpoints, existing hardware mostly integrat=
-es legacy PCI
-> > > > > >         devices with the Root Complex.
-> > > >=20
-> > > > "Mostly".. on my laptop at least the GPU shows up as an integrated =
-PCI
-> > > > Express endpoint, so it's certainly not the case that *all* root bus
-> > > > devices are legacy.
-> > > >=20
-> > > > > Guest OSes are suspected to behave
-> > > > > >         strangely when PCI Express devices are integrated
-> > > > > >         with the Root Complex.
-> > > >=20
-> > > > Clearly not that strangely, that often, since my laptop works just =
-fine.
-> > > >=20
-> > > > > >=20
-> > > > > >     [...]
-> > > > > >=20
-> > > > > > 2.2 PCI Express only hierarchy
-> > > > > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > > > > Always use PCI Express Root Ports to start PCI Express hierarch=
-ies.
-> > > > >=20
-> > > > > Above you mention "it's normal for PCIe devices to appear on the =
-root bus without root ports".
-> > > >=20
-> > > > Well "normal" perhaps wasn't the right word.  Let's say precedented,
-> > > > if uncommon.
-> > > >=20
-> > > > > Let me turn the question around: is it a *problem* for "pseries" =
-if
-> > > > > we require root ports? If so, why exactly?
-> > > >=20
-> > > > That's.. a complex question.  At least Linux guests (and we don't
-> > > > support any others yet) might cope with the addition of root ports.
-> > > > Maybe.  I have discussed this option with BenH and others.
-> > > >=20
-> > > > However it is gratuitously different from how PCIe devices will
-> > > > typically appear for the same guest running under PowerVM.  Althoug=
-h I
-> > > > suspect Linux would cope with the "normal standard" rather than "PA=
-PR
-> > > > standard" presentation, I'm not as confident about it as I would li=
-ke.
-> > > >=20
-> > > > Another consideration here is that other PCIe capable qemu emulated
-> > > > devices, such as XHCI, will present fine as PCIe integrated endpoin=
-ts
-> > > > when attached to the root bus.  Libvirt won't do that usually, of
-> > > > course, and it may not be the recommended way of doing things (on P=
-C)
-> > > > but it's possible.  I don't see any particular reason that virtio-p=
-ci
-> > > > should enforce the root port requirement more so than any other
-> > > > device.
-> > > >=20
-> > > > > On 02/08/17 07:16, David Gibson wrote:
-> > > > > >=20
-> > > > > > pcie_endpoint_cap_init() already automatically adjusts to adver=
-tise as
-> > > > > > an integrated device rather than a "normal" PCIe endpoint when =
-attached to
-> > > > > > a root bus.  So we can remove the check for root bus within vir=
-tio and
-> > > > > > allow (at the user's discretion) a PCIe virtio bus to be attach=
-ed to a
-> > > > > > root bus.
-> > > > >=20
-> > > > > If Marcel thinks this is a good change, then I think we should go
-> > > > > through "docs/pcie.txt" with a fine-toothed comb, and update all
-> > > > > relevant spots. (If Marcel agrees, perhaps you can include such
-> > > > > hunks in your patch at once.)
-> > > >=20
-> > > > Actually, I think that would be a neverending process.  Maybe better
-> > > > to put in a whole different spapr-pcie.txt with the assorted ways t=
-hat
-> > > > PAPR violates PCIe conventions.
-> > >=20
-> > > That works for me too, but I think it would be a lot more work for you
-> > > and others.
-> > >=20
-> > > I plan on consulting "docs/pcie.txt" frequently; among other things, =
-for
-> > > deciding debates. Thus, improving the scope of "docs/pcie.txt" is very
-> > > welcome IMO.
-> > >=20
-> > > >=20
-> > > > > It also may have consequences for libvirt (but I see you addressed
-> > > > > Andrea at once, which is great).
-> > > >=20
-> > > > Right, I've been discussed this with Andrea all along.  We're worki=
-ng
-> > > > on a proposed PAPR specific way of allocating PCI and PCIe addresses
-> > > > (different from the PCIe normal way, but the same as each other).
-> > > > That will simplify adding PCIe support to PAPR, and also has some
-> > > > other advantages for PAPR guests (related to the platform specific
-> > > > isolation, hotplug  and error recovery mechanisms - also different
-> > > > from the normal PCIe ones).
-> > >=20
-> > > Great, if Andrea is aware, that's a relief.
-> > >=20
-> > > Can you resubmit this patch with a small hunk for "docs/pcie.txt" that
-> > > removes PAPR from the scope?
-> >=20
+On Fri, Feb 10, 2017 at 04:25:58PM +1100, Suraj Jitindar Singh wrote:
+> Add a pa-features definition which includes all of the new fields which
+> have been added, note we don't claim support for any of these new features
+> at this stage.
 >=20
-> Hi David,
-> Sorry for the delay, I just came back from PTO.
+> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
+> ---
+>  hw/ppc/spapr.c | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
 >=20
-> > Well, first I'd like to see if Marcel knows of some reason I didn't
-> > think of why this test is important for virtio particularly here.  But
-> > assuming the basic idea is acceptable, then yes, I'll update pcie.txt.
-> >=20
->=20
-> There are two reasons for keeping virtio Integrated Endpoints as PCI devi=
-ces.
-> 1. The first point is generic; even if having PCIe devices as Integrated =
-Endpoints should be OK,
->    is not recommended because some guests may miss-behave (*). X86 arch s=
-upports a large number
->    of guests and we don't want to check and fix everything if *we don't h=
-ave to*.
->    Even if is not written anywhere and there are actually some PCI Expres=
-s Integrated Endpoints,
->    most of them are legacy PCI devices (I actually think this is why we h=
-ave Integrated Endpoints
->    at all, but I might be wrong).
-
-Hm, ok.  Could we implement that restriction in the pci/pcie core
-rather than in the virtio device?  That would then protect things like
-XHCI as well.  And for my purposes it would also make it easier to
-implement aa machine type specific hook to re-allow that configuration
-on pseries.
-
-At the moment XHCI and virtio-pci behave differently, which seems less
-than ideal.
-
-> 2. The second point is virtio specific. Not all the guests have virtio 1.=
-0 support (e.g RHEL 6) and we allow them
->    to use legacy virtio devices as Integrated Endpoints (following the th=
-ought that this is why we have Integrated Endpoints)
->    Making the virtio devices PCI Express, but not virtio 1.0 is also prob=
-lematic since now we will have too much
->    types of virtio devices. We want to keep it simple: virtio legacy
->    -> PCI, virtio modern -> PCIe.
-
-Ok.. it's not obvious to me why integrated endpoint vs. under a root
-port is relevant to this.  Can't we enable/disable PCIe mode based
-directly on the legacy/modern settings?
-
-> (*) A while ago Alex Williamson found such of issue, I think is this one:
-> 0282ab (vfio/pci: Hide device PCIe capability on non-express buses for PC=
-Ie VMs)
-
-It's also not clear to me why this fix is relevant to the question.
-That change disables the PCIe capability on a bus which is
-not-express, but is under an express root bridge (and is therefore
-clearly *not* on the root bus).  For the case I'm talking about the
-*is* on an express bus and it *is* the root bus.  AFAICT that patch
-would be relevant only for devices under a PCIe-to-PCI bridge on a
-PCIe system.
-
-> > > be appreciated too, if that makes sense. (By default we aim at
-> > > multi-arch / multi-target with this document; we may not have stated =
-it
-> > > explicitly, but AFAIR we intend to cover aarch64 / "virt" too.)
-> >=20
-> > Right, that was my understanding as well.
-> >=20
->=20
-> Indeed, we want the document to support them all. If PAPR is different, w=
-e should mention it.
-
-Sure.  I'm trying to work out what we can/should do for pseries first;
-I'll write something up for the docs when I have something I think is
-ready to merge.
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 057adae..44eb014 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -356,6 +356,20 @@ static void spapr_populate_pa_features(CPUPPCState *=
+env, void *fdt, int offset)
+>          0x80, 0x00, 0x00, 0x00, 0x00, 0x00,
+>          0x00, 0x00, 0x00, 0x00, 0x80, 0x00,
+>          0x80, 0x00, 0x80, 0x00, 0x00, 0x00 };
+> +    /* Currently we don't advertise any of the "new" ISAv3.00 functional=
+ity */
+> +    uint8_t pa_features_300[] =3D { 64, 0,
+> +        0xf6, 0x1f, 0xc7, 0xc0, 0x80, 0xf0, /*  0 -  5 */
+> +        0x80, 0x00, 0x00, 0x00, 0x00, 0x00, /*  6 - 11 */
+> +        0x00, 0x00, 0x00, 0x00, 0x80, 0x00, /* 12 - 17 */
+> +        0x80, 0x00, 0x80, 0x00, 0x00, 0x00, /* 18 - 23 */
+> +        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 24 - 29 */
+> +        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 30 - 35 */
+> +        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 36 - 41 */
+> +        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 42 - 47 */
+> +        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 48 - 53 */
+> +        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 54 - 59 */
+> +        0x00, 0x00, 0x00, 0x00           }; /* 60 - 63 */
+> +
+>      uint8_t *pa_features;
+>      size_t pa_size;
+> =20
+> @@ -370,6 +384,10 @@ static void spapr_populate_pa_features(CPUPPCState *=
+env, void *fdt, int offset)
+>          pa_features =3D pa_features_207;
+>          pa_size =3D sizeof(pa_features_207);
+>          break;
+> +    case POWERPC_MMU_3_00:
+> +        pa_features =3D pa_features_300;
+> +        pa_size =3D sizeof(pa_features_300);
+> +        break;
+>      default:
+>          return;
+>      }
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -294,25 +93,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---6axCafNXXMM8qu6Q
+--qpPEP5KwiTnADq8L
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYoTcAAAoJEGw4ysog2bOSJ38P/1MN6O+Ec7cwrMEgIKHZUg6/
-Kd7w4zkTfBlq8PkcFCcuQ74LWYGWT7TptNSPH6ZGjogTjBLav4qYD2xgk96EdDIE
-oAOuCSm0rHjc8xgy/HccKpgav4w0Mv1tpdSDtqXS2SVA6gXsQWZ/oLr682FNkS+3
-gsekeXYGl9fi3joGSYr+b9w/CexdZBjaiqRrWyw52xlJkH02FSRNKXZyurxneAGY
-PMsW1vAX1mZUcbDo6q7sHR4qhYzbyWqnezyEucTlJBLX2Z/neVq1FOZ+bX+RzC/E
-uhmyHcQ6evzi5FRiVxcUJybIt9yuq5PcGFv9anDtOQGxIymxcm/9+UNfKPFx/zZY
-hvA11hmkp/uWfRDsmorY4KgXQZQnDIblIS605cezDqn27K52lHu7vHfhp4OLsj+Z
-WkgPqXRNh2qgE8AFIz4EY9QnE9BHCbNbomYZJO1t7HCqCHepy8Q6KK8wmSfRx3U0
-bxpoUlt3sHn6jrKdAeRq2hsao3Xw8kreIZs9gnS8BJbhlW9mYGkQsrOmo+9Fhh5a
-WivcMGuEb5S287entHmenx17shhOfIqA53wVwagYLsoxSbgNTXF1NNzfM1MnIXOX
-dgoJ+NCkpVg089Xoqw0ckciU8rKnNH2KA25Ts21d9rv6/4IaWwGGgt/Eug2yHNhC
-LEACpK5TcB0HGSoyQHRm
-=FHft
+iQIcBAEBCAAGBQJYoTcuAAoJEGw4ysog2bOS818QAKFEuw4CD2YQvC+syQR3Tkkt
+fc2TRvEezObG64+6nnIfaeE7fMUbTNwwrtegNOZSEXDTEgX2jJEVENZIYUpenPOw
+30WG4cmshxlD+/6JQE/zZj25rPy+aE4lZGu9KGq3jBjA5TB5pT9+xDu3Q43A8jNy
+7Ea/o2F+wKAwsetKp9cW892khP3ipeswUTssUpRXYz7ZSmkYnq3w8hEZhnqnN4/t
+CsUEsFEdvlgdbb38OjhS8Y5KHBc0KlNzVWl6yASggcMyaS5HSQ3ByiJTMIdcjIVf
+sn6muVhry3oTvle5h2+ZV0Mx9FiXLdjg8oeqhoDW8IftF4KC7vMoQm2gMInTT2ey
+/i3qUma9dSYuv4ODG59szwSLnU0bWb9aI6wIdqhdNY4dbwItwf+WsEPPne32s1Yh
+duYs3fuNgTTCH4GAXfLNsbdR7neWJVd4wZHvYBvHHD/C7COeAgWnAqVE1/4wtl1g
+qNobPiWUFm/vhOC4PV1XMy/DMQqaVm1bYCPQEAr8Mayk/e5iuVXzqZzRnwwZak1T
+0vtP5/8C8Uor1EDgcF1ZBjAYt2zvrXpIUbcb38BgbxltxPk9B3nlBRb4HvEQGec1
+Qb0u+w/wbumDgh7xGcfdIFQzdhd93zH0aLEx4yAYN2aZBo70n+z6JIGTOkR4SQUK
+DizVl28Cr1pea9dRcrqY
+=486o
 -----END PGP SIGNATURE-----
 
---6axCafNXXMM8qu6Q--
+--qpPEP5KwiTnADq8L--
