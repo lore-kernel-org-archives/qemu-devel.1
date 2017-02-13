@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cdHSp-0008Mo-Ig
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 09:18:48 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cdHaW-0006gU-V6
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 09:26:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cdHSm-0002HB-Bw
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 09:18:47 -0500
-Received: from mail-wj0-x241.google.com ([2a00:1450:400c:c01::241]:35572)
+	(envelope-from <stefanha@gmail.com>) id 1cdHaU-0004VP-DC
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 09:26:44 -0500
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:36075)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cdHSm-0002Gt-4f
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 09:18:44 -0500
-Received: by mail-wj0-x241.google.com with SMTP id i7so210472wjf.2
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 06:18:44 -0800 (PST)
-Date: Mon, 13 Feb 2017 14:18:41 +0000
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cdHaU-0004V4-7C
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 09:26:42 -0500
+Received: by mail-wr0-x242.google.com with SMTP id k90so24317377wrc.3
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 06:26:42 -0800 (PST)
+Date: Mon, 13 Feb 2017 14:26:38 +0000
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170213141841.GH10361@stefanha-x1.localdomain>
-References: <CABiB5K4pvPnNmi7q=e=PXaanMNq7QYrqZgdWLX4VRhqyR_k+LQ@mail.gmail.com>
+Message-ID: <20170213142638.GI10361@stefanha-x1.localdomain>
+References: <20170207100302.3995.67911.malonedeb@chaenomeles.canonical.com>
+	<20170207232226.5557.42629.malone@wampee.canonical.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="17/8oYur5Y32USnW"
+	protocol="application/pgp-signature"; boundary="gTY1JhLGodeuSBqf"
 Content-Disposition: inline
-In-Reply-To: <CABiB5K4pvPnNmi7q=e=PXaanMNq7QYrqZgdWLX4VRhqyR_k+LQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] Query for PCI burst support
+In-Reply-To: <20170207232226.5557.42629.malone@wampee.canonical.com>
+Subject: Re: [Qemu-devel] [Bug 1662468] Re: [feature request] qemu-img
+ convert should respond to control-T like dd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +31,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gaurav Sharma <gauravs.2010@gmail.com>
-Cc: qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: Max Reitz <1662468@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org
 
 
---17/8oYur5Y32USnW
+--gTY1JhLGodeuSBqf
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 06, 2017 at 11:28:24AM +0530, Gaurav Sharma wrote:
-> Is it possible to generate a PCIe burst of greater than 2dw for any MMIO.
-> I see we have limit of max 2dw operation for any MemoryRegion defined by
-> the max access size.
+On Tue, Feb 07, 2017 at 11:22:26PM -0000, Max Reitz wrote:
+> That should be simple enough to implement considering we have this
+> behavior already on SIGUSR1. Unfortunately, I wouldn't be able to test
+> it because Linux apparently doesn't implement SIGINFO...
+>=20
+> Max
+>=20
+>=20
+> PS: By the way, thanks for the information. I didn't know about SIGINFO a=
+t all. Well, now I have mapped Ctrl-T to SIGUSR1 in my terminal emulator so=
+ I don't have to feel quite as inferior...
 
-My understanding is that QEMU does not emulate bursts because it's a
-functional simulator rather than low-level PCI bus transaction
-simulator.
+Christophe: In case you hadn't seen what Max is referring to on the
+qemu-img man page:
 
-You might be interested in KVM's coalesced MMIO feature.  That is a
-performance optimization but it's not PCI-specific.
+  -p  display progress bar (compare, convert and rebase commands
+      only).  If the -p option is not used for a command that supports
+      it, the progress is reported when the process receives a
+      "SIGUSR1" signal.
 
-Why are you trying to do PCIe bursts?
+Does this do what you want?
 
-Stefan
-
---17/8oYur5Y32USnW
+--gTY1JhLGodeuSBqf
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJYocBBAAoJEJykq7OBq3PImxoIALXfgbSe1AKBOcJrLMWgexIN
-IVevpd2xrTeuLDOnWahycBeFq9kv4tvQgfczrgxPTuIK+tUMaqE6IvYmHwQA3+CR
-8Bqfpy4N9ChE1kIQNIM/PZoyoEHK4sG9bcq+hwjoZgoBRu4mkrLa3SpSF/Cjz7mX
-uiT2RP9y0Y/7p+DKveU+w55JT8rOnc8DIClvmiG3mP53DMOWVRDmJNExyv+xy8Cd
-XcH/endSvmNRs+1GBKtrto6nAbDXPsu05xtV72FNBlw2Phcgqf/sk5LrJoJeZD6M
-bg+kuXOdTeHyRTwsqGZEczIW4T/PztFsIYdxhL4jwzg9/0chrXCnFW9Tldccgnw=
-=s8wm
+iQEcBAEBAgAGBQJYocIeAAoJEJykq7OBq3PIIJoH/3/Ogf0VaSmXe62d1YBlIgS+
+NTOHKfQ+MWHww4nAFIfe3/RUDqAGnbZNmpHZ0tsD9Nw57ioIFHbjSUec9ZHlih39
+CCW7770jLiC6knVsHfCPhr272YeSDVzzh1kZ45wqbkuoyM20GcU6q5dFNzWcpoW2
+XthJSfANLbU8/g89jCFmAQwqxpE21hyd3mmMNYcHVlwGR2L18szTEteV5Rft9hWr
+j8qPv2lK4DxFHPHFd5xmYTmYE8BM7NyAgQHvkyF+wnW0c5mfs4gpidK8v1OM/FED
+fkYjoriTQj6cRN3eJOQvwJrsPqaA2MULOAvTple8QrKL7fRtewSb0eMXPXQbT8k=
+=//iy
 -----END PGP SIGNATURE-----
 
---17/8oYur5Y32USnW--
+--gTY1JhLGodeuSBqf--
