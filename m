@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cdGxp-0007wx-W6
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 08:46:47 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cdH3X-00023I-7F
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 08:52:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cdGxk-0002Pz-W3
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 08:46:46 -0500
-Received: from mail-wj0-x244.google.com ([2a00:1450:400c:c01::244]:34948)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cdGxk-0002Pk-PP
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 08:46:40 -0500
-Received: by mail-wj0-x244.google.com with SMTP id i7so192048wjf.2
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 05:46:40 -0800 (PST)
-Date: Mon, 13 Feb 2017 13:46:37 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170213134637.GC10361@stefanha-x1.localdomain>
-References: <CAJSP0QWGcG9bTZZr22BEj-P_G2r4UhmNwGSfwSnwjZeTC687GQ@mail.gmail.com>
-	<CAFEAcA_OJWrknC+YSsbjgcv=YtMq5GY04EcyXZt+V8eBH5TSWw@mail.gmail.com>
-	<e5673883-cd68-7d4a-01fc-394c506b18a9@redhat.com>
-	<CAFEAcA8zSZ8S09APwV8SGy3oHeiutY1j+LSSP327hyZLFfDURw@mail.gmail.com>
-	<DM5PR03MB2827878B91C80E6DA61C56589E450@DM5PR03MB2827.namprd03.prod.outlook.com>
-	<CAFEAcA_zXQOBWqOmyH-_RA5pcREutKPUZAOm-OBuCExp-nMSGw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="hOcCNbCCxyk/YU74"
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_zXQOBWqOmyH-_RA5pcREutKPUZAOm-OBuCExp-nMSGw@mail.gmail.com>
-Subject: Re: [Qemu-devel] Call for GSoC 2017 mentors & project ideas
+	(envelope-from <pbonzini@redhat.com>) id 1cdH3T-0003cc-6t
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 08:52:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37890)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cdH3S-0003cR-Ue
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 08:52:35 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B0E6B811A7
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 13:52:34 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 13 Feb 2017 14:52:17 +0100
+Message-Id: <20170213135235.12274-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 00/18] aio_context_acquire/release pushdown,
+ part 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,79 +28,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Andrew Baumann <Andrew.Baumann@microsoft.com>, John Snow <jsnow@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, stefanha@redhat.com
 
+Same as v3 except for tests/Makefile.include and trace-events rebase.
 
---hOcCNbCCxyk/YU74
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The next part is CoMutex thread-safety, which is relatively
+small (6 patches).
 
-On Thu, Feb 09, 2017 at 10:17:45PM +0000, Peter Maydell wrote:
-> On 9 February 2017 at 22:12, Andrew Baumann
-> <Andrew.Baumann@microsoft.com> wrote:
-> >> From: Peter Maydell [mailto:peter.maydell@linaro.org]
-> >> Sent: Thursday, 9 February 2017 14:02
-> >> On 9 February 2017 at 20:46, John Snow <jsnow@redhat.com> wrote:
-> >> > On 02/09/2017 07:46 AM, Peter Maydell wrote:
-> >> >> Slightly late, but I had an idea last night: would "get
-> >> >> Raspbian booting on our raspi2 board model" be a good
-> >> >> project? Would involve some mix of bug fixing, cleaning
-> >> >> up and adding device models from the raspi2 tree on github,
-> >> >> and implementing missing devices. Bit of a "how long is a
-> >> >> piece of string" project, but on the other hand breaks
-> >> >> down easily into small parts that can all go upstream
-> >> >> individually. Would suit student who likes debugging :-)
-> >>
-> >> > Who was working on this most recently? There was someone submitting
-> >> > patches pretty frequently for the raspi2 board within the last year,
-> >> > wasn't there?
-> >>
-> >> That was Andrew Baumann, but I think his use case was
-> >> getting Windows 10 to boot on it, which exercises
-> >> different bits of the hardware.
-> >
-> > That's right, but I thought we also had Raspbian working after
-> > Peter C's implementation of SETEND. (I wouldn't be surprised if
-> > it had regressed, however.)
->=20
-> For the raspbian kernel image I had it never worked -- I
-> think the kernel gained some new functionality that means
-> it now touches some device we don't yet implement (vague
-> recollection it was somethnig message-box related?).
->=20
-> > I've dropped the ball on this, and don't forsee finding time
-> > for it in the immediate future, but if anyone wants to work
-> > on it there are still some outstanding bits of emulation
-> > lurking in my github tree (github.com/0xabu/qemu)
->=20
-> Yeah, I figured that was probably the situation, and I
-> don't personally have the time to do it either; but
-> it seemed like maybe it would make a GSoC project.
+Paolo
 
-It sounds like this can be broken down into tasks by a mentor willing to
-participate and knowledgable (or willing to do the homework) on device
-support status.
+Paolo Bonzini (18):
+  block: move AioContext, QEMUTimer, main-loop to libqemuutil
+  aio: introduce aio_co_schedule and aio_co_wake
+  block-backend: allow blk_prw from coroutine context
+  test-thread-pool: use generic AioContext infrastructure
+  io: add methods to set I/O handlers on AioContext
+  io: make qio_channel_yield aware of AioContexts
+  nbd: convert to use qio_channel_yield
+  coroutine-lock: reschedule coroutine on the AioContext it was running on
+  blkdebug: reschedule coroutine on the AioContext it is running on
+  qed: introduce qed_aio_start_io and qed_aio_next_io_cb
+  aio: push aio_context_acquire/release down to dispatching
+  block: explicitly acquire aiocontext in timers that need it
+  block: explicitly acquire aiocontext in callbacks that need it
+  block: explicitly acquire aiocontext in bottom halves that need it
+  block: explicitly acquire aiocontext in aio callbacks that need it
+  aio-posix: partially inline aio_dispatch into aio_poll
+  async: remove unnecessary inc/dec pairs
+  block: document fields protected by AioContext lock
 
-Are there any volunteers?
+ Makefile.objs                       |   4 -
+ block/blkdebug.c                    |   9 +-
+ block/blkreplay.c                   |   2 +-
+ block/block-backend.c               |  13 ++-
+ block/curl.c                        |  44 ++++++--
+ block/gluster.c                     |   9 +-
+ block/io.c                          |  38 ++-----
+ block/iscsi.c                       |  15 ++-
+ block/linux-aio.c                   |  10 +-
+ block/mirror.c                      |  12 +-
+ block/nbd-client.c                  | 117 +++++++++-----------
+ block/nbd-client.h                  |   2 +-
+ block/nfs.c                         |   9 +-
+ block/qed-cluster.c                 |   2 +
+ block/qed-table.c                   |  12 +-
+ block/qed.c                         |  58 +++++++---
+ block/qed.h                         |   3 +
+ block/sheepdog.c                    |  29 ++---
+ block/ssh.c                         |  29 ++---
+ block/throttle-groups.c             |   2 +
+ block/win32-aio.c                   |   9 +-
+ dma-helpers.c                       |   2 +
+ hw/block/virtio-blk.c               |  19 +++-
+ hw/scsi/scsi-bus.c                  |   2 +
+ hw/scsi/scsi-disk.c                 |  15 +++
+ hw/scsi/scsi-generic.c              |  20 +++-
+ hw/scsi/virtio-scsi.c               |   6 +
+ include/block/aio.h                 |  38 ++++++-
+ include/block/block_int.h           |  64 ++++++-----
+ include/io/channel.h                |  72 +++++++++++-
+ include/qemu/coroutine_int.h        |  11 +-
+ include/sysemu/block-backend.h      |  14 ++-
+ io/channel-command.c                |  13 +++
+ io/channel-file.c                   |  11 ++
+ io/channel-socket.c                 |  16 ++-
+ io/channel-tls.c                    |  12 ++
+ io/channel-watch.c                  |   6 +
+ io/channel.c                        |  97 ++++++++++++----
+ nbd/client.c                        |   2 +-
+ nbd/common.c                        |   9 +-
+ nbd/server.c                        |  94 +++++-----------
+ stubs/Makefile.objs                 |   1 +
+ stubs/linux-aio.c                   |  32 ++++++
+ stubs/set-fd-handler.c              |  11 --
+ tests/Makefile.include              |  19 ++--
+ tests/iothread.c                    |  91 +++++++++++++++
+ tests/iothread.h                    |  25 +++++
+ tests/test-aio-multithread.c        | 213 ++++++++++++++++++++++++++++++++++++
+ tests/test-thread-pool.c            |  12 +-
+ trace-events                        |  11 --
+ util/Makefile.objs                  |   6 +-
+ aio-posix.c => util/aio-posix.c     |  62 +++--------
+ aio-win32.c => util/aio-win32.c     |  30 ++---
+ util/aiocb.c                        |  55 ++++++++++
+ async.c => util/async.c             |  84 ++++++++++++--
+ iohandler.c => util/iohandler.c     |   0
+ main-loop.c => util/main-loop.c     |   0
+ util/qemu-coroutine-lock.c          |   5 +-
+ util/qemu-coroutine-sleep.c         |   2 +-
+ util/qemu-coroutine.c               |   8 ++
+ qemu-timer.c => util/qemu-timer.c   |   0
+ thread-pool.c => util/thread-pool.c |   8 +-
+ util/trace-events                   |  16 ++-
+ 63 files changed, 1174 insertions(+), 468 deletions(-)
+ create mode 100644 stubs/linux-aio.c
+ create mode 100644 tests/iothread.c
+ create mode 100644 tests/iothread.h
+ create mode 100644 tests/test-aio-multithread.c
+ rename aio-posix.c => util/aio-posix.c (94%)
+ rename aio-win32.c => util/aio-win32.c (95%)
+ create mode 100644 util/aiocb.c
+ rename async.c => util/async.c (82%)
+ rename iohandler.c => util/iohandler.c (100%)
+ rename main-loop.c => util/main-loop.c (100%)
+ rename qemu-timer.c => util/qemu-timer.c (100%)
+ rename thread-pool.c => util/thread-pool.c (97%)
 
-This would be a great project to have on board.
-
-Stefan
-
---hOcCNbCCxyk/YU74
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYobi9AAoJEJykq7OBq3PIO6oH/Al1VaFcztR73sxmLuuGxO78
-qEwBuVHWE9L7TnLjNexblBDijp2F7KHL40y+YJ203FoOEFwtK6xRiop7cY8l0Sq5
-+xf8kCL8T0diFH+FuLwPuaTKMIxX4IN56CeqeL2mYbwELnigLiiCfmrt2Ca7JTpz
-nLLxdvMTxf3PxLWH3YgGlX3x2HGCVvdGtJWN1jDVcERagNrIxNxvRBAbqL26aI+o
-xpDKucRkFVIlo7hx243LPUiJH00nlpWQZfIq/1wEkvIh0vE3bYnvbn4ICCgjYLOT
-0PMzE5iEUbOPLJVzr5NfD1wozyz1dtzTr3X8qoYlScHY4WKvWdmcBQWjAUspLA0=
-=PlZO
------END PGP SIGNATURE-----
-
---hOcCNbCCxyk/YU74--
+-- 
+2.9.3
