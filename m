@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cdKMT-0003tT-8P
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:24:28 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cdKMY-00041R-Fn
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:24:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cdKMS-0006QU-6x
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:24:25 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cdKMW-0006Sx-Tv
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:24:30 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 13 Feb 2017 18:22:57 +0100
-Message-Id: <1487006583-24350-36-git-send-email-kwolf@redhat.com>
+Date: Mon, 13 Feb 2017 18:22:58 +0100
+Message-Id: <1487006583-24350-37-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
 References: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 35/41] stream: Use real permissions in
- streaming block job
+Subject: [Qemu-devel] [RFC PATCH 36/41] hmp: Request permissions in qemu-io
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,79 +22,178 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-The correct permissions are relatively obvious here (and explained in
-code comments). For intermediate streaming, we need to reopen the top
-node read-write before creating the job now because the permissions
-system catches attempts to get the BLK_PERM_WRITE_UNCHANGED permission
-on a read-only node.
+The HMP command 'qemu-io' is a bit tricky because it wants to work on
+the original BlockBackend, but additional permissions could be required.
+The details are explained in a comment in the code, but in summary, just
+request whatever permissions the current qemu-io command needs.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/stream.c | 38 ++++++++++++++++++++++++++------------
- 1 file changed, 26 insertions(+), 12 deletions(-)
+ block/block-backend.c          |  6 ++++++
+ hmp.c                          | 26 +++++++++++++++++++++++++-
+ include/qemu-io.h              |  1 +
+ include/sysemu/block-backend.h |  1 +
+ qemu-io-cmds.c                 | 28 ++++++++++++++++++++++++++++
+ 5 files changed, 61 insertions(+), 1 deletion(-)
 
-diff --git a/block/stream.c b/block/stream.c
-index 47f0ffb..e562f57 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -229,27 +229,35 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-     BlockDriverState *iter;
-     int orig_bs_flags;
- 
--    /* FIXME Use real permissions */
--    s = block_job_create(job_id, &stream_job_driver, bs, 0, BLK_PERM_ALL,
--                         speed, BLOCK_JOB_DEFAULT, NULL, NULL, errp);
--    if (!s) {
--        return;
--    }
--
-     /* Make sure that the image is opened in read-write mode */
-     orig_bs_flags = bdrv_get_flags(bs);
-     if (!(orig_bs_flags & BDRV_O_RDWR)) {
-         if (bdrv_reopen(bs, orig_bs_flags | BDRV_O_RDWR, errp) != 0) {
--            block_job_unref(&s->common);
-             return;
-         }
-     }
- 
--    /* Block all intermediate nodes between bs and base, because they
--     * will disappear from the chain after this operation */
-+    /* Prevent concurrent jobs trying to modify the graph structure here, we
-+     * already have our own plans. Also don't allow resize as the image size is
-+     * queried only at the job start and then cached. */
-+    s = block_job_create(job_id, &stream_job_driver, bs,
-+                         BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
-+                         BLK_PERM_GRAPH_MOD,
-+                         BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
-+                         BLK_PERM_WRITE,
-+                         speed, BLOCK_JOB_DEFAULT, NULL, NULL, errp);
-+    if (!s) {
-+        goto fail;
-+    }
-+
-+    /* Block all intermediate nodes between bs and base, because they will
-+     * disappear from the chain after this operation. The streaming job reads
-+     * every block only once, assuming that it doesn't change, so block writes
-+     * and resizes. */
-     for (iter = backing_bs(bs); iter && iter != base; iter = backing_bs(iter)) {
--        /* FIXME Use real permissions */
--        block_job_add_bdrv(&s->common, iter, 0, BLK_PERM_ALL, &error_abort);
-+        block_job_add_bdrv(&s->common, iter, 0,
-+                           BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED,
-+                           &error_abort);
-     }
- 
-     s->base = base;
-@@ -259,4 +267,10 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-     s->on_error = on_error;
-     trace_stream_start(bs, base, s);
-     block_job_start(&s->common);
-+    return;
-+
-+fail:
-+    if (orig_bs_flags != bdrv_get_flags(bs)) {
-+        bdrv_reopen(bs, s->bs_flags, NULL);
-+    }
+diff --git a/block/block-backend.c b/block/block-backend.c
+index a314284..94db555 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -573,6 +573,12 @@ int blk_set_perm(BlockBackend *blk, uint64_t perm, uint64_t shared_perm,
+     return 0;
  }
+ 
++void blk_get_perm(BlockBackend *blk, uint64_t *perm, uint64_t *shared_perm)
++{
++    *perm = blk->perm;
++    *shared_perm = blk->shared_perm;
++}
++
+ static int blk_do_attach_dev(BlockBackend *blk, void *dev)
+ {
+     if (blk->dev) {
+diff --git a/hmp.c b/hmp.c
+index 801fddb..fde5016 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -2045,7 +2045,6 @@ void hmp_qemu_io(Monitor *mon, const QDict *qdict)
+     if (!blk) {
+         BlockDriverState *bs = bdrv_lookup_bs(NULL, device, &err);
+         if (bs) {
+-            /* FIXME Use real permissions */
+             blk = local_blk = blk_new(0, BLK_PERM_ALL);
+             ret = blk_insert_bs(blk, bs, &err);
+             if (ret < 0) {
+@@ -2059,6 +2058,31 @@ void hmp_qemu_io(Monitor *mon, const QDict *qdict)
+     aio_context = blk_get_aio_context(blk);
+     aio_context_acquire(aio_context);
+ 
++    /*
++     * Notably absent: Proper permission management. This is sad, but it seems
++     * almost impossible to achieve without changing the semantics and thereby
++     * limiting the use cases of the qemu-io HMP command.
++     *
++     * In an ideal world we would unconditionally create a new BlockBackend for
++     * qemuio_command(), but we have commands like 'reopen' and want them to
++     * take effect on the exact BlockBackend whose name the user passed instead
++     * of just on a temporary copy of it.
++     *
++     * Another problem is that deleting the temporary BlockBackend involves
++     * draining all requests on it first, but some qemu-iotests cases want to
++     * issue multiple aio_read/write requests and expect them to complete in
++     * the background while the monitor has already returned.
++     *
++     * This is also what prevents us from saving the original permissions and
++     * restoring them later: We can't revoke permissions until all requests
++     * have completed, and we don't know when that is nor can we really let
++     * anything else run before we have revoken them to avoid race conditions.
++     *
++     * What happens now is that command() in qemu-io-cmds.c can extend the
++     * permissions if necessary for the qemu-io command. And they simply stay
++     * extended, possibly resulting in a read-only guest device keeping write
++     * permissions. Ugly, but it appears to be the lesser evil.
++     */
+     qemuio_command(blk, command);
+ 
+     aio_context_release(aio_context);
+diff --git a/include/qemu-io.h b/include/qemu-io.h
+index 4d402b9..196fde0 100644
+--- a/include/qemu-io.h
++++ b/include/qemu-io.h
+@@ -36,6 +36,7 @@ typedef struct cmdinfo {
+     const char  *args;
+     const char  *oneline;
+     helpfunc_t  help;
++    uint64_t    perm;
+ } cmdinfo_t;
+ 
+ extern bool qemuio_misalign;
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+index 65bd081..b400212 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -101,6 +101,7 @@ bool bdrv_has_blk(BlockDriverState *bs);
+ bool bdrv_is_root_node(BlockDriverState *bs);
+ int blk_set_perm(BlockBackend *blk, uint64_t perm, uint64_t shared_perm,
+                  Error **errp);
++void blk_get_perm(BlockBackend *blk, uint64_t *perm, uint64_t *shared_perm);
+ 
+ void blk_set_allow_write_beyond_eof(BlockBackend *blk, bool allow);
+ void blk_iostatus_enable(BlockBackend *blk);
+diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+index e415b03..035cb96 100644
+--- a/qemu-io-cmds.c
++++ b/qemu-io-cmds.c
+@@ -83,6 +83,29 @@ static int command(BlockBackend *blk, const cmdinfo_t *ct, int argc,
+         }
+         return 0;
+     }
++
++    /* Request additional permissions if necessary for this command. The caller
++     * is responsible for restoring the original permissions afterwards if this
++     * is what it wants. */
++    if (ct->perm && blk_is_available(blk)) {
++        uint64_t orig_perm, orig_shared_perm;
++        blk_get_perm(blk, &orig_perm, &orig_shared_perm);
++
++        if (ct->perm & ~orig_perm) {
++            uint64_t new_perm;
++            Error *local_err = NULL;
++            int ret;
++
++            new_perm = orig_perm | ct->perm;
++
++            ret = blk_set_perm(blk, new_perm, orig_shared_perm, &local_err);
++            if (ret < 0) {
++                error_report_err(local_err);
++                return 0;
++            }
++        }
++    }
++
+     optind = 0;
+     return ct->cfunc(blk, argc, argv);
+ }
+@@ -916,6 +939,7 @@ static const cmdinfo_t write_cmd = {
+     .name       = "write",
+     .altname    = "w",
+     .cfunc      = write_f,
++    .perm       = BLK_PERM_WRITE,
+     .argmin     = 2,
+     .argmax     = -1,
+     .args       = "[-bcCfquz] [-P pattern] off len",
+@@ -1091,6 +1115,7 @@ static int writev_f(BlockBackend *blk, int argc, char **argv);
+ static const cmdinfo_t writev_cmd = {
+     .name       = "writev",
+     .cfunc      = writev_f,
++    .perm       = BLK_PERM_WRITE,
+     .argmin     = 2,
+     .argmax     = -1,
+     .args       = "[-Cfq] [-P pattern] off len [len..]",
+@@ -1390,6 +1415,7 @@ static int aio_write_f(BlockBackend *blk, int argc, char **argv);
+ static const cmdinfo_t aio_write_cmd = {
+     .name       = "aio_write",
+     .cfunc      = aio_write_f,
++    .perm       = BLK_PERM_WRITE,
+     .argmin     = 2,
+     .argmax     = -1,
+     .args       = "[-Cfiquz] [-P pattern] off len [len..]",
+@@ -1554,6 +1580,7 @@ static const cmdinfo_t truncate_cmd = {
+     .name       = "truncate",
+     .altname    = "t",
+     .cfunc      = truncate_f,
++    .perm       = BLK_PERM_WRITE | BLK_PERM_RESIZE,
+     .argmin     = 1,
+     .argmax     = 1,
+     .args       = "off",
+@@ -1651,6 +1678,7 @@ static const cmdinfo_t discard_cmd = {
+     .name       = "discard",
+     .altname    = "d",
+     .cfunc      = discard_f,
++    .perm       = BLK_PERM_WRITE,
+     .argmin     = 2,
+     .argmax     = -1,
+     .args       = "[-Cq] off len",
 -- 
 1.8.3.1
