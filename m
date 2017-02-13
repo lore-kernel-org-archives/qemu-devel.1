@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59396)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cdKM0-0003IK-D7
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:23:58 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cdKM3-0003Mw-96
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:24:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cdKLy-0006AF-LR
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:23:56 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cdKM0-0006Ay-Lm
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:23:59 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 13 Feb 2017 18:22:40 +0100
-Message-Id: <1487006583-24350-19-git-send-email-kwolf@redhat.com>
+Date: Mon, 13 Feb 2017 18:22:41 +0100
+Message-Id: <1487006583-24350-20-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
 References: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 18/41] block: Allow error return in
- BlockDevOps.change_media_cb()
+Subject: [Qemu-devel] [RFC PATCH 19/41] hw/block: Request permissions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,202 +22,496 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-Some devices allow a media change between read-only and read-write
-media. They need to adapt the permissions in their .change_media_cb()
-implementation, which can fail. So add an Error parameter to the
-function.
+This makes all device emulations with a qdev drive property request
+permissions on their BlockBackend. We don't block anything yet.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/block-backend.c          | 12 +++++++++---
- blockdev.c                     | 19 +++++++++++++++----
- hw/block/fdc.c                 |  2 +-
- hw/ide/core.c                  |  2 +-
- hw/scsi/scsi-disk.c            |  2 +-
- hw/sd/sd.c                     |  2 +-
- include/block/block_int.h      |  2 +-
- include/sysemu/block-backend.h |  2 +-
- 8 files changed, 30 insertions(+), 13 deletions(-)
+ hw/block/block.c                 | 19 ++++++++++++++++++-
+ hw/block/fdc.c                   | 25 +++++++++++++++++++++++--
+ hw/block/m25p80.c                |  8 ++++++++
+ hw/block/nand.c                  |  7 +++++++
+ hw/block/nvme.c                  |  8 +++++++-
+ hw/block/onenand.c               |  7 +++++++
+ hw/block/pflash_cfi01.c          | 18 ++++++++++++------
+ hw/block/pflash_cfi02.c          | 19 +++++++++++++------
+ hw/block/virtio-blk.c            |  8 +++++++-
+ hw/core/qdev-properties-system.c |  1 -
+ hw/ide/qdev.c                    |  7 +++++--
+ hw/nvram/spapr_nvram.c           |  8 ++++++++
+ hw/scsi/scsi-disk.c              |  8 ++++++--
+ hw/sd/sd.c                       |  6 ++++++
+ hw/usb/dev-storage.c             |  6 +++++-
+ include/hw/block/block.h         |  3 ++-
+ tests/qemu-iotests/051.pc.out    |  6 +++---
+ 17 files changed, 137 insertions(+), 27 deletions(-)
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index e10a278..0c23add 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -671,15 +671,21 @@ void blk_set_dev_ops(BlockBackend *blk, const BlockDevOps *ops,
-  * Else, notify of media eject.
-  * Also send DEVICE_TRAY_MOVED events as appropriate.
-  */
--void blk_dev_change_media_cb(BlockBackend *blk, bool load)
-+void blk_dev_change_media_cb(BlockBackend *blk, bool load, Error **errp)
- {
-     if (blk->dev_ops && blk->dev_ops->change_media_cb) {
-         bool tray_was_open, tray_is_open;
-+        Error *local_err = NULL;
- 
-         assert(!blk->legacy_dev);
- 
-         tray_was_open = blk_dev_is_tray_open(blk);
--        blk->dev_ops->change_media_cb(blk->dev_opaque, load);
-+        blk->dev_ops->change_media_cb(blk->dev_opaque, load, &local_err);
-+        if (local_err) {
-+            assert(load == true);
-+            error_propagate(errp, local_err);
-+            return;
-+        }
-         tray_is_open = blk_dev_is_tray_open(blk);
- 
-         if (tray_was_open != tray_is_open) {
-@@ -693,7 +699,7 @@ void blk_dev_change_media_cb(BlockBackend *blk, bool load)
- 
- static void blk_root_change_media(BdrvChild *child, bool load)
- {
--    blk_dev_change_media_cb(child->opaque, load);
-+    blk_dev_change_media_cb(child->opaque, load, NULL);
+diff --git a/hw/block/block.c b/hw/block/block.c
+index 8dc9d84..c3d3901 100644
+--- a/hw/block/block.c
++++ b/hw/block/block.c
+@@ -51,11 +51,28 @@ void blkconf_blocksizes(BlockConf *conf)
+     }
  }
  
- /*
-diff --git a/blockdev.c b/blockdev.c
-index c590e67..8c30084 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2307,7 +2307,7 @@ static int do_open_tray(const char *blk_name, const char *qdev_id,
-     }
- 
-     if (!locked || force) {
--        blk_dev_change_media_cb(blk, false);
-+        blk_dev_change_media_cb(blk, false, &error_abort);
-     }
- 
-     if (locked && !force) {
-@@ -2345,6 +2345,7 @@ void qmp_blockdev_close_tray(bool has_device, const char *device,
-                              Error **errp)
+-void blkconf_apply_backend_options(BlockConf *conf)
++void blkconf_apply_backend_options(BlockConf *conf, bool readonly,
++                                   Error **errp)
  {
-     BlockBackend *blk;
-+    Error *local_err = NULL;
- 
-     device = has_device ? device : NULL;
-     id = has_id ? id : NULL;
-@@ -2368,7 +2369,11 @@ void qmp_blockdev_close_tray(bool has_device, const char *device,
-         return;
-     }
- 
--    blk_dev_change_media_cb(blk, true);
-+    blk_dev_change_media_cb(blk, true, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
+     BlockBackend *blk = conf->blk;
+     BlockdevOnError rerror, werror;
++    uint64_t perm;
+     bool wce;
++    int ret;
++
++    perm = BLK_PERM_CONSISTENT_READ;
++    if (!readonly) {
++        perm |= BLK_PERM_WRITE;
++    }
++
++    /* TODO Remove BLK_PERM_WRITE unless explicitly configured so */
++    ret = blk_set_perm(blk, perm,
++                       BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
++                       BLK_PERM_GRAPH_MOD | BLK_PERM_RESIZE | BLK_PERM_WRITE,
++                       errp);
++    if (ret < 0) {
 +        return;
 +    }
- }
  
- void qmp_x_blockdev_remove_medium(bool has_device, const char *device,
-@@ -2421,7 +2426,7 @@ void qmp_x_blockdev_remove_medium(bool has_device, const char *device,
-          * called at all); therefore, the medium needs to be ejected here.
-          * Do it after blk_remove_bs() so blk_is_inserted(blk) returns the @load
-          * value passed here (i.e. false). */
--        blk_dev_change_media_cb(blk, false);
-+        blk_dev_change_media_cb(blk, false, &error_abort);
-     }
- 
- out:
-@@ -2431,6 +2436,7 @@ out:
- static void qmp_blockdev_insert_anon_medium(BlockBackend *blk,
-                                             BlockDriverState *bs, Error **errp)
- {
-+    Error *local_err = NULL;
-     bool has_device;
-     int ret;
- 
-@@ -2463,7 +2469,12 @@ static void qmp_blockdev_insert_anon_medium(BlockBackend *blk,
-          * slot here.
-          * Do it after blk_insert_bs() so blk_is_inserted(blk) returns the @load
-          * value passed here (i.e. true). */
--        blk_dev_change_media_cb(blk, true);
-+        blk_dev_change_media_cb(blk, true, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            blk_remove_bs(blk);
-+            return;
-+        }
-     }
- }
- 
+     switch (conf->wce) {
+     case ON_OFF_AUTO_ON:    wce = true; break;
 diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-index 74f3634..5f6c496 100644
+index 5f6c496..b3fa4c7 100644
 --- a/hw/block/fdc.c
 +++ b/hw/block/fdc.c
-@@ -469,7 +469,7 @@ static void fd_revalidate(FDrive *drv)
-     }
- }
- 
--static void fd_change_cb(void *opaque, bool load)
-+static void fd_change_cb(void *opaque, bool load, Error **errp)
+@@ -186,6 +186,7 @@ typedef enum FDiskFlags {
+ struct FDrive {
+     FDCtrl *fdctrl;
+     BlockBackend *blk;
++    BlockConf *conf;
+     /* Drive status */
+     FloppyDriveType drive;    /* CMOS drive type        */
+     uint8_t perpendicular;    /* 2.88 MB access mode    */
+@@ -472,6 +473,19 @@ static void fd_revalidate(FDrive *drv)
+ static void fd_change_cb(void *opaque, bool load, Error **errp)
  {
      FDrive *drive = opaque;
++    Error *local_err = NULL;
++
++    if (!load) {
++        blk_set_perm(drive->blk, 0, BLK_PERM_ALL, &error_abort);
++    } else {
++        blkconf_apply_backend_options(drive->conf,
++                                      blk_is_read_only(drive->blk),
++                                      &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            return;
++        }
++    }
  
-diff --git a/hw/ide/core.c b/hw/ide/core.c
-index 43709e5..f88b1e5 100644
---- a/hw/ide/core.c
-+++ b/hw/ide/core.c
-@@ -1120,7 +1120,7 @@ static void ide_cfata_metadata_write(IDEState *s)
- }
+     drive->media_changed = 1;
+     drive->media_validated = false;
+@@ -508,6 +522,7 @@ static int floppy_drive_init(DeviceState *qdev)
+     FloppyDrive *dev = FLOPPY_DRIVE(qdev);
+     FloppyBus *bus = FLOPPY_BUS(qdev->parent_bus);
+     FDrive *drive;
++    Error *local_err = NULL;
+     int ret;
  
- /* called when the inserted state of the media has changed */
--static void ide_cd_change_cb(void *opaque, bool load)
-+static void ide_cd_change_cb(void *opaque, bool load, Error **errp)
+     if (dev->unit == -1) {
+@@ -533,7 +548,6 @@ static int floppy_drive_init(DeviceState *qdev)
+ 
+     if (!dev->conf.blk) {
+         /* Anonymous BlockBackend for an empty drive */
+-        /* FIXME Use real permissions */
+         dev->conf.blk = blk_new(0, BLK_PERM_ALL);
+         ret = blk_attach_dev(dev->conf.blk, qdev);
+         assert(ret == 0);
+@@ -552,7 +566,13 @@ static int floppy_drive_init(DeviceState *qdev)
+      * blkconf_apply_backend_options(). */
+     dev->conf.rerror = BLOCKDEV_ON_ERROR_AUTO;
+     dev->conf.werror = BLOCKDEV_ON_ERROR_AUTO;
+-    blkconf_apply_backend_options(&dev->conf);
++
++    blkconf_apply_backend_options(&dev->conf, blk_is_read_only(dev->conf.blk),
++                                  &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++        return -1;
++    }
+ 
+     /* 'enospc' is the default for -drive, 'report' is what blk_new() gives us
+      * for empty drives. */
+@@ -566,6 +586,7 @@ static int floppy_drive_init(DeviceState *qdev)
+         return -1;
+     }
+ 
++    drive->conf = &dev->conf;
+     drive->blk = dev->conf.blk;
+     drive->fdctrl = bus->fdc;
+ 
+diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
+index 2d6eb46..190573c 100644
+--- a/hw/block/m25p80.c
++++ b/hw/block/m25p80.c
+@@ -1215,6 +1215,7 @@ static void m25p80_realize(SSISlave *ss, Error **errp)
  {
-     IDEState *s = opaque;
-     uint64_t nb_sectors;
+     Flash *s = M25P80(ss);
+     M25P80Class *mc = M25P80_GET_CLASS(s);
++    int ret;
+ 
+     s->pi = mc->pi;
+ 
+@@ -1222,6 +1223,13 @@ static void m25p80_realize(SSISlave *ss, Error **errp)
+     s->dirty_page = -1;
+ 
+     if (s->blk) {
++        uint64_t perm = BLK_PERM_CONSISTENT_READ |
++                        (blk_is_read_only(s->blk) ? 0 : BLK_PERM_WRITE);
++        ret = blk_set_perm(s->blk, perm, BLK_PERM_ALL, errp);
++        if (ret < 0) {
++            return;
++        }
++
+         DB_PRINT_L(0, "Binding to IF_MTD drive\n");
+         s->storage = blk_blockalign(s->blk, s->size);
+ 
+diff --git a/hw/block/nand.c b/hw/block/nand.c
+index c69e675..0d33ac2 100644
+--- a/hw/block/nand.c
++++ b/hw/block/nand.c
+@@ -373,6 +373,8 @@ static void nand_realize(DeviceState *dev, Error **errp)
+ {
+     int pagesize;
+     NANDFlashState *s = NAND(dev);
++    int ret;
++
+ 
+     s->buswidth = nand_flash_ids[s->chip_id].width >> 3;
+     s->size = nand_flash_ids[s->chip_id].size << 20;
+@@ -407,6 +409,11 @@ static void nand_realize(DeviceState *dev, Error **errp)
+             error_setg(errp, "Can't use a read-only drive");
+             return;
+         }
++        ret = blk_set_perm(s->blk, BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE,
++                           BLK_PERM_ALL, errp);
++        if (ret < 0) {
++            return;
++        }
+         if (blk_getlength(s->blk) >=
+                 (s->pages << s->page_shift) + (s->pages << s->oob_shift)) {
+             pagesize = 0;
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index ae91a18..4d423af 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -835,6 +835,7 @@ static int nvme_init(PCIDevice *pci_dev)
+     int i;
+     int64_t bs_size;
+     uint8_t *pci_conf;
++    Error *local_err = NULL;
+ 
+     if (!n->conf.blk) {
+         return -1;
+@@ -850,7 +851,12 @@ static int nvme_init(PCIDevice *pci_dev)
+         return -1;
+     }
+     blkconf_blocksizes(&n->conf);
+-    blkconf_apply_backend_options(&n->conf);
++    blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->conf.blk),
++                                  &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++        return -1;
++    }
+ 
+     pci_conf = pci_dev->config;
+     pci_conf[PCI_INTERRUPT_PIN] = 1;
+diff --git a/hw/block/onenand.c b/hw/block/onenand.c
+index 8d84227..ddf5492 100644
+--- a/hw/block/onenand.c
++++ b/hw/block/onenand.c
+@@ -778,6 +778,7 @@ static int onenand_initfn(SysBusDevice *sbd)
+     OneNANDState *s = ONE_NAND(dev);
+     uint32_t size = 1 << (24 + ((s->id.dev >> 4) & 7));
+     void *ram;
++    Error *local_err = NULL;
+ 
+     s->base = (hwaddr)-1;
+     s->rdy = NULL;
+@@ -796,6 +797,12 @@ static int onenand_initfn(SysBusDevice *sbd)
+             error_report("Can't use a read-only drive");
+             return -1;
+         }
++        blk_set_perm(s->blk, BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE,
++                     BLK_PERM_ALL, &local_err);
++        if (local_err) {
++            error_report_err(local_err);
++            return -1;
++        }
+         s->blk_cur = s->blk;
+     }
+     s->otp = memset(g_malloc((64 + 2) << PAGE_SHIFT),
+diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+index 71b98a3..594d4cf 100644
+--- a/hw/block/pflash_cfi01.c
++++ b/hw/block/pflash_cfi01.c
+@@ -758,6 +758,18 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
+     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &pfl->mem);
+ 
+     if (pfl->blk) {
++        uint64_t perm;
++        pfl->ro = blk_is_read_only(pfl->blk);
++        perm = BLK_PERM_CONSISTENT_READ | (pfl->ro ? 0 : BLK_PERM_WRITE);
++        ret = blk_set_perm(pfl->blk, perm, BLK_PERM_ALL, errp);
++        if (ret < 0) {
++            return;
++        }
++    } else {
++        pfl->ro = 0;
++    }
++
++    if (pfl->blk) {
+         /* read the initial flash content */
+         ret = blk_pread(pfl->blk, 0, pfl->storage, total_len);
+ 
+@@ -768,12 +780,6 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
+         }
+     }
+ 
+-    if (pfl->blk) {
+-        pfl->ro = blk_is_read_only(pfl->blk);
+-    } else {
+-        pfl->ro = 0;
+-    }
+-
+     /* Default to devices being used at their maximum device width. This was
+      * assumed before the device_width support was added.
+      */
+diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+index ef71322..e6c5c6c 100644
+--- a/hw/block/pflash_cfi02.c
++++ b/hw/block/pflash_cfi02.c
+@@ -632,6 +632,19 @@ static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
+     vmstate_register_ram(&pfl->orig_mem, DEVICE(pfl));
+     pfl->storage = memory_region_get_ram_ptr(&pfl->orig_mem);
+     pfl->chip_len = chip_len;
++
++    if (pfl->blk) {
++        uint64_t perm;
++        pfl->ro = blk_is_read_only(pfl->blk);
++        perm = BLK_PERM_CONSISTENT_READ | (pfl->ro ? 0 : BLK_PERM_WRITE);
++        ret = blk_set_perm(pfl->blk, perm, BLK_PERM_ALL, errp);
++        if (ret < 0) {
++            return;
++        }
++    } else {
++        pfl->ro = 0;
++    }
++
+     if (pfl->blk) {
+         /* read the initial flash content */
+         ret = blk_pread(pfl->blk, 0, pfl->storage, chip_len);
+@@ -646,12 +659,6 @@ static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
+     pfl->rom_mode = 1;
+     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &pfl->mem);
+ 
+-    if (pfl->blk) {
+-        pfl->ro = blk_is_read_only(pfl->blk);
+-    } else {
+-        pfl->ro = 0;
+-    }
+-
+     pfl->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, pflash_timer, pfl);
+     pfl->wcycle = 0;
+     pfl->cmd = 0;
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index 702eda8..18fcaa0 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -905,7 +905,13 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
+     }
+ 
+     blkconf_serial(&conf->conf, &conf->serial);
+-    blkconf_apply_backend_options(&conf->conf);
++    blkconf_apply_backend_options(&conf->conf,
++                                  blk_is_read_only(conf->conf.blk),
++                                  &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
+     s->original_wce = blk_enable_write_cache(conf->conf.blk);
+     blkconf_geometry(&conf->conf, NULL, 65535, 255, 255, &err);
+     if (err) {
+diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
+index 66ba367..c34be1c 100644
+--- a/hw/core/qdev-properties-system.c
++++ b/hw/core/qdev-properties-system.c
+@@ -79,7 +79,6 @@ static void parse_drive(DeviceState *dev, const char *str, void **ptr,
+     if (!blk) {
+         BlockDriverState *bs = bdrv_lookup_bs(NULL, str, NULL);
+         if (bs) {
+-            /* FIXME Use real permissions */
+             blk = blk_new(0, BLK_PERM_ALL);
+             blk_created = true;
+ 
+diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
+index bb3c377..db36843 100644
+--- a/hw/ide/qdev.c
++++ b/hw/ide/qdev.c
+@@ -170,7 +170,6 @@ static int ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind)
+             return -1;
+         } else {
+             /* Anonymous BlockBackend for an empty drive */
+-            /* FIXME Use real permissions */
+             dev->conf.blk = blk_new(0, BLK_PERM_ALL);
+         }
+     }
+@@ -197,7 +196,11 @@ static int ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind)
+             return -1;
+         }
+     }
+-    blkconf_apply_backend_options(&dev->conf);
++    blkconf_apply_backend_options(&dev->conf, kind == IDE_CD, &err);
++    if (err) {
++        error_report_err(err);
++        return -1;
++    }
+ 
+     if (ide_init_drive(s, dev->conf.blk, kind,
+                        dev->version, dev->serial, dev->model, dev->wwn,
+diff --git a/hw/nvram/spapr_nvram.c b/hw/nvram/spapr_nvram.c
+index eb42ea3..a7cc203 100644
+--- a/hw/nvram/spapr_nvram.c
++++ b/hw/nvram/spapr_nvram.c
+@@ -141,9 +141,17 @@ static void rtas_nvram_store(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+ static void spapr_nvram_realize(VIOsPAPRDevice *dev, Error **errp)
+ {
+     sPAPRNVRAM *nvram = VIO_SPAPR_NVRAM(dev);
++    int ret;
+ 
+     if (nvram->blk) {
+         nvram->size = blk_getlength(nvram->blk);
++
++        ret = blk_set_perm(nvram->blk,
++                           BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE,
++                           BLK_PERM_ALL, errp);
++        if (ret < 0) {
++            return;
++        }
+     } else {
+         nvram->size = DEFAULT_NVRAM_SIZE;
+     }
 diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index 61c44a9..f3f20da 100644
+index f3f20da..5683af6 100644
 --- a/hw/scsi/scsi-disk.c
 +++ b/hw/scsi/scsi-disk.c
-@@ -2225,7 +2225,7 @@ static void scsi_disk_resize_cb(void *opaque)
+@@ -2313,7 +2313,12 @@ static void scsi_realize(SCSIDevice *dev, Error **errp)
+             return;
+         }
      }
- }
+-    blkconf_apply_backend_options(&dev->conf);
++    blkconf_apply_backend_options(&dev->conf,
++                                  blk_is_read_only(s->qdev.conf.blk), &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
  
--static void scsi_cd_change_media_cb(void *opaque, bool load)
-+static void scsi_cd_change_media_cb(void *opaque, bool load, Error **errp)
- {
-     SCSIDiskState *s = opaque;
+     if (s->qdev.conf.discard_granularity == -1) {
+         s->qdev.conf.discard_granularity =
+@@ -2365,7 +2370,6 @@ static void scsi_cd_realize(SCSIDevice *dev, Error **errp)
+     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, dev);
+ 
+     if (!dev->conf.blk) {
+-        /* FIXME Use real permissions */
+         dev->conf.blk = blk_new(0, BLK_PERM_ALL);
+     }
  
 diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 8e88e83..8e31491 100644
+index 8e31491..ba47bff 100644
 --- a/hw/sd/sd.c
 +++ b/hw/sd/sd.c
-@@ -458,7 +458,7 @@ static bool sd_get_readonly(SDState *sd)
-     return sd->wp_switch;
- }
- 
--static void sd_cardchange(void *opaque, bool load)
-+static void sd_cardchange(void *opaque, bool load, Error **errp)
+@@ -1887,6 +1887,7 @@ static void sd_instance_finalize(Object *obj)
+ static void sd_realize(DeviceState *dev, Error **errp)
  {
-     SDState *sd = opaque;
-     DeviceState *dev = DEVICE(sd);
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 46f51a6..7558f99 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -895,7 +895,7 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
-                                uint64_t *nperm, uint64_t *nshared);
+     SDState *sd = SD_CARD(dev);
++    int ret;
  
- const char *bdrv_get_parent_name(const BlockDriverState *bs);
--void blk_dev_change_media_cb(BlockBackend *blk, bool load);
-+void blk_dev_change_media_cb(BlockBackend *blk, bool load, Error **errp);
- bool blk_dev_has_removable_media(BlockBackend *blk);
- bool blk_dev_has_tray(BlockBackend *blk);
- void blk_dev_eject_request(BlockBackend *blk, bool force);
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
-index 6f21508..65bd081 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -34,7 +34,7 @@ typedef struct BlockDevOps {
-      * changes.  Sure would be useful if it did.
-      * Device models with removable media must implement this callback.
-      */
--    void (*change_media_cb)(void *opaque, bool load);
-+    void (*change_media_cb)(void *opaque, bool load, Error **errp);
+     if (sd->blk && blk_is_read_only(sd->blk)) {
+         error_setg(errp, "Cannot use read-only drive as SD card");
+@@ -1894,6 +1895,11 @@ static void sd_realize(DeviceState *dev, Error **errp)
+     }
+ 
+     if (sd->blk) {
++        ret = blk_set_perm(sd->blk, BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE,
++                           BLK_PERM_ALL, errp);
++        if (ret < 0) {
++            return;
++        }
+         blk_set_dev_ops(sd->blk, &sd_block_ops, sd);
+     }
+ }
+diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
+index c607f76..46def96 100644
+--- a/hw/usb/dev-storage.c
++++ b/hw/usb/dev-storage.c
+@@ -603,7 +603,11 @@ static void usb_msd_realize_storage(USBDevice *dev, Error **errp)
+ 
+     blkconf_serial(&s->conf, &dev->serial);
+     blkconf_blocksizes(&s->conf);
+-    blkconf_apply_backend_options(&s->conf);
++    blkconf_apply_backend_options(&s->conf, blk_is_read_only(blk), &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
+ 
      /*
-      * Runs when an eject request is issued from the monitor, the tray
-      * is closed, and the medium is locked.
+      * Hack alert: this pretends to be a block device, but it's really
+diff --git a/include/hw/block/block.h b/include/hw/block/block.h
+index df9d207..3daccf1 100644
+--- a/include/hw/block/block.h
++++ b/include/hw/block/block.h
+@@ -73,7 +73,8 @@ void blkconf_geometry(BlockConf *conf, int *trans,
+                       unsigned cyls_max, unsigned heads_max, unsigned secs_max,
+                       Error **errp);
+ void blkconf_blocksizes(BlockConf *conf);
+-void blkconf_apply_backend_options(BlockConf *conf);
++void blkconf_apply_backend_options(BlockConf *conf, bool readonly,
++                                   Error **errp);
+ 
+ /* Hard disk geometry */
+ 
+diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.out
+index f1669c1..eb4b3b5 100644
+--- a/tests/qemu-iotests/051.pc.out
++++ b/tests/qemu-iotests/051.pc.out
+@@ -176,7 +176,7 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ 
+ Testing: -drive file=TEST_DIR/t.qcow2,if=ide,readonly=on
+ QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) QEMU_PROG: Can't use a read-only drive
++(qemu) QEMU_PROG: Block node is read-only
+ QEMU_PROG: Initialization of device ide-hd failed: Device initialization failed.
+ 
+ Testing: -drive file=TEST_DIR/t.qcow2,if=scsi,readonly=on
+@@ -197,12 +197,12 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ 
+ Testing: -drive file=TEST_DIR/t.qcow2,if=none,id=disk,readonly=on -device ide-drive,drive=disk
+ QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) QEMU_PROG: -device ide-drive,drive=disk: Can't use a read-only drive
++(qemu) QEMU_PROG: -device ide-drive,drive=disk: Block node is read-only
+ QEMU_PROG: -device ide-drive,drive=disk: Device initialization failed.
+ 
+ Testing: -drive file=TEST_DIR/t.qcow2,if=none,id=disk,readonly=on -device ide-hd,drive=disk
+ QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) QEMU_PROG: -device ide-hd,drive=disk: Can't use a read-only drive
++(qemu) QEMU_PROG: -device ide-hd,drive=disk: Block node is read-only
+ QEMU_PROG: -device ide-hd,drive=disk: Device initialization failed.
+ 
+ Testing: -drive file=TEST_DIR/t.qcow2,if=none,id=disk,readonly=on -device lsi53c895a -device scsi-disk,drive=disk
 -- 
 1.8.3.1
