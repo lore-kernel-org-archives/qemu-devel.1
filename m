@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cdJby-0002bA-BP
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:36:23 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cdJdN-0004JU-O7
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:37:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cdJbt-0008Np-H3
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:36:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59868)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cdJbt-0008Ne-BB
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:36:17 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7027C80F8E
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 16:36:17 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170127180255.GI3323@work-vm> (David Alan Gilbert's message of
-	"Fri, 27 Jan 2017 18:02:56 +0000")
-References: <1485207141-1941-1-git-send-email-quintela@redhat.com>
-	<1485207141-1941-11-git-send-email-quintela@redhat.com>
-	<20170127180255.GI3323@work-vm>
-Reply-To: quintela@redhat.com
-Date: Mon, 13 Feb 2017 17:36:03 +0100
-Message-ID: <8760ke59qk.fsf@emacs.mitica>
+	(envelope-from <stefanha@gmail.com>) id 1cdJdM-0000Kp-R8
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:37:49 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36286)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cdJdM-0000KS-L6
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:37:48 -0500
+Received: by mail-wm0-x242.google.com with SMTP id r18so20480898wmd.3
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 08:37:48 -0800 (PST)
+Date: Mon, 13 Feb 2017 16:37:45 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170213163745.GQ10361@stefanha-x1.localdomain>
+References: <3163c16d6ab4257f7be9ad44fe9cc0ce8c359e5a.1486718555.git.phrdina@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 10/17] migration: create ram_multifd_page
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="/YnR2r17TIEndSCI"
+Content-Disposition: inline
+In-Reply-To: <3163c16d6ab4257f7be9ad44fe9cc0ce8c359e5a.1486718555.git.phrdina@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] monitor: add poll-* properties into
+ query-iothreads result
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,61 +30,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, amit.shah@redhat.com
-
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> * Juan Quintela (quintela@redhat.com) wrote:
->> The function still don't use multifd, but we have simplified
->> ram_save_page, xbzrle and RDMA stuff is gone.  We have added a new
->> counter and a new flag for this type of pages.
+To: Pavel Hrdina <phrdina@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, armbru@redhat.com
 
 
->> +static int ram_multifd_page(QEMUFile *f, PageSearchStatus *pss,
->> +                            bool last_stage, uint64_t *bytes_transferred)
->> +{
->> +    int pages;
->> +    uint8_t *p;
->> +    RAMBlock *block = pss->block;
->> +    ram_addr_t offset = pss->offset;
->> +
->> +    p = block->host + offset;
->> +
->> +    if (block == last_sent_block) {
->> +        offset |= RAM_SAVE_FLAG_CONTINUE;
->> +    }
->> +    pages = save_zero_page(f, block, offset, p, bytes_transferred);
->> +    if (pages == -1) {
->> +        *bytes_transferred +=
->> +            save_page_header(f, block, offset | RAM_SAVE_FLAG_MULTIFD_PAGE);
->> +        qemu_put_buffer(f, p, TARGET_PAGE_SIZE);
->> +        *bytes_transferred += TARGET_PAGE_SIZE;
->> +        pages = 1;
->> +        acct_info.norm_pages++;
->> +        acct_info.multifd_pages++;
->> +    }
->> +
->> +    return pages;
->> +}
->> +
->>  static int do_compress_ram_page(QEMUFile *f, RAMBlock *block,
->>                                  ram_addr_t offset)
->>  {
->> @@ -1427,6 +1461,8 @@ static int ram_save_target_page(MigrationState *ms, QEMUFile *f,
->>              res = ram_save_compressed_page(f, pss,
->>                                             last_stage,
->>                                             bytes_transferred);
->> +        } else if (migrate_use_multifd()) {
->> +            res = ram_multifd_page(f, pss, last_stage, bytes_transferred);
->
-> I'm curious whether it's best to pick the destination fd at this level or one level
-> higher; for example would it be good to keep all the components of a
-> host page or huge
-> page together on the same fd? If so then it would be best to pick the fd
-> at ram_save_host_page level.
+--/YnR2r17TIEndSCI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-my plan here would be to change the migration code to be able to call
-with a bigger sizes, not page by page, and then the problem is solved by
-itself?
+On Fri, Feb 10, 2017 at 10:41:17AM +0100, Pavel Hrdina wrote:
+> IOthreads were recently extended by new properties that can
+> enable/disable and configure aio polling.  This will also allow
+> other tools that uses QEMU to probe for existence of those new
+> properties via query-qmp-schema.
+>=20
+> Signed-off-by: Pavel Hrdina <phrdina@redhat.com>
+> ---
+>=20
+> The other possible way would be to introduce object-list-properties
+> which I think would be good in general for the same reason why
+> device-list-properties exists.
+>=20
+>  hmp.c            |  9 +++++++--
+>  iothread.c       |  3 +++
+>  qapi-schema.json | 15 ++++++++++++++-
+>  3 files changed, 24 insertions(+), 3 deletions(-)
 
-Later, Juan.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--/YnR2r17TIEndSCI
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYoeDZAAoJEJykq7OBq3PIlb0H/0qSTk4TQ/TlSD8OghEhYI6z
+h3dXLYx0F8ziLCN4PwqRyWJBtBKu9bDdZVmkSC3R7vtiEbUeZspVxzwFEyPH1xJg
+47HMn8EdoeXBttQv055mkS202Dmh42LGZtz4BBJVCo+OJ4U2wNUDZybbTbX/fRuh
+iKgTomLUEfsRfj7qLI05v25SVTr3ECQs1IWcP65St2B4RG6QD/aKIRiu/I2A0KZ2
+PT4PlER+IyhOyFuptTaT505Zbk78+fNefRCpHcv0ac7IFaT2YrJ2b8rAnHnmzTmo
+sX5lncc2Ffr76siSJOmD3PKhGx5aKKyKE3sZE8k+0fpJKuABtWBlnxCG7PrVmNc=
+=gc2Q
+-----END PGP SIGNATURE-----
+
+--/YnR2r17TIEndSCI--
