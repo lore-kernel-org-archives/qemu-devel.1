@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41309)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Ketan.Nilangekar@veritas.com>) id 1cdPF5-0004vj-MC
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 17:37:09 -0500
+	(envelope-from <jcody@redhat.com>) id 1cdPxd-0001Oc-SG
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 18:23:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Ketan.Nilangekar@veritas.com>) id 1cdPF0-0005wn-P0
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 17:37:07 -0500
-Received: from mail1.bemta12.messagelabs.com ([216.82.251.10]:56157)
+	(envelope-from <jcody@redhat.com>) id 1cdPxZ-0001XM-TL
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 18:23:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41860)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Ketan.Nilangekar@veritas.com>)
-	id 1cdPF0-0005w7-EC
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 17:37:02 -0500
-From: Ketan Nilangekar <Ketan.Nilangekar@veritas.com>
-Date: Mon, 13 Feb 2017 22:36:53 +0000
-Message-ID: <B3F9860E-E786-48A5-8BBD-918833905E73@veritas.com>
+	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1cdPxZ-0001W4-KC
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 18:23:05 -0500
+Date: Mon, 13 Feb 2017 18:23:02 -0500
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170213232302.GP27752@localhost.localdomain>
 References: <1478566785-4002-1-git-send-email-ashish.mittal@veritas.com>
 	<1478566785-4002-3-git-send-email-ashish.mittal@veritas.com>
 	<20161108204413.GA6353@localhost.localdomain>
 	<CAAo6VWMyTjV1Fn8-BSex7Fx8OcEcuEyK2rQJ6L=wZZXDiB5A4w@mail.gmail.com>
 	<20170213133725.GA10361@stefanha-x1.localdomain>
 	<20170213163232.GN27752@localhost.localdomain>
-In-Reply-To: <20170213163232.GN27752@localhost.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <5019BDA0A50CF046869D05AADD615F5C@veritas.com>
-Content-Transfer-Encoding: base64
+	<B3F9860E-E786-48A5-8BBD-918833905E73@veritas.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <B3F9860E-E786-48A5-8BBD-918833905E73@veritas.com>
 Subject: Re: [Qemu-devel] [PATCH v6 2/2] block/vxhs.c: Add qemu-iotests for
  new block device type "vxhs"
 List-Id: <qemu-devel.nongnu.org>
@@ -35,70 +33,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: ashish mittal <ashmit602@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus
-	Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>
+To: Ketan Nilangekar <Ketan.Nilangekar@veritas.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, ashish mittal <ashmit602@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>
 
-DQoNCk9uIDIvMTMvMTcsIDg6MzIgQU0sICJKZWZmIENvZHkiIDxqY29keUByZWRoYXQuY29tPiB3
-cm90ZToNCg0KICAgIE9uIE1vbiwgRmViIDEzLCAyMDE3IGF0IDAxOjM3OjI1UE0gKzAwMDAsIFN0
-ZWZhbiBIYWpub2N6aSB3cm90ZToNCiAgICA+IE9uIFR1ZSwgRmViIDA3LCAyMDE3IGF0IDAzOjEy
-OjM2UE0gLTA4MDAsIGFzaGlzaCBtaXR0YWwgd3JvdGU6DQogICAgPiA+IE9uIFR1ZSwgTm92IDgs
-IDIwMTYgYXQgMTI6NDQgUE0sIEplZmYgQ29keSA8amNvZHlAcmVkaGF0LmNvbT4gd3JvdGU6DQog
-ICAgPiA+ID4gT24gTW9uLCBOb3YgMDcsIDIwMTYgYXQgMDQ6NTk6NDVQTSAtMDgwMCwgQXNoaXNo
-IE1pdHRhbCB3cm90ZToNCiAgICA+ID4gPj4gVGhlc2UgY2hhbmdlcyB1c2UgYSB2eGhzIHRlc3Qg
-c2VydmVyIHRoYXQgaXMgYSBwYXJ0IG9mIHRoZSBmb2xsb3dpbmcNCiAgICA+ID4gPj4gcmVwb3Np
-dG9yeToNCiAgICA+ID4gPj4gaHR0cHM6Ly9naXRodWIuY29tL01pdHRhbEFzaGlzaC9saWJxbmlv
-LmdpdA0KICAgID4gPiA+Pg0KICAgID4gPiA+PiBTaWduZWQtb2ZmLWJ5OiBBc2hpc2ggTWl0dGFs
-IDxhc2hpc2gubWl0dGFsQHZlcml0YXMuY29tPg0KICAgID4gPiA+PiAtLS0NCiAgICA+ID4gPj4g
-djYgY2hhbmdlbG9nOg0KICAgID4gPiA+PiAoMSkgQWRkZWQgaW90ZXN0cyBmb3IgVnhIUyBibG9j
-ayBkZXZpY2UuDQogICAgPiA+ID4+DQogICAgPiA+ID4+ICB0ZXN0cy9xZW11LWlvdGVzdHMvY29t
-bW9uICAgICAgICB8ICA2ICsrKysrKw0KICAgID4gPiA+PiAgdGVzdHMvcWVtdS1pb3Rlc3RzL2Nv
-bW1vbi5jb25maWcgfCAxMyArKysrKysrKysrKysrDQogICAgPiA+ID4+ICB0ZXN0cy9xZW11LWlv
-dGVzdHMvY29tbW9uLmZpbHRlciB8ICAxICsNCiAgICA+ID4gPj4gIHRlc3RzL3FlbXUtaW90ZXN0
-cy9jb21tb24ucmMgICAgIHwgMTkgKysrKysrKysrKysrKysrKysrKw0KICAgID4gPiA+PiAgNCBm
-aWxlcyBjaGFuZ2VkLCAzOSBpbnNlcnRpb25zKCspDQogICAgPiA+ID4+DQogICAgPiA+ID4+IGRp
-ZmYgLS1naXQgYS90ZXN0cy9xZW11LWlvdGVzdHMvY29tbW9uIGIvdGVzdHMvcWVtdS1pb3Rlc3Rz
-L2NvbW1vbg0KICAgID4gPiA+PiBpbmRleCBkNjBlYTJjLi40MTQzMGQ4IDEwMDY0NA0KICAgID4g
-PiA+PiAtLS0gYS90ZXN0cy9xZW11LWlvdGVzdHMvY29tbW9uDQogICAgPiA+ID4+ICsrKyBiL3Rl
-c3RzL3FlbXUtaW90ZXN0cy9jb21tb24NCiAgICA+ID4gPg0KICAgID4gPiA+IFdoZW4gdXNpbmcg
-cmF3IGZvcm1hdCwgSSB3YXMgYWJsZSB0byBydW4gdGhlIHRlc3Qgc3VjY2Vzc2Z1bGx5IGZvciBh
-bGwNCiAgICA+ID4gPiBzdXBwb3J0ZWQgdGVzdCBjYXNlcyAoMjYgb2YgdGhlbSkuDQogICAgPiA+
-ID4NCiAgICA+ID4gPiBXaXRoIHFjb3cyLCB0aGV5IGZhaWwgLSBidXQgbm90IHRoZSBmYXVsdCBv
-ZiB0aGlzIHBhdGNoLCBJIHRoaW5rOyBidXQNCiAgICA+ID4gPiByYXRoZXIsIHRoZSBmYXVsdCBv
-ZiB0aGUgdGVzdCBzZXJ2ZXIuICBDYW4gcW5pb19zZXJ2ZXIgYmUgbW9kaWZpZWQgc28gdGhhdA0K
-ICAgID4gPiA+IGl0IGRvZXMgbm90IHdvcmsgb24ganVzdCByYXcgZmlsZXM/DQogICAgPiA+ID4N
-CiAgICA+ID4gPg0KICAgID4gPiANCiAgICA+ID4gVnhIUyBzdXBwb3J0cyBhbmQgdXNlcyBvbmx5
-IHRoZSByYXcgZm9ybWF0Lg0KICAgID4gDQogICAgPiBUaGF0J3MgbGlrZSBzYXlpbmcgb25seSBl
-eHQ0IGd1ZXN0IGZpbGUgc3lzdGVtcyBhcmUgc3VwcG9ydGVkIG9uIFZ4SFMNCiAgICA+IGFuZCBu
-b3QgWkZTLiAgVGhlIFZ4SFMgZHJpdmVyIHNob3VsZCBub3QgY2FyZSB3aGF0IGZpbGUgc3lzdGVt
-IGlzIHVzZWQsDQogICAgPiBpdCBqdXN0IGRvZXMgYmxvY2sgSS9PIHdpdGhvdXQgaW50ZXJwcmV0
-aW5nIHRoZSBkYXRhLg0KICAgID4gDQogICAgPiBJdCBtdXN0IGJlIHBvc3NpYmxlIHRvIHVzZSBh
-bnkgZm9ybWF0IG9uIHRvcCBvZiB0aGUgVnhIUyBwcm90b2NvbC4NCiAgICA+IEFmdGVyIGFsbCwg
-dGhlIGltYWdlIGZvcm1hdCBkcml2ZXJzIGp1c3QgZG8gYmxvY2sgSS9PLiAgSWYgdGhlcmUgaXMg
-YQ0KICAgID4gY2FzZSB3aGVyZSBxY293MiBvbiBWeEhTIGZhaWxzIHRoZW4gaXQgbmVlZHMgdG8g
-YmUgaW52ZXN0aWdhdGVkLg0KICAgID4gDQogICAgPiBUaGUgVnhIUyBkcml2ZXIgY2FuJ3QgYmUg
-bWVyZ2VkIHVudGlsIHdlIGF0IGxlYXN0IHVuZGVyc3RhbmQgdGhlIGNhdXNlDQogICAgPiBvZiB0
-aGUgcWNvdzIgdGVzdCBmYWlsdXJlcy4NCiAgICA+DQogICAgDQogICAgQSBxdWljayBydW4gd2l0
-aCB0aGUgdGVzdCBzZXJ2ZXIgYW5kIGEgUUVNVSBwcm9jZXNzIHNob3dlZCBhbiBhYm9ydCgpIGlu
-IHRoZQ0KICAgIHRlc3Qgc2VydmVyLCBzbyBJIGp1c3Qgc2VudCBhIHB1bGwgcmVxIHRvIGxpYnFu
-aW8gdG8gZml4IHRoYXQuICANCiAgICANCiAgICBCdXQgcGxheWluZyB3aXRoIGl0IGluIGdkYiBy
-aWdodCBub3cgd2l0aCBhIHRlc3QgcWNvdzIgZmlsZSwgSSBzZWUgdGhhdCB3ZQ0KICAgIGFyZSB3
-YWl0aW5nIGluIGFpb19wb2xsKCkgZm9yZXZlciBmb3IgdGhlIHRlc3Qgc2VydmVyIHRvIHJlc3Bv
-bmQgdG8gYSByZWFkDQogICAgcmVxdWVzdCwgd2hlbiB1c2luZyBxY293MiBmb3JtYXQuICANCiAg
-ICANCiAgICBBcyBTdGVmYW4gc2FpZCwgdGhpcyBkb2Vzbid0IHJlYWxseSBtYWtlIGFueSBzZW5z
-ZSAtIHdoeSB3b3VsZCBWWEhTIGJlaGF2ZQ0KICAgIGRpZmZlcmVudGx5IGJhc2VkIG9uIHRoZSBm
-aWxlIGNvbnRlbnRzPw0KDQpbS2V0YW5dIA0KVG8gcmVhZC93cml0ZSBhIHFjb3cyIGJhY2tlZCBk
-ZXZpY2UgVnhIUyBzZXJ2ZXIgaW1wbGVtZW50YXRpb24gd2lsbCBuZWVkIHRvIHVuZGVyc3RhbmQg
-dGhlIHFjb3cyIGZvcm1hdC4gVGhpcyBpcyBub3QganVzdCBibG9jayBJTyBidXQgYWN0dWFsbHkg
-ZG9lcyBpbnZvbHZlIGludGVycHJldGluZyB0aGUgcWNvdzIgaGVhZGVyIGFuZCBjbHVzdGVyIGZv
-cm1hdHMuIENsZWFybHkgdGhlIHRlc3Qgc2VydmVyIGltcGxlbWVudGF0aW9uIGRvZXMgbm90IGhh
-bmRsZSBpdCBhcyBpdCB3YXMgbmV2ZXIgaW50ZW5kZWQgdG8uIFZ4SFMgYmFja2VuZCB3b24ndCBo
-YW5kbGUgaXQgZWl0aGVyIGJlY2F1c2UgVnhIUyB2aXJ0dWFsIGRpc2tzIGFyZSB3cml0dGVuIGFz
-IG5vbi1zcGFyc2UgZmlsZXMuDQpUaGVyZSBhcmUgc3BhY2Ugc2F2aW5ncyB3aXRoIHRoZSBxY293
-MiBmb3JtYXQgYnV0IHBlcmZvcm1hbmNlIHBlbmFsdGllcyBhcyB3ZWxsIGJlY2F1c2Ugb2YgdGhl
-IG1ldGFkYXRhIG92ZXJoZWFkLiBBcyBhIGJsb2NrIHN0b3JhZ2UgcHJvdmlkZXIsIFZ4SFMgZG9l
-cyBub3Qgc3VwcG9ydCBzcGFyc2UgZmlsZSBmb3JtYXRzIGxpa2UgcWNvdzIgcHJpbWFyaWx5IGJl
-Y2F1c2Ugb2YgcGVyZm9ybWFuY2UgcmVhc29ucy4NCkltcGxlbWVudGluZyBhIHFjb3cyIGJhY2tl
-bmQgaW4gdGhlIHRlc3Qgc2VydmVyIHdvdWxkIGJlIGEgbm9uLXRyaXZpYWwgYW5kIG5vbi11c2Vm
-dWwgZXhlcmNpc2Ugc2luY2UgdGhlIFZ4SFMgc2VydmVyIHdvbid0IHN1cHBvcnQgaXQuDQoNCiAg
-IA0KDQogSmVmZg0KICAgIA0KDQo=
+On Mon, Feb 13, 2017 at 10:36:53PM +0000, Ketan Nilangekar wrote:
+> 
+> 
+> On 2/13/17, 8:32 AM, "Jeff Cody" <jcody@redhat.com> wrote:
+> 
+>     On Mon, Feb 13, 2017 at 01:37:25PM +0000, Stefan Hajnoczi wrote:
+>     > On Tue, Feb 07, 2017 at 03:12:36PM -0800, ashish mittal wrote:
+>     > > On Tue, Nov 8, 2016 at 12:44 PM, Jeff Cody <jcody@redhat.com> wrote:
+>     > > > On Mon, Nov 07, 2016 at 04:59:45PM -0800, Ashish Mittal wrote:
+>     > > >> These changes use a vxhs test server that is a part of the following
+>     > > >> repository:
+>     > > >> https://github.com/MittalAshish/libqnio.git
+>     > > >>
+>     > > >> Signed-off-by: Ashish Mittal <ashish.mittal@veritas.com>
+>     > > >> ---
+>     > > >> v6 changelog:
+>     > > >> (1) Added iotests for VxHS block device.
+>     > > >>
+>     > > >>  tests/qemu-iotests/common        |  6 ++++++
+>     > > >>  tests/qemu-iotests/common.config | 13 +++++++++++++
+>     > > >>  tests/qemu-iotests/common.filter |  1 +
+>     > > >>  tests/qemu-iotests/common.rc     | 19 +++++++++++++++++++
+>     > > >>  4 files changed, 39 insertions(+)
+>     > > >>
+>     > > >> diff --git a/tests/qemu-iotests/common b/tests/qemu-iotests/common
+>     > > >> index d60ea2c..41430d8 100644
+>     > > >> --- a/tests/qemu-iotests/common
+>     > > >> +++ b/tests/qemu-iotests/common
+>     > > >
+>     > > > When using raw format, I was able to run the test successfully for all
+>     > > > supported test cases (26 of them).
+>     > > >
+>     > > > With qcow2, they fail - but not the fault of this patch, I think; but
+>     > > > rather, the fault of the test server.  Can qnio_server be modified so that
+>     > > > it does not work on just raw files?
+>     > > >
+>     > > >
+>     > > 
+>     > > VxHS supports and uses only the raw format.
+>     > 
+>     > That's like saying only ext4 guest file systems are supported on VxHS
+>     > and not ZFS.  The VxHS driver should not care what file system is used,
+>     > it just does block I/O without interpreting the data.
+>     > 
+>     > It must be possible to use any format on top of the VxHS protocol.
+>     > After all, the image format drivers just do block I/O.  If there is a
+>     > case where qcow2 on VxHS fails then it needs to be investigated.
+>     > 
+>     > The VxHS driver can't be merged until we at least understand the cause
+>     > of the qcow2 test failures.
+>     >
+>     
+>     A quick run with the test server and a QEMU process showed an abort() in the
+>     test server, so I just sent a pull req to libqnio to fix that.  
+>     
+>     But playing with it in gdb right now with a test qcow2 file, I see that we
+>     are waiting in aio_poll() forever for the test server to respond to a read
+>     request, when using qcow2 format.  
+>     
+>     As Stefan said, this doesn't really make any sense - why would VXHS behave
+>     differently based on the file contents?
+> 
+> [Ketan] To read/write a qcow2 backed device VxHS server implementation
+> will need to understand the qcow2 format. This is not just block IO but
+> actually does involve interpreting the qcow2 header and cluster formats.
+> Clearly the test server implementation does not handle it as it was never
+> intended to. VxHS backend won't handle it either because VxHS virtual
+> disks are written as non-sparse files.  There are space savings with the
+> qcow2 format but performance penalties as well because of the metadata
+> overhead. As a block storage provider, VxHS does not support sparse file
+> formats like qcow2 primarily because of performance reasons.  Implementing
+> a qcow2 backend in the test server would be a non-trivial and non-useful
+> exercise since the VxHS server won't support it.
+>
+
+What?  Why would the backend need to know anything about qcow2 formats; are
+you manipulating the guest image data directly yourself?  But regardless,
+since the test server is naive and just reads and writes data, the fact that
+the test server breaks on qcow2 image formats means that the test server is
+broken for raw images, as well [1].
+
+The backend should not need to know anything about the image file format in
+order to serve data, as the backend is essentially serving bytes. (I guess
+the only thing the backend would need to be aware of is how to invoke
+qemu-img to create a qcow2 image file initially).
+
+
+QEMU is what interprets the qcow2 format (or any image format).  Every read
+from QEMU will look like a raw file read from the perspective of libqnio /
+vxhs.  I can't see any reason why vxhs would need to know anything about the
+contents of the image file itself.
+
+The only thing the test server needs to do, in order to be able to serve
+qcow2 files correctly, is to be able to serve raw files correctly.
+
+Looking at the libqnio implementation from the test server with gdb, I think
+that the reason why qcow2 format does not work is that the current
+libqnio implementation does not handle short reads correctly.  For instance,
+if the file is not a even multiple of the read size, and we try to read 512
+bytes at the end of the file, it appears libqnio hangs on the short read.  I
+am not sure if this is a bug exclusive to the test server, or in the libqnio
+implementation.
+
+[1]
+This bug isn't limited to qcow2, since as mentioned above, QEMU is just
+relying on libqnio to read raw bytes.  So, you can reproduce this bug with a
+raw image file, as well:
+
+# dd if=/dev/zero of=test.raw bs=1 count=196616
+
+# qemu-io -c "read 196608 512" vxhs://localhost:9999/test.raw
+
+The above qemu-io process will hang in aio_poll, because libqnio never
+processes the callback. This is because process_incoming_messages() thinks
+it needs a full 512 bytes before it will call the registered callback, even
+though there will only ever be 8 bytes read.
+
+The above scenario is also exactly what is happening when I try to use a
+qcow2 format; QEMU issues a read for 8 bytes at offset 196608, and the file
+is 196616 bytes long.
+
+(The sparse image thing seems shouldn't be an issue - first, the test server
+works just fine with sparse raw images... as matter of fact, the
+"create_vdisk.sh" script in the libqnio repository does exactly that.  Also,
+if you choose to not use sparse images for whatever reason on the backend,
+qcow2 does not require it to be sparse, as image files can be created with
+the "-o preallocation=full" option).
+
+-Jeff
