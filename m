@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cdFOz-0002O7-Rf
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:06:43 -0500
+	(envelope-from <quintela@redhat.com>) id 1cdFPF-00030F-Ge
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:06:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cdFOu-0001V1-UQ
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:06:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43040)
+	(envelope-from <quintela@redhat.com>) id 1cdFPA-0001YJ-Sx
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:06:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43138)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cdFOu-0001Un-Oy
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:06:36 -0500
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cdFPA-0001Y2-NL
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:06:52 -0500
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20161027153217.16984-5-dgilbert@redhat.com> (David Alan
-	Gilbert's message of "Thu, 27 Oct 2016 16:32:13 +0100")
+In-Reply-To: <20161027153217.16984-6-dgilbert@redhat.com> (David Alan
+	Gilbert's message of "Thu, 27 Oct 2016 16:32:14 +0100")
 References: <20161027153217.16984-1-dgilbert@redhat.com>
-	<20161027153217.16984-5-dgilbert@redhat.com>
+	<20161027153217.16984-6-dgilbert@redhat.com>
 Reply-To: quintela@redhat.com
-Date: Mon, 13 Feb 2017 13:06:22 +0100
-Message-ID: <87bmu670sh.fsf@emacs.mitica>
+Date: Mon, 13 Feb 2017 13:06:44 +0100
+Message-ID: <877f4u70rv.fsf@emacs.mitica>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 4/8] tests/migration: Add test for
- VMSTATE_WITH_TMP
+Subject: Re: [Qemu-devel] [PATCH 5/8] slirp: VMState conversion; tcpcb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,8 +34,13 @@ Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, samuel.thibault@ens-lyon.org, j
 "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
 > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 >
-> Add a test for VMSTATE_WITH_TMP to tests/test-vmstate.c
+> Convert the migration of the struct tcpcb to use a VMStateDescription,
+> the rest of it will come later.
+>
+> Mostly mechanical, except for conversion of some 'char' to uint8_t
+> to ensure portability.
 >
 > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Reviewed-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 
 Reviewed-by: Juan Quintela <quintela@redhat.com>
