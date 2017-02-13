@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47653)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cdIHi-0003CF-38
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 10:11:23 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cdIKh-00067l-F5
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 10:14:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cdIHf-00016l-BT
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 10:11:22 -0500
-Received: from indium.canonical.com ([91.189.90.7]:51251)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cdIHf-00016N-5O
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 10:11:19 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cdIHe-00047I-2B
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 15:11:18 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0F0062E80C6
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 15:11:18 +0000 (UTC)
+	(envelope-from <dgilbert@redhat.com>) id 1cdIKe-0001yx-Mu
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 10:14:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36250)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cdIKe-0001yp-Ea
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 10:14:24 -0500
+Date: Mon, 13 Feb 2017 15:14:19 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170213151418.GD3086@work-vm>
+References: <1486210863-14924-1-git-send-email-ashijeetacharya@gmail.com>
+	<20170210150403.GC13357@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 Feb 2017 15:02:25 -0000
-From: Brian Campbell <bacam@z273.org.uk>
-Reply-To: Bug 1663287 <1663287@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170209154937.3933.99004.malonedeb@chaenomeles.canonical.com>
-Message-Id: <20170213150225.6116.95100.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1663287] Re: Illegal delay slot code causes abort
- on mips64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170210150403.GC13357@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v3] migrate: Introduce a 'dc->vmsd' check
+ to avoid segfault for --only-migratable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,61 +28,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Cc: quintela@redhat.com, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org
 
-I've just found the same problem with gen_compute_branch1,
+* Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
+> * Ashijeet Acharya (ashijeetacharya@gmail.com) wrote:
+> > Commit a3a3d8c7 introduced a segfault bug while checking for
+> > 'dc->vmsd->unmigratable' which caused QEMU to crash when trying to add
+> > devices which do no set their 'dc->vmsd' yet while initialization.
+> > Place a 'dc->vmsd' check prior to it so that we do not segfault for
+> > such devices.
+> > 
+> > NOTE: This doesn't compromise the functioning of --only-migratable
+> > option as all the unmigratable devices do set their 'dc->vmsd'.
+> > 
+> > Also, move the only_migratable check inside device_set_realized() to avoid
+> > code duplication and fix the bug to display only_migratable error message
+> > only if the device constructuon is right.
+> > 
+> > Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+> 
+> Queued
 
-00200008 jr at
-4540563a bc1any4f   $fcc0,0xffffffffbfc158ec
+I've had to remove this;  it fails to build user-mode qemu's.
+I think the problem is only_migratable is in vl.c and doesn't
+get linked in user mode qemu; I tried adding a #ifndef CONFIG_USER_ONLY
+around the block and it didn't help, so back to you.
 
-The cause is the same - if the instruction set is wrong then the delay
-slot check is skipped.
+Dave
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1663287
-
-Title:
-  Illegal delay slot code causes abort on mips64
-
-Status in QEMU:
-  New
-
-Bug description:
-  During some randomised testing of an experimental MIPS implementation
-  I found an instruction sequence that also causes aborts on mainline
-  qemu's MIPS support.  The problem is triggered by an MSA branch
-  instruction appearing in a delay slot when emulating a processor
-  without MSA support.
-
-  For example, with the current repository HEAD
-  (f073cd3a2bf1054135271b837c58a7da650dd84b) configured for
-  mips64-softmmu, if I run the attached binary using
-
-      mips64-softmmu/qemu-system-mips64 -bios ../abort2.bin -machine
-  mipssim -nographic
-
-  it will report
-
-      unknown branch 0x13000
-      Aborted (core dumped)
-
-  The binary contains the following two instructions:
-
-      00200008 jr at
-      47081e61 bz.b       w8,0xffffffffbfc0798c
-
-  The jr sets up a jump, and hflags is set accordingly in
-  gen_compute_branch (in target/mips/translate.c).  When processing the
-  bz.b, check_insn generates an exception because the instruction isn't
-  support, but gen_msa_branch skips the usual delay slot check for the
-  same reason, and sets more bits in hflags, leading to an abort in
-  gen_branch because the hflags are now invalid.
-
-  I suspect the best fix is to remove the instruction set condition from
-  the delay slot check in gen_msa_branch.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1663287/+subscriptions
+> > ---
+> > Changes is v3:
+> > - move only_migratable check inside device_set_realized() to avoid code 
+> > - duplication
+> > - I have dropped Juan's R-b tag for this one
+> > Changes in v2:
+> > - place dc->vmsd check in hw/usb/bus.c as well
+> > ---
+> >  hw/core/qdev.c | 10 ++++++++++
+> >  hw/usb/bus.c   | 19 -------------------
+> >  qdev-monitor.c |  9 ---------
+> >  3 files changed, 10 insertions(+), 28 deletions(-)
+> > 
+> > diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> > index 5783442..4438cbf 100644
+> > --- a/hw/core/qdev.c
+> > +++ b/hw/core/qdev.c
+> > @@ -37,6 +37,7 @@
+> >  #include "hw/boards.h"
+> >  #include "hw/sysbus.h"
+> >  #include "qapi-event.h"
+> > +#include "migration/migration.h"
+> >  
+> >  int qdev_hotplug = 0;
+> >  static bool qdev_hot_added = false;
+> > @@ -896,6 +897,15 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+> >      }
+> >  
+> >      if (value && !dev->realized) {
+> > +        if (only_migratable && dc->vmsd) {
+> > +            if (dc->vmsd->unmigratable) {
+> > +                error_setg(&local_err, "Device %s is not migratable, but "
+> > +                           "--only-migratable was specified",
+> > +                           object_get_typename(obj));
+> > +                goto fail;
+> > +            }
+> > +        }
+> > +
+> >          if (!obj->parent) {
+> >              gchar *name = g_strdup_printf("device[%d]", unattached_count++);
+> >  
+> > diff --git a/hw/usb/bus.c b/hw/usb/bus.c
+> > index 1dcc35c..25913ad 100644
+> > --- a/hw/usb/bus.c
+> > +++ b/hw/usb/bus.c
+> > @@ -8,7 +8,6 @@
+> >  #include "monitor/monitor.h"
+> >  #include "trace.h"
+> >  #include "qemu/cutils.h"
+> > -#include "migration/migration.h"
+> >  
+> >  static void usb_bus_dev_print(Monitor *mon, DeviceState *qdev, int indent);
+> >  
+> > @@ -687,8 +686,6 @@ USBDevice *usbdevice_create(const char *cmdline)
+> >      const char *params;
+> >      int len;
+> >      USBDevice *dev;
+> > -    ObjectClass *klass;
+> > -    DeviceClass *dc;
+> >  
+> >      params = strchr(cmdline,':');
+> >      if (params) {
+> > @@ -723,22 +720,6 @@ USBDevice *usbdevice_create(const char *cmdline)
+> >          return NULL;
+> >      }
+> >  
+> > -    klass = object_class_by_name(f->name);
+> > -    if (klass == NULL) {
+> > -        error_report("Device '%s' not found", f->name);
+> > -        return NULL;
+> > -    }
+> > -
+> > -    dc = DEVICE_CLASS(klass);
+> > -
+> > -    if (only_migratable) {
+> > -        if (dc->vmsd->unmigratable) {
+> > -            error_report("Device %s is not migratable, but --only-migratable "
+> > -                         "was specified", f->name);
+> > -            return NULL;
+> > -        }
+> > -    }
+> > -
+> >      if (f->usbdevice_init) {
+> >          dev = f->usbdevice_init(bus, params);
+> >      } else {
+> > diff --git a/qdev-monitor.c b/qdev-monitor.c
+> > index 549f45f..5f2fcdf 100644
+> > --- a/qdev-monitor.c
+> > +++ b/qdev-monitor.c
+> > @@ -29,7 +29,6 @@
+> >  #include "qemu/error-report.h"
+> >  #include "qemu/help_option.h"
+> >  #include "sysemu/block-backend.h"
+> > -#include "migration/migration.h"
+> >  
+> >  /*
+> >   * Aliases were a bad idea from the start.  Let's keep them
+> > @@ -579,14 +578,6 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
+> >          return NULL;
+> >      }
+> >  
+> > -    if (only_migratable) {
+> > -        if (dc->vmsd->unmigratable) {
+> > -            error_setg(errp, "Device %s is not migratable, but "
+> > -                       "--only-migratable was specified", driver);
+> > -            return NULL;
+> > -        }
+> > -    }
+> > -
+> >      /* find bus */
+> >      path = qemu_opt_get(opts, "bus");
+> >      if (path != NULL) {
+> > -- 
+> > 2.6.2
+> > 
+> > 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
