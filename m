@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cdKM9-0003UH-Fd
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:24:07 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cdKMG-0003e3-QT
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:24:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cdKM8-0006E1-5P
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:24:05 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cdKMF-0006I9-F2
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:24:12 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 13 Feb 2017 18:22:45 +0100
-Message-Id: <1487006583-24350-24-git-send-email-kwolf@redhat.com>
+Date: Mon, 13 Feb 2017 18:22:49 +0100
+Message-Id: <1487006583-24350-28-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
 References: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 23/41] block: Include details on permission
- errors in message
+Subject: [Qemu-devel] [RFC PATCH 27/41] block: Add bdrv_new_open_driver()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,98 +22,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-Instead of just telling that there was some conflict, we can be specific
-and tell which permissions were in conflict and which way the conflict
-is.
+This function allows to create more or less normal BlockDriverStates
+even for BlockDrivers that aren't globally registered (e.g. helper
+filters for block jobs).
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 55 insertions(+), 11 deletions(-)
+ block.c               | 31 ++++++++++++++++++++++++++++++-
+ include/block/block.h |  2 ++
+ 2 files changed, 32 insertions(+), 1 deletion(-)
 
 diff --git a/block.c b/block.c
-index 2116542..d743f50 100644
+index 9c80cba..7d84d43 100644
 --- a/block.c
 +++ b/block.c
-@@ -1381,6 +1381,43 @@ static void bdrv_update_perm(BlockDriverState *bs)
-     bdrv_set_perm(bs, cumulative_perms, cumulative_shared_perms);
+@@ -948,13 +948,16 @@ static int bdrv_open_driver(BlockDriverState *bs, BlockDriver *drv,
+     }
+ 
+     bs->drv = drv;
++    bs->read_only = !(bs->open_flags & BDRV_O_RDWR);
+     bs->opaque = g_malloc0(drv->instance_size);
+ 
+     if (drv->bdrv_file_open) {
+         assert(!drv->bdrv_needs_filename || bs->filename[0]);
+         ret = drv->bdrv_file_open(bs, options, open_flags, &local_err);
+-    } else {
++    } else if (drv->bdrv_open) {
+         ret = drv->bdrv_open(bs, options, open_flags, &local_err);
++    } else {
++        ret = 0;
+     }
+ 
+     if (ret < 0) {
+@@ -995,6 +998,32 @@ free_and_fail:
+     return ret;
  }
  
-+static char *bdrv_child_link_name(BdrvChild *c)
++int bdrv_new_open_driver(BlockDriver *drv, BlockDriverState **result,
++                         const char *node_name, int flags, Error **errp)
 +{
-+    if (c->role->get_link_name) {
-+        return c->role->get_link_name(c);
++    BlockDriverState *bs;
++    int ret;
++
++    bs = bdrv_new();
++    bs->open_flags = flags;
++    bs->explicit_options = qdict_new();
++    bs->options = qdict_new();
++    bs->opaque = NULL;
++
++    update_options_from_flags(bs->options, flags);
++
++    ret = bdrv_open_driver(bs, drv, node_name, bs->options, flags, errp);
++    if (ret < 0) {
++        QDECREF(bs->explicit_options);
++        QDECREF(bs->options);
++        bdrv_unref(bs);
++        return ret;
 +    }
 +
-+    return g_strdup("another user");
++    *result = bs;
++    return 0;
 +}
 +
-+static char *bdrv_perm_names(uint64_t perm)
-+{
-+    struct perm_name {
-+        uint64_t perm;
-+        const char *name;
-+    } permissions[] = {
-+        { BLK_PERM_CONSISTENT_READ, "consistent read" },
-+        { BLK_PERM_WRITE,           "write" },
-+        { BLK_PERM_WRITE_UNCHANGED, "write unchanged" },
-+        { BLK_PERM_RESIZE,          "resize" },
-+        { BLK_PERM_GRAPH_MOD,       "change children" },
-+        { 0, NULL }
-+    };
-+
-+    char *result = g_strdup("");
-+    struct perm_name *p;
-+
-+    for (p = permissions; p->name; p++) {
-+        if (perm & p->perm) {
-+            char *old = result;
-+            result = g_strdup_printf("%s%s%s", old, *old ? ", " : "", p->name);
-+            g_free(old);
-+        }
-+    }
-+
-+    return result;
-+}
-+
- static int bdrv_check_update_perm(BlockDriverState *bs, uint64_t new_used_perm,
-                                   uint64_t new_shared_perm,
-                                   BdrvChild *ignore_child, Error **errp)
-@@ -1397,17 +1434,24 @@ static int bdrv_check_update_perm(BlockDriverState *bs, uint64_t new_used_perm,
-             continue;
-         }
- 
--        if ((new_used_perm & c->shared_perm) != new_used_perm ||
--            (c->perm & new_shared_perm) != c->perm)
--        {
--            const char *user = NULL;
--            if (c->role->get_name) {
--                user = c->role->get_name(c);
--                if (user && !*user) {
--                    user = NULL;
--                }
--            }
--            error_setg(errp, "Conflicts with %s", user ?: "another operation");
-+        if ((new_used_perm & c->shared_perm) != new_used_perm) {
-+            char *link = bdrv_child_link_name(c);
-+            char *perm_names = bdrv_perm_names(new_used_perm & ~c->shared_perm);
-+            error_setg(errp, "Conflicts with %s, which does not allow '%s' "
-+                             "on %s",
-+                       link, perm_names, bdrv_get_node_name(c->bs));
-+            g_free(link);
-+            g_free(perm_names);
-+            return -EPERM;
-+        }
-+
-+        if ((c->perm & new_shared_perm) != c->perm) {
-+            char *link = bdrv_child_link_name(c);
-+            char *perm_names = bdrv_perm_names(c->perm & ~new_shared_perm);
-+            error_setg(errp, "Conflicts with %s, which uses '%s' on %s",
-+                       link, perm_names, bdrv_get_node_name(c->bs));
-+            g_free(link);
-+            g_free(perm_names);
-             return -EPERM;
-         }
- 
+ QemuOptsList bdrv_runtime_opts = {
+     .name = "bdrv_common",
+     .head = QTAILQ_HEAD_INITIALIZER(bdrv_runtime_opts.head),
+diff --git a/include/block/block.h b/include/block/block.h
+index 93812df..3238850 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -215,6 +215,8 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
+                            const char *bdref_key, Error **errp);
+ BlockDriverState *bdrv_open(const char *filename, const char *reference,
+                             QDict *options, int flags, Error **errp);
++int bdrv_new_open_driver(BlockDriver *drv, BlockDriverState **result,
++                         const char *node_name, int flags, Error **errp);
+ BlockReopenQueue *bdrv_reopen_queue(BlockReopenQueue *bs_queue,
+                                     BlockDriverState *bs,
+                                     QDict *options, int flags);
 -- 
 1.8.3.1
