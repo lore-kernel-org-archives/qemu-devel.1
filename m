@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38970)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cdMOB-0007gn-Ol
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 14:34:21 -0500
+	(envelope-from <bounces@canonical.com>) id 1cdMP7-0008Km-Jd
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 14:35:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cdMOA-0000M3-L3
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 14:34:19 -0500
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:34703)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1cdMOA-0000LQ-Gf
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 14:34:18 -0500
-Received: by mail-oi0-x244.google.com with SMTP id w144so428541oiw.1
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 11:34:16 -0800 (PST)
+	(envelope-from <bounces@canonical.com>) id 1cdMP3-0000dh-MP
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 14:35:17 -0500
+Received: from indium.canonical.com ([91.189.90.7]:44135)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cdMP3-0000cu-GX
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 14:35:13 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cdMP0-0004OC-Uj
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 19:35:11 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8704D2E80C9
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 19:35:09 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <0d990570-8318-7bba-c10c-cfe0387fdd1b@twiddle.net>
-References: <20170213121017.12907-1-alex.bennee@linaro.org>
-	<20170213121017.12907-13-alex.bennee@linaro.org>
-	<0d990570-8318-7bba-c10c-cfe0387fdd1b@twiddle.net>
-From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Mon, 13 Feb 2017 14:33:45 -0500
-Message-ID: <CAJhHMCBN903SJ32oSpOnx-ZFvVGwBFuX2B7=aSffBy2=0F=Jpg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v12 12/24] tcg: handle EXCP_ATOMIC
- exception for system emulation
+Date: Mon, 13 Feb 2017 19:25:07 -0000
+From: Thomas Huth <989504@bugs.launchpad.net>
+Reply-To: Bug 989504 <989504@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20120427090042.27084.71596.malonedeb@gac.canonical.com>
+Message-Id: <20170213192507.5447.19176.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 989504] Re: assertion failed when attaching USB
+ MSD device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,37 +37,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, mttcg@greensocs.com, qemu-devel <qemu-devel@nongnu.org>, =?UTF-8?B?S09OUkFEIEZyw6lkw6lyaWM=?= <fred.konrad@greensocs.com>, alvise rigo <a.rigo@virtualopensystems.com>, "Emilio G. Cota" <cota@braap.org>, nikunj@linux.vnet.ibm.com, Mark Burton <mark.burton@greensocs.com>, Paolo Bonzini <pbonzini@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Sergey Fedorov <serge.fdrv@gmail.com>, Bamvor Zhang Jian <bamvor.zhangjian@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: qemu-devel@nongnu.org
 
-On Mon, Feb 13, 2017 at 2:19 PM, Richard Henderson <rth@twiddle.net> wrote:
-> On 02/13/2017 11:10 PM, Alex Benn=C3=A9e wrote:
->>
->> @@ -239,9 +240,16 @@ static void cpu_exec_step(CPUState *cpu)
->>                       1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
->>      tb->orig_tb =3D NULL;
->>      tb_unlock();
->> -    /* execute the generated code */
->> -    trace_exec_tb_nocache(tb, pc);
->> -    cpu_tb_exec(cpu, tb);
->> +
->> +    cc->cpu_exec_enter(cpu);
->> +
->> +    if (sigsetjmp(cpu->jmp_env, 0) =3D=3D 0) {
->> +        /* execute the generated code */
->> +        trace_exec_tb_nocache(tb, pc);
->> +        cpu_tb_exec(cpu, tb);
->> +    }
->
->
-> I don't understand this, since cpu_tb_exec has its own sigsetjmp.  Where =
-is
-> the exception supposed to come from that escapes?
+Triaging old bug tickets ... Can you still reproduce this problem with
+the latest version of QEMU?
 
-cpu_exec() has its own sigsetjmp, not cpu_tb_exec(). The exception is
-the debug exception from the generated code. Without this new
-sigsetjmp, it'll jump to cpu_exec() instead of coming back here.
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-Thanks,
---=20
-Pranith
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/989504
+
+Title:
+  assertion failed when attaching USB MSD device
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  version: git rev be5ea8ed4481f0ffa4ea0f7ba13e465701536001
+  commandline: qemu-system-i386 -usb -fda dosusb.img -drive if=3Dnone,id=3D=
+usbstick,file=3Dusb.img -device usb-storage,bus=3Dusb.0,drive=3Dusbstick -b=
+oot a -L d:\_programs\qemu
+
+  ---------------------------
+  Microsoft Visual C++ Runtime Library
+  ---------------------------
+  Assertion failed!
+
+  Program: E:\qemu-system-i386.exe
+  File: C:/msys/home/User/qemu/hw/usb/hcd-uhci.c
+  Line: 968
+
+  Expression: ret =3D=3D TD_RESULT_ASYNC_START
+
+  For information on how your program can cause an assertion
+  failure, see the Visual C++ documentation on asserts
+
+  (Press Retry to debug the application - JIT must be enabled)
+  ---------------------------
+  Abort   Retry   Ignore   =
+
+  ---------------------------
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/989504/+subscriptions
