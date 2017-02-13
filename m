@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cdJgX-0006w0-25
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:41:06 -0500
+	(envelope-from <quintela@redhat.com>) id 1cdJmq-0003c2-2I
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:47:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cdJgT-0001Nl-4x
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:41:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34464)
+	(envelope-from <quintela@redhat.com>) id 1cdJmm-0002z7-5a
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:47:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58928)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cdJgS-0001MZ-M4
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:41:00 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cdJml-0002yz-Sc
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:47:32 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C306380F90
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 16:41:00 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id EA8107E9D9
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 16:47:31 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170202120319.GB2549@work-vm> (David Alan Gilbert's message of
-	"Thu, 2 Feb 2017 12:03:20 +0000")
+In-Reply-To: <20170203105430.GB3208@work-vm> (David Alan Gilbert's message of
+	"Fri, 3 Feb 2017 10:54:30 +0000")
 References: <1485207141-1941-1-git-send-email-quintela@redhat.com>
-	<1485207141-1941-12-git-send-email-quintela@redhat.com>
-	<20170202120319.GB2549@work-vm>
+	<1485207141-1941-13-git-send-email-quintela@redhat.com>
+	<20170203105430.GB3208@work-vm>
 Reply-To: quintela@redhat.com
-Date: Mon, 13 Feb 2017 17:40:51 +0100
-Message-ID: <87wpcu3uy4.fsf@emacs.mitica>
+Date: Mon, 13 Feb 2017 17:47:22 +0100
+Message-ID: <87shni3un9.fsf@emacs.mitica>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 11/17] migration: Create thread
- infrastructure for multifd send side
+Subject: Re: [Qemu-devel] [PATCH 12/17] migration: really use multiple pages
+ at a time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,104 +41,80 @@ Cc: qemu-devel@nongnu.org, amit.shah@redhat.com
 
 "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 > * Juan Quintela (quintela@redhat.com) wrote:
->> We make the locking and the transfer of information specific, even if we
->> are still transmiting things through the main thread.
+>> We now send several pages at a time each time that we wakeup a thread.
 >> 
 >> Signed-off-by: Juan Quintela <quintela@redhat.com>
 >> ---
->>  migration/ram.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
->>  1 file changed, 52 insertions(+), 1 deletion(-)
+>>  migration/ram.c | 44 ++++++++++++++++++++++++++++++++++++++------
+>>  1 file changed, 38 insertions(+), 6 deletions(-)
 >> 
 >> diff --git a/migration/ram.c b/migration/ram.c
->> index c71929e..9d7bc64 100644
+>> index 9d7bc64..1267730 100644
 >> --- a/migration/ram.c
 >> +++ b/migration/ram.c
->> @@ -392,17 +392,25 @@ void migrate_compress_threads_create(void)
+>> @@ -391,6 +391,13 @@ void migrate_compress_threads_create(void)
+>> 
 >>  /* Multiple fd's */
 >> 
->>  struct MultiFDSendParams {
->> +    /* not changed */
->>      QemuThread thread;
->>      QIOChannel *c;
->>      QemuCond cond;
->>      QemuMutex mutex;
->> +    /* protected by param mutex */
->>      bool quit;
->>      bool started;
->> +    uint8_t *address;
->> +    /* protected by multifd mutex */
->> +    bool done;
->>  };
->>  typedef struct MultiFDSendParams MultiFDSendParams;
->> 
->>  static MultiFDSendParams *multifd_send;
->> 
->> +QemuMutex multifd_send_mutex;
->> +QemuCond multifd_send_cond;
 >> +
->>  static void *multifd_send_thread(void *opaque)
->>  {
->>      MultiFDSendParams *params = opaque;
->> @@ -416,7 +424,17 @@ static void *multifd_send_thread(void *opaque)
->> 
->>      qemu_mutex_lock(&params->mutex);
->>      while (!params->quit){
->> -        qemu_cond_wait(&params->cond, &params->mutex);
->> +        if (params->address) {
->> +            params->address = 0;
+>> +typedef struct {
+>> +    int num;
+>> +    int size;
+>> +    uint8_t **address;
+>> +} multifd_pages_t;
 >
-> This confused me (I wondered what happens to the 1st block) but
-> I see in the next patch this gets replaced by something more complex;
-> so I suggest just using params->dummy and commented it's about
-> to get replaced.
+> The naming is odd for QEMU; should be MultiFDPages ?
+> You might want to make num & size unsigned.
 
-if you preffer, I wanted to minimize the change on the next patch,
-otherwise I also have to change the places where I check the value of
-address.
+ok.
+
+> I was trying to understand why you store 'size' - is that because you worry about
+> someone changing the size parameter while we're running?  But given that we call
+> init in a few places I'm not sure it covers it.
+
+No.  I am planning to chang the code so I call:
+
+ram_save_block(&multifd_pages, &size,...)
+
+And it returns at most "size" pages, depending on whatever it is easy to
+do.  Plan is not to change blocks, or do any expensive operation.  Just
+return the next "size" pages available that are easy to pick.
 
 
->> +    qemu_mutex_unlock(&multifd_send_mutex);
->> +    qemu_mutex_lock(&multifd_send[i].mutex);
+>> +    pages->num = 0;
+>> +    pages->size = migrate_multifd_group();
+>> +    pages->address = g_malloc0(pages->size * sizeof(uint8_t *));
 >
-> Having a 'multifd_send_mutex' and a
->          'multifd_send[i].mutex'
-> is pretty confusing!
+> g_new0(uint8_t *, pages->size)
 
-For different reason, I have moved all the
+changing it, I don't  really care O:-)
 
-  multifd_send[i]. to "p->"
-
-Better?
-
-
->
->> +    multifd_send[i].address = address;
->> +    qemu_cond_signal(&multifd_send[i].cond);
->> +    qemu_mutex_unlock(&multifd_send[i].mutex);
->> +
->> +    return 0;
 >> +}
 >> +
->>  struct MultiFDRecvParams {
->>      QemuThread thread;
->>      QIOChannel *c;
->> @@ -1015,6 +1065,7 @@ static int ram_multifd_page(QEMUFile *f, PageSearchStatus *pss,
->>          *bytes_transferred +=
->>              save_page_header(f, block, offset | RAM_SAVE_FLAG_MULTIFD_PAGE);
->>          qemu_put_buffer(f, p, TARGET_PAGE_SIZE);
->> +        multifd_send_page(p);
->>          *bytes_transferred += TARGET_PAGE_SIZE;
->>          pages = 1;
->>          acct_info.norm_pages++;
->> -- 
->> 2.9.3
+>>  void migrate_multifd_send_threads_create(void)
+>>  {
+>>      int i, thread_count;
+>> @@ -491,7 +505,7 @@ void migrate_multifd_send_threads_create(void)
+>>          multifd_send[i].quit = false;
+>>          multifd_send[i].started = false;
+>>          multifd_send[i].done = true;
+>> -        multifd_send[i].address = 0;
+>> +        multifd_init_group(&multifd_send[i].pages);
+>>          multifd_send[i].c = socket_send_channel_create();
+>>          if(!multifd_send[i].c) {
+>>              error_report("Error creating a send channel");
+>> @@ -511,8 +525,22 @@ void migrate_multifd_send_threads_create(void)
+>> 
+>>  static int multifd_send_page(uint8_t *address)
 >
-> I think I'm pretty OK with this; but we'll see what it looks like
-> after you think about Paolo's suggestion; it does feel like it should
-> be possible to do the locking etc simpler; I just don't know how.
+> Can you comment multifd_send_page to explain what it returns.
+>
+> (Do we really need u16 for fd number? More than 256 streams would seem
+> surprising).
 
-Locking can be simpler, but the problem is being speed :-(
-Paolo suggestion have helped.
-That our meassurement of bandwidth is lame, haven't :-(
+I *guess*, (big guess) that people are going to use the same number of
+threads than cpus.  And we are going to have more than 256 in the near
+future, su it looked more future proof to use uint16_t.  I don't really
+care though.
 
-Later, Juan.
+Thanks, Juan.
