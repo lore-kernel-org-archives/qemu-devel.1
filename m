@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cdFVX-0000HN-6i
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:13:28 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cdFYx-0003UK-1f
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:17:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cdFVW-0003Qx-1U
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:13:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59788)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cdFVV-0003QZ-S1
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:13:25 -0500
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20161027153217.16984-8-dgilbert@redhat.com> (David Alan
-	Gilbert's message of "Thu, 27 Oct 2016 16:32:16 +0100")
-References: <20161027153217.16984-1-dgilbert@redhat.com>
-	<20161027153217.16984-8-dgilbert@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Mon, 13 Feb 2017 13:13:16 +0100
-Message-ID: <87tw7y5lwj.fsf@emacs.mitica>
+	(envelope-from <alex.bennee@linaro.org>) id 1cdFYt-00041f-0R
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:16:58 -0500
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:37258)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cdFYs-00041P-Pb
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:16:54 -0500
+Received: by mail-wm0-x235.google.com with SMTP id v77so92124814wmv.0
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 04:16:54 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Mon, 13 Feb 2017 12:10:14 +0000
+Message-Id: <20170213121017.12907-22-alex.bennee@linaro.org>
+In-Reply-To: <20170213121017.12907-1-alex.bennee@linaro.org>
+References: <20170213121017.12907-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 7/8] slirp: VMStatify socket level
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v12 21/24] target-arm: don't generate WFE/YIELD
+ calls for MTTCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +30,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com, duanj@linux.vnet.ibm.com
+To: peter.maydell@linaro.org, rth@twiddle.net
+Cc: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> Working up the stack, this replaces the slirp_socket_load/save
-> with VMState definitions.
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+The WFE and YIELD instructions are really only hints and in TCG's case
+they were useful to move the scheduling on from one vCPU to the next. In
+the parallel context (MTTCG) this just causes an unnecessary cpu_exit
+and contention of the BQL.
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/op_helper.c     |  7 +++++++
+ target/arm/translate-a64.c |  8 ++++++--
+ target/arm/translate.c     | 20 ++++++++++++++++----
+ 3 files changed, 29 insertions(+), 6 deletions(-)
 
-
-> diff --git a/slirp/socket.h b/slirp/socket.h
-> index 8feed2a..0137928 100644
-> --- a/slirp/socket.h
-> +++ b/slirp/socket.h
-> @@ -30,7 +30,7 @@ struct socket {
->  				    * PING reply's */
->    struct tcpiphdr *so_ti;	   /* Pointer to the original ti within
->  				    * so_mconn, for non-blocking connections */
-> -  int so_urgc;
-> +  uint32_t      so_urgc;
->    union {   /* foreign host */
->        struct sockaddr_storage ss;
->        struct sockaddr_in sin;
-> @@ -56,8 +56,8 @@ struct socket {
->    uint8_t	so_iptos;	/* Type of service */
->    uint8_t	so_emu;		/* Is the socket emulated? */
->  
-> -  u_char	so_type;		/* Type of socket, UDP or TCP */
-> -  int	so_state;		/* internal state flags SS_*, below */
-> +  uint8_t       so_type;        /* Type of socket, UDP or TCP */
-> +  int32_t       so_state;       /* internal state flags SS_*, below */
->  
->    struct 	tcpcb *so_tcpcb;	/* pointer to TCP protocol control block */
->    u_int	so_expire;		/* When the socket will expire */
-
-I normally preffer to fix types in a previous patch, but that is clearly
-a question of taste.
-
-Later, Juan.
+diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+index 5f3e3bdae2..d64c8670fa 100644
+--- a/target/arm/op_helper.c
++++ b/target/arm/op_helper.c
+@@ -436,6 +436,13 @@ void HELPER(yield)(CPUARMState *env)
+     ARMCPU *cpu = arm_env_get_cpu(env);
+     CPUState *cs = CPU(cpu);
+ 
++    /* When running in MTTCG we don't generate jumps to the yield and
++     * WFE helpers as it won't affect the scheduling of other vCPUs.
++     * If we wanted to more completely model WFE/SEV so we don't busy
++     * spin unnecessarily we would need to do something more involved.
++     */
++    g_assert(!parallel_cpus);
++
+     /* This is a non-trappable hint instruction that generally indicates
+      * that the guest is currently busy-looping. Yield control back to the
+      * top level loop so that a more deserving VCPU has a chance to run.
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index e61bbd6b3b..e15eae6d41 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -1328,10 +1328,14 @@ static void handle_hint(DisasContext *s, uint32_t insn,
+         s->is_jmp = DISAS_WFI;
+         return;
+     case 1: /* YIELD */
+-        s->is_jmp = DISAS_YIELD;
++        if (!parallel_cpus) {
++            s->is_jmp = DISAS_YIELD;
++        }
+         return;
+     case 2: /* WFE */
+-        s->is_jmp = DISAS_WFE;
++        if (!parallel_cpus) {
++            s->is_jmp = DISAS_WFE;
++        }
+         return;
+     case 4: /* SEV */
+     case 5: /* SEVL */
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 4436d8f3a2..abc1f77ee4 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -4404,20 +4404,32 @@ static void gen_exception_return(DisasContext *s, TCGv_i32 pc)
+     gen_rfe(s, pc, load_cpu_field(spsr));
+ }
+ 
++/*
++ * For WFI we will halt the vCPU until an IRQ. For WFE and YIELD we
++ * only call the helper when running single threaded TCG code to ensure
++ * the next round-robin scheduled vCPU gets a crack. In MTTCG mode we
++ * just skip this instruction. Currently the SEV/SEVL instructions
++ * which are *one* of many ways to wake the CPU from WFE are not
++ * implemented so we can't sleep like WFI does.
++ */
+ static void gen_nop_hint(DisasContext *s, int val)
+ {
+     switch (val) {
+     case 1: /* yield */
+-        gen_set_pc_im(s, s->pc);
+-        s->is_jmp = DISAS_YIELD;
++        if (!parallel_cpus) {
++            gen_set_pc_im(s, s->pc);
++            s->is_jmp = DISAS_YIELD;
++        }
+         break;
+     case 3: /* wfi */
+         gen_set_pc_im(s, s->pc);
+         s->is_jmp = DISAS_WFI;
+         break;
+     case 2: /* wfe */
+-        gen_set_pc_im(s, s->pc);
+-        s->is_jmp = DISAS_WFE;
++        if (!parallel_cpus) {
++            gen_set_pc_im(s, s->pc);
++            s->is_jmp = DISAS_WFE;
++        }
+         break;
+     case 4: /* sev */
+     case 5: /* sevl */
+-- 
+2.11.0
