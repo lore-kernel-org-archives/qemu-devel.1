@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cdENA-000342-GM
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 06:00:45 -0500
+	(envelope-from <renzo@cs.unibo.it>) id 1cdEhi-0002s3-8p
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 06:21:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cdEN7-0001zY-Ag
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 06:00:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:4211)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cdEN7-0001zQ-2B
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 06:00:41 -0500
-Date: Mon, 13 Feb 2017 12:00:36 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170213120036.7712fccb@nial.brq.redhat.com>
-In-Reply-To: <d902a6b9-4a46-9010-b597-5e98388d10f4@suse.de>
-References: <cover.1486285434.git.ben@skyportsystems.com>
-	<88aaebda-29dd-a77a-1b78-7d0d6f911a76@redhat.com>
-	<20170210172107-mutt-send-email-mst@kernel.org>
-	<20170210171659.111aedda@nial.brq.redhat.com>
-	<20170210181852.zp6sg2d4k2p3xhbd@hawk.localdomain>
-	<d902a6b9-4a46-9010-b597-5e98388d10f4@suse.de>
+	(envelope-from <renzo@cs.unibo.it>) id 1cdEhf-0006x5-5Z
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 06:21:58 -0500
+Received: from mail.virtlab.unibo.it ([130.136.161.50]:54023)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <renzo@cs.unibo.it>) id 1cdEhe-0006vi-Uq
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 06:21:55 -0500
+Date: Mon, 13 Feb 2017 12:21:41 +0100
+From: Renzo Davoli <renzo@cs.unibo.it>
+Message-ID: <20170213112141.GA25336@cs.unibo.it>
+References: <CAJSP0QWT14J-cqwLqPCr0iC95pSLaiZJgPkqr1VBU=pqYF6kqQ@mail.gmail.com>
+	<20170208221050.GP2955@var.home>
+	<20170212073019.GA25566@cs.unibo.it>
+	<a4a3f167-b23b-621c-3d69-5fe32f7df239@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 00/10] Add support for VM Generation ID
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a4a3f167-b23b-621c-3d69-5fe32f7df239@redhat.com>
+Subject: Re: [Qemu-devel] libslirp and QEMU slirp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +29,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>
-Cc: Andrew Jones <drjones@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, ben@skyportsystems.com, "Daniel
-	P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Samuel Thibault <samuel.thibault@gnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, virtualsquare@cs.unibo.it, jasowang@redhat.com, Jan Kiszka <jan.kiszka@web.de>, peter.maydell@linaro.org, qemu-devel <qemu-devel@nongnu.org>
 
-On Fri, 10 Feb 2017 19:27:21 +0100
-Andreas F=C3=A4rber <afaerber@suse.de> wrote:
+Hi Thomas,
 
-> Am 10.02.2017 um 19:18 schrieb Andrew Jones:
-> > On Fri, Feb 10, 2017 at 05:16:59PM +0100, Igor Mammedov wrote: =20
-> >> On Fri, 10 Feb 2017 17:31:33 +0200
-> >> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >> =20
-> >>> On Fri, Feb 10, 2017 at 11:12:13AM +0100, Laszlo Ersek wrote: =20
-> >>>> On 02/05/17 10:11, ben@skyportsystems.com wrote:   =20
-> >>>>> From: Ben Warren <ben@skyportsystems.com> =20
-> >> [...]
-> >> =20
-> >>>>
-> >>>> - or else, add another boolean property to vmgenid, one that paralle=
-ls
-> >>>> "dma-enabled" of "fw-cfg" precisely, in HW_COMPAT*. Then simply fail
-> >>>> realize() when this property is false.   =20
-> >>>
-> >>> That's probably the easiest way. x-fw-cfg-dma-enabled.
-> >>> Won't delay merging because of this, can be done with
-> >>> patch on top. =20
-> >> (not related to this series)
-> >>
-> >> I've thought that there still were no consensus on x-foo prefix,
-> >> not to mention that x- might be legitimate prefix for some properties.
-> >>
-> >> Maybe we should add a flag to property like INTERNAL_PROPERTY
-> >> and then set it explicitly on for internal stuff.
-> >>
-> >> That way we could cleanly exclude internal properties from
-> >>  -device foo,help and make sure that user won't set them from CLI.
-> >> I'd even volunteer to add this API to Object =20
-> >=20
-> > Yes, please. I know of a property or two where it would be nice to
-> > have that flag. =20
->=20
-> Apart from documentation, what effect would such a flag have?
->=20
-> With QOM I don't really see "internal" as being a thing: Besides -device
-> and the likes, we expose qom-set operation and -global option, and I
-> don't think it makes sense to restrict the latter two. For -device,
-> "realized" is a property I would classify as non-user maybe.
-I'd propose to start with this flag hiding/forbiding usage of
-property in following interfaces:
+> FWIW, I know that WinUAE is using QEMU's slirp code, too.
+thank you! I'll have a look of it.
+> 
+> I've got a question: Is there already a project page and public
+> repository for libslirp available somewhere? I did not find anything
+> useful with Google yet...
+Sure:
 
-  * -device
-  * -device foo,help
-  * device_add
+https://github.com/rd235/libslirp
 
-With docs mentioning that usage of hidden properties with
- -globals/qom-set isn't recommended.
- =20
->=20
-> Regards,
-> Andreas
->=20
+ciao
+	renzo
