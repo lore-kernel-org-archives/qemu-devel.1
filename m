@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cdeSr-0001y3-8z
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 09:52:23 -0500
+	(envelope-from <mike.kravetz@oracle.com>) id 1cdOkQ-0003HW-Ht
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 17:05:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cdeSo-0003Ql-5Q
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 09:52:21 -0500
-Received: from mo4.mail-out.ovh.net ([178.32.228.4]:41376)
+	(envelope-from <mike.kravetz@oracle.com>) id 1cdOkN-00050H-7n
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 17:05:26 -0500
+Received: from userp1050.oracle.com ([156.151.31.82]:37966)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cdeSn-0003Ps-VY
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 09:52:18 -0500
-Received: from player772.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 147874AFB3
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 15:52:14 +0100 (CET)
-References: <1486994957-20400-1-git-send-email-clg@kaod.org>
-	<1486994957-20400-2-git-send-email-clg@kaod.org>
-	<20170214050219.GH2169@umbus.fritz.box>
-	<32f762b6-0fc0-fd1f-d0f1-6265436c8274@kaod.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <7cde2ccc-95cb-5ace-e50c-91095cc2c6b8@kaod.org>
-Date: Tue, 14 Feb 2017 15:52:09 +0100
+	(Exim 4.71) (envelope-from <mike.kravetz@oracle.com>)
+	id 1cdOkM-0004Ly-UR
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 17:05:23 -0500
+Received: from userp1040.oracle.com (userp1040.oracle.com [156.151.31.81])
+	by userp1050.oracle.com (Sentrion-MTA-4.3.2/Sentrion-MTA-4.3.2) with
+	ESMTP id v1DM3rmJ009625
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 22:03:54 GMT
+References: <20170206173306.20603-1-dgilbert@redhat.com>
+	<20170206174529.GI2524@work-vm>
+	<CGME20170213171108eucas1p147999fc8b6980ff89a67626b78b12e44@eucas1p1.samsung.com>
+	<20170213171058.GA4246@aperevalov-ubuntu>
+	<20170213175722.GG25530@redhat.com>
+	<20170213181028.GH25530@redhat.com>
+From: Mike Kravetz <mike.kravetz@oracle.com>
+Message-ID: <bded76ef-50be-dd93-1e77-fefaa7212fa2@oracle.com>
+Date: Mon, 13 Feb 2017 13:59:47 -0800
 MIME-Version: 1.0
-In-Reply-To: <32f762b6-0fc0-fd1f-d0f1-6265436c8274@kaod.org>
+In-Reply-To: <20170213181028.GH25530@redhat.com>
 Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] ppc/xics: remove set_nr_irqs() handler
- from XICSStateClass
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 00/16] Postcopy: Hugepage support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,124 +37,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Andrea Arcangeli <aarcange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com
 
-On 02/14/2017 08:04 AM, C=E9dric Le Goater wrote:
-> On 02/14/2017 06:02 AM, David Gibson wrote:
->> On Mon, Feb 13, 2017 at 03:09:16PM +0100, C=E9dric Le Goater wrote:
->>> Today, the ICS (Interrupt Controller Source) object is created and
->>> realized by the init and realize routines of the XICS object, but som=
-e
->>> of the parameters are only known at the machine level.
->>>
->>> These parameters are passed from the sPAPR machine to the ICS object
->>> in a rather convoluted way using property handlers and a class handle=
-r
->>> of the XICS object. The number of irqs required to allocate the IRQ
->>> state objects in the ICS realize routine is one of them.
->>>
->>> Let's simplify the process by creating the ICS object along with the
->>> XICS object at the machine level and link the ICS into the XICS list
->>> of ICSs at this level also. In the sPAPR machine, there is only a
->>> single ICS but that will change with the PowerNV machine.
->>>
->>> Also, QOMify the creation of the objects and get rid of the
->>> superfluous code.
->>>
->>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+On 02/13/2017 10:10 AM, Andrea Arcangeli wrote:
+> On Mon, Feb 13, 2017 at 06:57:22PM +0100, Andrea Arcangeli wrote:
+>> Hello,
 >>
->> I like the basic idea here: while the ics and icp objects are pretty
->> straightforward, the "xics" object has always been a bit of a hack,
->> with logic that really belongs in the machine.
+>> On Mon, Feb 13, 2017 at 08:11:06PM +0300, Alexey Perevalov wrote:
+>>> Another one request.
+>>> QEMU could use mem_path in hugefs with share key simultaneously
+>>> (-object memory-backend-file,id=mem,size=${mem_size},mem-path=${mem_path},share=on) and vm
+>>> in this case will start and will properly work (it will allocate memory
+>>> with mmap), but in case of destination for postcopy live migration
+>>> UFFDIO_COPY ioctl will fail for
+>>> such region, in Arcangeli's git tree there is such prevent check
+>>> (if (!vma_is_shmem(dst_vma) && dst_vma->vm_flags & VM_SHARED).
+>>> Is it possible to handle such situation at qemu?
 >>
->> But.. I don't think the approach here really works.  Specifically..
+>> It'd be nice to lift this hugetlbfs !VM_SHARED restriction I agree, I
+>> already asked Mike (CC'ed) why is there, because I'm afraid it's a
+> 
+> Cc'ed not existent email, mail client autocompletion error, corrected
+> the CC.
+> 
+>> leftover from the anon version where VM_SHARED means a very different
+>> thing but it was already lifted for shmem. share=on should already
+>> work on top of tmpfs and also with THP on tmpfs enabled.
 >>
->> [snip]
->>> -static XICSState *try_create_xics(const char *type, int nr_servers,
->>> -                                  int nr_irqs, Error **errp)
->>> -{
->>> -    Error *err =3D NULL;
->>> -    DeviceState *dev;
->>> +static XICSState *try_create_xics(const char *type, const char *type=
-_ics,
->>> +                                  int nr_servers, int nr_irqs, Error=
- **errp)
->>> +{
->>> +    Error *err =3D NULL, *local_err =3D NULL;
->>> +    XICSState *xics;
->>> +    ICSState *ics =3D NULL;
->>> +
->>> +    xics =3D XICS_COMMON(object_new(type));
->>> +    qdev_set_parent_bus(DEVICE(xics), sysbus_get_default());
->>> +    object_property_set_int(OBJECT(xics), nr_servers, "nr_servers", =
-&err);
->>> +    object_property_set_bool(OBJECT(xics), true, "realized", &local_=
-err);
->>> +    error_propagate(&err, local_err);
->>> +    if (err) {
->>> +        goto error;
->>> +    }
->>> =20
->>> -    dev =3D qdev_create(NULL, type);
->>> -    qdev_prop_set_uint32(dev, "nr_servers", nr_servers);
->>> -    qdev_prop_set_uint32(dev, "nr_irqs", nr_irqs);
->>> -    object_property_set_bool(OBJECT(dev), true, "realized", &err);
->>> +    ics =3D ICS_SIMPLE(object_new(type_ics));
->>> +    object_property_add_child(OBJECT(xics), "ics", OBJECT(ics), NULL=
-);
->>> +    object_property_set_int(OBJECT(ics), nr_irqs, "nr-irqs", &err);
->>> +    object_property_set_bool(OBJECT(ics), true, "realized", &local_e=
-rr);
->>> +    error_propagate(&err, local_err);
->>>      if (err) {
->>> -        error_propagate(errp, err);
->>> -        object_unparent(OBJECT(dev));
->>> -        return NULL;
->>> +        goto error;
->>> +    }
->>> +
->>> +    ics->xics =3D xics;
->>> +    QLIST_INSERT_HEAD(&xics->ics, ics, list);
+>> For hugetlbfs and shmem it should be generally more complicated to
+>> cope with private mappings than shared ones, shared is just the native
+>> form of the pseudofs without having to deal with private COWs aliases
+>> so it's hard to imagine something going wrong for VM_SHARED if the
+>> MAP_PRIVATE mapping already works fine. If it turns out to be
+>> superflous the check may be just turned into
+>> "vma_is_anonymous(dst_vma) && dst_vma->vm_flags & VM_SHARED".
 >>
->> Poking into the ics and xics objects directly from the machine here
->> violates abstraction even worse than the existing xics device does.
->> In fact, avoiding that is basically why the xics device exists in the
->> first place.
->=20
-> Well, currently, xics_set_nr_servers() also does a :
->=20
-> 	icp->xics =3D xics;
->=20
-> So, I think we can live with it until we move the ICS and ICP objects=20
-> out of XICS ?
->=20
-> if this is the only worrisome problem in the patch, I can start the
-> series with a QOM Interface handler implemented at the machine level,=20
-> something like :=20
->=20
-> 	void (*ics_insert)(ICSState *ics);
->=20
-> doing the insert above to hide the temporary hideousness. Is that ok ?=20
+>> Thanks,
+>> Andrea
 
-After some thought, I don't think this one is important. At the=20
-machine level, it seems OK to me to insert an ICS in the XICS list.=20
-I agree that XICS should disappear, but it is still there for the=20
-moment.=20
+Sorry, I did not see e-mail earlier.
 
-> And, as you propose below, I think we can add the 'xics' link property=20
-> right now to get rid of :
->=20
-> 	ic[ps]->xics =3D xics;
+Andrea is correct in that the VM_SHARED restriction for hugetlbfs was there
+to make the code common with the anon version.  The use case I had was to
+simply 'catch' no page hugetlbfs faults private -or- shared.  That is why
+you can register hugetlbfs shared regions.
 
-I have a v2 ready adding the 'xics' link property but keeping the=20
-QLIST_INSERT_HEAD() call in try_create_xics(). Do you think it is=20
-worth sending as an initial cleanup :
+I can take a look at what it would take to enable copy, and agree with Andrea
+that it should be relatively easy.
 
- 5 files changed, 96 insertions(+), 225 deletions(-)
-
-or do you want the full picture to be addressed ?=20
-
-Thanks,
-
-C.=20
+-- 
+Mike Kravetz
