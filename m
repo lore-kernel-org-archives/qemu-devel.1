@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44460)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cdMjb-00037V-Ns
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 14:56:29 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cdMkZ-0004XU-Ol
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 14:57:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cdMja-0005wP-B6
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 14:56:27 -0500
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:35316)
+	(envelope-from <rth7680@gmail.com>) id 1cdMkW-00069T-Nl
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 14:57:27 -0500
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:33983)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1cdMja-0005wK-5j
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 14:56:26 -0500
-Received: by mail-oi0-x244.google.com with SMTP id x84so539023oix.2
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 11:56:26 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cdMkW-00069L-J9
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 14:57:24 -0500
+Received: by mail-qk0-x243.google.com with SMTP id e1so16446859qkh.1
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 11:57:24 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170213121017.12907-1-alex.bennee@linaro.org>
+	<20170213121017.12907-13-alex.bennee@linaro.org>
+	<0d990570-8318-7bba-c10c-cfe0387fdd1b@twiddle.net>
+	<CAJhHMCBN903SJ32oSpOnx-ZFvVGwBFuX2B7=aSffBy2=0F=Jpg@mail.gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <5d7c638b-fe9f-c03f-4ba1-60dca3f7811a@twiddle.net>
+Date: Tue, 14 Feb 2017 06:57:13 +1100
 MIME-Version: 1.0
-In-Reply-To: <20170211150701.23391-2-ppandit@redhat.com>
-References: <20170211150701.23391-1-ppandit@redhat.com>
-	<20170211150701.23391-2-ppandit@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 13 Feb 2017 11:55:55 -0800
-Message-ID: <CAKmqyKNqmkH_BUzSszPSMp-pLWc52fyK7PnHdP7k-9vMuULoKQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v3 1/4] sd: sdhci: check transfer mode
- register in multi block transfer
+In-Reply-To: <CAJhHMCBN903SJ32oSpOnx-ZFvVGwBFuX2B7=aSffBy2=0F=Jpg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v12 12/24] tcg: handle EXCP_ATOMIC
+ exception for system emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,64 +33,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Wjjzhang <wjjzhang@tencent.com>, Jiang Xin <jiangxin1@huawei.com>, Prasad J Pandit <pjp@fedoraproject.org>
+To: Pranith Kumar <bobby.prani@gmail.com>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, mttcg@greensocs.com, qemu-devel <qemu-devel@nongnu.org>, =?UTF-8?B?S09OUkFEIEZyw6lkw6lyaWM=?= <fred.konrad@greensocs.com>, alvise rigo <a.rigo@virtualopensystems.com>, "Emilio G. Cota" <cota@braap.org>, nikunj@linux.vnet.ibm.com, Mark Burton <mark.burton@greensocs.com>, Paolo Bonzini <pbonzini@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Sergey Fedorov <serge.fdrv@gmail.com>, Bamvor Zhang Jian <bamvor.zhangjian@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-On Sat, Feb 11, 2017 at 7:06 AM, P J P <ppandit@redhat.com> wrote:
-> From: Prasad J Pandit <pjp@fedoraproject.org>
+On 02/14/2017 06:33 AM, Pranith Kumar wrote:
+> On Mon, Feb 13, 2017 at 2:19 PM, Richard Henderson <rth@twiddle.net> wrote:
+>> On 02/13/2017 11:10 PM, Alex Bennée wrote:
+>>>
+>>> @@ -239,9 +240,16 @@ static void cpu_exec_step(CPUState *cpu)
+>>>                       1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
+>>>      tb->orig_tb = NULL;
+>>>      tb_unlock();
+>>> -    /* execute the generated code */
+>>> -    trace_exec_tb_nocache(tb, pc);
+>>> -    cpu_tb_exec(cpu, tb);
+>>> +
+>>> +    cc->cpu_exec_enter(cpu);
+>>> +
+>>> +    if (sigsetjmp(cpu->jmp_env, 0) == 0) {
+>>> +        /* execute the generated code */
+>>> +        trace_exec_tb_nocache(tb, pc);
+>>> +        cpu_tb_exec(cpu, tb);
+>>> +    }
+>>
+>>
+>> I don't understand this, since cpu_tb_exec has its own sigsetjmp.  Where is
+>> the exception supposed to come from that escapes?
 >
-> In the SDHCI protocol, the transfer mode register value
-> is used during multi block transfer to check if block count
-> register is enabled and should be updated. Transfer mode
-> register could be set such that, block count register would
-> not be updated, thus leading to an infinite loop. Add check
-> to avoid it.
->
-> Reported-by: Wjjzhang <wjjzhang@tencent.com>
-> Reported-by: Jiang Xin <jiangxin1@huawei.com>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> cpu_exec() has its own sigsetjmp, not cpu_tb_exec(). The exception is
+> the debug exception from the generated code. Without this new
+> sigsetjmp, it'll jump to cpu_exec() instead of coming back here.
 
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Bah.  Sorry, ENOCOFFEE.
 
-Thanks,
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 
-Alistair
 
-> ---
->  hw/sd/sdhci.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
->
-> Update: use qemu_log_mask(LOG_UNIMP, ...)
->   -> https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg02354.html
->
-> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-> index 5bd5ab6..a9c744b 100644
-> --- a/hw/sd/sdhci.c
-> +++ b/hw/sd/sdhci.c
-> @@ -486,6 +486,11 @@ static void sdhci_sdma_transfer_multi_blocks(SDHCIState *s)
->      uint32_t boundary_chk = 1 << (((s->blksize & 0xf000) >> 12) + 12);
->      uint32_t boundary_count = boundary_chk - (s->sdmasysad % boundary_chk);
->
-> +    if (!(s->trnmod & SDHC_TRNS_BLK_CNT_EN) || !s->blkcnt) {
-> +        qemu_log_mask(LOG_UNIMP, "infinite transfer is not supported\n");
-> +        return;
-> +    }
-> +
->      /* XXX: Some sd/mmc drivers (for example, u-boot-slp) do not account for
->       * possible stop at page boundary if initial address is not page aligned,
->       * allow them to work properly */
-> @@ -797,11 +802,6 @@ static void sdhci_data_transfer(void *opaque)
->      if (s->trnmod & SDHC_TRNS_DMA) {
->          switch (SDHC_DMA_TYPE(s->hostctl)) {
->          case SDHC_CTRL_SDMA:
-> -            if ((s->trnmod & SDHC_TRNS_MULTI) &&
-> -                    (!(s->trnmod & SDHC_TRNS_BLK_CNT_EN) || s->blkcnt == 0)) {
-> -                break;
-> -            }
-> -
->              if ((s->blkcnt == 1) || !(s->trnmod & SDHC_TRNS_MULTI)) {
->                  sdhci_sdma_transfer_single_block(s);
->              } else {
-> --
-> 2.9.3
->
+r~
