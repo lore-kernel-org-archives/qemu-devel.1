@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43868)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cdJay-0001qo-MA
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:35:21 -0500
+	(envelope-from <quintela@redhat.com>) id 1cdJby-0002bA-BP
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:36:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cdJat-0008Do-Qb
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:35:20 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:33221)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cdJat-0008DQ-Kb
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:35:15 -0500
-Received: by mail-wm0-x243.google.com with SMTP id v77so20351242wmv.0
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 08:35:15 -0800 (PST)
-Date: Mon, 13 Feb 2017 16:35:12 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170213163512.GP10361@stefanha-x1.localdomain>
-References: <20170209084047.7897-1-famz@redhat.com>
+	(envelope-from <quintela@redhat.com>) id 1cdJbt-0008Np-H3
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:36:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59868)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cdJbt-0008Ne-BB
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:36:17 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7027C80F8E
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 16:36:17 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170127180255.GI3323@work-vm> (David Alan Gilbert's message of
+	"Fri, 27 Jan 2017 18:02:56 +0000")
+References: <1485207141-1941-1-git-send-email-quintela@redhat.com>
+	<1485207141-1941-11-git-send-email-quintela@redhat.com>
+	<20170127180255.GI3323@work-vm>
+Reply-To: quintela@redhat.com
+Date: Mon, 13 Feb 2017 17:36:03 +0100
+Message-ID: <8760ke59qk.fsf@emacs.mitica>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="kOdvwer/5gjFgNo6"
-Content-Disposition: inline
-In-Reply-To: <20170209084047.7897-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio: Report real progress in VQ aio
- poll handler
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 10/17] migration: create ram_multifd_page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,52 +35,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Ed Swierk <eswierk@skyportsystems.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, amit.shah@redhat.com
+
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> * Juan Quintela (quintela@redhat.com) wrote:
+>> The function still don't use multifd, but we have simplified
+>> ram_save_page, xbzrle and RDMA stuff is gone.  We have added a new
+>> counter and a new flag for this type of pages.
 
 
---kOdvwer/5gjFgNo6
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+>> +static int ram_multifd_page(QEMUFile *f, PageSearchStatus *pss,
+>> +                            bool last_stage, uint64_t *bytes_transferred)
+>> +{
+>> +    int pages;
+>> +    uint8_t *p;
+>> +    RAMBlock *block = pss->block;
+>> +    ram_addr_t offset = pss->offset;
+>> +
+>> +    p = block->host + offset;
+>> +
+>> +    if (block == last_sent_block) {
+>> +        offset |= RAM_SAVE_FLAG_CONTINUE;
+>> +    }
+>> +    pages = save_zero_page(f, block, offset, p, bytes_transferred);
+>> +    if (pages == -1) {
+>> +        *bytes_transferred +=
+>> +            save_page_header(f, block, offset | RAM_SAVE_FLAG_MULTIFD_PAGE);
+>> +        qemu_put_buffer(f, p, TARGET_PAGE_SIZE);
+>> +        *bytes_transferred += TARGET_PAGE_SIZE;
+>> +        pages = 1;
+>> +        acct_info.norm_pages++;
+>> +        acct_info.multifd_pages++;
+>> +    }
+>> +
+>> +    return pages;
+>> +}
+>> +
+>>  static int do_compress_ram_page(QEMUFile *f, RAMBlock *block,
+>>                                  ram_addr_t offset)
+>>  {
+>> @@ -1427,6 +1461,8 @@ static int ram_save_target_page(MigrationState *ms, QEMUFile *f,
+>>              res = ram_save_compressed_page(f, pss,
+>>                                             last_stage,
+>>                                             bytes_transferred);
+>> +        } else if (migrate_use_multifd()) {
+>> +            res = ram_multifd_page(f, pss, last_stage, bytes_transferred);
+>
+> I'm curious whether it's best to pick the destination fd at this level or one level
+> higher; for example would it be good to keep all the components of a
+> host page or huge
+> page together on the same fd? If so then it would be best to pick the fd
+> at ram_save_host_page level.
 
-On Thu, Feb 09, 2017 at 04:40:47PM +0800, Fam Zheng wrote:
-> In virtio_queue_host_notifier_aio_poll, not all "!virtio_queue_empty()"
-> cases are making true progress.
->=20
-> Currently the offending one is virtio-scsi event queue, whose handler
-> does nothing if no event is pending. As a result aio_poll() will spin on
-> the "non-empty" VQ and take 100% host CPU.
->=20
-> Fix this by reporting actual progress from virtio queue aio handlers.
->=20
-> Reported-by: Ed Swierk <eswierk@skyportsystems.com>
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  hw/block/dataplane/virtio-blk.c |  4 ++--
->  hw/block/virtio-blk.c           | 12 ++++++++++--
->  hw/scsi/virtio-scsi-dataplane.c | 14 +++++++-------
->  hw/scsi/virtio-scsi.c           | 14 +++++++++++---
->  hw/virtio/virtio.c              | 15 +++++++++------
->  include/hw/virtio/virtio-blk.h  |  2 +-
->  include/hw/virtio/virtio-scsi.h |  6 +++---
->  include/hw/virtio/virtio.h      |  4 ++--
->  8 files changed, 45 insertions(+), 26 deletions(-)
+my plan here would be to change the migration code to be able to call
+with a bigger sizes, not page by page, and then the problem is solved by
+itself?
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---kOdvwer/5gjFgNo6
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYoeBAAAoJEJykq7OBq3PIbIoH/2MSk/5WACDDAGqFwdRUT0a6
-l0/SP8G2rn26tZQ/glgo2Bu37+zm3s2iPmB2pX9q2sQV3l8J98GTEf0+iSRKYI+r
-fKuLLGb7q1nO6j2BgcMFXj+P66f2ROYChgn/2PLMPhXJDNRkz5rXa+CFhteThbI7
-eGCHnvyaSvY3kGW4r0IJ4qAgNfg4u+euWCpFHg4gxoKYSlpaGqyz0z7vQ3bGZQ7b
-uNAb5DKlNQTHjoJSjGF9XAZikiJFubd6baRG4+t+NL8FTs1OkMys/QXwxW5Ae8df
-zYnCYHWyjL+jzVfuIvuQa9X8RCktsAgnyRHJ2ZK81nKj7VsDLNBa8NhdlHXRz9k=
-=aUxs
------END PGP SIGNATURE-----
-
---kOdvwer/5gjFgNo6--
+Later, Juan.
