@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48521)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cdIKh-00067l-F5
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 10:14:29 -0500
+	(envelope-from <berrange@redhat.com>) id 1cdISm-0001Pg-It
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 10:22:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cdIKe-0001yx-Mu
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 10:14:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36250)
+	(envelope-from <berrange@redhat.com>) id 1cdISi-0003xS-U5
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 10:22:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51488)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cdIKe-0001yp-Ea
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 10:14:24 -0500
-Date: Mon, 13 Feb 2017 15:14:19 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170213151418.GD3086@work-vm>
-References: <1486210863-14924-1-git-send-email-ashijeetacharya@gmail.com>
-	<20170210150403.GC13357@work-vm>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cdISi-0003xG-Ld
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 10:22:44 -0500
+Date: Mon, 13 Feb 2017 15:22:34 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170213152234.GF12387@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1486527494-3387-1-git-send-email-Ashish.Mittal@veritas.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170210150403.GC13357@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v3] migrate: Introduce a 'dc->vmsd' check
- to avoid segfault for --only-migratable
+In-Reply-To: <1486527494-3387-1-git-send-email-Ashish.Mittal@veritas.com>
+Subject: Re: [Qemu-devel] [PATCH v7 1/2] block/vxhs.c: Add support for a new
+ block device type called "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,152 +28,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Cc: quintela@redhat.com, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org
+To: Ashish Mittal <ashmit602@gmail.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, jcody@redhat.com, famz@redhat.com, ashish.mittal@veritas.com, stefanha@gmail.com, jferlan@redhat.com, Buddhi.Madhav@veritas.com, Suraj.Singh@veritas.com, Nitin.Jerath@veritas.com, peter.maydell@linaro.org, Ketan.Nilangekar@veritas.com, Abhijit.Dey@veritas.com
 
-* Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
-> * Ashijeet Acharya (ashijeetacharya@gmail.com) wrote:
-> > Commit a3a3d8c7 introduced a segfault bug while checking for
-> > 'dc->vmsd->unmigratable' which caused QEMU to crash when trying to add
-> > devices which do no set their 'dc->vmsd' yet while initialization.
-> > Place a 'dc->vmsd' check prior to it so that we do not segfault for
-> > such devices.
-> > 
-> > NOTE: This doesn't compromise the functioning of --only-migratable
-> > option as all the unmigratable devices do set their 'dc->vmsd'.
-> > 
-> > Also, move the only_migratable check inside device_set_realized() to avoid
-> > code duplication and fix the bug to display only_migratable error message
-> > only if the device constructuon is right.
-> > 
-> > Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+On Tue, Feb 07, 2017 at 08:18:13PM -0800, Ashish Mittal wrote:
+> From: Ashish Mittal <ashish.mittal@veritas.com>
 > 
-> Queued
+> Source code for the qnio library that this code loads can be downloaded from:
+> https://github.com/VeritasHyperScale/libqnio.git
+> 
+> Sample command line using JSON syntax:
+> ./x86_64-softmmu/qemu-system-x86_64 -name instance-00000008 -S -vnc 0.0.0.0:0
+> -k en-us -vga cirrus -device virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x5
+> -msg timestamp=on
+> 'json:{"driver":"vxhs","vdisk-id":"c3e9095a-a5ee-4dce-afeb-2a59fb387410",
+> "server":{"host":"172.172.17.4","port":"9999"}}'
+> 
+> Sample command line using URI syntax:
+> qemu-img convert -f raw -O raw -n
+> /var/lib/nova/instances/_base/0c5eacd5ebea5ed914b6a3e7b18f1ce734c386ad
+> vxhs://192.168.0.1:9999/c6718f6b-0401-441d-a8c3-1f0064d75ee0
+> 
+> Signed-off-by: Ashish Mittal <ashish.mittal@veritas.com>
+> ---
+> TODO:
+> (1) valgrind report to follow soon.
+> (2) Security implementation for libqnio present in branch "securify".
+>     QEMU patch will use this once it gets merged to libqnio master.
+>     Please use master for building libqnio and testing with this patch.
+> (3) Rename libqnio to libvxhs. Changes ready in branch "securify".
 
-I've had to remove this;  it fails to build user-mode qemu's.
-I think the problem is only_migratable is in vl.c and doesn't
-get linked in user mode qemu; I tried adding a #ifndef CONFIG_USER_ONLY
-around the block and it didn't help, so back to you.
+The securify branch is still lacking in some significant ways that
+prevent effective use of TLS with QEMU. In particular the way it
+is written to use certs from a hardcoded set of paths is not very
+desirable. In addition the way it turns TLS on/off based on the
+existance of a file file is disk is really bad. For something as
+critical as TLS, we don't want it silently enabled/disabled as
+a side-effect of external host OS state.
 
-Dave
+We need to be able to explicitly mandate TLS or plain text mode
+from QEMU by calling a suitable API todo so. QEMU also needs to
+be able to specify wher the certiticates are located, at the
+time the connection is established, so that it can integrate with
+the QEMU TLS credentials object system.
 
-> > ---
-> > Changes is v3:
-> > - move only_migratable check inside device_set_realized() to avoid code 
-> > - duplication
-> > - I have dropped Juan's R-b tag for this one
-> > Changes in v2:
-> > - place dc->vmsd check in hw/usb/bus.c as well
-> > ---
-> >  hw/core/qdev.c | 10 ++++++++++
-> >  hw/usb/bus.c   | 19 -------------------
-> >  qdev-monitor.c |  9 ---------
-> >  3 files changed, 10 insertions(+), 28 deletions(-)
-> > 
-> > diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> > index 5783442..4438cbf 100644
-> > --- a/hw/core/qdev.c
-> > +++ b/hw/core/qdev.c
-> > @@ -37,6 +37,7 @@
-> >  #include "hw/boards.h"
-> >  #include "hw/sysbus.h"
-> >  #include "qapi-event.h"
-> > +#include "migration/migration.h"
-> >  
-> >  int qdev_hotplug = 0;
-> >  static bool qdev_hot_added = false;
-> > @@ -896,6 +897,15 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
-> >      }
-> >  
-> >      if (value && !dev->realized) {
-> > +        if (only_migratable && dc->vmsd) {
-> > +            if (dc->vmsd->unmigratable) {
-> > +                error_setg(&local_err, "Device %s is not migratable, but "
-> > +                           "--only-migratable was specified",
-> > +                           object_get_typename(obj));
-> > +                goto fail;
-> > +            }
-> > +        }
-> > +
-> >          if (!obj->parent) {
-> >              gchar *name = g_strdup_printf("device[%d]", unattached_count++);
-> >  
-> > diff --git a/hw/usb/bus.c b/hw/usb/bus.c
-> > index 1dcc35c..25913ad 100644
-> > --- a/hw/usb/bus.c
-> > +++ b/hw/usb/bus.c
-> > @@ -8,7 +8,6 @@
-> >  #include "monitor/monitor.h"
-> >  #include "trace.h"
-> >  #include "qemu/cutils.h"
-> > -#include "migration/migration.h"
-> >  
-> >  static void usb_bus_dev_print(Monitor *mon, DeviceState *qdev, int indent);
-> >  
-> > @@ -687,8 +686,6 @@ USBDevice *usbdevice_create(const char *cmdline)
-> >      const char *params;
-> >      int len;
-> >      USBDevice *dev;
-> > -    ObjectClass *klass;
-> > -    DeviceClass *dc;
-> >  
-> >      params = strchr(cmdline,':');
-> >      if (params) {
-> > @@ -723,22 +720,6 @@ USBDevice *usbdevice_create(const char *cmdline)
-> >          return NULL;
-> >      }
-> >  
-> > -    klass = object_class_by_name(f->name);
-> > -    if (klass == NULL) {
-> > -        error_report("Device '%s' not found", f->name);
-> > -        return NULL;
-> > -    }
-> > -
-> > -    dc = DEVICE_CLASS(klass);
-> > -
-> > -    if (only_migratable) {
-> > -        if (dc->vmsd->unmigratable) {
-> > -            error_report("Device %s is not migratable, but --only-migratable "
-> > -                         "was specified", f->name);
-> > -            return NULL;
-> > -        }
-> > -    }
-> > -
-> >      if (f->usbdevice_init) {
-> >          dev = f->usbdevice_init(bus, params);
-> >      } else {
-> > diff --git a/qdev-monitor.c b/qdev-monitor.c
-> > index 549f45f..5f2fcdf 100644
-> > --- a/qdev-monitor.c
-> > +++ b/qdev-monitor.c
-> > @@ -29,7 +29,6 @@
-> >  #include "qemu/error-report.h"
-> >  #include "qemu/help_option.h"
-> >  #include "sysemu/block-backend.h"
-> > -#include "migration/migration.h"
-> >  
-> >  /*
-> >   * Aliases were a bad idea from the start.  Let's keep them
-> > @@ -579,14 +578,6 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
-> >          return NULL;
-> >      }
-> >  
-> > -    if (only_migratable) {
-> > -        if (dc->vmsd->unmigratable) {
-> > -            error_setg(errp, "Device %s is not migratable, but "
-> > -                       "--only-migratable was specified", driver);
-> > -            return NULL;
-> > -        }
-> > -    }
-> > -
-> >      /* find bus */
-> >      path = qemu_opt_get(opts, "bus");
-> >      if (path != NULL) {
-> > -- 
-> > 2.6.2
-> > 
-> > 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+eg I'd expect configuration to look like (to be comparible with
+use of NBD):
+
+ $qemu-system-x86_64 \
+   -object tls-creds-x509,id=tls0,dir=/etc/pki/qemu,endpoint=client \
+  'json:{"driver":"vxhs","vdisk-id":"c3e9095a-a5ee-4dce-afeb-2a59fb387410",
+         "tls-creds": "tls0",
+         "server":{"host":"172.172.17.4","port":"9999"}}'
+
+The -object arg registers some TLS credentials with QEMU, at a given path.
+QEMU validates existance of ca-cert.pem, ca-crl.pem, client-crt.pem &
+client-key.pem files in the direct /etc/pki/qemu.
+
+When QEMU talks to libqnio it will tell it to enable use of TLS and to use
+the files
+
+  /etc/pki/qemu/ca-cert.pem
+  /etc/pki/qemu/ca-crl.pem
+  /etc/pki/qemu/client-cert.pem
+  /etc/pki/qemu/client-key.pem
+
+for negotiating the session.
+
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 932f5bb..f37df56 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+
+> @@ -2744,6 +2745,20 @@
+>    'data': { '*offset': 'int', '*size': 'int' } }
+>  
+>  ##
+> +# @BlockdevOptionsVxHS:
+> +#
+> +# Driver specific block device options for VxHS
+> +#
+> +# @vdisk-id:    UUID of VxHS volume
+> +# @server:      vxhs server IP, port
+> +#
+> +# Since: 2.9
+> +##
+> +{ 'struct': 'BlockdevOptionsVxHS',
+> +  'data': { 'vdisk-id': 'str',
+> +            'server': 'InetSocketAddress' } }
+
+This will need to gain a field
+
+    'tls-creds': 'str'
+
+NB, naming picked to be consistent with naming used for NBD.
+
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
