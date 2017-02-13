@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cdDLb-0002nQ-90
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 04:55:05 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cdDLc-0002ov-Ut
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 04:55:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cdDLW-0004M5-NB
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 04:55:03 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cdDLW-0004MJ-To
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 04:55:04 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 13 Feb 2017 12:54:46 +0300
-Message-Id: <1486979689-230770-15-git-send-email-vsementsov@virtuozzo.com>
-In-Reply-To: <1486979689-230770-1-git-send-email-vsementsov@virtuozzo.com>
-References: <1486979689-230770-1-git-send-email-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 14/17] qmp: add
- x-debug-block-dirty-bitmap-sha256
+Date: Mon, 13 Feb 2017 12:54:32 +0300
+Message-Id: <1486979689-230770-1-git-send-email-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v6 00/17] Dirty bitmaps postcopy migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,177 +20,249 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, vsementsov@virtuozzo.com, lirans@il.ibm.com
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- block/dirty-bitmap.c         |  5 +++++
- blockdev.c                   | 29 +++++++++++++++++++++++++++++
- include/block/dirty-bitmap.h |  2 ++
- include/qemu/hbitmap.h       |  8 ++++++++
- qapi/block-core.json         | 27 +++++++++++++++++++++++++++
- tests/Makefile.include       |  2 +-
- util/hbitmap.c               | 11 +++++++++++
- 7 files changed, 83 insertions(+), 1 deletion(-)
+Hi all!
 
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 32aa6eb..5bec99b 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -558,3 +558,8 @@ BdrvDirtyBitmap *bdrv_next_dirty_bitmap(BlockDriverState *bs,
- 
-     return QLIST_NEXT(bitmap, list);
- }
-+
-+char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp)
-+{
-+    return hbitmap_sha256(bitmap->bitmap, errp);
-+}
-diff --git a/blockdev.c b/blockdev.c
-index db82ac9..4d06885 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2790,6 +2790,35 @@ void qmp_block_dirty_bitmap_clear(const char *node, const char *name,
-     aio_context_release(aio_context);
- }
- 
-+BlockDirtyBitmapSha256 *qmp_x_debug_block_dirty_bitmap_sha256(const char *node,
-+                                                              const char *name,
-+                                                              Error **errp)
-+{
-+    AioContext *aio_context;
-+    BdrvDirtyBitmap *bitmap;
-+    BlockDriverState *bs;
-+    BlockDirtyBitmapSha256 *ret = NULL;
-+    char *sha256;
-+
-+    bitmap = block_dirty_bitmap_lookup(node, name, &bs, &aio_context, errp);
-+    if (!bitmap || !bs) {
-+        return NULL;
-+    }
-+
-+    sha256 = bdrv_dirty_bitmap_sha256(bitmap, errp);
-+    if (sha256 == NULL) {
-+        goto out;
-+    }
-+
-+    ret = g_new(BlockDirtyBitmapSha256, 1);
-+    ret->sha256 = sha256;
-+
-+out:
-+    aio_context_release(aio_context);
-+
-+    return ret;
-+}
-+
- void hmp_drive_del(Monitor *mon, const QDict *qdict)
- {
-     const char *id = qdict_get_str(qdict, "id");
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index 20b3ec7..ded872a 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -78,4 +78,6 @@ void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap);
- BdrvDirtyBitmap *bdrv_next_dirty_bitmap(BlockDriverState *bs,
-                                         BdrvDirtyBitmap *bitmap);
- 
-+char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp);
-+
- #endif
-diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
-index 9239fe5..f353e56 100644
---- a/include/qemu/hbitmap.h
-+++ b/include/qemu/hbitmap.h
-@@ -238,6 +238,14 @@ void hbitmap_deserialize_zeroes(HBitmap *hb, uint64_t start, uint64_t count,
- void hbitmap_deserialize_finish(HBitmap *hb);
- 
- /**
-+ * hbitmap_sha256:
-+ * @bitmap: HBitmap to operate on.
-+ *
-+ * Returns SHA256 hash of the last level.
-+ */
-+char *hbitmap_sha256(const HBitmap *bitmap, Error **errp);
-+
-+/**
-  * hbitmap_free:
-  * @hb: HBitmap to operate on.
-  *
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 932f5bb..8646054 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1632,6 +1632,33 @@
-   'data': 'BlockDirtyBitmap' }
- 
- ##
-+# @BlockDirtyBitmapSha256:
-+#
-+# SHA256 hash of dirty bitmap data
-+#
-+# @sha256: ASCII representation of SHA256 bitmap hash
-+#
-+# Since: 2.9
-+##
-+  { 'struct': 'BlockDirtyBitmapSha256',
-+    'data': {'sha256': 'str'} }
-+
-+##
-+# @x-debug-block-dirty-bitmap-sha256:
-+#
-+# Get bitmap SHA256
-+#
-+# Returns: BlockDirtyBitmapSha256 on success
-+#          If @node is not a valid block device, DeviceNotFound
-+#          If @name is not found or if hashing has failed, GenericError with an
-+#          explanation
-+#
-+# Since: 2.9
-+##
-+  { 'command': 'x-debug-block-dirty-bitmap-sha256',
-+    'data': 'BlockDirtyBitmap', 'returns': 'BlockDirtyBitmapSha256' }
-+
-+##
- # @blockdev-mirror:
- #
- # Start mirroring a block device's writes to a new destination.
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 634394a..7a71b4d 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -526,7 +526,7 @@ tests/test-blockjob$(EXESUF): tests/test-blockjob.o $(test-block-obj-y) $(test-u
- tests/test-blockjob-txn$(EXESUF): tests/test-blockjob-txn.o $(test-block-obj-y) $(test-util-obj-y)
- tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-obj-y)
- tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
--tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y)
-+tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y) $(test-crypto-obj-y)
- tests/test-x86-cpuid$(EXESUF): tests/test-x86-cpuid.o
- tests/test-xbzrle$(EXESUF): tests/test-xbzrle.o migration/xbzrle.o page_cache.o $(test-util-obj-y)
- tests/test-cutils$(EXESUF): tests/test-cutils.o util/cutils.o
-diff --git a/util/hbitmap.c b/util/hbitmap.c
-index 35088e1..412b0fa 100644
---- a/util/hbitmap.c
-+++ b/util/hbitmap.c
-@@ -13,6 +13,7 @@
- #include "qemu/hbitmap.h"
- #include "qemu/host-utils.h"
- #include "trace.h"
-+#include "crypto/hash.h"
- 
- /* HBitmaps provides an array of bits.  The bits are stored as usual in an
-  * array of unsigned longs, but HBitmap is also optimized to provide fast
-@@ -689,3 +690,13 @@ void hbitmap_free_meta(HBitmap *hb)
-     hbitmap_free(hb->meta);
-     hb->meta = NULL;
- }
-+
-+char *hbitmap_sha256(const HBitmap *bitmap, Error **errp)
-+{
-+    size_t size = bitmap->sizes[HBITMAP_LEVELS - 1] * sizeof(unsigned long);
-+    char *data = (char *)bitmap->levels[HBITMAP_LEVELS - 1];
-+    char *hash = NULL;
-+    qcrypto_hash_digest(QCRYPTO_HASH_ALG_SHA256, data, size, &hash, errp);
-+
-+    return hash;
-+}
+There is a new version of dirty bitmap postcopy migration series.
+
+v6:
+
+clone: tag postcopy-v6 from https://src.openvz.org/scm/~vsementsov/qemu.git
+online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=postcopy-v6
+
+rebase on master.
+
+03 - tiny contextual change
+
+12 - little change, but it should be reviewed. Call of init_dirty_bitmap_incoming_migration()
+    (which only initialize mutex) moved from start of process_incoming_migration_co (it was
+    immediately after "mis = migration_incoming_state_new(f)") to migration_incoming_get_current()
+    to stay with initialization code.
+    I remove r-b's, but hope that this will not be a problem. The only change in this patch - is moved
+    call of init_dirty_bitmap_incoming_migration.
+    I do so because of recent
+
+commit b4b076daf324894dd288cbdb67ff1e3c7434df7b
+Author: Juan Quintela <quintela@redhat.com>
+Date:   Mon Jan 23 22:32:06 2017 +0100
+
+    migration: create Migration Incoming State at init time
+
+15 - add Max's r-b
+
+v5:
+
+clone: tag postcopy-v5 from https://src.openvz.org/scm/~vsementsov/qemu.git
+online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=postcopy-v5
+
+- move 'signed-off' over 'reviewed-by' in patches.
+
+03,04 - add comments. Hope they will be ok for you, so add Juan's r-b.
+    If not ok - let me know and I'll resend.
+
+06,08,12 - add Max's r-b
+07,09,10,11,12 - add Juan's r-b
+
+14 - used last version of this patch from qcow2-bitmap series with 
+     Max's r-b. It has contextual changes due to different base.
+
+15 - fix 041 iotest, add default node-name only if path is specified and
+     node-name is not specified
+16 - handle whitespaces
+       s/"exec: cat " + fifo/"exec: cat '" + fifo + "'"/
+     fix indentation
+     add Max's r-b
+17 - fix typos, wrong size in comment, s/md5/sha256/
+     add Max's r-b
+
+v4:
+
+clone: tag postcopy-v4 from https://src.openvz.org/scm/~vsementsov/qemu.git
+online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=postcopy-v4
+
+reroll, to fix "failed automatic build test"
+
+rebase on master!
+
+07: since 2.8 -> since 2.9
+14: fix build of test-hbitmap
+    since 2.8 -> since 2.9 and small rewording of comment (this change was not done for
+    same patch in may parallels series about qcow2 bitmap extension)
+
+v3:
+
+rebased on Max's block branch: https://github.com/XanClic/qemu/commits/block
+clone: tag postcopy-v3 from https://src.openvz.org/scm/~vsementsov/qemu.git
+online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=postcopy-v3
+
+01  - r-b by Juan
+02  - r-b by Juan and David
+04  - fix indent
+07  - s/since 2.6/since 2.8/
+10  - change variable name s/buf/str/
+12  - improve copyright message and move it up
+      fix memory loss (thanks to Juan)
+      switch from DPRINTF to trace events
+14* - switch to sha256 and qcrypto_hash_*
+      separate qmp command x-debug-block-dirty-bitmap-sha256
+16  - use path_suffix for multi-vm test
+      fix indent
+      fix copyright
+      use x-debug-block-dirty-bitmap-sha256 instead of md5
+17  - use x-debug-block-dirty-bitmap-sha256 instead of md5
+      remove not existing 170 test from qemu-iotests/group
+
+*Note: patch 14 is also used in my second series 'qcow2 persistent dirty bitmaps'
+
+
+v2:
+some bugs fixed, iotests a bit changed and merged into one test.
+based on block-next (https://github.com/XanClic/qemu/commits/block-next)
+clone: tag postcopy-v2 from https://src.openvz.org/scm/~vsementsov/qemu.git
+online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=refs%2Ftags%2Fpostcopy-v2
+
+v1:
+
+These series are derived from my 'Dirty bitmaps migration' series. The
+core idea is switch to postcopy migration and drop usage of meta
+bitmaps.
+
+These patches provide dirty bitmap postcopy migration feature. Only
+named dirty bitmaps are to be migrated. Migration may be enabled using
+migration capabilities.
+
+The overall method (thanks to John Snow):
+
+1. migrate bitmaps meta data in .save_live_setup
+   - create/find related bitmaps on target
+   - disable them
+   - create successors (anonimous children) only for enabled migrated
+     bitmaps
+2. do nothing in precopy stage
+3. just before target vm start: enable successors, created in (1)
+4. migrate bitmap data
+5. reclaime bitmaps (merge successors to their parents)
+6. enable bitmaps (only bitmaps, which was enabled in source)
+
+
+Some patches are unchnaged from (v7) of 'Dirty bitmaps migration'
+(DBMv7). I've left Reviewed-by's for them, if you don't like it, say me
+and I'll drop them in the following version.
+
+So, relatively to last DBMv7: 
+
+01-04: new patches, splitting common postcopy migration out of ram
+       postcopy migration
+   05: equal to DBMv7.05
+   06: new
+   07: equal to DBMv7.06
+   08: new
+   09: equal to DBMv7.07
+   10: new
+   11: derived from DBMv7.08, see below
+12-15: equal to DBMv7.09-12
+   16: derived from DBMv7.13
+       - switch from fifo to socket, as postcopy don't work with fifo
+         for now
+       - change parameters: size, granularity, regions
+       - add time.sleep, to wait for postcopy migration phase (bad
+         temporary solution.
+       - drop Reviewed-by
+   17: new
+
+   11: the core patch of the series, it is derived from
+       [DBMv7.08: migration: add migration_block-dirty-bitmap.c]
+       There are a lot of changes related to switching from precopy to
+       postcopy, but functions related to migration stream itself
+       (structs, send/load sequences) are mostly unchnaged.
+
+       So, changes, to switch from precopy to postcopy:
+       - removed all staff related to meta bitmaps and dirty phase!!!
+       - add dirty_bitmap_mig_enable_successors, and call it before
+         target vm start in loadvm_postcopy_handle_run
+       - add enabled_bitmaps list of bitmaps for
+         dirty_bitmap_mig_enable_successors
+
+       - enabled flag is send with start bitmap chunk instead of
+         completion chunk
+       - sectors_per_chunk is calculated directly from CHUNK_SIZE, not
+         using meta bitmap granularity
+
+       - dirty_bitmap_save_iterate: remove dirty_phase, move bulk_phase
+         to postcopy stage
+       - dirty_bitmap_save_pending: remove dirty phase related pending,
+         switch pending to non-postcopyable
+       - dirty_bitmap_load_start: get enabled flag and prepare
+         successors for enabled bitmaps, also add them to
+         enabled_bitmaps list
+       - dirty_bitmap_load_complete: for enabled bitmaps: merge them
+         with successors and enable
+
+       - savevm handlers:
+         * remove separate savevm_dirty_bitmap_live_iterate_handlers state
+           (it was bad idea, any way), and move its save_live_iterate to
+           savevm_dirty_bitmap_handlers
+         * add is_active_iterate savevm handler, which allows iterations
+           only in postcopy stage (after stopping source vm)
+         * add has_postcopy savevm handler. (ofcourse, just returning true)
+         * use save_live_complete_postcopy instead of
+           save_live_complete_precopy
+
+       Other changes:
+       - some debug output changed
+       - remove MIN_LIVE_SIZE, is_live_iterative and related staff (it
+         was needed to omit iterations if bitmap data is small, possibly
+         this should be reimplemented)
+
+Vladimir Sementsov-Ogievskiy (17):
+  migration: add has_postcopy savevm handler
+  migration: fix ram_save_pending
+  migration: split common postcopy out of ram postcopy
+  migration: introduce postcopy-only pending
+  block: add bdrv_next_dirty_bitmap()
+  block: add bdrv_dirty_bitmap_enable_successor()
+  qapi: add dirty-bitmaps migration capability
+  block/dirty-bitmap: add bdrv_dirty_bitmap_release_successor
+  migration: include migrate_dirty_bitmaps in migrate_postcopy
+  migration/qemu-file: add qemu_put_counted_string()
+  migration: add is_active_iterate handler
+  migration: add postcopy migration of dirty bitmaps
+  iotests: add add_incoming_migration to VM class
+  qmp: add x-debug-block-dirty-bitmap-sha256
+  iotests: add default node-name
+  iotests: add dirty bitmap migration test
+  iotests: add dirty bitmap postcopy test
+
+ block/dirty-bitmap.c           |  30 ++
+ blockdev.c                     |  29 ++
+ include/block/dirty-bitmap.h   |   8 +
+ include/migration/block.h      |   1 +
+ include/migration/migration.h  |   6 +
+ include/migration/qemu-file.h  |   2 +
+ include/migration/vmstate.h    |  19 +-
+ include/qemu/hbitmap.h         |   8 +
+ include/sysemu/sysemu.h        |   5 +-
+ migration/Makefile.objs        |   2 +-
+ migration/block-dirty-bitmap.c | 679 +++++++++++++++++++++++++++++++++++++++++
+ migration/block.c              |   7 +-
+ migration/migration.c          |  66 ++--
+ migration/postcopy-ram.c       |   4 +-
+ migration/qemu-file.c          |  13 +
+ migration/ram.c                |  19 +-
+ migration/savevm.c             |  75 +++--
+ migration/trace-events         |  16 +-
+ qapi-schema.json               |   4 +-
+ qapi/block-core.json           |  27 ++
+ tests/Makefile.include         |   2 +-
+ tests/qemu-iotests/169         | 140 +++++++++
+ tests/qemu-iotests/169.out     |   5 +
+ tests/qemu-iotests/group       |   1 +
+ tests/qemu-iotests/iotests.py  |  15 +-
+ util/hbitmap.c                 |  11 +
+ vl.c                           |   1 +
+ 27 files changed, 1142 insertions(+), 53 deletions(-)
+ create mode 100644 migration/block-dirty-bitmap.c
+ create mode 100755 tests/qemu-iotests/169
+ create mode 100644 tests/qemu-iotests/169.out
+
 -- 
 1.8.3.1
