@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cdKm4-0003aV-3N
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:50:54 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cdKm5-0003bF-M0
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:50:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cdKm2-0005xH-Il
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:50:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36974)
+	(envelope-from <dgilbert@redhat.com>) id 1cdKm4-0005xs-6S
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:50:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53912)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cdKm2-0005x3-9k
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:50:50 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cdKm3-0005xX-U8
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:50:52 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon, 13 Feb 2017 17:50:27 +0000
-Message-Id: <20170213175033.7314-9-dgilbert@redhat.com>
+Date: Mon, 13 Feb 2017 17:50:28 +0000
+Message-Id: <20170213175033.7314-10-dgilbert@redhat.com>
 In-Reply-To: <20170213175033.7314-1-dgilbert@redhat.com>
 References: <20170213175033.7314-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 08/14] COLO: fix setting checkpoint-delay not
- working properly
+Subject: [Qemu-devel] [PULL 09/14] COLO: Shutdown related socket fd while do
+ failover
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,141 +29,150 @@ Cc: quintela@redhat.com, ashijeetacharya@gmail.com, amit@kernel.org, pbutsykin@v
 
 From: zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-If we set checkpoint-delay through command 'migrate-set-parameters',
-It will not take effect until we finish last sleep chekpoint-delay,
-That's will be offensive espeically when we want to change its value
-from an extreme big one to a proper value.
+If the net connection between primary host and secondary host breaks
+while COLO/COLO incoming threads are doing read() or write().
+It will block until connection is timeout, and the failover process
+will be blocked because of it.
 
-Fix it by using timer to realize checkpoint-delay.
+So it is necessary to shutdown all the socket fds used by COLO
+to avoid this situation. Besides, we should close the corresponding
+file descriptors after failvoer BH shutdown them,
+Or there will be an error.
 
 Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Message-Id: <1484657864-21708-2-git-send-email-zhang.zhanghailiang@huawei.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-Id: <1484657864-21708-3-git-send-email-zhang.zhanghailiang@huawei.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- include/migration/colo.h      |  2 ++
- include/migration/migration.h |  5 +++++
- migration/colo.c              | 33 +++++++++++++++++++++++----------
- migration/migration.c         |  3 +++
- 4 files changed, 33 insertions(+), 10 deletions(-)
+ include/migration/migration.h |  3 +++
+ migration/colo.c              | 43 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 46 insertions(+)
 
-diff --git a/include/migration/colo.h b/include/migration/colo.h
-index e32eef4..2bbff9e 100644
---- a/include/migration/colo.h
-+++ b/include/migration/colo.h
-@@ -35,4 +35,6 @@ COLOMode get_colo_mode(void);
- 
- /* failover */
- void colo_do_failover(MigrationState *s);
-+
-+void colo_checkpoint_notify(void *opaque);
- #endif
 diff --git a/include/migration/migration.h b/include/migration/migration.h
-index 71ce190..cb83f16 100644
+index cb83f16..1735d66 100644
 --- a/include/migration/migration.h
 +++ b/include/migration/migration.h
-@@ -188,6 +188,11 @@ struct MigrationState
+@@ -116,6 +116,7 @@ struct MigrationIncomingState {
+     QemuThread colo_incoming_thread;
+     /* The coroutine we should enter (back) after failover */
+     Coroutine *migration_incoming_co;
++    QemuSemaphore colo_incoming_sem;
+ 
+     /* See savevm.c */
+     LoadStateEntry_Head loadvm_handlers;
+@@ -187,6 +188,8 @@ struct MigrationState
+     QSIMPLEQ_HEAD(src_page_requests, MigrationSrcPageRequest) src_page_requests;
      /* The RAMBlock used in the last src_page_request */
      RAMBlock *last_req_rb;
++    /* The semaphore is used to notify COLO thread that failover is finished */
++    QemuSemaphore colo_exit_sem;
  
-+    /* The semaphore is used to notify COLO thread to do checkpoint */
-+    QemuSemaphore colo_checkpoint_sem;
-+    int64_t colo_checkpoint_time;
-+    QEMUTimer *colo_delay_timer;
-+
-     /* The last error that occurred */
-     Error *error;
- };
+     /* The semaphore is used to notify COLO thread to do checkpoint */
+     QemuSemaphore colo_checkpoint_sem;
 diff --git a/migration/colo.c b/migration/colo.c
-index 93c85c5..08b2e46 100644
+index 08b2e46..3222812 100644
 --- a/migration/colo.c
 +++ b/migration/colo.c
-@@ -302,7 +302,7 @@ static void colo_process_checkpoint(MigrationState *s)
- {
-     QIOChannelBuffer *bioc;
-     QEMUFile *fb = NULL;
--    int64_t current_time, checkpoint_time = qemu_clock_get_ms(QEMU_CLOCK_HOST);
-+    int64_t current_time = qemu_clock_get_ms(QEMU_CLOCK_HOST);
-     Error *local_err = NULL;
-     int ret;
- 
-@@ -332,26 +332,21 @@ static void colo_process_checkpoint(MigrationState *s)
-     qemu_mutex_unlock_iothread();
-     trace_colo_vm_state_change("stop", "run");
- 
-+    timer_mod(s->colo_delay_timer,
-+            current_time + s->parameters.x_checkpoint_delay);
-+
-     while (s->state == MIGRATION_STATUS_COLO) {
-         if (failover_get_state() != FAILOVER_STATUS_NONE) {
-             error_report("failover request");
-             goto out;
-         }
- 
--        current_time = qemu_clock_get_ms(QEMU_CLOCK_HOST);
--        if (current_time - checkpoint_time <
--            s->parameters.x_checkpoint_delay) {
--            int64_t delay_ms;
-+        qemu_sem_wait(&s->colo_checkpoint_sem);
- 
--            delay_ms = s->parameters.x_checkpoint_delay -
--                       (current_time - checkpoint_time);
--            g_usleep(delay_ms * 1000);
--        }
-         ret = colo_do_checkpoint_transaction(s, bioc, fb);
-         if (ret < 0) {
-             goto out;
-         }
--        checkpoint_time = qemu_clock_get_ms(QEMU_CLOCK_HOST);
+@@ -59,6 +59,18 @@ static void secondary_vm_do_failover(void)
+         /* recover runstate to normal migration finish state */
+         autostart = true;
      }
++    /*
++     * Make sure COLO incoming thread not block in recv or send,
++     * If mis->from_src_file and mis->to_src_file use the same fd,
++     * The second shutdown() will return -1, we ignore this value,
++     * It is harmless.
++     */
++    if (mis->from_src_file) {
++        qemu_file_shutdown(mis->from_src_file);
++    }
++    if (mis->to_src_file) {
++        qemu_file_shutdown(mis->to_src_file);
++    }
  
- out:
-@@ -364,14 +359,32 @@ out:
-         qemu_fclose(fb);
+     old_state = failover_set_state(FAILOVER_STATUS_ACTIVE,
+                                    FAILOVER_STATUS_COMPLETED);
+@@ -67,6 +79,8 @@ static void secondary_vm_do_failover(void)
+                      "secondary VM", FailoverStatus_lookup[old_state]);
+         return;
      }
++    /* Notify COLO incoming thread that failover work is finished */
++    qemu_sem_post(&mis->colo_incoming_sem);
+     /* For Secondary VM, jump to incoming co */
+     if (mis->migration_incoming_co) {
+         qemu_coroutine_enter(mis->migration_incoming_co);
+@@ -81,6 +95,18 @@ static void primary_vm_do_failover(void)
+     migrate_set_state(&s->state, MIGRATION_STATUS_COLO,
+                       MIGRATION_STATUS_COMPLETED);
  
-+    timer_del(s->colo_delay_timer);
++    /*
++     * Wake up COLO thread which may blocked in recv() or send(),
++     * The s->rp_state.from_dst_file and s->to_dst_file may use the
++     * same fd, but we still shutdown the fd for twice, it is harmless.
++     */
++    if (s->to_dst_file) {
++        qemu_file_shutdown(s->to_dst_file);
++    }
++    if (s->rp_state.from_dst_file) {
++        qemu_file_shutdown(s->rp_state.from_dst_file);
++    }
 +
+     old_state = failover_set_state(FAILOVER_STATUS_ACTIVE,
+                                    FAILOVER_STATUS_COMPLETED);
+     if (old_state != FAILOVER_STATUS_ACTIVE) {
+@@ -88,6 +114,8 @@ static void primary_vm_do_failover(void)
+                      FailoverStatus_lookup[old_state]);
+         return;
+     }
++    /* Notify COLO thread that failover work is finished */
++    qemu_sem_post(&s->colo_exit_sem);
+ }
+ 
+ void colo_do_failover(MigrationState *s)
+@@ -361,6 +389,14 @@ out:
+ 
+     timer_del(s->colo_delay_timer);
+ 
++    /* Hope this not to be too long to wait here */
++    qemu_sem_wait(&s->colo_exit_sem);
++    qemu_sem_destroy(&s->colo_exit_sem);
++    /*
++     * Must be called after failover BH is completed,
++     * Or the failover BH may shutdown the wrong fd that
++     * re-used by other threads after we release here.
++     */
      if (s->rp_state.from_dst_file) {
          qemu_fclose(s->rp_state.from_dst_file);
      }
- }
+@@ -385,6 +421,7 @@ void migrate_start_colo_process(MigrationState *s)
+     s->colo_delay_timer =  timer_new_ms(QEMU_CLOCK_HOST,
+                                 colo_checkpoint_notify, s);
  
-+void colo_checkpoint_notify(void *opaque)
-+{
-+    MigrationState *s = opaque;
-+    int64_t next_notify_time;
-+
-+    qemu_sem_post(&s->colo_checkpoint_sem);
-+    s->colo_checkpoint_time = qemu_clock_get_ms(QEMU_CLOCK_HOST);
-+    next_notify_time = s->colo_checkpoint_time +
-+                    s->parameters.x_checkpoint_delay;
-+    timer_mod(s->colo_delay_timer, next_notify_time);
-+}
-+
- void migrate_start_colo_process(MigrationState *s)
- {
-     qemu_mutex_unlock_iothread();
-+    qemu_sem_init(&s->colo_checkpoint_sem, 0);
-+    s->colo_delay_timer =  timer_new_ms(QEMU_CLOCK_HOST,
-+                                colo_checkpoint_notify, s);
-+
++    qemu_sem_init(&s->colo_exit_sem, 0);
      migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
                        MIGRATION_STATUS_COLO);
      colo_process_checkpoint(s);
-diff --git a/migration/migration.c b/migration/migration.c
-index 2a26a20..c6ae69d 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -891,6 +891,9 @@ void qmp_migrate_set_parameters(MigrationParameters *params, Error **errp)
+@@ -423,6 +460,8 @@ void *colo_process_incoming_thread(void *opaque)
+     uint64_t value;
+     Error *local_err = NULL;
  
-     if (params->has_x_checkpoint_delay) {
-         s->parameters.x_checkpoint_delay = params->x_checkpoint_delay;
-+        if (migration_in_colo_state()) {
-+            colo_checkpoint_notify(s);
-+        }
++    qemu_sem_init(&mis->colo_incoming_sem, 0);
++
+     migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
+                       MIGRATION_STATUS_COLO);
+ 
+@@ -533,6 +572,10 @@ out:
+         qemu_fclose(fb);
      }
- }
  
++    /* Hope this not to be too long to loop here */
++    qemu_sem_wait(&mis->colo_incoming_sem);
++    qemu_sem_destroy(&mis->colo_incoming_sem);
++    /* Must be called after failover BH is completed */
+     if (mis->to_src_file) {
+         qemu_fclose(mis->to_src_file);
+     }
 -- 
 2.9.3
