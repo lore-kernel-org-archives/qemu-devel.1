@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cdDZe-0008Bp-1B
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 05:09:35 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cdDZf-0008Cg-0t
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 05:09:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cdDZc-0007dN-Ds
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 05:09:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48552)
+	(envelope-from <pbonzini@redhat.com>) id 1cdDZd-0007dc-BF
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 05:09:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42570)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cdDZc-0007d9-5p
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 05:09:32 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cdDZd-0007dT-2z
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 05:09:33 -0500
 Received: from int-mx09.intmail.prod.int.phx2.redhat.com
 	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 66B48C05683F
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 10:09:32 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 55B558046C
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 10:09:33 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 13 Feb 2017 11:09:04 +0100
-Message-Id: <20170213100906.23486-17-pbonzini@redhat.com>
+Date: Mon, 13 Feb 2017 11:09:05 +0100
+Message-Id: <20170213100906.23486-18-pbonzini@redhat.com>
 In-Reply-To: <20170213100906.23486-1-pbonzini@redhat.com>
 References: <20170213100906.23486-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 16/18] aio-posix: partially inline aio_dispatch
- into aio_poll
+Subject: [Qemu-devel] [PATCH 17/18] async: remove unnecessary inc/dec pairs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,58 +32,65 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: famz@redhat.com, stefanha@redhat.com
 
-This patch prepares for the removal of unnecessary lockcnt inc/dec pairs.
-Extract the dispatching loop for file descriptor handlers into a new
-function aio_dispatch_handlers, and then inline aio_dispatch into
-aio_poll.
-
-aio_dispatch can now become void.
+Pull the increment/decrement pair out of aio_bh_poll and into the
+callers.
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/block/aio.h |  6 +-----
- util/aio-posix.c    | 44 ++++++++++++++------------------------------
- util/aio-win32.c    | 13 ++++---------
- util/async.c        |  2 +-
- 4 files changed, 20 insertions(+), 45 deletions(-)
+ util/aio-posix.c |  8 +++-----
+ util/aio-win32.c |  8 ++++----
+ util/async.c     | 12 ++++++------
+ 3 files changed, 13 insertions(+), 15 deletions(-)
 
-diff --git a/include/block/aio.h b/include/block/aio.h
-index 614cbc6..677b6ff 100644
---- a/include/block/aio.h
-+++ b/include/block/aio.h
-@@ -310,12 +310,8 @@ bool aio_pending(AioContext *ctx);
- /* Dispatch any pending callbacks from the GSource attached to the AioContext.
-  *
-  * This is used internally in the implementation of the GSource.
-- *
-- * @dispatch_fds: true to process fds, false to skip them
-- *                (can be used as an optimization by callers that know there
-- *                are no fds ready)
-  */
--bool aio_dispatch(AioContext *ctx, bool dispatch_fds);
-+void aio_dispatch(AioContext *ctx);
- 
- /* Progress in completing AIO work to occur.  This can issue new pending
-  * aio as a result of executing I/O completion or bh callbacks.
 diff --git a/util/aio-posix.c b/util/aio-posix.c
-index 0450392..e53434d 100644
+index e53434d..77cacdf 100644
 --- a/util/aio-posix.c
 +++ b/util/aio-posix.c
-@@ -386,12 +386,6 @@ static bool aio_dispatch_handlers(AioContext *ctx)
-     AioHandler *node, *tmp;
-     bool progress = false;
+@@ -425,9 +425,8 @@ static bool aio_dispatch_handlers(AioContext *ctx)
  
--    /*
--     * We have to walk very carefully in case aio_set_fd_handler is
--     * called while we're walking.
--     */
+ void aio_dispatch(AioContext *ctx)
+ {
+-    aio_bh_poll(ctx);
+-
+     qemu_lockcnt_inc(&ctx->list_lock);
++    aio_bh_poll(ctx);
+     aio_dispatch_handlers(ctx);
+     qemu_lockcnt_dec(&ctx->list_lock);
+ 
+@@ -679,16 +678,15 @@ bool aio_poll(AioContext *ctx, bool blocking)
+     }
+ 
+     npfd = 0;
+-    qemu_lockcnt_dec(&ctx->list_lock);
+ 
+     progress |= aio_bh_poll(ctx);
+ 
+     if (ret > 0) {
+-        qemu_lockcnt_inc(&ctx->list_lock);
+         progress |= aio_dispatch_handlers(ctx);
+-        qemu_lockcnt_dec(&ctx->list_lock);
+     }
+ 
++    qemu_lockcnt_dec(&ctx->list_lock);
++
+     progress |= timerlistgroup_run_timers(&ctx->tlg);
+ 
+     return progress;
+diff --git a/util/aio-win32.c b/util/aio-win32.c
+index 442a179..bca496a 100644
+--- a/util/aio-win32.c
++++ b/util/aio-win32.c
+@@ -253,8 +253,6 @@ static bool aio_dispatch_handlers(AioContext *ctx, HANDLE event)
+     bool progress = false;
+     AioHandler *tmp;
+ 
 -    qemu_lockcnt_inc(&ctx->list_lock);
 -
-     QLIST_FOREACH_SAFE_RCU(node, &ctx->aio_handlers, node, tmp) {
-         int revents;
- 
-@@ -426,33 +420,18 @@ static bool aio_dispatch_handlers(AioContext *ctx)
+     /*
+      * We have to walk very carefully in case aio_set_fd_handler is
+      * called while we're walking.
+@@ -305,14 +303,15 @@ static bool aio_dispatch_handlers(AioContext *ctx, HANDLE event)
          }
      }
  
@@ -92,95 +98,77 @@ index 0450392..e53434d 100644
      return progress;
  }
  
--/*
-- * Note that dispatch_fds == false has the side-effect of post-poning the
-- * freeing of deleted handlers.
-- */
--bool aio_dispatch(AioContext *ctx, bool dispatch_fds)
-+void aio_dispatch(AioContext *ctx)
+ void aio_dispatch(AioContext *ctx)
  {
--    bool progress;
--
--    /*
--     * If there are callbacks left that have been queued, we need to call them.
--     * Do not call select in this case, because it is possible that the caller
--     * does not need a complete flush (as is the case for aio_poll loops).
--     */
--    progress = aio_bh_poll(ctx);
-+    aio_bh_poll(ctx);
- 
--    if (dispatch_fds) {
--        progress |= aio_dispatch_handlers(ctx);
--    }
--
--    /* Run our timers */
--    progress |= timerlistgroup_run_timers(&ctx->tlg);
 +    qemu_lockcnt_inc(&ctx->list_lock);
-+    aio_dispatch_handlers(ctx);
+     aio_bh_poll(ctx);
+     aio_dispatch_handlers(ctx, INVALID_HANDLE_VALUE);
 +    qemu_lockcnt_dec(&ctx->list_lock);
- 
--    return progress;
-+    timerlistgroup_run_timers(&ctx->tlg);
+     timerlistgroup_run_timers(&ctx->tlg);
  }
  
- /* These thread-local variables are used only in a small part of aio_poll
-@@ -702,11 +681,16 @@ bool aio_poll(AioContext *ctx, bool blocking)
-     npfd = 0;
-     qemu_lockcnt_dec(&ctx->list_lock);
- 
--    /* Run dispatch even if there were no readable fds to run timers */
--    if (aio_dispatch(ctx, ret > 0)) {
--        progress = true;
-+    progress |= aio_bh_poll(ctx);
-+
-+    if (ret > 0) {
-+        qemu_lockcnt_inc(&ctx->list_lock);
-+        progress |= aio_dispatch_handlers(ctx);
-+        qemu_lockcnt_dec(&ctx->list_lock);
+@@ -349,7 +348,6 @@ bool aio_poll(AioContext *ctx, bool blocking)
+         }
      }
  
-+    progress |= timerlistgroup_run_timers(&ctx->tlg);
+-    qemu_lockcnt_dec(&ctx->list_lock);
+     first = true;
+ 
+     /* ctx->notifier is always registered.  */
+@@ -392,6 +390,8 @@ bool aio_poll(AioContext *ctx, bool blocking)
+         progress |= aio_dispatch_handlers(ctx, event);
+     } while (count > 0);
+ 
++    qemu_lockcnt_dec(&ctx->list_lock);
 +
+     progress |= timerlistgroup_run_timers(&ctx->tlg);
      return progress;
  }
- 
-diff --git a/util/aio-win32.c b/util/aio-win32.c
-index 20b63ce..442a179 100644
---- a/util/aio-win32.c
-+++ b/util/aio-win32.c
-@@ -309,16 +309,11 @@ static bool aio_dispatch_handlers(AioContext *ctx, HANDLE event)
-     return progress;
- }
- 
--bool aio_dispatch(AioContext *ctx, bool dispatch_fds)
-+void aio_dispatch(AioContext *ctx)
- {
--    bool progress;
--
--    progress = aio_bh_poll(ctx);
--    if (dispatch_fds) {
--        progress |= aio_dispatch_handlers(ctx, INVALID_HANDLE_VALUE);
--    }
--    progress |= timerlistgroup_run_timers(&ctx->tlg);
--    return progress;
-+    aio_bh_poll(ctx);
-+    aio_dispatch_handlers(ctx, INVALID_HANDLE_VALUE);
-+    timerlistgroup_run_timers(&ctx->tlg);
- }
- 
- bool aio_poll(AioContext *ctx, bool blocking)
 diff --git a/util/async.c b/util/async.c
-index 99b9d7e..cc40735 100644
+index cc40735..9c3ce6a 100644
 --- a/util/async.c
 +++ b/util/async.c
-@@ -258,7 +258,7 @@ aio_ctx_dispatch(GSource     *source,
-     AioContext *ctx = (AioContext *) source;
- 
-     assert(callback == NULL);
--    aio_dispatch(ctx, true);
-+    aio_dispatch(ctx);
-     return true;
+@@ -90,15 +90,16 @@ void aio_bh_call(QEMUBH *bh)
+     bh->cb(bh->opaque);
  }
  
+-/* Multiple occurrences of aio_bh_poll cannot be called concurrently */
++/* Multiple occurrences of aio_bh_poll cannot be called concurrently.
++ * The count in ctx->list_lock is incremented before the call, and is
++ * not affected by the call.
++ */
+ int aio_bh_poll(AioContext *ctx)
+ {
+     QEMUBH *bh, **bhp, *next;
+     int ret;
+     bool deleted = false;
+ 
+-    qemu_lockcnt_inc(&ctx->list_lock);
+-
+     ret = 0;
+     for (bh = atomic_rcu_read(&ctx->first_bh); bh; bh = next) {
+         next = atomic_rcu_read(&bh->next);
+@@ -123,11 +124,10 @@ int aio_bh_poll(AioContext *ctx)
+ 
+     /* remove deleted bhs */
+     if (!deleted) {
+-        qemu_lockcnt_dec(&ctx->list_lock);
+         return ret;
+     }
+ 
+-    if (qemu_lockcnt_dec_and_lock(&ctx->list_lock)) {
++    if (qemu_lockcnt_dec_if_lock(&ctx->list_lock)) {
+         bhp = &ctx->first_bh;
+         while (*bhp) {
+             bh = *bhp;
+@@ -138,7 +138,7 @@ int aio_bh_poll(AioContext *ctx)
+                 bhp = &bh->next;
+             }
+         }
+-        qemu_lockcnt_unlock(&ctx->list_lock);
++        qemu_lockcnt_inc_and_unlock(&ctx->list_lock);
+     }
+     return ret;
+ }
 -- 
 2.9.3
