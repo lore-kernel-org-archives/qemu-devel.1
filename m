@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cdO8J-0004WZ-ES
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 16:26:05 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cdO8L-0004Xg-6h
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 16:26:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cdO8I-0001DH-0C
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 16:26:03 -0500
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:34984)
+	(envelope-from <rth7680@gmail.com>) id 1cdO8K-0001F2-2f
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 16:26:05 -0500
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:36543)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cdO8H-0001D6-RM
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 16:26:01 -0500
-Received: by mail-qt0-x243.google.com with SMTP id s58so15046626qtc.2
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 13:26:01 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cdO8J-0001EV-VD
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 16:26:04 -0500
+Received: by mail-qk0-x244.google.com with SMTP id p22so8992157qka.3
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 13:26:03 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue, 14 Feb 2017 08:25:15 +1100
-Message-Id: <20170213212536.31871-4-rth@twiddle.net>
+Date: Tue, 14 Feb 2017 08:25:16 +1100
+Message-Id: <20170213212536.31871-5-rth@twiddle.net>
 In-Reply-To: <20170213212536.31871-1-rth@twiddle.net>
 References: <20170213212536.31871-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 03/24] linux-user: Fix openrisc cpu_loop
+Subject: [Qemu-devel] [PULL 04/24] linux-user: Honor CLONE_SETTLS for
+ openrisc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,144 +30,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-We need to handle EXCP_DEBUG and EXCP_INTERRUPT.
-We need to send signals to the guest using queue_signal.
+Threads work much better when you set the TLS register.
+This was fixed in the upstream kernel for Linux 4.9.
 
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- linux-user/main.c | 95 ++++++++++++++++++++++++-------------------------------
- 1 file changed, 41 insertions(+), 54 deletions(-)
+ linux-user/openrisc/target_cpu.h | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index e588f58..001f71c 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -2574,52 +2574,17 @@ kuser_fail:
- void cpu_loop(CPUOpenRISCState *env)
+diff --git a/linux-user/openrisc/target_cpu.h b/linux-user/openrisc/target_cpu.h
+index a21ed1a..f283d96 100644
+--- a/linux-user/openrisc/target_cpu.h
++++ b/linux-user/openrisc/target_cpu.h
+@@ -30,9 +30,7 @@ static inline void cpu_clone_regs(CPUOpenRISCState *env, target_ulong newsp)
+ 
+ static inline void cpu_set_tls(CPUOpenRISCState *env, target_ulong newtls)
  {
-     CPUState *cs = CPU(openrisc_env_get_cpu(env));
--    int trapnr, gdbsig;
-+    int trapnr;
-     abi_long ret;
-+    target_siginfo_t info;
- 
-     for (;;) {
-         cpu_exec_start(cs);
-         trapnr = cpu_exec(cs);
-         cpu_exec_end(cs);
-         process_queued_cpu_work(cs);
--        gdbsig = 0;
- 
-         switch (trapnr) {
--        case EXCP_RESET:
--            qemu_log_mask(CPU_LOG_INT, "\nReset request, exit, pc is %#x\n", env->pc);
--            exit(EXIT_FAILURE);
--            break;
--        case EXCP_BUSERR:
--            qemu_log_mask(CPU_LOG_INT, "\nBus error, exit, pc is %#x\n", env->pc);
--            gdbsig = TARGET_SIGBUS;
--            break;
--        case EXCP_DPF:
--        case EXCP_IPF:
--            cpu_dump_state(cs, stderr, fprintf, 0);
--            gdbsig = TARGET_SIGSEGV;
--            break;
--        case EXCP_TICK:
--            qemu_log_mask(CPU_LOG_INT, "\nTick time interrupt pc is %#x\n", env->pc);
--            break;
--        case EXCP_ALIGN:
--            qemu_log_mask(CPU_LOG_INT, "\nAlignment pc is %#x\n", env->pc);
--            gdbsig = TARGET_SIGBUS;
--            break;
--        case EXCP_ILLEGAL:
--            qemu_log_mask(CPU_LOG_INT, "\nIllegal instructionpc is %#x\n", env->pc);
--            gdbsig = TARGET_SIGILL;
--            break;
--        case EXCP_INT:
--            qemu_log_mask(CPU_LOG_INT, "\nExternal interruptpc is %#x\n", env->pc);
--            break;
--        case EXCP_DTLBMISS:
--        case EXCP_ITLBMISS:
--            qemu_log_mask(CPU_LOG_INT, "\nTLB miss\n");
--            break;
--        case EXCP_RANGE:
--            qemu_log_mask(CPU_LOG_INT, "\nRange\n");
--            gdbsig = TARGET_SIGSEGV;
--            break;
-         case EXCP_SYSCALL:
-             env->pc += 4;   /* 0xc00; */
-             ret = do_syscall(env,
-@@ -2636,32 +2601,54 @@ void cpu_loop(CPUOpenRISCState *env)
-                 env->gpr[11] = ret;
-             }
-             break;
-+        case EXCP_DPF:
-+        case EXCP_IPF:
-+        case EXCP_RANGE:
-+            info.si_signo = TARGET_SIGSEGV;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_SEGV_MAPERR;
-+            info._sifields._sigfault._addr = env->pc;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+        case EXCP_ALIGN:
-+            info.si_signo = TARGET_SIGBUS;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_BUS_ADRALN;
-+            info._sifields._sigfault._addr = env->pc;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+        case EXCP_ILLEGAL:
-+            info.si_signo = TARGET_SIGILL;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_ILL_ILLOPC;
-+            info._sifields._sigfault._addr = env->pc;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-         case EXCP_FPE:
--            qemu_log_mask(CPU_LOG_INT, "\nFloating point error\n");
-+            info.si_signo = TARGET_SIGFPE;
-+            info.si_errno = 0;
-+            info.si_code = 0;
-+            info._sifields._sigfault._addr = env->pc;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-             break;
--        case EXCP_TRAP:
--            qemu_log_mask(CPU_LOG_INT, "\nTrap\n");
--            gdbsig = TARGET_SIGTRAP;
-+        case EXCP_INTERRUPT:
-+            /* We processed the pending cpu work above.  */
-             break;
--        case EXCP_NR:
--            qemu_log_mask(CPU_LOG_INT, "\nNR\n");
-+        case EXCP_DEBUG:
-+            trapnr = gdb_handlesig(cs, TARGET_SIGTRAP);
-+            if (trapnr) {
-+                info.si_signo = trapnr;
-+                info.si_errno = 0;
-+                info.si_code = TARGET_TRAP_BRKPT;
-+                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            }
-             break;
-         case EXCP_ATOMIC:
-             cpu_exec_step_atomic(cs);
-             break;
-         default:
--            EXCP_DUMP(env, "\nqemu: unhandled CPU exception %#x - aborting\n",
--                     trapnr);
--            gdbsig = TARGET_SIGILL;
--            break;
--        }
--        if (gdbsig) {
--            gdb_handlesig(cs, gdbsig);
--            if (gdbsig != TARGET_SIGTRAP) {
--                exit(EXIT_FAILURE);
--            }
-+            g_assert_not_reached();
-         }
--
-         process_pending_signals(env);
-     }
+-    /* Linux kernel 3.10 does not pay any attention to CLONE_SETTLS
+-     * in copy_thread(), so QEMU need not do so either.
+-     */
++    env->gpr[10] = newtls;
  }
+ 
+ #endif
 -- 
 2.9.3
