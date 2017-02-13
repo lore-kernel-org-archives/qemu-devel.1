@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59333)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cdKLw-0003E7-Kw
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:23:54 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cdKM0-0003IK-D7
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:23:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cdKLu-00068D-5i
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:23:52 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cdKLy-0006AF-LR
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:23:56 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 13 Feb 2017 18:22:38 +0100
-Message-Id: <1487006583-24350-17-git-send-email-kwolf@redhat.com>
+Date: Mon, 13 Feb 2017 18:22:40 +0100
+Message-Id: <1487006583-24350-19-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
 References: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 16/41] block: Add error parameter to
- blk_insert_bs()
+Subject: [Qemu-devel] [RFC PATCH 18/41] block: Allow error return in
+ BlockDevOps.change_media_cb()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,352 +23,202 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-Mow that blk_insert_bs() requests the BlockBackend permissions for the
-node it attaches to, it can fail. Instead of aborting, pass the errors
-to the callers.
+Some devices allow a media change between read-only and read-write
+media. They need to adapt the permissions in their .change_media_cb()
+implementation, which can fail. So add an Error parameter to the
+function.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/backup.c                   |  5 ++++-
- block/block-backend.c            | 12 ++++++++----
- block/commit.c                   | 38 ++++++++++++++++++++++++++++++--------
- block/mirror.c                   | 15 ++++++++++++---
- blockdev.c                       |  6 +++++-
- blockjob.c                       |  7 ++++++-
- hmp.c                            |  6 +++++-
- hw/core/qdev-properties-system.c |  7 ++++++-
- include/sysemu/block-backend.h   |  2 +-
- migration/block.c                |  2 +-
- nbd/server.c                     |  6 +++++-
- tests/test-blockjob.c            |  2 +-
- 12 files changed, 84 insertions(+), 24 deletions(-)
+ block/block-backend.c          | 12 +++++++++---
+ blockdev.c                     | 19 +++++++++++++++----
+ hw/block/fdc.c                 |  2 +-
+ hw/ide/core.c                  |  2 +-
+ hw/scsi/scsi-disk.c            |  2 +-
+ hw/sd/sd.c                     |  2 +-
+ include/block/block_int.h      |  2 +-
+ include/sysemu/block-backend.h |  2 +-
+ 8 files changed, 30 insertions(+), 13 deletions(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index bb76c69..42e8e99 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -626,7 +626,10 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
- 
-     /* FIXME Use real permissions */
-     job->target = blk_new(0, BLK_PERM_ALL);
--    blk_insert_bs(job->target, target);
-+    ret = blk_insert_bs(job->target, target, errp);
-+    if (ret < 0) {
-+        goto error;
-+    }
- 
-     job->on_source_error = on_source_error;
-     job->on_target_error = on_target_error;
 diff --git a/block/block-backend.c b/block/block-backend.c
-index a219f0b..1f80854 100644
+index e10a278..0c23add 100644
 --- a/block/block-backend.c
 +++ b/block/block-backend.c
-@@ -502,18 +502,22 @@ void blk_remove_bs(BlockBackend *blk)
- /*
-  * Associates a new BlockDriverState with @blk.
+@@ -671,15 +671,21 @@ void blk_set_dev_ops(BlockBackend *blk, const BlockDevOps *ops,
+  * Else, notify of media eject.
+  * Also send DEVICE_TRAY_MOVED events as appropriate.
   */
--void blk_insert_bs(BlockBackend *blk, BlockDriverState *bs)
-+int blk_insert_bs(BlockBackend *blk, BlockDriverState *bs, Error **errp)
+-void blk_dev_change_media_cb(BlockBackend *blk, bool load)
++void blk_dev_change_media_cb(BlockBackend *blk, bool load, Error **errp)
  {
--    bdrv_ref(bs);
-     blk->root = bdrv_root_attach_child(bs, "root", &child_root,
--                                       blk->perm, blk->shared_perm, blk,
--                                       &error_abort);
-+                                       blk->perm, blk->shared_perm, blk, errp);
-+    if (blk->root == NULL) {
-+        return -EPERM;
-+    }
-+    bdrv_ref(bs);
+     if (blk->dev_ops && blk->dev_ops->change_media_cb) {
+         bool tray_was_open, tray_is_open;
++        Error *local_err = NULL;
  
-     notifier_list_notify(&blk->insert_bs_notifiers, blk);
-     if (blk->public.throttle_state) {
-         throttle_timers_attach_aio_context(
-             &blk->public.throttle_timers, bdrv_get_aio_context(bs));
-     }
-+
-+    return 0;
+         assert(!blk->legacy_dev);
+ 
+         tray_was_open = blk_dev_is_tray_open(blk);
+-        blk->dev_ops->change_media_cb(blk->dev_opaque, load);
++        blk->dev_ops->change_media_cb(blk->dev_opaque, load, &local_err);
++        if (local_err) {
++            assert(load == true);
++            error_propagate(errp, local_err);
++            return;
++        }
+         tray_is_open = blk_dev_is_tray_open(blk);
+ 
+         if (tray_was_open != tray_is_open) {
+@@ -693,7 +699,7 @@ void blk_dev_change_media_cb(BlockBackend *blk, bool load)
+ 
+ static void blk_root_change_media(BdrvChild *child, bool load)
+ {
+-    blk_dev_change_media_cb(child->opaque, load);
++    blk_dev_change_media_cb(child->opaque, load, NULL);
  }
  
  /*
-diff --git a/block/commit.c b/block/commit.c
-index 1897e98..2ad8138 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -220,6 +220,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-     BlockDriverState *iter;
-     BlockDriverState *overlay_bs;
-     Error *local_err = NULL;
-+    int ret;
- 
-     assert(top != bs);
-     if (top == base) {
-@@ -256,8 +257,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-         bdrv_reopen_multiple(bdrv_get_aio_context(bs), reopen_queue, &local_err);
-         if (local_err != NULL) {
-             error_propagate(errp, local_err);
--            block_job_unref(&s->common);
--            return;
-+            goto fail;
-         }
-     }
- 
-@@ -277,11 +277,17 @@ void commit_start(const char *job_id, BlockDriverState *bs,
- 
-     /* FIXME Use real permissions */
-     s->base = blk_new(0, BLK_PERM_ALL);
--    blk_insert_bs(s->base, base);
-+    ret = blk_insert_bs(s->base, base, errp);
-+    if (ret < 0) {
-+        goto fail;
-+    }
- 
-     /* FIXME Use real permissions */
-     s->top = blk_new(0, BLK_PERM_ALL);
--    blk_insert_bs(s->top, top);
-+    ret = blk_insert_bs(s->top, top, errp);
-+    if (ret < 0) {
-+        goto fail;
-+    }
- 
-     s->active = bs;
- 
-@@ -294,6 +300,16 @@ void commit_start(const char *job_id, BlockDriverState *bs,
- 
-     trace_commit_start(bs, base, top, s);
-     block_job_start(&s->common);
-+    return;
-+
-+fail:
-+    if (s->base) {
-+        blk_unref(s->base);
-+    }
-+    if (s->top) {
-+        blk_unref(s->top);
-+    }
-+    block_job_unref(&s->common);
- }
- 
- 
-@@ -332,11 +348,17 @@ int bdrv_commit(BlockDriverState *bs)
- 
-     /* FIXME Use real permissions */
-     src = blk_new(0, BLK_PERM_ALL);
--    blk_insert_bs(src, bs);
--
--    /* FIXME Use real permissions */
-     backing = blk_new(0, BLK_PERM_ALL);
--    blk_insert_bs(backing, bs->backing->bs);
-+
-+    ret = blk_insert_bs(src, bs, NULL);
-+    if (ret < 0) {
-+        goto ro_cleanup;
-+    }
-+
-+    ret = blk_insert_bs(backing, bs->backing->bs, NULL);
-+    if (ret < 0) {
-+        goto ro_cleanup;
-+    }
- 
-     length = blk_getlength(src);
-     if (length < 0) {
-diff --git a/block/mirror.c b/block/mirror.c
-index 810933e..630e5ef 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -517,9 +517,12 @@ static void mirror_exit(BlockJob *job, void *opaque)
-         bdrv_replace_in_backing_chain(to_replace, target_bs);
-         bdrv_drained_end(target_bs);
- 
--        /* We just changed the BDS the job BB refers to */
-+        /* We just changed the BDS the job BB refers to, so switch the BB back
-+         * so the cleanup does the right thing. We don't need any permissions
-+         * any more now. */
-         blk_remove_bs(job->blk);
--        blk_insert_bs(job->blk, src);
-+        blk_set_perm(job->blk, 0, BLK_PERM_ALL, &error_abort);
-+        blk_insert_bs(job->blk, src, &error_abort);
-     }
-     if (s->to_replace) {
-         bdrv_op_unblock_all(s->to_replace, s->replace_blocker);
-@@ -963,6 +966,7 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
-                              bool auto_complete)
- {
-     MirrorBlockJob *s;
-+    int ret;
- 
-     if (granularity == 0) {
-         granularity = bdrv_get_default_bitmap_granularity(target);
-@@ -987,7 +991,12 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
- 
-     /* FIXME Use real permissions */
-     s->target = blk_new(0, BLK_PERM_ALL);
--    blk_insert_bs(s->target, target);
-+    ret = blk_insert_bs(s->target, target, errp);
-+    if (ret < 0) {
-+        blk_unref(s->target);
-+        block_job_unref(&s->common);
-+        return;
-+    }
- 
-     s->replaces = g_strdup(replaces);
-     s->on_source_error = on_source_error;
 diff --git a/blockdev.c b/blockdev.c
-index 2e195f1..c590e67 100644
+index c590e67..8c30084 100644
 --- a/blockdev.c
 +++ b/blockdev.c
-@@ -2432,6 +2432,7 @@ static void qmp_blockdev_insert_anon_medium(BlockBackend *blk,
-                                             BlockDriverState *bs, Error **errp)
- {
-     bool has_device;
-+    int ret;
+@@ -2307,7 +2307,7 @@ static int do_open_tray(const char *blk_name, const char *qdev_id,
+     }
  
-     /* For BBs without a device, we can exchange the BDS tree at will */
-     has_device = blk_get_attached_dev(blk);
-@@ -2451,7 +2452,10 @@ static void qmp_blockdev_insert_anon_medium(BlockBackend *blk,
+     if (!locked || force) {
+-        blk_dev_change_media_cb(blk, false);
++        blk_dev_change_media_cb(blk, false, &error_abort);
+     }
+ 
+     if (locked && !force) {
+@@ -2345,6 +2345,7 @@ void qmp_blockdev_close_tray(bool has_device, const char *device,
+                              Error **errp)
+ {
+     BlockBackend *blk;
++    Error *local_err = NULL;
+ 
+     device = has_device ? device : NULL;
+     id = has_id ? id : NULL;
+@@ -2368,7 +2369,11 @@ void qmp_blockdev_close_tray(bool has_device, const char *device,
          return;
      }
  
--    blk_insert_bs(blk, bs);
-+    ret = blk_insert_bs(blk, bs, errp);
-+    if (ret < 0) {
+-    blk_dev_change_media_cb(blk, true);
++    blk_dev_change_media_cb(blk, true, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
 +        return;
 +    }
+ }
  
-     if (!blk_dev_has_tray(blk)) {
-         /* For tray-less devices, blockdev-close-tray is a no-op (or may not be
-diff --git a/blockjob.c b/blockjob.c
-index 508e0e5..72b7d4c 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -128,6 +128,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
- {
-     BlockBackend *blk;
-     BlockJob *job;
-+    int ret;
- 
-     if (bs->job) {
-         error_setg(errp, QERR_DEVICE_IN_USE, bdrv_get_device_name(bs));
-@@ -161,7 +162,11 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
- 
-     /* FIXME Use real permissions */
-     blk = blk_new(0, BLK_PERM_ALL);
--    blk_insert_bs(blk, bs);
-+    ret = blk_insert_bs(blk, bs, errp);
-+    if (ret < 0) {
-+        blk_unref(blk);
-+        return NULL;
-+    }
- 
-     job = g_malloc0(driver->instance_size);
-     error_setg(&job->blocker, "block device is in use by block job: %s",
-diff --git a/hmp.c b/hmp.c
-index 15fd3f7..801fddb 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -2039,6 +2039,7 @@ void hmp_qemu_io(Monitor *mon, const QDict *qdict)
-     const char* device = qdict_get_str(qdict, "device");
-     const char* command = qdict_get_str(qdict, "command");
-     Error *err = NULL;
-+    int ret;
- 
-     blk = blk_by_name(device);
-     if (!blk) {
-@@ -2046,7 +2047,10 @@ void hmp_qemu_io(Monitor *mon, const QDict *qdict)
-         if (bs) {
-             /* FIXME Use real permissions */
-             blk = local_blk = blk_new(0, BLK_PERM_ALL);
--            blk_insert_bs(blk, bs);
-+            ret = blk_insert_bs(blk, bs, &err);
-+            if (ret < 0) {
-+                goto fail;
-+            }
-         } else {
-             goto fail;
-         }
-diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
-index cca4775..66ba367 100644
---- a/hw/core/qdev-properties-system.c
-+++ b/hw/core/qdev-properties-system.c
-@@ -73,6 +73,7 @@ static void parse_drive(DeviceState *dev, const char *str, void **ptr,
- {
-     BlockBackend *blk;
-     bool blk_created = false;
-+    int ret;
- 
-     blk = blk_by_name(str);
-     if (!blk) {
-@@ -80,8 +81,12 @@ static void parse_drive(DeviceState *dev, const char *str, void **ptr,
-         if (bs) {
-             /* FIXME Use real permissions */
-             blk = blk_new(0, BLK_PERM_ALL);
--            blk_insert_bs(blk, bs);
-             blk_created = true;
-+
-+            ret = blk_insert_bs(blk, bs, errp);
-+            if (ret < 0) {
-+                goto fail;
-+            }
-         }
+ void qmp_x_blockdev_remove_medium(bool has_device, const char *device,
+@@ -2421,7 +2426,7 @@ void qmp_x_blockdev_remove_medium(bool has_device, const char *device,
+          * called at all); therefore, the medium needs to be ejected here.
+          * Do it after blk_remove_bs() so blk_is_inserted(blk) returns the @load
+          * value passed here (i.e. false). */
+-        blk_dev_change_media_cb(blk, false);
++        blk_dev_change_media_cb(blk, false, &error_abort);
      }
-     if (!blk) {
+ 
+ out:
+@@ -2431,6 +2436,7 @@ out:
+ static void qmp_blockdev_insert_anon_medium(BlockBackend *blk,
+                                             BlockDriverState *bs, Error **errp)
+ {
++    Error *local_err = NULL;
+     bool has_device;
+     int ret;
+ 
+@@ -2463,7 +2469,12 @@ static void qmp_blockdev_insert_anon_medium(BlockBackend *blk,
+          * slot here.
+          * Do it after blk_insert_bs() so blk_is_inserted(blk) returns the @load
+          * value passed here (i.e. true). */
+-        blk_dev_change_media_cb(blk, true);
++        blk_dev_change_media_cb(blk, true, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            blk_remove_bs(blk);
++            return;
++        }
+     }
+ }
+ 
+diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+index 74f3634..5f6c496 100644
+--- a/hw/block/fdc.c
++++ b/hw/block/fdc.c
+@@ -469,7 +469,7 @@ static void fd_revalidate(FDrive *drv)
+     }
+ }
+ 
+-static void fd_change_cb(void *opaque, bool load)
++static void fd_change_cb(void *opaque, bool load, Error **errp)
+ {
+     FDrive *drive = opaque;
+ 
+diff --git a/hw/ide/core.c b/hw/ide/core.c
+index 43709e5..f88b1e5 100644
+--- a/hw/ide/core.c
++++ b/hw/ide/core.c
+@@ -1120,7 +1120,7 @@ static void ide_cfata_metadata_write(IDEState *s)
+ }
+ 
+ /* called when the inserted state of the media has changed */
+-static void ide_cd_change_cb(void *opaque, bool load)
++static void ide_cd_change_cb(void *opaque, bool load, Error **errp)
+ {
+     IDEState *s = opaque;
+     uint64_t nb_sectors;
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index 61c44a9..f3f20da 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -2225,7 +2225,7 @@ static void scsi_disk_resize_cb(void *opaque)
+     }
+ }
+ 
+-static void scsi_cd_change_media_cb(void *opaque, bool load)
++static void scsi_cd_change_media_cb(void *opaque, bool load, Error **errp)
+ {
+     SCSIDiskState *s = opaque;
+ 
+diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+index 8e88e83..8e31491 100644
+--- a/hw/sd/sd.c
++++ b/hw/sd/sd.c
+@@ -458,7 +458,7 @@ static bool sd_get_readonly(SDState *sd)
+     return sd->wp_switch;
+ }
+ 
+-static void sd_cardchange(void *opaque, bool load)
++static void sd_cardchange(void *opaque, bool load, Error **errp)
+ {
+     SDState *sd = opaque;
+     DeviceState *dev = DEVICE(sd);
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 46f51a6..7558f99 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -895,7 +895,7 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
+                                uint64_t *nperm, uint64_t *nshared);
+ 
+ const char *bdrv_get_parent_name(const BlockDriverState *bs);
+-void blk_dev_change_media_cb(BlockBackend *blk, bool load);
++void blk_dev_change_media_cb(BlockBackend *blk, bool load, Error **errp);
+ bool blk_dev_has_removable_media(BlockBackend *blk);
+ bool blk_dev_has_tray(BlockBackend *blk);
+ void blk_dev_eject_request(BlockBackend *blk, bool force);
 diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
-index 1bda6d7..6f21508 100644
+index 6f21508..65bd081 100644
 --- a/include/sysemu/block-backend.h
 +++ b/include/sysemu/block-backend.h
-@@ -96,7 +96,7 @@ BlockBackend *blk_by_public(BlockBackendPublic *public);
- 
- BlockDriverState *blk_bs(BlockBackend *blk);
- void blk_remove_bs(BlockBackend *blk);
--void blk_insert_bs(BlockBackend *blk, BlockDriverState *bs);
-+int blk_insert_bs(BlockBackend *blk, BlockDriverState *bs, Error **errp);
- bool bdrv_has_blk(BlockDriverState *bs);
- bool bdrv_is_root_node(BlockDriverState *bs);
- int blk_set_perm(BlockBackend *blk, uint64_t perm, uint64_t shared_perm,
-diff --git a/migration/block.c b/migration/block.c
-index 6b7ffd4..d259936 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -446,7 +446,7 @@ static void init_blk_migration(QEMUFile *f)
-         BlockDriverState *bs = bmds_bs[i].bs;
- 
-         if (bmds) {
--            blk_insert_bs(bmds->blk, bs);
-+            blk_insert_bs(bmds->blk, bs, &error_abort);
- 
-             alloc_aio_bitmap(bmds);
-             error_setg(&bmds->blocker, "block device is in use by migration");
-diff --git a/nbd/server.c b/nbd/server.c
-index 871111c..deb4358 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -889,10 +889,14 @@ NBDExport *nbd_export_new(BlockDriverState *bs, off_t dev_offset, off_t size,
- {
-     BlockBackend *blk;
-     NBDExport *exp = g_malloc0(sizeof(NBDExport));
-+    int ret;
- 
-     /* FIXME Use real permissions */
-     blk = blk_new(0, BLK_PERM_ALL);
--    blk_insert_bs(blk, bs);
-+    ret = blk_insert_bs(blk, bs, errp);
-+    if (ret < 0) {
-+        goto fail;
-+    }
-     blk_set_enable_write_cache(blk, !writethrough);
- 
-     exp->refcount = 1;
-diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
-index 1dd1cfa..143ce96 100644
---- a/tests/test-blockjob.c
-+++ b/tests/test-blockjob.c
-@@ -60,7 +60,7 @@ static BlockBackend *create_blk(const char *name)
-     bs = bdrv_open("null-co://", NULL, NULL, 0, &error_abort);
-     g_assert_nonnull(bs);
- 
--    blk_insert_bs(blk, bs);
-+    blk_insert_bs(blk, bs, &error_abort);
-     bdrv_unref(bs);
- 
-     if (name) {
+@@ -34,7 +34,7 @@ typedef struct BlockDevOps {
+      * changes.  Sure would be useful if it did.
+      * Device models with removable media must implement this callback.
+      */
+-    void (*change_media_cb)(void *opaque, bool load);
++    void (*change_media_cb)(void *opaque, bool load, Error **errp);
+     /*
+      * Runs when an eject request is issued from the monitor, the tray
+      * is closed, and the medium is locked.
 -- 
 1.8.3.1
