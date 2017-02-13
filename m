@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41309)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1cdOy6-00078e-0D
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 17:19:35 -0500
+	(envelope-from <Ketan.Nilangekar@veritas.com>) id 1cdPF5-0004vj-MC
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 17:37:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1cdOy2-0000jF-PA
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 17:19:33 -0500
-Received: from mail-db5eur01on0110.outbound.protection.outlook.com
-	([104.47.2.110]:3417
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1cdOy2-0000j7-5X
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 17:19:30 -0500
-References: <1486134413-19988-1-git-send-email-den@openvz.org>
-	<5909b505-fecb-fa98-6ae7-190b846add4c@openvz.org>
-	<169f96e8-0ca5-264d-350a-7f085905bd5b@virtuozzo.com>
-	<a1049fab-1880-3b03-63bb-6b898ee55b40@redhat.com>
-	<20170213191327.GO27752@localhost.localdomain>
-From: "Denis V. Lunev" <den@virtuozzo.com>
-Message-ID: <f58d806b-b17d-8e9a-3fb9-da547a0ade0e@virtuozzo.com>
-Date: Mon, 13 Feb 2017 22:45:44 +0300
+	(envelope-from <Ketan.Nilangekar@veritas.com>) id 1cdPF0-0005wn-P0
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 17:37:07 -0500
+Received: from mail1.bemta12.messagelabs.com ([216.82.251.10]:56157)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Ketan.Nilangekar@veritas.com>)
+	id 1cdPF0-0005w7-EC
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 17:37:02 -0500
+From: Ketan Nilangekar <Ketan.Nilangekar@veritas.com>
+Date: Mon, 13 Feb 2017 22:36:53 +0000
+Message-ID: <B3F9860E-E786-48A5-8BBD-918833905E73@veritas.com>
+References: <1478566785-4002-1-git-send-email-ashish.mittal@veritas.com>
+	<1478566785-4002-3-git-send-email-ashish.mittal@veritas.com>
+	<20161108204413.GA6353@localhost.localdomain>
+	<CAAo6VWMyTjV1Fn8-BSex7Fx8OcEcuEyK2rQJ6L=wZZXDiB5A4w@mail.gmail.com>
+	<20170213133725.GA10361@stefanha-x1.localdomain>
+	<20170213163232.GN27752@localhost.localdomain>
+In-Reply-To: <20170213163232.GN27752@localhost.localdomain>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <5019BDA0A50CF046869D05AADD615F5C@veritas.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20170213191327.GO27752@localhost.localdomain>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] mirror: do not increase offset during
- initial zero_or_discard phase - pls consider this as V3 patch
+Subject: Re: [Qemu-devel] [PATCH v6 2/2] block/vxhs.c: Add qemu-iotests for
+ new block device type "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,44 +35,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: qemu-devel@nongnu.org, Anton Nefedov <anton.nefedov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>
+To: Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: ashish mittal <ashmit602@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus
+	Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>
 
-On 02/13/2017 10:13 PM, Jeff Cody wrote:
-> On Mon, Feb 13, 2017 at 06:16:36PM +0100, Max Reitz wrote:
->> On 13.02.2017 08:10, Denis V. Lunev wrote:
->>> On 02/03/2017 06:08 PM, Denis V. Lunev wrote:
->>>> On 02/03/2017 06:06 PM, Denis V. Lunev wrote:
->>>>> From: Anton Nefedov <anton.nefedov@virtuozzo.com>
->>>>>
->>>>> If explicit zeroing out before mirroring is required for the target image,
->>>>> it moves the block job offset counter to EOF, then offset and len counters
->>>>> count the image size twice. There is no harm but stats are confusing,
->>>>> specifically the progress of the operation is always reported as 99% by
->>>>> management tools.
->>>>>
->>>>> The patch skips offset increase for the first "technical" pass over the
->>>>> image. This should not cause any further harm.
->>>>>
->>>>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
->>>>> Signed-off-by: Denis V. Lunev <den@openvz.org>
->>>>> Reviewed-by: Eric Blake <eblake@redhat.com>
->>>>> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
->>>>> CC: Jeff Cody <jcody@redhat.com>
->>>>> CC: Kevin Wolf <kwolf@redhat.com>
->>>>> CC: Max Reitz <mreitz@redhat.com>
->>>> actually this is V3 patch. Sorry for broken subject.
->>>>
->>>> Den
->>> ping
->> Didn't Jeff merge v2?
->>
->> http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg01319.html
->>
->> Max
->>
->
-> Yes, I did.
-thank you very much for clarification
-
-Den
+DQoNCk9uIDIvMTMvMTcsIDg6MzIgQU0sICJKZWZmIENvZHkiIDxqY29keUByZWRoYXQuY29tPiB3
+cm90ZToNCg0KICAgIE9uIE1vbiwgRmViIDEzLCAyMDE3IGF0IDAxOjM3OjI1UE0gKzAwMDAsIFN0
+ZWZhbiBIYWpub2N6aSB3cm90ZToNCiAgICA+IE9uIFR1ZSwgRmViIDA3LCAyMDE3IGF0IDAzOjEy
+OjM2UE0gLTA4MDAsIGFzaGlzaCBtaXR0YWwgd3JvdGU6DQogICAgPiA+IE9uIFR1ZSwgTm92IDgs
+IDIwMTYgYXQgMTI6NDQgUE0sIEplZmYgQ29keSA8amNvZHlAcmVkaGF0LmNvbT4gd3JvdGU6DQog
+ICAgPiA+ID4gT24gTW9uLCBOb3YgMDcsIDIwMTYgYXQgMDQ6NTk6NDVQTSAtMDgwMCwgQXNoaXNo
+IE1pdHRhbCB3cm90ZToNCiAgICA+ID4gPj4gVGhlc2UgY2hhbmdlcyB1c2UgYSB2eGhzIHRlc3Qg
+c2VydmVyIHRoYXQgaXMgYSBwYXJ0IG9mIHRoZSBmb2xsb3dpbmcNCiAgICA+ID4gPj4gcmVwb3Np
+dG9yeToNCiAgICA+ID4gPj4gaHR0cHM6Ly9naXRodWIuY29tL01pdHRhbEFzaGlzaC9saWJxbmlv
+LmdpdA0KICAgID4gPiA+Pg0KICAgID4gPiA+PiBTaWduZWQtb2ZmLWJ5OiBBc2hpc2ggTWl0dGFs
+IDxhc2hpc2gubWl0dGFsQHZlcml0YXMuY29tPg0KICAgID4gPiA+PiAtLS0NCiAgICA+ID4gPj4g
+djYgY2hhbmdlbG9nOg0KICAgID4gPiA+PiAoMSkgQWRkZWQgaW90ZXN0cyBmb3IgVnhIUyBibG9j
+ayBkZXZpY2UuDQogICAgPiA+ID4+DQogICAgPiA+ID4+ICB0ZXN0cy9xZW11LWlvdGVzdHMvY29t
+bW9uICAgICAgICB8ICA2ICsrKysrKw0KICAgID4gPiA+PiAgdGVzdHMvcWVtdS1pb3Rlc3RzL2Nv
+bW1vbi5jb25maWcgfCAxMyArKysrKysrKysrKysrDQogICAgPiA+ID4+ICB0ZXN0cy9xZW11LWlv
+dGVzdHMvY29tbW9uLmZpbHRlciB8ICAxICsNCiAgICA+ID4gPj4gIHRlc3RzL3FlbXUtaW90ZXN0
+cy9jb21tb24ucmMgICAgIHwgMTkgKysrKysrKysrKysrKysrKysrKw0KICAgID4gPiA+PiAgNCBm
+aWxlcyBjaGFuZ2VkLCAzOSBpbnNlcnRpb25zKCspDQogICAgPiA+ID4+DQogICAgPiA+ID4+IGRp
+ZmYgLS1naXQgYS90ZXN0cy9xZW11LWlvdGVzdHMvY29tbW9uIGIvdGVzdHMvcWVtdS1pb3Rlc3Rz
+L2NvbW1vbg0KICAgID4gPiA+PiBpbmRleCBkNjBlYTJjLi40MTQzMGQ4IDEwMDY0NA0KICAgID4g
+PiA+PiAtLS0gYS90ZXN0cy9xZW11LWlvdGVzdHMvY29tbW9uDQogICAgPiA+ID4+ICsrKyBiL3Rl
+c3RzL3FlbXUtaW90ZXN0cy9jb21tb24NCiAgICA+ID4gPg0KICAgID4gPiA+IFdoZW4gdXNpbmcg
+cmF3IGZvcm1hdCwgSSB3YXMgYWJsZSB0byBydW4gdGhlIHRlc3Qgc3VjY2Vzc2Z1bGx5IGZvciBh
+bGwNCiAgICA+ID4gPiBzdXBwb3J0ZWQgdGVzdCBjYXNlcyAoMjYgb2YgdGhlbSkuDQogICAgPiA+
+ID4NCiAgICA+ID4gPiBXaXRoIHFjb3cyLCB0aGV5IGZhaWwgLSBidXQgbm90IHRoZSBmYXVsdCBv
+ZiB0aGlzIHBhdGNoLCBJIHRoaW5rOyBidXQNCiAgICA+ID4gPiByYXRoZXIsIHRoZSBmYXVsdCBv
+ZiB0aGUgdGVzdCBzZXJ2ZXIuICBDYW4gcW5pb19zZXJ2ZXIgYmUgbW9kaWZpZWQgc28gdGhhdA0K
+ICAgID4gPiA+IGl0IGRvZXMgbm90IHdvcmsgb24ganVzdCByYXcgZmlsZXM/DQogICAgPiA+ID4N
+CiAgICA+ID4gPg0KICAgID4gPiANCiAgICA+ID4gVnhIUyBzdXBwb3J0cyBhbmQgdXNlcyBvbmx5
+IHRoZSByYXcgZm9ybWF0Lg0KICAgID4gDQogICAgPiBUaGF0J3MgbGlrZSBzYXlpbmcgb25seSBl
+eHQ0IGd1ZXN0IGZpbGUgc3lzdGVtcyBhcmUgc3VwcG9ydGVkIG9uIFZ4SFMNCiAgICA+IGFuZCBu
+b3QgWkZTLiAgVGhlIFZ4SFMgZHJpdmVyIHNob3VsZCBub3QgY2FyZSB3aGF0IGZpbGUgc3lzdGVt
+IGlzIHVzZWQsDQogICAgPiBpdCBqdXN0IGRvZXMgYmxvY2sgSS9PIHdpdGhvdXQgaW50ZXJwcmV0
+aW5nIHRoZSBkYXRhLg0KICAgID4gDQogICAgPiBJdCBtdXN0IGJlIHBvc3NpYmxlIHRvIHVzZSBh
+bnkgZm9ybWF0IG9uIHRvcCBvZiB0aGUgVnhIUyBwcm90b2NvbC4NCiAgICA+IEFmdGVyIGFsbCwg
+dGhlIGltYWdlIGZvcm1hdCBkcml2ZXJzIGp1c3QgZG8gYmxvY2sgSS9PLiAgSWYgdGhlcmUgaXMg
+YQ0KICAgID4gY2FzZSB3aGVyZSBxY293MiBvbiBWeEhTIGZhaWxzIHRoZW4gaXQgbmVlZHMgdG8g
+YmUgaW52ZXN0aWdhdGVkLg0KICAgID4gDQogICAgPiBUaGUgVnhIUyBkcml2ZXIgY2FuJ3QgYmUg
+bWVyZ2VkIHVudGlsIHdlIGF0IGxlYXN0IHVuZGVyc3RhbmQgdGhlIGNhdXNlDQogICAgPiBvZiB0
+aGUgcWNvdzIgdGVzdCBmYWlsdXJlcy4NCiAgICA+DQogICAgDQogICAgQSBxdWljayBydW4gd2l0
+aCB0aGUgdGVzdCBzZXJ2ZXIgYW5kIGEgUUVNVSBwcm9jZXNzIHNob3dlZCBhbiBhYm9ydCgpIGlu
+IHRoZQ0KICAgIHRlc3Qgc2VydmVyLCBzbyBJIGp1c3Qgc2VudCBhIHB1bGwgcmVxIHRvIGxpYnFu
+aW8gdG8gZml4IHRoYXQuICANCiAgICANCiAgICBCdXQgcGxheWluZyB3aXRoIGl0IGluIGdkYiBy
+aWdodCBub3cgd2l0aCBhIHRlc3QgcWNvdzIgZmlsZSwgSSBzZWUgdGhhdCB3ZQ0KICAgIGFyZSB3
+YWl0aW5nIGluIGFpb19wb2xsKCkgZm9yZXZlciBmb3IgdGhlIHRlc3Qgc2VydmVyIHRvIHJlc3Bv
+bmQgdG8gYSByZWFkDQogICAgcmVxdWVzdCwgd2hlbiB1c2luZyBxY293MiBmb3JtYXQuICANCiAg
+ICANCiAgICBBcyBTdGVmYW4gc2FpZCwgdGhpcyBkb2Vzbid0IHJlYWxseSBtYWtlIGFueSBzZW5z
+ZSAtIHdoeSB3b3VsZCBWWEhTIGJlaGF2ZQ0KICAgIGRpZmZlcmVudGx5IGJhc2VkIG9uIHRoZSBm
+aWxlIGNvbnRlbnRzPw0KDQpbS2V0YW5dIA0KVG8gcmVhZC93cml0ZSBhIHFjb3cyIGJhY2tlZCBk
+ZXZpY2UgVnhIUyBzZXJ2ZXIgaW1wbGVtZW50YXRpb24gd2lsbCBuZWVkIHRvIHVuZGVyc3RhbmQg
+dGhlIHFjb3cyIGZvcm1hdC4gVGhpcyBpcyBub3QganVzdCBibG9jayBJTyBidXQgYWN0dWFsbHkg
+ZG9lcyBpbnZvbHZlIGludGVycHJldGluZyB0aGUgcWNvdzIgaGVhZGVyIGFuZCBjbHVzdGVyIGZv
+cm1hdHMuIENsZWFybHkgdGhlIHRlc3Qgc2VydmVyIGltcGxlbWVudGF0aW9uIGRvZXMgbm90IGhh
+bmRsZSBpdCBhcyBpdCB3YXMgbmV2ZXIgaW50ZW5kZWQgdG8uIFZ4SFMgYmFja2VuZCB3b24ndCBo
+YW5kbGUgaXQgZWl0aGVyIGJlY2F1c2UgVnhIUyB2aXJ0dWFsIGRpc2tzIGFyZSB3cml0dGVuIGFz
+IG5vbi1zcGFyc2UgZmlsZXMuDQpUaGVyZSBhcmUgc3BhY2Ugc2F2aW5ncyB3aXRoIHRoZSBxY293
+MiBmb3JtYXQgYnV0IHBlcmZvcm1hbmNlIHBlbmFsdGllcyBhcyB3ZWxsIGJlY2F1c2Ugb2YgdGhl
+IG1ldGFkYXRhIG92ZXJoZWFkLiBBcyBhIGJsb2NrIHN0b3JhZ2UgcHJvdmlkZXIsIFZ4SFMgZG9l
+cyBub3Qgc3VwcG9ydCBzcGFyc2UgZmlsZSBmb3JtYXRzIGxpa2UgcWNvdzIgcHJpbWFyaWx5IGJl
+Y2F1c2Ugb2YgcGVyZm9ybWFuY2UgcmVhc29ucy4NCkltcGxlbWVudGluZyBhIHFjb3cyIGJhY2tl
+bmQgaW4gdGhlIHRlc3Qgc2VydmVyIHdvdWxkIGJlIGEgbm9uLXRyaXZpYWwgYW5kIG5vbi11c2Vm
+dWwgZXhlcmNpc2Ugc2luY2UgdGhlIFZ4SFMgc2VydmVyIHdvbid0IHN1cHBvcnQgaXQuDQoNCiAg
+IA0KDQogSmVmZg0KICAgIA0KDQo=
