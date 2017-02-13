@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cdKLp-00034U-Os
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:23:46 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cdKLp-00034V-PI
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:23:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cdKLo-00060Q-JI
+	(envelope-from <kwolf@redhat.com>) id 1cdKLo-00060X-MZ
 	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:23:45 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 13 Feb 2017 18:22:36 +0100
-Message-Id: <1487006583-24350-15-git-send-email-kwolf@redhat.com>
+Date: Mon, 13 Feb 2017 18:22:35 +0100
+Message-Id: <1487006583-24350-14-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
 References: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 14/41] block: Add permissions to
- BlockBackend
+Subject: [Qemu-devel] [RFC PATCH 13/41] block: Request real permissions in
+ bdrv_attach_child()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,88 +23,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-The BlockBackend can now store the permissions that its user requires.
-This is necessary because nodes can be ejected from or inserted into a
-BlockBackend and all of these operations must make sure that the user
-still gets what it requested initially.
+Now that all block drivers with children tell us what permissions they
+need from each of their children, bdrv_attach_child() can use this
+information and make the right requirements while trying to attach new
+children.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/block-backend.c          | 27 +++++++++++++++++++++++++++
- include/sysemu/block-backend.h |  2 ++
- 2 files changed, 29 insertions(+)
+ block.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index d080f01..8f0348d 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -59,6 +59,9 @@ struct BlockBackend {
-     bool iostatus_enabled;
-     BlockDeviceIoStatus iostatus;
- 
-+    uint64_t perm;
-+    uint64_t shared_perm;
-+
-     bool allow_write_beyond_eof;
- 
-     NotifierList remove_bs_notifiers, insert_bs_notifiers;
-@@ -126,6 +129,8 @@ BlockBackend *blk_new(void)
- 
-     blk = g_new0(BlockBackend, 1);
-     blk->refcnt = 1;
-+    blk->perm = 0;
-+    blk->shared_perm = BLK_PERM_ALL;
-     blk_set_enable_write_cache(blk, true);
- 
-     qemu_co_queue_init(&blk->public.throttled_reqs[0]);
-@@ -511,6 +516,27 @@ void blk_insert_bs(BlockBackend *blk, BlockDriverState *bs)
-     }
- }
- 
-+/*
-+ * Sets the permission bitmasks that the user of the BlockBackend needs.
-+ */
-+int blk_set_perm(BlockBackend *blk, uint64_t perm, uint64_t shared_perm,
-+                 Error **errp)
-+{
-+    int ret;
-+
-+    if (blk->root) {
-+        ret = bdrv_child_try_set_perm(blk->root, perm, shared_perm, errp);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+    }
-+
-+    blk->perm = perm;
-+    blk->shared_perm = shared_perm;
-+
-+    return 0;
-+}
-+
- static int blk_do_attach_dev(BlockBackend *blk, void *dev)
+diff --git a/block.c b/block.c
+index 682548a..fd06549 100644
+--- a/block.c
++++ b/block.c
+@@ -1558,10 +1558,21 @@ BdrvChild *bdrv_attach_child(BlockDriverState *parent_bs,
+                              Error **errp)
  {
-     if (blk->dev) {
-@@ -557,6 +583,7 @@ void blk_detach_dev(BlockBackend *blk, void *dev)
-     blk->dev_ops = NULL;
-     blk->dev_opaque = NULL;
-     blk->guest_block_size = 512;
-+    blk_set_perm(blk, 0, BLK_PERM_ALL, &error_abort);
-     blk_unref(blk);
- }
+     BdrvChild *child;
++    uint64_t perm, shared_perm;
++
++    /* XXX This check is a workaround for bdrv_open_inherit(), which attaches
++     * bs->file before bs is opened for format probing. The 'else' branch
++     * really shouldn't exist. */
++    if (parent_bs->drv) {
++        parent_bs->drv->bdrv_child_perm(parent_bs, NULL, child_role,
++                                        0, BLK_PERM_ALL, &perm, &shared_perm);
++    } else {
++        perm = 0;
++        shared_perm = BLK_PERM_ALL;
++    }
  
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
-index 6444e41..4a5783a 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -99,6 +99,8 @@ void blk_remove_bs(BlockBackend *blk);
- void blk_insert_bs(BlockBackend *blk, BlockDriverState *bs);
- bool bdrv_has_blk(BlockDriverState *bs);
- bool bdrv_is_root_node(BlockDriverState *bs);
-+int blk_set_perm(BlockBackend *blk, uint64_t perm, uint64_t shared_perm,
-+                 Error **errp);
- 
- void blk_set_allow_write_beyond_eof(BlockBackend *blk, bool allow);
- void blk_iostatus_enable(BlockBackend *blk);
+-    /* FIXME Use real permissions */
+     child = bdrv_root_attach_child(child_bs, child_name, child_role,
+-                                   0, BLK_PERM_ALL, parent_bs, errp);
++                                   perm, shared_perm, parent_bs, errp);
+     if (child == NULL) {
+         return NULL;
+     }
+@@ -2041,6 +2052,8 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+      * probing, the block drivers will do their own bdrv_open_child() for the
+      * same BDS, which is why we put the node name back into options. */
+     if ((flags & BDRV_O_PROTOCOL) == 0) {
++        /* FIXME Really shouldn't try to open a child for a still closed bs,
++         * see bdrv_attach_child() */
+         file = bdrv_open_child(filename, options, "file", bs,
+                                &child_file, true, &local_err);
+         if (local_err) {
 -- 
 1.8.3.1
