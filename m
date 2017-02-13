@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53743)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cdFSS-0005Qi-Mf
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:10:17 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cdFSU-0005Sl-9N
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:10:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cdFSR-0002eN-9t
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:10:16 -0500
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:35171)
+	(envelope-from <alex.bennee@linaro.org>) id 1cdFSS-0002f0-NT
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:10:18 -0500
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:36792)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cdFSR-0002e4-4O
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:10:15 -0500
-Received: by mail-wr0-x230.google.com with SMTP id 89so149109865wrr.2
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 04:10:15 -0800 (PST)
+	id 1cdFSS-0002ea-Ef
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:10:16 -0500
+Received: by mail-wm0-x236.google.com with SMTP id c85so306357494wmi.1
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 04:10:16 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 13 Feb 2017 12:10:06 +0000
-Message-Id: <20170213121017.12907-14-alex.bennee@linaro.org>
+Date: Mon, 13 Feb 2017 12:10:08 +0000
+Message-Id: <20170213121017.12907-16-alex.bennee@linaro.org>
 In-Reply-To: <20170213121017.12907-1-alex.bennee@linaro.org>
 References: <20170213121017.12907-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v12 13/24] cputlb: add assert_cpu_is_self checks
+Subject: [Qemu-devel] [PATCH v12 15/24] cputlb: introduce tlb_flush_* async
+ work.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,100 +33,214 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, rth@twiddle.net
 Cc: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-For SoftMMU the TLB flushes are an example of a task that can be
-triggered on one vCPU by another. To deal with this properly we need to
-use safe work to ensure these changes are done safely. The new assert
-can be enabled while debugging to catch these cases.
+From: KONRAD Frederic <fred.konrad@greensocs.com>
 
+Some architectures allow to flush the tlb of other VCPUs. This is not a problem
+when we have only one thread for all VCPUs but it definitely needs to be an
+asynchronous work when we are in true multithreaded work.
+
+We take the tb_lock() when doing this to avoid racing with other threads
+which may be invalidating TB's at the same time. The alternative would
+be to use proper atomic primitives to clear the tlb entries en-mass.
+
+This patch doesn't do anything to protect other cputlb function being
+called in MTTCG mode making cross vCPU changes.
+
+Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
+[AJB: remove need for g_malloc on defer, make check fixes, tb_lock]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
+
 ---
- cputlb.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+v8
+  - fix merge failure mentioning global flush
+v6 (base patches)
+  - don't use cmpxchg_bool (we drop it later anyway)
+  - use RUN_ON_CPU macros instead of inlines
+  - bug out of tlb_flush if !tcg_enabled() (MacOSX make check failure)
+v5 (base patches)
+  - take tb_lock() for memset
+  - ensure tb_flush_page properly asyncs work for other vCPUs
+  - use run_on_cpu_data
+v4 (base_patches)
+  - brought forward from arm enabling series
+  - restore pending_tlb_flush flag
+v1
+  - Remove tlb_flush_all just do the check in tlb_flush.
+  - remove the need to g_malloc
+  - tlb_flush calls direct if !cpu->created
+---
+ cputlb.c                | 66 +++++++++++++++++++++++++++++++++++++++++++++++--
+ include/exec/exec-all.h |  1 +
+ include/qom/cpu.h       |  6 +++++
+ 3 files changed, 71 insertions(+), 2 deletions(-)
 
 diff --git a/cputlb.c b/cputlb.c
-index 1cc9d9da51..af0e65cd2c 100644
+index 94fa9977c5..5dfd3c3ba9 100644
 --- a/cputlb.c
 +++ b/cputlb.c
-@@ -58,6 +58,12 @@
-     } \
- } while (0)
+@@ -64,6 +64,10 @@
+         }                                                         \
+     } while (0)
  
-+#define assert_cpu_is_self(this_cpu) do {                         \
-+        if (DEBUG_TLB_GATE) {                                     \
-+            g_assert(!cpu->created || qemu_cpu_is_self(cpu));     \
-+        }                                                         \
-+    } while (0)
++/* run_on_cpu_data.target_ptr should always be big enough for a
++ * target_ulong even on 32 bit builds */
++QEMU_BUILD_BUG_ON(sizeof(target_ulong) > sizeof(run_on_cpu_data));
 +
  /* statistics */
  int tlb_flush_count;
  
-@@ -70,6 +76,9 @@ void tlb_flush(CPUState *cpu)
+@@ -72,13 +76,22 @@ int tlb_flush_count;
+  * flushing more entries than required is only an efficiency issue,
+  * not a correctness issue.
+  */
+-void tlb_flush(CPUState *cpu)
++static void tlb_flush_nocheck(CPUState *cpu)
  {
      CPUArchState *env = cpu->env_ptr;
  
-+    assert_cpu_is_self(cpu);
-+    tlb_debug("(count: %d)\n", tlb_flush_count++);
++    /* The QOM tests will trigger tlb_flushes without setting up TCG
++     * so we bug out here in that case.
++     */
++    if (!tcg_enabled()) {
++        return;
++    }
++
+     assert_cpu_is_self(cpu);
+     tlb_debug("(count: %d)\n", tlb_flush_count++);
+ 
++    tb_lock();
 +
      memset(env->tlb_table, -1, sizeof(env->tlb_table));
      memset(env->tlb_v_table, -1, sizeof(env->tlb_v_table));
      memset(cpu->tb_jmp_cache, 0, sizeof(cpu->tb_jmp_cache));
-@@ -77,13 +86,13 @@ void tlb_flush(CPUState *cpu)
+@@ -86,6 +99,27 @@ void tlb_flush(CPUState *cpu)
      env->vtlb_index = 0;
      env->tlb_flush_addr = -1;
      env->tlb_flush_mask = 0;
--    tlb_flush_count++;
++
++    tb_unlock();
++
++    atomic_mb_set(&cpu->pending_tlb_flush, false);
++}
++
++static void tlb_flush_global_async_work(CPUState *cpu, run_on_cpu_data data)
++{
++    tlb_flush_nocheck(cpu);
++}
++
++void tlb_flush(CPUState *cpu)
++{
++    if (cpu->created && !qemu_cpu_is_self(cpu)) {
++        if (atomic_cmpxchg(&cpu->pending_tlb_flush, false, true) == true) {
++            async_run_on_cpu(cpu, tlb_flush_global_async_work,
++                             RUN_ON_CPU_NULL);
++        }
++    } else {
++        tlb_flush_nocheck(cpu);
++    }
  }
  
  static inline void v_tlb_flush_by_mmuidx(CPUState *cpu, va_list argp)
- {
-     CPUArchState *env = cpu->env_ptr;
- 
-+    assert_cpu_is_self(cpu);
+@@ -95,6 +129,8 @@ static inline void v_tlb_flush_by_mmuidx(CPUState *cpu, va_list argp)
+     assert_cpu_is_self(cpu);
      tlb_debug("start\n");
  
++    tb_lock();
++
      for (;;) {
-@@ -128,6 +137,7 @@ void tlb_flush_page(CPUState *cpu, target_ulong addr)
+         int mmu_idx = va_arg(argp, int);
+ 
+@@ -109,6 +145,8 @@ static inline void v_tlb_flush_by_mmuidx(CPUState *cpu, va_list argp)
+     }
+ 
+     memset(cpu->tb_jmp_cache, 0, sizeof(cpu->tb_jmp_cache));
++
++    tb_unlock();
+ }
+ 
+ void tlb_flush_by_mmuidx(CPUState *cpu, ...)
+@@ -131,13 +169,15 @@ static inline void tlb_flush_entry(CPUTLBEntry *tlb_entry, target_ulong addr)
+     }
+ }
+ 
+-void tlb_flush_page(CPUState *cpu, target_ulong addr)
++static void tlb_flush_page_async_work(CPUState *cpu, run_on_cpu_data data)
+ {
+     CPUArchState *env = cpu->env_ptr;
++    target_ulong addr = (target_ulong) data.target_ptr;
      int i;
      int mmu_idx;
  
-+    assert_cpu_is_self(cpu);
+     assert_cpu_is_self(cpu);
++
      tlb_debug("page :" TARGET_FMT_lx "\n", addr);
  
      /* Check if we need to flush due to large pages.  */
-@@ -165,6 +175,7 @@ void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr, ...)
+@@ -167,6 +207,18 @@ void tlb_flush_page(CPUState *cpu, target_ulong addr)
+     tb_flush_jmp_cache(cpu, addr);
+ }
  
-     va_start(argp, addr);
- 
-+    assert_cpu_is_self(cpu);
-     tlb_debug("addr "TARGET_FMT_lx"\n", addr);
- 
-     /* Check if we need to flush due to large pages.  */
-@@ -253,6 +264,8 @@ void tlb_reset_dirty(CPUState *cpu, ram_addr_t start1, ram_addr_t length)
- 
-     int mmu_idx;
- 
-+    assert_cpu_is_self(cpu);
++void tlb_flush_page(CPUState *cpu, target_ulong addr)
++{
++    tlb_debug("page :" TARGET_FMT_lx "\n", addr);
 +
-     env = cpu->env_ptr;
-     for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
-         unsigned int i;
-@@ -284,6 +297,8 @@ void tlb_set_dirty(CPUState *cpu, target_ulong vaddr)
-     int i;
-     int mmu_idx;
- 
-+    assert_cpu_is_self(cpu);
++    if (!qemu_cpu_is_self(cpu)) {
++        async_run_on_cpu(cpu, tlb_flush_page_async_work,
++                         RUN_ON_CPU_TARGET_PTR(addr));
++    } else {
++        tlb_flush_page_async_work(cpu, RUN_ON_CPU_TARGET_PTR(addr));
++    }
++}
 +
-     vaddr &= TARGET_PAGE_MASK;
-     i = (vaddr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
-     for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
-@@ -343,6 +358,7 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
-     unsigned vidx = env->vtlb_index++ % CPU_VTLB_SIZE;
-     int asidx = cpu_asidx_from_attrs(cpu, attrs);
+ void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr, ...)
+ {
+     CPUArchState *env = cpu->env_ptr;
+@@ -213,6 +265,16 @@ void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr, ...)
+     tb_flush_jmp_cache(cpu, addr);
+ }
  
-+    assert_cpu_is_self(cpu);
-     assert(size >= TARGET_PAGE_SIZE);
-     if (size != TARGET_PAGE_SIZE) {
-         tlb_add_large_page(env, vaddr, size);
++void tlb_flush_page_all(target_ulong addr)
++{
++    CPUState *cpu;
++
++    CPU_FOREACH(cpu) {
++        async_run_on_cpu(cpu, tlb_flush_page_async_work,
++                         RUN_ON_CPU_TARGET_PTR(addr));
++    }
++}
++
+ /* update the TLBs so that writes to code in the virtual page 'addr'
+    can be detected */
+ void tlb_protect_code(ram_addr_t ram_addr)
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index bd4622ac5d..e43cb68355 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -158,6 +158,7 @@ void tlb_set_page(CPUState *cpu, target_ulong vaddr,
+ void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr);
+ void probe_write(CPUArchState *env, target_ulong addr, int mmu_idx,
+                  uintptr_t retaddr);
++void tlb_flush_page_all(target_ulong addr);
+ #else
+ static inline void tlb_flush_page(CPUState *cpu, target_ulong addr)
+ {
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index a38f9db191..f98a5ff627 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -401,6 +401,12 @@ struct CPUState {
+ 
+     bool hax_vcpu_dirty;
+     struct hax_vcpu_state *hax_vcpu;
++
++    /* The pending_tlb_flush flag is set and cleared atomically to
++     * avoid potential races. The aim of the flag is to avoid
++     * unnecessary flushes.
++     */
++    bool pending_tlb_flush;
+ };
+ 
+ QTAILQ_HEAD(CPUTailQ, CPUState);
 -- 
 2.11.0
