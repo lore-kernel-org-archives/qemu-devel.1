@@ -1,18 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cdO8R-0004d5-RV
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 16:26:13 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cdO8T-0004eU-AW
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 16:26:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cdO8N-0001Ga-Ea
+	(envelope-from <rth7680@gmail.com>) id 1cdO8S-0001J2-07
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 16:26:13 -0500
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:36389)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cdO8R-0001Im-S3
 	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 16:26:11 -0500
+Received: by mail-qt0-x243.google.com with SMTP id h53so15005593qth.3
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 13:26:11 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue, 14 Feb 2017 08:25:17 +1100
-Message-Id: <20170213212536.31871-6-rth@twiddle.net>
+Date: Tue, 14 Feb 2017 08:25:19 +1100
+Message-Id: <20170213212536.31871-8-rth@twiddle.net>
 In-Reply-To: <20170213212536.31871-1-rth@twiddle.net>
 References: <20170213212536.31871-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 05/24] target/openrisc: Fix exception handling
- status registers
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 07/24] target/openrisc: Tidy insn dumping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,54 +30,108 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Stafford Horne <shorne@gmail.com>, qemu-trivial@nongnu.org, openrisc@lists.librecores.org
+Cc: peter.maydell@linaro.org
 
-From: Stafford Horne <shorne@gmail.com>
+Avoids warnings from unused variables etc.
 
-I am working on testing instruction emulation patches for the linux
-kernel. During testing I found these 2 issues:
-
- - sets DSX (delay slot exception) but never clears it
- - EEAR for illegal insns should point to the bad exception (as per
-   openrisc spec) but its not
-
-This patch fixes these two issues by clearing the DSX flag when not in a
-delay slot and by setting EEAR to exception PC when handling illegal
-instruction exceptions.
-
-After this patch the openrisc kernel with latest patches boots great on
-qemu and instruction emulation works.
-
-Cc: qemu-trivial@nongnu.org
-Cc: openrisc@lists.librecores.org
-Signed-off-by: Stafford Horne <shorne@gmail.com>
-Message-Id: <20170113220028.29687-1-shorne@gmail.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/openrisc/interrupt.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ target/openrisc/translate.c | 36 ++++++++++++------------------------
+ 1 file changed, 12 insertions(+), 24 deletions(-)
 
-diff --git a/target/openrisc/interrupt.c b/target/openrisc/interrupt.c
-index e43fc84..a243eb2 100644
---- a/target/openrisc/interrupt.c
-+++ b/target/openrisc/interrupt.c
-@@ -38,10 +38,17 @@ void openrisc_cpu_do_interrupt(CPUState *cs)
-         env->flags &= ~D_FLAG;
-         env->sr |= SR_DSX;
-         env->epcr -= 4;
-+    } else {
-+        env->sr &= ~SR_DSX;
-     }
-     if (cs->exception_index == EXCP_SYSCALL) {
-         env->epcr += 4;
-     }
-+    /* When we have an illegal instruction the error effective address
-+       shall be set to the illegal instruction address.  */
-+    if (cs->exception_index == EXCP_ILLEGAL) {
-+        env->eear = env->pc;
-+    }
+diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
+index c207875..ac0c409 100644
+--- a/target/openrisc/translate.c
++++ b/target/openrisc/translate.c
+@@ -34,14 +34,8 @@
+ #include "trace-tcg.h"
+ #include "exec/log.h"
  
-     /* For machine-state changed between user-mode and supervisor mode,
-        we need flush TLB when we enter&exit EXCP.  */
+-
+-#define OPENRISC_DISAS
+-
+-#ifdef OPENRISC_DISAS
+-#  define LOG_DIS(...) qemu_log_mask(CPU_LOG_TB_IN_ASM, ## __VA_ARGS__)
+-#else
+-#  define LOG_DIS(...) do { } while (0)
+-#endif
++#define LOG_DIS(str, ...) \
++    qemu_log_mask(CPU_LOG_TB_IN_ASM, "%08x: " str, dc->pc, ## __VA_ARGS__)
+ 
+ typedef struct DisasContext {
+     TranslationBlock *tb;
+@@ -766,9 +760,7 @@ static void dec_misc(DisasContext *dc, uint32_t insn)
+ {
+     uint32_t op0, op1;
+     uint32_t ra, rb, rd;
+-#ifdef OPENRISC_DISAS
+     uint32_t L6, K5;
+-#endif
+     uint32_t I16, I5, I11, N26, tmp;
+     TCGMemOp mop;
+ 
+@@ -777,10 +769,8 @@ static void dec_misc(DisasContext *dc, uint32_t insn)
+     ra = extract32(insn, 16, 5);
+     rb = extract32(insn, 11, 5);
+     rd = extract32(insn, 21, 5);
+-#ifdef OPENRISC_DISAS
+     L6 = extract32(insn, 5, 6);
+     K5 = extract32(insn, 0, 5);
+-#endif
+     I16 = extract32(insn, 0, 16);
+     I5 = extract32(insn, 21, 5);
+     I11 = extract32(insn, 0, 11);
+@@ -1387,13 +1377,10 @@ static void dec_compi(DisasContext *dc, uint32_t insn)
+ static void dec_sys(DisasContext *dc, uint32_t insn)
+ {
+     uint32_t op0;
+-#ifdef OPENRISC_DISAS
+     uint32_t K16;
+-#endif
++
+     op0 = extract32(insn, 16, 10);
+-#ifdef OPENRISC_DISAS
+     K16 = extract32(insn, 0, 16);
+-#endif
+ 
+     switch (op0) {
+     case 0x000:    /* l.sys */
+@@ -1723,6 +1710,13 @@ void gen_intermediate_code(CPUOpenRISCState *env, struct TranslationBlock *tb)
+         max_insns = TCG_MAX_INSNS;
+     }
+ 
++    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
++        && qemu_log_in_addr_range(pc_start)) {
++        qemu_log_lock();
++        qemu_log("----------------\n");
++        qemu_log("IN: %s\n", lookup_symbol(pc_start));
++    }
++
+     gen_tb_start(tb);
+ 
+     do {
+@@ -1807,18 +1801,12 @@ void gen_intermediate_code(CPUOpenRISCState *env, struct TranslationBlock *tb)
+     tb->size = dc->pc - pc_start;
+     tb->icount = num_insns;
+ 
+-#ifdef DEBUG_DISAS
+     if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
+         && qemu_log_in_addr_range(pc_start)) {
+-        qemu_log_lock();
+-        qemu_log("----------------\n");
+-        qemu_log("IN: %s\n", lookup_symbol(pc_start));
+-        log_target_disas(cs, pc_start, dc->pc - pc_start, 0);
+-        qemu_log("\nisize=%d osize=%d\n",
+-                 dc->pc - pc_start, tcg_op_buf_count());
++        log_target_disas(cs, pc_start, tb->size, 0);
++        qemu_log("\n");
+         qemu_log_unlock();
+     }
+-#endif
+ }
+ 
+ void openrisc_cpu_dump_state(CPUState *cs, FILE *f,
 -- 
 2.9.3
