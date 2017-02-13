@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54351)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cdBpR-0004vY-EQ
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 03:17:47 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cdC8T-0006q2-0A
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 03:37:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cdBpN-0004bd-Bv
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 03:17:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43422)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cdBpN-0004ZK-6M
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 03:17:41 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0EF9AC05B1C7
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 08:17:40 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 13 Feb 2017 09:17:29 +0100
-Message-Id: <1486973851-21645-5-git-send-email-kraxel@redhat.com>
-In-Reply-To: <1486973851-21645-1-git-send-email-kraxel@redhat.com>
-References: <1486973851-21645-1-git-send-email-kraxel@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cdC8R-0008Kb-4r
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 03:37:25 -0500
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:36004)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cdC8Q-0008JL-O4
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 03:37:23 -0500
+Received: by mail-lf0-x244.google.com with SMTP id h65so7662724lfi.3
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 00:37:20 -0800 (PST)
 MIME-Version: 1.0
+References: <20170212112118.16044-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20170212112118.16044-1-marcandre.lureau@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 13 Feb 2017 08:37:08 +0000
+Message-ID: <CAJ+F1CJBwjp70CgzTCwXYQzcpn6X0r9ka80rc6DmqnJbgHZNUA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 4/6] cirrus: replace debug printf with trace
- points
+Subject: Re: [Qemu-devel] [PATCH] spice: allow to specify drm rendernode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,85 +30,144 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: kraxel@redhat.com
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-id: 1486561893-26470-2-git-send-email-kraxel@redhat.com
----
- hw/display/cirrus_vga.c | 11 +++++------
- hw/display/trace-events |  6 ++++++
- 2 files changed, 11 insertions(+), 6 deletions(-)
+Hi Gerd,
 
-diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
-index 16f27e8..b272a70 100644
---- a/hw/display/cirrus_vga.c
-+++ b/hw/display/cirrus_vga.c
-@@ -28,6 +28,7 @@
-  */
- #include "qemu/osdep.h"
- #include "qapi/error.h"
-+#include "trace.h"
- #include "hw/hw.h"
- #include "hw/pci/pci.h"
- #include "ui/console.h"
-@@ -1852,12 +1853,14 @@ static uint8_t cirrus_mmio_blt_read(CirrusVGAStat=
-e * s, unsigned address)
- 	break;
-     }
-=20
-+    trace_vga_cirrus_write_blt(address, value);
-     return (uint8_t) value;
- }
-=20
- static void cirrus_mmio_blt_write(CirrusVGAState * s, unsigned address,
- 				  uint8_t value)
- {
-+    trace_vga_cirrus_write_blt(address, value);
-     switch (address) {
-     case (CIRRUS_MMIO_BLTBGCOLOR + 0):
- 	cirrus_vga_write_gr(s, 0x00, value);
-@@ -2607,9 +2610,7 @@ static uint64_t cirrus_vga_ioport_read(void *opaque=
-, hwaddr addr,
- 	    break;
- 	}
-     }
--#if defined(DEBUG_VGA)
--    printf("VGA: read addr=3D0x%04x data=3D0x%02x\n", addr, val);
--#endif
-+    trace_vga_cirrus_read_io(addr, val);
-     return val;
- }
-=20
-@@ -2626,9 +2627,7 @@ static void cirrus_vga_ioport_write(void *opaque, h=
-waddr addr, uint64_t val,
-     if (vga_ioport_invalid(s, addr)) {
- 	return;
-     }
--#ifdef DEBUG_VGA
--    printf("VGA: write addr=3D0x%04x data=3D0x%02x\n", addr, val);
--#endif
-+    trace_vga_cirrus_write_io(addr, val);
-=20
-     switch (addr) {
-     case 0x3c0:
-diff --git a/hw/display/trace-events b/hw/display/trace-events
-index 26910e2..3e896d2 100644
---- a/hw/display/trace-events
-+++ b/hw/display/trace-events
-@@ -125,3 +125,9 @@ vga_std_read_io(uint32_t addr, uint32_t val) "addr 0x=
-%x, val 0x%x"
- vga_std_write_io(uint32_t addr, uint32_t val) "addr 0x%x, val 0x%x"
- vga_vbe_read(uint32_t index, uint32_t val) "index 0x%x, val 0x%x"
- vga_vbe_write(uint32_t index, uint32_t val) "index 0x%x, val 0x%x"
-+
-+# hw/display/cirrus_vga.c
-+vga_cirrus_read_io(uint32_t addr, uint32_t val) "addr 0x%x, val 0x%x"
-+vga_cirrus_write_io(uint32_t addr, uint32_t val) "addr 0x%x, val 0x%x"
-+vga_cirrus_read_blt(uint32_t offset, uint32_t val) "offset 0x%x, val 0x%=
-x"
-+vga_cirrus_write_blt(uint32_t offset, uint32_t val) "offset 0x%x, val 0x=
-%x"
---=20
-1.8.3.1
+Rendernode are not stable across reboots, it depends on module order.
+
+I have further patches to specify a pci address instead:
+rendernode=3D<file|pciaddr>. Does that seem fine?
+
+Do you want me to squash and resend?
+
+The current branch: https://github.com/elmarco/qemu/commits/spice
+
+thanks
+
+On Sun, Feb 12, 2017 at 3:23 PM Marc-Andr=C3=A9 Lureau <
+marcandre.lureau@redhat.com> wrote:
+
+> When multiple GPU are available, picking the first one isn't always the
+> best choice. Learn to specify a device rendernode.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  include/ui/egl-helpers.h |  3 +--
+>  ui/egl-helpers.c         | 10 +++++++---
+>  ui/spice-core.c          |  5 ++++-
+>  qemu-options.hx          |  6 +++++-
+>  4 files changed, 17 insertions(+), 7 deletions(-)
+>
+> diff --git a/include/ui/egl-helpers.h b/include/ui/egl-helpers.h
+> index 03fcf4bba2..88a13e827b 100644
+> --- a/include/ui/egl-helpers.h
+> +++ b/include/ui/egl-helpers.h
+> @@ -14,8 +14,7 @@ extern int qemu_egl_rn_fd;
+>  extern struct gbm_device *qemu_egl_rn_gbm_dev;
+>  extern EGLContext qemu_egl_rn_ctx;
+>
+> -int qemu_egl_rendernode_open(void);
+> -int egl_rendernode_init(void);
+> +int egl_rendernode_init(const char *rendernode);
+>  int egl_get_fd_for_texture(uint32_t tex_id, EGLint *stride, EGLint
+> *fourcc);
+>
+>  #endif
+> diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
+> index cd24568a5e..417462b76d 100644
+> --- a/ui/egl-helpers.c
+> +++ b/ui/egl-helpers.c
+> @@ -44,13 +44,17 @@ int qemu_egl_rn_fd;
+>  struct gbm_device *qemu_egl_rn_gbm_dev;
+>  EGLContext qemu_egl_rn_ctx;
+>
+> -int qemu_egl_rendernode_open(void)
+> +static int qemu_egl_rendernode_open(const char *rendernode)
+>  {
+>      DIR *dir;
+>      struct dirent *e;
+>      int r, fd;
+>      char *p;
+>
+> +    if (rendernode) {
+> +        return open(rendernode, O_RDWR | O_CLOEXEC | O_NOCTTY |
+> O_NONBLOCK);
+> +    }
+> +
+>      dir =3D opendir("/dev/dri");
+>      if (!dir) {
+>          return -1;
+> @@ -85,11 +89,11 @@ int qemu_egl_rendernode_open(void)
+>      return fd;
+>  }
+>
+> -int egl_rendernode_init(void)
+> +int egl_rendernode_init(const char *rendernode)
+>  {
+>      qemu_egl_rn_fd =3D -1;
+>
+> -    qemu_egl_rn_fd =3D qemu_egl_rendernode_open();
+> +    qemu_egl_rn_fd =3D qemu_egl_rendernode_open(rendernode);
+>      if (qemu_egl_rn_fd =3D=3D -1) {
+>          error_report("egl: no drm render node available");
+>          goto err;
+> diff --git a/ui/spice-core.c b/ui/spice-core.c
+> index 1452e77fd1..39ccab7561 100644
+> --- a/ui/spice-core.c
+> +++ b/ui/spice-core.c
+> @@ -501,6 +501,9 @@ static QemuOptsList qemu_spice_opts =3D {
+>          },{
+>              .name =3D "gl",
+>              .type =3D QEMU_OPT_BOOL,
+> +        },{
+> +            .name =3D "rendernode",
+> +            .type =3D QEMU_OPT_STRING,
+>  #endif
+>          },
+>          { /* end of list */ }
+> @@ -833,7 +836,7 @@ void qemu_spice_init(void)
+>                           "incompatible with -spice port/tls-port");
+>              exit(1);
+>          }
+> -        if (egl_rendernode_init() !=3D 0) {
+> +        if (egl_rendernode_init(qemu_opt_get(opts, "rendernode")) !=3D 0=
+) {
+>              error_report("Failed to initialize EGL render node for SPICE
+> GL");
+>              exit(1);
+>          }
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index ac036b4cbd..b64087d934 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -1066,7 +1066,7 @@ DEF("spice", HAS_ARG, QEMU_OPTION_spice,
+>      "       [,streaming-video=3D[off|all|filter]][,disable-copy-paste]\n=
+"
+>      "       [,disable-agent-file-xfer][,agent-mouse=3D[on|off]]\n"
+>      "
+>  [,playback-compression=3D[on|off]][,seamless-migration=3D[on|off]]\n"
+> -    "       [,gl=3D[on|off]]\n"
+> +    "       [,gl=3D[on|off]][,rendernode=3D<file>]\n"
+>      "   enable spice\n"
+>      "   at least one of {port, tls-port} is mandatory\n",
+>      QEMU_ARCH_ALL)
+> @@ -1161,6 +1161,10 @@ Enable/disable spice seamless migration. Default i=
+s
+> off.
+>  @item gl=3D[on|off]
+>  Enable/disable OpenGL context. Default is off.
+>
+> +@item rendernode=3D<file>
+> +DRM render node for OpenGL rendering. If not specified, it will pick
+> +the first available. (Since 2.9)
+> +
+>  @end table
+>  ETEXI
+>
+> --
+> 2.11.0.295.gd7dffce1c.dirty
+>
+>
+> --
+Marc-Andr=C3=A9 Lureau
