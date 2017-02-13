@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53707)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cdFSS-0005QK-8p
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:10:18 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cdFSY-0005WN-6Q
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:10:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cdFSP-0002d5-1J
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:10:16 -0500
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:38607)
+	(envelope-from <alex.bennee@linaro.org>) id 1cdFSW-0002gW-DI
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:10:22 -0500
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:35714)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cdFSO-0002ch-Nj
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:10:12 -0500
-Received: by mail-wm0-x231.google.com with SMTP id r141so92387843wmg.1
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 04:10:12 -0800 (PST)
+	id 1cdFSW-0002g4-59
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:10:20 -0500
+Received: by mail-wm0-x236.google.com with SMTP id v186so156319708wmd.0
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 04:10:20 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 13 Feb 2017 12:10:04 +0000
-Message-Id: <20170213121017.12907-12-alex.bennee@linaro.org>
+Date: Mon, 13 Feb 2017 12:10:10 +0000
+Message-Id: <20170213121017.12907-18-alex.bennee@linaro.org>
 In-Reply-To: <20170213121017.12907-1-alex.bennee@linaro.org>
 References: <20170213121017.12907-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v12 11/24] tcg: enable thread-per-vCPU
+Subject: [Qemu-devel] [PATCH v12 17/24] cputlb: add tlb_flush_by_mmuidx
+ async routines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,370 +33,220 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, rth@twiddle.net
 Cc: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-There are a couple of changes that occur at the same time here:
+This converts the remaining TLB flush routines to use async work when
+detecting a cross-vCPU flush. The only minor complication is having to
+serialise the var_list of MMU indexes into a form that can be punted
+to an asynchronous job.
 
-  - introduce a single vCPU qemu_tcg_cpu_thread_fn
+The pending_tlb_flush field on QOM's CPU structure also becomes a
+bitfield rather than a boolean.
 
-  One of these is spawned per vCPU with its own Thread and Condition
-  variables. qemu_tcg_rr_cpu_thread_fn is the new name for the old
-  single threaded function.
-
-  - the TLS current_cpu variable is now live for the lifetime of MTTCG
-    vCPU threads. This is for future work where async jobs need to know
-    the vCPU context they are operating in.
-
-The user to switch on multi-thread behaviour and spawn a thread
-per-vCPU. For a simple test kvm-unit-test like:
-
-  ./arm/run ./arm/locking-test.flat -smp 4 -accel tcg,thread=multi
-
-Will now use 4 vCPU threads and have an expected FAIL (instead of the
-unexpected PASS) as the default mode of the test has no protection when
-incrementing a shared variable.
-
-We enable the parallel_cpus flag to ensure we generate correct barrier
-and atomic code if supported by the front and backends. As each back end
-and front end is updated they can add CONFIG_MTTCG_TARGET and
-CONFIG_MTTCG_HOST to their respective make configurations so
-default_mttcg_enabled does the right thing.
-
-Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-[AJB: Some fixes, conditionally, commit rewording]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
-v1 (ajb):
-  - fix merge conflicts
-  - maintain single-thread approach
-v2
-  - re-base fixes (no longer has tb_find_fast lock tweak ahead)
-  - remove bogus break condition on cpu->stop/stopped
-  - only process exiting cpus exit_request
-  - handle all cpus idle case (fixes shutdown issues)
-  - sleep on EXCP_HALTED in mttcg mode (prevent crash on start-up)
-  - move icount timer into helper
-v3
-  - update the commit message
-  - rm kick_timer tweaks (move to earlier tcg_current_cpu tweaks)
-  - ensure linux-user clears cpu->exit_request in loop
-  - purging of global exit_request and tcg_current_cpu in earlier patches
-  - fix checkpatch warnings
-v4
-  - don't break loop on stopped, we may never schedule next in RR mode
-  - make sure we flush iorequests of current cpu if we exited on one
-  - add tcg_cpu_exec_start/end wraps for async work functions
-  - stop killing of current_cpu on loop exit
-  - set current_cpu in the single thread function
-  - remove sleep special case, add qemu_tcg_should_sleep() for mttcg
-  - no need to atomic set cpu->exit_request going into the loop
-  - removed extraneous setting of exit_request
-  - split tb_lock() part of patch
-  - rename single thread fn to qemu_tcg_rr_cpu_thread_fn
-v5
-  - enable parallel_cpus for MTTCG (for barriers/atomics)
-  - expand on CONFIG_ flags in commit message
 v7
-  - move parallel_cpus down into the mttcg leg
-  - minor ws merge fix
+  - un-merged from the atomic cputlb patch in the last series
+  - fix long line reported by checkpatch
+v8
+  - re-base merge/fixes
 ---
- cpu-exec.c |   5 ---
- cpus.c     | 134 +++++++++++++++++++++++++++++++++++++++++++++++--------------
- 2 files changed, 103 insertions(+), 36 deletions(-)
+ cputlb.c          | 110 +++++++++++++++++++++++++++++++++++++++++++-----------
+ include/qom/cpu.h |   2 +-
+ 2 files changed, 89 insertions(+), 23 deletions(-)
 
-diff --git a/cpu-exec.c b/cpu-exec.c
-index 94628b90cd..b0ddada8c1 100644
---- a/cpu-exec.c
-+++ b/cpu-exec.c
-@@ -396,7 +396,6 @@ static inline bool cpu_handle_halt(CPUState *cpu)
-         }
- #endif
-         if (!cpu_has_work(cpu)) {
--            current_cpu = NULL;
-             return true;
-         }
+diff --git a/cputlb.c b/cputlb.c
+index 97e5c12de8..c50254be26 100644
+--- a/cputlb.c
++++ b/cputlb.c
+@@ -68,6 +68,11 @@
+  * target_ulong even on 32 bit builds */
+ QEMU_BUILD_BUG_ON(sizeof(target_ulong) > sizeof(run_on_cpu_data));
  
-@@ -540,7 +539,6 @@ static inline void cpu_handle_interrupt(CPUState *cpu,
- 
- 
-     if (unlikely(atomic_read(&cpu->exit_request) || replay_has_interrupt())) {
--        atomic_set(&cpu->exit_request, 0);
-         cpu->exception_index = EXCP_INTERRUPT;
-         cpu_loop_exit(cpu);
-     }
-@@ -675,8 +673,5 @@ int cpu_exec(CPUState *cpu)
-     cc->cpu_exec_exit(cpu);
-     rcu_read_unlock();
- 
--    /* fail safe : never use current_cpu outside cpu_exec() */
--    current_cpu = NULL;
--
-     return ret;
- }
-diff --git a/cpus.c b/cpus.c
-index 010a946de8..25897edbd3 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -809,7 +809,7 @@ static void kick_tcg_thread(void *opaque)
- 
- static void start_tcg_kick_timer(void)
- {
--    if (!tcg_kick_vcpu_timer && CPU_NEXT(first_cpu)) {
-+    if (!mttcg_enabled && !tcg_kick_vcpu_timer && CPU_NEXT(first_cpu)) {
-         tcg_kick_vcpu_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
-                                            kick_tcg_thread, NULL);
-         timer_mod(tcg_kick_vcpu_timer, qemu_tcg_next_kick());
-@@ -1063,27 +1063,34 @@ static void qemu_tcg_destroy_vcpu(CPUState *cpu)
- 
- static void qemu_wait_io_event_common(CPUState *cpu)
- {
-+    atomic_mb_set(&cpu->thread_kicked, false);
-     if (cpu->stop) {
-         cpu->stop = false;
-         cpu->stopped = true;
-         qemu_cond_broadcast(&qemu_pause_cond);
-     }
-     process_queued_cpu_work(cpu);
--    cpu->thread_kicked = false;
-+}
-+
-+static bool qemu_tcg_should_sleep(CPUState *cpu)
-+{
-+    if (mttcg_enabled) {
-+        return cpu_thread_is_idle(cpu);
-+    } else {
-+        return all_cpu_threads_idle();
-+    }
- }
- 
- static void qemu_tcg_wait_io_event(CPUState *cpu)
- {
--    while (all_cpu_threads_idle()) {
-+    while (qemu_tcg_should_sleep(cpu)) {
-         stop_tcg_kick_timer();
-         qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
-     }
- 
-     start_tcg_kick_timer();
- 
--    CPU_FOREACH(cpu) {
--        qemu_wait_io_event_common(cpu);
--    }
-+    qemu_wait_io_event_common(cpu);
- }
- 
- static void qemu_kvm_wait_io_event(CPUState *cpu)
-@@ -1154,6 +1161,7 @@ static void *qemu_dummy_cpu_thread_fn(void *arg)
-     qemu_thread_get_self(cpu->thread);
-     cpu->thread_id = qemu_get_thread_id();
-     cpu->can_do_io = 1;
-+    current_cpu = cpu;
- 
-     sigemptyset(&waitset);
-     sigaddset(&waitset, SIG_IPI);
-@@ -1162,9 +1170,7 @@ static void *qemu_dummy_cpu_thread_fn(void *arg)
-     cpu->created = true;
-     qemu_cond_signal(&qemu_cpu_cond);
- 
--    current_cpu = cpu;
-     while (1) {
--        current_cpu = NULL;
-         qemu_mutex_unlock_iothread();
-         do {
-             int sig;
-@@ -1175,7 +1181,6 @@ static void *qemu_dummy_cpu_thread_fn(void *arg)
-             exit(1);
-         }
-         qemu_mutex_lock_iothread();
--        current_cpu = cpu;
-         qemu_wait_io_event_common(cpu);
-     }
- 
-@@ -1287,7 +1292,7 @@ static void deal_with_unplugged_cpus(void)
-  * elsewhere.
-  */
- 
--static void *qemu_tcg_cpu_thread_fn(void *arg)
-+static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
- {
-     CPUState *cpu = arg;
- 
-@@ -1309,6 +1314,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
- 
-         /* process any pending work */
-         CPU_FOREACH(cpu) {
-+            current_cpu = cpu;
-             qemu_wait_io_event_common(cpu);
-         }
-     }
-@@ -1330,6 +1336,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
- 
-         while (cpu && !cpu->exit_request) {
-             atomic_mb_set(&tcg_current_rr_cpu, cpu);
-+            current_cpu = cpu;
- 
-             qemu_clock_enable(QEMU_CLOCK_VIRTUAL,
-                               (cpu->singlestep_enabled & SSTEP_NOTIMER) == 0);
-@@ -1341,7 +1348,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
-                     cpu_handle_guest_debug(cpu);
-                     break;
-                 }
--            } else if (cpu->stop || cpu->stopped) {
-+            } else if (cpu->stop) {
-                 if (cpu->unplug) {
-                     cpu = CPU_NEXT(cpu);
-                 }
-@@ -1360,7 +1367,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
- 
-         handle_icount_deadline();
- 
--        qemu_tcg_wait_io_event(QTAILQ_FIRST(&cpus));
-+        qemu_tcg_wait_io_event(cpu ? cpu : QTAILQ_FIRST(&cpus));
-         deal_with_unplugged_cpus();
-     }
- 
-@@ -1407,6 +1414,64 @@ static void CALLBACK dummy_apc_func(ULONG_PTR unused)
- }
- #endif
- 
-+/* Multi-threaded TCG
-+ *
-+ * In the multi-threaded case each vCPU has its own thread. The TLS
-+ * variable current_cpu can be used deep in the code to find the
-+ * current CPUState for a given thread.
++/* We currently can't handle more than 16 bits in the MMUIDX bitmask.
 + */
++QEMU_BUILD_BUG_ON(NB_MMU_MODES > 16);
++#define ALL_MMUIDX_BITS ((1 << NB_MMU_MODES) - 1)
 +
-+static void *qemu_tcg_cpu_thread_fn(void *arg)
-+{
-+    CPUState *cpu = arg;
-+
-+    rcu_register_thread();
-+
-+    qemu_mutex_lock_iothread();
-+    qemu_thread_get_self(cpu->thread);
-+
-+    cpu->thread_id = qemu_get_thread_id();
-+    cpu->created = true;
-+    cpu->can_do_io = 1;
-+    current_cpu = cpu;
-+    qemu_cond_signal(&qemu_cpu_cond);
-+
-+    /* process any pending work */
-+    cpu->exit_request = 1;
-+
-+    while (1) {
-+        if (cpu_can_run(cpu)) {
-+            int r;
-+            r = tcg_cpu_exec(cpu);
-+            switch (r) {
-+            case EXCP_DEBUG:
-+                cpu_handle_guest_debug(cpu);
-+                break;
-+            case EXCP_HALTED:
-+                /* during start-up the vCPU is reset and the thread is
-+                 * kicked several times. If we don't ensure we go back
-+                 * to sleep in the halted state we won't cleanly
-+                 * start-up when the vCPU is enabled.
-+                 *
-+                 * cpu->halted should ensure we sleep in wait_io_event
-+                 */
-+                g_assert(cpu->halted);
-+                break;
-+            default:
-+                /* Ignore everything else? */
-+                break;
-+            }
-+        }
-+
-+        handle_icount_deadline();
-+
-+        atomic_mb_set(&cpu->exit_request, 0);
-+        qemu_tcg_wait_io_event(cpu);
-+    }
-+
-+    return NULL;
-+}
-+
- static void qemu_cpu_kick_thread(CPUState *cpu)
+ /* statistics */
+ int tlb_flush_count;
+ 
+@@ -102,7 +107,7 @@ static void tlb_flush_nocheck(CPUState *cpu)
+ 
+     tb_unlock();
+ 
+-    atomic_mb_set(&cpu->pending_tlb_flush, false);
++    atomic_mb_set(&cpu->pending_tlb_flush, 0);
+ }
+ 
+ static void tlb_flush_global_async_work(CPUState *cpu, run_on_cpu_data data)
+@@ -113,7 +118,8 @@ static void tlb_flush_global_async_work(CPUState *cpu, run_on_cpu_data data)
+ void tlb_flush(CPUState *cpu)
  {
- #ifndef _WIN32
-@@ -1437,7 +1502,7 @@ void qemu_cpu_kick(CPUState *cpu)
-     qemu_cond_broadcast(cpu->halt_cond);
-     if (tcg_enabled()) {
-         cpu_exit(cpu);
--        /* Also ensure current RR cpu is kicked */
-+        /* NOP unless doing single-thread RR */
-         qemu_cpu_kick_rr_cpu();
-     } else {
-         if (hax_enabled()) {
-@@ -1513,13 +1578,6 @@ void pause_all_vcpus(void)
- 
-     if (qemu_in_vcpu_thread()) {
-         cpu_stop_current();
--        if (!kvm_enabled()) {
--            CPU_FOREACH(cpu) {
--                cpu->stop = false;
--                cpu->stopped = true;
--            }
--            return;
--        }
-     }
- 
-     while (!all_vcpus_paused()) {
-@@ -1568,29 +1626,43 @@ void cpu_remove_sync(CPUState *cpu)
- static void qemu_tcg_init_vcpu(CPUState *cpu)
- {
-     char thread_name[VCPU_THREAD_NAME_SIZE];
--    static QemuCond *tcg_halt_cond;
--    static QemuThread *tcg_cpu_thread;
-+    static QemuCond *single_tcg_halt_cond;
-+    static QemuThread *single_tcg_cpu_thread;
- 
--    /* share a single thread for all cpus with TCG */
--    if (!tcg_cpu_thread) {
-+    if (qemu_tcg_mttcg_enabled() || !single_tcg_cpu_thread) {
-         cpu->thread = g_malloc0(sizeof(QemuThread));
-         cpu->halt_cond = g_malloc0(sizeof(QemuCond));
-         qemu_cond_init(cpu->halt_cond);
--        tcg_halt_cond = cpu->halt_cond;
--        snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/TCG",
-+
-+        if (qemu_tcg_mttcg_enabled()) {
-+            /* create a thread per vCPU with TCG (MTTCG) */
-+            parallel_cpus = true;
-+            snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/TCG",
-                  cpu->cpu_index);
--        qemu_thread_create(cpu->thread, thread_name, qemu_tcg_cpu_thread_fn,
--                           cpu, QEMU_THREAD_JOINABLE);
-+
-+            qemu_thread_create(cpu->thread, thread_name, qemu_tcg_cpu_thread_fn,
-+                               cpu, QEMU_THREAD_JOINABLE);
-+
-+        } else {
-+            /* share a single thread for all cpus with TCG */
-+            snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "ALL CPUs/TCG");
-+            qemu_thread_create(cpu->thread, thread_name,
-+                               qemu_tcg_rr_cpu_thread_fn,
-+                               cpu, QEMU_THREAD_JOINABLE);
-+
-+            single_tcg_halt_cond = cpu->halt_cond;
-+            single_tcg_cpu_thread = cpu->thread;
-+        }
- #ifdef _WIN32
-         cpu->hThread = qemu_thread_get_handle(cpu->thread);
- #endif
-         while (!cpu->created) {
-             qemu_cond_wait(&qemu_cpu_cond, &qemu_global_mutex);
+     if (cpu->created && !qemu_cpu_is_self(cpu)) {
+-        if (atomic_cmpxchg(&cpu->pending_tlb_flush, false, true) == true) {
++        if (atomic_mb_read(&cpu->pending_tlb_flush) != ALL_MMUIDX_BITS) {
++            atomic_mb_set(&cpu->pending_tlb_flush, ALL_MMUIDX_BITS);
+             async_run_on_cpu(cpu, tlb_flush_global_async_work,
+                              RUN_ON_CPU_NULL);
          }
--        tcg_cpu_thread = cpu->thread;
-     } else {
--        cpu->thread = tcg_cpu_thread;
--        cpu->halt_cond = tcg_halt_cond;
-+        /* For non-MTTCG cases we share the thread */
-+        cpu->thread = single_tcg_cpu_thread;
-+        cpu->halt_cond = single_tcg_halt_cond;
+@@ -122,17 +128,18 @@ void tlb_flush(CPUState *cpu)
      }
  }
  
+-static inline void v_tlb_flush_by_mmuidx(CPUState *cpu, uint16_t idxmap)
++static void tlb_flush_by_mmuidx_async_work(CPUState *cpu, run_on_cpu_data data)
+ {
+     CPUArchState *env = cpu->env_ptr;
+-    unsigned long mmu_idx_bitmask = idxmap;
++    unsigned long mmu_idx_bitmask = data.host_int;
+     int mmu_idx;
+ 
+     assert_cpu_is_self(cpu);
+-    tlb_debug("start\n");
+ 
+     tb_lock();
+ 
++    tlb_debug("start: mmu_idx:0x%04lx\n", mmu_idx_bitmask);
++
+     for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
+ 
+         if (test_bit(mmu_idx, &mmu_idx_bitmask)) {
+@@ -145,12 +152,30 @@ static inline void v_tlb_flush_by_mmuidx(CPUState *cpu, uint16_t idxmap)
+ 
+     memset(cpu->tb_jmp_cache, 0, sizeof(cpu->tb_jmp_cache));
+ 
++    tlb_debug("done\n");
++
+     tb_unlock();
+ }
+ 
+ void tlb_flush_by_mmuidx(CPUState *cpu, uint16_t idxmap)
+ {
+-    v_tlb_flush_by_mmuidx(cpu, idxmap);
++    tlb_debug("mmu_idx: 0x%" PRIx16 "\n", idxmap);
++
++    if (!qemu_cpu_is_self(cpu)) {
++        uint16_t pending_flushes = idxmap;
++        pending_flushes &= ~atomic_mb_read(&cpu->pending_tlb_flush);
++
++        if (pending_flushes) {
++            tlb_debug("reduced mmu_idx: 0x%" PRIx16 "\n", pending_flushes);
++
++            atomic_or(&cpu->pending_tlb_flush, pending_flushes);
++            async_run_on_cpu(cpu, tlb_flush_by_mmuidx_async_work,
++                             RUN_ON_CPU_HOST_INT(pending_flushes));
++        }
++    } else {
++        tlb_flush_by_mmuidx_async_work(cpu,
++                                       RUN_ON_CPU_HOST_INT(idxmap));
++    }
+ }
+ 
+ static inline void tlb_flush_entry(CPUTLBEntry *tlb_entry, target_ulong addr)
+@@ -215,27 +240,26 @@ void tlb_flush_page(CPUState *cpu, target_ulong addr)
+     }
+ }
+ 
+-void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr, uint16_t idxmap)
++/* As we are going to hijack the bottom bits of the page address for a
++ * mmuidx bit mask we need to fail to build if we can't do that
++ */
++QEMU_BUILD_BUG_ON(NB_MMU_MODES > TARGET_PAGE_BITS_MIN);
++
++static void tlb_flush_page_by_mmuidx_async_work(CPUState *cpu,
++                                                run_on_cpu_data data)
+ {
+     CPUArchState *env = cpu->env_ptr;
+-    unsigned long mmu_idx_bitmap = idxmap;
+-    int i, page, mmu_idx;
++    target_ulong addr_and_mmuidx = (target_ulong) data.target_ptr;
++    target_ulong addr = addr_and_mmuidx & TARGET_PAGE_MASK;
++    unsigned long mmu_idx_bitmap = addr_and_mmuidx & ALL_MMUIDX_BITS;
++    int page = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
++    int mmu_idx;
++    int i;
+ 
+     assert_cpu_is_self(cpu);
+-    tlb_debug("addr "TARGET_FMT_lx"\n", addr);
+-
+-    /* Check if we need to flush due to large pages.  */
+-    if ((addr & env->tlb_flush_mask) == env->tlb_flush_addr) {
+-        tlb_debug("forced full flush ("
+-                  TARGET_FMT_lx "/" TARGET_FMT_lx ")\n",
+-                  env->tlb_flush_addr, env->tlb_flush_mask);
+-
+-        v_tlb_flush_by_mmuidx(cpu, idxmap);
+-        return;
+-    }
+ 
+-    addr &= TARGET_PAGE_MASK;
+-    page = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
++    tlb_debug("page:%d addr:"TARGET_FMT_lx" mmu_idx:0x%lx\n",
++              page, addr, mmu_idx_bitmap);
+ 
+     for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
+         if (test_bit(mmu_idx, &mmu_idx_bitmap)) {
+@@ -251,6 +275,48 @@ void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr, uint16_t idxmap)
+     tb_flush_jmp_cache(cpu, addr);
+ }
+ 
++static void tlb_check_page_and_flush_by_mmuidx_async_work(CPUState *cpu,
++                                                          run_on_cpu_data data)
++{
++    CPUArchState *env = cpu->env_ptr;
++    target_ulong addr_and_mmuidx = (target_ulong) data.target_ptr;
++    target_ulong addr = addr_and_mmuidx & TARGET_PAGE_MASK;
++    unsigned long mmu_idx_bitmap = addr_and_mmuidx & ALL_MMUIDX_BITS;
++
++    tlb_debug("addr:"TARGET_FMT_lx" mmu_idx: %04lx\n", addr, mmu_idx_bitmap);
++
++    /* Check if we need to flush due to large pages.  */
++    if ((addr & env->tlb_flush_mask) == env->tlb_flush_addr) {
++        tlb_debug("forced full flush ("
++                  TARGET_FMT_lx "/" TARGET_FMT_lx ")\n",
++                  env->tlb_flush_addr, env->tlb_flush_mask);
++
++        tlb_flush_by_mmuidx_async_work(cpu,
++                                       RUN_ON_CPU_HOST_INT(mmu_idx_bitmap));
++    } else {
++        tlb_flush_page_by_mmuidx_async_work(cpu, data);
++    }
++}
++
++void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr, uint16_t idxmap)
++{
++    target_ulong addr_and_mmu_idx;
++
++    tlb_debug("addr: "TARGET_FMT_lx" mmu_idx:%" PRIx16 "\n", addr, idxmap);
++
++    /* This should already be page aligned */
++    addr_and_mmu_idx = addr & TARGET_PAGE_MASK;
++    addr_and_mmu_idx |= idxmap;
++
++    if (!qemu_cpu_is_self(cpu)) {
++        async_run_on_cpu(cpu, tlb_check_page_and_flush_by_mmuidx_async_work,
++                         RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
++    } else {
++        tlb_check_page_and_flush_by_mmuidx_async_work(
++            cpu, RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
++    }
++}
++
+ void tlb_flush_page_all(target_ulong addr)
+ {
+     CPUState *cpu;
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index f98a5ff627..de462036d8 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -406,7 +406,7 @@ struct CPUState {
+      * avoid potential races. The aim of the flag is to avoid
+      * unnecessary flushes.
+      */
+-    bool pending_tlb_flush;
++    uint16_t pending_tlb_flush;
+ };
+ 
+ QTAILQ_HEAD(CPUTailQ, CPUState);
 -- 
 2.11.0
