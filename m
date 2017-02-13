@@ -1,35 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cdO7D-0003vd-Cd
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 16:24:57 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cdO8G-0004Uk-Bq
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 16:26:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cdO78-0000cz-Ta
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 16:24:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37293)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cdO78-0000bU-Kg
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 16:24:50 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cdO76-0000eW-JH
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 21:24:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 820362E80D1
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 21:24:48 +0000 (UTC)
+	(envelope-from <rth7680@gmail.com>) id 1cdO8B-0001AN-BC
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 16:26:00 -0500
+Received: from mail-qt0-x236.google.com ([2607:f8b0:400d:c0d::236]:33846)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cdO8B-0001AD-6O
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 16:25:55 -0500
+Received: by mail-qt0-x236.google.com with SMTP id w20so94945317qtb.1
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 13:25:55 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Date: Tue, 14 Feb 2017 08:25:12 +1100
+Message-Id: <20170213212536.31871-1-rth@twiddle.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 Feb 2017 21:08:37 -0000
-From: Alexandre <1490611@bugs.launchpad.net>
-Reply-To: Bug 1490611 <1490611@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150831152901.21817.58033.malonedeb@gac.canonical.com>
-Message-Id: <20170213210837.6044.55445.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1490611] Re: Using qemu >=2.2.1 to convert
- raw->VHD (fixed) adds extra padding to the result file,
- which Microsoft Azure rejects as invalid
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 00/24] target/openrisc patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,129 +28,88 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-Is it correct to assume that current 16.04.2 Xenial with the 2.5 QEMU
-package, doesn't have this patch and can't generate MiB aligned Azure
-images with qemu-img (no force_size support) ?
+This is the v2 patch set that I posted last week.
+It even acquired some new R-b.  Whee!
 
-Any recommended PPA backport of QEMU from 16.10 (2.6+) ?
 
-cheers.
+r~
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1490611
 
-Title:
-  Using qemu >=3D2.2.1 to convert raw->VHD (fixed) adds extra padding to
-  the result file, which Microsoft Azure rejects as invalid
+The following changes since commit 305e6c8a2ff7a6e3f4942b50e853230f18eeb5a9:
 
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Xenial:
-  In Progress
+  Merge remote-tracking branch 'remotes/stefanha/tags/tracing-pull-request' into staging (2017-02-13 16:44:04 +0000)
 
-Bug description:
-  [Impact]
+are available in the git repository at:
 
-  =C2=A0* Starting with a raw disk image, using "qemu-img convert" to conve=
-rt
-  from raw to VHD results in the output VHD file's virtual size being
-  aligned to the nearest 516096 bytes (16 heads x 63 sectors per head x
-  512 bytes per sector), instead of preserving the input file's size as
-  the output VHD's virtual disk size.
+  git://github.com/rth7680/qemu.git tags/pull-or-20170214
 
-  =C2=A0* Microsoft Azure requires that disk images (VHDs) submitted for
-  upload have virtual sizes aligned to a megabyte boundary. (Ex. 4096MB,
-  4097MB, 4098MB, etc. are OK, 4096.5MB is rejected with an error.) This
-  is reflected in Microsoft's documentation: https://azure.microsoft.com
-  /en-us/documentation/articles/virtual-machines-linux-create-upload-
-  vhd-generic/
+for you to fetch changes up to 6597c28d618a3d16d468770b7c30a0237a8c8ea9:
 
-  =C2=A0* The fix for this bug is a backport from upstream.
-  http://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Dfb9245c2610932d33ce14
+  target/openrisc: Optimize for r0 being zero (2017-02-14 08:15:00 +1100)
 
-  [Test Case]
+----------------------------------------------------------------
+Queued openrisc patches
 
-  =C2=A0* This is reproducible with the following set of commands (including
-  the Azure command line tools from https://github.com/Azure/azure-
-  xplat-cli). For the following example, I used qemu version 2.2.1:
+----------------------------------------------------------------
+Richard Henderson (23):
+      target/openrisc: Rename the cpu from or32 to or1k
+      linux-user: Add MMAP_SHIFT for openrisc
+      linux-user: Fix openrisc cpu_loop
+      linux-user: Honor CLONE_SETTLS for openrisc
+      target/openrisc: Implement lwa, swa
+      target/openrisc: Tidy insn dumping
+      target/openrisc: Rationalize immediate extraction
+      target/openrisc: Streamline arithmetic and OVE
+      target/openrisc: Put SR[OVE] in TB flags
+      target/openrisc: Invert the decoding in dec_calc
+      target/openrisc: Keep SR_F in a separate variable
+      target/openrisc: Keep SR_CY and SR_OV in a separate variables
+      target/openrisc: Use movcond where appropriate
+      target/openrisc: Set flags on helpers
+      target/openrisc: Enable trap, csync, msync, psync for user mode
+      target/openrisc: Implement msync
+      target/openrisc: Represent MACHI:MACLO as a single unit
+      target/openrisc: Implement muld, muldu, macu, msbu
+      target/openrisc: Fix madd
+      target/openrisc: Optimize l.jal to next
+      target/openrisc: Tidy ppc/npc implementation
+      target/openrisc: Tidy handling of delayed branches
+      target/openrisc: Optimize for r0 being zero
 
-  $ dd if=3D/dev/zero of=3Dsource-disk.img bs=3D1M count=3D4096
+Stafford Horne (1):
+      target/openrisc: Fix exception handling status registers
 
-  $ stat source-disk.img
-  =C2=A0=C2=A0File: =E2=80=98source-disk.img=E2=80=99
-  =C2=A0=C2=A0Size: 4294967296      Blocks: 798656     IO Block: 4096   reg=
-ular file
-  Device: fc01h/64513d    Inode: 13247963    Links: 1
-  Access: (0644/-rw-r--r--)  Uid: ( 1000/  smkent)   Gid: ( 1000/  smkent)
-  Access: 2015-08-18 09:48:02.613988480 -0700
-  Modify: 2015-08-18 09:48:02.825985646 -0700
-  Change: 2015-08-18 09:48:02.825985646 -0700
-  =C2=A0Birth: -
-
-  $ qemu-img convert -f raw -o subformat=3Dfixed -O vpc source-disk.img
-  dest-disk.vhd
-
-  $ stat dest-disk.vhd
-  =C2=A0=C2=A0File: =E2=80=98dest-disk.vhd=E2=80=99
-  =C2=A0=C2=A0Size: 4296499712      Blocks: 535216     IO Block: 4096   reg=
-ular file
-  Device: fc01h/64513d    Inode: 13247964    Links: 1
-  Access: (0644/-rw-r--r--)  Uid: ( 1000/  smkent)   Gid: ( 1000/  smkent)
-  Access: 2015-08-18 09:50:22.252077624 -0700
-  Modify: 2015-08-18 09:49:24.424868868 -0700
-  Change: 2015-08-18 09:49:24.424868868 -0700
-  =C2=A0Birth: -
-
-  $ azure vm image create testimage1 dest-disk.vhd -o linux -l "West US"
-  info:    Executing command vm image create
-  + Retrieving storage accounts
-  info:    VHD size : 4097 MB
-  info:    Uploading 4195800.5 KB
-  Requested:100.0% Completed:100.0% Running:   0 Time: 1m 0s Speed:  6744 K=
-B/s
-  info:    https://[redacted].blob.core.windows.net/vm-images/dest-disk.vhd=
- was uploaded successfully
-  error:   The VHD https://[redacted].blob.core.windows.net/vm-images/dest-=
-disk.vhd has an unsupported virtual size of 4296499200 bytes.  The size mus=
-t be a whole number (in MBs).
-  info:    Error information has been recorded to /home/smkent/.azure/azure=
-.err
-  error:   vm image create command failed
-
-  =C2=A0* A fixed qemu-img will not result in an error during azure image
-  creation. It will require passing -o force_size, which will leverage
-  the backported functionality.
-
-  [Regression Potential]
-
-  =C2=A0* The upstream fix introduces a qemu-img option (-o force_size) whi=
-ch
-  is unset by default. The regression potential is very low, as a
-  result.
-
-  ...
-
-  I also ran the above commands using qemu 2.4.0, which resulted in the
-  same error as the conversion behavior is the same.
-
-  However, qemu 2.1.1 and earlier (including qemu 2.0.0 installed by
-  Ubuntu 14.04) does not pad the virtual disk size during conversion.
-  Using qemu-img convert from qemu versions <=3D2.1.1 results in a VHD
-  that is exactly the size of the raw input file plus 512 bytes (for the
-  VHD footer). Those qemu versions do not attempt to realign the disk.
-  As a result, Azure accepts VHD files created using those versions of
-  qemu-img convert for upload.
-
-  Is there a reason why newer qemu realigns the converted VHD file? It
-  would be useful if an option were added to disable this feature, as
-  current versions of qemu cannot be used to create VHD files for Azure
-  using Microsoft's official instructions.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1490611/+subscriptions
+ configure                            |    6 +-
+ default-configs/or1k-linux-user.mak  |    1 +
+ default-configs/or1k-softmmu.mak     |    4 +
+ default-configs/or32-linux-user.mak  |    1 -
+ default-configs/or32-softmmu.mak     |    4 -
+ hw/openrisc/openrisc_sim.c           |    4 +-
+ linux-user/elfload.c                 |    3 +-
+ linux-user/main.c                    |   98 +--
+ linux-user/openrisc/target_cpu.h     |    4 +-
+ linux-user/openrisc/target_syscall.h |    2 +
+ target/openrisc/Makefile.objs        |    2 +-
+ target/openrisc/cpu.c                |    1 +
+ target/openrisc/cpu.h                |   50 +-
+ target/openrisc/exception_helper.c   |   32 +
+ target/openrisc/fpu_helper.c         |   68 +-
+ target/openrisc/gdbstub.c            |   17 +-
+ target/openrisc/helper.h             |   33 +-
+ target/openrisc/int_helper.c         |   61 --
+ target/openrisc/interrupt.c          |   14 +-
+ target/openrisc/interrupt_helper.c   |    4 +-
+ target/openrisc/machine.c            |   62 +-
+ target/openrisc/mmu.c                |    1 +
+ target/openrisc/sys_helper.c         |   62 +-
+ target/openrisc/translate.c          | 1389 ++++++++++++++++------------------
+ tests/tcg/openrisc/Makefile          |    4 +-
+ 25 files changed, 915 insertions(+), 1012 deletions(-)
+ create mode 100644 default-configs/or1k-linux-user.mak
+ create mode 100644 default-configs/or1k-softmmu.mak
+ delete mode 100644 default-configs/or32-linux-user.mak
+ delete mode 100644 default-configs/or32-softmmu.mak
+ delete mode 100644 target/openrisc/int_helper.c
