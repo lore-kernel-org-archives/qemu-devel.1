@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cdFSX-0005VY-7w
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:10:23 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cdFSO-0005KZ-4A
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:10:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cdFSV-0002g8-Ky
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:10:21 -0500
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:33964)
+	(envelope-from <alex.bennee@linaro.org>) id 1cdFSM-0002bt-JT
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:10:12 -0500
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:38592)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cdFSV-0002fk-CJ
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:10:19 -0500
-Received: by mail-wm0-x231.google.com with SMTP id 196so6078361wmm.1
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 04:10:19 -0800 (PST)
+	id 1cdFSM-0002b7-B4
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:10:10 -0500
+Received: by mail-wm0-x22b.google.com with SMTP id r141so92386935wmg.1
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 04:10:10 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 13 Feb 2017 12:10:11 +0000
-Message-Id: <20170213121017.12907-19-alex.bennee@linaro.org>
+Date: Mon, 13 Feb 2017 12:10:02 +0000
+Message-Id: <20170213121017.12907-10-alex.bennee@linaro.org>
 In-Reply-To: <20170213121017.12907-1-alex.bennee@linaro.org>
 References: <20170213121017.12907-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v12 18/24] cputlb: atomically update tlb fields
- used by tlb_reset_dirty
+Subject: [Qemu-devel] [PATCH v12 09/24] tcg: remove global exit_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,245 +32,145 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, rth@twiddle.net
 Cc: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-The main use case for tlb_reset_dirty is to set the TLB_NOTDIRTY flags
-in TLB entries to force the slow-path on writes. This is used to mark
-page ranges containing code which has been translated so it can be
-invalidated if written to. To do this safely we need to ensure the TLB
-entries in question for all vCPUs are updated before we attempt to run
-the code otherwise a race could be introduced.
+There are now only two uses of the global exit_request left.
 
-To achieve this we atomically set the flag in tlb_reset_dirty_range and
-take care when setting it when the TLB entry is filled.
+The first ensures we exit the run_loop when we first start to process
+pending work and in the kick handler. This is just as easily done by
+setting the first_cpu->exit_request flag.
 
-On 32 bit systems attempting to emulate 64 bit guests we don't even
-bother as we might not have the atomic primitives available. MTTCG is
-disabled in this case and can't be forced on. The copy_tlb_helper
-function helps keep the atomic semantics in one place to avoid
-confusion.
+The second use is in the round robin kick routine. The global
+exit_request ensured every vCPU would set its local exit_request and
+cause a full exit of the loop. Now the iothread isn't being held while
+running we can just rely on the kick handler to push us out as intended.
 
-The dirty helper function is made static as it isn't used outside of
-cputlb.
+We lightly re-factor the main vCPU thread to ensure cpu->exit_requests
+cause us to exit the main loop and process any IO requests that might
+come along.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
-v6
-  - use TARGET_PAGE_BITS_MIN
-  - use run_on_cpu helpers
-v7
-  - fix tlb_debug fmt for 32bit build
-  - un-merged the mmuidx async work which got mashed in last round
-  - introduced copy_tlb_helper function and made TCG_OVERSIZED_GUEST aware
+v5
+  - minor merge conflict with kick patch
+v4
+  - moved to after iothread unlocking patch
+  - needed to remove kick exit_request as well.
+  - remove extraneous cpu->exit_request check
+  - remove stray exit_request setting
+  - remove needless atomic operation
 ---
- cputlb.c              | 120 +++++++++++++++++++++++++++++++++++++++-----------
- include/exec/cputlb.h |   2 -
- 2 files changed, 95 insertions(+), 27 deletions(-)
+ cpu-exec-common.c       |  2 --
+ cpu-exec.c              |  9 ++-------
+ cpus.c                  | 18 ++++++++++--------
+ include/exec/exec-all.h |  3 ---
+ 4 files changed, 12 insertions(+), 20 deletions(-)
 
-diff --git a/cputlb.c b/cputlb.c
-index c50254be26..65003350e3 100644
---- a/cputlb.c
-+++ b/cputlb.c
-@@ -342,32 +342,90 @@ void tlb_unprotect_code(ram_addr_t ram_addr)
-     cpu_physical_memory_set_dirty_flag(ram_addr, DIRTY_MEMORY_CODE);
- }
- 
--static bool tlb_is_dirty_ram(CPUTLBEntry *tlbe)
--{
--    return (tlbe->addr_write & (TLB_INVALID_MASK|TLB_MMIO|TLB_NOTDIRTY)) == 0;
--}
- 
--void tlb_reset_dirty_range(CPUTLBEntry *tlb_entry, uintptr_t start,
-+/*
-+ * Dirty write flag handling
-+ *
-+ * When the TCG code writes to a location it looks up the address in
-+ * the TLB and uses that data to compute the final address. If any of
-+ * the lower bits of the address are set then the slow path is forced.
-+ * There are a number of reasons to do this but for normal RAM the
-+ * most usual is detecting writes to code regions which may invalidate
-+ * generated code.
-+ *
-+ * Because we want other vCPUs to respond to changes straight away we
-+ * update the te->addr_write field atomically. If the TLB entry has
-+ * been changed by the vCPU in the mean time we skip the update.
-+ *
-+ * As this function uses atomic accesses we also need to ensure
-+ * updates to tlb_entries follow the same access rules. We don't need
-+ * to worry about this for oversized guests as MTTCG is disabled for
-+ * them.
-+ */
-+
-+static void tlb_reset_dirty_range(CPUTLBEntry *tlb_entry, uintptr_t start,
-                            uintptr_t length)
- {
--    uintptr_t addr;
-+#if TCG_OVERSIZED_GUEST
-+    uintptr_t addr = tlb_entry->addr_write;
- 
--    if (tlb_is_dirty_ram(tlb_entry)) {
--        addr = (tlb_entry->addr_write & TARGET_PAGE_MASK) + tlb_entry->addend;
-+    if ((addr & (TLB_INVALID_MASK | TLB_MMIO | TLB_NOTDIRTY)) == 0) {
-+        addr &= TARGET_PAGE_MASK;
-+        addr += tlb_entry->addend;
-         if ((addr - start) < length) {
-             tlb_entry->addr_write |= TLB_NOTDIRTY;
-         }
-     }
-+#else
-+    /* paired with atomic_mb_set in tlb_set_page_with_attrs */
-+    uintptr_t orig_addr = atomic_mb_read(&tlb_entry->addr_write);
-+    uintptr_t addr = orig_addr;
-+
-+    if ((addr & (TLB_INVALID_MASK | TLB_MMIO | TLB_NOTDIRTY)) == 0) {
-+        addr &= TARGET_PAGE_MASK;
-+        addr += atomic_read(&tlb_entry->addend);
-+        if ((addr - start) < length) {
-+            uintptr_t notdirty_addr = orig_addr | TLB_NOTDIRTY;
-+            atomic_cmpxchg(&tlb_entry->addr_write, orig_addr, notdirty_addr);
-+        }
-+    }
-+#endif
-+}
-+
-+/* For atomic correctness when running MTTCG we need to use the right
-+ * primitives when copying entries */
-+static inline void copy_tlb_helper(CPUTLBEntry *d, CPUTLBEntry *s,
-+                                   bool atomic_set)
-+{
-+#if TCG_OVERSIZED_GUEST
-+    *d = *s;
-+#else
-+    if (atomic_set) {
-+        d->addr_read = s->addr_read;
-+        d->addr_code = s->addr_code;
-+        atomic_set(&d->addend, atomic_read(&s->addend));
-+        /* Pairs with flag setting in tlb_reset_dirty_range */
-+        atomic_mb_set(&d->addr_write, atomic_read(&s->addr_write));
-+    } else {
-+        d->addr_read = s->addr_read;
-+        d->addr_write = atomic_read(&s->addr_write);
-+        d->addr_code = s->addr_code;
-+        d->addend = atomic_read(&s->addend);
-+    }
-+#endif
- }
- 
-+/* This is a cross vCPU call (i.e. another vCPU resetting the flags of
-+ * the target vCPU). As such care needs to be taken that we don't
-+ * dangerously race with another vCPU update. The only thing actually
-+ * updated is the target TLB entry ->addr_write flags.
-+ */
- void tlb_reset_dirty(CPUState *cpu, ram_addr_t start1, ram_addr_t length)
- {
-     CPUArchState *env;
- 
-     int mmu_idx;
- 
--    assert_cpu_is_self(cpu);
--
-     env = cpu->env_ptr;
-     for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
-         unsigned int i;
-@@ -455,7 +513,7 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
-     target_ulong address;
-     target_ulong code_address;
-     uintptr_t addend;
--    CPUTLBEntry *te;
-+    CPUTLBEntry *te, *tv, tn;
-     hwaddr iotlb, xlat, sz;
-     unsigned vidx = env->vtlb_index++ % CPU_VTLB_SIZE;
-     int asidx = cpu_asidx_from_attrs(cpu, attrs);
-@@ -490,41 +548,50 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
- 
-     index = (vaddr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
-     te = &env->tlb_table[mmu_idx][index];
--
-     /* do not discard the translation in te, evict it into a victim tlb */
--    env->tlb_v_table[mmu_idx][vidx] = *te;
-+    tv = &env->tlb_v_table[mmu_idx][vidx];
-+
-+    /* addr_write can race with tlb_reset_dirty_range */
-+    copy_tlb_helper(tv, te, true);
-+
-     env->iotlb_v[mmu_idx][vidx] = env->iotlb[mmu_idx][index];
- 
-     /* refill the tlb */
-     env->iotlb[mmu_idx][index].addr = iotlb - vaddr;
-     env->iotlb[mmu_idx][index].attrs = attrs;
--    te->addend = addend - vaddr;
-+
-+    /* Now calculate the new entry */
-+    tn.addend = addend - vaddr;
-     if (prot & PAGE_READ) {
--        te->addr_read = address;
-+        tn.addr_read = address;
-     } else {
--        te->addr_read = -1;
-+        tn.addr_read = -1;
-     }
- 
-     if (prot & PAGE_EXEC) {
--        te->addr_code = code_address;
-+        tn.addr_code = code_address;
-     } else {
--        te->addr_code = -1;
-+        tn.addr_code = -1;
-     }
-+
-+    tn.addr_write = -1;
-     if (prot & PAGE_WRITE) {
-         if ((memory_region_is_ram(section->mr) && section->readonly)
-             || memory_region_is_romd(section->mr)) {
-             /* Write access calls the I/O callback.  */
--            te->addr_write = address | TLB_MMIO;
-+            tn.addr_write = address | TLB_MMIO;
-         } else if (memory_region_is_ram(section->mr)
-                    && cpu_physical_memory_is_clean(
-                         memory_region_get_ram_addr(section->mr) + xlat)) {
--            te->addr_write = address | TLB_NOTDIRTY;
-+            tn.addr_write = address | TLB_NOTDIRTY;
-         } else {
--            te->addr_write = address;
-+            tn.addr_write = address;
-         }
--    } else {
--        te->addr_write = -1;
-     }
-+
-+    /* Pairs with flag setting in tlb_reset_dirty_range */
-+    copy_tlb_helper(te, &tn, true);
-+    /* atomic_mb_set(&te->addr_write, write_address); */
- }
- 
- /* Add a new TLB entry, but without specifying the memory
-@@ -687,10 +754,13 @@ static bool victim_tlb_hit(CPUArchState *env, size_t mmu_idx, size_t index,
-         if (cmp == page) {
-             /* Found entry in victim tlb, swap tlb and iotlb.  */
-             CPUTLBEntry tmptlb, *tlb = &env->tlb_table[mmu_idx][index];
-+
-+            copy_tlb_helper(&tmptlb, tlb, false);
-+            copy_tlb_helper(tlb, vtlb, true);
-+            copy_tlb_helper(vtlb, &tmptlb, true);
-+
-             CPUIOTLBEntry tmpio, *io = &env->iotlb[mmu_idx][index];
-             CPUIOTLBEntry *vio = &env->iotlb_v[mmu_idx][vidx];
--
--            tmptlb = *tlb; *tlb = *vtlb; *vtlb = tmptlb;
-             tmpio = *io; *io = *vio; *vio = tmpio;
-             return true;
-         }
-diff --git a/include/exec/cputlb.h b/include/exec/cputlb.h
-index d454c005b7..3f941783c5 100644
---- a/include/exec/cputlb.h
-+++ b/include/exec/cputlb.h
+diff --git a/cpu-exec-common.c b/cpu-exec-common.c
+index e2bc053372..0504a9457b 100644
+--- a/cpu-exec-common.c
++++ b/cpu-exec-common.c
 @@ -23,8 +23,6 @@
- /* cputlb.c */
- void tlb_protect_code(ram_addr_t ram_addr);
- void tlb_unprotect_code(ram_addr_t ram_addr);
--void tlb_reset_dirty_range(CPUTLBEntry *tlb_entry, uintptr_t start,
--                           uintptr_t length);
- extern int tlb_flush_count;
+ #include "exec/exec-all.h"
+ #include "exec/memory-internal.h"
  
+-bool exit_request;
+-
+ /* exit the current TB, but without causing any exception to be raised */
+ void cpu_loop_exit_noexc(CPUState *cpu)
+ {
+diff --git a/cpu-exec.c b/cpu-exec.c
+index bd47609074..94628b90cd 100644
+--- a/cpu-exec.c
++++ b/cpu-exec.c
+@@ -565,9 +565,8 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
+         /* Something asked us to stop executing
+          * chained TBs; just continue round the main
+          * loop. Whatever requested the exit will also
+-         * have set something else (eg exit_request or
+-         * interrupt_request) which we will handle
+-         * next time around the loop.  But we need to
++         * have set something else (eg interrupt_request) which we
++         * will handle next time around the loop.  But we need to
+          * ensure the tcg_exit_req read in generated code
+          * comes before the next read of cpu->exit_request
+          * or cpu->interrupt_request.
+@@ -623,10 +622,6 @@ int cpu_exec(CPUState *cpu)
+ 
+     rcu_read_lock();
+ 
+-    if (unlikely(atomic_mb_read(&exit_request))) {
+-        cpu->exit_request = 1;
+-    }
+-
+     cc->cpu_exec_enter(cpu);
+ 
+     /* Calculate difference between guest clock and host clock.
+diff --git a/cpus.c b/cpus.c
+index 73c54dffd3..010a946de8 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -793,7 +793,6 @@ static inline int64_t qemu_tcg_next_kick(void)
+ static void qemu_cpu_kick_rr_cpu(void)
+ {
+     CPUState *cpu;
+-    atomic_mb_set(&exit_request, 1);
+     do {
+         cpu = atomic_mb_read(&tcg_current_rr_cpu);
+         if (cpu) {
+@@ -1316,11 +1315,11 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+ 
+     start_tcg_kick_timer();
+ 
+-    /* process any pending work */
+-    atomic_mb_set(&exit_request, 1);
+-
+     cpu = first_cpu;
+ 
++    /* process any pending work */
++    cpu->exit_request = 1;
++
+     while (1) {
+         /* Account partial waits to QEMU_CLOCK_VIRTUAL.  */
+         qemu_account_warp_timer();
+@@ -1329,7 +1328,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+             cpu = first_cpu;
+         }
+ 
+-        for (; cpu != NULL && !exit_request; cpu = CPU_NEXT(cpu)) {
++        while (cpu && !cpu->exit_request) {
+             atomic_mb_set(&tcg_current_rr_cpu, cpu);
+ 
+             qemu_clock_enable(QEMU_CLOCK_VIRTUAL,
+@@ -1349,12 +1348,15 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+                 break;
+             }
+ 
+-        } /* for cpu.. */
++            cpu = CPU_NEXT(cpu);
++        } /* while (cpu && !cpu->exit_request).. */
++
+         /* Does not need atomic_mb_set because a spurious wakeup is okay.  */
+         atomic_set(&tcg_current_rr_cpu, NULL);
+ 
+-        /* Pairs with smp_wmb in qemu_cpu_kick.  */
+-        atomic_mb_set(&exit_request, 0);
++        if (cpu && cpu->exit_request) {
++            atomic_mb_set(&cpu->exit_request, 0);
++        }
+ 
+         handle_icount_deadline();
+ 
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index 3cbd359dd7..bd4622ac5d 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -403,7 +403,4 @@ bool memory_region_is_unassigned(MemoryRegion *mr);
+ /* vl.c */
+ extern int singlestep;
+ 
+-/* cpu-exec.c, accessed with atomic_mb_read/atomic_mb_set */
+-extern bool exit_request;
+-
  #endif
 -- 
 2.11.0
