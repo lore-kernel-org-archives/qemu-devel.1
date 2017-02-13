@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cdFYx-0003UK-1f
+	(envelope-from <alex.bennee@linaro.org>) id 1cdFYx-0003UF-0T
 	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:17:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cdFYt-00041f-0R
+	(envelope-from <alex.bennee@linaro.org>) id 1cdFYv-00042O-4b
 	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:16:58 -0500
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:37258)
+Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:33399)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cdFYs-00041P-Pb
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:16:54 -0500
-Received: by mail-wm0-x235.google.com with SMTP id v77so92124814wmv.0
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 04:16:54 -0800 (PST)
+	id 1cdFYu-00042C-SO
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:16:57 -0500
+Received: by mail-wr0-x22b.google.com with SMTP id i10so149216891wrb.0
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 04:16:56 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 13 Feb 2017 12:10:14 +0000
-Message-Id: <20170213121017.12907-22-alex.bennee@linaro.org>
+Date: Mon, 13 Feb 2017 12:10:16 +0000
+Message-Id: <20170213121017.12907-24-alex.bennee@linaro.org>
 In-Reply-To: <20170213121017.12907-1-alex.bennee@linaro.org>
 References: <20170213121017.12907-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v12 21/24] target-arm: don't generate WFE/YIELD
- calls for MTTCG
+Subject: [Qemu-devel] [PATCH v12 23/24] hw/misc/imx6_src: defer clearing of
+ SRC_SCR reset bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,101 +31,140 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, rth@twiddle.net
-Cc: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
+Cc: mttcg@listserver.greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Chubb <peter.chubb@nicta.com.au>, "open list:i.MX31" <qemu-arm@nongnu.org>
 
-The WFE and YIELD instructions are really only hints and in TCG's case
-they were useful to move the scheduling on from one vCPU to the next. In
-the parallel context (MTTCG) this just causes an unnecessary cpu_exit
-and contention of the BQL.
+The arm_reset_cpu/set_cpu_on/set_cpu_off() functions do their work
+asynchronously in the target vCPUs context. As a result we need to
+ensure the SRC_SCR reset bits correctly report the reset status at the
+right time. To do this we defer the clearing of the bit with an async
+job which will run after the work queued by ARM powerctl functions.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/op_helper.c     |  7 +++++++
- target/arm/translate-a64.c |  8 ++++++--
- target/arm/translate.c     | 20 ++++++++++++++++----
- 3 files changed, 29 insertions(+), 6 deletions(-)
 
-diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-index 5f3e3bdae2..d64c8670fa 100644
---- a/target/arm/op_helper.c
-+++ b/target/arm/op_helper.c
-@@ -436,6 +436,13 @@ void HELPER(yield)(CPUARMState *env)
-     ARMCPU *cpu = arm_env_get_cpu(env);
-     CPUState *cs = CPU(cpu);
+---
+
+v12
+  - s/src_scr_reset_info/SRCSCRResetInfo/
+  - use int for reset_bit;
+---
+ hw/misc/imx6_src.c | 58 +++++++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 49 insertions(+), 9 deletions(-)
+
+diff --git a/hw/misc/imx6_src.c b/hw/misc/imx6_src.c
+index 55b817b8d7..edbb756c36 100644
+--- a/hw/misc/imx6_src.c
++++ b/hw/misc/imx6_src.c
+@@ -14,6 +14,7 @@
+ #include "qemu/bitops.h"
+ #include "qemu/log.h"
+ #include "arm-powerctl.h"
++#include "qom/cpu.h"
  
-+    /* When running in MTTCG we don't generate jumps to the yield and
-+     * WFE helpers as it won't affect the scheduling of other vCPUs.
-+     * If we wanted to more completely model WFE/SEV so we don't busy
-+     * spin unnecessarily we would need to do something more involved.
-+     */
-+    g_assert(!parallel_cpus);
-+
-     /* This is a non-trappable hint instruction that generally indicates
-      * that the guest is currently busy-looping. Yield control back to the
-      * top level loop so that a more deserving VCPU has a chance to run.
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index e61bbd6b3b..e15eae6d41 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -1328,10 +1328,14 @@ static void handle_hint(DisasContext *s, uint32_t insn,
-         s->is_jmp = DISAS_WFI;
-         return;
-     case 1: /* YIELD */
--        s->is_jmp = DISAS_YIELD;
-+        if (!parallel_cpus) {
-+            s->is_jmp = DISAS_YIELD;
-+        }
-         return;
-     case 2: /* WFE */
--        s->is_jmp = DISAS_WFE;
-+        if (!parallel_cpus) {
-+            s->is_jmp = DISAS_WFE;
-+        }
-         return;
-     case 4: /* SEV */
-     case 5: /* SEVL */
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 4436d8f3a2..abc1f77ee4 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -4404,20 +4404,32 @@ static void gen_exception_return(DisasContext *s, TCGv_i32 pc)
-     gen_rfe(s, pc, load_cpu_field(spsr));
+ #ifndef DEBUG_IMX6_SRC
+ #define DEBUG_IMX6_SRC 0
+@@ -113,6 +114,45 @@ static uint64_t imx6_src_read(void *opaque, hwaddr offset, unsigned size)
+     return value;
  }
  
-+/*
-+ * For WFI we will halt the vCPU until an IRQ. For WFE and YIELD we
-+ * only call the helper when running single threaded TCG code to ensure
-+ * the next round-robin scheduled vCPU gets a crack. In MTTCG mode we
-+ * just skip this instruction. Currently the SEV/SEVL instructions
-+ * which are *one* of many ways to wake the CPU from WFE are not
-+ * implemented so we can't sleep like WFI does.
++
++/* The reset is asynchronous so we need to defer clearing the reset
++ * bit until the work is completed.
 + */
- static void gen_nop_hint(DisasContext *s, int val)
++
++struct SRCSCRResetInfo {
++    IMX6SRCState *s;
++    int reset_bit;
++};
++
++static void imx6_clear_reset_bit(CPUState *cpu, run_on_cpu_data data)
++{
++    struct SRCSCRResetInfo *ri = data.host_ptr;
++    IMX6SRCState *s = ri->s;
++
++    assert(qemu_mutex_iothread_locked());
++
++    s->regs[SRC_SCR] = deposit32(s->regs[SRC_SCR], ri->reset_bit, 1, 0);
++    DPRINTF("reg[%s] <= 0x%" PRIx32 "\n",
++            imx6_src_reg_name(SRC_SCR), s->regs[SRC_SCR]);
++
++    g_free(ri);
++}
++
++static void imx6_defer_clear_reset_bit(int cpuid,
++                                       IMX6SRCState *s,
++                                       unsigned long reset_shift)
++{
++    struct SRCSCRResetInfo *ri;
++
++    ri = g_malloc(sizeof(struct SRCSCRResetInfo));
++    ri->s = s;
++    ri->reset_bit = reset_shift;
++
++    async_run_on_cpu(arm_get_cpu_by_id(cpuid), imx6_clear_reset_bit,
++                     RUN_ON_CPU_HOST_PTR(ri));
++}
++
++
+ static void imx6_src_write(void *opaque, hwaddr offset, uint64_t value,
+                            unsigned size)
  {
-     switch (val) {
-     case 1: /* yield */
--        gen_set_pc_im(s, s->pc);
--        s->is_jmp = DISAS_YIELD;
-+        if (!parallel_cpus) {
-+            gen_set_pc_im(s, s->pc);
-+            s->is_jmp = DISAS_YIELD;
-+        }
-         break;
-     case 3: /* wfi */
-         gen_set_pc_im(s, s->pc);
-         s->is_jmp = DISAS_WFI;
-         break;
-     case 2: /* wfe */
--        gen_set_pc_im(s, s->pc);
--        s->is_jmp = DISAS_WFE;
-+        if (!parallel_cpus) {
-+            gen_set_pc_im(s, s->pc);
-+            s->is_jmp = DISAS_WFE;
-+        }
-         break;
-     case 4: /* sev */
-     case 5: /* sevl */
+@@ -153,7 +193,7 @@ static void imx6_src_write(void *opaque, hwaddr offset, uint64_t value,
+                 arm_set_cpu_off(3);
+             }
+             /* We clear the reset bits as the processor changed state */
+-            clear_bit(CORE3_RST_SHIFT, &current_value);
++            imx6_defer_clear_reset_bit(3, s, CORE3_RST_SHIFT);
+             clear_bit(CORE3_RST_SHIFT, &change_mask);
+         }
+         if (EXTRACT(change_mask, CORE2_ENABLE)) {
+@@ -162,11 +202,11 @@ static void imx6_src_write(void *opaque, hwaddr offset, uint64_t value,
+                 arm_set_cpu_on(2, s->regs[SRC_GPR5], s->regs[SRC_GPR6],
+                                3, false);
+             } else {
+-                /* CORE 3 is shut down */
++                /* CORE 2 is shut down */
+                 arm_set_cpu_off(2);
+             }
+             /* We clear the reset bits as the processor changed state */
+-            clear_bit(CORE2_RST_SHIFT, &current_value);
++            imx6_defer_clear_reset_bit(2, s, CORE2_RST_SHIFT);
+             clear_bit(CORE2_RST_SHIFT, &change_mask);
+         }
+         if (EXTRACT(change_mask, CORE1_ENABLE)) {
+@@ -175,28 +215,28 @@ static void imx6_src_write(void *opaque, hwaddr offset, uint64_t value,
+                 arm_set_cpu_on(1, s->regs[SRC_GPR3], s->regs[SRC_GPR4],
+                                3, false);
+             } else {
+-                /* CORE 3 is shut down */
++                /* CORE 1 is shut down */
+                 arm_set_cpu_off(1);
+             }
+             /* We clear the reset bits as the processor changed state */
+-            clear_bit(CORE1_RST_SHIFT, &current_value);
++            imx6_defer_clear_reset_bit(1, s, CORE1_RST_SHIFT);
+             clear_bit(CORE1_RST_SHIFT, &change_mask);
+         }
+         if (EXTRACT(change_mask, CORE0_RST)) {
+             arm_reset_cpu(0);
+-            clear_bit(CORE0_RST_SHIFT, &current_value);
++            imx6_defer_clear_reset_bit(0, s, CORE0_RST_SHIFT);
+         }
+         if (EXTRACT(change_mask, CORE1_RST)) {
+             arm_reset_cpu(1);
+-            clear_bit(CORE1_RST_SHIFT, &current_value);
++            imx6_defer_clear_reset_bit(1, s, CORE1_RST_SHIFT);
+         }
+         if (EXTRACT(change_mask, CORE2_RST)) {
+             arm_reset_cpu(2);
+-            clear_bit(CORE2_RST_SHIFT, &current_value);
++            imx6_defer_clear_reset_bit(2, s, CORE2_RST_SHIFT);
+         }
+         if (EXTRACT(change_mask, CORE3_RST)) {
+             arm_reset_cpu(3);
+-            clear_bit(CORE3_RST_SHIFT, &current_value);
++            imx6_defer_clear_reset_bit(3, s, CORE3_RST_SHIFT);
+         }
+         if (EXTRACT(change_mask, SW_IPU2_RST)) {
+             /* We pretend the IPU2 is reset */
 -- 
 2.11.0
