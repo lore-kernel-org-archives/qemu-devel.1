@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55432)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cdKCF-0003E6-0f
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:13:52 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cdKF3-0005G1-5g
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:16:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cdKCD-00034F-Rr
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:13:50 -0500
-References: <20170212014724.10618-1-mreitz@redhat.com>
-	<w51lgtazdqs.fsf@maestria.local.igalia.com>
+	(envelope-from <mreitz@redhat.com>) id 1cdKEy-0003lX-RZ
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:16:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36768)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1cdKEy-0003l9-JH
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:16:40 -0500
+References: <1486134413-19988-1-git-send-email-den@openvz.org>
+	<5909b505-fecb-fa98-6ae7-190b846add4c@openvz.org>
+	<169f96e8-0ca5-264d-350a-7f085905bd5b@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <8d536684-8a07-7c34-16ca-be234685ab2a@redhat.com>
-Date: Mon, 13 Feb 2017 18:13:38 +0100
+Message-ID: <a1049fab-1880-3b03-63bb-6b898ee55b40@redhat.com>
+Date: Mon, 13 Feb 2017 18:16:36 +0100
 MIME-Version: 1.0
-In-Reply-To: <w51lgtazdqs.fsf@maestria.local.igalia.com>
+In-Reply-To: <169f96e8-0ca5-264d-350a-7f085905bd5b@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="HaokacblsB190kF998C9LV3FbB8Imd2gj"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: Swap request limit
- definitions
+	boundary="F3ngW53QtrG32g1iXRcxe3pUAXdUetM8F"
+Subject: Re: [Qemu-devel] [PATCH 1/1] mirror: do not increase offset during
+ initial zero_or_discard phase - pls consider this as V3 patch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,83 +30,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: "Denis V. Lunev" <den@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HaokacblsB190kF998C9LV3FbB8Imd2gj
+--F3ngW53QtrG32g1iXRcxe3pUAXdUetM8F
 From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <8d536684-8a07-7c34-16ca-be234685ab2a@redhat.com>
-Subject: Re: [Qemu-block] [PATCH] block: Swap request limit definitions
-References: <20170212014724.10618-1-mreitz@redhat.com>
- <w51lgtazdqs.fsf@maestria.local.igalia.com>
-In-Reply-To: <w51lgtazdqs.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=iso-8859-15
+To: "Denis V. Lunev" <den@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>, Jeff Cody
+ <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <a1049fab-1880-3b03-63bb-6b898ee55b40@redhat.com>
+Subject: Re: [PATCH 1/1] mirror: do not increase offset during initial
+ zero_or_discard phase - pls consider this as V3 patch
+References: <1486134413-19988-1-git-send-email-den@openvz.org>
+ <5909b505-fecb-fa98-6ae7-190b846add4c@openvz.org>
+ <169f96e8-0ca5-264d-350a-7f085905bd5b@virtuozzo.com>
+In-Reply-To: <169f96e8-0ca5-264d-350a-7f085905bd5b@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 13.02.2017 09:39, Alberto Garcia wrote:
-> On Sun 12 Feb 2017 02:47:24 AM CET, Max Reitz <mreitz@redhat.com> wrote=
-:
->=20
->> -#define BDRV_REQUEST_MAX_SECTORS MIN(SIZE_MAX >> BDRV_SECTOR_BITS, \
->> -                                     INT_MAX >> BDRV_SECTOR_BITS)
->> -#define BDRV_REQUEST_MAX_BYTES (BDRV_REQUEST_MAX_SECTORS << BDRV_SECT=
-OR_BITS)
->> +#define BDRV_REQUEST_MAX_BYTES      MIN(SIZE_MAX, INT_MAX)
->> +#define BDRV_REQUEST_MAX_SECTORS    (BDRV_REQUEST_MAX_BYTES >> BDRV_S=
-ECTOR_BITS)
->=20
-> I'm just pointing it out because I don't know if this can cause
-> problems, but this patch would make BDRV_REQUEST_MAX_BYTES not a
-> multiple of the sector size (INT_MAX is actually a prime number).
+On 13.02.2017 08:10, Denis V. Lunev wrote:
+> On 02/03/2017 06:08 PM, Denis V. Lunev wrote:
+>> On 02/03/2017 06:06 PM, Denis V. Lunev wrote:
+>>> From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+>>>
+>>> If explicit zeroing out before mirroring is required for the target i=
+mage,
+>>> it moves the block job offset counter to EOF, then offset and len cou=
+nters
+>>> count the image size twice. There is no harm but stats are confusing,=
 
-Very good point. I don't think this could be an issue, though. For one
-thing, the use of BDRV_REQUEST_MAX_BYTES is very limited.
+>>> specifically the progress of the operation is always reported as 99% =
+by
+>>> management tools.
+>>>
+>>> The patch skips offset increase for the first "technical" pass over t=
+he
+>>> image. This should not cause any further harm.
+>>>
+>>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+>>> Signed-off-by: Denis V. Lunev <den@openvz.org>
+>>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>>> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+>>> CC: Jeff Cody <jcody@redhat.com>
+>>> CC: Kevin Wolf <kwolf@redhat.com>
+>>> CC: Max Reitz <mreitz@redhat.com>
+>> actually this is V3 patch. Sorry for broken subject.
+>>
+>> Den
+> ping
 
-Apart from that, I guess the main issue would be that if you send an
-unaligned head/tail the automatic round-up would exceed
-BDRV_REQUEST_MAX_SECTORS. But this is a pre-existing issue, actually:
-When you issue a request with an unaligned head and 2G - 512 bytes
-length, bdrv_co_pwritev() will align it to 2G (which is greater than
-INT_MAX).
+Didn't Jeff merge v2?
 
-(Can be tested trivially with:
-
-$ qemu-io -c 'write 511 2147483136' --image-opts driver=3Dnull-co,size=3D=
-4G
-
-and some debugging code in block/io.c)
-
-You can make the request even bigger by increasing the
-bs->bl.request_alignment.
-
-Not a big issue, though, as bdrv_aligned_p{read,write}v() actually take
-an unsigned int and break down requests greater than INT_MAX
-automatically. As long as bs->bl.request_alignment stays under 1G or so
-we'll be fine (i.e. as long as we don't get an unsigned int overflow) --
-and when it breaks it won't be because BDRV_REQUEST_MAX_BYTES is not
-aligned to sectors.
+http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg01319.html
 
 Max
 
 
---HaokacblsB190kF998C9LV3FbB8Imd2gj
+--F3ngW53QtrG32g1iXRcxe3pUAXdUetM8F
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlih6UISHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AQbgIALE5wwqpWZ+PnDvLgZutciEjVUFrIiBJ
-KrXfL4sIRXaYz4e2ohmTS2Sr2ijJWahvzWPLcAyJh79Zdq6z36HV/cOTVwto+2Ox
-zUAz2Ae+APwyLFXqdfxMmeiRlXByuJCz/oORhbuTDOQzgaN+PP031Bu2H+cczmuF
-Ei95xDSIFizkqJk2J4z5GTkMX1o4UqWQjY7BBMPuAI9XaqnmSo7m+kW+c0JhxHdN
-DOs1fxZYqZhHGDZhWVk8jr23cvbYnkuyw/aV27TAY/GQnUuelNmo9+jCDip0jOae
-cqnEZVul//s5S7BwVrd0ZgnBTcNrce6dJ6YbS+kwrAw1bd4mrr6DJqc=
-=X3ma
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlih6fQSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9Au+EIALFnfmpOL3bGX6ApHp+afKqMCtewG35L
+6ZfbWcfb6hg9ppgUoiWXN5hGtszUl7TEGX5EXGThGS4SOO5a8R/xRy2pNyUfJmpF
+Bch+IddES/gV1eQsIEl285/78EgVckfy5UEYn3DjFqRziy7nqT+vC15R0KPm0z14
++3VQUkfQ/1UGnJIXyzPjIoGzztj50nlfaDmFylmLGkdR5IzTydctfiaJ6LMl5VJ/
+2UBBgnUjB1e1P6Oucvj8XzjWLUMj73bGbT2NvzNqCkHOiC0J1WZ/L4PMktazbdnu
+qOPLTQ8AysJNRjBlOziKFnARlWw1s6HitbPqHLbtWh/XvchfWZQGjjo=
+=7y4O
 -----END PGP SIGNATURE-----
 
---HaokacblsB190kF998C9LV3FbB8Imd2gj--
+--F3ngW53QtrG32g1iXRcxe3pUAXdUetM8F--
