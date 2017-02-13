@@ -1,34 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cdNUR-0007Ap-G9
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 15:44:52 -0500
+	(envelope-from <bounces@canonical.com>) id 1cdO7D-0003vd-Cd
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 16:24:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cdNUO-0000ak-K6
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 15:44:51 -0500
-Received: from indium.canonical.com ([91.189.90.7]:56909)
+	(envelope-from <bounces@canonical.com>) id 1cdO78-0000cz-Ta
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 16:24:55 -0500
+Received: from indium.canonical.com ([91.189.90.7]:37293)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cdNUO-0000ac-EQ
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 15:44:48 -0500
+	id 1cdO78-0000bU-Kg
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 16:24:50 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cdNUN-0003uv-18
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 20:44:47 +0000
+	id 1cdO76-0000eW-JH
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 21:24:48 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C1F0F2E80DB
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 20:44:46 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 820362E80D1
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 21:24:48 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 Feb 2017 20:32:14 -0000
-From: Thomas Huth <921208@bugs.launchpad.net>
-Reply-To: Bug 921208 <921208@bugs.launchpad.net>
+Date: Mon, 13 Feb 2017 21:08:37 -0000
+From: Alexandre <1490611@bugs.launchpad.net>
+Reply-To: Bug 1490611 <1490611@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20120124212047.2129.40489.malonedeb@wampee.canonical.com>
-Message-Id: <20170213203214.5716.99575.malone@soybean.canonical.com>
+References: <20150831152901.21817.58033.malonedeb@gac.canonical.com>
+Message-Id: <20170213210837.6044.55445.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 921208] Re: win7/x64 installer hangs on startup
- with 0x0000005d.
+Subject: [Qemu-devel] [Bug 1490611] Re: Using qemu >=2.2.1 to convert
+ raw->VHD (fixed) adds extra padding to the result file,
+ which Microsoft Azure rejects as invalid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,76 +40,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Bug has also been reported here:
-https://bugs.launchpad.net/qemu/+bug/1012023
+Is it correct to assume that current 16.04.2 Xenial with the 2.5 QEMU
+package, doesn't have this patch and can't generate MiB aligned Azure
+images with qemu-img (no force_size support) ?
+
+Any recommended PPA backport of QEMU from 16.10 (2.6+) ?
+
+cheers.
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/921208
+https://bugs.launchpad.net/bugs/1490611
 
 Title:
-  win7/x64 installer hangs on startup with 0x0000005d.
+  Using qemu >=3D2.2.1 to convert raw->VHD (fixed) adds extra padding to
+  the result file, which Microsoft Azure rejects as invalid
 
 Status in QEMU:
-  Confirmed
+  Fix Released
 Status in qemu package in Ubuntu:
-  Triaged
+  Fix Released
+Status in qemu source package in Xenial:
+  In Progress
 
 Bug description:
-  hi,
+  [Impact]
 
-  during booting win7/x64 installer i'm observing a bsod with 0x0000005d
-  ( msdn: unsupported_processor ).
+  =C2=A0* Starting with a raw disk image, using "qemu-img convert" to conve=
+rt
+  from raw to VHD results in the output VHD file's virtual size being
+  aligned to the nearest 516096 bytes (16 heads x 63 sectors per head x
+  512 bytes per sector), instead of preserving the input file's size as
+  the output VHD's virtual disk size.
 
-  used command line: qemu-system-x86_64 -m 2048 -hda w7-system.img
-  -cdrom win7_x64.iso -boot d
+  =C2=A0* Microsoft Azure requires that disk images (VHDs) submitted for
+  upload have virtual sizes aligned to a megabyte boundary. (Ex. 4096MB,
+  4097MB, 4098MB, etc. are OK, 4096.5MB is rejected with an error.) This
+  is reflected in Microsoft's documentation: https://azure.microsoft.com
+  /en-us/documentation/articles/virtual-machines-linux-create-upload-
+  vhd-generic/
 
-  adding '-machine accel=3Dkvm' instead of default tcg accel helps to
-  boot.
+  =C2=A0* The fix for this bug is a backport from upstream.
+  http://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Dfb9245c2610932d33ce14
 
-  =
+  [Test Case]
 
-  installed software:
+  =C2=A0* This is reproducible with the following set of commands (including
+  the Azure command line tools from https://github.com/Azure/azure-
+  xplat-cli). For the following example, I used qemu version 2.2.1:
 
-  qemu-1.0
-  linux-3.2.1
-  glibc-2.14.1
-  gcc-4.6.2
+  $ dd if=3D/dev/zero of=3Dsource-disk.img bs=3D1M count=3D4096
 
-  hw cpu:
+  $ stat source-disk.img
+  =C2=A0=C2=A0File: =E2=80=98source-disk.img=E2=80=99
+  =C2=A0=C2=A0Size: 4294967296      Blocks: 798656     IO Block: 4096   reg=
+ular file
+  Device: fc01h/64513d    Inode: 13247963    Links: 1
+  Access: (0644/-rw-r--r--)  Uid: ( 1000/  smkent)   Gid: ( 1000/  smkent)
+  Access: 2015-08-18 09:48:02.613988480 -0700
+  Modify: 2015-08-18 09:48:02.825985646 -0700
+  Change: 2015-08-18 09:48:02.825985646 -0700
+  =C2=A0Birth: -
 
-  processor       : 0..7
-  vendor_id       : GenuineIntel
-  cpu family      : 6
-  model           : 42
-  model name      : Intel(R) Core(TM) i7-2630QM CPU @ 2.00GHz
-  stepping        : 7
-  microcode       : 0x14
-  cpu MHz         : 1995.739
-  cache size      : 6144 KB
-  physical id     : 0
-  siblings        : 8
-  core id         : 3
-  cpu cores       : 4
-  apicid          : 7
-  initial apicid  : 7
-  fpu             : yes
-  fpu_exception   : yes
-  cpuid level     : 13
-  wp              : yes
-  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
-a cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx=
- rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonst=
-op_tsc aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx est tm2 ssse3 cx1=
-6 xtpr pdcm pcid sse4_1 sse4_2 x2apic popcnt tsc_deadline_timer xsave avx l=
-ahf_lm ida arat epb xsaveopt pln pts dts tpr_shadow vnmi flexpriority ept v=
-pid
-  bogomips        : 3992.23
-  clflush size    : 64
-  cache_alignment : 64
-  address sizes   : 36 bits physical, 48 bits virtual
+  $ qemu-img convert -f raw -o subformat=3Dfixed -O vpc source-disk.img
+  dest-disk.vhd
+
+  $ stat dest-disk.vhd
+  =C2=A0=C2=A0File: =E2=80=98dest-disk.vhd=E2=80=99
+  =C2=A0=C2=A0Size: 4296499712      Blocks: 535216     IO Block: 4096   reg=
+ular file
+  Device: fc01h/64513d    Inode: 13247964    Links: 1
+  Access: (0644/-rw-r--r--)  Uid: ( 1000/  smkent)   Gid: ( 1000/  smkent)
+  Access: 2015-08-18 09:50:22.252077624 -0700
+  Modify: 2015-08-18 09:49:24.424868868 -0700
+  Change: 2015-08-18 09:49:24.424868868 -0700
+  =C2=A0Birth: -
+
+  $ azure vm image create testimage1 dest-disk.vhd -o linux -l "West US"
+  info:    Executing command vm image create
+  + Retrieving storage accounts
+  info:    VHD size : 4097 MB
+  info:    Uploading 4195800.5 KB
+  Requested:100.0% Completed:100.0% Running:   0 Time: 1m 0s Speed:  6744 K=
+B/s
+  info:    https://[redacted].blob.core.windows.net/vm-images/dest-disk.vhd=
+ was uploaded successfully
+  error:   The VHD https://[redacted].blob.core.windows.net/vm-images/dest-=
+disk.vhd has an unsupported virtual size of 4296499200 bytes.  The size mus=
+t be a whole number (in MBs).
+  info:    Error information has been recorded to /home/smkent/.azure/azure=
+.err
+  error:   vm image create command failed
+
+  =C2=A0* A fixed qemu-img will not result in an error during azure image
+  creation. It will require passing -o force_size, which will leverage
+  the backported functionality.
+
+  [Regression Potential]
+
+  =C2=A0* The upstream fix introduces a qemu-img option (-o force_size) whi=
+ch
+  is unset by default. The regression potential is very low, as a
+  result.
+
+  ...
+
+  I also ran the above commands using qemu 2.4.0, which resulted in the
+  same error as the conversion behavior is the same.
+
+  However, qemu 2.1.1 and earlier (including qemu 2.0.0 installed by
+  Ubuntu 14.04) does not pad the virtual disk size during conversion.
+  Using qemu-img convert from qemu versions <=3D2.1.1 results in a VHD
+  that is exactly the size of the raw input file plus 512 bytes (for the
+  VHD footer). Those qemu versions do not attempt to realign the disk.
+  As a result, Azure accepts VHD files created using those versions of
+  qemu-img convert for upload.
+
+  Is there a reason why newer qemu realigns the converted VHD file? It
+  would be useful if an option were added to disable this feature, as
+  current versions of qemu cannot be used to create VHD files for Azure
+  using Microsoft's official instructions.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/921208/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1490611/+subscriptions
