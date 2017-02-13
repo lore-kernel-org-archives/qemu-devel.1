@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59900)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cdKMY-00041R-Fn
+	(envelope-from <kwolf@redhat.com>) id 1cdKMZ-00042V-GE
 	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:24:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cdKMW-0006Sx-Tv
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:24:30 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cdKMY-0006TI-2i
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 12:24:31 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 13 Feb 2017 18:22:58 +0100
-Message-Id: <1487006583-24350-37-git-send-email-kwolf@redhat.com>
+Date: Mon, 13 Feb 2017 18:23:00 +0100
+Message-Id: <1487006583-24350-39-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
 References: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 36/41] hmp: Request permissions in qemu-io
+Subject: [Qemu-devel] [RFC PATCH 38/41] nbd/server: Use real permissions for
+ NBD exports
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,178 +23,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-The HMP command 'qemu-io' is a bit tricky because it wants to work on
-the original BlockBackend, but additional permissions could be required.
-The details are explained in a comment in the code, but in summary, just
-request whatever permissions the current qemu-io command needs.
+NBD can't cope with device size changes, so resize must be forbidden,
+but otherwise we can tolerate anything. Depending on whether the export
+is writable or not, we only require consistent reads and writes.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/block-backend.c          |  6 ++++++
- hmp.c                          | 26 +++++++++++++++++++++++++-
- include/qemu-io.h              |  1 +
- include/sysemu/block-backend.h |  1 +
- qemu-io-cmds.c                 | 28 ++++++++++++++++++++++++++++
- 5 files changed, 61 insertions(+), 1 deletion(-)
+ nbd/server.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index a314284..94db555 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -573,6 +573,12 @@ int blk_set_perm(BlockBackend *blk, uint64_t perm, uint64_t shared_perm,
-     return 0;
- }
- 
-+void blk_get_perm(BlockBackend *blk, uint64_t *perm, uint64_t *shared_perm)
-+{
-+    *perm = blk->perm;
-+    *shared_perm = blk->shared_perm;
-+}
-+
- static int blk_do_attach_dev(BlockBackend *blk, void *dev)
+diff --git a/nbd/server.c b/nbd/server.c
+index deb4358..4bb37d6 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -889,10 +889,17 @@ NBDExport *nbd_export_new(BlockDriverState *bs, off_t dev_offset, off_t size,
  {
-     if (blk->dev) {
-diff --git a/hmp.c b/hmp.c
-index 801fddb..fde5016 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -2045,7 +2045,6 @@ void hmp_qemu_io(Monitor *mon, const QDict *qdict)
-     if (!blk) {
-         BlockDriverState *bs = bdrv_lookup_bs(NULL, device, &err);
-         if (bs) {
--            /* FIXME Use real permissions */
-             blk = local_blk = blk_new(0, BLK_PERM_ALL);
-             ret = blk_insert_bs(blk, bs, &err);
-             if (ret < 0) {
-@@ -2059,6 +2058,31 @@ void hmp_qemu_io(Monitor *mon, const QDict *qdict)
-     aio_context = blk_get_aio_context(blk);
-     aio_context_acquire(aio_context);
+     BlockBackend *blk;
+     NBDExport *exp = g_malloc0(sizeof(NBDExport));
++    uint64_t perm;
+     int ret;
  
-+    /*
-+     * Notably absent: Proper permission management. This is sad, but it seems
-+     * almost impossible to achieve without changing the semantics and thereby
-+     * limiting the use cases of the qemu-io HMP command.
-+     *
-+     * In an ideal world we would unconditionally create a new BlockBackend for
-+     * qemuio_command(), but we have commands like 'reopen' and want them to
-+     * take effect on the exact BlockBackend whose name the user passed instead
-+     * of just on a temporary copy of it.
-+     *
-+     * Another problem is that deleting the temporary BlockBackend involves
-+     * draining all requests on it first, but some qemu-iotests cases want to
-+     * issue multiple aio_read/write requests and expect them to complete in
-+     * the background while the monitor has already returned.
-+     *
-+     * This is also what prevents us from saving the original permissions and
-+     * restoring them later: We can't revoke permissions until all requests
-+     * have completed, and we don't know when that is nor can we really let
-+     * anything else run before we have revoken them to avoid race conditions.
-+     *
-+     * What happens now is that command() in qemu-io-cmds.c can extend the
-+     * permissions if necessary for the qemu-io command. And they simply stay
-+     * extended, possibly resulting in a read-only guest device keeping write
-+     * permissions. Ugly, but it appears to be the lesser evil.
-+     */
-     qemuio_command(blk, command);
- 
-     aio_context_release(aio_context);
-diff --git a/include/qemu-io.h b/include/qemu-io.h
-index 4d402b9..196fde0 100644
---- a/include/qemu-io.h
-+++ b/include/qemu-io.h
-@@ -36,6 +36,7 @@ typedef struct cmdinfo {
-     const char  *args;
-     const char  *oneline;
-     helpfunc_t  help;
-+    uint64_t    perm;
- } cmdinfo_t;
- 
- extern bool qemuio_misalign;
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
-index 65bd081..b400212 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -101,6 +101,7 @@ bool bdrv_has_blk(BlockDriverState *bs);
- bool bdrv_is_root_node(BlockDriverState *bs);
- int blk_set_perm(BlockBackend *blk, uint64_t perm, uint64_t shared_perm,
-                  Error **errp);
-+void blk_get_perm(BlockBackend *blk, uint64_t *perm, uint64_t *shared_perm);
- 
- void blk_set_allow_write_beyond_eof(BlockBackend *blk, bool allow);
- void blk_iostatus_enable(BlockBackend *blk);
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index e415b03..035cb96 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -83,6 +83,29 @@ static int command(BlockBackend *blk, const cmdinfo_t *ct, int argc,
-         }
-         return 0;
-     }
-+
-+    /* Request additional permissions if necessary for this command. The caller
-+     * is responsible for restoring the original permissions afterwards if this
-+     * is what it wants. */
-+    if (ct->perm && blk_is_available(blk)) {
-+        uint64_t orig_perm, orig_shared_perm;
-+        blk_get_perm(blk, &orig_perm, &orig_shared_perm);
-+
-+        if (ct->perm & ~orig_perm) {
-+            uint64_t new_perm;
-+            Error *local_err = NULL;
-+            int ret;
-+
-+            new_perm = orig_perm | ct->perm;
-+
-+            ret = blk_set_perm(blk, new_perm, orig_shared_perm, &local_err);
-+            if (ret < 0) {
-+                error_report_err(local_err);
-+                return 0;
-+            }
-+        }
+-    /* FIXME Use real permissions */
+-    blk = blk_new(0, BLK_PERM_ALL);
++    /* Don't allow resize while the NBD server is running, otherwise we don't
++     * care what happens with the node. */
++    perm = BLK_PERM_CONSISTENT_READ;
++    if ((nbdflags & NBD_FLAG_READ_ONLY) == 0) {
++        perm |= BLK_PERM_WRITE;
 +    }
-+
-     optind = 0;
-     return ct->cfunc(blk, argc, argv);
- }
-@@ -916,6 +939,7 @@ static const cmdinfo_t write_cmd = {
-     .name       = "write",
-     .altname    = "w",
-     .cfunc      = write_f,
-+    .perm       = BLK_PERM_WRITE,
-     .argmin     = 2,
-     .argmax     = -1,
-     .args       = "[-bcCfquz] [-P pattern] off len",
-@@ -1091,6 +1115,7 @@ static int writev_f(BlockBackend *blk, int argc, char **argv);
- static const cmdinfo_t writev_cmd = {
-     .name       = "writev",
-     .cfunc      = writev_f,
-+    .perm       = BLK_PERM_WRITE,
-     .argmin     = 2,
-     .argmax     = -1,
-     .args       = "[-Cfq] [-P pattern] off len [len..]",
-@@ -1390,6 +1415,7 @@ static int aio_write_f(BlockBackend *blk, int argc, char **argv);
- static const cmdinfo_t aio_write_cmd = {
-     .name       = "aio_write",
-     .cfunc      = aio_write_f,
-+    .perm       = BLK_PERM_WRITE,
-     .argmin     = 2,
-     .argmax     = -1,
-     .args       = "[-Cfiquz] [-P pattern] off len [len..]",
-@@ -1554,6 +1580,7 @@ static const cmdinfo_t truncate_cmd = {
-     .name       = "truncate",
-     .altname    = "t",
-     .cfunc      = truncate_f,
-+    .perm       = BLK_PERM_WRITE | BLK_PERM_RESIZE,
-     .argmin     = 1,
-     .argmax     = 1,
-     .args       = "off",
-@@ -1651,6 +1678,7 @@ static const cmdinfo_t discard_cmd = {
-     .name       = "discard",
-     .altname    = "d",
-     .cfunc      = discard_f,
-+    .perm       = BLK_PERM_WRITE,
-     .argmin     = 2,
-     .argmax     = -1,
-     .args       = "[-Cq] off len",
++    blk = blk_new(perm, BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
++                        BLK_PERM_WRITE | BLK_PERM_GRAPH_MOD);
+     ret = blk_insert_bs(blk, bs, errp);
+     if (ret < 0) {
+         goto fail;
 -- 
 1.8.3.1
