@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42427)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cdEjB-0003n7-31
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 06:23:30 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cdEvc-00080G-Ll
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 06:36:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cdEj7-0007XR-Cb
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 06:23:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43206)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cdEj7-0007XD-3S
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 06:23:25 -0500
-Date: Mon, 13 Feb 2017 11:23:17 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170213112317.GB12387@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1486976456-17657-1-git-send-email-jitendra.kolhe@hpe.com>
-	<20170213114546.281915f1@nial.brq.redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cdEvb-0002Bn-GD
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 06:36:20 -0500
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:36715)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cdEvb-0002BA-8m
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 06:36:19 -0500
+Received: by mail-wr0-x22a.google.com with SMTP id k90so148107148wrc.3
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 03:36:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170213114546.281915f1@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] mem-prealloc: reduce large guest
- start-up and migration time.
+In-Reply-To: <1486973851-21645-1-git-send-email-kraxel@redhat.com>
+References: <1486973851-21645-1-git-send-email-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 13 Feb 2017 11:35:57 +0000
+Message-ID: <CAFEAcA8GqHqnm9fRDBTRWXWerqHwoxiUH1TGpXxNbbW1DQ=15w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 0/6] vga patch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,138 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Jitendra Kolhe <jitendra.kolhe@hpe.com>, qemu-devel@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, armbru@redhat.com, mohan_parthasarathy@hpe.com, renganathan.meenakshisundaram@hpe.com
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, Feb 13, 2017 at 11:45:46AM +0100, Igor Mammedov wrote:
-> On Mon, 13 Feb 2017 14:30:56 +0530
-> Jitendra Kolhe <jitendra.kolhe@hpe.com> wrote:
-> 
-> > Using "-mem-prealloc" option for a large guest leads to higher guest
-> > start-up and migration time. This is because with "-mem-prealloc" option
-> > qemu tries to map every guest page (create address translations), and
-> > make sure the pages are available during runtime. virsh/libvirt by
-> > default, seems to use "-mem-prealloc" option in case the guest is
-> > configured to use huge pages. The patch tries to map all guest pages
-> > simultaneously by spawning multiple threads. Currently limiting the
-> > change to QEMU library functions on POSIX compliant host only, as we are
-> > not sure if the problem exists on win32. Below are some stats with
-> > "-mem-prealloc" option for guest configured to use huge pages.
-> > 
-> > ------------------------------------------------------------------------
-> > Idle Guest      | Start-up time | Migration time
-> > ------------------------------------------------------------------------
-> > Guest stats with 2M HugePage usage - single threaded (existing code)
-> > ------------------------------------------------------------------------
-> > 64 Core - 4TB   | 54m11.796s    | 75m43.843s
-> > 64 Core - 1TB   | 8m56.576s     | 14m29.049s
-> > 64 Core - 256GB | 2m11.245s     | 3m26.598s
-> > ------------------------------------------------------------------------
-> > Guest stats with 2M HugePage usage - map guest pages using 8 threads
-> > ------------------------------------------------------------------------
-> > 64 Core - 4TB   | 5m1.027s      | 34m10.565s
-> > 64 Core - 1TB   | 1m10.366s     | 8m28.188s
-> > 64 Core - 256GB | 0m19.040s     | 2m10.148s
-> > -----------------------------------------------------------------------
-> > Guest stats with 2M HugePage usage - map guest pages using 16 threads
-> > -----------------------------------------------------------------------
-> > 64 Core - 4TB   | 1m58.970s     | 31m43.400s
-> > 64 Core - 1TB   | 0m39.885s     | 7m55.289s
-> > 64 Core - 256GB | 0m11.960s     | 2m0.135s
-> > -----------------------------------------------------------------------
-> > 
-> > Changed in v2:
-> >  - modify number of memset threads spawned to min(smp_cpus, 16).
-> >  - removed 64GB memory restriction for spawning memset threads.
-> > 
-> > Signed-off-by: Jitendra Kolhe <jitendra.kolhe@hpe.com>
-> > ---
-> >  backends/hostmem.c   |  4 ++--
-> >  exec.c               |  2 +-
-> >  include/qemu/osdep.h |  3 ++-
-> >  util/oslib-posix.c   | 68 +++++++++++++++++++++++++++++++++++++++++++++++-----
-> >  util/oslib-win32.c   |  3 ++-
-> >  5 files changed, 69 insertions(+), 11 deletions(-)
-> > 
-> > diff --git a/backends/hostmem.c b/backends/hostmem.c
-> > index 7f5de70..162c218 100644
-> > --- a/backends/hostmem.c
-> > +++ b/backends/hostmem.c
-> > @@ -224,7 +224,7 @@ static void host_memory_backend_set_prealloc(Object *obj, bool value,
-> >          void *ptr = memory_region_get_ram_ptr(&backend->mr);
-> >          uint64_t sz = memory_region_size(&backend->mr);
-> >  
-> > -        os_mem_prealloc(fd, ptr, sz, &local_err);
-> > +        os_mem_prealloc(fd, ptr, sz, smp_cpus, &local_err);
-> >          if (local_err) {
-> >              error_propagate(errp, local_err);
-> >              return;
-> > @@ -328,7 +328,7 @@ host_memory_backend_memory_complete(UserCreatable *uc, Error **errp)
-> >           */
-> >          if (backend->prealloc) {
-> >              os_mem_prealloc(memory_region_get_fd(&backend->mr), ptr, sz,
-> > -                            &local_err);
-> > +                            smp_cpus, &local_err);
-> >              if (local_err) {
-> >                  goto out;
-> >              }
-> > diff --git a/exec.c b/exec.c
-> > index 8b9ed73..53afcd2 100644
-> > --- a/exec.c
-> > +++ b/exec.c
-> > @@ -1379,7 +1379,7 @@ static void *file_ram_alloc(RAMBlock *block,
-> >      }
-> >  
-> >      if (mem_prealloc) {
-> > -        os_mem_prealloc(fd, area, memory, errp);
-> > +        os_mem_prealloc(fd, area, memory, smp_cpus, errp);
-> >          if (errp && *errp) {
-> >              goto error;
-> >          }
-> > diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> > index 56c9e22..fb1d22b 100644
-> > --- a/include/qemu/osdep.h
-> > +++ b/include/qemu/osdep.h
-> > @@ -401,7 +401,8 @@ unsigned long qemu_getauxval(unsigned long type);
-> >  
-> >  void qemu_set_tty_echo(int fd, bool echo);
-> >  
-> > -void os_mem_prealloc(int fd, char *area, size_t sz, Error **errp);
-> > +void os_mem_prealloc(int fd, char *area, size_t sz, int smp_cpus,
-> > +                     Error **errp);
-> >  
-> >  int qemu_read_password(char *buf, int buf_size);
-> >  
-> > diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> > index f631464..17da029 100644
-> > --- a/util/oslib-posix.c
-> > +++ b/util/oslib-posix.c
-> > @@ -55,6 +55,16 @@
-> >  #include "qemu/error-report.h"
-> >  #endif
-> >  
-> > +#define MAX_MEM_PREALLOC_THREAD_COUNT 16
-> running with -smp 16 or bigger on host with less than 16 cpus
-> it would be not quite optimal.
-> Why not to change MAX_MEM_PREALLOC_THREAD_COUNT constant to
-> something like sysconf(_SC_NPROCESSORS_ONLN)
+On 13 February 2017 at 08:17, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>   Hi,
+>
+> Here comes the vga patch queue, bringing bugfixes
+> for cirrus and virtio-gpu.
+>
+> please pull,
+>   Gerd
+>
+> The following changes since commit 33d076ebd05491d9f7cace682b4ed70c33263f12:
+>
+>   Merge remote-tracking branch 'remotes/stsquad/tags/pull-travis-10022017-1' into staging (2017-02-10 15:05:37 +0000)
+>
+> are available in the git repository at:
+>
+>
+>   git://git.kraxel.org/qemu tags/pull-vga-20170213-1
+>
+> for you to fetch changes up to 12e97ec39931e5321645fd483ab761319d48bf16:
+>
+>   Revert "cirrus: allow zero source pitch in pattern fill rops" (2017-02-10 16:49:45 +0100)
+>
+> ----------------------------------------------------------------
+> vga: bugfixes for cirrus and virtio-gpu
+>
 
-The point is to not consume more host resources than would otherwise
-be consumed by running the guest CPUs. ie, if running a KVM guest
-with -smp 4 on a 16 CPU host,  QEMU should not to consume more than
-4 pCPUs worth of resource on the host.  Using sysconf would cause
-the consume to consume all host resources, likely harming other
-guests workloads.
+Applied, thanks.
 
-If the person launching QEMU gives a -smp value that's larger than
-the host CPUs count, then they've already accepted that they're
-asking QEMU todo more than the host is really capable of. IOW, I
-don't think we need to special case memsetting for that, since
-VCPU execution itself is already going to overcommit the host.
-
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+-- PMM
