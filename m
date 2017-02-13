@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cdDLZ-0002n8-5S
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cdDLb-0002nO-62
 	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 04:55:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cdDLW-0004LH-CA
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 04:55:01 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cdDLW-0004Lz-Ka
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 04:55:03 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 13 Feb 2017 12:54:49 +0300
-Message-Id: <1486979689-230770-18-git-send-email-vsementsov@virtuozzo.com>
+Date: Mon, 13 Feb 2017 12:54:39 +0300
+Message-Id: <1486979689-230770-8-git-send-email-vsementsov@virtuozzo.com>
 In-Reply-To: <1486979689-230770-1-git-send-email-vsementsov@virtuozzo.com>
 References: <1486979689-230770-1-git-send-email-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 17/17] iotests: add dirty bitmap postcopy test
+Subject: [Qemu-devel] [PATCH 07/17] qapi: add dirty-bitmaps migration
+ capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,178 +23,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, vsementsov@virtuozzo.com, lirans@il.ibm.com
 
-Test
-- start two vms (vm_a, vm_b)
-
-- in a
-    - do writes from set A
-    - do writes from set B
-    - fix bitmap sha256
-    - clear bitmap
-    - do writes from set A
-    - start migration
-- than, in b
-    - wait vm start (postcopy should start)
-    - do writes from set B
-    - check bitmap sha256
-
-The test should verify postcopy migration and then merging with delta
-(changes in target, during postcopy process).
-
-Reduce supported cache modes to only 'none', because with cache on time
-from source.STOP to target.RESUME is unpredictable and we can fail with
-timout while waiting for target.RESUME.
-
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 ---
- tests/qemu-iotests/169        | 74 +++++++++++++++++++++++++++++++++++++------
- tests/qemu-iotests/169.out    |  4 +--
- tests/qemu-iotests/iotests.py |  7 +++-
- 3 files changed, 72 insertions(+), 13 deletions(-)
+ include/migration/migration.h | 1 +
+ migration/migration.c         | 9 +++++++++
+ qapi-schema.json              | 4 +++-
+ 3 files changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/169
-index ec6cd46..333df58 100755
---- a/tests/qemu-iotests/169
-+++ b/tests/qemu-iotests/169
-@@ -29,8 +29,14 @@ fifo = os.path.join(iotests.test_dir, 'mig_fifo')
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index 35f7460..46645f4 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -307,6 +307,7 @@ void migrate_del_blocker(Error *reason);
+ bool migrate_postcopy(void);
+ bool migrate_postcopy_ram(void);
+ bool migrate_zero_blocks(void);
++bool migrate_dirty_bitmaps(void);
  
- class TestDirtyBitmapMigration(iotests.QMPTestCase):
+ bool migrate_auto_converge(void);
  
--    def setUp(self):
--        size = 0x400000000 # 1G
-+    def tearDown(self):
-+        self.vm_a.shutdown()
-+        self.vm_b.shutdown()
-+        os.remove(disk_a)
-+        os.remove(disk_b)
-+        os.remove(fifo)
-+
-+    def init(self, size):
-         os.mkfifo(fifo)
-         qemu_img('create', '-f', iotests.imgfmt, disk_a, str(size))
-         qemu_img('create', '-f', iotests.imgfmt, disk_b, str(size))
-@@ -40,14 +46,8 @@ class TestDirtyBitmapMigration(iotests.QMPTestCase):
-         self.vm_a.launch()
-         self.vm_b.launch()
+diff --git a/migration/migration.c b/migration/migration.c
+index 6ca702e..0f0c3e8 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1365,6 +1365,15 @@ int migrate_decompress_threads(void)
+     return s->parameters.decompress_threads;
+ }
  
--    def tearDown(self):
--        self.vm_a.shutdown()
--        self.vm_b.shutdown()
--        os.remove(disk_a)
--        os.remove(disk_b)
--        os.remove(fifo)
--
-     def test_migration(self):
-+        self.init(0x400000000) # 1G
-         granularity = 512
-         regions = [
-             { 'start': 0,           'count': 0x100000 },
-@@ -81,6 +81,60 @@ class TestDirtyBitmapMigration(iotests.QMPTestCase):
-                                node='drive0', name='bitmap')
-         self.assert_qmp(result, 'return/sha256', sha256);
++bool migrate_dirty_bitmaps(void)
++{
++    MigrationState *s;
++
++    s = migrate_get_current();
++
++    return s->enabled_capabilities[MIGRATION_CAPABILITY_DIRTY_BITMAPS];
++}
++
+ bool migrate_use_events(void)
+ {
+     MigrationState *s;
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 61151f3..530539e 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -865,11 +865,13 @@
+ #        side, this process is called COarse-Grain LOck Stepping (COLO) for
+ #        Non-stop Service. (since 2.8)
+ #
++# @dirty-bitmaps: If enabled, QEMU will migrate named dirty bitmaps. (since 2.9)
++#
+ # Since: 1.2
+ ##
+ { 'enum': 'MigrationCapability',
+   'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
+-           'compress', 'events', 'postcopy-ram', 'x-colo'] }
++           'compress', 'events', 'postcopy-ram', 'x-colo', 'dirty-bitmaps'] }
  
-+    def test_postcopy(self):
-+        self.init(0x4000000000) # 256G
-+        write_size = 0x40000000
-+        granularity = 512
-+        chunk = 4096
-+
-+        result = self.vm_a.qmp('block-dirty-bitmap-add', node='drive0',
-+                               name='bitmap', granularity=granularity)
-+        self.assert_qmp(result, 'return', {});
-+
-+        s = 0
-+        while s < write_size:
-+            self.vm_a.hmp_qemu_io('drive0', 'write %d %d' % (s, chunk))
-+            s += 0x10000
-+        s = 0x8000
-+        while s < write_size:
-+            self.vm_a.hmp_qemu_io('drive0', 'write %d %d' % (s, chunk))
-+            s += 0x10000
-+
-+        result = self.vm_a.qmp('x-debug-block-dirty-bitmap-sha256',
-+                               node='drive0', name='bitmap')
-+        sha256 = result['return']['sha256']
-+
-+        result = self.vm_a.qmp('block-dirty-bitmap-clear', node='drive0',
-+                               name='bitmap')
-+        self.assert_qmp(result, 'return', {});
-+        s = 0
-+        while s < write_size:
-+            self.vm_a.hmp_qemu_io('drive0', 'write %d %d' % (s, chunk))
-+            s += 0x10000
-+
-+        result = self.vm_a.qmp('migrate-set-capabilities',
-+                               capabilities=[{'capability': 'dirty-bitmaps',
-+                                              'state': True}])
-+        self.assert_qmp(result, 'return', {})
-+
-+        result = self.vm_a.qmp('migrate', uri='exec:cat>' + fifo)
-+        self.assertNotEqual(self.vm_a.event_wait("STOP"), None)
-+        self.assertNotEqual(self.vm_b.event_wait("RESUME"), None)
-+
-+        s = 0x8000
-+        while s < write_size:
-+            self.vm_b.hmp_qemu_io('drive0', 'write %d %d' % (s, chunk))
-+            s += 0x10000
-+
-+        result = self.vm_b.qmp('query-block');
-+        while len(result['return'][0]['dirty-bitmaps']) > 1:
-+            time.sleep(2)
-+            result = self.vm_b.qmp('query-block');
-+
-+        result = self.vm_b.qmp('x-debug-block-dirty-bitmap-sha256',
-+                               node='drive0', name='bitmap')
-+
-+        self.assert_qmp(result, 'return/sha256', sha256);
- 
- if __name__ == '__main__':
--    iotests.main()
-+    iotests.main(supported_fmts=['qcow2'], supported_cache_modes=['none'])
-diff --git a/tests/qemu-iotests/169.out b/tests/qemu-iotests/169.out
-index ae1213e..fbc63e6 100644
---- a/tests/qemu-iotests/169.out
-+++ b/tests/qemu-iotests/169.out
-@@ -1,5 +1,5 @@
--.
-+..
- ----------------------------------------------------------------------
--Ran 1 tests
-+Ran 2 tests
- 
- OK
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index e110c90..7b64411 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -356,6 +356,10 @@ def verify_platform(supported_oses=['linux']):
-     if True not in [sys.platform.startswith(x) for x in supported_oses]:
-         notrun('not suitable for this OS: %s' % sys.platform)
- 
-+def verify_cache_mode(supported_cache_modes=[]):
-+    if supported_cache_modes and (cachemode not in supported_cache_modes):
-+        notrun('not suitable for this cache mode: %s' % cachemode)
-+
- def supports_quorum():
-     return 'quorum' in qemu_img_pipe('--help')
- 
-@@ -364,7 +368,7 @@ def verify_quorum():
-     if not supports_quorum():
-         notrun('quorum support missing')
- 
--def main(supported_fmts=[], supported_oses=['linux']):
-+def main(supported_fmts=[], supported_oses=['linux'], supported_cache_modes=[]):
-     '''Run tests'''
- 
-     global debug
-@@ -381,6 +385,7 @@ def main(supported_fmts=[], supported_oses=['linux']):
-     verbosity = 1
-     verify_image_format(supported_fmts)
-     verify_platform(supported_oses)
-+    verify_cache_mode(supported_cache_modes)
- 
-     # We need to filter out the time taken from the output so that qemu-iotest
-     # can reliably diff the results against master output.
+ ##
+ # @MigrationCapabilityStatus:
 -- 
 1.8.3.1
