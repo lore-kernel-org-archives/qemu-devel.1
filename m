@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47155)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cdGtC-0005Ds-31
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 08:41:59 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cdGxp-0007wx-W6
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 08:46:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cdGt7-00014H-4A
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 08:41:58 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34369)
+	(envelope-from <stefanha@gmail.com>) id 1cdGxk-0002Pz-W3
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 08:46:46 -0500
+Received: from mail-wj0-x244.google.com ([2a00:1450:400c:c01::244]:34948)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cdGt6-00014A-TI
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 08:41:53 -0500
-Received: by mail-wm0-x242.google.com with SMTP id c85so19587032wmi.1
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 05:41:52 -0800 (PST)
-Date: Mon, 13 Feb 2017 13:41:49 +0000
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cdGxk-0002Pk-PP
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 08:46:40 -0500
+Received: by mail-wj0-x244.google.com with SMTP id i7so192048wjf.2
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 05:46:40 -0800 (PST)
+Date: Mon, 13 Feb 2017 13:46:37 +0000
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170213134149.GB10361@stefanha-x1.localdomain>
-References: <1484727757-41240-1-git-send-email-arei.gonglei@huawei.com>
-	<1484727757-41240-2-git-send-email-arei.gonglei@huawei.com>
-	<20170203103316.GA29200@stefanha-x1.localdomain>
-	<20170203173607-mutt-send-email-mst@kernel.org>
-	<1fdc2663-2090-9e19-5ea9-1f5b8eef4eb1@linux.vnet.ibm.com>
+Message-ID: <20170213134637.GC10361@stefanha-x1.localdomain>
+References: <CAJSP0QWGcG9bTZZr22BEj-P_G2r4UhmNwGSfwSnwjZeTC687GQ@mail.gmail.com>
+	<CAFEAcA_OJWrknC+YSsbjgcv=YtMq5GY04EcyXZt+V8eBH5TSWw@mail.gmail.com>
+	<e5673883-cd68-7d4a-01fc-394c506b18a9@redhat.com>
+	<CAFEAcA8zSZ8S09APwV8SGy3oHeiutY1j+LSSP327hyZLFfDURw@mail.gmail.com>
+	<DM5PR03MB2827878B91C80E6DA61C56589E450@DM5PR03MB2827.namprd03.prod.outlook.com>
+	<CAFEAcA_zXQOBWqOmyH-_RA5pcREutKPUZAOm-OBuCExp-nMSGw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="pvezYHf7grwyp3Bc"
+	protocol="application/pgp-signature"; boundary="hOcCNbCCxyk/YU74"
 Content-Disposition: inline
-In-Reply-To: <1fdc2663-2090-9e19-5ea9-1f5b8eef4eb1@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v16 1/2] virtio-crypto: Add virtio crypto
- device specification
+In-Reply-To: <CAFEAcA_zXQOBWqOmyH-_RA5pcREutKPUZAOm-OBuCExp-nMSGw@mail.gmail.com>
+Subject: Re: [Qemu-devel] Call for GSoC 2017 mentors & project ideas
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,68 +34,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, weidong.huang@huawei.com, qemu-devel@nongnu.org, john.griffin@intel.com, jianjay.zhou@huawei.com, Varun.Sethi@freescale.com, denglingli@chinamobile.com, arei.gonglei@hotmail.com, virtio-dev@lists.oasis-open.org, agraf@suse.de, Gonglei <arei.gonglei@huawei.com>, nmorey@kalray.eu, longpeng2@huawei.com, vincent.jardin@6wind.com, Ola.Liljedahl@arm.com, luonengjun@huawei.com, xin.zeng@intel.com, liang.j.ma@intel.com, stefanha@redhat.com, cornelia.huck@de.ibm.com, Jani.Kokkonen@huawei.com, brian.a.keating@intel.com, claudio.fontana@huawei.com, mike.caraman@nxp.com, wu.wubin@huawei.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Andrew Baumann <Andrew.Baumann@microsoft.com>, John Snow <jsnow@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
 
---pvezYHf7grwyp3Bc
+--hOcCNbCCxyk/YU74
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 03, 2017 at 07:07:02PM +0100, Halil Pasic wrote:
->=20
->=20
-> On 02/03/2017 04:37 PM, Michael S. Tsirkin wrote:
-> > On Fri, Feb 03, 2017 at 10:33:16AM +0000, Stefan Hajnoczi wrote:
-> >>> +\begin{description}
-> >>> +\item[0] dataq1
-> >>> +\item[\ldots]
-> >>> +\item[N-1] dataqN
-> >>> +\item[N] controlq
-> >>> +\end{description}
-> >>> +
-> >>> +N is set by \field{max_dataqueues}.
-> >>> +
-> >>> +\subsection{Feature bits}\label{sec:Device Types / Crypto Device / F=
-eature bits}
-> >>> +
-> >>> +VIRTIO_CRYPTO_F_NON_SESSION_MODE (0) non-session mode is available.
-> >>> +VIRTIO_CRYPTO_F_CIPHER_NON_SESSION_MODE (1) non-session mode is avai=
-lable for CIPHER service.
-> >>> +VIRTIO_CRYPTO_F_HASH_NON_SESSION_MODE (2) non-session mode is availa=
-ble for HASH service.
-> >>> +VIRTIO_CRYPTO_F_MAC_NON_SESSION_MODE (3) non-session mode is availab=
-le for MAC service.
-> >>> +VIRTIO_CRYPTO_F_AEAD_NON_SESSION_MODE (4) non-session mode is availa=
-ble for AEAD service.
+On Thu, Feb 09, 2017 at 10:17:45PM +0000, Peter Maydell wrote:
+> On 9 February 2017 at 22:12, Andrew Baumann
+> <Andrew.Baumann@microsoft.com> wrote:
+> >> From: Peter Maydell [mailto:peter.maydell@linaro.org]
+> >> Sent: Thursday, 9 February 2017 14:02
+> >> On 9 February 2017 at 20:46, John Snow <jsnow@redhat.com> wrote:
+> >> > On 02/09/2017 07:46 AM, Peter Maydell wrote:
+> >> >> Slightly late, but I had an idea last night: would "get
+> >> >> Raspbian booting on our raspi2 board model" be a good
+> >> >> project? Would involve some mix of bug fixing, cleaning
+> >> >> up and adding device models from the raspi2 tree on github,
+> >> >> and implementing missing devices. Bit of a "how long is a
+> >> >> piece of string" project, but on the other hand breaks
+> >> >> down easily into small parts that can all go upstream
+> >> >> individually. Would suit student who likes debugging :-)
 > >>
-> >> Bits 1-4 require bit 0.  Is bit 0 necessary at all?  Or may bits 1-4 c=
-an
-> >> be eliminated in favor of just bit 0.
-> >=20
-> > Too late to change it as QEMU released a device with that feature.
-> >=20
+> >> > Who was working on this most recently? There was someone submitting
+> >> > patches pretty frequently for the raspi2 board within the last year,
+> >> > wasn't there?
+> >>
+> >> That was Andrew Baumann, but I think his use case was
+> >> getting Windows 10 to boot on it, which exercises
+> >> different bits of the hardware.
+> >
+> > That's right, but I thought we also had Raspbian working after
+> > Peter C's implementation of SETEND. (I wouldn't be surprised if
+> > it had regressed, however.)
 >=20
-> When was this introduced to QEMU? Can't find it in current master
-> and I do not remember seeing the patches.
+> For the raspbian kernel image I had it never worked -- I
+> think the kernel gained some new functionality that means
+> it now touches some device we don't yet implement (vague
+> recollection it was somethnig message-box related?).
+>=20
+> > I've dropped the ball on this, and don't forsee finding time
+> > for it in the immediate future, but if anyone wants to work
+> > on it there are still some outstanding bits of emulation
+> > lurking in my github tree (github.com/0xabu/qemu)
+>=20
+> Yeah, I figured that was probably the situation, and I
+> don't personally have the time to do it either; but
+> it seemed like maybe it would make a GSoC project.
 
-s/QEMU/Linux/
+It sounds like this can be broken down into tasks by a mentor willing to
+participate and knowledgable (or willing to do the homework) on device
+support status.
 
-It's in drivers/crypto/virtio/.
+Are there any volunteers?
 
---pvezYHf7grwyp3Bc
+This would be a great project to have on board.
+
+Stefan
+
+--hOcCNbCCxyk/YU74
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJYobedAAoJEJykq7OBq3PIVskIAMOIO715x0zHrA+C/3yXFau1
-+17EoRp9TYya0HJq076zOESa7/7+85kVlRTQRmJPAwfgRdulorirA6aVmUVApTQ3
-5onV+235wdnd67ztFJrTTEDgjXHzM1CRXh1Hi+B84fj4kTH89cOFa4i5niBLFXSm
-ArYqWJWnFxBuGLF4wp3u0eXk/Dvo+gmfoSuBGbw7PJznEpDmOV9VkSIjne38rrV4
-FLKH7/7CDqRzo5AoKNGEJwqNH73AF6mXAnjzKLmQZINmo/IxbDJY04XEtsk0aOS7
-/ZU2GtA91ncD2h8IFY+S4iSB05DupgWY5TuuMAHg6gGxG7wXMoD4EY6/mtCjaWU=
-=b+Im
+iQEcBAEBAgAGBQJYobi9AAoJEJykq7OBq3PIO6oH/Al1VaFcztR73sxmLuuGxO78
+qEwBuVHWE9L7TnLjNexblBDijp2F7KHL40y+YJ203FoOEFwtK6xRiop7cY8l0Sq5
++xf8kCL8T0diFH+FuLwPuaTKMIxX4IN56CeqeL2mYbwELnigLiiCfmrt2Ca7JTpz
+nLLxdvMTxf3PxLWH3YgGlX3x2HGCVvdGtJWN1jDVcERagNrIxNxvRBAbqL26aI+o
+xpDKucRkFVIlo7hx243LPUiJH00nlpWQZfIq/1wEkvIh0vE3bYnvbn4ICCgjYLOT
+0PMzE5iEUbOPLJVzr5NfD1wozyz1dtzTr3X8qoYlScHY4WKvWdmcBQWjAUspLA0=
+=PlZO
 -----END PGP SIGNATURE-----
 
---pvezYHf7grwyp3Bc--
+--hOcCNbCCxyk/YU74--
