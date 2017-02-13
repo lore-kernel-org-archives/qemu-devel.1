@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52903)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cd8od-0002cd-OZ
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 00:04:44 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1cd8oh-0002eZ-R5
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 00:04:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cd8oc-0006PB-Kb
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 00:04:43 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1cd8og-0006PU-Ql
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 00:04:47 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:60266)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1cd8og-0006PQ-Ji
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 00:04:46 -0500
 From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20170131115728.5244.21690.stgit@PASHA-ISP>
-In-Reply-To: <20170131115728.5244.21690.stgit@PASHA-ISP>
-Date: Mon, 13 Feb 2017 08:04:35 +0300
-Message-ID: <000c01d285b6$abd99070$038cb150$@ru>
+References: <20170131115913.6828.12266.stgit@PASHA-ISP>
+In-Reply-To: <20170131115913.6828.12266.stgit@PASHA-ISP>
+Date: Mon, 13 Feb 2017 08:04:46 +0300
+Message-ID: <000d01d285b6$b1f12a40$15d37ec0$@ru>
 MIME-Version: 1.0
 Content-Type: text/plain;
 	charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH 0/3] block devices record/replay update
+Subject: Re: [Qemu-devel] [PATCH] audio: make audio poll timer deterministic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +29,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, pbonzini@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+Cc: pbonzini@redhat.com, kraxel@redhat.com
 
 Ping?
 
 Pavel Dovgalyuk
 
+
 > -----Original Message-----
 > From: Pavel Dovgalyuk [mailto:pavel.dovgaluk@ispras.ru]
-> Sent: Tuesday, January 31, 2017 2:57 PM
+> Sent: Tuesday, January 31, 2017 2:59 PM
 > To: qemu-devel@nongnu.org
-> Cc: kwolf@redhat.com; pbonzini@redhat.com; dovgaluk@ispras.ru; qemu-block@nongnu.org;
-> mreitz@redhat.com
-> Subject: [PATCH 0/3] block devices record/replay update
+> Cc: pbonzini@redhat.com; dovgaluk@ispras.ru; kraxel@redhat.com
+> Subject: [PATCH] audio: make audio poll timer deterministic
 > 
-> This set of patches includes several fixes for preserving
-> the state of the block device images while recording and replaying
-> virtual machine execution.
+> This patch changes resetting strategy of the audio polling timer.
+> It does not change expiration time if the timer is already set.
 > 
-> blkreplay driver now creates temporary overlay for underlaying devices
-> This patch implicitly enables '-snapshot' behavior in record/replay mode.
-> blkreplay layer creates temporary overlays on top of underlaying
-> disk images. It is needed, because creating an overlay over blkreplay
-> with explicit '-snapshot' option breaks the determinism.
-> 
+> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 > ---
+>  audio/audio.c |    6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 > 
-> Pavel Dovgalyuk (3):
->       block: implement bdrv_snapshot_goto for blkreplay
->       blkreplay: create temporary overlay for underlaying devices
->       replay: disable default snapshot for record/replay
-> 
-> 
->  block/blkreplay.c |   84 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  stubs/replay.c    |    1 +
->  vl.c              |   10 +++++-
->  3 files changed, 93 insertions(+), 2 deletions(-)
-> 
-> --
-> Pavel Dovgalyuk
+> diff --git a/audio/audio.c b/audio/audio.c
+> index c845a44..1ee95a5 100644
+> --- a/audio/audio.c
+> +++ b/audio/audio.c
+> @@ -1112,8 +1112,10 @@ static int audio_is_timer_needed (void)
+>  static void audio_reset_timer (AudioState *s)
+>  {
+>      if (audio_is_timer_needed ()) {
+> -        timer_mod (s->ts,
+> -            qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + conf.period.ticks);
+> +        if (!timer_pending(s->ts)) {
+> +            timer_mod (s->ts,
+> +                qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + conf.period.ticks);
+> +        }
+>      }
+>      else {
+>          timer_del (s->ts);
