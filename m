@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cdFKq-0007lj-Dy
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:02:25 -0500
+	(envelope-from <quintela@redhat.com>) id 1cdFL9-0007tl-TS
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:02:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cdFKl-0008VT-Ir
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:02:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40678)
+	(envelope-from <quintela@redhat.com>) id 1cdFL5-0000Ay-3T
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:02:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39864)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cdFKl-0008VA-Dg
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:02:19 -0500
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cdFL4-0000Ab-TN
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 07:02:39 -0500
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20161027153217.16984-2-dgilbert@redhat.com> (David Alan
-	Gilbert's message of "Thu, 27 Oct 2016 16:32:10 +0100")
+In-Reply-To: <20161027153217.16984-3-dgilbert@redhat.com> (David Alan
+	Gilbert's message of "Thu, 27 Oct 2016 16:32:11 +0100")
 References: <20161027153217.16984-1-dgilbert@redhat.com>
-	<20161027153217.16984-2-dgilbert@redhat.com>
+	<20161027153217.16984-3-dgilbert@redhat.com>
 Reply-To: quintela@redhat.com
-Date: Mon, 13 Feb 2017 13:02:08 +0100
-Message-ID: <87o9y670zj.fsf@emacs.mitica>
+Date: Mon, 13 Feb 2017 13:02:30 +0100
+Message-ID: <87k28u70yx.fsf@emacs.mitica>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/8] migration: extend VMStateInfo
+Subject: Re: [Qemu-devel] [PATCH 2/8] add QEMU_BUILD_BUG_EXPR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,12 +32,11 @@ To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com, duanj@linux.vnet.ibm.com
 
 "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> From: Jianjun Duan <duanj@linux.vnet.ibm.com>
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 >
-> Current migration code cannot handle some data structures such as
-> QTAILQ in qemu/queue.h. Here we extend the signatures of put/get
-> in VMStateInfo so that customized handling is supported.
+> Glib's GLIB_STATIC_ASSERT_EXPR can't be used in an array initialisation
+> where as this rune can.
 >
-> Signed-off-by: Jianjun Duan <duanj@linux.vnet.ibm.com>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
 Reviewed-by: Juan Quintela <quintela@redhat.com>
