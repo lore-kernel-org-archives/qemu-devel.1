@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57418)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlipchuk@redhat.com>) id 1cdIpd-0002FV-6v
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 10:46:26 -0500
+	(envelope-from <jitendra.kolhe@hpe.com>) id 1cdIvn-0006Fb-K1
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 10:52:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlipchuk@redhat.com>) id 1cdIpZ-0001fr-Qi
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 10:46:25 -0500
-Received: from mail-oi0-f46.google.com ([209.85.218.46]:36421)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlipchuk@redhat.com>) id 1cdIpZ-0001fS-L9
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 10:46:21 -0500
-Received: by mail-oi0-f46.google.com with SMTP id u143so51973325oif.3
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 07:46:20 -0800 (PST)
+	(envelope-from <jitendra.kolhe@hpe.com>) id 1cdIvk-0003JK-S4
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 10:52:47 -0500
+Received: from g4t3426.houston.hpe.com ([15.241.140.75]:38985)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jitendra.kolhe@hpe.com>)
+	id 1cdIvk-0003IA-Ju
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 10:52:44 -0500
+References: <1486976456-17657-1-git-send-email-jitendra.kolhe@hpe.com>
+	<20170213114546.281915f1@nial.brq.redhat.com>
+	<20170213112317.GB12387@redhat.com>
+	<20170213130458.53ab9ab0@nial.brq.redhat.com>
+From: Jitendra Kolhe <jitendra.kolhe@hpe.com>
+Message-ID: <cb0ec861-7281-1fd3-6d7d-3a5af627c072@hpe.com>
+Date: Mon, 13 Feb 2017 21:22:36 +0530
 MIME-Version: 1.0
-From: Maor Lipchuk <mlipchuk@redhat.com>
-Date: Mon, 13 Feb 2017 17:46:19 +0200
-Message-ID: <CAJ1JNOd5cZ3RWUAkY=uo7+wwSwQrBWrN6GF_QZFjdVfx49VtGQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: [Qemu-devel] Estimation of qcow2 image size converted from raw image
+In-Reply-To: <20170213130458.53ab9ab0@nial.brq.redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] mem-prealloc: reduce large guest
+ start-up and migration time.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,133 +31,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-discuss@nongnu.org
-Cc: Nir Soffer <nsoffer@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Allon Mureinik <amureini@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, armbru@redhat.com, mohan_parthasarathy@hpe.com, renganathan.meenakshisundaram@hpe.com
 
-Hi all,
+On 2/13/2017 5:34 PM, Igor Mammedov wrote:
+> On Mon, 13 Feb 2017 11:23:17 +0000
+> "Daniel P. Berrange" <berrange@redhat.com> wrote:
+> 
+>> On Mon, Feb 13, 2017 at 11:45:46AM +0100, Igor Mammedov wrote:
+>>> On Mon, 13 Feb 2017 14:30:56 +0530
+>>> Jitendra Kolhe <jitendra.kolhe@hpe.com> wrote:
+>>>   
+>>>> Using "-mem-prealloc" option for a large guest leads to higher guest
+>>>> start-up and migration time. This is because with "-mem-prealloc" option
+>>>> qemu tries to map every guest page (create address translations), and
+>>>> make sure the pages are available during runtime. virsh/libvirt by
+>>>> default, seems to use "-mem-prealloc" option in case the guest is
+>>>> configured to use huge pages. The patch tries to map all guest pages
+>>>> simultaneously by spawning multiple threads. Currently limiting the
+>>>> change to QEMU library functions on POSIX compliant host only, as we are
+>>>> not sure if the problem exists on win32. Below are some stats with
+>>>> "-mem-prealloc" option for guest configured to use huge pages.
+>>>>
+>>>> ------------------------------------------------------------------------
+>>>> Idle Guest      | Start-up time | Migration time
+>>>> ------------------------------------------------------------------------
+>>>> Guest stats with 2M HugePage usage - single threaded (existing code)
+>>>> ------------------------------------------------------------------------
+>>>> 64 Core - 4TB   | 54m11.796s    | 75m43.843s
+>>>> 64 Core - 1TB   | 8m56.576s     | 14m29.049s
+>>>> 64 Core - 256GB | 2m11.245s     | 3m26.598s
+>>>> ------------------------------------------------------------------------
+>>>> Guest stats with 2M HugePage usage - map guest pages using 8 threads
+>>>> ------------------------------------------------------------------------
+>>>> 64 Core - 4TB   | 5m1.027s      | 34m10.565s
+>>>> 64 Core - 1TB   | 1m10.366s     | 8m28.188s
+>>>> 64 Core - 256GB | 0m19.040s     | 2m10.148s
+>>>> -----------------------------------------------------------------------
+>>>> Guest stats with 2M HugePage usage - map guest pages using 16 threads
+>>>> -----------------------------------------------------------------------
+>>>> 64 Core - 4TB   | 1m58.970s     | 31m43.400s
+>>>> 64 Core - 1TB   | 0m39.885s     | 7m55.289s
+>>>> 64 Core - 256GB | 0m11.960s     | 2m0.135s
+>>>> -----------------------------------------------------------------------
+>>>>
+>>>> Changed in v2:
+>>>>  - modify number of memset threads spawned to min(smp_cpus, 16).
+>>>>  - removed 64GB memory restriction for spawning memset threads.
+>>>>
+>>>> Signed-off-by: Jitendra Kolhe <jitendra.kolhe@hpe.com>
+>>>> ---
+>>>>  backends/hostmem.c   |  4 ++--
+>>>>  exec.c               |  2 +-
+>>>>  include/qemu/osdep.h |  3 ++-
+>>>>  util/oslib-posix.c   | 68 +++++++++++++++++++++++++++++++++++++++++++++++-----
+>>>>  util/oslib-win32.c   |  3 ++-
+>>>>  5 files changed, 69 insertions(+), 11 deletions(-)
+>>>>
+>>>> diff --git a/backends/hostmem.c b/backends/hostmem.c
+>>>> index 7f5de70..162c218 100644
+>>>> --- a/backends/hostmem.c
+>>>> +++ b/backends/hostmem.c
+>>>> @@ -224,7 +224,7 @@ static void host_memory_backend_set_prealloc(Object *obj, bool value,
+>>>>          void *ptr = memory_region_get_ram_ptr(&backend->mr);
+>>>>          uint64_t sz = memory_region_size(&backend->mr);
+>>>>  
+>>>> -        os_mem_prealloc(fd, ptr, sz, &local_err);
+>>>> +        os_mem_prealloc(fd, ptr, sz, smp_cpus, &local_err);
+>>>>          if (local_err) {
+>>>>              error_propagate(errp, local_err);
+>>>>              return;
+>>>> @@ -328,7 +328,7 @@ host_memory_backend_memory_complete(UserCreatable *uc, Error **errp)
+>>>>           */
+>>>>          if (backend->prealloc) {
+>>>>              os_mem_prealloc(memory_region_get_fd(&backend->mr), ptr, sz,
+>>>> -                            &local_err);
+>>>> +                            smp_cpus, &local_err);
+>>>>              if (local_err) {
+>>>>                  goto out;
+>>>>              }
+>>>> diff --git a/exec.c b/exec.c
+>>>> index 8b9ed73..53afcd2 100644
+>>>> --- a/exec.c
+>>>> +++ b/exec.c
+>>>> @@ -1379,7 +1379,7 @@ static void *file_ram_alloc(RAMBlock *block,
+>>>>      }
+>>>>  
+>>>>      if (mem_prealloc) {
+>>>> -        os_mem_prealloc(fd, area, memory, errp);
+>>>> +        os_mem_prealloc(fd, area, memory, smp_cpus, errp);
+>>>>          if (errp && *errp) {
+>>>>              goto error;
+>>>>          }
+>>>> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+>>>> index 56c9e22..fb1d22b 100644
+>>>> --- a/include/qemu/osdep.h
+>>>> +++ b/include/qemu/osdep.h
+>>>> @@ -401,7 +401,8 @@ unsigned long qemu_getauxval(unsigned long type);
+>>>>  
+>>>>  void qemu_set_tty_echo(int fd, bool echo);
+>>>>  
+>>>> -void os_mem_prealloc(int fd, char *area, size_t sz, Error **errp);
+>>>> +void os_mem_prealloc(int fd, char *area, size_t sz, int smp_cpus,
+>>>> +                     Error **errp);
+>>>>  
+>>>>  int qemu_read_password(char *buf, int buf_size);
+>>>>  
+>>>> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+>>>> index f631464..17da029 100644
+>>>> --- a/util/oslib-posix.c
+>>>> +++ b/util/oslib-posix.c
+>>>> @@ -55,6 +55,16 @@
+>>>>  #include "qemu/error-report.h"
+>>>>  #endif
+>>>>  
+>>>> +#define MAX_MEM_PREALLOC_THREAD_COUNT 16  
+>>> running with -smp 16 or bigger on host with less than 16 cpus
+>>> it would be not quite optimal.
+>>> Why not to change MAX_MEM_PREALLOC_THREAD_COUNT constant to
+>>> something like sysconf(_SC_NPROCESSORS_ONLN)  
+>>
+>> The point is to not consume more host resources than would otherwise
+>> be consumed by running the guest CPUs. ie, if running a KVM guest
+>> with -smp 4 on a 16 CPU host,  QEMU should not to consume more than
+>> 4 pCPUs worth of resource on the host.  Using sysconf would cause
+>> the consume to consume all host resources, likely harming other
+>> guests workloads.
+>>
+>> If the person launching QEMU gives a -smp value that's larger than
+>> the host CPUs count, then they've already accepted that they're
+>> asking QEMU todo more than the host is really capable of. IOW, I
+>> don't think we need to special case memsetting for that, since
+>> VCPU execution itself is already going to overcommit the host.
+> Doing over commit at preallocate time doesn't make much sense,
+> if MAX_MEM_PREALLOC_THREAD_COUNT is replaced with sysconf(_SC_NPROCESSORS_ONLN)
+> then QEMU will end up with MIN(-smp, sysconf(_SC_NPROCESSORS_ONLN))
+> which will put cap on upper value and avoid useless over commit at
+> preallocate time.
+> 
 
-I was wondering if that is possible to provide a new API that
-estimates the size of
-qcow2 image converted from a raw image. We could use this new API to
-allocate the
-size more precisely before the convert operation.
+I agree, we should consider case where we run with -smp >= 16 which 
+is overcommited on host with < 16 cpus. At the same time we should 
+also be sure that we don't end up spawning to many memset threads. 
+For e.g. I have been running fat guests with -smp > 64 on hosts 
+with 384 cpus.
 
-What are we trying to do:
-- Convert raw sparse image from NFS or from block device to qcow2 image
-  on thin provisioned block device
+Thanks,
+- Jitendra
 
-- In ovirt thin provisioned block device is a regular lv, and we like
-  allocate only the required size for the the qcow file.
-
-Our current (stupid) solution is to allocate the entire LV using the
-size of the raw image.
-
-Here is an example flow:
-
-    $ truncate -s 10G test.raw
-
-We don't know what will be the size of the qcow on the block storage,
-so we allocate the entire LV:
-
-    $ lvcreate --size 10G vg/lv
-
-Then we convert the file to the new LV:
-
-    $ qemu-img convert -f raw -O qcow2 test.raw /dev/vg/lv
-
-After the copy we can check the actual size:
-
-    $ qemu-img check /dev/vg/lv
-
-And reduce the LV:
-
-    $ lvreduce -L128m vg/lv
-
-But we like to avoid the allocation, and allocate only the needed size
-before we convert the image.
-
-We found that if we create a file with one byte for each cluster (64K),
-qcow2 file will be bigger than the raw file:
-
-Creating worst case raw file:
-
-    with open("worst.raw", "wb") as f:
-        for offset in range(64 * 1024 - 1, 10 * 1024**3, 64 * 1024):
-            f.seek(offset)
-            f.write("x")
-
-$ ls -lh worst.raw
--rw-rw-r--. 1 user user 10G Feb 13 16:43 worst.raw
-
-$ du -sh worst.raw
-642M worst.raw
-
-$ ls -lh worst.qcow2
--rw-r--r--. 1 user user 11G Feb 13 17:10 worst.qcow2
-
-Now compare that to the best case:
-
-    with open("best.raw", "wb") as f:
-        for i in range(10 * 1024**3 / (64*1024)):
-            f.write("x" * 4096)
-
-$ ls -lh best.raw
--rw-rw-r--. 1 user user 10G Feb 13 17:18 best.raw
-
-$ du -sh best.raw
-641M best.raw
-
-$ qemu-img convert -p -f raw -O qcow2 best.raw best.qcow2
-
-$ ls -lh best.qcow2
--rw-r--r--. 1 user user 641M Feb 13 17:21 best.qcow2
-
-$ du -sh best.qcow2
-641M best.qcow2
-
-So it seems that to estimate the size of the qcow2 file, we need
-to check not only the number of blocks but the location of the blocks.
-
-We can probably use qemu-img map to estimate:
-
-$ qemu-img map worst.raw --output json
-[{ "start": 0, "length": 61440, "depth": 0, "zero": true, "data":
-false, "offset": 0},
-{ "start": 61440, "length": 4096, "depth": 0, "zero": false, "data":
-true, "offset": 61440},
-{ "start": 65536, "length": 61440, "depth": 0, "zero": true, "data":
-false, "offset": 65536},
-{ "start": 126976, "length": 4096, "depth": 0, "zero": false, "data":
-true, "offset": 126976},
-{ "start": 131072, "length": 61440, "depth": 0, "zero": true, "data":
-false, "offset": 131072},
-...
-
-$ qemu-img map best.raw --output json
-[{ "start": 0, "length": 671088640, "depth": 0, "zero": false, "data":
-true, "offset": 0},
-{ "start": 671088640, "length": 10066325504, "depth": 0, "zero": true,
-"data": false, "offset": 671088640},
-{ "start": 10737414144, "length": 4096, "depth": 0, "zero": false,
-"data": true, "offset": 10737414144}]
-
-But this means we have to include qcow2 allocation logic in our code, and
-the calculation will break when qcow2 changes the format.
-
-We think that the best way to solve this issue is to return this info
-from qemu-img, maybe as a flag to qemu-img convert that will
-calculate the size of the converted image without doing any writes.
-
-
-See also:
-https://bugzilla.redhat.com/1358717 - Export of vm with thin provision
-disk from NFS Data domain and Import to Block Data domain makes
-virtual and Actual size of disk same.
-
-https://bugzilla.redhat.com/1419240 - Creating a Clone vm from
-template with Format "QCOW2" and Target "block based storage" has a
-disk with same actual and virtual size.
-
-
-Regards,
-Maor
+>> Regards,
+>> Daniel
+> 
