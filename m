@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cdM45-0006BA-Kx
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 14:13:34 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cdM9o-0001pf-10
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 14:19:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cdM41-0003Zx-Ey
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 14:13:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:24845)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1cdM41-0003Zg-8k
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 14:13:29 -0500
-Date: Mon, 13 Feb 2017 14:13:27 -0500
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170213191327.GO27752@localhost.localdomain>
-References: <1486134413-19988-1-git-send-email-den@openvz.org>
-	<5909b505-fecb-fa98-6ae7-190b846add4c@openvz.org>
-	<169f96e8-0ca5-264d-350a-7f085905bd5b@virtuozzo.com>
-	<a1049fab-1880-3b03-63bb-6b898ee55b40@redhat.com>
+	(envelope-from <rth7680@gmail.com>) id 1cdM9i-0004mz-VB
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 14:19:28 -0500
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:34751)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cdM9i-0004me-Qs
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 14:19:22 -0500
+Received: by mail-qt0-x243.google.com with SMTP id w20so14518282qtb.1
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 11:19:21 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170213121017.12907-1-alex.bennee@linaro.org>
+	<20170213121017.12907-13-alex.bennee@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <0d990570-8318-7bba-c10c-cfe0387fdd1b@twiddle.net>
+Date: Tue, 14 Feb 2017 06:19:10 +1100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a1049fab-1880-3b03-63bb-6b898ee55b40@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] mirror: do not increase offset during
- initial zero_or_discard phase - pls consider this as V3 patch
+In-Reply-To: <20170213121017.12907-13-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v12 12/24] tcg: handle EXCP_ATOMIC
+ exception for system emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +31,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: "Denis V. Lunev" <den@virtuozzo.com>, qemu-devel@nongnu.org, Anton Nefedov <anton.nefedov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org
+Cc: mttcg@greensocs.com, qemu-devel@nongnu.org, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, bamvor.zhangjian@linaro.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-On Mon, Feb 13, 2017 at 06:16:36PM +0100, Max Reitz wrote:
-> On 13.02.2017 08:10, Denis V. Lunev wrote:
-> > On 02/03/2017 06:08 PM, Denis V. Lunev wrote:
-> >> On 02/03/2017 06:06 PM, Denis V. Lunev wrote:
-> >>> From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> >>>
-> >>> If explicit zeroing out before mirroring is required for the target image,
-> >>> it moves the block job offset counter to EOF, then offset and len counters
-> >>> count the image size twice. There is no harm but stats are confusing,
-> >>> specifically the progress of the operation is always reported as 99% by
-> >>> management tools.
-> >>>
-> >>> The patch skips offset increase for the first "technical" pass over the
-> >>> image. This should not cause any further harm.
-> >>>
-> >>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> >>> Signed-off-by: Denis V. Lunev <den@openvz.org>
-> >>> Reviewed-by: Eric Blake <eblake@redhat.com>
-> >>> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> >>> CC: Jeff Cody <jcody@redhat.com>
-> >>> CC: Kevin Wolf <kwolf@redhat.com>
-> >>> CC: Max Reitz <mreitz@redhat.com>
-> >> actually this is V3 patch. Sorry for broken subject.
-> >>
-> >> Den
-> > ping
-> 
-> Didn't Jeff merge v2?
-> 
-> http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg01319.html
-> 
-> Max
-> 
+On 02/13/2017 11:10 PM, Alex Bennée wrote:
+> @@ -239,9 +240,16 @@ static void cpu_exec_step(CPUState *cpu)
+>                       1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
+>      tb->orig_tb = NULL;
+>      tb_unlock();
+> -    /* execute the generated code */
+> -    trace_exec_tb_nocache(tb, pc);
+> -    cpu_tb_exec(cpu, tb);
+> +
+> +    cc->cpu_exec_enter(cpu);
+> +
+> +    if (sigsetjmp(cpu->jmp_env, 0) == 0) {
+> +        /* execute the generated code */
+> +        trace_exec_tb_nocache(tb, pc);
+> +        cpu_tb_exec(cpu, tb);
+> +    }
+
+I don't understand this, since cpu_tb_exec has its own sigsetjmp.  Where is the 
+exception supposed to come from that escapes?
+
+> +                } else if (r == EXCP_ATOMIC) {
+> +                    qemu_mutex_unlock_iothread();
+> +                    cpu_exec_step_atomic(cpu);
+> +                    qemu_mutex_lock_iothread();
+...
+> +            case EXCP_ATOMIC:
+> +                qemu_mutex_unlock_iothread();
+> +                cpu_exec_step_atomic(cpu);
+> +                qemu_mutex_lock_iothread();
 
 
-Yes, I did.
+I just noticed this, but if you have to do a v13, it might be best to move 
+these locks inside cpu_exec_step_atomic, as with tcg_cpu_exec.  Otherwise leave 
+it for later.
+
+
+r~
