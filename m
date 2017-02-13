@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35179)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cdJAL-0005OZ-Q2
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:07:51 -0500
+	(envelope-from <marex@denx.de>) id 1cdJSG-00031P-86
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:26:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cdJAK-0007Wl-DD
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:07:49 -0500
-Resent-Message-Id: <E1cdJAK-0007Wl-DD@eggs.gnu.org>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <1487001847-19082-1-git-send-email-pl@kamp.de>
-Message-ID: <148700204590.63.338537355907614204@eba24e3a0d7f>
+	(envelope-from <marex@denx.de>) id 1cdJSB-0004tu-SD
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:26:20 -0500
+Received: from mail-out.m-online.net ([2001:a60:0:28:0:1:25:1]:43658)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marex@denx.de>) id 1cdJSB-0004ta-Lm
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 11:26:15 -0500
+References: <1486947403-22548-1-git-send-email-juro.bystricky@intel.com>
+From: Marek Vasut <marex@denx.de>
+Message-ID: <c84ee92b-6923-a808-1267-1438bd709c7b@denx.de>
+Date: Mon, 13 Feb 2017 16:57:48 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 13 Feb 2017 08:07:26 -0800 (PST)
-Subject: Re: [Qemu-devel] [RFC PATCH V2] qemu-img: make convert async
+In-Reply-To: <1486947403-22548-1-git-send-email-juro.bystricky@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6] nios2: Add Altera JTAG UART emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,52 +26,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pl@kamp.de
-Cc: famz@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.comfamz@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: Juro Bystricky <juro.bystricky@intel.com>, qemu-devel@nongnu.org
+Cc: crwulff@gmail.com, jurobystricky@hotmail.com, fred.konrad@greensocs.com
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtSRkMgUEFUQ0ggVjJdIHFlbXUtaW1nOiBtYWtlIGNvbnZlcnQgYXN5bmMKTWVzc2Fn
-ZS1pZDogMTQ4NzAwMTg0Ny0xOTA4Mi0xLWdpdC1zZW5kLWVtYWlsLXBsQGthbXAuZGUKVHlwZTog
-c2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UK
-bj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoK
-IyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxv
-ZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwog
-ICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1h
-dD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3Jp
-cHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAg
-ICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRF
-U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
-YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUK
-ICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8xNDg3MDAxODQ3LTE5MDgyLTEtZ2l0LXNlbmQt
-ZW1haWwtcGxAa2FtcC5kZSAtPiBwYXRjaGV3LzE0ODcwMDE4NDctMTkwODItMS1naXQtc2VuZC1l
-bWFpbC1wbEBrYW1wLmRlCiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAxNzAyMDgxNzA1
-MzMuMjg4MjItMS1qc25vd0ByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxNzAyMDgxNzA1MzMuMjg4
-MjItMS1qc25vd0ByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYjRm
-ZjhhZiBxZW11LWltZzogbWFrZSBjb252ZXJ0IGFzeW5jCgo9PT0gT1VUUFVUIEJFR0lOID09PQpD
-aGVja2luZyBQQVRDSCAxLzE6IHFlbXUtaW1nOiBtYWtlIGNvbnZlcnQgYXN5bmMuLi4KRVJST1I6
-IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiM2MDogRklMRTogcWVtdS1pbWcuYzoxNDU4Ogor
-Ly9YWFg6IHRoaXMgc2hvdWxkIGJlIGEgY21kbGluZSBwYXJhbWV0ZXIKCldBUk5JTkc6IGxpbmUg
-b3ZlciA4MCBjaGFyYWN0ZXJzCiMxMTM6IEZJTEU6IHFlbXUtaW1nLmM6MTU4NjoKKyAgICAgICAg
-cmV0ID0gYmxrX2NvX3ByZWFkdihibGssIChzZWN0b3JfbnVtIC0gcy0+c3JjX2N1cl9vZmZzZXQp
-IDw8IEJEUlZfU0VDVE9SX0JJVFMsCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzE0
-ODogRklMRTogcWVtdS1pbWcuYzoxNjMzOgorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIG4gPDwgQkRSVl9TRUNUT1JfQklUUywgcWlvdiwgQkRSVl9SRVFfV1JJVEVfQ09NUFJF
-U1NFRCk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTcwOiBGSUxFOiBxZW11
-LWltZy5jOjE2NjA6CisgICAgICAgICAgICByZXQgPSBibGtfY29fcHdyaXRlX3plcm9lcyhzLT50
-YXJnZXQsIHNlY3Rvcl9udW0gPDwgQkRSVl9TRUNUT1JfQklUUywKCkVSUk9SOiBkbyBub3QgdXNl
-IGFzc2lnbm1lbnQgaW4gaWYgY29uZGl0aW9uCiMxOTU6IEZJTEU6IHFlbXUtaW1nLmM6MTY5MDoK
-KyAgICAgICAgaWYgKChlbHQyID0gUVNJTVBMRVFfRklSU1QoJnMtPnF1ZXVlKSkpIHsKCkVSUk9S
-OiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMjE1OiBGSUxFOiBxZW11LWltZy5jOjE3MTA6
-CisgICAgICAgIC8vfiAvL1hYWDogaW4tb3JkZXIgd3JpdGUgb24vb2ZmIGNvdWxkIGJlIGEgc3dp
-dGNoCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjIzOiBGSUxFOiBxZW11LWlt
-Zy5jOjE3MTg6CisgICAgICAgIHJldCA9IGNvbnZlcnRfd3JpdGUocywgZWx0LT5zZWN0b3JfbnVt
-LCBlbHQtPm5iX3NlY3RvcnMsIGJ1ZiwgJnFpb3YsIGVsdC0+c3RhdHVzKTsKCnRvdGFsOiA0IGVy
-cm9ycywgMyB3YXJuaW5ncywgMjkzIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxl
-IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
-c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
-SCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
-ZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
-Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
-cGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On 02/13/2017 01:56 AM, Juro Bystricky wrote:
+> Add the Altera JTAG UART model.
+> 
+> Hardware emulation based on:
+> https://www.altera.com/en_US/pdfs/literature/ug/ug_embedded_ip.pdf
+> (Please see "Register Map" on page 65)
+> 
+> Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
+
+Acked-by: Marek Vasut <marex@denx.de>
+
+-- 
+Best regards,
+Marek Vasut
