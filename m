@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lma@suse.com>) id 1cdD99-0007E6-Dt
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 04:42:12 -0500
+	(envelope-from <lma@suse.com>) id 1cdDIw-0001js-3f
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 04:52:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lma@suse.com>) id 1cdD95-0000He-DX
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 04:42:11 -0500
-Received: from prv-mh.provo.novell.com ([137.65.248.74]:50813)
+	(envelope-from <lma@suse.com>) id 1cdDIs-0002ZJ-Qz
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 04:52:18 -0500
+Received: from prv3-mh.provo.novell.com ([137.65.250.26]:33259)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lma@suse.com>) id 1cdD95-0000HT-3K
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 04:42:07 -0500
-Message-Id: <58A1EFE702000062000CF3CD@prv-mh.provo.novell.com>
-Date: Mon, 13 Feb 2017 02:41:59 -0700
-From: "Lin Ma" <lma@suse.com>
-References: <20170213092709.24711-1-lma@suse.com>
-In-Reply-To: <20170213092709.24711-1-lma@suse.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] =?utf-8?b?562U5aSN77yaICBbUEFUQ0hdIHRyYWNlOiBmaXgg?=
- =?utf-8?q?trace-events-all_dependencies_in_Makefile=2Eobjs?=
+	(Exim 4.71) (envelope-from <lma@suse.com>) id 1cdDIs-0002XV-Ho
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 04:52:14 -0500
+From: Lin Ma <lma@suse.com>
+Date: Mon, 13 Feb 2017 17:51:48 +0800
+Message-Id: <20170213095148.25500-1-lma@suse.com>
+Subject: [Qemu-devel] [PATCH v2 RESEND] Makefile: Fix owner and group for
+ qemu-version.h.tmp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,71 +22,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, stefanha@redhat.com
+To: qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, famz@redhat.com
 
-Oops, I didn't notice that the issue was fixed already, Sorry about that.
-Lin
+By commit 67a1de0d, When we perform 'git pull && make && sudo make install',
+In 'make' stage a qemu-version.h.tmp will be generated. If the content of
+qemu-version.h.tmp and qemu-version.h aren't consistent, The qemu-version.h.tmp
+will be renamed to qemu-version.h. Because of the target FORCE, The same action
+will be do again in 'make install' stage.
 
->>> Lin Ma <lma@suse.com> 2017/2/13 =E6=98=9F=E6=9C=9F=E4=B8=80 =
-=E4=B8=8B=E5=8D=88 5:27 >>>
-It causes that file trace-events-all isn't generated during build, make
-install reports 'No such file or directory'. The patch fixes it.
+In 'make install' stage, If there is no qemu-version.h.tmp exists and we run
+'make install' with sudo, The owner and group of new qemu-version.h.tmp will be
+privileged user/group. When we run 'make' next time, qemu-version.h.tmp can't
+be overwritten because of permission issue.
+
+This patch uses 'cp' instead of 'mv' to keep the qemu-version.h.tmp file, So
+during the 'sudo make install' stage, new qemu-version.h.tmp's owner and group
+wont be set to privileged user/group.
 
 Signed-off-by: Lin Ma <lma@suse.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
 ---
-trace/Makefile.objs | 8 ++++----
-1 file changed, 4 insertions(+), 4 deletions(-)
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/trace/Makefile.objs b/trace/Makefile.objs
-index 7de840a..8e5e85a 100644
---- a/trace/Makefile.objs
-+++ b/trace/Makefile.objs
-@@ -17,7 +17,7 @@ $(BUILD_DIR)/trace-events-all: $(trace-events-files)
-
-$(obj)/generated-helpers-wrappers.h: $(obj)/generated-helpers-wrappers.h-ti=
-mestamp
-	@cmp $< $@ >/dev/null 2>&1 || cp $< $@
--$(obj)/generated-helpers-wrappers.h-timestamp: $(trace-events-files) =
-$(BUILD_DIR)/config-host.mak $(tracetool-y)
-+$(obj)/generated-helpers-wrappers.h-timestamp: $(BUILD_DIR)/trace-events-a=
-ll $(BUILD_DIR)/config-host.mak $(tracetool-y)
-	$(call quiet-command,$(TRACETOOL) \
-		--group=3Dall \
-		--format=3Dtcg-helper-wrapper-h \
-@@ -26,7 +26,7 @@ $(obj)/generated-helpers-wrappers.h-timestamp: $(trace-ev=
-ents-files) $(BUILD_DIR
-
-$(obj)/generated-helpers.h: $(obj)/generated-helpers.h-timestamp
-	@cmp $< $@ >/dev/null 2>&1 || cp $< $@
--$(obj)/generated-helpers.h-timestamp: $(trace-events-files) $(BUILD_DIR)/c=
-onfig-host.mak $(tracetool-y)
-+$(obj)/generated-helpers.h-timestamp: $(BUILD_DIR)/trace-events-all =
-$(BUILD_DIR)/config-host.mak $(tracetool-y)
-	$(call quiet-command,$(TRACETOOL) \
-		--group=3Dall \
-		--format=3Dtcg-helper-h \
-@@ -35,7 +35,7 @@ $(obj)/generated-helpers.h-timestamp: $(trace-events-file=
-s) $(BUILD_DIR)/config-
-
-$(obj)/generated-helpers.c: $(obj)/generated-helpers.c-timestamp
-	@cmp $< $@ >/dev/null 2>&1 || cp $< $@
--$(obj)/generated-helpers.c-timestamp: $(trace-events-files) $(BUILD_DIR)/c=
-onfig-host.mak $(tracetool-y)
-+$(obj)/generated-helpers.c-timestamp: $(BUILD_DIR)/trace-events-all =
-$(BUILD_DIR)/config-host.mak $(tracetool-y)
-	$(call quiet-command,$(TRACETOOL) \
-		--group=3Dall \
-		--format=3Dtcg-helper-c \
-@@ -49,7 +49,7 @@ target-obj-y +=3D generated-helpers.o
-
-$(obj)/generated-tcg-tracers.h: $(obj)/generated-tcg-tracers.h-timestamp
-	@cmp $< $@ >/dev/null 2>&1 || cp $< $@
--$(obj)/generated-tcg-tracers.h-timestamp: $(trace-events-files) $(BUILD_DI=
-R)/config-host.mak $(tracetool-y)
-+$(obj)/generated-tcg-tracers.h-timestamp: $(BUILD_DIR)/trace-events-all =
-$(BUILD_DIR)/config-host.mak $(tracetool-y)
-	$(call quiet-command,$(TRACETOOL) \
-		--group=3Dall \
-		--format=3Dtcg-h \
---=20
+diff --git a/Makefile b/Makefile
+index 1a8bfb2..1ca45b2 100644
+--- a/Makefile
++++ b/Makefile
+@@ -184,7 +184,7 @@ qemu-version.h: FORCE
+ 				printf '""\n'; \
+ 			fi; \
+ 		fi) > $@.tmp)
+-	$(call quiet-command, cmp -s $@ $@.tmp || mv $@.tmp $@)
++	$(call quiet-command, cmp -s $@ $@.tmp || cp $@.tmp $@)
+ 
+ config-host.h: config-host.h-timestamp
+ config-host.h-timestamp: config-host.mak
+-- 
 2.9.2
