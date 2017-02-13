@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@openvz.org>) id 1cdAl5-0001kB-UB
+	(envelope-from <den@openvz.org>) id 1cdAl5-0001kC-Uc
 	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 02:09:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@openvz.org>) id 1cdAl2-0008F8-MR
+	(envelope-from <den@openvz.org>) id 1cdAl2-0008FK-Vw
 	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 02:09:11 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:38396 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:26999 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <den@openvz.org>) id 1cdAl2-0008Ec-6q
+	(Exim 4.71) (envelope-from <den@openvz.org>) id 1cdAl2-0008Ed-Ge
 	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 02:09:08 -0500
 From: "Denis V. Lunev" <den@openvz.org>
-Date: Mon, 13 Feb 2017 10:09:01 +0300
-Message-Id: <1486969742-16539-3-git-send-email-den@openvz.org>
+Date: Mon, 13 Feb 2017 10:09:00 +0300
+Message-Id: <1486969742-16539-2-git-send-email-den@openvz.org>
 In-Reply-To: <1486969742-16539-1-git-send-email-den@openvz.org>
 References: <1486969742-16539-1-git-send-email-den@openvz.org>
-Subject: [Qemu-devel] [PATCH v3 2/3] report guest crash information in
- GUEST_PANICKED event
+Subject: [Qemu-devel] [PATCH v3 1/3] i386/cpu: add crash-information QOM
+ property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,219 +29,249 @@ Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.o
 
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-it's not very convenient to use the crash-information property interface,
-so provide a CPU class callback to get the guest crash information, and pass
-that information in the event
+Windows reports BSOD parameters through Hyper-V crash MSRs. This
+information is very useful for initial crash analysis and thus
+it would be nice to have a way to fetch it.
 
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 Signed-off-by: Denis V. Lunev <den@openvz.org>
 ---
- hw/misc/pvpanic.c       |  2 +-
- hw/ppc/spapr_rtas.c     |  3 ++-
- include/qom/cpu.h       | 10 ++++++++++
- include/sysemu/sysemu.h |  2 +-
- kvm-all.c               |  2 +-
- qapi/event.json         |  6 ++++--
- qom/cpu.c               | 11 +++++++++++
- target/i386/cpu.c       |  1 +
- target/s390x/kvm.c      |  4 ++--
- vl.c                    | 14 +++++++++++---
- 10 files changed, 44 insertions(+), 11 deletions(-)
+ include/sysemu/kvm.h |  2 ++
+ kvm-all.c            |  1 +
+ qapi-schema.json     | 24 +++++++++++++++++++++++
+ stubs/Makefile.objs  |  1 +
+ stubs/kvm-crash.c    |  8 ++++++++
+ target/i386/cpu.c    | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ target/i386/cpu.h    |  3 +++
+ target/i386/kvm.c    | 41 +++++++++++++++++++++++++++++++++++++++
+ 8 files changed, 134 insertions(+)
+ create mode 100644 stubs/kvm-crash.c
 
-diff --git a/hw/misc/pvpanic.c b/hw/misc/pvpanic.c
-index 0ac1e6a..57da7f2 100644
---- a/hw/misc/pvpanic.c
-+++ b/hw/misc/pvpanic.c
-@@ -42,7 +42,7 @@ static void handle_event(int event)
-     }
- 
-     if (event & PVPANIC_PANICKED) {
--        qemu_system_guest_panicked();
-+        qemu_system_guest_panicked(NULL);
-         return;
-     }
- }
-diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-index bb19944..619f32c 100644
---- a/hw/ppc/spapr_rtas.c
-+++ b/hw/ppc/spapr_rtas.c
-@@ -334,7 +334,8 @@ static void rtas_ibm_os_term(PowerPCCPU *cpu,
- {
-     target_ulong ret = 0;
- 
--    qapi_event_send_guest_panicked(GUEST_PANIC_ACTION_PAUSE, &error_abort);
-+    qapi_event_send_guest_panicked(GUEST_PANIC_ACTION_PAUSE, false, NULL,
-+                                   &error_abort);
- 
-     rtas_st(rets, 0, ret);
- }
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index ca4d0fb..f95a6c3 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -156,6 +156,7 @@ typedef struct CPUClass {
-                            uint8_t *buf, int len, bool is_write);
-     void (*dump_state)(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
-                        int flags);
-+    GuestPanicInformation* (*get_crash_info)(CPUState *cpu);
-     void (*dump_statistics)(CPUState *cpu, FILE *f,
-                             fprintf_function cpu_fprintf, int flags);
-     int64_t (*get_arch_id)(CPUState *cpu);
-@@ -469,6 +470,15 @@ int cpu_write_elf32_qemunote(WriteCoreDumpFunction f, CPUState *cpu,
-                              void *opaque);
- 
- /**
-+ * cpu_get_crash_info:
-+ * @cpu: The CPU to get crash information for
-+ *
-+ * Gets the previously saved crash information.
-+ * Caller is responsible for freeing the data.
-+ */
-+GuestPanicInformation *cpu_get_crash_info(CPUState *cpu);
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 3045ee7..02a363d 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -527,4 +527,6 @@ int kvm_set_one_reg(CPUState *cs, uint64_t id, void *source);
+  */
+ int kvm_get_one_reg(CPUState *cs, uint64_t id, void *target);
+ int kvm_get_max_memslots(void);
 +
-+/**
-  * CPUDumpFlags:
-  * @CPU_DUMP_CODE:
-  * @CPU_DUMP_FPU: dump FPU register state, not just integer
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 4d50694..2c39bed 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -64,7 +64,7 @@ int qemu_shutdown_requested_get(void);
- int qemu_reset_requested_get(void);
- void qemu_system_killed(int signal, pid_t pid);
- void qemu_system_reset(bool report);
--void qemu_system_guest_panicked(void);
-+void qemu_system_guest_panicked(GuestPanicInformation *info);
- size_t qemu_target_page_bits(void);
- 
- void qemu_add_exit_notifier(Notifier *notify);
++void kvm_arch_save_crash_info(CPUState *cpu);
+ #endif
 diff --git a/kvm-all.c b/kvm-all.c
-index abfe92d..8fe69bb 100644
+index a27c880..abfe92d 100644
 --- a/kvm-all.c
 +++ b/kvm-all.c
-@@ -2002,7 +2002,7 @@ int kvm_cpu_exec(CPUState *cpu)
-             case KVM_SYSTEM_EVENT_CRASH:
-                 kvm_arch_save_crash_info(cpu);
-                 qemu_mutex_lock_iothread();
--                qemu_system_guest_panicked();
-+                qemu_system_guest_panicked(cpu_get_crash_info(cpu));
-                 qemu_mutex_unlock_iothread();
-                 ret = 0;
+@@ -2000,6 +2000,7 @@ int kvm_cpu_exec(CPUState *cpu)
+                 ret = EXCP_INTERRUPT;
                  break;
-diff --git a/qapi/event.json b/qapi/event.json
-index 7bf539b..970ff02 100644
---- a/qapi/event.json
-+++ b/qapi/event.json
-@@ -488,7 +488,9 @@
- #
- # @action: action that has been taken, currently always "pause"
- #
--# Since: 1.5
-+# @info: optional information about a panic
+             case KVM_SYSTEM_EVENT_CRASH:
++                kvm_arch_save_crash_info(cpu);
+                 qemu_mutex_lock_iothread();
+                 qemu_system_guest_panicked();
+                 qemu_mutex_unlock_iothread();
+diff --git a/qapi-schema.json b/qapi-schema.json
+index cbdffdd..9cb6ac5 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -5846,6 +5846,30 @@
+   'data': [ 'pause', 'poweroff' ] }
+ 
+ ##
++# @GuestPanicInformation:
 +#
-+# Since: 1.5 (@info since 2.9)
++# Information about a guest panic
++#
++# Since: 2.9
++##
++{'union': 'GuestPanicInformation',
++ 'data': { 'hyper-v': 'GuestPanicInformationHyperV' } }
++
++##
++# @GuestPanicInformationHyperV:
++#
++# Hyper-V specific guest panic information (HV crash MSRs)
++#
++# Since: 2.9
++##
++{'struct': 'GuestPanicInformationHyperV',
++ 'data': { 'arg1': 'uint64',
++           'arg2': 'uint64',
++           'arg3': 'uint64',
++           'arg4': 'uint64',
++           'arg5': 'uint64' } }
++
++##
+ # @rtc-reset-reinjection:
  #
- # Example:
- #
-@@ -497,7 +499,7 @@
- #
- ##
- { 'event': 'GUEST_PANICKED',
--  'data': { 'action': 'GuestPanicAction' } }
-+  'data': { 'action': 'GuestPanicAction', '*info': 'GuestPanicInformation' } }
- 
- ##
- # @QUORUM_FAILURE:
-diff --git a/qom/cpu.c b/qom/cpu.c
-index d57faf3..5158f31 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -218,6 +218,17 @@ static bool cpu_common_exec_interrupt(CPUState *cpu, int int_req)
-     return false;
- }
- 
-+GuestPanicInformation *cpu_get_crash_info(CPUState *cpu)
+ # This command will reset the RTC interrupt reinjection backlog.
+diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+index a187295..3b1632a 100644
+--- a/stubs/Makefile.objs
++++ b/stubs/Makefile.objs
+@@ -35,3 +35,4 @@ stub-obj-y += qmp_pc_dimm_device_list.o
+ stub-obj-y += target-monitor-defs.o
+ stub-obj-y += target-get-monitor-def.o
+ stub-obj-y += pc_madt_cpu_entry.o
++stub-obj-y += kvm-crash.o
+diff --git a/stubs/kvm-crash.c b/stubs/kvm-crash.c
+new file mode 100644
+index 0000000..b2f502d
+--- /dev/null
++++ b/stubs/kvm-crash.c
+@@ -0,0 +1,8 @@
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "sysemu/kvm.h"
++
++void kvm_arch_save_crash_info(CPUState *cs)
 +{
-+    CPUClass *cc = CPU_GET_CLASS(cpu);
-+    GuestPanicInformation *res = NULL;
-+
-+    if (cc->get_crash_info) {
-+        res = cc->get_crash_info(cpu);
-+    }
-+    return res;
++    return;
 +}
-+
- void cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
-                     int flags)
- {
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 275e236..8bed688 100644
+index eb49980..275e236 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -3738,6 +3738,7 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
-     cc->do_interrupt = x86_cpu_do_interrupt;
-     cc->cpu_exec_interrupt = x86_cpu_exec_interrupt;
-     cc->dump_state = x86_cpu_dump_state;
-+    cc->get_crash_info = x86_cpu_get_crash_info;
-     cc->set_pc = x86_cpu_set_pc;
-     cc->synchronize_from_tb = x86_cpu_synchronize_from_tb;
-     cc->gdb_read_register = x86_cpu_gdb_read_register;
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 6ed3876..2536780 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -1864,7 +1864,7 @@ static void unmanageable_intercept(S390CPU *cpu, const char *str, int pswoffset)
-                  str, cs->cpu_index, ldq_phys(cs->as, cpu->env.psa + pswoffset),
-                  ldq_phys(cs->as, cpu->env.psa + pswoffset + 8));
-     s390_cpu_halt(cpu);
--    qemu_system_guest_panicked();
-+    qemu_system_guest_panicked(NULL);
+@@ -3495,6 +3495,57 @@ static void x86_cpu_register_feature_bit_props(X86CPU *cpu,
+     x86_cpu_register_bit_prop(cpu, name, &cpu->env.features[w], bitnr);
  }
  
- static int handle_intercept(S390CPU *cpu)
-@@ -1897,7 +1897,7 @@ static int handle_intercept(S390CPU *cpu)
-                 if (is_special_wait_psw(cs)) {
-                     qemu_system_shutdown_request();
-                 } else {
--                    qemu_system_guest_panicked();
-+                    qemu_system_guest_panicked(NULL);
-                 }
-             }
-             r = EXCP_HALTED;
-diff --git a/vl.c b/vl.c
-index b4eaf03..d5a183f 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1707,18 +1707,26 @@ void qemu_system_reset(bool report)
-     cpu_synchronize_all_post_reset();
- }
- 
--void qemu_system_guest_panicked(void)
-+void qemu_system_guest_panicked(GuestPanicInformation *info)
- {
-     if (current_cpu) {
-         current_cpu->crash_occurred = true;
-     }
--    qapi_event_send_guest_panicked(GUEST_PANIC_ACTION_PAUSE, &error_abort);
-+    qapi_event_send_guest_panicked(GUEST_PANIC_ACTION_PAUSE,
-+                                   !!info, info, &error_abort);
-     vm_stop(RUN_STATE_GUEST_PANICKED);
-     if (!no_shutdown) {
-         qapi_event_send_guest_panicked(GUEST_PANIC_ACTION_POWEROFF,
--                                       &error_abort);
-+                                       !!info, info, &error_abort);
-         qemu_system_shutdown_request();
-     }
++static GuestPanicInformation *x86_cpu_get_crash_info(CPUState *cs)
++{
++    X86CPU *cpu = X86_CPU(cs);
++    CPUX86State *env = &cpu->env;
++    GuestPanicInformation *panic_info = NULL;
 +
-+    if (info) {
-+        if (info->type == GUEST_PANIC_INFORMATION_KIND_HYPER_V) {
-+            g_free(info->u.hyper_v.data);
-+        }
-+        g_free(info);
++    if (env->features[FEAT_HYPERV_EDX] & HV_X64_GUEST_CRASH_MSR_AVAILABLE) {
++        GuestPanicInformationHyperV *panic_info_hv =
++            g_malloc0(sizeof(GuestPanicInformationHyperV));
++        panic_info = g_malloc0(sizeof(GuestPanicInformation));
++
++        panic_info->type = GUEST_PANIC_INFORMATION_KIND_HYPER_V;
++        panic_info->u.hyper_v.data = panic_info_hv;
++
++        assert(HV_X64_MSR_CRASH_PARAMS >= 5);
++        panic_info_hv->arg1 = cpu->hv_msr_crash_params[0];
++        panic_info_hv->arg2 = cpu->hv_msr_crash_params[1];
++        panic_info_hv->arg3 = cpu->hv_msr_crash_params[2];
++        panic_info_hv->arg4 = cpu->hv_msr_crash_params[3];
++        panic_info_hv->arg5 = cpu->hv_msr_crash_params[4];
 +    }
++
++    return panic_info;
++}
++static void x86_cpu_get_crash_info_qom(Object *obj, Visitor *v,
++                                       const char *name, void *opaque,
++                                       Error **errp)
++{
++    CPUState *cs = CPU(obj);
++    GuestPanicInformation *panic_info;
++
++    if (!cs->crash_occurred) {
++        error_setg(errp, "No crash occured");
++        return;
++    }
++
++    panic_info = x86_cpu_get_crash_info(cs);
++    if (panic_info == NULL) {
++        error_setg(errp, "No crash information");
++        return;
++    }
++
++    visit_type_GuestPanicInformation(v, "crash-information", &panic_info,
++                                     errp);
++
++    if (panic_info->type == GUEST_PANIC_INFORMATION_KIND_HYPER_V) {
++        g_free(panic_info->u.hyper_v.data);
++    }
++    g_free(panic_info);
++}
++
+ static void x86_cpu_initfn(Object *obj)
+ {
+     CPUState *cs = CPU(obj);
+@@ -3530,6 +3581,9 @@ static void x86_cpu_initfn(Object *obj)
+                         x86_cpu_get_feature_words,
+                         NULL, NULL, (void *)cpu->filtered_features, NULL);
+ 
++    object_property_add(obj, "crash-information", "GuestPanicInformation",
++                        x86_cpu_get_crash_info_qom, NULL, NULL, NULL, NULL);
++
+     cpu->hyperv_spinlock_attempts = HYPERV_SPINLOCK_NEVER_RETRY;
+ 
+     for (w = 0; w < FEATURE_WORDS; w++) {
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 4d788d5..38c8da9 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1258,6 +1258,9 @@ struct X86CPU {
+     /* Number of physical address bits supported */
+     uint32_t phys_bits;
+ 
++    /* Hyper-V crash MSRs */
++    uint64_t hv_msr_crash_params[HV_X64_MSR_CRASH_PARAMS];
++
+     /* in order to simplify APIC support, we leave this pointer to the
+        user */
+     struct DeviceState *apic_state;
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 27fd050..2427c4a 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -2054,6 +2054,36 @@ static int kvm_get_sregs(X86CPU *cpu)
+     return 0;
  }
  
- void qemu_system_reset_request(void)
++static int kvm_read_msr_hv_crash(X86CPU *cpu, uint64_t *buf)
++{
++    int i, ret;
++    struct {
++        struct kvm_msrs info;
++        struct kvm_msr_entry entries[HV_X64_MSR_CRASH_PARAMS];
++    } msr_data;
++
++    if (!has_msr_hv_crash) {
++        return -ENOSYS;
++    }
++
++    for (i = 0; i < HV_X64_MSR_CRASH_PARAMS; i++) {
++        msr_data.entries[i].index = HV_X64_MSR_CRASH_P0 + i;
++    }
++    msr_data.info.nmsrs = HV_X64_MSR_CRASH_PARAMS;
++
++    ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MSRS, &msr_data);
++    if (ret < 0) {
++        return ret;
++    }
++
++    for (i = 0; i < ret; i++) {
++        const struct kvm_msr_entry *msr = msr_data.entries + i;
++        buf[msr->index - HV_X64_MSR_CRASH_P0] = msr->data;
++    }
++
++    return 0;
++}
++
+ static int kvm_get_msrs(X86CPU *cpu)
+ {
+     CPUX86State *env = &cpu->env;
+@@ -2801,6 +2831,17 @@ int kvm_arch_get_registers(CPUState *cs)
+     return ret;
+ }
+ 
++void kvm_arch_save_crash_info(CPUState *cs)
++{
++    if (has_msr_hv_crash) {
++        X86CPU *cpu = X86_CPU(cs);
++        int ret = kvm_read_msr_hv_crash(cpu, cpu->hv_msr_crash_params);
++        if (ret < 0) {
++            fprintf(stderr, "Failed to get HV crash parameters\n");
++        }
++    }
++}
++
+ void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run)
+ {
+     X86CPU *x86_cpu = X86_CPU(cpu);
 -- 
 2.7.4
