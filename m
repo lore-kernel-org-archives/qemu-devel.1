@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cdmYR-00027t-UU
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 18:30:41 -0500
+	(envelope-from <jsnow@redhat.com>) id 1cdml0-00070D-Gq
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 18:43:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cdmYO-00073l-Jh
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 18:30:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36312)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1cdmYO-000738-5y
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 18:30:36 -0500
-References: <1486623844-13140-1-git-send-email-liqiang6-s@360.cn>
-	<1486623844-13140-2-git-send-email-liqiang6-s@360.cn>
-	<cfca49ad-7eec-5b04-7cdd-e52bd32f38ea@redhat.com>
-	<CAKXe6SJbYjUCphByCAtyVJiUfLk-XUSJQa3+BjbwsPFMOT5w6A@mail.gmail.com>
+	(envelope-from <jsnow@redhat.com>) id 1cdmkz-0002t7-C2
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 18:43:38 -0500
+References: <1487091579-67092-1-git-send-email-vsementsov@virtuozzo.com>
+	<1487091579-67092-23-git-send-email-vsementsov@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <092e0dfc-7e59-ba5c-ab21-8f667635beaf@redhat.com>
-Date: Tue, 14 Feb 2017 18:30:32 -0500
+Message-ID: <8f2dadf9-e2ff-b975-8460-daa8efea51fb@redhat.com>
+Date: Tue, 14 Feb 2017 18:43:30 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAKXe6SJbYjUCphByCAtyVJiUfLk-XUSJQa3+BjbwsPFMOT5w6A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1487091579-67092-23-git-send-email-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] ide: core: add cleanup function
+Subject: Re: [Qemu-devel] [PATCH 22/25] block/dirty-bitmap: add
+ bdrv_remove_persistent_dirty_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,103 +24,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>, pbonzini@redhat.com
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Li Qiang <liqiang6-s@360.cn>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
 
 
 
-On 02/09/2017 08:22 PM, Li Qiang wrote:
-> Hello John,
+On 02/14/2017 11:59 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Interface for removing persistent bitmap from its storage.
 > 
-> 2017-02-10 3:42 GMT+08:00 John Snow <jsnow@redhat.com
-> <mailto:jsnow@redhat.com>>:
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  block/dirty-bitmap.c         | 18 ++++++++++++++++++
+>  include/block/block_int.h    |  3 +++
+>  include/block/dirty-bitmap.h |  3 +++
+>  3 files changed, 24 insertions(+)
 > 
-> 
-> 
->     On 02/09/2017 02:04 AM, Li Qiang wrote:
->     > As the pci ahci can be hotplug and unplug, in the ahci unrealize
->     > function it should free all the resource once allocated in the
->     > realized function. This patch adds two cleanup function.
->     >
->     > Signed-off-by: Li Qiang <liqiang6-s@360.cn <mailto:liqiang6-s@360.cn>>
->     > ---
->     >  hw/ide/core.c             | 21 +++++++++++++++++++++
->     >  include/hw/ide/internal.h |  2 ++
->     >  2 files changed, 23 insertions(+)
->     >
->     > diff --git a/hw/ide/core.c b/hw/ide/core.c
->     > index 43709e5..8fe5896 100644
->     > --- a/hw/ide/core.c
->     > +++ b/hw/ide/core.c
->     > @@ -2586,6 +2586,13 @@ void ide_register_restart_cb(IDEBus *bus)
->     >      }
->     >  }
->     >
->     > +void ide_unregister_restart_cb(IDEBus *bus)
->     > +{
->     > +    if (bus->dma->ops->restart_dma) {
->     > +        qemu_del_vm_change_state_handler(bus->vmstate);
->     > +    }
->     > +}
->     > +
-> 
->     Doesn't this conflict with qdev.c's idebus_unrealize call? 
-> 
-> 
-> As far as I can see, No conflict. Let's get a confirmation.
-> 
-> Hello Paolo,
-> 
-> Does this patch have any conflict/affect with the qdev?
-> 
-> Thanks.
+> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+> index b684d8b..05e0aae 100644
+> --- a/block/dirty-bitmap.c
+> +++ b/block/dirty-bitmap.c
+> @@ -327,12 +327,30 @@ void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap)
+>  /**
+>   * Release all named dirty bitmaps attached to a BDS (for use in bdrv_close()).
+>   * There must not be any frozen bitmaps attached.
+> + * This function does not remove persistent bitmaps from the storage.
+>   */
+>  void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs)
+>  {
+>      bdrv_do_release_matching_dirty_bitmap(bs, NULL, true);
+>  }
+>  
+> +/**
+> + * Remove persistent dirty bitmap from the storage if it exists.
+> + * Absence of bitmap is not an error, because we have the following scenario:
+> + * BdrvDirtyBitmap can have .persistent = true but not yet saved and have no
+> + * stored version. For such bitmap bdrv_remove_persistent_dirty_bitmap() should
+> + * not fail.
+> + * This function doesn't release corresponding BdrvDirtyBitmap.
+> + */
+> +void bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs,
+> +                                         const char *name,
+> +                                         Error **errp)
+> +{
+> +    if (bs->drv && bs->drv->bdrv_remove_persistent_dirty_bitmap) {
+> +        bs->drv->bdrv_remove_persistent_dirty_bitmap(bs, name, errp);
+> +    }
+> +}
+> +
+>  void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
+>  {
+>      assert(!bdrv_dirty_bitmap_frozen(bitmap));
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index db68067..d138555 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -328,6 +328,9 @@ struct BlockDriver {
+>                                              const char *name,
+>                                              uint32_t granularity,
+>                                              Error **errp);
+> +    void (*bdrv_remove_persistent_dirty_bitmap)(BlockDriverState *bs,
+> +                                                const char *name,
+> +                                                Error **errp);
+>  
+>      QLIST_ENTRY(BlockDriver) list;
+>  };
+> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+> index b022b34..ce12610 100644
+> --- a/include/block/dirty-bitmap.h
+> +++ b/include/block/dirty-bitmap.h
+> @@ -25,6 +25,9 @@ BdrvDirtyBitmap *bdrv_find_dirty_bitmap(BlockDriverState *bs,
+>  void bdrv_dirty_bitmap_make_anon(BdrvDirtyBitmap *bitmap);
+>  void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap);
+>  void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs);
+> +void bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs,
+> +                                         const char *name,
+> +                                         Error **errp);
+>  void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap);
+>  void bdrv_enable_dirty_bitmap(BdrvDirtyBitmap *bitmap);
+>  BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs);
 > 
 
-They're both deleting the same VMstate handler, so as far as I can see
-this is a redundant call.
-
-> 
-> 
->     >  static IDEDMA ide_dma_nop = {
->     >      .ops = &ide_dma_nop_ops,
->     >      .aiocb = NULL,
->     > @@ -2603,6 +2610,20 @@ void ide_init2(IDEBus *bus, qemu_irq irq)
->     >      bus->dma = &ide_dma_nop;
->     >  }
->     >
->     > +void ide_exit(IDEBus *bus)
->     > +{
->     > +    int i;
->     > +
->     > +    for (i = 0; i < 2; i++) {
->     > +        IDEState *s = &bus->ifs[i];
->     > +
->     > +        timer_del(s->sector_write_timer);
->     > +        timer_free(s->sector_write_timer);
->     > +        qemu_vfree(s->smart_selftest_data);
->     > +        qemu_vfree(s->io_buffer);
->     > +    }
->     > +}
->     > +
->     >  static const MemoryRegionPortio ide_portio_list[] = {
->     >      { 0, 8, 1, .read = ide_ioport_read, .write = ide_ioport_write },
->     >      { 0, 1, 2, .read = ide_data_readw, .write = ide_data_writew },
->     > diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
->     > index 88dc118..09b0404 100644
->     > --- a/include/hw/ide/internal.h
->     > +++ b/include/hw/ide/internal.h
->     > @@ -607,8 +607,10 @@ int ide_init_drive(IDEState *s, BlockBackend
->     *blk, IDEDriveKind kind,
->     >                     uint32_t cylinders, uint32_t heads, uint32_t secs,
->     >                     int chs_trans);
->     >  void ide_init2(IDEBus *bus, qemu_irq irq);
->     > +void ide_exit(IDEBus *bus);
->     >  void ide_init_ioport(IDEBus *bus, ISADevice *isa, int iobase, int
->     iobase2);
->     >  void ide_register_restart_cb(IDEBus *bus);
->     > +void ide_unregister_restart_cb(IDEBus *bus);
->     >
->     >  void ide_exec_cmd(IDEBus *bus, uint32_t val);
->     >
->     >
-> 
+Reviewed-by: John Snow <jsnow@redhat.com>
