@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38512)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cdekX-0007Uv-4x
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 10:10:38 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cdelG-0007yP-MH
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 10:11:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cdekR-0000Sm-RT
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 10:10:37 -0500
-Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:36350)
+	(envelope-from <alex.bennee@linaro.org>) id 1cdelC-0000xK-Ih
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 10:11:22 -0500
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:37672)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cdekR-0000SI-Kf
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 10:10:31 -0500
-Received: by mail-wr0-x236.google.com with SMTP id k90so171732537wrc.3
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 07:10:31 -0800 (PST)
+	id 1cdelC-0000wz-C3
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 10:11:18 -0500
+Received: by mail-wm0-x234.google.com with SMTP id v77so19502537wmv.0
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 07:11:18 -0800 (PST)
 References: <20170214100733.22280-1-alex.bennee@linaro.org>
-	<20170214100733.22280-3-alex.bennee@linaro.org>
-	<20170214140049.GB12294@lemon.lan>
-	<20170214142727.GB20715@lemon.lan>
+	<20170214100733.22280-2-alex.bennee@linaro.org>
+	<20170214142204.GA20715@lemon.lan>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170214142727.GB20715@lemon.lan>
-Date: Tue, 14 Feb 2017 15:10:49 +0000
-Message-ID: <87efz0vmdi.fsf@linaro.org>
+In-reply-to: <20170214142204.GA20715@lemon.lan>
+Date: Tue, 14 Feb 2017 15:11:36 +0000
+Message-ID: <87d1ekvmc7.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] new: debian docker targets for
- cross-compiling
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] tests/docker: add basic user
+ mapping support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,50 +38,80 @@ Cc: qemu-devel@nongnu.org
 
 Fam Zheng <famz@redhat.com> writes:
 
-> On Tue, 02/14 22:00, Fam Zheng wrote:
->> On Tue, 02/14 10:07, Alex Bennée wrote:
->> > This provides a basic Debian install with access to the emdebian cross
->> > compilers. The debian-armhf-cross and debian-arm64-cross targets build
->> > on the basic Debian image to allow cross compiling to those targets.
->> >
->> > To build against the cross compiler a cross-compile prefix needs to be
->> > set in the configure options, for example:
->> >
->> >   make docker-test-build@debian-arm64-cross \
->> >     EXTRA_CONFIGURE_OPTS="--cross-prefix=aarch64-linux-gnu-" \
->> >     TARGET_LIST="aarch64-softmmu,aarch64-linux-user"
+> On Tue, 02/14 10:07, Alex Bennée wrote:
+>> Currently all docker builds are done by exporting a tarball to the
+>> docker container and running the build as the containers root user.
+>> Other use cases are possible however and it is possible to map a part
+>> of users file-system to the container. This is useful for example for
+>> doing cross-builds of arbitrary source trees. For this to work
+>> smoothly the container needs to have a user created that maps cleanly
+>> to the host system.
 >>
->> If cross-compile is the only meaningful way to use this image, we probably
->> should bake the configure option into the dockerfile and pick it up
->> automatically in common.rc.  What do you think?
+>> This adds a -u option to the docker script so that:
+>>
+>>   DEB_ARCH=armhf DEB_TYPE=stable ./tests/docker/docker.py build \
+>>     -u --include-executable=arm-linux-user/qemu-arm \
+>>     debian:armhf ./tests/docker/dockerfiles/debian-bootstrap.docker
+>>
+>> Will build a container that can then be run like:
+>>
+>>   docker run --rm -it -v /home/alex/lsrc/qemu/risu.git/:/src \
+>>     --user=alex:alex -w /src/ debian:armhf \
+>>     sh -c "make clean && ./configure -s && make"
+>>
+>> Alternatively specifying USER will add the appropriate stanza when
+>> building via the Makefile:
+>>
+>>   make docker-image-debian-armhf-cross USER=1
+>>
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>> Reviewed-by: Fam Zheng <famz@redhat.com>
+>>
+>> ---
+>> v2
+>>   - write the useradd directly
+>>   - change long option to --add-current-user
+>> v3
+>>   - images -> image's
+>>   - add r-b
+>>   - add USER to Makefile
+>> ---
+>>  tests/docker/Makefile.include |  2 ++
+>>  tests/docker/docker.py        | 15 +++++++++++++--
+>>  2 files changed, 15 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+>> index 3f15d5aea8..8db55e43aa 100644
+>> --- a/tests/docker/Makefile.include
+>> +++ b/tests/docker/Makefile.include
+>> @@ -50,6 +50,7 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
+>>  	$(call quiet-command,\
+>>  		$(SRC_PATH)/tests/docker/docker.py build qemu:$* $< \
+>>  		$(if $V,,--quiet) $(if $(NOCACHE),--no-cache) \
+>> +		$(if $(USER),--add-current-user,) \
+>>  		$(if $(EXECUTABLE),--include-executable=$(EXECUTABLE)),\
+>>  		"BUILD","$*")
+>>
+>> @@ -99,6 +100,7 @@ docker:
+>>  	@echo '                         (default is 1)'
+>>  	@echo '    DEBUG=1              Stop and drop to shell in the created container'
+>>  	@echo '                         before running the command.'
+>> +	@echo '    USER=1		Add current user to docker image.'
 >
-> The example change is like this:
->
-> diff --git a/tests/docker/common.rc b/tests/docker/common.rc
-> index 21657e87c6..6865689bb5 100755
-> --- a/tests/docker/common.rc
-> +++ b/tests/docker/common.rc
-> @@ -29,7 +29,7 @@ build_qemu()
->      config_opts="--enable-werror \
->                   ${TARGET_LIST:+--target-list=${TARGET_LIST}} \
->                   --prefix=$PWD/install \
-> -                 $EXTRA_CONFIGURE_OPTS \
-> +                 $QEMU_CONFIGURE_OPTS $EXTRA_CONFIGURE_OPTS \
->                   $@"
->      echo "Configure options:"
->      echo $config_opts
-> diff --git a/tests/docker/dockerfiles/debian-arm64-cross.docker b/tests/docker/dockerfiles/debian-arm64-cross.docker
-> index 04212629f7..fc1c135e74 100644
-> --- a/tests/docker/dockerfiles/debian-arm64-cross.docker
-> +++ b/tests/docker/dockerfiles/debian-arm64-cross.docker
-> @@ -10,3 +10,4 @@ RUN dpkg --add-architecture arm64
->  RUN apt update
->  RUN apt install -yy crossbuild-essential-arm64
->  RUN apt-get build-dep -yy -a arm64 qemu
-> +ENV QEMU_CONFIGURE_OPTS --cross-prefix=aarch64-linux-gnu-
+> This is a bad choice of name, $USER is "$(id -un)", maybe
+> ADD_CUR_USER?
 
-Yeah that seems like a good idea. Then a make
-docker-test-build@debian-armhf-cross will work as expected ;-)
+Or we could just enable it by default? Is there a reason not to enable
+the current user for these images?
+
+>
+> Fam
+>
+>
+>>  	@echo '    NOCACHE=1            Ignore cache when build images.'
+>>  	@echo '    EXECUTABLE=<path>    Include executable in image.'
+>>
+
 
 --
 Alex Bennée
