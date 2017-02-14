@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1cdasG-0004ow-9g
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:02:24 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cdato-0006Xr-Ea
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:03:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1cdasF-00062z-Fg
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:02:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40828)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1cdasF-00062Q-9u
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:02:19 -0500
-Date: Tue, 14 Feb 2017 16:32:12 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-In-Reply-To: <CAFEAcA-4AUMocZJgxEkR5khYvjKzfwMZTZQavyEBE-K32L2oUQ@mail.gmail.com>
-Message-ID: <alpine.LFD.2.20.1702141629580.25875@wniryva>
+	(envelope-from <peter.maydell@linaro.org>) id 1cdatk-0006cC-AD
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:03:56 -0500
+Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:33023)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cdatk-0006bi-4d
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:03:52 -0500
+Received: by mail-wr0-x22b.google.com with SMTP id i10so167574437wrb.0
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 03:03:51 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <alpine.LFD.2.20.1702141629580.25875@wniryva>
 References: <20170214062242.26124-1-ppandit@redhat.com>
 	<CAFEAcA-cnpn321oTvxPXAx55ngztojr=Q6KKTEcgKTvfDV8f8Q@mail.gmail.com>
 	<alpine.LFD.2.20.1702141551490.25875@wniryva>
 	<CAFEAcA-4AUMocZJgxEkR5khYvjKzfwMZTZQavyEBE-K32L2oUQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+	<alpine.LFD.2.20.1702141629580.25875@wniryva>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 14 Feb 2017 11:03:30 +0000
+Message-ID: <CAFEAcA_gBtVecZv8FW2Z2TN21Q2MCT=DcLpEjeSV+U3r_Hi5CQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Subject: Re: [Qemu-devel] [PATCH v4] sd: sdhci: mask transfer mode register
  value
 List-Id: <qemu-devel.nongnu.org>
@@ -29,20 +33,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
+To: P J P <ppandit@redhat.com>
 Cc: Qemu Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair23@gmail.com>, Wjjzhang <wjjzhang@tencent.com>, Jiang Xin <jiangxin1@huawei.com>
 
-  Hello Peter,
+On 14 February 2017 at 11:02, P J P <ppandit@redhat.com> wrote:
+>   Hello Peter,
+>
+> +-- On Tue, 14 Feb 2017, Peter Maydell wrote --+
+> | Please keep sending them as a single series, though. Otherwise I
+> | won't be able to easily apply them in the right order and track
+> | their current status.
+>
+>   Okay, got it. Ie. to re-send entire series even for change in one of the
+> patches?
 
-+-- On Tue, 14 Feb 2017, Peter Maydell wrote --+
-| Please keep sending them as a single series, though. Otherwise I
-| won't be able to easily apply them in the right order and track
-| their current status.
+Yes, exactly. (We document this in
+http://wiki.qemu-project.org/Contribute/SubmitAPatch#Participating_in_Code_Review
+but of course that page is huge...)
 
-  Okay, got it. Ie. to re-send entire series even for change in one of the 
-patches?
-
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+thanks
+-- PMM
