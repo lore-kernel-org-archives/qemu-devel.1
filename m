@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38766)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cdT5l-0005wn-JV
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 21:43:46 -0500
+	(envelope-from <Ketan.Nilangekar@veritas.com>) id 1cdTNZ-00025K-M9
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 22:02:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cdT5k-0003a7-7z
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 21:43:45 -0500
-Date: Tue, 14 Feb 2017 13:43:31 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170214024331.GD2169@umbus.fritz.box>
-References: <1486636445-24109-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<1486636445-24109-6-git-send-email-nikunj@linux.vnet.ibm.com>
-	<20170210001035.GJ27610@umbus.fritz.box>
-	<87k28yekze.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	(envelope-from <Ketan.Nilangekar@veritas.com>) id 1cdTNU-0006xo-PT
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 22:02:09 -0500
+Received: from mail1.bemta12.messagelabs.com ([216.82.251.8]:36035)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Ketan.Nilangekar@veritas.com>)
+	id 1cdTNU-0006xY-Gd
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 22:02:04 -0500
+From: Ketan Nilangekar <Ketan.Nilangekar@veritas.com>
+Date: Tue, 14 Feb 2017 03:02:00 +0000
+Message-ID: <983C87E0-DE5B-4147-82CD-CE6A8D093B6C@veritas.com>
+References: <1478566785-4002-1-git-send-email-ashish.mittal@veritas.com>
+	<1478566785-4002-3-git-send-email-ashish.mittal@veritas.com>
+	<20161108204413.GA6353@localhost.localdomain>
+	<CAAo6VWMyTjV1Fn8-BSex7Fx8OcEcuEyK2rQJ6L=wZZXDiB5A4w@mail.gmail.com>
+	<20170213133725.GA10361@stefanha-x1.localdomain>
+	<20170213163232.GN27752@localhost.localdomain>
+	<B3F9860E-E786-48A5-8BBD-918833905E73@veritas.com>
+	<20170213232302.GP27752@localhost.localdomain>
+In-Reply-To: <20170213232302.GP27752@localhost.localdomain>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <BD9E26D2E43B084EB6853844E9E145B8@veritas.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="wLAMOaPNJ0fu1fTG"
-Content-Disposition: inline
-In-Reply-To: <87k28yekze.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH 5/6] target-ppc: support for 32-bit carry
- and overflow
+Subject: Re: [Qemu-devel] [PATCH v6 2/2] block/vxhs.c: Add qemu-iotests for
+ new block device type "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,100 +37,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Cc: qemu-ppc@nongnu.org, rth@twiddle.net, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
+To: Jeff Cody <jcody@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, ashish mittal <ashmit602@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel
+	P. Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish
+	Mittal <Ashish.Mittal@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>
 
-
---wLAMOaPNJ0fu1fTG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Feb 10, 2017 at 09:49:17AM +0530, Nikunj A Dadhania wrote:
-> David Gibson <david@gibson.dropbear.id.au> writes:
->=20
-> > [ Unknown signature status ]
-> > On Thu, Feb 09, 2017 at 04:04:04PM +0530, Nikunj A Dadhania wrote:
-> >> POWER ISA 3.0 adds CA32 and OV32 status in 64-bit mode. Add the flags
-> >> and corresponding defines. Moreover, CA32 is set when CA is set and
-> >> OV32 is set when OV is set, there is no need to have a new
-> >> fields in the CPUPPCState structure.
-> >>=20
-> >> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-> >
-> > Um.. I don't quite understand this.  If CA always has the same value
-> > as CA32, what's the point?
->=20
-> I am not clear either. I think that as CA was set for both 32/64-bit
-> mode, that couldn't be changed for backward compatibility. CA32 should
-> have affected only the instructions working one word variants.
->=20
-> Re-scanning the ISA 3.0, found this in 3.3.9 Fixed-Point Arithmetic
-> Instructions:
->=20
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> addic, addic., subfic, addc, subfc, adde, subfe,
-> addme, subfme, addze, and subfze always set CA, to
-> reflect the carry out of bit 0 in 64-bit mode and out of bit
-> 32 in 32-bit mode. These instructions also always set
-> CA32 to reflect the carry out of bit 32.
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->=20
-> Which is conflicting to what is said in 3.2.2 Fixed-Point Exception
-> Register:
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> Carry32 (CA32)
-> CA32 is set whenever CA is set, and is set to
-> the same value that CA is defined to be set to
-> in 32-bit mode.
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-Ok, I've had a look at the ISA and discussed this with Michael
-Ellerman.  We think what's going on here is that it's using some
-unfortunately unclear wording.  When it says "OV32 is set when OV is
-set" we think that means "OV32 is updated when OV is updated", not
-that "OV32 is set to the same value as OV".
-
-So although they're updated at the same time, the 32-bit variants can
-have different values and will need real representation in the CPU
-model.  Well, at least in 64-bit mode.  When the CPU is in 32-bit
-mode, I believe they really will have the same values.
-
-That would make your implementation suggested here incorrect.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---wLAMOaPNJ0fu1fTG
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJYom7RAAoJEGw4ysog2bOSGeoP/j/DyB4LMWxlMOvvesDPOm44
-gv+YR6y8jMJxoGOtRS+VjKAavNG4IcWkQKXJtbjp74bC4WVKdUlMLkoESPlNCSNn
-E7vuOqm/kPI5r6cYk/5KjEPeINj4yQc3SCrwMoqpwoNmwWW/xNnoRN7NPkQpapte
-N+ITbUIZSMMG4j7looh66fEa/Qb79bZ78YJPJXlDmzXppja4dzA4K6vK4KO9bLty
-9csP03D9F8JRSBzhGp6PCQLWfdCN+SM30db0eNLQ/hJ6ye9Xr3n1Rhv/b8gldUuS
-Qg8kBe+T+Z0uajfwkv20hmb5zVjfFc5vNfjoZiA2UtCrbQ/IXLosu5tKypbfuyB4
-UKxNXnocVA4ieOvLLjWih5jKsG1h7e8fwWJwN7DzB1A3ePwXJM2JwWW1BPawOFbF
-+iZtjh7iEHiSDYhFRCLVfPFvmCy1H39QW9Q3MAO+e6BS/bo6izUHyoaCi83wKb/Z
-xi+cmaDn6u9ycsXWWdEMYWMdF0dGrVMl3rrcg9FjB5W4FO+4aUw/pENK1HzKbUCh
-xHln71ZEYzYNWJA1j9Q7+IokFdNYJ/1kcBaXTUtkKeRZaFQ7kP5sQNUxK27VWsAs
-CaRRJyFpK6lhAxBBymVSIZVaDSqdkHJM8MtCC2vpNtUF1WmbEkj8nFnJx1Cqn3Yw
-GgrTK9LJli7/RizQ+sC8
-=Cfci
------END PGP SIGNATURE-----
-
---wLAMOaPNJ0fu1fTG--
+DQoNCk9uIDIvMTMvMTcsIDM6MjMgUE0sICJKZWZmIENvZHkiIDxqY29keUByZWRoYXQuY29tPiB3
+cm90ZToNCg0KICAgIE9uIE1vbiwgRmViIDEzLCAyMDE3IGF0IDEwOjM2OjUzUE0gKzAwMDAsIEtl
+dGFuIE5pbGFuZ2VrYXIgd3JvdGU6DQogICAgPiANCiAgICA+IA0KICAgID4gT24gMi8xMy8xNywg
+ODozMiBBTSwgIkplZmYgQ29keSIgPGpjb2R5QHJlZGhhdC5jb20+IHdyb3RlOg0KICAgID4gDQog
+ICAgPiAgICAgT24gTW9uLCBGZWIgMTMsIDIwMTcgYXQgMDE6Mzc6MjVQTSArMDAwMCwgU3RlZmFu
+IEhham5vY3ppIHdyb3RlOg0KICAgID4gICAgID4gT24gVHVlLCBGZWIgMDcsIDIwMTcgYXQgMDM6
+MTI6MzZQTSAtMDgwMCwgYXNoaXNoIG1pdHRhbCB3cm90ZToNCiAgICA+ICAgICA+ID4gT24gVHVl
+LCBOb3YgOCwgMjAxNiBhdCAxMjo0NCBQTSwgSmVmZiBDb2R5IDxqY29keUByZWRoYXQuY29tPiB3
+cm90ZToNCiAgICA+ICAgICA+ID4gPiBPbiBNb24sIE5vdiAwNywgMjAxNiBhdCAwNDo1OTo0NVBN
+IC0wODAwLCBBc2hpc2ggTWl0dGFsIHdyb3RlOg0KICAgID4gICAgID4gPiA+PiBUaGVzZSBjaGFu
+Z2VzIHVzZSBhIHZ4aHMgdGVzdCBzZXJ2ZXIgdGhhdCBpcyBhIHBhcnQgb2YgdGhlIGZvbGxvd2lu
+Zw0KICAgID4gICAgID4gPiA+PiByZXBvc2l0b3J5Og0KICAgID4gICAgID4gPiA+PiBodHRwczov
+L2dpdGh1Yi5jb20vTWl0dGFsQXNoaXNoL2xpYnFuaW8uZ2l0DQogICAgPiAgICAgPiA+ID4+DQog
+ICAgPiAgICAgPiA+ID4+IFNpZ25lZC1vZmYtYnk6IEFzaGlzaCBNaXR0YWwgPGFzaGlzaC5taXR0
+YWxAdmVyaXRhcy5jb20+DQogICAgPiAgICAgPiA+ID4+IC0tLQ0KICAgID4gICAgID4gPiA+PiB2
+NiBjaGFuZ2Vsb2c6DQogICAgPiAgICAgPiA+ID4+ICgxKSBBZGRlZCBpb3Rlc3RzIGZvciBWeEhT
+IGJsb2NrIGRldmljZS4NCiAgICA+ICAgICA+ID4gPj4NCiAgICA+ICAgICA+ID4gPj4gIHRlc3Rz
+L3FlbXUtaW90ZXN0cy9jb21tb24gICAgICAgIHwgIDYgKysrKysrDQogICAgPiAgICAgPiA+ID4+
+ICB0ZXN0cy9xZW11LWlvdGVzdHMvY29tbW9uLmNvbmZpZyB8IDEzICsrKysrKysrKysrKysNCiAg
+ICA+ICAgICA+ID4gPj4gIHRlc3RzL3FlbXUtaW90ZXN0cy9jb21tb24uZmlsdGVyIHwgIDEgKw0K
+ICAgID4gICAgID4gPiA+PiAgdGVzdHMvcWVtdS1pb3Rlc3RzL2NvbW1vbi5yYyAgICAgfCAxOSAr
+KysrKysrKysrKysrKysrKysrDQogICAgPiAgICAgPiA+ID4+ICA0IGZpbGVzIGNoYW5nZWQsIDM5
+IGluc2VydGlvbnMoKykNCiAgICA+ICAgICA+ID4gPj4NCiAgICA+ICAgICA+ID4gPj4gZGlmZiAt
+LWdpdCBhL3Rlc3RzL3FlbXUtaW90ZXN0cy9jb21tb24gYi90ZXN0cy9xZW11LWlvdGVzdHMvY29t
+bW9uDQogICAgPiAgICAgPiA+ID4+IGluZGV4IGQ2MGVhMmMuLjQxNDMwZDggMTAwNjQ0DQogICAg
+PiAgICAgPiA+ID4+IC0tLSBhL3Rlc3RzL3FlbXUtaW90ZXN0cy9jb21tb24NCiAgICA+ICAgICA+
+ID4gPj4gKysrIGIvdGVzdHMvcWVtdS1pb3Rlc3RzL2NvbW1vbg0KICAgID4gICAgID4gPiA+DQog
+ICAgPiAgICAgPiA+ID4gV2hlbiB1c2luZyByYXcgZm9ybWF0LCBJIHdhcyBhYmxlIHRvIHJ1biB0
+aGUgdGVzdCBzdWNjZXNzZnVsbHkgZm9yIGFsbA0KICAgID4gICAgID4gPiA+IHN1cHBvcnRlZCB0
+ZXN0IGNhc2VzICgyNiBvZiB0aGVtKS4NCiAgICA+ICAgICA+ID4gPg0KICAgID4gICAgID4gPiA+
+IFdpdGggcWNvdzIsIHRoZXkgZmFpbCAtIGJ1dCBub3QgdGhlIGZhdWx0IG9mIHRoaXMgcGF0Y2gs
+IEkgdGhpbms7IGJ1dA0KICAgID4gICAgID4gPiA+IHJhdGhlciwgdGhlIGZhdWx0IG9mIHRoZSB0
+ZXN0IHNlcnZlci4gIENhbiBxbmlvX3NlcnZlciBiZSBtb2RpZmllZCBzbyB0aGF0DQogICAgPiAg
+ICAgPiA+ID4gaXQgZG9lcyBub3Qgd29yayBvbiBqdXN0IHJhdyBmaWxlcz8NCiAgICA+ICAgICA+
+ID4gPg0KICAgID4gICAgID4gPiA+DQogICAgPiAgICAgPiA+IA0KICAgID4gICAgID4gPiBWeEhT
+IHN1cHBvcnRzIGFuZCB1c2VzIG9ubHkgdGhlIHJhdyBmb3JtYXQuDQogICAgPiAgICAgPiANCiAg
+ICA+ICAgICA+IFRoYXQncyBsaWtlIHNheWluZyBvbmx5IGV4dDQgZ3Vlc3QgZmlsZSBzeXN0ZW1z
+IGFyZSBzdXBwb3J0ZWQgb24gVnhIUw0KICAgID4gICAgID4gYW5kIG5vdCBaRlMuICBUaGUgVnhI
+UyBkcml2ZXIgc2hvdWxkIG5vdCBjYXJlIHdoYXQgZmlsZSBzeXN0ZW0gaXMgdXNlZCwNCiAgICA+
+ICAgICA+IGl0IGp1c3QgZG9lcyBibG9jayBJL08gd2l0aG91dCBpbnRlcnByZXRpbmcgdGhlIGRh
+dGEuDQogICAgPiAgICAgPiANCiAgICA+ICAgICA+IEl0IG11c3QgYmUgcG9zc2libGUgdG8gdXNl
+IGFueSBmb3JtYXQgb24gdG9wIG9mIHRoZSBWeEhTIHByb3RvY29sLg0KICAgID4gICAgID4gQWZ0
+ZXIgYWxsLCB0aGUgaW1hZ2UgZm9ybWF0IGRyaXZlcnMganVzdCBkbyBibG9jayBJL08uICBJZiB0
+aGVyZSBpcyBhDQogICAgPiAgICAgPiBjYXNlIHdoZXJlIHFjb3cyIG9uIFZ4SFMgZmFpbHMgdGhl
+biBpdCBuZWVkcyB0byBiZSBpbnZlc3RpZ2F0ZWQuDQogICAgPiAgICAgPiANCiAgICA+ICAgICA+
+IFRoZSBWeEhTIGRyaXZlciBjYW4ndCBiZSBtZXJnZWQgdW50aWwgd2UgYXQgbGVhc3QgdW5kZXJz
+dGFuZCB0aGUgY2F1c2UNCiAgICA+ICAgICA+IG9mIHRoZSBxY293MiB0ZXN0IGZhaWx1cmVzLg0K
+ICAgID4gICAgID4NCiAgICA+ICAgICANCiAgICA+ICAgICBBIHF1aWNrIHJ1biB3aXRoIHRoZSB0
+ZXN0IHNlcnZlciBhbmQgYSBRRU1VIHByb2Nlc3Mgc2hvd2VkIGFuIGFib3J0KCkgaW4gdGhlDQog
+ICAgPiAgICAgdGVzdCBzZXJ2ZXIsIHNvIEkganVzdCBzZW50IGEgcHVsbCByZXEgdG8gbGlicW5p
+byB0byBmaXggdGhhdC4gIA0KICAgID4gICAgIA0KICAgID4gICAgIEJ1dCBwbGF5aW5nIHdpdGgg
+aXQgaW4gZ2RiIHJpZ2h0IG5vdyB3aXRoIGEgdGVzdCBxY293MiBmaWxlLCBJIHNlZSB0aGF0IHdl
+DQogICAgPiAgICAgYXJlIHdhaXRpbmcgaW4gYWlvX3BvbGwoKSBmb3JldmVyIGZvciB0aGUgdGVz
+dCBzZXJ2ZXIgdG8gcmVzcG9uZCB0byBhIHJlYWQNCiAgICA+ICAgICByZXF1ZXN0LCB3aGVuIHVz
+aW5nIHFjb3cyIGZvcm1hdC4gIA0KICAgID4gICAgIA0KICAgID4gICAgIEFzIFN0ZWZhbiBzYWlk
+LCB0aGlzIGRvZXNuJ3QgcmVhbGx5IG1ha2UgYW55IHNlbnNlIC0gd2h5IHdvdWxkIFZYSFMgYmVo
+YXZlDQogICAgPiAgICAgZGlmZmVyZW50bHkgYmFzZWQgb24gdGhlIGZpbGUgY29udGVudHM/DQog
+ICAgPiANCiAgICA+IFtLZXRhbl0gVG8gcmVhZC93cml0ZSBhIHFjb3cyIGJhY2tlZCBkZXZpY2Ug
+VnhIUyBzZXJ2ZXIgaW1wbGVtZW50YXRpb24NCiAgICA+IHdpbGwgbmVlZCB0byB1bmRlcnN0YW5k
+IHRoZSBxY293MiBmb3JtYXQuIFRoaXMgaXMgbm90IGp1c3QgYmxvY2sgSU8gYnV0DQogICAgPiBh
+Y3R1YWxseSBkb2VzIGludm9sdmUgaW50ZXJwcmV0aW5nIHRoZSBxY293MiBoZWFkZXIgYW5kIGNs
+dXN0ZXIgZm9ybWF0cy4NCiAgICA+IENsZWFybHkgdGhlIHRlc3Qgc2VydmVyIGltcGxlbWVudGF0
+aW9uIGRvZXMgbm90IGhhbmRsZSBpdCBhcyBpdCB3YXMgbmV2ZXINCiAgICA+IGludGVuZGVkIHRv
+LiBWeEhTIGJhY2tlbmQgd29uJ3QgaGFuZGxlIGl0IGVpdGhlciBiZWNhdXNlIFZ4SFMgdmlydHVh
+bA0KICAgID4gZGlza3MgYXJlIHdyaXR0ZW4gYXMgbm9uLXNwYXJzZSBmaWxlcy4gIFRoZXJlIGFy
+ZSBzcGFjZSBzYXZpbmdzIHdpdGggdGhlDQogICAgPiBxY293MiBmb3JtYXQgYnV0IHBlcmZvcm1h
+bmNlIHBlbmFsdGllcyBhcyB3ZWxsIGJlY2F1c2Ugb2YgdGhlIG1ldGFkYXRhDQogICAgPiBvdmVy
+aGVhZC4gQXMgYSBibG9jayBzdG9yYWdlIHByb3ZpZGVyLCBWeEhTIGRvZXMgbm90IHN1cHBvcnQg
+c3BhcnNlIGZpbGUNCiAgICA+IGZvcm1hdHMgbGlrZSBxY293MiBwcmltYXJpbHkgYmVjYXVzZSBv
+ZiBwZXJmb3JtYW5jZSByZWFzb25zLiAgSW1wbGVtZW50aW5nDQogICAgPiBhIHFjb3cyIGJhY2tl
+bmQgaW4gdGhlIHRlc3Qgc2VydmVyIHdvdWxkIGJlIGEgbm9uLXRyaXZpYWwgYW5kIG5vbi11c2Vm
+dWwNCiAgICA+IGV4ZXJjaXNlIHNpbmNlIHRoZSBWeEhTIHNlcnZlciB3b24ndCBzdXBwb3J0IGl0
+Lg0KICAgID4NCiAgICANCiAgICBXaGF0PyAgV2h5IHdvdWxkIHRoZSBiYWNrZW5kIG5lZWQgdG8g
+a25vdyBhbnl0aGluZyBhYm91dCBxY293MiBmb3JtYXRzOyBhcmUNCiAgICB5b3UgbWFuaXB1bGF0
+aW5nIHRoZSBndWVzdCBpbWFnZSBkYXRhIGRpcmVjdGx5IHlvdXJzZWxmPyAgQnV0IHJlZ2FyZGxl
+c3MsDQogICAgc2luY2UgdGhlIHRlc3Qgc2VydmVyIGlzIG5haXZlIGFuZCBqdXN0IHJlYWRzIGFu
+ZCB3cml0ZXMgZGF0YSwgdGhlIGZhY3QgdGhhdA0KICAgIHRoZSB0ZXN0IHNlcnZlciBicmVha3Mg
+b24gcWNvdzIgaW1hZ2UgZm9ybWF0cyBtZWFucyB0aGF0IHRoZSB0ZXN0IHNlcnZlciBpcw0KICAg
+IGJyb2tlbiBmb3IgcmF3IGltYWdlcywgYXMgd2VsbCBbMV0uDQogICAgDQogICAgVGhlIGJhY2tl
+bmQgc2hvdWxkIG5vdCBuZWVkIHRvIGtub3cgYW55dGhpbmcgYWJvdXQgdGhlIGltYWdlIGZpbGUg
+Zm9ybWF0IGluDQogICAgb3JkZXIgdG8gc2VydmUgZGF0YSwgYXMgdGhlIGJhY2tlbmQgaXMgZXNz
+ZW50aWFsbHkgc2VydmluZyBieXRlcy4gKEkgZ3Vlc3MNCiAgICB0aGUgb25seSB0aGluZyB0aGUg
+YmFja2VuZCB3b3VsZCBuZWVkIHRvIGJlIGF3YXJlIG9mIGlzIGhvdyB0byBpbnZva2UNCiAgICBx
+ZW11LWltZyB0byBjcmVhdGUgYSBxY293MiBpbWFnZSBmaWxlIGluaXRpYWxseSkuDQogICAgDQog
+ICAgDQogICAgUUVNVSBpcyB3aGF0IGludGVycHJldHMgdGhlIHFjb3cyIGZvcm1hdCAob3IgYW55
+IGltYWdlIGZvcm1hdCkuICBFdmVyeSByZWFkDQogICAgZnJvbSBRRU1VIHdpbGwgbG9vayBsaWtl
+IGEgcmF3IGZpbGUgcmVhZCBmcm9tIHRoZSBwZXJzcGVjdGl2ZSBvZiBsaWJxbmlvIC8NCiAgICB2
+eGhzLiAgSSBjYW4ndCBzZWUgYW55IHJlYXNvbiB3aHkgdnhocyB3b3VsZCBuZWVkIHRvIGtub3cg
+YW55dGhpbmcgYWJvdXQgdGhlDQogICAgY29udGVudHMgb2YgdGhlIGltYWdlIGZpbGUgaXRzZWxm
+Lg0KICAgIA0KICAgIFRoZSBvbmx5IHRoaW5nIHRoZSB0ZXN0IHNlcnZlciBuZWVkcyB0byBkbywg
+aW4gb3JkZXIgdG8gYmUgYWJsZSB0byBzZXJ2ZQ0KICAgIHFjb3cyIGZpbGVzIGNvcnJlY3RseSwg
+aXMgdG8gYmUgYWJsZSB0byBzZXJ2ZSByYXcgZmlsZXMgY29ycmVjdGx5Lg0KICAgIA0KICAgIExv
+b2tpbmcgYXQgdGhlIGxpYnFuaW8gaW1wbGVtZW50YXRpb24gZnJvbSB0aGUgdGVzdCBzZXJ2ZXIg
+d2l0aCBnZGIsIEkgdGhpbmsNCiAgICB0aGF0IHRoZSByZWFzb24gd2h5IHFjb3cyIGZvcm1hdCBk
+b2VzIG5vdCB3b3JrIGlzIHRoYXQgdGhlIGN1cnJlbnQNCiAgICBsaWJxbmlvIGltcGxlbWVudGF0
+aW9uIGRvZXMgbm90IGhhbmRsZSBzaG9ydCByZWFkcyBjb3JyZWN0bHkuICBGb3IgaW5zdGFuY2Us
+DQogICAgaWYgdGhlIGZpbGUgaXMgbm90IGEgZXZlbiBtdWx0aXBsZSBvZiB0aGUgcmVhZCBzaXpl
+LCBhbmQgd2UgdHJ5IHRvIHJlYWQgNTEyDQogICAgYnl0ZXMgYXQgdGhlIGVuZCBvZiB0aGUgZmls
+ZSwgaXQgYXBwZWFycyBsaWJxbmlvIGhhbmdzIG9uIHRoZSBzaG9ydCByZWFkLiAgSQ0KICAgIGFt
+IG5vdCBzdXJlIGlmIHRoaXMgaXMgYSBidWcgZXhjbHVzaXZlIHRvIHRoZSB0ZXN0IHNlcnZlciwg
+b3IgaW4gdGhlIGxpYnFuaW8NCiAgICBpbXBsZW1lbnRhdGlvbi4NCiAgICANCiAgICBbMV0NCiAg
+ICBUaGlzIGJ1ZyBpc24ndCBsaW1pdGVkIHRvIHFjb3cyLCBzaW5jZSBhcyBtZW50aW9uZWQgYWJv
+dmUsIFFFTVUgaXMganVzdA0KICAgIHJlbHlpbmcgb24gbGlicW5pbyB0byByZWFkIHJhdyBieXRl
+cy4gIFNvLCB5b3UgY2FuIHJlcHJvZHVjZSB0aGlzIGJ1ZyB3aXRoIGENCiAgICByYXcgaW1hZ2Ug
+ZmlsZSwgYXMgd2VsbDoNCiAgICANCiAgICAjIGRkIGlmPS9kZXYvemVybyBvZj10ZXN0LnJhdyBi
+cz0xIGNvdW50PTE5NjYxNg0KICAgIA0KICAgICMgcWVtdS1pbyAtYyAicmVhZCAxOTY2MDggNTEy
+IiB2eGhzOi8vbG9jYWxob3N0Ojk5OTkvdGVzdC5yYXcNCiAgICANCiAgICBUaGUgYWJvdmUgcWVt
+dS1pbyBwcm9jZXNzIHdpbGwgaGFuZyBpbiBhaW9fcG9sbCwgYmVjYXVzZSBsaWJxbmlvIG5ldmVy
+DQogICAgcHJvY2Vzc2VzIHRoZSBjYWxsYmFjay4gVGhpcyBpcyBiZWNhdXNlIHByb2Nlc3NfaW5j
+b21pbmdfbWVzc2FnZXMoKSB0aGlua3MNCiAgICBpdCBuZWVkcyBhIGZ1bGwgNTEyIGJ5dGVzIGJl
+Zm9yZSBpdCB3aWxsIGNhbGwgdGhlIHJlZ2lzdGVyZWQgY2FsbGJhY2ssIGV2ZW4NCiAgICB0aG91
+Z2ggdGhlcmUgd2lsbCBvbmx5IGV2ZXIgYmUgOCBieXRlcyByZWFkLg0KICAgIA0KICAgIFRoZSBh
+Ym92ZSBzY2VuYXJpbyBpcyBhbHNvIGV4YWN0bHkgd2hhdCBpcyBoYXBwZW5pbmcgd2hlbiBJIHRy
+eSB0byB1c2UgYQ0KICAgIHFjb3cyIGZvcm1hdDsgUUVNVSBpc3N1ZXMgYSByZWFkIGZvciA4IGJ5
+dGVzIGF0IG9mZnNldCAxOTY2MDgsIGFuZCB0aGUgZmlsZQ0KICAgIGlzIDE5NjYxNiBieXRlcyBs
+b25nLg0KICAgIA0KICAgIChUaGUgc3BhcnNlIGltYWdlIHRoaW5nIHNlZW1zIHNob3VsZG4ndCBi
+ZSBhbiBpc3N1ZSAtIGZpcnN0LCB0aGUgdGVzdCBzZXJ2ZXINCiAgICB3b3JrcyBqdXN0IGZpbmUg
+d2l0aCBzcGFyc2UgcmF3IGltYWdlcy4uLiBhcyBtYXR0ZXIgb2YgZmFjdCwgdGhlDQogICAgImNy
+ZWF0ZV92ZGlzay5zaCIgc2NyaXB0IGluIHRoZSBsaWJxbmlvIHJlcG9zaXRvcnkgZG9lcyBleGFj
+dGx5IHRoYXQuICBBbHNvLA0KICAgIGlmIHlvdSBjaG9vc2UgdG8gbm90IHVzZSBzcGFyc2UgaW1h
+Z2VzIGZvciB3aGF0ZXZlciByZWFzb24gb24gdGhlIGJhY2tlbmQsDQogICAgcWNvdzIgZG9lcyBu
+b3QgcmVxdWlyZSBpdCB0byBiZSBzcGFyc2UsIGFzIGltYWdlIGZpbGVzIGNhbiBiZSBjcmVhdGVk
+IHdpdGgNCiAgICB0aGUgIi1vIHByZWFsbG9jYXRpb249ZnVsbCIgb3B0aW9uKS4NCiAgICANCltL
+ZXRhbl0gWW91IGFyZSBjb3JyZWN0LiBXZSBoYXZlIGlkZW50aWZpZWQgdGhlIHByb2JsZW0gd2l0
+aCB0ZXN0IHNlcnZlciBhbmQgaGF2ZSBhIHBhdGNoIGZvciBpdCB3aGljaCByZXR1cm5zIHplcm8g
+ZmlsbGVkIHJlYWRzIHRvIGFsaWduIHRoZSByZWFkIGJ1ZmZlcnMgdG8gcmVxdWVzdGVkIGJsb2Nr
+IHNpemUuIFdlIGNvdWxkIGFsc28gZml4IHRoaXMgaW4gbGlidnhocyBieSBub3QgZXhwZWN0aW5n
+L3dhaXRpbmcgZm9yIHJlcXVlc3RlZCBibG9jayBzaXplIGluIGNhc2UgdGhlIHJlYWRzIGFyZSBw
+YXJ0aWFsLg0KQXNoaXNoIHdpbGwgdXBsb2FkIHRoZSBwYXRjaCBmb3IgdGhlIHRlc3Qgc2VydmVy
+IGZpeC4gUGxlYXNlIGxldCB1cyBrbm93IGhvdyB0aGUgcWNvdyB0ZXN0cyBnby4NCg0KICAgIC1K
+ZWZmDQogICAgDQoNCg==
