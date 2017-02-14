@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54063)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cdcld-0002eO-ND
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 08:03:38 -0500
+	(envelope-from <armbru@redhat.com>) id 1cdcta-0000Jn-6m
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 08:11:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cdclc-0005Od-SH
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 08:03:37 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35726)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cdclc-0005OH-MX
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 08:03:36 -0500
-Received: by mail-wm0-x241.google.com with SMTP id u63so3455294wmu.2
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 05:03:36 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <1487006388-7966-1-git-send-email-quintela@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1a8cebc2-7510-0c1f-70bd-2a922c1be1a3@redhat.com>
-Date: Tue, 14 Feb 2017 14:03:37 +0100
+	(envelope-from <armbru@redhat.com>) id 1cdctX-0002be-1a
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 08:11:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50510)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cdctW-0002ai-Rj
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 08:11:46 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B4E4A4DD4C
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 13:11:46 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <1487067971-10443-1-git-send-email-armbru@redhat.com>
+	<1487067971-10443-8-git-send-email-armbru@redhat.com>
+	<3c9934bf-7df3-6a81-caac-e949ca89ceaf@redhat.com>
+Date: Tue, 14 Feb 2017 14:11:43 +0100
+In-Reply-To: <3c9934bf-7df3-6a81-caac-e949ca89ceaf@redhat.com> (Paolo
+	Bonzini's message of "Tue, 14 Feb 2017 13:33:50 +0100")
+Message-ID: <87h93wc3xs.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1487006388-7966-1-git-send-email-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 00/12] Multifd v4
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 07/24] util/cutils: Clean up variable names
+ around qemu_strtol()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,23 +35,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: amit.shah@redhat.com, dgilbert@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
+> On 14/02/2017 11:25, Markus Armbruster wrote:
+>> * qemu_strtol()'s variable @err is *negative* errno,
+>>   check_strtox_error()'s parameter @err is *positive*.  Rename the
+>>   latter to @eno.
+>
+> What about in_errno or libc_errno?  No need to repost of course.
 
-On 13/02/2017 18:19, Juan Quintela wrote:
-> [v4]
-> 
-> - Address reviews
-> - move synchronization to semaphores (faster).  Paolo suggestion
-> - improvements overall (see invidiual patches)
-> - fix all the checkpatch warnings
-> - fix all [HACKS] except for one
-> 
-> Please review.
-
-I think you can simplify the receive threads much more.  I left comments
-on patch 11.
-
-Paolo
+I don't mind.
