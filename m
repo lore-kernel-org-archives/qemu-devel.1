@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1cdiDY-0007Hw-Tl
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 13:52:50 -0500
+	(envelope-from <bounces@canonical.com>) id 1cdiFb-0000ds-MH
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 13:54:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1cdiDW-0008FZ-Bg
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 13:52:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32884)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1cdiDW-0008EY-5N
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 13:52:46 -0500
-From: P J P <ppandit@redhat.com>
-Date: Wed, 15 Feb 2017 00:22:25 +0530
-Message-Id: <20170214185225.7994-5-ppandit@redhat.com>
-In-Reply-To: <20170214185225.7994-1-ppandit@redhat.com>
-References: <20170214185225.7994-1-ppandit@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 4/4] sd: sdhci: Remove block count enable
- check in single block transfers
+	(envelope-from <bounces@canonical.com>) id 1cdiFW-0000Vl-Qk
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 13:54:55 -0500
+Received: from indium.canonical.com ([91.189.90.7]:58842)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cdiFW-0000VO-L3
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 13:54:50 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cdiFV-0004Qb-61
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 18:54:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D2B5A2E80CE
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 18:54:48 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 14 Feb 2017 18:44:27 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 764252 <764252@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20110418053344.23556.39759.malonedeb@wampee.canonical.com>
+Message-Id: <20170214184428.5677.23976.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 764252] Re: wishlist: kirkwood support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,43 +36,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Qemu Developers <qemu-devel@nongnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair23@gmail.com>, Wjjzhang <wjjzhang@tencent.com>, Jiang Xin <jiangxin1@huawei.com>, Prasad J Pandit <pjp@fedoraproject.org>
+To: qemu-devel@nongnu.org
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
+My offer from comment #3 to review code if anybody wants to submit it
+still stands, but given the amount of work required to implement a model
+of a new SoC in QEMU I'm not surprised nobody's ever taken me up on it.
 
-In SDHCI protocol, the 'Block count enable' bit of the Transfer
-Mode register is relevant only in multi block transfers. We need
-not check it in single block transfers.
+-- =
 
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
----
- hw/sd/sdhci.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/764252
 
-diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index 8ae75fe..05558d3 100644
---- a/hw/sd/sdhci.c
-+++ b/hw/sd/sdhci.c
-@@ -570,7 +570,6 @@ static void sdhci_sdma_transfer_multi_blocks(SDHCIState *s)
- }
- 
- /* single block SDMA transfer */
--
- static void sdhci_sdma_transfer_single_block(SDHCIState *s)
- {
-     int n;
-@@ -589,10 +588,7 @@ static void sdhci_sdma_transfer_single_block(SDHCIState *s)
-             sdbus_write_data(&s->sdbus, s->fifo_buffer[n]);
-         }
-     }
--
--    if (s->trnmod & SDHC_TRNS_BLK_CNT_EN) {
--        s->blkcnt--;
--    }
-+    s->blkcnt--;
- 
-     sdhci_end_transfer(s);
- }
--- 
-2.9.3
+Title:
+  wishlist: kirkwood support
+
+Status in QEMU:
+  Won't Fix
+
+Bug description:
+  This is a feature request for qemu to emulate the Marvell Kirkwood
+  chipset. It is used by Sheevaplug, Guruplug, and many NAS devices.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/764252/+subscriptions
