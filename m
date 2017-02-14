@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cdgXl-0002bJ-Ed
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 12:05:34 -0500
+	(envelope-from <bounces@canonical.com>) id 1cdgYG-0002wM-7s
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 12:06:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cdgXg-0005vQ-H0
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 12:05:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36722)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1cdgXg-0005v2-8V
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 12:05:28 -0500
-Date: Tue, 14 Feb 2017 12:05:26 -0500
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170214170526.GR27752@localhost.localdomain>
-References: <20161108204413.GA6353@localhost.localdomain>
-	<CAAo6VWMyTjV1Fn8-BSex7Fx8OcEcuEyK2rQJ6L=wZZXDiB5A4w@mail.gmail.com>
-	<20170213133725.GA10361@stefanha-x1.localdomain>
-	<20170213163232.GN27752@localhost.localdomain>
-	<B3F9860E-E786-48A5-8BBD-918833905E73@veritas.com>
-	<20170213232302.GP27752@localhost.localdomain>
-	<983C87E0-DE5B-4147-82CD-CE6A8D093B6C@veritas.com>
-	<CAAo6VWNYZG5fc7Z9_u+9Qew5VgbTRA_cRfTu8wqPpOXzTrjvfA@mail.gmail.com>
-	<20170214163517.GQ27752@localhost.localdomain>
-	<20170214165109.GF17056@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1cdgYB-00061V-8Z
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 12:06:04 -0500
+Received: from indium.canonical.com ([91.189.90.7]:60319)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cdgYA-00061A-V1
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 12:05:59 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cdgY9-0005ng-Lg
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 17:05:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4D3332E80CE
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 17:05:57 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170214165109.GF17056@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 2/2] block/vxhs.c: Add qemu-iotests for
- new block device type "vxhs"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 14 Feb 2017 16:52:17 -0000
+From: Thomas Huth <886255@bugs.launchpad.net>
+Reply-To: Bug 886255 <886255@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20111104174931.4814.13940.malonedeb@soybean.canonical.com>
+Message-Id: <20170214165217.4151.2799.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 886255] Re: Qemu master branch - RHEL 6.1 guest
+ fails to boot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,51 +37,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: ashish mittal <ashmit602@gmail.com>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>
+To: qemu-devel@nongnu.org
 
-On Tue, Feb 14, 2017 at 04:51:09PM +0000, Daniel P. Berrange wrote:
-> On Tue, Feb 14, 2017 at 11:35:17AM -0500, Jeff Cody wrote:
-> > From 7c135439fd0151860cb0f6ef1a857dfbee6e6317 Mon Sep 17 00:00:00 2001
-> > From: Jeff Cody <jcody@redhat.com>
-> > Date: Tue, 14 Feb 2017 09:51:42 -0500
-> > Subject: [PATCH] qemu-iotests: exclude vxhs from image creation via protocol
-> > 
-> > The protocol VXHS does not support image creation.  Some tests expect
-> > to be able to create images through the protocol.  Exclude VXHS from
-> > these tests.
-> 
-> [snip]
-> 
-> > diff --git a/tests/qemu-iotests/017 b/tests/qemu-iotests/017
-> > index e3f9e75..4f9302d 100755
-> > --- a/tests/qemu-iotests/017
-> > +++ b/tests/qemu-iotests/017
-> > @@ -41,6 +41,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
-> >  # Any format supporting backing files
-> >  _supported_fmt qcow qcow2 vmdk qed
-> >  _supported_proto generic
-> > +_unsupported_proto vxhs
-> >  _supported_os Linux
-> >  _unsupported_imgopts "subformat=monolithicFlat" "subformat=twoGbMaxExtentFlat"
-> 
-> I've no objection to your patch as is, just a thought for future
-> improvements.
-> 
-> There's quite a few block protos that doen't support image
-> creation. Rather than listing protocols in _unsupported_proto
-> it would be more scalable if we could list features. eg if
-> each test had
-> 
->   _supported_feature imagecreate
-> 
-> Then, the tests/qemu-iotests/common file could set the list
-> of features supported by each protocol/format. Thus avoiding
-> the need to update all iotests when adding new protocols. We
-> could have features for "encryption", and "snapshots" and
-> "backing_files", etc too
->
+Marking as fixed, according to comment #5
 
-I like that approach, good idea.
+** Changed in: qemu
+       Status: New =3D> Fix Released
 
--Jeff
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/886255
+
+Title:
+  Qemu master branch - RHEL 6.1 guest fails to boot
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  Guest: RHEL 6.1 64 bit DVD
+
+  Kernel: Latest Fedora, also reproduces with Avi's kvm.git kernel based
+  on 3.1: 2.6.40.6-0.fc15.x86_64
+
+  qemu version:
+
+  11/04 00:25:30 DEBUG|virt_utils:2587| Git repo qemu uri: git://git.qemu.o=
+rg/qemu.git
+  11/04 00:25:30 DEBUG|virt_utils:2590| Git repo qemu branch: master
+  11/04 00:25:30 DEBUG|virt_utils:3189| Configure options for git_repo_qemu=
+: ['--target-list=3Dx86_64-softmmu']
+  11/04 00:25:30 DEBUG|virt_utils:2496| Initializing new git repo at /usr/l=
+ocal/autotest/tests/kvm/src/qemu for receiving git repo 11/04 00:25:30 INFO=
+ |virt_utils:2505| Fetching git [REP 'git://git.qemu.org/qemu.git' BRANCH '=
+master'] -> /usr/local/autotest/tests/kvm/src/qemu
+  11/04 00:25:30 DEBUG|base_utils:0074| Running 'git fetch -q -f -u -t git:=
+//git.qemu.org/qemu.git master:master'
+  11/04 00:34:41 INFO |virt_utils:2531| Commit hash for qemu is 932eacc158c=
+064935c7bab920c88a93a629e1ca4 (no tag found)
+
+  On guest boot screenshots (one of them attached), you can see the
+  message
+
+  "Bringing up interface eth0: Device eth0 does not seem to be present,
+  delaying initialization"
+
+  Network card info
+  11/04 00:44:55 DEBUG| virt_test:0041|     bridge =3D virbr0
+  11/04 00:44:55 DEBUG| virt_test:0041|     nic_mode =3D tap
+  11/04 00:44:55 DEBUG| virt_test:0041|     nic_model =3D virtio
+
+  Commented excerpt of the test log:
+
+  11/04 00:44:57 INFO |    kvm_vm:0790| Running qemu command:
+  /usr/local/autotest/tests/kvm/qemu -name 'vm1' -nodefaults -vga std -moni=
+tor unix:'/tmp/monitor-humanmonitor1-20111104-003602-LPJY',server,nowait -q=
+mp unix:'/tmp/monitor-qmpmonitor1-20111104-003602-LPJY',server,nowait -seri=
+al unix:'/tmp/serial-20111104-003602-LPJY',server,nowait -drive file=3D'/tm=
+p/kvm_autotest_root/images/rhel6.1-64.qcow2',index=3D0,if=3Dvirtio,cache=3D=
+none -device virtio-net-pci,netdev=3Did3HQgQx,mac=3D'9a:16:a5:3c:05:25',id=
+=3D'id0AfUVE' -netdev tap,id=3Did3HQgQx,fd=3D23 -m 2048 -smp 2 -vnc :0  -en=
+able-kvm
+  11/04 00:44:59 DEBUG|kvm_monito:0624| (monitor qmpmonitor1) Sending comma=
+nd 'qmp_capabilities'
+  11/04 00:44:59 DEBUG|    kvm_vm:0851| VM appears to be alive with PID 9827
+  11/04 00:44:59 DEBUG|virt_env_p:0318| Starting screendump thread
+  11/04 00:44:59 DEBUG|   virt_vm:0654| Attempting to log into 'vm1' (timeo=
+ut 720s)
+
+  ... here it starts booting ...
+
+  11/04 00:44:59 DEBUG|   virt_vm:0660| Cannot find IP address for MAC addr=
+ess 9a:16:a5:3c:05:25
+  11/04 00:45:01 DEBUG|   virt_vm:0660| Cannot find IP address for MAC addr=
+ess 9a:16:a5:3c:05:25
+  11/04 00:45:03 DEBUG|   virt_vm:0660| Cannot find IP address for MAC addr=
+ess 9a:16:a5:3c:05:25
+  11/04 00:45:05 DEBUG|   virt_vm:0660| Cannot find IP address for MAC addr=
+ess 9a:16:a5:3c:05:25
+  11/04 00:45:07 DEBUG|   virt_vm:0660| Cannot find IP address for MAC addr=
+ess 9a:16:a5:3c:05:25
+  11/04 00:45:09 DEBUG|   virt_vm:0660| Cannot find IP address for MAC addr=
+ess 9a:16:a5:3c:05:25
+  11/04 00:45:11 DEBUG|   virt_vm:0660| Cannot find IP address for MAC addr=
+ess 9a:16:a5:3c:05:25
+  11/04 00:45:13 DEBUG|   virt_vm:0660| Cannot find IP address for MAC addr=
+ess 9a:16:a5:3c:05:25
+  11/04 00:45:15 DEBUG|   virt_vm:0660| Cannot find IP address for MAC addr=
+ess 9a:16:a5:3c:05:25
+  11/04 00:45:17 DEBUG|   virt_vm:0660| Cannot find IP address for MAC addr=
+ess 9a:16:a5:3c:05:25
+  11/04 00:45:19 DEBUG|   virt_vm:0660| Cannot find IP address for MAC addr=
+ess 9a:16:a5:3c:05:25
+  11/04 00:45:21 DEBUG|   virt_vm:0660| Cannot find IP address for MAC addr=
+ess 9a:16:a5:3c:05:25
+  11/04 00:45:23 DEBUG|   virt_vm:0660| Cannot find IP address for MAC addr=
+ess 9a:16:a5:3c:05:25
+
+  ... here it gets an IP from the DHCP server ...
+
+  11/04 00:45:24 DEBUG|virt_env_p:0438| (address cache) Adding cache
+  entry: 9a:16:a5:3c:05:25 ---> 192.168.122.195
+
+  ... ok, let's try to login ...
+
+  11/04 00:45:25 DEBUG|virt_utils:0710| Trying to login with command
+  'ssh -o UserKnownHostsFile=3D/dev/null -o
+  PreferredAuthentications=3Dpassword -p 22 root@192.168.122.195'
+
+  ... ouch, not possible to login ...
+
+  11/04 00:45:25 DEBUG|   virt_vm:0660| Client said 'connection refused'
+  (output: 'ssh: connect to host 192.168.122.195 port 22: Connection
+  refused\n')
+
+  ... message above repeats until ...
+
+  11/04 00:56:59 ERROR| virt_test:0095| Test failed: LoginError: Client sai=
+d 'connection refused'    (output: 'ssh: connect to host 192.168.122.195 po=
+rt 22: Connection refused\n')
+  11/04 00:56:59 DEBUG|virt_env_p:0147| Postprocessing VM 'vm1'
+  11/04 00:56:59 DEBUG|virt_env_p:0166| Param 'kill_vm' specified, killing =
+VM
+  11/04 00:56:59 DEBUG|    kvm_vm:0885| Destroying VM with PID 9827
+  11/04 00:56:59 DEBUG|    kvm_vm:0889| Trying to shutdown VM with shell co=
+mmand
+  11/04 00:56:59 DEBUG|virt_utils:0710| Trying to login with command 'ssh -=
+o UserKnownHostsFile=3D/dev/null -o PreferredAuthentications=3Dpassword -p =
+22 root@192.168.122.195'
+  11/04 00:56:59 DEBUG|    kvm_vm:0893| Client said 'connection refused'   =
+ (output: 'ssh: connect to host 192.168.122.195 port 22: Connection refused=
+\n')
+  11/04 00:56:59 DEBUG|    kvm_vm:0908| Trying to kill VM with monitor comm=
+and
+  11/04 00:56:59 INFO |   aexpect:0783| [qemu output] (Process terminated w=
+ith status 0)
+  11/04 00:57:00 DEBUG|    kvm_vm:0916| VM is down
+  11/04 00:57:00 DEBUG|   virt_vm:0318| Checking image file /tmp/kvm_autote=
+st_root/images/rhel6.1-64.qcow2
+  11/04 00:57:00 DEBUG|base_utils:0074| Running '/usr/local/autotest/tests/=
+kvm/qemu-img'
+  11/04 00:57:00 DEBUG|base_utils:0074| Running '/usr/local/autotest/tests/=
+kvm/qemu-img info /tmp/kvm_autotest_root/images/rhel6.1-64.qcow2'
+  11/04 00:57:00 DEBUG|base_utils:0106| [stdout] image: /tmp/kvm_autotest_r=
+oot/images/rhel6.1-64.qcow2
+  11/04 00:57:00 DEBUG|base_utils:0106| [stdout] file format: qcow2
+  11/04 00:57:00 DEBUG|base_utils:0106| [stdout] virtual size: 10G (1073741=
+8240 bytes)
+  11/04 00:57:00 DEBUG|base_utils:0106| [stdout] disk size: 2.1G
+  11/04 00:57:00 DEBUG|base_utils:0106| [stdout] cluster_size: 65536
+  11/04 00:57:00 DEBUG|base_utils:0074| Running '/usr/local/autotest/tests/=
+kvm/qemu-img check /tmp/kvm_autotest_root/images/rhel6.1-64.qcow2'
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/886255/+subscriptions
