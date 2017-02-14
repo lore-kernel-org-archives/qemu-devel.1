@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1cdkyg-0005te-E1
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 16:49:40 -0500
+	(envelope-from <jsnow@redhat.com>) id 1cdlFj-0004nt-UC
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 17:07:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1cdkyf-0000EI-Dz
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 16:49:38 -0500
-Date: Tue, 14 Feb 2017 16:49:21 -0500
-From: Aaron Lindsay <alindsay@codeaurora.org>
-Message-ID: <20170214214921.GA7958@codeaurora.org>
+	(envelope-from <jsnow@redhat.com>) id 1cdlFi-00005V-Kh
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 17:07:15 -0500
+References: <1487091579-67092-1-git-send-email-vsementsov@virtuozzo.com>
+	<1487091579-67092-16-git-send-email-vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <f37e6eab-a3dd-5b4c-f779-3f83e51592fe@redhat.com>
+Date: Tue, 14 Feb 2017 17:07:06 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] [RFC] Pointers for implementing AArch64 PMU
- instruction counter?
+In-Reply-To: <1487091579-67092-16-git-send-email-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 15/25] qcow2: add
+ .bdrv_can_store_new_dirty_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,33 +24,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, Wei Huang <wei@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, cov@codeaurora.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-I am interested in implementing an instruction counter to augment the
-ongoing (mostly cycle-counter) PMU work on AArch64. The icount
-infrastructure seems like the logical source for the instruction counts,
-but I have a couple of implementation-related questions:
 
-1. It looks like cpu_get_icount_raw() can serve as a good source for
-directly reading the current instruction count. Does it seem reasonable
-to only enable the instruction counter in the PMU when icount is enabled
-and are there any caveats I've missed with using icount for this
-purpose?
 
-2. Triggering interrupts on overflow seems like it will take more work.
-Does it seem reasonable to add a QEMU_CLOCK_VIRTUAL for the PMU so that
-tcg_get_icount_limit() will overflow at the appropriate time for the PMU
-if an instruction counter overflow interrupt is set? TBH, I'm not sure
-how well this would work since the timer code mostly seems to deal with
-time (as you might expect), keeping the icount values somewhat hidden
-away.
+On 02/14/2017 11:59 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Realize .bdrv_can_store_new_dirty_bitmap interface.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  block/qcow2-bitmap.c | 40 ++++++++++++++++++++++++++++++++++++++++
+>  block/qcow2.c        |  1 +
+>  block/qcow2.h        |  4 ++++
+>  3 files changed, 45 insertions(+)
+> 
+> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+> index b177a95..419d51e 100644
+> --- a/block/qcow2-bitmap.c
+> +++ b/block/qcow2-bitmap.c
+> @@ -1182,3 +1182,43 @@ fail:
+>  
+>      bitmap_list_free(bm_list);
+>  }
+> +
+> +bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
+> +                                      const char *name,
+> +                                      uint32_t granularity,
+> +                                      Error **errp)
+> +{
+> +    BDRVQcow2State *s = bs->opaque;
+> +    const char *reason = NULL;
+> +    bool found;
+> +    Qcow2BitmapList *bm_list;
+> +
+> +    if (check_constraints_on_bitmap(bs, name, granularity) != 0) {
+> +        reason = "it doesn't satisfy the constraints";
+> +        goto common_errp;
+> +    }
 
-Thanks for any feedback!
+"the constraints" are still entirely opaque to the caller, it may not be
+obvious that it's because of the name length.
 
--Aaron
+(But maybe you fix this in patch 25.)
 
--- 
-Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the
-Code Aurora Forum, a Linux Foundation Collaborative Project.
+> +
+> +    if (s->nb_bitmaps == 0) {
+> +        return true;
+> +    }
+> +
+> +    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
+> +                               s->bitmap_directory_size, errp);
+> +    if (bm_list == NULL) {
+> +        return false;
+> +    }
+
+Another opportunity for caching the bm_list.
+
+> +
+> +    found = find_bitmap_by_name(bm_list, name);
+> +    bitmap_list_free(bm_list);
+> +    if (found) {
+> +        reason = "bitmap with the same name is already stored";
+> +        goto common_errp;
+> +    }
+> +
+> +    return true;
+> +
+> +common_errp:
+> +    error_setg(errp, "Can't make bitmap '%s' persistent in '%s', as %s.",
+> +               name, bdrv_get_device_or_node_name(bs), reason);
+> +    return false;
+> +}
+
+We don't check total numbers of bitmaps here? (I'll keep reading ahead
+in the series.)
+
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index d0e41bf..6e1fe53 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -3541,6 +3541,7 @@ BlockDriver bdrv_qcow2 = {
+>  
+>      .bdrv_load_autoloading_dirty_bitmaps = qcow2_load_autoloading_dirty_bitmaps,
+>      .bdrv_store_persistent_dirty_bitmaps = qcow2_store_persistent_dirty_bitmaps,
+> +    .bdrv_can_store_new_dirty_bitmap = qcow2_can_store_new_dirty_bitmap,
+>  };
+>  
+>  static void bdrv_qcow2_init(void)
+> diff --git a/block/qcow2.h b/block/qcow2.h
+> index d9a7643..749710d 100644
+> --- a/block/qcow2.h
+> +++ b/block/qcow2.h
+> @@ -616,5 +616,9 @@ void qcow2_cache_put(BlockDriverState *bs, Qcow2Cache *c, void **table);
+>  /* qcow2-bitmap.c functions */
+>  void qcow2_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp);
+>  void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
+> +bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
+> +                                      const char *name,
+> +                                      uint32_t granularity,
+> +                                      Error **errp);
+>  
+>  #endif
+> 
+
+Benefit of the doubt:
+
+Reviewed-by: John Snow <jsnow@redhat.com>
