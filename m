@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47033)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cdk4y-0007Jf-7s
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 15:52:05 -0500
+	(envelope-from <eblake@redhat.com>) id 1cdkbm-0003hm-PX
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 16:26:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cdk4v-0002Lh-33
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 15:52:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38724)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1cdk4u-0002LI-QD
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 15:52:01 -0500
-Date: Tue, 14 Feb 2017 15:51:58 -0500
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170214205158.GT27752@localhost.localdomain>
-References: <1486617814-5420-1-git-send-email-Ashish.Mittal@veritas.com>
-	<20170209062928.GI27752@localhost.localdomain>
-	<CAAo6VWNGtLvbN4ktxRQ9SsobNCgJWcaa_zvdA-9q2Pp3YK27gg@mail.gmail.com>
+	(envelope-from <eblake@redhat.com>) id 1cdkbl-00082Q-5O
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 16:25:58 -0500
+References: <1045307195-43255@kerio.kamp.de>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <503b14af-ad2f-7635-e340-6078a4e4f67a@redhat.com>
+Date: Tue, 14 Feb 2017 15:25:51 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAo6VWNGtLvbN4ktxRQ9SsobNCgJWcaa_zvdA-9q2Pp3YK27gg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
- block device type called "vxhs"
+In-Reply-To: <1045307195-43255@kerio.kamp.de>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="aPlk8gMnXrA6a63SmRxOrn3Ongs4M1GD8"
+Subject: Re: [Qemu-devel] [RFC PATCH V3] qemu-img: make convert async
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,95 +23,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ashish mittal <ashmit602@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <ashish.mittal@veritas.com>, Stefan Hajnoczi <stefanha@gmail.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>
+To: Peter Lieven <pl@kamp.de>, Kevin Wolf <kwolf@redhat.com>
+Cc: ct@flyingcircus.io, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-On Thu, Feb 09, 2017 at 01:24:58AM -0800, ashish mittal wrote:
-> On Wed, Feb 8, 2017 at 10:29 PM, Jeff Cody <jcody@redhat.com> wrote:
-> > On Wed, Feb 08, 2017 at 09:23:33PM -0800, Ashish Mittal wrote:
-> >> From: Ashish Mittal <ashish.mittal@veritas.com>
-> >>
-> >> Source code for the qnio library that this code loads can be downloaded from:
-> >> https://github.com/VeritasHyperScale/libqnio.git
-> >>
-> >> Sample command line using JSON syntax:
-> >> ./x86_64-softmmu/qemu-system-x86_64 -name instance-00000008 -S -vnc 0.0.0.0:0
-> >> -k en-us -vga cirrus -device virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x5
-> >> -msg timestamp=on
-> >> 'json:{"driver":"vxhs","vdisk-id":"c3e9095a-a5ee-4dce-afeb-2a59fb387410",
-> >> "server":{"host":"172.172.17.4","port":"9999"}}'
-> >>
-> >> Sample command line using URI syntax:
-> >> qemu-img convert -f raw -O raw -n
-> >> /var/lib/nova/instances/_base/0c5eacd5ebea5ed914b6a3e7b18f1ce734c386ad
-> >> vxhs://192.168.0.1:9999/c6718f6b-0401-441d-a8c3-1f0064d75ee0
-> >>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--aPlk8gMnXrA6a63SmRxOrn3Ongs4M1GD8
+From: Eric Blake <eblake@redhat.com>
+To: Peter Lieven <pl@kamp.de>, Kevin Wolf <kwolf@redhat.com>
+Cc: ct@flyingcircus.io, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ mreitz@redhat.com
+Message-ID: <503b14af-ad2f-7635-e340-6078a4e4f67a@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH V3] qemu-img: make convert async
+References: <1045307195-43255@kerio.kamp.de>
+In-Reply-To: <1045307195-43255@kerio.kamp.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-[...]
+[meta-comment]
 
-> >> +#define VXHS_OPT_FILENAME           "filename"
-> >> +#define VXHS_OPT_VDISK_ID           "vdisk-id"
-> >> +#define VXHS_OPT_SERVER             "server"
-> >> +#define VXHS_OPT_HOST               "host"
-> >> +#define VXHS_OPT_PORT               "port"
-> >> +#define VXHS_UUID_DEF "12345678-1234-1234-1234-123456789012"
-> >
-> > What is this?  It is not a valid UUID; is the value significant?
-> >
-> 
-> This value gets passed to libvxhs for binaries like qemu-io, qemu-img
-> that do not have an Instance ID. We can use this default ID to control
-> access to specific vdisks by these binaries. qemu-kvm will pass the
-> actual instance ID, and therefore will not use this default value.
-> 
-> Will reply to other queries soon.
->
+On 02/14/2017 02:43 PM, Peter Lieven wrote:
+>=20
+>=20
+>=20
+>=20
+>  Von:   Kevin Wolf <kwolf@redhat.com>=20
+>  An:   Peter Lieven <pl@kamp.de>=20
+>  Kopie:   <qemu-devel@nongnu.org>, <qemu-block@nongnu.org>, <mreitz@red=
+hat.com>, <ct@flyingcircus.io>=20
+>  Gesendet:   14.02.2017 17:20=20
+>  Betreff:   Re: [RFC PATCH V3] qemu-img: make convert async=20
+>=20
+> Am 14.02.2017 um 14:39 hat Peter Lieven geschrieben:=20
+>> this is something I have been thinking about for almost 2 years now.=20
 
-If you are going to call it a UUID, it should adhere to the RFC 4122 spec.
-You can easily generate a compliant UUID with uuidgen.  However:
+Your quoting style did not introduce any extra prefix in front of
+Kevin's comments...
 
-Can you explain more about how you are using this to control access by
-qemu-img and qemu-io?  Looking at libqnio, it looks like this is used to
-determine at runtime which TLS certs to use based off of a
-pathname/filename, which is then how I presume you are controlling access.
-See Daniel's email regarding TLS certificates.
+>> we heavily have the following two use cases when using qemu-img conver=
+t.=20
+>> +    int nb_sectors;=20
+>> +    QSIMPLEQ_ENTRY(ImgConvertRequest) next;=20
+>> +} ImgConvertRequest;=20
+> =20
+> If I understand your code correctly, you first go through the image and=
+=20
+> create an ImgConvertRequest for every chunk with the same allocation=20
+> status (well, actually not every chunk, but that may be a bug, see=20
+> below).=20
+> =20
+> So let's assume a 1 TB image with every other cluster allocated:=20
+> =20
+>     1T / (64k * 2) =3D 8M=20
+> =20
+> A list with 8 million entries (requiring 8 million mallocs) feels=20
+> relatively large. Not counting malloc overhead (which might be=20
+> considerable here), I think we're at 192 MB memory usage for this case.=
+=20
+> Not as bad as I was afraid, but not really nice either. And 1 TB isn't =
 
-[...]
+> even close to the maximum image size.=20
+> =20
+> Is it really necessary to create this list at the beginning? Why can't =
 
-> >> +
-> >> +static void bdrv_vxhs_init(void)
-> >> +{
-> >> +    char out[37];
+> we just get the next chunk as the old code used to?=20
+>=20
+>=20
+> In my initial version with AIO invoking convert_iterate_sectors caused
 
-Additional point: this should be sized as UUID_FMT_LEN + 1, not 37, but I
-suspect this code is changing anyways.
+=2E..with the VERY annoying effect that it is now impossible to tell the
+difference between what Kevin wrote and what you wrote.  Please consider
+improving your mail flow to use a mailer that properly inserts '>'
+prefixes in front of quoted lines, to make it easier to call attention
+to the lines that you are adding to the conversation.
 
-> >> +
-> >> +    if (qemu_uuid_is_null(&qemu_uuid)) {
-> >> +        lib_init_failed = iio_init(QNIO_VERSION, vxhs_iio_callback, VXHS_UUID_DEF);
-> >> +    } else {
-> >> +        qemu_uuid_unparse(&qemu_uuid, out);
-> >> +        lib_init_failed = iio_init(QNIO_VERSION, vxhs_iio_callback, out);
-> >> +    }
-> >> +
-> >
-> > [1]
-> >
-> > Can you explain what is going on here with the qemu_uuid check?
-> >
-> >
-> > You also can't do this here.  This init function is just to register the
-> > driver (e.g. populate the BlockDriver list).  You shouldn't be doing
-> > anything other than the bdrv_register() call here.
-> >
-> > Since you want to run this iio_init only once, I would recommend doing it in
-> > the vxhs_open() call, and using a ref counter.  That way, you can also call
-> > iio_fini() to finish releasing resources once the last device is closed.
-> >
-> > This was actually a suggestion I had before, which you then incorporated
-> > into v6, but it appears all the refcnt code has gone away for v7/v8.
-> >
-> >
-> >> +    bdrv_register(&bdrv_vxhs);
-> >> +}
-> >> +
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--aPlk8gMnXrA6a63SmRxOrn3Ongs4M1GD8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYo3XfAAoJEKeha0olJ0NqJugH/36FTz+jE5vEP9AAJjvq7LTK
+bQuFBGz/p37o1MAq2sN69/5tVvov04KScJq0gB1XJ2ts6ufYe76h2U37Se0bv4xA
+m058haYeeYQ4eCPhYX8RkqywF9oEjeFuXDq3G4ctDrO2nvMwGcNxREsmcYds253+
+i68MFaShMwK9tLWPpliLnm1LOMqvSv0y5qnJmOL2KfEf+BjxV4fo7dOFeNQjD0E/
+AwBaKTaszVxQ9SoYS4EnGaqtZIOIIgXJI8+JWjbOp6isZ83ttsPDJHBVyaj3D0HC
+KhOH0o/CvSdL7ssSMdDAjw77G5Ci+nVmKNgkUNqrdm4kQhEu+dmVLG1g6WgYEZQ=
+=v+RG
+-----END PGP SIGNATURE-----
+
+--aPlk8gMnXrA6a63SmRxOrn3Ongs4M1GD8--
