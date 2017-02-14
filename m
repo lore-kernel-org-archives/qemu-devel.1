@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55489)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cdart-0004Sk-PG
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:02:01 -0500
+	(envelope-from <ppandit@redhat.com>) id 1cdasG-0004ow-9g
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:02:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cdars-0005rf-PH
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:01:57 -0500
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:36170)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cdars-0005r0-KG
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:01:56 -0500
-Received: by mail-wr0-x230.google.com with SMTP id k90so166990691wrc.3
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 03:01:56 -0800 (PST)
+	(envelope-from <ppandit@redhat.com>) id 1cdasF-00062z-Fg
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:02:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40828)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1cdasF-00062Q-9u
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:02:19 -0500
+Date: Tue, 14 Feb 2017 16:32:12 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+In-Reply-To: <CAFEAcA-4AUMocZJgxEkR5khYvjKzfwMZTZQavyEBE-K32L2oUQ@mail.gmail.com>
+Message-ID: <alpine.LFD.2.20.1702141629580.25875@wniryva>
+References: <20170214062242.26124-1-ppandit@redhat.com>
+	<CAFEAcA-cnpn321oTvxPXAx55ngztojr=Q6KKTEcgKTvfDV8f8Q@mail.gmail.com>
+	<alpine.LFD.2.20.1702141551490.25875@wniryva>
+	<CAFEAcA-4AUMocZJgxEkR5khYvjKzfwMZTZQavyEBE-K32L2oUQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170213212536.31871-1-rth@twiddle.net>
-References: <20170213212536.31871-1-rth@twiddle.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 14 Feb 2017 11:01:33 +0000
-Message-ID: <CAFEAcA9T0-OMTzZmgxcTroFvTCh3N6GhRsR3BVHo05YWGyCeiA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 00/24] target/openrisc patches
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v4] sd: sdhci: mask transfer mode register
+ value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +29,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair23@gmail.com>, Wjjzhang <wjjzhang@tencent.com>, Jiang Xin <jiangxin1@huawei.com>
 
-On 13 February 2017 at 21:25, Richard Henderson <rth@twiddle.net> wrote:
-> This is the v2 patch set that I posted last week.
-> It even acquired some new R-b.  Whee!
->
->
-> r~
->
->
->
-> The following changes since commit 305e6c8a2ff7a6e3f4942b50e853230f18eeb5a9:
->
->   Merge remote-tracking branch 'remotes/stefanha/tags/tracing-pull-request' into staging (2017-02-13 16:44:04 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/rth7680/qemu.git tags/pull-or-20170214
->
-> for you to fetch changes up to 6597c28d618a3d16d468770b7c30a0237a8c8ea9:
->
->   target/openrisc: Optimize for r0 being zero (2017-02-14 08:15:00 +1100)
->
-> ----------------------------------------------------------------
-> Queued openrisc patches
->
+  Hello Peter,
 
-Applied, thanks.
++-- On Tue, 14 Feb 2017, Peter Maydell wrote --+
+| Please keep sending them as a single series, though. Otherwise I
+| won't be able to easily apply them in the right order and track
+| their current status.
 
--- PMM
+  Okay, got it. Ie. to re-send entire series even for change in one of the 
+patches?
+
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
