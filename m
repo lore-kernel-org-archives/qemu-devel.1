@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cdgas-0005oU-7j
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 12:08:47 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cdgcC-0006tn-Qq
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 12:10:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cdgan-0006oK-7a
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 12:08:46 -0500
-Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:36782)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cdgan-0006nt-2Q
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 12:08:41 -0500
-Received: by mail-wr0-x22a.google.com with SMTP id k90so174188147wrc.3
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 09:08:41 -0800 (PST)
-References: <1486065742-28639-1-git-send-email-peter.maydell@linaro.org>
-	<1486065742-28639-3-git-send-email-peter.maydell@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1486065742-28639-3-git-send-email-peter.maydell@linaro.org>
-Date: Tue, 14 Feb 2017 17:08:59 +0000
-Message-ID: <878tp8vgwk.fsf@linaro.org>
+	(envelope-from <pbonzini@redhat.com>) id 1cdgc7-0007NZ-PY
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 12:10:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56078)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cdgc7-0007NN-Jd
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 12:10:03 -0500
+References: <1487092068-16562-1-git-send-email-imbrenda@linux.vnet.ibm.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <405d82a8-5507-6dbf-8844-dc4004ea99c9@redhat.com>
+Date: Tue, 14 Feb 2017 18:10:03 +0100
 MIME-Version: 1.0
+In-Reply-To: <1487092068-16562-1-git-send-email-imbrenda@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/9] armv7m: Implement reading and writing
- of PRIGROUP
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 0/2] Qemu: gdbstub: fix vCont
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,79 +26,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Michael Davidsaver <mdavidsaver@gmail.com>, Liviu Ionescu <ilg@livius.net>
+To: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+Cc: borntraeger@de.ibm.com, qemu-devel@nongnu.org, palves@redhat.com, alex.bennee@linaro.org
 
+Thanks, I hope to send a pull request this week, including this patch.
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Paolo
 
-> Add a state field for the v7M PRIGROUP register and implent
-> reading and writing it. The current NVIC doesn't honour
-> the values written, but the new version will.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/intc/armv7m_nvic.c | 14 ++++++++------
->  1 file changed, 8 insertions(+), 6 deletions(-)
->
-> diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-> index 09975f3..ce22001 100644
-> --- a/hw/intc/armv7m_nvic.c
-> +++ b/hw/intc/armv7m_nvic.c
-> @@ -24,6 +24,9 @@
->  typedef struct NVICState {
->      GICState gic;
->      ARMCPU *cpu;
-> +
-> +    uint32_t prigroup;
-
-It might be worth mentioning the field resets to 0b000 here.
-Nevertheless:
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
-> +
->      struct {
->          uint32_t control;
->          uint32_t reload;
-> @@ -223,7 +226,7 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset)
->      case 0xd08: /* Vector Table Offset.  */
->          return cpu->env.v7m.vecbase;
->      case 0xd0c: /* Application Interrupt/Reset Control.  */
-> -        return 0xfa050000;
-> +        return 0xfa050000 | (s->prigroup << 8);
->      case 0xd10: /* System Control.  */
->          /* TODO: Implement SLEEPONEXIT.  */
->          return 0;
-> @@ -362,9 +365,7 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value)
->              if (value & 1) {
->                  qemu_log_mask(LOG_UNIMP, "AIRCR system reset unimplemented\n");
->              }
-> -            if (value & 0x700) {
-> -                qemu_log_mask(LOG_UNIMP, "PRIGROUP unimplemented\n");
-> -            }
-> +            s->prigroup = extract32(value, 8, 3);
->          }
->          break;
->      case 0xd10: /* System Control.  */
-> @@ -483,13 +484,14 @@ static const MemoryRegionOps nvic_sysreg_ops = {
->
->  static const VMStateDescription vmstate_nvic = {
->      .name = "armv7m_nvic",
-> -    .version_id = 1,
-> -    .minimum_version_id = 1,
-> +    .version_id = 2,
-> +    .minimum_version_id = 2,
->      .fields = (VMStateField[]) {
->          VMSTATE_UINT32(systick.control, NVICState),
->          VMSTATE_UINT32(systick.reload, NVICState),
->          VMSTATE_INT64(systick.tick, NVICState),
->          VMSTATE_TIMER_PTR(systick.timer, NVICState),
-> +        VMSTATE_UINT32(prigroup, NVICState),
->          VMSTATE_END_OF_LIST()
->      }
->  };
-
-
---
-Alex Bennée
+On 14/02/2017 18:07, Claudio Imbrenda wrote:
+> This small patchset fixes the incorrect behaviour of the vCont command
+> in the gdb stub. 
+> 
+> The first patch, as suggested be Paolo, refactors some code. The most
+> visible change is that it moves vm_start to cpus.c 
+> 
+> The second one fixes the incorrect behaviour of the vCont command.
+> Previously, continuing or stepping a single thread (CPU) caused all
+> other CPUs to be started too, whereas the GDB specification clearly
+> states that without a default action all threads not explicitly
+> mentioned in the command should stay stopped.
+> 
+> So if the Qemu gdbstub receives a  vCont;c:1  packet, no other CPU
+> should be restarted except the first, and when a  vCont;s:1  is
+> received, the first CPU should be stepped without restarting the others.
+> With this patchset Qemu now behaves as expected.
+> 
+> See here for reference material about the packets: 
+> https://sourceware.org/gdb/current/onlinedocs/gdb/Packets.html
+> https://sourceware.org/gdb/onlinedocs/gdb/Packets.html
+> 
+> v7 -> v8
+> * fixed and added some comments
+> * fixed vCont a little bit for user mode
+> * use cpu->cpu_index directly when possible
+> 
+> v6 -> v7
+> * fixed description of patch 1 to reflect what is actually happening
+>   and improved description of patch 2
+> * removed leftover header declaration of resume_some_vcpus which had
+>   been removed a few versions ago
+> * fixed a compilation issue when compiling userspace-mode only
+>   (global variable max_cpus is not defined when not in system-mode)
+> 
+> v4 -> v6
+> * rebased on master after target-s390x was moved
+> * put qemu_clock_enable back into resume_all_vcpus
+> * improved the parsing function of the vCont packet
+> * added qemu_clock_enable to gdb_continue_partial
+> 
+> v3 -> v4
+> * rebased on v2.8.0-rc2, no changes needed
+> 
+> v2 -> v3
+> * removed resume_some_vcpus
+> * cleared up the code and simplified the implementation in light of the 
+>   clarification in the specification of the vCont packet
+> 
+> Claudio Imbrenda (2):
+>   move vm_start to cpus.c
+>   gdbstub: Fix vCont behaviour
+> 
+>  cpus.c                  |  42 ++++++++++
+>  gdbstub.c               | 209 +++++++++++++++++++++++++++++++++++++-----------
+>  include/sysemu/sysemu.h |   2 +
+>  vl.c                    |  30 +------
+>  4 files changed, 207 insertions(+), 76 deletions(-)
+> 
