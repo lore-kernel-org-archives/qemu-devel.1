@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34538)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashmit602@gmail.com>) id 1cdlgH-0007ZY-Bq
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 17:34:43 -0500
+	(envelope-from <jsnow@redhat.com>) id 1cdljA-00011O-U6
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 17:37:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashmit602@gmail.com>) id 1cdlgF-00023J-Qu
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 17:34:41 -0500
-Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:36624)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ashmit602@gmail.com>) id 1cdlgF-000234-L0
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 17:34:39 -0500
-Received: by mail-it0-x244.google.com with SMTP id f200so7710595itf.3
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 14:34:39 -0800 (PST)
+	(envelope-from <jsnow@redhat.com>) id 1cdlj9-0002lv-Nz
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 17:37:40 -0500
+References: <1487091579-67092-1-git-send-email-vsementsov@virtuozzo.com>
+	<1487091579-67092-17-git-send-email-vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <c3aad39c-1eeb-2315-bf4b-1084e2e8cfbc@redhat.com>
+Date: Tue, 14 Feb 2017 17:37:33 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170214205158.GT27752@localhost.localdomain>
-References: <1486617814-5420-1-git-send-email-Ashish.Mittal@veritas.com>
-	<20170209062928.GI27752@localhost.localdomain>
-	<CAAo6VWNGtLvbN4ktxRQ9SsobNCgJWcaa_zvdA-9q2Pp3YK27gg@mail.gmail.com>
-	<20170214205158.GT27752@localhost.localdomain>
-From: ashish mittal <ashmit602@gmail.com>
-Date: Tue, 14 Feb 2017 14:34:38 -0800
-Message-ID: <CAAo6VWO64cuJZaNDSzFM6d2YFXr41nc78cPKBR=mbJc5mRD=0w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
- block device type called "vxhs"
+In-Reply-To: <1487091579-67092-17-git-send-email-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 16/25] qmp: add persistent flag to
+ block-dirty-bitmap-add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,124 +24,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <ashish.mittal@veritas.com>, Stefan Hajnoczi <stefanha@gmail.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-On Tue, Feb 14, 2017 at 12:51 PM, Jeff Cody <jcody@redhat.com> wrote:
-> On Thu, Feb 09, 2017 at 01:24:58AM -0800, ashish mittal wrote:
->> On Wed, Feb 8, 2017 at 10:29 PM, Jeff Cody <jcody@redhat.com> wrote:
->> > On Wed, Feb 08, 2017 at 09:23:33PM -0800, Ashish Mittal wrote:
->> >> From: Ashish Mittal <ashish.mittal@veritas.com>
->> >>
->> >> Source code for the qnio library that this code loads can be downloaded from:
->> >> https://github.com/VeritasHyperScale/libqnio.git
->> >>
->> >> Sample command line using JSON syntax:
->> >> ./x86_64-softmmu/qemu-system-x86_64 -name instance-00000008 -S -vnc 0.0.0.0:0
->> >> -k en-us -vga cirrus -device virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x5
->> >> -msg timestamp=on
->> >> 'json:{"driver":"vxhs","vdisk-id":"c3e9095a-a5ee-4dce-afeb-2a59fb387410",
->> >> "server":{"host":"172.172.17.4","port":"9999"}}'
->> >>
->> >> Sample command line using URI syntax:
->> >> qemu-img convert -f raw -O raw -n
->> >> /var/lib/nova/instances/_base/0c5eacd5ebea5ed914b6a3e7b18f1ce734c386ad
->> >> vxhs://192.168.0.1:9999/c6718f6b-0401-441d-a8c3-1f0064d75ee0
->> >>
->
-> [...]
->
->> >> +#define VXHS_OPT_FILENAME           "filename"
->> >> +#define VXHS_OPT_VDISK_ID           "vdisk-id"
->> >> +#define VXHS_OPT_SERVER             "server"
->> >> +#define VXHS_OPT_HOST               "host"
->> >> +#define VXHS_OPT_PORT               "port"
->> >> +#define VXHS_UUID_DEF "12345678-1234-1234-1234-123456789012"
->> >
->> > What is this?  It is not a valid UUID; is the value significant?
->> >
->>
->> This value gets passed to libvxhs for binaries like qemu-io, qemu-img
->> that do not have an Instance ID. We can use this default ID to control
->> access to specific vdisks by these binaries. qemu-kvm will pass the
->> actual instance ID, and therefore will not use this default value.
->>
->> Will reply to other queries soon.
->>
->
-> If you are going to call it a UUID, it should adhere to the RFC 4122 spec.
-> You can easily generate a compliant UUID with uuidgen.  However:
->
-> Can you explain more about how you are using this to control access by
-> qemu-img and qemu-io?  Looking at libqnio, it looks like this is used to
-> determine at runtime which TLS certs to use based off of a
-> pathname/filename, which is then how I presume you are controlling access.
-> See Daniel's email regarding TLS certificates.
->
 
-(1) The default behavior would be to disallow access to any vdisks by
-the non qemu-kvm binaries. qemu-kvm would use the actual instance ID
-for authentication.
-(2) Depending on the workflow, HyperScale controller can choose to
-grant *temporary* access to specific vdisks by qemu-img, qemu-io
-binaries (identified by the default VXHS_UUID_DEF above).
-(3) This information, described in #2, would be communicated by the
-HyperScale controller to the actual proprietary VxHS server (running
-on each compute) that does the authentication/SSL.
-(4) The HyperScale controller, in this way, can grant/revoke access
-for specific vdisks not just to clients with VXHS_UUID_DEF instance
-ID, but also the actual VM instances.
 
-> [...]
->
->> >> +
->> >> +static void bdrv_vxhs_init(void)
->> >> +{
->> >> +    char out[37];
->
-> Additional point: this should be sized as UUID_FMT_LEN + 1, not 37, but I
-> suspect this code is changing anyways.
->
->> >> +
->> >> +    if (qemu_uuid_is_null(&qemu_uuid)) {
->> >> +        lib_init_failed = iio_init(QNIO_VERSION, vxhs_iio_callback, VXHS_UUID_DEF);
->> >> +    } else {
->> >> +        qemu_uuid_unparse(&qemu_uuid, out);
->> >> +        lib_init_failed = iio_init(QNIO_VERSION, vxhs_iio_callback, out);
->> >> +    }
->> >> +
->> >
->> > [1]
->> >
->> > Can you explain what is going on here with the qemu_uuid check?
->> >
+On 02/14/2017 11:59 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Add optional 'persistent' flag to qmp command block-dirty-bitmap-add.
+> Default is false.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Signed-off-by: Denis V. Lunev <den@openvz.org>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  blockdev.c           | 18 +++++++++++++++++-
+>  qapi/block-core.json |  8 +++++++-
+>  2 files changed, 24 insertions(+), 2 deletions(-)
+> 
+> diff --git a/blockdev.c b/blockdev.c
+> index 245e1e1..40605fa 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -1967,6 +1967,7 @@ static void block_dirty_bitmap_add_prepare(BlkActionState *common,
+>      /* AIO context taken and released within qmp_block_dirty_bitmap_add */
+>      qmp_block_dirty_bitmap_add(action->node, action->name,
+>                                 action->has_granularity, action->granularity,
+> +                               action->has_persistent, action->persistent,
+>                                 &local_err);
+>  
+>      if (!local_err) {
+> @@ -2696,10 +2697,12 @@ out:
+>  
+>  void qmp_block_dirty_bitmap_add(const char *node, const char *name,
+>                                  bool has_granularity, uint32_t granularity,
+> +                                bool has_persistent, bool persistent,
+>                                  Error **errp)
+>  {
+>      AioContext *aio_context;
+>      BlockDriverState *bs;
+> +    BdrvDirtyBitmap *bitmap;
+>  
+>      if (!name || name[0] == '\0') {
+>          error_setg(errp, "Bitmap name cannot be empty");
+> @@ -2725,7 +2728,20 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
+>          granularity = bdrv_get_default_bitmap_granularity(bs);
+>      }
+>  
+> -    bdrv_create_dirty_bitmap(bs, granularity, name, errp);
+> +    if (!has_persistent) {
+> +        persistent = false;
+> +    }
+> +
+> +    if (persistent &&
+> +        !bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp))
+> +    {
+> +        goto out;
+> +    }
+> +
 
-(1) qemu_uuid_is_null(&qemu_uuid) is true for qemu-io, qemu-img that
-do not define a instance ID. We end up using the default VXHS_UUID_DEF
-ID for them, and authenticating them as described above.
+Yeah, I don't see where you're checking against MAX_BITMAPS in the qcow2
+implementation for can_store.
 
-(2) For the other case 'else', we convert the uuid to a char * using
-qemu_uuid_unparse(), and pass the resulting char * uuid in variable
-'out' to libvxhs.
+> +    bitmap = bdrv_create_dirty_bitmap(bs, granularity, name, errp);
+> +    if (bitmap != NULL) {
+> +        bdrv_dirty_bitmap_set_persistance(bitmap, persistent);
+> +    }
+>  
+>   out:
+>      aio_context_release(aio_context);
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 932f5bb..535df20 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -1559,10 +1559,16 @@
+>  # @granularity: #optional the bitmap granularity, default is 64k for
+>  #               block-dirty-bitmap-add
+>  #
+> +# @persistent: #optional the bitmap is persistent, i.e. it will be saved to the
+> +#              corresponding block device image file on its close. For now only
+> +#              Qcow2 disks support persistent bitmaps. Default is false.
+> +#              (Since 2.9)
+> +#
+>  # Since: 2.4
+>  ##
+>  { 'struct': 'BlockDirtyBitmapAdd',
+> -  'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32' } }
+> +  'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32',
+> +            '*persistent': 'bool' } }
+>  
+>  ##
+>  # @block-dirty-bitmap-add:
+> 
 
->> >
->> > You also can't do this here.  This init function is just to register the
->> > driver (e.g. populate the BlockDriver list).  You shouldn't be doing
->> > anything other than the bdrv_register() call here.
->> >
->> > Since you want to run this iio_init only once, I would recommend doing it in
->> > the vxhs_open() call, and using a ref counter.  That way, you can also call
->> > iio_fini() to finish releasing resources once the last device is closed.
->> >
->> > This was actually a suggestion I had before, which you then incorporated
->> > into v6, but it appears all the refcnt code has gone away for v7/v8.
->> >
->> >
->> >> +    bdrv_register(&bdrv_vxhs);
->> >> +}
->> >> +
-
-Will consider this in the next patch.
-
-Regards,
-Ashish
+Looks good otherwise.
