@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35193)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cdXeZ-0004J5-KB
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 02:36:01 -0500
+	(envelope-from <ashmit602@gmail.com>) id 1cdXli-0007KP-PO
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 02:43:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cdXeW-00089j-EH
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 02:35:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54984)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cdXeW-00088A-59
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 02:35:56 -0500
-Date: Tue, 14 Feb 2017 15:35:51 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170214073551.GA9055@pxdev.xzpeter.org>
-References: <CAHyh4xiVKjd+D=qaizUZ02O8xLYhpoVKOqC9cR0ZWWyLq9HtbQ@mail.gmail.com>
-	<20170208031216.GA5151@pxdev.xzpeter.org>
-	<CAHyh4xg7NVPjXu3c+xGWNzQqwLgFqFJTPo4SgN-X+FNuHjGihQ@mail.gmail.com>
-	<CAHyh4xhOPmfLoU_fvtbBF1Wqbzji9q6rp_bRN38qfnwvhQq+9A@mail.gmail.com>
-	<20170209035250.GB22153@pxdev.xzpeter.org>
-	<CAHyh4xi9KZm13mJnE3-EyYkkyN4YDKKwbeJ68AumCBM7kgr+MQ@mail.gmail.com>
+	(envelope-from <ashmit602@gmail.com>) id 1cdXlg-000578-Qd
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 02:43:22 -0500
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:36183)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ashmit602@gmail.com>) id 1cdXlg-00055h-JY
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 02:43:20 -0500
+Received: by mail-it0-x244.google.com with SMTP id f200so3735408itf.3
+	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 23:43:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAHyh4xi9KZm13mJnE3-EyYkkyN4YDKKwbeJ68AumCBM7kgr+MQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] iommu emulation
+In-Reply-To: <983C87E0-DE5B-4147-82CD-CE6A8D093B6C@veritas.com>
+References: <1478566785-4002-1-git-send-email-ashish.mittal@veritas.com>
+	<1478566785-4002-3-git-send-email-ashish.mittal@veritas.com>
+	<20161108204413.GA6353@localhost.localdomain>
+	<CAAo6VWMyTjV1Fn8-BSex7Fx8OcEcuEyK2rQJ6L=wZZXDiB5A4w@mail.gmail.com>
+	<20170213133725.GA10361@stefanha-x1.localdomain>
+	<20170213163232.GN27752@localhost.localdomain>
+	<B3F9860E-E786-48A5-8BBD-918833905E73@veritas.com>
+	<20170213232302.GP27752@localhost.localdomain>
+	<983C87E0-DE5B-4147-82CD-CE6A8D093B6C@veritas.com>
+From: ashish mittal <ashmit602@gmail.com>
+Date: Mon, 13 Feb 2017 23:43:17 -0800
+Message-ID: <CAAo6VWNYZG5fc7Z9_u+9Qew5VgbTRA_cRfTu8wqPpOXzTrjvfA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 2/2] block/vxhs.c: Add qemu-iotests for
+ new block device type "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,221 +37,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jintack Lim <jintack@cs.columbia.edu>
-Cc: mst@redhat.com, Alex Williamson <alex.williamson@redhat.com>, QEMU Devel Mailing List <qemu-devel@nongnu.org>
+To: Ketan Nilangekar <Ketan.Nilangekar@veritas.com>
+Cc: Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>
 
-On Thu, Feb 09, 2017 at 08:01:14AM -0500, Jintack Lim wrote:
-> On Wed, Feb 8, 2017 at 10:52 PM, Peter Xu <peterx@redhat.com> wrote:
-> > (cc qemu-devel and Alex)
-> >
-> > On Wed, Feb 08, 2017 at 09:14:03PM -0500, Jintack Lim wrote:
-> >> On Wed, Feb 8, 2017 at 10:49 AM, Jintack Lim <jintack@cs.columbia.edu> wrote:
-> >> > Hi Peter,
-> >> >
-> >> > On Tue, Feb 7, 2017 at 10:12 PM, Peter Xu <peterx@redhat.com> wrote:
-> >> >> On Tue, Feb 07, 2017 at 02:16:29PM -0500, Jintack Lim wrote:
-> >> >>> Hi Peter and Michael,
-> >> >>
-> >> >> Hi, Jintack,
-> >> >>
-> >> >>>
-> >> >>> I would like to get some help to run a VM with the emulated iommu. I
-> >> >>> have tried for a few days to make it work, but I couldn't.
-> >> >>>
-> >> >>> What I want to do eventually is to assign a network device to the
-> >> >>> nested VM so that I can measure the performance of applications
-> >> >>> running in the nested VM.
-> >> >>
-> >> >> Good to know that you are going to use [4] to do something useful. :-)
-> >> >>
-> >> >> However, could I ask why you want to measure the performance of
-> >> >> application inside nested VM rather than host? That's something I am
-> >> >> just curious about, considering that virtualization stack will
-> >> >> definitely introduce overhead along the way, and I don't know whether
-> >> >> that'll affect your measurement to the application.
-> >> >
-> >> > I have added nested virtualization support to KVM/ARM, which is under
-> >> > review now. I found that application performance running inside the
-> >> > nested VM is really bad both on ARM and x86, and I'm trying to figure
-> >> > out what's the real overhead. I think one way to figure that out is to
-> >> > see if the direct device assignment to L2 helps to reduce the overhead
-> >> > or not.
-> >
-> > I see. IIUC you are trying to use an assigned device to replace your
-> > old emulated device in L2 guest to see whether performance will drop
-> > as well, right? Then at least I can know that you won't need a nested
-> > VT-d here (so we should not need a vIOMMU in L2 guest).
-> 
-> That's right.
-> 
-> >
-> > In that case, I think we can give it a shot, considering that L1 guest
-> > will use vfio-pci for that assigned device as well, and when L2 guest
-> > QEMU uses this assigned device, it'll use a static mapping (just to
-> > map the whole GPA for L2 guest) there, so even if you are using a
-> > kernel driver in L2 guest with your to-be-tested application, we
-> > should still be having a static mapping in vIOMMU in L1 guest, which
-> > is IMHO fine from performance POV.
-> >
-> > I cced Alex in case I missed anything here.
-> >
-> >> >
-> >> >>
-> >> >> Another thing to mention is that (in case you don't know that), device
-> >> >> assignment with VT-d protection would be even slower than generic VMs
-> >> >> (without Intel IOMMU protection) if you are using generic kernel
-> >> >> drivers in the guest, since we may need real-time DMA translation on
-> >> >> data path.
-> >> >>
-> >> >
-> >> > So, this is the comparison between using virtio and using the device
-> >> > assignment for L1? I have tested application performance running
-> >> > inside L1 with and without iommu, and I found that the performance is
-> >> > better with iommu.
+On Mon, Feb 13, 2017 at 7:02 PM, Ketan Nilangekar
+<Ketan.Nilangekar@veritas.com> wrote:
+>
+>
+> On 2/13/17, 3:23 PM, "Jeff Cody" <jcody@redhat.com> wrote:
+>
+>     On Mon, Feb 13, 2017 at 10:36:53PM +0000, Ketan Nilangekar wrote:
+>     >
+>     >
+>     > On 2/13/17, 8:32 AM, "Jeff Cody" <jcody@redhat.com> wrote:
+>     >
+>     >     On Mon, Feb 13, 2017 at 01:37:25PM +0000, Stefan Hajnoczi wrote=
+:
+>     >     > On Tue, Feb 07, 2017 at 03:12:36PM -0800, ashish mittal wrote=
+:
+>     >     > > On Tue, Nov 8, 2016 at 12:44 PM, Jeff Cody <jcody@redhat.co=
+m> wrote:
+>     >     > > > On Mon, Nov 07, 2016 at 04:59:45PM -0800, Ashish Mittal w=
+rote:
+>     >     > > >> These changes use a vxhs test server that is a part of t=
+he following
+>     >     > > >> repository:
+>     >     > > >> https://github.com/MittalAshish/libqnio.git
+>     >     > > >>
+>     >     > > >> Signed-off-by: Ashish Mittal <ashish.mittal@veritas.com>
+>     >     > > >> ---
+>     >     > > >> v6 changelog:
+>     >     > > >> (1) Added iotests for VxHS block device.
+>     >     > > >>
+>     >     > > >>  tests/qemu-iotests/common        |  6 ++++++
+>     >     > > >>  tests/qemu-iotests/common.config | 13 +++++++++++++
+>     >     > > >>  tests/qemu-iotests/common.filter |  1 +
+>     >     > > >>  tests/qemu-iotests/common.rc     | 19 +++++++++++++++++=
+++
+>     >     > > >>  4 files changed, 39 insertions(+)
+>     >     > > >>
+>     >     > > >> diff --git a/tests/qemu-iotests/common b/tests/qemu-iote=
+sts/common
+>     >     > > >> index d60ea2c..41430d8 100644
+>     >     > > >> --- a/tests/qemu-iotests/common
+>     >     > > >> +++ b/tests/qemu-iotests/common
+>     >     > > >
+>     >     > > > When using raw format, I was able to run the test success=
+fully for all
+>     >     > > > supported test cases (26 of them).
+>     >     > > >
+>     >     > > > With qcow2, they fail - but not the fault of this patch, =
+I think; but
+>     >     > > > rather, the fault of the test server.  Can qnio_server be=
+ modified so that
+>     >     > > > it does not work on just raw files?
+>     >     > > >
+>     >     > > >
+>     >     > >
+>     >     > > VxHS supports and uses only the raw format.
+>     >     >
+>     >     > That's like saying only ext4 guest file systems are supported=
+ on VxHS
+>     >     > and not ZFS.  The VxHS driver should not care what file syste=
+m is used,
+>     >     > it just does block I/O without interpreting the data.
+>     >     >
+>     >     > It must be possible to use any format on top of the VxHS prot=
+ocol.
+>     >     > After all, the image format drivers just do block I/O.  If th=
+ere is a
+>     >     > case where qcow2 on VxHS fails then it needs to be investigat=
+ed.
+>     >     >
+>     >     > The VxHS driver can't be merged until we at least understand =
+the cause
+>     >     > of the qcow2 test failures.
+>     >     >
+>     >
+>     >     A quick run with the test server and a QEMU process showed an a=
+bort() in the
+>     >     test server, so I just sent a pull req to libqnio to fix that.
+>     >
+>     >     But playing with it in gdb right now with a test qcow2 file, I =
+see that we
+>     >     are waiting in aio_poll() forever for the test server to respon=
+d to a read
+>     >     request, when using qcow2 format.
+>     >
+>     >     As Stefan said, this doesn't really make any sense - why would =
+VXHS behave
+>     >     differently based on the file contents?
+>     >
+>     > [Ketan] To read/write a qcow2 backed device VxHS server implementat=
+ion
+>     > will need to understand the qcow2 format. This is not just block IO=
+ but
+>     > actually does involve interpreting the qcow2 header and cluster for=
+mats.
+>     > Clearly the test server implementation does not handle it as it was=
+ never
+>     > intended to. VxHS backend won't handle it either because VxHS virtu=
+al
+>     > disks are written as non-sparse files.  There are space savings wit=
+h the
+>     > qcow2 format but performance penalties as well because of the metad=
+ata
+>     > overhead. As a block storage provider, VxHS does not support sparse=
+ file
+>     > formats like qcow2 primarily because of performance reasons.  Imple=
+menting
+>     > a qcow2 backend in the test server would be a non-trivial and non-u=
+seful
+>     > exercise since the VxHS server won't support it.
+>     >
+>
+>     What?  Why would the backend need to know anything about qcow2 format=
+s; are
+>     you manipulating the guest image data directly yourself?  But regardl=
+ess,
+>     since the test server is naive and just reads and writes data, the fa=
+ct that
+>     the test server breaks on qcow2 image formats means that the test ser=
+ver is
+>     broken for raw images, as well [1].
+>
+>     The backend should not need to know anything about the image file for=
+mat in
+>     order to serve data, as the backend is essentially serving bytes. (I =
+guess
+>     the only thing the backend would need to be aware of is how to invoke
+>     qemu-img to create a qcow2 image file initially).
+>
+>
+>     QEMU is what interprets the qcow2 format (or any image format).  Ever=
+y read
+>     from QEMU will look like a raw file read from the perspective of libq=
+nio /
+>     vxhs.  I can't see any reason why vxhs would need to know anything ab=
+out the
+>     contents of the image file itself.
+>
+>     The only thing the test server needs to do, in order to be able to se=
+rve
+>     qcow2 files correctly, is to be able to serve raw files correctly.
+>
+>     Looking at the libqnio implementation from the test server with gdb, =
+I think
+>     that the reason why qcow2 format does not work is that the current
+>     libqnio implementation does not handle short reads correctly.  For in=
+stance,
+>     if the file is not a even multiple of the read size, and we try to re=
+ad 512
+>     bytes at the end of the file, it appears libqnio hangs on the short r=
+ead.  I
+>     am not sure if this is a bug exclusive to the test server, or in the =
+libqnio
+>     implementation.
+>
+>     [1]
+>     This bug isn't limited to qcow2, since as mentioned above, QEMU is ju=
+st
+>     relying on libqnio to read raw bytes.  So, you can reproduce this bug=
+ with a
+>     raw image file, as well:
+>
+>     # dd if=3D/dev/zero of=3Dtest.raw bs=3D1 count=3D196616
+>
+>     # qemu-io -c "read 196608 512" vxhs://localhost:9999/test.raw
+>
+>     The above qemu-io process will hang in aio_poll, because libqnio neve=
+r
+>     processes the callback. This is because process_incoming_messages() t=
+hinks
+>     it needs a full 512 bytes before it will call the registered callback=
+, even
+>     though there will only ever be 8 bytes read.
+>
+>     The above scenario is also exactly what is happening when I try to us=
+e a
+>     qcow2 format; QEMU issues a read for 8 bytes at offset 196608, and th=
+e file
+>     is 196616 bytes long.
+>
+>     (The sparse image thing seems shouldn't be an issue - first, the test=
+ server
+>     works just fine with sparse raw images... as matter of fact, the
+>     "create_vdisk.sh" script in the libqnio repository does exactly that.=
+  Also,
+>     if you choose to not use sparse images for whatever reason on the bac=
+kend,
+>     qcow2 does not require it to be sparse, as image files can be created=
+ with
+>     the "-o preallocation=3Dfull" option).
+>
+> [Ketan] You are correct. We have identified the problem with test server =
+and have a patch for it which returns zero filled reads to align the read b=
+uffers to requested block size. We could also fix this in libvxhs by not ex=
+pecting/waiting for requested block size in case the reads are partial.
+> Ashish will upload the patch for the test server fix. Please let us know =
+how the qcow tests go.
+>
+>     -Jeff
+>
+>
 
-Here iiuc you mean that "L1 guest with vIOMMU performs better than
-when without vIOMMU", while ...
-
-> >> > I thought whether the device is assigned to L1 or
-> >> > L2, the DMA translation is done by iommu, which is pretty fast? Maybe
-> >> > I misunderstood what you said?
-> >
-> > I failed to understand why an vIOMMU could help boost performance. :(
-> > Could you provide your command line here so that I can try to
-> > reproduce?
-> 
-> Sure. This is the command line to launch L1 VM
-> 
-> qemu-system-x86_64 -M q35,accel=kvm,kernel-irqchip=split \
-> -m 12G -device intel-iommu,intremap=on,eim=off,caching-mode=on \
-> -drive file=/mydata/guest0.img,format=raw --nographic -cpu host \
-> -smp 4,sockets=4,cores=1,threads=1 \
-> -device vfio-pci,host=08:00.0,id=net0
-> 
-> And this is for L2 VM.
-> 
-> ./qemu-system-x86_64 -M q35,accel=kvm \
-> -m 8G \
-> -drive file=/vm/l2guest.img,format=raw --nographic -cpu host \
-> -device vfio-pci,host=00:03.0,id=net0
-
-... here looks like these are command lines for L1/L2 guest, rather
-than L1 guest with/without vIOMMU?
-
-> 
-> >
-> > Besides, what I mentioned above is just in case you don't know that
-> > vIOMMU will drag down the performance in most cases.
-> >
-> > I think here to be more explicit, the overhead of vIOMMU is different
-> > for assigned devices and emulated ones.
-> >
-> >   (1) For emulated devices, the overhead is when we do the
-> >       translation, or say when we do the DMA operation. We need
-> >       real-time translation which should drag down the performance.
-> >
-> >   (2) For assigned devices (our case), the overhead is when we setup
-> >       the pages (since we are trapping the setup procedures via CM
-> >       bit). However, after it's setup, we should have no much
-> >       performance drag when we really do the data transfer (during
-> >       DMA) since that'll all be done in the hardware IOMMU (no matter
-> >       whether the device is assigned to L1/L2 guest).
-> >
-> > Now, after I know your use case now (use vIOMMU in L1 guest, don't use
-> > vIOMMU in L2 guest, only use assigned devices), I suspect we would
-> > have no big problem according to (2).
-> >
-> >> >
-> >> >>>
-> >> >>> First, I am having trouble to boot a VM with the emulated iommu. I
-> >> >>> have posted my problem to the qemu user mailing list[1],
-> >> >>
-> >> >> Here I would suggest that you cc qemu-devel as well next time:
-> >> >>
-> >> >>   qemu-devel@nongnu.org
-> >> >>
-> >> >> Since I guess not all people are registered to qemu-discuss, at least
-> >> >> I am not in that loop. Imho cc qemu-devel could let the question
-> >> >> spread to more people, and it'll get a higher chance to be answered.
-> >> >
-> >> > Thanks. I'll cc qemu-devel next time.
-> >> >
-> >> >>
-> >> >>> but to put it
-> >> >>> in a nutshell, I'd like to know the setting I can reuse to boot a VM
-> >> >>> with the emulated iommu. (e.g. how to create a VM with q35 chipset
-> >> >>> and/or libvirt xml if you use virsh).
-> >> >>
-> >> >> IIUC you are looking for device assignment for the nested VM case. So,
-> >> >> firstly, you may need my tree to run this (see below). Then, maybe you
-> >> >> can try to boot a L1 guest with assigned device (under VT-d
-> >> >> protection), with command:
-> >> >>
-> >> >> $qemu -M q35,accel=kvm,kernel-irqchip=split -m 1G \
-> >> >>       -device intel-iommu,intremap=on,eim=off,caching-mode=on \
-> >> >>       -device vfio-pci,host=$HOST_PCI_ADDR \
-> >> >>       $YOUR_IMAGE_PATH
-> >> >>
-> >> >
-> >> > Thanks! I'll try this right away.
-> >> >
-> >> >> Here $HOST_PCI_ADDR should be something like 05:00.0, which is the
-> >> >> host PCI address of the device to be assigned to guest.
-> >> >>
-> >> >> (If you go over the cover letter in [4], you'll see similar command
-> >> >>  line there, though with some more devices assigned, and with traces)
-> >> >>
-> >> >> If you are playing with nested VM, you'll also need a L2 guest, which
-> >> >> will be run inside the L1 guest. It'll require similar command line,
-> >> >> but I would suggest you first try a L2 guest without intel-iommu
-> >> >> device. Frankly speaking I haven't played with that yet, so just let
-> >> >> me know if you got any problem, which is possible. :-)
-> >> >>
-> >>
-> >> I was able to boot L2 guest without assigning a network device
-> >> successfully. (host iommu was on, L1 iommu was on, and the network
-> >> device was assigned to L1)
-> >>
-> >> Then, I unbound the network device in L1 and bound it to vfio-pci.
-> >> When I try to run L2 with the following command, I got an assertion.
-> >>
-> >> # ./qemu-system-x86_64 -M q35,accel=kvm \
-> >> -m 8G \
-> >> -drive file=/vm/l2guest.img,format=raw --nographic -cpu host \
-> >> -device vfio-pci,host=00:03.0,id=net0
-> >>
-> >> qemu-system-x86_64: hw/pci/pcie.c:686: pcie_add_capability: Assertion
-> >> `prev >= 0x100' failed.
-> >> Aborted (core dumped)
-> >>
-> >> Thoughts?
-> >
-> > I don't know whether it'll has anything to do with how vfio-pci works,
-> > anyway I cced Alex and the list in case there is quick answer.
-> >
-> > I'll reproduce this nested case and update when I got anything.
-> 
-> Thanks!
-
-I tried to reproduce this issue with the following 10g network card:
-
-00:03.0 Ethernet controller: Intel Corporation Ethernet Controller 10-Gigabit X540-AT2 (rev 01)
-
-In my case, both L1/L2 guests can boot with the assigned device. I
-also did a quick netperf TCP STREAM test, the result is (in case you
-are interested):
-
-   L1 guest: 1.12Gbps
-   L2 guest: 8.26Gbps
-
-First of all, just to confirm that you were using the same qemu binary
-in both host and L1 guest, right?
-
-Then, I *think* above assertion you encountered would fail only if
-prev == 0 here, but I still don't quite sure why was that happening.
-Btw, could you paste me your "lspci -vvv -s 00:03.0" result in your L1
-guest?
-
-Thanks,
-
--- peterx
+Changes per the above suggestion present in branch ashish_securify. Thanks!
