@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cdXtn-0002qU-NL
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 02:51:45 -0500
+	(envelope-from <laurent@vivier.eu>) id 1cdYT1-0003T2-Hy
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 03:28:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cdXti-0000vO-QK
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 02:51:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44920)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cdXti-0000v9-KQ
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 02:51:38 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B960FC0567B2
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 07:51:38 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Tue, 14 Feb 2017 15:51:32 +0800
-Message-Id: <1487058692-2789-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH] pcie: simplify pcie_add_capability()
+	(envelope-from <laurent@vivier.eu>) id 1cdYSw-0002qp-Br
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 03:28:07 -0500
+Received: from mout.kundenserver.de ([212.227.126.134]:51077)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cdYSw-0002oY-0u
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 03:28:02 -0500
+References: <1486939835-3452-1-git-send-email-huth@tuxfamily.org>
+	<1486939835-3452-2-git-send-email-huth@tuxfamily.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <88189d96-ba7e-23bd-45e4-31130f548eb1@vivier.eu>
+Date: Tue, 14 Feb 2017 09:27:55 +0100
+MIME-Version: 1.0
+In-Reply-To: <1486939835-3452-2-git-send-email-huth@tuxfamily.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] hw/m68k: QOMify the ColdFire interrupt
+ controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,60 +28,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, "\\  Michael S . Tsirkin \\ " <mst@redhat.com>, peterx@redhat.com
+To: Thomas Huth <huth@tuxfamily.org>, qemu-devel@nongnu.org
 
-When we add PCIe extended capabilities, we should be following the rule
-that we add the head extended cap (at offset 0x100) first, then the rest
-of them. Meanwhile, we are always adding new capability bits at the end
-of the list. Here the "next" looks meaningless in all cases since it
-should always be zero (along with the "header").
+Le 12/02/2017 à 23:50, Thomas Huth a écrit :
+> Use type_init() and friends to adapt the ColdFire interrupt
+> controller to the latest QEMU device conventions.
+> 
+> Signed-off-by: Thomas Huth <huth@tuxfamily.org>
+> ---
+>  hw/m68k/mcf_intc.c | 48 ++++++++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 44 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/m68k/mcf_intc.c b/hw/m68k/mcf_intc.c
+> index cf58132..8198afa 100644
+> --- a/hw/m68k/mcf_intc.c
+> +++ b/hw/m68k/mcf_intc.c
+> @@ -9,10 +9,16 @@
+>  #include "qemu-common.h"
+>  #include "cpu.h"
+>  #include "hw/hw.h"
+> +#include "hw/sysbus.h"
+>  #include "hw/m68k/mcf.h"
+>  #include "exec/address-spaces.h"
+>  
+> +#define TYPE_MCF_INTC "mcf-intc"
+> +#define MCF_INTC(obj) OBJECT_CHECK(mcf_intc_state, (obj), TYPE_MCF_INTC)
+> +
+>  typedef struct {
+> +    SysBusDevice parent_obj;
+> +
+>      MemoryRegion iomem;
+>      uint64_t ipr;
+>      uint64_t imr;
+> @@ -138,8 +144,10 @@ static void mcf_intc_set_irq(void *opaque, int irq, int level)
+>      mcf_intc_update(s);
+>  }
+>  
+> -static void mcf_intc_reset(mcf_intc_state *s)
+> +static void mcf_intc_reset(DeviceState *dev)
+>  {
+> +    mcf_intc_state *s = MCF_INTC(dev);
+> +
+>      s->imr = ~0ull;
+>      s->ipr = 0;
+>      s->ifr = 0;
+> @@ -154,17 +162,49 @@ static const MemoryRegionOps mcf_intc_ops = {
+>      .endianness = DEVICE_NATIVE_ENDIAN,
+>  };
+>  
+> +static void mcf_intc_instance_init(Object *obj)
+> +{
+> +    mcf_intc_state *s = MCF_INTC(obj);
+> +
+> +    memory_region_init_io(&s->iomem, obj, &mcf_intc_ops, s, "mcf", 0x100);
+> +}
+> +
+> +static void mcf_intc_class_init(ObjectClass *oc, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(oc);
+> +
+> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+> +    dc->reset = mcf_intc_reset;
+> +}
+> +
+> +static const TypeInfo mcf_intc_gate_info = {
+> +    .name          = TYPE_MCF_INTC,
+> +    .parent        = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(mcf_intc_state),
+> +    .instance_init = mcf_intc_instance_init,
+> +    .class_init    = mcf_intc_class_init,
+> +};
+> +
+> +static void mcf_intc_register_types(void)
+> +{
+> +    type_register_static(&mcf_intc_gate_info);
+> +}
+> +
+> +type_init(mcf_intc_register_types)
+> +
+>  qemu_irq *mcf_intc_init(MemoryRegion *sysmem,
+>                          hwaddr base,
+>                          M68kCPU *cpu)
+>  {
+> +    DeviceState  *dev;
+>      mcf_intc_state *s;
+>  
+> -    s = g_malloc0(sizeof(mcf_intc_state));
+> +    dev = qdev_create(NULL, TYPE_MCF_INTC);
+> +    qdev_init_nofail(dev);
+> +
+> +    s = MCF_INTC(dev);
+>      s->cpu = cpu;
+> -    mcf_intc_reset(s);
+>  
+> -    memory_region_init_io(&s->iomem, NULL, &mcf_intc_ops, s, "mcf", 0x100);
+>      memory_region_add_subregion(sysmem, base, &s->iomem);
+>  
+>      return qemu_allocate_irqs(mcf_intc_set_irq, s, 64);
+> 
 
-Simplify the function a bit, and it looks more readable now.
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- hw/pci/pcie.c | 15 ++++-----------
- 1 file changed, 4 insertions(+), 11 deletions(-)
+Later, we should consider to move this to mcf5208.c and to use
+sysbus_mmio_map()/qdev_get_gpio_in().
 
-diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-index cbd4bb4..e0e6f6a 100644
---- a/hw/pci/pcie.c
-+++ b/hw/pci/pcie.c
-@@ -664,30 +664,23 @@ void pcie_add_capability(PCIDevice *dev,
-                          uint16_t cap_id, uint8_t cap_ver,
-                          uint16_t offset, uint16_t size)
- {
--    uint32_t header;
--    uint16_t next;
--
-     assert(offset >= PCI_CONFIG_SPACE_SIZE);
-     assert(offset < offset + size);
-     assert(offset + size <= PCIE_CONFIG_SPACE_SIZE);
-     assert(size >= 8);
-     assert(pci_is_express(dev));
- 
--    if (offset == PCI_CONFIG_SPACE_SIZE) {
--        header = pci_get_long(dev->config + offset);
--        next = PCI_EXT_CAP_NEXT(header);
--    } else {
-+    if (offset != PCI_CONFIG_SPACE_SIZE) {
-         uint16_t prev;
- 
-         /* 0 is reserved cap id. use internally to find the last capability
-            in the linked list */
--        next = pcie_find_capability_list(dev, 0, &prev);
--
-+        assert(pcie_find_capability_list(dev, 0, &prev) == 0);
-         assert(prev >= PCI_CONFIG_SPACE_SIZE);
--        assert(next == 0);
-         pcie_ext_cap_set_next(dev, prev, offset);
-     }
--    pci_set_long(dev->config + offset, PCI_EXT_CAP(cap_id, cap_ver, next));
-+
-+    pci_set_long(dev->config + offset, PCI_EXT_CAP(cap_id, cap_ver, 0));
- 
-     /* Make capability read-only by default */
-     memset(dev->wmask + offset, 0, size);
--- 
-2.7.4
+Laurent
