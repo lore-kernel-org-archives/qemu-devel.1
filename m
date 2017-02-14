@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cdavo-00088a-Bj
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:06:04 -0500
+	(envelope-from <famz@redhat.com>) id 1cdb3R-00059n-Qd
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:13:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cdavl-0007Hv-7o
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:06:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51816)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cdavl-0007HM-21
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:05:57 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A97DE7FB6D
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 11:05:56 +0000 (UTC)
-Date: Tue, 14 Feb 2017 11:05:52 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170214110551.GD2463@work-vm>
-References: <1485207141-1941-1-git-send-email-quintela@redhat.com>
-	<1485207141-1941-16-git-send-email-quintela@redhat.com>
-	<20170203113611.GG3208@work-vm> <87k28u3u6c.fsf@emacs.mitica>
+	(envelope-from <famz@redhat.com>) id 1cdb3Q-0003No-Ik
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:13:53 -0500
+Date: Tue, 14 Feb 2017 19:13:41 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170214111341.GF6428@lemon.lan>
+References: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
+	<1487006583-24350-10-git-send-email-kwolf@redhat.com>
+	<20170214060112.GC6428@lemon.lan>
+	<20170214103728.GB6189@noname.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87k28u3u6c.fsf@emacs.mitica>
-Subject: Re: [Qemu-devel] [PATCH 15/17] migration: Test new fd infrastructure
+In-Reply-To: <20170214103728.GB6189@noname.redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 09/41] block: Default
+ .bdrv_child_perm() for format drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,60 +26,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, amit.shah@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: jcody@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > * Juan Quintela (quintela@redhat.com) wrote:
-> >> We just send the address through the alternate channels and test that it
-> >> is ok.
-> >> 
-> >> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> >> ---
-> >>  migration/ram.c | 36 ++++++++++++++++++++++++++++++++++++
-> >>  1 file changed, 36 insertions(+)
-> >> 
-> >> diff --git a/migration/ram.c b/migration/ram.c
-> >> index 4e530ea..95af694 100644
-> >> --- a/migration/ram.c
-> >> +++ b/migration/ram.c
-> >> @@ -432,8 +432,22 @@ static void *multifd_send_thread(void *opaque)
-> >>      qemu_mutex_lock(&params->mutex);
-> >>      while (!params->quit){
-> >>          if (params->pages.num) {
-> >> +            int i;
-> >> +            int num;
-> >> +
-> >> +            num = params->pages.num;
-> >>              params->pages.num = 0;
-> >>              qemu_mutex_unlock(&params->mutex);
-> >> +
-> >> +            for(i=0; i < num; i++) {
-> >> +                if (qio_channel_write(params->c,
-> >> +                                      (const char *)&params->pages.address[i],
-> >> +                                      sizeof(uint8_t *), &error_abort)
-> >> +                    != sizeof(uint8_t*)) {
-> >> +                    /* Shuoudn't ever happen */
-> >> +                    exit(-1);
-> >> +                }
-> >
-> > Nope, need to find a way to cleanly find the migration; that
-> > might actually be tricky from one of these threads?
+On Tue, 02/14 11:37, Kevin Wolf wrote:
+> Am 14.02.2017 um 07:01 hat Fam Zheng geschrieben:
+> > On Mon, 02/13 18:22, Kevin Wolf wrote:
+> > > Almost all format drivers have the same characteristics as far as
+> > > permissions are concerned: They have one or more children for storing
+> > > their own data and, more importantly, metadata (can be written to and
+> > > grow even without external write requests, must be protected against
+> > > other writers and present consistent data) and optionally a backing file
+> > > (this is just data, so like for a filter, it only depends on what the
+> > > parent nodes need).
+> > > 
+> > > This provides a default implementation that can be shared by most of
+> > > our format drivers.
+> > > 
+> > > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > > ---
+> > >  block.c                   | 37 +++++++++++++++++++++++++++++++++++++
+> > >  include/block/block_int.h |  8 ++++++++
+> > >  2 files changed, 45 insertions(+)
+> > > 
+> > > diff --git a/block.c b/block.c
+> > > index 290768d..8e99bb5 100644
+> > > --- a/block.c
+> > > +++ b/block.c
+> > > @@ -1459,6 +1459,43 @@ void bdrv_filter_default_perms(BlockDriverState *bs, BdrvChild *c,
+> > >                 (c->shared_perm & DEFAULT_PERM_UNCHANGED);
+> > >  }
+> > >  
+> > > +void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
+> > > +                               const BdrvChildRole *role,
+> > > +                               uint64_t perm, uint64_t shared,
+> > > +                               uint64_t *nperm, uint64_t *nshared)
+> > > +{
+> > > +    bool backing = (role == &child_backing);
+> > > +    assert(role == &child_backing || role == &child_file);
+> > > +
+> > > +    if (!backing) {
+> > > +        /* Apart from the modifications below, the same permissions are
+> > > +         * forwarded and left alone as for filters */
+> > > +        bdrv_filter_default_perms(bs, c, role, perm, shared, &perm, &shared);
+> > > +
+> > > +        /* Format drivers may touch metadata even if the guest doesn't write */
+> > > +        if (!bdrv_is_read_only(bs)) {
+> > > +            perm |= BLK_PERM_WRITE | BLK_PERM_RESIZE;
+> > > +        }
+> > > +
+> > > +        /* bs->file always needs to be consistent because of the metadata. We
+> > > +         * can never allow other users to resize or write to it. */
+> > > +        perm |= BLK_PERM_CONSISTENT_READ;
+> > > +        shared &= ~(BLK_PERM_WRITE | BLK_PERM_RESIZE);
+> > > +    } else {
+> > > +        /* We want consistent read from backing files if the parent needs it.
+> > > +         * No other operations are performed on backing files. */
+> > > +        perm &= BLK_PERM_CONSISTENT_READ;
+> > 
+> > Do you mean "perm &= ~BLK_PERM_CONSISTENT_READ"?
 > 
-> It is tricky, but the error handling is wrong in the callers of this
-> already.  Will try to improve it on next series, but the problem is
-> already there.
+> No. As the comment explains, we want to "forward" the CONSISTENT_READ
+> permission and clear everything else.
 
-Well we should never kill the source because of a failed migration;
-especially just due to a fairly boring IO error.
-You could just exit the thread and return a marker value that gets
-delivered to the pthread_join.
-There is qemu_file_set_error() that you could call - although you'd
-have to figure out thread safety.
-(Which might be as simple as cmpxchg the error values and only
-change the error value if it was previously 0).
+I see, my thinko.
 
-Dave
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Fam
