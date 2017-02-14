@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cdijP-00014P-DZ
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 14:25:45 -0500
+	(envelope-from <eblake@redhat.com>) id 1cdijP-000151-WE
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 14:25:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cdijN-0005Mh-Mp
+	(envelope-from <eblake@redhat.com>) id 1cdijO-0005Mw-0h
 	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 14:25:43 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Tue, 14 Feb 2017 13:25:24 -0600
-Message-Id: <20170214192525.18624-7-eblake@redhat.com>
+Date: Tue, 14 Feb 2017 13:25:25 -0600
+Message-Id: <20170214192525.18624-8-eblake@redhat.com>
 In-Reply-To: <20170214192525.18624-1-eblake@redhat.com>
 References: <20170214192525.18624-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 6/7] blkdebug: Add ability to override unmap
- geometries
+Subject: [Qemu-devel] [PATCH v5 7/7] tests: Add coverage for recent block
+ geometry fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,205 +21,241 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
 
-Make it easier to simulate various unusual hardware setups (for
-example, recent commits 3482b9b and b8d0a98 affect the Dell
-Equallogic iSCSI with its 15M preferred and maximum unmap and
-write zero sizing, or b2f95fe deals with the Linux loopback
-block device having a max_transfer of 64k), by allowing blkdebug
-to wrap any other device with further restrictions on various
-alignments.
+Use blkdebug's new geometry constraints to emulate setups that
+have caused recent regression fixes: write zeroes asserting
+when running through a loopback block device with max-transfer
+smaller than cluster size, and discard rounding away portions
+of requests not aligned to preferred boundaries.  Also, add
+coverage that the block layer is honoring max transfer limits.
+
+For now, a single iotest performs all actions, with the idea
+that we can add future blkdebug constraint test cases in the
+same file; but it can be split into multiple iotests if we find
+reason to run one portion of the test in more setups than what
+are possible in the other.
+
+For reference, the final portion of the test (checking whether
+discard passes as much as possible to the lowest layers of the
+stack) works as follows:
+
+qemu-io: discard 30M at 80000001, passed to blkdebug
+  blkdebug: discard 511 bytes at 80000001, -ENOTSUP (smaller than
+blkdebug's 512 align)
+  blkdebug: discard 14371328 bytes at 80000512, passed to qcow2
+    qcow2: discard 739840 bytes at 80000512, -ENOTSUP (smaller than
+qcow2's 1M align)
+    qcow2: discard 13M bytes at 77M, succeeds
+  blkdebug: discard 15M bytes at 90M, passed to qcow2
+    qcow2: discard 15M bytes at 90M, succeeds
+  blkdebug: discard 1356800 bytes at 105M, passed to qcow2
+    qcow2: discard 1M at 105M, succeeds
+    qcow2: discard 308224 bytes at 106M, -ENOTSUP (smaller than qcow2's
+1M align)
+  blkdebug: discard 1 byte at 111457280, -ENOTSUP (smaller than
+blkdebug's 512 align)
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 ---
-v5: tweak docs regarding max-transfer minimum
-v4: relax 512 byte minimum now that blkdebug is byte-based, fix doc typo
-v3: improve legibility of bounds checking, improve docs
+v5: rebase to master by renumbering s/173/175/
+v4: clean up some comments, nicer backing file creation, more commit message
+v3: make comments tied more to test at hand, rather than the
+particular hardware that led to the earlier patches being tested
 v2: new patch
 ---
- qapi/block-core.json | 25 ++++++++++++++-
- block/blkdebug.c     | 91 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 114 insertions(+), 2 deletions(-)
+ tests/qemu-iotests/175     | 114 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/175.out |  49 +++++++++++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 164 insertions(+)
+ create mode 100755 tests/qemu-iotests/175
+ create mode 100644 tests/qemu-iotests/175.out
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 932f5bb..8556c2b 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2463,6 +2463,27 @@
- # @align:           #optional required alignment for requests in bytes,
- #                   must be power of 2, or 0 for default
- #
-+# @max-transfer:    #optional maximum size for I/O transfers in bytes,
-+#                   must be multiple of @align and of the underlying file's
-+#                   request alignment (but need not be a power of 2), or
-+#                   0 for default (since 2.9)
+diff --git a/tests/qemu-iotests/175 b/tests/qemu-iotests/175
+new file mode 100755
+index 0000000..867c9ca
+--- /dev/null
++++ b/tests/qemu-iotests/175
+@@ -0,0 +1,114 @@
++#!/bin/bash
 +#
-+# @opt-write-zero:  #optional preferred alignment for write zero requests
-+#                   in bytes, must be multiple of @align (but need not be
-+#                   a power of 2), or 0 for default (since 2.9)
++# Test corner cases with unusual block geometries
 +#
-+# @max-write-zero:  #optional maximum size for write zero requests in bytes,
-+#                   must be multiple of @align (but need not be a power of
-+#                   2), or 0 for default (since 2.9)
++# Copyright (C) 2016-2017 Red Hat, Inc.
 +#
-+# @opt-discard:     #optional preferred alignment for discard requests
-+#                   in bytes, must be multiple of @align (but need not be
-+#                   a power of 2), or 0 for default (since 2.9)
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
 +#
-+# @max-discard:     #optional maximum size for discard requests in bytes,
-+#                   must be multiple of @align (but need not be a power of
-+#                   2), or 0 for default (since 2.9)
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
 +#
- # @inject-error:    #optional array of error injection descriptions
- #
- # @set-state:       #optional array of state-change descriptions
-@@ -2472,7 +2493,9 @@
- { 'struct': 'BlockdevOptionsBlkdebug',
-   'data': { 'image': 'BlockdevRef',
-             '*config': 'str',
--            '*align': 'int',
-+            '*align': 'int', '*max-transfer': 'int32',
-+            '*opt-write-zero': 'int32', '*max-write-zero': 'int32',
-+            '*opt-discard': 'int32', '*max-discard': 'int32',
-             '*inject-error': ['BlkdebugInjectErrorOptions'],
-             '*set-state': ['BlkdebugSetStateOptions'] } }
-
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index 2996152..c2e4604 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -39,6 +39,11 @@ typedef struct BDRVBlkdebugState {
-     int state;
-     int new_state;
-     uint64_t align;
-+    uint64_t max_transfer;
-+    uint64_t opt_write_zero;
-+    uint64_t max_write_zero;
-+    uint64_t opt_discard;
-+    uint64_t max_discard;
-
-     /* For blkdebug_refresh_filename() */
-     char *config_file;
-@@ -343,6 +348,31 @@ static QemuOptsList runtime_opts = {
-             .type = QEMU_OPT_SIZE,
-             .help = "Required alignment in bytes",
-         },
-+        {
-+            .name = "max-transfer",
-+            .type = QEMU_OPT_SIZE,
-+            .help = "Maximum transfer size in bytes",
-+        },
-+        {
-+            .name = "opt-write-zero",
-+            .type = QEMU_OPT_SIZE,
-+            .help = "Optimum write zero alignment in bytes",
-+        },
-+        {
-+            .name = "max-write-zero",
-+            .type = QEMU_OPT_SIZE,
-+            .help = "Maximum write zero size in bytes",
-+        },
-+        {
-+            .name = "opt-discard",
-+            .type = QEMU_OPT_SIZE,
-+            .help = "Optimum discard alignment in bytes",
-+        },
-+        {
-+            .name = "max-discard",
-+            .type = QEMU_OPT_SIZE,
-+            .help = "Maximum discard size in bytes",
-+        },
-         { /* end of list */ }
-     },
- };
-@@ -354,6 +384,7 @@ static int blkdebug_open(BlockDriverState *bs, QDict *options, int flags,
-     QemuOpts *opts;
-     Error *local_err = NULL;
-     int ret;
-+    uint64_t align;
-
-     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
-     qemu_opts_absorb_qdict(opts, options, &local_err);
-@@ -387,12 +418,55 @@ static int blkdebug_open(BlockDriverState *bs, QDict *options, int flags,
-     bs->supported_zero_flags = (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
-         bs->file->bs->supported_zero_flags;
-
--    /* Set request alignment */
-+    /* Set alignment overrides */
-     s->align = qemu_opt_get_size(opts, "align", 0);
-     if (s->align && (s->align >= INT_MAX || !is_power_of_2(s->align))) {
-         error_setg(errp, "Invalid alignment, align must be integer power of 2");
-         goto fail_unref;
-     }
-+    align = MAX(s->align, bs->file->bs->bl.request_alignment);
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-+    s->max_transfer = qemu_opt_get_size(opts, "max-transfer", 0);
-+    if (s->max_transfer &&
-+        (s->max_transfer >= INT_MAX ||
-+         !QEMU_IS_ALIGNED(s->max_transfer, align))) {
-+        error_setg(errp, "Invalid max-transfer, must be multiple of align");
-+        goto fail_unref;
-+    }
++# creator
++owner=eblake@redhat.com
 +
-+    s->opt_write_zero = qemu_opt_get_size(opts, "opt-write-zero", 0);
-+    if (s->opt_write_zero &&
-+        (s->opt_write_zero >= INT_MAX ||
-+         !QEMU_IS_ALIGNED(s->opt_write_zero, align))) {
-+        error_setg(errp, "Invalid opt-write-zero, not consistent with align");
-+        goto fail_unref;
-+    }
++seq=`basename $0`
++echo "QA output created by $seq"
 +
-+    s->max_write_zero = qemu_opt_get_size(opts, "max-write-zero", 0);
-+    if (s->max_write_zero &&
-+        (s->max_write_zero >= INT_MAX ||
-+         !QEMU_IS_ALIGNED(s->max_write_zero,
-+                          MAX(s->opt_write_zero, align)))) {
-+        error_setg(errp, "Invalid max-write-zero, not consistent with align");
-+        goto fail_unref;
-+    }
++here=`pwd`
++status=1	# failure is the default!
 +
-+    s->opt_discard = qemu_opt_get_size(opts, "opt-discard", 0);
-+    if (s->opt_discard &&
-+        (s->opt_discard >= INT_MAX ||
-+         !QEMU_IS_ALIGNED(s->opt_discard, align))) {
-+        error_setg(errp, "Invalid opt-discard, not consistent with align");
-+        goto fail_unref;
-+    }
++_cleanup()
++{
++	_cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
 +
-+    s->max_discard = qemu_opt_get_size(opts, "max-discard", 0);
-+    if (s->max_discard &&
-+        (s->max_discard >= INT_MAX ||
-+         !QEMU_IS_ALIGNED(s->max_discard,
-+                          MAX(s->opt_discard, align)))) {
-+        error_setg(errp, "Invalid max-discard, not consistent with align");
-+        goto fail_unref;
-+    }
-
-     ret = 0;
-     goto out;
-@@ -819,6 +893,21 @@ static void blkdebug_refresh_limits(BlockDriverState *bs, Error **errp)
-     if (s->align) {
-         bs->bl.request_alignment = s->align;
-     }
-+    if (s->max_transfer) {
-+        bs->bl.max_transfer = s->max_transfer;
-+    }
-+    if (s->opt_write_zero) {
-+        bs->bl.pwrite_zeroes_alignment = s->opt_write_zero;
-+    }
-+    if (s->max_write_zero) {
-+        bs->bl.max_pwrite_zeroes = s->max_write_zero;
-+    }
-+    if (s->opt_discard) {
-+        bs->bl.pdiscard_alignment = s->opt_discard;
-+    }
-+    if (s->max_discard) {
-+        bs->bl.max_pdiscard = s->max_discard;
-+    }
- }
-
- static int blkdebug_reopen_prepare(BDRVReopenState *reopen_state,
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++
++_supported_fmt qcow2
++_supported_proto file
++
++CLUSTER_SIZE=1M
++size=128M
++options=driver=blkdebug,image.driver=qcow2
++
++echo
++echo "== setting up files =="
++
++TEST_IMG="$TEST_IMG.base" _make_test_img $size
++$QEMU_IO -c "write -P 11 0 $size" "$TEST_IMG.base" | _filter_qemu_io
++_make_test_img -b "$TEST_IMG.base"
++$QEMU_IO -c "write -P 22 0 $size" "$TEST_IMG" | _filter_qemu_io
++
++# Limited to 64k max-transfer
++echo
++echo "== constrained alignment and max-transfer =="
++limits=align=4k,max-transfer=64k
++$QEMU_IO -c "open -o $options,$limits blkdebug::$TEST_IMG" \
++         -c "write -P 33 1000 128k" -c "read -P 33 1000 128k" | _filter_qemu_io
++
++echo
++echo "== write zero with constrained max-transfer =="
++limits=align=512,max-transfer=64k,opt-write-zero=$CLUSTER_SIZE
++$QEMU_IO -c "open -o $options,$limits blkdebug::$TEST_IMG" \
++         -c "write -z 8003584 2093056" | _filter_qemu_io
++
++# non-power-of-2 write-zero/discard alignments
++echo
++echo "== non-power-of-2 write zeroes limits =="
++
++limits=align=512,opt-write-zero=15M,max-write-zero=15M,opt-discard=15M,max-discard=15M
++$QEMU_IO -c "open -o $options,$limits blkdebug::$TEST_IMG" \
++         -c "write -z 32M 32M" | _filter_qemu_io
++
++echo
++echo "== non-power-of-2 discard limits =="
++
++limits=align=512,opt-write-zero=15M,max-write-zero=15M,opt-discard=15M,max-discard=15M
++$QEMU_IO -c "open -o $options,$limits blkdebug::$TEST_IMG" \
++         -c "discard 80000001 30M" | _filter_qemu_io
++
++echo
++echo "== verify image content =="
++
++function verify_io()
++{
++    if ($QEMU_IMG info -f "$IMGFMT" "$TEST_IMG" |
++	    grep "compat: 0.10" > /dev/null); then
++        # For v2 images, discarded clusters are read from the backing file
++        discarded=11
++    else
++        # Discarded clusters are zeroed for v3 or later
++        discarded=0
++    fi
++
++    echo read -P 22 0 1000
++    echo read -P 33 1000 128k
++    echo read -P 22 132072 7871512
++    echo read -P 0 8003584 2093056
++    echo read -P 22 10096640 23457792
++    echo read -P 0 32M 32M
++    echo read -P 22 64M 13M
++    echo read -P $discarded 77M 29M
++    echo read -P 22 106M 22M
++}
++
++verify_io | $QEMU_IO "$TEST_IMG" | _filter_qemu_io
++
++_check_test_img
++
++# success, all done
++echo "*** done"
++status=0
+diff --git a/tests/qemu-iotests/175.out b/tests/qemu-iotests/175.out
+new file mode 100644
+index 0000000..9ac5e33
+--- /dev/null
++++ b/tests/qemu-iotests/175.out
+@@ -0,0 +1,49 @@
++QA output created by 175
++
++== setting up files ==
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134217728
++wrote 134217728/134217728 bytes at offset 0
++128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/t.IMGFMT.base
++wrote 134217728/134217728 bytes at offset 0
++128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== constrained alignment and max-transfer ==
++wrote 131072/131072 bytes at offset 1000
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 131072/131072 bytes at offset 1000
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== write zero with constrained max-transfer ==
++wrote 2093056/2093056 bytes at offset 8003584
++1.996 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== non-power-of-2 write zeroes limits ==
++wrote 33554432/33554432 bytes at offset 33554432
++32 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== non-power-of-2 discard limits ==
++discard 31457280/31457280 bytes at offset 80000001
++30 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== verify image content ==
++read 1000/1000 bytes at offset 0
++1000 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 131072/131072 bytes at offset 1000
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 7871512/7871512 bytes at offset 132072
++7.507 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 2093056/2093056 bytes at offset 8003584
++1.996 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 23457792/23457792 bytes at offset 10096640
++22.371 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 33554432/33554432 bytes at offset 33554432
++32 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 13631488/13631488 bytes at offset 67108864
++13 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 30408704/30408704 bytes at offset 80740352
++29 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 23068672/23068672 bytes at offset 111149056
++22 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++No errors were found on the image.
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 985b9a6..bf504d1 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -167,3 +167,4 @@
+ 172 auto
+ 173 rw auto
+ 174 auto
++175 rw auto quick
 -- 
 2.9.3
