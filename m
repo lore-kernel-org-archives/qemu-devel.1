@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cdblD-00071Z-FF
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:59:08 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cdblX-0007EB-Ag
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:59:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cdbl9-0003jW-FP
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:59:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41656)
+	(envelope-from <pbonzini@redhat.com>) id 1cdblT-0003uF-En
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:59:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47640)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cdbl9-0003iH-7K
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:59:03 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5134D7FB66
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 11:59:03 +0000 (UTC)
-Date: Tue, 14 Feb 2017 11:58:58 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170214115858.GH2463@work-vm>
-References: <1485207141-1941-1-git-send-email-quintela@redhat.com>
-	<1485207141-1941-12-git-send-email-quintela@redhat.com>
-	<20170202120319.GB2549@work-vm> <87wpcu3uy4.fsf@emacs.mitica>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cdblT-0003tg-8P
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:59:23 -0500
+References: <20170214071510.6112.76764.stgit@PASHA-ISP>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a268900c-a44f-fbc1-9f6e-92a127c5dcbf@redhat.com>
+Date: Tue, 14 Feb 2017 12:59:22 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87wpcu3uy4.fsf@emacs.mitica>
-Subject: Re: [Qemu-devel] [PATCH 11/17] migration: Create thread
- infrastructure for multifd send side
+In-Reply-To: <20170214071510.6112.76764.stgit@PASHA-ISP>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3] audio: make audio poll timer
+ deterministic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,120 +27,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, amit.shah@redhat.com
+To: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: zyy@google.com, kraxel@redhat.com, marcandre.lureau@gmail.com
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > * Juan Quintela (quintela@redhat.com) wrote:
-> >> We make the locking and the transfer of information specific, even if we
-> >> are still transmiting things through the main thread.
-> >> 
-> >> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> >> ---
-> >>  migration/ram.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
-> >>  1 file changed, 52 insertions(+), 1 deletion(-)
-> >> 
-> >> diff --git a/migration/ram.c b/migration/ram.c
-> >> index c71929e..9d7bc64 100644
-> >> --- a/migration/ram.c
-> >> +++ b/migration/ram.c
-> >> @@ -392,17 +392,25 @@ void migrate_compress_threads_create(void)
-> >>  /* Multiple fd's */
-> >> 
-> >>  struct MultiFDSendParams {
-> >> +    /* not changed */
-> >>      QemuThread thread;
-> >>      QIOChannel *c;
-> >>      QemuCond cond;
-> >>      QemuMutex mutex;
-> >> +    /* protected by param mutex */
-> >>      bool quit;
-> >>      bool started;
-> >> +    uint8_t *address;
-> >> +    /* protected by multifd mutex */
-> >> +    bool done;
-> >>  };
-> >>  typedef struct MultiFDSendParams MultiFDSendParams;
-> >> 
-> >>  static MultiFDSendParams *multifd_send;
-> >> 
-> >> +QemuMutex multifd_send_mutex;
-> >> +QemuCond multifd_send_cond;
-> >> +
-> >>  static void *multifd_send_thread(void *opaque)
-> >>  {
-> >>      MultiFDSendParams *params = opaque;
-> >> @@ -416,7 +424,17 @@ static void *multifd_send_thread(void *opaque)
-> >> 
-> >>      qemu_mutex_lock(&params->mutex);
-> >>      while (!params->quit){
-> >> -        qemu_cond_wait(&params->cond, &params->mutex);
-> >> +        if (params->address) {
-> >> +            params->address = 0;
-> >
-> > This confused me (I wondered what happens to the 1st block) but
-> > I see in the next patch this gets replaced by something more complex;
-> > so I suggest just using params->dummy and commented it's about
-> > to get replaced.
+
+
+On 14/02/2017 08:15, Pavel Dovgalyuk wrote:
+> This patch changes resetting strategy of the audio polling timer.
+> It does not change expiration time if the timer is already set.
+> This patch is needed to make this timer deterministic and to use execution
+> record/replay for audio devices.
 > 
-> if you preffer, I wanted to minimize the change on the next patch,
-> otherwise I also have to change the places where I check the value of
-> address.
+> audio_reset_timer is used in the function audio_vm_change_state_handler.
+> Therefore every time VM is stopped or restarted the timer will be reset
+> to new timeout. Virtual clock does not proceed while VM is stopped.
+> Therefore there is no need in resetting the timeout when VM restarts.
 > 
+> v2: updated commit message
+> v3: now using timer_mod_anticipate function (as suggested by Yurii Zubrytskyi)
 
-OK, perhaps just adding a comment to say it's going to go in the
-next patch would work.
+Gerd, feel free to pick either v2 or v3.
 
-> >> +    qemu_mutex_unlock(&multifd_send_mutex);
-> >> +    qemu_mutex_lock(&multifd_send[i].mutex);
-> >
-> > Having a 'multifd_send_mutex' and a
-> >          'multifd_send[i].mutex'
-> > is pretty confusing!
-> 
-> For different reason, I have moved all the
-> 
->   multifd_send[i]. to "p->"
-> 
-> Better?
-
-Maybe!
-
-> >
-> >> +    multifd_send[i].address = address;
-> >> +    qemu_cond_signal(&multifd_send[i].cond);
-> >> +    qemu_mutex_unlock(&multifd_send[i].mutex);
-> >> +
-> >> +    return 0;
-> >> +}
-> >> +
-> >>  struct MultiFDRecvParams {
-> >>      QemuThread thread;
-> >>      QIOChannel *c;
-> >> @@ -1015,6 +1065,7 @@ static int ram_multifd_page(QEMUFile *f, PageSearchStatus *pss,
-> >>          *bytes_transferred +=
-> >>              save_page_header(f, block, offset | RAM_SAVE_FLAG_MULTIFD_PAGE);
-> >>          qemu_put_buffer(f, p, TARGET_PAGE_SIZE);
-> >> +        multifd_send_page(p);
-> >>          *bytes_transferred += TARGET_PAGE_SIZE;
-> >>          pages = 1;
-> >>          acct_info.norm_pages++;
-> >> -- 
-> >> 2.9.3
-> >
-> > I think I'm pretty OK with this; but we'll see what it looks like
-> > after you think about Paolo's suggestion; it does feel like it should
-> > be possible to do the locking etc simpler; I just don't know how.
-> 
-> Locking can be simpler, but the problem is being speed :-(
-> Paolo suggestion have helped.
-> That our meassurement of bandwidth is lame, haven't :-(
-
-Are you sure that your performance problems are anything to do with locking?
-
-Dave
-
-> Later, Juan.
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Paolo
