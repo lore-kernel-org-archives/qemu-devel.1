@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1cdeib-0006IJ-Vb
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 10:08:39 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cdejX-0006mI-Py
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 10:09:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1cdeiW-0007I7-Ta
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 10:08:37 -0500
-References: <1487083704-51658-1-git-send-email-vsementsov@virtuozzo.com>
-	<20170214150539.GC20715@lemon.lan>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <e26a6800-368f-7f9e-2800-22ccc17f5576@openvz.org>
-Date: Tue, 14 Feb 2017 18:08:21 +0300
+	(envelope-from <alex.bennee@linaro.org>) id 1cdejS-000809-Nk
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 10:09:35 -0500
+Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:33594)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cdejS-0007xR-GF
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 10:09:30 -0500
+Received: by mail-wr0-x22b.google.com with SMTP id i10so172275701wrb.0
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 07:09:28 -0800 (PST)
+References: <20170214100733.22280-1-alex.bennee@linaro.org>
+	<20170214100733.22280-3-alex.bennee@linaro.org>
+	<CAFEAcA8cXXc3oABFzvZQaTjxtZTxjuzi+7NBxTfM86rfPqGcqw@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA8cXXc3oABFzvZQaTjxtZTxjuzi+7NBxTfM86rfPqGcqw@mail.gmail.com>
+Date: Tue, 14 Feb 2017 15:09:46 +0000
+Message-ID: <87fujgvmf9.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170214150539.GC20715@lemon.lan>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] backup: allow target without .bdrv_get_info
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] new: debian docker targets for
+ cross-compiling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,63 +32,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, jsnow@redhat.com, stefanha@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Fam Zheng <famz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 02/14/2017 06:05 PM, Fam Zheng wrote:
-> On Tue, 02/14 17:48, Vladimir Sementsov-Ogievskiy wrote:
->> Currently backup to nbd target is broken, as nbd doesn't have
->> .bdrv_get_info realization.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>
->> Hi all!
->>
->> Since commit
->>
->> commit 4c9bca7e39a6e07ad02c1dcde3478363344ec60b
->> Author: John Snow <jsnow@redhat.com>
->> Date:   Thu Feb 25 15:58:30 2016 -0500
->>
->>     block/backup: avoid copying less than full target clusters
->>
->> backup to nbd target is broken, we have "Couldn't determine the cluster size of
->> the target image".
->>
->> Proposed NBD protocol extension - NBD_OPT_INFO should finally solve this problem.
->> But until it is not realized, we need allow backup to nbd target due to backward
->> compatibility.
->>
->> Furthermore, is it entirely ok to disallow backup if bds lacks .bdrv_get_info?
->> Which behavior should be default: to fail backup or to use default cluster size?
->>
->>  block/backup.c | 5 ++++-
->>  1 file changed, 4 insertions(+), 1 deletion(-)
->>
->> diff --git a/block/backup.c b/block/backup.c
->> index ea38733..095a390 100644
->> --- a/block/backup.c
->> +++ b/block/backup.c
->> @@ -638,7 +638,10 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
->>       * backup cluster size is smaller than the target cluster size. Even for
->>       * targets with a backing file, try to avoid COW if possible. */
->>      ret = bdrv_get_info(target, &bdi);
->> -    if (ret < 0 && !target->backing) {
->> +    if (ret == -ENOTSUP) {
->> +        /* Cluster size is not defined */
->> +        job->cluster_size = BACKUP_CLUSTER_SIZE_DEFAULT;
->> +    } else if (ret < 0 && !target->backing) {
->>          error_setg_errno(errp, -ret,
->>              "Couldn't determine the cluster size of the target image, "
->>              "which has no backing file");
->> -- 
->> 1.8.3.1
->>
-> Target not having .bdrv_get_info means 'some sane assumptions are okay' to me, so
+
+Peter Maydell <peter.maydell@linaro.org> writes:
+
+> On 14 February 2017 at 10:07, Alex Bennée <alex.bennee@linaro.org> wrote:
+>> This provides a basic Debian install with access to the emdebian cross
+>> compilers. The debian-armhf-cross and debian-arm64-cross targets build
+>> on the basic Debian image to allow cross compiling to those targets.
 >
-> Reviewed-by: Fam Zheng <famz@redhat.com>
->
-> (But we are going to have a .bdrv_get_info after NBD_OPT_INFO, right?)
->
-yes, sooner or later :)
+> Is there a particular reason for creating different docker images
+> for each cross target rather than just having one image with
+> all the cross compilers in it?
+
+Mainly the clashing of build-dependencies. Debian's multi-arch is pretty
+good but you still can't generally have two arches worth of complex
+dependencies installed at once.
+
+I did originally have one base docker image with all the compilers and
+intended to do the dependencies step as part of test-build. However when
+running as builders the docker images don't actually have network
+ability so couldn't download them.
+
+--
+Alex Bennée
