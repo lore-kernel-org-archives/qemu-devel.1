@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cdgYG-0002wM-7s
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 12:06:06 -0500
+	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1cdgaA-0005Ds-4D
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 12:08:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cdgYB-00061V-8Z
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 12:06:04 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60319)
+	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1cdga5-0006aR-3c
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 12:08:02 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50756)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cdgYA-00061A-V1
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 12:05:59 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cdgY9-0005ng-Lg
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 17:05:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4D3332E80CE
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 17:05:57 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 14 Feb 2017 16:52:17 -0000
-From: Thomas Huth <886255@bugs.launchpad.net>
-Reply-To: Bug 886255 <886255@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20111104174931.4814.13940.malonedeb@soybean.canonical.com>
-Message-Id: <20170214165217.4151.2799.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 886255] Re: Qemu master branch - RHEL 6.1 guest
- fails to boot
+	(Exim 4.71) (envelope-from <imbrenda@linux.vnet.ibm.com>)
+	id 1cdga4-0006Z4-R6
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 12:07:57 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1EGxn6B036332
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 12:07:55 -0500
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28kx6vwj17-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 12:07:55 -0500
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <imbrenda@linux.vnet.ibm.com>;
+	Tue, 14 Feb 2017 17:07:52 -0000
+From: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+Date: Tue, 14 Feb 2017 18:07:47 +0100
+In-Reply-To: <1487092068-16562-1-git-send-email-imbrenda@linux.vnet.ibm.com>
+References: <1487092068-16562-1-git-send-email-imbrenda@linux.vnet.ibm.com>
+Message-Id: <1487092068-16562-2-git-send-email-imbrenda@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v8 1/2] move vm_start to cpus.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,159 +37,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: pbonzini@redhat.com
+Cc: borntraeger@de.ibm.com, qemu-devel@nongnu.org, palves@redhat.com, alex.bennee@linaro.org
 
-Marking as fixed, according to comment #5
+This patch:
 
-** Changed in: qemu
-       Status: New =3D> Fix Released
+* moves vm_start to cpus.c.
+* exports qemu_vmstop_requested, since it's needed by vm_start.
+* extracts vm_prepare_start from vm_start; it does what vm_start did,
+  except restarting the cpus.
+* vm_start now calls vm_prepare_start and then restarts the cpus.
 
--- =
+Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+---
+ cpus.c                  | 42 ++++++++++++++++++++++++++++++++++++++++++
+ include/sysemu/sysemu.h |  2 ++
+ vl.c                    | 30 +-----------------------------
+ 3 files changed, 45 insertions(+), 29 deletions(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/886255
-
-Title:
-  Qemu master branch - RHEL 6.1 guest fails to boot
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  Guest: RHEL 6.1 64 bit DVD
-
-  Kernel: Latest Fedora, also reproduces with Avi's kvm.git kernel based
-  on 3.1: 2.6.40.6-0.fc15.x86_64
-
-  qemu version:
-
-  11/04 00:25:30 DEBUG|virt_utils:2587| Git repo qemu uri: git://git.qemu.o=
-rg/qemu.git
-  11/04 00:25:30 DEBUG|virt_utils:2590| Git repo qemu branch: master
-  11/04 00:25:30 DEBUG|virt_utils:3189| Configure options for git_repo_qemu=
-: ['--target-list=3Dx86_64-softmmu']
-  11/04 00:25:30 DEBUG|virt_utils:2496| Initializing new git repo at /usr/l=
-ocal/autotest/tests/kvm/src/qemu for receiving git repo 11/04 00:25:30 INFO=
- |virt_utils:2505| Fetching git [REP 'git://git.qemu.org/qemu.git' BRANCH '=
-master'] -> /usr/local/autotest/tests/kvm/src/qemu
-  11/04 00:25:30 DEBUG|base_utils:0074| Running 'git fetch -q -f -u -t git:=
-//git.qemu.org/qemu.git master:master'
-  11/04 00:34:41 INFO |virt_utils:2531| Commit hash for qemu is 932eacc158c=
-064935c7bab920c88a93a629e1ca4 (no tag found)
-
-  On guest boot screenshots (one of them attached), you can see the
-  message
-
-  "Bringing up interface eth0: Device eth0 does not seem to be present,
-  delaying initialization"
-
-  Network card info
-  11/04 00:44:55 DEBUG| virt_test:0041|     bridge =3D virbr0
-  11/04 00:44:55 DEBUG| virt_test:0041|     nic_mode =3D tap
-  11/04 00:44:55 DEBUG| virt_test:0041|     nic_model =3D virtio
-
-  Commented excerpt of the test log:
-
-  11/04 00:44:57 INFO |    kvm_vm:0790| Running qemu command:
-  /usr/local/autotest/tests/kvm/qemu -name 'vm1' -nodefaults -vga std -moni=
-tor unix:'/tmp/monitor-humanmonitor1-20111104-003602-LPJY',server,nowait -q=
-mp unix:'/tmp/monitor-qmpmonitor1-20111104-003602-LPJY',server,nowait -seri=
-al unix:'/tmp/serial-20111104-003602-LPJY',server,nowait -drive file=3D'/tm=
-p/kvm_autotest_root/images/rhel6.1-64.qcow2',index=3D0,if=3Dvirtio,cache=3D=
-none -device virtio-net-pci,netdev=3Did3HQgQx,mac=3D'9a:16:a5:3c:05:25',id=
-=3D'id0AfUVE' -netdev tap,id=3Did3HQgQx,fd=3D23 -m 2048 -smp 2 -vnc :0  -en=
-able-kvm
-  11/04 00:44:59 DEBUG|kvm_monito:0624| (monitor qmpmonitor1) Sending comma=
-nd 'qmp_capabilities'
-  11/04 00:44:59 DEBUG|    kvm_vm:0851| VM appears to be alive with PID 9827
-  11/04 00:44:59 DEBUG|virt_env_p:0318| Starting screendump thread
-  11/04 00:44:59 DEBUG|   virt_vm:0654| Attempting to log into 'vm1' (timeo=
-ut 720s)
-
-  ... here it starts booting ...
-
-  11/04 00:44:59 DEBUG|   virt_vm:0660| Cannot find IP address for MAC addr=
-ess 9a:16:a5:3c:05:25
-  11/04 00:45:01 DEBUG|   virt_vm:0660| Cannot find IP address for MAC addr=
-ess 9a:16:a5:3c:05:25
-  11/04 00:45:03 DEBUG|   virt_vm:0660| Cannot find IP address for MAC addr=
-ess 9a:16:a5:3c:05:25
-  11/04 00:45:05 DEBUG|   virt_vm:0660| Cannot find IP address for MAC addr=
-ess 9a:16:a5:3c:05:25
-  11/04 00:45:07 DEBUG|   virt_vm:0660| Cannot find IP address for MAC addr=
-ess 9a:16:a5:3c:05:25
-  11/04 00:45:09 DEBUG|   virt_vm:0660| Cannot find IP address for MAC addr=
-ess 9a:16:a5:3c:05:25
-  11/04 00:45:11 DEBUG|   virt_vm:0660| Cannot find IP address for MAC addr=
-ess 9a:16:a5:3c:05:25
-  11/04 00:45:13 DEBUG|   virt_vm:0660| Cannot find IP address for MAC addr=
-ess 9a:16:a5:3c:05:25
-  11/04 00:45:15 DEBUG|   virt_vm:0660| Cannot find IP address for MAC addr=
-ess 9a:16:a5:3c:05:25
-  11/04 00:45:17 DEBUG|   virt_vm:0660| Cannot find IP address for MAC addr=
-ess 9a:16:a5:3c:05:25
-  11/04 00:45:19 DEBUG|   virt_vm:0660| Cannot find IP address for MAC addr=
-ess 9a:16:a5:3c:05:25
-  11/04 00:45:21 DEBUG|   virt_vm:0660| Cannot find IP address for MAC addr=
-ess 9a:16:a5:3c:05:25
-  11/04 00:45:23 DEBUG|   virt_vm:0660| Cannot find IP address for MAC addr=
-ess 9a:16:a5:3c:05:25
-
-  ... here it gets an IP from the DHCP server ...
-
-  11/04 00:45:24 DEBUG|virt_env_p:0438| (address cache) Adding cache
-  entry: 9a:16:a5:3c:05:25 ---> 192.168.122.195
-
-  ... ok, let's try to login ...
-
-  11/04 00:45:25 DEBUG|virt_utils:0710| Trying to login with command
-  'ssh -o UserKnownHostsFile=3D/dev/null -o
-  PreferredAuthentications=3Dpassword -p 22 root@192.168.122.195'
-
-  ... ouch, not possible to login ...
-
-  11/04 00:45:25 DEBUG|   virt_vm:0660| Client said 'connection refused'
-  (output: 'ssh: connect to host 192.168.122.195 port 22: Connection
-  refused\n')
-
-  ... message above repeats until ...
-
-  11/04 00:56:59 ERROR| virt_test:0095| Test failed: LoginError: Client sai=
-d 'connection refused'    (output: 'ssh: connect to host 192.168.122.195 po=
-rt 22: Connection refused\n')
-  11/04 00:56:59 DEBUG|virt_env_p:0147| Postprocessing VM 'vm1'
-  11/04 00:56:59 DEBUG|virt_env_p:0166| Param 'kill_vm' specified, killing =
-VM
-  11/04 00:56:59 DEBUG|    kvm_vm:0885| Destroying VM with PID 9827
-  11/04 00:56:59 DEBUG|    kvm_vm:0889| Trying to shutdown VM with shell co=
-mmand
-  11/04 00:56:59 DEBUG|virt_utils:0710| Trying to login with command 'ssh -=
-o UserKnownHostsFile=3D/dev/null -o PreferredAuthentications=3Dpassword -p =
-22 root@192.168.122.195'
-  11/04 00:56:59 DEBUG|    kvm_vm:0893| Client said 'connection refused'   =
- (output: 'ssh: connect to host 192.168.122.195 port 22: Connection refused=
-\n')
-  11/04 00:56:59 DEBUG|    kvm_vm:0908| Trying to kill VM with monitor comm=
-and
-  11/04 00:56:59 INFO |   aexpect:0783| [qemu output] (Process terminated w=
-ith status 0)
-  11/04 00:57:00 DEBUG|    kvm_vm:0916| VM is down
-  11/04 00:57:00 DEBUG|   virt_vm:0318| Checking image file /tmp/kvm_autote=
-st_root/images/rhel6.1-64.qcow2
-  11/04 00:57:00 DEBUG|base_utils:0074| Running '/usr/local/autotest/tests/=
-kvm/qemu-img'
-  11/04 00:57:00 DEBUG|base_utils:0074| Running '/usr/local/autotest/tests/=
-kvm/qemu-img info /tmp/kvm_autotest_root/images/rhel6.1-64.qcow2'
-  11/04 00:57:00 DEBUG|base_utils:0106| [stdout] image: /tmp/kvm_autotest_r=
-oot/images/rhel6.1-64.qcow2
-  11/04 00:57:00 DEBUG|base_utils:0106| [stdout] file format: qcow2
-  11/04 00:57:00 DEBUG|base_utils:0106| [stdout] virtual size: 10G (1073741=
-8240 bytes)
-  11/04 00:57:00 DEBUG|base_utils:0106| [stdout] disk size: 2.1G
-  11/04 00:57:00 DEBUG|base_utils:0106| [stdout] cluster_size: 65536
-  11/04 00:57:00 DEBUG|base_utils:0074| Running '/usr/local/autotest/tests/=
-kvm/qemu-img check /tmp/kvm_autotest_root/images/rhel6.1-64.qcow2'
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/886255/+subscriptions
+diff --git a/cpus.c b/cpus.c
+index 71a82e5..0bcb5b5 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1578,6 +1578,48 @@ int vm_stop(RunState state)
+     return do_vm_stop(state);
+ }
+ 
++/**
++ * Prepare for (re)starting the VM.
++ * Returns -1 if the vCPUs are not to be restarted (e.g. if they are already
++ * running or in case of an error condition), 0 otherwise.
++ */
++int vm_prepare_start(void)
++{
++    RunState requested;
++    int res = 0;
++
++    qemu_vmstop_requested(&requested);
++    if (runstate_is_running() && requested == RUN_STATE__MAX) {
++        return -1;
++    }
++
++    /* Ensure that a STOP/RESUME pair of events is emitted if a
++     * vmstop request was pending.  The BLOCK_IO_ERROR event, for
++     * example, according to documentation is always followed by
++     * the STOP event.
++     */
++    if (runstate_is_running()) {
++        qapi_event_send_stop(&error_abort);
++        res = -1;
++    } else {
++        replay_enable_events();
++        cpu_enable_ticks();
++        runstate_set(RUN_STATE_RUNNING);
++        vm_state_notify(1, RUN_STATE_RUNNING);
++    }
++
++    /* We are sending this now, but the CPUs will be resumed shortly later */
++    qapi_event_send_resume(&error_abort);
++    return res;
++}
++
++void vm_start(void)
++{
++    if (!vm_prepare_start()) {
++        resume_all_vcpus();
++    }
++}
++
+ /* does a state transition even if the VM is already stopped,
+    current state is forgotten forever */
+ int vm_stop_force_state(RunState state)
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index ff8ffb5..0bb0c40 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -37,6 +37,7 @@ void vm_state_notify(int running, RunState state);
+ #define VMRESET_REPORT   true
+ 
+ void vm_start(void);
++int vm_prepare_start(void);
+ int vm_stop(RunState state);
+ int vm_stop_force_state(RunState state);
+ 
+@@ -60,6 +61,7 @@ void qemu_register_powerdown_notifier(Notifier *notifier);
+ void qemu_system_debug_request(void);
+ void qemu_system_vmstop_request(RunState reason);
+ void qemu_system_vmstop_request_prepare(void);
++bool qemu_vmstop_requested(RunState *r);
+ int qemu_shutdown_requested_get(void);
+ int qemu_reset_requested_get(void);
+ void qemu_system_killed(int signal, pid_t pid);
+diff --git a/vl.c b/vl.c
+index abb0900..7a32a30 100644
+--- a/vl.c
++++ b/vl.c
+@@ -757,7 +757,7 @@ StatusInfo *qmp_query_status(Error **errp)
+     return info;
+ }
+ 
+-static bool qemu_vmstop_requested(RunState *r)
++bool qemu_vmstop_requested(RunState *r)
+ {
+     qemu_mutex_lock(&vmstop_lock);
+     *r = vmstop_requested;
+@@ -778,34 +778,6 @@ void qemu_system_vmstop_request(RunState state)
+     qemu_notify_event();
+ }
+ 
+-void vm_start(void)
+-{
+-    RunState requested;
+-
+-    qemu_vmstop_requested(&requested);
+-    if (runstate_is_running() && requested == RUN_STATE__MAX) {
+-        return;
+-    }
+-
+-    /* Ensure that a STOP/RESUME pair of events is emitted if a
+-     * vmstop request was pending.  The BLOCK_IO_ERROR event, for
+-     * example, according to documentation is always followed by
+-     * the STOP event.
+-     */
+-    if (runstate_is_running()) {
+-        qapi_event_send_stop(&error_abort);
+-    } else {
+-        replay_enable_events();
+-        cpu_enable_ticks();
+-        runstate_set(RUN_STATE_RUNNING);
+-        vm_state_notify(1, RUN_STATE_RUNNING);
+-        resume_all_vcpus();
+-    }
+-
+-    qapi_event_send_resume(&error_abort);
+-}
+-
+-
+ /***********************************************************/
+ /* real time host monotonic timer */
+ 
+-- 
+2.7.4
