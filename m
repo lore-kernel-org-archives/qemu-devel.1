@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cdlYu-0004To-P1
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 17:27:05 -0500
+	(envelope-from <ashmit602@gmail.com>) id 1cdlgH-0007ZY-Bq
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 17:34:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cdlYr-0000Jw-Lp
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 17:27:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46314)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cdlYr-0000Jd-GK
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 17:27:01 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AA528C04B954
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 22:27:01 +0000 (UTC)
-References: <1487067971-10443-1-git-send-email-armbru@redhat.com>
-	<1487067971-10443-11-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <044d28d8-c920-d2a7-f435-cb1790010cfc@redhat.com>
-Date: Tue, 14 Feb 2017 16:26:59 -0600
+	(envelope-from <ashmit602@gmail.com>) id 1cdlgF-00023J-Qu
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 17:34:41 -0500
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:36624)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ashmit602@gmail.com>) id 1cdlgF-000234-L0
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 17:34:39 -0500
+Received: by mail-it0-x244.google.com with SMTP id f200so7710595itf.3
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 14:34:39 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1487067971-10443-11-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="M7hKIrrwOO8w42icXDgcwUu3n5TVoJrLt"
-Subject: Re: [Qemu-devel] [PATCH 10/24] tests/test-cutils: Add missing
- qemu_strtosz()... endptr checks
+In-Reply-To: <20170214205158.GT27752@localhost.localdomain>
+References: <1486617814-5420-1-git-send-email-Ashish.Mittal@veritas.com>
+	<20170209062928.GI27752@localhost.localdomain>
+	<CAAo6VWNGtLvbN4ktxRQ9SsobNCgJWcaa_zvdA-9q2Pp3YK27gg@mail.gmail.com>
+	<20170214205158.GT27752@localhost.localdomain>
+From: ashish mittal <ashmit602@gmail.com>
+Date: Tue, 14 Feb 2017 14:34:38 -0800
+Message-ID: <CAAo6VWO64cuJZaNDSzFM6d2YFXr41nc78cPKBR=mbJc5mRD=0w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
+ block device type called "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,52 +31,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <ashish.mittal@veritas.com>, Stefan Hajnoczi <stefanha@gmail.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---M7hKIrrwOO8w42icXDgcwUu3n5TVoJrLt
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <044d28d8-c920-d2a7-f435-cb1790010cfc@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 10/24] tests/test-cutils: Add missing
- qemu_strtosz()... endptr checks
-References: <1487067971-10443-1-git-send-email-armbru@redhat.com>
- <1487067971-10443-11-git-send-email-armbru@redhat.com>
-In-Reply-To: <1487067971-10443-11-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Feb 14, 2017 at 12:51 PM, Jeff Cody <jcody@redhat.com> wrote:
+> On Thu, Feb 09, 2017 at 01:24:58AM -0800, ashish mittal wrote:
+>> On Wed, Feb 8, 2017 at 10:29 PM, Jeff Cody <jcody@redhat.com> wrote:
+>> > On Wed, Feb 08, 2017 at 09:23:33PM -0800, Ashish Mittal wrote:
+>> >> From: Ashish Mittal <ashish.mittal@veritas.com>
+>> >>
+>> >> Source code for the qnio library that this code loads can be downloaded from:
+>> >> https://github.com/VeritasHyperScale/libqnio.git
+>> >>
+>> >> Sample command line using JSON syntax:
+>> >> ./x86_64-softmmu/qemu-system-x86_64 -name instance-00000008 -S -vnc 0.0.0.0:0
+>> >> -k en-us -vga cirrus -device virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x5
+>> >> -msg timestamp=on
+>> >> 'json:{"driver":"vxhs","vdisk-id":"c3e9095a-a5ee-4dce-afeb-2a59fb387410",
+>> >> "server":{"host":"172.172.17.4","port":"9999"}}'
+>> >>
+>> >> Sample command line using URI syntax:
+>> >> qemu-img convert -f raw -O raw -n
+>> >> /var/lib/nova/instances/_base/0c5eacd5ebea5ed914b6a3e7b18f1ce734c386ad
+>> >> vxhs://192.168.0.1:9999/c6718f6b-0401-441d-a8c3-1f0064d75ee0
+>> >>
+>
+> [...]
+>
+>> >> +#define VXHS_OPT_FILENAME           "filename"
+>> >> +#define VXHS_OPT_VDISK_ID           "vdisk-id"
+>> >> +#define VXHS_OPT_SERVER             "server"
+>> >> +#define VXHS_OPT_HOST               "host"
+>> >> +#define VXHS_OPT_PORT               "port"
+>> >> +#define VXHS_UUID_DEF "12345678-1234-1234-1234-123456789012"
+>> >
+>> > What is this?  It is not a valid UUID; is the value significant?
+>> >
+>>
+>> This value gets passed to libvxhs for binaries like qemu-io, qemu-img
+>> that do not have an Instance ID. We can use this default ID to control
+>> access to specific vdisks by these binaries. qemu-kvm will pass the
+>> actual instance ID, and therefore will not use this default value.
+>>
+>> Will reply to other queries soon.
+>>
+>
+> If you are going to call it a UUID, it should adhere to the RFC 4122 spec.
+> You can easily generate a compliant UUID with uuidgen.  However:
+>
+> Can you explain more about how you are using this to control access by
+> qemu-img and qemu-io?  Looking at libqnio, it looks like this is used to
+> determine at runtime which TLS certs to use based off of a
+> pathname/filename, which is then how I presume you are controlling access.
+> See Daniel's email regarding TLS certificates.
+>
 
-On 02/14/2017 04:25 AM, Markus Armbruster wrote:
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  tests/test-cutils.c | 37 ++++++++++++++++++++++++++-----------
->  1 file changed, 26 insertions(+), 11 deletions(-)
->=20
+(1) The default behavior would be to disallow access to any vdisks by
+the non qemu-kvm binaries. qemu-kvm would use the actual instance ID
+for authentication.
+(2) Depending on the workflow, HyperScale controller can choose to
+grant *temporary* access to specific vdisks by qemu-img, qemu-io
+binaries (identified by the default VXHS_UUID_DEF above).
+(3) This information, described in #2, would be communicated by the
+HyperScale controller to the actual proprietary VxHS server (running
+on each compute) that does the authentication/SSL.
+(4) The HyperScale controller, in this way, can grant/revoke access
+for specific vdisks not just to clients with VXHS_UUID_DEF instance
+ID, but also the actual VM instances.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+> [...]
+>
+>> >> +
+>> >> +static void bdrv_vxhs_init(void)
+>> >> +{
+>> >> +    char out[37];
+>
+> Additional point: this should be sized as UUID_FMT_LEN + 1, not 37, but I
+> suspect this code is changing anyways.
+>
+>> >> +
+>> >> +    if (qemu_uuid_is_null(&qemu_uuid)) {
+>> >> +        lib_init_failed = iio_init(QNIO_VERSION, vxhs_iio_callback, VXHS_UUID_DEF);
+>> >> +    } else {
+>> >> +        qemu_uuid_unparse(&qemu_uuid, out);
+>> >> +        lib_init_failed = iio_init(QNIO_VERSION, vxhs_iio_callback, out);
+>> >> +    }
+>> >> +
+>> >
+>> > [1]
+>> >
+>> > Can you explain what is going on here with the qemu_uuid check?
+>> >
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+(1) qemu_uuid_is_null(&qemu_uuid) is true for qemu-io, qemu-img that
+do not define a instance ID. We end up using the default VXHS_UUID_DEF
+ID for them, and authenticating them as described above.
 
+(2) For the other case 'else', we convert the uuid to a char * using
+qemu_uuid_unparse(), and pass the resulting char * uuid in variable
+'out' to libvxhs.
 
---M7hKIrrwOO8w42icXDgcwUu3n5TVoJrLt
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+>> >
+>> > You also can't do this here.  This init function is just to register the
+>> > driver (e.g. populate the BlockDriver list).  You shouldn't be doing
+>> > anything other than the bdrv_register() call here.
+>> >
+>> > Since you want to run this iio_init only once, I would recommend doing it in
+>> > the vxhs_open() call, and using a ref counter.  That way, you can also call
+>> > iio_fini() to finish releasing resources once the last device is closed.
+>> >
+>> > This was actually a suggestion I had before, which you then incorporated
+>> > into v6, but it appears all the refcnt code has gone away for v7/v8.
+>> >
+>> >
+>> >> +    bdrv_register(&bdrv_vxhs);
+>> >> +}
+>> >> +
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Will consider this in the next patch.
 
-iQEcBAEBCAAGBQJYo4QzAAoJEKeha0olJ0NqYIgH/1oz9pmTJ8CnmSHGXP6xaNFP
-XCq5d+f1uYCLGFxr+fz2KxbrkIAaly117AVAANQUPfEh58j4zwmUAbghMyc/chih
-ymKnOyDXrwD5aRIhvyTRyx8HQ67rjbIVHNfqD6x4wripvUaGYcFWzfhRZ09LeLzO
-F7j3RG+3/XvkQ/FwUzyXoxVn9Wwn258Vqn3Yq1Wpmx+iGkdXRxFcHYTxfGVP4DGq
-7/kB5VCJvvcr9lWsaG7K5JIoOD5JyF/8reJzCrdMyYHPmeaNt5UeLRDp5dle38H1
-UAr8ESt69OW6NJG4NyXYOeJS12qzLj3BlyCkn3ELRVbOvkkRq0dHOmfW0UfSTjQ=
-=95gT
------END PGP SIGNATURE-----
-
---M7hKIrrwOO8w42icXDgcwUu3n5TVoJrLt--
+Regards,
+Ashish
