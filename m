@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54837)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cdgSH-0005Wx-7e
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cdgSH-0005Wy-7L
 	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 11:59:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cdgSC-0003xb-F4
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cdgSC-0003x9-AC
 	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 11:59:53 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:4209 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:16837 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cdgSC-0003vd-2n
+	id 1cdgSB-0003vN-Vd
 	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 11:59:48 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 14 Feb 2017 19:59:37 +0300
-Message-Id: <1487091579-67092-24-git-send-email-vsementsov@virtuozzo.com>
+Date: Tue, 14 Feb 2017 19:59:35 +0300
+Message-Id: <1487091579-67092-22-git-send-email-vsementsov@virtuozzo.com>
 In-Reply-To: <1487091579-67092-1-git-send-email-vsementsov@virtuozzo.com>
 References: <1487091579-67092-1-git-send-email-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 23/25] qcow2: add
- .bdrv_remove_persistent_dirty_bitmap
+Subject: [Qemu-devel] [PATCH 21/25] qcow2-bitmap: refcounts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,91 +27,129 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-Realize .bdrv_remove_persistent_dirty_bitmap interface.
+Calculate refcounts for qcow2 bitmaps. It is needed for qcow2's qemu-img
+check implementation.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-bitmap.c | 41 +++++++++++++++++++++++++++++++++++++++++
- block/qcow2.c        |  1 +
- block/qcow2.h        |  3 +++
- 3 files changed, 45 insertions(+)
+ block/qcow2-bitmap.c   | 76 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ block/qcow2-refcount.c |  6 ++++
+ block/qcow2.h          |  3 ++
+ 3 files changed, 85 insertions(+)
 
 diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index 326a799..7ad1f7c 100644
+index 419d51e..326a799 100644
 --- a/block/qcow2-bitmap.c
 +++ b/block/qcow2-bitmap.c
-@@ -1055,6 +1055,47 @@ static Qcow2Bitmap *find_bitmap_by_name(Qcow2BitmapList *bm_list,
-     return NULL;
+@@ -1222,3 +1222,79 @@ common_errp:
+                name, bdrv_get_device_or_node_name(bs), reason);
+     return false;
  }
- 
-+void qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs,
-+                                          const char *name,
-+                                          Error **errp)
++
++int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
++                                  void **refcount_table,
++                                  int64_t *refcount_table_size)
 +{
 +    int ret;
 +    BDRVQcow2State *s = bs->opaque;
-+    Qcow2Bitmap *bm;
 +    Qcow2BitmapList *bm_list;
++    Qcow2Bitmap *bm;
 +
 +    if (s->nb_bitmaps == 0) {
-+        /* Absence of the bitmap is not an error: see explanation above
-+         * bdrv_remove_persistent_dirty_bitmap() definition. */
-+        return;
++        return 0;
++    }
++
++    ret = qcow2_inc_refcounts_imrt(bs, res, refcount_table, refcount_table_size,
++                                   s->bitmap_directory_offset,
++                                   s->bitmap_directory_size);
++    if (ret < 0) {
++        return ret;
 +    }
 +
 +    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
-+                               s->bitmap_directory_size, errp);
++                               s->bitmap_directory_size, NULL);
 +    if (bm_list == NULL) {
-+        return;
++        res->corruptions++;
++        return -EINVAL;
 +    }
 +
-+    bm = find_bitmap_by_name(bm_list, name);
-+    if (bm == NULL) {
-+        goto fail;
++    QSIMPLEQ_FOREACH(bm, bm_list, entry) {
++        uint64_t *bitmap_table = NULL;
++        int i;
++
++        ret = qcow2_inc_refcounts_imrt(bs, res,
++                                       refcount_table, refcount_table_size,
++                                       bm->table.offset,
++                                       bm->table.size * sizeof(uint64_t));
++        if (ret < 0) {
++            goto out;
++        }
++
++        ret = bitmap_table_load(bs, &bm->table, &bitmap_table);
++        if (ret < 0) {
++            res->corruptions++;
++            goto out;
++        }
++
++        for (i = 0; i < bm->table.size; ++i) {
++            uint64_t entry = bitmap_table[i];
++            uint64_t offset = entry & BME_TABLE_ENTRY_OFFSET_MASK;
++
++            if (check_table_entry(entry, s->cluster_size) < 0) {
++                res->corruptions++;
++                continue;
++            }
++
++            if (offset == 0) {
++                continue;
++            }
++
++            ret = qcow2_inc_refcounts_imrt(bs, res,
++                                           refcount_table, refcount_table_size,
++                                           offset, s->cluster_size);
++            if (ret < 0) {
++                g_free(bitmap_table);
++                goto out;
++            }
++        }
++
++        g_free(bitmap_table);
 +    }
 +
-+    QSIMPLEQ_REMOVE(bm_list, bm, Qcow2Bitmap, entry);
-+
-+    ret = update_ext_header_and_dir(bs, bm_list);
-+    if (ret < 0) {
-+        error_setg_errno(errp, -ret, "Failed to update bitmap extension");
-+        goto fail;
-+    }
-+
-+    free_bitmap_clusters(bs, &bm->table);
-+
-+fail:
-+    bitmap_free(bm);
++out:
 +    bitmap_list_free(bm_list);
-+}
 +
- void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
- {
-     BdrvDirtyBitmap *bitmap;
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 6e1fe53..653ba78 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -3542,6 +3542,7 @@ BlockDriver bdrv_qcow2 = {
-     .bdrv_load_autoloading_dirty_bitmaps = qcow2_load_autoloading_dirty_bitmaps,
-     .bdrv_store_persistent_dirty_bitmaps = qcow2_store_persistent_dirty_bitmaps,
-     .bdrv_can_store_new_dirty_bitmap = qcow2_can_store_new_dirty_bitmap,
-+    .bdrv_remove_persistent_dirty_bitmap = qcow2_remove_persistent_dirty_bitmap,
- };
++    return ret;
++}
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 14a736d..cdb74ba 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -1846,6 +1846,12 @@ static int calculate_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
+         return ret;
+     }
  
- static void bdrv_qcow2_init(void)
++    /* bitmaps */
++    ret = qcow2_check_bitmaps_refcounts(bs, res, refcount_table, nb_clusters);
++    if (ret < 0) {
++        return ret;
++    }
++
+     return check_refblocks(bs, res, fix, rebuild, refcount_table, nb_clusters);
+ }
+ 
 diff --git a/block/qcow2.h b/block/qcow2.h
-index eaad34a..a009827 100644
+index 0a3708d..eaad34a 100644
 --- a/block/qcow2.h
 +++ b/block/qcow2.h
-@@ -627,5 +627,8 @@ bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
- int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-                                   void **refcount_table,
-                                   int64_t *refcount_table_size);
-+void qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs,
-+                                          const char *name,
-+                                          Error **errp);
+@@ -624,5 +624,8 @@ bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
+                                       const char *name,
+                                       uint32_t granularity,
+                                       Error **errp);
++int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
++                                  void **refcount_table,
++                                  int64_t *refcount_table_size);
  
  #endif
 -- 
