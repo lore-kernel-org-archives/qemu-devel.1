@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cdUlZ-0003QM-5F
+	(envelope-from <bounces@canonical.com>) id 1cdUlZ-0003QK-4W
 	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 23:31:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cdUlW-0001JT-At
+	(envelope-from <bounces@canonical.com>) id 1cdUlW-0001Ja-CF
 	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 23:31:01 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57842)
+Received: from indium.canonical.com ([91.189.90.7]:57846)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cdUlW-0001IP-5k
+	id 1cdUlW-0001IT-5o
 	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 23:30:58 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cdUlS-000410-U4
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 04:30:55 +0000
+	id 1cdUlU-00040y-FM
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 04:30:56 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8F1292E80E7
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 04:30:53 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id D44422E80D6
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 04:30:55 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 14 Feb 2017 04:17:47 -0000
-From: Launchpad Bug Tracker <938945@bugs.launchpad.net>
-Reply-To: Bug 938945 <938945@bugs.launchpad.net>
+Date: Tue, 14 Feb 2017 04:17:46 -0000
+From: Launchpad Bug Tracker <907063@bugs.launchpad.net>
+Reply-To: Bug 907063 <907063@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20120222195009.30707.32438.malonedeb@chaenomeles.canonical.com>
-Message-Id: <20170214041747.28611.28765.malone@loganberry.canonical.com>
+References: <20111220205348.3164.18912.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170214041746.28611.10681.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 938945] Re: Slirp cannot be forward and makes
- segmentation faults
+Subject: [Qemu-devel] [Bug 907063] Re: Error reading VMDK4 with footer
+ instead of header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,46 +48,37 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/938945
+https://bugs.launchpad.net/bugs/907063
 
 Title:
-  Slirp cannot be forward and makes segmentation faults
+  Error reading VMDK4 with footer instead of header
 
 Status in QEMU:
   Expired
 
 Bug description:
-  Hi,
+  VMDK4 files can have a footer in the last block, which is the same datast=
+ructure as the header but must be used instead if present. In this case, th=
+e gd_offset in the usual header at the beginning of the file is the special=
+ flag -1 (VMDK 1.1 spec, page 17, "GD_AT_END
+  "). qemu-img doesn't know about this flag so it goes on to try to read ex=
+tents with a bogus l1_table from the wrong location in the file.
 
-  Let's consider the following lines:
+  I have regression-tested this with various OVAs exported from
+  VSphere/ESXi 3 and 4. Current master and all previous QEMU versions
+  were unable to import any compressed VMDKs with a footer. It now works
+  on all the ones I have.
 
-  $ qemu -enable-kvm -name opeth -hda debian1.img -k fr -localtime -m
-  512 -net user,vlan=3D0 -net
-  nic,vlan=3D0,model=3D$model,macaddr=3Da2:00:00:00:00:10 -net
-  socket,vlan=3D1,listen=3D127.0.0.1:5900 -net
-  nic,vlan=3D1,model=3D$model,macaddr=3Da2:00:00:00:00:04
+  bb45ded93115ad4303471c9a492579dc36716547 changed the order of
+  gd_offset and rgd_offset in the VMDK4Header struct. Page 8 of the VMDK
+  1.1 spec from VMWare shows the structure as rgd_ then gd_, while QEMU
+  now has gd_ *before* rgd_offset. I was only able to get VMDK
+  conversion to work by switching the order back to that specified by
+  VMWare and previously used by QEMU. I don't know what VMDK this commit
+  is referring to, so I can't test to see if I've broken it. :(
 
-  $qemu -enable-kvm -name nightwish -hda debian2.img -k fr -localtime -m
-  512 -net socket,vlan=3D0,connect=3D127.0.0.1:5900 -net
-  nic,vlan=3D0,model=3D$model,macaddr=3Da2:00:00:00:00:02
-
-  =
-
-  My configuration is clear and allows to transmit packets between the Slir=
-p and the guest nightwish.
-  But when I try to do on nightwish :
-
-  $ wget www.qemu.org
-
-  The opeth QEMU makes a segfault :    "11586 Segmentation Fault"
-
-  This phenomenon is not always present... If the Segfault does not
-  appear, nightwish cannot enable a connection with internet :(
-
-  =
-
-  Thanks
-  Vince
+  I will submit this patch to the mailing list if I get a chance, but
+  I'm also uploading it here so I don't lose it.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/938945/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/907063/+subscriptions
