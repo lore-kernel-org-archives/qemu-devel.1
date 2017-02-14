@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35842)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cdSoL-0007uI-7U
+	(envelope-from <bounces@canonical.com>) id 1cdSoL-0007uJ-7v
 	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 21:25:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cdSoI-0007kT-Gl
+	(envelope-from <bounces@canonical.com>) id 1cdSoI-0007kG-2h
 	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 21:25:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41081)
+Received: from indium.canonical.com ([91.189.90.7]:41073)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cdSoI-0007kA-3F
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 21:25:42 -0500
+	id 1cdSoH-0007k8-Sp
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 21:25:41 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cdSoH-0003kb-A1
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 02:25:41 +0000
+	id 1cdSoG-0003kK-Oq
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 02:25:40 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2E1E12E80C4
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 02:25:41 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id B9E6C2E80C7
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 02:25:40 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 14 Feb 2017 02:17:16 -0000
+Date: Tue, 14 Feb 2017 02:16:44 -0000
 From: wayen <1662050@bugs.launchpad.net>
 Reply-To: Bug 1662050 <1662050@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20170206024535.14624.3001.malonedeb@soybean.canonical.com>
-Message-Id: <20170214021716.5810.4550.malone@soybean.canonical.com>
+Message-Id: <20170214021644.29755.88223.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1662050] Re: qemu-img convert a overlay qcow2
  image into a entire image
@@ -39,9 +39,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Attachment added: "qemu-img map new.qcow2 output"
-   https://bugs.launchpad.net/qemu/+bug/1662050/+attachment/4818564/+files/=
-qemu_img_map_new_qcow2.txt
+** Attachment added: "stat new.qcow2 output"
+   https://bugs.launchpad.net/qemu/+bug/1662050/+attachment/4818563/+files/=
+stat_new_qcow2.txt
 
 -- =
 
