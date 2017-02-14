@@ -1,33 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cdiAq-0005QJ-F3
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 13:50:01 -0500
+	(envelope-from <ppandit@redhat.com>) id 1cdiDN-00070W-RC
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 13:52:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cdiAl-0007Ww-JL
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 13:50:00 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57648)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cdiAl-0007Wf-D3
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 13:49:55 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cdiAk-000247-4E
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 18:49:54 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1A87B2E80C6
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 18:49:54 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 14 Feb 2017 18:40:00 -0000
-From: Forest <764252@bugs.launchpad.net>
-Reply-To: Bug 764252 <764252@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20110418053344.23556.39759.malonedeb@wampee.canonical.com>
-Message-Id: <20170214184000.5145.63173.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 764252] Re: wishlist: kirkwood support
+	(envelope-from <ppandit@redhat.com>) id 1cdiDJ-00088H-Il
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 13:52:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44332)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1cdiDJ-000886-D1
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 13:52:33 -0500
+From: P J P <ppandit@redhat.com>
+Date: Wed, 15 Feb 2017 00:22:21 +0530
+Message-Id: <20170214185225.7994-1-ppandit@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 0/4] sd: sdhci: correct transfer mode
+ register usage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,27 +22,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Qemu Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair23@gmail.com>, Wjjzhang <wjjzhang@tencent.com>, Jiang Xin <jiangxin1@huawei.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
-For the record, I still regularly use a Kirkwood device (a QNAP NAS).
-Being able to compile software for it in qemu would be handy once in a
-while, though it's not a high priority for me.
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
--- =
+Hello,
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/764252
+In SDHCI protocol, the 'Block Count Enable' bit of the Transfer Mode
+register is used to control 's->blkcnt' value. This bit is not relevant
+in single block transfers. Also, Transfer Mode register value could be
+set such that 's->blkcnt' would not see an update during multi block
+transfers. Thus leading to an infinite loop.
 
-Title:
-  wishlist: kirkwood support
+This patch set attempts to correct 'Block Count Enable' bit usage.
 
-Status in QEMU:
-  Won't Fix
+This series incorporates changes suggested in patch set v3:
+  -> https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg02376.html
+  -> https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg02905.html
 
-Bug description:
-  This is a feature request for qemu to emulate the Marvell Kirkwood
-  chipset. It is used by Sheevaplug, Guruplug, and many NAS devices.
+Thank you.
+--
+Prasad J Pandit (4):
+  sd: sdhci: mask transfer mode register value
+  sd: sdhci: check transfer mode register in multi block transfer
+  sd: sdhci: conditionally invoke multi block transfer
+  sd: sdhci: Remove block count enable check in single block transfers
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/764252/+subscriptions
+ hw/sd/sdhci.c | 25 +++++++++++++------------
+ 1 file changed, 13 insertions(+), 12 deletions(-)
+
+-- 
+2.9.3
