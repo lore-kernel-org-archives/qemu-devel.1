@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cdm3n-0002Ls-Uv
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 17:59:01 -0500
+	(envelope-from <jsnow@redhat.com>) id 1cdm6T-0003Ye-Li
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 18:01:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cdm3j-000378-2x
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 17:58:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56256)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cdm3i-00036q-QH
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 17:58:55 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C9F757E9FD
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 22:58:54 +0000 (UTC)
-References: <1487067971-10443-1-git-send-email-armbru@redhat.com>
-	<1487067971-10443-13-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <23df2b0c-a93d-a655-553f-53916f897a0b@redhat.com>
-Date: Tue, 14 Feb 2017 16:58:52 -0600
+	(envelope-from <jsnow@redhat.com>) id 1cdm6S-00043t-3B
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 18:01:45 -0500
+References: <1487091579-67092-1-git-send-email-vsementsov@virtuozzo.com>
+	<1487091579-67092-20-git-send-email-vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <5a32aa37-2b33-2e09-9cb8-2e83f3f23f01@redhat.com>
+Date: Tue, 14 Feb 2017 18:01:36 -0500
 MIME-Version: 1.0
-In-Reply-To: <1487067971-10443-13-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="fa38SgO9vRAJ8Bp9cCKX85bMpgh0GDai1"
-Subject: Re: [Qemu-devel] [PATCH 12/24] tests/test-cutils: Cover
- qemu_strtosz() with trailing crap
+In-Reply-To: <1487091579-67092-20-git-send-email-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 19/25] iotests: test qcow2 persistent dirty
+ bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,83 +24,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fa38SgO9vRAJ8Bp9cCKX85bMpgh0GDai1
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <23df2b0c-a93d-a655-553f-53916f897a0b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 12/24] tests/test-cutils: Cover
- qemu_strtosz() with trailing crap
-References: <1487067971-10443-1-git-send-email-armbru@redhat.com>
- <1487067971-10443-13-git-send-email-armbru@redhat.com>
-In-Reply-To: <1487067971-10443-13-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 02/14/2017 04:25 AM, Markus Armbruster wrote:
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+
+On 02/14/2017 11:59 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
 > ---
->  tests/test-cutils.c | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
->=20
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-> diff --git a/tests/test-cutils.c b/tests/test-cutils.c
-> index 3dcd4c1..ec65d27 100644
-> --- a/tests/test-cutils.c
-> +++ b/tests/test-cutils.c
-> @@ -1463,6 +1463,23 @@ static void test_qemu_strtosz_invalid(void)
->      g_assert(endptr =3D=3D str);
->  }
-> =20
-> +static void test_qemu_strtosz_trailing(void)
-> +{
-> +    const char *str;
-> +    char *endptr =3D NULL;
-> +    int64_t res;
+>  tests/qemu-iotests/165     | 89 ++++++++++++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/165.out |  5 +++
+>  tests/qemu-iotests/group   |  1 +
+>  3 files changed, 95 insertions(+)
+>  create mode 100755 tests/qemu-iotests/165
+>  create mode 100644 tests/qemu-iotests/165.out
+> 
+> diff --git a/tests/qemu-iotests/165 b/tests/qemu-iotests/165
+> new file mode 100755
+> index 0000000..d583b33
+> --- /dev/null
+> +++ b/tests/qemu-iotests/165
+> @@ -0,0 +1,89 @@
+> +#!/usr/bin/env python
+> +#
+> +# Tests for persistent dirty bitmaps.
+> +#
+> +# Copyright: Vladimir Sementsov-Ogievskiy 2015-2017
+> +#
+> +# This program is free software; you can redistribute it and/or modify
+> +# it under the terms of the GNU General Public License as published by
+> +# the Free Software Foundation; either version 2 of the License, or
+> +# (at your option) any later version.
+> +#
+> +# This program is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +# GNU General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU General Public License
+> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> +#
 > +
-> +    str =3D "123xxx";
-> +    res =3D qemu_strtosz(str, &endptr);
-> +    g_assert_cmpint(res, =3D=3D, 123 * M_BYTE);
-> +    g_assert(endptr =3D=3D str + 3);
+> +import os
+> +import iotests
+> +from iotests import qemu_img
 > +
-> +    str =3D "1kiB";
-
-Personally, I think this one would be useful to support, but agree that
-right now it should be handled as trailing garbage.
-
-> +    res =3D qemu_strtosz(str, &endptr);
-> +    g_assert_cmpint(res, =3D=3D, 1024);
-> +    g_assert(endptr =3D=3D str + 2);
-> +}
+> +disk = os.path.join(iotests.test_dir, 'disk')
+> +disk_size = 0x40000000 # 1G
 > +
+> +# regions for qemu_io: (start, count) in bytes
+> +regions1 = ((0,        0x100000),
+> +            (0x200000, 0x100000))
+> +
+> +regions2 = ((0x10000000, 0x20000),
+> +            (0x3fff0000, 0x10000))
+> +
+> +class TestPersistentDirtyBitmap(iotests.QMPTestCase):
+> +
+> +    def setUp(self):
+> +        qemu_img('create', '-f', iotests.imgfmt, disk, str(disk_size))
+> +
+> +    def tearDown(self):
+> +        os.remove(disk)
+> +
+> +    def mkVm(self):
+> +        return iotests.VM().add_drive(disk)
+> +
+> +    def getSha256(self):
+> +        result = self.vm.qmp('x-debug-block-dirty-bitmap-sha256',
+> +                             node='drive0', name='bitmap0')
+> +        return result['return']['sha256']
+> +
+> +    def checkBitmap(self, sha256):
+> +        result = self.vm.qmp('x-debug-block-dirty-bitmap-sha256',
+> +                             node='drive0', name='bitmap0')
+> +        self.assert_qmp(result, 'return/sha256', sha256);
+> +
+> +    def writeRegions(self, regions):
+> +        for r in regions:
+> +            self.vm.hmp_qemu_io('drive0',
+> +                                'write %d %d' % r)
+> +
+> +    def qmpAddBitmap(self):
+> +        self.vm.qmp('block-dirty-bitmap-add', node='drive0',
+> +                    name='bitmap0', persistent=True, autoload=True)
+> +
+> +    def test_persistent(self):
+> +        self.vm = self.mkVm()
+> +        self.vm.launch()
+> +        self.qmpAddBitmap()
+> +
+> +        self.writeRegions(regions1)
+> +        sha256 = self.getSha256()
+> +
+> +        self.vm.shutdown()
+> +        self.vm = self.mkVm()
+> +        self.vm.launch()
+> +
+> +        self.checkBitmap(sha256)
+> +        self.writeRegions(regions2)
+> +        sha256 = self.getSha256()
+> +
+> +        self.vm.shutdown()
+> +        self.vm.launch()
+> +
+> +        self.checkBitmap(sha256)
+> +
+> +        self.vm.shutdown()
+> +
+> +if __name__ == '__main__':
+> +    iotests.main(supported_fmts=['qcow2'])
+> diff --git a/tests/qemu-iotests/165.out b/tests/qemu-iotests/165.out
+> new file mode 100644
+> index 0000000..ae1213e
+> --- /dev/null
+> +++ b/tests/qemu-iotests/165.out
+> @@ -0,0 +1,5 @@
+> +.
+> +----------------------------------------------------------------------
+> +Ran 1 tests
+> +
+> +OK
+> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+> index 866c1a0..8bd7a84 100644
+> --- a/tests/qemu-iotests/group
+> +++ b/tests/qemu-iotests/group
+> @@ -162,6 +162,7 @@
+>  159 rw auto quick
+>  160 rw auto quick
+>  162 auto quick
+> +165 rw auto quick
+>  170 rw auto quick
+>  171 rw auto quick
+>  172 auto
+> 
 
+Good enough for a basic test for now.
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+We'll want to test the error cases of the persistence and autoload flags
+eventually.
 
-
---fa38SgO9vRAJ8Bp9cCKX85bMpgh0GDai1
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYo4usAAoJEKeha0olJ0Nqae4H/A7+OF2P2ork6ozUPLzAoDnW
-9mGPUlsCWd8HaCbo2MK/BJNzGC1N5TxhDR/5ljRAKBZNnJU0cEaauGd2Jx2KcOsS
-2+dOoKqo8kCTGrsz7T+2kq9V95ff0NV6q9MNGfrd02LruuRGeBvYt5c1FmiQyDmE
-7KSddWAlTi51mmd5l/bK9pvnMI6h6YYGXE4kdCbV5ZHswSdxpocEXUHXtHO6Acj3
-qInabnbze3gnSMn64eHmYEonCl3tmLYDsV1n4j4VQ22+kQNl7iSGa7o+hwfziQvk
-ukvDmRE6h0jN/DYqLoay496brwQI2XBNOsyc9iJV/7rIBia/htSWe78NO9Wf1vQ=
-=fhJI
------END PGP SIGNATURE-----
-
---fa38SgO9vRAJ8Bp9cCKX85bMpgh0GDai1--
+Reviewed-by: John Snow <jsnow@redhat.com>
