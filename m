@@ -1,54 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47054)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jl4312@columbia.edu>) id 1cdcZJ-0002DG-9d
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 07:50:56 -0500
+	(envelope-from <marcel@redhat.com>) id 1cdcbd-0003pu-LS
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 07:53:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jl4312@columbia.edu>) id 1cdcZF-0006xh-9d
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 07:50:53 -0500
-Received: from outprodmail01.cc.columbia.edu ([128.59.72.39]:34238)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jl4312@columbia.edu>) id 1cdcZF-0006vK-1o
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 07:50:49 -0500
-Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
-	by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
-	v1ECo4SD031001
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 07:50:42 -0500
-Received: from hazelnut (localhost.localdomain [127.0.0.1])
-	by hazelnut (Postfix) with ESMTP id A67EB6D
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 07:50:42 -0500 (EST)
-Received: from sendprodmail02.cc.columbia.edu (sendprodmail02.cc.columbia.edu
-	[128.59.72.14]) by hazelnut (Postfix) with ESMTP id 9A7EF6D
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 07:50:42 -0500 (EST)
-Received: from mail-ua0-f199.google.com (mail-ua0-f199.google.com
-	[209.85.217.199])
-	by sendprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
-	v1ECog2A018911
-	(version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 07:50:42 -0500
-Received: by mail-ua0-f199.google.com with SMTP id x12so1623437uax.6
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 04:50:42 -0800 (PST)
-Received: from mail-vk0-f52.google.com (mail-vk0-f52.google.com.
-	[209.85.213.52])
-	by smtp.gmail.com with ESMTPSA id b33sm98612uaa.29.2017.02.14.04.50.40
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 14 Feb 2017 04:50:40 -0800 (PST)
-Received: by mail-vk0-f52.google.com with SMTP id k127so79147896vke.0
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 04:50:40 -0800 (PST)
+	(envelope-from <marcel@redhat.com>) id 1cdcbZ-0007xd-Oi
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 07:53:17 -0500
+References: <20170208061602.17666-1-david@gibson.dropbear.id.au>
+	<46d64512-1085-6d22-1e0f-660757ff7131@redhat.com>
+	<20170209041634.GC14524@umbus>
+	<95706652-0a80-92fc-951b-7a454d496ddf@redhat.com>
+	<20170210003746.GP27610@umbus.fritz.box>
+	<5ea3785c-b979-8b8c-3ab0-243d69384697@redhat.com>
+	<20170213043307.GT25381@umbus>
+	<45446029-e404-77d4-754e-5541a506bb7c@redhat.com>
+	<20170214041532.GF2169@umbus.fritz.box>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <c0e368b1-c89d-ef5a-d475-c92266d3eb41@redhat.com>
+Date: Tue, 14 Feb 2017 14:53:08 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170214073551.GA9055@pxdev.xzpeter.org>
-References: <CAHyh4xiVKjd+D=qaizUZ02O8xLYhpoVKOqC9cR0ZWWyLq9HtbQ@mail.gmail.com>
-	<20170208031216.GA5151@pxdev.xzpeter.org>
-	<CAHyh4xg7NVPjXu3c+xGWNzQqwLgFqFJTPo4SgN-X+FNuHjGihQ@mail.gmail.com>
-	<CAHyh4xhOPmfLoU_fvtbBF1Wqbzji9q6rp_bRN38qfnwvhQq+9A@mail.gmail.com>
-	<20170209035250.GB22153@pxdev.xzpeter.org>
-	<CAHyh4xi9KZm13mJnE3-EyYkkyN4YDKKwbeJ68AumCBM7kgr+MQ@mail.gmail.com>
-	<20170214073551.GA9055@pxdev.xzpeter.org>
-From: Jintack Lim <jintack@cs.columbia.edu>
-Date: Tue, 14 Feb 2017 07:50:39 -0500
-Message-ID: <CAHyh4xiATAV801U7zjK1F_B+7e2bDWhH1-gpFKF3U1jNmCfScw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] iommu emulation
+In-Reply-To: <20170214041532.GF2169@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] virtio-pci: Allow PCIe virtio devices on
+ root bus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -57,347 +31,345 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: mst@redhat.com, Alex Williamson <alex.williamson@redhat.com>, QEMU Devel Mailing List <qemu-devel@nongnu.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Laszlo Ersek <lersek@redhat.com>, abologna@redhat.com, lvivier@redhat.com, thuth@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, kraxel@redhat.com, Eduardo Habkost <ehabkost@redhat.com>mst@redhat.com
 
-On Tue, Feb 14, 2017 at 2:35 AM, Peter Xu <peterx@redhat.com> wrote:
-
-> On Thu, Feb 09, 2017 at 08:01:14AM -0500, Jintack Lim wrote:
-> > On Wed, Feb 8, 2017 at 10:52 PM, Peter Xu <peterx@redhat.com> wrote:
-> > > (cc qemu-devel and Alex)
-> > >
-> > > On Wed, Feb 08, 2017 at 09:14:03PM -0500, Jintack Lim wrote:
-> > >> On Wed, Feb 8, 2017 at 10:49 AM, Jintack Lim <jintack@cs.columbia.edu>
-> wrote:
-> > >> > Hi Peter,
-> > >> >
-> > >> > On Tue, Feb 7, 2017 at 10:12 PM, Peter Xu <peterx@redhat.com>
-> wrote:
-> > >> >> On Tue, Feb 07, 2017 at 02:16:29PM -0500, Jintack Lim wrote:
-> > >> >>> Hi Peter and Michael,
-> > >> >>
-> > >> >> Hi, Jintack,
-> > >> >>
-> > >> >>>
-> > >> >>> I would like to get some help to run a VM with the emulated
-> iommu. I
-> > >> >>> have tried for a few days to make it work, but I couldn't.
-> > >> >>>
-> > >> >>> What I want to do eventually is to assign a network device to the
-> > >> >>> nested VM so that I can measure the performance of applications
-> > >> >>> running in the nested VM.
-> > >> >>
-> > >> >> Good to know that you are going to use [4] to do something useful.
-> :-)
-> > >> >>
-> > >> >> However, could I ask why you want to measure the performance of
-> > >> >> application inside nested VM rather than host? That's something I
-> am
-> > >> >> just curious about, considering that virtualization stack will
-> > >> >> definitely introduce overhead along the way, and I don't know
-> whether
-> > >> >> that'll affect your measurement to the application.
-> > >> >
-> > >> > I have added nested virtualization support to KVM/ARM, which is
-> under
-> > >> > review now. I found that application performance running inside the
-> > >> > nested VM is really bad both on ARM and x86, and I'm trying to
-> figure
-> > >> > out what's the real overhead. I think one way to figure that out is
-> to
-> > >> > see if the direct device assignment to L2 helps to reduce the
-> overhead
-> > >> > or not.
-> > >
-> > > I see. IIUC you are trying to use an assigned device to replace your
-> > > old emulated device in L2 guest to see whether performance will drop
-> > > as well, right? Then at least I can know that you won't need a nested
-> > > VT-d here (so we should not need a vIOMMU in L2 guest).
-> >
-> > That's right.
-> >
-> > >
-> > > In that case, I think we can give it a shot, considering that L1 guest
-> > > will use vfio-pci for that assigned device as well, and when L2 guest
-> > > QEMU uses this assigned device, it'll use a static mapping (just to
-> > > map the whole GPA for L2 guest) there, so even if you are using a
-> > > kernel driver in L2 guest with your to-be-tested application, we
-> > > should still be having a static mapping in vIOMMU in L1 guest, which
-> > > is IMHO fine from performance POV.
-> > >
-> > > I cced Alex in case I missed anything here.
-> > >
-> > >> >
-> > >> >>
-> > >> >> Another thing to mention is that (in case you don't know that),
-> device
-> > >> >> assignment with VT-d protection would be even slower than generic
-> VMs
-> > >> >> (without Intel IOMMU protection) if you are using generic kernel
-> > >> >> drivers in the guest, since we may need real-time DMA translation
-> on
-> > >> >> data path.
-> > >> >>
-> > >> >
-> > >> > So, this is the comparison between using virtio and using the device
-> > >> > assignment for L1? I have tested application performance running
-> > >> > inside L1 with and without iommu, and I found that the performance
-> is
-> > >> > better with iommu.
+On 02/14/2017 06:15 AM, David Gibson wrote:
+> On Mon, Feb 13, 2017 at 12:14:23PM +0200, Marcel Apfelbaum wrote:
+>> On 02/13/2017 06:33 AM, David Gibson wrote:
+>>> On Sun, Feb 12, 2017 at 09:05:46PM +0200, Marcel Apfelbaum wrote:
+>>>> On 02/10/2017 02:37 AM, David Gibson wrote:
+>>>>> On Thu, Feb 09, 2017 at 10:04:47AM +0100, Laszlo Ersek wrote:
+>>>>>> On 02/09/17 05:16, David Gibson wrote:
+>>>>>>> On Wed, Feb 08, 2017 at 11:40:50AM +0100, Laszlo Ersek wrote:
+>>>>>>>> On 02/08/17 07:16, David Gibson wrote:
+>>>>>>>>> Marcel,
+>>>>>>>>>
+>>>>>>>>> Your original patch adding PCIe support to virtio-pci.c has the
+>>>>>>>>> limitation noted below that PCIe won't be enabled if the device is on
+>>>>>>>>> the root bus (rather than under a root or downstream port).  As
+>>>>>>>>> reasoned below, I think removing the check is correct, even for x86
+>>>>>>>>> (though it would rarely be useful there).  But I could well have
+>>>>>>>>> missed something.  Let me know if so...
+>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>> Virtio devices can appear as either vanilla PCI or PCI-Express devices
+>>>>>>>>> depending on the bus they're connected to.  At the moment it will only
+>>>>>>>>> appear as vanilla PCI if connected to the root bus of a PCIe host bridge.
+>>>>>>>>>
+>>>>>>>>> Presumably this is to reflect the fact that PCIe devices usually need to
+>>>>>>>>> be connected to a root (or further downstream) port rather than directly
+>>>>>>>>> on the root bus.  However, due to the odd requirements of the PAPR spec on the 'pseries'
+>>>>>>>>> machine type, it's normal for PCIe devices to appear on the root bus
+>>>>>>>>> without root ports.
+>>>>>>>>>
+>>>>>>>>> Further, even on x86, there's no inherent reason we couldn't present a
+>>>>>>>>> virtio device as an "integrated device" (typically used for things built
+>>>>>>>>> into the PCI chipset), and those devices *do* typically appear on the root
+>>>>>>>>> bus.
+>>>>>>>>
+>>>>>>>> I'm not personally making a counter-argument, just qouting some of
+>>>>>>>> the relevant parts of "docs/pcie.txt" ("PCI EXPRESS GUIDELINES"):
+>>>>>>>
+>>>>>>> So, an earlier discussion more or less concluded that the PCIe
+>>>>>>> guidelines don't really work with PAPR guests.  That comes because
+>>>>>>> PAPR was designed with PowerVM in mind which allows PCI passthrough
+>>>>>>> but doesn't do any emulated PCI devices.  So they wanted to present
+>>>>>>> passed through devices (virtual or phyical) to the guest without
+>>>>>>> inserting virtual root ports.
+>>>>>>>
+>>>>>>> Now, you can argue that this was a silly decision in PAPR, and you
+>>>>>>> could well be right, but there it is.
+>>>>>>
+>>>>>> I can totally accept this, but then we should state it as a fact near
+>>>>>> the top of "docs/pcie.txt".
+>>>>>>
+>>>>>>>
+>>>>>>>>> Place only the following kinds of devices directly on the Root Complex:
+>>>>>>>>>     (1) PCI Devices (e.g. network card, graphics card, IDE controller),
+>>>>>>>>>         not controllers. Place only legacy PCI devices on
+>>>>>>>>>         the Root Complex. These will be considered Integrated Endpoints.
+>>>>>>>>>         Note: Integrated Endpoints are not hot-pluggable.
+>>>>>>>>>
+>>>>>>>>>         Although the PCI Express spec does not forbid PCI Express devices as
+>>>>>>>>>         Integrated Endpoints, existing hardware mostly integrates legacy PCI
+>>>>>>>>>         devices with the Root Complex.
+>>>>>>>
+>>>>>>> "Mostly".. on my laptop at least the GPU shows up as an integrated PCI
+>>>>>>> Express endpoint, so it's certainly not the case that *all* root bus
+>>>>>>> devices are legacy.
+>>>>>>>
+>>>>>>>> Guest OSes are suspected to behave
+>>>>>>>>>         strangely when PCI Express devices are integrated
+>>>>>>>>>         with the Root Complex.
+>>>>>>>
+>>>>>>> Clearly not that strangely, that often, since my laptop works just fine.
+>>>>>>>
+>>>>>>>>>
+>>>>>>>>>     [...]
+>>>>>>>>>
+>>>>>>>>> 2.2 PCI Express only hierarchy
+>>>>>>>>> ==============================
+>>>>>>>>> Always use PCI Express Root Ports to start PCI Express hierarchies.
+>>>>>>>>
+>>>>>>>> Above you mention "it's normal for PCIe devices to appear on the root bus without root ports".
+>>>>>>>
+>>>>>>> Well "normal" perhaps wasn't the right word.  Let's say precedented,
+>>>>>>> if uncommon.
+>>>>>>>
+>>>>>>>> Let me turn the question around: is it a *problem* for "pseries" if
+>>>>>>>> we require root ports? If so, why exactly?
+>>>>>>>
+>>>>>>> That's.. a complex question.  At least Linux guests (and we don't
+>>>>>>> support any others yet) might cope with the addition of root ports.
+>>>>>>> Maybe.  I have discussed this option with BenH and others.
+>>>>>>>
+>>>>>>> However it is gratuitously different from how PCIe devices will
+>>>>>>> typically appear for the same guest running under PowerVM.  Although I
+>>>>>>> suspect Linux would cope with the "normal standard" rather than "PAPR
+>>>>>>> standard" presentation, I'm not as confident about it as I would like.
+>>>>>>>
+>>>>>>> Another consideration here is that other PCIe capable qemu emulated
+>>>>>>> devices, such as XHCI, will present fine as PCIe integrated endpoints
+>>>>>>> when attached to the root bus.  Libvirt won't do that usually, of
+>>>>>>> course, and it may not be the recommended way of doing things (on PC)
+>>>>>>> but it's possible.  I don't see any particular reason that virtio-pci
+>>>>>>> should enforce the root port requirement more so than any other
+>>>>>>> device.
+>>>>>>>
+>>>>>>>> On 02/08/17 07:16, David Gibson wrote:
+>>>>>>>>>
+>>>>>>>>> pcie_endpoint_cap_init() already automatically adjusts to advertise as
+>>>>>>>>> an integrated device rather than a "normal" PCIe endpoint when attached to
+>>>>>>>>> a root bus.  So we can remove the check for root bus within virtio and
+>>>>>>>>> allow (at the user's discretion) a PCIe virtio bus to be attached to a
+>>>>>>>>> root bus.
+>>>>>>>>
+>>>>>>>> If Marcel thinks this is a good change, then I think we should go
+>>>>>>>> through "docs/pcie.txt" with a fine-toothed comb, and update all
+>>>>>>>> relevant spots. (If Marcel agrees, perhaps you can include such
+>>>>>>>> hunks in your patch at once.)
+>>>>>>>
+>>>>>>> Actually, I think that would be a neverending process.  Maybe better
+>>>>>>> to put in a whole different spapr-pcie.txt with the assorted ways that
+>>>>>>> PAPR violates PCIe conventions.
+>>>>>>
+>>>>>> That works for me too, but I think it would be a lot more work for you
+>>>>>> and others.
+>>>>>>
+>>>>>> I plan on consulting "docs/pcie.txt" frequently; among other things, for
+>>>>>> deciding debates. Thus, improving the scope of "docs/pcie.txt" is very
+>>>>>> welcome IMO.
+>>>>>>
+>>>>>>>
+>>>>>>>> It also may have consequences for libvirt (but I see you addressed
+>>>>>>>> Andrea at once, which is great).
+>>>>>>>
+>>>>>>> Right, I've been discussed this with Andrea all along.  We're working
+>>>>>>> on a proposed PAPR specific way of allocating PCI and PCIe addresses
+>>>>>>> (different from the PCIe normal way, but the same as each other).
+>>>>>>> That will simplify adding PCIe support to PAPR, and also has some
+>>>>>>> other advantages for PAPR guests (related to the platform specific
+>>>>>>> isolation, hotplug  and error recovery mechanisms - also different
+>>>>>>> from the normal PCIe ones).
+>>>>>>
+>>>>>> Great, if Andrea is aware, that's a relief.
+>>>>>>
+>>>>>> Can you resubmit this patch with a small hunk for "docs/pcie.txt" that
+>>>>>> removes PAPR from the scope?
+>>>>>
+>>>>
+>>>> Hi David,
+>>>> Sorry for the delay, I just came back from PTO.
+>>>>
+>>>>> Well, first I'd like to see if Marcel knows of some reason I didn't
+>>>>> think of why this test is important for virtio particularly here.  But
+>>>>> assuming the basic idea is acceptable, then yes, I'll update pcie.txt.
+>>>>>
+>>>>
+>>>> There are two reasons for keeping virtio Integrated Endpoints as PCI devices.
+>>>> 1. The first point is generic; even if having PCIe devices as Integrated Endpoints should be OK,
+>>>>    is not recommended because some guests may miss-behave (*). X86 arch supports a large number
+>>>>    of guests and we don't want to check and fix everything if *we don't have to*.
+>>>>    Even if is not written anywhere and there are actually some PCI Express Integrated Endpoints,
+>>>>    most of them are legacy PCI devices (I actually think this is why we have Integrated Endpoints
+>>>>    at all, but I might be wrong).
+>>>
+>>> Hm, ok.  Could we implement that restriction in the pci/pcie core
+>>> rather than in the virtio device?
+>>
+>> I am not sure if we should do that. Most of the devices are PCI or PCIe.
+>> Only some devices are "hybrid", the virtio devices, XHCI and I am not sure we have more.
 >
-> Here iiuc you mean that "L1 guest with vIOMMU performs better than
-> when without vIOMMU", while ...
->
-
-Ah, I think I wrote the second sentence wrong. What I really meant is that
-I tested the performance using virtio and the device direct assignment for
-L1.
-
-
->
-> > >> > I thought whether the device is assigned to L1 or
-> > >> > L2, the DMA translation is done by iommu, which is pretty fast?
-> Maybe
-> > >> > I misunderstood what you said?
-> > >
-> > > I failed to understand why an vIOMMU could help boost performance. :(
-> > > Could you provide your command line here so that I can try to
-> > > reproduce?
-> >
-> > Sure. This is the command line to launch L1 VM
-> >
-> > qemu-system-x86_64 -M q35,accel=kvm,kernel-irqchip=split \
-> > -m 12G -device intel-iommu,intremap=on,eim=off,caching-mode=on \
-> > -drive file=/mydata/guest0.img,format=raw --nographic -cpu host \
-> > -smp 4,sockets=4,cores=1,threads=1 \
-> > -device vfio-pci,host=08:00.0,id=net0
-> >
-> > And this is for L2 VM.
-> >
-> > ./qemu-system-x86_64 -M q35,accel=kvm \
-> > -m 8G \
-> > -drive file=/vm/l2guest.img,format=raw --nographic -cpu host \
-> > -device vfio-pci,host=00:03.0,id=net0
->
-> ... here looks like these are command lines for L1/L2 guest, rather
-> than L1 guest with/without vIOMMU?
->
-
-That's right. I thought you were asking about command lines for L1/L2 guest
-:(.
-I think I made the confusion, and as I said above, I didn't mean to talk
-about the performance of L1 guest with/without vIOMMO.
-We can move on!
-
-
->
-> >
-> > >
-> > > Besides, what I mentioned above is just in case you don't know that
-> > > vIOMMU will drag down the performance in most cases.
-> > >
-> > > I think here to be more explicit, the overhead of vIOMMU is different
-> > > for assigned devices and emulated ones.
-> > >
-> > >   (1) For emulated devices, the overhead is when we do the
-> > >       translation, or say when we do the DMA operation. We need
-> > >       real-time translation which should drag down the performance.
-> > >
-> > >   (2) For assigned devices (our case), the overhead is when we setup
-> > >       the pages (since we are trapping the setup procedures via CM
-> > >       bit). However, after it's setup, we should have no much
-> > >       performance drag when we really do the data transfer (during
-> > >       DMA) since that'll all be done in the hardware IOMMU (no matter
-> > >       whether the device is assigned to L1/L2 guest).
-> > >
-> > > Now, after I know your use case now (use vIOMMU in L1 guest, don't use
-> > > vIOMMU in L2 guest, only use assigned devices), I suspect we would
-> > > have no big problem according to (2).
-> > >
-> > >> >
-> > >> >>>
-> > >> >>> First, I am having trouble to boot a VM with the emulated iommu. I
-> > >> >>> have posted my problem to the qemu user mailing list[1],
-> > >> >>
-> > >> >> Here I would suggest that you cc qemu-devel as well next time:
-> > >> >>
-> > >> >>   qemu-devel@nongnu.org
-> > >> >>
-> > >> >> Since I guess not all people are registered to qemu-discuss, at
-> least
-> > >> >> I am not in that loop. Imho cc qemu-devel could let the question
-> > >> >> spread to more people, and it'll get a higher chance to be
-> answered.
-> > >> >
-> > >> > Thanks. I'll cc qemu-devel next time.
-> > >> >
-> > >> >>
-> > >> >>> but to put it
-> > >> >>> in a nutshell, I'd like to know the setting I can reuse to boot a
-> VM
-> > >> >>> with the emulated iommu. (e.g. how to create a VM with q35 chipset
-> > >> >>> and/or libvirt xml if you use virsh).
-> > >> >>
-> > >> >> IIUC you are looking for device assignment for the nested VM case.
-> So,
-> > >> >> firstly, you may need my tree to run this (see below). Then, maybe
-> you
-> > >> >> can try to boot a L1 guest with assigned device (under VT-d
-> > >> >> protection), with command:
-> > >> >>
-> > >> >> $qemu -M q35,accel=kvm,kernel-irqchip=split -m 1G \
-> > >> >>       -device intel-iommu,intremap=on,eim=off,caching-mode=on \
-> > >> >>       -device vfio-pci,host=$HOST_PCI_ADDR \
-> > >> >>       $YOUR_IMAGE_PATH
-> > >> >>
-> > >> >
-> > >> > Thanks! I'll try this right away.
-> > >> >
-> > >> >> Here $HOST_PCI_ADDR should be something like 05:00.0, which is the
-> > >> >> host PCI address of the device to be assigned to guest.
-> > >> >>
-> > >> >> (If you go over the cover letter in [4], you'll see similar command
-> > >> >>  line there, though with some more devices assigned, and with
-> traces)
-> > >> >>
-> > >> >> If you are playing with nested VM, you'll also need a L2 guest,
-> which
-> > >> >> will be run inside the L1 guest. It'll require similar command
-> line,
-> > >> >> but I would suggest you first try a L2 guest without intel-iommu
-> > >> >> device. Frankly speaking I haven't played with that yet, so just
-> let
-> > >> >> me know if you got any problem, which is possible. :-)
-> > >> >>
-> > >>
-> > >> I was able to boot L2 guest without assigning a network device
-> > >> successfully. (host iommu was on, L1 iommu was on, and the network
-> > >> device was assigned to L1)
-> > >>
-> > >> Then, I unbound the network device in L1 and bound it to vfio-pci.
-> > >> When I try to run L2 with the following command, I got an assertion.
-> > >>
-> > >> # ./qemu-system-x86_64 -M q35,accel=kvm \
-> > >> -m 8G \
-> > >> -drive file=/vm/l2guest.img,format=raw --nographic -cpu host \
-> > >> -device vfio-pci,host=00:03.0,id=net0
-> > >>
-> > >> qemu-system-x86_64: hw/pci/pcie.c:686: pcie_add_capability: Assertion
-> > >> `prev >= 0x100' failed.
-> > >> Aborted (core dumped)
-> > >>
-> > >> Thoughts?
-> > >
-> > > I don't know whether it'll has anything to do with how vfio-pci works,
-> > > anyway I cced Alex and the list in case there is quick answer.
-> > >
-> > > I'll reproduce this nested case and update when I got anything.
-> >
-> > Thanks!
->
-> I tried to reproduce this issue with the following 10g network card:
->
-> 00:03.0 Ethernet controller: Intel Corporation Ethernet Controller
-> 10-Gigabit X540-AT2 (rev 01)
->
-> In my case, both L1/L2 guests can boot with the assigned device. I
-> also did a quick netperf TCP STREAM test, the result is (in case you
-> are interested):
->
->    L1 guest: 1.12Gbps
->    L2 guest: 8.26Gbps
->
-> First of all, just to confirm that you were using the same qemu binary
-> in both host and L1 guest, right?
+> Ok, I see your point, the pcie core might not be right.  But it still
+> seems really weird to have it explicitly in each hybrid device, even
+> if it's just the two.  As the code stands right now, XHCI and virtio
+> have different behaviour, without a clear reason for it.
 >
 
-Right. I'm using your branch.
+I suppose XHCI can behave the same as virtio if Gerd has nothing against it
+(remain PCI if plugged into the Root Complex), but I don't know how it will help your case.
 
-
->
-> Then, I *think* above assertion you encountered would fail only if
-> prev == 0 here, but I still don't quite sure why was that happening.
-> Btw, could you paste me your "lspci -vvv -s 00:03.0" result in your L1
-> guest?
+> Maybe a hybrid_setup() helper function?
 >
 
-Sure. This is from my L1 guest.
-
-root@guest0:~# lspci -vvv -s 00:03.0
-00:03.0 Network controller: Mellanox Technologies MT27500 Family
-[ConnectX-3]
-Subsystem: Mellanox Technologies Device 0050
-Control: I/O- Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr-
-Stepping- SERR+ FastB2B- DisINTx+
-Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort-
-<MAbort- >SERR- <PERR- INTx-
-Latency: 0, Cache Line Size: 64 bytes
-Interrupt: pin A routed to IRQ 23
-Region 0: Memory at fe900000 (64-bit, non-prefetchable) [size=1M]
-Region 2: Memory at fe000000 (64-bit, prefetchable) [size=8M]
-Expansion ROM at fea00000 [disabled] [size=1M]
-Capabilities: [40] Power Management version 3
-Flags: PMEClk- DSI- D1- D2- AuxCurrent=0mA PME(D0-,D1-,D2-,D3hot-,D3cold-)
-Status: D0 NoSoftRst+ PME-Enable- DSel=0 DScale=0 PME-
-Capabilities: [48] Vital Product Data
-Product Name: CX354A - ConnectX-3 QSFP
-Read-only fields:
-[PN] Part number: MCX354A-FCBT
-[EC] Engineering changes: A4
-[SN] Serial number: MT1346X00791
-[V0] Vendor specific: PCIe Gen3 x8
-[RV] Reserved: checksum good, 0 byte(s) reserved
-Read/write fields:
-[V1] Vendor specific: N/A
-[YA] Asset tag: N/A
-[RW] Read-write area: 105 byte(s) free
-[RW] Read-write area: 253 byte(s) free
-[RW] Read-write area: 253 byte(s) free
-[RW] Read-write area: 253 byte(s) free
-[RW] Read-write area: 253 byte(s) free
-[RW] Read-write area: 253 byte(s) free
-[RW] Read-write area: 253 byte(s) free
-[RW] Read-write area: 253 byte(s) free
-[RW] Read-write area: 253 byte(s) free
-[RW] Read-write area: 253 byte(s) free
-[RW] Read-write area: 253 byte(s) free
-[RW] Read-write area: 253 byte(s) free
-[RW] Read-write area: 253 byte(s) free
-[RW] Read-write area: 253 byte(s) free
-[RW] Read-write area: 253 byte(s) free
-[RW] Read-write area: 252 byte(s) free
-End
-Capabilities: [9c] MSI-X: Enable+ Count=128 Masked-
-Vector table: BAR=0 offset=0007c000
-PBA: BAR=0 offset=0007d000
-Capabilities: [60] Express (v2) Root Complex Integrated Endpoint, MSI 00
-DevCap: MaxPayload 256 bytes, PhantFunc 0
-ExtTag- RBE+
-DevCtl: Report errors: Correctable- Non-Fatal+ Fatal+ Unsupported+
-RlxdOrd- ExtTag- PhantFunc- AuxPwr- NoSnoop-
-MaxPayload 256 bytes, MaxReadReq 4096 bytes
-DevSta: CorrErr+ UncorrErr- FatalErr- UnsuppReq+ AuxPwr- TransPend-
-DevCap2: Completion Timeout: Range ABCD, TimeoutDis+, LTR-, OBFF Not
-Supported
-DevCtl2: Completion Timeout: 65ms to 210ms, TimeoutDis-, LTR-, OBFF Disabled
-Capabilities: [100 v0] #00
-Capabilities: [148 v1] Device Serial Number f4-52-14-03-00-15-5b-80
-Capabilities: [154 v2] Advanced Error Reporting
-UESta: DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- MalfTLP-
-ECRC- UnsupReq- ACSViol-
-UEMsk: DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt+ UnxCmplt+ RxOF- MalfTLP-
-ECRC- UnsupReq- ACSViol-
-UESvrt: DLP+ SDES- TLP+ FCP+ CmpltTO+ CmpltAbrt- UnxCmplt- RxOF+ MalfTLP+
-ECRC+ UnsupReq- ACSViol-
-CESta: RxErr- BadTLP- BadDLLP- Rollover- Timeout- NonFatalErr-
-CEMsk: RxErr+ BadTLP+ BadDLLP+ Rollover+ Timeout+ NonFatalErr+
-AERCap: First Error Pointer: 00, GenCap+ CGenEn- ChkCap+ ChkEn-
-Kernel driver in use: mlx4_core
+How would it help PAPR scenario? Anyway, Eduardo is working on supplying
+new query interfaces for libvirt and he touches this subject, I think
+he does plan to mark the hybrid devices in some way.
 
 
-
-> Thanks,
+>>> That would then protect things like
+>>> XHCI as well.
+>>
+>> I don't see a reason to have XHCI as Integrated Endpoint, I think it should be always
+>> plugged into a root port. (for x86. arm and power)
 >
-> -- peterx
+> No, not for Power.  Well, ok, yes for most ppc machine types, but not
+> for the paravirtualized 'pseries' machine (which is the one we most
+> care about).
 >
+> Well.. I guess it doesn't need to be an Integrated Endpoint per se,
+> but we should be able to have it appear on the guest root bus.
+>
+> The thing to realize is that the paravirtualized PCI interfaces in
+> PAPR mean there's very little guest visible difference between PCI and
+> PCIe.  In fact in most ways you could say that the paravirtualized bus
+> operates like a vanilla PCI bus.. except that it does provide a way to
+> access PCIe extended config space.
+
+Maybe we can have a new bus type deriving from PCIBus and sibling of the PCIe Bus.
+Then we can have the same rules as the PCI bus and add tweaks when necessary.
+
+This does not solve the virtio problem since the code is actively looking for
+a PCIe Root Port and we don't have it for PAPR.
+
+   Which means that you can use it to
+> drive PCIe devices just fine.  "Bus level" PCIe extensions like AER
+> and PCIe standard hotplug won't work, but PAPR has its own mechanisms
+> for those (common between PCI and PCIe).
+>
+> I did float the idea of having the pseries PCI bus remain plain PCI
+> but with a special flag to allow PCIe devices to be attached to it
+> anyway.  It wasn't greeted with much enthusiasm..
+>
+
+Can you point me to the discussion please? It seems similar to what I proposed above.
+
+As you properly described it, is much closer to PCI then PCIe, even the only characteristic
+that makes it "a little" PCIe, the Extended Configuration Space support,
+is done with an alternative interface.
+
+I agree the PAPR bus is not PCIe.
+
+>>   And for my purposes it would also make it easier to
+>>> implement aa machine type specific hook to re-allow that configuration
+>>> on pseries.
+>>
+>> I agree we need a solution for PAPR.
+>>
+>> What about a pcie_papr() function and then:
+>>
+>> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+>> index 5ce42af..2c646ae 100644
+>> --- a/hw/virtio/virtio-pci.c
+>> +++ b/hw/virtio/virtio-pci.c
+>> @@ -1804,7 +1804,7 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
+>>          return;
+>>      }
+>>
+>> -    if (pcie_port && pci_is_express(pci_dev)) {
+>> +    if ((pcie_port || pcie_parp()) && pci_is_express(pci_dev)) {
+>>          int pos;
+>>
+>>          pos = pcie_endpoint_cap_init(pci_dev, 0);
+>
+> That would be sufficient, yes, so I'll take it if we don't come to any
+> other solutions.
+
+OK
+
+  It still seems weird to me to have this logic within
+> a specific device implementation though.
+>
+
+I suppose you have a point, let's wait for Gerd and maybe Michael to comment
+on that, but anyway it will not help your case. (it will only make XHCI PCI if plugged into Root Complex)
+
+>>>
+>>> At the moment XHCI and virtio-pci behave differently, which seems less
+>>> than ideal.
+>>>
+>>>> 2. The second point is virtio specific. Not all the guests have virtio 1.0 support (e.g RHEL 6) and we allow them
+>>>>    to use legacy virtio devices as Integrated Endpoints (following the thought that this is why we have Integrated Endpoints)
+>>>>    Making the virtio devices PCI Express, but not virtio 1.0 is also problematic since now we will have too much
+>>>>    types of virtio devices. We want to keep it simple: virtio legacy
+>>>>    -> PCI, virtio modern -> PCIe.
+>>>
+>>> Ok.. it's not obvious to me why integrated endpoint vs. under a root
+>>> port is relevant to this.  Can't we enable/disable PCIe mode based
+>>> directly on the legacy/modern settings?
+>>>
+>>
+>> Yes, we can, but we don't want to do that. Previous setups will stop working
+>> and we will need libvirt to mange the disable-* properties.
+>> As a matter of fact the code today is after some discussions with libvirt guys.
+>
+> Uh.. I think I'm missing something.. but it's still not clear to me
+> why this would break existing setups or impose more work on libvirt.
+>
+
+Long story short, libvirt guys don't want to manually set the disable-* properties
+of virtio devices to make them comply to our goal (legacy -> PCI, modern PCIe).
+They also don't want to look at QEMU version/machine type to make a decision on the above properties.
+
+I agree the solution is not perfect, but at least it makes our testing matrix smaller
+and makes our PCIe guidelines a little easier to understand (e.g. all supported devices are PCIe,
+but if want legacy PCI devices put them on the Root Complex)
+
+XHCI being PCIe on Root Complex is an unintended exception, but we want it connected to a
+Root Port anyway, we don't have anything to gain from having it as Integrated Endpoint.
+We only loose a slot that can be used by 8 Root Ports assembled into one multi-function device.
+
+PAPR bus should not be considered PCIe and should have a different set of rules allowing PCIe
+devices to be plugged into Root Complex.
+
+Thanks,
+Marcel
+
+>>>> (*) A while ago Alex Williamson found such of issue, I think is this one:
+>>>> 0282ab (vfio/pci: Hide device PCIe capability on non-express buses for PCIe VMs)
+>>>
+>>> It's also not clear to me why this fix is relevant to the question.
+>>> That change disables the PCIe capability on a bus which is
+>>> not-express, but is under an express root bridge (and is therefore
+>>> clearly *not* on the root bus).  For the case I'm talking about the
+>>> *is* on an express bus and it *is* the root bus.  AFAICT that patch
+>>> would be relevant only for devices under a PCIe-to-PCI bridge on a
+>>> PCIe system.
+>>>
+>>
+>> I might have selected the wrong patch.
+>
+> Ok.
+>
+>>
+>> Thanks,
+>> Marcel
+>>
+>>
+>>>>>> be appreciated too, if that makes sense. (By default we aim at
+>>>>>> multi-arch / multi-target with this document; we may not have stated it
+>>>>>> explicitly, but AFAIR we intend to cover aarch64 / "virt" too.)
+>>>>>
+>>>>> Right, that was my understanding as well.
+>>>>>
+>>>>
+>>>> Indeed, we want the document to support them all. If PAPR is different, we should mention it.
+>>>
+>>> Sure.  I'm trying to work out what we can/should do for pseries first;
+>>> I'll write something up for the docs when I have something I think is
+>>> ready to merge.
+>>>
+>>
 >
