@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cdUlf-0003UA-Fi
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 23:31:10 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cdVG6-0000Mv-1f
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 00:02:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cdUld-0001Oo-Gu
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 23:31:07 -0500
-Received: from indium.canonical.com ([91.189.90.7]:58026)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cdUld-0001O8-5P
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 23:31:05 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cdUlb-0004PB-SA
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 04:31:04 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C90D52E80CA
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 04:31:03 +0000 (UTC)
+	(envelope-from <dgibson@ozlabs.org>) id 1cdVG4-00013D-Ll
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 00:02:34 -0500
+Date: Tue, 14 Feb 2017 16:02:19 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170214050219.GH2169@umbus.fritz.box>
+References: <1486994957-20400-1-git-send-email-clg@kaod.org>
+	<1486994957-20400-2-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 14 Feb 2017 04:17:36 -0000
-From: Launchpad Bug Tracker <897750@bugs.launchpad.net>
-Reply-To: Bug 897750 <897750@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20111129155310.23239.76602.malonedeb@wampee.canonical.com>
-Message-Id: <20170214041736.28611.22757.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 897750] Re: libvirt/kvm problem with disk
- attach/detach/reattach on running virt
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="vs0rQTeTompTJjtd"
+Content-Disposition: inline
+In-Reply-To: <1486994957-20400-2-git-send-email-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 1/2] ppc/xics: remove set_nr_irqs() handler
+ from XICSStateClass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,371 +25,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-[Expired for qemu-kvm (Ubuntu) because there has been no activity for 60
-days.]
-
-** Changed in: qemu-kvm (Ubuntu)
-       Status: Incomplete =3D> Expired
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/897750
-
-Title:
-  libvirt/kvm problem with disk attach/detach/reattach on running virt
-
-Status in QEMU:
-  Expired
-Status in qemu-kvm package in Ubuntu:
-  Expired
-
-Bug description:
-  Release:         Ubuntu 11.10 (Oneiric)
-  libvirt-bin:      0.9.2-4ubuntu15.1
-  qemu-kvm:   0.14.1+noroms-0ubuntu6
-
-  Summary:    With a running KVM virt,   performing an 'attach-disk',  then=
- a 'detach-disk', then another 'attach-disk' =
-
-  in an attempt to reattach the volume at the same point on the virt, fails=
-, with the qemu reporting back to
-  libvirt a 'Duplicate ID' error.
-
-  Expected behavior:   The 2nd invocation of 'attach-disk' should have succ=
-eeded
-  Actual behavior:         Duplicate ID error reported
-
-  =
-
-  I believe this is most likely a qemu-kvm issue, as the DOM  kvm spits bac=
-k at libvirt after the 'detach-disk'
-  does not show the just-detached disk.   There is some kind of registry/lo=
-okup for devices in qemu-kvm
-  and for whatever reason, the entry for the disk does not get removed when=
- it is detached from the
-  virt.   Specifically, the error gets reported at the 2nd attach-disk atte=
-mpt from:
-    =
-
-    qemu-option.c:qemu_opts_create:697
-
-  684 QemuOpts *qemu_opts_create(QemuOptsList *list, const char *id, int fa=
-il_if_exists)                                                  =
-
-  685 {                                                                    =
-                                                               =
-
-  686     QemuOpts *opts =3D NULL;                                         =
-                                                                 =
-
-  687                                                                      =
-                                                               =
-
-  688     if (id) {                                                        =
-                                                               =
-
-  689         if (!id_wellformed(id)) {                                    =
-                                                               =
-
-  690             qerror_report(QERR_INVALID_PARAMETER_VALUE, "id", "an ide=
-ntifier");                                                     =
-
-  691             error_printf_unless_qmp("Identifiers consist of letters, =
-digits, '-', '.', '_', starting with a letter.\n");            =
-
-  692             return NULL;                                             =
-                                                               =
-
-  693         }                                                            =
-                                                               =
-
-  694         opts =3D qemu_opts_find(list, id);                           =
-                                                                 =
-
-  695         if (opts !=3D NULL) {                                        =
-                                                                 =
-
-  696             if (fail_if_exists) {                                    =
-                                                               =
-
-  697                 qerror_report(QERR_DUPLICATE_ID, id, list->name);    =
-       <<<< =3D=3D=3D=3D=3D=3D HERE =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D      =
-                                                    =
-
-  698                 return NULL;                                         =
-                                                               =
-
-  699             } else {                                                 =
-                                                               =
-
-  700                 return opts;                                         =
-                                                               =
-
-  701             }                                                        =
-                                                               =
-
-  702         }                                                            =
-                                                               =
-
-  703     }                                                                =
-                                                               =
-
-  704     opts =3D qemu_mallocz(sizeof(*opts));                            =
-                                                                 =
-
-  705     if (id) {                                                        =
-                                                               =
-
-  706         opts->id =3D qemu_strdup(id);                                =
-                                                                 =
-
-  707     }                                                                =
-                                                               =
-
-  708     opts->list =3D list;                                             =
-                                                                 =
-
-  709     loc_save(&opts->loc);                                            =
-                                                               =
-
-  710     QTAILQ_INIT(&opts->head);                                        =
-                                                               =
-
-  711     QTAILQ_INSERT_TAIL(&list->head, opts, next);                     =
-                                                               =
-
-  712     return opts;                                                     =
-                                                               =
-
-  713 }                                                                    =
-                                                               =
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  Output of my  attach/detach/attach
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  virsh # attach-disk base1 /var/lib/libvirt/images/extrastorage.img vdb
-  Disk attached successfully
+--vs0rQTeTompTJjtd
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-  virsh # dumpxml base1
-  <domain type=3D'kvm' id=3D'2'>
-    <name>base1</name>
-    <uuid>9ebebe7f-7dfa-4735-a80c-c19ebe4e1459</uuid>
-    <memory>1048576</memory>
-    <currentMemory>1048576</currentMemory>
-    <vcpu>2</vcpu>
-    <os>
-      <type arch=3D'x86_64' machine=3D'pc-0.14'>hvm</type>
-      <boot dev=3D'hd'/>
-    </os>
-    <features>
-      <acpi/>
-      <apic/>
-      <pae/>
-    </features>
-    <cpu match=3D'exact'>
-      <model>Opteron_G3</model>
-      <vendor>AMD</vendor>
-      <feature policy=3D'require' name=3D'skinit'/>
-      <feature policy=3D'require' name=3D'vme'/>
-      <feature policy=3D'require' name=3D'mmxext'/>
-      <feature policy=3D'require' name=3D'fxsr_opt'/>
-      <feature policy=3D'require' name=3D'cr8legacy'/>
-      <feature policy=3D'require' name=3D'ht'/>
-      <feature policy=3D'require' name=3D'3dnowprefetch'/>
-      <feature policy=3D'require' name=3D'3dnowext'/>
-      <feature policy=3D'require' name=3D'wdt'/>
-      <feature policy=3D'require' name=3D'extapic'/>
-      <feature policy=3D'require' name=3D'pdpe1gb'/>
-      <feature policy=3D'require' name=3D'osvw'/>
-      <feature policy=3D'require' name=3D'cmp_legacy'/>
-      <feature policy=3D'require' name=3D'3dnow'/>
-    </cpu>
-    <clock offset=3D'utc'/>
-    <on_poweroff>destroy</on_poweroff>
-    <on_reboot>restart</on_reboot>
-    <on_crash>restart</on_crash>
-    <devices>
-      <emulator>/usr/bin/kvm</emulator>
-      <disk type=3D'file' device=3D'disk'>
-        <driver name=3D'qemu' type=3D'raw'/>
-        <source file=3D'/dev/rbd1'/>
-        <target dev=3D'vda' bus=3D'virtio'/>
-        <alias name=3D'virtio-disk0'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
-function=3D'0x0'/>
-      </disk>
-      <disk type=3D'block' device=3D'disk'>
-        <driver name=3D'qemu' type=3D'raw'/>
-        <source dev=3D'/var/lib/libvirt/images/extrastorage.img'/>
-        <target dev=3D'vdb' bus=3D'virtio'/>
-        <alias name=3D'virtio-disk1'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x07' =
-function=3D'0x0'/>
-      </disk>
-      <controller type=3D'ide' index=3D'0'>
-        <alias name=3D'ide0'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' =
-function=3D'0x1'/>
-      </controller>
-      <interface type=3D'bridge'>
-        <mac address=3D'52:54:00:a2:c1:2d'/>
-        <source bridge=3D'br0'/>
-        <target dev=3D'vnet0'/>
-        <model type=3D'virtio'/>
-        <alias name=3D'net0'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x03' =
-function=3D'0x0'/>
-      </interface>
-      <serial type=3D'pty'>
-        <source path=3D'/dev/pts/1'/>
-        <target port=3D'0'/>
-        <alias name=3D'serial0'/>
-      </serial>
-      <console type=3D'pty' tty=3D'/dev/pts/1'>
-        <source path=3D'/dev/pts/1'/>
-        <target type=3D'serial' port=3D'0'/>
-        <alias name=3D'serial0'/>
-      </console>
-      <input type=3D'mouse' bus=3D'ps2'/>
-      <graphics type=3D'vnc' port=3D'5900' autoport=3D'yes'/>
-      <sound model=3D'ich6'>
-        <alias name=3D'sound0'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x04' =
-function=3D'0x0'/>
-      </sound>
-      <video>
-        <model type=3D'cirrus' vram=3D'9216' heads=3D'1'/>
-        <alias name=3D'video0'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x02' =
-function=3D'0x0'/>
-      </video>
-      <memballoon model=3D'virtio'>
-        <alias name=3D'balloon0'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x06' =
-function=3D'0x0'/>
-      </memballoon>
-    </devices>
-    <seclabel type=3D'dynamic' model=3D'apparmor'>
-      <label>libvirt-9ebebe7f-7dfa-4735-a80c-c19ebe4e1459</label>
-      <imagelabel>libvirt-9ebebe7f-7dfa-4735-a80c-c19ebe4e1459</imagelabel>
-    </seclabel>
-  </domain>
+On Mon, Feb 13, 2017 at 03:09:16PM +0100, C=E9dric Le Goater wrote:
+> Today, the ICS (Interrupt Controller Source) object is created and
+> realized by the init and realize routines of the XICS object, but some
+> of the parameters are only known at the machine level.
+>=20
+> These parameters are passed from the sPAPR machine to the ICS object
+> in a rather convoluted way using property handlers and a class handler
+> of the XICS object. The number of irqs required to allocate the IRQ
+> state objects in the ICS realize routine is one of them.
+>=20
+> Let's simplify the process by creating the ICS object along with the
+> XICS object at the machine level and link the ICS into the XICS list
+> of ICSs at this level also. In the sPAPR machine, there is only a
+> single ICS but that will change with the PowerNV machine.
+>=20
+> Also, QOMify the creation of the objects and get rid of the
+> superfluous code.
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-  virsh # detach-disk base1 vdb
-  Disk detached successfully
+I like the basic idea here: while the ics and icp objects are pretty
+straightforward, the "xics" object has always been a bit of a hack,
+with logic that really belongs in the machine.
 
-  virsh # dumpxml base1
-  <domain type=3D'kvm' id=3D'2'>
-    <name>base1</name>
-    <uuid>9ebebe7f-7dfa-4735-a80c-c19ebe4e1459</uuid>
-    <memory>1048576</memory>
-    <currentMemory>1048576</currentMemory>
-    <vcpu>2</vcpu>
-    <os>
-      <type arch=3D'x86_64' machine=3D'pc-0.14'>hvm</type>
-      <boot dev=3D'hd'/>
-    </os>
-    <features>
-      <acpi/>
-      <apic/>
-      <pae/>
-    </features>
-    <cpu match=3D'exact'>
-      <model>Opteron_G3</model>
-      <vendor>AMD</vendor>
-      <feature policy=3D'require' name=3D'skinit'/>
-      <feature policy=3D'require' name=3D'vme'/>
-      <feature policy=3D'require' name=3D'mmxext'/>
-      <feature policy=3D'require' name=3D'fxsr_opt'/>
-      <feature policy=3D'require' name=3D'cr8legacy'/>
-      <feature policy=3D'require' name=3D'ht'/>
-      <feature policy=3D'require' name=3D'3dnowprefetch'/>
-      <feature policy=3D'require' name=3D'3dnowext'/>
-      <feature policy=3D'require' name=3D'wdt'/>
-      <feature policy=3D'require' name=3D'extapic'/>
-      <feature policy=3D'require' name=3D'pdpe1gb'/>
-      <feature policy=3D'require' name=3D'osvw'/>
-      <feature policy=3D'require' name=3D'cmp_legacy'/>
-      <feature policy=3D'require' name=3D'3dnow'/>
-    </cpu>
-    <clock offset=3D'utc'/>
-    <on_poweroff>destroy</on_poweroff>
-    <on_reboot>restart</on_reboot>
-    <on_crash>restart</on_crash>
-    <devices>
-      <emulator>/usr/bin/kvm</emulator>
-      <disk type=3D'file' device=3D'disk'>
-        <driver name=3D'qemu' type=3D'raw'/>
-        <source file=3D'/dev/rbd1'/>
-        <target dev=3D'vda' bus=3D'virtio'/>
-        <alias name=3D'virtio-disk0'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
-function=3D'0x0'/>
-      </disk>
-      <controller type=3D'ide' index=3D'0'>
-        <alias name=3D'ide0'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' =
-function=3D'0x1'/>
-      </controller>
-      <interface type=3D'bridge'>
-        <mac address=3D'52:54:00:a2:c1:2d'/>
-        <source bridge=3D'br0'/>
-        <target dev=3D'vnet0'/>
-        <model type=3D'virtio'/>
-        <alias name=3D'net0'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x03' =
-function=3D'0x0'/>
-      </interface>
-      <serial type=3D'pty'>
-        <source path=3D'/dev/pts/1'/>
-        <target port=3D'0'/>
-        <alias name=3D'serial0'/>
-      </serial>
-      <console type=3D'pty' tty=3D'/dev/pts/1'>
-        <source path=3D'/dev/pts/1'/>
-        <target type=3D'serial' port=3D'0'/>
-        <alias name=3D'serial0'/>
-      </console>
-      <input type=3D'mouse' bus=3D'ps2'/>
-      <graphics type=3D'vnc' port=3D'5900' autoport=3D'yes'/>
-      <sound model=3D'ich6'>
-        <alias name=3D'sound0'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x04' =
-function=3D'0x0'/>
-      </sound>
-      <video>
-        <model type=3D'cirrus' vram=3D'9216' heads=3D'1'/>
-        <alias name=3D'video0'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x02' =
-function=3D'0x0'/>
-      </video>
-      <memballoon model=3D'virtio'>
-        <alias name=3D'balloon0'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x06' =
-function=3D'0x0'/>
-      </memballoon>
-    </devices>
-    <seclabel type=3D'dynamic' model=3D'apparmor'>
-      <label>libvirt-9ebebe7f-7dfa-4735-a80c-c19ebe4e1459</label>
-      <imagelabel>libvirt-9ebebe7f-7dfa-4735-a80c-c19ebe4e1459</imagelabel>
-    </seclabel>
-  </domain>
+But.. I don't think the approach here really works.  Specifically..
 
-  virsh # attach-disk base1 /var/lib/libvirt/images/extrastorage.img vdb
-  error: Failed to attach disk
-  error: operation failed: adding virtio-blk-pci,bus=3Dpci.0,addr=3D0x8,dri=
-ve=3Ddrive-virtio-disk1,id=3Dvirtio-disk1 device failed: Duplicate ID 'virt=
-io-disk1' for device
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
+[snip]
+> -static XICSState *try_create_xics(const char *type, int nr_servers,
+> -                                  int nr_irqs, Error **errp)
+> -{
+> -    Error *err =3D NULL;
+> -    DeviceState *dev;
+> +static XICSState *try_create_xics(const char *type, const char *type_ics,
+> +                                  int nr_servers, int nr_irqs, Error **e=
+rrp)
+> +{
+> +    Error *err =3D NULL, *local_err =3D NULL;
+> +    XICSState *xics;
+> +    ICSState *ics =3D NULL;
+> +
+> +    xics =3D XICS_COMMON(object_new(type));
+> +    qdev_set_parent_bus(DEVICE(xics), sysbus_get_default());
+> +    object_property_set_int(OBJECT(xics), nr_servers, "nr_servers", &err=
+);
+> +    object_property_set_bool(OBJECT(xics), true, "realized", &local_err);
+> +    error_propagate(&err, local_err);
+> +    if (err) {
+> +        goto error;
+> +    }
+> =20
+> -    dev =3D qdev_create(NULL, type);
+> -    qdev_prop_set_uint32(dev, "nr_servers", nr_servers);
+> -    qdev_prop_set_uint32(dev, "nr_irqs", nr_irqs);
+> -    object_property_set_bool(OBJECT(dev), true, "realized", &err);
+> +    ics =3D ICS_SIMPLE(object_new(type_ics));
+> +    object_property_add_child(OBJECT(xics), "ics", OBJECT(ics), NULL);
+> +    object_property_set_int(OBJECT(ics), nr_irqs, "nr-irqs", &err);
+> +    object_property_set_bool(OBJECT(ics), true, "realized", &local_err);
+> +    error_propagate(&err, local_err);
+>      if (err) {
+> -        error_propagate(errp, err);
+> -        object_unparent(OBJECT(dev));
+> -        return NULL;
+> +        goto error;
+> +    }
+> +
+> +    ics->xics =3D xics;
+> +    QLIST_INSERT_HEAD(&xics->ics, ics, list);
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/897750/+subscriptions
+Poking into the ics and xics objects directly from the machine here
+violates abstraction even worse than the existing xics device does.
+In fact, avoiding that is basically why the xics device exists in the
+first place.
+
+I've thought about this a bit more, and I think I know how to solve
+this better now.
+
+I think that "xics" shouldn't be a concrete object at all, instead it
+should be a QOM interface, implemented by the machine type.  Both ICS
+and ICP would take a link property to find their xics.  The xics
+interface would provide methods to return an ics object given an irq
+number and to return an icp object given a server number. This gives
+full control of the irq and server number spaces back to the machine
+type, which is really where it belongs.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--vs0rQTeTompTJjtd
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYoo9ZAAoJEGw4ysog2bOS8MoP/iT1gGKqLO8H4UDni4bwrcHk
+Q8hvkeo3peGR1X4PLDCEMmKbDXduDbFTAlh61dv325UllA7rm3P61GPl1IGLiU/P
+NY7Y7zFR605y1gP8p3hrqZ2ei8Z4hwsZE6+eNlDCYa8t8Yhav3WoJ+seIuGxgaVK
+PZldJ37im9dxxBfBzJa21uFT8lZGNhKr/NlbfsJahM6XxYifWzbCRiYXaVSKJgXV
+Bv534Z7zp050Snmbo+J2OH/FL/cIjwOUqhezaQ8OjuTqo3CECqtox1tiOKtljlmB
+Nw1XbIyGkocRxpRstKI1wa0cxytEpWtyt3Ix/fKauHlIa8W3xm7NxAq94ZwH7+Ic
+5fTBGPPJ3xq2S1zZXLH1QnjtLWrBZx1MgwHH6E3QPt36nXuTU1+AOWaL+XU+ZC7U
+lKBpL7s2p6XwFPUhgoQ2INhDClDLBTHzs4i0b8Hq8iJbFnFc9eL8J5AU9Gkh2VDg
+dwMRwu4hVz//qGjPn/Wzi5jhb6oRalWMui2McHHJKfmOOHM61pYOeDVQ1ytPG5W0
+RLwPfWgLhpS94QX+ll80XsXnR4nOTRnkb5LgtAnOBd8fr0Dazp5E+6Yrj9VvN9XV
+YmgmpynAq/pswAvUlQjH2edxBEFN6+aZxUaS90zScN1SYH6e1OKMgoM6dwS60r3r
+Rk78FJ6bR/YmGIlvFPwU
+=SAWA
+-----END PGP SIGNATURE-----
+
+--vs0rQTeTompTJjtd--
