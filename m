@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cdejX-0006mI-Py
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 10:09:37 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cdekX-0007Uv-4x
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 10:10:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cdejS-000809-Nk
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 10:09:35 -0500
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:33594)
+	(envelope-from <alex.bennee@linaro.org>) id 1cdekR-0000Sm-RT
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 10:10:37 -0500
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:36350)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cdejS-0007xR-GF
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 10:09:30 -0500
-Received: by mail-wr0-x22b.google.com with SMTP id i10so172275701wrb.0
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 07:09:28 -0800 (PST)
+	id 1cdekR-0000SI-Kf
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 10:10:31 -0500
+Received: by mail-wr0-x236.google.com with SMTP id k90so171732537wrc.3
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 07:10:31 -0800 (PST)
 References: <20170214100733.22280-1-alex.bennee@linaro.org>
 	<20170214100733.22280-3-alex.bennee@linaro.org>
-	<CAFEAcA8cXXc3oABFzvZQaTjxtZTxjuzi+7NBxTfM86rfPqGcqw@mail.gmail.com>
+	<20170214140049.GB12294@lemon.lan>
+	<20170214142727.GB20715@lemon.lan>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA8cXXc3oABFzvZQaTjxtZTxjuzi+7NBxTfM86rfPqGcqw@mail.gmail.com>
-Date: Tue, 14 Feb 2017 15:09:46 +0000
-Message-ID: <87fujgvmf9.fsf@linaro.org>
+In-reply-to: <20170214142727.GB20715@lemon.lan>
+Date: Tue, 14 Feb 2017 15:10:49 +0000
+Message-ID: <87efz0vmdi.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
@@ -32,29 +33,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Fam Zheng <famz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org
 
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Fam Zheng <famz@redhat.com> writes:
 
-> On 14 February 2017 at 10:07, Alex Bennée <alex.bennee@linaro.org> wrote:
->> This provides a basic Debian install with access to the emdebian cross
->> compilers. The debian-armhf-cross and debian-arm64-cross targets build
->> on the basic Debian image to allow cross compiling to those targets.
+> On Tue, 02/14 22:00, Fam Zheng wrote:
+>> On Tue, 02/14 10:07, Alex Bennée wrote:
+>> > This provides a basic Debian install with access to the emdebian cross
+>> > compilers. The debian-armhf-cross and debian-arm64-cross targets build
+>> > on the basic Debian image to allow cross compiling to those targets.
+>> >
+>> > To build against the cross compiler a cross-compile prefix needs to be
+>> > set in the configure options, for example:
+>> >
+>> >   make docker-test-build@debian-arm64-cross \
+>> >     EXTRA_CONFIGURE_OPTS="--cross-prefix=aarch64-linux-gnu-" \
+>> >     TARGET_LIST="aarch64-softmmu,aarch64-linux-user"
+>>
+>> If cross-compile is the only meaningful way to use this image, we probably
+>> should bake the configure option into the dockerfile and pick it up
+>> automatically in common.rc.  What do you think?
 >
-> Is there a particular reason for creating different docker images
-> for each cross target rather than just having one image with
-> all the cross compilers in it?
+> The example change is like this:
+>
+> diff --git a/tests/docker/common.rc b/tests/docker/common.rc
+> index 21657e87c6..6865689bb5 100755
+> --- a/tests/docker/common.rc
+> +++ b/tests/docker/common.rc
+> @@ -29,7 +29,7 @@ build_qemu()
+>      config_opts="--enable-werror \
+>                   ${TARGET_LIST:+--target-list=${TARGET_LIST}} \
+>                   --prefix=$PWD/install \
+> -                 $EXTRA_CONFIGURE_OPTS \
+> +                 $QEMU_CONFIGURE_OPTS $EXTRA_CONFIGURE_OPTS \
+>                   $@"
+>      echo "Configure options:"
+>      echo $config_opts
+> diff --git a/tests/docker/dockerfiles/debian-arm64-cross.docker b/tests/docker/dockerfiles/debian-arm64-cross.docker
+> index 04212629f7..fc1c135e74 100644
+> --- a/tests/docker/dockerfiles/debian-arm64-cross.docker
+> +++ b/tests/docker/dockerfiles/debian-arm64-cross.docker
+> @@ -10,3 +10,4 @@ RUN dpkg --add-architecture arm64
+>  RUN apt update
+>  RUN apt install -yy crossbuild-essential-arm64
+>  RUN apt-get build-dep -yy -a arm64 qemu
+> +ENV QEMU_CONFIGURE_OPTS --cross-prefix=aarch64-linux-gnu-
 
-Mainly the clashing of build-dependencies. Debian's multi-arch is pretty
-good but you still can't generally have two arches worth of complex
-dependencies installed at once.
-
-I did originally have one base docker image with all the compilers and
-intended to do the dependencies step as part of test-build. However when
-running as builders the docker images don't actually have network
-ability so couldn't download them.
+Yeah that seems like a good idea. Then a make
+docker-test-build@debian-armhf-cross will work as expected ;-)
 
 --
 Alex Bennée
