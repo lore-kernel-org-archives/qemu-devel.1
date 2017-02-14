@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54765)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cdgSE-0005Wt-81
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cdgSH-0005X0-9M
 	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 11:59:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cdgS9-0003wL-DH
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 11:59:50 -0500
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:36298)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cdgS8-0003vj-Pb
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 11:59:45 -0500
-Received: by mail-wm0-x229.google.com with SMTP id c85so22884409wmi.1
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 08:59:44 -0800 (PST)
-References: <1486065742-28639-1-git-send-email-peter.maydell@linaro.org>
-	<1486065742-28639-2-git-send-email-peter.maydell@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1486065742-28639-2-git-send-email-peter.maydell@linaro.org>
-Date: Tue, 14 Feb 2017 17:00:02 +0000
-Message-ID: <87a89ovhbh.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/9] armv7m: Rename nvic_state to NVICState
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cdgSD-0003yj-2G
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 11:59:53 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:19508 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1cdgSC-0003vT-JL
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 11:59:48 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 14 Feb 2017 19:59:22 +0300
+Message-Id: <1487091579-67092-9-git-send-email-vsementsov@virtuozzo.com>
+In-Reply-To: <1487091579-67092-1-git-send-email-vsementsov@virtuozzo.com>
+References: <1487091579-67092-1-git-send-email-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH 08/25] block: introduce auto-loading bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,202 +24,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Michael Davidsaver <mdavidsaver@gmail.com>, Liviu Ionescu <ilg@livius.net>
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
+Auto loading bitmaps are bitmaps stored in the disk image, which should
+be loaded when the image is opened and become BdrvDirtyBitmaps for the
+corresponding drive.
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+---
+ block.c                   | 14 ++++++++++++++
+ include/block/block.h     |  2 ++
+ include/block/block_int.h |  3 +++
+ 3 files changed, 19 insertions(+)
 
-> Rename the nvic_state struct to NVICState, to match
-> our naming conventions.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
-> ---
->  hw/intc/armv7m_nvic.c | 44 ++++++++++++++++++++++----------------------
->  1 file changed, 22 insertions(+), 22 deletions(-)
->
-> diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-> index fe5c303..09975f3 100644
-> --- a/hw/intc/armv7m_nvic.c
-> +++ b/hw/intc/armv7m_nvic.c
-> @@ -21,7 +21,7 @@
->  #include "gic_internal.h"
->  #include "qemu/log.h"
->
-> -typedef struct {
-> +typedef struct NVICState {
->      GICState gic;
->      ARMCPU *cpu;
->      struct {
-> @@ -35,7 +35,7 @@ typedef struct {
->      MemoryRegion container;
->      uint32_t num_irq;
->      qemu_irq sysresetreq;
-> -} nvic_state;
-> +} NVICState;
->
->  #define TYPE_NVIC "armv7m_nvic"
->  /**
-> @@ -57,7 +57,7 @@ typedef struct NVICClass {
->  #define NVIC_GET_CLASS(obj) \
->      OBJECT_GET_CLASS(NVICClass, (obj), TYPE_NVIC)
->  #define NVIC(obj) \
-> -    OBJECT_CHECK(nvic_state, (obj), TYPE_NVIC)
-> +    OBJECT_CHECK(NVICState, (obj), TYPE_NVIC)
->
->  static const uint8_t nvic_id[] = {
->      0x00, 0xb0, 0x1b, 0x00, 0x0d, 0xe0, 0x05, 0xb1
-> @@ -74,7 +74,7 @@ static const uint8_t nvic_id[] = {
->  int system_clock_scale;
->
->  /* Conversion factor from qemu timer to SysTick frequencies.  */
-> -static inline int64_t systick_scale(nvic_state *s)
-> +static inline int64_t systick_scale(NVICState *s)
->  {
->      if (s->systick.control & SYSTICK_CLKSOURCE)
->          return system_clock_scale;
-> @@ -82,7 +82,7 @@ static inline int64_t systick_scale(nvic_state *s)
->          return 1000;
->  }
->
-> -static void systick_reload(nvic_state *s, int reset)
-> +static void systick_reload(NVICState *s, int reset)
->  {
->      /* The Cortex-M3 Devices Generic User Guide says that "When the
->       * ENABLE bit is set to 1, the counter loads the RELOAD value from the
-> @@ -101,7 +101,7 @@ static void systick_reload(nvic_state *s, int reset)
->
->  static void systick_timer_tick(void * opaque)
->  {
-> -    nvic_state *s = (nvic_state *)opaque;
-> +    NVICState *s = (NVICState *)opaque;
->      s->systick.control |= SYSTICK_COUNTFLAG;
->      if (s->systick.control & SYSTICK_TICKINT) {
->          /* Trigger the interrupt.  */
-> @@ -114,7 +114,7 @@ static void systick_timer_tick(void * opaque)
->      }
->  }
->
-> -static void systick_reset(nvic_state *s)
-> +static void systick_reset(NVICState *s)
->  {
->      s->systick.control = 0;
->      s->systick.reload = 0;
-> @@ -126,7 +126,7 @@ static void systick_reset(nvic_state *s)
->     IRQ is #16.  The internal GIC routines use #32 as the first IRQ.  */
->  void armv7m_nvic_set_pending(void *opaque, int irq)
->  {
-> -    nvic_state *s = (nvic_state *)opaque;
-> +    NVICState *s = (NVICState *)opaque;
->      if (irq >= 16)
->          irq += 16;
->      gic_set_pending_private(&s->gic, 0, irq);
-> @@ -135,7 +135,7 @@ void armv7m_nvic_set_pending(void *opaque, int irq)
->  /* Make pending IRQ active.  */
->  int armv7m_nvic_acknowledge_irq(void *opaque)
->  {
-> -    nvic_state *s = (nvic_state *)opaque;
-> +    NVICState *s = (NVICState *)opaque;
->      uint32_t irq;
->
->      irq = gic_acknowledge_irq(&s->gic, 0, MEMTXATTRS_UNSPECIFIED);
-> @@ -148,13 +148,13 @@ int armv7m_nvic_acknowledge_irq(void *opaque)
->
->  void armv7m_nvic_complete_irq(void *opaque, int irq)
->  {
-> -    nvic_state *s = (nvic_state *)opaque;
-> +    NVICState *s = (NVICState *)opaque;
->      if (irq >= 16)
->          irq += 16;
->      gic_complete_irq(&s->gic, 0, irq, MEMTXATTRS_UNSPECIFIED);
->  }
->
-> -static uint32_t nvic_readl(nvic_state *s, uint32_t offset)
-> +static uint32_t nvic_readl(NVICState *s, uint32_t offset)
->  {
->      ARMCPU *cpu = s->cpu;
->      uint32_t val;
-> @@ -294,7 +294,7 @@ static uint32_t nvic_readl(nvic_state *s, uint32_t offset)
->      }
->  }
->
-> -static void nvic_writel(nvic_state *s, uint32_t offset, uint32_t value)
-> +static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value)
->  {
->      ARMCPU *cpu = s->cpu;
->      uint32_t oldval;
-> @@ -425,7 +425,7 @@ static void nvic_writel(nvic_state *s, uint32_t offset, uint32_t value)
->  static uint64_t nvic_sysreg_read(void *opaque, hwaddr addr,
->                                   unsigned size)
->  {
-> -    nvic_state *s = (nvic_state *)opaque;
-> +    NVICState *s = (NVICState *)opaque;
->      uint32_t offset = addr;
->      int i;
->      uint32_t val;
-> @@ -454,7 +454,7 @@ static uint64_t nvic_sysreg_read(void *opaque, hwaddr addr,
->  static void nvic_sysreg_write(void *opaque, hwaddr addr,
->                                uint64_t value, unsigned size)
->  {
-> -    nvic_state *s = (nvic_state *)opaque;
-> +    NVICState *s = (NVICState *)opaque;
->      uint32_t offset = addr;
->      int i;
->
-> @@ -486,17 +486,17 @@ static const VMStateDescription vmstate_nvic = {
->      .version_id = 1,
->      .minimum_version_id = 1,
->      .fields = (VMStateField[]) {
-> -        VMSTATE_UINT32(systick.control, nvic_state),
-> -        VMSTATE_UINT32(systick.reload, nvic_state),
-> -        VMSTATE_INT64(systick.tick, nvic_state),
-> -        VMSTATE_TIMER_PTR(systick.timer, nvic_state),
-> +        VMSTATE_UINT32(systick.control, NVICState),
-> +        VMSTATE_UINT32(systick.reload, NVICState),
-> +        VMSTATE_INT64(systick.tick, NVICState),
-> +        VMSTATE_TIMER_PTR(systick.timer, NVICState),
->          VMSTATE_END_OF_LIST()
->      }
->  };
->
->  static void armv7m_nvic_reset(DeviceState *dev)
->  {
-> -    nvic_state *s = NVIC(dev);
-> +    NVICState *s = NVIC(dev);
->      NVICClass *nc = NVIC_GET_CLASS(s);
->      nc->parent_reset(dev);
->      /* Common GIC reset resets to disabled; the NVIC doesn't have
-> @@ -513,7 +513,7 @@ static void armv7m_nvic_reset(DeviceState *dev)
->
->  static void armv7m_nvic_realize(DeviceState *dev, Error **errp)
->  {
-> -    nvic_state *s = NVIC(dev);
-> +    NVICState *s = NVIC(dev);
->      NVICClass *nc = NVIC_GET_CLASS(s);
->      Error *local_err = NULL;
->
-> @@ -569,7 +569,7 @@ static void armv7m_nvic_instance_init(Object *obj)
->       */
->      GICState *s = ARM_GIC_COMMON(obj);
->      DeviceState *dev = DEVICE(obj);
-> -    nvic_state *nvic = NVIC(obj);
-> +    NVICState *nvic = NVIC(obj);
->      /* The ARM v7m may have anything from 0 to 496 external interrupt
->       * IRQ lines. We default to 64. Other boards may differ and should
->       * set the num-irq property appropriately.
-> @@ -594,7 +594,7 @@ static const TypeInfo armv7m_nvic_info = {
->      .name          = TYPE_NVIC,
->      .parent        = TYPE_ARM_GIC_COMMON,
->      .instance_init = armv7m_nvic_instance_init,
-> -    .instance_size = sizeof(nvic_state),
-> +    .instance_size = sizeof(NVICState),
->      .class_init    = armv7m_nvic_class_init,
->      .class_size    = sizeof(NVICClass),
->  };
-
-
---
-Alex Bennée
+diff --git a/block.c b/block.c
+index a0346c8..56f030c 100644
+--- a/block.c
++++ b/block.c
+@@ -1141,6 +1141,13 @@ static int bdrv_open_common(BlockDriverState *bs, BdrvChild *file,
+     assert(bdrv_min_mem_align(bs) != 0);
+     assert(is_power_of_2(bs->bl.request_alignment));
+ 
++    bdrv_load_autoloading_dirty_bitmaps(bs, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        ret = -EINVAL;
++        goto free_and_fail;
++    }
++
+     qemu_opts_del(opts);
+     return 0;
+ 
+@@ -4093,3 +4100,10 @@ void bdrv_del_child(BlockDriverState *parent_bs, BdrvChild *child, Error **errp)
+ 
+     parent_bs->drv->bdrv_del_child(parent_bs, child, errp);
+ }
++
++void bdrv_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp)
++{
++    if (bs->drv && bs->drv->bdrv_load_autoloading_dirty_bitmaps) {
++        bs->drv->bdrv_load_autoloading_dirty_bitmaps(bs, errp);
++    }
++}
+diff --git a/include/block/block.h b/include/block/block.h
+index 4e81f20..154ac7f 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -551,4 +551,6 @@ void bdrv_add_child(BlockDriverState *parent, BlockDriverState *child,
+                     Error **errp);
+ void bdrv_del_child(BlockDriverState *parent, BdrvChild *child, Error **errp);
+ 
++void bdrv_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp);
++
+ #endif
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 2d92d7e..6b2b50c 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -320,6 +320,9 @@ struct BlockDriver {
+     void (*bdrv_del_child)(BlockDriverState *parent, BdrvChild *child,
+                            Error **errp);
+ 
++    void (*bdrv_load_autoloading_dirty_bitmaps)(BlockDriverState *bs,
++                                                Error **errp);
++
+     QLIST_ENTRY(BlockDriver) list;
+ };
+ 
+-- 
+1.8.3.1
