@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cdmQV-0006S2-Pn
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 18:22:29 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cdmX7-0001Cg-T3
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 18:29:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cdmQR-0003iR-RV
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 18:22:27 -0500
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:35981)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cdmQR-0003i8-Na
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 18:22:23 -0500
-Received: by mail-qk0-x241.google.com with SMTP id p22so13502813qka.3
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 15:22:23 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170203152321.19739-1-pbutsykin@virtuozzo.com>
-	<20170203152321.19739-2-pbutsykin@virtuozzo.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <8cf56ca0-760a-8133-81a6-72d3c2b1e56b@amsat.org>
-Date: Tue, 14 Feb 2017 20:22:19 -0300
+	(envelope-from <dgibson@ozlabs.org>) id 1cdmX4-0006JU-Og
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 18:29:17 -0500
+Received: from ozlabs.org ([103.22.144.67]:43215)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1cdmX3-0006IN-W6
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 18:29:14 -0500
+Date: Wed, 15 Feb 2017 09:55:30 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170214225530.GA12369@umbus.fritz.box>
+References: <20170214133331.28997-1-lvivier@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170203152321.19739-2-pbutsykin@virtuozzo.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] migration: add MigrationState arg
- for ram_save_/compressed_/page()
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="J/dobhs11T7y2rNN"
+Content-Disposition: inline
+In-Reply-To: <20170214133331.28997-1-lvivier@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] vmstate-static-checker: update white list
+ with spapr_pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,81 +28,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, armbru@redhat.com, amit.shah@redhat.com, den@openvz.org
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Thomas Huth <thuth@redhat.com>, Greg Kurz <groug@kaod.org>, Alexey Kardashevskiy <aik@ozlabs.ru>
 
-On 02/03/2017 12:23 PM, Pavel Butsykin wrote:
-> Cosmetic patch. The use of ms variable instead of migrate_get_current()
-> looks nicer, especially when there reuse.
->
-> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+--J/dobhs11T7y2rNN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Feb 14, 2017 at 02:33:31PM +0100, Laurent Vivier wrote:
+> To fix migration between 2.7 and 2.8, some fields have
+> been renamed and managed with the help of a PHB property
+> (pre_2_8_migration):
+>=20
+>     5c4537b spapr: Fix 2.7<->2.8 migration of PCI host bridge
+>=20
+> So we need to add them to the white list:
+>=20
+>     dma_liobn[0],
+>     mem_win_addr, mem_win_size,
+>     io_win_addr, io_win_size
+>=20
+> become
+>=20
+>     mig_liobn,
+>     mig_mem_win_addr, mig_mem_win_size,
+>     mig_io_win_addr, mig_io_win_size
+>=20
+> CC: David Gibson <david@gibson.dropbear.id.au>
+> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> CC: Thomas Huth <thuth@redhat.com>
+> CC: Greg Kurz <groug@kaod.org>
+> CC: Alexey Kardashevskiy <aik@ozlabs.ru>
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 > ---
->  migration/ram.c | 15 ++++++++-------
->  1 file changed, 8 insertions(+), 7 deletions(-)
->
-> diff --git a/migration/ram.c b/migration/ram.c
-> index a683f4bb9e..d866b6518b 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -734,13 +734,14 @@ static int save_zero_page(QEMUFile *f, RAMBlock *block, ram_addr_t offset,
->   *          >=0 - Number of pages written - this might legally be 0
->   *                if xbzrle noticed the page was the same.
->   *
-> + * @ms: The current migration state.
->   * @f: QEMUFile where to send the data
->   * @block: block that contains the page we want to send
->   * @offset: offset inside the block for the page
->   * @last_stage: if we are at the completion stage
->   * @bytes_transferred: increase it with the number of transferred bytes
->   */
-> -static int ram_save_page(QEMUFile *f, PageSearchStatus *pss,
-> +static int ram_save_page(MigrationState *ms, QEMUFile *f, PageSearchStatus *pss,
->                           bool last_stage, uint64_t *bytes_transferred)
->  {
->      int pages = -1;
-> @@ -786,8 +787,7 @@ static int ram_save_page(QEMUFile *f, PageSearchStatus *pss,
->               */
->              xbzrle_cache_zero_page(current_addr);
->          } else if (!ram_bulk_stage &&
-> -                   !migration_in_postcopy(migrate_get_current()) &&
-> -                   migrate_use_xbzrle()) {
-> +                   !migration_in_postcopy(ms) && migrate_use_xbzrle()) {
->              pages = save_xbzrle_page(f, &p, current_addr, block,
->                                       offset, last_stage, bytes_transferred);
->              if (!last_stage) {
-> @@ -914,14 +914,15 @@ static int compress_page_with_multi_thread(QEMUFile *f, RAMBlock *block,
->   *
->   * Returns: Number of pages written.
->   *
-> + * @ms: The current migration state.
->   * @f: QEMUFile where to send the data
->   * @block: block that contains the page we want to send
->   * @offset: offset inside the block for the page
->   * @last_stage: if we are at the completion stage
->   * @bytes_transferred: increase it with the number of transferred bytes
->   */
-> -static int ram_save_compressed_page(QEMUFile *f, PageSearchStatus *pss,
-> -                                    bool last_stage,
-> +static int ram_save_compressed_page(MigrationState *ms, QEMUFile *f,
-> +                                    PageSearchStatus *pss, bool last_stage,
->                                      uint64_t *bytes_transferred)
->  {
->      int pages = -1;
-> @@ -1252,11 +1253,11 @@ static int ram_save_target_page(MigrationState *ms, QEMUFile *f,
->      if (migration_bitmap_clear_dirty(dirty_ram_abs)) {
->          unsigned long *unsentmap;
->          if (compression_switch && migrate_use_compression()) {
-> -            res = ram_save_compressed_page(f, pss,
-> +            res = ram_save_compressed_page(ms, f, pss,
->                                             last_stage,
->                                             bytes_transferred);
->          } else {
-> -            res = ram_save_page(f, pss, last_stage,
-> +            res = ram_save_page(ms, f, pss, last_stage,
->                                  bytes_transferred);
->          }
->
->
+>  scripts/vmstate-static-checker.py | 5 +++++
+>  1 file changed, 5 insertions(+)
+>=20
+> diff --git a/scripts/vmstate-static-checker.py b/scripts/vmstate-static-c=
+hecker.py
+> index 14a27e7..bcef7ee 100755
+> --- a/scripts/vmstate-static-checker.py
+> +++ b/scripts/vmstate-static-checker.py
+> @@ -85,6 +85,11 @@ def check_fields_match(name, s_field, d_field):
+>          'xio3130-express-upstream-port': ['br.dev', 'parent_obj.parent_o=
+bj',
+>                                            'br.dev.exp.aer_log',
+>                                            'parent_obj.parent_obj.exp.aer=
+_log'],
+> +        'spapr_pci': ['dma_liobn[0]', 'mig_liobn',
+> +                      'mem_win_addr', 'mig_mem_win_addr',
+> +                      'mem_win_size', 'mig_mem_win_size',
+> +                      'io_win_addr', 'mig_io_win_addr',
+> +                      'io_win_size', 'mig_io_win_size'],
+>      }
+> =20
+>      if not name in changed_names:
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--J/dobhs11T7y2rNN
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYo4riAAoJEGw4ysog2bOSjywQANtAr3X1dLtawJn0FRyL6FTP
+Xb6pmBKwaqu9vblldgzpVdPN/jqBscQ7GpIeIv9We0foXd6t3KGMzh12dkOVGrME
+asJRgYLC9A1NvqfFaK9kFW9uqcVU9Ac9Ws1Ha2YyO5xoiIOBQcJseHxqzyFVryeB
+l2V3MgllU0kY2WVUzpurnoPfiKDZtfU1fDa7tvgh66yrbCaz50lJi//HK5ltsXyX
+xtCV0cltVLHH3pTEyvZ/IkLaIOYDT641ykpDfvysfMbYwM/KNh2+IJNFIGxguJQq
+p4wT3dq4UxRVdWsoKExXwhJZNFglfsBIYTzqs+HjVUdx4GAHEKPfjabeIqFeNoe+
+SPXqxD71Uj/GQiSEH8yvyeIcjelPmjSNBL9fFcKE9It+gcOlQI98uc4is7dFeAoW
+Xj46oGJ6RD0opphJYGmHi4eCWEzTkH6Yp1Pet+Ann3yWBOEXAWRIra7n8q0nA7Rp
+WMLa37jLJSCozO3L6gABicS7+Xa47j+FFuOA90TgzFyRt1nDIy4vYRoJfCzIlLbO
+EhbnAzjmc4S9cWv3HxE0NZ8Ejhj9IEVpdn/95FFJkkLpUoYbZR6wqJnE2gQJJ9Pg
+HpXHxNvC9KudMpP4Ii9LN/7eIrN2wH2KKBMM1POpKvcD4SGUEOlXtZvNUI3UA6+i
+IXp8LnG6wUla36kLN8ii
+=T3QX
+-----END PGP SIGNATURE-----
+
+--J/dobhs11T7y2rNN--
