@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cddmY-0004N3-VL
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 09:08:40 -0500
+	(envelope-from <famz@redhat.com>) id 1cddpC-0006IE-AJ
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 09:11:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cddmV-0002jY-Ry
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 09:08:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41604)
+	(envelope-from <famz@redhat.com>) id 1cddpB-0004JI-1W
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 09:11:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35638)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cddmV-0002jF-MF
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 09:08:35 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ED4FD80F63
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 14:08:35 +0000 (UTC)
-References: <06BE8A21-A1E9-4264-BD02-04A566748633@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <173cba42-5390-0e16-71a3-3eadcd3ef654@redhat.com>
-Date: Tue, 14 Feb 2017 15:08:32 +0100
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cddpA-0004Im-Rt
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 09:11:20 -0500
+Date: Tue, 14 Feb 2017 22:11:17 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170214141117.GC12294@lemon.lan>
+References: <20170214100733.22280-1-alex.bennee@linaro.org>
+	<20170214100733.22280-4-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <06BE8A21-A1E9-4264-BD02-04A566748633@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] VirtIO Windows Driver repository
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20170214100733.22280-4-alex.bennee@linaro.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] .shippable.yml: new CI provider
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,20 +28,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yan Vugenfirer <yvugenfi@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Cole Robinson <crobinso@redhat.com>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-On 02/14/17 13:40, Yan Vugenfirer wrote:
-> Hello All,
-> 
-> The official upstream repository moved from
-> https://github.com/YanVugenfirer/kvm-guest-drivers-windows to
-> https://github.com/virtio-win/kvm-guest-drivers-windows
-> 
-> Best regards, Yan Vugenfirer.
+On Tue, 02/14 10:07, Alex Benn=E9e wrote:
+> Ostensibly Shippable offers a similar set of services as Travis.
+> However they are focused on Docker container based work-flows so we
+> can use our existing containers to run a few extra builds - in this
+> case a bunch of cross-compiled targets on a Debian multiarch system.
+>=20
+> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+>=20
+> ---
+> v3
+>   - reduce matrix to armhf/arm64 which currently work
+>   - use the make docker-image-* build stanzas
+>   - add TARGET_LIST to each build
+> ---
+>  .shippable.yml | 23 +++++++++++++++++++++++
+>  MAINTAINERS    |  1 +
+>  2 files changed, 24 insertions(+)
+>  create mode 100644 .shippable.yml
+>=20
+> diff --git a/.shippable.yml b/.shippable.yml
+> new file mode 100644
+> index 0000000000..e4fa159481
+> --- /dev/null
+> +++ b/.shippable.yml
+> @@ -0,0 +1,23 @@
+> +language: c
+> +env:
+> +  matrix:
+> +    - IMAGE=3Ddebian-armhf-cross
+> +      CROSS_PREFIX=3Darm-linux-gnueabihf-
+> +      TARGET_LIST=3Darm-softmmu,arm-linux-user
+> +    - IMAGE=3Ddebian-arm64-cross
+> +      CROSS_PREFIX=3Daarch64-linux-gnu-
+> +      TARGET_LIST=3Daarch64-softmmu,aarch64-linux-user
+> +    - IMAGE=3Dcentos6
+> +      TARGET_LIST=3Di386-softmmu,x86_64-softmmu
+> +build:
+> +  pre_ci:
+> +    - make docker-image-${IMAGE}
+> +  pre_ci_boot:
+> +    image_name: qemu
+> +    image_tag: ${IMAGE}
+> +    pull: false
+> +    options: "-e HOME=3D/root"
+> +  ci:
+> +    - unset CC
+> +    - ./configure --cross-prefix=3D${CROSS_PREFIX} --target-list=3D${T=
+ARGET_LIST}
+> +    - make -j2
 
-Thanks! I've updated the corresponding reference under
-<https://fedoraproject.org/wiki/Windows_Virtio_Drivers#Links>.
+Looks cool!
 
-Cheers
-Laszlo
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 7afbadaa15..578888d32d 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1805,6 +1805,7 @@ M: Alex Benn=E9e <alex.bennee@linaro.org>
+>  L: qemu-devel@nongnu.org
+>  S: Supported
+>  F: .travis.yml
+> +F: .shippable.yml
+> =20
+>  Documentation
+>  -------------
+> --=20
+> 2.11.0
+>=20
+>=20
+
+May I propose we merge 'docker testing' section of MAINTAINERS into 'buil=
+d and
+test automation' section? I don't know as much about travis (and shippabl=
+e) but
+I'm totally fine if you want to have docker tests under your umbrella, an=
+d
+it seems a logical step judging from their names.
+
+Fam
