@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cdaoB-0001rm-56
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 05:58:08 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cdart-0004Sk-PG
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:02:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cdao8-0003tL-2N
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 05:58:07 -0500
-Resent-Message-Id: <E1cdao8-0003tL-2N@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21337)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cdao7-0003qt-S1
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 05:58:04 -0500
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <1487067971-10443-1-git-send-email-armbru@redhat.com>
-Message-ID: <148706987763.63.3140425714648120623@eba24e3a0d7f>
+	(envelope-from <peter.maydell@linaro.org>) id 1cdars-0005rf-PH
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:01:57 -0500
+Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:36170)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cdars-0005r0-KG
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:01:56 -0500
+Received: by mail-wr0-x230.google.com with SMTP id k90so166990691wrc.3
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 03:01:56 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 14 Feb 2017 02:57:58 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 00/24] QemuOpts util/cutils: Fix and clean
- up number conversions
+In-Reply-To: <20170213212536.31871-1-rth@twiddle.net>
+References: <20170213212536.31871-1-rth@twiddle.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 14 Feb 2017 11:01:33 +0000
+Message-ID: <CAFEAcA9T0-OMTzZmgxcTroFvTCh3N6GhRsR3BVHo05YWGyCeiA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 00/24] target/openrisc patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,121 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: armbru@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCAwMC8yNF0gUWVtdU9wdHMgdXRpbC9jdXRpbHM6IEZpeCBhbmQgY2xlYW4g
-dXAgbnVtYmVyIGNvbnZlcnNpb25zCk1lc3NhZ2UtaWQ6IDE0ODcwNjc5NzEtMTA0NDMtMS1naXQt
-c2VuZC1lbWFpbC1hcm1icnVAcmVkaGF0LmNvbQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0t
-b25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJz
-ZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRD
-SCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEg
-Z2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
-aWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBu
-PSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
-YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBz
-Oi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBw
-YXRjaGV3LzE0ODcwNjc5NzEtMTA0NDMtMS1naXQtc2VuZC1lbWFpbC1hcm1icnVAcmVkaGF0LmNv
-bSAtPiBwYXRjaGV3LzE0ODcwNjc5NzEtMTA0NDMtMS1naXQtc2VuZC1lbWFpbC1hcm1icnVAcmVk
-aGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjg1NWRlMjEgUWVtdU9wdHM6
-IEZpeCBjaGVja2luZyBvZiBzaXplcyBmb3Igb3ZlcmZsb3cgYW5kIHRyYWlsaW5nIGNyYXAKNzA0
-YzU5YiB1dGlsL2N1dGlsczogQ2hhbmdlIHFlbXVfc3RydG9zeiooKSBmcm9tIGludDY0X3QgdG8g
-dWludDY0X3QKOTI2YTE3MCB1dGlsL2N1dGlsczogUmV0dXJuIHFlbXVfc3RydG9zeiooKSBlcnJv
-ciBhbmQgdmFsdWUgc2VwYXJhdGVseQozZWZhNmQ0IHV0aWwvY3V0aWxzOiBMZXQgcWVtdV9zdHJ0
-b3N6KigpIG9wdGlvbmFsbHkgcmVqZWN0IHRyYWlsaW5nIGNyYXAKYmQ0ZTMxZCBxZW11LWltZzog
-V3JhcCBjdnRudW0oKSBhcm91bmQgcWVtdV9zdHJ0b3N6KCkKMThhM2RhMCB0ZXN0cy90ZXN0LWN1
-dGlsczogRHJvcCBzdWZmaXggZnJvbSB0ZXN0X3FlbXVfc3RydG9zel9zaW1wbGUoKQpmMjg4MGRk
-IHRlc3RzL3Rlc3QtY3V0aWxzOiBVc2UgcWVtdV9zdHJ0b3N6KCkgbW9yZSBvZnRlbgo4ZTA0YjNi
-IHV0aWwvY3V0aWxzOiBEcm9wIFFFTVVfU1RSVE9TWl9ERUZTVUZGSVhfKiBtYWNyb3MKMjVmMmJm
-NiB1dGlsL2N1dGlsczogTmV3IHFlbXVfc3RydG9zeigpCmQxMzMwMjMgdXRpbC9jdXRpbHM6IFJl
-bmFtZSBxZW11X3N0cnRvc3ooKSB0byBxZW11X3N0cnRvc3pfbWViaSgpCjVjMzNmMWIgdXRpbC9j
-dXRpbHM6IE5ldyBxZW11X3N0cnRvc3pfbWV0cmljKCkKNTY3YTg1NiB0ZXN0cy90ZXN0LWN1dGls
-czogQ292ZXIgcWVtdV9zdHJ0b3N6KCkgYXJvdW5kIHJhbmdlIGxpbWl0cwo1ZWVhOGUwIHRlc3Rz
-L3Rlc3QtY3V0aWxzOiBDb3ZlciBxZW11X3N0cnRvc3ooKSB3aXRoIHRyYWlsaW5nIGNyYXAKZGI3
-NjVmNSB0ZXN0cy90ZXN0LWN1dGlsczogQ292ZXIgcWVtdV9zdHJ0b3N6KCkgaW52YWxpZCBpbnB1
-dAo5NThkMGYzIHRlc3RzL3Rlc3QtY3V0aWxzOiBBZGQgbWlzc2luZyBxZW11X3N0cnRvc3ooKS4u
-LiBlbmRwdHIgY2hlY2tzCjdjNjE3OTEgUWVtdU9wdHM6IEZpeCB0byByZWplY3QgbnVtYmVycyB0
-aGF0IG92ZXJmbG93IHVpbnQ2NF90CjI5ODcyZDMgdXRpbC9jdXRpbHM6IENsZWFuIHVwIGNvbnRy
-b2wgZmxvdyBhcm91bmQgcWVtdV9zdHJ0b2woKSBhIGJpdAozYTY5NmUyIHV0aWwvY3V0aWxzOiBD
-bGVhbiB1cCB2YXJpYWJsZSBuYW1lcyBhcm91bmQgcWVtdV9zdHJ0b2woKQpiMmU4YjU5IHV0aWwv
-Y3V0aWxzOiBSZW5hbWUgcWVtdV9zdHJ0b2xsKCksIHFlbXVfc3RydG91bGwoKQo1MTUzOTA4IHV0
-aWwvY3V0aWxzOiBSZXdyaXRlIGRvY3VtZW50YXRpb24gb2YgcWVtdV9zdHJ0b2woKSAmIGZyaWVu
-ZHMKMzJhNzg0NiB0ZXN0cy90ZXN0LWN1dGlsczogQ2xlYW4gdXAgcWVtdV9zdHJ0b3VsKCkgcmVz
-dWx0IGNoZWNrcwoyYTYwMmZiIHRlc3RzL3Rlc3QtY3V0aWxzOiBBZGQgbWlzc2luZyBxZW11X3N0
-cnRvbCgpLi4uIGVuZHB0ciBjaGVja3MKZWJkYTlmMCBRZW11T3B0czogQXNzZXJ0IHZhbHVlIHN0
-cmluZyBpc24ndCBudWxsCmFjZWQxMDcgdGVzdHMvdGVzdC1xZW11LW9wdHM6IENvdmVyIHFlbXVf
-b3B0c19wYXJzZSgpCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzI0OiB0
-ZXN0cy90ZXN0LXFlbXUtb3B0czogQ292ZXIgcWVtdV9vcHRzX3BhcnNlKCkuLi4KQ2hlY2tpbmcg
-UEFUQ0ggMi8yNDogUWVtdU9wdHM6IEFzc2VydCB2YWx1ZSBzdHJpbmcgaXNuJ3QgbnVsbC4uLgpF
-UlJPUjogY29uc2lkZXIgdXNpbmcgcWVtdV9zdHJ0b3VsbCBpbiBwcmVmZXJlbmNlIHRvIHN0cnRv
-dWxsCiM3NTogRklMRTogdXRpbC9xZW11LW9wdGlvbi5jOjE0NzoKKyAgICBudW1iZXIgPSBzdHJ0
-b3VsbCh2YWx1ZSwgJnBvc3RmaXgsIDApOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAx
-MTcgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
-ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
-IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoK
-Q2hlY2tpbmcgUEFUQ0ggMy8yNDogdGVzdHMvdGVzdC1jdXRpbHM6IEFkZCBtaXNzaW5nIHFlbXVf
-c3RydG9sKCkuLi4gZW5kcHRyIGNoZWNrcy4uLgpDaGVja2luZyBQQVRDSCA0LzI0OiB0ZXN0cy90
-ZXN0LWN1dGlsczogQ2xlYW4gdXAgcWVtdV9zdHJ0b3VsKCkgcmVzdWx0IGNoZWNrcy4uLgpDaGVj
-a2luZyBQQVRDSCA1LzI0OiB1dGlsL2N1dGlsczogUmV3cml0ZSBkb2N1bWVudGF0aW9uIG9mIHFl
-bXVfc3RydG9sKCkgJiBmcmllbmRzLi4uCkNoZWNraW5nIFBBVENIIDYvMjQ6IHV0aWwvY3V0aWxz
-OiBSZW5hbWUgcWVtdV9zdHJ0b2xsKCksIHFlbXVfc3RydG91bGwoKS4uLgpDaGVja2luZyBQQVRD
-SCA3LzI0OiB1dGlsL2N1dGlsczogQ2xlYW4gdXAgdmFyaWFibGUgbmFtZXMgYXJvdW5kIHFlbXVf
-c3RydG9sKCkuLi4KRVJST1I6IGNvbnNpZGVyIHVzaW5nIHFlbXVfc3RydG9sIGluIHByZWZlcmVu
-Y2UgdG8gc3RydG9sCiM3NjogRklMRTogdXRpbC9jdXRpbHMuYzozMTY6CisgICAgICAgICpyZXN1
-bHQgPSBzdHJ0b2wobnB0ciwgJmVwLCBiYXNlKTsKCkVSUk9SOiBjb25zaWRlciB1c2luZyBxZW11
-X3N0cnRvdWwgaW4gcHJlZmVyZW5jZSB0byBzdHJ0b3VsCiM5NTogRklMRTogdXRpbC9jdXRpbHMu
-YzozNTk6CisgICAgICAgICpyZXN1bHQgPSBzdHJ0b3VsKG5wdHIsICZlcCwgYmFzZSk7CgpFUlJP
-UjogY29uc2lkZXIgdXNpbmcgcWVtdV9zdHJ0b2xsIGluIHByZWZlcmVuY2UgdG8gc3RydG9sbAoj
-MTIwOiBGSUxFOiB1dGlsL2N1dGlscy5jOjM4ODoKKyAgICAgICAgKnJlc3VsdCA9IHN0cnRvbGwo
-bnB0ciwgJmVwLCBiYXNlKTsKCkVSUk9SOiBjb25zaWRlciB1c2luZyBxZW11X3N0cnRvdWxsIGlu
-IHByZWZlcmVuY2UgdG8gc3RydG91bGwKIzEzOTogRklMRTogdXRpbC9jdXRpbHMuYzo0MTI6Cisg
-ICAgICAgICpyZXN1bHQgPSBzdHJ0b3VsbChucHRyLCAmZXAsIGJhc2UpOwoKdG90YWw6IDQgZXJy
-b3JzLCAwIHdhcm5pbmdzLCAxMTAgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggOC8yNDogdXRpbC9jdXRpbHM6IENsZWFu
-IHVwIGNvbnRyb2wgZmxvdyBhcm91bmQgcWVtdV9zdHJ0b2woKSBhIGJpdC4uLgpFUlJPUjogY29u
-c2lkZXIgdXNpbmcgcWVtdV9zdHJ0b2wgaW4gcHJlZmVyZW5jZSB0byBzdHJ0b2wKIzgxOiBGSUxF
-OiB1dGlsL2N1dGlscy5jOjMyMjoKKyAgICAqcmVzdWx0ID0gc3RydG9sKG5wdHIsICZlcCwgYmFz
-ZSk7CgpFUlJPUjogY29uc2lkZXIgdXNpbmcgcWVtdV9zdHJ0b3VsIGluIHByZWZlcmVuY2UgdG8g
-c3RydG91bAojMTA5OiBGSUxFOiB1dGlsL2N1dGlscy5jOjM2NDoKKyAgICAqcmVzdWx0ID0gc3Ry
-dG91bChucHRyLCAmZXAsIGJhc2UpOwoKRVJST1I6IGNvbnNpZGVyIHVzaW5nIHFlbXVfc3RydG9s
-bCBpbiBwcmVmZXJlbmNlIHRvIHN0cnRvbGwKIzE0MTogRklMRTogdXRpbC9jdXRpbHMuYzozOTI6
-CisgICAgKnJlc3VsdCA9IHN0cnRvbGwobnB0ciwgJmVwLCBiYXNlKTsKCkVSUk9SOiBjb25zaWRl
-ciB1c2luZyBxZW11X3N0cnRvdWxsIGluIHByZWZlcmVuY2UgdG8gc3RydG91bGwKIzE3MTogRklM
-RTogdXRpbC9jdXRpbHMuYzo0MTU6CisgICAgKnJlc3VsdCA9IHN0cnRvdWxsKG5wdHIsICZlcCwg
-YmFzZSk7Cgp0b3RhbDogNCBlcnJvcnMsIDAgd2FybmluZ3MsIDE0MCBsaW5lcyBjaGVja2VkCgpZ
-b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA5LzI0
-OiBRZW11T3B0czogRml4IHRvIHJlamVjdCBudW1iZXJzIHRoYXQgb3ZlcmZsb3cgdWludDY0X3Qu
-Li4KQ2hlY2tpbmcgUEFUQ0ggMTAvMjQ6IHRlc3RzL3Rlc3QtY3V0aWxzOiBBZGQgbWlzc2luZyBx
-ZW11X3N0cnRvc3ooKS4uLiBlbmRwdHIgY2hlY2tzLi4uCkNoZWNraW5nIFBBVENIIDExLzI0OiB0
-ZXN0cy90ZXN0LWN1dGlsczogQ292ZXIgcWVtdV9zdHJ0b3N6KCkgaW52YWxpZCBpbnB1dC4uLgpD
-aGVja2luZyBQQVRDSCAxMi8yNDogdGVzdHMvdGVzdC1jdXRpbHM6IENvdmVyIHFlbXVfc3RydG9z
-eigpIHdpdGggdHJhaWxpbmcgY3JhcC4uLgpDaGVja2luZyBQQVRDSCAxMy8yNDogdGVzdHMvdGVz
-dC1jdXRpbHM6IENvdmVyIHFlbXVfc3RydG9zeigpIGFyb3VuZCByYW5nZSBsaW1pdHMuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMTQvMjQ6IHV0aWwvY3V0aWxzOiBOZXcgcWVtdV9zdHJ0b3N6X21ldHJpYygp
-Li4uCkNoZWNraW5nIFBBVENIIDE1LzI0OiB1dGlsL2N1dGlsczogUmVuYW1lIHFlbXVfc3RydG9z
-eigpIHRvIHFlbXVfc3RydG9zel9tZWJpKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMTYvMjQ6IHV0aWwv
-Y3V0aWxzOiBOZXcgcWVtdV9zdHJ0b3N6KCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMTcvMjQ6IHV0aWwv
-Y3V0aWxzOiBEcm9wIFFFTVVfU1RSVE9TWl9ERUZTVUZGSVhfKiBtYWNyb3MuLi4KQ2hlY2tpbmcg
-UEFUQ0ggMTgvMjQ6IHRlc3RzL3Rlc3QtY3V0aWxzOiBVc2UgcWVtdV9zdHJ0b3N6KCkgbW9yZSBv
-ZnRlbi4uLgpDaGVja2luZyBQQVRDSCAxOS8yNDogdGVzdHMvdGVzdC1jdXRpbHM6IERyb3Agc3Vm
-Zml4IGZyb20gdGVzdF9xZW11X3N0cnRvc3pfc2ltcGxlKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMjAv
-MjQ6IHFlbXUtaW1nOiBXcmFwIGN2dG51bSgpIGFyb3VuZCBxZW11X3N0cnRvc3ooKS4uLgpDaGVj
-a2luZyBQQVRDSCAyMS8yNDogdXRpbC9jdXRpbHM6IExldCBxZW11X3N0cnRvc3oqKCkgb3B0aW9u
-YWxseSByZWplY3QgdHJhaWxpbmcgY3JhcC4uLgpDaGVja2luZyBQQVRDSCAyMi8yNDogdXRpbC9j
-dXRpbHM6IFJldHVybiBxZW11X3N0cnRvc3oqKCkgZXJyb3IgYW5kIHZhbHVlIHNlcGFyYXRlbHku
-Li4KQ2hlY2tpbmcgUEFUQ0ggMjMvMjQ6IHV0aWwvY3V0aWxzOiBDaGFuZ2UgcWVtdV9zdHJ0b3N6
-KigpIGZyb20gaW50NjRfdCB0byB1aW50NjRfdC4uLgpDaGVja2luZyBQQVRDSCAyNC8yNDogUWVt
-dU9wdHM6IEZpeCBjaGVja2luZyBvZiBzaXplcyBmb3Igb3ZlcmZsb3cgYW5kIHRyYWlsaW5nIGNy
-YXAuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTog
-MQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8v
-cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
-QGZyZWVsaXN0cy5vcmc=
+On 13 February 2017 at 21:25, Richard Henderson <rth@twiddle.net> wrote:
+> This is the v2 patch set that I posted last week.
+> It even acquired some new R-b.  Whee!
+>
+>
+> r~
+>
+>
+>
+> The following changes since commit 305e6c8a2ff7a6e3f4942b50e853230f18eeb5a9:
+>
+>   Merge remote-tracking branch 'remotes/stefanha/tags/tracing-pull-request' into staging (2017-02-13 16:44:04 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/rth7680/qemu.git tags/pull-or-20170214
+>
+> for you to fetch changes up to 6597c28d618a3d16d468770b7c30a0237a8c8ea9:
+>
+>   target/openrisc: Optimize for r0 being zero (2017-02-14 08:15:00 +1100)
+>
+> ----------------------------------------------------------------
+> Queued openrisc patches
+>
+
+Applied, thanks.
+
+-- PMM
