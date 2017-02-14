@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38726)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cdaJO-0005qc-FN
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 05:26:20 -0500
+	(envelope-from <armbru@redhat.com>) id 1cdaJO-0005qh-Hd
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 05:26:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cdaJM-0003M4-AT
+	(envelope-from <armbru@redhat.com>) id 1cdaJL-0003Ko-BE
 	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 05:26:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53130)
+Received: from mx1.redhat.com ([209.132.183.28]:54692)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cdaJM-0003LO-5U
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 05:26:16 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cdaJL-0003KH-35
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 05:26:15 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5935C3D955
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 10:26:16 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6AE14C04B948
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 10:26:14 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-50.ams2.redhat.com
 	[10.36.116.50])
-	by int-mx13.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v1EAQFtg023206
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=NO)
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 05:26:16 -0500
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3557EACB84
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 10:26:14 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 14 Feb 2017 11:25:59 +0100
-Message-Id: <1487067971-10443-13-git-send-email-armbru@redhat.com>
+Date: Tue, 14 Feb 2017 11:25:50 +0100
+Message-Id: <1487067971-10443-4-git-send-email-armbru@redhat.com>
 In-Reply-To: <1487067971-10443-1-git-send-email-armbru@redhat.com>
 References: <1487067971-10443-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 12/24] tests/test-cutils: Cover qemu_strtosz()
- with trailing crap
+Subject: [Qemu-devel] [PATCH 03/24] tests/test-cutils: Add missing
+ qemu_strtol()... endptr checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,45 +38,108 @@ To: qemu-devel@nongnu.org
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/test-cutils.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ tests/test-cutils.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
 diff --git a/tests/test-cutils.c b/tests/test-cutils.c
-index 3dcd4c1..ec65d27 100644
+index 20b0f59..71681dc 100644
 --- a/tests/test-cutils.c
 +++ b/tests/test-cutils.c
-@@ -1463,6 +1463,23 @@ static void test_qemu_strtosz_invalid(void)
-     g_assert(endptr == str);
+@@ -262,6 +262,7 @@ static void test_qemu_strtol_empty(void)
+     err = qemu_strtol(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, -EINVAL);
++    g_assert(endptr == str);
  }
  
-+static void test_qemu_strtosz_trailing(void)
-+{
-+    const char *str;
-+    char *endptr = NULL;
-+    int64_t res;
-+
-+    str = "123xxx";
-+    res = qemu_strtosz(str, &endptr);
-+    g_assert_cmpint(res, ==, 123 * M_BYTE);
-+    g_assert(endptr == str + 3);
-+
-+    str = "1kiB";
-+    res = qemu_strtosz(str, &endptr);
-+    g_assert_cmpint(res, ==, 1024);
-+    g_assert(endptr == str + 2);
-+}
-+
- static void test_qemu_strtosz_erange(void)
- {
-     const char *str = "10E";
-@@ -1676,6 +1693,8 @@ int main(int argc, char **argv)
-                     test_qemu_strtosz_float);
-     g_test_add_func("/cutils/strtosz/invalid",
-                     test_qemu_strtosz_invalid);
-+    g_test_add_func("/cutils/strtosz/trailing",
-+                    test_qemu_strtosz_trailing);
-     g_test_add_func("/cutils/strtosz/erange",
-                     test_qemu_strtosz_erange);
-     g_test_add_func("/cutils/strtosz/suffix-unit",
+ static void test_qemu_strtol_whitespace(void)
+@@ -275,6 +276,7 @@ static void test_qemu_strtol_whitespace(void)
+     err = qemu_strtol(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, -EINVAL);
++    g_assert(endptr == str);
+ }
+ 
+ static void test_qemu_strtol_invalid(void)
+@@ -288,6 +290,7 @@ static void test_qemu_strtol_invalid(void)
+     err = qemu_strtol(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, -EINVAL);
++    g_assert(endptr == str);
+ }
+ 
+ static void test_qemu_strtol_trailing(void)
+@@ -548,6 +551,7 @@ static void test_qemu_strtoul_empty(void)
+     err = qemu_strtoul(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, -EINVAL);
++    g_assert(endptr == str);
+ }
+ 
+ static void test_qemu_strtoul_whitespace(void)
+@@ -561,6 +565,7 @@ static void test_qemu_strtoul_whitespace(void)
+     err = qemu_strtoul(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, -EINVAL);
++    g_assert(endptr == str);
+ }
+ 
+ static void test_qemu_strtoul_invalid(void)
+@@ -574,6 +579,7 @@ static void test_qemu_strtoul_invalid(void)
+     err = qemu_strtoul(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, -EINVAL);
++    g_assert(endptr == str);
+ }
+ 
+ static void test_qemu_strtoul_trailing(void)
+@@ -829,6 +835,7 @@ static void test_qemu_strtoll_empty(void)
+     err = qemu_strtoll(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, -EINVAL);
++    g_assert(endptr == str);
+ }
+ 
+ static void test_qemu_strtoll_whitespace(void)
+@@ -842,6 +849,7 @@ static void test_qemu_strtoll_whitespace(void)
+     err = qemu_strtoll(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, -EINVAL);
++    g_assert(endptr == str);
+ }
+ 
+ static void test_qemu_strtoll_invalid(void)
+@@ -855,6 +863,7 @@ static void test_qemu_strtoll_invalid(void)
+     err = qemu_strtoll(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, -EINVAL);
++    g_assert(endptr == str);
+ }
+ 
+ static void test_qemu_strtoll_trailing(void)
+@@ -1113,6 +1122,7 @@ static void test_qemu_strtoull_empty(void)
+     err = qemu_strtoull(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, -EINVAL);
++    g_assert(endptr == str);
+ }
+ 
+ static void test_qemu_strtoull_whitespace(void)
+@@ -1126,6 +1136,7 @@ static void test_qemu_strtoull_whitespace(void)
+     err = qemu_strtoull(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, -EINVAL);
++    g_assert(endptr == str);
+ }
+ 
+ static void test_qemu_strtoull_invalid(void)
+@@ -1139,6 +1150,7 @@ static void test_qemu_strtoull_invalid(void)
+     err = qemu_strtoull(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, -EINVAL);
++    g_assert(endptr == str);
+ }
+ 
+ static void test_qemu_strtoull_trailing(void)
 -- 
 2.7.4
