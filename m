@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cdTki-0001As-R7
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 22:26:06 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cdTpB-0003Qi-LI
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 22:30:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cdTkf-0003J6-OI
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 22:26:04 -0500
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:34638)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cdTkf-0003J0-IU
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 22:26:01 -0500
-Received: by mail-ot0-x242.google.com with SMTP id 73so14725350otj.1
-	for <qemu-devel@nongnu.org>; Mon, 13 Feb 2017 19:26:01 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <mailman.51026.1486615955.22738.qemu-devel@nongnu.org>
-	<8C14E9D0-F376-4CDC-BF24-A0609A329977@gmail.com>
-	<20170210003916.GL32144@lianli.shorne-pla.net>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <ec491d8c-3fb0-3ce9-5558-ac4ab1455f7f@twiddle.net>
-Date: Tue, 14 Feb 2017 14:25:31 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1cdTp8-0004Lb-Bh
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 22:30:41 -0500
+Date: Tue, 14 Feb 2017 14:23:48 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170214032348.GE2169@umbus.fritz.box>
+References: <4c44ad5045020be90edfdc8787002e09691db1d3.1479770377.git.sam.bobroff@au1.ibm.com>
+	<20170213053340.GC25381@umbus>
+	<602f2661-0d45-d135-e3f8-64426329a736@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170210003916.GL32144@lianli.shorne-pla.net>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 00/22] target/openrisc updates
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="/2994txjAzEdQwm5"
+Content-Disposition: inline
+In-Reply-To: <602f2661-0d45-d135-e3f8-64426329a736@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v3 1/1] hw/net/spapr_llan: 6
+ byte mac address device tree entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,80 +26,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stafford Horne <shorne@gmail.com>, G 3 <programmingkidx@gmail.com>
-Cc: Openrisc <openrisc@lists.librecores.org>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
-
-On 02/10/2017 11:39 AM, Stafford Horne wrote:
-> On Thu, Feb 09, 2017 at 09:10:51AM -0500, G 3 wrote:
->>
->> On Feb 8, 2017, at 11:52 PM, qemu-devel-request@nongnu.org wrote:
->>
->>> Message: 6
->>> Date: Wed,  8 Feb 2017 20:51:32 -0800
->>> From: Richard Henderson <rth@twiddle.net>
->>> To: qemu-devel@nongnu.org
->>> Cc: shorne@gmail.com
->>> Subject: [Qemu-devel] [PATCH 00/22] target/openrisc updates
->>> Message-ID: <20170209045154.16868-1-rth@twiddle.net>
->>>
->>> The bulk of this patch set is 2-3 years old, and was mostly
->>> reviewed by Bastian Koppelmann.  But it languished because
->>> there were reports of it not booting kernel images, and I
->>> had problems putting together a set of tools that could even
->>> build a kernel.
->>>
->>> The OpenRISC community has picked up activity recently,
->>> with Stafford Horne upstreaming some of the compiler tools.
->>> He has even done some testing for me of this patch set.
->>>
->>>
->>> r~
->>
->> I see you are working on OpenRISC. Would you be able to help
->> me improve its wiki page?
->>
->> http://wiki.qemu-project.org/Documentation/Platforms/OpenRISC
->>
->> Right now there isn't much information on OpenRISC here. I'm
->> hoping to make it a lot useful to anyone who is interesting in this
->> platform.
->>
->> Would you know of any links to software that works in OpenRISC?
->>
->> Pictures of the OpenRISC target running anything would be great also.
->>
->> What is your suggested command-line for using OpenRISC?
->>
->> If you have any suggestions on how to improve the page place don't
->> hesitate to let me know.
->>
->
-> Hi Richard, G 3,
->
-> I am not sure if Richard has the time for this.  But I kind of got him
-> started back on the openrisc work, it would be my fault to burden him
-> with even more work :).  Also, I was helping to do some tests so I have
-> some example commands.
-
-:-)
-
-> I don't have a lot of time, but I think I can help to update the above.
-> Probably Richard and I could work together?
->
-> I was recently working on updating the openrisc page
->
->   http://openrisc.io
->
-> I think I could link between the two for toolchain compile guides and
-> software guides (i.e. debugging and linux).
->
-> Richard what do you think?
-
-Probably the most beneficial thing that we can do is create a kernel+initrd 
-that boots into a busybox root shell.  Similar to the other test images that we 
-have at
-
-   http://wiki.qemu-project.org/Testing/System_Images
+To: Thomas Huth <thuth@redhat.com>
+Cc: Sam Bobroff <sam.bobroff@au1.ibm.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
-r~
+--/2994txjAzEdQwm5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Feb 13, 2017 at 08:36:45AM +0100, Thomas Huth wrote:
+> On 13.02.2017 06:33, David Gibson wrote:
+> > On Tue, Nov 22, 2016 at 10:19:38AM +1100, Sam Bobroff wrote:
+> >> The spapr-vlan device in QEMU has always presented it's MAC address in
+> >> the device tree as an 8 byte value, even though PAPR requires it to be
+> >> 6 bytes.  This is because, at the time, AIX required the value to be 8
+> >> bytes.  However, modern versions of AIX support the (correct) 6
+> >> byte value so they no longer require the workaround.
+> >>
+> >> It would be neatest to always provide a 6 byte value but that would
+> >> cause a problem with old Linux kernel ibmveth drivers, so the old 8
+> >> byte value is still presented when necessary.
+> >>
+> >> Since commit 13f85203e (3.10, May 2013) the driver has been able to
+> >> handle 6 or 8 byte addresses so versions after that don't need to be
+> >> considered specially.
+> >>
+> >> Drivers from kernels before that can also handle either type of
+> >> address, but not always:
+> >> * If the first byte's lowest bits are 10, the address must be 6 bytes.
+> >> * Otherwise, the address must be 8 bytes.
+> >> (The two bits in question are significant in a MAC address: they
+> >> indicate a locally-administered unicast address.)
+> >>
+> >> So to maintain compatibility the old 8 byte value is presented when
+> >> the lowest two bits of the first byte are not 10.
+> >>
+> >> Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
+> >=20
+> > Sorry, I didn't see this one until now.
+> >=20
+> > Since we need a workaround for the workaround, is it actually worth
+> > going to the 6-byte property?
+>=20
+> 8-byte addresses are just wrong, all other network devices and the
+> standard use 6-byte MAC addresses instead. So we should use 6-byte
+> addresses in QEMU whenever it is possible, too. Unfortunately there are
+> still guests in the field that use this bad assumption with 8 byte
+> addresses, so I think this work-around is the best we can and should do
+> right now.
+
+Hm, yes, good point.  Applied to ppc-for-2.9.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--/2994txjAzEdQwm5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYonhCAAoJEGw4ysog2bOS2F4QAJTePCsmPjWybnds9fLSxi90
+7qdwzpUBclu9UxOMF3K6AVN0lmOaws6+wiUGhdeYRXH2yXkXIReenZYF4HFuQseL
+XmF9P1emHbmxh8oECyZ3+AraFyQGvjxzEwnm8SPXH+wIEvO93h/aWoAZosEYvvq5
+LyAGcPCGTklGfSxMLAQz4OdvR/o8PlQJnJ423MWWRluFt8XZkGRh4poKKd32WZuX
+fpxLCmEK7XD642v8IU4P19nU7hQrG332Ehet/zrzJDirBjgCRN8pcQpq7Aa6XVNm
+Yx1PRrS/xwXbTT7PM8VruizYATt7BkRve5TS9g5cjbZrKd7TreN1n8coBDpRvUA+
+sHjmWjThSPibXn218nZWCXhLya+ChjGTzoILKusyhNzVglAG4MxlvPPUG15PPuYW
+xg9kK06q5E34mNRphoUO18lBTzy0mPdKZUlBRe52NjuaSFXir5FEreUI3WxwxKJP
+H26EaDGGDvTHQmAlBZDTjtaKcRpeOvyDrxcnh6GHLTNIV5kqSNhm6rfWe+VYKITZ
+mZfhqXwve/ev6F1w3w8jtbWSYaXeTJqKJZdEoBBw15RWjABGzEdvf9LrvtTqfAX5
+zF6+SYmvnFJftFzZVlabMAmsyxfD/FGKTW5zApGLVbe9CjGZiaCTmiO3bkkcG1LR
+3dgTBNyc75eBe5NjKCYM
+=s2kC
+-----END PGP SIGNATURE-----
+
+--/2994txjAzEdQwm5--
