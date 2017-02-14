@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cdijP-000151-WE
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 14:25:46 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cdirz-0001Kz-1D
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 14:34:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cdijO-0005Mw-0h
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 14:25:43 -0500
-From: Eric Blake <eblake@redhat.com>
-Date: Tue, 14 Feb 2017 13:25:25 -0600
-Message-Id: <20170214192525.18624-8-eblake@redhat.com>
-In-Reply-To: <20170214192525.18624-1-eblake@redhat.com>
-References: <20170214192525.18624-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 7/7] tests: Add coverage for recent block
- geometry fixes
+	(envelope-from <dgilbert@redhat.com>) id 1cdirw-0000HQ-Am
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 14:34:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59572)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cdirw-0000HI-1r
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 14:34:32 -0500
+Date: Tue, 14 Feb 2017 19:34:26 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170214193425.GF11561@work-vm>
+References: <20170206173306.20603-1-dgilbert@redhat.com>
+	<20170206174529.GI2524@work-vm>
+	<CGME20170213171108eucas1p147999fc8b6980ff89a67626b78b12e44@eucas1p1.samsung.com>
+	<20170213171058.GA4246@aperevalov-ubuntu>
+	<20170213181601.GG3086@work-vm>
+	<20170214162155.GB6645@aperevalov-ubuntu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170214162155.GB6645@aperevalov-ubuntu>
+Subject: Re: [Qemu-devel] [PATCH v2 00/16] Postcopy: Hugepage support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,242 +31,248 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: aarcange@redhat.com, qemu-devel@nongnu.org, quintela@redhat.com
 
-Use blkdebug's new geometry constraints to emulate setups that
-have caused recent regression fixes: write zeroes asserting
-when running through a loopback block device with max-transfer
-smaller than cluster size, and discard rounding away portions
-of requests not aligned to preferred boundaries.  Also, add
-coverage that the block layer is honoring max transfer limits.
+* Alexey Perevalov (a.perevalov@samsung.com) wrote:
+> Hi David,
+> 
+> Thank your, now it's clear.
+> 
+> On Mon, Feb 13, 2017 at 06:16:02PM +0000, Dr. David Alan Gilbert wrote:
+> > * Alexey Perevalov (a.perevalov@samsung.com) wrote:
+> > >  Hello David!
+> > 
+> > Hi Alexey,
+> > 
+> > > I have checked you series with 1G hugepage, but only in 1 Gbit/sec network
+> > > environment.
+> > 
+> > Can you show the qemu command line you're using?  I'm just trying
+> > to make sure I understand where your hugepages are; running 1G hostpages
+> > across a 1Gbit/sec network for postcopy would be pretty poor - it would take
+> > ~10 seconds to transfer the page.
+> 
+> sure
+> -hda ./Ubuntu.img -name PAU,debug-threads=on -boot d -net nic -net user
+> -m 1024 -localtime -nographic -enable-kvm -incoming tcp:0:4444 -object
+> memory-backend-file,id=mem,size=1G,mem-path=/dev/hugepages -mem-prealloc
+> -numa node,memdev=mem -trace events=/tmp/events -chardev
+> socket,id=charmonitor,path=/var/lib/migrate-vm-monitor.sock,server,nowait
+> -mon chardev=charmonitor,id=monitor,mode=control
 
-For now, a single iotest performs all actions, with the idea
-that we can add future blkdebug constraint test cases in the
-same file; but it can be split into multiple iotests if we find
-reason to run one portion of the test in more setups than what
-are possible in the other.
+OK, it's a pretty unusual setup - a 1G page guest with 1G of guest RAM.
 
-For reference, the final portion of the test (checking whether
-discard passes as much as possible to the lowest layers of the
-stack) works as follows:
+> > 
+> > > I started Ubuntu just with console interface and gave to it only 1G of
+> > > RAM, inside Ubuntu I started stress command
+> > 
+> > > (stress --cpu 4 --io 4 --vm 4 --vm-bytes 256000000 &)
+> > > in such environment precopy live migration was impossible, it never
+> > > being finished, in this case it infinitely sends pages (it looks like
+> > > dpkg scenario).
+> > > 
+> > > Also I modified stress utility
+> > > http://people.seas.harvard.edu/~apw/stress/stress-1.0.4.tar.gz
+> > > due to it wrote into memory every time the same value `Z`. My
+> > > modified version writes every allocation new incremented value.
+> > 
+> > I use google's stressapptest normally; although remember to turn
+> > off the bit where it pauses.
+> 
+> I decided to use it too
+> stressapptest -s 300 -M 256 -m 8 -W
+> 
+> > 
+> > > I'm using Arcangeli's kernel only at the destination.
+> > > 
+> > > I got controversial results. Downtime for 1G hugepage is close to 2Mb
+> > > hugepage and it took around 7 ms (in 2Mb hugepage scenario downtime was
+> > > around 8 ms).
+> > > I made that opinion by query-migrate.
+> > > {"return": {"status": "completed", "setup-time": 6, "downtime": 6, "total-time": 9668, "ram": {"total": 1091379200, "postcopy-requests": 1, "dirty-sync-count": 2, "remaining": 0, "mbps": 879.786851, "transferred": 1063007296, "duplicate": 7449, "dirty-pages-rate": 0, "skipped": 0, "normal-bytes": 1060868096, "normal": 259001}}}
+> > > 
+> > > Documentation says about downtime field - measurement unit is ms.
+> > 
+> > The downtime measurement field is pretty meaningless for postcopy; it's only
+> > the time from stopping the VM until the point where we tell the destination it
+> > can start running.  Meaningful measurements are only from inside the guest
+> > really, or the place latencys.
+> >
+> 
+> Maybe improve it by receiving such information from destination?
+> I wish to do that.
+> > > So I traced it (I added additional trace into postcopy_place_page
+> > > trace_postcopy_place_page_start(host, from, pagesize); )
+> > > 
+> > > postcopy_ram_fault_thread_request Request for HVA=7f6dc0000000 rb=/objects/mem offset=0
+> > > postcopy_place_page_start host=0x7f6dc0000000 from=0x7f6d70000000, pagesize=40000000
+> > > postcopy_place_page_start host=0x7f6e0e800000 from=0x55b665969619, pagesize=1000
+> > > postcopy_place_page_start host=0x7f6e0e801000 from=0x55b6659684e8, pagesize=1000
+> > > several pages with 4Kb step ...
+> > > postcopy_place_page_start host=0x7f6e0e817000 from=0x55b6659694f0, pagesize=1000
+> > > 
+> > > 4K pages, started from 0x7f6e0e800000 address it's
+> > > vga.ram, /rom@etc/acpi/tables etc.
+> > > 
+> > > Frankly saying, right now, I don't have any ideas why hugepage wasn't
+> > > resent. Maybe my expectation of it is wrong as well as understanding )
+> > 
+> > That's pretty much what I expect to see - before you get into postcopy
+> > mode everything is sent as individual 4k pages (in order); once we're
+> > in postcopy mode we send each page no more than once.  So you're
+> > huge page comes across once - and there it is.
+> > 
+> > > stress utility also duplicated for me value into appropriate file:
+> > > sec_since_epoch.microsec:value
+> > > 1487003192.728493:22
+> > > 1487003197.335362:23
+> > > *1487003213.367260:24*
+> > > *1487003238.480379:25*
+> > > 1487003243.315299:26
+> > > 1487003250.775721:27
+> > > 1487003255.473792:28
+> > > 
+> > > It mean rewriting 256Mb of memory per byte took around 5 sec, but at
+> > > the moment of migration it took 25 sec.
+> > 
+> > right, now this is the thing that's more useful to measure.
+> > That's not too surprising; when it migrates that data is changing rapidly
+> > so it's going to have to pause and wait for that whole 1GB to be transferred.
+> > Your 1Gbps network is going to take about 10 seconds to transfer that
+> > 1GB page - and that's if you're lucky and it saturates the network.
+> > SO it's going to take at least 10 seconds longer than it normally
+> > would, plus any other overheads - so at least 15 seconds.
+> > This is why I say it's a bad idea to use 1GB host pages with postcopy.
+> > Of course it would be fun to find where the other 10 seconds went!
+> > 
+> > You might like to add timing to the tracing so you can see the time between the
+> > fault thread requesting the page and it arriving.
+> >
+> yes, sorry I forgot about timing
+> 20806@1487084818.270993:postcopy_ram_fault_thread_request Request for HVA=7f0280000000 rb=/objects/mem offset=0
+> 20806@1487084818.271038:qemu_loadvm_state_section 8
+> 20806@1487084818.271056:loadvm_process_command com=0x2 len=4
+> 20806@1487084818.271089:qemu_loadvm_state_section 2
+> 20806@1487084823.315919:postcopy_place_page_start host=0x7f0280000000 from=0x7f0240000000, pagesize=40000000
+> 
+> 1487084823.315919 - 1487084818.270993 = 5.044926 sec.
+> Machines connected w/o any routers, directly by cable.
 
-qemu-io: discard 30M at 80000001, passed to blkdebug
-  blkdebug: discard 511 bytes at 80000001, -ENOTSUP (smaller than
-blkdebug's 512 align)
-  blkdebug: discard 14371328 bytes at 80000512, passed to qcow2
-    qcow2: discard 739840 bytes at 80000512, -ENOTSUP (smaller than
-qcow2's 1M align)
-    qcow2: discard 13M bytes at 77M, succeeds
-  blkdebug: discard 15M bytes at 90M, passed to qcow2
-    qcow2: discard 15M bytes at 90M, succeeds
-  blkdebug: discard 1356800 bytes at 105M, passed to qcow2
-    qcow2: discard 1M at 105M, succeeds
-    qcow2: discard 308224 bytes at 106M, -ENOTSUP (smaller than qcow2's
-1M align)
-  blkdebug: discard 1 byte at 111457280, -ENOTSUP (smaller than
-blkdebug's 512 align)
+OK, the fact it's only 5 seconds not 10 I think suggests a lot of the memory was all zero
+so didn't take up the whole bandwidth.
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+> > > Another one request.
+> > > QEMU could use mem_path in hugefs with share key simultaneously
+> > > (-object memory-backend-file,id=mem,size=${mem_size},mem-path=${mem_path},share=on) and vm
+> > > in this case will start and will properly work (it will allocate memory
+> > > with mmap), but in case of destination for postcopy live migration
+> > > UFFDIO_COPY ioctl will fail for
+> > > such region, in Arcangeli's git tree there is such prevent check
+> > > (if (!vma_is_shmem(dst_vma) && dst_vma->vm_flags & VM_SHARED).
+> > > Is it possible to handle such situation at qemu?
+> > 
+> > Imagine that you had shared memory; what semantics would you like
+> > to see ?  What happens to the other process?
+> 
+> Honestly, initially, I thought to handle such error, but I quit forgot
+> about vhost-user in ovs-dpdk.
 
----
-v5: rebase to master by renumbering s/173/175/
-v4: clean up some comments, nicer backing file creation, more commit message
-v3: make comments tied more to test at hand, rather than the
-particular hardware that led to the earlier patches being tested
-v2: new patch
----
- tests/qemu-iotests/175     | 114 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/175.out |  49 +++++++++++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 164 insertions(+)
- create mode 100755 tests/qemu-iotests/175
- create mode 100644 tests/qemu-iotests/175.out
+Yes, I don't know much about vhost-user; but we'll have to think carefully
+about the way things behave when they're accessing memory that's shared
+with qemu during migration.  Writing to the source after we've started
+the postcopy phase is not allowed.  Accessing the destination memory
+during postcopy will produce pauses in the other processes accessing it
+(I think) and they mustn't do various types of madvise etc - so
+I'm sure there will be things we find out the hard way!
 
-diff --git a/tests/qemu-iotests/175 b/tests/qemu-iotests/175
-new file mode 100755
-index 0000000..867c9ca
---- /dev/null
-+++ b/tests/qemu-iotests/175
-@@ -0,0 +1,114 @@
-+#!/bin/bash
-+#
-+# Test corner cases with unusual block geometries
-+#
-+# Copyright (C) 2016-2017 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=eblake@redhat.com
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+here=`pwd`
-+status=1	# failure is the default!
-+
-+_cleanup()
-+{
-+	_cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt qcow2
-+_supported_proto file
-+
-+CLUSTER_SIZE=1M
-+size=128M
-+options=driver=blkdebug,image.driver=qcow2
-+
-+echo
-+echo "== setting up files =="
-+
-+TEST_IMG="$TEST_IMG.base" _make_test_img $size
-+$QEMU_IO -c "write -P 11 0 $size" "$TEST_IMG.base" | _filter_qemu_io
-+_make_test_img -b "$TEST_IMG.base"
-+$QEMU_IO -c "write -P 22 0 $size" "$TEST_IMG" | _filter_qemu_io
-+
-+# Limited to 64k max-transfer
-+echo
-+echo "== constrained alignment and max-transfer =="
-+limits=align=4k,max-transfer=64k
-+$QEMU_IO -c "open -o $options,$limits blkdebug::$TEST_IMG" \
-+         -c "write -P 33 1000 128k" -c "read -P 33 1000 128k" | _filter_qemu_io
-+
-+echo
-+echo "== write zero with constrained max-transfer =="
-+limits=align=512,max-transfer=64k,opt-write-zero=$CLUSTER_SIZE
-+$QEMU_IO -c "open -o $options,$limits blkdebug::$TEST_IMG" \
-+         -c "write -z 8003584 2093056" | _filter_qemu_io
-+
-+# non-power-of-2 write-zero/discard alignments
-+echo
-+echo "== non-power-of-2 write zeroes limits =="
-+
-+limits=align=512,opt-write-zero=15M,max-write-zero=15M,opt-discard=15M,max-discard=15M
-+$QEMU_IO -c "open -o $options,$limits blkdebug::$TEST_IMG" \
-+         -c "write -z 32M 32M" | _filter_qemu_io
-+
-+echo
-+echo "== non-power-of-2 discard limits =="
-+
-+limits=align=512,opt-write-zero=15M,max-write-zero=15M,opt-discard=15M,max-discard=15M
-+$QEMU_IO -c "open -o $options,$limits blkdebug::$TEST_IMG" \
-+         -c "discard 80000001 30M" | _filter_qemu_io
-+
-+echo
-+echo "== verify image content =="
-+
-+function verify_io()
-+{
-+    if ($QEMU_IMG info -f "$IMGFMT" "$TEST_IMG" |
-+	    grep "compat: 0.10" > /dev/null); then
-+        # For v2 images, discarded clusters are read from the backing file
-+        discarded=11
-+    else
-+        # Discarded clusters are zeroed for v3 or later
-+        discarded=0
-+    fi
-+
-+    echo read -P 22 0 1000
-+    echo read -P 33 1000 128k
-+    echo read -P 22 132072 7871512
-+    echo read -P 0 8003584 2093056
-+    echo read -P 22 10096640 23457792
-+    echo read -P 0 32M 32M
-+    echo read -P 22 64M 13M
-+    echo read -P $discarded 77M 29M
-+    echo read -P 22 106M 22M
-+}
-+
-+verify_io | $QEMU_IO "$TEST_IMG" | _filter_qemu_io
-+
-+_check_test_img
-+
-+# success, all done
-+echo "*** done"
-+status=0
-diff --git a/tests/qemu-iotests/175.out b/tests/qemu-iotests/175.out
-new file mode 100644
-index 0000000..9ac5e33
---- /dev/null
-+++ b/tests/qemu-iotests/175.out
-@@ -0,0 +1,49 @@
-+QA output created by 175
-+
-+== setting up files ==
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134217728
-+wrote 134217728/134217728 bytes at offset 0
-+128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/t.IMGFMT.base
-+wrote 134217728/134217728 bytes at offset 0
-+128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== constrained alignment and max-transfer ==
-+wrote 131072/131072 bytes at offset 1000
-+128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 131072/131072 bytes at offset 1000
-+128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== write zero with constrained max-transfer ==
-+wrote 2093056/2093056 bytes at offset 8003584
-+1.996 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== non-power-of-2 write zeroes limits ==
-+wrote 33554432/33554432 bytes at offset 33554432
-+32 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== non-power-of-2 discard limits ==
-+discard 31457280/31457280 bytes at offset 80000001
-+30 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== verify image content ==
-+read 1000/1000 bytes at offset 0
-+1000 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 131072/131072 bytes at offset 1000
-+128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 7871512/7871512 bytes at offset 132072
-+7.507 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 2093056/2093056 bytes at offset 8003584
-+1.996 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 23457792/23457792 bytes at offset 10096640
-+22.371 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 33554432/33554432 bytes at offset 33554432
-+32 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 13631488/13631488 bytes at offset 67108864
-+13 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 30408704/30408704 bytes at offset 80740352
-+29 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 23068672/23068672 bytes at offset 111149056
-+22 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+No errors were found on the image.
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 985b9a6..bf504d1 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -167,3 +167,4 @@
- 172 auto
- 173 rw auto
- 174 auto
-+175 rw auto quick
--- 
-2.9.3
+Dave
+
+> > Dave
+> > 
+> > > On Mon, Feb 06, 2017 at 05:45:30PM +0000, Dr. David Alan Gilbert wrote:
+> > > > * Dr. David Alan Gilbert (git) (dgilbert@redhat.com) wrote:
+> > > > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > > > > 
+> > > > > Hi,
+> > > > >   The existing postcopy code, and the userfault kernel
+> > > > > code that supports it, only works for normal anonymous memory.
+> > > > > Kernel support for userfault on hugetlbfs is working
+> > > > > it's way upstream; it's in the linux-mm tree,
+> > > > > You can get a version at:
+> > > > >    git://git.kernel.org/pub/scm/linux/kernel/git/andrea/aa.git
+> > > > > on the origin/userfault branch.
+> > > > > 
+> > > > > Note that while this code supports arbitrary sized hugepages,
+> > > > > it doesn't make sense with pages above the few-MB region,
+> > > > > so while 2MB is fine, 1GB is probably a bad idea;
+> > > > > this code waits for and transmits whole huge pages, and a
+> > > > > 1GB page would take about 1 second to transfer over a 10Gbps
+> > > > > link - which is way too long to pause the destination for.
+> > > > > 
+> > > > > Dave
+> > > > 
+> > > > Oops I missed the v2 changes from the message:
+> > > > 
+> > > > v2
+> > > >   Flip ram-size summary word/compare individual page size patches around
+> > > >   Individual page size comparison is done in ram_load if 'advise' has been
+> > > >     received rather than checking migrate_postcopy_ram()
+> > > >   Moved discard code into exec.c, reworked ram_discard_range
+> > > > 
+> > > > Dave
+> > > 
+> > > Thank your, right now it's not necessary to set
+> > > postcopy-ram capability on destination machine.
+> > > 
+> > > 
+> > > > 
+> > > > > Dr. David Alan Gilbert (16):
+> > > > >   postcopy: Transmit ram size summary word
+> > > > >   postcopy: Transmit and compare individual page sizes
+> > > > >   postcopy: Chunk discards for hugepages
+> > > > >   exec: ram_block_discard_range
+> > > > >   postcopy: enhance ram_block_discard_range for hugepages
+> > > > >   Fold postcopy_ram_discard_range into ram_discard_range
+> > > > >   postcopy: Record largest page size
+> > > > >   postcopy: Plumb pagesize down into place helpers
+> > > > >   postcopy: Use temporary for placing zero huge pages
+> > > > >   postcopy: Load huge pages in one go
+> > > > >   postcopy: Mask fault addresses to huge page boundary
+> > > > >   postcopy: Send whole huge pages
+> > > > >   postcopy: Allow hugepages
+> > > > >   postcopy: Update userfaultfd.h header
+> > > > >   postcopy: Check for userfault+hugepage feature
+> > > > >   postcopy: Add doc about hugepages and postcopy
+> > > > > 
+> > > > >  docs/migration.txt                |  13 ++++
+> > > > >  exec.c                            |  83 +++++++++++++++++++++++
+> > > > >  include/exec/cpu-common.h         |   2 +
+> > > > >  include/exec/memory.h             |   1 -
+> > > > >  include/migration/migration.h     |   3 +
+> > > > >  include/migration/postcopy-ram.h  |  13 ++--
+> > > > >  linux-headers/linux/userfaultfd.h |  81 +++++++++++++++++++---
+> > > > >  migration/migration.c             |   1 +
+> > > > >  migration/postcopy-ram.c          | 138 +++++++++++++++++---------------------
+> > > > >  migration/ram.c                   | 109 ++++++++++++++++++------------
+> > > > >  migration/savevm.c                |  32 ++++++---
+> > > > >  migration/trace-events            |   2 +-
+> > > > >  12 files changed, 328 insertions(+), 150 deletions(-)
+> > > > > 
+> > > > > -- 
+> > > > > 2.9.3
+> > > > > 
+> > > > > 
+> > > > --
+> > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > > > 
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
+> 
+> -- 
+> 
+> BR
+> Alexey
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
