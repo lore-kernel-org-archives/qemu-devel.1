@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cdh13-0005ZK-46
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 12:35:51 -0500
+	(envelope-from <bounces@canonical.com>) id 1cdhZi-0004Xv-AO
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 13:11:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cdh12-0002Df-1j
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 12:35:49 -0500
-References: <20170203094018.15493-1-vsementsov@virtuozzo.com>
-	<20170203094018.15493-12-vsementsov@virtuozzo.com>
-	<72ced0d7-1ec1-c1e2-362f-f010d6d942e7@redhat.com>
-	<35954e87-8c8f-0747-15e4-e65838384dc2@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <095026e0-24fc-e020-0f45-09fe3124a267@redhat.com>
-Date: Tue, 14 Feb 2017 12:35:41 -0500
+	(envelope-from <bounces@canonical.com>) id 1cdhZe-0000Tz-D8
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 13:11:38 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47471)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cdhZe-0000Tj-7D
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 13:11:34 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cdhZc-0006Xx-Eq
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 18:11:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id E8D262E80CB
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 18:11:31 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <35954e87-8c8f-0747-15e4-e65838384dc2@virtuozzo.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 11/24] block: introduce persistent dirty
- bitmaps
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 14 Feb 2017 17:55:38 -0000
+From: Thomas Huth <1273944@bugs.launchpad.net>
+Reply-To: Bug 1273944 <1273944@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20140129041802.30520.43680.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170214175538.6292.84480.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1273944] Re: multiboot header has 0 in mem_upper
+ field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,51 +37,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: qemu-devel@nongnu.org
 
+tests/multiboot seems to work with current git again, so I assume this
+issue has been fixed? Or is there something left to do?
 
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-On 02/14/2017 07:05 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 11.02.2017 02:20, John Snow wrote:
->> On 02/03/2017 04:40 AM, Vladimir Sementsov-Ogievskiy wrote:
+-- =
 
->>> +void bdrv_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error
->>> **errp)
->>> +{
->>> +    BlockDriver *drv = bs->drv;
->>> +
->>> +    if (!bdrv_has_persistent_bitmaps(bs)) {
->>> +        return;
->>> +    }
->>> +
->>> +    if (!drv) {
->>> +        error_setg_errno(errp, ENOMEDIUM,
->>> +                         "Can't store persistent bitmaps to %s",
->>> +                         bdrv_get_device_or_node_name(bs));
->>> +        return;
->>> +    }
->>> +
->>> +    if (!drv->bdrv_store_persistent_dirty_bitmaps) {
->>> +        error_setg_errno(errp, ENOTSUP,
->>> +                         "Can't store persistent bitmaps to %s",
->>> +                         bdrv_get_device_or_node_name(bs));
->>> +        return;
->>> +    }
->>> +
->> I suppose this is for the case for where we have added a persistent
->> bitmap during runtime, but the driver does not support it?
->>
->> I'd rather fail this type of thing earlier if possible, but I'm not that
->> far in your series yet.
-> 
-> qmp bitmap add checks for availability of
-> drv->bdrv_can_store_new_dirty_bitmap,
-> and loaded bitmaps of course should be attached to bds with appropriate
-> driver.
-> So, it is mostly a paranoic check.
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1273944
 
-OK, understood. Not a problem, then.
+Title:
+  multiboot header has 0 in mem_upper field
 
---js
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  When booting a multiboot image,. mem_upper is now always zero.
+
+  To test, build qemu from current git head, then do
+    cd tests/multiboot
+    ./run_test.sh
+
+  You will see the test fail.  In each case mem_upper is 0k.
+
+  git-bisect says the bad commit is
+  0169c511554cb0014a00290b0d3d26c31a49818f in qemu.git
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1273944/+subscriptions
