@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cdb5W-0006Vq-4G
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:16:03 -0500
+	(envelope-from <berrange@redhat.com>) id 1cdb7D-0007Qf-Pk
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:17:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cdb5S-0004m0-83
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:16:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56062)
+	(envelope-from <berrange@redhat.com>) id 1cdb79-0005vf-Tz
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:17:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60958)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cdb5R-0004kq-VA
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:15:58 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cdb79-0005uq-L5
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 06:17:43 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7F73C7FB64
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 11:15:57 +0000 (UTC)
-Date: Tue, 14 Feb 2017 11:15:51 +0000
+	by mx1.redhat.com (Postfix) with ESMTPS id CEFF1C054908
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 11:17:43 +0000 (UTC)
+Date: Tue, 14 Feb 2017 11:17:37 +0000
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170214111551.GB467@redhat.com>
+Message-ID: <20170214111737.GC467@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1485207141-1941-1-git-send-email-quintela@redhat.com>
-	<1485207141-1941-16-git-send-email-quintela@redhat.com>
+References: <1487006388-7966-1-git-send-email-quintela@redhat.com>
+	<1487006388-7966-8-git-send-email-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1485207141-1941-16-git-send-email-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 15/17] migration: Test new fd infrastructure
+In-Reply-To: <1487006388-7966-8-git-send-email-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 07/12] migration: Start of multiple fd work
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,76 +37,126 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Juan Quintela <quintela@redhat.com>
 Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, dgilbert@redhat.com
 
-On Mon, Jan 23, 2017 at 10:32:19PM +0100, Juan Quintela wrote:
-> We just send the address through the alternate channels and test that it
-> is ok.
+On Mon, Feb 13, 2017 at 06:19:43PM +0100, Juan Quintela wrote:
+> We create new channels for each new thread created. We only send through
+> them a character to be sure that we are creating the channels in the
+> right order.
 > 
 > Signed-off-by: Juan Quintela <quintela@redhat.com>
 > ---
->  migration/ram.c | 36 ++++++++++++++++++++++++++++++++++++
->  1 file changed, 36 insertions(+)
+>  include/migration/migration.h |  7 +++++
+>  migration/ram.c               | 33 ++++++++++++++++++++++
+>  migration/socket.c            | 64 +++++++++++++++++++++++++++++++++++++++++--
+>  3 files changed, 101 insertions(+), 3 deletions(-)
+
+[snip]
+
+> diff --git a/migration/socket.c b/migration/socket.c
+> index 13966f1..1c764f1 100644
+> --- a/migration/socket.c
+> +++ b/migration/socket.c
+> @@ -24,6 +24,62 @@
+>  #include "io/channel-socket.h"
+>  #include "trace.h"
 > 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 4e530ea..95af694 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -432,8 +432,22 @@ static void *multifd_send_thread(void *opaque)
->      qemu_mutex_lock(&params->mutex);
->      while (!params->quit){
->          if (params->pages.num) {
-> +            int i;
-> +            int num;
+> +struct SocketArgs {
+> +    QIOChannelSocket *ioc;
+> +    SocketAddress *saddr;
+> +    Error **errp;
+> +} socket_args;
 > +
-> +            num = params->pages.num;
-
-Is this likely to be a small or a large value ? .....
-
->              params->pages.num = 0;
->              qemu_mutex_unlock(&params->mutex);
+> +QIOChannel *socket_recv_channel_create(void)
+> +{
+> +    QIOChannelSocket *sioc;
+> +    Error *err = NULL;
 > +
-> +            for(i=0; i < num; i++) {
-> +                if (qio_channel_write(params->c,
-> +                                      (const char *)&params->pages.address[i],
-> +                                      sizeof(uint8_t *), &error_abort)
-> +                    != sizeof(uint8_t*)) {
-> +                    /* Shuoudn't ever happen */
-> +                    exit(-1);
-> +                }
-> +            }
-
-If 'num' is large,then you would be better populating an iovec
-and using qio_channel_writev() rather than sending one uint8_t *
-at a time.
-
-
-> @@ -605,8 +620,29 @@ static void *multifd_recv_thread(void *opaque)
->      qemu_mutex_lock(&params->mutex);
->      while (!params->quit){
->          if (params->pages.num) {
-> +            int i;
-> +            int num;
+> +    sioc = qio_channel_socket_accept(QIO_CHANNEL_SOCKET(socket_args.ioc),
+> +                                     &err);
+> +    if (!sioc) {
+> +        error_report("could not accept migration connection (%s)",
+> +                     error_get_pretty(err));
+> +        return NULL;
+> +    }
+> +    return QIO_CHANNEL(sioc);
+> +}
 > +
-> +            num = params->pages.num;
->              params->pages.num = 0;
->              qemu_mutex_unlock(&params->mutex);
+> +int socket_recv_channel_destroy(QIOChannel *recv)
+> +{
+> +    /* Remove channel */
+> +    object_unref(OBJECT(send));
+> +    return 0;
+> +}
 > +
-> +            for(i = 0; i < num; i++) {
-> +                if (qio_channel_read(params->c,
-> +                                     (char *)&recv_address,
-> +                                     sizeof(uint8_t*), &error_abort)
-> +                    != sizeof(uint8_t *)) {
-> +                    /* shouldn't ever happen */
-> +                    exit(-1);
-> +                }
-> +                if (recv_address != params->pages.address[i]) {
-> +                    printf("We received %p what we were expecting %p (%d)\n",
-> +                           recv_address,
-> +                           params->pages.address[i], i);
-> +                    exit(-1);
-> +                }
-> +            }
+> +/* we have created all the recv channels, we can close the main one */
+> +int socket_recv_channel_close_listening(void)
+> +{
+> +    /* Close listening socket as its no longer needed */
+> +    qio_channel_close(QIO_CHANNEL(socket_args.ioc), NULL);
+> +    return 0;
+> +}
+> +
+> +QIOChannel *socket_send_channel_create(void)
+> +{
+> +    QIOChannelSocket *sioc = qio_channel_socket_new();
+> +
+> +    qio_channel_socket_connect_sync(sioc, socket_args.saddr,
+> +                                    socket_args.errp);
+> +    qio_channel_set_delay(QIO_CHANNEL(sioc), false);
+> +    return QIO_CHANNEL(sioc);
+> +}
+> +
+> +int socket_send_channel_destroy(QIOChannel *send)
+> +{
+> +    /* Remove channel */
+> +    object_unref(OBJECT(send));
+> +    if (socket_args.saddr) {
+> +        qapi_free_SocketAddress(socket_args.saddr);
+> +        socket_args.saddr = NULL;
+> +    }
+> +    return 0;
+> +}
+> 
+>  static SocketAddress *tcp_build_address(const char *host_port, Error **errp)
+>  {
+> @@ -97,6 +153,10 @@ static void socket_start_outgoing_migration(MigrationState *s,
+>      struct SocketConnectData *data = g_new0(struct SocketConnectData, 1);
+> 
+>      data->s = s;
+> +
+> +    socket_args.saddr = saddr;
+> +    socket_args.errp = errp;
+> +
+>      if (saddr->type == SOCKET_ADDRESS_KIND_INET) {
+>          data->hostname = g_strdup(saddr->u.inet.data->host);
+>      }
+> @@ -107,7 +167,6 @@ static void socket_start_outgoing_migration(MigrationState *s,
+>                                       socket_outgoing_migration,
+>                                       data,
+>                                       socket_connect_data_free);
+> -    qapi_free_SocketAddress(saddr);
+>  }
+> 
+>  void tcp_start_outgoing_migration(MigrationState *s,
+> @@ -154,8 +213,6 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
+>      object_unref(OBJECT(sioc));
+> 
+>  out:
+> -    /* Close listening socket as its no longer needed */
+> -    qio_channel_close(ioc, NULL);
+>      return FALSE; /* unregister */
+>  }
+> 
+> @@ -164,6 +221,7 @@ static void socket_start_incoming_migration(SocketAddress *saddr,
+>                                              Error **errp)
+>  {
+>      QIOChannelSocket *listen_ioc = qio_channel_socket_new();
+> +    socket_args.ioc = listen_ioc;
+> 
+>      qio_channel_set_name(QIO_CHANNEL(listen_ioc),
+>                           "migration-socket-listener");
 
-Same comment as above.
+FYI I put some comments against v3 on this patch just as you sent this v4,
+as I don't think the changes here are desirable in this format.
 
 Regards,
 Daniel
