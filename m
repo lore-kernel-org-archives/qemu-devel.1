@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cdZn1-0007ST-A3
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 04:52:52 -0500
+	(envelope-from <berto@igalia.com>) id 1cdZnw-0007y9-1N
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 04:53:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cdZmz-0000Cy-TW
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 04:52:51 -0500
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:37487)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cdZmz-0000AY-N7
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 04:52:49 -0500
-Received: by mail-wm0-x22e.google.com with SMTP id v77so12805542wmv.0
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 01:52:47 -0800 (PST)
+	(envelope-from <berto@igalia.com>) id 1cdZnv-0000qI-2t
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 04:53:48 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <8d536684-8a07-7c34-16ca-be234685ab2a@redhat.com>
+References: <20170212014724.10618-1-mreitz@redhat.com>
+	<w51lgtazdqs.fsf@maestria.local.igalia.com>
+	<8d536684-8a07-7c34-16ca-be234685ab2a@redhat.com>
+Date: Tue, 14 Feb 2017 10:52:56 +0100
+Message-ID: <w51k28tumiv.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20170213175033.7314-1-dgilbert@redhat.com>
-References: <20170213175033.7314-1-dgilbert@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 14 Feb 2017 09:52:26 +0000
-Message-ID: <CAFEAcA9tX-vFscg2p7ASVaSpO2y-x7XnyLMS4wtMN0ZyNjqPLA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 00/14] migration queue
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: Swap request limit
+ definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +24,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Pavel Butsykin <pbutsykin@virtuozzo.com>, amit@kernel.org, zhanghailiang <zhang.zhanghailiang@huawei.com>, Ashijeet Acharya <ashijeetacharya@gmail.com>, Juan Quintela <quintela@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-On 13 February 2017 at 17:50, Dr. David Alan Gilbert (git)
-<dgilbert@redhat.com> wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> The following changes since commit df96bfab49dab2d0373e49b51bbb51ce72e1601e:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/pull-vga-20170213-1' into staging (2017-02-13 10:54:49 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/dagrh/qemu.git tags/pull-migration-20170213a
->
-> for you to fetch changes up to 982b78c5e37864c06fd7b5f156d80bf02628a855:
->
->   virtio/migration: Migrate virtio-net to VMState (2017-02-13 17:27:14 +0000)
->
-> ----------------------------------------------------------------
-> Migration
->
->   Amit: migration: remove myself as maintainer
->         MAINTAINERS: update my email address
->   Ashijeet: migrate: Introduce zero RAM checks to skip RAM migration
->   Pavel: Postcopy release RAM
->   Halil: consolidate VMStateField.start
->   Hailiang: COLO: fix setting checkpoint-delay not working properly
->          COLO: Shutdown related socket fd while do failover
->          COLO: Don't process failover request while loading VM's state
->   Me:
->      migration: Add VMSTATE_UNUSED_VARRAY_UINT32
->      migration: Add VMSTATE_WITH_TMP
->      tests/migration: Add test for VMSTATE_WITH_TMP
->      virtio-net VMState conversion and new VMSTATE macros
->
-> ----------------------------------------------------------------
+On Mon 13 Feb 2017 06:13:38 PM CET, Max Reitz wrote:
 
-Applied, thanks.
+>>> -#define BDRV_REQUEST_MAX_SECTORS MIN(SIZE_MAX >> BDRV_SECTOR_BITS, \
+>>> -                                     INT_MAX >> BDRV_SECTOR_BITS)
+>>> -#define BDRV_REQUEST_MAX_BYTES (BDRV_REQUEST_MAX_SECTORS << BDRV_SECTOR_BITS)
+>>> +#define BDRV_REQUEST_MAX_BYTES      MIN(SIZE_MAX, INT_MAX)
+>>> +#define BDRV_REQUEST_MAX_SECTORS    (BDRV_REQUEST_MAX_BYTES >> BDRV_SECTOR_BITS)
+>> 
+>> I'm just pointing it out because I don't know if this can cause
+>> problems, but this patch would make BDRV_REQUEST_MAX_BYTES not a
+>> multiple of the sector size (INT_MAX is actually a prime number).
+>
+> Very good point. I don't think this could be an issue, though. For one
+> thing, the use of BDRV_REQUEST_MAX_BYTES is very limited.
 
--- PMM
+Ok, but then I wonder what's the benefit of increasing
+BDRV_REQUEST_MAX_BYTES.
+
+Berto
