@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38580)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cdm1E-0000SV-IY
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 17:56:21 -0500
+	(envelope-from <eblake@redhat.com>) id 1cdm3n-0002Ls-Uv
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 17:59:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cdm1D-00028j-IS
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 17:56:20 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 14 Feb 2017 19:55:35 -0300
-Message-Id: <20170214225535.6880-1-f4bug@amsat.org>
+	(envelope-from <eblake@redhat.com>) id 1cdm3j-000378-2x
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 17:58:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56256)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cdm3i-00036q-QH
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 17:58:55 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C9F757E9FD
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 22:58:54 +0000 (UTC)
+References: <1487067971-10443-1-git-send-email-armbru@redhat.com>
+	<1487067971-10443-13-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <23df2b0c-a93d-a655-553f-53916f897a0b@redhat.com>
+Date: Tue, 14 Feb 2017 16:58:52 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3] register: fix incorrect read mask
+In-Reply-To: <1487067971-10443-13-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="fa38SgO9vRAJ8Bp9cCKX85bMpgh0GDai1"
+Subject: Re: [Qemu-devel] [PATCH 12/24] tests/test-cutils: Cover
+ qemu_strtosz() with trailing crap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,75 +35,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-trivial@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
-The register_read() and register_write() functions expect a bitmask argument.
-To avoid duplicated code, a new inlined function register_enabled_mask() is
-introduced.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--fa38SgO9vRAJ8Bp9cCKX85bMpgh0GDai1
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <23df2b0c-a93d-a655-553f-53916f897a0b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 12/24] tests/test-cutils: Cover
+ qemu_strtosz() with trailing crap
+References: <1487067971-10443-1-git-send-email-armbru@redhat.com>
+ <1487067971-10443-13-git-send-email-armbru@redhat.com>
+In-Reply-To: <1487067971-10443-13-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
----
+On 02/14/2017 04:25 AM, Markus Armbruster wrote:
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  tests/test-cutils.c | 19 +++++++++++++++++++
+>  1 file changed, 19 insertions(+)
+>=20
 
- v3: clarify functions affected in the commit message.
- v2: squashed together both previous commits as suggested by Francis Alistair.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
- hw/core/register.c | 21 +++++++++++++++------
- 1 file changed, 15 insertions(+), 6 deletions(-)
+> diff --git a/tests/test-cutils.c b/tests/test-cutils.c
+> index 3dcd4c1..ec65d27 100644
+> --- a/tests/test-cutils.c
+> +++ b/tests/test-cutils.c
+> @@ -1463,6 +1463,23 @@ static void test_qemu_strtosz_invalid(void)
+>      g_assert(endptr =3D=3D str);
+>  }
+> =20
+> +static void test_qemu_strtosz_trailing(void)
+> +{
+> +    const char *str;
+> +    char *endptr =3D NULL;
+> +    int64_t res;
+> +
+> +    str =3D "123xxx";
+> +    res =3D qemu_strtosz(str, &endptr);
+> +    g_assert_cmpint(res, =3D=3D, 123 * M_BYTE);
+> +    g_assert(endptr =3D=3D str + 3);
+> +
+> +    str =3D "1kiB";
 
-diff --git a/hw/core/register.c b/hw/core/register.c
-index 4bfbc508de..482e3f827a 100644
---- a/hw/core/register.c
-+++ b/hw/core/register.c
-@@ -59,6 +59,15 @@ static inline uint64_t register_read_val(RegisterInfo *reg)
-     return 0; /* unreachable */
- }
- 
-+static inline uint64_t register_enabled_mask(int data_size, unsigned size)
-+{
-+    if (data_size < size) {
-+        size = data_size;
-+    }
-+
-+    return MAKE_64BIT_MASK(0, size * 8);
-+}
-+
- void register_write(RegisterInfo *reg, uint64_t val, uint64_t we,
-                     const char *prefix, bool debug)
- {
-@@ -192,11 +201,7 @@ void register_write_memory(void *opaque, hwaddr addr,
-     }
- 
-     /* Generate appropriate write enable mask */
--    if (reg->data_size < size) {
--        we = MAKE_64BIT_MASK(0, reg->data_size * 8);
--    } else {
--        we = MAKE_64BIT_MASK(0, size * 8);
--    }
-+    we = register_enabled_mask(reg->data_size, size);
- 
-     register_write(reg, value, we, reg_array->prefix,
-                    reg_array->debug);
-@@ -208,6 +213,7 @@ uint64_t register_read_memory(void *opaque, hwaddr addr,
-     RegisterInfoArray *reg_array = opaque;
-     RegisterInfo *reg = NULL;
-     uint64_t read_val;
-+    uint64_t re;
-     int i;
- 
-     for (i = 0; i < reg_array->num_elements; i++) {
-@@ -223,7 +229,10 @@ uint64_t register_read_memory(void *opaque, hwaddr addr,
-         return 0;
-     }
- 
--    read_val = register_read(reg, size * 8, reg_array->prefix,
-+    /* Generate appropriate read enable mask */
-+    re = register_enabled_mask(reg->data_size, size);
-+
-+    read_val = register_read(reg, re, reg_array->prefix,
-                              reg_array->debug);
- 
-     return extract64(read_val, 0, size * 8);
--- 
-2.11.0
+Personally, I think this one would be useful to support, but agree that
+right now it should be handled as trailing garbage.
+
+> +    res =3D qemu_strtosz(str, &endptr);
+> +    g_assert_cmpint(res, =3D=3D, 1024);
+> +    g_assert(endptr =3D=3D str + 2);
+> +}
+> +
+
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--fa38SgO9vRAJ8Bp9cCKX85bMpgh0GDai1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYo4usAAoJEKeha0olJ0Nqae4H/A7+OF2P2ork6ozUPLzAoDnW
+9mGPUlsCWd8HaCbo2MK/BJNzGC1N5TxhDR/5ljRAKBZNnJU0cEaauGd2Jx2KcOsS
+2+dOoKqo8kCTGrsz7T+2kq9V95ff0NV6q9MNGfrd02LruuRGeBvYt5c1FmiQyDmE
+7KSddWAlTi51mmd5l/bK9pvnMI6h6YYGXE4kdCbV5ZHswSdxpocEXUHXtHO6Acj3
+qInabnbze3gnSMn64eHmYEonCl3tmLYDsV1n4j4VQ22+kQNl7iSGa7o+hwfziQvk
+ukvDmRE6h0jN/DYqLoay496brwQI2XBNOsyc9iJV/7rIBia/htSWe78NO9Wf1vQ=
+=fhJI
+-----END PGP SIGNATURE-----
+
+--fa38SgO9vRAJ8Bp9cCKX85bMpgh0GDai1--
