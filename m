@@ -1,20 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47236)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cdmQO-0006ML-6w
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 18:22:21 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cdmQV-0006S2-Pn
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 18:22:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cdmQM-0003br-Tw
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 18:22:20 -0500
-References: <1487091579-67092-1-git-send-email-vsementsov@virtuozzo.com>
-	<1487091579-67092-22-git-send-email-vsementsov@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <eee8fdbb-515d-c198-6da0-634c5e6657e6@redhat.com>
-Date: Tue, 14 Feb 2017 18:22:10 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cdmQR-0003iR-RV
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 18:22:27 -0500
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:35981)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cdmQR-0003i8-Na
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 18:22:23 -0500
+Received: by mail-qk0-x241.google.com with SMTP id p22so13502813qka.3
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 15:22:23 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170203152321.19739-1-pbutsykin@virtuozzo.com>
+	<20170203152321.19739-2-pbutsykin@virtuozzo.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <8cf56ca0-760a-8133-81a6-72d3c2b1e56b@amsat.org>
+Date: Tue, 14 Feb 2017 20:22:19 -0300
 MIME-Version: 1.0
-In-Reply-To: <1487091579-67092-22-git-send-email-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 21/25] qcow2-bitmap: refcounts
+In-Reply-To: <20170203152321.19739-2-pbutsykin@virtuozzo.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] migration: add MigrationState arg
+ for ram_save_/compressed_/page()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,139 +35,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, armbru@redhat.com, amit.shah@redhat.com, den@openvz.org
 
+On 02/03/2017 12:23 PM, Pavel Butsykin wrote:
+> Cosmetic patch. The use of ms variable instead of migrate_get_current()
+> looks nicer, especially when there reuse.
+>
+> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
 
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-On 02/14/2017 11:59 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Calculate refcounts for qcow2 bitmaps. It is needed for qcow2's qemu-img
-> check implementation.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
 > ---
->  block/qcow2-bitmap.c   | 76 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  block/qcow2-refcount.c |  6 ++++
->  block/qcow2.h          |  3 ++
->  3 files changed, 85 insertions(+)
-> 
-> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-> index 419d51e..326a799 100644
-> --- a/block/qcow2-bitmap.c
-> +++ b/block/qcow2-bitmap.c
-> @@ -1222,3 +1222,79 @@ common_errp:
->                 name, bdrv_get_device_or_node_name(bs), reason);
->      return false;
->  }
-> +
-> +int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-> +                                  void **refcount_table,
-> +                                  int64_t *refcount_table_size)
-> +{
-> +    int ret;
-> +    BDRVQcow2State *s = bs->opaque;
-> +    Qcow2BitmapList *bm_list;
-> +    Qcow2Bitmap *bm;
-> +
-> +    if (s->nb_bitmaps == 0) {
-> +        return 0;
-> +    }
-> +
-> +    ret = qcow2_inc_refcounts_imrt(bs, res, refcount_table, refcount_table_size,
-> +                                   s->bitmap_directory_offset,
-> +                                   s->bitmap_directory_size);
-> +    if (ret < 0) {
-> +        return ret;
-> +    }
-> +
-> +    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
-> +                               s->bitmap_directory_size, NULL);
-> +    if (bm_list == NULL) {
-> +        res->corruptions++;
-> +        return -EINVAL;
-> +    }
-> +
-> +    QSIMPLEQ_FOREACH(bm, bm_list, entry) {
-> +        uint64_t *bitmap_table = NULL;
-> +        int i;
-> +
-> +        ret = qcow2_inc_refcounts_imrt(bs, res,
-> +                                       refcount_table, refcount_table_size,
-> +                                       bm->table.offset,
-> +                                       bm->table.size * sizeof(uint64_t));
-> +        if (ret < 0) {
-> +            goto out;
-> +        }
-> +
-> +        ret = bitmap_table_load(bs, &bm->table, &bitmap_table);
-> +        if (ret < 0) {
-> +            res->corruptions++;
-> +            goto out;
-> +        }
-> +
-> +        for (i = 0; i < bm->table.size; ++i) {
-> +            uint64_t entry = bitmap_table[i];
-> +            uint64_t offset = entry & BME_TABLE_ENTRY_OFFSET_MASK;
-> +
-> +            if (check_table_entry(entry, s->cluster_size) < 0) {
-> +                res->corruptions++;
-> +                continue;
-> +            }
-> +
-> +            if (offset == 0) {
-> +                continue;
-> +            }
-> +
-> +            ret = qcow2_inc_refcounts_imrt(bs, res,
-> +                                           refcount_table, refcount_table_size,
-> +                                           offset, s->cluster_size);
-> +            if (ret < 0) {
-> +                g_free(bitmap_table);
-> +                goto out;
-> +            }
-> +        }
-> +
-> +        g_free(bitmap_table);
-> +    }
-> +
-> +out:
-> +    bitmap_list_free(bm_list);
-> +
-> +    return ret;
-> +}
-> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-> index 14a736d..cdb74ba 100644
-> --- a/block/qcow2-refcount.c
-> +++ b/block/qcow2-refcount.c
-> @@ -1846,6 +1846,12 @@ static int calculate_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
->          return ret;
->      }
->  
-> +    /* bitmaps */
-> +    ret = qcow2_check_bitmaps_refcounts(bs, res, refcount_table, nb_clusters);
-> +    if (ret < 0) {
-> +        return ret;
-> +    }
-> +
->      return check_refblocks(bs, res, fix, rebuild, refcount_table, nb_clusters);
->  }
->  
-> diff --git a/block/qcow2.h b/block/qcow2.h
-> index 0a3708d..eaad34a 100644
-> --- a/block/qcow2.h
-> +++ b/block/qcow2.h
-> @@ -624,5 +624,8 @@ bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
->                                        const char *name,
->                                        uint32_t granularity,
->                                        Error **errp);
-> +int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-> +                                  void **refcount_table,
-> +                                  int64_t *refcount_table_size);
->  
->  #endif
-> 
-
-Looks OK.
-
-Reviewed-by: John Snow <jsnow@redhat.com>
+>  migration/ram.c | 15 ++++++++-------
+>  1 file changed, 8 insertions(+), 7 deletions(-)
+>
+> diff --git a/migration/ram.c b/migration/ram.c
+> index a683f4bb9e..d866b6518b 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -734,13 +734,14 @@ static int save_zero_page(QEMUFile *f, RAMBlock *block, ram_addr_t offset,
+>   *          >=0 - Number of pages written - this might legally be 0
+>   *                if xbzrle noticed the page was the same.
+>   *
+> + * @ms: The current migration state.
+>   * @f: QEMUFile where to send the data
+>   * @block: block that contains the page we want to send
+>   * @offset: offset inside the block for the page
+>   * @last_stage: if we are at the completion stage
+>   * @bytes_transferred: increase it with the number of transferred bytes
+>   */
+> -static int ram_save_page(QEMUFile *f, PageSearchStatus *pss,
+> +static int ram_save_page(MigrationState *ms, QEMUFile *f, PageSearchStatus *pss,
+>                           bool last_stage, uint64_t *bytes_transferred)
+>  {
+>      int pages = -1;
+> @@ -786,8 +787,7 @@ static int ram_save_page(QEMUFile *f, PageSearchStatus *pss,
+>               */
+>              xbzrle_cache_zero_page(current_addr);
+>          } else if (!ram_bulk_stage &&
+> -                   !migration_in_postcopy(migrate_get_current()) &&
+> -                   migrate_use_xbzrle()) {
+> +                   !migration_in_postcopy(ms) && migrate_use_xbzrle()) {
+>              pages = save_xbzrle_page(f, &p, current_addr, block,
+>                                       offset, last_stage, bytes_transferred);
+>              if (!last_stage) {
+> @@ -914,14 +914,15 @@ static int compress_page_with_multi_thread(QEMUFile *f, RAMBlock *block,
+>   *
+>   * Returns: Number of pages written.
+>   *
+> + * @ms: The current migration state.
+>   * @f: QEMUFile where to send the data
+>   * @block: block that contains the page we want to send
+>   * @offset: offset inside the block for the page
+>   * @last_stage: if we are at the completion stage
+>   * @bytes_transferred: increase it with the number of transferred bytes
+>   */
+> -static int ram_save_compressed_page(QEMUFile *f, PageSearchStatus *pss,
+> -                                    bool last_stage,
+> +static int ram_save_compressed_page(MigrationState *ms, QEMUFile *f,
+> +                                    PageSearchStatus *pss, bool last_stage,
+>                                      uint64_t *bytes_transferred)
+>  {
+>      int pages = -1;
+> @@ -1252,11 +1253,11 @@ static int ram_save_target_page(MigrationState *ms, QEMUFile *f,
+>      if (migration_bitmap_clear_dirty(dirty_ram_abs)) {
+>          unsigned long *unsentmap;
+>          if (compression_switch && migrate_use_compression()) {
+> -            res = ram_save_compressed_page(f, pss,
+> +            res = ram_save_compressed_page(ms, f, pss,
+>                                             last_stage,
+>                                             bytes_transferred);
+>          } else {
+> -            res = ram_save_page(f, pss, last_stage,
+> +            res = ram_save_page(ms, f, pss, last_stage,
+>                                  bytes_transferred);
+>          }
+>
+>
