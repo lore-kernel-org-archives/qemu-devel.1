@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cdi40-0002rV-3w
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 13:42:57 -0500
+	(envelope-from <bounces@canonical.com>) id 1cdiAq-0005QJ-F3
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 13:50:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cdi3y-0005sG-Mg
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 13:42:56 -0500
-References: <261ff7cb02d96c98ea068f3ca255a747b88ebc10.1487096041.git.jcody@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <44cf0a51-5dc1-b144-f269-af9bebf7708e@redhat.com>
-Date: Tue, 14 Feb 2017 12:42:44 -0600
+	(envelope-from <bounces@canonical.com>) id 1cdiAl-0007Ww-JL
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 13:50:00 -0500
+Received: from indium.canonical.com ([91.189.90.7]:57648)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cdiAl-0007Wf-D3
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 13:49:55 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cdiAk-000247-4E
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 18:49:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1A87B2E80C6
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 18:49:54 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <261ff7cb02d96c98ea068f3ca255a747b88ebc10.1487096041.git.jcody@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="53UqWvh4T1uvHAILcRk4CkMJeNahGpNjX"
-Subject: Re: [Qemu-devel] [PATCH 1/1] qemu-iotests: redirect nbd server
- stdout to /dev/null
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 14 Feb 2017 18:40:00 -0000
+From: Forest <764252@bugs.launchpad.net>
+Reply-To: Bug 764252 <764252@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20110418053344.23556.39759.malonedeb@wampee.canonical.com>
+Message-Id: <20170214184000.5145.63173.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 764252] Re: wishlist: kirkwood support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,79 +36,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---53UqWvh4T1uvHAILcRk4CkMJeNahGpNjX
-From: Eric Blake <eblake@redhat.com>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
-Message-ID: <44cf0a51-5dc1-b144-f269-af9bebf7708e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] qemu-iotests: redirect nbd server stdout
- to /dev/null
-References: <261ff7cb02d96c98ea068f3ca255a747b88ebc10.1487096041.git.jcody@redhat.com>
-In-Reply-To: <261ff7cb02d96c98ea068f3ca255a747b88ebc10.1487096041.git.jcody@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+For the record, I still regularly use a Kirkwood device (a QNAP NAS).
+Being able to compile software for it in qemu would be handy once in a
+while, though it's not a high priority for me.
 
-On 02/14/2017 12:15 PM, Jeff Cody wrote:
-> Some iotests (e.g. 174) try to filter the output of _make_test_image by=
+-- =
 
-> piping the stdout.  Pipe the server stdout to /dev/null, so that filter=
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/764252
 
-> pipe does not need to wait until process completion.
->=20
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
-> ---
->  tests/qemu-iotests/common.rc | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+Title:
+  wishlist: kirkwood support
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Status in QEMU:
+  Won't Fix
 
->=20
-> diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.r=
-c
-> index 6c0fd4c..08065dc 100644
-> --- a/tests/qemu-iotests/common.rc
-> +++ b/tests/qemu-iotests/common.rc
-> @@ -172,7 +172,7 @@ _make_test_img()
-> =20
->      # Start an NBD server on the image file, which is what we'll be ta=
-lking to
->      if [ $IMGPROTO =3D "nbd" ]; then
-> -        eval "$QEMU_NBD -v -t -b 127.0.0.1 -p 10810 -f $IMGFMT  $TEST_=
-IMG_FILE &"
-> +        eval "$QEMU_NBD -v -t -b 127.0.0.1 -p 10810 -f $IMGFMT  $TEST_=
-IMG_FILE >/dev/null &"
->          sleep 1 # FIXME: qemu-nbd needs to be listening before we cont=
-inue
->      fi
->  }
->=20
+Bug description:
+  This is a feature request for qemu to emulate the Marvell Kirkwood
+  chipset. It is used by Sheevaplug, Guruplug, and many NAS devices.
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---53UqWvh4T1uvHAILcRk4CkMJeNahGpNjX
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYo0+kAAoJEKeha0olJ0Nq9WwH/iQZrMAm2ZTBgWoEnpNL2B8I
-b2vGEIfNyRSHZTzjuqoBaTwQyh2SCvLRcJPdZZchtGzUICLJDo/pgGjdv1hTja9F
-YDYUeBUT/bz/4JoefmJ5c3uSU6OthjBAXZ9nHjToxVM5ogLe+wamkuIrupbKYWNn
-BCGylN5qT4KdBKCf8R5LSLhGH9y4rqtDsRjz8uosz+qeYwcGf0egu3AE+8d2e1wG
-d8DFHOxNOg7mYTdCzGXRKjgubUmd3iCArMSagKLTz5rEqM0u7PugOvszbxcn0rIZ
-xDe/L957iaml8ePkxogRNW9IwXUjM/kc+nu/b12raBlOaHtrKihbcvWhviXAyLA=
-=efno
------END PGP SIGNATURE-----
-
---53UqWvh4T1uvHAILcRk4CkMJeNahGpNjX--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/764252/+subscriptions
