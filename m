@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cdhZi-0004Xu-AQ
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 13:11:39 -0500
+	(envelope-from <jcody@redhat.com>) id 1cdhaR-0005bM-SW
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 13:12:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cdhZe-0000UA-K8
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 13:11:38 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47488)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cdhZe-0000Tp-Du
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 13:11:34 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cdhZd-0006Y6-63
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 18:11:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8646A2E80DF
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 18:11:32 +0000 (UTC)
+	(envelope-from <jcody@redhat.com>) id 1cdhaN-0000ic-PD
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 13:12:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58516)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1cdhaN-0000iP-G4
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 13:12:19 -0500
+Date: Tue, 14 Feb 2017 13:12:17 -0500
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170214181217.GS27752@localhost.localdomain>
+References: <1478566785-4002-1-git-send-email-ashish.mittal@veritas.com>
+	<1478566785-4002-3-git-send-email-ashish.mittal@veritas.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 14 Feb 2017 17:57:54 -0000
-From: Thomas Huth <764252@bugs.launchpad.net>
-Reply-To: Bug 764252 <764252@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20110418053344.23556.39759.malonedeb@wampee.canonical.com>
-Message-Id: <20170214175754.5740.51015.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 764252] Re: wishlist: kirkwood support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1478566785-4002-3-git-send-email-ashish.mittal@veritas.com>
+Subject: Re: [Qemu-devel] [PATCH v6 2/2] block/vxhs.c: Add qemu-iotests for
+ new block device type "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,30 +28,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Ashish Mittal <ashmit602@gmail.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, berrange@redhat.com, famz@redhat.com, ashish.mittal@veritas.com, stefanha@gmail.com, Rakesh.Ranjan@veritas.com, Buddhi.Madhav@veritas.com, Ketan.Nilangekar@veritas.com, Abhijit.Dey@veritas.com, Venkatesha.Mg@veritas.com
 
-Apparently nobody submitted code for this, and I assume nobody is
-interested in this kirkwood platform nowadays any more, so I'm closing
-this ticket now.
+On Mon, Nov 07, 2016 at 04:59:45PM -0800, Ashish Mittal wrote:
+> These changes use a vxhs test server that is a part of the following
+> repository:
+> https://github.com/MittalAshish/libqnio.git
+> 
+> Signed-off-by: Ashish Mittal <ashish.mittal@veritas.com>
+> ---
+> v6 changelog:
+> (1) Added iotests for VxHS block device.
+> 
+>  tests/qemu-iotests/common        |  6 ++++++
+>  tests/qemu-iotests/common.config | 13 +++++++++++++
+>  tests/qemu-iotests/common.filter |  1 +
+>  tests/qemu-iotests/common.rc     | 19 +++++++++++++++++++
+>  4 files changed, 39 insertions(+)
+> 
 
-** Changed in: qemu
-       Status: New =3D> Won't Fix
+[...]
 
--- =
+> diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.filter
+> index 240ed06..a8a4d0e 100644
+> --- a/tests/qemu-iotests/common.filter
+> +++ b/tests/qemu-iotests/common.filter
+> @@ -123,6 +123,7 @@ _filter_img_info()
+>          -e "s#$TEST_DIR#TEST_DIR#g" \
+>          -e "s#$IMGFMT#IMGFMT#g" \
+>          -e 's#nbd://127.0.0.1:10810$#TEST_DIR/t.IMGFMT#g' \
+> +        -e 's#json.*vdisk-id.*vxhs"}}#TEST_DIR/t.IMGFMT#' \
+>          -e "/encrypted: yes/d" \
+>          -e "/cluster_size: [0-9]\\+/d" \
+>          -e "/table_size: [0-9]\\+/d" \
+> diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+> index 3213765..06a3164 100644
+> --- a/tests/qemu-iotests/common.rc
+> +++ b/tests/qemu-iotests/common.rc
+> @@ -89,6 +89,9 @@ else
+>          TEST_IMG=$TEST_DIR/t.$IMGFMT
+>      elif [ "$IMGPROTO" = "archipelago" ]; then
+>          TEST_IMG="archipelago:at.$IMGFMT"
+> +    elif [ "$IMGPROTO" = "vxhs" ]; then
+> +        TEST_IMG_FILE=$TEST_DIR/t.$IMGFMT
+> +        TEST_IMG="vxhs://127.0.0.1:9999/t.$IMGFMT"
+>      else
+>          TEST_IMG=$IMGPROTO:$TEST_DIR/t.$IMGFMT
+>      fi
+> @@ -175,6 +178,12 @@ _make_test_img()
+>          eval "$QEMU_NBD -v -t -b 127.0.0.1 -p 10810 -f $IMGFMT  $TEST_IMG_FILE &"
+>          sleep 1 # FIXME: qemu-nbd needs to be listening before we continue
+>      fi
+> +
+> +    # Start QNIO server on image directory for vxhs protocol
+> +    if [ $IMGPROTO = "vxhs" ]; then
+> +        eval "$QEMU_VXHS -d  $TEST_DIR &"
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/764252
+So I spoke too soon about tests passing, but it is not really your fault :)
 
-Title:
-  wishlist: kirkwood support
+After rebasing to master, there is a new test 174 that now hangs (and hangs
+for nbd, as well).  This is because the test is piping the results of
+_make_test_image to sed to filter it.
 
-Status in QEMU:
-  Won't Fix
+This line should redirect stdout to /dev/null, so that the pipe does not
+need to wait until process completion:
 
-Bug description:
-  This is a feature request for qemu to emulate the Marvell Kirkwood
-  chipset. It is used by Sheevaplug, Guruplug, and many NAS devices.
+    eval "$QEMU_VXHS -d  $TEST_DIR > /dev/null &"
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/764252/+subscriptions
+ 
