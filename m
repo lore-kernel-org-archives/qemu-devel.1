@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57328)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1cdgaA-0005Ds-4D
+	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1cdga9-0005Dh-SS
 	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 12:08:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1cdga5-0006aR-3c
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 12:08:02 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50756)
+	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1cdga4-0006Zw-Ro
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 12:08:01 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36209
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <imbrenda@linux.vnet.ibm.com>)
-	id 1cdga4-0006Z4-R6
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 12:07:57 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	id 1cdga4-0006Z2-Ly
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 12:07:56 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1EGxn6B036332
+	v1EGxQUW063106
 	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 12:07:55 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28kx6vwj17-1
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28m2rrsxta-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 12:07:55 -0500
 Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <imbrenda@linux.vnet.ibm.com>;
-	Tue, 14 Feb 2017 17:07:52 -0000
+	Tue, 14 Feb 2017 17:07:53 -0000
 From: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-Date: Tue, 14 Feb 2017 18:07:47 +0100
-In-Reply-To: <1487092068-16562-1-git-send-email-imbrenda@linux.vnet.ibm.com>
-References: <1487092068-16562-1-git-send-email-imbrenda@linux.vnet.ibm.com>
-Message-Id: <1487092068-16562-2-git-send-email-imbrenda@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v8 1/2] move vm_start to cpus.c
+Date: Tue, 14 Feb 2017 18:07:46 +0100
+Message-Id: <1487092068-16562-1-git-send-email-imbrenda@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v8 0/2] Qemu: gdbstub: fix vCont
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,141 +39,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: pbonzini@redhat.com
 Cc: borntraeger@de.ibm.com, qemu-devel@nongnu.org, palves@redhat.com, alex.bennee@linaro.org
 
-This patch:
+This small patchset fixes the incorrect behaviour of the vCont command
+in the gdb stub. 
 
-* moves vm_start to cpus.c.
-* exports qemu_vmstop_requested, since it's needed by vm_start.
-* extracts vm_prepare_start from vm_start; it does what vm_start did,
-  except restarting the cpus.
-* vm_start now calls vm_prepare_start and then restarts the cpus.
+The first patch, as suggested be Paolo, refactors some code. The most
+visible change is that it moves vm_start to cpus.c 
 
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
----
- cpus.c                  | 42 ++++++++++++++++++++++++++++++++++++++++++
- include/sysemu/sysemu.h |  2 ++
- vl.c                    | 30 +-----------------------------
- 3 files changed, 45 insertions(+), 29 deletions(-)
+The second one fixes the incorrect behaviour of the vCont command.
+Previously, continuing or stepping a single thread (CPU) caused all
+other CPUs to be started too, whereas the GDB specification clearly
+states that without a default action all threads not explicitly
+mentioned in the command should stay stopped.
 
-diff --git a/cpus.c b/cpus.c
-index 71a82e5..0bcb5b5 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1578,6 +1578,48 @@ int vm_stop(RunState state)
-     return do_vm_stop(state);
- }
- 
-+/**
-+ * Prepare for (re)starting the VM.
-+ * Returns -1 if the vCPUs are not to be restarted (e.g. if they are already
-+ * running or in case of an error condition), 0 otherwise.
-+ */
-+int vm_prepare_start(void)
-+{
-+    RunState requested;
-+    int res = 0;
-+
-+    qemu_vmstop_requested(&requested);
-+    if (runstate_is_running() && requested == RUN_STATE__MAX) {
-+        return -1;
-+    }
-+
-+    /* Ensure that a STOP/RESUME pair of events is emitted if a
-+     * vmstop request was pending.  The BLOCK_IO_ERROR event, for
-+     * example, according to documentation is always followed by
-+     * the STOP event.
-+     */
-+    if (runstate_is_running()) {
-+        qapi_event_send_stop(&error_abort);
-+        res = -1;
-+    } else {
-+        replay_enable_events();
-+        cpu_enable_ticks();
-+        runstate_set(RUN_STATE_RUNNING);
-+        vm_state_notify(1, RUN_STATE_RUNNING);
-+    }
-+
-+    /* We are sending this now, but the CPUs will be resumed shortly later */
-+    qapi_event_send_resume(&error_abort);
-+    return res;
-+}
-+
-+void vm_start(void)
-+{
-+    if (!vm_prepare_start()) {
-+        resume_all_vcpus();
-+    }
-+}
-+
- /* does a state transition even if the VM is already stopped,
-    current state is forgotten forever */
- int vm_stop_force_state(RunState state)
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index ff8ffb5..0bb0c40 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -37,6 +37,7 @@ void vm_state_notify(int running, RunState state);
- #define VMRESET_REPORT   true
- 
- void vm_start(void);
-+int vm_prepare_start(void);
- int vm_stop(RunState state);
- int vm_stop_force_state(RunState state);
- 
-@@ -60,6 +61,7 @@ void qemu_register_powerdown_notifier(Notifier *notifier);
- void qemu_system_debug_request(void);
- void qemu_system_vmstop_request(RunState reason);
- void qemu_system_vmstop_request_prepare(void);
-+bool qemu_vmstop_requested(RunState *r);
- int qemu_shutdown_requested_get(void);
- int qemu_reset_requested_get(void);
- void qemu_system_killed(int signal, pid_t pid);
-diff --git a/vl.c b/vl.c
-index abb0900..7a32a30 100644
---- a/vl.c
-+++ b/vl.c
-@@ -757,7 +757,7 @@ StatusInfo *qmp_query_status(Error **errp)
-     return info;
- }
- 
--static bool qemu_vmstop_requested(RunState *r)
-+bool qemu_vmstop_requested(RunState *r)
- {
-     qemu_mutex_lock(&vmstop_lock);
-     *r = vmstop_requested;
-@@ -778,34 +778,6 @@ void qemu_system_vmstop_request(RunState state)
-     qemu_notify_event();
- }
- 
--void vm_start(void)
--{
--    RunState requested;
--
--    qemu_vmstop_requested(&requested);
--    if (runstate_is_running() && requested == RUN_STATE__MAX) {
--        return;
--    }
--
--    /* Ensure that a STOP/RESUME pair of events is emitted if a
--     * vmstop request was pending.  The BLOCK_IO_ERROR event, for
--     * example, according to documentation is always followed by
--     * the STOP event.
--     */
--    if (runstate_is_running()) {
--        qapi_event_send_stop(&error_abort);
--    } else {
--        replay_enable_events();
--        cpu_enable_ticks();
--        runstate_set(RUN_STATE_RUNNING);
--        vm_state_notify(1, RUN_STATE_RUNNING);
--        resume_all_vcpus();
--    }
--
--    qapi_event_send_resume(&error_abort);
--}
--
--
- /***********************************************************/
- /* real time host monotonic timer */
- 
+So if the Qemu gdbstub receives a  vCont;c:1  packet, no other CPU
+should be restarted except the first, and when a  vCont;s:1  is
+received, the first CPU should be stepped without restarting the others.
+With this patchset Qemu now behaves as expected.
+
+See here for reference material about the packets: 
+https://sourceware.org/gdb/current/onlinedocs/gdb/Packets.html
+https://sourceware.org/gdb/onlinedocs/gdb/Packets.html
+
+v7 -> v8
+* fixed and added some comments
+* fixed vCont a little bit for user mode
+* use cpu->cpu_index directly when possible
+
+v6 -> v7
+* fixed description of patch 1 to reflect what is actually happening
+  and improved description of patch 2
+* removed leftover header declaration of resume_some_vcpus which had
+  been removed a few versions ago
+* fixed a compilation issue when compiling userspace-mode only
+  (global variable max_cpus is not defined when not in system-mode)
+
+v4 -> v6
+* rebased on master after target-s390x was moved
+* put qemu_clock_enable back into resume_all_vcpus
+* improved the parsing function of the vCont packet
+* added qemu_clock_enable to gdb_continue_partial
+
+v3 -> v4
+* rebased on v2.8.0-rc2, no changes needed
+
+v2 -> v3
+* removed resume_some_vcpus
+* cleared up the code and simplified the implementation in light of the 
+  clarification in the specification of the vCont packet
+
+Claudio Imbrenda (2):
+  move vm_start to cpus.c
+  gdbstub: Fix vCont behaviour
+
+ cpus.c                  |  42 ++++++++++
+ gdbstub.c               | 209 +++++++++++++++++++++++++++++++++++++-----------
+ include/sysemu/sysemu.h |   2 +
+ vl.c                    |  30 +------
+ 4 files changed, 207 insertions(+), 76 deletions(-)
+
 -- 
 2.7.4
