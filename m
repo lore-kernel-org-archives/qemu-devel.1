@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cdgK2-0001wL-5a
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 11:51:23 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cdgSE-0005Wt-81
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 11:59:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cdgJz-0000yp-4Q
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 11:51:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45448)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cdgJy-0000yd-So
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 11:51:19 -0500
-Date: Tue, 14 Feb 2017 16:51:09 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170214165109.GF17056@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1478566785-4002-3-git-send-email-ashish.mittal@veritas.com>
-	<20161108204413.GA6353@localhost.localdomain>
-	<CAAo6VWMyTjV1Fn8-BSex7Fx8OcEcuEyK2rQJ6L=wZZXDiB5A4w@mail.gmail.com>
-	<20170213133725.GA10361@stefanha-x1.localdomain>
-	<20170213163232.GN27752@localhost.localdomain>
-	<B3F9860E-E786-48A5-8BBD-918833905E73@veritas.com>
-	<20170213232302.GP27752@localhost.localdomain>
-	<983C87E0-DE5B-4147-82CD-CE6A8D093B6C@veritas.com>
-	<CAAo6VWNYZG5fc7Z9_u+9Qew5VgbTRA_cRfTu8wqPpOXzTrjvfA@mail.gmail.com>
-	<20170214163517.GQ27752@localhost.localdomain>
+	(envelope-from <alex.bennee@linaro.org>) id 1cdgS9-0003wL-DH
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 11:59:50 -0500
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:36298)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cdgS8-0003vj-Pb
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 11:59:45 -0500
+Received: by mail-wm0-x229.google.com with SMTP id c85so22884409wmi.1
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 08:59:44 -0800 (PST)
+References: <1486065742-28639-1-git-send-email-peter.maydell@linaro.org>
+	<1486065742-28639-2-git-send-email-peter.maydell@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1486065742-28639-2-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 14 Feb 2017 17:00:02 +0000
+Message-ID: <87a89ovhbh.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170214163517.GQ27752@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v6 2/2] block/vxhs.c: Add qemu-iotests for
- new block device type "vxhs"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/9] armv7m: Rename nvic_state to NVICState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,52 +30,202 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: ashish mittal <ashmit602@gmail.com>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Michael Davidsaver <mdavidsaver@gmail.com>, Liviu Ionescu <ilg@livius.net>
 
-On Tue, Feb 14, 2017 at 11:35:17AM -0500, Jeff Cody wrote:
-> From 7c135439fd0151860cb0f6ef1a857dfbee6e6317 Mon Sep 17 00:00:00 2001
-> From: Jeff Cody <jcody@redhat.com>
-> Date: Tue, 14 Feb 2017 09:51:42 -0500
-> Subject: [PATCH] qemu-iotests: exclude vxhs from image creation via protocol
-> 
-> The protocol VXHS does not support image creation.  Some tests expect
-> to be able to create images through the protocol.  Exclude VXHS from
-> these tests.
 
-[snip]
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-> diff --git a/tests/qemu-iotests/017 b/tests/qemu-iotests/017
-> index e3f9e75..4f9302d 100755
-> --- a/tests/qemu-iotests/017
-> +++ b/tests/qemu-iotests/017
-> @@ -41,6 +41,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  # Any format supporting backing files
->  _supported_fmt qcow qcow2 vmdk qed
->  _supported_proto generic
-> +_unsupported_proto vxhs
->  _supported_os Linux
->  _unsupported_imgopts "subformat=monolithicFlat" "subformat=twoGbMaxExtentFlat"
+> Rename the nvic_state struct to NVICState, to match
+> our naming conventions.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-I've no objection to your patch as is, just a thought for future
-improvements.
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 
-There's quite a few block protos that doen't support image
-creation. Rather than listing protocols in _unsupported_proto
-it would be more scalable if we could list features. eg if
-each test had
+> ---
+>  hw/intc/armv7m_nvic.c | 44 ++++++++++++++++++++++----------------------
+>  1 file changed, 22 insertions(+), 22 deletions(-)
+>
+> diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+> index fe5c303..09975f3 100644
+> --- a/hw/intc/armv7m_nvic.c
+> +++ b/hw/intc/armv7m_nvic.c
+> @@ -21,7 +21,7 @@
+>  #include "gic_internal.h"
+>  #include "qemu/log.h"
+>
+> -typedef struct {
+> +typedef struct NVICState {
+>      GICState gic;
+>      ARMCPU *cpu;
+>      struct {
+> @@ -35,7 +35,7 @@ typedef struct {
+>      MemoryRegion container;
+>      uint32_t num_irq;
+>      qemu_irq sysresetreq;
+> -} nvic_state;
+> +} NVICState;
+>
+>  #define TYPE_NVIC "armv7m_nvic"
+>  /**
+> @@ -57,7 +57,7 @@ typedef struct NVICClass {
+>  #define NVIC_GET_CLASS(obj) \
+>      OBJECT_GET_CLASS(NVICClass, (obj), TYPE_NVIC)
+>  #define NVIC(obj) \
+> -    OBJECT_CHECK(nvic_state, (obj), TYPE_NVIC)
+> +    OBJECT_CHECK(NVICState, (obj), TYPE_NVIC)
+>
+>  static const uint8_t nvic_id[] = {
+>      0x00, 0xb0, 0x1b, 0x00, 0x0d, 0xe0, 0x05, 0xb1
+> @@ -74,7 +74,7 @@ static const uint8_t nvic_id[] = {
+>  int system_clock_scale;
+>
+>  /* Conversion factor from qemu timer to SysTick frequencies.  */
+> -static inline int64_t systick_scale(nvic_state *s)
+> +static inline int64_t systick_scale(NVICState *s)
+>  {
+>      if (s->systick.control & SYSTICK_CLKSOURCE)
+>          return system_clock_scale;
+> @@ -82,7 +82,7 @@ static inline int64_t systick_scale(nvic_state *s)
+>          return 1000;
+>  }
+>
+> -static void systick_reload(nvic_state *s, int reset)
+> +static void systick_reload(NVICState *s, int reset)
+>  {
+>      /* The Cortex-M3 Devices Generic User Guide says that "When the
+>       * ENABLE bit is set to 1, the counter loads the RELOAD value from the
+> @@ -101,7 +101,7 @@ static void systick_reload(nvic_state *s, int reset)
+>
+>  static void systick_timer_tick(void * opaque)
+>  {
+> -    nvic_state *s = (nvic_state *)opaque;
+> +    NVICState *s = (NVICState *)opaque;
+>      s->systick.control |= SYSTICK_COUNTFLAG;
+>      if (s->systick.control & SYSTICK_TICKINT) {
+>          /* Trigger the interrupt.  */
+> @@ -114,7 +114,7 @@ static void systick_timer_tick(void * opaque)
+>      }
+>  }
+>
+> -static void systick_reset(nvic_state *s)
+> +static void systick_reset(NVICState *s)
+>  {
+>      s->systick.control = 0;
+>      s->systick.reload = 0;
+> @@ -126,7 +126,7 @@ static void systick_reset(nvic_state *s)
+>     IRQ is #16.  The internal GIC routines use #32 as the first IRQ.  */
+>  void armv7m_nvic_set_pending(void *opaque, int irq)
+>  {
+> -    nvic_state *s = (nvic_state *)opaque;
+> +    NVICState *s = (NVICState *)opaque;
+>      if (irq >= 16)
+>          irq += 16;
+>      gic_set_pending_private(&s->gic, 0, irq);
+> @@ -135,7 +135,7 @@ void armv7m_nvic_set_pending(void *opaque, int irq)
+>  /* Make pending IRQ active.  */
+>  int armv7m_nvic_acknowledge_irq(void *opaque)
+>  {
+> -    nvic_state *s = (nvic_state *)opaque;
+> +    NVICState *s = (NVICState *)opaque;
+>      uint32_t irq;
+>
+>      irq = gic_acknowledge_irq(&s->gic, 0, MEMTXATTRS_UNSPECIFIED);
+> @@ -148,13 +148,13 @@ int armv7m_nvic_acknowledge_irq(void *opaque)
+>
+>  void armv7m_nvic_complete_irq(void *opaque, int irq)
+>  {
+> -    nvic_state *s = (nvic_state *)opaque;
+> +    NVICState *s = (NVICState *)opaque;
+>      if (irq >= 16)
+>          irq += 16;
+>      gic_complete_irq(&s->gic, 0, irq, MEMTXATTRS_UNSPECIFIED);
+>  }
+>
+> -static uint32_t nvic_readl(nvic_state *s, uint32_t offset)
+> +static uint32_t nvic_readl(NVICState *s, uint32_t offset)
+>  {
+>      ARMCPU *cpu = s->cpu;
+>      uint32_t val;
+> @@ -294,7 +294,7 @@ static uint32_t nvic_readl(nvic_state *s, uint32_t offset)
+>      }
+>  }
+>
+> -static void nvic_writel(nvic_state *s, uint32_t offset, uint32_t value)
+> +static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value)
+>  {
+>      ARMCPU *cpu = s->cpu;
+>      uint32_t oldval;
+> @@ -425,7 +425,7 @@ static void nvic_writel(nvic_state *s, uint32_t offset, uint32_t value)
+>  static uint64_t nvic_sysreg_read(void *opaque, hwaddr addr,
+>                                   unsigned size)
+>  {
+> -    nvic_state *s = (nvic_state *)opaque;
+> +    NVICState *s = (NVICState *)opaque;
+>      uint32_t offset = addr;
+>      int i;
+>      uint32_t val;
+> @@ -454,7 +454,7 @@ static uint64_t nvic_sysreg_read(void *opaque, hwaddr addr,
+>  static void nvic_sysreg_write(void *opaque, hwaddr addr,
+>                                uint64_t value, unsigned size)
+>  {
+> -    nvic_state *s = (nvic_state *)opaque;
+> +    NVICState *s = (NVICState *)opaque;
+>      uint32_t offset = addr;
+>      int i;
+>
+> @@ -486,17 +486,17 @@ static const VMStateDescription vmstate_nvic = {
+>      .version_id = 1,
+>      .minimum_version_id = 1,
+>      .fields = (VMStateField[]) {
+> -        VMSTATE_UINT32(systick.control, nvic_state),
+> -        VMSTATE_UINT32(systick.reload, nvic_state),
+> -        VMSTATE_INT64(systick.tick, nvic_state),
+> -        VMSTATE_TIMER_PTR(systick.timer, nvic_state),
+> +        VMSTATE_UINT32(systick.control, NVICState),
+> +        VMSTATE_UINT32(systick.reload, NVICState),
+> +        VMSTATE_INT64(systick.tick, NVICState),
+> +        VMSTATE_TIMER_PTR(systick.timer, NVICState),
+>          VMSTATE_END_OF_LIST()
+>      }
+>  };
+>
+>  static void armv7m_nvic_reset(DeviceState *dev)
+>  {
+> -    nvic_state *s = NVIC(dev);
+> +    NVICState *s = NVIC(dev);
+>      NVICClass *nc = NVIC_GET_CLASS(s);
+>      nc->parent_reset(dev);
+>      /* Common GIC reset resets to disabled; the NVIC doesn't have
+> @@ -513,7 +513,7 @@ static void armv7m_nvic_reset(DeviceState *dev)
+>
+>  static void armv7m_nvic_realize(DeviceState *dev, Error **errp)
+>  {
+> -    nvic_state *s = NVIC(dev);
+> +    NVICState *s = NVIC(dev);
+>      NVICClass *nc = NVIC_GET_CLASS(s);
+>      Error *local_err = NULL;
+>
+> @@ -569,7 +569,7 @@ static void armv7m_nvic_instance_init(Object *obj)
+>       */
+>      GICState *s = ARM_GIC_COMMON(obj);
+>      DeviceState *dev = DEVICE(obj);
+> -    nvic_state *nvic = NVIC(obj);
+> +    NVICState *nvic = NVIC(obj);
+>      /* The ARM v7m may have anything from 0 to 496 external interrupt
+>       * IRQ lines. We default to 64. Other boards may differ and should
+>       * set the num-irq property appropriately.
+> @@ -594,7 +594,7 @@ static const TypeInfo armv7m_nvic_info = {
+>      .name          = TYPE_NVIC,
+>      .parent        = TYPE_ARM_GIC_COMMON,
+>      .instance_init = armv7m_nvic_instance_init,
+> -    .instance_size = sizeof(nvic_state),
+> +    .instance_size = sizeof(NVICState),
+>      .class_init    = armv7m_nvic_class_init,
+>      .class_size    = sizeof(NVICClass),
+>  };
 
-  _supported_feature imagecreate
 
-Then, the tests/qemu-iotests/common file could set the list
-of features supported by each protocol/format. Thus avoiding
-the need to update all iotests when adding new protocols. We
-could have features for "encryption", and "snapshots" and
-"backing_files", etc too
-
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+--
+Alex Bennée
