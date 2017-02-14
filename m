@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cdSvH-00033H-VK
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 21:32:57 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cdT5l-0005wn-JV
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 21:43:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cdSvE-0000xS-QB
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 21:32:55 -0500
-Received: from szxga03-in.huawei.com ([119.145.14.66]:58644)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cdSvD-0000x1-W7
-	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 21:32:52 -0500
-References: <1485266748-15340-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1485266748-15340-2-git-send-email-zhang.zhanghailiang@huawei.com>
-	<4d0b52bc-bcdd-5b96-465c-f0e624cb4add@redhat.com>
-	<58983015.40300@huawei.com>
-	<0b5891cc-0170-0773-a4b2-31cf3ff2b6d7@redhat.com>
-	<589859CA.5030903@huawei.com>
-	<3c6e13ab-4f5a-fbe3-ef95-196c6b3e59c9@redhat.com>
-	<58997D40.60604@huawei.com>
-	<e8c2510f-f755-3ec1-f085-e3053480b772@redhat.com>
-	<5899831D.30005@huawei.com>
-	<2e301620-0362-f43e-9194-e438f2091546@redhat.com>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <58A26C35.9070309@huawei.com>
-Date: Tue, 14 Feb 2017 10:32:21 +0800
+	(envelope-from <dgibson@ozlabs.org>) id 1cdT5k-0003a7-7z
+	for qemu-devel@nongnu.org; Mon, 13 Feb 2017 21:43:45 -0500
+Date: Tue, 14 Feb 2017 13:43:31 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170214024331.GD2169@umbus.fritz.box>
+References: <1486636445-24109-1-git-send-email-nikunj@linux.vnet.ibm.com>
+	<1486636445-24109-6-git-send-email-nikunj@linux.vnet.ibm.com>
+	<20170210001035.GJ27610@umbus.fritz.box>
+	<87k28yekze.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
 MIME-Version: 1.0
-In-Reply-To: <2e301620-0362-f43e-9194-e438f2091546@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] colo-compare: reconstruct the mutex
- lock usage
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="wLAMOaPNJ0fu1fTG"
+Content-Disposition: inline
+In-Reply-To: <87k28yekze.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH 5/6] target-ppc: support for 32-bit carry
+ and overflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,147 +27,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, zhangchen.fnst@cn.fujitsu.com
-Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, lizhijian@cn.fujitsu.com
-
-On 2017/2/7 17:21, Jason Wang wrote:
->
->
-> On 2017年02月07日 16:19, Hailiang Zhang wrote:
->> On 2017/2/7 15:57, Jason Wang wrote:
->>>
->>>
->>> On 2017年02月07日 15:54, Hailiang Zhang wrote:
->>>> Hi Jason,
->>>>
->>>> On 2017/2/6 20:53, Jason Wang wrote:
->>>>>
->>>>>
->>>>> On 2017年02月06日 19:11, Hailiang Zhang wrote:
->>>>>> On 2017/2/6 17:35, Jason Wang wrote:
->>>>>>>
->>>>>>>
->>>>>>> On 2017年02月06日 16:13, Hailiang Zhang wrote:
->>>>>>>> On 2017/2/3 11:47, Jason Wang wrote:
->>>>>>>>>
->>>>>>>>>
->>>>>>>>> On 2017年01月24日 22:05, zhanghailiang wrote:
->>>>>>>>>> The original 'timer_check_lock' mutex lock of struct CompareState
->>>>>>>>>> is used to protect the 'conn_list' queue and its child queues
->>>>>>>>>> which
->>>>>>>>>> are 'primary_list' and 'secondary_list', which is a little abused
->>>>>>>>>> and confusing
->>>>>>>>>>
->>>>>>>>>> To make it clearer, we rename 'timer_check_lock' to
->>>>>>>>>> 'conn_list_lock'
->>>>>>>>>> which is used to protect 'conn_list' queue, use another
->>>>>>>>>> 'conn_lock'
->>>>>>>>>> to protect 'primary_list' and 'secondary_list'.
->>>>>>>>>>
->>>>>>>>>> Besides, fix some missing places which need these mutex lock.
->>>>>>>>>>
->>>>>>>>>> Signed-off-by: zhanghailiang<zhang.zhanghailiang@huawei.com>
->>>>>>>>>
->>>>>>>>> Instead of sticking to such kind of mutex, I think it's time to
->>>>>>>>> make
->>>>>>>>> colo timer run in colo thread (there's a TODO in the code).
->>>>>>>>>
->>>>>>>>
->>>>>>>> Er, it seems that, we still need these mutex locks even we make
->>>>>>>> colo
->>>>>>>> timer and colo thread run in the same thread, because we may access
->>>>>>>> the connect/primary/secondary list from colo (migratioin) thread
->>>>>>>> concurrently.
->>>>>>>
->>>>>>> Just make sure I understand the issue, why need it access the list?
->>>>>>>
->>>>>>>>
->>>>>>>> Besides, it seems to be a little complex to make colo timer run in
->>>>>>>> colo
->>>>>>>> compare thread, and it is not this series' goal.
->>>>>>>
->>>>>>> Seems not by just looking at how it was implemented in main loop,
->>>>>>> but
->>>>>>> maybe I was wrong.
->>>>>>>
->>>>>>>> This series is preparing
->>>>>>>> work for integrating COLO compare with COLO frame and it is
->>>>>>>> prerequisite.
->>>>>>>>
->>>>>>>> So, we may consider implementing it later in another series.
->>>>>>>> Zhang Chen, what's your opinion ?
->>>>>>>
->>>>>>> The problem is this patch make things even worse, it introduces one
->>>>>>> more
->>>>>>> mutex.
->>>>>>>
->>>>>>
->>>>>> Hmm, for most cases, we need to get these two locks at the same time.
->>>>>> We can use one lock to protect conn_list/primary_list/secondary_list,
->>>>>> (We need to get this lock before operate all these lists, as you can
->>>>>> see
->>>>>> in patch 2, while do checkpoint, we may operate these lists in
->>>>>> COLO checkpoint thread concurrently.)
->>>>>>
->>>>>> But for the original codes, we didn't got timer_check_lock in
->>>>>> packet_enqueue() while operate conn_list/primary_list/secondary_list,
->>>>>> and didn't got this lock in colo_compare_connection while operate
->>>>>> secondary_list either.
->>>>>>
->>>>>> So, is it OK to use the conn_lock instead of timer_check_lock, and
->>>>>> add the lock where it is need ?
->>>>>
->>>>> I'd like to know if timer were run in colo thread (this looks as
->>>>> simple
->>>>> as a g_timeout_source_new() followed by a g_source_attach()), why
->>>>> do we
->>>>> still need a mutex. And if we need it now but plan to remove it in the
->>>>> future, I'd like to use big lock to simplify the codes.
->>>>>
->>>>
->>>> After investigated your above suggestion, I think it works by using
->>>> g_timeout_source_new() and g_source_attach(), but I'm not sure
->>>> if it is a good idea to use the big lock to protect the possible
->>>> concurrent cases which seem to only happen between COLO migration
->>>> thread and COLO compare thread, any further suggestions ?
->>>
->>> I think I need first understand why migration thread need to access the
->>> list?
->>>
->>
->> Er, sorry to confuse you here, to be exactly, it is COLO checkpoint
->> thread,
->> we reuse the migration thread to realize checkpoint process for COLO,
->> Because qemu enters into COLO state after a complete migration, so we
->> reuse it.
->>
->> While do checkpoint, we need to release all the buffered packets that
->> have not
->> yet been compared, so we need to access the list in COLO checkpoint
->> thread.
->
-
-Hi Jason,
-
-> I think the better way is notify the comparing thread and let it do the
-> releasing. You probably need similar mechanism to notify from comparing
-> thread to checkpoint thread.
->
-
-It seems that there is no available APIs in glib to notify a thread which
-are run coroutine to do something (idle source ?). What about using anonymous pipe
-as the GPollFD to communicate between colo comparing thread and colo thread ?
-
-Any ideas ?
-
-Hailiang
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Cc: qemu-ppc@nongnu.org, rth@twiddle.net, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
 
-> Thanks
->
->>
->> Thanks.
->
->
-> .
->
+--wLAMOaPNJ0fu1fTG
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Feb 10, 2017 at 09:49:17AM +0530, Nikunj A Dadhania wrote:
+> David Gibson <david@gibson.dropbear.id.au> writes:
+>=20
+> > [ Unknown signature status ]
+> > On Thu, Feb 09, 2017 at 04:04:04PM +0530, Nikunj A Dadhania wrote:
+> >> POWER ISA 3.0 adds CA32 and OV32 status in 64-bit mode. Add the flags
+> >> and corresponding defines. Moreover, CA32 is set when CA is set and
+> >> OV32 is set when OV is set, there is no need to have a new
+> >> fields in the CPUPPCState structure.
+> >>=20
+> >> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+> >
+> > Um.. I don't quite understand this.  If CA always has the same value
+> > as CA32, what's the point?
+>=20
+> I am not clear either. I think that as CA was set for both 32/64-bit
+> mode, that couldn't be changed for backward compatibility. CA32 should
+> have affected only the instructions working one word variants.
+>=20
+> Re-scanning the ISA 3.0, found this in 3.3.9 Fixed-Point Arithmetic
+> Instructions:
+>=20
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> addic, addic., subfic, addc, subfc, adde, subfe,
+> addme, subfme, addze, and subfze always set CA, to
+> reflect the carry out of bit 0 in 64-bit mode and out of bit
+> 32 in 32-bit mode. These instructions also always set
+> CA32 to reflect the carry out of bit 32.
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> Which is conflicting to what is said in 3.2.2 Fixed-Point Exception
+> Register:
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> Carry32 (CA32)
+> CA32 is set whenever CA is set, and is set to
+> the same value that CA is defined to be set to
+> in 32-bit mode.
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+Ok, I've had a look at the ISA and discussed this with Michael
+Ellerman.  We think what's going on here is that it's using some
+unfortunately unclear wording.  When it says "OV32 is set when OV is
+set" we think that means "OV32 is updated when OV is updated", not
+that "OV32 is set to the same value as OV".
+
+So although they're updated at the same time, the 32-bit variants can
+have different values and will need real representation in the CPU
+model.  Well, at least in 64-bit mode.  When the CPU is in 32-bit
+mode, I believe they really will have the same values.
+
+That would make your implementation suggested here incorrect.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--wLAMOaPNJ0fu1fTG
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYom7RAAoJEGw4ysog2bOSGeoP/j/DyB4LMWxlMOvvesDPOm44
+gv+YR6y8jMJxoGOtRS+VjKAavNG4IcWkQKXJtbjp74bC4WVKdUlMLkoESPlNCSNn
+E7vuOqm/kPI5r6cYk/5KjEPeINj4yQc3SCrwMoqpwoNmwWW/xNnoRN7NPkQpapte
+N+ITbUIZSMMG4j7looh66fEa/Qb79bZ78YJPJXlDmzXppja4dzA4K6vK4KO9bLty
+9csP03D9F8JRSBzhGp6PCQLWfdCN+SM30db0eNLQ/hJ6ye9Xr3n1Rhv/b8gldUuS
+Qg8kBe+T+Z0uajfwkv20hmb5zVjfFc5vNfjoZiA2UtCrbQ/IXLosu5tKypbfuyB4
+UKxNXnocVA4ieOvLLjWih5jKsG1h7e8fwWJwN7DzB1A3ePwXJM2JwWW1BPawOFbF
++iZtjh7iEHiSDYhFRCLVfPFvmCy1H39QW9Q3MAO+e6BS/bo6izUHyoaCi83wKb/Z
+xi+cmaDn6u9ycsXWWdEMYWMdF0dGrVMl3rrcg9FjB5W4FO+4aUw/pENK1HzKbUCh
+xHln71ZEYzYNWJA1j9Q7+IokFdNYJ/1kcBaXTUtkKeRZaFQ7kP5sQNUxK27VWsAs
+CaRRJyFpK6lhAxBBymVSIZVaDSqdkHJM8MtCC2vpNtUF1WmbEkj8nFnJx1Cqn3Yw
+GgrTK9LJli7/RizQ+sC8
+=Cfci
+-----END PGP SIGNATURE-----
+
+--wLAMOaPNJ0fu1fTG--
