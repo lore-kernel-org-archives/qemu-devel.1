@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cdrEa-0000EJ-VZ
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 23:30:30 -0500
+	(envelope-from <ppandit@redhat.com>) id 1cdrfW-0000bv-D2
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 23:58:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cdrEX-0004ze-RP
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 23:30:28 -0500
-Received: from indium.canonical.com ([91.189.90.7]:34457)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cdrEX-0004xi-LE
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 23:30:25 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cdrEV-0004sY-Fy
-	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 04:30:23 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 776152E80C2
-	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 04:30:23 +0000 (UTC)
+	(envelope-from <ppandit@redhat.com>) id 1cdrfS-0005Ni-MS
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 23:58:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51068)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1cdrfS-0005Ml-GR
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 23:58:14 -0500
+Date: Wed, 15 Feb 2017 10:28:06 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+In-Reply-To: <CAKmqyKPWncbASv=VD1YAzKokEHxdOVse+G41XNmv5LUwy-kfUQ@mail.gmail.com>
+Message-ID: <alpine.LFD.2.20.1702151024310.11222@wniryva>
+References: <20170214185225.7994-1-ppandit@redhat.com>
+	<20170214185225.7994-3-ppandit@redhat.com>
+	<CAKmqyKPWncbASv=VD1YAzKokEHxdOVse+G41XNmv5LUwy-kfUQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 15 Feb 2017 04:17:23 -0000
-From: Launchpad Bug Tracker <1068900@bugs.launchpad.net>
-Reply-To: Bug 1068900 <1068900@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20121019232243.16004.28788.malonedeb@wampee.canonical.com>
-Message-Id: <20170215041723.9002.57570.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1068900] Re: Thread cancellation broken in
- app-level emulation
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v4 2/4] sd: sdhci: check transfer mode
+ register in multi block transfer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,45 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Alistair Francis <alistair23@gmail.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Wjjzhang <wjjzhang@tencent.com>, Jiang Xin <jiangxin1@huawei.com>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+  Hello Alistair,
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
++-- On Tue, 14 Feb 2017, Alistair Francis wrote --+
+| On Tue, Feb 14, 2017 at 10:52 AM, P J P <ppandit@redhat.com> wrote:
+| > From: Prasad J Pandit <pjp@fedoraproject.org>
+| >
+| > In the SDHCI protocol, the transfer mode register value
+| > is used during multi block transfer to check if block count
+| > register is enabled and should be updated. Transfer mode
+| > register could be set such that, block count register would
+| > not be updated, thus leading to an infinite loop. Add check
+| > to avoid it.
+| >
+| > Reported-by: Wjjzhang <wjjzhang@tencent.com>
+| > Reported-by: Jiang Xin <jiangxin1@huawei.com>
+| > Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+| 
+| Didn't I already review this?
 
--- =
+Yes, you did. I resent it owing to thread
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1068900
+  -> https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg02898.html
 
-Title:
-  Thread cancellation broken in app-level emulation
-
-Status in QEMU:
-  Expired
-
-Bug description:
-  Thread cancellation (and certain other implementation-internal things
-  such as set*id() and timers) are implemented in userspace on Linux by
-  stealing a couple of the realtime signals for internal use by the
-  implementation, leaving them unavailable to applications.
-  Unfortunately, this bites qemu application-level emulation when the
-  application being run uses thread cancellation or other features that
-  need such signals. The signal handler is unable to be set (because
-  sigaction on the host rejects the signal numbers) and attempts to send
-  the signals result in it being received not by the emulated
-  application code, but by the libc/libpthread code on which qemu is
-  running; this in turn seems to cause qemu to crash.
-
-  The best solution I can think of is for qemu to steal one of the
-  realtime signals for its own use, and multiplex signal numbers outside
-  the range SIGRTMIN..SIGRTMAX, as well as the stolen signal itself, on
-  top of this stolen signal. This would both allow cancellation to work,
-  and would allow applications the full range of realtime signals when
-  the guest has more signals than the host (e.g. MIPS running on x86
-  host).
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1068900/+subscriptions
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
