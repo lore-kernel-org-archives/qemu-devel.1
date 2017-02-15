@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cdqer-000272-0v
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 22:53:34 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cdqer-000273-UY
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 22:53:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cdqeo-0008OW-BW
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 22:53:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36174)
+	(envelope-from <jasowang@redhat.com>) id 1cdqeq-0008Pi-PB
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 22:53:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55344)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cdqeo-0008No-5w
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 22:53:30 -0500
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cdqeq-0008PB-Jv
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 22:53:32 -0500
 From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 15 Feb 2017 11:53:18 +0800
-Message-Id: <1487130802-27953-2-git-send-email-jasowang@redhat.com>
+Date: Wed, 15 Feb 2017 11:53:19 +0800
+Message-Id: <1487130802-27953-3-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1487130802-27953-1-git-send-email-jasowang@redhat.com>
 References: <1487130802-27953-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL 1/5] net: Mark 'vlan' parameter as deprecated
+Subject: [Qemu-devel] [PULL 2/5] net: e1000e: fix dead code in
+ e1000e_write_packet_to_guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,51 +25,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Jason Wang <jasowang@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-The 'vlan' parameter is a continuous source of confusion for the users,
-many people mix it up with the more common term VLAN (the link layer
-packet encapsulation), and even if they realize that the QEMU 'vlan' is
-rather some kind of network hub emulation, there is still a high risk
-that they configure their QEMU networking in a wrong way with this
-parameter (e.g. by hooking NICs together, so they get a 'loopback'
-between one and the other NIC).
-Thus at one point in time, we should finally get rid of the 'vlan'
-feature in QEMU. Let's do a first step in this direction by declaring
-the 'vlan' parameter as deprecated and informing the users to use the
-'netdev' parameter instead.
+Because is_first is declared inside a loop, it is always true.  The store
+is dead, and so is the "else" branch of "if (is_first)".  is_last is
+okay though.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Reported by Coverity.
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Dmitry Fleytman <dmitry@daynix.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- net/net.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ hw/net/e1000e_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/net.c b/net/net.c
-index 939fe31..fb7af3a 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -970,6 +970,7 @@ static int net_client_init1(const void *object, bool is_netdev, Error **errp)
-     const Netdev *netdev;
-     const char *name;
-     NetClientState *peer = NULL;
-+    static bool vlan_warned;
+diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+index 2b11499..c99e2fb 100644
+--- a/hw/net/e1000e_core.c
++++ b/hw/net/e1000e_core.c
+@@ -1507,6 +1507,7 @@ e1000e_write_packet_to_guest(E1000ECore *core, struct NetRxPkt *pkt,
+     const E1000E_RingInfo *rxi;
+     size_t ps_hdr_len = 0;
+     bool do_ps = e1000e_do_ps(core, pkt, &ps_hdr_len);
++    bool is_first = true;
  
-     if (is_netdev) {
-         netdev = object;
-@@ -1050,6 +1051,11 @@ static int net_client_init1(const void *object, bool is_netdev, Error **errp)
-             !opts->u.nic.data->has_netdev) {
-             peer = net_hub_add_port(net->has_vlan ? net->vlan : 0, NULL);
-         }
-+
-+        if (net->has_vlan && !vlan_warned) {
-+            error_report("'vlan' is deprecated. Please use 'netdev' instead.");
-+            vlan_warned = true;
-+        }
-     }
+     rxi = rxr->i;
  
-     if (net_client_init_fun[netdev->type](netdev, name, peer, errp) < 0) {
+@@ -1514,7 +1515,6 @@ e1000e_write_packet_to_guest(E1000ECore *core, struct NetRxPkt *pkt,
+         hwaddr ba[MAX_PS_BUFFERS];
+         e1000e_ba_state bastate = { { 0 } };
+         bool is_last = false;
+-        bool is_first = true;
+ 
+         desc_size = total_size - desc_offset;
+ 
 -- 
 2.7.4
