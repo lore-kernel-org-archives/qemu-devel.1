@@ -1,30 +1,55 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44825)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1ce7af-0003hu-16
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 16:58:22 -0500
+	(envelope-from <jl4312@columbia.edu>) id 1ce7hu-00077s-Rs
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 17:05:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1ce7ab-0000yM-VH
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 16:58:21 -0500
-Received: from mail-pf0-x22e.google.com ([2607:f8b0:400e:c00::22e]:34354)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
-	id 1ce7ab-0000yE-Lp
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 16:58:17 -0500
-Received: by mail-pf0-x22e.google.com with SMTP id e4so34267781pfg.1
-	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 13:58:17 -0800 (PST)
-From: Ben Warren <ben@skyportsystems.com>
-Message-Id: <4757B80F-46A7-4A6F-BB65-1119A07BE52A@skyportsystems.com>
-Content-Type: multipart/signed;
-	boundary="Apple-Mail=_72C19BC4-DE22-4407-B82B-A414856AF5C5";
-	protocol="application/pkcs7-signature"; micalg=sha1
-Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Date: Wed, 15 Feb 2017 13:58:15 -0800
-In-Reply-To: <ebde49dc-fd80-895e-b73f-545ec9a966c8@redhat.com>
-References: <cover.1487139038.git.ben@skyportsystems.com>
-	<96c621a0c1588234e473bf0c0d068af8812f3225.1487139038.git.ben@skyportsystems.com>
-	<ebde49dc-fd80-895e-b73f-545ec9a966c8@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 6/7] tests: Move reusable ACPI macros
- into a new header file
+	(envelope-from <jl4312@columbia.edu>) id 1ce7hp-00041I-R8
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 17:05:50 -0500
+Received: from outprodmail02.cc.columbia.edu ([128.59.72.51]:51651)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jl4312@columbia.edu>) id 1ce7hp-0003xM-KO
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 17:05:45 -0500
+Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
+	by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
+	v1FM3wYi016462
+	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 17:05:38 -0500
+Received: from hazelnut (localhost.localdomain [127.0.0.1])
+	by hazelnut (Postfix) with ESMTP id CAEBC7E
+	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 17:05:38 -0500 (EST)
+Received: from sendprodmail03.cc.columbia.edu (sendprodmail03.cc.columbia.edu
+	[128.59.72.15]) by hazelnut (Postfix) with ESMTP id AB28C85
+	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 17:05:38 -0500 (EST)
+Received: from mail-vk0-f69.google.com (mail-vk0-f69.google.com
+	[209.85.213.69])
+	by sendprodmail03.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
+	v1FM5cAt055546
+	(version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 17:05:38 -0500
+Received: by mail-vk0-f69.google.com with SMTP id 23so116092287vkc.1
+	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 14:05:38 -0800 (PST)
+Received: from mail-ua0-f181.google.com (mail-ua0-f181.google.com.
+	[209.85.217.181]) by smtp.gmail.com with ESMTPSA id
+	z45sm1343602uab.38.2017.02.15.14.05.36 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 15 Feb 2017 14:05:36 -0800 (PST)
+Received: by mail-ua0-f181.google.com with SMTP id x12so11617039uax.0
+	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 14:05:36 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20170215025243.GA3988@pxdev.xzpeter.org>
+References: <CAHyh4xiVKjd+D=qaizUZ02O8xLYhpoVKOqC9cR0ZWWyLq9HtbQ@mail.gmail.com>
+	<20170208031216.GA5151@pxdev.xzpeter.org>
+	<CAHyh4xg7NVPjXu3c+xGWNzQqwLgFqFJTPo4SgN-X+FNuHjGihQ@mail.gmail.com>
+	<CAHyh4xhOPmfLoU_fvtbBF1Wqbzji9q6rp_bRN38qfnwvhQq+9A@mail.gmail.com>
+	<20170209035250.GB22153@pxdev.xzpeter.org>
+	<CAHyh4xi9KZm13mJnE3-EyYkkyN4YDKKwbeJ68AumCBM7kgr+MQ@mail.gmail.com>
+	<20170214073551.GA9055@pxdev.xzpeter.org>
+	<CAHyh4xiATAV801U7zjK1F_B+7e2bDWhH1-gpFKF3U1jNmCfScw@mail.gmail.com>
+	<20170215025243.GA3988@pxdev.xzpeter.org>
+From: Jintack Lim <jintack@cs.columbia.edu>
+Date: Wed, 15 Feb 2017 17:05:35 -0500
+Message-ID: <CAHyh4xg0sY2woR5BPVd6uiESpu6U9PHYs7a173sQ7BcLSVk5Hg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] iommu emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,124 +58,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>, mst@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: mst@redhat.com, Alex Williamson <alex.williamson@redhat.com>, QEMU Devel Mailing List <qemu-devel@nongnu.org>
+
+On Tue, Feb 14, 2017 at 9:52 PM, Peter Xu <peterx@redhat.com> wrote:
+
+> On Tue, Feb 14, 2017 at 07:50:39AM -0500, Jintack Lim wrote:
+>
+> [...]
+>
+> > > > >> > I misunderstood what you said?
+> > > > >
+> > > > > I failed to understand why an vIOMMU could help boost performance.
+> :(
+> > > > > Could you provide your command line here so that I can try to
+> > > > > reproduce?
+> > > >
+> > > > Sure. This is the command line to launch L1 VM
+> > > >
+> > > > qemu-system-x86_64 -M q35,accel=kvm,kernel-irqchip=split \
+> > > > -m 12G -device intel-iommu,intremap=on,eim=off,caching-mode=on \
+> > > > -drive file=/mydata/guest0.img,format=raw --nographic -cpu host \
+> > > > -smp 4,sockets=4,cores=1,threads=1 \
+> > > > -device vfio-pci,host=08:00.0,id=net0
+> > > >
+> > > > And this is for L2 VM.
+> > > >
+> > > > ./qemu-system-x86_64 -M q35,accel=kvm \
+> > > > -m 8G \
+> > > > -drive file=/vm/l2guest.img,format=raw --nographic -cpu host \
+> > > > -device vfio-pci,host=00:03.0,id=net0
+> > >
+> > > ... here looks like these are command lines for L1/L2 guest, rather
+> > > than L1 guest with/without vIOMMU?
+> > >
+> >
+> > That's right. I thought you were asking about command lines for L1/L2
+> guest
+> > :(.
+> > I think I made the confusion, and as I said above, I didn't mean to talk
+> > about the performance of L1 guest with/without vIOMMO.
+> > We can move on!
+>
+> I see. Sure! :-)
+>
+> [...]
+>
+> > >
+> > > Then, I *think* above assertion you encountered would fail only if
+> > > prev == 0 here, but I still don't quite sure why was that happening.
+> > > Btw, could you paste me your "lspci -vvv -s 00:03.0" result in your L1
+> > > guest?
+> > >
+> >
+> > Sure. This is from my L1 guest.
+>
+> Hmm... I think I found the problem...
+>
+> >
+> > root@guest0:~# lspci -vvv -s 00:03.0
+> > 00:03.0 Network controller: Mellanox Technologies MT27500 Family
+> > [ConnectX-3]
+> > Subsystem: Mellanox Technologies Device 0050
+> > Control: I/O- Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr-
+> > Stepping- SERR+ FastB2B- DisINTx+
+> > Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort-
+> > <MAbort- >SERR- <PERR- INTx-
+> > Latency: 0, Cache Line Size: 64 bytes
+> > Interrupt: pin A routed to IRQ 23
+> > Region 0: Memory at fe900000 (64-bit, non-prefetchable) [size=1M]
+> > Region 2: Memory at fe000000 (64-bit, prefetchable) [size=8M]
+> > Expansion ROM at fea00000 [disabled] [size=1M]
+> > Capabilities: [40] Power Management version 3
+> > Flags: PMEClk- DSI- D1- D2- AuxCurrent=0mA PME(D0-,D1-,D2-,D3hot-,D3cold-
+> )
+> > Status: D0 NoSoftRst+ PME-Enable- DSel=0 DScale=0 PME-
+> > Capabilities: [48] Vital Product Data
+> > Product Name: CX354A - ConnectX-3 QSFP
+> > Read-only fields:
+> > [PN] Part number: MCX354A-FCBT
+> > [EC] Engineering changes: A4
+> > [SN] Serial number: MT1346X00791
+> > [V0] Vendor specific: PCIe Gen3 x8
+> > [RV] Reserved: checksum good, 0 byte(s) reserved
+> > Read/write fields:
+> > [V1] Vendor specific: N/A
+> > [YA] Asset tag: N/A
+> > [RW] Read-write area: 105 byte(s) free
+> > [RW] Read-write area: 253 byte(s) free
+> > [RW] Read-write area: 253 byte(s) free
+> > [RW] Read-write area: 253 byte(s) free
+> > [RW] Read-write area: 253 byte(s) free
+> > [RW] Read-write area: 253 byte(s) free
+> > [RW] Read-write area: 253 byte(s) free
+> > [RW] Read-write area: 253 byte(s) free
+> > [RW] Read-write area: 253 byte(s) free
+> > [RW] Read-write area: 253 byte(s) free
+> > [RW] Read-write area: 253 byte(s) free
+> > [RW] Read-write area: 253 byte(s) free
+> > [RW] Read-write area: 253 byte(s) free
+> > [RW] Read-write area: 253 byte(s) free
+> > [RW] Read-write area: 253 byte(s) free
+> > [RW] Read-write area: 252 byte(s) free
+> > End
+> > Capabilities: [9c] MSI-X: Enable+ Count=128 Masked-
+> > Vector table: BAR=0 offset=0007c000
+> > PBA: BAR=0 offset=0007d000
+> > Capabilities: [60] Express (v2) Root Complex Integrated Endpoint, MSI 00
+> > DevCap: MaxPayload 256 bytes, PhantFunc 0
+> > ExtTag- RBE+
+> > DevCtl: Report errors: Correctable- Non-Fatal+ Fatal+ Unsupported+
+> > RlxdOrd- ExtTag- PhantFunc- AuxPwr- NoSnoop-
+> > MaxPayload 256 bytes, MaxReadReq 4096 bytes
+> > DevSta: CorrErr+ UncorrErr- FatalErr- UnsuppReq+ AuxPwr- TransPend-
+> > DevCap2: Completion Timeout: Range ABCD, TimeoutDis+, LTR-, OBFF Not
+> > Supported
+> > DevCtl2: Completion Timeout: 65ms to 210ms, TimeoutDis-, LTR-, OBFF
+> Disabled
+> > Capabilities: [100 v0] #00
+>
+> Here we have the head of ecap capability as cap_id==0, then when we
+> boot the l2 guest with the same device, we'll first copy this
+> cap_id==0 cap, then when adding the 2nd ecap, we'll probably encounter
+> problem since pcie_find_capability_list() will thought there is no cap
+> at all (cap_id==0 is skipped).
+>
+> Do you want to try this "hacky patch" to see whether it works for you?
+>
+
+Thanks for following this up!
+
+I just tried this, and I got some different message this time.
+
+qemu-system-x86_64: vfio: Cannot reset device 0000:00:03.0, no available
+reset mechanism.
+qemu-system-x86_64: vfio: Cannot reset device 0000:00:03.0, no available
+reset mechanism.
 
 
---Apple-Mail=_72C19BC4-DE22-4407-B82B-A414856AF5C5
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
+Thanks,
+Jintack
 
 
-> On Feb 15, 2017, at 1:35 PM, Eric Blake <eblake@redhat.com> wrote:
->=20
-> On 02/15/2017 12:15 AM, ben@skyportsystems.com =
-<mailto:ben@skyportsystems.com> wrote:
->> From: Ben Warren <ben@skyportsystems.com>
->>=20
->> Also usable by upcoming VM Generation ID tests
->>=20
->> Signed-off-by: Ben Warren <ben@skyportsystems.com>
->> ---
->> tests/acpi-utils.h       | 75 =
-++++++++++++++++++++++++++++++++++++++++++++++++
->> tests/bios-tables-test.c | 72 =
-+---------------------------------------------
->> 2 files changed, 76 insertions(+), 71 deletions(-)
->> create mode 100644 tests/acpi-utils.h
->>=20
->> diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
->> new file mode 100644
->> index 0000000..d5e5eff
->> --- /dev/null
->> +++ b/tests/acpi-utils.h
->> @@ -0,0 +1,75 @@
->> +#ifndef TEST_ACPI_UTILS_H
->> +#define TEST_ACPI_UTILS_H
->=20
-> No copyright blurb? Also, does MAINTAINERS need an update to cover the
-> new file?
->=20
-Sure, I didn=E2=80=99t realize the header files all have copyright =
-headers.  As for MAINTAINERS, do you mean I should add a device entry =
-for vmgenid?
-
-thanks,
-Ben
-> --=20
-> Eric Blake   eblake redhat com    +1-919-301-3266
-> Libvirt virtualization library http://libvirt.org =
-<http://libvirt.org/>
-
---Apple-Mail=_72C19BC4-DE22-4407-B82B-A414856AF5C5
-Content-Disposition: attachment;
-	filename=smime.p7s
-Content-Type: application/pkcs7-signature;
-	name=smime.p7s
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIIJ+zCCBK8w
-ggOXoAMCAQICEQDgI8sVEoNTia1hbnpUZ2shMA0GCSqGSIb3DQEBCwUAMG8xCzAJBgNVBAYTAlNF
-MRQwEgYDVQQKEwtBZGRUcnVzdCBBQjEmMCQGA1UECxMdQWRkVHJ1c3QgRXh0ZXJuYWwgVFRQIE5l
-dHdvcmsxIjAgBgNVBAMTGUFkZFRydXN0IEV4dGVybmFsIENBIFJvb3QwHhcNMTQxMjIyMDAwMDAw
-WhcNMjAwNTMwMTA0ODM4WjCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hl
-c3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxQTA/BgNV
-BAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWls
-IENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAibEN2npTGU5wUh28VqYGJre4SeCW
-51Gr8fBaE0kVo7SMG2C8elFCp3mMpCLfF2FOkdV2IwoU00oCf7YdCYBupQQ92bq7Fv6hh6kuQ1JD
-FnyvMlDIpk9a6QjYz5MlnHuI6DBk5qT4VoD9KiQUMxeZrETlaYujRgZLwjPU6UCfBrCxrJNAubUI
-kzqcKlOjENs9IGE8VQOO2U52JQIhKfqjfHF2T+7hX4Hp+1SA28N7NVK3hN4iPSwwLTF/Wb1SN7Az
-aS1D6/rWpfGXd2dRjNnuJ+u8pQc4doykqTj/34z1A6xJvsr3c5k6DzKrnJU6Ez0ORjpXdGFQvsZA
-P8vk4p+iIQIDAQABo4IBFzCCARMwHwYDVR0jBBgwFoAUrb2YejS0Jvf6xCZU7wO94CTLVBowHQYD
-VR0OBBYEFJJha4LhoqCqT+xn8cKj97SAAMHsMA4GA1UdDwEB/wQEAwIBhjASBgNVHRMBAf8ECDAG
-AQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDARBgNVHSAECjAIMAYGBFUdIAAw
-RAYDVR0fBD0wOzA5oDegNYYzaHR0cDovL2NybC51c2VydHJ1c3QuY29tL0FkZFRydXN0RXh0ZXJu
-YWxDQVJvb3QuY3JsMDUGCCsGAQUFBwEBBCkwJzAlBggrBgEFBQcwAYYZaHR0cDovL29jc3AudXNl
-cnRydXN0LmNvbTANBgkqhkiG9w0BAQsFAAOCAQEAGypurFXBOquIxdjtzVXzqmthK8AJECOZD8Vm
-am+x9bS1d14PAmEA330F/hKzpICAAPz7HVtqcgIKQbwFusFY1SbC6tVNhPv+gpjPWBvjImOcUvi7
-BTarfVil3qs7Y+Xa1XPv7OD7e+Kj//BCI5zKto1NPuRLGAOyqC3U2LtCS5BphRDbpjc06HvgARCl
-nMo6x59PiDRuimXQGoq7qdzKyjbR9PzCZCk1r9axp3ER0gNDsY8+muyeMlP0dpLKhjQHuSzK5hxK
-2JkNwYbikJL7WkJqIyEQ6WXH9dW7fuqMhSACYurROgcsWcWZM/I4ieW26RZ6H3kU9koQGib6fIr7
-mzCCBUQwggQsoAMCAQICEQCWOeMVlifzA+PvGfHjMeybMA0GCSqGSIb3DQEBCwUAMIGbMQswCQYD
-VQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRow
-GAYDVQQKExFDT01PRE8gQ0EgTGltaXRlZDFBMD8GA1UEAxM4Q09NT0RPIFNIQS0yNTYgQ2xpZW50
-IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTYwNTE5MDAwMDAwWhcNMTcw
-NTE5MjM1OTU5WjAnMSUwIwYJKoZIhvcNAQkBFhZiZW5Ac2t5cG9ydHN5c3RlbXMuY29tMIIBIjAN
-BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAryjnKj/3VRzbNXiWAp7RAZSzUCOzDG6WJ2ybuDWP
-A7uDl48iX2v3ulbcZq8G0sL1nwGvBdSrmd5X3Qzirx0ti0Qe0mlAd22PEOL/xR5ChLDhNI6i43cM
-R1qM1JNtuC5Dz8h2TfYbF/VuKkA1YVuXNguSP8Z1DQXptE1m3yS0gk9LLdDkqq7Vi/zfSmD1NYHN
-gEGvtux/3lMp8pHgQiZo8PxKH2Y4zem0AiWtZ9fKZqYWRIhECJ+etvpGvh4dNIj8vdo/ig3uSwLv
-ePX7rFz3C5WHOyKjl4VGHNOA5IRZjabp4bdAEIiMPU7lfWt0o4nCRtM/G/6FvFinR6PIHSma1wID
-AQABo4IB9DCCAfAwHwYDVR0jBBgwFoAUkmFrguGioKpP7GfxwqP3tIAAwewwHQYDVR0OBBYEFJv6
-uT+NCtbUQ0MHZLryEY65oKgbMA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMCAGA1UdJQQZ
-MBcGCCsGAQUFBwMEBgsrBgEEAbIxAQMFAjARBglghkgBhvhCAQEEBAMCBSAwRgYDVR0gBD8wPTA7
-BgwrBgEEAbIxAQIBAQEwKzApBggrBgEFBQcCARYdaHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9D
-UFMwXQYDVR0fBFYwVDBSoFCgToZMaHR0cDovL2NybC5jb21vZG9jYS5jb20vQ09NT0RPU0hBMjU2
-Q2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNybDCBkAYIKwYBBQUHAQEEgYMw
-gYAwWAYIKwYBBQUHMAKGTGh0dHA6Ly9jcnQuY29tb2RvY2EuY29tL0NPTU9ET1NIQTI1NkNsaWVu
-dEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYIKwYBBQUHMAGGGGh0dHA6Ly9v
-Y3NwLmNvbW9kb2NhLmNvbTAhBgNVHREEGjAYgRZiZW5Ac2t5cG9ydHN5c3RlbXMuY29tMA0GCSqG
-SIb3DQEBCwUAA4IBAQAwVeCMNqTr20+cqsHnSK2AtzxKZyVG9y51wB88lPnRGHe2m+qKGdPgAh/7
-iDzEEXsy4sDwHVHVq4kLHW9lX7CvRTxCtmOAtsty5ePhJjh3CX+nsK2HKpi043E6azad6L64DNVN
-dMZFwUrUu8dYjOp48TPpIhW13Sbu2t/SOZK4G8EZAaZPX8Dg34tyHRUvM/B/eaJuUgdM5qY2IU+F
-7U2K4hBHkhJMJgQ7TyVe8GhdBMaztY4GHqhWP5cCgZBdC9QII8E5jqX7//FbBRB0zVHRVeBZO32H
-TvapSOG8ZYd0n5l5j3rBQnLfHWsnQ07rL2+w8W9BBPSZBbciPuwOe3ksMYIDxjCCA8ICAQEwgbEw
-gZsxCzAJBgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1Nh
-bGZvcmQxGjAYBgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1
-NiBDbGllbnQgQXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z
-8eMx7JswCQYFKw4DAhoFAKCCAekwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0B
-CQUxDxcNMTcwMjE1MjE1ODE1WjAjBgkqhkiG9w0BCQQxFgQUCqqM90qWFtUUCeY1tND2qu7+GP8w
-gcIGCSsGAQQBgjcQBDGBtDCBsTCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFu
-Y2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxQTA/
-BgNVBAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVt
-YWlsIENBAhEAljnjFZYn8wPj7xnx4zHsmzCBxAYLKoZIhvcNAQkQAgsxgbSggbEwgZsxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1NiBDbGllbnQg
-QXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z8eMx7JswDQYJ
-KoZIhvcNAQEBBQAEggEAE2tMbUNdVX1tQIau96yEiSO8iylgwE9DZDAylQoutlpWrGSuTkrgdcOm
-nzfUkfOBuIiw8UVrAaMihSjof+/k6yo2Nzjk3s8U4LbD/f2746d+m1ECiLO6QzgU5hWk7ljoUk2y
-pCfNloPQWsIoUxbdwKxkicD8ZbcexQqRSFLE5B/KRsuYUUuSq5lK2iXiwIrOH7WIriPx/GF8p0RW
-gITWMXwuvCW+JdD7CQ/oZxOZgPxiOm5mqIp6gvyjIx/tAY/J52Y7D1Q51fJwgJewfuYcy8EOCFbH
-3rxa29wX8/FpXlvW8VUCqx8vcqH1cPHuzggbddbZ46UTecXWY+NPaRnA0gAAAAAAAA==
---Apple-Mail=_72C19BC4-DE22-4407-B82B-A414856AF5C5--
+> ------8<-------
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index 332f41d..bacd302 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -1925,11 +1925,6 @@ static void vfio_add_ext_cap(VFIOPCIDevice *vdev)
+>
+>      }
+>
+> -    /* Cleanup chain head ID if necessary */
+> -    if (pci_get_word(pdev->config + PCI_CONFIG_SPACE_SIZE) == 0xFFFF) {
+> -        pci_set_word(pdev->config + PCI_CONFIG_SPACE_SIZE, 0);
+> -    }
+> -
+>      g_free(config);
+>      return;
+>  }
+> ------>8-------
+>
+> I don't think it's a good solution (it just used 0xffff instead of 0x0
+> for the masked cap_id, then l2 guest would like to co-op with it), but
+> it should workaround this temporarily. I'll try to think of a better
+> one later and post when proper.
+>
+> (Alex, please leave comment if you have any better suggestion before
+>  mine :)
+>
+> Thanks,
+>
+> -- peterx
+>
+>
