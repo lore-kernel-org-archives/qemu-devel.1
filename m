@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ce7CF-000102-G6
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 16:33:08 -0500
+	(envelope-from <eblake@redhat.com>) id 1ce7EN-0002RR-Lw
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 16:35:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ce7CC-00004v-Cn
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 16:33:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54536)
+	(envelope-from <eblake@redhat.com>) id 1ce7EK-00019t-Jl
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 16:35:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55666)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1ce7CC-0008WS-70
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 16:33:04 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 23E588553C
-	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 21:33:04 +0000 (UTC)
-Date: Wed, 15 Feb 2017 14:33:01 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170215143301.363029a2@t450s.home>
-In-Reply-To: <1487191768-8489-1-git-send-email-mst@redhat.com>
-References: <1487191768-8489-1-git-send-email-mst@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ce7EK-00019n-As
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 16:35:16 -0500
+References: <cover.1487139038.git.ben@skyportsystems.com>
+	<96c621a0c1588234e473bf0c0d068af8812f3225.1487139038.git.ben@skyportsystems.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ebde49dc-fd80-895e-b73f-545ec9a966c8@redhat.com>
+Date: Wed, 15 Feb 2017 15:35:13 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] pci/pcie: don't assume cap id 0 is reserved
+In-Reply-To: <96c621a0c1588234e473bf0c0d068af8812f3225.1487139038.git.ben@skyportsystems.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="vfHGGhrqNwP0VEU1vI5CKlnTbUtFp2IMb"
+Subject: Re: [Qemu-devel] [PATCH v6 6/7] tests: Move reusable ACPI macros
+ into a new header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,57 +29,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: ben@skyportsystems.com, qemu-devel@nongnu.org
+Cc: imammedo@redhat.com, lersek@redhat.com, mst@redhat.com
 
-On Wed, 15 Feb 2017 22:49:47 +0200
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vfHGGhrqNwP0VEU1vI5CKlnTbUtFp2IMb
+From: Eric Blake <eblake@redhat.com>
+To: ben@skyportsystems.com, qemu-devel@nongnu.org
+Cc: imammedo@redhat.com, lersek@redhat.com, mst@redhat.com
+Message-ID: <ebde49dc-fd80-895e-b73f-545ec9a966c8@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 6/7] tests: Move reusable ACPI macros into
+ a new header file
+References: <cover.1487139038.git.ben@skyportsystems.com>
+ <96c621a0c1588234e473bf0c0d068af8812f3225.1487139038.git.ben@skyportsystems.com>
+In-Reply-To: <96c621a0c1588234e473bf0c0d068af8812f3225.1487139038.git.ben@skyportsystems.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> VFIO actually wants to create a capability with ID == 0.
-> This is done to make guest drivers skip the given capability.
-> pcie_add_capability then trips up on this capability
-> when looking for end of capability list.
-> 
-> To support this use-case, it's easy enough to switch to
-> e.g. 0xffffffff for these comparisons - we can be sure
-> it will never match a 16-bit capability ID.
-> 
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+On 02/15/2017 12:15 AM, ben@skyportsystems.com wrote:
+> From: Ben Warren <ben@skyportsystems.com>
+>=20
+> Also usable by upcoming VM Generation ID tests
+>=20
+> Signed-off-by: Ben Warren <ben@skyportsystems.com>
 > ---
+>  tests/acpi-utils.h       | 75 ++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  tests/bios-tables-test.c | 72 +---------------------------------------=
+------
+>  2 files changed, 76 insertions(+), 71 deletions(-)
+>  create mode 100644 tests/acpi-utils.h
+>=20
+> diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
+> new file mode 100644
+> index 0000000..d5e5eff
+> --- /dev/null
+> +++ b/tests/acpi-utils.h
+> @@ -0,0 +1,75 @@
+> +#ifndef TEST_ACPI_UTILS_H
+> +#define TEST_ACPI_UTILS_H
+
+No copyright blurb? Also, does MAINTAINERS need an update to cover the
+new file?
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
-Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
+--vfHGGhrqNwP0VEU1vI5CKlnTbUtFp2IMb
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
->  hw/pci/pcie.c | 11 +++++++----
->  1 file changed, 7 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-> index cbd4bb4..f4dd177 100644
-> --- a/hw/pci/pcie.c
-> +++ b/hw/pci/pcie.c
-> @@ -610,7 +610,8 @@ bool pcie_cap_is_arifwd_enabled(const PCIDevice *dev)
->   * uint16_t ext_cap_size
->   */
->  
-> -static uint16_t pcie_find_capability_list(PCIDevice *dev, uint16_t cap_id,
-> +/* Passing a cap_id value > 0xffff will return 0 and put end of list in prev */
-> +static uint16_t pcie_find_capability_list(PCIDevice *dev, uint32_t cap_id,
->                                            uint16_t *prev_p)
->  {
->      uint16_t prev = 0;
-> @@ -679,9 +680,11 @@ void pcie_add_capability(PCIDevice *dev,
->      } else {
->          uint16_t prev;
->  
-> -        /* 0 is reserved cap id. use internally to find the last capability
-> -           in the linked list */
-> -        next = pcie_find_capability_list(dev, 0, &prev);
-> +        /*
-> +         * 0xffffffff is not a valid cap id (it's a 16 bit field). use
-> +         * internally to find the last capability in the linked list.
-> +         */
-> +        next = pcie_find_capability_list(dev, 0xffffffff, &prev);
->  
->          assert(prev >= PCI_CONFIG_SPACE_SIZE);
->          assert(next == 0);
+iQEcBAEBCAAGBQJYpMmRAAoJEKeha0olJ0NqhCgH/2QcgUyZkq+UF4Yc8uLtrdey
+i2DjIXO2r0/MvRjVYkvQtSInxTczvdxjQRYgZHrMBHtYoi+H7oBNjDWnvr9bf5AM
+MPn92aTCbYrwop1JlzhhQBssW7MGfcrjJNJbDWXIoQwz0ylko9iNd9yQqzcqZ8aJ
+ze4dtBKZu1wzMppqYHaNQ1w5KVA5QT38mDTUkiEttIhFXp9XEl7kq+7eOz0qt1N5
+SjPjAcR6FAPGKdUuKJqjIi4viUsDPr5AgllQgrkjkLBv4Na4661CNkgGF+40KlSh
+tGN7mJjCIDzbG/ti3IYcs2IbyXpQR22uZ5J7Ns6ZjsPRPYk50rZkw2beIX8SRtc=
+=LfN0
+-----END PGP SIGNATURE-----
+
+--vfHGGhrqNwP0VEU1vI5CKlnTbUtFp2IMb--
