@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cdwXq-0002qb-Ns
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 05:10:45 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cdwXs-0002ru-KS
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 05:10:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cdwXl-0003as-Gc
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 05:10:42 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:7282 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cdwXm-0003cF-5l
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 05:10:44 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:33597 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cdwXl-0003Yp-5u
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 05:10:37 -0500
+	id 1cdwXl-0003Yw-OW
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 05:10:38 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 15 Feb 2017 13:10:07 +0300
-Message-Id: <1487153430-17260-3-git-send-email-vsementsov@virtuozzo.com>
+Date: Wed, 15 Feb 2017 13:10:17 +0300
+Message-Id: <1487153430-17260-13-git-send-email-vsementsov@virtuozzo.com>
 In-Reply-To: <1487153430-17260-1-git-send-email-vsementsov@virtuozzo.com>
 References: <1487153430-17260-1-git-send-email-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v15 02/25] specs/qcow2: do not use wording
- 'bitmap header'
+Subject: [Qemu-devel] [PATCH v15 12/25] block/dirty-bitmap: add
+ bdrv_dirty_bitmap_next()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +28,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-A bitmap directory entry is sometimes called a 'bitmap header'. This
-patch leaves only one name - 'bitmap directory entry'. The name 'bitmap
-header' creates misunderstandings with 'qcow2 header' and 'qcow2 bitmap
-header extension' (which is extension of qcow2 header)
-
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- docs/specs/qcow2.txt | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ block/dirty-bitmap.c         | 7 +++++++
+ include/block/dirty-bitmap.h | 3 +++
+ 2 files changed, 10 insertions(+)
 
-diff --git a/docs/specs/qcow2.txt b/docs/specs/qcow2.txt
-index dda53dd..8874e8c 100644
---- a/docs/specs/qcow2.txt
-+++ b/docs/specs/qcow2.txt
-@@ -201,7 +201,7 @@ The fields of the bitmaps extension are:
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index d2fbf55..9208844 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -581,3 +581,10 @@ bool bdrv_has_persistent_bitmaps(BlockDriverState *bs)
  
-           8 - 15:  bitmap_directory_size
-                    Size of the bitmap directory in bytes. It is the cumulative
--                   size of all (nb_bitmaps) bitmap headers.
-+                   size of all (nb_bitmaps) bitmap directory entries.
+     return false;
+ }
++
++BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
++                                        BdrvDirtyBitmap *bitmap)
++{
++    return bitmap == NULL ? QLIST_FIRST(&bs->dirty_bitmaps) :
++                            QLIST_NEXT(bitmap, list);
++}
+diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+index 8dbd16b..d71edc4 100644
+--- a/include/block/dirty-bitmap.h
++++ b/include/block/dirty-bitmap.h
+@@ -81,6 +81,9 @@ void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap,
+                                                 bool persistent);
+ bool bdrv_dirty_bitmap_get_persistance(BdrvDirtyBitmap *bitmap);
  
-          16 - 23:  bitmap_directory_offset
-                    Offset into the image file at which the bitmap directory
-@@ -426,8 +426,7 @@ Each bitmap saved in the image is described in a bitmap directory entry. The
- bitmap directory is a contiguous area in the image file, whose starting offset
- and length are given by the header extension fields bitmap_directory_offset and
- bitmap_directory_size. The entries of the bitmap directory have variable
--length, depending on the lengths of the bitmap name and extra data. These
--entries are also called bitmap headers.
-+length, depending on the lengths of the bitmap name and extra data.
++BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
++                                        BdrvDirtyBitmap *bitmap);
++
+ bool bdrv_has_persistent_bitmaps(BlockDriverState *bs);
  
- Structure of a bitmap directory entry:
- 
+ #endif
 -- 
 1.8.3.1
