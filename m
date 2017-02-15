@@ -1,38 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42272)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1ce46Z-0007Bk-HA
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 13:15:07 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1ce47T-0007fw-Qo
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 13:16:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1ce46U-0004hl-Bb
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 13:15:03 -0500
-Received: from mail-pf0-x231.google.com ([2607:f8b0:400e:c00::231]:35216)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
-	id 1ce46T-0004hY-RS
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 13:14:58 -0500
-Received: by mail-pf0-x231.google.com with SMTP id 202so30125317pfx.2
-	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 10:14:57 -0800 (PST)
-From: Ben Warren <ben@skyportsystems.com>
-Message-Id: <5E496DF7-107A-49E2-95AE-66DC32F6225B@skyportsystems.com>
-Content-Type: multipart/signed;
-	boundary="Apple-Mail=_53570E59-2458-4A56-A10C-1F772C434C17";
-	protocol="application/pkcs7-signature"; micalg=sha1
-Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Date: Wed, 15 Feb 2017 10:14:55 -0800
-In-Reply-To: <20170215200506-mutt-send-email-mst@kernel.org>
-References: <cover.1487139038.git.ben@skyportsystems.com>
-	<9dffe31a245cf6a717eef8227fe80ca666b168b5.1487139038.git.ben@skyportsystems.com>
-	<20170215115723.77e4d9d7@nial.brq.redhat.com>
-	<1f4a6eb2-0838-2218-88e3-4f65498a41d6@redhat.com>
-	<20170215162225.74d48058@nial.brq.redhat.com>
-	<20170215172515-mutt-send-email-mst@kernel.org>
-	<20170215165602.72e96c28@nial.brq.redhat.com>
-	<20170215183736-mutt-send-email-mst@kernel.org>
-	<20170215184309.521aa90f@nial.brq.redhat.com>
-	<5216BB96-2CB8-4E83-8950-40E44EE5264D@skyportsystems.com>
-	<20170215200506-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v6 1/7] linker-loader: Add new 'write
- pointer' command
+	(envelope-from <alex.williamson@redhat.com>) id 1ce47P-00058t-FR
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 13:15:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41764)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1ce47P-00058c-6v
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 13:15:55 -0500
+Date: Wed, 15 Feb 2017 11:15:52 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170215111552.5405418a@t450s.home>
+In-Reply-To: <20170215033452.GB3988@pxdev.xzpeter.org>
+References: <CAHyh4xiVKjd+D=qaizUZ02O8xLYhpoVKOqC9cR0ZWWyLq9HtbQ@mail.gmail.com>
+	<20170208031216.GA5151@pxdev.xzpeter.org>
+	<CAHyh4xg7NVPjXu3c+xGWNzQqwLgFqFJTPo4SgN-X+FNuHjGihQ@mail.gmail.com>
+	<CAHyh4xhOPmfLoU_fvtbBF1Wqbzji9q6rp_bRN38qfnwvhQq+9A@mail.gmail.com>
+	<20170209035250.GB22153@pxdev.xzpeter.org>
+	<CAHyh4xi9KZm13mJnE3-EyYkkyN4YDKKwbeJ68AumCBM7kgr+MQ@mail.gmail.com>
+	<20170214073551.GA9055@pxdev.xzpeter.org>
+	<CAHyh4xiATAV801U7zjK1F_B+7e2bDWhH1-gpFKF3U1jNmCfScw@mail.gmail.com>
+	<20170215025243.GA3988@pxdev.xzpeter.org>
+	<20170215033452.GB3988@pxdev.xzpeter.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] iommu emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,661 +36,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: Jintack Lim <jintack@cs.columbia.edu>, mst@redhat.com, QEMU Devel Mailing List <qemu-devel@nongnu.org>
 
+On Wed, 15 Feb 2017 11:34:52 +0800
+Peter Xu <peterx@redhat.com> wrote:
 
---Apple-Mail=_53570E59-2458-4A56-A10C-1F772C434C17
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
+> On Wed, Feb 15, 2017 at 10:52:43AM +0800, Peter Xu wrote:
+> 
+> [...]
+> 
+> > > >
+> > > > Then, I *think* above assertion you encountered would fail only if
+> > > > prev == 0 here, but I still don't quite sure why was that happening.
+> > > > Btw, could you paste me your "lspci -vvv -s 00:03.0" result in your L1
+> > > > guest?
+> > > >  
+> > > 
+> > > Sure. This is from my L1 guest.  
+> > 
+> > Hmm... I think I found the problem...
+> >   
+> > > 
+> > > root@guest0:~# lspci -vvv -s 00:03.0
+> > > 00:03.0 Network controller: Mellanox Technologies MT27500 Family
+> > > [ConnectX-3]
+> > > Subsystem: Mellanox Technologies Device 0050
+> > > Control: I/O- Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr-
+> > > Stepping- SERR+ FastB2B- DisINTx+
+> > > Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort-
+> > > <MAbort- >SERR- <PERR- INTx-
+> > > Latency: 0, Cache Line Size: 64 bytes
+> > > Interrupt: pin A routed to IRQ 23
+> > > Region 0: Memory at fe900000 (64-bit, non-prefetchable) [size=1M]
+> > > Region 2: Memory at fe000000 (64-bit, prefetchable) [size=8M]
+> > > Expansion ROM at fea00000 [disabled] [size=1M]
+> > > Capabilities: [40] Power Management version 3
+> > > Flags: PMEClk- DSI- D1- D2- AuxCurrent=0mA PME(D0-,D1-,D2-,D3hot-,D3cold-)
+> > > Status: D0 NoSoftRst+ PME-Enable- DSel=0 DScale=0 PME-
+> > > Capabilities: [48] Vital Product Data
+> > > Product Name: CX354A - ConnectX-3 QSFP
+> > > Read-only fields:
+> > > [PN] Part number: MCX354A-FCBT
+> > > [EC] Engineering changes: A4
+> > > [SN] Serial number: MT1346X00791
+> > > [V0] Vendor specific: PCIe Gen3 x8
+> > > [RV] Reserved: checksum good, 0 byte(s) reserved
+> > > Read/write fields:
+> > > [V1] Vendor specific: N/A
+> > > [YA] Asset tag: N/A
+> > > [RW] Read-write area: 105 byte(s) free
+> > > [RW] Read-write area: 253 byte(s) free
+> > > [RW] Read-write area: 253 byte(s) free
+> > > [RW] Read-write area: 253 byte(s) free
+> > > [RW] Read-write area: 253 byte(s) free
+> > > [RW] Read-write area: 253 byte(s) free
+> > > [RW] Read-write area: 253 byte(s) free
+> > > [RW] Read-write area: 253 byte(s) free
+> > > [RW] Read-write area: 253 byte(s) free
+> > > [RW] Read-write area: 253 byte(s) free
+> > > [RW] Read-write area: 253 byte(s) free
+> > > [RW] Read-write area: 253 byte(s) free
+> > > [RW] Read-write area: 253 byte(s) free
+> > > [RW] Read-write area: 253 byte(s) free
+> > > [RW] Read-write area: 253 byte(s) free
+> > > [RW] Read-write area: 252 byte(s) free
+> > > End
+> > > Capabilities: [9c] MSI-X: Enable+ Count=128 Masked-
+> > > Vector table: BAR=0 offset=0007c000
+> > > PBA: BAR=0 offset=0007d000
+> > > Capabilities: [60] Express (v2) Root Complex Integrated Endpoint, MSI 00
+> > > DevCap: MaxPayload 256 bytes, PhantFunc 0
+> > > ExtTag- RBE+
+> > > DevCtl: Report errors: Correctable- Non-Fatal+ Fatal+ Unsupported+
+> > > RlxdOrd- ExtTag- PhantFunc- AuxPwr- NoSnoop-
+> > > MaxPayload 256 bytes, MaxReadReq 4096 bytes
+> > > DevSta: CorrErr+ UncorrErr- FatalErr- UnsuppReq+ AuxPwr- TransPend-
+> > > DevCap2: Completion Timeout: Range ABCD, TimeoutDis+, LTR-, OBFF Not
+> > > Supported
+> > > DevCtl2: Completion Timeout: 65ms to 210ms, TimeoutDis-, LTR-, OBFF Disabled
+> > > Capabilities: [100 v0] #00  
+> > 
+> > Here we have the head of ecap capability as cap_id==0, then when we
+> > boot the l2 guest with the same device, we'll first copy this
+> > cap_id==0 cap, then when adding the 2nd ecap, we'll probably encounter
+> > problem since pcie_find_capability_list() will thought there is no cap
+> > at all (cap_id==0 is skipped).
+> > 
+> > Do you want to try this "hacky patch" to see whether it works for you?
+> > 
+> > ------8<-------
+> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> > index 332f41d..bacd302 100644
+> > --- a/hw/vfio/pci.c
+> > +++ b/hw/vfio/pci.c
+> > @@ -1925,11 +1925,6 @@ static void vfio_add_ext_cap(VFIOPCIDevice *vdev)
+> >  
+> >      }
+> >  
+> > -    /* Cleanup chain head ID if necessary */
+> > -    if (pci_get_word(pdev->config + PCI_CONFIG_SPACE_SIZE) == 0xFFFF) {
+> > -        pci_set_word(pdev->config + PCI_CONFIG_SPACE_SIZE, 0);
+> > -    }
+> > -
+> >      g_free(config);
+> >      return;
+> >  }  
+> > ------>8-------  
+> > 
+> > I don't think it's a good solution (it just used 0xffff instead of 0x0
+> > for the masked cap_id, then l2 guest would like to co-op with it), but
+> > it should workaround this temporarily. I'll try to think of a better
+> > one later and post when proper.
+> > 
+> > (Alex, please leave comment if you have any better suggestion before
+> >  mine :)  
+> 
+> Alex, do you like something like below to fix above issue that Jintack
+> has encountered?
+> 
+> (note: this code is not for compile, only trying show what I mean...)
+> 
+> ------8<-------
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index 332f41d..4dca631 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -1877,25 +1877,6 @@ static void vfio_add_ext_cap(VFIOPCIDevice *vdev)
+>       */
+>      config = g_memdup(pdev->config, vdev->config_size);
+> 
+> -    /*
+> -     * Extended capabilities are chained with each pointing to the next, so we
+> -     * can drop anything other than the head of the chain simply by modifying
+> -     * the previous next pointer.  For the head of the chain, we can modify the
+> -     * capability ID to something that cannot match a valid capability.  ID
+> -     * 0 is reserved for this since absence of capabilities is indicated by
+> -     * 0 for the ID, version, AND next pointer.  However, pcie_add_capability()
+> -     * uses ID 0 as reserved for list management and will incorrectly match and
+> -     * assert if we attempt to pre-load the head of the chain with this ID.
+> -     * Use ID 0xFFFF temporarily since it is also seems to be reserved in
+> -     * part for identifying absence of capabilities in a root complex register
+> -     * block.  If the ID still exists after adding capabilities, switch back to
+> -     * zero.  We'll mark this entire first dword as emulated for this purpose.
+> -     */
+> -    pci_set_long(pdev->config + PCI_CONFIG_SPACE_SIZE,
+> -                 PCI_EXT_CAP(0xFFFF, 0, 0));
+> -    pci_set_long(pdev->wmask + PCI_CONFIG_SPACE_SIZE, 0);
+> -    pci_set_long(vdev->emulated_config_bits + PCI_CONFIG_SPACE_SIZE, ~0);
+> -
+>      for (next = PCI_CONFIG_SPACE_SIZE; next;
+>           next = PCI_EXT_CAP_NEXT(pci_get_long(config + next))) {
+>          header = pci_get_long(config + next);
+> @@ -1917,6 +1898,8 @@ static void vfio_add_ext_cap(VFIOPCIDevice *vdev)
+>          switch (cap_id) {
+>          case PCI_EXT_CAP_ID_SRIOV: /* Read-only VF BARs confuse OVMF */
+>          case PCI_EXT_CAP_ID_ARI: /* XXX Needs next function virtualization */
+> +            /* keep this ecap header (4 bytes), but mask cap_id to 0xffff */
+> +            ...
+>              trace_vfio_add_ext_cap_dropped(vdev->vbasedev.name, cap_id, next);
+>              break;
+>          default:
+> @@ -1925,11 +1908,6 @@ static void vfio_add_ext_cap(VFIOPCIDevice *vdev)
+> 
+>      }
+> 
+> -    /* Cleanup chain head ID if necessary */
+> -    if (pci_get_word(pdev->config + PCI_CONFIG_SPACE_SIZE) == 0xFFFF) {
+> -        pci_set_word(pdev->config + PCI_CONFIG_SPACE_SIZE, 0);
+> -    }
+> -
+>      g_free(config);
+>      return;
+>  }
+> ----->8-----  
+> 
+> Since after all we need the assumption that 0xffff is reserved for
+> cap_id. Then, we can just remove the "first 0xffff then 0x0" hack,
+> which is imho error-prone and hacky.
 
+This doesn't fix the bug, which is that pcie_add_capability() uses a
+valid capability ID for it's own internal tracking.  It's only doing
+this to find the end of the capability chain, which we could do in a
+spec complaint way by looking for a zero next pointer.  Fix that and
+then vfio doesn't need to do this set to 0xffff then back to zero
+nonsense at all.  Capability ID zero is valid.  Thanks,
 
-> On Feb 15, 2017, at 10:06 AM, Michael S. Tsirkin <mst@redhat.com> =
-wrote:
->=20
-> On Wed, Feb 15, 2017 at 09:54:08AM -0800, Ben Warren wrote:
->>=20
->>    On Feb 15, 2017, at 9:43 AM, Igor Mammedov <imammedo@redhat.com> =
-wrote:
->>=20
->>    On Wed, 15 Feb 2017 18:39:06 +0200
->>    "Michael S. Tsirkin" <mst@redhat.com> wrote:
->>=20
->>=20
->>        On Wed, Feb 15, 2017 at 04:56:02PM +0100, Igor Mammedov wrote:
->>=20
->>            On Wed, 15 Feb 2017 17:30:00 +0200
->>            "Michael S. Tsirkin" <mst@redhat.com> wrote:
->>=20
->>=20
->>                On Wed, Feb 15, 2017 at 04:22:25PM +0100, Igor =
-Mammedov wrote:
->>=20
->>=20
->>                    On Wed, 15 Feb 2017 15:13:20 +0100
->>                    Laszlo Ersek <lersek@redhat.com> wrote:
->>=20
->>=20
->>                        Commenting under Igor's reply for simplicity
->>=20
->>                        On 02/15/17 11:57, Igor Mammedov wrote:   =20
->>=20
->>                            On Tue, 14 Feb 2017 22:15:43 -0800
->>                            ben@skyportsystems.com wrote:
->>=20
->>=20
->>                                From: Ben Warren =
-<ben@skyportsystems.com>
->>=20
->>                                This is similar to the existing 'add =
-pointer'
->>                                functionality, but instead
->>                                of instructing the guest (BIOS or =
-UEFI) to
->>                                patch memory, it instructs
->>                                the guest to write the pointer back to =
-QEMU via
->>                                a writeable fw_cfg file.
->>=20
->>                                Signed-off-by: Ben Warren <
->>                                ben@skyportsystems.com>
->>                                ---
->>                                hw/acpi/bios-linker-loader.c         | =
-58
->>                                ++++++++++++++++++++++++++++++++++--
->>                                include/hw/acpi/bios-linker-loader.h | =
- 6 ++++
->>                                2 files changed, 61 insertions(+), 3 =
-deletions
->>                                (-)
->>=20
->>                                diff --git =
-a/hw/acpi/bios-linker-loader.c b/hw/
->>                                acpi/bios-linker-loader.c
->>                                index d963ebe..5030cf1 100644
->>                                --- a/hw/acpi/bios-linker-loader.c
->>                                +++ b/hw/acpi/bios-linker-loader.c
->>                                @@ -78,6 +78,19 @@ struct =
-BiosLinkerLoaderEntry
->>                                {
->>                                            uint32_t length;
->>                                        } cksum;
->>=20
->>                                +        /*
->>                                +         * COMMAND_WRITE_POINTER - =
-write the
->>                                fw_cfg file (originating from
->>                                +         * @dest_file) at =
-@wr_pointer.offset,
->>                                by adding a pointer to the table
->>                                +         * originating from =
-@src_file. 1,2,4
->>                                or 8 byte unsigned
->>                                +         * addition is used depending =
-on
->>                                @wr_pointer.size.
->>                                +         */     =20
->>=20
->>=20
->>                        The words "adding" and "addition" are causing =
-confusion
->>                        here.
->>=20
->>                        In all of the previous discussion, *addition* =
-was out
->>                        of scope from
->>                        WRITE_POINTER. Again, the firmware is =
-specifically not
->>                        required to
->>                        *read* any part of the fw_cfg blob identified =
-by
->>                        "dest_file".
->>=20
->>                        WRITE_POINTER instructs the firmware to return =
-the
->>                        allocation address of
->>                        the downloaded "src_file" to QEMU. Any =
-necessary
->>                        runtime subscripting
->>                        within "src_file" is to be handled by QEMU =
-code
->>                        dynamically.
->>=20
->>                        For example, consider that "src_file" has =
-*several*
->>                        fields that QEMU
->>                        wants to massage; in that case, indexing =
-within QEMU
->>                        code with field
->>                        offsets is simply unavoidable.   =20
->>=20
->>                    what I don't like here is that this indexing would =
-be
->>                    rather fragile
->>                    and has to be done in different parts of QEMU =
-/device, AML
->>                    /.
->>=20
->>                    I'd prefer this helper function to have the same
->>                    @src_offset
->>                    behavior as ADD_POINTER where patched address =
-could point
->>                    to
->>                    any part of src_file i.e. not just beginning.   =20=
-
->>=20
->>=20
->>=20
->>=20
->>                       /*
->>                        * COMMAND_ADD_POINTER - patch the table =
-(originating
->>                from
->>                        * @dest_file) at @pointer.offset, by adding a =
-pointer
->>                to the table
->>                        * originating from @src_file. 1,2,4 or 8 byte =
-unsigned
->>                        * addition is used depending on @pointer.size.
->>                        */
->>=20
->>                so the way ADD works is
->>                read at offset
->>                add table address
->>                write result at offset
->>=20
->>                in other words it is always beginning of table that is =
-added. =20
->>=20
->>            more exactly it's, read at=20
->>             src_offset =3D *(dst_blob_ptr+dst_offset)
->>             *(dst_blob+dst_offset) =3D src_blob_ptr + src_offset
->>=20
->>=20
->>                Would the following be acceptable?
->>=20
->>=20
->>                        * COMMAND_WRITE_POINTER - update the fw_cfg =
-file
->>                (originating from
->>                        * @dest_file) at @wr_pointer.offset, by =
-writing a
->>                pointer to the table
->>                        * originating from @src_file. 1,2,4 or 8 byte =
-unsigned
->>                value
->>                        * is written depending on @wr_pointer.size. =20=
-
->>=20
->>            it looses 'adding' part of ADD_POINTER command which =
-handles
->>            src_offset,
->>            however implementing adding part looks a bit complicated
->>            as patched blob (dst) is not in guest memory but in QEMU =
-and
->>            on reset *(dst_blob+dst_offset) should be reset to =
-src_offset.
->>            Considering dst file could be device specific memory =
-(field/blob/
->>            whatever)
->>            it could be hard to track/notice proper reset behavior.
->>=20
->>            So now I'm not sure if src_offset is worth adding. =20
->>=20
->>=20
->>        Right. Let's just do this math in QEMU if we have to.
->>=20
->>    Math complicates QEMU code though and not only QMEMU but AML code =
-as well.
->>    Considering that we are adding a new command and don't have to =
-keep
->>    any sort of compatibility we can pass src_offset as part
->>    of command instead of hiding it inside of dst_file.
->>    Something like this:
->>=20
->>           /*
->>            * COMMAND_WRITE_POINTER - write the fw_cfg file =
-(originating from
->>            * @dest_file) at @wr_pointer.offset, by writing a pointer =
-to
->>    @src_offset
->>            * within the table originating from @src_file. 1,2,4 or 8 =
-byte
->>    unsigned
->>            * addition is used depending on @wr_pointer.size.
->>            */
->>           struct {
->>                char dest_file[BIOS_LINKER_LOADER_FILESZ];
->>                char src_file[BIOS_LINKER_LOADER_FILESZ];
->>    -            uint32_t offset;
->>    +            uint32_t dst_offset;
->>    +            uint32_t src_offset;
->>                uint8_t size;
->>           } wr_pointer;
->>=20
->>=20
->> OK, this is easy enough to do and maybe we=E2=80=99ll have a use case =
-in the future.
->> I=E2=80=99ll make this change in v7
->=20
->=20
-> So if you do, you want to set it to VMGENID_GUID_OFFSET.
->=20
-Oh, I was going to set it to 0 since that doesn=E2=80=99t require any =
-other changes (other than to SeaBIOS)
->>=20
->>=20
->>=20
->>=20
->>=20
->>=20
->>=20
->>=20
->>=20
->>                        (1) So, the above looks correct, but please =
-replace
->>                        "adding" with
->>                        "storing", and "unsigned addition" with =
-"store".
->>=20
->>                        Side point: the case for ADD_POINTER is =
-different;
->>                        there we patch
->>                        several individual ACPI objects. The fact that =
-I
->>                        requested explicit
->>                        addition within the ADDR method, as opposed to
->>                        pre-setting VGIA to a
->>                        nonzero offset, is an *incidental* limitation =
-(coming
->>                        from the OVMF ACPI
->>                        SDT header probe suppressor), and we'll likely =
-fix that
->>                        up later, with
->>                        ALLOCATE command hints or something like that. =
-However,
->>                        in
->>                        WRITE_POINTER, asking for the exact allocation =
-address
->>                        of "src_file" is
->>                        an *inherent* characteristic.
->>=20
->>                        For reference, this is the command's =
-description from
->>                        the (not as yet
->>                        posted) OVMF series:
->>=20
->>                        // QemuLoaderCmdWritePointer: the bytes at
->>                        // [PointerOffset..PointerOffset+PointerSize) =
-in the
->>                        writeable fw_cfg
->>                        // file PointerFile are to receive the =
-absolute address
->>                        of PointeeFile,
->>                        // as allocated and downloaded by the =
-firmware. Store
->>                        the base address
->>                        // of where PointeeFile's contents have been =
-placed
->>                        (when
->>                        // QemuLoaderCmdAllocate has been executed for
->>                        PointeeFile) to this
->>                        // portion of PointerFile.
->>                        //
->>                        // This command is similar to =
-QemuLoaderCmdAddPointer;
->>                        the difference is
->>                        // that the "pointer to patch" does not exist =
-in
->>                        guest-physical address
->>                        // space, only in "fw_cfg file space". In =
-addition, the
->>                        "pointer to
->>                        // patch" is not initialized by QEMU with a =
-possibly
->>                        nonzero offset
->>                        // value: the base address of the memory =
-allocated for
->>                        downloading
->>                        // PointeeFile shall not increment the =
-pointer, but
->>                        overwrite it.
->>=20
->>                        In the last SeaBIOS patch series, namely
->>=20
->>                        [SeaBIOS] [PATCH v3 2/2] QEMU fw_cfg: Add =
-command to
->>                        write back address
->>                                                of file
->>=20
->>                        function romfile_loader_write_pointer() =
-implemented
->>                        just that plain
->>                        store (not an addition), and that was exactly =
-right.
->>=20
->>                        Continuing:
->>=20
->>=20
->>                                +        struct {
->>                                +            char dest_file
->>                                [BIOS_LINKER_LOADER_FILESZ];
->>                                +            char src_file
->>                                [BIOS_LINKER_LOADER_FILESZ];
->>                                +            uint32_t offset;
->>                                +            uint8_t size;
->>                                +        } wr_pointer;
->>                                +
->>                                        /* padding */
->>                                        char pad[124];
->>                                    };
->>                                @@ -85,9 +98,10 @@ struct =
-BiosLinkerLoaderEntry
->>                                {
->>                                typedef struct BiosLinkerLoaderEntry
->>                                BiosLinkerLoaderEntry;
->>=20
->>                                enum {
->>                                -    =
-BIOS_LINKER_LOADER_COMMAND_ALLOCATE     =3D
->>                                0x1,
->>                                -    =
-BIOS_LINKER_LOADER_COMMAND_ADD_POINTER  =3D
->>                                0x2,
->>                                -    =
-BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM =3D
->>                                0x3,
->>                                +    =
-BIOS_LINKER_LOADER_COMMAND_ALLOCATE
->>                                         =3D 0x1,
->>                                +    =
-BIOS_LINKER_LOADER_COMMAND_ADD_POINTER
->>                                      =3D 0x2,
->>                                +    =
-BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM
->>                                     =3D 0x3,
->>                                +    =
-BIOS_LINKER_LOADER_COMMAND_WRITE_POINTER
->>                                    =3D 0x4,
->>                                };
->>=20
->>                                enum {
->>                                @@ -278,3 +292,41 @@ void
->>                                =
-bios_linker_loader_add_pointer(BIOSLinker
->>                                *linker,
->>=20
->>                                    =
-g_array_append_vals(linker->cmd_blob, &
->>                                entry, sizeof entry);
->>                                }
->>                                +
->>                                +/*
->>                                + * bios_linker_loader_write_pointer: =
-ask guest
->>                                to write a pointer to the
->>                                + * source file into the destination =
-file, and
->>                                write it back to QEMU via
->>                                + * fw_cfg DMA.
->>                                + *
->>                                + * @linker: linker object instance
->>                                + * @dest_file: destination file that =
-must be
->>                                written
->>                                + * @dst_patched_offset: location =
-within
->>                                destination file blob to be patched
->>                                + *                      with the =
-pointer to
->>                                @src_file, in bytes
->>                                + * @dst_patched_offset_size: size of =
-the
->>                                pointer to be patched
->>                                + *                      at =
-@dst_patched_offset
->>                                in @dest_file blob, in bytes
->>                                + * @src_file: source file who's =
-address must
->>                                be taken
->>                                + */
->>                                +void bios_linker_loader_write_pointer
->>                                (BIOSLinker *linker,
->>                                +                                    =
-const char
->>                                *dest_file,
->>                                +                                    =
-uint32_t
->>                                dst_patched_offset,
->>                                +                                    =
-uint8_t
->>                                dst_patched_size,
->>                                +                                    =
-const char
->>                                *src_file)     =20
->>=20
->>                            API is missing "src_offset" even though =
-it's not
->>                            used in this series,
->>                            a patch on top to fix it up is ok for me =
-as far as
->>                            Seabios/OVMF
->>                            counterpart can handle src_offset =
-correctly from
->>                            starters.     =20
->>=20
->>=20
->>                        According to the above, it is the right thing =
-not to
->>                        add "src_offset"
->>                        here. The documentation on the command is =
-slightly
->>                        incorrect (and causes
->>                        confusion), but the helper function's =
-signature and
->>                        comments are okay.
->>=20
->>=20
->>=20
->>=20
->>                                +{
->>                                +    BiosLinkerLoaderEntry entry;
->>                                +    const BiosLinkerFileEntry =
-*source_file =3D
->>                                +        bios_linker_find_file(linker,
->>                                src_file);
->>                                +
->>                                +    assert(source_file);     =20
->>=20
->>=20
->>                        I wish we kept the following asserts from
->>                        bios_linker_loader_add_pointer():
->>=20
->>                           assert(dst_patched_offset < =
-dst_file->blob->len);
->>                           assert(dst_patched_offset + =
-dst_patched_size <=3D
->>                        dst_file->blob->len);
->>=20
->>                        Namely, just because the dst_file is never =
-supposed to
->>                        be downloaded by
->>                        the firmware, it still remains a requirement =
-that the
->>                        "dst file offset
->>                        range" that is to be rewritten *do fall* =
-within the dst
->>                        file.
->>=20
->>                        Nonetheless, this is not critical. (OVMF at =
-least
->>                        verifies it anyway.)
->>=20
->>                        Summary (from my side anyway): I feel that the
->>                        documentation of the new
->>                        command is very important. Please fix it up as
->>                        suggested under (1), in
->>                        v7. Regarding the asserts, I'll let you =
-decide.
->>=20
->>                        With the documentation fixed up:
->>=20
->>                        Reviewed-by: Laszlo Ersek <lersek@redhat.com>
->>=20
->>                        (If you don't wish to post a v7, I'm also =
-completely
->>                        fine if Michael or
->>                        someone else fixes up the docs as proposed in =
-(1),
->>                        before committing the
->>                        patch.)
->>=20
->>                        Thanks!
->>                        Laszlo
->>=20
->>=20
->>                                +    memset(&entry, 0, sizeof entry);
->>                                +    =
-strncpy(entry.wr_pointer.dest_file,
->>                                dest_file,
->>                                +            sizeof =
-entry.wr_pointer.dest_file
->>                                - 1);
->>                                +    =
-strncpy(entry.wr_pointer.src_file,
->>                                src_file,
->>                                +            sizeof =
-entry.wr_pointer.src_file -
->>                                1);
->>                                +    entry.command =3D cpu_to_le32
->>                                =
-(BIOS_LINKER_LOADER_COMMAND_WRITE_POINTER);
->>                                +    entry.wr_pointer.offset =3D =
-cpu_to_le32
->>                                (dst_patched_offset);
->>                                +    entry.wr_pointer.size =3D =
-dst_patched_size;
->>                                +    assert(dst_patched_size =3D=3D 1 =
-||
->>                                dst_patched_size =3D=3D 2 ||
->>                                +           dst_patched_size =3D=3D 4 =
-||
->>                                dst_patched_size =3D=3D 8);
->>                                +
->>                                +    =
-g_array_append_vals(linker->cmd_blob, &
->>                                entry, sizeof entry);
->>                                +}
->>                                diff --git a/include/hw/acpi/
->>                                bios-linker-loader.h =
-b/include/hw/acpi/
->>                                bios-linker-loader.h
->>                                index fa1e5d1..f9ba5d6 100644
->>                                --- =
-a/include/hw/acpi/bios-linker-loader.h
->>                                +++ =
-b/include/hw/acpi/bios-linker-loader.h
->>                                @@ -26,5 +26,11 @@ void
->>                                =
-bios_linker_loader_add_pointer(BIOSLinker
->>                                *linker,
->>                                                                    =
-const char
->>                                *src_file,
->>                                                                    =
-uint32_t
->>                                src_offset);
->>=20
->>                                +void bios_linker_loader_write_pointer
->>                                (BIOSLinker *linker,
->>                                +                                      =
-const
->>                                char *dest_file,
->>                                +                                      =
-uint32_t
->>                                dst_patched_offset,
->>                                +                                      =
-uint8_t
->>                                dst_patched_size,
->>                                +                                      =
-const
->>                                char *src_file);
->>                                +
->>                                void =
-bios_linker_loader_cleanup(BIOSLinker
->>                                *linker);
->>                                #endif     =20
-
-
---Apple-Mail=_53570E59-2458-4A56-A10C-1F772C434C17
-Content-Disposition: attachment;
-	filename=smime.p7s
-Content-Type: application/pkcs7-signature;
-	name=smime.p7s
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIIJ+zCCBK8w
-ggOXoAMCAQICEQDgI8sVEoNTia1hbnpUZ2shMA0GCSqGSIb3DQEBCwUAMG8xCzAJBgNVBAYTAlNF
-MRQwEgYDVQQKEwtBZGRUcnVzdCBBQjEmMCQGA1UECxMdQWRkVHJ1c3QgRXh0ZXJuYWwgVFRQIE5l
-dHdvcmsxIjAgBgNVBAMTGUFkZFRydXN0IEV4dGVybmFsIENBIFJvb3QwHhcNMTQxMjIyMDAwMDAw
-WhcNMjAwNTMwMTA0ODM4WjCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hl
-c3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxQTA/BgNV
-BAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWls
-IENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAibEN2npTGU5wUh28VqYGJre4SeCW
-51Gr8fBaE0kVo7SMG2C8elFCp3mMpCLfF2FOkdV2IwoU00oCf7YdCYBupQQ92bq7Fv6hh6kuQ1JD
-FnyvMlDIpk9a6QjYz5MlnHuI6DBk5qT4VoD9KiQUMxeZrETlaYujRgZLwjPU6UCfBrCxrJNAubUI
-kzqcKlOjENs9IGE8VQOO2U52JQIhKfqjfHF2T+7hX4Hp+1SA28N7NVK3hN4iPSwwLTF/Wb1SN7Az
-aS1D6/rWpfGXd2dRjNnuJ+u8pQc4doykqTj/34z1A6xJvsr3c5k6DzKrnJU6Ez0ORjpXdGFQvsZA
-P8vk4p+iIQIDAQABo4IBFzCCARMwHwYDVR0jBBgwFoAUrb2YejS0Jvf6xCZU7wO94CTLVBowHQYD
-VR0OBBYEFJJha4LhoqCqT+xn8cKj97SAAMHsMA4GA1UdDwEB/wQEAwIBhjASBgNVHRMBAf8ECDAG
-AQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDARBgNVHSAECjAIMAYGBFUdIAAw
-RAYDVR0fBD0wOzA5oDegNYYzaHR0cDovL2NybC51c2VydHJ1c3QuY29tL0FkZFRydXN0RXh0ZXJu
-YWxDQVJvb3QuY3JsMDUGCCsGAQUFBwEBBCkwJzAlBggrBgEFBQcwAYYZaHR0cDovL29jc3AudXNl
-cnRydXN0LmNvbTANBgkqhkiG9w0BAQsFAAOCAQEAGypurFXBOquIxdjtzVXzqmthK8AJECOZD8Vm
-am+x9bS1d14PAmEA330F/hKzpICAAPz7HVtqcgIKQbwFusFY1SbC6tVNhPv+gpjPWBvjImOcUvi7
-BTarfVil3qs7Y+Xa1XPv7OD7e+Kj//BCI5zKto1NPuRLGAOyqC3U2LtCS5BphRDbpjc06HvgARCl
-nMo6x59PiDRuimXQGoq7qdzKyjbR9PzCZCk1r9axp3ER0gNDsY8+muyeMlP0dpLKhjQHuSzK5hxK
-2JkNwYbikJL7WkJqIyEQ6WXH9dW7fuqMhSACYurROgcsWcWZM/I4ieW26RZ6H3kU9koQGib6fIr7
-mzCCBUQwggQsoAMCAQICEQCWOeMVlifzA+PvGfHjMeybMA0GCSqGSIb3DQEBCwUAMIGbMQswCQYD
-VQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRow
-GAYDVQQKExFDT01PRE8gQ0EgTGltaXRlZDFBMD8GA1UEAxM4Q09NT0RPIFNIQS0yNTYgQ2xpZW50
-IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTYwNTE5MDAwMDAwWhcNMTcw
-NTE5MjM1OTU5WjAnMSUwIwYJKoZIhvcNAQkBFhZiZW5Ac2t5cG9ydHN5c3RlbXMuY29tMIIBIjAN
-BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAryjnKj/3VRzbNXiWAp7RAZSzUCOzDG6WJ2ybuDWP
-A7uDl48iX2v3ulbcZq8G0sL1nwGvBdSrmd5X3Qzirx0ti0Qe0mlAd22PEOL/xR5ChLDhNI6i43cM
-R1qM1JNtuC5Dz8h2TfYbF/VuKkA1YVuXNguSP8Z1DQXptE1m3yS0gk9LLdDkqq7Vi/zfSmD1NYHN
-gEGvtux/3lMp8pHgQiZo8PxKH2Y4zem0AiWtZ9fKZqYWRIhECJ+etvpGvh4dNIj8vdo/ig3uSwLv
-ePX7rFz3C5WHOyKjl4VGHNOA5IRZjabp4bdAEIiMPU7lfWt0o4nCRtM/G/6FvFinR6PIHSma1wID
-AQABo4IB9DCCAfAwHwYDVR0jBBgwFoAUkmFrguGioKpP7GfxwqP3tIAAwewwHQYDVR0OBBYEFJv6
-uT+NCtbUQ0MHZLryEY65oKgbMA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMCAGA1UdJQQZ
-MBcGCCsGAQUFBwMEBgsrBgEEAbIxAQMFAjARBglghkgBhvhCAQEEBAMCBSAwRgYDVR0gBD8wPTA7
-BgwrBgEEAbIxAQIBAQEwKzApBggrBgEFBQcCARYdaHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9D
-UFMwXQYDVR0fBFYwVDBSoFCgToZMaHR0cDovL2NybC5jb21vZG9jYS5jb20vQ09NT0RPU0hBMjU2
-Q2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNybDCBkAYIKwYBBQUHAQEEgYMw
-gYAwWAYIKwYBBQUHMAKGTGh0dHA6Ly9jcnQuY29tb2RvY2EuY29tL0NPTU9ET1NIQTI1NkNsaWVu
-dEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYIKwYBBQUHMAGGGGh0dHA6Ly9v
-Y3NwLmNvbW9kb2NhLmNvbTAhBgNVHREEGjAYgRZiZW5Ac2t5cG9ydHN5c3RlbXMuY29tMA0GCSqG
-SIb3DQEBCwUAA4IBAQAwVeCMNqTr20+cqsHnSK2AtzxKZyVG9y51wB88lPnRGHe2m+qKGdPgAh/7
-iDzEEXsy4sDwHVHVq4kLHW9lX7CvRTxCtmOAtsty5ePhJjh3CX+nsK2HKpi043E6azad6L64DNVN
-dMZFwUrUu8dYjOp48TPpIhW13Sbu2t/SOZK4G8EZAaZPX8Dg34tyHRUvM/B/eaJuUgdM5qY2IU+F
-7U2K4hBHkhJMJgQ7TyVe8GhdBMaztY4GHqhWP5cCgZBdC9QII8E5jqX7//FbBRB0zVHRVeBZO32H
-TvapSOG8ZYd0n5l5j3rBQnLfHWsnQ07rL2+w8W9BBPSZBbciPuwOe3ksMYIDxjCCA8ICAQEwgbEw
-gZsxCzAJBgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1Nh
-bGZvcmQxGjAYBgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1
-NiBDbGllbnQgQXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z
-8eMx7JswCQYFKw4DAhoFAKCCAekwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0B
-CQUxDxcNMTcwMjE1MTgxNDU1WjAjBgkqhkiG9w0BCQQxFgQUYsYQSQtnc42FNPyswk22D9kVfVUw
-gcIGCSsGAQQBgjcQBDGBtDCBsTCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFu
-Y2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxQTA/
-BgNVBAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVt
-YWlsIENBAhEAljnjFZYn8wPj7xnx4zHsmzCBxAYLKoZIhvcNAQkQAgsxgbSggbEwgZsxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1NiBDbGllbnQg
-QXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z8eMx7JswDQYJ
-KoZIhvcNAQEBBQAEggEAbXUtPzM7tHYxpkEs5IG0OVjDS8otLu7LMkCeejrlK4cqMKg/yLgQCzyx
-wAJLHcgyqyP21zyjH24tmKdUSyPhjueVgj4dyZBtNk8V4NYPCqWWeTOQEfmKYQcKn62Hz36JdrSO
-rUKBQ+24dnwTUqS0vzH0y77eE2gWZ8Uf20Ov4vFOLnbD6U3QBeXyVh+I5MM4r0JZ4SVmjJKqBxxK
-n5Ryf2VsWt0agkXJQVpb0hyenEzwJoAUx7y7ntc666tdDIWKKREeyez6mXS7VqL7y2P5ewFvfm3r
-l8se5wBpQ+iOg/navGgUbq7Bw3O8sK8wwyShso+15sMzRps2oH91wBsSYAAAAAAAAA==
---Apple-Mail=_53570E59-2458-4A56-A10C-1F772C434C17--
+Alex
