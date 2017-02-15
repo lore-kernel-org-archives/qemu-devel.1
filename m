@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39393)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ce5Lo-0007Cb-Ht
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 14:34:53 -0500
+	(envelope-from <eblake@redhat.com>) id 1ce5Sn-0001Ut-V9
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 14:42:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ce5Lj-0001mY-Lw
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 14:34:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56698)
+	(envelope-from <eblake@redhat.com>) id 1ce5Sj-0006ND-Qb
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 14:42:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59916)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ce5Lj-0001la-A2
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 14:34:47 -0500
-Date: Wed, 15 Feb 2017 21:34:45 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170215211910-mutt-send-email-mst@kernel.org>
-References: <9dffe31a245cf6a717eef8227fe80ca666b168b5.1487139038.git.ben@skyportsystems.com>
-	<20170215115723.77e4d9d7@nial.brq.redhat.com>
-	<1f4a6eb2-0838-2218-88e3-4f65498a41d6@redhat.com>
-	<20170215162225.74d48058@nial.brq.redhat.com>
-	<20170215172515-mutt-send-email-mst@kernel.org>
-	<20170215165602.72e96c28@nial.brq.redhat.com>
-	<20170215183736-mutt-send-email-mst@kernel.org>
-	<20170215184309.521aa90f@nial.brq.redhat.com>
-	<20170215194647-mutt-send-email-mst@kernel.org>
-	<20170215192436.2695b9f6@nial.brq.redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ce5Sj-0006M4-I1
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 14:42:01 -0500
+References: <1487053524-18674-1-git-send-email-den@openvz.org>
+	<1487053524-18674-2-git-send-email-den@openvz.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f805c30f-47d1-6f79-c01b-ac1155d6859a@redhat.com>
+Date: Wed, 15 Feb 2017 13:41:57 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170215192436.2695b9f6@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 1/7] linker-loader: Add new 'write
- pointer' command
+In-Reply-To: <1487053524-18674-2-git-send-email-den@openvz.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="gmTIRhRT0TTEcLbKW32SRlT5Gq8WJqVMd"
+Subject: Re: [Qemu-devel] [PATCH v4 1/3] i386/cpu: add crash-information QOM
+ property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,102 +29,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, ben@skyportsystems.com
+To: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
+Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>, Markus Armbruster <armbru@redhat.com>
 
-On Wed, Feb 15, 2017 at 07:24:36PM +0100, Igor Mammedov wrote:
-> > As long as all users pass in 0 though there's a real possibility guests
-> > will implement this incorrectly.
-> We are here to ensure that at least Seabios (I'll review it)
-> and OVMF (Laszlo would take care of it I suppose) do it right,
-> and if there are other firmwares, they should do it correctly
-> as described fix their own bugs later wrt randomly written
-> implementation.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--gmTIRhRT0TTEcLbKW32SRlT5Gq8WJqVMd
+From: Eric Blake <eblake@redhat.com>
+To: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
+Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ Markus Armbruster <armbru@redhat.com>
+Message-ID: <f805c30f-47d1-6f79-c01b-ac1155d6859a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/3] i386/cpu: add crash-information QOM
+ property
+References: <1487053524-18674-1-git-send-email-den@openvz.org>
+ <1487053524-18674-2-git-send-email-den@openvz.org>
+In-Reply-To: <1487053524-18674-2-git-send-email-den@openvz.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-As long as it's untested, it can always do the wrong thing
-even if it looks right, or it can bitrot.
+On 02/14/2017 12:25 AM, Denis V. Lunev wrote:
+> From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+>=20
+> Windows reports BSOD parameters through Hyper-V crash MSRs. This
+> information is very useful for initial crash analysis and thus
+> it would be nice to have a way to fetch it.
+>=20
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> Signed-off-by: Denis V. Lunev <den@openvz.org>
+> ---
 
-> > I guess we can put in the offset just
-> > behind the zero-filled padding we have there.
-> I've assumed padding was there to make commands fixed size and give
-> a room for future extensions
-
-you mean
-        char pad[124];
-?
-
-Right. So you can easily add fields, but if you do firmware
-will just assume it does not know how to handle these
-commands and skip them.
-
-> so hunk changing BiosLinkerLoaderEntry
-> would look like:
-> 
-> diff --git a/hw/acpi/bios-linker-loader.c b/hw/acpi/bios-linker-loader.c
-> index d963ebe..6983713 100644
-> --- a/hw/acpi/bios-linker-loader.c
-> +++ b/hw/acpi/bios-linker-loader.c
-> @@ -49,6 +49,7 @@ struct BiosLinkerLoaderEntry {
->              char file[BIOS_LINKER_LOADER_FILESZ];
->              uint32_t align;
->              uint8_t zone;
-> +            uint32_t padding;
->          } alloc;
->  
->          /*
-> @@ -62,6 +63,7 @@ struct BiosLinkerLoaderEntry {
->              char src_file[BIOS_LINKER_LOADER_FILESZ];
->              uint32_t offset;
->              uint8_t size;
-> +            uint32_t padding;
->          } pointer;
->  
->          /*
-> @@ -76,10 +78,25 @@ struct BiosLinkerLoaderEntry {
->              uint32_t offset;
->              uint32_t start;
->              uint32_t length;
-> +            uint32_t padding;
->          } cksum;
-
-why is this necessary?
-
-> +        /*
-> +         * COMMAND_WRITE_POINTER - write the fw_cfg file (originating from
-> +         * @dest_file) at @wr_pointer.offset, by writing a pointer to @src_offset
-> +         * within the table originating from @src_file. 1,2,4 or 8 byte unsigned
-> +         * addition is used depending on @wr_pointer.size.
-> +         */
-> +         struct {
-> +             char dest_file[BIOS_LINKER_LOADER_FILESZ];
-> +             char src_file[BIOS_LINKER_LOADER_FILESZ];
-> +             uint32_t dst_offset;
-> +             uint32_t src_offset;
-> +             uint8_t size;
-> +        } wr_pointer;
+> +++ b/qapi-schema.json
+> @@ -5846,6 +5846,30 @@
+>    'data': [ 'pause', 'poweroff' ] }
+> =20
+>  ##
+> +# @GuestPanicInformation:
+> +#
+> +# Information about a guest panic
+> +#
+> +# Since: 2.9
+> +##
+> +{'union': 'GuestPanicInformation',
+> + 'data': { 'hyper-v': 'GuestPanicInformationHyperV' } }
 > +
->          /* padding */
-> -        char pad[124];
-> +        char pad[120];
 
-and this shrinks entry size by 4 bytes. Why?
+Markus has been trying to eliminate the addition of new "simple unions"
+- while they are syntactically shorter in the .json file, they are
+bulkier over the wire with extra {} nesting, and more verbose in the C
+code, when compared to using a flat union instead.  I won't necessarily
+hold up this patch as-is, but if we are going to avoid new simple
+unions, we have to change this before 2.9 bakes in the {} nesting (we
+can convert a simple union to a flat union without breaking QMP
+back-compat, but it's messier than if we avoid the nesting to begin with)=
+=2E
 
->      };
->  } QEMU_PACKED;
->  typedef struct BiosLinkerLoaderEntry BiosLinkerLoaderEntry;
-> 
->  
-> > I'm mostly concerned we are adding new features to something
-> > that has been through 25 revisions already.
-> It's ABI so it's worth extra effort,
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-There's always yet another possible enhancement you can add.
-I see it as a bit of a feature creep frankly.
 
-> it looks like only one more revision is left and there is
-> about a week left to post and merge it.
+--gmTIRhRT0TTEcLbKW32SRlT5Gq8WJqVMd
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-If we can do it quickly, fine, but I think we should merge ASAP.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
--- 
-MST
+iQEcBAEBCAAGBQJYpK8FAAoJEKeha0olJ0NqWX0H/3zTGmXJpmnMhcMW0NctjRFu
+BRxEdTCbavzDwzWjuVTPBm0W5CjsP6STREge7GxIhBrrjVakm710ZsuiTuQjBvyA
+fjf9K8SK5n2YAnYzOCyZGQUCgz6eOOQo8aFGK4nzmlfRtQlqctM3yMXw2yczM0cX
+C45csCxMULbIEgzMpHpef3dDAfHu5U9Nt02Hk32+lLBsRb3xgUGDMDZuNGR3+mE5
+JOKt/AoC2P7GkiLfyDtPXe3mKJqAgG3KV224EEAkExcBJMmWpxdPOvFKCoH8QQ7F
+PAwKVIIoBysS32VM/oM0E1Wec39hd7/cy6yGQKTnUD0+DAUbGDJ4fIFJdnFvyX8=
+=uFL7
+-----END PGP SIGNATURE-----
+
+--gmTIRhRT0TTEcLbKW32SRlT5Gq8WJqVMd--
