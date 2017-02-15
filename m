@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cdxd3-0000pX-Uq
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 06:20:10 -0500
+	(envelope-from <famz@redhat.com>) id 1cdxq0-0005PC-8W
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 06:33:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cdxd3-0007mm-1C
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 06:20:09 -0500
-References: <20170213181244.16297-1-pbonzini@redhat.com>
-	<20170213181244.16297-7-pbonzini@redhat.com>
-	<20170215092341.GC26331@lemon.lan>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1effc0aa-c050-5f09-11f8-1e3f8ced5219@redhat.com>
-Date: Wed, 15 Feb 2017 12:20:03 +0100
+	(envelope-from <famz@redhat.com>) id 1cdxpz-0005zE-9E
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 06:33:32 -0500
+Date: Wed, 15 Feb 2017 19:33:24 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170215113324.GA1134@lemon.lan>
+References: <1487156985-18321-1-git-send-email-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20170215092341.GC26331@lemon.lan>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 6/6] coroutine-lock: make CoRwlock
- thread-safe and fair
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1487156985-18321-1-git-send-email-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v2] backup: allow target without
+ .bdrv_get_info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +23,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, qemu-block@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, jsnow@redhat.com, den@openvz.org, stefanha@redhat.com
 
-
-
-On 15/02/2017 10:23, Fam Zheng wrote:
-> On Mon, 02/13 19:12, Paolo Bonzini wrote:
->> This adds a CoMutex around the existing CoQueue.  Because the write-side
+On Wed, 02/15 14:09, Vladimir Sementsov-Ogievskiy wrote:
+> Currently backup to nbd target is broken, as nbd doesn't have
+> .bdrv_get_info realization.
 > 
-> s/CoQueue/CoRwlock/
-
-No, I meant that CoRwlock has a CoQueue, and after this patch it is
-wrapped by a CoMutex too.
-
-
->> @@ -375,16 +384,20 @@ void qemu_co_rwlock_unlock(CoRwlock *lock)
->>              qemu_co_queue_next(&lock->queue);
->>          }
->>      }
->> -    self->locks_held--;
->> +    qemu_co_mutex_unlock(&lock->mutex);
->>  }
->>  
->>  void qemu_co_rwlock_wrlock(CoRwlock *lock)
->>  {
->> -    Coroutine *self = qemu_coroutine_self();
->> -
->> -    while (lock->writer || lock->reader) {
->> -        qemu_co_queue_wait(&lock->queue, NULL);
->> +    qemu_co_mutex_lock(&lock->mutex);
->> +    lock->pending_writer++;
->> +    while (lock->reader) {
->> +        qemu_co_queue_wait(&lock->queue, &lock->mutex);
->>      }
->> -    lock->writer = true;
->> -    self->locks_held++;
->> +    lock->pending_writer--;
->> +
->> +    /* The rest of the write-side critical section is run with
->> +     * the mutex taken, so that lock->reader remains zero.
->> +     * There is no need to update self->locks_held.
->> +     */
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
 > 
-> But is it still better to update self->locks_held anyway for the
-> 'assert(!co->locks_held)' in qemu_coroutine_enter? Or is the same thing checked
-> elsewhere?
+> v2: add WARNING
+> 
+> ===
+> 
+> Since commit
+> 
+> commit 4c9bca7e39a6e07ad02c1dcde3478363344ec60b
+> Author: John Snow <jsnow@redhat.com>
+> Date:   Thu Feb 25 15:58:30 2016 -0500
+> 
+>     block/backup: avoid copying less than full target clusters
+> 
+> backup to nbd target is broken, we have "Couldn't determine the cluster size of
+> the target image".
+> 
+> Proposed NBD protocol extension - NBD_OPT_INFO should finally solve this problem.
+> But until it is not realized, we need allow backup to nbd target due to backward
+> compatibility.
 
-self->locks_held is already incremented by the qemu_co_mutex_lock call
-at the beginning of qemu_co_rwlock_wrlock.  It is then decremented in
-qemu_co_rwlock_unlock.
+If you respin, including above in the commit message is even better, IMO.
 
-For the read side, rdlock _unlocks_ lock->mutex before returning, so
-self->locks_held must be incremented by rdlock and decremented by unlock.
+> 
+> Furthermore, is it entirely ok to disallow backup if bds lacks .bdrv_get_info?
+> Which behavior should be default: to fail backup or to use default cluster size?
+> 
+>  block/backup.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/backup.c b/block/backup.c
+> index ea38733..a464b63 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -638,7 +638,15 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
+>       * backup cluster size is smaller than the target cluster size. Even for
+>       * targets with a backing file, try to avoid COW if possible. */
+>      ret = bdrv_get_info(target, &bdi);
+> -    if (ret < 0 && !target->backing) {
+> +    if (ret == -ENOTSUP) {
+> +        /* Cluster size is not defined */
+> +        error_report("WARNING: Target block device doesn't provide information "
+> +                     "about block size and it doesn't have backing file. "
+> +                     "Default block size of %u bytes is used. If actual block "
+> +                     "size of target exceeds this default, destination image "
+> +                     "may become unusable");
 
-Paolo
+"Image unusable" might be too strong here because it sounds like a serious
+damage to the image, while actually what we mean is "backup unusable".
+
+> +        job->cluster_size = BACKUP_CLUSTER_SIZE_DEFAULT;
+> +    } else if (ret < 0 && !target->backing) {
+>          error_setg_errno(errp, -ret,
+>              "Couldn't determine the cluster size of the target image, "
+>              "which has no backing file");
+> -- 
+> 1.8.3.1
+> 
+
+Fam
