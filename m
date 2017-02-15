@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cdyY5-0008U2-DD
+	(envelope-from <armbru@redhat.com>) id 1cdyY5-0008UF-Ol
 	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 07:19:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cdyY4-0000Z7-7m
+	(envelope-from <armbru@redhat.com>) id 1cdyY4-0000ZZ-KK
 	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 07:19:05 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 15 Feb 2017 13:18:53 +0100
-Message-Id: <1487161136-9018-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/3] hw: Deprecate unwanted use -drive
- if=scsi
+Date: Wed, 15 Feb 2017 13:18:56 +0100
+Message-Id: <1487161136-9018-4-git-send-email-armbru@redhat.com>
+In-Reply-To: <1487161136-9018-1-git-send-email-armbru@redhat.com>
+References: <1487161136-9018-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 3/3] hw/i386: Deprecate -drive if=scsi with
+ PC machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,50 +23,107 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, peter.maydell@linaro.org, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
 
-Drives defined with if=scsi get connected to buses created with
--device, unlike other interface types.  Deprecate this usage.
+The PC machines (pc-q35-* pc-i440fx-* pc-* isapc xenfv) automatically
+create lsi53c895a SCSI HBAs and SCSI devices to honor -drive if=scsi.
+For giggles, try -drive if=scsi,bus=25,media=cdrom --- this makes QEMU
+create 25 of them.
 
-There is no good default SCSI HBA for PC machines.  Deprecate if=scsi
-there entirely.
+lsi53c895a is thoroughly obsolete (PCI Ultra2 SCSI, ca. 2000), and
+currently has no maintainer in QEMU.  megasas is a better choice,
+except with old OSes that lack drivers.  virtio-scsi is a much better
+choice when you have a driver, but only (newish) Linux comes with one
+in the box.  There is no good default that works for all guests.
 
-Before this series, frontends for -drive if=scsi get created by SCSI
-HBAs.  Frontends for other interface types get created by machine
-initialization.
+Encourage users to pick a non-obsolete SCSI HBA that works for them by
+deprecating -drive if=scsi.
 
-After this series, they get created by machine initialization, except
-for deprecated cases, which get created by new function
-scsi_legacy_handle_cmdline().
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ hw/i386/pc.c                  |  8 +++++++-
+ qemu-options.hx               |  5 -----
+ tests/qemu-iotests/051.pc.out | 12 ++++++++----
+ 3 files changed, 15 insertions(+), 10 deletions(-)
 
-Based on "[PATCH v3 0/8] More sensible default for -drive interface
-type".
-
-v2:
-* Trivially rebased
-* PATCH 2: Suppress warning for default drives
-* PATCH 3: Update user manual and qemu-iotests/051.pc.out
-
-Markus Armbruster (3):
-  hw/scsi: Concentrate -drive if=scsi auto-create in one place
-  hw: Deprecate -drive if=scsi with non-onboard HBAs
-  hw/i386: Deprecate -drive if=scsi with PC machine types
-
- hw/arm/realview.c             |  2 +-
- hw/arm/versatilepb.c          |  2 +-
- hw/i386/pc.c                  |  6 +++++
- hw/scsi/esp-pci.c             |  3 ---
- hw/scsi/esp.c                 |  6 -----
- hw/scsi/lsi53c895a.c          | 10 +++++---
- hw/scsi/megasas.c             |  4 ----
- hw/scsi/mptsas.c              |  4 ----
- hw/scsi/scsi-bus.c            | 56 +++++++++++++++++++++++++++++++++++++------
- hw/scsi/spapr_vscsi.c         |  5 ++--
- hw/scsi/virtio-scsi.c         |  8 -------
- include/hw/pci/pci.h          |  2 ++
- include/hw/scsi/scsi.h        |  3 ++-
- qemu-options.hx               |  5 ----
- tests/qemu-iotests/051.pc.out | 12 ++++++----
- vl.c                          | 10 ++++++++
- 16 files changed, 88 insertions(+), 50 deletions(-)
-
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index c2c75e2..60b0946 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1650,9 +1650,15 @@ void pc_pci_device_init(PCIBus *pci_bus)
+     int max_bus;
+     int bus;
+ 
++    /* Note: if=scsi is deprecated with PC machine types */
+     max_bus = drive_get_max_bus(IF_SCSI);
+     for (bus = 0; bus <= max_bus; bus++) {
+-        lsi53c895a_create(pci_bus);
++        pci_create_simple(pci_bus, -1, "lsi53c895a");
++        /*
++         * By not creating frontends here, we make
++         * scsi_legacy_handle_cmdline() create them, and warn that
++         * this usage is deprecated.
++         */
+     }
+ }
+ 
+diff --git a/qemu-options.hx b/qemu-options.hx
+index ac036b4..f41cc18 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -654,11 +654,6 @@ If you don't specify the "file=" argument, you define an empty drive:
+ qemu-system-i386 -drive if=ide,index=1,media=cdrom
+ @end example
+ 
+-You can connect a SCSI disk with unit ID 6 on the bus #0:
+-@example
+-qemu-system-i386 -drive file=file,if=scsi,bus=0,unit=6
+-@end example
+-
+ Instead of @option{-fda}, @option{-fdb}, you can use:
+ @example
+ qemu-system-i386 -drive file=file,index=0,if=floppy
+diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.out
+index 603bb76..f8047a2 100644
+--- a/tests/qemu-iotests/051.pc.out
++++ b/tests/qemu-iotests/051.pc.out
+@@ -118,7 +118,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ 
+ Testing: -drive if=scsi,media=cdrom
+ QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) q[K[Dqu[K[D[Dqui[K[D[D[Dquit[K
++(qemu) QEMU_PROG: -drive if=scsi,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
++q[K[Dqu[K[D[Dqui[K[D[D[Dquit[K
+ 
+ Testing: -drive if=ide
+ QEMU X.Y.Z monitor - type 'help' for more information
+@@ -127,7 +128,8 @@ QEMU_PROG: Initialization of device ide-hd failed: Device initialization failed.
+ 
+ Testing: -drive if=scsi
+ QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) QEMU_PROG: Initialization of device lsi53c895a failed: Device needs media, but drive is empty
++(qemu) QEMU_PROG: -drive if=scsi: warning: bus=0,unit=0 is deprecated with this machine type
++QEMU_PROG: -drive if=scsi: Device needs media, but drive is empty
+ 
+ Testing: -drive if=virtio
+ QEMU X.Y.Z monitor - type 'help' for more information
+@@ -172,7 +174,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ 
+ Testing: -drive file=TEST_DIR/t.qcow2,if=scsi,media=cdrom,readonly=on
+ QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) q[K[Dqu[K[D[Dqui[K[D[D[Dquit[K
++(qemu) QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=scsi,media=cdrom,readonly=on: warning: bus=0,unit=0 is deprecated with this machine type
++q[K[Dqu[K[D[Dqui[K[D[D[Dquit[K
+ 
+ Testing: -drive file=TEST_DIR/t.qcow2,if=ide,readonly=on
+ QEMU X.Y.Z monitor - type 'help' for more information
+@@ -181,7 +184,8 @@ QEMU_PROG: Initialization of device ide-hd failed: Device initialization failed.
+ 
+ Testing: -drive file=TEST_DIR/t.qcow2,if=scsi,readonly=on
+ QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) q[K[Dqu[K[D[Dqui[K[D[D[Dquit[K
++(qemu) QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=scsi,readonly=on: warning: bus=0,unit=0 is deprecated with this machine type
++q[K[Dqu[K[D[Dqui[K[D[D[Dquit[K
+ 
+ Testing: -drive file=TEST_DIR/t.qcow2,if=virtio,readonly=on
+ QEMU X.Y.Z monitor - type 'help' for more information
 -- 
 2.7.4
