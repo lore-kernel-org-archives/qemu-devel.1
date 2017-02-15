@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cdqex-00028t-5D
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 22:53:43 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cdqf2-0002By-5E
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 22:53:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cdqev-0008R3-Po
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 22:53:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34106)
+	(envelope-from <jasowang@redhat.com>) id 1cdqf0-0008Ty-9r
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 22:53:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52250)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cdqev-0008Qk-K2
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 22:53:37 -0500
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cdqf0-0008T7-3L
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 22:53:42 -0500
 From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 15 Feb 2017 11:53:21 +0800
-Message-Id: <1487130802-27953-5-git-send-email-jasowang@redhat.com>
+Date: Wed, 15 Feb 2017 11:53:22 +0800
+Message-Id: <1487130802-27953-6-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1487130802-27953-1-git-send-email-jasowang@redhat.com>
 References: <1487130802-27953-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL 4/5] net: imx: limit buffer descriptor count
+Subject: [Qemu-devel] [PULL 5/5] net: e1000e: fix an infinite loop issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,65 +24,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, Prasad J Pandit <pjp@fedoraproject.org>, Jason Wang <jasowang@redhat.com>
+Cc: qemu-devel@nongnu.org, Li Qiang <liq3ea@gmail.com>, Li Qiang <liqiang6-s@360.cn>, Jason Wang <jasowang@redhat.com>
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
+From: Li Qiang <liq3ea@gmail.com>
 
-i.MX Fast Ethernet Controller uses buffer descriptors to manage
-data flow to/fro receive & transmit queues. While transmitting
-packets, it could continue to read buffer descriptors if a buffer
-descriptor has length of zero and has crafted values in bd.flags.
-Set an upper limit to number of buffer descriptors.
+This issue is like the issue in e1000 network card addressed in
+this commit:
+e1000: eliminate infinite loops on out-of-bounds transfer start.
 
-Reported-by: Li Qiang <liqiang6-s@360.cn>
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+Signed-off-by: Li Qiang <liqiang6-s@360.cn>
+Reviewed-by: Dmitry Fleytman <dmitry@daynix.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/net/imx_fec.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ hw/net/e1000e_core.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
-index 50c7564..90e6ee3 100644
---- a/hw/net/imx_fec.c
-+++ b/hw/net/imx_fec.c
-@@ -55,6 +55,8 @@
-         } \
-     } while (0)
+diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+index c99e2fb..28c5be1 100644
+--- a/hw/net/e1000e_core.c
++++ b/hw/net/e1000e_core.c
+@@ -806,7 +806,8 @@ typedef struct E1000E_RingInfo_st {
+ static inline bool
+ e1000e_ring_empty(E1000ECore *core, const E1000E_RingInfo *r)
+ {
+-    return core->mac[r->dh] == core->mac[r->dt];
++    return core->mac[r->dh] == core->mac[r->dt] ||
++                core->mac[r->dt] >= core->mac[r->dlen] / E1000_RING_DESC_LEN;
+ }
  
-+#define IMX_MAX_DESC    1024
+ static inline uint64_t
+@@ -1522,6 +1523,10 @@ e1000e_write_packet_to_guest(E1000ECore *core, struct NetRxPkt *pkt,
+             desc_size = core->rx_desc_buf_size;
+         }
+ 
++        if (e1000e_ring_empty(core, rxi)) {
++            return;
++        }
 +
- static const char *imx_default_reg_name(IMXFECState *s, uint32_t index)
- {
-     static char tmp[20];
-@@ -402,12 +404,12 @@ static void imx_eth_update(IMXFECState *s)
+         base = e1000e_ring_head_descr(core, rxi);
  
- static void imx_fec_do_tx(IMXFECState *s)
- {
--    int frame_size = 0;
-+    int frame_size = 0, descnt = 0;
-     uint8_t frame[ENET_MAX_FRAME_SIZE];
-     uint8_t *ptr = frame;
-     uint32_t addr = s->tx_descriptor;
- 
--    while (1) {
-+    while (descnt++ < IMX_MAX_DESC) {
-         IMXFECBufDesc bd;
-         int len;
- 
-@@ -453,12 +455,12 @@ static void imx_fec_do_tx(IMXFECState *s)
- 
- static void imx_enet_do_tx(IMXFECState *s)
- {
--    int frame_size = 0;
-+    int frame_size = 0, descnt = 0;
-     uint8_t frame[ENET_MAX_FRAME_SIZE];
-     uint8_t *ptr = frame;
-     uint32_t addr = s->tx_descriptor;
- 
--    while (1) {
-+    while (descnt++ < IMX_MAX_DESC) {
-         IMXENETBufDesc bd;
-         int len;
- 
+         pci_dma_read(d, base, &desc, core->rx_desc_len);
 -- 
 2.7.4
