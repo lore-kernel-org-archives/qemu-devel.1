@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ce1tu-0000nD-1t
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 10:53:51 -0500
+	(envelope-from <imammedo@redhat.com>) id 1ce1wA-00038a-BJ
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 10:56:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ce1ts-0001Er-UE
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 10:53:50 -0500
-Date: Wed, 15 Feb 2017 16:53:39 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170215155339.GD4935@noname.redhat.com>
-References: <20170214192525.18624-1-eblake@redhat.com>
-	<20170214192525.18624-5-eblake@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1ce1w6-0002mw-BD
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 10:56:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36670)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ce1w6-0002m8-2P
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 10:56:06 -0500
+Date: Wed, 15 Feb 2017 16:56:02 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170215165602.72e96c28@nial.brq.redhat.com>
+In-Reply-To: <20170215172515-mutt-send-email-mst@kernel.org>
+References: <cover.1487139038.git.ben@skyportsystems.com>
+	<9dffe31a245cf6a717eef8227fe80ca666b168b5.1487139038.git.ben@skyportsystems.com>
+	<20170215115723.77e4d9d7@nial.brq.redhat.com>
+	<1f4a6eb2-0838-2218-88e3-4f65498a41d6@redhat.com>
+	<20170215162225.74d48058@nial.brq.redhat.com>
+	<20170215172515-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170214192525.18624-5-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 4/7] blkdebug: Add pass-through
- write_zero and discard support
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 1/7] linker-loader: Add new 'write
+ pointer' command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,176 +32,265 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, ben@skyportsystems.com, qemu-devel@nongnu.org
 
-Am 14.02.2017 um 20:25 hat Eric Blake geschrieben:
-> In order to test the effects of artificial geometry constraints
-> on operations like write zero or discard, we first need blkdebug
-> to manage these actions.  It also allows us to inject errors on
-> those operations, just like we can for read/write/flush.
-> 
-> We can also test the contract promised by the block layer; namely,
-> if a device has specified limits on alignment or maximum size,
-> then those limits must be obeyed (for now, the blkdebug driver
-> merely inherits limits from whatever it is wrapping, but the next
-> patch will further enhance it to allow specific limit overrides).
-> 
-> This patch intentionally refuses to service requests smaller than
-> the requested alignments; this is because an upcoming patch adds
-> a qemu-iotest to prove that the block layer is correctly handling
-> fragmentation, but the test only works if there is a way to tell
-> the difference at artificial alignment boundaries when blkdebug is
-> using a larger-than-default alignment.  If we let the blkdebug
-> layer always defer to the underlying layer, which potentially has
-> a smaller granularity, the iotest will be thwarted.
-> 
-> Tested by setting up an NBD server with export 'foo', then invoking:
-> $ ./qemu-io
-> qemu-io> open -o driver=blkdebug blkdebug::nbd://localhost:10809/foo
-> qemu-io> d 0 15M
-> qemu-io> w -z 0 15M
-> 
-> Pre-patch, the server never sees the discard (it was silently
-> eaten by the block layer); post-patch it is passed across the
-> wire.  Likewise, pre-patch the write is always passed with
-> NBD_WRITE (with 15M of zeroes on the wire), while post-patch
-> it can utilize NBD_WRITE_ZEROES (for less traffic).
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> 
-> ---
-> v5: include 2017 copyright
-> v4: correct error injection to respect byte range, tweak formatting
-> v3: rebase to byte-based read/write, improve docs on why no
-> partial write zero passthrough
-> v2: new patch
-> ---
->  block/blkdebug.c | 86 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 86 insertions(+)
-> 
-> diff --git a/block/blkdebug.c b/block/blkdebug.c
-> index 37094a2..b2d5f7d 100644
-> --- a/block/blkdebug.c
-> +++ b/block/blkdebug.c
-> @@ -1,6 +1,7 @@
->  /*
->   * Block protocol for I/O error injection
->   *
-> + * Copyright (C) 2016-2017 Red Hat, Inc.
->   * Copyright (c) 2010 Kevin Wolf <kwolf@redhat.com>
->   *
->   * Permission is hereby granted, free of charge, to any person obtaining a copy
-> @@ -382,6 +383,11 @@ static int blkdebug_open(BlockDriverState *bs, QDict *options, int flags,
->          goto out;
->      }
-> 
-> +    bs->supported_write_flags = BDRV_REQ_FUA &
-> +        bs->file->bs->supported_write_flags;
-> +    bs->supported_zero_flags = (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
-> +        bs->file->bs->supported_zero_flags;
-> +
->      /* Set request alignment */
->      align = qemu_opt_get_size(opts, "align", 0);
->      if (align < INT_MAX && is_power_of_2(align)) {
-> @@ -511,6 +517,84 @@ static int blkdebug_co_flush(BlockDriverState *bs)
->      return bdrv_co_flush(bs->file->bs);
->  }
-> 
-> +static int coroutine_fn blkdebug_co_pwrite_zeroes(BlockDriverState *bs,
-> +                                                  int64_t offset, int count,
-> +                                                  BdrvRequestFlags flags)
-> +{
-> +    BDRVBlkdebugState *s = bs->opaque;
-> +    BlkdebugRule *rule = NULL;
-> +    uint32_t align = MAX(bs->bl.request_alignment,
-> +                         bs->bl.pwrite_zeroes_alignment);
-> +
-> +    /* Only pass through requests that are larger than requested
-> +     * preferred alignment (so that we test the fallback to writes on
-> +     * unaligned portions), and check that the block layer never hands
-> +     * us anything crossing an alignment boundary.  */
+On Wed, 15 Feb 2017 17:30:00 +0200
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-"crossing an alignment boundary" isn't really what we're interested in
-(and also not what your code checks), but just that things are properly
-aligned.
+> On Wed, Feb 15, 2017 at 04:22:25PM +0100, Igor Mammedov wrote:
+> > On Wed, 15 Feb 2017 15:13:20 +0100
+> > Laszlo Ersek <lersek@redhat.com> wrote:
+> >   
+> > > Commenting under Igor's reply for simplicity
+> > > 
+> > > On 02/15/17 11:57, Igor Mammedov wrote:  
+> > > > On Tue, 14 Feb 2017 22:15:43 -0800
+> > > > ben@skyportsystems.com wrote:
+> > > >     
+> > > >> From: Ben Warren <ben@skyportsystems.com>
+> > > >>
+> > > >> This is similar to the existing 'add pointer' functionality, but instead
+> > > >> of instructing the guest (BIOS or UEFI) to patch memory, it instructs
+> > > >> the guest to write the pointer back to QEMU via a writeable fw_cfg file.
+> > > >>
+> > > >> Signed-off-by: Ben Warren <ben@skyportsystems.com>
+> > > >> ---
+> > > >>  hw/acpi/bios-linker-loader.c         | 58 ++++++++++++++++++++++++++++++++++--
+> > > >>  include/hw/acpi/bios-linker-loader.h |  6 ++++
+> > > >>  2 files changed, 61 insertions(+), 3 deletions(-)
+> > > >>
+> > > >> diff --git a/hw/acpi/bios-linker-loader.c b/hw/acpi/bios-linker-loader.c
+> > > >> index d963ebe..5030cf1 100644
+> > > >> --- a/hw/acpi/bios-linker-loader.c
+> > > >> +++ b/hw/acpi/bios-linker-loader.c
+> > > >> @@ -78,6 +78,19 @@ struct BiosLinkerLoaderEntry {
+> > > >>              uint32_t length;
+> > > >>          } cksum;
+> > > >>  
+> > > >> +        /*
+> > > >> +         * COMMAND_WRITE_POINTER - write the fw_cfg file (originating from
+> > > >> +         * @dest_file) at @wr_pointer.offset, by adding a pointer to the table
+> > > >> +         * originating from @src_file. 1,2,4 or 8 byte unsigned
+> > > >> +         * addition is used depending on @wr_pointer.size.
+> > > >> +         */    
+> > > 
+> > > The words "adding" and "addition" are causing confusion here.
+> > > 
+> > > In all of the previous discussion, *addition* was out of scope from
+> > > WRITE_POINTER. Again, the firmware is specifically not required to
+> > > *read* any part of the fw_cfg blob identified by "dest_file".
+> > > 
+> > > WRITE_POINTER instructs the firmware to return the allocation address of
+> > > the downloaded "src_file" to QEMU. Any necessary runtime subscripting
+> > > within "src_file" is to be handled by QEMU code dynamically.
+> > > 
+> > > For example, consider that "src_file" has *several* fields that QEMU
+> > > wants to massage; in that case, indexing within QEMU code with field
+> > > offsets is simply unavoidable.  
+> > what I don't like here is that this indexing would be rather fragile
+> > and has to be done in different parts of QEMU /device, AML/.
+> > 
+> > I'd prefer this helper function to have the same @src_offset
+> > behavior as ADD_POINTER where patched address could point to
+> > any part of src_file i.e. not just beginning.  
+> 
+> 
+> 
+>         /*
+>          * COMMAND_ADD_POINTER - patch the table (originating from
+>          * @dest_file) at @pointer.offset, by adding a pointer to the table
+>          * originating from @src_file. 1,2,4 or 8 byte unsigned
+>          * addition is used depending on @pointer.size.
+>          */
+>  
+> so the way ADD works is
+> 	read at offset
+> 	add table address
+> 	write result at offset
+> 
+> in other words it is always beginning of table that is added.
+more exactly it's, read at 
+  src_offset = *(dst_blob_ptr+dst_offset)
+  *(dst_blob+dst_offset) = src_blob_ptr + src_offset
 
-> +    if (count < align) {
-> +        return -ENOTSUP;
-> +    }
-> +    assert(QEMU_IS_ALIGNED(offset, align));
-> +    assert(QEMU_IS_ALIGNED(count, align));
-> +    if (bs->bl.max_pwrite_zeroes) {
-> +        assert(count <= bs->bl.max_pwrite_zeroes);
-> +    }
-> +
-> +    QSIMPLEQ_FOREACH(rule, &s->active_rules, active_next) {
-> +        uint64_t inject_offset = rule->options.inject.offset;
-> +
-> +        if (inject_offset == -1 ||
-> +            (inject_offset >= offset && inject_offset < offset + count))
-> +        {
-> +            break;
-> +        }
-> +    }
-> +
-> +    if (rule && rule->options.inject.error) {
-> +        return inject_error(bs, rule);
-> +    }
-> +
-> +    return bdrv_co_pwrite_zeroes(bs->file, offset, count, flags);
-> +}
-> +
-> +static int coroutine_fn blkdebug_co_pdiscard(BlockDriverState *bs,
-> +                                             int64_t offset, int count)
-> +{
-> +    BDRVBlkdebugState *s = bs->opaque;
-> +    BlkdebugRule *rule = NULL;
-> +    uint32_t align = bs->bl.pdiscard_alignment;
-> +
-> +    /* Only pass through requests that are larger than requested
-> +     * minimum alignment, and ensure that unaligned requests do not
-> +     * cross optimum discard boundaries. */
-> +    if (count < bs->bl.request_alignment) {
-> +        return -ENOTSUP;
-> +    }
-> +    assert(QEMU_IS_ALIGNED(offset, bs->bl.request_alignment));
-> +    assert(QEMU_IS_ALIGNED(count, bs->bl.request_alignment));
-> +    if (align && count >= align) {
-> +        assert(QEMU_IS_ALIGNED(offset, align));
-> +        assert(QEMU_IS_ALIGNED(count, align));
+> Would the following be acceptable?
+> 
+> 
+>          * COMMAND_WRITE_POINTER - update the fw_cfg file (originating from
+>          * @dest_file) at @wr_pointer.offset, by writing a pointer to the table
+>          * originating from @src_file. 1,2,4 or 8 byte unsigned value
+>          * is written depending on @wr_pointer.size.
+it looses 'adding' part of ADD_POINTER command which handles src_offset,
+however implementing adding part looks a bit complicated
+as patched blob (dst) is not in guest memory but in QEMU and
+on reset *(dst_blob+dst_offset) should be reset to src_offset.
+Considering dst file could be device specific memory (field/blob/whatever)
+it could be hard to track/notice proper reset behavior.
 
-Here, in contrast, I think you really want to do what the comment says
-(because the contract is that you get head, bulk and tail of a discard
-request separately), but the code fails to do so: We could have
-count < align, but still cross a optimum discard alignment boundary if
-offset is misaligned, too, and we have two partial accesses (i.e. head
-and tail in the same call).
+So now I'm not sure if src_offset is worth adding.
 
-> +    }
-> +    if (bs->bl.max_pdiscard) {
-> +        assert(count <= bs->bl.max_pdiscard);
-> +    }
-> +
-> +    QSIMPLEQ_FOREACH(rule, &s->active_rules, active_next) {
-> +        uint64_t inject_offset = rule->options.inject.offset;
-> +
-> +        if (inject_offset == -1 ||
-> +            (inject_offset >= offset && inject_offset < offset + count))
-> +        {
-> +            break;
-> +        }
-> +    }
-> +
-> +    if (rule && rule->options.inject.error) {
-> +        return inject_error(bs, rule);
-> +    }
-
-This piece of code is duplicated in each I/O function. Should we
-consider factoring it out?
-
-> +    return bdrv_co_pdiscard(bs->file->bs, offset, count);
-> +}
-
-Kevin
+> 
+> 
+> > 
+> >   
+> > > (1) So, the above looks correct, but please replace "adding" with
+> > > "storing", and "unsigned addition" with "store".
+> > > 
+> > > Side point: the case for ADD_POINTER is different; there we patch
+> > > several individual ACPI objects. The fact that I requested explicit
+> > > addition within the ADDR method, as opposed to pre-setting VGIA to a
+> > > nonzero offset, is an *incidental* limitation (coming from the OVMF ACPI
+> > > SDT header probe suppressor), and we'll likely fix that up later, with
+> > > ALLOCATE command hints or something like that. However, in
+> > > WRITE_POINTER, asking for the exact allocation address of "src_file" is
+> > > an *inherent* characteristic.
+> > > 
+> > > For reference, this is the command's description from the (not as yet
+> > > posted) OVMF series:
+> > > 
+> > > // QemuLoaderCmdWritePointer: the bytes at
+> > > // [PointerOffset..PointerOffset+PointerSize) in the writeable fw_cfg
+> > > // file PointerFile are to receive the absolute address of PointeeFile,
+> > > // as allocated and downloaded by the firmware. Store the base address
+> > > // of where PointeeFile's contents have been placed (when
+> > > // QemuLoaderCmdAllocate has been executed for PointeeFile) to this
+> > > // portion of PointerFile.
+> > > //
+> > > // This command is similar to QemuLoaderCmdAddPointer; the difference is
+> > > // that the "pointer to patch" does not exist in guest-physical address
+> > > // space, only in "fw_cfg file space". In addition, the "pointer to
+> > > // patch" is not initialized by QEMU with a possibly nonzero offset
+> > > // value: the base address of the memory allocated for downloading
+> > > // PointeeFile shall not increment the pointer, but overwrite it.
+> > > 
+> > > In the last SeaBIOS patch series, namely
+> > > 
+> > > [SeaBIOS] [PATCH v3 2/2] QEMU fw_cfg: Add command to write back address
+> > >                          of file
+> > > 
+> > > function romfile_loader_write_pointer() implemented just that plain
+> > > store (not an addition), and that was exactly right.
+> > > 
+> > > Continuing:
+> > >   
+> > > >> +        struct {
+> > > >> +            char dest_file[BIOS_LINKER_LOADER_FILESZ];
+> > > >> +            char src_file[BIOS_LINKER_LOADER_FILESZ];
+> > > >> +            uint32_t offset;
+> > > >> +            uint8_t size;
+> > > >> +        } wr_pointer;
+> > > >> +
+> > > >>          /* padding */
+> > > >>          char pad[124];
+> > > >>      };
+> > > >> @@ -85,9 +98,10 @@ struct BiosLinkerLoaderEntry {
+> > > >>  typedef struct BiosLinkerLoaderEntry BiosLinkerLoaderEntry;
+> > > >>  
+> > > >>  enum {
+> > > >> -    BIOS_LINKER_LOADER_COMMAND_ALLOCATE     = 0x1,
+> > > >> -    BIOS_LINKER_LOADER_COMMAND_ADD_POINTER  = 0x2,
+> > > >> -    BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM = 0x3,
+> > > >> +    BIOS_LINKER_LOADER_COMMAND_ALLOCATE          = 0x1,
+> > > >> +    BIOS_LINKER_LOADER_COMMAND_ADD_POINTER       = 0x2,
+> > > >> +    BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM      = 0x3,
+> > > >> +    BIOS_LINKER_LOADER_COMMAND_WRITE_POINTER     = 0x4,
+> > > >>  };
+> > > >>  
+> > > >>  enum {
+> > > >> @@ -278,3 +292,41 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
+> > > >>  
+> > > >>      g_array_append_vals(linker->cmd_blob, &entry, sizeof entry);
+> > > >>  }
+> > > >> +
+> > > >> +/*
+> > > >> + * bios_linker_loader_write_pointer: ask guest to write a pointer to the
+> > > >> + * source file into the destination file, and write it back to QEMU via
+> > > >> + * fw_cfg DMA.
+> > > >> + *
+> > > >> + * @linker: linker object instance
+> > > >> + * @dest_file: destination file that must be written
+> > > >> + * @dst_patched_offset: location within destination file blob to be patched
+> > > >> + *                      with the pointer to @src_file, in bytes
+> > > >> + * @dst_patched_offset_size: size of the pointer to be patched
+> > > >> + *                      at @dst_patched_offset in @dest_file blob, in bytes
+> > > >> + * @src_file: source file who's address must be taken
+> > > >> + */
+> > > >> +void bios_linker_loader_write_pointer(BIOSLinker *linker,
+> > > >> +                                    const char *dest_file,
+> > > >> +                                    uint32_t dst_patched_offset,
+> > > >> +                                    uint8_t dst_patched_size,
+> > > >> +                                    const char *src_file)    
+> > > > API is missing "src_offset" even though it's not used in this series,
+> > > > a patch on top to fix it up is ok for me as far as Seabios/OVMF
+> > > > counterpart can handle src_offset correctly from starters.    
+> > > 
+> > > According to the above, it is the right thing not to add "src_offset"
+> > > here. The documentation on the command is slightly incorrect (and causes
+> > > confusion), but the helper function's signature and comments are okay.
+> > >   
+> > > >     
+> > > >> +{
+> > > >> +    BiosLinkerLoaderEntry entry;
+> > > >> +    const BiosLinkerFileEntry *source_file =
+> > > >> +        bios_linker_find_file(linker, src_file);
+> > > >> +
+> > > >> +    assert(source_file);    
+> > > 
+> > > I wish we kept the following asserts from bios_linker_loader_add_pointer():
+> > > 
+> > >     assert(dst_patched_offset < dst_file->blob->len);
+> > >     assert(dst_patched_offset + dst_patched_size <= dst_file->blob->len);
+> > > 
+> > > Namely, just because the dst_file is never supposed to be downloaded by
+> > > the firmware, it still remains a requirement that the "dst file offset
+> > > range" that is to be rewritten *do fall* within the dst file.
+> > > 
+> > > Nonetheless, this is not critical. (OVMF at least verifies it anyway.)
+> > > 
+> > > Summary (from my side anyway): I feel that the documentation of the new
+> > > command is very important. Please fix it up as suggested under (1), in
+> > > v7. Regarding the asserts, I'll let you decide.
+> > > 
+> > > With the documentation fixed up:
+> > > 
+> > > Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+> > > 
+> > > (If you don't wish to post a v7, I'm also completely fine if Michael or
+> > > someone else fixes up the docs as proposed in (1), before committing the
+> > > patch.)
+> > > 
+> > > Thanks!
+> > > Laszlo
+> > >   
+> > > >> +    memset(&entry, 0, sizeof entry);
+> > > >> +    strncpy(entry.wr_pointer.dest_file, dest_file,
+> > > >> +            sizeof entry.wr_pointer.dest_file - 1);
+> > > >> +    strncpy(entry.wr_pointer.src_file, src_file,
+> > > >> +            sizeof entry.wr_pointer.src_file - 1);
+> > > >> +    entry.command = cpu_to_le32(BIOS_LINKER_LOADER_COMMAND_WRITE_POINTER);
+> > > >> +    entry.wr_pointer.offset = cpu_to_le32(dst_patched_offset);
+> > > >> +    entry.wr_pointer.size = dst_patched_size;
+> > > >> +    assert(dst_patched_size == 1 || dst_patched_size == 2 ||
+> > > >> +           dst_patched_size == 4 || dst_patched_size == 8);
+> > > >> +
+> > > >> +    g_array_append_vals(linker->cmd_blob, &entry, sizeof entry);
+> > > >> +}
+> > > >> diff --git a/include/hw/acpi/bios-linker-loader.h b/include/hw/acpi/bios-linker-loader.h
+> > > >> index fa1e5d1..f9ba5d6 100644
+> > > >> --- a/include/hw/acpi/bios-linker-loader.h
+> > > >> +++ b/include/hw/acpi/bios-linker-loader.h
+> > > >> @@ -26,5 +26,11 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
+> > > >>                                      const char *src_file,
+> > > >>                                      uint32_t src_offset);
+> > > >>  
+> > > >> +void bios_linker_loader_write_pointer(BIOSLinker *linker,
+> > > >> +                                      const char *dest_file,
+> > > >> +                                      uint32_t dst_patched_offset,
+> > > >> +                                      uint8_t dst_patched_size,
+> > > >> +                                      const char *src_file);
+> > > >> +
+> > > >>  void bios_linker_loader_cleanup(BIOSLinker *linker);
+> > > >>  #endif    
+> > > >     
+> > >   
