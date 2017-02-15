@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59024)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1cdrfW-0000bv-D2
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 23:58:20 -0500
+	(envelope-from <ben@skyportsystems.com>) id 1cdssu-00023G-A2
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 01:16:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1cdrfS-0005Ni-MS
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 23:58:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51068)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1cdrfS-0005Ml-GR
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 23:58:14 -0500
-Date: Wed, 15 Feb 2017 10:28:06 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-In-Reply-To: <CAKmqyKPWncbASv=VD1YAzKokEHxdOVse+G41XNmv5LUwy-kfUQ@mail.gmail.com>
-Message-ID: <alpine.LFD.2.20.1702151024310.11222@wniryva>
-References: <20170214185225.7994-1-ppandit@redhat.com>
-	<20170214185225.7994-3-ppandit@redhat.com>
-	<CAKmqyKPWncbASv=VD1YAzKokEHxdOVse+G41XNmv5LUwy-kfUQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v4 2/4] sd: sdhci: check transfer mode
- register in multi block transfer
+	(envelope-from <ben@skyportsystems.com>) id 1cdsss-0007DT-Cs
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 01:16:12 -0500
+Received: from mail-pf0-x235.google.com ([2607:f8b0:400e:c00::235]:33264)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
+	id 1cdsss-0007DL-6r
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 01:16:10 -0500
+Received: by mail-pf0-x235.google.com with SMTP id c73so25593662pfb.0
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 22:16:10 -0800 (PST)
+From: ben@skyportsystems.com
+Date: Tue, 14 Feb 2017 22:15:45 -0800
+Message-Id: <60b6ece3ce0a24aec79c1061627fa2e6ab058fc2.1487139038.git.ben@skyportsystems.com>
+In-Reply-To: <cover.1487139038.git.ben@skyportsystems.com>
+References: <cover.1487139038.git.ben@skyportsystems.com>
+In-Reply-To: <cover.1487139038.git.ben@skyportsystems.com>
+References: <cover.1487139038.git.ben@skyportsystems.com>
+Subject: [Qemu-devel] [PATCH v6 3/7] ACPI: Add vmgenid blob storage to the
+ build tables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +29,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Wjjzhang <wjjzhang@tencent.com>, Jiang Xin <jiangxin1@huawei.com>
+To: qemu-devel@nongnu.org
+Cc: lersek@redhat.com, mst@redhat.com, imammedo@redhat.com, Ben Warren <ben@skyportsystems.com>
 
-  Hello Alistair,
+From: Ben Warren <ben@skyportsystems.com>
 
-+-- On Tue, 14 Feb 2017, Alistair Francis wrote --+
-| On Tue, Feb 14, 2017 at 10:52 AM, P J P <ppandit@redhat.com> wrote:
-| > From: Prasad J Pandit <pjp@fedoraproject.org>
-| >
-| > In the SDHCI protocol, the transfer mode register value
-| > is used during multi block transfer to check if block count
-| > register is enabled and should be updated. Transfer mode
-| > register could be set such that, block count register would
-| > not be updated, thus leading to an infinite loop. Add check
-| > to avoid it.
-| >
-| > Reported-by: Wjjzhang <wjjzhang@tencent.com>
-| > Reported-by: Jiang Xin <jiangxin1@huawei.com>
-| > Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-| 
-| Didn't I already review this?
+This allows them to be centrally initialized and destroyed
 
-Yes, you did. I resent it owing to thread
+The "AcpiBuildTables.vmgenid" array will be used to construct the
+"etc/vmgenid" fw_cfg blob.
 
-  -> https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg02898.html
+Its contents will be linked into fw_cfg after being built on the
+pc_machine_done() -> acpi_setup() -> acpi_build() call path, and dropped
+without use on the subsequent, guest triggered, acpi_build_update() ->
+acpi_build() call path.
 
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+Signed-off-by: Ben Warren <ben@skyportsystems.com>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+---
+ hw/acpi/aml-build.c         | 2 ++
+ include/hw/acpi/aml-build.h | 1 +
+ 2 files changed, 3 insertions(+)
+
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index b2a1e40..c6f2032 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -1559,6 +1559,7 @@ void acpi_build_tables_init(AcpiBuildTables *tables)
+     tables->rsdp = g_array_new(false, true /* clear */, 1);
+     tables->table_data = g_array_new(false, true /* clear */, 1);
+     tables->tcpalog = g_array_new(false, true /* clear */, 1);
++    tables->vmgenid = g_array_new(false, true /* clear */, 1);
+     tables->linker = bios_linker_loader_init();
+ }
+ 
+@@ -1568,6 +1569,7 @@ void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre)
+     g_array_free(tables->rsdp, true);
+     g_array_free(tables->table_data, true);
+     g_array_free(tables->tcpalog, mfre);
++    g_array_free(tables->vmgenid, mfre);
+ }
+ 
+ /* Build rsdt table */
+diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+index 559326c..00c21f1 100644
+--- a/include/hw/acpi/aml-build.h
++++ b/include/hw/acpi/aml-build.h
+@@ -210,6 +210,7 @@ struct AcpiBuildTables {
+     GArray *table_data;
+     GArray *rsdp;
+     GArray *tcpalog;
++    GArray *vmgenid;
+     BIOSLinker *linker;
+ } AcpiBuildTables;
+ 
+-- 
+2.7.4
