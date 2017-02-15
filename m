@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ce2LZ-0004ZO-Db
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 11:22:26 -0500
+	(envelope-from <lersek@redhat.com>) id 1ce2R3-00015e-M6
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 11:28:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ce2LY-0004JN-Fs
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 11:22:25 -0500
-Date: Wed, 15 Feb 2017 17:22:14 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170215162214.GG4935@noname.redhat.com>
-References: <261ff7cb02d96c98ea068f3ca255a747b88ebc10.1487096041.git.jcody@redhat.com>
-	<44cf0a51-5dc1-b144-f269-af9bebf7708e@redhat.com>
+	(envelope-from <lersek@redhat.com>) id 1ce2R0-0006Sd-Hk
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 11:28:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39418)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1ce2R0-0006SM-CP
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 11:28:02 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 61AFEC054C20
+	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 16:28:02 +0000 (UTC)
+References: <06BE8A21-A1E9-4264-BD02-04A566748633@redhat.com>
+	<173cba42-5390-0e16-71a3-3eadcd3ef654@redhat.com>
+	<9657908C-A71B-424E-BBFD-E4A8EEF1C178@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <416ddd00-7348-a7c7-54c0-6f0754e7d062@redhat.com>
+Date: Wed, 15 Feb 2017 17:27:59 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="/04w6evG8XlLl3ft"
-Content-Disposition: inline
-In-Reply-To: <44cf0a51-5dc1-b144-f269-af9bebf7708e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] qemu-iotests: redirect nbd server
- stdout to /dev/null
+In-Reply-To: <9657908C-A71B-424E-BBFD-E4A8EEF1C178@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] VirtIO Windows Driver repository
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,51 +34,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: Yan Vugenfirer <yvugenfi@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Cole Robinson <crobinso@redhat.com>
 
+On 02/15/17 16:15, Yan Vugenfirer wrote:
+> 
+>> On 14 Feb 2017, at 16:08, Laszlo Ersek <lersek@redhat.com> wrote:
+>>
+>> On 02/14/17 13:40, Yan Vugenfirer wrote:
+>>> Hello All,
+>>>
+>>> The official upstream repository moved from
+>>> https://github.com/YanVugenfirer/kvm-guest-drivers-windows to
+>>> https://github.com/virtio-win/kvm-guest-drivers-windows
+>>>
+>>> Best regards, Yan Vugenfirer.
+>>
+>> Thanks! I've updated the corresponding reference under
+>> <https://fedoraproject.org/wiki/Windows_Virtio_Drivers#Links>.
+> 
+> Thanks!
+> 
+> Do you know who can make a change on
+> http://www.linux-kvm.org/page/WindowsGuestDrivers/Repository ?
 
---/04w6evG8XlLl3ft
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I thought that I had page editing permissions, and indeed when I edit
+the page and hit "Save", I'm presented with the updated version.
+However, as soon as I re-visit the page, the old version is shown, and I
+can't find my changes in the page history either.
 
-Am 14.02.2017 um 19:42 hat Eric Blake geschrieben:
-> On 02/14/2017 12:15 PM, Jeff Cody wrote:
-> > Some iotests (e.g. 174) try to filter the output of _make_test_image by
-> > piping the stdout.  Pipe the server stdout to /dev/null, so that filter
-> > pipe does not need to wait until process completion.
-> >=20
-> > Signed-off-by: Jeff Cody <jcody@redhat.com>
-> > ---
-> >  tests/qemu-iotests/common.rc | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+Dan, can you pls help?
 
-Thanks, applied to the block branch.
-
-Kevin
-
---/04w6evG8XlLl3ft
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJYpIA2AAoJEH8JsnLIjy/W4BIP/288b8++JFimwZM4mc62CIE7
-BdiwhM53RaxkXl7ZhWofTNq7/U5nulByF1GY0s35SqZbPqz9Z+9U7Xv8HlJiE8gJ
-dot20lBQ20/DopTggZ+6/46g04j0A/UB2Kl3PIPiSKXVd6R82gxMhoAXHwCrNQ5j
-oJlrlfP7mRPz6tTqF/Tq8qqfkHqb/XOutTJLkHRmz37psduUZ7UlPJw/2uG4XMNu
-d6UhEEjYRRLCsi1iIIdoov62yXaAbfzX0KY6gOUnFIJkRMCUxTgP65I/cgVXostv
-m8WWySXYyRMITodGctRDgIdafbaQ5a6X3WuxB99/8Xz3gMg3f26wt2f7mo5KVa1M
-Wy9ZgrTU2vVe2R1s5OU938Xu6gXB4PsPRDux7ASEexg7WUphyiGcILVTSZmQd0kF
-Qgme+QHWPbIcC0jP0Zi/lFxDGX0/5sGujtHCZ2n+ZCpcnWcTZPONvfcjt8JAnou6
-asLNLPs6U6XVLPdgXiusT0AiT1WRbAhEKqOOofYMs25OtT1vteHX58WayMjGPsli
-h4fpi1e5LRzsK4kPBkH0JuA43IapBp5luJG15Y1PMdPs5btzKyDHuzRSHctw+yn+
-MyoRuCHEF1wmeikTMbc65LXNwCsHm0AI/6DI+bQaQ1WBiib0ZpnlewVcnT8RwW9t
-DOQLYNJIPjO3VhISlRzt
-=mOfU
------END PGP SIGNATURE-----
-
---/04w6evG8XlLl3ft--
+Thanks,
+Laszlo
