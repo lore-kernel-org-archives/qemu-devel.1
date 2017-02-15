@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cdwTH-0006bx-Lb
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 05:06:00 -0500
+	(envelope-from <armbru@redhat.com>) id 1cdwTJ-0006ed-GW
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 05:06:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cdwTG-0001k8-BW
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 05:05:59 -0500
+	(envelope-from <armbru@redhat.com>) id 1cdwTI-0001mJ-67
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 05:06:01 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 15 Feb 2017 11:05:47 +0100
-Message-Id: <1487153147-11530-9-git-send-email-armbru@redhat.com>
+Date: Wed, 15 Feb 2017 11:05:41 +0100
+Message-Id: <1487153147-11530-3-git-send-email-armbru@redhat.com>
 In-Reply-To: <1487153147-11530-1-git-send-email-armbru@redhat.com>
 References: <1487153147-11530-1-git-send-email-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 8/8] hw: Drop superfluous special checks for
- orphaned -drive
+Subject: [Qemu-devel] [PATCH v3 2/8] hw/arm/cubieboard hw/arm/xlnx-ep108:
+ Fix units_per_default_bus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,114 +21,87 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, John Snow <jsnow@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, Beniamino Galvani <b.galvani@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
 
-We've traditionally rejected orphans here and there, but not
-systematically.  For instance, the sun4m machines have an onboard SCSI
-HBA (bus=3D0), and have always rejected bus>0.  Other machines with an
-onboard SCSI HBA don't.
+Machine types cubieboard, xlnx-ep108, xlnx-zcu102 have an onboard AHCI
+controller, but neglect to set their MachineClass member
+units_per_default_bus = 1.  This permits -drive if=ide,unit=1, which
+makes no sense for AHCI.  It also screws up index=N for odd N, because
+it gets desugared to unit=1,bus=N/2
 
-Commit a66c9dc made all orphans trigger a warning, and the previous
-commit turned this into an error.  The checks "here and there" are now
-redundant.  Drop them.
+Doesn't really matter, because these machine types fail to honor
+-drive if=ide.  Add the missing units_per_default_bus = 1 anyway,
+along with a TODO comment on what needs to be done for -drive if=ide.
 
-Note that the one in mips_jazz.c was wrong: it rejected bus > MAX_FD,
-but MAX_FD is the number of floppy drives per bus.
+Also set block_default_type = IF_IDE explicitly.  It's currently the
+default, but the next commit will change it to something more
+sensible, and we want to keep the IF_IDE default for these three
+machines.  See also the previous commit.
 
-Error messages change from
-
-    $ qemu-system-x86_64 -drive if=3Dide,bus=3D2
-    qemu-system-x86_64: Too many IDE buses defined (3 > 2)
-    $ qemu-system-mips64 -M magnum,accel=3Dqtest -drive if=3Dfloppy,bus=3D=
-2,id=3Dfd1
-    qemu: too many floppy drives
-    $ qemu-system-sparc -M LX -drive if=3Dscsi,bus=3D1
-    qemu: too many SCSI bus
-
-to
-
-    $ qemu-system-x86_64 -drive if=3Dide,bus=3D2
-    qemu-system-x86_64: -drive if=3Dide,bus=3D2: machine type does not su=
-pport if=3Dide,bus=3D2,unit=3D0
-    $ qemu-system-mips64 -M magnum,accel=3Dqtest -drive if=3Dfloppy,bus=3D=
-2,id=3Dfd1
-    qemu-system-mips64: -drive if=3Dfloppy,bus=3D2,id=3Dfd1: machine type=
- does not support if=3Dfloppy,bus=3D2,unit=3D0
-    $ qemu-system-sparc -M LX -drive if=3Dscsi,bus=3D1
-    qemu-system-sparc: -drive if=3Dscsi,bus=3D1: machine type does not su=
-pport if=3Dscsi,bus=3D1,unit=3D0
-
-Cc: John Snow <jsnow@redhat.com>
-Cc: "Herv=C3=A9 Poussineau" <hpoussin@reactos.org>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Beniamino Galvani <b.galvani@gmail.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Acked-by: Alistair Francis <alistair.francis@xilinx.com>
 ---
- hw/ide/core.c       | 17 -----------------
- hw/mips/mips_jazz.c |  4 ----
- hw/sparc/sun4m.c    |  5 -----
- 3 files changed, 26 deletions(-)
+ hw/arm/cubieboard.c | 4 ++++
+ hw/arm/xlnx-ep108.c | 6 ++++++
+ 2 files changed, 10 insertions(+)
 
-diff --git a/hw/ide/core.c b/hw/ide/core.c
-index 43709e5..cfa5de6 100644
---- a/hw/ide/core.c
-+++ b/hw/ide/core.c
-@@ -2840,23 +2840,6 @@ const VMStateDescription vmstate_ide_bus =3D {
- void ide_drive_get(DriveInfo **hd, int n)
+diff --git a/hw/arm/cubieboard.c b/hw/arm/cubieboard.c
+index dd19ba3..b98e1c4 100644
+--- a/hw/arm/cubieboard.c
++++ b/hw/arm/cubieboard.c
+@@ -71,6 +71,8 @@ static void cubieboard_init(MachineState *machine)
+     memory_region_add_subregion(get_system_memory(), AW_A10_SDRAM_BASE,
+                                 &s->sdram);
+ 
++    /* TODO create and connect IDE devices for ide_drive_get() */
++
+     cubieboard_binfo.ram_size = machine->ram_size;
+     cubieboard_binfo.kernel_filename = machine->kernel_filename;
+     cubieboard_binfo.kernel_cmdline = machine->kernel_cmdline;
+@@ -82,6 +84,8 @@ static void cubieboard_machine_init(MachineClass *mc)
  {
-     int i;
--    int highest_bus =3D drive_get_max_bus(IF_IDE) + 1;
--    int max_devs =3D drive_get_max_devs(IF_IDE);
--    int n_buses =3D max_devs ? (n / max_devs) : n;
--
--    /*
--     * Note: The number of actual buses available is not known.
--     * We compute this based on the size of the DriveInfo* array, n.
--     * If it is less than max_devs * <num_real_buses>,
--     * We will stop looking for drives prematurely instead of overfillin=
-g
--     * the array.
--     */
--
--    if (highest_bus > n_buses) {
--        error_report("Too many IDE buses defined (%d > %d)",
--                     highest_bus, n_buses);
--        exit(1);
--    }
-=20
-     for (i =3D 0; i < n; i++) {
-         hd[i] =3D drive_get_by_index(IF_IDE, i);
-diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-index 73f6c9f..1cef581 100644
---- a/hw/mips/mips_jazz.c
-+++ b/hw/mips/mips_jazz.c
-@@ -291,10 +291,6 @@ static void mips_jazz_init(MachineState *machine,
-              qdev_get_gpio_in(rc4030, 5), &esp_reset, &dma_enable);
-=20
-     /* Floppy */
--    if (drive_get_max_bus(IF_FLOPPY) >=3D MAX_FD) {
--        fprintf(stderr, "qemu: too many floppy drives\n");
--        exit(1);
--    }
-     for (n =3D 0; n < MAX_FD; n++) {
-         fds[n] =3D drive_get(IF_FLOPPY, 0, n);
+     mc->desc = "cubietech cubieboard";
+     mc->init = cubieboard_init;
++    mc->block_default_type = IF_IDE;
++    mc->units_per_default_bus = 1;
+ }
+ 
+ DEFINE_MACHINE("cubieboard", cubieboard_machine_init)
+diff --git a/hw/arm/xlnx-ep108.c b/hw/arm/xlnx-ep108.c
+index 4ec590a..860780a 100644
+--- a/hw/arm/xlnx-ep108.c
++++ b/hw/arm/xlnx-ep108.c
+@@ -106,6 +106,8 @@ static void xlnx_ep108_init(MachineState *machine)
+         sysbus_connect_irq(SYS_BUS_DEVICE(&s->soc.spi[i]), 1, cs_line);
      }
-diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index f5b6efd..61416a6 100644
---- a/hw/sparc/sun4m.c
-+++ b/hw/sparc/sun4m.c
-@@ -989,11 +989,6 @@ static void sun4m_hw_init(const struct sun4m_hwdef *=
-hwdef,
-     slavio_misc_init(hwdef->slavio_base, hwdef->aux1_base, hwdef->aux2_b=
-ase,
-                      slavio_irq[30], fdc_tc);
-=20
--    if (drive_get_max_bus(IF_SCSI) > 0) {
--        fprintf(stderr, "qemu: too many SCSI bus\n");
--        exit(1);
--    }
--
-     esp_init(hwdef->esp_base, 2,
-              espdma_memory_read, espdma_memory_write,
-              espdma, espdma_irq, &esp_reset, &dma_enable);
---=20
+ 
++    /* TODO create and connect IDE devices for ide_drive_get() */
++
+     xlnx_ep108_binfo.ram_size = ram_size;
+     xlnx_ep108_binfo.kernel_filename = machine->kernel_filename;
+     xlnx_ep108_binfo.kernel_cmdline = machine->kernel_cmdline;
+@@ -118,6 +120,8 @@ static void xlnx_ep108_machine_init(MachineClass *mc)
+ {
+     mc->desc = "Xilinx ZynqMP EP108 board";
+     mc->init = xlnx_ep108_init;
++    mc->block_default_type = IF_IDE;
++    mc->units_per_default_bus = 1;
+ }
+ 
+ DEFINE_MACHINE("xlnx-ep108", xlnx_ep108_machine_init)
+@@ -126,6 +130,8 @@ static void xlnx_zcu102_machine_init(MachineClass *mc)
+ {
+     mc->desc = "Xilinx ZynqMP ZCU102 board";
+     mc->init = xlnx_ep108_init;
++    mc->block_default_type = IF_IDE;
++    mc->units_per_default_bus = 1;
+ }
+ 
+ DEFINE_MACHINE("xlnx-zcu102", xlnx_zcu102_machine_init)
+-- 
 2.7.4
