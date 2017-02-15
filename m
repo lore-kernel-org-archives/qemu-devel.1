@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cdxYw-0006f8-JU
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 06:15:55 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cdxd3-0000pX-Uq
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 06:20:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cdxYs-0005Er-Ih
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 06:15:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48470)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cdxYs-0005E1-CB
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 06:15:50 -0500
-Date: Wed, 15 Feb 2017 12:15:47 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170215121547.7b4c3756@nial.brq.redhat.com>
-In-Reply-To: <60b6ece3ce0a24aec79c1061627fa2e6ab058fc2.1487139038.git.ben@skyportsystems.com>
-References: <cover.1487139038.git.ben@skyportsystems.com>
-	<60b6ece3ce0a24aec79c1061627fa2e6ab058fc2.1487139038.git.ben@skyportsystems.com>
+	(envelope-from <pbonzini@redhat.com>) id 1cdxd3-0007mm-1C
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 06:20:09 -0500
+References: <20170213181244.16297-1-pbonzini@redhat.com>
+	<20170213181244.16297-7-pbonzini@redhat.com>
+	<20170215092341.GC26331@lemon.lan>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1effc0aa-c050-5f09-11f8-1e3f8ced5219@redhat.com>
+Date: Wed, 15 Feb 2017 12:20:03 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20170215092341.GC26331@lemon.lan>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 3/7] ACPI: Add vmgenid blob storage to
- the build tables
+Subject: Re: [Qemu-devel] [PATCH 6/6] coroutine-lock: make CoRwlock
+ thread-safe and fair
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,62 +25,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ben@skyportsystems.com
-Cc: qemu-devel@nongnu.org, lersek@redhat.com, mst@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, qemu-block@nongnu.org
 
-On Tue, 14 Feb 2017 22:15:45 -0800
-ben@skyportsystems.com wrote:
 
-> From: Ben Warren <ben@skyportsystems.com>
-> 
-> This allows them to be centrally initialized and destroyed
-> 
-> The "AcpiBuildTables.vmgenid" array will be used to construct the
-> "etc/vmgenid" fw_cfg blob.
-> 
-> Its contents will be linked into fw_cfg after being built on the
-> pc_machine_done() -> acpi_setup() -> acpi_build() call path, and dropped
-> without use on the subsequent, guest triggered, acpi_build_update() ->
-> acpi_build() call path.
-> 
-> Signed-off-by: Ben Warren <ben@skyportsystems.com>
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-> ---
->  hw/acpi/aml-build.c         | 2 ++
->  include/hw/acpi/aml-build.h | 1 +
->  2 files changed, 3 insertions(+)
+On 15/02/2017 10:23, Fam Zheng wrote:
+> On Mon, 02/13 19:12, Paolo Bonzini wrote:
+>> This adds a CoMutex around the existing CoQueue.  Because the write-side
 > 
-> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-> index b2a1e40..c6f2032 100644
-> --- a/hw/acpi/aml-build.c
-> +++ b/hw/acpi/aml-build.c
-> @@ -1559,6 +1559,7 @@ void acpi_build_tables_init(AcpiBuildTables *tables)
->      tables->rsdp = g_array_new(false, true /* clear */, 1);
->      tables->table_data = g_array_new(false, true /* clear */, 1);
->      tables->tcpalog = g_array_new(false, true /* clear */, 1);
-> +    tables->vmgenid = g_array_new(false, true /* clear */, 1);
->      tables->linker = bios_linker_loader_init();
->  }
->  
-> @@ -1568,6 +1569,7 @@ void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre)
->      g_array_free(tables->rsdp, true);
->      g_array_free(tables->table_data, true);
->      g_array_free(tables->tcpalog, mfre);
-> +    g_array_free(tables->vmgenid, mfre);
->  }
->  
->  /* Build rsdt table */
-> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-> index 559326c..00c21f1 100644
-> --- a/include/hw/acpi/aml-build.h
-> +++ b/include/hw/acpi/aml-build.h
-> @@ -210,6 +210,7 @@ struct AcpiBuildTables {
->      GArray *table_data;
->      GArray *rsdp;
->      GArray *tcpalog;
-> +    GArray *vmgenid;
->      BIOSLinker *linker;
->  } AcpiBuildTables;
->  
+> s/CoQueue/CoRwlock/
+
+No, I meant that CoRwlock has a CoQueue, and after this patch it is
+wrapped by a CoMutex too.
+
+
+>> @@ -375,16 +384,20 @@ void qemu_co_rwlock_unlock(CoRwlock *lock)
+>>              qemu_co_queue_next(&lock->queue);
+>>          }
+>>      }
+>> -    self->locks_held--;
+>> +    qemu_co_mutex_unlock(&lock->mutex);
+>>  }
+>>  
+>>  void qemu_co_rwlock_wrlock(CoRwlock *lock)
+>>  {
+>> -    Coroutine *self = qemu_coroutine_self();
+>> -
+>> -    while (lock->writer || lock->reader) {
+>> -        qemu_co_queue_wait(&lock->queue, NULL);
+>> +    qemu_co_mutex_lock(&lock->mutex);
+>> +    lock->pending_writer++;
+>> +    while (lock->reader) {
+>> +        qemu_co_queue_wait(&lock->queue, &lock->mutex);
+>>      }
+>> -    lock->writer = true;
+>> -    self->locks_held++;
+>> +    lock->pending_writer--;
+>> +
+>> +    /* The rest of the write-side critical section is run with
+>> +     * the mutex taken, so that lock->reader remains zero.
+>> +     * There is no need to update self->locks_held.
+>> +     */
+> 
+> But is it still better to update self->locks_held anyway for the
+> 'assert(!co->locks_held)' in qemu_coroutine_enter? Or is the same thing checked
+> elsewhere?
+
+self->locks_held is already incremented by the qemu_co_mutex_lock call
+at the beginning of qemu_co_rwlock_wrlock.  It is then decremented in
+qemu_co_rwlock_unlock.
+
+For the read side, rdlock _unlocks_ lock->mutex before returning, so
+self->locks_held must be incremented by rdlock and decremented by unlock.
+
+Paolo
