@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cdnTY-0004gz-A9
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 19:29:41 -0500
+	(envelope-from <jsnow@redhat.com>) id 1cdnZ2-0007jx-0K
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 19:35:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cdnTX-0003dl-Am
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 19:29:40 -0500
+	(envelope-from <jsnow@redhat.com>) id 1cdnZ0-0005W8-M0
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 19:35:20 -0500
 References: <1487091579-67092-1-git-send-email-vsementsov@virtuozzo.com>
-	<1487091579-67092-25-git-send-email-vsementsov@virtuozzo.com>
+	<1487091579-67092-26-git-send-email-vsementsov@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <480cc4f8-c952-49b3-7e20-2f91593c9bf9@redhat.com>
-Date: Tue, 14 Feb 2017 19:29:30 -0500
+Message-ID: <00d45252-11c7-638a-03b9-ba51bffae99b@redhat.com>
+Date: Tue, 14 Feb 2017 19:35:09 -0500
 MIME-Version: 1.0
-In-Reply-To: <1487091579-67092-25-git-send-email-vsementsov@virtuozzo.com>
+In-Reply-To: <1487091579-67092-26-git-send-email-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 24/25] qmp: block-dirty-bitmap-remove:
- remove persistent
+Subject: Re: [Qemu-devel] [PATCH 25/25] qcow2-bitmap: improve
+ check_constraints_on_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +30,138 @@ Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, ste
 
 
 On 02/14/2017 11:59 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Remove persistent bitmap from the storage on block-dirty-bitmap-remove.
+> Add detailed error messages.
 > 
+
+yay
+
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
 > ---
->  blockdev.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+>  block/qcow2-bitmap.c | 63 ++++++++++++++++++++++++++++++++++------------------
+>  1 file changed, 41 insertions(+), 22 deletions(-)
 > 
-> diff --git a/blockdev.c b/blockdev.c
-> index c41b791..a365cdf 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -2767,6 +2767,7 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
->      AioContext *aio_context;
->      BlockDriverState *bs;
->      BdrvDirtyBitmap *bitmap;
-> +    Error *local_err = NULL;
+> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+> index 7ad1f7c..113d48c 100644
+> --- a/block/qcow2-bitmap.c
+> +++ b/block/qcow2-bitmap.c
+> @@ -160,28 +160,49 @@ static int check_table_entry(uint64_t entry, int cluster_size)
 >  
->      bitmap = block_dirty_bitmap_lookup(node, name, &bs, &aio_context, errp);
->      if (!bitmap || !bs) {
-> @@ -2779,6 +2780,15 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
->                     name);
->          goto out;
+>  static int check_constraints_on_bitmap(BlockDriverState *bs,
+>                                         const char *name,
+> -                                       uint32_t granularity)
+> +                                       uint32_t granularity,
+> +                                       Error **errp)
+>  {
+>      BDRVQcow2State *s = bs->opaque;
+>      int granularity_bits = ctz32(granularity);
+>      int64_t len = bdrv_getlength(bs);
+> -    bool fail;
+>  
+>      assert(granularity > 0);
+>      assert((granularity & (granularity - 1)) == 0);
+>  
+>      if (len < 0) {
+> +        error_setg_errno(errp, -len, "Failed to get size of '%s'",
+> +                         bdrv_get_device_or_node_name(bs));
+>          return len;
 >      }
-> +
-> +    if (bdrv_dirty_bitmap_get_persistance(bitmap)) {
-> +        bdrv_remove_persistent_dirty_bitmap(bs, name, &local_err);
-> +        if (local_err != NULL) {
-> +            error_propagate(errp, local_err);
-> +            goto out;
-> +        }
+>  
+> -    fail = (granularity_bits > BME_MAX_GRANULARITY_BITS) ||
+> -           (granularity_bits < BME_MIN_GRANULARITY_BITS) ||
+> -           (len > (uint64_t)BME_MAX_PHYS_SIZE << granularity_bits) ||
+> -           (len > (uint64_t)BME_MAX_TABLE_SIZE * s->cluster_size <<
+> -                  granularity_bits) ||
+> -           (strlen(name) > BME_MAX_NAME_SIZE);
+> +    if (granularity_bits > BME_MAX_GRANULARITY_BITS) {
+> +        error_setg(errp, "Granularity exceeds maximum (%u bytes)",
+> +                   1 << BME_MAX_GRANULARITY_BITS);
+> +        return -EINVAL;
+> +    }
+> +    if (granularity_bits < BME_MIN_GRANULARITY_BITS) {
+> +        error_setg(errp, "Granularity is under minimum (%u bytes)",
+> +                   1 << BME_MIN_GRANULARITY_BITS);
+> +        return -EINVAL;
+> +    }
+>  
+> -    return fail ? -EINVAL : 0;
+> +    if ((len > (uint64_t)BME_MAX_PHYS_SIZE << granularity_bits) ||
+> +        (len > (uint64_t)BME_MAX_TABLE_SIZE * s->cluster_size <<
+> +               granularity_bits))
+> +    {
+> +        error_setg(errp, "Too much space will be occupied by the bitmap. "
+> +                   "Use larger granularity");
+> +        return -EINVAL;
 > +    }
 > +
->      bdrv_dirty_bitmap_make_anon(bitmap);
->      bdrv_release_dirty_bitmap(bs, bitmap);
+> +    if (strlen(name) > BME_MAX_NAME_SIZE) {
+> +        error_setg(errp, "Name length exceeds maximum (%u characters)",
+> +                   BME_MAX_NAME_SIZE);
+> +        return -EINVAL;
+> +    }
+> +
+> +    return 0;
+>  }
+>  
+>  static void clear_bitmap_table(BlockDriverState *bs, uint64_t *bitmap_table,
+> @@ -1142,9 +1163,9 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+>              continue;
+>          }
+>  
+> -        if (check_constraints_on_bitmap(bs, name, granularity) < 0) {
+> -            error_setg(errp, "Bitmap '%s' doesn't satisfy the constraints",
+> -                       name);
+> +        if (check_constraints_on_bitmap(bs, name, granularity, errp) < 0) {
+> +            error_prepend(errp, "Bitmap '%s' doesn't satisfy the constraints: ",
+> +                          name);
+>              goto fail;
+>          }
+>  
+> @@ -1230,13 +1251,11 @@ bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
+>                                        Error **errp)
+>  {
+>      BDRVQcow2State *s = bs->opaque;
+> -    const char *reason = NULL;
+>      bool found;
+>      Qcow2BitmapList *bm_list;
+>  
+> -    if (check_constraints_on_bitmap(bs, name, granularity) != 0) {
+> -        reason = "it doesn't satisfy the constraints";
+> -        goto common_errp;
+> +    if (check_constraints_on_bitmap(bs, name, granularity, errp) != 0) {
+> +        goto fail;
+>      }
+>  
+>      if (s->nb_bitmaps == 0) {
+> @@ -1246,21 +1265,21 @@ bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
+>      bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
+>                                 s->bitmap_directory_size, errp);
+>      if (bm_list == NULL) {
+> -        return false;
+> +        goto fail;
+>      }
+>  
+>      found = find_bitmap_by_name(bm_list, name);
+>      bitmap_list_free(bm_list);
+>      if (found) {
+> -        reason = "bitmap with the same name is already stored";
+> -        goto common_errp;
+> +        error_setg(errp, "Bitmap with the same name is already stored");
+> +        goto fail;
+>      }
+>  
+>      return true;
+>  
+> -common_errp:
+> -    error_setg(errp, "Can't make bitmap '%s' persistent in '%s', as %s.",
+> -               name, bdrv_get_device_or_node_name(bs), reason);
+> +fail:
+> +    error_prepend(errp, "Can't make bitmap '%s' persistent in '%s': ",
+> +                  name, bdrv_get_device_or_node_name(bs));
+>      return false;
+>  }
 >  
 > 
+
+Sorry I made it less efficient :)
 
 Reviewed-by: John Snow <jsnow@redhat.com>
