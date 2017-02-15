@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53525)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ce1d7-00082S-EF
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 10:36:30 -0500
+	(envelope-from <eblake@redhat.com>) id 1ce1ds-0000j5-BM
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 10:37:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ce1d2-0002ju-Fv
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 10:36:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56752)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1ce1d2-0002jT-7N
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 10:36:24 -0500
-References: <cover.1487139038.git.ben@skyportsystems.com>
-	<fe5a0d87343f282cab0bedf0cca4d0bb2ad8b29c.1487139038.git.ben@skyportsystems.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <6845273b-aa91-c00c-bdf5-4353d5dbdd3a@redhat.com>
-Date: Wed, 15 Feb 2017 16:36:21 +0100
+	(envelope-from <eblake@redhat.com>) id 1ce1dr-0003El-J2
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 10:37:16 -0500
+References: <5fd09f2c-4201-1099-6d1b-a130e688e6eb@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5022d0be-7086-a743-23f0-5888b7ceefc3@redhat.com>
+Date: Wed, 15 Feb 2017 09:37:07 -0600
 MIME-Version: 1.0
-In-Reply-To: <fe5a0d87343f282cab0bedf0cca4d0bb2ad8b29c.1487139038.git.ben@skyportsystems.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 5/7] qmp/hmp: add query-vm-generation-id
- and 'info vm-generation-id' commands
+In-Reply-To: <5fd09f2c-4201-1099-6d1b-a130e688e6eb@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="BxlVvKU4tTFSj3wVRWxEltOksNsP9Vpf1"
+Subject: Re: [Qemu-devel] blockdev-add/del status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,175 +23,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ben@skyportsystems.com, qemu-devel@nongnu.org
-Cc: mst@redhat.com, imammedo@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>, John Snow <jsnow@redhat.com>
 
-Two questions:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--BxlVvKU4tTFSj3wVRWxEltOksNsP9Vpf1
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>,
+ Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>,
+ John Snow <jsnow@redhat.com>
+Message-ID: <5022d0be-7086-a743-23f0-5888b7ceefc3@redhat.com>
+Subject: Re: [Qemu-devel] blockdev-add/del status
+References: <5fd09f2c-4201-1099-6d1b-a130e688e6eb@virtuozzo.com>
+In-Reply-To: <5fd09f2c-4201-1099-6d1b-a130e688e6eb@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 02/15/17 07:15, ben@skyportsystems.com wrote:
-> From: Igor Mammedov <imammedo@redhat.com>
-> 
-> Add commands to query Virtual Machine Generation ID counter.
-> 
-> QMP command example:
->     { "execute": "query-vm-generation-id" }
-> 
-> HMP command example:
->     info vm-generation-id
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Ben Warren <ben@skyportsystems.com>
-> ---
->  hmp-commands-info.hx | 13 +++++++++++++
->  hmp.c                |  9 +++++++++
->  hmp.h                |  1 +
->  hw/acpi/vmgenid.c    | 16 ++++++++++++++++
->  qapi-schema.json     | 20 ++++++++++++++++++++
->  stubs/Makefile.objs  |  1 +
->  stubs/vmgenid.c      |  8 ++++++++
->  7 files changed, 68 insertions(+)
->  create mode 100644 stubs/vmgenid.c
-> 
-> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-> index b0f35e6..f3df793 100644
-> --- a/hmp-commands-info.hx
-> +++ b/hmp-commands-info.hx
-> @@ -802,6 +802,19 @@ Show information about hotpluggable CPUs
->  ETEXI
->  
->  STEXI
-> +@item info vm-generation-id
+On 02/15/2017 09:26 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Hi all!
+>=20
+> What is the status of qmp commands blockdev-add and x-blockdev-del? Is
+> blockdev-add stable (it never had x- prefix)? What should be done to ge=
+t
+> rid of "x-" for x-blockdev-del?
 
-(1) Don't we need some kind of @findex here, for consistency with the
-rest of the file?
+We are still working on 'BlockdevOptions' for iscsi, rbd, and sheepdog.
+When those are done (target of 2.9), then x-blockdev-del will be renamed
+to drop the x- prefix, and blockdev-add will be considered stable.
+Meanwhile, we are also working on adding a -blockdev command line option
+that maps to the QMP command, again targetted for 2.9.
 
-> +Show Virtual Machine Generation ID
-> +ETEXI
-> +
-> +    {
-> +        .name       = "vm-generation-id",
-> +        .args_type  = "",
-> +        .params     = "",
-> +        .help       = "Show Virtual Machine Generation ID",
-> +        .cmd = hmp_info_vm_generation_id,
-> +    },
-> +
-> +STEXI
->  @end table
->  ETEXI
->  
-> diff --git a/hmp.c b/hmp.c
-> index 2bc4f06..535613d 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -2565,3 +2565,12 @@ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict)
->  
->      qapi_free_HotpluggableCPUList(saved);
->  }
-> +
-> +void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict)
-> +{
-> +    GuidInfo *info = qmp_query_vm_generation_id(NULL);
-> +    if (info) {
-> +        monitor_printf(mon, "%s\n", info->guid);
-> +    }
-> +    qapi_free_GuidInfo(info);
-> +}
-> diff --git a/hmp.h b/hmp.h
-> index 05daf7c..799fd37 100644
-> --- a/hmp.h
-> +++ b/hmp.h
-> @@ -137,5 +137,6 @@ void hmp_rocker_of_dpa_flows(Monitor *mon, const QDict *qdict);
->  void hmp_rocker_of_dpa_groups(Monitor *mon, const QDict *qdict);
->  void hmp_info_dump(Monitor *mon, const QDict *qdict);
->  void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
-> +void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
->  
->  #endif
-> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
-> index b1b7b32..c159c76 100644
-> --- a/hw/acpi/vmgenid.c
-> +++ b/hw/acpi/vmgenid.c
-> @@ -235,3 +235,19 @@ static void vmgenid_register_types(void)
->  }
->  
->  type_init(vmgenid_register_types)
-> +
-> +GuidInfo *qmp_query_vm_generation_id(Error **errp)
-> +{
-> +    GuidInfo *info;
-> +    VmGenIdState *vms;
-> +    Object *obj = find_vmgenid_dev();
-> +
-> +    if (!obj) {
-> +        return NULL;
-> +    }
-> +    vms = VMGENID(obj);
-> +
-> +    info = g_malloc0(sizeof(*info));
-> +    info->guid = qemu_uuid_unparse_strdup(&vms->guid);
-> +    return info;
-> +}
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 61151f3..5e2a47f 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -6051,3 +6051,23 @@
->  #
->  ##
->  { 'command': 'query-hotpluggable-cpus', 'returns': ['HotpluggableCPU'] }
-> +
-> +##
-> +# @GuidInfo:
-> +#
-> +# GUID information.
-> +#
-> +# @guid: the globally unique identifier
-> +#
-> +# Since: 2.9
-> +##
-> +{ 'struct': 'GuidInfo', 'data': {'guid': 'str'} }
-> +
-> +##
-> +# @query-vm-generation-id:
-> +#
-> +# Show Virtual Machine Generation ID
-> +#
-> +# Since 2.9
-> +##
-> +{ 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
-> diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-> index a187295..0bffca6 100644
-> --- a/stubs/Makefile.objs
-> +++ b/stubs/Makefile.objs
-> @@ -35,3 +35,4 @@ stub-obj-y += qmp_pc_dimm_device_list.o
->  stub-obj-y += target-monitor-defs.o
->  stub-obj-y += target-get-monitor-def.o
->  stub-obj-y += pc_madt_cpu_entry.o
-> +stub-obj-y += vmgenid.o
-> diff --git a/stubs/vmgenid.c b/stubs/vmgenid.c
-> new file mode 100644
-> index 0000000..8c448ac
-> --- /dev/null
-> +++ b/stubs/vmgenid.c
-> @@ -0,0 +1,8 @@
-> +#include "qemu/osdep.h"
-> +#include "qmp-commands.h"
-> +
-> +GuidInfo *qmp_query_vm_generation_id(Error **errp)
-> +{
-> +    error_setg(errp, "this command is not currently supported");
-> +    return NULL;
-> +}
-> 
+>=20
+> I see a lot of work on blockdev-add in the list, but x-blockdev-del
+> seems untouched about 8 moths..
 
-(2) Don't we usually employ QERR_UNSUPPORTED for the format string in
-such cases?
+Right now, x-blockdev-del is unlikely to change much, if at all; rather,
+it keeps the name to remind us that blockdev-add is still changing, so
+that we'll have a nice witness during introspection that both interfaces
+are stable based on the loss of the x- prefix.
 
-With or without updates:
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 
-Thanks
-Laszlo
+--BxlVvKU4tTFSj3wVRWxEltOksNsP9Vpf1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYpHWjAAoJEKeha0olJ0Nq/OUH/jvuUcZzEFKcpbJygeNNJCFq
+et/gHVFhDgll3o2Gxr/4O95EYsao16tGLbp6M+Mbj+LXU9ALvBPb2u1ezvG11IT0
+5FoRQ6Bkw/N/rHlyK352u2Ru1F7KeZVxxuGE6RTVy1WmUOCP93DLB4v+NyVG6MsZ
+D4xnA+q4Aab5IWNzC0JrzbdrfhAB4jYbSXJUl3fPyXi4bp+qc9O433KuekFcKLUv
+htWJPZV5aAb8jbE4bXjjqorZpbZXq07N13IoRvPF/tXd+IvJLNfFA/r5cwG/yCRI
+n1kx4RozeIt9z/PHZTCH6CdSH9kzTefL0mQBiQX4RlgmUoBECmSuiUKagAkEpmk=
+=NNhF
+-----END PGP SIGNATURE-----
+
+--BxlVvKU4tTFSj3wVRWxEltOksNsP9Vpf1--
