@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ce0Kr-0007Ik-1m
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:13:34 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ce0LX-0007dY-QL
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:14:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ce0Kl-0004vT-0N
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:13:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57004)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1ce0Kk-0004ub-Mj
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:13:26 -0500
-References: <cover.1487139038.git.ben@skyportsystems.com>
-	<9dffe31a245cf6a717eef8227fe80ca666b168b5.1487139038.git.ben@skyportsystems.com>
-	<20170215115723.77e4d9d7@nial.brq.redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <1f4a6eb2-0838-2218-88e3-4f65498a41d6@redhat.com>
-Date: Wed, 15 Feb 2017 15:13:20 +0100
+	(envelope-from <alex.bennee@linaro.org>) id 1ce0LS-0005CG-QA
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:14:15 -0500
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:37055)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ce0LS-0005Bu-H5
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:14:10 -0500
+Received: by mail-wm0-x22b.google.com with SMTP id v77so41340002wmv.0
+	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 06:14:10 -0800 (PST)
+References: <1486065742-28639-1-git-send-email-peter.maydell@linaro.org>
+	<1486065742-28639-4-git-send-email-peter.maydell@linaro.org>
+	<87mvdnvcxx.fsf@linaro.org>
+	<CAFEAcA-PFJp_9=NOCFqiQp=xF6Y-TnmE3bfU3zDa6xH7nK2Zfg@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA-PFJp_9=NOCFqiQp=xF6Y-TnmE3bfU3zDa6xH7nK2Zfg@mail.gmail.com>
+Date: Wed, 15 Feb 2017 14:14:07 +0000
+Message-ID: <87inobv8wg.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170215115723.77e4d9d7@nial.brq.redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 1/7] linker-loader: Add new 'write
- pointer' command
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 3/9] armv7m: Rewrite NVIC to not use any
+ GIC code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,212 +33,234 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, ben@skyportsystems.com
-Cc: qemu-devel@nongnu.org, mst@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Michael Davidsaver <mdavidsaver@gmail.com>, Liviu Ionescu <ilg@livius.net>
 
-Commenting under Igor's reply for simplicity
 
-On 02/15/17 11:57, Igor Mammedov wrote:
-> On Tue, 14 Feb 2017 22:15:43 -0800
-> ben@skyportsystems.com wrote:
-> 
->> From: Ben Warren <ben@skyportsystems.com>
+Peter Maydell <peter.maydell@linaro.org> writes:
+
+> On 15 February 2017 at 12:46, Alex Bennée <alex.bennee@linaro.org> wrote:
 >>
->> This is similar to the existing 'add pointer' functionality, but instead
->> of instructing the guest (BIOS or UEFI) to patch memory, it instructs
->> the guest to write the pointer back to QEMU via a writeable fw_cfg file.
+>> Peter Maydell <peter.maydell@linaro.org> writes:
 >>
->> Signed-off-by: Ben Warren <ben@skyportsystems.com>
->> ---
->>  hw/acpi/bios-linker-loader.c         | 58 ++++++++++++++++++++++++++++++++++--
->>  include/hw/acpi/bios-linker-loader.h |  6 ++++
->>  2 files changed, 61 insertions(+), 3 deletions(-)
+>>> From: Michael Davidsaver <mdavidsaver@gmail.com>
+>>>
+>>> Despite some superficial similarities of register layout, the
+>>> M-profile NVIC is really very different from the A-profile GIC.
+>>> Our current attempt to reuse the GIC code means that we have
+>>> significant bugs in our NVIC.
+>>>
+>>> Implement the NVIC as an entirely separate device, to give
+>>> us somewhere we can get the behaviour correct.
+>>>
+>>> This initial commit does not attempt to implement exception
+>>> priority escalation, since the GIC-based code didn't either.
+>>> It does fix a few bugs in passing:
+>>>  * ICSR.RETTOBASE polarity was wrong and didn't account for
+>>>    internal exceptions
+>>>  * ICSR.VECTPENDING was 16 too high if the pending exception
+>>>    was for an external interrupt
+>>>  * UsageFault, BusFault and MemFault were not disabled on reset
+>>>    as they are supposed to be
+>>>
+>>> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+>>> [PMM: reworked, various bugs and stylistic cleanups]
+>>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>>> ---
+>>>  hw/intc/armv7m_nvic.c | 721 ++++++++++++++++++++++++++++++++++++++++----------
+>>>  hw/intc/trace-events  |  15 ++
+>>>  2 files changed, 592 insertions(+), 144 deletions(-)
+>>>
+>>> diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+>>> index ce22001..e319077 100644
+>>> --- a/hw/intc/armv7m_nvic.c
+>>> +++ b/hw/intc/armv7m_nvic.c
+>>> @@ -17,48 +17,79 @@
+<snip>
+>>> +static bool nvic_rettobase(NVICState *s)
+>>> +{
+>>> +    int irq, nhand = 0;
+>>> +
+>>> +    for (irq = ARMV7M_EXCP_RESET; irq < s->num_irq; irq++) {
+>>> +        if (s->vectors[irq].active) {
 >>
->> diff --git a/hw/acpi/bios-linker-loader.c b/hw/acpi/bios-linker-loader.c
->> index d963ebe..5030cf1 100644
->> --- a/hw/acpi/bios-linker-loader.c
->> +++ b/hw/acpi/bios-linker-loader.c
->> @@ -78,6 +78,19 @@ struct BiosLinkerLoaderEntry {
->>              uint32_t length;
->>          } cksum;
->>  
->> +        /*
->> +         * COMMAND_WRITE_POINTER - write the fw_cfg file (originating from
->> +         * @dest_file) at @wr_pointer.offset, by adding a pointer to the table
->> +         * originating from @src_file. 1,2,4 or 8 byte unsigned
->> +         * addition is used depending on @wr_pointer.size.
->> +         */
+>> I would expect && !what the ISPR is reporting. However looking at the
+>> code it doesn't look like we ever report an exception in the IPSR
+>> (assuming HELPER(v7m_mrs) is the right one).
+>
+> See xpsr_read() in target/arm/cpu.h -- we report
+> v7m.exception in the IPSR bits.
 
-The words "adding" and "addition" are causing confusion here.
+So depending on your re-reading of the latest spec should we we count
+s->vectors[irq].active && s->vect_pending != irq?
 
-In all of the previous discussion, *addition* was out of scope from
-WRITE_POINTER. Again, the firmware is specifically not required to
-*read* any part of the fw_cfg blob identified by "dest_file".
+>
+>>> +            nhand++;
+>>> +            if (nhand == 2) {
+>>> +                break;
+>>> +            }
+>>> +        }
+>>> +    }
+>>> +
+>>> +    return nhand == 1;
+>>> +}
+>>> +
+>>> +/* Return the value of the ISCR ISRPENDING bit:
+>>> + * 1 if an external interrupt is pending
+>>> + * 0 if no external interrupt is pending
+>>> + */
+>>> +static bool nvic_isrpending(NVICState *s)
+>>> +{
+>>> +    int irq;
+>>> +
+>>> +    /* We can shortcut if the highest priority pending interrupt
+>>> +     * happens to be external or if there is nothing pending.
+>>> +     */
+>>> +    if (s->vectpending > NVIC_FIRST_IRQ) {
+>>> +        return true;
+>>> +    }
+>>> +    if (s->vectpending == 0) {
+>>> +        return false;
+>>> +    }
+>>> +
+>>> +    for (irq = NVIC_FIRST_IRQ; irq < s->num_irq; irq++) {
+>>
+>> Should NVIC_FIRST_IRQ be renamed to NVIC_FIRST_EXTERNAL_IRQ?
+>
+> The internal ones aren't IRQs, they're exceptions.
+> The terminology is a bit confusing, though.
 
-WRITE_POINTER instructs the firmware to return the allocation address of
-the downloaded "src_file" to QEMU. Any necessary runtime subscripting
-within "src_file" is to be handled by QEMU code dynamically.
+Ahh ok. Maybe just a comment to that effect by the define?
 
-For example, consider that "src_file" has *several* fields that QEMU
-wants to massage; in that case, indexing within QEMU code with field
-offsets is simply unavoidable.
+>
+>>> +        if (s->vectors[irq].pending) {
+>>> +            return true;
+>>> +        }
+>>> +    }
+>>> +    return false;
+>>> +}
+>>> +
+>>> +/* Return a mask word which clears the subpriority bits from
+>>> + * a priority value for an M-profile exception, leaving only
+>>> + * the group priority.
+>>> + */
+>>> +static inline uint32_t nvic_gprio_mask(NVICState *s)
+>>> +{
+>>> +    return ~0U << (s->prigroup + 1);
+>>
+>> I wonder if it is worth adding MAKE_32BIT_MASK to bitops.h?
+>
+> MAKE_64BIT_MASK would work here too. This is the same way
+> arm_gicv3_cpuif.c writes it, though.
+>
+>>> +/* caller must call nvic_irq_update() after this */
+>>> +static void set_prio(NVICState *s, unsigned irq, uint8_t prio)
+>>> +{
+>>> +    assert(irq > ARMV7M_EXCP_NMI); /* only use for configurable prios */
+>>> +    assert(irq < s->num_irq);
+>>> +
+>>> +    s->vectors[irq].prio = prio;
+>>
+>> So this means the negative priorities are hardwired parts of the NVIC
+>> for NMI/RESET? Maybe we should make that clearer in the comment for
+>> VecInfo.
+>
+> Sure. (Yes, the priorities for NMI and HardFault are architecturally
+> hardwired. I suspect that in hardware they are not in fact represented
+> as negative numbers :-))
+>
+>>>  /* Make pending IRQ active.  */
+>>>  int armv7m_nvic_acknowledge_irq(void *opaque)
+>>>  {
+>>>      NVICState *s = (NVICState *)opaque;
+>>> -    uint32_t irq;
+>>> -
+>>> -    irq = gic_acknowledge_irq(&s->gic, 0, MEMTXATTRS_UNSPECIFIED);
+>>> -    if (irq == 1023)
+>>> -        hw_error("Interrupt but no vector\n");
+>>> -    if (irq >= 32)
+>>> -        irq -= 16;
+>>> -    return irq;
+>>> +    CPUARMState *env = &s->cpu->env;
+>>> +    const int pending = s->vectpending;
+>>> +    const int running = nvic_exec_prio(s);
+>>> +    int pendgroupprio;
+>>> +    VecInfo *vec;
+>>> +
+>>> +    assert(pending > ARMV7M_EXCP_RESET && pending < s->num_irq);
+>>> +
+>>> +    vec = &s->vectors[pending];
+>>> +
+>>> +    assert(vec->enabled);
+>>> +    assert(vec->pending);
+>>> +
+>>> +    pendgroupprio = vec->prio & nvic_gprio_mask(s);
+>>> +    assert(pendgroupprio < running);
+>>
+>> I'm all for asserts to declare what the API is expecting. These are
+>> starting to look like being unsure of the nvic being in the correct
+>> state. Are they left over from debugging?
+>
+> They're mostly left over from Michael's code where I didn't
+> see any reason to specifically delete them. For this particular
+> assert the situation is quite complicated -- we know the
+> pending priority must be such that we can take this
+> exception, but that is only true because the code
+> in target/arm is required to only try to acknowledge
+> (take) the exception if the priority permits it,
+> which in turn is the result of a combination of the
+> conditions that the NVIC applies to decide whether to
+> assert the interrupt line and the conditions applied
+> in arm_v7m_cpu_exec_interrupt() to decide whether to
+> call the CPU do_interrupt hook. That's quite a lot of
+> moving parts which need to all agree, which I think makes
+> an assert() justified.
 
-(1) So, the above looks correct, but please replace "adding" with
-"storing", and "unsigned addition" with "store".
+I guess it would be easier to remove the asserts if we had run test
+cases that explicitly exercised all this code. What are you currently
+running to test this code?
 
-Side point: the case for ADD_POINTER is different; there we patch
-several individual ACPI objects. The fact that I requested explicit
-addition within the ADDR method, as opposed to pre-setting VGIA to a
-nonzero offset, is an *incidental* limitation (coming from the OVMF ACPI
-SDT header probe suppressor), and we'll likely fix that up later, with
-ALLOCATE command hints or something like that. However, in
-WRITE_POINTER, asking for the exact allocation address of "src_file" is
-an *inherent* characteristic.
+>
+>>> @@ -428,28 +713,81 @@ static uint64_t nvic_sysreg_read(void *opaque, hwaddr addr,
+>>>  {
+>>>      NVICState *s = (NVICState *)opaque;
+>>>      uint32_t offset = addr;
+>>> -    int i;
+>>> +    unsigned i, end;
+>>>      uint32_t val;
+>>>
+>>>      switch (offset) {
+>>> +    /* reads of set and clear both return the status */
+>>> +    case 0x100 ... 0x13f: /* NVIC Set enable */
+>>> +        offset += 0x80;
+>>> +        /* fall through */
+>>> +    case 0x180 ... 0x1bf: /* NVIC Clear enable */
+>>> +        val = 0;
+>>> +        offset = offset - 0x180 + NVIC_FIRST_IRQ; /* vector # */
+>>
+>> Can we not calculate a vector index rather than abusing the meaning of
+>> offset while switching on it?
+>
+> Yeah, we could. (This is just a case where I thought "I could
+> rewrite the code Michael did initially, but it doesn't quite
+> reach my threshold for doing that just because it's not the
+> way I'd have written it.".)
+>
+>
+>>> +    /* include space for internal exception vectors */
+>>> +    s->num_irq += NVIC_FIRST_IRQ;
+>>> +
+>>> +    /* The NVIC and system controller register area starts at 0xe000e000
+>>> +     * and looks like this:
+>>
+>> s/system controller register area/System Control Space (SCS)/ to make it
+>> easier to find in the ARM ARM.
+>
+> OK.
+>
+> thanks
+> -- PMM
 
-For reference, this is the command's description from the (not as yet
-posted) OVMF series:
 
-// QemuLoaderCmdWritePointer: the bytes at
-// [PointerOffset..PointerOffset+PointerSize) in the writeable fw_cfg
-// file PointerFile are to receive the absolute address of PointeeFile,
-// as allocated and downloaded by the firmware. Store the base address
-// of where PointeeFile's contents have been placed (when
-// QemuLoaderCmdAllocate has been executed for PointeeFile) to this
-// portion of PointerFile.
-//
-// This command is similar to QemuLoaderCmdAddPointer; the difference is
-// that the "pointer to patch" does not exist in guest-physical address
-// space, only in "fw_cfg file space". In addition, the "pointer to
-// patch" is not initialized by QEMU with a possibly nonzero offset
-// value: the base address of the memory allocated for downloading
-// PointeeFile shall not increment the pointer, but overwrite it.
-
-In the last SeaBIOS patch series, namely
-
-[SeaBIOS] [PATCH v3 2/2] QEMU fw_cfg: Add command to write back address
-                         of file
-
-function romfile_loader_write_pointer() implemented just that plain
-store (not an addition), and that was exactly right.
-
-Continuing:
-
->> +        struct {
->> +            char dest_file[BIOS_LINKER_LOADER_FILESZ];
->> +            char src_file[BIOS_LINKER_LOADER_FILESZ];
->> +            uint32_t offset;
->> +            uint8_t size;
->> +        } wr_pointer;
->> +
->>          /* padding */
->>          char pad[124];
->>      };
->> @@ -85,9 +98,10 @@ struct BiosLinkerLoaderEntry {
->>  typedef struct BiosLinkerLoaderEntry BiosLinkerLoaderEntry;
->>  
->>  enum {
->> -    BIOS_LINKER_LOADER_COMMAND_ALLOCATE     = 0x1,
->> -    BIOS_LINKER_LOADER_COMMAND_ADD_POINTER  = 0x2,
->> -    BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM = 0x3,
->> +    BIOS_LINKER_LOADER_COMMAND_ALLOCATE          = 0x1,
->> +    BIOS_LINKER_LOADER_COMMAND_ADD_POINTER       = 0x2,
->> +    BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM      = 0x3,
->> +    BIOS_LINKER_LOADER_COMMAND_WRITE_POINTER     = 0x4,
->>  };
->>  
->>  enum {
->> @@ -278,3 +292,41 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
->>  
->>      g_array_append_vals(linker->cmd_blob, &entry, sizeof entry);
->>  }
->> +
->> +/*
->> + * bios_linker_loader_write_pointer: ask guest to write a pointer to the
->> + * source file into the destination file, and write it back to QEMU via
->> + * fw_cfg DMA.
->> + *
->> + * @linker: linker object instance
->> + * @dest_file: destination file that must be written
->> + * @dst_patched_offset: location within destination file blob to be patched
->> + *                      with the pointer to @src_file, in bytes
->> + * @dst_patched_offset_size: size of the pointer to be patched
->> + *                      at @dst_patched_offset in @dest_file blob, in bytes
->> + * @src_file: source file who's address must be taken
->> + */
->> +void bios_linker_loader_write_pointer(BIOSLinker *linker,
->> +                                    const char *dest_file,
->> +                                    uint32_t dst_patched_offset,
->> +                                    uint8_t dst_patched_size,
->> +                                    const char *src_file)
-> API is missing "src_offset" even though it's not used in this series,
-> a patch on top to fix it up is ok for me as far as Seabios/OVMF
-> counterpart can handle src_offset correctly from starters.
-
-According to the above, it is the right thing not to add "src_offset"
-here. The documentation on the command is slightly incorrect (and causes
-confusion), but the helper function's signature and comments are okay.
-
-> 
->> +{
->> +    BiosLinkerLoaderEntry entry;
->> +    const BiosLinkerFileEntry *source_file =
->> +        bios_linker_find_file(linker, src_file);
->> +
->> +    assert(source_file);
-
-I wish we kept the following asserts from bios_linker_loader_add_pointer():
-
-    assert(dst_patched_offset < dst_file->blob->len);
-    assert(dst_patched_offset + dst_patched_size <= dst_file->blob->len);
-
-Namely, just because the dst_file is never supposed to be downloaded by
-the firmware, it still remains a requirement that the "dst file offset
-range" that is to be rewritten *do fall* within the dst file.
-
-Nonetheless, this is not critical. (OVMF at least verifies it anyway.)
-
-Summary (from my side anyway): I feel that the documentation of the new
-command is very important. Please fix it up as suggested under (1), in
-v7. Regarding the asserts, I'll let you decide.
-
-With the documentation fixed up:
-
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-
-(If you don't wish to post a v7, I'm also completely fine if Michael or
-someone else fixes up the docs as proposed in (1), before committing the
-patch.)
-
-Thanks!
-Laszlo
-
->> +    memset(&entry, 0, sizeof entry);
->> +    strncpy(entry.wr_pointer.dest_file, dest_file,
->> +            sizeof entry.wr_pointer.dest_file - 1);
->> +    strncpy(entry.wr_pointer.src_file, src_file,
->> +            sizeof entry.wr_pointer.src_file - 1);
->> +    entry.command = cpu_to_le32(BIOS_LINKER_LOADER_COMMAND_WRITE_POINTER);
->> +    entry.wr_pointer.offset = cpu_to_le32(dst_patched_offset);
->> +    entry.wr_pointer.size = dst_patched_size;
->> +    assert(dst_patched_size == 1 || dst_patched_size == 2 ||
->> +           dst_patched_size == 4 || dst_patched_size == 8);
->> +
->> +    g_array_append_vals(linker->cmd_blob, &entry, sizeof entry);
->> +}
->> diff --git a/include/hw/acpi/bios-linker-loader.h b/include/hw/acpi/bios-linker-loader.h
->> index fa1e5d1..f9ba5d6 100644
->> --- a/include/hw/acpi/bios-linker-loader.h
->> +++ b/include/hw/acpi/bios-linker-loader.h
->> @@ -26,5 +26,11 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
->>                                      const char *src_file,
->>                                      uint32_t src_offset);
->>  
->> +void bios_linker_loader_write_pointer(BIOSLinker *linker,
->> +                                      const char *dest_file,
->> +                                      uint32_t dst_patched_offset,
->> +                                      uint8_t dst_patched_size,
->> +                                      const char *src_file);
->> +
->>  void bios_linker_loader_cleanup(BIOSLinker *linker);
->>  #endif
-> 
+--
+Alex Bennée
