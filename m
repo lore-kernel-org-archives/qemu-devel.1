@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ce0uS-0000CN-QV
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:50:26 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ce0vG-0000hG-BC
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:51:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ce0uR-0004AW-Qe
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:50:20 -0500
-References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
-	<20170203154757.36140-6-vsementsov@virtuozzo.com>
-	<e69c4f0f-ca4f-f3fd-18e4-3db9adb94021@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <6158196a-7bf4-d9e1-b66e-9cf8e734f159@redhat.com>
-Date: Wed, 15 Feb 2017 08:50:05 -0600
+	(envelope-from <alex.bennee@linaro.org>) id 1ce0vC-0004ZW-Ei
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:51:10 -0500
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:33734)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ce0vC-0004ZA-7J
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:51:06 -0500
+Received: by mail-wr0-x232.google.com with SMTP id i10so192777759wrb.0
+	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 06:51:06 -0800 (PST)
+References: <1486065742-28639-1-git-send-email-peter.maydell@linaro.org>
+	<1486065742-28639-4-git-send-email-peter.maydell@linaro.org>
+	<87mvdnvcxx.fsf@linaro.org>
+	<CAFEAcA-PFJp_9=NOCFqiQp=xF6Y-TnmE3bfU3zDa6xH7nK2Zfg@mail.gmail.com>
+	<87inobv8wg.fsf@linaro.org>
+	<CAFEAcA-6QnqGby3gOTgfo=H3SBWYYztmA7b0iEri9D-Q-LUAzQ@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA-6QnqGby3gOTgfo=H3SBWYYztmA7b0iEri9D-Q-LUAzQ@mail.gmail.com>
+Date: Wed, 15 Feb 2017 14:51:03 +0000
+Message-ID: <87bmu3v76w.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <e69c4f0f-ca4f-f3fd-18e4-3db9adb94021@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="xorau0TQuQUI6nkKI6agw2bFNL0rU8naW"
-Subject: Re: [Qemu-devel] [PATCH 05/18] nbd/client: fix drop_sync
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 3/9] armv7m: Rewrite NVIC to not use any
+ GIC code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,89 +35,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, den@virtuozzo.com, qemu-stable <qemu-stable@nongnu.org>, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, jsnow@redhat.com
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---xorau0TQuQUI6nkKI6agw2bFNL0rU8naW
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, den@virtuozzo.com,
- qemu-stable <qemu-stable@nongnu.org>, armbru@redhat.com, mreitz@redhat.com,
- stefanha@redhat.com, pbonzini@redhat.com, jsnow@redhat.com
-Message-ID: <6158196a-7bf4-d9e1-b66e-9cf8e734f159@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 05/18] nbd/client: fix drop_sync
-References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
- <20170203154757.36140-6-vsementsov@virtuozzo.com>
- <e69c4f0f-ca4f-f3fd-18e4-3db9adb94021@redhat.com>
-In-Reply-To: <e69c4f0f-ca4f-f3fd-18e4-3db9adb94021@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 02/06/2017 05:17 PM, Eric Blake wrote:
-> On 02/03/2017 09:47 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Comparison symbol is misused. It may lead to memory corruption.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>=
-
->> ---
->>  nbd/client.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> Adding qemu-stable; this needs to be back-ported, and can be applied
-> independently from your series.
->=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-For the record, this is now assigned CVE-2017-2630.  My apologies for
-introducing the bug in the first place (commit 7d3123e).  The maintainer
-may want to touch up the commit message to give those further details,
-since it is security-related.
-
->=20
->>
->> diff --git a/nbd/client.c b/nbd/client.c
->> index 6caf6bda6d..351731bc63 100644
->> --- a/nbd/client.c
->> +++ b/nbd/client.c
->> @@ -94,7 +94,7 @@ static ssize_t drop_sync(QIOChannel *ioc, size_t siz=
-e)
->>      char small[1024];
->>      char *buffer;
->> =20
->> -    buffer =3D sizeof(small) < size ? small : g_malloc(MIN(65536, siz=
-e));
->> +    buffer =3D sizeof(small) > size ? small : g_malloc(MIN(65536, siz=
-e));
->>      while (size > 0) {
->>          ssize_t count =3D read_sync(ioc, buffer, MIN(65536, size));
->> =20
->>
->=20
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Michael Davidsaver <mdavidsaver@gmail.com>, Liviu Ionescu <ilg@livius.net>
 
 
---xorau0TQuQUI6nkKI6agw2bFNL0rU8naW
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Peter Maydell <peter.maydell@linaro.org> writes:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+> On 15 February 2017 at 14:14, Alex Bennée <alex.bennee@linaro.org> wrote:
+>> I guess it would be easier to remove the asserts if we had run test
+>> cases that explicitly exercised all this code. What are you currently
+>> running to test this code?
+>
+> The cover letter has a pointer to the tests I've been using
+> (plus the usual "run a random stellaris image").
 
-iQEcBAEBCAAGBQJYpGqdAAoJEKeha0olJ0NqSLsH/RAYXMm+PLDAUYLv6bSzlQH3
-aen/ect1ipAcSDfKkjeh5/p8AJNXBmivr6iu2RB9KuRtIVCNPK9x68wnCh+PFH+p
-SemQbEe3tNUUU0cpohZiwdRzxdIurUy+nqiu7QT6+kQbtsdbFAsxDIbiSEsuK1Oh
-dBu/ITyehze8GjbwPiWb1X5ooODHRWqv693jMu9BSjWyYFtD0W6AgDQlnSqhCsQo
-+UkKWjib7TMSPf1/E5ruWWAA2SAb0tMjKPUqA0LuwvvSt8r6DM26/M+pcQ1TL4gw
-hYtSneQKz8nPLSycZ75YzXKB7FblT+boIA3eO5+/seFzrCJ58mnFE6JFo/p9Scg=
-=dYe+
------END PGP SIGNATURE-----
+Doh, teach me for not reading that. I shall snarf them now ;-)
 
---xorau0TQuQUI6nkKI6agw2bFNL0rU8naW--
+>
+> I think the benefit of the asserts is in warding off future
+> bugs; so I think they're worth keeping where we know something
+> should never happen but the code is complicated enough that
+> perhaps a future patch might put things in a state where the
+> impossible does happen.
+>
+> Also, number of assert()s is to some extent a coding style
+> issue, and in this patchset I'm really taking Michael's code
+> and doing a review/cleanup pass on it, so I've tried not to
+> do too much rework of the "well I wouldn't have put quite this
+> many asserts in" flavour.
+
+Sure no problem.
+
+>
+> thanks
+> -- PMM
+
+
+--
+Alex Bennée
