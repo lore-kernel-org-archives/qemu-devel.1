@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ce1Hn-0007Ao-8W
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 10:14:28 -0500
+	(envelope-from <yvugenfi@redhat.com>) id 1ce1Iq-000820-M1
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 10:15:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ce1Hk-0008JZ-2I
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 10:14:27 -0500
-Date: Wed, 15 Feb 2017 15:14:19 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170215151419.GD16064@stefanha-x1.localdomain>
-References: <CAJ1JNOd5cZ3RWUAkY=uo7+wwSwQrBWrN6GF_QZFjdVfx49VtGQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="GpGaEY17fSl8rd50"
-Content-Disposition: inline
-In-Reply-To: <CAJ1JNOd5cZ3RWUAkY=uo7+wwSwQrBWrN6GF_QZFjdVfx49VtGQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] Estimation of qcow2 image size converted from raw
- image
+	(envelope-from <yvugenfi@redhat.com>) id 1ce1In-0008WV-Hi
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 10:15:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36138)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yvugenfi@redhat.com>) id 1ce1In-0008WD-BQ
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 10:15:29 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B4B8D3DBFC
+	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 15:15:28 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+From: Yan Vugenfirer <yvugenfi@redhat.com>
+In-Reply-To: <173cba42-5390-0e16-71a3-3eadcd3ef654@redhat.com>
+Date: Wed, 15 Feb 2017 17:15:23 +0200
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <9657908C-A71B-424E-BBFD-E4A8EEF1C178@redhat.com>
+References: <06BE8A21-A1E9-4264-BD02-04A566748633@redhat.com>
+	<173cba42-5390-0e16-71a3-3eadcd3ef654@redhat.com>
+Subject: Re: [Qemu-devel] VirtIO Windows Driver repository
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,71 +33,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maor Lipchuk <mlipchuk@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-discuss@nongnu.org, Nir Soffer <nsoffer@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Allon Mureinik <amureini@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Cole Robinson <crobinso@redhat.com>
 
 
---GpGaEY17fSl8rd50
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Feb 13, 2017 at 05:46:19PM +0200, Maor Lipchuk wrote:
-> I was wondering if that is possible to provide a new API that
-> estimates the size of
-> qcow2 image converted from a raw image. We could use this new API to
-> allocate the
-> size more precisely before the convert operation.
+> On 14 Feb 2017, at 16:08, Laszlo Ersek <lersek@redhat.com> wrote:
 >=20
-[...]
-> We think that the best way to solve this issue is to return this info
-> from qemu-img, maybe as a flag to qemu-img convert that will
-> calculate the size of the converted image without doing any writes.
+> On 02/14/17 13:40, Yan Vugenfirer wrote:
+>> Hello All,
+>>=20
+>> The official upstream repository moved from
+>> https://github.com/YanVugenfirer/kvm-guest-drivers-windows to
+>> https://github.com/virtio-win/kvm-guest-drivers-windows
+>>=20
+>> Best regards, Yan Vugenfirer.
+>=20
+> Thanks! I've updated the corresponding reference under
+> <https://fedoraproject.org/wiki/Windows_Virtio_Drivers#Links>.
 
-Sounds reasonable.  qcow2 actually already does some of this calculation
-internally for image preallocation in qcow2_create2().
+Thanks!
 
-Let's try this syntax:
+Do you know who can make a change on =
+http://www.linux-kvm.org/page/WindowsGuestDrivers/Repository ?
 
-  $ qemu-img query-max-size -f raw -O qcow2 input.raw
-  1234678000
+Best regards,
+Yan.
 
-As John explained, it is only an estimate.  But it will be a
-conservative maximum.
-
-Internally BlockDriver needs a new interface:
-
-struct BlockDriver {
-    /*
-     * Return a conservative estimate of the maximum host file size
-     * required by a new image given an existing BlockDriverState (not
-     * necessarily opened with this BlockDriver).
-     */
-    uint64_t (*bdrv_query_max_size)(BlockDriverState *other_bs,
-                                    Error **errp);
-};
-
-This interface allows individual block drivers to probe other_bs in
-whatever way necessary (e.g. querying block allocation status).
-
-Since this is a conservative max estimate there's no need to read all
-data to check for zero regions.  We should give the best estimate that
-can be generated quickly.
-
-Stefan
-
---GpGaEY17fSl8rd50
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYpHBLAAoJEJykq7OBq3PIPWMH/iTCg4lFEI95aoJrFGZ5vXr3
-TVO3p/zZWTql3vwt0fPpu5nJAhIHLA6TjdaxSs5Gi6kVkzA6i7XDIEnSX+SKWTbo
-g4si/IztpcXTEwOy3BXlD8YWsl3KmnU9L9yftzqProGAzkK3Uf5W4o+IF86PfOki
-MwhYa07PHFmniNl7E2w+0tJgBhK6RPj9zZw4A7RqP+Eo70QKNR0R8cmaS/s4BQH8
-lsPBbvno3z+j106oyiztshT/5+LsGoa7UoFC/Owg2QnKtgY6FwRNg29LxS+Z0/AD
-BK95U0m9L4naacUqkhO8oBqKLVK+zymNDHMVbA9zUSOY2tx/0OdnAE1+/nXMC0c=
-=3ySC
------END PGP SIGNATURE-----
-
---GpGaEY17fSl8rd50--
+>=20
+> Cheers
+> Laszlo
+>=20
