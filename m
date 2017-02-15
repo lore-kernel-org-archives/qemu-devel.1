@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ce0qd-0006Ul-UG
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:46:25 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ce0sX-0007ZC-SF
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:48:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ce0qa-0002Ff-5E
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:46:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43576)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ce0qZ-0002FW-S3
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:46:20 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D57473DBD9
-	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 14:46:19 +0000 (UTC)
-Date: Wed, 15 Feb 2017 14:46:15 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170215144614.GA2410@work-vm>
-References: <1485207141-1941-1-git-send-email-quintela@redhat.com>
-	<1485207141-1941-10-git-send-email-quintela@redhat.com>
-	<20170213173520.GK12387@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1ce0sW-00034y-S9
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:48:21 -0500
+References: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
+	<1487006583-24350-4-git-send-email-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <6c464b4f-38ef-778c-637c-261a9691d814@redhat.com>
+Date: Wed, 15 Feb 2017 15:48:10 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170213173520.GK12387@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 09/17] migration: Start of multiple fd work
+In-Reply-To: <1487006583-24350-4-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="VuVjB84IBT0kSaGnRDFlnK4HJVH24FGaI"
+Subject: Re: [Qemu-devel] [RFC PATCH 03/41] block: Add Error argument to
+ bdrv_attach_child()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,311 +25,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-* Daniel P. Berrange (berrange@redhat.com) wrote:
-> On Mon, Jan 23, 2017 at 10:32:13PM +0100, Juan Quintela wrote:
-> > We create new channels for each new thread created. We only send through
-> > them a character to be sure that we are creating the channels in the
-> > right order.
-> > 
-> > Note: Reference count/freeing of channels is not done
-> > 
-> > Signed-off-by: Juan Quintela <quintela@redhat.com>
-> > ---
-> >  include/migration/migration.h |  6 +++++
-> >  migration/ram.c               | 45 +++++++++++++++++++++++++++++++++-
-> >  migration/socket.c            | 56 +++++++++++++++++++++++++++++++++++++++++--
-> 
-> BTW, right now libvirt never uses QEMU's tcp: protocol - it does everything
-> with the fd: protocol.  So either we need multi-fd support for fd: protocol,
-> or libvirt needs to switch to use tcp:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--VuVjB84IBT0kSaGnRDFlnK4HJVH24FGaI
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+Message-ID: <6c464b4f-38ef-778c-637c-261a9691d814@redhat.com>
+Subject: Re: [RFC PATCH 03/41] block: Add Error argument to
+ bdrv_attach_child()
+References: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
+ <1487006583-24350-4-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1487006583-24350-4-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-I thought using fd was safer than tcp: because of the race when something else
-could listen on the proposed port on the incoming side between the point of libvirt
-picking the port number and qemu starting.
+On 13.02.2017 18:22, Kevin Wolf wrote:
+> It will have to return an error soon, so prepare the callers for it.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block.c               | 13 ++++++++++---
+>  block/quorum.c        |  8 +++++++-
+>  include/block/block.h |  3 ++-
+>  3 files changed, 19 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/block.c b/block.c
+> index 0618f4b..9895aaf 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -1323,7 +1323,8 @@ BdrvChild *bdrv_root_attach_child(BlockDriverStat=
+e *child_bs,
+>  BdrvChild *bdrv_attach_child(BlockDriverState *parent_bs,
+>                               BlockDriverState *child_bs,
+>                               const char *child_name,
+> -                             const BdrvChildRole *child_role)
+> +                             const BdrvChildRole *child_role,
+> +                             Error **errp)
+>  {
+>      BdrvChild *child =3D bdrv_root_attach_child(child_bs, child_name, =
+child_role,
+>                                                parent_bs);
+> @@ -1424,7 +1425,9 @@ void bdrv_set_backing_hd(BlockDriverState *bs, Bl=
+ockDriverState *backing_hd)
+>          bs->backing =3D NULL;
+>          goto out;
+>      }
+> -    bs->backing =3D bdrv_attach_child(bs, backing_hd, "backing", &chil=
+d_backing);
+> +    /* FIXME Error handling */
+> +    bs->backing =3D bdrv_attach_child(bs, backing_hd, "backing", &chil=
+d_backing,
+> +                                    &error_abort);
 
-> In fact, having said that, we're going to have to switch to use  the tcp:
-> protocol anyway in order to support TLS, so this is just another good
-> reason for the switch.
+Not sure if this counts as "prepare the callers for it". ;-)
 
-I thought you had a way of allowing fd to work for TLS?
+>      bs->open_flags &=3D ~BDRV_O_NO_BACKING;
+>      pstrcpy(bs->backing_file, sizeof(bs->backing_file), backing_hd->fi=
+lename);
+>      pstrcpy(bs->backing_format, sizeof(bs->backing_format),
+> @@ -1594,7 +1597,11 @@ BdrvChild *bdrv_open_child(const char *filename,=
 
-Dave
+>          goto done;
+>      }
+> =20
+> -    c =3D bdrv_attach_child(parent, bs, bdref_key, child_role);
+> +    c =3D bdrv_attach_child(parent, bs, bdref_key, child_role, errp);
+> +    if (!c) {
+> +        bdrv_unref(bs);
+> +        goto done;
+> +    }
+> =20
+>  done:
+>      qdict_del(options, bdref_key);
+> diff --git a/block/quorum.c b/block/quorum.c
+> index 86e2072..45bf010 100644
+> --- a/block/quorum.c
+> +++ b/block/quorum.c
+> @@ -1032,10 +1032,16 @@ static void quorum_add_child(BlockDriverState *=
+bs, BlockDriverState *child_bs,
+> =20
+>      /* We can safely add the child now */
+>      bdrv_ref(child_bs);
+> -    child =3D bdrv_attach_child(bs, child_bs, indexstr, &child_format)=
+;
+> +
+> +    child =3D bdrv_attach_child(bs, child_bs, indexstr, &child_format,=
+ errp);
+> +    if (child =3D=3D NULL) {
+> +        bdrv_unref(child_bs);
+> +        goto out;
 
-> 
-> We avoided tcp: in the past because QEMU was incapable of reporting error
-> messages when the connection failed. That's fixed since
-> 
->   commit d59ce6f34434bf47a9b26138c908650bf9a24be1
->   Author: Daniel P. Berrange <berrange@redhat.com>
->   Date:   Wed Apr 27 11:05:00 2016 +0100
-> 
->     migration: add reporting of errors for outgoing migration
-> 
-> so libvirt should be ok to use tcp: now.
-> 
-> >  3 files changed, 104 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/include/migration/migration.h b/include/migration/migration.h
-> > index f119ba0..3989bd6 100644
-> > --- a/include/migration/migration.h
-> > +++ b/include/migration/migration.h
-> > @@ -22,6 +22,7 @@
-> >  #include "qapi-types.h"
-> >  #include "exec/cpu-common.h"
-> >  #include "qemu/coroutine_int.h"
-> > +#include "io/channel.h"
-> > 
-> >  #define QEMU_VM_FILE_MAGIC           0x5145564d
-> >  #define QEMU_VM_FILE_VERSION_COMPAT  0x00000002
-> > @@ -218,6 +219,11 @@ void tcp_start_incoming_migration(const char *host_port, Error **errp);
-> > 
-> >  void tcp_start_outgoing_migration(MigrationState *s, const char *host_port, Error **errp);
-> > 
-> > +QIOChannel *socket_recv_channel_create(void);
-> > +int socket_recv_channel_destroy(QIOChannel *recv);
-> > +QIOChannel *socket_send_channel_create(void);
-> > +int socket_send_channel_destroy(QIOChannel *send);
-> > +
-> >  void unix_start_incoming_migration(const char *path, Error **errp);
-> > 
-> >  void unix_start_outgoing_migration(MigrationState *s, const char *path, Error **errp);
-> > diff --git a/migration/ram.c b/migration/ram.c
-> > index 939f364..5ad7cb3 100644
-> > --- a/migration/ram.c
-> > +++ b/migration/ram.c
-> > @@ -386,9 +386,11 @@ void migrate_compress_threads_create(void)
-> > 
-> >  struct MultiFDSendParams {
-> >      QemuThread thread;
-> > +    QIOChannel *c;
-> >      QemuCond cond;
-> >      QemuMutex mutex;
-> >      bool quit;
-> > +    bool started;
-> >  };
-> >  typedef struct MultiFDSendParams MultiFDSendParams;
-> > 
-> > @@ -397,6 +399,13 @@ static MultiFDSendParams *multifd_send;
-> >  static void *multifd_send_thread(void *opaque)
-> >  {
-> >      MultiFDSendParams *params = opaque;
-> > +    char start = 's';
-> > +
-> > +    qio_channel_write(params->c, &start, 1, &error_abort);
-> > +    qemu_mutex_lock(&params->mutex);
-> > +    params->started = true;
-> > +    qemu_cond_signal(&params->cond);
-> > +    qemu_mutex_unlock(&params->mutex);
-> > 
-> >      qemu_mutex_lock(&params->mutex);
-> >      while (!params->quit){
-> > @@ -433,6 +442,7 @@ void migrate_multifd_send_threads_join(void)
-> >          qemu_thread_join(&multifd_send[i].thread);
-> >          qemu_mutex_destroy(&multifd_send[i].mutex);
-> >          qemu_cond_destroy(&multifd_send[i].cond);
-> > +        socket_send_channel_destroy(multifd_send[i].c);
-> >      }
-> >      g_free(multifd_send);
-> >      multifd_send = NULL;
-> > @@ -452,18 +462,31 @@ void migrate_multifd_send_threads_create(void)
-> >          qemu_mutex_init(&multifd_send[i].mutex);
-> >          qemu_cond_init(&multifd_send[i].cond);
-> >          multifd_send[i].quit = false;
-> > +        multifd_send[i].started = false;
-> > +        multifd_send[i].c = socket_send_channel_create();
-> > +        if(!multifd_send[i].c) {
-> > +            error_report("Error creating a send channel");
-> > +            exit(0);
-> > +        }
-> >          snprintf(thread_name, 15, "multifd_send_%d", i);
-> >          qemu_thread_create(&multifd_send[i].thread, thread_name,
-> >                             multifd_send_thread, &multifd_send[i],
-> >                             QEMU_THREAD_JOINABLE);
-> > +        qemu_mutex_lock(&multifd_send[i].mutex);
-> > +        while (!multifd_send[i].started) {
-> > +            qemu_cond_wait(&multifd_send[i].cond, &multifd_send[i].mutex);
-> > +        }
-> > +        qemu_mutex_unlock(&multifd_send[i].mutex);
-> >      }
-> >  }
-> > 
-> >  struct MultiFDRecvParams {
-> >      QemuThread thread;
-> > +    QIOChannel *c;
-> >      QemuCond cond;
-> >      QemuMutex mutex;
-> >      bool quit;
-> > +    bool started;
-> >  };
-> >  typedef struct MultiFDRecvParams MultiFDRecvParams;
-> > 
-> > @@ -472,7 +495,14 @@ static MultiFDRecvParams *multifd_recv;
-> >  static void *multifd_recv_thread(void *opaque)
-> >  {
-> >      MultiFDRecvParams *params = opaque;
-> > - 
-> > +    char start;
-> > +
-> > +    qio_channel_read(params->c, &start, 1, &error_abort);
-> > +    qemu_mutex_lock(&params->mutex);
-> > +    params->started = true;
-> > +    qemu_cond_signal(&params->cond);
-> > +    qemu_mutex_unlock(&params->mutex);
-> > +
-> >      qemu_mutex_lock(&params->mutex);
-> >      while (!params->quit){
-> >          qemu_cond_wait(&params->cond, &params->mutex);
-> > @@ -508,6 +538,7 @@ void migrate_multifd_recv_threads_join(void)
-> >          qemu_thread_join(&multifd_recv[i].thread);
-> >          qemu_mutex_destroy(&multifd_recv[i].mutex);
-> >          qemu_cond_destroy(&multifd_recv[i].cond);
-> > +        socket_send_channel_destroy(multifd_recv[i].c);
-> >      }
-> >      g_free(multifd_recv);
-> >      multifd_recv = NULL;
-> > @@ -526,9 +557,21 @@ void migrate_multifd_recv_threads_create(void)
-> >          qemu_mutex_init(&multifd_recv[i].mutex);
-> >          qemu_cond_init(&multifd_recv[i].cond);
-> >          multifd_recv[i].quit = false;
-> > +        multifd_recv[i].started = false;
-> > +        multifd_recv[i].c = socket_recv_channel_create();
-> > +
-> > +        if(!multifd_recv[i].c) {
-> > +            error_report("Error creating a recv channel");
-> > +            exit(0);
-> > +        }
-> >          qemu_thread_create(&multifd_recv[i].thread, "multifd_recv",
-> >                             multifd_recv_thread, &multifd_recv[i],
-> >                             QEMU_THREAD_JOINABLE);
-> > +        qemu_mutex_lock(&multifd_recv[i].mutex);
-> > +        while (!multifd_recv[i].started) {
-> > +            qemu_cond_wait(&multifd_recv[i].cond, &multifd_recv[i].mutex);
-> > +        }
-> > +        qemu_mutex_unlock(&multifd_recv[i].mutex);
-> >      }
-> >  }
-> > 
-> > diff --git a/migration/socket.c b/migration/socket.c
-> > index 11f80b1..7cd9213 100644
-> > --- a/migration/socket.c
-> > +++ b/migration/socket.c
-> > @@ -24,6 +24,54 @@
-> >  #include "io/channel-socket.h"
-> >  #include "trace.h"
-> > 
-> > +struct SocketArgs {
-> > +    QIOChannelSocket *ioc;
-> > +    SocketAddress *saddr;
-> > +    Error **errp;
-> > +} socket_args;
-> 
-> Passing data from one method to another indirectly via this random
-> global var feels rather dirty, since two different pairs of methods
-> are both using the same global var. It happens to be ok since one
-> pair of methods is only ever called on the target, and one pair is
-> only ever called on the source. It is recipe for future unpleasant
-> surprises though, so I think this needs rethinking.
-> 
-> > +QIOChannel *socket_recv_channel_create(void)
-> > +{
-> > +    QIOChannelSocket *sioc;
-> > +    Error *err = NULL;
-> > +
-> > +    sioc = qio_channel_socket_accept(QIO_CHANNEL_SOCKET(socket_args.ioc),
-> > +                                     &err);
-> > +    if (!sioc) {
-> > +        error_report("could not accept migration connection (%s)",
-> > +                     error_get_pretty(err));
-> > +        return NULL;
-> > +    }
-> > +    return QIO_CHANNEL(sioc);
-> > +}
-> > +
-> > +int socket_recv_channel_destroy(QIOChannel *recv)
-> > +{
-> > +    // Remove channel
-> > +    object_unref(OBJECT(send));
-> > +    return 0;
-> > +}
-> > +
-> > +QIOChannel *socket_send_channel_create(void)
-> > +{
-> > +    QIOChannelSocket *sioc = qio_channel_socket_new();
-> > +
-> > +    qio_channel_socket_connect_sync(sioc, socket_args.saddr,
-> > +                                    socket_args.errp);
-> > +    qio_channel_set_delay(QIO_CHANNEL(sioc), false);
-> > +    return QIO_CHANNEL(sioc);
-> > +}
-> > +
-> > +int socket_send_channel_destroy(QIOChannel *send)
-> > +{
-> > +    // Remove channel
-> > +    object_unref(OBJECT(send));
-> > +    if (socket_args.saddr) {
-> > +        qapi_free_SocketAddress(socket_args.saddr);
-> > +        socket_args.saddr = NULL;
-> > +    }
-> > +    return 0;
-> > +}
-> > 
-> >  static SocketAddress *tcp_build_address(const char *host_port, Error **errp)
-> >  {
-> > @@ -96,6 +144,10 @@ static void socket_start_outgoing_migration(MigrationState *s,
-> >      struct SocketConnectData *data = g_new0(struct SocketConnectData, 1);
-> > 
-> >      data->s = s;
-> > +
-> > +    socket_args.saddr = saddr;
-> > +    socket_args.errp = errp;
-> > +
-> >      if (saddr->type == SOCKET_ADDRESS_KIND_INET) {
-> >          data->hostname = g_strdup(saddr->u.inet.data->host);
-> >      }
-> > @@ -106,7 +158,6 @@ static void socket_start_outgoing_migration(MigrationState *s,
-> >                                       socket_outgoing_migration,
-> >                                       data,
-> >                                       socket_connect_data_free);
-> > -    qapi_free_SocketAddress(saddr);
-> >  }
-> > 
-> >  void tcp_start_outgoing_migration(MigrationState *s,
-> > @@ -154,7 +205,7 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
-> > 
-> >  out:
-> >      /* Close listening socket as its no longer needed */
-> > -    qio_channel_close(ioc, NULL);
-> > +//    qio_channel_close(ioc, NULL);
-> >      return FALSE; /* unregister */
-> >  }
-> 
-> If you changed this to return TRUE, then this existing code would be
-> automatically invoked when the client makes its 2nd, 3rd, etc
-> connection. You'd just have to put some logic in
-> migration_channel_process_incoming to take different behaviour when
-> seeing the 1st vs the additional connections.
-> 
-> 
-> > 
-> > @@ -163,6 +214,7 @@ static void socket_start_incoming_migration(SocketAddress *saddr,
-> >                                              Error **errp)
-> >  {
-> >      QIOChannelSocket *listen_ioc = qio_channel_socket_new();
-> > +    socket_args.ioc = listen_ioc;
-> > 
-> >      qio_channel_set_name(QIO_CHANNEL(listen_ioc),
-> >                           "migration-socket-listener");
-> 
-> 
-> 
-> Regards,
-> Daniel
-> -- 
-> |: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-> |: http://libvirt.org              -o-             http://virt-manager.org :|
-> |: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Might make sense to decrement next_child_index here, but it's not necessa=
+ry.
+
+(That means: Patch is fine, I'm just nagging because I like to nag.)
+
+Max
+
+> +    }
+>      s->children =3D g_renew(BdrvChild *, s->children, s->num_children =
++ 1);
+>      s->children[s->num_children++] =3D child;
+> =20
+> +out:
+>      bdrv_drained_end(bs);
+>  }
+> =20
+> diff --git a/include/block/block.h b/include/block/block.h
+> index 4e81f20..93812df 100644
+> --- a/include/block/block.h
+> +++ b/include/block/block.h
+> @@ -482,7 +482,8 @@ void bdrv_unref_child(BlockDriverState *parent, Bdr=
+vChild *child);
+>  BdrvChild *bdrv_attach_child(BlockDriverState *parent_bs,
+>                               BlockDriverState *child_bs,
+>                               const char *child_name,
+> -                             const BdrvChildRole *child_role);
+> +                             const BdrvChildRole *child_role,
+> +                             Error **errp);
+> =20
+>  bool bdrv_op_is_blocked(BlockDriverState *bs, BlockOpType op, Error **=
+errp);
+>  void bdrv_op_block(BlockDriverState *bs, BlockOpType op, Error *reason=
+);
+>=20
+
+
+
+--VuVjB84IBT0kSaGnRDFlnK4HJVH24FGaI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlikaioSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A9JIH/0Q1PuHVkbZ2BaDQlVrxt45rkKqPxrJT
+U+zl8E3xrkmYFCScsSDAHaKbvHs83C36JHCLyyZkJcaO68Ovu+Buv01JdFGLbz1r
+5Ql/4iCK2ofL9ekOLAGvaTCDQXR50dCHGCBfk4CEXTwYizBrmKt1VPqTutJyi0nx
+03vNVNMPGjbKwpIQTUS0s9gg8NzzT2IddVv8NiD2lmAGUAcQ4+4ZX+bV9eq0KaMQ
+aYEDFlk2oZhHQVJCfrcfn42DwujPmsnw4TidM7UrEMcRRIt8tRxlYIfBWbGTAScg
+qy2ojbEBksdk+6nM2dGrxsCXzFkjRq9x4GZzrPykadBFyrZass/pegw=
+=GTQj
+-----END PGP SIGNATURE-----
+
+--VuVjB84IBT0kSaGnRDFlnK4HJVH24FGaI--
