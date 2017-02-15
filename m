@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cdv3D-0008FD-AL
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 03:35:00 -0500
+	(envelope-from <dmitry@daynix.com>) id 1cdvPd-0001nR-Sb
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 03:58:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cdv3C-0007cp-4n
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 03:34:59 -0500
-Received: from szxga03-in.huawei.com ([119.145.14.66]:44929)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cdv3B-0007aB-Iz
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 03:34:58 -0500
-From: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Date: Wed, 15 Feb 2017 16:34:16 +0800
-Message-ID: <1487147657-166092-5-git-send-email-zhang.zhanghailiang@huawei.com>
-In-Reply-To: <1487147657-166092-1-git-send-email-zhang.zhanghailiang@huawei.com>
-References: <1487147657-166092-1-git-send-email-zhang.zhanghailiang@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 4/5] char: remove the right fd been watched in
- qemu_chr_fe_set_handlers()
+	(envelope-from <dmitry@daynix.com>) id 1cdvPa-0000EB-0Q
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 03:58:09 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34591)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dmitry@daynix.com>) id 1cdvPZ-0000Ce-OK
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 03:58:05 -0500
+Received: by mail-wm0-x242.google.com with SMTP id c85so7087865wmi.1
+	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 00:58:03 -0800 (PST)
+From: Dmitry Fleytman <dmitry@daynix.com>
+Message-Id: <7A52E0CB-9F86-4BFF-B641-C820CB9107FE@daynix.com>
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+Date: Wed, 15 Feb 2017 10:58:03 +0200
+In-Reply-To: <20170215083143.15897-1-famz@redhat.com>
+References: <20170215083143.15897-1-famz@redhat.com>
+Content-Type: text/plain;
+	charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] net: Remove useless local var pkt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,94 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jasowang@redhat.com, zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com
-Cc: qemu-devel@nongnu.org, xuquan8@huawei.com, pss.wulizhen@huawei.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
 
-We can call qemu_chr_fe_set_handlers() to add/remove fd been watched
-in 'context' which can be either default main context or other explicit
-context. But the original logic is not correct, we didn't remove
-the right fd because we call g_main_context_find_source_by_id(NULL, tag)
-which always try to find the Gsource from default context.
+Reviewed-by: Dmitry Fleytman <dmitry@daynix.com>
 
-Fix it by passing the right context to g_main_context_find_source_by_id().
+This patch also fixes compilation with NET_RX_PKT_DEBUG defined.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc-André Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
----
- chardev/char-io.c | 13 +++++++++----
- chardev/char-io.h |  2 ++
- chardev/char.c    |  2 +-
- 3 files changed, 12 insertions(+), 5 deletions(-)
-
-diff --git a/chardev/char-io.c b/chardev/char-io.c
-index 7dfc3f2..a69cc61 100644
---- a/chardev/char-io.c
-+++ b/chardev/char-io.c
-@@ -127,14 +127,14 @@ guint io_add_watch_poll(Chardev *chr,
-     return tag;
- }
- 
--static void io_remove_watch_poll(guint tag)
-+static void io_remove_watch_poll(guint tag, GMainContext *context)
- {
-     GSource *source;
-     IOWatchPoll *iwp;
- 
-     g_return_if_fail(tag > 0);
- 
--    source = g_main_context_find_source_by_id(NULL, tag);
-+    source = g_main_context_find_source_by_id(context, tag);
-     g_return_if_fail(source != NULL);
- 
-     iwp = io_watch_poll_from_source(source);
-@@ -146,14 +146,19 @@ static void io_remove_watch_poll(guint tag)
-     g_source_destroy(&iwp->parent);
- }
- 
--void remove_fd_in_watch(Chardev *chr)
-+void qemu_remove_fd_in_watch(Chardev *chr, GMainContext *context)
- {
-     if (chr->fd_in_tag) {
--        io_remove_watch_poll(chr->fd_in_tag);
-+        io_remove_watch_poll(chr->fd_in_tag, context);
-         chr->fd_in_tag = 0;
-     }
- }
- 
-+void remove_fd_in_watch(Chardev *chr)
-+{
-+    qemu_remove_fd_in_watch(chr, NULL);
-+}
-+
- int io_channel_send_full(QIOChannel *ioc,
-                          const void *buf, size_t len,
-                          int *fds, size_t nfds)
-diff --git a/chardev/char-io.h b/chardev/char-io.h
-index d7ae5f1..117c888 100644
---- a/chardev/char-io.h
-+++ b/chardev/char-io.h
-@@ -38,6 +38,8 @@ guint io_add_watch_poll(Chardev *chr,
- 
- void remove_fd_in_watch(Chardev *chr);
- 
-+void qemu_remove_fd_in_watch(Chardev *chr, GMainContext *context);
-+
- int io_channel_send(QIOChannel *ioc, const void *buf, size_t len);
- 
- int io_channel_send_full(QIOChannel *ioc, const void *buf, size_t len,
-diff --git a/chardev/char.c b/chardev/char.c
-index abd525f..5563375 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -560,7 +560,7 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
-     cc = CHARDEV_GET_CLASS(s);
-     if (!opaque && !fd_can_read && !fd_read && !fd_event) {
-         fe_open = 0;
--        remove_fd_in_watch(s);
-+        qemu_remove_fd_in_watch(s, context);
-     } else {
-         fe_open = 1;
-     }
--- 
-1.8.3.1
+> On 15 Feb 2017, at 10:31 AM, Fam Zheng <famz@redhat.com> wrote:
+> 
+> This has been pointless since commit 605d52e62, which was a
+> search-and-replace, overlooked the redundancy.
+> 
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+> hw/net/net_rx_pkt.c | 1 -
+> 1 file changed, 1 deletion(-)
+> 
+> diff --git a/hw/net/net_rx_pkt.c b/hw/net/net_rx_pkt.c
+> index 1019b50..7f928d7 100644
+> --- a/hw/net/net_rx_pkt.c
+> +++ b/hw/net/net_rx_pkt.c
+> @@ -159,7 +159,6 @@ void net_rx_pkt_attach_iovec_ex(struct NetRxPkt *pkt,
+> void net_rx_pkt_dump(struct NetRxPkt *pkt)
+> {
+> #ifdef NET_RX_PKT_DEBUG
+> -    NetRxPkt *pkt = (NetRxPkt *)pkt;
+>     assert(pkt);
+> 
+>     printf("RX PKT: tot_len: %d, vlan_stripped: %d, vlan_tag: %d\n",
+> -- 
+> 2.9.3
+> 
