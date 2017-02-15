@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ce8VB-00007E-Tz
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 17:56:47 -0500
+	(envelope-from <rth7680@gmail.com>) id 1ce8Xb-0001qh-Cd
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 17:59:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ce8V7-0005TR-Dj
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 17:56:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43270)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ce8V7-0005T6-4i
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 17:56:41 -0500
-References: <cover.1487139038.git.ben@skyportsystems.com>
-	<96c621a0c1588234e473bf0c0d068af8812f3225.1487139038.git.ben@skyportsystems.com>
-	<ebde49dc-fd80-895e-b73f-545ec9a966c8@redhat.com>
-	<4757B80F-46A7-4A6F-BB65-1119A07BE52A@skyportsystems.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <be899831-3bd1-3ea0-d689-473b86a3a15a@redhat.com>
-Date: Wed, 15 Feb 2017 16:56:37 -0600
+	(envelope-from <rth7680@gmail.com>) id 1ce8XW-0006Ox-Fk
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 17:59:15 -0500
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:36061)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ce8XW-0006Op-9l
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 17:59:10 -0500
+Received: by mail-pg0-x243.google.com with SMTP id 75so70023pgf.3
+	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 14:59:10 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170207005930.28327-1-laurent@vivier.eu>
+	<20170207005930.28327-6-laurent@vivier.eu>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <5f165880-5918-c920-3df1-b195a1a3bd5c@twiddle.net>
+Date: Thu, 16 Feb 2017 09:59:02 +1100
 MIME-Version: 1.0
-In-Reply-To: <4757B80F-46A7-4A6F-BB65-1119A07BE52A@skyportsystems.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Hc2GNmoUF3QR22hjjbbiioRSTe1EVH5gB"
-Subject: Re: [Qemu-devel] [PATCH v6 6/7] tests: Move reusable ACPI macros
- into a new header file
+In-Reply-To: <20170207005930.28327-6-laurent@vivier.eu>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 05/16] target-m68k: use floatx80
+ internally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,80 +31,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ben Warren <ben@skyportsystems.com>
-Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>, mst@redhat.com
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Aurelien Jarno <aurelien@aurel32.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Hc2GNmoUF3QR22hjjbbiioRSTe1EVH5gB
-From: Eric Blake <eblake@redhat.com>
-To: Ben Warren <ben@skyportsystems.com>
-Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
- Laszlo Ersek <lersek@redhat.com>, mst@redhat.com
-Message-ID: <be899831-3bd1-3ea0-d689-473b86a3a15a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 6/7] tests: Move reusable ACPI macros into
- a new header file
-References: <cover.1487139038.git.ben@skyportsystems.com>
- <96c621a0c1588234e473bf0c0d068af8812f3225.1487139038.git.ben@skyportsystems.com>
- <ebde49dc-fd80-895e-b73f-545ec9a966c8@redhat.com>
- <4757B80F-46A7-4A6F-BB65-1119A07BE52A@skyportsystems.com>
-In-Reply-To: <4757B80F-46A7-4A6F-BB65-1119A07BE52A@skyportsystems.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 02/07/2017 11:59 AM, Laurent Vivier wrote:
+> +    uint32_t fp0h;
+> +    uint64_t fp0l;
+> +    uint32_t fp1h;
+> +    uint64_t fp1l;
 
-On 02/15/2017 03:58 PM, Ben Warren wrote:
+I'm not especially keen on these temporaries.
 
->>=20
->> ---
->> tests/acpi-utils.h       | 75 ++++++++++++++++++++++++++++++++++++++++=
-++++++++
->> tests/bios-tables-test.c | 72 +---------------------------------------=
-------
->> 2 files changed, 76 insertions(+), 71 deletions(-)
+Wouldn't it be better to pass pointers to FPReg to the helpers, so that e.g.
 
+   fadd.x  fp0, fp1
 
->> No copyright blurb? Also, does MAINTAINERS need an update to cover the=
+puts the result in fp1 directly, without having to copy from this FP0 location?
+I can see that you would need a proper FPReg temporary to deal with e.g.
 
->> new file?
->>
-> Sure, I didn=E2=80=99t realize the header files all have copyright head=
-ers.  As for MAINTAINERS, do you mean I should add a device entry for vmg=
-enid?
+   fadd.d  a0@, fp1
 
-In this patch, you're just refactoring to a new tests/acpi-utils.h, so
-I'd normally suggest adding it to the blurb that owns
-tests/bios-tables-test.c - but as a pre-existing problem, that also has
-no listed maintainer.  we're trying to ensure that all new added files
-have something listed in MAINTAINERS, even if it is in a misc section
-that only emails the list, although it's harder to say what maintainer
-to use for existing files that you are merely touching, and failure to
-list a maintainer is not (yet) a hard failure (although there have been
-patches proposed to scripts/checkpatch.pl to tighten the rules).
+such that the memory source gets converted before being used as input to the 
+addition.
 
-A new section for vmgenid might not be a bad idea, especially it if
-covers more files than just the one addition I noticed in this patch.
+> +static float32 FP0_to_float32(CPUM68KState *env)
+>  {
+> +    return *(float32 *)&env->fp0h;
+>  }
+...
+> +static void float32_to_FP0(CPUM68KState *env, float32 val)
+>  {
+> +    env->fp0h = *(uint32_t *)&val;
+>  }
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+I don't like this type-punning.  I also don't see what good it does to store 
+these truncated values in portions of FP0, when you could simply pass or return 
+them by value from the relevant helpers, e.g.
+
+> +void HELPER(reds32_FP0)(CPUM68KState *env)
+>  {
+> +    int32_t res;
+> +
+> +    res = floatx80_to_int32(FP0_to_floatx80(env), &env->fp_status);
+> +
+> +    int32_to_FP0(env, res);
+>  }
+
+could easily be
+
+int32_t HELPER(reds32)(CPUM68KState *env, FPReg *val)
+{
+   return floatx80_to_int32(*val, &env->fp_status);
+}
 
 
---Hc2GNmoUF3QR22hjjbbiioRSTe1EVH5gB
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYpNylAAoJEKeha0olJ0Nq5BgH/iwnEmEZebmnuXeFr0iE7kFr
-J9xdj33pCrl6cvy6KxMYZ//taiwYbnYSqpRUfMiF8V3MB3AA7/uomy6cBw34vrxx
-SHwu2kgeHg5CA6I5JADVfM56Iq+JWo+8VjbTy5gemWh8texyIZRCJSs5DKmK+dTI
-5Kzox3fyVKsDJuJeYspTcW60VUyZG4dhWOkgAyo5Bxnmr0OzAD461vRtqRR+B7Eg
-CLVE3HlhE+VN9sc/gXc5lpGos0M7XmvH/r8RSjCDQTKoDJHfVCG8PPqXUX3KlXKi
-vqvMggrT5c3VqHcrrG+Dwx5icXapRxJtWjjowzKgE+qjTs4jXUAOIlMXb/aGVpY=
-=nzam
------END PGP SIGNATURE-----
-
---Hc2GNmoUF3QR22hjjbbiioRSTe1EVH5gB--
+r~
