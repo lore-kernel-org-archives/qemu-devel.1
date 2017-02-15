@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cdwXx-0002xC-67
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 05:10:55 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cdwYD-0003F5-4S
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 05:11:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cdwXm-0003cO-5d
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 05:10:49 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:3824 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cdwXl-0003Zk-PU
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 05:10:38 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 15 Feb 2017 13:10:30 +0300
-Message-Id: <1487153430-17260-26-git-send-email-vsementsov@virtuozzo.com>
-In-Reply-To: <1487153430-17260-1-git-send-email-vsementsov@virtuozzo.com>
-References: <1487153430-17260-1-git-send-email-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v15 25/25] qcow2-bitmap: improve
- check_constraints_on_bitmap
+	(envelope-from <kwolf@redhat.com>) id 1cdwYB-0003rT-QV
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 05:11:05 -0500
+Date: Wed, 15 Feb 2017 11:10:52 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170215101052.GA4935@noname.redhat.com>
+References: <1202180823.778907.1487108292243.JavaMail.zimbra@research.iiit.ac.in>
+	<6066bf52-d3d9-07d2-1e0f-118b8c19f3f4@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6066bf52-d3d9-07d2-1e0f-118b8c19f3f4@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] regarding bug name : -hda FAT:.
+ limited to 504MBytes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,101 +24,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: Shubham Kumar <kumar.shubham@research.iiit.ac.in>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-Add detailed error messages.
+Am 14.02.2017 um 23:24 hat Thomas Huth geschrieben:
+> On 14.02.2017 22:38, Shubham Kumar wrote:
+> > Since the problem seems like the used FAT-16 file system , 
+> > Will it solve the problem if I change the code of  vvfat.c for FAT-32 file system to increase acceptable file size ?
+> 
+> As far as I know, FAT16 can already support up to 4GB file systems, so
+> that limitation to 504 MB must be something different.
+> It's maybe best if you put the qemu-block mailing list on CC:, to get
+> the attention of the block/disk expert, too. Maybe there's someone
+> around who knows the vvfat code and its limitations and can give a good
+> answer here...
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/qcow2-bitmap.c | 48 ++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 34 insertions(+), 14 deletions(-)
+None of the active developers know, or want to know, the vvfat code.
 
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index 9177c56..e25c872 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -160,28 +160,49 @@ static int check_table_entry(uint64_t entry, int cluster_size)
- 
- static int check_constraints_on_bitmap(BlockDriverState *bs,
-                                        const char *name,
--                                       uint32_t granularity)
-+                                       uint32_t granularity,
-+                                       Error **errp)
- {
-     BDRVQcow2State *s = bs->opaque;
-     int granularity_bits = ctz32(granularity);
-     int64_t len = bdrv_getlength(bs);
--    bool fail;
- 
-     assert(granularity > 0);
-     assert((granularity & (granularity - 1)) == 0);
- 
-     if (len < 0) {
-+        error_setg_errno(errp, -len, "Failed to get size of '%s'",
-+                         bdrv_get_device_or_node_name(bs));
-         return len;
-     }
- 
--    fail = (granularity_bits > BME_MAX_GRANULARITY_BITS) ||
--           (granularity_bits < BME_MIN_GRANULARITY_BITS) ||
--           (len > (uint64_t)BME_MAX_PHYS_SIZE << granularity_bits) ||
--           (len > (uint64_t)BME_MAX_TABLE_SIZE * s->cluster_size <<
--                  granularity_bits) ||
--           (strlen(name) > BME_MAX_NAME_SIZE);
-+    if (granularity_bits > BME_MAX_GRANULARITY_BITS) {
-+        error_setg(errp, "Granularity exceeds maximum (%u bytes)",
-+                   1 << BME_MAX_GRANULARITY_BITS);
-+        return -EINVAL;
-+    }
-+    if (granularity_bits < BME_MIN_GRANULARITY_BITS) {
-+        error_setg(errp, "Granularity is under minimum (%u bytes)",
-+                   1 << BME_MIN_GRANULARITY_BITS);
-+        return -EINVAL;
-+    }
- 
--    return fail ? -EINVAL : 0;
-+    if ((len > (uint64_t)BME_MAX_PHYS_SIZE << granularity_bits) ||
-+        (len > (uint64_t)BME_MAX_TABLE_SIZE * s->cluster_size <<
-+               granularity_bits))
-+    {
-+        error_setg(errp, "Too much space will be occupied by the bitmap. "
-+                   "Use larger granularity");
-+        return -EINVAL;
-+    }
-+
-+    if (strlen(name) > BME_MAX_NAME_SIZE) {
-+        error_setg(errp, "Name length exceeds maximum (%u characters)",
-+                   BME_MAX_NAME_SIZE);
-+        return -EINVAL;
-+    }
-+
-+    return 0;
- }
- 
- static void clear_bitmap_table(BlockDriverState *bs, uint64_t *bitmap_table,
-@@ -1142,9 +1163,9 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-             continue;
-         }
- 
--        if (check_constraints_on_bitmap(bs, name, granularity) < 0) {
--            error_setg(errp, "Bitmap '%s' doesn't satisfy the constraints",
--                       name);
-+        if (check_constraints_on_bitmap(bs, name, granularity, errp) < 0) {
-+            error_prepend(errp, "Bitmap '%s' doesn't satisfy the constraints: ",
-+                          name);
-             goto fail;
-         }
- 
-@@ -1233,8 +1254,7 @@ bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
-     bool found;
-     Qcow2BitmapList *bm_list;
- 
--    if (check_constraints_on_bitmap(bs, name, granularity) != 0) {
--        error_setg(errp, "The constraints are not satisfied");
-+    if (check_constraints_on_bitmap(bs, name, granularity, errp) != 0) {
-         goto fail;
-     }
- 
--- 
-1.8.3.1
+There is some FAT32 support there, but if you use it:
+
+    fprintf(stderr, "Big fat greek warning: FAT32 has not been tested. "
+                    "You are welcome to do so!\n");
+
+So if you just want to play with it, go ahead. But if you care about
+your data, maybe vvfat isn't the right tool anyway.
+
+Kevin
