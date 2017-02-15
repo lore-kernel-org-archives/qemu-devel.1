@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ce30R-0007dt-OR
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:04:40 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ce30X-0007k2-GV
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:04:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ce30Q-0004S3-TD
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:04:39 -0500
-Date: Wed, 15 Feb 2017 12:04:30 -0500
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170215170430.GC19045@localhost.localdomain>
-References: <1487170693-28224-1-git-send-email-vsementsov@virtuozzo.com>
+	(envelope-from <pbonzini@redhat.com>) id 1ce30U-0004Ug-Ap
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:04:45 -0500
+References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
+	<20170203154757.36140-19-vsementsov@virtuozzo.com>
+	<01d5a5fd-3ac8-0122-a07a-859bef4f3deb@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <689f7bff-f430-d7d8-d8a2-705091d5a2fc@redhat.com>
+Date: Wed, 15 Feb 2017 18:04:37 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1487170693-28224-1-git-send-email-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v3] backup: allow target without
- .bdrv_get_info
+In-Reply-To: <01d5a5fd-3ac8-0122-a07a-859bef4f3deb@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Sv92GjsqAJ9KtFBSJAokfcWtGrA7ukPeV"
+Subject: Re: [Qemu-devel] [PATCH 18/18] nbd: BLOCK_STATUS for standard
+ get_block_status function: client part
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,71 +26,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com
+To: Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, den@virtuozzo.com, stefanha@redhat.com
 
-On Wed, Feb 15, 2017 at 05:58:13PM +0300, Vladimir Sementsov-Ogievskiy wrote:
-> Currently backup to nbd target is broken, as nbd doesn't have
-> .bdrv_get_info realization.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
-> 
-> v3: fix compilation (I feel like an idiot)
->     adjust wording (Fam)
->     
-> v2: add WARNING
-> 
-> ===
-> 
-> Since commit
-> 
-> commit 4c9bca7e39a6e07ad02c1dcde3478363344ec60b
-> Author: John Snow <jsnow@redhat.com>
-> Date:   Thu Feb 25 15:58:30 2016 -0500
-> 
->     block/backup: avoid copying less than full target clusters
-> 
-> backup to nbd target is broken, we have "Couldn't determine the cluster size of
-> the target image".
-> 
-> Proposed NBD protocol extension - NBD_OPT_INFO should finally solve this problem.
-> But until it is not realized, we need allow backup to nbd target due to backward
-> compatibility.
-> 
-> Furthermore, is it entirely ok to disallow backup if bds lacks .bdrv_get_info?
-> Which behavior should be default: to fail backup or to use default cluster size?
-> 
-> 
->  block/backup.c | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/backup.c b/block/backup.c
-> index ea38733..d800a24 100644
-> --- a/block/backup.c
-> +++ b/block/backup.c
-> @@ -638,7 +638,16 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
->       * backup cluster size is smaller than the target cluster size. Even for
->       * targets with a backing file, try to avoid COW if possible. */
->      ret = bdrv_get_info(target, &bdi);
-> -    if (ret < 0 && !target->backing) {
-> +    if (ret == -ENOTSUP) {
-> +        /* Cluster size is not defined */
-> +        fprintf(stderr,
-> +                "WARNING: Target block device doesn't provide information "
-> +                "about block size and it doesn't have backing file. Default "
-> +                "block size of %u bytes is used. If actual block size of "
-> +                "target exceeds this default, backup may be unusable",
-> +                BACKUP_CLUSTER_SIZE_DEFAULT);
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Sv92GjsqAJ9KtFBSJAokfcWtGrA7ukPeV
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Eric Blake <eblake@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com,
+ armbru@redhat.com, den@virtuozzo.com, stefanha@redhat.com
+Message-ID: <689f7bff-f430-d7d8-d8a2-705091d5a2fc@redhat.com>
+Subject: Re: [PATCH 18/18] nbd: BLOCK_STATUS for standard get_block_status
+ function: client part
+References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
+ <20170203154757.36140-19-vsementsov@virtuozzo.com>
+ <01d5a5fd-3ac8-0122-a07a-859bef4f3deb@redhat.com>
+In-Reply-To: <01d5a5fd-3ac8-0122-a07a-859bef4f3deb@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-You should use error_report, like in your v2 patch.  Just make sure to
-include qemu/error-report.h.
 
-> +        job->cluster_size = BACKUP_CLUSTER_SIZE_DEFAULT;
-> +    } else if (ret < 0 && !target->backing) {
->          error_setg_errno(errp, -ret,
->              "Couldn't determine the cluster size of the target image, "
->              "which has no backing file");
-> -- 
-> 1.8.3.1
-> 
+
+On 09/02/2017 17:00, Eric Blake wrote:
+>> +    if (!client->block_status_ok) {
+>> +        *pnum =3D nb_sectors;
+>> +        ret =3D BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED;
+>> +        if (bs->drv->protocol_name) {
+
+This condition is always true, I think?
+
+>> +            ret |=3D BDRV_BLOCK_OFFSET_VALID | (sector_num * BDRV_SEC=
+TOR_SIZE);
+>> +        }
+>> +        return ret;
+>> +    }
+> Looks like a sane fallback when we don't have anything more accurate.
+
+>> +
+>> +    ret =3D nbd_client_co_cmd_block_status(bs, sector_num << BDRV_SEC=
+TOR_BITS,
+>> +                                         nb_sectors << BDRV_SECTOR_BI=
+TS,
+>> +                                         &extents, &nb_extents);
+>> +    if (ret < 0) {
+>> +        return ret;
+>> +    }
+>> +
+>> +    *pnum =3D extents[0].length >> BDRV_SECTOR_BITS;
+>> +    ret =3D (extents[0].flags & NBD_STATE_HOLE ? 0 : BDRV_BLOCK_ALLOC=
+ATED) |
+>> +          (extents[0].flags & NBD_STATE_ZERO ? BDRV_BLOCK_ZERO : 0);
+>> +
+>> +    if ((ret & BDRV_BLOCK_ALLOCATED) && !(ret & BDRV_BLOCK_ZERO)) {
+>> +        ret |=3D BDRV_BLOCK_DATA;
+>> +    }
+
+You can always return BDRV_BLOCK_OFFSET_VALID here, too.
+
+Paolo
+
+
+--Sv92GjsqAJ9KtFBSJAokfcWtGrA7ukPeV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEcBAEBCAAGBQJYpIolAAoJEL/70l94x66DX9MIAJ4YVc6juE8Of5/3M4f7Jpxx
+EPx7xp7Vyv2EBpH38b2g0PqsRFBJyOCgOkpD88cM1OKi3CaJBIt0hJKlm7JRSzoL
+3by7t9QS5yYdhJMIBgqAyF4g40OY9uVXvy/QIi+Rfex2bU3+51ibEzo+mHvZO6LD
+ea69saIbJKqjgvzOk2Irhu5O6lD5wEzcdAlrAmwNsqfpeMTbU4CVxLBMf5hJXe30
+UBTB0wElcceIoyJo51MBtJZsDXPqG2BqoVIjc5RRy/krg/+Y4FF9Uwyzh4gx7mae
+mMueBVkQpZtufiAU7x8FNTudnDKola1X7nEoLng24r+HKlhkH+BXG+xf19LMH3w=
+=YYXQ
+-----END PGP SIGNATURE-----
+
+--Sv92GjsqAJ9KtFBSJAokfcWtGrA7ukPeV--
