@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44155)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ce4Fw-0005tD-Ut
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 13:24:51 -0500
+	(envelope-from <berrange@redhat.com>) id 1ce4Ip-0008Jf-GH
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 13:27:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ce4Fs-00085j-QN
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 13:24:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43920)
+	(envelope-from <berrange@redhat.com>) id 1ce4Il-0000y8-Es
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 13:27:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49088)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ce4Fs-00085I-HW
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 13:24:40 -0500
-Date: Wed, 15 Feb 2017 19:24:36 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170215192436.2695b9f6@nial.brq.redhat.com>
-In-Reply-To: <20170215194647-mutt-send-email-mst@kernel.org>
-References: <cover.1487139038.git.ben@skyportsystems.com>
-	<9dffe31a245cf6a717eef8227fe80ca666b168b5.1487139038.git.ben@skyportsystems.com>
-	<20170215115723.77e4d9d7@nial.brq.redhat.com>
-	<1f4a6eb2-0838-2218-88e3-4f65498a41d6@redhat.com>
-	<20170215162225.74d48058@nial.brq.redhat.com>
-	<20170215172515-mutt-send-email-mst@kernel.org>
-	<20170215165602.72e96c28@nial.brq.redhat.com>
-	<20170215183736-mutt-send-email-mst@kernel.org>
-	<20170215184309.521aa90f@nial.brq.redhat.com>
-	<20170215194647-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ce4Il-0000xP-23
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 13:27:39 -0500
+Date: Wed, 15 Feb 2017 18:27:32 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170215182732.GN24672@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 1/7] linker-loader: Add new 'write
- pointer' command
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Subject: [Qemu-devel] RFC: How to make seccomp reliable and useful ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,369 +25,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, ben@skyportsystems.com
+To: qemu-devel@nongnu.org
+Cc: Eduardo Otubo <eduardo.otubo@profitbricks.com>
 
-On Wed, 15 Feb 2017 20:04:40 +0200
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+The current impl of seccomp in QEMU is intentionally allowing a huge range
+of system calls to be executed. The goal was that running '-sandbox on'
+should never break any feature of QEMU, so naturally any syscall that can
+executed on any codepath QEMU takes must be allowed.
 
-> On Wed, Feb 15, 2017 at 06:43:09PM +0100, Igor Mammedov wrote:
-> > On Wed, 15 Feb 2017 18:39:06 +0200
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >   
-> > > On Wed, Feb 15, 2017 at 04:56:02PM +0100, Igor Mammedov wrote:  
-> > > > On Wed, 15 Feb 2017 17:30:00 +0200
-> > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > >     
-> > > > > On Wed, Feb 15, 2017 at 04:22:25PM +0100, Igor Mammedov wrote:    
-> > > > > > On Wed, 15 Feb 2017 15:13:20 +0100
-> > > > > > Laszlo Ersek <lersek@redhat.com> wrote:
-> > > > > >       
-> > > > > > > Commenting under Igor's reply for simplicity
-> > > > > > > 
-> > > > > > > On 02/15/17 11:57, Igor Mammedov wrote:      
-> > > > > > > > On Tue, 14 Feb 2017 22:15:43 -0800
-> > > > > > > > ben@skyportsystems.com wrote:
-> > > > > > > >         
-> > > > > > > >> From: Ben Warren <ben@skyportsystems.com>
-> > > > > > > >>
-> > > > > > > >> This is similar to the existing 'add pointer' functionality, but instead
-> > > > > > > >> of instructing the guest (BIOS or UEFI) to patch memory, it instructs
-> > > > > > > >> the guest to write the pointer back to QEMU via a writeable fw_cfg file.
-> > > > > > > >>
-> > > > > > > >> Signed-off-by: Ben Warren <ben@skyportsystems.com>
-> > > > > > > >> ---
-> > > > > > > >>  hw/acpi/bios-linker-loader.c         | 58 ++++++++++++++++++++++++++++++++++--
-> > > > > > > >>  include/hw/acpi/bios-linker-loader.h |  6 ++++
-> > > > > > > >>  2 files changed, 61 insertions(+), 3 deletions(-)
-> > > > > > > >>
-> > > > > > > >> diff --git a/hw/acpi/bios-linker-loader.c b/hw/acpi/bios-linker-loader.c
-> > > > > > > >> index d963ebe..5030cf1 100644
-> > > > > > > >> --- a/hw/acpi/bios-linker-loader.c
-> > > > > > > >> +++ b/hw/acpi/bios-linker-loader.c
-> > > > > > > >> @@ -78,6 +78,19 @@ struct BiosLinkerLoaderEntry {
-> > > > > > > >>              uint32_t length;
-> > > > > > > >>          } cksum;
-> > > > > > > >>  
-> > > > > > > >> +        /*
-> > > > > > > >> +         * COMMAND_WRITE_POINTER - write the fw_cfg file (originating from
-> > > > > > > >> +         * @dest_file) at @wr_pointer.offset, by adding a pointer to the table
-> > > > > > > >> +         * originating from @src_file. 1,2,4 or 8 byte unsigned
-> > > > > > > >> +         * addition is used depending on @wr_pointer.size.
-> > > > > > > >> +         */        
-> > > > > > > 
-> > > > > > > The words "adding" and "addition" are causing confusion here.
-> > > > > > > 
-> > > > > > > In all of the previous discussion, *addition* was out of scope from
-> > > > > > > WRITE_POINTER. Again, the firmware is specifically not required to
-> > > > > > > *read* any part of the fw_cfg blob identified by "dest_file".
-> > > > > > > 
-> > > > > > > WRITE_POINTER instructs the firmware to return the allocation address of
-> > > > > > > the downloaded "src_file" to QEMU. Any necessary runtime subscripting
-> > > > > > > within "src_file" is to be handled by QEMU code dynamically.
-> > > > > > > 
-> > > > > > > For example, consider that "src_file" has *several* fields that QEMU
-> > > > > > > wants to massage; in that case, indexing within QEMU code with field
-> > > > > > > offsets is simply unavoidable.      
-> > > > > > what I don't like here is that this indexing would be rather fragile
-> > > > > > and has to be done in different parts of QEMU /device, AML/.
-> > > > > > 
-> > > > > > I'd prefer this helper function to have the same @src_offset
-> > > > > > behavior as ADD_POINTER where patched address could point to
-> > > > > > any part of src_file i.e. not just beginning.      
-> > > > > 
-> > > > > 
-> > > > > 
-> > > > >         /*
-> > > > >          * COMMAND_ADD_POINTER - patch the table (originating from
-> > > > >          * @dest_file) at @pointer.offset, by adding a pointer to the table
-> > > > >          * originating from @src_file. 1,2,4 or 8 byte unsigned
-> > > > >          * addition is used depending on @pointer.size.
-> > > > >          */
-> > > > >  
-> > > > > so the way ADD works is
-> > > > > 	read at offset
-> > > > > 	add table address
-> > > > > 	write result at offset
-> > > > > 
-> > > > > in other words it is always beginning of table that is added.    
-> > > > more exactly it's, read at 
-> > > >   src_offset = *(dst_blob_ptr+dst_offset)
-> > > >   *(dst_blob+dst_offset) = src_blob_ptr + src_offset
-> > > >     
-> > > > > Would the following be acceptable?
-> > > > > 
-> > > > > 
-> > > > >          * COMMAND_WRITE_POINTER - update the fw_cfg file (originating from
-> > > > >          * @dest_file) at @wr_pointer.offset, by writing a pointer to the table
-> > > > >          * originating from @src_file. 1,2,4 or 8 byte unsigned value
-> > > > >          * is written depending on @wr_pointer.size.    
-> > > > it looses 'adding' part of ADD_POINTER command which handles src_offset,
-> > > > however implementing adding part looks a bit complicated
-> > > > as patched blob (dst) is not in guest memory but in QEMU and
-> > > > on reset *(dst_blob+dst_offset) should be reset to src_offset.
-> > > > Considering dst file could be device specific memory (field/blob/whatever)
-> > > > it could be hard to track/notice proper reset behavior.
-> > > > 
-> > > > So now I'm not sure if src_offset is worth adding.    
-> > > 
-> > > Right. Let's just do this math in QEMU if we have to.  
-> > Math complicates QEMU code though and not only QMEMU but AML code as well.
-> > Considering that we are adding a new command and don't have to keep
-> > any sort of compatibility we can pass src_offset as part
-> > of command instead of hiding it inside of dst_file.
-> > Something like this:
-> > 
-> >         /*
-> >          * COMMAND_WRITE_POINTER - write the fw_cfg file (originating from
-> >          * @dest_file) at @wr_pointer.offset, by writing a pointer to @src_offset
-> >          * within the table originating from @src_file. 1,2,4 or 8 byte unsigned
-> >          * addition is used depending on @wr_pointer.size.
-> >          */
-> >         struct {
-> >              char dest_file[BIOS_LINKER_LOADER_FILESZ];
-> >              char src_file[BIOS_LINKER_LOADER_FILESZ];
-> > -            uint32_t offset;
-> > +            uint32_t dst_offset;
-> > +            uint32_t src_offset;
-> >              uint8_t size;
-> >         } wr_pointer;  
-> 
-> 
-> As long as all users pass in 0 though there's a real possibility guests
-> will implement this incorrectly.
-We are here to ensure that at least Seabios (I'll review it)
-and OVMF (Laszlo would take care of it I suppose) do it right,
-and if there are other firmwares, they should do it correctly
-as described fix their own bugs later wrt randomly written
-implementation.
+This is good for usability because users don't need to understand the technical
+details of the sandbox technology, they merely say "on" and it "just works".
+Conversely though, this is bad for security because QEMU has to allow a huge
+range of system calls to be used due to its broad functionality.
 
-> I guess we can put in the offset just
-> behind the zero-filled padding we have there.
-I've assumed padding was there to make commands fixed size and give
-a room for future extensions so hunk changing BiosLinkerLoaderEntry
-would look like:
+During initial discussions for seccomp back in 2012 it was suggested, there
+might be alternate policies developed for QEMU which deny some features, but
+improve security overall. To best of my knowledge, this has never been discussed
+again since then.
 
-diff --git a/hw/acpi/bios-linker-loader.c b/hw/acpi/bios-linker-loader.c
-index d963ebe..6983713 100644
---- a/hw/acpi/bios-linker-loader.c
-+++ b/hw/acpi/bios-linker-loader.c
-@@ -49,6 +49,7 @@ struct BiosLinkerLoaderEntry {
-             char file[BIOS_LINKER_LOADER_FILESZ];
-             uint32_t align;
-             uint8_t zone;
-+            uint32_t padding;
-         } alloc;
- 
-         /*
-@@ -62,6 +63,7 @@ struct BiosLinkerLoaderEntry {
-             char src_file[BIOS_LINKER_LOADER_FILESZ];
-             uint32_t offset;
-             uint8_t size;
-+            uint32_t padding;
-         } pointer;
- 
-         /*
-@@ -76,10 +78,25 @@ struct BiosLinkerLoaderEntry {
-             uint32_t offset;
-             uint32_t start;
-             uint32_t length;
-+            uint32_t padding;
-         } cksum;
- 
-+        /*
-+         * COMMAND_WRITE_POINTER - write the fw_cfg file (originating from
-+         * @dest_file) at @wr_pointer.offset, by writing a pointer to @src_offset
-+         * within the table originating from @src_file. 1,2,4 or 8 byte unsigned
-+         * addition is used depending on @wr_pointer.size.
-+         */
-+         struct {
-+             char dest_file[BIOS_LINKER_LOADER_FILESZ];
-+             char src_file[BIOS_LINKER_LOADER_FILESZ];
-+             uint32_t dst_offset;
-+             uint32_t src_offset;
-+             uint8_t size;
-+        } wr_pointer;
-+
-         /* padding */
--        char pad[124];
-+        char pad[120];
-     };
- } QEMU_PACKED;
- typedef struct BiosLinkerLoaderEntry BiosLinkerLoaderEntry;
 
- 
-> I'm mostly concerned we are adding new features to something
-> that has been through 25 revisions already.
-It's ABI so it's worth extra effort,
-it looks like only one more revision is left and there is
-about a week left to post and merge it.
+In addition, since initially merging, there has been a steady stream of patches
+to whitelist further syscalls that were missing. Some of these were missing due
+to newly added functionality in QEMU since the original seccomp impl, while
+others have been missing since day 1. It is reasonable to expect that there are
+still many syscalls missing in the whitelist. In just a couple of minutes of
+comparing the whitelist vs global syscall list it was possible to identify two
+further missing syscalls. The '-netdev bridge,br=virbr0' network backend fails
+because setuid is blocked, preventing execution of the qemu-bridge-helper
+program. If built against glibc < 2.9, or running on kernel < 2.6.27 it will
+fail to call eventfd() because we only permit eventfd2() syscall, not the
+older eventfd() syscall used on older Linux. Some ifup scripts used with the
+-netdev arg may also break due to lack of chmod, flock, getxattr permissions.
+This risk of missing syscalls is why -sandbox defaults to off, and we've never
+considered defaulting it to on.
 
-> 
-> 
-> > >   
-> > > > > 
-> > > > >     
-> > > > > > 
-> > > > > >       
-> > > > > > > (1) So, the above looks correct, but please replace "adding" with
-> > > > > > > "storing", and "unsigned addition" with "store".
-> > > > > > > 
-> > > > > > > Side point: the case for ADD_POINTER is different; there we patch
-> > > > > > > several individual ACPI objects. The fact that I requested explicit
-> > > > > > > addition within the ADDR method, as opposed to pre-setting VGIA to a
-> > > > > > > nonzero offset, is an *incidental* limitation (coming from the OVMF ACPI
-> > > > > > > SDT header probe suppressor), and we'll likely fix that up later, with
-> > > > > > > ALLOCATE command hints or something like that. However, in
-> > > > > > > WRITE_POINTER, asking for the exact allocation address of "src_file" is
-> > > > > > > an *inherent* characteristic.
-> > > > > > > 
-> > > > > > > For reference, this is the command's description from the (not as yet
-> > > > > > > posted) OVMF series:
-> > > > > > > 
-> > > > > > > // QemuLoaderCmdWritePointer: the bytes at
-> > > > > > > // [PointerOffset..PointerOffset+PointerSize) in the writeable fw_cfg
-> > > > > > > // file PointerFile are to receive the absolute address of PointeeFile,
-> > > > > > > // as allocated and downloaded by the firmware. Store the base address
-> > > > > > > // of where PointeeFile's contents have been placed (when
-> > > > > > > // QemuLoaderCmdAllocate has been executed for PointeeFile) to this
-> > > > > > > // portion of PointerFile.
-> > > > > > > //
-> > > > > > > // This command is similar to QemuLoaderCmdAddPointer; the difference is
-> > > > > > > // that the "pointer to patch" does not exist in guest-physical address
-> > > > > > > // space, only in "fw_cfg file space". In addition, the "pointer to
-> > > > > > > // patch" is not initialized by QEMU with a possibly nonzero offset
-> > > > > > > // value: the base address of the memory allocated for downloading
-> > > > > > > // PointeeFile shall not increment the pointer, but overwrite it.
-> > > > > > > 
-> > > > > > > In the last SeaBIOS patch series, namely
-> > > > > > > 
-> > > > > > > [SeaBIOS] [PATCH v3 2/2] QEMU fw_cfg: Add command to write back address
-> > > > > > >                          of file
-> > > > > > > 
-> > > > > > > function romfile_loader_write_pointer() implemented just that plain
-> > > > > > > store (not an addition), and that was exactly right.
-> > > > > > > 
-> > > > > > > Continuing:
-> > > > > > >       
-> > > > > > > >> +        struct {
-> > > > > > > >> +            char dest_file[BIOS_LINKER_LOADER_FILESZ];
-> > > > > > > >> +            char src_file[BIOS_LINKER_LOADER_FILESZ];
-> > > > > > > >> +            uint32_t offset;
-> > > > > > > >> +            uint8_t size;
-> > > > > > > >> +        } wr_pointer;
-> > > > > > > >> +
-> > > > > > > >>          /* padding */
-> > > > > > > >>          char pad[124];
-> > > > > > > >>      };
-> > > > > > > >> @@ -85,9 +98,10 @@ struct BiosLinkerLoaderEntry {
-> > > > > > > >>  typedef struct BiosLinkerLoaderEntry BiosLinkerLoaderEntry;
-> > > > > > > >>  
-> > > > > > > >>  enum {
-> > > > > > > >> -    BIOS_LINKER_LOADER_COMMAND_ALLOCATE     = 0x1,
-> > > > > > > >> -    BIOS_LINKER_LOADER_COMMAND_ADD_POINTER  = 0x2,
-> > > > > > > >> -    BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM = 0x3,
-> > > > > > > >> +    BIOS_LINKER_LOADER_COMMAND_ALLOCATE          = 0x1,
-> > > > > > > >> +    BIOS_LINKER_LOADER_COMMAND_ADD_POINTER       = 0x2,
-> > > > > > > >> +    BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM      = 0x3,
-> > > > > > > >> +    BIOS_LINKER_LOADER_COMMAND_WRITE_POINTER     = 0x4,
-> > > > > > > >>  };
-> > > > > > > >>  
-> > > > > > > >>  enum {
-> > > > > > > >> @@ -278,3 +292,41 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
-> > > > > > > >>  
-> > > > > > > >>      g_array_append_vals(linker->cmd_blob, &entry, sizeof entry);
-> > > > > > > >>  }
-> > > > > > > >> +
-> > > > > > > >> +/*
-> > > > > > > >> + * bios_linker_loader_write_pointer: ask guest to write a pointer to the
-> > > > > > > >> + * source file into the destination file, and write it back to QEMU via
-> > > > > > > >> + * fw_cfg DMA.
-> > > > > > > >> + *
-> > > > > > > >> + * @linker: linker object instance
-> > > > > > > >> + * @dest_file: destination file that must be written
-> > > > > > > >> + * @dst_patched_offset: location within destination file blob to be patched
-> > > > > > > >> + *                      with the pointer to @src_file, in bytes
-> > > > > > > >> + * @dst_patched_offset_size: size of the pointer to be patched
-> > > > > > > >> + *                      at @dst_patched_offset in @dest_file blob, in bytes
-> > > > > > > >> + * @src_file: source file who's address must be taken
-> > > > > > > >> + */
-> > > > > > > >> +void bios_linker_loader_write_pointer(BIOSLinker *linker,
-> > > > > > > >> +                                    const char *dest_file,
-> > > > > > > >> +                                    uint32_t dst_patched_offset,
-> > > > > > > >> +                                    uint8_t dst_patched_size,
-> > > > > > > >> +                                    const char *src_file)        
-> > > > > > > > API is missing "src_offset" even though it's not used in this series,
-> > > > > > > > a patch on top to fix it up is ok for me as far as Seabios/OVMF
-> > > > > > > > counterpart can handle src_offset correctly from starters.        
-> > > > > > > 
-> > > > > > > According to the above, it is the right thing not to add "src_offset"
-> > > > > > > here. The documentation on the command is slightly incorrect (and causes
-> > > > > > > confusion), but the helper function's signature and comments are okay.
-> > > > > > >       
-> > > > > > > >         
-> > > > > > > >> +{
-> > > > > > > >> +    BiosLinkerLoaderEntry entry;
-> > > > > > > >> +    const BiosLinkerFileEntry *source_file =
-> > > > > > > >> +        bios_linker_find_file(linker, src_file);
-> > > > > > > >> +
-> > > > > > > >> +    assert(source_file);        
-> > > > > > > 
-> > > > > > > I wish we kept the following asserts from bios_linker_loader_add_pointer():
-> > > > > > > 
-> > > > > > >     assert(dst_patched_offset < dst_file->blob->len);
-> > > > > > >     assert(dst_patched_offset + dst_patched_size <= dst_file->blob->len);
-> > > > > > > 
-> > > > > > > Namely, just because the dst_file is never supposed to be downloaded by
-> > > > > > > the firmware, it still remains a requirement that the "dst file offset
-> > > > > > > range" that is to be rewritten *do fall* within the dst file.
-> > > > > > > 
-> > > > > > > Nonetheless, this is not critical. (OVMF at least verifies it anyway.)
-> > > > > > > 
-> > > > > > > Summary (from my side anyway): I feel that the documentation of the new
-> > > > > > > command is very important. Please fix it up as suggested under (1), in
-> > > > > > > v7. Regarding the asserts, I'll let you decide.
-> > > > > > > 
-> > > > > > > With the documentation fixed up:
-> > > > > > > 
-> > > > > > > Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-> > > > > > > 
-> > > > > > > (If you don't wish to post a v7, I'm also completely fine if Michael or
-> > > > > > > someone else fixes up the docs as proposed in (1), before committing the
-> > > > > > > patch.)
-> > > > > > > 
-> > > > > > > Thanks!
-> > > > > > > Laszlo
-> > > > > > >       
-> > > > > > > >> +    memset(&entry, 0, sizeof entry);
-> > > > > > > >> +    strncpy(entry.wr_pointer.dest_file, dest_file,
-> > > > > > > >> +            sizeof entry.wr_pointer.dest_file - 1);
-> > > > > > > >> +    strncpy(entry.wr_pointer.src_file, src_file,
-> > > > > > > >> +            sizeof entry.wr_pointer.src_file - 1);
-> > > > > > > >> +    entry.command = cpu_to_le32(BIOS_LINKER_LOADER_COMMAND_WRITE_POINTER);
-> > > > > > > >> +    entry.wr_pointer.offset = cpu_to_le32(dst_patched_offset);
-> > > > > > > >> +    entry.wr_pointer.size = dst_patched_size;
-> > > > > > > >> +    assert(dst_patched_size == 1 || dst_patched_size == 2 ||
-> > > > > > > >> +           dst_patched_size == 4 || dst_patched_size == 8);
-> > > > > > > >> +
-> > > > > > > >> +    g_array_append_vals(linker->cmd_blob, &entry, sizeof entry);
-> > > > > > > >> +}
-> > > > > > > >> diff --git a/include/hw/acpi/bios-linker-loader.h b/include/hw/acpi/bios-linker-loader.h
-> > > > > > > >> index fa1e5d1..f9ba5d6 100644
-> > > > > > > >> --- a/include/hw/acpi/bios-linker-loader.h
-> > > > > > > >> +++ b/include/hw/acpi/bios-linker-loader.h
-> > > > > > > >> @@ -26,5 +26,11 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
-> > > > > > > >>                                      const char *src_file,
-> > > > > > > >>                                      uint32_t src_offset);
-> > > > > > > >>  
-> > > > > > > >> +void bios_linker_loader_write_pointer(BIOSLinker *linker,
-> > > > > > > >> +                                      const char *dest_file,
-> > > > > > > >> +                                      uint32_t dst_patched_offset,
-> > > > > > > >> +                                      uint8_t dst_patched_size,
-> > > > > > > >> +                                      const char *src_file);
-> > > > > > > >> +
-> > > > > > > >>  void bios_linker_loader_cleanup(BIOSLinker *linker);
-> > > > > > > >>  #endif        
-> > > > > > > >         
-> > > > > > >       
-> > >   
+
+The fundamental problem is that building a whitelist of syscalls used by QEMU
+emulators is an intractable problem. QEMU on my system links to 183 different
+shared libraries and there is no way in the world that anyone can figure out
+which code paths QEMU triggers in these libraries and thus identify which
+syscalls will be genuinely needed.
+
+Thus a whitelist based approach for QEMU is doomed to always be missing some
+syscalls, resulting in uneccessary abrts of QEMU when it tickles some edge
+case. If you are lucky the abort() happens at startup so you see it quickly
+and can address it. If you are unlucky the abort() happens after your VM has
+been running for days/week/months and you loose data.
+
+IOW, seccomp integration as it currently exists today in QEMU offers minimal
+security benefits, while at the same time causing spurious crashes which may
+cause user data loss from aborting a running VM, discouraging users from using
+even the minimal protection it offers.
+
+I think we need to rework our seccomp support so that we can have a high enough
+level of confidence in it, that it could be enabled by default. At the same time
+we need to make it do something more tangibly useful from a security POV.
+
+
+First we need to admit that whitelisting is a failed approach, and switch to
+using blacklisting. Unless we do this, we'll never have high enough confidence
+to enable it by default - something that's never turned on might as well not
+exist at all.
+
+
+There is a reasonable easily identifiable set of syscalls that QEMU should
+never be permitted to use, no matter what configuration it is in, what helpers
+it spawns, or what libraries it links to. eg reboot, swapon, swapoff,  syslog,
+mount, unmount, kexec_*, etc - any syscall that affects global system state,
+rather than process local state should be forbidden.
+
+There are some syscalls that are simply hardcoded to return ENOSYS which can
+be trivially blacklisted. afs_syscall, break, fattach, ftime, etc (see the
+man page 'unimplemented(2)').
+
+There are some syscalls which are considered obsolete - they were previously
+useful, but no modern code would call them, as they have been superceeded.
+For example, readdir replaced by getdents. We could blacklist these by default
+but provide a way to allow use of obsolete syscalls if running on older systems.
+e.g. '-sandbox on,obsolete=allow'. They might be obsolete enough that we decide
+to just block them permanently with no opt in - would need to analyse when
+their replacements appeared in widespread use.
+
+There might be a few more syscalls which we can determine are never valid to
+use in QEMU or any library or helper program it might run. I expect this list
+to be very small though, given the impossibility of auditing code paths through
+millions of lines of code QEMU links to.
+
+Everything else should be allowed.
+
+At this point we have a highly reliable "-sandbox on" which we're not having
+to constantly patch.
+
+
+>From here we need a way to allow a user to opt-in to more restrictive policies,
+accepting that it will block certain features. For example, there should be a
+a way to disable any means to elevate privileges from QEMU or things it spawns.
+e.g. '-sandbox on,elevateprivileges=deny'.
+
+This would not only block the variuous set*uid|gid functions via seccomp, but
+should also prctl(PR_SET_NO_NEW_PRIVS). This would allows the user to optin to
+a restrictive world if they know they'll not require things like the setuid
+bridge helper.
+
+Similarly there should be an '-sandbox on,spawn=deny' which prevents the ability
+to fork/exec processes at all, whether privileged or not. This would block
+features like the qemu bridge helper, SMB server, ifup/down scripts, migration
+exec: protocol. These are all rarely used features though, so an opt-in to block
+their use is reasonable & desirable.
+
+A -sandbox on,resourcecontrol=deny, which prevents QEMU from setting stuff like
+process affinity, schedular priority, etc. Some uses of QEMU might need them,
+but normally such controls are left to the mgmt app above QEMU to set prior to
+the exec() of QEMU.
+
+
+
+The key is that these are *not* low level knobs controlling system calls, but
+moderately high level knobs controlling general concepts. This is a high enough
+level of abstraction to enable libvirt to automatically turn them on/off based
+on guest config, without libvirt having to know anything detailed about QEMU
+code impl for the features.
+
+
+Finally, for avoidance of doubt, I'm *not* actually proposing to implement this
+myself any time in the forseeable future. This mail came about from the fact
+that many people have questioned whether current seccomp code is anything other
+than "security theatre". I tend to agree with such an assessment myself, and was
+initially intending to just send a patch to remove seccomp, to stimulate some
+discussion. Instead, however, I decided to write this mail to see if we can
+identify a way forward to make seccomp both reliable and useful. If QEMU had the
+kind of approach outlined above, with a default blacklist instead of whitelist,
+and some opt-ins for stricter lists, it is something I think libvirt would be
+reasonably happy to enable out of the box. That would be a step forward from
+today where libvirt would never consider turning seccomp on by default.
+
+Perhaps this re-working could be a GSoC idea for some interested student...
+
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
