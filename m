@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brak@gameservers.com>) id 1ce1LB-0001lE-GE
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 10:17:59 -0500
+	(envelope-from <berto@igalia.com>) id 1ce1MF-0002YU-Up
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 10:19:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brak@gameservers.com>) id 1ce1L8-0000ST-BJ
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 10:17:57 -0500
-Received: from mail2015.choopa.net ([208.167.225.251]:23669)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brak@gameservers.com>)
-	id 1ce1L8-0000RZ-63
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 10:17:54 -0500
-References: <95bdbbb7-e0b7-b932-52a8-93d35b3e1294@gameservers.com>
-	<49f9e829-67bb-845e-f343-e04ddfb1ad48@fnarfbargle.com>
-From: Brian Rak <brak@gameservers.com>
-Message-ID: <549fe369-6e11-d172-626e-7db4404c51b4@gameservers.com>
-Date: Wed, 15 Feb 2017 10:17:49 -0500
+	(envelope-from <berto@igalia.com>) id 1ce1MC-0000oL-Oy
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 10:19:03 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170210170910.8867-13-berrange@redhat.com>
+References: <20170210170910.8867-1-berrange@redhat.com>
+	<20170210170910.8867-13-berrange@redhat.com>
+Date: Wed, 15 Feb 2017 16:18:37 +0100
+Message-ID: <w51d1ejqy7m.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <49f9e829-67bb-845e-f343-e04ddfb1ad48@fnarfbargle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] VirtIO issues after
- 83d768b5640946b7da55ce8335509df297e2c7cd
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 12/18] qcow2: extend specification to
+ cover LUKS encryption
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +23,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brad Campbell <lists2009@fnarfbargle.com>, qemu-devel <qemu-devel@nongnu.org>
-Cc: pbonzini@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On 2/10/2017 3:35 AM, Brad Campbell wrote:
-> On 03/02/17 01:14, Brian Rak wrote:
->> We recently upgraded to qemu 2.8.0, and noticed a bunch of issues with
->> various non-linux operating systems.
->>
->> I was able to bisect this down to
->> 83d768b5640946b7da55ce8335509df297e2c7cd being the commit that breaks
->> things (0687c37c5eeef8580b31cc6e1202d874833ae38a which is immediately
->> prior still works ok).
->>
->> The issue here seems to be that guests stop receiving packets, and this
->> only happens with vhost_net enabled.
->>
->>
->> I've been consistently able to reproduce this with by booting the
->> OpenBSD 5.8 ISO (
->> http://mirrors.evowise.com/pub/OpenBSD/5.8/amd64/install58.iso ), and
->> pressing 'A' at the first prompt.  It'll attempt to do a DHCP lease, and
->> will succeed prior to 83d7.  After that commit, it'll continue to
->> transit DHCP requests, but never actually receive the reply.
->>
->> So far, we've seen this same problem manifest on the following operating
->> systems:
->>
->> * OpenBSD 5.8
->> * pfSense 2.2.6 (seems to be FreeBSD 10.1 underneath)
->> * Windows XP
->> * "9front" (fork of Plan 9)
->>
->> More modern operating systems did work, including
->>
->> * Various Linux distributions (CentOS 6+, Ubuntu 12.04+)
->> * Modern windows distributions (Server 2012)
->> * OpenBSD 6
->>
->> I was pointed to this thread -
->> https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg04532.html ,
->> and if I apply that patch network connectivity begins working normally
->> again. (I am running under x86-64 btw)
->>
->>
+On Fri 10 Feb 2017 06:09:04 PM CET, Daniel P. Berrange wrote:
+> Update the qcow2 specification to describe how the LUKS header is
+> placed inside a qcow2 file, when using LUKS encryption for the
+> qcow2 payload instead of the legacy AES-CBC encryption
 >
-> I raised this on the 18th of Jan too. 
-> https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg03467.html
->
-> I found that it would fail with any linux guest compiled without 
-> CONFIG_GENERIC_MSI_IRQ.
->
-> Thanks for the pointer to the patch. I can apply that and set all the 
-> XP guests back to virtio networking. (Had to change them to ne2k_pci 
-> to get networking).
->
-> Regards,
-> Brad
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 
-I'm not 100% sure if the patch is production-ready or not.. there was 
-some discussion about it, but it's a bit over my head.  We had applied 
-it just to confirm it fixed the issue we were seeing, but it never left 
-our development environment.  We just ended up rolling back qemu, 
-breaking all sorts of legacy guests wasn't really something we were 
-willing to do.
+> +    Byte  0 -  7:   Offset into the image file at which the encryption
+> +                    header starts in bytes. Must be aligned to a cluster
+> +		    boundary.
+> +    Byte  8 - 15:   Length of the written encryption header in bytes.
+> +                    Note actual space allocated in the qcow2 file may
+> +		    be larger than this value, since it will be rounded
+> +		    to the nearest multiple of the cluster size. Any
+> +		    unused bytes in the allocated space will be initialized
+> +		    to 0.
+
+You are using tabs instead of spaces in these paragraphs. Those are the
+only tabs in the whole file so you probably want to change them.
+
+> +In the LUKS partition header, the "payload-offset" field will be
+> +calculated as normal for the LUKS spec. ie the size of the LUKS
+> +header, plus key material regions, plus padding. Its value is not
+> +used, however, since the qcow2 file format itself defines where
+> +the real payload offset is.
+
+If I understand this, the value of payload-offset is not used but it
+must be correct.
+
+Is payload-offset also relative to the start of the LUKS header? I
+assume that it is, but maybe it can be clarified like you did with
+key-material-offset.
+
+> +In the LUKS key slots header, the "key-material-offset" is relative
+> +to the start of the LUKS header clusters in the qcow2 container,
+> +not the start of the qcow2 file.
+
+Berto
