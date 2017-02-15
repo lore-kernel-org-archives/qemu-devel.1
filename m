@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ce0sX-0007ZC-SF
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:48:22 -0500
+	(envelope-from <eblake@redhat.com>) id 1ce0uS-0000CN-QV
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:50:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ce0sW-00034y-S9
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:48:21 -0500
-References: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
-	<1487006583-24350-4-git-send-email-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <6c464b4f-38ef-778c-637c-261a9691d814@redhat.com>
-Date: Wed, 15 Feb 2017 15:48:10 +0100
+	(envelope-from <eblake@redhat.com>) id 1ce0uR-0004AW-Qe
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:50:20 -0500
+References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
+	<20170203154757.36140-6-vsementsov@virtuozzo.com>
+	<e69c4f0f-ca4f-f3fd-18e4-3db9adb94021@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6158196a-7bf4-d9e1-b66e-9cf8e734f159@redhat.com>
+Date: Wed, 15 Feb 2017 08:50:05 -0600
 MIME-Version: 1.0
-In-Reply-To: <1487006583-24350-4-git-send-email-kwolf@redhat.com>
+In-Reply-To: <e69c4f0f-ca4f-f3fd-18e4-3db9adb94021@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="VuVjB84IBT0kSaGnRDFlnK4HJVH24FGaI"
-Subject: Re: [Qemu-devel] [RFC PATCH 03/41] block: Add Error argument to
- bdrv_attach_child()
+	boundary="xorau0TQuQUI6nkKI6agw2bFNL0rU8naW"
+Subject: Re: [Qemu-devel] [PATCH 05/18] nbd/client: fix drop_sync
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,151 +25,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, den@virtuozzo.com, qemu-stable <qemu-stable@nongnu.org>, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, jsnow@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---VuVjB84IBT0kSaGnRDFlnK4HJVH24FGaI
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
-Message-ID: <6c464b4f-38ef-778c-637c-261a9691d814@redhat.com>
-Subject: Re: [RFC PATCH 03/41] block: Add Error argument to
- bdrv_attach_child()
-References: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
- <1487006583-24350-4-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1487006583-24350-4-git-send-email-kwolf@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
+--xorau0TQuQUI6nkKI6agw2bFNL0rU8naW
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, den@virtuozzo.com,
+ qemu-stable <qemu-stable@nongnu.org>, armbru@redhat.com, mreitz@redhat.com,
+ stefanha@redhat.com, pbonzini@redhat.com, jsnow@redhat.com
+Message-ID: <6158196a-7bf4-d9e1-b66e-9cf8e734f159@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 05/18] nbd/client: fix drop_sync
+References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
+ <20170203154757.36140-6-vsementsov@virtuozzo.com>
+ <e69c4f0f-ca4f-f3fd-18e4-3db9adb94021@redhat.com>
+In-Reply-To: <e69c4f0f-ca4f-f3fd-18e4-3db9adb94021@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 13.02.2017 18:22, Kevin Wolf wrote:
-> It will have to return an error soon, so prepare the callers for it.
+On 02/06/2017 05:17 PM, Eric Blake wrote:
+> On 02/03/2017 09:47 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Comparison symbol is misused. It may lead to memory corruption.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>=
+
+>> ---
+>>  nbd/client.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block.c               | 13 ++++++++++---
->  block/quorum.c        |  8 +++++++-
->  include/block/block.h |  3 ++-
->  3 files changed, 19 insertions(+), 5 deletions(-)
+> Adding qemu-stable; this needs to be back-ported, and can be applied
+> independently from your series.
 >=20
-> diff --git a/block.c b/block.c
-> index 0618f4b..9895aaf 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -1323,7 +1323,8 @@ BdrvChild *bdrv_root_attach_child(BlockDriverStat=
-e *child_bs,
->  BdrvChild *bdrv_attach_child(BlockDriverState *parent_bs,
->                               BlockDriverState *child_bs,
->                               const char *child_name,
-> -                             const BdrvChildRole *child_role)
-> +                             const BdrvChildRole *child_role,
-> +                             Error **errp)
->  {
->      BdrvChild *child =3D bdrv_root_attach_child(child_bs, child_name, =
-child_role,
->                                                parent_bs);
-> @@ -1424,7 +1425,9 @@ void bdrv_set_backing_hd(BlockDriverState *bs, Bl=
-ockDriverState *backing_hd)
->          bs->backing =3D NULL;
->          goto out;
->      }
-> -    bs->backing =3D bdrv_attach_child(bs, backing_hd, "backing", &chil=
-d_backing);
-> +    /* FIXME Error handling */
-> +    bs->backing =3D bdrv_attach_child(bs, backing_hd, "backing", &chil=
-d_backing,
-> +                                    &error_abort);
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Not sure if this counts as "prepare the callers for it". ;-)
+For the record, this is now assigned CVE-2017-2630.  My apologies for
+introducing the bug in the first place (commit 7d3123e).  The maintainer
+may want to touch up the commit message to give those further details,
+since it is security-related.
 
->      bs->open_flags &=3D ~BDRV_O_NO_BACKING;
->      pstrcpy(bs->backing_file, sizeof(bs->backing_file), backing_hd->fi=
-lename);
->      pstrcpy(bs->backing_format, sizeof(bs->backing_format),
-> @@ -1594,7 +1597,11 @@ BdrvChild *bdrv_open_child(const char *filename,=
-
->          goto done;
->      }
-> =20
-> -    c =3D bdrv_attach_child(parent, bs, bdref_key, child_role);
-> +    c =3D bdrv_attach_child(parent, bs, bdref_key, child_role, errp);
-> +    if (!c) {
-> +        bdrv_unref(bs);
-> +        goto done;
-> +    }
-> =20
->  done:
->      qdict_del(options, bdref_key);
-> diff --git a/block/quorum.c b/block/quorum.c
-> index 86e2072..45bf010 100644
-> --- a/block/quorum.c
-> +++ b/block/quorum.c
-> @@ -1032,10 +1032,16 @@ static void quorum_add_child(BlockDriverState *=
-bs, BlockDriverState *child_bs,
-> =20
->      /* We can safely add the child now */
->      bdrv_ref(child_bs);
-> -    child =3D bdrv_attach_child(bs, child_bs, indexstr, &child_format)=
-;
-> +
-> +    child =3D bdrv_attach_child(bs, child_bs, indexstr, &child_format,=
- errp);
-> +    if (child =3D=3D NULL) {
-> +        bdrv_unref(child_bs);
-> +        goto out;
-
-Might make sense to decrement next_child_index here, but it's not necessa=
-ry.
-
-(That means: Patch is fine, I'm just nagging because I like to nag.)
-
-Max
-
-> +    }
->      s->children =3D g_renew(BdrvChild *, s->children, s->num_children =
-+ 1);
->      s->children[s->num_children++] =3D child;
-> =20
-> +out:
->      bdrv_drained_end(bs);
->  }
-> =20
-> diff --git a/include/block/block.h b/include/block/block.h
-> index 4e81f20..93812df 100644
-> --- a/include/block/block.h
-> +++ b/include/block/block.h
-> @@ -482,7 +482,8 @@ void bdrv_unref_child(BlockDriverState *parent, Bdr=
-vChild *child);
->  BdrvChild *bdrv_attach_child(BlockDriverState *parent_bs,
->                               BlockDriverState *child_bs,
->                               const char *child_name,
-> -                             const BdrvChildRole *child_role);
-> +                             const BdrvChildRole *child_role,
-> +                             Error **errp);
-> =20
->  bool bdrv_op_is_blocked(BlockDriverState *bs, BlockOpType op, Error **=
-errp);
->  void bdrv_op_block(BlockDriverState *bs, BlockOpType op, Error *reason=
-);
+>=20
+>>
+>> diff --git a/nbd/client.c b/nbd/client.c
+>> index 6caf6bda6d..351731bc63 100644
+>> --- a/nbd/client.c
+>> +++ b/nbd/client.c
+>> @@ -94,7 +94,7 @@ static ssize_t drop_sync(QIOChannel *ioc, size_t siz=
+e)
+>>      char small[1024];
+>>      char *buffer;
+>> =20
+>> -    buffer =3D sizeof(small) < size ? small : g_malloc(MIN(65536, siz=
+e));
+>> +    buffer =3D sizeof(small) > size ? small : g_malloc(MIN(65536, siz=
+e));
+>>      while (size > 0) {
+>>          ssize_t count =3D read_sync(ioc, buffer, MIN(65536, size));
+>> =20
+>>
 >=20
 
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
---VuVjB84IBT0kSaGnRDFlnK4HJVH24FGaI
+--xorau0TQuQUI6nkKI6agw2bFNL0rU8naW
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlikaioSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A9JIH/0Q1PuHVkbZ2BaDQlVrxt45rkKqPxrJT
-U+zl8E3xrkmYFCScsSDAHaKbvHs83C36JHCLyyZkJcaO68Ovu+Buv01JdFGLbz1r
-5Ql/4iCK2ofL9ekOLAGvaTCDQXR50dCHGCBfk4CEXTwYizBrmKt1VPqTutJyi0nx
-03vNVNMPGjbKwpIQTUS0s9gg8NzzT2IddVv8NiD2lmAGUAcQ4+4ZX+bV9eq0KaMQ
-aYEDFlk2oZhHQVJCfrcfn42DwujPmsnw4TidM7UrEMcRRIt8tRxlYIfBWbGTAScg
-qy2ojbEBksdk+6nM2dGrxsCXzFkjRq9x4GZzrPykadBFyrZass/pegw=
-=GTQj
+iQEcBAEBCAAGBQJYpGqdAAoJEKeha0olJ0NqSLsH/RAYXMm+PLDAUYLv6bSzlQH3
+aen/ect1ipAcSDfKkjeh5/p8AJNXBmivr6iu2RB9KuRtIVCNPK9x68wnCh+PFH+p
+SemQbEe3tNUUU0cpohZiwdRzxdIurUy+nqiu7QT6+kQbtsdbFAsxDIbiSEsuK1Oh
+dBu/ITyehze8GjbwPiWb1X5ooODHRWqv693jMu9BSjWyYFtD0W6AgDQlnSqhCsQo
++UkKWjib7TMSPf1/E5ruWWAA2SAb0tMjKPUqA0LuwvvSt8r6DM26/M+pcQ1TL4gw
+hYtSneQKz8nPLSycZ75YzXKB7FblT+boIA3eO5+/seFzrCJ58mnFE6JFo/p9Scg=
+=dYe+
 -----END PGP SIGNATURE-----
 
---VuVjB84IBT0kSaGnRDFlnK4HJVH24FGaI--
+--xorau0TQuQUI6nkKI6agw2bFNL0rU8naW--
