@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39660)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vapier@gentoo.org>) id 1cdprG-0008TI-Jx
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 22:02:19 -0500
+	(envelope-from <ashmit602@gmail.com>) id 1cdpra-0000Rw-96
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 22:02:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vapier@gentoo.org>) id 1cdprF-0004qj-9a
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 22:02:18 -0500
-Received: from dev.gentoo.org ([2001:470:ea4a:1:5054:ff:fec7:86e4]:36059
-	helo=smtp.gentoo.org)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vapier@gentoo.org>) id 1cdprF-0004qD-3C
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 22:02:17 -0500
-Date: Tue, 14 Feb 2017 22:02:11 -0500
-From: Mike Frysinger <vapier@gentoo.org>
-Message-ID: <20170215030211.GL28432@vapier>
-References: <20170210061200.15373-1-vapier@gentoo.org>
-	<CAFEAcA9rYHgR39tbmvJtQ+m01eok1QT7+K-Wpk_ykFDyqfFNNQ@mail.gmail.com>
+	(envelope-from <ashmit602@gmail.com>) id 1cdprY-0004uf-8w
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 22:02:38 -0500
+Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:34866)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ashmit602@gmail.com>) id 1cdprY-0004uT-2g
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 22:02:36 -0500
+Received: by mail-it0-x241.google.com with SMTP id 203so8597271ith.2
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 19:02:35 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="zYjDATHXTWnytHRU"
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9rYHgR39tbmvJtQ+m01eok1QT7+K-Wpk_ykFDyqfFNNQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] osdep.h: pull in sys/sysmacros.h for
- major/minor/makedev
+In-Reply-To: <CAAo6VWO64cuJZaNDSzFM6d2YFXr41nc78cPKBR=mbJc5mRD=0w@mail.gmail.com>
+References: <1486617814-5420-1-git-send-email-Ashish.Mittal@veritas.com>
+	<20170209062928.GI27752@localhost.localdomain>
+	<CAAo6VWNGtLvbN4ktxRQ9SsobNCgJWcaa_zvdA-9q2Pp3YK27gg@mail.gmail.com>
+	<20170214205158.GT27752@localhost.localdomain>
+	<CAAo6VWO64cuJZaNDSzFM6d2YFXr41nc78cPKBR=mbJc5mRD=0w@mail.gmail.com>
+From: ashish mittal <ashmit602@gmail.com>
+Date: Tue, 14 Feb 2017 19:02:32 -0800
+Message-ID: <CAAo6VWPUL7=jotUzgbA7ko-9+WjeqL7kxWF_1LVLQxs8Y6ajbg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
+ block device type called "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +32,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <ashish.mittal@veritas.com>, Stefan Hajnoczi <stefanha@gmail.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
 
+On Tue, Feb 14, 2017 at 2:34 PM, ashish mittal <ashmit602@gmail.com> wrote:
+> On Tue, Feb 14, 2017 at 12:51 PM, Jeff Cody <jcody@redhat.com> wrote:
+>> On Thu, Feb 09, 2017 at 01:24:58AM -0800, ashish mittal wrote:
+>>> On Wed, Feb 8, 2017 at 10:29 PM, Jeff Cody <jcody@redhat.com> wrote:
+>>> > On Wed, Feb 08, 2017 at 09:23:33PM -0800, Ashish Mittal wrote:
+>>> >> From: Ashish Mittal <ashish.mittal@veritas.com>
+>>> >>
+>>> >> Source code for the qnio library that this code loads can be downloaded from:
+>>> >> https://github.com/VeritasHyperScale/libqnio.git
+>>> >>
+>>> >> Sample command line using JSON syntax:
+>>> >> ./x86_64-softmmu/qemu-system-x86_64 -name instance-00000008 -S -vnc 0.0.0.0:0
+>>> >> -k en-us -vga cirrus -device virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x5
+>>> >> -msg timestamp=on
+>>> >> 'json:{"driver":"vxhs","vdisk-id":"c3e9095a-a5ee-4dce-afeb-2a59fb387410",
+>>> >> "server":{"host":"172.172.17.4","port":"9999"}}'
+>>> >>
+>>> >> Sample command line using URI syntax:
+>>> >> qemu-img convert -f raw -O raw -n
+>>> >> /var/lib/nova/instances/_base/0c5eacd5ebea5ed914b6a3e7b18f1ce734c386ad
+>>> >> vxhs://192.168.0.1:9999/c6718f6b-0401-441d-a8c3-1f0064d75ee0
+>>> >>
+>>
+>> [...]
+>>
+>>> >> +#define VXHS_OPT_FILENAME           "filename"
+>>> >> +#define VXHS_OPT_VDISK_ID           "vdisk-id"
+>>> >> +#define VXHS_OPT_SERVER             "server"
+>>> >> +#define VXHS_OPT_HOST               "host"
+>>> >> +#define VXHS_OPT_PORT               "port"
+>>> >> +#define VXHS_UUID_DEF "12345678-1234-1234-1234-123456789012"
+>>> >
+>>> > What is this?  It is not a valid UUID; is the value significant?
+>>> >
+>>>
+>>> This value gets passed to libvxhs for binaries like qemu-io, qemu-img
+>>> that do not have an Instance ID. We can use this default ID to control
+>>> access to specific vdisks by these binaries. qemu-kvm will pass the
+>>> actual instance ID, and therefore will not use this default value.
+>>>
+>>> Will reply to other queries soon.
+>>>
+>>
+>> If you are going to call it a UUID, it should adhere to the RFC 4122 spec.
+>> You can easily generate a compliant UUID with uuidgen.  However:
+>>
+>> Can you explain more about how you are using this to control access by
+>> qemu-img and qemu-io?  Looking at libqnio, it looks like this is used to
+>> determine at runtime which TLS certs to use based off of a
+>> pathname/filename, which is then how I presume you are controlling access.
+>> See Daniel's email regarding TLS certificates.
+>>
+>
+> (1) The default behavior would be to disallow access to any vdisks by
+> the non qemu-kvm binaries. qemu-kvm would use the actual instance ID
+> for authentication.
+> (2) Depending on the workflow, HyperScale controller can choose to
+> grant *temporary* access to specific vdisks by qemu-img, qemu-io
+> binaries (identified by the default VXHS_UUID_DEF above).
+> (3) This information, described in #2, would be communicated by the
+> HyperScale controller to the actual proprietary VxHS server (running
+> on each compute) that does the authentication/SSL.
+> (4) The HyperScale controller, in this way, can grant/revoke access
+> for specific vdisks not just to clients with VXHS_UUID_DEF instance
+> ID, but also the actual VM instances.
+>
+>> [...]
+>>
+>>> >> +
+>>> >> +static void bdrv_vxhs_init(void)
+>>> >> +{
+>>> >> +    char out[37];
+>>
+>> Additional point: this should be sized as UUID_FMT_LEN + 1, not 37, but I
+>> suspect this code is changing anyways.
+>>
+>>> >> +
+>>> >> +    if (qemu_uuid_is_null(&qemu_uuid)) {
+>>> >> +        lib_init_failed = iio_init(QNIO_VERSION, vxhs_iio_callback, VXHS_UUID_DEF);
+>>> >> +    } else {
+>>> >> +        qemu_uuid_unparse(&qemu_uuid, out);
+>>> >> +        lib_init_failed = iio_init(QNIO_VERSION, vxhs_iio_callback, out);
+>>> >> +    }
+>>> >> +
+>>> >
+>>> > [1]
+>>> >
+>>> > Can you explain what is going on here with the qemu_uuid check?
+>>> >
+>
+> (1) qemu_uuid_is_null(&qemu_uuid) is true for qemu-io, qemu-img that
+> do not define a instance ID. We end up using the default VXHS_UUID_DEF
+> ID for them, and authenticating them as described above.
+>
+> (2) For the other case 'else', we convert the uuid to a char * using
+> qemu_uuid_unparse(), and pass the resulting char * uuid in variable
+> 'out' to libvxhs.
+>
+>>> >
+>>> > You also can't do this here.  This init function is just to register the
+>>> > driver (e.g. populate the BlockDriver list).  You shouldn't be doing
+>>> > anything other than the bdrv_register() call here.
+>>> >
+>>> > Since you want to run this iio_init only once, I would recommend doing it in
+>>> > the vxhs_open() call, and using a ref counter.  That way, you can also call
+>>> > iio_fini() to finish releasing resources once the last device is closed.
+>>> >
+>>> > This was actually a suggestion I had before, which you then incorporated
+>>> > into v6, but it appears all the refcnt code has gone away for v7/v8.
+>>> >
+>>> >
+>>> >> +    bdrv_register(&bdrv_vxhs);
+>>> >> +}
+>>> >> +
+>
 
---zYjDATHXTWnytHRU
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Per my understanding, device open and close are serialized, therefore
+I would not need to use the refcnt under a lock.
+Does the following diff look ok for the refcnt and iio_fini() change?
 
-On 10 Feb 2017 09:04, Peter Maydell wrote:
-> I still think that it's a shame that glibc is breaking
-> compatibility with where these macros have always been
-> kept on every OS that's implemented them back to 2BSD...
+diff --git a/block/vxhs.c b/block/vxhs.c
+index f1b5f1c..d07a461 100644
+--- a/block/vxhs.c
++++ b/block/vxhs.c
+@@ -27,7 +27,7 @@
 
-i don't think that characterization is accurate.  if it were,
-autoconf wouldn't have a AC_HEADER_MAJOR helper.
-https://www.gnu.org/software/autoconf/manual/autoconf-2.69/html_node/Particular-Headers.html#index-AC_005fHEADER_005fMAJOR-616
--mike
+ QemuUUID qemu_uuid __attribute__ ((weak));
 
---zYjDATHXTWnytHRU
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
+-static int lib_init_failed;
++static uint32_t refcnt;
 
------BEGIN PGP SIGNATURE-----
+ typedef enum {
+     VDISK_AIO_READ,
+@@ -232,9 +232,24 @@ static int vxhs_open(BlockDriverState *bs, QDict *options,
+     char *str = NULL;
+     int ret = 0;
 
-iQIzBAEBCAAdFiEEuQK1JxMl+JKsJRrUQWM7n+g39YEFAlijxLMACgkQQWM7n+g3
-9YE8ohAA10nzAysRkcGOAYZiI6a0Kq60CGubqtPxhVMiwY4ilL0qSJFjWbFVCZSW
-IVGPCzpNMn1xWTj7VrNG8FucH+xuazmSC2Y2w4TH5o2HLfBxYO/Gz4OrnuSOb56J
-5nEh8Rk2pJaKeZ+0APUiA7fvIJvM/gqDboEAYx2ISe+qeiqul1Qa0tCXTlMpNCnM
-UcVbtJA28Dg+wtCGGx1ekTh+QfGHSO79h+2I4lmqgYHjP5dqLvSUYjxcQ6Yq81kU
-YsyOjawEE6Q/n/vMCxGhul8selU62YTYB7YpRY75ZY07oHaq5JeI3WW8ye8S8RpO
-BzXM67SUWfZ5eMliolLx96S/CiBjrMTBOT+O6vNejf8w1Debzp1Q825fIZh8vkgy
-IU39PRpWuPuuuqZfOOFwFlQg1Mns0Us54BH55n5stgKjrIpOIeIBhgDfO/7FVB3W
-r1X4nGZEpVV9HP5Yy4G8zUGPsgT7S2kKDlHmKQAziXt8aJKTcCSaKu7CPXMNFFpW
-wOJ1qAdwmKvSAm80/Rp7yWyUKw85l8kMxKjrpUtWLSwGtjXAkW6o09g725pBaDU4
-5TdjRU67NpZqe9IOXWm0//mdn09kp1J9nDEJEKxh97SqhL+KTM1hEfWwGtgHdc+B
-/2o5eqE/qfD/ZO832HPJJXGluCDJ0dW8vxhEnDp8ua5JRKDbvqo=
-=CwSA
------END PGP SIGNATURE-----
+-    if (lib_init_failed) {
+-        return -ENODEV;
++    if (refcnt == 0) {
++        char out[UUID_FMT_LEN + 1];
++        if (qemu_uuid_is_null(&qemu_uuid)) {
++            if (iio_init(QNIO_VERSION, vxhs_iio_callback, VXHS_UUID_DEF))
++                return -ENODEV;
++        } else {
++            qemu_uuid_unparse(&qemu_uuid, out);
++            if (iio_init(QNIO_VERSION, vxhs_iio_callback, out))
++                return -ENODEV;
++        }
+     }
++
++    /*
++     * Increment refcnt before actual open.
++     * We will decrement it if there is an error.
++     */
++    refcnt++;
++
+     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+     qemu_opts_absorb_qdict(opts, options, &local_err);
+     if (local_err) {
+@@ -323,6 +338,13 @@ out:
+     qemu_opts_del(opts);
 
---zYjDATHXTWnytHRU--
+     if (ret < 0) {
++        if (refcnt == 1) {
++            /*
++             * First device open resulted in error.
++             */
++            iio_fini();
++        }
++        refcnt--;
+         error_propagate(errp, local_err);
+         g_free(s->vdisk_hostinfo.host);
+         g_free(s->vdisk_guid);
+@@ -428,6 +450,10 @@ static void vxhs_close(BlockDriverState *bs)
+         s->vdisk_hostinfo.dev_handle = NULL;
+     }
+
++    if (--refcnt == 0) {
++        iio_fini();
++    }
++
+     /*
+      * Free the dynamically allocated host string
+      */
+@@ -484,15 +510,6 @@ static BlockDriver bdrv_vxhs = {
+
+ static void bdrv_vxhs_init(void)
+ {
+-    char out[37];
+-
+-    if (qemu_uuid_is_null(&qemu_uuid)) {
+-        lib_init_failed = iio_init(QNIO_VERSION, vxhs_iio_callback,
+VXHS_UUID_DEF);
+-    } else {
+-        qemu_uuid_unparse(&qemu_uuid, out);
+-        lib_init_failed = iio_init(QNIO_VERSION, vxhs_iio_callback, out);
+-    }
+-
+     bdrv_register(&bdrv_vxhs);
+ }
+
+Thanks,
+Ashish
+
+> Will consider this in the next patch.
+>
+> Regards,
+> Ashish
