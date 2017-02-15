@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ce315-0008FO-QY
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:05:21 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ce35n-00044A-Tz
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:10:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ce314-0004fF-N0
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:05:19 -0500
-References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2442d4fc-7dd9-7e25-2389-7dd602e2aa27@redhat.com>
-Date: Wed, 15 Feb 2017 18:05:11 +0100
+	(envelope-from <kwolf@redhat.com>) id 1ce35m-0005jx-VX
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:10:11 -0500
+Date: Wed, 15 Feb 2017 18:10:03 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170215171003.GJ4935@noname.redhat.com>
+References: <20170212014724.10618-1-mreitz@redhat.com>
+	<w51lgtazdqs.fsf@maestria.local.igalia.com>
+	<8d536684-8a07-7c34-16ca-be234685ab2a@redhat.com>
+	<w51k28tumiv.fsf@maestria.local.igalia.com>
+	<7fcba84d-4cd8-b34d-ef3e-4fbfa46d59a9@redhat.com>
+	<20170215164451.GH4935@noname.redhat.com>
+	<4756605d-5cd3-20be-d7fc-2909bae8a268@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170203154757.36140-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 00/18] nbd: BLOCK_STATUS
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="NU0Ex4SbNnrxsi6C"
+Content-Disposition: inline
+In-Reply-To: <4756605d-5cd3-20be-d7fc-2909bae8a268@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: Swap request limit
+ definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,93 +30,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, den@virtuozzo.com, stefanha@redhat.com
+To: Max Reitz <mreitz@redhat.com>
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
 
+--NU0Ex4SbNnrxsi6C
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 03/02/2017 16:47, Vladimir Sementsov-Ogievskiy wrote:
-> Hi all!
-> 
-> We really need exporting dirty bitmaps feature as well as remote
-> get_block_status for nbd devices. So, here is minimalistic and restricted
-> realization of 'structured reply' and 'block status' nbd protocol extension
-> (as second is developed over the first the combined spec may be found here:
-> https://github.com/NetworkBlockDevice/nbd/blob/extension-blockstatus/doc/proto.md)
-> 
-> What is done:
-> 
-> server:
->  - can send not fragmented structured replies for CMD_READ (this was done only
->    because the spec doesn't allow structure reply feature without maintaining
->    structured read)
->  - can export dirty bitmap through BLOCK_STATUS. Only one bitmap can be exported,
->    negotiation query should be 'qemu-dirty-bitmap:<bitmap name>'
->  - cab export block status through BLOCK_STATUS. Client can negotiate only one
->    entity for exporting through BLOCK_STATUS - bitmap _or_ block status.
->    negotiation query should be 'base:allocation', as defined in the spec.
->    server sends only one extent on each BLOCK_STATUS query.
-> 
-> client:
->  - can receive not fragmented structured replies for CMD_READ
->  - can get load dirty bitmap through nbd. Be careful: bitmap for export is
->    is selected during nbd negotiation - actually in open(). So, name argument for
->    qmp block-dirty-bitmap-load is just a _new_ name for loaded bitmap.
->    (any way, for us block-dirty-bitmap-load is just a way to test the feature,
->     really we need only server part)
->  - get_block_status works now through nbd CMD_BLOCK_STATUS, if base:allocation is
->    negotiated for export.
-> 
-> It should be minimal but fully compatible realization of the spec.
+Am 15.02.2017 um 17:48 hat Max Reitz geschrieben:
+> On 15.02.2017 17:44, Kevin Wolf wrote:
+> > Am 15.02.2017 um 14:42 hat Max Reitz geschrieben:
+> >> On 14.02.2017 10:52, Alberto Garcia wrote:
+> >>> On Mon 13 Feb 2017 06:13:38 PM CET, Max Reitz wrote:
+> >>>
+> >>>>>> -#define BDRV_REQUEST_MAX_SECTORS MIN(SIZE_MAX >> BDRV_SECTOR_BITS=
+, \
+> >>>>>> -                                     INT_MAX >> BDRV_SECTOR_BITS)
+> >>>>>> -#define BDRV_REQUEST_MAX_BYTES (BDRV_REQUEST_MAX_SECTORS << BDRV_=
+SECTOR_BITS)
+> >>>>>> +#define BDRV_REQUEST_MAX_BYTES      MIN(SIZE_MAX, INT_MAX)
+> >>>>>> +#define BDRV_REQUEST_MAX_SECTORS    (BDRV_REQUEST_MAX_BYTES >> BD=
+RV_SECTOR_BITS)
+> >>>>>
+> >>>>> I'm just pointing it out because I don't know if this can cause
+> >>>>> problems, but this patch would make BDRV_REQUEST_MAX_BYTES not a
+> >>>>> multiple of the sector size (INT_MAX is actually a prime number).
+> >>>>
+> >>>> Very good point. I don't think this could be an issue, though. For o=
+ne
+> >>>> thing, the use of BDRV_REQUEST_MAX_BYTES is very limited.
+> >>>
+> >>> Ok, but then I wonder what's the benefit of increasing
+> >>> BDRV_REQUEST_MAX_BYTES.
+> >>
+> >> The benefit is that the definition looks cleaner.
+> >=20
+> > Whatever way we want to write it, I think MAX_BYTES =3D MAX_SECTORS * 5=
+12
+> > should be a given. Everything else is bound to confuse people and
+> > introduce bugs sooner or later.
+>=20
+> Probably only sooner and not later, considering we are switching to byte
+> granularity overall anyway. And if something confuses people, I'd argue
+> it's the fact that we still have sector granularity all over the place
+> and not that your requests can be a bit bigger if you submit them in
+> bytes than if you submit them in sectors.
+>=20
+> Anyway, if MAX_BYTES should be a multiple of the sector size, then I
+> can't think of a much better way to write this than what we currently
+> have and this patch is unneeded.
 
-This will require v2, but it seems pretty close already.
+Maybe we can just get rid of BDRV_REQUEST_MAX_SECTORS? Or do we need to
+do a few more conversion before that?
 
-Paolo
+Kevin
 
-> web: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=nbd-block-status-v1
-> git: https://src.openvz.org/scm/~vsementsov/qemu.git (tag nbd-block-status-v1)
-> 
-> Vladimir Sementsov-Ogievskiy (18):
->   nbd: rename NBD_REPLY_MAGIC to NBD_SIMPLE_REPLY_MAGIC
->   nbd-server: refactor simple reply sending
->   nbd: Minimal structured read for server
->   nbd/client: refactor nbd_receive_starttls
->   nbd/client: fix drop_sync
->   nbd/client: refactor drop_sync
->   nbd: Minimal structured read for client
->   hbitmap: add next_zero function
->   block/dirty-bitmap: add bdrv_dirty_bitmap_next()
->   block/dirty-bitmap: add bdrv_load_dirty_bitmap
->   nbd: BLOCK_STATUS for bitmap export: server part
->   nbd: BLOCK_STATUS for bitmap export: client part
->   nbd: add nbd_dirty_bitmap_load
->   qmp: add x-debug-block-dirty-bitmap-sha256
->   qmp: add block-dirty-bitmap-load
->   iotests: add test for nbd dirty bitmap export
->   nbd: BLOCK_STATUS for standard get_block_status function: server part
->   nbd: BLOCK_STATUS for standard get_block_status function: client part
-> 
->  block/dirty-bitmap.c                     |  70 ++++
->  block/nbd-client.c                       | 230 ++++++++++-
->  block/nbd-client.h                       |  13 +
->  block/nbd.c                              |  44 +-
->  blockdev.c                               |  57 +++
->  include/block/block_int.h                |   4 +
->  include/block/dirty-bitmap.h             |  10 +
->  include/block/nbd.h                      |  73 +++-
->  include/qemu/hbitmap.h                   |  16 +
->  nbd/client.c                             | 373 ++++++++++++++---
->  nbd/nbd-internal.h                       |  25 +-
->  nbd/server.c                             | 661 ++++++++++++++++++++++++++++++-
->  qapi/block-core.json                     |  46 ++-
->  qemu-nbd.c                               |   2 +-
->  tests/Makefile.include                   |   2 +-
->  tests/qemu-iotests/180                   | 133 +++++++
->  tests/qemu-iotests/180.out               |   5 +
->  tests/qemu-iotests/group                 |   1 +
->  tests/qemu-iotests/nbd-fault-injector.py |   4 +-
->  util/hbitmap.c                           |  37 ++
->  20 files changed, 1713 insertions(+), 93 deletions(-)
->  create mode 100755 tests/qemu-iotests/180
->  create mode 100644 tests/qemu-iotests/180.out
-> 
+--NU0Ex4SbNnrxsi6C
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJYpItrAAoJEH8JsnLIjy/WlSYP/37Wsyc0TXSRUVAA4iNZyRIp
+Z1ySkNmsUyKz6URNTH853ifHcLN4MePW0kLPtGtdSDl1nMQiypBhohr9WTOPxira
+At4VXVWGbPonBEIvFgPb6jICX6XxrrNH77nZFmjQK6i8fKP3+Tc1DY2IVcsvHysH
+8u/+uJSIFb9oljI9deM9fIr1IaCN8Z4I8UgdXDPJi1UuiNXsuAlnFr2gkvSUHvrf
+ZtyBGE8qxH+S1IgC34KBHG/KBJ1JqkRWGqcysF6zaBcd9MPaXN2txNgz3SrE7Vj1
+gyzttZEjNgCUWhRVZIRAlD3Uu/DPMe9tS0tcGxCdjtAIpS2xydt1/9J+oo9ZbKO2
+xtKaqXrl4GqbkSfKwurMa0wO4KRWgAhf+sBeWg23iSrsfwnLGul1iIfOVqNiInOZ
+RwqrSpGAe2EEOKkwYADNY0OZeztFOQgdXxUjuYP0cD9vSt7URlbZY30ZlyEIg/B9
+fmdsUsS2JUQJiRBP8nZaD8jDLffTCgqYgpcjwct8Ljw9WOtfyyKH0aI2w0yf891m
+v7zpeudSbdph4JZwKuwQnibwxzKuEjPlLa5Iwh74xonVS10bEVyuf0vj3MMFJbop
+DQnAHC46/qmg7nL5KOPW0NZYxf0KnkBhaSmJXlHwHPfZCC3mPTsTtrMwNVwpUU3o
+G/bSsJS2vrAqyXKUvyma
+=a4TA
+-----END PGP SIGNATURE-----
+
+--NU0Ex4SbNnrxsi6C--
