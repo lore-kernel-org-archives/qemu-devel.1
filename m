@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44238)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cdqMw-0003ws-V9
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 22:35:04 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cdqOO-0004eF-In
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 22:36:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cdqMt-0000Tk-SK
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 22:35:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33474)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cdqMt-0000TC-JX
-	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 22:34:59 -0500
-Date: Wed, 15 Feb 2017 11:34:52 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170215033452.GB3988@pxdev.xzpeter.org>
-References: <CAHyh4xiVKjd+D=qaizUZ02O8xLYhpoVKOqC9cR0ZWWyLq9HtbQ@mail.gmail.com>
-	<20170208031216.GA5151@pxdev.xzpeter.org>
-	<CAHyh4xg7NVPjXu3c+xGWNzQqwLgFqFJTPo4SgN-X+FNuHjGihQ@mail.gmail.com>
-	<CAHyh4xhOPmfLoU_fvtbBF1Wqbzji9q6rp_bRN38qfnwvhQq+9A@mail.gmail.com>
-	<20170209035250.GB22153@pxdev.xzpeter.org>
-	<CAHyh4xi9KZm13mJnE3-EyYkkyN4YDKKwbeJ68AumCBM7kgr+MQ@mail.gmail.com>
-	<20170214073551.GA9055@pxdev.xzpeter.org>
-	<CAHyh4xiATAV801U7zjK1F_B+7e2bDWhH1-gpFKF3U1jNmCfScw@mail.gmail.com>
-	<20170215025243.GA3988@pxdev.xzpeter.org>
+	(envelope-from <dgibson@ozlabs.org>) id 1cdqOL-0001Fp-Fr
+	for qemu-devel@nongnu.org; Tue, 14 Feb 2017 22:36:32 -0500
+Date: Wed, 15 Feb 2017 14:35:15 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170215033515.GF12369@umbus.fritz.box>
+References: <1486978404-17509-1-git-send-email-clg@kaod.org>
+	<20170214015843.GA2169@umbus.fritz.box>
+	<0d8bcb67-2712-d15b-5989-99a40436b417@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="oFbHfjnMgUMsrGjO"
 Content-Disposition: inline
-In-Reply-To: <20170215025243.GA3988@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] iommu emulation
+In-Reply-To: <0d8bcb67-2712-d15b-5989-99a40436b417@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH] ppc/xics: fix XICSStateClass parent class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,182 +25,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jintack Lim <jintack@cs.columbia.edu>, Alex Williamson <alex.williamson@redhat.com>
-Cc: mst@redhat.com, QEMU Devel Mailing List <qemu-devel@nongnu.org>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Wed, Feb 15, 2017 at 10:52:43AM +0800, Peter Xu wrote:
 
-[...]
+--oFbHfjnMgUMsrGjO
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > >
-> > > Then, I *think* above assertion you encountered would fail only if
-> > > prev == 0 here, but I still don't quite sure why was that happening.
-> > > Btw, could you paste me your "lspci -vvv -s 00:03.0" result in your L1
-> > > guest?
-> > >
-> > 
-> > Sure. This is from my L1 guest.
-> 
-> Hmm... I think I found the problem...
-> 
-> > 
-> > root@guest0:~# lspci -vvv -s 00:03.0
-> > 00:03.0 Network controller: Mellanox Technologies MT27500 Family
-> > [ConnectX-3]
-> > Subsystem: Mellanox Technologies Device 0050
-> > Control: I/O- Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr-
-> > Stepping- SERR+ FastB2B- DisINTx+
-> > Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort-
-> > <MAbort- >SERR- <PERR- INTx-
-> > Latency: 0, Cache Line Size: 64 bytes
-> > Interrupt: pin A routed to IRQ 23
-> > Region 0: Memory at fe900000 (64-bit, non-prefetchable) [size=1M]
-> > Region 2: Memory at fe000000 (64-bit, prefetchable) [size=8M]
-> > Expansion ROM at fea00000 [disabled] [size=1M]
-> > Capabilities: [40] Power Management version 3
-> > Flags: PMEClk- DSI- D1- D2- AuxCurrent=0mA PME(D0-,D1-,D2-,D3hot-,D3cold-)
-> > Status: D0 NoSoftRst+ PME-Enable- DSel=0 DScale=0 PME-
-> > Capabilities: [48] Vital Product Data
-> > Product Name: CX354A - ConnectX-3 QSFP
-> > Read-only fields:
-> > [PN] Part number: MCX354A-FCBT
-> > [EC] Engineering changes: A4
-> > [SN] Serial number: MT1346X00791
-> > [V0] Vendor specific: PCIe Gen3 x8
-> > [RV] Reserved: checksum good, 0 byte(s) reserved
-> > Read/write fields:
-> > [V1] Vendor specific: N/A
-> > [YA] Asset tag: N/A
-> > [RW] Read-write area: 105 byte(s) free
-> > [RW] Read-write area: 253 byte(s) free
-> > [RW] Read-write area: 253 byte(s) free
-> > [RW] Read-write area: 253 byte(s) free
-> > [RW] Read-write area: 253 byte(s) free
-> > [RW] Read-write area: 253 byte(s) free
-> > [RW] Read-write area: 253 byte(s) free
-> > [RW] Read-write area: 253 byte(s) free
-> > [RW] Read-write area: 253 byte(s) free
-> > [RW] Read-write area: 253 byte(s) free
-> > [RW] Read-write area: 253 byte(s) free
-> > [RW] Read-write area: 253 byte(s) free
-> > [RW] Read-write area: 253 byte(s) free
-> > [RW] Read-write area: 253 byte(s) free
-> > [RW] Read-write area: 253 byte(s) free
-> > [RW] Read-write area: 252 byte(s) free
-> > End
-> > Capabilities: [9c] MSI-X: Enable+ Count=128 Masked-
-> > Vector table: BAR=0 offset=0007c000
-> > PBA: BAR=0 offset=0007d000
-> > Capabilities: [60] Express (v2) Root Complex Integrated Endpoint, MSI 00
-> > DevCap: MaxPayload 256 bytes, PhantFunc 0
-> > ExtTag- RBE+
-> > DevCtl: Report errors: Correctable- Non-Fatal+ Fatal+ Unsupported+
-> > RlxdOrd- ExtTag- PhantFunc- AuxPwr- NoSnoop-
-> > MaxPayload 256 bytes, MaxReadReq 4096 bytes
-> > DevSta: CorrErr+ UncorrErr- FatalErr- UnsuppReq+ AuxPwr- TransPend-
-> > DevCap2: Completion Timeout: Range ABCD, TimeoutDis+, LTR-, OBFF Not
-> > Supported
-> > DevCtl2: Completion Timeout: 65ms to 210ms, TimeoutDis-, LTR-, OBFF Disabled
-> > Capabilities: [100 v0] #00
-> 
-> Here we have the head of ecap capability as cap_id==0, then when we
-> boot the l2 guest with the same device, we'll first copy this
-> cap_id==0 cap, then when adding the 2nd ecap, we'll probably encounter
-> problem since pcie_find_capability_list() will thought there is no cap
-> at all (cap_id==0 is skipped).
-> 
-> Do you want to try this "hacky patch" to see whether it works for you?
-> 
-> ------8<-------
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index 332f41d..bacd302 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -1925,11 +1925,6 @@ static void vfio_add_ext_cap(VFIOPCIDevice *vdev)
->  
->      }
->  
-> -    /* Cleanup chain head ID if necessary */
-> -    if (pci_get_word(pdev->config + PCI_CONFIG_SPACE_SIZE) == 0xFFFF) {
-> -        pci_set_word(pdev->config + PCI_CONFIG_SPACE_SIZE, 0);
-> -    }
-> -
->      g_free(config);
->      return;
->  }
-> ------>8-------
-> 
-> I don't think it's a good solution (it just used 0xffff instead of 0x0
-> for the masked cap_id, then l2 guest would like to co-op with it), but
-> it should workaround this temporarily. I'll try to think of a better
-> one later and post when proper.
-> 
-> (Alex, please leave comment if you have any better suggestion before
->  mine :)
+On Tue, Feb 14, 2017 at 07:25:07AM +0100, C=E9dric Le Goater wrote:
+> On 02/14/2017 02:58 AM, David Gibson wrote:
+> > On Mon, Feb 13, 2017 at 10:33:24AM +0100, C=E9dric Le Goater wrote:
+> >> XICSState inherits from SysBusDevice and so the object class should
+> >> inherit from SysBusDeviceClass.
+> >>
+> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> >=20
+> > That's definitely a bug, but I don't think this is the right fix.
+> >=20
+> > XICS was put on sysbus back when I thought that was where you put any
+> > "system" devices that didn't belong on a more specific bus.  I've
+> > since discovered that's not the case, and - particularly since xics
+> > doesn't expose any mmio - it shouldn't be a sysbus device at all.
+> >=20
+> > I've instead made a patch changing it to a direct child of
+> > TYPE_DEVICE.  Since the device shouldn't ever be command line
+> > instantiated, and it has no migratable state I believe this should be
+> > a safe change.
+> >=20
+> > This is in ppc-for-2.9, tentatively; please review:
+> >=20
+> > From eae21fcf2430588f17e6a58d505aa8eaa580b507 Mon Sep 17 00:00:00 2001
+> > From: David Gibson <david@gibson.dropbear.id.au>
+> > Date: Tue, 14 Feb 2017 12:58:05 +1100
+> > Subject: [PATCH] xics: XICS should not be a SysBusDevice
+> >=20
+> > Currently xics - the component of the IBM POWER interrupt controller
+> > representing the overall interrupt fabric / architecture is represented=
+ as
+> > a descedent of SysBusDevice.  However, this is not really correct - the
+>=20
+> descendant ?
 
-Alex, do you like something like below to fix above issue that Jintack
-has encountered?
+descendent, actually, we were both wrong.
 
-(note: this code is not for compile, only trying show what I mean...)
+>=20
+> > xics presents nothing in MMIO space so it should be an "unattached" dev=
+ice
+> > in the current QOM model.
+> >=20
+> > Since this device will always be created by the machine type, not creat=
+ed
+> > specifically from the command line, and because it has no migrated state
+> > it should be safe to move it around the device composition tree.
+> >=20
+> > Therefore this patch changes it to a descendent of TYPE_DEVICE, and mak=
+es
+> > it an unattached device.
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>=20
+> Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
+>=20
+> Thanks,
+>=20
+> C.
+>=20
+> > ---
+> >  hw/intc/xics.c | 2 +-
+> >  hw/ppc/spapr.c | 2 +-
+> >  2 files changed, 2 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+> > index 095c16a..372b831 100644
+> > --- a/hw/intc/xics.c
+> > +++ b/hw/intc/xics.c
+> > @@ -260,7 +260,7 @@ static void xics_common_class_init(ObjectClass *oc,=
+ void *data)
+> > =20
+> >  static const TypeInfo xics_common_info =3D {
+> >      .name          =3D TYPE_XICS_COMMON,
+> > -    .parent        =3D TYPE_SYS_BUS_DEVICE,
+> > +    .parent        =3D TYPE_DEVICE,
+> >      .instance_size =3D sizeof(XICSState),
+> >      .class_size    =3D sizeof(XICSStateClass),
+> >      .instance_init =3D xics_common_initfn,
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index 6f37288..9b6ad0f 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -101,7 +101,7 @@ static XICSState *try_create_xics(const char *type,=
+ int nr_servers,
+> >      Error *err =3D NULL;
+> >      DeviceState *dev;
+> > =20
+> > -    dev =3D qdev_create(NULL, type);
+> > +    dev =3D DEVICE(object_new(type));
+> >      qdev_prop_set_uint32(dev, "nr_servers", nr_servers);
+> >      qdev_prop_set_uint32(dev, "nr_irqs", nr_irqs);
+> >      object_property_set_bool(OBJECT(dev), true, "realized", &err);
+> >=20
+>=20
 
-------8<-------
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 332f41d..4dca631 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -1877,25 +1877,6 @@ static void vfio_add_ext_cap(VFIOPCIDevice *vdev)
-      */
-     config = g_memdup(pdev->config, vdev->config_size);
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
--    /*
--     * Extended capabilities are chained with each pointing to the next, so we
--     * can drop anything other than the head of the chain simply by modifying
--     * the previous next pointer.  For the head of the chain, we can modify the
--     * capability ID to something that cannot match a valid capability.  ID
--     * 0 is reserved for this since absence of capabilities is indicated by
--     * 0 for the ID, version, AND next pointer.  However, pcie_add_capability()
--     * uses ID 0 as reserved for list management and will incorrectly match and
--     * assert if we attempt to pre-load the head of the chain with this ID.
--     * Use ID 0xFFFF temporarily since it is also seems to be reserved in
--     * part for identifying absence of capabilities in a root complex register
--     * block.  If the ID still exists after adding capabilities, switch back to
--     * zero.  We'll mark this entire first dword as emulated for this purpose.
--     */
--    pci_set_long(pdev->config + PCI_CONFIG_SPACE_SIZE,
--                 PCI_EXT_CAP(0xFFFF, 0, 0));
--    pci_set_long(pdev->wmask + PCI_CONFIG_SPACE_SIZE, 0);
--    pci_set_long(vdev->emulated_config_bits + PCI_CONFIG_SPACE_SIZE, ~0);
--
-     for (next = PCI_CONFIG_SPACE_SIZE; next;
-          next = PCI_EXT_CAP_NEXT(pci_get_long(config + next))) {
-         header = pci_get_long(config + next);
-@@ -1917,6 +1898,8 @@ static void vfio_add_ext_cap(VFIOPCIDevice *vdev)
-         switch (cap_id) {
-         case PCI_EXT_CAP_ID_SRIOV: /* Read-only VF BARs confuse OVMF */
-         case PCI_EXT_CAP_ID_ARI: /* XXX Needs next function virtualization */
-+            /* keep this ecap header (4 bytes), but mask cap_id to 0xffff */
-+            ...
-             trace_vfio_add_ext_cap_dropped(vdev->vbasedev.name, cap_id, next);
-             break;
-         default:
-@@ -1925,11 +1908,6 @@ static void vfio_add_ext_cap(VFIOPCIDevice *vdev)
+--oFbHfjnMgUMsrGjO
+Content-Type: application/pgp-signature; name="signature.asc"
 
-     }
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
--    /* Cleanup chain head ID if necessary */
--    if (pci_get_word(pdev->config + PCI_CONFIG_SPACE_SIZE) == 0xFFFF) {
--        pci_set_word(pdev->config + PCI_CONFIG_SPACE_SIZE, 0);
--    }
--
-     g_free(config);
-     return;
- }
------>8-----
+iQIcBAEBCAAGBQJYo8xxAAoJEGw4ysog2bOSc2YP/1uVVPlL0SbshWt36MZX1TDm
+Dhg2TaVK8Na+v+Bb0gV+m6qi/CDbVnSy1igTRIUofeGmPLQT3vucdNuUTNYW5dvn
+Xnm1HH7YZ9D4QjQKxblg8aKZFPrJyfQDk/vYPjP9QkGFSJ9hjDjvRRMljo0KUNZz
+cek9jCVHDGrCwc+Z0ZEmSG/iASyuPMyyaHIfm/iNFYomfQdtJdArCTHdaAeK/iFG
+S8sivd/KlHN3P8blEbkRhHmJ40914bG/GeaqR3XCU66wKyM8pICxsvm0oTKBi4NS
+CwBy458SldEulyXFU+2uGS/sn17hx2cua/1wuIUcsFs76LylxwX6UKkBHqxeic6R
+dAoGkFQYGERHb+xz12uk4JUfP2+5/itdex+vkkdid7p1FvbUDT+Lq4pYDRK8V2yd
+9gSTd9VsxXvsfVdJpilCDHu3rAApNyviJ+zhBtjSI+Imd0+woxug7n1CQ7ALtLCt
+u8tlHaJXeu6Ph1kIRg884m+hUF2saHF96uA9MXvjg3D9F+Rjr68S7qFVcuN869tT
+1qOksMPPM5t5PLjLoxxhyrycdpXRip4zORdeekQy64A3cbGgEV6clnLw0ULMMqmx
++sL9C8wU02YTFz/x1zGhxGrhEzxuCjy2BKW9UdNId5KG2GBEJ0vm3L8meb/ZaUls
+W/qQrbMKOW6tpmpEATsF
+=iCfD
+-----END PGP SIGNATURE-----
 
-Since after all we need the assumption that 0xffff is reserved for
-cap_id. Then, we can just remove the "first 0xffff then 0x0" hack,
-which is imho error-prone and hacky.
-
-Thanks,
-
--- peterx
+--oFbHfjnMgUMsrGjO--
