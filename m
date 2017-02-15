@@ -1,22 +1,45 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cdyG1-0000ZR-BN
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 07:00:26 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cdyHc-0002HV-6o
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 07:02:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cdyG0-0008BN-E5
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 07:00:25 -0500
-Date: Wed, 15 Feb 2017 20:00:15 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170215120015.GC1134@lemon.lan>
-References: <1487156985-18321-1-git-send-email-vsementsov@virtuozzo.com>
-	<20170215113324.GA1134@lemon.lan>
-	<b12de021-3baa-4e35-1a84-eafb5d1650cf@virtuozzo.com>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cdyHZ-0000fF-5E
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 07:02:04 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53201
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1cdyHY-0000ek-W3
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 07:02:01 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1FBwoOu067352
+	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 07:01:59 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28mhh13q30-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 07:01:59 -0500
+Received: from localhost
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Wed, 15 Feb 2017 12:01:56 -0000
+References: <1484727757-41240-1-git-send-email-arei.gonglei@huawei.com>
+	<1484727757-41240-2-git-send-email-arei.gonglei@huawei.com>
+	<62a99d8e-1735-0838-4067-bce401c86526@linux.vnet.ibm.com>
+	<20170207140710.01e4b694.cornelia.huck@de.ibm.com>
+	<33183CC9F5247A488A2544077AF19020DA1AFF1E@DGGEMA505-MBX.china.huawei.com>
+	<a80c3f48-e3c9-dd7e-643b-a54bdde54882@linux.vnet.ibm.com>
+	<33183CC9F5247A488A2544077AF19020DA1B30AA@DGGEMA505-MBX.china.huawei.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Wed, 15 Feb 2017 13:01:49 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b12de021-3baa-4e35-1a84-eafb5d1650cf@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v2] backup: allow target without
- .bdrv_get_info
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA1B30AA@DGGEMA505-MBX.china.huawei.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Message-Id: <10648449-6b1a-2a97-673a-6d9681b0fb68@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v16 1/2] virtio-crypto: Add
+ virtio crypto device specification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,65 +48,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, jsnow@redhat.com, den@openvz.org, stefanha@redhat.com
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "john.griffin@intel.com" <john.griffin@intel.com>, "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "Varun.Sethi@freescale.com" <Varun.Sethi@freescale.com>, "denglingli@chinamobile.com" <denglingli@chinamobile.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "agraf@suse.de" <agraf@suse.de>, "nmorey@kalray.eu" <nmorey@kalray.eu>, longpeng <longpeng2@huawei.com>, "vincent.jardin@6wind.com" <vincent.jardin@6wind.com>, "Ola.Liljedahl@arm.com" <Ola.Liljedahl@arm.com>, Luonengjun <luonengjun@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "liang.j.ma@intel.com" <liang.j.ma@intel.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "brian.a.keating@intel.com" <brian.a.keating@intel.com>, "mike.caraman@nxp.com" <mike.caraman@nxp.com>, "Wubin (H)" <wu.wubin@huawei.com>
 
-On Wed, 02/15 14:42, Vladimir Sementsov-Ogievskiy wrote:
-> 15.02.2017 14:33, Fam Zheng wrote:
-> > On Wed, 02/15 14:09, Vladimir Sementsov-Ogievskiy wrote:
-> > > Currently backup to nbd target is broken, as nbd doesn't have
-> > > .bdrv_get_info realization.
-> > > 
-> > > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> > > ---
-> > > 
-> > > v2: add WARNING
-> > > 
-> > > ===
-> > > 
-> > > Since commit
-> > > 
-> > > commit 4c9bca7e39a6e07ad02c1dcde3478363344ec60b
-> > > Author: John Snow <jsnow@redhat.com>
-> > > Date:   Thu Feb 25 15:58:30 2016 -0500
-> > > 
-> > >      block/backup: avoid copying less than full target clusters
-> > > 
-> > > backup to nbd target is broken, we have "Couldn't determine the cluster size of
-> > > the target image".
-> > > 
-> > > Proposed NBD protocol extension - NBD_OPT_INFO should finally solve this problem.
-> > > But until it is not realized, we need allow backup to nbd target due to backward
-> > > compatibility.
-> > If you respin, including above in the commit message is even better, IMO.
-> > 
-> > > Furthermore, is it entirely ok to disallow backup if bds lacks .bdrv_get_info?
-> > > Which behavior should be default: to fail backup or to use default cluster size?
-> > > 
-> > >   block/backup.c | 10 +++++++++-
-> > >   1 file changed, 9 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/block/backup.c b/block/backup.c
-> > > index ea38733..a464b63 100644
-> > > --- a/block/backup.c
-> > > +++ b/block/backup.c
-> > > @@ -638,7 +638,15 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-> > >        * backup cluster size is smaller than the target cluster size. Even for
-> > >        * targets with a backing file, try to avoid COW if possible. */
-> > >       ret = bdrv_get_info(target, &bdi);
-> > > -    if (ret < 0 && !target->backing) {
-> > > +    if (ret == -ENOTSUP) {
-> > > +        /* Cluster size is not defined */
-> > > +        error_report("WARNING: Target block device doesn't provide information "
-> > > +                     "about block size and it doesn't have backing file. "
-> > > +                     "Default block size of %u bytes is used. If actual block "
-> > > +                     "size of target exceeds this default, destination image "
-> > > +                     "may become unusable");
-> > "Image unusable" might be too strong here because it sounds like a serious
-> > damage to the image, while actually what we mean is "backup unusable".
+
+
+On 02/09/2017 03:29 AM, Gonglei (Arei) wrote:
+[..]
+> Oh, so much work need to be done.
 > 
-> Finally, "... default, backup may be unusable"?
+> Halil, Would you mind work together with me to perfect the spec?
+> And feel free to add your signed-off-by tag. :)
+> 
+> TBH as a non-native English speaker, it's more difficult writing a
+> spec than coding. :(
+> 
+> Look forward to your reply.
+> 
 
-Yes, looks good.
 
-Fam
+First, sorry for the long delay -- was busy and then ill. Thank you
+very much for your offer. I would prefer continuing as a reviewer,
+but I would very much appreciate if you could add me to the
+'Acknowledgments' appendix as a part of your patch ;). Unfortunately
+I do not have the time now to allocate significantly more time for
+this. I'm also having difficulties to think of another way of working
+efficiently together on this, than what we already do. I can try to
+provide more suggestions in terms of formulation, but it's still 
+just review. Thank you very much!
+
+Halil
