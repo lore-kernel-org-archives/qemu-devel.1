@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cdxTB-0002Rm-2W
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 06:09:58 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cdxYw-0006f8-JU
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 06:15:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cdxT5-0002Bj-JU
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 06:09:56 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:23646 helo=relay.sw.ru)
+	(envelope-from <imammedo@redhat.com>) id 1cdxYs-0005Er-Ih
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 06:15:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48470)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cdxT5-0002BV-76
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 06:09:51 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 15 Feb 2017 14:09:45 +0300
-Message-Id: <1487156985-18321-1-git-send-email-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2] backup: allow target without .bdrv_get_info
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cdxYs-0005E1-CB
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 06:15:50 -0500
+Date: Wed, 15 Feb 2017 12:15:47 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170215121547.7b4c3756@nial.brq.redhat.com>
+In-Reply-To: <60b6ece3ce0a24aec79c1061627fa2e6ab058fc2.1487139038.git.ben@skyportsystems.com>
+References: <cover.1487139038.git.ben@skyportsystems.com>
+	<60b6ece3ce0a24aec79c1061627fa2e6ab058fc2.1487139038.git.ben@skyportsystems.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 3/7] ACPI: Add vmgenid blob storage to
+ the build tables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,60 +28,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, stefanha@redhat.com
+To: ben@skyportsystems.com
+Cc: qemu-devel@nongnu.org, lersek@redhat.com, mst@redhat.com
 
-Currently backup to nbd target is broken, as nbd doesn't have
-.bdrv_get_info realization.
+On Tue, 14 Feb 2017 22:15:45 -0800
+ben@skyportsystems.com wrote:
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
+> From: Ben Warren <ben@skyportsystems.com>
+> 
+> This allows them to be centrally initialized and destroyed
+> 
+> The "AcpiBuildTables.vmgenid" array will be used to construct the
+> "etc/vmgenid" fw_cfg blob.
+> 
+> Its contents will be linked into fw_cfg after being built on the
+> pc_machine_done() -> acpi_setup() -> acpi_build() call path, and dropped
+> without use on the subsequent, guest triggered, acpi_build_update() ->
+> acpi_build() call path.
+> 
+> Signed-off-by: Ben Warren <ben@skyportsystems.com>
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-v2: add WARNING
-
-===
-
-Since commit
-
-commit 4c9bca7e39a6e07ad02c1dcde3478363344ec60b
-Author: John Snow <jsnow@redhat.com>
-Date:   Thu Feb 25 15:58:30 2016 -0500
-
-    block/backup: avoid copying less than full target clusters
-
-backup to nbd target is broken, we have "Couldn't determine the cluster size of
-the target image".
-
-Proposed NBD protocol extension - NBD_OPT_INFO should finally solve this problem.
-But until it is not realized, we need allow backup to nbd target due to backward
-compatibility.
-
-Furthermore, is it entirely ok to disallow backup if bds lacks .bdrv_get_info?
-Which behavior should be default: to fail backup or to use default cluster size?
-
- block/backup.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
-
-diff --git a/block/backup.c b/block/backup.c
-index ea38733..a464b63 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -638,7 +638,15 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-      * backup cluster size is smaller than the target cluster size. Even for
-      * targets with a backing file, try to avoid COW if possible. */
-     ret = bdrv_get_info(target, &bdi);
--    if (ret < 0 && !target->backing) {
-+    if (ret == -ENOTSUP) {
-+        /* Cluster size is not defined */
-+        error_report("WARNING: Target block device doesn't provide information "
-+                     "about block size and it doesn't have backing file. "
-+                     "Default block size of %u bytes is used. If actual block "
-+                     "size of target exceeds this default, destination image "
-+                     "may become unusable");
-+        job->cluster_size = BACKUP_CLUSTER_SIZE_DEFAULT;
-+    } else if (ret < 0 && !target->backing) {
-         error_setg_errno(errp, -ret,
-             "Couldn't determine the cluster size of the target image, "
-             "which has no backing file");
--- 
-1.8.3.1
+> ---
+>  hw/acpi/aml-build.c         | 2 ++
+>  include/hw/acpi/aml-build.h | 1 +
+>  2 files changed, 3 insertions(+)
+> 
+> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+> index b2a1e40..c6f2032 100644
+> --- a/hw/acpi/aml-build.c
+> +++ b/hw/acpi/aml-build.c
+> @@ -1559,6 +1559,7 @@ void acpi_build_tables_init(AcpiBuildTables *tables)
+>      tables->rsdp = g_array_new(false, true /* clear */, 1);
+>      tables->table_data = g_array_new(false, true /* clear */, 1);
+>      tables->tcpalog = g_array_new(false, true /* clear */, 1);
+> +    tables->vmgenid = g_array_new(false, true /* clear */, 1);
+>      tables->linker = bios_linker_loader_init();
+>  }
+>  
+> @@ -1568,6 +1569,7 @@ void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre)
+>      g_array_free(tables->rsdp, true);
+>      g_array_free(tables->table_data, true);
+>      g_array_free(tables->tcpalog, mfre);
+> +    g_array_free(tables->vmgenid, mfre);
+>  }
+>  
+>  /* Build rsdt table */
+> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+> index 559326c..00c21f1 100644
+> --- a/include/hw/acpi/aml-build.h
+> +++ b/include/hw/acpi/aml-build.h
+> @@ -210,6 +210,7 @@ struct AcpiBuildTables {
+>      GArray *table_data;
+>      GArray *rsdp;
+>      GArray *tcpalog;
+> +    GArray *vmgenid;
+>      BIOSLinker *linker;
+>  } AcpiBuildTables;
+>  
