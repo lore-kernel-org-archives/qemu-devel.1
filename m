@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ce37P-0005e4-Ld
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:11:52 -0500
+	(envelope-from <ben@skyportsystems.com>) id 1ce37z-000674-Kw
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:12:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ce37O-0006Vi-JD
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:11:51 -0500
-References: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
-	<1487006583-24350-10-git-send-email-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <0867a10b-b21f-da63-fb82-b1dd5cd38386@redhat.com>
-Date: Wed, 15 Feb 2017 18:11:41 +0100
-MIME-Version: 1.0
-In-Reply-To: <1487006583-24350-10-git-send-email-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="NkvwbqmfdcaPxV09gLplRwtIeDapTIwdw"
-Subject: Re: [Qemu-devel] [RFC PATCH 09/41] block: Default
- .bdrv_child_perm() for format drivers
+	(envelope-from <ben@skyportsystems.com>) id 1ce37y-0006qI-LG
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:12:27 -0500
+Received: from mail-pg0-x22d.google.com ([2607:f8b0:400e:c05::22d]:34248)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
+	id 1ce37y-0006q0-Bz
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:12:26 -0500
+Received: by mail-pg0-x22d.google.com with SMTP id z67so6485136pgb.1
+	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 09:12:26 -0800 (PST)
+From: Ben Warren <ben@skyportsystems.com>
+Message-Id: <311C06BA-6A6F-4984-9A31-B66E055729D7@skyportsystems.com>
+Content-Type: multipart/signed;
+	boundary="Apple-Mail=_AB74B8D4-3F26-4F3F-8ACB-211F54398301";
+	protocol="application/pkcs7-signature"; micalg=sha1
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+Date: Wed, 15 Feb 2017 09:12:24 -0800
+In-Reply-To: <20170215183952-mutt-send-email-mst@kernel.org>
+References: <cover.1487139038.git.ben@skyportsystems.com>
+	<111628dff0803a21b75cc390858f0c288decee22.1487139038.git.ben@skyportsystems.com>
+	<20170215131903.2394b096@nial.brq.redhat.com>
+	<6d3caba0-c747-457d-0fee-b02f7f09e50a@redhat.com>
+	<20170215170757.59fe54de@nial.brq.redhat.com>
+	<20170215183952-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v6 4/7] ACPI: Add Virtual Machine
+ Generation ID support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,145 +36,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---NkvwbqmfdcaPxV09gLplRwtIeDapTIwdw
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
-Message-ID: <0867a10b-b21f-da63-fb82-b1dd5cd38386@redhat.com>
-Subject: Re: [RFC PATCH 09/41] block: Default .bdrv_child_perm() for format
- drivers
-References: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
- <1487006583-24350-10-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1487006583-24350-10-git-send-email-kwolf@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
+
+--Apple-Mail=_AB74B8D4-3F26-4F3F-8ACB-211F54398301
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-On 13.02.2017 18:22, Kevin Wolf wrote:
-> Almost all format drivers have the same characteristics as far as
-> permissions are concerned: They have one or more children for storing
-> their own data and, more importantly, metadata (can be written to and
-> grow even without external write requests, must be protected against
-> other writers and present consistent data) and optionally a backing fil=
-e
-> (this is just data, so like for a filter, it only depends on what the
-> parent nodes need).
+
+> On Feb 15, 2017, at 8:40 AM, Michael S. Tsirkin <mst@redhat.com> =
+wrote:
 >=20
-> This provides a default implementation that can be shared by most of
-> our format drivers.
+> On Wed, Feb 15, 2017 at 05:07:57PM +0100, Igor Mammedov wrote:
+>>> Those improvements can be added later, IMO -- but please do work out
+>>> with Igor whether he really wants a v7 for those.
+>> since it's minor fixes not influencing other patches within series
+>> there is not need to repost whole series,
+>> just this fixed up patch as replay to this thread tagged as v7
+>> or a patch on top, I'm fine with either way.
 >=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block.c                   | 37 +++++++++++++++++++++++++++++++++++++
->  include/block/block_int.h |  8 ++++++++
->  2 files changed, 45 insertions(+)
+> OK, I'll merge v7, send more cleanups/fixes as patches on top pls.
 >=20
-> diff --git a/block.c b/block.c
-> index 290768d..8e99bb5 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -1459,6 +1459,43 @@ void bdrv_filter_default_perms(BlockDriverState =
-*bs, BdrvChild *c,
->                 (c->shared_perm & DEFAULT_PERM_UNCHANGED);
->  }
-> =20
-> +void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
-> +                               const BdrvChildRole *role,
-> +                               uint64_t perm, uint64_t shared,
-> +                               uint64_t *nperm, uint64_t *nshared)
-> +{
-> +    bool backing =3D (role =3D=3D &child_backing);
-> +    assert(role =3D=3D &child_backing || role =3D=3D &child_file);
-> +
-> +    if (!backing) {
-> +        /* Apart from the modifications below, the same permissions ar=
-e
-> +         * forwarded and left alone as for filters */
-> +        bdrv_filter_default_perms(bs, c, role, perm, shared, &perm, &s=
-hared);
-> +
-> +        /* Format drivers may touch metadata even if the guest doesn't=
- write */
-> +        if (!bdrv_is_read_only(bs)) {
-> +            perm |=3D BLK_PERM_WRITE | BLK_PERM_RESIZE;
-> +        }
-> +
-> +        /* bs->file always needs to be consistent because of the metad=
-ata. We
-> +         * can never allow other users to resize or write to it. */
-> +        perm |=3D BLK_PERM_CONSISTENT_READ;
-> +        shared &=3D ~(BLK_PERM_WRITE | BLK_PERM_RESIZE);
-> +    } else {
-> +        /* We want consistent read from backing files if the parent ne=
-eds it.
-> +         * No other operations are performed on backing files. */
-> +        perm &=3D BLK_PERM_CONSISTENT_READ;
-> +
-> +        /* If the parent can deal with changing data, we're okay with =
-a
-> +         * writable backing file. */
+> --=20
+> MST
+Thanks everybody.  The requested changes are pretty minor so I should be =
+able to turn v7 around today.
 
-Are we OK with a resizable backing file, too? I'm not sure, actually.
-Maybe we should just forbid it and hope nobody asks for it.
+=E2=80=94Ben=
 
-Max
+--Apple-Mail=_AB74B8D4-3F26-4F3F-8ACB-211F54398301
+Content-Disposition: attachment;
+	filename=smime.p7s
+Content-Type: application/pkcs7-signature;
+	name=smime.p7s
+Content-Transfer-Encoding: base64
 
-> +        shared &=3D BLK_PERM_WRITE;
-> +        shared |=3D BLK_PERM_CONSISTENT_READ | BLK_PERM_GRAPH_MOD |
-> +                  BLK_PERM_WRITE_UNCHANGED;
-> +    }
-> +
-> +    *nperm =3D perm;
-> +    *nshared =3D shared;
-> +}
-> =20
->  static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new=
-_bs)
->  {
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index 2d74f92..46f51a6 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -885,6 +885,14 @@ void bdrv_filter_default_perms(BlockDriverState *b=
-s, BdrvChild *c,
->                                 uint64_t perm, uint64_t shared,
->                                 uint64_t *nperm, uint64_t *nshared);
-> =20
-> +/* Default implementation for BlockDriver.bdrv_child_perm() that can b=
-e used by
-> + * (non-raw) image formats: Like above for bs->backing, but for bs->fi=
-le it
-> + * requires WRITE | RESIZE for read-write images, always requires
-> + * CONSISTENT_READ and doesn't share WRITE. */
-> +void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
-> +                               const BdrvChildRole *role,
-> +                               uint64_t perm, uint64_t shared,
-> +                               uint64_t *nperm, uint64_t *nshared);
-> =20
->  const char *bdrv_get_parent_name(const BlockDriverState *bs);
->  void blk_dev_change_media_cb(BlockBackend *blk, bool load);
->=20
-
-
-
---NkvwbqmfdcaPxV09gLplRwtIeDapTIwdw
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliki80SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AwxAH/0L9I1gyzQ+aRmAv/FYX74sa+Rn1f7sF
-dzqlkf5q7uCUsKsU/l3+/XZ+0PKpKsZ3o2jYxAm1NrEw5XSVzKVul/RiVkg29puN
-QDz+oRol9MefK1Dv+xIlq7sOb/UUFgtkXp4de1rUt1aneMoJdf1zEg6GsY9tw5wb
-sa4JGJfUQDx8PbOwqnHN8KE5vHYI3md20Hik/eBqGKfbPt9SGFHcnV1K2wVug1KR
-16FQhkXYvD9Z2SAtKr+A7BxhNW1XnbyYCE9jEW4q8lvTz3tjiYPvIVawWEzPL1RX
-Vk6fmXF6fQZgaV+uvhSa4Qp2nGlUhZpFdG70HPqjhWDBScReYFbIGGM=
-=i2up
------END PGP SIGNATURE-----
-
---NkvwbqmfdcaPxV09gLplRwtIeDapTIwdw--
+MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIIJ+zCCBK8w
+ggOXoAMCAQICEQDgI8sVEoNTia1hbnpUZ2shMA0GCSqGSIb3DQEBCwUAMG8xCzAJBgNVBAYTAlNF
+MRQwEgYDVQQKEwtBZGRUcnVzdCBBQjEmMCQGA1UECxMdQWRkVHJ1c3QgRXh0ZXJuYWwgVFRQIE5l
+dHdvcmsxIjAgBgNVBAMTGUFkZFRydXN0IEV4dGVybmFsIENBIFJvb3QwHhcNMTQxMjIyMDAwMDAw
+WhcNMjAwNTMwMTA0ODM4WjCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hl
+c3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxQTA/BgNV
+BAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWls
+IENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAibEN2npTGU5wUh28VqYGJre4SeCW
+51Gr8fBaE0kVo7SMG2C8elFCp3mMpCLfF2FOkdV2IwoU00oCf7YdCYBupQQ92bq7Fv6hh6kuQ1JD
+FnyvMlDIpk9a6QjYz5MlnHuI6DBk5qT4VoD9KiQUMxeZrETlaYujRgZLwjPU6UCfBrCxrJNAubUI
+kzqcKlOjENs9IGE8VQOO2U52JQIhKfqjfHF2T+7hX4Hp+1SA28N7NVK3hN4iPSwwLTF/Wb1SN7Az
+aS1D6/rWpfGXd2dRjNnuJ+u8pQc4doykqTj/34z1A6xJvsr3c5k6DzKrnJU6Ez0ORjpXdGFQvsZA
+P8vk4p+iIQIDAQABo4IBFzCCARMwHwYDVR0jBBgwFoAUrb2YejS0Jvf6xCZU7wO94CTLVBowHQYD
+VR0OBBYEFJJha4LhoqCqT+xn8cKj97SAAMHsMA4GA1UdDwEB/wQEAwIBhjASBgNVHRMBAf8ECDAG
+AQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDARBgNVHSAECjAIMAYGBFUdIAAw
+RAYDVR0fBD0wOzA5oDegNYYzaHR0cDovL2NybC51c2VydHJ1c3QuY29tL0FkZFRydXN0RXh0ZXJu
+YWxDQVJvb3QuY3JsMDUGCCsGAQUFBwEBBCkwJzAlBggrBgEFBQcwAYYZaHR0cDovL29jc3AudXNl
+cnRydXN0LmNvbTANBgkqhkiG9w0BAQsFAAOCAQEAGypurFXBOquIxdjtzVXzqmthK8AJECOZD8Vm
+am+x9bS1d14PAmEA330F/hKzpICAAPz7HVtqcgIKQbwFusFY1SbC6tVNhPv+gpjPWBvjImOcUvi7
+BTarfVil3qs7Y+Xa1XPv7OD7e+Kj//BCI5zKto1NPuRLGAOyqC3U2LtCS5BphRDbpjc06HvgARCl
+nMo6x59PiDRuimXQGoq7qdzKyjbR9PzCZCk1r9axp3ER0gNDsY8+muyeMlP0dpLKhjQHuSzK5hxK
+2JkNwYbikJL7WkJqIyEQ6WXH9dW7fuqMhSACYurROgcsWcWZM/I4ieW26RZ6H3kU9koQGib6fIr7
+mzCCBUQwggQsoAMCAQICEQCWOeMVlifzA+PvGfHjMeybMA0GCSqGSIb3DQEBCwUAMIGbMQswCQYD
+VQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRow
+GAYDVQQKExFDT01PRE8gQ0EgTGltaXRlZDFBMD8GA1UEAxM4Q09NT0RPIFNIQS0yNTYgQ2xpZW50
+IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTYwNTE5MDAwMDAwWhcNMTcw
+NTE5MjM1OTU5WjAnMSUwIwYJKoZIhvcNAQkBFhZiZW5Ac2t5cG9ydHN5c3RlbXMuY29tMIIBIjAN
+BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAryjnKj/3VRzbNXiWAp7RAZSzUCOzDG6WJ2ybuDWP
+A7uDl48iX2v3ulbcZq8G0sL1nwGvBdSrmd5X3Qzirx0ti0Qe0mlAd22PEOL/xR5ChLDhNI6i43cM
+R1qM1JNtuC5Dz8h2TfYbF/VuKkA1YVuXNguSP8Z1DQXptE1m3yS0gk9LLdDkqq7Vi/zfSmD1NYHN
+gEGvtux/3lMp8pHgQiZo8PxKH2Y4zem0AiWtZ9fKZqYWRIhECJ+etvpGvh4dNIj8vdo/ig3uSwLv
+ePX7rFz3C5WHOyKjl4VGHNOA5IRZjabp4bdAEIiMPU7lfWt0o4nCRtM/G/6FvFinR6PIHSma1wID
+AQABo4IB9DCCAfAwHwYDVR0jBBgwFoAUkmFrguGioKpP7GfxwqP3tIAAwewwHQYDVR0OBBYEFJv6
+uT+NCtbUQ0MHZLryEY65oKgbMA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMCAGA1UdJQQZ
+MBcGCCsGAQUFBwMEBgsrBgEEAbIxAQMFAjARBglghkgBhvhCAQEEBAMCBSAwRgYDVR0gBD8wPTA7
+BgwrBgEEAbIxAQIBAQEwKzApBggrBgEFBQcCARYdaHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9D
+UFMwXQYDVR0fBFYwVDBSoFCgToZMaHR0cDovL2NybC5jb21vZG9jYS5jb20vQ09NT0RPU0hBMjU2
+Q2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNybDCBkAYIKwYBBQUHAQEEgYMw
+gYAwWAYIKwYBBQUHMAKGTGh0dHA6Ly9jcnQuY29tb2RvY2EuY29tL0NPTU9ET1NIQTI1NkNsaWVu
+dEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYIKwYBBQUHMAGGGGh0dHA6Ly9v
+Y3NwLmNvbW9kb2NhLmNvbTAhBgNVHREEGjAYgRZiZW5Ac2t5cG9ydHN5c3RlbXMuY29tMA0GCSqG
+SIb3DQEBCwUAA4IBAQAwVeCMNqTr20+cqsHnSK2AtzxKZyVG9y51wB88lPnRGHe2m+qKGdPgAh/7
+iDzEEXsy4sDwHVHVq4kLHW9lX7CvRTxCtmOAtsty5ePhJjh3CX+nsK2HKpi043E6azad6L64DNVN
+dMZFwUrUu8dYjOp48TPpIhW13Sbu2t/SOZK4G8EZAaZPX8Dg34tyHRUvM/B/eaJuUgdM5qY2IU+F
+7U2K4hBHkhJMJgQ7TyVe8GhdBMaztY4GHqhWP5cCgZBdC9QII8E5jqX7//FbBRB0zVHRVeBZO32H
+TvapSOG8ZYd0n5l5j3rBQnLfHWsnQ07rL2+w8W9BBPSZBbciPuwOe3ksMYIDxjCCA8ICAQEwgbEw
+gZsxCzAJBgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1Nh
+bGZvcmQxGjAYBgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1
+NiBDbGllbnQgQXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z
+8eMx7JswCQYFKw4DAhoFAKCCAekwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0B
+CQUxDxcNMTcwMjE1MTcxMjI0WjAjBgkqhkiG9w0BCQQxFgQUahrZD8qGshDN+r4udwdtpJGuFE0w
+gcIGCSsGAQQBgjcQBDGBtDCBsTCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFu
+Y2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxQTA/
+BgNVBAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVt
+YWlsIENBAhEAljnjFZYn8wPj7xnx4zHsmzCBxAYLKoZIhvcNAQkQAgsxgbSggbEwgZsxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1NiBDbGllbnQg
+QXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z8eMx7JswDQYJ
+KoZIhvcNAQEBBQAEggEAjnBffETFTRbvTncHJ3B9IMFJb0GGR+C6/SkqJriIr62Og+/s49fZcY/6
+cPLCTzqfxNSjCUjk5TKIl7isbi8QWPhxGnyETydawj6sRrvFd22LTirKTXaD9CQd6sTKX5E+nxCH
+pYCd3brNBlOUI8WY119Sw0+s9nwN+Rujgj2HR4ZkWrfl2sS3/OIpMy9RVA0atftUeaqwWPnFE/tr
+6yqk6cMW2cm7Utpk4RsvcKFxEuWSMAdloi4apP/9Dj4mlAklwv92P0h7HhYjrUHoL0+OL0WJsKlU
+FOGF7PIv2E/zNlBtxGZaRlL4UkOFX+OLGUvmZz6602IPeO0ku8jeAydjbQAAAAAAAA==
+--Apple-Mail=_AB74B8D4-3F26-4F3F-8ACB-211F54398301--
