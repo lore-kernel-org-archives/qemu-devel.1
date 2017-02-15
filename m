@@ -1,39 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cdxya-0000qS-IS
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 06:42:25 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cdxz0-0001Dd-2Q
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 06:42:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cdxyX-0000iM-Eu
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 06:42:24 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49768)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1cdxyX-0000hd-5K
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 06:42:21 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1FBd6jL071948
-	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 06:42:19 -0500
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28m9wy0yrt-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 06:42:18 -0500
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Wed, 15 Feb 2017 11:42:15 -0000
-References: <20170203175217.45562-1-pasic@linux.vnet.ibm.com>
-	<20170210152403.GH2568@work-vm>
-	<273b267a-7458-2538-8a4b-a9f8ba6dfc5a@amsat.org>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Wed, 15 Feb 2017 12:42:12 +0100
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cdxyz-0000wj-3f
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 06:42:50 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:23472 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1cdxyy-0000wG-Oa
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 06:42:49 -0500
+References: <1487156985-18321-1-git-send-email-vsementsov@virtuozzo.com>
+	<20170215113324.GA1134@lemon.lan>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <b12de021-3baa-4e35-1a84-eafb5d1650cf@virtuozzo.com>
+Date: Wed, 15 Feb 2017 14:42:34 +0300
 MIME-Version: 1.0
-In-Reply-To: <273b267a-7458-2538-8a4b-a9f8ba6dfc5a@amsat.org>
-Content-Type: text/plain; charset=windows-1252
-Message-Id: <34825483-e6c0-085b-bb85-4d54bad6e2b1@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] migration: consolidate VMStateField.start
+In-Reply-To: <20170215113324.GA1134@lemon.lan>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] backup: allow target without
+ .bdrv_get_info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,39 +29,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, jsnow@redhat.com, den@openvz.org, stefanha@redhat.com
 
-
-
-On 02/11/2017 05:26 AM, Philippe Mathieu-Daud=E9 wrote:
-> On 02/10/2017 12:24 PM, Dr. David Alan Gilbert wrote:
->> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
->>> The member VMStateField.start is used for two things, partial data
->>> migration for VBUFFER data (basically provide migration for a
->>> sub-buffer) and for locating next in QTAILQ.
->>>
->>> The implementation of the VBUFFER feature is broken when VMSTATE_ALLO=
-C
->>> is used. This however goes unnoticed because actually partial migrati=
-on
->>> for VBUFFER is not used at all.
->>>
->>> Let's consolidate the usage of VMStateField.start by removing support
->>> for partial migration for VBUFFER.
->>>
->>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+15.02.2017 14:33, Fam Zheng wrote:
+> On Wed, 02/15 14:09, Vladimir Sementsov-Ogievskiy wrote:
+>> Currently backup to nbd target is broken, as nbd doesn't have
+>> .bdrv_get_info realization.
 >>
->> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
 >>
->=20
-> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+>> v2: add WARNING
+>>
+>> ===
+>>
+>> Since commit
+>>
+>> commit 4c9bca7e39a6e07ad02c1dcde3478363344ec60b
+>> Author: John Snow <jsnow@redhat.com>
+>> Date:   Thu Feb 25 15:58:30 2016 -0500
+>>
+>>      block/backup: avoid copying less than full target clusters
+>>
+>> backup to nbd target is broken, we have "Couldn't determine the cluster size of
+>> the target image".
+>>
+>> Proposed NBD protocol extension - NBD_OPT_INFO should finally solve this problem.
+>> But until it is not realized, we need allow backup to nbd target due to backward
+>> compatibility.
+> If you respin, including above in the commit message is even better, IMO.
+>
+>> Furthermore, is it entirely ok to disallow backup if bds lacks .bdrv_get_info?
+>> Which behavior should be default: to fail backup or to use default cluster size?
+>>
+>>   block/backup.c | 10 +++++++++-
+>>   1 file changed, 9 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/block/backup.c b/block/backup.c
+>> index ea38733..a464b63 100644
+>> --- a/block/backup.c
+>> +++ b/block/backup.c
+>> @@ -638,7 +638,15 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
+>>        * backup cluster size is smaller than the target cluster size. Even for
+>>        * targets with a backing file, try to avoid COW if possible. */
+>>       ret = bdrv_get_info(target, &bdi);
+>> -    if (ret < 0 && !target->backing) {
+>> +    if (ret == -ENOTSUP) {
+>> +        /* Cluster size is not defined */
+>> +        error_report("WARNING: Target block device doesn't provide information "
+>> +                     "about block size and it doesn't have backing file. "
+>> +                     "Default block size of %u bytes is used. If actual block "
+>> +                     "size of target exceeds this default, destination image "
+>> +                     "may become unusable");
+> "Image unusable" might be too strong here because it sounds like a serious
+> damage to the image, while actually what we mean is "backup unusable".
 
-Thanks for the review Philippe!
+Finally, "... default, backup may be unusable"?
 
-@Maintainers: Softfreeze is approaching, and I would like to try
-get my 'array of pointers with null pointers' (which is on top of
-this) in 2.9 too if possible. Anything I can do to speed things up?
 
-Regards,
-Halil
+>
+>> +        job->cluster_size = BACKUP_CLUSTER_SIZE_DEFAULT;
+>> +    } else if (ret < 0 && !target->backing) {
+>>           error_setg_errno(errp, -ret,
+>>               "Couldn't determine the cluster size of the target image, "
+>>               "which has no backing file");
+>> -- 
+>> 1.8.3.1
+>>
+> Fam
+
+
+-- 
+Best regards,
+Vladimir
