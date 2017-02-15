@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cdwZn-0005Wa-SX
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 05:12:44 -0500
+	(envelope-from <eduardo.otubo@profitbricks.com>) id 1cdwbm-0007Dx-O3
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 05:14:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cdwZi-00049m-W4
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 05:12:43 -0500
-References: <1486148371-11692-1-git-send-email-peter.maydell@linaro.org>
-From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <3f200670-cce5-014a-eaed-e82302ed3e7f@msgid.tls.msk.ru>
-Date: Wed, 15 Feb 2017 13:12:37 +0300
-MIME-Version: 1.0
-In-Reply-To: <1486148371-11692-1-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=windows-1251
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] softfloat: Use correct type in
- float64_to_uint64_round_to_zero()
+	(envelope-from <eduardo.otubo@profitbricks.com>) id 1cdwbi-0004w1-QO
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 05:14:46 -0500
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:35464)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <eduardo.otubo@profitbricks.com>)
+	id 1cdwbi-0004v3-H1
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 05:14:42 -0500
+Received: by mail-wm0-x22b.google.com with SMTP id v186so37931957wmd.0
+	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 02:14:41 -0800 (PST)
+From: Eduardo Otubo <eduardo.otubo@profitbricks.com>
+Date: Wed, 15 Feb 2017 11:14:25 +0100
+Message-Id: <20170215101427.23736-1-eduardo.otubo@profitbricks.com>
+Subject: [Qemu-devel] [PATCH 0/2] add writeconfig command on monitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,16 +24,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: patches@linaro.org
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, armbru@redhat.com, Eduardo Otubo <eduardo.otubo@profitbricks.com>
 
-03.02.2017 21:59, Peter Maydell wrote:
-> In float64_to_uint64_round_to_zero() a typo meant that we were
-> taking the uint64_t return value from float64_to_uint64() and
-> putting it into an int64_t variable before returning it as
-> uint64_t again. Use uint64_t instead of pointlessly casting it
-> back and forth to int64_t.
+This first patch extends the command line option `-writeconfig <file>' to a
+command on HMP and QMP monitors. This is useful when live migrating after a
+series of device hot plug events. One can just generate an updated config file
+for the vm, transport it to the target host and start the vm with `-readconfig
+<file>'.
 
-Applied to -trivial, thanks!
+The second patch re-includes the reference of the memory object on the config
+file generated.
 
-/mjt
+Eduardo Otubo (2):
+  qmp/hmp: add writeconfig
+  object_add not registering option
+
+ hmp-commands.hx  | 14 ++++++++++++++
+ hmp.c            | 10 +++++++++-
+ hmp.h            |  1 +
+ qapi-schema.json | 20 ++++++++++++++++++++
+ ui/console.c     | 14 ++++++++++++++
+ 5 files changed, 58 insertions(+), 1 deletion(-)
+
+-- 
+2.11.0
