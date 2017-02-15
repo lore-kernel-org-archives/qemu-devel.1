@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ce7EN-0002RR-Lw
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 16:35:20 -0500
+	(envelope-from <rth7680@gmail.com>) id 1ce7WQ-0001gO-C9
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 16:53:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ce7EK-00019t-Jl
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 16:35:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55666)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ce7EK-00019n-As
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 16:35:16 -0500
-References: <cover.1487139038.git.ben@skyportsystems.com>
-	<96c621a0c1588234e473bf0c0d068af8812f3225.1487139038.git.ben@skyportsystems.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ebde49dc-fd80-895e-b73f-545ec9a966c8@redhat.com>
-Date: Wed, 15 Feb 2017 15:35:13 -0600
+	(envelope-from <rth7680@gmail.com>) id 1ce7WN-00080n-94
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 16:53:58 -0500
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:33904)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ce7WN-00080N-3Y
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 16:53:55 -0500
+Received: by mail-pg0-x241.google.com with SMTP id v184so12134883pgv.1
+	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 13:53:54 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170213121017.12907-1-alex.bennee@linaro.org>
+	<20170213121017.12907-13-alex.bennee@linaro.org>
+	<0d990570-8318-7bba-c10c-cfe0387fdd1b@twiddle.net>
+	<87h93xujv3.fsf@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <f6ab9967-6b88-4c49-fdc9-4203cbda3e7d@twiddle.net>
+Date: Thu, 16 Feb 2017 08:53:41 +1100
 MIME-Version: 1.0
-In-Reply-To: <96c621a0c1588234e473bf0c0d068af8812f3225.1487139038.git.ben@skyportsystems.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="vfHGGhrqNwP0VEU1vI5CKlnTbUtFp2IMb"
-Subject: Re: [Qemu-devel] [PATCH v6 6/7] tests: Move reusable ACPI macros
- into a new header file
+In-Reply-To: <87h93xujv3.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v12 12/24] tcg: handle EXCP_ATOMIC
+ exception for system emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +33,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ben@skyportsystems.com, qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, lersek@redhat.com, mst@redhat.com
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: mttcg@greensocs.com, peter.maydell@linaro.org, nikunj@linux.vnet.ibm.com, Peter Crosthwaite <crosthwaite.peter@gmail.com>, jan.kiszka@siemens.com, mark.burton@greensocs.com, a.rigo@virtualopensystems.com, qemu-devel@nongnu.org, cota@braap.org, serge.fdrv@gmail.com, pbonzini@redhat.com, bobby.prani@gmail.com, bamvor.zhangjian@linaro.org, fred.konrad@greensocs.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---vfHGGhrqNwP0VEU1vI5CKlnTbUtFp2IMb
-From: Eric Blake <eblake@redhat.com>
-To: ben@skyportsystems.com, qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, lersek@redhat.com, mst@redhat.com
-Message-ID: <ebde49dc-fd80-895e-b73f-545ec9a966c8@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 6/7] tests: Move reusable ACPI macros into
- a new header file
-References: <cover.1487139038.git.ben@skyportsystems.com>
- <96c621a0c1588234e473bf0c0d068af8812f3225.1487139038.git.ben@skyportsystems.com>
-In-Reply-To: <96c621a0c1588234e473bf0c0d068af8812f3225.1487139038.git.ben@skyportsystems.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 02/14/2017 09:50 PM, Alex Bennée wrote:
+>
+> Richard Henderson <rth@twiddle.net> writes:
+>
+>> On 02/13/2017 11:10 PM, Alex Bennée wrote:
+>>> @@ -239,9 +240,16 @@ static void cpu_exec_step(CPUState *cpu)
+> <snip>
+>>> +                } else if (r == EXCP_ATOMIC) {
+>>> +                    qemu_mutex_unlock_iothread();
+>>> +                    cpu_exec_step_atomic(cpu);
+>>> +                    qemu_mutex_lock_iothread();
+>> ...
+>>> +            case EXCP_ATOMIC:
+>>> +                qemu_mutex_unlock_iothread();
+>>> +                cpu_exec_step_atomic(cpu);
+>>> +                qemu_mutex_lock_iothread();
+>>
+>>
+>> I just noticed this, but if you have to do a v13, it might be best to
+>> move these locks inside cpu_exec_step_atomic, as with tcg_cpu_exec.
+>> Otherwise leave it for later.
+>
+> Will that work given cpu_exec_step_atomic() is common between linux-user
+> and system emulation?
 
-On 02/15/2017 12:15 AM, ben@skyportsystems.com wrote:
-> From: Ben Warren <ben@skyportsystems.com>
->=20
-> Also usable by upcoming VM Generation ID tests
->=20
-> Signed-off-by: Ben Warren <ben@skyportsystems.com>
-> ---
->  tests/acpi-utils.h       | 75 ++++++++++++++++++++++++++++++++++++++++=
-++++++++
->  tests/bios-tables-test.c | 72 +---------------------------------------=
-------
->  2 files changed, 76 insertions(+), 71 deletions(-)
->  create mode 100644 tests/acpi-utils.h
->=20
-> diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
-> new file mode 100644
-> index 0000000..d5e5eff
-> --- /dev/null
-> +++ b/tests/acpi-utils.h
-> @@ -0,0 +1,75 @@
-> +#ifndef TEST_ACPI_UTILS_H
-> +#define TEST_ACPI_UTILS_H
-
-No copyright blurb? Also, does MAINTAINERS need an update to cover the
-new file?
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+Ug.  No, you're right.
 
 
---vfHGGhrqNwP0VEU1vI5CKlnTbUtFp2IMb
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYpMmRAAoJEKeha0olJ0NqhCgH/2QcgUyZkq+UF4Yc8uLtrdey
-i2DjIXO2r0/MvRjVYkvQtSInxTczvdxjQRYgZHrMBHtYoi+H7oBNjDWnvr9bf5AM
-MPn92aTCbYrwop1JlzhhQBssW7MGfcrjJNJbDWXIoQwz0ylko9iNd9yQqzcqZ8aJ
-ze4dtBKZu1wzMppqYHaNQ1w5KVA5QT38mDTUkiEttIhFXp9XEl7kq+7eOz0qt1N5
-SjPjAcR6FAPGKdUuKJqjIi4viUsDPr5AgllQgrkjkLBv4Na4661CNkgGF+40KlSh
-tGN7mJjCIDzbG/ti3IYcs2IbyXpQR22uZ5J7Ns6ZjsPRPYk50rZkw2beIX8SRtc=
-=LfN0
------END PGP SIGNATURE-----
-
---vfHGGhrqNwP0VEU1vI5CKlnTbUtFp2IMb--
+r~
