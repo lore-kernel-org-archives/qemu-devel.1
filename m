@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ce0e1-0006CK-Tc
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:33:23 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ce0f6-0006uM-Tf
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:34:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ce0dw-00054f-WB
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:33:21 -0500
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:36308)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ce0dw-00054G-NP
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:33:16 -0500
-Received: by mail-wm0-x229.google.com with SMTP id c85so43386292wmi.1
-	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 06:33:14 -0800 (PST)
-Date: Wed, 15 Feb 2017 14:24:11 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170215142411.GA16064@stefanha-x1.localdomain>
-References: <20170206024535.14624.3001.malonedeb@soybean.canonical.com>
-	<20170214021716.5810.4550.malone@soybean.canonical.com>
+	(envelope-from <mreitz@redhat.com>) id 1ce0f2-0005MW-0V
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:34:28 -0500
+References: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
+	<1487006583-24350-2-git-send-email-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <1012b97a-db5f-9f2c-04c5-c9912a2e71f8@redhat.com>
+Date: Wed, 15 Feb 2017 15:34:07 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="5mCyUwZo2JvN/JJP"
-Content-Disposition: inline
-In-Reply-To: <20170214021716.5810.4550.malone@soybean.canonical.com>
-Subject: Re: [Qemu-devel] [Bug 1662050] Re: qemu-img convert a overlay qcow2
- image into a entire image
+In-Reply-To: <1487006583-24350-2-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="2g03l0iA17Ot4xpB9WShRU5NLxW3bxb0S"
+Subject: Re: [Qemu-devel] [RFC PATCH 01/41] block: Attach bs->file only
+ during .bdrv_open()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,167 +25,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: wayen <1662050@bugs.launchpad.net>
-Cc: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--2g03l0iA17Ot4xpB9WShRU5NLxW3bxb0S
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+Message-ID: <1012b97a-db5f-9f2c-04c5-c9912a2e71f8@redhat.com>
+Subject: Re: [RFC PATCH 01/41] block: Attach bs->file only during .bdrv_open()
+References: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
+ <1487006583-24350-2-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1487006583-24350-2-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
+
+On 13.02.2017 18:22, Kevin Wolf wrote:
+> The way that attaching bs->file worked was a bit unusual in that it was=
+
+> the only child that would be attached to a node which is not opened yet=
+=2E
+> Because of this, the block layer couldn't know yet which permissions th=
+e
+> driver would eventually need.
+>=20
+> This patch moves the point where bs->file is attached to the beginning
+> of the individual .bdrv_open() implementations, so drivers already know=
+
+> what they are going to do with the child. This is also more consistent
+> with how driver-specific children work.
+
+Can't say I'm convinced by this because I personally do consider
+bs->file to be special. It's fine and maybe even good if it's not like
+driver-specific children (or even bs->backing).
+
+But the fact that it doesn't work with a good op blocker model is more
+than compelling.
+
+> bdrv_open() still needs its own BdrvChild to perform image probing, but=
+
+> instead of directly assigning this BdrvChild to the BDS, it becomes a
+> temporary one and the node name is passed as an option to the drivers,
+> so that they can simply use bdrv_open_child() to create another
+> reference for their own use.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block.c                       | 34 +++++++++++++++++++++++-----------
+>  block/bochs.c                 |  6 ++++++
+>  block/cloop.c                 |  6 ++++++
+>  block/crypto.c                |  6 ++++++
+>  block/dmg.c                   |  6 ++++++
+>  block/parallels.c             |  6 ++++++
+>  block/qcow.c                  |  6 ++++++
+>  block/qcow2.c                 | 18 +++++++++++++++---
+>  block/qed.c                   | 18 +++++++++++++++---
+>  block/raw-format.c            |  6 ++++++
+>  block/replication.c           |  6 ++++++
+>  block/vdi.c                   |  6 ++++++
+>  block/vhdx.c                  |  6 ++++++
+>  block/vmdk.c                  |  6 ++++++
+>  block/vpc.c                   |  6 ++++++
+>  tests/qemu-iotests/051.out    |  4 ++--
+>  tests/qemu-iotests/051.pc.out |  4 ++--
+>  17 files changed, 129 insertions(+), 21 deletions(-)
+>=20
+> diff --git a/block.c b/block.c
+> index 743c349..0618f4b 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -1103,13 +1103,6 @@ static int bdrv_open_common(BlockDriverState *bs=
+, BdrvChild *file,
+>          assert(!drv->bdrv_needs_filename || filename !=3D NULL);
+>          ret =3D drv->bdrv_file_open(bs, options, open_flags, &local_er=
+r);
+>      } else {
+> -        if (file =3D=3D NULL) {
+> -            error_setg(errp, "Can't use '%s' as a block driver for the=
+ "
+> -                       "protocol level", drv->format_name);
+> -            ret =3D -EINVAL;
+> -            goto free_and_fail;
+> -        }
+
+Interesting. I like that this explicit check becomes unnecessary. I'm
+not sure whether I like how the error messages changes, but I can't say
+that I was a fan of this one to begin with.
+
+> -        bs->file =3D file;
+>          ret =3D drv->bdrv_open(bs, options, open_flags, &local_err);
+>      }
+> =20
+> @@ -1145,7 +1138,6 @@ static int bdrv_open_common(BlockDriverState *bs,=
+ BdrvChild *file,
+>      return 0;
+> =20
+>  free_and_fail:
+> -    bs->file =3D NULL;
+>      g_free(bs->opaque);
+>      bs->opaque =3D NULL;
+>      bs->drv =3D NULL;
+> @@ -1368,7 +1360,18 @@ void bdrv_unref_child(BlockDriverState *parent, =
+BdrvChild *child)
+>      }
+> =20
+>      if (child->bs->inherits_from =3D=3D parent) {
+> -        child->bs->inherits_from =3D NULL;
+> +        BdrvChild *c;
+> +
+> +        /* Remove inherits_from only when the last reference between p=
+arent and
+> +         * child->bs goes away. */
+> +        QLIST_FOREACH(c, &parent->children, next) {
+> +            if (c !=3D child && c->bs =3D=3D child->bs) {
+> +                break;
+> +            }
+> +        }
+
+That's pretty kaputt. I'm not sure if I like it.
+
+(But I like the reason for this even less, see below.)
+
+> +        if (c =3D=3D NULL) {
+> +            child->bs->inherits_from =3D NULL;
+> +        }
+>      }
+> =20
+>      bdrv_root_unref_child(child);
+> @@ -1789,13 +1792,19 @@ static BlockDriverState *bdrv_open_inherit(cons=
+t char *filename,
+>          qdict_del(options, "backing");
+>      }
+> =20
+> -    /* Open image file without format layer */
+> +    /* Open image file without format layer. This BdrvChild is only us=
+ed for
+> +     * probing, the block drivers will do their own bdrv_open_child() =
+for the
+> +     * same BDS, which is why we put the node name back into options. =
+*/
+>      if ((flags & BDRV_O_PROTOCOL) =3D=3D 0) {
+>          file =3D bdrv_open_child(filename, options, "file", bs,
+>                                 &child_file, true, &local_err);
+>          if (local_err) {
+>              goto fail;
+>          }
+> +        if (file !=3D NULL) {
+> +            qdict_put(options, "file",
+> +                      qstring_from_str(bdrv_get_node_name(file->bs)));=
+
+> +        }
+
+Verrry interesting. I would say "Well, I guess it works" but I can't say
+I'm glad with how it requires multiple BdrvChild pointing to the same
+BDS attached to the same parent. Not only that, but both children have
+the same BdrvChild.name which I don't like at all. In my opinion, that
+name is supposed to be a unique ID and I don't find the fact that it's
+just temporary a very good excuse. Neither do I find "Well, they have
+the same ID and point to the same BDS, so it doesn't really matter" very
+compelling. (Worsened by the fact that the block driver can just choose
+to attach some other BDS as its file, then both "file" children no
+longer point to the same BDS.)
+
+Actually, I'd be happier if you just invoked bdrv_ref() and
+bdrv_unref_child() (or just bdrv_detach_child(), I don't think NULLing
+inherits_from is important here) right after bdrv_open_child().
+
+We want @file for probing and probing only. It should be independent of
+@bs now. The only reason I'm not proposing using bdrv_open_inherit()
+directly is because using bdrv_open_child() saves us from having to
+extract the file's options. But I don't see why @file should be
+connected to @bs after this point (until the block driver potentially
+decides to re-attach it as bs->file, but bdrv_open_child() will handle
+all of that).
+
+Max
 
 
---5mCyUwZo2JvN/JJP
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Tue, Feb 14, 2017 at 02:17:16AM -0000, wayen wrote:
-> ** Attachment added: "qemu-img map new.qcow2 output"
->    https://bugs.launchpad.net/qemu/+bug/1662050/+attachment/4818564/+files/qemu_img_map_new_qcow2.txt
-
-Thanks for posting the attachments.
-
-I ran a script to find unallocated clusters in the delta.qcow2 host
-file.  Most are actually qcow2 metadata (L1/L2 tables, refcount blocks).
-
-This output shows that any image file size reduction you are hoping to
-achieve can only come from zero clusters.
-
-There are no holes in the files that would result in significant image
-file size reduction if a new image were written out.
-
-Just wanted to share this info in case anyone else is thinking about how
-to optimize qcow2 files.  I still think rewriting images sequentially
-can be useful - if internal snapshots were used and deleted then COW can
-result in holes.
-
-Hole at 0 size 5.0 clusters
-Hole at 393216 size 1.0 clusters
-Hole at 589824 size 1.0 clusters
-Hole at 1114112 size 1.0 clusters
-Hole at 1310720 size 1.0 clusters
-Hole at 1507328 size 1.0 clusters
-Hole at 1703936 size 1.0 clusters
-Hole at 2293760 size 1.0 clusters
-Hole at 2621440 size 1.0 clusters
-Hole at 3080192 size 1.0 clusters
-Hole at 5111808 size 1.0 clusters
-Hole at 6291456 size 1.0 clusters
-Hole at 30408704 size 1.0 clusters
-Hole at 47906816 size 1.0 clusters
-Hole at 142671872 size 1.0 clusters
-Hole at 219545600 size 1.0 clusters
-Hole at 667090944 size 1.0 clusters
-Hole at 853868544 size 1.0 clusters
-Hole at 1562640384 size 1.0 clusters
-Hole at 2147483648 size 1.0 clusters
-Hole at 2617180160 size 1.0 clusters
-Hole at 3411148800 size 1.0 clusters
-Hole at 4107075584 size 1.0 clusters
-Hole at 4294967296 size 1.0 clusters
-Hole at 4452646912 size 1.0 clusters
-Hole at 4792057856 size 1.0 clusters
-Hole at 5494865920 size 1.0 clusters
-Hole at 5645271040 size 1.0 clusters
-Hole at 5702483968 size 1.0 clusters
-Hole at 6187188224 size 1.0 clusters
-Hole at 6442450944 size 1.0 clusters
-Hole at 6862995456 size 1.0 clusters
-Hole at 6987317248 size 1.0 clusters
-Hole at 7567245312 size 1.0 clusters
-Hole at 8135245824 size 1.0 clusters
-Hole at 8590589952 size 1.0 clusters
-Hole at 8613462016 size 1.0 clusters
-Hole at 9055436800 size 1.0 clusters
-Hole at 9703522304 size 1.0 clusters
-Hole at 10279321600 size 1.0 clusters
-Hole at 10737418240 size 3.0 clusters
-Hole at 10844372992 size 1.0 clusters
-Hole at 11167858688 size 1.0 clusters
-Hole at 11209605120 size 1.0 clusters
-Hole at 11209801728 size 1.0 clusters
-Hole at 11730944000 size 1.0 clusters
-Hole at 12183207936 size 1.0 clusters
-Hole at 12705464320 size 1.0 clusters
-Hole at 12884901888 size 1.0 clusters
-Hole at 13444120576 size 1.0 clusters
-Hole at 13910016000 size 1.0 clusters
-Hole at 14182711296 size 1.0 clusters
-Hole at 15025635328 size 1.0 clusters
-Hole at 15032385536 size 1.0 clusters
-
-The following script draws the allocated clusters and holes in the image
-file.  I took your qemu-img map output, filtered out any lines with
-base.qcow2, and sorted using sort -k3 -g to sort on the "Mapped to"
-field.  Then I ran ./qcow2-map-svg.py <filtered.txt >output.svg.
-
-#!/usr/bin/python3
-import sys
-import io
-
-COLOR_ALLOCATED = '#ffaaaa'
-COLOR_HOLE = '#999999'
-
-def svg_percentage(value, total):
-    return '{0}%'.format(100.0 * value / total)
-
-def svg_rect(x, width, color):
-    print('<rect x="{0}" y="0" width="{1}" height="40" fill="{2}" stroke="none" />'.format(x, width, color), file=out)
-
-def svg_text(x, y, text):
-    print('<text x="{0}" y="{1}">{2}</text>'.format(x, y, text), file=out)
-
-out = io.StringIO()
-
-print('''<?xml version="1.0" encoding="UTF-8" ?>
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1">''', file=out)
-
-file_map = []
-header = True
-for line in sys.stdin:
-    if header:
-        header = False
-        continue
-
-    offset, length, mapped, filename = line.split()
-    offset = int(offset, 16)
-    length = int(length, 16)
-    mapped = int(mapped, 16)
-
-    file_map.append((offset, length, mapped, filename))
-
-file_size = file_map[-1][2] + file_map[-1][1]
-last_mapped = 0
-for _, length, mapped, _ in file_map:
-    if mapped > last_mapped:
-#        if mapped - last_mapped:
-#            print('Hole at {0} size {1} clusters'.format(last_mapped, (mapped - last_mapped) / 65536))
-        svg_rect(svg_percentage(last_mapped, file_size),
-                 svg_percentage(mapped - last_mapped, file_size),
-                 COLOR_HOLE)
-
-    svg_rect(svg_percentage(mapped, file_size),
-             svg_percentage(length, file_size),
-             COLOR_ALLOCATED)
-    last_mapped = mapped + length
-if last_mapped < file_size:
-    svg_rect(svg_percentage(last_mapped, file_size),
-             svg_percentage(file_size - last_mapped, file_size),
-             COLOR_HOLE)
-
-for i in range(10):
-    svg_text(svg_percentage(i, 10), 60, svg_percentage(i, 10))
-
-print('</svg>', file=out)
-
-print(out.getvalue())
-
---5mCyUwZo2JvN/JJP
+--2g03l0iA17Ot4xpB9WShRU5NLxW3bxb0S
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJYpGSLAAoJEJykq7OBq3PItSkH/1uh8bVds2HPOJ8o6YHFl+ns
-vDKTnz2vftaQNyWed3X//Uv4rOYfARdT5oJxN9D6yo2BoikuXdxZ1TaIF9Bo2zHS
-MC6/68meIXy9BQgYo9VHCFY6pBRUXSIB5TRF6Xqgbse8S2AVbYQ1iK3krzuSqbiD
-M4uHMTrSyTXgLD6MBBytQrt0mmLeoW39kYarYgI9nXVSNmiCVe+wSGb+LFnXpMiH
-S12mrhZrkhpOvvpSQNYAhPclluSvRrC7MKWUlS2S84tF3lr4iv8WP9a9G9zKkvQm
-PeUObu4hRPoviqkj1szFrJafU6wosJi39VpiI19tuaCfA+UHFtTPkI3MhmgFZTY=
-=2jTA
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlikZt8SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AcIQH/3oQWZ03JdNqgwzn3V+MeuZrIdCa8Dv4
+ZGwNmtmYtaxmcA6VfhBT9SX3PqjGFXyAFE4iQNNZr6kXQVfiVCneCyWEQXyBHA+f
+UvesX2G9EhoakQRGuqocaZZJGZehX99RT1gmJNl8CjQdpHnrJ0/x/kTjAF0L5LHb
+meLgu9LrgoR2kz0yXmCOaqYunXgATXFoCB3XrVz60wBJk6cuH+nltChnsZbFlsOh
++rpIKiBOr4PnYSbg9mq/qcqanQFi/7NXTjlt8oM8oim6EwgzoDMURAEXFBbytbcF
+bycpvjwmHOjPXtsVFJjOtSPIGbG4supry/hW/FEkivipwaQqYiyf5VM=
+=eVOy
 -----END PGP SIGNATURE-----
 
---5mCyUwZo2JvN/JJP--
+--2g03l0iA17Ot4xpB9WShRU5NLxW3bxb0S--
