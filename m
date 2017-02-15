@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cdz8z-0005z1-GA
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 07:57:14 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cdzFR-0000xu-7U
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 08:03:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cdz8y-0000zY-Kp
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 07:57:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41582)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cdz8y-0000z7-D6
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 07:57:12 -0500
-References: <20170129210910.6333-1-pbonzini@redhat.com>
-	<0775ca1e-ecdb-39a1-d2e9-6e410f0d4e54@redhat.com>
-	<000c01d28789$5b942330$12bc6990$@ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2187e424-595e-d8ee-2e88-9f975dbc2e3f@redhat.com>
-Date: Wed, 15 Feb 2017 13:57:13 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1cdzFQ-0003zN-8J
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 08:03:53 -0500
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:36817)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cdzFQ-0003yd-0q
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 08:03:52 -0500
+Received: by mail-wr0-x22f.google.com with SMTP id k90so190111538wrc.3
+	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 05:03:51 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <000c01d28789$5b942330$12bc6990$@ru>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC/RFT PATCH 0/7] cpu-exec: simplify cpu_exec
- and remove some icount special cases
+In-Reply-To: <tencent_0D7C69D20350D3654337361B@qq.com>
+References: <tencent_44FCF9336341E20C3F2A5EB7@qq.com>
+	<CAFEAcA_2hK+cYTnBeR-GX1jqkCtUr6JEzaduP9VAu-vLGWTefQ@mail.gmail.com>
+	<tencent_0D7C69D20350D3654337361B@qq.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 15 Feb 2017 13:03:29 +0000
+Message-ID: <CAFEAcA-13woFEUEbMacux1S4vDM5vaCGwxOrE51nsimKp8wEgA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] Fw: qemu integrator RAM size can't reach 128M
+ whenemulate the arm926
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +31,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: serge.fdrv@gmail.com, pavel.dovgaluk@ispras.ru, peter.maydell@linaro.org
+To: heavybird <4345099@qq.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
+On 15 February 2017 at 09:41, heavybird <4345099@qq.com> wrote:
+> the issue i reported is caused by my test program, i fixed it by myself now.
+> some more concern about your integratorcp.c.
+> 1 what is your consideration to use the direct address in the code
+> (s->cm_osc = 0x01000048,integratorcm_init), does it take some potential
+> trouble for user once it is overlapped in the guest code?
 
+This value is not an address. It is the reset value for the
+CM_OSC oscillator control register, and indicates that
+the BMODE field is set to 0b10 and the PLL_VDW field
+is set to 0b01001000, which is the standard value for this
+board as documented in the CM926EJ-S integrator core module
+user guide.
 
-On 15/02/2017 13:45, Pavel Dovgalyuk wrote:
->> From: Paolo Bonzini [mailto:paolo.bonzini@gmail.com] On Behalf Of Paolo Bonzini
->> On 29/01/2017 22:09, Paolo Bonzini wrote:
->>> The series includes three parts:
->>>
->>> 1-2: fix two bugs, the first one pretty bad, the second seems
->>> to be theoretical only.
->>>
->>> 3-5: simplify cpu_exec.  This builds on Sergey's conversion
->>> of cpu_exec to a simple top-down logic, making the phases
->>> clearer and saving on the cost of siglongjmp in the meanwhile.
->>
->> I'll include these five in my next pull request.  Review for patch 6 is
->> welcome!
-> 
-> I've tested all 7 and briefly looked at their code.
-> Do you need official reviewed-by?
+> 2 is it possible to create a big DRAM(256M above) memory space to change
+> your code integratorcp.c just like the "integrator.flash" with the function
+> memory_region_init_ram.
 
-No, but for patch 6 specifically, I would like more than one review. :)
+The integratorcp is a model of a specific board, and that
+board can't have a large DRAM in it. You'd need to
+look at the board's physical address map to find out
+if there is space in it to add more RAM.
+integrator.flash is a complicated thing because it is
+possible for the guest to control at runtime whether
+it is mapped; it's not a good example to follow for
+simple always-present RAM.
 
-Paolo
+For the standards of the time 256MB was a decent amount
+of RAM for an ARM926 core.
 
-> Pavel Dovgalyuk
->>
->>> 6-7: these are intended to be a base for Pavel's record/replay
->>> fixes.  The main thing I noticed while reviewing is that icount
->>> is redoing (with u16.high) a lot of things that tcg_exit_req is
->>> doing too.  This is because, at the time icount was introduced,
->>> tcg_exit_req didn't exist and QEMU instead unwound chained TBs
->>> through POSIX signals.  But now we have essentially two ways to
->>> do the same thing with subtly different invariants or downright
->>> bugs (such as the one fixed by patch 1).  Patch 6 therefore
->>> unifies tcg_exit_req and the icount interrupt flag.  It saves a
->>> handful of instructions per TB in icount mode and generally
->>> makes icount mode "less special", which is a good thing since
->>> no one seems to understand it well.  Patch 7 then removes another
->>> EXCP_INTERRUPT/cpu_loop_exit pair; by exiting to main loop simply
->>> through cpu->exit_request, hopefully it fixes one of the issues that
->>> Pavel was seeing.
->>>
->>> For now I've tested this only on an aarch64 Linux image (with
->>> and without -icount).  Thanks,
->>>
->>> Paolo
->>>
->>> Paolo Bonzini (7):
->>>   cpu-exec: fix jmp_first out-of-bounds access with icount
->>>   cpu-exec: tighten barrier on TCG_EXIT_REQUESTED
->>>   cpu-exec: avoid cpu_loop_exit in cpu_handle_interrupt
->>>   cpu-exec: avoid repeated sigsetjmp on interrupts
->>>   cpu-exec: remove outermost infinite loop
->>>   cpu-exec: unify icount_decr and tcg_exit_req
->>>   cpu-exec: centralize exiting to the main loop
->>>
->>>  cpu-exec.c                | 153 +++++++++++++++++++++-------------------------
->>>  include/exec/exec-all.h   |   1 +
->>>  include/exec/gen-icount.h |  53 ++++++++--------
->>>  include/qom/cpu.h         |  15 +++--
->>>  qom/cpu.c                 |   2 +-
->>>  tcg/tcg.h                 |   1 -
->>>  translate-all.c           |   2 +-
->>>  translate-common.c        |  13 ++--
->>>  8 files changed, 109 insertions(+), 131 deletions(-)
->>>
-> 
+thanks
+-- PMM
