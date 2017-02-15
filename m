@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sebastien.fremal@gmail.com>) id 1ce1Yb-0005B7-8a
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 10:31:50 -0500
+	(envelope-from <ipavlikevich@gmail.com>) id 1ce1lt-00053j-7r
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 10:45:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sebastien.fremal@gmail.com>) id 1ce1YV-0006vm-J7
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 10:31:49 -0500
-Received: from mail-ot0-x22a.google.com ([2607:f8b0:4003:c0f::22a]:34395)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sebastien.fremal@gmail.com>)
-	id 1ce1YV-0006ue-Dz
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 10:31:43 -0500
-Received: by mail-ot0-x22a.google.com with SMTP id t47so33001197ota.1
-	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 07:31:41 -0800 (PST)
+	(envelope-from <ipavlikevich@gmail.com>) id 1ce1ls-0006Ov-23
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 10:45:33 -0500
 MIME-Version: 1.0
-From: =?UTF-8?B?U8OpYmFzdGllbiBGcsOpbWFs?= <sebastien.fremal@gmail.com>
-Date: Wed, 15 Feb 2017 16:31:20 +0100
-Message-ID: <CAOV6k-Am5hxdjueMMzaOVygtq16L7KJur_jkDi5snjeLJqDU2w@mail.gmail.com>
+In-Reply-To: <97012317-0db8-a272-1802-7a402ebe78a5@msgid.tls.msk.ru>
+References: <CA+O_+ExjKRNyfbXWzh7RRHgTjqTBC+WscYCiBGyjLK2XOvoPmQ@mail.gmail.com>
+	<97012317-0db8-a272-1802-7a402ebe78a5@msgid.tls.msk.ru>
+From: Igor Pavlikevich <ipavlikevich@gmail.com>
+Date: Wed, 15 Feb 2017 18:45:26 +0300
+Message-ID: <CA+O_+Ex6E291g0BKLWox+x8g16j2ij4KYJ9PwiwrH7Qx4J-Epw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: [Qemu-devel] How to access to ivshmem device in VM ?
+Subject: Re: [Qemu-devel] [PATCH] hw/acpi/tco.c: fix tco timer stop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,39 +22,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Michael Tokarev <mjt@tls.msk.ru>
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 
-Hello !
+On Wed, Feb 15, 2017 at 1:34 PM, Michael Tokarev <mjt@tls.msk.ru> wrote:
+> 06.02.2017 17:44, Igor Pavlikevich wrote:
+>> TCO timer does not actually stop
+>>
+>> Signed-off-by: Igor Pavlikevich <ipavlikevich@gmail.com>
+>> ---
+>>  hw/acpi/tco.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/hw/acpi/tco.c b/hw/acpi/tco.c
+>> index 8ce7daf..b4adac8 100644
+>> --- a/hw/acpi/tco.c
+>> +++ b/hw/acpi/tco.c
+>> @@ -49,6 +49,7 @@ static inline void tco_timer_reload(TCOIORegs *tr)
+>>  static inline void tco_timer_stop(TCOIORegs *tr)
+>>  {
+>>      tr->expire_time = -1;
+>> +    timer_del(tr->tco_timer);
+>>  }
+>>
+>>  static void tco_timer_expired(void *opaque)
+>>
+>
+> I'm not sure this is really trivial change.
+> Can you elaborate a bit please?
 
-I searched for a forum or a place where questions about QEMU can be asked,
-but I found nothing except mailing lists. If there is a more appropriate
-place for my question, do not hesitate to indicate it to me !!
+When linux guest goes to first reboot, it calls
+watchdog_open()->watchdog_start()->iTCO_wdt_start() and write 0 to
+TCO1_CNT.
+After that can_start_tco_timer() returns true, starts timer in
+tco_timer_reload() and guest kernel starts flooding
+[  590.392055] Uhhuh. NMI received for unknown reason 30 on CPU 0.
+[  590.392055] Do you have a strange power saving mode enabled?
+[  590.392055] Dazed and confused, but trying to continue
+[  620.392035] Uhhuh. NMI received for unknown reason 20 on CPU 0.
+[  620.392035] Do you have a strange power saving mode enabled?
+[  620.392035] Dazed and confused, but trying to continue
 
-So, I'm trying to use ivshmem to share memory pages between several VM. I
-found many webpages documenting the set up of this device. I successfully
-installed the mechanism in the host. I launched ivshmem-clients which
-successfully connected to the server. The problem is that I can't
-understand how to access to the shared memory pages in a VM. I launched my
-VM with this command line :
-sudo qemu-system-x86_64 -show-cursor -enable-kvm -drive
-format=raw,file=/var/lib/libvirt/images/theRise.img -m 4096 -machine q35
--show-cursor -device ivshmem-doorbell,vectors=4,chardev=ivshmem -chardev
-socket,path=/tmp/ivshmem_socket,id=ivshmem
-(the server was launched with : sudo ivshmem-server -p
-/var/run/ivshmem-server.pid -S /tmp/ivshmem_socket -M ivshmem -l 4K -n 4).
+Timer keeps reloading after ich9_generate_nmi() so there is only one
+way to stop reloading by clearing ICH9_CC_GCS_NO_REBOOT and reset
+guest via  watchdog_perform_action(), becasue tco_timer_stop() does
+not actually modify tr->tco_timer.
 
-The VM executes properly (I just don't have a visible mouse cursor despite
-the "-show-cursor" option, but it could be worse) but I have absolutely no
-idea on how to access the ivshmem device. I firstly thought that the option
-would add a new device in /dev but there is nothing special. I ran an
-updatedb/locate ivshmem to check if there was something interesting on the
-machine, but there is no results. I don't know which socket path I must
-give to my ivshmem client in my VM so it can connect to my server. I
-searched for this particular information on the web, but I found nothing.
+Tested on Debian wheezy/jessie guests with default kernels and qemu
+2.5+ q35 machine.
 
-Can someone indicate me how to connect to the ivshmem-server from a VM
-please ?
-
-Best regards,
-
-Sebastien Fremal
+>
+> And please Cc qemu-devel@ too (doing this now).
+>
+> Thanks,
+>
+> /mjt
