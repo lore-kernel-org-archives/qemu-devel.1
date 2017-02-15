@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56013)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ce3Aq-0001R3-GI
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:15:25 -0500
+	(envelope-from <lersek@redhat.com>) id 1ce3El-0004qF-Ke
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:19:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ce3Ap-0001sE-Ck
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:15:24 -0500
-References: <20170212014724.10618-1-mreitz@redhat.com>
-	<w51lgtazdqs.fsf@maestria.local.igalia.com>
-	<8d536684-8a07-7c34-16ca-be234685ab2a@redhat.com>
-	<w51k28tumiv.fsf@maestria.local.igalia.com>
-	<7fcba84d-4cd8-b34d-ef3e-4fbfa46d59a9@redhat.com>
-	<20170215164451.GH4935@noname.redhat.com>
-	<4756605d-5cd3-20be-d7fc-2909bae8a268@redhat.com>
-	<20170215171003.GJ4935@noname.redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <d368b28b-ca32-0601-6092-5aa16422578f@redhat.com>
-Date: Wed, 15 Feb 2017 18:15:14 +0100
+	(envelope-from <lersek@redhat.com>) id 1ce3Eg-0004Pl-Jx
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:19:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40394)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1ce3Eg-0004Pg-AS
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:19:22 -0500
+References: <cover.1487139038.git.ben@skyportsystems.com>
+	<9dffe31a245cf6a717eef8227fe80ca666b168b5.1487139038.git.ben@skyportsystems.com>
+	<20170215115723.77e4d9d7@nial.brq.redhat.com>
+	<1f4a6eb2-0838-2218-88e3-4f65498a41d6@redhat.com>
+	<20170215162225.74d48058@nial.brq.redhat.com>
+	<20170215172515-mutt-send-email-mst@kernel.org>
+	<20170215165602.72e96c28@nial.brq.redhat.com>
+	<20170215183736-mutt-send-email-mst@kernel.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <d971f4f3-7cb1-bb42-d200-aa9fdd6d105d@redhat.com>
+Date: Wed, 15 Feb 2017 18:19:19 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170215171003.GJ4935@noname.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="i2SLgoqX1E2JjDtbtguSlPns4F77Ca0DB"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: Swap request limit
- definitions
+In-Reply-To: <20170215183736-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 1/7] linker-loader: Add new 'write
+ pointer' command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,106 +34,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: ben@skyportsystems.com, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---i2SLgoqX1E2JjDtbtguSlPns4F77Ca0DB
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
-Message-ID: <d368b28b-ca32-0601-6092-5aa16422578f@redhat.com>
-Subject: Re: [Qemu-block] [PATCH] block: Swap request limit definitions
-References: <20170212014724.10618-1-mreitz@redhat.com>
- <w51lgtazdqs.fsf@maestria.local.igalia.com>
- <8d536684-8a07-7c34-16ca-be234685ab2a@redhat.com>
- <w51k28tumiv.fsf@maestria.local.igalia.com>
- <7fcba84d-4cd8-b34d-ef3e-4fbfa46d59a9@redhat.com>
- <20170215164451.GH4935@noname.redhat.com>
- <4756605d-5cd3-20be-d7fc-2909bae8a268@redhat.com>
- <20170215171003.GJ4935@noname.redhat.com>
-In-Reply-To: <20170215171003.GJ4935@noname.redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-
-On 15.02.2017 18:10, Kevin Wolf wrote:
-> Am 15.02.2017 um 17:48 hat Max Reitz geschrieben:
->> On 15.02.2017 17:44, Kevin Wolf wrote:
->>> Am 15.02.2017 um 14:42 hat Max Reitz geschrieben:
->>>> On 14.02.2017 10:52, Alberto Garcia wrote:
->>>>> On Mon 13 Feb 2017 06:13:38 PM CET, Max Reitz wrote:
+On 02/15/17 17:39, Michael S. Tsirkin wrote:
+> On Wed, Feb 15, 2017 at 04:56:02PM +0100, Igor Mammedov wrote:
+>> On Wed, 15 Feb 2017 17:30:00 +0200
+>> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+>>
+>>> On Wed, Feb 15, 2017 at 04:22:25PM +0100, Igor Mammedov wrote:
+>>>> On Wed, 15 Feb 2017 15:13:20 +0100
+>>>> Laszlo Ersek <lersek@redhat.com> wrote:
+>>>>   
+>>>>> Commenting under Igor's reply for simplicity
 >>>>>
->>>>>>>> -#define BDRV_REQUEST_MAX_SECTORS MIN(SIZE_MAX >> BDRV_SECTOR_BI=
-TS, \
->>>>>>>> -                                     INT_MAX >> BDRV_SECTOR_BIT=
-S)
->>>>>>>> -#define BDRV_REQUEST_MAX_BYTES (BDRV_REQUEST_MAX_SECTORS << BDR=
-V_SECTOR_BITS)
->>>>>>>> +#define BDRV_REQUEST_MAX_BYTES      MIN(SIZE_MAX, INT_MAX)
->>>>>>>> +#define BDRV_REQUEST_MAX_SECTORS    (BDRV_REQUEST_MAX_BYTES >> =
-BDRV_SECTOR_BITS)
+>>>>> On 02/15/17 11:57, Igor Mammedov wrote:  
+>>>>>> On Tue, 14 Feb 2017 22:15:43 -0800
+>>>>>> ben@skyportsystems.com wrote:
+>>>>>>     
+>>>>>>> From: Ben Warren <ben@skyportsystems.com>
 >>>>>>>
->>>>>>> I'm just pointing it out because I don't know if this can cause
->>>>>>> problems, but this patch would make BDRV_REQUEST_MAX_BYTES not a
->>>>>>> multiple of the sector size (INT_MAX is actually a prime number).=
-
->>>>>>
->>>>>> Very good point. I don't think this could be an issue, though. For=
- one
->>>>>> thing, the use of BDRV_REQUEST_MAX_BYTES is very limited.
+>>>>>>> This is similar to the existing 'add pointer' functionality, but instead
+>>>>>>> of instructing the guest (BIOS or UEFI) to patch memory, it instructs
+>>>>>>> the guest to write the pointer back to QEMU via a writeable fw_cfg file.
+>>>>>>>
+>>>>>>> Signed-off-by: Ben Warren <ben@skyportsystems.com>
+>>>>>>> ---
+>>>>>>>  hw/acpi/bios-linker-loader.c         | 58 ++++++++++++++++++++++++++++++++++--
+>>>>>>>  include/hw/acpi/bios-linker-loader.h |  6 ++++
+>>>>>>>  2 files changed, 61 insertions(+), 3 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/hw/acpi/bios-linker-loader.c b/hw/acpi/bios-linker-loader.c
+>>>>>>> index d963ebe..5030cf1 100644
+>>>>>>> --- a/hw/acpi/bios-linker-loader.c
+>>>>>>> +++ b/hw/acpi/bios-linker-loader.c
+>>>>>>> @@ -78,6 +78,19 @@ struct BiosLinkerLoaderEntry {
+>>>>>>>              uint32_t length;
+>>>>>>>          } cksum;
+>>>>>>>  
+>>>>>>> +        /*
+>>>>>>> +         * COMMAND_WRITE_POINTER - write the fw_cfg file (originating from
+>>>>>>> +         * @dest_file) at @wr_pointer.offset, by adding a pointer to the table
+>>>>>>> +         * originating from @src_file. 1,2,4 or 8 byte unsigned
+>>>>>>> +         * addition is used depending on @wr_pointer.size.
+>>>>>>> +         */    
 >>>>>
->>>>> Ok, but then I wonder what's the benefit of increasing
->>>>> BDRV_REQUEST_MAX_BYTES.
+>>>>> The words "adding" and "addition" are causing confusion here.
+>>>>>
+>>>>> In all of the previous discussion, *addition* was out of scope from
+>>>>> WRITE_POINTER. Again, the firmware is specifically not required to
+>>>>> *read* any part of the fw_cfg blob identified by "dest_file".
+>>>>>
+>>>>> WRITE_POINTER instructs the firmware to return the allocation address of
+>>>>> the downloaded "src_file" to QEMU. Any necessary runtime subscripting
+>>>>> within "src_file" is to be handled by QEMU code dynamically.
+>>>>>
+>>>>> For example, consider that "src_file" has *several* fields that QEMU
+>>>>> wants to massage; in that case, indexing within QEMU code with field
+>>>>> offsets is simply unavoidable.  
+>>>> what I don't like here is that this indexing would be rather fragile
+>>>> and has to be done in different parts of QEMU /device, AML/.
 >>>>
->>>> The benefit is that the definition looks cleaner.
+>>>> I'd prefer this helper function to have the same @src_offset
+>>>> behavior as ADD_POINTER where patched address could point to
+>>>> any part of src_file i.e. not just beginning.  
 >>>
->>> Whatever way we want to write it, I think MAX_BYTES =3D MAX_SECTORS *=
- 512
->>> should be a given. Everything else is bound to confuse people and
->>> introduce bugs sooner or later.
+>>>
+>>>
+>>>         /*
+>>>          * COMMAND_ADD_POINTER - patch the table (originating from
+>>>          * @dest_file) at @pointer.offset, by adding a pointer to the table
+>>>          * originating from @src_file. 1,2,4 or 8 byte unsigned
+>>>          * addition is used depending on @pointer.size.
+>>>          */
+>>>  
+>>> so the way ADD works is
+>>> 	read at offset
+>>> 	add table address
+>>> 	write result at offset
+>>>
+>>> in other words it is always beginning of table that is added.
+>> more exactly it's, read at 
+>>   src_offset = *(dst_blob_ptr+dst_offset)
+>>   *(dst_blob+dst_offset) = src_blob_ptr + src_offset
 >>
->> Probably only sooner and not later, considering we are switching to by=
-te
->> granularity overall anyway. And if something confuses people, I'd argu=
-e
->> it's the fact that we still have sector granularity all over the place=
-
->> and not that your requests can be a bit bigger if you submit them in
->> bytes than if you submit them in sectors.
+>>> Would the following be acceptable?
+>>>
+>>>
+>>>          * COMMAND_WRITE_POINTER - update the fw_cfg file (originating from
+>>>          * @dest_file) at @wr_pointer.offset, by writing a pointer to the table
+>>>          * originating from @src_file. 1,2,4 or 8 byte unsigned value
+>>>          * is written depending on @wr_pointer.size.
+>> it looses 'adding' part of ADD_POINTER command which handles src_offset,
+>> however implementing adding part looks a bit complicated
+>> as patched blob (dst) is not in guest memory but in QEMU and
+>> on reset *(dst_blob+dst_offset) should be reset to src_offset.
+>> Considering dst file could be device specific memory (field/blob/whatever)
+>> it could be hard to track/notice proper reset behavior.
 >>
->> Anyway, if MAX_BYTES should be a multiple of the sector size, then I
->> can't think of a much better way to write this than what we currently
->> have and this patch is unneeded.
->=20
-> Maybe we can just get rid of BDRV_REQUEST_MAX_SECTORS? Or do we need to=
+>> So now I'm not sure if src_offset is worth adding.
+> 
+> Right. Let's just do this math in QEMU if we have to.
 
-> do a few more conversion before that?
+Deal. :)
 
-We probably could, but it wouldn't make much sense. We have many places
-that use BDRV_REQUEST_MAX_SECTORS without multiplying it by 512 and if
-we decided to use *_MAX_BYTES dividing it by 512 in every one of those
-places, we could just as well define a central macro for that -- which
-would be *_MAX_SECTORS, so...
-
-Max
-
-
---i2SLgoqX1E2JjDtbtguSlPns4F77Ca0DB
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlikjKMSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AZFkH/2L6W8ip00CKrTLQmm4UEvIPqlxR1xcI
-tmDX6A7xSR/BAcVn/QJcjP2TAeJXf8rAoy40csl3rJI1C1fgkWYYl/eyCSqYOvDT
-qgbwK9gcF2I8QV2UrDyd9s3srjhcvnqnMti4LCn9eDuX9KeftmLcx8myy0Vb5xbS
-1fMdmtiS3rxsvRSMgNt0Sjc15tvA7e1LD1ewCImUhkZj8Nr8SI36vH1k4mjT1AwO
-mnoQmo/WRtwDE0S32Qk4AfKp7zan3JM6ooQILOKKVubIKbZ8Bpn6UhiREvwLgYJP
-Q6Qumm7y0+EAYdN3EKEcbzXmBykxtrvl6ncGb1MWYleFc+MXzY4cjKE=
-=irnM
------END PGP SIGNATURE-----
-
---i2SLgoqX1E2JjDtbtguSlPns4F77Ca0DB--
+Thanks
+Laszlo
