@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ce2l9-0003T7-Rl
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 11:48:52 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ce2os-00064e-Jk
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 11:52:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ce2l8-0005GE-Qx
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 11:48:51 -0500
-References: <20170212014724.10618-1-mreitz@redhat.com>
-	<w51lgtazdqs.fsf@maestria.local.igalia.com>
-	<8d536684-8a07-7c34-16ca-be234685ab2a@redhat.com>
-	<w51k28tumiv.fsf@maestria.local.igalia.com>
-	<7fcba84d-4cd8-b34d-ef3e-4fbfa46d59a9@redhat.com>
-	<20170215164451.GH4935@noname.redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <4756605d-5cd3-20be-d7fc-2909bae8a268@redhat.com>
-Date: Wed, 15 Feb 2017 17:48:41 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1ce2oo-0006LA-AV
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 11:52:39 -0500
+References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
+	<20170203154757.36140-7-vsementsov@virtuozzo.com>
+	<f9ddd60b-532a-2009-c1cc-edab0ca64458@redhat.com>
+	<950e5279-0d30-77a4-ca1c-f8543ae08248@virtuozzo.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <751994f4-b3ef-c189-dde4-687d4e040871@redhat.com>
+Date: Wed, 15 Feb 2017 17:52:32 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170215164451.GH4935@noname.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="hwT6nox9bGeSS4J0IHhWaDsfaUXGBIwa8"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: Swap request limit
- definitions
+In-Reply-To: <950e5279-0d30-77a4-ca1c-f8543ae08248@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 06/18] nbd/client: refactor drop_sync
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,88 +25,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, den@virtuozzo.com, stefanha@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---hwT6nox9bGeSS4J0IHhWaDsfaUXGBIwa8
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
-Message-ID: <4756605d-5cd3-20be-d7fc-2909bae8a268@redhat.com>
-Subject: Re: [Qemu-block] [PATCH] block: Swap request limit definitions
-References: <20170212014724.10618-1-mreitz@redhat.com>
- <w51lgtazdqs.fsf@maestria.local.igalia.com>
- <8d536684-8a07-7c34-16ca-be234685ab2a@redhat.com>
- <w51k28tumiv.fsf@maestria.local.igalia.com>
- <7fcba84d-4cd8-b34d-ef3e-4fbfa46d59a9@redhat.com>
- <20170215164451.GH4935@noname.redhat.com>
-In-Reply-To: <20170215164451.GH4935@noname.redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
 
-On 15.02.2017 17:44, Kevin Wolf wrote:
-> Am 15.02.2017 um 14:42 hat Max Reitz geschrieben:
->> On 14.02.2017 10:52, Alberto Garcia wrote:
->>> On Mon 13 Feb 2017 06:13:38 PM CET, Max Reitz wrote:
+
+On 08/02/2017 08:55, Vladimir Sementsov-Ogievskiy wrote:
+> 07.02.2017 02:19, Eric Blake wrote:
+>> On 02/03/2017 09:47 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>> Return 0 on success to simplify success checking.
 >>>
->>>>>> -#define BDRV_REQUEST_MAX_SECTORS MIN(SIZE_MAX >> BDRV_SECTOR_BITS=
-, \
->>>>>> -                                     INT_MAX >> BDRV_SECTOR_BITS)=
-
->>>>>> -#define BDRV_REQUEST_MAX_BYTES (BDRV_REQUEST_MAX_SECTORS << BDRV_=
-SECTOR_BITS)
->>>>>> +#define BDRV_REQUEST_MAX_BYTES      MIN(SIZE_MAX, INT_MAX)
->>>>>> +#define BDRV_REQUEST_MAX_SECTORS    (BDRV_REQUEST_MAX_BYTES >> BD=
-RV_SECTOR_BITS)
->>>>>
->>>>> I'm just pointing it out because I don't know if this can cause
->>>>> problems, but this patch would make BDRV_REQUEST_MAX_BYTES not a
->>>>> multiple of the sector size (INT_MAX is actually a prime number).
->>>>
->>>> Very good point. I don't think this could be an issue, though. For o=
-ne
->>>> thing, the use of BDRV_REQUEST_MAX_BYTES is very limited.
->>>
->>> Ok, but then I wonder what's the benefit of increasing
->>> BDRV_REQUEST_MAX_BYTES.
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>> ---
+>>>  nbd/client.c | 35 +++++++++++++++++++----------------
+>>>  1 file changed, 19 insertions(+), 16 deletions(-)
+>> I'm not sure that this simplifies anything.  You have a net addition in
+>> lines of code, so unless some later patch is improved because of this,
+>> I'm inclined to say this is needless churn.
 >>
->> The benefit is that the definition looks cleaner.
->=20
-> Whatever way we want to write it, I think MAX_BYTES =3D MAX_SECTORS * 5=
-12
-> should be a given. Everything else is bound to confuse people and
-> introduce bugs sooner or later.
+> 
+> I just dislike duplicating information like "drop_sync(ioc, 124) !=
+> 124". In the code there is no place where positive and not equal to size
+> return value actually handled. But it is not so important, if you are
+> against i'll drop this, no problem.
 
-Probably only sooner and not later, considering we are switching to byte
-granularity overall anyway. And if something confuses people, I'd argue
-it's the fact that we still have sector granularity all over the place
-and not that your requests can be a bit bigger if you submit them in
-bytes than if you submit them in sectors.
+I think I agree with Vladimir.
 
-Anyway, if MAX_BYTES should be a multiple of the sector size, then I
-can't think of a much better way to write this than what we currently
-have and this patch is unneeded.
+> One note: I don't have good understanding of the following: actually
+> read can return positive value < queried size, which means that we
+> should read again. But it is not handled in the code (handled, but just
+> as an error), except drop_sync.. (With drop_sync it is side effect of
+> using limited buffer size, yes?). Is it all ok?
 
-Max
+It is handled in nbd_wr_syncv.
 
-
---hwT6nox9bGeSS4J0IHhWaDsfaUXGBIwa8
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlikhmkSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ABZEIAJP6q5I/CtRIjXjqtw0Xd7XYyDIvZ+KM
-ZkwZgPreSHwPk1s1SEdh6+dENzX5NRYQ3Aw6oLGfSnMfXdrLUPQgqcdraldfiDmn
-L4xFsi7IBBYEmRuE6Kgma54Dv5EXkafj4+CJAix+YQwoDyL1t8ibC4E6zmJWo5k4
-C8kwflFEyY7jvhGS5/6uY5GGOfFAjDiAXW7oCwz0GV5yOWbDA8Kko3beWZN7Wn87
-NHDa9WZRCIbkpuctWdhquRjtDAAhKpq1N+v0qH2NRlSYsgDUO1NoaHH4aMYz0Ok5
-IAS+UPWnRKGEW2E1Pp7scGTUmGCKLD2wSRePtxBPwgEJjy0kwTzFWkw=
-=3Uan
------END PGP SIGNATURE-----
-
---hwT6nox9bGeSS4J0IHhWaDsfaUXGBIwa8--
+Paolo
