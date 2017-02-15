@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ce3Kh-0000y7-SD
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:25:38 -0500
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ce3Kk-00010g-Qx
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:25:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ce3Kf-0006Vw-3u
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:25:35 -0500
-Received: from mailapp01.imgtec.com ([195.59.15.196]:44628)
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ce3Kh-0006WV-JO
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:25:38 -0500
+Received: from mailapp01.imgtec.com ([195.59.15.196]:50001)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ce3Ke-0006Vi-GQ
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:25:33 -0500
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ce3Kh-0006WE-0P
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:25:35 -0500
 From: Yongbok Kim <yongbok.kim@imgtec.com>
-Date: Wed, 15 Feb 2017 17:23:53 +0000
-Message-ID: <1487179434-13306-8-git-send-email-yongbok.kim@imgtec.com>
+Date: Wed, 15 Feb 2017 17:23:54 +0000
+Message-ID: <1487179434-13306-9-git-send-email-yongbok.kim@imgtec.com>
 In-Reply-To: <1487179434-13306-1-git-send-email-yongbok.kim@imgtec.com>
 References: <1487179434-13306-1-git-send-email-yongbok.kim@imgtec.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 7/8] hw: xilinx-pcie: Add support for Xilinx
- AXI PCIe Controller
+Subject: [Qemu-devel] [PATCH v4 8/8] hw/mips: MIPS Boston board support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,44 +30,90 @@ Cc: Aurelien Jarno <aurelien@aurel32.net>, Paul Burton <paul.burton@imgtec.com>
 
 From: Paul Burton <paul.burton@imgtec.com>
 
-Add support for emulating the Xilinx AXI Root Port Bridge for PCI
-Express as described by Xilinx' PG055 document. This is a PCIe
-controller that can be used with certain series of Xilinx FPGAs, and is
-used on the MIPS Boston board which will make use of this code.
+Introduce support for emulating the MIPS Boston development board. The
+Boston board is built around an FPGA & 3 PCIe controllers, one of which
+is connected to an Intel EG20T Platform Controller Hub. It is used
+during the development & debug of new CPUs and the software intended to
+run on them, and is essentially the successor to the older MIPS Malta
+board.
+
+This patch does not implement the EG20T, instead connecting an already
+supported ICH-9 AHCI controller. Whilst this isn't accurate it's enough
+for typical stock Boston software (eg. Linux kernels) to work with hard
+disks given that both the ICH-9 & EG20T implement the AHCI
+specification.
+
+Boston boards typically boot kernels in the FIT image format, and this
+patch will treat kernels provided to QEMU as such. When loading a kernel
+directly, the board code will generate minimal firmware much as the
+Malta board code does. This firmware will set up the CM, CPC & GIC
+register base addresses then set argument registers & jump to the kernel
+entry point. Alternatively, bootloader code may be loaded using the bios
+argument in which case no firmware will be generated & execution will
+proceed from the start of the boot code at the default MIPS boot
+exception vector (offset 0x1fc00000 into (c)kseg1).
+
+Currently real Boston boards are always used with FPGA bitfiles that
+include a Global Interrupt Controller (GIC), so the interrupt
+configuration is only defined for such cases. Therefore the board will
+only allow use of CPUs which implement the CPS components, including the
+GIC, and will otherwise exit with a message.
 
 Signed-off-by: Paul Burton <paul.burton@imgtec.com>
+Reviewed-by: Yongbok Kim <yongbok.kim@imgtec.com>
 [yongbok.kim@imgtec.com:
-  removed returning on !level,
-  updated IRQ connection with GPIO logic,
-  moved xilinx_pcie_init() to boston.c
-  replaced stw_le_p() with pci_set_word()
-  and other cosmetic changes]
+  isolated boston machine support for mips64el.
+  updated for recent Chardev changes.
+  ignore missing bios/kernel for qtest.]
 Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
 ---
- hw/pci-host/Makefile.objs         |   1 +
- hw/pci-host/xilinx-pcie.c         | 328 ++++++++++++++++++++++++++++++++++++++
- include/hw/pci-host/xilinx-pcie.h |  68 ++++++++
- 3 files changed, 397 insertions(+)
- create mode 100644 hw/pci-host/xilinx-pcie.c
- create mode 100644 include/hw/pci-host/xilinx-pcie.h
+ configure                            |   2 +-
+ default-configs/mips64el-softmmu.mak |   2 +
+ hw/mips/Makefile.objs                |   1 +
+ hw/mips/boston.c                     | 576 +++++++++++++++++++++++++++++++++++
+ 4 files changed, 580 insertions(+), 1 deletion(-)
+ create mode 100644 hw/mips/boston.c
 
-diff --git a/hw/pci-host/Makefile.objs b/hw/pci-host/Makefile.objs
-index 45f1f0e..9c7909c 100644
---- a/hw/pci-host/Makefile.objs
-+++ b/hw/pci-host/Makefile.objs
-@@ -16,3 +16,4 @@ common-obj-$(CONFIG_FULONG) += bonito.o
- common-obj-$(CONFIG_PCI_PIIX) += piix.o
- common-obj-$(CONFIG_PCI_Q35) += q35.o
- common-obj-$(CONFIG_PCI_GENERIC) += gpex.o
-+common-obj-$(CONFIG_PCI_XILINX) += xilinx-pcie.o
-diff --git a/hw/pci-host/xilinx-pcie.c b/hw/pci-host/xilinx-pcie.c
+diff --git a/configure b/configure
+index 4b68861..8e8f18d 100755
+--- a/configure
++++ b/configure
+@@ -3378,7 +3378,7 @@ fi
+ fdt_required=no
+ for target in $target_list; do
+   case $target in
+-    aarch64*-softmmu|arm*-softmmu|ppc*-softmmu|microblaze*-softmmu)
++    aarch64*-softmmu|arm*-softmmu|ppc*-softmmu|microblaze*-softmmu|mips64el-softmmu)
+       fdt_required=yes
+     ;;
+   esac
+diff --git a/default-configs/mips64el-softmmu.mak b/default-configs/mips64el-softmmu.mak
+index 485e218..cc5f3b3 100644
+--- a/default-configs/mips64el-softmmu.mak
++++ b/default-configs/mips64el-softmmu.mak
+@@ -10,3 +10,5 @@ CONFIG_JAZZ=y
+ CONFIG_G364FB=y
+ CONFIG_JAZZ_LED=y
+ CONFIG_VT82C686=y
++CONFIG_MIPS_BOSTON=y
++CONFIG_PCI_XILINX=y
+diff --git a/hw/mips/Makefile.objs b/hw/mips/Makefile.objs
+index 9352a1c..48cd2ef 100644
+--- a/hw/mips/Makefile.objs
++++ b/hw/mips/Makefile.objs
+@@ -4,3 +4,4 @@ obj-$(CONFIG_JAZZ) += mips_jazz.o
+ obj-$(CONFIG_FULONG) += mips_fulong2e.o
+ obj-y += gt64xxx_pci.o
+ obj-$(CONFIG_MIPS_CPS) += cps.o
++obj-$(CONFIG_MIPS_BOSTON) += boston.o
+diff --git a/hw/mips/boston.c b/hw/mips/boston.c
 new file mode 100644
-index 0000000..8b71e2d
+index 0000000..560c8b4
 --- /dev/null
-+++ b/hw/pci-host/xilinx-pcie.c
-@@ -0,0 +1,328 @@
++++ b/hw/mips/boston.c
+@@ -0,0 +1,576 @@
 +/*
-+ * Xilinx PCIe host controller emulation.
++ * MIPS Boston development board emulation.
 + *
 + * Copyright (c) 2016 Imagination Technologies
 + *
@@ -87,387 +132,561 @@ index 0000000..8b71e2d
 + */
 +
 +#include "qemu/osdep.h"
-+#include "hw/pci/pci_bridge.h"
++#include "qemu-common.h"
++
++#include "exec/address-spaces.h"
++#include "hw/boards.h"
++#include "hw/char/serial.h"
++#include "hw/hw.h"
++#include "hw/ide/pci.h"
++#include "hw/ide/ahci.h"
++#include "hw/loader.h"
++#include "hw/loader-fit.h"
++#include "hw/mips/cps.h"
++#include "hw/mips/cpudevs.h"
 +#include "hw/pci-host/xilinx-pcie.h"
++#include "qapi/error.h"
++#include "qemu/cutils.h"
++#include "qemu/error-report.h"
++#include "qemu/log.h"
++#include "sysemu/char.h"
++#include "sysemu/device_tree.h"
++#include "sysemu/sysemu.h"
++#include "sysemu/qtest.h"
 +
-+enum root_cfg_reg {
-+    /* Interrupt Decode Register */
-+    ROOTCFG_INTDEC              = 0x138,
++#include <libfdt.h>
 +
-+    /* Interrupt Mask Register */
-+    ROOTCFG_INTMASK             = 0x13c,
-+    /* INTx Interrupt Received */
-+#define ROOTCFG_INTMASK_INTX    (1 << 16)
-+    /* MSI Interrupt Received */
-+#define ROOTCFG_INTMASK_MSI     (1 << 17)
++#define TYPE_MIPS_BOSTON "mips-boston"
++#define BOSTON(obj) OBJECT_CHECK(BostonState, (obj), TYPE_MIPS_BOSTON)
 +
-+    /* PHY Status/Control Register */
-+    ROOTCFG_PSCR                = 0x144,
-+    /* Link Up */
-+#define ROOTCFG_PSCR_LINK_UP    (1 << 11)
++typedef struct {
++    SysBusDevice parent_obj;
 +
-+    /* Root Port Status/Control Register */
-+    ROOTCFG_RPSCR               = 0x148,
-+    /* Bridge Enable */
-+#define ROOTCFG_RPSCR_BRIDGEEN  (1 << 0)
-+    /* Interrupt FIFO Not Empty */
-+#define ROOTCFG_RPSCR_INTNEMPTY (1 << 18)
-+    /* Interrupt FIFO Overflow */
-+#define ROOTCFG_RPSCR_INTOVF    (1 << 19)
++    MachineState *mach;
++    MIPSCPSState *cps;
++    SerialState *uart;
 +
-+    /* Root Port Interrupt FIFO Read Register 1 */
-+    ROOTCFG_RPIFR1              = 0x158,
-+#define ROOTCFG_RPIFR1_INT_LANE_SHIFT   27
-+#define ROOTCFG_RPIFR1_INT_ASSERT_SHIFT 29
-+#define ROOTCFG_RPIFR1_INT_VALID_SHIFT  31
-+    /* Root Port Interrupt FIFO Read Register 2 */
-+    ROOTCFG_RPIFR2              = 0x15c,
++    CharBackend lcd_display;
++    char lcd_content[8];
++    bool lcd_inited;
++
++    hwaddr kernel_entry;
++    hwaddr fdt_base;
++} BostonState;
++
++enum boston_plat_reg {
++    PLAT_FPGA_BUILD     = 0x00,
++    PLAT_CORE_CL        = 0x04,
++    PLAT_WRAPPER_CL     = 0x08,
++    PLAT_SYSCLK_STATUS  = 0x0c,
++    PLAT_SOFTRST_CTL    = 0x10,
++#define PLAT_SOFTRST_CTL_SYSRESET       (1 << 4)
++    PLAT_DDR3_STATUS    = 0x14,
++#define PLAT_DDR3_STATUS_LOCKED         (1 << 0)
++#define PLAT_DDR3_STATUS_CALIBRATED     (1 << 2)
++    PLAT_PCIE_STATUS    = 0x18,
++#define PLAT_PCIE_STATUS_PCIE0_LOCKED   (1 << 0)
++#define PLAT_PCIE_STATUS_PCIE1_LOCKED   (1 << 8)
++#define PLAT_PCIE_STATUS_PCIE2_LOCKED   (1 << 16)
++    PLAT_FLASH_CTL      = 0x1c,
++    PLAT_SPARE0         = 0x20,
++    PLAT_SPARE1         = 0x24,
++    PLAT_SPARE2         = 0x28,
++    PLAT_SPARE3         = 0x2c,
++    PLAT_MMCM_DIV       = 0x30,
++#define PLAT_MMCM_DIV_CLK0DIV_SHIFT     0
++#define PLAT_MMCM_DIV_INPUT_SHIFT       8
++#define PLAT_MMCM_DIV_MUL_SHIFT         16
++#define PLAT_MMCM_DIV_CLK1DIV_SHIFT     24
++    PLAT_BUILD_CFG      = 0x34,
++#define PLAT_BUILD_CFG_IOCU_EN          (1 << 0)
++#define PLAT_BUILD_CFG_PCIE0_EN         (1 << 1)
++#define PLAT_BUILD_CFG_PCIE1_EN         (1 << 2)
++#define PLAT_BUILD_CFG_PCIE2_EN         (1 << 3)
++    PLAT_DDR_CFG        = 0x38,
++#define PLAT_DDR_CFG_SIZE               (0xf << 0)
++#define PLAT_DDR_CFG_MHZ                (0xfff << 4)
++    PLAT_NOC_PCIE0_ADDR = 0x3c,
++    PLAT_NOC_PCIE1_ADDR = 0x40,
++    PLAT_NOC_PCIE2_ADDR = 0x44,
++    PLAT_SYS_CTL        = 0x48,
 +};
 +
-+static void xilinx_pcie_update_intr(XilinxPCIEHost *s,
-+                                    uint32_t set, uint32_t clear)
++static void boston_lcd_event(void *opaque, int event)
 +{
-+    int level;
++    BostonState *s = opaque;
++    if (event == CHR_EVENT_OPENED && !s->lcd_inited) {
++        qemu_chr_fe_printf(&s->lcd_display, "        ");
++        s->lcd_inited = true;
++    }
++}
 +
-+    s->intr |= set;
-+    s->intr &= ~clear;
++static uint64_t boston_lcd_read(void *opaque, hwaddr addr,
++                                unsigned size)
++{
++    BostonState *s = opaque;
++    uint64_t val = 0;
 +
-+    if (s->intr_fifo_r != s->intr_fifo_w) {
-+        s->intr |= ROOTCFG_INTMASK_INTX;
++    switch (size) {
++    case 8:
++        val |= (uint64_t)s->lcd_content[(addr + 7) & 0x7] << 56;
++        val |= (uint64_t)s->lcd_content[(addr + 6) & 0x7] << 48;
++        val |= (uint64_t)s->lcd_content[(addr + 5) & 0x7] << 40;
++        val |= (uint64_t)s->lcd_content[(addr + 4) & 0x7] << 32;
++        /* fall through */
++    case 4:
++        val |= (uint64_t)s->lcd_content[(addr + 3) & 0x7] << 24;
++        val |= (uint64_t)s->lcd_content[(addr + 2) & 0x7] << 16;
++        /* fall through */
++    case 2:
++        val |= (uint64_t)s->lcd_content[(addr + 1) & 0x7] << 8;
++        /* fall through */
++    case 1:
++        val |= (uint64_t)s->lcd_content[(addr + 0) & 0x7];
++        break;
 +    }
 +
-+    level = !!(s->intr & s->intr_mask);
-+    qemu_set_irq(s->irq, level);
-+}
-+
-+static void xilinx_pcie_queue_intr(XilinxPCIEHost *s,
-+                                   uint32_t fifo_reg1, uint32_t fifo_reg2)
-+{
-+    XilinxPCIEInt *intr;
-+    unsigned int new_w;
-+
-+    new_w = (s->intr_fifo_w + 1) % ARRAY_SIZE(s->intr_fifo);
-+    if (new_w == s->intr_fifo_r) {
-+        s->rpscr |= ROOTCFG_RPSCR_INTOVF;
-+        return;
-+    }
-+
-+    intr = &s->intr_fifo[s->intr_fifo_w];
-+    s->intr_fifo_w = new_w;
-+
-+    intr->fifo_reg1 = fifo_reg1;
-+    intr->fifo_reg2 = fifo_reg2;
-+
-+    xilinx_pcie_update_intr(s, ROOTCFG_INTMASK_INTX, 0);
-+}
-+
-+static void xilinx_pcie_set_irq(void *opaque, int irq_num, int level)
-+{
-+    XilinxPCIEHost *s = XILINX_PCIE_HOST(opaque);
-+
-+    xilinx_pcie_queue_intr(s,
-+       (irq_num << ROOTCFG_RPIFR1_INT_LANE_SHIFT) |
-+           (level << ROOTCFG_RPIFR1_INT_ASSERT_SHIFT) |
-+           (1 << ROOTCFG_RPIFR1_INT_VALID_SHIFT),
-+       0);
-+}
-+
-+static void xilinx_pcie_host_realize(DeviceState *dev, Error **errp)
-+{
-+    PCIHostState *pci = PCI_HOST_BRIDGE(dev);
-+    XilinxPCIEHost *s = XILINX_PCIE_HOST(dev);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-+    PCIExpressHost *pex = PCIE_HOST_BRIDGE(dev);
-+
-+    snprintf(s->name, sizeof(s->name), "pcie%u", s->bus_nr);
-+
-+    /* PCI configuration space */
-+    pcie_host_mmcfg_init(pex, s->cfg_size);
-+
-+    /* MMIO region */
-+    memory_region_init(&s->mmio, OBJECT(s), "mmio", UINT64_MAX);
-+    memory_region_set_enabled(&s->mmio, false);
-+
-+    /* dummy I/O region */
-+    memory_region_init_ram(&s->io, OBJECT(s), "io", 16, NULL);
-+    memory_region_set_enabled(&s->io, false);
-+
-+    /* interrupt out */
-+    qdev_init_gpio_out_named(dev, &s->irq, "interrupt_out", 1);
-+
-+    sysbus_init_mmio(sbd, &pex->mmio);
-+    sysbus_init_mmio(sbd, &s->mmio);
-+
-+    pci->bus = pci_register_bus(dev, s->name, xilinx_pcie_set_irq,
-+                                pci_swizzle_map_irq_fn, s, &s->mmio,
-+                                &s->io, 0, 4, TYPE_PCIE_BUS);
-+
-+    qdev_set_parent_bus(DEVICE(&s->root), BUS(pci->bus));
-+    qdev_init_nofail(DEVICE(&s->root));
-+}
-+
-+static const char *xilinx_pcie_host_root_bus_path(PCIHostState *host_bridge,
-+                                                  PCIBus *rootbus)
-+{
-+    return "0000:00";
-+}
-+
-+static void xilinx_pcie_host_init(Object *obj)
-+{
-+    XilinxPCIEHost *s = XILINX_PCIE_HOST(obj);
-+    XilinxPCIERoot *root = &s->root;
-+
-+    object_initialize(root, sizeof(*root), TYPE_XILINX_PCIE_ROOT);
-+    object_property_add_child(obj, "root", OBJECT(root), NULL);
-+    qdev_prop_set_uint32(DEVICE(root), "addr", PCI_DEVFN(0, 0));
-+    qdev_prop_set_bit(DEVICE(root), "multifunction", false);
-+}
-+
-+static Property xilinx_pcie_host_props[] = {
-+    DEFINE_PROP_UINT32("bus_nr", XilinxPCIEHost, bus_nr, 0),
-+    DEFINE_PROP_SIZE("cfg_base", XilinxPCIEHost, cfg_base, 0),
-+    DEFINE_PROP_SIZE("cfg_size", XilinxPCIEHost, cfg_size, 32 << 20),
-+    DEFINE_PROP_SIZE("mmio_base", XilinxPCIEHost, mmio_base, 0),
-+    DEFINE_PROP_SIZE("mmio_size", XilinxPCIEHost, mmio_size, 1 << 20),
-+    DEFINE_PROP_BOOL("link_up", XilinxPCIEHost, link_up, true),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void xilinx_pcie_host_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    PCIHostBridgeClass *hc = PCI_HOST_BRIDGE_CLASS(klass);
-+
-+    hc->root_bus_path = xilinx_pcie_host_root_bus_path;
-+    dc->realize = xilinx_pcie_host_realize;
-+    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-+    dc->fw_name = "pci";
-+    dc->props = xilinx_pcie_host_props;
-+}
-+
-+static const TypeInfo xilinx_pcie_host_info = {
-+    .name       = TYPE_XILINX_PCIE_HOST,
-+    .parent     = TYPE_PCIE_HOST_BRIDGE,
-+    .instance_size = sizeof(XilinxPCIEHost),
-+    .instance_init = xilinx_pcie_host_init,
-+    .class_init = xilinx_pcie_host_class_init,
-+};
-+
-+static uint32_t xilinx_pcie_root_config_read(PCIDevice *d,
-+                                             uint32_t address, int len)
-+{
-+    XilinxPCIEHost *s = XILINX_PCIE_HOST(OBJECT(d)->parent);
-+    uint32_t val;
-+
-+    switch (address) {
-+    case ROOTCFG_INTDEC:
-+        val = s->intr;
-+        break;
-+    case ROOTCFG_INTMASK:
-+        val = s->intr_mask;
-+        break;
-+    case ROOTCFG_PSCR:
-+        val = s->link_up ? ROOTCFG_PSCR_LINK_UP : 0;
-+        break;
-+    case ROOTCFG_RPSCR:
-+        if (s->intr_fifo_r != s->intr_fifo_w) {
-+            s->rpscr &= ~ROOTCFG_RPSCR_INTNEMPTY;
-+        } else {
-+            s->rpscr |= ROOTCFG_RPSCR_INTNEMPTY;
-+        }
-+        val = s->rpscr;
-+        break;
-+    case ROOTCFG_RPIFR1:
-+        if (s->intr_fifo_w == s->intr_fifo_r) {
-+            /* FIFO empty */
-+            val = 0;
-+        } else {
-+            val = s->intr_fifo[s->intr_fifo_r].fifo_reg1;
-+        }
-+        break;
-+    case ROOTCFG_RPIFR2:
-+        if (s->intr_fifo_w == s->intr_fifo_r) {
-+            /* FIFO empty */
-+            val = 0;
-+        } else {
-+            val = s->intr_fifo[s->intr_fifo_r].fifo_reg2;
-+        }
-+        break;
-+    default:
-+        val = pci_default_read_config(d, address, len);
-+        break;
-+    }
 +    return val;
 +}
 +
-+static void xilinx_pcie_root_config_write(PCIDevice *d, uint32_t address,
-+                                          uint32_t val, int len)
++static void boston_lcd_write(void *opaque, hwaddr addr,
++                             uint64_t val, unsigned size)
 +{
-+    XilinxPCIEHost *s = XILINX_PCIE_HOST(OBJECT(d)->parent);
-+    switch (address) {
-+    case ROOTCFG_INTDEC:
-+        xilinx_pcie_update_intr(s, 0, val);
-+        break;
-+    case ROOTCFG_INTMASK:
-+        s->intr_mask = val;
-+        xilinx_pcie_update_intr(s, 0, 0);
-+        break;
-+    case ROOTCFG_RPSCR:
-+        s->rpscr &= ~ROOTCFG_RPSCR_BRIDGEEN;
-+        s->rpscr |= val & ROOTCFG_RPSCR_BRIDGEEN;
-+        memory_region_set_enabled(&s->mmio, val & ROOTCFG_RPSCR_BRIDGEEN);
++    BostonState *s = opaque;
 +
-+        if (val & ROOTCFG_INTMASK_INTX) {
-+            s->rpscr &= ~ROOTCFG_INTMASK_INTX;
-+        }
++    switch (size) {
++    case 8:
++        s->lcd_content[(addr + 7) & 0x7] = val >> 56;
++        s->lcd_content[(addr + 6) & 0x7] = val >> 48;
++        s->lcd_content[(addr + 5) & 0x7] = val >> 40;
++        s->lcd_content[(addr + 4) & 0x7] = val >> 32;
++        /* fall through */
++    case 4:
++        s->lcd_content[(addr + 3) & 0x7] = val >> 24;
++        s->lcd_content[(addr + 2) & 0x7] = val >> 16;
++        /* fall through */
++    case 2:
++        s->lcd_content[(addr + 1) & 0x7] = val >> 8;
++        /* fall through */
++    case 1:
++        s->lcd_content[(addr + 0) & 0x7] = val;
 +        break;
-+    case ROOTCFG_RPIFR1:
-+    case ROOTCFG_RPIFR2:
-+        if (s->intr_fifo_w == s->intr_fifo_r) {
-+            /* FIFO empty */
-+            return;
-+        } else {
-+            s->intr_fifo_r = (s->intr_fifo_r + 1) % ARRAY_SIZE(s->intr_fifo);
++    }
++
++    qemu_chr_fe_printf(&s->lcd_display,
++                       "\r%-8.8s", s->lcd_content);
++}
++
++static const MemoryRegionOps boston_lcd_ops = {
++    .read = boston_lcd_read,
++    .write = boston_lcd_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++};
++
++static uint64_t boston_platreg_read(void *opaque, hwaddr addr,
++                                    unsigned size)
++{
++    BostonState *s = opaque;
++    uint32_t gic_freq, val;
++
++    if (size != 4) {
++        qemu_log_mask(LOG_UNIMP, "%uB platform register read", size);
++        return 0;
++    }
++
++    switch (addr & 0xffff) {
++    case PLAT_FPGA_BUILD:
++    case PLAT_CORE_CL:
++    case PLAT_WRAPPER_CL:
++        return 0;
++    case PLAT_DDR3_STATUS:
++        return PLAT_DDR3_STATUS_LOCKED | PLAT_DDR3_STATUS_CALIBRATED;
++    case PLAT_MMCM_DIV:
++        gic_freq = mips_gictimer_get_freq(s->cps->gic.gic_timer) / 1000000;
++        val = gic_freq << PLAT_MMCM_DIV_INPUT_SHIFT;
++        val |= 1 << PLAT_MMCM_DIV_MUL_SHIFT;
++        val |= 1 << PLAT_MMCM_DIV_CLK0DIV_SHIFT;
++        val |= 1 << PLAT_MMCM_DIV_CLK1DIV_SHIFT;
++        return val;
++    case PLAT_BUILD_CFG:
++        val = PLAT_BUILD_CFG_PCIE0_EN;
++        val |= PLAT_BUILD_CFG_PCIE1_EN;
++        val |= PLAT_BUILD_CFG_PCIE2_EN;
++        return val;
++    case PLAT_DDR_CFG:
++        val = s->mach->ram_size / G_BYTE;
++        assert(!(val & ~PLAT_DDR_CFG_SIZE));
++        val |= PLAT_DDR_CFG_MHZ;
++        return val;
++    default:
++        qemu_log_mask(LOG_UNIMP, "Read platform register 0x%" HWADDR_PRIx,
++                      addr & 0xffff);
++        return 0;
++    }
++}
++
++static void boston_platreg_write(void *opaque, hwaddr addr,
++                                 uint64_t val, unsigned size)
++{
++    if (size != 4) {
++        qemu_log_mask(LOG_UNIMP, "%uB platform register write", size);
++        return;
++    }
++
++    switch (addr & 0xffff) {
++    case PLAT_FPGA_BUILD:
++    case PLAT_CORE_CL:
++    case PLAT_WRAPPER_CL:
++    case PLAT_DDR3_STATUS:
++    case PLAT_PCIE_STATUS:
++    case PLAT_MMCM_DIV:
++    case PLAT_BUILD_CFG:
++    case PLAT_DDR_CFG:
++        /* read only */
++        break;
++    case PLAT_SOFTRST_CTL:
++        if (val & PLAT_SOFTRST_CTL_SYSRESET) {
++            qemu_system_reset_request();
 +        }
 +        break;
 +    default:
-+        pci_default_write_config(d, address, val, len);
++        qemu_log_mask(LOG_UNIMP, "Write platform register 0x%" HWADDR_PRIx
++                      " = 0x%" PRIx64, addr & 0xffff, val);
 +        break;
 +    }
 +}
 +
-+static int xilinx_pcie_root_init(PCIDevice *dev)
-+{
-+    BusState *bus = qdev_get_parent_bus(DEVICE(dev));
-+    XilinxPCIEHost *s = XILINX_PCIE_HOST(bus->parent);
-+
-+    pci_set_word(dev->config + PCI_COMMAND,
-+                 PCI_COMMAND_MEMORY | PCI_COMMAND_MASTER);
-+    pci_set_word(dev->config + PCI_MEMORY_BASE, s->mmio_base >> 16);
-+    pci_set_word(dev->config + PCI_MEMORY_LIMIT,
-+                 ((s->mmio_base + s->mmio_size - 1) >> 16) & 0xfff0);
-+
-+    pci_bridge_initfn(dev, TYPE_PCI_BUS);
-+
-+    if (pcie_endpoint_cap_v1_init(dev, 0x80) < 0) {
-+        hw_error("Failed to initialize PCIe capability");
-+    }
-+
-+    return 0;
-+}
-+
-+static void xilinx_pcie_root_class_init(ObjectClass *klass, void *data)
-+{
-+    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-+    dc->desc = "Xilinx AXI-PCIe Host Bridge";
-+    k->vendor_id = PCI_VENDOR_ID_XILINX;
-+    k->device_id = 0x7021;
-+    k->revision = 0;
-+    k->class_id = PCI_CLASS_BRIDGE_HOST;
-+    k->is_express = true;
-+    k->is_bridge = true;
-+    k->init = xilinx_pcie_root_init;
-+    k->exit = pci_bridge_exitfn;
-+    dc->reset = pci_bridge_reset;
-+    k->config_read = xilinx_pcie_root_config_read;
-+    k->config_write = xilinx_pcie_root_config_write;
-+    /*
-+     * PCI-facing part of the host bridge, not usable without the
-+     * host-facing part, which can't be device_add'ed, yet.
-+     */
-+    dc->cannot_instantiate_with_device_add_yet = true;
-+}
-+
-+static const TypeInfo xilinx_pcie_root_info = {
-+    .name = TYPE_XILINX_PCIE_ROOT,
-+    .parent = TYPE_PCI_BRIDGE,
-+    .instance_size = sizeof(XilinxPCIERoot),
-+    .class_init = xilinx_pcie_root_class_init,
++static const MemoryRegionOps boston_platreg_ops = {
++    .read = boston_platreg_read,
++    .write = boston_platreg_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
 +};
 +
-+static void xilinx_pcie_register(void)
++static void boston_flash_write(void *opaque, hwaddr addr,
++                               uint64_t val, unsigned size)
 +{
-+    type_register_static(&xilinx_pcie_root_info);
-+    type_register_static(&xilinx_pcie_host_info);
 +}
 +
-+type_init(xilinx_pcie_register)
-diff --git a/include/hw/pci-host/xilinx-pcie.h b/include/hw/pci-host/xilinx-pcie.h
-new file mode 100644
-index 0000000..bec66b2
---- /dev/null
-+++ b/include/hw/pci-host/xilinx-pcie.h
-@@ -0,0 +1,68 @@
-+/*
-+ * Xilinx PCIe host controller emulation.
-+ *
-+ * Copyright (c) 2016 Imagination Technologies
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ */
++static const MemoryRegionOps boston_flash_ops = {
++    .write = boston_flash_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++};
 +
-+#ifndef HW_XILINX_PCIE_H
-+#define HW_XILINX_PCIE_H
++static const TypeInfo boston_device = {
++    .name          = TYPE_MIPS_BOSTON,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(BostonState),
++};
 +
-+#include "hw/hw.h"
-+#include "hw/sysbus.h"
-+#include "hw/pci/pci.h"
-+#include "hw/pci/pci_bus.h"
-+#include "hw/pci/pcie_host.h"
++static void boston_register_types(void)
++{
++    type_register_static(&boston_device);
++}
++type_init(boston_register_types)
 +
-+#define TYPE_XILINX_PCIE_HOST "xilinx-pcie-host"
-+#define XILINX_PCIE_HOST(obj) \
-+     OBJECT_CHECK(XilinxPCIEHost, (obj), TYPE_XILINX_PCIE_HOST)
++static void gen_firmware(uint32_t *p, hwaddr kernel_entry, hwaddr fdt_addr,
++                         bool is_64b)
++{
++    const uint32_t cm_base = 0x16100000;
++    const uint32_t gic_base = 0x16120000;
++    const uint32_t cpc_base = 0x16200000;
 +
-+#define TYPE_XILINX_PCIE_ROOT "xilinx-pcie-root"
-+#define XILINX_PCIE_ROOT(obj) \
-+     OBJECT_CHECK(XilinxPCIERoot, (obj), TYPE_XILINX_PCIE_ROOT)
++    /* Move CM GCRs */
++    if (is_64b) {
++        stl_p(p++, 0x40287803);                 /* dmfc0 $8, CMGCRBase */
++        stl_p(p++, 0x00084138);                 /* dsll $8, $8, 4 */
++    } else {
++        stl_p(p++, 0x40087803);                 /* mfc0 $8, CMGCRBase */
++        stl_p(p++, 0x00084100);                 /* sll  $8, $8, 4 */
++    }
++    stl_p(p++, 0x3c09a000);                     /* lui  $9, 0xa000 */
++    stl_p(p++, 0x01094025);                     /* or   $8, $9 */
++    stl_p(p++, 0x3c0a0000 | (cm_base >> 16));   /* lui  $10, cm_base >> 16 */
++    if (is_64b) {
++        stl_p(p++, 0xfd0a0008);                 /* sd   $10, 0x8($8) */
++    } else {
++        stl_p(p++, 0xad0a0008);                 /* sw   $10, 0x8($8) */
++    }
++    stl_p(p++, 0x012a4025);                     /* or   $8, $10 */
 +
-+typedef struct XilinxPCIERoot {
-+    PCIBridge parent_obj;
-+} XilinxPCIERoot;
++    /* Move & enable GIC GCRs */
++    stl_p(p++, 0x3c090000 | (gic_base >> 16));  /* lui  $9, gic_base >> 16 */
++    stl_p(p++, 0x35290001);                     /* ori  $9, 0x1 */
++    if (is_64b) {
++        stl_p(p++, 0xfd090080);                 /* sd   $9, 0x80($8) */
++    } else {
++        stl_p(p++, 0xad090080);                 /* sw   $9, 0x80($8) */
++    }
 +
-+typedef struct XilinxPCIEInt {
-+    uint32_t fifo_reg1;
-+    uint32_t fifo_reg2;
-+} XilinxPCIEInt;
++    /* Move & enable CPC GCRs */
++    stl_p(p++, 0x3c090000 | (cpc_base >> 16));  /* lui  $9, cpc_base >> 16 */
++    stl_p(p++, 0x35290001);                     /* ori  $9, 0x1 */
++    if (is_64b) {
++        stl_p(p++, 0xfd090088);                 /* sd   $9, 0x88($8) */
++    } else {
++        stl_p(p++, 0xad090088);                 /* sw   $9, 0x88($8) */
++    }
 +
-+typedef struct XilinxPCIEHost {
-+    PCIExpressHost parent_obj;
++    /*
++     * Setup argument registers to follow the UHI boot protocol:
++     *
++     * a0/$4 = -2
++     * a1/$5 = virtual address of FDT
++     * a2/$6 = 0
++     * a3/$7 = 0
++     */
++    stl_p(p++, 0x2404fffe);                     /* li   $4, -2 */
++                                                /* lui  $5, hi(fdt_addr) */
++    stl_p(p++, 0x3c050000 | ((fdt_addr >> 16) & 0xffff));
++    if (fdt_addr & 0xffff) {                    /* ori  $5, lo(fdt_addr) */
++        stl_p(p++, 0x34a50000 | (fdt_addr & 0xffff));
++    }
++    stl_p(p++, 0x34060000);                     /* li   $6, 0 */
++    stl_p(p++, 0x34070000);                     /* li   $7, 0 */
 +
-+    char name[16];
++    /* Load kernel entry address & jump to it */
++                                                /* lui  $25, hi(kernel_entry) */
++    stl_p(p++, 0x3c190000 | ((kernel_entry >> 16) & 0xffff));
++                                                /* ori  $25, lo(kernel_entry) */
++    stl_p(p++, 0x37390000 | (kernel_entry & 0xffff));
++    stl_p(p++, 0x03200009);                     /* jr   $25 */
++}
 +
-+    uint32_t bus_nr;
-+    uint64_t cfg_base, cfg_size;
-+    uint64_t mmio_base, mmio_size;
-+    bool link_up;
-+    qemu_irq irq;
++static const void *boston_fdt_filter(void *opaque, const void *fdt_orig,
++                                     const void *match_data, hwaddr *load_addr)
++{
++    BostonState *s = BOSTON(opaque);
++    MachineState *machine = s->mach;
++    const char *cmdline;
++    int err;
++    void *fdt;
++    size_t fdt_sz, ram_low_sz, ram_high_sz;
 +
-+    MemoryRegion mmio, io;
++    fdt_sz = fdt_totalsize(fdt_orig) * 2;
++    fdt = g_malloc0(fdt_sz);
 +
-+    XilinxPCIERoot root;
++    err = fdt_open_into(fdt_orig, fdt, fdt_sz);
++    if (err) {
++        fprintf(stderr, "unable to open FDT\n");
++        return NULL;
++    }
 +
-+    uint32_t intr;
-+    uint32_t intr_mask;
-+    XilinxPCIEInt intr_fifo[16];
-+    unsigned int intr_fifo_r, intr_fifo_w;
-+    uint32_t rpscr;
-+} XilinxPCIEHost;
++    cmdline = (machine->kernel_cmdline && machine->kernel_cmdline[0])
++            ? machine->kernel_cmdline : " ";
++    err = qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
++    if (err < 0) {
++        fprintf(stderr, "couldn't set /chosen/bootargs\n");
++        return NULL;
++    }
 +
-+#endif /* HW_XILINX_PCIE_H */
++    ram_low_sz = MIN(256 * M_BYTE, machine->ram_size);
++    ram_high_sz = machine->ram_size - ram_low_sz;
++    qemu_fdt_setprop_sized_cells(fdt, "/memory@0", "reg",
++                                 1, 0x00000000, 1, ram_low_sz,
++                                 1, 0x90000000, 1, ram_high_sz);
++
++    fdt = g_realloc(fdt, fdt_totalsize(fdt));
++    qemu_fdt_dumpdtb(fdt, fdt_sz);
++
++    s->fdt_base = *load_addr;
++
++    return fdt;
++}
++
++static const void *boston_kernel_filter(void *opaque, const void *kernel,
++                                        hwaddr *load_addr, hwaddr *entry_addr)
++{
++    BostonState *s = BOSTON(opaque);
++
++    s->kernel_entry = *entry_addr;
++
++    return kernel;
++}
++
++static const struct fit_loader_match boston_matches[] = {
++    { "img,boston" },
++    { NULL },
++};
++
++static const struct fit_loader boston_fit_loader = {
++    .matches = boston_matches,
++    .addr_to_phys = cpu_mips_kseg0_to_phys,
++    .fdt_filter = boston_fdt_filter,
++    .kernel_filter = boston_kernel_filter,
++};
++
++static inline XilinxPCIEHost *
++xilinx_pcie_init(MemoryRegion *sys_mem, uint32_t bus_nr,
++                 hwaddr cfg_base, uint64_t cfg_size,
++                 hwaddr mmio_base, uint64_t mmio_size,
++                 qemu_irq irq, bool link_up)
++{
++    DeviceState *dev;
++    MemoryRegion *cfg, *mmio;
++
++    dev = qdev_create(NULL, TYPE_XILINX_PCIE_HOST);
++
++    qdev_prop_set_uint32(dev, "bus_nr", bus_nr);
++    qdev_prop_set_uint64(dev, "cfg_base", cfg_base);
++    qdev_prop_set_uint64(dev, "cfg_size", cfg_size);
++    qdev_prop_set_uint64(dev, "mmio_base", mmio_base);
++    qdev_prop_set_uint64(dev, "mmio_size", mmio_size);
++    qdev_prop_set_bit(dev, "link_up", link_up);
++
++    qdev_init_nofail(dev);
++
++    cfg = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
++    memory_region_add_subregion_overlap(sys_mem, cfg_base, cfg, 0);
++
++    mmio = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 1);
++    memory_region_add_subregion_overlap(sys_mem, 0, mmio, 0);
++
++    qdev_connect_gpio_out_named(dev, "interrupt_out", 0, irq);
++
++    return XILINX_PCIE_HOST(dev);
++}
++
++static void boston_mach_init(MachineState *machine)
++{
++    DeviceState *dev;
++    BostonState *s;
++    Error *err = NULL;
++    const char *cpu_model;
++    MemoryRegion *flash, *ddr, *ddr_low_alias, *lcd, *platreg;
++    MemoryRegion *sys_mem = get_system_memory();
++    XilinxPCIEHost *pcie2;
++    PCIDevice *ahci;
++    DriveInfo *hd[6];
++    Chardev *chr;
++    int fw_size, fit_err;
++    bool is_64b;
++
++    if ((machine->ram_size % G_BYTE) ||
++        (machine->ram_size > (2 * G_BYTE))) {
++        error_report("Memory size must be 1GB or 2GB");
++        exit(1);
++    }
++
++    cpu_model = machine->cpu_model ?: "I6400";
++
++    dev = qdev_create(NULL, TYPE_MIPS_BOSTON);
++    qdev_init_nofail(dev);
++
++    s = BOSTON(dev);
++    s->mach = machine;
++    s->cps = g_new0(MIPSCPSState, 1);
++
++    if (!cpu_supports_cps_smp(cpu_model)) {
++        error_report("Boston requires CPUs which support CPS");
++        exit(1);
++    }
++
++    is_64b = cpu_supports_isa(cpu_model, ISA_MIPS64);
++
++    object_initialize(s->cps, sizeof(MIPSCPSState), TYPE_MIPS_CPS);
++    qdev_set_parent_bus(DEVICE(s->cps), sysbus_get_default());
++
++    object_property_set_str(OBJECT(s->cps), cpu_model, "cpu-model", &err);
++    object_property_set_int(OBJECT(s->cps), smp_cpus, "num-vp", &err);
++    object_property_set_bool(OBJECT(s->cps), true, "realized", &err);
++
++    if (err != NULL) {
++        error_report("%s", error_get_pretty(err));
++        exit(1);
++    }
++
++    sysbus_mmio_map_overlap(SYS_BUS_DEVICE(s->cps), 0, 0, 1);
++
++    flash =  g_new(MemoryRegion, 1);
++    memory_region_init_rom_device(flash, NULL, &boston_flash_ops, s,
++                                  "boston.flash", 128 * M_BYTE, &err);
++    memory_region_add_subregion_overlap(sys_mem, 0x18000000, flash, 0);
++
++    ddr = g_new(MemoryRegion, 1);
++    memory_region_allocate_system_memory(ddr, NULL, "boston.ddr",
++                                         machine->ram_size);
++    memory_region_add_subregion_overlap(sys_mem, 0x80000000, ddr, 0);
++
++    ddr_low_alias = g_new(MemoryRegion, 1);
++    memory_region_init_alias(ddr_low_alias, NULL, "boston_low.ddr",
++                             ddr, 0, MIN(machine->ram_size, (256 * M_BYTE)));
++    memory_region_add_subregion_overlap(sys_mem, 0, ddr_low_alias, 0);
++
++    xilinx_pcie_init(sys_mem, 0,
++                     0x10000000, 32 * M_BYTE,
++                     0x40000000, 1 * G_BYTE,
++                     get_cps_irq(s->cps, 2), false);
++
++    xilinx_pcie_init(sys_mem, 1,
++                     0x12000000, 32 * M_BYTE,
++                     0x20000000, 512 * M_BYTE,
++                     get_cps_irq(s->cps, 1), false);
++
++    pcie2 = xilinx_pcie_init(sys_mem, 2,
++                             0x14000000, 32 * M_BYTE,
++                             0x16000000, 1 * M_BYTE,
++                             get_cps_irq(s->cps, 0), true);
++
++    platreg = g_new(MemoryRegion, 1);
++    memory_region_init_io(platreg, NULL, &boston_platreg_ops, s,
++                          "boston-platregs", 0x1000);
++    memory_region_add_subregion_overlap(sys_mem, 0x17ffd000, platreg, 0);
++
++    if (!serial_hds[0]) {
++        serial_hds[0] = qemu_chr_new("serial0", "null");
++    }
++
++    s->uart = serial_mm_init(sys_mem, 0x17ffe000, 2,
++                             get_cps_irq(s->cps, 3), 10000000,
++                             serial_hds[0], DEVICE_NATIVE_ENDIAN);
++
++    lcd = g_new(MemoryRegion, 1);
++    memory_region_init_io(lcd, NULL, &boston_lcd_ops, s, "boston-lcd", 0x8);
++    memory_region_add_subregion_overlap(sys_mem, 0x17fff000, lcd, 0);
++
++    chr = qemu_chr_new("lcd", "vc:320x240");
++    qemu_chr_fe_init(&s->lcd_display, chr, NULL);
++    qemu_chr_fe_set_handlers(&s->lcd_display, NULL, NULL,
++                             boston_lcd_event, s, NULL, true);
++
++    ahci = pci_create_simple_multifunction(&PCI_BRIDGE(&pcie2->root)->sec_bus,
++                                           PCI_DEVFN(0, 0),
++                                           true, TYPE_ICH9_AHCI);
++    g_assert(ARRAY_SIZE(hd) == ICH_AHCI(ahci)->ahci.ports);
++    ide_drive_get(hd, ICH_AHCI(ahci)->ahci.ports);
++    ahci_ide_create_devs(ahci, hd);
++
++    if (machine->firmware) {
++        fw_size = load_image_targphys(machine->firmware,
++                                      0x1fc00000, 4 * M_BYTE);
++        if (fw_size == -1) {
++            error_printf("unable to load firmware image '%s'\n",
++                          machine->firmware);
++            exit(1);
++        }
++    } else if (machine->kernel_filename) {
++        fit_err = load_fit(&boston_fit_loader, machine->kernel_filename, s);
++        if (fit_err) {
++            error_printf("unable to load FIT image\n");
++            exit(1);
++        }
++
++        gen_firmware(memory_region_get_ram_ptr(flash) + 0x7c00000,
++                     s->kernel_entry, s->fdt_base, is_64b);
++    } else if (!qtest_enabled()) {
++        error_printf("Please provide either a -kernel or -bios argument\n");
++        exit(1);
++    }
++}
++
++static void boston_mach_class_init(MachineClass *mc)
++{
++    mc->desc = "MIPS Boston";
++    mc->init = boston_mach_init;
++    mc->default_ram_size = 2 * G_BYTE;
++    mc->max_cpus = 16;
++}
++
++DEFINE_MACHINE("boston", boston_mach_class_init)
 -- 
 2.7.4
