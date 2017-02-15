@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32940)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ce0bi-0003E7-9K
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:30:59 -0500
+	(envelope-from <stefanha@gmail.com>) id 1ce0e1-0006CH-Sy
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:33:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ce0bd-0004Fk-Cq
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:30:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42300)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1ce0bd-0004FD-6H
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:30:53 -0500
-References: <cover.1487139038.git.ben@skyportsystems.com>
-	<60b6ece3ce0a24aec79c1061627fa2e6ab058fc2.1487139038.git.ben@skyportsystems.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <a155508d-4b44-6ca3-02cb-d36bb9b8f100@redhat.com>
-Date: Wed, 15 Feb 2017 15:30:50 +0100
+	(envelope-from <stefanha@gmail.com>) id 1ce0dx-00054r-5u
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:33:21 -0500
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:35155)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ce0dw-00054V-W7
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 09:33:17 -0500
+Received: by mail-wr0-x242.google.com with SMTP id q39so793503wrb.2
+	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 06:33:16 -0800 (PST)
+Date: Wed, 15 Feb 2017 14:33:11 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170215143311.GB16064@stefanha-x1.localdomain>
+References: <CAJSP0QWT14J-cqwLqPCr0iC95pSLaiZJgPkqr1VBU=pqYF6kqQ@mail.gmail.com>
+	<20170208221050.GP2955@var.home>
+	<20170212073019.GA25566@cs.unibo.it>
 MIME-Version: 1.0
-In-Reply-To: <60b6ece3ce0a24aec79c1061627fa2e6ab058fc2.1487139038.git.ben@skyportsystems.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 3/7] ACPI: Add vmgenid blob storage to
- the build tables
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="vGgW1X5XWziG23Ko"
+Content-Disposition: inline
+In-Reply-To: <20170212073019.GA25566@cs.unibo.it>
+Subject: Re: [Qemu-devel] libslirp and QEMU slirp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,68 +31,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ben@skyportsystems.com, qemu-devel@nongnu.org
-Cc: mst@redhat.com, imammedo@redhat.com
+To: Renzo Davoli <renzo@cs.unibo.it>
+Cc: Samuel Thibault <samuel.thibault@gnu.org>, virtualsquare@cs.unibo.it, thuth@redhat.com, jasowang@redhat.com, Jan Kiszka <jan.kiszka@web.de>, peter.maydell@linaro.org, qemu-devel <qemu-devel@nongnu.org>
 
-On 02/15/17 07:15, ben@skyportsystems.com wrote:
-> From: Ben Warren <ben@skyportsystems.com>
-> 
-> This allows them to be centrally initialized and destroyed
-> 
-> The "AcpiBuildTables.vmgenid" array will be used to construct the
-> "etc/vmgenid" fw_cfg blob.
 
-Trivial wart: the blob is now called "etc/vmgenid_guid".
+--vGgW1X5XWziG23Ko
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-If you send a v7, feel free to fix it up. Not critical.
+On Sun, Feb 12, 2017 at 08:30:19AM +0100, Renzo Davoli wrote:
+> It would be a nice project to create a common codebase for libslirp.
+> The project sould be interesting for other VM projects (virtualbox-OSE?) =
+and
+> maybe many others. We could collect several ants...
+>=20
+> Libslirp/QEMU integration is not so difficult.
+> As a first step:
+> * Qemu could add the UNIX socket redirect feature, or at least a unixtcp_=
+fconnect dummy function
+> returning -1 (#ifndef LIBSLIRP)
+> * #include <qemu2libslirp.h>
+> could be added in slirp.h (inside an #ifdef LIBSLIRP).
+> In this way we could share exactly the same codebase.
+>=20
+> One further step:
+> * discuss how to reduce/eliminate qemu-specific dependence
+> * create an API for save/restore
 
-My R-b stands.
+Eliminating QEMU dependencies is feasible, I think.  libslirp could have
+no "qemu" strings in the code :).  Applications like QEMU need to query
+libslirp for timers and fds so they can be integrated into event loops
+(select(2)).
 
-Thanks!
-Laszlo
+Once there is a working libslirp that arbitrary programs can link
+against it can be packaged (rpm, deb, etc) and announced.  That might
+attract new contributors.
 
-> Its contents will be linked into fw_cfg after being built on the
-> pc_machine_done() -> acpi_setup() -> acpi_build() call path, and dropped
-> without use on the subsequent, guest triggered, acpi_build_update() ->
-> acpi_build() call path.
-> 
-> Signed-off-by: Ben Warren <ben@skyportsystems.com>
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-> ---
->  hw/acpi/aml-build.c         | 2 ++
->  include/hw/acpi/aml-build.h | 1 +
->  2 files changed, 3 insertions(+)
-> 
-> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-> index b2a1e40..c6f2032 100644
-> --- a/hw/acpi/aml-build.c
-> +++ b/hw/acpi/aml-build.c
-> @@ -1559,6 +1559,7 @@ void acpi_build_tables_init(AcpiBuildTables *tables)
->      tables->rsdp = g_array_new(false, true /* clear */, 1);
->      tables->table_data = g_array_new(false, true /* clear */, 1);
->      tables->tcpalog = g_array_new(false, true /* clear */, 1);
-> +    tables->vmgenid = g_array_new(false, true /* clear */, 1);
->      tables->linker = bios_linker_loader_init();
->  }
->  
-> @@ -1568,6 +1569,7 @@ void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre)
->      g_array_free(tables->rsdp, true);
->      g_array_free(tables->table_data, true);
->      g_array_free(tables->tcpalog, mfre);
-> +    g_array_free(tables->vmgenid, mfre);
->  }
->  
->  /* Build rsdt table */
-> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-> index 559326c..00c21f1 100644
-> --- a/include/hw/acpi/aml-build.h
-> +++ b/include/hw/acpi/aml-build.h
-> @@ -210,6 +210,7 @@ struct AcpiBuildTables {
->      GArray *table_data;
->      GArray *rsdp;
->      GArray *tcpalog;
-> +    GArray *vmgenid;
->      BIOSLinker *linker;
->  } AcpiBuildTables;
->  
-> 
+Stefan
+
+--vGgW1X5XWziG23Ko
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYpGanAAoJEJykq7OBq3PICswIALWCIbicJEfZXpMw1VtwRZor
+eOR5SKlcOjyXzm5pwDfhhiCvfWN1YFGYA/Er7oqKQrAAzfueJtrDOMlbj1aIdHsy
+K/iVLVxAdqa88gLLMozlj1FlqExk+GP91HYKA94yIt+HpnjLqObRz7gFjVt0lwEh
+r9pKLty1lOY+PQ+iVUys739KH63Gt1YTxixmXq/o6V5qokI7EGcG2PkNfaX6S81r
+fv4fCCbxUnzhZBepDrv6TtokacqrRmwEJsC3G7kgIrCHRwwnhvUjO4ZMMCxLrxKC
+TAHH+GhKEHbzndBxU6OJxI2Q9WWg/yC/1AuCnQ5kAZ0Y3yRiKpWlK2d9ESyVytc=
+=xAWn
+-----END PGP SIGNATURE-----
+
+--vGgW1X5XWziG23Ko--
