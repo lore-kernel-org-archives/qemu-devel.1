@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42521)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1cdssu-00023E-8I
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 01:16:14 -0500
+	(envelope-from <ben@skyportsystems.com>) id 1cdssw-00023R-4f
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 01:16:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1cdssq-0007D2-DQ
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 01:16:12 -0500
-Received: from mail-pg0-x231.google.com ([2607:f8b0:400e:c05::231]:34203)
+	(envelope-from <ben@skyportsystems.com>) id 1cdsst-0007Dj-Hh
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 01:16:14 -0500
+Received: from mail-pg0-x22d.google.com ([2607:f8b0:400e:c05::22d]:36606)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
-	id 1cdssq-0007Cl-4x
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 01:16:08 -0500
-Received: by mail-pg0-x231.google.com with SMTP id z67so2172705pgb.1
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 22:16:08 -0800 (PST)
+	id 1cdsst-0007DY-8e
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 01:16:11 -0500
+Received: by mail-pg0-x22d.google.com with SMTP id v184so34070944pgv.3
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 22:16:11 -0800 (PST)
 From: ben@skyportsystems.com
-Date: Tue, 14 Feb 2017 22:15:44 -0800
-Message-Id: <1cf6435fc49709114f935abf86d73d8b538f5c0f.1487139038.git.ben@skyportsystems.com>
+Date: Tue, 14 Feb 2017 22:15:46 -0800
+Message-Id: <111628dff0803a21b75cc390858f0c288decee22.1487139038.git.ben@skyportsystems.com>
 In-Reply-To: <cover.1487139038.git.ben@skyportsystems.com>
 References: <cover.1487139038.git.ben@skyportsystems.com>
 In-Reply-To: <cover.1487139038.git.ben@skyportsystems.com>
 References: <cover.1487139038.git.ben@skyportsystems.com>
-Subject: [Qemu-devel] [PATCH v6 2/7] docs: VM Generation ID device
- description
+Subject: [Qemu-devel] [PATCH v6 4/7] ACPI: Add Virtual Machine Generation ID
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,274 +30,411 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: lersek@redhat.com, mst@redhat.com, imammedo@redhat.com, Ben Warren <ben@skyportsystems.com>, Gal Hammer <ghammer@redhat.com>
+Cc: lersek@redhat.com, mst@redhat.com, imammedo@redhat.com, Ben Warren <ben@skyportsystems.com>
 
 From: Ben Warren <ben@skyportsystems.com>
 
-This patch is based off an earlier version by
-Gal Hammer (ghammer@redhat.com)
+This implements the VM Generation ID feature by passing a 128-bit
+GUID to the guest via a fw_cfg blob.
+Any time the GUID changes, an ACPI notify event is sent to the guest
 
-Requirements section, ASCII diagrams and overall help
-provided by Laszlo Ersek (lersek@redhat.com)
+The user interface is a simple device with one parameter:
+ - guid (string, must be "auto" or in UUID format
+   xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
 
-Signed-off-by: Gal Hammer <ghammer@redhat.com>
 Signed-off-by: Ben Warren <ben@skyportsystems.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 ---
- docs/specs/vmgenid.txt | 245 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 245 insertions(+)
- create mode 100644 docs/specs/vmgenid.txt
+ default-configs/i386-softmmu.mak     |   1 +
+ default-configs/x86_64-softmmu.mak   |   1 +
+ hw/acpi/Makefile.objs                |   1 +
+ hw/acpi/vmgenid.c                    | 237 +++++++++++++++++++++++++++++++++++
+ hw/i386/acpi-build.c                 |  16 +++
+ include/hw/acpi/acpi_dev_interface.h |   1 +
+ include/hw/acpi/vmgenid.h            |  35 ++++++
+ 7 files changed, 292 insertions(+)
+ create mode 100644 hw/acpi/vmgenid.c
+ create mode 100644 include/hw/acpi/vmgenid.h
 
-diff --git a/docs/specs/vmgenid.txt b/docs/specs/vmgenid.txt
+diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+index 48b07a4..029e952 100644
+--- a/default-configs/i386-softmmu.mak
++++ b/default-configs/i386-softmmu.mak
+@@ -59,3 +59,4 @@ CONFIG_I82801B11=y
+ CONFIG_SMBIOS=y
+ CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
+ CONFIG_PXB=y
++CONFIG_ACPI_VMGENID=y
+diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
+index fd96345..d1d7432 100644
+--- a/default-configs/x86_64-softmmu.mak
++++ b/default-configs/x86_64-softmmu.mak
+@@ -59,3 +59,4 @@ CONFIG_I82801B11=y
+ CONFIG_SMBIOS=y
+ CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
+ CONFIG_PXB=y
++CONFIG_ACPI_VMGENID=y
+diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
+index 6acf798..11c35bc 100644
+--- a/hw/acpi/Makefile.objs
++++ b/hw/acpi/Makefile.objs
+@@ -5,6 +5,7 @@ common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu_hotplug.o
+ common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
+ common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
+ common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
++common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
+ common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
+ 
+ common-obj-y += acpi_interface.o
+diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
 new file mode 100644
-index 0000000..aa9f518
+index 0000000..b1b7b32
 --- /dev/null
-+++ b/docs/specs/vmgenid.txt
-@@ -0,0 +1,245 @@
-+VIRTUAL MACHINE GENERATION ID
-+=============================
-+
-+Copyright (C) 2016 Red Hat, Inc.
-+Copyright (C) 2017 Skyport Systems, Inc.
-+
-+This work is licensed under the terms of the GNU GPL, version 2 or later.
-+See the COPYING file in the top-level directory.
-+
-+===
-+
-+The VM generation ID (vmgenid) device is an emulated device which
-+exposes a 128-bit, cryptographically random, integer value identifier,
-+referred to as a Globally Unique Identifier, or GUID.
-+
-+This allows management applications (e.g. libvirt) to notify the guest
-+operating system when the virtual machine is executed with a different
-+configuration (e.g. snapshot execution or creation from a template).  The
-+guest operating system notices the change, and is then able to react as
-+appropriate by marking its copies of distributed databases as dirty,
-+re-initializing its random number generator etc.
-+
-+
-+Requirements
-+------------
-+
-+These requirements are extracted from the "How to implement virtual machine
-+generation ID support in a virtualization platform" section of the
-+specification, dated August 1, 2012.
-+
-+
-+The document may be found on the web at:
-+  http://go.microsoft.com/fwlink/?LinkId=260709
-+
-+R1a. The generation ID shall live in an 8-byte aligned buffer.
-+
-+R1b. The buffer holding the generation ID shall be in guest RAM, ROM, or device
-+     MMIO range.
-+
-+R1c. The buffer holding the generation ID shall be kept separate from areas
-+     used by the operating system.
-+
-+R1d. The buffer shall not be covered by an AddressRangeMemory or
-+     AddressRangeACPI entry in the E820 or UEFI memory map.
-+
-+R1e. The generation ID shall not live in a page frame that could be mapped with
-+     caching disabled. (In other words, regardless of whether the generation ID
-+     lives in RAM, ROM or MMIO, it shall only be mapped as cacheable.)
-+
-+R2 to R5. [These AML requirements are isolated well enough in the Microsoft
-+          specification for us to simply refer to them here.]
-+
-+R6. The hypervisor shall expose a _HID (hardware identifier) object in the
-+    VMGenId device's scope that is unique to the hypervisor vendor.
-+
-+
-+QEMU Implementation
-+-------------------
-+
-+The above-mentioned specification does not dictate which ACPI descriptor table
-+will contain the VM Generation ID device.  Other implementations (Hyper-V and
-+Xen) put it in the main descriptor table (Differentiated System Description
-+Table or DSDT).  For ease of debugging and implementation, we have decided to
-+put it in its own Secondary System Description Table, or SSDT.
-+
-+The following is a dump of the contents from a running system:
-+
-+# iasl -p ./SSDT -d /sys/firmware/acpi/tables/SSDT
-+
-+Intel ACPI Component Architecture
-+ASL+ Optimizing Compiler version 20150717-64
-+Copyright (c) 2000 - 2015 Intel Corporation
-+
-+Reading ACPI table from file /sys/firmware/acpi/tables/SSDT - Length
-+00000198 (0x0000C6)
-+ACPI: SSDT 0x0000000000000000 0000C6 (v01 BOCHS  VMGENID  00000001 BXPC
-+00000001)
-+Acpi table [SSDT] successfully installed and loaded
-+Pass 1 parse of [SSDT]
-+Pass 2 parse of [SSDT]
-+Parsing Deferred Opcodes (Methods/Buffers/Packages/Regions)
-+
-+Parsing completed
-+Disassembly completed
-+ASL Output:    ./SSDT.dsl - 1631 bytes
-+# cat SSDT.dsl
++++ b/hw/acpi/vmgenid.c
+@@ -0,0 +1,237 @@
 +/*
-+ * Intel ACPI Component Architecture
-+ * AML/ASL+ Disassembler version 20150717-64
-+ * Copyright (c) 2000 - 2015 Intel Corporation
++ *  Virtual Machine Generation ID Device
 + *
-+ * Disassembling to symbolic ASL+ operators
++ *  Copyright (C) 2017 Skyport Systems.
 + *
-+ * Disassembly of /sys/firmware/acpi/tables/SSDT, Sun Feb  5 00:19:37 2017
++ *  Author: Ben Warren <ben@skyportsystems.com>
 + *
-+ * Original Table Header:
-+ *     Signature        "SSDT"
-+ *     Length           0x000000CA (202)
-+ *     Revision         0x01
-+ *     Checksum         0x4B
-+ *     OEM ID           "BOCHS "
-+ *     OEM Table ID     "VMGENID"
-+ *     OEM Revision     0x00000001 (1)
-+ *     Compiler ID      "BXPC"
-+ *     Compiler Version 0x00000001 (1)
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
 + */
-+DefinitionBlock ("/sys/firmware/acpi/tables/SSDT.aml", "SSDT", 1, "BOCHS ",
-+"VMGENID", 0x00000001)
++
++#include "qemu/osdep.h"
++#include "qmp-commands.h"
++#include "hw/acpi/acpi.h"
++#include "hw/acpi/aml-build.h"
++#include "hw/acpi/vmgenid.h"
++#include "hw/nvram/fw_cfg.h"
++#include "sysemu/sysemu.h"
++
++void vmgenid_build_acpi(VmGenIdState *vms, GArray *table_data, GArray *guid,
++                        BIOSLinker *linker)
 +{
-+    Name (VGIA, 0x07FFF000)
-+    Scope (\_SB)
-+    {
-+        Device (VGEN)
-+        {
-+            Name (_HID, "QEMUVGID")  // _HID: Hardware ID
-+            Name (_CID, "VM_Gen_Counter")  // _CID: Compatible ID
-+            Name (_DDN, "VM_Gen_Counter")  // _DDN: DOS Device Name
-+            Method (_STA, 0, NotSerialized)  // _STA: Status
-+            {
-+                Local0 = 0x0F
-+                If ((VGIA == Zero))
-+                {
-+                    Local0 = Zero
-+                }
++    Aml *ssdt, *dev, *scope, *method, *addr, *if_ctx;
++    uint32_t vgia_offset;
++    QemuUUID guid_le;
 +
-+                Return (Local0)
-+            }
++    /* Fill in the GUID values.  These need to be converted to little-endian
++     * first, since that's what the guest expects
++     */
++    g_array_set_size(guid, VMGENID_FW_CFG_SIZE);
++    memcpy(&guid_le.data, &vms->guid.data, sizeof(vms->guid.data));
++    qemu_uuid_bswap(&guid_le);
++    /* The GUID is written at a fixed offset into the fw_cfg file
++     * in order to implement the "OVMF SDT Header probe suppressor"
++     * see docs/specs/vmgenid.txt for more details
++     */
++    g_array_insert_vals(guid, VMGENID_GUID_OFFSET, guid_le.data,
++                        ARRAY_SIZE(guid_le.data));
 +
-+            Method (ADDR, 0, NotSerialized)
-+            {
-+                Local0 = Package (0x02) {}
-+                Index (Local0, Zero) = (VGIA + 0x28)
-+                Index (Local0, One) = Zero
-+                Return (Local0)
-+            }
++    /* Put this in a separate SSDT table */
++    ssdt = init_aml_allocator();
++
++    /* Reserve space for header */
++    acpi_data_push(ssdt->buf, sizeof(AcpiTableHeader));
++
++    /* Storage for the GUID address */
++    vgia_offset = table_data->len +
++        build_append_named_dword(ssdt->buf, "VGIA");
++    scope = aml_scope("\\_SB");
++    dev = aml_device("VGEN");
++    aml_append(dev, aml_name_decl("_HID", aml_string("QEMUVGID")));
++    aml_append(dev, aml_name_decl("_CID", aml_string("VM_Gen_Counter")));
++    aml_append(dev, aml_name_decl("_DDN", aml_string("VM_Gen_Counter")));
++
++    /* Simple status method to check that address is linked and non-zero */
++    method = aml_method("_STA", 0, AML_NOTSERIALIZED);
++    addr = aml_local(0);
++    aml_append(method, aml_store(aml_int(0xf), addr));
++    if_ctx = aml_if(aml_equal(aml_name("VGIA"), aml_int(0)));
++    aml_append(if_ctx, aml_store(aml_int(0), addr));
++    aml_append(method, if_ctx);
++    aml_append(method, aml_return(addr));
++    aml_append(dev, method);
++
++    /* the ADDR method returns two 32-bit words representing the lower and
++     * upper halves * of the physical address of the fw_cfg blob
++     * (holding the GUID)
++     */
++    method = aml_method("ADDR", 0, AML_NOTSERIALIZED);
++
++    addr = aml_local(0);
++    aml_append(method, aml_store(aml_package(2), addr));
++
++    aml_append(method, aml_store(aml_add(aml_name("VGIA"),
++                                         aml_int(VMGENID_GUID_OFFSET), NULL),
++                                 aml_index(addr, aml_int(0))));
++    aml_append(method, aml_store(aml_int(0), aml_index(addr, aml_int(1))));
++    aml_append(method, aml_return(addr));
++
++    aml_append(dev, method);
++    aml_append(scope, dev);
++    aml_append(ssdt, scope);
++
++    /* attach an ACPI notify */
++    method = aml_method("\\_GPE._E05", 0, AML_NOTSERIALIZED);
++    aml_append(method, aml_notify(aml_name("\\_SB.VGEN"), aml_int(0x80)));
++    aml_append(ssdt, method);
++
++    g_array_append_vals(table_data, ssdt->buf->data, ssdt->buf->len);
++
++    /* Allocate guest memory for the Data fw_cfg blob */
++    bios_linker_loader_alloc(linker, VMGENID_GUID_FW_CFG_FILE, guid, 4096,
++                             false /* page boundary, high memory */);
++
++    /* Patch address of GUID fw_cfg blob into the ADDR fw_cfg blob
++     * so QEMU can write the GUID there.  The address is expected to be
++     * < 4GB, but write 64 bits anyway.
++     */
++    bios_linker_loader_write_pointer(linker,
++        VMGENID_ADDR_FW_CFG_FILE, 0, sizeof(uint64_t),
++        VMGENID_GUID_FW_CFG_FILE);
++
++    /* Patch address of GUID fw_cfg blob into the AML so OSPM can retrieve
++     * and read it.  Note that while we provide storage for 64 bits, only
++     * the least-signficant 32 get patched into AML.
++     */
++    bios_linker_loader_add_pointer(linker,
++        ACPI_BUILD_TABLE_FILE, vgia_offset, sizeof(uint32_t),
++        VMGENID_GUID_FW_CFG_FILE, 0);
++
++    build_header(linker, table_data,
++        (void *)(table_data->data + table_data->len - ssdt->buf->len),
++        "SSDT", ssdt->buf->len, 1, NULL, "VMGENID");
++    free_aml_allocator();
++}
++
++void vmgenid_add_fw_cfg(VmGenIdState *vms, FWCfgState *s, GArray *guid)
++{
++    /* Create a read-only fw_cfg file for GUID */
++    fw_cfg_add_file(s, VMGENID_GUID_FW_CFG_FILE, guid->data,
++                    VMGENID_FW_CFG_SIZE);
++    /* Create a read-write fw_cfg file for Address */
++    fw_cfg_add_file_callback(s, VMGENID_ADDR_FW_CFG_FILE, NULL, NULL,
++                             vms->vmgenid_addr_le,
++                             ARRAY_SIZE(vms->vmgenid_addr_le), false);
++}
++
++static void vmgenid_update_guest(VmGenIdState *vms)
++{
++    Object *obj = object_resolve_path_type("", TYPE_ACPI_DEVICE_IF, NULL);
++    uint32_t vmgenid_addr;
++    QemuUUID guid_le;
++
++    if (obj) {
++        /* Write the GUID to guest memory */
++        memcpy(&vmgenid_addr, vms->vmgenid_addr_le, sizeof(vmgenid_addr));
++        vmgenid_addr = le32_to_cpu(vmgenid_addr);
++        /* A zero value in vmgenid_addr means that BIOS has not yet written
++         * the address
++         */
++        if (vmgenid_addr) {
++            /* QemuUUID has the first three words as big-endian, and expect
++             * that any GUIDs passed in will always be BE.  The guest,
++             * however, will expect the fields to be little-endian.
++             * Perform a byte swap immediately before writing.
++             */
++            memcpy(&guid_le.data, &vms->guid.data, sizeof(vms->guid.data));
++            qemu_uuid_bswap(&guid_le);
++            /* The GUID is written at a fixed offset into the fw_cfg file
++             * in order to implement the "OVMF SDT Header probe suppressor"
++             * see docs/specs/vmgenid.txt for more details
++             */
++            cpu_physical_memory_write(vmgenid_addr + VMGENID_GUID_OFFSET,
++                                      guid_le.data, sizeof(guid_le.data));
++            /* Send _GPE.E05 event */
++            acpi_send_event(DEVICE(obj), ACPI_VMGENID_CHANGE_STATUS);
 +        }
-+    }
-+
-+    Method (\_GPE._E05, 0, NotSerialized)  // _Exx: Edge-Triggered GPE
-+    {
-+        Notify (\_SB.VGEN, 0x80) // Status Change
 +    }
 +}
 +
++static void vmgenid_set_guid(Object *obj, const char *value, Error **errp)
++{
++    VmGenIdState *vms = VMGENID(obj);
 +
-+Design Details:
-+---------------
++    if (!strcmp(value, "auto")) {
++        qemu_uuid_generate(&vms->guid);
++    } else if (qemu_uuid_parse(value, &vms->guid) < 0) {
++        error_setg(errp, "'%s. %s': Failed to parse GUID string: %s",
++                   object_get_typename(OBJECT(vms)), VMGENID_GUID, value);
++        return;
++    }
 +
-+Requirements R1a through R1e dictate that the memory holding the
-+VM Generation ID must be allocated and owned by the guest firmware,
-+in this case BIOS or UEFI.  However, to be useful, QEMU must be able to
-+change the contents of the memory at runtime, specifically when starting a
-+backed-up or snapshotted image.  In order to do this, QEMU must know the
-+address that has been allocated.
++    vmgenid_update_guest(vms);
++}
 +
-+The mechanism chosen for this memory sharing is writeable fw_cfg blobs.
-+These are data object that are visible to both QEMU and guests, and are
-+addressable as sequential files.
++/* After restoring an image, we need to update the guest memory and notify
++ * it of a potential change to VM Generation ID
++ */
++static int vmgenid_post_load(void *opaque, int version_id)
++{
++    VmGenIdState *vms = opaque;
++    vmgenid_update_guest(vms);
++    return 0;
++}
 +
-+More information about fw_cfg can be found in "docs/specs/fw_cfg.txt"
++static const VMStateDescription vmstate_vmgenid = {
++    .name = "vmgenid",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .post_load = vmgenid_post_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT8_ARRAY(vmgenid_addr_le, VmGenIdState, sizeof(uint64_t)),
++        VMSTATE_END_OF_LIST()
++    },
++};
 +
-+Two fw_cfg blobs are used in this case:
++static void vmgenid_initfn(Object *obj)
++{
++    object_property_add_str(obj, VMGENID_GUID, NULL, vmgenid_set_guid, NULL);
++}
 +
-+/etc/vmgenid_guid - contains the actual VM Generation ID GUID
-+                  - read-only to the guest
-+/etc/vmgenid_addr - contains the address of the downloaded vmgenid blob
-+                  - writeable by the guest
++static void vmgenid_handle_reset(void *opaque)
++{
++    VmGenIdState *vms = VMGENID(opaque);
++    /* Clear the guest-allocated GUID address when the VM resets */
++    memset(vms->vmgenid_addr_le, 0, ARRAY_SIZE(vms->vmgenid_addr_le));
++}
 +
++static void vmgenid_realize(DeviceState *dev, Error **errp)
++{
++    VmGenIdState *vms = VMGENID(dev);
++    qemu_register_reset(vmgenid_handle_reset, vms);
++}
 +
-+QEMU sends the following commands to the guest at startup:
++static void vmgenid_device_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
 +
-+1. Allocate memory for vmgenid_guid fw_cfg blob.
-+2. Write the address of vmgenid_guid into the SSDT (VGIA ACPI variable as
-+   shown above in the iasl dump).  Note that this change is not propagated
-+   back to QEMU.
-+3. Write the address of vmgenid_guid back to QEMU's copy of vmgenid_addr
-+   via the fw_cfg DMA interface.
++    dc->vmsd = &vmstate_vmgenid;
++    dc->realize = vmgenid_realize;
++}
 +
-+After step 3, QEMU is able to update the contents of vmgenid_guid at will.
++static const TypeInfo vmgenid_device_info = {
++    .name          = VMGENID_DEVICE,
++    .parent        = TYPE_DEVICE,
++    .instance_size = sizeof(VmGenIdState),
++    .instance_init = vmgenid_initfn,
++    .class_init    = vmgenid_device_class_init,
++};
 +
-+Since BIOS or UEFI does not necessarily run when we wish to change the GUID,
-+the value of VGIA is persisted via the VMState mechanism.
++static void vmgenid_register_types(void)
++{
++    type_register_static(&vmgenid_device_info);
++}
 +
-+As spelled out in the specification, any change to the GUID executes an
-+ACPI notification.  The exact handler to use is not specified, so the vmgenid
-+device uses the first unused one:  \_GPE._E05.
++type_init(vmgenid_register_types)
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 1c928ab..db04cf5 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -42,6 +42,7 @@
+ #include "hw/acpi/memory_hotplug.h"
+ #include "sysemu/tpm.h"
+ #include "hw/acpi/tpm.h"
++#include "hw/acpi/vmgenid.h"
+ #include "sysemu/tpm_backend.h"
+ #include "hw/timer/mc146818rtc_regs.h"
+ #include "sysemu/numa.h"
+@@ -2610,6 +2611,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+     size_t aml_len = 0;
+     GArray *tables_blob = tables->table_data;
+     AcpiSlicOem slic_oem = { .id = NULL, .table_id = NULL };
++    Object *vmgenid_dev;
+ 
+     acpi_get_pm_info(&pm);
+     acpi_get_misc_info(&misc);
+@@ -2653,6 +2655,13 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+     acpi_add_table(table_offsets, tables_blob);
+     build_madt(tables_blob, tables->linker, pcms);
+ 
++    vmgenid_dev = find_vmgenid_dev();
++    if (vmgenid_dev) {
++        acpi_add_table(table_offsets, tables_blob);
++        vmgenid_build_acpi(VMGENID(vmgenid_dev), tables_blob,
++                           tables->vmgenid, tables->linker);
++    }
 +
+     if (misc.has_hpet) {
+         acpi_add_table(table_offsets, tables_blob);
+         build_hpet(tables_blob, tables->linker);
+@@ -2823,6 +2832,7 @@ void acpi_setup(void)
+     PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+     AcpiBuildTables tables;
+     AcpiBuildState *build_state;
++    Object *vmgenid_dev;
+ 
+     if (!pcms->fw_cfg) {
+         ACPI_BUILD_DPRINTF("No fw cfg. Bailing out.\n");
+@@ -2859,6 +2869,12 @@ void acpi_setup(void)
+     fw_cfg_add_file(pcms->fw_cfg, ACPI_BUILD_TPMLOG_FILE,
+                     tables.tcpalog->data, acpi_data_len(tables.tcpalog));
+ 
++    vmgenid_dev = find_vmgenid_dev();
++    if (vmgenid_dev) {
++        vmgenid_add_fw_cfg(VMGENID(vmgenid_dev), pcms->fw_cfg,
++                           tables.vmgenid);
++    }
 +
-+Endian-ness Considerations:
-+---------------------------
+     if (!pcmc->rsdp_in_ram) {
+         /*
+          * Keep for compatibility with old machine types.
+diff --git a/include/hw/acpi/acpi_dev_interface.h b/include/hw/acpi/acpi_dev_interface.h
+index 71d3c48..3c2e4e9 100644
+--- a/include/hw/acpi/acpi_dev_interface.h
++++ b/include/hw/acpi/acpi_dev_interface.h
+@@ -11,6 +11,7 @@ typedef enum {
+     ACPI_CPU_HOTPLUG_STATUS = 4,
+     ACPI_MEMORY_HOTPLUG_STATUS = 8,
+     ACPI_NVDIMM_HOTPLUG_STATUS = 16,
++    ACPI_VMGENID_CHANGE_STATUS = 32,
+ } AcpiEventStatusBits;
+ 
+ #define TYPE_ACPI_DEVICE_IF "acpi-device-interface"
+diff --git a/include/hw/acpi/vmgenid.h b/include/hw/acpi/vmgenid.h
+new file mode 100644
+index 0000000..db7fa0e
+--- /dev/null
++++ b/include/hw/acpi/vmgenid.h
+@@ -0,0 +1,35 @@
++#ifndef ACPI_VMGENID_H
++#define ACPI_VMGENID_H
 +
-+Although not specified in Microsoft's document, it is assumed that the
-+device is expected to use little-endian format.
++#include "hw/acpi/bios-linker-loader.h"
++#include "hw/qdev.h"
++#include "qemu/uuid.h"
 +
-+All GUID passed in via command line or monitor are treated as big-endian.
-+GUID values displayed via monitor are shown in big-endian format.
++#define VMGENID_DEVICE           "vmgenid"
++#define VMGENID_GUID             "guid"
++#define VMGENID_GUID_FW_CFG_FILE      "etc/vmgenid_guid"
++#define VMGENID_ADDR_FW_CFG_FILE      "etc/vmgenid_addr"
 +
++#define VMGENID_FW_CFG_SIZE      4096 /* Occupy a page of memory */
++#define VMGENID_GUID_OFFSET      40   /* allow space for
++                                       * OVMF SDT Header Probe Supressor
++                                       */
 +
-+GUID Storage Format:
-+--------------------
++#define VMGENID(obj) OBJECT_CHECK(VmGenIdState, (obj), VMGENID_DEVICE)
 +
-+In order to implement an OVMF "SDT Header Probe Suppressor", the contents of
-+the vmgenid_guid fw_cfg blob are not simply a 128-bit GUID.  There is also
-+significant padding in order to align and fill a memory page, as shown in the
-+following diagram:
++typedef struct VmGenIdState {
++    DeviceClass parent_obj;
++    QemuUUID guid;                /* The 128-bit GUID seen by the guest */
++    uint8_t vmgenid_addr_le[8];   /* Address of the GUID (little-endian) */
++} VmGenIdState;
 +
-++----------------------------------+
-+| SSDT with OEM Table ID = VMGENID |
-++----------------------------------+
-+| ...                              |       TOP OF PAGE
-+| VGIA dword object ---------------|-----> +---------------------------+
-+| ...                              |       | fw-allocated array for    |
-+| _STA method referring to VGIA    |       | "etc/vmgenid_guid"        |
-+| ...                              |       +---------------------------+
-+| ADDR method referring to VGIA    |       |  0: OVMF SDT Header probe |
-+| ...                              |       |     suppressor            |
-++----------------------------------+       | 36: padding for 8-byte    |
-+                                           |     alignment             |
-+                                           | 40: GUID                  |
-+                                           | 56: padding to page size  |
-+                                           +---------------------------+
-+                                           END OF PAGE
++static inline Object *find_vmgenid_dev(void)
++{
++    return object_resolve_path_type("", VMGENID_DEVICE, NULL);
++}
 +
++void vmgenid_build_acpi(VmGenIdState *vms, GArray *table_data, GArray *guid,
++                        BIOSLinker *linker);
++void vmgenid_add_fw_cfg(VmGenIdState *vms, FWCfgState *s, GArray *guid);
 +
-+Device Usage:
-+-------------
-+
-+The device has one property, which may be only be set using the command line:
-+
-+  guid - sets the value of the GUID.  A special value "auto" instructs
-+         QEMU to generate a new random GUID.
-+
-+For example:
-+
-+  QEMU  -device vmgenid,guid="324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
-+  QEMU  -device vmgenid,guid=auto
-+
-+The property may be queried via QMP/HMP:
-+
-+  (QEMU) query-vm-generation-id
-+  {"return": {"guid": "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"}}
-+
-+Setting of this parameter is intentionally left out from the QMP/HMP
-+interfaces.  There are no known use cases for changing the GUID once QEMU is
-+running, and adding this capability would greatly increase the complexity.
++#endif
 -- 
 2.7.4
