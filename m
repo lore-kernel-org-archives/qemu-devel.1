@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ce3KX-0000oV-5A
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:25:26 -0500
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ce3KY-0000pY-8G
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:25:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ce3KV-0006Tb-S7
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:25:25 -0500
-Received: from mailapp01.imgtec.com ([195.59.15.196]:2693)
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ce3KX-0006UB-DO
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:25:26 -0500
+Received: from mailapp01.imgtec.com ([195.59.15.196]:50353)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ce3KV-0006TU-J6
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:25:23 -0500
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ce3KX-0006U1-7P
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 12:25:25 -0500
 From: Yongbok Kim <yongbok.kim@imgtec.com>
-Date: Wed, 15 Feb 2017 17:23:49 +0000
-Message-ID: <1487179434-13306-4-git-send-email-yongbok.kim@imgtec.com>
+Date: Wed, 15 Feb 2017 17:23:50 +0000
+Message-ID: <1487179434-13306-5-git-send-email-yongbok.kim@imgtec.com>
 In-Reply-To: <1487179434-13306-1-git-send-email-yongbok.kim@imgtec.com>
 References: <1487179434-13306-1-git-send-email-yongbok.kim@imgtec.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 3/8] hw/mips_gic: Update pin state on mask
- changes
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 4/8] target-mips: Provide function to test
+ if a CPU supports an ISA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,129 +32,57 @@ Cc: Aurelien Jarno <aurelien@aurel32.net>, Paul Burton <paul.burton@imgtec.com>
 
 From: Paul Burton <paul.burton@imgtec.com>
 
-If the GIC interrupt mask is changed by a write to the smask (set mask)
-or rmask (reset mask) registers, we need to re-evaluate the state of the
-pins/IRQs fed to the CPU. Without doing so we risk leaving a pin high
-despite the interrupt that led to that state being masked, or losing
-interrupts if an already pending interrupt is unmasked.
+Provide a new cpu_supports_isa function which allows callers to
+determine whether a CPU supports one of the ISA_ flags, by testing
+whether the associated struct mips_def_t sets the ISA flags in its
+insn_flags field.
+
+An example use of this is to allow boards which generate bootloader code
+to determine the properties of the CPU that will be used, for example
+whether the CPU is 64 bit or which architecture revision it implements.
 
 Signed-off-by: Paul Burton <paul.burton@imgtec.com>
 Reviewed-by: Leon Alrae <leon.alrae@imgtec.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
 ---
- hw/intc/mips_gic.c | 56 ++++++++++++++++++++++++++++++------------------------
- 1 file changed, 31 insertions(+), 25 deletions(-)
+ target/mips/cpu.h       |  1 +
+ target/mips/translate.c | 10 ++++++++++
+ 2 files changed, 11 insertions(+)
 
-diff --git a/hw/intc/mips_gic.c b/hw/intc/mips_gic.c
-index 6e25773..15e6e40 100644
---- a/hw/intc/mips_gic.c
-+++ b/hw/intc/mips_gic.c
-@@ -20,31 +20,29 @@
- #include "kvm_mips.h"
- #include "hw/intc/mips_gic.h"
- 
--static void mips_gic_set_vp_irq(MIPSGICState *gic, int vp, int pin, int level)
-+static void mips_gic_set_vp_irq(MIPSGICState *gic, int vp, int pin)
- {
--    int ored_level = level;
-+    int ored_level = 0;
-     int i;
- 
-     /* ORing pending registers sharing same pin */
--    if (!ored_level) {
--        for (i = 0; i < gic->num_irq; i++) {
--            if ((gic->irq_state[i].map_pin & GIC_MAP_MSK) == pin &&
--                    gic->irq_state[i].map_vp == vp &&
--                    gic->irq_state[i].enabled) {
--                ored_level |= gic->irq_state[i].pending;
--            }
--            if (ored_level) {
--                /* no need to iterate all interrupts */
--                break;
--            }
-+    for (i = 0; i < gic->num_irq; i++) {
-+        if ((gic->irq_state[i].map_pin & GIC_MAP_MSK) == pin &&
-+                gic->irq_state[i].map_vp == vp &&
-+                gic->irq_state[i].enabled) {
-+            ored_level |= gic->irq_state[i].pending;
-         }
--        if (((gic->vps[vp].compare_map & GIC_MAP_MSK) == pin) &&
--                (gic->vps[vp].mask & GIC_VP_MASK_CMP_MSK)) {
--            /* ORing with local pending register (count/compare) */
--            ored_level |= (gic->vps[vp].pend & GIC_VP_MASK_CMP_MSK) >>
--                          GIC_VP_MASK_CMP_SHF;
-+        if (ored_level) {
-+            /* no need to iterate all interrupts */
-+            break;
-         }
-     }
-+    if (((gic->vps[vp].compare_map & GIC_MAP_MSK) == pin) &&
-+            (gic->vps[vp].mask & GIC_VP_MASK_CMP_MSK)) {
-+        /* ORing with local pending register (count/compare) */
-+        ored_level |= (gic->vps[vp].pend & GIC_VP_MASK_CMP_MSK) >>
-+                      GIC_VP_MASK_CMP_SHF;
-+    }
-     if (kvm_enabled())  {
-         kvm_mips_set_ipi_interrupt(mips_env_get_cpu(gic->vps[vp].env),
-                                    pin + GIC_CPU_PIN_OFFSET,
-@@ -55,21 +53,27 @@ static void mips_gic_set_vp_irq(MIPSGICState *gic, int vp, int pin, int level)
-     }
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index e1c78f5..4a4747a 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -815,6 +815,7 @@ int cpu_mips_signal_handler(int host_signum, void *pi=
+nfo, void *puc);
+=20
+ #define cpu_init(cpu_model) CPU(cpu_mips_init(cpu_model))
+ bool cpu_supports_cps_smp(const char *cpu_model);
++bool cpu_supports_isa(const char *cpu_model, unsigned int isa);
+ void cpu_set_exception_base(int vp_index, target_ulong address);
+=20
+ /* TODO QOM'ify CPU reset and remove */
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 7f8ecf4..8b4a072 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -20233,6 +20233,16 @@ bool cpu_supports_cps_smp(const char *cpu_model)
+     return (def->CP0_Config3 & (1 << CP0C3_CMGCR)) !=3D 0;
  }
- 
--static void gic_set_irq(void *opaque, int n_IRQ, int level)
-+static void gic_update_pin_for_irq(MIPSGICState *gic, int n_IRQ)
- {
--    MIPSGICState *gic = (MIPSGICState *) opaque;
-     int vp = gic->irq_state[n_IRQ].map_vp;
-     int pin = gic->irq_state[n_IRQ].map_pin & GIC_MAP_MSK;
- 
-+    if (vp < 0 || vp >= gic->num_vps) {
-+        return;
+=20
++bool cpu_supports_isa(const char *cpu_model, unsigned int isa)
++{
++    const mips_def_t *def =3D cpu_mips_find_by_name(cpu_model);
++    if (!def) {
++        return false;
 +    }
-+    mips_gic_set_vp_irq(gic, vp, pin);
++
++    return (def->insn_flags & isa) !=3D 0;
 +}
 +
-+static void gic_set_irq(void *opaque, int n_IRQ, int level)
-+{
-+    MIPSGICState *gic = (MIPSGICState *) opaque;
-+
-     gic->irq_state[n_IRQ].pending = (uint8_t) level;
-     if (!gic->irq_state[n_IRQ].enabled) {
-         /* GIC interrupt source disabled */
-         return;
-     }
--    if (vp < 0 || vp >= gic->num_vps) {
--        return;
--    }
--    mips_gic_set_vp_irq(gic, vp, pin, level);
-+    gic_update_pin_for_irq(gic, n_IRQ);
- }
- 
- #define OFFSET_CHECK(c)                         \
-@@ -209,7 +213,7 @@ static void gic_timer_store_vp_compare(MIPSGICState *gic, uint32_t vp_index,
-     gic->vps[vp_index].pend &= ~(1 << GIC_LOCAL_INT_COMPARE);
-     if (gic->vps[vp_index].compare_map & GIC_MAP_TO_PIN_MSK) {
-         uint32_t pin = (gic->vps[vp_index].compare_map & GIC_MAP_MSK);
--        mips_gic_set_vp_irq(gic, vp_index, pin, 0);
-+        mips_gic_set_vp_irq(gic, vp_index, pin);
-     }
-     mips_gictimer_store_vp_compare(gic->gic_timer, vp_index, compare);
- }
-@@ -286,6 +290,7 @@ static void gic_write(void *opaque, hwaddr addr, uint64_t data, unsigned size)
-         OFFSET_CHECK((base + size * 8) <= gic->num_irq);
-         for (i = 0; i < size * 8; i++) {
-             gic->irq_state[base + i].enabled &= !((data >> i) & 1);
-+            gic_update_pin_for_irq(gic, base + i);
-         }
-         break;
-     case GIC_SH_WEDGE_OFS:
-@@ -305,6 +310,7 @@ static void gic_write(void *opaque, hwaddr addr, uint64_t data, unsigned size)
-         OFFSET_CHECK((base + size * 8) <= gic->num_irq);
-         for (i = 0; i < size * 8; i++) {
-             gic->irq_state[base + i].enabled |= (data >> i) & 1;
-+            gic_update_pin_for_irq(gic, base + i);
-         }
-         break;
-     case GIC_SH_MAP0_PIN_OFS ... GIC_SH_MAP255_PIN_OFS:
--- 
+ void cpu_set_exception_base(int vp_index, target_ulong address)
+ {
+     MIPSCPU *vp =3D MIPS_CPU(qemu_get_cpu(vp_index));
+--=20
 2.7.4
