@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cdv3C-0008F4-Ve
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cdv3D-0008FD-AL
 	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 03:35:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cdv38-0007a8-7u
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cdv3C-0007cp-4n
 	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 03:34:59 -0500
-Received: from szxga01-in.huawei.com ([58.251.152.64]:38294)
+Received: from szxga03-in.huawei.com ([119.145.14.66]:44929)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cdv37-0007Wz-Fn
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 03:34:54 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cdv3B-0007aB-Iz
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 03:34:58 -0500
 From: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Date: Wed, 15 Feb 2017 16:34:17 +0800
-Message-ID: <1487147657-166092-6-git-send-email-zhang.zhanghailiang@huawei.com>
+Date: Wed, 15 Feb 2017 16:34:16 +0800
+Message-ID: <1487147657-166092-5-git-send-email-zhang.zhanghailiang@huawei.com>
 In-Reply-To: <1487147657-166092-1-git-send-email-zhang.zhanghailiang@huawei.com>
 References: <1487147657-166092-1-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 5/5] colo-compare: Fix removing fds been
- watched incorrectly in finalization
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 4/5] char: remove the right fd been watched in
+ qemu_chr_fe_set_handlers()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,83 +28,93 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: jasowang@redhat.com, zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com
-Cc: qemu-devel@nongnu.org, xuquan8@huawei.com, pss.wulizhen@huawei.com, zhanghailiang <zhang.zhanghailiang@huawei.com>
+Cc: qemu-devel@nongnu.org, xuquan8@huawei.com, pss.wulizhen@huawei.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-We will catch the bellow error report while try to delete compare object
-by qmp command:
-chardev/char-io.c:91: io_watch_poll_finalize: Assertion `iwp->src == ((void *)0)' failed.
+We can call qemu_chr_fe_set_handlers() to add/remove fd been watched
+in 'context' which can be either default main context or other explicit
+context. But the original logic is not correct, we didn't remove
+the right fd because we call g_main_context_find_source_by_id(NULL, tag)
+which always try to find the Gsource from default context.
 
-This is caused by failing to remove the right fd been watched while
-call qemu_chr_fe_set_handlers();
+Fix it by passing the right context to g_main_context_find_source_by_id().
 
-Fix it by pass the worker_context parameter to qemu_chr_fe_set_handlers().
-
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 ---
- net/colo-compare.c | 20 +++++++++++---------
- 1 file changed, 11 insertions(+), 9 deletions(-)
+ chardev/char-io.c | 13 +++++++++----
+ chardev/char-io.h |  2 ++
+ chardev/char.c    |  2 +-
+ 3 files changed, 12 insertions(+), 5 deletions(-)
 
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index 809bad3..4c74b02 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -84,6 +84,7 @@ typedef struct CompareState {
-     /* compare thread, a thread for each NIC */
-     QemuThread thread;
- 
-+    GMainContext *worker_context;
-     GMainLoop *compare_loop;
- } CompareState;
- 
-@@ -497,30 +498,29 @@ static gboolean check_old_packet_regular(void *opaque)
- 
- static void *colo_compare_thread(void *opaque)
- {
--    GMainContext *worker_context;
-     CompareState *s = opaque;
-     GSource *timeout_source;
- 
--    worker_context = g_main_context_new();
-+    s->worker_context = g_main_context_new();
- 
-     qemu_chr_fe_set_handlers(&s->chr_pri_in, compare_chr_can_read,
--                             compare_pri_chr_in, NULL, s, worker_context, true);
-+                          compare_pri_chr_in, NULL, s, s->worker_context, true);
-     qemu_chr_fe_set_handlers(&s->chr_sec_in, compare_chr_can_read,
--                             compare_sec_chr_in, NULL, s, worker_context, true);
-+                          compare_sec_chr_in, NULL, s, s->worker_context, true);
- 
--    s->compare_loop = g_main_loop_new(worker_context, FALSE);
-+    s->compare_loop = g_main_loop_new(s->worker_context, FALSE);
- 
-     /* To kick any packets that the secondary doesn't match */
-     timeout_source = g_timeout_source_new(REGULAR_PACKET_CHECK_MS);
-     g_source_set_callback(timeout_source,
-                           (GSourceFunc)check_old_packet_regular, s, NULL);
--    g_source_attach(timeout_source, worker_context);
-+    g_source_attach(timeout_source, s->worker_context);
- 
-     g_main_loop_run(s->compare_loop);
- 
-     g_source_unref(timeout_source);
-     g_main_loop_unref(s->compare_loop);
--    g_main_context_unref(worker_context);
-+    g_main_context_unref(s->worker_context);
-     return NULL;
+diff --git a/chardev/char-io.c b/chardev/char-io.c
+index 7dfc3f2..a69cc61 100644
+--- a/chardev/char-io.c
++++ b/chardev/char-io.c
+@@ -127,14 +127,14 @@ guint io_add_watch_poll(Chardev *chr,
+     return tag;
  }
  
-@@ -717,8 +717,10 @@ static void colo_compare_finalize(Object *obj)
+-static void io_remove_watch_poll(guint tag)
++static void io_remove_watch_poll(guint tag, GMainContext *context)
  {
-     CompareState *s = COLO_COMPARE(obj);
+     GSource *source;
+     IOWatchPoll *iwp;
  
--    qemu_chr_fe_deinit(&s->chr_pri_in);
--    qemu_chr_fe_deinit(&s->chr_sec_in);
-+    qemu_chr_fe_set_handlers(&s->chr_pri_in, NULL, NULL, NULL, NULL,
-+                             s->worker_context, true);
-+    qemu_chr_fe_set_handlers(&s->chr_sec_in, NULL, NULL, NULL, NULL,
-+                             s->worker_context, true);
-     qemu_chr_fe_deinit(&s->chr_out);
+     g_return_if_fail(tag > 0);
  
-     g_main_loop_quit(s->compare_loop);
+-    source = g_main_context_find_source_by_id(NULL, tag);
++    source = g_main_context_find_source_by_id(context, tag);
+     g_return_if_fail(source != NULL);
+ 
+     iwp = io_watch_poll_from_source(source);
+@@ -146,14 +146,19 @@ static void io_remove_watch_poll(guint tag)
+     g_source_destroy(&iwp->parent);
+ }
+ 
+-void remove_fd_in_watch(Chardev *chr)
++void qemu_remove_fd_in_watch(Chardev *chr, GMainContext *context)
+ {
+     if (chr->fd_in_tag) {
+-        io_remove_watch_poll(chr->fd_in_tag);
++        io_remove_watch_poll(chr->fd_in_tag, context);
+         chr->fd_in_tag = 0;
+     }
+ }
+ 
++void remove_fd_in_watch(Chardev *chr)
++{
++    qemu_remove_fd_in_watch(chr, NULL);
++}
++
+ int io_channel_send_full(QIOChannel *ioc,
+                          const void *buf, size_t len,
+                          int *fds, size_t nfds)
+diff --git a/chardev/char-io.h b/chardev/char-io.h
+index d7ae5f1..117c888 100644
+--- a/chardev/char-io.h
++++ b/chardev/char-io.h
+@@ -38,6 +38,8 @@ guint io_add_watch_poll(Chardev *chr,
+ 
+ void remove_fd_in_watch(Chardev *chr);
+ 
++void qemu_remove_fd_in_watch(Chardev *chr, GMainContext *context);
++
+ int io_channel_send(QIOChannel *ioc, const void *buf, size_t len);
+ 
+ int io_channel_send_full(QIOChannel *ioc, const void *buf, size_t len,
+diff --git a/chardev/char.c b/chardev/char.c
+index abd525f..5563375 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -560,7 +560,7 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
+     cc = CHARDEV_GET_CLASS(s);
+     if (!opaque && !fd_can_read && !fd_read && !fd_event) {
+         fe_open = 0;
+-        remove_fd_in_watch(s);
++        qemu_remove_fd_in_watch(s, context);
+     } else {
+         fe_open = 1;
+     }
 -- 
 1.8.3.1
