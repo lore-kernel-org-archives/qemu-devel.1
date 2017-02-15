@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43703)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cdzSP-00028C-BW
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 08:17:18 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cdzUY-0003yx-CF
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 08:19:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cdzSK-0000WV-D0
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 08:17:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53380)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cdzSK-0000W6-7p
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 08:17:12 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 527137E9F5
-	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 13:17:12 +0000 (UTC)
-Date: Wed, 15 Feb 2017 13:17:08 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170215131707.GF2731@work-vm>
-References: <1487006388-7966-1-git-send-email-quintela@redhat.com>
-	<1487006388-7966-3-git-send-email-quintela@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1cdzUX-0001D1-7l
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 08:19:30 -0500
+References: <1487161136-9018-1-git-send-email-armbru@redhat.com>
+	<575ab227-e44e-8d66-7b58-3e68e1df8491@redhat.com>
+	<878tp7tx98.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ca73f39c-04b2-ce0b-1f80-5eef0e4861ce@redhat.com>
+Date: Wed, 15 Feb 2017 14:19:21 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1487006388-7966-3-git-send-email-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 02/12] migration: Don't create decompression
- threads if not enabled
+In-Reply-To: <878tp7tx98.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] hw: Deprecate unwanted use -drive
+ if=scsi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,50 +25,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-This can go in separately.
+On 15/02/2017 14:10, Markus Armbruster wrote:
+> Paolo Bonzini <pbonzini@redhat.com> writes:
+> 
+>> On 15/02/2017 13:18, Markus Armbruster wrote:
+>>> Drives defined with if=scsi get connected to buses created with
+>>> -device, unlike other interface types.  Deprecate this usage.
+>>>
+>>> There is no good default SCSI HBA for PC machines.  Deprecate if=scsi
+>>> there entirely.
+>>>
+>>> Before this series, frontends for -drive if=scsi get created by SCSI
+>>> HBAs.  Frontends for other interface types get created by machine
+>>> initialization.
+>>>
+>>> After this series, they get created by machine initialization, except
+>>> for deprecated cases, which get created by new function
+>>> scsi_legacy_handle_cmdline().
+>>>
+>>> Based on "[PATCH v3 0/8] More sensible default for -drive interface
+>>> type".
+>>>
+>>> v2:
+>>> * Trivially rebased
+>>> * PATCH 2: Suppress warning for default drives
+>>> * PATCH 3: Update user manual and qemu-iotests/051.pc.out
+>>>
+>>> Markus Armbruster (3):
+>>>   hw/scsi: Concentrate -drive if=scsi auto-create in one place
+>>>   hw: Deprecate -drive if=scsi with non-onboard HBAs
+>>>   hw/i386: Deprecate -drive if=scsi with PC machine types
+>>>
+>>>  hw/arm/realview.c             |  2 +-
+>>>  hw/arm/versatilepb.c          |  2 +-
+>>>  hw/i386/pc.c                  |  6 +++++
+>>>  hw/scsi/esp-pci.c             |  3 ---
+>>>  hw/scsi/esp.c                 |  6 -----
+>>>  hw/scsi/lsi53c895a.c          | 10 +++++---
+>>>  hw/scsi/megasas.c             |  4 ----
+>>>  hw/scsi/mptsas.c              |  4 ----
+>>>  hw/scsi/scsi-bus.c            | 56 +++++++++++++++++++++++++++++++++++++------
+>>>  hw/scsi/spapr_vscsi.c         |  5 ++--
+>>>  hw/scsi/virtio-scsi.c         |  8 -------
+>>>  include/hw/pci/pci.h          |  2 ++
+>>>  include/hw/scsi/scsi.h        |  3 ++-
+>>>  qemu-options.hx               |  5 ----
+>>>  tests/qemu-iotests/051.pc.out | 12 ++++++----
+>>>  vl.c                          | 10 ++++++++
+>>>  16 files changed, 88 insertions(+), 50 deletions(-)
+>>>
+>>
+>> Because of the ESC characters in 051.pc.out, please send the pull
+>> request for this yourself.
+> 
+> Is that an Acked-by?
 
-> --
-> 
-> I removed the [HACK] part because previous patch just check that
-> compression pages are not received.
-> ---
->  migration/ram.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 5817f8c..4422ee8 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -2251,6 +2251,9 @@ void migrate_decompress_threads_create(void)
->  {
->      int i, thread_count;
-> 
-> +    if (!migrate_use_compression()) {
-> +        return;
-> +    }
->      thread_count = migrate_decompress_threads();
->      decompress_threads = g_new0(QemuThread, thread_count);
->      decomp_param = g_new0(DecompressParam, thread_count);
-> @@ -2272,6 +2275,9 @@ void migrate_decompress_threads_join(void)
->  {
->      int i, thread_count;
-> 
-> +    if (!migrate_use_compression()) {
-> +        return;
-> +    }
->      thread_count = migrate_decompress_threads();
->      for (i = 0; i < thread_count; i++) {
->          qemu_mutex_lock(&decomp_param[i].mutex);
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Not a sufficient one because the patch touches files outside my area of
+maintenance, but for hw/scsi you can treat it as one.
+
+Paolo
