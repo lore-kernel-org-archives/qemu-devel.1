@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ce2tX-0001BB-Hi
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 11:57:32 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ce2tZ-0001Cj-RO
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 11:57:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ce2tW-0001gs-Gw
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 11:57:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58130)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1ce2tW-0001gS-AY
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 11:57:30 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 60DF1C054C55
-	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 16:57:30 +0000 (UTC)
-References: <06BE8A21-A1E9-4264-BD02-04A566748633@redhat.com>
-	<173cba42-5390-0e16-71a3-3eadcd3ef654@redhat.com>
-	<9657908C-A71B-424E-BBFD-E4A8EEF1C178@redhat.com>
-	<416ddd00-7348-a7c7-54c0-6f0754e7d062@redhat.com>
-	<20170215163232.GL24672@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <09c9cfe1-0ebb-9393-6ea8-2aeb99650225@redhat.com>
-Date: Wed, 15 Feb 2017 17:57:26 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1ce2tZ-0001iD-75
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 11:57:33 -0500
+References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
+	<20170203154757.36140-9-vsementsov@virtuozzo.com>
+	<4cfafc14-f9af-f992-b0be-8f283d0ddcfa@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a05595fe-1e70-823f-9584-64c968f11398@redhat.com>
+Date: Wed, 15 Feb 2017 17:57:27 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170215163232.GL24672@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] VirtIO Windows Driver repository
+In-Reply-To: <4cfafc14-f9af-f992-b0be-8f283d0ddcfa@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="OLkKk2PJmULfJL2UJpFgiIJlA0HvL2F9l"
+Subject: Re: [Qemu-devel] [PATCH 08/18] hbitmap: add next_zero function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,46 +25,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yan Vugenfirer <yvugenfi@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Cole Robinson <crobinso@redhat.com>, Bandan Das <bsd@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, den@virtuozzo.com, stefanha@redhat.com
 
-CC Bandan
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--OLkKk2PJmULfJL2UJpFgiIJlA0HvL2F9l
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Eric Blake <eblake@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com,
+ armbru@redhat.com, den@virtuozzo.com, stefanha@redhat.com
+Message-ID: <a05595fe-1e70-823f-9584-64c968f11398@redhat.com>
+Subject: Re: [PATCH 08/18] hbitmap: add next_zero function
+References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
+ <20170203154757.36140-9-vsementsov@virtuozzo.com>
+ <4cfafc14-f9af-f992-b0be-8f283d0ddcfa@redhat.com>
+In-Reply-To: <4cfafc14-f9af-f992-b0be-8f283d0ddcfa@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 02/15/17 17:32, Daniel P. Berrange wrote:
-> On Wed, Feb 15, 2017 at 05:27:59PM +0100, Laszlo Ersek wrote:
->> On 02/15/17 16:15, Yan Vugenfirer wrote:
->>>
->>>> On 14 Feb 2017, at 16:08, Laszlo Ersek <lersek@redhat.com> wrote:
->>>>
->>>> On 02/14/17 13:40, Yan Vugenfirer wrote:
->>>>> Hello All,
->>>>>
->>>>> The official upstream repository moved from
->>>>> https://github.com/YanVugenfirer/kvm-guest-drivers-windows to
->>>>> https://github.com/virtio-win/kvm-guest-drivers-windows
->>>>>
->>>>> Best regards, Yan Vugenfirer.
->>>>
->>>> Thanks! I've updated the corresponding reference under
->>>> <https://fedoraproject.org/wiki/Windows_Virtio_Drivers#Links>.
->>>
->>> Thanks!
->>>
->>> Do you know who can make a change on
->>> http://www.linux-kvm.org/page/WindowsGuestDrivers/Repository ?
+
+
+On 07/02/2017 23:55, Eric Blake wrote:
+> On 02/03/2017 09:47 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> The function searches for next zero bit.
+>> Also add interface for BdrvDirtyBitmap.
 >>
->> I thought that I had page editing permissions, and indeed when I edit
->> the page and hit "Save", I'm presented with the updated version.
->> However, as soon as I re-visit the page, the old version is shown, and I
->> can't find my changes in the page history either.
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>=
+
+>> ---
+>>  block/dirty-bitmap.c         |  5 +++++
+>>  include/block/dirty-bitmap.h |  2 ++
+>>  include/qemu/hbitmap.h       |  8 ++++++++
+>>  util/hbitmap.c               | 26 ++++++++++++++++++++++++++
+>>  4 files changed, 41 insertions(+)
 >>
->> Dan, can you pls help?
-> 
-> I'm not admin for the KVM wiki - try Jeff Cody iirc
+>=20
+> It would be nice to enhance the testsuite to cover hbitmap_next_zero().=
 
-In parallel, Bandan notified me off-list that the KVM wiki reported my
-editing as a "spam attempt". Bandan has now placed me in the right
-group, and I've updated the page successfully. (I think.)
+>=20
 
-Thanks all!
-Laszlo
+Agreed.
+
+Paolo
+
+
+--OLkKk2PJmULfJL2UJpFgiIJlA0HvL2F9l
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEcBAEBCAAGBQJYpIh3AAoJEL/70l94x66D/fAH/A/zojwF43i80Oi/MZs7WDKR
+/AZgskXkPX/3bdYN+w4m7zDqZwDgLQx6n/CwRTukzZe/HeHTsNA1llCTcBouem3x
+3xQ8tnuKvBzHDgGgZVAwYrcHWVHm974gf+7fTHc1NyjLDsAjFACEVrX4gRfvpNgl
+QYkqZ6QxS9Jlsnd+61Rv2cu/KYrUAD6MPE/okpGwHYA2DuBNlQB7hzDhJwIsmHcW
+J4IMBya/xtQwyIzRazZ/IrZkt4zo7gyARyYzJ9JVJoYN9W2gnSPh7Y8Osv6/8NfV
+ajmeqPZ4DfDYjqvF1EreZiymQHYJ55JRo2idebnAMKc6Md/ck5e8TM2HO2U9lSE=
+=8Tv2
+-----END PGP SIGNATURE-----
+
+--OLkKk2PJmULfJL2UJpFgiIJlA0HvL2F9l--
