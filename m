@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54648)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ce8PL-0006Bj-2W
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 17:50:44 -0500
+	(envelope-from <eblake@redhat.com>) id 1ce8VB-00007E-Tz
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 17:56:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ce8PG-0003fZ-Hh
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 17:50:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56324)
+	(envelope-from <eblake@redhat.com>) id 1ce8V7-0005TR-Dj
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 17:56:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43270)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1ce8PG-0003ew-8Y
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 17:50:38 -0500
-Date: Wed, 15 Feb 2017 15:50:35 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170215155035.3f7220c4@t450s.home>
-In-Reply-To: <CAHyh4xg0sY2woR5BPVd6uiESpu6U9PHYs7a173sQ7BcLSVk5Hg@mail.gmail.com>
-References: <CAHyh4xiVKjd+D=qaizUZ02O8xLYhpoVKOqC9cR0ZWWyLq9HtbQ@mail.gmail.com>
-	<20170208031216.GA5151@pxdev.xzpeter.org>
-	<CAHyh4xg7NVPjXu3c+xGWNzQqwLgFqFJTPo4SgN-X+FNuHjGihQ@mail.gmail.com>
-	<CAHyh4xhOPmfLoU_fvtbBF1Wqbzji9q6rp_bRN38qfnwvhQq+9A@mail.gmail.com>
-	<20170209035250.GB22153@pxdev.xzpeter.org>
-	<CAHyh4xi9KZm13mJnE3-EyYkkyN4YDKKwbeJ68AumCBM7kgr+MQ@mail.gmail.com>
-	<20170214073551.GA9055@pxdev.xzpeter.org>
-	<CAHyh4xiATAV801U7zjK1F_B+7e2bDWhH1-gpFKF3U1jNmCfScw@mail.gmail.com>
-	<20170215025243.GA3988@pxdev.xzpeter.org>
-	<CAHyh4xg0sY2woR5BPVd6uiESpu6U9PHYs7a173sQ7BcLSVk5Hg@mail.gmail.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ce8V7-0005T6-4i
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 17:56:41 -0500
+References: <cover.1487139038.git.ben@skyportsystems.com>
+	<96c621a0c1588234e473bf0c0d068af8812f3225.1487139038.git.ben@skyportsystems.com>
+	<ebde49dc-fd80-895e-b73f-545ec9a966c8@redhat.com>
+	<4757B80F-46A7-4A6F-BB65-1119A07BE52A@skyportsystems.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <be899831-3bd1-3ea0-d689-473b86a3a15a@redhat.com>
+Date: Wed, 15 Feb 2017 16:56:37 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] iommu emulation
+In-Reply-To: <4757B80F-46A7-4A6F-BB65-1119A07BE52A@skyportsystems.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Hc2GNmoUF3QR22hjjbbiioRSTe1EVH5gB"
+Subject: Re: [Qemu-devel] [PATCH v6 6/7] tests: Move reusable ACPI macros
+ into a new header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,149 +31,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jintack Lim <jintack@cs.columbia.edu>
-Cc: Peter Xu <peterx@redhat.com>, mst@redhat.com, QEMU Devel Mailing List <qemu-devel@nongnu.org>
+To: Ben Warren <ben@skyportsystems.com>
+Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>, mst@redhat.com
 
-On Wed, 15 Feb 2017 17:05:35 -0500
-Jintack Lim <jintack@cs.columbia.edu> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Hc2GNmoUF3QR22hjjbbiioRSTe1EVH5gB
+From: Eric Blake <eblake@redhat.com>
+To: Ben Warren <ben@skyportsystems.com>
+Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
+ Laszlo Ersek <lersek@redhat.com>, mst@redhat.com
+Message-ID: <be899831-3bd1-3ea0-d689-473b86a3a15a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 6/7] tests: Move reusable ACPI macros into
+ a new header file
+References: <cover.1487139038.git.ben@skyportsystems.com>
+ <96c621a0c1588234e473bf0c0d068af8812f3225.1487139038.git.ben@skyportsystems.com>
+ <ebde49dc-fd80-895e-b73f-545ec9a966c8@redhat.com>
+ <4757B80F-46A7-4A6F-BB65-1119A07BE52A@skyportsystems.com>
+In-Reply-To: <4757B80F-46A7-4A6F-BB65-1119A07BE52A@skyportsystems.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On Tue, Feb 14, 2017 at 9:52 PM, Peter Xu <peterx@redhat.com> wrote:
-> 
-> > On Tue, Feb 14, 2017 at 07:50:39AM -0500, Jintack Lim wrote:
-> >
-> > [...]
-> >  
-> > > > > >> > I misunderstood what you said?  
-> > > > > >
-> > > > > > I failed to understand why an vIOMMU could help boost performance.  
-> > :(  
-> > > > > > Could you provide your command line here so that I can try to
-> > > > > > reproduce?  
-> > > > >
-> > > > > Sure. This is the command line to launch L1 VM
-> > > > >
-> > > > > qemu-system-x86_64 -M q35,accel=kvm,kernel-irqchip=split \
-> > > > > -m 12G -device intel-iommu,intremap=on,eim=off,caching-mode=on \
-> > > > > -drive file=/mydata/guest0.img,format=raw --nographic -cpu host \
-> > > > > -smp 4,sockets=4,cores=1,threads=1 \
-> > > > > -device vfio-pci,host=08:00.0,id=net0
-> > > > >
-> > > > > And this is for L2 VM.
-> > > > >
-> > > > > ./qemu-system-x86_64 -M q35,accel=kvm \
-> > > > > -m 8G \
-> > > > > -drive file=/vm/l2guest.img,format=raw --nographic -cpu host \
-> > > > > -device vfio-pci,host=00:03.0,id=net0  
-> > > >
-> > > > ... here looks like these are command lines for L1/L2 guest, rather
-> > > > than L1 guest with/without vIOMMU?
-> > > >  
-> > >
-> > > That's right. I thought you were asking about command lines for L1/L2  
-> > guest  
-> > > :(.
-> > > I think I made the confusion, and as I said above, I didn't mean to talk
-> > > about the performance of L1 guest with/without vIOMMO.
-> > > We can move on!  
-> >
-> > I see. Sure! :-)
-> >
-> > [...]
-> >  
-> > > >
-> > > > Then, I *think* above assertion you encountered would fail only if
-> > > > prev == 0 here, but I still don't quite sure why was that happening.
-> > > > Btw, could you paste me your "lspci -vvv -s 00:03.0" result in your L1
-> > > > guest?
-> > > >  
-> > >
-> > > Sure. This is from my L1 guest.  
-> >
-> > Hmm... I think I found the problem...
-> >  
-> > >
-> > > root@guest0:~# lspci -vvv -s 00:03.0
-> > > 00:03.0 Network controller: Mellanox Technologies MT27500 Family
-> > > [ConnectX-3]
-> > > Subsystem: Mellanox Technologies Device 0050
-> > > Control: I/O- Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr-
-> > > Stepping- SERR+ FastB2B- DisINTx+
-> > > Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort-
-> > > <MAbort- >SERR- <PERR- INTx-
-> > > Latency: 0, Cache Line Size: 64 bytes
-> > > Interrupt: pin A routed to IRQ 23
-> > > Region 0: Memory at fe900000 (64-bit, non-prefetchable) [size=1M]
-> > > Region 2: Memory at fe000000 (64-bit, prefetchable) [size=8M]
-> > > Expansion ROM at fea00000 [disabled] [size=1M]
-> > > Capabilities: [40] Power Management version 3
-> > > Flags: PMEClk- DSI- D1- D2- AuxCurrent=0mA PME(D0-,D1-,D2-,D3hot-,D3cold-  
-> > )  
-> > > Status: D0 NoSoftRst+ PME-Enable- DSel=0 DScale=0 PME-
-> > > Capabilities: [48] Vital Product Data
-> > > Product Name: CX354A - ConnectX-3 QSFP
-> > > Read-only fields:
-> > > [PN] Part number: MCX354A-FCBT
-> > > [EC] Engineering changes: A4
-> > > [SN] Serial number: MT1346X00791
-> > > [V0] Vendor specific: PCIe Gen3 x8
-> > > [RV] Reserved: checksum good, 0 byte(s) reserved
-> > > Read/write fields:
-> > > [V1] Vendor specific: N/A
-> > > [YA] Asset tag: N/A
-> > > [RW] Read-write area: 105 byte(s) free
-> > > [RW] Read-write area: 253 byte(s) free
-> > > [RW] Read-write area: 253 byte(s) free
-> > > [RW] Read-write area: 253 byte(s) free
-> > > [RW] Read-write area: 253 byte(s) free
-> > > [RW] Read-write area: 253 byte(s) free
-> > > [RW] Read-write area: 253 byte(s) free
-> > > [RW] Read-write area: 253 byte(s) free
-> > > [RW] Read-write area: 253 byte(s) free
-> > > [RW] Read-write area: 253 byte(s) free
-> > > [RW] Read-write area: 253 byte(s) free
-> > > [RW] Read-write area: 253 byte(s) free
-> > > [RW] Read-write area: 253 byte(s) free
-> > > [RW] Read-write area: 253 byte(s) free
-> > > [RW] Read-write area: 253 byte(s) free
-> > > [RW] Read-write area: 252 byte(s) free
-> > > End
-> > > Capabilities: [9c] MSI-X: Enable+ Count=128 Masked-
-> > > Vector table: BAR=0 offset=0007c000
-> > > PBA: BAR=0 offset=0007d000
-> > > Capabilities: [60] Express (v2) Root Complex Integrated Endpoint, MSI 00
-> > > DevCap: MaxPayload 256 bytes, PhantFunc 0
-> > > ExtTag- RBE+
-> > > DevCtl: Report errors: Correctable- Non-Fatal+ Fatal+ Unsupported+
-> > > RlxdOrd- ExtTag- PhantFunc- AuxPwr- NoSnoop-
-> > > MaxPayload 256 bytes, MaxReadReq 4096 bytes
-> > > DevSta: CorrErr+ UncorrErr- FatalErr- UnsuppReq+ AuxPwr- TransPend-
-> > > DevCap2: Completion Timeout: Range ABCD, TimeoutDis+, LTR-, OBFF Not
-> > > Supported
-> > > DevCtl2: Completion Timeout: 65ms to 210ms, TimeoutDis-, LTR-, OBFF  
-> > Disabled  
-> > > Capabilities: [100 v0] #00  
-> >
-> > Here we have the head of ecap capability as cap_id==0, then when we
-> > boot the l2 guest with the same device, we'll first copy this
-> > cap_id==0 cap, then when adding the 2nd ecap, we'll probably encounter
-> > problem since pcie_find_capability_list() will thought there is no cap
-> > at all (cap_id==0 is skipped).
-> >
-> > Do you want to try this "hacky patch" to see whether it works for you?
-> >  
-> 
-> Thanks for following this up!
-> 
-> I just tried this, and I got some different message this time.
-> 
-> qemu-system-x86_64: vfio: Cannot reset device 0000:00:03.0, no available
-> reset mechanism.
-> qemu-system-x86_64: vfio: Cannot reset device 0000:00:03.0, no available
-> reset mechanism.
+On 02/15/2017 03:58 PM, Ben Warren wrote:
 
-Possibly very true, it might affect the reliability of the device in
-the l2 guest, but shouldn't prevent it from being assigned.  What's the
-reset mechanism on the physical device (lspci -vvv from host please).
-Thanks,
+>>=20
+>> ---
+>> tests/acpi-utils.h       | 75 ++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>> tests/bios-tables-test.c | 72 +---------------------------------------=
+------
+>> 2 files changed, 76 insertions(+), 71 deletions(-)
 
-Alex
+
+>> No copyright blurb? Also, does MAINTAINERS need an update to cover the=
+
+>> new file?
+>>
+> Sure, I didn=E2=80=99t realize the header files all have copyright head=
+ers.  As for MAINTAINERS, do you mean I should add a device entry for vmg=
+enid?
+
+In this patch, you're just refactoring to a new tests/acpi-utils.h, so
+I'd normally suggest adding it to the blurb that owns
+tests/bios-tables-test.c - but as a pre-existing problem, that also has
+no listed maintainer.  we're trying to ensure that all new added files
+have something listed in MAINTAINERS, even if it is in a misc section
+that only emails the list, although it's harder to say what maintainer
+to use for existing files that you are merely touching, and failure to
+list a maintainer is not (yet) a hard failure (although there have been
+patches proposed to scripts/checkpatch.pl to tighten the rules).
+
+A new section for vmgenid might not be a bad idea, especially it if
+covers more files than just the one addition I noticed in this patch.
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--Hc2GNmoUF3QR22hjjbbiioRSTe1EVH5gB
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYpNylAAoJEKeha0olJ0Nq5BgH/iwnEmEZebmnuXeFr0iE7kFr
+J9xdj33pCrl6cvy6KxMYZ//taiwYbnYSqpRUfMiF8V3MB3AA7/uomy6cBw34vrxx
+SHwu2kgeHg5CA6I5JADVfM56Iq+JWo+8VjbTy5gemWh8texyIZRCJSs5DKmK+dTI
+5Kzox3fyVKsDJuJeYspTcW60VUyZG4dhWOkgAyo5Bxnmr0OzAD461vRtqRR+B7Eg
+CLVE3HlhE+VN9sc/gXc5lpGos0M7XmvH/r8RSjCDQTKoDJHfVCG8PPqXUX3KlXKi
+vqvMggrT5c3VqHcrrG+Dwx5icXapRxJtWjjowzKgE+qjTs4jXUAOIlMXb/aGVpY=
+=nzam
+-----END PGP SIGNATURE-----
+
+--Hc2GNmoUF3QR22hjjbbiioRSTe1EVH5gB--
