@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cdzFt-00019j-2q
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 08:04:22 -0500
+	(envelope-from <armbru@redhat.com>) id 1cdzMS-0004pZ-Pa
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 08:11:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cdzFp-0004E4-U7
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 08:04:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34432)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cdzFp-0004Dy-OF
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 08:04:17 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CE4E565D11
-	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 13:04:17 +0000 (UTC)
-Date: Wed, 15 Feb 2017 13:04:13 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170215130412.GD2731@work-vm>
-References: <1487006388-7966-1-git-send-email-quintela@redhat.com>
-	<1487006388-7966-4-git-send-email-quintela@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1cdzMR-0006qU-ST
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 08:11:08 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1487161136-9018-1-git-send-email-armbru@redhat.com>
+	<575ab227-e44e-8d66-7b58-3e68e1df8491@redhat.com>
+Date: Wed, 15 Feb 2017 14:10:59 +0100
+In-Reply-To: <575ab227-e44e-8d66-7b58-3e68e1df8491@redhat.com> (Paolo
+	Bonzini's message of "Wed, 15 Feb 2017 13:39:54 +0100")
+Message-ID: <878tp7tx98.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1487006388-7966-4-git-send-email-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 03/12] migration: Add multifd capability
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] hw: Deprecate unwanted use -drive
+ if=scsi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,77 +24,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, amit.shah@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  include/migration/migration.h | 1 +
->  migration/migration.c         | 9 +++++++++
->  qapi-schema.json              | 5 +++--
->  3 files changed, 13 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/migration/migration.h b/include/migration/migration.h
-> index 7528cc2..e8bba55 100644
-> --- a/include/migration/migration.h
-> +++ b/include/migration/migration.h
-> @@ -308,6 +308,7 @@ bool migrate_postcopy_ram(void);
->  bool migrate_zero_blocks(void);
-> 
->  bool migrate_auto_converge(void);
-> +bool migrate_use_multifd(void);
-> 
->  int xbzrle_encode_buffer(uint8_t *old_buf, uint8_t *new_buf, int slen,
->                           uint8_t *dst, int dlen);
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 2b179c6..37af7a4 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1369,6 +1369,15 @@ bool migrate_use_events(void)
->      return s->enabled_capabilities[MIGRATION_CAPABILITY_EVENTS];
->  }
-> 
-> +bool migrate_use_multifd(void)
-> +{
-> +    MigrationState *s;
-> +
-> +    s = migrate_get_current();
-> +
-> +    return s->enabled_capabilities[MIGRATION_CAPABILITY_X_MULTIFD];
-> +}
-> +
->  int migrate_use_xbzrle(void)
->  {
->      MigrationState *s;
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 61151f3..ff7579e 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -865,12 +865,13 @@
->  #        side, this process is called COarse-Grain LOck Stepping (COLO) for
->  #        Non-stop Service. (since 2.8)
->  #
-> +# @x-multifd: Use more than one fd for migration (since 2.9)
-> +#
->  # Since: 1.2
->  ##
->  { 'enum': 'MigrationCapability',
->    'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
-> -           'compress', 'events', 'postcopy-ram', 'x-colo'] }
-> -
-> +           'compress', 'events', 'postcopy-ram', 'x-colo', 'x-multifd'] }
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-That needs a minor remerge after 'release-ram' just went in.
+> On 15/02/2017 13:18, Markus Armbruster wrote:
+>> Drives defined with if=scsi get connected to buses created with
+>> -device, unlike other interface types.  Deprecate this usage.
+>> 
+>> There is no good default SCSI HBA for PC machines.  Deprecate if=scsi
+>> there entirely.
+>> 
+>> Before this series, frontends for -drive if=scsi get created by SCSI
+>> HBAs.  Frontends for other interface types get created by machine
+>> initialization.
+>> 
+>> After this series, they get created by machine initialization, except
+>> for deprecated cases, which get created by new function
+>> scsi_legacy_handle_cmdline().
+>> 
+>> Based on "[PATCH v3 0/8] More sensible default for -drive interface
+>> type".
+>> 
+>> v2:
+>> * Trivially rebased
+>> * PATCH 2: Suppress warning for default drives
+>> * PATCH 3: Update user manual and qemu-iotests/051.pc.out
+>> 
+>> Markus Armbruster (3):
+>>   hw/scsi: Concentrate -drive if=scsi auto-create in one place
+>>   hw: Deprecate -drive if=scsi with non-onboard HBAs
+>>   hw/i386: Deprecate -drive if=scsi with PC machine types
+>> 
+>>  hw/arm/realview.c             |  2 +-
+>>  hw/arm/versatilepb.c          |  2 +-
+>>  hw/i386/pc.c                  |  6 +++++
+>>  hw/scsi/esp-pci.c             |  3 ---
+>>  hw/scsi/esp.c                 |  6 -----
+>>  hw/scsi/lsi53c895a.c          | 10 +++++---
+>>  hw/scsi/megasas.c             |  4 ----
+>>  hw/scsi/mptsas.c              |  4 ----
+>>  hw/scsi/scsi-bus.c            | 56 +++++++++++++++++++++++++++++++++++++------
+>>  hw/scsi/spapr_vscsi.c         |  5 ++--
+>>  hw/scsi/virtio-scsi.c         |  8 -------
+>>  include/hw/pci/pci.h          |  2 ++
+>>  include/hw/scsi/scsi.h        |  3 ++-
+>>  qemu-options.hx               |  5 ----
+>>  tests/qemu-iotests/051.pc.out | 12 ++++++----
+>>  vl.c                          | 10 ++++++++
+>>  16 files changed, 88 insertions(+), 50 deletions(-)
+>> 
+>
+> Because of the ESC characters in 051.pc.out, please send the pull
+> request for this yourself.
 
-Dave
-
->  ##
->  # @MigrationCapabilityStatus:
->  #
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Is that an Acked-by?
