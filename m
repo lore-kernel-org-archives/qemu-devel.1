@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cdwXs-0002sA-U6
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cdwXt-0002sF-0M
 	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 05:10:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cdwXm-0003cx-85
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cdwXm-0003cr-7t
 	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 05:10:44 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:26776 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:48842 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cdwXl-0003Yx-Q2
+	id 1cdwXl-0003Z5-QI
 	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 05:10:38 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 15 Feb 2017 13:10:11 +0300
-Message-Id: <1487153430-17260-7-git-send-email-vsementsov@virtuozzo.com>
+Date: Wed, 15 Feb 2017 13:10:20 +0300
+Message-Id: <1487153430-17260-16-git-send-email-vsementsov@virtuozzo.com>
 In-Reply-To: <1487153430-17260-1-git-send-email-vsementsov@virtuozzo.com>
 References: <1487153430-17260-1-git-send-email-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v15 06/25] block/dirty-bitmap: add
- deserialize_ones func
+Subject: [Qemu-devel] [PATCH v15 15/25] qcow2: add
+ .bdrv_can_store_new_dirty_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,105 +28,100 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-Add bdrv_dirty_bitmap_deserialize_ones() function, which is needed for
-qcow2 bitmap loading, to handle unallocated bitmap parts, marked as
-all-ones.
+Realize .bdrv_can_store_new_dirty_bitmap interface.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- block/dirty-bitmap.c         |  7 +++++++
- include/block/dirty-bitmap.h |  3 +++
- include/qemu/hbitmap.h       | 15 +++++++++++++++
- util/hbitmap.c               | 17 +++++++++++++++++
- 4 files changed, 42 insertions(+)
+ block/qcow2-bitmap.c | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ block/qcow2.c        |  1 +
+ block/qcow2.h        |  4 ++++
+ 3 files changed, 57 insertions(+)
 
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 186941c..90af372 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -499,6 +499,13 @@ void bdrv_dirty_bitmap_deserialize_zeroes(BdrvDirtyBitmap *bitmap,
-     hbitmap_deserialize_zeroes(bitmap->bitmap, start, count, finish);
- }
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index b177a95..1ee89e4 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -1182,3 +1182,55 @@ fail:
  
-+void bdrv_dirty_bitmap_deserialize_ones(BdrvDirtyBitmap *bitmap,
-+                                        uint64_t start, uint64_t count,
-+                                        bool finish)
-+{
-+    hbitmap_deserialize_ones(bitmap->bitmap, start, count, finish);
-+}
+     bitmap_list_free(bm_list);
+ }
 +
- void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap)
- {
-     hbitmap_deserialize_finish(bitmap->bitmap);
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index 7cbe623..1e17729 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -70,6 +70,9 @@ void bdrv_dirty_bitmap_deserialize_part(BdrvDirtyBitmap *bitmap,
- void bdrv_dirty_bitmap_deserialize_zeroes(BdrvDirtyBitmap *bitmap,
-                                           uint64_t start, uint64_t count,
-                                           bool finish);
-+void bdrv_dirty_bitmap_deserialize_ones(BdrvDirtyBitmap *bitmap,
-+                                        uint64_t start, uint64_t count,
-+                                        bool finish);
- void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap);
++bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
++                                      const char *name,
++                                      uint32_t granularity,
++                                      Error **errp)
++{
++    BDRVQcow2State *s = bs->opaque;
++    bool found;
++    Qcow2BitmapList *bm_list;
++
++    if (check_constraints_on_bitmap(bs, name, granularity) != 0) {
++        error_setg(errp, "The constraints are not satisfied");
++        goto fail;
++    }
++
++    if (s->nb_bitmaps == 0) {
++        return true;
++    }
++
++    if (s->nb_bitmaps >= QCOW2_MAX_BITMAPS) {
++        error_setg(errp,
++                   "Maximum number of persistent bitmaps is already reached");
++        goto fail;
++    }
++
++    if (s->bitmap_directory_size + calc_dir_entry_size(strlen(name), 0) >
++        QCOW2_MAX_BITMAP_DIRECTORY_SIZE)
++    {
++        error_setg(errp, "No enough space in the bitmap directory");
++        goto fail;
++    }
++
++    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
++                               s->bitmap_directory_size, errp);
++    if (bm_list == NULL) {
++        goto fail;
++    }
++
++    found = find_bitmap_by_name(bm_list, name);
++    bitmap_list_free(bm_list);
++    if (found) {
++        error_setg(errp, "Bitmap with the same name is already stored");
++        goto fail;
++    }
++
++    return true;
++
++fail:
++    error_prepend(errp, "Can't make bitmap '%s' persistent in '%s': ",
++                  name, bdrv_get_device_or_node_name(bs));
++    return false;
++}
+diff --git a/block/qcow2.c b/block/qcow2.c
+index d0e41bf..6e1fe53 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -3541,6 +3541,7 @@ BlockDriver bdrv_qcow2 = {
+ 
+     .bdrv_load_autoloading_dirty_bitmaps = qcow2_load_autoloading_dirty_bitmaps,
+     .bdrv_store_persistent_dirty_bitmaps = qcow2_store_persistent_dirty_bitmaps,
++    .bdrv_can_store_new_dirty_bitmap = qcow2_can_store_new_dirty_bitmap,
+ };
+ 
+ static void bdrv_qcow2_init(void)
+diff --git a/block/qcow2.h b/block/qcow2.h
+index d9a7643..749710d 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -616,5 +616,9 @@ void qcow2_cache_put(BlockDriverState *bs, Qcow2Cache *c, void **table);
+ /* qcow2-bitmap.c functions */
+ void qcow2_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp);
+ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
++bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
++                                      const char *name,
++                                      uint32_t granularity,
++                                      Error **errp);
  
  #endif
-diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
-index 6b04391..b52304a 100644
---- a/include/qemu/hbitmap.h
-+++ b/include/qemu/hbitmap.h
-@@ -229,6 +229,21 @@ void hbitmap_deserialize_zeroes(HBitmap *hb, uint64_t start, uint64_t count,
-                                 bool finish);
- 
- /**
-+ * hbitmap_deserialize_ones
-+ * @hb: HBitmap to operate on.
-+ * @start: First bit to restore.
-+ * @count: Number of bits to restore.
-+ * @finish: Whether to call hbitmap_deserialize_finish automatically.
-+ *
-+ * Fills the bitmap with ones.
-+ *
-+ * If @finish is false, caller must call hbitmap_serialize_finish before using
-+ * the bitmap.
-+ */
-+void hbitmap_deserialize_ones(HBitmap *hb, uint64_t start, uint64_t count,
-+                              bool finish);
-+
-+/**
-  * hbitmap_deserialize_finish
-  * @hb: HBitmap to operate on.
-  *
-diff --git a/util/hbitmap.c b/util/hbitmap.c
-index 0b38817..0c1591a 100644
---- a/util/hbitmap.c
-+++ b/util/hbitmap.c
-@@ -551,6 +551,23 @@ void hbitmap_deserialize_zeroes(HBitmap *hb, uint64_t start, uint64_t count,
-     }
- }
- 
-+void hbitmap_deserialize_ones(HBitmap *hb, uint64_t start, uint64_t count,
-+                              bool finish)
-+{
-+    uint64_t el_count;
-+    unsigned long *first;
-+
-+    if (!count) {
-+        return;
-+    }
-+    serialization_chunk(hb, start, count, &first, &el_count);
-+
-+    memset(first, 0xff, el_count * sizeof(unsigned long));
-+    if (finish) {
-+        hbitmap_deserialize_finish(hb);
-+    }
-+}
-+
- void hbitmap_deserialize_finish(HBitmap *bitmap)
- {
-     int64_t i, size, prev_size;
 -- 
 1.8.3.1
