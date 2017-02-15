@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cdwTJ-0006ed-GW
+	(envelope-from <armbru@redhat.com>) id 1cdwTJ-0006eg-In
 	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 05:06:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cdwTI-0001mJ-67
+	(envelope-from <armbru@redhat.com>) id 1cdwTI-0001mZ-HL
 	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 05:06:01 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 15 Feb 2017 11:05:41 +0100
-Message-Id: <1487153147-11530-3-git-send-email-armbru@redhat.com>
+Date: Wed, 15 Feb 2017 11:05:44 +0100
+Message-Id: <1487153147-11530-6-git-send-email-armbru@redhat.com>
 In-Reply-To: <1487153147-11530-1-git-send-email-armbru@redhat.com>
 References: <1487153147-11530-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 2/8] hw/arm/cubieboard hw/arm/xlnx-ep108:
- Fix units_per_default_bus
+Subject: [Qemu-devel] [PATCH v3 5/8] hw/arm/highbank: Default -drive to
+ if=ide instead of if=scsi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,87 +21,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, Beniamino Galvani <b.galvani@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, Rob Herring <robh@kernel.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
 
-Machine types cubieboard, xlnx-ep108, xlnx-zcu102 have an onboard AHCI
-controller, but neglect to set their MachineClass member
-units_per_default_bus = 1.  This permits -drive if=ide,unit=1, which
-makes no sense for AHCI.  It also screws up index=N for odd N, because
-it gets desugared to unit=1,bus=N/2
+These machines have no onboard SCSI HBA, and no way to plug one.
+-drive if=scsi therefore cannot work.  They do have an onboard IDE
+controller (sysbus-ahci), but fail to honor if=ide.
 
-Doesn't really matter, because these machine types fail to honor
--drive if=ide.  Add the missing units_per_default_bus = 1 anyway,
-along with a TODO comment on what needs to be done for -drive if=ide.
+Change their default to if=ide, and add a TODO comment on what needs
+to be done to actually honor -drive if=ide.
 
-Also set block_default_type = IF_IDE explicitly.  It's currently the
-default, but the next commit will change it to something more
-sensible, and we want to keep the IF_IDE default for these three
-machines.  See also the previous commit.
-
-Cc: Beniamino Galvani <b.galvani@gmail.com>
-Cc: Alistair Francis <alistair.francis@xilinx.com>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: Rob Herring <robh@kernel.org>
 Cc: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-arm@nongnu.org
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Acked-by: Alistair Francis <alistair.francis@xilinx.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/arm/cubieboard.c | 4 ++++
- hw/arm/xlnx-ep108.c | 6 ++++++
- 2 files changed, 10 insertions(+)
+ hw/arm/highbank.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/hw/arm/cubieboard.c b/hw/arm/cubieboard.c
-index dd19ba3..b98e1c4 100644
---- a/hw/arm/cubieboard.c
-+++ b/hw/arm/cubieboard.c
-@@ -71,6 +71,8 @@ static void cubieboard_init(MachineState *machine)
-     memory_region_add_subregion(get_system_memory(), AW_A10_SDRAM_BASE,
-                                 &s->sdram);
- 
-+    /* TODO create and connect IDE devices for ide_drive_get() */
-+
-     cubieboard_binfo.ram_size = machine->ram_size;
-     cubieboard_binfo.kernel_filename = machine->kernel_filename;
-     cubieboard_binfo.kernel_cmdline = machine->kernel_cmdline;
-@@ -82,6 +84,8 @@ static void cubieboard_machine_init(MachineClass *mc)
- {
-     mc->desc = "cubietech cubieboard";
-     mc->init = cubieboard_init;
-+    mc->block_default_type = IF_IDE;
-+    mc->units_per_default_bus = 1;
- }
- 
- DEFINE_MACHINE("cubieboard", cubieboard_machine_init)
-diff --git a/hw/arm/xlnx-ep108.c b/hw/arm/xlnx-ep108.c
-index 4ec590a..860780a 100644
---- a/hw/arm/xlnx-ep108.c
-+++ b/hw/arm/xlnx-ep108.c
-@@ -106,6 +106,8 @@ static void xlnx_ep108_init(MachineState *machine)
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->soc.spi[i]), 1, cs_line);
+diff --git a/hw/arm/highbank.c b/hw/arm/highbank.c
+index 80e5fd4..0a4508c 100644
+--- a/hw/arm/highbank.c
++++ b/hw/arm/highbank.c
+@@ -363,6 +363,8 @@ static void calxeda_init(MachineState *machine, enum cxmachines machine_id)
+         sysbus_connect_irq(SYS_BUS_DEVICE(dev), 2, pic[82]);
      }
  
 +    /* TODO create and connect IDE devices for ide_drive_get() */
 +
-     xlnx_ep108_binfo.ram_size = ram_size;
-     xlnx_ep108_binfo.kernel_filename = machine->kernel_filename;
-     xlnx_ep108_binfo.kernel_cmdline = machine->kernel_cmdline;
-@@ -118,6 +120,8 @@ static void xlnx_ep108_machine_init(MachineClass *mc)
- {
-     mc->desc = "Xilinx ZynqMP EP108 board";
-     mc->init = xlnx_ep108_init;
+     highbank_binfo.ram_size = ram_size;
+     highbank_binfo.kernel_filename = kernel_filename;
+     highbank_binfo.kernel_cmdline = kernel_cmdline;
+@@ -405,7 +407,8 @@ static void highbank_class_init(ObjectClass *oc, void *data)
+ 
+     mc->desc = "Calxeda Highbank (ECX-1000)";
+     mc->init = highbank_init;
+-    mc->block_default_type = IF_SCSI;
 +    mc->block_default_type = IF_IDE;
 +    mc->units_per_default_bus = 1;
+     mc->max_cpus = 4;
  }
  
- DEFINE_MACHINE("xlnx-ep108", xlnx_ep108_machine_init)
-@@ -126,6 +130,8 @@ static void xlnx_zcu102_machine_init(MachineClass *mc)
- {
-     mc->desc = "Xilinx ZynqMP ZCU102 board";
-     mc->init = xlnx_ep108_init;
+@@ -421,7 +424,8 @@ static void midway_class_init(ObjectClass *oc, void *data)
+ 
+     mc->desc = "Calxeda Midway (ECX-2000)";
+     mc->init = midway_init;
+-    mc->block_default_type = IF_SCSI;
 +    mc->block_default_type = IF_IDE;
 +    mc->units_per_default_bus = 1;
+     mc->max_cpus = 4;
  }
  
- DEFINE_MACHINE("xlnx-zcu102", xlnx_zcu102_machine_init)
 -- 
 2.7.4
