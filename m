@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1cdssx-00024U-Ti
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 01:16:17 -0500
+	(envelope-from <ben@skyportsystems.com>) id 1cdssu-00023D-7w
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 01:16:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1cdssw-0007FO-Co
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 01:16:15 -0500
-Received: from mail-pg0-x231.google.com ([2607:f8b0:400e:c05::231]:36616)
+	(envelope-from <ben@skyportsystems.com>) id 1cdssq-0007DD-Pa
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 01:16:12 -0500
+Received: from mail-pg0-x22f.google.com ([2607:f8b0:400e:c05::22f]:36595)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
-	id 1cdssw-0007En-5M
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 01:16:14 -0500
-Received: by mail-pg0-x231.google.com with SMTP id v184so34071392pgv.3
-	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 22:16:14 -0800 (PST)
+	id 1cdssq-0007Ch-Hp
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 01:16:08 -0500
+Received: by mail-pg0-x22f.google.com with SMTP id v184so34070435pgv.3
+	for <qemu-devel@nongnu.org>; Tue, 14 Feb 2017 22:16:07 -0800 (PST)
 From: ben@skyportsystems.com
-Date: Tue, 14 Feb 2017 22:15:49 -0800
-Message-Id: <b126fbc5e3115a959c8a80c3217b0faf7b7e92d5.1487139038.git.ben@skyportsystems.com>
+Date: Tue, 14 Feb 2017 22:15:43 -0800
+Message-Id: <9dffe31a245cf6a717eef8227fe80ca666b168b5.1487139038.git.ben@skyportsystems.com>
 In-Reply-To: <cover.1487139038.git.ben@skyportsystems.com>
 References: <cover.1487139038.git.ben@skyportsystems.com>
 In-Reply-To: <cover.1487139038.git.ben@skyportsystems.com>
 References: <cover.1487139038.git.ben@skyportsystems.com>
-Subject: [Qemu-devel] [PATCH v6 7/7] tests: Add unit tests for the VM
- Generation ID feature
+Subject: [Qemu-devel] [PATCH v6 1/7] linker-loader: Add new 'write pointer'
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,243 +34,111 @@ Cc: lersek@redhat.com, mst@redhat.com, imammedo@redhat.com, Ben Warren <ben@skyp
 
 From: Ben Warren <ben@skyportsystems.com>
 
-The following tests are implemented:
-* test that a GUID passed in by command line is propagated to the guest.
-* test that changing the GUID at runtime via the monitor is reflected in
-  the guest.
-* test that the "auto" argument to the GUID generates a different, and
-  correct GUID as seen by the guest.
-
-  This patch is loosely based on a previous patch from:
-  Gal Hammer <ghammer@redhat.com>  and Igor Mammedov <imammedo@redhat.com>
+This is similar to the existing 'add pointer' functionality, but instead
+of instructing the guest (BIOS or UEFI) to patch memory, it instructs
+the guest to write the pointer back to QEMU via a writeable fw_cfg file.
 
 Signed-off-by: Ben Warren <ben@skyportsystems.com>
 ---
- tests/Makefile.include |   2 +
- tests/vmgenid-test.c   | 195 +++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 197 insertions(+)
- create mode 100644 tests/vmgenid-test.c
+ hw/acpi/bios-linker-loader.c         | 58 ++++++++++++++++++++++++++++++++++--
+ include/hw/acpi/bios-linker-loader.h |  6 ++++
+ 2 files changed, 61 insertions(+), 3 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 634394a..ca4b3f7 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -241,6 +241,7 @@ check-qtest-i386-y += tests/usb-hcd-xhci-test$(EXESUF)
- gcov-files-i386-y += hw/usb/hcd-xhci.c
- check-qtest-i386-y += tests/pc-cpu-test$(EXESUF)
- check-qtest-i386-y += tests/q35-test$(EXESUF)
-+check-qtest-i386-y += tests/vmgenid-test$(EXESUF)
- gcov-files-i386-y += hw/pci-host/q35.c
- check-qtest-i386-$(CONFIG_VHOST_NET_TEST_i386) += tests/vhost-user-test$(EXESUF)
- ifeq ($(CONFIG_VHOST_NET_TEST_i386),)
-@@ -726,6 +727,7 @@ tests/ivshmem-test$(EXESUF): tests/ivshmem-test.o contrib/ivshmem-server/ivshmem
- tests/vhost-user-bridge$(EXESUF): tests/vhost-user-bridge.o contrib/libvhost-user/libvhost-user.o $(test-util-obj-y)
- tests/test-uuid$(EXESUF): tests/test-uuid.o $(test-util-obj-y)
- tests/test-arm-mptimer$(EXESUF): tests/test-arm-mptimer.o
-+tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o
+diff --git a/hw/acpi/bios-linker-loader.c b/hw/acpi/bios-linker-loader.c
+index d963ebe..5030cf1 100644
+--- a/hw/acpi/bios-linker-loader.c
++++ b/hw/acpi/bios-linker-loader.c
+@@ -78,6 +78,19 @@ struct BiosLinkerLoaderEntry {
+             uint32_t length;
+         } cksum;
  
- tests/migration/stress$(EXESUF): tests/migration/stress.o
- 	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,"LINK","$(TARGET_DIR)$@")
-diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
-new file mode 100644
-index 0000000..721ba05
---- /dev/null
-+++ b/tests/vmgenid-test.c
-@@ -0,0 +1,195 @@
++        /*
++         * COMMAND_WRITE_POINTER - write the fw_cfg file (originating from
++         * @dest_file) at @wr_pointer.offset, by adding a pointer to the table
++         * originating from @src_file. 1,2,4 or 8 byte unsigned
++         * addition is used depending on @wr_pointer.size.
++         */
++        struct {
++            char dest_file[BIOS_LINKER_LOADER_FILESZ];
++            char src_file[BIOS_LINKER_LOADER_FILESZ];
++            uint32_t offset;
++            uint8_t size;
++        } wr_pointer;
++
+         /* padding */
+         char pad[124];
+     };
+@@ -85,9 +98,10 @@ struct BiosLinkerLoaderEntry {
+ typedef struct BiosLinkerLoaderEntry BiosLinkerLoaderEntry;
+ 
+ enum {
+-    BIOS_LINKER_LOADER_COMMAND_ALLOCATE     = 0x1,
+-    BIOS_LINKER_LOADER_COMMAND_ADD_POINTER  = 0x2,
+-    BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM = 0x3,
++    BIOS_LINKER_LOADER_COMMAND_ALLOCATE          = 0x1,
++    BIOS_LINKER_LOADER_COMMAND_ADD_POINTER       = 0x2,
++    BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM      = 0x3,
++    BIOS_LINKER_LOADER_COMMAND_WRITE_POINTER     = 0x4,
+ };
+ 
+ enum {
+@@ -278,3 +292,41 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
+ 
+     g_array_append_vals(linker->cmd_blob, &entry, sizeof entry);
+ }
++
 +/*
-+ * QTest testcase for VM Generation ID
++ * bios_linker_loader_write_pointer: ask guest to write a pointer to the
++ * source file into the destination file, and write it back to QEMU via
++ * fw_cfg DMA.
 + *
-+ * Copyright (c) 2016 Red Hat, Inc.
-+ * Copyright (c) 2017 Skyport Systems
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
++ * @linker: linker object instance
++ * @dest_file: destination file that must be written
++ * @dst_patched_offset: location within destination file blob to be patched
++ *                      with the pointer to @src_file, in bytes
++ * @dst_patched_offset_size: size of the pointer to be patched
++ *                      at @dst_patched_offset in @dest_file blob, in bytes
++ * @src_file: source file who's address must be taken
 + */
-+
-+#include <glib.h>
-+#include <string.h>
-+#include <unistd.h>
-+#include "qemu/osdep.h"
-+#include "qemu/bitmap.h"
-+#include "qemu/uuid.h"
-+#include "hw/acpi/acpi-defs.h"
-+#include "acpi-utils.h"
-+#include "libqtest.h"
-+
-+#define VGID_GUID "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
-+#define VMGENID_GUID_OFFSET      40   /* allow space for
-+                                       * OVMF SDT Header Probe Supressor
-+                                       */
-+
-+static uint32_t vgia;
-+
-+typedef struct {
-+    AcpiTableHeader header;
-+    gchar name_op;
-+    gchar vgia[4];
-+    gchar val_op;
-+    uint32_t vgia_val;
-+} QEMU_PACKED VgidTable;
-+
-+static uint32_t find_vgia(void)
++void bios_linker_loader_write_pointer(BIOSLinker *linker,
++                                    const char *dest_file,
++                                    uint32_t dst_patched_offset,
++                                    uint8_t dst_patched_size,
++                                    const char *src_file)
 +{
-+    uint32_t off;
-+    AcpiRsdpDescriptor rsdp_table;
-+    uint32_t rsdt;
-+    AcpiRsdtDescriptorRev1 rsdt_table;
-+    int tables_nr;
-+    uint32_t *tables;
-+    AcpiTableHeader ssdt_table;
-+    VgidTable vgid_table;
-+    int i;
++    BiosLinkerLoaderEntry entry;
++    const BiosLinkerFileEntry *source_file =
++        bios_linker_find_file(linker, src_file);
 +
-+    /* First, find the RSDP */
-+    for (off = 0xf0000; off < 0x100000; off += 0x10) {
-+        uint8_t sig[] = "RSD PTR ";
++    assert(source_file);
++    memset(&entry, 0, sizeof entry);
++    strncpy(entry.wr_pointer.dest_file, dest_file,
++            sizeof entry.wr_pointer.dest_file - 1);
++    strncpy(entry.wr_pointer.src_file, src_file,
++            sizeof entry.wr_pointer.src_file - 1);
++    entry.command = cpu_to_le32(BIOS_LINKER_LOADER_COMMAND_WRITE_POINTER);
++    entry.wr_pointer.offset = cpu_to_le32(dst_patched_offset);
++    entry.wr_pointer.size = dst_patched_size;
++    assert(dst_patched_size == 1 || dst_patched_size == 2 ||
++           dst_patched_size == 4 || dst_patched_size == 8);
 +
-+        for (i = 0; i < sizeof sig - 1; ++i) {
-+            sig[i] = readb(off + i);
-+        }
-+
-+        if (!memcmp(sig, "RSD PTR ", sizeof sig)) {
-+            break;
-+        }
-+    }
-+    g_assert_cmphex(off, <, 0x100000);
-+
-+    /* Parse the RSDP header so we can find the RSDT */
-+    ACPI_READ_FIELD(rsdp_table.signature, off);
-+    ACPI_ASSERT_CMP64(rsdp_table.signature, "RSD PTR ");
-+
-+    ACPI_READ_FIELD(rsdp_table.checksum, off);
-+    ACPI_READ_ARRAY(rsdp_table.oem_id, off);
-+    ACPI_READ_FIELD(rsdp_table.revision, off);
-+    ACPI_READ_FIELD(rsdp_table.rsdt_physical_address, off);
-+
-+    rsdt = rsdp_table.rsdt_physical_address;
-+    /* read the header */
-+    ACPI_READ_TABLE_HEADER(&rsdt_table, rsdt);
-+    ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
-+
-+    /* compute the table entries in rsdt */
-+    tables_nr = (rsdt_table.length - sizeof(AcpiRsdtDescriptorRev1)) /
-+                sizeof(uint32_t);
-+    g_assert_cmpint(tables_nr, >, 0);
-+
-+    /* get the addresses of the tables pointed by rsdt */
-+    tables = g_new0(uint32_t, tables_nr);
-+    ACPI_READ_ARRAY_PTR(tables, tables_nr, rsdt);
-+
-+    for (i = 0; i < tables_nr; i++) {
-+        ACPI_READ_TABLE_HEADER(&ssdt_table, tables[i]);
-+        if (!strncmp((char *)ssdt_table.oem_table_id, "VMGENID", 7)) {
-+            /* the first entry in the table should be VGIA
-+             * That's all we need
-+             */
-+            ACPI_READ_FIELD(vgid_table.name_op, tables[i]);
-+            g_assert(vgid_table.name_op == 0x08);  /* name */
-+            ACPI_READ_ARRAY(vgid_table.vgia, tables[i]);
-+            g_assert(memcmp(vgid_table.vgia, "VGIA", 4) == 0);
-+            ACPI_READ_FIELD(vgid_table.val_op, tables[i]);
-+            g_assert(vgid_table.val_op == 0x0C);  /* dword */
-+            ACPI_READ_FIELD(vgid_table.vgia_val, tables[i]);
-+            /* The GUID is written at a fixed offset into the fw_cfg file
-+             * in order to implement the "OVMF SDT Header probe suppressor"
-+             * see docs/specs/vmgenid.txt for more details
-+             */
-+            return vgid_table.vgia_val + VMGENID_GUID_OFFSET;
-+        }
-+    }
-+    return 0;
++    g_array_append_vals(linker->cmd_blob, &entry, sizeof entry);
 +}
+diff --git a/include/hw/acpi/bios-linker-loader.h b/include/hw/acpi/bios-linker-loader.h
+index fa1e5d1..f9ba5d6 100644
+--- a/include/hw/acpi/bios-linker-loader.h
++++ b/include/hw/acpi/bios-linker-loader.h
+@@ -26,5 +26,11 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
+                                     const char *src_file,
+                                     uint32_t src_offset);
+ 
++void bios_linker_loader_write_pointer(BIOSLinker *linker,
++                                      const char *dest_file,
++                                      uint32_t dst_patched_offset,
++                                      uint8_t dst_patched_size,
++                                      const char *src_file);
 +
-+static void vmgenid_read_guid(QemuUUID *guid)
-+{
-+    int i;
-+
-+    if (vgia == 0) {
-+        vgia = find_vgia();
-+    }
-+    g_assert(vgia);
-+
-+    /* Read the GUID directly from guest memory */
-+    for (i = 0; i < 16; i++) {
-+        guid->data[i] = readb(vgia + i);
-+    }
-+    /* The GUID is in little-endian format in the guest, while QEMU
-+     * uses big-endian.  Swap after reading.
-+     */
-+    qemu_uuid_bswap(guid);
-+}
-+
-+static void vmgenid_test(void)
-+{
-+    QemuUUID expected, measured;
-+    g_assert(qemu_uuid_parse(VGID_GUID, &expected) == 0);
-+    vmgenid_read_guid(&measured);
-+    g_assert(memcmp(measured.data, expected.data, sizeof(measured.data)) == 0);
-+}
-+
-+static void vmgenid_set_guid_test(void)
-+{
-+    QDict *response;
-+    gchar *cmd;
-+    QemuUUID expected, measured;
-+    g_assert(qemu_uuid_parse(VGID_GUID, &expected) == 0);
-+    /* Change the GUID slightly */
-+    expected.data[0] += 1;
-+
-+    cmd = g_strdup_printf("{ 'execute': 'qom-set', 'arguments': { "
-+                   "'path': '/machine/peripheral/testvgid', "
-+                   "'property': 'guid', 'value': '%s' } }",
-+                   qemu_uuid_unparse_strdup(&expected));
-+    response = qmp(cmd);
-+    g_assert(qdict_haskey(response, "return"));
-+    QDECREF(response);
-+
-+    vmgenid_read_guid(&measured);
-+    g_assert(memcmp(measured.data, expected.data, sizeof(measured.data)) == 0);
-+}
-+
-+static void vmgenid_set_guid_auto_test(void)
-+{
-+    QDict *response;
-+    QemuUUID expected, measured;
-+
-+    /* Read the initial value */
-+    vmgenid_read_guid(&expected);
-+
-+    /* Setting to 'auto' generates a random GUID */
-+    response = qmp("{ 'execute': 'qom-set', 'arguments': { "
-+                   "'path': '/machine/peripheral/testvgid', "
-+                   "'property': 'guid', 'value': 'auto' } }");
-+
-+    g_assert(qdict_haskey(response, "return"));
-+    QDECREF(response);
-+
-+    vmgenid_read_guid(&measured);
-+    g_assert(memcmp(measured.data, expected.data, sizeof(measured.data)) != 0);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    int ret;
-+    gchar *cmd;
-+
-+    g_test_init(&argc, &argv, NULL);
-+
-+    cmd = g_strdup_printf("-machine accel=tcg -device vmgenid,id=testvgid,"
-+                          "guid=%s", VGID_GUID);
-+    qtest_start(cmd);
-+    qtest_add_func("/vmgenid/vmgenid", vmgenid_test);
-+    qtest_add_func("/vmgenid/vmgenid/set-guid", vmgenid_set_guid_test);
-+    qtest_add_func("/vmgenid/vmgenid/set-guid-auto",
-+                   vmgenid_set_guid_auto_test);
-+    ret = g_test_run();
-+
-+    qtest_end();
-+
-+    return ret;
-+}
+ void bios_linker_loader_cleanup(BIOSLinker *linker);
+ #endif
 -- 
 2.7.4
