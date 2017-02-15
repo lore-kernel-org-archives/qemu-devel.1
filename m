@@ -1,45 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cdyid-0007vD-I9
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 07:30:00 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cdyjn-0000Kr-MB
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 07:31:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cdyia-0005eS-EJ
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 07:29:59 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35761
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1cdyia-0005eJ-7H
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 07:29:56 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1FCSfbE090251
-	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 07:29:55 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28mjx7hu4v-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 07:29:54 -0500
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Wed, 15 Feb 2017 12:29:52 -0000
-References: <1484727757-41240-1-git-send-email-arei.gonglei@huawei.com>
-	<1484727757-41240-2-git-send-email-arei.gonglei@huawei.com>
-	<20170203103316.GA29200@stefanha-x1.localdomain>
-	<20170203173607-mutt-send-email-mst@kernel.org>
-	<1fdc2663-2090-9e19-5ea9-1f5b8eef4eb1@linux.vnet.ibm.com>
-	<20170213134149.GB10361@stefanha-x1.localdomain>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Wed, 15 Feb 2017 13:28:53 +0100
+	(envelope-from <no-reply@patchew.org>) id 1cdyjm-00068q-E4
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 07:31:11 -0500
+Resent-Message-Id: <E1cdyjm-00068q-E4@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <1487161136-9018-1-git-send-email-armbru@redhat.com>
+Message-ID: <148716185256.114.12832429945301157779@eba24e3a0d7f>
 MIME-Version: 1.0
-In-Reply-To: <20170213134149.GB10361@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="ODgBf7fHe7S6893d8lsdLhkgV7OT4kduJ"
-Message-Id: <1fbe30cc-87ec-32bc-4c57-85f9b03b3034@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v16 1/2] virtio-crypto: Add virtio crypto
- device specification
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 15 Feb 2017 04:30:53 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] hw: Deprecate unwanted use -drive
+ if=scsi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,123 +24,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, weidong.huang@huawei.com, qemu-devel@nongnu.org, john.griffin@intel.com, jianjay.zhou@huawei.com, Varun.Sethi@freescale.com, denglingli@chinamobile.com, arei.gonglei@hotmail.com, virtio-dev@lists.oasis-open.org, agraf@suse.de, Gonglei <arei.gonglei@huawei.com>, nmorey@kalray.eu, longpeng2@huawei.com, vincent.jardin@6wind.com, Ola.Liljedahl@arm.com, luonengjun@huawei.com, xin.zeng@intel.com, liang.j.ma@intel.com, stefanha@redhat.com, cornelia.huck@de.ibm.com, Jani.Kokkonen@huawei.com, brian.a.keating@intel.com, claudio.fontana@huawei.com, mike.caraman@nxp.com, wu.wubin@huawei.com
+To: armbru@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, peter.maydell@linaro.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ODgBf7fHe7S6893d8lsdLhkgV7OT4kduJ
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, weidong.huang@huawei.com,
- qemu-devel@nongnu.org, john.griffin@intel.com, jianjay.zhou@huawei.com,
- Varun.Sethi@freescale.com, denglingli@chinamobile.com,
- arei.gonglei@hotmail.com, virtio-dev@lists.oasis-open.org, agraf@suse.de,
- Gonglei <arei.gonglei@huawei.com>, nmorey@kalray.eu, longpeng2@huawei.com,
- vincent.jardin@6wind.com, Ola.Liljedahl@arm.com, luonengjun@huawei.com,
- xin.zeng@intel.com, liang.j.ma@intel.com, stefanha@redhat.com,
- cornelia.huck@de.ibm.com, Jani.Kokkonen@huawei.com,
- brian.a.keating@intel.com, claudio.fontana@huawei.com, mike.caraman@nxp.com,
- wu.wubin@huawei.com
-Message-ID: <1fbe30cc-87ec-32bc-4c57-85f9b03b3034@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v16 1/2] virtio-crypto: Add virtio crypto
- device specification
-References: <1484727757-41240-1-git-send-email-arei.gonglei@huawei.com>
- <1484727757-41240-2-git-send-email-arei.gonglei@huawei.com>
- <20170203103316.GA29200@stefanha-x1.localdomain>
- <20170203173607-mutt-send-email-mst@kernel.org>
- <1fdc2663-2090-9e19-5ea9-1f5b8eef4eb1@linux.vnet.ibm.com>
- <20170213134149.GB10361@stefanha-x1.localdomain>
-In-Reply-To: <20170213134149.GB10361@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-
-
-
-On 02/13/2017 02:41 PM, Stefan Hajnoczi wrote:
-> On Fri, Feb 03, 2017 at 07:07:02PM +0100, Halil Pasic wrote:
->>
->>
->> On 02/03/2017 04:37 PM, Michael S. Tsirkin wrote:
->>> On Fri, Feb 03, 2017 at 10:33:16AM +0000, Stefan Hajnoczi wrote:
->>>>> +\begin{description}
->>>>> +\item[0] dataq1
->>>>> +\item[\ldots]
->>>>> +\item[N-1] dataqN
->>>>> +\item[N] controlq
->>>>> +\end{description}
->>>>> +
->>>>> +N is set by \field{max_dataqueues}.
->>>>> +
->>>>> +\subsection{Feature bits}\label{sec:Device Types / Crypto Device /=
- Feature bits}
->>>>> +
->>>>> +VIRTIO_CRYPTO_F_NON_SESSION_MODE (0) non-session mode is available=
-=2E
->>>>> +VIRTIO_CRYPTO_F_CIPHER_NON_SESSION_MODE (1) non-session mode is av=
-ailable for CIPHER service.
->>>>> +VIRTIO_CRYPTO_F_HASH_NON_SESSION_MODE (2) non-session mode is avai=
-lable for HASH service.
->>>>> +VIRTIO_CRYPTO_F_MAC_NON_SESSION_MODE (3) non-session mode is avail=
-able for MAC service.
->>>>> +VIRTIO_CRYPTO_F_AEAD_NON_SESSION_MODE (4) non-session mode is avai=
-lable for AEAD service.
->>>>
->>>> Bits 1-4 require bit 0.  Is bit 0 necessary at all?  Or may bits 1-4=
- can
->>>> be eliminated in favor of just bit 0.
->>>
->>> Too late to change it as QEMU released a device with that feature.
-                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
->>>
->>
->> When was this introduced to QEMU? Can't find it in current master
->> and I do not remember seeing the patches.
->=20
-> s/QEMU/Linux/
->=20
-> It's in drivers/crypto/virtio/.
->=20
-
-
-Thanks! Sorry but I could not find the NON_SESSION_MODE in Linus master
-(Linux) either, and Michael has stated that a QEMU device was released
-with these. I'm still confused. But if it's only Linux, it most likely is=
-
-not interface, so theoretically should not break anything if we change it=
-
--- should we want to change it.
-
-I think your original questions regarding these feature bits are valid
-(and have not been addressed in a satisfactory way yet) by the way.
-
-Halil
-
-
-
-
-
-
---ODgBf7fHe7S6893d8lsdLhkgV7OT4kduJ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.14 (GNU/Linux)
-
-iQIcBAEBAgAGBQJYpEm2AAoJEA0vhuyXGx0AhXUQALiT+qUGBdrPEjUQiZh1uWA5
-5gkAVPWc9u7zkjUmBBmzLxdPgRvtrXfGgv3eyJgWD1p5fJVSfD0vlBlI9MwrIpvT
-hX1RYfuSa/Nb9dQVT3pZFHCaM/LWJp5N5U3nc2WfEP2lIw3D6K70E8AN6sfvWVZq
-l2ZE9XC75IlN4kEGfCM7jmqOeYfOwNe5ig03Ci81c4uodGH+IQg+iDtB7+Ra+qBb
-Z5dMNVZzM1JnxAxjMJHZKJQSklR5Ds3EOD0Dud2fT0h0jI1ZB8QfSkC8f3TlgyFF
-A5YTWtEqw3w9ZIlOxzhJJAvSeNAfgudnooMYNxBSfSuW/MxhSPkNYIVG+uTAzZWy
-pAtC1lGVkoHICZ4yYW2+fBMbdeEKLjnqospFpYQPKxJ9lqn0fVgPxd2e72+g2p9F
-9Yemg36zHOG1KRQud+ijRriNPVIMGqTKlDWAal44cNuPclDn9xlaEfNBZO33ktEb
-NDuqoevG8FMTEl3McAtkbgcao/4qJa8B8SENKAFAjCXDqXj/zinT1nKB07irJX4V
-cQHk7W+GPw0ODsxF6d12Ln/CJINASE10b3G202Y7q7H+fqFpgdDNT0Ew8eCw2iFS
-RSuMqZ9OwdBhzxCPSYcd4DiBNGQyohZ/M+0eSML4+wCrIh5ks88YqPWZ7Dn6EnzR
-e6kStShXjJRNPzT7cxLw
-=itQc
------END PGP SIGNATURE-----
-
---ODgBf7fHe7S6893d8lsdLhkgV7OT4kduJ--
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCB2MiAwLzNdIGh3OiBEZXByZWNhdGUgdW53YW50ZWQgdXNlIC1kcml2ZSBp
+Zj1zY3NpCk1lc3NhZ2UtaWQ6IDE0ODcxNjExMzYtOTAxOC0xLWdpdC1zZW5kLWVtYWlsLWFybWJy
+dUByZWRoYXQuY29tClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
+aW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4g
+fCB3YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2Nh
+bCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVl
+Cgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3Ig
+YyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChn
+aXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZv
+cm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgog
+ICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoK
+ZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMy
+MWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3Bh
+dGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTQ4NzE2MTEz
+Ni05MDE4LTEtZ2l0LXNlbmQtZW1haWwtYXJtYnJ1QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8xNDg3
+MTYxMTM2LTkwMTgtMS1naXQtc2VuZC1lbWFpbC1hcm1icnVAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0
+byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjgxZjM3ZTUgaHcvaTM4NjogRGVwcmVjYXRlIC1kcml2ZSBp
+Zj1zY3NpIHdpdGggUEMgbWFjaGluZSB0eXBlcwplMDBlYmU1IGh3OiBEZXByZWNhdGUgLWRyaXZl
+IGlmPXNjc2kgd2l0aCBub24tb25ib2FyZCBIQkFzCmFiMGUxODMgaHcvc2NzaTogQ29uY2VudHJh
+dGUgLWRyaXZlIGlmPXNjc2kgYXV0by1jcmVhdGUgaW4gb25lIHBsYWNlCgo9PT0gT1VUUFVUIEJF
+R0lOID09PQpDaGVja2luZyBQQVRDSCAxLzM6IGh3L3Njc2k6IENvbmNlbnRyYXRlIC1kcml2ZSBp
+Zj1zY3NpIGF1dG8tY3JlYXRlIGluIG9uZSBwbGFjZS4uLgpDaGVja2luZyBQQVRDSCAyLzM6IGh3
+OiBEZXByZWNhdGUgLWRyaXZlIGlmPXNjc2kgd2l0aCBub24tb25ib2FyZCBIQkFzLi4uCkNoZWNr
+aW5nIFBBVENIIDMvMzogaHcvaTM4NjogRGVwcmVjYXRlIC1kcml2ZSBpZj1zY3NpIHdpdGggUEMg
+bWFjaGluZSB0eXBlcy4uLgpFUlJPUjogSW52YWxpZCBVVEYtOCwgcGF0Y2ggYW5kIGNvbW1pdCBt
+ZXNzYWdlIHNob3VsZCBiZSBlbmNvZGVkIGluIFVURi04CiM3MDogRklMRTogdGVzdHMvcWVtdS1p
+b3Rlc3RzLzA1MS5wYy5vdXQ6MTIyOgorcRtbSxtbRHF1G1tLG1tEG1tEcXVpG1tLG1tEG1tEG1tE
+cXVpdBtbSwogIF4KCkVSUk9SOiBJbnZhbGlkIFVURi04LCBwYXRjaCBhbmQgY29tbWl0IG1lc3Nh
+Z2Ugc2hvdWxkIGJlIGVuY29kZWQgaW4gVVRGLTgKIzkwOiBGSUxFOiB0ZXN0cy9xZW11LWlvdGVz
+dHMvMDUxLnBjLm91dDoxNzg6CitxG1tLG1tEcXUbW0sbW0QbW0RxdWkbW0sbW0QbW0QbW0RxdWl0
+G1tLCiAgXgoKRVJST1I6IEludmFsaWQgVVRGLTgsIHBhdGNoIGFuZCBjb21taXQgbWVzc2FnZSBz
+aG91bGQgYmUgZW5jb2RlZCBpbiBVVEYtOAojMTAwOiBGSUxFOiB0ZXN0cy9xZW11LWlvdGVzdHMv
+MDUxLnBjLm91dDoxODg6CitxG1tLG1tEcXUbW0sbW0QbW0RxdWkbW0sbW0QbW0QbW0RxdWl0G1tL
+CiAgXgoKdG90YWw6IDMgZXJyb3JzLCAwIHdhcm5pbmdzLCA2MyBsaW5lcyBjaGVja2VkCgpZb3Vy
+IHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
+ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
+ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRl
+c3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRv
+bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5
+b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
