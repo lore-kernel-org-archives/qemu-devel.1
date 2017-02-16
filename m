@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ceTB3-0000EL-OP
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 16:01:22 -0500
+	(envelope-from <jsnow@redhat.com>) id 1ceTcc-0003Cs-W4
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 16:29:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ceTB0-0008GD-OJ
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 16:01:21 -0500
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:33645)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ceTB0-0008Fj-JJ
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 16:01:18 -0500
-Received: by mail-pf0-x244.google.com with SMTP id e4so2375287pfg.0
-	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 13:01:18 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170207005930.28327-1-laurent@vivier.eu>
-	<20170207005930.28327-16-laurent@vivier.eu>
-	<ca2f9cdf-c18c-bc8a-05a7-05b1d9748a48@twiddle.net>
-	<87poiiv3oz.fsf@linux-m68k.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <93272090-e43c-d877-bd2b-49bc19d7175b@twiddle.net>
-Date: Fri, 17 Feb 2017 08:01:10 +1100
+	(envelope-from <jsnow@redhat.com>) id 1ceTcb-0000DN-UR
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 16:29:51 -0500
+References: <1487153147-11530-1-git-send-email-armbru@redhat.com>
+	<1487153147-11530-8-git-send-email-armbru@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <6e41226a-e874-902c-c5f9-659ec8680273@redhat.com>
+Date: Thu, 16 Feb 2017 16:29:42 -0500
 MIME-Version: 1.0
-In-Reply-To: <87poiiv3oz.fsf@linux-m68k.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <1487153147-11530-8-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 15/16] target-m68k: add more FPU
- instructions
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 7/8] blockdev: Make
+ orphaned -drive fatal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,16 +24,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andreas Schwab <schwab@linux-m68k.org>
-Cc: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
-
-On 02/16/2017 09:18 PM, Andreas Schwab wrote:
-> There is no guarantee that the host long double has the same range and
-> precision as floatx80.
-
-Indeed not.  However, do you have another plan for implementing the 
-trancendentals?  I'm quite happy using the host long double libm as an 
-estimate.  Which is better than at least BasiliskII, which uses the host double.
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
 
-r~
+
+On 02/15/2017 05:05 AM, Markus Armbruster wrote:
+> Block backends defined with "-drive if=T" with T other than "none" are
+> meant to be picked up by machine initialization code: a suitable
+> frontend gets created and wired up automatically.
+> 
+> If machine initialization code doesn't comply, the block backend
+> remains unused.  This triggers a warning since commit a66c9dc, v2.2.0.
+> Drives created by default are exempted; use -nodefaults to get rid of
+> them.
+> 
+> Turn this warning into an error.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  blockdev.c                | 14 +++++++-------
+>  include/sysemu/blockdev.h |  2 +-
+>  2 files changed, 8 insertions(+), 8 deletions(-)
+> 
+> diff --git a/blockdev.c b/blockdev.c
+> index eb75f35..bbf9d4d 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -227,30 +227,30 @@ DriveInfo *drive_get(BlockInterfaceType type, int bus, int unit)
+>      return NULL;
+>  }
+>  
+> -bool drive_check_orphaned(void)
+> +void drive_check_orphaned(void)
+>  {
+>      BlockBackend *blk;
+>      DriveInfo *dinfo;
+>      Location loc;
+> -    bool rs = false;
+> +    bool orphans = false;
+>  
+>      for (blk = blk_next(NULL); blk; blk = blk_next(blk)) {
+>          dinfo = blk_legacy_dinfo(blk);
+> -        /* If dinfo->bdrv->dev is NULL, it has no device attached. */
+> -        /* Unless this is a default drive, this may be an oversight. */
+>          if (!blk_get_attached_dev(blk) && !dinfo->is_default &&
+>              dinfo->type != IF_NONE) {
+>              loc_push_none(&loc);
+>              qemu_opts_loc_restore(dinfo->opts);
+> -            error_report("warning: machine type does not support"
+> +            error_report("machine type does not support"
+>                           " if=%s,bus=%d,unit=%d",
+>                           if_name[dinfo->type], dinfo->bus, dinfo->unit);
+>              loc_pop(&loc);
+> -            rs = true;
+> +            orphans = true;
+>          }
+>      }
+>  
+> -    return rs;
+> +    if (orphans) {
+> +        exit(1);
+> +    }
+>  }
+>  
+>  DriveInfo *drive_get_by_index(BlockInterfaceType type, int index)
+> diff --git a/include/sysemu/blockdev.h b/include/sysemu/blockdev.h
+> index 351a039..ac22f2a 100644
+> --- a/include/sysemu/blockdev.h
+> +++ b/include/sysemu/blockdev.h
+> @@ -48,7 +48,7 @@ BlockBackend *blk_by_legacy_dinfo(DriveInfo *dinfo);
+>  void override_max_devs(BlockInterfaceType type, int max_devs);
+>  
+>  DriveInfo *drive_get(BlockInterfaceType type, int bus, int unit);
+> -bool drive_check_orphaned(void);
+> +void drive_check_orphaned(void);
+>  DriveInfo *drive_get_by_index(BlockInterfaceType type, int index);
+>  int drive_get_max_bus(BlockInterfaceType type);
+>  int drive_get_max_devs(BlockInterfaceType type);
+> 
+
+6,7:
+
+Reviewed-by: John Snow <jsnow@redhat.com>
