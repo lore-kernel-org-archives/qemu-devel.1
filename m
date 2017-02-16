@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cePas-0003rP-IZ
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:11:47 -0500
+	(envelope-from <lersek@redhat.com>) id 1cePcl-0006jI-5r
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:13:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cePao-0005dy-KA
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:11:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45082)
+	(envelope-from <lersek@redhat.com>) id 1cePch-0006vk-JD
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:13:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47024)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cePao-0005di-F0
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:11:42 -0500
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cePch-0006v6-Cx
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:13:39 -0500
 References: <cover.1487224954.git.ben@skyportsystems.com>
-	<625570854359178b416000644f68695bc50630ae.1487224954.git.ben@skyportsystems.com>
+	<e6d8ee835048d5dcae9375e568615eb5a20c2cc2.1487224954.git.ben@skyportsystems.com>
 From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <68730a47-a8fc-bfde-75e6-5a4f237cf89f@redhat.com>
-Date: Thu, 16 Feb 2017 18:11:39 +0100
+Message-ID: <3221aceb-1400-d37d-bbda-923f464bc405@redhat.com>
+Date: Thu, 16 Feb 2017 18:13:36 +0100
 MIME-Version: 1.0
-In-Reply-To: <625570854359178b416000644f68695bc50630ae.1487224954.git.ben@skyportsystems.com>
+In-Reply-To: <e6d8ee835048d5dcae9375e568615eb5a20c2cc2.1487224954.git.ben@skyportsystems.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 4/8] ACPI: Add Virtual Machine
- Generation ID support
+Subject: Re: [Qemu-devel] [PATCH v7 5/8] qmp/hmp: add query-vm-generation-id
+ and 'info vm-generation-id' commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,34 +32,34 @@ To: ben@skyportsystems.com, qemu-devel@nongnu.org
 Cc: mst@redhat.com, imammedo@redhat.com
 
 On 02/16/17 07:18, ben@skyportsystems.com wrote:
-> From: Ben Warren <ben@skyportsystems.com>
+> From: Igor Mammedov <imammedo@redhat.com>
 > 
-> This implements the VM Generation ID feature by passing a 128-bit
-> GUID to the guest via a fw_cfg blob.
-> Any time the GUID changes, an ACPI notify event is sent to the guest
+> Add commands to query Virtual Machine Generation ID counter.
 > 
-> The user interface is a simple device with one parameter:
->  - guid (string, must be "auto" or in UUID format
->    xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+> QMP command example:
+>     { "execute": "query-vm-generation-id" }
 > 
+> HMP command example:
+>     info vm-generation-id
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 > Signed-off-by: Ben Warren <ben@skyportsystems.com>
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 > ---
->  default-configs/i386-softmmu.mak     |   1 +
->  default-configs/x86_64-softmmu.mak   |   1 +
->  hw/acpi/Makefile.objs                |   1 +
->  hw/acpi/vmgenid.c                    | 239 +++++++++++++++++++++++++++++++++++
->  hw/i386/acpi-build.c                 |  16 +++
->  include/hw/acpi/acpi_dev_interface.h |   1 +
->  include/hw/acpi/vmgenid.h            |  35 +++++
->  7 files changed, 294 insertions(+)
->  create mode 100644 hw/acpi/vmgenid.c
->  create mode 100644 include/hw/acpi/vmgenid.h
+>  hmp-commands-info.hx | 14 ++++++++++++++
+>  hmp.c                |  9 +++++++++
+>  hmp.h                |  1 +
+>  hw/acpi/vmgenid.c    | 16 ++++++++++++++++
+>  qapi-schema.json     | 20 ++++++++++++++++++++
+>  stubs/Makefile.objs  |  1 +
+>  stubs/vmgenid.c      |  9 +++++++++
+>  7 files changed, 70 insertions(+)
+>  create mode 100644 stubs/vmgenid.c
 
-I compared this version against v6. It looks good. I also tested it
-(with the fixup I mentioned under v7 1/8, and without live migration).
+I tested the "info vm-generation-id" command via HMP.
 
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 Tested-by: Laszlo Ersek <lersek@redhat.com>
 
-Thanks
+Thanks,
 Laszlo
