@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ceIQ9-00020B-VZ
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:32:15 -0500
+	(envelope-from <berrange@redhat.com>) id 1ceIRH-0002VA-7w
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:33:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ceIQ6-0004Al-LW
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:32:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34804)
+	(envelope-from <berrange@redhat.com>) id 1ceIRF-0004Zj-5B
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:33:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44206)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ceIQ6-0004Aa-DA
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:32:10 -0500
-Date: Thu, 16 Feb 2017 09:32:03 +0000
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ceIRE-0004Z6-TP
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:33:21 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 18C0A4E339
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 09:33:21 +0000 (UTC)
+Date: Thu, 16 Feb 2017 09:33:16 +0000
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170216093203.GA7346@redhat.com>
+Message-ID: <20170216093316.GB7346@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170215182732.GN24672@redhat.com>
-	<5ae6dee4-779b-7073-4192-21554b8a2b62@redhat.com>
+References: <20170215182732.GN24672@redhat.com> <20170215233651.GA30794@vader>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <5ae6dee4-779b-7073-4192-21554b8a2b62@redhat.com>
+In-Reply-To: <20170215233651.GA30794@vader>
 Subject: Re: [Qemu-devel] RFC: How to make seccomp reliable and useful ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,11 +33,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Otubo <eduardo.otubo@profitbricks.com>
+To: qemu-devel@nongnu.org, pmoore@redhat.com
 
-On Thu, Feb 16, 2017 at 09:38:59AM +0100, Thomas Huth wrote:
-> On 15.02.2017 19:27, Daniel P. Berrange wrote:
+On Thu, Feb 16, 2017 at 12:36:51AM +0100, Eduardo Otubo wrote:
+> On Wed, Feb 15, 2017 at 06=27=32PM +0000, Daniel P. Berrange wrote:
 > > The current impl of seccomp in QEMU is intentionally allowing a huge range
 > > of system calls to be executed. The goal was that running '-sandbox on'
 > > should never break any feature of QEMU, so naturally any syscall that can
@@ -121,6 +125,7 @@ On Thu, Feb 16, 2017 at 09:38:59AM +0100, Thomas Huth wrote:
 > > At this point we have a highly reliable "-sandbox on" which we're not having
 > > to constantly patch.
 > > 
+> > 
 > > From here we need a way to allow a user to opt-in to more restrictive policies,
 > > accepting that it will block certain features. For example, there should be a
 > > a way to disable any means to elevate privileges from QEMU or things it spawns.
@@ -141,21 +146,53 @@ On Thu, Feb 16, 2017 at 09:38:59AM +0100, Thomas Huth wrote:
 > > process affinity, schedular priority, etc. Some uses of QEMU might need them,
 > > but normally such controls are left to the mgmt app above QEMU to set prior to
 > > the exec() of QEMU.
+> > 
+> > 
+> > 
+> > The key is that these are *not* low level knobs controlling system calls, but
+> > moderately high level knobs controlling general concepts. This is a high enough
+> > level of abstraction to enable libvirt to automatically turn them on/off based
+> > on guest config, without libvirt having to know anything detailed about QEMU
+> > code impl for the features.
+> > 
+> > 
+> > Finally, for avoidance of doubt, I'm *not* actually proposing to implement this
+> > myself any time in the forseeable future. This mail came about from the fact
+> > that many people have questioned whether current seccomp code is anything other
+> > than "security theatre". I tend to agree with such an assessment myself, and was
+> > initially intending to just send a patch to remove seccomp, to stimulate some
+> > discussion. Instead, however, I decided to write this mail to see if we can
+> > identify a way forward to make seccomp both reliable and useful. If QEMU had the
+> > kind of approach outlined above, with a default blacklist instead of whitelist,
+> > and some opt-ins for stricter lists, it is something I think libvirt would be
+> > reasonably happy to enable out of the box. That would be a step forward from
+> > today where libvirt would never consider turning seccomp on by default.
+> > 
+> > Perhaps this re-working could be a GSoC idea for some interested student...
+> > 
 > 
-> I like your proposal! I just wanted to add an idea for an additional
-> parameter (not sure whether it is feasible, though): Something like
-> "-sandbox on,network=off" ... i.e. forbid all system calls that are used
-> for networking. Rationale: Sometimes your VM does not need any
-> networking, and you want to make sure that a malicious guest can also
-> not reach your local network in that case.
+> I'm not a student, thus not eligible GSoC person but I would be more
+> than grateful to take this initiative of yours and transform into some
+> patches so we can make this feature something really useful and
+> reliable.
 
-This is pretty tricky. Even if there is not obviously configured network
-backend in QEMU, there's plenty of scope for things in libraries to
-be using networking. Something want a fully qualified hostname ? That'll
-trigger UDP / TCP connections to a DNS resolver. Running with the SDL
-or GTK display frontends - those use networking over UNIX sockets to
-talk to a display server. Linked to glib2 ? That'll connect to DConf
-over DBus UNIX socket in the background. etc
+Sure, I just threw GSoC out there as one possible idea. If you or anyone
+else has time to work on it, that's great too.
+
+> Perhaps now is not the right time to terse comments on every idea you
+> gave, I agree with most of them. I wrote the whole implementation of
+> this feature but actually became the maintainer because people approving
+> sycalls and sending pull-requests were too busy, and I could do it. But
+> to be completely honest I had few poor ideas on how to improve it and
+> almost no time to actually do it in the past. Time passed by and all I
+> did was approve new syscalls and turn them into pull-requests.
+> 
+> Let's spin up these ideas and hopefully incorporate into Qemu. Next step
+> I'm gonna dig into every topic and draft a little more. I guess we can
+> keep on this thread, or perhaps in separate ones. From there I can start
+> to write some code.
+
+ok
 
 Regards,
 Daniel
