@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ceEaL-0006i6-HJ
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 00:26:30 -0500
+	(envelope-from <yi.l.liu@intel.com>) id 1ceEjp-0002OC-6x
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 00:36:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ceEaI-0005YG-FB
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 00:26:29 -0500
-Received: from szxga03-in.huawei.com ([119.145.14.66]:48000)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ceEaH-0005Xg-S9
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 00:26:26 -0500
-References: <1487147657-166092-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1487147657-166092-4-git-send-email-zhang.zhanghailiang@huawei.com>
-	<4867fec3-cf63-8148-90ef-35e4da958c89@cn.fujitsu.com>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <58A537DC.4040604@huawei.com>
-Date: Thu, 16 Feb 2017 13:25:48 +0800
+	(envelope-from <yi.l.liu@intel.com>) id 1ceEjm-00014f-2W
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 00:36:17 -0500
+Received: from mga05.intel.com ([192.55.52.43]:42428)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1ceEjl-00013K-OC
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 00:36:14 -0500
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+Date: Thu, 16 Feb 2017 05:36:06 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743900AAEF@shsmsx102.ccr.corp.intel.com>
+References: <1484026704-28027-1-git-send-email-mst@redhat.com>
+	<1484026704-28027-9-git-send-email-mst@redhat.com>
+In-Reply-To: <1484026704-28027-9-git-send-email-mst@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <4867fec3-cf63-8148-90ef-35e4da958c89@cn.fujitsu.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/5] colo-compare: release all unhandled
- packets in finalize function
+Subject: Re: [Qemu-devel] [PULL 08/41] intel_iommu: support device iotlb
+ descriptor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +29,290 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, jasowang@redhat.com, lizhijian@cn.fujitsu.com
-Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, pss.wulizhen@huawei.com
+To: "Michael S. Tsirkin" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Jason Wang <jasowang@redhat.com>, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Tian, Kevin" <kevin.tian@intel.com>, "Lan, Tianyu" <tianyu.lan@intel.com>
 
+> -----Original Message-----
+> From: Qemu-devel [mailto:qemu-devel-bounces+yi.l.liu=3Dintel.com@nongnu.o=
+rg]
+> On Behalf Of Michael S. Tsirkin
+> Sent: Tuesday, January 10, 2017 1:40 PM
+> To: qemu-devel@nongnu.org
+> Cc: Peter Maydell <peter.maydell@linaro.org>; Eduardo Habkost
+> <ehabkost@redhat.com>; Jason Wang <jasowang@redhat.com>; Peter Xu
+> <peterx@redhat.com>; Paolo Bonzini <pbonzini@redhat.com>; Richard
+> Henderson <rth@twiddle.net>
+> Subject: [Qemu-devel] [PULL 08/41] intel_iommu: support device iotlb
+> descriptor
+>=20
+> From: Jason Wang <jasowang@redhat.com>
+>=20
+> This patch enables device IOTLB support for intel iommu. The major work i=
+s to
+> implement QI device IOTLB descriptor processing and notify the device thr=
+ough
+> iommu notifier.
+>
+Hi Jason/Michael,
+=09
+Recently Peter Xu's patch also touched intel-iommu emulation. His patch sha=
+dows
+second-level page table by capturing iotlb flush from guest. It would resul=
+t in page
+table updating in host. Does this patch also use the same map/umap API prov=
+ided
+by VFIO? If it is, then I think it would also update page table in host. It=
+ looks to be
+a duplicate update. Pls refer to the following snapshot captured from secti=
+on 6.5.2.5
+of vtd spec.=20
 
-On 2017/2/16 10:27, Zhang Chen wrote:
->
->
-> On 02/15/2017 04:34 PM, zhanghailiang wrote:
->> We should release all unhandled packets before finalize colo compare.
->> Besides, we need to free connection_track_table, or there will be
->> a memory leak bug.
->>
->> Signed-off-by: zhanghailiang<zhang.zhanghailiang@huawei.com>
->> ---
->>    net/colo-compare.c | 20 ++++++++++++++++++++
->>    1 file changed, 20 insertions(+)
->>
->> diff --git a/net/colo-compare.c b/net/colo-compare.c
->> index a16e2d5..809bad3 100644
->> --- a/net/colo-compare.c
->> +++ b/net/colo-compare.c
->> @@ -676,6 +676,23 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
->>        return;
->>    }
->>
->
-> This function in my patch "colo-compare and filter-rewriter work with
-> colo-frame "
-> Named 'colo_flush_connection', I think use 'flush' instead of 'release'
-> is better,
->
+"Since translation requests from a device may be serviced by hardware from =
+the IOTLB, software must
+always request IOTLB invalidation (iotlb_inv_dsc) before requesting corresp=
+onding Device-TLB
+(dev_tlb_inv_dsc) invalidation."
 
-OK, i will fix it in next version, thanks.
+Maybe for device-iotlb, we need a separate API which just pass down the inv=
+alidate
+info without updating page table. Any thoughts?
 
-> Thanks
-> Zhang Chen
->
->
->> +static void colo_release_packets(void *opaque, void *user_data)
->> +{
->> +    CompareState *s = user_data;
->> +    Connection *conn = opaque;
->> +    Packet *pkt = NULL;
->> +
->> +    while (!g_queue_is_empty(&conn->primary_list)) {
->> +        pkt = g_queue_pop_head(&conn->primary_list);
->> +        compare_chr_send(&s->chr_out, pkt->data, pkt->size);
->> +        packet_destroy(pkt, NULL);
->> +    }
->> +    while (!g_queue_is_empty(&conn->secondary_list)) {
->> +        pkt = g_queue_pop_head(&conn->secondary_list);
->> +        packet_destroy(pkt, NULL);
->> +    }
->> +}
->> +
->>    static void colo_compare_class_init(ObjectClass *oc, void *data)
->>    {
->>        UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
->> @@ -707,9 +724,12 @@ static void colo_compare_finalize(Object *obj)
->>        g_main_loop_quit(s->compare_loop);
->>        qemu_thread_join(&s->thread);
->>
->> +    /* Release all unhandled packets after compare thead exited */
->> +    g_queue_foreach(&s->conn_list, colo_release_packets, s);
->>
->>        g_queue_free(&s->conn_list);
->>
->> +    g_hash_table_destroy(s->connection_track_table);
->>        g_free(s->pri_indev);
->>        g_free(s->sec_indev);
->>        g_free(s->outdev);
->
+Thanks,
+Yi L
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> Reviewed-by: Peter Xu <peterx@redhat.com>
+> ---
+>  hw/i386/intel_iommu_internal.h | 13 ++++++-
+>  include/hw/i386/x86-iommu.h    |  1 +
+>  hw/i386/intel_iommu.c          | 83
+> +++++++++++++++++++++++++++++++++++++++---
+>  hw/i386/x86-iommu.c            | 17 +++++++++
+>  4 files changed, 107 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/hw/i386/intel_iommu_internal.h
+> b/hw/i386/intel_iommu_internal.h index 11abfa2..356f188 100644
+> --- a/hw/i386/intel_iommu_internal.h
+> +++ b/hw/i386/intel_iommu_internal.h
+> @@ -183,6 +183,7 @@
+>  /* (offset >> 4) << 8 */
+>  #define VTD_ECAP_IRO                (DMAR_IOTLB_REG_OFFSET << 4)
+>  #define VTD_ECAP_QI                 (1ULL << 1)
+> +#define VTD_ECAP_DT                 (1ULL << 2)
+>  /* Interrupt Remapping support */
+>  #define VTD_ECAP_IR                 (1ULL << 3)
+>  #define VTD_ECAP_EIM                (1ULL << 4)
+> @@ -326,6 +327,7 @@ typedef union VTDInvDesc VTDInvDesc;
+>  #define VTD_INV_DESC_TYPE               0xf
+>  #define VTD_INV_DESC_CC                 0x1 /* Context-cache Invalidate =
+Desc */
+>  #define VTD_INV_DESC_IOTLB              0x2
+> +#define VTD_INV_DESC_DEVICE             0x3
+>  #define VTD_INV_DESC_IEC                0x4 /* Interrupt Entry Cache
+>                                                 Invalidate Descriptor */
+>  #define VTD_INV_DESC_WAIT               0x5 /* Invalidation Wait Descrip=
+tor */
+> @@ -361,6 +363,13 @@ typedef union VTDInvDesc VTDInvDesc;
+>  #define VTD_INV_DESC_IOTLB_RSVD_LO      0xffffffff0000ff00ULL
+>  #define VTD_INV_DESC_IOTLB_RSVD_HI      0xf80ULL
+>=20
+> +/* Mask for Device IOTLB Invalidate Descriptor */ #define
+> +VTD_INV_DESC_DEVICE_IOTLB_ADDR(val) ((val) & 0xfffffffffffff000ULL)
+> +#define VTD_INV_DESC_DEVICE_IOTLB_SIZE(val) ((val) & 0x1) #define
+> +VTD_INV_DESC_DEVICE_IOTLB_SID(val) (((val) >> 32) & 0xFFFFULL) #define
+> +VTD_INV_DESC_DEVICE_IOTLB_RSVD_HI 0xffeULL #define
+> +VTD_INV_DESC_DEVICE_IOTLB_RSVD_LO 0xffff0000ffe0fff8
+> +
+>  /* Information about page-selective IOTLB invalidate */  struct
+> VTDIOTLBPageInvInfo {
+>      uint16_t domain_id;
+> @@ -399,8 +408,8 @@ typedef struct VTDRootEntry VTDRootEntry;
+>  #define VTD_CONTEXT_ENTRY_FPD       (1ULL << 1) /* Fault Processing Disa=
+ble
+> */
+>  #define VTD_CONTEXT_ENTRY_TT        (3ULL << 2) /* Translation Type */
+>  #define VTD_CONTEXT_TT_MULTI_LEVEL  0
+> -#define VTD_CONTEXT_TT_DEV_IOTLB    1
+> -#define VTD_CONTEXT_TT_PASS_THROUGH 2
+> +#define VTD_CONTEXT_TT_DEV_IOTLB    (1ULL << 2)
+> +#define VTD_CONTEXT_TT_PASS_THROUGH (2ULL << 2)
+>  /* Second Level Page Translation Pointer*/
+>  #define VTD_CONTEXT_ENTRY_SLPTPTR   (~0xfffULL)
+>  #define VTD_CONTEXT_ENTRY_RSVD_LO   (0xff0ULL | ~VTD_HAW_MASK)
+> diff --git a/include/hw/i386/x86-iommu.h b/include/hw/i386/x86-iommu.h
+> index 0c89d98..361c07c 100644
+> --- a/include/hw/i386/x86-iommu.h
+> +++ b/include/hw/i386/x86-iommu.h
+> @@ -73,6 +73,7 @@ typedef struct IEC_Notifier IEC_Notifier;  struct
+> X86IOMMUState {
+>      SysBusDevice busdev;
+>      bool intr_supported;        /* Whether vIOMMU supports IR */
+> +    bool dt_supported;          /* Whether vIOMMU supports DT */
+>      IommuType type;             /* IOMMU type - AMD/Intel     */
+>      QLIST_HEAD(, IEC_Notifier) iec_notifiers; /* IEC notify list */  }; =
+diff --git
+> a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c index e39b764..ec62239
+> 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -738,11 +738,18 @@ static int
+> vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
+>                      "context-entry hi 0x%"PRIx64 " lo 0x%"PRIx64,
+>                      ce->hi, ce->lo);
+>          return -VTD_FR_CONTEXT_ENTRY_INV;
+> -    } else if (ce->lo & VTD_CONTEXT_ENTRY_TT) {
+> -        VTD_DPRINTF(GENERAL, "error: unsupported Translation Type in "
+> -                    "context-entry hi 0x%"PRIx64 " lo 0x%"PRIx64,
+> -                    ce->hi, ce->lo);
+> -        return -VTD_FR_CONTEXT_ENTRY_INV;
+> +    } else {
+> +        switch (ce->lo & VTD_CONTEXT_ENTRY_TT) {
+> +        case VTD_CONTEXT_TT_MULTI_LEVEL:
+> +            /* fall through */
+> +        case VTD_CONTEXT_TT_DEV_IOTLB:
+> +            break;
+> +        default:
+> +            VTD_DPRINTF(GENERAL, "error: unsupported Translation Type in=
+ "
+> +                        "context-entry hi 0x%"PRIx64 " lo 0x%"PRIx64,
+> +                        ce->hi, ce->lo);
+> +            return -VTD_FR_CONTEXT_ENTRY_INV;
+> +        }
+>      }
+>      return 0;
+>  }
+> @@ -1438,7 +1445,61 @@ static bool
+> vtd_process_inv_iec_desc(IntelIOMMUState *s,
+>      vtd_iec_notify_all(s, !inv_desc->iec.granularity,
+>                         inv_desc->iec.index,
+>                         inv_desc->iec.index_mask);
+> +    return true;
+> +}
+> +
+> +static bool vtd_process_device_iotlb_desc(IntelIOMMUState *s,
+> +                                          VTDInvDesc *inv_desc) {
+> +    VTDAddressSpace *vtd_dev_as;
+> +    IOMMUTLBEntry entry;
+> +    struct VTDBus *vtd_bus;
+> +    hwaddr addr;
+> +    uint64_t sz;
+> +    uint16_t sid;
+> +    uint8_t devfn;
+> +    bool size;
+> +    uint8_t bus_num;
+> +
+> +    addr =3D VTD_INV_DESC_DEVICE_IOTLB_ADDR(inv_desc->hi);
+> +    sid =3D VTD_INV_DESC_DEVICE_IOTLB_SID(inv_desc->lo);
+> +    devfn =3D sid & 0xff;
+> +    bus_num =3D sid >> 8;
+> +    size =3D VTD_INV_DESC_DEVICE_IOTLB_SIZE(inv_desc->hi);
+> +
+> +    if ((inv_desc->lo & VTD_INV_DESC_DEVICE_IOTLB_RSVD_LO) ||
+> +        (inv_desc->hi & VTD_INV_DESC_DEVICE_IOTLB_RSVD_HI)) {
+> +        VTD_DPRINTF(GENERAL, "error: non-zero reserved field in Device "
+> +                    "IOTLB Invalidate Descriptor hi 0x%"PRIx64 " lo 0x%"=
+PRIx64,
+> +                    inv_desc->hi, inv_desc->lo);
+> +        return false;
+> +    }
+> +
+> +    vtd_bus =3D vtd_find_as_from_bus_num(s, bus_num);
+> +    if (!vtd_bus) {
+> +        goto done;
+> +    }
+> +
+> +    vtd_dev_as =3D vtd_bus->dev_as[devfn];
+> +    if (!vtd_dev_as) {
+> +        goto done;
+> +    }
+> +
+> +    if (size) {
+> +        sz =3D 1 << (ctz64(~(addr | (VTD_PAGE_MASK_4K - 1))) + 1);
+> +        addr &=3D ~(sz - 1);
+> +    } else {
+> +        sz =3D VTD_PAGE_SIZE;
+> +    }
+>=20
+> +    entry.target_as =3D &vtd_dev_as->as;
+> +    entry.addr_mask =3D sz - 1;
+> +    entry.iova =3D addr;
+> +    entry.perm =3D IOMMU_NONE;
+> +    entry.translated_addr =3D 0;
+> +    memory_region_notify_iommu(entry.target_as->root, entry);
+> +
+> +done:
+>      return true;
+>  }
+>=20
+> @@ -1490,6 +1551,14 @@ static bool vtd_process_inv_desc(IntelIOMMUState
+> *s)
+>          }
+>          break;
+>=20
+> +    case VTD_INV_DESC_DEVICE:
+> +        VTD_DPRINTF(INV, "Device IOTLB Invalidation Descriptor hi 0x%"PR=
+Ix64
+> +                    " lo 0x%"PRIx64, inv_desc.hi, inv_desc.lo);
+> +        if (!vtd_process_device_iotlb_desc(s, &inv_desc)) {
+> +            return false;
+> +        }
+> +        break;
+> +
+>      default:
+>          VTD_DPRINTF(GENERAL, "error: unkonw Invalidation Descriptor type=
+ "
+>                      "hi 0x%"PRIx64 " lo 0x%"PRIx64 " type %"PRIu8, @@ -2=
+415,6
+> +2484,10 @@ static void vtd_init(IntelIOMMUState *s)
+>          assert(s->intr_eim !=3D ON_OFF_AUTO_AUTO);
+>      }
+>=20
+> +    if (x86_iommu->dt_supported) {
+> +        s->ecap |=3D VTD_ECAP_DT;
+> +    }
+> +
+>      vtd_reset_context_cache(s);
+>      vtd_reset_iotlb(s);
+>=20
+> diff --git a/hw/i386/x86-iommu.c b/hw/i386/x86-iommu.c index
+> 2278af7..23dcd3f 100644
+> --- a/hw/i386/x86-iommu.c
+> +++ b/hw/i386/x86-iommu.c
+> @@ -106,6 +106,18 @@ static void x86_iommu_intremap_prop_set(Object *o,
+> bool value, Error **errp)
+>      s->intr_supported =3D value;
+>  }
+>=20
+> +static bool x86_iommu_device_iotlb_prop_get(Object *o, Error **errp) {
+> +    X86IOMMUState *s =3D X86_IOMMU_DEVICE(o);
+> +    return s->dt_supported;
+> +}
+> +
+> +static void x86_iommu_device_iotlb_prop_set(Object *o, bool value,
+> +Error **errp) {
+> +    X86IOMMUState *s =3D X86_IOMMU_DEVICE(o);
+> +    s->dt_supported =3D value;
+> +}
+> +
+>  static void x86_iommu_instance_init(Object *o)  {
+>      X86IOMMUState *s =3D X86_IOMMU_DEVICE(o); @@ -114,6 +126,11 @@
+> static void x86_iommu_instance_init(Object *o)
+>      s->intr_supported =3D false;
+>      object_property_add_bool(o, "intremap", x86_iommu_intremap_prop_get,
+>                               x86_iommu_intremap_prop_set, NULL);
+> +    s->dt_supported =3D false;
+> +    object_property_add_bool(o, "device-iotlb",
+> +                             x86_iommu_device_iotlb_prop_get,
+> +                             x86_iommu_device_iotlb_prop_set,
+> +                             NULL);
+>  }
+>=20
+>  static const TypeInfo x86_iommu_info =3D {
+> --
+> MST
+>=20
