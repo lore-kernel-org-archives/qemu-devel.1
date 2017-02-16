@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ceMEW-0002lW-D1
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:36:29 -0500
+	(envelope-from <berto@igalia.com>) id 1ceMK4-0006HP-9U
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:42:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ceMET-0001PW-BT
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:36:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45052)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1ceMET-0001PH-5Q
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:36:25 -0500
-Date: Thu, 16 Feb 2017 21:36:21 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170216133621.GA10337@lemon.lan>
-References: <20170216123456.28621-1-alex.bennee@linaro.org>
+	(envelope-from <berto@igalia.com>) id 1ceMJz-0003C6-Hu
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:42:12 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170210170910.8867-14-berrange@redhat.com>
+References: <20170210170910.8867-1-berrange@redhat.com>
+	<20170210170910.8867-14-berrange@redhat.com>
+Date: Thu, 16 Feb 2017 14:42:04 +0100
+Message-ID: <w5160kackwj.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20170216123456.28621-1-alex.bennee@linaro.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 0/4] Docker cross-compile targets and
- user build support
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 13/18] qcow2: add support for LUKS
+ encryption format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,21 +23,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On Thu, 02/16 12:34, Alex Benn=E9e wrote:
-> Hi Fam,
->=20
-> Here is the latest iteration of the docker changes incorporating your
-> suggestions:
->=20
->   - -u behaves safely if user already added
->   - cross containers specify QEMU_CONFIGURE_OPTS
->   - merged docker and build automation in MAINTAINERS
+On Fri 10 Feb 2017 06:09:05 PM CET, Daniel P. Berrange wrote:
+> @@ -990,12 +1123,6 @@ static int qcow2_open(BlockDriverState *bs, QDict *options, int flags,
+>      s->refcount_max = UINT64_C(1) << (s->refcount_bits - 1);
+>      s->refcount_max += s->refcount_max - 1;
+>  
+> -    if (header.crypt_method > QCOW_CRYPT_AES) {
+> -        error_setg(errp, "Unsupported encryption method: %" PRIu32,
+> -                   header.crypt_method);
+> -        ret = -EINVAL;
+> -        goto fail;
+> -    }
 
-Thanks for iterating.  I suggested a few minor changes, after which I thi=
-nk it's
-time to merge!
+Here you remove the check for a valid encryption method...
 
-Fam
+>      s->crypt_method_header = header.crypt_method;
+>      if (s->crypt_method_header) {
+>          if (bdrv_uses_whitelist() &&
+> @@ -1012,6 +1139,12 @@ static int qcow2_open(BlockDriverState *bs, QDict *options, int flags,
+>              goto fail;
+>          }
+>  
+> +        if (s->crypt_method_header == QCOW_CRYPT_AES) {
+> +            s->crypt_physical_offset = false;
+> +        } else {
+> +            s->crypt_physical_offset = true;
+> +        }
+> +
+
+...and here you assume that if it's not AES then it must be LUKS.
+However at this point crypt_method_header hasn't been verified yet and
+can have any value.
+
+The image will fail to open anyway because of the qcow2_update_options()
+call later in this function, but I think it wouldn't hurt to have an
+explicit check here, or at least an explanatory comment.
+
+> +static int qcow2_crypt_method_from_format(const char *format)
+> +{
+> +    if (g_str_equal(format, "luks")) {
+> +        return QCOW_CRYPT_LUKS;
+> +    } else if (g_str_equal(format, "aes")) {
+> +        return QCOW_CRYPT_AES;
+> +    } else {
+> +        return -EINVAL;
+> +    }
+> +}
+>  
+>  static int qcow2_set_up_encryption(BlockDriverState *bs, QemuOpts *opts,
+> -                                   Error **errp)
+> +                                   const char *format, Error **errp)
+>  {
+>      BDRVQcow2State *s = bs->opaque;
+>      QCryptoBlockCreateOptions *cryptoopts = NULL;
+>      QCryptoBlock *crypto = NULL;
+>      int ret = -EINVAL;
+>  
+> -    cryptoopts = block_crypto_create_opts_init(
+> -        Q_CRYPTO_BLOCK_FORMAT_QCOW, opts, "aes-", errp);
+> +    if (g_str_equal(format, "luks")) {
+> +        cryptoopts = block_crypto_create_opts_init(
+> +            Q_CRYPTO_BLOCK_FORMAT_LUKS, opts, "luks-", errp);
+> +        s->crypt_method_header = QCOW_CRYPT_LUKS;
+> +    } else if (g_str_equal(format, "aes")) {
+> +        cryptoopts = block_crypto_create_opts_init(
+> +            Q_CRYPTO_BLOCK_FORMAT_QCOW, opts, "aes-", errp);
+> +        s->crypt_method_header = QCOW_CRYPT_AES;
+> +    } else {
+
+You just added a nice qcow2_crypt_method_from_format() function
+immediately before this one, I think this one would be more readable if
+you use it here.
+
+Berto
