@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48106)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jazeltq@gmail.com>) id 1ceHf5-0007Q3-7B
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 03:43:40 -0500
+	(envelope-from <jazeltq@gmail.com>) id 1ceHtz-0004MG-9q
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 03:59:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jazeltq@gmail.com>) id 1ceHf4-0002A3-8C
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 03:43:35 -0500
+	(envelope-from <jazeltq@gmail.com>) id 1ceHty-00007q-B6
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 03:58:59 -0500
 From: jazeltq@gmail.com
-Date: Thu, 16 Feb 2017 16:43:18 +0800
-Message-Id: <20170216084318.11122-1-jazeltq@gmail.com>
-In-Reply-To: <20170121131909.17230-1-jazeltq@gmail.com>
-References: <20170121131909.17230-1-jazeltq@gmail.com>
-Subject: [Qemu-devel] [RFC v4] RBD: Add support readv,writev for rbd
+Date: Thu, 16 Feb 2017 17:00:02 +0800
+Message-Id: <20170216090002.12511-1-jazeltq@gmail.com>
+In-Reply-To: <20170216084318.11122-1-jazeltq@gmail.com>
+References: <20170216084318.11122-1-jazeltq@gmail.com>
+Subject: [Qemu-devel] [RFC v5] RBD: Add support readv,writev for rbd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,13 +29,22 @@ iov to buf or vice versa any more.
 
 Signed-off-by: tianqing <tianqing@unitedstack.com>
 ---
- block/rbd.c | 47 +++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 41 insertions(+), 6 deletions(-)
+ block/rbd.c | 49 ++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 42 insertions(+), 7 deletions(-)
 
 diff --git a/block/rbd.c b/block/rbd.c
-index a57b3e3..0cbd9e3 100644
+index a57b3e3..75ae1d6 100644
 --- a/block/rbd.c
 +++ b/block/rbd.c
+@@ -47,7 +47,7 @@
+  */
+ 
+ /* rbd_aio_discard added in 0.1.2 */
+-#if LIBRBD_VERSION_CODE >= LIBRBD_VERSION(0, 1, 2)
++#if LIBRBD_VERSION_CODE >= LIBRBD_VERSION(12, 0, 0)
+ #define LIBRBD_SUPPORTS_DISCARD
+ #else
+ #undef LIBRBD_SUPPORTS_DISCARD
 @@ -73,7 +73,12 @@ typedef struct RBDAIOCB {
      BlockAIOCB common;
      int64_t ret;
