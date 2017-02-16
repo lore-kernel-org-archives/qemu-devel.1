@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vijay.kilari@gmail.com>) id 1ceIlV-0005Jt-FQ
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:54:18 -0500
+	(envelope-from <hare@suse.de>) id 1ceInx-0006uL-Sp
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:56:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vijay.kilari@gmail.com>) id 1ceIlU-0004fB-FI
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:54:17 -0500
+	(envelope-from <hare@suse.de>) id 1ceInu-0005Rj-14
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:56:50 -0500
+Received: from mx2.suse.de ([195.135.220.15]:59884)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <hare@suse.de>) id 1ceInt-0005RM-QR
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:56:45 -0500
+References: <58A4707602000062000D0393@prv-mh.provo.novell.com>
+	<20170215153306.GF16064@stefanha-x1.localdomain>
+	<58A5C23202000062000D0FCB@prv-mh.provo.novell.com>
+	<b50ed69e-ce2f-36d9-797b-5f6a5cf7850d@redhat.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <154b3902-d891-f77a-3d59-09d80596ddff@suse.de>
+Date: Thu, 16 Feb 2017 10:56:42 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-7PE_T7BsV=vSCEkQDeekB9KnX33Ou5NiUec4XeUu+zw@mail.gmail.com>
-References: <1485879782-6075-1-git-send-email-vijay.kilari@gmail.com>
-	<1485879782-6075-6-git-send-email-vijay.kilari@gmail.com>
-	<CAFEAcA-7PE_T7BsV=vSCEkQDeekB9KnX33Ou5NiUec4XeUu+zw@mail.gmail.com>
-From: Vijay Kilari <vijay.kilari@gmail.com>
-Date: Thu, 16 Feb 2017 15:24:10 +0530
-Message-ID: <CALicx6vWBR_bM2g_DObYgw-12girdK9YgGS8X=zAwenz2EmPFg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v7 RESEND 5/5] hw/intc/arm_gicv3_kvm: Reset
- GICv3 cpu interface registers
+In-Reply-To: <b50ed69e-ce2f-36d9-797b-5f6a5cf7850d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel]
+ =?utf-8?b?562U5aSN77yaIFJlOiBbUkZDXSB2aXJ0aW8tZmM6?=
+ =?utf-8?q?_draft_idea_of_virtual_fibre_channel_HBA?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,144 +31,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>, Pavel Fedin <p.fedin@samsung.com>, Marc Zyngier <marc.zyngier@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Lin Ma <lma@suse.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Zhiqiang Zhou <ZZhou@suse.com>, Fam Zheng <famz@redhat.com>, mst@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com
 
-On Tue, Feb 7, 2017 at 8:19 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 31 January 2017 at 16:23,  <vijay.kilari@gmail.com> wrote:
->> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+On 02/16/2017 09:39 AM, Paolo Bonzini wrote:
+>=20
+>=20
+> On 16/02/2017 08:16, Lin Ma wrote:
+>>> What are the benefits of having FC access from the guest?
 >>
->> Reset CPU interface registers of GICv3 when CPU is reset.
->> For this, ARMCPRegInfo struct is registered with one ICC
->> register whose resetfn is called when cpu is reset.
->>
->> All the ICC registers are reset under one single register
->> reset function instead of calling resetfn for each ICC
->> register.
->>
->> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
->> ---
->>  hw/intc/arm_gicv3_kvm.c | 69 +++++++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 69 insertions(+)
->>
->> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
->> index f91e0ac..c3f38aa 100644
->> --- a/hw/intc/arm_gicv3_kvm.c
->> +++ b/hw/intc/arm_gicv3_kvm.c
->> @@ -604,6 +604,39 @@ static void kvm_arm_gicv3_get(GICv3State *s)
->>      }
->>  }
->>
->> +static void arm_gicv3_icc_reset(CPUARMState *env, const ARMCPRegInfo *ri)
->> +{
->> +    ARMCPU *cpu;
->> +    GICv3State *s;
->> +    GICv3CPUState *c;
->> +
->> +    c = (GICv3CPUState *)env->gicv3state;
->> +    if (!c || !c->cpu || !c->gic) {
->
-> We should assert this kind of thing, not just silently do nothing.
-> Or just assume it's true, because if it's not then we'll segfault
-> immediately below which is just as clear an indication of where
-> the bug is as asserting.
+>> Actually, I havn't dug it too much, Just thought that from virtualizat=
+ion's
+>> perspective, when interact with FC storage, having complete FC access
+>> from the guest is the way it should use.
+>=20
+> How much of this requires a completely new spec?  Could we get enough o=
+f
+> the benefit (e.g. the ability to issue rescans or LIPs on the host) by
+> extending virtio-scsi?
+>=20
+I guess I'd need to chime in with my favourite topic :-)
 
-OK
->
->> +        return;
->> +    }
->> +
->> +    s = c->gic;
->> +    if (!s) {
->
-> You've already checked this once.
->
->> +        return;
->> +    }
->> +
->> +    cpu = ARM_CPU(c->cpu);
->> +    /* Initialize to actual HW supported configuration */
->> +    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS,
->> +                      KVM_VGIC_ATTR(ICC_CTLR_EL1, cpu->mp_affinity),
->> +                      &c->icc_ctlr_el1[GICV3_NS], false);
->> +
->> +    c->icc_ctlr_el1[GICV3_S] = c->icc_ctlr_el1[GICV3_NS];
->> +    c->icc_pmr_el1 = 0;
->> +    c->icc_bpr[GICV3_G0] = GIC_MIN_BPR;
->> +    c->icc_bpr[GICV3_G1] = GIC_MIN_BPR;
->> +    c->icc_bpr[GICV3_G1NS] = GIC_MIN_BPR;
->> +
->> +    c->icc_sre_el1 = 0x7;
->> +    memset(c->icc_apr, 0, sizeof(c->icc_apr));
->> +    memset(c->icc_igrpen, 0, sizeof(c->icc_igrpen));
->> +}
->> +
->>  static void kvm_arm_gicv3_reset(DeviceState *dev)
->>  {
->>      GICv3State *s = ARM_GICV3_COMMON(dev);
->> @@ -621,6 +654,41 @@ static void kvm_arm_gicv3_reset(DeviceState *dev)
->>      kvm_arm_gicv3_put(s);
->>  }
->>
->> +static uint64_t icc_cp_reg_read(CPUARMState *env, const ARMCPRegInfo *ri)
->> +{
->> +    return 0;
->> +}
->> +
->> +static void icc_cp_reg_write(CPUARMState *env, const ARMCPRegInfo *ri,
->> +                          uint64_t value)
->> +{
->> +    return;
->> +}
->
-> If you want to do nothing in a read/write function there are
-> already arm_cp_read_zero and arm_cp_write_ignore functions for
-> this. But using the ARM_CP_NOP flag is better still.
+Initially I really would go with extending the virtio-scsi spec, as
+'real' virtio-fc suffers from some issues:
+While it's of course possible to implement a full fc stack in qemu
+itself, it's not easily possible assign 'real' FC devices to the guest.
+Problem here is that any virtio-fc would basically have to use the
+standard FC frame format for virtio itself, but all 'real' FC HBAs
+(excluding FCoE drivers) do _not_ allow access to the actual FC frames,
+but rather present you with a 'cooked' version of them.
+So if you were attempting to pass FC devices to the guest you would have
+to implement yet-another conversion between raw FC frames and the
+version the HBA would like.
+And that doesn't even deal with the real complexity like generating
+correct OXID/RXIDs etc.
 
-With ARM_CP_NOP qemu fails to boot.
-qemu-system-aarch64: KVM_SET_DEVICE_ATTR failed: Invalid argument
-Group 6 attr 0x000000000000c665
+So initially I would propose to update the virtio spec to include:
+- Full 64bit LUNs
+- A 64bit target port ID (well, _actually_ it should be a SCSI-compliant
+  target port ID, but as this essentially is a free text field I'd
+  restrict it to something sensible)
+For full compability we'd also need a (64-bit) initiator ID, but that is
+essentially a property of the virtio queue, so we don't need to transmit
+it with every command; once during queue setup is enough.
+And if we restrict virtio-scsi to point-to-point topology we can even
+associate the target port ID with the virtio queue, making
+implementation even easier.
+I'm not sure if that is a good idea long-term, as one might want to
+identify an NPIV host with a virtio device, in which case we're having a
+1-M topology and that model won't work anymore.
 
->
->> +
->> +/*
->> + * CPU interface registers of GIC needs to be reset on CPU reset.
->> + * For the calling arm_gicv3_icc_reset() on CPU reset, we register
->> + * below ARMCPRegInfo. As we reset the whole cpu interface under single
->> + * register reset, we define only one register of CPU interface instead
->> + * of defining all the registers.
->> + */
->> +static const ARMCPRegInfo gicv3_cpuif_reginfo[] = {
->> +    { .name = "ICC_CTLR_EL1", .state = ARM_CP_STATE_BOTH,
->> +      .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 12, .opc2 = 4,
->> +      .type = ARM_CP_NO_RAW,
->> +      .access = PL1_RW,
->> +      .readfn = icc_cp_reg_read,
->> +      .writefn = icc_cp_reg_write,
->> +      /*
->> +       * We hang the whole cpu interface reset routine off here
->> +       * rather than parcelling it out into one little function
->> +       * per register
->> +       */
->> +      .resetfn = arm_gicv3_icc_reset,
->> +    },
->> +    REGINFO_SENTINEL
->> +};
->> +
->>  static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
->>  {
->>      GICv3State *s = KVM_ARM_GICV3(dev);
->> @@ -650,6 +718,7 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
->>
->>          /* Store GICv3CPUState in CPUARMState gicv3state pointer */
->>          env->gicv3state = (void *)&s->cpu[i];
->> +        define_arm_cp_regs(cpu, gicv3_cpuif_reginfo);
->>      }
->>
->>      /* Try to create the device via the device control API */
->> --
->> 1.9.1
->>
->
-> thanks
-> -- PMM
+To be precise:
+
+I'd propose to update
+
+struct virtio_scsi_config
+with a field 'u8 initiator_id[8]'
+
+and
+
+struct virtio_scsi_req_cmd
+with a field 'u8 target_id[8]'
+
+and do away with the weird LUN remapping qemu has nowadays.
+
+That should be enough to get proper NPIV passthrough working.
+
+Cheers,
+
+Hannes
+--=20
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg
+GF: F. Imend=C3=B6rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N=C3=BCrnberg)
