@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ceT3U-0003Mw-V2
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 15:53:33 -0500
+	(envelope-from <lersek@redhat.com>) id 1ceT5O-0005P4-LZ
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 15:55:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ceT3U-0002tr-Ap
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 15:53:33 -0500
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1487140636-19955-1-git-send-email-bharata@linux.vnet.ibm.com>
-	<44595100-389c-18ee-6355-2d1355577187@twiddle.net>
-	<20170216024126.GA17196@in.ibm.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <b2492a5c-51c5-834c-4d99-c055d78d1f67@twiddle.net>
-Date: Fri, 17 Feb 2017 07:53:20 +1100
+	(envelope-from <lersek@redhat.com>) id 1ceT5L-00048l-Ky
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 15:55:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35822)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1ceT5L-00048T-Fy
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 15:55:27 -0500
+References: <cover.1487224954.git.ben@skyportsystems.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <cae7d7f8-9075-1d00-e036-76476862e12f@redhat.com>
+Date: Thu, 16 Feb 2017 21:55:24 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170216024126.GA17196@in.ibm.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <cover.1487224954.git.ben@skyportsystems.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target-ppc: Add quad precision muladd
- instructions
+Subject: Re: [Qemu-devel] [PATCH v7 0/8] Add support for VM Generation ID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,15 +26,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: bharata@linux.vnet.ibm.com
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, nikunj@linux.vnet.ibm.com, david@gibson.dropbear.id.au
+To: ben@skyportsystems.com, qemu-devel@nongnu.org
+Cc: imammedo@redhat.com, mst@redhat.com
 
-On 02/16/2017 01:41 PM, Bharata B Rao wrote:
-> For some reason float128_mul implements
-> multipliction via multiplication and addition (mul128To256 & add128). There
-> is no equivalent to this in float64_muladd.
+On 02/16/17 07:18, ben@skyportsystems.com wrote:
+> From: Ben Warren <ben@skyportsystems.com>
+> 
+> This patch set adds support for passing a GUID to Windows guests.  It is a
+> re-implementation of previous patch sets written by Igor Mammedov et al, but
+> this time passing the GUID data as a fw_cfg blob.
+> 
+> This patch set has dependencies on new guest functionality, in particular the
+> support for a new linker-loader command and the ability to write back data
+> to QEMU over a DMA link.  Work is in flight in both SeaBIOS and OVMF to support this.
+> 
+> v6->v7:
+>     - Rebased to top of tree.
+>     - Added 'src_offset' field to "write pointer" command
+>     - Reworked unit tests based on feedback
+>     - various minor changes based on feedback
+>     - Added entries to MAINTAINERS file
 
-Yes, I don't understand that myself.  It really appears to be a bug.
+I posted the OVMF series:
 
+  [edk2] [PATCH 0/5] OvmfPkg: support QEMU_LOADER_WRITE_POINTER
+  Message-Id: <20170216204137.30221-1-lersek@redhat.com>
+  https://lists.01.org/pipermail/edk2-devel/2017-February/007454.html
 
-r~
+Thanks,
+Laszlo
