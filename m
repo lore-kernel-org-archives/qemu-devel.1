@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54409)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chadjoan@gmail.com>) id 1ceQ9n-00015P-0a
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:47:53 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ceQEr-0005O1-7E
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:53:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chadjoan@gmail.com>) id 1ceQ9l-0005bA-LS
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:47:51 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ceQEq-0007j7-C6
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:53:05 -0500
+Date: Thu, 16 Feb 2017 18:52:51 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170216175251.GJ4869@noname.redhat.com>
+References: <20170203195037.4238-1-nirsof@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <bf1410bc-bc6d-bb29-5591-55634f25d487@redhat.com>
-References: <CABHMSTVDnAxAvpp81+z_2fkAFO7tazLJs3cFXpuDuuGQj-Ek-A@mail.gmail.com>
-	<1933406e-2576-e687-3545-a72f3b999310@redhat.com>
-	<bf1410bc-bc6d-bb29-5591-55634f25d487@redhat.com>
-From: Chad Joan <chadjoan@gmail.com>
-Date: Thu, 16 Feb 2017 12:47:28 -0500
-Message-ID: <CABHMSTUsZy0u4b1b84YC5CgafKvD-Zms5dCQ=31+XnQphUQxLA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] Fix build break during configuration on musl-libc
- based Linux systems.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170203195037.4238-1-nirsof@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: Do not truncate before
+ preallocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,98 +23,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Nir Soffer <nirsof@gmail.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-I am glad others are chiming in and might provide better solutions.
+Am 03.02.2017 um 20:50 hat Nir Soffer geschrieben:
+> When using file system that does not support fallocate() (e.g. NFS <
+> 4.2), truncating the file only when preallocation=OFF speeds up creating
+> raw file.
+> 
+> Here is example run, tested on Fedora 24 machine, creating raw file on
+> NFS version 3 server.
+> 
+> $ time ./qemu-img-master create -f raw -o preallocation=falloc mnt/test 1g
+> Formatting 'mnt/test', fmt=raw size=1073741824 preallocation=falloc
+> 
+> real	0m21.185s
+> user	0m0.022s
+> sys	0m0.574s
+> 
+> $ time ./qemu-img-fix create -f raw -o preallocation=falloc mnt/test 1g
+> Formatting 'mnt/test', fmt=raw size=1073741824 preallocation=falloc
+> 
+> real	0m11.601s
+> user	0m0.016s
+> sys	0m0.525s
+> 
+> $ time dd if=/dev/zero of=mnt/test bs=1M count=1024 oflag=direct
+> 1024+0 records in
+> 1024+0 records out
+> 1073741824 bytes (1.1 GB, 1.0 GiB) copied, 15.6627 s, 68.6 MB/s
+> 
+> real	0m16.104s
+> user	0m0.009s
+> sys	0m0.220s
+> 
+> Running with strace we can see that without this change we do one
+> pread() and one pwrite() for each block. With this change, we do only
+> one pwrite() per block.
+> 
+> $ strace ./qemu-img-master create -f raw -o preallocation=falloc mnt/test 8192
+> ...
+> pread64(9, "\0", 1, 4095)               = 1
+> pwrite64(9, "\0", 1, 4095)              = 1
+> pread64(9, "\0", 1, 8191)               = 1
+> pwrite64(9, "\0", 1, 8191)              = 1
+> 
+> $ strace ./qemu-img-fix create -f raw -o preallocation=falloc mnt/test 8192
+> ...
+> pwrite64(9, "\0", 1, 4095)              = 1
+> pwrite64(9, "\0", 1, 8191)              = 1
+> 
+> This happens because posix_fallocate is checking if each block is
+> allocated before writing a byte to the block, and when truncating the
+> file before preallocation, all blocks are unallocated.
+> 
+> Signed-off-by: Nir Soffer <nirsof@gmail.com>
 
-Honestly, following the instructions at
-http://wiki.qemu-project.org/Contribute/SubmitAPatch to-the-letter is quite
-daunting to me, just to get one line of code changed.  It might help if
-that page had some kind of dead-simple example for trivial patches;
-something like:
-$ cd <QEMU directory>
-$ git format-patch blah blah blah
-$ maybe-some-other-command
-$ # Now copy the contents of file xyz.patch into your email client and send
-to qemu-devel@nongnu.org and qemu-trivial@nongnu.org
+Thanks, applied to the block branch.
 
-Ask me to do signing/secure-signatures/etc (or any foray into gnupg
-commands), setup and secure new email connectivity (ex: git send-email), or
-install new software on my system... and I'm going to bounce ;)  Sorry.
+I'm not completely sure if doing an ftruncate() first couldn't improve
+PREALLOC_MODE_FULL somewhat in some cases, but I agree that the patch
+should still result in correct images.
 
-I kind of expected that discerning maintainers might want to do this patch
-differently.  I'm not familiar with the why's of how your configure script
-is organized, so I really hope the QEMU devs can meet me in the middle and
-take this the rest of the way.  I am perfectly willing to run commands on
-my machine and echo results to you if it helps you learn the nature of this
-problem.
-
-Hope that helps.
-- Chad
-
-On Thu, Feb 16, 2017 at 12:23 PM, Laszlo Ersek <lersek@redhat.com> wrote:
-
-> On 02/16/17 17:58, Paolo Bonzini wrote:
-> >
-> >
-> > On 16/02/2017 17:30, Chad Joan wrote:
-> >> Hello,
-> >>
-> >> This is a one-line patch to the configure script that will allow QEMU
-> to be
-> >> built on musl-libc based Linux systems.  This problem is only noticeable
-> >> when QEMU is built with --enable-curses.
-> >>
-> >> Detailed reading material if you want to know where this came from:
-> >> https://bugs.gentoo.org/show_bug.cgi?id=609364
-> >
-> > Hi,
-> >
-> > can you explain exactly which function is missing without
-> > -D_XOPEN_SOURCE=500?  If it is curses' wide-char functions, why does it
-> > fail with musl but not with glibc?  Is _XOPEN_SOURCE always defined by
-> > glibc if you have _D_GNU_SOURCE?
->
-> It is not necessarily auto-defined, but the effect is "as if".
->
-> It is documented in the libc info:
->
-> https://www.gnu.org/software/libc/manual/html_node/Feature-
-> Test-Macros.html#index-_005fXOPEN_005fSOURCE
->
-> > Macro: _XOPEN_SOURCE
-> > Macro: _XOPEN_SOURCE_EXTENDED
-> >
-> >     If you define this macro, functionality described in the X/Open
-> >     Portability Guide is included. This is a superset of the POSIX.1
-> >     and POSIX.2 functionality and in fact _POSIX_SOURCE and
-> >     _POSIX_C_SOURCE are automatically defined.
-> >
-> >     As the unification of all Unices, functionality only available in
-> >     BSD and SVID is also included.
-> >
-> >     If the macro _XOPEN_SOURCE_EXTENDED is also defined, even more
-> >     functionality is available. The extra functions will make all
-> >     functions available which are necessary for the X/Open Unix brand.
-> >
-> >     If the macro _XOPEN_SOURCE has the value 500 this includes all
-> >     functionality described so far plus some new definitions from the
-> >     Single Unix Specification, version 2.
->
-> https://www.gnu.org/software/libc/manual/html_node/Feature-
-> Test-Macros.html#index-_005fGNU_005fSOURCE
->
-> > Macro: _GNU_SOURCE
-> >
-> >     If you define this macro, everything is included: ISO C89, ISO
-> >     C99, POSIX.1, POSIX.2, BSD, SVID, X/Open, LFS, and GNU extensions.
-> >     In the cases where POSIX.1 conflicts with BSD, the POSIX
-> >     definitions take precedence.
->
-> Curiously, I managed to recall this from years ago, when I was still
-> living and breathing the SUS (and looking frequently at the glibc info
-> too).
->
-> Laszlo
->
+KEvin
