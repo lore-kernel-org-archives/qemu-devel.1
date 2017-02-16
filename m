@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ceKdw-0000kP-VD
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 06:54:38 -0500
+	(envelope-from <imammedo@redhat.com>) id 1ceKr1-0005wy-FX
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 07:08:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ceKdw-0001NJ-62
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 06:54:37 -0500
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:38894)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ceKdv-0001Mt-W2
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 06:54:36 -0500
-Received: by mail-wm0-x22f.google.com with SMTP id r141so13225480wmg.1
-	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 03:54:35 -0800 (PST)
+	(envelope-from <imammedo@redhat.com>) id 1ceKqy-0006EO-4z
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 07:08:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57466)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ceKqx-0006Cy-SF
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 07:08:04 -0500
+Date: Thu, 16 Feb 2017 13:08:00 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170216130800.1f2833aa@nial.brq.redhat.com>
+In-Reply-To: <e7e9cf57-a5b4-4f2b-36e5-3e08dee70d68@redhat.com>
+References: <cover.1487139038.git.ben@skyportsystems.com>
+	<678c203f-3768-7e65-6e48-6729473b6ffa@redhat.com>
+	<20170215220837-mutt-send-email-mst@kernel.org>
+	<e7e9cf57-a5b4-4f2b-36e5-3e08dee70d68@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CALicx6u=i0ukrbQiiVTq4gFKM_Har925UdRrpmJuErk-U5o58Q@mail.gmail.com>
-References: <1485879782-6075-1-git-send-email-vijay.kilari@gmail.com>
-	<1485879782-6075-6-git-send-email-vijay.kilari@gmail.com>
-	<CAFEAcA-7PE_T7BsV=vSCEkQDeekB9KnX33Ou5NiUec4XeUu+zw@mail.gmail.com>
-	<CALicx6vWBR_bM2g_DObYgw-12girdK9YgGS8X=zAwenz2EmPFg@mail.gmail.com>
-	<CAFEAcA9aQwJiwsMSgvPs=vj+qfrFbVVv6-AuhFVsEKX_xO7J2Q@mail.gmail.com>
-	<CALicx6u=i0ukrbQiiVTq4gFKM_Har925UdRrpmJuErk-U5o58Q@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Feb 2017 11:54:14 +0000
-Message-ID: <CAFEAcA_m30zGGDeUPT98rMtTp00kS2qyv33vp9wYBb_+f7YEiw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v7 RESEND 5/5] hw/intc/arm_gicv3_kvm: Reset
- GICv3 cpu interface registers
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 0/7] Add support for VM Generation ID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,30 +29,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vijay Kilari <vijay.kilari@gmail.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>, Pavel Fedin <p.fedin@samsung.com>, Marc Zyngier <marc.zyngier@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, ben@skyportsystems.com, qemu-devel@nongnu.org
 
-On 16 February 2017 at 11:28, Vijay Kilari <vijay.kilari@gmail.com> wrote:
-> On Thu, Feb 16, 2017 at 3:39 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
->> On 16 February 2017 at 09:54, Vijay Kilari <vijay.kilari@gmail.com> wrote:
->>> On Tue, Feb 7, 2017 at 8:19 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
->>>> If you want to do nothing in a read/write function there are
->>>> already arm_cp_read_zero and arm_cp_write_ignore functions for
->>>> this. But using the ARM_CP_NOP flag is better still.
->>>
->>> With ARM_CP_NOP qemu fails to boot.
->>> qemu-system-aarch64: KVM_SET_DEVICE_ATTR failed: Invalid argument
->>> Group 6 attr 0x000000000000c665
->>
->> Not clear to me why using ARM_CP_NOP should result in a KVM
->> call failure -- can you dig further into why that is happening?
->
-> if ARM_CP_NOP is set, .reset function is not called and there by KVM fails
-> when SRE_EL1 is written with 0x0.
+On Wed, 15 Feb 2017 21:52:55 +0100
+Laszlo Ersek <lersek@redhat.com> wrote:
 
-OK. Use the arm_cp_read_zero/arm_cp_write_ignore functions, and
-add a comment that we don't use CP_NOP because that means our
-reset function isn't called.
+> On 02/15/17 21:09, Michael S. Tsirkin wrote:
+> > On Wed, Feb 15, 2017 at 08:47:48PM +0100, Laszlo Ersek wrote:  
+> 
+> [snip]
+> 
+> >> For patches #1, #3, #4 and #5:
+> >>
+> >> Tested-by: Laszlo Ersek <lersek@redhat.com>
+> >>
+> >> I'll soon post the OVMF patches.
+> >>
+> >> Thanks!
+> >> Laszlo  
+> > 
+> > 
+> > How do you feel about Igor's request to change WRITE_POINTER to add
+> > offset in there, so guest can pass in the address of GUID and
+> > not start of table? Would that be a lot of work to add?  
+> 
+> I think it's doable in practice: simply add a constant from the command
+> itself, for passing the value back to QEMU, and also for saving the
+> fw_cfg write commend for S3 resume time.
+> 
+> But, I disagree with it from a design POV.
+> 
+> Igor's point is:
+> 
+> > Math complicates QEMU code though and not only QMEMU but AML code as
+> > well.  
+> 
+> As I understand it, the goal is to push the addition to the firmware
+> (which is "one place"), rather than having to implement it twice in
+> QEMU, i.e., in two places ((a) native QEMU logic, (b) AML generator).
+> 
+> Here's my counter-argument:
+> 
+> (a) As I mentioned earlier, assume a complex communication structure
+> between the guest OS and QEMU. Currently our shared structure consists
+> of a single field (the GUID), but next time it might contain several fields.
+> 
+> For such a multi-field shared structure, QEMU will have to do manual
+> offsetting into the guest RAM anyway, for accessing fields F1, F2, and
+> F3. We will not create three separate WRITE_POINTER commands and let the
+> firmware calculate and return the absolute GPAs of the fields F1, F2 and
+> F3. Instead, there will be one WRITE_POINTER command, and QEMU will do
+> the offsetting manually, minimally for fields F2 and F3.
+> 
+> "src_offset" looks tempting now only because we have a shared structure
+> with only one field, the GUID at offset 40 decimal.
 
-thanks
--- PMM
+benefits of having src_offset from QEMU POV I see are:
+ a) (biggest one) firmware and device code are clearly separated where:
+     - VMGENID_GUID_OFFSET would be used only by firmware side, such as:
+         WRITE_POINTER and AML addition to help OVMF detect non ACPI blob
+     - device doesn't have to assume/or have a knowledge about
+       layout of GUID blob except of size of data it's needs
+       to access at location provided by WRITE_POINTER as v7 shows it.
+
+ b) wrt shared blob I've envisioned slightly different approach,
+    where multiple WRITE_POINTER commands are used instead of one
+    with following workflow to extend shared blob:
+     1) firmware part of QEMU (acpi-build.c):
+          if (device_foo_present) {
+             fw_cfg_add_file_callback('/etc/device_foo_addr', device_foo->addr_storage)
+
+             shared_off = device_foo->align(next_free_shared_offset)
+             WRITE_POINTER('/etc/device_foo_addr', 0,
+                           '/etc/shared_blob, shared_off)
+
+             next_free_shared_offset = shared_off + device_foo->data_size;
+          }
+     2) device_foo accesses data at device_foo->addr_storage directly
+        * there is no need to spread knowledge of shared_blob
+          layout to device code anymore.
+        * no need to care where in shared_blob data will be placed,
+        * shared space is used only when device is present
+        * since there is no shared_writeback_blob, there isn't 
+          need in mechanism to propagate written data to device
+          or notify device about write
+     
+   drawback in this approach is that a device would consume
+   a file slot if fw_cfg and space for WRITE_POINTER in
+   linker file when present.
+
+ 
+> (b) Regarding the runtime addition in the AML code:
+as you pointed out WRITE_POINTER has nothing to do with addition
+on AML side which is influenced by ADD_POINTER and OVMF and could
+be fixed with flags down the road, so there is nothing to argue
+about on this bullet.
+
+
+> As discussed before, the main reason *now*, for not pointing VGIA (and
+> other named integer objects) with ADD_POINTER commands directly to
+> "meaningful" fields, is that OVMF probes the targets of ADD_POINTER
+> commands for patterns that look like ACPI table headers. And, for the
+> time being, we want to suppress any mis-recognitions by prepending some
+> padding.
+> 
+> Igor was right to dislike this, and we agreed that *down the road* we
+> should add allocation flags, or further allocation commands, to supplant
+> this kind of heuristics in OVMF. But:
+> 
+> - we don't have time to do it now, plus
+> 
+> - please observe that the runtime addition in AML relates to the
+>   ADD_POINTER and the ALLOCATE commands. It does not relate to
+>   WRITE_POINTER at all.
+> 
+>   Whatever we change on WRITE_POINTER will do nothing for suppressing
+>   OVMF's table header probing -- because that is tied to ADD_POINTER
+>   --, therefore WRITE_POINTER tweaks cannot eliminate the "need to add"
+>   in AML.
+> 
+> 
+> In summary, I think the proposed WRITE_POINTER modification is
+> implementable, but I think it will not pay off, because:
+> 
+> (a) for QEMU logic, it will not prove useful as soon as we have a
+> multi-field shared structure (QEMU will have to add field offsets anyway),
+> 
+> (b) and for eliminating the AML addition (which is a consequence of the
+> current ADD_POINTER handling in OVMF), it does nothing.
+> 
+> Thanks
+> Laszlo
