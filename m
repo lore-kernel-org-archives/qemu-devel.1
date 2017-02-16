@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1ceQrf-0007D4-J7
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 13:33:12 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ceQvQ-000158-UW
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 13:37:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1ceQrc-0004CH-DX
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 13:33:11 -0500
-References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
-	<20170203154757.36140-12-vsementsov@virtuozzo.com>
-From: "Denis V. Lunev" <den@virtuozzo.com>
-Message-ID: <29a208bf-4b7e-930e-7016-fc7269982ae6@virtuozzo.com>
-Date: Thu, 16 Feb 2017 16:00:15 +0300
+	(envelope-from <kwolf@redhat.com>) id 1ceQvP-0005ZM-Up
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 13:37:04 -0500
+Date: Thu, 16 Feb 2017 19:36:53 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170216183653.GK4869@noname.redhat.com>
+References: <20170203195037.4238-1-nirsof@gmail.com>
+	<20170216175251.GJ4869@noname.redhat.com>
+	<CAMr-obsQExOZmpiieJt33v+x1TW4axV6+7YyfatEqngocF5Djw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170203154757.36140-12-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 11/18] nbd: BLOCK_STATUS for bitmap export:
- server part
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMr-obsQExOZmpiieJt33v+x1TW4axV6+7YyfatEqngocF5Djw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: Do not truncate before
+ preallocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,68 +25,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, stefanha@redhat.com
+To: Nir Soffer <nirsof@gmail.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On 02/03/2017 06:47 PM, Vladimir Sementsov-Ogievskiy wrote:
-> Only one meta context type is defined: qemu-bitmap:<bitmap-name>.
-> Maximum one query is allowed for NBD_OPT_{SET,LIST}_META_CONTEXT,
-> NBD_REP_ERR_TOO_BIG is returned otherwise.
->
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-...
-> +static int nbd_negotiate_opt_meta_context_start(NBDClient *client, uint32_t opt,
-> +                                                uint32_t length,
-> +                                                uint32_t *nb_queries,
-> +                                                BlockDriverState **bs)
-> +{
-> +    int ret;
-> +    NBDExport *exp;
-> +    char *export_name;
-> +    int nb_read = 0;
-> +
-> +    if (!client->structured_reply) {
-> +        uint32_t tail = length - nb_read;
-> +        LOG("Structured reply is not negotiated");
-> +
-> +        if (nbd_negotiate_drop_sync(client->ioc, tail) != tail) {
-> +            return -EIO;
-> +        }
-> +        ret = nbd_negotiate_send_rep_err(client->ioc, NBD_REP_ERR_INVALID, opt,
-> +                                         "Structured reply is not negotiated");
-> +        g_free(export_name);
-export_name is not initialized here! for me there is no need to free
-anything here
+Am 16.02.2017 um 19:23 hat Nir Soffer geschrieben:
+> On Thu, Feb 16, 2017 at 7:52 PM, Kevin Wolf <kwolf@redhat.com> wrote:
+> > Am 03.02.2017 um 20:50 hat Nir Soffer geschrieben:
+> >> When using file system that does not support fallocate() (e.g. NFS <
+> >> 4.2), truncating the file only when preallocation=OFF speeds up creating
+> >> raw file.
+> >>
+> >> Here is example run, tested on Fedora 24 machine, creating raw file on
+> >> NFS version 3 server.
+> >>
+> >> $ time ./qemu-img-master create -f raw -o preallocation=falloc mnt/test 1g
+> >> Formatting 'mnt/test', fmt=raw size=1073741824 preallocation=falloc
+> >>
+> >> real  0m21.185s
+> >> user  0m0.022s
+> >> sys   0m0.574s
+> >>
+> >> $ time ./qemu-img-fix create -f raw -o preallocation=falloc mnt/test 1g
+> >> Formatting 'mnt/test', fmt=raw size=1073741824 preallocation=falloc
+> >>
+> >> real  0m11.601s
+> >> user  0m0.016s
+> >> sys   0m0.525s
+> >>
+> >> $ time dd if=/dev/zero of=mnt/test bs=1M count=1024 oflag=direct
+> >> 1024+0 records in
+> >> 1024+0 records out
+> >> 1073741824 bytes (1.1 GB, 1.0 GiB) copied, 15.6627 s, 68.6 MB/s
+> >>
+> >> real  0m16.104s
+> >> user  0m0.009s
+> >> sys   0m0.220s
+> >>
+> >> Running with strace we can see that without this change we do one
+> >> pread() and one pwrite() for each block. With this change, we do only
+> >> one pwrite() per block.
+> >>
+> >> $ strace ./qemu-img-master create -f raw -o preallocation=falloc mnt/test 8192
+> >> ...
+> >> pread64(9, "\0", 1, 4095)               = 1
+> >> pwrite64(9, "\0", 1, 4095)              = 1
+> >> pread64(9, "\0", 1, 8191)               = 1
+> >> pwrite64(9, "\0", 1, 8191)              = 1
+> >>
+> >> $ strace ./qemu-img-fix create -f raw -o preallocation=falloc mnt/test 8192
+> >> ...
+> >> pwrite64(9, "\0", 1, 4095)              = 1
+> >> pwrite64(9, "\0", 1, 8191)              = 1
+> >>
+> >> This happens because posix_fallocate is checking if each block is
+> >> allocated before writing a byte to the block, and when truncating the
+> >> file before preallocation, all blocks are unallocated.
+> >>
+> >> Signed-off-by: Nir Soffer <nirsof@gmail.com>
+> >
+> > Thanks, applied to the block branch.
+> >
+> > I'm not completely sure if doing an ftruncate() first couldn't improve
+> > PREALLOC_MODE_FULL somewhat in some cases, but I agree that the patch
+> > should still result in correct images.
+> 
+> Good point, I'll do some tests with full mode to check this.
+> 
+> Do you know which cases can benefit from ftruncate() before full preallocation?
 
+Knowing the final size from the beginning could allow the file system
+driver to do less allocations and possibly avoid fragmentation of the
+file. I'm not sure if that's easily measurable, though.
 
-> +
-> +        if (ret < 0) {
-> +            return ret;
-> +        } else {
-> +            *bs = NULL;
-> +            *nb_queries = 0;
-> +            return length;
-> +        }
-> +    }
-> +
-> +    nb_read = nbd_negotiate_read_size_string(client->ioc, &export_name,
-> +                                             NBD_MAX_NAME_SIZE);
-> +    if (nb_read < 0) {
-> +        return nb_read;
-> +    }
-> +
-> +    exp = nbd_export_find(export_name);
-> +    if (exp == NULL) {
-> +        uint32_t tail = length - nb_read;
-> +        LOG("export '%s' is not found", export_name);
-> +
-> +        if (nbd_negotiate_drop_sync(client->ioc, tail) != tail) {
-export_name is leaked on this path
+I'd also expect that with XFS, you'll see no or less preallocation.
+'du' often shows values much larger than the actual image size on XFS
+because the file was growing a lot, so without having the actual size,
+XFS takes a guess and does some generous preallocation.
 
-> +            return -EIO;
-> +        }
-> +        ret = nbd_negotiate_send_rep_err(client->ioc, NBD_REP_ERR_INVALID, opt,
-> +                                         "export '%s' is not found",
-> +                                         export_name);
-> +        g_free(export_name);
-> +
+Kevin
