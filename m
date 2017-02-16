@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ceM95-0007Ll-9q
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:30:52 -0500
+	(envelope-from <famz@redhat.com>) id 1ceM9R-0007XE-R1
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:31:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ceM92-0007Pc-20
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:30:51 -0500
-Received: from indium.canonical.com ([91.189.90.7]:56413)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ceM91-0007P6-So
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:30:48 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ceM90-00054e-P0
-	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 13:30:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9FC012E80AC
-	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 13:30:46 +0000 (UTC)
+	(envelope-from <famz@redhat.com>) id 1ceM9Q-0007Yv-Sm
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:31:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43260)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1ceM9Q-0007YZ-Mh
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:31:12 -0500
+Date: Thu, 16 Feb 2017 21:31:09 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170216133109.GD8817@lemon.lan>
+References: <20170216123456.28621-1-alex.bennee@linaro.org>
+	<20170216123456.28621-4-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20170216123456.28621-4-alex.bennee@linaro.org>
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 16 Feb 2017 13:19:49 -0000
-From: Suramya <1665344@bugs.launchpad.net>
-Reply-To: Bug 1665344 <1665344@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20170216131950.29722.40834.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1665344] [NEW] documentation error:404 not found
+Subject: Re: [Qemu-devel] [PATCH v4 3/4] .shippable.yml: new CI provider
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,44 +28,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-Public bug reported:
+On Thu, 02/16 12:34, Alex Benn=E9e wrote:
+> Ostensibly Shippable offers a similar set of services as Travis.
+> However they are focused on Docker container based work-flows so we
+> can use our existing containers to run a few extra builds - in this
+> case a bunch of cross-compiled targets on a Debian multiarch system.
 
-In http://wiki.qemu-project.org/Outreachy_2017_MayAugust the urls
- http://www.qemu-project.org/images/4/4e/Q35.pdf and http://www.qemu-projec=
-t.org/images/f/f6/PCIvsPCIe.pdf on opening displays:
+Out of curiosity, what are the forms of build report from shippable servi=
+ce?
 
+>=20
+> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+>=20
+> ---
+> v3
+>   - reduce matrix to armhf/arm64 which currently work
+>   - use the make docker-image-* build stanzas
+>   - add TARGET_LIST to each build
+> ---
+>  .shippable.yml | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
+>  create mode 100644 .shippable.yml
+>=20
+> diff --git a/.shippable.yml b/.shippable.yml
+> new file mode 100644
+> index 0000000000..4de8daf341
+> --- /dev/null
+> +++ b/.shippable.yml
+> @@ -0,0 +1,21 @@
+> +language: c
+> +env:
+> +  matrix:
+> +    - IMAGE=3Ddebian-armhf-cross
+> +      TARGET_LIST=3Darm-softmmu,arm-linux-user
+> +    - IMAGE=3Ddebian-arm64-cross
+> +      TARGET_LIST=3Daarch64-softmmu,aarch64-linux-user
+> +    - IMAGE=3Dcentos6
+> +      TARGET_LIST=3Di386-softmmu,x86_64-softmmu
+> +build:
+> +  pre_ci:
+> +    - make docker-image-${IMAGE}
+> +  pre_ci_boot:
+> +    image_name: qemu
+> +    image_tag: ${IMAGE}
+> +    pull: false
+> +    options: "-e HOME=3D/root"
+> +  ci:
+> +    - unset CC
+> +    - ./configure ${QEMU_CONFIGURE_OPTS} --target-list=3D${TARGET_LIST=
+}
+> +    - make -j2
 
- Not Found
+It's a good surprise that our docker infrastructure fits in the shippable
+framework pretty nicely. :)
 
-The requested URL /images/4/4e/Q35.pdf was not found on this server.
+Looks good to me without cross checking the shippable API:
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1665344
-
-Title:
-  documentation error:404 not found
-
-Status in QEMU:
-  New
-
-Bug description:
-  In http://wiki.qemu-project.org/Outreachy_2017_MayAugust the urls
-   http://www.qemu-project.org/images/4/4e/Q35.pdf and http://www.qemu-proj=
-ect.org/images/f/f6/PCIvsPCIe.pdf on opening displays:
-
-
-   Not Found
-
-  The requested URL /images/4/4e/Q35.pdf was not found on this server.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1665344/+subscriptions
+Reviewed-by: Fam Zheng <famz@redhat.com>
