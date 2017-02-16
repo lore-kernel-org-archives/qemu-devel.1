@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ceNlA-0003Rd-KI
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 10:14:22 -0500
+	(envelope-from <aderumier@oxygem.tv>) id 1ceNlN-0003ho-DJ
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 10:14:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ceNl6-0000wO-QR
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 10:14:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36132)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ceNl6-0000vQ-KT
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 10:14:12 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D406719CBD8
-	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 15:14:12 +0000 (UTC)
-Message-ID: <1487258050.32455.1.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 16 Feb 2017 16:14:10 +0100
-In-Reply-To: <7ba960b7-4235-8036-7f48-974819775292@redhat.com>
-References: <1485852398-2327-1-git-send-email-thuth@redhat.com>
-	<1485955513.1076.59.camel@redhat.com>
-	<7ba960b7-4235-8036-7f48-974819775292@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+	(envelope-from <aderumier@oxygem.tv>) id 1ceNlH-000189-3W
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 10:14:29 -0500
+Date: Thu, 16 Feb 2017 16:13:41 +0100 (CET)
+From: Alexandre DERUMIER <aderumier@odiso.com>
+Message-ID: <887093105.8854266.1487258021988.JavaMail.zimbra@oxygem.tv>
+In-Reply-To: <CAKZcxgfA6YvAOZfngyf0QC5iF1WwGK86DcXPJPwBOr_XFfzMuA@mail.gmail.com>
+References: <20170216084318.11122-1-jazeltq@gmail.com>
+	<20170216090002.12511-1-jazeltq@gmail.com>
+	<D7075812-8210-4092-8ED4-BB6FAC4E612C@gmail.com>
+	<CAKZcxgfA6YvAOZfngyf0QC5iF1WwGK86DcXPJPwBOr_XFfzMuA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH] audio/sdlaudio: Allow audio playback
- with SDL2
+Subject: Re: [Qemu-devel] [RFC v5] RBD: Add support readv,writev for rbd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,35 +25,220 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: jazeltq <jazeltq@gmail.com>
+Cc: Tiger Hu <hufh2004@gmail.com>, Josh Durgin <jdurgin@redhat.com>, Jeff Cody <jcody@redhat.com>, dillaman <dillaman@redhat.com>, Kevin Wolf <kwolf@redhat.com>, mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel <qemu-devel@nongnu.org>, ceph-devel <ceph-devel@vger.kernel.org>, tianqing <tianqing@unitedstack.com>
 
-On Mi, 2017-02-01 at 16:30 +0100, Thomas Huth wrote:
-> On 01.02.2017 14:25, Gerd Hoffmann wrote:
-> > On Di, 2017-01-31 at 09:46 +0100, Thomas Huth wrote:
-> >> When compiling with SDL2, the semaphore trick used in sdlaudio.c
-> >> does not work - QEMU locks up completely in this case. To avoid
-> >> the hang and get at least some audio playback up and running (it's
-> >> a little bit crackling, but better than nothing), we can use the
-> >> SDL locking functions SDL_LockAudio() and SDL_UnlockAudio() to sync
-> >> with the sound playback thread instead.
-> >=20
-> > Does SDL_LockAudio work with sdl1 too?
-> > So we can possibly avoid having all those #ifdefs?
+>>No yet. I just test on one qemu-kvm vm. It works fine.=20
+>>The performance may need more time.=20
+>>Any one can test on this patch if you do fast....=20
+
+Hi, I would like to bench it with small 4k read/write.
+
+On the ceph side,do we need this PR ? :
+https://github.com/ceph/ceph/pull/13447
+
+
+----- Mail original -----
+De: "jazeltq" <jazeltq@gmail.com>
+=C3=80: "Tiger Hu" <hufh2004@gmail.com>
+Cc: "Josh Durgin" <jdurgin@redhat.com>, "Jeff Cody" <jcody@redhat.com>, "di=
+llaman" <dillaman@redhat.com>, "Kevin Wolf" <kwolf@redhat.com>, mreitz@redh=
+at.com, qemu-block@nongnu.org, "qemu-devel" <qemu-devel@nongnu.org>, "ceph-=
+devel" <ceph-devel@vger.kernel.org>, "tianqing" <tianqing@unitedstack.com>
+Envoy=C3=A9: Jeudi 16 F=C3=A9vrier 2017 15:03:52
+Objet: Re: [RFC v5] RBD: Add support readv,writev for rbd
+
+No yet. I just test on one qemu-kvm vm. It works fine.=20
+The performance may need more time.=20
+Any one can test on this patch if you do fast....=20
+
+2017-02-16 20:07 GMT+08:00 Tiger Hu <hufh2004@gmail.com>:=20
+> Tianqing,=20
 >=20
-> It somehow works, too, but sound quality is - at least for me - much
-> worse here than with the semaphore code. Maybe it can be fixed, too, but
-> I am really not familiar enough with the QEMU internal audio API to
-> figure out how to fix this (e.g. I don't understand why the run_out
-> function is called way more often than the callback function, but its
-> "live" parameter never reaches the full buffer size).
-> So maybe we can start with the #ifdefs for now and remove them once
-> somebody figured out how to improve sound quality for SDL1, too? (or
-> once we remove support for SDL1 from QEMU completely ... or do we want
-> to carry that with us forever?).
+> Do we have any performance data for this patch? Thanks.=20
+>=20
+> Tiger=20
+>> =E5=9C=A8 2017=E5=B9=B42=E6=9C=8816=E6=97=A5=EF=BC=8C=E4=B8=8B=E5=8D=885=
+:00=EF=BC=8Cjazeltq@gmail.com =E5=86=99=E9=81=93=EF=BC=9A=20
+>>=20
+>> From: tianqing <tianqing@unitedstack.com>=20
+>>=20
+>> Rbd can do readv and writev directly, so wo do not need to transform=20
+>> iov to buf or vice versa any more.=20
+>>=20
+>> Signed-off-by: tianqing <tianqing@unitedstack.com>=20
+>> ---=20
+>> block/rbd.c | 49 ++++++++++++++++++++++++++++++++++++++++++-------=20
+>> 1 file changed, 42 insertions(+), 7 deletions(-)=20
+>>=20
+>> diff --git a/block/rbd.c b/block/rbd.c=20
+>> index a57b3e3..75ae1d6 100644=20
+>> --- a/block/rbd.c=20
+>> +++ b/block/rbd.c=20
+>> @@ -47,7 +47,7 @@=20
+>> */=20
+>>=20
+>> /* rbd_aio_discard added in 0.1.2 */=20
+>> -#if LIBRBD_VERSION_CODE >=3D LIBRBD_VERSION(0, 1, 2)=20
+>> +#if LIBRBD_VERSION_CODE >=3D LIBRBD_VERSION(12, 0, 0)=20
+>> #define LIBRBD_SUPPORTS_DISCARD=20
+>> #else=20
+>> #undef LIBRBD_SUPPORTS_DISCARD=20
+>> @@ -73,7 +73,12 @@ typedef struct RBDAIOCB {=20
+>> BlockAIOCB common;=20
+>> int64_t ret;=20
+>> QEMUIOVector *qiov;=20
+>> +/* Note:=20
+>> + * The LIBRBD_SUPPORTS_IOVEC is defined in librbd.h.=20
+>> + */=20
+>> +#ifndef LIBRBD_SUPPORTS_IOVEC=20
+>> char *bounce;=20
+>> +#endif=20
+>> RBDAIOCmd cmd;=20
+>> int error;=20
+>> struct BDRVRBDState *s;=20
+>> @@ -83,7 +88,9 @@ typedef struct RADOSCB {=20
+>> RBDAIOCB *acb;=20
+>> struct BDRVRBDState *s;=20
+>> int64_t size;=20
+>> +#ifndef LIBRBD_SUPPORTS_IOVEC=20
+>> char *buf;=20
+>> +#endif=20
+>> int64_t ret;=20
+>> } RADOSCB;=20
+>>=20
+>> @@ -426,11 +433,21 @@ static void qemu_rbd_complete_aio(RADOSCB *rcb)=20
+>> }=20
+>> } else {=20
+>> if (r < 0) {=20
+>> +#ifndef LIBRBD_SUPPORTS_IOVEC=20
+>> memset(rcb->buf, 0, rcb->size);=20
+>> +#else=20
+>> + iov_memset(acb->qiov->iov, acb->qiov->niov, 0, 0, acb->qiov->size);=20
+>> +#endif=20
+>> acb->ret =3D r;=20
+>> acb->error =3D 1;=20
+>> } else if (r < rcb->size) {=20
+>> +#ifndef LIBRBD_SUPPORTS_IOVEC=20
+>> memset(rcb->buf + r, 0, rcb->size - r);=20
+>> +#else=20
+>> + iov_memset(acb->qiov->iov, acb->qiov->niov,=20
+>> + r, 0, acb->qiov->size - r);=20
+>> +#endif=20
+>> +=20
+>> if (!acb->error) {=20
+>> acb->ret =3D rcb->size;=20
+>> }=20
+>> @@ -441,10 +458,12 @@ static void qemu_rbd_complete_aio(RADOSCB *rcb)=20
+>>=20
+>> g_free(rcb);=20
+>>=20
+>> +#ifndef LIBRBD_SUPPORTS_IOVEC=20
+>> if (acb->cmd =3D=3D RBD_AIO_READ) {=20
+>> qemu_iovec_from_buf(acb->qiov, 0, acb->bounce, acb->qiov->size);=20
+>> }=20
+>> qemu_vfree(acb->bounce);=20
+>> +#endif=20
+>> acb->common.cb(acb->common.opaque, (acb->ret > 0 ? 0 : acb->ret));=20
+>>=20
+>> qemu_aio_unref(acb);=20
+>> @@ -655,8 +674,10 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *=
+bs,=20
+>> RBDAIOCB *acb;=20
+>> RADOSCB *rcb =3D NULL;=20
+>> rbd_completion_t c;=20
+>> - char *buf;=20
+>> int r;=20
+>> +#ifndef LIBRBD_SUPPORTS_IOVEC=20
+>> + char *buf =3D NULL;=20
+>> +#endif=20
+>>=20
+>> BDRVRBDState *s =3D bs->opaque;=20
+>>=20
+>> @@ -664,6 +685,8 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *b=
+s,=20
+>> acb->cmd =3D cmd;=20
+>> acb->qiov =3D qiov;=20
+>> assert(!qiov || qiov->size =3D=3D size);=20
+>> +#ifndef LIBRBD_SUPPORTS_IOVEC=20
+>> +=20
+>> if (cmd =3D=3D RBD_AIO_DISCARD || cmd =3D=3D RBD_AIO_FLUSH) {=20
+>> acb->bounce =3D NULL;=20
+>> } else {=20
+>> @@ -672,19 +695,21 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState =
+*bs,=20
+>> goto failed;=20
+>> }=20
+>> }=20
+>> - acb->ret =3D 0;=20
+>> - acb->error =3D 0;=20
+>> - acb->s =3D s;=20
+>> -=20
+>> if (cmd =3D=3D RBD_AIO_WRITE) {=20
+>> qemu_iovec_to_buf(acb->qiov, 0, acb->bounce, qiov->size);=20
+>> }=20
+>> -=20
+>> buf =3D acb->bounce;=20
+>> +#endif=20
+>> + acb->ret =3D 0;=20
+>> + acb->error =3D 0;=20
+>> + acb->s =3D s;=20
+>>=20
+>> rcb =3D g_new(RADOSCB, 1);=20
+>> +=20
+>> rcb->acb =3D acb;=20
+>> +#ifndef LIBRBD_SUPPORTS_IOVEC=20
+>> rcb->buf =3D buf;=20
+>> +#endif=20
+>> rcb->s =3D acb->s;=20
+>> rcb->size =3D size;=20
+>> r =3D rbd_aio_create_completion(rcb, (rbd_callback_t) rbd_finish_aiocb, =
+&c);=20
+>> @@ -694,10 +719,18 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState =
+*bs,=20
+>>=20
+>> switch (cmd) {=20
+>> case RBD_AIO_WRITE:=20
+>> +#ifndef LIBRBD_SUPPORTS_IOVEC=20
+>> r =3D rbd_aio_write(s->image, off, size, buf, c);=20
+>> +#else=20
+>> + r =3D rbd_aio_writev(s->image, qiov->iov, qiov->niov, off, c);=20
+>> +#endif=20
+>> break;=20
+>> case RBD_AIO_READ:=20
+>> +#ifndef LIBRBD_SUPPORTS_IOVEC=20
+>> r =3D rbd_aio_read(s->image, off, size, buf, c);=20
+>> +#else=20
+>> + r =3D rbd_aio_readv(s->image, qiov->iov, qiov->niov, off, c);=20
+>> +#endif=20
+>> break;=20
+>> case RBD_AIO_DISCARD:=20
+>> r =3D rbd_aio_discard_wrapper(s->image, off, size, c);=20
+>> @@ -719,7 +752,9 @@ failed_completion:=20
+>> rbd_aio_release(c);=20
+>> failed:=20
+>> g_free(rcb);=20
+>> +#ifndef LIBRBD_SUPPORTS_IOVEC=20
+>> qemu_vfree(acb->bounce);=20
+>> +#endif=20
+>> qemu_aio_unref(acb);=20
+>> return NULL;=20
+>> }=20
+>> --=20
+>> 2.10.2=20
+>>=20
+>> --=20
+>> To unsubscribe from this list: send the line "unsubscribe ceph-devel" in=
+=20
+>> the body of a message to majordomo@vger.kernel.org=20
+>> More majordomo info at http://vger.kernel.org/majordomo-info.html=20
+>=20
 
-Ok, picked as-is for now.  It's better than nothing, and I'm too busy
-with other stuff atm to have a closer look myself.
 
-thanks,
-  Gerd
+
+--=20
+=E8=B0=A6=E8=B0=A6=E5=90=9B=E5=AD=90=20
+--=20
+To unsubscribe from this list: send the line "unsubscribe ceph-devel" in=20
+the body of a message to majordomo@vger.kernel.org=20
+More majordomo info at http://vger.kernel.org/majordomo-info.html=20
