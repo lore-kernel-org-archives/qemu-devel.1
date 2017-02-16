@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47390)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ceOaH-0003Ks-SR
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:07:07 -0500
+	(envelope-from <eblake@redhat.com>) id 1ceOal-0004Qw-Fn
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:07:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ceOaG-0003s5-KP
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:07:05 -0500
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:36518)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ceOaG-0003rx-DL
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:07:04 -0500
-Received: by mail-wr0-x231.google.com with SMTP id 89so10323691wrr.3
-	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 08:07:04 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1ceOah-0003zA-FB
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:07:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33208)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ceOah-0003yx-6i
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:07:31 -0500
+References: <1487255507-106654-1-git-send-email-pbonzini@redhat.com>
+	<1487255507-106654-22-git-send-email-pbonzini@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5712fbf2-1a9e-42c9-a22f-554a6e8bc14d@redhat.com>
+Date: Thu, 16 Feb 2017 10:07:28 -0600
 MIME-Version: 1.0
-In-Reply-To: <20170216143816.2384-1-laurent@vivier.eu>
-References: <20170216143816.2384-1-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Feb 2017 16:06:42 +0000
-Message-ID: <CAFEAcA8MXwZcp3uBwHfQRLUJvvK7pxhOEnoaVTqkpw_DzhBAtA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL v2 00/14] Linux user for upstream patches
+In-Reply-To: <1487255507-106654-22-git-send-email-pbonzini@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="6X0P6Weo6rgmTddLL6nTf52V7vlx45ipj"
+Subject: Re: [Qemu-devel] [PULL 21/23] report guest crash information in
+ GUEST_PANICKED event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,58 +29,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: "Denis V. Lunev" <den@openvz.org>, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-On 16 February 2017 at 14:38, Laurent Vivier <laurent@vivier.eu> wrote:
-> The following changes since commit 5dae13cd71f0755a1395b5a4cde635b8a6ee3f58:
->
->   Merge remote-tracking branch 'remotes/rth/tags/pull-or-20170214' into staging (2017-02-14 09:55:48 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/vivier/qemu.git tags/linux-user-for-upstream-pull-request
->
-> for you to fetch changes up to 21992cb6794a5f8edb0cee01bdfe0b03d0438dac:
->
->   linux-user: Add FICLONE and FICLONERANGE ioctls (2017-02-16 15:29:30 +0100)
->
-> ----------------------------------------------------------------
-> To help Riku in his maintainer role of linux-user, I've proposed
-> to help him to manage this pull request.
->
-> This series is based on his branch linux-user-for-upstream at:
->
->     https://git.linaro.org/people/riku.voipio/qemu.git
->
-> I have added some reviewed patches from the mailing list since
-> the last pull request.
->
-> I have tested this series by creating some containers:
->
-> ppc64   fedora-21
-> ppc     debian-8
-> aarch64 centos-7.2
->
-> All these containers can boot and run as expected
-> (create an user, log in as this user, install packages with yum/dnf/apt-get
-> using sudo)
->
-> I have tested the LTP-20170116 in the ppc container (big-endian 32bit)
-> on an x86_64 host (little-endian 64bit). The result is:
->
-> Total Tests: 1111
-> Total Skipped Tests: 174
-> Total Failures: 68
-> Kernel Version: 4.9.5-200.fc25.x86_64
-> Machine Architecture: ppc
-> Hostname: debian-8-ppc
->
-> v2:
->     Fix John Paul Adrian Glaubitz author name
-> ----------------------------------------------------------------
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--6X0P6Weo6rgmTddLL6nTf52V7vlx45ipj
+From: Eric Blake <eblake@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: "Denis V. Lunev" <den@openvz.org>,
+ Anton Nefedov <anton.nefedov@virtuozzo.com>
+Message-ID: <5712fbf2-1a9e-42c9-a22f-554a6e8bc14d@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 21/23] report guest crash information in
+ GUEST_PANICKED event
+References: <1487255507-106654-1-git-send-email-pbonzini@redhat.com>
+ <1487255507-106654-22-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1487255507-106654-22-git-send-email-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Sorry, I applied v1 before I noticed you'd done this respin :-(
+On 02/16/2017 08:31 AM, Paolo Bonzini wrote:
+> From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+>=20
+> it's not very convenient to use the crash-information property interfac=
+e,
+> so provide a CPU class callback to get the guest crash information, and=
+ pass
+> that information in the event
+>=20
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> Signed-off-by: Denis V. Lunev <den@openvz.org>
+> Message-Id: <1487053524-18674-3-git-send-email-den@openvz.org>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
 
-thanks
--- PMM
+> +++ b/qapi/event.json
+> @@ -488,7 +488,9 @@
+>  #
+>  # @action: action that has been taken, currently always "pause"
+>  #
+> -# Since: 1.5
+> +# @info: optional information about a panic
+> +#
+> +# Since: 1.5 (@info since 2.9)
+
+I had a (late) comment on this being unusual formatting, but it can be
+fixed in a followup patch if there is no other reason to respin the pull
+request.
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--6X0P6Weo6rgmTddLL6nTf52V7vlx45ipj
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYpc5AAAoJEKeha0olJ0NqHkoIAIq+yFnR6LV4ltObg3r+Q5el
+7l22fILtJp75zpvaTSoqyj8zTaDU8BwpPwV6+eht7Jf9OmmcJE+kw3ZivtzjSzYm
+BWLNVdajoYfKYSwKmhlDgsh1lNvH6nUALpvESgLSt853hwKW2syz6/VqngnMQjWF
+hqs8jPD4AfKvii8Cp01ZPdV0oQz6tm1j8+amdgquPGLl/jifCuwcg1uJ//VuRmwR
+IdIG1atKmt54JeBMIpZxAOYtDogdZNl3kuk+c73gbt1BQBkIP059Gwv3oT9UjaZG
+20t05VWCax/03rXRk7/+rxbxH8HoLhY15skXA0WAgIClo8so/VENIMpJFT5Swlg=
+=TC2g
+-----END PGP SIGNATURE-----
+
+--6X0P6Weo6rgmTddLL6nTf52V7vlx45ipj--
