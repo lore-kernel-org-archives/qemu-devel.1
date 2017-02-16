@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ceRSC-0003UG-RY
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 14:10:58 -0500
+	(envelope-from <marcel@redhat.com>) id 1ceRVY-0005ic-LZ
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 14:14:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ceRS9-0004ym-Kg
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 14:10:56 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41656)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ceRS9-0004yW-C9
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 14:10:53 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ceRS8-00063v-Fb
-	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 19:10:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 73BE52E80C2
-	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 19:10:52 +0000 (UTC)
+	(envelope-from <marcel@redhat.com>) id 1ceRVV-0006Xl-EN
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 14:14:24 -0500
+References: <95706652-0a80-92fc-951b-7a454d496ddf@redhat.com>
+	<20170210003746.GP27610@umbus.fritz.box>
+	<5ea3785c-b979-8b8c-3ab0-243d69384697@redhat.com>
+	<20170213043307.GT25381@umbus>
+	<45446029-e404-77d4-754e-5541a506bb7c@redhat.com>
+	<20170214041532.GF2169@umbus.fritz.box>
+	<c0e368b1-c89d-ef5a-d475-c92266d3eb41@redhat.com>
+	<20170215014544.GC12369@umbus.fritz.box>
+	<22b4c89b-bfeb-e196-73c3-927115398e5e@redhat.com>
+	<20170216024842.GQ12369@umbus.fritz.box>
+	<20170216032808.GR12369@umbus.fritz.box>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <255b322c-f294-4653-ee18-c549962445f5@redhat.com>
+Date: Thu, 16 Feb 2017 21:14:01 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 16 Feb 2017 18:58:49 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1665389 <1665389@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170216160426.5716.21453.malonedeb@soybean.canonical.com>
-Message-Id: <20170216185849.30255.18804.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1665389] Re: Nested kvm guest fails to start on a
- emulated Westmere CPU guest under a Broadwell CPU host
+In-Reply-To: <20170216032808.GR12369@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] virtio-pci: Allow PCIe virtio devices on
+ root bus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,162 +33,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Laszlo Ersek <lersek@redhat.com>, abologna@redhat.com, lvivier@redhat.com, thuth@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, kraxel@redhat.com, Eduardo Habkost <ehabkost@redhat.com>
 
-Hi Nadav,
-  Can you clarify what the host and L1 kernels are please?
+On 02/16/2017 05:28 AM, David Gibson wrote:
+> On Thu, Feb 16, 2017 at 01:48:42PM +1100, David Gibson wrote:
+>> On Wed, Feb 15, 2017 at 04:59:33PM +0200, Marcel Apfelbaum wrote:
+>>> On 02/15/2017 03:45 AM, David Gibson wrote:
+>>>> On Tue, Feb 14, 2017 at 02:53:08PM +0200, Marcel Apfelbaum wrote:
+>>>>> On 02/14/2017 06:15 AM, David Gibson wrote:
+>>>>>> On Mon, Feb 13, 2017 at 12:14:23PM +0200, Marcel Apfelbaum wrote:
+>>>>>>> On 02/13/2017 06:33 AM, David Gibson wrote:
+>>>>>>>> On Sun, Feb 12, 2017 at 09:05:46PM +0200, Marcel Apfelbaum wrote:
+>>>>>>>>> On 02/10/2017 02:37 AM, David Gibson wrote:
+>>>>>>>>>> On Thu, Feb 09, 2017 at 10:04:47AM +0100, Laszlo Ersek wrote:
+>>>>>>>>>>> On 02/09/17 05:16, David Gibson wrote:
+>>>>>>>>>>>> On Wed, Feb 08, 2017 at 11:40:50AM +0100, Laszlo Ersek wrote:
+>>>>>>>>>>>>> On 02/08/17 07:16, David Gibson wrote:
+> [snip]
+>>>>>   Which means that you can use it to
+>>>>>> drive PCIe devices just fine.  "Bus level" PCIe extensions like AER
+>>>>>> and PCIe standard hotplug won't work, but PAPR has its own mechanisms
+>>>>>> for those (common between PCI and PCIe).
+>>>>>>
+>>>>>> I did float the idea of having the pseries PCI bus remain plain PCI
+>>>>>> but with a special flag to allow PCIe devices to be attached to it
+>>>>>> anyway.  It wasn't greeted with much enthusiasm..
+>>>>>>
+>>>>>
+>>>>> Can you point me to the discussion please? It seems similar to what I proposed above.
+>>>>
+>>>> Sorry, I was misleading.  I think I just raised that idea with Andrea
+>>>> and a few other people internally, not on one of the lists at large.
+>>>>
+>>>>> As you properly described it, is much closer to PCI then PCIe, even the only characteristic
+>>>>> that makes it "a little" PCIe, the Extended Configuration Space support,
+>>>>> is done with an alternative interface.
+>>>>>
+>>>>> I agree the PAPR bus is not PCIe.
+>>>>
+>>>> Ok, so if we take that direction, the question becomes how do we let
+>>>> PCIe devices plug into this mostly-not-PCIe bus.  Maybe introduce a
+>>>> "pci_bus_accepts_express()" function that will replace many, but not
+>>>> all current uses of "pci_bus_is_express()"?
+>>>>
+>>>
+>>> Sounds good and I think Eduardo is already working on exactly this
+>>> idea, however he is on PTO now. It is better to synchronize with him.
+>>
+>> Ah, right.  Do you know when he'll be back?  This is semi-urgent for
+>> Power.
+>>
+>>
+>>>> Such a helper could maybe simplify the logic in virtio-pci (and XHCI?)
+>>>> by returning false on an x86 root bus.
+>>>>
+>>>
+>>> The rule would me more complicated. We don't want to completely remove the
+>>> possibility to have PCIe devices as part of Root Complex. it seems
+>>> like I am contradicting myself, but no).
+>>> This is why we have guidelines and  not hard-coded policies.
+>>> Also ,the QEMU way is to be more permissive. We provide guidelines and sane
+>>> defaults, but we let the user to chose.
+>>>
+>>> Getting back to our problem, the rule would be:
+>>> hybrid devices should be PCI or PCIe for a bus?
+>>> PAPR bus should return 'PCIe' for hybrid devices.
+>>> X86 bus should return 'PCIe' if not root.
+>>
+>> Ok.
+>
+> Wait, actually.. we have two possible directions to go, both of which
+> have been mentioned in the thread, but I don't think we've settled on
+> one:
+>
+> 1) Have pseries create a PCIe bus (as my first cut draft does).
+>
+> That should allow pure PCIe devices to appear either under a port or
+> (more usually for PAPR) as "integrated endpoints".  In addition we'd
+> need as suggested above a "pcie_hybrid_type()" function that would
+> tell hybrid devices to also appear as PCIe rather than PCI.
+>
+> 2) Have pseries create a vanilla PCI bus (or a special PAPR PCI
+>    variant)
+>
+> Appearing as vanilla PCI would in a number of ways more closely match
+> the way PCI buses are handled on PAPR.  However, we still need to
+> connect PCIe devices to it.  So we'd need some 'bus_accepts_pcie()'
+> hook and use that (in place of pci_bus_is_express()) to determine both
+> whether we can attach pure PCIe devices and that hybrid devices should
+> appear as PCIe rather than plain PCI.
+>
+>
+> Based on the immediately preceding discussion, I was leaning towards
+> (2).  Is that your feeling as well?
+>
 
-This error means that qemu tried to write some msrs but one of the msr
-writes failed; we need to figure out which one to understand what's
-going on.
+On 02/16/2017 05:28 AM, David Gibson wrote:
+ > On Thu, Feb 16, 2017 at 01:48:42PM +1100, David Gibson wrote:
+ >> On Wed, Feb 15, 2017 at 04:59:33PM +0200, Marcel Apfelbaum wrote:
+ >>> On 02/15/2017 03:45 AM, David Gibson wrote:
+ >>>> On Tue, Feb 14, 2017 at 02:53:08PM +0200, Marcel Apfelbaum wrote:
+ >>>>> On 02/14/2017 06:15 AM, David Gibson wrote:
+ >>>>>> On Mon, Feb 13, 2017 at 12:14:23PM +0200, Marcel Apfelbaum wrote:
+ >>>>>>> On 02/13/2017 06:33 AM, David Gibson wrote:
+ >>>>>>>> On Sun, Feb 12, 2017 at 09:05:46PM +0200, Marcel Apfelbaum wrote:
+ >>>>>>>>> On 02/10/2017 02:37 AM, David Gibson wrote:
+ >>>>>>>>>> On Thu, Feb 09, 2017 at 10:04:47AM +0100, Laszlo Ersek wrote:
+ >>>>>>>>>>> On 02/09/17 05:16, David Gibson wrote:
+ >>>>>>>>>>>> On Wed, Feb 08, 2017 at 11:40:50AM +0100, Laszlo Ersek wrote:
+ >>>>>>>>>>>>> On 02/08/17 07:16, David Gibson wrote:
+ > [snip]
+ >>>>>   Which means that you can use it to
+ >>>>>> drive PCIe devices just fine.  "Bus level" PCIe extensions like AER
+ >>>>>> and PCIe standard hotplug won't work, but PAPR has its own mechanisms
+ >>>>>> for those (common between PCI and PCIe).
+ >>>>>>
+ >>>>>> I did float the idea of having the pseries PCI bus remain plain PCI
+ >>>>>> but with a special flag to allow PCIe devices to be attached to it
+ >>>>>> anyway.  It wasn't greeted with much enthusiasm..
+ >>>>>>
+ >>>>>
+ >>>>> Can you point me to the discussion please? It seems similar to what I proposed above.
+ >>>>
+ >>>> Sorry, I was misleading.  I think I just raised that idea with Andrea
+ >>>> and a few other people internally, not on one of the lists at large.
+ >>>>
+ >>>>> As you properly described it, is much closer to PCI then PCIe, even the only characteristic
+ >>>>> that makes it "a little" PCIe, the Extended Configuration Space support,
+ >>>>> is done with an alternative interface.
+ >>>>>
+ >>>>> I agree the PAPR bus is not PCIe.
+ >>>>
+ >>>> Ok, so if we take that direction, the question becomes how do we let
+ >>>> PCIe devices plug into this mostly-not-PCIe bus.  Maybe introduce a
+ >>>> "pci_bus_accepts_express()" function that will replace many, but not
+ >>>> all current uses of "pci_bus_is_express()"?
+ >>>>
+ >>>
+ >>> Sounds good and I think Eduardo is already working on exactly this
+ >>> idea, however he is on PTO now. It is better to synchronize with him.
+ >>
+ >> Ah, right.  Do you know when he'll be back?  This is semi-urgent for
+ >> Power.
+ >>
+ >>
+ >>>> Such a helper could maybe simplify the logic in virtio-pci (and XHCI?)
+ >>>> by returning false on an x86 root bus.
+ >>>>
+ >>>
+ >>> The rule would me more complicated. We don't want to completely remove the
+ >>> possibility to have PCIe devices as part of Root Complex. it seems
+ >>> like I am contradicting myself, but no).
+ >>> This is why we have guidelines and  not hard-coded policies.
+ >>> Also ,the QEMU way is to be more permissive. We provide guidelines and sane
+ >>> defaults, but we let the user to chose.
+ >>>
+ >>> Getting back to our problem, the rule would be:
+ >>> hybrid devices should be PCI or PCIe for a bus?
+ >>> PAPR bus should return 'PCIe' for hybrid devices.
+ >>> X86 bus should return 'PCIe' if not root.
+ >>
+ >> Ok.
+ >
+ > Wait, actually.. we have two possible directions to go, both of which
+ > have been mentioned in the thread, but I don't think we've settled on
+ > one:
+ >
+ > 1) Have pseries create a PCIe bus (as my first cut draft does).
+ >
+ > That should allow pure PCIe devices to appear either under a port or
+ > (more usually for PAPR) as "integrated endpoints".  In addition we'd
+ > need as suggested above a "pcie_hybrid_type()" function that would
+ > tell hybrid devices to also appear as PCIe rather than PCI.
+ >
+ > 2) Have pseries create a vanilla PCI bus (or a special PAPR PCI
+ >    variant)
+ >
+ > Appearing as vanilla PCI would in a number of ways more closely match
+ > the way PCI buses are handled on PAPR.  However, we still need to
+ > connect PCIe devices to it.  So we'd need some 'bus_accepts_pcie()'
+ > hook and use that (in place of pci_bus_is_express()) to determine both
+ > whether we can attach pure PCIe devices and that hybrid devices should
+ > appear as PCIe rather than plain PCI.
+ >
+ >
+ > Based on the immediately preceding discussion, I was leaning towards
+ > (2).  Is that your feeling as well?
+ >
 
-1) Edit kvm_msr_entry_add in target/i386/kvm.c to something like:
+I also like option (2).
 
-    assert((void *)(entry + 1) <=3D limit);
-    fprintf(stderr,"kvm_msr_entry_add: @%d index=3D%x value=3D%lx\n", msrs-=
->nmsrs, index, value);
-    entry->index =3D index;
-
-2) edit kvm_put_msrs near the bottom:
-
-    fprintf(stderr,"kvm_put_msrs: ret=3D%d expected=3D%d\n", ret, cpu->kvm_=
-msr_buf->nmsrs);
-    assert(ret =3D=3D cpu->kvm_msr_buf->nmsrs);
-
-Now with any luck the 'ret' value will tell you the entry which is bad, and=
- you can match
-that to the @%d value (or maybe it's the entry before that one which failed=
-?) then we get the index, look it up in the intel docs and figure out which=
- MSR it's complaining about.
-
-Also, does the problem go away if you remove the +x2apic on the top
-level qemu?
-
-Dave
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1665389
-
-Title:
-  Nested kvm guest fails to start on a emulated Westmere CPU guest under
-  a Broadwell CPU host
-
-Status in QEMU:
-  New
-
-Bug description:
-  Using latest master(5dae13), qemu fails to start any nested guest in a
-  Westmere emulated guest(layer 1), under a Broadwell host(layer 0),
-  with the error:
-
-  qemu-custom: /root/qemu/target/i386/kvm.c:1849: kvm_put_msrs:
-  Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
-
-  The qemu command used(though other CPUs didn't work either):
-  /usr/bin/qemu-custom -name guest=3D12ed9230-vm-el73,debug-threads=3Don -S=
- -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/d=
-omain-5-12ed9230-vm-el73/master-key.aes -machine pc-i440fx-2.9,accel=3Dkvm,=
-usb=3Doff -cpu Westmere,+vmx -m 512 -realtime mlock=3Doff -smp 2,sockets=3D=
-2,cores=3D1,threads=3D1 -object iothread,id=3Diothread1 -uuid f4ce4eba-985f=
--42a3-94c4-6e4a8a530347 -nographic -no-user-config -nodefaults -chardev soc=
-ket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-5-12ed9230-vm-el73=
-/monitor.sock,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3D=
-control -rtc base=3Dutc -no-shutdown -boot menu=3Doff,strict=3Don -device v=
-irtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x3 -drive file=3D/=
-root/lago/.lago/default/images/vm-el73_root.qcow2,format=3Dqcow2,if=3Dnone,=
-id=3Ddrive-virtio-disk0,serial=3D1,discard=3Dunmap -device virtio-blk-pci,s=
-csi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Ddrive-virtio-disk0,id=3Dvirtio-dis=
-k0,bootindex=3D1 -netdev tap,fd=3D26,id=3Dhostnet0,vhost=3Don,vhostfd=3D28 =
--device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D54:52:c0:a7:c8:02,=
-bus=3Dpci.0,addr=3D0x2 -chardev pty,id=3Dcharserial0 -device isa-serial,cha=
-rdev=3Dcharserial0,id=3Dserial0 -chardev socket,id=3Dcharchannel0,path=3D/v=
-ar/lib/libvirt/qemu/channel/target/domain-5-12ed9230-vm-el73/org.qemu.guest=
-_agent.0,server,nowait -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1=
-,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu.guest_agent.0 -object=
- rng-random,id=3Dobjrng0,filename=3D/dev/random -device virtio-rng-pci,rng=
-=3Dobjrng0,id=3Drng0,bus=3Dpci.0,addr=3D0x9 -msg timestamp=3Don
-  2017-02-16T15:14:45.840412Z qemu-custom: -chardev pty,id=3Dcharserial0: c=
-har device redirected to /dev/pts/2 (label charserial0)
-  qemu-custom: /root/qemu/target/i386/kvm.c:1849: kvm_put_msrs: Assertion `=
-ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
-
-  =
-
-  The CPU flags in the Westmere guest:
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush mmx fxsr sse sse2 syscall nx lm constant_tsc rep_good nopl =
-pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 x2apic popcnt aes hypervisor lah=
-f_lm arat tpr_shadow vnmi flexpriority ept vpid
-
-  The guest kernel is 3.10.0-514.2.2.el7.x86_64.
-
-  The CPU flags of the host(Broadwell): =
-
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb =
-rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology no=
-nstop_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx smx e=
-st tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt=
- tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch epb=
- intel_pt tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hl=
-e avx2 smep bmi2 erms invpcid rtm mpx rdseed adx smap clflushopt xsaveopt x=
-savec xgetbv1 xsaves dtherm ida arat pln pts hwp hwp_notify hwp_act_window =
-hwp_epp
-
-  qemu command on the host - Broadwell(which works):
-  /usr/bin/qemu-kvm -name 4ffcd448-vm-el73,debug-threads=3Don -S -machine p=
-c-i440fx-2.6,accel=3Dkvm,usb=3Doff -cpu Westmere,+x2apic,+vmx,+vme -m 4096 =
--realtime mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -object ioth=
-read,id=3Diothread1 -uuid 8cc0a2cf-d25a-4014-acdb-f159c376a532 -nographic -=
-no-user-config -nodefaults -chardev socket,id=3Dcharmonitor,path=3D/var/lib=
-/libvirt/qemu/domain-4-4ffcd448-vm-el73/monitor.sock,server,nowait -mon cha=
-rdev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc -no-shutdown=
- -boot menu=3Doff,strict=3Don -device virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.=
-0,addr=3D0x3 -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=
-=3D0x4 -drive file=3D/home/ngoldin/src/nvgoldin.github.com/lago-init-files/=
-.lago/flags-tests/default/images/vm-el73_root.qcow2,format=3Dqcow2,if=3Dnon=
-e,id=3Ddrive-virtio-disk0,serial=3D1,discard=3Dunmap -device virtio-blk-pci=
-,scsi=3Doff,bus=3Dpci.0,addr=3D0x5,drive=3Ddrive-virtio-disk0,id=3Dvirtio-d=
-isk0,bootindex=3D1 -drive file=3D/home/ngoldin/src/nvgoldin.github.com/lago=
--init-files/.lago/flags-tests/default/images/vm-el73_additonal.qcow2,format=
-=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0,serial=3D2,discard=3Dunmap -devic=
-e scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,drive=3Ddrive-scsi0=
--0-0-0,id=3Dscsi0-0-0-0,bootindex=3D2 -netdev tap,fd=3D29,id=3Dhostnet0,vho=
-st=3Don,vhostfd=3D31 -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=
-=3D54:52:c0:a8:c9:02,bus=3Dpci.0,addr=3D0x2 -chardev pty,id=3Dcharserial0 -=
-device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev socket,id=3Dc=
-harchannel0,path=3D/var/lib/libvirt/qemu/channel/target/domain-4-4ffcd448-v=
-m-el73/org.qemu.guest_agent.0,server,nowait -device virtserialport,bus=3Dvi=
-rtio-serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu.=
-guest_agent.0 -object rng-random,id=3Dobjrng0,filename=3D/dev/random -devic=
-e virtio-rng-pci,rng=3Dobjrng0,id=3Drng0,bus=3Dpci.0,addr=3D0x9 -msg timest=
-amp=3Don
-
-  On the Broadwell host I'm using a distribution package if it matters
-  (qemu-kvm-2.6.2-5.fc24.x86_64 and 4.8.15-200.fc24.x86_64)
-
-  As the error indicates, I think this assertion was put in:
-  commit 48e1a45c3166d659f781171a47dabf4a187ed7a5
-  Author: Paolo Bonzini <pbonzini@redhat.com>
-  Date:   Wed Mar 30 22:55:29 2016 +0200
-
-      target-i386: assert that KVM_GET/SET_MSRS can set all requested MSRs
-      =
-
-      This would have caught the bug in the previous patch.
-      =
-
-      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-  I tried going back one commit before to 273c515, and then the error is go=
-ne and the nested guest comes up as expected. If I try to run with head at =
-the above commit(48e145c) the error output is slightly different, though it=
- looks the same:
-  /root/qemu/target-i386/kvm.c:1713: kvm_put_msrs: Assertion `ret =3D=3D n'=
- failed.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1665389/+subscriptions
+Thanks,
+Marcel
