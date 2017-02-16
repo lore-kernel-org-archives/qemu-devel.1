@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ceNCk-0000gn-Cn
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:38:46 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ceNCo-0000kf-A8
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:38:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ceNCg-0002LP-B7
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:38:42 -0500
-Received: from mout.kundenserver.de ([212.227.17.13]:52445)
+	(envelope-from <laurent@vivier.eu>) id 1ceNCj-0002Mg-97
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:38:46 -0500
+Received: from mout.kundenserver.de ([217.72.192.75]:57207)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ceNCg-0002Kr-0O
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:38:38 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ceNCi-0002ML-Ui
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:38:41 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu, 16 Feb 2017 15:38:15 +0100
-Message-Id: <20170216143816.2384-14-laurent@vivier.eu>
+Date: Thu, 16 Feb 2017 15:38:16 +0100
+Message-Id: <20170216143816.2384-15-laurent@vivier.eu>
 In-Reply-To: <20170216143816.2384-1-laurent@vivier.eu>
 References: <20170216143816.2384-1-laurent@vivier.eu>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 13/14] linux-user: Use correct types in
- load_symbols()
+Subject: [Qemu-devel] [PULL v2 14/14] linux-user: Add FICLONE and
+ FICLONERANGE ioctls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +25,69 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <laurent@vivier.eu>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Helge Deller <deller@gmx.de>, Laurent Vivier <laurent@vivier.eu>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+From: Helge Deller <deller@gmx.de>
 
-Coverity doesn't like the code in load_symbols() which assumes
-it can use 'int' for a variable that might hold an offset into
-the guest ELF file, because in a 64-bit guest that could
-overflow. Guest binaries with 2GB sections aren't very likely
-and this isn't a security issue because we fully trust the
-guest linux-user binary anyway, but we might as well use the
-right types, which will placate Coverity. Use uint64_t to
-hold section sizes, and bail out if the symbol table is too
-large rather than just overflowing an int.
+Add missing FICLONE and FICLONERANGE ioctls.
 
-(Coverity issue CID1005776)
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Helge Deller <deller@gmx.de>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <1486249533-5260-1-git-send-email-peter.maydell@linaro.org>
+Message-Id: <20170211222602.GA6399@ls3530.fritz.box>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/elfload.c | 22 +++++++++++++++-------
- 1 file changed, 15 insertions(+), 7 deletions(-)
+ linux-user/ioctls.h        | 5 +++++
+ linux-user/syscall_defs.h  | 4 ++++
+ linux-user/syscall_types.h | 6 ++++++
+ 3 files changed, 15 insertions(+)
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 8271227..f520d77 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -2262,6 +2262,7 @@ static int symcmp(const void *s0, const void *s1)
- static void load_symbols(struct elfhdr *hdr, int fd, abi_ulong load_bias)
- {
-     int i, shnum, nsyms, sym_idx = 0, str_idx = 0;
-+    uint64_t segsz;
-     struct elf_shdr *shdr;
-     char *strings = NULL;
-     struct syminfo *s = NULL;
-@@ -2293,19 +2294,26 @@ static void load_symbols(struct elfhdr *hdr, int fd, abi_ulong load_bias)
-         goto give_up;
-     }
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index 2f6e85b..e6997ff 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -112,6 +112,11 @@
+ #ifdef FIBMAP
+      IOCTL(FIBMAP, IOC_W | IOC_R, MK_PTR(TYPE_LONG))
+ #endif
++#ifdef FICLONE
++     IOCTL(FICLONE, IOC_W, TYPE_INT)
++     IOCTL(FICLONERANGE, IOC_W, MK_PTR(MK_STRUCT(STRUCT_file_clone_range)))
++#endif
++
+ #ifdef FIGETBSZ
+      IOCTL(FIGETBSZ, IOC_R, MK_PTR(TYPE_LONG))
+ #endif
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 4442c22..72ca5b1 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -1086,6 +1086,10 @@ struct target_pollfd {
  
--    i = shdr[str_idx].sh_size;
--    s->disas_strtab = strings = g_try_malloc(i);
--    if (!strings || pread(fd, strings, i, shdr[str_idx].sh_offset) != i) {
-+    segsz = shdr[str_idx].sh_size;
-+    s->disas_strtab = strings = g_try_malloc(segsz);
-+    if (!strings ||
-+        pread(fd, strings, segsz, shdr[str_idx].sh_offset) != segsz) {
-         goto give_up;
-     }
+ #define TARGET_FIBMAP     TARGET_IO(0x00,1)  /* bmap access */
+ #define TARGET_FIGETBSZ   TARGET_IO(0x00,2)  /* get the block size used for bmap */
++
++#define TARGET_FICLONE    TARGET_IOW(0x94, 9, int)
++#define TARGET_FICLONERANGE TARGET_IOW(0x94, 13, struct file_clone_range)
++
+ /* Note that the ioctl numbers claim type "long" but the actual type
+  * used by the kernel is "int".
+  */
+diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
+index 2b8c0c6..24631b0 100644
+--- a/linux-user/syscall_types.h
++++ b/linux-user/syscall_types.h
+@@ -232,6 +232,12 @@ STRUCT(dm_target_versions,
+ STRUCT(dm_target_msg,
+        TYPE_ULONGLONG) /* sector */
  
--    i = shdr[sym_idx].sh_size;
--    syms = g_try_malloc(i);
--    if (!syms || pread(fd, syms, i, shdr[sym_idx].sh_offset) != i) {
-+    segsz = shdr[sym_idx].sh_size;
-+    syms = g_try_malloc(segsz);
-+    if (!syms || pread(fd, syms, segsz, shdr[sym_idx].sh_offset) != segsz) {
-         goto give_up;
-     }
- 
--    nsyms = i / sizeof(struct elf_sym);
-+    if (segsz / sizeof(struct elf_sym) > INT_MAX) {
-+        /* Implausibly large symbol table: give up rather than ploughing
-+         * on with the number of symbols calculation overflowing
-+         */
-+        goto give_up;
-+    }
-+    nsyms = segsz / sizeof(struct elf_sym);
-     for (i = 0; i < nsyms; ) {
-         bswap_sym(syms + i);
-         /* Throw away entries which we do not need.  */
++STRUCT(file_clone_range,
++       TYPE_LONGLONG, /* src_fd */
++       TYPE_ULONGLONG, /* src_offset */
++       TYPE_ULONGLONG, /* src_length */
++       TYPE_ULONGLONG) /* dest_offset */
++
+ STRUCT(fiemap_extent,
+        TYPE_ULONGLONG, /* fe_logical */
+        TYPE_ULONGLONG, /* fe_physical */
 -- 
 2.9.3
