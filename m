@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34425)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1ceAwh-0000In-9D
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 20:33:20 -0500
+	(envelope-from <rth7680@gmail.com>) id 1ceAy1-0000vC-MA
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 20:34:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1ceAwd-0003ej-5b
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 20:33:19 -0500
-Received: from [45.249.212.189] (port=2394 helo=dggrg03-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1ceAwb-0003cU-R6
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 20:33:15 -0500
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Thu, 16 Feb 2017 01:31:40 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA1BD1CA@DGGEMA505-MBX.china.huawei.com>
-References: <589C099A.9090605@huawei.com>
-	<AF60004D-7133-44D1-8A9F-7DB9822D84AF@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA1B4379@DGGEMA505-MBX.china.huawei.com>
-	<105e5774-38c3-0683-ca08-64f6ed53c643@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA1B6988@DGGEMA505-MBX.china.huawei.com>
-	<2127602137.20489688.1486827559449.JavaMail.zimbra@redhat.com>
-	<1486980300.17184.28.camel@redhat.com>
-In-Reply-To: <1486980300.17184.28.camel@redhat.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <rth7680@gmail.com>) id 1ceAy0-0004Cr-QA
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 20:34:41 -0500
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:34879)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ceAy0-0004CU-K1
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 20:34:40 -0500
+Received: by mail-pg0-x244.google.com with SMTP id 204so377517pge.2
+	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 17:34:40 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170207005930.28327-1-laurent@vivier.eu>
+	<20170207005930.28327-13-laurent@vivier.eu>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <33f7c944-8c6f-ec23-f88f-2a7a4b27a55e@twiddle.net>
+Date: Thu, 16 Feb 2017 12:34:27 +1100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Help] Windows2012 as Guest 64+cores on KVM Halts
+In-Reply-To: <20170207005930.28327-13-laurent@vivier.eu>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 12/16] target-m68k: add fscale, fgetman,
+ fgetexp and fmod
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,50 +31,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vadim Rozenfeld <vrozenfe@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Yan Vugenfirer <yvugenfi@redhat.com>, Hangaohuai <hangaohuai@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Radim Krcmar <rkrcmar@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Aurelien Jarno <aurelien@aurel32.net>
 
-SGksDQoNCj4gDQo+IE9uIFNhdCwgMjAxNy0wMi0xMSBhdCAxMDozOSAtMDUwMCwgUGFvbG8gQm9u
-emluaSB3cm90ZToNCj4gPiA+DQo+ID4gPg0KPiA+ID4gPg0KPiA+ID4gPiBPbiAxMC8wMi8yMDE3
-IDEwOjMxLCBHb25nbGVpIChBcmVpKSB3cm90ZToNCj4gPiA+ID4gPg0KPiA+ID4gPiA+IEJ1dCBX
-ZSB0ZXN0ZWQgdGhlIHNhbWUgY2FzZXMgb24gWGVuIHBsYXRmb3JtIGFuZCBWTXdhcmUsIGFuZA0K
-PiA+ID4gPiA+IHRoZSBndWVzdCBib290ZWQgc3VjY2Vzc2Z1bGx5Lg0KPiA+ID4gPg0KPiA+ID4g
-PiBXZXJlIHRoZXNlIHR3byBhbHNvIHRlc3RlZCB3aXRoIGVubGlnaHRlbm1lbnRzIGVuYWJsZWQ/
-wqDCoFRDRw0KPiA+ID4gPiBzdXJlbHkgaXNuJ3QuDQo+ID4gPg0KPiA+ID4gQWJvdXQgVENHLCBJ
-IGp1c3QgcmVtb3ZlICcgYWNjZWw9a3ZtLCcgYW5kICdoeV9yZWxlYXhlZCcgZnJvbSB0aGUNCj4g
-PiA+IGJlbG93IFFFTVUNCj4gPiA+IENvbW1hbmQgbGluZSwgSSB0aG91Z2h0IHRoZSBoeXBlci1W
-IGVuYWJsZWQgdGhlbi4gU29ycnkgYWJvdXQgdGhhdC4NCj4gPiA+DQo+ID4gPiBCdXQgZm9yIFhl
-biwgd2Ugc2V0ICd2aXJpZGlhbj0xJyB3aGljaCBiZSB0aG91Z2h0IHRoZSBIeXBlci1WIGlzDQo+
-ID4gPiBlbmFibGVkLg0KPiA+ID4NCj4gPiA+IEZvciBWTVdhcmUgd2UgYWxzbyBlbmFibGVkIHRo
-ZSBIeXBlci1WIGVubGlnaHRlbm1lbnRzLg0KPiBJZiBJJ20gbm90IG1pc3Rha2VuLCBldmVuIEh5
-cGVyLVYgc2VydmVyIGRvZXNuJ3QgYWxsb3cgc3BlY2lmeSBtb3JlDQo+IHRoYW4gNjQgdkNQVXMg
-Zm9yIEdlbmVyYXRpb24gMSBWTXMuDQoNCk5vcm1hbGx5IHllcywgYnV0IEkgZm91bmQgdGhlIGV4
-cGxhbmF0aW9uIGZyb20gTWljcm9zb2Z0IGRvY3VtZW50IGFib3V0IGl0Og0KDQpNYXhpbXVtIFN1
-cHBvcnRlZCBWaXJ0dWFsIFByb2Nlc3NvcnMNCg0KT24gV2luZG93cyBvcGVyYXRpbmcgc3lzdGVt
-cyB2ZXJzaW9ucyB0aHJvdWdoIFdpbmRvd3MgU2VydmVyIDIwMDggUjIsIA0KcmVwb3J0aW5nIHRo
-ZSBIViMxIGh5cGVydmlzb3IgaW50ZXJmYWNlIGxpbWl0cyB0aGUgV2luZG93cyB2aXJ0dWFsIG1h
-Y2hpbmUgDQp0byBhIG1heGltdW0gb2YgNjQgVlBzLCByZWdhcmRsZXNzIG9mIHdoYXQgaXMgcmVw
-b3J0ZWQgdmlhIENQVUlELjQwMDAwMDA1LkVBWC4NClN0YXJ0aW5nIHdpdGggV2luZG93cyBTZXJ2
-ZXIgMjAxMiBhbmQgV2luZG93cyA4LCBpZiBDUFVJRC40MDAwMDAwNS5FQVggDQpjb250YWlucyBh
-IHZhbHVlIG9mIC0xLCBXaW5kb3dzIGFzc3VtZXMgdGhhdCB0aGUgaHlwZXJ2aXNvciBpbXBvc2Vz
-IG5vIHNwZWNpZmljDQpsaW1pdCB0byB0aGUgbnVtYmVyIG9mIFZQcy4gSW4gdGhpcyBjYXNlLCBX
-aW5kb3dzIFNlcnZlciAyMDEyIGd1ZXN0IFZNcyBtYXkNCnVzZSBtb3JlIHRoYW4gNjQgVlBzLCB1
-cCB0byB0aGUgbWF4aW11bSBzdXBwb3J0ZWQgbnVtYmVyIG9mIHByb2Nlc3NvcnMgDQphcHBsaWNh
-YmxlIHRvIHRoZSBzcGVjaWZpYyBXaW5kb3dzIHZlcnNpb24gYmVpbmcgdXNlZC4NCg0KTGluazog
-aHR0cHM6Ly9kb2NzLm1pY3Jvc29mdC5jb20vZW4tdXMvdmlydHVhbGl6YXRpb24vaHlwZXItdi1v
-bi13aW5kb3dzL3JlZmVyZW5jZS90bGZzDQoNCiJSZXF1aXJlbWVudHMgZm9yIEltcGxlbWVudGlu
-ZyB0aGUgTWljcm9zb2Z0IEh5cGVydmlzb3IgSW50ZXJmYWNlIg0KDQpBbmQgdGhlIGJlbG93IHBh
-dGNoIHdvcmtzIGZvciBtZSwgSSBjYW4gc3VwcG9ydCBtYXggMjU1IHZjcHVzIGZvciBXUzIwMTIN
-CndpdGggaHlwZXItdiBlbmxpZ2h0ZW5tZW50cy4NCg0KZGlmZiAtLWdpdCBhL3RhcmdldC9pMzg2
-L2t2bS5jIGIvdGFyZ2V0L2kzODYva3ZtLmMNCmluZGV4IDI3ZmQwNTAuLmVmZTNjYmMgMTAwNjQ0
-DQotLS0gYS90YXJnZXQvaTM4Ni9rdm0uYw0KKysrIGIvdGFyZ2V0L2kzODYva3ZtLmMNCkBAIC03
-NzIsNyArNzcyLDcgQEAgaW50IGt2bV9hcmNoX2luaXRfdmNwdShDUFVTdGF0ZSAqY3MpDQoNCiAg
-ICAgICAgIGMgPSAmY3B1aWRfZGF0YS5lbnRyaWVzW2NwdWlkX2krK107DQogICAgICAgICBjLT5m
-dW5jdGlvbiA9IEhZUEVSVl9DUFVJRF9JTVBMRU1FTlRfTElNSVRTOw0KLSAgICAgICAgYy0+ZWF4
-ID0gMHg0MDsNCisgICAgICAgIGMtPmVheCA9IC0xOw0KICAgICAgICAgYy0+ZWJ4ID0gMHg0MDsN
-Cg0KICAgICAgICAga3ZtX2Jhc2UgPSBLVk1fQ1BVSURfU0lHTkFUVVJFX05FWFQ7DQoNCj4gSW4g
-YW55IGNhc2UsIGlmIHlvdSBhcmUgb25seSBpbnRlcmVzdGVkIGluIGh2X3JlbGF4ZWQsIHlvdSBj
-YW4gZHJvcCBpdA0KPiBvZmYgZm9yIFdTMjAxMiBhcyBsb25nIGFzIHlvdSBoYXZlIGNwdSBoeXBl
-cnZpc29yIGZsYWcNCj4gKENQVUlELjE6RUNYwqBbYml0wqAzMV09MSkgdHVybmVkIG9uLg0KPiAN
-Cmh5X3JlbGF4ZWQgaXMganVzdCBhIGV4YW1wbGUgb2YgZW5hYmxpbmcgaHlwZXJ2LXYgZW5saWdo
-dGVubWVudHMuDQoNClRoYW5rcywNCi1Hb25nbGVpDQo=
+On 02/07/2017 11:59 AM, Laurent Vivier wrote:
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>  target/m68k/cpu.h        |  1 +
+>  target/m68k/fpu_helper.c | 56 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  target/m68k/helper.h     |  4 ++++
+>  target/m68k/translate.c  | 14 ++++++++++++
+>  4 files changed, 75 insertions(+)
+>
+> diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
+> index 7985dc3..3042ab7 100644
+> --- a/target/m68k/cpu.h
+> +++ b/target/m68k/cpu.h
+> @@ -253,6 +253,7 @@ typedef enum {
+>  /* Quotient */
+>
+>  #define FPSR_QT_MASK  0x00ff0000
+> +#define FPSR_QT_SHIFT 16
+>
+>  /* Floating-Point Control Register */
+>  /* Rounding mode */
+> diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
+> index d8145e0..42f5b5c 100644
+> --- a/target/m68k/fpu_helper.c
+> +++ b/target/m68k/fpu_helper.c
+> @@ -458,3 +458,59 @@ void HELPER(const_FP0)(CPUM68KState *env, uint32_t offset)
+>      env->fp0l = fpu_rom[offset].low;
+>      env->fp0h = fpu_rom[offset].high;
+>  }
+> +
+> +void HELPER(getexp_FP0)(CPUM68KState *env)
+> +{
+> +    int32_t exp;
+> +    floatx80 res;
+> +
+> +    res = FP0_to_floatx80(env);
+> +    if (floatx80_is_zero_or_denormal(res) || floatx80_is_any_nan(res) ||
+> +        floatx80_is_infinity(res)) {
+> +        return;
+> +    }
+> +    exp = (env->fp0h & 0x7fff) - 0x3fff;
+> +
+> +    res = int32_to_floatx80(exp, &env->fp_status);
+> +
+> +    floatx80_to_FP0(env, res);
+
+Failure to raise OPERR for infinities?
+
+> +void HELPER(getman_FP0)(CPUM68KState *env)
+> +{
+> +    floatx80 res;
+> +    res = int64_to_floatx80(env->fp0l, &env->fp_status);
+> +    floatx80_to_FP0(env, res);
+> +}
+
+This seems completely wrong.  (1) NaN gets returned, (2) Inf raises OPERR, (3) 
+Normal values return something in the range [1.0 ... 2.0).  Which means you 
+should just force the exponent rather than convert the low part.
+
+> +
+> +void HELPER(scale_FP0_FP1)(CPUM68KState *env)
+> +{
+> +    int32_t scale;
+> +    int32_t exp;
+> +
+> +    scale = floatx80_to_int32(FP0_to_floatx80(env), &env->fp_status);
+> +
+> +    exp = (env->fp1h & 0x7fff) + scale;
+> +
+> +    env->fp0h = (env->fp1h & 0x8000) | (exp & 0x7fff);
+> +    env->fp0l = env->fp1l;
+> +}
+
+Missing handling for NaN, Inf, 0, denormal.
+
+
+r~
