@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ceGCU-0007Nb-KM
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 02:10:00 -0500
+	(envelope-from <lma@suse.com>) id 1ceGIa-0001Ko-7m
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 02:16:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ceGCT-0002Jj-4T
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 02:09:58 -0500
-References: <1486979689-230770-1-git-send-email-vsementsov@virtuozzo.com>
-	<1486979689-230770-15-git-send-email-vsementsov@virtuozzo.com>
-	<b62f61e3-af0b-c2ef-8e9e-2742d59bffa3@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <af7be966-90c6-185d-269b-3c6bb190918c@virtuozzo.com>
-Date: Thu, 16 Feb 2017 10:09:42 +0300
-MIME-Version: 1.0
-In-Reply-To: <b62f61e3-af0b-c2ef-8e9e-2742d59bffa3@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 14/17] qmp: add
- x-debug-block-dirty-bitmap-sha256
+	(envelope-from <lma@suse.com>) id 1ceGIX-0004Fe-0B
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 02:16:16 -0500
+Received: from prv-mh.provo.novell.com ([137.65.248.74]:44182)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lma@suse.com>) id 1ceGIW-0004EU-M1
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 02:16:12 -0500
+Message-Id: <58A5C23202000062000D0FCB@prv-mh.provo.novell.com>
+Date: Thu, 16 Feb 2017 00:16:02 -0700
+From: "Lin Ma" <lma@suse.com>
+References: <58A4707602000062000D0393@prv-mh.provo.novell.com>
+	<20170215153306.GF16064@stefanha-x1.localdomain>
+In-Reply-To: <20170215153306.GF16064@stefanha-x1.localdomain>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] =?utf-8?b?562U5aSN77yaIFJlOiAgW1JGQ10gdmlydGlvLWZj?=
+ =?utf-8?q?=3A_draft_idea_of_virtual_fibre_channel_HBA?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,197 +28,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, famz@redhat.com, lirans@il.ibm.com, quintela@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, amit.shah@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, mst@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, Zhiqiang Zhou <ZZhou@suse.com>, hare@suse.de
 
-16.02.2017 03:35, John Snow wrote:
+
+
+>>> Stefan Hajnoczi <stefanha@gmail.com> 2/15/2017 11:33 =E4=B8=8B=E5=8D=88=
+ >>>
+>On Wed, Feb 15, 2017 at 12:15:02AM -0700, Lin Ma wrote:
+>> Hi all,
+>> =20
+>> We know that libvirt can create fibre channels vHBA on host
+>> based on npiv, and present the LUNs to guest.
+>> =20
+>> I'd like to implement a virtual fibre channel HBA for qemu,
+>> I havn't investigate it deeply yet. The idea presents a fc
+>> vHBA in guest, interact with remote fc switch through npiv,
+>> The LUNs will be recognized inside guest. I sent this email
+>> here to see if you are in agreement with this approach and
+>> hope to get some ideas/suggestions.
+>> =20
+>> The frontend is based on virtio, say virtio-fc-pci; the backend
+>> is based on npiv of physical fc hba on host.
+>> The implementation of this virtual fc hba doesn't support Fc-al,
+>> only supports Fabric. It wrappers scsi data info fc frames, then
+>> forwards them to backend, sounds like scsi over fc.
+>> (maybe I can re-use some of virtio-scsi code/idea to deal with scsi =
+data)
+>> =20
+>> The minimum invocation may look like:
+>> qemu-system-x86_64 \
+>> ...... \
+>> -object fibrechannel-backend,id=3Dfcdev0,host=3D0000:81:00.0 \
+>> -device virtio-fc-pci,id=3Dvfc0,fc_backend=3Dfcdev0,wwpn=3D1000000000000=
+001,wwnn=3D1100000000000001 \
+>> ......
+>> =20
+>> BTW, I have no idea how to make migration works:
+>> How to deal with the BDF during migration?
+>> How to deal with the Fabric ID during migration?
+>> =20
+>> It's a draft idea, There are lots of related code I need to
+>> investigate, Currently this is all thoughts I have.
+>> =20
+>> Hello Paolo and Stefan, You are the authors of virtio-scsi,
+>> and had some in-depth discuss about virtio-scsi in 2011
+>> with Hannes, May I have your ideas/thoughts?
 >
-> On 02/13/2017 04:54 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> This is simply the same as the version in the other two series, right?
-
-Yes. Context a bit differs... Aha, I've discovered that in migration I'm 
-adding bdrv_next_dirty_bitmap and in persistent - 
-bdrv_dirty_bitmap_next. Anyway, one series should be rebased after 
-applying the second..
-
+>I'm not sure it's necessary for the guest to have FC access.  Fam Zheng
+>and Paolo are working on virtio-scsi FC NPIV enhancements.  It should
+>make NPIV work better without adding a whole new FC device.
 >
-> Reviewed-by: John Snow <jsnow@redhat.com>
+>https://lkml.org/lkml/2017/1/16/439
 >
->> ---
->>   block/dirty-bitmap.c         |  5 +++++
->>   blockdev.c                   | 29 +++++++++++++++++++++++++++++
->>   include/block/dirty-bitmap.h |  2 ++
->>   include/qemu/hbitmap.h       |  8 ++++++++
->>   qapi/block-core.json         | 27 +++++++++++++++++++++++++++
->>   tests/Makefile.include       |  2 +-
->>   util/hbitmap.c               | 11 +++++++++++
->>   7 files changed, 83 insertions(+), 1 deletion(-)
->>
->> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
->> index 32aa6eb..5bec99b 100644
->> --- a/block/dirty-bitmap.c
->> +++ b/block/dirty-bitmap.c
->> @@ -558,3 +558,8 @@ BdrvDirtyBitmap *bdrv_next_dirty_bitmap(BlockDriverState *bs,
->>   
->>       return QLIST_NEXT(bitmap, list);
->>   }
->> +
->> +char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp)
->> +{
->> +    return hbitmap_sha256(bitmap->bitmap, errp);
->> +}
->> diff --git a/blockdev.c b/blockdev.c
->> index db82ac9..4d06885 100644
->> --- a/blockdev.c
->> +++ b/blockdev.c
->> @@ -2790,6 +2790,35 @@ void qmp_block_dirty_bitmap_clear(const char *node, const char *name,
->>       aio_context_release(aio_context);
->>   }
->>   
->> +BlockDirtyBitmapSha256 *qmp_x_debug_block_dirty_bitmap_sha256(const char *node,
->> +                                                              const char *name,
->> +                                                              Error **errp)
->> +{
->> +    AioContext *aio_context;
->> +    BdrvDirtyBitmap *bitmap;
->> +    BlockDriverState *bs;
->> +    BlockDirtyBitmapSha256 *ret = NULL;
->> +    char *sha256;
->> +
->> +    bitmap = block_dirty_bitmap_lookup(node, name, &bs, &aio_context, errp);
->> +    if (!bitmap || !bs) {
->> +        return NULL;
->> +    }
->> +
->> +    sha256 = bdrv_dirty_bitmap_sha256(bitmap, errp);
->> +    if (sha256 == NULL) {
->> +        goto out;
->> +    }
->> +
->> +    ret = g_new(BlockDirtyBitmapSha256, 1);
->> +    ret->sha256 = sha256;
->> +
->> +out:
->> +    aio_context_release(aio_context);
->> +
->> +    return ret;
->> +}
->> +
->>   void hmp_drive_del(Monitor *mon, const QDict *qdict)
->>   {
->>       const char *id = qdict_get_str(qdict, "id");
->> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
->> index 20b3ec7..ded872a 100644
->> --- a/include/block/dirty-bitmap.h
->> +++ b/include/block/dirty-bitmap.h
->> @@ -78,4 +78,6 @@ void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap);
->>   BdrvDirtyBitmap *bdrv_next_dirty_bitmap(BlockDriverState *bs,
->>                                           BdrvDirtyBitmap *bitmap);
->>   
->> +char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp);
->> +
->>   #endif
->> diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
->> index 9239fe5..f353e56 100644
->> --- a/include/qemu/hbitmap.h
->> +++ b/include/qemu/hbitmap.h
->> @@ -238,6 +238,14 @@ void hbitmap_deserialize_zeroes(HBitmap *hb, uint64_t start, uint64_t count,
->>   void hbitmap_deserialize_finish(HBitmap *hb);
->>   
->>   /**
->> + * hbitmap_sha256:
->> + * @bitmap: HBitmap to operate on.
->> + *
->> + * Returns SHA256 hash of the last level.
->> + */
->> +char *hbitmap_sha256(const HBitmap *bitmap, Error **errp);
->> +
->> +/**
->>    * hbitmap_free:
->>    * @hb: HBitmap to operate on.
->>    *
->> diff --git a/qapi/block-core.json b/qapi/block-core.json
->> index 932f5bb..8646054 100644
->> --- a/qapi/block-core.json
->> +++ b/qapi/block-core.json
->> @@ -1632,6 +1632,33 @@
->>     'data': 'BlockDirtyBitmap' }
->>   
->>   ##
->> +# @BlockDirtyBitmapSha256:
->> +#
->> +# SHA256 hash of dirty bitmap data
->> +#
->> +# @sha256: ASCII representation of SHA256 bitmap hash
->> +#
->> +# Since: 2.9
->> +##
->> +  { 'struct': 'BlockDirtyBitmapSha256',
->> +    'data': {'sha256': 'str'} }
->> +
->> +##
->> +# @x-debug-block-dirty-bitmap-sha256:
->> +#
->> +# Get bitmap SHA256
->> +#
->> +# Returns: BlockDirtyBitmapSha256 on success
->> +#          If @node is not a valid block device, DeviceNotFound
->> +#          If @name is not found or if hashing has failed, GenericError with an
->> +#          explanation
->> +#
->> +# Since: 2.9
->> +##
->> +  { 'command': 'x-debug-block-dirty-bitmap-sha256',
->> +    'data': 'BlockDirtyBitmap', 'returns': 'BlockDirtyBitmapSha256' }
->> +
->> +##
->>   # @blockdev-mirror:
->>   #
->>   # Start mirroring a block device's writes to a new destination.
->> diff --git a/tests/Makefile.include b/tests/Makefile.include
->> index 634394a..7a71b4d 100644
->> --- a/tests/Makefile.include
->> +++ b/tests/Makefile.include
->> @@ -526,7 +526,7 @@ tests/test-blockjob$(EXESUF): tests/test-blockjob.o $(test-block-obj-y) $(test-u
->>   tests/test-blockjob-txn$(EXESUF): tests/test-blockjob-txn.o $(test-block-obj-y) $(test-util-obj-y)
->>   tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-obj-y)
->>   tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
->> -tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y)
->> +tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y) $(test-crypto-obj-y)
->>   tests/test-x86-cpuid$(EXESUF): tests/test-x86-cpuid.o
->>   tests/test-xbzrle$(EXESUF): tests/test-xbzrle.o migration/xbzrle.o page_cache.o $(test-util-obj-y)
->>   tests/test-cutils$(EXESUF): tests/test-cutils.o util/cutils.o
->> diff --git a/util/hbitmap.c b/util/hbitmap.c
->> index 35088e1..412b0fa 100644
->> --- a/util/hbitmap.c
->> +++ b/util/hbitmap.c
->> @@ -13,6 +13,7 @@
->>   #include "qemu/hbitmap.h"
->>   #include "qemu/host-utils.h"
->>   #include "trace.h"
->> +#include "crypto/hash.h"
->>   
->>   /* HBitmaps provides an array of bits.  The bits are stored as usual in an
->>    * array of unsigned longs, but HBitmap is also optimized to provide fast
->> @@ -689,3 +690,13 @@ void hbitmap_free_meta(HBitmap *hb)
->>       hbitmap_free(hb->meta);
->>       hb->meta = NULL;
->>   }
->> +
->> +char *hbitmap_sha256(const HBitmap *bitmap, Error **errp)
->> +{
->> +    size_t size = bitmap->sizes[HBITMAP_LEVELS - 1] * sizeof(unsigned long);
->> +    char *data = (char *)bitmap->levels[HBITMAP_LEVELS - 1];
->> +    char *hash = NULL;
->> +    qcrypto_hash_digest(QCRYPTO_HASH_ALG_SHA256, data, size, &hash, errp);
->> +
->> +    return hash;
->> +}
->>
+>The plan is:
+>
+>1. libvirt listens to udev events on the host so it can add/remove
+>   QEMU SCSI LUNs.
+>
+>2. virtio-scsi is extended to include a WWPN that the guest can see.
+>
+>The guest doesn't do any FC fabric level stuff, it just does virtio-scsi
+>as usual.
+>
+>It supports live migration by swapping between a pair of WWPNs across
+>migration.
+OK, Thanks for the information. This way still makes qemu as a SCSI
+TARGET, I'm not sure which way makes more sense, But it does solve
+the live migration case.
 
+>What are the benefits of having FC access from the guest?
+Actually, I havn't dug it too much, Just thought that from virtualization's=
 
--- 
-Best regards,
-Vladimir
+perspective, when interact with FC storage, having complete FC access
+from the guest is the way it should use.
+Lin
