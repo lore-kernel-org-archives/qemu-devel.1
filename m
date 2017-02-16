@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47445)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ceOal-0004Qw-Fn
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:07:36 -0500
+	(envelope-from <no-reply@patchew.org>) id 1ceObM-0004xL-Mb
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:08:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ceOah-0003zA-FB
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:07:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33208)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ceOah-0003yx-6i
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:07:31 -0500
-References: <1487255507-106654-1-git-send-email-pbonzini@redhat.com>
-	<1487255507-106654-22-git-send-email-pbonzini@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5712fbf2-1a9e-42c9-a22f-554a6e8bc14d@redhat.com>
-Date: Thu, 16 Feb 2017 10:07:28 -0600
+	(envelope-from <no-reply@patchew.org>) id 1ceObI-0004GN-5I
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:08:12 -0500
+Resent-Message-Id: <E1ceObI-0004GN-5I@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21406)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1ceObH-0004Fd-UH
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:08:08 -0500
+In-Reply-To: <1487255507-106654-1-git-send-email-pbonzini@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148726127585.27.3469969280270038040@0e2666bad730>
 MIME-Version: 1.0
-In-Reply-To: <1487255507-106654-22-git-send-email-pbonzini@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="6X0P6Weo6rgmTddLL6nTf52V7vlx45ipj"
-Subject: Re: [Qemu-devel] [PULL 21/23] report guest crash information in
- GUEST_PANICKED event
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 16 Feb 2017 08:07:56 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 00/23] Misc patches for 2017-02-16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +28,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: "Denis V. Lunev" <den@openvz.org>, Anton Nefedov <anton.nefedov@virtuozzo.com>
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6X0P6Weo6rgmTddLL6nTf52V7vlx45ipj
-From: Eric Blake <eblake@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: "Denis V. Lunev" <den@openvz.org>,
- Anton Nefedov <anton.nefedov@virtuozzo.com>
-Message-ID: <5712fbf2-1a9e-42c9-a22f-554a6e8bc14d@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 21/23] report guest crash information in
- GUEST_PANICKED event
-References: <1487255507-106654-1-git-send-email-pbonzini@redhat.com>
- <1487255507-106654-22-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1487255507-106654-22-git-send-email-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 02/16/2017 08:31 AM, Paolo Bonzini wrote:
-> From: Anton Nefedov <anton.nefedov@virtuozzo.com>
->=20
-> it's not very convenient to use the crash-information property interfac=
-e,
-> so provide a CPU class callback to get the guest crash information, and=
- pass
-> that information in the event
->=20
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> Signed-off-by: Denis V. Lunev <den@openvz.org>
-> Message-Id: <1487053524-18674-3-git-send-email-den@openvz.org>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
-
-> +++ b/qapi/event.json
-> @@ -488,7 +488,9 @@
->  #
->  # @action: action that has been taken, currently always "pause"
->  #
-> -# Since: 1.5
-> +# @info: optional information about a panic
-> +#
-> +# Since: 1.5 (@info since 2.9)
-
-I had a (late) comment on this being unusual formatting, but it can be
-fixed in a followup patch if there is no other reason to respin the pull
-request.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---6X0P6Weo6rgmTddLL6nTf52V7vlx45ipj
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYpc5AAAoJEKeha0olJ0NqHkoIAIq+yFnR6LV4ltObg3r+Q5el
-7l22fILtJp75zpvaTSoqyj8zTaDU8BwpPwV6+eht7Jf9OmmcJE+kw3ZivtzjSzYm
-BWLNVdajoYfKYSwKmhlDgsh1lNvH6nUALpvESgLSt853hwKW2syz6/VqngnMQjWF
-hqs8jPD4AfKvii8Cp01ZPdV0oQz6tm1j8+amdgquPGLl/jifCuwcg1uJ//VuRmwR
-IdIG1atKmt54JeBMIpZxAOYtDogdZNl3kuk+c73gbt1BQBkIP059Gwv3oT9UjaZG
-20t05VWCax/03rXRk7/+rxbxH8HoLhY15skXA0WAgIClo8so/VENIMpJFT5Swlg=
-=TC2g
------END PGP SIGNATURE-----
-
---6X0P6Weo6rgmTddLL6nTf52V7vlx45ipj--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwMC8yM10gTWlzYyBwYXRjaGVzIGZvciAyMDE3LTAy
+LTE2Ck1lc3NhZ2UtaWQ6IDE0ODcyNTU1MDctMTA2NjU0LTEtZ2l0LXNlbmQtZW1haWwtcGJvbnpp
+bmlAcmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFT
+RT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFp
+bGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
+ZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIk
+KGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0
+czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEg
+LS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8
+IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxl
+ZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVk
+Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
+ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
+dC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTQ4NzI1NTUwNy0xMDY2NTQtMS1n
+aXQtc2VuZC1lbWFpbC1wYm9uemluaUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMTQ4NzI1NTUwNy0x
+MDY2NTQtMS1naXQtc2VuZC1lbWFpbC1wYm9uemluaUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEg
+bmV3IGJyYW5jaCAndGVzdCcKYTg0MmRiYSB0YXJnZXQtaTM4NjogY29ycmVjdGx5IHByb3BhZ2F0
+ZSByZXRhZGRyIGludG8gU1ZNIGhlbHBlcnMKMzZmMGQ3NiB2bDogbG9nIGF2YWlsYWJsZSBndWVz
+dCBjcmFzaCBpbmZvcm1hdGlvbgo1OTUxZTYwIHJlcG9ydCBndWVzdCBjcmFzaCBpbmZvcm1hdGlv
+biBpbiBHVUVTVF9QQU5JQ0tFRCBldmVudAplM2QwMTk2IGkzODYvY3B1OiBhZGQgY3Jhc2gtaW5m
+b3JtYXRpb24gUU9NIHByb3BlcnR5CmIyMmE1NDcgTWFrZWZpbGU6IGF2b2lkIGxlYXZpbmcgdGhl
+IHRlbXBvcmFyeSBRRU1VX1BLR1ZFUlNJT04gaGVhZGVyIGZpbGUKMWFjNDZjZiB2bDogTW92ZSB0
+aGUgY3B1X3N5bmNocm9uaXplX2FsbF9wb3N0X2luaXQoKSBhZnRlciBnZW5lcmljIGRldmljZXMg
+aW5pdGlhbGl6YXRpb24KYWQ1YzI4MiBxZW11LW5iZDogSW1wbGVtZW50IHNvY2tldCBhY3RpdmF0
+aW9uLgo1MTE2NTJkIHFlbXUtZG9jOiBDbGFyaWZ5IHRoYXQgLXZnYSBzdGQgaXMgbm93IHRoZSBk
+ZWZhdWx0CjdhYjhlNTYgY3B1LWV4ZWM6IHJlbW92ZSBvdXRlcm1vc3QgaW5maW5pdGUgbG9vcAo4
+YTEzMjE0IGNwdS1leGVjOiBhdm9pZCByZXBlYXRlZCBzaWdzZXRqbXAgb24gaW50ZXJydXB0cwow
+M2UxNmNlIGNwdS1leGVjOiBhdm9pZCBjcHVfbG9vcF9leGl0IGluIGNwdV9oYW5kbGVfaW50ZXJy
+dXB0CjRmZjVjMTQgY3B1LWV4ZWM6IHRpZ2h0ZW4gYmFycmllciBvbiBUQ0dfRVhJVF9SRVFVRVNU
+RUQKOTQyY2RmYSBjcHUtZXhlYzogZml4IGljb3VudCBvdXQtb2YtYm91bmRzIGFjY2Vzcwo5MWFh
+OWVlIGh3L2NoYXIvbWNmX3VhcnQ6IFFPTWlmeSB0aGUgQ29sZEZpcmUgVUFSVApmNDM3YzE1IGdk
+YnN0dWI6IEZpeCB2Q29udCBiZWhhdmlvdXIKMjM5YmNhMiBtb3ZlIHZtX3N0YXJ0IHRvIGNwdXMu
+Ywo1YWFiNDRiIGNoYXI6IGRyb3AgZGF0YSB3cml0dGVuIHRvIGEgZGlzY29ubmVjdGVkIHB0eQpm
+NTBjYzRlIGFwaWM6IHJlc2V0IGFwaWNfZGVsaXZlcmVkIGdsb2JhbCB2YXJpYWJsZSBvbiBtYWNo
+aW5lIHJlc2V0CmQ0YjdiZGMgcWVtdS1jaGFyOiBzb2NrZXQgYmFja2VuZDogZGlzY29ubmVjdCBv
+biB3cml0ZSBlcnJvcgoyNmU4NzkyIHRlc3Qtdm1zdGF0ZTogcmVtb3ZlIHlpZWxkX3VudGlsX2Zk
+X3JlYWRhYmxlCjgzOTRjMGIga3ZtL2lvYXBpYzogY29ycmVjdCBrdm0gaW9hcGljIHZlcnNpb24K
+MzBjYjU5NyBpb2FwaWM6IGZpeCBlcnJvciByZXBvcnQgdmFsdWUgb2YgZGVmIHZlcnNpb24KMzQy
+NzQ1ZCBrdm0vaW9hcGljOiBkdW1wIHJlYWwgb2JqZWN0IGluc3RlYWQgb2YgYSBmYWtlIG9uZQoK
+PT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8yMzoga3ZtL2lvYXBpYzogZHVt
+cCByZWFsIG9iamVjdCBpbnN0ZWFkIG9mIGEgZmFrZSBvbmUuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8y
+MzogaW9hcGljOiBmaXggZXJyb3IgcmVwb3J0IHZhbHVlIG9mIGRlZiB2ZXJzaW9uLi4uCkNoZWNr
+aW5nIFBBVENIIDMvMjM6IGt2bS9pb2FwaWM6IGNvcnJlY3Qga3ZtIGlvYXBpYyB2ZXJzaW9uLi4u
+CkNoZWNraW5nIFBBVENIIDQvMjM6IHRlc3Qtdm1zdGF0ZTogcmVtb3ZlIHlpZWxkX3VudGlsX2Zk
+X3JlYWRhYmxlLi4uCkNoZWNraW5nIFBBVENIIDUvMjM6IHFlbXUtY2hhcjogc29ja2V0IGJhY2tl
+bmQ6IGRpc2Nvbm5lY3Qgb24gd3JpdGUgZXJyb3IuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8yMzogYXBp
+YzogcmVzZXQgYXBpY19kZWxpdmVyZWQgZ2xvYmFsIHZhcmlhYmxlIG9uIG1hY2hpbmUgcmVzZXQu
+Li4KQ2hlY2tpbmcgUEFUQ0ggNy8yMzogY2hhcjogZHJvcCBkYXRhIHdyaXR0ZW4gdG8gYSBkaXNj
+b25uZWN0ZWQgcHR5Li4uCkNoZWNraW5nIFBBVENIIDgvMjM6IG1vdmUgdm1fc3RhcnQgdG8gY3B1
+cy5jLi4uCkNoZWNraW5nIFBBVENIIDkvMjM6IGdkYnN0dWI6IEZpeCB2Q29udCBiZWhhdmlvdXIu
+Li4KQ2hlY2tpbmcgUEFUQ0ggMTAvMjM6IGh3L2NoYXIvbWNmX3VhcnQ6IFFPTWlmeSB0aGUgQ29s
+ZEZpcmUgVUFSVC4uLgpDaGVja2luZyBQQVRDSCAxMS8yMzogY3B1LWV4ZWM6IGZpeCBpY291bnQg
+b3V0LW9mLWJvdW5kcyBhY2Nlc3MuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvMjM6IGNwdS1leGVjOiB0
+aWdodGVuIGJhcnJpZXIgb24gVENHX0VYSVRfUkVRVUVTVEVELi4uCkVSUk9SOiBtZW1vcnkgYmFy
+cmllciB3aXRob3V0IGNvbW1lbnQKIzUxOiBGSUxFOiBjcHUtZXhlYy5jOjU1OToKKyAgICAgICAg
+c21wX21iKCk7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDEzIGxpbmVzIGNoZWNrZWQK
+CllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
+IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
+dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDEz
+LzIzOiBjcHUtZXhlYzogYXZvaWQgY3B1X2xvb3BfZXhpdCBpbiBjcHVfaGFuZGxlX2ludGVycnVw
+dC4uLgpDaGVja2luZyBQQVRDSCAxNC8yMzogY3B1LWV4ZWM6IGF2b2lkIHJlcGVhdGVkIHNpZ3Nl
+dGptcCBvbiBpbnRlcnJ1cHRzLi4uCkNoZWNraW5nIFBBVENIIDE1LzIzOiBjcHUtZXhlYzogcmVt
+b3ZlIG91dGVybW9zdCBpbmZpbml0ZSBsb29wLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
+YWN0ZXJzCiM1MTogRklMRTogY3B1LWV4ZWMuYzo2MzM6CisgICAgICAgICAqIE5ld2VyIHZlcnNp
+b25zIG9mIGdjYyB3b3VsZCBjb21wbGFpbiBhYm91dCB0aGlzIGNvZGUgKC1XY2xvYmJlcmVkKS4g
+Ki8KCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNjggbGluZXMgY2hlY2tlZAoKWW91ciBw
+YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
+ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
+IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAxNi8yMzogcWVt
+dS1kb2M6IENsYXJpZnkgdGhhdCAtdmdhIHN0ZCBpcyBub3cgdGhlIGRlZmF1bHQuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMTcvMjM6IHFlbXUtbmJkOiBJbXBsZW1lbnQgc29ja2V0IGFjdGl2YXRpb24uLi4u
+CkNoZWNraW5nIFBBVENIIDE4LzIzOiB2bDogTW92ZSB0aGUgY3B1X3N5bmNocm9uaXplX2FsbF9w
+b3N0X2luaXQoKSBhZnRlciBnZW5lcmljIGRldmljZXMgaW5pdGlhbGl6YXRpb24uLi4KQ2hlY2tp
+bmcgUEFUQ0ggMTkvMjM6IE1ha2VmaWxlOiBhdm9pZCBsZWF2aW5nIHRoZSB0ZW1wb3JhcnkgUUVN
+VV9QS0dWRVJTSU9OIGhlYWRlciBmaWxlLi4uCkNoZWNraW5nIFBBVENIIDIwLzIzOiBpMzg2L2Nw
+dTogYWRkIGNyYXNoLWluZm9ybWF0aW9uIFFPTSBwcm9wZXJ0eS4uLgpDaGVja2luZyBQQVRDSCAy
+MS8yMzogcmVwb3J0IGd1ZXN0IGNyYXNoIGluZm9ybWF0aW9uIGluIEdVRVNUX1BBTklDS0VEIGV2
+ZW50Li4uCkNoZWNraW5nIFBBVENIIDIyLzIzOiB2bDogbG9nIGF2YWlsYWJsZSBndWVzdCBjcmFz
+aCBpbmZvcm1hdGlvbi4uLgpDaGVja2luZyBQQVRDSCAyMy8yMzogdGFyZ2V0LWkzODY6IGNvcnJl
+Y3RseSBwcm9wYWdhdGUgcmV0YWRkciBpbnRvIFNWTSBoZWxwZXJzLi4uCldBUk5JTkc6IGxpbmUg
+b3ZlciA4MCBjaGFyYWN0ZXJzCiM3NjogRklMRTogdGFyZ2V0L2kzODYvZXhjcF9oZWxwZXIuYzo1
+NzoKKyAgICAgICAgICAgIGNwdV92bWV4aXQoZW52LCBTVk1fRVhJVF9TSFVURE9XTiwgMCwgcmV0
+YWRkcik7IC8qIGRvZXMgbm90IHJldHVybiAqLwoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdz
+LCAzNjggbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
+ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
+b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
+Lgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoK
+LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRj
+aGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJl
+ZWxpc3RzLm9yZw==
