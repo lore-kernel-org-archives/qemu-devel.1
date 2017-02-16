@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46328)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ceQvQ-000158-UW
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 13:37:06 -0500
+	(envelope-from <lersek@redhat.com>) id 1ceRLY-0006ec-AK
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 14:04:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ceQvP-0005ZM-Up
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 13:37:04 -0500
-Date: Thu, 16 Feb 2017 19:36:53 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170216183653.GK4869@noname.redhat.com>
-References: <20170203195037.4238-1-nirsof@gmail.com>
-	<20170216175251.GJ4869@noname.redhat.com>
-	<CAMr-obsQExOZmpiieJt33v+x1TW4axV6+7YyfatEqngocF5Djw@mail.gmail.com>
+	(envelope-from <lersek@redhat.com>) id 1ceRLV-0000dx-7c
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 14:04:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42954)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1ceRLV-0000cj-13
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 14:04:01 -0500
+References: <cover.1487224954.git.ben@skyportsystems.com>
+	<625570854359178b416000644f68695bc50630ae.1487224954.git.ben@skyportsystems.com>
+	<20170216105649.43944bad@nial.brq.redhat.com>
+	<41F19D95-ED58-427E-944A-00F872F8DD48@skyportsystems.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <fb101b08-988a-494d-6ede-783ebe4ae4af@redhat.com>
+Date: Thu, 16 Feb 2017 20:03:57 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMr-obsQExOZmpiieJt33v+x1TW4axV6+7YyfatEqngocF5Djw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-img: Do not truncate before
- preallocation
+In-Reply-To: <41F19D95-ED58-427E-944A-00F872F8DD48@skyportsystems.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 4/8] ACPI: Add Virtual Machine
+ Generation ID support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,81 +30,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nir Soffer <nirsof@gmail.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Ben Warren <ben@skyportsystems.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com
 
-Am 16.02.2017 um 19:23 hat Nir Soffer geschrieben:
-> On Thu, Feb 16, 2017 at 7:52 PM, Kevin Wolf <kwolf@redhat.com> wrote:
-> > Am 03.02.2017 um 20:50 hat Nir Soffer geschrieben:
-> >> When using file system that does not support fallocate() (e.g. NFS <
-> >> 4.2), truncating the file only when preallocation=OFF speeds up creating
-> >> raw file.
-> >>
-> >> Here is example run, tested on Fedora 24 machine, creating raw file on
-> >> NFS version 3 server.
-> >>
-> >> $ time ./qemu-img-master create -f raw -o preallocation=falloc mnt/test 1g
-> >> Formatting 'mnt/test', fmt=raw size=1073741824 preallocation=falloc
-> >>
-> >> real  0m21.185s
-> >> user  0m0.022s
-> >> sys   0m0.574s
-> >>
-> >> $ time ./qemu-img-fix create -f raw -o preallocation=falloc mnt/test 1g
-> >> Formatting 'mnt/test', fmt=raw size=1073741824 preallocation=falloc
-> >>
-> >> real  0m11.601s
-> >> user  0m0.016s
-> >> sys   0m0.525s
-> >>
-> >> $ time dd if=/dev/zero of=mnt/test bs=1M count=1024 oflag=direct
-> >> 1024+0 records in
-> >> 1024+0 records out
-> >> 1073741824 bytes (1.1 GB, 1.0 GiB) copied, 15.6627 s, 68.6 MB/s
-> >>
-> >> real  0m16.104s
-> >> user  0m0.009s
-> >> sys   0m0.220s
-> >>
-> >> Running with strace we can see that without this change we do one
-> >> pread() and one pwrite() for each block. With this change, we do only
-> >> one pwrite() per block.
-> >>
-> >> $ strace ./qemu-img-master create -f raw -o preallocation=falloc mnt/test 8192
-> >> ...
-> >> pread64(9, "\0", 1, 4095)               = 1
-> >> pwrite64(9, "\0", 1, 4095)              = 1
-> >> pread64(9, "\0", 1, 8191)               = 1
-> >> pwrite64(9, "\0", 1, 8191)              = 1
-> >>
-> >> $ strace ./qemu-img-fix create -f raw -o preallocation=falloc mnt/test 8192
-> >> ...
-> >> pwrite64(9, "\0", 1, 4095)              = 1
-> >> pwrite64(9, "\0", 1, 8191)              = 1
-> >>
-> >> This happens because posix_fallocate is checking if each block is
-> >> allocated before writing a byte to the block, and when truncating the
-> >> file before preallocation, all blocks are unallocated.
-> >>
-> >> Signed-off-by: Nir Soffer <nirsof@gmail.com>
-> >
-> > Thanks, applied to the block branch.
-> >
-> > I'm not completely sure if doing an ftruncate() first couldn't improve
-> > PREALLOC_MODE_FULL somewhat in some cases, but I agree that the patch
-> > should still result in correct images.
-> 
-> Good point, I'll do some tests with full mode to check this.
-> 
-> Do you know which cases can benefit from ftruncate() before full preallocation?
+On 02/16/17 19:32, Ben Warren wrote:
+>=20
+>> On Feb 16, 2017, at 1:56 AM, Igor Mammedov <imammedo@redhat.com> wrote=
+:
+>>
+>> On Wed, 15 Feb 2017 22:18:14 -0800
+>> ben@skyportsystems.com wrote:
+>>
+>>> From: Ben Warren <ben@skyportsystems.com>
+>>>
+>>> This implements the VM Generation ID feature by passing a 128-bit
+>>> GUID to the guest via a fw_cfg blob.
+>>> Any time the GUID changes, an ACPI notify event is sent to the guest
+>>>
+>>> The user interface is a simple device with one parameter:
+>>> - guid (string, must be "auto" or in UUID format
+>>>   xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+>>>
+>>> Signed-off-by: Ben Warren <ben@skyportsystems.com>
+>> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+>>
+>> Thing to get fixed on top is to check
+>> that there isn't vmgenid device present already
+>> into realizefn() and fail gracefully is there is.
+>>
+> I made the change as follows:
+> =3D=3D=3D
+>=20
+> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+> index c8465df..fa3de6d 100644
+> --- a/hw/acpi/vmgenid.c
+> +++ b/hw/acpi/vmgenid.c
+> @@ -207,8 +207,15 @@ static void vmgenid_handle_reset(void *opaque)
+> =20
+>  static void vmgenid_realize(DeviceState *dev, Error **errp)
+>  {
+> +    static bool is_realized =3D false;
+>      VmGenIdState *vms =3D VMGENID(dev);
+> +
+> +    if (is_realized) {
+> +        error_setg(errp, "Device %s may only be specified once",
+> +                   VMGENID_DEVICE);
+> +    }
+>      qemu_register_reset(vmgenid_handle_reset, vms);
+> +    is_realized =3D true;
+>  }
+>=20
+> =3D=3D=3D
+> Sample output:
+> $ ../workspace/qemu/x86_64-softmmu/qemu-system-x86_64 -nographic -bios =
+../workspace/seabios/out/bios.bin -machine type=3Dq35 -hda beiwe-with-vmg=
+enid-driver.qcow2 -qmp unix:./qmp-sock,server,nowait -device vmgenid,guid=
+=3D"324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb66" -device vmgenid,guid=3D"324e6ea=
+f-d1d1-4bf6-bf41-b9bb6c91fb67"
+> qemu-system-x86_64: -device vmgenid,guid=3D324e6eaf-d1d1-4bf6-bf41-b9bb=
+6c91fb67: Device vmgenid may only be specified once
+>=20
+>=20
+> Good enough?  If so, I=E2=80=99ll roll it in.  Otherwise, it=E2=80=99ll=
+ be a supplemental patch.
 
-Knowing the final size from the beginning could allow the file system
-driver to do less allocations and possibly avoid fragmentation of the
-file. I'm not sure if that's easily measurable, though.
+Ehm, I'd say let's postpone that patch. Function (or even file) scope
+static variables that plaster over QOM shortcomings (or, well,
+"non-trivial QOM patterns") are strongly frowned upon. I've done it
+myself before (totally as a last resort, really -- not kidding!), and it
+was real hard to get into the tree.
 
-I'd also expect that with XFS, you'll see no or less preallocation.
-'du' often shows values much larger than the actual image size on XFS
-because the file was growing a lot, so without having the actual size,
-XFS takes a guess and does some generous preallocation.
+This deserves more discussion, so please delay it.
 
-Kevin
+(While at it, please remember my other recommendation for realize():
+enforcing that the running machine type / version provides the guest
+with the DMA interface for fw_cfg. For that, based on prior consensus,
+you'll need another device property, to be set in parallel to
+fw_cfg_mem's and fw_cfg_io's "dma-enabled" property. So I think it makes
+sense to address all of these things in a separate, followup series.)
+
+Thanks!
+Laszlo
