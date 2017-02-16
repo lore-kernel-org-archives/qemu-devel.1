@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ceNCs-0000pt-DQ
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:38:51 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ceNCq-0000nU-Ew
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:38:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ceNCo-0002Qq-Nw
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:38:50 -0500
-Received: from mout.kundenserver.de ([217.72.192.73]:64401)
+	(envelope-from <laurent@vivier.eu>) id 1ceNCm-0002On-4s
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:38:48 -0500
+Received: from mout.kundenserver.de ([212.227.17.10]:50981)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ceNCo-0002Pp-Db
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:38:46 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ceNCl-0002Nf-RK
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:38:44 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu, 16 Feb 2017 15:38:05 +0100
-Message-Id: <20170216143816.2384-4-laurent@vivier.eu>
+Date: Thu, 16 Feb 2017 15:38:07 +0100
+Message-Id: <20170216143816.2384-6-laurent@vivier.eu>
 In-Reply-To: <20170216143816.2384-1-laurent@vivier.eu>
 References: <20170216143816.2384-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL v2 03/14] linux-user: Fix s390x safe-syscall for
- z900
+Subject: [Qemu-devel] [PULL v2 05/14] linux-user: Fix readahead
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,36 +24,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <rth@twiddle.net>, Riku Voipio <riku.voipio@linaro.org>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Lena Djokic <Lena.Djokic@rt-rk.com>, Riku Voipio <riku.voipio@linaro.org>
 
-From: Richard Henderson <rth@twiddle.net>
+From: Lena Djokic <Lena.Djokic@rt-rk.com>
 
-The LT instruction was added in the extended immediate facility
-introduced with the z9-109 processor.
+Calculation of 64-bit offset was not correct for all cases.
 
-Cc: Riku Voipio <riku.voipio@iki.fi>
-Reported-by: Michael Tokarev <mjt@tls.msk.ru>
-Fixes: c9bc3437a905b660561a26cd4ecc64579843267b
-Suggested-by: Aurelien Jarno <aurelien@aurel32.net>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Lena Djokic <Lena.Djokic@rt-rk.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
 ---
- linux-user/host/s390x/safe-syscall.inc.S | 2 +-
+ linux-user/syscall.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/linux-user/host/s390x/safe-syscall.inc.S b/linux-user/host/s390x/safe-syscall.inc.S
-index f1b446a..414b44a 100644
---- a/linux-user/host/s390x/safe-syscall.inc.S
-+++ b/linux-user/host/s390x/safe-syscall.inc.S
-@@ -72,7 +72,7 @@ safe_syscall_base:
- 	 */
- safe_syscall_start:
- 	/* if signal_pending is non-zero, don't do the call */
--	lt	%r0,0(%r8)
-+	icm	%r0,15,0(%r8)
- 	jne	2f
- 	svc	0
- safe_syscall_end:
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index fccd631..3e88dd1 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -11228,7 +11228,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+             arg3 = arg4;
+             arg4 = arg5;
+         }
+-        ret = get_errno(readahead(arg1, ((off64_t)arg3 << 32) | arg2, arg4));
++        ret = get_errno(readahead(arg1, target_offset64(arg2, arg3) , arg4));
+ #else
+         ret = get_errno(readahead(arg1, arg2, arg3));
+ #endif
 -- 
 2.9.3
