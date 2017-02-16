@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ceJQR-00042C-3n
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:36:36 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1ceJUK-0006Nb-Bt
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:40:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ceJQN-0003lQ-2a
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:36:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52202)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ceJQM-0003kH-PZ
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:36:30 -0500
-Date: Thu, 16 Feb 2017 11:36:27 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170216113627.759cc396@nial.brq.redhat.com>
-In-Reply-To: <56acb26636bb86ff1f04145c2911100f15e2689c.1487224954.git.ben@skyportsystems.com>
-References: <cover.1487224954.git.ben@skyportsystems.com>
-	<56acb26636bb86ff1f04145c2911100f15e2689c.1487224954.git.ben@skyportsystems.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1ceJUI-0005N7-Ql
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:40:36 -0500
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:35598)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1ceJUI-0005Ma-Ei
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:40:34 -0500
+Received: by mail-lf0-x241.google.com with SMTP id v186so1112725lfa.2
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 02:40:33 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 7/8] tests: Add unit tests for the VM
- Generation ID feature
+References: <1487224821-120916-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1487224821-120916-4-git-send-email-zhang.zhanghailiang@huawei.com>
+In-Reply-To: <1487224821-120916-4-git-send-email-zhang.zhanghailiang@huawei.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 16 Feb 2017 10:40:21 +0000
+Message-ID: <CAJ+F1CLMKKT_xv4Z5NNfd7rYzcKyrHri=Z7-QSWLoMX0DGBk+Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] char: remove the right fd been
+ watched in qemu_chr_fe_set_handlers()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,234 +31,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ben@skyportsystems.com
-Cc: qemu-devel@nongnu.org, lersek@redhat.com, mst@redhat.com
+To: zhanghailiang <zhang.zhanghailiang@huawei.com>, jasowang@redhat.com, zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com
+Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, pss.wulizhen@huawei.com, Paolo Bonzini <pbonzini@redhat.com>
 
-On Wed, 15 Feb 2017 22:18:17 -0800
-ben@skyportsystems.com wrote:
+Hi
 
-> From: Ben Warren <ben@skyportsystems.com>
-> 
-> The following tests are implemented:
-> * test that a GUID passed in by command line is propagated to the guest.
->   Read the GUID both from guest memory and from the monitor
-> * test that the "auto" argument to the GUID generates a valid GUID, as
->   seen by the guest.
-> 
->   This patch is loosely based on a previous patch from:
->   Gal Hammer <ghammer@redhat.com>  and Igor Mammedov <imammedo@redhat.com>
-> 
-> Signed-off-by: Ben Warren <ben@skyportsystems.com>
+On Thu, Feb 16, 2017 at 10:08 AM zhanghailiang <
+zhang.zhanghailiang@huawei.com> wrote:
+
+> We can call qemu_chr_fe_set_handlers() to add/remove fd been watched
+> in 'context' which can be either default main context or other explicit
+> context. But the original logic is not correct, we didn't remove
+> the right fd because we call g_main_context_find_source_by_id(NULL, tag)
+> which always try to find the Gsource from default context.
+>
+> Fix it by passing the right context to g_main_context_find_source_by_id()=
+.
+>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 > ---
->  tests/Makefile.include |   2 +
->  tests/vmgenid-test.c   | 174 +++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 176 insertions(+)
->  create mode 100644 tests/vmgenid-test.c
-> 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 143507e..8d36341 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -241,6 +241,7 @@ check-qtest-i386-y += tests/usb-hcd-xhci-test$(EXESUF)
->  gcov-files-i386-y += hw/usb/hcd-xhci.c
->  check-qtest-i386-y += tests/pc-cpu-test$(EXESUF)
->  check-qtest-i386-y += tests/q35-test$(EXESUF)
-> +check-qtest-i386-y += tests/vmgenid-test$(EXESUF)
->  gcov-files-i386-y += hw/pci-host/q35.c
->  check-qtest-i386-$(CONFIG_VHOST_NET_TEST_i386) += tests/vhost-user-test$(EXESUF)
->  ifeq ($(CONFIG_VHOST_NET_TEST_i386),)
-> @@ -726,6 +727,7 @@ tests/ivshmem-test$(EXESUF): tests/ivshmem-test.o contrib/ivshmem-server/ivshmem
->  tests/vhost-user-bridge$(EXESUF): tests/vhost-user-bridge.o contrib/libvhost-user/libvhost-user.o $(test-util-obj-y)
->  tests/test-uuid$(EXESUF): tests/test-uuid.o $(test-util-obj-y)
->  tests/test-arm-mptimer$(EXESUF): tests/test-arm-mptimer.o
-> +tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/acpi-utils.o
->  
->  tests/migration/stress$(EXESUF): tests/migration/stress.o
->  	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,"LINK","$(TARGET_DIR)$@")
-> diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
-> new file mode 100644
-> index 0000000..1741455
-> --- /dev/null
-> +++ b/tests/vmgenid-test.c
-> @@ -0,0 +1,174 @@
-> +/*
-> + * QTest testcase for VM Generation ID
-> + *
-> + * Copyright (c) 2016 Red Hat, Inc.
-> + * Copyright (c) 2017 Skyport Systems
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +#include <glib.h>
-> +#include <string.h>
-> +#include <unistd.h>
-> +#include "qemu/osdep.h"
-> +#include "qemu/bitmap.h"
-> +#include "qemu/uuid.h"
-> +#include "hw/acpi/acpi-defs.h"
-> +#include "acpi-utils.h"
-> +#include "libqtest.h"
-> +
-> +#define VGID_GUID "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
-> +#define VMGENID_GUID_OFFSET      40   /* allow space for
-> +                                       * OVMF SDT Header Probe Supressor
-> +                                       */
-> +
-> +typedef struct {
-> +    AcpiTableHeader header;
-> +    gchar name_op;
-> +    gchar vgia[4];
-> +    gchar val_op;
-> +    uint32_t vgia_val;
-> +} QEMU_PACKED VgidTable;
-> +
-> +static uint32_t acpi_find_vgia(void)
+>  chardev/char-io.c | 13 +++++++++----
+>  chardev/char-io.h |  2 ++
+>  chardev/char.c    |  2 +-
+>  3 files changed, 12 insertions(+), 5 deletions(-)
+>
+> diff --git a/chardev/char-io.c b/chardev/char-io.c
+> index 7dfc3f2..a69cc61 100644
+> --- a/chardev/char-io.c
+> +++ b/chardev/char-io.c
+> @@ -127,14 +127,14 @@ guint io_add_watch_poll(Chardev *chr,
+>      return tag;
+>  }
+>
+> -static void io_remove_watch_poll(guint tag)
+> +static void io_remove_watch_poll(guint tag, GMainContext *context)
+>  {
+>      GSource *source;
+>      IOWatchPoll *iwp;
+>
+>      g_return_if_fail(tag > 0);
+>
+> -    source =3D g_main_context_find_source_by_id(NULL, tag);
+> +    source =3D g_main_context_find_source_by_id(context, tag);
+>      g_return_if_fail(source !=3D NULL);
+>
+>      iwp =3D io_watch_poll_from_source(source);
+> @@ -146,14 +146,19 @@ static void io_remove_watch_poll(guint tag)
+>      g_source_destroy(&iwp->parent);
+>  }
+>
+> -void remove_fd_in_watch(Chardev *chr)
+> +void qemu_remove_fd_in_watch(Chardev *chr, GMainContext *context)
+>  {
+>      if (chr->fd_in_tag) {
+> -        io_remove_watch_poll(chr->fd_in_tag);
+> +        io_remove_watch_poll(chr->fd_in_tag, context);
+>          chr->fd_in_tag =3D 0;
+>      }
+>  }
+>
+> +void remove_fd_in_watch(Chardev *chr)
 > +{
-> +    uint32_t off;
-> +    AcpiRsdpDescriptor rsdp_table;
-> +    uint32_t rsdt;
-> +    AcpiRsdtDescriptorRev1 rsdt_table;
-> +    int tables_nr;
-> +    uint32_t *tables;
-> +    AcpiTableHeader ssdt_table;
-> +    VgidTable vgid_table;
-> +    int i;
+> +    qemu_remove_fd_in_watch(chr, NULL);
+> +}
 > +
-> +    off = acpi_find_rsdp_address();
-> +    g_assert_cmphex(off, <, 0x100000);
-something's off here,
-it fails for me for me with:
+>
 
-QTEST_QEMU_BINARY=x86_64-softmmu/qemu-system-x86_64 tests/vmgenid-test
-/x86_64/vmgenid/vmgenid: **
-ERROR:/home/imammedo/builds/qemu/tests/vmgenid-test.c:47:acpi_find_vgia: assertion failed (off < 0x100000): (0x00100000 < 0x00100000)
+I would just change the signature of remove_fd_in_watch() instead of
+introducing a function.
 
+ int io_channel_send_full(QIOChannel *ioc,
+>                           const void *buf, size_t len,
+>                           int *fds, size_t nfds)
+> diff --git a/chardev/char-io.h b/chardev/char-io.h
+> index d7ae5f1..117c888 100644
+> --- a/chardev/char-io.h
+> +++ b/chardev/char-io.h
+> @@ -38,6 +38,8 @@ guint io_add_watch_poll(Chardev *chr,
+>
+>  void remove_fd_in_watch(Chardev *chr);
+>
+> +void qemu_remove_fd_in_watch(Chardev *chr, GMainContext *context);
 > +
-> +    acpi_parse_rsdp_table(off, &rsdp_table);
-> +
-> +    rsdt = rsdp_table.rsdt_physical_address;
-> +    /* read the header */
-> +    ACPI_READ_TABLE_HEADER(&rsdt_table, rsdt);
-> +    ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
-> +
-> +    /* compute the table entries in rsdt */
-> +    tables_nr = (rsdt_table.length - sizeof(AcpiRsdtDescriptorRev1)) /
-> +                sizeof(uint32_t);
-> +    g_assert_cmpint(tables_nr, >, 0);
-> +
-> +    /* get the addresses of the tables pointed by rsdt */
-> +    tables = g_new0(uint32_t, tables_nr);
-> +    ACPI_READ_ARRAY_PTR(tables, tables_nr, rsdt);
-> +
-> +    for (i = 0; i < tables_nr; i++) {
-> +        ACPI_READ_TABLE_HEADER(&ssdt_table, tables[i]);
-> +        if (!strncmp((char *)ssdt_table.oem_table_id, "VMGENID", 7)) {
-> +            /* the first entry in the table should be VGIA
-> +             * That's all we need
-> +             */
-> +            ACPI_READ_FIELD(vgid_table.name_op, tables[i]);
-> +            g_assert(vgid_table.name_op == 0x08);  /* name */
-> +            ACPI_READ_ARRAY(vgid_table.vgia, tables[i]);
-> +            g_assert(memcmp(vgid_table.vgia, "VGIA", 4) == 0);
-> +            ACPI_READ_FIELD(vgid_table.val_op, tables[i]);
-> +            g_assert(vgid_table.val_op == 0x0C);  /* dword */
-> +            ACPI_READ_FIELD(vgid_table.vgia_val, tables[i]);
-> +            /* The GUID is written at a fixed offset into the fw_cfg file
-> +             * in order to implement the "OVMF SDT Header probe suppressor"
-> +             * see docs/specs/vmgenid.txt for more details
-> +             */
-> +            return vgid_table.vgia_val + VMGENID_GUID_OFFSET;
-> +        }
-> +    }
-> +    return 0;
-> +}
-> +
-> +static void read_guid_from_memory(QemuUUID *guid)
-> +{
-> +    uint32_t vmgenid_addr;
-> +    int i;
-> +
-> +    vmgenid_addr = acpi_find_vgia();
-> +    g_assert(vmgenid_addr);
-> +
-> +    /* Read the GUID directly from guest memory */
-> +    for (i = 0; i < 16; i++) {
-> +        guid->data[i] = readb(vmgenid_addr + i);
-> +    }
-> +    /* The GUID is in little-endian format in the guest, while QEMU
-> +     * uses big-endian.  Swap after reading.
-> +     */
-> +    qemu_uuid_bswap(guid);
-> +}
-> +
-> +static void read_guid_from_monitor(QemuUUID *guid)
-> +{
-> +    QDict *rsp, *rsp_ret;
-> +    const char *guid_str;
-> +
-> +    rsp = qmp("{ 'execute': 'query-vm-generation-id' }");
-> +    if (qdict_haskey(rsp, "return")) {
-> +        rsp_ret = qdict_get_qdict(rsp, "return");
-> +        g_assert(qdict_haskey(rsp_ret, "guid"));
-> +        guid_str = qdict_get_str(rsp_ret, "guid");
-> +        g_assert(qemu_uuid_parse(guid_str, guid) == 0);
-> +    }
-> +    QDECREF(rsp);
-> +}
-> +
-> +static void vmgenid_test(void)
-> +{
-> +    QemuUUID expected, measured;
-> +    gchar *cmd;
-> +
-> +    g_assert(qemu_uuid_parse(VGID_GUID, &expected) == 0);
-> +
-> +    cmd = g_strdup_printf("-machine accel=tcg -device vmgenid,id=testvgid,"
-> +                          "guid=%s", VGID_GUID);
-> +    qtest_start(cmd);
-> +
-> +    /* Read the GUID from accessing guest memory */
-> +    read_guid_from_memory(&measured);
-> +    g_assert(memcmp(measured.data, expected.data, sizeof(measured.data)) == 0);
-> +
-> +    /* Read the GUID via the monitor */
-> +    read_guid_from_monitor(&measured);
-> +    g_assert(memcmp(measured.data, expected.data, sizeof(measured.data)) == 0);
-> +
-> +    qtest_quit(global_qtest);
-> +    g_free(cmd);
-> +}
-> +
-> +static void vmgenid_set_guid_auto_test(void)
-> +{
-> +    const char *cmd;
-> +    QemuUUID measured;
-> +
-> +    cmd = "-machine accel=tcg -device vmgenid,id=testvgid," "guid=auto";
-> +    qtest_start(cmd);
-> +
-> +    read_guid_from_memory(&measured);
-> +
-> +    /* Just check that the GUID is non-null */
-> +    g_assert(!qemu_uuid_is_null(&measured));
-> +
-> +    qtest_quit(global_qtest);
-> +}
-> +
-> +int main(int argc, char **argv)
-> +{
-> +    int ret;
-> +
-> +    g_test_init(&argc, &argv, NULL);
-> +
-> +    qtest_add_func("/vmgenid/vmgenid", vmgenid_test);
-> +    qtest_add_func("/vmgenid/vmgenid/set-guid-auto",
-> +                   vmgenid_set_guid_auto_test);
-> +    ret = g_test_run();
-> +
-> +    qtest_end();
-> +
-> +    return ret;
-> +}
+>  int io_channel_send(QIOChannel *ioc, const void *buf, size_t len);
+>
+>  int io_channel_send_full(QIOChannel *ioc, const void *buf, size_t len,
+> diff --git a/chardev/char.c b/chardev/char.c
+> index abd525f..5563375 100644
+> --- a/chardev/char.c
+> +++ b/chardev/char.c
+> @@ -560,7 +560,7 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
+>      cc =3D CHARDEV_GET_CLASS(s);
+>      if (!opaque && !fd_can_read && !fd_read && !fd_event) {
+>          fe_open =3D 0;
+> -        remove_fd_in_watch(s);
+> +        qemu_remove_fd_in_watch(s, context);
+>      } else {
+>          fe_open =3D 1;
+>      }
+> --
+> 1.8.3.1
+>
+>
+>
+otherwise, looks good to me
+
+--=20
+Marc-Andr=C3=A9 Lureau
