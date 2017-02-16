@@ -1,40 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1ceC0r-0005p9-Vq
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 21:41:43 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ceC4C-0007uc-2Y
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 21:45:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1ceC0o-0002LO-SM
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 21:41:42 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53645)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1ceC0o-0002Ks-IT
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 21:41:38 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1G2d6gt026042
-	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 21:41:36 -0500
-Received: from e28smtp02.in.ibm.com (e28smtp02.in.ibm.com [125.16.236.2])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28mxq3sw9h-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 21:41:35 -0500
-Received: from localhost
-	by e28smtp02.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Thu, 16 Feb 2017 08:11:33 +0530
-Date: Thu, 16 Feb 2017 08:11:26 +0530
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Reply-To: bharata@linux.vnet.ibm.com
-References: <1487140636-19955-1-git-send-email-bharata@linux.vnet.ibm.com>
-	<44595100-389c-18ee-6355-2d1355577187@twiddle.net>
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ceC49-0003Ix-1c
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 21:45:08 -0500
+Received: from szxga01-in.huawei.com ([58.251.152.64]:4099)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ceC48-0003ID-9m
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 21:45:04 -0500
+References: <1487147657-166092-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1487147657-166092-4-git-send-email-zhang.zhanghailiang@huawei.com>
+	<09a2bc10-d8dd-a2c0-f545-6b08a871d91a@redhat.com>
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <58A511D2.6020102@huawei.com>
+Date: Thu, 16 Feb 2017 10:43:30 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <44595100-389c-18ee-6355-2d1355577187@twiddle.net>
-Message-Id: <20170216024126.GA17196@in.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] target-ppc: Add quad precision muladd
- instructions
+In-Reply-To: <09a2bc10-d8dd-a2c0-f545-6b08a871d91a@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 3/5] colo-compare: release all unhandled
+ packets in finalize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,39 +29,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, nikunj@linux.vnet.ibm.com, david@gibson.dropbear.id.au
+To: Jason Wang <jasowang@redhat.com>, zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com
+Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, pss.wulizhen@huawei.com
 
-On Thu, Feb 16, 2017 at 09:13:31AM +1100, Richard Henderson wrote:
-> On 02/15/2017 05:37 PM, Bharata B Rao wrote:
-> > + *
-> > + * TODO: When float128_muladd() becomes available, switch this
-> > + * implementation to use that instead of separate float128_mul()
-> > + * followed by float128_add().
-> 
-> Let's just do that, rather than add something that can't pass tests.
-> 
-> You should be able to copy float64_muladd and, for the most part, s/128/256/
-> and s/64/128/.  Other of the magic numbers, like the implicit bit and the
-> exponent bias, you get from float128_mul.
+On 2017/2/16 10:34, Jason Wang wrote:
+>
+>
+> On 2017年02月15日 16:34, zhanghailiang wrote:
+>> We should release all unhandled packets before finalize colo compare.
+>> Besides, we need to free connection_track_table, or there will be
+>> a memory leak bug.
+>>
+>> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+>> ---
+>>    net/colo-compare.c | 20 ++++++++++++++++++++
+>>    1 file changed, 20 insertions(+)
+>>
+>> diff --git a/net/colo-compare.c b/net/colo-compare.c
+>> index a16e2d5..809bad3 100644
+>> --- a/net/colo-compare.c
+>> +++ b/net/colo-compare.c
+>> @@ -676,6 +676,23 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
+>>        return;
+>>    }
+>>
+>> +static void colo_release_packets(void *opaque, void *user_data)
+>> +{
+>> +    CompareState *s = user_data;
+>> +    Connection *conn = opaque;
+>> +    Packet *pkt = NULL;
+>> +
+>> +    while (!g_queue_is_empty(&conn->primary_list)) {
+>> +        pkt = g_queue_pop_head(&conn->primary_list);
+>> +        compare_chr_send(&s->chr_out, pkt->data, pkt->size);
+>
+> Any reason to send packets here?
+>
 
-I started like that but got lost somewhere down that path...
+Yes, considering the usage case which we shut COLO for
+the VM to make it as a normal VM without FT.
+We need to remove all the filter objects. In this case,
+IMHO, it is necessary to release the unhandled packets.
 
-It needs at least the following new functions to be implemented:
 
-propagateFloat128MulAddNaN
-shortShift256Left
-shift256RightJamming
-add256
-sub256
+Thanks.
 
-It all looked doable, but the magic numbers used around the code that
-does eventual multiplication looked difficult to understand and I couldn't
-deduce that from float128_mul. For some reason float128_mul implements
-multipliction via multiplication and addition (mul128To256 & add128). There
-is no equivalent to this in float64_muladd.
-
-Let me make another attempt at this.
-
-Regards,
-Bharata.
+> Thanks
+>
+>> +        packet_destroy(pkt, NULL);
+>> +    }
+>> +    while (!g_queue_is_empty(&conn->secondary_list)) {
+>> +        pkt = g_queue_pop_head(&conn->secondary_list);
+>> +        packet_destroy(pkt, NULL);
+>> +    }
+>> +}
+>> +
+>>    static void colo_compare_class_init(ObjectClass *oc, void *data)
+>>    {
+>>        UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
+>> @@ -707,9 +724,12 @@ static void colo_compare_finalize(Object *obj)
+>>        g_main_loop_quit(s->compare_loop);
+>>        qemu_thread_join(&s->thread);
+>>
+>> +    /* Release all unhandled packets after compare thead exited */
+>> +    g_queue_foreach(&s->conn_list, colo_release_packets, s);
+>>
+>>        g_queue_free(&s->conn_list);
+>>
+>> +    g_hash_table_destroy(s->connection_track_table);
+>>        g_free(s->pri_indev);
+>>        g_free(s->sec_indev);
+>>        g_free(s->outdev);
+>
+>
+> .
+>
