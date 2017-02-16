@@ -1,26 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ceNHn-0006I8-BE
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:43:56 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1ceNJ3-0007ru-Qn
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:45:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ceNHi-0004Bp-B1
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:43:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55946)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ceNHi-0004BV-2A
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:43:50 -0500
-Date: Thu, 16 Feb 2017 16:43:48 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170216163756-mutt-send-email-mst@kernel.org>
-References: <cover.1487224954.git.ben@skyportsystems.com>
-	<4d92b9f92d2f5b702c23bf135222dfb226ec94a7.1487224954.git.ben@skyportsystems.com>
-	<20170216104310.7bc059e2@nial.brq.redhat.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1ceNIy-0004ea-Pm
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:45:13 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54268)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1ceNIy-0004d4-Fx
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:45:08 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1GEdSCA112329
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 09:45:07 -0500
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28nd69argp-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 09:45:07 -0500
+Received: from localhost
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Thu, 16 Feb 2017 07:45:06 -0700
+References: <20170116195452.23532-1-ehabkost@redhat.com>
+	<0503ac26-e660-325c-8257-59227c41021d@redhat.com>
+	<1daa0992-e594-d870-f264-923bf1cb9673@de.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Thu, 16 Feb 2017 15:44:59 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170216104310.7bc059e2@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 1/8] linker-loader: Add new 'write
- pointer' command
+In-Reply-To: <1daa0992-e594-d870-f264-923bf1cb9673@de.ibm.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: 7bit
+Message-Id: <00e9f692-9d5f-4e85-7502-9fafb43a45f0@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] i386: Support "-cpu host" on TCG too
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,146 +42,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: ben@skyportsystems.com, qemu-devel@nongnu.org, lersek@redhat.com
+To: David Hildenbrand <david@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>, Igor Mammedov <imammedo@redhat.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
 
-On Thu, Feb 16, 2017 at 10:43:10AM +0100, Igor Mammedov wrote:
-> On Wed, 15 Feb 2017 22:18:11 -0800
-> ben@skyportsystems.com wrote:
+On 02/16/2017 03:43 PM, Christian Borntraeger wrote:
+> On 01/17/2017 06:43 PM, David Hildenbrand wrote:
+>> Am 16.01.2017 um 20:54 schrieb Eduardo Habkost:
+>>> Change the meaning of "-cpu host" to "enable all features
+>>> supported by the accelerator in the current host", so that it can
+>>> be used to enable/query all features supported by TCG.
+>>>
+>>> To make sure "host" is still at the end of the list in "-cpu
+>>> help", add a "ordering" field that will be used when sorting the
+>>> CPU model list.
+>>>
+>>> Cc: Richard Henderson <rth@twiddle.net>
+>>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+>>
+>> I also had the same thing in mind when working on s390x models but
+>> decided to do it like x86. Now that x86 changes ...
+>>
+>> Something like that should work for s390x (and I don't think it will break any concept). Most probably cleaner to handle this the same
+>> way on all architectures and to not disable tests for s390x.
+>>
+>> Uncompiled and untested.
+>>
+>> @Conny and Christian, feel free to pick up and modify if this makes
+>> sense
+>>
+> Looks sane to me. Can you resend properly, it looks like whitespace
+> got damaged all over the place.
 > 
-> > From: Ben Warren <ben@skyportsystems.com>
-> > 
-> > This is similar to the existing 'add pointer' functionality, but instead
-> > of instructing the guest (BIOS or UEFI) to patch memory, it instructs
-> > the guest to write the pointer back to QEMU via a writeable fw_cfg file.
-> > 
-> > Signed-off-by: Ben Warren <ben@skyportsystems.com>
-> > ---
-> >  hw/acpi/bios-linker-loader.c         | 66 ++++++++++++++++++++++++++++++++++--
-> >  include/hw/acpi/bios-linker-loader.h |  7 ++++
-> >  2 files changed, 70 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/hw/acpi/bios-linker-loader.c b/hw/acpi/bios-linker-loader.c
-> > index d963ebe..d5fb703 100644
-> > --- a/hw/acpi/bios-linker-loader.c
-> > +++ b/hw/acpi/bios-linker-loader.c
-> > @@ -78,6 +78,21 @@ struct BiosLinkerLoaderEntry {
-> >              uint32_t length;
-> >          } cksum;
-> >  
-> > +        /*
-> > +         * COMMAND_WRITE_POINTER - write the fw_cfg file (originating from
-> > +         * @dest_file) at @wr_pointer.offset, by adding a pointer to
-> > +         * @src_offset within the table originating from @src_file.
-> > +         * 1,2,4 or 8 byte unsigned addition is used depending on
-> > +         * @wr_pointer.size.
-> > +         */
-> > +        struct {
-> > +            char dest_file[BIOS_LINKER_LOADER_FILESZ];
-> > +            char src_file[BIOS_LINKER_LOADER_FILESZ];
-> > +            uint32_t dst_offset;
-> > +            uint32_t src_offset;
-> > +            uint8_t size;
-> > +        } wr_pointer;
-> > +
-> >          /* padding */
-> >          char pad[124];
-> Shouldn't padding be reduced by 4 bytes to keep 
-> sizeof(BiosLinkerLoaderEntry) the same as before patch,
-> so that old bios would be able to skip this unknown command
-> and read the next at the right offset?
+> Thanks
 
-IMHO no - because it's a union.
-
-
-> >      };
-> > @@ -85,9 +100,10 @@ struct BiosLinkerLoaderEntry {
-> >  typedef struct BiosLinkerLoaderEntry BiosLinkerLoaderEntry;
-> >  
-> >  enum {
-> > -    BIOS_LINKER_LOADER_COMMAND_ALLOCATE     = 0x1,
-> > -    BIOS_LINKER_LOADER_COMMAND_ADD_POINTER  = 0x2,
-> > -    BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM = 0x3,
-> > +    BIOS_LINKER_LOADER_COMMAND_ALLOCATE          = 0x1,
-> > +    BIOS_LINKER_LOADER_COMMAND_ADD_POINTER       = 0x2,
-> > +    BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM      = 0x3,
-> > +    BIOS_LINKER_LOADER_COMMAND_WRITE_POINTER     = 0x4,
-> >  };
-> >  
-> >  enum {
-> > @@ -278,3 +294,47 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
-> >  
-> >      g_array_append_vals(linker->cmd_blob, &entry, sizeof entry);
-> >  }
-> > +
-> > +/*
-> > + * bios_linker_loader_write_pointer: ask guest to write a pointer to the
-> > + * source file into the destination file, and write it back to QEMU via
-> > + * fw_cfg DMA.
-> > + *
-> > + * @linker: linker object instance
-> > + * @dest_file: destination file that must be written
-> > + * @dst_patched_offset: location within destination file blob to be patched
-> > + *                      with the pointer to @src_file, in bytes
-> > + * @dst_patched_offset_size: size of the pointer to be patched
-> > + *                      at @dst_patched_offset in @dest_file blob, in bytes
-> > + * @src_file: source file who's address must be taken
-> > + * @src_offset: location within source file blob to which
-> > + *              @dest_file+@dst_patched_offset will point to after
-> > + *              firmware's executed WRITE_POINTER command
-> > + */
-> > +void bios_linker_loader_write_pointer(BIOSLinker *linker,
-> > +                                    const char *dest_file,
-> > +                                    uint32_t dst_patched_offset,
-> > +                                    uint8_t dst_patched_size,
-> > +                                    const char *src_file,
-> > +                                    uint32_t src_offset)
-> > +{
-> > +    BiosLinkerLoaderEntry entry;
-> > +    const BiosLinkerFileEntry *source_file =
-> > +        bios_linker_find_file(linker, src_file);
-> > +
-> > +    assert(source_file);
-> > +    assert(src_offset <= source_file->blob->len);
-> off by one, should be '<'
-> 
-> > +    memset(&entry, 0, sizeof entry);
-> > +    strncpy(entry.wr_pointer.dest_file, dest_file,
-> > +            sizeof entry.wr_pointer.dest_file - 1);
-> > +    strncpy(entry.wr_pointer.src_file, src_file,
-> > +            sizeof entry.wr_pointer.src_file - 1);
-> > +    entry.command = cpu_to_le32(BIOS_LINKER_LOADER_COMMAND_WRITE_POINTER);
-> > +    entry.wr_pointer.dst_offset = cpu_to_le32(dst_patched_offset);
-> > +    entry.wr_pointer.src_offset = cpu_to_le32(dst_patched_offset);
-> > +    entry.wr_pointer.size = dst_patched_size;
-> > +    assert(dst_patched_size == 1 || dst_patched_size == 2 ||
-> > +           dst_patched_size == 4 || dst_patched_size == 8);
-> > +
-> > +    g_array_append_vals(linker->cmd_blob, &entry, sizeof entry);
-> > +}
-> > diff --git a/include/hw/acpi/bios-linker-loader.h b/include/hw/acpi/bios-linker-loader.h
-> > index fa1e5d1..efe17b0 100644
-> > --- a/include/hw/acpi/bios-linker-loader.h
-> > +++ b/include/hw/acpi/bios-linker-loader.h
-> > @@ -26,5 +26,12 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
-> >                                      const char *src_file,
-> >                                      uint32_t src_offset);
-> >  
-> > +void bios_linker_loader_write_pointer(BIOSLinker *linker,
-> > +                                      const char *dest_file,
-> > +                                      uint32_t dst_patched_offset,
-> > +                                      uint8_t dst_patched_size,
-> > +                                      const char *src_file,
-> > +                                      uint32_t src_offset);
-> > +
-> >  void bios_linker_loader_cleanup(BIOSLinker *linker);
-> >  #endif
-> 
-> Taking in account comments above are corner cases.
->  1: old bios running on new QEMU with vmgenid device and OLD/not supported bios
->  2: assert check
-> 
-> It's ok fixes for above issues being fixed in follow up patch
-> or as fixup while patch is staged in pci tree
-> 
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Forget that. For some reason, the "max" cpu patch series did not reach my inbox :-/
+Will look into that.
