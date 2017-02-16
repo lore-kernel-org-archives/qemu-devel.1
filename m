@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1ceVHA-0000R0-D0
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 18:15:49 -0500
+	(envelope-from <ben@skyportsystems.com>) id 1ceVHA-0000R1-Dm
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 18:15:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1ceVH8-0000tZ-1q
+	(envelope-from <ben@skyportsystems.com>) id 1ceVH7-0000sR-7R
 	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 18:15:48 -0500
-Received: from mail-pf0-x22b.google.com ([2607:f8b0:400e:c00::22b]:33026)
+Received: from mail-pg0-x22b.google.com ([2607:f8b0:400e:c05::22b]:36520)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
-	id 1ceVH7-0000sE-IQ
+	id 1ceVH6-0000rb-T0
 	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 18:15:45 -0500
-Received: by mail-pf0-x22b.google.com with SMTP id c73so8711345pfb.0
-	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 15:15:45 -0800 (PST)
+Received: by mail-pg0-x22b.google.com with SMTP id v184so9799172pgv.3
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 15:15:44 -0800 (PST)
 From: ben@skyportsystems.com
-Date: Thu, 16 Feb 2017 15:15:33 -0800
-Message-Id: <a783671b5631fc40c06e0070dffb91f858a1ed24.1487286467.git.ben@skyportsystems.com>
-In-Reply-To: <cover.1487286467.git.ben@skyportsystems.com>
-References: <cover.1487286467.git.ben@skyportsystems.com>
-In-Reply-To: <cover.1487286467.git.ben@skyportsystems.com>
-References: <cover.1487286467.git.ben@skyportsystems.com>
-Subject: [Qemu-devel] [PATCH v8 1/8] linker-loader: Add new 'write pointer'
- command
+Date: Thu, 16 Feb 2017 15:15:32 -0800
+Message-Id: <cover.1487286467.git.ben@skyportsystems.com>
+Subject: [Qemu-devel] [PATCH v8 0/8] Add support for VM Generation ID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,123 +29,111 @@ Cc: lersek@redhat.com, mst@redhat.com, imammedo@redhat.com, Ben Warren <ben@skyp
 
 From: Ben Warren <ben@skyportsystems.com>
 
-This is similar to the existing 'add pointer' functionality, but instead
-of instructing the guest (BIOS or UEFI) to patch memory, it instructs
-the guest to write the pointer back to QEMU via a writeable fw_cfg file.
+This patch set adds support for passing a GUID to Windows guests.  It is a
+re-implementation of previous patch sets written by Igor Mammedov et al, but
+this time passing the GUID data as a fw_cfg blob.
 
-Signed-off-by: Ben Warren <ben@skyportsystems.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Tested-by: Laszlo Ersek <lersek@redhat.com>
----
- hw/acpi/bios-linker-loader.c         | 66 ++++++++++++++++++++++++++++++++++--
- include/hw/acpi/bios-linker-loader.h |  7 ++++
- 2 files changed, 70 insertions(+), 3 deletions(-)
+This patch set has dependencies on new guest functionality, in particular the
+support for a new linker-loader command and the ability to write back data
+to QEMU over a DMA link.  Work is in flight in both SeaBIOS and OVMF to support this.
 
-diff --git a/hw/acpi/bios-linker-loader.c b/hw/acpi/bios-linker-loader.c
-index d963ebe..046183a 100644
---- a/hw/acpi/bios-linker-loader.c
-+++ b/hw/acpi/bios-linker-loader.c
-@@ -78,6 +78,21 @@ struct BiosLinkerLoaderEntry {
-             uint32_t length;
-         } cksum;
- 
-+        /*
-+         * COMMAND_WRITE_POINTER - write the fw_cfg file (originating from
-+         * @dest_file) at @wr_pointer.offset, by adding a pointer to
-+         * @src_offset within the table originating from @src_file.
-+         * 1,2,4 or 8 byte unsigned addition is used depending on
-+         * @wr_pointer.size.
-+         */
-+        struct {
-+            char dest_file[BIOS_LINKER_LOADER_FILESZ];
-+            char src_file[BIOS_LINKER_LOADER_FILESZ];
-+            uint32_t dst_offset;
-+            uint32_t src_offset;
-+            uint8_t size;
-+        } wr_pointer;
-+
-         /* padding */
-         char pad[124];
-     };
-@@ -85,9 +100,10 @@ struct BiosLinkerLoaderEntry {
- typedef struct BiosLinkerLoaderEntry BiosLinkerLoaderEntry;
- 
- enum {
--    BIOS_LINKER_LOADER_COMMAND_ALLOCATE     = 0x1,
--    BIOS_LINKER_LOADER_COMMAND_ADD_POINTER  = 0x2,
--    BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM = 0x3,
-+    BIOS_LINKER_LOADER_COMMAND_ALLOCATE          = 0x1,
-+    BIOS_LINKER_LOADER_COMMAND_ADD_POINTER       = 0x2,
-+    BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM      = 0x3,
-+    BIOS_LINKER_LOADER_COMMAND_WRITE_POINTER     = 0x4,
- };
- 
- enum {
-@@ -278,3 +294,47 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
- 
-     g_array_append_vals(linker->cmd_blob, &entry, sizeof entry);
- }
-+
-+/*
-+ * bios_linker_loader_write_pointer: ask guest to write a pointer to the
-+ * source file into the destination file, and write it back to QEMU via
-+ * fw_cfg DMA.
-+ *
-+ * @linker: linker object instance
-+ * @dest_file: destination file that must be written
-+ * @dst_patched_offset: location within destination file blob to be patched
-+ *                      with the pointer to @src_file, in bytes
-+ * @dst_patched_offset_size: size of the pointer to be patched
-+ *                      at @dst_patched_offset in @dest_file blob, in bytes
-+ * @src_file: source file who's address must be taken
-+ * @src_offset: location within source file blob to which
-+ *              @dest_file+@dst_patched_offset will point to after
-+ *              firmware's executed WRITE_POINTER command
-+ */
-+void bios_linker_loader_write_pointer(BIOSLinker *linker,
-+                                    const char *dest_file,
-+                                    uint32_t dst_patched_offset,
-+                                    uint8_t dst_patched_size,
-+                                    const char *src_file,
-+                                    uint32_t src_offset)
-+{
-+    BiosLinkerLoaderEntry entry;
-+    const BiosLinkerFileEntry *source_file =
-+        bios_linker_find_file(linker, src_file);
-+
-+    assert(source_file);
-+    assert(src_offset < source_file->blob->len);
-+    memset(&entry, 0, sizeof entry);
-+    strncpy(entry.wr_pointer.dest_file, dest_file,
-+            sizeof entry.wr_pointer.dest_file - 1);
-+    strncpy(entry.wr_pointer.src_file, src_file,
-+            sizeof entry.wr_pointer.src_file - 1);
-+    entry.command = cpu_to_le32(BIOS_LINKER_LOADER_COMMAND_WRITE_POINTER);
-+    entry.wr_pointer.dst_offset = cpu_to_le32(dst_patched_offset);
-+    entry.wr_pointer.src_offset = cpu_to_le32(src_offset);
-+    entry.wr_pointer.size = dst_patched_size;
-+    assert(dst_patched_size == 1 || dst_patched_size == 2 ||
-+           dst_patched_size == 4 || dst_patched_size == 8);
-+
-+    g_array_append_vals(linker->cmd_blob, &entry, sizeof entry);
-+}
-diff --git a/include/hw/acpi/bios-linker-loader.h b/include/hw/acpi/bios-linker-loader.h
-index fa1e5d1..efe17b0 100644
---- a/include/hw/acpi/bios-linker-loader.h
-+++ b/include/hw/acpi/bios-linker-loader.h
-@@ -26,5 +26,12 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
-                                     const char *src_file,
-                                     uint32_t src_offset);
- 
-+void bios_linker_loader_write_pointer(BIOSLinker *linker,
-+                                      const char *dest_file,
-+                                      uint32_t dst_patched_offset,
-+                                      uint8_t dst_patched_size,
-+                                      const char *src_file,
-+                                      uint32_t src_offset);
-+
- void bios_linker_loader_cleanup(BIOSLinker *linker);
- #endif
+v7->v8:
+    - Rebased to top of tree.
+    - Fixed two small bugs in "write pointer" function
+    - minor re-ordering of data in patches
+    - Fixed unit test by adding delays/retries to reading RSDP table
+
+v6->v7:
+    - Rebased to top of tree.
+    - Added 'src_offset' field to "write pointer" command
+    - Reworked unit tests based on feedback
+    - various minor changes based on feedback
+    - Added entries to MAINTAINERS file
+
+v5->v6:
+    - Rebased to top of tree.
+    - Changed device from sysbus to a simple device.  This removed the need for
+      adding dynamic sysbus support to pc_piix boards.
+    - Removed patch that introduced QWORD patching of AML.
+    - Removed ability to set GUID via QMP/HMP.
+    - Improved comments/documentation in code.
+
+v4->v5:
+    - Added significantly more detail to the documentation.
+    - Replaced the previously-implemented linker-loader command with a new one:
+      "write pointer".  This allows writing the guest address of a fw_cfg blob back
+      to an arbitrary offset in a writeable fw_cfg file visible to QEMU.  This will
+      require support in SeaBIOS and OVMF (ongoing).
+    - Fixed endianness issues throughout.
+    - Several styling cleanups.
+
+v3->v4:
+    - Rebased to top of tree.
+    - Re-added document patch that was accidentally dropped from the last revision.
+    - Added VMState functionality so that VGIA is restored properly.
+    - Added Unit tests
+v2->v3:
+    - Added second writeable fw_cfg for storing the VM Generaiton ID
+      address.  This uses a new linker-loader command for instructing the
+      guest to write back the allocated address.  A patch for SeaBIOS has been
+      submitted (https://www.seabios.org/pipermail/seabios/2017-January/011079.html)
+      and the resulting binary will need to be pulled into QEMU once accepted.
+    - Setting VM Generation ID by command line or qmp/hmp now accepts an "auto"
+      value, whereby QEMU generates a random GUID.
+    - Incorporated review comments from v2 mainly around code styling and AML syntax
+    - Changed to use the E05 ACPI event instead of E00
+v1->v2:
+    - Removed "changed" boolean parameter as it is unneeded
+    - Added ACPI Notify logic
+    - Style changes to pass checkpatch.pl
+    - Added support for dynamic sysbus to pc_piix boards
+
+
+Ben Warren (7):
+  linker-loader: Add new 'write pointer' command
+  docs: VM Generation ID device description
+  ACPI: Add vmgenid blob storage to the build tables
+  ACPI: Add Virtual Machine Generation ID support
+  tests: Move reusable ACPI code into a utility file
+  tests: Add unit tests for the VM Generation ID feature
+  MAINTAINERS: Add VM Generation ID entries
+
+Igor Mammedov (1):
+  qmp/hmp: add query-vm-generation-id and 'info vm-generation-id'
+    commands
+
+ MAINTAINERS                          |  11 ++
+ default-configs/i386-softmmu.mak     |   1 +
+ default-configs/x86_64-softmmu.mak   |   1 +
+ docs/specs/vmgenid.txt               | 245 +++++++++++++++++++++++++++++++++
+ hmp-commands-info.hx                 |  14 ++
+ hmp.c                                |   9 ++
+ hmp.h                                |   1 +
+ hw/acpi/Makefile.objs                |   1 +
+ hw/acpi/aml-build.c                  |   2 +
+ hw/acpi/bios-linker-loader.c         |  66 ++++++++-
+ hw/acpi/vmgenid.c                    | 258 +++++++++++++++++++++++++++++++++++
+ hw/i386/acpi-build.c                 |  16 +++
+ include/hw/acpi/acpi_dev_interface.h |   1 +
+ include/hw/acpi/aml-build.h          |   1 +
+ include/hw/acpi/bios-linker-loader.h |   7 +
+ include/hw/acpi/vmgenid.h            |  35 +++++
+ qapi-schema.json                     |  20 +++
+ stubs/Makefile.objs                  |   1 +
+ stubs/vmgenid.c                      |   9 ++
+ tests/Makefile.include               |   4 +-
+ tests/acpi-utils.c                   |  65 +++++++++
+ tests/acpi-utils.h                   |  94 +++++++++++++
+ tests/bios-tables-test.c             | 132 ++----------------
+ tests/vmgenid-test.c                 | 200 +++++++++++++++++++++++++++
+ 24 files changed, 1073 insertions(+), 121 deletions(-)
+ create mode 100644 docs/specs/vmgenid.txt
+ create mode 100644 hw/acpi/vmgenid.c
+ create mode 100644 include/hw/acpi/vmgenid.h
+ create mode 100644 stubs/vmgenid.c
+ create mode 100644 tests/acpi-utils.c
+ create mode 100644 tests/acpi-utils.h
+ create mode 100644 tests/vmgenid-test.c
+
 -- 
 2.7.4
