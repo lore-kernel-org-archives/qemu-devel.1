@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50820)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ceN4G-0001i4-R3
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:29:57 -0500
+	(envelope-from <fred.konrad@greensocs.com>) id 1ceN4u-0002LE-6U
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:30:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ceN4D-0006x1-Kw
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:29:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35586)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ceN4D-0006wV-Fa
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:29:53 -0500
-Date: Thu, 16 Feb 2017 15:29:50 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170216152950.2d2de076@nial.brq.redhat.com>
-In-Reply-To: <cover.1487224954.git.ben@skyportsystems.com>
-References: <cover.1487224954.git.ben@skyportsystems.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 0/8] Add support for VM Generation ID
+	(envelope-from <fred.konrad@greensocs.com>) id 1ceN4r-0007SG-Ny
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:30:36 -0500
+Received: from greensocs.com ([193.104.36.180]:53624)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <fred.konrad@greensocs.com>) id 1ceN4r-0007Rf-Cz
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:30:33 -0500
+From: fred.konrad@greensocs.com
+Date: Thu, 16 Feb 2017 15:30:13 +0100
+Message-Id: <1487255413-14196-8-git-send-email-fred.konrad@greensocs.com>
+In-Reply-To: <1487255413-14196-1-git-send-email-fred.konrad@greensocs.com>
+References: <1487255413-14196-1-git-send-email-fred.konrad@greensocs.com>
+Subject: [Qemu-devel] [PATCH V1 7/7] xilinx_spips: allow mmio execution
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,25 +23,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ben@skyportsystems.com
-Cc: qemu-devel@nongnu.org, lersek@redhat.com, mst@redhat.com
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, pbonzini@redhat.com, edgar.iglesias@xilinx.com, alistair.francis@xilinx.com, clg@kaod.org, mark.burton@greensocs.com, fred.konrad@greensocs.com
 
-On Wed, 15 Feb 2017 22:18:10 -0800
-ben@skyportsystems.com wrote:
+From: KONRAD Frederic <fred.konrad@greensocs.com>
 
-> From: Ben Warren <ben@skyportsystems.com>
-> 
-> This patch set adds support for passing a GUID to Windows guests.  It is a
-> re-implementation of previous patch sets written by Igor Mammedov et al, but
-> this time passing the GUID data as a fw_cfg blob.
-> 
-> This patch set has dependencies on new guest functionality, in particular the
-> support for a new linker-loader command and the ability to write back data
-> to QEMU over a DMA link.  Work is in flight in both SeaBIOS and OVMF to support this.
-> 
-> v6->v7:
->     - Rebased to top of tree.
->     - Added 'src_offset' field to "write pointer" command
-Ben,
+This allows to execute from the lqspi area.
 
-Do you plan to post updated write pointer seabios impl.?
+When the request_ptr is called the device loads 1024bytes from the SPI device.
+Then this code can be executed by the guest.
+
+Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
+---
+ hw/ssi/xilinx_spips.c | 74 ++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 55 insertions(+), 19 deletions(-)
+
+diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+index da8adfa..e833028 100644
+--- a/hw/ssi/xilinx_spips.c
++++ b/hw/ssi/xilinx_spips.c
+@@ -496,6 +496,18 @@ static const MemoryRegionOps spips_ops = {
+     .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
++static void xilinx_qspips_invalidate_mmio_ptr(XilinxQSPIPS *q)
++{
++    XilinxSPIPS *s = &q->parent_obj;
++
++    if (q->lqspi_cached_addr != ~0ULL) {
++        /* Invalidate the current mapped mmio */
++        memory_region_invalidate_mmio_ptr(&s->mmlqspi, q->lqspi_cached_addr,
++                                          LQSPI_CACHE_SIZE);
++        q->lqspi_cached_addr = ~0ULL;
++    }
++}
++
+ static void xilinx_qspips_write(void *opaque, hwaddr addr,
+                                 uint64_t value, unsigned size)
+ {
+@@ -505,7 +517,7 @@ static void xilinx_qspips_write(void *opaque, hwaddr addr,
+     addr >>= 2;
+ 
+     if (addr == R_LQSPI_CFG) {
+-        q->lqspi_cached_addr = ~0ULL;
++        xilinx_qspips_invalidate_mmio_ptr(q);
+     }
+ }
+ 
+@@ -517,27 +529,20 @@ static const MemoryRegionOps qspips_ops = {
+ 
+ #define LQSPI_CACHE_SIZE 1024
+ 
+-static uint64_t
+-lqspi_read(void *opaque, hwaddr addr, unsigned int size)
++static void lqspi_load_cache(void *opaque, hwaddr addr)
+ {
+-    int i;
+     XilinxQSPIPS *q = opaque;
+     XilinxSPIPS *s = opaque;
+-    uint32_t ret;
+-
+-    if (addr >= q->lqspi_cached_addr &&
+-            addr <= q->lqspi_cached_addr + LQSPI_CACHE_SIZE - 4) {
+-        uint8_t *retp = &q->lqspi_buf[addr - q->lqspi_cached_addr];
+-        ret = cpu_to_le32(*(uint32_t *)retp);
+-        DB_PRINT_L(1, "addr: %08x, data: %08x\n", (unsigned)addr,
+-                   (unsigned)ret);
+-        return ret;
+-    } else {
+-        int flash_addr = (addr / num_effective_busses(s));
+-        int slave = flash_addr >> LQSPI_ADDRESS_BITS;
+-        int cache_entry = 0;
+-        uint32_t u_page_save = s->regs[R_LQSPI_STS] & ~LQSPI_CFG_U_PAGE;
+-
++    int i;
++    int flash_addr = ((addr & ~(LQSPI_CACHE_SIZE - 1))
++                   / num_effective_busses(s));
++    int slave = flash_addr >> LQSPI_ADDRESS_BITS;
++    int cache_entry = 0;
++    uint32_t u_page_save = s->regs[R_LQSPI_STS] & ~LQSPI_CFG_U_PAGE;
++
++    if (addr < q->lqspi_cached_addr ||
++            addr > q->lqspi_cached_addr + LQSPI_CACHE_SIZE - 4) {
++        xilinx_qspips_invalidate_mmio_ptr(q);
+         s->regs[R_LQSPI_STS] &= ~LQSPI_CFG_U_PAGE;
+         s->regs[R_LQSPI_STS] |= slave ? LQSPI_CFG_U_PAGE : 0;
+ 
+@@ -589,12 +594,43 @@ lqspi_read(void *opaque, hwaddr addr, unsigned int size)
+         xilinx_spips_update_cs_lines(s);
+ 
+         q->lqspi_cached_addr = flash_addr * num_effective_busses(s);
++    }
++}
++
++static void *lqspi_request_mmio_ptr(void *opaque, hwaddr addr, unsigned *size,
++                                    unsigned *offset)
++{
++    XilinxQSPIPS *q = opaque;
++    hwaddr offset_within_the_region = addr & ~(LQSPI_CACHE_SIZE - 1);
++
++    lqspi_load_cache(opaque, offset_within_the_region);
++    *size = LQSPI_CACHE_SIZE;
++    *offset = offset_within_the_region;
++    return q->lqspi_buf;
++}
++
++static uint64_t
++lqspi_read(void *opaque, hwaddr addr, unsigned int size)
++{
++    XilinxQSPIPS *q = opaque;
++    uint32_t ret;
++
++    if (addr >= q->lqspi_cached_addr &&
++            addr <= q->lqspi_cached_addr + LQSPI_CACHE_SIZE - 4) {
++        uint8_t *retp = &q->lqspi_buf[addr - q->lqspi_cached_addr];
++        ret = cpu_to_le32(*(uint32_t *)retp);
++        DB_PRINT_L(1, "addr: %08x, data: %08x\n", (unsigned)addr,
++                   (unsigned)ret);
++        return ret;
++    } else {
++        lqspi_load_cache(opaque, addr);
+         return lqspi_read(opaque, addr, size);
+     }
+ }
+ 
+ static const MemoryRegionOps lqspi_ops = {
+     .read = lqspi_read,
++    .request_ptr = lqspi_request_mmio_ptr,
+     .endianness = DEVICE_NATIVE_ENDIAN,
+     .valid = {
+         .min_access_size = 1,
+-- 
+1.8.3.1
