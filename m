@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1ceKr7-00062X-VJ
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 07:08:15 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ceKsL-00076w-Nk
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 07:09:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1ceKr4-0006Iu-N0
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 07:08:13 -0500
-Received: from mx5-phx2.redhat.com ([209.132.183.37]:58141)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1ceKr4-0006I1-FJ
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 07:08:10 -0500
-Date: Thu, 16 Feb 2017 07:08:10 -0500 (EST)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>
-Message-ID: <783754281.5755288.1487246890217.JavaMail.zimbra@redhat.com>
-In-Reply-To: <352f44a4-e9be-f97d-ac26-f5d84c7dbe38@redhat.com>
-References: <20170216105827.1486-1-marcandre.lureau@redhat.com>
-	<d845bee9-5de1-96ce-3bb2-1110d260729d@redhat.com>
-	<2066565427.5738720.1487243969707.JavaMail.zimbra@redhat.com>
-	<352f44a4-e9be-f97d-ac26-f5d84c7dbe38@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1ceKsK-0006zS-Nv
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 07:09:29 -0500
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:38499)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ceKsK-0006zK-FK
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 07:09:28 -0500
+Received: by mail-wm0-x235.google.com with SMTP id r141so13523657wmg.1
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 04:09:28 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCHv2] cutils: factor out
- pci_host_device_address_parse()
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 16 Feb 2017 12:09:06 +0000
+Message-ID: <CAFEAcA9GHWQCUrgYsT_Bnsy8_ZYP073_DWBcoRvX2Hg+F=_h5w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: [Qemu-devel] problems with qapi2texi.py (use of @quotation)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,356 +26,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Markus Armbruster <armbru@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <mlureau@redhat.com>
 
-Hi
+When we build qemu-qmp-ref.txt this causes texinfo to complain several
+times:
+"Negative repeat count does nothing at
+/usr/share/texinfo/Texinfo/Convert/Line.pm line 124."
 
------ Original Message -----
-> On 02/16/2017 01:19 PM, Marc-Andr=C3=A9 Lureau wrote:
-> > Hi
-> >
-> > ----- Original Message -----
-> >> On 02/16/2017 12:58 PM, Marc-Andr=C3=A9 Lureau wrote:
-> >>> This will allow the function to be used outside of QOM properties.
-> >>>
-> >>
-> >> Hi Mark-Andre,
-> >>
-> >> I am not sure cutil.h is the right header for the function, because is=
- too
-> >> PCI
-> >> related for a utility library.
-> >
-> > It's in the pci.h header, implementation and test is put in
-> > {test-,}cutils.c
-> >
->=20
-> sorry about the miss-match, I war referring to the implementation.
->=20
-> > I can try to put it in pci/pci.c, but it will be harder to link to for
-> > testing (note: I haven't tried). I could also put it in a seperate
-> > pci-parse.c for example.
->=20
-> no need for a new file, but hw/pci/pci_host.c should be a good place.
+I dug into what's happening here a bit, and I think the problem is
+that we're generating bogus texinfo.
 
-It pulls in pci/pci.c for pci_find_device() and friends, plus type registra=
-tion etc.
+In particular I think they're the result of the three places where
+we try to have an enumerated list inside a Notes section, which
+generate texi like this:
 
-I'll move it to a standalone pci/pci-util.c
+@quotation Notes
+@enumerate
+@item
+The 'query-migrate' command should be used to check migration's progress
+and final result (this information is provided by the 'status' member)
 
->=20
-> regarding the tests, an new pci test file would be welcomed.
->=20
-> >
-> >
-> >> Also, maybe we can post the patch together with the code that uses the
-> >> exposed function.
-> >
-> > I dropped the patch using it for now, but I thought it would still be n=
-ice
-> > to have the test, doc and strtoul change.
-> >
->=20
-> I agree if Michael has nothing against this.
->=20
-> Thanks,
-> Marcel
->=20
-> >>
-> >> And thanks for the unit-tests, much appreciated!
-> >
-> > thanks
-> >
-> >> Marcel
-> >>
-> >>> Add tests and replace strtoul usage for qemu_strtoul while touching i=
-t.
-> >>>
-> >>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> >>> ---
-> >>> v2:
-> >>>  - fixed incompatible type warning/error
-> >>>
-> >>> include/hw/pci/pci.h      | 12 ++++++++++
-> >>>  hw/core/qdev-properties.c | 61
-> >>>  +++--------------------------------------------
-> >>>  tests/test-cutils.c       | 46 +++++++++++++++++++++++++++++++++++
-> >>>  util/cutils.c             | 59
-> >>>  +++++++++++++++++++++++++++++++++++++++++++++
-> >>>  4 files changed, 120 insertions(+), 58 deletions(-)
-> >>>
-> >>> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> >>> index cbc1fdfb5b..61718080ea 100644
-> >>> --- a/include/hw/pci/pci.h
-> >>> +++ b/include/hw/pci/pci.h
-> >>> @@ -815,4 +815,16 @@ extern const VMStateDescription vmstate_pci_devi=
-ce;
-> >>>
-> >>>  MSIMessage pci_get_msi_message(PCIDevice *dev, int vector);
-> >>>
-> >>> +/**
-> >>> + * pci_host_device_address_parse:
-> >>> + * @str: string to parse
-> >>> + * @addr: destination structure or NULL
-> >>> + *
-> >>> + * Parse [<domain>:]<bus>:<slot>.<func>
-> >>> + *   if <domain> is not supplied, it's assumed to be 0.
-> >>> + *
-> >>> + * Returns: -1 on failure, 0 on success.
-> >>> + */
-> >>> +int pci_host_device_address_parse(const char *str, PCIHostDeviceAddr=
-ess
-> >>> *addr);
-> >>> +
-> >>>  #endif
-> >>> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-> >>> index 6ab4265eb4..5dd0774e88 100644
-> >>> --- a/hw/core/qdev-properties.c
-> >>> +++ b/hw/core/qdev-properties.c
-> >>> @@ -722,10 +722,6 @@ static void get_pci_host_devaddr(Object *obj,
-> >>> Visitor
-> >>> *v, const char *name,
-> >>>      visit_type_str(v, name, &p, errp);
-> >>>  }
-> >>>
-> >>> -/*
-> >>> - * Parse [<domain>:]<bus>:<slot>.<func>
-> >>> - *   if <domain> is not supplied, it's assumed to be 0.
-> >>> - */
-> >>>  static void set_pci_host_devaddr(Object *obj, Visitor *v, const char
-> >>>  *name,
-> >>>                                   void *opaque, Error **errp)
-> >>>  {
-> >>> @@ -733,11 +729,7 @@ static void set_pci_host_devaddr(Object *obj,
-> >>> Visitor
-> >>> *v, const char *name,
-> >>>      Property *prop =3D opaque;
-> >>>      PCIHostDeviceAddress *addr =3D qdev_get_prop_ptr(dev, prop);
-> >>>      Error *local_err =3D NULL;
-> >>> -    char *str, *p;
-> >>> -    char *e;
-> >>> -    unsigned long val;
-> >>> -    unsigned long dom =3D 0, bus =3D 0;
-> >>> -    unsigned int slot =3D 0, func =3D 0;
-> >>> +    char *str;
-> >>>
-> >>>      if (dev->realized) {
-> >>>          qdev_prop_set_after_realize(dev, name, errp);
-> >>> @@ -750,58 +742,11 @@ static void set_pci_host_devaddr(Object *obj,
-> >>> Visitor
-> >>> *v, const char *name,
-> >>>          return;
-> >>>      }
-> >>>
-> >>> -    p =3D str;
-> >>> -    val =3D strtoul(p, &e, 16);
-> >>> -    if (e =3D=3D p || *e !=3D ':') {
-> >>> -        goto inval;
-> >>> -    }
-> >>> -    bus =3D val;
-> >>> -
-> >>> -    p =3D e + 1;
-> >>> -    val =3D strtoul(p, &e, 16);
-> >>> -    if (e =3D=3D p) {
-> >>> -        goto inval;
-> >>> -    }
-> >>> -    if (*e =3D=3D ':') {
-> >>> -        dom =3D bus;
-> >>> -        bus =3D val;
-> >>> -        p =3D e + 1;
-> >>> -        val =3D strtoul(p, &e, 16);
-> >>> -        if (e =3D=3D p) {
-> >>> -            goto inval;
-> >>> -        }
-> >>> -    }
-> >>> -    slot =3D val;
-> >>> -
-> >>> -    if (*e !=3D '.') {
-> >>> -        goto inval;
-> >>> +    if (!pci_host_device_address_parse(str, addr)) {
-> >>> +        error_set_from_qdev_prop_error(errp, EINVAL, dev, prop, str)=
-;
-> >>>      }
-> >>> -    p =3D e + 1;
-> >>> -    val =3D strtoul(p, &e, 10);
-> >>> -    if (e =3D=3D p) {
-> >>> -        goto inval;
-> >>> -    }
-> >>> -    func =3D val;
-> >>> -
-> >>> -    if (dom > 0xffff || bus > 0xff || slot > 0x1f || func > 7) {
-> >>> -        goto inval;
-> >>> -    }
-> >>> -
-> >>> -    if (*e) {
-> >>> -        goto inval;
-> >>> -    }
-> >>> -
-> >>> -    addr->domain =3D dom;
-> >>> -    addr->bus =3D bus;
-> >>> -    addr->slot =3D slot;
-> >>> -    addr->function =3D func;
-> >>>
-> >>>      g_free(str);
-> >>> -    return;
-> >>> -
-> >>> -inval:
-> >>> -    error_set_from_qdev_prop_error(errp, EINVAL, dev, prop, str);
-> >>> -    g_free(str);
-> >>>  }
-> >>>
-> >>>  PropertyInfo qdev_prop_pci_host_devaddr =3D {
-> >>> diff --git a/tests/test-cutils.c b/tests/test-cutils.c
-> >>> index 20b0f59ba2..81c4f072f3 100644
-> >>> --- a/tests/test-cutils.c
-> >>> +++ b/tests/test-cutils.c
-> >>> @@ -28,6 +28,7 @@
-> >>>  #include "qemu/osdep.h"
-> >>>
-> >>>  #include "qemu/cutils.h"
-> >>> +#include "hw/pci/pci.h"
-> >>>
-> >>>  static void test_parse_uint_null(void)
-> >>>  {
-> >>> @@ -1437,6 +1438,46 @@ static void test_qemu_strtosz_suffix_unit(void=
-)
-> >>>      g_assert_cmpint(res, =3D=3D, 12345000);
-> >>>  }
-> >>>
-> >>> +static void test_pci_parse_valid(void)
-> >>> +{
-> >>> +    PCIHostDeviceAddress addr =3D { 0xff, 0xff, 0xff, 0xff };
-> >>> +    int i, res;
-> >>> +    const struct {
-> >>> +        const char *str;
-> >>> +        PCIHostDeviceAddress addr;
-> >>> +    } tests[] =3D {
-> >>> +        { "1:2.3", { 0, 1, 2, 3 } },
-> >>> +        { "4:1:2.3", { 4, 1, 2, 3 } },
-> >>> +        { "a:a:a.7", { 10, 10, 10, 7 } },
-> >>> +    };
-> >>> +
-> >>> +    for (i =3D 0; i < ARRAY_SIZE(tests); i++) {
-> >>> +        res =3D pci_host_device_address_parse(tests[i].str, &addr);
-> >>> +        g_assert_cmpint(res, =3D=3D, 0);
-> >>> +
-> >>> +        g_assert_cmpint(addr.domain, =3D=3D, tests[i].addr.domain);
-> >>> +        g_assert_cmpint(addr.bus, =3D=3D, tests[i].addr.bus);
-> >>> +        g_assert_cmpint(addr.slot, =3D=3D, tests[i].addr.slot);
-> >>> +        g_assert_cmpint(addr.function, =3D=3D, tests[i].addr.functio=
-n);
-> >>> +    }
-> >>> +}
-> >>> +
-> >>> +static void test_pci_parse_invalid(void)
-> >>> +{
-> >>> +    int i, res;
-> >>> +    const char *tests[] =3D  {
-> >>> +        "", "foo", "1:2.3 foo",
-> >>> +        "a:a:a.a",
-> >>> +        "1", "1:", "1:2", "1:2:", "1:2:3", ":1:2:3.",
-> >>> +        "-1:1:2.3", "-1:2.3", "1:-1.3", "1:2.-3",
-> >>> +        "0x10000:1:1.1", "0x100:1.1", "1:0x20.1", "1:1.8" };
-> >>> +
-> >>> +    for (i =3D 0; i < ARRAY_SIZE(tests); i++) {
-> >>> +        res =3D pci_host_device_address_parse(tests[i], NULL);
-> >>> +        g_assert_cmpint(res, =3D=3D, -1);
-> >>> +    }
-> >>> +}
-> >>> +
-> >>>  int main(int argc, char **argv)
-> >>>  {
-> >>>      g_test_init(&argc, &argv, NULL);
-> >>> @@ -1598,5 +1639,10 @@ int main(int argc, char **argv)
-> >>>      g_test_add_func("/cutils/strtosz/suffix-unit",
-> >>>                      test_qemu_strtosz_suffix_unit);
-> >>>
-> >>> +    g_test_add_func("/cutils/pci-parse/valid",
-> >>> +                    test_pci_parse_valid);
-> >>> +    g_test_add_func("/cutils/pci-parse/invalid",
-> >>> +                    test_pci_parse_invalid);
-> >>> +
-> >>>      return g_test_run();
-> >>>  }
-> >>> diff --git a/util/cutils.c b/util/cutils.c
-> >>> index 4fefcf3be3..fc71c85816 100644
-> >>> --- a/util/cutils.c
-> >>> +++ b/util/cutils.c
-> >>> @@ -29,6 +29,7 @@
-> >>>  #include "qemu/sockets.h"
-> >>>  #include "qemu/iov.h"
-> >>>  #include "net/net.h"
-> >>> +#include "hw/pci/pci.h"
-> >>>  #include "qemu/cutils.h"
-> >>>
-> >>>  void strpadcpy(char *buf, int buf_size, const char *str, char pad)
-> >>> @@ -594,3 +595,61 @@ const char *qemu_ether_ntoa(const MACAddr *mac)
-> >>>
-> >>>      return ret;
-> >>>  }
-> >>> +
-> >>> +int pci_host_device_address_parse(const char *str, PCIHostDeviceAddr=
-ess
-> >>> *addr)
-> >>> +{
-> >>> +    const char *p =3D str;
-> >>> +    const char *e;
-> >>> +    unsigned long val;
-> >>> +    unsigned int dom =3D 0, bus =3D 0;
-> >>> +    unsigned int slot =3D 0, func =3D 0;
-> >>> +
-> >>> +    if (qemu_strtoul(p, &e, 16, &val) < 0
-> >>> +        || e =3D=3D p || *e !=3D ':') {
-> >>> +        return -1;
-> >>> +    }
-> >>> +    bus =3D val;
-> >>> +
-> >>> +    p =3D e + 1;
-> >>> +    if (qemu_strtoul(p, &e, 16, &val) < 0
-> >>> +        || e =3D=3D p) {
-> >>> +        return -1;
-> >>> +    }
-> >>> +    if (*e =3D=3D ':') {
-> >>> +        dom =3D bus;
-> >>> +        bus =3D val;
-> >>> +        p =3D e + 1;
-> >>> +        if (qemu_strtoul(p, &e, 16, &val) < 0
-> >>> +            || e =3D=3D p) {
-> >>> +            return -1;
-> >>> +        }
-> >>> +    }
-> >>> +    slot =3D val;
-> >>> +
-> >>> +    if (*e !=3D '.') {
-> >>> +        return -1;
-> >>> +    }
-> >>> +    p =3D e + 1;
-> >>> +    if (qemu_strtoul(p, &e, 10, &val) < 0
-> >>> +        || e =3D=3D p) {
-> >>> +        return -1;
-> >>> +    }
-> >>> +    func =3D val;
-> >>> +
-> >>> +    if (dom > 0xffff || bus > 0xff || slot > 0x1f || func > 7) {
-> >>> +        return -1;
-> >>> +    }
-> >>> +
-> >>> +    if (*e) {
-> >>> +        return -1;
-> >>> +    }
-> >>> +
-> >>> +    if (addr) {
-> >>> +        addr->domain =3D dom;
-> >>> +        addr->bus =3D bus;
-> >>> +        addr->slot =3D slot;
-> >>> +        addr->function =3D func;
-> >>> +    }
-> >>> +
-> >>> +    return 0;
-> >>> +}
-> >>>
-> >>
-> >>
->=20
->=20
+@item
+All boolean arguments default to false
+
+@item
+The user Monitor's "detach" argument is invalid in QMP and should not
+be used
+@end enumerate
+
+@end quotation
+
+This is definitely not what @quotation is supposed to be used for,
+and I think the nested indentation (since @enumerate also indents)
+is confusing things.
+
+It also doesn't display correctly, because the "Notes" text disappears
+entirely in the HTML version because it thinks there's no actual
+quotation text.
+
+Similarly, all the Examples lose the "Examples" heading text because
+they're an @example inside a @quotation and the @quotation handling
+thinks there's no actual quotation text.
+
+The text file output formatting is also not good, for instance:
+
+          Notes: 1. The 'query-migrate' command should be used to check
+               migration's progress and final result (this information
+               is provided by the 'status' member)
+
+            2. All boolean arguments default to false
+
+            3. The user Monitor's "detach" argument is invalid in QMP
+               and should not be used
+
+          Example: -> { "execute": "migrate", "arguments": { "uri":
+"tcp:0:4446" } }
+               <- { "return": {} }
+
+where the lack of a line break after "Example:" and "Notes:"
+means things don't line up right.
+
+I think the best fix for all these problems is to stop misusing
+@quotation for doing something other than printing quotations,
+and use something that just formats the "Notes", "Examples",
+etc lines the way we want. I don't know enough texinfo to
+suggest what that should be, though.
+
+thanks
+-- PMM
