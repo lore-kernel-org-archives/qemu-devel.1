@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37973)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ceNyr-0006Ys-BY
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 10:28:26 -0500
+	(envelope-from <mst@redhat.com>) id 1ceO06-0007er-TL
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 10:29:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ceNyq-00060H-Dz
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 10:28:25 -0500
-Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:35557)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ceNyq-0005zl-7E
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 10:28:24 -0500
-Received: by mail-wr0-x233.google.com with SMTP id c4so14055382wrd.2
-	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 07:28:24 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1ceO01-00078d-Vu
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 10:29:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36118)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ceO01-00078X-NI
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 10:29:37 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AF90C804E2
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 15:29:37 +0000 (UTC)
+Date: Thu, 16 Feb 2017 17:29:35 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170216172617-mutt-send-email-mst@kernel.org>
+References: <20170216105827.1486-1-marcandre.lureau@redhat.com>
+	<20170216162538-mutt-send-email-mst@kernel.org>
+	<925489093.5978820.1487257670312.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1486645277-4724-6-git-send-email-kraxel@redhat.com>
-References: <1486645277-4724-1-git-send-email-kraxel@redhat.com>
-	<1486645277-4724-6-git-send-email-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Feb 2017 15:28:02 +0000
-Message-ID: <CAFEAcA8XRGyugmFzJ4PxRpcpHidfBD=1PX1NX8k7mAg3X+vCdA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 05/10] ui: refactor VncDisplay to allow
- multiple listening sockets
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <925489093.5978820.1487257670312.JavaMail.zimbra@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCHv2] cutils: factor out
+ pci_host_device_address_parse()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,68 +36,333 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <mlureau@redhat.com>
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, marcel@redhat.com
 
-On 9 February 2017 at 13:01, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> From: "Daniel P. Berrange" <berrange@redhat.com>
->
-> Currently there is only a single listener for plain VNC and
-> a single listener for websockets VNC. This means that if
-> getaddrinfo() returns multiple IP addresses, for a hostname,
-> the VNC server can only listen on one of them. This is
-> just bearable if listening on wildcard interface, or if
-> the host only has a single network interface to listen on,
-> but if there are multiple NICs and the VNC server needs
-> to listen on 2 or more specific IP addresses, it can't be
-> done.
->
-> This refactors the VncDisplay state so that it holds an
-> array of listening sockets, but still only listens on
-> one socket.
->
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> Message-id: 20170203120649.15637-4-berrange@redhat.com
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+On Thu, Feb 16, 2017 at 10:07:50AM -0500, Marc-Andr=E9 Lureau wrote:
+> Hi
+>=20
+> ----- Original Message -----
+> > On Thu, Feb 16, 2017 at 02:58:27PM +0400, Marc-Andr=E9 Lureau wrote:
+> > > This will allow the function to be used outside of QOM properties.
+> > >=20
+> > > Add tests and replace strtoul usage for qemu_strtoul while touching=
+ it.
+> > >=20
+> > > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> >=20
+> > Sorry, I don't want to start maintaining it. So pls do not move it
+> > to hw/pci. Find out who wants to maintain this and add it there :)
+>=20
+>=20
+> Well, if you are PCI maintainer, I guess it falls into you anyway ;)
 
-> @@ -3153,24 +3166,33 @@ void vnc_display_init(const char *id)
->
->  static void vnc_display_close(VncDisplay *vd)
->  {
-> +    size_t i;
->      if (!vd) {
->          return;
->      }
->      vd->is_unix = false;
-> -    if (vd->lsock != NULL) {
-> -        if (vd->lsock_tag) {
-> -            g_source_remove(vd->lsock_tag);
-> +    for (i = 0; i < vd->nlsock; i++) {
-> +        if (vd->lsock_tag[i]) {
-> +            g_source_remove(vd->lsock_tag[i]);
->          }
-> -        object_unref(OBJECT(vd->lsock));
-> -        vd->lsock = NULL;
-> +        object_unref(OBJECT(vd->lsock[i]));
->      }
-> -    if (vd->lwebsock != NULL) {
-> -        if (vd->lwebsock_tag) {
-> -            g_source_remove(vd->lwebsock_tag);
-> +    g_free(vd->lsock);
-> +    g_free(vd->lsock_tag);
-> +    vd->lsock = NULL;
-> +    vd->nlsock = 0;
+I don't get to maintain all pci devices. This parsing code is part of
+QMP/HMP interfaces with pass-through devices. Not part of pci emulation
+which is what I maintain.
 
-Coverity points out that this results in a double-free,
-because vnc_display_open() has code paths which result in
-calling vnc_display_close() twice on the same VncDisplay*,
-and this code frees vd->lsock_tag without then setting it
-to NULL.
-
-Similarly for vd->lwebsock_tag and vd->led.
-
-(Coverity issues CID 1371242, 1371243, 1371244.)
-
-thanks
--- PMM
+> >=20
+> > > ---
+> > > v2:
+> > >  - fixed incompatible type warning/error
+> > >=20
+> > > include/hw/pci/pci.h      | 12 ++++++++++
+> > >  hw/core/qdev-properties.c | 61
+> > >  +++--------------------------------------------
+> > >  tests/test-cutils.c       | 46 +++++++++++++++++++++++++++++++++++
+> > >  util/cutils.c             | 59
+> > >  +++++++++++++++++++++++++++++++++++++++++++++
+> > >  4 files changed, 120 insertions(+), 58 deletions(-)
+> > >=20
+> > > diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+> > > index cbc1fdfb5b..61718080ea 100644
+> > > --- a/include/hw/pci/pci.h
+> > > +++ b/include/hw/pci/pci.h
+> > > @@ -815,4 +815,16 @@ extern const VMStateDescription vmstate_pci_de=
+vice;
+> > > =20
+> > >  MSIMessage pci_get_msi_message(PCIDevice *dev, int vector);
+> > > =20
+> > > +/**
+> > > + * pci_host_device_address_parse:
+> > > + * @str: string to parse
+> > > + * @addr: destination structure or NULL
+> > > + *
+> > > + * Parse [<domain>:]<bus>:<slot>.<func>
+> > > + *   if <domain> is not supplied, it's assumed to be 0.
+> > > + *
+> > > + * Returns: -1 on failure, 0 on success.
+> > > + */
+> > > +int pci_host_device_address_parse(const char *str, PCIHostDeviceAd=
+dress
+> > > *addr);
+> > > +
+> > >  #endif
+> >=20
+> > Used to be a static function, now it's an interface, I'm not sure it'=
+s a win.
+>=20
+> It's an internal interface, with a single user and a test. Not a big de=
+al.
+>=20
+> >=20
+> > > diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> > > index 6ab4265eb4..5dd0774e88 100644
+> > > --- a/hw/core/qdev-properties.c
+> > > +++ b/hw/core/qdev-properties.c
+> > > @@ -722,10 +722,6 @@ static void get_pci_host_devaddr(Object *obj, =
+Visitor
+> > > *v, const char *name,
+> > >      visit_type_str(v, name, &p, errp);
+> > >  }
+> > > =20
+> > > -/*
+> > > - * Parse [<domain>:]<bus>:<slot>.<func>
+> > > - *   if <domain> is not supplied, it's assumed to be 0.
+> > > - */
+> > >  static void set_pci_host_devaddr(Object *obj, Visitor *v, const ch=
+ar
+> > >  *name,
+> > >                                   void *opaque, Error **errp)
+> > >  {
+> > > @@ -733,11 +729,7 @@ static void set_pci_host_devaddr(Object *obj, =
+Visitor
+> > > *v, const char *name,
+> > >      Property *prop =3D opaque;
+> > >      PCIHostDeviceAddress *addr =3D qdev_get_prop_ptr(dev, prop);
+> > >      Error *local_err =3D NULL;
+> > > -    char *str, *p;
+> > > -    char *e;
+> > > -    unsigned long val;
+> > > -    unsigned long dom =3D 0, bus =3D 0;
+> > > -    unsigned int slot =3D 0, func =3D 0;
+> > > +    char *str;
+> > > =20
+> > >      if (dev->realized) {
+> > >          qdev_prop_set_after_realize(dev, name, errp);
+> > > @@ -750,58 +742,11 @@ static void set_pci_host_devaddr(Object *obj,=
+ Visitor
+> > > *v, const char *name,
+> > >          return;
+> > >      }
+> > > =20
+> > > -    p =3D str;
+> > > -    val =3D strtoul(p, &e, 16);
+> > > -    if (e =3D=3D p || *e !=3D ':') {
+> > > -        goto inval;
+> > > -    }
+> > > -    bus =3D val;
+> > > -
+> > > -    p =3D e + 1;
+> > > -    val =3D strtoul(p, &e, 16);
+> > > -    if (e =3D=3D p) {
+> > > -        goto inval;
+> > > -    }
+> > > -    if (*e =3D=3D ':') {
+> > > -        dom =3D bus;
+> > > -        bus =3D val;
+> > > -        p =3D e + 1;
+> > > -        val =3D strtoul(p, &e, 16);
+> > > -        if (e =3D=3D p) {
+> > > -            goto inval;
+> > > -        }
+> > > -    }
+> > > -    slot =3D val;
+> > > -
+> > > -    if (*e !=3D '.') {
+> > > -        goto inval;
+> > > +    if (!pci_host_device_address_parse(str, addr)) {
+> > > +        error_set_from_qdev_prop_error(errp, EINVAL, dev, prop, st=
+r);
+> > >      }
+> > > -    p =3D e + 1;
+> > > -    val =3D strtoul(p, &e, 10);
+> > > -    if (e =3D=3D p) {
+> > > -        goto inval;
+> > > -    }
+> > > -    func =3D val;
+> > > -
+> > > -    if (dom > 0xffff || bus > 0xff || slot > 0x1f || func > 7) {
+> > > -        goto inval;
+> > > -    }
+> > > -
+> > > -    if (*e) {
+> > > -        goto inval;
+> > > -    }
+> > > -
+> > > -    addr->domain =3D dom;
+> > > -    addr->bus =3D bus;
+> > > -    addr->slot =3D slot;
+> > > -    addr->function =3D func;
+> > > =20
+> > >      g_free(str);
+> > > -    return;
+> > > -
+> > > -inval:
+> > > -    error_set_from_qdev_prop_error(errp, EINVAL, dev, prop, str);
+> > > -    g_free(str);
+> > >  }
+> > > =20
+> > >  PropertyInfo qdev_prop_pci_host_devaddr =3D {
+> > > diff --git a/tests/test-cutils.c b/tests/test-cutils.c
+> > > index 20b0f59ba2..81c4f072f3 100644
+> > > --- a/tests/test-cutils.c
+> > > +++ b/tests/test-cutils.c
+> > > @@ -28,6 +28,7 @@
+> > >  #include "qemu/osdep.h"
+> > > =20
+> > >  #include "qemu/cutils.h"
+> > > +#include "hw/pci/pci.h"
+> > > =20
+> > >  static void test_parse_uint_null(void)
+> > >  {
+> > > @@ -1437,6 +1438,46 @@ static void test_qemu_strtosz_suffix_unit(vo=
+id)
+> > >      g_assert_cmpint(res, =3D=3D, 12345000);
+> > >  }
+> > > =20
+> > > +static void test_pci_parse_valid(void)
+> > > +{
+> > > +    PCIHostDeviceAddress addr =3D { 0xff, 0xff, 0xff, 0xff };
+> > > +    int i, res;
+> > > +    const struct {
+> > > +        const char *str;
+> > > +        PCIHostDeviceAddress addr;
+> > > +    } tests[] =3D {
+> > > +        { "1:2.3", { 0, 1, 2, 3 } },
+> > > +        { "4:1:2.3", { 4, 1, 2, 3 } },
+> > > +        { "a:a:a.7", { 10, 10, 10, 7 } },
+> > > +    };
+> > > +
+> > > +    for (i =3D 0; i < ARRAY_SIZE(tests); i++) {
+> > > +        res =3D pci_host_device_address_parse(tests[i].str, &addr)=
+;
+> > > +        g_assert_cmpint(res, =3D=3D, 0);
+> > > +
+> > > +        g_assert_cmpint(addr.domain, =3D=3D, tests[i].addr.domain)=
+;
+> > > +        g_assert_cmpint(addr.bus, =3D=3D, tests[i].addr.bus);
+> > > +        g_assert_cmpint(addr.slot, =3D=3D, tests[i].addr.slot);
+> > > +        g_assert_cmpint(addr.function, =3D=3D, tests[i].addr.funct=
+ion);
+> > > +    }
+> > > +}
+> > > +
+> > > +static void test_pci_parse_invalid(void)
+> > > +{
+> > > +    int i, res;
+> > > +    const char *tests[] =3D  {
+> > > +        "", "foo", "1:2.3 foo",
+> > > +        "a:a:a.a",
+> > > +        "1", "1:", "1:2", "1:2:", "1:2:3", ":1:2:3.",
+> > > +        "-1:1:2.3", "-1:2.3", "1:-1.3", "1:2.-3",
+> > > +        "0x10000:1:1.1", "0x100:1.1", "1:0x20.1", "1:1.8" };
+> > > +
+> > > +    for (i =3D 0; i < ARRAY_SIZE(tests); i++) {
+> > > +        res =3D pci_host_device_address_parse(tests[i], NULL);
+> > > +        g_assert_cmpint(res, =3D=3D, -1);
+> > > +    }
+> > > +}
+> > > +
+> > >  int main(int argc, char **argv)
+> > >  {
+> > >      g_test_init(&argc, &argv, NULL);
+> >=20
+> >=20
+> > Pls find a way to test is through a property.
+>=20
+> Probably doable, though it's less of a unit test then. I'll look into d=
+oing it.
+>=20
+> >=20
+> > > @@ -1598,5 +1639,10 @@ int main(int argc, char **argv)
+> > >      g_test_add_func("/cutils/strtosz/suffix-unit",
+> > >                      test_qemu_strtosz_suffix_unit);
+> > > =20
+> > > +    g_test_add_func("/cutils/pci-parse/valid",
+> > > +                    test_pci_parse_valid);
+> > > +    g_test_add_func("/cutils/pci-parse/invalid",
+> > > +                    test_pci_parse_invalid);
+> > > +
+> > >      return g_test_run();
+> > >  }
+> > > diff --git a/util/cutils.c b/util/cutils.c
+> > > index 4fefcf3be3..fc71c85816 100644
+> > > --- a/util/cutils.c
+> > > +++ b/util/cutils.c
+> > > @@ -29,6 +29,7 @@
+> > >  #include "qemu/sockets.h"
+> > >  #include "qemu/iov.h"
+> > >  #include "net/net.h"
+> > > +#include "hw/pci/pci.h"
+> > >  #include "qemu/cutils.h"
+> > > =20
+> > >  void strpadcpy(char *buf, int buf_size, const char *str, char pad)
+> > > @@ -594,3 +595,61 @@ const char *qemu_ether_ntoa(const MACAddr *mac=
+)
+> > > =20
+> > >      return ret;
+> > >  }
+> > > +
+> > > +int pci_host_device_address_parse(const char *str, PCIHostDeviceAd=
+dress
+> > > *addr)
+> > > +{
+> > > +    const char *p =3D str;
+> > > +    const char *e;
+> > > +    unsigned long val;
+> > > +    unsigned int dom =3D 0, bus =3D 0;
+> > > +    unsigned int slot =3D 0, func =3D 0;
+> > > +
+> > > +    if (qemu_strtoul(p, &e, 16, &val) < 0
+> > > +        || e =3D=3D p || *e !=3D ':') {
+> > > +        return -1;
+> > > +    }
+> > > +    bus =3D val;
+> > > +
+> > > +    p =3D e + 1;
+> > > +    if (qemu_strtoul(p, &e, 16, &val) < 0
+> > > +        || e =3D=3D p) {
+> > > +        return -1;
+> > > +    }
+> > > +    if (*e =3D=3D ':') {
+> > > +        dom =3D bus;
+> > > +        bus =3D val;
+> > > +        p =3D e + 1;
+> > > +        if (qemu_strtoul(p, &e, 16, &val) < 0
+> > > +            || e =3D=3D p) {
+> > > +            return -1;
+> > > +        }
+> > > +    }
+> > > +    slot =3D val;
+> > > +
+> > > +    if (*e !=3D '.') {
+> > > +        return -1;
+> > > +    }
+> > > +    p =3D e + 1;
+> > > +    if (qemu_strtoul(p, &e, 10, &val) < 0
+> > > +        || e =3D=3D p) {
+> > > +        return -1;
+> > > +    }
+> > > +    func =3D val;
+> > > +
+> > > +    if (dom > 0xffff || bus > 0xff || slot > 0x1f || func > 7) {
+> > > +        return -1;
+> > > +    }
+> > > +
+> > > +    if (*e) {
+> > > +        return -1;
+> > > +    }
+> > > +
+> > > +    if (addr) {
+> > > +        addr->domain =3D dom;
+> > > +        addr->bus =3D bus;
+> > > +        addr->slot =3D slot;
+> > > +        addr->function =3D func;
+> > > +    }
+> > > +
+> > > +    return 0;
+> > > +}
+> > > --
+> > > 2.11.0.295.gd7dffce1c.dirty
+> >=20
