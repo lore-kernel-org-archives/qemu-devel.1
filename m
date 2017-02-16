@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ceMxH-0002BJ-IS
+	(envelope-from <laurent@vivier.eu>) id 1ceMxI-0002Cx-Qo
 	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:22:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ceMxG-0002Ia-9I
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:22:43 -0500
-Received: from mout.kundenserver.de ([212.227.17.13]:60047)
+	(envelope-from <laurent@vivier.eu>) id 1ceMxF-0002IM-KK
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:22:44 -0500
+Received: from mout.kundenserver.de ([212.227.17.24]:63469)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ceMxF-0002I9-TF
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:22:42 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ceMxF-0002Hw-92
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:22:41 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu, 16 Feb 2017 15:22:26 +0100
-Message-Id: <20170216142227.27448-14-laurent@vivier.eu>
+Date: Thu, 16 Feb 2017 15:22:14 +0100
+Message-Id: <20170216142227.27448-2-laurent@vivier.eu>
 In-Reply-To: <20170216142227.27448-1-laurent@vivier.eu>
 References: <20170216142227.27448-1-laurent@vivier.eu>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 13/14] linux-user: Use correct types in
- load_symbols()
+Subject: [Qemu-devel] [PULL 01/14] linux-user: remove ifdef __USER_MISC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +24,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <laurent@vivier.eu>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Riku Voipio <riku.voipio@linaro.org>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+From: Riku Voipio <riku.voipio@linaro.org>
 
-Coverity doesn't like the code in load_symbols() which assumes
-it can use 'int' for a variable that might hold an offset into
-the guest ELF file, because in a 64-bit guest that could
-overflow. Guest binaries with 2GB sections aren't very likely
-and this isn't a security issue because we fully trust the
-guest linux-user binary anyway, but we might as well use the
-right types, which will placate Coverity. Use uint64_t to
-hold section sizes, and bail out if the symbol table is too
-large rather than just overflowing an int.
+This preprocessor macro isn't set anywhere. Remove
+the check so -strace can show these options.
 
-(Coverity issue CID1005776)
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <1486249533-5260-1-git-send-email-peter.maydell@linaro.org>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
 ---
- linux-user/elfload.c | 22 +++++++++++++++-------
- 1 file changed, 15 insertions(+), 7 deletions(-)
+ linux-user/strace.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 8271227..f520d77 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -2262,6 +2262,7 @@ static int symcmp(const void *s0, const void *s1)
- static void load_symbols(struct elfhdr *hdr, int fd, abi_ulong load_bias)
- {
-     int i, shnum, nsyms, sym_idx = 0, str_idx = 0;
-+    uint64_t segsz;
-     struct elf_shdr *shdr;
-     char *strings = NULL;
-     struct syminfo *s = NULL;
-@@ -2293,19 +2294,26 @@ static void load_symbols(struct elfhdr *hdr, int fd, abi_ulong load_bias)
-         goto give_up;
-     }
- 
--    i = shdr[str_idx].sh_size;
--    s->disas_strtab = strings = g_try_malloc(i);
--    if (!strings || pread(fd, strings, i, shdr[str_idx].sh_offset) != i) {
-+    segsz = shdr[str_idx].sh_size;
-+    s->disas_strtab = strings = g_try_malloc(segsz);
-+    if (!strings ||
-+        pread(fd, strings, segsz, shdr[str_idx].sh_offset) != segsz) {
-         goto give_up;
-     }
- 
--    i = shdr[sym_idx].sh_size;
--    syms = g_try_malloc(i);
--    if (!syms || pread(fd, syms, i, shdr[sym_idx].sh_offset) != i) {
-+    segsz = shdr[sym_idx].sh_size;
-+    syms = g_try_malloc(segsz);
-+    if (!syms || pread(fd, syms, segsz, shdr[sym_idx].sh_offset) != segsz) {
-         goto give_up;
-     }
- 
--    nsyms = i / sizeof(struct elf_sym);
-+    if (segsz / sizeof(struct elf_sym) > INT_MAX) {
-+        /* Implausibly large symbol table: give up rather than ploughing
-+         * on with the number of symbols calculation overflowing
-+         */
-+        goto give_up;
-+    }
-+    nsyms = segsz / sizeof(struct elf_sym);
-     for (i = 0; i < nsyms; ) {
-         bswap_sym(syms + i);
-         /* Throw away entries which we do not need.  */
+diff --git a/linux-user/strace.c b/linux-user/strace.c
+index 489dbc9..8fb1b6e 100644
+--- a/linux-user/strace.c
++++ b/linux-user/strace.c
+@@ -90,10 +90,8 @@ if( cmd == val ) { \
+     output_cmd( IPC_STAT );
+     output_cmd( IPC_INFO );
+     /* msgctl() commands */
+-    #ifdef __USER_MISC
+     output_cmd( MSG_STAT );
+     output_cmd( MSG_INFO );
+-    #endif
+     /* shmctl() commands */
+     output_cmd( SHM_LOCK );
+     output_cmd( SHM_UNLOCK );
 -- 
 2.9.3
