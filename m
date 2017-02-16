@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ceVBh-0005ZI-Pa
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 18:10:10 -0500
+	(envelope-from <ben@skyportsystems.com>) id 1ceVHA-0000R0-D0
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 18:15:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1ceVBe-0005xm-K0
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 18:10:09 -0500
-Received: from mail-db5eur01on0117.outbound.protection.outlook.com
-	([104.47.2.117]:3680
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
-	id 1ceVBe-0005uo-6H
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 18:10:06 -0500
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Thu, 16 Feb 2017 20:39:20 +0300
-Message-ID: <1487266760-80500-2-git-send-email-anton.nefedov@virtuozzo.com>
-In-Reply-To: <1487266760-80500-1-git-send-email-anton.nefedov@virtuozzo.com>
-References: <1487266760-80500-1-git-send-email-anton.nefedov@virtuozzo.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] qmp-events: fix GUEST_PANICKED description
- formatting
+	(envelope-from <ben@skyportsystems.com>) id 1ceVH8-0000tZ-1q
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 18:15:48 -0500
+Received: from mail-pf0-x22b.google.com ([2607:f8b0:400e:c00::22b]:33026)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
+	id 1ceVH7-0000sE-IQ
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 18:15:45 -0500
+Received: by mail-pf0-x22b.google.com with SMTP id c73so8711345pfb.0
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 15:15:45 -0800 (PST)
+From: ben@skyportsystems.com
+Date: Thu, 16 Feb 2017 15:15:33 -0800
+Message-Id: <a783671b5631fc40c06e0070dffb91f858a1ed24.1487286467.git.ben@skyportsystems.com>
+In-Reply-To: <cover.1487286467.git.ben@skyportsystems.com>
+References: <cover.1487286467.git.ben@skyportsystems.com>
+In-Reply-To: <cover.1487286467.git.ben@skyportsystems.com>
+References: <cover.1487286467.git.ben@skyportsystems.com>
+Subject: [Qemu-devel] [PATCH v8 1/8] linker-loader: Add new 'write pointer'
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,71 +30,127 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: eblake@redhat.com, pbonzini@redhat.com, armbru@redhat.com, den@openvz.org, anton.nefedov@virtuozzo.com
+Cc: lersek@redhat.com, mst@redhat.com, imammedo@redhat.com, Ben Warren <ben@skyportsystems.com>
 
-also remove a useless NULL check in the event reporting code
+From: Ben Warren <ben@skyportsystems.com>
 
-Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+This is similar to the existing 'add pointer' functionality, but instead
+of instructing the guest (BIOS or UEFI) to patch memory, it instructs
+the guest to write the pointer back to QEMU via a writeable fw_cfg file.
+
+Signed-off-by: Ben Warren <ben@skyportsystems.com>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Tested-by: Laszlo Ersek <lersek@redhat.com>
 ---
- qapi/event.json |  4 ++--
- vl.c            | 22 ++++++++++------------
- 2 files changed, 12 insertions(+), 14 deletions(-)
+ hw/acpi/bios-linker-loader.c         | 66 ++++++++++++++++++++++++++++++++++--
+ include/hw/acpi/bios-linker-loader.h |  7 ++++
+ 2 files changed, 70 insertions(+), 3 deletions(-)
 
-diff --git a/qapi/event.json b/qapi/event.json
-index 970ff02..e02852c 100644
---- a/qapi/event.json
-+++ b/qapi/event.json
-@@ -488,9 +488,9 @@
- #
- # @action: action that has been taken, currently always "pause"
- #
--# @info: optional information about a panic
-+# @info: #optional information about a panic (since 2.9)
- #
--# Since: 1.5 (@info since 2.9)
-+# Since: 1.5
- #
- # Example:
- #
-diff --git a/vl.c b/vl.c
-index 903c46d..f410e03 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1710,6 +1710,15 @@ void qemu_system_reset(bool report)
- void qemu_system_guest_panicked(GuestPanicInformation *info)
- {
-     qemu_log_mask(LOG_GUEST_ERROR, "Guest crashed\n");
-+    if (info && info->type == GUEST_PANIC_INFORMATION_KIND_HYPER_V) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "HV crash parameters: (%#"PRIx64
-+                      " %#"PRIx64" %#"PRIx64" %#"PRIx64" %#"PRIx64")\n",
-+                      info->u.hyper_v.data->arg1,
-+                      info->u.hyper_v.data->arg2,
-+                      info->u.hyper_v.data->arg3,
-+                      info->u.hyper_v.data->arg4,
-+                      info->u.hyper_v.data->arg5);
-+    }
+diff --git a/hw/acpi/bios-linker-loader.c b/hw/acpi/bios-linker-loader.c
+index d963ebe..046183a 100644
+--- a/hw/acpi/bios-linker-loader.c
++++ b/hw/acpi/bios-linker-loader.c
+@@ -78,6 +78,21 @@ struct BiosLinkerLoaderEntry {
+             uint32_t length;
+         } cksum;
  
-     if (current_cpu) {
-         current_cpu->crash_occurred = true;
-@@ -1723,18 +1732,7 @@ void qemu_system_guest_panicked(GuestPanicInformation *info)
-         qemu_system_shutdown_request();
-     }
++        /*
++         * COMMAND_WRITE_POINTER - write the fw_cfg file (originating from
++         * @dest_file) at @wr_pointer.offset, by adding a pointer to
++         * @src_offset within the table originating from @src_file.
++         * 1,2,4 or 8 byte unsigned addition is used depending on
++         * @wr_pointer.size.
++         */
++        struct {
++            char dest_file[BIOS_LINKER_LOADER_FILESZ];
++            char src_file[BIOS_LINKER_LOADER_FILESZ];
++            uint32_t dst_offset;
++            uint32_t src_offset;
++            uint8_t size;
++        } wr_pointer;
++
+         /* padding */
+         char pad[124];
+     };
+@@ -85,9 +100,10 @@ struct BiosLinkerLoaderEntry {
+ typedef struct BiosLinkerLoaderEntry BiosLinkerLoaderEntry;
  
--    if (info) {
--        if (info->type == GUEST_PANIC_INFORMATION_KIND_HYPER_V) {
--            qemu_log_mask(LOG_GUEST_ERROR, "HV crash parameters: (%#"PRIx64
--                          " %#"PRIx64" %#"PRIx64" %#"PRIx64" %#"PRIx64")\n",
--                          info->u.hyper_v.data->arg1,
--                          info->u.hyper_v.data->arg2,
--                          info->u.hyper_v.data->arg3,
--                          info->u.hyper_v.data->arg4,
--                          info->u.hyper_v.data->arg5);
--        }
--        qapi_free_GuestPanicInformation(info);
--    }
-+    qapi_free_GuestPanicInformation(info);
+ enum {
+-    BIOS_LINKER_LOADER_COMMAND_ALLOCATE     = 0x1,
+-    BIOS_LINKER_LOADER_COMMAND_ADD_POINTER  = 0x2,
+-    BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM = 0x3,
++    BIOS_LINKER_LOADER_COMMAND_ALLOCATE          = 0x1,
++    BIOS_LINKER_LOADER_COMMAND_ADD_POINTER       = 0x2,
++    BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM      = 0x3,
++    BIOS_LINKER_LOADER_COMMAND_WRITE_POINTER     = 0x4,
+ };
+ 
+ enum {
+@@ -278,3 +294,47 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
+ 
+     g_array_append_vals(linker->cmd_blob, &entry, sizeof entry);
  }
++
++/*
++ * bios_linker_loader_write_pointer: ask guest to write a pointer to the
++ * source file into the destination file, and write it back to QEMU via
++ * fw_cfg DMA.
++ *
++ * @linker: linker object instance
++ * @dest_file: destination file that must be written
++ * @dst_patched_offset: location within destination file blob to be patched
++ *                      with the pointer to @src_file, in bytes
++ * @dst_patched_offset_size: size of the pointer to be patched
++ *                      at @dst_patched_offset in @dest_file blob, in bytes
++ * @src_file: source file who's address must be taken
++ * @src_offset: location within source file blob to which
++ *              @dest_file+@dst_patched_offset will point to after
++ *              firmware's executed WRITE_POINTER command
++ */
++void bios_linker_loader_write_pointer(BIOSLinker *linker,
++                                    const char *dest_file,
++                                    uint32_t dst_patched_offset,
++                                    uint8_t dst_patched_size,
++                                    const char *src_file,
++                                    uint32_t src_offset)
++{
++    BiosLinkerLoaderEntry entry;
++    const BiosLinkerFileEntry *source_file =
++        bios_linker_find_file(linker, src_file);
++
++    assert(source_file);
++    assert(src_offset < source_file->blob->len);
++    memset(&entry, 0, sizeof entry);
++    strncpy(entry.wr_pointer.dest_file, dest_file,
++            sizeof entry.wr_pointer.dest_file - 1);
++    strncpy(entry.wr_pointer.src_file, src_file,
++            sizeof entry.wr_pointer.src_file - 1);
++    entry.command = cpu_to_le32(BIOS_LINKER_LOADER_COMMAND_WRITE_POINTER);
++    entry.wr_pointer.dst_offset = cpu_to_le32(dst_patched_offset);
++    entry.wr_pointer.src_offset = cpu_to_le32(src_offset);
++    entry.wr_pointer.size = dst_patched_size;
++    assert(dst_patched_size == 1 || dst_patched_size == 2 ||
++           dst_patched_size == 4 || dst_patched_size == 8);
++
++    g_array_append_vals(linker->cmd_blob, &entry, sizeof entry);
++}
+diff --git a/include/hw/acpi/bios-linker-loader.h b/include/hw/acpi/bios-linker-loader.h
+index fa1e5d1..efe17b0 100644
+--- a/include/hw/acpi/bios-linker-loader.h
++++ b/include/hw/acpi/bios-linker-loader.h
+@@ -26,5 +26,12 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
+                                     const char *src_file,
+                                     uint32_t src_offset);
  
- void qemu_system_reset_request(void)
++void bios_linker_loader_write_pointer(BIOSLinker *linker,
++                                      const char *dest_file,
++                                      uint32_t dst_patched_offset,
++                                      uint8_t dst_patched_size,
++                                      const char *src_file,
++                                      uint32_t src_offset);
++
+ void bios_linker_loader_cleanup(BIOSLinker *linker);
+ #endif
 -- 
 2.7.4
