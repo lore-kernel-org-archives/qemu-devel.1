@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ceJ0s-0005q2-2O
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:10:10 -0500
+	(envelope-from <whitebox@nefkom.net>) id 1ceJ9a-00011G-J4
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:19:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ceJ0r-0000Un-9b
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:10:10 -0500
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:38805)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ceJ0r-0000TJ-3y
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:10:09 -0500
-Received: by mail-wm0-x231.google.com with SMTP id r141so11144172wmg.1
-	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 02:10:09 -0800 (PST)
+	(envelope-from <whitebox@nefkom.net>) id 1ceJ9V-0005Mw-KL
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:19:10 -0500
+Received: from mail-out.m-online.net ([212.18.0.10]:37084)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <whitebox@nefkom.net>) id 1ceJ9V-0005KK-Dj
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:19:05 -0500
+From: Andreas Schwab <schwab@linux-m68k.org>
+References: <20170207005930.28327-1-laurent@vivier.eu>
+	<20170207005930.28327-16-laurent@vivier.eu>
+	<ca2f9cdf-c18c-bc8a-05a7-05b1d9748a48@twiddle.net>
+Date: Thu, 16 Feb 2017 11:18:52 +0100
+In-Reply-To: <ca2f9cdf-c18c-bc8a-05a7-05b1d9748a48@twiddle.net> (Richard
+	Henderson's message of "Thu, 16 Feb 2017 12:46:35 +1100")
+Message-ID: <87poiiv3oz.fsf@linux-m68k.org>
 MIME-Version: 1.0
-In-Reply-To: <CALicx6vWBR_bM2g_DObYgw-12girdK9YgGS8X=zAwenz2EmPFg@mail.gmail.com>
-References: <1485879782-6075-1-git-send-email-vijay.kilari@gmail.com>
-	<1485879782-6075-6-git-send-email-vijay.kilari@gmail.com>
-	<CAFEAcA-7PE_T7BsV=vSCEkQDeekB9KnX33Ou5NiUec4XeUu+zw@mail.gmail.com>
-	<CALicx6vWBR_bM2g_DObYgw-12girdK9YgGS8X=zAwenz2EmPFg@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Feb 2017 10:09:47 +0000
-Message-ID: <CAFEAcA9aQwJiwsMSgvPs=vj+qfrFbVVv6-AuhFVsEKX_xO7J2Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v7 RESEND 5/5] hw/intc/arm_gicv3_kvm: Reset
- GICv3 cpu interface registers
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 15/16] target-m68k: add more FPU
+ instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,21 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vijay Kilari <vijay.kilari@gmail.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>, Pavel Fedin <p.fedin@samsung.com>, Marc Zyngier <marc.zyngier@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+To: Richard Henderson <rth@twiddle.net>
+Cc: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
 
-On 16 February 2017 at 09:54, Vijay Kilari <vijay.kilari@gmail.com> wrote:
-> On Tue, Feb 7, 2017 at 8:19 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
->> If you want to do nothing in a read/write function there are
->> already arm_cp_read_zero and arm_cp_write_ignore functions for
->> this. But using the ARM_CP_NOP flag is better still.
+On Feb 16 2017, Richard Henderson <rth@twiddle.net> wrote:
+
+> On 02/07/2017 11:59 AM, Laurent Vivier wrote:
+>> +static long double floatx80_to_ldouble(floatx80 val)
+>> +{
+>> +    if (floatx80_is_infinity(val)) {
+>> +            if (floatx80_is_neg(val)) {
+>> +                    return -__builtin_infl();
+>> +            }
+>> +            return __builtin_infl();
+>> +    }
+>> +    if (floatx80_is_any_nan(val)) {
+>> +            char low[20];
+>> +            sprintf(low, "0x%016"PRIx64, val.low);
+>> +
+>> +            return nanl(low);
+>> +    }
+>> +
+>> +    return *(long double *)&val;
+>> +}
 >
-> With ARM_CP_NOP qemu fails to boot.
-> qemu-system-aarch64: KVM_SET_DEVICE_ATTR failed: Invalid argument
-> Group 6 attr 0x000000000000c665
+> This doesn't work except for x86 host.
 
-Not clear to me why using ARM_CP_NOP should result in a KVM
-call failure -- can you dig further into why that is happening?
+Not even then.
 
-thanks
--- PMM
+> You ought to extract the mantissa, convert the 64-bit value to
+> long-double, and use ldexpl to scale the result for the exponent.
+>
+> Similarly converting the other way use frexpl and ldexpl.
+
+There is no guarantee that the host long double has the same range and
+precision as floatx80.
+
+Andreas.
+
+-- 
+Andreas Schwab, schwab@linux-m68k.org
+GPG Key fingerprint = 58CA 54C7 6D53 942B 1756  01D3 44D5 214B 8276 4ED5
+"And now for something completely different."
