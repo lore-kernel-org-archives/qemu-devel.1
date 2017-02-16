@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ceNiS-0000ko-5o
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 10:11:31 -0500
+	(envelope-from <kraxel@redhat.com>) id 1ceNjZ-0001q4-Nm
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 10:12:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ceNiM-0007re-Hg
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 10:11:28 -0500
-Date: Thu, 16 Feb 2017 16:11:14 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170216161114.220260cf@nial.brq.redhat.com>
-In-Reply-To: <CAFEAcA_NgmdDCfbPy+DnHQBmNGmQ4tj1z4ci+OP7+x4tHLLCxg@mail.gmail.com>
-References: <1487253461-269218-1-git-send-email-imammedo@redhat.com>
-	<CAFEAcA_NgmdDCfbPy+DnHQBmNGmQ4tj1z4ci+OP7+x4tHLLCxg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/virt: fix cpu object reference leak
+	(envelope-from <kraxel@redhat.com>) id 1ceNjW-0008Cu-KI
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 10:12:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46140)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ceNjW-0008CS-Ds
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 10:12:34 -0500
+Message-ID: <1487257950.32455.0.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 16 Feb 2017 16:12:30 +0100
+In-Reply-To: <a268900c-a44f-fbc1-9f6e-92a127c5dcbf@redhat.com>
+References: <20170214071510.6112.76764.stgit@PASHA-ISP>
+	<a268900c-a44f-fbc1-9f6e-92a127c5dcbf@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3] audio: make audio poll timer
+ deterministic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,35 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Andrew Jones <drjones@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org, zyy@google.comdovgaluk@ispras.ru, marcandre.lureau@gmail.com
 
-On Thu, 16 Feb 2017 14:18:05 +0000
-Peter Maydell <peter.maydell@linaro.org> wrote:
+On Di, 2017-02-14 at 12:59 +0100, Paolo Bonzini wrote:
+>=20
+> On 14/02/2017 08:15, Pavel Dovgalyuk wrote:
+> > This patch changes resetting strategy of the audio polling timer.
+> > It does not change expiration time if the timer is already set.
+> > This patch is needed to make this timer deterministic and to use execut=
+ion
+> > record/replay for audio devices.
+> >=20
+> > audio_reset_timer is used in the function audio_vm_change_state_handler=
+.
+> > Therefore every time VM is stopped or restarted the timer will be reset
+> > to new timeout. Virtual clock does not proceed while VM is stopped.
+> > Therefore there is no need in resetting the timeout when VM restarts.
+> >=20
+> > v2: updated commit message
+> > v3: now using timer_mod_anticipate function (as suggested by Yurii Zubr=
+ytskyi)
+>=20
+> Gerd, feel free to pick either v2 or v3.
 
-> On 16 February 2017 at 13:57, Igor Mammedov <imammedo@redhat.com> wrote:
-> > object_new(FOO) returns an object with ref_cnt == 1
-> > and following
-> >   object_property_set_bool(cpuobj, true, "realized", NULL)
-> > set parent of cpuobj to '/machine/unattached' which makes
-> > ref_cnt == 2.
-> >
-> > Since machvirt_init() doesn't take ownership of cpuobj
-> > returned by object_new() it should explicitly drop
-> > reference to cpuobj when dangling pointer is about to
-> > go out of scope like it's done pc_new_cpu() to avoid
-> > object leak.  
-> 
-> I've always found the object reference semantics somewhat
-> confusing (why does realizing a device add a reference,
-> for instance?). Do we document them anywhere?
-I'm not aware of a place where it's documented.
+Picked up v3 now.
 
-currently device_realize() sets parent thus increasing
-ref counter only if device creator haven't set parent
-explicitly.
-
-> 
-> thanks
-> -- PMM
-> 
+thanks,
+  Gerd
