@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vijay.kilari@gmail.com>) id 1ceIpE-0000LF-2U
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:58:09 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ceJ0s-0005q2-2O
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:10:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vijay.kilari@gmail.com>) id 1ceIpD-0005x7-9H
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:58:08 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ceJ0r-0000Un-9b
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:10:10 -0500
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:38805)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ceJ0r-0000TJ-3y
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:10:09 -0500
+Received: by mail-wm0-x231.google.com with SMTP id r141so11144172wmg.1
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 02:10:09 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-Kty3EynELrP88fgNoFj3njh1w6XZ5DOpNsTC7edPmng@mail.gmail.com>
+In-Reply-To: <CALicx6vWBR_bM2g_DObYgw-12girdK9YgGS8X=zAwenz2EmPFg@mail.gmail.com>
 References: <1485879782-6075-1-git-send-email-vijay.kilari@gmail.com>
-	<1485879782-6075-5-git-send-email-vijay.kilari@gmail.com>
-	<CAFEAcA-Kty3EynELrP88fgNoFj3njh1w6XZ5DOpNsTC7edPmng@mail.gmail.com>
-From: Vijay Kilari <vijay.kilari@gmail.com>
-Date: Thu, 16 Feb 2017 15:28:02 +0530
-Message-ID: <CALicx6u0sDaqxJ-y_GxCCMV1CXo095MGG_ibR9HB+ZYavpuc=Q@mail.gmail.com>
+	<1485879782-6075-6-git-send-email-vijay.kilari@gmail.com>
+	<CAFEAcA-7PE_T7BsV=vSCEkQDeekB9KnX33Ou5NiUec4XeUu+zw@mail.gmail.com>
+	<CALicx6vWBR_bM2g_DObYgw-12girdK9YgGS8X=zAwenz2EmPFg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 16 Feb 2017 10:09:47 +0000
+Message-ID: <CAFEAcA9aQwJiwsMSgvPs=vj+qfrFbVVv6-AuhFVsEKX_xO7J2Q@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v7 RESEND 4/5] target-arm: Add
- GICv3CPUState in CPUARMState struct
+Subject: Re: [Qemu-devel] [PATCH v7 RESEND 5/5] hw/intc/arm_gicv3_kvm: Reset
+ GICv3 cpu interface registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,58 +32,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
+To: Vijay Kilari <vijay.kilari@gmail.com>
 Cc: qemu-arm <qemu-arm@nongnu.org>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>, Pavel Fedin <p.fedin@samsung.com>, Marc Zyngier <marc.zyngier@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 
-On Tue, Feb 7, 2017 at 8:12 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 31 January 2017 at 16:23,  <vijay.kilari@gmail.com> wrote:
->> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
->>
->> Add gicv3state void pointer to CPUARMState struct
->> to store GICv3CPUState.
->>
->> In case of usecase like CPU reset, we need to reset
->> GICv3CPUState of the CPU. In such scenario, this pointer
->> becomes handy.
->>
->> This patch take care of only GICv3.
->>
->> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
->> ---
->>  hw/intc/arm_gicv3_kvm.c | 8 ++++++++
->>  target-arm/cpu.h        | 2 ++
->>  2 files changed, 10 insertions(+)
->>
->> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
->> index 77af32d..f91e0ac 100644
->> --- a/hw/intc/arm_gicv3_kvm.c
->> +++ b/hw/intc/arm_gicv3_kvm.c
->> @@ -644,6 +644,14 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
->>
->>      gicv3_init_irqs_and_mmio(s, kvm_arm_gicv3_set_irq, NULL);
->>
->> +    for (i = 0; i < s->num_cpu; i++) {
->> +        ARMCPU *cpu = ARM_CPU(qemu_get_cpu(i));
->> +        CPUARMState *env = &cpu->env;
->> +
->> +        /* Store GICv3CPUState in CPUARMState gicv3state pointer */
->> +        env->gicv3state = (void *)&s->cpu[i];
->> +    }
->> +
->>      /* Try to create the device via the device control API */
->>      s->dev_fd = kvm_create_device(kvm_state, KVM_DEV_TYPE_ARM_VGIC_V3, false);
->>      if (s->dev_fd < 0) {
+On 16 February 2017 at 09:54, Vijay Kilari <vijay.kilari@gmail.com> wrote:
+> On Tue, Feb 7, 2017 at 8:19 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> If you want to do nothing in a read/write function there are
+>> already arm_cp_read_zero and arm_cp_write_ignore functions for
+>> this. But using the ARM_CP_NOP flag is better still.
 >
-> Please set the CPU's pointer to the GICv3 in arm_gicv3_common_realize(),
-> because that's where we set the GICv3's pointer to the CPU.
-> (We don't want the pointer to be specific to the KVM GICv3
-> anyway.)
+> With ARM_CP_NOP qemu fails to boot.
+> qemu-system-aarch64: KVM_SET_DEVICE_ATTR failed: Invalid argument
+> Group 6 attr 0x000000000000c665
 
-Adding this arch specific to arm_gicv3_common_realize() lands in
-compilation errors
- as arm_gicv3_common.c is common file.
-So, I would like to add this to arm_gicv3_cpuif.c and export it as a function
-and call from arm_gicv3_common_realize().
->
-> thanks
-> -- PMM
+Not clear to me why using ARM_CP_NOP should result in a KVM
+call failure -- can you dig further into why that is happening?
+
+thanks
+-- PMM
