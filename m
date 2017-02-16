@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ceKr1-0005wy-FX
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 07:08:08 -0500
+	(envelope-from <mlureau@redhat.com>) id 1ceKr7-00062X-VJ
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 07:08:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ceKqy-0006EO-4z
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 07:08:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57466)
+	(envelope-from <mlureau@redhat.com>) id 1ceKr4-0006Iu-N0
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 07:08:13 -0500
+Received: from mx5-phx2.redhat.com ([209.132.183.37]:58141)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ceKqx-0006Cy-SF
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 07:08:04 -0500
-Date: Thu, 16 Feb 2017 13:08:00 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170216130800.1f2833aa@nial.brq.redhat.com>
-In-Reply-To: <e7e9cf57-a5b4-4f2b-36e5-3e08dee70d68@redhat.com>
-References: <cover.1487139038.git.ben@skyportsystems.com>
-	<678c203f-3768-7e65-6e48-6729473b6ffa@redhat.com>
-	<20170215220837-mutt-send-email-mst@kernel.org>
-	<e7e9cf57-a5b4-4f2b-36e5-3e08dee70d68@redhat.com>
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1ceKr4-0006I1-FJ
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 07:08:10 -0500
+Date: Thu, 16 Feb 2017 07:08:10 -0500 (EST)
+From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>
+Message-ID: <783754281.5755288.1487246890217.JavaMail.zimbra@redhat.com>
+In-Reply-To: <352f44a4-e9be-f97d-ac26-f5d84c7dbe38@redhat.com>
+References: <20170216105827.1486-1-marcandre.lureau@redhat.com>
+	<d845bee9-5de1-96ce-3bb2-1110d260729d@redhat.com>
+	<2066565427.5738720.1487243969707.JavaMail.zimbra@redhat.com>
+	<352f44a4-e9be-f97d-ac26-f5d84c7dbe38@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 0/7] Add support for VM Generation ID
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCHv2] cutils: factor out
+ pci_host_device_address_parse()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,135 +30,356 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, ben@skyportsystems.com, qemu-devel@nongnu.org
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com
 
-On Wed, 15 Feb 2017 21:52:55 +0100
-Laszlo Ersek <lersek@redhat.com> wrote:
+Hi
 
-> On 02/15/17 21:09, Michael S. Tsirkin wrote:
-> > On Wed, Feb 15, 2017 at 08:47:48PM +0100, Laszlo Ersek wrote:  
-> 
-> [snip]
-> 
-> >> For patches #1, #3, #4 and #5:
+----- Original Message -----
+> On 02/16/2017 01:19 PM, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi
+> >
+> > ----- Original Message -----
+> >> On 02/16/2017 12:58 PM, Marc-Andr=C3=A9 Lureau wrote:
+> >>> This will allow the function to be used outside of QOM properties.
+> >>>
 > >>
-> >> Tested-by: Laszlo Ersek <lersek@redhat.com>
+> >> Hi Mark-Andre,
 > >>
-> >> I'll soon post the OVMF patches.
+> >> I am not sure cutil.h is the right header for the function, because is=
+ too
+> >> PCI
+> >> related for a utility library.
+> >
+> > It's in the pci.h header, implementation and test is put in
+> > {test-,}cutils.c
+> >
+>=20
+> sorry about the miss-match, I war referring to the implementation.
+>=20
+> > I can try to put it in pci/pci.c, but it will be harder to link to for
+> > testing (note: I haven't tried). I could also put it in a seperate
+> > pci-parse.c for example.
+>=20
+> no need for a new file, but hw/pci/pci_host.c should be a good place.
+
+It pulls in pci/pci.c for pci_find_device() and friends, plus type registra=
+tion etc.
+
+I'll move it to a standalone pci/pci-util.c
+
+>=20
+> regarding the tests, an new pci test file would be welcomed.
+>=20
+> >
+> >
+> >> Also, maybe we can post the patch together with the code that uses the
+> >> exposed function.
+> >
+> > I dropped the patch using it for now, but I thought it would still be n=
+ice
+> > to have the test, doc and strtoul change.
+> >
+>=20
+> I agree if Michael has nothing against this.
+>=20
+> Thanks,
+> Marcel
+>=20
 > >>
-> >> Thanks!
-> >> Laszlo  
-> > 
-> > 
-> > How do you feel about Igor's request to change WRITE_POINTER to add
-> > offset in there, so guest can pass in the address of GUID and
-> > not start of table? Would that be a lot of work to add?  
-> 
-> I think it's doable in practice: simply add a constant from the command
-> itself, for passing the value back to QEMU, and also for saving the
-> fw_cfg write commend for S3 resume time.
-> 
-> But, I disagree with it from a design POV.
-> 
-> Igor's point is:
-> 
-> > Math complicates QEMU code though and not only QMEMU but AML code as
-> > well.  
-> 
-> As I understand it, the goal is to push the addition to the firmware
-> (which is "one place"), rather than having to implement it twice in
-> QEMU, i.e., in two places ((a) native QEMU logic, (b) AML generator).
-> 
-> Here's my counter-argument:
-> 
-> (a) As I mentioned earlier, assume a complex communication structure
-> between the guest OS and QEMU. Currently our shared structure consists
-> of a single field (the GUID), but next time it might contain several fields.
-> 
-> For such a multi-field shared structure, QEMU will have to do manual
-> offsetting into the guest RAM anyway, for accessing fields F1, F2, and
-> F3. We will not create three separate WRITE_POINTER commands and let the
-> firmware calculate and return the absolute GPAs of the fields F1, F2 and
-> F3. Instead, there will be one WRITE_POINTER command, and QEMU will do
-> the offsetting manually, minimally for fields F2 and F3.
-> 
-> "src_offset" looks tempting now only because we have a shared structure
-> with only one field, the GUID at offset 40 decimal.
-
-benefits of having src_offset from QEMU POV I see are:
- a) (biggest one) firmware and device code are clearly separated where:
-     - VMGENID_GUID_OFFSET would be used only by firmware side, such as:
-         WRITE_POINTER and AML addition to help OVMF detect non ACPI blob
-     - device doesn't have to assume/or have a knowledge about
-       layout of GUID blob except of size of data it's needs
-       to access at location provided by WRITE_POINTER as v7 shows it.
-
- b) wrt shared blob I've envisioned slightly different approach,
-    where multiple WRITE_POINTER commands are used instead of one
-    with following workflow to extend shared blob:
-     1) firmware part of QEMU (acpi-build.c):
-          if (device_foo_present) {
-             fw_cfg_add_file_callback('/etc/device_foo_addr', device_foo->addr_storage)
-
-             shared_off = device_foo->align(next_free_shared_offset)
-             WRITE_POINTER('/etc/device_foo_addr', 0,
-                           '/etc/shared_blob, shared_off)
-
-             next_free_shared_offset = shared_off + device_foo->data_size;
-          }
-     2) device_foo accesses data at device_foo->addr_storage directly
-        * there is no need to spread knowledge of shared_blob
-          layout to device code anymore.
-        * no need to care where in shared_blob data will be placed,
-        * shared space is used only when device is present
-        * since there is no shared_writeback_blob, there isn't 
-          need in mechanism to propagate written data to device
-          or notify device about write
-     
-   drawback in this approach is that a device would consume
-   a file slot if fw_cfg and space for WRITE_POINTER in
-   linker file when present.
-
- 
-> (b) Regarding the runtime addition in the AML code:
-as you pointed out WRITE_POINTER has nothing to do with addition
-on AML side which is influenced by ADD_POINTER and OVMF and could
-be fixed with flags down the road, so there is nothing to argue
-about on this bullet.
-
-
-> As discussed before, the main reason *now*, for not pointing VGIA (and
-> other named integer objects) with ADD_POINTER commands directly to
-> "meaningful" fields, is that OVMF probes the targets of ADD_POINTER
-> commands for patterns that look like ACPI table headers. And, for the
-> time being, we want to suppress any mis-recognitions by prepending some
-> padding.
-> 
-> Igor was right to dislike this, and we agreed that *down the road* we
-> should add allocation flags, or further allocation commands, to supplant
-> this kind of heuristics in OVMF. But:
-> 
-> - we don't have time to do it now, plus
-> 
-> - please observe that the runtime addition in AML relates to the
->   ADD_POINTER and the ALLOCATE commands. It does not relate to
->   WRITE_POINTER at all.
-> 
->   Whatever we change on WRITE_POINTER will do nothing for suppressing
->   OVMF's table header probing -- because that is tied to ADD_POINTER
->   --, therefore WRITE_POINTER tweaks cannot eliminate the "need to add"
->   in AML.
-> 
-> 
-> In summary, I think the proposed WRITE_POINTER modification is
-> implementable, but I think it will not pay off, because:
-> 
-> (a) for QEMU logic, it will not prove useful as soon as we have a
-> multi-field shared structure (QEMU will have to add field offsets anyway),
-> 
-> (b) and for eliminating the AML addition (which is a consequence of the
-> current ADD_POINTER handling in OVMF), it does nothing.
-> 
-> Thanks
-> Laszlo
+> >> And thanks for the unit-tests, much appreciated!
+> >
+> > thanks
+> >
+> >> Marcel
+> >>
+> >>> Add tests and replace strtoul usage for qemu_strtoul while touching i=
+t.
+> >>>
+> >>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> >>> ---
+> >>> v2:
+> >>>  - fixed incompatible type warning/error
+> >>>
+> >>> include/hw/pci/pci.h      | 12 ++++++++++
+> >>>  hw/core/qdev-properties.c | 61
+> >>>  +++--------------------------------------------
+> >>>  tests/test-cutils.c       | 46 +++++++++++++++++++++++++++++++++++
+> >>>  util/cutils.c             | 59
+> >>>  +++++++++++++++++++++++++++++++++++++++++++++
+> >>>  4 files changed, 120 insertions(+), 58 deletions(-)
+> >>>
+> >>> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+> >>> index cbc1fdfb5b..61718080ea 100644
+> >>> --- a/include/hw/pci/pci.h
+> >>> +++ b/include/hw/pci/pci.h
+> >>> @@ -815,4 +815,16 @@ extern const VMStateDescription vmstate_pci_devi=
+ce;
+> >>>
+> >>>  MSIMessage pci_get_msi_message(PCIDevice *dev, int vector);
+> >>>
+> >>> +/**
+> >>> + * pci_host_device_address_parse:
+> >>> + * @str: string to parse
+> >>> + * @addr: destination structure or NULL
+> >>> + *
+> >>> + * Parse [<domain>:]<bus>:<slot>.<func>
+> >>> + *   if <domain> is not supplied, it's assumed to be 0.
+> >>> + *
+> >>> + * Returns: -1 on failure, 0 on success.
+> >>> + */
+> >>> +int pci_host_device_address_parse(const char *str, PCIHostDeviceAddr=
+ess
+> >>> *addr);
+> >>> +
+> >>>  #endif
+> >>> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> >>> index 6ab4265eb4..5dd0774e88 100644
+> >>> --- a/hw/core/qdev-properties.c
+> >>> +++ b/hw/core/qdev-properties.c
+> >>> @@ -722,10 +722,6 @@ static void get_pci_host_devaddr(Object *obj,
+> >>> Visitor
+> >>> *v, const char *name,
+> >>>      visit_type_str(v, name, &p, errp);
+> >>>  }
+> >>>
+> >>> -/*
+> >>> - * Parse [<domain>:]<bus>:<slot>.<func>
+> >>> - *   if <domain> is not supplied, it's assumed to be 0.
+> >>> - */
+> >>>  static void set_pci_host_devaddr(Object *obj, Visitor *v, const char
+> >>>  *name,
+> >>>                                   void *opaque, Error **errp)
+> >>>  {
+> >>> @@ -733,11 +729,7 @@ static void set_pci_host_devaddr(Object *obj,
+> >>> Visitor
+> >>> *v, const char *name,
+> >>>      Property *prop =3D opaque;
+> >>>      PCIHostDeviceAddress *addr =3D qdev_get_prop_ptr(dev, prop);
+> >>>      Error *local_err =3D NULL;
+> >>> -    char *str, *p;
+> >>> -    char *e;
+> >>> -    unsigned long val;
+> >>> -    unsigned long dom =3D 0, bus =3D 0;
+> >>> -    unsigned int slot =3D 0, func =3D 0;
+> >>> +    char *str;
+> >>>
+> >>>      if (dev->realized) {
+> >>>          qdev_prop_set_after_realize(dev, name, errp);
+> >>> @@ -750,58 +742,11 @@ static void set_pci_host_devaddr(Object *obj,
+> >>> Visitor
+> >>> *v, const char *name,
+> >>>          return;
+> >>>      }
+> >>>
+> >>> -    p =3D str;
+> >>> -    val =3D strtoul(p, &e, 16);
+> >>> -    if (e =3D=3D p || *e !=3D ':') {
+> >>> -        goto inval;
+> >>> -    }
+> >>> -    bus =3D val;
+> >>> -
+> >>> -    p =3D e + 1;
+> >>> -    val =3D strtoul(p, &e, 16);
+> >>> -    if (e =3D=3D p) {
+> >>> -        goto inval;
+> >>> -    }
+> >>> -    if (*e =3D=3D ':') {
+> >>> -        dom =3D bus;
+> >>> -        bus =3D val;
+> >>> -        p =3D e + 1;
+> >>> -        val =3D strtoul(p, &e, 16);
+> >>> -        if (e =3D=3D p) {
+> >>> -            goto inval;
+> >>> -        }
+> >>> -    }
+> >>> -    slot =3D val;
+> >>> -
+> >>> -    if (*e !=3D '.') {
+> >>> -        goto inval;
+> >>> +    if (!pci_host_device_address_parse(str, addr)) {
+> >>> +        error_set_from_qdev_prop_error(errp, EINVAL, dev, prop, str)=
+;
+> >>>      }
+> >>> -    p =3D e + 1;
+> >>> -    val =3D strtoul(p, &e, 10);
+> >>> -    if (e =3D=3D p) {
+> >>> -        goto inval;
+> >>> -    }
+> >>> -    func =3D val;
+> >>> -
+> >>> -    if (dom > 0xffff || bus > 0xff || slot > 0x1f || func > 7) {
+> >>> -        goto inval;
+> >>> -    }
+> >>> -
+> >>> -    if (*e) {
+> >>> -        goto inval;
+> >>> -    }
+> >>> -
+> >>> -    addr->domain =3D dom;
+> >>> -    addr->bus =3D bus;
+> >>> -    addr->slot =3D slot;
+> >>> -    addr->function =3D func;
+> >>>
+> >>>      g_free(str);
+> >>> -    return;
+> >>> -
+> >>> -inval:
+> >>> -    error_set_from_qdev_prop_error(errp, EINVAL, dev, prop, str);
+> >>> -    g_free(str);
+> >>>  }
+> >>>
+> >>>  PropertyInfo qdev_prop_pci_host_devaddr =3D {
+> >>> diff --git a/tests/test-cutils.c b/tests/test-cutils.c
+> >>> index 20b0f59ba2..81c4f072f3 100644
+> >>> --- a/tests/test-cutils.c
+> >>> +++ b/tests/test-cutils.c
+> >>> @@ -28,6 +28,7 @@
+> >>>  #include "qemu/osdep.h"
+> >>>
+> >>>  #include "qemu/cutils.h"
+> >>> +#include "hw/pci/pci.h"
+> >>>
+> >>>  static void test_parse_uint_null(void)
+> >>>  {
+> >>> @@ -1437,6 +1438,46 @@ static void test_qemu_strtosz_suffix_unit(void=
+)
+> >>>      g_assert_cmpint(res, =3D=3D, 12345000);
+> >>>  }
+> >>>
+> >>> +static void test_pci_parse_valid(void)
+> >>> +{
+> >>> +    PCIHostDeviceAddress addr =3D { 0xff, 0xff, 0xff, 0xff };
+> >>> +    int i, res;
+> >>> +    const struct {
+> >>> +        const char *str;
+> >>> +        PCIHostDeviceAddress addr;
+> >>> +    } tests[] =3D {
+> >>> +        { "1:2.3", { 0, 1, 2, 3 } },
+> >>> +        { "4:1:2.3", { 4, 1, 2, 3 } },
+> >>> +        { "a:a:a.7", { 10, 10, 10, 7 } },
+> >>> +    };
+> >>> +
+> >>> +    for (i =3D 0; i < ARRAY_SIZE(tests); i++) {
+> >>> +        res =3D pci_host_device_address_parse(tests[i].str, &addr);
+> >>> +        g_assert_cmpint(res, =3D=3D, 0);
+> >>> +
+> >>> +        g_assert_cmpint(addr.domain, =3D=3D, tests[i].addr.domain);
+> >>> +        g_assert_cmpint(addr.bus, =3D=3D, tests[i].addr.bus);
+> >>> +        g_assert_cmpint(addr.slot, =3D=3D, tests[i].addr.slot);
+> >>> +        g_assert_cmpint(addr.function, =3D=3D, tests[i].addr.functio=
+n);
+> >>> +    }
+> >>> +}
+> >>> +
+> >>> +static void test_pci_parse_invalid(void)
+> >>> +{
+> >>> +    int i, res;
+> >>> +    const char *tests[] =3D  {
+> >>> +        "", "foo", "1:2.3 foo",
+> >>> +        "a:a:a.a",
+> >>> +        "1", "1:", "1:2", "1:2:", "1:2:3", ":1:2:3.",
+> >>> +        "-1:1:2.3", "-1:2.3", "1:-1.3", "1:2.-3",
+> >>> +        "0x10000:1:1.1", "0x100:1.1", "1:0x20.1", "1:1.8" };
+> >>> +
+> >>> +    for (i =3D 0; i < ARRAY_SIZE(tests); i++) {
+> >>> +        res =3D pci_host_device_address_parse(tests[i], NULL);
+> >>> +        g_assert_cmpint(res, =3D=3D, -1);
+> >>> +    }
+> >>> +}
+> >>> +
+> >>>  int main(int argc, char **argv)
+> >>>  {
+> >>>      g_test_init(&argc, &argv, NULL);
+> >>> @@ -1598,5 +1639,10 @@ int main(int argc, char **argv)
+> >>>      g_test_add_func("/cutils/strtosz/suffix-unit",
+> >>>                      test_qemu_strtosz_suffix_unit);
+> >>>
+> >>> +    g_test_add_func("/cutils/pci-parse/valid",
+> >>> +                    test_pci_parse_valid);
+> >>> +    g_test_add_func("/cutils/pci-parse/invalid",
+> >>> +                    test_pci_parse_invalid);
+> >>> +
+> >>>      return g_test_run();
+> >>>  }
+> >>> diff --git a/util/cutils.c b/util/cutils.c
+> >>> index 4fefcf3be3..fc71c85816 100644
+> >>> --- a/util/cutils.c
+> >>> +++ b/util/cutils.c
+> >>> @@ -29,6 +29,7 @@
+> >>>  #include "qemu/sockets.h"
+> >>>  #include "qemu/iov.h"
+> >>>  #include "net/net.h"
+> >>> +#include "hw/pci/pci.h"
+> >>>  #include "qemu/cutils.h"
+> >>>
+> >>>  void strpadcpy(char *buf, int buf_size, const char *str, char pad)
+> >>> @@ -594,3 +595,61 @@ const char *qemu_ether_ntoa(const MACAddr *mac)
+> >>>
+> >>>      return ret;
+> >>>  }
+> >>> +
+> >>> +int pci_host_device_address_parse(const char *str, PCIHostDeviceAddr=
+ess
+> >>> *addr)
+> >>> +{
+> >>> +    const char *p =3D str;
+> >>> +    const char *e;
+> >>> +    unsigned long val;
+> >>> +    unsigned int dom =3D 0, bus =3D 0;
+> >>> +    unsigned int slot =3D 0, func =3D 0;
+> >>> +
+> >>> +    if (qemu_strtoul(p, &e, 16, &val) < 0
+> >>> +        || e =3D=3D p || *e !=3D ':') {
+> >>> +        return -1;
+> >>> +    }
+> >>> +    bus =3D val;
+> >>> +
+> >>> +    p =3D e + 1;
+> >>> +    if (qemu_strtoul(p, &e, 16, &val) < 0
+> >>> +        || e =3D=3D p) {
+> >>> +        return -1;
+> >>> +    }
+> >>> +    if (*e =3D=3D ':') {
+> >>> +        dom =3D bus;
+> >>> +        bus =3D val;
+> >>> +        p =3D e + 1;
+> >>> +        if (qemu_strtoul(p, &e, 16, &val) < 0
+> >>> +            || e =3D=3D p) {
+> >>> +            return -1;
+> >>> +        }
+> >>> +    }
+> >>> +    slot =3D val;
+> >>> +
+> >>> +    if (*e !=3D '.') {
+> >>> +        return -1;
+> >>> +    }
+> >>> +    p =3D e + 1;
+> >>> +    if (qemu_strtoul(p, &e, 10, &val) < 0
+> >>> +        || e =3D=3D p) {
+> >>> +        return -1;
+> >>> +    }
+> >>> +    func =3D val;
+> >>> +
+> >>> +    if (dom > 0xffff || bus > 0xff || slot > 0x1f || func > 7) {
+> >>> +        return -1;
+> >>> +    }
+> >>> +
+> >>> +    if (*e) {
+> >>> +        return -1;
+> >>> +    }
+> >>> +
+> >>> +    if (addr) {
+> >>> +        addr->domain =3D dom;
+> >>> +        addr->bus =3D bus;
+> >>> +        addr->slot =3D slot;
+> >>> +        addr->function =3D func;
+> >>> +    }
+> >>> +
+> >>> +    return 0;
+> >>> +}
+> >>>
+> >>
+> >>
+>=20
+>=20
