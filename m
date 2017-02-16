@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ce9vZ-0008BM-Ic
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 19:28:08 -0500
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ce9vc-0008EH-Rc
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 19:28:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ce9vY-0001J9-Lu
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 19:28:05 -0500
-Received: from mailapp01.imgtec.com ([195.59.15.196]:20181)
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ce9vZ-0001Jo-OZ
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 19:28:08 -0500
+Received: from mailapp01.imgtec.com ([195.59.15.196]:60097)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ce9vY-0001J1-FF
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 19:28:04 -0500
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ce9vZ-0001JW-JZ
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 19:28:05 -0500
 From: Yongbok Kim <yongbok.kim@imgtec.com>
-Date: Thu, 16 Feb 2017 00:27:26 +0000
-Message-ID: <1487204850-16448-5-git-send-email-yongbok.kim@imgtec.com>
+Date: Thu, 16 Feb 2017 00:27:27 +0000
+Message-ID: <1487204850-16448-6-git-send-email-yongbok.kim@imgtec.com>
 In-Reply-To: <1487204850-16448-1-git-send-email-yongbok.kim@imgtec.com>
 References: <1487204850-16448-1-git-send-email-yongbok.kim@imgtec.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 4/8] target-mips: Provide function to test
- if a CPU supports an ISA
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v5 5/8] dtc: Update requirement to v1.4.2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,57 +30,51 @@ Cc: Aurelien Jarno <aurelien@aurel32.net>, Paul Burton <paul.burton@imgtec.com>
 
 From: Paul Burton <paul.burton@imgtec.com>
 
-Provide a new cpu_supports_isa function which allows callers to
-determine whether a CPU supports one of the ISA_ flags, by testing
-whether the associated struct mips_def_t sets the ISA flags in its
-insn_flags field.
-
-An example use of this is to allow boards which generate bootloader code
-to determine the properties of the CPU that will be used, for example
-whether the CPU is 64 bit or which architecture revision it implements.
+In order to obtain fdt_first_subnode & fdt_next_subnode symbols from
+libfdt for use by a later patch, bump the requirement for dtc to v1.4.2
+& the submodule to that same version.
 
 Signed-off-by: Paul Burton <paul.burton@imgtec.com>
-Reviewed-by: Leon Alrae <leon.alrae@imgtec.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Yongbok Kim <yongbok.kim@imgtec.com>
 Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
 ---
- target/mips/cpu.h       |  1 +
- target/mips/translate.c | 10 ++++++++++
- 2 files changed, 11 insertions(+)
+ configure | 6 +++---
+ dtc       | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index e1c78f5..4a4747a 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -815,6 +815,7 @@ int cpu_mips_signal_handler(int host_signum, void *pi=
-nfo, void *puc);
-=20
- #define cpu_init(cpu_model) CPU(cpu_mips_init(cpu_model))
- bool cpu_supports_cps_smp(const char *cpu_model);
-+bool cpu_supports_isa(const char *cpu_model, unsigned int isa);
- void cpu_set_exception_base(int vp_index, target_ulong address);
-=20
- /* TODO QOM'ify CPU reset and remove */
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 7f8ecf4..8b4a072 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -20233,6 +20233,16 @@ bool cpu_supports_cps_smp(const char *cpu_model)
-     return (def->CP0_Config3 & (1 << CP0C3_CMGCR)) !=3D 0;
- }
-=20
-+bool cpu_supports_isa(const char *cpu_model, unsigned int isa)
-+{
-+    const mips_def_t *def =3D cpu_mips_find_by_name(cpu_model);
-+    if (!def) {
-+        return false;
-+    }
-+
-+    return (def->insn_flags & isa) !=3D 0;
-+}
-+
- void cpu_set_exception_base(int vp_index, target_ulong address)
- {
-     MIPSCPU *vp =3D MIPS_CPU(qemu_get_cpu(vp_index));
---=20
+diff --git a/configure b/configure
+index 1c9655e..4b68861 100755
+--- a/configure
++++ b/configure
+@@ -3396,11 +3396,11 @@ fi
+ if test "$fdt" != "no" ; then
+   fdt_libs="-lfdt"
+   # explicitly check for libfdt_env.h as it is missing in some stable installs
+-  # and test for required functions to make sure we are on a version >= 1.4.0
++  # and test for required functions to make sure we are on a version >= 1.4.2
+   cat > $TMPC << EOF
+ #include <libfdt.h>
+ #include <libfdt_env.h>
+-int main(void) { fdt_get_property_by_offset(0, 0, 0); return 0; }
++int main(void) { fdt_first_subnode(0, 0); return 0; }
+ EOF
+   if compile_prog "" "$fdt_libs" ; then
+     # system DTC is good - use it
+@@ -3418,7 +3418,7 @@ EOF
+     fdt_libs="-L\$(BUILD_DIR)/dtc/libfdt $fdt_libs"
+   elif test "$fdt" = "yes" ; then
+     # have neither and want - prompt for system/submodule install
+-    error_exit "DTC (libfdt) version >= 1.4.0 not present. Your options:" \
++    error_exit "DTC (libfdt) version >= 1.4.2 not present. Your options:" \
+         "  (1) Preferred: Install the DTC (libfdt) devel package" \
+         "  (2) Fetch the DTC submodule, using:" \
+         "      git submodule update --init dtc"
+diff --git a/dtc b/dtc
+index 65cc4d2..ec02b34 160000
+--- a/dtc
++++ b/dtc
+@@ -1 +1 @@
+-Subproject commit 65cc4d2748a2c2e6f27f1cf39e07a5dbabd80ebf
++Subproject commit ec02b34c05be04f249ffaaca4b666f5246877dea
+-- 
 2.7.4
