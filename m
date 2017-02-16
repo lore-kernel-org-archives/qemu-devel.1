@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ceN6q-00040k-EY
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:32:37 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ceN6q-00041I-WD
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:32:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ceN6k-0008Fj-GK
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ceN6p-0008IO-IF
 	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:32:36 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34177)
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34883)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1ceN6k-0008FF-AA
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:32:30 -0500
-Received: by mail-wm0-x243.google.com with SMTP id c85so3431039wmi.1
-	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 06:32:30 -0800 (PST)
-Received: from 640k.lan (94-39-187-56.adsl-ull.clienti.tiscali.it.
-	[94.39.187.56])
-	by smtp.gmail.com with ESMTPSA id g5sm9203365wrd.0.2017.02.16.06.32.26
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 16 Feb 2017 06:32:28 -0800 (PST)
+	id 1ceN6p-0008Hq-8g
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:32:35 -0500
+Received: by mail-wm0-x243.google.com with SMTP id u63so3408810wmu.2
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 06:32:35 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 16 Feb 2017 15:31:39 +0100
-Message-Id: <1487255507-106654-16-git-send-email-pbonzini@redhat.com>
+Date: Thu, 16 Feb 2017 15:31:41 +0100
+Message-Id: <1487255507-106654-18-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1487255507-106654-1-git-send-email-pbonzini@redhat.com>
 References: <1487255507-106654-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 15/23] cpu-exec: remove outermost infinite loop
+Subject: [Qemu-devel] [PULL 17/23] qemu-nbd: Implement socket activation.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,87 +28,245 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: "Richard W.M. Jones" <rjones@redhat.com>
 
-Reorganize the sigsetjmp so that the restart case falls through
-to cpu_handle_exception and the execution loop.
+From: "Richard W.M. Jones" <rjones@redhat.com>
 
+Socket activation (sometimes known as systemd socket activation)
+allows an Internet superserver to pass a pre-opened listening socket
+to the process, instead of having qemu-nbd open a socket itself.  This
+is done via the LISTEN_FDS and LISTEN_PID environment variables, and a
+standard file descriptor range.
+
+This change partially implements socket activation for qemu-nbd.  If
+the environment variables are set correctly, then socket activation
+will happen automatically, otherwise everything works as before.  The
+limitation is that LISTEN_FDS must be 1.
+
+Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
+Message-Id: <20170204100317.32425-2-rjones@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- cpu-exec.c | 58 +++++++++++++++++++++++++++-------------------------------
- 1 file changed, 27 insertions(+), 31 deletions(-)
+ qemu-nbd.c | 172 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 163 insertions(+), 9 deletions(-)
 
-diff --git a/cpu-exec.c b/cpu-exec.c
-index 865015c..b8ebb5c 100644
---- a/cpu-exec.c
-+++ b/cpu-exec.c
-@@ -624,41 +624,37 @@ int cpu_exec(CPUState *cpu)
-      */
-     init_delay_params(&sc, cpu);
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index c734f62..e4fede6 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -463,6 +463,135 @@ static QCryptoTLSCreds *nbd_get_tls_creds(const char *id, Error **errp)
+     return creds;
+ }
  
--    for(;;) {
--        /* prepare setjmp context for exception handling */
--        if (sigsetjmp(cpu->jmp_env, 0) == 0) {
--            /* if an exception is pending, we execute it here */
--            while (!cpu_handle_exception(cpu, &ret)) {
--                TranslationBlock *last_tb = NULL;
--                int tb_exit = 0;
--
--                while (!cpu_handle_interrupt(cpu, &last_tb)) {
--                    TranslationBlock *tb = tb_find(cpu, last_tb, tb_exit);
--                    cpu_loop_exec_tb(cpu, tb, &last_tb, &tb_exit, &sc);
--                    /* Try to align the host and virtual clocks
--                       if the guest is in advance */
--                    align_clocks(&sc, cpu);
--                }
--            }
--            break;
--
--        } else {
-+    /* prepare setjmp context for exception handling */
-+    if (sigsetjmp(cpu->jmp_env, 0) != 0) {
- #if defined(__clang__) || !QEMU_GNUC_PREREQ(4, 6)
--            /* Some compilers wrongly smash all local variables after
--             * siglongjmp. There were bug reports for gcc 4.5.0 and clang.
--             * Reload essential local variables here for those compilers.
--             * Newer versions of gcc would complain about this code (-Wclobbered). */
--            cpu = current_cpu;
--            cc = CPU_GET_CLASS(cpu);
-+        /* Some compilers wrongly smash all local variables after
-+         * siglongjmp. There were bug reports for gcc 4.5.0 and clang.
-+         * Reload essential local variables here for those compilers.
-+         * Newer versions of gcc would complain about this code (-Wclobbered). */
-+        cpu = current_cpu;
-+        cc = CPU_GET_CLASS(cpu);
- #else /* buggy compiler */
--            /* Assert that the compiler does not smash local variables. */
--            g_assert(cpu == current_cpu);
--            g_assert(cc == CPU_GET_CLASS(cpu));
-+        /* Assert that the compiler does not smash local variables. */
-+        g_assert(cpu == current_cpu);
-+        g_assert(cc == CPU_GET_CLASS(cpu));
- #endif /* buggy compiler */
--            cpu->can_do_io = 1;
--            tb_lock_reset();
-+        cpu->can_do_io = 1;
-+        tb_lock_reset();
++static void setup_address_and_port(const char **address, const char **port)
++{
++    if (*address == NULL) {
++        *address = "0.0.0.0";
 +    }
 +
-+    /* if an exception is pending, we execute it here */
-+    while (!cpu_handle_exception(cpu, &ret)) {
-+        TranslationBlock *last_tb = NULL;
-+        int tb_exit = 0;
++    if (*port == NULL) {
++        *port = stringify(NBD_DEFAULT_PORT);
++    }
++}
 +
-+        while (!cpu_handle_interrupt(cpu, &last_tb)) {
-+            TranslationBlock *tb = tb_find(cpu, last_tb, tb_exit);
-+            cpu_loop_exec_tb(cpu, tb, &last_tb, &tb_exit, &sc);
-+            /* Try to align the host and virtual clocks
-+               if the guest is in advance */
-+            align_clocks(&sc, cpu);
-         }
--    } /* for(;;) */
++#define FIRST_SOCKET_ACTIVATION_FD 3 /* defined by systemd ABI */
++
++#ifndef _WIN32
++/*
++ * Check if socket activation was requested via use of the
++ * LISTEN_FDS and LISTEN_PID environment variables.
++ *
++ * Returns 0 if no socket activation, or the number of FDs.
++ */
++static unsigned int check_socket_activation(void)
++{
++    const char *s;
++    unsigned long pid;
++    unsigned long nr_fds;
++    unsigned int i;
++    int fd;
++    int err;
++
++    s = getenv("LISTEN_PID");
++    if (s == NULL) {
++        return 0;
++    }
++    err = qemu_strtoul(s, NULL, 10, &pid);
++    if (err) {
++        if (verbose) {
++            fprintf(stderr, "malformed %s environment variable (ignored)\n",
++                    "LISTEN_PID");
++        }
++        return 0;
++    }
++    if (pid != getpid()) {
++        if (verbose) {
++            fprintf(stderr, "%s was not for us (ignored)\n",
++                    "LISTEN_PID");
++        }
++        return 0;
++    }
++
++    s = getenv("LISTEN_FDS");
++    if (s == NULL) {
++        return 0;
++    }
++    err = qemu_strtoul(s, NULL, 10, &nr_fds);
++    if (err) {
++        if (verbose) {
++            fprintf(stderr, "malformed %s environment variable (ignored)\n",
++                    "LISTEN_FDS");
++        }
++        return 0;
++    }
++    assert(nr_fds <= UINT_MAX);
++
++    /* A limitation of current qemu-nbd is that it can only listen on
++     * a single socket.  When that limitation is lifted, we can change
++     * this function to allow LISTEN_FDS > 1, and remove the assertion
++     * in the main function below.
++     */
++    if (nr_fds > 1) {
++        error_report("qemu-nbd does not support socket activation with %s > 1",
++                     "LISTEN_FDS");
++        exit(EXIT_FAILURE);
++    }
++
++    /* So these are not passed to any child processes we might start. */
++    unsetenv("LISTEN_FDS");
++    unsetenv("LISTEN_PID");
++
++    /* So the file descriptors don't leak into child processes. */
++    for (i = 0; i < nr_fds; ++i) {
++        fd = FIRST_SOCKET_ACTIVATION_FD + i;
++        if (fcntl(fd, F_SETFD, FD_CLOEXEC) == -1) {
++            /* If we cannot set FD_CLOEXEC then it probably means the file
++             * descriptor is invalid, so socket activation has gone wrong
++             * and we should exit.
++             */
++            error_report("Socket activation failed: "
++                         "invalid file descriptor fd = %d: %m",
++                         fd);
++            exit(EXIT_FAILURE);
++        }
++    }
++
++    return (unsigned int) nr_fds;
++}
++
++#else /* !_WIN32 */
++static unsigned int check_socket_activation(void)
++{
++    return 0;
++}
++#endif
++
++/*
++ * Check socket parameters compatibility when socket activation is used.
++ */
++static const char *socket_activation_validate_opts(const char *device,
++                                                   const char *sockpath,
++                                                   const char *address,
++                                                   const char *port)
++{
++    if (device != NULL) {
++        return "NBD device can't be set when using socket activation";
++    }
++
++    if (sockpath != NULL) {
++        return "Unix socket can't be set when using socket activation";
++    }
++
++    if (address != NULL) {
++        return "The interface can't be set when using socket activation";
++    }
++
++    if (port != NULL) {
++        return "TCP port number can't be set when using socket activation";
++    }
++
++    return NULL;
++}
+ 
+ int main(int argc, char **argv)
+ {
+@@ -471,7 +600,7 @@ int main(int argc, char **argv)
+     off_t dev_offset = 0;
+     uint16_t nbdflags = 0;
+     bool disconnect = false;
+-    const char *bindto = "0.0.0.0";
++    const char *bindto = NULL;
+     const char *port = NULL;
+     char *sockpath = NULL;
+     char *device = NULL;
+@@ -533,6 +662,7 @@ int main(int argc, char **argv)
+     char *trace_file = NULL;
+     bool fork_process = false;
+     int old_stderr = -1;
++    unsigned socket_activation;
+ 
+     /* The client thread uses SIGTERM to interrupt the server.  A signal
+      * handler ensures that "qemu-nbd -v -c" exits with a nice status code.
+@@ -751,6 +881,19 @@ int main(int argc, char **argv)
+     trace_init_file(trace_file);
+     qemu_set_log(LOG_TRACE);
+ 
++    socket_activation = check_socket_activation();
++    if (socket_activation == 0) {
++        setup_address_and_port(&bindto, &port);
++    } else {
++        /* Using socket activation - check user didn't use -p etc. */
++        const char *err_msg = socket_activation_validate_opts(device, sockpath,
++                                                              bindto, port);
++        if (err_msg != NULL) {
++            error_report("%s", err_msg);
++            exit(EXIT_FAILURE);
++        }
++    }
++
+     if (tlscredsid) {
+         if (sockpath) {
+             error_report("TLS is only supported with IPv4/IPv6");
+@@ -855,7 +998,25 @@ int main(int argc, char **argv)
+         snprintf(sockpath, 128, SOCKET_PATH, basename(device));
+     }
+ 
+-    saddr = nbd_build_socket_address(sockpath, bindto, port);
++    if (socket_activation == 0) {
++        server_ioc = qio_channel_socket_new();
++        saddr = nbd_build_socket_address(sockpath, bindto, port);
++        if (qio_channel_socket_listen_sync(server_ioc, saddr, &local_err) < 0) {
++            object_unref(OBJECT(server_ioc));
++            error_report_err(local_err);
++            return 1;
++        }
++    } else {
++        /* See comment in check_socket_activation above. */
++        assert(socket_activation == 1);
++        server_ioc = qio_channel_socket_new_fd(FIRST_SOCKET_ACTIVATION_FD,
++                                               &local_err);
++        if (server_ioc == NULL) {
++            error_report("Failed to use socket activation: %s",
++                         error_get_pretty(local_err));
++            exit(EXIT_FAILURE);
++        }
 +    }
  
-     cc->cpu_exec_exit(cpu);
-     rcu_read_unlock();
+     if (qemu_init_main_loop(&local_err)) {
+         error_report_err(local_err);
+@@ -950,13 +1111,6 @@ int main(int argc, char **argv)
+         exit(EXIT_FAILURE);
+     }
+ 
+-    server_ioc = qio_channel_socket_new();
+-    if (qio_channel_socket_listen_sync(server_ioc, saddr, &local_err) < 0) {
+-        object_unref(OBJECT(server_ioc));
+-        error_report_err(local_err);
+-        return 1;
+-    }
+-
+     if (device) {
+         int ret;
+ 
 -- 
 1.8.3.1
