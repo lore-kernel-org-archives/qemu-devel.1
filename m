@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ceITz-00041t-GW
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:36:12 -0500
+	(envelope-from <thuth@redhat.com>) id 1ceIVQ-0004oA-De
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:37:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ceITu-0005Xu-KD
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:36:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60144)
+	(envelope-from <thuth@redhat.com>) id 1ceIVL-0005qR-HD
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:37:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60858)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1ceITu-0005XW-Bf
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:36:06 -0500
-References: <cover.1487139038.git.ben@skyportsystems.com>
-	<678c203f-3768-7e65-6e48-6729473b6ffa@redhat.com>
-	<20170215220837-mutt-send-email-mst@kernel.org>
-	<e7e9cf57-a5b4-4f2b-36e5-3e08dee70d68@redhat.com>
-	<088D760B-A48E-4B79-9177-C63753C306D6@skyportsystems.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <c45ee0ad-3aff-95b6-9e33-31e9a426bae0@redhat.com>
-Date: Thu, 16 Feb 2017 10:36:02 +0100
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ceIVL-0005qM-8h
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:37:35 -0500
+References: <20170215182732.GN24672@redhat.com>
+	<5ae6dee4-779b-7073-4192-21554b8a2b62@redhat.com>
+	<20170216093203.GA7346@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <a964ee79-d160-207d-34e8-de480fdf3e23@redhat.com>
+Date: Thu, 16 Feb 2017 10:37:31 +0100
 MIME-Version: 1.0
-In-Reply-To: <088D760B-A48E-4B79-9177-C63753C306D6@skyportsystems.com>
+In-Reply-To: <20170216093203.GA7346@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 0/7] Add support for VM Generation ID
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] RFC: How to make seccomp reliable and useful ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,136 +28,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ben Warren <ben@skyportsystems.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, imammedo@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Otubo <eduardo.otubo@profitbricks.com>
 
-On 02/16/17 07:10, Ben Warren wrote:
->=20
->> On Feb 15, 2017, at 12:52 PM, Laszlo Ersek <lersek@redhat.com> wrote:
->>
->> On 02/15/17 21:09, Michael S. Tsirkin wrote:
->>> On Wed, Feb 15, 2017 at 08:47:48PM +0100, Laszlo Ersek wrote:
->>
->> [snip]
->>
->>>> For patches #1, #3, #4 and #5:
->>>>
->>>> Tested-by: Laszlo Ersek <lersek@redhat.com>
->>>>
->>>> I'll soon post the OVMF patches.
->>>>
->>>> Thanks!
->>>> Laszlo
+On 16.02.2017 10:32, Daniel P. Berrange wrote:
+> On Thu, Feb 16, 2017 at 09:38:59AM +0100, Thomas Huth wrote:
+>> On 15.02.2017 19:27, Daniel P. Berrange wrote:
+>>> The current impl of seccomp in QEMU is intentionally allowing a huge range
+>>> of system calls to be executed. The goal was that running '-sandbox on'
+>>> should never break any feature of QEMU, so naturally any syscall that can
+>>> executed on any codepath QEMU takes must be allowed.
+>>>
+>>> This is good for usability because users don't need to understand the technical
+>>> details of the sandbox technology, they merely say "on" and it "just works".
+>>> Conversely though, this is bad for security because QEMU has to allow a huge
+>>> range of system calls to be used due to its broad functionality.
+>>>
+>>> During initial discussions for seccomp back in 2012 it was suggested, there
+>>> might be alternate policies developed for QEMU which deny some features, but
+>>> improve security overall. To best of my knowledge, this has never been discussed
+>>> again since then.
 >>>
 >>>
->>> How do you feel about Igor's request to change WRITE_POINTER to add
->>> offset in there, so guest can pass in the address of GUID and
->>> not start of table? Would that be a lot of work to add?
+>>> In addition, since initially merging, there has been a steady stream of patches
+>>> to whitelist further syscalls that were missing. Some of these were missing due
+>>> to newly added functionality in QEMU since the original seccomp impl, while
+>>> others have been missing since day 1. It is reasonable to expect that there are
+>>> still many syscalls missing in the whitelist. In just a couple of minutes of
+>>> comparing the whitelist vs global syscall list it was possible to identify two
+>>> further missing syscalls. The '-netdev bridge,br=virbr0' network backend fails
+>>> because setuid is blocked, preventing execution of the qemu-bridge-helper
+>>> program. If built against glibc < 2.9, or running on kernel < 2.6.27 it will
+>>> fail to call eventfd() because we only permit eventfd2() syscall, not the
+>>> older eventfd() syscall used on older Linux. Some ifup scripts used with the
+>>> -netdev arg may also break due to lack of chmod, flock, getxattr permissions.
+>>> This risk of missing syscalls is why -sandbox defaults to off, and we've never
+>>> considered defaulting it to on.
+>>>
+>>>
+>>> The fundamental problem is that building a whitelist of syscalls used by QEMU
+>>> emulators is an intractable problem. QEMU on my system links to 183 different
+>>> shared libraries and there is no way in the world that anyone can figure out
+>>> which code paths QEMU triggers in these libraries and thus identify which
+>>> syscalls will be genuinely needed.
+>>>
+>>> Thus a whitelist based approach for QEMU is doomed to always be missing some
+>>> syscalls, resulting in uneccessary abrts of QEMU when it tickles some edge
+>>> case. If you are lucky the abort() happens at startup so you see it quickly
+>>> and can address it. If you are unlucky the abort() happens after your VM has
+>>> been running for days/week/months and you loose data.
+>>>
+>>> IOW, seccomp integration as it currently exists today in QEMU offers minimal
+>>> security benefits, while at the same time causing spurious crashes which may
+>>> cause user data loss from aborting a running VM, discouraging users from using
+>>> even the minimal protection it offers.
+>>>
+>>> I think we need to rework our seccomp support so that we can have a high enough
+>>> level of confidence in it, that it could be enabled by default. At the same time
+>>> we need to make it do something more tangibly useful from a security POV.
+>>>
+>>>
+>>> First we need to admit that whitelisting is a failed approach, and switch to
+>>> using blacklisting. Unless we do this, we'll never have high enough confidence
+>>> to enable it by default - something that's never turned on might as well not
+>>> exist at all.
+>>>
+>>>
+>>> There is a reasonable easily identifiable set of syscalls that QEMU should
+>>> never be permitted to use, no matter what configuration it is in, what helpers
+>>> it spawns, or what libraries it links to. eg reboot, swapon, swapoff,  syslog,
+>>> mount, unmount, kexec_*, etc - any syscall that affects global system state,
+>>> rather than process local state should be forbidden.
+>>>
+>>> There are some syscalls that are simply hardcoded to return ENOSYS which can
+>>> be trivially blacklisted. afs_syscall, break, fattach, ftime, etc (see the
+>>> man page 'unimplemented(2)').
+>>>
+>>> There are some syscalls which are considered obsolete - they were previously
+>>> useful, but no modern code would call them, as they have been superceeded.
+>>> For example, readdir replaced by getdents. We could blacklist these by default
+>>> but provide a way to allow use of obsolete syscalls if running on older systems.
+>>> e.g. '-sandbox on,obsolete=allow'. They might be obsolete enough that we decide
+>>> to just block them permanently with no opt in - would need to analyse when
+>>> their replacements appeared in widespread use.
+>>>
+>>> There might be a few more syscalls which we can determine are never valid to
+>>> use in QEMU or any library or helper program it might run. I expect this list
+>>> to be very small though, given the impossibility of auditing code paths through
+>>> millions of lines of code QEMU links to.
+>>>
+>>> Everything else should be allowed.
+>>>
+>>> At this point we have a highly reliable "-sandbox on" which we're not having
+>>> to constantly patch.
+>>>
+>>> From here we need a way to allow a user to opt-in to more restrictive policies,
+>>> accepting that it will block certain features. For example, there should be a
+>>> a way to disable any means to elevate privileges from QEMU or things it spawns.
+>>> e.g. '-sandbox on,elevateprivileges=deny'.
+>>>
+>>> This would not only block the variuous set*uid|gid functions via seccomp, but
+>>> should also prctl(PR_SET_NO_NEW_PRIVS). This would allows the user to optin to
+>>> a restrictive world if they know they'll not require things like the setuid
+>>> bridge helper.
+>>>
+>>> Similarly there should be an '-sandbox on,spawn=deny' which prevents the ability
+>>> to fork/exec processes at all, whether privileged or not. This would block
+>>> features like the qemu bridge helper, SMB server, ifup/down scripts, migration
+>>> exec: protocol. These are all rarely used features though, so an opt-in to block
+>>> their use is reasonable & desirable.
+>>>
+>>> A -sandbox on,resourcecontrol=deny, which prevents QEMU from setting stuff like
+>>> process affinity, schedular priority, etc. Some uses of QEMU might need them,
+>>> but normally such controls are left to the mgmt app above QEMU to set prior to
+>>> the exec() of QEMU.
 >>
->> I think it's doable in practice: simply add a constant from the comman=
-d
->> itself, for passing the value back to QEMU, and also for saving the
->> fw_cfg write commend for S3 resume time.
->>
->> But, I disagree with it from a design POV.
->>
->> Igor's point is:
->>
->>> Math complicates QEMU code though and not only QMEMU but AML code as
->>> well.
->>
->> As I understand it, the goal is to push the addition to the firmware
->> (which is "one place"), rather than having to implement it twice in
->> QEMU, i.e., in two places ((a) native QEMU logic, (b) AML generator).
->>
->> Here's my counter-argument:
->>
->> (a) As I mentioned earlier, assume a complex communication structure
->> between the guest OS and QEMU. Currently our shared structure consists
->> of a single field (the GUID), but next time it might contain several f=
-ields.
->>
->> For such a multi-field shared structure, QEMU will have to do manual
->> offsetting into the guest RAM anyway, for accessing fields F1, F2, and
->> F3. We will not create three separate WRITE_POINTER commands and let t=
-he
->> firmware calculate and return the absolute GPAs of the fields F1, F2 a=
-nd
->> F3. Instead, there will be one WRITE_POINTER command, and QEMU will do
->> the offsetting manually, minimally for fields F2 and F3.
->>
->> "src_offset" looks tempting now only because we have a shared structur=
-e
->> with only one field, the GUID at offset 40 decimal.
->>
->> (b) Regarding the runtime addition in the AML code:
->>
->> As discussed before, the main reason *now*, for not pointing VGIA (and
->> other named integer objects) with ADD_POINTER commands directly to
->> "meaningful" fields, is that OVMF probes the targets of ADD_POINTER
->> commands for patterns that look like ACPI table headers. And, for the
->> time being, we want to suppress any mis-recognitions by prepending som=
-e
->> padding.
->>
->> Igor was right to dislike this, and we agreed that *down the road* we
->> should add allocation flags, or further allocation commands, to suppla=
-nt
->> this kind of heuristics in OVMF. But:
->>
->> - we don't have time to do it now, plus
->>
->> - please observe that the runtime addition in AML relates to the
->>  ADD_POINTER and the ALLOCATE commands. It does not relate to
->>  WRITE_POINTER at all.
->>
->>  Whatever we change on WRITE_POINTER will do nothing for suppressing
->>  OVMF's table header probing -- because that is tied to ADD_POINTER
->>  --, therefore WRITE_POINTER tweaks cannot eliminate the "need to add"
->>  in AML.
->>
->>
->> In summary, I think the proposed WRITE_POINTER modification is
->> implementable, but I think it will not pay off, because:
->>
->> (a) for QEMU logic, it will not prove useful as soon as we have a
->> multi-field shared structure (QEMU will have to add field offsets anyw=
-ay),
->>
->> (b) and for eliminating the AML addition (which is a consequence of th=
-e
->> current ADD_POINTER handling in OVMF), it does nothing.
->>
-> OK Laszlo, in v7 (imminent)  I went ahead and implemented this
-> src_offset.  If you are truly dead-set against it, it=E2=80=99s not ver=
-y hard
-> to remove.  To me it seems pretty harmless.
+>> I like your proposal! I just wanted to add an idea for an additional
+>> parameter (not sure whether it is feasible, though): Something like
+>> "-sandbox on,network=off" ... i.e. forbid all system calls that are used
+>> for networking. Rationale: Sometimes your VM does not need any
+>> networking, and you want to make sure that a malicious guest can also
+>> not reach your local network in that case.
+> 
+> This is pretty tricky. Even if there is not obviously configured network
+> backend in QEMU, there's plenty of scope for things in libraries to
+> be using networking. Something want a fully qualified hostname ? That'll
+> trigger UDP / TCP connections to a DNS resolver. Running with the SDL
+> or GTK display frontends - those use networking over UNIX sockets to
+> talk to a display server. Linked to glib2 ? That'll connect to DConf
+> over DBus UNIX socket in the background. etc
 
-I'd like to hear Igor's opinion about my counter-argument above.
+Oh, too bad. Aren't there at least some system calls which could be used
+to block TCP/IP connections, while we still allow local UNIX sockets?
+... hmm, maybe that's rather something to solve at the SELinux level
+instead...
 
-It would be a fair bit of work in OVMF:
-- it introduces a new addition which has to be range checked (the sum
-  cannot overflow either the pointer object or the size of the
-  pointed-to blob),
-- if the range check fails, that's a new error condition that needs
-  handling,
-- in edk2 we document error conditions carefully, so it affects
-  documentation too, for the function that processes WRITE_POINTER,
-- I'd have to redo all the testing.
-
-After I post the OVMF patches, we can count on about one week of review
-time (assuming I don't have to post a v2, that is!). That comes pretty
-close to the end of February, which is when I want to do a downstream
-OVMF rebase. (I can't do it in March due to a conference, and then it's
-too late.) The downstream rebase will take a few days too. I would have
-preferred to post the OVMF patches near the beginning of this week.
-
-So, as I said, it is implementable, I'm not "dead-set" against it, but
-the price for me to pay is definitely not zero. And, as it stands, I
-disagree with the design -- there don't seem to be any general benefits.
-
-I'd like to hear back from Igor. If he convincingly refutes my argument,
-I'm game.
-
-Thanks,
-Laszlo
+ Thomas
