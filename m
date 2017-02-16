@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ceC4s-0008Ik-4n
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 21:45:51 -0500
+	(envelope-from <jasowang@redhat.com>) id 1ceC6G-0001HW-CC
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 21:47:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ceC4p-0003Wn-2Z
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 21:45:50 -0500
-Received: from szxga01-in.huawei.com ([58.251.152.64]:4510)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ceC4o-0003VO-5O
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 21:45:46 -0500
+	(envelope-from <jasowang@redhat.com>) id 1ceC6B-0003tQ-Lo
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 21:47:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55952)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1ceC6B-0003sy-Cy
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 21:47:11 -0500
 References: <1487147657-166092-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1487147657-166092-3-git-send-email-zhang.zhanghailiang@huawei.com>
-	<ce15349b-facb-aed4-4352-1c57890a7f68@cn.fujitsu.com>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <58A51234.4060203@huawei.com>
-Date: Thu, 16 Feb 2017 10:45:08 +0800
+	<1487147657-166092-4-git-send-email-zhang.zhanghailiang@huawei.com>
+	<09a2bc10-d8dd-a2c0-f545-6b08a871d91a@redhat.com>
+	<58A511D2.6020102@huawei.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <485b2b76-3efb-45d0-155f-7d56f80f3df6@redhat.com>
+Date: Thu, 16 Feb 2017 10:47:04 +0800
 MIME-Version: 1.0
-In-Reply-To: <ce15349b-facb-aed4-4352-1c57890a7f68@cn.fujitsu.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/5] colo-compare: kick compare thread to
- exit while finalize
+In-Reply-To: <58A511D2.6020102@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/5] colo-compare: release all unhandled
+ packets in finalize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,96 +30,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, jasowang@redhat.com, lizhijian@cn.fujitsu.com
+To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>, zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com
 Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, pss.wulizhen@huawei.com
 
-On 2017/2/16 10:25, Zhang Chen wrote:
->
->
-> On 02/15/2017 04:34 PM, zhanghailiang wrote:
->> We should call g_main_loop_quit() to notify colo compare thread to
->> exit, Or it will run in g_main_loop_run() forever.
->>
->> Besides, the finalizing process can't happen in context of colo thread,
->> it is reasonable to remove the 'if (qemu_thread_is_self(&s->thread))'
->> branch.
->>
->> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
->> ---
->>    net/colo-compare.c | 19 +++++++++----------
->>    1 file changed, 9 insertions(+), 10 deletions(-)
->>
->> diff --git a/net/colo-compare.c b/net/colo-compare.c
->> index fdde788..a16e2d5 100644
->> --- a/net/colo-compare.c
->> +++ b/net/colo-compare.c
->> @@ -83,6 +83,8 @@ typedef struct CompareState {
->>        GHashTable *connection_track_table;
->>        /* compare thread, a thread for each NIC */
->>        QemuThread thread;
->> +
->> +    GMainLoop *compare_loop;
->>    } CompareState;
->>
->>    typedef struct CompareClass {
->> @@ -496,7 +498,6 @@ static gboolean check_old_packet_regular(void *opaque)
->>    static void *colo_compare_thread(void *opaque)
->>    {
->>        GMainContext *worker_context;
->> -    GMainLoop *compare_loop;
->>        CompareState *s = opaque;
->>        GSource *timeout_source;
->>
->> @@ -507,7 +508,7 @@ static void *colo_compare_thread(void *opaque)
->>        qemu_chr_fe_set_handlers(&s->chr_sec_in, compare_chr_can_read,
->>                                 compare_sec_chr_in, NULL, s, worker_context, true);
->>
->> -    compare_loop = g_main_loop_new(worker_context, FALSE);
->> +    s->compare_loop = g_main_loop_new(worker_context, FALSE);
->>
->>        /* To kick any packets that the secondary doesn't match */
->>        timeout_source = g_timeout_source_new(REGULAR_PACKET_CHECK_MS);
->> @@ -515,10 +516,10 @@ static void *colo_compare_thread(void *opaque)
->>                              (GSourceFunc)check_old_packet_regular, s, NULL);
->>        g_source_attach(timeout_source, worker_context);
->>
->> -    g_main_loop_run(compare_loop);
->> +    g_main_loop_run(s->compare_loop);
->>
->>        g_source_unref(timeout_source);
->> -    g_main_loop_unref(compare_loop);
->> +    g_main_loop_unref(s->compare_loop);
->>        g_main_context_unref(worker_context);
->>        return NULL;
->>    }
->> @@ -703,13 +704,11 @@ static void colo_compare_finalize(Object *obj)
->>        qemu_chr_fe_deinit(&s->chr_sec_in);
->>        qemu_chr_fe_deinit(&s->chr_out);
->>
->> -    g_queue_free(&s->conn_list);
->> +    g_main_loop_quit(s->compare_loop);
->> +    qemu_thread_join(&s->thread);
->>
->> -    if (qemu_thread_is_self(&s->thread)) {
->> -        /* compare connection */
->> -        g_queue_foreach(&s->conn_list, colo_compare_connection, s);
->> -        qemu_thread_join(&s->thread);
->> -    }
->
-> Before free the 's->conn_list', you should flush all queued primary packets
-> and release all queued secondary packets here, so combine this patch
-> with 3/5 patch as
-> one patch is a better choose.
->
 
-Make sense, will fix it in next version, thanks.
 
-> Thanks
-> Zhang Chen
->
->> +
->> +    g_queue_free(&s->conn_list);
+On 2017=E5=B9=B402=E6=9C=8816=E6=97=A5 10:43, Hailiang Zhang wrote:
+> On 2017/2/16 10:34, Jason Wang wrote:
 >>
->>        g_free(s->pri_indev);
->>        g_free(s->sec_indev);
+>>
+>> On 2017=E5=B9=B402=E6=9C=8815=E6=97=A5 16:34, zhanghailiang wrote:
+>>> We should release all unhandled packets before finalize colo compare.
+>>> Besides, we need to free connection_track_table, or there will be
+>>> a memory leak bug.
+>>>
+>>> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+>>> ---
+>>>    net/colo-compare.c | 20 ++++++++++++++++++++
+>>>    1 file changed, 20 insertions(+)
+>>>
+>>> diff --git a/net/colo-compare.c b/net/colo-compare.c
+>>> index a16e2d5..809bad3 100644
+>>> --- a/net/colo-compare.c
+>>> +++ b/net/colo-compare.c
+>>> @@ -676,6 +676,23 @@ static void colo_compare_complete(UserCreatable=20
+>>> *uc, Error **errp)
+>>>        return;
+>>>    }
+>>>
+>>> +static void colo_release_packets(void *opaque, void *user_data)
+>>> +{
+>>> +    CompareState *s =3D user_data;
+>>> +    Connection *conn =3D opaque;
+>>> +    Packet *pkt =3D NULL;
+>>> +
+>>> +    while (!g_queue_is_empty(&conn->primary_list)) {
+>>> +        pkt =3D g_queue_pop_head(&conn->primary_list);
+>>> +        compare_chr_send(&s->chr_out, pkt->data, pkt->size);
+>>
+>> Any reason to send packets here?
+>>
+>
+> Yes, considering the usage case which we shut COLO for
+> the VM to make it as a normal VM without FT.
+> We need to remove all the filter objects. In this case,
+> IMHO, it is necessary to release the unhandled packets.
+>
+>
+> Thanks.
+
+Right, I see. All other patches looks good let's squash this into 2.
+
+Thanks
+
+>
+>> Thanks
+>>
+>>> +        packet_destroy(pkt, NULL);
+>>> +    }
+>>> +    while (!g_queue_is_empty(&conn->secondary_list)) {
+>>> +        pkt =3D g_queue_pop_head(&conn->secondary_list);
+>>> +        packet_destroy(pkt, NULL);
+>>> +    }
+>>> +}
+>>> +
+>>>    static void colo_compare_class_init(ObjectClass *oc, void *data)
+>>>    {
+>>>        UserCreatableClass *ucc =3D USER_CREATABLE_CLASS(oc);
+>>> @@ -707,9 +724,12 @@ static void colo_compare_finalize(Object *obj)
+>>>        g_main_loop_quit(s->compare_loop);
+>>>        qemu_thread_join(&s->thread);
+>>>
+>>> +    /* Release all unhandled packets after compare thead exited */
+>>> +    g_queue_foreach(&s->conn_list, colo_release_packets, s);
+>>>
+>>>        g_queue_free(&s->conn_list);
+>>>
+>>> +    g_hash_table_destroy(s->connection_track_table);
+>>>        g_free(s->pri_indev);
+>>>        g_free(s->sec_indev);
+>>>        g_free(s->outdev);
+>>
+>>
+>> .
+>>
 >
