@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ceJBC-0002Ci-Hc
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:20:51 -0500
+	(envelope-from <a175818323@gmail.com>) id 1ceJGM-0004nr-Eb
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:26:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ceJB7-00065s-JP
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:20:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50594)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ceJB7-00065c-Ci
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:20:45 -0500
-Date: Thu, 16 Feb 2017 10:20:42 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170216102042.GB494@stefanha-x1.localdomain>
-References: <20170215144246.17756-1-stefanha@redhat.com>
-	<faa63719-e836-d15d-8f00-07b2d795da99@redhat.com>
+	(envelope-from <a175818323@gmail.com>) id 1ceJGL-0008LH-Ik
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:26:10 -0500
+Received: from mail-ot0-x22b.google.com ([2607:f8b0:4003:c0f::22b]:34007)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a175818323@gmail.com>)
+	id 1ceJGL-0008K5-Dw
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:26:09 -0500
+Received: by mail-ot0-x22b.google.com with SMTP id t47so8263473ota.1
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 02:26:06 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="U+BazGySraz5kW0T"
-Content-Disposition: inline
-In-Reply-To: <faa63719-e836-d15d-8f00-07b2d795da99@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH qemu-web] Add Andrea's virtual memory
- FOSDEM presentation to blog post
+From: Bob Chen <a175818323@gmail.com>
+Date: Thu, 16 Feb 2017 18:26:05 +0800
+Message-ID: <CAMxP3BT90xgAGFhhMxaSz=3GA3Kd-6oiKNDc0C1bs8Msbnfb9w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: [Qemu-devel] Is it safe to replace files under /user/local/share
+ in-flight?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +27,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>, Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
 
+Hi,
 
---U+BazGySraz5kW0T
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Feb 15, 2017 at 04:00:44PM +0100, Paolo Bonzini wrote:
-> On 15/02/2017 15:42, Stefan Hajnoczi wrote:
-> > From: Stefan Hajnoczi <stefanha@gmail.com>
-> >=20
-> > Andrea's presentation touches on Transparent Huge Pages and post-copy
-> > live migration using userfaultfd for virtualization use cases.
-> >=20
-> > Cc: Thomas Huth <thuth@redhat.com>
-> > Signed-off-by: Stefan Hajnoczi <stefanha@gmail.com>
-> > ---
-> > I don't know jekyll or how the blog is set up.  Perhaps timestamps need
-> > to be updated in the post file.  Please fix up when applying.
->=20
-> Right, I only had to add
->=20
-> last_modified_at: 2017-02-15 15:49:00 +0100
->=20
-> to the header.  So this will be also a nice example of how to update a
-> post after the fact!
-
-Thanks for looking into it.
-
-Weird that the blog engine relies on manual metadata rather than using
-file timestamps.
-
-Stefan
-
---U+BazGySraz5kW0T
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYpXz6AAoJEJykq7OBq3PIrMAIAMeugfT/75MuFF2IHpsImwOc
-lUk+pcE5mKWIixKE1IKhUOffPcak35X4/LXH+7OEhYNVGF5Y7IvYpMcT0moO8ZVw
-ceigPqNkhlDB77YV5KXvkzgrvMGwtW2AsClwHYyRUt8kPYx/+RvcEdpIxh24m9qr
-EsUSG+FRCsGH/LFVuDgxQ2+r3twXTOayxgaPhWotWV/kSU5WLxyCk0LcVcUh6WdI
-EKzcRE+bOj0viFTnvqrV2stdJFjU3VvTqFvG5xP6TUfFQMLHkfzFYt454MCMk/vE
-RMa+gCmniQTlhJR7WWyIM3v6bou9z6QVhISXpw9dE9ByOT8WlP444AdaNukgzHw=
-=dr6w
------END PGP SIGNATURE-----
-
---U+BazGySraz5kW0T--
+I want to upgrade my qemu, is it safe to replace these ROM and keymap files
+in-flight while qemu processes are still running?
