@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57673)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ceLsZ-0001kz-8x
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:13:48 -0500
+	(envelope-from <famz@redhat.com>) id 1ceLuL-0003Fh-9U
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:15:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ceLsW-0000Xq-FT
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:13:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34818)
+	(envelope-from <famz@redhat.com>) id 1ceLuH-0001cZ-FJ
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:15:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34452)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ceLsW-0000Wv-7B
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:13:44 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 742868553C
-	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 13:13:44 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 16 Feb 2017 14:13:37 +0100
-Message-Id: <1487250819-23764-2-git-send-email-kraxel@redhat.com>
-In-Reply-To: <1487250819-23764-1-git-send-email-kraxel@redhat.com>
-References: <1487250819-23764-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/3] usb-ccid: better bulk_out error handling
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1ceLuH-0001cB-6G
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:15:33 -0500
+Date: Thu, 16 Feb 2017 21:15:29 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170216131529.GA8817@lemon.lan>
+References: <20170216123456.28621-1-alex.bennee@linaro.org>
+	<20170216123456.28621-2-alex.bennee@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20170216123456.28621-2-alex.bennee@linaro.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 1/4] tests/docker: add basic user
+ mapping support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,159 +29,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-Add err goto label where we can jump to from all error conditions.
-STALL request on all errors.  Reset position on all errors.
+On Thu, 02/16 12:34, Alex Benn=E9e wrote:
+> Currently all docker builds are done by exporting a tarball to the
+> docker container and running the build as the containers root user.
+> Other use cases are possible however and it is possible to map a part
+> of users file-system to the container. This is useful for example for
+> doing cross-builds of arbitrary source trees. For this to work
+> smoothly the container needs to have a user created that maps cleanly
+> to the host system.
+>=20
+> This adds a -u option to the docker script so that:
+>=20
+>   DEB_ARCH=3Darmhf DEB_TYPE=3Dstable ./tests/docker/docker.py build \
+>     -u --include-executable=3Darm-linux-user/qemu-arm \
+>     debian:armhf ./tests/docker/dockerfiles/debian-bootstrap.docker
+>=20
+> Will build a container that can then be run like:
+>=20
+>   docker run --rm -it -v /home/alex/lsrc/qemu/risu.git/:/src \
+>     --user=3Dalex:alex -w /src/ debian:armhf \
+>     sh -c "make clean && ./configure -s && make"
+>=20
+> All docker containers built will add the current user unless
+> explicitly disabled by specifying NOUSER when invoking the Makefile:
+>=20
+>   make docker-image-debian-armhf-cross NOUSER=3D1
+>=20
+> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> Reviewed-by: Fam Zheng <famz@redhat.com>
+>=20
+> ---
+> v2
+>   - write the useradd directly
+>   - change long option to --add-current-user
+> v3
+>   - images -> image's
+>   - add r-b
+>   - add USER to Makefile
+> v4
+>   - s/USER/NOUSER/ and default to on
+>   - fix the add-user code to skip if user already setup (for chained im=
+ages)
+> ---
+>  tests/docker/Makefile.include |  2 ++
+>  tests/docker/docker.py        | 16 ++++++++++++++--
+>  2 files changed, 16 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.incl=
+ude
+> index 3f15d5aea8..4778b27ca8 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -50,6 +50,7 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
+>  	$(call quiet-command,\
+>  		$(SRC_PATH)/tests/docker/docker.py build qemu:$* $< \
+>  		$(if $V,,--quiet) $(if $(NOCACHE),--no-cache) \
+> +		$(if $(NOUSER),,--add-current-user) \
+>  		$(if $(EXECUTABLE),--include-executable=3D$(EXECUTABLE)),\
+>  		"BUILD","$*")
+> =20
+> @@ -99,6 +100,7 @@ docker:
+>  	@echo '                         (default is 1)'
+>  	@echo '    DEBUG=3D1              Stop and drop to shell in the creat=
+ed container'
+>  	@echo '                         before running the command.'
+> +	@echo '    NOUSER=3D1		Disable adding current user to containers pass=
+wd.'
 
-Normal request processing is not in a else branch any more, so this code
-is reintended, there are no code changes in that part of the code
-though.
+Please expand tabs in the middle into whitespaces.
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/usb/dev-smartcard-reader.c | 116 ++++++++++++++++++++++--------------------
- 1 file changed, 61 insertions(+), 55 deletions(-)
+>  	@echo '    NOCACHE=3D1            Ignore cache when build images.'
+>  	@echo '    EXECUTABLE=3D<path>    Include executable in image.'
+> =20
+> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+> index 37d83199e7..d277a2268f 100755
+> --- a/tests/docker/docker.py
+> +++ b/tests/docker/docker.py
+> @@ -25,6 +25,7 @@ import signal
+>  from tarfile import TarFile, TarInfo
+>  from StringIO import StringIO
+>  from shutil import copy, rmtree
+> +from pwd import getpwuid
+> =20
+> =20
+>  DEVNULL =3D open(os.devnull, 'wb')
+> @@ -149,13 +150,21 @@ class Docker(object):
+>          labels =3D json.loads(resp)[0]["Config"].get("Labels", {})
+>          return labels.get("com.qemu.dockerfile-checksum", "")
+> =20
+> -    def build_image(self, tag, docker_dir, dockerfile, quiet=3DTrue, a=
+rgv=3DNone):
+> +    def build_image(self, tag, docker_dir, dockerfile,
+> +                    quiet=3DTrue, user=3DFalse, argv=3DNone):
+>          if argv =3D=3D None:
+>              argv =3D []
+> =20
+>          tmp_df =3D tempfile.NamedTemporaryFile(dir=3Ddocker_dir, suffi=
+x=3D".docker")
+>          tmp_df.write(dockerfile)
+> =20
+> +        if user:
+> +            uid =3D os.getuid()
+> +            uname =3D getpwuid(uid).pw_name
+> +            tmp_df.write("\n")
+> +            tmp_df.write("RUN id %s || useradd -u %d -U %s" %
+> +                         (uname, uid, uname))
 
-diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reader.c
-index 1325ea1..badcfcb 100644
---- a/hw/usb/dev-smartcard-reader.c
-+++ b/hw/usb/dev-smartcard-reader.c
-@@ -1001,8 +1001,7 @@ static void ccid_handle_bulk_out(USBCCIDState *s, USBPacket *p)
-     CCID_Header *ccid_header;
- 
-     if (p->iov.size + s->bulk_out_pos > BULK_OUT_DATA_SIZE) {
--        p->status = USB_RET_STALL;
--        return;
-+        goto err;
-     }
-     ccid_header = (CCID_Header *)s->bulk_out_data;
-     usb_packet_copy(p, s->bulk_out_data + s->bulk_out_pos, p->iov.size);
-@@ -1017,64 +1016,71 @@ static void ccid_handle_bulk_out(USBCCIDState *s, USBPacket *p)
-         DPRINTF(s, 1,
-                 "%s: bad USB_TOKEN_OUT length, should be at least 10 bytes\n",
-                 __func__);
--    } else {
--        DPRINTF(s, D_MORE_INFO, "%s %x %s\n", __func__,
--                ccid_header->bMessageType,
--                ccid_message_type_to_str(ccid_header->bMessageType));
--        switch (ccid_header->bMessageType) {
--        case CCID_MESSAGE_TYPE_PC_to_RDR_GetSlotStatus:
--            ccid_write_slot_status(s, ccid_header);
--            break;
--        case CCID_MESSAGE_TYPE_PC_to_RDR_IccPowerOn:
--            DPRINTF(s, 1, "%s: PowerOn: %d\n", __func__,
-+        goto err;
-+    }
-+
-+    DPRINTF(s, D_MORE_INFO, "%s %x %s\n", __func__,
-+            ccid_header->bMessageType,
-+            ccid_message_type_to_str(ccid_header->bMessageType));
-+    switch (ccid_header->bMessageType) {
-+    case CCID_MESSAGE_TYPE_PC_to_RDR_GetSlotStatus:
-+        ccid_write_slot_status(s, ccid_header);
-+        break;
-+    case CCID_MESSAGE_TYPE_PC_to_RDR_IccPowerOn:
-+        DPRINTF(s, 1, "%s: PowerOn: %d\n", __func__,
-                 ((CCID_IccPowerOn *)(ccid_header))->bPowerSelect);
--            s->powered = true;
--            if (!ccid_card_inserted(s)) {
--                ccid_report_error_failed(s, ERROR_ICC_MUTE);
--            }
--            /* atr is written regardless of error. */
--            ccid_write_data_block_atr(s, ccid_header);
--            break;
--        case CCID_MESSAGE_TYPE_PC_to_RDR_IccPowerOff:
--            ccid_reset_error_status(s);
--            s->powered = false;
--            ccid_write_slot_status(s, ccid_header);
--            break;
--        case CCID_MESSAGE_TYPE_PC_to_RDR_XfrBlock:
--            ccid_on_apdu_from_guest(s, (CCID_XferBlock *)s->bulk_out_data);
--            break;
--        case CCID_MESSAGE_TYPE_PC_to_RDR_SetParameters:
--            ccid_reset_error_status(s);
--            ccid_set_parameters(s, ccid_header);
--            ccid_write_parameters(s, ccid_header);
--            break;
--        case CCID_MESSAGE_TYPE_PC_to_RDR_ResetParameters:
--            ccid_reset_error_status(s);
--            ccid_reset_parameters(s);
--            ccid_write_parameters(s, ccid_header);
--            break;
--        case CCID_MESSAGE_TYPE_PC_to_RDR_GetParameters:
--            ccid_reset_error_status(s);
--            ccid_write_parameters(s, ccid_header);
--            break;
--        case CCID_MESSAGE_TYPE_PC_to_RDR_Mechanical:
--            ccid_report_error_failed(s, 0);
--            ccid_write_slot_status(s, ccid_header);
--            break;
--        default:
--            DPRINTF(s, 1,
-+        s->powered = true;
-+        if (!ccid_card_inserted(s)) {
-+            ccid_report_error_failed(s, ERROR_ICC_MUTE);
-+        }
-+        /* atr is written regardless of error. */
-+        ccid_write_data_block_atr(s, ccid_header);
-+        break;
-+    case CCID_MESSAGE_TYPE_PC_to_RDR_IccPowerOff:
-+        ccid_reset_error_status(s);
-+        s->powered = false;
-+        ccid_write_slot_status(s, ccid_header);
-+        break;
-+    case CCID_MESSAGE_TYPE_PC_to_RDR_XfrBlock:
-+        ccid_on_apdu_from_guest(s, (CCID_XferBlock *)s->bulk_out_data);
-+        break;
-+    case CCID_MESSAGE_TYPE_PC_to_RDR_SetParameters:
-+        ccid_reset_error_status(s);
-+        ccid_set_parameters(s, ccid_header);
-+        ccid_write_parameters(s, ccid_header);
-+        break;
-+    case CCID_MESSAGE_TYPE_PC_to_RDR_ResetParameters:
-+        ccid_reset_error_status(s);
-+        ccid_reset_parameters(s);
-+        ccid_write_parameters(s, ccid_header);
-+        break;
-+    case CCID_MESSAGE_TYPE_PC_to_RDR_GetParameters:
-+        ccid_reset_error_status(s);
-+        ccid_write_parameters(s, ccid_header);
-+        break;
-+    case CCID_MESSAGE_TYPE_PC_to_RDR_Mechanical:
-+        ccid_report_error_failed(s, 0);
-+        ccid_write_slot_status(s, ccid_header);
-+        break;
-+    default:
-+        DPRINTF(s, 1,
-                 "handle_data: ERROR: unhandled message type %Xh\n",
-                 ccid_header->bMessageType);
--            /*
--             * The caller is expecting the device to respond, tell it we
--             * don't support the operation.
--             */
--            ccid_report_error_failed(s, ERROR_CMD_NOT_SUPPORTED);
--            ccid_write_slot_status(s, ccid_header);
--            break;
--        }
-+        /*
-+         * The caller is expecting the device to respond, tell it we
-+         * don't support the operation.
-+         */
-+        ccid_report_error_failed(s, ERROR_CMD_NOT_SUPPORTED);
-+        ccid_write_slot_status(s, ccid_header);
-+        break;
-     }
-     s->bulk_out_pos = 0;
-+    return;
-+
-+err:
-+    p->status = USB_RET_STALL;
-+    s->bulk_out_pos = 0;
-+    return;
- }
- 
- static void ccid_bulk_in_copy_to_guest(USBCCIDState *s, USBPacket *p)
--- 
-1.8.3.1
+Please "2>/dev/null" the id command.
+
+> +
+>          tmp_df.write("\n")
+>          tmp_df.write("LABEL com.qemu.dockerfile-checksum=3D%s" %
+>                       _text_checksum(dockerfile))
+> @@ -225,6 +234,9 @@ class BuildCommand(SubCommand):
+>                              help=3D"""Specify a binary that will be co=
+pied to the
+>                              container together with all its dependent
+>                              libraries""")
+> +        parser.add_argument("--add-current-user", "-u", dest=3D"user",
+> +                            action=3D"store_true",
+> +                            help=3D"Add the current user to image's pa=
+sswd")
+>          parser.add_argument("tag",
+>                              help=3D"Image Tag")
+>          parser.add_argument("dockerfile",
+> @@ -261,7 +273,7 @@ class BuildCommand(SubCommand):
+>                                         docker_dir)
+> =20
+>              dkr.build_image(tag, docker_dir, dockerfile,
+> -                            quiet=3Dargs.quiet, argv=3Dargv)
+> +                            quiet=3Dargs.quiet, user=3Dargs.user, argv=
+=3Dargv)
+> =20
+>              rmtree(docker_dir)
+> =20
+> --=20
+> 2.11.0
+>=20
+
+Fam
