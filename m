@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ceMxJ-0002E6-Rc
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:22:46 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ceMxQ-0002WH-0m
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:22:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ceMxI-0002Jy-Tn
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:22:45 -0500
-Received: from mout.kundenserver.de ([212.227.17.13]:50778)
+	(envelope-from <laurent@vivier.eu>) id 1ceMxM-0002Kh-Ow
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:22:51 -0500
+Received: from mout.kundenserver.de ([217.72.192.74]:61189)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ceMxI-0002J8-Jl
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:22:44 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ceMxM-0002KS-ES
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:22:48 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu, 16 Feb 2017 15:22:20 +0100
-Message-Id: <20170216142227.27448-8-laurent@vivier.eu>
+Date: Thu, 16 Feb 2017 15:22:22 +0100
+Message-Id: <20170216142227.27448-10-laurent@vivier.eu>
 In-Reply-To: <20170216142227.27448-1-laurent@vivier.eu>
 References: <20170216142227.27448-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 07/14] linux-user: manage two new IFLA host
- message types
+Subject: [Qemu-devel] [PULL 09/14] linux-user: Update m68k syscall
+ definitions to match Linux 4.6
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,35 +25,28 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Laurent Vivier <laurent@vivier.eu>
 
-Add QEMU_IFLA_GSO_MAX_SEGS and QEMU_IFLA_GSO_MAX_SIZE
-in host_to_target_data_link_rtattr().
+From: Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 
-These two messages are sent by the host kernel when
-we use "sudo".
-
-Found with qemu-m68k and Debian etch-m68k (sudo 1.6.8p12-4) and
-host kernel 4.7.6-200.fc24.x86_64
-
+Signed-off-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20170116224915.19430-2-glaubitz@physik.fu-berlin.de>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <1477530049-15676-1-git-send-email-laurent@vivier.eu>
 ---
- linux-user/syscall.c | 2 ++
- 1 file changed, 2 insertions(+)
+ linux-user/m68k/syscall_nr.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index c1d6f76..d982a27 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -2326,6 +2326,8 @@ static abi_long host_to_target_data_link_rtattr(struct rtattr *rtattr)
-     case QEMU_IFLA_GROUP:
-     case QEMU_IFLA_MASTER:
-     case QEMU_IFLA_NUM_VF:
-+    case QEMU_IFLA_GSO_MAX_SEGS:
-+    case QEMU_IFLA_GSO_MAX_SIZE:
-         u32 = RTA_DATA(rtattr);
-         *u32 = tswap32(*u32);
-         break;
+diff --git a/linux-user/m68k/syscall_nr.h b/linux-user/m68k/syscall_nr.h
+index 4b50fb2..d239551 100644
+--- a/linux-user/m68k/syscall_nr.h
++++ b/linux-user/m68k/syscall_nr.h
+@@ -376,3 +376,6 @@
+ #define TARGET_NR_userfaultfd           373
+ #define TARGET_NR_membarrier            374
+ #define TARGET_NR_mlock2                375
++#define TARGET_NR_copy_file_range       376
++#define TARGET_NR_preadv2               377
++#define TARGET_NR_pwritev2              378
 -- 
 2.9.3
