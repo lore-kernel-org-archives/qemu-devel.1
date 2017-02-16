@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1ceFGk-0002e9-Ld
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 01:10:20 -0500
+	(envelope-from <ben@skyportsystems.com>) id 1ceFHV-00032c-VY
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 01:11:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1ceFGj-0005lx-EL
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 01:10:18 -0500
-Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:36608)
+	(envelope-from <ben@skyportsystems.com>) id 1ceFHU-00063W-T7
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 01:11:05 -0500
+Received: from mail-oi0-x22e.google.com ([2607:f8b0:4003:c06::22e]:34818)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
-	id 1ceFGj-0005lj-6s
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 01:10:17 -0500
-Received: by mail-oi0-x233.google.com with SMTP id u143so3844460oif.3
-	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 22:10:17 -0800 (PST)
+	id 1ceFHU-000635-MT
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 01:11:04 -0500
+Received: by mail-oi0-x22e.google.com with SMTP id j15so3881466oih.2
+	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 22:11:04 -0800 (PST)
 From: Ben Warren <ben@skyportsystems.com>
-Message-Id: <088D760B-A48E-4B79-9177-C63753C306D6@skyportsystems.com>
+Message-Id: <F8CA5B90-142E-4CE9-B47C-32A1954C7075@skyportsystems.com>
 Content-Type: multipart/signed;
-	boundary="Apple-Mail=_ACAC52A9-F437-49E6-9E08-A5A351C31376";
+	boundary="Apple-Mail=_AE827837-EFA4-4987-9B87-50E1C19F22E8";
 	protocol="application/pkcs7-signature"; micalg=sha1
 Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Date: Wed, 15 Feb 2017 22:10:14 -0800
-In-Reply-To: <e7e9cf57-a5b4-4f2b-36e5-3e08dee70d68@redhat.com>
+Date: Wed, 15 Feb 2017 22:11:02 -0800
+In-Reply-To: <a155508d-4b44-6ca3-02cb-d36bb9b8f100@redhat.com>
 References: <cover.1487139038.git.ben@skyportsystems.com>
-	<678c203f-3768-7e65-6e48-6729473b6ffa@redhat.com>
-	<20170215220837-mutt-send-email-mst@kernel.org>
-	<e7e9cf57-a5b4-4f2b-36e5-3e08dee70d68@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 0/7] Add support for VM Generation ID
+	<60b6ece3ce0a24aec79c1061627fa2e6ab058fc2.1487139038.git.ben@skyportsystems.com>
+	<a155508d-4b44-6ca3-02cb-d36bb9b8f100@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 3/7] ACPI: Add vmgenid blob storage to
+ the build tables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,119 +34,89 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Laszlo Ersek <lersek@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, imammedo@redhat.com
+Cc: qemu-devel@nongnu.org, mst@redhat.com, imammedo@redhat.com
 
 
---Apple-Mail=_ACAC52A9-F437-49E6-9E08-A5A351C31376
+--Apple-Mail=_AE827837-EFA4-4987-9B87-50E1C19F22E8
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain;
-	charset=utf-8
+	charset=us-ascii
 
 
-> On Feb 15, 2017, at 12:52 PM, Laszlo Ersek <lersek@redhat.com> wrote:
+> On Feb 15, 2017, at 6:30 AM, Laszlo Ersek <lersek@redhat.com> wrote:
 >=20
-> On 02/15/17 21:09, Michael S. Tsirkin wrote:
->> On Wed, Feb 15, 2017 at 08:47:48PM +0100, Laszlo Ersek wrote:
->=20
-> [snip]
->=20
->>> For patches #1, #3, #4 and #5:
->>>=20
->>> Tested-by: Laszlo Ersek <lersek@redhat.com>
->>>=20
->>> I'll soon post the OVMF patches.
->>>=20
->>> Thanks!
->>> Laszlo
+> On 02/15/17 07:15, ben@skyportsystems.com wrote:
+>> From: Ben Warren <ben@skyportsystems.com>
 >>=20
+>> This allows them to be centrally initialized and destroyed
 >>=20
->> How do you feel about Igor's request to change WRITE_POINTER to add
->> offset in there, so guest can pass in the address of GUID and
->> not start of table? Would that be a lot of work to add?
+>> The "AcpiBuildTables.vmgenid" array will be used to construct the
+>> "etc/vmgenid" fw_cfg blob.
 >=20
-> I think it's doable in practice: simply add a constant from the =
-command
-> itself, for passing the value back to QEMU, and also for saving the
-> fw_cfg write commend for S3 resume time.
+> Trivial wart: the blob is now called "etc/vmgenid_guid".
 >=20
-> But, I disagree with it from a design POV.
+> If you send a v7, feel free to fix it up. Not critical.
 >=20
-> Igor's point is:
+Fixed in v7
+> My R-b stands.
 >=20
->> Math complicates QEMU code though and not only QMEMU but AML code as
->> well.
->=20
-> As I understand it, the goal is to push the addition to the firmware
-> (which is "one place"), rather than having to implement it twice in
-> QEMU, i.e., in two places ((a) native QEMU logic, (b) AML generator).
->=20
-> Here's my counter-argument:
->=20
-> (a) As I mentioned earlier, assume a complex communication structure
-> between the guest OS and QEMU. Currently our shared structure consists
-> of a single field (the GUID), but next time it might contain several =
-fields.
->=20
-> For such a multi-field shared structure, QEMU will have to do manual
-> offsetting into the guest RAM anyway, for accessing fields F1, F2, and
-> F3. We will not create three separate WRITE_POINTER commands and let =
-the
-> firmware calculate and return the absolute GPAs of the fields F1, F2 =
-and
-> F3. Instead, there will be one WRITE_POINTER command, and QEMU will do
-> the offsetting manually, minimally for fields F2 and F3.
->=20
-> "src_offset" looks tempting now only because we have a shared =
-structure
-> with only one field, the GUID at offset 40 decimal.
->=20
-> (b) Regarding the runtime addition in the AML code:
->=20
-> As discussed before, the main reason *now*, for not pointing VGIA (and
-> other named integer objects) with ADD_POINTER commands directly to
-> "meaningful" fields, is that OVMF probes the targets of ADD_POINTER
-> commands for patterns that look like ACPI table headers. And, for the
-> time being, we want to suppress any mis-recognitions by prepending =
-some
-> padding.
->=20
-> Igor was right to dislike this, and we agreed that *down the road* we
-> should add allocation flags, or further allocation commands, to =
-supplant
-> this kind of heuristics in OVMF. But:
->=20
-> - we don't have time to do it now, plus
->=20
-> - please observe that the runtime addition in AML relates to the
->  ADD_POINTER and the ALLOCATE commands. It does not relate to
->  WRITE_POINTER at all.
->=20
->  Whatever we change on WRITE_POINTER will do nothing for suppressing
->  OVMF's table header probing -- because that is tied to ADD_POINTER
->  --, therefore WRITE_POINTER tweaks cannot eliminate the "need to add"
->  in AML.
->=20
->=20
-> In summary, I think the proposed WRITE_POINTER modification is
-> implementable, but I think it will not pay off, because:
->=20
-> (a) for QEMU logic, it will not prove useful as soon as we have a
-> multi-field shared structure (QEMU will have to add field offsets =
-anyway),
->=20
-> (b) and for eliminating the AML addition (which is a consequence of =
-the
-> current ADD_POINTER handling in OVMF), it does nothing.
->=20
-OK Laszlo, in v7 (imminent)  I went ahead and implemented this =
-src_offset.  If you are truly dead-set against it, it=E2=80=99s not very =
-hard to remove.  To me it seems pretty harmless.
-
-> Thanks
+> Thanks!
 > Laszlo
+>=20
+>> Its contents will be linked into fw_cfg after being built on the
+>> pc_machine_done() -> acpi_setup() -> acpi_build() call path, and =
+dropped
+>> without use on the subsequent, guest triggered, acpi_build_update() =
+->
+>> acpi_build() call path.
+>>=20
+>> Signed-off-by: Ben Warren <ben@skyportsystems.com>
+>> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+>> ---
+>> hw/acpi/aml-build.c         | 2 ++
+>> include/hw/acpi/aml-build.h | 1 +
+>> 2 files changed, 3 insertions(+)
+>>=20
+>> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+>> index b2a1e40..c6f2032 100644
+>> --- a/hw/acpi/aml-build.c
+>> +++ b/hw/acpi/aml-build.c
+>> @@ -1559,6 +1559,7 @@ void acpi_build_tables_init(AcpiBuildTables =
+*tables)
+>>     tables->rsdp =3D g_array_new(false, true /* clear */, 1);
+>>     tables->table_data =3D g_array_new(false, true /* clear */, 1);
+>>     tables->tcpalog =3D g_array_new(false, true /* clear */, 1);
+>> +    tables->vmgenid =3D g_array_new(false, true /* clear */, 1);
+>>     tables->linker =3D bios_linker_loader_init();
+>> }
+>>=20
+>> @@ -1568,6 +1569,7 @@ void acpi_build_tables_cleanup(AcpiBuildTables =
+*tables, bool mfre)
+>>     g_array_free(tables->rsdp, true);
+>>     g_array_free(tables->table_data, true);
+>>     g_array_free(tables->tcpalog, mfre);
+>> +    g_array_free(tables->vmgenid, mfre);
+>> }
+>>=20
+>> /* Build rsdt table */
+>> diff --git a/include/hw/acpi/aml-build.h =
+b/include/hw/acpi/aml-build.h
+>> index 559326c..00c21f1 100644
+>> --- a/include/hw/acpi/aml-build.h
+>> +++ b/include/hw/acpi/aml-build.h
+>> @@ -210,6 +210,7 @@ struct AcpiBuildTables {
+>>     GArray *table_data;
+>>     GArray *rsdp;
+>>     GArray *tcpalog;
+>> +    GArray *vmgenid;
+>>     BIOSLinker *linker;
+>> } AcpiBuildTables;
+>>=20
+>>=20
+>=20
 
 
---Apple-Mail=_ACAC52A9-F437-49E6-9E08-A5A351C31376
+--Apple-Mail=_AE827837-EFA4-4987-9B87-50E1C19F22E8
 Content-Disposition: attachment;
 	filename=smime.p7s
 Content-Type: application/pkcs7-signature;
@@ -203,7 +173,7 @@ gZsxCzAJBgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1Nh
 bGZvcmQxGjAYBgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1
 NiBDbGllbnQgQXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z
 8eMx7JswCQYFKw4DAhoFAKCCAekwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0B
-CQUxDxcNMTcwMjE2MDYxMDE0WjAjBgkqhkiG9w0BCQQxFgQU3okzwauaP9SbPrEPCvnzfllAQesw
+CQUxDxcNMTcwMjE2MDYxMTAzWjAjBgkqhkiG9w0BCQQxFgQUjL6quBqakmJtcoo0Tt2ukPVP/eAw
 gcIGCSsGAQQBgjcQBDGBtDCBsTCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFu
 Y2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxQTA/
 BgNVBAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVt
@@ -211,9 +181,9 @@ YWlsIENBAhEAljnjFZYn8wPj7xnx4zHsmzCBxAYLKoZIhvcNAQkQAgsxgbSggbEwgZsxCzAJBgNV
 BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
 BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1NiBDbGllbnQg
 QXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z8eMx7JswDQYJ
-KoZIhvcNAQEBBQAEggEATmLH+KmUczp+5cTmUm1NFGxiUPLoOSMm34pW4S1p1gFrXNlknSnqHcP3
-9Ei2c2HcwLo9sOGvCy8O1Q2YGmJb3GjGUiqMWYgh5SYueuCYjvlg36AFGqn86MyXU0YCz24syUzZ
-oyQtZMOw7z5cWOxEdPKi6pZUAaGIU6n7BBhMDT4Igy64rdWnc3Nuh2KlupVE4wIfbywOkJM+c472
-Wmkz498u/k7rwVips5CnQFuTd5FdHSKwD/WlrXuxtbOLEzSiaakaa9ZHhMXXhZeSqYh8JwoValsS
-RJ0SIHb0augxnIxrCnH25khA2nb9Ux3iqauMHsiSfuZAwEmwm6c5Fk8JIAAAAAAAAA==
---Apple-Mail=_ACAC52A9-F437-49E6-9E08-A5A351C31376--
+KoZIhvcNAQEBBQAEggEAFLBD5kSffPIdJ3L/nIuSRIuRQCyOSLp6JnKlKxgP20e+o2mUtaAtvRxN
+VRVTosVzkdpMwr+Ppdl358ESHtnXuTqizefwC4Fvk+TTph8qHncpI2tcaY0b582B9d+le8gcO9he
+F/Fo68JEWmF6Nv5fumup4ckyadlpiynQVfz5xA7DVMkTeQbdw3/XAZ47HBoBAN2IvONbiZIbbmy3
+XSXw9aChVS/MBFyMb1rrRUnfexL4P/KPz4dPgnTuzEKW+V+06MLyvxpb0NJ8PtmCo/ae6XFFHqAA
+MG/aST6XhZI01eZ01afcUb1yHEL1R18sKMf9OAX2OpW0SdHp4z1pxZxQVgAAAAAAAA==
+--Apple-Mail=_AE827837-EFA4-4987-9B87-50E1C19F22E8--
