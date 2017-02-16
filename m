@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ceP2c-0008IR-1k
+	(envelope-from <pm215@archaic.org.uk>) id 1ceP2c-0008Jm-F9
 	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:36:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ceP2a-0007f6-V1
+	(envelope-from <pm215@archaic.org.uk>) id 1ceP2b-0007fy-Jh
 	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:36:22 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Feb 2017 16:35:58 +0000
-Message-Id: <1487262963-11519-9-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 16 Feb 2017 16:35:57 +0000
+Message-Id: <1487262963-11519-8-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1487262963-11519-1-git-send-email-peter.maydell@linaro.org>
 References: <1487262963-11519-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 08/13] armv7m: Simpler and faster exception
- start
+Subject: [Qemu-devel] [PATCH v2 07/13] armv7m: Remove unused
+ armv7m_nvic_acknowledge_irq() return value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,78 +26,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-From: Michael Davidsaver <mdavidsaver@gmail.com>
+Having armv7m_nvic_acknowledge_irq() return the new value of
+env->v7m.exception and its one caller assign the return value
+back to env->v7m.exception is pointless. Just make the return
+type void instead.
 
-All the places in armv7m_cpu_do_interrupt() which pend an
-exception in the NVIC are doing so for synchronous
-exceptions. We know that we will always take some
-exception in this case, so we can just acknowledge it
-immediately, rather than returning and then immediately
-being called again because the NVIC has raised its outbound
-IRQ line.
-
-Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
-[PMM: tweaked commit message; added DEBUG to the set of
-exceptions we handle immediately, since it is synchronous
-when it results from the BKPT instruction]
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- target/arm/helper.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+ target/arm/cpu.h      | 2 +-
+ hw/intc/armv7m_nvic.c | 4 +---
+ target/arm/helper.c   | 2 +-
+ 3 files changed, 3 insertions(+), 5 deletions(-)
 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 53299fa..ab46c0c 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -1351,7 +1351,7 @@ static inline bool armv7m_nvic_can_take_pending_exception(void *opaque)
+ }
+ #endif
+ void armv7m_nvic_set_pending(void *opaque, int irq);
+-int armv7m_nvic_acknowledge_irq(void *opaque);
++void armv7m_nvic_acknowledge_irq(void *opaque);
+ void armv7m_nvic_complete_irq(void *opaque, int irq);
+ 
+ /* Interface for defining coprocessor registers.
+diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+index d9b9a43..010bf92 100644
+--- a/hw/intc/armv7m_nvic.c
++++ b/hw/intc/armv7m_nvic.c
+@@ -412,7 +412,7 @@ void armv7m_nvic_set_pending(void *opaque, int irq)
+ }
+ 
+ /* Make pending IRQ active.  */
+-int armv7m_nvic_acknowledge_irq(void *opaque)
++void armv7m_nvic_acknowledge_irq(void *opaque)
+ {
+     NVICState *s = (NVICState *)opaque;
+     CPUARMState *env = &s->cpu->env;
+@@ -439,8 +439,6 @@ int armv7m_nvic_acknowledge_irq(void *opaque)
+     env->v7m.exception = s->vectpending;
+ 
+     nvic_irq_update(s);
+-
+-    return env->v7m.exception;
+ }
+ 
+ void armv7m_nvic_complete_irq(void *opaque, int irq)
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 050d8df..1844852 100644
+index bac1718..050d8df 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -6109,22 +6109,22 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
-     case EXCP_UDEF:
-         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE);
-         env->v7m.cfsr |= R_V7M_CFSR_UNDEFINSTR_MASK;
--        return;
-+        break;
-     case EXCP_NOCP:
-         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE);
-         env->v7m.cfsr |= R_V7M_CFSR_NOCP_MASK;
--        return;
-+        break;
-     case EXCP_SWI:
-         /* The PC already points to the next instruction.  */
-         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_SVC);
--        return;
-+        break;
-     case EXCP_PREFETCH_ABORT:
-     case EXCP_DATA_ABORT:
-         /* TODO: if we implemented the MPU registers, this is where we
-          * should set the MMFAR, etc from exception.fsr and exception.vaddress.
-          */
-         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_MEM);
--        return;
-+        break;
-     case EXCP_BKPT:
-         if (semihosting_enabled()) {
-             int nr;
-@@ -6139,9 +6139,8 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
-             }
-         }
+@@ -6141,7 +6141,7 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
          armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_DEBUG);
--        return;
-+        break;
+         return;
      case EXCP_IRQ:
--        armv7m_nvic_acknowledge_irq(env->nvic);
+-        env->v7m.exception = armv7m_nvic_acknowledge_irq(env->nvic);
++        armv7m_nvic_acknowledge_irq(env->nvic);
          break;
      case EXCP_EXCEPTION_EXIT:
          do_v7m_exception_exit(env);
-@@ -6151,6 +6150,10 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
-         return; /* Never happens.  Keep compiler happy.  */
-     }
- 
-+    armv7m_nvic_acknowledge_irq(env->nvic);
-+
-+    qemu_log_mask(CPU_LOG_INT, "... as %d\n", env->v7m.exception);
-+
-     /* Align stack pointer if the guest wants that */
-     if ((env->regs[13] & 4) && (env->v7m.ccr & R_V7M_CCR_STKALIGN_MASK)) {
-         env->regs[13] -= 4;
 -- 
 2.7.4
