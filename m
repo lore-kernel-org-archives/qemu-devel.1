@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ceMxH-0002BK-IR
+	(envelope-from <laurent@vivier.eu>) id 1ceMxH-0002BJ-IS
 	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:22:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ceMxE-0002Hz-AP
+	(envelope-from <laurent@vivier.eu>) id 1ceMxG-0002Ia-9I
 	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:22:43 -0500
-Received: from mout.kundenserver.de ([212.227.17.13]:50136)
+Received: from mout.kundenserver.de ([212.227.17.13]:60047)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ceMxD-0002HE-Ub
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:22:40 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ceMxF-0002I9-TF
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:22:42 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu, 16 Feb 2017 15:22:13 +0100
-Message-Id: <20170216142227.27448-1-laurent@vivier.eu>
+Date: Thu, 16 Feb 2017 15:22:26 +0100
+Message-Id: <20170216142227.27448-14-laurent@vivier.eu>
+In-Reply-To: <20170216142227.27448-1-laurent@vivier.eu>
+References: <20170216142227.27448-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 00/14] Linux user for upstream patches
+Subject: [Qemu-devel] [PULL 13/14] linux-user: Use correct types in
+ load_symbols()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,96 +28,76 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <laurent@vivier.eu>
 
-The following changes since commit 5dae13cd71f0755a1395b5a4cde635b8a6ee3f58:
+From: Peter Maydell <peter.maydell@linaro.org>
 
-  Merge remote-tracking branch 'remotes/rth/tags/pull-or-20170214' into staging (2017-02-14 09:55:48 +0000)
+Coverity doesn't like the code in load_symbols() which assumes
+it can use 'int' for a variable that might hold an offset into
+the guest ELF file, because in a 64-bit guest that could
+overflow. Guest binaries with 2GB sections aren't very likely
+and this isn't a security issue because we fully trust the
+guest linux-user binary anyway, but we might as well use the
+right types, which will placate Coverity. Use uint64_t to
+hold section sizes, and bail out if the symbol table is too
+large rather than just overflowing an int.
 
-are available in the git repository at:
+(Coverity issue CID1005776)
 
-  git://github.com/vivier/qemu.git tags/linux-user-for-upstream-pull-request
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <1486249533-5260-1-git-send-email-peter.maydell@linaro.org>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/elfload.c | 22 +++++++++++++++-------
+ 1 file changed, 15 insertions(+), 7 deletions(-)
 
-for you to fetch changes up to b4e74f188b2a50a25bc8d43894c36ea98b1d51a8:
-
-  linux-user: Add FICLONE and FICLONERANGE ioctls (2017-02-14 18:31:50 +0100)
-
-----------------------------------------------------------------
-To help Riku in his maintainer role of linux-user, I've proposed
-to help him to manage this pull request.
-
-This series is based on his branch linux-user-for-upstream at:
-
-    https://git.linaro.org/people/riku.voipio/qemu.git
-
-I have added some reviewed patches from the mailing list since
-the last pull request.
-
-I have tested this series by creating some containers:
-
-ppc64   fedora-21
-ppc     debian-8
-aarch64 centos-7.2
-
-All these containers can boot and run as expected
-(create an user, log in as this user, install packages with yum/dnf/apt-get
-using sudo)
-
-I have tested the LTP-20170116 in the ppc container (big-endian 32bit)
-on an x86_64 host (little-endian 64bit). The result is: 
-
-Total Tests: 1111
-Total Skipped Tests: 174
-Total Failures: 68
-Kernel Version: 4.9.5-200.fc25.x86_64
-Machine Architecture: ppc
-Hostname: debian-8-ppc
-----------------------------------------------------------------
-
-Adrian Glaubitz (2):
-  linux-user: Update sh4 syscall definitions to match Linux 4.8
-  linux-user: Update m68k syscall definitions to match Linux 4.6
-
-Helge Deller (1):
-  linux-user: Add FICLONE and FICLONERANGE ioctls
-
-Jose Ricardo Ziviani (1):
-  linux-user: fill target sigcontext struct accordingly
-
-Laurent Vivier (1):
-  linux-user: manage two new IFLA host message types
-
-Lena Djokic (3):
-  linux-user: Fix inotify_init1 support
-  linux-user: Fix readahead
-  linux-user: Fix mq_open
-
-Marc-André Lureau (2):
-  linux-user: fix settime old value location
-  linux-user: fix tcg/mmap test
-
-Peter Maydell (1):
-  linux-user: Use correct types in load_symbols()
-
-Richard Henderson (1):
-  linux-user: Fix s390x safe-syscall for z900
-
-Riku Voipio (2):
-  linux-user: remove ifdef __USER_MISC
-  linux-user: drop __cygwin__ ifdef
-
- linux-user/elfload.c                     | 22 +++++++++++++++-------
- linux-user/host/s390x/safe-syscall.inc.S |  2 +-
- linux-user/ioctls.h                      |  5 +++++
- linux-user/m68k/syscall_nr.h             |  3 +++
- linux-user/mmap.c                        |  9 +++------
- linux-user/sh4/syscall_nr.h              | 14 ++++++++++++++
- linux-user/signal.c                      |  5 +++++
- linux-user/strace.c                      |  2 --
- linux-user/syscall.c                     | 26 +++++++++++++++++++-------
- linux-user/syscall_defs.h                |  4 ++++
- linux-user/syscall_types.h               |  6 ++++++
- 11 files changed, 75 insertions(+), 23 deletions(-)
-
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 8271227..f520d77 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -2262,6 +2262,7 @@ static int symcmp(const void *s0, const void *s1)
+ static void load_symbols(struct elfhdr *hdr, int fd, abi_ulong load_bias)
+ {
+     int i, shnum, nsyms, sym_idx = 0, str_idx = 0;
++    uint64_t segsz;
+     struct elf_shdr *shdr;
+     char *strings = NULL;
+     struct syminfo *s = NULL;
+@@ -2293,19 +2294,26 @@ static void load_symbols(struct elfhdr *hdr, int fd, abi_ulong load_bias)
+         goto give_up;
+     }
+ 
+-    i = shdr[str_idx].sh_size;
+-    s->disas_strtab = strings = g_try_malloc(i);
+-    if (!strings || pread(fd, strings, i, shdr[str_idx].sh_offset) != i) {
++    segsz = shdr[str_idx].sh_size;
++    s->disas_strtab = strings = g_try_malloc(segsz);
++    if (!strings ||
++        pread(fd, strings, segsz, shdr[str_idx].sh_offset) != segsz) {
+         goto give_up;
+     }
+ 
+-    i = shdr[sym_idx].sh_size;
+-    syms = g_try_malloc(i);
+-    if (!syms || pread(fd, syms, i, shdr[sym_idx].sh_offset) != i) {
++    segsz = shdr[sym_idx].sh_size;
++    syms = g_try_malloc(segsz);
++    if (!syms || pread(fd, syms, segsz, shdr[sym_idx].sh_offset) != segsz) {
+         goto give_up;
+     }
+ 
+-    nsyms = i / sizeof(struct elf_sym);
++    if (segsz / sizeof(struct elf_sym) > INT_MAX) {
++        /* Implausibly large symbol table: give up rather than ploughing
++         * on with the number of symbols calculation overflowing
++         */
++        goto give_up;
++    }
++    nsyms = segsz / sizeof(struct elf_sym);
+     for (i = 0; i < nsyms; ) {
+         bswap_sym(syms + i);
+         /* Throw away entries which we do not need.  */
 -- 
 2.9.3
