@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1ceN4u-0002LE-6U
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:30:37 -0500
+	(envelope-from <fred.konrad@greensocs.com>) id 1ceN4u-0002LB-6G
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:30:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1ceN4r-0007SG-Ny
+	(envelope-from <fred.konrad@greensocs.com>) id 1ceN4r-0007RU-0o
 	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:30:36 -0500
-Received: from greensocs.com ([193.104.36.180]:53624)
+Received: from greensocs.com ([193.104.36.180]:53103)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1ceN4r-0007Rf-Cz
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:30:33 -0500
+	(envelope-from <fred.konrad@greensocs.com>) id 1ceN4q-0007Nm-L7
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:30:32 -0500
 From: fred.konrad@greensocs.com
-Date: Thu, 16 Feb 2017 15:30:13 +0100
-Message-Id: <1487255413-14196-8-git-send-email-fred.konrad@greensocs.com>
+Date: Thu, 16 Feb 2017 15:30:07 +0100
+Message-Id: <1487255413-14196-2-git-send-email-fred.konrad@greensocs.com>
 In-Reply-To: <1487255413-14196-1-git-send-email-fred.konrad@greensocs.com>
 References: <1487255413-14196-1-git-send-email-fred.konrad@greensocs.com>
-Subject: [Qemu-devel] [PATCH V1 7/7] xilinx_spips: allow mmio execution
+Subject: [Qemu-devel] [PATCH V1 1/7] cputlb: cleanup get_page_addr_code to
+ use VICTIM_TLB_HIT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,130 +29,56 @@ Cc: peter.maydell@linaro.org, pbonzini@redhat.com, edgar.iglesias@xilinx.com, al
 
 From: KONRAD Frederic <fred.konrad@greensocs.com>
 
-This allows to execute from the lqspi area.
-
-When the request_ptr is called the device loads 1024bytes from the SPI device.
-Then this code can be executed by the guest.
+This replaces env1 and page_index variables by env and index
+so we can use VICTIM_TLB_HIT macro later.
 
 Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
 ---
- hw/ssi/xilinx_spips.c | 74 ++++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 55 insertions(+), 19 deletions(-)
+ cputlb.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index da8adfa..e833028 100644
---- a/hw/ssi/xilinx_spips.c
-+++ b/hw/ssi/xilinx_spips.c
-@@ -496,6 +496,18 @@ static const MemoryRegionOps spips_ops = {
-     .endianness = DEVICE_LITTLE_ENDIAN,
- };
- 
-+static void xilinx_qspips_invalidate_mmio_ptr(XilinxQSPIPS *q)
-+{
-+    XilinxSPIPS *s = &q->parent_obj;
-+
-+    if (q->lqspi_cached_addr != ~0ULL) {
-+        /* Invalidate the current mapped mmio */
-+        memory_region_invalidate_mmio_ptr(&s->mmlqspi, q->lqspi_cached_addr,
-+                                          LQSPI_CACHE_SIZE);
-+        q->lqspi_cached_addr = ~0ULL;
-+    }
-+}
-+
- static void xilinx_qspips_write(void *opaque, hwaddr addr,
-                                 uint64_t value, unsigned size)
+diff --git a/cputlb.c b/cputlb.c
+index 6c39927..665caea 100644
+--- a/cputlb.c
++++ b/cputlb.c
+@@ -457,21 +457,21 @@ static void report_bad_exec(CPUState *cpu, target_ulong addr)
+  * is actually a ram_addr_t (in system mode; the user mode emulation
+  * version of this function returns a guest virtual address).
+  */
+-tb_page_addr_t get_page_addr_code(CPUArchState *env1, target_ulong addr)
++tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
  {
-@@ -505,7 +517,7 @@ static void xilinx_qspips_write(void *opaque, hwaddr addr,
-     addr >>= 2;
+-    int mmu_idx, page_index, pd;
++    int mmu_idx, index, pd;
+     void *p;
+     MemoryRegion *mr;
+-    CPUState *cpu = ENV_GET_CPU(env1);
++    CPUState *cpu = ENV_GET_CPU(env);
+     CPUIOTLBEntry *iotlbentry;
  
-     if (addr == R_LQSPI_CFG) {
--        q->lqspi_cached_addr = ~0ULL;
-+        xilinx_qspips_invalidate_mmio_ptr(q);
+-    page_index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
+-    mmu_idx = cpu_mmu_index(env1, true);
+-    if (unlikely(env1->tlb_table[mmu_idx][page_index].addr_code !=
++    index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
++    mmu_idx = cpu_mmu_index(env, true);
++    if (unlikely(env->tlb_table[mmu_idx][index].addr_code !=
+                  (addr & TARGET_PAGE_MASK))) {
+-        cpu_ldub_code(env1, addr);
++        cpu_ldub_code(env, addr);
      }
+-    iotlbentry = &env1->iotlb[mmu_idx][page_index];
++    iotlbentry = &env->iotlb[mmu_idx][index];
+     pd = iotlbentry->addr & ~TARGET_PAGE_MASK;
+     mr = iotlb_to_region(cpu, pd, iotlbentry->attrs);
+     if (memory_region_is_unassigned(mr)) {
+@@ -484,7 +484,7 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env1, target_ulong addr)
+             exit(1);
+         }
+     }
+-    p = (void *)((uintptr_t)addr + env1->tlb_table[mmu_idx][page_index].addend);
++    p = (void *)((uintptr_t)addr + env->tlb_table[mmu_idx][index].addend);
+     return qemu_ram_addr_from_host_nofail(p);
  }
  
-@@ -517,27 +529,20 @@ static const MemoryRegionOps qspips_ops = {
- 
- #define LQSPI_CACHE_SIZE 1024
- 
--static uint64_t
--lqspi_read(void *opaque, hwaddr addr, unsigned int size)
-+static void lqspi_load_cache(void *opaque, hwaddr addr)
- {
--    int i;
-     XilinxQSPIPS *q = opaque;
-     XilinxSPIPS *s = opaque;
--    uint32_t ret;
--
--    if (addr >= q->lqspi_cached_addr &&
--            addr <= q->lqspi_cached_addr + LQSPI_CACHE_SIZE - 4) {
--        uint8_t *retp = &q->lqspi_buf[addr - q->lqspi_cached_addr];
--        ret = cpu_to_le32(*(uint32_t *)retp);
--        DB_PRINT_L(1, "addr: %08x, data: %08x\n", (unsigned)addr,
--                   (unsigned)ret);
--        return ret;
--    } else {
--        int flash_addr = (addr / num_effective_busses(s));
--        int slave = flash_addr >> LQSPI_ADDRESS_BITS;
--        int cache_entry = 0;
--        uint32_t u_page_save = s->regs[R_LQSPI_STS] & ~LQSPI_CFG_U_PAGE;
--
-+    int i;
-+    int flash_addr = ((addr & ~(LQSPI_CACHE_SIZE - 1))
-+                   / num_effective_busses(s));
-+    int slave = flash_addr >> LQSPI_ADDRESS_BITS;
-+    int cache_entry = 0;
-+    uint32_t u_page_save = s->regs[R_LQSPI_STS] & ~LQSPI_CFG_U_PAGE;
-+
-+    if (addr < q->lqspi_cached_addr ||
-+            addr > q->lqspi_cached_addr + LQSPI_CACHE_SIZE - 4) {
-+        xilinx_qspips_invalidate_mmio_ptr(q);
-         s->regs[R_LQSPI_STS] &= ~LQSPI_CFG_U_PAGE;
-         s->regs[R_LQSPI_STS] |= slave ? LQSPI_CFG_U_PAGE : 0;
- 
-@@ -589,12 +594,43 @@ lqspi_read(void *opaque, hwaddr addr, unsigned int size)
-         xilinx_spips_update_cs_lines(s);
- 
-         q->lqspi_cached_addr = flash_addr * num_effective_busses(s);
-+    }
-+}
-+
-+static void *lqspi_request_mmio_ptr(void *opaque, hwaddr addr, unsigned *size,
-+                                    unsigned *offset)
-+{
-+    XilinxQSPIPS *q = opaque;
-+    hwaddr offset_within_the_region = addr & ~(LQSPI_CACHE_SIZE - 1);
-+
-+    lqspi_load_cache(opaque, offset_within_the_region);
-+    *size = LQSPI_CACHE_SIZE;
-+    *offset = offset_within_the_region;
-+    return q->lqspi_buf;
-+}
-+
-+static uint64_t
-+lqspi_read(void *opaque, hwaddr addr, unsigned int size)
-+{
-+    XilinxQSPIPS *q = opaque;
-+    uint32_t ret;
-+
-+    if (addr >= q->lqspi_cached_addr &&
-+            addr <= q->lqspi_cached_addr + LQSPI_CACHE_SIZE - 4) {
-+        uint8_t *retp = &q->lqspi_buf[addr - q->lqspi_cached_addr];
-+        ret = cpu_to_le32(*(uint32_t *)retp);
-+        DB_PRINT_L(1, "addr: %08x, data: %08x\n", (unsigned)addr,
-+                   (unsigned)ret);
-+        return ret;
-+    } else {
-+        lqspi_load_cache(opaque, addr);
-         return lqspi_read(opaque, addr, size);
-     }
- }
- 
- static const MemoryRegionOps lqspi_ops = {
-     .read = lqspi_read,
-+    .request_ptr = lqspi_request_mmio_ptr,
-     .endianness = DEVICE_NATIVE_ENDIAN,
-     .valid = {
-         .min_access_size = 1,
 -- 
 1.8.3.1
