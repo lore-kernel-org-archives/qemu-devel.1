@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ceN6a-0003lT-Ev
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:32:21 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ceN6c-0003oa-HH
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:32:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ceN6Z-00087i-12
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:32:20 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34151)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ceN6b-0008Ac-KC
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:32:22 -0500
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:34089)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1ceN6Y-00087P-Mi
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:32:18 -0500
-Received: by mail-wm0-x242.google.com with SMTP id c85so3430026wmi.1
-	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 06:32:18 -0800 (PST)
+	id 1ceN6b-00089z-Dp
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:32:21 -0500
+Received: by mail-wr0-x244.google.com with SMTP id c4so2275240wrd.1
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 06:32:21 -0800 (PST)
+Received: from 640k.lan (94-39-187-56.adsl-ull.clienti.tiscali.it.
+	[94.39.187.56])
+	by smtp.gmail.com with ESMTPSA id g5sm9203365wrd.0.2017.02.16.06.32.17
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 16 Feb 2017 06:32:19 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 16 Feb 2017 15:31:34 +0100
-Message-Id: <1487255507-106654-11-git-send-email-pbonzini@redhat.com>
+Date: Thu, 16 Feb 2017 15:31:35 +0100
+Message-Id: <1487255507-106654-12-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1487255507-106654-1-git-send-email-pbonzini@redhat.com>
 References: <1487255507-106654-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 10/23] hw/char/mcf_uart: QOMify the ColdFire UART
+Subject: [Qemu-devel] [PULL 11/23] cpu-exec: fix icount out-of-bounds access
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,208 +34,71 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Thomas Huth <huth@tuxfamily.org>
 
-From: Thomas Huth <huth@tuxfamily.org>
+When icount is active, tb_add_jump is surprisingly called with an
+out of bounds basic block index.  I have no idea how that can work,
+but it does not seem like a good idea.  Clear *last_tb for all
+TB_EXIT_ICOUNT_EXPIRED cases, even when all you have to do is
+refill icount_extra.
 
-Use type_init() etc. to adapt the ColdFire UART
-to the latest QEMU device conventions.
-
-Signed-off-by: Thomas Huth <huth@tuxfamily.org>
-Message-Id: <1485586582-6490-1-git-send-email-huth@tuxfamily.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/char/mcf_uart.c    | 102 +++++++++++++++++++++++++++++++++++++-------------
- hw/m68k/mcf5208.c     |   6 +--
- include/hw/m68k/mcf.h |   6 +--
- 3 files changed, 81 insertions(+), 33 deletions(-)
+ cpu-exec.c              | 7 ++++---
+ include/exec/exec-all.h | 1 +
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/hw/char/mcf_uart.c b/hw/char/mcf_uart.c
-index 80c380e..e69672f 100644
---- a/hw/char/mcf_uart.c
-+++ b/hw/char/mcf_uart.c
-@@ -7,12 +7,15 @@
-  */
- #include "qemu/osdep.h"
- #include "hw/hw.h"
-+#include "hw/sysbus.h"
- #include "hw/m68k/mcf.h"
- #include "sysemu/char.h"
- #include "exec/address-spaces.h"
- #include "qapi/error.h"
+diff --git a/cpu-exec.c b/cpu-exec.c
+index 57583f1..1f7d217 100644
+--- a/cpu-exec.c
++++ b/cpu-exec.c
+@@ -542,7 +542,7 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
  
- typedef struct {
-+    SysBusDevice parent_obj;
-+
-     MemoryRegion iomem;
-     uint8_t mr[2];
-     uint8_t sr;
-@@ -30,6 +33,9 @@ typedef struct {
-     CharBackend chr;
- } mcf_uart_state;
- 
-+#define TYPE_MCF_UART "mcf-uart"
-+#define MCF_UART(obj) OBJECT_CHECK(mcf_uart_state, (obj), TYPE_MCF_UART)
-+
- /* UART Status Register bits.  */
- #define MCF_UART_RxRDY  0x01
- #define MCF_UART_FFULL  0x02
-@@ -220,8 +226,10 @@ void mcf_uart_write(void *opaque, hwaddr addr,
-     mcf_uart_update(s);
+     trace_exec_tb(tb, tb->pc);
+     ret = cpu_tb_exec(cpu, tb);
+-    *last_tb = (TranslationBlock *)(ret & ~TB_EXIT_MASK);
++    tb = (TranslationBlock *)(ret & ~TB_EXIT_MASK);
+     *tb_exit = ret & TB_EXIT_MASK;
+     switch (*tb_exit) {
+     case TB_EXIT_REQUESTED:
+@@ -566,6 +566,7 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
+         abort();
+ #else
+         int insns_left = cpu->icount_decr.u32;
++        *last_tb = NULL;
+         if (cpu->icount_extra && insns_left >= 0) {
+             /* Refill decrementer and continue execution.  */
+             cpu->icount_extra += insns_left;
+@@ -575,17 +576,17 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
+         } else {
+             if (insns_left > 0) {
+                 /* Execute remaining instructions.  */
+-                cpu_exec_nocache(cpu, insns_left, *last_tb, false);
++                cpu_exec_nocache(cpu, insns_left, tb, false);
+                 align_clocks(sc, cpu);
+             }
+             cpu->exception_index = EXCP_INTERRUPT;
+-            *last_tb = NULL;
+             cpu_loop_exit(cpu);
+         }
+         break;
+ #endif
+     }
+     default:
++        *last_tb = tb;
+         break;
+     }
  }
- 
--static void mcf_uart_reset(mcf_uart_state *s)
-+static void mcf_uart_reset(DeviceState *dev)
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index bbc9478..21ab7bf 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -318,6 +318,7 @@ static inline void tb_set_jmp_target(TranslationBlock *tb,
+ static inline void tb_add_jump(TranslationBlock *tb, int n,
+                                TranslationBlock *tb_next)
  {
-+    mcf_uart_state *s = MCF_UART(dev);
-+
-     s->fifo_len = 0;
-     s->mr[0] = 0;
-     s->mr[1] = 0;
-@@ -275,36 +283,80 @@ static void mcf_uart_receive(void *opaque, const uint8_t *buf, int size)
-     mcf_uart_push_byte(s, buf[0]);
- }
- 
--void *mcf_uart_init(qemu_irq irq, Chardev *chr)
--{
--    mcf_uart_state *s;
--
--    s = g_malloc0(sizeof(mcf_uart_state));
--    s->irq = irq;
--    if (chr) {
--        qemu_chr_fe_init(&s->chr, chr, &error_abort);
--        qemu_chr_fe_set_handlers(&s->chr, mcf_uart_can_receive,
--                                 mcf_uart_receive, mcf_uart_event,
--                                 s, NULL, true);
--    }
--    mcf_uart_reset(s);
--    return s;
--}
--
- static const MemoryRegionOps mcf_uart_ops = {
-     .read = mcf_uart_read,
-     .write = mcf_uart_write,
-     .endianness = DEVICE_NATIVE_ENDIAN,
- };
- 
--void mcf_uart_mm_init(MemoryRegion *sysmem,
--                      hwaddr base,
--                      qemu_irq irq,
--                      Chardev *chr)
-+static void mcf_uart_instance_init(Object *obj)
-+{
-+    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
-+    mcf_uart_state *s = MCF_UART(dev);
-+
-+    memory_region_init_io(&s->iomem, obj, &mcf_uart_ops, s, "uart", 0x40);
-+    sysbus_init_mmio(dev, &s->iomem);
-+
-+    sysbus_init_irq(dev, &s->irq);
-+}
-+
-+static void mcf_uart_realize(DeviceState *dev, Error **errp)
-+{
-+    mcf_uart_state *s = MCF_UART(dev);
-+
-+    qemu_chr_fe_set_handlers(&s->chr, mcf_uart_can_receive, mcf_uart_receive,
-+                             mcf_uart_event, s, NULL, true);
-+}
-+
-+static Property mcf_uart_properties[] = {
-+    DEFINE_PROP_CHR("chardev", mcf_uart_state, chr),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void mcf_uart_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+
-+    dc->realize = mcf_uart_realize;
-+    dc->reset = mcf_uart_reset;
-+    dc->props = mcf_uart_properties;
-+    set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
-+}
-+
-+static const TypeInfo mcf_uart_info = {
-+    .name          = TYPE_MCF_UART,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(mcf_uart_state),
-+    .instance_init = mcf_uart_instance_init,
-+    .class_init    = mcf_uart_class_init,
-+};
-+
-+static void mcf_uart_register(void)
-+{
-+    type_register_static(&mcf_uart_info);
-+}
-+
-+type_init(mcf_uart_register)
-+
-+void *mcf_uart_init(qemu_irq irq, Chardev *chrdrv)
-+{
-+    DeviceState  *dev;
-+
-+    dev = qdev_create(NULL, TYPE_MCF_UART);
-+    if (chrdrv) {
-+        qdev_prop_set_chr(dev, "chardev", chrdrv);
-+    }
-+    qdev_init_nofail(dev);
-+
-+    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, irq);
-+
-+    return dev;
-+}
-+
-+void mcf_uart_mm_init(hwaddr base, qemu_irq irq, Chardev *chrdrv)
- {
--    mcf_uart_state *s;
-+    DeviceState  *dev;
- 
--    s = mcf_uart_init(irq, chr);
--    memory_region_init_io(&s->iomem, NULL, &mcf_uart_ops, s, "uart", 0x40);
--    memory_region_add_subregion(sysmem, base, &s->iomem);
-+    dev = mcf_uart_init(irq, chrdrv);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
- }
-diff --git a/hw/m68k/mcf5208.c b/hw/m68k/mcf5208.c
-index bad1d33..6563518 100644
---- a/hw/m68k/mcf5208.c
-+++ b/hw/m68k/mcf5208.c
-@@ -255,9 +255,9 @@ static void mcf5208evb_init(MachineState *machine)
-     /* Internal peripherals.  */
-     pic = mcf_intc_init(address_space_mem, 0xfc048000, cpu);
- 
--    mcf_uart_mm_init(address_space_mem, 0xfc060000, pic[26], serial_hds[0]);
--    mcf_uart_mm_init(address_space_mem, 0xfc064000, pic[27], serial_hds[1]);
--    mcf_uart_mm_init(address_space_mem, 0xfc068000, pic[28], serial_hds[2]);
-+    mcf_uart_mm_init(0xfc060000, pic[26], serial_hds[0]);
-+    mcf_uart_mm_init(0xfc064000, pic[27], serial_hds[1]);
-+    mcf_uart_mm_init(0xfc068000, pic[28], serial_hds[2]);
- 
-     mcf5208_sys_init(address_space_mem, pic);
- 
-diff --git a/include/hw/m68k/mcf.h b/include/hw/m68k/mcf.h
-index 9a0bcfa..0db49c5 100644
---- a/include/hw/m68k/mcf.h
-+++ b/include/hw/m68k/mcf.h
-@@ -4,17 +4,13 @@
- 
- #include "target/m68k/cpu-qom.h"
- 
--struct MemoryRegion;
--
- /* mcf_uart.c */
- uint64_t mcf_uart_read(void *opaque, hwaddr addr,
-                        unsigned size);
- void mcf_uart_write(void *opaque, hwaddr addr,
-                     uint64_t val, unsigned size);
- void *mcf_uart_init(qemu_irq irq, Chardev *chr);
--void mcf_uart_mm_init(struct MemoryRegion *sysmem,
--                      hwaddr base,
--                      qemu_irq irq, Chardev *chr);
-+void mcf_uart_mm_init(hwaddr base, qemu_irq irq, Chardev *chr);
- 
- /* mcf_intc.c */
- qemu_irq *mcf_intc_init(struct MemoryRegion *sysmem,
++    assert(n < ARRAY_SIZE(tb->jmp_list_next));
+     if (tb->jmp_list_next[n]) {
+         /* Another thread has already done this while we were
+          * outside of the lock; nothing to do in this case */
 -- 
 1.8.3.1
