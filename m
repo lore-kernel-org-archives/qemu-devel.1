@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ceQ4k-0004eX-Tp
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:42:39 -0500
+	(envelope-from <chadjoan@gmail.com>) id 1ceQ9n-00015P-0a
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:47:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ceQ4k-0003Rs-1l
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:42:38 -0500
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:33677)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ceQ4j-0003RD-RG
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:42:37 -0500
-Received: by mail-wm0-x234.google.com with SMTP id t18so4946132wmt.0
-	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 09:42:37 -0800 (PST)
+	(envelope-from <chadjoan@gmail.com>) id 1ceQ9l-0005bA-LS
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:47:51 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170216173707.16209-1-laurent@vivier.eu>
-References: <20170216173707.16209-1-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Feb 2017 17:42:16 +0000
-Message-ID: <CAFEAcA-b7Y4r-PJ32NyFyxcvT9kA6D-QJL2BEMU6ZJmCHiLO+g@mail.gmail.com>
+In-Reply-To: <bf1410bc-bc6d-bb29-5591-55634f25d487@redhat.com>
+References: <CABHMSTVDnAxAvpp81+z_2fkAFO7tazLJs3cFXpuDuuGQj-Ek-A@mail.gmail.com>
+	<1933406e-2576-e687-3545-a72f3b999310@redhat.com>
+	<bf1410bc-bc6d-bb29-5591-55634f25d487@redhat.com>
+From: Chad Joan <chadjoan@gmail.com>
+Date: Thu, 16 Feb 2017 12:47:28 -0500
+Message-ID: <CABHMSTUsZy0u4b1b84YC5CgafKvD-Zms5dCQ=31+XnQphUQxLA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] linux-user: fix fork()
+Subject: Re: [Qemu-devel] Fix build break during configuration on musl-libc
+ based Linux systems.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +24,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-On 16 February 2017 at 17:37, Laurent Vivier <laurent@vivier.eu> wrote:
-> Since commit 5ea2fc8 ("linux-user: Sanity check clone flags"),
-> trying to run fork() fails with old distro on some architectures.
->
-> This is the case with HP-PA and Debian 5 (Lenny).
->
-> It fails on:
->
->          if ((flags & CSIGNAL) != TARGET_SIGCHLD) {
->              return -TARGET_EINVAL;
->          }
->
-> because flags is 17, whereas on HP-PA, SIGCHLD is 18.
-> 17 is the SIGCHLD value of my host (x86_64).
->
-> It appears that for TARGET_NR_fork and TARGET_NR_vfork, QEMU calls
-> do_fork() with SIGCHLD instead of TARGET_SIGCHLD.
->
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->  linux-user/syscall.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index f569f82..4d85355 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -7680,7 +7680,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->          break;
->  #ifdef TARGET_NR_fork
->      case TARGET_NR_fork:
-> -        ret = get_errno(do_fork(cpu_env, SIGCHLD, 0, 0, 0, 0));
-> +        ret = get_errno(do_fork(cpu_env, TARGET_SIGCHLD, 0, 0, 0, 0));
->          break;
->  #endif
->  #ifdef TARGET_NR_waitpid
-> @@ -10490,7 +10490,8 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->  #endif
->  #ifdef TARGET_NR_vfork
->      case TARGET_NR_vfork:
-> -        ret = get_errno(do_fork(cpu_env, CLONE_VFORK | CLONE_VM | SIGCHLD,
-> +        ret = get_errno(do_fork(cpu_env,
-> +                        CLONE_VFORK | CLONE_VM | TARGET_SIGCHLD,
->                          0, 0, 0, 0));
->          break;
->  #endif
+I am glad others are chiming in and might provide better solutions.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Honestly, following the instructions at
+http://wiki.qemu-project.org/Contribute/SubmitAPatch to-the-letter is quite
+daunting to me, just to get one line of code changed.  It might help if
+that page had some kind of dead-simple example for trivial patches;
+something like:
+$ cd <QEMU directory>
+$ git format-patch blah blah blah
+$ maybe-some-other-command
+$ # Now copy the contents of file xyz.patch into your email client and send
+to qemu-devel@nongnu.org and qemu-trivial@nongnu.org
 
-thanks
--- PMM
+Ask me to do signing/secure-signatures/etc (or any foray into gnupg
+commands), setup and secure new email connectivity (ex: git send-email), or
+install new software on my system... and I'm going to bounce ;)  Sorry.
+
+I kind of expected that discerning maintainers might want to do this patch
+differently.  I'm not familiar with the why's of how your configure script
+is organized, so I really hope the QEMU devs can meet me in the middle and
+take this the rest of the way.  I am perfectly willing to run commands on
+my machine and echo results to you if it helps you learn the nature of this
+problem.
+
+Hope that helps.
+- Chad
+
+On Thu, Feb 16, 2017 at 12:23 PM, Laszlo Ersek <lersek@redhat.com> wrote:
+
+> On 02/16/17 17:58, Paolo Bonzini wrote:
+> >
+> >
+> > On 16/02/2017 17:30, Chad Joan wrote:
+> >> Hello,
+> >>
+> >> This is a one-line patch to the configure script that will allow QEMU
+> to be
+> >> built on musl-libc based Linux systems.  This problem is only noticeable
+> >> when QEMU is built with --enable-curses.
+> >>
+> >> Detailed reading material if you want to know where this came from:
+> >> https://bugs.gentoo.org/show_bug.cgi?id=609364
+> >
+> > Hi,
+> >
+> > can you explain exactly which function is missing without
+> > -D_XOPEN_SOURCE=500?  If it is curses' wide-char functions, why does it
+> > fail with musl but not with glibc?  Is _XOPEN_SOURCE always defined by
+> > glibc if you have _D_GNU_SOURCE?
+>
+> It is not necessarily auto-defined, but the effect is "as if".
+>
+> It is documented in the libc info:
+>
+> https://www.gnu.org/software/libc/manual/html_node/Feature-
+> Test-Macros.html#index-_005fXOPEN_005fSOURCE
+>
+> > Macro: _XOPEN_SOURCE
+> > Macro: _XOPEN_SOURCE_EXTENDED
+> >
+> >     If you define this macro, functionality described in the X/Open
+> >     Portability Guide is included. This is a superset of the POSIX.1
+> >     and POSIX.2 functionality and in fact _POSIX_SOURCE and
+> >     _POSIX_C_SOURCE are automatically defined.
+> >
+> >     As the unification of all Unices, functionality only available in
+> >     BSD and SVID is also included.
+> >
+> >     If the macro _XOPEN_SOURCE_EXTENDED is also defined, even more
+> >     functionality is available. The extra functions will make all
+> >     functions available which are necessary for the X/Open Unix brand.
+> >
+> >     If the macro _XOPEN_SOURCE has the value 500 this includes all
+> >     functionality described so far plus some new definitions from the
+> >     Single Unix Specification, version 2.
+>
+> https://www.gnu.org/software/libc/manual/html_node/Feature-
+> Test-Macros.html#index-_005fGNU_005fSOURCE
+>
+> > Macro: _GNU_SOURCE
+> >
+> >     If you define this macro, everything is included: ISO C89, ISO
+> >     C99, POSIX.1, POSIX.2, BSD, SVID, X/Open, LFS, and GNU extensions.
+> >     In the cases where POSIX.1 conflicts with BSD, the POSIX
+> >     definitions take precedence.
+>
+> Curiously, I managed to recall this from years ago, when I was still
+> living and breathing the SUS (and looking frequently at the glibc info
+> too).
+>
+> Laszlo
+>
