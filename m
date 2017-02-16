@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ceGXK-0007XJ-Ql
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 02:31:31 -0500
+	(envelope-from <imammedo@redhat.com>) id 1ceHO2-0006Ru-Ab
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 03:25:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ceGXH-0000qt-O0
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 02:31:30 -0500
-Message-ID: <1487230282.3658.0.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 16 Feb 2017 08:31:22 +0100
-In-Reply-To: <c0e368b1-c89d-ef5a-d475-c92266d3eb41@redhat.com>
-References: <20170208061602.17666-1-david@gibson.dropbear.id.au>
-	<46d64512-1085-6d22-1e0f-660757ff7131@redhat.com>
-	<20170209041634.GC14524@umbus>
-	<95706652-0a80-92fc-951b-7a454d496ddf@redhat.com>
-	<20170210003746.GP27610@umbus.fritz.box>
-	<5ea3785c-b979-8b8c-3ab0-243d69384697@redhat.com>
-	<20170213043307.GT25381@umbus>
-	<45446029-e404-77d4-754e-5541a506bb7c@redhat.com>
-	<20170214041532.GF2169@umbus.fritz.box>
-	<c0e368b1-c89d-ef5a-d475-c92266d3eb41@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC] virtio-pci: Allow PCIe virtio devices on
- root bus
+	(envelope-from <imammedo@redhat.com>) id 1ceHNz-0004Sn-4Q
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 03:25:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41002)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ceHNy-0004SI-SR
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 03:25:55 -0500
+Date: Thu, 16 Feb 2017 09:25:50 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170216092550.0ec11535@nial.brq.redhat.com>
+In-Reply-To: <20170215211910-mutt-send-email-mst@kernel.org>
+References: <9dffe31a245cf6a717eef8227fe80ca666b168b5.1487139038.git.ben@skyportsystems.com>
+	<20170215115723.77e4d9d7@nial.brq.redhat.com>
+	<1f4a6eb2-0838-2218-88e3-4f65498a41d6@redhat.com>
+	<20170215162225.74d48058@nial.brq.redhat.com>
+	<20170215172515-mutt-send-email-mst@kernel.org>
+	<20170215165602.72e96c28@nial.brq.redhat.com>
+	<20170215183736-mutt-send-email-mst@kernel.org>
+	<20170215184309.521aa90f@nial.brq.redhat.com>
+	<20170215194647-mutt-send-email-mst@kernel.org>
+	<20170215192436.2695b9f6@nial.brq.redhat.com>
+	<20170215211910-mutt-send-email-mst@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 1/7] linker-loader: Add new 'write
+ pointer' command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,14 +37,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Laszlo Ersek <lersek@redhat.com>, abologna@redhat.com, lvivier@redhat.com, thuth@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, ben@skyportsystems.com
 
-On Di, 2017-02-14 at 14:53 +0200, Marcel Apfelbaum wrote:
-> I suppose XHCI can behave the same as virtio if Gerd has nothing
-> against it
+On Wed, 15 Feb 2017 21:34:45 +0200
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-No objections.
+> On Wed, Feb 15, 2017 at 07:24:36PM +0100, Igor Mammedov wrote:
+> > > As long as all users pass in 0 though there's a real possibility guests
+> > > will implement this incorrectly.  
+> > We are here to ensure that at least Seabios (I'll review it)
+> > and OVMF (Laszlo would take care of it I suppose) do it right,
+> > and if there are other firmwares, they should do it correctly
+> > as described fix their own bugs later wrt randomly written
+> > implementation.  
+> 
+> As long as it's untested, it can always do the wrong thing
+> even if it looks right, or it can bitrot.
+> 
+> > > I guess we can put in the offset just
+> > > behind the zero-filled padding we have there.  
+> > I've assumed padding was there to make commands fixed size and give
+> > a room for future extensions  
+> 
+> you mean
+>         char pad[124];
+> ?
+> 
+> Right. So you can easily add fields, but if you do firmware
+> will just assume it does not know how to handle these
+> commands and skip them.
+> 
+> > so hunk changing BiosLinkerLoaderEntry
+> > would look like:
+> > 
+> > diff --git a/hw/acpi/bios-linker-loader.c b/hw/acpi/bios-linker-loader.c
+> > index d963ebe..6983713 100644
+> > --- a/hw/acpi/bios-linker-loader.c
+> > +++ b/hw/acpi/bios-linker-loader.c
+> > @@ -49,6 +49,7 @@ struct BiosLinkerLoaderEntry {
+> >              char file[BIOS_LINKER_LOADER_FILESZ];
+> >              uint32_t align;
+> >              uint8_t zone;
+> > +            uint32_t padding;
+> >          } alloc;
+> >  
+> >          /*
+> > @@ -62,6 +63,7 @@ struct BiosLinkerLoaderEntry {
+> >              char src_file[BIOS_LINKER_LOADER_FILESZ];
+> >              uint32_t offset;
+> >              uint8_t size;
+> > +            uint32_t padding;
+> >          } pointer;
+> >  
+> >          /*
+> > @@ -76,10 +78,25 @@ struct BiosLinkerLoaderEntry {
+> >              uint32_t offset;
+> >              uint32_t start;
+> >              uint32_t length;
+> > +            uint32_t padding;
+> >          } cksum;  
+> 
+> why is this necessary?
+> 
+> > +        /*
+> > +         * COMMAND_WRITE_POINTER - write the fw_cfg file (originating from
+> > +         * @dest_file) at @wr_pointer.offset, by writing a pointer to @src_offset
+> > +         * within the table originating from @src_file. 1,2,4 or 8 byte unsigned
+> > +         * addition is used depending on @wr_pointer.size.
+> > +         */
+> > +         struct {
+> > +             char dest_file[BIOS_LINKER_LOADER_FILESZ];
+> > +             char src_file[BIOS_LINKER_LOADER_FILESZ];
+> > +             uint32_t dst_offset;
+> > +             uint32_t src_offset;
+> > +             uint8_t size;
+> > +        } wr_pointer;
+> > +
+> >          /* padding */
+> > -        char pad[124];
+> > +        char pad[120];  
+> 
+> and this shrinks entry size by 4 bytes. Why?
+so total size won't change, due to +4 to account for src_offest in wr_pointer
 
-cheers,
-  Gerd
+> 
+> >      };
+> >  } QEMU_PACKED;
+> >  typedef struct BiosLinkerLoaderEntry BiosLinkerLoaderEntry;
+> > 
+> >    
+> > > I'm mostly concerned we are adding new features to something
+> > > that has been through 25 revisions already.  
+> > It's ABI so it's worth extra effort,  
+> 
+> There's always yet another possible enhancement you can add.
+> I see it as a bit of a feature creep frankly.
+> 
+> > it looks like only one more revision is left and there is
+> > about a week left to post and merge it.  
+> 
+> If we can do it quickly, fine, but I think we should merge ASAP.
+> 
