@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1ceObh-0005Fx-TT
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:08:34 -0500
+	(envelope-from <stefanha@redhat.com>) id 1ceOdU-0006zQ-Rh
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:10:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1ceObd-0004Se-RC
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:08:33 -0500
-Received: from mail-db5eur01on0108.outbound.protection.outlook.com
-	([104.47.2.108]:19149
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1ceObd-0004Rp-6s
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:08:29 -0500
-References: <1487255507-106654-1-git-send-email-pbonzini@redhat.com>
-	<1487255507-106654-22-git-send-email-pbonzini@redhat.com>
-	<5712fbf2-1a9e-42c9-a22f-554a6e8bc14d@redhat.com>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <aefcd4e5-8d7e-b50e-e080-981e18013967@openvz.org>
-Date: Thu, 16 Feb 2017 19:08:22 +0300
+	(envelope-from <stefanha@redhat.com>) id 1ceOdP-0005ig-2r
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:10:24 -0500
+Date: Thu, 16 Feb 2017 16:10:07 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170216161007.GB1022@stefanha-x1.localdomain>
+References: <20170213181244.16297-1-pbonzini@redhat.com>
+	<20170213181244.16297-3-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <5712fbf2-1a9e-42c9-a22f-554a6e8bc14d@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 21/23] report guest crash information in
- GUEST_PANICKED event
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="l76fUT7nc3MelDdI"
+Content-Disposition: inline
+In-Reply-To: <20170213181244.16297-3-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/6] coroutine-lock: add limited spinning
+ to CoMutex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +25,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Anton Nefedov <anton.nefedov@virtuozzo.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org
 
-On 02/16/2017 07:07 PM, Eric Blake wrote:
-> On 02/16/2017 08:31 AM, Paolo Bonzini wrote:
->> From: Anton Nefedov <anton.nefedov@virtuozzo.com>
->>
->> it's not very convenient to use the crash-information property interfa=
-ce,
->> so provide a CPU class callback to get the guest crash information, an=
-d pass
->> that information in the event
->>
->> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
->> Signed-off-by: Denis V. Lunev <den@openvz.org>
->> Message-Id: <1487053524-18674-3-git-send-email-den@openvz.org>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->> +++ b/qapi/event.json
->> @@ -488,7 +488,9 @@
->>  #
->>  # @action: action that has been taken, currently always "pause"
->>  #
->> -# Since: 1.5
->> +# @info: optional information about a panic
->> +#
->> +# Since: 1.5 (@info since 2.9)
-> I had a (late) comment on this being unusual formatting, but it can be
-> fixed in a followup patch if there is no other reason to respin the pul=
-l
-> request.
->
-OK, we will send the follow up.
 
-Anton, pls.
+--l76fUT7nc3MelDdI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Den
+On Mon, Feb 13, 2017 at 07:12:40PM +0100, Paolo Bonzini wrote:
+> Running a very small critical section on pthread_mutex_t and CoMutex
+> shows that pthread_mutex_t is much faster because it doesn't actually
+> go to sleep.  What happens is that the critical section is shorter
+> than the latency of entering the kernel and thus FUTEX_WAIT always
+> fails.  With CoMutex there is no such latency but you still want to
+> avoid wait and wakeup.  So introduce it artificially.
+>=20
+> This only works with one waiters; because CoMutex is fair, it will
+> always have more waits and wakeups than a pthread_mutex_t.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  include/qemu/coroutine.h   |  5 +++++
+>  util/qemu-coroutine-lock.c | 51 ++++++++++++++++++++++++++++++++++++++++=
+------
+>  util/qemu-coroutine.c      |  2 +-
+>  3 files changed, 51 insertions(+), 7 deletions(-)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--l76fUT7nc3MelDdI
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYpc7fAAoJEJykq7OBq3PIUMsH/R0i8laweMrDOiLLkZQfnN22
++HLhDZgGPNK9DM9r76EXbS57hLxHsuXectTpJsVqkNc/kxOci0iUoNdDOAGGwFqI
+nunu1bUBrtCB3c4eMsX+U5T9hd1uEXXmJNV8P2ryaTcR4oFtHAH1DW3mZAOtdhnF
+H//w8bvn840ihSd59aWm1sWLnKuwFeJYAE6DwmQplUYU/wfElDi3lxp9rEcTjdkX
+jjJraT0Dx3/FIxa6ErIwh+fRdOA3XtOl0lw68zXz3rlfsrMWu90p/YYZx4Xm7N38
+XZsr9hqmsHcFy9o/X6ZQBmLjV+wxwE9KEDt3thNfLVLDP2wwD39drGVPV7X/Zfs=
+=SaPQ
+-----END PGP SIGNATURE-----
+
+--l76fUT7nc3MelDdI--
