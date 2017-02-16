@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39044)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ceMR6-0002DY-W3
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:49:30 -0500
+	(envelope-from <clg@kaod.org>) id 1ceMRH-0002NM-9L
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:49:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ceMR2-0005gX-K9
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:49:29 -0500
-Received: from 2.mo173.mail-out.ovh.net ([178.33.251.49]:45070)
+	(envelope-from <clg@kaod.org>) id 1ceMRC-0005i2-EC
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:49:39 -0500
+Received: from 5.mo173.mail-out.ovh.net ([46.105.40.148]:44431)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ceMR2-0005fZ-DW
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:49:24 -0500
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ceMRC-0005hq-6m
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:49:34 -0500
 Received: from player791.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id C9746241B5
-	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 14:49:22 +0100 (CET)
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 03766241CE
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 14:49:32 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu, 16 Feb 2017 14:47:35 +0100
-Message-Id: <1487252865-12064-13-git-send-email-clg@kaod.org>
+Date: Thu, 16 Feb 2017 14:47:36 +0100
+Message-Id: <1487252865-12064-14-git-send-email-clg@kaod.org>
 In-Reply-To: <1487252865-12064-1-git-send-email-clg@kaod.org>
 References: <1487252865-12064-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 12/22] ppc/xics: extend the QOM interface to
- handle ICPs
+Subject: [Qemu-devel] [PATCH v2 13/22] ppc/xics: simplify the cpu_setup()
+ handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,89 +33,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Let's add two new handlers for ICPs. One is to get an ICP object from
-a server number and a second is to resend the irqs when needed.
+The cpu_setup() handler currently takes a 'XICSState *' argument to
+grab the kernel ICP file descriptor. This interface can be simplified
+by using the 'xics' backlink of the ICP object.
+
+This change is also required by subsequent patches which makes use of
+the QOM interface for XICS.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/intc/xics.c        |  2 +-
- hw/ppc/spapr.c        | 20 ++++++++++++++++++++
- include/hw/ppc/xics.h |  3 +++
- 3 files changed, 24 insertions(+), 1 deletion(-)
+ hw/intc/xics.c        |  5 +++--
+ hw/intc/xics_kvm.c    | 11 +++--------
+ include/hw/ppc/xics.h |  2 +-
+ 3 files changed, 7 insertions(+), 11 deletions(-)
 
 diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index 5131587ce088..7168c2cfd8a1 100644
+index 7168c2cfd8a1..c14797fb1964 100644
 --- a/hw/intc/xics.c
 +++ b/hw/intc/xics.c
-@@ -216,7 +216,7 @@ static void icp_check_ipi(ICPState *ss)
-     qemu_irq_raise(ss->output);
- }
+@@ -66,14 +66,15 @@ void xics_cpu_setup(XICSState *xics, PowerPCCPU *cpu)
+     CPUState *cs =3D CPU(cpu);
+     CPUPPCState *env =3D &cpu->env;
+     ICPState *ss =3D &xics->ss[cs->cpu_index];
+-    XICSStateClass *info =3D XICS_COMMON_GET_CLASS(xics);
++    XICSStateClass *info;
 =20
--static void icp_resend(XICSInterface *xi, ICPState *ss)
-+void icp_resend(XICSInterface *xi, ICPState *ss)
+     assert(cs->cpu_index < xics->nr_servers);
+=20
+     ss->cs =3D cs;
+=20
++    info =3D XICS_COMMON_GET_CLASS(ss->xics);
+     if (info->cpu_setup) {
+-        info->cpu_setup(xics, cpu);
++        info->cpu_setup(ss, cpu);
+     }
+=20
+     switch (PPC_INPUT(env)) {
+diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+index 6cabc11f6be1..3941f31c5b3f 100644
+--- a/hw/intc/xics_kvm.c
++++ b/hw/intc/xics_kvm.c
+@@ -334,17 +334,12 @@ static const TypeInfo ics_kvm_info =3D {
+ /*
+  * XICS-KVM
+  */
+-static void xics_kvm_cpu_setup(XICSState *xics, PowerPCCPU *cpu)
++static void xics_kvm_cpu_setup(ICPState *ss, PowerPCCPU *cpu)
  {
-     XICSInterfaceClass *xic =3D XICS_INTERFACE_GET_CLASS(xi);
+-    CPUState *cs;
+-    ICPState *ss;
+-    KVMXICSState *xicskvm =3D XICS_SPAPR_KVM(xics);
++    CPUState *cs =3D CPU(cpu);
++    KVMXICSState *xicskvm =3D XICS_SPAPR_KVM(ss->xics);
+     int ret;
 =20
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index d1946ebcac69..eb7da32296d8 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2915,6 +2915,24 @@ static void spapr_ics_resend(XICSInterface *dev)
-     ics_resend(spapr->ics);
- }
-=20
-+static ICPState *spapr_icp_get(XICSInterface *xi, int server)
-+{
-+    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
-+
-+    return (server < spapr->xics->nr_servers) ? &spapr->xics->ss[server]=
- :
-+        NULL;
-+}
-+
-+static void spapr_icp_resend(XICSInterface *xi)
-+{
-+    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
-+    int i;
-+
-+    for (i =3D 0; i < spapr->xics->nr_servers; i++) {
-+        icp_resend(xi, &spapr->xics->ss[i]);
-+    }
-+}
-+
- static void spapr_machine_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc =3D MACHINE_CLASS(oc);
-@@ -2959,6 +2977,8 @@ static void spapr_machine_class_init(ObjectClass *o=
-c, void *data)
-     vhc->hypercall =3D emulate_spapr_hypercall;
-     xic->ics_get =3D spapr_ics_get;
-     xic->ics_resend =3D spapr_ics_resend;
-+    xic->icp_get =3D spapr_icp_get;
-+    xic->icp_resend =3D spapr_icp_resend;
- }
-=20
- static const TypeInfo spapr_machine_info =3D {
+-    cs =3D CPU(cpu);
+-    ss =3D &xics->ss[cs->cpu_index];
+-
+-    assert(cs->cpu_index < xics->nr_servers);
+     if (xicskvm->kernel_xics_fd =3D=3D -1) {
+         abort();
+     }
 diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index c15d8e2a8ae6..7004c851e250 100644
+index 7004c851e250..0375d7d481ef 100644
 --- a/include/hw/ppc/xics.h
 +++ b/include/hw/ppc/xics.h
-@@ -191,6 +191,8 @@ typedef struct XICSInterfaceClass {
-     InterfaceClass parent;
-     ICSState *(*ics_get)(XICSInterface *xi, int irq);
-     void (*ics_resend)(XICSInterface *xi);
-+    ICPState *(*icp_get)(XICSInterface *xi, int server);
-+    void (*icp_resend)(XICSInterface *xi);
- } XICSInterfaceClass;
+@@ -73,7 +73,7 @@ typedef struct ICSIRQState ICSIRQState;
+ struct XICSStateClass {
+     DeviceClass parent_class;
 =20
- #define XICS_IRQS_SPAPR               1024
-@@ -221,5 +223,6 @@ void ics_simple_write_xive(ICSState *ics, int nr, int=
- server,
- void ics_set_irq_type(ICSState *ics, int srcno, bool lsi);
+-    void (*cpu_setup)(XICSState *icp, PowerPCCPU *cpu);
++    void (*cpu_setup)(ICPState *icp, PowerPCCPU *cpu);
+ };
 =20
- void ics_resend(ICSState *ics);
-+void icp_resend(XICSInterface *xi, ICPState *ss);
-=20
- #endif /* XICS_H */
+ struct XICSState {
 --=20
 2.7.4
