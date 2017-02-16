@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38076)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ce9Br-0002qh-DJ
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 18:40:52 -0500
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ce9vT-00088g-Rx
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 19:28:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ce9Bq-0006US-Bd
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 18:40:51 -0500
-References: <1487153430-17260-1-git-send-email-vsementsov@virtuozzo.com>
-	<1487153430-17260-26-git-send-email-vsementsov@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <6f5fd357-2aed-5f47-d0de-03fa02f89f5e@redhat.com>
-Date: Wed, 15 Feb 2017 18:40:43 -0500
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ce9vR-0001FZ-DH
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 19:27:59 -0500
+Received: from mailapp01.imgtec.com ([195.59.15.196]:5697)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1ce9vR-0001FD-8T
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 19:27:57 -0500
+From: Yongbok Kim <yongbok.kim@imgtec.com>
+Date: Thu, 16 Feb 2017 00:27:23 +0000
+Message-ID: <1487204850-16448-2-git-send-email-yongbok.kim@imgtec.com>
+In-Reply-To: <1487204850-16448-1-git-send-email-yongbok.kim@imgtec.com>
+References: <1487204850-16448-1-git-send-email-yongbok.kim@imgtec.com>
 MIME-Version: 1.0
-In-Reply-To: <1487153430-17260-26-git-send-email-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v15 25/25] qcow2-bitmap: improve
- check_constraints_on_bitmap
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v5 1/8] hw/mips_cmgcr: allow GCR base to be
+ moved
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,120 +26,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: qemu-devel@nongnu.org
+Cc: Aurelien Jarno <aurelien@aurel32.net>, Paul Burton <paul.burton@imgtec.com>
 
+From: Paul Burton <paul.burton@imgtec.com>
 
+Support moving the GCR base address & updating the CPU's CP0 CMGCRBase
+register appropriately. This is required if a platform needs to move its
+GCRs away from other memory, as the MIPS Boston development board does
+to avoid its flash memory.
 
-On 02/15/2017 05:10 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Add detailed error messages.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Paul Burton <paul.burton@imgtec.com>
+Reviewed-by: Leon Alrae <leon.alrae@imgtec.com>
+Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
+---
+ hw/misc/mips_cmgcr.c         | 17 +++++++++++++++++
+ include/hw/misc/mips_cmgcr.h |  3 +++
+ 2 files changed, 20 insertions(+)
 
-Reviewed-by: John Snow <jsnow@redhat.com>
-
-> ---
->  block/qcow2-bitmap.c | 48 ++++++++++++++++++++++++++++++++++----------=
-----
->  1 file changed, 34 insertions(+), 14 deletions(-)
->=20
-> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-> index 9177c56..e25c872 100644
-> --- a/block/qcow2-bitmap.c
-> +++ b/block/qcow2-bitmap.c
-> @@ -160,28 +160,49 @@ static int check_table_entry(uint64_t entry, int =
-cluster_size)
-> =20
->  static int check_constraints_on_bitmap(BlockDriverState *bs,
->                                         const char *name,
-> -                                       uint32_t granularity)
-> +                                       uint32_t granularity,
-> +                                       Error **errp)
->  {
->      BDRVQcow2State *s =3D bs->opaque;
->      int granularity_bits =3D ctz32(granularity);
->      int64_t len =3D bdrv_getlength(bs);
-> -    bool fail;
-> =20
->      assert(granularity > 0);
->      assert((granularity & (granularity - 1)) =3D=3D 0);
-> =20
->      if (len < 0) {
-> +        error_setg_errno(errp, -len, "Failed to get size of '%s'",
-> +                         bdrv_get_device_or_node_name(bs));
->          return len;
->      }
-> =20
-> -    fail =3D (granularity_bits > BME_MAX_GRANULARITY_BITS) ||
-> -           (granularity_bits < BME_MIN_GRANULARITY_BITS) ||
-> -           (len > (uint64_t)BME_MAX_PHYS_SIZE << granularity_bits) ||
-> -           (len > (uint64_t)BME_MAX_TABLE_SIZE * s->cluster_size <<
-> -                  granularity_bits) ||
-> -           (strlen(name) > BME_MAX_NAME_SIZE);
-> +    if (granularity_bits > BME_MAX_GRANULARITY_BITS) {
-> +        error_setg(errp, "Granularity exceeds maximum (%u bytes)",
-> +                   1 << BME_MAX_GRANULARITY_BITS);
-> +        return -EINVAL;
-> +    }
-> +    if (granularity_bits < BME_MIN_GRANULARITY_BITS) {
-> +        error_setg(errp, "Granularity is under minimum (%u bytes)",
-> +                   1 << BME_MIN_GRANULARITY_BITS);
-> +        return -EINVAL;
-> +    }
-> =20
-> -    return fail ? -EINVAL : 0;
-> +    if ((len > (uint64_t)BME_MAX_PHYS_SIZE << granularity_bits) ||
-> +        (len > (uint64_t)BME_MAX_TABLE_SIZE * s->cluster_size <<
-> +               granularity_bits))
-> +    {
-> +        error_setg(errp, "Too much space will be occupied by the bitma=
-p. "
-> +                   "Use larger granularity");
-> +        return -EINVAL;
-> +    }
-> +
-> +    if (strlen(name) > BME_MAX_NAME_SIZE) {
-> +        error_setg(errp, "Name length exceeds maximum (%u characters)"=
-,
-> +                   BME_MAX_NAME_SIZE);
-> +        return -EINVAL;
-> +    }
-> +
-> +    return 0;
->  }
-> =20
->  static void clear_bitmap_table(BlockDriverState *bs, uint64_t *bitmap_=
-table,
-> @@ -1142,9 +1163,9 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDr=
-iverState *bs, Error **errp)
->              continue;
->          }
-> =20
-> -        if (check_constraints_on_bitmap(bs, name, granularity) < 0) {
-> -            error_setg(errp, "Bitmap '%s' doesn't satisfy the constrai=
-nts",
-> -                       name);
-> +        if (check_constraints_on_bitmap(bs, name, granularity, errp) <=
- 0) {
-> +            error_prepend(errp, "Bitmap '%s' doesn't satisfy the const=
-raints: ",
-> +                          name);
->              goto fail;
->          }
-> =20
-> @@ -1233,8 +1254,7 @@ bool qcow2_can_store_new_dirty_bitmap(BlockDriver=
-State *bs,
->      bool found;
->      Qcow2BitmapList *bm_list;
-> =20
-> -    if (check_constraints_on_bitmap(bs, name, granularity) !=3D 0) {
-> -        error_setg(errp, "The constraints are not satisfied");
-> +    if (check_constraints_on_bitmap(bs, name, granularity, errp) !=3D =
-0) {
->          goto fail;
->      }
-> =20
->=20
-
---=20
-=97js
+diff --git a/hw/misc/mips_cmgcr.c b/hw/misc/mips_cmgcr.c
+index b3ba166..a1edb53 100644
+--- a/hw/misc/mips_cmgcr.c
++++ b/hw/misc/mips_cmgcr.c
+@@ -29,6 +29,20 @@ static inline bool is_gic_connected(MIPSGCRState *s)
+     return s->gic_mr != NULL;
+ }
+ 
++static inline void update_gcr_base(MIPSGCRState *gcr, uint64_t val)
++{
++    CPUState *cpu;
++    MIPSCPU *mips_cpu;
++
++    gcr->gcr_base = val & GCR_BASE_GCRBASE_MSK;
++    memory_region_set_address(&gcr->iomem, gcr->gcr_base);
++
++    CPU_FOREACH(cpu) {
++        mips_cpu = MIPS_CPU(cpu);
++        mips_cpu->env.CP0_CMGCRBase = gcr->gcr_base >> 4;
++    }
++}
++
+ static inline void update_cpc_base(MIPSGCRState *gcr, uint64_t val)
+ {
+     if (is_cpc_connected(gcr)) {
+@@ -117,6 +131,9 @@ static void gcr_write(void *opaque, hwaddr addr, uint64_t data, unsigned size)
+     MIPSGCRVPState *other_vps = &gcr->vps[current_vps->other];
+ 
+     switch (addr) {
++    case GCR_BASE_OFS:
++        update_gcr_base(gcr, data);
++        break;
+     case GCR_GIC_BASE_OFS:
+         update_gic_base(gcr, data);
+         break;
+diff --git a/include/hw/misc/mips_cmgcr.h b/include/hw/misc/mips_cmgcr.h
+index a209d91..c9dfcb4 100644
+--- a/include/hw/misc/mips_cmgcr.h
++++ b/include/hw/misc/mips_cmgcr.h
+@@ -41,6 +41,9 @@
+ #define GCR_L2_CONFIG_BYPASS_SHF    20
+ #define GCR_L2_CONFIG_BYPASS_MSK    ((0x1ULL) << GCR_L2_CONFIG_BYPASS_SHF)
+ 
++/* GCR_BASE register fields */
++#define GCR_BASE_GCRBASE_MSK     0xffffffff8000ULL
++
+ /* GCR_GIC_BASE register fields */
+ #define GCR_GIC_BASE_GICEN_MSK   1
+ #define GCR_GIC_BASE_GICBASE_MSK 0xFFFFFFFE0000ULL
+-- 
+2.7.4
