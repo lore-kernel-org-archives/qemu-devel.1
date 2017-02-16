@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37476)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ceIkl-00050R-Mc
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:53:32 -0500
+	(envelope-from <vijay.kilari@gmail.com>) id 1ceIlV-0005Jt-FQ
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:54:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ceIkh-0004C3-R6
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:53:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36792)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ceIkh-0004Ba-Ic
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:53:27 -0500
-Date: Thu, 16 Feb 2017 09:53:22 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170216095322.GB2525@work-vm>
-References: <20170215101427.23736-1-eduardo.otubo@profitbricks.com>
-	<87k28qlca9.fsf@dusky.pond.sub.org>
+	(envelope-from <vijay.kilari@gmail.com>) id 1ceIlU-0004fB-FI
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:54:17 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87k28qlca9.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH 0/2] add writeconfig command on monitor
+In-Reply-To: <CAFEAcA-7PE_T7BsV=vSCEkQDeekB9KnX33Ou5NiUec4XeUu+zw@mail.gmail.com>
+References: <1485879782-6075-1-git-send-email-vijay.kilari@gmail.com>
+	<1485879782-6075-6-git-send-email-vijay.kilari@gmail.com>
+	<CAFEAcA-7PE_T7BsV=vSCEkQDeekB9KnX33Ou5NiUec4XeUu+zw@mail.gmail.com>
+From: Vijay Kilari <vijay.kilari@gmail.com>
+Date: Thu, 16 Feb 2017 15:24:10 +0530
+Message-ID: <CALicx6vWBR_bM2g_DObYgw-12girdK9YgGS8X=zAwenz2EmPFg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v7 RESEND 5/5] hw/intc/arm_gicv3_kvm: Reset
+ GICv3 cpu interface registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,89 +24,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Eduardo Otubo <eduardo.otubo@profitbricks.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>, Pavel Fedin <p.fedin@samsung.com>, Marc Zyngier <marc.zyngier@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> Eduardo Otubo <eduardo.otubo@profitbricks.com> writes:
-> 
-> > This first patch extends the command line option `-writeconfig <file>' to a
-> > command on HMP and QMP monitors. This is useful when live migrating after a
-> > series of device hot plug events. One can just generate an updated config file
-> > for the vm, transport it to the target host and start the vm with `-readconfig
-> > <file>'.
-> >
-> > The second patch re-includes the reference of the memory object on the config
-> > file generated.
-> 
-> The high-level idea of having QEMU regurgitate its configuration for the
-> migration target sounds nice, but there are several issues with
-> regurgitating QemuOpts state with writeconfig:
-> 
-> 1. Our needs have outgrown QemuOpts' design.  We have accumulated
->    various hacks and work-arounds to make do, and it's still not enough.
->    Instead of adding more, I want to revise its design.  The work has
->    started, but it'll take some time.  Adding creative new uses of
->    QemuOpts while this work is in progress can only make it harder.
-> 
->    If this issue was the only one, I'd take the hit for the team.
-> 
-> 2. Transmitting configuration at the beginning of migration doesn't
->    fully solve the problem.  What about configuration changes during
->    migration?  Think of hot plug.  Doesn't mean transmitting
->    configuration is a bad idea, only means there's more to the problem
->    than a naive observer might think.
-> 
->    In my opinion, the proper solution is to transmit configuration
->    information in the migration stream, complete with updates as it
->    changes.  Hard to do, which is why it hasn't been done.
-> 
->    If we can't have the proper solution now, a less-than-ideal partial
->    solution may still be better than nothing.
+On Tue, Feb 7, 2017 at 8:19 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 31 January 2017 at 16:23,  <vijay.kilari@gmail.com> wrote:
+>> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+>>
+>> Reset CPU interface registers of GICv3 when CPU is reset.
+>> For this, ARMCPRegInfo struct is registered with one ICC
+>> register whose resetfn is called when cpu is reset.
+>>
+>> All the ICC registers are reset under one single register
+>> reset function instead of calling resetfn for each ICC
+>> register.
+>>
+>> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+>> ---
+>>  hw/intc/arm_gicv3_kvm.c | 69 +++++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 69 insertions(+)
+>>
+>> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+>> index f91e0ac..c3f38aa 100644
+>> --- a/hw/intc/arm_gicv3_kvm.c
+>> +++ b/hw/intc/arm_gicv3_kvm.c
+>> @@ -604,6 +604,39 @@ static void kvm_arm_gicv3_get(GICv3State *s)
+>>      }
+>>  }
+>>
+>> +static void arm_gicv3_icc_reset(CPUARMState *env, const ARMCPRegInfo *ri)
+>> +{
+>> +    ARMCPU *cpu;
+>> +    GICv3State *s;
+>> +    GICv3CPUState *c;
+>> +
+>> +    c = (GICv3CPUState *)env->gicv3state;
+>> +    if (!c || !c->cpu || !c->gic) {
+>
+> We should assert this kind of thing, not just silently do nothing.
+> Or just assume it's true, because if it's not then we'll segfault
+> immediately below which is just as clear an indication of where
+> the bug is as asserting.
 
-That's a separate problem from the one Eduardo is trying to solve;
-I wouldn't trust migration to survive a device hotplugged during the migration
-as it is.  So I wouldn't worry about it as a reason against this series.
+OK
+>
+>> +        return;
+>> +    }
+>> +
+>> +    s = c->gic;
+>> +    if (!s) {
+>
+> You've already checked this once.
+>
+>> +        return;
+>> +    }
+>> +
+>> +    cpu = ARM_CPU(c->cpu);
+>> +    /* Initialize to actual HW supported configuration */
+>> +    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS,
+>> +                      KVM_VGIC_ATTR(ICC_CTLR_EL1, cpu->mp_affinity),
+>> +                      &c->icc_ctlr_el1[GICV3_NS], false);
+>> +
+>> +    c->icc_ctlr_el1[GICV3_S] = c->icc_ctlr_el1[GICV3_NS];
+>> +    c->icc_pmr_el1 = 0;
+>> +    c->icc_bpr[GICV3_G0] = GIC_MIN_BPR;
+>> +    c->icc_bpr[GICV3_G1] = GIC_MIN_BPR;
+>> +    c->icc_bpr[GICV3_G1NS] = GIC_MIN_BPR;
+>> +
+>> +    c->icc_sre_el1 = 0x7;
+>> +    memset(c->icc_apr, 0, sizeof(c->icc_apr));
+>> +    memset(c->icc_igrpen, 0, sizeof(c->icc_igrpen));
+>> +}
+>> +
+>>  static void kvm_arm_gicv3_reset(DeviceState *dev)
+>>  {
+>>      GICv3State *s = ARM_GICV3_COMMON(dev);
+>> @@ -621,6 +654,41 @@ static void kvm_arm_gicv3_reset(DeviceState *dev)
+>>      kvm_arm_gicv3_put(s);
+>>  }
+>>
+>> +static uint64_t icc_cp_reg_read(CPUARMState *env, const ARMCPRegInfo *ri)
+>> +{
+>> +    return 0;
+>> +}
+>> +
+>> +static void icc_cp_reg_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>> +                          uint64_t value)
+>> +{
+>> +    return;
+>> +}
+>
+> If you want to do nothing in a read/write function there are
+> already arm_cp_read_zero and arm_cp_write_ignore functions for
+> this. But using the ARM_CP_NOP flag is better still.
 
-> 3. The accuracy of QemuOpts information is doubtful.
-> 
->    Completeness: only certain kinds of configuration are done with
->    QemuOpts.  Incompleteness makes -writeconfig less useful than it
->    could be, but it's still useful.  Monitor command writeconfig could
->    be similarly useful.
-> 
->    Correctness: configuration gets stored in QemuOpts when we parse
->    KEY=VALUE,... strings.  It can also be constructed and updated
->    manually.  At certain points in time, bits from QemuOpts are used to
->    actually configure stuff.
-> 
->    Example: -device creates an entry in the "device" configuration
->    group, which is later used to actually create and configure a device
->    object.
-> 
->    My point is: whenever we manipulate the actual objects, we may
->    invalidate information stored in QemuOpts.  We can try to keep it in
->    sync, and we do at least sometimes.  But this is a game we can only
->    lose, except for the period(s) of time where QemuOpts is all there
->    is, i.e. before actual objects get created.  Note that -writeconfig
->    runs before objects get created, so it's not affected by this issue.
-> 
->    Out-of-sync QemuOpts is harmless unless something relies on it being
->    accurate.  I know we currently rely on QemuOpts IDs to catch
->    duplicate IDs for some of the configuration groups.  I doubt there's
->    much else.
-> 
->    If we add your monitor command, out-of-sync QemuOpts goes from
->    harmless to serious bug.  In other words, we'd create a new class of
->    bugs, with an unknown number of existing instances that are probably
->    hard to find and fix.  Probably a perpetual source of new instances,
->    too.
-> 
->    Feels like a show stopper to me.
+With ARM_CP_NOP qemu fails to boot.
+qemu-system-aarch64: KVM_SET_DEVICE_ATTR failed: Invalid argument
+Group 6 attr 0x000000000000c665
 
-Hmm this does seem a bigger problem.
-
-Dave
-
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+>> +
+>> +/*
+>> + * CPU interface registers of GIC needs to be reset on CPU reset.
+>> + * For the calling arm_gicv3_icc_reset() on CPU reset, we register
+>> + * below ARMCPRegInfo. As we reset the whole cpu interface under single
+>> + * register reset, we define only one register of CPU interface instead
+>> + * of defining all the registers.
+>> + */
+>> +static const ARMCPRegInfo gicv3_cpuif_reginfo[] = {
+>> +    { .name = "ICC_CTLR_EL1", .state = ARM_CP_STATE_BOTH,
+>> +      .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 12, .opc2 = 4,
+>> +      .type = ARM_CP_NO_RAW,
+>> +      .access = PL1_RW,
+>> +      .readfn = icc_cp_reg_read,
+>> +      .writefn = icc_cp_reg_write,
+>> +      /*
+>> +       * We hang the whole cpu interface reset routine off here
+>> +       * rather than parcelling it out into one little function
+>> +       * per register
+>> +       */
+>> +      .resetfn = arm_gicv3_icc_reset,
+>> +    },
+>> +    REGINFO_SENTINEL
+>> +};
+>> +
+>>  static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
+>>  {
+>>      GICv3State *s = KVM_ARM_GICV3(dev);
+>> @@ -650,6 +718,7 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
+>>
+>>          /* Store GICv3CPUState in CPUARMState gicv3state pointer */
+>>          env->gicv3state = (void *)&s->cpu[i];
+>> +        define_arm_cp_regs(cpu, gicv3_cpuif_reginfo);
+>>      }
+>>
+>>      /* Try to create the device via the device control API */
+>> --
+>> 1.9.1
+>>
+>
+> thanks
+> -- PMM
