@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cePgn-0001wn-9q
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:17:59 -0500
+	(envelope-from <lersek@redhat.com>) id 1cePmM-0000X1-52
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:23:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cePgm-0001Ct-8g
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:17:53 -0500
-Date: Thu, 16 Feb 2017 17:17:43 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170216171743.GC1022@stefanha-x1.localdomain>
-References: <20170213181244.16297-1-pbonzini@redhat.com>
+	(envelope-from <lersek@redhat.com>) id 1cePmJ-00038N-1S
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:23:38 -0500
+References: <CABHMSTVDnAxAvpp81+z_2fkAFO7tazLJs3cFXpuDuuGQj-Ek-A@mail.gmail.com>
+	<1933406e-2576-e687-3545-a72f3b999310@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <bf1410bc-bc6d-bb29-5591-55634f25d487@redhat.com>
+Date: Thu, 16 Feb 2017 18:23:31 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="da4uJneut+ArUgXk"
-Content-Disposition: inline
-In-Reply-To: <20170213181244.16297-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/6] Make CoMutex/CoQueue/CoRwlock
- thread-safe
+In-Reply-To: <1933406e-2576-e687-3545-a72f3b999310@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Fix build break during configuration on musl-libc
+ based Linux systems.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,122 +24,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, Chad Joan <chadjoan@gmail.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
+On 02/16/17 17:58, Paolo Bonzini wrote:
+> 
+> 
+> On 16/02/2017 17:30, Chad Joan wrote:
+>> Hello,
+>>
+>> This is a one-line patch to the configure script that will allow QEMU to be
+>> built on musl-libc based Linux systems.  This problem is only noticeable
+>> when QEMU is built with --enable-curses.
+>>
+>> Detailed reading material if you want to know where this came from:
+>> https://bugs.gentoo.org/show_bug.cgi?id=609364
+> 
+> Hi,
+> 
+> can you explain exactly which function is missing without
+> -D_XOPEN_SOURCE=500?  If it is curses' wide-char functions, why does it
+> fail with musl but not with glibc?  Is _XOPEN_SOURCE always defined by
+> glibc if you have _D_GNU_SOURCE?
 
---da4uJneut+ArUgXk
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+It is not necessarily auto-defined, but the effect is "as if".
 
-On Mon, Feb 13, 2017 at 07:12:38PM +0100, Paolo Bonzini wrote:
-> This is yet another tiny bit of the multiqueue work, this time affecting
-> the synchronization infrastructure for coroutines.  Currently, coroutines
-> synchronize between the main I/O thread and the dataplane iothread through
-> the AioContext lock.  However, for multiqueue a single BDS will be used
-> by multiple iothreads and hence multiple AioContexts.  This calls for
-> a different approach to coroutine synchronization, and this series is my
-> attempt.
->=20
-> After the previous series, coroutines are already bound to an AioContext
-> while they wait on a CoMutex.  Of course currently a CoMutex is generally
-> not used across multiple iothreads, because you have to acquire/release
-> the AioContext around CoMutex critical sections.  This series is the
-> missing link between the aio_co_schedule/aio_co_wake infrastructure and
-> making BDS thread-safe: by making CoMutex thread-safe, it removes
-> the need for a "thread-based" mutex around it.
->=20
-> This will still need some changes in the formats because, for multiqueue,
-> CoMutexes would need to be used like "real" thread mutexes.  Code like
-> this:
->=20
->     ...
->     qemu_co_mutex_unlock()
->     ... /* still access shared data, but don't yield */
->     qemu_coroutine_yield()
->=20
-> might be required to use this other pattern:
->=20
->     ... /* access shared data, but don't yield */
->     qemu_co_mutex_unlock()
->     qemu_coroutine_yield()
->=20
-> because adding a second AioContext is already introducing concurrency that
-> wasn't there before.  Still, even if you have to take concurrency into
-> account, multitasking between coroutines remains non-preemptive.  So for
-> example, it is easy to synchronize between qemu_co_mutex_lock's yield
-> and the qemu_coroutine_enter in aio_co_schedule's bottom half.
->=20
-> CoMutex puts coroutines to sleep with qemu_coroutine_yield and wake them
-> up with aio_co_wake.  I could have wrapped CoMutex's CoQueue with
-> a "regular" thread mutex or spinlock.  The resulting code would
-> have looked a lot like RFifoLock (with CoQueue replacing RFifoLock's
-> condition variable).  Instead, CoMutex is implemented from scratch and
-> CoQueue is made to depend on a CoMutex, similar to condition variables.
-> Most CoQueues already have a corresponding CoMutex so this is not a big
-> deal; converting the others is left for a future series, but a surprising
-> number of drivers actually need no change.
->=20
-> The mutex algorithm comes from OSv; it only needs two to four atomic ops
-> for a lock-unlock pair (two when uncontended) and if necessary
-> we could even take OSv's support for wait morphing (which avoids the
-> thundering herd problem) and add it to CoMutex and CoQueue.
->=20
-> Performance of CoMutex is comparable to pthread mutexes.  However, you
-> cannot make a direct comparison between CoMutex (fair) and pthread_mutex_t
-> (unfair).  For this reason the testcase also measures performance of
-> a quick-and-dirty implementation of a fair mutex, based on MCS locks
-> and futexes.
->=20
-> Paolo
->=20
-> Paolo Bonzini (6):
->   coroutine-lock: make CoMutex thread-safe
->   coroutine-lock: add limited spinning to CoMutex
->   test-aio-multithread: add performance comparison with thread-based
->     mutexes
->   coroutine-lock: place CoMutex before CoQueue in header
->   coroutine-lock: add mutex argument to CoQueue APIs
->   coroutine-lock: make CoRwlock thread-safe and fair
->=20
->  block/backup.c               |   2 +-
->  block/io.c                   |   4 +-
->  block/nbd-client.c           |   2 +-
->  block/qcow2-cluster.c        |   4 +-
->  block/sheepdog.c             |   2 +-
->  block/throttle-groups.c      |   2 +-
->  hw/9pfs/9p.c                 |   2 +-
->  include/qemu/coroutine.h     |  84 +++++++++------
->  tests/test-aio-multithread.c | 250 +++++++++++++++++++++++++++++++++++++=
-++++++
->  util/qemu-coroutine-lock.c   | 247 +++++++++++++++++++++++++++++++++++++=
-+----
->  util/qemu-coroutine.c        |   2 +-
->  util/trace-events            |   1 +
->  12 files changed, 537 insertions(+), 65 deletions(-)
->=20
-> --=20
-> 2.9.3
->=20
+It is documented in the libc info:
 
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
+https://www.gnu.org/software/libc/manual/html_node/Feature-Test-Macros.html#index-_005fXOPEN_005fSOURCE
 
-Stefan
+> Macro: _XOPEN_SOURCE
+> Macro: _XOPEN_SOURCE_EXTENDED
+>
+>     If you define this macro, functionality described in the X/Open
+>     Portability Guide is included. This is a superset of the POSIX.1
+>     and POSIX.2 functionality and in fact _POSIX_SOURCE and
+>     _POSIX_C_SOURCE are automatically defined.
+>
+>     As the unification of all Unices, functionality only available in
+>     BSD and SVID is also included.
+>
+>     If the macro _XOPEN_SOURCE_EXTENDED is also defined, even more
+>     functionality is available. The extra functions will make all
+>     functions available which are necessary for the X/Open Unix brand.
+>
+>     If the macro _XOPEN_SOURCE has the value 500 this includes all
+>     functionality described so far plus some new definitions from the
+>     Single Unix Specification, version 2.
 
---da4uJneut+ArUgXk
-Content-Type: application/pgp-signature; name="signature.asc"
+https://www.gnu.org/software/libc/manual/html_node/Feature-Test-Macros.html#index-_005fGNU_005fSOURCE
 
------BEGIN PGP SIGNATURE-----
+> Macro: _GNU_SOURCE
+>
+>     If you define this macro, everything is included: ISO C89, ISO
+>     C99, POSIX.1, POSIX.2, BSD, SVID, X/Open, LFS, and GNU extensions.
+>     In the cases where POSIX.1 conflicts with BSD, the POSIX
+>     definitions take precedence.
 
-iQEcBAEBAgAGBQJYpd63AAoJEJykq7OBq3PIp3kH/Rw4bv/mzQDL0pEHeLXAlt8N
-CHW8/d+kX7WbUNiJdcB+pXb0TczvLzAgo6eU1vj9JTZbrw2q1s09gsyryxUY4vNj
-I6XHwE/77o5CP38eZGs6PQvakkzjnKf+OsR9pHG2VgIcow6qOQ2vGirpheMEIJlD
-vEZS3ZUytLWtwCUTGOOEIzafrNXuXqqdIV/PGcKUl6Zmq8Ip9p1L3KPxVn+FGWxR
-N2SFUnogtSLWkxj8UjaF2QAja811DUUu9UJ9mT6+Vgn3ZYP5NqOsypkUv/JP0+zO
-hOqPb0JMM+VMdmQBAjznLaMVQdWr0MAvchrN6QVDs/Ub+PG+/G2+gv3tilij0vk=
-=shlM
------END PGP SIGNATURE-----
+Curiously, I managed to recall this from years ago, when I was still
+living and breathing the SUS (and looking frequently at the glibc info too).
 
---da4uJneut+ArUgXk--
+Laszlo
