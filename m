@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56427)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ceP2h-0008Oq-I2
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:36:28 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ceP2i-0008RE-EV
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:36:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ceP2g-0007ij-IH
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:36:27 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ceP2h-0007iy-D6
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:36:28 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Feb 2017 16:35:54 +0000
-Message-Id: <1487262963-11519-5-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1487262963-11519-1-git-send-email-peter.maydell@linaro.org>
-References: <1487262963-11519-1-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 16 Feb 2017 16:35:50 +0000
+Message-Id: <1487262963-11519-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 04/13] armv7m: Fix condition check for
- taking exceptions
+Subject: [Qemu-devel] [PATCH v2 00/13] Rewrite NVIC to not depend on the GIC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,98 +23,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-The M profile condition for when we can take a pending exception or
-interrupt is not the same as that for A/R profile.  The code
-originally copied from the A/R profile version of the
-cpu_exec_interrupt function only worked by chance for the
-very simple case of exceptions being masked by PRIMASK.
-Replace it with a call to a function in the NVIC code that
-correctly compares the priority of the pending exception
-against the current execution priority of the CPU.
+This patchset is the revamp of the NVIC code from Michael
+Davidsaver's patchset of a year ago.
 
-[Michael Davidsaver's patchset had a patch to do something
-similar but the implementation ended up being a rewrite.]
+Despite some superficial similarities of register layout, the
+M-profile NVIC is really very different from the A-profile GIC.  Our
+current attempt to reuse the GIC code means that we have significant
+bugs in our NVIC.  The series pulls the NVIC apart from the GIC code
+(fixing a few accidental bugs in the process), and then once it has a
+place to stand, implements a few minor cleanups, a key bugfix
+(getting priority calculations and masking right) and a missing
+feature (escalation to HardFault).
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
----
- target/arm/cpu.h      |  8 ++++++++
- hw/intc/armv7m_nvic.c |  7 +++++++
- target/arm/cpu.c      | 16 ++++++++--------
- 3 files changed, 23 insertions(+), 8 deletions(-)
+For testing, I have used the Stellaris image I have to hand:
+http://people.linaro.org/~peter.maydell/stellaris.tgz
+and also a set of bare-metal test programs also written by
+Michael. You can find my slightly tweaked and cleand up
+version of those here (a README explains how to run them):
+https://git.linaro.org/people/peter.maydell/m-profile-tests.git
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 0956a54..53299fa 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1342,6 +1342,14 @@ uint32_t arm_phys_excp_target_el(CPUState *cs, uint32_t excp_idx,
-                                  uint32_t cur_el, bool secure);
- 
- /* Interface between CPU and Interrupt controller.  */
-+#ifndef CONFIG_USER_ONLY
-+bool armv7m_nvic_can_take_pending_exception(void *opaque);
-+#else
-+static inline bool armv7m_nvic_can_take_pending_exception(void *opaque)
-+{
-+    return true;
-+}
-+#endif
- void armv7m_nvic_set_pending(void *opaque, int irq);
- int armv7m_nvic_acknowledge_irq(void *opaque);
- void armv7m_nvic_complete_irq(void *opaque, int irq);
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index f45b897..e0fce3e 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -286,6 +286,13 @@ static inline int nvic_exec_prio(NVICState *s)
-     return MIN(running, s->exception_prio);
- }
- 
-+bool armv7m_nvic_can_take_pending_exception(void *opaque)
-+{
-+    NVICState *s = opaque;
-+
-+    return nvic_exec_prio(s) > nvic_pending_prio(s);
-+}
-+
- /* caller must call nvic_irq_update() after this */
- static void set_prio(NVICState *s, unsigned irq, uint8_t prio)
- {
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 4a069f6..edbc87b 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -338,13 +338,6 @@ static bool arm_v7m_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-     CPUARMState *env = &cpu->env;
-     bool ret = false;
- 
--
--    if (interrupt_request & CPU_INTERRUPT_FIQ
--        && !(env->daif & PSTATE_F)) {
--        cs->exception_index = EXCP_FIQ;
--        cc->do_interrupt(cs);
--        ret = true;
--    }
-     /* ARMv7-M interrupt return works by loading a magic value
-      * into the PC.  On real hardware the load causes the
-      * return to occur.  The qemu implementation performs the
-@@ -354,9 +347,16 @@ static bool arm_v7m_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-      * the stack if an interrupt occurred at the wrong time.
-      * We avoid this by disabling interrupts when
-      * pc contains a magic address.
-+     *
-+     * ARMv7-M interrupt masking works differently than -A or -R.
-+     * There is no FIQ/IRQ distinction. Instead of I and F bits
-+     * masking FIQ and IRQ interrupts, an exception is taken only
-+     * if it is higher priority than the current execution priority
-+     * (which depends on state like BASEPRI, FAULTMASK and the
-+     * currently active exception).
-      */
-     if (interrupt_request & CPU_INTERRUPT_HARD
--        && !(env->daif & PSTATE_I)
-+        && (armv7m_nvic_can_take_pending_exception(env->nvic))
-         && (env->regs[15] < 0xfffffff0)) {
-         cs->exception_index = EXCP_IRQ;
-         cc->do_interrupt(cs);
+Changes v1->v2:
+ * clarify a few comments
+ * rephrase loops in nvic_sysreg_read() and nvic_sysreg_write()
+ * checked RETTOBASE semantics vs various docs; the existing
+   code seems to best match, but flipped our choice of behaviour
+   in the UNKNOWN "no interrupt" case to match the M3's choice,
+   and expanded the comment.
+New patches in v2:
+ * patches 10, 11 implement the exception return integrity check logic
+ * patch 12 fixes a minor bug in reporting attempts to run ARM code
+ * Patch 13 implements writing of SHCSR active and pending bits
+   (mostly useful for test code that puts the CPU in weird states
+   like deactivating the current active interrupt)
+
+Patches needing review: 3, 10, 11, 12, 13.
+
+I've also updated the m-profile-tests test code to add
+tests for the exception return integrity checks.
+
+(Next after this I have a dozen or so patches which QOMify
+the armv7m container and otherwise bring that code up to
+date with how we do objects these days.)
+
+thanks
+-- PMM
+
+Michael Davidsaver (5):
+  armv7m: Rewrite NVIC to not use any GIC code
+  arm: gic: Remove references to NVIC
+  armv7m: Escalate exceptions to HardFault if necessary
+  armv7m: Simpler and faster exception start
+  armv7m: VECTCLRACTIVE and VECTRESET are UNPREDICTABLE
+
+Peter Maydell (8):
+  armv7m: Rename nvic_state to NVICState
+  armv7m: Implement reading and writing of PRIGROUP
+  armv7m: Fix condition check for taking exceptions
+  armv7m: Remove unused armv7m_nvic_acknowledge_irq() return value
+  armv7m: Extract "exception taken" code into functions
+  armv7m: Check exception return consistency
+  armv7m: Raise correct kind of UsageFault for attempts to execute ARM
+    code
+  armv7m: Allow SHCSR writes to change pending and active bits
+
+ hw/intc/gic_internal.h   |   7 +-
+ target/arm/cpu.h         |  23 +-
+ hw/intc/arm_gic.c        |  31 +-
+ hw/intc/arm_gic_common.c |  23 +-
+ hw/intc/armv7m_nvic.c    | 885 +++++++++++++++++++++++++++++++++++++----------
+ linux-user/main.c        |   1 +
+ target/arm/cpu.c         |  16 +-
+ target/arm/helper.c      | 245 +++++++++----
+ target/arm/translate.c   |   8 +-
+ hw/intc/trace-events     |  15 +
+ 10 files changed, 954 insertions(+), 300 deletions(-)
+
 -- 
 2.7.4
