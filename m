@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cePPC-0008WG-KP
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:59:43 -0500
+	(envelope-from <lersek@redhat.com>) id 1cePR1-0001dK-CA
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:01:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cePP8-0000bS-44
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:59:42 -0500
-References: <CABHMSTVDnAxAvpp81+z_2fkAFO7tazLJs3cFXpuDuuGQj-Ek-A@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d80521c7-f548-7ec5-0860-e654125da113@redhat.com>
-Date: Thu, 16 Feb 2017 10:59:35 -0600
+	(envelope-from <lersek@redhat.com>) id 1cePQx-0001sq-0x
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:01:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41482)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cePQw-0001rJ-PE
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:01:30 -0500
+References: <cover.1487224954.git.ben@skyportsystems.com>
+	<4d92b9f92d2f5b702c23bf135222dfb226ec94a7.1487224954.git.ben@skyportsystems.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <9e222b4c-c05d-8fd0-6c55-4b2e52cab7b0@redhat.com>
+Date: Thu, 16 Feb 2017 18:01:25 +0100
 MIME-Version: 1.0
-In-Reply-To: <CABHMSTVDnAxAvpp81+z_2fkAFO7tazLJs3cFXpuDuuGQj-Ek-A@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="7tK3BcG49XM9tLk5bvaHECPTLGfdtrp3q"
-Subject: Re: [Qemu-devel] Fix build break during configuration on musl-libc
- based Linux systems.
+In-Reply-To: <4d92b9f92d2f5b702c23bf135222dfb226ec94a7.1487224954.git.ben@skyportsystems.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 1/8] linker-loader: Add new 'write
+ pointer' command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,86 +28,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Chad Joan <chadjoan@gmail.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: ben@skyportsystems.com
+Cc: qemu-devel@nongnu.org, mst@redhat.com, imammedo@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7tK3BcG49XM9tLk5bvaHECPTLGfdtrp3q
-From: Eric Blake <eblake@redhat.com>
-To: Chad Joan <chadjoan@gmail.com>, qemu-devel@nongnu.org,
- qemu-trivial@nongnu.org
-Message-ID: <d80521c7-f548-7ec5-0860-e654125da113@redhat.com>
-Subject: Re: [Qemu-devel] Fix build break during configuration on musl-libc
- based Linux systems.
-References: <CABHMSTVDnAxAvpp81+z_2fkAFO7tazLJs3cFXpuDuuGQj-Ek-A@mail.gmail.com>
-In-Reply-To: <CABHMSTVDnAxAvpp81+z_2fkAFO7tazLJs3cFXpuDuuGQj-Ek-A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 02/16/17 07:18, ben@skyportsystems.com wrote:
+> From: Ben Warren <ben@skyportsystems.com>
+> 
+> This is similar to the existing 'add pointer' functionality, but instead
+> of instructing the guest (BIOS or UEFI) to patch memory, it instructs
+> the guest to write the pointer back to QEMU via a writeable fw_cfg file.
+> 
+> Signed-off-by: Ben Warren <ben@skyportsystems.com>
+> ---
+>  hw/acpi/bios-linker-loader.c         | 66 ++++++++++++++++++++++++++++++++++--
+>  include/hw/acpi/bios-linker-loader.h |  7 ++++
+>  2 files changed, 70 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/acpi/bios-linker-loader.c b/hw/acpi/bios-linker-loader.c
+> index d963ebe..d5fb703 100644
+> --- a/hw/acpi/bios-linker-loader.c
+> +++ b/hw/acpi/bios-linker-loader.c
+> @@ -78,6 +78,21 @@ struct BiosLinkerLoaderEntry {
+>              uint32_t length;
+>          } cksum;
+>  
+> +        /*
+> +         * COMMAND_WRITE_POINTER - write the fw_cfg file (originating from
+> +         * @dest_file) at @wr_pointer.offset, by adding a pointer to
+> +         * @src_offset within the table originating from @src_file.
+> +         * 1,2,4 or 8 byte unsigned addition is used depending on
+> +         * @wr_pointer.size.
+> +         */
+> +        struct {
+> +            char dest_file[BIOS_LINKER_LOADER_FILESZ];
+> +            char src_file[BIOS_LINKER_LOADER_FILESZ];
+> +            uint32_t dst_offset;
+> +            uint32_t src_offset;
+> +            uint8_t size;
+> +        } wr_pointer;
+> +
+>          /* padding */
+>          char pad[124];
+>      };
+> @@ -85,9 +100,10 @@ struct BiosLinkerLoaderEntry {
+>  typedef struct BiosLinkerLoaderEntry BiosLinkerLoaderEntry;
+>  
+>  enum {
+> -    BIOS_LINKER_LOADER_COMMAND_ALLOCATE     = 0x1,
+> -    BIOS_LINKER_LOADER_COMMAND_ADD_POINTER  = 0x2,
+> -    BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM = 0x3,
+> +    BIOS_LINKER_LOADER_COMMAND_ALLOCATE          = 0x1,
+> +    BIOS_LINKER_LOADER_COMMAND_ADD_POINTER       = 0x2,
+> +    BIOS_LINKER_LOADER_COMMAND_ADD_CHECKSUM      = 0x3,
+> +    BIOS_LINKER_LOADER_COMMAND_WRITE_POINTER     = 0x4,
+>  };
+>  
+>  enum {
+> @@ -278,3 +294,47 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
+>  
+>      g_array_append_vals(linker->cmd_blob, &entry, sizeof entry);
+>  }
+> +
+> +/*
+> + * bios_linker_loader_write_pointer: ask guest to write a pointer to the
+> + * source file into the destination file, and write it back to QEMU via
+> + * fw_cfg DMA.
+> + *
+> + * @linker: linker object instance
+> + * @dest_file: destination file that must be written
+> + * @dst_patched_offset: location within destination file blob to be patched
+> + *                      with the pointer to @src_file, in bytes
+> + * @dst_patched_offset_size: size of the pointer to be patched
+> + *                      at @dst_patched_offset in @dest_file blob, in bytes
+> + * @src_file: source file who's address must be taken
+> + * @src_offset: location within source file blob to which
+> + *              @dest_file+@dst_patched_offset will point to after
+> + *              firmware's executed WRITE_POINTER command
+> + */
+> +void bios_linker_loader_write_pointer(BIOSLinker *linker,
+> +                                    const char *dest_file,
+> +                                    uint32_t dst_patched_offset,
+> +                                    uint8_t dst_patched_size,
+> +                                    const char *src_file,
+> +                                    uint32_t src_offset)
+> +{
+> +    BiosLinkerLoaderEntry entry;
+> +    const BiosLinkerFileEntry *source_file =
+> +        bios_linker_find_file(linker, src_file);
+> +
+> +    assert(source_file);
+> +    assert(src_offset <= source_file->blob->len);
 
-On 02/16/2017 10:30 AM, Chad Joan wrote:
-> Hello,
->=20
-> This is a one-line patch to the configure script that will allow QEMU t=
-o be
-> built on musl-libc based Linux systems.  This problem is only noticeabl=
-e
-> when QEMU is built with --enable-curses.
->=20
-> Detailed reading material if you want to know where this came from:
-> https://bugs.gentoo.org/show_bug.cgi?id=3D609364
->=20
-> Hope that helps!
-> - Chad
->=20
->=20
-> qemu-2.8.0-musl-ncurses.patch
->=20
+(1) Off by one, as pointed out by Igor.
 
+> +    memset(&entry, 0, sizeof entry);
+> +    strncpy(entry.wr_pointer.dest_file, dest_file,
+> +            sizeof entry.wr_pointer.dest_file - 1);
+> +    strncpy(entry.wr_pointer.src_file, src_file,
+> +            sizeof entry.wr_pointer.src_file - 1);
+> +    entry.command = cpu_to_le32(BIOS_LINKER_LOADER_COMMAND_WRITE_POINTER);
+> +    entry.wr_pointer.dst_offset = cpu_to_le32(dst_patched_offset);
+> +    entry.wr_pointer.src_offset = cpu_to_le32(dst_patched_offset);
 
-Thanks for the patch.  However, it is not in the usual format (we prefer
-'git send-email's inline format, rather than attachements), and is
-missing a Signed-off-by: designation, so it cannot be applied without
-that being fixed first.  More information at:
+(2) copy/paste error, you should be assigning "src_offset", as in:
 
-http://wiki.qemu-project.org/Contribute/SubmitAPatch
+> diff --git a/hw/acpi/bios-linker-loader.c b/hw/acpi/bios-linker-loader.c
+> index d5fb7033a0be..d1a9f2f33dcc 100644
+> --- a/hw/acpi/bios-linker-loader.c
+> +++ b/hw/acpi/bios-linker-loader.c
+> @@ -331,7 +331,7 @@ void bios_linker_loader_write_pointer(BIOSLinker *linker,
+>              sizeof entry.wr_pointer.src_file - 1);
+>      entry.command = cpu_to_le32(BIOS_LINKER_LOADER_COMMAND_WRITE_POINTER);
+>      entry.wr_pointer.dst_offset = cpu_to_le32(dst_patched_offset);
+> -    entry.wr_pointer.src_offset = cpu_to_le32(dst_patched_offset);
+> +    entry.wr_pointer.src_offset = cpu_to_le32(src_offset);
+>      entry.wr_pointer.size = dst_patched_size;
+>      assert(dst_patched_size == 1 || dst_patched_size == 2 ||
+>             dst_patched_size == 4 || dst_patched_size == 8);
 
->=20
-> diff --git configure configure
-> index 1c9655e..9f83176 100755
-> --- configure
-> +++ configure
-> @@ -682,6 +682,7 @@ Haiku)
->    vhost_net=3D"yes"
->    vhost_scsi=3D"yes"
->    vhost_vsock=3D"yes"
-> +  QEMU_CFLAGS=3D"-D_XOPEN_SOURCE=3D500 $QEMU_CFLAGS"
->    QEMU_INCLUDES=3D"-I\$(SRC_PATH)/linux-headers -I$(pwd)/linux-headers=
- $QEMU_INCLUDES"
->  ;;
->  esac
->=20
+With these errors fixed:
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 
+I also tested this series (with the assignment under (2) fixed up, of course), as documented earlier in <https://www.mail-archive.com/qemu-devel@nongnu.org/msg430075.html> (msgid <678c203f-3768-7e65-6e48-6729473b6ffa@redhat.com>).
 
---7tK3BcG49XM9tLk5bvaHECPTLGfdtrp3q
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Hence, with (1) and (2) fixed, you can also add
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Tested-by: Laszlo Ersek <lersek@redhat.com>
 
-iQEcBAEBCAAGBQJYpdp3AAoJEKeha0olJ0Nqu4gH/iqjD7G2aca0/5eCnV8PdKIk
-eofVcU3sUIyLw70JBmEhg4Ach9BfjWTZ+45MI+3mR8fadGKOAG0ZelhMtmG1b0KY
-29Uu8YPfYTfFAUEHYIKltm2X4qblhsU9wzYR9EBg1Uy/41VQFK6leV0Xe4qcd1OW
-w/fkatfpl4+k/6a01jgbok7nBZKFJGNhbpe4iYeYM9SyX3d1Hs1Rg3JtLeZnQ7eo
-a7iFxGzexxdbKmTeqOt5R6a1cUYli8KZp5Go+FzfVXucDO+sBKRi8/7nAoj5m+dv
-Ubt4rommwkiXycnzzLse0fyaZNBXqka1jpmddSr65i+bIOg3qw4rO5yqY38P2BI=
-=swEo
------END PGP SIGNATURE-----
+Thanks
+Laszlo
 
---7tK3BcG49XM9tLk5bvaHECPTLGfdtrp3q--
+> +    entry.wr_pointer.size = dst_patched_size;
+> +    assert(dst_patched_size == 1 || dst_patched_size == 2 ||
+> +           dst_patched_size == 4 || dst_patched_size == 8);
+> +
+> +    g_array_append_vals(linker->cmd_blob, &entry, sizeof entry);
+> +}
+> diff --git a/include/hw/acpi/bios-linker-loader.h b/include/hw/acpi/bios-linker-loader.h
+> index fa1e5d1..efe17b0 100644
+> --- a/include/hw/acpi/bios-linker-loader.h
+> +++ b/include/hw/acpi/bios-linker-loader.h
+> @@ -26,5 +26,12 @@ void bios_linker_loader_add_pointer(BIOSLinker *linker,
+>                                      const char *src_file,
+>                                      uint32_t src_offset);
+>  
+> +void bios_linker_loader_write_pointer(BIOSLinker *linker,
+> +                                      const char *dest_file,
+> +                                      uint32_t dst_patched_offset,
+> +                                      uint8_t dst_patched_size,
+> +                                      const char *src_file,
+> +                                      uint32_t src_offset);
+> +
+>  void bios_linker_loader_cleanup(BIOSLinker *linker);
+>  #endif
+> 
