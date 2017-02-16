@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48523)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ceMxQ-0002WH-0m
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:22:55 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ceMxT-0002eW-8A
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:22:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ceMxM-0002Kh-Ow
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:22:51 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:61189)
+	(envelope-from <laurent@vivier.eu>) id 1ceMxR-0002NF-OX
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:22:55 -0500
+Received: from mout.kundenserver.de ([217.72.192.74]:62026)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ceMxM-0002KS-ES
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:22:48 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ceMxR-0002MT-Db
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:22:53 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu, 16 Feb 2017 15:22:22 +0100
-Message-Id: <20170216142227.27448-10-laurent@vivier.eu>
+Date: Thu, 16 Feb 2017 15:22:25 +0100
+Message-Id: <20170216142227.27448-13-laurent@vivier.eu>
 In-Reply-To: <20170216142227.27448-1-laurent@vivier.eu>
 References: <20170216142227.27448-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 09/14] linux-user: Update m68k syscall
- definitions to match Linux 4.6
+Subject: [Qemu-devel] [PULL 12/14] linux-user: fill target sigcontext struct
+ accordingly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,28 +25,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Laurent Vivier <laurent@vivier.eu>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, Laurent Vivier <laurent@vivier.eu>
 
-From: Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
 
-Signed-off-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+A segfault is noticed when an emulated program uses any of ucontext
+regs fields. Risu detected this issue in the following operation when
+handling a signal:
+  ucontext_t *uc = (ucontext_t*)uc;
+  uc->uc_mcontext.regs->nip += 4;
+
+but this works fine:
+  uc->uc_mcontext.gp_regs[PT_NIP] += 4;
+
+This patch set regs to a valid location as well as other sigcontext
+fields.
+
+Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20170116224915.19430-2-glaubitz@physik.fu-berlin.de>
+Message-Id: <1485900317-3256-1-git-send-email-joserz@linux.vnet.ibm.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/m68k/syscall_nr.h | 3 +++
- 1 file changed, 3 insertions(+)
+ linux-user/signal.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/linux-user/m68k/syscall_nr.h b/linux-user/m68k/syscall_nr.h
-index 4b50fb2..d239551 100644
---- a/linux-user/m68k/syscall_nr.h
-+++ b/linux-user/m68k/syscall_nr.h
-@@ -376,3 +376,6 @@
- #define TARGET_NR_userfaultfd           373
- #define TARGET_NR_membarrier            374
- #define TARGET_NR_mlock2                375
-+#define TARGET_NR_copy_file_range       376
-+#define TARGET_NR_preadv2               377
-+#define TARGET_NR_pwritev2              378
+diff --git a/linux-user/signal.c b/linux-user/signal.c
+index 5064de0..8209539 100644
+--- a/linux-user/signal.c
++++ b/linux-user/signal.c
+@@ -5155,6 +5155,7 @@ static void setup_rt_frame(int sig, struct target_sigaction *ka,
+     target_ulong rt_sf_addr, newsp = 0;
+     int i, err = 0;
+ #if defined(TARGET_PPC64)
++    struct target_sigcontext *sc = 0;
+     struct image_info *image = ((TaskState *)thread_cpu->opaque)->info;
+ #endif
+ 
+@@ -5183,6 +5184,10 @@ static void setup_rt_frame(int sig, struct target_sigaction *ka,
+ #if defined(TARGET_PPC64)
+     mctx = &rt_sf->uc.tuc_sigcontext.mcontext;
+     trampptr = &rt_sf->trampoline[0];
++
++    sc = &rt_sf->uc.tuc_sigcontext;
++    __put_user(h2g(mctx), &sc->regs);
++    __put_user(sig, &sc->signal);
+ #else
+     mctx = &rt_sf->uc.tuc_mcontext;
+     trampptr = (uint32_t *)&rt_sf->uc.tuc_mcontext.tramp;
 -- 
 2.9.3
