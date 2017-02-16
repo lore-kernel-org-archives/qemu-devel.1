@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1ceK63-0001Lq-AW
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 06:19:36 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ceKBX-0003fz-BX
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 06:25:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1ceK60-0003Rq-4B
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 06:19:35 -0500
-Received: from mx4-phx2.redhat.com ([209.132.183.25]:36674)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1ceK5z-0003Ra-Ox
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 06:19:32 -0500
-Date: Thu, 16 Feb 2017 06:19:29 -0500 (EST)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>
-Message-ID: <2066565427.5738720.1487243969707.JavaMail.zimbra@redhat.com>
-In-Reply-To: <d845bee9-5de1-96ce-3bb2-1110d260729d@redhat.com>
-References: <20170216105827.1486-1-marcandre.lureau@redhat.com>
-	<d845bee9-5de1-96ce-3bb2-1110d260729d@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1ceKBW-0005wZ-MM
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 06:25:15 -0500
+Date: Thu, 16 Feb 2017 12:25:06 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170216112506.GB4869@noname.redhat.com>
+References: <1487153430-17260-1-git-send-email-vsementsov@virtuozzo.com>
+	<1487153430-17260-9-git-send-email-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCHv2] cutils: factor out
- pci_host_device_address_parse()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1487153430-17260-9-git-send-email-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v15 08/25] block: introduce auto-loading
+ bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,326 +24,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
-Hi
+Am 15.02.2017 um 11:10 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> Auto loading bitmaps are bitmaps stored in the disk image, which should
+> be loaded when the image is opened and become BdrvDirtyBitmaps for the
+> corresponding drive.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: John Snow <jsnow@redhat.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
 
------ Original Message -----
-> On 02/16/2017 12:58 PM, Marc-Andr=C3=A9 Lureau wrote:
-> > This will allow the function to be used outside of QOM properties.
-> >
->=20
-> Hi Mark-Andre,
->=20
-> I am not sure cutil.h is the right header for the function, because is to=
-o
-> PCI
-> related for a utility library.
+Why do we need a new BlockDriver callback and special code for it in
+bdrv_open_common()? The callback is only ever called immediately after
+.bdrv_open/.bdrv_file_open, so can't the drivers just do this internally
+in their .bdrv_open implementation? Even more so because qcow2 is the
+only driver that supports this callback.
 
-It's in the pci.h header, implementation and test is put in {test-,}cutils.=
-c
-
-I can try to put it in pci/pci.c, but it will be harder to link to for test=
-ing (note: I haven't tried). I could also put it in a seperate pci-parse.c =
-for example.
-
-
-> Also, maybe we can post the patch together with the code that uses the
-> exposed function.
-
-I dropped the patch using it for now, but I thought it would still be nice =
-to have the test, doc and strtoul change.
-
->=20
-> And thanks for the unit-tests, much appreciated!
-
-thanks
-
-> Marcel
->=20
-> > Add tests and replace strtoul usage for qemu_strtoul while touching it.
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> > v2:
-> >  - fixed incompatible type warning/error
-> >
-> > include/hw/pci/pci.h      | 12 ++++++++++
-> >  hw/core/qdev-properties.c | 61
-> >  +++--------------------------------------------
-> >  tests/test-cutils.c       | 46 +++++++++++++++++++++++++++++++++++
-> >  util/cutils.c             | 59
-> >  +++++++++++++++++++++++++++++++++++++++++++++
-> >  4 files changed, 120 insertions(+), 58 deletions(-)
-> >
-> > diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> > index cbc1fdfb5b..61718080ea 100644
-> > --- a/include/hw/pci/pci.h
-> > +++ b/include/hw/pci/pci.h
-> > @@ -815,4 +815,16 @@ extern const VMStateDescription vmstate_pci_device=
-;
-> >
-> >  MSIMessage pci_get_msi_message(PCIDevice *dev, int vector);
-> >
-> > +/**
-> > + * pci_host_device_address_parse:
-> > + * @str: string to parse
-> > + * @addr: destination structure or NULL
-> > + *
-> > + * Parse [<domain>:]<bus>:<slot>.<func>
-> > + *   if <domain> is not supplied, it's assumed to be 0.
-> > + *
-> > + * Returns: -1 on failure, 0 on success.
-> > + */
-> > +int pci_host_device_address_parse(const char *str, PCIHostDeviceAddres=
-s
-> > *addr);
-> > +
-> >  #endif
-> > diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-> > index 6ab4265eb4..5dd0774e88 100644
-> > --- a/hw/core/qdev-properties.c
-> > +++ b/hw/core/qdev-properties.c
-> > @@ -722,10 +722,6 @@ static void get_pci_host_devaddr(Object *obj, Visi=
-tor
-> > *v, const char *name,
-> >      visit_type_str(v, name, &p, errp);
-> >  }
-> >
-> > -/*
-> > - * Parse [<domain>:]<bus>:<slot>.<func>
-> > - *   if <domain> is not supplied, it's assumed to be 0.
-> > - */
-> >  static void set_pci_host_devaddr(Object *obj, Visitor *v, const char
-> >  *name,
-> >                                   void *opaque, Error **errp)
-> >  {
-> > @@ -733,11 +729,7 @@ static void set_pci_host_devaddr(Object *obj, Visi=
-tor
-> > *v, const char *name,
-> >      Property *prop =3D opaque;
-> >      PCIHostDeviceAddress *addr =3D qdev_get_prop_ptr(dev, prop);
-> >      Error *local_err =3D NULL;
-> > -    char *str, *p;
-> > -    char *e;
-> > -    unsigned long val;
-> > -    unsigned long dom =3D 0, bus =3D 0;
-> > -    unsigned int slot =3D 0, func =3D 0;
-> > +    char *str;
-> >
-> >      if (dev->realized) {
-> >          qdev_prop_set_after_realize(dev, name, errp);
-> > @@ -750,58 +742,11 @@ static void set_pci_host_devaddr(Object *obj, Vis=
-itor
-> > *v, const char *name,
-> >          return;
-> >      }
-> >
-> > -    p =3D str;
-> > -    val =3D strtoul(p, &e, 16);
-> > -    if (e =3D=3D p || *e !=3D ':') {
-> > -        goto inval;
-> > -    }
-> > -    bus =3D val;
-> > -
-> > -    p =3D e + 1;
-> > -    val =3D strtoul(p, &e, 16);
-> > -    if (e =3D=3D p) {
-> > -        goto inval;
-> > -    }
-> > -    if (*e =3D=3D ':') {
-> > -        dom =3D bus;
-> > -        bus =3D val;
-> > -        p =3D e + 1;
-> > -        val =3D strtoul(p, &e, 16);
-> > -        if (e =3D=3D p) {
-> > -            goto inval;
-> > -        }
-> > -    }
-> > -    slot =3D val;
-> > -
-> > -    if (*e !=3D '.') {
-> > -        goto inval;
-> > +    if (!pci_host_device_address_parse(str, addr)) {
-> > +        error_set_from_qdev_prop_error(errp, EINVAL, dev, prop, str);
-> >      }
-> > -    p =3D e + 1;
-> > -    val =3D strtoul(p, &e, 10);
-> > -    if (e =3D=3D p) {
-> > -        goto inval;
-> > -    }
-> > -    func =3D val;
-> > -
-> > -    if (dom > 0xffff || bus > 0xff || slot > 0x1f || func > 7) {
-> > -        goto inval;
-> > -    }
-> > -
-> > -    if (*e) {
-> > -        goto inval;
-> > -    }
-> > -
-> > -    addr->domain =3D dom;
-> > -    addr->bus =3D bus;
-> > -    addr->slot =3D slot;
-> > -    addr->function =3D func;
-> >
-> >      g_free(str);
-> > -    return;
-> > -
-> > -inval:
-> > -    error_set_from_qdev_prop_error(errp, EINVAL, dev, prop, str);
-> > -    g_free(str);
-> >  }
-> >
-> >  PropertyInfo qdev_prop_pci_host_devaddr =3D {
-> > diff --git a/tests/test-cutils.c b/tests/test-cutils.c
-> > index 20b0f59ba2..81c4f072f3 100644
-> > --- a/tests/test-cutils.c
-> > +++ b/tests/test-cutils.c
-> > @@ -28,6 +28,7 @@
-> >  #include "qemu/osdep.h"
-> >
-> >  #include "qemu/cutils.h"
-> > +#include "hw/pci/pci.h"
-> >
-> >  static void test_parse_uint_null(void)
-> >  {
-> > @@ -1437,6 +1438,46 @@ static void test_qemu_strtosz_suffix_unit(void)
-> >      g_assert_cmpint(res, =3D=3D, 12345000);
-> >  }
-> >
-> > +static void test_pci_parse_valid(void)
-> > +{
-> > +    PCIHostDeviceAddress addr =3D { 0xff, 0xff, 0xff, 0xff };
-> > +    int i, res;
-> > +    const struct {
-> > +        const char *str;
-> > +        PCIHostDeviceAddress addr;
-> > +    } tests[] =3D {
-> > +        { "1:2.3", { 0, 1, 2, 3 } },
-> > +        { "4:1:2.3", { 4, 1, 2, 3 } },
-> > +        { "a:a:a.7", { 10, 10, 10, 7 } },
-> > +    };
-> > +
-> > +    for (i =3D 0; i < ARRAY_SIZE(tests); i++) {
-> > +        res =3D pci_host_device_address_parse(tests[i].str, &addr);
-> > +        g_assert_cmpint(res, =3D=3D, 0);
-> > +
-> > +        g_assert_cmpint(addr.domain, =3D=3D, tests[i].addr.domain);
-> > +        g_assert_cmpint(addr.bus, =3D=3D, tests[i].addr.bus);
-> > +        g_assert_cmpint(addr.slot, =3D=3D, tests[i].addr.slot);
-> > +        g_assert_cmpint(addr.function, =3D=3D, tests[i].addr.function)=
-;
-> > +    }
-> > +}
-> > +
-> > +static void test_pci_parse_invalid(void)
-> > +{
-> > +    int i, res;
-> > +    const char *tests[] =3D  {
-> > +        "", "foo", "1:2.3 foo",
-> > +        "a:a:a.a",
-> > +        "1", "1:", "1:2", "1:2:", "1:2:3", ":1:2:3.",
-> > +        "-1:1:2.3", "-1:2.3", "1:-1.3", "1:2.-3",
-> > +        "0x10000:1:1.1", "0x100:1.1", "1:0x20.1", "1:1.8" };
-> > +
-> > +    for (i =3D 0; i < ARRAY_SIZE(tests); i++) {
-> > +        res =3D pci_host_device_address_parse(tests[i], NULL);
-> > +        g_assert_cmpint(res, =3D=3D, -1);
-> > +    }
-> > +}
-> > +
-> >  int main(int argc, char **argv)
-> >  {
-> >      g_test_init(&argc, &argv, NULL);
-> > @@ -1598,5 +1639,10 @@ int main(int argc, char **argv)
-> >      g_test_add_func("/cutils/strtosz/suffix-unit",
-> >                      test_qemu_strtosz_suffix_unit);
-> >
-> > +    g_test_add_func("/cutils/pci-parse/valid",
-> > +                    test_pci_parse_valid);
-> > +    g_test_add_func("/cutils/pci-parse/invalid",
-> > +                    test_pci_parse_invalid);
-> > +
-> >      return g_test_run();
-> >  }
-> > diff --git a/util/cutils.c b/util/cutils.c
-> > index 4fefcf3be3..fc71c85816 100644
-> > --- a/util/cutils.c
-> > +++ b/util/cutils.c
-> > @@ -29,6 +29,7 @@
-> >  #include "qemu/sockets.h"
-> >  #include "qemu/iov.h"
-> >  #include "net/net.h"
-> > +#include "hw/pci/pci.h"
-> >  #include "qemu/cutils.h"
-> >
-> >  void strpadcpy(char *buf, int buf_size, const char *str, char pad)
-> > @@ -594,3 +595,61 @@ const char *qemu_ether_ntoa(const MACAddr *mac)
-> >
-> >      return ret;
-> >  }
-> > +
-> > +int pci_host_device_address_parse(const char *str, PCIHostDeviceAddres=
-s
-> > *addr)
-> > +{
-> > +    const char *p =3D str;
-> > +    const char *e;
-> > +    unsigned long val;
-> > +    unsigned int dom =3D 0, bus =3D 0;
-> > +    unsigned int slot =3D 0, func =3D 0;
-> > +
-> > +    if (qemu_strtoul(p, &e, 16, &val) < 0
-> > +        || e =3D=3D p || *e !=3D ':') {
-> > +        return -1;
-> > +    }
-> > +    bus =3D val;
-> > +
-> > +    p =3D e + 1;
-> > +    if (qemu_strtoul(p, &e, 16, &val) < 0
-> > +        || e =3D=3D p) {
-> > +        return -1;
-> > +    }
-> > +    if (*e =3D=3D ':') {
-> > +        dom =3D bus;
-> > +        bus =3D val;
-> > +        p =3D e + 1;
-> > +        if (qemu_strtoul(p, &e, 16, &val) < 0
-> > +            || e =3D=3D p) {
-> > +            return -1;
-> > +        }
-> > +    }
-> > +    slot =3D val;
-> > +
-> > +    if (*e !=3D '.') {
-> > +        return -1;
-> > +    }
-> > +    p =3D e + 1;
-> > +    if (qemu_strtoul(p, &e, 10, &val) < 0
-> > +        || e =3D=3D p) {
-> > +        return -1;
-> > +    }
-> > +    func =3D val;
-> > +
-> > +    if (dom > 0xffff || bus > 0xff || slot > 0x1f || func > 7) {
-> > +        return -1;
-> > +    }
-> > +
-> > +    if (*e) {
-> > +        return -1;
-> > +    }
-> > +
-> > +    if (addr) {
-> > +        addr->domain =3D dom;
-> > +        addr->bus =3D bus;
-> > +        addr->slot =3D slot;
-> > +        addr->function =3D func;
-> > +    }
-> > +
-> > +    return 0;
-> > +}
-> >
->=20
->=20
+Kevin
