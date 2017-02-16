@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ceLdF-0008Gq-Lm
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 07:57:58 -0500
+	(envelope-from <armbru@redhat.com>) id 1ceLdk-00005v-Ts
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 07:58:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ceLdB-0001w0-RF
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 07:57:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52306)
+	(envelope-from <armbru@redhat.com>) id 1ceLdh-0002Aw-1b
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 07:58:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57628)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ceLdB-0001vX-LN
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 07:57:53 -0500
-References: <efb89578-ba8c-1f42-0ec3-79f769b3f1f1@genode-labs.com>
-	<1266688981.22789860.1487246005187.JavaMail.zimbra@redhat.com>
-	<f40048d0-23bc-a4c7-8b18-00d6d3fd04b5@genode-labs.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ae235b6f-3e43-c132-c2ff-fd220c8c9dde@redhat.com>
-Date: Thu, 16 Feb 2017 13:57:53 +0100
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ceLdg-0002Ap-S2
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 07:58:24 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7D09C83F44
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 12:58:24 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <1487067971-10443-1-git-send-email-armbru@redhat.com>
+	<1487067971-10443-3-git-send-email-armbru@redhat.com>
+	<99dd0998-5e15-888f-301c-141c931b10a8@redhat.com>
+Date: Thu, 16 Feb 2017 13:58:21 +0100
+In-Reply-To: <99dd0998-5e15-888f-301c-141c931b10a8@redhat.com> (Eric Blake's
+	message of "Tue, 14 Feb 2017 14:10:17 -0600")
+Message-ID: <87shnegumq.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <f40048d0-23bc-a4c7-8b18-00d6d3fd04b5@genode-labs.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] x86 tlb_fill in memory_helper.c
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 02/24] QemuOpts: Assert value string isn't
+ null
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +35,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Boettcher <alexander.boettcher@genode-labs.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, rth@twiddle.net
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+Eric Blake <eblake@redhat.com> writes:
 
-
-On 16/02/2017 13:57, Alexander Boettcher wrote:
-> Hello Paolo,
-> 
-> On 16.02.2017 12:53, Paolo Bonzini wrote:
->> As you noticed, the problem is that now cpu_vmexit is called without a
->> cpu_restore_state before.
->>
->> The right fix is to pass the retaddr to cpu_vmexit (via
->> cpu_svm_check_intercept_param); something like this untested patch:
-> 
+> On 02/14/2017 04:25 AM, Markus Armbruster wrote:
+>> Plenty of code relies on QemuOpt member @str not being null, including
+>> qemu_opts_print(), qemu_opts_to_qdict(), and callbacks passed to
+>> qemu_opt_foreach().
+>> 
+>
+>> 
+>> Assert member @str isn't null, so that misuse is caught right away.
+>> 
+>> Simplify parse_option_bool(), parse_option_number() and
+>> parse_option_size() accordingly.  Best viewed with whitespace changes
+>> ignored.
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  util/qemu-option.c | 89 ++++++++++++++++++++++++------------------------------
+>>  1 file changed, 39 insertions(+), 50 deletions(-)
+>> 
+>
+>> @@ -180,39 +172,35 @@ void parse_option_size(const char *name, const char *value,
+>>      char *postfix;
+>>      double sizef;
+>>  
+>
+>> +    sizef = strtod(value, &postfix);
+>> +    if (sizef < 0 || sizef > UINT64_MAX) {
+>> +        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, name,
+>> +                   "a non-negative number below 2^64");
+>> +        return;
+>> +    }
+>> +    switch (*postfix) {
+>> +    case 'T':
 > ...
-> 
->>
->> If it works for you we can include it.
-> 
-> thank you for the quick patch. It works like a charm.
-> 
-> Do you take care of adding the patch, please ? (I can of course also do.)
+>> +    default:
+>>          error_setg(errp, QERR_INVALID_PARAMETER_VALUE, name, "a size");
+>> +        error_append_hint(errp, "You may use k, M, G or T suffixes for "
+>> +                          "kilobytes, megabytes, gigabytes and terabytes.\n");
+>> +        return;
+>>      }
+>
+> Unrelated to this patch, but noticing it now: it looks like we blindly
+> accept "qemu-system-x86_64 -nodefaults -m 1Mgarbage" as meaning the same
+> as "... -m 1M".  Looking back at 1/24, looks like you marked that as one
+> of the buggy cases.
 
-Great, I will look at it.  Have you debugged the exact failure mode to
-include something in the commit message?
+Correct.
 
-Paolo
+>                      Good - I guess I'll get to comment more on it in a
+> later patch.
+>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks!
