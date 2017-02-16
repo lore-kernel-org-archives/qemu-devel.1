@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1ceNn9-0005QA-Hb
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 10:16:20 -0500
+	(envelope-from <kraxel@redhat.com>) id 1ceNoB-0006ka-D2
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 10:17:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1ceNn6-0001hI-DG
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 10:16:19 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:46020)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1ceNn6-0001gz-2z
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 10:16:16 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20170214071510.6112.76764.stgit@PASHA-ISP>	
-	<a268900c-a44f-fbc1-9f6e-92a127c5dcbf@redhat.com>
-	<1487257950.32455.0.camel@redhat.com>
-In-Reply-To: <1487257950.32455.0.camel@redhat.com>
-Date: Thu, 16 Feb 2017 18:16:16 +0300
-Message-ID: <002f01d28867$9e79ff10$db6dfd30$@ru>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH v3] audio: make audio poll timer
- deterministic
+	(envelope-from <kraxel@redhat.com>) id 1ceNo8-0001sA-9e
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 10:17:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51722)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ceNo8-0001rc-3w
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 10:17:20 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 508FF8553C
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 15:17:20 +0000 (UTC)
+Message-ID: <1487258237.32455.3.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 16 Feb 2017 16:17:17 +0100
+In-Reply-To: <20170120211107.GD21555@thinpad.lan.raisama.net>
+References: <20170117184638.25809-1-ehabkost@redhat.com>
+	<20170120211107.GD21555@thinpad.lan.raisama.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 0/3] arch_init: Move soundhw code to
+ hw/audio/soundhw.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +34,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Gerd Hoffmann' <kraxel@redhat.com>, 'Paolo Bonzini' <pbonzini@redhat.com>
-Cc: 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org, zyy@google.com, marcandre.lureau@gmail.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-> From: Gerd Hoffmann [mailto:kraxel@redhat.com]
-> On Di, 2017-02-14 at 12:59 +0100, Paolo Bonzini wrote:
-> > On 14/02/2017 08:15, Pavel Dovgalyuk wrote:
-> > > This patch changes resetting strategy of the audio polling timer.
-> > > It does not change expiration time if the timer is already set.
-> > > This patch is needed to make this timer deterministic and to use execution
-> > > record/replay for audio devices.
-> > >
-> > > audio_reset_timer is used in the function audio_vm_change_state_handler.
-> > > Therefore every time VM is stopped or restarted the timer will be reset
-> > > to new timeout. Virtual clock does not proceed while VM is stopped.
-> > > Therefore there is no need in resetting the timeout when VM restarts.
-> > >
-> > > v2: updated commit message
-> > > v3: now using timer_mod_anticipate function (as suggested by Yurii Zubrytskyi)
-> >
-> > Gerd, feel free to pick either v2 or v3.
-> 
-> Picked up v3 now.
+On Fr, 2017-01-20 at 19:11 -0200, Eduardo Habkost wrote:
+> Ping? Any feedback?
+>=20
+> On Tue, Jan 17, 2017 at 04:46:35PM -0200, Eduardo Habkost wrote:
+> > This moves the arch_init.c soundhw code to its own file, renames
+> > audio_init() to soundhw_init(), and renames hw/audio/audio.h to
+> > hw/audio/soundhw.h.
 
-Thanks!
+Looks good to me.  Seems to need a rebase though, tried to add to the
+audio queue but it doesn't apply.  Can you send a rebase?
 
-And what about patch for audio record/replay?
-http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg00345.html
-
-Pavel Dovgalyuk
+thanks,
+  Gerd
