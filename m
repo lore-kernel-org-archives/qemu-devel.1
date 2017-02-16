@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45805)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1ceF6f-0002TW-Sp
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 00:59:55 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ceF7r-0003Bp-1Q
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 01:01:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1ceF6c-0002Yq-NA
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 00:59:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45190)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1ceF6c-0002YQ-E8
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 00:59:50 -0500
-References: <1484026704-28027-1-git-send-email-mst@redhat.com>
-	<1484026704-28027-9-git-send-email-mst@redhat.com>
-	<A2975661238FB949B60364EF0F2C25743900AAEF@shsmsx102.ccr.corp.intel.com>
-	<c1f86fba-6b22-8316-156f-2024bee46b0c@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <00b66a54-57d0-d85a-8358-e84f927f2904@redhat.com>
-Date: Thu, 16 Feb 2017 13:59:41 +0800
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ceF7o-0003BE-1B
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 01:01:07 -0500
+Received: from szxga03-in.huawei.com ([119.145.14.66]:59311)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ceF7n-0003Am-7z
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 01:01:03 -0500
+From: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Date: Thu, 16 Feb 2017 14:00:18 +0800
+Message-ID: <1487224821-120916-2-git-send-email-zhang.zhanghailiang@huawei.com>
+In-Reply-To: <1487224821-120916-1-git-send-email-zhang.zhanghailiang@huawei.com>
+References: <1487224821-120916-1-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <c1f86fba-6b22-8316-156f-2024bee46b0c@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 08/41] intel_iommu: support device iotlb
- descriptor
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2 1/4] colo-compare: use
+ g_timeout_source_new() to process the stale packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +26,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "Lan, Tianyu" <tianyu.lan@intel.com>, Peter Maydell <peter.maydell@linaro.org>, "Tian, Kevin" <kevin.tian@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Xu <peterx@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: jasowang@redhat.com, zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com
+Cc: qemu-devel@nongnu.org, xuquan8@huawei.com, pss.wulizhen@huawei.com, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
+Instead of using qemu timer to process the stale packets,
+We re-use the colo compare thread to process these packets
+by creating a new timeout coroutine.
 
+Besides, since we process all the same vNIC's net connection/packets
+in one thread, it is safe to remove the timer_check_lock.
 
-On 2017=E5=B9=B402=E6=9C=8816=E6=97=A5 13:43, Jason Wang wrote:
->
->
-> On 2017=E5=B9=B402=E6=9C=8816=E6=97=A5 13:36, Liu, Yi L wrote:
->>> -----Original Message-----
->>> From: Qemu-devel=20
->>> [mailto:qemu-devel-bounces+yi.l.liu=3Dintel.com@nongnu.org]
->>> On Behalf Of Michael S. Tsirkin
->>> Sent: Tuesday, January 10, 2017 1:40 PM
->>> To: qemu-devel@nongnu.org
->>> Cc: Peter Maydell <peter.maydell@linaro.org>; Eduardo Habkost
->>> <ehabkost@redhat.com>; Jason Wang <jasowang@redhat.com>; Peter Xu
->>> <peterx@redhat.com>; Paolo Bonzini <pbonzini@redhat.com>; Richard
->>> Henderson <rth@twiddle.net>
->>> Subject: [Qemu-devel] [PULL 08/41] intel_iommu: support device iotlb
->>> descriptor
->>>
->>> From: Jason Wang <jasowang@redhat.com>
->>>
->>> This patch enables device IOTLB support for intel iommu. The major=20
->>> work is to
->>> implement QI device IOTLB descriptor processing and notify the=20
->>> device through
->>> iommu notifier.
->>>
->> Hi Jason/Michael,
->>
->> Recently Peter Xu's patch also touched intel-iommu emulation. His=20
->> patch shadows
->> second-level page table by capturing iotlb flush from guest. It would=20
->> result in page
->> table updating in host. Does this patch also use the same map/umap=20
->> API provided
->> by VFIO?
->
-> Yes, it depends on the iommu notifier too.
->
->> If it is, then I think it would also update page table in host. It=20
->> looks to be
->> a duplicate update. Pls refer to the following snapshot captured from=20
->> section 6.5.2.5
->> of vtd spec.
->>
->> "Since translation requests from a device may be serviced by hardware=20
->> from the IOTLB, software must
->> always request IOTLB invalidation (iotlb_inv_dsc) before requesting=20
->> corresponding Device-TLB
->> (dev_tlb_inv_dsc) invalidation."
->>
->> Maybe for device-iotlb, we need a separate API which just pass down=20
->> the invalidate
->> info without updating page table. Any thoughts?
->
-> cc Alex.
->
-> If we want ATS to be visible for guest (but I'm not sure if VFIO=20
-> support this), we probably need another notifier or a new flag.
->
-> Thanks=20
+Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+---
+ net/colo-compare.c | 62 +++++++++++++++++++-----------------------------------
+ 1 file changed, 22 insertions(+), 40 deletions(-)
 
-Or need a dedicated address_space if ATS were enabled for the device.
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index 162fd6a..fdde788 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -83,9 +83,6 @@ typedef struct CompareState {
+     GHashTable *connection_track_table;
+     /* compare thread, a thread for each NIC */
+     QemuThread thread;
+-    /* Timer used on the primary to find packets that are never matched */
+-    QEMUTimer *timer;
+-    QemuMutex timer_check_lock;
+ } CompareState;
+ 
+ typedef struct CompareClass {
+@@ -374,9 +371,7 @@ static void colo_compare_connection(void *opaque, void *user_data)
+ 
+     while (!g_queue_is_empty(&conn->primary_list) &&
+            !g_queue_is_empty(&conn->secondary_list)) {
+-        qemu_mutex_lock(&s->timer_check_lock);
+         pkt = g_queue_pop_tail(&conn->primary_list);
+-        qemu_mutex_unlock(&s->timer_check_lock);
+         switch (conn->ip_proto) {
+         case IPPROTO_TCP:
+             result = g_queue_find_custom(&conn->secondary_list,
+@@ -411,9 +406,7 @@ static void colo_compare_connection(void *opaque, void *user_data)
+              * until next comparison.
+              */
+             trace_colo_compare_main("packet different");
+-            qemu_mutex_lock(&s->timer_check_lock);
+             g_queue_push_tail(&conn->primary_list, pkt);
+-            qemu_mutex_unlock(&s->timer_check_lock);
+             /* TODO: colo_notify_checkpoint();*/
+             break;
+         }
+@@ -486,11 +479,26 @@ static void compare_sec_chr_in(void *opaque, const uint8_t *buf, int size)
+     }
+ }
+ 
++/*
++ * Check old packet regularly so it can watch for any packets
++ * that the secondary hasn't produced equivalents of.
++ */
++static gboolean check_old_packet_regular(void *opaque)
++{
++    CompareState *s = opaque;
++
++    /* if have old packet we will notify checkpoint */
++    colo_old_packet_check(s);
++
++    return TRUE;
++}
++
+ static void *colo_compare_thread(void *opaque)
+ {
+     GMainContext *worker_context;
+     GMainLoop *compare_loop;
+     CompareState *s = opaque;
++    GSource *timeout_source;
+ 
+     worker_context = g_main_context_new();
+ 
+@@ -501,8 +509,15 @@ static void *colo_compare_thread(void *opaque)
+ 
+     compare_loop = g_main_loop_new(worker_context, FALSE);
+ 
++    /* To kick any packets that the secondary doesn't match */
++    timeout_source = g_timeout_source_new(REGULAR_PACKET_CHECK_MS);
++    g_source_set_callback(timeout_source,
++                          (GSourceFunc)check_old_packet_regular, s, NULL);
++    g_source_attach(timeout_source, worker_context);
++
+     g_main_loop_run(compare_loop);
+ 
++    g_source_unref(timeout_source);
+     g_main_loop_unref(compare_loop);
+     g_main_context_unref(worker_context);
+     return NULL;
+@@ -604,26 +619,6 @@ static int find_and_check_chardev(Chardev **chr,
+ }
+ 
+ /*
+- * Check old packet regularly so it can watch for any packets
+- * that the secondary hasn't produced equivalents of.
+- */
+-static void check_old_packet_regular(void *opaque)
+-{
+-    CompareState *s = opaque;
+-
+-    timer_mod(s->timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
+-              REGULAR_PACKET_CHECK_MS);
+-    /* if have old packet we will notify checkpoint */
+-    /*
+-     * TODO: Make timer handler run in compare thread
+-     * like qemu_chr_add_handlers_full.
+-     */
+-    qemu_mutex_lock(&s->timer_check_lock);
+-    colo_old_packet_check(s);
+-    qemu_mutex_unlock(&s->timer_check_lock);
+-}
+-
+-/*
+  * Called from the main thread on the primary
+  * to setup colo-compare.
+  */
+@@ -665,7 +660,6 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
+     net_socket_rs_init(&s->sec_rs, compare_sec_rs_finalize);
+ 
+     g_queue_init(&s->conn_list);
+-    qemu_mutex_init(&s->timer_check_lock);
+ 
+     s->connection_track_table = g_hash_table_new_full(connection_key_hash,
+                                                       connection_key_equal,
+@@ -678,12 +672,6 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
+                        QEMU_THREAD_JOINABLE);
+     compare_id++;
+ 
+-    /* A regular timer to kick any packets that the secondary doesn't match */
+-    s->timer = timer_new_ms(QEMU_CLOCK_VIRTUAL, /* Only when guest runs */
+-                            check_old_packet_regular, s);
+-    timer_mod(s->timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
+-                        REGULAR_PACKET_CHECK_MS);
+-
+     return;
+ }
+ 
+@@ -723,12 +711,6 @@ static void colo_compare_finalize(Object *obj)
+         qemu_thread_join(&s->thread);
+     }
+ 
+-    if (s->timer) {
+-        timer_del(s->timer);
+-    }
+-
+-    qemu_mutex_destroy(&s->timer_check_lock);
+-
+     g_free(s->pri_indev);
+     g_free(s->sec_indev);
+     g_free(s->outdev);
+-- 
+1.8.3.1
