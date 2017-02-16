@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ceOio-0004IT-T0
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:15:57 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ceOkr-00075F-Rf
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:18:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ceOik-0007GI-Q6
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:15:54 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42859)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ceOik-0007FX-Hh
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:15:50 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ceOii-0001Qm-G2
-	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 16:15:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 373B72E80D0
-	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 16:15:48 +0000 (UTC)
+	(envelope-from <laurent@vivier.eu>) id 1ceOkn-0007qp-SD
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:18:01 -0500
+Received: from mout.kundenserver.de ([212.227.126.130]:58549)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ceOkn-0007qR-Gd
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 11:17:57 -0500
+References: <20170216143816.2384-1-laurent@vivier.eu>
+	<CAFEAcA8MXwZcp3uBwHfQRLUJvvK7pxhOEnoaVTqkpw_DzhBAtA@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <e9b5c51b-9393-4c79-e2ab-a046763ec274@vivier.eu>
+Date: Thu, 16 Feb 2017 17:17:34 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 16 Feb 2017 16:04:26 -0000
-From: Nadav Goldin <1665389@bugs.launchpad.net>
-Reply-To: Bug 1665389 <1665389@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20170216160426.5716.21453.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1665389] [NEW] Nested kvm guest fails to start on
- a emulated Westmere CPU guest under a Broadwell CPU host
+In-Reply-To: <CAFEAcA8MXwZcp3uBwHfQRLUJvvK7pxhOEnoaVTqkpw_DzhBAtA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL v2 00/14] Linux user for upstream patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,249 +27,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 
-Public bug reported:
+Le 16/02/2017 à 17:06, Peter Maydell a écrit :
+> On 16 February 2017 at 14:38, Laurent Vivier <laurent@vivier.eu> wrote:
+>> The following changes since commit 5dae13cd71f0755a1395b5a4cde635b8a6ee3f58:
+>>
+>>   Merge remote-tracking branch 'remotes/rth/tags/pull-or-20170214' into staging (2017-02-14 09:55:48 +0000)
+>>
+>> are available in the git repository at:
+>>
+>>   git://github.com/vivier/qemu.git tags/linux-user-for-upstream-pull-request
+>>
+>> for you to fetch changes up to 21992cb6794a5f8edb0cee01bdfe0b03d0438dac:
+>>
+>>   linux-user: Add FICLONE and FICLONERANGE ioctls (2017-02-16 15:29:30 +0100)
+>>
+>> ----------------------------------------------------------------
+>> To help Riku in his maintainer role of linux-user, I've proposed
+>> to help him to manage this pull request.
+>>
+>> This series is based on his branch linux-user-for-upstream at:
+>>
+>>     https://git.linaro.org/people/riku.voipio/qemu.git
+>>
+>> I have added some reviewed patches from the mailing list since
+>> the last pull request.
+>>
+>> I have tested this series by creating some containers:
+>>
+>> ppc64   fedora-21
+>> ppc     debian-8
+>> aarch64 centos-7.2
+>>
+>> All these containers can boot and run as expected
+>> (create an user, log in as this user, install packages with yum/dnf/apt-get
+>> using sudo)
+>>
+>> I have tested the LTP-20170116 in the ppc container (big-endian 32bit)
+>> on an x86_64 host (little-endian 64bit). The result is:
+>>
+>> Total Tests: 1111
+>> Total Skipped Tests: 174
+>> Total Failures: 68
+>> Kernel Version: 4.9.5-200.fc25.x86_64
+>> Machine Architecture: ppc
+>> Hostname: debian-8-ppc
+>>
+>> v2:
+>>     Fix John Paul Adrian Glaubitz author name
+>> ----------------------------------------------------------------
+> 
+> Sorry, I applied v1 before I noticed you'd done this respin :-(
 
-Using latest master(5dae13), qemu fails to start any nested guest in a
-Westmere emulated guest(layer 1), under a Broadwell host(layer 0), with
-the error:
+It's fine: the tag was the same, and it seems you've applied it after
+I've pushed the v2 to the repo.
 
-qemu-custom: /root/qemu/target/i386/kvm.c:1849: kvm_put_msrs: Assertion
-`ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+The author name is correct:
 
-The qemu command used(though other CPUs didn't work either):
-/usr/bin/qemu-custom -name guest=3D12ed9230-vm-el73,debug-threads=3Don -S -=
-object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/dom=
-ain-5-12ed9230-vm-el73/master-key.aes -machine pc-i440fx-2.9,accel=3Dkvm,us=
-b=3Doff -cpu Westmere,+vmx -m 512 -realtime mlock=3Doff -smp 2,sockets=3D2,=
-cores=3D1,threads=3D1 -object iothread,id=3Diothread1 -uuid f4ce4eba-985f-4=
-2a3-94c4-6e4a8a530347 -nographic -no-user-config -nodefaults -chardev socke=
-t,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-5-12ed9230-vm-el73/m=
-onitor.sock,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dco=
-ntrol -rtc base=3Dutc -no-shutdown -boot menu=3Doff,strict=3Don -device vir=
-tio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x3 -drive file=3D/ro=
-ot/lago/.lago/default/images/vm-el73_root.qcow2,format=3Dqcow2,if=3Dnone,id=
-=3Ddrive-virtio-disk0,serial=3D1,discard=3Dunmap -device virtio-blk-pci,scs=
-i=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0=
-,bootindex=3D1 -netdev tap,fd=3D26,id=3Dhostnet0,vhost=3Don,vhostfd=3D28 -d=
-evice virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D54:52:c0:a7:c8:02,bu=
-s=3Dpci.0,addr=3D0x2 -chardev pty,id=3Dcharserial0 -device isa-serial,chard=
-ev=3Dcharserial0,id=3Dserial0 -chardev socket,id=3Dcharchannel0,path=3D/var=
-/lib/libvirt/qemu/channel/target/domain-5-12ed9230-vm-el73/org.qemu.guest_a=
-gent.0,server,nowait -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,c=
-hardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu.guest_agent.0 -object r=
-ng-random,id=3Dobjrng0,filename=3D/dev/random -device virtio-rng-pci,rng=3D=
-objrng0,id=3Drng0,bus=3Dpci.0,addr=3D0x9 -msg timestamp=3Don
-2017-02-16T15:14:45.840412Z qemu-custom: -chardev pty,id=3Dcharserial0: cha=
-r device redirected to /dev/pts/2 (label charserial0)
-qemu-custom: /root/qemu/target/i386/kvm.c:1849: kvm_put_msrs: Assertion `re=
-t =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+    Author: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 
-
-The CPU flags in the Westmere guest:
-flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat =
-pse36 clflush mmx fxsr sse sse2 syscall nx lm constant_tsc rep_good nopl pn=
-i pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 x2apic popcnt aes hypervisor lahf_=
-lm arat tpr_shadow vnmi flexpriority ept vpid
-
-The guest kernel is 3.10.0-514.2.2.el7.x86_64.
-
-The CPU flags of the host(Broadwell): =
-
-flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat =
-pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rd=
-tscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nons=
-top_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx smx est=
- tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt t=
-sc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch epb i=
-ntel_pt tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hle =
-avx2 smep bmi2 erms invpcid rtm mpx rdseed adx smap clflushopt xsaveopt xsa=
-vec xgetbv1 xsaves dtherm ida arat pln pts hwp hwp_notify hwp_act_window hw=
-p_epp
-
-qemu command on the host - Broadwell(which works):
-/usr/bin/qemu-kvm -name 4ffcd448-vm-el73,debug-threads=3Don -S -machine pc-=
-i440fx-2.6,accel=3Dkvm,usb=3Doff -cpu Westmere,+x2apic,+vmx,+vme -m 4096 -r=
-ealtime mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -object iothre=
-ad,id=3Diothread1 -uuid 8cc0a2cf-d25a-4014-acdb-f159c376a532 -nographic -no=
--user-config -nodefaults -chardev socket,id=3Dcharmonitor,path=3D/var/lib/l=
-ibvirt/qemu/domain-4-4ffcd448-vm-el73/monitor.sock,server,nowait -mon chard=
-ev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc -no-shutdown -=
-boot menu=3Doff,strict=3Don -device virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.0,=
-addr=3D0x3 -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=
-=3D0x4 -drive file=3D/home/ngoldin/src/nvgoldin.github.com/lago-init-files/=
-.lago/flags-tests/default/images/vm-el73_root.qcow2,format=3Dqcow2,if=3Dnon=
-e,id=3Ddrive-virtio-disk0,serial=3D1,discard=3Dunmap -device virtio-blk-pci=
-,scsi=3Doff,bus=3Dpci.0,addr=3D0x5,drive=3Ddrive-virtio-disk0,id=3Dvirtio-d=
-isk0,bootindex=3D1 -drive file=3D/home/ngoldin/src/nvgoldin.github.com/lago=
--init-files/.lago/flags-tests/default/images/vm-el73_additonal.qcow2,format=
-=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0,serial=3D2,discard=3Dunmap -devic=
-e scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,drive=3Ddrive-scsi0=
--0-0-0,id=3Dscsi0-0-0-0,bootindex=3D2 -netdev tap,fd=3D29,id=3Dhostnet0,vho=
-st=3Don,vhostfd=3D31 -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=
-=3D54:52:c0:a8:c9:02,bus=3Dpci.0,addr=3D0x2 -chardev pty,id=3Dcharserial0 -=
-device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev socket,id=3Dc=
-harchannel0,path=3D/var/lib/libvirt/qemu/channel/target/domain-4-4ffcd448-v=
-m-el73/org.qemu.guest_agent.0,server,nowait -device virtserialport,bus=3Dvi=
-rtio-serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu.=
-guest_agent.0 -object rng-random,id=3Dobjrng0,filename=3D/dev/random -devic=
-e virtio-rng-pci,rng=3Dobjrng0,id=3Drng0,bus=3Dpci.0,addr=3D0x9 -msg timest=
-amp=3Don
-
-On the Broadwell host I'm using a distribution package if it matters
-(qemu-kvm-2.6.2-5.fc24.x86_64 and 4.8.15-200.fc24.x86_64)
-
-As the error indicates, I think this assertion was put in:
-commit 48e1a45c3166d659f781171a47dabf4a187ed7a5
-Author: Paolo Bonzini <pbonzini@redhat.com>
-Date:   Wed Mar 30 22:55:29 2016 +0200
-
-    target-i386: assert that KVM_GET/SET_MSRS can set all requested MSRs
-    =
-
-    This would have caught the bug in the previous patch.
-    =
-
-    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-I tried going back one commit before to 273c515, and then the error is gone=
- and the nested guest comes up as expected. If I try to run with head at th=
-e above commit(48e145c) the error output is slightly different, though it l=
-ooks the same:
-/root/qemu/target-i386/kvm.c:1713: kvm_put_msrs: Assertion `ret =3D=3D n' f=
-ailed.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: kvm
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1665389
-
-Title:
-  Nested kvm guest fails to start on a emulated Westmere CPU guest under
-  a Broadwell CPU host
-
-Status in QEMU:
-  New
-
-Bug description:
-  Using latest master(5dae13), qemu fails to start any nested guest in a
-  Westmere emulated guest(layer 1), under a Broadwell host(layer 0),
-  with the error:
-
-  qemu-custom: /root/qemu/target/i386/kvm.c:1849: kvm_put_msrs:
-  Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
-
-  The qemu command used(though other CPUs didn't work either):
-  /usr/bin/qemu-custom -name guest=3D12ed9230-vm-el73,debug-threads=3Don -S=
- -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/d=
-omain-5-12ed9230-vm-el73/master-key.aes -machine pc-i440fx-2.9,accel=3Dkvm,=
-usb=3Doff -cpu Westmere,+vmx -m 512 -realtime mlock=3Doff -smp 2,sockets=3D=
-2,cores=3D1,threads=3D1 -object iothread,id=3Diothread1 -uuid f4ce4eba-985f=
--42a3-94c4-6e4a8a530347 -nographic -no-user-config -nodefaults -chardev soc=
-ket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-5-12ed9230-vm-el73=
-/monitor.sock,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3D=
-control -rtc base=3Dutc -no-shutdown -boot menu=3Doff,strict=3Don -device v=
-irtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x3 -drive file=3D/=
-root/lago/.lago/default/images/vm-el73_root.qcow2,format=3Dqcow2,if=3Dnone,=
-id=3Ddrive-virtio-disk0,serial=3D1,discard=3Dunmap -device virtio-blk-pci,s=
-csi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Ddrive-virtio-disk0,id=3Dvirtio-dis=
-k0,bootindex=3D1 -netdev tap,fd=3D26,id=3Dhostnet0,vhost=3Don,vhostfd=3D28 =
--device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D54:52:c0:a7:c8:02,=
-bus=3Dpci.0,addr=3D0x2 -chardev pty,id=3Dcharserial0 -device isa-serial,cha=
-rdev=3Dcharserial0,id=3Dserial0 -chardev socket,id=3Dcharchannel0,path=3D/v=
-ar/lib/libvirt/qemu/channel/target/domain-5-12ed9230-vm-el73/org.qemu.guest=
-_agent.0,server,nowait -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1=
-,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu.guest_agent.0 -object=
- rng-random,id=3Dobjrng0,filename=3D/dev/random -device virtio-rng-pci,rng=
-=3Dobjrng0,id=3Drng0,bus=3Dpci.0,addr=3D0x9 -msg timestamp=3Don
-  2017-02-16T15:14:45.840412Z qemu-custom: -chardev pty,id=3Dcharserial0: c=
-har device redirected to /dev/pts/2 (label charserial0)
-  qemu-custom: /root/qemu/target/i386/kvm.c:1849: kvm_put_msrs: Assertion `=
-ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
-
-  =
-
-  The CPU flags in the Westmere guest:
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush mmx fxsr sse sse2 syscall nx lm constant_tsc rep_good nopl =
-pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 x2apic popcnt aes hypervisor lah=
-f_lm arat tpr_shadow vnmi flexpriority ept vpid
-
-  The guest kernel is 3.10.0-514.2.2.el7.x86_64.
-
-  The CPU flags of the host(Broadwell): =
-
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb =
-rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology no=
-nstop_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx smx e=
-st tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt=
- tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch epb=
- intel_pt tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hl=
-e avx2 smep bmi2 erms invpcid rtm mpx rdseed adx smap clflushopt xsaveopt x=
-savec xgetbv1 xsaves dtherm ida arat pln pts hwp hwp_notify hwp_act_window =
-hwp_epp
-
-  qemu command on the host - Broadwell(which works):
-  /usr/bin/qemu-kvm -name 4ffcd448-vm-el73,debug-threads=3Don -S -machine p=
-c-i440fx-2.6,accel=3Dkvm,usb=3Doff -cpu Westmere,+x2apic,+vmx,+vme -m 4096 =
--realtime mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -object ioth=
-read,id=3Diothread1 -uuid 8cc0a2cf-d25a-4014-acdb-f159c376a532 -nographic -=
-no-user-config -nodefaults -chardev socket,id=3Dcharmonitor,path=3D/var/lib=
-/libvirt/qemu/domain-4-4ffcd448-vm-el73/monitor.sock,server,nowait -mon cha=
-rdev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc -no-shutdown=
- -boot menu=3Doff,strict=3Don -device virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.=
-0,addr=3D0x3 -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=
-=3D0x4 -drive file=3D/home/ngoldin/src/nvgoldin.github.com/lago-init-files/=
-.lago/flags-tests/default/images/vm-el73_root.qcow2,format=3Dqcow2,if=3Dnon=
-e,id=3Ddrive-virtio-disk0,serial=3D1,discard=3Dunmap -device virtio-blk-pci=
-,scsi=3Doff,bus=3Dpci.0,addr=3D0x5,drive=3Ddrive-virtio-disk0,id=3Dvirtio-d=
-isk0,bootindex=3D1 -drive file=3D/home/ngoldin/src/nvgoldin.github.com/lago=
--init-files/.lago/flags-tests/default/images/vm-el73_additonal.qcow2,format=
-=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0,serial=3D2,discard=3Dunmap -devic=
-e scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,drive=3Ddrive-scsi0=
--0-0-0,id=3Dscsi0-0-0-0,bootindex=3D2 -netdev tap,fd=3D29,id=3Dhostnet0,vho=
-st=3Don,vhostfd=3D31 -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=
-=3D54:52:c0:a8:c9:02,bus=3Dpci.0,addr=3D0x2 -chardev pty,id=3Dcharserial0 -=
-device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev socket,id=3Dc=
-harchannel0,path=3D/var/lib/libvirt/qemu/channel/target/domain-4-4ffcd448-v=
-m-el73/org.qemu.guest_agent.0,server,nowait -device virtserialport,bus=3Dvi=
-rtio-serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu.=
-guest_agent.0 -object rng-random,id=3Dobjrng0,filename=3D/dev/random -devic=
-e virtio-rng-pci,rng=3Dobjrng0,id=3Drng0,bus=3Dpci.0,addr=3D0x9 -msg timest=
-amp=3Don
-
-  On the Broadwell host I'm using a distribution package if it matters
-  (qemu-kvm-2.6.2-5.fc24.x86_64 and 4.8.15-200.fc24.x86_64)
-
-  As the error indicates, I think this assertion was put in:
-  commit 48e1a45c3166d659f781171a47dabf4a187ed7a5
-  Author: Paolo Bonzini <pbonzini@redhat.com>
-  Date:   Wed Mar 30 22:55:29 2016 +0200
-
-      target-i386: assert that KVM_GET/SET_MSRS can set all requested MSRs
-      =
-
-      This would have caught the bug in the previous patch.
-      =
-
-      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-  I tried going back one commit before to 273c515, and then the error is go=
-ne and the nested guest comes up as expected. If I try to run with head at =
-the above commit(48e145c) the error output is slightly different, though it=
- looks the same:
-  /root/qemu/target-i386/kvm.c:1713: kvm_put_msrs: Assertion `ret =3D=3D n'=
- failed.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1665389/+subscriptions
+Thanks,
+Laurent
