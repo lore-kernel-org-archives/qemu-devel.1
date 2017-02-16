@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43894)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1ceQi4-0002Z6-VM
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 13:23:18 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ceQmI-0004lV-2I
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 13:27:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1ceQi3-0007e6-Su
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 13:23:16 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ceQmH-0000pm-1s
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 13:27:38 -0500
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:33994)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ceQmG-0000ox-S5
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 13:27:36 -0500
+Received: by mail-wr0-x22e.google.com with SMTP id z61so17544205wrc.1
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 10:27:36 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20170216175251.GJ4869@noname.redhat.com>
-References: <20170203195037.4238-1-nirsof@gmail.com>
-	<20170216175251.GJ4869@noname.redhat.com>
-From: Nir Soffer <nirsof@gmail.com>
-Date: Thu, 16 Feb 2017 20:23:13 +0200
-Message-ID: <CAMr-obsQExOZmpiieJt33v+x1TW4axV6+7YyfatEqngocF5Djw@mail.gmail.com>
+In-Reply-To: <1487262963-11519-4-git-send-email-peter.maydell@linaro.org>
+References: <1487262963-11519-1-git-send-email-peter.maydell@linaro.org>
+	<1487262963-11519-4-git-send-email-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 16 Feb 2017 18:27:15 +0000
+Message-ID: <CAFEAcA-JoKKkKtL=W0ecVQ=+wHbxe-gxKGho8GDm95YuyD7rWw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] qemu-img: Do not truncate before
- preallocation
+Subject: Re: [Qemu-devel] [PATCH v2 03/13] armv7m: Rewrite NVIC to not use
+ any GIC code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,71 +30,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, "patches@linaro.org" <patches@linaro.org>
 
-On Thu, Feb 16, 2017 at 7:52 PM, Kevin Wolf <kwolf@redhat.com> wrote:
-> Am 03.02.2017 um 20:50 hat Nir Soffer geschrieben:
->> When using file system that does not support fallocate() (e.g. NFS <
->> 4.2), truncating the file only when preallocation=OFF speeds up creating
->> raw file.
->>
->> Here is example run, tested on Fedora 24 machine, creating raw file on
->> NFS version 3 server.
->>
->> $ time ./qemu-img-master create -f raw -o preallocation=falloc mnt/test 1g
->> Formatting 'mnt/test', fmt=raw size=1073741824 preallocation=falloc
->>
->> real  0m21.185s
->> user  0m0.022s
->> sys   0m0.574s
->>
->> $ time ./qemu-img-fix create -f raw -o preallocation=falloc mnt/test 1g
->> Formatting 'mnt/test', fmt=raw size=1073741824 preallocation=falloc
->>
->> real  0m11.601s
->> user  0m0.016s
->> sys   0m0.525s
->>
->> $ time dd if=/dev/zero of=mnt/test bs=1M count=1024 oflag=direct
->> 1024+0 records in
->> 1024+0 records out
->> 1073741824 bytes (1.1 GB, 1.0 GiB) copied, 15.6627 s, 68.6 MB/s
->>
->> real  0m16.104s
->> user  0m0.009s
->> sys   0m0.220s
->>
->> Running with strace we can see that without this change we do one
->> pread() and one pwrite() for each block. With this change, we do only
->> one pwrite() per block.
->>
->> $ strace ./qemu-img-master create -f raw -o preallocation=falloc mnt/test 8192
->> ...
->> pread64(9, "\0", 1, 4095)               = 1
->> pwrite64(9, "\0", 1, 4095)              = 1
->> pread64(9, "\0", 1, 8191)               = 1
->> pwrite64(9, "\0", 1, 8191)              = 1
->>
->> $ strace ./qemu-img-fix create -f raw -o preallocation=falloc mnt/test 8192
->> ...
->> pwrite64(9, "\0", 1, 4095)              = 1
->> pwrite64(9, "\0", 1, 8191)              = 1
->>
->> This happens because posix_fallocate is checking if each block is
->> allocated before writing a byte to the block, and when truncating the
->> file before preallocation, all blocks are unallocated.
->>
->> Signed-off-by: Nir Soffer <nirsof@gmail.com>
+On 16 February 2017 at 16:35, Peter Maydell <peter.maydell@linaro.org> wrote:
+> From: Michael Davidsaver <mdavidsaver@gmail.com>
 >
-> Thanks, applied to the block branch.
+> Despite some superficial similarities of register layout, the
+> M-profile NVIC is really very different from the A-profile GIC.
+> Our current attempt to reuse the GIC code means that we have
+> significant bugs in our NVIC.
 >
-> I'm not completely sure if doing an ftruncate() first couldn't improve
-> PREALLOC_MODE_FULL somewhat in some cases, but I agree that the patch
-> should still result in correct images.
+> Implement the NVIC as an entirely separate device, to give
+> us somewhere we can get the behaviour correct.
+>
+> This initial commit does not attempt to implement exception
+> priority escalation, since the GIC-based code didn't either.
+> It does fix a few bugs in passing:
+>  * ICSR.RETTOBASE polarity was wrong and didn't account for
+>    internal exceptions
+>  * ICSR.VECTPENDING was 16 too high if the pending exception
+>    was for an external interrupt
+>  * UsageFault, BusFault and MemFault were not disabled on reset
+>    as they are supposed to be
+>
+> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+> [PMM: reworked, various bugs and stylistic cleanups]
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Good point, I'll do some tests with full mode to check this.
+> +    case 0x400 ... 0x5ef: /* NVIC Priority */
+> +        startvec = 8 * (offset - 0x400) + NVIC_FIRST_IRQ; /* vector # */
+> +
+> +        for (i = 0; i < size; i++) {
 
-Do you know which cases can benefit from ftruncate() before full preallocation?
+Just noticed this line should be
++        for (i = 0; i < size && startvec + i < s->num_irq; i++) {
 
-Nir
+which brings it into line with the nvic_sysreg_read() code
+and prevents an assert() in set_prio() if the guest writes to
+registers beyond the end of the implemented IRQ range.
+
+> +            set_prio(s, startvec + i, (value >> (i * 8)) & 0xff);
+> +        }
+> +        nvic_irq_update(s);
+> +        return;
+
+Unless there's some other problem that means I need
+to respin anyway I propose to just squash in that fix.
+
+thanks
+-- PMM
