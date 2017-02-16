@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ceMRu-00030P-DM
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:50:19 -0500
+	(envelope-from <clg@kaod.org>) id 1ceMS4-00039D-R2
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:50:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ceMRt-0006Dy-8x
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:50:18 -0500
-Received: from 9.mo173.mail-out.ovh.net ([46.105.72.44]:34849)
+	(envelope-from <clg@kaod.org>) id 1ceMRz-0006Fj-VM
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:50:28 -0500
+Received: from mo173.mail-out.ovh.net ([178.32.228.173]:34155)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ceMRt-0006DO-2D
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:50:17 -0500
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ceMRz-0006Fa-Pa
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 08:50:23 -0500
 Received: from player791.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id D75EE241B8
-	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 14:50:15 +0100 (CET)
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 9CD0D241B8
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 14:50:22 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu, 16 Feb 2017 14:47:42 +0100
-Message-Id: <1487252865-12064-20-git-send-email-clg@kaod.org>
+Date: Thu, 16 Feb 2017 14:47:43 +0100
+Message-Id: <1487252865-12064-21-git-send-email-clg@kaod.org>
 In-Reply-To: <1487252865-12064-1-git-send-email-clg@kaod.org>
 References: <1487252865-12064-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 19/22] ppc/xics: move the cpu_setup()
- handler under the ICPState class
+Subject: [Qemu-devel] [PATCH v2 20/22] ppc/xics: remove the 'xics' backlinks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,158 +32,140 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-The cpu_setup() handler is currenlty under the XICSState class but it
-really belongs under ICPState as it is setting up a vCPU.
-
-It makes use of the kernel ICP file descriptor which could be a
-problem.
+These are not used anymore. Do the cleanups
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/intc/xics.c        |  8 +++----
- hw/intc/xics_kvm.c    | 58 +++++++++++++++++++++++++--------------------=
-------
- include/hw/ppc/xics.h |  3 +--
- 3 files changed, 34 insertions(+), 35 deletions(-)
+ hw/intc/xics.c        | 28 ----------------------------
+ hw/intc/xics_kvm.c    | 10 ----------
+ hw/ppc/spapr.c        |  3 ---
+ include/hw/ppc/xics.h |  3 ---
+ 4 files changed, 44 deletions(-)
 
 diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index 3ad7e8cf8ec4..78e08e23e3d6 100644
+index 78e08e23e3d6..eb1a9f12fd3a 100644
 --- a/hw/intc/xics.c
 +++ b/hw/intc/xics.c
-@@ -66,15 +66,15 @@ void xics_cpu_setup(XICSInterface *xi, PowerPCCPU *cp=
-u)
-     CPUState *cs =3D CPU(cpu);
-     CPUPPCState *env =3D &cpu->env;
-     ICPState *ss =3D xics_icp_get(xi, cs->cpu_index);
--    XICSStateClass *info;
-+    ICPStateClass *icpc;
-=20
-     assert(ss);
-=20
-     ss->cs =3D cs;
-=20
--    info =3D XICS_COMMON_GET_CLASS(ss->xics);
--    if (info->cpu_setup) {
--        info->cpu_setup(ss, cpu);
-+    icpc =3D ICP_GET_CLASS(ss);
-+    if (icpc->cpu_setup) {
-+        icpc->cpu_setup(ss, cpu);
-     }
-=20
-     switch (PPC_INPUT(env)) {
-diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index 19c55fa74412..850777eab913 100644
---- a/hw/intc/xics_kvm.c
-+++ b/hw/intc/xics_kvm.c
-@@ -124,6 +124,34 @@ static void icp_kvm_reset(DeviceState *dev)
-     icp_set_kvm_state(icp, 1);
+@@ -360,23 +360,6 @@ static void icp_reset(DeviceState *dev)
+     qemu_set_irq(icp->output, 0);
  }
 =20
-+static void icp_kvm_cpu_setup(ICPState *ss, PowerPCCPU *cpu)
-+{
-+    CPUState *cs =3D CPU(cpu);
-+    int ret;
-+
-+    if (kernel_xics_fd =3D=3D -1) {
-+        abort();
-+    }
-+
-+    /*
-+     * If we are reusing a parked vCPU fd corresponding to the CPU
-+     * which was hot-removed earlier we don't have to renable
-+     * KVM_CAP_IRQ_XICS capability again.
-+     */
-+    if (ss->cap_irq_xics_enabled) {
-+        return;
-+    }
-+
-+    ret =3D kvm_vcpu_enable_cap(cs, KVM_CAP_IRQ_XICS, 0, kernel_xics_fd,
-+                              kvm_arch_vcpu_id(cs));
-+    if (ret < 0) {
-+        error_report("Unable to connect CPU%ld to kernel XICS: %s",
-+                     kvm_arch_vcpu_id(cs), strerror(errno));
-+        exit(1);
-+    }
-+    ss->cap_irq_xics_enabled =3D true;
-+}
-+
- static void icp_kvm_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-@@ -132,6 +160,7 @@ static void icp_kvm_class_init(ObjectClass *klass, vo=
-id *data)
-     dc->reset =3D icp_kvm_reset;
-     icpc->pre_save =3D icp_get_kvm_state;
-     icpc->post_load =3D icp_set_kvm_state;
-+    icpc->cpu_setup =3D icp_kvm_cpu_setup;
- }
-=20
- static const TypeInfo icp_kvm_info =3D {
-@@ -334,33 +363,6 @@ static const TypeInfo ics_kvm_info =3D {
- /*
-  * XICS-KVM
-  */
--static void xics_kvm_cpu_setup(ICPState *ss, PowerPCCPU *cpu)
+-static void icp_realize(DeviceState *dev, Error **errp)
 -{
--    CPUState *cs =3D CPU(cpu);
--    int ret;
+-    ICPState *icp =3D ICP(dev);
+-    Object *obj;
+-    Error *err =3D NULL;
 -
--    if (kernel_xics_fd =3D=3D -1) {
--        abort();
--    }
--
--    /*
--     * If we are reusing a parked vCPU fd corresponding to the CPU
--     * which was hot-removed earlier we don't have to renable
--     * KVM_CAP_IRQ_XICS capability again.
--     */
--    if (ss->cap_irq_xics_enabled) {
+-    obj =3D object_property_get_link(OBJECT(dev), "xics", &err);
+-    if (!obj) {
+-        error_setg(errp, "%s: required link 'xics' not found: %s",
+-                   __func__, error_get_pretty(err));
 -        return;
 -    }
 -
--    ret =3D kvm_vcpu_enable_cap(cs, KVM_CAP_IRQ_XICS, 0, kernel_xics_fd,
--                              kvm_arch_vcpu_id(cs));
--    if (ret < 0) {
--        error_report("Unable to connect CPU%ld to kernel XICS: %s",
--                     kvm_arch_vcpu_id(cs), strerror(errno));
--        exit(1);
--    }
--    ss->cap_irq_xics_enabled =3D true;
+-    icp->xics =3D XICS_COMMON(obj);
 -}
-=20
- static void rtas_dummy(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                        uint32_t token,
-@@ -439,10 +441,8 @@ fail:
- static void xics_kvm_class_init(ObjectClass *oc, void *data)
+-
+-
+ static void icp_class_init(ObjectClass *klass, void *data)
  {
-     DeviceClass *dc =3D DEVICE_CLASS(oc);
--    XICSStateClass *xsc =3D XICS_COMMON_CLASS(oc);
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+@@ -384,7 +367,6 @@ static void icp_class_init(ObjectClass *klass, void *=
+data)
 =20
-     dc->realize =3D xics_kvm_realize;
--    xsc->cpu_setup =3D xics_kvm_cpu_setup;
+     dc->reset =3D icp_reset;
+     dc->vmsd =3D &vmstate_icp_server;
+-    dc->realize =3D icp_realize;
+     ic->print_info =3D icp_pic_print_info;
  }
 =20
- static const TypeInfo xics_spapr_kvm_info =3D {
+@@ -634,16 +616,6 @@ static void ics_simple_initfn(Object *obj)
+ static void ics_simple_realize(DeviceState *dev, Error **errp)
+ {
+     ICSState *ics =3D ICS_SIMPLE(dev);
+-    Object *obj;
+-    Error *err =3D NULL;
+-
+-    obj =3D object_property_get_link(OBJECT(dev), "xics", &err);
+-    if (!obj) {
+-        error_setg(errp, "%s: required link 'xics' not found: %s",
+-                   __func__, error_get_pretty(err));
+-        return;
+-    }
+-    ics->xics =3D XICS_COMMON(obj);
+=20
+     if (!ics->nr_irqs) {
+         error_setg(errp, "Number of interrupts needs to be greater 0");
+diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+index 850777eab913..7c1809873c29 100644
+--- a/hw/intc/xics_kvm.c
++++ b/hw/intc/xics_kvm.c
+@@ -323,16 +323,6 @@ static void ics_kvm_reset(DeviceState *dev)
+ static void ics_kvm_realize(DeviceState *dev, Error **errp)
+ {
+     ICSState *ics =3D ICS_SIMPLE(dev);
+-    Object *obj;
+-    Error *err =3D NULL;
+-
+-    obj =3D object_property_get_link(OBJECT(dev), "xics", &err);
+-    if (!obj) {
+-        error_setg(errp, "%s: required link 'xics' not found: %s",
+-                   __func__, error_get_pretty(err));
+-        return;
+-    }
+-    ics->xics =3D XICS_COMMON(obj);
+=20
+     if (!ics->nr_irqs) {
+         error_setg(errp, "Number of interrupts needs to be greater 0");
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 6b35b48f818a..059408a81b8a 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -115,8 +115,6 @@ static XICSState *try_create_xics(sPAPRMachineState *=
+spapr,
+     qdev_set_parent_bus(DEVICE(spapr->ics), sysbus_get_default());
+     object_property_add_child(OBJECT(spapr), "ics", OBJECT(spapr->ics), =
+NULL);
+     object_property_set_int(OBJECT(spapr->ics), nr_irqs, "nr-irqs", &err=
+);
+-    object_property_add_const_link(OBJECT(spapr->ics), "xics", OBJECT(xi=
+cs),
+-                                   NULL);
+     object_property_set_bool(OBJECT(spapr->ics), true, "realized", &loca=
+l_err);
+     error_propagate(&err, local_err);
+     if (err) {
+@@ -132,7 +130,6 @@ static XICSState *try_create_xics(sPAPRMachineState *=
+spapr,
+         object_initialize(icp, sizeof(*icp), type_icp);
+         qdev_set_parent_bus(DEVICE(icp), sysbus_get_default());
+         object_property_add_child(OBJECT(spapr), "icp[*]", OBJECT(icp), =
+NULL);
+-        object_property_add_const_link(OBJECT(icp), "xics", OBJECT(xics)=
+, NULL);
+         object_property_set_bool(OBJECT(icp), true, "realized", &err);
+         if (err) {
+             goto error;
 diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index 726492c948db..f7f89c1d18d7 100644
+index f7f89c1d18d7..20c792fccfc3 100644
 --- a/include/hw/ppc/xics.h
 +++ b/include/hw/ppc/xics.h
-@@ -72,8 +72,6 @@ typedef struct ICSIRQState ICSIRQState;
-=20
- struct XICSStateClass {
-     DeviceClass parent_class;
+@@ -110,8 +110,6 @@ struct ICPState {
+     uint8_t mfrr;
+     qemu_irq output;
+     bool cap_irq_xics_enabled;
 -
--    void (*cpu_setup)(ICPState *icp, PowerPCCPU *cpu);
+-    XICSState *xics;
  };
 =20
- struct XICSState {
-@@ -98,6 +96,7 @@ struct ICPStateClass {
-=20
-     void (*pre_save)(ICPState *s);
-     int (*post_load)(ICPState *s, int version_id);
-+    void (*cpu_setup)(ICPState *icp, PowerPCCPU *cpu);
+ #define TYPE_ICS_BASE "ics-base"
+@@ -147,7 +145,6 @@ struct ICSState {
+     uint32_t offset;
+     qemu_irq *qirqs;
+     ICSIRQState *irqs;
+-    XICSState *xics;
  };
 =20
- struct ICPState {
+ static inline bool ics_valid_irq(ICSState *ics, uint32_t nr)
 --=20
 2.7.4
