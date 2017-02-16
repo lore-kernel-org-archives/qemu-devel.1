@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ceB9g-0006oh-07
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 20:46:44 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1ceBXL-0005vX-IJ
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 21:11:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ceB9f-0000C6-9i
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 20:46:44 -0500
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:35824)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ceB9f-0000Bx-2R
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 20:46:43 -0500
-Received: by mail-pg0-x243.google.com with SMTP id 204so403736pge.2
-	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 17:46:42 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170207005930.28327-1-laurent@vivier.eu>
-	<20170207005930.28327-16-laurent@vivier.eu>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <ca2f9cdf-c18c-bc8a-05a7-05b1d9748a48@twiddle.net>
-Date: Thu, 16 Feb 2017 12:46:35 +1100
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1ceBXI-0007uD-Cu
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 21:11:11 -0500
+Received: from [59.151.112.132] (port=15911 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1ceBXG-0007sg-RG
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 21:11:08 -0500
+References: <1487058692-2789-1-git-send-email-peterx@redhat.com>
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Message-ID: <58A50BD8.3070506@cn.fujitsu.com>
+Date: Thu, 16 Feb 2017 10:18:00 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170207005930.28327-16-laurent@vivier.eu>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <1487058692-2789-1-git-send-email-peterx@redhat.com>
+Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 15/16] target-m68k: add more FPU
- instructions
+Subject: Re: [Qemu-devel] [PATCH] pcie: simplify pcie_add_capability()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,34 +26,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 02/07/2017 11:59 AM, Laurent Vivier wrote:
-> +static long double floatx80_to_ldouble(floatx80 val)
-> +{
-> +    if (floatx80_is_infinity(val)) {
-> +            if (floatx80_is_neg(val)) {
-> +                    return -__builtin_infl();
-> +            }
-> +            return __builtin_infl();
-> +    }
-> +    if (floatx80_is_any_nan(val)) {
-> +            char low[20];
-> +            sprintf(low, "0x%016"PRIx64, val.low);
+Hi peter
+
+On 02/14/2017 03:51 PM, Peter Xu wrote:
+> When we add PCIe extended capabilities, we should be following the rule
+> that we add the head extended cap (at offset 0x100) first, then the rest
+> of them. Meanwhile, we are always adding new capability bits at the end
+> of the list. Here the "next" looks meaningless in all cases since it
+> should always be zero (along with the "header").
+> 
+> Simplify the function a bit, and it looks more readable now.
+> 
+
+See if this suggestion could be incorporated into your patch:)
+http://lists.nongnu.org/archive/html/qemu-devel/2017-01/msg01418.html
+
+-- 
+Sincerely,
+Cao jin
+
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  hw/pci/pcie.c | 15 ++++-----------
+>  1 file changed, 4 insertions(+), 11 deletions(-)
+> 
+> diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+> index cbd4bb4..e0e6f6a 100644
+> --- a/hw/pci/pcie.c
+> +++ b/hw/pci/pcie.c
+> @@ -664,30 +664,23 @@ void pcie_add_capability(PCIDevice *dev,
+>                           uint16_t cap_id, uint8_t cap_ver,
+>                           uint16_t offset, uint16_t size)
+>  {
+> -    uint32_t header;
+> -    uint16_t next;
+> -
+>      assert(offset >= PCI_CONFIG_SPACE_SIZE);
+>      assert(offset < offset + size);
+>      assert(offset + size <= PCIE_CONFIG_SPACE_SIZE);
+>      assert(size >= 8);
+>      assert(pci_is_express(dev));
+>  
+> -    if (offset == PCI_CONFIG_SPACE_SIZE) {
+> -        header = pci_get_long(dev->config + offset);
+> -        next = PCI_EXT_CAP_NEXT(header);
+> -    } else {
+> +    if (offset != PCI_CONFIG_SPACE_SIZE) {
+>          uint16_t prev;
+>  
+>          /* 0 is reserved cap id. use internally to find the last capability
+>             in the linked list */
+> -        next = pcie_find_capability_list(dev, 0, &prev);
+> -
+> +        assert(pcie_find_capability_list(dev, 0, &prev) == 0);
+>          assert(prev >= PCI_CONFIG_SPACE_SIZE);
+> -        assert(next == 0);
+>          pcie_ext_cap_set_next(dev, prev, offset);
+>      }
+> -    pci_set_long(dev->config + offset, PCI_EXT_CAP(cap_id, cap_ver, next));
 > +
-> +            return nanl(low);
-> +    }
-> +
-> +    return *(long double *)&val;
-> +}
-
-This doesn't work except for x86 host.
-
-You ought to extract the mantissa, convert the 64-bit value to long-double, and 
-use ldexpl to scale the result for the exponent.
-
-Similarly converting the other way use frexpl and ldexpl.
-
-
-r~
+> +    pci_set_long(dev->config + offset, PCI_EXT_CAP(cap_id, cap_ver, 0));
+>  
+>      /* Make capability read-only by default */
+>      memset(dev->wmask + offset, 0, size);
+> 
