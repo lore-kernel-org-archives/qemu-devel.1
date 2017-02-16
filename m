@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashmit602@gmail.com>) id 1ceCG7-0006SL-2k
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 21:57:28 -0500
+	(envelope-from <ashmit602@gmail.com>) id 1ceCID-0008JC-6S
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 21:59:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashmit602@gmail.com>) id 1ceCG6-0000nM-4U
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 21:57:27 -0500
-Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:34891)
+	(envelope-from <ashmit602@gmail.com>) id 1ceCIB-0001hl-LQ
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 21:59:37 -0500
+Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:35134)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ashmit602@gmail.com>) id 1ceCG5-0000nE-WD
-	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 21:57:26 -0500
-Received: by mail-it0-x241.google.com with SMTP id 203so1679685ith.2
-	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 18:57:25 -0800 (PST)
+	(Exim 4.71) (envelope-from <ashmit602@gmail.com>) id 1ceCIB-0001hM-CV
+	for qemu-devel@nongnu.org; Wed, 15 Feb 2017 21:59:35 -0500
+Received: by mail-it0-x242.google.com with SMTP id 203so1687121ith.2
+	for <qemu-devel@nongnu.org>; Wed, 15 Feb 2017 18:59:35 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20170213145732.GN10361@stefanha-x1.localdomain>
+In-Reply-To: <20170213144356.GM10361@stefanha-x1.localdomain>
 References: <1486527494-3387-1-git-send-email-Ashish.Mittal@veritas.com>
-	<20170213145732.GN10361@stefanha-x1.localdomain>
+	<1486527494-3387-2-git-send-email-Ashish.Mittal@veritas.com>
+	<20170213144356.GM10361@stefanha-x1.localdomain>
 From: ashish mittal <ashmit602@gmail.com>
-Date: Wed, 15 Feb 2017 18:57:24 -0800
-Message-ID: <CAAo6VWNzuzMNEUjy4J+XKyuZhetf38-DOZTXOJsrnNVRX3fcNQ@mail.gmail.com>
+Date: Wed, 15 Feb 2017 18:59:33 -0800
+Message-ID: <CAAo6VWMHunKLCuT4cwp2g1kvubKVdgMqnczFBnewB=WQ15rLxA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v7 1/2] block/vxhs.c: Add support for a new
- block device type called "vxhs"
+Subject: Re: [Qemu-devel] [PATCH v7 2/2] block/vxhs.c: Add qemu-iotests for
+ new block device type "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,118 +30,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Jeff Cody <jcody@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <ashish.mittal@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Jeff Cody <jcody@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <ashish.mittal@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>
 
-On Mon, Feb 13, 2017 at 6:57 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> On Tue, Feb 07, 2017 at 08:18:13PM -0800, Ashish Mittal wrote:
->> +static int vxhs_parse_uri(const char *filename, QDict *options)
->> +{
->> +    URI *uri = NULL;
->> +    char *hoststr, *portstr;
->> +    char *port;
->> +    int ret = 0;
->> +
->> +    trace_vxhs_parse_uri_filename(filename);
->> +    uri = uri_parse(filename);
->> +    if (!uri || !uri->server || !uri->path) {
->> +        uri_free(uri);
->> +        return -EINVAL;
->> +    }
->> +
->> +    hoststr = g_strdup(VXHS_OPT_SERVER".host");
->> +    qdict_put(options, hoststr, qstring_from_str(uri->server));
->> +    g_free(hoststr);
->> +
->> +    portstr = g_strdup(VXHS_OPT_SERVER".port");
->> +    if (uri->port) {
->> +        port = g_strdup_printf("%d", uri->port);
->> +        qdict_put(options, portstr, qstring_from_str(port));
->> +        g_free(port);
->> +    }
->> +    g_free(portstr);
->> +
->> +    if (strstr(uri->path, "vxhs") == NULL) {
->> +        qdict_put(options, "vdisk-id", qstring_from_str(uri->path));
->> +    }
->> +
->> +    trace_vxhs_parse_uri_hostinfo(1, uri->server, uri->port);
->
-> What is the purpose of the first argument?
->
-
-It used to be a placeholder for the host index, which is now only 1. I
-will remove it.
-
->> +    str = g_strdup_printf(VXHS_OPT_SERVER".");
->> +    qdict_extract_subqdict(options, &backing_options, str);
->> +
->> +    /* Create opts info from runtime_tcp_opts list */
->> +    tcp_opts = qemu_opts_create(&runtime_tcp_opts, NULL, 0, &error_abort);
->> +    qemu_opts_absorb_qdict(tcp_opts, backing_options, &local_err);
->> +    if (local_err) {
->> +        qdict_del(backing_options, str);
->
-> What is qdict_del(backing_options, VXHS_OPT_SERVER".") supposed to do?
-> The same call is made further down too.
->
-
-Per my understanding, qdict_del() is to free the 'server.' entries
-within the subqdict.
-
-qdict_extract_subqdict() allocates a subqdict and populates it with
-the entries based on the pattern we pass. In this case 'server.'.
-
->> +        qemu_opts_del(tcp_opts);
->> +        ret = -EINVAL;
->> +        goto out;
->> +    }
->> +
->> +    server_host_opt = qemu_opt_get(tcp_opts, VXHS_OPT_HOST);
->> +    if (!server_host_opt) {
->> +        error_setg(&local_err, QERR_MISSING_PARAMETER,
->> +                   VXHS_OPT_SERVER"."VXHS_OPT_HOST);
->> +        ret = -EINVAL;
->> +        goto out;
->
-> Missing qemu_opts_del(tcp_opts).
->
-
-Will fix this!
-
->> +    }
->> +
->> +    if (strlen(server_host_opt) > MAXHOSTNAMELEN) {
->> +        error_setg(errp, "server.host cannot be more than %d characters",
->> +                   MAXHOSTNAMELEN);
->> +        ret = -EINVAL;
->> +        goto out;
->
-> Missing qemu_opts_del(tcp_opts).
->
-
-Will fix this!
-
->> @@ -5114,6 +5147,7 @@ echo "tcmalloc support  $tcmalloc"
->>  echo "jemalloc support  $jemalloc"
->>  echo "avx2 optimization $avx2_opt"
->>  echo "replication support $replication"
->> +echo "VxHS block device $vxhs"
->>
->>  if test "$sdl_too_old" = "yes"; then
->>  echo "-> Your SDL version is too old - please upgrade to have SDL support"
->> @@ -5729,6 +5763,12 @@ if test "$pthread_setname_np" = "yes" ; then
->>    echo "CONFIG_PTHREAD_SETNAME_NP=y" >> $config_host_mak
+On Mon, Feb 13, 2017 at 6:43 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> On Tue, Feb 07, 2017 at 08:18:14PM -0800, Ashish Mittal wrote:
+>> diff --git a/tests/qemu-iotests/common.config b/tests/qemu-iotests/common.config
+>> index f6384fb..c7a80c0 100644
+>> --- a/tests/qemu-iotests/common.config
+>> +++ b/tests/qemu-iotests/common.config
+>> @@ -105,6 +105,10 @@ if [ -z "$QEMU_NBD_PROG" ]; then
+>>      export QEMU_NBD_PROG="`set_prog_path qemu-nbd`"
 >>  fi
 >>
->> +if test "$vxhs" = "yes" ; then
->> +  echo "CONFIG_VXHS=y" >> $config_host_mak
->> +  echo "VXHS_CFLAGS=$vxhs_cflags" >> $config_host_mak
+>> +if [ -z "$QEMU_VXHS_PROG" ]; then
+>> +    export QEMU_VXHS_PROG="`set_prog_path qnio_server /usr/local/bin`"
 >
-> Please drop this unused variable.
-
-Will fix this!
-
-
-Thanks,
-Ashish
+> Did you test this with /usr/local/bin/qnio_server?
+>
+> I think it will evaluate to QEMU_VXHS_PROG=/usr/local/bin when qnio_server
+> isn't found in PATH.  You probably wanted /usr/local/bin/qnio_server instead.
+>
+> I suggest dropping the second argument completely and letting the user set PATH
+> themselves.  No existing set_prog_path caller uses the second argument.
+>
+> # $1 = prog to look for, $2* = default pathnames if not found in $PATH
+> set_prog_path()
+> {
+>     p=`command -v $1 2> /dev/null`
+>     if [ -n "$p" -a -x "$p" ]; then
+>         echo $p
+>         return 0
+>     fi
+>     p=$1
+>
+>     shift
+>     for f; do
+>         if [ -x $f ]; then
+>             echo $f
+>             return 0
+>         fi
+>     done
+>
+>     echo ""
+>     return 1
+> }
+>
+>> diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+>> index 3213765..06a3164 100644
+>> --- a/tests/qemu-iotests/common.rc
+>> +++ b/tests/qemu-iotests/common.rc
+>> @@ -89,6 +89,9 @@ else
+>>          TEST_IMG=$TEST_DIR/t.$IMGFMT
+>>      elif [ "$IMGPROTO" = "archipelago" ]; then
+>>          TEST_IMG="archipelago:at.$IMGFMT"
+>> +    elif [ "$IMGPROTO" = "vxhs" ]; then
+>> +        TEST_IMG_FILE=$TEST_DIR/t.$IMGFMT
+>> +        TEST_IMG="vxhs://127.0.0.1:9999/t.$IMGFMT"
+>>      else
+>>          TEST_IMG=$IMGPROTO:$TEST_DIR/t.$IMGFMT
+>>      fi
+>> @@ -175,6 +178,12 @@ _make_test_img()
+>>          eval "$QEMU_NBD -v -t -b 127.0.0.1 -p 10810 -f $IMGFMT  $TEST_IMG_FILE &"
+>>          sleep 1 # FIXME: qemu-nbd needs to be listening before we continue
+>>      fi
+>> +
+>> +    # Start QNIO server on image directory for vxhs protocol
+>> +    if [ $IMGPROTO = "vxhs" ]; then
+>> +        eval "$QEMU_VXHS -d  $TEST_DIR &"
+>> +        sleep 1 # Wait for server to come up.
+>
+> This is a pre-existing problem and you don't need to fix it now:
+>
+> We should replace sleep 1 with a function that probes the TCP port until the
+> connection can be established or a timeout is reached.  The netcat (nc) utility
+> is often used for this.
+>
+> sleep 1 is not reliable and may fail on a heavily loaded machine like the
+> Travis-CI build machines that are used.
