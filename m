@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ceNCo-0000kt-Bl
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:38:47 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ceNCo-0000kr-Ba
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:38:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ceNCl-0002OO-OB
+	(envelope-from <laurent@vivier.eu>) id 1ceNCl-0002OF-JE
 	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:38:46 -0500
-Received: from mout.kundenserver.de ([212.227.17.24]:54395)
+Received: from mout.kundenserver.de ([212.227.17.13]:55069)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ceNCl-0002NR-Dc
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ceNCl-0002NC-9P
 	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:38:43 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu, 16 Feb 2017 15:38:09 +0100
-Message-Id: <20170216143816.2384-8-laurent@vivier.eu>
+Date: Thu, 16 Feb 2017 15:38:06 +0100
+Message-Id: <20170216143816.2384-5-laurent@vivier.eu>
 In-Reply-To: <20170216143816.2384-1-laurent@vivier.eu>
 References: <20170216143816.2384-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL v2 07/14] linux-user: manage two new IFLA host
- message types
+Subject: [Qemu-devel] [PULL v2 04/14] linux-user: Fix inotify_init1 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,35 +24,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Lena Djokic <Lena.Djokic@rt-rk.com>, Riku Voipio <riku.voipio@linaro.org>
 
-Add QEMU_IFLA_GSO_MAX_SEGS and QEMU_IFLA_GSO_MAX_SIZE
-in host_to_target_data_link_rtattr().
+From: Lena Djokic <Lena.Djokic@rt-rk.com>
 
-These two messages are sent by the host kernel when
-we use "sudo".
+This commit adds necessary conversion of argument passed to inotify_init1.
+inotify_init1 flags can be IN_NONBLOCK and IN_CLOEXEC which rely on O_NONBLOCK
+and O_CLOEXEC and those can have different values on different platforms.
 
-Found with qemu-m68k and Debian etch-m68k (sudo 1.6.8p12-4) and
-host kernel 4.7.6-200.fc24.x86_64
-
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <1477530049-15676-1-git-send-email-laurent@vivier.eu>
+Signed-off-by: Lena Djokic <Lena.Djokic@rt-rk.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
 ---
- linux-user/syscall.c | 2 ++
- 1 file changed, 2 insertions(+)
+ linux-user/syscall.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index c1d6f76..d982a27 100644
+index 9be8e95..fccd631 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -2326,6 +2326,8 @@ static abi_long host_to_target_data_link_rtattr(struct rtattr *rtattr)
-     case QEMU_IFLA_GROUP:
-     case QEMU_IFLA_MASTER:
-     case QEMU_IFLA_NUM_VF:
-+    case QEMU_IFLA_GSO_MAX_SEGS:
-+    case QEMU_IFLA_GSO_MAX_SIZE:
-         u32 = RTA_DATA(rtattr);
-         *u32 = tswap32(*u32);
+@@ -11561,7 +11561,8 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+ #ifdef CONFIG_INOTIFY1
+ #if defined(TARGET_NR_inotify_init1) && defined(__NR_inotify_init1)
+     case TARGET_NR_inotify_init1:
+-        ret = get_errno(sys_inotify_init1(arg1));
++        ret = get_errno(sys_inotify_init1(target_to_host_bitmask(arg1,
++                                          fcntl_flags_tbl)));
          break;
+ #endif
+ #endif
 -- 
 2.9.3
