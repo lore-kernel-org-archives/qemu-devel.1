@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ceNCo-0000kj-As
+	(envelope-from <laurent@vivier.eu>) id 1ceNCo-0000kk-B0
 	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:38:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ceNCl-0002Nx-AU
+	(envelope-from <laurent@vivier.eu>) id 1ceNCj-0002N3-QY
 	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:38:46 -0500
-Received: from mout.kundenserver.de ([217.72.192.75]:64170)
+Received: from mout.kundenserver.de ([217.72.192.74]:55514)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ceNCk-0002N9-W9
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:38:43 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ceNCj-0002MU-Fa
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:38:41 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu, 16 Feb 2017 15:38:04 +0100
-Message-Id: <20170216143816.2384-3-laurent@vivier.eu>
+Date: Thu, 16 Feb 2017 15:38:13 +0100
+Message-Id: <20170216143816.2384-12-laurent@vivier.eu>
 In-Reply-To: <20170216143816.2384-1-laurent@vivier.eu>
 References: <20170216143816.2384-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL v2 02/14] linux-user: drop __cygwin__ ifdef
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v2 11/14] linux-user: fix tcg/mmap test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,31 +27,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Riku Voipio <riku.voipio@linaro.org>, Richard Henderson <rth@twiddle.net>
+Cc: Riku Voipio <riku.voipio@iki.fi>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Pranith Kumar <bobby.prani@gmail.com>, Laurent Vivier <laurent@vivier.eu>
 
-From: Riku Voipio <riku.voipio@linaro.org>
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-linux-user doesn't work on cygwin anyways.
+tests/tcg/mmap test fails with values other than default target page
+size. When creating a map beyond EOF, extra anonymous pages are added up
+to the target page boundary. Currently, this operation is performed only
+when qemu_real_host_page_size < TARGET_PAGE_SIZE, but it should be
+performed if the configured page size (qemu -p) is larger than
+qemu_real_host_page_size too.
 
-Cc: Richard Henderson <rth@twiddle.net>
-Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+[pranith: dropped checkpatch changes]
+Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20170119151533.29328-2-bobby.prani@gmail.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/mmap.c | 3 ---
- 1 file changed, 3 deletions(-)
+ linux-user/mmap.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/linux-user/mmap.c b/linux-user/mmap.c
-index 61685bf..4ed9cad 100644
+index 4ed9cad..4888f53 100644
 --- a/linux-user/mmap.c
 +++ b/linux-user/mmap.c
-@@ -193,9 +193,6 @@ static int mmap_frag(abi_ulong real_start,
+@@ -426,9 +426,9 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
+        may need to truncate file maps at EOF and add extra anonymous pages
+        up to the targets page boundary.  */
  
- #if HOST_LONG_BITS == 64 && TARGET_ABI_BITS == 64
- # define TASK_UNMAPPED_BASE  (1ul << 38)
--#elif defined(__CYGWIN__)
--/* Cygwin doesn't have a whole lot of address space.  */
--# define TASK_UNMAPPED_BASE  0x18000000
- #else
- # define TASK_UNMAPPED_BASE  0x40000000
- #endif
+-    if ((qemu_real_host_page_size < TARGET_PAGE_SIZE)
+-        && !(flags & MAP_ANONYMOUS)) {
+-       struct stat sb;
++    if ((qemu_real_host_page_size < qemu_host_page_size) &&
++        !(flags & MAP_ANONYMOUS)) {
++        struct stat sb;
+ 
+        if (fstat (fd, &sb) == -1)
+            goto fail;
 -- 
 2.9.3
