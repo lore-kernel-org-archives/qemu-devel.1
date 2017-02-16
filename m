@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alexander.boettcher@genode-labs.com>)
-	id 1ceJkr-0006vf-6K
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:57:42 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ceJlk-0007NT-AU
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:58:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alexander.boettcher@genode-labs.com>)
-	id 1ceJko-0003tD-23
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:57:41 -0500
-Received: from mail.genode-labs.com ([88.198.56.169]:53634)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alexander.boettcher@genode-labs.com>)
-	id 1ceJkn-0003sZ-O9
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:57:38 -0500
-From: Alexander Boettcher <alexander.boettcher@genode-labs.com>
-Message-ID: <efb89578-ba8c-1f42-0ec3-79f769b3f1f1@genode-labs.com>
-Date: Thu, 16 Feb 2017 11:57:28 +0100
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ceJlh-0004NV-7F
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:58:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33166)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1ceJlg-0004MO-VU
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 05:58:33 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E1DB33B721
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 10:58:32 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Thu, 16 Feb 2017 14:58:27 +0400
+Message-Id: <20170216105827.1486-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] x86 tlb_fill in memory_helper.c
+Subject: [Qemu-devel] [PATCHv2] cutils: factor out
+ pci_host_device_address_parse()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,186 +33,284 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
+Cc: mst@redhat.com, marcel@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Hello,
+This will allow the function to be used outside of QOM properties.
 
-I have a short question/observation and a longer story.
+Add tests and replace strtoul usage for qemu_strtoul while touching it.
 
-Short question:
-
-Between qemu 2.4.1 and 2.5.0 following snippet of code vanished:
-
---- qemu-2.4.1/target-i386/mem_helper.c
-+++ qemu-2.5.0/target-i386/mem_helper.c
-@@ -122,11 +142,7 @@
-         X86CPU *cpu =3D X86_CPU(cs);
-         CPUX86State *env =3D &cpu->env;
-
--        if (retaddr) {
--            /* now we have a real cpu fault */
--            cpu_restore_state(cs, retaddr);
--        }
--        raise_exception_err(env, cs->exception_index, env->error_code);
-+        raise_exception_err_ra(env, cs->exception_index,
-env->error_code, retaddr);
-     }
- }
- #endif
-
-The special retaddr condition seems to be part in every other
-architecture but not i386. Is there a specific reason ?
-
-The point is - because I'm asking - beginning with qemu 2.5.0. the AMD
-SVM virtualization (-cpu phenom) does not work anymore for us. Patching
-the vanished retaddr condition back to 2.5.0, 2.8.0 and qemu devel git
-branch makes it working again.
-
-
-
->From 87e061542205ac56cc485d13607db16239524e4b Mon Sep 17 00:00:00 2001
-From: Alexander Boettcher <alexander.boettcher@genode-labs.com>
-Date: Thu, 16 Feb 2017 11:17:09 +0100
-Subject: [PATCH] x86/tlb_fill: call cpu_restore_state on valid addr
-
-Vanished between 2.4.1 and 2.5.0 release and breaks SVM virtualization.
-
-Signed-off-by: Alexander Boettcher <alexander.boettcher@genode-labs.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- target/i386/mem_helper.c | 4 ++++
- 1 file changed, 4 insertions(+)
+v2:
+ - fixed incompatible type warning/error
 
-diff --git a/target/i386/mem_helper.c b/target/i386/mem_helper.c
-index 70f6766..d6267f9 100644
---- a/target/i386/mem_helper.c
-+++ b/target/i386/mem_helper.c
-@@ -209,6 +209,10 @@ void tlb_fill(CPUState *cs, target_ulong addr,
-MMUAccessType access_type,
-         X86CPU *cpu =3D X86_CPU(cs);
-         CPUX86State *env =3D &cpu->env;
+include/hw/pci/pci.h      | 12 ++++++++++
+ hw/core/qdev-properties.c | 61 +++--------------------------------------=
+------
+ tests/test-cutils.c       | 46 +++++++++++++++++++++++++++++++++++
+ util/cutils.c             | 59 +++++++++++++++++++++++++++++++++++++++++=
+++++
+ 4 files changed, 120 insertions(+), 58 deletions(-)
 
-+        if (retaddr) {
-+            /* now we have a real cpu fault */
-+            cpu_restore_state(cs, retaddr);
-+        }
-         raise_exception_err_ra(env, cs->exception_index,
-env->error_code, retaddr);
-     }
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index cbc1fdfb5b..61718080ea 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -815,4 +815,16 @@ extern const VMStateDescription vmstate_pci_device;
+=20
+ MSIMessage pci_get_msi_message(PCIDevice *dev, int vector);
+=20
++/**
++ * pci_host_device_address_parse:
++ * @str: string to parse
++ * @addr: destination structure or NULL
++ *
++ * Parse [<domain>:]<bus>:<slot>.<func>
++ *   if <domain> is not supplied, it's assumed to be 0.
++ *
++ * Returns: -1 on failure, 0 on success.
++ */
++int pci_host_device_address_parse(const char *str, PCIHostDeviceAddress =
+*addr);
++
+ #endif
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index 6ab4265eb4..5dd0774e88 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -722,10 +722,6 @@ static void get_pci_host_devaddr(Object *obj, Visito=
+r *v, const char *name,
+     visit_type_str(v, name, &p, errp);
  }
+=20
+-/*
+- * Parse [<domain>:]<bus>:<slot>.<func>
+- *   if <domain> is not supplied, it's assumed to be 0.
+- */
+ static void set_pci_host_devaddr(Object *obj, Visitor *v, const char *na=
+me,
+                                  void *opaque, Error **errp)
+ {
+@@ -733,11 +729,7 @@ static void set_pci_host_devaddr(Object *obj, Visito=
+r *v, const char *name,
+     Property *prop =3D opaque;
+     PCIHostDeviceAddress *addr =3D qdev_get_prop_ptr(dev, prop);
+     Error *local_err =3D NULL;
+-    char *str, *p;
+-    char *e;
+-    unsigned long val;
+-    unsigned long dom =3D 0, bus =3D 0;
+-    unsigned int slot =3D 0, func =3D 0;
++    char *str;
+=20
+     if (dev->realized) {
+         qdev_prop_set_after_realize(dev, name, errp);
+@@ -750,58 +742,11 @@ static void set_pci_host_devaddr(Object *obj, Visit=
+or *v, const char *name,
+         return;
+     }
+=20
+-    p =3D str;
+-    val =3D strtoul(p, &e, 16);
+-    if (e =3D=3D p || *e !=3D ':') {
+-        goto inval;
+-    }
+-    bus =3D val;
+-
+-    p =3D e + 1;
+-    val =3D strtoul(p, &e, 16);
+-    if (e =3D=3D p) {
+-        goto inval;
+-    }
+-    if (*e =3D=3D ':') {
+-        dom =3D bus;
+-        bus =3D val;
+-        p =3D e + 1;
+-        val =3D strtoul(p, &e, 16);
+-        if (e =3D=3D p) {
+-            goto inval;
+-        }
+-    }
+-    slot =3D val;
+-
+-    if (*e !=3D '.') {
+-        goto inval;
++    if (!pci_host_device_address_parse(str, addr)) {
++        error_set_from_qdev_prop_error(errp, EINVAL, dev, prop, str);
+     }
+-    p =3D e + 1;
+-    val =3D strtoul(p, &e, 10);
+-    if (e =3D=3D p) {
+-        goto inval;
+-    }
+-    func =3D val;
+-
+-    if (dom > 0xffff || bus > 0xff || slot > 0x1f || func > 7) {
+-        goto inval;
+-    }
+-
+-    if (*e) {
+-        goto inval;
+-    }
+-
+-    addr->domain =3D dom;
+-    addr->bus =3D bus;
+-    addr->slot =3D slot;
+-    addr->function =3D func;
+=20
+     g_free(str);
+-    return;
+-
+-inval:
+-    error_set_from_qdev_prop_error(errp, EINVAL, dev, prop, str);
+-    g_free(str);
+ }
+=20
+ PropertyInfo qdev_prop_pci_host_devaddr =3D {
+diff --git a/tests/test-cutils.c b/tests/test-cutils.c
+index 20b0f59ba2..81c4f072f3 100644
+--- a/tests/test-cutils.c
++++ b/tests/test-cutils.c
+@@ -28,6 +28,7 @@
+ #include "qemu/osdep.h"
+=20
+ #include "qemu/cutils.h"
++#include "hw/pci/pci.h"
+=20
+ static void test_parse_uint_null(void)
+ {
+@@ -1437,6 +1438,46 @@ static void test_qemu_strtosz_suffix_unit(void)
+     g_assert_cmpint(res, =3D=3D, 12345000);
+ }
+=20
++static void test_pci_parse_valid(void)
++{
++    PCIHostDeviceAddress addr =3D { 0xff, 0xff, 0xff, 0xff };
++    int i, res;
++    const struct {
++        const char *str;
++        PCIHostDeviceAddress addr;
++    } tests[] =3D {
++        { "1:2.3", { 0, 1, 2, 3 } },
++        { "4:1:2.3", { 4, 1, 2, 3 } },
++        { "a:a:a.7", { 10, 10, 10, 7 } },
++    };
++
++    for (i =3D 0; i < ARRAY_SIZE(tests); i++) {
++        res =3D pci_host_device_address_parse(tests[i].str, &addr);
++        g_assert_cmpint(res, =3D=3D, 0);
++
++        g_assert_cmpint(addr.domain, =3D=3D, tests[i].addr.domain);
++        g_assert_cmpint(addr.bus, =3D=3D, tests[i].addr.bus);
++        g_assert_cmpint(addr.slot, =3D=3D, tests[i].addr.slot);
++        g_assert_cmpint(addr.function, =3D=3D, tests[i].addr.function);
++    }
++}
++
++static void test_pci_parse_invalid(void)
++{
++    int i, res;
++    const char *tests[] =3D  {
++        "", "foo", "1:2.3 foo",
++        "a:a:a.a",
++        "1", "1:", "1:2", "1:2:", "1:2:3", ":1:2:3.",
++        "-1:1:2.3", "-1:2.3", "1:-1.3", "1:2.-3",
++        "0x10000:1:1.1", "0x100:1.1", "1:0x20.1", "1:1.8" };
++
++    for (i =3D 0; i < ARRAY_SIZE(tests); i++) {
++        res =3D pci_host_device_address_parse(tests[i], NULL);
++        g_assert_cmpint(res, =3D=3D, -1);
++    }
++}
++
+ int main(int argc, char **argv)
+ {
+     g_test_init(&argc, &argv, NULL);
+@@ -1598,5 +1639,10 @@ int main(int argc, char **argv)
+     g_test_add_func("/cutils/strtosz/suffix-unit",
+                     test_qemu_strtosz_suffix_unit);
+=20
++    g_test_add_func("/cutils/pci-parse/valid",
++                    test_pci_parse_valid);
++    g_test_add_func("/cutils/pci-parse/invalid",
++                    test_pci_parse_invalid);
++
+     return g_test_run();
+ }
+diff --git a/util/cutils.c b/util/cutils.c
+index 4fefcf3be3..fc71c85816 100644
+--- a/util/cutils.c
++++ b/util/cutils.c
+@@ -29,6 +29,7 @@
+ #include "qemu/sockets.h"
+ #include "qemu/iov.h"
+ #include "net/net.h"
++#include "hw/pci/pci.h"
+ #include "qemu/cutils.h"
+=20
+ void strpadcpy(char *buf, int buf_size, const char *str, char pad)
+@@ -594,3 +595,61 @@ const char *qemu_ether_ntoa(const MACAddr *mac)
+=20
+     return ret;
+ }
++
++int pci_host_device_address_parse(const char *str, PCIHostDeviceAddress =
+*addr)
++{
++    const char *p =3D str;
++    const char *e;
++    unsigned long val;
++    unsigned int dom =3D 0, bus =3D 0;
++    unsigned int slot =3D 0, func =3D 0;
++
++    if (qemu_strtoul(p, &e, 16, &val) < 0
++        || e =3D=3D p || *e !=3D ':') {
++        return -1;
++    }
++    bus =3D val;
++
++    p =3D e + 1;
++    if (qemu_strtoul(p, &e, 16, &val) < 0
++        || e =3D=3D p) {
++        return -1;
++    }
++    if (*e =3D=3D ':') {
++        dom =3D bus;
++        bus =3D val;
++        p =3D e + 1;
++        if (qemu_strtoul(p, &e, 16, &val) < 0
++            || e =3D=3D p) {
++            return -1;
++        }
++    }
++    slot =3D val;
++
++    if (*e !=3D '.') {
++        return -1;
++    }
++    p =3D e + 1;
++    if (qemu_strtoul(p, &e, 10, &val) < 0
++        || e =3D=3D p) {
++        return -1;
++    }
++    func =3D val;
++
++    if (dom > 0xffff || bus > 0xff || slot > 0x1f || func > 7) {
++        return -1;
++    }
++
++    if (*e) {
++        return -1;
++    }
++
++    if (addr) {
++        addr->domain =3D dom;
++        addr->bus =3D bus;
++        addr->slot =3D slot;
++        addr->function =3D func;
++    }
++
++    return 0;
++}
 --=20
-2.7.4
-
-
-
-Thanks, in advance, (the longer story is below)
-
-Alex.
-
---=20
-Alexander Boettcher
-Genode Labs
-
-http://www.genode-labs.com - http://www.genode.org
-
-Genode Labs GmbH - Amtsgericht Dresden - HRB 28424 - Sitz Dresden
-Gesch=C3=A4ftsf=C3=BChrer: Dr.-Ing. Norman Feske, Christian Helmuth
-
-
-
-
-
-
-Long story:
-
-We use Qemu for early debugging/developing of our Genode/Nova +
-Virtualbox port. Genode [0] is a OS framework to build up own tailored
-OSes, Nova [1] is a microkernel also being a hypervisor. We ported
-Virtualbox on top of Genode/Nova [2] as a user-level VMM to run
-unmodified VM Guests. We use AMD SVM (-cpu phenom) in Qemu for
-debugging/developing hypervisor related virtualization related issues.
-
-Beginning with 2.5.0 the setup suddenly don't run anymore and we get
-mysterious triple faults originating from the guest (solely in Qemu,
-same image runs fine on native hardware). We tested also 2.5.1, 2.8.0
-and the current qemu.git repository
-(5dae13cd71f0755a1395b5a4cde635b8a6ee3f58).
-
-So, I made a diff from 2.4.1 to 2.5.0 and looked up what could be
-potentially the change which effects us. The code snippet as above seems
-to be the responsible change.
-
-Below I attached the instructions if someone want to reproduce it. The
-iso image can be found on my qemu git branch [3]. The ISO image contains
-Genode/Nova + user-level port of Virtualbox as VMM + a 32bit VM running
-Genode/Nova.
-
-
-[0] https://www.genode.org
-[1] http://www.hypervisor.org
-[2]
-https://genode.org/documentation/release-notes/14.02#VirtualBox_on_top_of=
-_the_NOVA_microhypervisor
-[3] https://github.com/alex-ab/qemu/blob/genode/virtualbox.iso
-
-
-
-
-Instructions to reproduce:
---------------------------
-
-~/local/qemu-<X>/bin/qemu-system-x86_64 -smp 1 -no-kvm -display sdl -m
-512 -cpu phenom -serial mon:stdio -cdrom virtualbox.iso
-
-<X> being:
-
-2.3.1 - ok
-2.4.1 - ok
-2.5.0 - fails with triple fault in Guest
-2.5.1 - fails with triple fault in Guest
-2.8.0 - fails with triple fault in Guest
-git   - fails with triple fault in Guest
-
-
-The Qemu sources has been configured and build from the original release
-tar.xz sources with
-gcc (Ubuntu 5.4.0-6ubuntu1~16.04.4) 5.4.0 20160609
-
-./configure --prefix=3D~/local/qemu-<X> --disable-vnc
---target-list=3Di386-softmmu,arm-softmmu,x86_64-softmmu
-make install
-
-
-Bad/Failing UART output from Qemu:
-
-...
-[init -> virtualbox] fb resize : 640x480@16 -> 720x400@0
-[init -> log_terminal] Bender: Hello World.
-Need 001d1000 bytes to relocate modules.
-Relocating to 0fe1f000:
-Copying 1774420 bytes...
-Copying 123492 bytes...
-[init -> log_terminal]
-Now we get the fault if I touch this 0xc001c09c ...
-[ 0] Killed EC:0xffffffff832a4b80 SC:0xffffffff810e3e40 V:0x7f
-CR0:0x8001003b CR3:0x421000 CR4:0x698 (PT not found)
-...
-
-Good UART output from Qemu:
-
-...
-[init -> virtualbox] fb resize : 640x480@16 -> 720x400@0
-[init -> log_terminal] Bender: Hello World.
-Need 001d1000 bytes to relocate modules.
-Relocating to 0fe1f000:
-Copying 1774420 bytes...
-Copying 123492 bytes...
-[init -> log_terminal]
-Now we get the fault if I touch this 0xc001c09c ...
-[init -> log_terminal]  - oh - no fault ? Eureka !
-[init -> log_terminal]
-                       NOVA Microhypervisor v7-dc6cf64 (x86_32): Feb 16
-2017 08:57:37 [gcc 4.9.2]
-[init -> log_terminal]
-[init -> log_terminal] [ 0] CORE:0:0:0 10:2:3:0 [0] AMD Phenom(tm) 9550
-Quad-Core Processor
-...
+2.11.0.295.gd7dffce1c.dirty
