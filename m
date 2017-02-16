@@ -1,19 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1ceQ0t-0007Su-9v
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:38:41 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ceQ10-0007jF-7S
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:38:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1ceQ0r-0002Bs-Rq
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:38:39 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ceQ0x-0002GQ-4F
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:38:46 -0500
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:35765)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1ceQ0w-0002Fm-Uc
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 12:38:43 -0500
+Received: by mail-wm0-x232.google.com with SMTP id v186so72399765wmd.0
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 09:38:42 -0800 (PST)
+Received: from 640k.lan (94-39-187-56.adsl-ull.clienti.tiscali.it.
+	[94.39.187.56]) by smtp.gmail.com with ESMTPSA id
+	m83sm1065397wmc.33.2017.02.16.09.38.39 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 16 Feb 2017 09:38:40 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 16 Feb 2017 18:38:37 +0100
+Message-Id: <1487266718-108184-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170203195037.4238-1-nirsof@gmail.com>
-References: <20170203195037.4238-1-nirsof@gmail.com>
-From: Nir Soffer <nirsof@gmail.com>
-Date: Thu, 16 Feb 2017 19:38:24 +0200
-Message-ID: <CAMr-obvrGhP=S9ovxk2okPbeVy817+Z-vpk0b_d5KHRj3o-qpQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] qemu-img: Do not truncate before
- preallocation
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v2 00/23] Misc patches for 2017-02-16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,108 +34,112 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Nir Soffer <nirsof@gmail.com>
 
-Ping
+The following changes since commit 5dae13cd71f0755a1395b5a4cde635b8a6ee3f58:
 
-On Fri, Feb 3, 2017 at 9:50 PM, Nir Soffer <nirsof@gmail.com> wrote:
-> When using file system that does not support fallocate() (e.g. NFS <
-> 4.2), truncating the file only when preallocation=OFF speeds up creating
-> raw file.
->
-> Here is example run, tested on Fedora 24 machine, creating raw file on
-> NFS version 3 server.
->
-> $ time ./qemu-img-master create -f raw -o preallocation=falloc mnt/test 1g
-> Formatting 'mnt/test', fmt=raw size=1073741824 preallocation=falloc
->
-> real    0m21.185s
-> user    0m0.022s
-> sys     0m0.574s
->
-> $ time ./qemu-img-fix create -f raw -o preallocation=falloc mnt/test 1g
-> Formatting 'mnt/test', fmt=raw size=1073741824 preallocation=falloc
->
-> real    0m11.601s
-> user    0m0.016s
-> sys     0m0.525s
->
-> $ time dd if=/dev/zero of=mnt/test bs=1M count=1024 oflag=direct
-> 1024+0 records in
-> 1024+0 records out
-> 1073741824 bytes (1.1 GB, 1.0 GiB) copied, 15.6627 s, 68.6 MB/s
->
-> real    0m16.104s
-> user    0m0.009s
-> sys     0m0.220s
->
-> Running with strace we can see that without this change we do one
-> pread() and one pwrite() for each block. With this change, we do only
-> one pwrite() per block.
->
-> $ strace ./qemu-img-master create -f raw -o preallocation=falloc mnt/test 8192
-> ...
-> pread64(9, "\0", 1, 4095)               = 1
-> pwrite64(9, "\0", 1, 4095)              = 1
-> pread64(9, "\0", 1, 8191)               = 1
-> pwrite64(9, "\0", 1, 8191)              = 1
->
-> $ strace ./qemu-img-fix create -f raw -o preallocation=falloc mnt/test 8192
-> ...
-> pwrite64(9, "\0", 1, 4095)              = 1
-> pwrite64(9, "\0", 1, 8191)              = 1
->
-> This happens because posix_fallocate is checking if each block is
-> allocated before writing a byte to the block, and when truncating the
-> file before preallocation, all blocks are unallocated.
->
-> Signed-off-by: Nir Soffer <nirsof@gmail.com>
-> ---
->
-> I sent this a week ago:
-> http://lists.nongnu.org/archive/html/qemu-devel/2017-01/msg06123.html
->
-> Sending again with improved commit message.
->
->  block/file-posix.c | 11 ++++-------
->  1 file changed, 4 insertions(+), 7 deletions(-)
->
-> diff --git a/block/file-posix.c b/block/file-posix.c
-> index 2134e0e..442f080 100644
-> --- a/block/file-posix.c
-> +++ b/block/file-posix.c
-> @@ -1591,12 +1591,6 @@ static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
->  #endif
->      }
->
-> -    if (ftruncate(fd, total_size) != 0) {
-> -        result = -errno;
-> -        error_setg_errno(errp, -result, "Could not resize file");
-> -        goto out_close;
-> -    }
-> -
->      switch (prealloc) {
->  #ifdef CONFIG_POSIX_FALLOCATE
->      case PREALLOC_MODE_FALLOC:
-> @@ -1636,6 +1630,10 @@ static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
->          break;
->      }
->      case PREALLOC_MODE_OFF:
-> +        if (ftruncate(fd, total_size) != 0) {
-> +            result = -errno;
-> +            error_setg_errno(errp, -result, "Could not resize file");
-> +        }
->          break;
->      default:
->          result = -EINVAL;
-> @@ -1644,7 +1642,6 @@ static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
->          break;
->      }
->
-> -out_close:
->      if (qemu_close(fd) != 0 && result == 0) {
->          result = -errno;
->          error_setg_errno(errp, -result, "Could not close the new file");
-> --
-> 2.9.3
->
+  Merge remote-tracking branch 'remotes/rth/tags/pull-or-20170214' into staging (2017-02-14 09:55:48 +0000)
+
+are available in the git repository at:
+
+
+  git://github.com/bonzini/qemu.git tags/for-upstream
+
+for you to fetch changes up to 65c9d60a3ad3249784348824eca69acac455bc02:
+
+  target-i386: correctly propagate retaddr into SVM helpers (2017-02-16 18:37:01 +0100)
+
+----------------------------------------------------------------
+* GUEST_PANICKED improvements (Anton)
+* vCont gdbstub rewrite (Claudio)
+* Fix CPU creation with -device (Liyang)
+* Logging fixes for pty chardevs (Ed)
+* Makefile "move if changed" fix (Lin)
+* First part of cpu_exec refactoring (me)
+* SVM emulation fix (me)
+* apic_delivered fix (Pavel)
+* "info ioapic" fix (Peter)
+* qemu-nbd socket activation (Richard)
+* QOMification of mcf_uart (Thomas)
+
+----------------------------------------------------------------
+Alberto Garcia (1):
+      qemu-doc: Clarify that -vga std is now the default
+
+Anton Nefedov (4):
+      qemu-char: socket backend: disconnect on write error
+      i386/cpu: add crash-information QOM property
+      report guest crash information in GUEST_PANICKED event
+      vl: log available guest crash information
+
+Claudio Imbrenda (2):
+      move vm_start to cpus.c
+      gdbstub: Fix vCont behaviour
+
+Dou Liyang (1):
+      vl: Move the cpu_synchronize_all_post_init() after generic devices initialization
+
+Ed Swierk (1):
+      char: drop data written to a disconnected pty
+
+Lin Ma (1):
+      Makefile: avoid leaving the temporary QEMU_PKGVERSION header file
+
+Paolo Bonzini (7):
+      test-vmstate: remove yield_until_fd_readable
+      cpu-exec: fix icount out-of-bounds access
+      cpu-exec: tighten barrier on TCG_EXIT_REQUESTED
+      cpu-exec: avoid cpu_loop_exit in cpu_handle_interrupt
+      cpu-exec: avoid repeated sigsetjmp on interrupts
+      cpu-exec: remove outermost infinite loop
+      target-i386: correctly propagate retaddr into SVM helpers
+
+Pavel Dovgalyuk (1):
+      apic: reset apic_delivered global variable on machine reset
+
+Peter Xu (3):
+      kvm/ioapic: dump real object instead of a fake one
+      ioapic: fix error report value of def version
+      kvm/ioapic: correct kvm ioapic version
+
+Richard W.M. Jones (1):
+      qemu-nbd: Implement socket activation.
+
+Thomas Huth (1):
+      hw/char/mcf_uart: QOMify the ColdFire UART
+
+ Makefile                  |   6 +-
+ chardev/char-pty.c        |   2 +-
+ chardev/char-socket.c     |  10 +++
+ cpu-exec.c                |  86 ++++++++++---------
+ cpus.c                    |  42 ++++++++++
+ gdbstub.c                 | 209 +++++++++++++++++++++++++++++++++++-----------
+ hw/char/mcf_uart.c        | 102 ++++++++++++++++------
+ hw/i386/kvm/ioapic.c      |  13 ++-
+ hw/intc/apic_common.c     |   2 +
+ hw/intc/ioapic.c          |   6 +-
+ hw/m68k/mcf5208.c         |   6 +-
+ hw/misc/pvpanic.c         |   2 +-
+ hw/ppc/spapr_rtas.c       |   3 +-
+ include/exec/exec-all.h   |   1 +
+ include/hw/m68k/mcf.h     |   6 +-
+ include/qom/cpu.h         |  10 +++
+ include/sysemu/sysemu.h   |   4 +-
+ kvm-all.c                 |   3 +-
+ qapi-schema.json          |  24 ++++++
+ qapi/event.json           |   6 +-
+ qemu-nbd.c                | 172 ++++++++++++++++++++++++++++++++++++--
+ qemu-options.hx           |   4 +-
+ qom/cpu.c                 |  11 +++
+ target/i386/cpu.c         |  51 +++++++++++
+ target/i386/cpu.h         |   5 +-
+ target/i386/excp_helper.c |  11 +--
+ target/i386/helper.h      |   1 -
+ target/i386/misc_helper.c |  24 +++---
+ target/i386/seg_helper.c  |   6 +-
+ target/i386/svm_helper.c  |  65 +++++++-------
+ target/s390x/kvm.c        |   4 +-
+ tests/test-vmstate.c      |  11 ---
+ vl.c                      |  56 +++++--------
+ 33 files changed, 711 insertions(+), 253 deletions(-)
+-- 
+1.8.3.1
