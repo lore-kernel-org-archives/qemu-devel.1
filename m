@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1ceRPb-0001eM-HA
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 14:08:17 -0500
+	(envelope-from <bounces@canonical.com>) id 1ceRSC-0003UG-RY
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 14:10:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1ceRPY-0003Cb-Bm
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 14:08:15 -0500
-From: Marcel Apfelbaum <marcel@redhat.com>
-References: <20170209041634.GC14524@umbus>
-	<95706652-0a80-92fc-951b-7a454d496ddf@redhat.com>
-	<20170210003746.GP27610@umbus.fritz.box>
-	<5ea3785c-b979-8b8c-3ab0-243d69384697@redhat.com>
-	<20170213043307.GT25381@umbus>
-	<45446029-e404-77d4-754e-5541a506bb7c@redhat.com>
-	<20170214041532.GF2169@umbus.fritz.box>
-	<c0e368b1-c89d-ef5a-d475-c92266d3eb41@redhat.com>
-	<20170215014544.GC12369@umbus.fritz.box>
-	<22b4c89b-bfeb-e196-73c3-927115398e5e@redhat.com>
-	<20170216024842.GQ12369@umbus.fritz.box>
-Message-ID: <4d6ea732-772f-f4f8-22a7-fad7bc9cdf7a@redhat.com>
-Date: Thu, 16 Feb 2017 21:07:35 +0200
+	(envelope-from <bounces@canonical.com>) id 1ceRS9-0004ym-Kg
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 14:10:56 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41656)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ceRS9-0004yW-C9
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 14:10:53 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1ceRS8-00063v-Fb
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 19:10:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 73BE52E80C2
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 19:10:52 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170216024842.GQ12369@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] virtio-pci: Allow PCIe virtio devices on
- root bus
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 16 Feb 2017 18:58:49 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1665389 <1665389@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170216160426.5716.21453.malonedeb@soybean.canonical.com>
+Message-Id: <20170216185849.30255.18804.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1665389] Re: Nested kvm guest fails to start on a
+ emulated Westmere CPU guest under a Broadwell CPU host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,143 +37,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Laszlo Ersek <lersek@redhat.com>, abologna@redhat.com, lvivier@redhat.com, thuth@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, kraxel@redhat.com, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 02/16/2017 04:48 AM, David Gibson wrote:
-> On Wed, Feb 15, 2017 at 04:59:33PM +0200, Marcel Apfelbaum wrote:
+Hi Nadav,
+  Can you clarify what the host and L1 kernels are please?
 
-[...]
+This error means that qemu tried to write some msrs but one of the msr
+writes failed; we need to figure out which one to understand what's
+going on.
 
->>>>>
->>>>> I did float the idea of having the pseries PCI bus remain plain PCI
->>>>> but with a special flag to allow PCIe devices to be attached to it
->>>>> anyway.  It wasn't greeted with much enthusiasm..
->>>>>
->>>>
->>>> Can you point me to the discussion please? It seems similar to what I proposed above.
->>>
->>> Sorry, I was misleading.  I think I just raised that idea with Andrea
->>> and a few other people internally, not on one of the lists at large.
->>>
->>>> As you properly described it, is much closer to PCI then PCIe, even the only characteristic
->>>> that makes it "a little" PCIe, the Extended Configuration Space support,
->>>> is done with an alternative interface.
->>>>
->>>> I agree the PAPR bus is not PCIe.
->>>
->>> Ok, so if we take that direction, the question becomes how do we let
->>> PCIe devices plug into this mostly-not-PCIe bus.  Maybe introduce a
->>> "pci_bus_accepts_express()" function that will replace many, but not
->>> all current uses of "pci_bus_is_express()"?
->>>
->>
->> Sounds good and I think Eduardo is already working on exactly this
->> idea, however he is on PTO now. It is better to synchronize with him.
->
-> Ah, right.  Do you know when he'll be back?  This is semi-urgent for
-> Power.
->
+1) Edit kvm_msr_entry_add in target/i386/kvm.c to something like:
 
-In a week or so.
+    assert((void *)(entry + 1) <=3D limit);
+    fprintf(stderr,"kvm_msr_entry_add: @%d index=3D%x value=3D%lx\n", msrs-=
+>nmsrs, index, value);
+    entry->index =3D index;
 
->
+2) edit kvm_put_msrs near the bottom:
 
-[...]
+    fprintf(stderr,"kvm_put_msrs: ret=3D%d expected=3D%d\n", ret, cpu->kvm_=
+msr_buf->nmsrs);
+    assert(ret =3D=3D cpu->kvm_msr_buf->nmsrs);
 
->>>
->>> Ok.. I'm still missing something.  Are you saying that instead of the
->>> legacy/modern status determining PCIe support, that PCIe status is
->>> determining legacy/modern support by default?
->>
->> Is more a guideline. We want QEMU to behave like this *by default*.
->> The modern spec does not require virtio 1.0 devices to be PCIe.
->
-> Ok.  But I'm trying to get a handle on how - even by default - the
-> linkage between PCI/PCIe and modern/legacy is created:  it's not
-> obvious to me.
->
+Now with any luck the 'ret' value will tell you the entry which is bad, and=
+ you can match
+that to the @%d value (or maybe it's the entry before that one which failed=
+?) then we get the index, look it up in the intel docs and figure out which=
+ MSR it's complaining about.
 
-There is no direct connection between modern/legacy <-> PCI/PCIe.
-However the defaults work like that:
-I440FX - (pc): devices are PCI, transitional
-    created by: disable-legacy=auto,disable-modern=off
-    - in virtio_pci_realize disable-legacy: auto => off
-Q35 - on root bus - devices are PCI, transitional
-     - other buses - devices are PCIe, modern
-    created by: disable-legacy=auto,disable-modern=off
-    - in virtio_pci_dc_realize:
-         if disable-modern=off -> pcie
-    - in virtio_pci_realize:
-     if on pcie root port -> disable-legacy: auto => on
-     otherwise ->    disable-legacy: auto => off
+Also, does the problem go away if you remove the +x2apic on the top
+level qemu?
 
+Dave
 
->>   That would actually
->>> seem to simplify things: whatever method we end up allowing PCIe
->>> virtio on PAPR, that should automatically enable modern mode, which is
->>> fine.
->>>
->>
->> Agreed.
->>
->>> Although.. I do wonder about legacy/modern for PAPR in general.
->>> Current kernels will support virtio 1.0 fine, but we have older
->>> released versions which only support legacy.
->>
->> So, do you want legacy virtio devices to be PCIe ?
->
-> TBH, we probably don't care one way or another.
->
-> I'm not clear here if you're making a distinction between legacy-only
-> and legacy+modern virtio instances.
->
+-- =
 
-Legacy devices and the modern ones are different devices (product ID).
-I think the 'transitional' ones have the ID of the modern virtio.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1665389
 
-> I think we need to keep legacy support on for Power machines, because
-> we don't have the machine type switchover to let us handle it.  But we
-> certainly would like to enable modern support so that newer guests can
-> exploit it.
->
+Title:
+  Nested kvm guest fails to start on a emulated Westmere CPU guest under
+  a Broadwell CPU host
 
-"transitional" is the right way to go.
+Status in QEMU:
+  New
 
-Thanks,
-Marcel
+Bug description:
+  Using latest master(5dae13), qemu fails to start any nested guest in a
+  Westmere emulated guest(layer 1), under a Broadwell host(layer 0),
+  with the error:
 
->>   Unlike PC we won't (I
->>> hope) have a whole machine type switch to handle this.
->>
->> Good for you!
->>
->>   At this stage
->>> I think we want virtio devices (whatever their bus type) on PAPR to
->>> default to allowing both legacy and modern for the forseeable future.
->>> How does that affect the matrix?
->>>
->>
->> It adds a legacy virtio PCIe device to the matrix. For X86 we don't need
->> this combination because PC machines are PCI and Q35 machines are to be used
->> only on modern setups.
->>
->> Since PARP does not have separate machines for PCi and PCIe, we need to live with it.
->>
->>
->>>> XHCI being PCIe on Root Complex is an unintended exception, but we want it connected to a
->>>> Root Port anyway, we don't have anything to gain from having it as Integrated Endpoint.
->>>> We only loose a slot that can be used by 8 Root Ports assembled into one multi-function device.
->>>>
->>>> PAPR bus should not be considered PCIe and should have a different set of rules allowing PCIe
->>>> devices to be plugged into Root Complex.
->>>
->>> Alright, I can work with that.  Michael, Andrea, how does this idea
->>> seem to you?
->>>
->>
->> We should definitely get more opinions.
->> Thanks,
->> Marcel
->>
->
+  qemu-custom: /root/qemu/target/i386/kvm.c:1849: kvm_put_msrs:
+  Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+
+  The qemu command used(though other CPUs didn't work either):
+  /usr/bin/qemu-custom -name guest=3D12ed9230-vm-el73,debug-threads=3Don -S=
+ -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/d=
+omain-5-12ed9230-vm-el73/master-key.aes -machine pc-i440fx-2.9,accel=3Dkvm,=
+usb=3Doff -cpu Westmere,+vmx -m 512 -realtime mlock=3Doff -smp 2,sockets=3D=
+2,cores=3D1,threads=3D1 -object iothread,id=3Diothread1 -uuid f4ce4eba-985f=
+-42a3-94c4-6e4a8a530347 -nographic -no-user-config -nodefaults -chardev soc=
+ket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-5-12ed9230-vm-el73=
+/monitor.sock,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3D=
+control -rtc base=3Dutc -no-shutdown -boot menu=3Doff,strict=3Don -device v=
+irtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x3 -drive file=3D/=
+root/lago/.lago/default/images/vm-el73_root.qcow2,format=3Dqcow2,if=3Dnone,=
+id=3Ddrive-virtio-disk0,serial=3D1,discard=3Dunmap -device virtio-blk-pci,s=
+csi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Ddrive-virtio-disk0,id=3Dvirtio-dis=
+k0,bootindex=3D1 -netdev tap,fd=3D26,id=3Dhostnet0,vhost=3Don,vhostfd=3D28 =
+-device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D54:52:c0:a7:c8:02,=
+bus=3Dpci.0,addr=3D0x2 -chardev pty,id=3Dcharserial0 -device isa-serial,cha=
+rdev=3Dcharserial0,id=3Dserial0 -chardev socket,id=3Dcharchannel0,path=3D/v=
+ar/lib/libvirt/qemu/channel/target/domain-5-12ed9230-vm-el73/org.qemu.guest=
+_agent.0,server,nowait -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1=
+,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu.guest_agent.0 -object=
+ rng-random,id=3Dobjrng0,filename=3D/dev/random -device virtio-rng-pci,rng=
+=3Dobjrng0,id=3Drng0,bus=3Dpci.0,addr=3D0x9 -msg timestamp=3Don
+  2017-02-16T15:14:45.840412Z qemu-custom: -chardev pty,id=3Dcharserial0: c=
+har device redirected to /dev/pts/2 (label charserial0)
+  qemu-custom: /root/qemu/target/i386/kvm.c:1849: kvm_put_msrs: Assertion `=
+ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+
+  =
+
+  The CPU flags in the Westmere guest:
+  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
+t pse36 clflush mmx fxsr sse sse2 syscall nx lm constant_tsc rep_good nopl =
+pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 x2apic popcnt aes hypervisor lah=
+f_lm arat tpr_shadow vnmi flexpriority ept vpid
+
+  The guest kernel is 3.10.0-514.2.2.el7.x86_64.
+
+  The CPU flags of the host(Broadwell): =
+
+  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
+t pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb =
+rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology no=
+nstop_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx smx e=
+st tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt=
+ tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch epb=
+ intel_pt tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hl=
+e avx2 smep bmi2 erms invpcid rtm mpx rdseed adx smap clflushopt xsaveopt x=
+savec xgetbv1 xsaves dtherm ida arat pln pts hwp hwp_notify hwp_act_window =
+hwp_epp
+
+  qemu command on the host - Broadwell(which works):
+  /usr/bin/qemu-kvm -name 4ffcd448-vm-el73,debug-threads=3Don -S -machine p=
+c-i440fx-2.6,accel=3Dkvm,usb=3Doff -cpu Westmere,+x2apic,+vmx,+vme -m 4096 =
+-realtime mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -object ioth=
+read,id=3Diothread1 -uuid 8cc0a2cf-d25a-4014-acdb-f159c376a532 -nographic -=
+no-user-config -nodefaults -chardev socket,id=3Dcharmonitor,path=3D/var/lib=
+/libvirt/qemu/domain-4-4ffcd448-vm-el73/monitor.sock,server,nowait -mon cha=
+rdev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc -no-shutdown=
+ -boot menu=3Doff,strict=3Don -device virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.=
+0,addr=3D0x3 -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=
+=3D0x4 -drive file=3D/home/ngoldin/src/nvgoldin.github.com/lago-init-files/=
+.lago/flags-tests/default/images/vm-el73_root.qcow2,format=3Dqcow2,if=3Dnon=
+e,id=3Ddrive-virtio-disk0,serial=3D1,discard=3Dunmap -device virtio-blk-pci=
+,scsi=3Doff,bus=3Dpci.0,addr=3D0x5,drive=3Ddrive-virtio-disk0,id=3Dvirtio-d=
+isk0,bootindex=3D1 -drive file=3D/home/ngoldin/src/nvgoldin.github.com/lago=
+-init-files/.lago/flags-tests/default/images/vm-el73_additonal.qcow2,format=
+=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0,serial=3D2,discard=3Dunmap -devic=
+e scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,drive=3Ddrive-scsi0=
+-0-0-0,id=3Dscsi0-0-0-0,bootindex=3D2 -netdev tap,fd=3D29,id=3Dhostnet0,vho=
+st=3Don,vhostfd=3D31 -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=
+=3D54:52:c0:a8:c9:02,bus=3Dpci.0,addr=3D0x2 -chardev pty,id=3Dcharserial0 -=
+device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev socket,id=3Dc=
+harchannel0,path=3D/var/lib/libvirt/qemu/channel/target/domain-4-4ffcd448-v=
+m-el73/org.qemu.guest_agent.0,server,nowait -device virtserialport,bus=3Dvi=
+rtio-serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu.=
+guest_agent.0 -object rng-random,id=3Dobjrng0,filename=3D/dev/random -devic=
+e virtio-rng-pci,rng=3Dobjrng0,id=3Drng0,bus=3Dpci.0,addr=3D0x9 -msg timest=
+amp=3Don
+
+  On the Broadwell host I'm using a distribution package if it matters
+  (qemu-kvm-2.6.2-5.fc24.x86_64 and 4.8.15-200.fc24.x86_64)
+
+  As the error indicates, I think this assertion was put in:
+  commit 48e1a45c3166d659f781171a47dabf4a187ed7a5
+  Author: Paolo Bonzini <pbonzini@redhat.com>
+  Date:   Wed Mar 30 22:55:29 2016 +0200
+
+      target-i386: assert that KVM_GET/SET_MSRS can set all requested MSRs
+      =
+
+      This would have caught the bug in the previous patch.
+      =
+
+      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+  I tried going back one commit before to 273c515, and then the error is go=
+ne and the nested guest comes up as expected. If I try to run with head at =
+the above commit(48e145c) the error output is slightly different, though it=
+ looks the same:
+  /root/qemu/target-i386/kvm.c:1713: kvm_put_msrs: Assertion `ret =3D=3D n'=
+ failed.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1665389/+subscriptions
