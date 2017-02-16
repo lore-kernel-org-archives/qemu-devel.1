@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ceKBX-0003fz-BX
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 06:25:16 -0500
+	(envelope-from <vijay.kilari@gmail.com>) id 1ceKEw-0005iS-Bf
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 06:28:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ceKBW-0005wZ-MM
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 06:25:15 -0500
-Date: Thu, 16 Feb 2017 12:25:06 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170216112506.GB4869@noname.redhat.com>
-References: <1487153430-17260-1-git-send-email-vsementsov@virtuozzo.com>
-	<1487153430-17260-9-git-send-email-vsementsov@virtuozzo.com>
+	(envelope-from <vijay.kilari@gmail.com>) id 1ceKEv-0007Gc-H8
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 06:28:46 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1487153430-17260-9-git-send-email-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v15 08/25] block: introduce auto-loading
- bitmaps
+In-Reply-To: <CAFEAcA9aQwJiwsMSgvPs=vj+qfrFbVVv6-AuhFVsEKX_xO7J2Q@mail.gmail.com>
+References: <1485879782-6075-1-git-send-email-vijay.kilari@gmail.com>
+	<1485879782-6075-6-git-send-email-vijay.kilari@gmail.com>
+	<CAFEAcA-7PE_T7BsV=vSCEkQDeekB9KnX33Ou5NiUec4XeUu+zw@mail.gmail.com>
+	<CALicx6vWBR_bM2g_DObYgw-12girdK9YgGS8X=zAwenz2EmPFg@mail.gmail.com>
+	<CAFEAcA9aQwJiwsMSgvPs=vj+qfrFbVVv6-AuhFVsEKX_xO7J2Q@mail.gmail.com>
+From: Vijay Kilari <vijay.kilari@gmail.com>
+Date: Thu, 16 Feb 2017 16:58:40 +0530
+Message-ID: <CALicx6u=i0ukrbQiiVTq4gFKM_Har925UdRrpmJuErk-U5o58Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v7 RESEND 5/5] hw/intc/arm_gicv3_kvm: Reset
+ GICv3 cpu interface registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,22 +26,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>, Pavel Fedin <p.fedin@samsung.com>, Marc Zyngier <marc.zyngier@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 
-Am 15.02.2017 um 11:10 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> Auto loading bitmaps are bitmaps stored in the disk image, which should
-> be loaded when the image is opened and become BdrvDirtyBitmaps for the
-> corresponding drive.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: John Snow <jsnow@redhat.com>
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
+On Thu, Feb 16, 2017 at 3:39 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 16 February 2017 at 09:54, Vijay Kilari <vijay.kilari@gmail.com> wrote:
+>> On Tue, Feb 7, 2017 at 8:19 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>>> If you want to do nothing in a read/write function there are
+>>> already arm_cp_read_zero and arm_cp_write_ignore functions for
+>>> this. But using the ARM_CP_NOP flag is better still.
+>>
+>> With ARM_CP_NOP qemu fails to boot.
+>> qemu-system-aarch64: KVM_SET_DEVICE_ATTR failed: Invalid argument
+>> Group 6 attr 0x000000000000c665
+>
+> Not clear to me why using ARM_CP_NOP should result in a KVM
+> call failure -- can you dig further into why that is happening?
 
-Why do we need a new BlockDriver callback and special code for it in
-bdrv_open_common()? The callback is only ever called immediately after
-.bdrv_open/.bdrv_file_open, so can't the drivers just do this internally
-in their .bdrv_open implementation? Even more so because qcow2 is the
-only driver that supports this callback.
+if ARM_CP_NOP is set, .reset function is not called and there by KVM fails
+when SRE_EL1 is written with 0x0.
 
-Kevin
+>
+> thanks
+> -- PMM
