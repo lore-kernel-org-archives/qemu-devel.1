@@ -1,16 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jazeltq@gmail.com>) id 1ceHtz-0004MG-9q
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 03:59:00 -0500
+	(envelope-from <lma@suse.com>) id 1ceHxW-00069j-24
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:02:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jazeltq@gmail.com>) id 1ceHty-00007q-B6
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 03:58:59 -0500
-From: jazeltq@gmail.com
-Date: Thu, 16 Feb 2017 17:00:02 +0800
-Message-Id: <20170216090002.12511-1-jazeltq@gmail.com>
-In-Reply-To: <20170216084318.11122-1-jazeltq@gmail.com>
-References: <20170216084318.11122-1-jazeltq@gmail.com>
-Subject: [Qemu-devel] [RFC v5] RBD: Add support readv,writev for rbd
+	(envelope-from <lma@suse.com>) id 1ceHxS-0001Ui-4s
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:02:38 -0500
+Received: from prv-mh.provo.novell.com ([137.65.248.74]:57197)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lma@suse.com>) id 1ceHxR-0001Tk-R9
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 04:02:34 -0500
+Message-Id: <58A5DB2002000062000D1075@prv-mh.provo.novell.com>
+Date: Thu, 16 Feb 2017 02:02:24 -0700
+From: "Lin Ma" <lma@suse.com>
+References: <58A4707602000062000D0393@prv-mh.provo.novell.com>
+	<20170215153306.GF16064@stefanha-x1.localdomain>
+	<58A5C23202000062000D0FCB@prv-mh.provo.novell.com>
+	<b50ed69e-ce2f-36d9-797b-5f6a5cf7850d@redhat.com>
+In-Reply-To: <b50ed69e-ce2f-36d9-797b-5f6a5cf7850d@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel]
+ =?utf-8?b?562U5aSN77yaIFJlOiBbUkZDXSB2aXJ0aW8tZmM6?=
+ =?utf-8?q?_draft_idea_of_virtual_fibre_channel_HBA?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,166 +31,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jdurgin@redhat.com, jcody@redhat.com, dillaman@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, ceph-devel@vger.kernel.org, jazeltq@gmail.com, tianqing <tianqing@unitedstack.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, mst@redhat.com, stefanha@redhat.com, Zhiqiang Zhou <ZZhou@suse.com>, hare@suse.de
 
-From: tianqing <tianqing@unitedstack.com>
 
-Rbd can do readv and writev directly, so wo do not need to transform
-iov to buf or vice versa any more.
 
-Signed-off-by: tianqing <tianqing@unitedstack.com>
----
- block/rbd.c | 49 ++++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 42 insertions(+), 7 deletions(-)
+>>> Paolo Bonzini <pbonzini@redhat.com> 2/16/2017 4:39 =E4=B8=8B=E5=8D=88 =
+>>>
+>
+>
+>On 16/02/2017 08:16, Lin Ma wrote:
+>>> What are the benefits of having FC access from the guest?
+>>=20
+>> Actually, I havn't dug it too much, Just thought that from virtualizatio=
+n's
+>> perspective, when interact with FC storage, having complete FC access
+>> from the guest is the way it should use.
+>
+>How much of this requires a completely new spec?  Could we get enough of
+>the benefit (e.g. the ability to issue rescans or LIPs on the host) by
+>extending virtio-scsi?
 
-diff --git a/block/rbd.c b/block/rbd.c
-index a57b3e3..75ae1d6 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -47,7 +47,7 @@
-  */
- 
- /* rbd_aio_discard added in 0.1.2 */
--#if LIBRBD_VERSION_CODE >= LIBRBD_VERSION(0, 1, 2)
-+#if LIBRBD_VERSION_CODE >= LIBRBD_VERSION(12, 0, 0)
- #define LIBRBD_SUPPORTS_DISCARD
- #else
- #undef LIBRBD_SUPPORTS_DISCARD
-@@ -73,7 +73,12 @@ typedef struct RBDAIOCB {
-     BlockAIOCB common;
-     int64_t ret;
-     QEMUIOVector *qiov;
-+/* Note:
-+ * The LIBRBD_SUPPORTS_IOVEC is defined in librbd.h.
-+ */
-+#ifndef LIBRBD_SUPPORTS_IOVEC
-     char *bounce;
-+#endif
-     RBDAIOCmd cmd;
-     int error;
-     struct BDRVRBDState *s;
-@@ -83,7 +88,9 @@ typedef struct RADOSCB {
-     RBDAIOCB *acb;
-     struct BDRVRBDState *s;
-     int64_t size;
-+#ifndef LIBRBD_SUPPORTS_IOVEC
-     char *buf;
-+#endif
-     int64_t ret;
- } RADOSCB;
- 
-@@ -426,11 +433,21 @@ static void qemu_rbd_complete_aio(RADOSCB *rcb)
-         }
-     } else {
-         if (r < 0) {
-+#ifndef LIBRBD_SUPPORTS_IOVEC
-             memset(rcb->buf, 0, rcb->size);
-+#else
-+            iov_memset(acb->qiov->iov, acb->qiov->niov, 0, 0, acb->qiov->size);
-+#endif
-             acb->ret = r;
-             acb->error = 1;
-         } else if (r < rcb->size) {
-+#ifndef LIBRBD_SUPPORTS_IOVEC
-             memset(rcb->buf + r, 0, rcb->size - r);
-+#else
-+            iov_memset(acb->qiov->iov, acb->qiov->niov,
-+                       r, 0, acb->qiov->size - r);
-+#endif
-+
-             if (!acb->error) {
-                 acb->ret = rcb->size;
-             }
-@@ -441,10 +458,12 @@ static void qemu_rbd_complete_aio(RADOSCB *rcb)
- 
-     g_free(rcb);
- 
-+#ifndef LIBRBD_SUPPORTS_IOVEC
-     if (acb->cmd == RBD_AIO_READ) {
-         qemu_iovec_from_buf(acb->qiov, 0, acb->bounce, acb->qiov->size);
-     }
-     qemu_vfree(acb->bounce);
-+#endif
-     acb->common.cb(acb->common.opaque, (acb->ret > 0 ? 0 : acb->ret));
- 
-     qemu_aio_unref(acb);
-@@ -655,8 +674,10 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
-     RBDAIOCB *acb;
-     RADOSCB *rcb = NULL;
-     rbd_completion_t c;
--    char *buf;
-     int r;
-+#ifndef LIBRBD_SUPPORTS_IOVEC
-+    char *buf = NULL;
-+#endif
- 
-     BDRVRBDState *s = bs->opaque;
- 
-@@ -664,6 +685,8 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
-     acb->cmd = cmd;
-     acb->qiov = qiov;
-     assert(!qiov || qiov->size == size);
-+#ifndef LIBRBD_SUPPORTS_IOVEC
-+
-     if (cmd == RBD_AIO_DISCARD || cmd == RBD_AIO_FLUSH) {
-         acb->bounce = NULL;
-     } else {
-@@ -672,19 +695,21 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
-             goto failed;
-         }
-     }
--    acb->ret = 0;
--    acb->error = 0;
--    acb->s = s;
--
-     if (cmd == RBD_AIO_WRITE) {
-         qemu_iovec_to_buf(acb->qiov, 0, acb->bounce, qiov->size);
-     }
--
-     buf = acb->bounce;
-+#endif
-+    acb->ret = 0;
-+    acb->error = 0;
-+    acb->s = s;
- 
-     rcb = g_new(RADOSCB, 1);
-+
-     rcb->acb = acb;
-+#ifndef LIBRBD_SUPPORTS_IOVEC
-     rcb->buf = buf;
-+#endif
-     rcb->s = acb->s;
-     rcb->size = size;
-     r = rbd_aio_create_completion(rcb, (rbd_callback_t) rbd_finish_aiocb, &c);
-@@ -694,10 +719,18 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
- 
-     switch (cmd) {
-     case RBD_AIO_WRITE:
-+#ifndef LIBRBD_SUPPORTS_IOVEC
-         r = rbd_aio_write(s->image, off, size, buf, c);
-+#else
-+        r = rbd_aio_writev(s->image, qiov->iov, qiov->niov, off, c);
-+#endif
-         break;
-     case RBD_AIO_READ:
-+#ifndef LIBRBD_SUPPORTS_IOVEC
-         r = rbd_aio_read(s->image, off, size, buf, c);
-+#else
-+        r = rbd_aio_readv(s->image, qiov->iov, qiov->niov, off, c);
-+#endif
-         break;
-     case RBD_AIO_DISCARD:
-         r = rbd_aio_discard_wrapper(s->image, off, size, c);
-@@ -719,7 +752,9 @@ failed_completion:
-     rbd_aio_release(c);
- failed:
-     g_free(rcb);
-+#ifndef LIBRBD_SUPPORTS_IOVEC
-     qemu_vfree(acb->bounce);
-+#endif
-     qemu_aio_unref(acb);
-     return NULL;
- }
--- 
-2.10.2
+I understand, It needs too much stuff for building such an all new =
+device.=20
+Furthermore, from performance's perspective, Extending virtio-scsi way =
+doesn't
+involve in the fc fabric level, leave it to physical HBA to handle, may =
+get better
+performance.
+=20
+Lin
