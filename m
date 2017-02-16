@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1ceN4u-0002LI-6u
+	(envelope-from <fred.konrad@greensocs.com>) id 1ceN4u-0002LF-6Y
 	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:30:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1ceN4r-0007Rr-Gv
+	(envelope-from <fred.konrad@greensocs.com>) id 1ceN4q-0007R2-RX
 	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:30:36 -0500
-Received: from greensocs.com ([193.104.36.180]:53623)
+Received: from greensocs.com ([193.104.36.180]:53249)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1ceN4r-0007RY-9o
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:30:33 -0500
+	(envelope-from <fred.konrad@greensocs.com>) id 1ceN4q-0007Ov-It
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:30:32 -0500
 From: fred.konrad@greensocs.com
-Date: Thu, 16 Feb 2017 15:30:11 +0100
-Message-Id: <1487255413-14196-6-git-send-email-fred.konrad@greensocs.com>
+Date: Thu, 16 Feb 2017 15:30:09 +0100
+Message-Id: <1487255413-14196-4-git-send-email-fred.konrad@greensocs.com>
 In-Reply-To: <1487255413-14196-1-git-send-email-fred.konrad@greensocs.com>
 References: <1487255413-14196-1-git-send-email-fred.konrad@greensocs.com>
-Subject: [Qemu-devel] [PATCH V1 5/7] qdev: add MemoryRegion property
+Subject: [Qemu-devel] [PATCH V1 3/7] cputlb: fix the way get_page_addr_code
+ fills the tlb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +29,32 @@ Cc: peter.maydell@linaro.org, pbonzini@redhat.com, edgar.iglesias@xilinx.com, al
 
 From: KONRAD Frederic <fred.konrad@greensocs.com>
 
-We need to pass a pointer to a MemoryRegion for mmio_interface.
-So this just adds that.
+get_page_addr_code(..) does a cpu_ldub_code to fill the tlb:
+This can lead to some side effects if a device is mapped at this address.
+
+So this patch replaces the cpu_memory_ld by a tlb_fill.
 
 Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
 ---
- include/hw/qdev-properties.h | 2 ++
- 1 file changed, 2 insertions(+)
+ cputlb.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-index 7ac3153..babb258 100644
---- a/include/hw/qdev-properties.h
-+++ b/include/hw/qdev-properties.h
-@@ -171,6 +171,8 @@ extern PropertyInfo qdev_prop_arraylen;
-     DEFINE_PROP_DEFAULT(_n, _s, _f, 0, qdev_prop_blocksize, uint16_t)
- #define DEFINE_PROP_PCI_HOST_DEVADDR(_n, _s, _f) \
-     DEFINE_PROP(_n, _s, _f, qdev_prop_pci_host_devaddr, PCIHostDeviceAddress)
-+#define DEFINE_PROP_MEMORY_REGION(_n, _s, _f)             \
-+    DEFINE_PROP(_n, _s, _f, qdev_prop_ptr, MemoryRegion *)
- 
- #define DEFINE_PROP_END_OF_LIST()               \
-     {}
+diff --git a/cputlb.c b/cputlb.c
+index b3a5f47..846341e 100644
+--- a/cputlb.c
++++ b/cputlb.c
+@@ -534,8 +534,10 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
+     index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
+     mmu_idx = cpu_mmu_index(env, true);
+     if (unlikely(env->tlb_table[mmu_idx][index].addr_code !=
+-                 (addr & TARGET_PAGE_MASK))) {
+-        cpu_ldub_code(env, addr);
++                 (addr & (TARGET_PAGE_MASK | TLB_INVALID_MASK)))) {
++        if (!VICTIM_TLB_HIT(addr_read, addr)) {
++            tlb_fill(ENV_GET_CPU(env), addr, MMU_INST_FETCH, mmu_idx, 0);
++        }
+     }
+     iotlbentry = &env->iotlb[mmu_idx][index];
+     pd = iotlbentry->addr & ~TARGET_PAGE_MASK;
 -- 
 1.8.3.1
