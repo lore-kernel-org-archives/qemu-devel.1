@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ceN6X-0003iG-LK
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:32:19 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ceN6a-0003lT-Ev
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:32:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ceN6V-00085L-5L
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:32:17 -0500
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:32861)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1ceN6Z-00087i-12
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:32:20 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34151)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1ceN6U-00084l-VQ
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:32:15 -0500
-Received: by mail-wr0-x242.google.com with SMTP id i10so2281066wrb.0
-	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 06:32:14 -0800 (PST)
+	id 1ceN6Y-00087P-Mi
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 09:32:18 -0500
+Received: by mail-wm0-x242.google.com with SMTP id c85so3430026wmi.1
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 06:32:18 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 16 Feb 2017 15:31:32 +0100
-Message-Id: <1487255507-106654-9-git-send-email-pbonzini@redhat.com>
+Date: Thu, 16 Feb 2017 15:31:34 +0100
+Message-Id: <1487255507-106654-11-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1487255507-106654-1-git-send-email-pbonzini@redhat.com>
 References: <1487255507-106654-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 08/23] move vm_start to cpus.c
+Subject: [Qemu-devel] [PULL 10/23] hw/char/mcf_uart: QOMify the ColdFire UART
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,147 +28,208 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+Cc: Thomas Huth <huth@tuxfamily.org>
 
-From: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+From: Thomas Huth <huth@tuxfamily.org>
 
-This patch:
+Use type_init() etc. to adapt the ColdFire UART
+to the latest QEMU device conventions.
 
-* moves vm_start to cpus.c.
-* exports qemu_vmstop_requested, since it's needed by vm_start.
-* extracts vm_prepare_start from vm_start; it does what vm_start did,
-  except restarting the cpus.
-* vm_start now calls vm_prepare_start and then restarts the cpus.
-
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-Message-Id: <1487092068-16562-2-git-send-email-imbrenda@linux.vnet.ibm.com>
+Signed-off-by: Thomas Huth <huth@tuxfamily.org>
+Message-Id: <1485586582-6490-1-git-send-email-huth@tuxfamily.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- cpus.c                  | 42 ++++++++++++++++++++++++++++++++++++++++++
- include/sysemu/sysemu.h |  2 ++
- vl.c                    | 30 +-----------------------------
- 3 files changed, 45 insertions(+), 29 deletions(-)
+ hw/char/mcf_uart.c    | 102 +++++++++++++++++++++++++++++++++++++-------------
+ hw/m68k/mcf5208.c     |   6 +--
+ include/hw/m68k/mcf.h |   6 +--
+ 3 files changed, 81 insertions(+), 33 deletions(-)
 
-diff --git a/cpus.c b/cpus.c
-index 71a82e5..0bcb5b5 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1578,6 +1578,48 @@ int vm_stop(RunState state)
-     return do_vm_stop(state);
+diff --git a/hw/char/mcf_uart.c b/hw/char/mcf_uart.c
+index 80c380e..e69672f 100644
+--- a/hw/char/mcf_uart.c
++++ b/hw/char/mcf_uart.c
+@@ -7,12 +7,15 @@
+  */
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
++#include "hw/sysbus.h"
+ #include "hw/m68k/mcf.h"
+ #include "sysemu/char.h"
+ #include "exec/address-spaces.h"
+ #include "qapi/error.h"
+ 
+ typedef struct {
++    SysBusDevice parent_obj;
++
+     MemoryRegion iomem;
+     uint8_t mr[2];
+     uint8_t sr;
+@@ -30,6 +33,9 @@ typedef struct {
+     CharBackend chr;
+ } mcf_uart_state;
+ 
++#define TYPE_MCF_UART "mcf-uart"
++#define MCF_UART(obj) OBJECT_CHECK(mcf_uart_state, (obj), TYPE_MCF_UART)
++
+ /* UART Status Register bits.  */
+ #define MCF_UART_RxRDY  0x01
+ #define MCF_UART_FFULL  0x02
+@@ -220,8 +226,10 @@ void mcf_uart_write(void *opaque, hwaddr addr,
+     mcf_uart_update(s);
  }
  
-+/**
-+ * Prepare for (re)starting the VM.
-+ * Returns -1 if the vCPUs are not to be restarted (e.g. if they are already
-+ * running or in case of an error condition), 0 otherwise.
-+ */
-+int vm_prepare_start(void)
-+{
-+    RunState requested;
-+    int res = 0;
-+
-+    qemu_vmstop_requested(&requested);
-+    if (runstate_is_running() && requested == RUN_STATE__MAX) {
-+        return -1;
-+    }
-+
-+    /* Ensure that a STOP/RESUME pair of events is emitted if a
-+     * vmstop request was pending.  The BLOCK_IO_ERROR event, for
-+     * example, according to documentation is always followed by
-+     * the STOP event.
-+     */
-+    if (runstate_is_running()) {
-+        qapi_event_send_stop(&error_abort);
-+        res = -1;
-+    } else {
-+        replay_enable_events();
-+        cpu_enable_ticks();
-+        runstate_set(RUN_STATE_RUNNING);
-+        vm_state_notify(1, RUN_STATE_RUNNING);
-+    }
-+
-+    /* We are sending this now, but the CPUs will be resumed shortly later */
-+    qapi_event_send_resume(&error_abort);
-+    return res;
-+}
-+
-+void vm_start(void)
-+{
-+    if (!vm_prepare_start()) {
-+        resume_all_vcpus();
-+    }
-+}
-+
- /* does a state transition even if the VM is already stopped,
-    current state is forgotten forever */
- int vm_stop_force_state(RunState state)
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 4d50694..eda5241 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -37,6 +37,7 @@ void vm_state_notify(int running, RunState state);
- #define VMRESET_REPORT   true
- 
- void vm_start(void);
-+int vm_prepare_start(void);
- int vm_stop(RunState state);
- int vm_stop_force_state(RunState state);
- 
-@@ -60,6 +61,7 @@ void qemu_register_powerdown_notifier(Notifier *notifier);
- void qemu_system_debug_request(void);
- void qemu_system_vmstop_request(RunState reason);
- void qemu_system_vmstop_request_prepare(void);
-+bool qemu_vmstop_requested(RunState *r);
- int qemu_shutdown_requested_get(void);
- int qemu_reset_requested_get(void);
- void qemu_system_killed(int signal, pid_t pid);
-diff --git a/vl.c b/vl.c
-index b4eaf03..0d866ad 100644
---- a/vl.c
-+++ b/vl.c
-@@ -724,7 +724,7 @@ StatusInfo *qmp_query_status(Error **errp)
-     return info;
- }
- 
--static bool qemu_vmstop_requested(RunState *r)
-+bool qemu_vmstop_requested(RunState *r)
+-static void mcf_uart_reset(mcf_uart_state *s)
++static void mcf_uart_reset(DeviceState *dev)
  {
-     qemu_mutex_lock(&vmstop_lock);
-     *r = vmstop_requested;
-@@ -745,34 +745,6 @@ void qemu_system_vmstop_request(RunState state)
-     qemu_notify_event();
++    mcf_uart_state *s = MCF_UART(dev);
++
+     s->fifo_len = 0;
+     s->mr[0] = 0;
+     s->mr[1] = 0;
+@@ -275,36 +283,80 @@ static void mcf_uart_receive(void *opaque, const uint8_t *buf, int size)
+     mcf_uart_push_byte(s, buf[0]);
  }
  
--void vm_start(void)
+-void *mcf_uart_init(qemu_irq irq, Chardev *chr)
 -{
--    RunState requested;
+-    mcf_uart_state *s;
 -
--    qemu_vmstop_requested(&requested);
--    if (runstate_is_running() && requested == RUN_STATE__MAX) {
--        return;
+-    s = g_malloc0(sizeof(mcf_uart_state));
+-    s->irq = irq;
+-    if (chr) {
+-        qemu_chr_fe_init(&s->chr, chr, &error_abort);
+-        qemu_chr_fe_set_handlers(&s->chr, mcf_uart_can_receive,
+-                                 mcf_uart_receive, mcf_uart_event,
+-                                 s, NULL, true);
 -    }
--
--    /* Ensure that a STOP/RESUME pair of events is emitted if a
--     * vmstop request was pending.  The BLOCK_IO_ERROR event, for
--     * example, according to documentation is always followed by
--     * the STOP event.
--     */
--    if (runstate_is_running()) {
--        qapi_event_send_stop(&error_abort);
--    } else {
--        replay_enable_events();
--        cpu_enable_ticks();
--        runstate_set(RUN_STATE_RUNNING);
--        vm_state_notify(1, RUN_STATE_RUNNING);
--        resume_all_vcpus();
--    }
--
--    qapi_event_send_resume(&error_abort);
+-    mcf_uart_reset(s);
+-    return s;
 -}
 -
--
- /***********************************************************/
- /* real time host monotonic timer */
+ static const MemoryRegionOps mcf_uart_ops = {
+     .read = mcf_uart_read,
+     .write = mcf_uart_write,
+     .endianness = DEVICE_NATIVE_ENDIAN,
+ };
  
+-void mcf_uart_mm_init(MemoryRegion *sysmem,
+-                      hwaddr base,
+-                      qemu_irq irq,
+-                      Chardev *chr)
++static void mcf_uart_instance_init(Object *obj)
++{
++    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
++    mcf_uart_state *s = MCF_UART(dev);
++
++    memory_region_init_io(&s->iomem, obj, &mcf_uart_ops, s, "uart", 0x40);
++    sysbus_init_mmio(dev, &s->iomem);
++
++    sysbus_init_irq(dev, &s->irq);
++}
++
++static void mcf_uart_realize(DeviceState *dev, Error **errp)
++{
++    mcf_uart_state *s = MCF_UART(dev);
++
++    qemu_chr_fe_set_handlers(&s->chr, mcf_uart_can_receive, mcf_uart_receive,
++                             mcf_uart_event, s, NULL, true);
++}
++
++static Property mcf_uart_properties[] = {
++    DEFINE_PROP_CHR("chardev", mcf_uart_state, chr),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void mcf_uart_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(oc);
++
++    dc->realize = mcf_uart_realize;
++    dc->reset = mcf_uart_reset;
++    dc->props = mcf_uart_properties;
++    set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
++}
++
++static const TypeInfo mcf_uart_info = {
++    .name          = TYPE_MCF_UART,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(mcf_uart_state),
++    .instance_init = mcf_uart_instance_init,
++    .class_init    = mcf_uart_class_init,
++};
++
++static void mcf_uart_register(void)
++{
++    type_register_static(&mcf_uart_info);
++}
++
++type_init(mcf_uart_register)
++
++void *mcf_uart_init(qemu_irq irq, Chardev *chrdrv)
++{
++    DeviceState  *dev;
++
++    dev = qdev_create(NULL, TYPE_MCF_UART);
++    if (chrdrv) {
++        qdev_prop_set_chr(dev, "chardev", chrdrv);
++    }
++    qdev_init_nofail(dev);
++
++    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, irq);
++
++    return dev;
++}
++
++void mcf_uart_mm_init(hwaddr base, qemu_irq irq, Chardev *chrdrv)
+ {
+-    mcf_uart_state *s;
++    DeviceState  *dev;
+ 
+-    s = mcf_uart_init(irq, chr);
+-    memory_region_init_io(&s->iomem, NULL, &mcf_uart_ops, s, "uart", 0x40);
+-    memory_region_add_subregion(sysmem, base, &s->iomem);
++    dev = mcf_uart_init(irq, chrdrv);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
+ }
+diff --git a/hw/m68k/mcf5208.c b/hw/m68k/mcf5208.c
+index bad1d33..6563518 100644
+--- a/hw/m68k/mcf5208.c
++++ b/hw/m68k/mcf5208.c
+@@ -255,9 +255,9 @@ static void mcf5208evb_init(MachineState *machine)
+     /* Internal peripherals.  */
+     pic = mcf_intc_init(address_space_mem, 0xfc048000, cpu);
+ 
+-    mcf_uart_mm_init(address_space_mem, 0xfc060000, pic[26], serial_hds[0]);
+-    mcf_uart_mm_init(address_space_mem, 0xfc064000, pic[27], serial_hds[1]);
+-    mcf_uart_mm_init(address_space_mem, 0xfc068000, pic[28], serial_hds[2]);
++    mcf_uart_mm_init(0xfc060000, pic[26], serial_hds[0]);
++    mcf_uart_mm_init(0xfc064000, pic[27], serial_hds[1]);
++    mcf_uart_mm_init(0xfc068000, pic[28], serial_hds[2]);
+ 
+     mcf5208_sys_init(address_space_mem, pic);
+ 
+diff --git a/include/hw/m68k/mcf.h b/include/hw/m68k/mcf.h
+index 9a0bcfa..0db49c5 100644
+--- a/include/hw/m68k/mcf.h
++++ b/include/hw/m68k/mcf.h
+@@ -4,17 +4,13 @@
+ 
+ #include "target/m68k/cpu-qom.h"
+ 
+-struct MemoryRegion;
+-
+ /* mcf_uart.c */
+ uint64_t mcf_uart_read(void *opaque, hwaddr addr,
+                        unsigned size);
+ void mcf_uart_write(void *opaque, hwaddr addr,
+                     uint64_t val, unsigned size);
+ void *mcf_uart_init(qemu_irq irq, Chardev *chr);
+-void mcf_uart_mm_init(struct MemoryRegion *sysmem,
+-                      hwaddr base,
+-                      qemu_irq irq, Chardev *chr);
++void mcf_uart_mm_init(hwaddr base, qemu_irq irq, Chardev *chr);
+ 
+ /* mcf_intc.c */
+ qemu_irq *mcf_intc_init(struct MemoryRegion *sysmem,
 -- 
 1.8.3.1
