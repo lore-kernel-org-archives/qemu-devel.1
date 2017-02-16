@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ceRrS-0007aw-At
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 14:37:03 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ceRuv-0001Ov-MQ
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 14:40:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ceRrP-0000Cp-6j
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 14:37:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54094)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ceRrO-0000CN-U7
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 14:36:59 -0500
-References: <1487266760-80500-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1487266760-80500-2-git-send-email-anton.nefedov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <6882690d-5972-8b42-61ad-302531dc6d7e@redhat.com>
-Date: Thu, 16 Feb 2017 13:36:55 -0600
+	(envelope-from <alex.bennee@linaro.org>) id 1ceRus-0002Bu-85
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 14:40:37 -0500
+Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:32947)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ceRur-0002BS-Vr
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 14:40:34 -0500
+Received: by mail-wr0-x235.google.com with SMTP id i10so18707335wrb.0
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 11:40:33 -0800 (PST)
+References: <20170216123456.28621-1-alex.bennee@linaro.org>
+	<20170216123456.28621-4-alex.bennee@linaro.org>
+	<20170216133109.GD8817@lemon.lan>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170216133109.GD8817@lemon.lan>
+Date: Thu, 16 Feb 2017 19:40:32 +0000
+Message-ID: <871suxc4b3.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1487266760-80500-2-git-send-email-anton.nefedov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="8lDTwi3WlV0P11LAKD8XxmQ9iQK6PVnai"
-Subject: Re: [Qemu-devel] [PATCH] qmp-events: fix GUEST_PANICKED description
- formatting
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 3/4] .shippable.yml: new CI provider
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,138 +31,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, armbru@redhat.com, den@openvz.org
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---8lDTwi3WlV0P11LAKD8XxmQ9iQK6PVnai
-From: Eric Blake <eblake@redhat.com>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, armbru@redhat.com, den@openvz.org
-Message-ID: <6882690d-5972-8b42-61ad-302531dc6d7e@redhat.com>
-Subject: Re: [PATCH] qmp-events: fix GUEST_PANICKED description formatting
-References: <1487266760-80500-1-git-send-email-anton.nefedov@virtuozzo.com>
- <1487266760-80500-2-git-send-email-anton.nefedov@virtuozzo.com>
-In-Reply-To: <1487266760-80500-2-git-send-email-anton.nefedov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 02/16/2017 11:39 AM, Anton Nefedov wrote:
-> also remove a useless NULL check in the event reporting code
->=20
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> ---
->  qapi/event.json |  4 ++--
->  vl.c            | 22 ++++++++++------------
->  2 files changed, 12 insertions(+), 14 deletions(-)
->=20
-> diff --git a/qapi/event.json b/qapi/event.json
-> index 970ff02..e02852c 100644
-> --- a/qapi/event.json
-> +++ b/qapi/event.json
-> @@ -488,9 +488,9 @@
->  #
->  # @action: action that has been taken, currently always "pause"
->  #
-> -# @info: optional information about a panic
-> +# @info: #optional information about a panic (since 2.9)
->  #
-> -# Since: 1.5 (@info since 2.9)
-> +# Since: 1.5
-
-This part's fine, but
-
-> +++ b/vl.c
-> @@ -1710,6 +1710,15 @@ void qemu_system_reset(bool report)
->  void qemu_system_guest_panicked(GuestPanicInformation *info)
->  {
->      qemu_log_mask(LOG_GUEST_ERROR, "Guest crashed\n");
-> +    if (info && info->type =3D=3D GUEST_PANIC_INFORMATION_KIND_HYPER_V=
-) {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "HV crash parameters: (%#"PRIx6=
-4
-> +                      " %#"PRIx64" %#"PRIx64" %#"PRIx64" %#"PRIx64")\n=
-",
-> +                      info->u.hyper_v.data->arg1,
-> +                      info->u.hyper_v.data->arg2,
-> +                      info->u.hyper_v.data->arg3,
-> +                      info->u.hyper_v.data->arg4,
-> +                      info->u.hyper_v.data->arg5);
-> +    }
-
-This code motion doesn't seem to match up with the pull request...
-
-> =20
->      if (current_cpu) {
->          current_cpu->crash_occurred =3D true;
-> @@ -1723,18 +1732,7 @@ void qemu_system_guest_panicked(GuestPanicInform=
-ation *info)
->          qemu_system_shutdown_request();
->      }
-> =20
-> -    if (info) {
-> -        if (info->type =3D=3D GUEST_PANIC_INFORMATION_KIND_HYPER_V) {
-> -            qemu_log_mask(LOG_GUEST_ERROR, "HV crash parameters: (%#"P=
-RIx64
-> -                          " %#"PRIx64" %#"PRIx64" %#"PRIx64" %#"PRIx64=
-")\n",
-> -                          info->u.hyper_v.data->arg1,
-> -                          info->u.hyper_v.data->arg2,
-> -                          info->u.hyper_v.data->arg3,
-> -                          info->u.hyper_v.data->arg4,
-> -                          info->u.hyper_v.data->arg5);
-> -        }
-> -        qapi_free_GuestPanicInformation(info);
-> -    }
-
-The pull request for 21/23 just had:
-
-+
-+    if (info) {
-+        qapi_free_GuestPanicInformation(info);
-+    }
- }
-
-where did the qemu_log_mask() stuff come from?  Oh, I see now - it was
-in 22/23.
-
-On that grounds, you already need the 'if (info)' for more than just the
-free, so this code motion is no longer quite as important.  But now I'm
-noticing that it looks weird because you are freeing an input parameter.
- Generally, transfer semantics like that are screwy - it's probably
-better if the caller of qemu_system_guest_panicked() is the one freeing
-info, rather than requiring that the caller pass in malloc'd memory that
-gets freed as a side effect and must not be referenced afterwards in the
-caller.  In other words, I think the code motion is unnecessary, but
-that the qapi_free_GuestPanicInformation() call is probably in the wrong
-function to begin with.
-
-Sorry for not noticing sooner (it shows that I didn't read the full pull
-request, but just the one patch that caught my eye because of the .json
-edit).
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org
 
 
---8lDTwi3WlV0P11LAKD8XxmQ9iQK6PVnai
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Fam Zheng <famz@redhat.com> writes:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+> On Thu, 02/16 12:34, Alex Bennée wrote:
+>> Ostensibly Shippable offers a similar set of services as Travis.
+>> However they are focused on Docker container based work-flows so we
+>> can use our existing containers to run a few extra builds - in this
+>> case a bunch of cross-compiled targets on a Debian multiarch system.
+>
+> Out of curiosity, what are the forms of build report from shippable
+> service?
 
-iQEcBAEBCAAGBQJYpf9XAAoJEKeha0olJ0NqgJMIAKiL2MAXhxgl4pYa6SzaWShP
-1+eQw20qLag8lmvANkjyvdF93fzRRzSgNO9Pwuq7AWGT2Z+c8TkTWfj5sX5Dzs1w
-FjQXitxiQf4CRZCiE3EzocfliPdWZB/56GlVOgRUAH0bwFYfPYvLJwLPA+pKumcZ
-rdZlnxHly0xHwPrk7Xz/VRVJOPQB17pKBH3G5mIKg7Q2orRQSEjwkGykElZaPqin
-Fhmc52y+4OPH9vw6R3HRfUJNhT207pGBUOWPkY9XtGv1zXD2VxpE+NnFx5pESBKw
-DvbxbwYk+1LIdaL2CnY/B+driI/lNlnoGIMmcPLG3ue7Q+4VHP2x0B7E8IcQ45M=
-=oe1e
------END PGP SIGNATURE-----
+It sends out emails and there is the web status page:
 
---8lDTwi3WlV0P11LAKD8XxmQ9iQK6PVnai--
+https://app.shippable.com/runs/58a596c4266ed80f003a9385/summary
+
+There is also support for build badges a.la Travis.
+
+>
+>>
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>>
+>> ---
+>> v3
+>>   - reduce matrix to armhf/arm64 which currently work
+>>   - use the make docker-image-* build stanzas
+>>   - add TARGET_LIST to each build
+>> ---
+>>  .shippable.yml | 21 +++++++++++++++++++++
+>>  1 file changed, 21 insertions(+)
+>>  create mode 100644 .shippable.yml
+>>
+>> diff --git a/.shippable.yml b/.shippable.yml
+>> new file mode 100644
+>> index 0000000000..4de8daf341
+>> --- /dev/null
+>> +++ b/.shippable.yml
+>> @@ -0,0 +1,21 @@
+>> +language: c
+>> +env:
+>> +  matrix:
+>> +    - IMAGE=debian-armhf-cross
+>> +      TARGET_LIST=arm-softmmu,arm-linux-user
+>> +    - IMAGE=debian-arm64-cross
+>> +      TARGET_LIST=aarch64-softmmu,aarch64-linux-user
+>> +    - IMAGE=centos6
+>> +      TARGET_LIST=i386-softmmu,x86_64-softmmu
+>> +build:
+>> +  pre_ci:
+>> +    - make docker-image-${IMAGE}
+>> +  pre_ci_boot:
+>> +    image_name: qemu
+>> +    image_tag: ${IMAGE}
+>> +    pull: false
+>> +    options: "-e HOME=/root"
+>> +  ci:
+>> +    - unset CC
+>> +    - ./configure ${QEMU_CONFIGURE_OPTS} --target-list=${TARGET_LIST}
+>> +    - make -j2
+>
+> It's a good surprise that our docker infrastructure fits in the shippable
+> framework pretty nicely. :)
+>
+> Looks good to me without cross checking the shippable API:
+>
+> Reviewed-by: Fam Zheng <famz@redhat.com>
+
+
+--
+Alex Bennée
