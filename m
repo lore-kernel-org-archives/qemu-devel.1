@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48427)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ceLH4-0007pO-Ux
+	(envelope-from <alex.bennee@linaro.org>) id 1ceLH4-0007pP-Ug
 	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 07:35:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ceLH2-0001EX-Fh
+	(envelope-from <alex.bennee@linaro.org>) id 1ceLH0-0001DN-MC
 	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 07:35:02 -0500
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:34593)
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:36927)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ceLH2-0001Dy-9a
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 07:35:00 -0500
-Received: by mail-wr0-x22b.google.com with SMTP id z61so10649076wrc.1
-	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 04:35:00 -0800 (PST)
+	id 1ceLH0-0001Cp-GE
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 07:34:58 -0500
+Received: by mail-wm0-x236.google.com with SMTP id v77so14049162wmv.0
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 04:34:58 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 16 Feb 2017 12:34:55 +0000
-Message-Id: <20170216123456.28621-4-alex.bennee@linaro.org>
-In-Reply-To: <20170216123456.28621-1-alex.bennee@linaro.org>
-References: <20170216123456.28621-1-alex.bennee@linaro.org>
+Date: Thu, 16 Feb 2017 12:34:52 +0000
+Message-Id: <20170216123456.28621-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 3/4] .shippable.yml: new CI provider
+Subject: [Qemu-devel] [PATCH v4 0/4] Docker cross-compile targets and user
+ build support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,49 +31,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: famz@redhat.com
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Ostensibly Shippable offers a similar set of services as Travis.
-However they are focused on Docker container based work-flows so we
-can use our existing containers to run a few extra builds - in this
-case a bunch of cross-compiled targets on a Debian multiarch system.
+Hi Fam,
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Here is the latest iteration of the docker changes incorporating your
+suggestions:
 
----
-v3
-  - reduce matrix to armhf/arm64 which currently work
-  - use the make docker-image-* build stanzas
-  - add TARGET_LIST to each build
----
- .shippable.yml | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+  - -u behaves safely if user already added
+  - cross containers specify QEMU_CONFIGURE_OPTS
+  - merged docker and build automation in MAINTAINERS
+
+Regards,
+
+Alex Bennée (4):
+  tests/docker: add basic user mapping support
+  new: debian docker targets for cross-compiling
+  .shippable.yml: new CI provider
+  MAINTAINERS: merge Build and test automation with Docker tests
+
+ .shippable.yml                                     | 21 ++++++++++++++++++
+ MAINTAINERS                                        | 13 ++++++-----
+ tests/docker/Makefile.include                      |  6 ++++++
+ tests/docker/common.rc                             |  2 +-
+ tests/docker/docker.py                             | 16 ++++++++++++--
+ tests/docker/dockerfiles/debian-arm64-cross.docker | 15 +++++++++++++
+ tests/docker/dockerfiles/debian-armhf-cross.docker | 15 +++++++++++++
+ tests/docker/dockerfiles/debian.docker             | 25 ++++++++++++++++++++++
+ 8 files changed, 103 insertions(+), 10 deletions(-)
  create mode 100644 .shippable.yml
+ create mode 100644 tests/docker/dockerfiles/debian-arm64-cross.docker
+ create mode 100644 tests/docker/dockerfiles/debian-armhf-cross.docker
+ create mode 100644 tests/docker/dockerfiles/debian.docker
 
-diff --git a/.shippable.yml b/.shippable.yml
-new file mode 100644
-index 0000000000..4de8daf341
---- /dev/null
-+++ b/.shippable.yml
-@@ -0,0 +1,21 @@
-+language: c
-+env:
-+  matrix:
-+    - IMAGE=debian-armhf-cross
-+      TARGET_LIST=arm-softmmu,arm-linux-user
-+    - IMAGE=debian-arm64-cross
-+      TARGET_LIST=aarch64-softmmu,aarch64-linux-user
-+    - IMAGE=centos6
-+      TARGET_LIST=i386-softmmu,x86_64-softmmu
-+build:
-+  pre_ci:
-+    - make docker-image-${IMAGE}
-+  pre_ci_boot:
-+    image_name: qemu
-+    image_tag: ${IMAGE}
-+    pull: false
-+    options: "-e HOME=/root"
-+  ci:
-+    - unset CC
-+    - ./configure ${QEMU_CONFIGURE_OPTS} --target-list=${TARGET_LIST}
-+    - make -j2
 -- 
 2.11.0
