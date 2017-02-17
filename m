@@ -1,36 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44837)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cedur-0003SM-ER
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:29:23 -0500
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cedur-0003SL-ES
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:29:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1ceduo-0000tv-Ke
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cedum-0000sL-FK
 	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:29:21 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53324
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37979
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1ceduo-0000tc-E4
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:29:18 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1H8T2nW076186
-	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 03:29:17 -0500
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28nrnu1qnh-1
+	id 1cedum-0000rZ-8p
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:29:16 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1H8TFQR032462
+	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 03:29:15 -0500
+Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28ns6j0s5x-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 03:29:17 -0500
+	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 03:29:15 -0500
 Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Fri, 17 Feb 2017 01:29:16 -0700
+	Fri, 17 Feb 2017 03:28:52 -0500
 From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Date: Fri, 17 Feb 2017 09:28:43 +0100
+Date: Fri, 17 Feb 2017 09:28:34 +0100
 In-Reply-To: <20170217082844.89466-1-bjsdjshi@linux.vnet.ibm.com>
 References: <20170217082844.89466-1-bjsdjshi@linux.vnet.ibm.com>
-Message-Id: <20170217082844.89466-11-bjsdjshi@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH RFC v3 10/11] s390x/css: ccw translation
- infrastructure
+Message-Id: <20170217082844.89466-2-bjsdjshi@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH RFC v3 01/11] vfio: linux-headers update for
+ vfio-ccw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,237 +44,83 @@ Cc: bjsdjshi@linux.vnet.ibm.com, renxiaof@linux.vnet.ibm.com, cornelia.huck@de.i
 
 From: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
 
-Implement a basic infrastructure of handling channel I/O instruction
-interception for passed through subchannels:
-1. Branch the code path of instruction interception handling by
-   SubChannel type.
-2. For a passed-through subchannel, issue the ORB to kernel to do ccw
-   translation and perform an I/O operation.
-3. Assign different condition code based on the I/O result, or
-   trigger a program check.
+This is a placeholder for a linux-headers update.
 
 Signed-off-by: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
 ---
- hw/s390x/css.c         | 88 ++++++++++++++++++++++++++++++++++++++++++++++----
- hw/s390x/s390-ccw.c    | 12 +++++++
- hw/s390x/virtio-ccw.c  |  1 +
- include/hw/s390x/css.h |  4 +++
- target/s390x/ioinst.c  |  9 ++++++
- 5 files changed, 108 insertions(+), 6 deletions(-)
+ linux-headers/linux/vfio.h     | 17 +++++++++++++++++
+ linux-headers/linux/vfio_ccw.h | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 45 insertions(+)
+ create mode 100644 linux-headers/linux/vfio_ccw.h
 
-diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index 6dc8c1a..204ace5 100644
---- a/hw/s390x/css.c
-+++ b/hw/s390x/css.c
-@@ -500,7 +500,7 @@ static int css_interpret_ccw(SubchDev *sch, hwaddr ccw_addr,
-     return ret;
- }
- 
--static void sch_handle_start_func(SubchDev *sch, ORB *orb)
-+static void sch_handle_start_func_virtual(SubchDev *sch, ORB *orb)
- {
- 
-     PMCW *p = &sch->curr_status.pmcw;
-@@ -599,13 +599,57 @@ static void sch_handle_start_func(SubchDev *sch, ORB *orb)
- 
- }
- 
-+static int sch_handle_start_func_passthrough(SubchDev *sch, ORB *orb)
-+{
-+
-+    PMCW *p = &sch->curr_status.pmcw;
-+    SCSW *s = &sch->curr_status.scsw;
-+    int ret;
-+
-+    if (!(s->ctrl & SCSW_ACTL_SUSP)) {
-+        assert(orb != NULL);
-+        p->intparm = orb->intparm;
-+    }
-+
-+    /*
-+     * Only support prefetch enable mode.
-+     * Only support 64bit addressing idal.
-+     */
-+    if (!(orb->ctrl0 & ORB_CTRL0_MASK_PFCH) ||
-+        !(orb->ctrl0 & ORB_CTRL0_MASK_C64)) {
-+        return -EINVAL;
-+    }
-+
-+    ret = s390_ccw_cmd_request(orb, s, sch->driver_data);
-+    switch (ret) {
-+    /* Currently we don't update control block and just return the cc code. */
-+    case 0:
-+        break;
-+    case -EBUSY:
-+        break;
-+    case -ENODEV:
-+        break;
-+    case -EACCES:
-+        /* Let's reflect an inaccessible host device by cc 3. */
-+        ret = -ENODEV;
-+        break;
-+    default:
-+       /* All other return codes will trigger a program check,
-+        * or set cc to 1.
-+        */
-+       break;
-+    };
-+
-+    return ret;
-+}
-+
- /*
-  * On real machines, this would run asynchronously to the main vcpus.
-  * We might want to make some parts of the ssch handling (interpreting
-  * read/writes) asynchronous later on if we start supporting more than
-  * our current very simple devices.
-  */
--static void do_subchannel_work(SubchDev *sch, ORB *orb)
-+int do_subchannel_work_virtual(SubchDev *sch, ORB *orb)
- {
- 
-     SCSW *s = &sch->curr_status.scsw;
-@@ -616,12 +660,45 @@ static void do_subchannel_work(SubchDev *sch, ORB *orb)
-         sch_handle_halt_func(sch);
-     } else if (s->ctrl & SCSW_FCTL_START_FUNC) {
-         /* Triggered by both ssch and rsch. */
--        sch_handle_start_func(sch, orb);
-+        sch_handle_start_func_virtual(sch, orb);
-     } else {
-         /* Cannot happen. */
--        return;
-+        return 0;
-     }
-     css_inject_io_interrupt(sch);
-+    return 0;
-+}
-+
-+int do_subchannel_work_passthrough(SubchDev *sch, ORB *orb)
-+{
-+    int ret;
-+    SCSW *s = &sch->curr_status.scsw;
-+
-+    if (s->ctrl & SCSW_FCTL_CLEAR_FUNC) {
-+        /* TODO: Clear handling */
-+        sch_handle_clear_func(sch);
-+        ret = 0;
-+    } else if (s->ctrl & SCSW_FCTL_HALT_FUNC) {
-+        /* TODO: Halt handling */
-+        sch_handle_halt_func(sch);
-+        ret = 0;
-+    } else if (s->ctrl & SCSW_FCTL_START_FUNC) {
-+        ret = sch_handle_start_func_passthrough(sch, orb);
-+    } else {
-+        /* Cannot happen. */
-+        return -ENODEV;
-+    }
-+
-+    return ret;
-+}
-+
-+static int do_subchannel_work(SubchDev *sch, ORB *orb)
-+{
-+    if (sch->do_subchannel_work) {
-+        return sch->do_subchannel_work(sch, orb);
-+    } else {
-+        return -EINVAL;
-+    }
- }
- 
- static void copy_pmcw_to_guest(PMCW *dest, const PMCW *src)
-@@ -940,8 +1017,7 @@ int css_do_ssch(SubchDev *sch, ORB *orb)
-     s->ctrl |= (SCSW_FCTL_START_FUNC | SCSW_ACTL_START_PEND);
-     s->flags &= ~SCSW_FLAGS_MASK_PNO;
- 
--    do_subchannel_work(sch, orb);
--    ret = 0;
-+    ret = do_subchannel_work(sch, orb);
- 
- out:
-     return ret;
-diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
-index 9b6de68..d91a8b2 100644
---- a/hw/s390x/s390-ccw.c
-+++ b/hw/s390x/s390-ccw.c
-@@ -18,6 +18,17 @@
- #include "hw/s390x/css-bridge.h"
- #include "s390-ccw.h"
- 
-+int s390_ccw_cmd_request(ORB *orb, SCSW *scsw, void *data)
-+{
-+    S390CCWDevice *cdev = data;
-+
-+    if (cdev->handle_request) {
-+        return cdev->handle_request(orb, scsw, data);
-+    } else {
-+        return -ENOSYS;
-+    }
-+}
-+
- static void s390_ccw_get_dev_info(S390CCWDevice *cdev,
-                                   char *sysfsdev,
-                                   Error **errp)
-@@ -67,6 +78,7 @@ static void s390_ccw_realize(S390CCWDevice *cdev, char *sysfsdev, Error **errp)
-     }
- 
-     sch->driver_data = cdev;
-+    sch->do_subchannel_work = do_subchannel_work_passthrough;
- 
-     ret = css_sch_build_schib(sch, &cdev->hostid);
-     if (ret) {
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index 6c1bb0e..8d2d9d7 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -679,6 +679,7 @@ static void virtio_ccw_device_realize(VirtioCcwDevice *dev, Error **errp)
-     sch->disable_cb = virtio_sch_disable_cb;
-     sch->id.reserved = 0xff;
-     sch->id.cu_type = VIRTIO_CCW_CU_TYPE;
-+    sch->do_subchannel_work = do_subchannel_work_virtual;
-     ccw_dev->sch = sch;
-     dev->indicators = NULL;
-     dev->revision = -1;
-diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-index 46cdf8c..83dc711 100644
---- a/include/hw/s390x/css.h
-+++ b/include/hw/s390x/css.h
-@@ -88,6 +88,7 @@ struct SubchDev {
-     /* transport-provided data: */
-     int (*ccw_cb) (SubchDev *, CCW1);
-     void (*disable_cb)(SubchDev *);
-+    int (*do_subchannel_work) (SubchDev *, ORB *);
-     SenseId id;
-     void *driver_data;
+diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+index 759b850..b09d247 100644
+--- a/linux-headers/linux/vfio.h
++++ b/linux-headers/linux/vfio.h
+@@ -198,6 +198,7 @@ struct vfio_device_info {
+ #define VFIO_DEVICE_FLAGS_PCI	(1 << 1)	/* vfio-pci device */
+ #define VFIO_DEVICE_FLAGS_PLATFORM (1 << 2)	/* vfio-platform device */
+ #define VFIO_DEVICE_FLAGS_AMBA  (1 << 3)	/* vfio-amba device */
++#define VFIO_DEVICE_FLAGS_CCW   (1 << 4)	/* vfio-ccw device */
+ 	__u32	num_regions;	/* Max region index + 1 */
+ 	__u32	num_irqs;	/* Max IRQ index + 1 */
  };
-@@ -144,6 +145,9 @@ void css_generate_chp_crws(uint8_t cssid, uint8_t chpid);
- void css_generate_css_crws(uint8_t cssid);
- void css_clear_sei_pending(void);
- void css_adapter_interrupt(uint8_t isc);
-+int s390_ccw_cmd_request(ORB *orb, SCSW *scsw, void *data);
-+int do_subchannel_work_virtual(SubchDev *sub, ORB *orb);
-+int do_subchannel_work_passthrough(SubchDev *sub, ORB *orb);
+@@ -436,6 +437,22 @@ enum {
+ 	VFIO_PCI_NUM_IRQS
+ };
  
- #define CSS_IO_ADAPTER_VIRTIO 1
- int css_register_io_adapter(uint8_t type, uint8_t isc, bool swap,
-diff --git a/target/s390x/ioinst.c b/target/s390x/ioinst.c
-index 590bfa4..62a7771 100644
---- a/target/s390x/ioinst.c
-+++ b/target/s390x/ioinst.c
-@@ -244,6 +244,15 @@ void ioinst_handle_ssch(S390CPU *cpu, uint64_t reg1, uint32_t ipb)
-     case -EBUSY:
-         cc = 2;
-         break;
-+    case -EFAULT:
-+        /*
-+         * TODO:
-+         * I'm wondering whether there is something better
-+         * to do for us here (like setting some device or
-+         * subchannel status).
-+         */
-+        program_interrupt(env, PGM_ADDRESSING, 4);
-+        return;
-     case 0:
-         cc = 0;
-         break;
++/*
++ * The VFIO-CCW bus driver makes use of the following fixed region and
++ * IRQ index mapping.  Unimplemented regions return a size of zero.
++ * Unimplemented IRQ types return a count of zero.
++ */
++
++enum {
++        VFIO_CCW_CONFIG_REGION_INDEX,
++        VFIO_CCW_NUM_REGIONS
++};
++
++enum {
++        VFIO_CCW_IO_IRQ_INDEX,
++        VFIO_CCW_NUM_IRQS
++};
++
+ /**
+  * VFIO_DEVICE_GET_PCI_HOT_RESET_INFO - _IORW(VFIO_TYPE, VFIO_BASE + 12,
+  *					      struct vfio_pci_hot_reset_info)
+diff --git a/linux-headers/linux/vfio_ccw.h b/linux-headers/linux/vfio_ccw.h
+new file mode 100644
+index 0000000..4ee74ae
+--- /dev/null
++++ b/linux-headers/linux/vfio_ccw.h
+@@ -0,0 +1,28 @@
++/*
++ * Interfaces for vfio-ccw
++ *
++ * Copyright IBM Corp. 2017
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License (version 2 only)
++ * as published by the Free Software Foundation.
++ *
++ * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
++ */
++
++#ifndef _VFIO_CCW_H_
++#define _VFIO_CCW_H_
++
++#include <linux/types.h>
++
++struct ccw_io_region {
++#define ORB_AREA_SIZE 12
++	__u8	orb_area[ORB_AREA_SIZE];
++#define SCSW_AREA_SIZE 12
++	__u8	scsw_area[SCSW_AREA_SIZE];
++#define IRB_AREA_SIZE 96
++	__u8	irb_area[IRB_AREA_SIZE];
++	__u32	ret_code;
++} __packed;
++
++#endif
 -- 
 2.8.4
