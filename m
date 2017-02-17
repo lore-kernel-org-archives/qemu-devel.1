@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ceinA-0004Ib-1X
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 08:41:45 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1ceiyl-0001w9-P8
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 08:53:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cein6-0006RT-Tn
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 08:41:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53406)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cein6-0006RM-LA
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 08:41:40 -0500
-References: <cover.1487286467.git.ben@skyportsystems.com>
-	<88232638f9ff3b17b54987624468678ea14a3037.1487286467.git.ben@skyportsystems.com>
-	<20170217114321.6c8577e1@nial.brq.redhat.com>
-	<918524f7-26cf-3fce-d9e3-7316ca69285b@redhat.com>
-	<20170217140516.35d4ded5@nial.brq.redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <e8722e0b-1beb-9ba3-bd59-ffe281bc1ecc@redhat.com>
-Date: Fri, 17 Feb 2017 14:41:37 +0100
-MIME-Version: 1.0
-In-Reply-To: <20170217140516.35d4ded5@nial.brq.redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 4/8] ACPI: Add Virtual Machine
- Generation ID support
+	(envelope-from <eric.auger@redhat.com>) id 1ceiyk-0003yw-NP
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 08:53:43 -0500
+From: Eric Auger <eric.auger@redhat.com>
+Date: Fri, 17 Feb 2017 14:53:19 +0100
+Message-Id: <1487339599-20910-1-git-send-email-eric.auger@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/arm/virt: Add a user option to disallow ITS
+ instantiation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,82 +18,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: ben@skyportsystems.com, qemu-devel@nongnu.org, "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, mst@redhat.com
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: vijay.kilari@gmail.com, drjones@redhat.com
 
-On 02/17/17 14:05, Igor Mammedov wrote:
-> On Fri, 17 Feb 2017 13:50:40 +0100
-> Laszlo Ersek <lersek@redhat.com> wrote:
-> 
->> CC Dave
->>
->> On 02/17/17 11:43, Igor Mammedov wrote:
->>> On Thu, 16 Feb 2017 15:15:36 -0800
->>> ben@skyportsystems.com wrote:
->>>
->>>> From: Ben Warren <ben@skyportsystems.com>
->>>>
->>>> This implements the VM Generation ID feature by passing a 128-bit
->>>> GUID to the guest via a fw_cfg blob.
->>>> Any time the GUID changes, an ACPI notify event is sent to the guest
->>>>
->>>> The user interface is a simple device with one parameter:
->>>>  - guid (string, must be "auto" or in UUID format
->>>>    xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
->>> I've given it some testing with WS2012R2 and v4 patches for Seabios,
->>>
->>> Windows is able to read initial GUID allocation and writeback
->>> seems to work somehow:
->>>
->>> (qemu) info vm-generation-id 
->>> c109c09b-0e8b-42d5-9b33-8409c9dcd16c
->>>
->>> vmgenid client in Windows reads it as 2 following 64bit integers:
->>> 42d50e8bc109c09b:6cd1dcc90984339b
->>>
->>> However update path/restore from snapshot doesn't
->>> here is as I've tested it:
->>>
->>> qemu-system-x86_64 -device vmgenid,id=testvgid,guid=auto -monitor stdio
->>> (qemu) info vm-generation-id 
->>> c109c09b-0e8b-42d5-9b33-8409c9dcd16c
->>> (qemu) stop
->>> (qemu) migrate "exec:gzip -c > STATEFILE.gz" 
->>> (qemu) quit
->>>
->>> qemu-system-x86_64 -device vmgenid,id=testvgid,guid=auto -monitor stdio
->>> -incoming "exec: gzip -c -d STATEFILE.gz"
->>> (qemu) info vm-generation-id 
->>> 28b587fa-991b-4267-80d7-9cf28b746fe9
->>>
->>> guest
->>>  1. doesn't get GPE notification that it must receive
->>>  2. vmgenid client in Windows reads the same value
->>>       42d50e8bc109c09b:6cd1dcc90984339b
->>
->> Hmmm, I wonder if we need something like this, in vmgenid_post_load():
->>
->> commit 90c647db8d59e47c9000affc0d81754eb346e939
->> Author: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> Date:   Fri Apr 15 12:41:30 2016 +0100
->>
->>     Fix pflash migration
->>
->> with the idea being that in a single device's post_load callback, we
->> shouldn't perform machine-wide actions (post_load is likely for fixing
->> up the device itself). If machine-wide actions are necessary, we should
->> temporarily register a "vm change state handler", and do the thing once
->> that handler is called (when the machine has been loaded fully and is
->> about to continue execution).
->>
->> Can you please try the attached patch on top? (Build tested only.)
-> it doesn't help
+In 2.9 ITS will block save/restore and migration use cases. As
+such let's introduce a user option that disallows its instantiation
+along with the GICv3. With no-its option turned true, migration will
+be possible, obviously at the expense of MSI support (with GICv3).
 
-Thanks for trying! And, well, sh*t. :(
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-I guess it's time to resurrect the monitor command (temporarily, for
-testing) so we can inject the SCI at will, without migration. I don't
-want to burden you unreasonably, so I'll make an effort to try that myself.
+---
 
-Thanks!
-Laszlo
+With this patch the option also is added in virt 2.8. I don't know
+if it is acceptable.
+---
+ hw/arm/virt.c         | 28 +++++++++++++++++++++++++++-
+ include/hw/arm/virt.h |  1 +
+ 2 files changed, 28 insertions(+), 1 deletion(-)
+
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index f3440f2..702a392 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -605,7 +605,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
+ 
+     fdt_add_gic_node(vms);
+ 
+-    if (type == 3 && !vmc->no_its) {
++    if (type == 3 && !vmc->no_its && !vms->no_its) {
+         create_its(vms, gicdev);
+     } else if (type == 2) {
+         create_v2m(vms, pic);
+@@ -1480,6 +1480,21 @@ static void virt_set_highmem(Object *obj, bool value, Error **errp)
+     vms->highmem = value;
+ }
+ 
++static bool virt_get_no_its(Object *obj, Error **errp)
++{
++    VirtMachineState *vms = VIRT_MACHINE(obj);
++
++    return vms->no_its;
++}
++
++static void virt_set_no_its(Object *obj, bool value, Error **errp)
++{
++    VirtMachineState *vms = VIRT_MACHINE(obj);
++
++    vms->no_its = value;
++}
++
++
+ static char *virt_get_gic_version(Object *obj, Error **errp)
+ {
+     VirtMachineState *vms = VIRT_MACHINE(obj);
+@@ -1540,6 +1555,7 @@ type_init(machvirt_machine_init);
+ static void virt_2_9_instance_init(Object *obj)
+ {
+     VirtMachineState *vms = VIRT_MACHINE(obj);
++    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
+ 
+     /* EL3 is disabled by default on virt: this makes us consistent
+      * between KVM and TCG for this board, and it also allows us to
+@@ -1579,6 +1595,16 @@ static void virt_2_9_instance_init(Object *obj)
+                                     "Set GIC version. "
+                                     "Valid values are 2, 3 and host", NULL);
+ 
++    /* Default allows ITS instantiation */
++    if (!vmc->no_its) {
++        object_property_add_bool(obj, "no-its", virt_get_no_its,
++                                 virt_set_no_its, NULL);
++        vms->no_its = false;
++        object_property_set_description(obj, "no-its",
++                                        "Disallow the ITS instantiation"
++                                        NULL);
++    }
++
+     vms->memmap = a15memmap;
+     vms->irqmap = a15irqmap;
+ }
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index 58ce74e..5e73be9 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -93,6 +93,7 @@ typedef struct {
+     FWCfgState *fw_cfg;
+     bool secure;
+     bool highmem;
++    bool no_its;
+     bool virt;
+     int32_t gic_version;
+     struct arm_boot_info bootinfo;
+-- 
+2.5.5
