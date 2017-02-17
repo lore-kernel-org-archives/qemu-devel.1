@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cefcl-0005MD-Pd
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 05:18:48 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cefct-0005SD-2t
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 05:18:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cefck-0007Ea-Ng
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 05:18:47 -0500
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:35109)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cefck-0007E7-IX
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 05:18:46 -0500
-Received: by mail-wm0-x236.google.com with SMTP id v186so10450699wmd.0
-	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 02:18:46 -0800 (PST)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cefcs-0007IQ-9z
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 05:18:55 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:1404 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1cefcr-0007Hg-UU
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 05:18:54 -0500
+References: <1487153430-17260-1-git-send-email-vsementsov@virtuozzo.com>
+	<1487153430-17260-26-git-send-email-vsementsov@virtuozzo.com>
+	<20170216142144.GG4869@noname.redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <e572baaf-f726-ee89-ae33-b8e2d99125e5@virtuozzo.com>
+Date: Fri, 17 Feb 2017 13:18:38 +0300
 MIME-Version: 1.0
-In-Reply-To: <e19aed34-77c2-f588-351d-2daa8a099ae9@redhat.com>
-References: <CABHMSTVDnAxAvpp81+z_2fkAFO7tazLJs3cFXpuDuuGQj-Ek-A@mail.gmail.com>
-	<1933406e-2576-e687-3545-a72f3b999310@redhat.com>
-	<bf1410bc-bc6d-bb29-5591-55634f25d487@redhat.com>
-	<e19aed34-77c2-f588-351d-2daa8a099ae9@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 17 Feb 2017 10:18:24 +0000
-Message-ID: <CAFEAcA-3TkmaJXpG2RpzBPKmj+JKGK5EBwPvXWkwR=Qkobq-Sg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] Fix build break during configuration on musl-libc
- based Linux systems.
+In-Reply-To: <20170216142144.GG4869@noname.redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v15 25/25] qcow2-bitmap: improve
+ check_constraints_on_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,25 +30,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Chad Joan <chadjoan@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
-On 17 February 2017 at 08:56, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> So I do think that if musl wants to support _GNU_SOURCE, it should also auto-define;
-> however it doesn't, see https://git.musl-libc.org/cgit/musl/tree/include/features.h.
+16.02.2017 17:21, Kevin Wolf wrote:
+> Am 15.02.2017 um 11:10 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>> Add detailed error messages.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Why not merge this patch into the one that originally introduced the
+> function?
 
-Yes, I agree that this looks like a musl bug. I spoke to a musl
-developer I happen to know, and he agreed to submit a patch to
-see what the other musl devs think.
+Just to not create extra work for reviewers
 
-In the meantime, we should probably work around this system
-bug for the benefit of the existing musl installs in the field.
+>
+> Kevin
 
-Defining _XOPEN_SOURCE is easy enough, and I think we should
-do it unconditionally. We should check what effect this has
-on the BSD hosts though I guess. (You could argue that we
-should be defining _XOPEN_SOURCE anyway for the benefit of
-the non-glibc BSD/Solaris/etc platforms.)
 
-thanks
--- PMM
+-- 
+Best regards,
+Vladimir
