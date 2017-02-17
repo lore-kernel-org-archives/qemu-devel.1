@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49078)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1ceeFZ-0006wG-8N
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:50:46 -0500
+	(envelope-from <fred.konrad@greensocs.com>) id 1ceeHl-0000wy-Od
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:53:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1ceeFV-0007Ss-Cr
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:50:45 -0500
-Received: from [59.151.112.132] (port=38709 helo=heian.cn.fujitsu.com)
+	(envelope-from <fred.konrad@greensocs.com>) id 1ceeHi-00083g-IW
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:53:01 -0500
+Received: from greensocs.com ([193.104.36.180]:50881)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1ceeFV-0007R2-0L
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:50:41 -0500
-References: <1487299994-98348-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1487299994-98348-2-git-send-email-zhang.zhanghailiang@huawei.com>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <a1b61a11-ce57-a785-4f37-960d0edb94b1@cn.fujitsu.com>
-Date: Fri, 17 Feb 2017 16:50:46 +0800
+	(envelope-from <fred.konrad@greensocs.com>) id 1ceeHi-00083Z-5Q
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:52:58 -0500
+References: <1487255413-14196-1-git-send-email-fred.konrad@greensocs.com>
+	<854a99a2-015e-5c6b-1f72-1aa189194084@redhat.com>
+From: Frederic Konrad <fred.konrad@greensocs.com>
+Message-ID: <6cd9864b-06a6-fa84-f2be-a6635f38532f@greensocs.com>
+Date: Fri, 17 Feb 2017 09:52:54 +0100
 MIME-Version: 1.0
-In-Reply-To: <1487299994-98348-2-git-send-email-zhang.zhanghailiang@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <854a99a2-015e-5c6b-1f72-1aa189194084@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/4] colo-compare: use
- g_timeout_source_new() to process the stale packets
+Subject: Re: [Qemu-devel] [PATCH V1 0/7] execute code from mmio area
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +27,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhanghailiang <zhang.zhanghailiang@huawei.com>, jasowang@redhat.com, lizhijian@cn.fujitsu.com
-Cc: qemu-devel@nongnu.org, xuquan8@huawei.com, pss.wulizhen@huawei.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, edgar.iglesias@xilinx.com, alistair.francis@xilinx.com, clg@kaod.org, mark.burton@greensocs.com
 
+On 02/16/2017 03:39 PM, Paolo Bonzini wrote:
+> 
+> 
+> On 16/02/2017 15:30, fred.konrad@greensocs.com wrote:
+>> From: KONRAD Frederic <fred.konrad@greensocs.com>
+>>
+>> This series allows to execute code from mmio areas.
+>> The main goal of this is to be able to run code for example from an SPI device.
+>>
+>> The three first patch fixes the way get_page_addr_code fills the TLB.
+>>
+>> The fourth patch implements the mmio execution helpers: the device must
+>> implement the request_ptr callback of the MemoryRegion and will be notified when
+>> the guest wants to execute code from it.
+>>
+>> The fifth patch introduces mmio_interface device which allows to dynamically
+>> map a host pointer somewhere into the memory.
+>>
+>> The sixth patch implements the execution from the SPI memories in the
+>> xilinx_spips model.
+> 
+> Sorry for the stupid question, where is mmio-interface used?  Wrong
+> version of patch 7 perhaps?
 
+BTW I forgot to mention that but this mmio-interface effectively fix the
+leak you mentioned on the RFC.
+My testcase stresses that and I see regularly the device finalized and
+I don't see the process eating up the memory.
 
-On 02/17/2017 10:53 AM, zhanghailiang wrote:
-> Instead of using qemu timer to process the stale packets,
-> We re-use the colo compare thread to process these packets
-> by creating a new timeout coroutine.
->
-> Besides, since we process all the same vNIC's net connection/packets
-> in one thread, it is safe to remove the timer_check_lock.
->
-> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-
-Reviewed-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-
-> ---
->   net/colo-compare.c | 62 +++++++++++++++++++-----------------------------------
->   1 file changed, 22 insertions(+), 40 deletions(-)
->
->
--- 
-Thanks
-Zhang Chen
+Thanks,
+Fred
+> 
+> Paolo
+> 
+>> Thanks,
+>> Fred
+>>
+>> RFC -> V1:
+>>   * Use an interface (mmio-interface) to fix any reference leak issue.
+>>
+>> KONRAD Frederic (7):
+>>   cputlb: cleanup get_page_addr_code to use VICTIM_TLB_HIT
+>>   cputlb: move get_page_addr_code
+>>   cputlb: fix the way get_page_addr_code fills the tlb
+>>   exec: allow to get a pointer for some mmio memory region
+>>   qdev: add MemoryRegion property
+>>   introduce mmio_interface
+>>   xilinx_spips: allow mmio execution
+>>
+>>  cputlb.c                         |  81 ++++++++++++++-----------
+>>  hw/misc/Makefile.objs            |   1 +
+>>  hw/misc/mmio_interface.c         | 128 +++++++++++++++++++++++++++++++++++++++
+>>  hw/ssi/xilinx_spips.c            |  74 ++++++++++++++++------
+>>  include/exec/memory.h            |  35 +++++++++++
+>>  include/hw/misc/mmio_interface.h |  49 +++++++++++++++
+>>  include/hw/qdev-properties.h     |   2 +
+>>  memory.c                         |  57 +++++++++++++++++
+>>  8 files changed, 372 insertions(+), 55 deletions(-)
+>>  create mode 100644 hw/misc/mmio_interface.c
+>>  create mode 100644 include/hw/misc/mmio_interface.h
+>>
