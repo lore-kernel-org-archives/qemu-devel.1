@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58995)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cepIV-0002Ym-0a
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 15:38:33 -0500
+	(envelope-from <eblake@redhat.com>) id 1cepJ3-00035r-2E
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 15:39:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cepIT-0004QU-OS
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 15:38:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52532)
+	(envelope-from <eblake@redhat.com>) id 1cepJ0-0004ag-Do
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 15:39:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:29921)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cepIT-0004PX-GP
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 15:38:29 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AB9EF7FB77
-	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 20:38:29 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-50.ams2.redhat.com
-	[10.36.116.50])
-	by int-mx14.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v1HKcS11005390
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=NO)
-	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 15:38:29 -0500
-From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 17 Feb 2017 21:38:23 +0100
-Message-Id: <1487363905-9480-13-git-send-email-armbru@redhat.com>
-In-Reply-To: <1487363905-9480-1-git-send-email-armbru@redhat.com>
-References: <1487363905-9480-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 12/14] tests: Don't check qobject_type() before
- qobject_to_qbool()
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cepJ0-0004Zw-7V
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 15:39:02 -0500
+References: <1487362554-5688-1-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5407a810-b21d-8551-c8b8-01a6582e3c0e@redhat.com>
+Date: Fri, 17 Feb 2017 14:39:00 -0600
+MIME-Version: 1.0
+In-Reply-To: <1487362554-5688-1-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="LrpqxtoiLxesCqpt0sbJEXC1QotN02evu"
+Subject: Re: [Qemu-devel] [PATCH] tests: Use error_free_or_abort() where
+ appropriate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,105 +28,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com
 
-qobject_to_qbool(obj) returns NULL when obj isn't a QBool.  Check
-that instead of qobject_type(obj) == QTYPE_QBOOL.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--LrpqxtoiLxesCqpt0sbJEXC1QotN02evu
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com
+Message-ID: <5407a810-b21d-8551-c8b8-01a6582e3c0e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] tests: Use error_free_or_abort() where
+ appropriate
+References: <1487362554-5688-1-git-send-email-armbru@redhat.com>
+In-Reply-To: <1487362554-5688-1-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- tests/check-qjson.c                 | 24 ++++++------------------
- tests/test-qobject-output-visitor.c | 12 +++++-------
- 2 files changed, 11 insertions(+), 25 deletions(-)
+On 02/17/2017 02:15 PM, Markus Armbruster wrote:
+> Done with this Coccinelle semantic patch:
+>=20
+>     @@
+>     expression E;
+>     @@
+>     -    g_assert(E);
+>     -    error_free(E);
+>     +    error_free_or_abort(&E);
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  tests/test-qemu-opts.c              | 3 +--
+>  tests/test-qobject-output-visitor.c | 6 ++----
+>  2 files changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index 591b70a..e6d6935 100644
---- a/tests/check-qjson.c
-+++ b/tests/check-qjson.c
-@@ -966,10 +966,8 @@ static void keyword_literal(void)
-     QString *str;
- 
-     obj = qobject_from_json("true");
--    g_assert(obj != NULL);
--    g_assert(qobject_type(obj) == QTYPE_QBOOL);
--
-     qbool = qobject_to_qbool(obj);
-+    g_assert(qbool);
-     g_assert(qbool_get_bool(qbool) == true);
- 
-     str = qobject_to_json(obj);
-@@ -979,10 +977,8 @@ static void keyword_literal(void)
-     QDECREF(qbool);
- 
-     obj = qobject_from_json("false");
--    g_assert(obj != NULL);
--    g_assert(qobject_type(obj) == QTYPE_QBOOL);
--
-     qbool = qobject_to_qbool(obj);
-+    g_assert(qbool);
-     g_assert(qbool_get_bool(qbool) == false);
- 
-     str = qobject_to_json(obj);
-@@ -991,23 +987,15 @@ static void keyword_literal(void)
- 
-     QDECREF(qbool);
- 
--    obj = qobject_from_jsonf("%i", false);
--    g_assert(obj != NULL);
--    g_assert(qobject_type(obj) == QTYPE_QBOOL);
--
--    qbool = qobject_to_qbool(obj);
-+    qbool = qobject_to_qbool(qobject_from_jsonf("%i", false));
-+    g_assert(qbool);
-     g_assert(qbool_get_bool(qbool) == false);
--
-     QDECREF(qbool);
- 
-     /* Test that non-zero values other than 1 get collapsed to true */
--    obj = qobject_from_jsonf("%i", 2);
--    g_assert(obj != NULL);
--    g_assert(qobject_type(obj) == QTYPE_QBOOL);
--
--    qbool = qobject_to_qbool(obj);
-+    qbool = qobject_to_qbool(qobject_from_jsonf("%i", 2));
-+    g_assert(qbool);
-     g_assert(qbool_get_bool(qbool) == true);
--
-     QDECREF(qbool);
- 
-     obj = qobject_from_json("null");
-diff --git a/tests/test-qobject-output-visitor.c b/tests/test-qobject-output-visitor.c
-index 5617fd3..500b452 100644
---- a/tests/test-qobject-output-visitor.c
-+++ b/tests/test-qobject-output-visitor.c
-@@ -71,13 +71,13 @@ static void test_visitor_out_bool(TestOutputVisitorData *data,
-                                   const void *unused)
- {
-     bool value = true;
--    QObject *obj;
-+    QBool *qbool;
- 
-     visit_type_bool(data->ov, NULL, &value, &error_abort);
- 
--    obj = visitor_get(data);
--    g_assert(qobject_type(obj) == QTYPE_QBOOL);
--    g_assert(qbool_get_bool(qobject_to_qbool(obj)) == value);
-+    qbool = qobject_to_qbool(visitor_get(data));
-+    g_assert(qbool);
-+    g_assert(qbool_get_bool(qbool) == value);
- }
- 
- static void test_visitor_out_number(TestOutputVisitorData *data,
-@@ -356,9 +356,7 @@ static void test_visitor_out_any(TestOutputVisitorData *data,
-     qint = qobject_to_qint(qdict_get(qdict, "integer"));
-     g_assert(qint);
-     g_assert_cmpint(qint_get_int(qint), ==, -42);
--    qobj = qdict_get(qdict, "boolean");
--    g_assert(qobj);
--    qbool = qobject_to_qbool(qobj);
-+    qbool = qobject_to_qbool(qdict_get(qdict, "boolean"));
-     g_assert(qbool);
-     g_assert(qbool_get_bool(qbool) == true);
-     qstring = qobject_to_qstring(qdict_get(qdict, "string"));
--- 
-2.7.4
+Nice that it doesn't find many uses (it means we've already swept the
+tests for this pattern manually).
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--LrpqxtoiLxesCqpt0sbJEXC1QotN02evu
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYp19kAAoJEKeha0olJ0NqhO8H/iboyy6VAZv5k0oGZnATDSNS
+prpNA7LCm+OyHgZBzMPntwVH8L/7H4YF37oe1L/zzlUsY9KkOwFhMD4mV7uJggkg
+mhkecL2WyttwPPkwnp0q4NjEsgP2r48RzYbd08UiSVHwU6zNLLmKtphSZYNFd77l
+/YuiySm9vSCAZiSx2+9d92jGLMFsc5ucxbRXEZ84SQ8r9tysBerayeuvaoBi2zHG
+8ZvbIpB39FMLzDuEz7GuZRfnxgcZ2m5LZ3rCCvsYLqC5jn6Zy4qYMrXDbIaikdmr
+aBdpEz28/YObqh9V46e4y97z0xrXGCMOB2j3Voo81Jf+MVwdIcAdXOtjtWmGB/w=
+=ruSa
+-----END PGP SIGNATURE-----
+
+--LrpqxtoiLxesCqpt0sbJEXC1QotN02evu--
