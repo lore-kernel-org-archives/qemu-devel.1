@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cemB6-0004vW-8M
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 12:18:42 -0500
+	(envelope-from <den@virtuozzo.com>) id 1cemD6-0006bh-5q
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 12:20:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cemB4-0003BL-CM
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 12:18:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54580)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1cemB4-00038N-2W
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 12:18:38 -0500
-Date: Fri, 17 Feb 2017 10:18:35 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170217101835.58e59c41@t450s.home>
-In-Reply-To: <1486456099-7345-1-git-send-email-peterx@redhat.com>
-References: <1486456099-7345-1-git-send-email-peterx@redhat.com>
+	(envelope-from <den@virtuozzo.com>) id 1cemD3-0005Ks-0j
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 12:20:44 -0500
+References: <1487153430-17260-1-git-send-email-vsementsov@virtuozzo.com>
+	<1487153430-17260-9-git-send-email-vsementsov@virtuozzo.com>
+	<20170216112506.GB4869@noname.redhat.com>
+	<20170216114944.GD4869@noname.redhat.com>
+	<8d7a5d17-7b1b-578a-67fc-c79beb196a4c@virtuozzo.com>
+	<20170217120935.GC5338@noname.redhat.com>
+	<fd790939-7ad7-1d74-c810-eceece98bbb7@virtuozzo.com>
+	<20170217124842.GE5338@noname.redhat.com>
+	<3a827d65-1028-d0fd-c3aa-cabe61dafbd9@openvz.org>
+	<20170217133430.GI5338@noname.redhat.com>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <635d98d9-0f65-4fa6-2208-02ff7d23a2e9@openvz.org>
+Date: Fri, 17 Feb 2017 16:48:42 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20170217133430.GI5338@noname.redhat.com>
+Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 00/17] VT-d: vfio enablement and misc
- enhances
+Subject: Re: [Qemu-devel] [PATCH v15 08/25] block: introduce auto-loading
+ bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,109 +32,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, David Gibson <david@gibson.dropbear.id.au>, bd.aviv@gmail.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
 
-On Tue,  7 Feb 2017 16:28:02 +0800
-Peter Xu <peterx@redhat.com> wrote:
+On 02/17/2017 04:34 PM, Kevin Wolf wrote:
+> Am 17.02.2017 um 14:22 hat Denis V. Lunev geschrieben:
+>> On 02/17/2017 03:48 PM, Kevin Wolf wrote:
+>>> Am 17.02.2017 um 13:40 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>>>> 17.02.2017 15:09, Kevin Wolf wrote:
+>>>>> Am 17.02.2017 um 12:46 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>>>>>> 16.02.2017 14:49, Kevin Wolf wrote:
+>>>>>>> Am 16.02.2017 um 12:25 hat Kevin Wolf geschrieben:
+>>>>>>>> Am 15.02.2017 um 11:10 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>>>>>>>>> Auto loading bitmaps are bitmaps stored in the disk image, which should
+>>>>>>>>> be loaded when the image is opened and become BdrvDirtyBitmaps for the
+>>>>>>>>> corresponding drive.
+>>>>>>>>>
+>>>>>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>>>>>>>> Reviewed-by: John Snow <jsnow@redhat.com>
+>>>>>>>>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>>>>>>>> Why do we need a new BlockDriver callback and special code for it in
+>>>>>>>> bdrv_open_common()? The callback is only ever called immediately after
+>>>>>>>> .bdrv_open/.bdrv_file_open, so can't the drivers just do this internally
+>>>>>>>> in their .bdrv_open implementation? Even more so because qcow2 is the
+>>>>>>>> only driver that supports this callback.
+>>>>>>> Actually, don't we have to call this in qcow2_invalidate_cache()?
+>>>>>>> Currently, I think, after a migration, the autoload bitmaps aren't
+>>>>>>> loaded.
+>>>>>>>
+>>>>>>> By moving the qcow2_load_autoloading_dirty_bitmaps() call to
+>>>>>>> qcow2_open(), this would be fixed.
+>>>>>>>
+>>>>>>> Kevin
+>>>>>> Bitmap should not be reloaded on any intermediate qcow2-open's,
+>>>>>> reopens, etc. It should be loaded once, on bdrv_open, to not create
+>>>>>> extra collisions (between in-memory bitmap and it's stored version).
+>>>>>> That was the idea.
+>>>>>>
+>>>>>> For bitmaps migration there are separate series, we shouldn't load
+>>>>>> bitmap from file on migration, as it's version in the file is
+>>>>>> outdated.
+>>>>> That's not what your series is doing, though. It loads the bitmaps when
+>>>> Actually, they will not be loaded as they will have IN_USE flag.
+>>>>
+>>>>> migration starts and doesn't reload then when migration completes, even
+>>>>> though they are stale. Migration with shared storage would just work
+>>>>> without an extra series if you did these things in the correct places.
+>>>>>
+>>>>> As a reminder, this is how migration with shared storage works (or
+>>>>> should work with your series):
+>>>>>
+>>>>> 1. Start destination qemu instance. This calls bdrv_open() with
+>>>>>    BDRV_O_INACTIVE. We can read in some metadata, though we don't need
+>>>>>    much more than the image size at this point. Writing to the image is
+>>>>>    still impossible.
+>>>>>
+>>>>> 2. Start migration on the source, while the VM is still writing to the
+>>>>>    image, rendering the cached metadata from step 1 stale.
+>>>>>
+>>>>> 3. Migration completes:
+>>>>>
+>>>>>     a. Stop the VM
+>>>>>
+>>>>>     b. Inactivate all images in the source qemu. This is where all
+>>>>>        metadata needs to be written back to the image file, including
+>>>>>        bitmaps. No writes to the image are possible after this point
+>>>>>        because BDRV_O_INACTIVE is set.
+>>>>>
+>>>>>     c. Invalidate the caches in the destination qemu, i.e. reload
+>>>>>        everything from the file that could have changed since step 1,
+>>>>>        including bitmaps. BDRV_O_INACTIVE is cleared, making the image
+>>>>>        ready for writes.
+>>>>>
+>>>>>     d. Resume the VM on the destination
+>>>>>
+>>>>> 4. Exit the source qemu process, which involves bdrv_close(). Note that
+>>>>>    at this point, no writing to the image file is possible any more,
+>>>>>    it's the destination qemu process that own the image file now.
+>>>>>
+>>>>> Your series loads and stores bitmaps in steps 1 and 4. This means that
+>>>> Actually - not. in 1 bitmaps are "in use", in 4 INACTIVE is set (and
+>>>> it is checked), nothing is stored.
+>>>>
+>>>>> they are stale on the destination when migration completes, and that
+>>>>> bdrv_close() wants to write to an image file that it doesn't own any
+>>>>> more, which will cause an assertion failure. If you instead move things
+>>>>> to steps 3b and 3c, it will just work.
+>>>> Hmm, I understand the idea.. But this will interfere with postcopy
+>>>> bitmap migration. So if we really need this, there should be some
+>>>> additional control flags or capabilities.. The problem of your
+>>>> approach is that bitmap actually migrated in the short state when
+>>>> source and destination are stopped, it may take time, as bitmaps may
+>>>> be large.
+>>> You can always add optimisations, but this is the basic lifecycle
+>>> process of block devices in qemu, so it would be good to adhere to it.
+>>> So far there are no other pieces of information that are ignored in
+>>> bdrv_invalidate()/bdrv_inactivate() and instead only handled in
+>>> bdrv_open()/bdrv_close(). It's a matter of consistency, too.
+>>>
+>>> And not having to add special cases for specific features in the generic
+>>> bdrv_open()/close() paths is a big plus for me anyway.
+>>>
+>>> Kevin
+>> But for sure this is bad from the downtime point of view.
+>> On migrate you will have to write to the image and re-read
+>> it again on the target. This would be very slow. This will
+>> not help for the migration with non-shared disk too.
+>>
+>> That is why we have specifically worked in a migration,
+>> which for a good does not influence downtime at all now.
+>>
+>> With a write we are issuing several write requests + sync.
+>> Our measurements shows that bdrv_drain could take around
+>> a second on an averagely loaded conventional system, which
+>> seems unacceptable addition to me.
+> I'm not arguing against optimising migration, I fully agree with you. I
+> just think that we should start with a correct if slow base version and
+> then add optimisation to that, instead of starting with a broken base
+> version and adding to that.
+>
+> Look, whether you do the expensive I/O on open/close and make that a
+> slow operation or whether you do it on invalidate_cache/inactivate
+> doesn't really make a difference in term of slowness because in general
+> both operations are called exactly once. But it does make a difference
+> in terms of correctness.
+>
+> Once you do the optimisation, of course, you'll skip writing those
+> bitmaps that you transfer using a different channel, no matter whether
+> you skip it in bdrv_close() or in bdrv_inactivate().
+>
+> Kevin
+I do not understand this point as in order to optimize this
+we will have to create specific code path or option from
+the migration code and keep this as an ugly kludge forever.
 
-> This is v7 of vt-d vfio enablement series.
-[snip]
-> =========
-> Test Done
-> =========
-> 
-> Build test passed for x86_64/arm/ppc64.
-> 
-> Simply tested with x86_64, assigning two PCI devices to a single VM,
-> boot the VM using:
-> 
-> bin=x86_64-softmmu/qemu-system-x86_64
-> $bin -M q35,accel=kvm,kernel-irqchip=split -m 1G \
->      -device intel-iommu,intremap=on,eim=off,caching-mode=on \
->      -netdev user,id=net0,hostfwd=tcp::5555-:22 \
->      -device virtio-net-pci,netdev=net0 \
->      -device vfio-pci,host=03:00.0 \
->      -device vfio-pci,host=02:00.0 \
->      -trace events=".trace.vfio" \
->      /var/lib/libvirt/images/vm1.qcow2
-> 
-> pxdev:bin [vtd-vfio-enablement]# cat .trace.vfio
-> vtd_page_walk*
-> vtd_replay*
-> vtd_inv_desc*
-> 
-> Then, in the guest, run the following tool:
-> 
->   https://github.com/xzpeter/clibs/blob/master/gpl/userspace/vfio-bind-group/vfio-bind-group.c
-> 
-> With parameter:
-> 
->   ./vfio-bind-group 00:03.0 00:04.0
-> 
-> Check host side trace log, I can see pages are replayed and mapped in
-> 00:04.0 device address space, like:
-> 
-> ...
-> vtd_replay_ce_valid replay valid context device 00:04.00 hi 0x401 lo 0x38fe1001
-> vtd_page_walk Page walk for ce (0x401, 0x38fe1001) iova range 0x0 - 0x8000000000
-> vtd_page_walk_level Page walk (base=0x38fe1000, level=3) iova range 0x0 - 0x8000000000
-> vtd_page_walk_level Page walk (base=0x35d31000, level=2) iova range 0x0 - 0x40000000
-> vtd_page_walk_level Page walk (base=0x34979000, level=1) iova range 0x0 - 0x200000
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x0 -> gpa 0x22dc3000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x1000 -> gpa 0x22e25000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x2000 -> gpa 0x22e12000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x3000 -> gpa 0x22e2d000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x4000 -> gpa 0x12a49000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x5000 -> gpa 0x129bb000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x6000 -> gpa 0x128db000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x7000 -> gpa 0x12a80000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x8000 -> gpa 0x12a7e000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x9000 -> gpa 0x12b22000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0xa000 -> gpa 0x12b41000 mask 0xfff perm 3
-> ...
-
-Hi Peter,
-
-I'm trying to make use of this, with your vtd-vfio-enablement-v7 branch
-(HEAD 0c1c4e738095).  I'm assigning an 82576 PF to a VM.  It works with
-iommu=pt, but if I remove that option, the device does not work and
-vfio_iommu_map_notify is never called.  Any suggestions?  My
-commandline is below.  Thanks,
-
-Alex
-
-/usr/local/bin/qemu-system-x86_64 \
-        -name guest=l1,debug-threads=on -S \
-        -machine pc-q35-2.9,accel=kvm,usb=off,dump-guest-core=off,kernel-irqchip=split \
-        -cpu host -m 10240 -realtime mlock=off -smp 4,sockets=1,cores=2,threads=2 \
-        -no-user-config -nodefaults -monitor stdio -rtc base=utc,driftfix=slew \
-        -global kvm-pit.lost_tick_policy=discard -no-hpet -no-shutdown \
-        -global ICH9-LPC.disable_s3=1 -global ICH9-LPC.disable_s4=1 \
-        -boot strict=on \
-        -device ioh3420,port=0x10,chassis=1,id=pci.1,bus=pcie.0,addr=0x2 \
-        -device i82801b11-bridge,id=pci.2,bus=pcie.0,addr=0x1e \
-        -device pci-bridge,chassis_nr=3,id=pci.3,bus=pci.2,addr=0x0 \
-        -device ioh3420,port=0x18,chassis=4,id=pci.4,bus=pcie.0,addr=0x3 \
-        -device ioh3420,port=0x20,chassis=5,id=pci.5,bus=pcie.0,addr=0x4 \
-        -device ioh3420,port=0x28,chassis=6,id=pci.6,bus=pcie.0,addr=0x5 \
-        -device ioh3420,port=0x30,chassis=7,id=pci.7,bus=pcie.0,addr=0x6 \
-        -device ioh3420,port=0x38,chassis=8,id=pci.8,bus=pcie.0,addr=0x7 \
-        -device ich9-usb-ehci1,id=usb,bus=pcie.0,addr=0x1d.0x7 \
-        -device ich9-usb-uhci1,masterbus=usb.0,firstport=0,bus=pcie.0,multifunction=on,addr=0x1d \
-        -device ich9-usb-uhci2,masterbus=usb.0,firstport=2,bus=pcie.0,addr=0x1d.0x1 \
-        -device ich9-usb-uhci3,masterbus=usb.0,firstport=4,bus=pcie.0,addr=0x1d.0x2 \
-        -device virtio-serial-pci,id=virtio-serial0,bus=pci.4,addr=0x0 \
-        -drive file=/dev/vg_s20/lv_l1,format=raw,if=none,id=drive-virtio-disk0,cache=none,aio=native \
-        -device virtio-blk-pci,scsi=off,bus=pci.5,addr=0x0,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1 \
-        -netdev user,id=hostnet0 \
-        -device virtio-net-pci,netdev=hostnet0,id=net0,mac=52:54:00:c2:62:30,bus=pci.1,addr=0x0 \
-        -device usb-tablet,id=input0,bus=usb.0,port=1 \
-        -vnc :0 -vga std \
-        -device vfio-pci,host=01:00.0,id=hostdev0,bus=pci.8,addr=0x0 \
-        -device intel-iommu,intremap=on,eim=off,caching-mode=on -trace events=/trace-events.txt -msg timestamp=on
-
-# cat /trace-events.txt 
-vfio_listener*
-vfio_iommu*
-vtd*
+Den
