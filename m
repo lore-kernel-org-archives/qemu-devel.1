@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35588)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cekCw-0003Bb-5f
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:12:27 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cekJ4-0005R0-NA
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:18:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cekCv-0005Vg-2u
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:12:26 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48553)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cekCu-0005Ug-SG
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:12:25 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 17 Feb 2017 15:12:20 +0000
-Message-Id: <1487344340-30471-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] Makefile: Put VERSION info into version.texi
- rather than using -D
+	(envelope-from <imammedo@redhat.com>) id 1cekJ3-0002Yx-IY
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:18:46 -0500
+Date: Fri, 17 Feb 2017 16:18:34 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170217161834.4f9c556c@nial.brq.redhat.com>
+In-Reply-To: <CAFEAcA-aaEPxhYK2ePq2QXW6UVe2A=NxP=V7cokURkurPzLRGg@mail.gmail.com>
+References: <1487253461-269218-1-git-send-email-imammedo@redhat.com>
+	<CAFEAcA_NgmdDCfbPy+DnHQBmNGmQ4tj1z4ci+OP7+x4tHLLCxg@mail.gmail.com>
+	<20170216161114.220260cf@nial.brq.redhat.com>
+	<CAFEAcA-aaEPxhYK2ePq2QXW6UVe2A=NxP=V7cokURkurPzLRGg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/virt: fix cpu object reference leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,94 +25,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <mlureau@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Andrew Jones <drjones@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Unfortunately some older versions of makeinfo don't correctly
-handle the -D command line option and fail to set the variable.
-This then causes them to complain
- docs/qemu-ga-ref.texi:41: warning: undefined flag: VERSION
+On Fri, 17 Feb 2017 13:32:15 +0000
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
-Work around this by doing as the autotools do, and writing
-the information into a version.texi file which we then
-include from the .texi files that need it.
+> On 16 February 2017 at 15:11, Igor Mammedov <imammedo@redhat.com> wrote:
+> > On Thu, 16 Feb 2017 14:18:05 +0000
+> > Peter Maydell <peter.maydell@linaro.org> wrote:  
+> >> I've always found the object reference semantics somewhat
+> >> confusing (why does realizing a device add a reference,
+> >> for instance?). Do we document them anywhere?  
+> > I'm not aware of a place where it's documented.
+> >
+> > currently device_realize() sets parent thus increasing
+> > ref counter only if device creator haven't set parent
+> > explicitly.  
+> 
+> It doesn't seem to:
+> 
+> static void device_realize(DeviceState *dev, Error **errp)
+> {
+>     DeviceClass *dc = DEVICE_GET_CLASS(dev);
+> 
+>     if (dc->init) {
+>         int rc = dc->init(dev);
+>         if (rc < 0) {
+>             error_setg(errp, "Device initialization failed.");
+>             return;
+>         }
+>     }
+> }
+static void device_set_realized(Object *obj, bool value, Error **errp)
+{
+...
+    if (value && !dev->realized) {                                               
+        if (!obj->parent) {                                                      
+            gchar *name = g_strdup_printf("device[%d]", unattached_count++);     
+                                                                                 
+            object_property_add_child(container_get(qdev_get_machine(),          
+                                                    "/unattached"),              
+                                      name, obj, &error_abort);                  
+            unattached_parent = true;                                            
+            g_free(name);                                                        
+        }
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- Makefile               | 17 ++++++++++-------
- docs/qemu-ga-ref.texi  |  2 ++
- docs/qemu-qmp-ref.texi |  2 ++
- 3 files changed, 14 insertions(+), 7 deletions(-)
+ 
+> ...it just calls the device's init function if it has one.
+> 
+> It's also pretty confusing that qdev_try_create()
+> and qdev_create() return a pointer to an object
+> that has been put into a bus and had unref called
+> (so the caller doesn't need to manually unref),
+qdev_try_create() when puts device on bus,
+it creates QOM link property to device which increases refcnt
+qdev_try_create() -> qdev_set_parent_bus() -> bus_add_child()
 
-diff --git a/Makefile b/Makefile
-index 830fa5a..1c4c04f 100644
---- a/Makefile
-+++ b/Makefile
-@@ -516,7 +516,7 @@ distclean: clean
- 	rm -f qemu-doc.vr qemu-doc.txt
- 	rm -f config.log
- 	rm -f linux-headers/asm
--	rm -f qemu-ga-qapi.texi qemu-qapi.texi
-+	rm -f qemu-ga-qapi.texi qemu-qapi.texi version.texi
- 	rm -f docs/qemu-qmp-ref.7 docs/qemu-ga-ref.7
- 	rm -f docs/qemu-qmp-ref.txt docs/qemu-ga-ref.txt
- 	rm -f docs/qemu-qmp-ref.pdf docs/qemu-ga-ref.pdf
-@@ -663,21 +663,24 @@ ui/console-gl.o: $(SRC_PATH)/ui/console-gl.c \
- 
- # documentation
- MAKEINFO=makeinfo
--MAKEINFOFLAGS=--no-split --number-sections -D 'VERSION $(VERSION)'
--TEXIFLAG=$(if $(V),,--quiet) --command='@set VERSION $(VERSION)'
-+MAKEINFOFLAGS=--no-split --number-sections
-+TEXIFLAG=$(if $(V),,--quiet)
- 
--%.html: %.texi
-+version.texi: $(SRC_PATH)/VERSION
-+	$(call quiet-command,echo "@set VERSION $(VERSION)" > $@,"GEN","$@")
-+
-+%.html: %.texi version.texi
- 	$(call quiet-command,LC_ALL=C $(MAKEINFO) $(MAKEINFOFLAGS) --no-headers \
- 	--html $< -o $@,"GEN","$@")
- 
--%.info: %.texi
-+%.info: %.texi version.texi
- 	$(call quiet-command,$(MAKEINFO) $(MAKEINFOFLAGS) $< -o $@,"GEN","$@")
- 
--%.txt: %.texi
-+%.txt: %.texi version.texi
- 	$(call quiet-command,LC_ALL=C $(MAKEINFO) $(MAKEINFOFLAGS) --no-headers \
- 	--plaintext $< -o $@,"GEN","$@")
- 
--%.pdf: %.texi
-+%.pdf: %.texi version.texi
- 	$(call quiet-command,texi2pdf $(TEXIFLAG) -I $(SRC_PATH) -I . $< -o $@,"GEN","$@")
- 
- qemu-options.texi: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
-diff --git a/docs/qemu-ga-ref.texi b/docs/qemu-ga-ref.texi
-index 87cc8d0..ddb76ce 100644
---- a/docs/qemu-ga-ref.texi
-+++ b/docs/qemu-ga-ref.texi
-@@ -1,6 +1,8 @@
- \input texinfo
- @setfilename qemu-ga-ref.info
- 
-+@include version.texi
-+
- @exampleindent 0
- @paragraphindent 0
- 
-diff --git a/docs/qemu-qmp-ref.texi b/docs/qemu-qmp-ref.texi
-index 818e525..0a00569 100644
---- a/docs/qemu-qmp-ref.texi
-+++ b/docs/qemu-qmp-ref.texi
-@@ -1,6 +1,8 @@
- \input texinfo
- @setfilename qemu-qmp-ref.info
- 
-+@include version.texi
-+
- @exampleindent 0
- @paragraphindent 0
- 
--- 
-2.7.4
+link is not really usable at that time as device doesn't have
+parent (in QOM terms) and attempt to resolve it to path would
+assert, so it does set link manually by hack
+bus_add_child()
+    kid->child = child;                                                          
+    object_ref(OBJECT(kid->child)); 
+
+and then as bus holds reference, device won't disappear 
+until it's attached to bus, it unrefs original
+(qdev_try_create owned) pointer and returns pointer
+owned by qdev framework.
+
+later device creator calls
+ qdev_init_nofail() ->
+   object_property_set_bool(true, "realized");
+
+which sets QOM parent for device to "/machine/unattached"
+if caller hasn't set it manually,
+
+like
+ qdev_device_add() ->
+    qdev_set_id() ->
+       object_property_add_child("/peripheral" | "/peripheral-anon")
+
+or
+ ioapic_init_gsi() ->
+     qdev_create()
+     object_property_add_child(...)
+     qdev_init_nofail()
+
+> but plain object_new() returns a pointer to an
+> object that hasn't been put into a bus, yet
+it's like malloc/new and used for all objects including
+ones without realize which is Device concept.
+So naturally caller hold/owns the first reference
+and should take care of it.
+
+> realizing does put it into a bus but doesn't do the
+> corresponding unref.
+it might add extra reference so successfully created device
+won't disappear once original owner 'frees' pointer that
+goes out of scope.
+
+
+> I'd be a lot happier if we had clear documentation that
+> described how our object model, plugging things into buses,
+> etc handled reference counting and what the expected
+> "correct" code patterns are for using it.
+I see 2 APIs in use:
+ 1: legacy qdev_create() + qdev_init_nofail()
+     for hardwired on board devices bus attached oriented
+ 2: object_new() (+ device.realize() in case if object is Device)
+     used by device_add() used for both bus/bus-less device
+     post machine_init time.
+    
+
+> That said, I guess this patch is correct so I'm applying
+> it to target-arm.next.
+> 
+> thanks
+> -- PMM
