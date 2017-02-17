@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48643)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1cejON-0001J3-HS
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 09:20:12 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cejSM-000367-PA
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 09:24:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1cejOM-00025q-Jq
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 09:20:11 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cejSL-0006wD-RV
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 09:24:18 -0500
+Date: Fri, 17 Feb 2017 15:24:03 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170217142403.GJ5338@noname.redhat.com>
+References: <1487153430-17260-9-git-send-email-vsementsov@virtuozzo.com>
+	<20170216112506.GB4869@noname.redhat.com>
+	<20170216114944.GD4869@noname.redhat.com>
+	<8d7a5d17-7b1b-578a-67fc-c79beb196a4c@virtuozzo.com>
+	<20170217120935.GC5338@noname.redhat.com>
+	<fd790939-7ad7-1d74-c810-eceece98bbb7@virtuozzo.com>
+	<20170217124842.GE5338@noname.redhat.com>
+	<3a827d65-1028-d0fd-c3aa-cabe61dafbd9@openvz.org>
+	<20170217133430.GI5338@noname.redhat.com>
+	<635d98d9-0f65-4fa6-2208-02ff7d23a2e9@openvz.org>
 MIME-Version: 1.0
-In-Reply-To: <20170217091435.GB5338@noname.redhat.com>
-References: <20170217005127.21010-1-nirsof@gmail.com>
-	<20170217005127.21010-2-nirsof@gmail.com>
-	<20170217091435.GB5338@noname.redhat.com>
-From: Nir Soffer <nirsof@gmail.com>
-Date: Fri, 17 Feb 2017 16:20:09 +0200
-Message-ID: <CAMr-obu0RPWyTcJHGA5b_Hs3L3usOvFNJ0N+runD4ZyMMvgWFg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 1/3] qemu-img: Add tests for raw image
- preallocation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <635d98d9-0f65-4fa6-2208-02ff7d23a2e9@openvz.org>
+Subject: Re: [Qemu-devel] [PATCH v15 08/25] block: introduce auto-loading
+ bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,27 +32,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: "Denis V. Lunev" <den@openvz.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
 
-On Fri, Feb 17, 2017 at 11:14 AM, Kevin Wolf <kwolf@redhat.com> wrote:
-> Am 17.02.2017 um 01:51 hat Nir Soffer geschrieben:
->> Add tests for creating raw image with and without the preallocation
->> option.
->>
->> Signed-off-by: Nir Soffer <nirsof@gmail.com>
->
-> Looks good, but 175 is already (multiply) taken. Not making this a
-> blocker, but I just want to remind everyone to check the mailing list
-> for pending patches which add new tests before using a new number in
-> order to avoid unnecessary rebases for everyone. In general, it's as
-> easy as searching for the string "175.out" in the mailbox.
->
-> The next free one seems to be 177 currently.
+Am 17.02.2017 um 14:48 hat Denis V. Lunev geschrieben:
+> On 02/17/2017 04:34 PM, Kevin Wolf wrote:
+> > Am 17.02.2017 um 14:22 hat Denis V. Lunev geschrieben:
+> >> But for sure this is bad from the downtime point of view.
+> >> On migrate you will have to write to the image and re-read
+> >> it again on the target. This would be very slow. This will
+> >> not help for the migration with non-shared disk too.
+> >>
+> >> That is why we have specifically worked in a migration,
+> >> which for a good does not influence downtime at all now.
+> >>
+> >> With a write we are issuing several write requests + sync.
+> >> Our measurements shows that bdrv_drain could take around
+> >> a second on an averagely loaded conventional system, which
+> >> seems unacceptable addition to me.
+> > I'm not arguing against optimising migration, I fully agree with you. I
+> > just think that we should start with a correct if slow base version and
+> > then add optimisation to that, instead of starting with a broken base
+> > version and adding to that.
+> >
+> > Look, whether you do the expensive I/O on open/close and make that a
+> > slow operation or whether you do it on invalidate_cache/inactivate
+> > doesn't really make a difference in term of slowness because in general
+> > both operations are called exactly once. But it does make a difference
+> > in terms of correctness.
+> >
+> > Once you do the optimisation, of course, you'll skip writing those
+> > bitmaps that you transfer using a different channel, no matter whether
+> > you skip it in bdrv_close() or in bdrv_inactivate().
+> >
+> > Kevin
+> I do not understand this point as in order to optimize this
+> we will have to create specific code path or option from
+> the migration code and keep this as an ugly kludge forever.
 
-Thanks, will change to 177 in the next version.
+The point that I don't understand is why it makes any difference for the
+follow-up migration series whether the writeout is in bdrv_close() or
+bdrv_inactivate(). I don't really see the difference between the two
+from a migration POV; both need to be skipped if we transfer the bitmap
+using a different channel.
 
-For next patches, what do you mean by "pending"? patches sent
-to the block mailing list?
+Maybe I would see the reason if I could find the time to look at the
+migration patches first, but unfortunately I don't have this time at the
+moment.
 
-Nir
+My point is just that generally we want to have a correctly working qemu
+after every single patch, and even more importantly after every series.
+As the migration series is separate from this, I don't think it's a good
+excuse for doing worse than we could easily do here.
+
+Kevin
