@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mallachiev@ispras.ru>) id 1cen7m-0001jg-9m
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 13:19:19 -0500
+	(envelope-from <eblake@redhat.com>) id 1cepy3-0008Ix-0M
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 16:21:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mallachiev@ispras.ru>) id 1cen7j-0003sP-0Z
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 13:19:18 -0500
-From: Kurban Mallachiev <mallachiev@ispras.ru>
-Message-ID: <076b0d94-738e-252c-1ed8-4640a864ac34@ispras.ru>
-Date: Fri, 17 Feb 2017 21:18:10 +0300
+	(envelope-from <eblake@redhat.com>) id 1cepy1-0003i9-DI
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 16:21:27 -0500
+References: <1487067971-10443-1-git-send-email-armbru@redhat.com>
+	<1487067971-10443-22-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <49e87de6-431a-43b9-14d1-78abe9da7aaf@redhat.com>
+Date: Fri, 17 Feb 2017 15:21:16 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] ARM i.MX timers: fix software reset
+In-Reply-To: <1487067971-10443-22-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="DB2bmq22J9wIXtvlKCc5n1ETtsQboVhcN"
+Subject: Re: [Qemu-devel] [PATCH 21/24] util/cutils: Let qemu_strtosz*()
+ optionally reject trailing crap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,91 +25,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Chubb <peter.chubb@nicta.com.au>, qemu-arm@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 
-Hello!
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--DB2bmq22J9wIXtvlKCc5n1ETtsQboVhcN
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <49e87de6-431a-43b9-14d1-78abe9da7aaf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 21/24] util/cutils: Let qemu_strtosz*()
+ optionally reject trailing crap
+References: <1487067971-10443-1-git-send-email-armbru@redhat.com>
+ <1487067971-10443-22-git-send-email-armbru@redhat.com>
+In-Reply-To: <1487067971-10443-22-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-i.MX6 RM says that setting software reset bit in CR register of GPT 
-(general purpose timers) should resets all of the registers of GPT to 
-their default reset values, except for the CLKSRC, EN, ENMOD, STOPEN, 
-WAITEN, and DBGEN bits in CR. But current implementation does the 
-opposite for CR register (it clears CLKSRC and friends bits and 
-preserves the others).
+On 02/14/2017 04:26 AM, Markus Armbruster wrote:
+> Change the qemu_strtosz() & friends to return -EINVAL when @endptr is
+> null and the conversion doesn't consume the string completely.
+> Matches how qemu_strtol() & friends work.
+>=20
+> Only test_qemu_strtosz_simple() passes a null @endptr.  No functional
+> change there, because its conversion consumes the string.
+>=20
+> Simplify callers that use @endptr only to fail when it doesn't point
+> to '\0' to pass a null @endptr instead.
+>=20
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Cc: Eduardo Habkost <ehabkost@redhat.com> (maintainer:X86)
+> Cc: Kevin Wolf <kwolf@redhat.com> (supporter:Block layer core)
+> Cc: Max Reitz <mreitz@redhat.com> (supporter:Block layer core)
+> Cc: qemu-block@nongnu.org (open list:Block layer core)
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  hmp.c               |  6 ++----
+>  hw/misc/ivshmem.c   |  6 ++----
+>  qapi/opts-visitor.c |  5 ++---
+>  qemu-img.c          |  7 +------
+>  qemu-io-cmds.c      |  7 +------
+>  target/i386/cpu.c   |  5 ++---
+>  tests/test-cutils.c |  6 ++++++
+>  util/cutils.c       | 14 +++++++++-----
+>  8 files changed, 25 insertions(+), 31 deletions(-)
 
-Most importantly this leads to that software reset bit doesn't clears 
-automatically.
+Nice cleanup.
 
-I have a look at git history and found that software reset bit was being 
-cleared before 462566fc5e3 commit.
-
-I have doubts about the correct fixing of this problem. I don't really 
-understand the nature of the "/Soft reset doesn't touch some bits; hard 
-reset clears them/" comment in /imx_gpt_reset/ function, does it mean 
-that /imx_gpt_reset/ performs a hard reset or soft reset? I see two 
-possible fixings:
-
-1. If /imx_gpt_reset/ purpose is to do a software reset of device, then 
-we should fix this function. My patch at the end of email fixes this 
-function.
-
-2. If /imx_gpt_reset/ purpose is to do a hard reset of device? then 
-there should be another function to software reset of device. If so I 
-can create a new patch.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 
----
+> +++ b/qemu-img.c
+> @@ -370,14 +370,9 @@ static int add_old_style_options(const char *fmt, =
+QemuOpts *opts,
+> =20
+>  static int64_t cvtnum(const char *s)
+>  {
 
- From e12f689a2f41d18a29714771d83e343ca5195b61 Mon Sep 17 00:00:00 2001
+> +++ b/qemu-io-cmds.c
+> @@ -137,14 +137,9 @@ static char **breakline(char *input, int *count)
+> =20
+>  static int64_t cvtnum(const char *s)
+>  {
+> -    char *end;
 
-From: Kurban Mallachiev <mallachiev@ispras.ru>
+Why do we reimplement cvtnum() as copied static functions instead of
+exporting it?  But that would be a separate cleanup (perhaps squashed
+into 20/24, where you use cvtnum in qemu-img).
 
-Date: Fri, 17 Feb 2017 20:30:49 +0300
+> @@ -217,7 +217,8 @@ static int64_t do_strtosz(const char *nptr, char **=
+end,
+>      errno =3D 0;
+>      val =3D strtod(nptr, &endptr);
+>      if (isnan(val) || endptr =3D=3D nptr || errno !=3D 0) {
 
-Subject: [PATCH] i.MX timers: fix software reset
+Hmm - we explicitly reject "NaN", but not "infinity".  But when strtod()
+accepts infinity, ...
 
-Software reset function clears CR bits that should not clear and
+> -        goto fail;
+> +        retval =3D -EINVAL;
+> +        goto out;
+>      }
+>      fraction =3D modf(val, &integral);
 
-preserves bits that should clear.
+then modf() returns 0 with integral left at infinity...
 
-Signed-off-by: Kurban Mallachiev <mallachiev@ispras.ru>
+>      if (fraction !=3D 0) {
+> @@ -232,17 +233,20 @@ static int64_t do_strtosz(const char *nptr, char =
+**end,
+>          assert(mul >=3D 0);
+>      }
+>      if (mul =3D=3D 1 && mul_required) {
+> -        goto fail;
+> +        retval =3D -EINVAL;
+> +        goto out;
+>      }
+>      if ((val * mul >=3D INT64_MAX) || val < 0) {
 
----
+=2E..and the multiply exceeds INT64_MAX, so we still end up rejecting it
+(with ERANGE instead of EINVAL).  Weird way but seems to work, and is
+pre-existing, so not this patch's problem.
 
-  hw/timer/imx_gpt.c | 4 ++--
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/timer/imx_gpt.c b/hw/timer/imx_gpt.c
+--DB2bmq22J9wIXtvlKCc5n1ETtsQboVhcN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-index 010ccbf207..9777160f49 100644
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
---- a/hw/timer/imx_gpt.c
+iQEcBAEBCAAGBQJYp2lMAAoJEKeha0olJ0NqV5gH/RJDIhRYdalLllVJwpvE28Ag
+2Wk0lF5FdFfAtD6Zi8w7ShKm0PJwgOi9PeUE3y62+gpD/2PgZwQpkk5+ylfn2NyY
+BodE05JjSZM9NqdpzogsmWcaRyN2dClK+6GFiHKnOKQ0Gqbhoe4fAbTLwUCzXqJP
+lGQ4kBjjaSFxOkskeeCicmOjWpqMjVd+ggQoTmiosea37ld3lk5cLWB0V9ev7nOd
+3MxHsfcdP+Fj3j3zK/RtAbivxWIbiq1Pp+H40Oq5Z/0lW9vWaR7MB4l/dIh/JOcI
+f8F0SHdBsfUApJOKgw0xFmt/+Hw42VufVxQm+32bSVFcbH9r9ZDC9mLNnhIhHWo=
+=SKYT
+-----END PGP SIGNATURE-----
 
-+++ b/hw/timer/imx_gpt.c
-
-@@ -306,8 +306,8 @@ static void imx_gpt_reset(DeviceState *dev)
-
-      /*
-
-       * Soft reset doesn't touch some bits; hard reset clears them
-
-       */
-
--    s->cr &= ~(GPT_CR_EN|GPT_CR_ENMOD|GPT_CR_STOPEN|GPT_CR_DOZEN|
-
--               GPT_CR_WAITEN|GPT_CR_DBGEN);
-
-+    s->cr &= GPT_CR_EN|GPT_CR_ENMOD|GPT_CR_STOPEN|GPT_CR_DOZEN|
-
-+               GPT_CR_WAITEN|GPT_CR_DBGEN;
-
-      s->sr = 0;
-
-      s->pr = 0;
-
-      s->ir = 0;
-
--- 
-
-2.11.1
+--DB2bmq22J9wIXtvlKCc5n1ETtsQboVhcN--
