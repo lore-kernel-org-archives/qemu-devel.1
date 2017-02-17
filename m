@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <franklinmathieu@gmail.com>) id 1ceeN4-0006Cx-7y
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:58:31 -0500
+	(envelope-from <franklinmathieu@gmail.com>) id 1ceeNF-0006NT-RC
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:58:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <franklinmathieu@gmail.com>) id 1ceeN0-0001Sv-TS
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:58:30 -0500
+	(envelope-from <franklinmathieu@gmail.com>) id 1ceeNC-0001Vo-N0
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:58:41 -0500
 From: Franklin Snaipe Mathieu <snaipe@diacritic.io>
-Date: Fri, 17 Feb 2017 08:57:59 +0000
-Message-Id: <20170217085800.28873-1-snaipe@diacritic.io>
-In-Reply-To: <20170216085857.23501-1-snaipe@diacritic.io>
+Date: Fri, 17 Feb 2017 08:58:00 +0000
+Message-Id: <20170217085800.28873-2-snaipe@diacritic.io>
+In-Reply-To: <20170217085800.28873-1-snaipe@diacritic.io>
 References: <20170216085857.23501-1-snaipe@diacritic.io>
-Subject: [Qemu-devel] [PATCH] syscall: fixed mincore(2) not failing with
+	<20170217085800.28873-1-snaipe@diacritic.io>
+Subject: [Qemu-devel] [PATCH v2] syscall: fixed mincore(2) not failing with
  ENOMEM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
