@@ -1,35 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cerC6-0004GX-4S
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 17:40:03 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cerU5-0001NF-QM
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 17:58:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cerC2-0004KR-4R
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 17:40:02 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33545)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cerC1-0004K0-V2
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 17:39:58 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cerBz-0008Du-HJ
-	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 22:39:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8054B2E80C4
-	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 22:39:55 +0000 (UTC)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cerU2-0005fA-M9
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 17:58:37 -0500
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:35369)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cerU2-0005ez-I8
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 17:58:34 -0500
+Received: by mail-qk0-x242.google.com with SMTP id u25so8527353qki.2
+	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 14:58:34 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170216173707.16209-1-laurent@vivier.eu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <459bd212-56e5-5771-34fe-2aa28be2ba96@amsat.org>
+Date: Fri, 17 Feb 2017 19:58:30 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 17 Feb 2017 22:29:05 -0000
-From: Nish Aravamudan <nish.aravamudan@canonical.com>
-Reply-To: Bug 1490611 <1490611@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150831152901.21817.58033.malonedeb@gac.canonical.com>
-Message-Id: <20170217222905.6449.56435.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1490611] Re: Using qemu >=2.2.1 to convert
- raw->VHD (fixed) adds extra padding to the result file,
- which Microsoft Azure rejects as invalid
+In-Reply-To: <20170216173707.16209-1-laurent@vivier.eu>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: fix fork()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,138 +33,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>
 
-Hello Alexandre,
+On 02/16/2017 02:37 PM, Laurent Vivier wrote:
+> Since commit 5ea2fc8 ("linux-user: Sanity check clone flags"),
+> trying to run fork() fails with old distro on some architectures.
+>
+> This is the case with HP-PA and Debian 5 (Lenny).
+>
+> It fails on:
+>
+>          if ((flags & CSIGNAL) != TARGET_SIGCHLD) {
+>              return -TARGET_EINVAL;
+>          }
+>
+> because flags is 17, whereas on HP-PA, SIGCHLD is 18.
+> 17 is the SIGCHLD value of my host (x86_64).
+>
+> It appears that for TARGET_NR_fork and TARGET_NR_vfork, QEMU calls
+> do_fork() with SIGCHLD instead of TARGET_SIGCHLD.
+>
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 
-Yes, sorry, there have been several qemu SRUs pending and this one kept
-getting pushed back. Note that as far as end-users are concerned wrt.
-qemu, 16.04.2 is not really a relevant milestone. You'd still need to
-`apt update; apt upgrade` to get the latest from the repositories -- and
-yes, that version from the repositories does not yet have this fix. I
-believe Christian has it on his todo for the next SRU, though;
-Christian, could you confirm?
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-** Changed in: qemu (Ubuntu Xenial)
-     Assignee: Nish Aravamudan (nacc) =3D> (unassigned)
-
-** Changed in: qemu (Ubuntu Xenial)
-     Assignee: (unassigned) =3D> ChristianEhrhardt (paelzer)
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1490611
-
-Title:
-  Using qemu >=3D2.2.1 to convert raw->VHD (fixed) adds extra padding to
-  the result file, which Microsoft Azure rejects as invalid
-
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Xenial:
-  In Progress
-
-Bug description:
-  [Impact]
-
-  =C2=A0* Starting with a raw disk image, using "qemu-img convert" to conve=
-rt
-  from raw to VHD results in the output VHD file's virtual size being
-  aligned to the nearest 516096 bytes (16 heads x 63 sectors per head x
-  512 bytes per sector), instead of preserving the input file's size as
-  the output VHD's virtual disk size.
-
-  =C2=A0* Microsoft Azure requires that disk images (VHDs) submitted for
-  upload have virtual sizes aligned to a megabyte boundary. (Ex. 4096MB,
-  4097MB, 4098MB, etc. are OK, 4096.5MB is rejected with an error.) This
-  is reflected in Microsoft's documentation: https://azure.microsoft.com
-  /en-us/documentation/articles/virtual-machines-linux-create-upload-
-  vhd-generic/
-
-  =C2=A0* The fix for this bug is a backport from upstream.
-  http://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Dfb9245c2610932d33ce14
-
-  [Test Case]
-
-  =C2=A0* This is reproducible with the following set of commands (including
-  the Azure command line tools from https://github.com/Azure/azure-
-  xplat-cli). For the following example, I used qemu version 2.2.1:
-
-  $ dd if=3D/dev/zero of=3Dsource-disk.img bs=3D1M count=3D4096
-
-  $ stat source-disk.img
-  =C2=A0=C2=A0File: =E2=80=98source-disk.img=E2=80=99
-  =C2=A0=C2=A0Size: 4294967296      Blocks: 798656     IO Block: 4096   reg=
-ular file
-  Device: fc01h/64513d    Inode: 13247963    Links: 1
-  Access: (0644/-rw-r--r--)  Uid: ( 1000/  smkent)   Gid: ( 1000/  smkent)
-  Access: 2015-08-18 09:48:02.613988480 -0700
-  Modify: 2015-08-18 09:48:02.825985646 -0700
-  Change: 2015-08-18 09:48:02.825985646 -0700
-  =C2=A0Birth: -
-
-  $ qemu-img convert -f raw -o subformat=3Dfixed -O vpc source-disk.img
-  dest-disk.vhd
-
-  $ stat dest-disk.vhd
-  =C2=A0=C2=A0File: =E2=80=98dest-disk.vhd=E2=80=99
-  =C2=A0=C2=A0Size: 4296499712      Blocks: 535216     IO Block: 4096   reg=
-ular file
-  Device: fc01h/64513d    Inode: 13247964    Links: 1
-  Access: (0644/-rw-r--r--)  Uid: ( 1000/  smkent)   Gid: ( 1000/  smkent)
-  Access: 2015-08-18 09:50:22.252077624 -0700
-  Modify: 2015-08-18 09:49:24.424868868 -0700
-  Change: 2015-08-18 09:49:24.424868868 -0700
-  =C2=A0Birth: -
-
-  $ azure vm image create testimage1 dest-disk.vhd -o linux -l "West US"
-  info:    Executing command vm image create
-  + Retrieving storage accounts
-  info:    VHD size : 4097 MB
-  info:    Uploading 4195800.5 KB
-  Requested:100.0% Completed:100.0% Running:   0 Time: 1m 0s Speed:  6744 K=
-B/s
-  info:    https://[redacted].blob.core.windows.net/vm-images/dest-disk.vhd=
- was uploaded successfully
-  error:   The VHD https://[redacted].blob.core.windows.net/vm-images/dest-=
-disk.vhd has an unsupported virtual size of 4296499200 bytes.  The size mus=
-t be a whole number (in MBs).
-  info:    Error information has been recorded to /home/smkent/.azure/azure=
-.err
-  error:   vm image create command failed
-
-  =C2=A0* A fixed qemu-img will not result in an error during azure image
-  creation. It will require passing -o force_size, which will leverage
-  the backported functionality.
-
-  [Regression Potential]
-
-  =C2=A0* The upstream fix introduces a qemu-img option (-o force_size) whi=
-ch
-  is unset by default. The regression potential is very low, as a
-  result.
-
-  ...
-
-  I also ran the above commands using qemu 2.4.0, which resulted in the
-  same error as the conversion behavior is the same.
-
-  However, qemu 2.1.1 and earlier (including qemu 2.0.0 installed by
-  Ubuntu 14.04) does not pad the virtual disk size during conversion.
-  Using qemu-img convert from qemu versions <=3D2.1.1 results in a VHD
-  that is exactly the size of the raw input file plus 512 bytes (for the
-  VHD footer). Those qemu versions do not attempt to realign the disk.
-  As a result, Azure accepts VHD files created using those versions of
-  qemu-img convert for upload.
-
-  Is there a reason why newer qemu realigns the converted VHD file? It
-  would be useful if an option were added to disable this feature, as
-  current versions of qemu cannot be used to create VHD files for Azure
-  using Microsoft's official instructions.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1490611/+subscriptions
+> ---
+>  linux-user/syscall.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index f569f82..4d85355 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -7680,7 +7680,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>          break;
+>  #ifdef TARGET_NR_fork
+>      case TARGET_NR_fork:
+> -        ret = get_errno(do_fork(cpu_env, SIGCHLD, 0, 0, 0, 0));
+> +        ret = get_errno(do_fork(cpu_env, TARGET_SIGCHLD, 0, 0, 0, 0));
+>          break;
+>  #endif
+>  #ifdef TARGET_NR_waitpid
+> @@ -10490,7 +10490,8 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>  #endif
+>  #ifdef TARGET_NR_vfork
+>      case TARGET_NR_vfork:
+> -        ret = get_errno(do_fork(cpu_env, CLONE_VFORK | CLONE_VM | SIGCHLD,
+> +        ret = get_errno(do_fork(cpu_env,
+> +                        CLONE_VFORK | CLONE_VM | TARGET_SIGCHLD,
+>                          0, 0, 0, 0));
+>          break;
+>  #endif
+>
