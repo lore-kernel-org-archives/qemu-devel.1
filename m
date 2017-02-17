@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vijay.kilari@gmail.com>) id 1cec60-0001P0-4e
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 01:32:46 -0500
+	(envelope-from <yi.l.liu@intel.com>) id 1cecAg-000506-LQ
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 01:37:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vijay.kilari@gmail.com>) id 1cec5z-0005nw-4G
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 01:32:44 -0500
-From: vijay.kilari@gmail.com
-Date: Fri, 17 Feb 2017 12:01:55 +0530
-Message-Id: <1487313115-9510-6-git-send-email-vijay.kilari@gmail.com>
-In-Reply-To: <1487313115-9510-1-git-send-email-vijay.kilari@gmail.com>
-References: <1487313115-9510-1-git-send-email-vijay.kilari@gmail.com>
-Subject: [Qemu-devel] [PATCH v8 5/5] hw/intc/arm_gicv3_kvm: Reset GICv3 cpu
- interface registers
+	(envelope-from <yi.l.liu@intel.com>) id 1cecAc-0008V3-Pl
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 01:37:33 -0500
+Received: from mga04.intel.com ([192.55.52.120]:29814)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1cecAc-0008U3-EL
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 01:37:30 -0500
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+Date: Fri, 17 Feb 2017 06:36:41 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743900B765@shsmsx102.ccr.corp.intel.com>
+References: <1484026704-28027-1-git-send-email-mst@redhat.com>
+	<1484026704-28027-9-git-send-email-mst@redhat.com>
+	<A2975661238FB949B60364EF0F2C25743900AAEF@shsmsx102.ccr.corp.intel.com>
+	<20170217032619.GL15985@pxdev.xzpeter.org>
+In-Reply-To: <20170217032619.GL15985@pxdev.xzpeter.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PULL 08/41] intel_iommu: support device iotlb
+ descriptor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,106 +31,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, peter.maydell@linaro.org, christoffer.dall@linaro.org, eric.auger@redhat.com
-Cc: p.fedin@samsung.com, marc.zyngier@arm.com, qemu-devel@nongnu.org, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Eduardo
+	Habkost <ehabkost@redhat.com>, Jason Wang <jasowang@redhat.com>, Paolo
+	Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Tian, Kevin" <kevin.tian@intel.com>, "Lan, Tianyu" <tianyu.lan@intel.com>
 
-From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
-
-Reset CPU interface registers of GICv3 when CPU is reset.
-For this, ARMCPRegInfo struct is registered with one ICC
-register whose resetfn is called when cpu is reset.
-
-All the ICC registers are reset under one single register
-reset function instead of calling resetfn for each ICC
-register.
-
-Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
----
- hw/intc/arm_gicv3_kvm.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 58 insertions(+)
-
-diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-index cda1af4..6377dc3 100644
---- a/hw/intc/arm_gicv3_kvm.c
-+++ b/hw/intc/arm_gicv3_kvm.c
-@@ -604,6 +604,34 @@ static void kvm_arm_gicv3_get(GICv3State *s)
-     }
- }
- 
-+static void arm_gicv3_icc_reset(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    ARMCPU *cpu;
-+    GICv3State *s;
-+    GICv3CPUState *c;
-+
-+    c = (GICv3CPUState *)env->gicv3state;
-+    assert(!(!c || !c->cpu || !c->gic));
-+
-+    s = c->gic;
-+    cpu = ARM_CPU(c->cpu);
-+
-+    /* Initialize to actual HW supported configuration */
-+    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS,
-+                      KVM_VGIC_ATTR(ICC_CTLR_EL1, cpu->mp_affinity),
-+                      &c->icc_ctlr_el1[GICV3_NS], false);
-+
-+    c->icc_ctlr_el1[GICV3_S] = c->icc_ctlr_el1[GICV3_NS];
-+    c->icc_pmr_el1 = 0;
-+    c->icc_bpr[GICV3_G0] = GIC_MIN_BPR;
-+    c->icc_bpr[GICV3_G1] = GIC_MIN_BPR;
-+    c->icc_bpr[GICV3_G1NS] = GIC_MIN_BPR;
-+
-+    c->icc_sre_el1 = 0x7;
-+    memset(c->icc_apr, 0, sizeof(c->icc_apr));
-+    memset(c->icc_igrpen, 0, sizeof(c->icc_igrpen));
-+}
-+
- static void kvm_arm_gicv3_reset(DeviceState *dev)
- {
-     GICv3State *s = ARM_GICV3_COMMON(dev);
-@@ -621,6 +649,30 @@ static void kvm_arm_gicv3_reset(DeviceState *dev)
-     kvm_arm_gicv3_put(s);
- }
- 
-+/*
-+ * CPU interface registers of GIC needs to be reset on CPU reset.
-+ * For the calling arm_gicv3_icc_reset() on CPU reset, we register
-+ * below ARMCPRegInfo. As we reset the whole cpu interface under single
-+ * register reset, we define only one register of CPU interface instead
-+ * of defining all the registers.
-+ */
-+static const ARMCPRegInfo gicv3_cpuif_reginfo[] = {
-+    { .name = "ICC_CTLR_EL1", .state = ARM_CP_STATE_BOTH,
-+      .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 12, .opc2 = 4,
-+      .type = ARM_CP_NO_RAW,
-+      .access = PL1_RW,
-+      .readfn = arm_cp_read_zero,
-+      .writefn = arm_cp_write_ignore,
-+      /*
-+       * We hang the whole cpu interface reset routine off here
-+       * rather than parcelling it out into one little function
-+       * per register
-+       */
-+      .resetfn = arm_gicv3_icc_reset,
-+    },
-+    REGINFO_SENTINEL
-+};
-+
- static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
- {
-     GICv3State *s = KVM_ARM_GICV3(dev);
-@@ -644,6 +696,12 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
- 
-     gicv3_init_irqs_and_mmio(s, kvm_arm_gicv3_set_irq, NULL);
- 
-+    for (i = 0; i < s->num_cpu; i++) {
-+        ARMCPU *cpu = ARM_CPU(qemu_get_cpu(i));
-+
-+        define_arm_cp_regs(cpu, gicv3_cpuif_reginfo);
-+    }
-+
-     /* Try to create the device via the device control API */
-     s->dev_fd = kvm_create_device(kvm_state, KVM_DEV_TYPE_ARM_VGIC_V3, false);
-     if (s->dev_fd < 0) {
--- 
-1.9.1
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBl
+dGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBGcmlkYXksIEZlYnJ1YXJ5IDE3LCAyMDE3IDExOjI2
+IEFNDQo+IFRvOiBMaXUsIFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gQ2M6IE1pY2hhZWwg
+Uy4gVHNpcmtpbiA8bXN0QHJlZGhhdC5jb20+OyBxZW11LWRldmVsQG5vbmdudS5vcmc7IFBldGVy
+DQo+IE1heWRlbGwgPHBldGVyLm1heWRlbGxAbGluYXJvLm9yZz47IEVkdWFyZG8gSGFia29zdA0K
+PiA8ZWhhYmtvc3RAcmVkaGF0LmNvbT47IEphc29uIFdhbmcgPGphc293YW5nQHJlZGhhdC5jb20+
+OyBQYW9sbyBCb256aW5pDQo+IDxwYm9uemluaUByZWRoYXQuY29tPjsgUmljaGFyZCBIZW5kZXJz
+b24gPHJ0aEB0d2lkZGxlLm5ldD47IFRpYW4sIEtldmluDQo+IDxrZXZpbi50aWFuQGludGVsLmNv
+bT47IExhbiwgVGlhbnl1IDx0aWFueXUubGFuQGludGVsLmNvbT4NCj4gU3ViamVjdDogUmU6IFtR
+ZW11LWRldmVsXSBbUFVMTCAwOC80MV0gaW50ZWxfaW9tbXU6IHN1cHBvcnQgZGV2aWNlIGlvdGxi
+DQo+IGRlc2NyaXB0b3INCj4gDQo+IE9uIFRodSwgRmViIDE2LCAyMDE3IGF0IDA1OjM2OjA2QU0g
+KzAwMDAsIExpdSwgWWkgTCB3cm90ZToNCj4gPiA+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0t
+DQo+ID4gPiBGcm9tOiBRZW11LWRldmVsDQo+ID4gPiBbbWFpbHRvOnFlbXUtZGV2ZWwtYm91bmNl
+cyt5aS5sLmxpdT1pbnRlbC5jb21Abm9uZ251Lm9yZ10NCj4gPiA+IE9uIEJlaGFsZiBPZiBNaWNo
+YWVsIFMuIFRzaXJraW4NCj4gPiA+IFNlbnQ6IFR1ZXNkYXksIEphbnVhcnkgMTAsIDIwMTcgMTo0
+MCBQTQ0KPiA+ID4gVG86IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiA+ID4gQ2M6IFBldGVyIE1h
+eWRlbGwgPHBldGVyLm1heWRlbGxAbGluYXJvLm9yZz47IEVkdWFyZG8gSGFia29zdA0KPiA+ID4g
+PGVoYWJrb3N0QHJlZGhhdC5jb20+OyBKYXNvbiBXYW5nIDxqYXNvd2FuZ0ByZWRoYXQuY29tPjsg
+UGV0ZXIgWHUNCj4gPiA+IDxwZXRlcnhAcmVkaGF0LmNvbT47IFBhb2xvIEJvbnppbmkgPHBib256
+aW5pQHJlZGhhdC5jb20+OyBSaWNoYXJkDQo+ID4gPiBIZW5kZXJzb24gPHJ0aEB0d2lkZGxlLm5l
+dD4NCj4gPiA+IFN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwOC80MV0gaW50ZWxfaW9tbXU6
+IHN1cHBvcnQgZGV2aWNlIGlvdGxiDQo+ID4gPiBkZXNjcmlwdG9yDQo+ID4gPg0KPiA+ID4gRnJv
+bTogSmFzb24gV2FuZyA8amFzb3dhbmdAcmVkaGF0LmNvbT4NCj4gPiA+DQo+ID4gPiBUaGlzIHBh
+dGNoIGVuYWJsZXMgZGV2aWNlIElPVExCIHN1cHBvcnQgZm9yIGludGVsIGlvbW11LiBUaGUgbWFq
+b3INCj4gPiA+IHdvcmsgaXMgdG8gaW1wbGVtZW50IFFJIGRldmljZSBJT1RMQiBkZXNjcmlwdG9y
+IHByb2Nlc3NpbmcgYW5kDQo+ID4gPiBub3RpZnkgdGhlIGRldmljZSB0aHJvdWdoIGlvbW11IG5v
+dGlmaWVyLg0KPiA+ID4NCj4gPiBIaSBKYXNvbi9NaWNoYWVsLA0KPiA+DQo+ID4gUmVjZW50bHkg
+UGV0ZXIgWHUncyBwYXRjaCBhbHNvIHRvdWNoZWQgaW50ZWwtaW9tbXUgZW11bGF0aW9uLiBIaXMN
+Cj4gPiBwYXRjaCBzaGFkb3dzIHNlY29uZC1sZXZlbCBwYWdlIHRhYmxlIGJ5IGNhcHR1cmluZyBp
+b3RsYiBmbHVzaCBmcm9tDQo+ID4gZ3Vlc3QuIEl0IHdvdWxkIHJlc3VsdCBpbiBwYWdlIHRhYmxl
+IHVwZGF0aW5nIGluIGhvc3QuIERvZXMgdGhpcyBwYXRjaA0KPiA+IGFsc28gdXNlIHRoZSBzYW1l
+IG1hcC91bWFwIEFQSSBwcm92aWRlZCBieSBWRklPPyBJZiBpdCBpcywgdGhlbiBJIHRoaW5rIGl0
+DQo+IHdvdWxkIGFsc28gdXBkYXRlIHBhZ2UgdGFibGUgaW4gaG9zdC4NCj4gDQo+IEkgaGF2ZW4n
+dCBjb25zaWRlcmVkIGNvbXBsZXggc2NlbmFyaW9zLCBidXQgaWYgc2ltcGx5IHdlIGhhdmUgYSBW
+TSB3aXRoIG9uZQ0KPiB2aG9zdCBkZXZpY2UgYW5kIG9uZSB2ZmlvLXBjaSBkZXZpY2UsIGltaG8g
+dGhhdCBzaG91bGQgbm90IGJlIGEgcHJvYmxlbSAtDQo+IGRldmljZSBpb3RsYiBpcyB0YXJnZXRp
+bmcgU0lEIHJhdGhlciB0aGFuIERPTUFJTi4gU28gZGV2aWNlIGlvdGxiIGludmFsaWRhdGlvbnMN
+Cj4gZm9yIHZob3N0IHdpbGwgYmUgc2VudCB0byB2aG9zdCBkZXZpY2Ugb25seS4NCg0KUGV0ZXIs
+IEkgdGhpbmsgZm9yIGFzc2lnbmVkIGRldmljZSwgYWxsIGd1ZXN0IGlvdGxiIGZsdXNoIHNob3Vs
+ZCBiZSB0cmFuc2xhdGVkIHRvDQpiZSB0YXJnZXRpbmcgZGV2aWNlIGluIHRoZSBzY29wZSBvZiBo
+b3N0LiBCZXNpZGVzIHRoZSBzY2VuYXJpbyB3aGljaCBoYXMgdmhvc3QNCmFuZCB2ZmlvLXBjaSBk
+ZXZpY2UgYXQgdGhlIHNhbWUgdGltZSwgaG93IGFib3V0IG9ubHkgaGF2aW5nIHZmaW8tcGNpIGRl
+dmljZQ0KYW5kIHRoaXMgZGV2aWNlIGhhcyBBVFMgc3VwcG9ydC4gVGhlbiB0aGVyZSBzaG91bGQg
+YmUgZGV2aWNlLWlvdGxiIGZsdXNoaW5nLg0KV2l0aCB0aGlzIHBhdGNoIGFuZCB5b3VyIHBhdGNo
+LCBpdCB3b3VsZCBhbHNvIGludHJvZHVjZSB0d28gZmx1c2hpbmcuDQoNCj4gSG93ZXZlciwgdmhv
+c3QgbWF5IHJlY2VpdmUgdHdvIGludmFsaWRhdGlvbnMgaGVyZSwgYnV0IGl0IHdvbid0IG1hdHRl
+ciBtdWNoDQo+IHNpbmNlIHZob3N0IGlzIGp1c3QgZmx1c2hpbmcgY2FjaGVzIHR3aWNlLg0KDQp5
+ZWFoLCBzbyBmYXIgSSBkaWRu4oCZdCBzZWUgZnVuY3Rpb25hbCBpc3N1ZSwgbWF5IGp1c3QgcmVk
+dWNlIHBlcmZvcm1hbmNlXl9eDQoNCj4gPiBJdCBsb29rcyB0byBiZQ0KPiA+IGEgZHVwbGljYXRl
+IHVwZGF0ZS4gUGxzIHJlZmVyIHRvIHRoZSBmb2xsb3dpbmcgc25hcHNob3QgY2FwdHVyZWQgZnJv
+bQ0KPiA+IHNlY3Rpb24gNi41LjIuNSBvZiB2dGQgc3BlYy4NCj4gPg0KPiA+ICJTaW5jZSB0cmFu
+c2xhdGlvbiByZXF1ZXN0cyBmcm9tIGEgZGV2aWNlIG1heSBiZSBzZXJ2aWNlZCBieSBoYXJkd2Fy
+ZQ0KPiA+IGZyb20gdGhlIElPVExCLCBzb2Z0d2FyZSBtdXN0IGFsd2F5cyByZXF1ZXN0IElPVExC
+IGludmFsaWRhdGlvbg0KPiA+IChpb3RsYl9pbnZfZHNjKSBiZWZvcmUgcmVxdWVzdGluZyBjb3Jy
+ZXNwb25kaW5nIERldmljZS1UTEINCj4gPiAoZGV2X3RsYl9pbnZfZHNjKSBpbnZhbGlkYXRpb24u
+Ig0KPiA+DQo+ID4gTWF5YmUgZm9yIGRldmljZS1pb3RsYiwgd2UgbmVlZCBhIHNlcGFyYXRlIEFQ
+SSB3aGljaCBqdXN0IHBhc3MgZG93bg0KPiA+IHRoZSBpbnZhbGlkYXRlIGluZm8gd2l0aG91dCB1
+cGRhdGluZyBwYWdlIHRhYmxlLiBBbnkgdGhvdWdodHM/DQo+IA0KPiBOb3cgaW1obyBJIHNsaWdo
+dGx5IHByZWZlciBqdXN0IHVzZSB0aGUgY3VycmVudCBVTk1BUCBub3RpZmllciB0eXBlIGV2ZW4g
+Zm9yDQo+IGRldmljZSBpb3RsYiBkZXZpY2UuIEJ1dCwgd2UgbWF5IG5lZWQgdG8gZG8gb25lIG1v
+cmUgY2hlY2sgdGhhdCB3ZSBza2lwDQo+IHNlbmRpbmcgZ2VuZXJhbCBpb3RsYiBpbnZhbGlkYXRp
+b25zIHRvIEFUUyBlbmFibGVkIGRldmljZXMgbGlrZSB2aG9zdCwgdG8gYXZvaWQNCj4gZHVwbGlj
+YXRlZCBjYWNoZSBmbHVzaGluZy4gRnJvbSB2aXJ0LXN2bSBzaWRlLCBkbyB3ZSBoYXZlIHNwZWNp
+ZmljIHJlcXVpcmVtZW50DQo+IHRvIGludHJvZHVjZSBhIG5ldyBmbGFnIGZvciBpdD8NCkkgdGhp
+bmsgaXQgaXMgYSBwcmFjdGljYWwgc29sdXRpb24gdG8gZG8gc3VjaCBhIGNoZWNrIHRvIGF2b2lk
+IGR1cGxpY2F0ZSBmbHVzaGluZy4NCg0KRm9yIHZpcnQtc3ZtLCByZXF1aXJlbWVudCBpcyBhIGxp
+dHRsZSBiaXQgZGlmZmVyZW50IHNpbmNlIGl0J3Mgbm90IHNoYWRvd2luZyBhbnkgZ3Vlc3QNCnBh
+Z2UgdGFibGUuIEl0IG5lZWRzIHRvIHNoYWRvdyBpbnZhbGlkYXRlIG9wZXJhdGlvbnMuIFNvIHZp
+cnQtc3ZtIHdpbGwgbm90IHVzZQ0KTUFQL1VOTUFQIG5vdGlmaWVyLiBJbnN0ZWFkLCBpdCBtYXkg
+cmVxdWlyZSBub3RpZmllciB3aGljaCBwYXNzZG93biBpbnZhbGlkYXRlDQppbmZvIGFuZCB0aGVu
+IHN1Ym1pdCBpbnZhbGlkYXRpb24gZGlyZWN0bHkuKG5vIHBhZ2UgdGFibGUgdXBkYXRpbmcgaW4g
+aG9zdCkuIA0KDQpSZWdhcmRzLA0KWWkgTA0KDQo=
