@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1ceWm9-0001HT-3D
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 19:51:55 -0500
+	(envelope-from <bobby.prani@gmail.com>) id 1ceWom-0003tY-FR
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 19:54:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1ceWm8-0007sB-4p
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 19:51:53 -0500
-From: Nir Soffer <nirsof@gmail.com>
-Date: Fri, 17 Feb 2017 02:51:27 +0200
-Message-Id: <20170217005127.21010-4-nirsof@gmail.com>
-In-Reply-To: <20170217005127.21010-1-nirsof@gmail.com>
-References: <20170217005127.21010-1-nirsof@gmail.com>
-Subject: [Qemu-devel] [PATCH 3/3] qemu-img: Improve documentation for
- PREALLOC_MODE_FALLOC
+	(envelope-from <bobby.prani@gmail.com>) id 1ceWoj-0001ot-Ti
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 19:54:36 -0500
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:33228)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1ceWoj-0001oS-Pv
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 19:54:33 -0500
+Received: by mail-qk0-x242.google.com with SMTP id 11so4721565qkl.0
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 16:54:33 -0800 (PST)
+From: Pranith Kumar <bobby.prani@gmail.com>
+Date: Thu, 16 Feb 2017 19:54:29 -0500
+Message-Id: <20170217005431.4016-1-bobby.prani@gmail.com>
+Subject: [Qemu-devel] [PATCH 0/2] Add mardown formatting to README
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,37 +24,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, Nir Soffer <nirsof@gmail.com>
+To: alex.bennee@linaro.org
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, peter.maydell@linaro.org, berrange@redhat.com, eblake@redhat.com
 
-Now that we are truncating the file in both PREALLOC_MODE_FULL and
-PREALLOC_MODE_OFF, not truncating in PREALLOC_MODE_FALLOC looks odd.
-Add a comment explaining why we do not truncate in this case.
+Also create README.md as a symlink to README so that github displays
+markdown.
 
-Signed-off-by: Nir Soffer <nirsof@gmail.com>
----
- block/file-posix.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+Update the README file to markdown so that it makes the github page
+look prettier. I know that github repo is a mirror and not the
+official repo, but I think it doesn't hurt to have it in markdown
+format.
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index d24e34b..20a261f 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1594,9 +1594,14 @@ static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
-     switch (prealloc) {
- #ifdef CONFIG_POSIX_FALLOCATE
-     case PREALLOC_MODE_FALLOC:
--        /* posix_fallocate() doesn't set errno. */
-+        /*
-+         * Truncating before posix_fallocate() makes it about twice slower on
-+         * file systems that do not support fallocate(), trying to check if a
-+         * block is allocated before allocating it.
-+         */
-         result = -posix_fallocate(fd, 0, total_size);
-         if (result != 0) {
-+            /* posix_fallocate() doesn't set errno. */
-             error_setg_errno(errp, -result,
-                              "Could not preallocate data for the new file");
-         }
+The last time we tried, it caused issues for building installers and
+the check patch. Creating a symlink will hopefully avoid those.
+
+To compare, you can take a look at the following links:
+
+old: https://github.com/pranith/qemu/
+new: https://github.com/pranith/qemu/tree/readme
+
+Pranith Kumar (2):
+  Update README to accomodate markdown format
+  Create README.md as a symlink to README
+
+ README    | 44 +++++++++++++++++++++-----------------------
+ README.md |  1 +
+ 2 files changed, 22 insertions(+), 23 deletions(-)
+ create mode 120000 README.md
+
 -- 
-2.9.3
+2.11.0
