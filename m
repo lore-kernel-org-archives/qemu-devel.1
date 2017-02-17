@@ -1,34 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cedvh-0004JQ-7j
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:30:17 -0500
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cedw0-0004b0-MZ
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:30:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cedvc-0001HS-AC
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:30:13 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38007)
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cedvv-0001Sd-Oa
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:30:32 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51694)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1cedvc-0001Fp-0a
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:30:08 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	id 1cedvv-0001Rt-F1
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:30:27 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1H8T1NF130750
-	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 03:30:07 -0500
+	v1H8SxYG006125
+	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 03:30:26 -0500
 Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28npefx8pe-1
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28nnyayc0x-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 03:30:06 -0500
+	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 03:30:26 -0500
 Received: from localhost
 	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Fri, 17 Feb 2017 03:30:05 -0500
+	Fri, 17 Feb 2017 03:30:25 -0500
 From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Date: Fri, 17 Feb 2017 09:29:31 +0100
+Date: Fri, 17 Feb 2017 09:29:39 +0100
 In-Reply-To: <20170217082939.33208-1-bjsdjshi@linux.vnet.ibm.com>
 References: <20170217082939.33208-1-bjsdjshi@linux.vnet.ibm.com>
-Message-Id: <20170217082939.33208-8-bjsdjshi@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH RFC v3 07/15] vfio: ccw: introduce ccw_io_region
+Message-Id: <20170217082939.33208-16-bjsdjshi@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH RFC v3 15/15] vfio: ccw: introduce support for
+ ccw0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,160 +41,132 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org
 Cc: bjsdjshi@linux.vnet.ibm.com, renxiaof@linux.vnet.ibm.com, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, wkywang@linux.vnet.ibm.com
 
-To provide user-space a set of interfaces to:
-1. pass in a ccw program to perform an I/O operation.
-2. read back I/O results of the completed I/O operations.
-We introduce an MMIO region for the vfio-ccw device here.
+Although Linux does not use format-0 channel command words (CCW0)
+these are a non-optional part of the platform spec, and for the sake
+of platform compliance, and possibly some non-Linux guests, we have
+to support CCW0.
 
-This region is defined to content:
-1. areas to store arguments that an ssch required.
-2. areas to store the I/O results.
+Making the kernel execute a format 0 channel program is too much hassle
+because we would need to allocate and use memory which can be addressed
+by 24 bit physical addresses (because of CCW0.cda). So we implement CCW0
+support by translating the channel program into an equivalent CCW1
+program instead.
 
-Using pwrite/pread to the device on this region, a user-space program
-could write/read data to/from the vfio-ccw device.
-
+Signed-off-by: Kai Yue Wang <wkywang@linux.vnet.ibm.com>
 Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
 ---
- arch/s390/include/uapi/asm/Kbuild   |  1 +
- drivers/s390/cio/vfio_ccw_ops.c     | 47 +++++++++++++++++++++++++++++++++++++
- drivers/s390/cio/vfio_ccw_private.h |  4 ++++
- include/uapi/linux/vfio_ccw.h       | 24 +++++++++++++++++++
- 4 files changed, 76 insertions(+)
- create mode 100644 include/uapi/linux/vfio_ccw.h
+ arch/s390/Kconfig              |  7 +++++
+ drivers/s390/cio/vfio_ccw_cp.c | 58 ++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 63 insertions(+), 2 deletions(-)
 
-diff --git a/arch/s390/include/uapi/asm/Kbuild b/arch/s390/include/uapi/asm/Kbuild
-index bf736e7..fdb9529 100644
---- a/arch/s390/include/uapi/asm/Kbuild
-+++ b/arch/s390/include/uapi/asm/Kbuild
-@@ -52,3 +52,4 @@ header-y += unistd.h
- header-y += virtio-ccw.h
- header-y += vtoc.h
- header-y += zcrypt.h
-+header-y += vfio_ccw.h
-diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw_ops.c
-index b8a2fed..6c06805 100644
---- a/drivers/s390/cio/vfio_ccw_ops.c
-+++ b/drivers/s390/cio/vfio_ccw_ops.c
-@@ -127,6 +127,51 @@ void vfio_ccw_mdev_release(struct mdev_device *mdev)
- 				 &private->nb);
+diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
+index 32008b8..f25d077 100644
+--- a/arch/s390/Kconfig
++++ b/arch/s390/Kconfig
+@@ -680,6 +680,13 @@ config VFIO_CCW
+ 	  To compile this driver as a module, choose M here: the
+ 	  module will be called vfio_ccw.
+ 
++config VFIO_CCW_CCW0
++	def_bool n
++	prompt "Support for CCW0 translation"
++	depends on VFIO_CCW
++	help
++	  Enable translation for CCW0 programs for VFIO-CCW subchannels.
++
+ endmenu
+ 
+ menu "Dump support"
+diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+index 16bbb54..b0a8bc05 100644
+--- a/drivers/s390/cio/vfio_ccw_cp.c
++++ b/drivers/s390/cio/vfio_ccw_cp.c
+@@ -15,6 +15,26 @@
+ 
+ #include "vfio_ccw_cp.h"
+ 
++#ifdef CONFIG_VFIO_CCW_CCW0
++/**
++ * struct ccw0 - channel command word
++ * @cmd_code: command code
++ * @cda: data address
++ * @flags: flags, like IDA addressing, etc.
++ * @reserved: will be ignored
++ * @count: byte count
++ *
++ * The format-0 ccw structure.
++ */
++struct ccw0 {
++	__u8 cmd_code;
++	__u32 cda : 24;
++	__u8  flags;
++	__u8  reserved;
++	__u16 count;
++} __packed __aligned(8);
++#endif
++
+ /*
+  * Max length for ccw chain.
+  * XXX: Limit to 256, need to check more?
+@@ -243,12 +263,42 @@ static long copy_from_iova(struct device *mdev,
+ 	return l;
  }
  
-+static ssize_t vfio_ccw_mdev_read(struct mdev_device *mdev,
-+				  char __user *buf,
-+				  size_t count,
-+				  loff_t *ppos)
++#ifdef CONFIG_VFIO_CCW_CCW0
++static long copy_ccw_from_iova(struct channel_program *cp,
++			       struct ccw1 *to, u64 iova,
++			       unsigned long len)
 +{
-+	struct vfio_ccw_private *private;
-+	struct ccw_io_region *region;
++	struct ccw0 ccw0;
++	struct ccw1 *pccw1;
++	int ret;
++	int i;
 +
-+	if (*ppos + count > sizeof(*region))
-+		return -EINVAL;
++	ret = copy_from_iova(cp->mdev, to, iova, len * sizeof(struct ccw1));
++	if (ret)
++		return ret;
 +
-+	private = dev_get_drvdata(mdev_parent_dev(mdev));
-+	if (!private)
-+		return -ENODEV;
++	if (!cp->orb.cmd.fmt) {
++		pccw1 = to;
++		for (i = 0; i < len; i++) {
++			ccw0 = *(struct ccw0 *)pccw1;
++			pccw1->cmd_code = ccw0.cmd_code;
++			pccw1->flags = ccw0.flags;
++			pccw1->count = ccw0.count;
++			pccw1->cda = ccw0.cda;
++			pccw1++;
++		}
++	}
 +
-+	region = &private->io_region;
-+	if (copy_to_user(buf, (void *)region + *ppos, count))
-+		return -EFAULT;
-+
-+	return count;
++	return ret;
 +}
-+
-+static ssize_t vfio_ccw_mdev_write(struct mdev_device *mdev,
-+				   const char __user *buf,
-+				   size_t count,
-+				   loff_t *ppos)
-+{
-+	struct vfio_ccw_private *private;
-+	struct ccw_io_region *region;
-+
-+	if (*ppos + count > sizeof(*region))
-+		return -EINVAL;
-+
-+	private = dev_get_drvdata(mdev_parent_dev(mdev));
-+	if (!private)
-+		return -ENODEV;
-+
-+	region = &private->io_region;
-+	if (copy_from_user((void *)region + *ppos, buf, count))
-+		return -EFAULT;
-+	region->ret_code = 0;
-+
-+	return count;
-+}
-+
- static const struct mdev_parent_ops vfio_ccw_mdev_ops = {
- 	.owner			= THIS_MODULE,
- 	.supported_type_groups  = mdev_type_groups,
-@@ -134,6 +179,8 @@ static const struct mdev_parent_ops vfio_ccw_mdev_ops = {
- 	.remove			= vfio_ccw_mdev_remove,
- 	.open			= vfio_ccw_mdev_open,
- 	.release		= vfio_ccw_mdev_release,
-+	.read			= vfio_ccw_mdev_read,
-+	.write			= vfio_ccw_mdev_write,
- };
- 
- int vfio_ccw_mdev_reg(struct subchannel *sch)
-diff --git a/drivers/s390/cio/vfio_ccw_private.h b/drivers/s390/cio/vfio_ccw_private.h
-index 5afb3ba..359e96b 100644
---- a/drivers/s390/cio/vfio_ccw_private.h
-+++ b/drivers/s390/cio/vfio_ccw_private.h
-@@ -10,6 +10,8 @@
- #ifndef _VFIO_CCW_PRIVATE_H_
- #define _VFIO_CCW_PRIVATE_H_
- 
-+#include <linux/vfio_ccw.h>
-+
- #include "css.h"
- 
- /**
-@@ -19,6 +21,7 @@
-  * @avail: available for creating a mediated device
-  * @mdev: pointer to the mediated device
-  * @nb: notifier for vfio events
-+ * @io_region: MMIO region to input/output I/O arguments/results
-  */
- struct vfio_ccw_private {
- 	struct subchannel	*sch;
-@@ -26,6 +29,7 @@ struct vfio_ccw_private {
- 	atomic_t		avail;
- 	struct mdev_device	*mdev;
- 	struct notifier_block	nb;
-+	struct ccw_io_region	io_region;
- } __aligned(8);
- 
- extern int vfio_ccw_mdev_reg(struct subchannel *sch);
-diff --git a/include/uapi/linux/vfio_ccw.h b/include/uapi/linux/vfio_ccw.h
-new file mode 100644
-index 0000000..34a7f6f
---- /dev/null
-+++ b/include/uapi/linux/vfio_ccw.h
-@@ -0,0 +1,24 @@
-+/*
-+ * Interfaces for vfio-ccw
-+ *
-+ * Copyright IBM Corp. 2017
-+ *
-+ * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-+ */
-+
-+#ifndef _VFIO_CCW_H_
-+#define _VFIO_CCW_H_
-+
-+#include <linux/types.h>
-+
-+struct ccw_io_region {
-+#define ORB_AREA_SIZE 12
-+	__u8	orb_area[ORB_AREA_SIZE];
-+#define SCSW_AREA_SIZE 12
-+	__u8	scsw_area[SCSW_AREA_SIZE];
-+#define IRB_AREA_SIZE 96
-+	__u8	irb_area[IRB_AREA_SIZE];
-+	__u32	ret_code;
-+} __packed;
-+
++#else
+ static long copy_ccw_from_iova(struct channel_program *cp,
+ 			       struct ccw1 *to, u64 iova,
+ 			       unsigned long len)
+ {
+ 	return copy_from_iova(cp->mdev, to, iova, len * sizeof(struct ccw1));
+ }
 +#endif
+ 
+ /*
+  * Helpers to operate ccwchain.
+@@ -616,10 +666,14 @@ int cp_init(struct channel_program *cp, struct device *mdev, union orb *orb)
+ 	 * Only support prefetch enable mode now.
+ 	 * Only support 64bit addressing idal.
+ 	 * Only support 4k IDAW.
+-	 * Only support ccw1.
+ 	 */
+-	if (!orb->cmd.pfch || !orb->cmd.c64 || orb->cmd.i2k || !orb->cmd.fmt)
++	if (!orb->cmd.pfch || !orb->cmd.c64 || orb->cmd.i2k)
++		return -EOPNOTSUPP;
++
++#ifndef CONFIG_VFIO_CCW_CCW0
++	if (!orb->cmd.fmt)
+ 		return -EOPNOTSUPP;
++#endif
+ 
+ 	INIT_LIST_HEAD(&cp->ccwchain_list);
+ 	memcpy(&cp->orb, orb, sizeof(*orb));
 -- 
 2.8.4
