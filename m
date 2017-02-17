@@ -1,18 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <franklinmathieu@gmail.com>) id 1ceeNF-0006NT-RC
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:58:42 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1ceeP2-00082Y-ES
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 04:00:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <franklinmathieu@gmail.com>) id 1ceeNC-0001Vo-N0
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:58:41 -0500
-From: Franklin Snaipe Mathieu <snaipe@diacritic.io>
-Date: Fri, 17 Feb 2017 08:58:00 +0000
-Message-Id: <20170217085800.28873-2-snaipe@diacritic.io>
-In-Reply-To: <20170217085800.28873-1-snaipe@diacritic.io>
-References: <20170216085857.23501-1-snaipe@diacritic.io>
-	<20170217085800.28873-1-snaipe@diacritic.io>
-Subject: [Qemu-devel] [PATCH v2] syscall: fixed mincore(2) not failing with
- ENOMEM
+	(envelope-from <eric.auger@redhat.com>) id 1ceeP1-0002PK-HQ
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 04:00:32 -0500
+References: <1485879782-6075-1-git-send-email-vijay.kilari@gmail.com>
+	<1485879782-6075-3-git-send-email-vijay.kilari@gmail.com>
+	<CAFEAcA_K2TcihHTTrrr7kZ3pGZ3BNptDb0mt5Rc0YinkGD1eHQ@mail.gmail.com>
+	<CALicx6v7B3145pJXsOcgGass8xG4HHY7=iA6gEHKbMcHxqQD-A@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <bebfa013-8627-83d2-85bc-7ae55131ea48@redhat.com>
+Date: Fri, 17 Feb 2017 10:00:18 +0100
+MIME-Version: 1.0
+In-Reply-To: <CALicx6v7B3145pJXsOcgGass8xG4HHY7=iA6gEHKbMcHxqQD-A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 RESEND 2/5] hw/intc/arm_gicv3_kvm: Add
+ ICC_SRE_EL1 register to vmstate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,50 +26,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, snaipe@arista.com, "Franklin \"Snaipe\" Mathieu" <snaipe@diacritic.io>, Riku Voipio <riku.voipio@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: Vijay Kilari <vijay.kilari@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Christoffer Dall <christoffer.dall@linaro.org>, Pavel Fedin <p.fedin@samsung.com>, Marc Zyngier <marc.zyngier@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 
-From: "Franklin \"Snaipe\" Mathieu" <snaipe@diacritic.io>
+Hi Vijaya,
 
-The current implementation of the mincore(2) syscall sets errno to
-EFAULT when the region identified by the first two parameters is
-invalid.
+On 13/02/2017 13:17, Vijay Kilari wrote:
+> On Tue, Feb 7, 2017 at 8:09 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> On 31 January 2017 at 16:22,  <vijay.kilari@gmail.com> wrote:
+>>> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+>>>
+>>> To Save and Restore ICC_SRE_EL1 register Add ICC_SRE_EL1 register
+>>> to vmstate and GICv3CPUState struct.
+>>>
+>>> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+>>> ---
+>>>  hw/intc/arm_gicv3_common.c         | 1 +
+>>>  include/hw/intc/arm_gicv3_common.h | 1 +
+>>>  2 files changed, 2 insertions(+)
+>>>
+>>> diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
+>>> index 0f8c4b8..f3245d9 100644
+>>> --- a/hw/intc/arm_gicv3_common.c
+>>> +++ b/hw/intc/arm_gicv3_common.c
+>>> @@ -68,6 +68,7 @@ static const VMStateDescription vmstate_gicv3_cpu = {
+>>>          VMSTATE_UINT32(gicr_igrpmodr0, GICv3CPUState),
+>>>          VMSTATE_UINT32(gicr_nsacr, GICv3CPUState),
+>>>          VMSTATE_UINT8_ARRAY(gicr_ipriorityr, GICv3CPUState, GIC_INTERNAL),
+>>> +        VMSTATE_UINT64(icc_sre_el1, GICv3CPUState),
+>>>          VMSTATE_UINT64_ARRAY(icc_ctlr_el1, GICv3CPUState, 2),
+>>>          VMSTATE_UINT64(icc_pmr_el1, GICv3CPUState),
+>>>          VMSTATE_UINT64_ARRAY(icc_bpr, GICv3CPUState, 3),
+>>> diff --git a/include/hw/intc/arm_gicv3_common.h b/include/hw/intc/arm_gicv3_common.h
+>>> index 341a311..183c7f8 100644
+>>> --- a/include/hw/intc/arm_gicv3_common.h
+>>> +++ b/include/hw/intc/arm_gicv3_common.h
+>>> @@ -166,6 +166,7 @@ struct GICv3CPUState {
+>>>      uint8_t gicr_ipriorityr[GIC_INTERNAL];
+>>>
+>>>      /* CPU interface */
+>>> +    uint64_t icc_sre_el1;
+>>>      uint64_t icc_ctlr_el1[2];
+>>>      uint64_t icc_pmr_el1;
+>>>      uint64_t icc_bpr[3];
+>>
+>> This breaks migration compatibility for TCG using GICv3; you
+>> need to do something here with a VMState subsection so
+>> the new register is only transferred if it's non-zero.
+> 
+> So, you mean to put a check in kvm_arm_gicv3_put() and
+> kvm_arm_gicv3_get() to check for non-zero value?
+> icc_sre_el1 is always non-zero reset to 0xf in TCG and 0x7 in KVM mode.
+In hw/intc/arm_gicv3_cpuif.c we have
+    { .name = "ICC_SRE_EL1", .state = ARM_CP_STATE_BOTH,
+	../..
+      .resetvalue = 0x7,
+    },
+where did you find the TCG reset value equal to 0xF? I am not able to
+find it.
 
-This goes against the man page specification, where mincore(2) should
-only fail with EFAULT when the third parameter is an invalid address;
-and fail with ENOMEM when the checked region does not point to mapped
-memory.
+Thanks
 
-Signed-off-by: Franklin "Snaipe" Mathieu <snaipe@diacritic.io>
-Cc: Riku Voipio <riku.voipio@linaro.org>
-Cc: Aurelien Jarno <aurelien@aurel32.net>
----
- linux-user/syscall.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+Eric
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 9be8e9530e..733e0009e1 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -11061,11 +11061,16 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-     case TARGET_NR_mincore:
-         {
-             void *a;
-+            ret = -TARGET_ENOMEM;
-+            a = lock_user(VERIFY_READ, arg1, arg2, 0);
-+            if (!a) {
-+                goto fail;
-+            }
-             ret = -TARGET_EFAULT;
--            if (!(a = lock_user(VERIFY_READ, arg1,arg2, 0)))
--                goto efault;
--            if (!(p = lock_user_string(arg3)))
-+            p = lock_user_string(arg3);
-+            if (!p) {
-                 goto mincore_fail;
-+            }
-             ret = get_errno(mincore(a, arg2, p));
-             unlock_user(p, arg3, ret);
-             mincore_fail:
--- 
-2.11.0
+> 
+>>
+>> thanks
+>> -- PMM
