@@ -1,20 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ceWkl-00009r-LD
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 19:50:28 -0500
+	(envelope-from <nirsof@gmail.com>) id 1ceWm6-00018R-Ef
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 19:51:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ceWkh-0006p2-NR
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 19:50:27 -0500
-Date: Fri, 17 Feb 2017 08:50:18 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170217005018.GA21716@lemon.lan>
-References: <20170216085857.23501-1-snaipe@diacritic.io>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170216085857.23501-1-snaipe@diacritic.io>
-Subject: Re: [Qemu-devel] [PATCH] syscall: fixed mincore(2) not failing with
- ENOMEM
+	(envelope-from <nirsof@gmail.com>) id 1ceWm3-0007nK-Ta
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 19:51:50 -0500
+From: Nir Soffer <nirsof@gmail.com>
+Date: Fri, 17 Feb 2017 02:51:24 +0200
+Message-Id: <20170217005127.21010-1-nirsof@gmail.com>
+Subject: [Qemu-devel] [PATCH 0/3] qemu-img raw preallocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,13 +17,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Franklin Snaipe Mathieu <snaipe@diacritic.io>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, snaipe@arista.com, Riku Voipio <riku.voipio@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, Nir Soffer <nirsof@gmail.com>
 
-On Thu, 02/16 08:58, Franklin Snaipe Mathieu wrote:
-> +            p = lock_user_string(arg3)
-> +            if (!p) {
+This series add missing tests for raw image preallocation, refine
+preallocation=full and improve documentation.
 
-Please compile test at least, even if it is a trivial patch.
+Create on top of the commit	10ddfe7b6044 (qemu-img: Do not truncate
+before preallocation) from Kevin block branch.
 
-Fam
+Nir Soffer (3):
+  qemu-img: Add tests for raw image preallocation
+  qemu-img: Truncate before full preallocation
+  qemu-img: Improve documentation for PREALLOC_MODE_FALLOC
+
+ block/file-posix.c         | 19 ++++++++++++++-
+ tests/qemu-iotests/175     | 61 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/175.out | 18 ++++++++++++++
+ tests/qemu-iotests/group   |  1 +
+ 4 files changed, 98 insertions(+), 1 deletion(-)
+ create mode 100755 tests/qemu-iotests/175
+ create mode 100644 tests/qemu-iotests/175.out
+
+-- 
+2.9.3
