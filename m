@@ -1,32 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35588)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cer75-0002Ty-IZ
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 17:34:52 -0500
+	(envelope-from <bounces@canonical.com>) id 1cerC6-0004GX-4S
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 17:40:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cer70-00029S-Mw
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 17:34:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47478)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cer70-00028v-Fv
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 17:34:46 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 73DA183F38
-	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 22:34:46 +0000 (UTC)
-References: <1487363905-9480-1-git-send-email-armbru@redhat.com>
-	<1487363905-9480-3-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b886937d-ed47-6ae5-f7da-3bea4f2d122d@redhat.com>
-Date: Fri, 17 Feb 2017 16:34:44 -0600
+	(envelope-from <bounces@canonical.com>) id 1cerC2-0004KR-4R
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 17:40:02 -0500
+Received: from indium.canonical.com ([91.189.90.7]:33545)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cerC1-0004K0-V2
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 17:39:58 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cerBz-0008Du-HJ
+	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 22:39:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8054B2E80C4
+	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 22:39:55 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1487363905-9480-3-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="IhL9x8f26coHnhMU0Vig0lRDccD3iMEpx"
-Subject: Re: [Qemu-devel] [PATCH 02/14] check-qdict: Simplify
- qdict_crumple_test_recursive()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 17 Feb 2017 22:29:05 -0000
+From: Nish Aravamudan <nish.aravamudan@canonical.com>
+Reply-To: Bug 1490611 <1490611@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150831152901.21817.58033.malonedeb@gac.canonical.com>
+Message-Id: <20170217222905.6449.56435.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1490611] Re: Using qemu >=2.2.1 to convert
+ raw->VHD (fixed) adds extra padding to the result file,
+ which Microsoft Azure rejects as invalid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,60 +38,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---IhL9x8f26coHnhMU0Vig0lRDccD3iMEpx
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <b886937d-ed47-6ae5-f7da-3bea4f2d122d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 02/14] check-qdict: Simplify
- qdict_crumple_test_recursive()
-References: <1487363905-9480-1-git-send-email-armbru@redhat.com>
- <1487363905-9480-3-git-send-email-armbru@redhat.com>
-In-Reply-To: <1487363905-9480-3-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hello Alexandre,
 
-On 02/17/2017 02:38 PM, Markus Armbruster wrote:
-> Use qdict_get_qdict(), qdict_get_qlist() instead of qdict_get()
-> followed by qobject_to_qdict(), qobject_to_qlist().
+Yes, sorry, there have been several qemu SRUs pending and this one kept
+getting pushed back. Note that as far as end-users are concerned wrt.
+qemu, 16.04.2 is not really a relevant milestone. You'd still need to
+`apt update; apt upgrade` to get the latest from the repositories -- and
+yes, that version from the repositories does not yet have this fix. I
+believe Christian has it on his todo for the next SRU, though;
+Christian, could you confirm?
 
-Worth a Coccinelle script to make sure we catch it all?
+** Changed in: qemu (Ubuntu Xenial)
+     Assignee: Nish Aravamudan (nacc) =3D> (unassigned)
 
->=20
-> While there, drop some redundant code.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  tests/check-qdict.c | 25 +++++++++----------------
->  1 file changed, 9 insertions(+), 16 deletions(-)
->=20
+** Changed in: qemu (Ubuntu Xenial)
+     Assignee: (unassigned) =3D> ChristianEhrhardt (paelzer)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+-- =
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1490611
 
+Title:
+  Using qemu >=3D2.2.1 to convert raw->VHD (fixed) adds extra padding to
+  the result file, which Microsoft Azure rejects as invalid
 
---IhL9x8f26coHnhMU0Vig0lRDccD3iMEpx
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Xenial:
+  In Progress
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Bug description:
+  [Impact]
 
-iQEcBAEBCAAGBQJYp3qEAAoJEKeha0olJ0NqQVkIAJ8m0vr4LdotPzTplywFVnjV
-9nRR/f+zk+X/tZIw1MZwq/3MPoeG1LSoX0PJH+jmNyFTXB5K6CMOVTMvs/+V7C9K
-UU60zmVWA/e4RZW5nqC60xpMA4b2r5PpeJVwG+79R4h1teIWj99uQETLrdHL7nfp
-vcjHBTZOmczoVKuxyg7Bj7NS347QtssmNDu6jctojZ2U77Qjm0WL2ybw6f8NOLSw
-3yPkIX63MYdblcoxmpjm9XPNv+bHY6myVorYwNxOVPG2Ko9pjsnh+zj+bvDT7Y+d
-S0lE0jZLyK7ILUpZVn5PAe47hUGIKdeVo8NGObPgN4bGujMkii9a6Meqp5EQ2m0=
-=rJcE
------END PGP SIGNATURE-----
+  =C2=A0* Starting with a raw disk image, using "qemu-img convert" to conve=
+rt
+  from raw to VHD results in the output VHD file's virtual size being
+  aligned to the nearest 516096 bytes (16 heads x 63 sectors per head x
+  512 bytes per sector), instead of preserving the input file's size as
+  the output VHD's virtual disk size.
 
---IhL9x8f26coHnhMU0Vig0lRDccD3iMEpx--
+  =C2=A0* Microsoft Azure requires that disk images (VHDs) submitted for
+  upload have virtual sizes aligned to a megabyte boundary. (Ex. 4096MB,
+  4097MB, 4098MB, etc. are OK, 4096.5MB is rejected with an error.) This
+  is reflected in Microsoft's documentation: https://azure.microsoft.com
+  /en-us/documentation/articles/virtual-machines-linux-create-upload-
+  vhd-generic/
+
+  =C2=A0* The fix for this bug is a backport from upstream.
+  http://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Dfb9245c2610932d33ce14
+
+  [Test Case]
+
+  =C2=A0* This is reproducible with the following set of commands (including
+  the Azure command line tools from https://github.com/Azure/azure-
+  xplat-cli). For the following example, I used qemu version 2.2.1:
+
+  $ dd if=3D/dev/zero of=3Dsource-disk.img bs=3D1M count=3D4096
+
+  $ stat source-disk.img
+  =C2=A0=C2=A0File: =E2=80=98source-disk.img=E2=80=99
+  =C2=A0=C2=A0Size: 4294967296      Blocks: 798656     IO Block: 4096   reg=
+ular file
+  Device: fc01h/64513d    Inode: 13247963    Links: 1
+  Access: (0644/-rw-r--r--)  Uid: ( 1000/  smkent)   Gid: ( 1000/  smkent)
+  Access: 2015-08-18 09:48:02.613988480 -0700
+  Modify: 2015-08-18 09:48:02.825985646 -0700
+  Change: 2015-08-18 09:48:02.825985646 -0700
+  =C2=A0Birth: -
+
+  $ qemu-img convert -f raw -o subformat=3Dfixed -O vpc source-disk.img
+  dest-disk.vhd
+
+  $ stat dest-disk.vhd
+  =C2=A0=C2=A0File: =E2=80=98dest-disk.vhd=E2=80=99
+  =C2=A0=C2=A0Size: 4296499712      Blocks: 535216     IO Block: 4096   reg=
+ular file
+  Device: fc01h/64513d    Inode: 13247964    Links: 1
+  Access: (0644/-rw-r--r--)  Uid: ( 1000/  smkent)   Gid: ( 1000/  smkent)
+  Access: 2015-08-18 09:50:22.252077624 -0700
+  Modify: 2015-08-18 09:49:24.424868868 -0700
+  Change: 2015-08-18 09:49:24.424868868 -0700
+  =C2=A0Birth: -
+
+  $ azure vm image create testimage1 dest-disk.vhd -o linux -l "West US"
+  info:    Executing command vm image create
+  + Retrieving storage accounts
+  info:    VHD size : 4097 MB
+  info:    Uploading 4195800.5 KB
+  Requested:100.0% Completed:100.0% Running:   0 Time: 1m 0s Speed:  6744 K=
+B/s
+  info:    https://[redacted].blob.core.windows.net/vm-images/dest-disk.vhd=
+ was uploaded successfully
+  error:   The VHD https://[redacted].blob.core.windows.net/vm-images/dest-=
+disk.vhd has an unsupported virtual size of 4296499200 bytes.  The size mus=
+t be a whole number (in MBs).
+  info:    Error information has been recorded to /home/smkent/.azure/azure=
+.err
+  error:   vm image create command failed
+
+  =C2=A0* A fixed qemu-img will not result in an error during azure image
+  creation. It will require passing -o force_size, which will leverage
+  the backported functionality.
+
+  [Regression Potential]
+
+  =C2=A0* The upstream fix introduces a qemu-img option (-o force_size) whi=
+ch
+  is unset by default. The regression potential is very low, as a
+  result.
+
+  ...
+
+  I also ran the above commands using qemu 2.4.0, which resulted in the
+  same error as the conversion behavior is the same.
+
+  However, qemu 2.1.1 and earlier (including qemu 2.0.0 installed by
+  Ubuntu 14.04) does not pad the virtual disk size during conversion.
+  Using qemu-img convert from qemu versions <=3D2.1.1 results in a VHD
+  that is exactly the size of the raw input file plus 512 bytes (for the
+  VHD footer). Those qemu versions do not attempt to realign the disk.
+  As a result, Azure accepts VHD files created using those versions of
+  qemu-img convert for upload.
+
+  Is there a reason why newer qemu realigns the converted VHD file? It
+  would be useful if an option were added to disable this feature, as
+  current versions of qemu cannot be used to create VHD files for Azure
+  using Microsoft's official instructions.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1490611/+subscriptions
