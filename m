@@ -1,26 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46180)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1ceXLc-00020V-4S
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 20:28:33 -0500
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1ceXyI-0001L1-7u
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 21:08:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1ceXLa-0000ZF-UW
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 20:28:32 -0500
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:34212)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <nirsof@gmail.com>) id 1ceXLa-0000Z0-Py
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 20:28:30 -0500
-Received: by mail-ot0-x243.google.com with SMTP id 45so430553otd.1
-	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 17:28:30 -0800 (PST)
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1ceXyD-0002BX-7N
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 21:08:30 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51276
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1ceXyD-00028l-0y
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 21:08:25 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1H23bfX036509
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 21:08:23 -0500
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28npg4u66r-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 16 Feb 2017 21:08:23 -0500
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Thu, 16 Feb 2017 19:08:21 -0700
+Date: Fri, 17 Feb 2017 10:08:15 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170112072513.98411-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170112072513.98411-4-bjsdjshi@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170217005431.4016-2-bobby.prani@gmail.com>
-References: <20170217005431.4016-1-bobby.prani@gmail.com>
-	<20170217005431.4016-2-bobby.prani@gmail.com>
-From: Nir Soffer <nirsof@gmail.com>
-Date: Fri, 17 Feb 2017 03:28:29 +0200
-Message-ID: <CAMr-obvtzqgFT1XZp5pg-b8PaDq4BT+a_WsKuhnjTLOp-py4tQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 1/2] Update README to accomodate markdown
- format
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170112072513.98411-4-bjsdjshi@linux.vnet.ibm.com>
+Message-Id: <20170217020815.GA28001@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v2 03/12] s390x/css: add s390-map-css
+ machine option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,123 +43,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pranith Kumar <bobby.prani@gmail.com>
-Cc: alex.bennee@linaro.org, peter.maydell@linaro.org, qemu-devel@nongnu.org, stefanha@redhat.com
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, wkywang@linux.vnet.ibm.com
 
-On Fri, Feb 17, 2017 at 2:54 AM, Pranith Kumar <bobby.prani@gmail.com> wrote:
-> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
-> ---
->  README | 44 +++++++++++++++++++++-----------------------
->  1 file changed, 21 insertions(+), 23 deletions(-)
->
-> diff --git a/README b/README
-> index cb60d05bee..225afd6be7 100644
-> --- a/README
-> +++ b/README
-> @@ -1,5 +1,5 @@
-> -         QEMU README
-> -         ===========
-> +QEMU
-> +====
->
->  QEMU is a generic and open source machine & userspace emulator and
->  virtualizer.
-> @@ -31,22 +31,22 @@ version 2. For full licensing details, consult the LICENSE file.
->
->
->  Building
-> -========
-> +--------
->
->  QEMU is multi-platform software intended to be buildable on all modern
->  Linux platforms, OS-X, Win32 (via the Mingw64 toolchain) and a variety
->  of other UNIX targets. The simple steps to build QEMU are:
->
-> -  mkdir build
-> -  cd build
-> -  ../configure
-> -  make
-> +    mkdir build
-> +    cd build
-> +    ../configure
-> +    make
->
->  Additional information can also be found online via the QEMU website:
->
-> -  http://qemu-project.org/Hosts/Linux
-> -  http://qemu-project.org/Hosts/Mac
-> -  http://qemu-project.org/Hosts/W32
-> +  - http://qemu-project.org/Hosts/Linux
-> +  - http://qemu-project.org/Hosts/Mac
-> +  - http://qemu-project.org/Hosts/W32
->
->
->  Submitting patches
+* Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> [2017-01-12 08:25:04 +0100]:
 
-You missed this title
+> From: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> 
+> We want to support real (i.e. not virtual) channel devices
+> even for guests that do not support MCSS-E (where guests may
+> see devices from any channel subsystem image at once). As all
+> virtio-ccw devices are in css 0xfe (and show up in the default
+> css 0 for guests not activating MCSS-E), we need an option to
+> map e.g. passed-through subchannels from their real css (0-3,
+> or 0 for hosts not activating MCSS-E) into the default css.
+> This will be exploited in a later patch.
 
-> @@ -54,7 +54,7 @@ Submitting patches
->
->  The QEMU source code is maintained under the GIT version control system.
->
-> -   git clone git://git.qemu-project.org/qemu.git
-> +    git clone git://git.qemu-project.org/qemu.git
->
->  When submitting patches, the preferred approach is to use 'git
->  format-patch' and/or 'git send-email' to format & send the mail to the
-> @@ -65,18 +65,18 @@ guidelines set out in the HACKING and CODING_STYLE files.
->  Additional information on submitting patches can be found online via
->  the QEMU website
->
-> -  http://qemu-project.org/Contribute/SubmitAPatch
-> -  http://qemu-project.org/Contribute/TrivialPatches
-> +  - http://qemu-project.org/Contribute/SubmitAPatch
-> +  - http://qemu-project.org/Contribute/TrivialPatches
->
->
->  Bug reporting
-> -=============
-> +-------------
->
->  The QEMU project uses Launchpad as its primary upstream bug tracker. Bugs
->  found when running code built from QEMU git or upstream released sources
->  should be reported via:
->
-> -  https://bugs.launchpad.net/qemu/
-> +  - https://bugs.launchpad.net/qemu/
->
->  If using QEMU via an operating system vendor pre-built binary package, it
->  is preferable to report bugs to the vendor's own bug tracker first. If
-> @@ -85,22 +85,20 @@ reported via launchpad.
->
->  For additional information on bug reporting consult:
->
-> -  http://qemu-project.org/Contribute/ReportABug
-> +  - http://qemu-project.org/Contribute/ReportABug
->
->
->  Contact
-> -=======
-> +-------
->
->  The QEMU community can be contacted in a number of ways, with the two
->  main methods being email and IRC
->
-> - - qemu-devel@nongnu.org
-> -   http://lists.nongnu.org/mailman/listinfo/qemu-devel
-> - - #qemu on irc.oftc.net
-> + - Mailing List: qemu-devel@nongnu.org
-> + - Archives: http://lists.nongnu.org/mailman/listinfo/qemu-devel
-> + - IRC: #qemu on irc.oftc.net
->
->  Information on additional methods of contacting the community can be
->  found online via the QEMU website:
->
-> -  http://qemu-project.org/Contribute/StartHere
-> -
-> --- End
-> +  - http://qemu-project.org/Contribute/StartHere
+After some brainstorming, we decided to change this interface a bit.
 
-Much nicer now!
+The first thing is that, we agreed that "s390-squash-mcss" is a better
+name than "s390-map-css". The new name denotes that it is trying to
+accommodate the devices from multiple channel subsystems into a
+non-mcsse-e system, and the word "suqash" is more accurate about what
+is happening internally.
 
-Nir
+The second thing is, we should never map/squash a vfio-ccw device into
+css 0xfe, which is reserved for virtio device only. So when squashing,
+we need to do it the other way around (i.e. have virtio devices at
+0.x.xxxx instead of fe.x.xxxx to accommodate non-mcsse-e).
+
+> 
+> Signed-off-by: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+[...]
+
+-- 
+Dong Jia
