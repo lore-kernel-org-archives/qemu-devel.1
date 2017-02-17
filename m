@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51554)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ceqGT-000494-Bt
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 16:40:30 -0500
+	(envelope-from <bounces@canonical.com>) id 1ceqGq-0004Oj-ST
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 16:40:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ceqGS-0007RH-Hp
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 16:40:29 -0500
-References: <cover.1485365834.git.jcody@redhat.com>
-	<f0449fb39181c0c4c45d3deba6faaea5282161e0.1485365834.git.jcody@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <36a56ad1-9a1a-9542-1b54-389fddc7081e@redhat.com>
-Date: Fri, 17 Feb 2017 15:40:21 -0600
+	(envelope-from <bounces@canonical.com>) id 1ceqGn-0007Vf-PW
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 16:40:52 -0500
+Received: from indium.canonical.com ([91.189.90.7]:52941)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ceqGn-0007Va-Gf
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 16:40:49 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1ceqGl-0008Mk-Dp
+	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 21:40:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 52A752E80C2
+	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 21:40:47 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <f0449fb39181c0c4c45d3deba6faaea5282161e0.1485365834.git.jcody@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="IaVsaapdAWfa19QRoAqtaTO44lor2odIc"
-Subject: Re: [Qemu-devel] [PATCH v2 6/7] iscsi: Add blockdev-add support
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 17 Feb 2017 21:35:27 -0000
+From: Phil Troy <phil@philtroy.com>
+Reply-To: Bug 1665789 <1665789@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170217213527.4184.5367.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1665789] [NEW] More resolutions for vga displays
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,79 +35,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, pbonzini@redhat.com, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---IaVsaapdAWfa19QRoAqtaTO44lor2odIc
-From: Eric Blake <eblake@redhat.com>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, pbonzini@redhat.com, qemu-block@nongnu.org
-Message-ID: <36a56ad1-9a1a-9542-1b54-389fddc7081e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 6/7] iscsi: Add blockdev-add support
-References: <cover.1485365834.git.jcody@redhat.com>
- <f0449fb39181c0c4c45d3deba6faaea5282161e0.1485365834.git.jcody@redhat.com>
-In-Reply-To: <f0449fb39181c0c4c45d3deba6faaea5282161e0.1485365834.git.jcody@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Public bug reported:
 
-On 01/25/2017 11:42 AM, Jeff Cody wrote:
-> From: Kevin Wolf <kwolf@redhat.com>
->=20
-> This adds blockdev-add support for iscsi devices.
->=20
-> Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
-> ---
->  block/iscsi.c        | 14 ++++++----
->  qapi/block-core.json | 74 ++++++++++++++++++++++++++++++++++++++++++++=
-++++----
->  2 files changed, 78 insertions(+), 10 deletions(-)
+Would it be possible to add more resolutions for vga displays (which I
+am accessing via vnc instead of spice)?  In particular:
 
-> +++ b/qapi/block-core.json
-> @@ -2116,10 +2116,10 @@
->  { 'enum': 'BlockdevDriver',
->    'data': [ 'archipelago', 'blkdebug', 'blkverify', 'bochs', 'cloop',
->              'dmg', 'file', 'ftp', 'ftps', 'gluster', 'host_cdrom',
-> -            'host_device', 'http', 'https', 'luks', 'nbd', 'nfs', 'nul=
-l-aio',
-> -            'null-co', 'parallels', 'qcow', 'qcow2', 'qed', 'quorum', =
-'raw',
-> -            'replication', 'ssh', 'vdi', 'vhdx', 'vmdk', 'vpc',
-> -            'vvfat' ] }
-> +            'host_device', 'http', 'https', 'iscsi', 'luks', 'nbd', 'n=
-fs',
-> +            'null-aio', 'null-co', 'parallels', 'qcow', 'qcow2', 'qed'=
-,
-> +            'quorum', 'raw', 'replication', 'ssh', 'vdi', 'vhdx', 'vmd=
-k',
-> +            'vpc', 'vvfat' ] }
+- 1080 wide x 1920 high (rotate 1920 x 1080 screen)
 
-Are we missing a since 2.9 documentation designation here?
+- 1920 wide x 1080 + 1980 high (1920 x 1080 screen on top of 1600 x 900
+screen)
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
+-- =
 
---IaVsaapdAWfa19QRoAqtaTO44lor2odIc
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1665789
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Title:
+  More resolutions for vga displays
 
-iQEcBAEBCAAGBQJYp23FAAoJEKeha0olJ0NqcvEH/jh7X+ySO2SfELwFCD6vfTeD
-K/mLahWdzfccucBA5DsOJYBozBnMnVnjwctosUhdMHCzs/NqZYO/+S3QYyI8uAe7
-LLEWjVK5nYj4C01/OanJ2EFT+Rc0fzt0lSpou5BGCBKvVvzN6SLL6EgGCkkSgP3E
-zfx8LUPH3sIox/LjC+tNqfOxNycp8JKKhcp9BhR5oD/4CmDj1ZHBPQXdkRiqwbDs
-Y4UxntZ4YrrEZBLV1x3+1HfcftBkI0bqz7yMon70KOhmwg0pD1N88P93MackzFbJ
-/JwIEpcbt3mWF1NmG4kprF6kVLUV7bG3JpYQtbKe6rrJocNNpFZbpbAHwBcXCSA=
-=0NCK
------END PGP SIGNATURE-----
+Status in QEMU:
+  New
 
---IaVsaapdAWfa19QRoAqtaTO44lor2odIc--
+Bug description:
+  Would it be possible to add more resolutions for vga displays (which I
+  am accessing via vnc instead of spice)?  In particular:
+
+  - 1080 wide x 1920 high (rotate 1920 x 1080 screen)
+
+  - 1920 wide x 1080 + 1980 high (1920 x 1080 screen on top of 1600 x
+  900 screen)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1665789/+subscriptions
