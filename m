@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cefVq-0008P8-Bm
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 05:11:39 -0500
+	(envelope-from <abologna@redhat.com>) id 1cefYt-0001uj-P4
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 05:14:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cefVn-0000Si-71
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 05:11:38 -0500
-Date: Fri, 17 Feb 2017 18:11:31 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170217101131.GA3468@lemon.lan>
-References: <CABHMSTVDnAxAvpp81+z_2fkAFO7tazLJs3cFXpuDuuGQj-Ek-A@mail.gmail.com>
-	<1933406e-2576-e687-3545-a72f3b999310@redhat.com>
-	<bf1410bc-bc6d-bb29-5591-55634f25d487@redhat.com>
-	<CABHMSTUsZy0u4b1b84YC5CgafKvD-Zms5dCQ=31+XnQphUQxLA@mail.gmail.com>
-	<20170217064327.GB21716@lemon.lan>
-	<2a2570bf-2e4b-e793-4362-0a679b182b1e@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2a2570bf-2e4b-e793-4362-0a679b182b1e@redhat.com>
-Subject: Re: [Qemu-devel] Fix build break during configuration on musl-libc
- based Linux systems.
+	(envelope-from <abologna@redhat.com>) id 1cefYq-0003wv-HT
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 05:14:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49586)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1cefYq-0003ti-93
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 05:14:44 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C9E6F61D14
+	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 10:14:43 +0000 (UTC)
+Received: from inaba.usersys.redhat.com ([10.34.129.229])
+	by int-mx11.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v1HAEgN2020639
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=NO)
+	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 05:14:43 -0500
+From: Andrea Bolognani <abologna@redhat.com>
+Date: Fri, 17 Feb 2017 11:14:37 +0100
+Message-Id: <1487326479-8664-1-git-send-email-abologna@redhat.com>
+Subject: [Qemu-devel] [PATCH v8 0/2] docs: Improve sample configuration files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,58 +33,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Chad Joan <chadjoan@gmail.com>, qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Fri, 02/17 10:23, Laszlo Ersek wrote:
-> On 02/17/17 07:43, Fam Zheng wrote:
-> > On Thu, 02/16 12:47, Chad Joan wrote:
-> >> I am glad others are chiming in and might provide better solutions.
-> >>
-> >> Honestly, following the instructions at
-> >> http://wiki.qemu-project.org/Contribute/SubmitAPatch to-the-letter is quite
-> >> daunting to me, just to get one line of code changed.  It might help if
-> >> that page had some kind of dead-simple example for trivial patches;
-> >> something like:
-> >> $ cd <QEMU directory>
-> >> $ git format-patch blah blah blah
-> >> $ maybe-some-other-command
-> >> $ # Now copy the contents of file xyz.patch into your email client and send
-> >> to qemu-devel@nongnu.org and qemu-trivial@nongnu.org
-> > 
-> > Makes sense in general except for the sending part - email clients tend to
-> > damage the patch when you copy and paste by wrapping long lines or messing up
-> > other things. But your point is taken, we should make the first (or a one-shot)
-> > contribution as easy as possible.
-> 
-> I disagree (from the sidelines, that is; I'm not a QEMU maintainer --
-> I'm a co-maintainer elsewhere). The patch submission process exists for
-> a reason, the goal is to maximize the throughput of long-term
-> contributors and maintainers, because that's the best for the project's
-> overall health and progress.
+Changes since [v7]
 
-Having a process and smoothly revealing it to new contributors are not in
-conflict. The problem here is the long SubmitAPatch I think. It does include
-more details than needed for the minimum of the very first submission; also it
-is not in an easy-to-follow step-by-step form.
+  * Paperwork:
+    - add missing Signed-off-by tags;
+    - pick up Reviewed-by tags from v7.
 
-I believe people will happily learn the process once he feels appreciation on
-his effort, once they get replies to his patch. :)
+Changes since [v6]
 
-> 
-> It does not mean that one-off contributions are not welcome -- all
-> contributions are welcome that follow the process (and beyond that,
-> everyone is welcome to become a long-term contributor).
+  * Address review comments:
+    - re-introduce optical media support;
+    - rename PCIe Root Ports from pci.* to pcie.*;
+    - remove reference to GTK+.
 
-IMHO one-off _fixes_ are also good, like this one. Like Peter noted, the only
-recommendation for those who don't like formalities and have no intention to
-contribute regularly, is to add a "signed-off-by" line to their patch.
+Changes since [v5]
 
-> 
-> Just my two cents, of course; don't take this as an official standpoint
-> or whatever. (And, I'm saying this after having manually fixed up
-> garbled patches from one-off contributors.)
-> 
-> Laszlo
+  * Address review comments:
+    - use the native serial console rather than the VirtIO
+      based one, and enable monitor multiplexing so that
+      the user can switch between the two;
+    - add GIC version configuration;
+    - improve wording all over the place.
 
-Fam
+  * Improvements:
+    - add information about Debian/Ubuntu firmware
+      packages.
+
+Changes since [v4]
+
+  * Improvements:
+    - move storage configuration from the command line
+      to the configuration files so that the command
+      line is shorter and we can provide better
+      documentation for the various parts;
+    - configure the amount of memory for the guest in
+      the file too;
+    - document the fact that you might want/need to use
+      '-serial stdio' and '-display vnc=...' in some
+      situations;
+    - fix the value of 'port' for one of the
+      pcie-root-port devices;
+    - fix some inaccurate comments.
+
+  * Arguably the opposite:
+    - remove the sample command line for running a live
+      OS from the file header. I could be convinced to
+      add it back as a (commented) section about it, if
+      people think it's useful enough.
+
+Changes since [v3]
+
+  * Address review comments:
+    - place VGA at 00:01.0;
+    - use pcie-root-port instead of ioh3420 in
+      q35-virtio-*.cfg;
+    - add a comment to let users know that PCI Express
+      devices should not be placed on the legacy PCI
+      bridge.
+
+Changes since [v2]
+
+  * Address review comments:
+    - use -nodefaults in q35-emulated.cfg too;
+    - add explicit VGA and Ethernet.
+
+  * Improvements:
+    - use virtconsole and virtio-serial instead of
+      isa-serial in q35-virtio-serial.cfg.
+
+  * Possibily controversial:
+    - get rid of q35-virtio-common.cfg and add the PCIe
+      Root Ports back into q35-virtio-*.cfg: while this
+      leads to having some duplicated content, I feel like
+      the sample configurations are much more useful when
+      they can stand entirely on their own, especially now
+      that they start with a detailed hardware listing.
+
+  * Cosmetic stuff:
+    - hardware listing looks like the output of lspci;
+    - section names match what's used in the hardware
+      listing so it's faster to jump to the section;
+    - PCI addresses also match the output of lspci;
+    - PCI Express is used instead of PCIe.
+
+Changes since [v1]
+
+  * Address review comments:
+    - improve the existing configuration file instead
+      of removing it;
+    - split off the common part for VirtIO guests;
+    - plug all ioh3420 devices in a single slot;
+    - use slot 1c for ioh3420 devices;
+    - remove useless USB keyboard.
+
+  * Improve usage description:
+    - make sure the OS disk actually uses the VirtIO
+      SCSI controller, as intended, rather than the
+      built-in SATA one;
+    - provide a command line for running live CDs.
+
+  * Document more devices:
+    - the video card is added by default;
+    - so is the Ethernet adapter, apparently.
+
+[v1] http://lists.nongnu.org/archive/html/qemu-devel/2017-01/msg06342.html
+[v2] http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg00184.html
+[v3] http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg00461.html
+[v4] http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg00672.html
+[v5] http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg01714.html
+[v6] http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg02206.html
+[v7] http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg02311.html
+
+Andrea Bolognani (2):
+  q35: Improve sample configuration files
+  mach-virt: Provide sample configuration files
+
+ docs/mach-virt-graphical.cfg  | 281 +++++++++++++++++++++++++++++++++++++++++
+ docs/mach-virt-serial.cfg     | 243 +++++++++++++++++++++++++++++++++++
+ docs/q35-chipset.cfg          | 152 ----------------------
+ docs/q35-emulated.cfg         | 288 ++++++++++++++++++++++++++++++++++++++++++
+ docs/q35-virtio-graphical.cfg | 248 ++++++++++++++++++++++++++++++++++++
+ docs/q35-virtio-serial.cfg    | 193 ++++++++++++++++++++++++++++
+ 6 files changed, 1253 insertions(+), 152 deletions(-)
+ create mode 100644 docs/mach-virt-graphical.cfg
+ create mode 100644 docs/mach-virt-serial.cfg
+ delete mode 100644 docs/q35-chipset.cfg
+ create mode 100644 docs/q35-emulated.cfg
+ create mode 100644 docs/q35-virtio-graphical.cfg
+ create mode 100644 docs/q35-virtio-serial.cfg
+
+-- 
+2.7.4
