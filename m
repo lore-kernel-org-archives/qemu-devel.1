@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <snaipe@diacritic.io>) id 1cedYC-0004wX-7J
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:05:57 -0500
+	(envelope-from <pagupta@redhat.com>) id 1cedYY-00056B-Hg
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:06:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <snaipe@diacritic.io>) id 1cedY8-0004M5-4Y
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:05:56 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170217005018.GA21716@lemon.lan>
-References: <20170216085857.23501-1-snaipe@diacritic.io>
-	<20170217005018.GA21716@lemon.lan>
-From: "Franklin \"Snaipe\" Mathieu" <snaipe@diacritic.io>
-Date: Fri, 17 Feb 2017 08:05:05 +0000
-Message-ID: <CAK_MOSePd7740oW9X1M0U-ga3uOQZUm+P9v4sd95m+r0hBjQEw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] syscall: fixed mincore(2) not failing with
- ENOMEM
+	(envelope-from <pagupta@redhat.com>) id 1cedYX-0004dK-HN
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:06:18 -0500
+From: Pankaj Gupta <pagupta@redhat.com>
+Date: Fri, 17 Feb 2017 13:36:04 +0530
+Message-Id: <1487318764-29513-1-git-send-email-pagupta@redhat.com>
+Subject: [Qemu-devel] [PATCH] block,
+ migration: Use qemu_madvise inplace of madvise
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,19 +18,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, snaipe@arista.com, Riku Voipio <riku.voipio@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, quintela@redhat.com, dgilbert@redhat.com
 
-2017-02-17 0:50 GMT+00:00 Fam Zheng <famz@redhat.com>:
-> On Thu, 02/16 08:58, Franklin Snaipe Mathieu wrote:
->> +            p =3D lock_user_string(arg3)
->> +            if (!p) {
->
-> Please compile test at least, even if it is a trivial patch.
->
+ To maintain consistency at all the places use qemu_madvise wrapper
+ inplace of madvise call.
 
-Whoops, sorry, I forgot to re-compile after fixing the checkpatch issues.
+Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+---
+ block/qcow2-cache.c      | 2 +-
+ migration/postcopy-ram.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
---=20
-Franklin "Snaipe" Mathieu
-=F0=9F=9D=B0 https://diacritic.io
+diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
+index 1d25147..4991ca5 100644
+--- a/block/qcow2-cache.c
++++ b/block/qcow2-cache.c
+@@ -74,7 +74,7 @@ static void qcow2_cache_table_release(BlockDriverState *bs, Qcow2Cache *c,
+     size_t offset = QEMU_ALIGN_UP((uintptr_t) t, align) - (uintptr_t) t;
+     size_t length = QEMU_ALIGN_DOWN(mem_size - offset, align);
+     if (length > 0) {
+-        madvise((uint8_t *) t + offset, length, MADV_DONTNEED);
++        qemu_madvise((uint8_t *) t + offset, length, QEMU_MADV_DONTNEED);
+     }
+ #endif
+ }
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index a40dddb..558fec1 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -213,7 +213,7 @@ int postcopy_ram_discard_range(MigrationIncomingState *mis, uint8_t *start,
+                                size_t length)
+ {
+     trace_postcopy_ram_discard_range(start, length);
+-    if (madvise(start, length, MADV_DONTNEED)) {
++    if (qemu_madvise(start, length, QEMU_MADV_DONTNEED)) {
+         error_report("%s MADV_DONTNEED: %s", __func__, strerror(errno));
+         return -1;
+     }
+-- 
+2.7.4
