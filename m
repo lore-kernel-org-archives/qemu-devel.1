@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cehzs-0002Uy-LX
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 07:50:49 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cei4A-0005JJ-9p
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 07:55:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cehzo-0002TY-D2
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 07:50:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44666)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cehzn-0002Sg-Vl
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 07:50:44 -0500
-References: <cover.1487286467.git.ben@skyportsystems.com>
-	<88232638f9ff3b17b54987624468678ea14a3037.1487286467.git.ben@skyportsystems.com>
-	<20170217114321.6c8577e1@nial.brq.redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <918524f7-26cf-3fce-d9e3-7316ca69285b@redhat.com>
-Date: Fri, 17 Feb 2017 13:50:40 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1cei49-0004KD-Is
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 07:55:14 -0500
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:33138)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cei49-0004K1-D8
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 07:55:13 -0500
+Received: by mail-wr0-x22d.google.com with SMTP id i10so29439640wrb.0
+	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 04:55:13 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20170217114321.6c8577e1@nial.brq.redhat.com>
-Content-Type: multipart/mixed; boundary="------------0479B87207D380CFB2D3ECFE"
-Subject: Re: [Qemu-devel] [PATCH v8 4/8] ACPI: Add Virtual Machine
- Generation ID support
+In-Reply-To: <20170210210857.47893-1-marcinch7@gmail.com>
+References: <20170210210857.47893-1-marcinch7@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 17 Feb 2017 12:54:51 +0000
+Message-ID: <CAFEAcA-i6xqsik1=hMk9N0w-rCa8JxZD9VF7h==hjYJokx1fCw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2] target-arm: Implement BCM2835 hardware
+ RNG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,132 +29,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, ben@skyportsystems.com
-Cc: qemu-devel@nongnu.org, mst@redhat.com, "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: Marcin Chojnacki <marcinch7@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-This is a multi-part message in MIME format.
---------------0479B87207D380CFB2D3ECFE
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+On 10 February 2017 at 21:08, Marcin Chojnacki <marcinch7@gmail.com> wrote:
+> Recent vanilla Raspberry Pi kernels started to make use of
+> the hardware random number generator in BCM2835 SoC. As a
+> result, those kernels wouldn't work anymore under QEMU
+> but rather just freeze during the boot process.
+>
+> This patch implements a trivial BCM2835 compatible RNG,
+> and adds it as a peripheral to BCM2835 platform, which
+> allows to boot a vanilla Raspberry Pi kernel under Qemu.
 
-CC Dave
+So this looks good to me (other than the rand issue which
+I just posted a patch for). My testing shows that it
+definitely helps for the raspbian image I just downloaded.
+However although the kernel boots OK it hangs indefinitely
+because it can't find a root filesystem -- presumably
+it doesn't see the sd card. Do you see that, or does it
+work for you?
 
-On 02/17/17 11:43, Igor Mammedov wrote:
-> On Thu, 16 Feb 2017 15:15:36 -0800
-> ben@skyportsystems.com wrote:
-> 
->> From: Ben Warren <ben@skyportsystems.com>
->>
->> This implements the VM Generation ID feature by passing a 128-bit
->> GUID to the guest via a fw_cfg blob.
->> Any time the GUID changes, an ACPI notify event is sent to the guest
->>
->> The user interface is a simple device with one parameter:
->>  - guid (string, must be "auto" or in UUID format
->>    xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
-> I've given it some testing with WS2012R2 and v4 patches for Seabios,
-> 
-> Windows is able to read initial GUID allocation and writeback
-> seems to work somehow:
-> 
-> (qemu) info vm-generation-id 
-> c109c09b-0e8b-42d5-9b33-8409c9dcd16c
-> 
-> vmgenid client in Windows reads it as 2 following 64bit integers:
-> 42d50e8bc109c09b:6cd1dcc90984339b
-> 
-> However update path/restore from snapshot doesn't
-> here is as I've tested it:
-> 
-> qemu-system-x86_64 -device vmgenid,id=testvgid,guid=auto -monitor stdio
-> (qemu) info vm-generation-id 
-> c109c09b-0e8b-42d5-9b33-8409c9dcd16c
-> (qemu) stop
-> (qemu) migrate "exec:gzip -c > STATEFILE.gz" 
-> (qemu) quit
-> 
-> qemu-system-x86_64 -device vmgenid,id=testvgid,guid=auto -monitor stdio
-> -incoming "exec: gzip -c -d STATEFILE.gz"
-> (qemu) info vm-generation-id 
-> 28b587fa-991b-4267-80d7-9cf28b746fe9
-> 
-> guest
->  1. doesn't get GPE notification that it must receive
->  2. vmgenid client in Windows reads the same value
->       42d50e8bc109c09b:6cd1dcc90984339b
-
-Hmmm, I wonder if we need something like this, in vmgenid_post_load():
-
-commit 90c647db8d59e47c9000affc0d81754eb346e939
-Author: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Date:   Fri Apr 15 12:41:30 2016 +0100
-
-    Fix pflash migration
-
-with the idea being that in a single device's post_load callback, we
-shouldn't perform machine-wide actions (post_load is likely for fixing
-up the device itself). If machine-wide actions are necessary, we should
-temporarily register a "vm change state handler", and do the thing once
-that handler is called (when the machine has been loaded fully and is
-about to continue execution).
-
-Can you please try the attached patch on top? (Build tested only.)
-
-Thanks!
-Laszlo
-
---------------0479B87207D380CFB2D3ECFE
-Content-Type: text/x-patch;
- name="vmstate_change.diff"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="vmstate_change.diff"
-
-diff --git a/include/hw/acpi/vmgenid.h b/include/hw/acpi/vmgenid.h
-index db7fa0e63303..a2ae450b1f56 100644
---- a/include/hw/acpi/vmgenid.h
-+++ b/include/hw/acpi/vmgenid.h
-@@ -4,6 +4,7 @@
- #include "hw/acpi/bios-linker-loader.h"
- #include "hw/qdev.h"
- #include "qemu/uuid.h"
-+#include "sysemu/sysemu.h"
- 
- #define VMGENID_DEVICE           "vmgenid"
- #define VMGENID_GUID             "guid"
-@@ -21,6 +22,7 @@ typedef struct VmGenIdState {
-     DeviceClass parent_obj;
-     QemuUUID guid;                /* The 128-bit GUID seen by the guest */
-     uint8_t vmgenid_addr_le[8];   /* Address of the GUID (little-endian) */
-+    VMChangeStateEntry *vmstate;
- } VmGenIdState;
- 
- static inline Object *find_vmgenid_dev(void)
-diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
-index 9f97b722761b..0ae1d56ff297 100644
---- a/hw/acpi/vmgenid.c
-+++ b/hw/acpi/vmgenid.c
-@@ -177,10 +177,20 @@ static void vmgenid_set_guid(Object *obj, const char *value, Error **errp)
- /* After restoring an image, we need to update the guest memory and notify
-  * it of a potential change to VM Generation ID
-  */
-+static void postload_update_guest_cb(void *opaque, int running, RunState state)
-+{
-+    VmGenIdState *vms = opaque;
-+
-+    qemu_del_vm_change_state_handler(vms->vmstate);
-+    vms->vmstate = NULL;
-+    vmgenid_update_guest(vms);
-+}
-+
- static int vmgenid_post_load(void *opaque, int version_id)
- {
-     VmGenIdState *vms = opaque;
--    vmgenid_update_guest(vms);
-+    vms->vmstate = qemu_add_vm_change_state_handler(postload_update_guest_cb,
-+                                                    vms);
-     return 0;
- }
- 
-
---------------0479B87207D380CFB2D3ECFE--
+thanks
+-- PMM
