@@ -1,24 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cehY3-0002oL-Vt
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 07:22:05 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cehYm-0003lC-BS
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 07:22:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cehY2-0004tn-Sh
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 07:22:03 -0500
-Date: Fri, 17 Feb 2017 13:21:54 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170217122154.GD5338@noname.redhat.com>
-References: <1487153430-17260-1-git-send-email-vsementsov@virtuozzo.com>
-	<1487153430-17260-10-git-send-email-vsementsov@virtuozzo.com>
-	<20170216114533.GC4869@noname.redhat.com>
-	<20170216124753.GE4869@noname.redhat.com>
-	<f257ad53-748b-64b6-1b70-ddbbfb79c965@virtuozzo.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f257ad53-748b-64b6-1b70-ddbbfb79c965@virtuozzo.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v15 09/25] qcow2: add
- .bdrv_load_autoloading_dirty_bitmaps
+	(envelope-from <pm215@archaic.org.uk>) id 1cehYl-0005SR-5A
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 07:22:48 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 17 Feb 2017 12:22:39 +0000
+Message-Id: <1487334159-19664-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] bcm2835_rng: Use qcrypto_random_bytes() rather
+ than rand()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,109 +18,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: famz@redhat.com, qemu-block@nongnu.org, armbru@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org, mreitz@redhat.com
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Marcin Chojnacki <marcinch7@gmail.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, "Daniel P . Berrange" <berrange@redhat.com>
 
-Am 17.02.2017 um 13:07 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 16.02.2017 15:47, Kevin Wolf wrote:
-> >Sorry, this was sent too early. Next attempt...
-> >
-> >Am 16.02.2017 um 12:45 hat Kevin Wolf geschrieben:
-> >>Am 15.02.2017 um 11:10 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> >>>Auto loading bitmaps are bitmaps in Qcow2, with the AUTO flag set. They
-> >>>are loaded when the image is opened and become BdrvDirtyBitmaps for the
-> >>>corresponding drive.
-> >>>
-> >>>Extra data in bitmaps is not supported for now.
-> 
-> [...]
-> 
-> >>>hdx.o vhdx-endian.o vhdx-log.o
-> >>>diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-> >>>new file mode 100644
-> >>>index 0000000..e08e46e
-> >>>--- /dev/null
-> >>>+++ b/block/qcow2-bitmap.c
-> 
-> [...]
-> 
-> >>>+
-> >>>+static int update_header_sync(BlockDriverState *bs)
-> >>>+{
-> >>>+    int ret;
-> >>>+
-> >>>+    ret = qcow2_update_header(bs);
-> >>>+    if (ret < 0) {
-> >>>+        return ret;
-> >>>+    }
-> >>>+
-> >>>+    /* We don't return bdrv_flush error code. Even if it fails, write was
-> >>>+     * successful and it is more logical to consider that header is in the new
-> >>>+     * state than in the old.
-> >>>+     */
-> >>>+    ret = bdrv_flush(bs);
-> >>>+    if (ret < 0) {
-> >>>+        fprintf(stderr, "Failed to flush qcow2 header");
-> >>>+    }
-> >I don't think I can agree with this one. If you don't care whether the
-> >new header is actually on disk, don't call bdrv_flush(). But if you do
-> >care, then bdrv_flush() failure means that most likely the new header
-> >has not made it to the disk, but is just sitting in some volatile cache.
-> 
-> And what should be done on bdrv_flush fail? Current solution was
-> proposed by Max.
+Switch to using qcrypto_random_bytes() rather than rand() as
+our source of randomness for the BCM2835 RNG.
 
-Pass an error up and let the calling operation fail, because we can't
-promise that it actually executed correctly.
+If qcrypto_random_bytes() fails, we don't want to return the guest a
+non-random value in case they're really using it for cryptographic
+purposes, so the best we can do is a fatal error.  This shouldn't
+happen unless something's broken, though.
 
-> >
-> >>>+    return 0;
-> >>>+}
-> >>>+
-> 
-> [...]
-> 
-> >>>+
-> >>>+/* This function returns the number of disk sectors covered by a single cluster
-> >>>+ * of bitmap data. */
-> >>>+static uint64_t disk_sectors_in_bitmap_cluster(const BDRVQcow2State *s,
-> >>>+                                               const BdrvDirtyBitmap *bitmap)
-> >>>+{
-> >>>+    uint32_t sector_granularity =
-> >>>+            bdrv_dirty_bitmap_granularity(bitmap) >> BDRV_SECTOR_BITS;
-> >>>+
-> >>>+    return (uint64_t)sector_granularity * (s->cluster_size << 3);
-> >>>+}
-> >This has nothing to do with disk sectors, neither of the guest disk nor
-> >of the host disk. It's just using a funny 512 bytes unit. Is there a
-> >good reason for introducing this funny unit in new code?
-> >
-> >I'm also not sure what this function calculates, but it's not what the
-> >comment says. The unit of the result is something like sectors * bytes,
-> >and even when normalising it to a single base unit, I've never seen a
-> >use for square bytes so far.
-> 
-> sector granularity is number of disk sectors, corresponding to one
-> bit of the dirty bitmap, (disk-sectors/bitmap-bit)
+In theory we could implement this device's full FIFO and interrupt
+semantics and then just stop filling the FIFO.  That's a lot of work,
+though, and doesn't really give a very nice diagnostic to the user
+since the guest will just seem to hang.
 
-Please don't use the word "disk sectors", it's misleading because it's
-not a sector size of any specific disk. It's best to say just "sectors",
-which is a fixed qemu block layer unit of 512 bytes.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+This patch sits on top of http://patchwork.ozlabs.org/patch/726744/
+(though for review purposes I think it's pretty self explanatory).
+The interesting question here is the failure case handling, where
+we're a bit between a rock and a hard place because we don't have
+a nice way to report it to the guest, but we don't want to return
+a non-random value either...
 
-> cluster_size << 3 is a number of bits in one cluster, (bitmap-bit)
-> 
-> so, we have
-> sector_granularity (disk-sector/bitmap-bit) * <cluster size in bits>
-> (bitmapbit)  = some disk sectors, corresponding to one cluster of
-> bitmap data.
+We should probably improve crypto/random-platform.c to use
+getentropy() if available, which would fix the "BSD or OSX
+host and not using gcrypt or gnutls" case which I think is
+the most likely cause of qcrypto_random_bytes() failing.
 
-Aha! I completely misunderstood what a bitmap cluster is supposed to
-be. I expected it to be a chunk of bitmap data whose size corresponds to
-the bitmap granularity, whereas it's really about qcow2 clusters.
+ hw/misc/bcm2835_rng.c | 26 +++++++++++++++++++++++++-
+ 1 file changed, 25 insertions(+), 1 deletion(-)
 
-I wonder if we can rephrase the comment to make this more obvious. Maybe
-"...covered by a single qcow2 cluster containing bitmap data"? And the
-function could be called sectors_covered_by_bitmap_cluster() or
-something.
-
-Kevin
+diff --git a/hw/misc/bcm2835_rng.c b/hw/misc/bcm2835_rng.c
+index 2242bc5..bbe903d 100644
+--- a/hw/misc/bcm2835_rng.c
++++ b/hw/misc/bcm2835_rng.c
+@@ -9,8 +9,32 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qemu/log.h"
++#include "qapi/error.h"
++#include "crypto/random.h"
+ #include "hw/misc/bcm2835_rng.h"
+ 
++static uint32_t get_random_bytes(void)
++{
++    uint32_t res;
++    Error *err = NULL;
++
++    if (qcrypto_random_bytes((uint8_t *)&res, sizeof(res), &err) < 0) {
++        /* On failure we don't want to return the guest a non-random
++         * value in case they're really using it for cryptographic
++         * purposes, so the best we can do is die here.
++         * This shouldn't happen unless something's broken.
++         * In theory we could implement this device's full FIFO
++         * and interrupt semantics and then just stop filling the
++         * FIFO. That's a lot of work, though, so we assume any
++         * errors are systematic problems and trust that the check
++         * on init is sufficient.
++         */
++        error_report_err(err);
++        exit(1);
++    }
++    return res;
++}
++
+ static uint64_t bcm2835_rng_read(void *opaque, hwaddr offset,
+                                  unsigned size)
+ {
+@@ -27,7 +51,7 @@ static uint64_t bcm2835_rng_read(void *opaque, hwaddr offset,
+         res = s->rng_status | (1 << 24);
+         break;
+     case 0x8:    /* rng_data */
+-        res = rand();
++        res = get_random_bytes();
+         break;
+ 
+     default:
+-- 
+2.7.4
