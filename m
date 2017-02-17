@@ -1,29 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cejSM-000367-PA
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 09:24:19 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1cejTd-0003rW-As
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 09:25:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cejSL-0006wD-RV
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 09:24:18 -0500
-Date: Fri, 17 Feb 2017 15:24:03 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170217142403.GJ5338@noname.redhat.com>
-References: <1487153430-17260-9-git-send-email-vsementsov@virtuozzo.com>
-	<20170216112506.GB4869@noname.redhat.com>
-	<20170216114944.GD4869@noname.redhat.com>
-	<8d7a5d17-7b1b-578a-67fc-c79beb196a4c@virtuozzo.com>
-	<20170217120935.GC5338@noname.redhat.com>
-	<fd790939-7ad7-1d74-c810-eceece98bbb7@virtuozzo.com>
-	<20170217124842.GE5338@noname.redhat.com>
-	<3a827d65-1028-d0fd-c3aa-cabe61dafbd9@openvz.org>
-	<20170217133430.GI5338@noname.redhat.com>
-	<635d98d9-0f65-4fa6-2208-02ff7d23a2e9@openvz.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <635d98d9-0f65-4fa6-2208-02ff7d23a2e9@openvz.org>
-Subject: Re: [Qemu-devel] [PATCH v15 08/25] block: introduce auto-loading
- bitmaps
+	(envelope-from <eric.auger@redhat.com>) id 1cejTc-0008Hk-3w
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 09:25:37 -0500
+From: Eric Auger <eric.auger@redhat.com>
+Date: Fri, 17 Feb 2017 15:25:25 +0100
+Message-Id: <1487341525-5785-1-git-send-email-eric.auger@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] hw/arm/virt: Add a user option to disallow
+ ITS instantiation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,57 +18,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: vijay.kilari@gmail.com, drjones@redhat.com
 
-Am 17.02.2017 um 14:48 hat Denis V. Lunev geschrieben:
-> On 02/17/2017 04:34 PM, Kevin Wolf wrote:
-> > Am 17.02.2017 um 14:22 hat Denis V. Lunev geschrieben:
-> >> But for sure this is bad from the downtime point of view.
-> >> On migrate you will have to write to the image and re-read
-> >> it again on the target. This would be very slow. This will
-> >> not help for the migration with non-shared disk too.
-> >>
-> >> That is why we have specifically worked in a migration,
-> >> which for a good does not influence downtime at all now.
-> >>
-> >> With a write we are issuing several write requests + sync.
-> >> Our measurements shows that bdrv_drain could take around
-> >> a second on an averagely loaded conventional system, which
-> >> seems unacceptable addition to me.
-> > I'm not arguing against optimising migration, I fully agree with you. I
-> > just think that we should start with a correct if slow base version and
-> > then add optimisation to that, instead of starting with a broken base
-> > version and adding to that.
-> >
-> > Look, whether you do the expensive I/O on open/close and make that a
-> > slow operation or whether you do it on invalidate_cache/inactivate
-> > doesn't really make a difference in term of slowness because in general
-> > both operations are called exactly once. But it does make a difference
-> > in terms of correctness.
-> >
-> > Once you do the optimisation, of course, you'll skip writing those
-> > bitmaps that you transfer using a different channel, no matter whether
-> > you skip it in bdrv_close() or in bdrv_inactivate().
-> >
-> > Kevin
-> I do not understand this point as in order to optimize this
-> we will have to create specific code path or option from
-> the migration code and keep this as an ugly kludge forever.
+In 2.9 ITS will block save/restore and migration use cases. As
+such let's introduce a user option that disallows its instantiation
+along with the GICv3. With no-its option turned true, migration will
+be possible, obviously at the expense of MSI support (with GICv3).
 
-The point that I don't understand is why it makes any difference for the
-follow-up migration series whether the writeout is in bdrv_close() or
-bdrv_inactivate(). I don't really see the difference between the two
-from a migration POV; both need to be skipped if we transfer the bitmap
-using a different channel.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-Maybe I would see the reason if I could find the time to look at the
-migration patches first, but unfortunately I don't have this time at the
-moment.
+---
 
-My point is just that generally we want to have a correctly working qemu
-after every single patch, and even more importantly after every series.
-As the migration series is separate from this, I don't think it's a good
-excuse for doing worse than we could easily do here.
+v1 -> v2: fix omitted coma in object_property_set_description
 
-Kevin
+With this patch the option also is added in virt 2.8. I don't know
+if it is acceptable.
+---
+ hw/arm/virt.c         | 28 +++++++++++++++++++++++++++-
+ include/hw/arm/virt.h |  1 +
+ 2 files changed, 28 insertions(+), 1 deletion(-)
+
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index f3440f2..c08deb0 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -605,7 +605,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
+ 
+     fdt_add_gic_node(vms);
+ 
+-    if (type == 3 && !vmc->no_its) {
++    if (type == 3 && !vmc->no_its && !vms->no_its) {
+         create_its(vms, gicdev);
+     } else if (type == 2) {
+         create_v2m(vms, pic);
+@@ -1480,6 +1480,21 @@ static void virt_set_highmem(Object *obj, bool value, Error **errp)
+     vms->highmem = value;
+ }
+ 
++static bool virt_get_no_its(Object *obj, Error **errp)
++{
++    VirtMachineState *vms = VIRT_MACHINE(obj);
++
++    return vms->no_its;
++}
++
++static void virt_set_no_its(Object *obj, bool value, Error **errp)
++{
++    VirtMachineState *vms = VIRT_MACHINE(obj);
++
++    vms->no_its = value;
++}
++
++
+ static char *virt_get_gic_version(Object *obj, Error **errp)
+ {
+     VirtMachineState *vms = VIRT_MACHINE(obj);
+@@ -1540,6 +1555,7 @@ type_init(machvirt_machine_init);
+ static void virt_2_9_instance_init(Object *obj)
+ {
+     VirtMachineState *vms = VIRT_MACHINE(obj);
++    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
+ 
+     /* EL3 is disabled by default on virt: this makes us consistent
+      * between KVM and TCG for this board, and it also allows us to
+@@ -1579,6 +1595,16 @@ static void virt_2_9_instance_init(Object *obj)
+                                     "Set GIC version. "
+                                     "Valid values are 2, 3 and host", NULL);
+ 
++    /* Default allows ITS instantiation */
++    if (!vmc->no_its) {
++        object_property_add_bool(obj, "no-its", virt_get_no_its,
++                                 virt_set_no_its, NULL);
++        vms->no_its = false;
++        object_property_set_description(obj, "no-its",
++                                        "Disallow the ITS instantiation",
++                                        NULL);
++    }
++
+     vms->memmap = a15memmap;
+     vms->irqmap = a15irqmap;
+ }
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index 58ce74e..5e73be9 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -93,6 +93,7 @@ typedef struct {
+     FWCfgState *fw_cfg;
+     bool secure;
+     bool highmem;
++    bool no_its;
+     bool virt;
+     int32_t gic_version;
+     struct arm_boot_info bootinfo;
+-- 
+2.5.5
