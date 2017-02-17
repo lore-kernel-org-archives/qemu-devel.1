@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ceimX-0003pf-R0
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 08:41:07 -0500
+	(envelope-from <lersek@redhat.com>) id 1ceinA-0004Ib-1X
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 08:41:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ceimW-0006GK-P4
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 08:41:05 -0500
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:34227)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ceimW-0006Fi-Il
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 08:41:04 -0500
-Received: by mail-wm0-x229.google.com with SMTP id 196so9694872wmm.1
-	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 05:41:04 -0800 (PST)
+	(envelope-from <lersek@redhat.com>) id 1cein6-0006RT-Tn
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 08:41:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53406)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cein6-0006RM-LA
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 08:41:40 -0500
+References: <cover.1487286467.git.ben@skyportsystems.com>
+	<88232638f9ff3b17b54987624468678ea14a3037.1487286467.git.ben@skyportsystems.com>
+	<20170217114321.6c8577e1@nial.brq.redhat.com>
+	<918524f7-26cf-3fce-d9e3-7316ca69285b@redhat.com>
+	<20170217140516.35d4ded5@nial.brq.redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <e8722e0b-1beb-9ba3-bd59-ffe281bc1ecc@redhat.com>
+Date: Fri, 17 Feb 2017 14:41:37 +0100
 MIME-Version: 1.0
-In-Reply-To: <1487313115-9510-6-git-send-email-vijay.kilari@gmail.com>
-References: <1487313115-9510-1-git-send-email-vijay.kilari@gmail.com>
-	<1487313115-9510-6-git-send-email-vijay.kilari@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 17 Feb 2017 13:40:42 +0000
-Message-ID: <CAFEAcA8Fn0DUOx-htiJPQsRUhc+QG0oZ0vYpBees=OaKbu7s0Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v8 5/5] hw/intc/arm_gicv3_kvm: Reset GICv3
- cpu interface registers
+In-Reply-To: <20170217140516.35d4ded5@nial.brq.redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 4/8] ACPI: Add Virtual Machine
+ Generation ID support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,102 +31,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vijay Kilari <vijay.kilari@gmail.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>, Pavel Fedin <p.fedin@samsung.com>, Marc Zyngier <marc.zyngier@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: ben@skyportsystems.com, qemu-devel@nongnu.org, "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, mst@redhat.com
 
-On 17 February 2017 at 06:31,  <vijay.kilari@gmail.com> wrote:
-> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
->
-> Reset CPU interface registers of GICv3 when CPU is reset.
-> For this, ARMCPRegInfo struct is registered with one ICC
-> register whose resetfn is called when cpu is reset.
->
-> All the ICC registers are reset under one single register
-> reset function instead of calling resetfn for each ICC
-> register.
->
-> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
-> ---
->  hw/intc/arm_gicv3_kvm.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 58 insertions(+)
->
-> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-> index cda1af4..6377dc3 100644
-> --- a/hw/intc/arm_gicv3_kvm.c
-> +++ b/hw/intc/arm_gicv3_kvm.c
-> @@ -604,6 +604,34 @@ static void kvm_arm_gicv3_get(GICv3State *s)
->      }
->  }
->
-> +static void arm_gicv3_icc_reset(CPUARMState *env, const ARMCPRegInfo *ri)
-> +{
-> +    ARMCPU *cpu;
-> +    GICv3State *s;
-> +    GICv3CPUState *c;
-> +
-> +    c = (GICv3CPUState *)env->gicv3state;
-> +    assert(!(!c || !c->cpu || !c->gic));
+On 02/17/17 14:05, Igor Mammedov wrote:
+> On Fri, 17 Feb 2017 13:50:40 +0100
+> Laszlo Ersek <lersek@redhat.com> wrote:
+> 
+>> CC Dave
+>>
+>> On 02/17/17 11:43, Igor Mammedov wrote:
+>>> On Thu, 16 Feb 2017 15:15:36 -0800
+>>> ben@skyportsystems.com wrote:
+>>>
+>>>> From: Ben Warren <ben@skyportsystems.com>
+>>>>
+>>>> This implements the VM Generation ID feature by passing a 128-bit
+>>>> GUID to the guest via a fw_cfg blob.
+>>>> Any time the GUID changes, an ACPI notify event is sent to the guest
+>>>>
+>>>> The user interface is a simple device with one parameter:
+>>>>  - guid (string, must be "auto" or in UUID format
+>>>>    xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+>>> I've given it some testing with WS2012R2 and v4 patches for Seabios,
+>>>
+>>> Windows is able to read initial GUID allocation and writeback
+>>> seems to work somehow:
+>>>
+>>> (qemu) info vm-generation-id 
+>>> c109c09b-0e8b-42d5-9b33-8409c9dcd16c
+>>>
+>>> vmgenid client in Windows reads it as 2 following 64bit integers:
+>>> 42d50e8bc109c09b:6cd1dcc90984339b
+>>>
+>>> However update path/restore from snapshot doesn't
+>>> here is as I've tested it:
+>>>
+>>> qemu-system-x86_64 -device vmgenid,id=testvgid,guid=auto -monitor stdio
+>>> (qemu) info vm-generation-id 
+>>> c109c09b-0e8b-42d5-9b33-8409c9dcd16c
+>>> (qemu) stop
+>>> (qemu) migrate "exec:gzip -c > STATEFILE.gz" 
+>>> (qemu) quit
+>>>
+>>> qemu-system-x86_64 -device vmgenid,id=testvgid,guid=auto -monitor stdio
+>>> -incoming "exec: gzip -c -d STATEFILE.gz"
+>>> (qemu) info vm-generation-id 
+>>> 28b587fa-991b-4267-80d7-9cf28b746fe9
+>>>
+>>> guest
+>>>  1. doesn't get GPE notification that it must receive
+>>>  2. vmgenid client in Windows reads the same value
+>>>       42d50e8bc109c09b:6cd1dcc90984339b
+>>
+>> Hmmm, I wonder if we need something like this, in vmgenid_post_load():
+>>
+>> commit 90c647db8d59e47c9000affc0d81754eb346e939
+>> Author: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> Date:   Fri Apr 15 12:41:30 2016 +0100
+>>
+>>     Fix pflash migration
+>>
+>> with the idea being that in a single device's post_load callback, we
+>> shouldn't perform machine-wide actions (post_load is likely for fixing
+>> up the device itself). If machine-wide actions are necessary, we should
+>> temporarily register a "vm change state handler", and do the thing once
+>> that handler is called (when the machine has been loaded fully and is
+>> about to continue execution).
+>>
+>> Can you please try the attached patch on top? (Build tested only.)
+> it doesn't help
 
-I thought I'd made a comment about these asserts on a previous
-version of this code... they're pretty unnecessary since if
-any of them are untrue we'll just segfault in this function.
+Thanks for trying! And, well, sh*t. :(
 
-The aim of an assert is to turn a hard-to-debug failure that
-only becomes visible late into an easy-to-debug failure that
-happens earlier. Assertions which don't move the failure
-significantly forward in time or turn an obscure problem into a
-clear one aren't really worth having.
+I guess it's time to resurrect the monitor command (temporarily, for
+testing) so we can inject the SCI at will, without migration. I don't
+want to burden you unreasonably, so I'll make an effort to try that myself.
 
-> +    s = c->gic;
-> +    cpu = ARM_CPU(c->cpu);
-> +
-> +    /* Initialize to actual HW supported configuration */
-> +    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS,
-> +                      KVM_VGIC_ATTR(ICC_CTLR_EL1, cpu->mp_affinity),
-> +                      &c->icc_ctlr_el1[GICV3_NS], false);
-> +
-> +    c->icc_ctlr_el1[GICV3_S] = c->icc_ctlr_el1[GICV3_NS];
-> +    c->icc_pmr_el1 = 0;
-> +    c->icc_bpr[GICV3_G0] = GIC_MIN_BPR;
-> +    c->icc_bpr[GICV3_G1] = GIC_MIN_BPR;
-> +    c->icc_bpr[GICV3_G1NS] = GIC_MIN_BPR;
-> +
-> +    c->icc_sre_el1 = 0x7;
-> +    memset(c->icc_apr, 0, sizeof(c->icc_apr));
-> +    memset(c->icc_igrpen, 0, sizeof(c->icc_igrpen));
-> +}
-> +
->  static void kvm_arm_gicv3_reset(DeviceState *dev)
->  {
->      GICv3State *s = ARM_GICV3_COMMON(dev);
-> @@ -621,6 +649,30 @@ static void kvm_arm_gicv3_reset(DeviceState *dev)
->      kvm_arm_gicv3_put(s);
->  }
->
-> +/*
-> + * CPU interface registers of GIC needs to be reset on CPU reset.
-> + * For the calling arm_gicv3_icc_reset() on CPU reset, we register
-> + * below ARMCPRegInfo. As we reset the whole cpu interface under single
-> + * register reset, we define only one register of CPU interface instead
-> + * of defining all the registers.
-> + */
-> +static const ARMCPRegInfo gicv3_cpuif_reginfo[] = {
-> +    { .name = "ICC_CTLR_EL1", .state = ARM_CP_STATE_BOTH,
-> +      .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 12, .opc2 = 4,
-> +      .type = ARM_CP_NO_RAW,
-> +      .access = PL1_RW,
-> +      .readfn = arm_cp_read_zero,
-> +      .writefn = arm_cp_write_ignore,
-> +      /*
-> +       * We hang the whole cpu interface reset routine off here
-> +       * rather than parcelling it out into one little function
-> +       * per register
-> +       */
-> +      .resetfn = arm_gicv3_icc_reset,
-> +    },
-> +    REGINFO_SENTINEL
-
-I asked for a comment saying why we can't use ARM_CP_NOP...
-
-thanks
--- PMM
+Thanks!
+Laszlo
