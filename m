@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35588)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cekJ4-0005R0-NA
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:18:47 -0500
+	(envelope-from <ben@skyportsystems.com>) id 1cekXr-0002p7-F6
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:34:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cekJ3-0002Yx-IY
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:18:46 -0500
-Date: Fri, 17 Feb 2017 16:18:34 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170217161834.4f9c556c@nial.brq.redhat.com>
-In-Reply-To: <CAFEAcA-aaEPxhYK2ePq2QXW6UVe2A=NxP=V7cokURkurPzLRGg@mail.gmail.com>
-References: <1487253461-269218-1-git-send-email-imammedo@redhat.com>
-	<CAFEAcA_NgmdDCfbPy+DnHQBmNGmQ4tj1z4ci+OP7+x4tHLLCxg@mail.gmail.com>
-	<20170216161114.220260cf@nial.brq.redhat.com>
-	<CAFEAcA-aaEPxhYK2ePq2QXW6UVe2A=NxP=V7cokURkurPzLRGg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/virt: fix cpu object reference leak
+	(envelope-from <ben@skyportsystems.com>) id 1cekXq-0001U6-2k
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:34:03 -0500
+Received: from mail-pg0-x233.google.com ([2607:f8b0:400e:c05::233]:33451)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
+	id 1cekXp-0001TM-Pl
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:34:02 -0500
+Received: by mail-pg0-x233.google.com with SMTP id y6so12853754pgy.0
+	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 07:34:01 -0800 (PST)
+From: Ben Warren <ben@skyportsystems.com>
+Message-Id: <4F60B53E-1A5D-4D4C-954F-F1C3ED5B487C@skyportsystems.com>
+Content-Type: multipart/signed;
+	boundary="Apple-Mail=_781549C1-9D4B-4F6D-99B8-5637061DED80";
+	protocol="application/pkcs7-signature"; micalg=sha1
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+Date: Fri, 17 Feb 2017 07:33:59 -0800
+In-Reply-To: <20170217114321.6c8577e1@nial.brq.redhat.com>
+References: <cover.1487286467.git.ben@skyportsystems.com>
+	<88232638f9ff3b17b54987624468678ea14a3037.1487286467.git.ben@skyportsystems.com>
+	<20170217114321.6c8577e1@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v8 4/8] ACPI: Add Virtual Machine
+ Generation ID support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,121 +33,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Andrew Jones <drjones@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
-
-On Fri, 17 Feb 2017 13:32:15 +0000
-Peter Maydell <peter.maydell@linaro.org> wrote:
-
-> On 16 February 2017 at 15:11, Igor Mammedov <imammedo@redhat.com> wrote:
-> > On Thu, 16 Feb 2017 14:18:05 +0000
-> > Peter Maydell <peter.maydell@linaro.org> wrote:  
-> >> I've always found the object reference semantics somewhat
-> >> confusing (why does realizing a device add a reference,
-> >> for instance?). Do we document them anywhere?  
-> > I'm not aware of a place where it's documented.
-> >
-> > currently device_realize() sets parent thus increasing
-> > ref counter only if device creator haven't set parent
-> > explicitly.  
-> 
-> It doesn't seem to:
-> 
-> static void device_realize(DeviceState *dev, Error **errp)
-> {
->     DeviceClass *dc = DEVICE_GET_CLASS(dev);
-> 
->     if (dc->init) {
->         int rc = dc->init(dev);
->         if (rc < 0) {
->             error_setg(errp, "Device initialization failed.");
->             return;
->         }
->     }
-> }
-static void device_set_realized(Object *obj, bool value, Error **errp)
-{
-...
-    if (value && !dev->realized) {                                               
-        if (!obj->parent) {                                                      
-            gchar *name = g_strdup_printf("device[%d]", unattached_count++);     
-                                                                                 
-            object_property_add_child(container_get(qdev_get_machine(),          
-                                                    "/unattached"),              
-                                      name, obj, &error_abort);                  
-            unattached_parent = true;                                            
-            g_free(name);                                                        
-        }
-
- 
-> ...it just calls the device's init function if it has one.
-> 
-> It's also pretty confusing that qdev_try_create()
-> and qdev_create() return a pointer to an object
-> that has been put into a bus and had unref called
-> (so the caller doesn't need to manually unref),
-qdev_try_create() when puts device on bus,
-it creates QOM link property to device which increases refcnt
-qdev_try_create() -> qdev_set_parent_bus() -> bus_add_child()
-
-link is not really usable at that time as device doesn't have
-parent (in QOM terms) and attempt to resolve it to path would
-assert, so it does set link manually by hack
-bus_add_child()
-    kid->child = child;                                                          
-    object_ref(OBJECT(kid->child)); 
-
-and then as bus holds reference, device won't disappear 
-until it's attached to bus, it unrefs original
-(qdev_try_create owned) pointer and returns pointer
-owned by qdev framework.
-
-later device creator calls
- qdev_init_nofail() ->
-   object_property_set_bool(true, "realized");
-
-which sets QOM parent for device to "/machine/unattached"
-if caller hasn't set it manually,
-
-like
- qdev_device_add() ->
-    qdev_set_id() ->
-       object_property_add_child("/peripheral" | "/peripheral-anon")
-
-or
- ioapic_init_gsi() ->
-     qdev_create()
-     object_property_add_child(...)
-     qdev_init_nofail()
-
-> but plain object_new() returns a pointer to an
-> object that hasn't been put into a bus, yet
-it's like malloc/new and used for all objects including
-ones without realize which is Device concept.
-So naturally caller hold/owns the first reference
-and should take care of it.
-
-> realizing does put it into a bus but doesn't do the
-> corresponding unref.
-it might add extra reference so successfully created device
-won't disappear once original owner 'frees' pointer that
-goes out of scope.
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, lersek@redhat.com, mst@redhat.com
 
 
-> I'd be a lot happier if we had clear documentation that
-> described how our object model, plugging things into buses,
-> etc handled reference counting and what the expected
-> "correct" code patterns are for using it.
-I see 2 APIs in use:
- 1: legacy qdev_create() + qdev_init_nofail()
-     for hardwired on board devices bus attached oriented
- 2: object_new() (+ device.realize() in case if object is Device)
-     used by device_add() used for both bus/bus-less device
-     post machine_init time.
-    
+--Apple-Mail=_781549C1-9D4B-4F6D-99B8-5637061DED80
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-> That said, I guess this patch is correct so I'm applying
-> it to target-arm.next.
-> 
-> thanks
-> -- PMM
+
+> On Feb 17, 2017, at 2:43 AM, Igor Mammedov <imammedo@redhat.com> =
+wrote:
+>=20
+> On Thu, 16 Feb 2017 15:15:36 -0800
+> ben@skyportsystems.com wrote:
+>=20
+>> From: Ben Warren <ben@skyportsystems.com>
+>>=20
+>> This implements the VM Generation ID feature by passing a 128-bit
+>> GUID to the guest via a fw_cfg blob.
+>> Any time the GUID changes, an ACPI notify event is sent to the guest
+>>=20
+>> The user interface is a simple device with one parameter:
+>> - guid (string, must be "auto" or in UUID format
+>>   xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+> I've given it some testing with WS2012R2 and v4 patches for Seabios,
+>=20
+> Windows is able to read initial GUID allocation and writeback
+> seems to work somehow:
+>=20
+> (qemu) info vm-generation-id=20
+> c109c09b-0e8b-42d5-9b33-8409c9dcd16c
+>=20
+> vmgenid client in Windows reads it as 2 following 64bit integers:
+> 42d50e8bc109c09b:6cd1dcc90984339b
+>=20
+> However update path/restore from snapshot doesn't
+> here is as I've tested it:
+>=20
+> qemu-system-x86_64 -device vmgenid,id=3Dtestvgid,guid=3Dauto -monitor =
+stdio
+> (qemu) info vm-generation-id=20
+> c109c09b-0e8b-42d5-9b33-8409c9dcd16c
+> (qemu) stop
+> (qemu) migrate "exec:gzip -c > STATEFILE.gz"=20
+> (qemu) quit
+>=20
+> qemu-system-x86_64 -device vmgenid,id=3Dtestvgid,guid=3Dauto -monitor =
+stdio
+> -incoming "exec: gzip -c -d STATEFILE.gz"
+> (qemu) info vm-generation-id=20
+> 28b587fa-991b-4267-80d7-9cf28b746fe9
+>=20
+> guest
+> 1. doesn't get GPE notification that it must receive
+> 2. vmgenid client in Windows reads the same value
+>      42d50e8bc109c09b:6cd1dcc90984339b
+>=20
+Strange, this was working for me, but with a slightly different test =
+method:
+I use virsh save/restore
+While I do later testing with Windows, during development I use a Linux =
+kernel module I wrote that keeps track of GUID and notifications.  I=E2=80=
+=99m happy to share this with you if interested.
+
+I=E2=80=99ll dig into this morning.
+
+=E2=80=94Ben
+<snip>=
+
+--Apple-Mail=_781549C1-9D4B-4F6D-99B8-5637061DED80
+Content-Disposition: attachment;
+	filename=smime.p7s
+Content-Type: application/pkcs7-signature;
+	name=smime.p7s
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIIJ+zCCBK8w
+ggOXoAMCAQICEQDgI8sVEoNTia1hbnpUZ2shMA0GCSqGSIb3DQEBCwUAMG8xCzAJBgNVBAYTAlNF
+MRQwEgYDVQQKEwtBZGRUcnVzdCBBQjEmMCQGA1UECxMdQWRkVHJ1c3QgRXh0ZXJuYWwgVFRQIE5l
+dHdvcmsxIjAgBgNVBAMTGUFkZFRydXN0IEV4dGVybmFsIENBIFJvb3QwHhcNMTQxMjIyMDAwMDAw
+WhcNMjAwNTMwMTA0ODM4WjCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hl
+c3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxQTA/BgNV
+BAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWls
+IENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAibEN2npTGU5wUh28VqYGJre4SeCW
+51Gr8fBaE0kVo7SMG2C8elFCp3mMpCLfF2FOkdV2IwoU00oCf7YdCYBupQQ92bq7Fv6hh6kuQ1JD
+FnyvMlDIpk9a6QjYz5MlnHuI6DBk5qT4VoD9KiQUMxeZrETlaYujRgZLwjPU6UCfBrCxrJNAubUI
+kzqcKlOjENs9IGE8VQOO2U52JQIhKfqjfHF2T+7hX4Hp+1SA28N7NVK3hN4iPSwwLTF/Wb1SN7Az
+aS1D6/rWpfGXd2dRjNnuJ+u8pQc4doykqTj/34z1A6xJvsr3c5k6DzKrnJU6Ez0ORjpXdGFQvsZA
+P8vk4p+iIQIDAQABo4IBFzCCARMwHwYDVR0jBBgwFoAUrb2YejS0Jvf6xCZU7wO94CTLVBowHQYD
+VR0OBBYEFJJha4LhoqCqT+xn8cKj97SAAMHsMA4GA1UdDwEB/wQEAwIBhjASBgNVHRMBAf8ECDAG
+AQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDARBgNVHSAECjAIMAYGBFUdIAAw
+RAYDVR0fBD0wOzA5oDegNYYzaHR0cDovL2NybC51c2VydHJ1c3QuY29tL0FkZFRydXN0RXh0ZXJu
+YWxDQVJvb3QuY3JsMDUGCCsGAQUFBwEBBCkwJzAlBggrBgEFBQcwAYYZaHR0cDovL29jc3AudXNl
+cnRydXN0LmNvbTANBgkqhkiG9w0BAQsFAAOCAQEAGypurFXBOquIxdjtzVXzqmthK8AJECOZD8Vm
+am+x9bS1d14PAmEA330F/hKzpICAAPz7HVtqcgIKQbwFusFY1SbC6tVNhPv+gpjPWBvjImOcUvi7
+BTarfVil3qs7Y+Xa1XPv7OD7e+Kj//BCI5zKto1NPuRLGAOyqC3U2LtCS5BphRDbpjc06HvgARCl
+nMo6x59PiDRuimXQGoq7qdzKyjbR9PzCZCk1r9axp3ER0gNDsY8+muyeMlP0dpLKhjQHuSzK5hxK
+2JkNwYbikJL7WkJqIyEQ6WXH9dW7fuqMhSACYurROgcsWcWZM/I4ieW26RZ6H3kU9koQGib6fIr7
+mzCCBUQwggQsoAMCAQICEQCWOeMVlifzA+PvGfHjMeybMA0GCSqGSIb3DQEBCwUAMIGbMQswCQYD
+VQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRow
+GAYDVQQKExFDT01PRE8gQ0EgTGltaXRlZDFBMD8GA1UEAxM4Q09NT0RPIFNIQS0yNTYgQ2xpZW50
+IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTYwNTE5MDAwMDAwWhcNMTcw
+NTE5MjM1OTU5WjAnMSUwIwYJKoZIhvcNAQkBFhZiZW5Ac2t5cG9ydHN5c3RlbXMuY29tMIIBIjAN
+BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAryjnKj/3VRzbNXiWAp7RAZSzUCOzDG6WJ2ybuDWP
+A7uDl48iX2v3ulbcZq8G0sL1nwGvBdSrmd5X3Qzirx0ti0Qe0mlAd22PEOL/xR5ChLDhNI6i43cM
+R1qM1JNtuC5Dz8h2TfYbF/VuKkA1YVuXNguSP8Z1DQXptE1m3yS0gk9LLdDkqq7Vi/zfSmD1NYHN
+gEGvtux/3lMp8pHgQiZo8PxKH2Y4zem0AiWtZ9fKZqYWRIhECJ+etvpGvh4dNIj8vdo/ig3uSwLv
+ePX7rFz3C5WHOyKjl4VGHNOA5IRZjabp4bdAEIiMPU7lfWt0o4nCRtM/G/6FvFinR6PIHSma1wID
+AQABo4IB9DCCAfAwHwYDVR0jBBgwFoAUkmFrguGioKpP7GfxwqP3tIAAwewwHQYDVR0OBBYEFJv6
+uT+NCtbUQ0MHZLryEY65oKgbMA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMCAGA1UdJQQZ
+MBcGCCsGAQUFBwMEBgsrBgEEAbIxAQMFAjARBglghkgBhvhCAQEEBAMCBSAwRgYDVR0gBD8wPTA7
+BgwrBgEEAbIxAQIBAQEwKzApBggrBgEFBQcCARYdaHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9D
+UFMwXQYDVR0fBFYwVDBSoFCgToZMaHR0cDovL2NybC5jb21vZG9jYS5jb20vQ09NT0RPU0hBMjU2
+Q2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNybDCBkAYIKwYBBQUHAQEEgYMw
+gYAwWAYIKwYBBQUHMAKGTGh0dHA6Ly9jcnQuY29tb2RvY2EuY29tL0NPTU9ET1NIQTI1NkNsaWVu
+dEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYIKwYBBQUHMAGGGGh0dHA6Ly9v
+Y3NwLmNvbW9kb2NhLmNvbTAhBgNVHREEGjAYgRZiZW5Ac2t5cG9ydHN5c3RlbXMuY29tMA0GCSqG
+SIb3DQEBCwUAA4IBAQAwVeCMNqTr20+cqsHnSK2AtzxKZyVG9y51wB88lPnRGHe2m+qKGdPgAh/7
+iDzEEXsy4sDwHVHVq4kLHW9lX7CvRTxCtmOAtsty5ePhJjh3CX+nsK2HKpi043E6azad6L64DNVN
+dMZFwUrUu8dYjOp48TPpIhW13Sbu2t/SOZK4G8EZAaZPX8Dg34tyHRUvM/B/eaJuUgdM5qY2IU+F
+7U2K4hBHkhJMJgQ7TyVe8GhdBMaztY4GHqhWP5cCgZBdC9QII8E5jqX7//FbBRB0zVHRVeBZO32H
+TvapSOG8ZYd0n5l5j3rBQnLfHWsnQ07rL2+w8W9BBPSZBbciPuwOe3ksMYIDxjCCA8ICAQEwgbEw
+gZsxCzAJBgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1Nh
+bGZvcmQxGjAYBgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1
+NiBDbGllbnQgQXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z
+8eMx7JswCQYFKw4DAhoFAKCCAekwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0B
+CQUxDxcNMTcwMjE3MTUzMzYwWjAjBgkqhkiG9w0BCQQxFgQU2bnRAvGnSlqwKEfsDpY8KIjKlJkw
+gcIGCSsGAQQBgjcQBDGBtDCBsTCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFu
+Y2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxQTA/
+BgNVBAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVt
+YWlsIENBAhEAljnjFZYn8wPj7xnx4zHsmzCBxAYLKoZIhvcNAQkQAgsxgbSggbEwgZsxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1NiBDbGllbnQg
+QXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z8eMx7JswDQYJ
+KoZIhvcNAQEBBQAEggEAJoSWc+zmqes0VfgbCNbuoQgKr9wr90fIsPjb8V1mpJUBRzIf8L4dHnwF
+K288lQ1DhqziQBME+aijIP1hG5SqAwOKYI3CQilq8HQ3kkww1YRwiHvuSMvv0ZzHJNfjCzdOOGDr
+JbAUfqgNxjO7LOyTa/ldv1nOSONbc4Jkl7NkubZ7153smpuP+DHR9kPRYPFcrualcSyIVA6+ukVE
+Zpt+IdkYy6mGQxxt2iuP3VwAx5+SFdSoJRXs/Ck9Q+ieV3dn5/v12BvZ64L1oxVivwHiR97Zvtvk
+u/2MAkus4G51zUWzKORzxl0X2ASY00tMdWvkFb30socz9p6Smzs7JfyFbwAAAAAAAA==
+--Apple-Mail=_781549C1-9D4B-4F6D-99B8-5637061DED80--
