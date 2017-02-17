@@ -1,36 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cedub-0003Fp-S4
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:29:10 -0500
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1ceduh-0003K4-Eo
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:29:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1ceduW-0000gc-SH
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:29:05 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50699
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1ceduc-0000hb-G8
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:29:11 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33985)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1ceduW-0000gW-L0
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:29:00 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1H8Sx4K052961
-	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 03:28:59 -0500
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28np0yew2e-1
+	id 1ceduc-0000hF-6r
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:29:06 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1H8SxJA095139
+	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 03:29:04 -0500
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28nnyf765g-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 03:28:59 -0500
+	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 03:29:04 -0500
 Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Fri, 17 Feb 2017 03:28:58 -0500
+	Fri, 17 Feb 2017 01:29:03 -0700
 From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Date: Fri, 17 Feb 2017 09:28:36 +0100
+Date: Fri, 17 Feb 2017 09:28:38 +0100
 In-Reply-To: <20170217082844.89466-1-bjsdjshi@linux.vnet.ibm.com>
 References: <20170217082844.89466-1-bjsdjshi@linux.vnet.ibm.com>
-Message-Id: <20170217082844.89466-4-bjsdjshi@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH RFC v3 03/11] s390x/css: realize
- css_sch_build_schib
+Message-Id: <20170217082844.89466-6-bjsdjshi@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH RFC v3 05/11] s390x/css: device support for
+ s390-ccw passthrough
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,272 +41,203 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org
 Cc: bjsdjshi@linux.vnet.ibm.com, renxiaof@linux.vnet.ibm.com, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, wkywang@linux.vnet.ibm.com
 
-From: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
-
-The S390 virtual css support already has a mechanism to build virtual
-Sub-Channel Information Block and provide virtual subchannels to the
-guest. However, to pass-through subchannels to a guest, we need to
-introduce a new mechanism to build its schib according to the real
-device information. Thus we realize a new css_sch_build_schib function
-to extract the path_masks, chpids, chpid type from sysfs. To reuse
-the existing code, we refactor css_add_virtual_chpid to css_add_chpid.
+In order to support subchannels pass-through, we introduce a s390
+subchannel device called "s390-ccw" to hold the real subchannel info.
+The s390-ccw devices inherit from the abstract CcwDevice which connect
+to the existing virtual-css-bus.
 
 Signed-off-by: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
-Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
 ---
- hw/s390x/css.c         | 153 ++++++++++++++++++++++++++++++++++++++++++++++++-
- include/hw/s390x/css.h |  36 ++++++------
- 2 files changed, 169 insertions(+), 20 deletions(-)
+ hw/s390x/Makefile.objs |   1 +
+ hw/s390x/s390-ccw.c    | 125 +++++++++++++++++++++++++++++++++++++++++++++++++
+ hw/s390x/s390-ccw.h    |  38 +++++++++++++++
+ 3 files changed, 164 insertions(+)
+ create mode 100644 hw/s390x/s390-ccw.c
+ create mode 100644 hw/s390x/s390-ccw.h
 
-diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index 0f2580d..09038a2 100644
---- a/hw/s390x/css.c
-+++ b/hw/s390x/css.c
-@@ -13,6 +13,7 @@
- #include "qapi/error.h"
- #include "qapi/visitor.h"
- #include "hw/qdev.h"
-+#include "qemu/error-report.h"
- #include "qemu/bitops.h"
- #include "exec/address-spaces.h"
- #include "cpu.h"
-@@ -1278,7 +1279,8 @@ bool css_schid_final(int m, uint8_t cssid, uint8_t ssid, uint16_t schid)
-                                  (MAX_SCHID + 1) / sizeof(unsigned long));
- }
- 
--static int css_add_virtual_chpid(uint8_t cssid, uint8_t chpid, uint8_t type)
-+static int css_add_chpid(uint8_t cssid, uint8_t chpid, uint8_t type,
-+                         bool is_virt)
- {
-     CssImage *css;
- 
-@@ -1292,7 +1294,7 @@ static int css_add_virtual_chpid(uint8_t cssid, uint8_t chpid, uint8_t type)
-     }
-     css->chpids[chpid].in_use = 1;
-     css->chpids[chpid].type = type;
--    css->chpids[chpid].is_virtual = 1;
-+    css->chpids[chpid].is_virtual = is_virt;
- 
-     css_generate_chp_crws(cssid, chpid);
- 
-@@ -1316,7 +1318,7 @@ void css_sch_build_virtual_schib(SubchDev *sch, uint8_t chpid, uint8_t type)
-     p->pam = 0x80;
-     p->chpid[0] = chpid;
-     if (!css->chpids[chpid].in_use) {
--        css_add_virtual_chpid(sch->cssid, chpid, type);
-+        css_add_chpid(sch->cssid, chpid, type, true);
-     }
- 
-     memset(s, 0, sizeof(SCSW));
-@@ -1908,3 +1910,148 @@ SubchDev *css_create_virtual_sch(CssDevId bus_id, Error **errp)
-     css_subch_assign(sch->cssid, sch->ssid, schid, sch->devno, sch);
-     return sch;
- }
-+
-+static int css_sch_get_chpids(SubchDev *sch, CssDevId *dev_id)
-+{
-+    char *fid_path;
-+    FILE *fd;
-+    uint32_t chpid[8];
-+    int i;
-+    PMCW *p = &sch->curr_status.pmcw;
-+
-+    fid_path = g_strdup_printf("/sys/bus/css/devices/%x.%x.%04x/chpids",
-+                               dev_id->cssid, dev_id->ssid, dev_id->devid);
-+    fd = fopen(fid_path, "r");
-+    if (fd == NULL) {
-+        error_report("%s: open %s failed", __func__, fid_path);
-+        g_free(fid_path);
-+        return -EINVAL;
-+    }
-+
-+    if (fscanf(fd, "%x %x %x %x %x %x %x %x",
-+        &chpid[0], &chpid[1], &chpid[2], &chpid[3],
-+        &chpid[4], &chpid[5], &chpid[6], &chpid[7]) != 8) {
-+        fclose(fd);
-+        g_free(fid_path);
-+        return -EINVAL;
-+    }
-+
-+    for (i = 0; i < ARRAY_SIZE(p->chpid); i++) {
-+        p->chpid[i] = chpid[i];
-+    }
-+
-+    fclose(fd);
-+    g_free(fid_path);
-+
-+    return 0;
-+}
-+
-+static int css_sch_get_path_masks(SubchDev *sch, CssDevId *dev_id)
-+{
-+    char *fid_path;
-+    FILE *fd;
-+    uint32_t pim, pam, pom;
-+    PMCW *p = &sch->curr_status.pmcw;
-+
-+    fid_path = g_strdup_printf("/sys/bus/css/devices/%x.%x.%04x/pimpampom",
-+                               dev_id->cssid, dev_id->ssid, dev_id->devid);
-+    fd = fopen(fid_path, "r");
-+    if (fd == NULL) {
-+        error_report("%s: open %s failed", __func__, fid_path);
-+        g_free(fid_path);
-+        return -EINVAL;
-+    }
-+
-+    if (fscanf(fd, "%x %x %x", &pim, &pam, &pom) != 3) {
-+        fclose(fd);
-+        g_free(fid_path);
-+        return -EINVAL;
-+    }
-+
-+    p->pim = pim;
-+    p->pam = pam;
-+    p->pom = pom;
-+    fclose(fd);
-+    g_free(fid_path);
-+
-+    return 0;
-+}
-+
-+static int css_sch_get_chpid_type(uint8_t chpid, uint32_t *type,
-+                                  CssDevId *dev_id)
-+{
-+    char *fid_path;
-+    FILE *fd;
-+
-+    fid_path = g_strdup_printf("/sys/devices/css%x/chp0.%02x/type",
-+                               dev_id->cssid, chpid);
-+    fd = fopen(fid_path, "r");
-+    if (fd == NULL) {
-+        error_report("%s: open %s failed", __func__, fid_path);
-+        g_free(fid_path);
-+        return -EINVAL;
-+    }
-+
-+    if (fscanf(fd, "%x", type) != 1) {
-+        fclose(fd);
-+        g_free(fid_path);
-+        return -EINVAL;
-+    }
-+
-+    fclose(fd);
-+    g_free(fid_path);
-+
-+    return 0;
-+}
-+
+diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
+index 41ac4ec..72a3d37 100644
+--- a/hw/s390x/Makefile.objs
++++ b/hw/s390x/Makefile.objs
+@@ -13,3 +13,4 @@ obj-y += ccw-device.o
+ obj-y += s390-pci-bus.o s390-pci-inst.o
+ obj-y += s390-skeys.o
+ obj-$(CONFIG_KVM) += s390-skeys-kvm.o
++obj-y += s390-ccw.o
+diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
+new file mode 100644
+index 0000000..9b6de68
+--- /dev/null
++++ b/hw/s390x/s390-ccw.c
+@@ -0,0 +1,125 @@
 +/*
-+ * We currently retrieve the real device information from sysfs to build the
-+ * guest subchannel information block without considering the migration feature.
-+ * If migrate, it won't be sure to use the real device information directly,
-+ * this point will be handled in the future.
++ * s390 CCW Assignment Support
++ *
++ * Copyright 2017 IBM Corp
++ * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
++ *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
++ *            Pierre Morel <pmorel@linux.vnet.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2
++ * or (at your option) any later version. See the COPYING file in the
++ * top-level directory.
 + */
-+int css_sch_build_schib(SubchDev *sch, CssDevId *dev_id)
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "hw/sysbus.h"
++#include "libgen.h"
++#include "hw/s390x/css.h"
++#include "hw/s390x/css-bridge.h"
++#include "s390-ccw.h"
++
++static void s390_ccw_get_dev_info(S390CCWDevice *cdev,
++                                  char *sysfsdev,
++                                  Error **errp)
 +{
-+    CssImage *css = channel_subsys.css[sch->cssid];
-+    PMCW *p = &sch->curr_status.pmcw;
-+    SCSW *s = &sch->curr_status.scsw;
-+    uint32_t type;
-+    int i, ret;
++    char dev_path[PATH_MAX], *tmp;
++    unsigned int cssid, ssid, devid;
 +
-+    /* We are dealing with I/O subchannels only. */
-+    assert(css != NULL);
-+    memset(p, 0, sizeof(PMCW));
-+    p->flags |= PMCW_FLAGS_MASK_DNV;
-+    p->devno = sch->devno;
-+
-+    /* Grab path mask from sysfs. */
-+    ret = css_sch_get_path_masks(sch, dev_id);
-+    if (ret) {
-+        return ret;
++    if (!sysfsdev) {
++        error_setg(errp, "No host device provided");
++        error_append_hint(errp, "Use -vfio-ccw,sysfsdev=PATH_TO_DEVICE\n");
++        return;
 +    }
 +
-+    /* Grab chpids from sysfs. */
-+    ret = css_sch_get_chpids(sch, dev_id);
-+    if (ret) {
-+        return ret;
++    if (!realpath(sysfsdev, dev_path)) {
++        error_setg(errp, "Host device '%s' not found", sysfsdev);
++        return;
 +    }
 +
-+   /* Build chpid type. */
-+    for (i = 0; i < ARRAY_SIZE(p->chpid); i++) {
-+        if (p->chpid[i] && !css->chpids[p->chpid[i]].in_use) {
-+            ret = css_sch_get_chpid_type(p->chpid[i], &type, dev_id);
-+            if (ret) {
-+                return ret;
-+            }
-+            css_add_chpid(sch->cssid, p->chpid[i], type, false);
-+        }
-+    }
++    cdev->mdevid = g_strdup(basename(dev_path));
 +
-+    memset(s, 0, sizeof(SCSW));
-+    sch->curr_status.mba = 0;
-+    for (i = 0; i < ARRAY_SIZE(sch->curr_status.mda); i++) {
-+        sch->curr_status.mda[i] = 0;
-+    }
++    tmp = basename(dirname(dev_path));
++    sscanf(tmp, "%2x.%1x.%4x", &cssid, &ssid, &devid);
 +
-+    return 0;
++    cdev->hostid.cssid = cssid;
++    cdev->hostid.ssid = ssid;
++    cdev->hostid.devid = devid;
++    cdev->hostid.valid = true;
 +}
-diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-index c96c862..648ea2f 100644
---- a/include/hw/s390x/css.h
-+++ b/include/hw/s390x/css.h
-@@ -92,6 +92,24 @@ struct SubchDev {
-     void *driver_data;
- };
- 
++
++static void s390_ccw_realize(S390CCWDevice *cdev, char *sysfsdev, Error **errp)
++{
++    CcwDevice *ccw_dev = CCW_DEVICE(cdev);
++    DeviceState *parent = DEVICE(ccw_dev);
++    BusState *qbus = qdev_get_parent_bus(parent);
++    VirtualCssBus *cbus = VIRTUAL_CSS_BUS(qbus);
++    SubchDev *sch;
++    int ret;
++
++    s390_ccw_get_dev_info(cdev, sysfsdev, errp);
++    if (*errp) {
++        return;
++    }
++
++    sch = css_create_sch(ccw_dev->bus_id, false, cbus->squash_mcss, errp);
++    if (!sch) {
++        return;
++    }
++
++    sch->driver_data = cdev;
++
++    ret = css_sch_build_schib(sch, &cdev->hostid);
++    if (ret) {
++        error_setg(errp, "%s: Failed to build initial schib: %d",
++                   __func__, ret);
++        css_subch_assign(sch->cssid, sch->ssid, sch->schid, sch->devno, NULL);
++        g_free(sch);
++        return;
++    }
++    css_generate_sch_crws(sch->cssid, sch->ssid, sch->schid,
++                          parent->hotplugged, 1);
++
++    ccw_dev->sch = sch;
++
++    return;
++}
++
++static void s390_ccw_unrealize(S390CCWDevice *cdev, Error **errp)
++{
++    CcwDevice *ccw_dev = CCW_DEVICE(cdev);
++    SubchDev *sch = ccw_dev->sch;
++
++    if (sch) {
++        css_subch_assign(sch->cssid, sch->ssid, sch->schid, sch->devno, NULL);
++        g_free(sch);
++        ccw_dev->sch = NULL;
++    }
++
++    g_free(cdev->mdevid);
++}
++
++static void s390_ccw_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    S390CCWDeviceClass *cdc = S390_CCW_DEVICE_CLASS(klass);
++
++    dc->bus_type = TYPE_VIRTUAL_CSS_BUS;
++    cdc->realize = s390_ccw_realize;
++    cdc->unrealize = s390_ccw_unrealize;
++}
++
++static const TypeInfo s390_ccw_info = {
++    .name          = TYPE_S390_CCW,
++    .parent        = TYPE_CCW_DEVICE,
++    .instance_size = sizeof(S390CCWDevice),
++    .class_size    = sizeof(S390CCWDeviceClass),
++    .class_init    = s390_ccw_class_init,
++    .abstract      = true,
++};
++
++static void register_s390_ccw_type(void)
++{
++    type_register_static(&s390_ccw_info);
++}
++
++type_init(register_s390_ccw_type)
+diff --git a/hw/s390x/s390-ccw.h b/hw/s390x/s390-ccw.h
+new file mode 100644
+index 0000000..b58d8e9
+--- /dev/null
++++ b/hw/s390x/s390-ccw.h
+@@ -0,0 +1,38 @@
 +/*
-+ * Identify a device within the channel subsystem.
-+ * Note that this can be used to identify either the subchannel or
-+ * the attached I/O device, as there's always one I/O device per
-+ * subchannel.
++ * s390 CCW Assignment Support
++ *
++ * Copyright 2017 IBM Corp.
++ * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
++ *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or (at
++ * your option) any later version. See the COPYING file in the top-level
++ * directory.
 + */
-+typedef struct CssDevId {
-+    uint8_t cssid;
-+    uint8_t ssid;
-+    uint16_t devid;
-+    bool valid;
-+} CssDevId;
 +
-+extern PropertyInfo css_devid_propinfo;
++#ifndef HW_S390_CCW_H
++#define HW_S390_CCW_H
 +
-+#define DEFINE_PROP_CSS_DEV_ID(_n, _s, _f) \
-+    DEFINE_PROP(_n, _s, _f, css_devid_propinfo, CssDevId)
++#include "hw/s390x/ccw-device.h"
 +
- typedef struct IndAddr {
-     hwaddr addr;
-     uint64_t map;
-@@ -113,6 +131,7 @@ bool css_devno_used(uint8_t cssid, uint8_t ssid, uint16_t devno);
- void css_subch_assign(uint8_t cssid, uint8_t ssid, uint16_t schid,
-                       uint16_t devno, SubchDev *sch);
- void css_sch_build_virtual_schib(SubchDev *sch, uint8_t chpid, uint8_t type);
-+int css_sch_build_schib(SubchDev *sch, CssDevId *dev_id);
- uint16_t css_build_subchannel_id(SubchDev *sch);
- void css_reset(void);
- void css_reset_sch(SubchDev *sch);
-@@ -154,23 +173,6 @@ int css_do_rsch(SubchDev *sch);
- int css_do_rchp(uint8_t cssid, uint8_t chpid);
- bool css_present(uint8_t cssid);
- #endif
--/*
-- * Identify a device within the channel subsystem.
-- * Note that this can be used to identify either the subchannel or
-- * the attached I/O device, as there's always one I/O device per
-- * subchannel.
-- */
--typedef struct CssDevId {
--    uint8_t cssid;
--    uint8_t ssid;
--    uint16_t devid;
--    bool valid;
--} CssDevId;
--
--extern PropertyInfo css_devid_propinfo;
--
--#define DEFINE_PROP_CSS_DEV_ID(_n, _s, _f) \
--    DEFINE_PROP(_n, _s, _f, css_devid_propinfo, CssDevId)
- 
- /**
-  * Create a subchannel for the given bus id.
++#define TYPE_S390_CCW "s390-ccw"
++#define S390_CCW_DEVICE(obj) \
++    OBJECT_CHECK(S390CCWDevice, (obj), TYPE_S390_CCW)
++#define S390_CCW_DEVICE_CLASS(klass) \
++    OBJECT_CLASS_CHECK(S390CCWDeviceClass, (klass), TYPE_S390_CCW)
++#define S390_CCW_DEVICE_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(S390CCWDeviceClass, (obj), TYPE_S390_CCW)
++
++typedef struct S390CCWDevice {
++    CcwDevice parent_obj;
++    CssDevId hostid;
++    char *mdevid;
++} S390CCWDevice;
++
++typedef struct S390CCWDeviceClass {
++    CCWDeviceClass parent_class;
++    void (*realize)(S390CCWDevice *dev, char *sysfsdev, Error **errp);
++    void (*unrealize)(S390CCWDevice *dev, Error **errp);
++} S390CCWDeviceClass;
++
++#endif
 -- 
 2.8.4
