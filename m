@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1cekkv-00039Z-SA
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:47:35 -0500
+	(envelope-from <eblake@redhat.com>) id 1ceklb-0003Wy-Q0
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:48:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1cekkr-0000hl-H3
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:47:33 -0500
-Received: from mx5-phx2.redhat.com ([209.132.183.37]:41904)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1cekkr-0000hA-8P
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:47:29 -0500
-Date: Fri, 17 Feb 2017 10:47:26 -0500 (EST)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>
-Message-ID: <669850340.6891018.1487346446001.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1487344340-30471-1-git-send-email-peter.maydell@linaro.org>
-References: <1487344340-30471-1-git-send-email-peter.maydell@linaro.org>
+	(envelope-from <eblake@redhat.com>) id 1cekla-0001EW-M1
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:48:15 -0500
+References: <1487153430-17260-1-git-send-email-vsementsov@virtuozzo.com>
+	<1487153430-17260-26-git-send-email-vsementsov@virtuozzo.com>
+	<20170216142144.GG4869@noname.redhat.com>
+	<e572baaf-f726-ee89-ae33-b8e2d99125e5@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <86274ce0-34df-1f60-0f9d-41327153bdc8@redhat.com>
+Date: Fri, 17 Feb 2017 09:48:05 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Makefile: Put VERSION info into
- version.texi rather than using -D
+In-Reply-To: <e572baaf-f726-ee89-ae33-b8e2d99125e5@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="UaWmVvGrfs278wqI8Wf0V4U6WtPJexOq9"
+Subject: Re: [Qemu-devel] [PATCH v15 25/25] qcow2-bitmap: improve
+ check_constraints_on_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,103 +27,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, patches@linaro.org, Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
-Hi
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--UaWmVvGrfs278wqI8Wf0V4U6WtPJexOq9
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com,
+ armbru@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org,
+ stefanha@redhat.com, pbonzini@redhat.com
+Message-ID: <86274ce0-34df-1f60-0f9d-41327153bdc8@redhat.com>
+Subject: Re: [PATCH v15 25/25] qcow2-bitmap: improve
+ check_constraints_on_bitmap
+References: <1487153430-17260-1-git-send-email-vsementsov@virtuozzo.com>
+ <1487153430-17260-26-git-send-email-vsementsov@virtuozzo.com>
+ <20170216142144.GG4869@noname.redhat.com>
+ <e572baaf-f726-ee89-ae33-b8e2d99125e5@virtuozzo.com>
+In-Reply-To: <e572baaf-f726-ee89-ae33-b8e2d99125e5@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
------ Original Message -----
-> Unfortunately some older versions of makeinfo don't correctly
-> handle the -D command line option and fail to set the variable.
-> This then causes them to complain
->  docs/qemu-ga-ref.texi:41: warning: undefined flag: VERSION
-> 
-> Work around this by doing as the autotools do, and writing
-> the information into a version.texi file which we then
-> include from the .texi files that need it.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  Makefile               | 17 ++++++++++-------
->  docs/qemu-ga-ref.texi  |  2 ++
->  docs/qemu-qmp-ref.texi |  2 ++
->  3 files changed, 14 insertions(+), 7 deletions(-)
+On 02/17/2017 04:18 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 16.02.2017 17:21, Kevin Wolf wrote:
+>> Am 15.02.2017 um 11:10 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>>> Add detailed error messages.
+>>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
+>
+>> Why not merge this patch into the one that originally introduced the
+>> function?
+>=20
+> Just to not create extra work for reviewers
 
-looks good,
-version.texi should probably be in .gitignore though
+It's extra work for reviewers if you don't rebase obvious fixes where
+they belong - a new reviewer may flag the issue in the earlier patch
+only to find out later in the series that you've already fixed it.
+Avoiding needless code churn is part of what rebasing is all about - you
+want each step of the series to be self-contained and as correct as
+possible, by adding in the fixes at the point where they make sense,
+rather than at the end of the series.
 
-> diff --git a/Makefile b/Makefile
-> index 830fa5a..1c4c04f 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -516,7 +516,7 @@ distclean: clean
->  	rm -f qemu-doc.vr qemu-doc.txt
->  	rm -f config.log
->  	rm -f linux-headers/asm
-> -	rm -f qemu-ga-qapi.texi qemu-qapi.texi
-> +	rm -f qemu-ga-qapi.texi qemu-qapi.texi version.texi
->  	rm -f docs/qemu-qmp-ref.7 docs/qemu-ga-ref.7
->  	rm -f docs/qemu-qmp-ref.txt docs/qemu-ga-ref.txt
->  	rm -f docs/qemu-qmp-ref.pdf docs/qemu-ga-ref.pdf
-> @@ -663,21 +663,24 @@ ui/console-gl.o: $(SRC_PATH)/ui/console-gl.c \
->  
->  # documentation
->  MAKEINFO=makeinfo
-> -MAKEINFOFLAGS=--no-split --number-sections -D 'VERSION $(VERSION)'
-> -TEXIFLAG=$(if $(V),,--quiet) --command='@set VERSION $(VERSION)'
-> +MAKEINFOFLAGS=--no-split --number-sections
-> +TEXIFLAG=$(if $(V),,--quiet)
->  
-> -%.html: %.texi
-> +version.texi: $(SRC_PATH)/VERSION
-> +	$(call quiet-command,echo "@set VERSION $(VERSION)" > $@,"GEN","$@")
-> +
-> +%.html: %.texi version.texi
->  	$(call quiet-command,LC_ALL=C $(MAKEINFO) $(MAKEINFOFLAGS) --no-headers \
->  	--html $< -o $@,"GEN","$@")
->  
-> -%.info: %.texi
-> +%.info: %.texi version.texi
->  	$(call quiet-command,$(MAKEINFO) $(MAKEINFOFLAGS) $< -o $@,"GEN","$@")
->  
-> -%.txt: %.texi
-> +%.txt: %.texi version.texi
->  	$(call quiet-command,LC_ALL=C $(MAKEINFO) $(MAKEINFOFLAGS) --no-headers \
->  	--plaintext $< -o $@,"GEN","$@")
->  
-> -%.pdf: %.texi
-> +%.pdf: %.texi version.texi
->  	$(call quiet-command,texi2pdf $(TEXIFLAG) -I $(SRC_PATH) -I . $< -o
->  	$@,"GEN","$@")
->  
->  qemu-options.texi: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
-> diff --git a/docs/qemu-ga-ref.texi b/docs/qemu-ga-ref.texi
-> index 87cc8d0..ddb76ce 100644
-> --- a/docs/qemu-ga-ref.texi
-> +++ b/docs/qemu-ga-ref.texi
-> @@ -1,6 +1,8 @@
->  \input texinfo
->  @setfilename qemu-ga-ref.info
->  
-> +@include version.texi
-> +
->  @exampleindent 0
->  @paragraphindent 0
->  
-> diff --git a/docs/qemu-qmp-ref.texi b/docs/qemu-qmp-ref.texi
-> index 818e525..0a00569 100644
-> --- a/docs/qemu-qmp-ref.texi
-> +++ b/docs/qemu-qmp-ref.texi
-> @@ -1,6 +1,8 @@
->  \input texinfo
->  @setfilename qemu-qmp-ref.info
->  
-> +@include version.texi
-> +
->  @exampleindent 0
->  @paragraphindent 0
->  
-> --
-> 2.7.4
-> 
-> 
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--UaWmVvGrfs278wqI8Wf0V4U6WtPJexOq9
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYpxs1AAoJEKeha0olJ0Nq62kH/AmdDGW994YpRhQATPhmSXwp
+klk5Me4t345pHbuXA5BFM+wFbCzsP2Gom9dui7Z7U5XBjH02bspHJc+jnIB/vA4v
+C5GfFa1Z0VDhuAPQAwThHHQHN90U4L09ydEVLS/xB0gcfjb6m/174ZSrqqUvqE9D
+I6Zwwwyl5ljuFMHqNXjx7eb88BLCNXocgybiWYXCLo6AdJ0DrMvxKar1KWcQdjTP
+X8MGNm4eUDXX2iFffcILsKusYuwZqZROi6RpLMaAlFEm/8LRULfa392DxczzvF8x
+juWLjb8HO/hZxjGN8oiwCZuDdC7VztCXgRqetD+gzoSdlBPVnmbzvjtVDKwZl7Y=
+=zHvc
+-----END PGP SIGNATURE-----
+
+--UaWmVvGrfs278wqI8Wf0V4U6WtPJexOq9--
