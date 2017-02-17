@@ -1,35 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cejvc-0005Xc-M9
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 09:54:33 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cekCw-0003Bb-5f
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:12:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cejvb-0006tV-LT
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 09:54:32 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:5531 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cejvb-0006se-9p
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 09:54:31 -0500
-References: <1487153430-17260-9-git-send-email-vsementsov@virtuozzo.com>
-	<20170216112506.GB4869@noname.redhat.com>
-	<20170216114944.GD4869@noname.redhat.com>
-	<8d7a5d17-7b1b-578a-67fc-c79beb196a4c@virtuozzo.com>
-	<20170217120935.GC5338@noname.redhat.com>
-	<fd790939-7ad7-1d74-c810-eceece98bbb7@virtuozzo.com>
-	<20170217124842.GE5338@noname.redhat.com>
-	<3a827d65-1028-d0fd-c3aa-cabe61dafbd9@openvz.org>
-	<20170217133430.GI5338@noname.redhat.com>
-	<635d98d9-0f65-4fa6-2208-02ff7d23a2e9@openvz.org>
-	<20170217142403.GJ5338@noname.redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <89b7456e-e689-fdee-7ab0-89bb664f1cb6@virtuozzo.com>
-Date: Fri, 17 Feb 2017 17:54:16 +0300
-MIME-Version: 1.0
-In-Reply-To: <20170217142403.GJ5338@noname.redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v15 08/25] block: introduce auto-loading
- bitmaps
+	(envelope-from <pm215@archaic.org.uk>) id 1cekCv-0005Vg-2u
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:12:26 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48553)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1cekCu-0005Ug-SG
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:12:25 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 17 Feb 2017 15:12:20 +0000
+Message-Id: <1487344340-30471-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] Makefile: Put VERSION info into version.texi
+ rather than using -D
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,65 +23,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, "Denis V. Lunev" <den@openvz.org>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <mlureau@redhat.com>
 
-17.02.2017 17:24, Kevin Wolf wrote:
-> Am 17.02.2017 um 14:48 hat Denis V. Lunev geschrieben:
->> On 02/17/2017 04:34 PM, Kevin Wolf wrote:
->>> Am 17.02.2017 um 14:22 hat Denis V. Lunev geschrieben:
->>>> But for sure this is bad from the downtime point of view.
->>>> On migrate you will have to write to the image and re-read
->>>> it again on the target. This would be very slow. This will
->>>> not help for the migration with non-shared disk too.
->>>>
->>>> That is why we have specifically worked in a migration,
->>>> which for a good does not influence downtime at all now.
->>>>
->>>> With a write we are issuing several write requests + sync.
->>>> Our measurements shows that bdrv_drain could take around
->>>> a second on an averagely loaded conventional system, which
->>>> seems unacceptable addition to me.
->>> I'm not arguing against optimising migration, I fully agree with you. I
->>> just think that we should start with a correct if slow base version and
->>> then add optimisation to that, instead of starting with a broken base
->>> version and adding to that.
->>>
->>> Look, whether you do the expensive I/O on open/close and make that a
->>> slow operation or whether you do it on invalidate_cache/inactivate
->>> doesn't really make a difference in term of slowness because in general
->>> both operations are called exactly once. But it does make a difference
->>> in terms of correctness.
->>>
->>> Once you do the optimisation, of course, you'll skip writing those
->>> bitmaps that you transfer using a different channel, no matter whether
->>> you skip it in bdrv_close() or in bdrv_inactivate().
->>>
->>> Kevin
->> I do not understand this point as in order to optimize this
->> we will have to create specific code path or option from
->> the migration code and keep this as an ugly kludge forever.
-> The point that I don't understand is why it makes any difference for the
-> follow-up migration series whether the writeout is in bdrv_close() or
-> bdrv_inactivate(). I don't really see the difference between the two
-> from a migration POV; both need to be skipped if we transfer the bitmap
-> using a different channel.
->
-> Maybe I would see the reason if I could find the time to look at the
-> migration patches first, but unfortunately I don't have this time at the
-> moment.
->
-> My point is just that generally we want to have a correctly working qemu
-> after every single patch, and even more importantly after every series.
-> As the migration series is separate from this, I don't think it's a good
-> excuse for doing worse than we could easily do here.
->
-> Kevin
+Unfortunately some older versions of makeinfo don't correctly
+handle the -D command line option and fail to set the variable.
+This then causes them to complain
+ docs/qemu-ga-ref.texi:41: warning: undefined flag: VERSION
 
-With open/close all is already ok - bitmaps will not be saved because of 
-BDRV_O_INACTIVE  and will not be loaded because of IN_USE.
+Work around this by doing as the autotools do, and writing
+the information into a version.texi file which we then
+include from the .texi files that need it.
 
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ Makefile               | 17 ++++++++++-------
+ docs/qemu-ga-ref.texi  |  2 ++
+ docs/qemu-qmp-ref.texi |  2 ++
+ 3 files changed, 14 insertions(+), 7 deletions(-)
 
+diff --git a/Makefile b/Makefile
+index 830fa5a..1c4c04f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -516,7 +516,7 @@ distclean: clean
+ 	rm -f qemu-doc.vr qemu-doc.txt
+ 	rm -f config.log
+ 	rm -f linux-headers/asm
+-	rm -f qemu-ga-qapi.texi qemu-qapi.texi
++	rm -f qemu-ga-qapi.texi qemu-qapi.texi version.texi
+ 	rm -f docs/qemu-qmp-ref.7 docs/qemu-ga-ref.7
+ 	rm -f docs/qemu-qmp-ref.txt docs/qemu-ga-ref.txt
+ 	rm -f docs/qemu-qmp-ref.pdf docs/qemu-ga-ref.pdf
+@@ -663,21 +663,24 @@ ui/console-gl.o: $(SRC_PATH)/ui/console-gl.c \
+ 
+ # documentation
+ MAKEINFO=makeinfo
+-MAKEINFOFLAGS=--no-split --number-sections -D 'VERSION $(VERSION)'
+-TEXIFLAG=$(if $(V),,--quiet) --command='@set VERSION $(VERSION)'
++MAKEINFOFLAGS=--no-split --number-sections
++TEXIFLAG=$(if $(V),,--quiet)
+ 
+-%.html: %.texi
++version.texi: $(SRC_PATH)/VERSION
++	$(call quiet-command,echo "@set VERSION $(VERSION)" > $@,"GEN","$@")
++
++%.html: %.texi version.texi
+ 	$(call quiet-command,LC_ALL=C $(MAKEINFO) $(MAKEINFOFLAGS) --no-headers \
+ 	--html $< -o $@,"GEN","$@")
+ 
+-%.info: %.texi
++%.info: %.texi version.texi
+ 	$(call quiet-command,$(MAKEINFO) $(MAKEINFOFLAGS) $< -o $@,"GEN","$@")
+ 
+-%.txt: %.texi
++%.txt: %.texi version.texi
+ 	$(call quiet-command,LC_ALL=C $(MAKEINFO) $(MAKEINFOFLAGS) --no-headers \
+ 	--plaintext $< -o $@,"GEN","$@")
+ 
+-%.pdf: %.texi
++%.pdf: %.texi version.texi
+ 	$(call quiet-command,texi2pdf $(TEXIFLAG) -I $(SRC_PATH) -I . $< -o $@,"GEN","$@")
+ 
+ qemu-options.texi: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
+diff --git a/docs/qemu-ga-ref.texi b/docs/qemu-ga-ref.texi
+index 87cc8d0..ddb76ce 100644
+--- a/docs/qemu-ga-ref.texi
++++ b/docs/qemu-ga-ref.texi
+@@ -1,6 +1,8 @@
+ \input texinfo
+ @setfilename qemu-ga-ref.info
+ 
++@include version.texi
++
+ @exampleindent 0
+ @paragraphindent 0
+ 
+diff --git a/docs/qemu-qmp-ref.texi b/docs/qemu-qmp-ref.texi
+index 818e525..0a00569 100644
+--- a/docs/qemu-qmp-ref.texi
++++ b/docs/qemu-qmp-ref.texi
+@@ -1,6 +1,8 @@
+ \input texinfo
+ @setfilename qemu-qmp-ref.info
+ 
++@include version.texi
++
+ @exampleindent 0
+ @paragraphindent 0
+ 
 -- 
-Best regards,
-Vladimir
+2.7.4
