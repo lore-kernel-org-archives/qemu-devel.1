@@ -1,36 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cedvo-0004QE-Fz
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:30:21 -0500
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cedvv-0004WD-FW
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:30:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cedvj-0001Ll-HE
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:30:20 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39273
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cedvq-0001P2-GH
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:30:27 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52650
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1cedvj-0001LL-A3
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:30:15 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	id 1cedvq-0001On-8l
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:30:22 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1H8TEMc032419
-	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 03:30:14 -0500
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28ns6j0tbv-1
+	v1H8SxOT052966
+	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 03:30:21 -0500
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28np0yexg2-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 03:30:14 -0500
+	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 03:30:21 -0500
 Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Fri, 17 Feb 2017 01:30:13 -0700
+	Fri, 17 Feb 2017 01:30:19 -0700
 From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Date: Fri, 17 Feb 2017 09:29:35 +0100
+Date: Fri, 17 Feb 2017 09:29:37 +0100
 In-Reply-To: <20170217082939.33208-1-bjsdjshi@linux.vnet.ibm.com>
 References: <20170217082939.33208-1-bjsdjshi@linux.vnet.ibm.com>
-Message-Id: <20170217082939.33208-12-bjsdjshi@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH RFC v3 11/15] vfio: ccw: realize
- VFIO_DEVICE_G(S)ET_IRQ_INFO ioctls
+Message-Id: <20170217082939.33208-14-bjsdjshi@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH RFC v3 13/15] vfio: ccw: introduce a finite
+ state machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,232 +42,562 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org
 Cc: bjsdjshi@linux.vnet.ibm.com, renxiaof@linux.vnet.ibm.com, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, wkywang@linux.vnet.ibm.com
 
-Realize VFIO_DEVICE_GET_IRQ_INFO ioctl to retrieve
-VFIO_CCW_IO_IRQ information.
-
-Realize VFIO_DEVICE_SET_IRQS ioctl to set an eventfd fd for
-VFIO_CCW_IO_IRQ. Once a write operation to the ccw_io_region
-was performed, trigger a signal on this fd.
+The current implementation doesn't check if the subchannel is in a
+proper device state when handling an event. Let's introduce
+a finite state machine to manage the state/event change.
 
 Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
 ---
- drivers/s390/cio/vfio_ccw_ops.c     | 123 +++++++++++++++++++++++++++++++++++-
- drivers/s390/cio/vfio_ccw_private.h |   4 ++
- include/uapi/linux/vfio.h           |  10 ++-
- 3 files changed, 134 insertions(+), 3 deletions(-)
+ drivers/s390/cio/Makefile           |   2 +-
+ drivers/s390/cio/vfio_ccw_drv.c     | 116 +++-----------------
+ drivers/s390/cio/vfio_ccw_fsm.c     | 207 ++++++++++++++++++++++++++++++++++++
+ drivers/s390/cio/vfio_ccw_ops.c     |  28 ++++-
+ drivers/s390/cio/vfio_ccw_private.h |  41 ++++++-
+ 5 files changed, 287 insertions(+), 107 deletions(-)
+ create mode 100644 drivers/s390/cio/vfio_ccw_fsm.c
 
-diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw_ops.c
-index 125818c..ebc38fb 100644
---- a/drivers/s390/cio/vfio_ccw_ops.c
-+++ b/drivers/s390/cio/vfio_ccw_ops.c
-@@ -202,6 +202,9 @@ static ssize_t vfio_ccw_mdev_write(struct mdev_device *mdev,
- 	if (region->ret_code != 0)
- 		return region->ret_code;
+diff --git a/drivers/s390/cio/Makefile b/drivers/s390/cio/Makefile
+index b0586b2..bdf4752 100644
+--- a/drivers/s390/cio/Makefile
++++ b/drivers/s390/cio/Makefile
+@@ -18,5 +18,5 @@ obj-$(CONFIG_CCWGROUP) += ccwgroup.o
+ qdio-objs := qdio_main.o qdio_thinint.o qdio_debug.o qdio_setup.o
+ obj-$(CONFIG_QDIO) += qdio.o
  
-+	if (private->io_trigger)
-+		eventfd_signal(private->io_trigger, 1);
-+
- 	return count;
+-vfio_ccw-objs += vfio_ccw_drv.o vfio_ccw_cp.o vfio_ccw_ops.o
++vfio_ccw-objs += vfio_ccw_drv.o vfio_ccw_cp.o vfio_ccw_ops.o vfio_ccw_fsm.o
+ obj-$(CONFIG_VFIO_CCW) += vfio_ccw.o
+diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
+index dcf2d70..0cec76f 100644
+--- a/drivers/s390/cio/vfio_ccw_drv.c
++++ b/drivers/s390/cio/vfio_ccw_drv.c
+@@ -60,54 +60,12 @@ int vfio_ccw_sch_quiesce(struct subchannel *sch)
+ 
+ 		ret = cio_disable_subchannel(sch);
+ 	} while (ret == -EBUSY);
+-
+ out_unlock:
++	private->state = VFIO_CCW_STATE_NOT_OPER;
+ 	spin_unlock_irq(sch->lock);
+ 	return ret;
  }
  
-@@ -209,7 +212,7 @@ static int vfio_ccw_mdev_get_device_info(struct vfio_device_info *info)
+-static int vfio_ccw_sch_io_helper(struct vfio_ccw_private *private)
+-{
+-	struct subchannel *sch;
+-	union orb *orb;
+-	int ccode;
+-	__u8 lpm;
+-
+-	sch = private->sch;
+-
+-	orb = cp_get_orb(&private->cp, (u32)(addr_t)sch, sch->lpm);
+-
+-	/* Issue "Start Subchannel" */
+-	ccode = ssch(sch->schid, orb);
+-
+-	switch (ccode) {
+-	case 0:
+-		/*
+-		 * Initialize device status information
+-		 */
+-		sch->schib.scsw.cmd.actl |= SCSW_ACTL_START_PEND;
+-		return 0;
+-	case 1:		/* Status pending */
+-	case 2:		/* Busy */
+-		return -EBUSY;
+-	case 3:		/* Device/path not operational */
+-	{
+-		lpm = orb->cmd.lpm;
+-		if (lpm != 0)
+-			sch->lpm &= ~lpm;
+-		else
+-			sch->lpm = 0;
+-
+-		if (cio_update_schib(sch))
+-			return -ENODEV;
+-
+-		return sch->lpm ? -EACCES : -ENODEV;
+-	}
+-	default:
+-		return ccode;
+-	}
+-}
+-
+ static void vfio_ccw_sch_io_todo(struct work_struct *work)
  {
- 	info->flags = VFIO_DEVICE_FLAGS_CCW | VFIO_DEVICE_FLAGS_RESET;
- 	info->num_regions = VFIO_CCW_NUM_REGIONS;
--	info->num_irqs = 0;
-+	info->num_irqs = VFIO_CCW_NUM_IRQS;
+ 	struct vfio_ccw_private *private;
+@@ -126,47 +84,9 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
+ 
+ 	if (private->io_trigger)
+ 		eventfd_signal(private->io_trigger, 1);
+-}
+-
+-/* Deal with the ccw command request from the userspace. */
+-int vfio_ccw_sch_cmd_request(struct vfio_ccw_private *private)
+-{
+-	struct mdev_device *mdev = private->mdev;
+-	union orb *orb;
+-	union scsw *scsw = &private->scsw;
+-	struct ccw_io_region *io_region = &private->io_region;
+-	int ret;
+-
+-	memcpy(scsw, io_region->scsw_area, sizeof(*scsw));
+-
+-	if (scsw->cmd.fctl & SCSW_FCTL_START_FUNC) {
+-		orb = (union orb *)io_region->orb_area;
+-
+-		ret = cp_init(&private->cp, mdev_dev(mdev), orb);
+-		if (ret)
+-			return ret;
+-
+-		ret = cp_prefetch(&private->cp);
+-		if (ret) {
+-			cp_free(&private->cp);
+-			return ret;
+-		}
+-
+-		/* Start channel program and wait for I/O interrupt. */
+-		ret = vfio_ccw_sch_io_helper(private);
+-		if (!ret)
+-			cp_free(&private->cp);
+-	} else if (scsw->cmd.fctl & SCSW_FCTL_HALT_FUNC) {
+-		/* XXX: Handle halt. */
+-		ret = -EOPNOTSUPP;
+-	} else if (scsw->cmd.fctl & SCSW_FCTL_CLEAR_FUNC) {
+-		/* XXX: Handle clear. */
+-		ret = -EOPNOTSUPP;
+-	} else {
+-		ret = -EOPNOTSUPP;
+-	}
+ 
+-	return ret;
++	if (private->mdev)
++		private->state = VFIO_CCW_STATE_IDLE;
+ }
+ 
+ /*
+@@ -223,20 +143,9 @@ static struct attribute_group vfio_subchannel_attr_group = {
+ static void vfio_ccw_sch_irq(struct subchannel *sch)
+ {
+ 	struct vfio_ccw_private *private = dev_get_drvdata(&sch->dev);
+-	struct irb *irb;
+ 
+ 	inc_irq_stat(IRQIO_CIO);
+-
+-	if (!private)
+-		return;
+-
+-	irb = this_cpu_ptr(&cio_irb);
+-	memcpy(&private->irb, irb, sizeof(*irb));
+-
+-	queue_work(vfio_ccw_work_q, &private->io_work);
+-
+-	if (private->completion)
+-		complete(private->completion);
++	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_INTERRUPT);
+ }
+ 
+ static int vfio_ccw_sch_probe(struct subchannel *sch)
+@@ -258,6 +167,7 @@ static int vfio_ccw_sch_probe(struct subchannel *sch)
+ 	dev_set_drvdata(&sch->dev, private);
+ 
+ 	spin_lock_irq(sch->lock);
++	private->state = VFIO_CCW_STATE_NOT_OPER;
+ 	sch->isc = VFIO_CCW_ISC;
+ 	ret = cio_enable_subchannel(sch, (u32)(unsigned long)sch);
+ 	spin_unlock_irq(sch->lock);
+@@ -274,6 +184,7 @@ static int vfio_ccw_sch_probe(struct subchannel *sch)
+ 
+ 	INIT_WORK(&private->io_work, vfio_ccw_sch_io_todo);
+ 	atomic_set(&private->avail, 1);
++	private->state = VFIO_CCW_STATE_STANDBY;
+ 
+ 	return 0;
+ 
+@@ -321,6 +232,7 @@ static void vfio_ccw_sch_shutdown(struct subchannel *sch)
+  */
+ static int vfio_ccw_sch_event(struct subchannel *sch, int process)
+ {
++	struct vfio_ccw_private *private = dev_get_drvdata(&sch->dev);
+ 	unsigned long flags;
+ 
+ 	spin_lock_irqsave(sch->lock, flags);
+@@ -331,16 +243,16 @@ static int vfio_ccw_sch_event(struct subchannel *sch, int process)
+ 		goto out_unlock;
+ 
+ 	if (cio_update_schib(sch)) {
+-		/* Not operational. */
+-		css_sched_sch_todo(sch, SCH_TODO_UNREG);
+-
+-		/*
+-		 * TODO:
+-		 * Probably we should send the machine check to the guest.
+-		 */
++		vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_NOT_OPER);
+ 		goto out_unlock;
+ 	}
+ 
++	private = dev_get_drvdata(&sch->dev);
++	if (private->state == VFIO_CCW_STATE_NOT_OPER) {
++		private->state = private->mdev ? VFIO_CCW_STATE_IDLE :
++				 VFIO_CCW_STATE_STANDBY;
++	}
++
+ out_unlock:
+ 	spin_unlock_irqrestore(sch->lock, flags);
+ 
+diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
+new file mode 100644
+index 0000000..55b6cc5
+--- /dev/null
++++ b/drivers/s390/cio/vfio_ccw_fsm.c
+@@ -0,0 +1,207 @@
++/*
++ * Finite state machine for vfio-ccw device handling
++ *
++ * Copyright IBM Corp. 2017
++ *
++ * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
++ */
++
++#include <linux/vfio.h>
++#include <linux/mdev.h>
++
++#include "ioasm.h"
++#include "vfio_ccw_private.h"
++
++static int fsm_io_helper(struct vfio_ccw_private *private)
++{
++	struct subchannel *sch;
++	union orb *orb;
++	int ccode;
++	__u8 lpm;
++	unsigned long flags;
++
++	sch = private->sch;
++
++	spin_lock_irqsave(sch->lock, flags);
++	private->state = VFIO_CCW_STATE_BUSY;
++	spin_unlock_irqrestore(sch->lock, flags);
++
++	orb = cp_get_orb(&private->cp, (u32)(addr_t)sch, sch->lpm);
++
++	/* Issue "Start Subchannel" */
++	ccode = ssch(sch->schid, orb);
++
++	switch (ccode) {
++	case 0:
++		/*
++		 * Initialize device status information
++		 */
++		sch->schib.scsw.cmd.actl |= SCSW_ACTL_START_PEND;
++		return 0;
++	case 1:		/* Status pending */
++	case 2:		/* Busy */
++		return -EBUSY;
++	case 3:		/* Device/path not operational */
++	{
++		lpm = orb->cmd.lpm;
++		if (lpm != 0)
++			sch->lpm &= ~lpm;
++		else
++			sch->lpm = 0;
++
++		if (cio_update_schib(sch))
++			return -ENODEV;
++
++		return sch->lpm ? -EACCES : -ENODEV;
++	}
++	default:
++		return ccode;
++	}
++}
++
++static void fsm_notoper(struct vfio_ccw_private *private,
++			enum vfio_ccw_event event)
++{
++	struct subchannel *sch = private->sch;
++
++	/*
++	 * TODO:
++	 * Probably we should send the machine check to the guest.
++	 */
++	css_sched_sch_todo(sch, SCH_TODO_UNREG);
++	private->state = VFIO_CCW_STATE_NOT_OPER;
++}
++
++/*
++ * No operation action.
++ */
++static void fsm_nop(struct vfio_ccw_private *private,
++		    enum vfio_ccw_event event)
++{
++}
++
++static void fsm_io_error(struct vfio_ccw_private *private,
++			 enum vfio_ccw_event event)
++{
++	pr_err("vfio-ccw: FSM: I/O request from state:%d\n", private->state);
++	private->io_region.ret_code = -EIO;
++}
++
++static void fsm_io_busy(struct vfio_ccw_private *private,
++			enum vfio_ccw_event event)
++{
++	private->io_region.ret_code = -EBUSY;
++}
++
++static void fsm_disabled_irq(struct vfio_ccw_private *private,
++			     enum vfio_ccw_event event)
++{
++	struct subchannel *sch = private->sch;
++
++	/*
++	 * An interrupt in a disabled state means a previous disable was not
++	 * successful - should not happen, but we try to disable again.
++	 */
++	cio_disable_subchannel(sch);
++}
++
++/*
++ * Deal with the ccw command request from the userspace.
++ */
++static void fsm_io_request(struct vfio_ccw_private *private,
++			   enum vfio_ccw_event event)
++{
++	union orb *orb;
++	union scsw *scsw = &private->scsw;
++	struct ccw_io_region *io_region = &private->io_region;
++	struct mdev_device *mdev = private->mdev;
++
++	private->state = VFIO_CCW_STATE_BOXED;
++
++	memcpy(scsw, io_region->scsw_area, sizeof(*scsw));
++
++	if (scsw->cmd.fctl & SCSW_FCTL_START_FUNC) {
++		orb = (union orb *)io_region->orb_area;
++
++		io_region->ret_code = cp_init(&private->cp, mdev_dev(mdev),
++					      orb);
++		if (io_region->ret_code)
++			goto err_out;
++
++		io_region->ret_code = cp_prefetch(&private->cp);
++		if (io_region->ret_code) {
++			cp_free(&private->cp);
++			goto err_out;
++		}
++
++		/* Start channel program and wait for I/O interrupt. */
++		io_region->ret_code = fsm_io_helper(private);
++		if (io_region->ret_code) {
++			cp_free(&private->cp);
++			goto err_out;
++		}
++		return;
++	} else if (scsw->cmd.fctl & SCSW_FCTL_HALT_FUNC) {
++		/* XXX: Handle halt. */
++		io_region->ret_code = -EOPNOTSUPP;
++		goto err_out;
++	} else if (scsw->cmd.fctl & SCSW_FCTL_CLEAR_FUNC) {
++		/* XXX: Handle clear. */
++		io_region->ret_code = -EOPNOTSUPP;
++		goto err_out;
++	}
++
++err_out:
++	private->state = VFIO_CCW_STATE_IDLE;
++}
++
++/*
++ * Got an interrupt for a normal io (state busy).
++ */
++static void fsm_irq(struct vfio_ccw_private *private,
++		    enum vfio_ccw_event event)
++{
++	struct irb *irb;
++
++	if (!private)
++		return;
++
++	irb = this_cpu_ptr(&cio_irb);
++	memcpy(&private->irb, irb, sizeof(*irb));
++
++	queue_work(vfio_ccw_work_q, &private->io_work);
++
++	if (private->completion)
++		complete(private->completion);
++}
++
++/*
++ * Device statemachine
++ */
++fsm_func_t *vfio_ccw_jumptable[NR_VFIO_CCW_STATES][NR_VFIO_CCW_EVENTS] = {
++	[VFIO_CCW_STATE_NOT_OPER] = {
++		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_nop,
++		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_error,
++		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_disabled_irq,
++	},
++	[VFIO_CCW_STATE_STANDBY] = {
++		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
++		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_error,
++		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
++	},
++	[VFIO_CCW_STATE_IDLE] = {
++		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
++		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_request,
++		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
++	},
++	[VFIO_CCW_STATE_BOXED] = {
++		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
++		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_busy,
++		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
++	},
++	[VFIO_CCW_STATE_BUSY] = {
++		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
++		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_busy,
++		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
++	},
++};
+diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw_ops.c
+index 8e6754d..c7bed30a 100644
+--- a/drivers/s390/cio/vfio_ccw_ops.c
++++ b/drivers/s390/cio/vfio_ccw_ops.c
+@@ -35,7 +35,11 @@ static int vfio_ccw_mdev_reset(struct mdev_device *mdev)
+ 	if (ret)
+ 		return ret;
+ 
+-	return cio_enable_subchannel(sch, (u32)(unsigned long)sch);
++	ret = cio_enable_subchannel(sch, (u32)(unsigned long)sch);
++	if (!ret)
++		private->state = VFIO_CCW_STATE_IDLE;
++
++	return ret;
+ }
+ 
+ static int vfio_ccw_mdev_notifier(struct notifier_block *nb,
+@@ -112,10 +116,14 @@ static int vfio_ccw_mdev_create(struct kobject *kobj, struct mdev_device *mdev)
+ 	struct vfio_ccw_private *private =
+ 		dev_get_drvdata(mdev_parent_dev(mdev));
+ 
++	if (private->state == VFIO_CCW_STATE_NOT_OPER)
++		return -ENODEV;
++
+ 	if (atomic_dec_if_positive(&private->avail) < 0)
+ 		return -EPERM;
+ 
+ 	private->mdev = mdev;
++	private->state = VFIO_CCW_STATE_IDLE;
  
  	return 0;
  }
-@@ -230,6 +233,83 @@ static int vfio_ccw_mdev_get_region_info(struct vfio_region_info *info,
- 	}
- }
+@@ -126,10 +134,20 @@ static int vfio_ccw_mdev_remove(struct mdev_device *mdev)
+ 		dev_get_drvdata(mdev_parent_dev(mdev));
+ 	int ret;
  
-+int vfio_ccw_mdev_get_irq_info(struct vfio_irq_info *info)
-+{
-+	if (info->index != VFIO_CCW_IO_IRQ_INDEX)
-+		return -EINVAL;
-+
-+	info->count = 1;
-+	info->flags = VFIO_IRQ_INFO_EVENTFD | VFIO_IRQ_INFO_NORESIZE;
-+
-+	return 0;
-+}
-+
-+static int vfio_ccw_mdev_set_irqs(struct mdev_device *mdev,
-+				  uint32_t flags,
-+				  void __user *data)
-+{
-+	struct vfio_ccw_private *private;
-+	struct eventfd_ctx **ctx;
-+
-+	if (!(flags & VFIO_IRQ_SET_ACTION_TRIGGER))
-+		return -EINVAL;
-+
-+	private = dev_get_drvdata(mdev_parent_dev(mdev));
 +	if (!private)
-+		return -ENODEV;
++		goto out;
 +
-+	ctx = &private->io_trigger;
++	if ((private->state == VFIO_CCW_STATE_NOT_OPER) ||
++	    (private->state == VFIO_CCW_STATE_STANDBY))
++		goto out;
 +
-+	switch (flags & VFIO_IRQ_SET_DATA_TYPE_MASK) {
-+	case VFIO_IRQ_SET_DATA_NONE:
-+	{
-+		if (*ctx)
-+			eventfd_signal(*ctx, 1);
-+		return 0;
-+	}
-+	case VFIO_IRQ_SET_DATA_BOOL:
-+	{
-+		uint8_t trigger;
-+
-+		if (get_user(trigger, (uint8_t __user *)data))
-+			return -EFAULT;
-+
-+		if (trigger && *ctx)
-+			eventfd_signal(*ctx, 1);
-+		return 0;
-+	}
-+	case VFIO_IRQ_SET_DATA_EVENTFD:
-+	{
-+		int32_t fd;
-+
-+		if (get_user(fd, (int32_t __user *)data))
-+			return -EFAULT;
-+
-+		if (fd == -1) {
-+			if (*ctx)
-+				eventfd_ctx_put(*ctx);
-+			*ctx = NULL;
-+		} else if (fd >= 0) {
-+			struct eventfd_ctx *efdctx;
-+
-+			efdctx = eventfd_ctx_fdget(fd);
-+			if (IS_ERR(efdctx))
-+				return PTR_ERR(efdctx);
-+
-+			if (*ctx)
-+				eventfd_ctx_put(*ctx);
-+
-+			*ctx = efdctx;
-+		} else
-+			return -EINVAL;
-+
-+		return 0;
-+	}
-+	default:
-+		return -EINVAL;
-+	}
-+}
-+
- static ssize_t vfio_ccw_mdev_ioctl(struct mdev_device *mdev,
- 				   unsigned int cmd,
- 				   unsigned long arg)
-@@ -277,6 +357,47 @@ static ssize_t vfio_ccw_mdev_ioctl(struct mdev_device *mdev,
+ 	ret = vfio_ccw_mdev_reset(mdev);
+ 	if (ret)
+ 		return ret;
  
- 		return copy_to_user((void __user *)arg, &info, minsz);
- 	}
-+	case VFIO_DEVICE_GET_IRQ_INFO:
-+	{
-+		struct vfio_irq_info info;
++	private->state = VFIO_CCW_STATE_STANDBY;
 +
-+		minsz = offsetofend(struct vfio_irq_info, count);
-+
-+		if (copy_from_user(&info, (void __user *)arg, minsz))
-+			return -EFAULT;
-+
-+		if (info.argsz < minsz || info.index >= VFIO_CCW_NUM_IRQS)
-+			return -EINVAL;
-+
-+		ret = vfio_ccw_mdev_get_irq_info(&info);
-+		if (ret)
-+			return ret;
-+
-+		if (info.count == -1)
-+			return -EINVAL;
-+
-+		return copy_to_user((void __user *)arg, &info, minsz);
++out:
+ 	private->mdev = NULL;
+ 	atomic_inc(&private->avail);
+ 
+@@ -193,14 +211,18 @@ static ssize_t vfio_ccw_mdev_write(struct mdev_device *mdev,
+ 	private = dev_get_drvdata(mdev_parent_dev(mdev));
+ 	if (!private)
+ 		return -ENODEV;
++	if (private->state != VFIO_CCW_STATE_IDLE)
++		return -EACCES;
+ 
+ 	region = &private->io_region;
+ 	if (copy_from_user((void *)region + *ppos, buf, count))
+ 		return -EFAULT;
+ 
+-	region->ret_code = vfio_ccw_sch_cmd_request(private);
+-	if (region->ret_code != 0)
++	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_IO_REQ);
++	if (region->ret_code != 0) {
++		private->state = VFIO_CCW_STATE_IDLE;
+ 		return region->ret_code;
 +	}
-+	case VFIO_DEVICE_SET_IRQS:
-+	{
-+		struct vfio_irq_set hdr;
-+		size_t data_size;
-+		void __user *data;
-+
-+		minsz = offsetofend(struct vfio_irq_set, count);
-+
-+		if (copy_from_user(&hdr, (void __user *)arg, minsz))
-+			return -EFAULT;
-+
-+		ret = vfio_set_irqs_validate_and_prepare(&hdr, 1,
-+							 VFIO_CCW_NUM_IRQS,
-+							 &data_size);
-+		if (ret)
-+			return ret;
-+
-+		data = (void __user *)(arg + minsz);
-+		return vfio_ccw_mdev_set_irqs(mdev, hdr.flags, data);
-+	}
- 	case VFIO_DEVICE_RESET:
- 		return vfio_ccw_mdev_reset(mdev);
- 	default:
+ 
+ 	return count;
+ }
 diff --git a/drivers/s390/cio/vfio_ccw_private.h b/drivers/s390/cio/vfio_ccw_private.h
-index 79e5337..dddab52 100644
+index 2503797..fc0f01c 100644
 --- a/drivers/s390/cio/vfio_ccw_private.h
 +++ b/drivers/s390/cio/vfio_ccw_private.h
-@@ -11,6 +11,7 @@
- #define _VFIO_CCW_PRIVATE_H_
- 
- #include <linux/completion.h>
-+#include <linux/eventfd.h>
- #include <linux/vfio_ccw.h>
- 
- #include "css.h"
-@@ -29,6 +30,7 @@
-  * @cp: channel program for the current I/O operation
-  * @irb: irb info received from interrupt
-  * @scsw: scsw info
-+ * @io_trigger: eventfd ctx for signaling userspace I/O results
+@@ -21,6 +21,7 @@
+ /**
+  * struct vfio_ccw_private
+  * @sch: pointer to the subchannel
++ * @state: internal state of the device
+  * @completion: synchronization helper of the I/O completion
+  * @avail: available for creating a mediated device
+  * @mdev: pointer to the mediated device
+@@ -34,6 +35,7 @@
   */
  struct vfio_ccw_private {
  	struct subchannel	*sch;
-@@ -43,6 +45,8 @@ struct vfio_ccw_private {
- 	struct channel_program	cp;
- 	struct irb		irb;
- 	union scsw		scsw;
++	int			state;
+ 	struct completion	*completion;
+ 	atomic_t		avail;
+ 	struct mdev_device	*mdev;
+@@ -52,6 +54,43 @@ extern int vfio_ccw_mdev_reg(struct subchannel *sch);
+ extern void vfio_ccw_mdev_unreg(struct subchannel *sch);
+ 
+ extern int vfio_ccw_sch_quiesce(struct subchannel *sch);
+-extern int vfio_ccw_sch_cmd_request(struct vfio_ccw_private *private);
 +
-+	struct eventfd_ctx	*io_trigger;
- } __aligned(8);
- 
- extern int vfio_ccw_mdev_reg(struct subchannel *sch);
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index 3fd70ff..ae46105 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -449,8 +449,9 @@ enum {
- };
- 
- /*
-- * The vfio-ccw bus driver makes use of the following fixed region.
-- * Unimplemented regions return a size of zero.
-+ * The vfio-ccw bus driver makes use of the following fixed region and
-+ * IRQ index mapping. Unimplemented regions return a size of zero.
-+ * Unimplemented IRQ types return a count of zero.
-  */
- 
- enum {
-@@ -458,6 +459,11 @@ enum {
- 	VFIO_CCW_NUM_REGIONS
- };
- 
-+enum {
-+	VFIO_CCW_IO_IRQ_INDEX,
-+	VFIO_CCW_NUM_IRQS
++/*
++ * States of the device statemachine.
++ */
++enum vfio_ccw_state {
++	VFIO_CCW_STATE_NOT_OPER,
++	VFIO_CCW_STATE_STANDBY,
++	VFIO_CCW_STATE_IDLE,
++	VFIO_CCW_STATE_BOXED,
++	VFIO_CCW_STATE_BUSY,
++	/* last element! */
++	NR_VFIO_CCW_STATES
 +};
 +
- /**
-  * VFIO_DEVICE_GET_PCI_HOT_RESET_INFO - _IORW(VFIO_TYPE, VFIO_BASE + 12,
-  *					      struct vfio_pci_hot_reset_info)
++/*
++ * Asynchronous events of the device statemachine.
++ */
++enum vfio_ccw_event {
++	VFIO_CCW_EVENT_NOT_OPER,
++	VFIO_CCW_EVENT_IO_REQ,
++	VFIO_CCW_EVENT_INTERRUPT,
++	/* last element! */
++	NR_VFIO_CCW_EVENTS
++};
++
++/*
++ * Action called through jumptable.
++ */
++typedef void (fsm_func_t)(struct vfio_ccw_private *, enum vfio_ccw_event);
++extern fsm_func_t *vfio_ccw_jumptable[NR_VFIO_CCW_STATES][NR_VFIO_CCW_EVENTS];
++
++static inline void vfio_ccw_fsm_event(struct vfio_ccw_private *private,
++				     int event)
++{
++	vfio_ccw_jumptable[private->state][event](private, event);
++}
++
++extern struct workqueue_struct *vfio_ccw_work_q;
+ 
+ #endif
 -- 
 2.8.4
