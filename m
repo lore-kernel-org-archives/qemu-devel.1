@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cekff-0007XA-HQ
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:42:08 -0500
+	(envelope-from <bobby.prani@gmail.com>) id 1cekgn-0000Hs-E4
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:43:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cekfa-0006hk-Kz
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:42:07 -0500
-Received: from mail-yb0-x242.google.com ([2607:f8b0:4002:c09::242]:34899)
+	(envelope-from <bobby.prani@gmail.com>) id 1cekgj-0007Lt-Fm
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:43:17 -0500
+Received: from mail-yw0-x244.google.com ([2607:f8b0:4002:c05::244]:35724)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1cekfa-0006hN-H0
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:42:02 -0500
-Received: by mail-yb0-x242.google.com with SMTP id u130so59316ybb.2
-	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 07:42:02 -0800 (PST)
+	id 1cekgj-0007Li-An
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:43:13 -0500
+Received: by mail-yw0-x244.google.com with SMTP id l16so3513274ywb.2
+	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 07:43:13 -0800 (PST)
 From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Fri, 17 Feb 2017 10:42:00 -0500
-Message-Id: <20170217154200.10504-1-bobby.prani@gmail.com>
-Subject: [Qemu-devel] (no subject)
+Date: Fri, 17 Feb 2017 10:43:11 -0500
+Message-Id: <20170217154311.13920-1-bobby.prani@gmail.com>
+Subject: [Qemu-devel] [PATCH RESEND] aarch64: Change ext type to TCGType to
+ fix warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,8 +27,6 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: alex.bennee@linaro.org
 Cc: qemu-devel@nongnu.org, rth@twiddle.net, peter.maydell@linaro.org
-
-Subject: [PATCH] aarch64: Change ext type to TCGType to fix warnings
 
 To fix the following warnings:
 
