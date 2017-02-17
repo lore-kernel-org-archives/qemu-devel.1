@@ -1,15 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39765)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1cedYY-00056B-Hg
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:06:19 -0500
+	(envelope-from <skiver.cloud.yzy@gmail.com>) id 1cedt9-0002IU-S7
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:27:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1cedYX-0004dK-HN
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:06:18 -0500
-From: Pankaj Gupta <pagupta@redhat.com>
-Date: Fri, 17 Feb 2017 13:36:04 +0530
-Message-Id: <1487318764-29513-1-git-send-email-pagupta@redhat.com>
-Subject: [Qemu-devel] [PATCH] block,
- migration: Use qemu_madvise inplace of madvise
+	(envelope-from <skiver.cloud.yzy@gmail.com>) id 1cedt4-0008Gb-V0
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:27:35 -0500
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:36007)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <skiver.cloud.yzy@gmail.com>)
+	id 1cedt4-0008Fh-Pp
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:27:30 -0500
+Received: by mail-pf0-x243.google.com with SMTP id 19so3610824pfo.3
+	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 00:27:30 -0800 (PST)
+From: Ziyue Yang <skiver.cloud.yzy@gmail.com>
+Date: Fri, 17 Feb 2017 16:27:02 +0800
+Message-Id: <20170217082704.23270-1-skiver.cloud.yzy@gmail.com>
+Subject: [Qemu-devel] [PATCH 0/2] fix segfaults caused by accessing CPU in
+ empty machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,43 +25,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, quintela@redhat.com, dgilbert@redhat.com
+To: qemu-devel@nongnu.org
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Pavel Butsykin <pbutsykin@virtuozzo.com>, Ziyue Yang <yzylivezh@hotmail.com>
 
- To maintain consistency at all the places use qemu_madvise wrapper
- inplace of madvise call.
+From: Ziyue Yang <yzylivezh@hotmail.com>
 
-Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
----
- block/qcow2-cache.c      | 2 +-
- migration/postcopy-ram.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Many QEMU monitor commands, like "info lapic", "info tlb" and so on
+use mon_get_cpu or related wrappers to access CPU info without checking
+whether the CPU exists.
+This patch series fix the "info lapic" case, and is the base of the incoming
+patch series aiming to eliminate segfaults caused by other QEMU commands
+trying to access CPU that doesn't exist.
 
-diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
-index 1d25147..4991ca5 100644
---- a/block/qcow2-cache.c
-+++ b/block/qcow2-cache.c
-@@ -74,7 +74,7 @@ static void qcow2_cache_table_release(BlockDriverState *bs, Qcow2Cache *c,
-     size_t offset = QEMU_ALIGN_UP((uintptr_t) t, align) - (uintptr_t) t;
-     size_t length = QEMU_ALIGN_DOWN(mem_size - offset, align);
-     if (length > 0) {
--        madvise((uint8_t *) t + offset, length, MADV_DONTNEED);
-+        qemu_madvise((uint8_t *) t + offset, length, QEMU_MADV_DONTNEED);
-     }
- #endif
- }
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index a40dddb..558fec1 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -213,7 +213,7 @@ int postcopy_ram_discard_range(MigrationIncomingState *mis, uint8_t *start,
-                                size_t length)
- {
-     trace_postcopy_ram_discard_range(start, length);
--    if (madvise(start, length, MADV_DONTNEED)) {
-+    if (qemu_madvise(start, length, QEMU_MADV_DONTNEED)) {
-         error_report("%s MADV_DONTNEED: %s", __func__, strerror(errno));
-         return -1;
-     }
--- 
-2.7.4
+Ziyue Yang (2):
+  monitor.c: make mon_get_cpu return NULL when there is no CPU
+  target/i386/monitor.c: check return value of mon_get_cpu before using
+    it
+
+ monitor.c             | 10 +++++++---
+ target/i386/monitor.c |  7 +++++--
+ 2 files changed, 12 insertions(+), 5 deletions(-)
+
+--
+2.11.0
