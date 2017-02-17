@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <skiver.cloud.yzy@gmail.com>) id 1cedtg-0002Y4-KS
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:28:09 -0500
+	(envelope-from <skiver.cloud.yzy@gmail.com>) id 1cedtr-0002fB-Qc
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:28:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <skiver.cloud.yzy@gmail.com>) id 1cedtb-0000EZ-Mo
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:28:08 -0500
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:35866)
+	(envelope-from <skiver.cloud.yzy@gmail.com>) id 1cedtm-0000M0-Su
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:28:19 -0500
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:33425)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <skiver.cloud.yzy@gmail.com>)
-	id 1cedtb-0000E3-HP
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:28:03 -0500
-Received: by mail-pg0-x244.google.com with SMTP id a123so1590984pgc.3
-	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 00:28:03 -0800 (PST)
+	id 1cedtm-0000L9-JA
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 03:28:14 -0500
+Received: by mail-pf0-x244.google.com with SMTP id e4so3611766pfg.0
+	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 00:28:14 -0800 (PST)
 From: Ziyue Yang <skiver.cloud.yzy@gmail.com>
-Date: Fri, 17 Feb 2017 16:27:03 +0800
-Message-Id: <20170217082704.23270-2-skiver.cloud.yzy@gmail.com>
+Date: Fri, 17 Feb 2017 16:27:04 +0800
+Message-Id: <20170217082704.23270-3-skiver.cloud.yzy@gmail.com>
 In-Reply-To: <20170217082704.23270-1-skiver.cloud.yzy@gmail.com>
 References: <20170217082704.23270-1-skiver.cloud.yzy@gmail.com>
-Subject: [Qemu-devel] [PATCH 1/2] monitor.c: make mon_get_cpu return NULL
- when there is no CPU
+Subject: [Qemu-devel] [PATCH 2/2] target/i386/monitor.c: check return value
+ of mon_get_cpu before using it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,52 +32,35 @@ Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Pavel Butsykin <pbutsykin@v
 
 From: Ziyue Yang <yzylivezh@hotmail.com>
 
-Currently mon_get_cpu always dereferences first_cpu without checking
-whether it's a valid pointer. This commit adds check before dereferencing,
-and reports "No CPU" info if there isn't any CPU then returns NULL.
+This patch eliminates the segfault caused by accessing CPU that doesn't
+exist in hmp command "info lapic", which can be reproduced by
+
+$ qemu-system-x86_64 -nographic -M none -serial none -monitor stdio
+
+and then type "info lapic" into qemu monitor.
 
 Signed-off-by: Ziyue Yang <skiver.cloud.yzy@gmail.com>
 ---
- monitor.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ target/i386/monitor.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/monitor.c b/monitor.c
-index 3cd72a9bab..6b25cf7a2b 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -1026,6 +1026,10 @@ int monitor_set_cpu(int cpu_index)
- CPUState *mon_get_cpu(void)
+diff --git a/target/i386/monitor.c b/target/i386/monitor.c
+index 468aa073bc..7b96c74a24 100644
+--- a/target/i386/monitor.c
++++ b/target/i386/monitor.c
+@@ -624,8 +624,11 @@ const MonitorDef *target_monitor_defs(void)
+ 
+ void hmp_info_local_apic(Monitor *mon, const QDict *qdict)
  {
-     if (!cur_mon->mon_cpu) {
-+        if (!first_cpu) {
-+            monitor_printf(cur_mon, "No CPU available on this machine\n");
-+            return NULL;
-+        }
-         monitor_set_cpu(first_cpu->cpu_index);
-     }
-     cpu_synchronize_state(cur_mon->mon_cpu);
-@@ -2495,11 +2499,11 @@ static int default_fmt_size = 4;
- static int is_valid_option(const char *c, const char *typestr)
- {
-     char option[3];
--  
-+
-     option[0] = '-';
-     option[1] = *c;
-     option[2] = '\0';
--  
-+
-     typestr = strstr(typestr, option);
-     return (typestr != NULL);
+-    x86_cpu_dump_local_apic_state(mon_get_cpu(), (FILE *)mon, monitor_fprintf,
+-                                  CPU_DUMP_FPU);
++    CPUState *cs = mon_get_cpu();
++    if (cs) {
++        x86_cpu_dump_local_apic_state(cs, (FILE *)mon, monitor_fprintf,
++                                      CPU_DUMP_FPU);
++    }
  }
-@@ -2864,7 +2868,7 @@ static QDict *monitor_parse_arguments(Monitor *mon,
-                     p++;
-                     if(c != *p) {
-                         if(!is_valid_option(p, typestr)) {
--                  
-+
-                             monitor_printf(mon, "%s: unsupported option -%c\n",
-                                            cmd->name, *p);
-                             goto fail;
+ 
+ void hmp_info_io_apic(Monitor *mon, const QDict *qdict)
 -- 
 2.11.0
