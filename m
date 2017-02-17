@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cegpk-0005B8-R0
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 06:36:17 -0500
+	(envelope-from <chadjoan@gmail.com>) id 1cegxQ-0007pW-FD
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 06:44:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cegpj-00041N-Uu
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 06:36:16 -0500
-Date: Fri, 17 Feb 2017 11:36:03 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170217113601.GB4941@work-vm>
-References: <1487318764-29513-1-git-send-email-pagupta@redhat.com>
-	<w51poihqggo.fsf@maestria.local.igalia.com>
-	<1323841238.24175066.1487331028566.JavaMail.zimbra@redhat.com>
+	(envelope-from <chadjoan@gmail.com>) id 1cegxP-00071F-9e
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 06:44:12 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1323841238.24175066.1487331028566.JavaMail.zimbra@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block,
- migration: Use qemu_madvise inplace of madvise
+In-Reply-To: <6e37308a-5d95-8795-fd1a-25e4ace2158f@redhat.com>
+References: <CABHMSTVDnAxAvpp81+z_2fkAFO7tazLJs3cFXpuDuuGQj-Ek-A@mail.gmail.com>
+	<1933406e-2576-e687-3545-a72f3b999310@redhat.com>
+	<bf1410bc-bc6d-bb29-5591-55634f25d487@redhat.com>
+	<e19aed34-77c2-f588-351d-2daa8a099ae9@redhat.com>
+	<279d2ba8-dabc-0c50-ea7e-1cecccc22291@redhat.com>
+	<6e37308a-5d95-8795-fd1a-25e4ace2158f@redhat.com>
+From: Chad Joan <chadjoan@gmail.com>
+Date: Fri, 17 Feb 2017 06:43:50 -0500
+Message-ID: <CABHMSTXEgftj1if9_YZJztUOUa3sK-qFhTm5=_6+kC=wraOFLw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] Fix build break during configuration on musl-libc
+ based Linux systems.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,76 +27,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, quintela@redhat.com, mreitz@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-* Pankaj Gupta (pagupta@redhat.com) wrote:
-> 
-> Thanks for your comments. I have below query.
-> > 
-> > On Fri 17 Feb 2017 09:06:04 AM CET, Pankaj Gupta wrote:
-> > >  To maintain consistency at all the places use qemu_madvise wrapper
-> > >  inplace of madvise call.
-> > 
-> > >      if (length > 0) {
-> > > -        madvise((uint8_t *) t + offset, length, MADV_DONTNEED);
-> > > +        qemu_madvise((uint8_t *) t + offset, length, QEMU_MADV_DONTNEED);
-> > 
-> > This was changed two months ago from qemu_madvise() to madvise(), is
-> > there any reason why you want to revert that change? Those two calls are
-> > not equivalent, please see commit 2f2c8d6b371cfc6689affb0b7e for an
-> > explanation.
-> > 
-> > > -    if (madvise(start, length, MADV_DONTNEED)) {
-> > > +    if (qemu_madvise(start, length, QEMU_MADV_DONTNEED)) {
-> > >          error_report("%s MADV_DONTNEED: %s", __func__, strerror(errno));
-> 
-> I checked history of only change related to 'postcopy'.
-> 
-> For my linux machine:
-> 
-> ./config-host.mak
-> 
-> CONFIG_MADVISE=y
-> CONFIG_POSIX_MADVISE=y
-> 
-> As both these options are set for Linux, every time we call call 'qemu_madvise' ==>"madvise(addr, len, advice);" will 
-> be compiled/called. I don't understand why '2f2c8d6b371cfc6689affb0b7e' explicitly changed for :"#ifdef CONFIG_LINUX"
-> I think its better to write generic function maybe in a wrapper then to conditionally set something at different places.
+Sure.
 
-No; the problem is that the behaviours are different.
-You're right that the current build on Linux defines MADVISE and thus we are safe because qemu_madvise
-takes teh CONFIG_MADVISE/madvise route - but we need to be explicit that it's only
-the madvise() route that's safe, not any of the calls implemented by 
-qemu_madvise, because if in the future someone was to rearrange qemu_madvise
-to prefer posix_madvise postcopy would break in a very subtle way.
+I'll see your -O2 and raise you a -c ;)
 
-IMHO it might even be better to remove the definition of QEMU_MADV_DONTNEED altogether
-and make a name that wasn't ambiguous between the two, since the posix definition is
-so different.
+It went like this:
 
-Dave
+$ gcc -c first.c -O2
+$ gcc -c second.c -O2
+$ gcc -c third.c -O2
 
-> int qemu_madvise(void *addr, size_t len, int advice)
-> {
->     if (advice == QEMU_MADV_INVALID) {
->         errno = EINVAL;
->         return -1;
->     }
-> #if defined(CONFIG_MADVISE)
->     return madvise(addr, len, advice);
-> #elif defined(CONFIG_POSIX_MADVISE)
->     return posix_madvise(addr, len, advice);
-> #else
->     errno = EINVAL;
->     return -1;
-> #endif
+No complaints from gcc whatsoever (unless I drop the -c, then ld complains
+about the undefined reference to main, which I think we all expect).
+
+Just incase you expected one of them to fail (ex: as a control test), I
+verified that the original snippet from the configure script still causes
+an error on the system:
+#########
+$ cat << EOF > reference.c
+> #include <locale.h>
+> #include <curses.h>
+> #include <wchar.h>
+> int main(void) {
+>   const char *s = curses_version();
+>   wchar_t wch = L'w';
+>   setlocale(LC_ALL, "");
+>   resize_term(0, 0);
+>   addwstr(L"wide chars\n");
+>   addnwstr(&wch, 1);
+>   add_wch(WACS_DEGREE);
+>   return s != 0;
 > }
-> 
-> > 
-> > And this is the same case.
-> > 
-> > Berto
-> > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> EOF
+$ gcc reference.c -O2
+reference.c: In function 'main':
+reference.c:11:11: error: 'WACS_DEGREE' undeclared (first use in this
+function)
+   add_wch(WACS_DEGREE);
+           ^
+reference.c:11:11: note: each undeclared identifier is reported only once
+for each function it appears in
+#########
+
+Hope that helps.
+
+On Fri, Feb 17, 2017 at 6:11 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+
+>
+>
+> On 17/02/2017 10:17, Laszlo Ersek wrote:
+> > Of course, *if* that other C library, and the Curses implementation,
+> > claim compatibility with glibc as far as _GNU_SOURCE goes, *then* I
+> > fully agree with you. (IOW, it depends on the condition that you
+> > formulated above, "if musl wants to support _GNU_SOURCE".)
+>
+> They at least try, since their features.h supports it.
+>
+> > Same for ncurses -- do they aim at SUSv2 conformance, or do they intend
+> > to consider _GNU_SOURCE specifically?
+>
+> Well, ncurses is a GNU project so I suppose they mostly care about
+> whatever Autoconf does.  And indeed Autoconf does have some special
+> casing for -D_XOPEN_SOURCE=500:
+>
+>   AC_CACHE_CHECK([whether _XOPEN_SOURCE should be defined],
+>     [ac_cv_should_define__xopen_source],
+>     [ac_cv_should_define__xopen_source=no
+>      AC_COMPILE_IFELSE(
+>        [AC_LANG_PROGRAM([[
+>           #include <wchar.h>
+>           mbstate_t x;]])],
+>        [],
+>        [AC_COMPILE_IFELSE(
+>           [AC_LANG_PROGRAM([[
+>              #define _XOPEN_SOURCE 500
+>              #include <wchar.h>
+>              mbstate_t x;]])],
+>           [ac_cv_should_define__xopen_source=yes])])])
+>   test $ac_cv_should_define__xopen_source = yes &&
+>     AC_DEFINE([_XOPEN_SOURCE], [500])
+>
+> If musl needs _XOPEN_SOURCE for wchar.h, then it would be worth working
+> around in QEMU.  If it's just happening with ncurses, however, it'd be a
+> musl bug, which should be fixed in musl or worked around in ncurses.
+>
+> Chad, can you check whether the programs below fails with musl:
+>
+> /* First program */
+> #define _GNU_SOURCE
+> #include <wchar.h>
+> mbstate_t x;
+>
+> /* Second program */
+> #include <wchar.h>
+> mbstate_t x;
+>
+> /* Third program */
+> #define _XOPEN_SOURCE 500
+> #include <wchar.h>
+> mbstate_t x;
+>
+> Just compile them with "gcc foo.c -O2".
+>
+> Thanks,
+>
+> Paolo
+>
