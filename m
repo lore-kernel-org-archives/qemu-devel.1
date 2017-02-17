@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ceqNj-00021J-Pj
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 16:48:00 -0500
+	(envelope-from <jcody@redhat.com>) id 1ceqR2-0003Wu-Ni
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 16:51:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ceqNj-00049k-3D
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 16:47:59 -0500
-Date: Fri, 17 Feb 2017 16:47:52 -0500
+	(envelope-from <jcody@redhat.com>) id 1ceqR2-0006cy-0E
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 16:51:24 -0500
+Date: Fri, 17 Feb 2017 16:51:17 -0500
 From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170217214752.GL19045@localhost.localdomain>
-References: <cover.1485365834.git.jcody@redhat.com>
-	<f0449fb39181c0c4c45d3deba6faaea5282161e0.1485365834.git.jcody@redhat.com>
-	<36a56ad1-9a1a-9542-1b54-389fddc7081e@redhat.com>
+Message-ID: <20170217215117.GM19045@localhost.localdomain>
+References: <1487349541-10201-1-git-send-email-pl@kamp.de>
+	<1487349541-10201-3-git-send-email-pl@kamp.de>
+	<20170217213715.GJ19045@localhost.localdomain>
+	<feb6aa92-5e7f-9af9-12cb-bd7beae47750@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <36a56ad1-9a1a-9542-1b54-389fddc7081e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 6/7] iscsi: Add blockdev-add support
+In-Reply-To: <feb6aa92-5e7f-9af9-12cb-bd7beae47750@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] block/nfs: try to avoid the bounce
+ buffer in pwritev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,52 +27,64 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, pbonzini@redhat.com, qemu-block@nongnu.org
+Cc: Peter Lieven <pl@kamp.de>, kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-On Fri, Feb 17, 2017 at 03:40:21PM -0600, Eric Blake wrote:
-> On 01/25/2017 11:42 AM, Jeff Cody wrote:
-> > From: Kevin Wolf <kwolf@redhat.com>
+On Fri, Feb 17, 2017 at 03:42:52PM -0600, Eric Blake wrote:
+> On 02/17/2017 03:37 PM, Jeff Cody wrote:
+> > On Fri, Feb 17, 2017 at 05:39:01PM +0100, Peter Lieven wrote:
+> >> if the passed qiov contains exactly one iov we can
+> >> pass the buffer directly.
+> >>
+> >> Signed-off-by: Peter Lieven <pl@kamp.de>
+> >> ---
+> >>  block/nfs.c | 23 ++++++++++++++++-------
+> >>  1 file changed, 16 insertions(+), 7 deletions(-)
+> >>
+> >> diff --git a/block/nfs.c b/block/nfs.c
+> >> index ab5dcc2..bb4b75f 100644
+> >> --- a/block/nfs.c
+> >> +++ b/block/nfs.c
+> >> @@ -295,20 +295,27 @@ static int coroutine_fn nfs_co_pwritev(BlockDriverState *bs, uint64_t offset,
+> >>      NFSClient *client = bs->opaque;
+> >>      NFSRPC task;
+> >>      char *buf = NULL;
+> >> +    bool my_buffer = false;
 > > 
-> > This adds blockdev-add support for iscsi devices.
-> > 
-> > Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > Signed-off-by: Jeff Cody <jcody@redhat.com>
-> > ---
-> >  block/iscsi.c        | 14 ++++++----
-> >  qapi/block-core.json | 74 ++++++++++++++++++++++++++++++++++++++++++++++++----
-> >  2 files changed, 78 insertions(+), 10 deletions(-)
+> > g_free() is a nop if buf is NULL, so there is no need for the my_buffer
+> > variable & check.
 > 
-> > +++ b/qapi/block-core.json
-> > @@ -2116,10 +2116,10 @@
-> >  { 'enum': 'BlockdevDriver',
-> >    'data': [ 'archipelago', 'blkdebug', 'blkverify', 'bochs', 'cloop',
-> >              'dmg', 'file', 'ftp', 'ftps', 'gluster', 'host_cdrom',
-> > -            'host_device', 'http', 'https', 'luks', 'nbd', 'nfs', 'null-aio',
-> > -            'null-co', 'parallels', 'qcow', 'qcow2', 'qed', 'quorum', 'raw',
-> > -            'replication', 'ssh', 'vdi', 'vhdx', 'vmdk', 'vpc',
-> > -            'vvfat' ] }
-> > +            'host_device', 'http', 'https', 'iscsi', 'luks', 'nbd', 'nfs',
-> > +            'null-aio', 'null-co', 'parallels', 'qcow', 'qcow2', 'qed',
-> > +            'quorum', 'raw', 'replication', 'ssh', 'vdi', 'vhdx', 'vmdk',
-> > +            'vpc', 'vvfat' ] }
+> Umm, yes there is:
 > 
-> Are we missing a since 2.9 documentation designation here?
+> >> +    if (iov->niov != 1) {
+> >> +        buf = g_try_malloc(bytes);
+> >> +        if (bytes && buf == NULL) {
+> >> +            return -ENOMEM;
+> >> +        }
+> >> +        qemu_iovec_to_buf(iov, 0, buf, bytes);
+> >> +        my_buffer = true;
+> >> +    } else {
+> >> +        buf = iov->iov[0].iov_base;
 > 
+> If we took the else branch, then we definitely do not want to be calling
+> g_free(buf).
 
-Yes, thanks for catching that.  I've applied it to my branch already, but I
-will go ahead and fix this and rebase with the following squashed into the
-patch:
+Doh!
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index f00fc9d..5f82d35 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2110,6 +2110,7 @@
- # @nfs: Since 2.8
- # @replication: Since 2.8
- # @ssh: Since 2.8
-+# @iscsi: Since 2.9
- #
- # Since: 2.0
- ##
+> 
+> >>      }
+> >>  
+> >> -    qemu_iovec_to_buf(iov, 0, buf, bytes);
+> >> -
+> >>      if (nfs_pwrite_async(client->context, client->fh,
+> >>                           offset, bytes, buf,
+> >>                           nfs_co_generic_cb, &task) != 0) {
+> >> -        g_free(buf);
+> >> +        if (my_buffer) {
+> >> +            g_free(buf);
+> >> +        }
+> 
+> It looks correct as-is to me.
+
+Indeed.
+
+Reviewed-by: Jeff Cody <jcody@redhat.com>
