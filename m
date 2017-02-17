@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44216)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <SRS0=y3pv=Z6=redhat.com=mst@kernel.org>)
-	id 1ceobt-00046x-9a
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 14:54:30 -0500
+	id 1ceoc4-0004H1-Cr
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 14:54:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <SRS0=y3pv=Z6=redhat.com=mst@kernel.org>)
-	id 1ceobs-0005aD-0Z
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 14:54:29 -0500
-Received: from mail.kernel.org ([198.145.29.136]:34388)
+	id 1ceoc1-0005gl-JA
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 14:54:40 -0500
+Received: from mail.kernel.org ([198.145.29.136]:34442)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <SRS0=y3pv=Z6=redhat.com=mst@kernel.org>)
-	id 1ceobr-0005ZC-MR
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 14:54:27 -0500
-Date: Fri, 17 Feb 2017 21:54:23 +0200
+	id 1ceoc1-0005gH-Br
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 14:54:37 -0500
+Date: Fri, 17 Feb 2017 21:54:33 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1487361200-29966-10-git-send-email-mst@redhat.com>
+Message-ID: <1487361200-29966-12-git-send-email-mst@redhat.com>
 References: <1487361200-29966-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <1487361200-29966-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 09/23] virtio: add MemoryListener to cache ring
- translations
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 11/23] virtio: check for vring setup in
+ virtio_queue_update_used_idx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,212 +32,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
-The cached translations are RCU-protected to allow efficient use
-when processing virtqueues.
+If the vring has not been set up, it is not necessary for vring_used_idx
+to do anything (as is already the case when the caller is virtio_load).
+This is harmless for now, but it will be a problem when the
+MemoryRegionCache has not been set up.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/hw/virtio/virtio.h |   1 +
- hw/virtio/virtio.c         | 105 +++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 103 insertions(+), 3 deletions(-)
+ hw/virtio/virtio.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-index 0863a25..15efcf2 100644
---- a/include/hw/virtio/virtio.h
-+++ b/include/hw/virtio/virtio.h
-@@ -85,6 +85,7 @@ struct VirtIODevice
-     uint32_t generation;
-     int nvectors;
-     VirtQueue *vq;
-+    MemoryListener listener;
-     uint16_t device_id;
-     bool vm_running;
-     bool broken; /* device in invalid state, needs reset */
 diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 71e41f6..b75cb52 100644
+index d62509d..cdafcec 100644
 --- a/hw/virtio/virtio.c
 +++ b/hw/virtio/virtio.c
-@@ -60,6 +60,13 @@ typedef struct VRingUsed
-     VRingUsedElem ring[0];
- } VRingUsed;
- 
-+typedef struct VRingMemoryRegionCaches {
-+    struct rcu_head rcu;
-+    MemoryRegionCache desc;
-+    MemoryRegionCache avail;
-+    MemoryRegionCache used;
-+} VRingMemoryRegionCaches;
-+
- typedef struct VRing
+@@ -2156,7 +2156,9 @@ void virtio_queue_set_last_avail_idx(VirtIODevice *=
+vdev, int n, uint16_t idx)
+=20
+ void virtio_queue_update_used_idx(VirtIODevice *vdev, int n)
  {
-     unsigned int num;
-@@ -68,6 +75,7 @@ typedef struct VRing
-     hwaddr desc;
-     hwaddr avail;
-     hwaddr used;
-+    VRingMemoryRegionCaches *caches;
- } VRing;
- 
- struct VirtQueue
-@@ -104,6 +112,51 @@ struct VirtQueue
-     QLIST_ENTRY(VirtQueue) node;
- };
- 
-+static void virtio_free_region_cache(VRingMemoryRegionCaches *caches)
-+{
-+    if (!caches) {
-+        return;
+-    vdev->vq[n].used_idx =3D vring_used_idx(&vdev->vq[n]);
++    if (vdev->vq[n].vring.desc) {
++        vdev->vq[n].used_idx =3D vring_used_idx(&vdev->vq[n]);
 +    }
-+
-+    address_space_cache_destroy(&caches->desc);
-+    address_space_cache_destroy(&caches->avail);
-+    address_space_cache_destroy(&caches->used);
-+    g_free(caches);
-+}
-+
-+static void virtio_init_region_cache(VirtIODevice *vdev, int n)
-+{
-+    VirtQueue *vq = &vdev->vq[n];
-+    VRingMemoryRegionCaches *old = vq->vring.caches;
-+    VRingMemoryRegionCaches *new;
-+    hwaddr addr, size;
-+    int event_size;
-+
-+    event_size = virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX) ? 2 : 0;
-+
-+    addr = vq->vring.desc;
-+    if (!addr) {
-+        return;
-+    }
-+    new = g_new0(VRingMemoryRegionCaches, 1);
-+    size = virtio_queue_get_desc_size(vdev, n);
-+    address_space_cache_init(&new->desc, vdev->dma_as,
-+                             addr, size, false);
-+
-+    size = virtio_queue_get_used_size(vdev, n) + event_size;
-+    address_space_cache_init(&new->used, vdev->dma_as,
-+                             vq->vring.used, size, true);
-+
-+    size = virtio_queue_get_avail_size(vdev, n) + event_size;
-+    address_space_cache_init(&new->avail, vdev->dma_as,
-+                             vq->vring.avail, size, false);
-+
-+    atomic_rcu_set(&vq->vring.caches, new);
-+    if (old) {
-+        call_rcu(old, virtio_free_region_cache, rcu);
-+    }
-+}
-+
- /* virt queue functions */
- void virtio_queue_update_rings(VirtIODevice *vdev, int n)
- {
-@@ -117,6 +170,7 @@ void virtio_queue_update_rings(VirtIODevice *vdev, int n)
-     vring->used = vring_align(vring->avail +
-                               offsetof(VRingAvail, ring[vring->num]),
-                               vring->align);
-+    virtio_init_region_cache(vdev, n);
  }
- 
- static void vring_desc_read(VirtIODevice *vdev, VRingDesc *desc,
-@@ -1264,6 +1318,7 @@ void virtio_queue_set_rings(VirtIODevice *vdev, int n, hwaddr desc,
-     vdev->vq[n].vring.desc = desc;
-     vdev->vq[n].vring.avail = avail;
-     vdev->vq[n].vring.used = used;
-+    virtio_init_region_cache(vdev, n);
- }
- 
- void virtio_queue_set_num(VirtIODevice *vdev, int n, int num)
-@@ -1984,9 +2039,6 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int version_id)
- void virtio_cleanup(VirtIODevice *vdev)
- {
-     qemu_del_vm_change_state_handler(vdev->vmstate);
--    g_free(vdev->config);
--    g_free(vdev->vq);
--    g_free(vdev->vector_queues);
- }
- 
- static void virtio_vmstate_change(void *opaque, int running, RunState state)
-@@ -2248,6 +2300,19 @@ void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
-     }
- }
- 
-+static void virtio_memory_listener_commit(MemoryListener *listener)
-+{
-+    VirtIODevice *vdev = container_of(listener, VirtIODevice, listener);
-+    int i;
-+
-+    for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
-+        if (vdev->vq[i].vring.num == 0) {
-+            break;
-+        }
-+        virtio_init_region_cache(vdev, i);
-+    }
-+}
-+
- static void virtio_device_realize(DeviceState *dev, Error **errp)
- {
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-@@ -2270,6 +2335,9 @@ static void virtio_device_realize(DeviceState *dev, Error **errp)
-         error_propagate(errp, err);
-         return;
-     }
-+
-+    vdev->listener.commit = virtio_memory_listener_commit;
-+    memory_listener_register(&vdev->listener, vdev->dma_as);
- }
- 
- static void virtio_device_unrealize(DeviceState *dev, Error **errp)
-@@ -2292,6 +2360,36 @@ static void virtio_device_unrealize(DeviceState *dev, Error **errp)
-     vdev->bus_name = NULL;
- }
- 
-+static void virtio_device_free_virtqueues(VirtIODevice *vdev)
-+{
-+    int i;
-+    if (!vdev->vq) {
-+        return;
-+    }
-+
-+    for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
-+        VRingMemoryRegionCaches *caches;
-+        if (vdev->vq[i].vring.num == 0) {
-+            break;
-+        }
-+        caches = atomic_read(&vdev->vq[i].vring.caches);
-+        atomic_set(&vdev->vq[i].vring.caches, NULL);
-+        virtio_free_region_cache(caches);
-+    }
-+    g_free(vdev->vq);
-+}
-+
-+static void virtio_device_instance_finalize(Object *obj)
-+{
-+    VirtIODevice *vdev = VIRTIO_DEVICE(obj);
-+
-+    memory_listener_unregister(&vdev->listener);
-+    virtio_device_free_virtqueues(vdev);
-+
-+    g_free(vdev->config);
-+    g_free(vdev->vector_queues);
-+}
-+
- static Property virtio_properties[] = {
-     DEFINE_VIRTIO_COMMON_FEATURES(VirtIODevice, host_features),
-     DEFINE_PROP_END_OF_LIST(),
-@@ -2418,6 +2516,7 @@ static const TypeInfo virtio_device_info = {
-     .parent = TYPE_DEVICE,
-     .instance_size = sizeof(VirtIODevice),
-     .class_init = virtio_device_class_init,
-+    .instance_finalize = virtio_device_instance_finalize,
-     .abstract = true,
-     .class_size = sizeof(VirtioDeviceClass),
- };
--- 
+=20
+ void virtio_queue_invalidate_signalled_used(VirtIODevice *vdev, int n)
+--=20
 MST
