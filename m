@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cepy3-0008Ix-0M
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 16:21:28 -0500
+	(envelope-from <no-reply@patchew.org>) id 1ceq7L-0006nC-Gw
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 16:31:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cepy1-0003i9-DI
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 16:21:27 -0500
-References: <1487067971-10443-1-git-send-email-armbru@redhat.com>
-	<1487067971-10443-22-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <49e87de6-431a-43b9-14d1-78abe9da7aaf@redhat.com>
-Date: Fri, 17 Feb 2017 15:21:16 -0600
+	(envelope-from <no-reply@patchew.org>) id 1ceq7H-0001Fp-K0
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 16:31:03 -0500
+Resent-Message-Id: <E1ceq7H-0001Fp-K0@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21390)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1ceq7H-0001DS-D9
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 16:30:59 -0500
+In-Reply-To: <20170217210831.GA26068@ls3530.fritz.box>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148736704260.27.14044803222819912550@0e2666bad730>
 MIME-Version: 1.0
-In-Reply-To: <1487067971-10443-22-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="DB2bmq22J9wIXtvlKCc5n1ETtsQboVhcN"
-Subject: Re: [Qemu-devel] [PATCH 21/24] util/cutils: Let qemu_strtosz*()
- optionally reject trailing crap
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 17 Feb 2017 13:30:43 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3] linux-user: Add sockopts for IPv6 ping
+ and IPv6 traceroute
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,132 +29,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+To: deller@gmx.de
+Cc: famz@redhat.com, qemu-devel@nongnu.org, riku.voipio@iki.fi, f4bug@amsat.org, laurent@vivier.eu, rth@twiddle.net
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---DB2bmq22J9wIXtvlKCc5n1ETtsQboVhcN
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- "open list:Block layer core" <qemu-block@nongnu.org>,
- Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <49e87de6-431a-43b9-14d1-78abe9da7aaf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 21/24] util/cutils: Let qemu_strtosz*()
- optionally reject trailing crap
-References: <1487067971-10443-1-git-send-email-armbru@redhat.com>
- <1487067971-10443-22-git-send-email-armbru@redhat.com>
-In-Reply-To: <1487067971-10443-22-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 02/14/2017 04:26 AM, Markus Armbruster wrote:
-> Change the qemu_strtosz() & friends to return -EINVAL when @endptr is
-> null and the conversion doesn't consume the string completely.
-> Matches how qemu_strtol() & friends work.
->=20
-> Only test_qemu_strtosz_simple() passes a null @endptr.  No functional
-> change there, because its conversion consumes the string.
->=20
-> Simplify callers that use @endptr only to fail when it doesn't point
-> to '\0' to pass a null @endptr instead.
->=20
-> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Cc: Eduardo Habkost <ehabkost@redhat.com> (maintainer:X86)
-> Cc: Kevin Wolf <kwolf@redhat.com> (supporter:Block layer core)
-> Cc: Max Reitz <mreitz@redhat.com> (supporter:Block layer core)
-> Cc: qemu-block@nongnu.org (open list:Block layer core)
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  hmp.c               |  6 ++----
->  hw/misc/ivshmem.c   |  6 ++----
->  qapi/opts-visitor.c |  5 ++---
->  qemu-img.c          |  7 +------
->  qemu-io-cmds.c      |  7 +------
->  target/i386/cpu.c   |  5 ++---
->  tests/test-cutils.c |  6 ++++++
->  util/cutils.c       | 14 +++++++++-----
->  8 files changed, 25 insertions(+), 31 deletions(-)
-
-Nice cleanup.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-
-> +++ b/qemu-img.c
-> @@ -370,14 +370,9 @@ static int add_old_style_options(const char *fmt, =
-QemuOpts *opts,
-> =20
->  static int64_t cvtnum(const char *s)
->  {
-
-> +++ b/qemu-io-cmds.c
-> @@ -137,14 +137,9 @@ static char **breakline(char *input, int *count)
-> =20
->  static int64_t cvtnum(const char *s)
->  {
-> -    char *end;
-
-Why do we reimplement cvtnum() as copied static functions instead of
-exporting it?  But that would be a separate cleanup (perhaps squashed
-into 20/24, where you use cvtnum in qemu-img).
-
-> @@ -217,7 +217,8 @@ static int64_t do_strtosz(const char *nptr, char **=
-end,
->      errno =3D 0;
->      val =3D strtod(nptr, &endptr);
->      if (isnan(val) || endptr =3D=3D nptr || errno !=3D 0) {
-
-Hmm - we explicitly reject "NaN", but not "infinity".  But when strtod()
-accepts infinity, ...
-
-> -        goto fail;
-> +        retval =3D -EINVAL;
-> +        goto out;
->      }
->      fraction =3D modf(val, &integral);
-
-then modf() returns 0 with integral left at infinity...
-
->      if (fraction !=3D 0) {
-> @@ -232,17 +233,20 @@ static int64_t do_strtosz(const char *nptr, char =
-**end,
->          assert(mul >=3D 0);
->      }
->      if (mul =3D=3D 1 && mul_required) {
-> -        goto fail;
-> +        retval =3D -EINVAL;
-> +        goto out;
->      }
->      if ((val * mul >=3D INT64_MAX) || val < 0) {
-
-=2E..and the multiply exceeds INT64_MAX, so we still end up rejecting it
-(with ERANGE instead of EINVAL).  Weird way but seems to work, and is
-pre-existing, so not this patch's problem.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---DB2bmq22J9wIXtvlKCc5n1ETtsQboVhcN
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYp2lMAAoJEKeha0olJ0NqV5gH/RJDIhRYdalLllVJwpvE28Ag
-2Wk0lF5FdFfAtD6Zi8w7ShKm0PJwgOi9PeUE3y62+gpD/2PgZwQpkk5+ylfn2NyY
-BodE05JjSZM9NqdpzogsmWcaRyN2dClK+6GFiHKnOKQ0Gqbhoe4fAbTLwUCzXqJP
-lGQ4kBjjaSFxOkskeeCicmOjWpqMjVd+ggQoTmiosea37ld3lk5cLWB0V9ev7nOd
-3MxHsfcdP+Fj3j3zK/RtAbivxWIbiq1Pp+H40Oq5Z/0lW9vWaR7MB4l/dIh/JOcI
-f8F0SHdBsfUApJOKgw0xFmt/+Hw42VufVxQm+32bSVFcbH9r9ZDC9mLNnhIhHWo=
-=SKYT
------END PGP SIGNATURE-----
-
---DB2bmq22J9wIXtvlKCc5n1ETtsQboVhcN--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjNdIGxpbnV4LXVzZXI6IEFkZCBzb2Nrb3B0cyBm
+b3IgSVB2NiBwaW5nIGFuZCBJUHY2IHRyYWNlcm91dGUKTWVzc2FnZS1pZDogMjAxNzAyMTcyMTA4
+MzEuR0EyNjA2OEBsczM1MzAuZnJpdHouYm94Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
+L2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0Uu
+LiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRy
+dWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZv
+ciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAk
+KGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0t
+Zm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVu
+CiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25l
+CgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5
+YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20v
+cGF0Y2hldy1wcm9qZWN0L3FlbXUKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8xNDg3MDY3
+OTcxLTEwNDQzLTEtZ2l0LXNlbmQtZW1haWwtYXJtYnJ1QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8x
+NDg3MDY3OTcxLTEwNDQzLTEtZ2l0LXNlbmQtZW1haWwtYXJtYnJ1QHJlZGhhdC5jb20KICogW25l
+dyB0YWddICAgICAgICAgcGF0Y2hldy8yMDE3MDIxNzIxMDgzMS5HQTI2MDY4QGxzMzUzMC5mcml0
+ei5ib3ggLT4gcGF0Y2hldy8yMDE3MDIxNzIxMDgzMS5HQTI2MDY4QGxzMzUzMC5mcml0ei5ib3gK
+U3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpjZTZmMTQyIGxpbnV4LXVzZXI6IEFkZCBz
+b2Nrb3B0cyBmb3IgSVB2NiBwaW5nIGFuZCBJUHY2IHRyYWNlcm91dGUKCj09PSBPVVRQVVQgQkVH
+SU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogbGludXgtdXNlcjogQWRkIHNvY2tvcHRzIGZvciBJ
+UHY2IHBpbmcgYW5kIElQdjYgdHJhY2Vyb3V0ZS4uLgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNl
+c3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM1NDogRklMRTogbGludXgtdXNl
+ci9zeXNjYWxsLmM6MTY1NjoKKyAgICBpZiAoIXRhcmdldF9zYWRkcikKWy4uLl0KCkVSUk9SOiBi
+cmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzgz
+OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzoxODc3OgorICAgICAgICAgICAgICAgIGlmICh0
+Z3RfbGVuICE9IENNU0dfTEVOKDApKQpbLi4uXQoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBu
+ZXZlciB1c2UgdGFicwojMTA4OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzoxOTAyOgorXkle
+SWJyZWFrOyQKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2Yg
+dGhpcyBzdGF0ZW1lbnQKIzEyMTogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6MTkxNToKKyAg
+ICAgICAgICAgICAgICBpZiAodGd0X2xlbiAhPSBDTVNHX0xFTigwKSkKWy4uLl0KCkVSUk9SOiBj
+b2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzEyNTogRklMRTogbGludXgtdXNlci9z
+eXNjYWxsLmM6MTkxOToKK15JXklicmVhazskCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
+dGVycwojMTQ0OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzoxOTM4OgorICAgICAgICAgICAg
+ICAgIGhvc3RfdG9fdGFyZ2V0X3NvY2thZGRyX2luNigodW5zaWduZWQgbG9uZykgJnRhcmdldF9l
+cnJoLT5vZmZlbmRlciwKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMK
+IzE0NjogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6MTk0MDoKK15JXklicmVhazskCgpFUlJP
+Ujogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoZSBvcGVuIHBhcmVudGhlc2lzICcoJwojMjAzOiBG
+SUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzoyOTY0OgorICAgICAgICBzd2l0Y2gob3B0bmFtZSkg
+ewoKdG90YWw6IDcgZXJyb3JzLCAxIHdhcm5pbmdzLCAyMTQgbGluZXMgY2hlY2tlZAoKWW91ciBw
+YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
+ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
+IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0
+IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
+dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
+ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
