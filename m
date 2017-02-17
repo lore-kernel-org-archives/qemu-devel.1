@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ceZBn-0004vk-5Y
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 22:26:32 -0500
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1ceZYo-00011l-Cw
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 22:50:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ceZBi-0004rS-8Y
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 22:26:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47394)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ceZBh-0004qh-VU
-	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 22:26:26 -0500
-Date: Fri, 17 Feb 2017 11:26:19 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170217032619.GL15985@pxdev.xzpeter.org>
-References: <1484026704-28027-1-git-send-email-mst@redhat.com>
-	<1484026704-28027-9-git-send-email-mst@redhat.com>
-	<A2975661238FB949B60364EF0F2C25743900AAEF@shsmsx102.ccr.corp.intel.com>
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1ceZYl-0007Td-CH
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 22:50:18 -0500
+Received: from [59.151.112.132] (port=13423 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1ceZYl-0007Cr-0b
+	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 22:50:15 -0500
+References: <1487299994-98348-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1487299994-98348-3-git-send-email-zhang.zhanghailiang@huawei.com>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <4fc4488e-eecc-a15e-aa91-031388b8fc95@cn.fujitsu.com>
+Date: Fri, 17 Feb 2017 11:50:15 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743900AAEF@shsmsx102.ccr.corp.intel.com>
-Subject: Re: [Qemu-devel] [PULL 08/41] intel_iommu: support device iotlb
- descriptor
+In-Reply-To: <1487299994-98348-3-git-send-email-zhang.zhanghailiang@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/4] colo-compare: kick compare thread
+ to exit after some cleanup in finalization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@intel.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Tian, Kevin" <kevin.tian@intel.com>, "Lan, Tianyu" <tianyu.lan@intel.com>
+To: zhanghailiang <zhang.zhanghailiang@huawei.com>, jasowang@redhat.com, lizhijian@cn.fujitsu.com
+Cc: qemu-devel@nongnu.org, xuquan8@huawei.com, pss.wulizhen@huawei.com
 
-On Thu, Feb 16, 2017 at 05:36:06AM +0000, Liu, Yi L wrote:
-> > -----Original Message-----
-> > From: Qemu-devel [mailto:qemu-devel-bounces+yi.l.liu=intel.com@nongnu.org]
-> > On Behalf Of Michael S. Tsirkin
-> > Sent: Tuesday, January 10, 2017 1:40 PM
-> > To: qemu-devel@nongnu.org
-> > Cc: Peter Maydell <peter.maydell@linaro.org>; Eduardo Habkost
-> > <ehabkost@redhat.com>; Jason Wang <jasowang@redhat.com>; Peter Xu
-> > <peterx@redhat.com>; Paolo Bonzini <pbonzini@redhat.com>; Richard
-> > Henderson <rth@twiddle.net>
-> > Subject: [Qemu-devel] [PULL 08/41] intel_iommu: support device iotlb
-> > descriptor
-> > 
-> > From: Jason Wang <jasowang@redhat.com>
-> > 
-> > This patch enables device IOTLB support for intel iommu. The major work is to
-> > implement QI device IOTLB descriptor processing and notify the device through
-> > iommu notifier.
-> >
-> Hi Jason/Michael,
-> 	
-> Recently Peter Xu's patch also touched intel-iommu emulation. His patch shadows
-> second-level page table by capturing iotlb flush from guest. It would result in page
-> table updating in host. Does this patch also use the same map/umap API provided
-> by VFIO? If it is, then I think it would also update page table in host.
 
-I haven't considered complex scenarios, but if simply we have a VM
-with one vhost device and one vfio-pci device, imho that should not be
-a problem - device iotlb is targeting SID rather than DOMAIN. So
-device iotlb invalidations for vhost will be sent to vhost device
-only.
 
-However, vhost may receive two invalidations here, but it won't matter
-much since vhost is just flushing caches twice.
+On 02/17/2017 10:53 AM, zhanghailiang wrote:
+> We should call g_main_loop_quit() to notify colo compare thread to
+> exit, Or it will run in g_main_loop_run() forever.
+>
+> Besides, the finalizing process can't happen in context of colo thread,
+> it is reasonable to remove the 'if (qemu_thread_is_self(&s->thread))'
+> branch.
+>
+> Before compare thead exits, some cleanup works need to be
+> done,  All unhandled packets need to be released and connection_track_table
+> needs to be freed, or there will be memory leak.
+>
+> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-> It looks to be
-> a duplicate update. Pls refer to the following snapshot captured from section 6.5.2.5
-> of vtd spec. 
-> 
-> "Since translation requests from a device may be serviced by hardware from the IOTLB, software must
-> always request IOTLB invalidation (iotlb_inv_dsc) before requesting corresponding Device-TLB
-> (dev_tlb_inv_dsc) invalidation."
-> 
-> Maybe for device-iotlb, we need a separate API which just pass down the invalidate
-> info without updating page table. Any thoughts?
+Reviewed-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 
-Now imho I slightly prefer just use the current UNMAP notifier type
-even for device iotlb device. But, we may need to do one more check
-that we skip sending general iotlb invalidations to ATS enabled
-devices like vhost, to avoid duplicated cache flushing. From virt-svm
-side, do we have specific requirement to introduce a new flag for it?
+> ---
+>   net/colo-compare.c | 39 +++++++++++++++++++++++++++++----------
+>   1 file changed, 29 insertions(+), 10 deletions(-)
 
-Thanks,
-
--- peterx
+-- 
+Thanks
+Zhang Chen
