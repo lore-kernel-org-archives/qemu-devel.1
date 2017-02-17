@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47123)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ceYg1-0001UL-M9
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ceYg1-0001UN-PU
 	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 21:53:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ceYfy-0005PZ-Jc
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ceYfy-0005Pa-Jd
 	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 21:53:41 -0500
-Received: from szxga03-in.huawei.com ([119.145.14.66]:37657)
+Received: from szxga02-in.huawei.com ([119.145.14.65]:33291)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ceYfy-0005Km-0v
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ceYfy-0005M9-1E
 	for qemu-devel@nongnu.org; Thu, 16 Feb 2017 21:53:38 -0500
 From: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Date: Fri, 17 Feb 2017 10:53:14 +0800
-Message-ID: <1487299994-98348-5-git-send-email-zhang.zhanghailiang@huawei.com>
-In-Reply-To: <1487299994-98348-1-git-send-email-zhang.zhanghailiang@huawei.com>
-References: <1487299994-98348-1-git-send-email-zhang.zhanghailiang@huawei.com>
+Date: Fri, 17 Feb 2017 10:53:10 +0800
+Message-ID: <1487299994-98348-1-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 4/4] colo-compare: Fix removing fds been
- watched incorrectly in finalization
+Content-Type: text/plain; charset="y"
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3 0/4] colo-compare: fix some bugs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,81 +27,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: jasowang@redhat.com, zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com
 Cc: qemu-devel@nongnu.org, xuquan8@huawei.com, pss.wulizhen@huawei.com, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-We will catch the bellow error report while try to delete compare object
-by qmp command:
-chardev/char-io.c:91: io_watch_poll_finalize: Assertion `iwp->src == ((void *)0)' failed.
+This series includes two parts: codes optimization and bug fix.
+patch 1 tries to move timer process into colo compare thread as 
+a new coroutine.
+patch 2 ~ 4 fixe some bugs of colo compare.
 
-This is caused by failing to remove the right fd been watched while
-call qemu_chr_fe_set_handlers();
+v2->v3:
+ - change the definition of remove_fd_in_watch() instead of
+   introducing a function (Marc-André Lureau's suggestion)
+v1->v2:
+ - Squash patch 3 of last version into patch 2. (ZhangChen's suggestion)
 
-Fix it by pass the worker_context parameter to qemu_chr_fe_set_handlers().
+zhanghailiang (4):
+  colo-compare: use g_timeout_source_new() to process the stale packets
+  colo-compare: kick compare thread to exit after some cleanup in
+    finalization
+  char: remove the right fd been watched in qemu_chr_fe_set_handlers()
+  colo-compare: Fix removing fds been watched incorrectly in
+    finalization
 
-Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
----
- net/colo-compare.c | 20 +++++++++++---------
- 1 file changed, 11 insertions(+), 9 deletions(-)
+ chardev/char-fd.c     |   6 +--
+ chardev/char-io.c     |   8 ++--
+ chardev/char-io.h     |   2 +-
+ chardev/char-pty.c    |   2 +-
+ chardev/char-socket.c |   4 +-
+ chardev/char-udp.c    |   6 +--
+ chardev/char.c        |   2 +-
+ net/colo-compare.c    | 115 ++++++++++++++++++++++++++------------------------
+ 8 files changed, 74 insertions(+), 71 deletions(-)
 
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index 37ce75c..a6fc2ff 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -84,6 +84,7 @@ typedef struct CompareState {
-     /* compare thread, a thread for each NIC */
-     QemuThread thread;
- 
-+    GMainContext *worker_context;
-     GMainLoop *compare_loop;
- } CompareState;
- 
-@@ -497,30 +498,29 @@ static gboolean check_old_packet_regular(void *opaque)
- 
- static void *colo_compare_thread(void *opaque)
- {
--    GMainContext *worker_context;
-     CompareState *s = opaque;
-     GSource *timeout_source;
- 
--    worker_context = g_main_context_new();
-+    s->worker_context = g_main_context_new();
- 
-     qemu_chr_fe_set_handlers(&s->chr_pri_in, compare_chr_can_read,
--                             compare_pri_chr_in, NULL, s, worker_context, true);
-+                          compare_pri_chr_in, NULL, s, s->worker_context, true);
-     qemu_chr_fe_set_handlers(&s->chr_sec_in, compare_chr_can_read,
--                             compare_sec_chr_in, NULL, s, worker_context, true);
-+                          compare_sec_chr_in, NULL, s, s->worker_context, true);
- 
--    s->compare_loop = g_main_loop_new(worker_context, FALSE);
-+    s->compare_loop = g_main_loop_new(s->worker_context, FALSE);
- 
-     /* To kick any packets that the secondary doesn't match */
-     timeout_source = g_timeout_source_new(REGULAR_PACKET_CHECK_MS);
-     g_source_set_callback(timeout_source,
-                           (GSourceFunc)check_old_packet_regular, s, NULL);
--    g_source_attach(timeout_source, worker_context);
-+    g_source_attach(timeout_source, s->worker_context);
- 
-     g_main_loop_run(s->compare_loop);
- 
-     g_source_unref(timeout_source);
-     g_main_loop_unref(s->compare_loop);
--    g_main_context_unref(worker_context);
-+    g_main_context_unref(s->worker_context);
-     return NULL;
- }
- 
-@@ -717,8 +717,10 @@ static void colo_compare_finalize(Object *obj)
- {
-     CompareState *s = COLO_COMPARE(obj);
- 
--    qemu_chr_fe_deinit(&s->chr_pri_in);
--    qemu_chr_fe_deinit(&s->chr_sec_in);
-+    qemu_chr_fe_set_handlers(&s->chr_pri_in, NULL, NULL, NULL, NULL,
-+                             s->worker_context, true);
-+    qemu_chr_fe_set_handlers(&s->chr_sec_in, NULL, NULL, NULL, NULL,
-+                             s->worker_context, true);
-     qemu_chr_fe_deinit(&s->chr_out);
- 
-     g_main_loop_quit(s->compare_loop);
 -- 
 1.8.3.1
