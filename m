@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42144)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cekgn-0000Hs-E4
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:43:18 -0500
+	(envelope-from <mlureau@redhat.com>) id 1cekkv-00039Z-SA
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:47:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cekgj-0007Lt-Fm
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:43:17 -0500
-Received: from mail-yw0-x244.google.com ([2607:f8b0:4002:c05::244]:35724)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1cekgj-0007Li-An
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:43:13 -0500
-Received: by mail-yw0-x244.google.com with SMTP id l16so3513274ywb.2
-	for <qemu-devel@nongnu.org>; Fri, 17 Feb 2017 07:43:13 -0800 (PST)
-From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Fri, 17 Feb 2017 10:43:11 -0500
-Message-Id: <20170217154311.13920-1-bobby.prani@gmail.com>
-Subject: [Qemu-devel] [PATCH RESEND] aarch64: Change ext type to TCGType to
- fix warnings
+	(envelope-from <mlureau@redhat.com>) id 1cekkr-0000hl-H3
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:47:33 -0500
+Received: from mx5-phx2.redhat.com ([209.132.183.37]:41904)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1cekkr-0000hA-8P
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 10:47:29 -0500
+Date: Fri, 17 Feb 2017 10:47:26 -0500 (EST)
+From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>
+Message-ID: <669850340.6891018.1487346446001.JavaMail.zimbra@redhat.com>
+In-Reply-To: <1487344340-30471-1-git-send-email-peter.maydell@linaro.org>
+References: <1487344340-30471-1-git-send-email-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Makefile: Put VERSION info into
+ version.texi rather than using -D
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,61 +27,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alex.bennee@linaro.org
-Cc: qemu-devel@nongnu.org, rth@twiddle.net, peter.maydell@linaro.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, patches@linaro.org, Markus Armbruster <armbru@redhat.com>
 
-To fix the following warnings:
+Hi
 
-In file included from /users/pranith/qemu/tcg/tcg.c:255:
-/users/pranith/qemu/tcg/aarch64/tcg-target.inc.c:879:24: warning: implicit conversion from enumeration type 'TCGMemOp' (aka 'enum TCGMemOp') to different enumeration type 'TCGType' (aka 'enum TCGType')
-      [-Wenum-conversion]
-        tcg_out_cmp(s, ext, a, b, b_const);
-        ~~~~~~~~~~~    ^~~
-/users/pranith/qemu/tcg/aarch64/tcg-target.inc.c:893:36: warning: implicit conversion from enumeration type 'TCGMemOp' (aka 'enum TCGMemOp') to different enumeration type 'TCGType' (aka 'enum TCGType')
-      [-Wenum-conversion]
-        tcg_out_insn(s, 3201, CBZ, ext, a, offset);
-        ~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~
-/users/pranith/qemu/tcg/aarch64/tcg-target.inc.c:389:65: note: expanded from macro 'tcg_out_insn'
-    glue(tcg_out_insn_,FMT)(S, glue(glue(glue(I,FMT),_),OP), ## __VA_ARGS__)
-                                                                ^
-/users/pranith/qemu/tcg/aarch64/tcg-target.inc.c:895:37: warning: implicit conversion from enumeration type 'TCGMemOp' (aka 'enum TCGMemOp') to different enumeration type 'TCGType' (aka 'enum TCGType')
-      [-Wenum-conversion]
-        tcg_out_insn(s, 3201, CBNZ, ext, a, offset);
-        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~
-/users/pranith/qemu/tcg/aarch64/tcg-target.inc.c:389:65: note: expanded from macro 'tcg_out_insn'
-    glue(tcg_out_insn_,FMT)(S, glue(glue(glue(I,FMT),_),OP), ## __VA_ARGS__)
-                                                                ^
-/users/pranith/qemu/tcg/aarch64/tcg-target.inc.c:1610:27: warning: implicit conversion from enumeration type 'TCGType' (aka 'enum TCGType') to different enumeration type 'TCGMemOp' (aka 'enum TCGMemOp')
-      [-Wenum-conversion]
-        tcg_out_brcond(s, ext, a2, a0, a1, const_args[1], arg_label(args[3]));
-        ~~~~~~~~~~~~~~    ^~~
+----- Original Message -----
+> Unfortunately some older versions of makeinfo don't correctly
+> handle the -D command line option and fail to set the variable.
+> This then causes them to complain
+>  docs/qemu-ga-ref.texi:41: warning: undefined flag: VERSION
+> 
+> Work around this by doing as the autotools do, and writing
+> the information into a version.texi file which we then
+> include from the .texi files that need it.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  Makefile               | 17 ++++++++++-------
+>  docs/qemu-ga-ref.texi  |  2 ++
+>  docs/qemu-qmp-ref.texi |  2 ++
+>  3 files changed, 14 insertions(+), 7 deletions(-)
 
-Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
----
- tcg/aarch64/tcg-target.inc.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+looks good,
+version.texi should probably be in .gitignore though
 
-diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
-index 6d227a5a6a..290de6dae6 100644
---- a/tcg/aarch64/tcg-target.inc.c
-+++ b/tcg/aarch64/tcg-target.inc.c
-@@ -866,7 +866,7 @@ static inline void tcg_out_goto_label(TCGContext *s, TCGLabel *l)
-     }
- }
- 
--static void tcg_out_brcond(TCGContext *s, TCGMemOp ext, TCGCond c, TCGArg a,
-+static void tcg_out_brcond(TCGContext *s, TCGType ext, TCGCond c, TCGArg a,
-                            TCGArg b, bool b_const, TCGLabel *l)
- {
-     intptr_t offset;
-@@ -937,7 +937,7 @@ static void tcg_out_addsubi(TCGContext *s, int ext, TCGReg rd,
-     }
- }
- 
--static inline void tcg_out_addsub2(TCGContext *s, int ext, TCGReg rl,
-+static inline void tcg_out_addsub2(TCGContext *s, TCGType ext, TCGReg rl,
-                                    TCGReg rh, TCGReg al, TCGReg ah,
-                                    tcg_target_long bl, tcg_target_long bh,
-                                    bool const_bl, bool const_bh, bool sub)
--- 
-2.11.0
+> diff --git a/Makefile b/Makefile
+> index 830fa5a..1c4c04f 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -516,7 +516,7 @@ distclean: clean
+>  	rm -f qemu-doc.vr qemu-doc.txt
+>  	rm -f config.log
+>  	rm -f linux-headers/asm
+> -	rm -f qemu-ga-qapi.texi qemu-qapi.texi
+> +	rm -f qemu-ga-qapi.texi qemu-qapi.texi version.texi
+>  	rm -f docs/qemu-qmp-ref.7 docs/qemu-ga-ref.7
+>  	rm -f docs/qemu-qmp-ref.txt docs/qemu-ga-ref.txt
+>  	rm -f docs/qemu-qmp-ref.pdf docs/qemu-ga-ref.pdf
+> @@ -663,21 +663,24 @@ ui/console-gl.o: $(SRC_PATH)/ui/console-gl.c \
+>  
+>  # documentation
+>  MAKEINFO=makeinfo
+> -MAKEINFOFLAGS=--no-split --number-sections -D 'VERSION $(VERSION)'
+> -TEXIFLAG=$(if $(V),,--quiet) --command='@set VERSION $(VERSION)'
+> +MAKEINFOFLAGS=--no-split --number-sections
+> +TEXIFLAG=$(if $(V),,--quiet)
+>  
+> -%.html: %.texi
+> +version.texi: $(SRC_PATH)/VERSION
+> +	$(call quiet-command,echo "@set VERSION $(VERSION)" > $@,"GEN","$@")
+> +
+> +%.html: %.texi version.texi
+>  	$(call quiet-command,LC_ALL=C $(MAKEINFO) $(MAKEINFOFLAGS) --no-headers \
+>  	--html $< -o $@,"GEN","$@")
+>  
+> -%.info: %.texi
+> +%.info: %.texi version.texi
+>  	$(call quiet-command,$(MAKEINFO) $(MAKEINFOFLAGS) $< -o $@,"GEN","$@")
+>  
+> -%.txt: %.texi
+> +%.txt: %.texi version.texi
+>  	$(call quiet-command,LC_ALL=C $(MAKEINFO) $(MAKEINFOFLAGS) --no-headers \
+>  	--plaintext $< -o $@,"GEN","$@")
+>  
+> -%.pdf: %.texi
+> +%.pdf: %.texi version.texi
+>  	$(call quiet-command,texi2pdf $(TEXIFLAG) -I $(SRC_PATH) -I . $< -o
+>  	$@,"GEN","$@")
+>  
+>  qemu-options.texi: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
+> diff --git a/docs/qemu-ga-ref.texi b/docs/qemu-ga-ref.texi
+> index 87cc8d0..ddb76ce 100644
+> --- a/docs/qemu-ga-ref.texi
+> +++ b/docs/qemu-ga-ref.texi
+> @@ -1,6 +1,8 @@
+>  \input texinfo
+>  @setfilename qemu-ga-ref.info
+>  
+> +@include version.texi
+> +
+>  @exampleindent 0
+>  @paragraphindent 0
+>  
+> diff --git a/docs/qemu-qmp-ref.texi b/docs/qemu-qmp-ref.texi
+> index 818e525..0a00569 100644
+> --- a/docs/qemu-qmp-ref.texi
+> +++ b/docs/qemu-qmp-ref.texi
+> @@ -1,6 +1,8 @@
+>  \input texinfo
+>  @setfilename qemu-qmp-ref.info
+>  
+> +@include version.texi
+> +
+>  @exampleindent 0
+>  @paragraphindent 0
+>  
+> --
+> 2.7.4
+> 
+> 
