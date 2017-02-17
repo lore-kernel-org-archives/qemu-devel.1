@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44258)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <SRS0=y3pv=Z6=redhat.com=mst@kernel.org>)
-	id 1ceoc7-0004KE-Vd
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 14:54:44 -0500
+	id 1ceoc7-0004K7-Rf
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 14:54:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <SRS0=y3pv=Z6=redhat.com=mst@kernel.org>)
-	id 1ceoc7-0005k8-36
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 14:54:44 -0500
-Received: from mail.kernel.org ([198.145.29.136]:34494)
+	id 1ceoc5-0005ix-Cd
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 14:54:43 -0500
+Received: from mail.kernel.org ([198.145.29.136]:34472)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <SRS0=y3pv=Z6=redhat.com=mst@kernel.org>)
-	id 1ceoc6-0005jU-SQ
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 14:54:43 -0500
-Date: Fri, 17 Feb 2017 21:54:38 +0200
+	id 1ceoc5-0005i2-1x
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 14:54:41 -0500
+Date: Fri, 17 Feb 2017 21:54:35 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1487361200-29966-14-git-send-email-mst@redhat.com>
+Message-ID: <1487361200-29966-13-git-send-email-mst@redhat.com>
 References: <1487361200-29966-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1487361200-29966-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 13/23] virtio: Fix no interrupt when not
- creating msi controller
+Subject: [Qemu-devel] [PULL 12/23] virtio: use VRingMemoryRegionCaches for
+ avail and used rings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,55 +31,380 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Shannon Zhao <shannon.zhao@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>
 
-For ARM virt machine, if we use virt-2.7 which will not create ITS node,
-the virtio-net can not recieve interrupts so it can't get ip address
-through dhcp.
-This fixes commit 83d768b(virtio: set ISR on dataplane notifications).
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+The virtio-net change is necessary because it uses virtqueue_fill
+and virtqueue_flush instead of the more convenient virtqueue_push.
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/virtio/virtio.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ hw/net/virtio-net.c |  14 +++++-
+ hw/virtio/virtio.c  | 132 ++++++++++++++++++++++++++++++++++++++--------------
+ 2 files changed, 109 insertions(+), 37 deletions(-)
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index c08e50f..23483c7 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -1584,6 +1584,12 @@ void virtio_notify_irqfd(VirtIODevice *vdev, VirtQueue *vq)
-     event_notifier_set(&vq->guest_notifier);
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 354a19e..c321680 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -1130,7 +1130,8 @@ static int receive_filter(VirtIONet *n, const uint8_t *buf, int size)
+     return 0;
  }
  
-+static void virtio_irq(VirtQueue *vq)
+-static ssize_t virtio_net_receive(NetClientState *nc, const uint8_t *buf, size_t size)
++static ssize_t virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
++                                      size_t size)
+ {
+     VirtIONet *n = qemu_get_nic_opaque(nc);
+     VirtIONetQueue *q = virtio_net_get_subqueue(nc);
+@@ -1233,6 +1234,17 @@ static ssize_t virtio_net_receive(NetClientState *nc, const uint8_t *buf, size_t
+     return size;
+ }
+ 
++static ssize_t virtio_net_receive(NetClientState *nc, const uint8_t *buf,
++                                  size_t size)
 +{
-+    virtio_set_isr(vq->vdev, 0x1);
-+    virtio_notify_vector(vq->vdev, vq->vector);
++    ssize_t r;
++
++    rcu_read_lock();
++    r = virtio_net_receive_rcu(nc, buf, size);
++    rcu_read_unlock();
++    return r;
 +}
 +
+ static int32_t virtio_net_flush_tx(VirtIONetQueue *q);
+ 
+ static void virtio_net_tx_complete(NetClientState *nc, ssize_t len)
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index cdafcec..c08e50f 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -173,6 +173,7 @@ void virtio_queue_update_rings(VirtIODevice *vdev, int n)
+     virtio_init_region_cache(vdev, n);
+ }
+ 
++/* Called within rcu_read_lock().  */
+ static void vring_desc_read(VirtIODevice *vdev, VRingDesc *desc,
+                             MemoryRegionCache *cache, int i)
+ {
+@@ -184,88 +185,110 @@ static void vring_desc_read(VirtIODevice *vdev, VRingDesc *desc,
+     virtio_tswap16s(vdev, &desc->next);
+ }
+ 
++/* Called within rcu_read_lock().  */
+ static inline uint16_t vring_avail_flags(VirtQueue *vq)
+ {
+-    hwaddr pa;
+-    pa = vq->vring.avail + offsetof(VRingAvail, flags);
+-    return virtio_lduw_phys(vq->vdev, pa);
++    VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
++    hwaddr pa = offsetof(VRingAvail, flags);
++    return virtio_lduw_phys_cached(vq->vdev, &caches->avail, pa);
+ }
+ 
++/* Called within rcu_read_lock().  */
+ static inline uint16_t vring_avail_idx(VirtQueue *vq)
+ {
+-    hwaddr pa;
+-    pa = vq->vring.avail + offsetof(VRingAvail, idx);
+-    vq->shadow_avail_idx = virtio_lduw_phys(vq->vdev, pa);
++    VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
++    hwaddr pa = offsetof(VRingAvail, idx);
++    vq->shadow_avail_idx = virtio_lduw_phys_cached(vq->vdev, &caches->avail, pa);
+     return vq->shadow_avail_idx;
+ }
+ 
++/* Called within rcu_read_lock().  */
+ static inline uint16_t vring_avail_ring(VirtQueue *vq, int i)
+ {
+-    hwaddr pa;
+-    pa = vq->vring.avail + offsetof(VRingAvail, ring[i]);
+-    return virtio_lduw_phys(vq->vdev, pa);
++    VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
++    hwaddr pa = offsetof(VRingAvail, ring[i]);
++    return virtio_lduw_phys_cached(vq->vdev, &caches->avail, pa);
+ }
+ 
++/* Called within rcu_read_lock().  */
+ static inline uint16_t vring_get_used_event(VirtQueue *vq)
+ {
+     return vring_avail_ring(vq, vq->vring.num);
+ }
+ 
++/* Called within rcu_read_lock().  */
+ static inline void vring_used_write(VirtQueue *vq, VRingUsedElem *uelem,
+                                     int i)
+ {
+-    hwaddr pa;
++    VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
++    hwaddr pa = offsetof(VRingUsed, ring[i]);
+     virtio_tswap32s(vq->vdev, &uelem->id);
+     virtio_tswap32s(vq->vdev, &uelem->len);
+-    pa = vq->vring.used + offsetof(VRingUsed, ring[i]);
+-    address_space_write(vq->vdev->dma_as, pa, MEMTXATTRS_UNSPECIFIED,
+-                       (void *)uelem, sizeof(VRingUsedElem));
++    address_space_write_cached(&caches->used, pa, uelem, sizeof(VRingUsedElem));
++    address_space_cache_invalidate(&caches->used, pa, sizeof(VRingUsedElem));
+ }
+ 
++/* Called within rcu_read_lock().  */
+ static uint16_t vring_used_idx(VirtQueue *vq)
+ {
+-    hwaddr pa;
+-    pa = vq->vring.used + offsetof(VRingUsed, idx);
+-    return virtio_lduw_phys(vq->vdev, pa);
++    VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
++    hwaddr pa = offsetof(VRingUsed, idx);
++    return virtio_lduw_phys_cached(vq->vdev, &caches->used, pa);
+ }
+ 
++/* Called within rcu_read_lock().  */
+ static inline void vring_used_idx_set(VirtQueue *vq, uint16_t val)
+ {
+-    hwaddr pa;
+-    pa = vq->vring.used + offsetof(VRingUsed, idx);
+-    virtio_stw_phys(vq->vdev, pa, val);
++    VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
++    hwaddr pa = offsetof(VRingUsed, idx);
++    virtio_stw_phys_cached(vq->vdev, &caches->used, pa, val);
++    address_space_cache_invalidate(&caches->used, pa, sizeof(val));
+     vq->used_idx = val;
+ }
+ 
++/* Called within rcu_read_lock().  */
+ static inline void vring_used_flags_set_bit(VirtQueue *vq, int mask)
+ {
++    VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
+     VirtIODevice *vdev = vq->vdev;
+-    hwaddr pa;
+-    pa = vq->vring.used + offsetof(VRingUsed, flags);
+-    virtio_stw_phys(vdev, pa, virtio_lduw_phys(vdev, pa) | mask);
++    hwaddr pa = offsetof(VRingUsed, flags);
++    uint16_t flags = virtio_lduw_phys_cached(vq->vdev, &caches->used, pa);
++
++    virtio_stw_phys_cached(vdev, &caches->used, pa, flags | mask);
++    address_space_cache_invalidate(&caches->used, pa, sizeof(flags));
+ }
+ 
++/* Called within rcu_read_lock().  */
+ static inline void vring_used_flags_unset_bit(VirtQueue *vq, int mask)
+ {
++    VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
+     VirtIODevice *vdev = vq->vdev;
+-    hwaddr pa;
+-    pa = vq->vring.used + offsetof(VRingUsed, flags);
+-    virtio_stw_phys(vdev, pa, virtio_lduw_phys(vdev, pa) & ~mask);
++    hwaddr pa = offsetof(VRingUsed, flags);
++    uint16_t flags = virtio_lduw_phys_cached(vq->vdev, &caches->used, pa);
++
++    virtio_stw_phys_cached(vdev, &caches->used, pa, flags & ~mask);
++    address_space_cache_invalidate(&caches->used, pa, sizeof(flags));
+ }
+ 
++/* Called within rcu_read_lock().  */
+ static inline void vring_set_avail_event(VirtQueue *vq, uint16_t val)
+ {
++    VRingMemoryRegionCaches *caches;
+     hwaddr pa;
+     if (!vq->notification) {
+         return;
+     }
+-    pa = vq->vring.used + offsetof(VRingUsed, ring[vq->vring.num]);
+-    virtio_stw_phys(vq->vdev, pa, val);
++
++    caches = atomic_rcu_read(&vq->vring.caches);
++    pa = offsetof(VRingUsed, ring[vq->vring.num]);
++    virtio_stw_phys_cached(vq->vdev, &caches->used, pa, val);
+ }
+ 
+ void virtio_queue_set_notification(VirtQueue *vq, int enable)
+ {
+     vq->notification = enable;
++
++    rcu_read_lock();
+     if (virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX)) {
+         vring_set_avail_event(vq, vring_avail_idx(vq));
+     } else if (enable) {
+@@ -277,6 +300,7 @@ void virtio_queue_set_notification(VirtQueue *vq, int enable)
+         /* Expose avail event/used flags before caller checks the avail idx. */
+         smp_mb();
+     }
++    rcu_read_unlock();
+ }
+ 
+ int virtio_queue_ready(VirtQueue *vq)
+@@ -285,8 +309,9 @@ int virtio_queue_ready(VirtQueue *vq)
+ }
+ 
+ /* Fetch avail_idx from VQ memory only when we really need to know if
+- * guest has added some buffers. */
+-int virtio_queue_empty(VirtQueue *vq)
++ * guest has added some buffers.
++ * Called within rcu_read_lock().  */
++static int virtio_queue_empty_rcu(VirtQueue *vq)
+ {
+     if (vq->shadow_avail_idx != vq->last_avail_idx) {
+         return 0;
+@@ -295,6 +320,20 @@ int virtio_queue_empty(VirtQueue *vq)
+     return vring_avail_idx(vq) == vq->last_avail_idx;
+ }
+ 
++int virtio_queue_empty(VirtQueue *vq)
++{
++    bool empty;
++
++    if (vq->shadow_avail_idx != vq->last_avail_idx) {
++        return 0;
++    }
++
++    rcu_read_lock();
++    empty = vring_avail_idx(vq) == vq->last_avail_idx;
++    rcu_read_unlock();
++    return empty;
++}
++
+ static void virtqueue_unmap_sg(VirtQueue *vq, const VirtQueueElement *elem,
+                                unsigned int len)
+ {
+@@ -373,6 +412,7 @@ bool virtqueue_rewind(VirtQueue *vq, unsigned int num)
+     return true;
+ }
+ 
++/* Called within rcu_read_lock().  */
+ void virtqueue_fill(VirtQueue *vq, const VirtQueueElement *elem,
+                     unsigned int len, unsigned int idx)
+ {
+@@ -393,6 +433,7 @@ void virtqueue_fill(VirtQueue *vq, const VirtQueueElement *elem,
+     vring_used_write(vq, &uelem, idx);
+ }
+ 
++/* Called within rcu_read_lock().  */
+ void virtqueue_flush(VirtQueue *vq, unsigned int count)
+ {
+     uint16_t old, new;
+@@ -416,10 +457,13 @@ void virtqueue_flush(VirtQueue *vq, unsigned int count)
+ void virtqueue_push(VirtQueue *vq, const VirtQueueElement *elem,
+                     unsigned int len)
+ {
++    rcu_read_lock();
+     virtqueue_fill(vq, elem, len, 0);
+     virtqueue_flush(vq, 1);
++    rcu_read_unlock();
+ }
+ 
++/* Called within rcu_read_lock().  */
+ static int virtqueue_num_heads(VirtQueue *vq, unsigned int idx)
+ {
+     uint16_t num_heads = vring_avail_idx(vq) - idx;
+@@ -439,6 +483,7 @@ static int virtqueue_num_heads(VirtQueue *vq, unsigned int idx)
+     return num_heads;
+ }
+ 
++/* Called within rcu_read_lock().  */
+ static bool virtqueue_get_head(VirtQueue *vq, unsigned int idx,
+                                unsigned int *head)
+ {
+@@ -740,8 +785,9 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz)
+     if (unlikely(vdev->broken)) {
+         return NULL;
+     }
+-    if (virtio_queue_empty(vq)) {
+-        return NULL;
++    rcu_read_lock();
++    if (virtio_queue_empty_rcu(vq)) {
++        goto done;
+     }
+     /* Needed after virtio_queue_empty(), see comment in
+      * virtqueue_num_heads(). */
+@@ -754,11 +800,11 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz)
+ 
+     if (vq->inuse >= vq->vring.num) {
+         virtio_error(vdev, "Virtqueue size exceeded");
+-        return NULL;
++        goto done;
+     }
+ 
+     if (!virtqueue_get_head(vq, vq->last_avail_idx++, &head)) {
+-        return NULL;
++        goto done;
+     }
+ 
+     if (virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX)) {
+@@ -767,7 +813,6 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz)
+ 
+     i = head;
+ 
+-    rcu_read_lock();
+     caches = atomic_rcu_read(&vq->vring.caches);
+     if (caches->desc.len < max * sizeof(VRingDesc)) {
+         virtio_error(vdev, "Cannot map descriptor ring");
+@@ -1483,6 +1528,7 @@ static void virtio_set_isr(VirtIODevice *vdev, int value)
+     }
+ }
+ 
++/* Called within rcu_read_lock().  */
+ static bool virtio_should_notify(VirtIODevice *vdev, VirtQueue *vq)
+ {
+     uint16_t old, new;
+@@ -1508,7 +1554,12 @@ static bool virtio_should_notify(VirtIODevice *vdev, VirtQueue *vq)
+ 
+ void virtio_notify_irqfd(VirtIODevice *vdev, VirtQueue *vq)
+ {
+-    if (!virtio_should_notify(vdev, vq)) {
++    bool should_notify;
++    rcu_read_lock();
++    should_notify = virtio_should_notify(vdev, vq);
++    rcu_read_unlock();
++
++    if (!should_notify) {
+         return;
+     }
+ 
+@@ -1535,7 +1586,12 @@ void virtio_notify_irqfd(VirtIODevice *vdev, VirtQueue *vq)
+ 
  void virtio_notify(VirtIODevice *vdev, VirtQueue *vq)
  {
-     bool should_notify;
-@@ -1596,8 +1602,7 @@ void virtio_notify(VirtIODevice *vdev, VirtQueue *vq)
+-    if (!virtio_should_notify(vdev, vq)) {
++    bool should_notify;
++    rcu_read_lock();
++    should_notify = virtio_should_notify(vdev, vq);
++    rcu_read_unlock();
++
++    if (!should_notify) {
+         return;
      }
  
-     trace_virtio_notify(vdev, vq);
--    virtio_set_isr(vq->vdev, 0x1);
--    virtio_notify_vector(vdev, vq->vector);
-+    virtio_irq(vq);
- }
+@@ -1996,6 +2052,7 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int version_id)
+         }
+     }
  
- void virtio_notify_config(VirtIODevice *vdev)
-@@ -2240,7 +2245,7 @@ static void virtio_queue_guest_notifier_read(EventNotifier *n)
++    rcu_read_lock();
+     for (i = 0; i < num; i++) {
+         if (vdev->vq[i].vring.desc) {
+             uint16_t nheads;
+@@ -2030,6 +2087,7 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int version_id)
+             }
+         }
+     }
++    rcu_read_unlock();
+ 
+     return 0;
+ }
+@@ -2156,9 +2214,11 @@ void virtio_queue_set_last_avail_idx(VirtIODevice *vdev, int n, uint16_t idx)
+ 
+ void virtio_queue_update_used_idx(VirtIODevice *vdev, int n)
  {
-     VirtQueue *vq = container_of(n, VirtQueue, guest_notifier);
-     if (event_notifier_test_and_clear(n)) {
--        virtio_notify_vector(vq->vdev, vq->vector);
-+        virtio_irq(vq);
++    rcu_read_lock();
+     if (vdev->vq[n].vring.desc) {
+         vdev->vq[n].used_idx = vring_used_idx(&vdev->vq[n]);
      }
++    rcu_read_unlock();
  }
  
+ void virtio_queue_invalidate_signalled_used(VirtIODevice *vdev, int n)
 -- 
 MST
