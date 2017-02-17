@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54392)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cehyW-0001hm-Ts
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 07:49:25 -0500
+	(envelope-from <lersek@redhat.com>) id 1cehzs-0002Uy-LX
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 07:50:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cehyW-00020h-8d
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 07:49:24 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <1252732340.24195236.1487334609462.JavaMail.zimbra@redhat.com>
-References: <1487318764-29513-1-git-send-email-pagupta@redhat.com>
-	<w51poihqggo.fsf@maestria.local.igalia.com>
-	<1323841238.24175066.1487331028566.JavaMail.zimbra@redhat.com>
-	<20170217113601.GB4941@work-vm>
-	<1252732340.24195236.1487334609462.JavaMail.zimbra@redhat.com>
-Date: Fri, 17 Feb 2017 13:49:12 +0100
-Message-ID: <w51k28pq8xj.fsf@maestria.local.igalia.com>
+	(envelope-from <lersek@redhat.com>) id 1cehzo-0002TY-D2
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 07:50:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44666)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cehzn-0002Sg-Vl
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 07:50:44 -0500
+References: <cover.1487286467.git.ben@skyportsystems.com>
+	<88232638f9ff3b17b54987624468678ea14a3037.1487286467.git.ben@skyportsystems.com>
+	<20170217114321.6c8577e1@nial.brq.redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <918524f7-26cf-3fce-d9e3-7316ca69285b@redhat.com>
+Date: Fri, 17 Feb 2017 13:50:40 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block,
- migration: Use qemu_madvise inplace of madvise
+In-Reply-To: <20170217114321.6c8577e1@nial.brq.redhat.com>
+Content-Type: multipart/mixed; boundary="------------0479B87207D380CFB2D3ECFE"
+Subject: Re: [Qemu-devel] [PATCH v8 4/8] ACPI: Add Virtual Machine
+ Generation ID support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,19 +28,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>, ben@skyportsystems.com
+Cc: qemu-devel@nongnu.org, mst@redhat.com, "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 
-On Fri 17 Feb 2017 01:30:09 PM CET, Pankaj Gupta wrote:
-> I think 'posix_madvise' was added for systems which didnot have
-> 'madvise' [...] For the systems which don't have madvise call
-> 'posix_madvise' is called which as per discussion is not right thing
-> for 'DONTNEED' option. It will not give desired results.
->
-> Either we have to find right alternative or else it is already broken
-> for systems which don't support madvise.
+This is a multi-part message in MIME format.
+--------------0479B87207D380CFB2D3ECFE
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 
-Do you have an example of a call that is currently broken in the QEMU
-code?
+CC Dave
 
-Berto
+On 02/17/17 11:43, Igor Mammedov wrote:
+> On Thu, 16 Feb 2017 15:15:36 -0800
+> ben@skyportsystems.com wrote:
+> 
+>> From: Ben Warren <ben@skyportsystems.com>
+>>
+>> This implements the VM Generation ID feature by passing a 128-bit
+>> GUID to the guest via a fw_cfg blob.
+>> Any time the GUID changes, an ACPI notify event is sent to the guest
+>>
+>> The user interface is a simple device with one parameter:
+>>  - guid (string, must be "auto" or in UUID format
+>>    xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+> I've given it some testing with WS2012R2 and v4 patches for Seabios,
+> 
+> Windows is able to read initial GUID allocation and writeback
+> seems to work somehow:
+> 
+> (qemu) info vm-generation-id 
+> c109c09b-0e8b-42d5-9b33-8409c9dcd16c
+> 
+> vmgenid client in Windows reads it as 2 following 64bit integers:
+> 42d50e8bc109c09b:6cd1dcc90984339b
+> 
+> However update path/restore from snapshot doesn't
+> here is as I've tested it:
+> 
+> qemu-system-x86_64 -device vmgenid,id=testvgid,guid=auto -monitor stdio
+> (qemu) info vm-generation-id 
+> c109c09b-0e8b-42d5-9b33-8409c9dcd16c
+> (qemu) stop
+> (qemu) migrate "exec:gzip -c > STATEFILE.gz" 
+> (qemu) quit
+> 
+> qemu-system-x86_64 -device vmgenid,id=testvgid,guid=auto -monitor stdio
+> -incoming "exec: gzip -c -d STATEFILE.gz"
+> (qemu) info vm-generation-id 
+> 28b587fa-991b-4267-80d7-9cf28b746fe9
+> 
+> guest
+>  1. doesn't get GPE notification that it must receive
+>  2. vmgenid client in Windows reads the same value
+>       42d50e8bc109c09b:6cd1dcc90984339b
+
+Hmmm, I wonder if we need something like this, in vmgenid_post_load():
+
+commit 90c647db8d59e47c9000affc0d81754eb346e939
+Author: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Date:   Fri Apr 15 12:41:30 2016 +0100
+
+    Fix pflash migration
+
+with the idea being that in a single device's post_load callback, we
+shouldn't perform machine-wide actions (post_load is likely for fixing
+up the device itself). If machine-wide actions are necessary, we should
+temporarily register a "vm change state handler", and do the thing once
+that handler is called (when the machine has been loaded fully and is
+about to continue execution).
+
+Can you please try the attached patch on top? (Build tested only.)
+
+Thanks!
+Laszlo
+
+--------------0479B87207D380CFB2D3ECFE
+Content-Type: text/x-patch;
+ name="vmstate_change.diff"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="vmstate_change.diff"
+
+diff --git a/include/hw/acpi/vmgenid.h b/include/hw/acpi/vmgenid.h
+index db7fa0e63303..a2ae450b1f56 100644
+--- a/include/hw/acpi/vmgenid.h
++++ b/include/hw/acpi/vmgenid.h
+@@ -4,6 +4,7 @@
+ #include "hw/acpi/bios-linker-loader.h"
+ #include "hw/qdev.h"
+ #include "qemu/uuid.h"
++#include "sysemu/sysemu.h"
+ 
+ #define VMGENID_DEVICE           "vmgenid"
+ #define VMGENID_GUID             "guid"
+@@ -21,6 +22,7 @@ typedef struct VmGenIdState {
+     DeviceClass parent_obj;
+     QemuUUID guid;                /* The 128-bit GUID seen by the guest */
+     uint8_t vmgenid_addr_le[8];   /* Address of the GUID (little-endian) */
++    VMChangeStateEntry *vmstate;
+ } VmGenIdState;
+ 
+ static inline Object *find_vmgenid_dev(void)
+diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+index 9f97b722761b..0ae1d56ff297 100644
+--- a/hw/acpi/vmgenid.c
++++ b/hw/acpi/vmgenid.c
+@@ -177,10 +177,20 @@ static void vmgenid_set_guid(Object *obj, const char *value, Error **errp)
+ /* After restoring an image, we need to update the guest memory and notify
+  * it of a potential change to VM Generation ID
+  */
++static void postload_update_guest_cb(void *opaque, int running, RunState state)
++{
++    VmGenIdState *vms = opaque;
++
++    qemu_del_vm_change_state_handler(vms->vmstate);
++    vms->vmstate = NULL;
++    vmgenid_update_guest(vms);
++}
++
+ static int vmgenid_post_load(void *opaque, int version_id)
+ {
+     VmGenIdState *vms = opaque;
+-    vmgenid_update_guest(vms);
++    vms->vmstate = qemu_add_vm_change_state_handler(postload_update_guest_cb,
++                                                    vms);
+     return 0;
+ }
+ 
+
+--------------0479B87207D380CFB2D3ECFE--
