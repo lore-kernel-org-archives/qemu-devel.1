@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46632)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <deller@gmx.de>) id 1cfDXj-0003MQ-TD
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 17:31:53 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cfDds-0005N9-F6
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 17:38:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <deller@gmx.de>) id 1cfDXf-00022G-16
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 17:31:51 -0500
-Received: from mout.gmx.net ([212.227.15.19]:60986)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <deller@gmx.de>) id 1cfDXe-00020m-M8
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 17:31:46 -0500
-Date: Sat, 18 Feb 2017 23:31:30 +0100
-From: Helge Deller <deller@gmx.de>
-Message-ID: <20170218223130.GA25278@ls3530.fritz.box>
+	(envelope-from <peter.maydell@linaro.org>) id 1cfDdr-0004AP-GV
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 17:38:12 -0500
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:37150)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cfDdr-0004AC-A9
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 17:38:11 -0500
+Received: by mail-wm0-x22d.google.com with SMTP id v77so30615518wmv.0
+	for <qemu-devel@nongnu.org>; Sat, 18 Feb 2017 14:38:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5] linux-user: Add sockopts for IPv6 ping and
- IPv6 traceroute
+In-Reply-To: <20170207183356.17840-3-laurent@vivier.eu>
+References: <20170207183356.17840-1-laurent@vivier.eu>
+	<20170207183356.17840-3-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 18 Feb 2017 22:37:49 +0000
+Message-ID: <CAFEAcA8i8r4to8XmQwpd3h_7=tSUsu1qP9UHYcEd0vJSCo950w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/5] m68k: implement server and client side
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,248 +30,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
-Cc: Philippe =?iso-8859-15?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Add the neccessary sockopts for ping and traceroute on IPv6.
+On 7 February 2017 at 18:33, Laurent Vivier <laurent@vivier.eu> wrote:
+> This also adds the basic test file and the configuration update.
+>
+> This implementation can only test instructions with values in register an=
+d
+> no memory access.
+>
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 
-This fixes the following qemu warnings with IPv6:
-Unsupported ancillary data: 0/2
-Unsupported ancillary data: 0/11
-Unsupported ancillary data: 41/25
-Unsupported setsockopt level=0 optname=12 
-Unsupported setsockopt level=41 optname=16
-Unsupported setsockopt level=41 optname=25
-Unsupported setsockopt level=41 optname=50
-Unsupported setsockopt level=41 optname=51
-Unsupported setsockopt level=41 optname=8
-Unsupported setsockopt level=58 optname=1
+Hi; I got round to setting up my machine with an m68k cross
+compiler so I can at least compile-test the other target
+architectures, and I noticed this code generates compiler
+warnings:
 
-Tested with hppa-linux-user (big-endian) on x86_64 (little-endian).
+> +/* reginfo_dump: print state to a stream, returns nonzero on success */
+> +void reginfo_dump(struct reginfo *ri, int is_master)
+> +{
+> +    int i;
+> +    if (is_master) {
+> +        fprintf(stderr, "  pc            \e[1;101;37m0x%08x\e[0m\n",
+> +                ri->pc);
+> +    }
+> +    fprintf(stderr, "\tPC: %08x\n", ri->gregs[R_PC]);
+> +    fprintf(stderr, "\tPS: %04x\n", ri->gregs[R_PS]);
+> +
+> +    for (i =3D 0; i < 8; i++) {
+> +        fprintf(stderr, "\tD%d: %8x\tA%d: %8x\n", i, ri->gregs[i],
+> +                i, ri->gregs[i + 8]);
+> +    }
+> +
+> +
+> +    for (i =3D 0; i < 8; i++) {
+> +        fprintf(stderr, "\tFP%d: %08x %08x %08x\n", i,
+> +                ri->fpregs.f_fpregs[i * 3], ri->fpregs.f_fpregs[i * 3 + =
+1],
+> +                ri->fpregs.f_fpregs[i * 3 + 2]);
 
-Signed-off-by: Helge Deller <deller@gmx.de>
+/home/pm215/risu/risu_reginfo_m68k.c:95:37: warning: format =E2=80=98%x=E2=
+=80=99
+expects argument of type =E2=80=98unsigned int=E2=80=99, but argument 4 has=
+ type =E2=80=98int
+*=E2=80=99 [-Wformat=3D]
+         fprintf(stderr, "\tFP%d: %08x %08x %08x\n", i,
+                                     ^
 
----
-Changes to v4: (all suggested by Laurent Vivier)
-- Handle AF_INET6 in host_to_target_sockaddr()
-- Drop length check for IP_TTL and SOL_IPV6
-- Trunk optlen length in ICMPV6_FILTER if necessary
+and similarly for the other 3 f_fpregs[] arguments here
+and in the fprintf calls in reginfo_dump_mismatch().
 
-Changes to v3:
-- Fix up checkpatch fallouts
+Looking at the m68k sys/ucontext.h its definition of
+struct fpregset is
+#ifdef __mcoldfire__
+  int f_fpregs[8][2];
+#else
+  int f_fpregs[8][3];
+#endif
 
-Changes to v2: (all suggested by Laurent Vivier)
-- Drop goto statements and replaced by real code
-- New function host_to_target_sockaddr_in6()
-- Fix IPV6_PKTINFO which uses in6_pktinfo instead of uint32_t
-- Move one IPV6_CHECKSUM from SOL_ICMPV6 to SOL_IPV6
-- Fix ICMPV6_FILTER to use icmpv6_filter
+so it's a 2d array, not a 1d array.
 
-Changes to v1:
-- Added IPV6_PKTINFO sockopt as reported by Philippe Mathieu-Daudé
+Any suggestions for how to fix the code? The whole file
+seems to treat f_fpregs as a 1d array...
 
-
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index f569f82..b9d10e7 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -57,6 +57,8 @@ int __clone2(int (*fn)(void *), void *child_stack_base,
- #include <netinet/tcp.h>
- #include <linux/wireless.h>
- #include <linux/icmp.h>
-+#include <linux/icmpv6.h>
-+#include <linux/errqueue.h>
- #include "qemu-common.h"
- #ifdef CONFIG_TIMERFD
- #include <sys/timerfd.h>
-@@ -1634,6 +1636,11 @@ static inline abi_long host_to_target_sockaddr(abi_ulong target_addr,
-         struct sockaddr_ll *target_ll = (struct sockaddr_ll *)target_saddr;
-         target_ll->sll_ifindex = tswap32(target_ll->sll_ifindex);
-         target_ll->sll_hatype = tswap16(target_ll->sll_hatype);
-+    } else if (addr->sa_family == AF_INET6 &&
-+               len >= sizeof(struct target_sockaddr_in6)) {
-+        struct target_sockaddr_in6 *target_in6 =
-+               (struct target_sockaddr_in6 *)target_saddr;
-+        target_in6->sin6_scope_id = tswap16(target_in6->sin6_scope_id);
-     }
-     unlock_user(target_saddr, target_addr, len);
- 
-@@ -1839,6 +1846,78 @@ static inline abi_long host_to_target_cmsg(struct target_msghdr *target_msgh,
-             }
-             break;
- 
-+        case SOL_IP:
-+            switch (cmsg->cmsg_type) {
-+            case IP_TTL:
-+            {
-+                uint32_t *v = (uint32_t *)data;
-+                uint32_t *t_int = (uint32_t *)target_data;
-+
-+                __put_user(*v, t_int);
-+                break;
-+            }
-+            case IP_RECVERR:
-+            {
-+                struct errhdr_t {
-+                   struct sock_extended_err ee;
-+                   struct sockaddr_in offender;
-+                };
-+                struct errhdr_t *errh = (struct errhdr_t *)data;
-+                struct errhdr_t *target_errh =
-+                    (struct errhdr_t *)target_data;
-+
-+                __put_user(errh->ee.ee_errno, &target_errh->ee.ee_errno);
-+                __put_user(errh->ee.ee_origin, &target_errh->ee.ee_origin);
-+                __put_user(errh->ee.ee_type,  &target_errh->ee.ee_type);
-+                __put_user(errh->ee.ee_code, &target_errh->ee.ee_code);
-+                __put_user(errh->ee.ee_pad, &target_errh->ee.ee_pad);
-+                __put_user(errh->ee.ee_info, &target_errh->ee.ee_info);
-+                __put_user(errh->ee.ee_data, &target_errh->ee.ee_data);
-+                host_to_target_sockaddr((unsigned long) &target_errh->offender,
-+                    (void *) &errh->offender, sizeof(errh->offender));
-+                break;
-+            }
-+            default:
-+                goto unimplemented;
-+            }
-+            break;
-+
-+        case SOL_IPV6:
-+            switch (cmsg->cmsg_type) {
-+            case IPV6_HOPLIMIT:
-+            {
-+                uint32_t *v = (uint32_t *)data;
-+                uint32_t *t_int = (uint32_t *)target_data;
-+
-+                __put_user(*v, t_int);
-+                break;
-+            }
-+            case IPV6_RECVERR:
-+            {
-+                struct errhdr6_t {
-+                   struct sock_extended_err ee;
-+                   struct sockaddr_in6 offender;
-+                };
-+                struct errhdr6_t *errh = (struct errhdr6_t *)data;
-+                struct errhdr6_t *target_errh =
-+                    (struct errhdr6_t *)target_data;
-+
-+                __put_user(errh->ee.ee_errno, &target_errh->ee.ee_errno);
-+                __put_user(errh->ee.ee_origin, &target_errh->ee.ee_origin);
-+                __put_user(errh->ee.ee_type,  &target_errh->ee.ee_type);
-+                __put_user(errh->ee.ee_code, &target_errh->ee.ee_code);
-+                __put_user(errh->ee.ee_pad, &target_errh->ee.ee_pad);
-+                __put_user(errh->ee.ee_info, &target_errh->ee.ee_info);
-+                __put_user(errh->ee.ee_data, &target_errh->ee.ee_data);
-+                host_to_target_sockaddr((unsigned long) &target_errh->offender,
-+                    (void *) &errh->offender, sizeof(errh->offender));
-+                break;
-+            }
-+            default:
-+                goto unimplemented;
-+            }
-+            break;
-+
-         default:
-         unimplemented:
-             gemu_log("Unsupported ancillary data: %d/%d\n",
-@@ -2768,6 +2847,7 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
-         case IP_PKTINFO:
-         case IP_MTU_DISCOVER:
-         case IP_RECVERR:
-+        case IP_RECVTTL:
-         case IP_RECVTOS:
- #ifdef IP_FREEBIND
-         case IP_FREEBIND:
-@@ -2817,6 +2897,11 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
-         case IPV6_MTU:
-         case IPV6_V6ONLY:
-         case IPV6_RECVPKTINFO:
-+        case IPV6_UNICAST_HOPS:
-+        case IPV6_RECVERR:
-+        case IPV6_RECVHOPLIMIT:
-+        case IPV6_2292HOPLIMIT:
-+        case IPV6_CHECKSUM:
-             val = 0;
-             if (optlen < sizeof(uint32_t)) {
-                 return -TARGET_EINVAL;
-@@ -2827,6 +2912,50 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
-             ret = get_errno(setsockopt(sockfd, level, optname,
-                                        &val, sizeof(val)));
-             break;
-+        case IPV6_PKTINFO:
-+        {
-+            struct in6_pktinfo pki;
-+
-+            if (optlen < sizeof(pki)) {
-+                return -TARGET_EINVAL;
-+            }
-+
-+            if (copy_from_user(&pki, optval_addr, sizeof(pki))) {
-+                return -TARGET_EFAULT;
-+            }
-+
-+            pki.ipi6_ifindex = tswap32(pki.ipi6_ifindex);
-+
-+            ret = get_errno(setsockopt(sockfd, level, optname,
-+                                       &pki, sizeof(pki)));
-+            break;
-+        }
-+        default:
-+            goto unimplemented;
-+        }
-+        break;
-+    case SOL_ICMPV6:
-+        switch (optname) {
-+        case ICMPV6_FILTER:
-+        {
-+            struct icmp6_filter icmp6f;
-+
-+            if (optlen > sizeof(icmp6f)) {
-+                optlen = sizeof(icmp6f);
-+            }
-+
-+            if (copy_from_user(&icmp6f, optval_addr, optlen)) {
-+                return -TARGET_EFAULT;
-+            }
-+
-+            for (val = 0; val < 8; val++) {
-+                icmp6f.data[val] = tswap32(icmp6f.data[val]);
-+            }
-+
-+            ret = get_errno(setsockopt(sockfd, level, optname,
-+                                       &icmp6f, optlen));
-+            break;
-+        }
-         default:
-             goto unimplemented;
-         }
-@@ -2834,7 +2963,8 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
-     case SOL_RAW:
-         switch (optname) {
-         case ICMP_FILTER:
--            /* struct icmp_filter takes an u32 value */
-+        case IPV6_CHECKSUM:
-+            /* those take an u32 value */
-             if (optlen < sizeof(uint32_t)) {
-                 return -TARGET_EINVAL;
-             }
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 72ca5b1..40c5027 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -164,6 +164,14 @@ struct target_sockaddr_in {
-                 sizeof(struct target_in_addr)];
- };
- 
-+struct target_sockaddr_in6 {
-+    uint16_t sin6_family;
-+    uint16_t sin6_port; /* big endian */
-+    uint32_t sin6_flowinfo; /* big endian */
-+    struct in6_addr sin6_addr; /* IPv6 address, big endian */
-+    uint32_t sin6_scope_id;
-+};
-+
- struct target_sock_filter {
-     abi_ushort code;
-     uint8_t jt;
+thanks
+-- PMM
