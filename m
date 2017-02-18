@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cewfq-0006gR-4t
+	(envelope-from <bounces@canonical.com>) id 1cewfq-0006gS-4u
 	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 23:31:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cewfn-0005mf-EZ
+	(envelope-from <bounces@canonical.com>) id 1cewfo-0005o3-Ex
 	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 23:31:06 -0500
-Received: from indium.canonical.com ([91.189.90.7]:44649)
+Received: from indium.canonical.com ([91.189.90.7]:44668)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cewfn-0005mN-8X
-	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 23:31:03 -0500
+	id 1cewfo-0005nC-90
+	for qemu-devel@nongnu.org; Fri, 17 Feb 2017 23:31:04 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cewfm-0006YR-BN
-	for <qemu-devel@nongnu.org>; Sat, 18 Feb 2017 04:31:02 +0000
+	id 1cewfn-0006YR-Df
+	for <qemu-devel@nongnu.org>; Sat, 18 Feb 2017 04:31:03 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4F5072E80C2
-	for <qemu-devel@nongnu.org>; Sat, 18 Feb 2017 04:31:02 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 62F692E80CC
+	for <qemu-devel@nongnu.org>; Sat, 18 Feb 2017 04:31:03 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 18 Feb 2017 04:17:28 -0000
-From: Launchpad Bug Tracker <682360@bugs.launchpad.net>
-Reply-To: Bug 682360 <682360@bugs.launchpad.net>
+Date: Sat, 18 Feb 2017 04:17:27 -0000
+From: Launchpad Bug Tracker <682326@bugs.launchpad.net>
+Reply-To: Bug 682326 <682326@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20101128141117.27491.10254.malonedeb@palladium.canonical.com>
-Message-Id: <20170218041728.19951.32888.malone@loganberry.canonical.com>
+References: <20101128105835.27278.44074.malonedeb@soybean.canonical.com>
+Message-Id: <20170218041727.19951.23838.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 682360] Re: Unaccessible memory
+Subject: [Qemu-devel] [Bug 682326] Re: linux-user/mmap exhaustion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,50 +47,47 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/682360
+https://bugs.launchpad.net/bugs/682326
 
 Title:
-  Unaccessible memory
+  linux-user/mmap exhaustion
 
 Status in QEMU:
   Expired
 
 Bug description:
-  Hello,
+  Currently when executing a linux-user target, mmap.c is in use- the
+  model it uses internally for figuring out what the mmap address
+  actually should be basically is an accumulator, every mmap invocation
+  (regardless of munmap's that cleared the previous usage) is center on
+  the next page.
 
-  I'm trying to develop a OS over L4/X2 microkernel and I use Linux
-  debian and qemu 0.13 in 64 bits mode. When I start qemu with qemu-
-  system-x86_64 -hdc freevms.img -smp 1 -serial stdio -m 128M -k fr, my
-  kernel boots fine. If I modify this command line with -m 384M (for
-  example), my kernel is loaded but enter in a deadlock. I have found a
-  bug in my code until I have tried to use the _same_ disk image under
-  virtualbox and it works without any trouble. I runs fine on a real PC
-  also.
+  The end result of this is that it'll burn it's way through the space
+  soon enough, especially if it's a 64bit host w/ a 32bit target- the
+  host starts giving back 64bit addresses and the emulated mmap falls
+  over after failed attempts at a low MAP_FIXED range.
 
-  I have bissected my code and qemu stops (maybe in a deadlock) when I try =
-to access to memory :
-  %MEM-I-VM_ALLOC, adding $0000000000045000 - $0000000000108FFF to VM alloc=
-ator
-  %MEM-I-VM_ALLOC, adding $000000000010B000 - $00000000003F2FFF to VM alloc=
-ator
-  %MEM-I-VM_ALLOC, adding $000000000040C000 - $0000000000FFFFFF to VM alloc=
-ator
-  %MEM-I-VM_ALLOC, adding $000000000100F000 - $FFFFFEFFFFFFFFFF to VM alloc=
-ator
-  %MEM-I-ACCMAP, accepting mapping
-  %MEM-I-ACCMAP, virtual  $FFFF000000000000 - $FFFF000000000FFF
-  %MEM-I-ACCMAP, physical $000000000009E000 - $000000000009EFFF
+  Where this becomes problematic is that glibc's FILE internals mmap a
+  *lot*- once per handle.  Any long running process can hit this wall-
+  rpmbuild unfortunately is pretty loose in it's FILE creation/usage, so
+  it hits the wall surprisingly fast- at least on an opensuse 11.2
+  system w/ mmap_min_addr of 65536 (their default), building qt reliably
+  hits that exhaustion during packaging.
 
-  Note that qemu doesn't crash. It only stops. My virtual memory
-  subsystem maps $FFFF000000000000 in physical memory ($9E000). And when
-  I try to initialize this memory, qemu enters in deadlock.
+  Attached is basically, a hack- but one that works surprisingly well
+  and at least for meego building via qemu-arm, eliminates the failure
+  scenario I've described above.  It doesn't remove the exhaustion as
+  much as push it a fair bit back, although there are still a couple of
+  ways to trigger it (http://bugs.meego.com/show_bug.cgi?id=3D10526 is the
+  only remaining example I'm aware of).
 
-  A disk image to reproduce this bug is available at
-  http://www.systella.fr/~bertrand/freevms.img.bz2
-
-  Regards,
-
-  JKB
+  This patch simply checks to see if upon an actual, host level munmap,
+  if the ending point of the munmap is where we'd allocate from next- if
+  so, it shifts the starting point back to the (now) unmap'd start,
+  reusing the space.  Rebuilding meego a couple of times over, thus far
+  I've not managed to flush out any failures that point at this specific
+  patch, so... it looks like it's doing the trick- that said the lack of
+  a g2h/h2g in the calculation still seems questionable to me.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/682360/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/682326/+subscriptions
