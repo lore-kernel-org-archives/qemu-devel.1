@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cf7DZ-0003M8-GA
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 10:46:38 -0500
+	(envelope-from <eblake@redhat.com>) id 1cf7LL-00066P-I3
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 10:54:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cf7DY-0004Mk-Ka
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 10:46:37 -0500
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:33227)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cf7DY-0004Lw-Eq
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 10:46:36 -0500
-Received: by mail-wr0-x231.google.com with SMTP id 35so3677041wrw.0
-	for <qemu-devel@nongnu.org>; Sat, 18 Feb 2017 07:46:36 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1cf7LG-00075G-OS
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 10:54:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48424)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cf7LG-00074t-Ig
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 10:54:34 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BA85581222
+	for <qemu-devel@nongnu.org>; Sat, 18 Feb 2017 15:54:33 +0000 (UTC)
+References: <1487363905-9480-1-git-send-email-armbru@redhat.com>
+	<1487363905-9480-5-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3b8d038b-bf53-ff2c-f776-feda8560fac6@redhat.com>
+Date: Sat, 18 Feb 2017 09:54:31 -0600
 MIME-Version: 1.0
-In-Reply-To: <076b0d94-738e-252c-1ed8-4640a864ac34@ispras.ru>
-References: <076b0d94-738e-252c-1ed8-4640a864ac34@ispras.ru>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 18 Feb 2017 15:46:14 +0000
-Message-ID: <CAFEAcA-zURkUb28wVA347AFJX5Wa4GyXbFSVmUDH1BSXRMA+rQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] ARM i.MX timers: fix software
- reset
+In-Reply-To: <1487363905-9480-5-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="4OT6G9dBLVE5CpapgnfvSpw8wrLb3bqBF"
+Subject: Re: [Qemu-devel] [PATCH 04/14] check-qjson: Simplify around
+ compare_litqobj_to_qobj()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +35,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kurban Mallachiev <mallachiev@ispras.ru>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Chubb <peter.chubb@nicta.com.au>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
-On 17 February 2017 at 18:18, Kurban Mallachiev <mallachiev@ispras.ru> wrote:
-> Hello!
->
-> i.MX6 RM says that setting software reset bit in CR register of GPT (general
-> purpose timers) should resets all of the registers of GPT to their default
-> reset values, except for the CLKSRC, EN, ENMOD, STOPEN, WAITEN, and DBGEN
-> bits in CR. But current implementation does the opposite for CR register (it
-> clears CLKSRC and friends bits and preserves the others).
->
-> Most importantly this leads to that software reset bit doesn't clears
-> automatically.
->
-> I have a look at git history and found that software reset bit was being
-> cleared before 462566fc5e3 commit.
->
-> I have doubts about the correct fixing of this problem. I don't really
-> understand the nature of the "Soft reset doesn't touch some bits; hard reset
-> clears them" comment in imx_gpt_reset function, does it mean that
-> imx_gpt_reset performs a hard reset or soft reset? I see two possible
-> fixings:
->
-> 1. If imx_gpt_reset purpose is to do a software reset of device, then we
-> should fix this function. My patch at the end of email fixes this function.
->
-> 2. If imx_gpt_reset purpose is to do a hard reset of device? then there
-> should be another function to software reset of device. If so I can create a
-> new patch.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--4OT6G9dBLVE5CpapgnfvSpw8wrLb3bqBF
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <3b8d038b-bf53-ff2c-f776-feda8560fac6@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 04/14] check-qjson: Simplify around
+ compare_litqobj_to_qobj()
+References: <1487363905-9480-1-git-send-email-armbru@redhat.com>
+ <1487363905-9480-5-git-send-email-armbru@redhat.com>
+In-Reply-To: <1487363905-9480-5-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-As the function registered via the DeviceState's dc->reset
-pointer, imx_gpt_reset() has to behave as a "device was
-powercycled" level reset. It looks like we also call it
-from imx_gpt_write() when the guest does a write to a
-particular register. If that guest-requested reset has
-to have different behaviour from "device was powered off
-and on again" then it needs to use a different function
-and can't just call imx_gpt_reset().
+On 02/17/2017 02:38 PM, Markus Armbruster wrote:
+> Make compare_litqobj_to_qobj() cope with null, and drop non-null
+> assertions from callers.
+>=20
+> compare_litqobj_to_qobj() already checks the QType matches; drop the
+> redundant assertions from callers.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  tests/check-qjson.c | 22 +---------------------
+>  1 file changed, 1 insertion(+), 21 deletions(-)
 
-thanks
--- PMM
+Wow - impressive diffstat.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--4OT6G9dBLVE5CpapgnfvSpw8wrLb3bqBF
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYqG43AAoJEKeha0olJ0Nq3RkIAKQEmTkK9PO+M4LC6rblU/gH
+3Bbdk8UmfY+s8cdhUZK/3tzYjv7dcK6O9kfvF+eatsCfss4wNsMPjVhkPp6y7m7O
+tt/lCIkVZDaEFzub1vzqeTruau2x3p0idkSbUMDV4EVNYAIrkuhSuGD4M4skNMhJ
+ROKskkLN/QiCRYYCcSRyBBE2rWIaEct5RylhtH6beKA1RIbXP1P4q1IiorOanQiK
+DnvYQa3kpqIM0eHGLrSw1MZd7y9oUbHEnW7C2DiSsdawEB0/vHo/fQS+5TMlWd0n
+AIMfIwLIseJHsxlcblALflc0yYIiJ5SSaV43mFuj7yVy3nHHJ4/4yDeYrkYE7rE=
+=qmtb
+-----END PGP SIGNATURE-----
+
+--4OT6G9dBLVE5CpapgnfvSpw8wrLb3bqBF--
