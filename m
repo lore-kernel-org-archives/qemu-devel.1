@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39467)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cf0Ku-00019F-EB
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 03:25:46 -0500
+	(envelope-from <deller@gmx.de>) id 1cf0Qf-0002s1-M3
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 03:31:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cf0Kq-00034k-Ee
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 03:25:44 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55798)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cf0Kq-00034W-3m
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 03:25:40 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cf0Kp-0000Ou-1v
-	for <qemu-devel@nongnu.org>; Sat, 18 Feb 2017 08:25:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0B8672E8025
-	for <qemu-devel@nongnu.org>; Sat, 18 Feb 2017 08:25:39 +0000 (UTC)
+	(envelope-from <deller@gmx.de>) id 1cf0Qc-0005bv-Cn
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 03:31:41 -0500
+Received: from mout.gmx.net ([212.227.15.19]:55958)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <deller@gmx.de>) id 1cf0Qc-0005aZ-04
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 03:31:38 -0500
+Date: Sat, 18 Feb 2017 09:31:14 +0100
+From: Helge Deller <deller@gmx.de>
+Message-ID: <20170218083114.GA3424@ls3530.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 18 Feb 2017 08:17:06 -0000
-From: Paolo Bonzini <bonzini@gnu.org>
-Reply-To: Bug 1665389 <1665389@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170216160426.5716.21453.malonedeb@soybean.canonical.com>
-Message-Id: <20170218081706.29755.34673.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1665389] Re: Nested kvm guest fails to start on a
- emulated Westmere CPU guest under a Broadwell CPU host
+Content-Type: text/plain; charset=iso-8859-15
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v4] linux-user: Add sockopts for IPv6 ping and
+ IPv6 traceroute
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,134 +26,273 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
+Cc: Laurent Vivier <laurent@vivier.eu>, Richard Henderson <rth@twiddle.net>, Philippe =?iso-8859-15?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
-Nested is currently supported only with -cpu host. Kernel 4.9 has the
-necessary support but QEMU doesn't.
+Add the neccessary sockopts for ping and traceroute on IPv6.
 
--- =
+This fixes the following qemu warnings with IPv6:
+Unsupported ancillary data: 0/2
+Unsupported ancillary data: 0/11
+Unsupported ancillary data: 41/25
+Unsupported setsockopt level=0 optname=12 
+Unsupported setsockopt level=41 optname=16
+Unsupported setsockopt level=41 optname=25
+Unsupported setsockopt level=41 optname=50
+Unsupported setsockopt level=41 optname=51
+Unsupported setsockopt level=41 optname=8
+Unsupported setsockopt level=58 optname=1
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1665389
+Tested with hppa-linux-user (big-endian) on x86_64 (little-endian).
 
-Title:
-  Nested kvm guest fails to start on a emulated Westmere CPU guest under
-  a Broadwell CPU host
+Signed-off-by: Helge Deller <deller@gmx.de>
 
-Status in QEMU:
-  New
+---
+Changes to v3:
+- Fix up checkpatch fallouts
 
-Bug description:
-  Using latest master(5dae13), qemu fails to start any nested guest in a
-  Westmere emulated guest(layer 1), under a Broadwell host(layer 0),
-  with the error:
+Changes to v2: (all suggested by Laurent Vivier)
+- Drop goto statements and replaced by real code
+- New function host_to_target_sockaddr_in6()
+- Fix IPV6_PKTINFO which uses in6_pktinfo instead of uint32_t
+- Move one IPV6_CHECKSUM from SOL_ICMPV6 to SOL_IPV6
+- Fix ICMPV6_FILTER to use icmpv6_filter
 
-  qemu-custom: /root/qemu/target/i386/kvm.c:1849: kvm_put_msrs:
-  Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+Changes to v1:
+- Added IPV6_PKTINFO sockopt as reported by Philippe Mathieu-Daudé
 
-  The qemu command used(though other CPUs didn't work either):
-  /usr/bin/qemu-custom -name guest=3D12ed9230-vm-el73,debug-threads=3Don -S=
- -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/d=
-omain-5-12ed9230-vm-el73/master-key.aes -machine pc-i440fx-2.9,accel=3Dkvm,=
-usb=3Doff -cpu Westmere,+vmx -m 512 -realtime mlock=3Doff -smp 2,sockets=3D=
-2,cores=3D1,threads=3D1 -object iothread,id=3Diothread1 -uuid f4ce4eba-985f=
--42a3-94c4-6e4a8a530347 -nographic -no-user-config -nodefaults -chardev soc=
-ket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-5-12ed9230-vm-el73=
-/monitor.sock,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3D=
-control -rtc base=3Dutc -no-shutdown -boot menu=3Doff,strict=3Don -device v=
-irtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x3 -drive file=3D/=
-root/lago/.lago/default/images/vm-el73_root.qcow2,format=3Dqcow2,if=3Dnone,=
-id=3Ddrive-virtio-disk0,serial=3D1,discard=3Dunmap -device virtio-blk-pci,s=
-csi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Ddrive-virtio-disk0,id=3Dvirtio-dis=
-k0,bootindex=3D1 -netdev tap,fd=3D26,id=3Dhostnet0,vhost=3Don,vhostfd=3D28 =
--device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D54:52:c0:a7:c8:02,=
-bus=3Dpci.0,addr=3D0x2 -chardev pty,id=3Dcharserial0 -device isa-serial,cha=
-rdev=3Dcharserial0,id=3Dserial0 -chardev socket,id=3Dcharchannel0,path=3D/v=
-ar/lib/libvirt/qemu/channel/target/domain-5-12ed9230-vm-el73/org.qemu.guest=
-_agent.0,server,nowait -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1=
-,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu.guest_agent.0 -object=
- rng-random,id=3Dobjrng0,filename=3D/dev/random -device virtio-rng-pci,rng=
-=3Dobjrng0,id=3Drng0,bus=3Dpci.0,addr=3D0x9 -msg timestamp=3Don
-  2017-02-16T15:14:45.840412Z qemu-custom: -chardev pty,id=3Dcharserial0: c=
-har device redirected to /dev/pts/2 (label charserial0)
-  qemu-custom: /root/qemu/target/i386/kvm.c:1849: kvm_put_msrs: Assertion `=
-ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
 
-  =
-
-  The CPU flags in the Westmere guest:
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush mmx fxsr sse sse2 syscall nx lm constant_tsc rep_good nopl =
-pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 x2apic popcnt aes hypervisor lah=
-f_lm arat tpr_shadow vnmi flexpriority ept vpid
-
-  The guest kernel is 3.10.0-514.2.2.el7.x86_64.
-
-  The CPU flags of the host(Broadwell): =
-
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb =
-rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology no=
-nstop_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx smx e=
-st tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt=
- tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch epb=
- intel_pt tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hl=
-e avx2 smep bmi2 erms invpcid rtm mpx rdseed adx smap clflushopt xsaveopt x=
-savec xgetbv1 xsaves dtherm ida arat pln pts hwp hwp_notify hwp_act_window =
-hwp_epp
-
-  qemu command on the host - Broadwell(which works):
-  /usr/bin/qemu-kvm -name 4ffcd448-vm-el73,debug-threads=3Don -S -machine p=
-c-i440fx-2.6,accel=3Dkvm,usb=3Doff -cpu Westmere,+x2apic,+vmx,+vme -m 4096 =
--realtime mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -object ioth=
-read,id=3Diothread1 -uuid 8cc0a2cf-d25a-4014-acdb-f159c376a532 -nographic -=
-no-user-config -nodefaults -chardev socket,id=3Dcharmonitor,path=3D/var/lib=
-/libvirt/qemu/domain-4-4ffcd448-vm-el73/monitor.sock,server,nowait -mon cha=
-rdev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc -no-shutdown=
- -boot menu=3Doff,strict=3Don -device virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.=
-0,addr=3D0x3 -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=
-=3D0x4 -drive file=3D/home/ngoldin/src/nvgoldin.github.com/lago-init-files/=
-.lago/flags-tests/default/images/vm-el73_root.qcow2,format=3Dqcow2,if=3Dnon=
-e,id=3Ddrive-virtio-disk0,serial=3D1,discard=3Dunmap -device virtio-blk-pci=
-,scsi=3Doff,bus=3Dpci.0,addr=3D0x5,drive=3Ddrive-virtio-disk0,id=3Dvirtio-d=
-isk0,bootindex=3D1 -drive file=3D/home/ngoldin/src/nvgoldin.github.com/lago=
--init-files/.lago/flags-tests/default/images/vm-el73_additonal.qcow2,format=
-=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0,serial=3D2,discard=3Dunmap -devic=
-e scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,drive=3Ddrive-scsi0=
--0-0-0,id=3Dscsi0-0-0-0,bootindex=3D2 -netdev tap,fd=3D29,id=3Dhostnet0,vho=
-st=3Don,vhostfd=3D31 -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=
-=3D54:52:c0:a8:c9:02,bus=3Dpci.0,addr=3D0x2 -chardev pty,id=3Dcharserial0 -=
-device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev socket,id=3Dc=
-harchannel0,path=3D/var/lib/libvirt/qemu/channel/target/domain-4-4ffcd448-v=
-m-el73/org.qemu.guest_agent.0,server,nowait -device virtserialport,bus=3Dvi=
-rtio-serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu.=
-guest_agent.0 -object rng-random,id=3Dobjrng0,filename=3D/dev/random -devic=
-e virtio-rng-pci,rng=3Dobjrng0,id=3Drng0,bus=3Dpci.0,addr=3D0x9 -msg timest=
-amp=3Don
-
-  On the Broadwell host I'm using a distribution package if it matters
-  (qemu-kvm-2.6.2-5.fc24.x86_64 and 4.8.15-200.fc24.x86_64)
-
-  As the error indicates, I think this assertion was put in:
-  commit 48e1a45c3166d659f781171a47dabf4a187ed7a5
-  Author: Paolo Bonzini <pbonzini@redhat.com>
-  Date:   Wed Mar 30 22:55:29 2016 +0200
-
-      target-i386: assert that KVM_GET/SET_MSRS can set all requested MSRs
-      =
-
-      This would have caught the bug in the previous patch.
-      =
-
-      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-  I tried going back one commit before to 273c515, and then the error is go=
-ne and the nested guest comes up as expected. If I try to run with head at =
-the above commit(48e145c) the error output is slightly different, though it=
- looks the same:
-  /root/qemu/target-i386/kvm.c:1713: kvm_put_msrs: Assertion `ret =3D=3D n'=
- failed.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1665389/+subscriptions
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index f569f82..6bd3ea7 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -57,6 +57,8 @@ int __clone2(int (*fn)(void *), void *child_stack_base,
+ #include <netinet/tcp.h>
+ #include <linux/wireless.h>
+ #include <linux/icmp.h>
++#include <linux/icmpv6.h>
++#include <linux/errqueue.h>
+ #include "qemu-common.h"
+ #ifdef CONFIG_TIMERFD
+ #include <sys/timerfd.h>
+@@ -1640,6 +1642,34 @@ static inline abi_long host_to_target_sockaddr(abi_ulong target_addr,
+     return 0;
+ }
+ 
++static inline abi_long host_to_target_sockaddr_in6(abi_ulong target_addr,
++                                               struct sockaddr_in6 *addr,
++                                               socklen_t len)
++{
++    struct target_sockaddr_in6 *target_saddr;
++
++    if (len == 0) {
++        return 0;
++    }
++
++    target_saddr = lock_user(VERIFY_WRITE, target_addr, len, 0);
++    if (!target_saddr) {
++        return -TARGET_EFAULT;
++    }
++    memcpy(target_saddr, addr, len);
++    if (len >= offsetof(struct target_sockaddr_in6, sin6_family) +
++        sizeof(target_saddr->sin6_family)) {
++        target_saddr->sin6_family = tswap16(addr->sin6_family);
++    }
++    if (len >= offsetof(struct target_sockaddr_in6, sin6_scope_id) +
++        sizeof(target_saddr->sin6_scope_id)) {
++        target_saddr->sin6_scope_id = tswap16(addr->sin6_scope_id);
++    }
++    unlock_user(target_saddr, target_addr, len);
++
++    return 0;
++}
++
+ static inline abi_long target_to_host_cmsg(struct msghdr *msgh,
+                                            struct target_msghdr *target_msgh)
+ {
+@@ -1839,6 +1869,85 @@ static inline abi_long host_to_target_cmsg(struct target_msghdr *target_msgh,
+             }
+             break;
+ 
++        case SOL_IP:
++            switch (cmsg->cmsg_type) {
++            case IP_TTL:
++            {
++                uint32_t *v = (uint32_t *)data;
++                uint32_t *t_int = (uint32_t *)target_data;
++                if (tgt_len != CMSG_LEN(0)) {
++                    goto unimplemented;
++                }
++
++                __put_user(*v, t_int);
++                break;
++            }
++            case IP_RECVERR:
++            {
++                struct errhdr_t {
++                   struct sock_extended_err ee;
++                   struct sockaddr_in offender;
++                };
++                struct errhdr_t *errh = (struct errhdr_t *)data;
++                struct errhdr_t *target_errh =
++                    (struct errhdr_t *)target_data;
++
++                __put_user(errh->ee.ee_errno, &target_errh->ee.ee_errno);
++                __put_user(errh->ee.ee_origin, &target_errh->ee.ee_origin);
++                __put_user(errh->ee.ee_type,  &target_errh->ee.ee_type);
++                __put_user(errh->ee.ee_code, &target_errh->ee.ee_code);
++                __put_user(errh->ee.ee_pad, &target_errh->ee.ee_pad);
++                __put_user(errh->ee.ee_info, &target_errh->ee.ee_info);
++                __put_user(errh->ee.ee_data, &target_errh->ee.ee_data);
++                host_to_target_sockaddr((unsigned long) &target_errh->offender,
++                    (void *) &errh->offender, sizeof(errh->offender));
++                break;
++            }
++            default:
++                goto unimplemented;
++            }
++            break;
++
++        case SOL_IPV6:
++            switch (cmsg->cmsg_type) {
++            case IPV6_HOPLIMIT:
++            {
++                uint32_t *v = (uint32_t *)data;
++                uint32_t *t_int = (uint32_t *)target_data;
++                if (tgt_len != CMSG_LEN(0)) {
++                    goto unimplemented;
++                }
++
++                __put_user(*v, t_int);
++                break;
++            }
++            case IPV6_RECVERR:
++            {
++                struct errhdr6_t {
++                   struct sock_extended_err ee;
++                   struct sockaddr_in6 offender;
++                };
++                struct errhdr6_t *errh = (struct errhdr6_t *)data;
++                struct errhdr6_t *target_errh =
++                    (struct errhdr6_t *)target_data;
++
++                __put_user(errh->ee.ee_errno, &target_errh->ee.ee_errno);
++                __put_user(errh->ee.ee_origin, &target_errh->ee.ee_origin);
++                __put_user(errh->ee.ee_type,  &target_errh->ee.ee_type);
++                __put_user(errh->ee.ee_code, &target_errh->ee.ee_code);
++                __put_user(errh->ee.ee_pad, &target_errh->ee.ee_pad);
++                __put_user(errh->ee.ee_info, &target_errh->ee.ee_info);
++                __put_user(errh->ee.ee_data, &target_errh->ee.ee_data);
++                host_to_target_sockaddr_in6(
++                    (unsigned long) &target_errh->offender,
++                    &errh->offender, sizeof(errh->offender));
++                break;
++            }
++            default:
++                goto unimplemented;
++            }
++            break;
++
+         default:
+         unimplemented:
+             gemu_log("Unsupported ancillary data: %d/%d\n",
+@@ -2768,6 +2877,7 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
+         case IP_PKTINFO:
+         case IP_MTU_DISCOVER:
+         case IP_RECVERR:
++        case IP_RECVTTL:
+         case IP_RECVTOS:
+ #ifdef IP_FREEBIND
+         case IP_FREEBIND:
+@@ -2817,6 +2927,11 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
+         case IPV6_MTU:
+         case IPV6_V6ONLY:
+         case IPV6_RECVPKTINFO:
++        case IPV6_UNICAST_HOPS:
++        case IPV6_RECVERR:
++        case IPV6_RECVHOPLIMIT:
++        case IPV6_2292HOPLIMIT:
++        case IPV6_CHECKSUM:
+             val = 0;
+             if (optlen < sizeof(uint32_t)) {
+                 return -TARGET_EINVAL;
+@@ -2827,6 +2942,50 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
+             ret = get_errno(setsockopt(sockfd, level, optname,
+                                        &val, sizeof(val)));
+             break;
++        case IPV6_PKTINFO:
++        {
++            struct in6_pktinfo pki;
++
++            if (optlen < sizeof(pki)) {
++                return -TARGET_EINVAL;
++            }
++
++            if (copy_from_user(&pki, optval_addr, sizeof(pki))) {
++                return -TARGET_EFAULT;
++            }
++
++            pki.ipi6_ifindex = tswap32(pki.ipi6_ifindex);
++
++            ret = get_errno(setsockopt(sockfd, level, optname,
++                                       &pki, sizeof(pki)));
++            break;
++        }
++        default:
++            goto unimplemented;
++        }
++        break;
++    case SOL_ICMPV6:
++        switch (optname) {
++        case ICMPV6_FILTER:
++        {
++            struct icmp6_filter icmp6f;
++
++            if (optlen < sizeof(icmp6f)) {
++                return -TARGET_EINVAL;
++            }
++
++            if (copy_from_user(&icmp6f, optval_addr, sizeof(icmp6f))) {
++                return -TARGET_EFAULT;
++            }
++
++            for (val = 0; val < 8; val++) {
++                icmp6f.data[val] = tswap32(icmp6f.data[val]);
++            }
++
++            ret = get_errno(setsockopt(sockfd, level, optname,
++                                       &icmp6f, sizeof(icmp6f)));
++            break;
++        }
+         default:
+             goto unimplemented;
+         }
+@@ -2834,7 +2993,8 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
+     case SOL_RAW:
+         switch (optname) {
+         case ICMP_FILTER:
+-            /* struct icmp_filter takes an u32 value */
++        case IPV6_CHECKSUM:
++            /* those take an u32 value */
+             if (optlen < sizeof(uint32_t)) {
+                 return -TARGET_EINVAL;
+             }
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 72ca5b1..40c5027 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -164,6 +164,14 @@ struct target_sockaddr_in {
+                 sizeof(struct target_in_addr)];
+ };
+ 
++struct target_sockaddr_in6 {
++    uint16_t sin6_family;
++    uint16_t sin6_port; /* big endian */
++    uint32_t sin6_flowinfo; /* big endian */
++    struct in6_addr sin6_addr; /* IPv6 address, big endian */
++    uint32_t sin6_scope_id;
++};
++
+ struct target_sock_filter {
+     abi_ushort code;
+     uint8_t jt;
