@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56951)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mallachiev@ispras.ru>) id 1cfB9X-0008SD-Ho
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 14:58:46 -0500
+	(envelope-from <laurent@vivier.eu>) id 1cfBMn-0004Kx-JI
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 15:12:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mallachiev@ispras.ru>) id 1cfB9W-0005ln-DJ
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 14:58:43 -0500
-References: <076b0d94-738e-252c-1ed8-4640a864ac34@ispras.ru>
-	<CAFEAcA-zURkUb28wVA347AFJX5Wa4GyXbFSVmUDH1BSXRMA+rQ@mail.gmail.com>
-From: Kurban Mallachiev <mallachiev@ispras.ru>
-Message-ID: <4d2f2d04-e294-bdad-4f77-9a0171357d05@ispras.ru>
-Date: Sat, 18 Feb 2017 22:57:51 +0300
+	(envelope-from <laurent@vivier.eu>) id 1cfBMk-0002Bv-CD
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 15:12:25 -0500
+Received: from mout.kundenserver.de ([212.227.17.10]:50026)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cfBMk-0002BB-0z
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 15:12:22 -0500
+References: <20170218083114.GA3424@ls3530.fritz.box>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <a3ab218d-c4f2-c961-64a1-f62df207ab5b@vivier.eu>
+Date: Sat, 18 Feb 2017 21:11:59 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-zURkUb28wVA347AFJX5Wa4GyXbFSVmUDH1BSXRMA+rQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] ARM i.MX timers: fix software reset
+In-Reply-To: <20170218083114.GA3424@ls3530.fritz.box>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4] linux-user: Add sockopts for IPv6 ping
+ and IPv6 traceroute
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,127 +27,247 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Chubb <peter.chubb@nicta.com.au>
+To: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
+Cc: Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-Ok, thank you for reply.
+Le 18/02/2017 à 09:31, Helge Deller a écrit :
+> Add the neccessary sockopts for ping and traceroute on IPv6.
+> 
+> This fixes the following qemu warnings with IPv6:
+> Unsupported ancillary data: 0/2
+> Unsupported ancillary data: 0/11
+> Unsupported ancillary data: 41/25
+> Unsupported setsockopt level=0 optname=12 
+> Unsupported setsockopt level=41 optname=16
+> Unsupported setsockopt level=41 optname=25
+> Unsupported setsockopt level=41 optname=50
+> Unsupported setsockopt level=41 optname=51
+> Unsupported setsockopt level=41 optname=8
+> Unsupported setsockopt level=58 optname=1
+> 
+> Tested with hppa-linux-user (big-endian) on x86_64 (little-endian).
+> 
+> Signed-off-by: Helge Deller <deller@gmx.de>
+> 
+> ---
+> Changes to v3:
+> - Fix up checkpatch fallouts
+> 
+> Changes to v2: (all suggested by Laurent Vivier)
+> - Drop goto statements and replaced by real code
+> - New function host_to_target_sockaddr_in6()
+> - Fix IPV6_PKTINFO which uses in6_pktinfo instead of uint32_t
+> - Move one IPV6_CHECKSUM from SOL_ICMPV6 to SOL_IPV6
+> - Fix ICMPV6_FILTER to use icmpv6_filter
+> 
+> Changes to v1:
+> - Added IPV6_PKTINFO sockopt as reported by Philippe Mathieu-Daudé
+> 
+> 
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index f569f82..6bd3ea7 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -57,6 +57,8 @@ int __clone2(int (*fn)(void *), void *child_stack_base,
+>  #include <netinet/tcp.h>
+>  #include <linux/wireless.h>
+>  #include <linux/icmp.h>
+> +#include <linux/icmpv6.h>
+> +#include <linux/errqueue.h>
+>  #include "qemu-common.h"
+>  #ifdef CONFIG_TIMERFD
+>  #include <sys/timerfd.h>
+> @@ -1640,6 +1642,34 @@ static inline abi_long host_to_target_sockaddr(abi_ulong target_addr,
+>      return 0;
+>  }
+>  
+> +static inline abi_long host_to_target_sockaddr_in6(abi_ulong target_addr,
+> +                                               struct sockaddr_in6 *addr,
+> +                                               socklen_t len)
+> +{
+> +    struct target_sockaddr_in6 *target_saddr;
+> +
+> +    if (len == 0) {
+> +        return 0;
+> +    }
+> +
+> +    target_saddr = lock_user(VERIFY_WRITE, target_addr, len, 0);
+> +    if (!target_saddr) {
+> +        return -TARGET_EFAULT;
+> +    }
+> +    memcpy(target_saddr, addr, len);
+> +    if (len >= offsetof(struct target_sockaddr_in6, sin6_family) +
+> +        sizeof(target_saddr->sin6_family)) {
+> +        target_saddr->sin6_family = tswap16(addr->sin6_family);
+> +    }
+> +    if (len >= offsetof(struct target_sockaddr_in6, sin6_scope_id) +
+> +        sizeof(target_saddr->sin6_scope_id)) {
+> +        target_saddr->sin6_scope_id = tswap16(addr->sin6_scope_id);
+> +    }
+> +    unlock_user(target_saddr, target_addr, len);
+> +
+> +    return 0;
+> +}
 
-Here is another patch. I have created different function for software 
-reset (imx_gpt_soft_reset), and to prevent duplication extracted common 
-code to imx_gpt_reset_common.
 
-Take a look, please.
+I think you can add directly this code in host_to_target_sockaddr() and
+check if sa_family is AF_INET6 (and check length) and then swap
+sin6_scope_id.
 
----
-Subject: [PATCH] i.MX timers: fix software reset
+>  static inline abi_long target_to_host_cmsg(struct msghdr *msgh,
+>                                             struct target_msghdr *target_msgh)
+>  {
+> @@ -1839,6 +1869,85 @@ static inline abi_long host_to_target_cmsg(struct target_msghdr *target_msgh,
+>              }
+>              break;
+>  
+> +        case SOL_IP:
+> +            switch (cmsg->cmsg_type) {
+> +            case IP_TTL:
+> +            {
+> +                uint32_t *v = (uint32_t *)data;
+> +                uint32_t *t_int = (uint32_t *)target_data;
+> +                if (tgt_len != CMSG_LEN(0)) {
 
-Software reset function clears CR bits that should not clear and
-preserve bits that should clear.
+This checking looks strange, where does it come from?
 
-Signed-off-by: Kurban Mallachiev <mallachiev@ispras.ru>
----
-  hw/timer/imx_gpt.c | 26 ++++++++++++++++++++------
-  1 file changed, 20 insertions(+), 6 deletions(-)
+You compare the target structure length (including data) with the host
+structure head length.
 
-diff --git a/hw/timer/imx_gpt.c b/hw/timer/imx_gpt.c
-index 010ccbf207..f07ae3d9a4 100644
---- a/hw/timer/imx_gpt.c
-+++ b/hw/timer/imx_gpt.c
-@@ -296,18 +296,20 @@ static uint64_t imx_gpt_read(void *opaque, hwaddr 
-offset, unsigned size)
-      return reg_value;
-  }
+> +                    goto unimplemented;
+> +                }
+> +
+> +                __put_user(*v, t_int);
+> +                break;
+> +            }
+> +            case IP_RECVERR:
+> +            {
+> +                struct errhdr_t {
+> +                   struct sock_extended_err ee;
+> +                   struct sockaddr_in offender;
+> +                };
+> +                struct errhdr_t *errh = (struct errhdr_t *)data;
+> +                struct errhdr_t *target_errh =
+> +                    (struct errhdr_t *)target_data;
+> +
+> +                __put_user(errh->ee.ee_errno, &target_errh->ee.ee_errno);
+> +                __put_user(errh->ee.ee_origin, &target_errh->ee.ee_origin);
+> +                __put_user(errh->ee.ee_type,  &target_errh->ee.ee_type);
+> +                __put_user(errh->ee.ee_code, &target_errh->ee.ee_code);
+> +                __put_user(errh->ee.ee_pad, &target_errh->ee.ee_pad);
+> +                __put_user(errh->ee.ee_info, &target_errh->ee.ee_info);
+> +                __put_user(errh->ee.ee_data, &target_errh->ee.ee_data);
+> +                host_to_target_sockaddr((unsigned long) &target_errh->offender,
+> +                    (void *) &errh->offender, sizeof(errh->offender));
+> +                break;
+> +            }
+> +            default:
+> +                goto unimplemented;
+> +            }
+> +            break;
+> +
+> +        case SOL_IPV6:
+> +            switch (cmsg->cmsg_type) {
+> +            case IPV6_HOPLIMIT:
+> +            {
+> +                uint32_t *v = (uint32_t *)data;
+> +                uint32_t *t_int = (uint32_t *)target_data;
+> +                if (tgt_len != CMSG_LEN(0)) {
+> +                    goto unimplemented;
 
--static void imx_gpt_reset(DeviceState *dev)
-+static void imx_gpt_reset_common(IMXGPTState *s, int is_soft_reset)
-  {
--    IMXGPTState *s = IMX_GPT(dev);
--
-      /* stop timer */
-      ptimer_stop(s->timer);
+ditto
 
-      /*
-       * Soft reset doesn't touch some bits; hard reset clears them
-       */
--    s->cr &= ~(GPT_CR_EN|GPT_CR_ENMOD|GPT_CR_STOPEN|GPT_CR_DOZEN|
--               GPT_CR_WAITEN|GPT_CR_DBGEN);
-+    if (is_soft_reset) {
-+        s->cr &= GPT_CR_EN|GPT_CR_ENMOD|GPT_CR_STOPEN|GPT_CR_DOZEN|
-+                   GPT_CR_WAITEN|GPT_CR_DBGEN;
-+    } else {
-+        s->cr = 0;
-+    }
-      s->sr = 0;
-      s->pr = 0;
-      s->ir = 0;
-@@ -333,6 +335,18 @@ static void imx_gpt_reset(DeviceState *dev)
-      }
-  }
+> +                }
+> +
+> +                __put_user(*v, t_int);
+> +                break;
+> +            }
+> +            case IPV6_RECVERR:
+> +            {
+> +                struct errhdr6_t {
+> +                   struct sock_extended_err ee;
+> +                   struct sockaddr_in6 offender;
+> +                };
+> +                struct errhdr6_t *errh = (struct errhdr6_t *)data;
+> +                struct errhdr6_t *target_errh =
+> +                    (struct errhdr6_t *)target_data;
+> +
+> +                __put_user(errh->ee.ee_errno, &target_errh->ee.ee_errno);
+> +                __put_user(errh->ee.ee_origin, &target_errh->ee.ee_origin);
+> +                __put_user(errh->ee.ee_type,  &target_errh->ee.ee_type);
+> +                __put_user(errh->ee.ee_code, &target_errh->ee.ee_code);
+> +                __put_user(errh->ee.ee_pad, &target_errh->ee.ee_pad);
+> +                __put_user(errh->ee.ee_info, &target_errh->ee.ee_info);
+> +                __put_user(errh->ee.ee_data, &target_errh->ee.ee_data);
+> +                host_to_target_sockaddr_in6(
+> +                    (unsigned long) &target_errh->offender,
+> +                    &errh->offender, sizeof(errh->offender));
+> +                break;
+> +            }
+> +            default:
+> +                goto unimplemented;
+> +            }
+> +            break;
+> +
+>          default:
+>          unimplemented:
+>              gemu_log("Unsupported ancillary data: %d/%d\n",
+> @@ -2768,6 +2877,7 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
+>          case IP_PKTINFO:
+>          case IP_MTU_DISCOVER:
+>          case IP_RECVERR:
+> +        case IP_RECVTTL:
+>          case IP_RECVTOS:
+>  #ifdef IP_FREEBIND
+>          case IP_FREEBIND:
+> @@ -2817,6 +2927,11 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
+>          case IPV6_MTU:
+>          case IPV6_V6ONLY:
+>          case IPV6_RECVPKTINFO:
+> +        case IPV6_UNICAST_HOPS:
+> +        case IPV6_RECVERR:
+> +        case IPV6_RECVHOPLIMIT:
+> +        case IPV6_2292HOPLIMIT:
+> +        case IPV6_CHECKSUM:
+>              val = 0;
+>              if (optlen < sizeof(uint32_t)) {
+>                  return -TARGET_EINVAL;
+> @@ -2827,6 +2942,50 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
+>              ret = get_errno(setsockopt(sockfd, level, optname,
+>                                         &val, sizeof(val)));
+>              break;
+> +        case IPV6_PKTINFO:
+> +        {
+> +            struct in6_pktinfo pki;
+> +
+> +            if (optlen < sizeof(pki)) {
+> +                return -TARGET_EINVAL;
+> +            }
+> +
+> +            if (copy_from_user(&pki, optval_addr, sizeof(pki))) {
+> +                return -TARGET_EFAULT;
+> +            }
+> +
+> +            pki.ipi6_ifindex = tswap32(pki.ipi6_ifindex);
+> +
+> +            ret = get_errno(setsockopt(sockfd, level, optname,
+> +                                       &pki, sizeof(pki)));
+> +            break;
+> +        }
+> +        default:
+> +            goto unimplemented;
+> +        }
+> +        break;
+> +    case SOL_ICMPV6:
+> +        switch (optname) {
+> +        case ICMPV6_FILTER:
+> +        {
+> +            struct icmp6_filter icmp6f;
+> +
+> +            if (optlen < sizeof(icmp6f)) {
+> +                return -TARGET_EINVAL;
 
-+static void imx_gpt_soft_reset(DeviceState *dev)
-+{
-+    IMXGPTState *s = IMX_GPT(dev);
-+    imx_gpt_reset_common(s, 1);
-+}
-+
-+static void imx_gpt_reset(DeviceState *dev)
-+{
-+    IMXGPTState *s = IMX_GPT(dev);
-+    imx_gpt_reset_common(s, 0);
-+}
-+
-  static void imx_gpt_write(void *opaque, hwaddr offset, uint64_t value,
-                            unsigned size)
-  {
-@@ -348,7 +362,7 @@ static void imx_gpt_write(void *opaque, hwaddr 
-offset, uint64_t value,
-          s->cr = value & ~0x7c14;
-          if (s->cr & GPT_CR_SWR) { /* force reset */
-              /* handle the reset */
--            imx_gpt_reset(DEVICE(s));
-+            imx_gpt_soft_reset(DEVICE(s));
-          } else {
-              /* set our freq, as the source might have changed */
-              imx_gpt_set_freq(s);
--- 
-2.11.1
+kernel doesn't return EINVAL, it trunks the length instead.
 
-On 18.02.2017 18:46, Peter Maydell wrote:
-> On 17 February 2017 at 18:18, Kurban Mallachiev <mallachiev@ispras.ru> wrote:
->> Hello!
->>
->> i.MX6 RM says that setting software reset bit in CR register of GPT (general
->> purpose timers) should resets all of the registers of GPT to their default
->> reset values, except for the CLKSRC, EN, ENMOD, STOPEN, WAITEN, and DBGEN
->> bits in CR. But current implementation does the opposite for CR register (it
->> clears CLKSRC and friends bits and preserves the others).
->>
->> Most importantly this leads to that software reset bit doesn't clears
->> automatically.
->>
->> I have a look at git history and found that software reset bit was being
->> cleared before 462566fc5e3 commit.
->>
->> I have doubts about the correct fixing of this problem. I don't really
->> understand the nature of the "Soft reset doesn't touch some bits; hard reset
->> clears them" comment in imx_gpt_reset function, does it mean that
->> imx_gpt_reset performs a hard reset or soft reset? I see two possible
->> fixings:
->>
->> 1. If imx_gpt_reset purpose is to do a software reset of device, then we
->> should fix this function. My patch at the end of email fixes this function.
->>
->> 2. If imx_gpt_reset purpose is to do a hard reset of device? then there
->> should be another function to software reset of device. If so I can create a
->> new patch.
-> As the function registered via the DeviceState's dc->reset
-> pointer, imx_gpt_reset() has to behave as a "device was
-> powercycled" level reset. It looks like we also call it
-> from imx_gpt_write() when the guest does a write to a
-> particular register. If that guest-requested reset has
-> to have different behaviour from "device was powered off
-> and on again" then it needs to use a different function
-> and can't just call imx_gpt_reset().
->
-> thanks
-> -- PMM
+
+Laurent
