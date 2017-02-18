@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1cf3AR-0003Db-2t
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 06:27:08 -0500
+	(envelope-from <eblake@redhat.com>) id 1cf4nt-0007qS-00
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 08:11:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1cf3AO-00056Q-0G
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 06:27:07 -0500
-References: <1487153430-17260-9-git-send-email-vsementsov@virtuozzo.com>
-	<20170216112506.GB4869@noname.redhat.com>
-	<20170216114944.GD4869@noname.redhat.com>
-	<8d7a5d17-7b1b-578a-67fc-c79beb196a4c@virtuozzo.com>
-	<20170217120935.GC5338@noname.redhat.com>
-	<fd790939-7ad7-1d74-c810-eceece98bbb7@virtuozzo.com>
-	<20170217124842.GE5338@noname.redhat.com>
-	<3a827d65-1028-d0fd-c3aa-cabe61dafbd9@openvz.org>
-	<20170217133430.GI5338@noname.redhat.com>
-	<635d98d9-0f65-4fa6-2208-02ff7d23a2e9@openvz.org>
-	<20170217142403.GJ5338@noname.redhat.com>
-	<89b7456e-e689-fdee-7ab0-89bb664f1cb6@virtuozzo.com>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <d41ae075-95db-6cf9-3cc7-58f2f337420b@openvz.org>
-Date: Sat, 18 Feb 2017 11:54:02 +0100
+	(envelope-from <eblake@redhat.com>) id 1cf4no-0001MG-4j
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 08:11:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56832)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cf4nn-0001LG-UQ
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 08:11:52 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E3292C0467F1
+	for <qemu-devel@nongnu.org>; Sat, 18 Feb 2017 13:11:51 +0000 (UTC)
+References: <1487363905-9480-1-git-send-email-armbru@redhat.com>
+	<1487363905-9480-4-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3611b112-f976-a228-e54e-b3deadc1f52b@redhat.com>
+Date: Sat, 18 Feb 2017 07:11:49 -0600
 MIME-Version: 1.0
-In-Reply-To: <89b7456e-e689-fdee-7ab0-89bb664f1cb6@virtuozzo.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v15 08/25] block: introduce auto-loading
- bitmaps
+In-Reply-To: <1487363905-9480-4-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="wMvDhlWR3l81Hc6pf3131pdHBkCCVe9Hm"
+Subject: Re: [Qemu-devel] [PATCH 03/14] check-qdict: Tighten
+ qdict_crumple_test_recursive() some
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,71 +35,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
-On 02/17/2017 03:54 PM, Vladimir Sementsov-Ogievskiy wrote:
-> 17.02.2017 17:24, Kevin Wolf wrote:
->> Am 17.02.2017 um 14:48 hat Denis V. Lunev geschrieben:
->>> On 02/17/2017 04:34 PM, Kevin Wolf wrote:
->>>> Am 17.02.2017 um 14:22 hat Denis V. Lunev geschrieben:
->>>>> But for sure this is bad from the downtime point of view.
->>>>> On migrate you will have to write to the image and re-read
->>>>> it again on the target. This would be very slow. This will
->>>>> not help for the migration with non-shared disk too.
->>>>>
->>>>> That is why we have specifically worked in a migration,
->>>>> which for a good does not influence downtime at all now.
->>>>>
->>>>> With a write we are issuing several write requests + sync.
->>>>> Our measurements shows that bdrv_drain could take around
->>>>> a second on an averagely loaded conventional system, which
->>>>> seems unacceptable addition to me.
->>>> I'm not arguing against optimising migration, I fully agree with
->>>> you. I
->>>> just think that we should start with a correct if slow base version
->>>> and
->>>> then add optimisation to that, instead of starting with a broken base
->>>> version and adding to that.
->>>>
->>>> Look, whether you do the expensive I/O on open/close and make that a
->>>> slow operation or whether you do it on invalidate_cache/inactivate
->>>> doesn't really make a difference in term of slowness because in
->>>> general
->>>> both operations are called exactly once. But it does make a difference
->>>> in terms of correctness.
->>>>
->>>> Once you do the optimisation, of course, you'll skip writing those
->>>> bitmaps that you transfer using a different channel, no matter whether
->>>> you skip it in bdrv_close() or in bdrv_inactivate().
->>>>
->>>> Kevin
->>> I do not understand this point as in order to optimize this
->>> we will have to create specific code path or option from
->>> the migration code and keep this as an ugly kludge forever.
->> The point that I don't understand is why it makes any difference for the
->> follow-up migration series whether the writeout is in bdrv_close() or
->> bdrv_inactivate(). I don't really see the difference between the two
->> from a migration POV; both need to be skipped if we transfer the bitmap
->> using a different channel.
->>
->> Maybe I would see the reason if I could find the time to look at the
->> migration patches first, but unfortunately I don't have this time at the
->> moment.
->>
->> My point is just that generally we want to have a correctly working qemu
->> after every single patch, and even more importantly after every series.
->> As the migration series is separate from this, I don't think it's a good
->> excuse for doing worse than we could easily do here.
->>
->> Kevin
->
-> With open/close all is already ok - bitmaps will not be saved because
-> of BDRV_O_INACTIVE  and will not be loaded because of IN_USE.
->
->
-in any case load/store happens outside of VM downtime.
-The target is running at the moment of close on source,
-the source is running at the moment of open on target.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--wMvDhlWR3l81Hc6pf3131pdHBkCCVe9Hm
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <3611b112-f976-a228-e54e-b3deadc1f52b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 03/14] check-qdict: Tighten
+ qdict_crumple_test_recursive() some
+References: <1487363905-9480-1-git-send-email-armbru@redhat.com>
+ <1487363905-9480-4-git-send-email-armbru@redhat.com>
+In-Reply-To: <1487363905-9480-4-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Den
+On 02/17/2017 02:38 PM, Markus Armbruster wrote:
+> Consistently check for unexpected QDict entries, and qdict_get_qdict()
+> success.  The latter doesn't tighten the test, it only makes it fail
+> more nicely.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  tests/check-qdict.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>=20
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--wMvDhlWR3l81Hc6pf3131pdHBkCCVe9Hm
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYqEgVAAoJEKeha0olJ0Nqmk0IAKoRGNN6l1mMRvcfzYougcpw
+mmc6gZBLANxdyXyX0RaJVFoZweUngytw1U8Xb+HXKeV2cNq+hmilL8P2SrhghZGi
+90b8hkjB3swug13gqj992eUz6GSkGLneRRoULdbUMv5zZ6KY3eYy7iwCFhloxY7g
++66uI709Wx6ReVQfWR06daUBoMr11GdbcBYcEsSm1HIZkjEgCNLifD4RcAR7g8mm
+S4QANxAYq6cSvHvlYDS2+0PnZUeG8/vPnr63cwtPxWhXutGfDNKMf2DxDvhwWLgt
+GG0Lmid/U2GZE9Hqh8erBOvbixKHyzaZQwOKuDscfXyuGUZCv0XlzO5O3M8RRRc=
+=cG84
+-----END PGP SIGNATURE-----
+
+--wMvDhlWR3l81Hc6pf3131pdHBkCCVe9Hm--
