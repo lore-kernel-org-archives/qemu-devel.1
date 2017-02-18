@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cf4nt-0007qS-00
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 08:11:57 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cf7DZ-0003M8-GA
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 10:46:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cf4no-0001MG-4j
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 08:11:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56832)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cf4nn-0001LG-UQ
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 08:11:52 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E3292C0467F1
-	for <qemu-devel@nongnu.org>; Sat, 18 Feb 2017 13:11:51 +0000 (UTC)
-References: <1487363905-9480-1-git-send-email-armbru@redhat.com>
-	<1487363905-9480-4-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3611b112-f976-a228-e54e-b3deadc1f52b@redhat.com>
-Date: Sat, 18 Feb 2017 07:11:49 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1cf7DY-0004Mk-Ka
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 10:46:37 -0500
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:33227)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cf7DY-0004Lw-Eq
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 10:46:36 -0500
+Received: by mail-wr0-x231.google.com with SMTP id 35so3677041wrw.0
+	for <qemu-devel@nongnu.org>; Sat, 18 Feb 2017 07:46:36 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1487363905-9480-4-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="wMvDhlWR3l81Hc6pf3131pdHBkCCVe9Hm"
-Subject: Re: [Qemu-devel] [PATCH 03/14] check-qdict: Tighten
- qdict_crumple_test_recursive() some
+In-Reply-To: <076b0d94-738e-252c-1ed8-4640a864ac34@ispras.ru>
+References: <076b0d94-738e-252c-1ed8-4640a864ac34@ispras.ru>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 18 Feb 2017 15:46:14 +0000
+Message-ID: <CAFEAcA-zURkUb28wVA347AFJX5Wa4GyXbFSVmUDH1BSXRMA+rQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] ARM i.MX timers: fix software
+ reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,56 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: Kurban Mallachiev <mallachiev@ispras.ru>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Chubb <peter.chubb@nicta.com.au>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wMvDhlWR3l81Hc6pf3131pdHBkCCVe9Hm
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <3611b112-f976-a228-e54e-b3deadc1f52b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 03/14] check-qdict: Tighten
- qdict_crumple_test_recursive() some
-References: <1487363905-9480-1-git-send-email-armbru@redhat.com>
- <1487363905-9480-4-git-send-email-armbru@redhat.com>
-In-Reply-To: <1487363905-9480-4-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 17 February 2017 at 18:18, Kurban Mallachiev <mallachiev@ispras.ru> wrote:
+> Hello!
+>
+> i.MX6 RM says that setting software reset bit in CR register of GPT (general
+> purpose timers) should resets all of the registers of GPT to their default
+> reset values, except for the CLKSRC, EN, ENMOD, STOPEN, WAITEN, and DBGEN
+> bits in CR. But current implementation does the opposite for CR register (it
+> clears CLKSRC and friends bits and preserves the others).
+>
+> Most importantly this leads to that software reset bit doesn't clears
+> automatically.
+>
+> I have a look at git history and found that software reset bit was being
+> cleared before 462566fc5e3 commit.
+>
+> I have doubts about the correct fixing of this problem. I don't really
+> understand the nature of the "Soft reset doesn't touch some bits; hard reset
+> clears them" comment in imx_gpt_reset function, does it mean that
+> imx_gpt_reset performs a hard reset or soft reset? I see two possible
+> fixings:
+>
+> 1. If imx_gpt_reset purpose is to do a software reset of device, then we
+> should fix this function. My patch at the end of email fixes this function.
+>
+> 2. If imx_gpt_reset purpose is to do a hard reset of device? then there
+> should be another function to software reset of device. If so I can create a
+> new patch.
 
-On 02/17/2017 02:38 PM, Markus Armbruster wrote:
-> Consistently check for unexpected QDict entries, and qdict_get_qdict()
-> success.  The latter doesn't tighten the test, it only makes it fail
-> more nicely.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  tests/check-qdict.c | 5 +++++
->  1 file changed, 5 insertions(+)
->=20
+As the function registered via the DeviceState's dc->reset
+pointer, imx_gpt_reset() has to behave as a "device was
+powercycled" level reset. It looks like we also call it
+from imx_gpt_write() when the guest does a write to a
+particular register. If that guest-requested reset has
+to have different behaviour from "device was powered off
+and on again" then it needs to use a different function
+and can't just call imx_gpt_reset().
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---wMvDhlWR3l81Hc6pf3131pdHBkCCVe9Hm
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYqEgVAAoJEKeha0olJ0Nqmk0IAKoRGNN6l1mMRvcfzYougcpw
-mmc6gZBLANxdyXyX0RaJVFoZweUngytw1U8Xb+HXKeV2cNq+hmilL8P2SrhghZGi
-90b8hkjB3swug13gqj992eUz6GSkGLneRRoULdbUMv5zZ6KY3eYy7iwCFhloxY7g
-+66uI709Wx6ReVQfWR06daUBoMr11GdbcBYcEsSm1HIZkjEgCNLifD4RcAR7g8mm
-S4QANxAYq6cSvHvlYDS2+0PnZUeG8/vPnr63cwtPxWhXutGfDNKMf2DxDvhwWLgt
-GG0Lmid/U2GZE9Hqh8erBOvbixKHyzaZQwOKuDscfXyuGUZCv0XlzO5O3M8RRRc=
-=cG84
------END PGP SIGNATURE-----
-
---wMvDhlWR3l81Hc6pf3131pdHBkCCVe9Hm--
+thanks
+-- PMM
