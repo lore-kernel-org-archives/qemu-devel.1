@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cf2RX-0007bR-A7
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 05:40:44 -0500
+	(envelope-from <armbru@redhat.com>) id 1cf2X7-0001ak-Sk
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 05:46:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cf2RW-0005Xr-D4
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 05:40:43 -0500
+	(envelope-from <armbru@redhat.com>) id 1cf2X3-00080q-14
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 05:46:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49676)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cf2X2-00080g-RM
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 05:46:24 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 884323B755
+	for <qemu-devel@nongnu.org>; Sat, 18 Feb 2017 10:46:24 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
 References: <1487067971-10443-1-git-send-email-armbru@redhat.com>
-	<1487067971-10443-24-git-send-email-armbru@redhat.com>
-	<711102c9-cd43-6c6f-cf2e-422251bbb211@redhat.com>
-Date: Sat, 18 Feb 2017 11:40:33 +0100
-In-Reply-To: <711102c9-cd43-6c6f-cf2e-422251bbb211@redhat.com> (Eric Blake's
-	message of "Fri, 17 Feb 2017 16:19:58 -0600")
-Message-ID: <87k28n6au6.fsf@dusky.pond.sub.org>
+	<1487067971-10443-25-git-send-email-armbru@redhat.com>
+	<5ade6214-3ec8-162c-55aa-e71f44a99009@redhat.com>
+Date: Sat, 18 Feb 2017 11:46:21 +0100
+In-Reply-To: <5ade6214-3ec8-162c-55aa-e71f44a99009@redhat.com> (Eric Blake's
+	message of "Fri, 17 Feb 2017 16:27:51 -0600")
+Message-ID: <87efyv6aki.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 23/24] util/cutils: Change qemu_strtosz*()
- from int64_t to uint64_t
+Subject: Re: [Qemu-devel] [PATCH 24/24] QemuOpts: Fix checking of sizes for
+ overflow and trailing crap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,102 +36,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org
 
 Eric Blake <eblake@redhat.com> writes:
 
 > On 02/14/2017 04:26 AM, Markus Armbruster wrote:
->> This will permit its use in parse_option_size().
->
-> Progress!  (not that it matters - off_t is a signed value, so you are
-> STILL limited to 2^63, not 2^64, as the maximum theoretical size storage
-> that you can target - and it's not like we have that much storage even
-> accessible)
->
+>> parse_option_size()'s checking for overflow and trailing crap is
+>> wrong.  Has always been that way.  qemu_strtosz() gets it right, so
+>> use that.
 >> 
->> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> Cc: Eduardo Habkost <ehabkost@redhat.com> (maintainer:X86)
->> Cc: Kevin Wolf <kwolf@redhat.com> (supporter:Block layer core)
->> Cc: Max Reitz <mreitz@redhat.com> (supporter:Block layer core)
->> Cc: qemu-block@nongnu.org (open list:Block layer core)
+>> This adds support for size suffixes 'P', 'E', and ignores case for all
+>> suffixes, not just 'k'.
+>
+> Yay! Be liberal in what you accept!  (I've always been annoyed that '-m
+> 1g' complains, forcing me to us '-m 1G').
+
+The liberality is okay when we measure bytes, because 'm' can only mean
+"mega" there.  It's problematic when we measure things like seconds,
+where 'm' definitely should mean "milli".
+
+Perhaps I should make do_strtosz() case-insensitive only when unit ==
+1024, but not when unit == 1000.
+
+> Okay, we're at the end of the series, and I've pointed out other
+> possible improvements.  As mentioned elsewhere, it might be nice to add
+> a 25/24 to match coreutils, which allows 'm' and 'mib' to mean
+> 1024*1024, vs. 'mb' to mean 1000*1000.  Right now, all clients of
+> qemu_strtosz() are stuck to one scale, vs. letting the user choose a
+> scale by their choice of suffix.  But it does not hold up this series if
+> you don't like the idea.
+
+I'd prefer not to do that now, because I'm busy on getting -blockdev
+done before the soft freeze.
+
 >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 >> ---
+>>  tests/test-qemu-opts.c | 21 +++++++++------------
+>>  util/qemu-option.c     | 41 +++++++++++++----------------------------
+>>  2 files changed, 22 insertions(+), 40 deletions(-)
+>> 
 >
->> +++ b/hmp.c
->> @@ -1338,7 +1338,7 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
->>  {
->>      const char *param = qdict_get_str(qdict, "parameter");
->>      const char *valuestr = qdict_get_str(qdict, "value");
->> -    int64_t valuebw = 0;
->> +    uint64_t valuebw = 0;
->>      long valueint = 0;
->>      Error *err = NULL;
->>      bool use_int_value = false;
->> @@ -1379,7 +1379,8 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
->>              case MIGRATION_PARAMETER_MAX_BANDWIDTH:
->>                  p.has_max_bandwidth = true;
->>                  ret = qemu_strtosz_mebi(valuestr, NULL, &valuebw);
->> -                if (ret < 0 || (size_t)valuebw != valuebw) {
->> +                if (ret < 0 || valuebw > INT64_MAX
->> +                    || (size_t)valuebw != valuebw) {
->
-> I don't know if this looks any better as:
->
-> if (ret < 0 || valuebw > MIN(INT64_MAX, SIZE_MAX))
->
-> so don't bother changing it if you think that's ugly.
-
-I think (size_t)valuebw != valuebw neatly expresses "valuebw not
-representable as size_t".  Requires unsigned, though.
-
->> +++ b/qapi/opts-visitor.c
->> @@ -481,7 +481,6 @@ opts_type_size(Visitor *v, const char *name, uint64_t *obj, Error **errp)
->>  {
->>      OptsVisitor *ov = to_ov(v);
->>      const QemuOpt *opt;
->> -    int64_t val;
->>      int err;
->>  
->>      opt = lookup_scalar(ov, name, errp);
->> @@ -489,14 +488,13 @@ opts_type_size(Visitor *v, const char *name, uint64_t *obj, Error **errp)
->>          return;
->>      }
->>  
->> -    err = qemu_strtosz(opt->str ? opt->str : "", NULL, &val);
->> +    err = qemu_strtosz(opt->str ? opt->str : "", NULL, obj);
->>      if (err < 0) {
->>          error_setg(errp, QERR_INVALID_PARAMETER_VALUE, opt->name,
->> -                   "a size value representible as a non-negative int64");
->
-> Nice - you're killing the unusual variant spelling of representable.
->
->> +++ b/util/cutils.c
->> @@ -207,7 +207,7 @@ static int64_t suffix_mul(char suffix, int64_t unit)
->>   */
->>  static int do_strtosz(const char *nptr, char **end,
->>                        const char default_suffix, int64_t unit,
->> -                      int64_t *result)
->> +                      uint64_t *result)
->>  {
->>      int retval;
->>      char *endptr;
->> @@ -237,7 +237,11 @@ static int do_strtosz(const char *nptr, char **end,
->>          retval = -EINVAL;
->>          goto out;
->>      }
->> -    if ((val * mul >= INT64_MAX) || val < 0) {
->> +    /*
->> +     * Values >= 0xfffffffffffffc00 overflow uint64_t after their trip
->> +     * through double (53 bits of precision).
->> +     */
->> +    if ((val * mul >= 0xfffffffffffffc00) || val < 0) {
->
-> I guess there's not any simpler expression using INT64_MAX and
-> operations (including casts to double and int64_t) that would reliably
-> produce the same constant that you just open-coded here.
-
-I think the literal plus the comment explaining it is easier to read.
-
 > Reviewed-by: Eric Blake <eblake@redhat.com>
 
 Thanks!
