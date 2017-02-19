@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1cfEk7-0001s5-S7
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 18:48:45 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cfIbC-0003LH-0R
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 22:55:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1cfEk5-0007CD-3Q
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 18:48:43 -0500
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:33944)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cfIb8-00004w-Uf
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 22:55:46 -0500
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:34200)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1cfEk4-0007Bw-T6
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 18:48:41 -0500
-Received: by mail-wm0-f68.google.com with SMTP id c85so8448101wmi.1
-	for <qemu-devel@nongnu.org>; Sat, 18 Feb 2017 15:48:40 -0800 (PST)
-From: Thomas Huth <huth@tuxfamily.org>
-Date: Sun, 19 Feb 2017 00:48:31 +0100
-Message-Id: <1487461713-23092-2-git-send-email-huth@tuxfamily.org>
-In-Reply-To: <1487461713-23092-1-git-send-email-huth@tuxfamily.org>
-References: <1487461713-23092-1-git-send-email-huth@tuxfamily.org>
-Subject: [Qemu-devel] [PULL 1/3] hw/m68k: Remove dummy machine
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cfIb8-0008WP-QQ
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 22:55:42 -0500
+Received: by mail-qt0-x242.google.com with SMTP id w20so10417281qtb.1
+	for <qemu-devel@nongnu.org>; Sat, 18 Feb 2017 19:55:42 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170217082704.23270-1-skiver.cloud.yzy@gmail.com>
+	<20170217082704.23270-2-skiver.cloud.yzy@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <5c9a78b3-bd37-d263-b7c2-d7a2db92c0a8@amsat.org>
+Date: Sun, 19 Feb 2017 00:55:38 -0300
+MIME-Version: 1.0
+In-Reply-To: <20170217082704.23270-2-skiver.cloud.yzy@gmail.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] monitor.c: make mon_get_cpu return
+ NULL when there is no CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,136 +35,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>
+To: Ziyue Yang <skiver.cloud.yzy@gmail.com>
+Cc: qemu-devel@nongnu.org, Ziyue Yang <yzylivezh@hotmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Pavel Butsykin <pbutsykin@virtuozzo.com>
 
-Since it is now possible to instantiate a CPU and RAM with the "none"
-machine, too, and a kernel can be loaded there with the generic loader
-device, there is no more need for the m68k "dummy" machine. Thus let's
-remove this unmaintained file now.
+On 02/17/2017 05:27 AM, Ziyue Yang wrote:
+> From: Ziyue Yang <yzylivezh@hotmail.com>
+>
+> Currently mon_get_cpu always dereferences first_cpu without checking
+> whether it's a valid pointer. This commit adds check before dereferencing,
+> and reports "No CPU" info if there isn't any CPU then returns NULL.
+>
+> Signed-off-by: Ziyue Yang <skiver.cloud.yzy@gmail.com>
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Signed-off-by: Thomas Huth <huth@tuxfamily.org>
----
- MAINTAINERS           |  4 ---
- hw/m68k/Makefile.objs |  2 --
- hw/m68k/dummy_m68k.c  | 84 ---------------------------------------------------
- 3 files changed, 90 deletions(-)
- delete mode 100644 hw/m68k/dummy_m68k.c
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index fb57d8e..3efe7c5 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -565,10 +565,6 @@ S: Orphan
- F: hw/m68k/an5206.c
- F: hw/m68k/mcf5206.c
- 
--dummy_m68k
--S: Orphan
--F: hw/m68k/dummy_m68k.c
--
- mcf5208
- S: Orphan
- F: hw/m68k/mcf5208.c
-diff --git a/hw/m68k/Makefile.objs b/hw/m68k/Makefile.objs
-index c4352e7..d1f089c 100644
---- a/hw/m68k/Makefile.objs
-+++ b/hw/m68k/Makefile.objs
-@@ -1,4 +1,2 @@
- obj-y += an5206.o mcf5208.o
--obj-y += dummy_m68k.o
--
- obj-y += mcf5206.o mcf_intc.o
-diff --git a/hw/m68k/dummy_m68k.c b/hw/m68k/dummy_m68k.c
-deleted file mode 100644
-index 0b11d20..0000000
---- a/hw/m68k/dummy_m68k.c
-+++ /dev/null
-@@ -1,84 +0,0 @@
--/*
-- * Dummy board with just RAM and CPU for use as an ISS.
-- *
-- * Copyright (c) 2007 CodeSourcery.
-- *
-- * This code is licensed under the GPL
-- */
--
--#include "qemu/osdep.h"
--#include "qemu-common.h"
--#include "cpu.h"
--#include "hw/hw.h"
--#include "hw/boards.h"
--#include "hw/loader.h"
--#include "elf.h"
--#include "exec/address-spaces.h"
--
--#define KERNEL_LOAD_ADDR 0x10000
--
--/* Board init.  */
--
--static void dummy_m68k_init(MachineState *machine)
--{
--    ram_addr_t ram_size = machine->ram_size;
--    const char *cpu_model = machine->cpu_model;
--    const char *kernel_filename = machine->kernel_filename;
--    M68kCPU *cpu;
--    CPUM68KState *env;
--    MemoryRegion *address_space_mem =  get_system_memory();
--    MemoryRegion *ram = g_new(MemoryRegion, 1);
--    int kernel_size;
--    uint64_t elf_entry;
--    hwaddr entry;
--
--    if (!cpu_model)
--        cpu_model = "cfv4e";
--    cpu = cpu_m68k_init(cpu_model);
--    if (!cpu) {
--        fprintf(stderr, "Unable to find m68k CPU definition\n");
--        exit(1);
--    }
--    env = &cpu->env;
--
--    /* Initialize CPU registers.  */
--    env->vbr = 0;
--
--    /* RAM at address zero */
--    memory_region_allocate_system_memory(ram, NULL, "dummy_m68k.ram",
--                                         ram_size);
--    memory_region_add_subregion(address_space_mem, 0, ram);
--
--    /* Load kernel.  */
--    if (kernel_filename) {
--        kernel_size = load_elf(kernel_filename, NULL, NULL, &elf_entry,
--                               NULL, NULL, 1, EM_68K, 0, 0);
--        entry = elf_entry;
--        if (kernel_size < 0) {
--            kernel_size = load_uimage(kernel_filename, &entry, NULL, NULL,
--                                      NULL, NULL);
--        }
--        if (kernel_size < 0) {
--            kernel_size = load_image_targphys(kernel_filename,
--                                              KERNEL_LOAD_ADDR,
--                                              ram_size - KERNEL_LOAD_ADDR);
--            entry = KERNEL_LOAD_ADDR;
--        }
--        if (kernel_size < 0) {
--            fprintf(stderr, "qemu: could not load kernel '%s'\n",
--                    kernel_filename);
--            exit(1);
--        }
--    } else {
--        entry = 0;
--    }
--    env->pc = entry;
--}
--
--static void dummy_m68k_machine_init(MachineClass *mc)
--{
--    mc->desc = "Dummy board";
--    mc->init = dummy_m68k_init;
--}
--
--DEFINE_MACHINE("dummy", dummy_m68k_machine_init)
--- 
-2.7.4
+> ---
+>  monitor.c | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
+>
+> diff --git a/monitor.c b/monitor.c
+> index 3cd72a9bab..6b25cf7a2b 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -1026,6 +1026,10 @@ int monitor_set_cpu(int cpu_index)
+>  CPUState *mon_get_cpu(void)
+>  {
+>      if (!cur_mon->mon_cpu) {
+> +        if (!first_cpu) {
+> +            monitor_printf(cur_mon, "No CPU available on this machine\n");
+> +            return NULL;
+> +        }
+>          monitor_set_cpu(first_cpu->cpu_index);
+>      }
+>      cpu_synchronize_state(cur_mon->mon_cpu);
+> @@ -2495,11 +2499,11 @@ static int default_fmt_size = 4;
+>  static int is_valid_option(const char *c, const char *typestr)
+>  {
+>      char option[3];
+> -
+> +
+>      option[0] = '-';
+>      option[1] = *c;
+>      option[2] = '\0';
+> -
+> +
+>      typestr = strstr(typestr, option);
+>      return (typestr != NULL);
+>  }
+> @@ -2864,7 +2868,7 @@ static QDict *monitor_parse_arguments(Monitor *mon,
+>                      p++;
+>                      if(c != *p) {
+>                          if(!is_valid_option(p, typestr)) {
+> -
+> +
+>                              monitor_printf(mon, "%s: unsupported option -%c\n",
+>                                             cmd->name, *p);
+>                              goto fail;
+>
