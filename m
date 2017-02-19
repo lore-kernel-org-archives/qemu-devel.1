@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54975)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cfIcF-00048V-NX
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 22:56:52 -0500
+	id 1cfIi8-0006Qq-H8
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 23:02:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cfIcE-0000Sv-TK
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 22:56:51 -0500
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:34200)
+	id 1cfIi5-00033Q-Ev
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 23:02:56 -0500
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:34437)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cfIcE-0000Sh-Ok
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 22:56:50 -0500
-Received: by mail-qk0-x243.google.com with SMTP id s186so4441743qkb.1
-	for <qemu-devel@nongnu.org>; Sat, 18 Feb 2017 19:56:50 -0800 (PST)
+	id 1cfIi5-00032V-Bf
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 23:02:53 -0500
+Received: by mail-qk0-x244.google.com with SMTP id s186so4449124qkb.1
+	for <qemu-devel@nongnu.org>; Sat, 18 Feb 2017 20:02:53 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20170217082704.23270-1-skiver.cloud.yzy@gmail.com>
-	<20170217082704.23270-3-skiver.cloud.yzy@gmail.com>
+References: <1487248176-29602-1-git-send-email-dmitry@daynix.com>
+	<1487248176-29602-6-git-send-email-dmitry@daynix.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ad911bcd-c535-6b2a-a29b-f8ed1146168c@amsat.org>
-Date: Sun, 19 Feb 2017 00:56:46 -0300
+Message-ID: <2e89988f-a172-20f4-e0b3-83b8d07bb727@amsat.org>
+Date: Sun, 19 Feb 2017 01:02:49 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170217082704.23270-3-skiver.cloud.yzy@gmail.com>
+In-Reply-To: <1487248176-29602-6-git-send-email-dmitry@daynix.com>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] target/i386/monitor.c: check return
- value of mon_get_cpu before using it
+Subject: Re: [Qemu-devel] [PATCH 5/5] NetRxPkt: Remove code duplication in
+ net_rx_pkt_pull_data()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,43 +35,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ziyue Yang <skiver.cloud.yzy@gmail.com>, qemu-devel@nongnu.org
-Cc: Ziyue Yang <yzylivezh@hotmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Pavel Butsykin <pbutsykin@virtuozzo.com>
+To: Dmitry Fleytman <dmitry@daynix.com>, qemu-devel@nongnu.org
+Cc: Yan Vugenfirer <yan@daynix.com>, Jason Wang <jasowang@redhat.com>, P J P <ppandit@redhat.com>
 
-On 02/17/2017 05:27 AM, Ziyue Yang wrote:
-> From: Ziyue Yang <yzylivezh@hotmail.com>
+On 02/16/2017 09:29 AM, Dmitry Fleytman wrote:
+> This is a refactoring commit that does not change behavior.
 >
-> This patch eliminates the segfault caused by accessing CPU that doesn't
-> exist in hmp command "info lapic", which can be reproduced by
->
-> $ qemu-system-x86_64 -nographic -M none -serial none -monitor stdio
->
-> and then type "info lapic" into qemu monitor.
->
-> Signed-off-by: Ziyue Yang <skiver.cloud.yzy@gmail.com>
+> Signed-off-by: Dmitry Fleytman <dmitry@daynix.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  target/i386/monitor.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+>  hw/net/net_rx_pkt.c | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
 >
-> diff --git a/target/i386/monitor.c b/target/i386/monitor.c
-> index 468aa073bc..7b96c74a24 100644
-> --- a/target/i386/monitor.c
-> +++ b/target/i386/monitor.c
-> @@ -624,8 +624,11 @@ const MonitorDef *target_monitor_defs(void)
->
->  void hmp_info_local_apic(Monitor *mon, const QDict *qdict)
+> diff --git a/hw/net/net_rx_pkt.c b/hw/net/net_rx_pkt.c
+> index c7ae33d..3899211 100644
+> --- a/hw/net/net_rx_pkt.c
+> +++ b/hw/net/net_rx_pkt.c
+> @@ -88,20 +88,21 @@ net_rx_pkt_pull_data(struct NetRxPkt *pkt,
+>                          const struct iovec *iov, int iovcnt,
+>                          size_t ploff)
 >  {
-> -    x86_cpu_dump_local_apic_state(mon_get_cpu(), (FILE *)mon, monitor_fprintf,
-> -                                  CPU_DUMP_FPU);
-> +    CPUState *cs = mon_get_cpu();
-> +    if (cs) {
-> +        x86_cpu_dump_local_apic_state(cs, (FILE *)mon, monitor_fprintf,
-> +                                      CPU_DUMP_FPU);
-> +    }
->  }
+> +    uint32_t pllen = iov_size(iov, iovcnt) - ploff;
+> +
+>      if (pkt->ehdr_buf_len) {
+>          net_rx_pkt_iovec_realloc(pkt, iovcnt + 1);
 >
->  void hmp_info_io_apic(Monitor *mon, const QDict *qdict)
+>          pkt->vec[0].iov_base = pkt->ehdr_buf;
+>          pkt->vec[0].iov_len = pkt->ehdr_buf_len;
+>
+> -        pkt->tot_len = iov_size(iov, iovcnt) - ploff + pkt->ehdr_buf_len;
+> +        pkt->tot_len = pllen + pkt->ehdr_buf_len;
+>          pkt->vec_len = iov_copy(pkt->vec + 1, pkt->vec_len_total - 1,
+> -                                iov, iovcnt, ploff,
+> -                                pkt->tot_len - pkt->ehdr_buf_len) + 1;
+> +                                iov, iovcnt, ploff, pllen) + 1;
+>      } else {
+>          net_rx_pkt_iovec_realloc(pkt, iovcnt);
+>
+> -        pkt->tot_len = iov_size(iov, iovcnt) - ploff;
+> +        pkt->tot_len = pllen;
+>          pkt->vec_len = iov_copy(pkt->vec, pkt->vec_len_total,
+>                                  iov, iovcnt, ploff, pkt->tot_len);
+>      }
 >
