@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cfJzG-00079q-Qx
-	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 00:24:44 -0500
+	(envelope-from <chadjoan@gmail.com>) id 1cfLWD-00077C-53
+	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 02:02:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cfJzD-0008I7-M1
-	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 00:24:42 -0500
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:34956)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cfJzD-0008Hl-Fl
-	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 00:24:39 -0500
-Received: by mail-qt0-x242.google.com with SMTP id b16so7202414qte.2
-	for <qemu-devel@nongnu.org>; Sat, 18 Feb 2017 21:24:39 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170216123456.28621-1-alex.bennee@linaro.org>
-	<20170216123456.28621-2-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <622dafb3-11e0-92fd-f26d-13e096e8dda6@amsat.org>
-Date: Sun, 19 Feb 2017 02:24:35 -0300
+	(envelope-from <chadjoan@gmail.com>) id 1cfLWA-00086U-QZ
+	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 02:02:49 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170216123456.28621-2-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 1/4] tests/docker: add basic user
- mapping support
+In-Reply-To: <fc3b6729-6739-5daf-5e78-85fbd7d3260d@redhat.com>
+References: <CABHMSTVDnAxAvpp81+z_2fkAFO7tazLJs3cFXpuDuuGQj-Ek-A@mail.gmail.com>
+	<1933406e-2576-e687-3545-a72f3b999310@redhat.com>
+	<bf1410bc-bc6d-bb29-5591-55634f25d487@redhat.com>
+	<CABHMSTUsZy0u4b1b84YC5CgafKvD-Zms5dCQ=31+XnQphUQxLA@mail.gmail.com>
+	<20170217064327.GB21716@lemon.lan>
+	<CAFEAcA8_f8SVX+rirAFBJ76ZiXaKUwh9uO0AeBFoR7G_q8pGDg@mail.gmail.com>
+	<6ab86cf8-4780-ca76-f648-ac0ce211e27b@redhat.com>
+	<CABHMSTWN2KdAXDjEEbyWio6rNM2FuDk_NUj40mFW0HdyZFu68g@mail.gmail.com>
+	<fc3b6729-6739-5daf-5e78-85fbd7d3260d@redhat.com>
+From: Chad Joan <chadjoan@gmail.com>
+Date: Sun, 19 Feb 2017 02:02:19 -0500
+Message-ID: <CABHMSTUS4Oi5WZt0NcYaOnX9_u8zQeu=CupLVX2LjvD+mTYATg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] Fix build break during configuration on musl-libc
+ based Linux systems.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,143 +30,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-Hi Alex,
+On Fri, Feb 17, 2017 at 12:17 PM, Eric Blake <eblake@redhat.com> wrote:
 
-I first tried "make docker-image-debian-armhf-cross NOUSER=1 V=1" which 
-worked fine, then "make docker-image-debian-armhf-cross NOUSER=0" but 
-got a "Image is up to date." I thought I should have to remove the image 
-manually so I typed "docker rmi qemu:debian-armhf-cross" and tried again 
-but still no change in my 
-tests/docker/dockerfiles/debian-armhf-cross.docker adding my username, 
-then I reviewed your change in the Makefile and got it, setting NOUSER 
-to '0' has the same behavior, it's just set. To build the image with my 
-user I had to _not_ use the flag or use it unset "NOUSER=" and it worked 
-like charm.
+> On 02/17/2017 10:54 AM, Chad Joan wrote:
+> > Wow, that is some quick turn-around.  Well done!
+> >
+> > My thoughts:
+> >
+> >    - I find this summary info very helpful!  On behalf of the N people
+> >    trying to heal paper cuts: thank you!
+> >    - I still recommend an example snippet for shell/bash interaction that
+> >    demonstrates the workflow you expect from a first-time contributor.
+> It
+> >    should be populated with commonly used values (ex: mailing list
+> >    addresses).  I don't expect this to happen fast like the summary
+> info; I
+> >    suspect someone is going to have to pretend they are submitting a
+> patch,
+> >    write down what they do, and then think about how to present this.
+>
+> For a quickie patch, I make my edits, then 'git commit -a -s' and 'git
+> send-email -1' - but that works because I've already set up git hooks to
+> auto-cc the list, and I already debugged my 'get send-email' setup years
+> ago.  So yeah, doing it from a completely virgin environment could
+> benefit from a complete command line that reproduces what I take for
+> granted in my normal environment.  And some email setups are a lot
+> friendlier than others (I personally do not use gmail, but will readily
+> admit that it is probably a lot easier to set up my work emails to use
+> Red Hat's SMTP servers than it is for a gmail contributor to get their
+> email setup working in a way that does not mangle patches).
+>
+>
+I appreciate this retrospective :)
+
+In my case I am working on a machine that wasn't even supposed to see any
+development work.  There are no user accounts, just root.  I have tried to
+avoid putting any personal information on it.  If I am on it, then I'm
+editing files in /etc or installing system-wide software.  I'm realizing
+that I might have to change this a bit due to the WIP nature of the
+hardened-musl profile: ultimately I *am* doing development work on it, and
+that kind of snuck up on me.  If I give myself a user account, then
+authoring patches with git (and using send-email) becomes somewhat more
+practical (putting smtp login information onto the machine still bugs me).
+Still, I can't imagine I'm the only person who runs into this kind of thing
+and wants to write quick patches on an impersonal machine.
 
 
-On 02/16/2017 09:34 AM, Alex Bennée wrote:
-> Currently all docker builds are done by exporting a tarball to the
-> docker container and running the build as the containers root user.
-> Other use cases are possible however and it is possible to map a part
-> of users file-system to the container. This is useful for example for
-> doing cross-builds of arbitrary source trees. For this to work
-> smoothly the container needs to have a user created that maps cleanly
-> to the host system.
+> [...]
 >
-> This adds a -u option to the docker script so that:
+> But nothing requires you to set up a certificate to submit a patch.  I'm
+> not sure which piece of the documentation got you steered in that
+> direction, but gpg signing of patches is only required of maintainers,
+> not contributors (or maybe you're hinting at the extra effort required
+> to set up gmail as a valid 'git send-email' target, to which I have no
+> experience, but which starts to leave the realm of qemu-specific
+> instructions into something where it would be better to link to a good
+> git setup tutorial, if one exists).
 >
->   DEB_ARCH=armhf DEB_TYPE=stable ./tests/docker/docker.py build \
->     -u --include-executable=arm-linux-user/qemu-arm \
->     debian:armhf ./tests/docker/dockerfiles/debian-bootstrap.docker
 >
-> Will build a container that can then be run like:
->
->   docker run --rm -it -v /home/alex/lsrc/qemu/risu.git/:/src \
->     --user=alex:alex -w /src/ debian:armhf \
->     sh -c "make clean && ./configure -s && make"
->
-> All docker containers built will add the current user unless
-> explicitly disabled by specifying NOUSER when invoking the Makefile:
->
->   make docker-image-debian-armhf-cross NOUSER=1
->
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> Reviewed-by: Fam Zheng <famz@redhat.com>
+I think this is just language ambiguity and confirmation bias doing their
+thing.  Usually when I read "you have to sign this" in an OSS context, I
+think of cryptographic signing.  I haven't encountered the requirement for
+non-cryptographic signing before.  Language is arbitrary and we all have
+different experiences and backgrounds.
 
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+This is one of the reasons why I suggest a simple example: it would be both
+very concise and unambiguous.  If there are no signing steps in the example
+then you don't even need to spend words telling the reader that
+cryptographic signing is unnecessary.  It'll be implied.
 
-> ---
-> v2
->   - write the useradd directly
->   - change long option to --add-current-user
-> v3
->   - images -> image's
->   - add r-b
->   - add USER to Makefile
-> v4
->   - s/USER/NOUSER/ and default to on
->   - fix the add-user code to skip if user already setup (for chained images)
-> ---
->  tests/docker/Makefile.include |  2 ++
->  tests/docker/docker.py        | 16 ++++++++++++++--
->  2 files changed, 16 insertions(+), 2 deletions(-)
+Thankfully, this is a separate concern from the 'git send-email' thing.
+
+
+
+> >  Having that example will go a long way to
+> >    help with this.
 >
-> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-> index 3f15d5aea8..4778b27ca8 100644
-> --- a/tests/docker/Makefile.include
-> +++ b/tests/docker/Makefile.include
-> @@ -50,6 +50,7 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
->  	$(call quiet-command,\
->  		$(SRC_PATH)/tests/docker/docker.py build qemu:$* $< \
->  		$(if $V,,--quiet) $(if $(NOCACHE),--no-cache) \
-> +		$(if $(NOUSER),,--add-current-user) \
->  		$(if $(EXECUTABLE),--include-executable=$(EXECUTABLE)),\
->  		"BUILD","$*")
+> <snip lots of useful ideas for improvement>
 >
-> @@ -99,6 +100,7 @@ docker:
->  	@echo '                         (default is 1)'
->  	@echo '    DEBUG=1              Stop and drop to shell in the created container'
->  	@echo '                         before running the command.'
-> +	@echo '    NOUSER=1		Disable adding current user to containers passwd.'
->  	@echo '    NOCACHE=1            Ignore cache when build images.'
->  	@echo '    EXECUTABLE=<path>    Include executable in image.'
+> >    - I should also mention that I found the rest of the document to be
+> very
+> >    well-written.  It's comprehensiveness became its weakness, but that's
+> still
+> >    important long-term, hence why I think an alternative path with a
+> short
+> >    example for trivial patches is plenty sufficient: from my perspective,
+> >    there's no need to change the rest of the text; it is already good :).
 >
-> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-> index 37d83199e7..d277a2268f 100755
-> --- a/tests/docker/docker.py
-> +++ b/tests/docker/docker.py
-> @@ -25,6 +25,7 @@ import signal
->  from tarfile import TarFile, TarInfo
->  from StringIO import StringIO
->  from shutil import copy, rmtree
-> +from pwd import getpwuid
+> Thanks for that feedback.  It's often hard for a core contributor to
+> remember what it was like to submit their first patch years ago, and
+> having a fresh take on the matter from a new contributor is well worth
+> the reminders.  It's also nice to hear this as a compliment, and not
+> just a complaint.
 >
 >
->  DEVNULL = open(os.devnull, 'wb')
-> @@ -149,13 +150,21 @@ class Docker(object):
->          labels = json.loads(resp)[0]["Config"].get("Labels", {})
->          return labels.get("com.qemu.dockerfile-checksum", "")
+Thanks for listening :)
+
+I know what you mean about the complaint thing.  It's unfortunate, but it
+can be very hard to know the significance of your words for others.  For
+many people (possibly myself included; hard to remember) it may take a long
+time to learn and internalize the implications of a truth such as "no one
+wants to be hurt".  I try to be the world that I want to live in.  I'm glad
+it's working out for everyone this time around.
+
+FWIW, this thread has also left me impressed with the culture in the QEMU
+community, and it makes me feel good about choosing this software too.
+Good job everyone!
+
+
+> >
+> > Note that I'm bothering to stick around and provide feedback, despite
+> other
+> > pressing life obligations.  Providing advice on submit-a-patch usability
+> > for QEMU isn't on my schedule, but I don't have the heart to bail on
+> this,
+> > especially when you all are kindly listening, having high quality
+> > discussion, and sincerely trying to improve things.  If you read between
+> > the lines, you see the truth: I am a yak shaver!
 >
-> -    def build_image(self, tag, docker_dir, dockerfile, quiet=True, argv=None):
-> +    def build_image(self, tag, docker_dir, dockerfile,
-> +                    quiet=True, user=False, argv=None):
->          if argv == None:
->              argv = []
->
->          tmp_df = tempfile.NamedTemporaryFile(dir=docker_dir, suffix=".docker")
->          tmp_df.write(dockerfile)
->
-> +        if user:
-> +            uid = os.getuid()
-> +            uname = getpwuid(uid).pw_name
-> +            tmp_df.write("\n")
-> +            tmp_df.write("RUN id %s || useradd -u %d -U %s" %
-> +                         (uname, uid, uname))
-> +
->          tmp_df.write("\n")
->          tmp_df.write("LABEL com.qemu.dockerfile-checksum=%s" %
->                       _text_checksum(dockerfile))
-> @@ -225,6 +234,9 @@ class BuildCommand(SubCommand):
->                              help="""Specify a binary that will be copied to the
->                              container together with all its dependent
->                              libraries""")
-> +        parser.add_argument("--add-current-user", "-u", dest="user",
-> +                            action="store_true",
-> +                            help="Add the current user to image's passwd")
->          parser.add_argument("tag",
->                              help="Image Tag")
->          parser.add_argument("dockerfile",
-> @@ -261,7 +273,7 @@ class BuildCommand(SubCommand):
->                                         docker_dir)
->
->              dkr.build_image(tag, docker_dir, dockerfile,
-> -                            quiet=args.quiet, argv=argv)
-> +                            quiet=args.quiet, user=args.user, argv=argv)
->
->              rmtree(docker_dir)
+> At the risk of pushing too hard, you could always turn your (good!)
+> suggestions into concrete wording, or even request a wiki account to
+> make the changes yourself. But even if that is beyond your planned level
+> of involvement, I do hope that various readers will be able to act on
+> the suggestions in this mail to improve things.
 >
 >
+It's always worth asking!
+
+I'm in deep enough now that I wouldn't cheap out on it ;)
+
+I'm more worried that I'm completely unqualified to do this.  I could try
+to read the whole thing and make a small 2-4 liner that would do what QEMU
+devs want.  But I'm almost certain I'd botch it up somehow.  I've already
+misinterpreted the gpg signature thing; there's more where that came from!
+I think a QEMU dev would get results that a QEMU dev would expect.
+
+Well, let me know if you want me to try *anyways*.
+
+
+> >
+> > Oh man, when I hit a topic like "use git send-email", the hair started
+> > flying: learning new git commands, two-factor auth on gmail, U2F keys,
+> > governance for the no-mans-land of a server, and so on, a real
+> yak-shaving
+> > party.  After an hour or two, my safety triggered, and I thought, "man, I
+> > am spending way too much time perfecting this workflow that I might never
+> > do again" and I spent a few minutes writing a message in gmail.  I
+> > certainly don't expect QEMU devs to fix garbled patches either: that also
+> > seems like a huge waste of valuable time (and for talented and passionate
+> > individuals, too).  There has to be a better way!  So I hope the
+> whitelist
+> > idea helps, or maybe it's enough to just call awareness to this potential
+> > improvement.
+>
+> Again, part of the problem may be that gmail is not really suited to the
+> ideal patch flow, and so that's going to be a pain point for any such
+> contributor.  Submitting patches as an attachment is harder than the
+> inline version you get with 'git send-email', but it is one of those
+> one-off manual fixups that a maintainer can overlook, as long as it
+> really is a one-off thing and not a repeated pattern.  And yes, we
+> should document that use of an attachment is the most likely to avoid
+> mangling the patch if you don't have 'git send-email' working, even if
+> it is harder for the maintainer to apply such a patch.
+>
+>
+> --
+> Eric Blake   eblake redhat com    +1-919-301-3266
+> Libvirt virtualization library http://libvirt.org
+>
+>
+Interesting.  I certainly think that would help.  If the QEMU maintainers
+could meet me (the hypothetical mass of first-timers) in the middle and
+handle 1-3 attachments or so, then that would make things very painless on
+my side.  And at the point where I am submitting more than a few patches, I
+know that there is a pattern developing and I wouldn't mind spending the
+effort to streamline it for everyone.  tl;dr: This idea makes sense on my
+side too.
