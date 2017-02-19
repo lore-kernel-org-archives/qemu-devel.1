@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56586)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57872)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cfJ0a-00057n-Bb
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 23:22:01 -0500
+	id 1cfJD1-0007oq-6e
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 23:34:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cfJ0X-0003DS-7Y
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 23:22:00 -0500
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:36133)
+	id 1cfJCy-0001HQ-2R
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 23:34:51 -0500
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:33464)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cfJ0X-0003DG-3l
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 23:21:57 -0500
-Received: by mail-qk0-x243.google.com with SMTP id p22so11588728qka.3
-	for <qemu-devel@nongnu.org>; Sat, 18 Feb 2017 20:21:57 -0800 (PST)
+	id 1cfJCx-0001HG-SS
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 23:34:47 -0500
+Received: by mail-qk0-x243.google.com with SMTP id x71so1474129qkb.0
+	for <qemu-devel@nongnu.org>; Sat, 18 Feb 2017 20:34:47 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <1487067971-10443-1-git-send-email-armbru@redhat.com>
-	<1487067971-10443-18-git-send-email-armbru@redhat.com>
+References: <20170216123456.28621-1-alex.bennee@linaro.org>
+	<20170216123456.28621-3-alex.bennee@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ddab08e5-7f6b-5b59-75e4-8b59fb7891f2@amsat.org>
-Date: Sun, 19 Feb 2017 01:21:53 -0300
+Message-ID: <9c369896-91c1-8479-40c6-2eb12ff3e40e@amsat.org>
+Date: Sun, 19 Feb 2017 01:34:44 -0300
 MIME-Version: 1.0
-In-Reply-To: <1487067971-10443-18-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <20170216123456.28621-3-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 17/24] util/cutils: Drop
- QEMU_STRTOSZ_DEFSUFFIX_* macros
+Subject: Re: [Qemu-devel] [PATCH v4 2/4] new: debian docker targets for
+ cross-compiling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,82 +35,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-
-On 02/14/2017 07:26 AM, Markus Armbruster wrote:
-> Writing QEMU_STRTOSZ_DEFSUFFIX_* instead of '*' gains nothing.  Get
-> rid of these eyesores.
+On 02/16/2017 09:34 AM, Alex Bennée wrote:
+> This provides a basic Debian install with access to the emdebian cross
+> compilers. The debian-armhf-cross and debian-arm64-cross targets build
+> on the basic Debian image to allow cross compiling to those targets.
 >
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-
-Reviewed-by: Philippe Mathieu-Daud� <f4bug@amsat.org>
-
+> A new environment variable (QEMU_CONFIGURE_OPTS) is set as part of the
+> docker container and passed to the build to specify the
+> --cross-prefix. The user still calls the build in the usual way, for
+> example:
+>
+>   make docker-test-build@debian-arm64-cross \
+>     TARGET_LIST="aarch64-softmmu,aarch64-linux-user"
+>
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>
 > ---
->  util/cutils.c | 28 ++++++++++------------------
->  1 file changed, 10 insertions(+), 18 deletions(-)
+> v2
+>   - add clang (keep shippable happy)
+>   - rm adduser code (done direct now)
+>   - add aptitude (useful for debugging package clashes)
+> v3
+>   - split into debian, debian-armhf-cross and debian-aarch64-cross
+> v4
+>   - Add QEMU_CONFIGURE_OPTS
+> ---
+>  tests/docker/Makefile.include                      |  4 ++++
+>  tests/docker/common.rc                             |  2 +-
+>  tests/docker/dockerfiles/debian-arm64-cross.docker | 15 +++++++++++++
+>  tests/docker/dockerfiles/debian-armhf-cross.docker | 15 +++++++++++++
+>  tests/docker/dockerfiles/debian.docker             | 25 ++++++++++++++++++++++
+>  5 files changed, 60 insertions(+), 1 deletion(-)
+>  create mode 100644 tests/docker/dockerfiles/debian-arm64-cross.docker
+>  create mode 100644 tests/docker/dockerfiles/debian-armhf-cross.docker
+>  create mode 100644 tests/docker/dockerfiles/debian.docker
 >
-> diff --git a/util/cutils.c b/util/cutils.c
-> index ef658bb..4a290ea 100644
-> --- a/util/cutils.c
-> +++ b/util/cutils.c
-> @@ -178,30 +178,22 @@ int fcntl_setfl(int fd, int flag)
->  }
->  #endif
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+> index 4778b27ca8..84bdcc944a 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -54,6 +54,10 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
+>  		$(if $(EXECUTABLE),--include-executable=$(EXECUTABLE)),\
+>  		"BUILD","$*")
 >
-> -#define QEMU_STRTOSZ_DEFSUFFIX_EB 'E'
-> -#define QEMU_STRTOSZ_DEFSUFFIX_PB 'P'
-> -#define QEMU_STRTOSZ_DEFSUFFIX_TB 'T'
-> -#define QEMU_STRTOSZ_DEFSUFFIX_GB 'G'
-> -#define QEMU_STRTOSZ_DEFSUFFIX_MB 'M'
-> -#define QEMU_STRTOSZ_DEFSUFFIX_KB 'K'
-> -#define QEMU_STRTOSZ_DEFSUFFIX_B 'B'
-> -
->  static int64_t suffix_mul(char suffix, int64_t unit)
->  {
->      switch (qemu_toupper(suffix)) {
-> -    case QEMU_STRTOSZ_DEFSUFFIX_B:
-> +    case 'B':
->          return 1;
-> -    case QEMU_STRTOSZ_DEFSUFFIX_KB:
-> +    case 'K':
->          return unit;
-> -    case QEMU_STRTOSZ_DEFSUFFIX_MB:
-> +    case 'M':
->          return unit * unit;
-> -    case QEMU_STRTOSZ_DEFSUFFIX_GB:
-> +    case 'G':
->          return unit * unit * unit;
-> -    case QEMU_STRTOSZ_DEFSUFFIX_TB:
-> +    case 'T':
->          return unit * unit * unit * unit;
-> -    case QEMU_STRTOSZ_DEFSUFFIX_PB:
-> +    case 'P':
->          return unit * unit * unit * unit * unit;
-> -    case QEMU_STRTOSZ_DEFSUFFIX_EB:
-> +    case 'E':
->          return unit * unit * unit * unit * unit * unit;
->      }
->      return -1;
-> @@ -258,17 +250,17 @@ fail:
->
->  int64_t qemu_strtosz(const char *nptr, char **end)
->  {
-> -    return do_strtosz(nptr, end, QEMU_STRTOSZ_DEFSUFFIX_B, 1024);
-> +    return do_strtosz(nptr, end, 'B', 1024);
->  }
->
->  int64_t qemu_strtosz_mebi(const char *nptr, char **end)
->  {
-> -    return do_strtosz(nptr, end, QEMU_STRTOSZ_DEFSUFFIX_MB, 1024);
-> +    return do_strtosz(nptr, end, 'M', 1024);
->  }
->
->  int64_t qemu_strtosz_metric(const char *nptr, char **end)
->  {
-> -    return do_strtosz(nptr, end, QEMU_STRTOSZ_DEFSUFFIX_B, 1000);
-> +    return do_strtosz(nptr, end, 'B', 1000);
->  }
->
->  /**
+> +# Enforce dependancies for composite images
+> +docker-image-debian-armhf-cross: docker-image-debian
+> +docker-image-debian-arm64-cross: docker-image-debian
+> +
+>  # Expand all the pre-requistes for each docker image and test combination
+>  $(foreach i,$(DOCKER_IMAGES), \
+>  	$(foreach t,$(DOCKER_TESTS) $(DOCKER_TOOLS), \
+> diff --git a/tests/docker/common.rc b/tests/docker/common.rc
+> index 21657e87c6..6865689bb5 100755
+> --- a/tests/docker/common.rc
+> +++ b/tests/docker/common.rc
+> @@ -29,7 +29,7 @@ build_qemu()
+>      config_opts="--enable-werror \
+>                   ${TARGET_LIST:+--target-list=${TARGET_LIST}} \
+>                   --prefix=$PWD/install \
+> -                 $EXTRA_CONFIGURE_OPTS \
+> +                 $QEMU_CONFIGURE_OPTS $EXTRA_CONFIGURE_OPTS \
+>                   $@"
+>      echo "Configure options:"
+>      echo $config_opts
+> diff --git a/tests/docker/dockerfiles/debian-arm64-cross.docker b/tests/docker/dockerfiles/debian-arm64-cross.docker
+> new file mode 100644
+> index 0000000000..ce90da943f
+> --- /dev/null
+> +++ b/tests/docker/dockerfiles/debian-arm64-cross.docker
+> @@ -0,0 +1,15 @@
+> +#
+> +# Docker arm64 cross-compiler target
+> +#
+> +# This docker target builds on the base debian image.
+> +#
+> +FROM qemu:debian
+> +
+> +# Add the foreign architecture we want and install dependacies
+
+typo "dependencies"
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> +RUN dpkg --add-architecture arm64
+> +RUN apt update
+> +RUN apt install -yy crossbuild-essential-arm64
+> +RUN apt-get build-dep -yy -a arm64 qemu
+> +
+> +# Specify the cross prefix for this image (see tests/docker/common.rc)
+> +ENV QEMU_CONFIGURE_OPTS --cross-prefix=aarch64-linux-gnu-
+> diff --git a/tests/docker/dockerfiles/debian-armhf-cross.docker b/tests/docker/dockerfiles/debian-armhf-cross.docker
+> new file mode 100644
+> index 0000000000..e0f81a556d
+> --- /dev/null
+> +++ b/tests/docker/dockerfiles/debian-armhf-cross.docker
+> @@ -0,0 +1,15 @@
+> +#
+> +# Docker armhf cross-compiler target
+> +#
+> +# This docker target builds on the base debian image.
+> +#
+> +FROM qemu:debian
+> +
+> +# Add the foreign architecture we want and install dependacies
+> +RUN dpkg --add-architecture armhf
+> +RUN apt update
+> +RUN apt install -yy crossbuild-essential-armhf
+> +RUN apt-get build-dep -yy -a armhf qemu
+> +
+> +# Specify the cross prefix for this image (see tests/docker/common.rc)
+> +ENV QEMU_CONFIGURE_OPTS --cross-prefix=arm-linux-gnueabihf-
+> diff --git a/tests/docker/dockerfiles/debian.docker b/tests/docker/dockerfiles/debian.docker
+> new file mode 100644
+> index 0000000000..52bd79938e
+> --- /dev/null
+> +++ b/tests/docker/dockerfiles/debian.docker
+> @@ -0,0 +1,25 @@
+> +#
+> +# Docker multiarch cross-compiler target
+> +#
+> +# This docker target is builds on Debian and Emdebian's cross compiler targets
+> +# to build distro with a selection of cross compilers for building test binaries.
+> +#
+> +# On its own you can't build much but the docker-foo-cross targets
+> +# build on top of the base debian image.
+> +#
+> +FROM debian:stable-slim
+> +
+> +# Setup some basic tools we need
+> +RUN apt update
+> +RUN apt install -yy curl aptitude
+> +
+> +# Setup Emdebian
+> +RUN echo "deb http://emdebian.org/tools/debian/ jessie main" >> /etc/apt/sources.list
+> +RUN curl http://emdebian.org/tools/debian/emdebian-toolchain-archive.key | apt-key add -
+> +
+> +# Duplicate deb line as deb-src
+> +RUN cat /etc/apt/sources.list | sed "s/deb/deb-src/" >> /etc/apt/sources.list
+> +
+> +# Install common build utilities
+> +RUN apt update
+> +RUN apt install -yy build-essential clang
 >
