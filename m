@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56586)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cfIvB-0002Ob-Jo
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 23:16:26 -0500
+	id 1cfJ0a-00057n-Bb
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 23:22:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cfIv8-0000WP-E2
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 23:16:25 -0500
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:35953)
+	id 1cfJ0X-0003DS-7Y
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 23:22:00 -0500
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:36133)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cfIv8-0000WH-9m
-	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 23:16:22 -0500
-Received: by mail-qk0-x243.google.com with SMTP id p22so11582205qka.3
-	for <qemu-devel@nongnu.org>; Sat, 18 Feb 2017 20:16:22 -0800 (PST)
+	id 1cfJ0X-0003DG-3l
+	for qemu-devel@nongnu.org; Sat, 18 Feb 2017 23:21:57 -0500
+Received: by mail-qk0-x243.google.com with SMTP id p22so11588728qka.3
+	for <qemu-devel@nongnu.org>; Sat, 18 Feb 2017 20:21:57 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <1487067971-10443-1-git-send-email-armbru@redhat.com>
-	<1487067971-10443-11-git-send-email-armbru@redhat.com>
+	<1487067971-10443-18-git-send-email-armbru@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f49e26b1-5698-c55f-f0d4-0214571e3e26@amsat.org>
-Date: Sun, 19 Feb 2017 01:16:18 -0300
+Message-ID: <ddab08e5-7f6b-5b59-75e4-8b59fb7891f2@amsat.org>
+Date: Sun, 19 Feb 2017 01:21:53 -0300
 MIME-Version: 1.0
-In-Reply-To: <1487067971-10443-11-git-send-email-armbru@redhat.com>
+In-Reply-To: <1487067971-10443-18-git-send-email-armbru@redhat.com>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 10/24] tests/test-cutils: Add missing
- qemu_strtosz()... endptr checks
+Subject: Re: [Qemu-devel] [PATCH 17/24] util/cutils: Drop
+ QEMU_STRTOSZ_DEFSUFFIX_* macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,104 +37,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
-On 02/14/2017 07:25 AM, Markus Armbruster wrote:
+
+On 02/14/2017 07:26 AM, Markus Armbruster wrote:
+> Writing QEMU_STRTOSZ_DEFSUFFIX_* instead of '*' gains nothing.  Get
+> rid of these eyesores.
+>
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  tests/test-cutils.c | 37 ++++++++++++++++++++++++++-----------
->  1 file changed, 26 insertions(+), 11 deletions(-)
+>  util/cutils.c | 28 ++++++++++------------------
+>  1 file changed, 10 insertions(+), 18 deletions(-)
 >
-> diff --git a/tests/test-cutils.c b/tests/test-cutils.c
-> index 47cc8a4..2dc6832 100644
-> --- a/tests/test-cutils.c
-> +++ b/tests/test-cutils.c
-> @@ -1393,60 +1393,75 @@ static void test_qemu_strtosz_units(void)
->      const char *t = "1T";
->      const char *p = "1P";
->      const char *e = "1E";
-> +    char *endptr = NULL;
->      int64_t res;
->
->      /* default is M */
-> -    res = qemu_strtosz(none, NULL);
-> +    res = qemu_strtosz(none, &endptr);
->      g_assert_cmpint(res, ==, M_BYTE);
-> +    g_assert(endptr == none + 1);
->
-> -    res = qemu_strtosz(b, NULL);
-> +    res = qemu_strtosz(b, &endptr);
->      g_assert_cmpint(res, ==, 1);
-> +    g_assert(endptr == b + 2);
->
-> -    res = qemu_strtosz(k, NULL);
-> +    res = qemu_strtosz(k, &endptr);
->      g_assert_cmpint(res, ==, K_BYTE);
-> +    g_assert(endptr == k + 2);
->
-> -    res = qemu_strtosz(m, NULL);
-> +    res = qemu_strtosz(m, &endptr);
->      g_assert_cmpint(res, ==, M_BYTE);
-> +    g_assert(endptr == m + 2);
->
-> -    res = qemu_strtosz(g, NULL);
-> +    res = qemu_strtosz(g, &endptr);
->      g_assert_cmpint(res, ==, G_BYTE);
-> +    g_assert(endptr == g + 2);
->
-> -    res = qemu_strtosz(t, NULL);
-> +    res = qemu_strtosz(t, &endptr);
->      g_assert_cmpint(res, ==, T_BYTE);
-> +    g_assert(endptr == t + 2);
->
-> -    res = qemu_strtosz(p, NULL);
-> +    res = qemu_strtosz(p, &endptr);
->      g_assert_cmpint(res, ==, P_BYTE);
-> +    g_assert(endptr == p + 2);
->
-> -    res = qemu_strtosz(e, NULL);
-> +    res = qemu_strtosz(e, &endptr);
->      g_assert_cmpint(res, ==, E_BYTE);
-> +    g_assert(endptr == e + 2);
+> diff --git a/util/cutils.c b/util/cutils.c
+> index ef658bb..4a290ea 100644
+> --- a/util/cutils.c
+> +++ b/util/cutils.c
+> @@ -178,30 +178,22 @@ int fcntl_setfl(int fd, int flag)
 >  }
+>  #endif
 >
->  static void test_qemu_strtosz_float(void)
+> -#define QEMU_STRTOSZ_DEFSUFFIX_EB 'E'
+> -#define QEMU_STRTOSZ_DEFSUFFIX_PB 'P'
+> -#define QEMU_STRTOSZ_DEFSUFFIX_TB 'T'
+> -#define QEMU_STRTOSZ_DEFSUFFIX_GB 'G'
+> -#define QEMU_STRTOSZ_DEFSUFFIX_MB 'M'
+> -#define QEMU_STRTOSZ_DEFSUFFIX_KB 'K'
+> -#define QEMU_STRTOSZ_DEFSUFFIX_B 'B'
+> -
+>  static int64_t suffix_mul(char suffix, int64_t unit)
 >  {
->      const char *str = "12.345M";
-> +    char *endptr = NULL;
->      int64_t res;
+>      switch (qemu_toupper(suffix)) {
+> -    case QEMU_STRTOSZ_DEFSUFFIX_B:
+> +    case 'B':
+>          return 1;
+> -    case QEMU_STRTOSZ_DEFSUFFIX_KB:
+> +    case 'K':
+>          return unit;
+> -    case QEMU_STRTOSZ_DEFSUFFIX_MB:
+> +    case 'M':
+>          return unit * unit;
+> -    case QEMU_STRTOSZ_DEFSUFFIX_GB:
+> +    case 'G':
+>          return unit * unit * unit;
+> -    case QEMU_STRTOSZ_DEFSUFFIX_TB:
+> +    case 'T':
+>          return unit * unit * unit * unit;
+> -    case QEMU_STRTOSZ_DEFSUFFIX_PB:
+> +    case 'P':
+>          return unit * unit * unit * unit * unit;
+> -    case QEMU_STRTOSZ_DEFSUFFIX_EB:
+> +    case 'E':
+>          return unit * unit * unit * unit * unit * unit;
+>      }
+>      return -1;
+> @@ -258,17 +250,17 @@ fail:
 >
-> -    res = qemu_strtosz(str, NULL);
-> +    res = qemu_strtosz(str, &endptr);
->      g_assert_cmpint(res, ==, 12.345 * M_BYTE);
-> +    g_assert(endptr == str + 7);
->  }
->
->  static void test_qemu_strtosz_erange(void)
+>  int64_t qemu_strtosz(const char *nptr, char **end)
 >  {
->      const char *str = "10E";
-> +    char *endptr = NULL;
->      int64_t res;
->
-> -    res = qemu_strtosz(str, NULL);
-> +    res = qemu_strtosz(str, &endptr);
->      g_assert_cmpint(res, ==, -ERANGE);
-> +    g_assert(endptr == str + 3);
+> -    return do_strtosz(nptr, end, QEMU_STRTOSZ_DEFSUFFIX_B, 1024);
+> +    return do_strtosz(nptr, end, 'B', 1024);
 >  }
 >
->  static void test_qemu_strtosz_suffix_unit(void)
+>  int64_t qemu_strtosz_mebi(const char *nptr, char **end)
 >  {
->      const char *str = "12345";
-> +    char *endptr = NULL;
->      int64_t res;
->
-> -    res = qemu_strtosz_suffix_unit(str, NULL,
-> +    res = qemu_strtosz_suffix_unit(str, &endptr,
->                                     QEMU_STRTOSZ_DEFSUFFIX_KB, 1000);
->      g_assert_cmpint(res, ==, 12345000);
-> +    g_assert(endptr == str + 5);
+> -    return do_strtosz(nptr, end, QEMU_STRTOSZ_DEFSUFFIX_MB, 1024);
+> +    return do_strtosz(nptr, end, 'M', 1024);
 >  }
 >
->  int main(int argc, char **argv)
+>  int64_t qemu_strtosz_metric(const char *nptr, char **end)
+>  {
+> -    return do_strtosz(nptr, end, QEMU_STRTOSZ_DEFSUFFIX_B, 1000);
+> +    return do_strtosz(nptr, end, 'B', 1000);
+>  }
+>
+>  /**
 >
