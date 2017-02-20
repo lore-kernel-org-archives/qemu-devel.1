@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cfjJZ-0007qE-R1
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 03:27:26 -0500
+	(envelope-from <yi.l.liu@intel.com>) id 1cfjKc-00009a-4X
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 03:28:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cfjJY-0004ao-Np
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 03:27:21 -0500
-Received: from [45.249.212.188] (port=2930 helo=dggrg02-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cfjJY-0004aE-2H
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 03:27:20 -0500
-From: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Date: Mon, 20 Feb 2017 16:02:00 +0800
-Message-ID: <1487577721-31084-3-git-send-email-zhang.zhanghailiang@huawei.com>
-In-Reply-To: <1487577721-31084-1-git-send-email-zhang.zhanghailiang@huawei.com>
-References: <1487577721-31084-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	(envelope-from <yi.l.liu@intel.com>) id 1cfjKY-0004vK-3U
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 03:28:26 -0500
+Received: from mga02.intel.com ([134.134.136.20]:32332)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1cfjKX-0004uf-OY
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 03:28:22 -0500
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+Date: Mon, 20 Feb 2017 08:27:54 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743900C602@shsmsx102.ccr.corp.intel.com>
+References: <1484026704-28027-1-git-send-email-mst@redhat.com>
+	<1484026704-28027-9-git-send-email-mst@redhat.com>
+	<A2975661238FB949B60364EF0F2C25743900AAEF@shsmsx102.ccr.corp.intel.com>
+	<c1f86fba-6b22-8316-156f-2024bee46b0c@redhat.com>
+	<A2975661238FB949B60364EF0F2C25743900B73D@shsmsx102.ccr.corp.intel.com>
+	<e9022e3a-5fa5-45c3-cc84-cb78d3ff9cdc@redhat.com>
+In-Reply-To: <e9022e3a-5fa5-45c3-cc84-cb78d3ff9cdc@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 2/3] filter-rewriter: fix memory leak for
- connection in connection_track_table
+Subject: Re: [Qemu-devel] [PULL 08/41] intel_iommu: support device iotlb
+ descriptor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,160 +33,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jasowang@redhat.com, zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com
-Cc: qemu-devel@nongnu.org, xuquan8@huawei.com, pss.wulizhen@huawei.com, zhanghailiang <zhang.zhanghailiang@huawei.com>
+To: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Tian, Kevin" <kevin.tian@intel.com>, "Lan, Tianyu" <tianyu.lan@intel.com>, Alex Williamson <alex.williamson@redhat.com>
 
-After a net connection is closed, we didn't clear its releated resources
-in connection_track_table, which will lead to memory leak.
-
-Let't track the state of net connection, if it is closed, its related
-resources will be cleared up.
-
-Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
----
- net/colo.h            |  4 +++
- net/filter-rewriter.c | 70 +++++++++++++++++++++++++++++++++++++++++++++------
- 2 files changed, 67 insertions(+), 7 deletions(-)
-
-diff --git a/net/colo.h b/net/colo.h
-index 7c524f3..cd9027f 100644
---- a/net/colo.h
-+++ b/net/colo.h
-@@ -18,6 +18,7 @@
- #include "slirp/slirp.h"
- #include "qemu/jhash.h"
- #include "qemu/timer.h"
-+#include "slirp/tcp.h"
- 
- #define HASHTABLE_MAX_SIZE 16384
- 
-@@ -69,6 +70,9 @@ typedef struct Connection {
-      * run once in independent tcp connection
-      */
-     int syn_flag;
-+
-+    int tcp_state; /* TCP FSM state */
-+    tcp_seq fin_ack_seq; /* the seq of 'fin=1,ack=1' */
- } Connection;
- 
- uint32_t connection_key_hash(const void *opaque);
-diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
-index c4ab91c..7e7ec35 100644
---- a/net/filter-rewriter.c
-+++ b/net/filter-rewriter.c
-@@ -60,9 +60,9 @@ static int is_tcp_packet(Packet *pkt)
- }
- 
- /* handle tcp packet from primary guest */
--static int handle_primary_tcp_pkt(NetFilterState *nf,
-+static int handle_primary_tcp_pkt(RewriterState *rf,
-                                   Connection *conn,
--                                  Packet *pkt)
-+                                  Packet *pkt, ConnectionKey *key)
- {
-     struct tcphdr *tcp_pkt;
- 
-@@ -97,15 +97,45 @@ static int handle_primary_tcp_pkt(NetFilterState *nf,
-         tcp_pkt->th_ack = htonl(ntohl(tcp_pkt->th_ack) + conn->offset);
- 
-         net_checksum_calculate((uint8_t *)pkt->data, pkt->size);
-+        /*
-+         * Case 1:
-+         * The *server* side of this connect is VM, *client* tries to close
-+         * the connection.
-+         *
-+         * We got 'ack=1' packets from client side, it acks 'fin=1, ack=1'
-+         * packet from server side. From this point, we can ensure that there
-+         * will be no packets in the connection, except that, some errors
-+         * happen between the path of 'filter object' and vNIC, if this rare
-+         * case really happen, we can still create a new connection,
-+         * So it is safe to remove the connection from connection_track_table.
-+         *
-+         */
-+        if ((conn->tcp_state == TCPS_LAST_ACK) &&
-+            (ntohl(tcp_pkt->th_ack) == (conn->fin_ack_seq + 1))) {
-+            fprintf(stderr, "Remove conn "
-+            g_hash_table_remove(rf->connection_track_table, key);
-+        }
-+    }
-+    /*
-+     * Case 2:
-+     * The *server* side of this connect is VM, *server* tries to close
-+     * the connection.
-+     *
-+     * We got 'fin=1, ack=1' packet from client side, we need to
-+     * record the seq of 'fin=1, ack=1' packet.
-+     */
-+    if ((tcp_pkt->th_flags & (TH_ACK | TH_FIN)) == (TH_ACK | TH_FIN)) {
-+        conn->fin_ack_seq = htonl(tcp_pkt->th_seq);
-+        conn->tcp_state = TCPS_LAST_ACK;
-     }
- 
-     return 0;
- }
- 
- /* handle tcp packet from secondary guest */
--static int handle_secondary_tcp_pkt(NetFilterState *nf,
-+static int handle_secondary_tcp_pkt(RewriterState *rf,
-                                     Connection *conn,
--                                    Packet *pkt)
-+                                    Packet *pkt, ConnectionKey *key)
- {
-     struct tcphdr *tcp_pkt;
- 
-@@ -133,8 +163,34 @@ static int handle_secondary_tcp_pkt(NetFilterState *nf,
-         tcp_pkt->th_seq = htonl(ntohl(tcp_pkt->th_seq) - conn->offset);
- 
-         net_checksum_calculate((uint8_t *)pkt->data, pkt->size);
-+        /*
-+         * Case 2:
-+         * The *server* side of this connect is VM, *server* tries to close
-+         * the connection.
-+         *
-+         * We got 'ack=1' packets from server side, it acks 'fin=1, ack=1'
-+         * packet from client side. Like Case 1, there should be no packets
-+         * in the connection from now know, But the difference here is
-+         * if the packet is lost, We will get the resent 'fin=1,ack=1' packet.
-+         * TODO: Fix above case.
-+         */
-+        if ((conn->tcp_state == TCPS_LAST_ACK) &&
-+            (ntohl(tcp_pkt->th_ack) == (conn->fin_ack_seq + 1))) {
-+            g_hash_table_remove(rf->connection_track_table, key);
-+        }
-+    }
-+    /*
-+     * Case 1:
-+     * The *server* side of this connect is VM, *client* tries to close
-+     * the connection.
-+     *
-+     * We got 'fin=1, ack=1' packet from server side, we need to
-+     * record the seq of 'fin=1, ack=1' packet.
-+     */
-+    if ((tcp_pkt->th_flags & (TH_ACK | TH_FIN)) == (TH_ACK | TH_FIN)) {
-+        conn->fin_ack_seq = ntohl(tcp_pkt->th_seq);
-+        conn->tcp_state = TCPS_LAST_ACK;
-     }
--
-     return 0;
- }
- 
-@@ -178,7 +234,7 @@ static ssize_t colo_rewriter_receive_iov(NetFilterState *nf,
- 
-         if (sender == nf->netdev) {
-             /* NET_FILTER_DIRECTION_TX */
--            if (!handle_primary_tcp_pkt(nf, conn, pkt)) {
-+            if (!handle_primary_tcp_pkt(s, conn, pkt, &key)) {
-                 qemu_net_queue_send(s->incoming_queue, sender, 0,
-                 (const uint8_t *)pkt->data, pkt->size, NULL);
-                 packet_destroy(pkt, NULL);
-@@ -191,7 +247,7 @@ static ssize_t colo_rewriter_receive_iov(NetFilterState *nf,
-             }
-         } else {
-             /* NET_FILTER_DIRECTION_RX */
--            if (!handle_secondary_tcp_pkt(nf, conn, pkt)) {
-+            if (!handle_secondary_tcp_pkt(s, conn, pkt, &key)) {
-                 qemu_net_queue_send(s->incoming_queue, sender, 0,
-                 (const uint8_t *)pkt->data, pkt->size, NULL);
-                 packet_destroy(pkt, NULL);
--- 
-1.8.3.1
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBKYXNvbiBXYW5nIFttYWlsdG86
+amFzb3dhbmdAcmVkaGF0LmNvbV0NCj4gU2VudDogRnJpZGF5LCBGZWJydWFyeSAxNywgMjAxNyAy
+OjQzIFBNDQo+IFRvOiBMaXUsIFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT47IE1pY2hhZWwgUy4g
+VHNpcmtpbiA8bXN0QHJlZGhhdC5jb20+OyBxZW11LQ0KPiBkZXZlbEBub25nbnUub3JnDQo+IENj
+OiBQZXRlciBNYXlkZWxsIDxwZXRlci5tYXlkZWxsQGxpbmFyby5vcmc+OyBFZHVhcmRvIEhhYmtv
+c3QNCj4gPGVoYWJrb3N0QHJlZGhhdC5jb20+OyBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+
+OyBQYW9sbyBCb256aW5pDQo+IDxwYm9uemluaUByZWRoYXQuY29tPjsgUmljaGFyZCBIZW5kZXJz
+b24gPHJ0aEB0d2lkZGxlLm5ldD47IFRpYW4sIEtldmluDQo+IDxrZXZpbi50aWFuQGludGVsLmNv
+bT47IExhbiwgVGlhbnl1IDx0aWFueXUubGFuQGludGVsLmNvbT47IEFsZXggV2lsbGlhbXNvbg0K
+PiA8YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUWVtdS1kZXZl
+bF0gW1BVTEwgMDgvNDFdIGludGVsX2lvbW11OiBzdXBwb3J0IGRldmljZSBpb3RsYg0KPiBkZXNj
+cmlwdG9yDQo+IA0KPiANCj4gDQo+IE9uIDIwMTflubQwMuaciDE35pelIDE0OjE4LCBMaXUsIFlp
+IEwgd3JvdGU6DQo+ID4+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4+IEZyb206IEph
+c29uIFdhbmcgW21haWx0bzpqYXNvd2FuZ0ByZWRoYXQuY29tXQ0KPiA+PiBTZW50OiBUaHVyc2Rh
+eSwgRmVicnVhcnkgMTYsIDIwMTcgMTo0NCBQTQ0KPiA+PiBUbzogTGl1LCBZaSBMIDx5aS5sLmxp
+dUBpbnRlbC5jb20+OyBNaWNoYWVsIFMuIFRzaXJraW4NCj4gPj4gPG1zdEByZWRoYXQuY29tPjsg
+cWVtdS0gZGV2ZWxAbm9uZ251Lm9yZw0KPiA+PiBDYzogUGV0ZXIgTWF5ZGVsbCA8cGV0ZXIubWF5
+ZGVsbEBsaW5hcm8ub3JnPjsgRWR1YXJkbyBIYWJrb3N0DQo+ID4+IDxlaGFia29zdEByZWRoYXQu
+Y29tPjsgUGV0ZXIgWHUgPHBldGVyeEByZWRoYXQuY29tPjsgUGFvbG8gQm9uemluaQ0KPiA+PiA8
+cGJvbnppbmlAcmVkaGF0LmNvbT47IFJpY2hhcmQgSGVuZGVyc29uIDxydGhAdHdpZGRsZS5uZXQ+
+OyBUaWFuLA0KPiA+PiBLZXZpbiA8a2V2aW4udGlhbkBpbnRlbC5jb20+OyBMYW4sIFRpYW55dSA8
+dGlhbnl1LmxhbkBpbnRlbC5jb20+Ow0KPiA+PiBBbGV4IFdpbGxpYW1zb24gPGFsZXgud2lsbGlh
+bXNvbkByZWRoYXQuY29tPg0KPiA+PiBTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIFtQVUxMIDA4
+LzQxXSBpbnRlbF9pb21tdTogc3VwcG9ydCBkZXZpY2UNCj4gPj4gaW90bGIgZGVzY3JpcHRvcg0K
+PiA+Pg0KPiA+Pg0KPiA+Pg0KPiA+PiBPbiAyMDE35bm0MDLmnIgxNuaXpSAxMzozNiwgTGl1LCBZ
+aSBMIHdyb3RlOg0KPiA+Pj4+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4+Pj4gRnJv
+bTogUWVtdS1kZXZlbA0KPiA+Pj4+IFttYWlsdG86cWVtdS1kZXZlbC1ib3VuY2VzK3lpLmwubGl1
+PWludGVsLmNvbUBub25nbnUub3JnXQ0KPiA+Pj4+IE9uIEJlaGFsZiBPZiBNaWNoYWVsIFMuIFRz
+aXJraW4NCj4gPj4+PiBTZW50OiBUdWVzZGF5LCBKYW51YXJ5IDEwLCAyMDE3IDE6NDAgUE0NCj4g
+Pj4+PiBUbzogcWVtdS1kZXZlbEBub25nbnUub3JnDQo+ID4+Pj4gQ2M6IFBldGVyIE1heWRlbGwg
+PHBldGVyLm1heWRlbGxAbGluYXJvLm9yZz47IEVkdWFyZG8gSGFia29zdA0KPiA+Pj4+IDxlaGFi
+a29zdEByZWRoYXQuY29tPjsgSmFzb24gV2FuZyA8amFzb3dhbmdAcmVkaGF0LmNvbT47IFBldGVy
+DQo+IFh1DQo+ID4+Pj4gPHBldGVyeEByZWRoYXQuY29tPjsgUGFvbG8gQm9uemluaSA8cGJvbnpp
+bmlAcmVkaGF0LmNvbT47IFJpY2hhcmQNCj4gPj4+PiBIZW5kZXJzb24gPHJ0aEB0d2lkZGxlLm5l
+dD4NCj4gPj4+PiBTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMDgvNDFdIGludGVsX2lvbW11
+OiBzdXBwb3J0IGRldmljZQ0KPiA+Pj4+IGlvdGxiIGRlc2NyaXB0b3INCj4gPj4+Pg0KPiA+Pj4+
+IEZyb206IEphc29uIFdhbmcgPGphc293YW5nQHJlZGhhdC5jb20+DQo+ID4+Pj4NCj4gPj4+PiBU
+aGlzIHBhdGNoIGVuYWJsZXMgZGV2aWNlIElPVExCIHN1cHBvcnQgZm9yIGludGVsIGlvbW11LiBU
+aGUgbWFqb3INCj4gPj4+PiB3b3JrIGlzIHRvIGltcGxlbWVudCBRSSBkZXZpY2UgSU9UTEIgZGVz
+Y3JpcHRvciBwcm9jZXNzaW5nIGFuZA0KPiA+Pj4+IG5vdGlmeSB0aGUgZGV2aWNlIHRocm91Z2gg
+aW9tbXUgbm90aWZpZXIuDQo+ID4+Pj4NCj4gPj4+IEhpIEphc29uL01pY2hhZWwsDQo+ID4+Pg0K
+PiA+Pj4gUmVjZW50bHkgUGV0ZXIgWHUncyBwYXRjaCBhbHNvIHRvdWNoZWQgaW50ZWwtaW9tbXUg
+ZW11bGF0aW9uLiBIaXMNCj4gPj4+IHBhdGNoIHNoYWRvd3Mgc2Vjb25kLWxldmVsIHBhZ2UgdGFi
+bGUgYnkgY2FwdHVyaW5nIGlvdGxiIGZsdXNoIGZyb20NCj4gPj4+IGd1ZXN0LiBJdCB3b3VsZCBy
+ZXN1bHQgaW4gcGFnZSB0YWJsZSB1cGRhdGluZyBpbiBob3N0LiBEb2VzIHRoaXMNCj4gPj4+IHBh
+dGNoIGFsc28gdXNlIHRoZSBzYW1lIG1hcC91bWFwIEFQSSBwcm92aWRlZCBieSBWRklPPw0KPiA+
+PiBZZXMsIGl0IGRlcGVuZHMgb24gdGhlIGlvbW11IG5vdGlmaWVyIHRvby4NCj4gPj4NCj4gPj4+
+IElmIGl0IGlzLCB0aGVuIEkgdGhpbmsgaXQgd291bGQgYWxzbyB1cGRhdGUgcGFnZSB0YWJsZSBp
+biBob3N0LiBJdA0KPiA+Pj4gbG9va3MgdG8gYmUgYSBkdXBsaWNhdGUgdXBkYXRlLiBQbHMgcmVm
+ZXIgdG8gdGhlIGZvbGxvd2luZyBzbmFwc2hvdA0KPiA+Pj4gY2FwdHVyZWQgZnJvbSBzZWN0aW9u
+IDYuNS4yLjUgb2YgdnRkIHNwZWMuDQo+ID4+Pg0KPiA+Pj4gIlNpbmNlIHRyYW5zbGF0aW9uIHJl
+cXVlc3RzIGZyb20gYSBkZXZpY2UgbWF5IGJlIHNlcnZpY2VkIGJ5DQo+ID4+PiBoYXJkd2FyZSBm
+cm9tIHRoZSBJT1RMQiwgc29mdHdhcmUgbXVzdCBhbHdheXMgcmVxdWVzdCBJT1RMQg0KPiA+Pj4g
+aW52YWxpZGF0aW9uDQo+ID4+PiAoaW90bGJfaW52X2RzYykgYmVmb3JlIHJlcXVlc3RpbmcgY29y
+cmVzcG9uZGluZyBEZXZpY2UtVExCDQo+ID4+PiAoZGV2X3RsYl9pbnZfZHNjKSBpbnZhbGlkYXRp
+b24uIg0KPiA+Pj4NCj4gPj4+IE1heWJlIGZvciBkZXZpY2UtaW90bGIsIHdlIG5lZWQgYSBzZXBh
+cmF0ZSBBUEkgd2hpY2gganVzdCBwYXNzIGRvd24NCj4gPj4+IHRoZSBpbnZhbGlkYXRlIGluZm8g
+d2l0aG91dCB1cGRhdGluZyBwYWdlIHRhYmxlLiBBbnkgdGhvdWdodHM/DQo+ID4+IGNjIEFsZXgu
+DQo+ID4+DQo+ID4+IElmIHdlIHdhbnQgQVRTIHRvIGJlIHZpc2libGUgZm9yIGd1ZXN0IChidXQg
+SSdtIG5vdCBzdXJlIGlmIFZGSU8NCj4gPj4gc3VwcG9ydCB0aGlzKSwgd2UgcHJvYmFibHkgbmVl
+ZCBhbm90aGVyIG5vdGlmaWVyIG9yIGEgbmV3IGZsYWcuDQo+ID4gSmFzb24sIGZvciBhc3NpZ25l
+ZCBkZXZpY2UsIEkgdGhpbmsgZ3Vlc3QgY291bGQgc2VlIEFUUyBpZiB0aGUNCj4gPiBhc3NpZ25l
+ZCBkZXZpY2Ugc3VwcG9ydHMgQVRTLiBJIGNhbiBzZWUgaXQgd2hlbiBwYXNzdGhydSBpR1BVLg0K
+PiA+DQo+ID4gUmVnYXJkcywNCj4gPiBZaSBMDQo+IA0KPiBHb29kIHRvIGtub3cgdGhpcy4NCj4g
+DQo+IElmIEkgdW5kZXJzdGFuZCB5b3VyIHN1Z2dlc3Rpb24gY29ycmVjdGx5LCB5b3Ugd2FudCBh
+IGRlZGljYXRlZCBBUEkgdG8gZmx1c2ggYQ0KPiBoYXJkd2FyZSBkZXZpY2UgSU9UTEIuIEknbSBu
+b3Qgc3VyZSB0aGlzIGlzIHJlYWxseSBuZWVkZWQuDQp5ZXMsIEknZCBsaWtlIHRvIGhhdmUgYW4g
+ZXh0cmEgQVBJIGJlc2lkZXMgdGhlIGN1cnJlbnQgTUFQL1VOTUFQLg0KDQo+IFRoZXJlJ3Mgc29t
+ZSBkaXNjdXNzaW9uIG9mIHNpbWlsYXIgaXNzdWUgaW4gdGhlIHBhc3QgKHdoZW4gQVRTIGlzIHVz
+ZWQgZm9yIHZpcnRpby0NCj4gbmV0L3Zob3N0KSwgbG9va3MgbGlrZSB3ZSBjb3VsZCBzb2x2ZSB0
+aGlzIGJ5IG5vdCB0cmlnZ2VyIHRoZSBVTk1BUCBub3RpZmllcg0KPiB1bmxlc3MgaXQgd2FzIGRl
+dmljZSBJT1RMQiBpbnYgZGVzYyBpZiBBVFMgaXMgZW5hYmxlZCBmb3IgdGhlIGRldmljZT8gV2l0
+aCB0aGlzDQo+IHJlbW90ZSBJT01NVS9JT1RMQiBjYW4gb25seSBnZXQgaW52YWxpZGF0aW9uIHJl
+cXVlc3Qgb25jZS4gRm9yIFZGSU8sIHRoZQ0KPiB1bmRlciBsYXllciBJT01NVSBjYW4gZGVhbCB3
+aXRoIGhhcmR3YXJlIGRldmljZSBJT1RMQiB3aXRob3V0IGFueSBleHRyYQ0KPiBlZmZvcnRzLg0K
+SWYgSSBjYXRjaCB0aGUgYmFja2dyb3VuZCwgSSB0aGluayBpdCBzaG91bGQgYmUgIm5vdCB0cmln
+Z2VyIHRoZSBVTk1BUCBub3RpZmllcg0Kd2hlbiB1bmxlc3MgaXQgd2FzIGRldmljZSBJT1RMQiBp
+bnYgZGVzYyBpZiBBVFMgaXMgZW5hYmxlZCBmb3IgdGhlIGRldmljZSINCg0KRmVlbCBmcmVlIHRv
+IGNvcnJlY3QgbWUuDQoNClRoYW5rcywNCllpIEwNCj4gRG9lcyB0aGlzIG1ha2Ugc2Vuc2U/DQo+
+IA0KPiBUaGFua3MNCg==
