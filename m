@@ -1,21 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bsingharora@gmail.com>) id 1cfiS1-0002YD-0E
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 02:32:02 -0500
+	(envelope-from <bounces@canonical.com>) id 1cfiVK-0003ld-JM
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 02:35:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bsingharora@gmail.com>) id 1cfiRz-0005bq-Vy
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 02:32:01 -0500
-From: Balbir Singh <bsingharora@gmail.com>
-Date: Mon, 20 Feb 2017 18:31:46 +1100
-Message-ID: <20170220073146.GC661@balbir.ozlabs.ibm.com>
-References: <1487563478-22265-1-git-send-email-sjitindarsingh@gmail.com>
-	<1487563478-22265-4-git-send-email-sjitindarsingh@gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1cfiVH-0006Iu-ER
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 02:35:26 -0500
+Received: from indium.canonical.com ([91.189.90.7]:35551)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cfiVH-0006Ij-8N
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 02:35:23 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cfiVF-0003CC-BE
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 07:35:21 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 534AD2E80C0
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 07:35:21 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1487563478-22265-4-git-send-email-sjitindarsingh@gmail.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [QEMU-PPC] [PATCH V3 03/10]
- target/ppc/POWER9: Adapt LPCR handling for POWER9
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 20 Feb 2017 07:19:44 -0000
+From: ChristianEhrhardt <1490611@bugs.launchpad.net>
+Reply-To: Bug 1490611 <1490611@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150831152901.21817.58033.malonedeb@gac.canonical.com>
+	<20170217222905.6449.56435.malone@wampee.canonical.com>
+Message-Id: <CAATJJ0L_D8bDgc_06S+iP_k9=DUBeA_dLkU09QLAJ2XFVS0iFw@mail.gmail.com>
+Errors-To: bounces@canonical.com
+Subject: Re: [Qemu-devel] [Bug 1490611] Re: Using qemu >=2.2.1 to convert
+ raw->VHD (fixed) adds extra padding to the result file,
+ which Microsoft Azure rejects as invalid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,71 +39,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, sam.bobroff@au1.ibm.com, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
 
-On Mon, Feb 20, 2017 at 03:04:31PM +1100, Suraj Jitindar Singh wrote:
-> The logical partitioning control register controls a threads operation
-> based on the partition it is currently executing. Add new definitions and
-> update the mask used when writing to the LPCR based on the POWER9 spec.
-> 
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> ---
->  target/ppc/cpu.h            | 18 ++++++++++++++++++
->  target/ppc/mmu-hash64.c     |  8 ++++++++
->  target/ppc/translate_init.c | 24 ++++++++++++++++++------
->  3 files changed, 44 insertions(+), 6 deletions(-)
-> 
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index bb96dd5..425e79d 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -384,12 +384,19 @@ struct ppc_slb_t {
->  #define LPCR_DPFD         (0x7ull << LPCR_DPFD_SHIFT)
->  #define LPCR_VRMASD_SHIFT (63 - 16)
->  #define LPCR_VRMASD       (0x1full << LPCR_VRMASD_SHIFT)
-> +/* P9: Power-saving mode Exit Cause Enable (Upper Section) Mask */
-> +#define LPCR_PECE_U_SHIFT (63 - 19)
-> +#define LPCR_PECE_U_MASK  (0x7ull << LPCR_PECE_U_SHIFT)
-> +#define LPCR_HVEE         (1ull << (63 - 17)) /* Hypervisor Virt Exit Enable */
->  #define LPCR_RMLS_SHIFT   (63 - 37)
->  #define LPCR_RMLS         (0xfull << LPCR_RMLS_SHIFT)
->  #define LPCR_ILE          (1ull << (63 - 38))
->  #define LPCR_AIL_SHIFT    (63 - 40)      /* Alternate interrupt location */
->  #define LPCR_AIL          (3ull << LPCR_AIL_SHIFT)
-> +#define LPCR_UPRT         (1ull << (63 - 41)) /* Use Process Table */
-> +#define LPCR_EVIRT        (1ull << (63 - 42)) /* Enhanced Virtualisation */
->  #define LPCR_ONL          (1ull << (63 - 45))
-> +#define LPCR_LD           (1ull << (63 - 46)) /* Large Decrementer */
->  #define LPCR_P7_PECE0     (1ull << (63 - 49))
->  #define LPCR_P7_PECE1     (1ull << (63 - 50))
->  #define LPCR_P7_PECE2     (1ull << (63 - 51))
-> @@ -398,11 +405,22 @@ struct ppc_slb_t {
->  #define LPCR_P8_PECE2     (1ull << (63 - 49))
->  #define LPCR_P8_PECE3     (1ull << (63 - 50))
->  #define LPCR_P8_PECE4     (1ull << (63 - 51))
-> +/* P9: Power-saving mode Exit Cause Enable (Lower Section) Mask */
-> +#define LPCR_PECE_L_SHIFT (63 - 51)
-> +#define LPCR_PECE_L_MASK  (0x1full << LPCR_PECE_L_SHIFT)
-> +#define LPCR_PDEE         (1ull << (63 - 47)) /* Privileged Doorbell Exit EN */
-> +#define LPCR_HDEE         (1ull << (63 - 48)) /* Hyperv Doorbell Exit Enable */
-> +#define LPCR_EEE          (1ull << (63 - 49)) /* External Exit Enable        */
-> +#define LPCR_DEE          (1ull << (63 - 50)) /* Decrementer Exit Enable     */
-> +#define LPCR_OEE          (1ull << (63 - 51)) /* Other Exit Enable           */
->  #define LPCR_MER          (1ull << (63 - 52))
-> +#define LPCR_GTSE         (1ull << (63 - 53)) /* Guest Translation Shootdown */
->  #define LPCR_TC           (1ull << (63 - 54))
-> +#define LPCR_HEIC         (1ull << (63 - 59)) /* HV Extern Interrupt Control */
->  #define LPCR_LPES0        (1ull << (63 - 60))
->  #define LPCR_LPES1        (1ull << (63 - 61))
->  #define LPCR_RMI          (1ull << (63 - 62))
-> +#define LPCR_HVICE        (1ull << (63 - 62)) /* HV Virtualisation Int Enable */
->  #define LPCR_HDICE        (1ull << (63 - 63))
+On Fri, Feb 17, 2017 at 11:29 PM, Nish Aravamudan <
+nish.aravamudan@canonical.com> wrote:
 
-This patch is missing
+> I believe Christian has it on his todo for the next SRU, though;
+> Christian, could you confirm?
+>
 
-#define LPCR_HR	(1ull << (63 - 43))	/* HV uses Radix Tree Translation */
+Yes, that is correct.
+Sorry for the inconvenient delay due to the chain SRUs.
+But at least the bigger ones we need to unbundle to make sure not making
+things worse for end-users when SRU'ing.
 
-See arch/powerpc/include/asm/reg.h in the Linux kernel. 
+-- =
 
-Balbir Singh.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1490611
+
+Title:
+  Using qemu >=3D2.2.1 to convert raw->VHD (fixed) adds extra padding to
+  the result file, which Microsoft Azure rejects as invalid
+
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Xenial:
+  In Progress
+
+Bug description:
+  [Impact]
+
+  =C2=A0* Starting with a raw disk image, using "qemu-img convert" to conve=
+rt
+  from raw to VHD results in the output VHD file's virtual size being
+  aligned to the nearest 516096 bytes (16 heads x 63 sectors per head x
+  512 bytes per sector), instead of preserving the input file's size as
+  the output VHD's virtual disk size.
+
+  =C2=A0* Microsoft Azure requires that disk images (VHDs) submitted for
+  upload have virtual sizes aligned to a megabyte boundary. (Ex. 4096MB,
+  4097MB, 4098MB, etc. are OK, 4096.5MB is rejected with an error.) This
+  is reflected in Microsoft's documentation: https://azure.microsoft.com
+  /en-us/documentation/articles/virtual-machines-linux-create-upload-
+  vhd-generic/
+
+  =C2=A0* The fix for this bug is a backport from upstream.
+  http://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Dfb9245c2610932d33ce14
+
+  [Test Case]
+
+  =C2=A0* This is reproducible with the following set of commands (including
+  the Azure command line tools from https://github.com/Azure/azure-
+  xplat-cli). For the following example, I used qemu version 2.2.1:
+
+  $ dd if=3D/dev/zero of=3Dsource-disk.img bs=3D1M count=3D4096
+
+  $ stat source-disk.img
+  =C2=A0=C2=A0File: =E2=80=98source-disk.img=E2=80=99
+  =C2=A0=C2=A0Size: 4294967296      Blocks: 798656     IO Block: 4096   reg=
+ular file
+  Device: fc01h/64513d    Inode: 13247963    Links: 1
+  Access: (0644/-rw-r--r--)  Uid: ( 1000/  smkent)   Gid: ( 1000/  smkent)
+  Access: 2015-08-18 09:48:02.613988480 -0700
+  Modify: 2015-08-18 09:48:02.825985646 -0700
+  Change: 2015-08-18 09:48:02.825985646 -0700
+  =C2=A0Birth: -
+
+  $ qemu-img convert -f raw -o subformat=3Dfixed -O vpc source-disk.img
+  dest-disk.vhd
+
+  $ stat dest-disk.vhd
+  =C2=A0=C2=A0File: =E2=80=98dest-disk.vhd=E2=80=99
+  =C2=A0=C2=A0Size: 4296499712      Blocks: 535216     IO Block: 4096   reg=
+ular file
+  Device: fc01h/64513d    Inode: 13247964    Links: 1
+  Access: (0644/-rw-r--r--)  Uid: ( 1000/  smkent)   Gid: ( 1000/  smkent)
+  Access: 2015-08-18 09:50:22.252077624 -0700
+  Modify: 2015-08-18 09:49:24.424868868 -0700
+  Change: 2015-08-18 09:49:24.424868868 -0700
+  =C2=A0Birth: -
+
+  $ azure vm image create testimage1 dest-disk.vhd -o linux -l "West US"
+  info:    Executing command vm image create
+  + Retrieving storage accounts
+  info:    VHD size : 4097 MB
+  info:    Uploading 4195800.5 KB
+  Requested:100.0% Completed:100.0% Running:   0 Time: 1m 0s Speed:  6744 K=
+B/s
+  info:    https://[redacted].blob.core.windows.net/vm-images/dest-disk.vhd=
+ was uploaded successfully
+  error:   The VHD https://[redacted].blob.core.windows.net/vm-images/dest-=
+disk.vhd has an unsupported virtual size of 4296499200 bytes.  The size mus=
+t be a whole number (in MBs).
+  info:    Error information has been recorded to /home/smkent/.azure/azure=
+.err
+  error:   vm image create command failed
+
+  =C2=A0* A fixed qemu-img will not result in an error during azure image
+  creation. It will require passing -o force_size, which will leverage
+  the backported functionality.
+
+  [Regression Potential]
+
+  =C2=A0* The upstream fix introduces a qemu-img option (-o force_size) whi=
+ch
+  is unset by default. The regression potential is very low, as a
+  result.
+
+  ...
+
+  I also ran the above commands using qemu 2.4.0, which resulted in the
+  same error as the conversion behavior is the same.
+
+  However, qemu 2.1.1 and earlier (including qemu 2.0.0 installed by
+  Ubuntu 14.04) does not pad the virtual disk size during conversion.
+  Using qemu-img convert from qemu versions <=3D2.1.1 results in a VHD
+  that is exactly the size of the raw input file plus 512 bytes (for the
+  VHD footer). Those qemu versions do not attempt to realign the disk.
+  As a result, Azure accepts VHD files created using those versions of
+  qemu-img convert for upload.
+
+  Is there a reason why newer qemu realigns the converted VHD file? It
+  would be useful if an option were added to disable this feature, as
+  current versions of qemu cannot be used to create VHD files for Azure
+  using Microsoft's official instructions.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1490611/+subscriptions
