@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35888)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cfucE-00084e-AV
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:31:23 -0500
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cfucE-00084d-9n
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:31:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cfucB-0004ah-6Q
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cfucB-0004b6-KZ
 	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:31:22 -0500
-Received: from mailapp01.imgtec.com ([195.59.15.196]:64223)
+Received: from mailapp01.imgtec.com ([195.59.15.196]:2709)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cfucB-0004Zy-0Y
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cfucB-0004at-FQ
 	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:31:19 -0500
 Received: from hhmail02.hh.imgtec.org (unknown [10.100.10.20])
-	by Forcepoint Email with ESMTPS id EA016CA9D01D2
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 20:31:10 +0000 (GMT)
+	by Forcepoint Email with ESMTPS id F141AAFF79688
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 20:31:13 +0000 (GMT)
 From: Yongbok Kim <yongbok.kim@imgtec.com>
-Date: Mon, 20 Feb 2017 20:30:54 +0000
-Message-ID: <1487622662-62984-1-git-send-email-yongbok.kim@imgtec.com>
+Date: Mon, 20 Feb 2017 20:30:59 +0000
+Message-ID: <1487622662-62984-6-git-send-email-yongbok.kim@imgtec.com>
+In-Reply-To: <1487622662-62984-1-git-send-email-yongbok.kim@imgtec.com>
+References: <1487622662-62984-1-git-send-email-yongbok.kim@imgtec.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/8] target-mips queue
+Content-Type: text/plain
+Subject: [Qemu-devel] [PULL 5/8] dtc: Update requirement to v1.4.2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +30,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Hi,
+From: Paul Burton <paul.burton@imgtec.com>
 
-This is pull-req for target-mips.
+In order to obtain fdt_first_subnode & fdt_next_subnode symbols from
+libfdt for use by a later patch, bump the requirement for dtc to v1.4.2
+& the submodule to that same version.
 
-Regards,
-Yongbok
+Signed-off-by: Paul Burton <paul.burton@imgtec.com>
+Reviewed-by: Yongbok Kim <yongbok.kim@imgtec.com>
+Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
+---
+ configure | 6 +++---
+ dtc       | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-The following changes since commit 56f9e46b841c7be478ca038d8d4085d776ab4b=
-0d:
-
-  Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2017-02-20'=
- into staging (2017-02-20 17:42:47 +0000)
-
-are available in the git repository at:
-
-  git://github.com/yongbok/upstream-qemu.git tags/mips-20170220
-
-for you to fetch changes up to 0a1fdcc94338ea12f7deba71e795c01989152752:
-
-  hw/mips: MIPS Boston board support (2017-02-20 19:37:28 +0000)
-
-----------------------------------------------------------------
-MIPS patches 2017-02-20
-
-Changes:
-* Add MIPS Boston board support
-
-----------------------------------------------------------------
-
-Paul Burton (8):
-  hw/mips_cmgcr: allow GCR base to be moved
-  hw/mips_gictimer: provide API for retrieving frequency
-  hw/mips_gic: Update pin state on mask changes
-  target-mips: Provide function to test if a CPU supports an ISA
-  dtc: Update requirement to v1.4.2
-  loader: Support Flattened Image Trees (FIT images)
-  hw: xilinx-pcie: Add support for Xilinx AXI PCIe Controller
-  hw/mips: MIPS Boston board support
-
- configure                            |   8 +-
- default-configs/mips64el-softmmu.mak |   2 +
- dtc                                  |   2 +-
- hw/core/Makefile.objs                |   1 +
- hw/core/loader-fit.c                 | 325 ++++++++++++++++++++
- hw/core/loader.c                     |   7 +-
- hw/intc/mips_gic.c                   |  56 ++--
- hw/mips/Makefile.objs                |   1 +
- hw/mips/boston.c                     | 576 +++++++++++++++++++++++++++++=
-++++++
- hw/misc/mips_cmgcr.c                 |  17 ++
- hw/pci-host/Makefile.objs            |   1 +
- hw/pci-host/xilinx-pcie.c            | 328 ++++++++++++++++++++
- hw/timer/mips_gictimer.c             |   5 +
- include/hw/loader-fit.h              |  41 +++
- include/hw/loader.h                  |   6 +
- include/hw/misc/mips_cmgcr.h         |   3 +
- include/hw/pci-host/xilinx-pcie.h    |  68 +++++
- include/hw/timer/mips_gictimer.h     |   1 +
- target/mips/cpu.h                    |   1 +
- target/mips/translate.c              |  10 +
- 20 files changed, 1423 insertions(+), 36 deletions(-)
- create mode 100644 hw/core/loader-fit.c
- create mode 100644 hw/mips/boston.c
- create mode 100644 hw/pci-host/xilinx-pcie.c
- create mode 100644 include/hw/loader-fit.h
- create mode 100644 include/hw/pci-host/xilinx-pcie.h
-
---=20
+diff --git a/configure b/configure
+index 1c9655e..4b68861 100755
+--- a/configure
++++ b/configure
+@@ -3396,11 +3396,11 @@ fi
+ if test "$fdt" != "no" ; then
+   fdt_libs="-lfdt"
+   # explicitly check for libfdt_env.h as it is missing in some stable installs
+-  # and test for required functions to make sure we are on a version >= 1.4.0
++  # and test for required functions to make sure we are on a version >= 1.4.2
+   cat > $TMPC << EOF
+ #include <libfdt.h>
+ #include <libfdt_env.h>
+-int main(void) { fdt_get_property_by_offset(0, 0, 0); return 0; }
++int main(void) { fdt_first_subnode(0, 0); return 0; }
+ EOF
+   if compile_prog "" "$fdt_libs" ; then
+     # system DTC is good - use it
+@@ -3418,7 +3418,7 @@ EOF
+     fdt_libs="-L\$(BUILD_DIR)/dtc/libfdt $fdt_libs"
+   elif test "$fdt" = "yes" ; then
+     # have neither and want - prompt for system/submodule install
+-    error_exit "DTC (libfdt) version >= 1.4.0 not present. Your options:" \
++    error_exit "DTC (libfdt) version >= 1.4.2 not present. Your options:" \
+         "  (1) Preferred: Install the DTC (libfdt) devel package" \
+         "  (2) Fetch the DTC submodule, using:" \
+         "      git submodule update --init dtc"
+diff --git a/dtc b/dtc
+index 65cc4d2..ec02b34 160000
+--- a/dtc
++++ b/dtc
+@@ -1 +1 @@
+-Subproject commit 65cc4d2748a2c2e6f27f1cf39e07a5dbabd80ebf
++Subproject commit ec02b34c05be04f249ffaaca4b666f5246877dea
+-- 
 2.7.4
