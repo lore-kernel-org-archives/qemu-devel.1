@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cfq0q-0006g1-IR
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:36:29 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cfq0q-0006gJ-Ng
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:36:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cfq0p-0003UO-Ae
+	(envelope-from <pm215@archaic.org.uk>) id 1cfq0k-0003QZ-EA
 	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:36:28 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Feb 2017 15:35:57 +0000
-Message-Id: <1487604965-23220-4-git-send-email-peter.maydell@linaro.org>
+Date: Mon, 20 Feb 2017 15:36:01 +0000
+Message-Id: <1487604965-23220-8-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1487604965-23220-1-git-send-email-peter.maydell@linaro.org>
 References: <1487604965-23220-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 03/11] armv7m: QOMify the armv7m container
+Subject: [Qemu-devel] [PATCH 07/11] armv7m: Make bitband device take the
+ address space to access
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,244 +23,247 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Alistair Francis <alistair23@gmail.com>, Michael Davidsaver <mdavidsaver@gmail.com>
 
-Create a proper QOM object for the armv7m container, which
-holds the CPU, the NVIC and the bitband regions.
+Instead of the bitband device doing a cpu_physical_memory_read/write,
+make it take a MemoryRegion which specifies where it should be
+accessing, and use address_space_read/write to access the
+corresponding AddressSpace.
+
+Since this entails pretty much a rewrite, convert away from
+old_mmio in the process.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/arm/armv7m.h |  51 ++++++++++++++++++
- hw/arm/armv7m.c         | 140 +++++++++++++++++++++++++++++++++++++++++++-----
- 2 files changed, 179 insertions(+), 12 deletions(-)
- create mode 100644 include/hw/arm/armv7m.h
+ include/hw/arm/armv7m.h |   2 +
+ hw/arm/armv7m.c         | 166 +++++++++++++++++++++++-------------------------
+ 2 files changed, 81 insertions(+), 87 deletions(-)
 
 diff --git a/include/hw/arm/armv7m.h b/include/hw/arm/armv7m.h
-new file mode 100644
-index 0000000..193ad71
---- /dev/null
+index 3333c91..a9b3f2a 100644
+--- a/include/hw/arm/armv7m.h
 +++ b/include/hw/arm/armv7m.h
-@@ -0,0 +1,51 @@
-+/*
-+ * ARMv7M CPU object
-+ *
-+ * Copyright (c) 2017 Linaro Ltd
-+ * Written by Peter Maydell <peter.maydell@linaro.org>
-+ *
-+ * This code is licensed under the GPL version 2 or later.
-+ */
-+
-+#ifndef HW_ARM_ARMV7M_H
-+#define HW_ARM_ARMV7M_H
-+
-+#include "hw/sysbus.h"
-+#include "hw/arm/armv7m_nvic.h"
-+
-+#define TYPE_BITBAND "ARM,bitband-memory"
-+#define BITBAND(obj) OBJECT_CHECK(BitBandState, (obj), TYPE_BITBAND)
-+
-+typedef struct {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+    /*< public >*/
-+
-+    MemoryRegion iomem;
-+    uint32_t base;
-+} BitBandState;
-+
-+#define TYPE_ARMV7M "armv7m"
-+#define ARMV7M(obj) OBJECT_CHECK(ARMv7MState, (obj), TYPE_ARMV7M)
-+
-+#define ARMV7M_NUM_BITBANDS 2
-+
-+/* ARMv7M container object.
-+ * + Unnamed GPIO input lines: external IRQ lines for the NVIC
-+ * + Named GPIO output SYSRESETREQ: signalled for guest AIRCR.SYSRESETREQ
-+ * + Property "cpu-model": CPU model to instantiate
-+ * + Property "num-irq": number of external IRQ lines
-+ */
-+typedef struct ARMv7MState {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+    /*< public >*/
-+    NVICState nvic;
-+    BitBandState bitband[ARMV7M_NUM_BITBANDS];
-+    ARMCPU *cpu;
-+
-+    /* Properties */
-+    char *cpu_model;
-+} ARMv7MState;
-+
-+#endif
+@@ -21,8 +21,10 @@ typedef struct {
+     SysBusDevice parent_obj;
+     /*< public >*/
+ 
++    AddressSpace *source_as;
+     MemoryRegion iomem;
+     uint32_t base;
++    MemoryRegion *source_memory;
+ } BitBandState;
+ 
+ #define TYPE_ARMV7M "armv7m"
 diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-index b2cc6e9..56d02d4 100644
+index fb21f74..4481106 100644
 --- a/hw/arm/armv7m.c
 +++ b/hw/arm/armv7m.c
-@@ -8,6 +8,7 @@
-  */
+@@ -23,103 +23,73 @@
+ /* Bitbanded IO.  Each word corresponds to a single bit.  */
  
- #include "qemu/osdep.h"
-+#include "hw/arm/armv7m.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
- #include "cpu.h"
-@@ -120,18 +121,6 @@ static const MemoryRegionOps bitband_ops = {
-     .endianness = DEVICE_NATIVE_ENDIAN,
- };
- 
--#define TYPE_BITBAND "ARM,bitband-memory"
--#define BITBAND(obj) OBJECT_CHECK(BitBandState, (obj), TYPE_BITBAND)
--
--typedef struct {
--    /*< private >*/
--    SysBusDevice parent_obj;
--    /*< public >*/
--
--    MemoryRegion iomem;
--    uint32_t base;
--} BitBandState;
--
- static void bitband_init(Object *obj)
+ /* Get the byte address of the real memory for a bitband access.  */
+-static inline uint32_t bitband_addr(void * opaque, uint32_t addr)
++static inline hwaddr bitband_addr(BitBandState *s, hwaddr offset)
  {
-     BitBandState *s = BITBAND(obj);
-@@ -159,6 +148,132 @@ static void armv7m_bitband_init(void)
- 
- /* Board init.  */
- 
-+static const hwaddr bitband_input_addr[ARMV7M_NUM_BITBANDS] = {
-+    0x20000000, 0x40000000
-+};
-+
-+static const hwaddr bitband_output_addr[ARMV7M_NUM_BITBANDS] = {
-+    0x22000000, 0x42000000
-+};
-+
-+static void armv7m_instance_init(Object *obj)
-+{
-+    ARMv7MState *s = ARMV7M(obj);
-+    int i;
-+
-+    /* Can't init the cpu here, we don't yet know which model to use */
-+
-+    object_initialize(&s->nvic, sizeof(s->nvic), "armv7m_nvic");
-+    qdev_set_parent_bus(DEVICE(&s->nvic), sysbus_get_default());
-+    object_property_add_alias(obj, "num-irq",
-+                              OBJECT(&s->nvic), "num-irq", &error_abort);
-+
-+    for (i = 0; i < ARRAY_SIZE(s->bitband); i++) {
-+        object_initialize(&s->bitband[i], sizeof(s->bitband[i]), TYPE_BITBAND);
-+        qdev_set_parent_bus(DEVICE(&s->bitband[i]), sysbus_get_default());
-+    }
-+}
-+
-+static void armv7m_realize(DeviceState *dev, Error **errp)
-+{
-+    /* here realize our children */
-+    ARMv7MState *s = ARMV7M(dev);
-+    Error *err = NULL;
-+    int i;
-+    char **cpustr;
-+    ObjectClass *oc;
-+    const char *typename;
-+    CPUClass *cc;
-+
-+    cpustr = g_strsplit(s->cpu_model, ",", 2);
-+
-+    oc = cpu_class_by_name(TYPE_ARM_CPU, cpustr[0]);
-+    if (!oc) {
-+        error_setg(errp, "Unknown CPU model %s", cpustr[0]);
-+        g_strfreev(cpustr);
-+        return;
-+    }
-+
-+    cc = CPU_CLASS(oc);
-+    typename = object_class_get_name(oc);
-+    cc->parse_features(typename, cpustr[1], &err);
-+    g_strfreev(cpustr);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+
-+    s->cpu = ARM_CPU(object_new(typename));
-+    if (!s->cpu) {
-+        error_setg(errp, "Unknown CPU model %s", s->cpu_model);
-+        return;
-+    }
-+
-+    object_property_set_bool(OBJECT(s->cpu), true, "realized", &err);
-+    if (err != NULL) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+
-+    /* Note that we must realize the NVIC after the CPU */
-+    object_property_set_bool(OBJECT(&s->nvic), true, "realized", &err);
-+    if (err != NULL) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+
-+    /* Alias the NVIC's input and output GPIOs as our own so the board
-+     * code can wire them up. (We do this in realize because the
-+     * NVIC doesn't create the input GPIO array until realize.)
-+     */
-+    qdev_pass_gpios(DEVICE(&s->nvic), dev, NULL);
-+    qdev_pass_gpios(DEVICE(&s->nvic), dev, "SYSRESETREQ");
-+
-+    /* Wire the NVIC up to the CPU */
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->nvic), 0,
-+                       qdev_get_gpio_in(DEVICE(s->cpu), ARM_CPU_IRQ));
-+    s->cpu->env.nvic = &s->nvic;
-+
-+    for (i = 0; i < ARRAY_SIZE(s->bitband); i++) {
-+        Object *obj = OBJECT(&s->bitband[i]);
-+        SysBusDevice *sbd = SYS_BUS_DEVICE(&s->bitband[i]);
-+
-+        object_property_set_int(obj, bitband_input_addr[i], "base", &err);
-+        if (err != NULL) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+        object_property_set_bool(obj, true, "realized", &err);
-+        if (err != NULL) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+
-+        sysbus_mmio_map(sbd, 0, bitband_output_addr[i]);
-+    }
-+}
-+
-+static Property armv7m_properties[] = {
-+    DEFINE_PROP_STRING("cpu-model", ARMv7MState, cpu_model),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void armv7m_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = armv7m_realize;
-+    dc->props = armv7m_properties;
-+}
-+
-+static const TypeInfo armv7m_info = {
-+    .name = TYPE_ARMV7M,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(ARMv7MState),
-+    .instance_init = armv7m_instance_init,
-+    .class_init = armv7m_class_init,
-+};
-+
- static void armv7m_reset(void *opaque)
- {
-     ARMCPU *cpu = opaque;
-@@ -264,6 +379,7 @@ static const TypeInfo bitband_info = {
- static void armv7m_register_types(void)
- {
-     type_register_static(&bitband_info);
-+    type_register_static(&armv7m_info);
+-    uint32_t res;
+-
+-    res = *(uint32_t *)opaque;
+-    res |= (addr & 0x1ffffff) >> 5;
+-    return res;
+-
+-}
+-
+-static uint32_t bitband_readb(void *opaque, hwaddr offset)
+-{
+-    uint8_t v;
+-    cpu_physical_memory_read(bitband_addr(opaque, offset), &v, 1);
+-    return (v & (1 << ((offset >> 2) & 7))) != 0;
+-}
+-
+-static void bitband_writeb(void *opaque, hwaddr offset,
+-                           uint32_t value)
+-{
+-    uint32_t addr;
+-    uint8_t mask;
+-    uint8_t v;
+-    addr = bitband_addr(opaque, offset);
+-    mask = (1 << ((offset >> 2) & 7));
+-    cpu_physical_memory_read(addr, &v, 1);
+-    if (value & 1)
+-        v |= mask;
+-    else
+-        v &= ~mask;
+-    cpu_physical_memory_write(addr, &v, 1);
+-}
+-
+-static uint32_t bitband_readw(void *opaque, hwaddr offset)
+-{
+-    uint32_t addr;
+-    uint16_t mask;
+-    uint16_t v;
+-    addr = bitband_addr(opaque, offset) & ~1;
+-    mask = (1 << ((offset >> 2) & 15));
+-    mask = tswap16(mask);
+-    cpu_physical_memory_read(addr, &v, 2);
+-    return (v & mask) != 0;
+-}
+-
+-static void bitband_writew(void *opaque, hwaddr offset,
+-                           uint32_t value)
+-{
+-    uint32_t addr;
+-    uint16_t mask;
+-    uint16_t v;
+-    addr = bitband_addr(opaque, offset) & ~1;
+-    mask = (1 << ((offset >> 2) & 15));
+-    mask = tswap16(mask);
+-    cpu_physical_memory_read(addr, &v, 2);
+-    if (value & 1)
+-        v |= mask;
+-    else
+-        v &= ~mask;
+-    cpu_physical_memory_write(addr, &v, 2);
++    return s->base | (offset & 0x1ffffff) >> 5;
  }
  
- type_init(armv7m_register_types)
+-static uint32_t bitband_readl(void *opaque, hwaddr offset)
++static MemTxResult bitband_read(void *opaque, hwaddr offset,
++                                uint64_t *data, unsigned size, MemTxAttrs attrs)
+ {
+-    uint32_t addr;
+-    uint32_t mask;
+-    uint32_t v;
+-    addr = bitband_addr(opaque, offset) & ~3;
+-    mask = (1 << ((offset >> 2) & 31));
+-    mask = tswap32(mask);
+-    cpu_physical_memory_read(addr, &v, 4);
+-    return (v & mask) != 0;
++    BitBandState *s = opaque;
++    uint8_t buf[4];
++    MemTxResult res;
++    int bitpos, bit;
++    hwaddr addr;
++
++    assert(size <= 4);
++
++    /* Find address in underlying memory and round down to multiple of size */
++    addr = bitband_addr(s, offset) & (-size);
++    res = address_space_read(s->source_as, addr, attrs, buf, size);
++    if (res) {
++        return res;
++    }
++    /* Bit position in the N bytes read... */
++    bitpos = (offset >> 2) & ((size * 8) - 1);
++    /* ...converted to byte in buffer and bit in byte */
++    bit = (buf[bitpos >> 3] >> (bitpos & 7)) & 1;
++    *data = bit;
++    return MEMTX_OK;
+ }
+ 
+-static void bitband_writel(void *opaque, hwaddr offset,
+-                           uint32_t value)
++static MemTxResult bitband_write(void *opaque, hwaddr offset, uint64_t value,
++                                 unsigned size, MemTxAttrs attrs)
+ {
+-    uint32_t addr;
+-    uint32_t mask;
+-    uint32_t v;
+-    addr = bitband_addr(opaque, offset) & ~3;
+-    mask = (1 << ((offset >> 2) & 31));
+-    mask = tswap32(mask);
+-    cpu_physical_memory_read(addr, &v, 4);
+-    if (value & 1)
+-        v |= mask;
+-    else
+-        v &= ~mask;
+-    cpu_physical_memory_write(addr, &v, 4);
++    BitBandState *s = opaque;
++    uint8_t buf[4];
++    MemTxResult res;
++    int bitpos, bit;
++    hwaddr addr;
++
++    assert(size <= 4);
++
++    /* Find address in underlying memory and round down to multiple of size */
++    addr = bitband_addr(s, offset) & (-size);
++    res = address_space_read(s->source_as, addr, attrs, buf, size);
++    if (res) {
++        return res;
++    }
++    /* Bit position in the N bytes read... */
++    bitpos = (offset >> 2) & ((size * 8) - 1);
++    /* ...converted to byte in buffer and bit in byte */
++    bit = 1 << (bitpos & 7);
++    if (value & 1) {
++        buf[bitpos >> 3] |= bit;
++    } else {
++        buf[bitpos >> 3] &= ~bit;
++    }
++    return address_space_write(s->source_as, addr, attrs, buf, size);
+ }
+ 
+ static const MemoryRegionOps bitband_ops = {
+-    .old_mmio = {
+-        .read = { bitband_readb, bitband_readw, bitband_readl, },
+-        .write = { bitband_writeb, bitband_writew, bitband_writel, },
+-    },
++    .read_with_attrs = bitband_read,
++    .write_with_attrs = bitband_write,
+     .endianness = DEVICE_NATIVE_ENDIAN,
++    .impl.min_access_size = 1,
++    .impl.max_access_size = 4,
++    .valid.min_access_size = 1,
++    .valid.max_access_size = 4,
+ };
+ 
+ static void bitband_init(Object *obj)
+@@ -127,11 +97,30 @@ static void bitband_init(Object *obj)
+     BitBandState *s = BITBAND(obj);
+     SysBusDevice *dev = SYS_BUS_DEVICE(obj);
+ 
+-    memory_region_init_io(&s->iomem, obj, &bitband_ops, &s->base,
++    object_property_add_link(obj, "source-memory",
++                             TYPE_MEMORY_REGION,
++                             (Object **)&s->source_memory,
++                             qdev_prop_allow_set_link_before_realize,
++                             OBJ_PROP_LINK_UNREF_ON_RELEASE,
++                             &error_abort);
++    memory_region_init_io(&s->iomem, obj, &bitband_ops, s,
+                           "bitband", 0x02000000);
+     sysbus_init_mmio(dev, &s->iomem);
+ }
+ 
++static void bitband_realize(DeviceState *dev, Error **errp)
++{
++    BitBandState *s = BITBAND(dev);
++
++    if (!s->source_memory) {
++        error_setg(errp, "source-memory property not set");
++        return;
++    }
++
++    s->source_as = address_space_init_shareable(s->source_memory,
++                                                "bitband-source");
++}
++
+ /* Board init.  */
+ 
+ static const hwaddr bitband_input_addr[ARMV7M_NUM_BITBANDS] = {
+@@ -251,6 +240,8 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
+             error_propagate(errp, err);
+             return;
+         }
++        object_property_set_link(obj, OBJECT(s->board_memory),
++                                 "source-memory", &error_abort);
+         object_property_set_bool(obj, true, "realized", &err);
+         if (err != NULL) {
+             error_propagate(errp, err);
+@@ -366,6 +357,7 @@ static void bitband_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
++    dc->realize = bitband_realize;
+     dc->props = bitband_properties;
+ }
+ 
 -- 
 2.7.4
