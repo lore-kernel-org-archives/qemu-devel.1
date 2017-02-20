@@ -1,36 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cfmjn-0002BN-6k
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 07:06:40 -0500
+	(envelope-from <armbru@redhat.com>) id 1cfmkj-0002dR-Jc
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 07:07:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cfmjl-0007A0-Sb
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 07:06:39 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:44840 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cfmjl-00079q-Ce
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 07:06:37 -0500
-References: <8d7a5d17-7b1b-578a-67fc-c79beb196a4c@virtuozzo.com>
-	<20170217120935.GC5338@noname.redhat.com>
-	<fd790939-7ad7-1d74-c810-eceece98bbb7@virtuozzo.com>
-	<20170217124842.GE5338@noname.redhat.com>
-	<3a827d65-1028-d0fd-c3aa-cabe61dafbd9@openvz.org>
-	<20170217133430.GI5338@noname.redhat.com>
-	<635d98d9-0f65-4fa6-2208-02ff7d23a2e9@openvz.org>
-	<20170217142403.GJ5338@noname.redhat.com>
-	<89b7456e-e689-fdee-7ab0-89bb664f1cb6@virtuozzo.com>
-	<d41ae075-95db-6cf9-3cc7-58f2f337420b@openvz.org>
-	<20170220111535.GA4814@noname.redhat.com>
-	<72b9788d-e85d-b20d-b334-fe63154ba20d@openvz.org>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <32306648-f252-1045-ed12-0b049abd8ddf@virtuozzo.com>
-Date: Mon, 20 Feb 2017 15:06:22 +0300
+	(envelope-from <armbru@redhat.com>) id 1cfmki-0007Gh-KO
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 07:07:37 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1487161136-9018-1-git-send-email-armbru@redhat.com>
+	<575ab227-e44e-8d66-7b58-3e68e1df8491@redhat.com>
+	<878tp7tx98.fsf@dusky.pond.sub.org>
+	<ca73f39c-04b2-ce0b-1f80-5eef0e4861ce@redhat.com>
+Date: Mon, 20 Feb 2017 13:07:27 +0100
+In-Reply-To: <ca73f39c-04b2-ce0b-1f80-5eef0e4861ce@redhat.com> (Paolo
+	Bonzini's message of "Wed, 15 Feb 2017 14:19:21 +0100")
+Message-ID: <87poidkqv4.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <72b9788d-e85d-b20d-b334-fe63154ba20d@openvz.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v15 08/25] block: introduce auto-loading
- bitmaps
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] hw: Deprecate unwanted use -drive
+ if=scsi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,104 +26,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>, Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-20.02.2017 14:21, Denis V. Lunev wrote:
-> On 02/20/2017 12:15 PM, Kevin Wolf wrote:
->> Am 18.02.2017 um 11:54 hat Denis V. Lunev geschrieben:
->>> On 02/17/2017 03:54 PM, Vladimir Sementsov-Ogievskiy wrote:
->>>> 17.02.2017 17:24, Kevin Wolf wrote:
->>>>> Am 17.02.2017 um 14:48 hat Denis V. Lunev geschrieben:
->>>>>> On 02/17/2017 04:34 PM, Kevin Wolf wrote:
->>>>>>> Am 17.02.2017 um 14:22 hat Denis V. Lunev geschrieben:
->>>>>>>> But for sure this is bad from the downtime point of view.
->>>>>>>> On migrate you will have to write to the image and re-read
->>>>>>>> it again on the target. This would be very slow. This will
->>>>>>>> not help for the migration with non-shared disk too.
->>>>>>>>
->>>>>>>> That is why we have specifically worked in a migration,
->>>>>>>> which for a good does not influence downtime at all now.
->>>>>>>>
->>>>>>>> With a write we are issuing several write requests + sync.
->>>>>>>> Our measurements shows that bdrv_drain could take around
->>>>>>>> a second on an averagely loaded conventional system, which
->>>>>>>> seems unacceptable addition to me.
->>>>>>> I'm not arguing against optimising migration, I fully agree with
->>>>>>> you. I
->>>>>>> just think that we should start with a correct if slow base version
->>>>>>> and
->>>>>>> then add optimisation to that, instead of starting with a broken base
->>>>>>> version and adding to that.
->>>>>>>
->>>>>>> Look, whether you do the expensive I/O on open/close and make that a
->>>>>>> slow operation or whether you do it on invalidate_cache/inactivate
->>>>>>> doesn't really make a difference in term of slowness because in
->>>>>>> general
->>>>>>> both operations are called exactly once. But it does make a difference
->>>>>>> in terms of correctness.
->>>>>>>
->>>>>>> Once you do the optimisation, of course, you'll skip writing those
->>>>>>> bitmaps that you transfer using a different channel, no matter whether
->>>>>>> you skip it in bdrv_close() or in bdrv_inactivate().
->>>>>>>
->>>>>>> Kevin
->>>>>> I do not understand this point as in order to optimize this
->>>>>> we will have to create specific code path or option from
->>>>>> the migration code and keep this as an ugly kludge forever.
->>>>> The point that I don't understand is why it makes any difference for the
->>>>> follow-up migration series whether the writeout is in bdrv_close() or
->>>>> bdrv_inactivate(). I don't really see the difference between the two
->>>>> from a migration POV; both need to be skipped if we transfer the bitmap
->>>>> using a different channel.
->>>>>
->>>>> Maybe I would see the reason if I could find the time to look at the
->>>>> migration patches first, but unfortunately I don't have this time at the
->>>>> moment.
->>>>>
->>>>> My point is just that generally we want to have a correctly working qemu
->>>>> after every single patch, and even more importantly after every series.
->>>>> As the migration series is separate from this, I don't think it's a good
->>>>> excuse for doing worse than we could easily do here.
->>>>>
->>>>> Kevin
->>>> With open/close all is already ok - bitmaps will not be saved because
->>>> of BDRV_O_INACTIVE  and will not be loaded because of IN_USE.
->> If the contents of so-called persistent bitmaps is lost across
->> migration and stale after bdrv_invalidate_cache, that's not "all ok" in
->> my book. It's buggy.
->>
->>> in any case load/store happens outside of VM downtime.
->>> The target is running at the moment of close on source,
->>> the source is running at the moment of open on target.
->> Which makes the operation in open/close meaningless: open reads data
->> which may still by changed, and close cannot write to the image any more
->> because ownership is already given up.
->>
->> Anyway, all of this isn't really productive. Please, can't you just
->> answer that simple question that I asked you above: What problems would
->> you get if you used invalidate_cache/inactivate instead of open/close
->> for triggering these actions?
->>
->> If you can bring up some "this would break X", "it would be very hard to
->> implement Y correctly then" or "in scenario Z, this would have unwanted
->> effects", then we can figure out what to do. But not putting things in
->> the proper place just because you don't feel like it isn't a very strong
->> argument.
->>
->> Kevin
-> This will increase the downtime ~0.5-1 second for migrated VM
-> or will require very intrusive interface from migration code to
-> here to avoid bitmap save for inactivation on that path.
+Paolo Bonzini <pbonzini@redhat.com> writes:
+
+> On 15/02/2017 14:10, Markus Armbruster wrote:
+>> Paolo Bonzini <pbonzini@redhat.com> writes:
+>> 
+>>> On 15/02/2017 13:18, Markus Armbruster wrote:
+>>>> Drives defined with if=scsi get connected to buses created with
+>>>> -device, unlike other interface types.  Deprecate this usage.
+>>>>
+>>>> There is no good default SCSI HBA for PC machines.  Deprecate if=scsi
+>>>> there entirely.
+>>>>
+>>>> Before this series, frontends for -drive if=scsi get created by SCSI
+>>>> HBAs.  Frontends for other interface types get created by machine
+>>>> initialization.
+>>>>
+>>>> After this series, they get created by machine initialization, except
+>>>> for deprecated cases, which get created by new function
+>>>> scsi_legacy_handle_cmdline().
+>>>>
+>>>> Based on "[PATCH v3 0/8] More sensible default for -drive interface
+>>>> type".
+>>>>
+>>>> v2:
+>>>> * Trivially rebased
+>>>> * PATCH 2: Suppress warning for default drives
+>>>> * PATCH 3: Update user manual and qemu-iotests/051.pc.out
+>>>>
+>>>> Markus Armbruster (3):
+>>>>   hw/scsi: Concentrate -drive if=scsi auto-create in one place
+>>>>   hw: Deprecate -drive if=scsi with non-onboard HBAs
+>>>>   hw/i386: Deprecate -drive if=scsi with PC machine types
+>>>>
+>>>>  hw/arm/realview.c             |  2 +-
+>>>>  hw/arm/versatilepb.c          |  2 +-
+>>>>  hw/i386/pc.c                  |  6 +++++
+>>>>  hw/scsi/esp-pci.c             |  3 ---
+>>>>  hw/scsi/esp.c                 |  6 -----
+>>>>  hw/scsi/lsi53c895a.c          | 10 +++++---
+>>>>  hw/scsi/megasas.c             |  4 ----
+>>>>  hw/scsi/mptsas.c              |  4 ----
+>>>>  hw/scsi/scsi-bus.c            | 56 +++++++++++++++++++++++++++++++++++++------
+>>>>  hw/scsi/spapr_vscsi.c         |  5 ++--
+>>>>  hw/scsi/virtio-scsi.c         |  8 -------
+>>>>  include/hw/pci/pci.h          |  2 ++
+>>>>  include/hw/scsi/scsi.h        |  3 ++-
+>>>>  qemu-options.hx               |  5 ----
+>>>>  tests/qemu-iotests/051.pc.out | 12 ++++++----
+>>>>  vl.c                          | 10 ++++++++
+>>>>  16 files changed, 88 insertions(+), 50 deletions(-)
+>>>>
+>>>
+>>> Because of the ESC characters in 051.pc.out, please send the pull
+>>> request for this yourself.
+>> 
+>> Is that an Acked-by?
 >
-> No other arguments so far.
->
-> Den
+> Not a sufficient one because the patch touches files outside my area of
+> maintenance, but for hw/scsi you can treat it as one.
 
-Ok. Finally, I'll make v16 with load/store in inactivate/invalidate. It 
-will not be too hard to change this back if really needed.
+Okay, that covers PATCH 1/3.
 
+What about PATCH 3/3?  It's actually your idea...
 
--- 
-Best regards,
-Vladimir
+Message-ID: <3512807d-d04e-50fa-9fcf-d1d5ba8ac350@redhat.com>
+https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg05037.html
