@@ -1,35 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47123)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1cfqPE-00049I-2L
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 11:01:41 -0500
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1cfqRM-0006O6-Ia
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 11:03:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1cfqP9-0004K6-5t
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 11:01:40 -0500
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:30162)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1cfqP8-0004JZ-UU
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 11:01:35 -0500
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout1.w1.samsung.com
-	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
-	2014)) with ESMTP id <0OLO006N9KIHFW90@mailout1.w1.samsung.com> for
-	qemu-devel@nongnu.org; Mon, 20 Feb 2017 16:01:29 +0000 (GMT)
-Date: Mon, 20 Feb 2017 19:01:26 +0300
-From: Alexey Perevalov <a.perevalov@samsung.com>
-Message-id: <20170220160118.GA11004@aperevalov-ubuntu>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
-Content-disposition: inline
-In-reply-to: <20170217164730.GU25530@redhat.com>
-References: <20170206173306.20603-1-dgilbert@redhat.com>
-	<20170206174529.GI2524@work-vm>
-	<CGME20170213171108eucas1p147999fc8b6980ff89a67626b78b12e44@eucas1p1.samsung.com>
-	<20170213171058.GA4246@aperevalov-ubuntu>
-	<20170213175722.GG25530@redhat.com>
-	<20170214144817.GA4324@aperevalov-ubuntu>
-	<20170217164730.GU25530@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 00/16] Postcopy: Hugepage support
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1cfqRH-0004ys-Iu
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 11:03:52 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39856)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1cfqRH-0004yM-9i
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 11:03:47 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1KFdOPn141450
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 11:03:45 -0500
+Received: from e24smtp01.br.ibm.com (e24smtp01.br.ibm.com [32.104.18.85])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28qw8ws3hf-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 11:03:44 -0500
+Received: from localhost
+	by e24smtp01.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Mon, 20 Feb 2017 13:03:41 -0300
+Received: from d24relay02.br.ibm.com (d24relay02.br.ibm.com [9.18.232.42])
+	by d24dlp02.br.ibm.com (Postfix) with ESMTP id A85601DC006D
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 11:03:40 -0500 (EST)
+Received: from d24av04.br.ibm.com (d24av04.br.ibm.com [9.8.31.97])
+	by d24relay02.br.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v1KG3dYi32112794
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 13:03:39 -0300
+Received: from d24av04.br.ibm.com (localhost [127.0.0.1])
+	by d24av04.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+	v1KG3cIE010467
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 13:03:39 -0300
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Mon, 20 Feb 2017 13:03:16 -0300
+Message-Id: <20170220160316.16803-1-danielhb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2] Changing error message of QMP
+ 'migrate_set_downtime' to seconds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,70 +47,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Arcangeli <aarcange@redhat.com>
-Cc: qemu-devel@nongnu.org, Mike Kravetz <mike.kravetz@oracle.com>, kravetz@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, quintela@redhat.com
+To: qemu-devel@nongnu.org
+Cc: quintela@redhat.com, dgilbert@redhat.com
 
-Hello Andrea,
+The previous error message was displaying the values in miliseconds,
+being misleading with the command that accepts the value in seconds:
 
+{ "execute": "migrate_set_downtime", "arguments": {"value": 3000}}
+{"error": {"class": "GenericError", "desc": "Parameter 'downtime_limit'
+expects an integer in the range of 0 to 2000000 milliseconds"}}
 
-On Fri, Feb 17, 2017 at 05:47:30PM +0100, Andrea Arcangeli wrote:
-> Hello Alexey,
-> 
-> On Tue, Feb 14, 2017 at 05:48:25PM +0300, Alexey Perevalov wrote:
-> > On Mon, Feb 13, 2017 at 06:57:22PM +0100, Andrea Arcangeli wrote:
-> > > Hello,
-> > > 
-> > > On Mon, Feb 13, 2017 at 08:11:06PM +0300, Alexey Perevalov wrote:
-> > > > Another one request.
-> > > > QEMU could use mem_path in hugefs with share key simultaneously
-> > > > (-object memory-backend-file,id=mem,size=${mem_size},mem-path=${mem_path},share=on) and vm
-> > > > in this case will start and will properly work (it will allocate memory
-> > > > with mmap), but in case of destination for postcopy live migration
-> > > > UFFDIO_COPY ioctl will fail for
-> > > > such region, in Arcangeli's git tree there is such prevent check
-> > > > (if (!vma_is_shmem(dst_vma) && dst_vma->vm_flags & VM_SHARED).
-> > > > Is it possible to handle such situation at qemu?
-> > > 
-> > > It'd be nice to lift this hugetlbfs !VM_SHARED restriction I agree, I
-> > > already asked Mike (CC'ed) why is there, because I'm afraid it's a
-> > > leftover from the anon version where VM_SHARED means a very different
-> > > thing but it was already lifted for shmem. share=on should already
-> > > work on top of tmpfs and also with THP on tmpfs enabled.
-> > > 
-> > > For hugetlbfs and shmem it should be generally more complicated to
-> > > cope with private mappings than shared ones, shared is just the native
-> > > form of the pseudofs without having to deal with private COWs aliases
-> > > so it's hard to imagine something going wrong for VM_SHARED if the
-> > > MAP_PRIVATE mapping already works fine. If it turns out to be
-> > > superflous the check may be just turned into
-> > > "vma_is_anonymous(dst_vma) && dst_vma->vm_flags & VM_SHARED".
-> > 
-> > Great, as I know  -netdev type=vhost-user requires share=on in
-> > -object memory-backend in ovs-dpdk scenario
-> > http://wiki.qemu-project.org/Documentation/vhost-user-ovs-dpdk
-> 
-> share=on should work now with current aa.git userfault branch, and the
-> support is already included in -mm, it should all get merged upstream
-> in kernel 4.11.
-> 
-> Could you test the current aa.git userfault branch to verify postcopy
-> live migration works fine on hugetlbfs share=on?
->
+This patch changes it to '2000 seconds' to keep consistency with
+the expected parameter. The macro 'QERR_INVALID_PARAMETER_VALUE'
+was changed for a regular string that allows the use of the
+MAX_MIGRATE_SET_DOWNTIME as a parameter, instead of hardcoding
+the value in the error message.
 
-Yes, I already checked with you suggestion of using another check
-"vma_is_anonymous(dst_vma) && dst_vma->vm_flags & VM_SHARED", but in
-this case dst page was anonymous after successfully passed ioctl.
+Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+---
+ migration/migration.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-There is no such bug in latest aa.git now.
-"userfaultfd: hugetlbfs: add UFFDIO_COPY support for shared mappings"
-solved issue with anonymous page after UFFDIO_COPY.
-
-
-> Thanks!
-> Andrea
-> 
-
+diff --git a/migration/migration.c b/migration/migration.c
+index c6ae69d..c05e764 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -49,6 +49,9 @@
+  * for sending the last part */
+ #define DEFAULT_MIGRATE_SET_DOWNTIME 300
+ 
++/* Maximum migrate downtime set to 2000*1000 miliseconds */
++#define MAX_MIGRATE_SET_DOWNTIME (2000 * 1000)
++
+ /* Default compression thread count */
+ #define DEFAULT_MIGRATE_COMPRESS_THREAD_COUNT 8
+ /* Default decompression thread count, usually decompression is at
+@@ -843,10 +846,11 @@ void qmp_migrate_set_parameters(MigrationParameters *params, Error **errp)
+         return;
+     }
+     if (params->has_downtime_limit &&
+-        (params->downtime_limit < 0 || params->downtime_limit > 2000000)) {
+-        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+-                   "downtime_limit",
+-                   "an integer in the range of 0 to 2000000 milliseconds");
++        (params->downtime_limit < 0 ||
++         params->downtime_limit > MAX_MIGRATE_SET_DOWNTIME)) {
++        error_setg(errp, "Parameter 'downtime_limit' expects an integer in "
++                         "the range of 0 to %d seconds",
++                         MAX_MIGRATE_SET_DOWNTIME / 1000);
+         return;
+     }
+     if (params->has_x_checkpoint_delay && (params->x_checkpoint_delay < 0)) {
 -- 
-
-BR
-Alexey
+2.9.3
