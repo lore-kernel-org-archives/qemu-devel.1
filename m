@@ -1,32 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cfk8z-00022S-VR
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:20:30 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cfkLS-0006cZ-Oj
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:33:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cfk8w-0002pw-PL
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:20:29 -0500
-Received: from [45.249.212.187] (port=2534 helo=dggrg01-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cfk8w-0002oW-4N
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:20:26 -0500
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Mon, 20 Feb 2017 09:19:01 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA1C13C3@DGGEMA505-MBX.china.huawei.com>
-References: <589C099A.9090605@huawei.com>
-	<AF60004D-7133-44D1-8A9F-7DB9822D84AF@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA1B4379@DGGEMA505-MBX.china.huawei.com>
-	<105e5774-38c3-0683-ca08-64f6ed53c643@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA1B6988@DGGEMA505-MBX.china.huawei.com>
-	<2127602137.20489688.1486827559449.JavaMail.zimbra@redhat.com>
-	<1486980300.17184.28.camel@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA1BD1CA@DGGEMA505-MBX.china.huawei.com>
-	<ea1dbe94-7343-ef9e-56e1-9c6d8bcd78d6@redhat.com>
-In-Reply-To: <ea1dbe94-7343-ef9e-56e1-9c6d8bcd78d6@redhat.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Help] Windows2012 as Guest 64+cores on KVM Halts
+	(envelope-from <stefanha@redhat.com>) id 1cfkLO-00077U-1N
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:33:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44036)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cfkLN-00076m-QQ
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:33:17 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Mon, 20 Feb 2017 09:32:40 +0000
+Message-Id: <20170220093304.20515-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PULL 00/24] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,23 +21,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Vadim Rozenfeld <vrozenfe@redhat.com>
-Cc: Yan Vugenfirer <yvugenfi@redhat.com>, Hangaohuai <hangaohuai@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Radim Krcmar <rkrcmar@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-SGkgUGFvbG8sDQoNCj4gDQo+IA0KPiBPbiAxNi8wMi8yMDE3IDAyOjMxLCBHb25nbGVpIChBcmVp
-KSB3cm90ZToNCj4gPiBBbmQgdGhlIGJlbG93IHBhdGNoIHdvcmtzIGZvciBtZSwgSSBjYW4gc3Vw
-cG9ydCBtYXggMjU1IHZjcHVzIGZvciBXUzIwMTINCj4gPiB3aXRoIGh5cGVyLXYgZW5saWdodGVu
-bWVudHMuDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvdGFyZ2V0L2kzODYva3ZtLmMgYi90YXJnZXQv
-aTM4Ni9rdm0uYw0KPiA+IGluZGV4IDI3ZmQwNTAuLmVmZTNjYmMgMTAwNjQ0DQo+ID4gLS0tIGEv
-dGFyZ2V0L2kzODYva3ZtLmMNCj4gPiArKysgYi90YXJnZXQvaTM4Ni9rdm0uYw0KPiA+IEBAIC03
-NzIsNyArNzcyLDcgQEAgaW50IGt2bV9hcmNoX2luaXRfdmNwdShDUFVTdGF0ZSAqY3MpDQo+ID4N
-Cj4gPiAgICAgICAgICBjID0gJmNwdWlkX2RhdGEuZW50cmllc1tjcHVpZF9pKytdOw0KPiA+ICAg
-ICAgICAgIGMtPmZ1bmN0aW9uID0gSFlQRVJWX0NQVUlEX0lNUExFTUVOVF9MSU1JVFM7DQo+ID4g
-LSAgICAgICAgYy0+ZWF4ID0gMHg0MDsNCj4gPiArICAgICAgICBjLT5lYXggPSAtMTsNCj4gPiAg
-ICAgICAgICBjLT5lYnggPSAweDQwOw0KPiA+DQo+ID4gICAgICAgICAga3ZtX2Jhc2UgPSBLVk1f
-Q1BVSURfU0lHTkFUVVJFX05FWFQ7DQo+IA0KPiBUaGlzIG5lZWRzIHRvIGRlcGVuZCBvbiB0aGUg
-bWFjaGluZSB0eXBlLCBidXQgYXBhcnQgZnJvbSB0aGF0IEkgdGhpbmsNCg0KSSBkb24ndCBrbm93
-IHdoeS4gQmVjYXVzZSB0aGUgbmVnYXRpdmUgZWZmZWN0cyBmb3IgdGhpcyBjaGFuZ2UgZG9uJ3Qg
-ZXhpc3QNCm9uIGN1cnJlbnQgUUVNVSBJSVVDLCBhbmQgd2UgZG9uJ3QgaGF2ZSBjb21wYXRpYmxl
-IHByb2JsZW1zIGZvciBsaXZlIG1pZ3JhdGlvbi4NCg0KPiB5b3Ugc2hvdWxkIHN1Ym1pdCB0aGUg
-cGF0Y2ggZm9yIDIuOS4NCj4gDQoNClRoYW5rcywNCi1Hb25nbGVpDQo=
+The following changes since commit 5dae13cd71f0755a1395b5a4cde635b8a6ee3f58:
+
+  Merge remote-tracking branch 'remotes/rth/tags/pull-or-20170214' into staging (2017-02-14 09:55:48 +0000)
+
+are available in the git repository at:
+
+  git://github.com/stefanha/qemu.git tags/block-pull-request
+
+for you to fetch changes up to decc18f33adecb1316437a47fff0cf0a7665906a:
+
+  coroutine-lock: make CoRwlock thread-safe and fair (2017-02-16 17:17:34 +0000)
+
+----------------------------------------------------------------
+
+----------------------------------------------------------------
+
+Paolo Bonzini (24):
+  block: move AioContext, QEMUTimer, main-loop to libqemuutil
+  aio: introduce aio_co_schedule and aio_co_wake
+  block-backend: allow blk_prw from coroutine context
+  test-thread-pool: use generic AioContext infrastructure
+  io: add methods to set I/O handlers on AioContext
+  io: make qio_channel_yield aware of AioContexts
+  nbd: convert to use qio_channel_yield
+  coroutine-lock: reschedule coroutine on the AioContext it was running
+    on
+  blkdebug: reschedule coroutine on the AioContext it is running on
+  qed: introduce qed_aio_start_io and qed_aio_next_io_cb
+  aio: push aio_context_acquire/release down to dispatching
+  block: explicitly acquire aiocontext in timers that need it
+  block: explicitly acquire aiocontext in callbacks that need it
+  block: explicitly acquire aiocontext in bottom halves that need it
+  block: explicitly acquire aiocontext in aio callbacks that need it
+  aio-posix: partially inline aio_dispatch into aio_poll
+  async: remove unnecessary inc/dec pairs
+  block: document fields protected by AioContext lock
+  coroutine-lock: make CoMutex thread-safe
+  coroutine-lock: add limited spinning to CoMutex
+  test-aio-multithread: add performance comparison with thread-based
+    mutexes
+  coroutine-lock: place CoMutex before CoQueue in header
+  coroutine-lock: add mutex argument to CoQueue APIs
+  coroutine-lock: make CoRwlock thread-safe and fair
+
+ Makefile.objs                       |   4 -
+ stubs/Makefile.objs                 |   1 +
+ tests/Makefile.include              |  19 +-
+ util/Makefile.objs                  |   6 +-
+ block/nbd-client.h                  |   2 +-
+ block/qed.h                         |   3 +
+ include/block/aio.h                 |  38 ++-
+ include/block/block_int.h           |  64 +++--
+ include/io/channel.h                |  72 +++++-
+ include/qemu/coroutine.h            |  84 ++++---
+ include/qemu/coroutine_int.h        |  11 +-
+ include/sysemu/block-backend.h      |  14 +-
+ tests/iothread.h                    |  25 ++
+ block/backup.c                      |   2 +-
+ block/blkdebug.c                    |   9 +-
+ block/blkreplay.c                   |   2 +-
+ block/block-backend.c               |  13 +-
+ block/curl.c                        |  44 +++-
+ block/gluster.c                     |   9 +-
+ block/io.c                          |  42 +---
+ block/iscsi.c                       |  15 +-
+ block/linux-aio.c                   |  10 +-
+ block/mirror.c                      |  12 +-
+ block/nbd-client.c                  | 119 +++++----
+ block/nfs.c                         |   9 +-
+ block/qcow2-cluster.c               |   4 +-
+ block/qed-cluster.c                 |   2 +
+ block/qed-table.c                   |  12 +-
+ block/qed.c                         |  58 +++--
+ block/sheepdog.c                    |  31 +--
+ block/ssh.c                         |  29 +--
+ block/throttle-groups.c             |   4 +-
+ block/win32-aio.c                   |   9 +-
+ dma-helpers.c                       |   2 +
+ hw/9pfs/9p.c                        |   2 +-
+ hw/block/virtio-blk.c               |  19 +-
+ hw/scsi/scsi-bus.c                  |   2 +
+ hw/scsi/scsi-disk.c                 |  15 ++
+ hw/scsi/scsi-generic.c              |  20 +-
+ hw/scsi/virtio-scsi.c               |   6 +
+ io/channel-command.c                |  13 +
+ io/channel-file.c                   |  11 +
+ io/channel-socket.c                 |  16 +-
+ io/channel-tls.c                    |  12 +
+ io/channel-watch.c                  |   6 +
+ io/channel.c                        |  97 ++++++--
+ nbd/client.c                        |   2 +-
+ nbd/common.c                        |   9 +-
+ nbd/server.c                        |  94 +++-----
+ stubs/linux-aio.c                   |  32 +++
+ stubs/set-fd-handler.c              |  11 -
+ tests/iothread.c                    |  91 +++++++
+ tests/test-aio-multithread.c        | 463 ++++++++++++++++++++++++++++++++++++
+ tests/test-thread-pool.c            |  12 +-
+ aio-posix.c => util/aio-posix.c     |  62 ++---
+ aio-win32.c => util/aio-win32.c     |  30 +--
+ util/aiocb.c                        |  55 +++++
+ async.c => util/async.c             |  84 ++++++-
+ iohandler.c => util/iohandler.c     |   0
+ main-loop.c => util/main-loop.c     |   0
+ util/qemu-coroutine-lock.c          | 254 ++++++++++++++++++--
+ util/qemu-coroutine-sleep.c         |   2 +-
+ util/qemu-coroutine.c               |   8 +
+ qemu-timer.c => util/qemu-timer.c   |   0
+ thread-pool.c => util/thread-pool.c |   8 +-
+ trace-events                        |  11 -
+ util/trace-events                   |  17 +-
+ 67 files changed, 1711 insertions(+), 533 deletions(-)
+ create mode 100644 tests/iothread.h
+ create mode 100644 stubs/linux-aio.c
+ create mode 100644 tests/iothread.c
+ create mode 100644 tests/test-aio-multithread.c
+ rename aio-posix.c => util/aio-posix.c (94%)
+ rename aio-win32.c => util/aio-win32.c (95%)
+ create mode 100644 util/aiocb.c
+ rename async.c => util/async.c (82%)
+ rename iohandler.c => util/iohandler.c (100%)
+ rename main-loop.c => util/main-loop.c (100%)
+ rename qemu-timer.c => util/qemu-timer.c (100%)
+ rename thread-pool.c => util/thread-pool.c (97%)
+
+-- 
+2.9.3
