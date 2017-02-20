@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cfnwi-0007H8-IN
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 08:24:05 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cfnxD-0007i9-4M
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 08:24:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cfnwh-0007fd-HW
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 08:24:04 -0500
-Date: Mon, 20 Feb 2017 08:23:55 -0500 (EST)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <49937814.23682538.1487597035306.JavaMail.zimbra@redhat.com>
-In-Reply-To: <878tp1yp4l.fsf@dusky.pond.sub.org>
-References: <1487161136-9018-1-git-send-email-armbru@redhat.com>
-	<575ab227-e44e-8d66-7b58-3e68e1df8491@redhat.com>
-	<878tp7tx98.fsf@dusky.pond.sub.org>
-	<ca73f39c-04b2-ce0b-1f80-5eef0e4861ce@redhat.com>
-	<87poidkqv4.fsf@dusky.pond.sub.org>
-	<35ce9aed-b82a-3270-a4a9-12f2e1782b9d@redhat.com>
-	<878tp1yp4l.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] hw: Deprecate unwanted use -drive
- if=scsi
+	(envelope-from <kraxel@redhat.com>) id 1cfnx8-0007lU-Rw
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 08:24:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34436)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cfnx8-0007l6-M4
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 08:24:30 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D894AC05681A
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 13:24:30 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 20 Feb 2017 14:24:25 +0100
+Message-Id: <1487597065-27023-3-git-send-email-kraxel@redhat.com>
+In-Reply-To: <1487597065-27023-1-git-send-email-kraxel@redhat.com>
+References: <1487597065-27023-1-git-send-email-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 2/2] egl-helpers: Support newer MESA versions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,23 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: kwolf@redhat.com, peter maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Frediano Ziglio <fziglio@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-> >>>> Is that an Acked-by?
-> >>>
-> >>> Not a sufficient one because the patch touches files outside my area of
-> >>> maintenance, but for hw/scsi you can treat it as one.
-> >> 
-> >> Okay, that covers PATCH 1/3.
-> >> 
-> >> What about PATCH 3/3?  It's actually your idea...
-> >
-> > Yep, hw/i386 too I guess.
-> 
-> Do you mean the he/i386 part of PATCH 2/3?  How would I express that?
-> Acked-by goes into the commit message, not individual files...
+From: Frediano Ziglio <fziglio@redhat.com>
 
-I mean that you only need Peter to ack now.
+According to
+https://www.khronos.org/registry/EGL/extensions/MESA/EGL_MESA_platform_gbm.txt
+if MESA_platform_gbm is supported display should be initialized
+from a GBM handle using eglGetPlatformDisplayEXT.
 
-Paolo
+Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
+Message-id: 20170220095055.4234-1-fziglio@redhat.com
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ ui/egl-helpers.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
+index 417462b..584dd1b 100644
+--- a/ui/egl-helpers.c
++++ b/ui/egl-helpers.c
+@@ -223,7 +223,11 @@ int qemu_egl_init_dpy(EGLNativeDisplayType dpy, bool gles, bool debug)
+     }
+ 
+     egl_dbg("eglGetDisplay (dpy %p) ...\n", dpy);
++#ifdef EGL_MESA_platform_gbm
++    qemu_egl_display = eglGetPlatformDisplayEXT(EGL_PLATFORM_GBM_MESA, dpy, NULL);
++#else
+     qemu_egl_display = eglGetDisplay(dpy);
++#endif
+     if (qemu_egl_display == EGL_NO_DISPLAY) {
+         error_report("egl: eglGetDisplay failed");
+         return -1;
+-- 
+1.8.3.1
