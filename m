@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cfkRJ-0003Uh-PO
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:39:26 -0500
+	(envelope-from <berrange@redhat.com>) id 1cfkWQ-0008Ai-RF
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:44:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cfkRE-0000kf-Pw
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:39:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34618)
+	(envelope-from <berrange@redhat.com>) id 1cfkWO-0002Oz-1Q
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:44:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47736)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cfkRE-0000kJ-KP
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:39:20 -0500
-Date: Mon, 20 Feb 2017 09:39:14 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170220093914.GB2372@work-vm>
-References: <0f8f3bd3-04d2-7213-2afb-ea75507eced6@linux.vnet.ibm.com>
-	<be5d706e-edd8-3428-971d-59f9df5b91d1@de.ibm.com>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cfkWN-0002OM-R3
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:44:39 -0500
+Date: Mon, 20 Feb 2017 09:44:26 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170220094426.GB15874@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <CAAo6VWOAnGQeDwc_bJ4M=FQsu7rOhAv=1Qk6PdzG+0pcVnku=A@mail.gmail.com>
+	<20170217214215.GK19045@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <be5d706e-edd8-3428-971d-59f9df5b91d1@de.ibm.com>
-Subject: Re: [Qemu-devel] Error handling for KVM_GET_DIRTY_LOG
+In-Reply-To: <20170217214215.GK19045@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
+ block device type called "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Janosch Frank <frankja@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Jeff Cody <jcody@redhat.com>
+Cc: ashish mittal <ashmit602@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <ashish.mittal@veritas.com>, Stefan Hajnoczi <stefanha@gmail.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
 
-* Christian Borntraeger (borntraeger@de.ibm.com) wrote:
-> On 02/16/2017 03:51 PM, Janosch Frank wrote:
-> > While trying to fix a bug in the s390 migration code, I noticed that
-> > QEMU ignores practically all errors returned from that VM ioctl. QEMU
-> > behaves as specified in the KVM api and only processes -1 (-EPERM) as an
-> > error.
+On Fri, Feb 17, 2017 at 04:42:15PM -0500, Jeff Cody wrote:
+> On Thu, Feb 16, 2017 at 02:24:19PM -0800, ashish mittal wrote:
+> > Hi,
 > > 
-> > Unfortunately the documentation is wrong/old and KVM may return -EFAULT,
-> > -EINVAL, -ENOTSUPP (BookE) and -ENOENT. This bugs me, as I found a case
-> > where I want to return -EFAULT because of guest memory problems and QEMU
-> > will still happily migrate the VM.
+> > I am getting the following error with checkpatch.pl
 > > 
-> > I currently don't see a reason why we continue to migrate on EFAULT and
-> > EINVAL. But returning -error from kvm_physical_sync_dirty_bitmap might
-> > also a bit hard, as it kills QEMU.
+> > ERROR: externs should be avoided in .c files
+> > #78: FILE: block/vxhs.c:28:
+> > +QemuUUID qemu_uuid __attribute__ ((weak));
 > > 
-> > Do we want to fix this and if, how do we want it done?
-> > If not we at least have a definitive mail to point to when the next one
-> > comes around. I also have a KVM patch to update the api documentation if
-> > wanted (maybe we should dust that off a bit anyhow).
+> > Is there any way to get around this, or does it mean that I would have
+> > to add a vxhs.h just for this one entry?
+> >
 > 
-> I think we want to handle _ALL_ error of that ioctl. Instead of aborting
-> QEMU we might just want to abort the migration  in that case?
+> I remain skeptical on the use of the qemu_uuid as a way to select the TLS
+> cert.
 
-Yes, I don't see any reason to kill the source guest.
+Yes, we should not be hardcoding arbitrary path lookup policies like that
+in QEMU. The libqnio API should allow QEMU to specify what paths it wants
+to use for certs directly. That allows the admin the flexibility to decide
+their own policy for where to put certs and the policy on which certs are
+used for which purpose.
 
-> > This has been brought up in 2009 [1] the first time and was more or less
-> > fixed and then reverted in 2014 [2].
-> > 
-> > The reason in [1] was that PPC hadn't settled yet on a valid return code.
-> > 
-> > In [2] it was too close to the v2 to handle it properly.
-> > 
-> > 
-> > [1] https://lists.nongnu.org/archive/html/qemu-devel/2009-07/msg01772.html
-> > 
-> > [2] https://lists.nongnu.org/archive/html/qemu-devel/2014-04/msg01993.html
-> 
-> So back then it was just too close to 2.0 and should have been revisited for 
-> 2.1. Lets now fix it for 2.9?
-
-Yes
-
-Dave
-
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
