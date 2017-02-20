@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1cfuns-0001Z5-JH
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:43:25 -0500
+	(envelope-from <marcel@redhat.com>) id 1cfunt-0001a5-Ru
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:43:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1cfunp-0008SX-HJ
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:43:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58716)
+	(envelope-from <marcel@redhat.com>) id 1cfuns-0008VR-Tc
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:43:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34272)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1cfunp-0008S7-BM
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:43:21 -0500
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1cfuns-0008Uc-No
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:43:24 -0500
 Received: from int-mx10.intmail.prod.int.phx2.redhat.com
 	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A7017B0831
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 20:43:20 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D2BD68047A
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 20:43:24 +0000 (UTC)
 From: Marcel Apfelbaum <marcel@redhat.com>
-Date: Mon, 20 Feb 2017 22:43:09 +0200
-Message-Id: <1487623393-2492-1-git-send-email-marcel@redhat.com>
-Subject: [Qemu-devel] [PATCH V2 0/4] hw/virtio: fix several PCI Express
- compliance issues
+Date: Mon, 20 Feb 2017 22:43:10 +0200
+Message-Id: <1487623393-2492-2-git-send-email-marcel@redhat.com>
+In-Reply-To: <1487623393-2492-1-git-send-email-marcel@redhat.com>
+References: <1487623393-2492-1-git-send-email-marcel@redhat.com>
+Subject: [Qemu-devel] [PATCH V2 1/4] hw/pcie: fix Extended Configuration
+ Space for devices with no Extended Capabilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,62 +33,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mst@redhat.com, marcel@redhat.com
 
-v1 -> v2:
-  - Added compat properties (Michael S. Tsirkin)
-  - Rebased on latest master
-  - Regarding the patch 1/4, we don't need to init the PCI "standard"
-    config capabilities to 0 since they are "protected" by the Capabilities List bit
-   (bit 4) to indicate that the Capabilities Pointer is located at offset 34h.
+Absence of any Extended Capabilities is required to be
+indicated by an Extended Capability header with a Capability ID of
+0000h, a Capability Version of 0h, and a Next Capability Offset of 000h.
 
+Instead of inserting a 'NULL' capability is simpler to mark the start
+of the Extended Configuration Space as read-only to achieve the same
+behaviour.
 
-Fix a few issues found while running WHQL tests:
+Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+---
+ hw/pci/pci.c         | 2 ++
+ hw/pci/pcie.c        | 6 ++++++
+ include/hw/compat.h  | 4 ++++
+ include/hw/pci/pci.h | 2 ++
+ 4 files changed, 14 insertions(+)
 
- - Assertion 1F27399E-30B9-44BC-8908-D6E6F3836212: FAILED. Enhanced Capability Header register
-   of the PCI Express Enhanced Capabilities Absent Indicator table must be read-only .
-
-   Solved in patch 1/4
-
- - Assertion 47C39833-84AD-44EA-9723-0695202ADDEA: FAILED. Bit 0 (Correctable Error Reporting Enable)
-   in the Device Control register (offset 8h) in the PCI Express Capability table must be read-writable .
- - Assertion 5CBA2A63-A48E-4443-85FA-A7DCD8EA47BC: FAILED. Bit 1 (Non-Fatal Error Reporting Enable)
-   in the Device Control register (offset 8h) in the PCI Express Capability table must be read-writable .
- - Assertion 0AB06F7C-59CB-4F9A-8363-B51B1ACAB54F: FAILED. Bit 2 (Fatal Error Reporting Enable)
-   in the Device Control register (offset 8h) in the PCI Express Capability table must be read-writable .
- - Assertion E3834E4A-A7BD-410C-9A61-FA91770D2A71: FAILED. Bit 3 (Unsupported Request Reporting Enable)
-   in the Device Control register (offset 8h) in the PCI Express Capability table must be read-writable 
-
-   Solved in patch 2/4
-
- - Assertion 1587DC0B-FE59-494E-85B5-C2A59D0CC098: FAILED. Bit 6 (Common Clock Configuration)
-   in the Link Control register (offset 10h) in the PCI Express Capability table must be read-writable .
- - Assertion 13DD25A3-07E4-4477-BE0F-2273BBB32174: FAILED. Bit 7 (Extended Synch) in the Link Control
-   register (offset 10h) in the PCI Express Capability table must be read-writable .
-
-  Solved in patch 3/4
-
-  - AM Assertion 06779BD9-0C35-4CA1-9EB3-96E7DA9A74F8: FAILED. Bit range 1:0 (PowerState)in
-    the Power Management Control/Status register (offset 4h) in the Power Management Capability table is 0h.
-    It must be 3h after a supported D3 transition. 
-
-Thanks,
-Marcel
-
-Marcel Apfelbaum (4):
-  hw/pcie: fix Extended Configuration Space for devices with no Extended
-    Capabilities
-  hw/virtio: fix error enabling flags in Device Control register
-  hw/virtio: fix Link Control Register for PCI Express virtio devices
-  hw/virtio: fix Power Management Control Register for PCI Express
-    virtio devices
-
- hw/pci/pci.c           |  2 ++
- hw/pci/pcie.c          | 20 ++++++++++++++++++++
- hw/virtio/virtio-pci.c | 31 +++++++++++++++++++++++++++++++
- hw/virtio/virtio-pci.h | 12 ++++++++++++
- include/hw/compat.h    | 16 ++++++++++++++++
- include/hw/pci/pci.h   |  2 ++
- include/hw/pci/pcie.h  |  5 +++++
- 7 files changed, 88 insertions(+)
-
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index a563555..4d2c0e1 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -64,6 +64,8 @@ static Property pci_props[] = {
+                     QEMU_PCI_CAP_SERR_BITNR, true),
+     DEFINE_PROP_BIT("x-pcie-lnksta-dllla", PCIDevice, cap_present,
+                     QEMU_PCIE_LNKSTA_DLLLA_BITNR, true),
++    DEFINE_PROP_BIT("x-pcie-extcap-init", PCIDevice, cap_present,
++                    QEMU_PCIE_EXTCAP_INIT_BITNR, true),
+     DEFINE_PROP_END_OF_LIST()
+ };
+ 
+diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+index cbd4bb4..2526e3a 100644
+--- a/hw/pci/pcie.c
++++ b/hw/pci/pcie.c
+@@ -109,6 +109,12 @@ int pcie_cap_init(PCIDevice *dev, uint8_t offset, uint8_t type, uint8_t port)
+                  PCI_EXP_DEVCAP2_EFF | PCI_EXP_DEVCAP2_EETLPP);
+ 
+     pci_set_word(dev->wmask + pos + PCI_EXP_DEVCTL2, PCI_EXP_DEVCTL2_EETLPPB);
++
++    if (dev->cap_present & QEMU_PCIE_EXTCAP_INIT) {
++        /* read-only to behave like a 'NULL' Extended Capability Header */
++        pci_set_long(dev->wmask + PCI_CONFIG_SPACE_SIZE, 0);
++    }
++
+     return pos;
+ }
+ 
+diff --git a/include/hw/compat.h b/include/hw/compat.h
+index b7db438..ce3bfe3 100644
+--- a/include/hw/compat.h
++++ b/include/hw/compat.h
+@@ -18,6 +18,10 @@
+         .driver   = "pci-bridge",\
+         .property = "shpc",\
+         .value    = "on",\
++    },{\
++        .driver   = TYPE_PCI_DEVICE,\
++        .property = "x-pcie-extcap-init",\
++        .value    = "off",\
+     },
+ 
+ #define HW_COMPAT_2_7 \
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index cbc1fdf..ded978c 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -182,6 +182,8 @@ enum {
+     /* Link active status in endpoint capability is always set */
+ #define QEMU_PCIE_LNKSTA_DLLLA_BITNR 8
+     QEMU_PCIE_LNKSTA_DLLLA = (1 << QEMU_PCIE_LNKSTA_DLLLA_BITNR),
++#define QEMU_PCIE_EXTCAP_INIT_BITNR 9
++    QEMU_PCIE_EXTCAP_INIT = (1 << QEMU_PCIE_EXTCAP_INIT_BITNR),
+ };
+ 
+ #define TYPE_PCI_DEVICE "pci-device"
 -- 
 2.5.5
