@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57054)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cfneo-00040f-7B
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 08:05:37 -0500
+	(envelope-from <armbru@redhat.com>) id 1cfnhW-0005Tg-VI
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 08:08:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cfnen-0001GU-AE
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 08:05:34 -0500
-Date: Mon, 20 Feb 2017 14:05:25 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170220130525.GE4814@noname.redhat.com>
-References: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
-	<1487006583-24350-21-git-send-email-kwolf@redhat.com>
-	<6f790f11-1427-7f23-83d1-d3212fb74ddc@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1cfnhT-0002GR-P8
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 08:08:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55778)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cfnhT-0002ER-JN
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 08:08:19 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170217093416.27688-1-marcandre.lureau@redhat.com>
+Date: Mon, 20 Feb 2017 14:08:15 +0100
+In-Reply-To: <20170217093416.27688-1-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Fri, 17 Feb 2017 13:34:16 +0400")
+Message-ID: <87poid103k.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="OBd5C1Lgu00Gd/Tn"
-Content-Disposition: inline
-In-Reply-To: <6f790f11-1427-7f23-83d1-d3212fb74ddc@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 20/41] hw/block: Introduce share-rw
- qdev property
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] qapi2texi: replace quotation by bold
+ section name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,95 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
---OBd5C1Lgu00Gd/Tn
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> When we build qemu-qmp-ref.txt this causes texinfo to complain several
+> times:
+> "Negative repeat count does nothing at
+> /usr/share/texinfo/Texinfo/Convert/Line.pm line 124."
+>
+> It also doesn't display correctly, because the "Notes" text disappears
+> entirely in the HTML version because it thinks there's no actual
+> quotation text.
+>
+> The text file output formatting is also not good.
+>
+> To solve those problems, remove usage of @quotation, and simply use bold
+> face for the section name.
+>
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  scripts/qapi2texi.py | 10 ++++------
+>  1 file changed, 4 insertions(+), 6 deletions(-)
+>
+> diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
+> index 83ded95c2d..c1071c62c6 100755
+> --- a/scripts/qapi2texi.py
+> +++ b/scripts/qapi2texi.py
+> @@ -159,12 +159,10 @@ def texi_body(doc):
+>              func =3D texi_example
+>=20=20
+>          if name:
+> -            # FIXME the indentation produced by @quotation in .txt and
+> -            # .html output is confusing
+> -            body +=3D "\n@quotation %s\n%s\n@end quotation" % \
+> -                    (name, func(doc))
+> -        else:
+> -            body +=3D func(doc)
+> +            # prefer @b over @strong, so txt doesn't translate it to *Fo=
+o:*
+> +            body +=3D "\n\n@b{%s:}\n" % name
 
-Am 20.02.2017 um 13:28 hat Max Reitz geschrieben:
-> On 13.02.2017 18:22, Kevin Wolf wrote:
-> > By default, don't allow another writer for block devices that are
-> > attached to a guest device. For the cases where this setup is intended
-> > (e.g. using a cluster filesystem on the disk), the new option can be
-> > used to allow it.
-> >=20
-> > This change affects only devices using DEFINE_BLOCK_PROPERTIES().
-> > Devices directly using DEFINE_PROP_DRIVE() still accept writers
-> > unconditionally.
-> >=20
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >  hw/block/block.c           | 14 ++++++------
-> >  include/hw/block/block.h   |  4 +++-
-> >  tests/qemu-iotests/172.out | 53 ++++++++++++++++++++++++++++++++++++++=
-++++++++
-> >  3 files changed, 64 insertions(+), 7 deletions(-)
-> >=20
-> > diff --git a/hw/block/block.c b/hw/block/block.c
-> > index c3d3901..3c218eb 100644
-> > --- a/hw/block/block.c
-> > +++ b/hw/block/block.c
-> > @@ -56,7 +56,7 @@ void blkconf_apply_backend_options(BlockConf *conf, b=
-ool readonly,
-> >  {
-> >      BlockBackend *blk =3D conf->blk;
-> >      BlockdevOnError rerror, werror;
-> > -    uint64_t perm;
-> > +    uint64_t perm, shared_perm;
-> >      bool wce;
-> >      int ret;
-> > =20
-> > @@ -65,11 +65,13 @@ void blkconf_apply_backend_options(BlockConf *conf,=
- bool readonly,
-> >          perm |=3D BLK_PERM_WRITE;
-> >      }
-> > =20
-> > -    /* TODO Remove BLK_PERM_WRITE unless explicitly configured so */
-> > -    ret =3D blk_set_perm(blk, perm,
-> > -                       BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHA=
-NGED |
-> > -                       BLK_PERM_GRAPH_MOD | BLK_PERM_RESIZE | BLK_PERM=
-_WRITE,
-> > -                       errp);
-> > +    shared_perm =3D BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGE=
-D |
-> > +                  BLK_PERM_GRAPH_MOD | BLK_PERM_RESIZE;
->=20
-> I'm not so sure BLK_PERM_RESIZE belongs here.
+The second newline is sometimes needed to make a paragraph, and at other
+times it's redundant and somewhat ugly.  Tolerable, as this file isn't
+for humans.
 
-Where does it belong in your opinion?
+> +
+> +        body +=3D func(doc)
+>=20=20
+>      return body
 
-An option that I considered was adding BLK_PERM_RESIZE in
-blk_set_dev_ops() if op.resize_cb !=3D NULL, but it felt a bit too
-implicit to me.
-
-Or I guess we can just add another bool parameter?
-
-Kevin
-
---OBd5C1Lgu00Gd/Tn
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJYqumVAAoJEH8JsnLIjy/WO0UP/R9+9OQ9pxLts/Y5pvaWx1H7
-MoUSpusnVFBsiubL4ao/MN+Fm+NkGQlwrwFC4UUliVRGw6zxemYLVKs756MqHYtr
-zF4KC0wfufn1t37D7JTsUMp19gZosExKtscIepHy2q4ae0Us/rqzdoeburPbOLpp
-hyQNn5HC9IL6+ioXmu0+/TmtzybSH15h+gzT7rDOMvMziC3N0c0kJEh/1r8kRVCv
-yQ3tNHGJZvrhyisuPr7w4cbYO5NL7av01kPGQat9Z6x8D+AN8vy8opFX8vgcAoEv
-/JB8ZL6RHLW+vkCfTX5dpaUJG3EMkp4kTcpStVxz6A/gO8d+hFA7qNwURnlW+G/A
-iJ3yO+NUbb6cqJ6Oe2210WPtKkAaxly+G84XVR96cND5QsQhRcjwdLtnLW1ofaMN
-JvvWspUMaDdBhmHKtD4kcV/KxmCmwc1N3k+dCY9tiz9ilmadLj/MPaGeYadO43l5
-hxNkFs4FjhGzIZ/lmmd66Uz+7+OIpYlmLZrvRRIm+i3tI/9tgWSEMMWzwIcJV5L3
-rOAdVurXE0TFPYRXD9jv20EjVZ3OyKxb7/MmwrsuxcWS4OOh038LeKGqrRsELbWN
-BkebXC15LB/b4xsbLTqfdrykSbsjP+6fpVcY+Pi0/Zcnb7c+0DM1ug2GTo+2u65U
-18Sx8TTGsjjTzhcW6Jjl
-=uk06
------END PGP SIGNATURE-----
-
---OBd5C1Lgu00Gd/Tn--
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
