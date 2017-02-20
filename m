@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cfqc6-00087Z-MG
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 11:14:59 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cfqdJ-0000q4-5x
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 11:16:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cfqc5-0007wj-Om
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 11:14:58 -0500
-References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
-	<20170203154757.36140-5-vsementsov@virtuozzo.com>
-	<7b79d03c-0fba-ddb8-4295-b155cb26a206@redhat.com>
-	<829007b8-d8a4-652c-7a23-59fbb5476cd2@virtuozzo.com>
-	<de548107-dbff-36ca-96ba-fead03589fde@redhat.com>
-	<e0ec9530-a87d-0f10-262d-4b2af4516eed@virtuozzo.com>
-	<14aa4b87-54d4-1faa-8453-5e5dea2e346a@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <15e87bd8-38e6-a502-a8f3-99d043997b8e@redhat.com>
-Date: Mon, 20 Feb 2017 10:14:49 -0600
+	(envelope-from <alex.bennee@linaro.org>) id 1cfqdF-00009s-8O
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 11:16:13 -0500
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:36923)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cfqdF-00009M-0n
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 11:16:09 -0500
+Received: by mail-wm0-x22c.google.com with SMTP id v77so56602795wmv.0
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 08:16:08 -0800 (PST)
+References: <20170220145335.591-1-bobby.prani@gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170220145335.591-1-bobby.prani@gmail.com>
+Date: Mon, 20 Feb 2017 16:16:13 +0000
+Message-ID: <87fuj8x2gi.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <14aa4b87-54d4-1faa-8453-5e5dea2e346a@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="CaVWW1PQXoQ5uAXWvaG0JU1nQpdkkJLIw"
-Subject: Re: [Qemu-devel] [PATCH 04/18] nbd/client: refactor
- nbd_receive_starttls
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] mttcg: Set jmp_env to handle exit from
+ tb_gen_code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,78 +30,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, den@virtuozzo.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, jsnow@redhat.com
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---CaVWW1PQXoQ5uAXWvaG0JU1nQpdkkJLIw
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, den@virtuozzo.com, armbru@redhat.com,
- mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, jsnow@redhat.com
-Message-ID: <15e87bd8-38e6-a502-a8f3-99d043997b8e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 04/18] nbd/client: refactor
- nbd_receive_starttls
-References: <20170203154757.36140-1-vsementsov@virtuozzo.com>
- <20170203154757.36140-5-vsementsov@virtuozzo.com>
- <7b79d03c-0fba-ddb8-4295-b155cb26a206@redhat.com>
- <829007b8-d8a4-652c-7a23-59fbb5476cd2@virtuozzo.com>
- <de548107-dbff-36ca-96ba-fead03589fde@redhat.com>
- <e0ec9530-a87d-0f10-262d-4b2af4516eed@virtuozzo.com>
- <14aa4b87-54d4-1faa-8453-5e5dea2e346a@redhat.com>
-In-Reply-To: <14aa4b87-54d4-1faa-8453-5e5dea2e346a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 02/11/2017 01:30 PM, Eric Blake wrote:
->>>>> On 02/03/2017 09:47 AM, Vladimir Sementsov-Ogievskiy wrote:
->>>>>> Split out nbd_receive_simple_option to be reused for structured re=
-ply
->>>>>> option.
->>>>>> +    return "<unknown option>";
->>>>> Can you please consider making this include the %d representation o=
-f
->>>>> the
->>>>> unknown option; perhaps by snprintf'ing into static storage?  While=
- it
-
-> If you're still worried about the race (I'm not), to the point that you=
-
-> don't want to use static storage just to avoid g_malloc(), then another=
-
-> option is to make nbd_opt_name() take an input parameter for a buffer
-> and max size, and let the caller provide stack-based storage for
-> computing the resulting message (similar to how strerror_r does things)=
-=2E
-
-Or, as long as the caller prints the value as well as the reverse-mapped
-name, that would work too.  I'm going to add such a reverse-mapping for
-my NBD_INFO_* patches about to land later today, so I'll make my
-counter-proposal for NBD_OPT_* along those lines as part of my series.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+To: Pranith Kumar <bobby.prani@gmail.com>
+Cc: qemu-devel@nongnu.org, rth@twiddle.net
 
 
---CaVWW1PQXoQ5uAXWvaG0JU1nQpdkkJLIw
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Pranith Kumar <bobby.prani@gmail.com> writes:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+> tb_gen_code() can exit execution using cpu_exit_loop() when it cannot
+> allocate new tb's. To handle this, we need to properly set the jmp_env
+> pointer ahead of calling tb_gen_code().
+>
+> CC:Alex Bennée <alex.bennee@linaro.org>
+> CC: Richard Henderson <rth@twiddle.net>
+> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+> ---
+>  cpu-exec.c | 23 +++++++++++------------
+>  1 file changed, 11 insertions(+), 12 deletions(-)
+>
+> diff --git a/cpu-exec.c b/cpu-exec.c
+> index 97d79612d9..4b70988b24 100644
+> --- a/cpu-exec.c
+> +++ b/cpu-exec.c
+> @@ -236,23 +236,22 @@ static void cpu_exec_step(CPUState *cpu)
+>
+>      cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
+>      tb_lock();
+> -    tb = tb_gen_code(cpu, pc, cs_base, flags,
+> -                     1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
+> -    tb->orig_tb = NULL;
+> -    tb_unlock();
+> -
+> -    cc->cpu_exec_enter(cpu);
+> -
 
-iQEcBAEBCAAGBQJYqxX5AAoJEKeha0olJ0NqEEIH/Apt3+343AVROV5xLZspxL/l
-8nYMRYD0v8dCuB4+tEDzw7agV6Dtd/1fJB7YGVWlsth0BjclcDBjo08C7iwDph1W
-g9jZRNe62xG+1pg6ypT3gvKowCI1pFgVlcVWQjOdkfrWrOWnJC4S1t5VxA3UMVaa
-5Ag/HVz8F8FJ8aHqNLNUrp7J7cY4EkgmkOYhXIz3/q0nBpsv+TjUNSAHKuwIPiRx
-EogMVGBueiRi2nsOnQ58SPhKqKaZZFf/lqzRo//eXs/rMDa4bA60HMkiFYwv3zqd
-wjjtLMXTD6WoBACdxJaBOok3mmgOIJlFfuZeLiPLjiL+70v/njfEhPzrvSpohr4=
-=p8Ac
------END PGP SIGNATURE-----
+It occurs to me we are also diverging in our locking pattern from
+tb_find which takes mmap_lock first. This is a NOP for system emulation
+but needed for user-emulation (for which we can do cpu_exec_step but not
+cpu_exec_nocache).
 
---CaVWW1PQXoQ5uAXWvaG0JU1nQpdkkJLIw--
+>      if (sigsetjmp(cpu->jmp_env, 0) == 0) {
+> +        tb = tb_gen_code(cpu, pc, cs_base, flags,
+> +                         1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
+> +        tb->orig_tb = NULL;
+> +        tb_unlock();
+> +
+> +        cc->cpu_exec_enter(cpu);
+>          /* execute the generated code */
+>          trace_exec_tb_nocache(tb, pc);
+>          cpu_tb_exec(cpu, tb);
+> -    }
+> +        cc->cpu_exec_exit(cpu);
+>
+> -    cc->cpu_exec_exit(cpu);
+> -    tb_lock();
+> -    tb_phys_invalidate(tb, -1);
+> -    tb_free(tb);
+> +        tb_lock();
+> +        tb_phys_invalidate(tb, -1);
+> +        tb_free(tb);
+> +    }
+>      tb_unlock();
+>  }
+
+
+--
+Alex Bennée
