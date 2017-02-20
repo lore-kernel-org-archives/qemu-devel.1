@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cfucH-00086S-AD
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:31:27 -0500
+	(envelope-from <hpoussin@reactos.org>) id 1cfum4-0008DJ-PJ
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:41:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cfucG-0004dl-91
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:31:25 -0500
-Received: from mailapp01.imgtec.com ([195.59.15.196]:42521)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cfucG-0004a6-33
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:31:24 -0500
-Received: from hhmail02.hh.imgtec.org (unknown [10.100.10.20])
-	by Forcepoint Email with ESMTPS id 9C7CB4EA56025
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 20:31:11 +0000 (GMT)
-From: Yongbok Kim <yongbok.kim@imgtec.com>
-Date: Mon, 20 Feb 2017 20:30:55 +0000
-Message-ID: <1487622662-62984-2-git-send-email-yongbok.kim@imgtec.com>
-In-Reply-To: <1487622662-62984-1-git-send-email-yongbok.kim@imgtec.com>
-References: <1487622662-62984-1-git-send-email-yongbok.kim@imgtec.com>
+	(envelope-from <hpoussin@reactos.org>) id 1cfum4-0007sv-4C
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:41:32 -0500
+From: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
+Date: Mon, 20 Feb 2017 21:41:19 +0100
+Message-Id: <1487623279-29930-1-git-send-email-hpoussin@reactos.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PULL 1/8] hw/mips_cmgcr: allow GCR base to be moved
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2] vl: disable default cdrom when using
+ explicitely scsi-hd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +22,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Markus Armbruster <armbru@redhat.com>, John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
 
-From: Paul Burton <paul.burton@imgtec.com>
+In commit af6bf1328ef90fae617857c02697e0174b84d596 (May 2011),
+ide-hd, ide-cd and scsi-cd have been added to disable default cdrom,
+"or else you can't put one on secondary master without -nodefaults".
 
-Support moving the GCR base address & updating the CPU's CP0 CMGCRBase
-register appropriately. This is required if a platform needs to move its
-GCRs away from other memory, as the MIPS Boston development board does
-to avoid its flash memory.
+Make it the same for scsi-hd, so you can put one on scsi-id 2 without
+using -nodefaults.
+scsi-hd has probably been forgotten, as it has been added in the
+preceding commit (b443ae67130d32ad06b06fc9aa6d04d05ccd93ce).
 
-Signed-off-by: Paul Burton <paul.burton@imgtec.com>
-Reviewed-by: Leon Alrae <leon.alrae@imgtec.com>
-Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
+Affected users are the ones using a machine with SCSI devices and start Q=
+EMU
+with -device scsi-hd but without -device scsi-cd or -cdrom
+In that case, the default cdrom device will disappear instead of being em=
+pty.
+
+Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
 ---
- hw/misc/mips_cmgcr.c         | 17 +++++++++++++++++
- include/hw/misc/mips_cmgcr.h |  3 +++
- 2 files changed, 20 insertions(+)
+ vl.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/misc/mips_cmgcr.c b/hw/misc/mips_cmgcr.c
-index b3ba166..a1edb53 100644
---- a/hw/misc/mips_cmgcr.c
-+++ b/hw/misc/mips_cmgcr.c
-@@ -29,6 +29,20 @@ static inline bool is_gic_connected(MIPSGCRState *s)
-     return s->gic_mr != NULL;
- }
- 
-+static inline void update_gcr_base(MIPSGCRState *gcr, uint64_t val)
-+{
-+    CPUState *cpu;
-+    MIPSCPU *mips_cpu;
-+
-+    gcr->gcr_base = val & GCR_BASE_GCRBASE_MSK;
-+    memory_region_set_address(&gcr->iomem, gcr->gcr_base);
-+
-+    CPU_FOREACH(cpu) {
-+        mips_cpu = MIPS_CPU(cpu);
-+        mips_cpu->env.CP0_CMGCRBase = gcr->gcr_base >> 4;
-+    }
-+}
-+
- static inline void update_cpc_base(MIPSGCRState *gcr, uint64_t val)
- {
-     if (is_cpc_connected(gcr)) {
-@@ -117,6 +131,9 @@ static void gcr_write(void *opaque, hwaddr addr, uint64_t data, unsigned size)
-     MIPSGCRVPState *other_vps = &gcr->vps[current_vps->other];
- 
-     switch (addr) {
-+    case GCR_BASE_OFS:
-+        update_gcr_base(gcr, data);
-+        break;
-     case GCR_GIC_BASE_OFS:
-         update_gic_base(gcr, data);
-         break;
-diff --git a/include/hw/misc/mips_cmgcr.h b/include/hw/misc/mips_cmgcr.h
-index a209d91..c9dfcb4 100644
---- a/include/hw/misc/mips_cmgcr.h
-+++ b/include/hw/misc/mips_cmgcr.h
-@@ -41,6 +41,9 @@
- #define GCR_L2_CONFIG_BYPASS_SHF    20
- #define GCR_L2_CONFIG_BYPASS_MSK    ((0x1ULL) << GCR_L2_CONFIG_BYPASS_SHF)
- 
-+/* GCR_BASE register fields */
-+#define GCR_BASE_GCRBASE_MSK     0xffffffff8000ULL
-+
- /* GCR_GIC_BASE register fields */
- #define GCR_GIC_BASE_GICEN_MSK   1
- #define GCR_GIC_BASE_GICBASE_MSK 0xFFFFFFFE0000ULL
--- 
-2.7.4
+diff --git a/vl.c b/vl.c
+index 27d9829..4af95b3 100644
+--- a/vl.c
++++ b/vl.c
+@@ -226,6 +226,7 @@ static struct {
+     { .driver =3D "ide-hd",               .flag =3D &default_cdrom     }=
+,
+     { .driver =3D "ide-drive",            .flag =3D &default_cdrom     }=
+,
+     { .driver =3D "scsi-cd",              .flag =3D &default_cdrom     }=
+,
++    { .driver =3D "scsi-hd",              .flag =3D &default_cdrom     }=
+,
+     { .driver =3D "virtio-serial-pci",    .flag =3D &default_virtcon   }=
+,
+     { .driver =3D "virtio-serial",        .flag =3D &default_virtcon   }=
+,
+     { .driver =3D "VGA",                  .flag =3D &default_vga       }=
+,
+--=20
+2.1.4
