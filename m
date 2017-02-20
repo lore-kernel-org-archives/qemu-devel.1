@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cfohY-0000l3-RH
+	(envelope-from <kraxel@redhat.com>) id 1cfohY-0000l2-Qc
 	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:12:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cfohU-00052j-4d
+	(envelope-from <kraxel@redhat.com>) id 1cfohU-00052o-4q
 	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:12:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38308)
+Received: from mx1.redhat.com ([209.132.183.28]:55490)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cfohT-000528-RV
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cfohT-00052C-SN
 	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:12:24 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 17D757A495
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 14:12:24 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 20 Feb 2017 15:12:19 +0100
-Message-Id: <1487599939-4776-4-git-send-email-kraxel@redhat.com>
+Date: Mon, 20 Feb 2017 15:12:17 +0100
+Message-Id: <1487599939-4776-2-git-send-email-kraxel@redhat.com>
 In-Reply-To: <1487599939-4776-1-git-send-email-kraxel@redhat.com>
 References: <1487599939-4776-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 3/3] audio/sdlaudio: Allow audio playback with
- SDL2
+Subject: [Qemu-devel] [PULL 1/3] replay: add record/replay for audio
+ passthrough
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,201 +25,263 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Gerd Hoffmann <kraxel@redhat.com>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-When compiling with SDL2, the semaphore trick used in sdlaudio.c
-does not work - QEMU locks up completely in this case. To avoid
-the hang and get at least some audio playback up and running (it's
-a little bit crackling, but better than nothing), we can use the
-SDL locking functions SDL_LockAudio() and SDL_UnlockAudio() to sync
-with the sound playback thread instead.
+This patch adds recording and replaying audio data. Is saves synchronization
+information for audio out and inputs from the microphone.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-id: 1485852398-2327-1-git-send-email-thuth@redhat.com
+v2: removed unneeded whitespace change
+
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Message-id: 20170202055054.4848.94901.stgit@PASHA-ISP.lan02.inno
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- audio/sdlaudio.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
+ audio/audio.c            |  9 ++++--
+ audio/audio.h            |  5 +++
+ audio/mixeng.c           | 31 +++++++++++++++++++
+ docs/replay.txt          |  7 +++++
+ include/sysemu/replay.h  |  7 +++++
+ replay/Makefile.objs     |  1 +
+ replay/replay-audio.c    | 79 ++++++++++++++++++++++++++++++++++++++++++++++++
+ replay/replay-internal.h |  4 +++
+ 8 files changed, 141 insertions(+), 2 deletions(-)
+ create mode 100644 replay/replay-audio.c
 
-diff --git a/audio/sdlaudio.c b/audio/sdlaudio.c
-index db69fe1..e8d91d2 100644
---- a/audio/sdlaudio.c
-+++ b/audio/sdlaudio.c
-@@ -38,10 +38,14 @@
- #define AUDIO_CAP "sdl"
+diff --git a/audio/audio.c b/audio/audio.c
+index c845a44..21f7b0b 100644
+--- a/audio/audio.c
++++ b/audio/audio.c
+@@ -28,6 +28,7 @@
+ #include "qemu/timer.h"
+ #include "sysemu/sysemu.h"
+ #include "qemu/cutils.h"
++#include "sysemu/replay.h"
+ 
+ #define AUDIO_CAP "audio"
  #include "audio_int.h"
+@@ -1387,6 +1388,7 @@ static void audio_run_out (AudioState *s)
  
-+#define USE_SEMAPHORE (SDL_MAJOR_VERSION < 2)
-+
- typedef struct SDLVoiceOut {
-     HWVoiceOut hw;
-     int live;
-+#if USE_SEMAPHORE
-     int rpos;
-+#endif
-     int decr;
- } SDLVoiceOut;
+         prev_rpos = hw->rpos;
+         played = hw->pcm_ops->run_out (hw, live);
++        replay_audio_out(&played);
+         if (audio_bug (AUDIO_FUNC, hw->rpos >= hw->samples)) {
+             dolog ("hw->rpos=%d hw->samples=%d played=%d\n",
+                    hw->rpos, hw->samples, played);
+@@ -1450,9 +1452,12 @@ static void audio_run_in (AudioState *s)
  
-@@ -53,8 +57,10 @@ static struct {
+     while ((hw = audio_pcm_hw_find_any_enabled_in (hw))) {
+         SWVoiceIn *sw;
+-        int captured, min;
++        int captured = 0, min;
  
- static struct SDLAudioState {
-     int exit;
-+#if USE_SEMAPHORE
-     SDL_mutex *mutex;
-     SDL_sem *sem;
-+#endif
-     int initialized;
-     bool driver_created;
- } glob_sdl;
-@@ -73,31 +79,45 @@ static void GCC_FMT_ATTR (1, 2) sdl_logerr (const char *fmt, ...)
- 
- static int sdl_lock (SDLAudioState *s, const char *forfn)
- {
-+#if USE_SEMAPHORE
-     if (SDL_LockMutex (s->mutex)) {
-         sdl_logerr ("SDL_LockMutex for %s failed\n", forfn);
-         return -1;
-     }
-+#else
-+    SDL_LockAudio();
-+#endif
-+
-     return 0;
- }
- 
- static int sdl_unlock (SDLAudioState *s, const char *forfn)
- {
-+#if USE_SEMAPHORE
-     if (SDL_UnlockMutex (s->mutex)) {
-         sdl_logerr ("SDL_UnlockMutex for %s failed\n", forfn);
-         return -1;
-     }
-+#else
-+    SDL_UnlockAudio();
-+#endif
-+
-     return 0;
- }
- 
- static int sdl_post (SDLAudioState *s, const char *forfn)
- {
-+#if USE_SEMAPHORE
-     if (SDL_SemPost (s->sem)) {
-         sdl_logerr ("SDL_SemPost for %s failed\n", forfn);
-         return -1;
-     }
-+#endif
-+
-     return 0;
- }
- 
-+#if USE_SEMAPHORE
- static int sdl_wait (SDLAudioState *s, const char *forfn)
- {
-     if (SDL_SemWait (s->sem)) {
-@@ -106,6 +126,7 @@ static int sdl_wait (SDLAudioState *s, const char *forfn)
-     }
-     return 0;
- }
-+#endif
- 
- static int sdl_unlock_and_post (SDLAudioState *s, const char *forfn)
- {
-@@ -246,6 +267,7 @@ static void sdl_callback (void *opaque, Uint8 *buf, int len)
-         int to_mix, decr;
- 
-         /* dolog ("in callback samples=%d\n", samples); */
-+#if USE_SEMAPHORE
-         sdl_wait (s, "sdl_callback");
-         if (s->exit) {
-             return;
-@@ -264,6 +286,11 @@ static void sdl_callback (void *opaque, Uint8 *buf, int len)
-         if (!sdl->live) {
-             goto again;
-         }
-+#else
-+        if (s->exit || !sdl->live) {
-+            break;
+-        captured = hw->pcm_ops->run_in (hw);
++        if (replay_mode != REPLAY_MODE_PLAY) {
++            captured = hw->pcm_ops->run_in(hw);
 +        }
-+#endif
++        replay_audio_in(&captured, hw->conv_buf, &hw->wpos, hw->samples);
  
-         /* dolog ("in callback live=%d\n", live); */
-         to_mix = audio_MIN (samples, sdl->live);
-@@ -274,7 +301,11 @@ static void sdl_callback (void *opaque, Uint8 *buf, int len)
+         min = audio_pcm_hw_find_min_in (hw);
+         hw->total_samples_captured += captured - min;
+diff --git a/audio/audio.h b/audio/audio.h
+index c3c5198..f4339a1 100644
+--- a/audio/audio.h
++++ b/audio/audio.h
+@@ -166,4 +166,9 @@ int wav_start_capture (CaptureState *s, const char *path, int freq,
+ bool audio_is_cleaning_up(void);
+ void audio_cleanup(void);
  
-             /* dolog ("in callback to_mix %d, chunk %d\n", to_mix, chunk); */
-             hw->clip (buf, src, chunk);
-+#if USE_SEMAPHORE
-             sdl->rpos = (sdl->rpos + chunk) % hw->samples;
-+#else
-+            hw->rpos = (hw->rpos + chunk) % hw->samples;
-+#endif
-             to_mix -= chunk;
-             buf += chunk << hw->info.shift;
-         }
-@@ -282,12 +313,21 @@ static void sdl_callback (void *opaque, Uint8 *buf, int len)
-         sdl->live -= decr;
-         sdl->decr += decr;
- 
-+#if USE_SEMAPHORE
-     again:
-         if (sdl_unlock (s, "sdl_callback")) {
-             return;
-         }
-+#endif
-     }
-     /* dolog ("done len=%d\n", len); */
++void audio_sample_to_uint64(void *samples, int pos,
++                            uint64_t *left, uint64_t *right);
++void audio_sample_from_uint64(void *samples, int pos,
++                            uint64_t left, uint64_t right);
 +
-+#if (SDL_MAJOR_VERSION >= 2)
-+    /* SDL2 does not clear the remaining buffer for us, so do it on our own */
-+    if (samples) {
-+        memset(buf, 0, samples << hw->info.shift);
-+    }
-+#endif
- }
+ #endif /* QEMU_AUDIO_H */
+diff --git a/audio/mixeng.c b/audio/mixeng.c
+index 66c0328..c23508e 100644
+--- a/audio/mixeng.c
++++ b/audio/mixeng.c
+@@ -267,6 +267,37 @@ f_sample *mixeng_clip[2][2][2][3] = {
+     }
+ };
  
- static int sdl_write_out (SWVoiceOut *sw, void *buf, int len)
-@@ -315,8 +355,12 @@ static int sdl_run_out (HWVoiceOut *hw, int live)
-     decr = audio_MIN (sdl->decr, live);
-     sdl->decr -= decr;
- 
-+#if USE_SEMAPHORE
-     sdl->live = live - decr;
-     hw->rpos = sdl->rpos;
++
++void audio_sample_to_uint64(void *samples, int pos,
++                            uint64_t *left, uint64_t *right)
++{
++    struct st_sample *sample = samples;
++    sample += pos;
++#ifdef FLOAT_MIXENG
++    error_report(
++        "Coreaudio and floating point samples are not supported by replay yet");
++    abort();
 +#else
-+    sdl->live = live;
++    *left = sample->l;
++    *right = sample->r;
 +#endif
- 
-     if (sdl->live > 0) {
-         sdl_unlock_and_post (s, "sdl_run_out");
-@@ -405,6 +449,7 @@ static void *sdl_audio_init (void)
-         return NULL;
-     }
- 
-+#if USE_SEMAPHORE
-     s->mutex = SDL_CreateMutex ();
-     if (!s->mutex) {
-         sdl_logerr ("Failed to create SDL mutex\n");
-@@ -419,6 +464,7 @@ static void *sdl_audio_init (void)
-         SDL_QuitSubSystem (SDL_INIT_AUDIO);
-         return NULL;
-     }
++}
++
++void audio_sample_from_uint64(void *samples, int pos,
++                            uint64_t left, uint64_t right)
++{
++    struct st_sample *sample = samples;
++    sample += pos;
++#ifdef FLOAT_MIXENG
++    error_report(
++        "Coreaudio and floating point samples are not supported by replay yet");
++    abort();
++#else
++    sample->l = left;
++    sample->r = right;
 +#endif
++}
++
+ /*
+  * August 21, 1998
+  * Copyright 1998 Fabrice Bellard.
+diff --git a/docs/replay.txt b/docs/replay.txt
+index 03e1931..486c1e0 100644
+--- a/docs/replay.txt
++++ b/docs/replay.txt
+@@ -225,3 +225,10 @@ recording the virtual machine this filter puts all packets coming from
+ the outer world into the log. In replay mode packets from the log are
+ injected into the network device. All interactions with network backend
+ in replay mode are disabled.
++
++Audio devices
++-------------
++
++Audio data is recorded and replay automatically. The command line for recording
++and replaying must contain identical specifications of audio hardware, e.g.:
++ -soundhw ac97
+diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
+index 7aad20b..f1c0712 100644
+--- a/include/sysemu/replay.h
++++ b/include/sysemu/replay.h
+@@ -152,6 +152,13 @@ void replay_unregister_net(ReplayNetState *rns);
+ void replay_net_packet_event(ReplayNetState *rns, unsigned flags,
+                              const struct iovec *iov, int iovcnt);
  
-     s->driver_created = true;
-     return s;
-@@ -428,8 +474,10 @@ static void sdl_audio_fini (void *opaque)
- {
-     SDLAudioState *s = opaque;
-     sdl_close (s);
-+#if USE_SEMAPHORE
-     SDL_DestroySemaphore (s->sem);
-     SDL_DestroyMutex (s->mutex);
-+#endif
-     SDL_QuitSubSystem (SDL_INIT_AUDIO);
-     s->driver_created = false;
- }
++/* Audio */
++
++/*! Saves/restores number of played samples of audio out operation. */
++void replay_audio_out(int *played);
++/*! Saves/restores recorded samples of audio in operation. */
++void replay_audio_in(int *recorded, void *samples, int *wpos, int size);
++
+ /* VM state operations */
+ 
+ /*! Called at the start of execution.
+diff --git a/replay/Makefile.objs b/replay/Makefile.objs
+index b2afd40..cee6539 100644
+--- a/replay/Makefile.objs
++++ b/replay/Makefile.objs
+@@ -6,3 +6,4 @@ common-obj-y += replay-input.o
+ common-obj-y += replay-char.o
+ common-obj-y += replay-snapshot.o
+ common-obj-y += replay-net.o
++common-obj-y += replay-audio.o
+\ No newline at end of file
+diff --git a/replay/replay-audio.c b/replay/replay-audio.c
+new file mode 100644
+index 0000000..3d83743
+--- /dev/null
++++ b/replay/replay-audio.c
+@@ -0,0 +1,79 @@
++/*
++ * replay-audio.c
++ *
++ * Copyright (c) 2010-2017 Institute for System Programming
++ *                         of the Russian Academy of Sciences.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/error-report.h"
++#include "sysemu/replay.h"
++#include "replay-internal.h"
++#include "sysemu/sysemu.h"
++#include "audio/audio.h"
++
++void replay_audio_out(int *played)
++{
++    if (replay_mode == REPLAY_MODE_RECORD) {
++        replay_save_instructions();
++        replay_mutex_lock();
++        replay_put_event(EVENT_AUDIO_OUT);
++        replay_put_dword(*played);
++        replay_mutex_unlock();
++    } else if (replay_mode == REPLAY_MODE_PLAY) {
++        replay_account_executed_instructions();
++        replay_mutex_lock();
++        if (replay_next_event_is(EVENT_AUDIO_OUT)) {
++            *played = replay_get_dword();
++            replay_finish_event();
++            replay_mutex_unlock();
++        } else {
++            replay_mutex_unlock();
++            error_report("Missing audio out event in the replay log");
++            abort();
++        }
++    }
++}
++
++void replay_audio_in(int *recorded, void *samples, int *wpos, int size)
++{
++    int pos;
++    uint64_t left, right;
++    if (replay_mode == REPLAY_MODE_RECORD) {
++        replay_save_instructions();
++        replay_mutex_lock();
++        replay_put_event(EVENT_AUDIO_IN);
++        replay_put_dword(*recorded);
++        replay_put_dword(*wpos);
++        for (pos = (*wpos - *recorded + size) % size ; pos != *wpos
++             ; pos = (pos + 1) % size) {
++            audio_sample_to_uint64(samples, pos, &left, &right);
++            replay_put_qword(left);
++            replay_put_qword(right);
++        }
++        replay_mutex_unlock();
++    } else if (replay_mode == REPLAY_MODE_PLAY) {
++        replay_account_executed_instructions();
++        replay_mutex_lock();
++        if (replay_next_event_is(EVENT_AUDIO_IN)) {
++            *recorded = replay_get_dword();
++            *wpos = replay_get_dword();
++            for (pos = (*wpos - *recorded + size) % size ; pos != *wpos
++                 ; pos = (pos + 1) % size) {
++                left = replay_get_qword();
++                right = replay_get_qword();
++                audio_sample_from_uint64(samples, pos, left, right);
++            }
++            replay_finish_event();
++            replay_mutex_unlock();
++        } else {
++            replay_mutex_unlock();
++            error_report("Missing audio in event in the replay log");
++            abort();
++        }
++    }
++}
+diff --git a/replay/replay-internal.h b/replay/replay-internal.h
+index c26d079..ed66ed8 100644
+--- a/replay/replay-internal.h
++++ b/replay/replay-internal.h
+@@ -29,6 +29,10 @@ enum ReplayEvents {
+     /* for character device read all event */
+     EVENT_CHAR_READ_ALL,
+     EVENT_CHAR_READ_ALL_ERROR,
++    /* for audio out event */
++    EVENT_AUDIO_OUT,
++    /* for audio in event */
++    EVENT_AUDIO_IN,
+     /* for clock read/writes */
+     /* some of greater codes are reserved for clocks */
+     EVENT_CLOCK,
 -- 
 1.8.3.1
