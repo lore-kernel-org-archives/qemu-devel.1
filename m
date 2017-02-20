@@ -1,14 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cfstj-00033b-1d
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:41:19 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cft2Z-0006mC-S2
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:50:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cfsti-0000Ce-9T
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:41:19 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Feb 2017 18:41:08 +0000
-Message-Id: <1487616072-9226-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 0/4] arm: Fix M profile MSR/MRS
+	(envelope-from <dgilbert@redhat.com>) id 1cft2W-0002Qi-Op
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:50:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41778)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cft2W-0002QQ-Ia
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:50:24 -0500
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Mon, 20 Feb 2017 18:50:15 +0000
+Message-Id: <20170220185020.774-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 0/5] SLIRP VMStatification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,42 +21,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Michael Davidsaver <mdavidsaver@gmail.com>
+To: qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com
+Cc: quintela@redhat.com
 
-This patchseries fixes up some deficiencies and one nasty
-bug in the M profile MSR/MRS handling.
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-The first three patches are just cleaning up the decode
-so that we UNDEF where we should in the MRS/MSR space
-for M profile -- this won't have caused any problems in
-practice since real world code doesn't generally execute
-UNDEFfing instructions on purpose.
 
-The fourth patch fixes a nasty bug that I introduced in
-commit 58117c9bb429cd which broke APSR writes via MSR,
-and brings them into line with the pseudocode by allowing
-writes to the APSR GE[3:0] bits when the CPU implements
-the DSP extensions.
+Hi,
+  This is an update to my previous SLIRP vmstatification, but finally
+the dependent patches have gone in, so this can now follow.
 
-Alex -- I should have paid closer attention to your review
-comments on the patch that became commit 58117c9bb429cd;
-sorry about that. I knew we didn't get the GE[3:0] stuff
-right yet but I didn't spot that we'd managed to invert
-the sense of the SYSm bit 2 test in that patch :-(
 
-thanks
--- PMM
+Dave
 
-Peter Maydell (4):
-  arm: HVC and SMC encodings don't exist for M profile
-  arm: Don't decode MRS(banked) or MSR(banked) for M profile
-  arm: Enforce should-be-1 bits in MRS decoding
-  arm: Fix APSR writes via M profile MSR
+v4
+  Fix 'VMStatify socket level' for mingw64 build; it has some different
+  choices for the type of IPv4 addresses.
 
- target/arm/helper.c    | 26 ++++++++++++++++++++++----
- target/arm/translate.c | 26 +++++++++++++++++++++++---
- 2 files changed, 45 insertions(+), 7 deletions(-)
+Dr. David Alan Gilbert (5):
+  slirp: VMState conversion; tcpcb
+  slirp: VMStatify sbuf
+  slirp: Common lhost/fhost union
+  slirp: VMStatify socket level
+  slirp: VMStatify remaining except for loop
+
+ slirp/sbuf.h    |   4 +-
+ slirp/slirp.c   | 449 ++++++++++++++++++++++++++++----------------------------
+ slirp/socket.h  |  24 ++-
+ slirp/tcp_var.h |   6 +-
+ 4 files changed, 238 insertions(+), 245 deletions(-)
 
 -- 
-2.7.4
+2.9.3
