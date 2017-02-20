@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cfncF-0002nn-JS
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 08:02:56 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cfneo-00040f-7B
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 08:05:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cfncB-00005d-IK
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 08:02:55 -0500
-Date: Mon, 20 Feb 2017 14:02:43 +0100
+	(envelope-from <kwolf@redhat.com>) id 1cfnen-0001GU-AE
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 08:05:34 -0500
+Date: Mon, 20 Feb 2017 14:05:25 +0100
 From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170220130243.GD4814@noname.redhat.com>
+Message-ID: <20170220130525.GE4814@noname.redhat.com>
 References: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
-	<1487006583-24350-20-git-send-email-kwolf@redhat.com>
-	<c8592787-34e5-1ab3-7e33-596f97520cd3@redhat.com>
+	<1487006583-24350-21-git-send-email-kwolf@redhat.com>
+	<6f790f11-1427-7f23-83d1-d3212fb74ddc@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="2B/JsCI69OhZNC5r"
+	protocol="application/pgp-signature"; boundary="OBd5C1Lgu00Gd/Tn"
 Content-Disposition: inline
-In-Reply-To: <c8592787-34e5-1ab3-7e33-596f97520cd3@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 19/41] hw/block: Request permissions
+In-Reply-To: <6f790f11-1427-7f23-83d1-d3212fb74ddc@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 20/41] hw/block: Introduce share-rw
+ qdev property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,107 +30,91 @@ To: Max Reitz <mreitz@redhat.com>
 Cc: qemu-block@nongnu.org, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
 
---2B/JsCI69OhZNC5r
+--OBd5C1Lgu00Gd/Tn
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-Am 20.02.2017 um 13:25 hat Max Reitz geschrieben:
+Am 20.02.2017 um 13:28 hat Max Reitz geschrieben:
 > On 13.02.2017 18:22, Kevin Wolf wrote:
-> > This makes all device emulations with a qdev drive property request
-> > permissions on their BlockBackend. We don't block anything yet.
+> > By default, don't allow another writer for block devices that are
+> > attached to a guest device. For the cases where this setup is intended
+> > (e.g. using a cluster filesystem on the disk), the new option can be
+> > used to allow it.
+> >=20
+> > This change affects only devices using DEFINE_BLOCK_PROPERTIES().
+> > Devices directly using DEFINE_PROP_DRIVE() still accept writers
+> > unconditionally.
 > >=20
 > > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > > ---
-> >  hw/block/block.c                 | 19 ++++++++++++++++++-
-> >  hw/block/fdc.c                   | 25 +++++++++++++++++++++++--
-> >  hw/block/m25p80.c                |  8 ++++++++
-> >  hw/block/nand.c                  |  7 +++++++
-> >  hw/block/nvme.c                  |  8 +++++++-
-> >  hw/block/onenand.c               |  7 +++++++
-> >  hw/block/pflash_cfi01.c          | 18 ++++++++++++------
-> >  hw/block/pflash_cfi02.c          | 19 +++++++++++++------
-> >  hw/block/virtio-blk.c            |  8 +++++++-
-> >  hw/core/qdev-properties-system.c |  1 -
-> >  hw/ide/qdev.c                    |  7 +++++--
-> >  hw/nvram/spapr_nvram.c           |  8 ++++++++
-> >  hw/scsi/scsi-disk.c              |  8 ++++++--
->=20
-> Since I have no idea how scsi-generic and all of that works, just an
-> innocent question: Do we need to set permissions there, too?
-
-I couldn't see any use for it. With an SG BDS, you can't really do
-anything anyway except directly attach it to scsi-generic. And the only
-thing that scsi-generic does is invoking ioctls, which the block layer
-doesn't understand but just pass though.
-
-So I didn't feel that op blockers could provide anything here.
-
-> >  hw/sd/sd.c                       |  6 ++++++
-> >  hw/usb/dev-storage.c             |  6 +++++-
-> >  include/hw/block/block.h         |  3 ++-
-> >  tests/qemu-iotests/051.pc.out    |  6 +++---
-> >  17 files changed, 137 insertions(+), 27 deletions(-)
->=20
-> [...]
->=20
-> > diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
-> > index 2d6eb46..190573c 100644
-> > --- a/hw/block/m25p80.c
-> > +++ b/hw/block/m25p80.c
-> > @@ -1215,6 +1215,7 @@ static void m25p80_realize(SSISlave *ss, Error **=
-errp)
+> >  hw/block/block.c           | 14 ++++++------
+> >  include/hw/block/block.h   |  4 +++-
+> >  tests/qemu-iotests/172.out | 53 ++++++++++++++++++++++++++++++++++++++=
+++++++++
+> >  3 files changed, 64 insertions(+), 7 deletions(-)
+> >=20
+> > diff --git a/hw/block/block.c b/hw/block/block.c
+> > index c3d3901..3c218eb 100644
+> > --- a/hw/block/block.c
+> > +++ b/hw/block/block.c
+> > @@ -56,7 +56,7 @@ void blkconf_apply_backend_options(BlockConf *conf, b=
+ool readonly,
 > >  {
-> >      Flash *s =3D M25P80(ss);
-> >      M25P80Class *mc =3D M25P80_GET_CLASS(s);
-> > +    int ret;
+> >      BlockBackend *blk =3D conf->blk;
+> >      BlockdevOnError rerror, werror;
+> > -    uint64_t perm;
+> > +    uint64_t perm, shared_perm;
+> >      bool wce;
+> >      int ret;
 > > =20
-> >      s->pi =3D mc->pi;
+> > @@ -65,11 +65,13 @@ void blkconf_apply_backend_options(BlockConf *conf,=
+ bool readonly,
+> >          perm |=3D BLK_PERM_WRITE;
+> >      }
 > > =20
-> > @@ -1222,6 +1223,13 @@ static void m25p80_realize(SSISlave *ss, Error *=
-*errp)
-> >      s->dirty_page =3D -1;
-> > =20
-> >      if (s->blk) {
-> > +        uint64_t perm =3D BLK_PERM_CONSISTENT_READ |
-> > +                        (blk_is_read_only(s->blk) ? 0 : BLK_PERM_WRITE=
-);
-> > +        ret =3D blk_set_perm(s->blk, perm, BLK_PERM_ALL, errp);
+> > -    /* TODO Remove BLK_PERM_WRITE unless explicitly configured so */
+> > -    ret =3D blk_set_perm(blk, perm,
+> > -                       BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHA=
+NGED |
+> > -                       BLK_PERM_GRAPH_MOD | BLK_PERM_RESIZE | BLK_PERM=
+_WRITE,
+> > -                       errp);
+> > +    shared_perm =3D BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGE=
+D |
+> > +                  BLK_PERM_GRAPH_MOD | BLK_PERM_RESIZE;
 >=20
-> Not sure whether it should be changed in this patch, but I don't know
-> whether BLK_PERM_ALL is right here; and from a quick glance it doesn't
-> look like any of the following patches change it.
->=20
-> (Same for all of the block device emulation code that invokes
-> blk_set_perm() directly.)
+> I'm not so sure BLK_PERM_RESIZE belongs here.
 
-Yeah, I'm not completely sure about the real requirements here either.
-What I do know is that currently nothing is blocked (so doing the same
-in the future won't make things worse at least), and that I don't want
-to break exotic devices that I can't really test. So for these devices I
-tended to be more permissive in case of doubt.
+Where does it belong in your opinion?
+
+An option that I considered was adding BLK_PERM_RESIZE in
+blk_set_dev_ops() if op.resize_cb !=3D NULL, but it felt a bit too
+implicit to me.
+
+Or I guess we can just add another bool parameter?
 
 Kevin
 
---2B/JsCI69OhZNC5r
+--OBd5C1Lgu00Gd/Tn
 Content-Type: application/pgp-signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2.0.22 (GNU/Linux)
 
-iQIcBAEBAgAGBQJYqujzAAoJEH8JsnLIjy/Wu7sP/3RUDUB+OnI5z4ab8tvLFTrY
-jfwyJcx4CgZXUPFaZLHgcmF2vB655NlJ1f9xYxVm63XUk8c3W0LuGfy56mhsNYBq
-iJoISOmU3zvNh5ZOHWgIRDVjobnyKYUiaTqMRDt0MlBlxW9bF2jihHAWwWpLV7+i
-mzGYmr30pnaZglqLg60JppQmNY8pDnJlBSHEkgI6pSozdC/yNV7Yh0gW1h0h7cIq
-VgQCAtQaK880xdCbv6wK1s2YQVP4pJOBdof1bn7QCBvBHKstSnPMuzkuMp6q4oLj
-D8H8QdOIhniQQylPZawVBNeFmX7hatIWkQoQg/NpgOVntYJtcCczc0JpajtgTtgz
-1oGXYZUAznw0o7UEjOeEqfLXPQXJHT5olUdnq2yWOV86M/F9wHGhbMie+5wfCuG4
-cmIyXBgzG9YPeblumeeF/ysZdDCJPzPp06mNXk+VpftRnPIJIQRlMo/hKIasqn1r
-znTFHbj4MtSnPbBLuMuoa3/3RVrF1KY4KiXJak+JXw7DKqxKf6P4mYYu3Cta3Uju
-8UciIoT6B83zpEIrczDI6UQBF7Rhyp69hD+MDnjG8IPZ0lMmYx8pDjwPUX+vgBnK
-uEVxNgOYRKXr2i+wf2WleE7PuFQrSsPhJkWqqE7BpjcDYX+bbdhP8fpnNyJvVl08
-VmhybSsulIv0UJWSlY7e
-=XiJb
+iQIcBAEBAgAGBQJYqumVAAoJEH8JsnLIjy/WO0UP/R9+9OQ9pxLts/Y5pvaWx1H7
+MoUSpusnVFBsiubL4ao/MN+Fm+NkGQlwrwFC4UUliVRGw6zxemYLVKs756MqHYtr
+zF4KC0wfufn1t37D7JTsUMp19gZosExKtscIepHy2q4ae0Us/rqzdoeburPbOLpp
+hyQNn5HC9IL6+ioXmu0+/TmtzybSH15h+gzT7rDOMvMziC3N0c0kJEh/1r8kRVCv
+yQ3tNHGJZvrhyisuPr7w4cbYO5NL7av01kPGQat9Z6x8D+AN8vy8opFX8vgcAoEv
+/JB8ZL6RHLW+vkCfTX5dpaUJG3EMkp4kTcpStVxz6A/gO8d+hFA7qNwURnlW+G/A
+iJ3yO+NUbb6cqJ6Oe2210WPtKkAaxly+G84XVR96cND5QsQhRcjwdLtnLW1ofaMN
+JvvWspUMaDdBhmHKtD4kcV/KxmCmwc1N3k+dCY9tiz9ilmadLj/MPaGeYadO43l5
+hxNkFs4FjhGzIZ/lmmd66Uz+7+OIpYlmLZrvRRIm+i3tI/9tgWSEMMWzwIcJV5L3
+rOAdVurXE0TFPYRXD9jv20EjVZ3OyKxb7/MmwrsuxcWS4OOh038LeKGqrRsELbWN
+BkebXC15LB/b4xsbLTqfdrykSbsjP+6fpVcY+Pi0/Zcnb7c+0DM1ug2GTo+2u65U
+18Sx8TTGsjjTzhcW6Jjl
+=uk06
 -----END PGP SIGNATURE-----
 
---2B/JsCI69OhZNC5r--
+--OBd5C1Lgu00Gd/Tn--
