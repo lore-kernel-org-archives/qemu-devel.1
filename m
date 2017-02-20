@@ -1,37 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cfpBQ-0000f4-DQ
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:43:26 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cfpH9-0005rR-5S
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:49:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cfpBN-0004B0-6Z
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:43:20 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33317
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cfpBN-0004Au-05
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:43:17 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1KEf4eC143779
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 09:43:16 -0500
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28r16cbg9y-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 09:43:15 -0500
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Mon, 20 Feb 2017 07:43:15 -0700
-From: Greg Kurz <groug@kaod.org>
-Date: Mon, 20 Feb 2017 15:43:07 +0100
-In-Reply-To: <148760155821.31154.13876757160410915057.stgit@bahia.lan>
-References: <148760155821.31154.13876757160410915057.stgit@bahia.lan>
+	(envelope-from <imammedo@redhat.com>) id 1cfpH6-00061C-Gt
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:49:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40632)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cfpH6-000618-7Q
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:49:12 -0500
+Date: Mon, 20 Feb 2017 15:49:09 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170220154909.4a88bfed@nial.brq.redhat.com>
+In-Reply-To: <5353279f68be14c63f049bc34902675290e45b1d.1487286467.git.ben@skyportsystems.com>
+References: <cover.1487286467.git.ben@skyportsystems.com>
+	<5353279f68be14c63f049bc34902675290e45b1d.1487286467.git.ben@skyportsystems.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <148760178735.31154.8978137672060558694.stgit@bahia.lan>
-Subject: [Qemu-devel] [PATCH 29/29] 9pfs: local: drop unused code
+Subject: Re: [Qemu-devel] [PATCH v8 7/8] tests: Add unit tests for the VM
+ Generation ID feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,244 +28,256 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>, Greg Kurz <groug@kaod.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: ben@skyportsystems.com
+Cc: qemu-devel@nongnu.org, lersek@redhat.com, mst@redhat.com
 
-Now that the all callbacks have been converted to use "at" syscalls, we
-can drop this code.
+On Thu, 16 Feb 2017 15:15:39 -0800
+ben@skyportsystems.com wrote:
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/9pfs/9p-local.c |  198 ----------------------------------------------------
- 1 file changed, 198 deletions(-)
+> From: Ben Warren <ben@skyportsystems.com>
+> 
+> The following tests are implemented:
+> * test that a GUID passed in by command line is propagated to the guest.
+>   Read the GUID from guest memory
+> * test that the "auto" argument to the GUID generates a valid GUID, as
+>   seen by the guest.
+> * test that a GUID passed in can be queried from the monitor
+> 
+>   This patch is loosely based on a previous patch from:
+>   Gal Hammer <ghammer@redhat.com>  and Igor Mammedov <imammedo@redhat.com>
+> 
+> Signed-off-by: Ben Warren <ben@skyportsystems.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 730cc37b765f..6d7d1d35bb6b 100644
---- a/hw/9pfs/9p-local.c
-+++ b/hw/9pfs/9p-local.c
-@@ -78,48 +78,6 @@ static void unlinkat_preserve_errno(int dirfd, const char *path, int flags)
- 
- #define VIRTFS_META_DIR ".virtfs_metadata"
- 
--static char *local_mapped_attr_path(FsContext *ctx, const char *path)
--{
--    int dirlen;
--    const char *name = strrchr(path, '/');
--    if (name) {
--        dirlen = name - path;
--        ++name;
--    } else {
--        name = path;
--        dirlen = 0;
--    }
--    return g_strdup_printf("%s/%.*s/%s/%s", ctx->fs_root,
--                           dirlen, path, VIRTFS_META_DIR, name);
--}
--
--static FILE *local_fopen(const char *path, const char *mode)
--{
--    int fd, o_mode = 0;
--    FILE *fp;
--    int flags = O_NOFOLLOW;
--    /*
--     * only supports two modes
--     */
--    if (mode[0] == 'r') {
--        flags |= O_RDONLY;
--    } else if (mode[0] == 'w') {
--        flags |= O_WRONLY | O_TRUNC | O_CREAT;
--        o_mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
--    } else {
--        return NULL;
--    }
--    fd = open(path, flags, o_mode);
--    if (fd == -1) {
--        return NULL;
--    }
--    fp = fdopen(fd, mode);
--    if (!fp) {
--        close(fd);
--    }
--    return fp;
--}
--
- static FILE *local_fopenat(int dirfd, const char *name, const char *mode)
- {
-     int fd, o_mode = 0;
-@@ -233,100 +191,6 @@ out:
-     return err;
- }
- 
--static int local_create_mapped_attr_dir(FsContext *ctx, const char *path)
--{
--    int err;
--    char *attr_dir;
--    char *tmp_path = g_strdup(path);
--
--    attr_dir = g_strdup_printf("%s/%s/%s",
--             ctx->fs_root, dirname(tmp_path), VIRTFS_META_DIR);
--
--    err = mkdir(attr_dir, 0700);
--    if (err < 0 && errno == EEXIST) {
--        err = 0;
--    }
--    g_free(attr_dir);
--    g_free(tmp_path);
--    return err;
--}
--
--static int local_set_mapped_file_attr(FsContext *ctx,
--                                      const char *path, FsCred *credp)
--{
--    FILE *fp;
--    int ret = 0;
--    char buf[ATTR_MAX];
--    char *attr_path;
--    int uid = -1, gid = -1, mode = -1, rdev = -1;
--
--    attr_path = local_mapped_attr_path(ctx, path);
--    fp = local_fopen(attr_path, "r");
--    if (!fp) {
--        goto create_map_file;
--    }
--    memset(buf, 0, ATTR_MAX);
--    while (fgets(buf, ATTR_MAX, fp)) {
--        if (!strncmp(buf, "virtfs.uid", 10)) {
--            uid = atoi(buf+11);
--        } else if (!strncmp(buf, "virtfs.gid", 10)) {
--            gid = atoi(buf+11);
--        } else if (!strncmp(buf, "virtfs.mode", 11)) {
--            mode = atoi(buf+12);
--        } else if (!strncmp(buf, "virtfs.rdev", 11)) {
--            rdev = atoi(buf+12);
--        }
--        memset(buf, 0, ATTR_MAX);
--    }
--    fclose(fp);
--    goto update_map_file;
--
--create_map_file:
--    ret = local_create_mapped_attr_dir(ctx, path);
--    if (ret < 0) {
--        goto err_out;
--    }
--
--update_map_file:
--    fp = local_fopen(attr_path, "w");
--    if (!fp) {
--        ret = -1;
--        goto err_out;
--    }
--
--    if (credp->fc_uid != -1) {
--        uid = credp->fc_uid;
--    }
--    if (credp->fc_gid != -1) {
--        gid = credp->fc_gid;
--    }
--    if (credp->fc_mode != -1) {
--        mode = credp->fc_mode;
--    }
--    if (credp->fc_rdev != -1) {
--        rdev = credp->fc_rdev;
--    }
--
--
--    if (uid != -1) {
--        fprintf(fp, "virtfs.uid=%d\n", uid);
--    }
--    if (gid != -1) {
--        fprintf(fp, "virtfs.gid=%d\n", gid);
--    }
--    if (mode != -1) {
--        fprintf(fp, "virtfs.mode=%d\n", mode);
--    }
--    if (rdev != -1) {
--        fprintf(fp, "virtfs.rdev=%d\n", rdev);
--    }
--    fclose(fp);
--
--err_out:
--    g_free(attr_path);
--    return ret;
--}
--
- static int local_set_mapped_file_attrat(int dirfd, const char *name,
-                                         FsCred *credp)
- {
-@@ -408,41 +272,6 @@ update_map_file:
-     return 0;
- }
- 
--static int local_set_xattr(const char *path, FsCred *credp)
--{
--    int err;
--
--    if (credp->fc_uid != -1) {
--        uint32_t tmp_uid = cpu_to_le32(credp->fc_uid);
--        err = setxattr(path, "user.virtfs.uid", &tmp_uid, sizeof(uid_t), 0);
--        if (err) {
--            return err;
--        }
--    }
--    if (credp->fc_gid != -1) {
--        uint32_t tmp_gid = cpu_to_le32(credp->fc_gid);
--        err = setxattr(path, "user.virtfs.gid", &tmp_gid, sizeof(gid_t), 0);
--        if (err) {
--            return err;
--        }
--    }
--    if (credp->fc_mode != -1) {
--        uint32_t tmp_mode = cpu_to_le32(credp->fc_mode);
--        err = setxattr(path, "user.virtfs.mode", &tmp_mode, sizeof(mode_t), 0);
--        if (err) {
--            return err;
--        }
--    }
--    if (credp->fc_rdev != -1) {
--        uint64_t tmp_rdev = cpu_to_le64(credp->fc_rdev);
--        err = setxattr(path, "user.virtfs.rdev", &tmp_rdev, sizeof(dev_t), 0);
--        if (err) {
--            return err;
--        }
--    }
--    return 0;
--}
--
- static int local_set_xattrat(int dirfd, const char *path, FsCred *credp)
- {
-     int err;
-@@ -482,33 +311,6 @@ static int local_set_xattrat(int dirfd, const char *path, FsCred *credp)
-     return 0;
- }
- 
--static int local_post_create_passthrough(FsContext *fs_ctx, const char *path,
--                                         FsCred *credp)
--{
--    char *buffer;
--
--    buffer = rpath(fs_ctx, path);
--    if (lchown(buffer, credp->fc_uid, credp->fc_gid) < 0) {
--        /*
--         * If we fail to change ownership and if we are
--         * using security model none. Ignore the error
--         */
--        if ((fs_ctx->export_flags & V9FS_SEC_MASK) != V9FS_SM_NONE) {
--            goto err;
--        }
--    }
--
--    if (chmod(buffer, credp->fc_mode & 07777) < 0) {
--        goto err;
--    }
--
--    g_free(buffer);
--    return 0;
--err:
--    g_free(buffer);
--    return -1;
--}
--
- static int local_set_cred_passthrough(FsContext *fs_ctx, int dirfd,
-                                       const char *name, FsCred *credp)
- {
+> ---
+>  tests/Makefile.include |   2 +
+>  tests/vmgenid-test.c   | 200 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 202 insertions(+)
+>  create mode 100644 tests/vmgenid-test.c
+> 
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 143507e..8d36341 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -241,6 +241,7 @@ check-qtest-i386-y += tests/usb-hcd-xhci-test$(EXESUF)
+>  gcov-files-i386-y += hw/usb/hcd-xhci.c
+>  check-qtest-i386-y += tests/pc-cpu-test$(EXESUF)
+>  check-qtest-i386-y += tests/q35-test$(EXESUF)
+> +check-qtest-i386-y += tests/vmgenid-test$(EXESUF)
+>  gcov-files-i386-y += hw/pci-host/q35.c
+>  check-qtest-i386-$(CONFIG_VHOST_NET_TEST_i386) += tests/vhost-user-test$(EXESUF)
+>  ifeq ($(CONFIG_VHOST_NET_TEST_i386),)
+> @@ -726,6 +727,7 @@ tests/ivshmem-test$(EXESUF): tests/ivshmem-test.o contrib/ivshmem-server/ivshmem
+>  tests/vhost-user-bridge$(EXESUF): tests/vhost-user-bridge.o contrib/libvhost-user/libvhost-user.o $(test-util-obj-y)
+>  tests/test-uuid$(EXESUF): tests/test-uuid.o $(test-util-obj-y)
+>  tests/test-arm-mptimer$(EXESUF): tests/test-arm-mptimer.o
+> +tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/acpi-utils.o
+>  
+>  tests/migration/stress$(EXESUF): tests/migration/stress.o
+>  	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,"LINK","$(TARGET_DIR)$@")
+> diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
+> new file mode 100644
+> index 0000000..123beae
+> --- /dev/null
+> +++ b/tests/vmgenid-test.c
+> @@ -0,0 +1,200 @@
+> +/*
+> + * QTest testcase for VM Generation ID
+> + *
+> + * Copyright (c) 2016 Red Hat, Inc.
+> + * Copyright (c) 2017 Skyport Systems
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include <glib.h>
+> +#include <string.h>
+> +#include <unistd.h>
+> +#include "qemu/osdep.h"
+> +#include "qemu/bitmap.h"
+> +#include "qemu/uuid.h"
+> +#include "hw/acpi/acpi-defs.h"
+> +#include "acpi-utils.h"
+> +#include "libqtest.h"
+> +
+> +#define VGID_GUID "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
+> +#define VMGENID_GUID_OFFSET 40   /* allow space for
+> +                                  * OVMF SDT Header Probe Supressor
+> +                                  */
+> +#define RSDP_ADDR_INVALID 0x100000 /* RSDP must be below this address */
+> +#define RSDP_SLEEP_US     100000   /* Sleep for 100ms between tries */
+> +#define RSDP_TRIES_MAX    100      /* Max total time is 10 seconds */
+> +
+> +typedef struct {
+> +    AcpiTableHeader header;
+> +    gchar name_op;
+> +    gchar vgia[4];
+> +    gchar val_op;
+> +    uint32_t vgia_val;
+> +} QEMU_PACKED VgidTable;
+> +
+> +static uint32_t acpi_find_vgia(void)
+> +{
+> +    uint32_t off;
+> +    AcpiRsdpDescriptor rsdp_table;
+> +    uint32_t rsdt;
+> +    AcpiRsdtDescriptorRev1 rsdt_table;
+> +    int tables_nr;
+> +    uint32_t *tables;
+> +    AcpiTableHeader ssdt_table;
+> +    VgidTable vgid_table;
+> +    int i;
+> +
+> +    /* Tables may take a short time to be set up by the guest */
+> +    for (i = 0; i < RSDP_TRIES_MAX; i++) {
+> +        off = acpi_find_rsdp_address();
+> +        if (off < RSDP_ADDR_INVALID) {
+> +            break;
+> +        }
+> +        g_usleep(RSDP_SLEEP_US);
+> +    }
+> +    g_assert_cmphex(off, <, RSDP_ADDR_INVALID);
+> +
+> +    acpi_parse_rsdp_table(off, &rsdp_table);
+> +
+> +    rsdt = rsdp_table.rsdt_physical_address;
+> +    /* read the header */
+> +    ACPI_READ_TABLE_HEADER(&rsdt_table, rsdt);
+> +    ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
+> +
+> +    /* compute the table entries in rsdt */
+> +    tables_nr = (rsdt_table.length - sizeof(AcpiRsdtDescriptorRev1)) /
+> +                sizeof(uint32_t);
+> +    g_assert_cmpint(tables_nr, >, 0);
+> +
+> +    /* get the addresses of the tables pointed by rsdt */
+> +    tables = g_new0(uint32_t, tables_nr);
+> +    ACPI_READ_ARRAY_PTR(tables, tables_nr, rsdt);
+> +
+> +    for (i = 0; i < tables_nr; i++) {
+> +        ACPI_READ_TABLE_HEADER(&ssdt_table, tables[i]);
+> +        if (!strncmp((char *)ssdt_table.oem_table_id, "VMGENID", 7)) {
+> +            /* the first entry in the table should be VGIA
+> +             * That's all we need
+> +             */
+> +            ACPI_READ_FIELD(vgid_table.name_op, tables[i]);
+> +            g_assert(vgid_table.name_op == 0x08);  /* name */
+> +            ACPI_READ_ARRAY(vgid_table.vgia, tables[i]);
+> +            g_assert(memcmp(vgid_table.vgia, "VGIA", 4) == 0);
+> +            ACPI_READ_FIELD(vgid_table.val_op, tables[i]);
+> +            g_assert(vgid_table.val_op == 0x0C);  /* dword */
+> +            ACPI_READ_FIELD(vgid_table.vgia_val, tables[i]);
+> +            /* The GUID is written at a fixed offset into the fw_cfg file
+> +             * in order to implement the "OVMF SDT Header probe suppressor"
+> +             * see docs/specs/vmgenid.txt for more details
+> +             */
+> +            return vgid_table.vgia_val + VMGENID_GUID_OFFSET;
+> +        }
+> +    }
+> +    return 0;
+> +}
+> +
+> +static void read_guid_from_memory(QemuUUID *guid)
+> +{
+> +    uint32_t vmgenid_addr;
+> +    int i;
+> +
+> +    vmgenid_addr = acpi_find_vgia();
+> +    g_assert(vmgenid_addr);
+> +
+> +    /* Read the GUID directly from guest memory */
+> +    for (i = 0; i < 16; i++) {
+> +        guid->data[i] = readb(vmgenid_addr + i);
+> +    }
+> +    /* The GUID is in little-endian format in the guest, while QEMU
+> +     * uses big-endian.  Swap after reading.
+> +     */
+> +    qemu_uuid_bswap(guid);
+> +}
+> +
+> +static void read_guid_from_monitor(QemuUUID *guid)
+> +{
+> +    QDict *rsp, *rsp_ret;
+> +    const char *guid_str;
+> +
+> +    rsp = qmp("{ 'execute': 'query-vm-generation-id' }");
+> +    if (qdict_haskey(rsp, "return")) {
+> +        rsp_ret = qdict_get_qdict(rsp, "return");
+> +        g_assert(qdict_haskey(rsp_ret, "guid"));
+> +        guid_str = qdict_get_str(rsp_ret, "guid");
+> +        g_assert(qemu_uuid_parse(guid_str, guid) == 0);
+> +    }
+> +    QDECREF(rsp);
+> +}
+> +
+> +static void vmgenid_set_guid_test(void)
+> +{
+> +    QemuUUID expected, measured;
+> +    gchar *cmd;
+> +
+> +    g_assert(qemu_uuid_parse(VGID_GUID, &expected) == 0);
+> +
+> +    cmd = g_strdup_printf("-machine accel=tcg -device vmgenid,id=testvgid,"
+> +                          "guid=%s", VGID_GUID);
+> +    qtest_start(cmd);
+> +
+> +    /* Read the GUID from accessing guest memory */
+> +    read_guid_from_memory(&measured);
+> +    g_assert(memcmp(measured.data, expected.data, sizeof(measured.data)) == 0);
+> +
+> +    qtest_quit(global_qtest);
+> +    g_free(cmd);
+> +}
+> +
+> +static void vmgenid_set_guid_auto_test(void)
+> +{
+> +    const char *cmd;
+> +    QemuUUID measured;
+> +
+> +    cmd = "-machine accel=tcg -device vmgenid,id=testvgid," "guid=auto";
+> +    qtest_start(cmd);
+> +
+> +    read_guid_from_memory(&measured);
+> +
+> +    /* Just check that the GUID is non-null */
+> +    g_assert(!qemu_uuid_is_null(&measured));
+> +
+> +    qtest_quit(global_qtest);
+> +}
+> +
+> +static void vmgenid_query_monitor_test(void)
+> +{
+> +    QemuUUID expected, measured;
+> +    gchar *cmd;
+> +
+> +    g_assert(qemu_uuid_parse(VGID_GUID, &expected) == 0);
+> +
+> +    cmd = g_strdup_printf("-machine accel=tcg -device vmgenid,id=testvgid,"
+> +                          "guid=%s", VGID_GUID);
+> +    qtest_start(cmd);
+> +
+> +    /* Read the GUID via the monitor */
+> +    read_guid_from_monitor(&measured);
+> +    g_assert(memcmp(measured.data, expected.data, sizeof(measured.data)) == 0);
+> +
+> +    qtest_quit(global_qtest);
+> +    g_free(cmd);
+> +}
+> +
+> +int main(int argc, char **argv)
+> +{
+> +    int ret;
+> +
+> +    g_test_init(&argc, &argv, NULL);
+> +
+> +    qtest_add_func("/vmgenid/vmgenid/set-guid",
+> +                   vmgenid_set_guid_test);
+> +    qtest_add_func("/vmgenid/vmgenid/set-guid-auto",
+> +                   vmgenid_set_guid_auto_test);
+> +    qtest_add_func("/vmgenid/vmgenid/query-monitor",
+> +                   vmgenid_query_monitor_test);
+> +    ret = g_test_run();
+> +
+> +    return ret;
+> +}
