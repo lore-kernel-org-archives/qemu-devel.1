@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cfuzu-0002t6-Ku
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:55:51 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cfv6Z-0006sD-Gw
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 16:02:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cfuzp-0003Kt-Me
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:55:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35974)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cfuzp-0003Kf-C6
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:55:45 -0500
-References: <cover.1487286467.git.ben@skyportsystems.com>
-	<88232638f9ff3b17b54987624468678ea14a3037.1487286467.git.ben@skyportsystems.com>
-	<20170217114321.6c8577e1@nial.brq.redhat.com>
-	<918524f7-26cf-3fce-d9e3-7316ca69285b@redhat.com>
-	<20170220102304.GC2372@work-vm>
-	<3fb8499e-884c-99e8-b295-3d4603921075@redhat.com>
-	<20170220201923.GM2372@work-vm>
-	<d51d4a21-5558-d4e5-5b7e-08f729fc1a5e@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <0488d90c-f73c-916c-f84c-a1ffd2bad592@redhat.com>
-Date: Mon, 20 Feb 2017 21:55:40 +0100
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cfv6V-0005cu-Ie
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 16:02:43 -0500
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:34301)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cfv6V-0005co-Dx
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 16:02:39 -0500
+Received: by mail-qt0-x244.google.com with SMTP id x35so4782113qtc.1
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 13:02:39 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170220185020.774-1-dgilbert@redhat.com>
+	<20170220185020.774-4-dgilbert@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <131d13b5-a960-fc5c-4400-cafdf3f96245@amsat.org>
+Date: Mon, 20 Feb 2017 18:02:34 -0300
 MIME-Version: 1.0
-In-Reply-To: <d51d4a21-5558-d4e5-5b7e-08f729fc1a5e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 4/8] ACPI: Add Virtual Machine
- Generation ID support
+In-Reply-To: <20170220185020.774-4-dgilbert@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 3/5] slirp: Common lhost/fhost union
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,75 +34,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, ben@skyportsystems.com, mst@redhat.com
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com
+Cc: quintela@redhat.com
 
-On 02/20/17 21:45, Eric Blake wrote:
-> On 02/20/2017 02:19 PM, Dr. David Alan Gilbert wrote:
->> * Eric Blake (eblake@redhat.com) wrote:
->>> On 02/20/2017 04:23 AM, Dr. David Alan Gilbert wrote:
->>>> * Laszlo Ersek (lersek@redhat.com) wrote:
->>>>> CC Dave
->>>>
->>>> This isn't an area I really understand; but if I'm
->>>> reading this right then 
->>>>    vmgenid is stored in fw_cfg?
->>>>    fw_cfg isn't migrated
->>>>
->>>> So why should any changes to it get migrated, except if it's already
->>>> been read by the guest (and if the guest reads it again aftwards what's
->>>> it expected to read?)
->>>
->>> Why are we expecting it to change on migration?  You want a new value
->>
->> I'm not; I was asking why a change made prior to migration would be
->> preserved across migration.
-> 
-> Okay, so you're asking what happens if the source requests the vmgenid
-> device, and sets an id, but the destination of the migration does not
-> request anything
+On 02/20/2017 03:50 PM, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> The socket structure has a pair of unions for lhost and fhost
+> addresses; the unions are identical so split them out into
+> a separate union declaration.
+>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-This should never happen, as it means different QEMU command lines on
-source vs. target hosts. (Different as in "incorrectly different".)
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Dave writes, "a change made prior to migration". Change made to what?
-
-- the GUID cannot be changed via the monitor once QEMU has been started.
-We dropped the monitor command for that, due to lack of a good use case,
-and due to lifecycle complexities. We have figured out a way to make it
-safe, but until there's a really convincing use case, we shouldn't add
-that complexity.
-
-- the address of the GUID is changed (the firmware programs it from
-"zero" to an actual address, in a writeable fw_cfg file), and that piece
-of info is explicitly migrated, as part of the vmgenid device's vmsd.
-
-Thanks
-Laszlo
-
-
-> - how does the guest on the destination see the same id
-> as was in place on the source at the time migration started.
-> 
->>
->>
->>> when you load state from disk (you don't know how many times the same
->>> state has been loaded previously, so each load is effectively forking
->>> the VM and you want a different value), but for a single live migration,
->>> you aren't forking the VM and don't need a new generation ID.
->>>
->>> I guess it all boils down to what command line you're using: if libvirt
->>> is driving a live migration, it will request the same UUID in the
->>> command line of the destination as what is on the source; while if
->>> libvirt is loading from a [managed]save to restore state from a file, it
->>> will either request a new UUID directly or request auto to let qemu
->>> generate the new id.
->>
->> Hmm now I've lost it a bit; I thought we would preserve the value
->> transmitted from the source, not the value on the command line of the destination.
-> 
-> I guess I'm trying to figure out whether libvirt MUST read the current
-> id and explicitly tell the destination of migration to reuse that id, or
-> if libvirt can omit the id on migration and everything just works
-> because the id was migrated from the source.
-> 
+> ---
+>  slirp/socket.h | 18 ++++++++----------
+>  1 file changed, 8 insertions(+), 10 deletions(-)
+>
+> diff --git a/slirp/socket.h b/slirp/socket.h
+> index 8feed2a..c1be77e 100644
+> --- a/slirp/socket.h
+> +++ b/slirp/socket.h
+> @@ -15,6 +15,12 @@
+>   * Our socket structure
+>   */
+>
+> +union slirp_sockaddr {
+> +    struct sockaddr_storage ss;
+> +    struct sockaddr_in sin;
+> +    struct sockaddr_in6 sin6;
+> +};
+> +
+>  struct socket {
+>    struct socket *so_next,*so_prev;      /* For a linked list of sockets */
+>
+> @@ -31,22 +37,14 @@ struct socket {
+>    struct tcpiphdr *so_ti;	   /* Pointer to the original ti within
+>  				    * so_mconn, for non-blocking connections */
+>    int so_urgc;
+> -  union {   /* foreign host */
+> -      struct sockaddr_storage ss;
+> -      struct sockaddr_in sin;
+> -      struct sockaddr_in6 sin6;
+> -  } fhost;
+> +  union slirp_sockaddr fhost;      /* Foreign host */
+>  #define so_faddr fhost.sin.sin_addr
+>  #define so_fport fhost.sin.sin_port
+>  #define so_faddr6 fhost.sin6.sin6_addr
+>  #define so_fport6 fhost.sin6.sin6_port
+>  #define so_ffamily fhost.ss.ss_family
+>
+> -  union {   /* local host */
+> -      struct sockaddr_storage ss;
+> -      struct sockaddr_in sin;
+> -      struct sockaddr_in6 sin6;
+> -  } lhost;
+> +  union slirp_sockaddr lhost;      /* Local host */
+>  #define so_laddr lhost.sin.sin_addr
+>  #define so_lport lhost.sin.sin_port
+>  #define so_laddr6 lhost.sin6.sin6_addr
+>
