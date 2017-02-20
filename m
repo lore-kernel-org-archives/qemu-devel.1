@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cfqOK-0003PH-Ot
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 11:00:48 -0500
+	(envelope-from <agraf@suse.de>) id 1cfqP1-0003xp-PU
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 11:01:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cfqOG-00049U-5V
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 11:00:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59598)
+	(envelope-from <agraf@suse.de>) id 1cfqOw-0004Hz-Su
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 11:01:27 -0500
+Received: from mx2.suse.de ([195.135.220.15]:53881)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cfqOF-00049P-Uk
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 11:00:40 -0500
-References: <cover.1487286467.git.ben@skyportsystems.com>
-	<20170220155752.32892bc3@nial.brq.redhat.com>
-	<6ad09d32-8d26-3f55-3922-a913275fc9d1@redhat.com>
-	<20170220154546.GA25159@morn.lan>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <25bea714-db34-3250-2f30-64e0daf2ce0e@redhat.com>
-Date: Mon, 20 Feb 2017 17:00:26 +0100
+	(Exim 4.71) (envelope-from <agraf@suse.de>) id 1cfqOw-0004Hm-Mb
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 11:01:22 -0500
+References: <20170220141943.8426-1-cornelia.huck@de.ibm.com>
+	<9b1118e8-8b00-fa68-a3f8-9a8af2346e17@redhat.com>
+From: Alexander Graf <agraf@suse.de>
+Message-ID: <77cdf172-3321-7031-0e6e-f485c23393f2@suse.de>
+Date: Mon, 20 Feb 2017 08:01:15 -0800
 MIME-Version: 1.0
-In-Reply-To: <20170220154546.GA25159@morn.lan>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <9b1118e8-8b00-fa68-a3f8-9a8af2346e17@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 0/8] Add support for VM Generation ID
+Subject: Re: [Qemu-devel] [PATCH 0/5] s390x: network boot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +27,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin O'Connor <kevin@koconnor.net>, Igor Mammedov <imammedo@redhat.com>, ben@skyportsystems.com, mst@redhat.com
-Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, jfrei@linux.vnet.ibm.com
 
-On 02/20/17 16:45, Kevin O'Connor wrote:
-> On Mon, Feb 20, 2017 at 04:41:38PM +0100, Laszlo Ersek wrote:
->> On 02/20/17 15:57, Igor Mammedov wrote:
->>> On Thu, 16 Feb 2017 15:15:32 -0800
->>> ben@skyportsystems.com wrote:
->>>
->>>> From: Ben Warren <ben@skyportsystems.com>
->>>>
->>>> This patch set adds support for passing a GUID to Windows guests.  It is a
->>>> re-implementation of previous patch sets written by Igor Mammedov et al, but
->>>> this time passing the GUID data as a fw_cfg blob.
->>>>
->>>> This patch set has dependencies on new guest functionality, in particular the
->>>> support for a new linker-loader command and the ability to write back data
->>>> to QEMU over a DMA link.  Work is in flight in both SeaBIOS and OVMF to support this.
->>>>
->>>> v7->v8:
->>>>     - Rebased to top of tree.
->>>>     - Fixed two small bugs in "write pointer" function
->>>>     - minor re-ordering of data in patches
->>>>     - Fixed unit test by adding delays/retries to reading RSDP table
->>> Michael,
->>>
->>> series looks good for merging.
->>> Patch
->>>  [PATCH v8 7/8] tests: Add unit tests for the VM  Generation ID feature
->>> needs updated seabios blob to make 'make check' happy
->>> so we probably should merge/update seabios first
->>>   [PATCH v5 0/5] QEMU: Add capability to write back fw_cfg address to QEMU
->>>
->>> CCing Gerd and Kevin.
->>>
->>
->> That's sort of a circular dependency, as Kevin generally prefers to
->> merge SeaBIOS patches once the underlying QEMU code has been committed :)
->>
->> For a total ordering, all QEMU patches except v8 7/8 could be merged in
->> QEMU, then the v5 SeaBIOS patches could be merged, then Gerd could
->> refresh the bundled SeaBIOS binaries, then QEMU patch v8 7/8 could be
->> merged.
->>
->> I'm not actually suggesting that though, given that the soft freeze is
->> in about a week.
->>
->> Kevin, can you please make an exception this time and merge the SeaBIOS
->> patches ahead of the QEMU patches?
-> 
-> Yes.
 
-Thank you!
 
-Ben, Igor or Michael -- can one of you please add a paragraph on VMGENID
-to <http://wiki.qemu-project.org/ChangeLog/2.9>, later on?
+On 20/02/2017 07:43, Thomas Huth wrote:
+> On 20.02.2017 15:19, Cornelia Huck wrote:
+>> This patchset implements network boot for s390x. You need to build
+>> a s390-netboot.img to actually perform the work (not included).
+>
+> Do you plan to include this into the upstream QEMU repository later, or
+> will this stay an external binary?
+>
+>> Basically, we add support for virtio-net devices into the ipl code
+>> and update the ccw bios to handle this as well.
+>
+> Just out of curiosity: What's the reason for shipping an additional
+> binary here? Couldn't it be linked into the ccw bios as well (so that
+> it's easier for the user to select a different version with the -bios
+> parameter)?
 
-(Ben, if you don't have an account yet, I think Stefan (CC'd) can give
-you one.)
+The "other binary" (s390-netboot.img) is the equivalent of grub or 
+pxelinux in an x86 network boot environment. That one usually comes from 
+a different entity and different department :).
 
-Thanks!
-Laszlo
+I haven't looked at the patches in detail, but do they follow the 
+"normal" PXE boot flow? Do they do a DHCP request, send a proper 
+Vendor-Class-Identifier for s390x, fetch the binary described by the 
+"filename" property in the DHCP ack via TFTP from next-server and run 
+that one then?
 
-> 
-> Gerd - are you planning to backport this series to the stable branch?
-> 
-> -Kevin
-> 
+It would be very good to stick to that flow, so that you don't confuse 
+your network admins :).
+
+
+Alex
