@@ -1,26 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37911)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cfsks-00088Z-Qt
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:32:12 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cfstj-00033b-1d
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:41:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cfskp-0006bo-6x
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:32:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43586)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cfskp-0006bW-18
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:32:07 -0500
-Date: Mon, 20 Feb 2017 18:32:01 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170220183201.GD15874@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1487053524-18674-1-git-send-email-den@openvz.org>
-	<1487053524-18674-2-git-send-email-den@openvz.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1487053524-18674-2-git-send-email-den@openvz.org>
-Subject: Re: [Qemu-devel] [PATCH v4 1/3] i386/cpu: add crash-information QOM
- property
+	(envelope-from <pm215@archaic.org.uk>) id 1cfsti-0000Ce-9T
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:41:19 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 20 Feb 2017 18:41:08 +0000
+Message-Id: <1487616072-9226-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 0/4] arm: Fix M profile MSR/MRS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,78 +17,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>
-Cc: qemu-devel@nongnu.org, Anton Nefedov <anton.nefedov@virtuozzo.com>
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Michael Davidsaver <mdavidsaver@gmail.com>
 
-On Tue, Feb 14, 2017 at 09:25:22AM +0300, Denis V. Lunev wrote:
-> From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> 
-> Windows reports BSOD parameters through Hyper-V crash MSRs. This
-> information is very useful for initial crash analysis and thus
-> it would be nice to have a way to fetch it.
-> 
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> Signed-off-by: Denis V. Lunev <den@openvz.org>
-> ---
->  kvm-all.c         |  1 +
->  qapi-schema.json  | 24 ++++++++++++++++++++++++
->  target/i386/cpu.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 75 insertions(+)
-> 
-> diff --git a/kvm-all.c b/kvm-all.c
-> index a27c880..64f46c8 100644
-> --- a/kvm-all.c
-> +++ b/kvm-all.c
-> @@ -2000,6 +2000,7 @@ int kvm_cpu_exec(CPUState *cpu)
->                  ret = EXCP_INTERRUPT;
->                  break;
->              case KVM_SYSTEM_EVENT_CRASH:
-> +                kvm_cpu_synchronize_state(cpu);
->                  qemu_mutex_lock_iothread();
->                  qemu_system_guest_panicked();
->                  qemu_mutex_unlock_iothread();
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index cbdffdd..9cb6ac5 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -5846,6 +5846,30 @@
->    'data': [ 'pause', 'poweroff' ] }
->  
->  ##
-> +# @GuestPanicInformation:
-> +#
-> +# Information about a guest panic
-> +#
-> +# Since: 2.9
-> +##
-> +{'union': 'GuestPanicInformation',
-> + 'data': { 'hyper-v': 'GuestPanicInformationHyperV' } }
-> +
-> +##
-> +# @GuestPanicInformationHyperV:
-> +#
-> +# Hyper-V specific guest panic information (HV crash MSRs)
-> +#
-> +# Since: 2.9
-> +##
-> +{'struct': 'GuestPanicInformationHyperV',
-> + 'data': { 'arg1': 'uint64',
-> +           'arg2': 'uint64',
-> +           'arg3': 'uint64',
-> +           'arg4': 'uint64',
-> +           'arg5': 'uint64' } }
+This patchseries fixes up some deficiencies and one nasty
+bug in the M profile MSR/MRS handling.
 
-Is there any benefit in naming these fields ?  In the Linux kernel
-they are filled with ip, ax, bx, cx, dx register values. I'm unclear
-if that's defined standard semantics by Microsoft, and thus consistent
-for all OS using this interface, or just what Linux happens to store
-there ?  If they're standard, then IMHO it could be nicer to name the
-QAPI fields  ip, ax, bx, cx, dx.
+The first three patches are just cleaning up the decode
+so that we UNDEF where we should in the MRS/MSR space
+for M profile -- this won't have caused any problems in
+practice since real world code doesn't generally execute
+UNDEFfing instructions on purpose.
 
+The fourth patch fixes a nasty bug that I introduced in
+commit 58117c9bb429cd which broke APSR writes via MSR,
+and brings them into line with the pseudocode by allowing
+writes to the APSR GE[3:0] bits when the CPU implements
+the DSP extensions.
 
-Regards,
-Daniel
+Alex -- I should have paid closer attention to your review
+comments on the patch that became commit 58117c9bb429cd;
+sorry about that. I knew we didn't get the GE[3:0] stuff
+right yet but I didn't spot that we'd managed to invert
+the sense of the SYSm bit 2 test in that patch :-(
+
+thanks
+-- PMM
+
+Peter Maydell (4):
+  arm: HVC and SMC encodings don't exist for M profile
+  arm: Don't decode MRS(banked) or MSR(banked) for M profile
+  arm: Enforce should-be-1 bits in MRS decoding
+  arm: Fix APSR writes via M profile MSR
+
+ target/arm/helper.c    | 26 ++++++++++++++++++++++----
+ target/arm/translate.c | 26 +++++++++++++++++++++++---
+ 2 files changed, 45 insertions(+), 7 deletions(-)
+
 -- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+2.7.4
