@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1cfk2q-0007Uc-FS
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:14:09 -0500
+	(envelope-from <bounces@canonical.com>) id 1cfk5h-0000KA-6J
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:17:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1cfk2n-0000JH-6S
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:14:08 -0500
-Received: from mga06.intel.com ([134.134.136.31]:62438)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1cfk2m-0000J0-Rj
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:14:05 -0500
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-Date: Mon, 20 Feb 2017 09:13:59 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743900C6A9@shsmsx102.ccr.corp.intel.com>
-References: <1484026704-28027-1-git-send-email-mst@redhat.com>
-	<1484026704-28027-9-git-send-email-mst@redhat.com>
-	<A2975661238FB949B60364EF0F2C25743900AAEF@shsmsx102.ccr.corp.intel.com>
-	<c1f86fba-6b22-8316-156f-2024bee46b0c@redhat.com>
-	<A2975661238FB949B60364EF0F2C25743900B73D@shsmsx102.ccr.corp.intel.com>
-	<e9022e3a-5fa5-45c3-cc84-cb78d3ff9cdc@redhat.com>
-	<A2975661238FB949B60364EF0F2C25743900C602@shsmsx102.ccr.corp.intel.com>
-	<60ec34e3-2585-123f-7bc0-9d7bb143fc38@redhat.com>
-In-Reply-To: <60ec34e3-2585-123f-7bc0-9d7bb143fc38@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <bounces@canonical.com>) id 1cfk5e-00010w-06
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:17:05 -0500
+Received: from indium.canonical.com ([91.189.90.7]:40508)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cfk5d-00010U-QO
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:17:01 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cfk5b-00025D-BF
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 09:16:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 06A6D2E80CB
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 09:16:59 +0000 (UTC)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PULL 08/41] intel_iommu: support device iotlb
- descriptor
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 20 Feb 2017 09:03:42 -0000
+From: Thomas Huth <741115@bugs.launchpad.net>
+Reply-To: Bug 741115 <741115@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20110323164949.17887.98157.malonedeb@soybean.canonical.com>
+Message-Id: <20170220090342.4151.10984.launchpad@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 741115] Re: Add support of coprocessor cp15,
+ cp14 registers exposion in the embedded gdb server
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,111 +37,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "Lan, Tianyu" <tianyu.lan@intel.com>, Peter Maydell <peter.maydell@linaro.org>, "Tian, Kevin" <kevin.tian@intel.com>, Eduardo
-	Habkost <ehabkost@redhat.com>, Peter Xu <peterx@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard
-	Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBKYXNvbiBXYW5nIFttYWlsdG86
-amFzb3dhbmdAcmVkaGF0LmNvbV0NCj4gU2VudDogTW9uZGF5LCBGZWJydWFyeSAyMCwgMjAxNyA1
-OjA0IFBNDQo+IFRvOiBMaXUsIFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT47IE1pY2hhZWwgUy4g
-VHNpcmtpbiA8bXN0QHJlZGhhdC5jb20+OyBxZW11LQ0KPiBkZXZlbEBub25nbnUub3JnDQo+IENj
-OiBMYW4sIFRpYW55dSA8dGlhbnl1LmxhbkBpbnRlbC5jb20+OyBQZXRlciBNYXlkZWxsDQo+IDxw
-ZXRlci5tYXlkZWxsQGxpbmFyby5vcmc+OyBUaWFuLCBLZXZpbiA8a2V2aW4udGlhbkBpbnRlbC5j
-b20+OyBFZHVhcmRvDQo+IEhhYmtvc3QgPGVoYWJrb3N0QHJlZGhhdC5jb20+OyBQZXRlciBYdSA8
-cGV0ZXJ4QHJlZGhhdC5jb20+OyBBbGV4DQo+IFdpbGxpYW1zb24gPGFsZXgud2lsbGlhbXNvbkBy
-ZWRoYXQuY29tPjsgUGFvbG8gQm9uemluaQ0KPiA8cGJvbnppbmlAcmVkaGF0LmNvbT47IFJpY2hh
-cmQgSGVuZGVyc29uIDxydGhAdHdpZGRsZS5uZXQ+DQo+IFN1YmplY3Q6IFJlOiBbUWVtdS1kZXZl
-bF0gW1BVTEwgMDgvNDFdIGludGVsX2lvbW11OiBzdXBwb3J0IGRldmljZSBpb3RsYg0KPiBkZXNj
-cmlwdG9yDQo+IA0KPiANCj4gDQo+IE9uIDIwMTflubQwMuaciDIw5pelIDE2OjI3LCBMaXUsIFlp
-IEwgd3JvdGU6DQo+ID4+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4+IEZyb206IEph
-c29uIFdhbmcgW21haWx0bzpqYXNvd2FuZ0ByZWRoYXQuY29tXQ0KPiA+PiBTZW50OiBGcmlkYXks
-IEZlYnJ1YXJ5IDE3LCAyMDE3IDI6NDMgUE0NCj4gPj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVA
-aW50ZWwuY29tPjsgTWljaGFlbCBTLiBUc2lya2luDQo+ID4+IDxtc3RAcmVkaGF0LmNvbT47IHFl
-bXUtIGRldmVsQG5vbmdudS5vcmcNCj4gPj4gQ2M6IFBldGVyIE1heWRlbGwgPHBldGVyLm1heWRl
-bGxAbGluYXJvLm9yZz47IEVkdWFyZG8gSGFia29zdA0KPiA+PiA8ZWhhYmtvc3RAcmVkaGF0LmNv
-bT47IFBldGVyIFh1IDxwZXRlcnhAcmVkaGF0LmNvbT47IFBhb2xvIEJvbnppbmkNCj4gPj4gPHBi
-b256aW5pQHJlZGhhdC5jb20+OyBSaWNoYXJkIEhlbmRlcnNvbiA8cnRoQHR3aWRkbGUubmV0Pjsg
-VGlhbiwNCj4gPj4gS2V2aW4gPGtldmluLnRpYW5AaW50ZWwuY29tPjsgTGFuLCBUaWFueXUgPHRp
-YW55dS5sYW5AaW50ZWwuY29tPjsNCj4gPj4gQWxleCBXaWxsaWFtc29uIDxhbGV4LndpbGxpYW1z
-b25AcmVkaGF0LmNvbT4NCj4gPj4gU3ViamVjdDogUmU6IFtRZW11LWRldmVsXSBbUFVMTCAwOC80
-MV0gaW50ZWxfaW9tbXU6IHN1cHBvcnQgZGV2aWNlDQo+ID4+IGlvdGxiIGRlc2NyaXB0b3INCj4g
-Pj4NCj4gPj4NCj4gPj4NCj4gPj4gT24gMjAxN+W5tDAy5pyIMTfml6UgMTQ6MTgsIExpdSwgWWkg
-TCB3cm90ZToNCj4gPj4+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+Pj4+IEZyb206
-IEphc29uIFdhbmcgW21haWx0bzpqYXNvd2FuZ0ByZWRoYXQuY29tXQ0KPiA+Pj4+IFNlbnQ6IFRo
-dXJzZGF5LCBGZWJydWFyeSAxNiwgMjAxNyAxOjQ0IFBNDQo+ID4+Pj4gVG86IExpdSwgWWkgTCA8
-eWkubC5saXVAaW50ZWwuY29tPjsgTWljaGFlbCBTLiBUc2lya2luDQo+ID4+Pj4gPG1zdEByZWRo
-YXQuY29tPjsgcWVtdS0gZGV2ZWxAbm9uZ251Lm9yZw0KPiA+Pj4+IENjOiBQZXRlciBNYXlkZWxs
-IDxwZXRlci5tYXlkZWxsQGxpbmFyby5vcmc+OyBFZHVhcmRvIEhhYmtvc3QNCj4gPj4+PiA8ZWhh
-Ymtvc3RAcmVkaGF0LmNvbT47IFBldGVyIFh1IDxwZXRlcnhAcmVkaGF0LmNvbT47IFBhb2xvIEJv
-bnppbmkNCj4gPj4+PiA8cGJvbnppbmlAcmVkaGF0LmNvbT47IFJpY2hhcmQgSGVuZGVyc29uIDxy
-dGhAdHdpZGRsZS5uZXQ+OyBUaWFuLA0KPiA+Pj4+IEtldmluIDxrZXZpbi50aWFuQGludGVsLmNv
-bT47IExhbiwgVGlhbnl1IDx0aWFueXUubGFuQGludGVsLmNvbT47DQo+ID4+Pj4gQWxleCBXaWxs
-aWFtc29uIDxhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbT4NCj4gPj4+PiBTdWJqZWN0OiBSZTog
-W1FlbXUtZGV2ZWxdIFtQVUxMIDA4LzQxXSBpbnRlbF9pb21tdTogc3VwcG9ydCBkZXZpY2UNCj4g
-Pj4+PiBpb3RsYiBkZXNjcmlwdG9yDQo+ID4+Pj4NCj4gPj4+Pg0KPiA+Pj4+DQo+ID4+Pj4gT24g
-MjAxN+W5tDAy5pyIMTbml6UgMTM6MzYsIExpdSwgWWkgTCB3cm90ZToNCj4gPj4+Pj4+IC0tLS0t
-T3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4+Pj4+PiBGcm9tOiBRZW11LWRldmVsDQo+ID4+Pj4+
-PiBbbWFpbHRvOnFlbXUtZGV2ZWwtYm91bmNlcyt5aS5sLmxpdT1pbnRlbC5jb21Abm9uZ251Lm9y
-Z10NCj4gPj4+Pj4+IE9uIEJlaGFsZiBPZiBNaWNoYWVsIFMuIFRzaXJraW4NCj4gPj4+Pj4+IFNl
-bnQ6IFR1ZXNkYXksIEphbnVhcnkgMTAsIDIwMTcgMTo0MCBQTQ0KPiA+Pj4+Pj4gVG86IHFlbXUt
-ZGV2ZWxAbm9uZ251Lm9yZw0KPiA+Pj4+Pj4gQ2M6IFBldGVyIE1heWRlbGwgPHBldGVyLm1heWRl
-bGxAbGluYXJvLm9yZz47IEVkdWFyZG8gSGFia29zdA0KPiA+Pj4+Pj4gPGVoYWJrb3N0QHJlZGhh
-dC5jb20+OyBKYXNvbiBXYW5nIDxqYXNvd2FuZ0ByZWRoYXQuY29tPjsgUGV0ZXINCj4gPj4gWHUN
-Cj4gPj4+Pj4+IDxwZXRlcnhAcmVkaGF0LmNvbT47IFBhb2xvIEJvbnppbmkgPHBib256aW5pQHJl
-ZGhhdC5jb20+OyBSaWNoYXJkDQo+ID4+Pj4+PiBIZW5kZXJzb24gPHJ0aEB0d2lkZGxlLm5ldD4N
-Cj4gPj4+Pj4+IFN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwOC80MV0gaW50ZWxfaW9tbXU6
-IHN1cHBvcnQgZGV2aWNlDQo+ID4+Pj4+PiBpb3RsYiBkZXNjcmlwdG9yDQo+ID4+Pj4+Pg0KPiA+
-Pj4+Pj4gRnJvbTogSmFzb24gV2FuZyA8amFzb3dhbmdAcmVkaGF0LmNvbT4NCj4gPj4+Pj4+DQo+
-ID4+Pj4+PiBUaGlzIHBhdGNoIGVuYWJsZXMgZGV2aWNlIElPVExCIHN1cHBvcnQgZm9yIGludGVs
-IGlvbW11LiBUaGUNCj4gPj4+Pj4+IG1ham9yIHdvcmsgaXMgdG8gaW1wbGVtZW50IFFJIGRldmlj
-ZSBJT1RMQiBkZXNjcmlwdG9yIHByb2Nlc3NpbmcNCj4gPj4+Pj4+IGFuZCBub3RpZnkgdGhlIGRl
-dmljZSB0aHJvdWdoIGlvbW11IG5vdGlmaWVyLg0KPiA+Pj4+Pj4NCj4gPj4+Pj4gSGkgSmFzb24v
-TWljaGFlbCwNCj4gPj4+Pj4NCj4gPj4+Pj4gUmVjZW50bHkgUGV0ZXIgWHUncyBwYXRjaCBhbHNv
-IHRvdWNoZWQgaW50ZWwtaW9tbXUgZW11bGF0aW9uLiBIaXMNCj4gPj4+Pj4gcGF0Y2ggc2hhZG93
-cyBzZWNvbmQtbGV2ZWwgcGFnZSB0YWJsZSBieSBjYXB0dXJpbmcgaW90bGIgZmx1c2gNCj4gPj4+
-Pj4gZnJvbSBndWVzdC4gSXQgd291bGQgcmVzdWx0IGluIHBhZ2UgdGFibGUgdXBkYXRpbmcgaW4g
-aG9zdC4gRG9lcw0KPiA+Pj4+PiB0aGlzIHBhdGNoIGFsc28gdXNlIHRoZSBzYW1lIG1hcC91bWFw
-IEFQSSBwcm92aWRlZCBieSBWRklPPw0KPiA+Pj4+IFllcywgaXQgZGVwZW5kcyBvbiB0aGUgaW9t
-bXUgbm90aWZpZXIgdG9vLg0KPiA+Pj4+DQo+ID4+Pj4+IElmIGl0IGlzLCB0aGVuIEkgdGhpbmsg
-aXQgd291bGQgYWxzbyB1cGRhdGUgcGFnZSB0YWJsZSBpbiBob3N0LiBJdA0KPiA+Pj4+PiBsb29r
-cyB0byBiZSBhIGR1cGxpY2F0ZSB1cGRhdGUuIFBscyByZWZlciB0byB0aGUgZm9sbG93aW5nDQo+
-ID4+Pj4+IHNuYXBzaG90IGNhcHR1cmVkIGZyb20gc2VjdGlvbiA2LjUuMi41IG9mIHZ0ZCBzcGVj
-Lg0KPiA+Pj4+Pg0KPiA+Pj4+PiAiU2luY2UgdHJhbnNsYXRpb24gcmVxdWVzdHMgZnJvbSBhIGRl
-dmljZSBtYXkgYmUgc2VydmljZWQgYnkNCj4gPj4+Pj4gaGFyZHdhcmUgZnJvbSB0aGUgSU9UTEIs
-IHNvZnR3YXJlIG11c3QgYWx3YXlzIHJlcXVlc3QgSU9UTEINCj4gPj4+Pj4gaW52YWxpZGF0aW9u
-DQo+ID4+Pj4+IChpb3RsYl9pbnZfZHNjKSBiZWZvcmUgcmVxdWVzdGluZyBjb3JyZXNwb25kaW5n
-IERldmljZS1UTEINCj4gPj4+Pj4gKGRldl90bGJfaW52X2RzYykgaW52YWxpZGF0aW9uLiINCj4g
-Pj4+Pj4NCj4gPj4+Pj4gTWF5YmUgZm9yIGRldmljZS1pb3RsYiwgd2UgbmVlZCBhIHNlcGFyYXRl
-IEFQSSB3aGljaCBqdXN0IHBhc3MNCj4gPj4+Pj4gZG93biB0aGUgaW52YWxpZGF0ZSBpbmZvIHdp
-dGhvdXQgdXBkYXRpbmcgcGFnZSB0YWJsZS4gQW55IHRob3VnaHRzPw0KPiA+Pj4+IGNjIEFsZXgu
-DQo+ID4+Pj4NCj4gPj4+PiBJZiB3ZSB3YW50IEFUUyB0byBiZSB2aXNpYmxlIGZvciBndWVzdCAo
-YnV0IEknbSBub3Qgc3VyZSBpZiBWRklPDQo+ID4+Pj4gc3VwcG9ydCB0aGlzKSwgd2UgcHJvYmFi
-bHkgbmVlZCBhbm90aGVyIG5vdGlmaWVyIG9yIGEgbmV3IGZsYWcuDQo+ID4+PiBKYXNvbiwgZm9y
-IGFzc2lnbmVkIGRldmljZSwgSSB0aGluayBndWVzdCBjb3VsZCBzZWUgQVRTIGlmIHRoZQ0KPiA+
-Pj4gYXNzaWduZWQgZGV2aWNlIHN1cHBvcnRzIEFUUy4gSSBjYW4gc2VlIGl0IHdoZW4gcGFzc3Ro
-cnUgaUdQVS4NCj4gPj4+DQo+ID4+PiBSZWdhcmRzLA0KPiA+Pj4gWWkgTA0KPiA+PiBHb29kIHRv
-IGtub3cgdGhpcy4NCj4gPj4NCj4gPj4gSWYgSSB1bmRlcnN0YW5kIHlvdXIgc3VnZ2VzdGlvbiBj
-b3JyZWN0bHksIHlvdSB3YW50IGEgZGVkaWNhdGVkIEFQSQ0KPiA+PiB0byBmbHVzaCBhIGhhcmR3
-YXJlIGRldmljZSBJT1RMQi4gSSdtIG5vdCBzdXJlIHRoaXMgaXMgcmVhbGx5IG5lZWRlZC4NCj4g
-PiB5ZXMsIEknZCBsaWtlIHRvIGhhdmUgYW4gZXh0cmEgQVBJIGJlc2lkZXMgdGhlIGN1cnJlbnQg
-TUFQL1VOTUFQLg0KPiANCj4gSSdtIHRoaW5rIHdoZXRoZXIgb3Igbm90IHdlIGNhbiBkbyB0aGlz
-IHdpdGhvdXQgZXh0cmEgQVBJIG9yIGV2ZW4gZG9uJ3QgbmVlZCB0bw0KPiBjYXJlIGFib3V0IHRo
-aXMuDQo+IA0KPiA+DQo+ID4+IFRoZXJlJ3Mgc29tZSBkaXNjdXNzaW9uIG9mIHNpbWlsYXIgaXNz
-dWUgaW4gdGhlIHBhc3QgKHdoZW4gQVRTIGlzDQo+ID4+IHVzZWQgZm9yIHZpcnRpby0gbmV0L3Zo
-b3N0KSwgbG9va3MgbGlrZSB3ZSBjb3VsZCBzb2x2ZSB0aGlzIGJ5IG5vdA0KPiA+PiB0cmlnZ2Vy
-IHRoZSBVTk1BUCBub3RpZmllciB1bmxlc3MgaXQgd2FzIGRldmljZSBJT1RMQiBpbnYgZGVzYyBp
-ZiBBVFMNCj4gPj4gaXMgZW5hYmxlZCBmb3IgdGhlIGRldmljZT8gV2l0aCB0aGlzIHJlbW90ZSBJ
-T01NVS9JT1RMQiBjYW4gb25seSBnZXQNCj4gPj4gaW52YWxpZGF0aW9uIHJlcXVlc3Qgb25jZS4g
-Rm9yIFZGSU8sIHRoZSB1bmRlciBsYXllciBJT01NVSBjYW4gZGVhbA0KPiA+PiB3aXRoIGhhcmR3
-YXJlIGRldmljZSBJT1RMQiB3aXRob3V0IGFueSBleHRyYSBlZmZvcnRzLg0KPiA+IElmIEkgY2F0
-Y2ggdGhlIGJhY2tncm91bmQsIEkgdGhpbmsgaXQgc2hvdWxkIGJlICJub3QgdHJpZ2dlciB0aGUg
-VU5NQVANCj4gPiBub3RpZmllciB3aGVuIHVubGVzcyBpdCB3YXMgZGV2aWNlIElPVExCIGludiBk
-ZXNjIGlmIEFUUyBpcyBlbmFibGVkIGZvciB0aGUNCj4gZGV2aWNlIg0KPiANCj4gU2VlbXMgbm90
-IDopDQo+IA0KPiBJIG1lYW4sIGlmIEFUUyBpcyBlbmFibGVkIGZvciB0aGUgZGV2aWNlLCBvbmx5
-IHRyaWdnZXIgVU5NQVAgbm90aWZpZXIgd2hlbg0KPiBwcm9jZXNzaW5nIGRldmljZSBJT1RMQi4g
-VGhlbiB3ZSBjYW4gb25seSBoYXZlIGZsdXNoIG9uY2UuIEFuZCBob3N0IElPTU1VDQo+IGRyaXZl
-ciB3aWxsIHRha2UgY2FyZSBvZiBkZXZpY2UgSU9UTEIgZmx1c2ggdG9vLg0KaG1tbSwgaG93IGFi
-b3V0IHRoZSBpb3RsYiBpbnYgZGVzYyB3aGljaCBpcyBwcmlvciB0byBkZXZpY2UtaW90bGI/IEkn
-bSBub3Qgc3VyZQ0KaWYgaXQgaXMgcHJhY3RpY2FsIHRvIGlnbm9yZSB0aGUgaW90bGIgaW52IGRl
-cyBzaW5jZSB0aGVyZSBpcyBubyBTSUQgaW5mbyBpbiBpdC4NCg0KUmVnYXJkcywNCllpIEwNCg==
+** Changed in: qemu
+   Importance: Undecided =3D> Wishlist
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/741115
+
+Title:
+  Add support of coprocessor cp15, cp14 registers exposion in the
+  embedded gdb server
+
+Status in QEMU:
+  New
+
+Bug description:
+  Please add support of exposion of ARM coprocesor registers/logic at the e=
+mbedded gdb server,
+   for example of cp15, cp14, etc registers.
+
+  Related project http://jtagarmgdbsrvr.sourceforge.net/index.html
+
+  Also filled bug in the GDB
+  http://sourceware.org/bugzilla/show_bug.cgi?id=3D12602
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/741115/+subscriptions
