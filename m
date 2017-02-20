@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cfkLh-0006ky-0D
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:33:37 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cfkLj-0006n6-9x
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:33:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cfkLg-0007D4-AP
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:33:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34304)
+	(envelope-from <stefanha@redhat.com>) id 1cfkLi-0007EB-Dm
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:33:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34314)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cfkLg-0007Cl-5R
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:33:36 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cfkLi-0007Du-6P
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:33:38 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon, 20 Feb 2017 09:32:49 +0000
-Message-Id: <20170220093304.20515-10-stefanha@redhat.com>
+Date: Mon, 20 Feb 2017 09:32:50 +0000
+Message-Id: <20170220093304.20515-11-stefanha@redhat.com>
 In-Reply-To: <20170220093304.20515-1-stefanha@redhat.com>
 References: <20170220093304.20515-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 09/24] blkdebug: reschedule coroutine on the
- AioContext it is running on
+Subject: [Qemu-devel] [PULL 10/24] qed: introduce qed_aio_start_io and
+ qed_aio_next_io_cb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +29,145 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
-Keep the coroutine on the same AioContext.  Without this change,
-there would be a race between yielding the coroutine and reentering it.
-While the race cannot happen now, because the code only runs from a single
-AioContext, this will change with multiqueue support in the block layer.
+qed_aio_start_io and qed_aio_next_io will not have to acquire/release
+the AioContext, while qed_aio_next_io_cb will.  Split the functionality
+and gain a little type-safety in the process.
 
-While doing the change, replace custom bottom half with aio_co_schedule.
-
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20170213135235.12274-10-pbonzini@redhat.com
+Message-id: 20170213135235.12274-11-pbonzini@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/blkdebug.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+ block/qed.c | 39 +++++++++++++++++++++++++--------------
+ 1 file changed, 25 insertions(+), 14 deletions(-)
 
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index acccf85..d8eee1b 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -405,12 +405,6 @@ out:
-     return ret;
+diff --git a/block/qed.c b/block/qed.c
+index 1a7ef0a..7f1c508 100644
+--- a/block/qed.c
++++ b/block/qed.c
+@@ -273,7 +273,19 @@ static CachedL2Table *qed_new_l2_table(BDRVQEDState *s)
+     return l2_table;
  }
  
--static void error_callback_bh(void *opaque)
--{
--    Coroutine *co = opaque;
--    qemu_coroutine_enter(co);
--}
--
- static int inject_error(BlockDriverState *bs, BlkdebugRule *rule)
+-static void qed_aio_next_io(void *opaque, int ret);
++static void qed_aio_next_io(QEDAIOCB *acb, int ret);
++
++static void qed_aio_start_io(QEDAIOCB *acb)
++{
++    qed_aio_next_io(acb, 0);
++}
++
++static void qed_aio_next_io_cb(void *opaque, int ret)
++{
++    QEDAIOCB *acb = opaque;
++
++    qed_aio_next_io(acb, ret);
++}
+ 
+ static void qed_plug_allocating_write_reqs(BDRVQEDState *s)
  {
-     BDRVBlkdebugState *s = bs->opaque;
-@@ -423,8 +417,7 @@ static int inject_error(BlockDriverState *bs, BlkdebugRule *rule)
+@@ -292,7 +304,7 @@ static void qed_unplug_allocating_write_reqs(BDRVQEDState *s)
+ 
+     acb = QSIMPLEQ_FIRST(&s->allocating_write_reqs);
+     if (acb) {
+-        qed_aio_next_io(acb, 0);
++        qed_aio_start_io(acb);
+     }
+ }
+ 
+@@ -959,7 +971,7 @@ static void qed_aio_complete(QEDAIOCB *acb, int ret)
+         QSIMPLEQ_REMOVE_HEAD(&s->allocating_write_reqs, next);
+         acb = QSIMPLEQ_FIRST(&s->allocating_write_reqs);
+         if (acb) {
+-            qed_aio_next_io(acb, 0);
++            qed_aio_start_io(acb);
+         } else if (s->header.features & QED_F_NEED_CHECK) {
+             qed_start_need_check_timer(s);
+         }
+@@ -984,7 +996,7 @@ static void qed_commit_l2_update(void *opaque, int ret)
+     acb->request.l2_table = qed_find_l2_cache_entry(&s->l2_cache, l2_offset);
+     assert(acb->request.l2_table != NULL);
+ 
+-    qed_aio_next_io(opaque, ret);
++    qed_aio_next_io(acb, ret);
+ }
+ 
+ /**
+@@ -1032,11 +1044,11 @@ static void qed_aio_write_l2_update(QEDAIOCB *acb, int ret, uint64_t offset)
+     if (need_alloc) {
+         /* Write out the whole new L2 table */
+         qed_write_l2_table(s, &acb->request, 0, s->table_nelems, true,
+-                            qed_aio_write_l1_update, acb);
++                           qed_aio_write_l1_update, acb);
+     } else {
+         /* Write out only the updated part of the L2 table */
+         qed_write_l2_table(s, &acb->request, index, acb->cur_nclusters, false,
+-                            qed_aio_next_io, acb);
++                           qed_aio_next_io_cb, acb);
+     }
+     return;
+ 
+@@ -1088,7 +1100,7 @@ static void qed_aio_write_main(void *opaque, int ret)
      }
  
-     if (!immediately) {
--        aio_bh_schedule_oneshot(bdrv_get_aio_context(bs), error_callback_bh,
--                                qemu_coroutine_self());
-+        aio_co_schedule(qemu_get_current_aio_context(), qemu_coroutine_self());
-         qemu_coroutine_yield();
+     if (acb->find_cluster_ret == QED_CLUSTER_FOUND) {
+-        next_fn = qed_aio_next_io;
++        next_fn = qed_aio_next_io_cb;
+     } else {
+         if (s->bs->backing) {
+             next_fn = qed_aio_write_flush_before_l2_update;
+@@ -1201,7 +1213,7 @@ static void qed_aio_write_alloc(QEDAIOCB *acb, size_t len)
+     if (acb->flags & QED_AIOCB_ZERO) {
+         /* Skip ahead if the clusters are already zero */
+         if (acb->find_cluster_ret == QED_CLUSTER_ZERO) {
+-            qed_aio_next_io(acb, 0);
++            qed_aio_start_io(acb);
+             return;
+         }
+ 
+@@ -1321,18 +1333,18 @@ static void qed_aio_read_data(void *opaque, int ret,
+     /* Handle zero cluster and backing file reads */
+     if (ret == QED_CLUSTER_ZERO) {
+         qemu_iovec_memset(&acb->cur_qiov, 0, 0, acb->cur_qiov.size);
+-        qed_aio_next_io(acb, 0);
++        qed_aio_start_io(acb);
+         return;
+     } else if (ret != QED_CLUSTER_FOUND) {
+         qed_read_backing_file(s, acb->cur_pos, &acb->cur_qiov,
+-                              &acb->backing_qiov, qed_aio_next_io, acb);
++                              &acb->backing_qiov, qed_aio_next_io_cb, acb);
+         return;
      }
+ 
+     BLKDBG_EVENT(bs->file, BLKDBG_READ_AIO);
+     bdrv_aio_readv(bs->file, offset / BDRV_SECTOR_SIZE,
+                    &acb->cur_qiov, acb->cur_qiov.size / BDRV_SECTOR_SIZE,
+-                   qed_aio_next_io, acb);
++                   qed_aio_next_io_cb, acb);
+     return;
+ 
+ err:
+@@ -1342,9 +1354,8 @@ err:
+ /**
+  * Begin next I/O or complete the request
+  */
+-static void qed_aio_next_io(void *opaque, int ret)
++static void qed_aio_next_io(QEDAIOCB *acb, int ret)
+ {
+-    QEDAIOCB *acb = opaque;
+     BDRVQEDState *s = acb_to_s(acb);
+     QEDFindClusterFunc *io_fn = (acb->flags & QED_AIOCB_WRITE) ?
+                                 qed_aio_write_data : qed_aio_read_data;
+@@ -1400,7 +1411,7 @@ static BlockAIOCB *qed_aio_setup(BlockDriverState *bs,
+     qemu_iovec_init(&acb->cur_qiov, qiov->niov);
+ 
+     /* Start request */
+-    qed_aio_next_io(acb, 0);
++    qed_aio_start_io(acb);
+     return &acb->common;
+ }
  
 -- 
 2.9.3
