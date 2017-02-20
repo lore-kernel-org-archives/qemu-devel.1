@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54998)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cflhj-0003tG-5D
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 06:00:28 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cfljx-0005Gg-4I
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 06:02:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cflhg-0000Ui-4I
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 06:00:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38414)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cflhf-0000UH-Ry
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 06:00:24 -0500
-Date: Mon, 20 Feb 2017 11:00:15 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170220110014.GD2372@work-vm>
-References: <cover.1487286467.git.ben@skyportsystems.com>
-	<88232638f9ff3b17b54987624468678ea14a3037.1487286467.git.ben@skyportsystems.com>
-	<20170217114321.6c8577e1@nial.brq.redhat.com>
-	<918524f7-26cf-3fce-d9e3-7316ca69285b@redhat.com>
-	<20170220102304.GC2372@work-vm>
-	<1ea5fff1-6216-8a8f-1e98-571253a3f596@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1cfljr-0000ju-6r
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 06:02:45 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:32871)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cfljq-0000jp-Vk
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 06:02:39 -0500
+Received: by mail-wm0-x243.google.com with SMTP id v77so13687135wmv.0
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 03:02:38 -0800 (PST)
+Date: Mon, 20 Feb 2017 11:02:35 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170220110235.GD21255@stefanha-x1.localdomain>
+References: <CAAo6VWOAnGQeDwc_bJ4M=FQsu7rOhAv=1Qk6PdzG+0pcVnku=A@mail.gmail.com>
+	<20170217214215.GK19045@localhost.localdomain>
+	<F23F188C-DAF9-49EA-9C0E-54F57945267A@veritas.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="ZJcv+A0YCCLh2VIg"
 Content-Disposition: inline
-In-Reply-To: <1ea5fff1-6216-8a8f-1e98-571253a3f596@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v8 4/8] ACPI: Add Virtual Machine
- Generation ID support
+In-Reply-To: <F23F188C-DAF9-49EA-9C0E-54F57945267A@veritas.com>
+Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
+ block device type called "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,189 +32,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, ben@skyportsystems.com, qemu-devel@nongnu.org, mst@redhat.com
-
-* Laszlo Ersek (lersek@redhat.com) wrote:
-> On 02/20/17 11:23, Dr. David Alan Gilbert wrote:
-> > * Laszlo Ersek (lersek@redhat.com) wrote:
-> >> CC Dave
-> > 
-> > This isn't an area I really understand; but if I'm
-> > reading this right then 
-> >    vmgenid is stored in fw_cfg?
-> >    fw_cfg isn't migrated
-> > 
-> > So why should any changes to it get migrated, except if it's already
-> > been read by the guest (and if the guest reads it again aftwards what's
-> > it expected to read?)
-> 
-> This is what we have here:
-> - QEMU formats read-only fw_cfg blob with GUID
-> - guest downloads blob, places it in guest RAM
-> - guest tells QEMU the guest-side address of the blob
-> - during migration, guest RAM is transferred
-> - after migration, in the device's post_load callback, QEMU overwrites
->   the GUID in guest RAM with a different value, and injects an SCI
-> 
-> I CC'd you for the following reason: Igor reported that he didn't see
-> either the fresh GUID or the SCI in the guest, on the target host, after
-> migration. I figured that perhaps there was an ordering issue between
-> RAM loading and post_load execution on the target host, and so I
-> proposed to delay the RAM overwrite + SCI injection a bit more;
-> following the pattern seen in your commit 90c647db8d59.
-> 
-> However, since then, both Ben and myself tested the code with migration
-> (using "virsh save" (Ben) and "virsh managedsave" (myself)), with
-> Windows and Linux guests, and it works for us; there seems to be no
-> ordering issue with the current code (= overwrite RAM + inject SCI in
-> the post_load callback()).
-> 
-> For now we don't understand why it doesn't work for Igor (Igor used
-> exec/gzip migration to/from a local file using direct QEMU monitor
-> commands / options, no libvirt). And, copying the pattern seen in your
-> commit 90c647db8d59 didn't help in his case (while it wasn't even
-> necessary for success in Ben's and my testing).
-
-One thing I noticed in Igor's test was that he did a 'stop' on the source
-before the migate, and so it's probably still paused on the destination
-after the migration is loaded, so anything the guest needs to do might
-not have happened until it's started.
-
-You say;
-   'guest tells QEMU the guest-side address of the blob'
-how is that stored/migrated/etc ?
+To: Ketan Nilangekar <Ketan.Nilangekar@veritas.com>
+Cc: Jeff Cody <jcody@redhat.com>, ashish mittal <ashmit602@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
 
 
-> So it seems that delaying the deed with
-> qemu_add_vm_change_state_handler() is neither needed nor effective in
-> this case; but then we still don't know why it doesn't work for Igor.
+--ZJcv+A0YCCLh2VIg
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Nod.
+On Sat, Feb 18, 2017 at 12:30:31AM +0000, Ketan Nilangekar wrote:
+> On 2/17/17, 1:42 PM, "Jeff Cody" <jcody@redhat.com> wrote:
+>=20
+>     On Thu, Feb 16, 2017 at 02:24:19PM -0800, ashish mittal wrote:
+>     > Hi,
+>     >=20
+>     > I am getting the following error with checkpatch.pl
+>     >=20
+>     > ERROR: externs should be avoided in .c files
+>     > #78: FILE: block/vxhs.c:28:
+>     > +QemuUUID qemu_uuid __attribute__ ((weak));
+>     >=20
+>     > Is there any way to get around this, or does it mean that I would h=
+ave
+>     > to add a vxhs.h just for this one entry?
+>     >
+>    =20
+>     I remain skeptical on the use of the qemu_uuid as a way to select the=
+ TLS
+>     cert.
+>=20
+> [ketan]
+> Is there another identity that can be used for uniquely identifying insta=
+nces?
+> The requirement was to enforce vdisk access to owner instances.
 
-Dave
+The qemu_uuid weak attribute looks suspect.  What is going to provide a
+strong qemu_uuid symbol?
 
-> 
-> Thanks
-> Laszlo
-> 
-> > 
-> > Dave
-> > 
-> >> On 02/17/17 11:43, Igor Mammedov wrote:
-> >>> On Thu, 16 Feb 2017 15:15:36 -0800
-> >>> ben@skyportsystems.com wrote:
-> >>>
-> >>>> From: Ben Warren <ben@skyportsystems.com>
-> >>>>
-> >>>> This implements the VM Generation ID feature by passing a 128-bit
-> >>>> GUID to the guest via a fw_cfg blob.
-> >>>> Any time the GUID changes, an ACPI notify event is sent to the guest
-> >>>>
-> >>>> The user interface is a simple device with one parameter:
-> >>>>  - guid (string, must be "auto" or in UUID format
-> >>>>    xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
-> >>> I've given it some testing with WS2012R2 and v4 patches for Seabios,
-> >>>
-> >>> Windows is able to read initial GUID allocation and writeback
-> >>> seems to work somehow:
-> >>>
-> >>> (qemu) info vm-generation-id 
-> >>> c109c09b-0e8b-42d5-9b33-8409c9dcd16c
-> >>>
-> >>> vmgenid client in Windows reads it as 2 following 64bit integers:
-> >>> 42d50e8bc109c09b:6cd1dcc90984339b
-> >>>
-> >>> However update path/restore from snapshot doesn't
-> >>> here is as I've tested it:
-> >>>
-> >>> qemu-system-x86_64 -device vmgenid,id=testvgid,guid=auto -monitor stdio
-> >>> (qemu) info vm-generation-id 
-> >>> c109c09b-0e8b-42d5-9b33-8409c9dcd16c
-> >>> (qemu) stop
-> >>> (qemu) migrate "exec:gzip -c > STATEFILE.gz" 
-> >>> (qemu) quit
-> >>>
-> >>> qemu-system-x86_64 -device vmgenid,id=testvgid,guid=auto -monitor stdio
-> >>> -incoming "exec: gzip -c -d STATEFILE.gz"
-> >>> (qemu) info vm-generation-id 
-> >>> 28b587fa-991b-4267-80d7-9cf28b746fe9
-> >>>
-> >>> guest
-> >>>  1. doesn't get GPE notification that it must receive
-> >>>  2. vmgenid client in Windows reads the same value
-> >>>       42d50e8bc109c09b:6cd1dcc90984339b
-> >>
-> >> Hmmm, I wonder if we need something like this, in vmgenid_post_load():
-> >>
-> >> commit 90c647db8d59e47c9000affc0d81754eb346e939
-> >> Author: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> >> Date:   Fri Apr 15 12:41:30 2016 +0100
-> >>
-> >>     Fix pflash migration
-> >>
-> >> with the idea being that in a single device's post_load callback, we
-> >> shouldn't perform machine-wide actions (post_load is likely for fixing
-> >> up the device itself). If machine-wide actions are necessary, we should
-> >> temporarily register a "vm change state handler", and do the thing once
-> >> that handler is called (when the machine has been loaded fully and is
-> >> about to continue execution).
-> >>
-> >> Can you please try the attached patch on top? (Build tested only.)
-> >>
-> >> Thanks!
-> >> Laszlo
-> > 
-> >> diff --git a/include/hw/acpi/vmgenid.h b/include/hw/acpi/vmgenid.h
-> >> index db7fa0e63303..a2ae450b1f56 100644
-> >> --- a/include/hw/acpi/vmgenid.h
-> >> +++ b/include/hw/acpi/vmgenid.h
-> >> @@ -4,6 +4,7 @@
-> >>  #include "hw/acpi/bios-linker-loader.h"
-> >>  #include "hw/qdev.h"
-> >>  #include "qemu/uuid.h"
-> >> +#include "sysemu/sysemu.h"
-> >>  
-> >>  #define VMGENID_DEVICE           "vmgenid"
-> >>  #define VMGENID_GUID             "guid"
-> >> @@ -21,6 +22,7 @@ typedef struct VmGenIdState {
-> >>      DeviceClass parent_obj;
-> >>      QemuUUID guid;                /* The 128-bit GUID seen by the guest */
-> >>      uint8_t vmgenid_addr_le[8];   /* Address of the GUID (little-endian) */
-> >> +    VMChangeStateEntry *vmstate;
-> >>  } VmGenIdState;
-> >>  
-> >>  static inline Object *find_vmgenid_dev(void)
-> >> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
-> >> index 9f97b722761b..0ae1d56ff297 100644
-> >> --- a/hw/acpi/vmgenid.c
-> >> +++ b/hw/acpi/vmgenid.c
-> >> @@ -177,10 +177,20 @@ static void vmgenid_set_guid(Object *obj, const char *value, Error **errp)
-> >>  /* After restoring an image, we need to update the guest memory and notify
-> >>   * it of a potential change to VM Generation ID
-> >>   */
-> >> +static void postload_update_guest_cb(void *opaque, int running, RunState state)
-> >> +{
-> >> +    VmGenIdState *vms = opaque;
-> >> +
-> >> +    qemu_del_vm_change_state_handler(vms->vmstate);
-> >> +    vms->vmstate = NULL;
-> >> +    vmgenid_update_guest(vms);
-> >> +}
-> >> +
-> >>  static int vmgenid_post_load(void *opaque, int version_id)
-> >>  {
-> >>      VmGenIdState *vms = opaque;
-> >> -    vmgenid_update_guest(vms);
-> >> +    vms->vmstate = qemu_add_vm_change_state_handler(postload_update_guest_cb,
-> >> +                                                    vms);
-> >>      return 0;
-> >>  }
-> >>  
-> > 
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Why aren't configuration parameters like the UUID coming from the QEMU
+command-line?
+
+Stefan
+
+--ZJcv+A0YCCLh2VIg
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYqszLAAoJEJykq7OBq3PIckoIAJXtHXuobOW8iSxx1fCxYkkF
+/6VmAyAF2jDGKO9+/1TfpV5S9S+ZQil+asU1gfs0hTUVwyqavqt9kCsC94ajrWuF
+eiWFPLBNDw7X8YH0XBLCTeT4iFcdSfsmXJplCz/HEgz1ymdVjtIt7/pviVafuKxe
+r0vcqgGvZHdox5hWii2NkFkKjxGF4iFZd10CEKcqGXovfTHQoNSXNNYXgb8jllwg
+40GhMuy2ghc76IC/OuklMZGr3jmf0DQRgYptk4OjK26TU9oUV2edS5UxhrdlmRHj
+udn/UQv+/+tNsNVFfO1dTH7PdfMtceE8f/Bj4W8gljtHqZw9NczDO14Nyb70V+o=
+=CFTR
+-----END PGP SIGNATURE-----
+
+--ZJcv+A0YCCLh2VIg--
