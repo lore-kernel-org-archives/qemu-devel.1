@@ -1,32 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39772)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cfpzX-0005Wn-D6
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:35:08 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cfq0g-0006Yd-Hd
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:36:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cfpzU-000351-8w
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:35:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38712)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cfpzU-00034h-0k
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:35:04 -0500
-References: <cover.1487286467.git.ben@skyportsystems.com>
-	<88232638f9ff3b17b54987624468678ea14a3037.1487286467.git.ben@skyportsystems.com>
-	<20170217114321.6c8577e1@nial.brq.redhat.com>
-	<918524f7-26cf-3fce-d9e3-7316ca69285b@redhat.com>
-	<20170220102304.GC2372@work-vm>
-	<1ea5fff1-6216-8a8f-1e98-571253a3f596@redhat.com>
-	<20170220110014.GD2372@work-vm>
-	<1b2ce22b-3085-af08-332c-9519322b207e@redhat.com>
-	<20170220123240.GA4568@work-vm>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <94784a52-0e64-63e2-5686-2ef5b5ec2bfa@redhat.com>
-Date: Mon, 20 Feb 2017 16:35:00 +0100
-MIME-Version: 1.0
-In-Reply-To: <20170220123240.GA4568@work-vm>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 4/8] ACPI: Add Virtual Machine
- Generation ID support
+	(envelope-from <pm215@archaic.org.uk>) id 1cfq0f-0003NK-FR
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:36:18 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 20 Feb 2017 15:35:55 +0000
+Message-Id: <1487604965-23220-2-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1487604965-23220-1-git-send-email-peter.maydell@linaro.org>
+References: <1487604965-23220-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 01/11] armv7m: Abstract out the "load kernel"
+ code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,109 +20,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, ben@skyportsystems.com, qemu-devel@nongnu.org, mst@redhat.com
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Alistair Francis <alistair23@gmail.com>, Michael Davidsaver <mdavidsaver@gmail.com>
 
-So Igor has now confirmed he's fine with v8 (thanks!), but I still
-wanted to respond here:
+Abstract the "load kernel" code out of armv7m_init() into its own
+function.  This includes the registration of the CPU reset function,
+to parallel how we handle this for A profile cores.
 
-On 02/20/17 13:32, Dr. David Alan Gilbert wrote:
-> * Laszlo Ersek (lersek@redhat.com) wrote:
->> On 02/20/17 12:00, Dr. David Alan Gilbert wrote:
->>> * Laszlo Ersek (lersek@redhat.com) wrote:
->>>> On 02/20/17 11:23, Dr. David Alan Gilbert wrote:
->>>>> * Laszlo Ersek (lersek@redhat.com) wrote:
->>>>>> CC Dave
->>>>>
->>>>> This isn't an area I really understand; but if I'm
->>>>> reading this right then 
->>>>>    vmgenid is stored in fw_cfg?
->>>>>    fw_cfg isn't migrated
->>>>>
->>>>> So why should any changes to it get migrated, except if it's already
->>>>> been read by the guest (and if the guest reads it again aftwards what's
->>>>> it expected to read?)
->>>>
->>>> This is what we have here:
->>>> - QEMU formats read-only fw_cfg blob with GUID
->>>> - guest downloads blob, places it in guest RAM
->>>> - guest tells QEMU the guest-side address of the blob
->>>> - during migration, guest RAM is transferred
->>>> - after migration, in the device's post_load callback, QEMU overwrites
->>>>   the GUID in guest RAM with a different value, and injects an SCI
->>>>
->>>> I CC'd you for the following reason: Igor reported that he didn't see
->>>> either the fresh GUID or the SCI in the guest, on the target host, after
->>>> migration. I figured that perhaps there was an ordering issue between
->>>> RAM loading and post_load execution on the target host, and so I
->>>> proposed to delay the RAM overwrite + SCI injection a bit more;
->>>> following the pattern seen in your commit 90c647db8d59.
->>>>
->>>> However, since then, both Ben and myself tested the code with migration
->>>> (using "virsh save" (Ben) and "virsh managedsave" (myself)), with
->>>> Windows and Linux guests, and it works for us; there seems to be no
->>>> ordering issue with the current code (= overwrite RAM + inject SCI in
->>>> the post_load callback()).
->>>>
->>>> For now we don't understand why it doesn't work for Igor (Igor used
->>>> exec/gzip migration to/from a local file using direct QEMU monitor
->>>> commands / options, no libvirt). And, copying the pattern seen in your
->>>> commit 90c647db8d59 didn't help in his case (while it wasn't even
->>>> necessary for success in Ben's and my testing).
->>>
->>> One thing I noticed in Igor's test was that he did a 'stop' on the source
->>> before the migate, and so it's probably still paused on the destination
->>> after the migration is loaded, so anything the guest needs to do might
->>> not have happened until it's started.
->>
->> Interesting! I hope Igor can double-check this!
->>
->> In the virsh docs, before doing my tests, I read that "managedsave"
->> optionally took --running or --paused:
->>
->>     Normally, starting a managed save will decide between running or
->>     paused based on the state the domain was in when the save was done;
->>     passing either the --running or --paused flag will allow overriding
->>     which state the start should use.
->>
->> I didn't pass any such flag ultimately, and I didn't stop the guests
->> before the managedsave. Indeed they continued execution right after
->> being loaded with "virsh start".
->>
->> (Side point: managedsave is awesome. :) )
-> 
-> If I've followed the bread crumbs correctly, I think managedsave
-> is just using a migrate to fd anyway, so the same code.
+We make the function public so that boards which choose to
+directly instantiate an ARMv7M device object can call it.
 
-Yes, I agree.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ include/hw/arm/arm.h | 12 ++++++++++++
+ hw/arm/armv7m.c      | 23 ++++++++++++++++++-----
+ 2 files changed, 30 insertions(+), 5 deletions(-)
 
-My enthusiasm for "managedsave" is due to "virsh start"'s awareness as
-to whether it should boot the guest from zero, or in-migrate it from the
-"managed" saved state.
-
-Plain "save" is much more risky for the admin to mess up (because it
-needs specialized guest startup too).
-
-Of course, I also find QEMU's migration feature awesome in the first
-place. :)
-
-> 
->>>
->>> You say;
->>>    'guest tells QEMU the guest-side address of the blob'
->>> how is that stored/migrated/etc ?
->>
->> It is a uint8_t[8] array (little endian representation), linked into
->> another (writeable) fw_cfg entry, and it's migrated explicitly (it has a
->> descriptor in the device's vmstate descriptor). The post_load callback
->> relies on this array being restored before the migration infrastructure
->> calls post_load.
-> 
-> RAM normally comes back before other devices, so you should be OK;
-> although we frequently have problems with devices reading from RAM
-> during device init before migration has started, or writing to it
-> after migration has finished on the source.
-
-Thanks; we should be fine then. (We only write to RAM in post_load.)
-
-Laszlo
+diff --git a/include/hw/arm/arm.h b/include/hw/arm/arm.h
+index c175c0e..a3f79d3 100644
+--- a/include/hw/arm/arm.h
++++ b/include/hw/arm/arm.h
+@@ -26,6 +26,18 @@ typedef enum {
+ /* armv7m.c */
+ DeviceState *armv7m_init(MemoryRegion *system_memory, int mem_size, int num_irq,
+                       const char *kernel_filename, const char *cpu_model);
++/**
++ * armv7m_load_kernel:
++ * @cpu: CPU
++ * @kernel_filename: file to load
++ * @mem_size: mem_size: maximum image size to load
++ *
++ * Load the guest image for an ARMv7M system. This must be called by
++ * any ARMv7M board, either directly or via armv7m_init(). (This is
++ * necessary to ensure that the CPU resets correctly on system reset,
++ * as well as for kernel loading.)
++ */
++void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_size);
+ 
+ /*
+  * struct used as a parameter of the arm_load_kernel machine init
+diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
+index 0c9ca7b..b2cc6e9 100644
+--- a/hw/arm/armv7m.c
++++ b/hw/arm/armv7m.c
+@@ -176,10 +176,6 @@ DeviceState *armv7m_init(MemoryRegion *system_memory, int mem_size, int num_irq,
+     ARMCPU *cpu;
+     CPUARMState *env;
+     DeviceState *nvic;
+-    int image_size;
+-    uint64_t entry;
+-    uint64_t lowaddr;
+-    int big_endian;
+ 
+     if (cpu_model == NULL) {
+ 	cpu_model = "cortex-m3";
+@@ -199,6 +195,16 @@ DeviceState *armv7m_init(MemoryRegion *system_memory, int mem_size, int num_irq,
+     qdev_init_nofail(nvic);
+     sysbus_connect_irq(SYS_BUS_DEVICE(nvic), 0,
+                        qdev_get_gpio_in(DEVICE(cpu), ARM_CPU_IRQ));
++    armv7m_load_kernel(cpu, kernel_filename, mem_size);
++    return nvic;
++}
++
++void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_size)
++{
++    int image_size;
++    uint64_t entry;
++    uint64_t lowaddr;
++    int big_endian;
+ 
+ #ifdef TARGET_WORDS_BIGENDIAN
+     big_endian = 1;
+@@ -224,8 +230,15 @@ DeviceState *armv7m_init(MemoryRegion *system_memory, int mem_size, int num_irq,
+         }
+     }
+ 
++    /* CPU objects (unlike devices) are not automatically reset on system
++     * reset, so we must always register a handler to do so. Unlike
++     * A-profile CPUs, we don't need to do anything special in the
++     * handler to arrange that it starts correctly.
++     * This is arguably the wrong place to do this, but it matches the
++     * way A-profile does it. Note that this means that every M profile
++     * board must call this function!
++     */
+     qemu_register_reset(armv7m_reset, cpu);
+-    return nvic;
+ }
+ 
+ static Property bitband_properties[] = {
+-- 
+2.7.4
