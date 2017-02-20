@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cfpkW-0008Eo-6K
+	(envelope-from <berrange@redhat.com>) id 1cfpkW-0008FB-Mz
 	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:19:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cfpkV-0007EV-C2
+	(envelope-from <berrange@redhat.com>) id 1cfpkV-0007Ea-I5
 	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:19:36 -0500
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Mon, 20 Feb 2017 15:19:18 +0000
-Message-Id: <20170220151921.22842-2-berrange@redhat.com>
-In-Reply-To: <20170220151921.22842-1-berrange@redhat.com>
-References: <20170220151921.22842-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 1/4] qemu-img: add support for --object with
- 'dd' command
+Date: Mon, 20 Feb 2017 15:19:17 +0000
+Message-Id: <20170220151921.22842-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/4] Improve convert and dd commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,58 +20,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-The qemu-img dd command added --image-opts support, but missed
-the corresponding --object support. This prevented passing
-secrets (eg auth passwords) needed by certain disk images.
+Update to
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- qemu-img.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+  v1: https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg05699.html
+  v2: https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg00728.html
 
-diff --git a/qemu-img.c b/qemu-img.c
-index cff22e3..739345e 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -3951,6 +3951,7 @@ static int img_dd(int argc, char **argv)
-     };
-     const struct option long_options[] = {
-         { "help", no_argument, 0, 'h'},
-+        { "object", required_argument, 0, OPTION_OBJECT},
-         { "image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-         { 0, 0, 0, 0 }
-     };
-@@ -3973,6 +3974,15 @@ static int img_dd(int argc, char **argv)
-         case 'h':
-             help();
-             break;
-+        case OPTION_OBJECT: {
-+            QemuOpts *opts;
-+            opts = qemu_opts_parse_noisily(&qemu_object_opts,
-+                                           optarg, true);
-+            if (!opts) {
-+                ret = -1;
-+                goto out;
-+            }
-+        }   break;
-         case OPTION_IMAGE_OPTS:
-             image_opts = true;
-             break;
-@@ -4017,6 +4027,14 @@ static int img_dd(int argc, char **argv)
-         ret = -1;
-         goto out;
-     }
-+
-+    if (qemu_opts_foreach(&qemu_object_opts,
-+                          user_creatable_add_opts_foreach,
-+                          NULL, NULL)) {
-+        ret = -1;
-+        goto out;
-+    }
-+
-     blk1 = img_open(image_opts, in.filename, fmt, 0, false, false);
- 
-     if (!blk1) {
+This series is in response to Max pointing out that you cannot
+use 'convert' for an encrypted target image.
+
+The 'convert' and 'dd' commands need to first create the image
+and then open it. The bdrv_create() method takes a set of options
+for creating the image, which let us provide a key-secret for the
+encryption key. When the commands then open the new image, they
+don't provide any options, so the image is unable to be opened
+due to lack of encryption key. It is also not possible to use
+the --image-opts argument to provide structured options in the
+target image name - it must be a plain filename to satisfy the
+bdrv_create() API contract.
+
+This series addresses these problems to some extent
+
+ - Adds a new --target-image-opts flag which is used to say
+   that the target filename is using structured options.
+   It is *only* permitted to use this when -n is also set.
+   ie the target image must be pre-created so convert/dd
+   don't need to run bdrv_create().
+
+ - When --target-image-opts is not used, add special case
+   code that identifies options passed to bdrv_create()
+   named "*key-secret" and adds them to the options used
+   to open the new image
+
+In future it is desirable to make --target-image-opts work
+even when -n is *not* given. This requires considerable
+work to create a new bdrv_create() API impl.
+
+The first patch fixes a bug in the 'dd' command while the second adds support
+for the missing '--object' arg to 'dd', allowing it to reference secrets when
+opening files.  The last two patches implement the new features described above
+for the 'convert' command.
+
+Changed in v3:
+
+ - Drop all patches affecting the 'dd' command except for the clear bug fix
+   and the --object support. They can be re-considered once dd is rewritten
+   to run ontop of convert.
+ - Use consistent return/goto style in dd command (Max)
+ - Fix error reporting when using compressed image and skip-create (Max)
+ - Unconditionally create QDict when open files (Max)
+
+Changed in v2:
+
+ - Replace dd -n flag with support for conv=nocreat,notrunc
+ - Misc typos (Eric, Fam)
+
+Daniel P. Berrange (4):
+  qemu-img: add support for --object with 'dd' command
+  qemu-img: fix --image-opts usage with dd command
+  qemu-img: introduce --target-image-opts for 'convert' command
+  qemu-img: copy *key-secret opts when opening newly created files
+
+ qemu-img-cmds.hx |   4 +-
+ qemu-img.c       | 151 +++++++++++++++++++++++++++++++++++++++++++++----------
+ qemu-img.texi    |  12 ++++-
+ 3 files changed, 136 insertions(+), 31 deletions(-)
+
 -- 
 2.9.3
