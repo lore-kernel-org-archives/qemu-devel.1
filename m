@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <skiver.cloud.yzy@gmail.com>) id 1cfkLf-0006kM-UF
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:33:36 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cfkLh-0006ky-0D
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:33:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <skiver.cloud.yzy@gmail.com>) id 1cfkLe-0007CR-So
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:33:35 -0500
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:34728)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <skiver.cloud.yzy@gmail.com>)
-	id 1cfkLe-0007CB-PN
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:33:34 -0500
-Received: by mail-qt0-x244.google.com with SMTP id x35so2615256qtc.1
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 01:33:34 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <6dccacf7-688c-1009-8c34-7887b70469c7@redhat.com>
-References: <20170217082704.23270-1-skiver.cloud.yzy@gmail.com>
-	<20170217082704.23270-2-skiver.cloud.yzy@gmail.com>
-	<5c9a78b3-bd37-d263-b7c2-d7a2db92c0a8@amsat.org>
-	<6dccacf7-688c-1009-8c34-7887b70469c7@redhat.com>
-From: Yang Ziyue <skiver.cloud.yzy@gmail.com>
-Date: Mon, 20 Feb 2017 17:33:33 +0800
-Message-ID: <CAHkcwae7J9Bo5d8W-JjVH5hhX+DvuuorbN5x1fZmHwAFu4E3GA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] monitor.c: make mon_get_cpu return
- NULL when there is no CPU
+	(envelope-from <stefanha@redhat.com>) id 1cfkLg-0007D4-AP
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:33:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34304)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cfkLg-0007Cl-5R
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:33:36 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Mon, 20 Feb 2017 09:32:49 +0000
+Message-Id: <20170220093304.20515-10-stefanha@redhat.com>
+In-Reply-To: <20170220093304.20515-1-stefanha@redhat.com>
+References: <20170220093304.20515-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PULL 09/24] blkdebug: reschedule coroutine on the
+ AioContext it is running on
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,74 +24,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Ziyue Yang <yzylivezh@hotmail.com>, Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Sorry for forgetting the "no irrelevant change" rule...won't do that next t=
-ime!
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-2017-02-20 14:09 GMT+08:00 Thomas Huth <thuth@redhat.com>:
-> On 19.02.2017 04:55, Philippe Mathieu-Daud=C3=A9 wrote:
->> On 02/17/2017 05:27 AM, Ziyue Yang wrote:
->>> From: Ziyue Yang <yzylivezh@hotmail.com>
->>>
->>> Currently mon_get_cpu always dereferences first_cpu without checking
->>> whether it's a valid pointer. This commit adds check before
->>> dereferencing,
->>> and reports "No CPU" info if there isn't any CPU then returns NULL.
->>>
->>> Signed-off-by: Ziyue Yang <skiver.cloud.yzy@gmail.com>
->>
->> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>
->>> ---
->>>  monitor.c | 10 +++++++---
->>>  1 file changed, 7 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/monitor.c b/monitor.c
->>> index 3cd72a9bab..6b25cf7a2b 100644
->>> --- a/monitor.c
->>> +++ b/monitor.c
->>> @@ -1026,6 +1026,10 @@ int monitor_set_cpu(int cpu_index)
->>>  CPUState *mon_get_cpu(void)
->>>  {
->>>      if (!cur_mon->mon_cpu) {
->>> +        if (!first_cpu) {
->>> +            monitor_printf(cur_mon, "No CPU available on this
->>> machine\n");
->>> +            return NULL;
->>> +        }
->>>          monitor_set_cpu(first_cpu->cpu_index);
->>>      }
->>>      cpu_synchronize_state(cur_mon->mon_cpu);
->>> @@ -2495,11 +2499,11 @@ static int default_fmt_size =3D 4;
->>>  static int is_valid_option(const char *c, const char *typestr)
->>>  {
->>>      char option[3];
->>> -
->>> +
->>>      option[0] =3D '-';
->>>      option[1] =3D *c;
->>>      option[2] =3D '\0';
->>> -
->>> +
->>>      typestr =3D strstr(typestr, option);
->>>      return (typestr !=3D NULL);
->>>  }
->>> @@ -2864,7 +2868,7 @@ static QDict *monitor_parse_arguments(Monitor *mo=
-n,
->>>                      p++;
->>>                      if(c !=3D *p) {
->>>                          if(!is_valid_option(p, typestr)) {
->>> -
->>> +
->>>                              monitor_printf(mon, "%s: unsupported
->>> option -%c\n",
->>>                                             cmd->name, *p);
->>>                              goto fail;
->
-> Your patch contains some unnecessary white space changes, please try to
-> avoid that! (or send a separate "beautification" patch to fix these).
->
->  Thomas
->
+Keep the coroutine on the same AioContext.  Without this change,
+there would be a race between yielding the coroutine and reentering it.
+While the race cannot happen now, because the code only runs from a single
+AioContext, this will change with multiqueue support in the block layer.
+
+While doing the change, replace custom bottom half with aio_co_schedule.
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+Message-id: 20170213135235.12274-10-pbonzini@redhat.com
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ block/blkdebug.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
+
+diff --git a/block/blkdebug.c b/block/blkdebug.c
+index acccf85..d8eee1b 100644
+--- a/block/blkdebug.c
++++ b/block/blkdebug.c
+@@ -405,12 +405,6 @@ out:
+     return ret;
+ }
+ 
+-static void error_callback_bh(void *opaque)
+-{
+-    Coroutine *co = opaque;
+-    qemu_coroutine_enter(co);
+-}
+-
+ static int inject_error(BlockDriverState *bs, BlkdebugRule *rule)
+ {
+     BDRVBlkdebugState *s = bs->opaque;
+@@ -423,8 +417,7 @@ static int inject_error(BlockDriverState *bs, BlkdebugRule *rule)
+     }
+ 
+     if (!immediately) {
+-        aio_bh_schedule_oneshot(bdrv_get_aio_context(bs), error_callback_bh,
+-                                qemu_coroutine_self());
++        aio_co_schedule(qemu_get_current_aio_context(), qemu_coroutine_self());
+         qemu_coroutine_yield();
+     }
+ 
+-- 
+2.9.3
