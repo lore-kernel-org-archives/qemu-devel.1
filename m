@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49351)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cftdT-0006ny-DZ
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 14:28:36 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cfthk-0008Sm-Hk
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 14:33:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cftdP-000458-Az
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 14:28:35 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cfthh-0004rg-9U
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 14:33:00 -0500
 Sender: Richard Henderson <rth7680@gmail.com>
 References: <1487585521-19445-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<1487585521-19445-2-git-send-email-nikunj@linux.vnet.ibm.com>
+	<1487585521-19445-3-git-send-email-nikunj@linux.vnet.ibm.com>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <3d0d83c5-0588-649d-5ed0-202a82031a1e@twiddle.net>
-Date: Tue, 21 Feb 2017 06:28:22 +1100
+Message-ID: <6227dda7-460d-443b-2e59-0e2c2e14c53f@twiddle.net>
+Date: Tue, 21 Feb 2017 06:32:49 +1100
 MIME-Version: 1.0
-In-Reply-To: <1487585521-19445-2-git-send-email-nikunj@linux.vnet.ibm.com>
+In-Reply-To: <1487585521-19445-3-git-send-email-nikunj@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 01/10] target/ppc: support for 32-bit
- carry and overflow
+Subject: Re: [Qemu-devel] [PATCH v1 02/10] target/ppc: Update ca32 in
+ arithmetic add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,76 +29,60 @@ To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, david@gi
 Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
 On 02/20/2017 09:11 PM, Nikunj A Dadhania wrote:
-> +#ifndef TARGET_PPC64
->  static inline target_ulong cpu_read_xer(CPUPPCState *env)
->  {
->      return env->xer | (env->so << XER_SO) | (env->ov << XER_OV) | (env->ca << XER_CA);
->  }
-> +#else
-> +static inline target_ulong cpu_read_xer(CPUPPCState *env)
-> +{
-> +    return env->xer | (env->so << XER_SO) |
-> +        (env->ov << XER_OV) | (env->ca << XER_CA) |
-> +        (env->ov32 << XER_OV32) | (env->ca32 << XER_CA32);
-> +}
-> +#endif
+> Adds routine to compute ca32 - gen_op_arith_compute_ca32
 >
-> +#ifndef TARGET_PPC64
->  static inline void cpu_write_xer(CPUPPCState *env, target_ulong xer)
->  {
->      env->so = (xer >> XER_SO) & 1;
-> @@ -2355,6 +2371,20 @@ static inline void cpu_write_xer(CPUPPCState *env, target_ulong xer)
->      env->ca = (xer >> XER_CA) & 1;
->      env->xer = xer & ~((1u << XER_SO) | (1u << XER_OV) | (1u << XER_CA));
+> For 64-bit mode use the compute ca32 routine. While for 32-bit mode, CA
+> and CA32 will have same value.
+>
+> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+> ---
+>  target/ppc/translate.c | 32 ++++++++++++++++++++++++++++++++
+>  1 file changed, 32 insertions(+)
+>
+> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> index 498b095..2a2d071 100644
+> --- a/target/ppc/translate.c
+> +++ b/target/ppc/translate.c
+> @@ -816,6 +816,36 @@ static inline void gen_op_arith_compute_ov(DisasContext *ctx, TCGv arg0,
+>      tcg_gen_or_tl(cpu_so, cpu_so, cpu_ov);
 >  }
-> +#else
-> +static inline void cpu_write_xer(CPUPPCState *env, target_ulong xer)
+>
+> +static inline void gen_op_arith_compute_ca32(DisasContext *ctx, TCGv arg0,
+> +                                             TCGv arg1, bool add_ca, int sub)
 > +{
-> +    env->so = (xer >> XER_SO) & 1;
-> +    env->ov = (xer >> XER_OV) & 1;
-> +    env->ca = (xer >> XER_CA) & 1;
-> +    env->ov32 = (xer >> XER_OV32) & 1;
-> +    env->ca32 = (xer >> XER_CA32) & 1;
-> +    env->xer = xer & ~((1ul << XER_SO) |
-> +                       (1ul << XER_OV) | (1ul << XER_CA) |
-> +                       (1ul << XER_OV32) | (1ul << XER_CA32));
-> +}
-> +#endif
-
-You should probably move both of these out of line now (perhaps cpu.c).
-
-You probably don't want to set ov32/ca32 unless the cpu is power9.  I assume 
-that if you attempt to set these bits for power8 they are 
-read-as-zero/write-ignore?
-
-> @@ -3715,6 +3719,12 @@ static void gen_read_xer(TCGv dst)
->      tcg_gen_or_tl(t0, t0, t1);
->      tcg_gen_or_tl(dst, dst, t2);
->      tcg_gen_or_tl(dst, dst, t0);
-> +#ifdef TARGET_PPC64
-> +    tcg_gen_shli_tl(t0, cpu_ov32, XER_OV32);
-> +    tcg_gen_or_tl(dst, dst, t0);
-> +    tcg_gen_shli_tl(t0, cpu_ca32, XER_CA32);
-> +    tcg_gen_or_tl(dst, dst, t0);
-> +#endif
->      tcg_temp_free(t0);
->      tcg_temp_free(t1);
->      tcg_temp_free(t2);
-> @@ -3727,9 +3737,14 @@ static void gen_write_xer(TCGv src)
->      tcg_gen_shri_tl(cpu_so, src, XER_SO);
->      tcg_gen_shri_tl(cpu_ov, src, XER_OV);
->      tcg_gen_shri_tl(cpu_ca, src, XER_CA);
-> +    tcg_gen_shri_tl(cpu_ov32, src, XER_OV32);
-> +    tcg_gen_shri_tl(cpu_ca32, src, XER_CA32);
->      tcg_gen_andi_tl(cpu_so, cpu_so, 1);
->      tcg_gen_andi_tl(cpu_ov, cpu_ov, 1);
->      tcg_gen_andi_tl(cpu_ca, cpu_ca, 1);
-> +    tcg_gen_andi_tl(cpu_ov32, cpu_ov32, 1);
-> +    tcg_gen_andi_tl(cpu_ca32, cpu_ca32, 1);
+> +    TCGv t0 = tcg_temp_new();
+> +    TCGv t1 = tcg_temp_new();
+> +    TCGv inv0 = tcg_temp_new();
 > +
->  }
+> +    tcg_gen_extract_tl(t0, arg0, 0, 32);
+> +    tcg_gen_extract_tl(t1, arg1, 0, 32);
+> +    if (sub) {
+> +        tcg_gen_not_tl(inv0, t0);
+> +        if (add_ca) {
+> +            tcg_gen_add_tl(t1, t1, cpu_ca32);
+> +        } else {
+> +            tcg_gen_addi_tl(t1, t1, 1);
+> +        }
+> +        tcg_gen_add_tl(t0, t1, inv0);
+> +        tcg_gen_extract_tl(cpu_ca32, t0, 32, 1);
+> +    } else {
+> +        tcg_gen_add_tl(t0, t0, t1);
+> +        if (add_ca) {
+> +            tcg_gen_add_tl(t0, t0, cpu_ca32);
+> +        }
+> +        tcg_gen_extract_tl(cpu_ca32, t0, 32, 1);
+> +    }
+> +    tcg_temp_free(t0);
+> +    tcg_temp_free(t1);
+> +}
 
-Watch the blank lines.  No ifdef here on the write side?
+This is incorrect, since you're not considering the carry-in bits.  It's also 
+inefficient since you should only need a single extraction.
+
+Compute ca32 via
+
+   t0 = result ^ in0 ^ in1
+   extract_tl(ca32, t0, 32, 1)
 
 
 r~
