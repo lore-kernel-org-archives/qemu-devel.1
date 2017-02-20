@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cfooq-0006EZ-Is
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:20:01 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cfoor-0006Ef-CQ
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:20:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cfoom-00077p-HL
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:20:00 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41687)
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cfoon-000784-9M
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:20:01 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50306)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cfoom-00077a-8H
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:19:56 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	id 1cfoom-00077l-Vs
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:19:57 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1KEJE1X014114
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 09:19:54 -0500
-Received: from e06smtp09.uk.ibm.com (e06smtp09.uk.ibm.com [195.75.94.105])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28qvmcp4pv-1
+	v1KEJL1r066562
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 09:19:55 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28pp6msjyb-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 09:19:54 -0500
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 09:19:55 -0500
 Received: from localhost
-	by e06smtp09.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
 	Mon, 20 Feb 2017 14:19:52 -0000
 From: Cornelia Huck <cornelia.huck@de.ibm.com>
-Date: Mon, 20 Feb 2017 15:19:38 +0100
-Message-Id: <20170220141943.8426-1-cornelia.huck@de.ibm.com>
-Subject: [Qemu-devel] [PATCH 0/5] s390x: network boot
+Date: Mon, 20 Feb 2017 15:19:39 +0100
+In-Reply-To: <20170220141943.8426-1-cornelia.huck@de.ibm.com>
+References: <20170220141943.8426-1-cornelia.huck@de.ibm.com>
+Message-Id: <20170220141943.8426-2-cornelia.huck@de.ibm.com>
+Subject: [Qemu-devel] [PATCH 1/5] elf-loader: Allow late loading of elf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,80 +38,135 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, Farhan Ali <alifm@linux.vnet.ibm.com>, Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cornelia.huck@de.ibm.com>
 
-This patchset implements network boot for s390x. You need to build
-a s390-netboot.img to actually perform the work (not included).
+From: Farhan Ali <alifm@linux.vnet.ibm.com>
 
-Basically, we add support for virtio-net devices into the ipl code
-and update the ccw bios to handle this as well.
+The current QEMU ROM infrastructure rejects late loading of ROMs.
+And ELFs are currently loaded as ROM, this prevents delayed loading
+of ELFs. So when loading ELF, allow the user to specify if ELF should
+be loaded as ROM or not.
 
-For the first patch (elf loading) I'd like to get an ack.
+If an ELF is not loaded as ROM, then they are not restored on a
+guest reboot/reset and so its upto the user to handle the reloading.
 
-A s390-netboot.img can be built by bundling some shell scripts, busybox
-and the kexec binary bundled into an initial ramdisk and append that to
-a kernel image. An existing s390 system can be used as source.
+Signed-off-by: Farhan Ali <alifm@linux.vnet.ibm.com>
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+---
+ hw/core/loader.c     | 17 +++++++++++++++--
+ include/hw/elf_ops.h | 13 +++++++++----
+ include/hw/loader.h  | 13 ++++++++++++-
+ 3 files changed, 36 insertions(+), 7 deletions(-)
 
-The init process can be a simple shell script that mounts a few
-essential filesystems, like /dev, /proc, /sys, ..., starts a DHCP client
-(busybox udchpc) and then invokes another script to do the actual
-network boot.
-
-udchpc will invoke the script /usr/share/udhcpc/default.script in
-response to DHCP server messages to configure interfaces. The sample
-busybox default.script can be used for that, but needs to also extract
-the DHCP options like the tftp server address and pass that on to the
-boot script.
-
-The boot script itself has to retrieve the PXELINUX configuration from
-the tftp server as in [1], then retrieve the remote kernel and initial
-ramdisk and finally use kexec to boot the network kernel.
-
-In a nutshell:
-
-1. Create a skeleton initramfs directory structure
-2. Create the init script, the PXE boot scripts and the DHCP default
-   script
-3. Copy kexec and its dependencies from the source system into the
-   initramfs
-4. Copy virtio network and block modules from the source system into
-   the initramfs
-5. Copy the busybox binaries into the initramfs
-6. Build the ramdisk (in compressed CPIO format)
-7. Concatenate the kernel image and the initial ramdisk
-8. Update the 8 bytes at location 66568 with the offset value of the
-   ramdisk in the new binary, and the 8 bytes at location 66576 with the
-   size of the ramdisk. Both values need to be updated in binary, big
-   endian format.
-
-[1]
-http://www.syslinux.org/wiki/index.php?title=PXELINUX#Configuration_filename
-
-
-Cornelia Huck (1):
-  pc-bios/s390-ccw.img: rebuild image
-
-Farhan Ali (4):
-  elf-loader: Allow late loading of elf
-  s390x/ipl: Extend S390IPLState to support network boot
-  s390x/ipl: Load network boot image
-  pc-bios/s390-ccw: Use the ccw bios to start the network boot
-
- hw/core/loader.c           |  17 +++++++--
- hw/s390x/ipl.c             |  87 +++++++++++++++++++++++++++++++++++++++++++++
- hw/s390x/ipl.h             |   5 ++-
- hw/s390x/s390-virtio-ccw.c |   3 +-
- hw/s390x/s390-virtio.c     |   2 ++
- hw/s390x/s390-virtio.h     |   1 +
- include/hw/elf_ops.h       |  13 ++++---
- include/hw/loader.h        |  13 ++++++-
- pc-bios/s390-ccw.img       | Bin 26392 -> 26456 bytes
- pc-bios/s390-ccw/bootmap.c |   8 ++++-
- pc-bios/s390-ccw/iplb.h    |   3 +-
- pc-bios/s390-ccw/main.c    |  20 +++++++----
- pc-bios/s390-ccw/virtio.c  |   1 +
- pc-bios/s390-ccw/virtio.h  |   1 +
- 14 files changed, 157 insertions(+), 17 deletions(-)
-
+diff --git a/hw/core/loader.c b/hw/core/loader.c
+index ee5abd6eb7..9d1af1f6f3 100644
+--- a/hw/core/loader.c
++++ b/hw/core/loader.c
+@@ -435,6 +435,19 @@ int load_elf_as(const char *filename,
+                 uint64_t *highaddr, int big_endian, int elf_machine,
+                 int clear_lsb, int data_swab, AddressSpace *as)
+ {
++    return load_elf_ram(filename, translate_fn, translate_opaque,
++                        pentry, lowaddr, highaddr, big_endian, elf_machine,
++                        clear_lsb, data_swab, as, true);
++}
++
++/* return < 0 if error, otherwise the number of bytes loaded in memory */
++int load_elf_ram(const char *filename,
++                 uint64_t (*translate_fn)(void *, uint64_t),
++                 void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
++                 uint64_t *highaddr, int big_endian, int elf_machine,
++                 int clear_lsb, int data_swab, AddressSpace *as,
++                 bool load_rom)
++{
+     int fd, data_order, target_data_order, must_swab, ret = ELF_LOAD_FAILED;
+     uint8_t e_ident[EI_NIDENT];
+ 
+@@ -473,11 +486,11 @@ int load_elf_as(const char *filename,
+     if (e_ident[EI_CLASS] == ELFCLASS64) {
+         ret = load_elf64(filename, fd, translate_fn, translate_opaque, must_swab,
+                          pentry, lowaddr, highaddr, elf_machine, clear_lsb,
+-                         data_swab, as);
++                         data_swab, as, load_rom);
+     } else {
+         ret = load_elf32(filename, fd, translate_fn, translate_opaque, must_swab,
+                          pentry, lowaddr, highaddr, elf_machine, clear_lsb,
+-                         data_swab, as);
++                         data_swab, as, load_rom);
+     }
+ 
+  fail:
+diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
+index 25659b93be..a172a6068a 100644
+--- a/include/hw/elf_ops.h
++++ b/include/hw/elf_ops.h
+@@ -264,7 +264,7 @@ static int glue(load_elf, SZ)(const char *name, int fd,
+                               int must_swab, uint64_t *pentry,
+                               uint64_t *lowaddr, uint64_t *highaddr,
+                               int elf_machine, int clear_lsb, int data_swab,
+-                              AddressSpace *as)
++                              AddressSpace *as, bool load_rom)
+ {
+     struct elfhdr ehdr;
+     struct elf_phdr *phdr = NULL, *ph;
+@@ -403,10 +403,15 @@ static int glue(load_elf, SZ)(const char *name, int fd,
+                 *pentry = ehdr.e_entry - ph->p_vaddr + ph->p_paddr;
+             }
+ 
+-            snprintf(label, sizeof(label), "phdr #%d: %s", i, name);
++            if (load_rom) {
++                snprintf(label, sizeof(label), "phdr #%d: %s", i, name);
+ 
+-            /* rom_add_elf_program() seize the ownership of 'data' */
+-            rom_add_elf_program(label, data, file_size, mem_size, addr, as);
++                /* rom_add_elf_program() seize the ownership of 'data' */
++                rom_add_elf_program(label, data, file_size, mem_size, addr, as);
++            } else {
++                cpu_physical_memory_write(addr, data, file_size);
++                g_free(data);
++            }
+ 
+             total_size += mem_size;
+             if (addr < low)
+diff --git a/include/hw/loader.h b/include/hw/loader.h
+index 0dbd8d6bf3..3df4d73398 100644
+--- a/include/hw/loader.h
++++ b/include/hw/loader.h
+@@ -65,7 +65,7 @@ int load_image_gzipped(const char *filename, hwaddr addr, uint64_t max_sz);
+ #define ELF_LOAD_WRONG_ENDIAN -4
+ const char *load_elf_strerror(int error);
+ 
+-/** load_elf_as:
++/** load_elf_ram:
+  * @filename: Path of ELF file
+  * @translate_fn: optional function to translate load addresses
+  * @translate_opaque: opaque data passed to @translate_fn
+@@ -81,6 +81,7 @@ const char *load_elf_strerror(int error);
+  *             words and 3 for within doublewords.
+  * @as: The AddressSpace to load the ELF to. The value of address_space_memory
+  *      is used if nothing is supplied here.
++ * @load_rom : Load ELF binary as ROM
+  *
+  * Load an ELF file's contents to the emulated system's address space.
+  * Clients may optionally specify a callback to perform address
+@@ -93,6 +94,16 @@ const char *load_elf_strerror(int error);
+  * If @elf_machine is EM_NONE then the machine type will be read from the
+  * ELF header and no checks will be carried out against the machine type.
+  */
++int load_elf_ram(const char *filename,
++                 uint64_t (*translate_fn)(void *, uint64_t),
++                 void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
++                 uint64_t *highaddr, int big_endian, int elf_machine,
++                 int clear_lsb, int data_swab, AddressSpace *as,
++                 bool load_rom);
++
++/** load_elf_as:
++ * Same as load_elf_ram(), but always loads the elf as ROM
++ */
+ int load_elf_as(const char *filename,
+                 uint64_t (*translate_fn)(void *, uint64_t),
+                 void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
 -- 
 2.11.0
