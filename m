@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bsingharora@gmail.com>) id 1cfgpW-0001vV-Nj
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 00:48:11 -0500
+	(envelope-from <thuth@redhat.com>) id 1cfh81-0005KL-M7
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 01:07:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bsingharora@gmail.com>) id 1cfgpW-00040e-5d
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 00:48:10 -0500
-From: Balbir Singh <bsingharora@gmail.com>
-Date: Mon, 20 Feb 2017 16:47:56 +1100
-Message-ID: <20170220054756.GB661@balbir.ozlabs.ibm.com>
-References: <1487563478-22265-1-git-send-email-sjitindarsingh@gmail.com>
-	<1487563478-22265-3-git-send-email-sjitindarsingh@gmail.com>
+	(envelope-from <thuth@redhat.com>) id 1cfh7x-0007qC-OT
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 01:07:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45060)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cfh7x-0007py-Hk
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 01:07:13 -0500
+References: <20170217082704.23270-1-skiver.cloud.yzy@gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <5a03f6f2-f867-8dfe-28bb-6f481782f6af@redhat.com>
+Date: Mon, 20 Feb 2017 07:07:08 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1487563478-22265-3-git-send-email-sjitindarsingh@gmail.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [QEMU-PPC] [PATCH V3 02/10] target/ppc:
- Fix LPCR DPFD mask define
+In-Reply-To: <20170217082704.23270-1-skiver.cloud.yzy@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/2] fix segfaults caused by accessing CPU
+ in empty machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,15 +27,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, sam.bobroff@au1.ibm.com, david@gibson.dropbear.id.au
+To: Ziyue Yang <skiver.cloud.yzy@gmail.com>, qemu-devel@nongnu.org
+Cc: Ziyue Yang <yzylivezh@hotmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Pavel Butsykin <pbutsykin@virtuozzo.com>
 
-On Mon, Feb 20, 2017 at 03:04:30PM +1100, Suraj Jitindar Singh wrote:
-> The DPFD field in the LPCR is 3 bits wide. This has always been defined
-> as 0x3 << shift which indicates a 2 bit field, which is incorrect.
-> Correct this.
+On 17.02.2017 09:27, Ziyue Yang wrote:
+> From: Ziyue Yang <yzylivezh@hotmail.com>
 > 
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> ---
+> Many QEMU monitor commands, like "info lapic", "info tlb" and so on
+> use mon_get_cpu or related wrappers to access CPU info without checking
+> whether the CPU exists.
+> This patch series fix the "info lapic" case, and is the base of the incoming
+> patch series aiming to eliminate segfaults caused by other QEMU commands
+> trying to access CPU that doesn't exist.
 
-Acked-by: Balbir Singh <bsingharora@gmail.com>
+ Hi,
+
+FYI, I've posted a patch for all of these monitor commands that crash
+without CPU already last month:
+
+https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg02602.html
+
+ Thomas
