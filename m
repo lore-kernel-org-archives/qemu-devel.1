@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40172)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cfq0i-0006aU-8A
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:36:21 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cfq0m-0006dm-Ob
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:36:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cfq0h-0003Ol-7c
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:36:20 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cfq0l-0003RW-GQ
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:36:24 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Feb 2017 15:36:04 +0000
-Message-Id: <1487604965-23220-11-git-send-email-peter.maydell@linaro.org>
+Date: Mon, 20 Feb 2017 15:35:59 +0000
+Message-Id: <1487604965-23220-6-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1487604965-23220-1-git-send-email-peter.maydell@linaro.org>
 References: <1487604965-23220-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 10/11] stm32f205: Create armv7m object without
- using armv7m_init()
+Subject: [Qemu-devel] [PATCH 05/11] armv7m: Make ARMv7M object take memory
+ region link
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,112 +23,114 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Alistair Francis <alistair23@gmail.com>, Michael Davidsaver <mdavidsaver@gmail.com>
 
-Switch the stm32f205 SoC to create the armv7m object directly
-rather than via the armv7m_init() wrapper. This fits better
-with the SoC model's very QOMified design.
-
-In particular this means we can push loading the guest image
-out to the top level board code where it belongs, rather
-than the SoC object having a QOM property for the filename
-to load.
+Make the ARMv7M object take a memory region link which it uses
+to wire up the bitband rather than having them always put
+themselves in the system address space.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/arm/stm32f205_soc.h |  4 +++-
- hw/arm/netduino2.c             |  7 ++++---
- hw/arm/stm32f205_soc.c         | 16 +++++++++++++---
- 3 files changed, 20 insertions(+), 7 deletions(-)
+ include/hw/arm/armv7m.h | 10 ++++++++++
+ hw/arm/armv7m.c         | 23 ++++++++++++++++++++++-
+ 2 files changed, 32 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/arm/stm32f205_soc.h b/include/hw/arm/stm32f205_soc.h
-index 1332141..e2dce11 100644
---- a/include/hw/arm/stm32f205_soc.h
-+++ b/include/hw/arm/stm32f205_soc.h
-@@ -31,6 +31,7 @@
- #include "hw/adc/stm32f2xx_adc.h"
- #include "hw/or-irq.h"
- #include "hw/ssi/stm32f2xx_spi.h"
-+#include "hw/arm/armv7m.h"
+diff --git a/include/hw/arm/armv7m.h b/include/hw/arm/armv7m.h
+index 193ad71..3333c91 100644
+--- a/include/hw/arm/armv7m.h
++++ b/include/hw/arm/armv7m.h
+@@ -35,6 +35,9 @@ typedef struct {
+  * + Named GPIO output SYSRESETREQ: signalled for guest AIRCR.SYSRESETREQ
+  * + Property "cpu-model": CPU model to instantiate
+  * + Property "num-irq": number of external IRQ lines
++ * + Property "memory": MemoryRegion defining the physical address space
++ *   that CPU accesses see. (The NVIC, bitbanding and other CPU-internal
++ *   devices will be automatically layered on top of this view.)
+  */
+ typedef struct ARMv7MState {
+     /*< private >*/
+@@ -44,8 +47,15 @@ typedef struct ARMv7MState {
+     BitBandState bitband[ARMV7M_NUM_BITBANDS];
+     ARMCPU *cpu;
  
- #define TYPE_STM32F205_SOC "stm32f205-soc"
- #define STM32F205_SOC(obj) \
-@@ -51,9 +52,10 @@ typedef struct STM32F205State {
-     SysBusDevice parent_obj;
-     /*< public >*/
- 
--    char *kernel_filename;
++    /* MemoryRegion we pass to the CPU, with our devices layered on
++     * top of the ones the board provides in board_memory.
++     */
++    MemoryRegion container;
++
+     /* Properties */
      char *cpu_model;
++    /* MemoryRegion the board provides to us (with its devices, RAM, etc) */
++    MemoryRegion *board_memory;
+ } ARMv7MState;
  
-+    ARMv7MState armv7m;
-+
-     STM32F2XXSyscfgState syscfg;
-     STM32F2XXUsartState usart[STM_NUM_USARTS];
-     STM32F2XXTimerState timer[STM_NUM_TIMERS];
-diff --git a/hw/arm/netduino2.c b/hw/arm/netduino2.c
-index 23d7928..3cfe332 100644
---- a/hw/arm/netduino2.c
-+++ b/hw/arm/netduino2.c
-@@ -27,17 +27,18 @@
- #include "hw/boards.h"
+ #endif
+diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
+index 36f213c..638c597 100644
+--- a/hw/arm/armv7m.c
++++ b/hw/arm/armv7m.c
+@@ -18,6 +18,7 @@
+ #include "elf.h"
+ #include "sysemu/qtest.h"
  #include "qemu/error-report.h"
- #include "hw/arm/stm32f205_soc.h"
-+#include "hw/arm/arm.h"
++#include "exec/address-spaces.h"
  
- static void netduino2_init(MachineState *machine)
- {
-     DeviceState *dev;
+ /* Bitbanded IO.  Each word corresponds to a single bit.  */
  
-     dev = qdev_create(NULL, TYPE_STM32F205_SOC);
--    if (machine->kernel_filename) {
--        qdev_prop_set_string(dev, "kernel-filename", machine->kernel_filename);
--    }
-     qdev_prop_set_string(dev, "cpu-model", "cortex-m3");
-     object_property_set_bool(OBJECT(dev), true, "realized", &error_fatal);
+@@ -148,6 +149,14 @@ static void armv7m_instance_init(Object *obj)
+ 
+     /* Can't init the cpu here, we don't yet know which model to use */
+ 
++    object_property_add_link(obj, "memory",
++                             TYPE_MEMORY_REGION,
++                             (Object **)&s->board_memory,
++                             qdev_prop_allow_set_link_before_realize,
++                             OBJ_PROP_LINK_UNREF_ON_RELEASE,
++                             &error_abort);
++    memory_region_init(&s->container, obj, "armv7m-container", UINT64_MAX);
 +
-+    armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
-+                       FLASH_SIZE);
- }
+     object_initialize(&s->nvic, sizeof(s->nvic), "armv7m_nvic");
+     qdev_set_parent_bus(DEVICE(&s->nvic), sysbus_get_default());
+     object_property_add_alias(obj, "num-irq",
+@@ -170,6 +179,13 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
+     const char *typename;
+     CPUClass *cc;
  
- static void netduino2_machine_init(MachineClass *mc)
-diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
-index 38425bd..e6bd73a 100644
---- a/hw/arm/stm32f205_soc.c
-+++ b/hw/arm/stm32f205_soc.c
-@@ -49,6 +49,9 @@ static void stm32f205_soc_initfn(Object *obj)
-     STM32F205State *s = STM32F205_SOC(obj);
-     int i;
- 
-+    object_initialize(&s->armv7m, sizeof(s->armv7m), TYPE_ARMV7M);
-+    qdev_set_parent_bus(DEVICE(&s->armv7m), sysbus_get_default());
-+
-     object_initialize(&s->syscfg, sizeof(s->syscfg), TYPE_STM32F2XX_SYSCFG);
-     qdev_set_parent_bus(DEVICE(&s->syscfg), sysbus_get_default());
- 
-@@ -110,8 +113,16 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
-     vmstate_register_ram_global(sram);
-     memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, sram);
- 
--    nvic = armv7m_init(get_system_memory(), FLASH_SIZE, 96,
--                       s->kernel_filename, s->cpu_model);
-+    nvic = DEVICE(&s->armv7m);
-+    qdev_prop_set_uint32(nvic, "num-irq", 96);
-+    qdev_prop_set_string(nvic, "cpu-model", s->cpu_model);
-+    object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memory()),
-+                                     "memory", &error_abort);
-+    object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
-+    if (err != NULL) {
-+        error_propagate(errp, err);
++    if (!s->board_memory) {
++        error_setg(errp, "memory property was not set");
 +        return;
 +    }
++
++    memory_region_add_subregion_overlap(&s->container, 0, s->board_memory, -1);
++
+     cpustr = g_strsplit(s->cpu_model, ",", 2);
  
-     /* System configuration controller */
-     dev = DEVICE(&s->syscfg);
-@@ -192,7 +203,6 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+     oc = cpu_class_by_name(TYPE_ARM_CPU, cpustr[0]);
+@@ -194,6 +210,8 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
++    object_property_set_link(OBJECT(s->cpu), OBJECT(&s->container), "memory",
++                             &error_abort);
+     object_property_set_bool(OBJECT(s->cpu), true, "realized", &err);
+     if (err != NULL) {
+         error_propagate(errp, err);
+@@ -234,7 +252,8 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
+             return;
+         }
+ 
+-        sysbus_mmio_map(sbd, 0, bitband_output_addr[i]);
++        memory_region_add_subregion(&s->container, bitband_output_addr[i],
++                                    sysbus_mmio_get_region(sbd, 0));
+     }
  }
  
- static Property stm32f205_soc_properties[] = {
--    DEFINE_PROP_STRING("kernel-filename", STM32F205State, kernel_filename),
-     DEFINE_PROP_STRING("cpu-model", STM32F205State, cpu_model),
-     DEFINE_PROP_END_OF_LIST(),
- };
+@@ -282,6 +301,8 @@ DeviceState *armv7m_init(MemoryRegion *system_memory, int mem_size, int num_irq,
+     armv7m = qdev_create(NULL, "armv7m");
+     qdev_prop_set_uint32(armv7m, "num-irq", num_irq);
+     qdev_prop_set_string(armv7m, "cpu-model", cpu_model);
++    object_property_set_link(OBJECT(armv7m), OBJECT(get_system_memory()),
++                                     "memory", &error_abort);
+     /* This will exit with an error if the user passed us a bad cpu_model */
+     qdev_init_nofail(armv7m);
+ 
 -- 
 2.7.4
