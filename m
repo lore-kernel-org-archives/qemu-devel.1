@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cfcEh-0008KT-2p
-	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 19:53:52 -0500
+	(envelope-from <armbru@redhat.com>) id 1cfcLZ-0001yz-O7
+	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 20:00:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cfcEd-0001XX-W7
-	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 19:53:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40248)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cfcEd-0001Wd-Pz
-	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 19:53:47 -0500
+	(envelope-from <armbru@redhat.com>) id 1cfcLZ-00046N-1t
+	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 20:00:57 -0500
 From: Markus Armbruster <armbru@redhat.com>
-References: <1487053524-18674-1-git-send-email-den@openvz.org>
-	<1487053524-18674-2-git-send-email-den@openvz.org>
-	<f805c30f-47d1-6f79-c01b-ac1155d6859a@redhat.com>
-Date: Mon, 20 Feb 2017 01:53:42 +0100
-In-Reply-To: <f805c30f-47d1-6f79-c01b-ac1155d6859a@redhat.com> (Eric Blake's
-	message of "Wed, 15 Feb 2017 13:41:57 -0600")
-Message-ID: <87bmtxvg15.fsf@dusky.pond.sub.org>
+References: <1483194856-14079-1-git-send-email-hpoussin@reactos.org>
+	<8737gsl7o7.fsf@dusky.pond.sub.org>
+	<4b140d8b-0745-6d7f-101f-25c3ca5f28c2@redhat.com>
+	<fd8fb30f-4e54-e119-0287-2459fd6c85ca@reactos.org>
+Date: Mon, 20 Feb 2017 02:00:46 +0100
+In-Reply-To: <fd8fb30f-4e54-e119-0287-2459fd6c85ca@reactos.org>
+	(=?utf-8?Q?=22Herv=C3=A9?=
+	Poussineau"'s message of "Sat, 18 Feb 2017 18:58:10 +0100")
+Message-ID: <87a89hvfpd.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 1/3] i386/cpu: add crash-information QOM
- property
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] vl: disable default cdrom when using
+ explicitely scsi-hd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org, Anton Nefedov <anton.nefedov@virtuozzo.com>
+To: =?utf-8?Q?Herv=C3=A9?= Poussineau <hpoussin@reactos.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>, qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
 
-Eric Blake <eblake@redhat.com> writes:
+Herv=C3=A9 Poussineau <hpoussin@reactos.org> writes:
 
-> On 02/14/2017 12:25 AM, Denis V. Lunev wrote:
->> From: Anton Nefedov <anton.nefedov@virtuozzo.com>
->> 
->> Windows reports BSOD parameters through Hyper-V crash MSRs. This
->> information is very useful for initial crash analysis and thus
->> it would be nice to have a way to fetch it.
->> 
->> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
->> Signed-off-by: Denis V. Lunev <den@openvz.org>
->> ---
+> Hi,
 >
->> +++ b/qapi-schema.json
->> @@ -5846,6 +5846,30 @@
->>    'data': [ 'pause', 'poweroff' ] }
->>  
->>  ##
->> +# @GuestPanicInformation:
->> +#
->> +# Information about a guest panic
->> +#
->> +# Since: 2.9
->> +##
->> +{'union': 'GuestPanicInformation',
->> + 'data': { 'hyper-v': 'GuestPanicInformationHyperV' } }
->> +
+> Le 09/01/2017 =C3=A0 14:48, Paolo Bonzini a =C3=A9crit :
+>>
+>>
+>> On 09/01/2017 13:49, Markus Armbruster wrote:
+>>> Herv=C3=A9 Poussineau <hpoussin@reactos.org> writes:
+>>>
+>>>> 'ide-hd', 'ide-cd' and 'scsi-cd' devices already disable default cdrom.
+>>>> Make it the same for 'scsi-hd'.
+>>>>
+>>>> That way, we can add/replace the device on lun=3D2 without using -node=
+faults.
+>>>
+>>> Yes, but it might upset existing usage that relies on the default
+>>> CD-ROM.  In my opinion, making your needs explicit is better than
+>>> relying on defaults, but that doesn't mean we can change the defaults
+>>> unthinkingly.  Definitely not qemu-trivial.
+>>>
+>>> Opinions on the change?
+>>
+>> The original rationale for the change was "ide-hd has to suppress the
+>> default CD-ROM, or else you can't put one on secondary master without
+>> -nodefaults" but the same applies for scsi-hd vs. lun=3D1.
+>>
+>> So I'm not sure, but I lean towards accepting the patch.
+>>
+>> Paolo
 >
-> Markus has been trying to eliminate the addition of new "simple unions"
-> - while they are syntactically shorter in the .json file, they are
-> bulkier over the wire with extra {} nesting, and more verbose in the C
-> code, when compared to using a flat union instead.  I won't necessarily
-> hold up this patch as-is, but if we are going to avoid new simple
-> unions, we have to change this before 2.9 bakes in the {} nesting (we
-> can convert a simple union to a flat union without breaking QMP
-> back-compat, but it's messier than if we avoid the nesting to begin with).
+> Paolo, Markus, so what is the conclusion?
+> Accepting the patch, or refusing it?
 
-We should not add new simple unions.  Please have a look at my
-"[PATCH 0/2] Flatten simple unions where we still can".
-
-Message-Id: <1486569864-17005-1-git-send-email-armbru@redhat.com>
-https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg01689.html
+Suggest to repost with the commit message updated to mention the
+backwards incompatibility, and why you think it's okay.
+cc: John Snow <jsnow@redhat.com>, cc: qemu-block@nongnu.org
