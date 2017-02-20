@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cfmUs-0004yV-HZ
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 06:51:15 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1cfmYE-00078A-0C
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 06:54:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cfmUr-0001kP-Ht
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 06:51:14 -0500
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:38193)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cfmUr-0001k1-Bl
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 06:51:13 -0500
-Received: by mail-wm0-x22b.google.com with SMTP id r141so50479774wmg.1
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 03:51:13 -0800 (PST)
+	(envelope-from <arei.gonglei@huawei.com>) id 1cfmYA-0003GQ-T4
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 06:54:42 -0500
+Received: from [45.249.212.187] (port=2535 helo=dggrg01-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1cfmYA-0003EW-7c
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 06:54:38 -0500
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Mon, 20 Feb 2017 11:54:10 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA1C1608@DGGEMA505-MBX.china.huawei.com>
+References: <589C099A.9090605@huawei.com>
+	<AF60004D-7133-44D1-8A9F-7DB9822D84AF@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA1B4379@DGGEMA505-MBX.china.huawei.com>
+	<105e5774-38c3-0683-ca08-64f6ed53c643@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA1B6988@DGGEMA505-MBX.china.huawei.com>
+	<2127602137.20489688.1486827559449.JavaMail.zimbra@redhat.com>
+	<1486980300.17184.28.camel@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA1BD1CA@DGGEMA505-MBX.china.huawei.com>
+	<ea1dbe94-7343-ef9e-56e1-9c6d8bcd78d6@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA1C13C3@DGGEMA505-MBX.china.huawei.com>
+	<43632326-97a1-1f60-39f4-1044cd596b66@redhat.com>
+In-Reply-To: <43632326-97a1-1f60-39f4-1044cd596b66@redhat.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <1487341525-5785-1-git-send-email-eric.auger@redhat.com>
-References: <1487341525-5785-1-git-send-email-eric.auger@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Feb 2017 11:50:51 +0000
-Message-ID: <CAFEAcA97d3kxq1XWgKMdjRB4VjSdg+tYVA5U0hhL3Af6Ja9FmA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2] hw/arm/virt: Add a user option to
- disallow ITS instantiation
+Subject: Re: [Qemu-devel] [Help] Windows2012 as Guest 64+cores on KVM Halts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,95 +37,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Vijay Kilari <vijay.kilari@gmail.com>, Andrew Jones <drjones@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Vadim Rozenfeld <vrozenfe@redhat.com>
+Cc: Hangaohuai <hangaohuai@huawei.com>, Yan Vugenfirer <yvugenfi@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Radim Krcmar <rkrcmar@redhat.com>
 
-On 17 February 2017 at 14:25, Eric Auger <eric.auger@redhat.com> wrote:
-> In 2.9 ITS will block save/restore and migration use cases. As
-> such let's introduce a user option that disallows its instantiation
-> along with the GICv3. With no-its option turned true, migration will
-> be possible, obviously at the expense of MSI support (with GICv3).
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->
-> ---
->
-> v1 -> v2: fix omitted coma in object_property_set_description
->
-> With this patch the option also is added in virt 2.8. I don't know
-> if it is acceptable.
-
-I think that's OK.
-
-> ---
->  hw/arm/virt.c         | 28 +++++++++++++++++++++++++++-
->  include/hw/arm/virt.h |  1 +
->  2 files changed, 28 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index f3440f2..c08deb0 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -605,7 +605,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
->
->      fdt_add_gic_node(vms);
->
-> -    if (type == 3 && !vmc->no_its) {
-> +    if (type == 3 && !vmc->no_its && !vms->no_its) {
-
-Making the board creation code check both a vmc field and
-a vms field seems a bit awkward...
-
-> +    /* Default allows ITS instantiation */
-> +    if (!vmc->no_its) {
-> +        object_property_add_bool(obj, "no-its", virt_get_no_its,
-> +                                 virt_set_no_its, NULL);
-> +        vms->no_its = false;
-> +        object_property_set_description(obj, "no-its",
-> +                                        "Disallow the ITS instantiation",
-> +                                        NULL);
-
-Can we have the property be "its" with true-for-enabled,
-rather than "no-its", please? (See later for rationale.)
-
-> +    }
-
-...if we have this code have an else {} clause we can
-make it set the vms field appropriately, and then the
-board creation code only needs to check the vms field.
-
-> +
->      vms->memmap = a15memmap;
->      vms->irqmap = a15irqmap;
->  }
-> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> index 58ce74e..5e73be9 100644
-> --- a/include/hw/arm/virt.h
-> +++ b/include/hw/arm/virt.h
-> @@ -93,6 +93,7 @@ typedef struct {
->      FWCfgState *fw_cfg;
->      bool secure;
->      bool highmem;
-> +    bool no_its;
-
-Can we make this "bool its" where true means "has an ITS", please?
-The fields in VirtMachineClass are all "no_foo" because we require
-the "false" case to be the "new modern behaviour" and the "true"
-case to be "legacy like old boards" for convenience of the
-virt_machine_*_options() function chain, but we don't need to
-do this for VirtMachineState fields. (So VMS 'secure', 'highmem'
-and 'virt' are all true-for-feature-enabled.)
-The user-facing property should also be "its" for the same reason.
-
-An alternative to having the property be always default true
-and only existing on newer boards would be to have the VMC field
-be "no_default_its", expose the "its" property in all cases and
-just have its default value be different for old virt-* machine
-versions. I have no opinion here about which would be better.
-
->      bool virt;
->      int32_t gic_version;
->      struct arm_boot_info bootinfo;
-
-thanks
--- PMM
+PiANCj4gT24gMjAvMDIvMjAxNyAxMDoxOSwgR29uZ2xlaSAoQXJlaSkgd3JvdGU6DQo+ID4gSGkg
+UGFvbG8sDQo+ID4NCj4gPj4NCj4gPj4NCj4gPj4gT24gMTYvMDIvMjAxNyAwMjozMSwgR29uZ2xl
+aSAoQXJlaSkgd3JvdGU6DQo+ID4+PiBBbmQgdGhlIGJlbG93IHBhdGNoIHdvcmtzIGZvciBtZSwg
+SSBjYW4gc3VwcG9ydCBtYXggMjU1IHZjcHVzIGZvcg0KPiBXUzIwMTINCj4gPj4+IHdpdGggaHlw
+ZXItdiBlbmxpZ2h0ZW5tZW50cy4NCj4gPj4+DQo+ID4+PiBkaWZmIC0tZ2l0IGEvdGFyZ2V0L2kz
+ODYva3ZtLmMgYi90YXJnZXQvaTM4Ni9rdm0uYw0KPiA+Pj4gaW5kZXggMjdmZDA1MC4uZWZlM2Ni
+YyAxMDA2NDQNCj4gPj4+IC0tLSBhL3RhcmdldC9pMzg2L2t2bS5jDQo+ID4+PiArKysgYi90YXJn
+ZXQvaTM4Ni9rdm0uYw0KPiA+Pj4gQEAgLTc3Miw3ICs3NzIsNyBAQCBpbnQga3ZtX2FyY2hfaW5p
+dF92Y3B1KENQVVN0YXRlICpjcykNCj4gPj4+DQo+ID4+PiAgICAgICAgICBjID0gJmNwdWlkX2Rh
+dGEuZW50cmllc1tjcHVpZF9pKytdOw0KPiA+Pj4gICAgICAgICAgYy0+ZnVuY3Rpb24gPSBIWVBF
+UlZfQ1BVSURfSU1QTEVNRU5UX0xJTUlUUzsNCj4gPj4+IC0gICAgICAgIGMtPmVheCA9IDB4NDA7
+DQo+ID4+PiArICAgICAgICBjLT5lYXggPSAtMTsNCj4gPj4+ICAgICAgICAgIGMtPmVieCA9IDB4
+NDA7DQo+ID4+Pg0KPiA+Pj4gICAgICAgICAga3ZtX2Jhc2UgPSBLVk1fQ1BVSURfU0lHTkFUVVJF
+X05FWFQ7DQo+ID4+DQo+ID4+IFRoaXMgbmVlZHMgdG8gZGVwZW5kIG9uIHRoZSBtYWNoaW5lIHR5
+cGUsIGJ1dCBhcGFydCBmcm9tIHRoYXQgSSB0aGluaw0KPiA+DQo+ID4gSSBkb24ndCBrbm93IHdo
+eS4gQmVjYXVzZSB0aGUgbmVnYXRpdmUgZWZmZWN0cyBmb3IgdGhpcyBjaGFuZ2UgZG9uJ3QgZXhp
+c3QNCj4gPiBvbiBjdXJyZW50IFFFTVUgSUlVQywgYW5kIHdlIGRvbid0IGhhdmUgY29tcGF0aWJs
+ZSBwcm9ibGVtcyBmb3IgbGl2ZQ0KPiBtaWdyYXRpb24uDQo+IA0KPiBDUFVJRCBzaG91bGQgbmV2
+ZXIgY2hhbmdlIHdpdGggdGhlIHNhbWUgbWFjaGluZSB0eXBlIGFuZCBjb21tYW5kIGxpbmUuDQo+
+IA0KT0ssIHRoZW4gaG93IGRvIHdlIGFkZCBjb21wYXQgY29kZSBmb3IgdGhlIENQVUlEIGNoYW5n
+ZT8gSXQncyBub3QgYSB2aXNpYmxlIHByb3BlcnR5Lg0KDQpUaGFua3MsDQotR29uZ2xlaQ0KDQo+
+IFBhb2xvDQo+IA0KPiA+PiB5b3Ugc2hvdWxkIHN1Ym1pdCB0aGUgcGF0Y2ggZm9yIDIuOS4NCj4g
+Pj4NCj4gPg0KPiA+IFRoYW5rcywNCj4gPiAtR29uZ2xlaQ0KPiA+DQo=
