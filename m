@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45724)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cfcLZ-0001yz-O7
-	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 20:00:59 -0500
+	(envelope-from <tianyu.lan@intel.com>) id 1cfcsq-0007oE-AU
+	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 20:35:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cfcLZ-00046N-1t
-	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 20:00:57 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1483194856-14079-1-git-send-email-hpoussin@reactos.org>
-	<8737gsl7o7.fsf@dusky.pond.sub.org>
-	<4b140d8b-0745-6d7f-101f-25c3ca5f28c2@redhat.com>
-	<fd8fb30f-4e54-e119-0287-2459fd6c85ca@reactos.org>
-Date: Mon, 20 Feb 2017 02:00:46 +0100
-In-Reply-To: <fd8fb30f-4e54-e119-0287-2459fd6c85ca@reactos.org>
-	(=?utf-8?Q?=22Herv=C3=A9?=
-	Poussineau"'s message of "Sat, 18 Feb 2017 18:58:10 +0100")
-Message-ID: <87a89hvfpd.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] vl: disable default cdrom when using
- explicitely scsi-hd
+	(envelope-from <tianyu.lan@intel.com>) id 1cfcsl-0007ov-DR
+	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 20:35:20 -0500
+Received: from mga06.intel.com ([134.134.136.31]:30207)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <tianyu.lan@intel.com>)
+	id 1cfcsl-0007oT-38
+	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 20:35:15 -0500
+From: Lan Tianyu <tianyu.lan@intel.com>
+Date: Mon, 20 Feb 2017 09:28:04 +0800
+Message-Id: <1487554087-15347-2-git-send-email-tianyu.lan@intel.com>
+In-Reply-To: <1487554087-15347-1-git-send-email-tianyu.lan@intel.com>
+References: <1487554087-15347-1-git-send-email-tianyu.lan@intel.com>
+Subject: [Qemu-devel] [Resend RFC PATCH 1/4] VFIO: Set eventfd for IOMMU
+ fault event via new vfio cmd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +25,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Herv=C3=A9?= Poussineau <hpoussin@reactos.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>, qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Lan Tianyu <tianyu.lan@intel.com>, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, peterx@redhat.com, david@gibson.dropbear.id.au, alex.williamson@redhat.com, yi.l.liu@intel.com
 
-Herv=C3=A9 Poussineau <hpoussin@reactos.org> writes:
 
-> Hi,
->
-> Le 09/01/2017 =C3=A0 14:48, Paolo Bonzini a =C3=A9crit :
->>
->>
->> On 09/01/2017 13:49, Markus Armbruster wrote:
->>> Herv=C3=A9 Poussineau <hpoussin@reactos.org> writes:
->>>
->>>> 'ide-hd', 'ide-cd' and 'scsi-cd' devices already disable default cdrom.
->>>> Make it the same for 'scsi-hd'.
->>>>
->>>> That way, we can add/replace the device on lun=3D2 without using -node=
-faults.
->>>
->>> Yes, but it might upset existing usage that relies on the default
->>> CD-ROM.  In my opinion, making your needs explicit is better than
->>> relying on defaults, but that doesn't mean we can change the defaults
->>> unthinkingly.  Definitely not qemu-trivial.
->>>
->>> Opinions on the change?
->>
->> The original rationale for the change was "ide-hd has to suppress the
->> default CD-ROM, or else you can't put one on secondary master without
->> -nodefaults" but the same applies for scsi-hd vs. lun=3D1.
->>
->> So I'm not sure, but I lean towards accepting the patch.
->>
->> Paolo
->
-> Paolo, Markus, so what is the conclusion?
-> Accepting the patch, or refusing it?
+This patch is to assign an event fd to VFIO IOMMU type1 driver
+in order to get notification when IOMMU driver reports fault event.
 
-Suggest to repost with the commit message updated to mention the
-backwards incompatibility, and why you think it's okay.
-cc: John Snow <jsnow@redhat.com>, cc: qemu-block@nongnu.org
+Signed-off-by: Lan Tianyu <tianyu.lan@intel.com>
+---
+ hw/vfio/common.c              | 37 +++++++++++++++++++++++++++++++++++++
+ include/hw/vfio/vfio-common.h |  3 +++
+ linux-headers/linux/vfio.h    | 13 +++++++++++++
+ 3 files changed, 53 insertions(+)
+
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 6b33b9f..628b424 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -33,6 +33,7 @@
+ #include "qemu/error-report.h"
+ #include "qemu/range.h"
+ #include "sysemu/kvm.h"
++#include "sysemu/sysemu.h"
+ #include "trace.h"
+ #include "qapi/error.h"
+ 
+@@ -294,6 +295,34 @@ static bool vfio_listener_skipped_section(MemoryRegionSection *section)
+            section->offset_within_address_space & (1ULL << 63);
+ }
+ 
++static void vfio_iommu_fault(void *opaque)
++{
++}
++
++static int vfio_set_iommu_fault_notifier(struct VFIOContainer *container)
++{
++    struct vfio_iommu_type1_set_fault_eventfd eventfd;
++    int ret;
++
++    ret = event_notifier_init(&container->fault_notifier, 0);
++    if (ret < 0) {
++        error_report("vfio: Failed to init notifier for IOMMU fault event");
++        return ret;
++    }
++
++    eventfd.fd = event_notifier_get_fd(&container->fault_notifier);
++    eventfd.argsz = sizeof(eventfd);
++
++    ret = ioctl(container->fd, VFIO_IOMMU_SET_FAULT_EVENTFD, &eventfd);
++    if (ret < 0) {
++        error_report("vfio: Failed to set notifier for IOMMU fault event");
++        return ret;
++    }
++
++    qemu_set_fd_handler(eventfd.fd, vfio_iommu_fault, NULL, container);
++    return 0;
++}
++
+ /* Called with rcu_read_lock held.  */
+ static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
+                            bool *read_only)
+@@ -1103,6 +1132,14 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+         goto listener_release_exit;
+     }
+ 
++    if (memory_region_is_iommu(container->space->as->root)) {
++        if (vfio_set_iommu_fault_notifier(container)) {
++            error_setg_errno(errp, -ret,
++                "Fail to set IOMMU fault notifier");
++            goto listener_release_exit;
++        }
++    }
++
+     container->initialized = true;
+ 
+     QLIST_INIT(&container->group_list);
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index c582de1..1b594c6 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -26,6 +26,7 @@
+ #include "exec/memory.h"
+ #include "qemu/queue.h"
+ #include "qemu/notify.h"
++#include "qemu/event_notifier.h"
+ #ifdef CONFIG_LINUX
+ #include <linux/vfio.h>
+ #endif
+@@ -81,6 +82,8 @@ typedef struct VFIOContainer {
+     unsigned iommu_type;
+     int error;
+     bool initialized;
++    EventNotifier fault_notifier;
++
+     /*
+      * This assumes the host IOMMU can support only a single
+      * contiguous IOVA window.  We may need to generalize that in
+diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+index 759b850..ca890ee 100644
+--- a/linux-headers/linux/vfio.h
++++ b/linux-headers/linux/vfio.h
+@@ -537,6 +537,19 @@ struct vfio_iommu_type1_dma_unmap {
+ #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
+ #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
+ 
++/*
++ * VFIO_IOMMU_SET_FAULT_EVENT_FD	_IO(VFIO_TYPE, VFIO_BASE + 17)
++ * 
++ * Receive eventfd from userspace to notify fault event from IOMMU.
++ */
++struct vfio_iommu_type1_set_fault_eventfd {
++	__u32	argsz;
++	__u32   flags;
++	__u32	fd;
++};
++
++#define VFIO_IOMMU_SET_FAULT_EVENTFD	_IO(VFIO_TYPE, VFIO_BASE + 17)
++
+ /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
+ 
+ /*
+-- 
+1.8.3.1
