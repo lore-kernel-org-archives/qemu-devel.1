@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1cfjcw-0007xR-BI
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 03:47:26 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cfjqU-0002mO-I6
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:01:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1cfjcs-0001Ew-Cr
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 03:47:22 -0500
-Received: from mga11.intel.com ([192.55.52.93]:2109)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1cfjcs-0001EP-2M
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 03:47:18 -0500
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-Date: Mon, 20 Feb 2017 08:47:11 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743900C656@shsmsx102.ccr.corp.intel.com>
-References: <1484026704-28027-1-git-send-email-mst@redhat.com>
-	<1484026704-28027-9-git-send-email-mst@redhat.com>
-	<A2975661238FB949B60364EF0F2C25743900AAEF@shsmsx102.ccr.corp.intel.com>
-	<20170217032619.GL15985@pxdev.xzpeter.org>
-	<A2975661238FB949B60364EF0F2C25743900B765@shsmsx102.ccr.corp.intel.com>
-	<20170217070006.GB12693@pxdev.xzpeter.org>
-In-Reply-To: <20170217070006.GB12693@pxdev.xzpeter.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <alex.bennee@linaro.org>) id 1cfjqQ-00059f-LU
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:01:22 -0500
+Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:35055)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cfjqQ-000596-Co
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:01:18 -0500
+Received: by mail-wr0-x230.google.com with SMTP id s27so12947842wrb.2
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 01:01:17 -0800 (PST)
+References: <20170216123456.28621-1-alex.bennee@linaro.org>
+	<20170216123456.28621-2-alex.bennee@linaro.org>
+	<622dafb3-11e0-92fd-f26d-13e096e8dda6@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <622dafb3-11e0-92fd-f26d-13e096e8dda6@amsat.org>
+Date: Mon, 20 Feb 2017 09:01:21 +0000
+Message-ID: <87k28lw80u.fsf@linaro.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PULL 08/41] intel_iommu: support device iotlb
- descriptor
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 1/4] tests/docker: add basic user
+ mapping support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,115 +32,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Eduardo
-	Habkost <ehabkost@redhat.com>, Jason Wang <jasowang@redhat.com>, Paolo
-	Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Tian, Kevin" <kevin.tian@intel.com>, "Lan, Tianyu" <tianyu.lan@intel.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBl
-dGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBGcmlkYXksIEZlYnJ1YXJ5IDE3LCAyMDE3IDM6MDAg
-UE0NCj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVAaW50ZWwuY29tPg0KPiBDYzogTWljaGFlbCBT
-LiBUc2lya2luIDxtc3RAcmVkaGF0LmNvbT47IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsgUGV0ZXIN
-Cj4gTWF5ZGVsbCA8cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnPjsgRWR1YXJkbyBIYWJrb3N0DQo+
-IDxlaGFia29zdEByZWRoYXQuY29tPjsgSmFzb24gV2FuZyA8amFzb3dhbmdAcmVkaGF0LmNvbT47
-IFBhb2xvIEJvbnppbmkNCj4gPHBib256aW5pQHJlZGhhdC5jb20+OyBSaWNoYXJkIEhlbmRlcnNv
-biA8cnRoQHR3aWRkbGUubmV0PjsgVGlhbiwgS2V2aW4NCj4gPGtldmluLnRpYW5AaW50ZWwuY29t
-PjsgTGFuLCBUaWFueXUgPHRpYW55dS5sYW5AaW50ZWwuY29tPg0KPiBTdWJqZWN0OiBSZTogW1Fl
-bXUtZGV2ZWxdIFtQVUxMIDA4LzQxXSBpbnRlbF9pb21tdTogc3VwcG9ydCBkZXZpY2UgaW90bGIN
-Cj4gZGVzY3JpcHRvcg0KPiANCj4gT24gRnJpLCBGZWIgMTcsIDIwMTcgYXQgMDY6MzY6NDFBTSAr
-MDAwMCwgTGl1LCBZaSBMIHdyb3RlOg0KPiA+ID4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0N
-Cj4gPiA+IEZyb206IFBldGVyIFh1IFttYWlsdG86cGV0ZXJ4QHJlZGhhdC5jb21dDQo+ID4gPiBT
-ZW50OiBGcmlkYXksIEZlYnJ1YXJ5IDE3LCAyMDE3IDExOjI2IEFNDQo+ID4gPiBUbzogTGl1LCBZ
-aSBMIDx5aS5sLmxpdUBpbnRlbC5jb20+DQo+ID4gPiBDYzogTWljaGFlbCBTLiBUc2lya2luIDxt
-c3RAcmVkaGF0LmNvbT47IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsNCj4gPiA+IFBldGVyIE1heWRl
-bGwgPHBldGVyLm1heWRlbGxAbGluYXJvLm9yZz47IEVkdWFyZG8gSGFia29zdA0KPiA+ID4gPGVo
-YWJrb3N0QHJlZGhhdC5jb20+OyBKYXNvbiBXYW5nIDxqYXNvd2FuZ0ByZWRoYXQuY29tPjsgUGFv
-bG8NCj4gPiA+IEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+OyBSaWNoYXJkIEhlbmRlcnNv
-biA8cnRoQHR3aWRkbGUubmV0PjsNCj4gPiA+IFRpYW4sIEtldmluIDxrZXZpbi50aWFuQGludGVs
-LmNvbT47IExhbiwgVGlhbnl1DQo+ID4gPiA8dGlhbnl1LmxhbkBpbnRlbC5jb20+DQo+ID4gPiBT
-dWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIFtQVUxMIDA4LzQxXSBpbnRlbF9pb21tdTogc3VwcG9y
-dCBkZXZpY2UNCj4gPiA+IGlvdGxiIGRlc2NyaXB0b3INCj4gPiA+DQo+ID4gPiBPbiBUaHUsIEZl
-YiAxNiwgMjAxNyBhdCAwNTozNjowNkFNICswMDAwLCBMaXUsIFlpIEwgd3JvdGU6DQo+ID4gPiA+
-ID4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gPiA+ID4gPiBGcm9tOiBRZW11LWRldmVs
-DQo+ID4gPiA+ID4gW21haWx0bzpxZW11LWRldmVsLWJvdW5jZXMreWkubC5saXU9aW50ZWwuY29t
-QG5vbmdudS5vcmddDQo+ID4gPiA+ID4gT24gQmVoYWxmIE9mIE1pY2hhZWwgUy4gVHNpcmtpbg0K
-PiA+ID4gPiA+IFNlbnQ6IFR1ZXNkYXksIEphbnVhcnkgMTAsIDIwMTcgMTo0MCBQTQ0KPiA+ID4g
-PiA+IFRvOiBxZW11LWRldmVsQG5vbmdudS5vcmcNCj4gPiA+ID4gPiBDYzogUGV0ZXIgTWF5ZGVs
-bCA8cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnPjsgRWR1YXJkbyBIYWJrb3N0DQo+ID4gPiA+ID4g
-PGVoYWJrb3N0QHJlZGhhdC5jb20+OyBKYXNvbiBXYW5nIDxqYXNvd2FuZ0ByZWRoYXQuY29tPjsg
-UGV0ZXINCj4gPiA+ID4gPiBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+OyBQYW9sbyBCb256aW5pIDxw
-Ym9uemluaUByZWRoYXQuY29tPjsNCj4gPiA+ID4gPiBSaWNoYXJkIEhlbmRlcnNvbiA8cnRoQHR3
-aWRkbGUubmV0Pg0KPiA+ID4gPiA+IFN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwOC80MV0g
-aW50ZWxfaW9tbXU6IHN1cHBvcnQgZGV2aWNlDQo+ID4gPiA+ID4gaW90bGIgZGVzY3JpcHRvcg0K
-PiA+ID4gPiA+DQo+ID4gPiA+ID4gRnJvbTogSmFzb24gV2FuZyA8amFzb3dhbmdAcmVkaGF0LmNv
-bT4NCj4gPiA+ID4gPg0KPiA+ID4gPiA+IFRoaXMgcGF0Y2ggZW5hYmxlcyBkZXZpY2UgSU9UTEIg
-c3VwcG9ydCBmb3IgaW50ZWwgaW9tbXUuIFRoZQ0KPiA+ID4gPiA+IG1ham9yIHdvcmsgaXMgdG8g
-aW1wbGVtZW50IFFJIGRldmljZSBJT1RMQiBkZXNjcmlwdG9yIHByb2Nlc3NpbmcNCj4gPiA+ID4g
-PiBhbmQgbm90aWZ5IHRoZSBkZXZpY2UgdGhyb3VnaCBpb21tdSBub3RpZmllci4NCj4gPiA+ID4g
-Pg0KPiA+ID4gPiBIaSBKYXNvbi9NaWNoYWVsLA0KPiA+ID4gPg0KPiA+ID4gPiBSZWNlbnRseSBQ
-ZXRlciBYdSdzIHBhdGNoIGFsc28gdG91Y2hlZCBpbnRlbC1pb21tdSBlbXVsYXRpb24uIEhpcw0K
-PiA+ID4gPiBwYXRjaCBzaGFkb3dzIHNlY29uZC1sZXZlbCBwYWdlIHRhYmxlIGJ5IGNhcHR1cmlu
-ZyBpb3RsYiBmbHVzaA0KPiA+ID4gPiBmcm9tIGd1ZXN0LiBJdCB3b3VsZCByZXN1bHQgaW4gcGFn
-ZSB0YWJsZSB1cGRhdGluZyBpbiBob3N0LiBEb2VzDQo+ID4gPiA+IHRoaXMgcGF0Y2ggYWxzbyB1
-c2UgdGhlIHNhbWUgbWFwL3VtYXAgQVBJIHByb3ZpZGVkIGJ5IFZGSU8/IElmIGl0DQo+ID4gPiA+
-IGlzLCB0aGVuIEkgdGhpbmsgaXQNCj4gPiA+IHdvdWxkIGFsc28gdXBkYXRlIHBhZ2UgdGFibGUg
-aW4gaG9zdC4NCj4gPiA+DQo+ID4gPiBJIGhhdmVuJ3QgY29uc2lkZXJlZCBjb21wbGV4IHNjZW5h
-cmlvcywgYnV0IGlmIHNpbXBseSB3ZSBoYXZlIGEgVk0NCj4gPiA+IHdpdGggb25lIHZob3N0IGRl
-dmljZSBhbmQgb25lIHZmaW8tcGNpIGRldmljZSwgaW1obyB0aGF0IHNob3VsZCBub3QNCj4gPiA+
-IGJlIGEgcHJvYmxlbSAtIGRldmljZSBpb3RsYiBpcyB0YXJnZXRpbmcgU0lEIHJhdGhlciB0aGFu
-IERPTUFJTi4gU28NCj4gPiA+IGRldmljZSBpb3RsYiBpbnZhbGlkYXRpb25zIGZvciB2aG9zdCB3
-aWxsIGJlIHNlbnQgdG8gdmhvc3QgZGV2aWNlIG9ubHkuDQo+ID4NCj4gPiBQZXRlciwgSSB0aGlu
-ayBmb3IgYXNzaWduZWQgZGV2aWNlLCBhbGwgZ3Vlc3QgaW90bGIgZmx1c2ggc2hvdWxkIGJlDQo+
-ID4gdHJhbnNsYXRlZCB0byBiZSB0YXJnZXRpbmcgZGV2aWNlIGluIHRoZSBzY29wZSBvZiBob3N0
-LiBCZXNpZGVzIHRoZQ0KPiA+IHNjZW5hcmlvIHdoaWNoIGhhcyB2aG9zdCBhbmQgdmZpby1wY2kg
-ZGV2aWNlIGF0IHRoZSBzYW1lIHRpbWUsIGhvdw0KPiA+IGFib3V0IG9ubHkgaGF2aW5nIHZmaW8t
-cGNpIGRldmljZSBhbmQgdGhpcyBkZXZpY2UgaGFzIEFUUyBzdXBwb3J0LiBUaGVuIHRoZXJlDQo+
-IHNob3VsZCBiZSBkZXZpY2UtaW90bGIgZmx1c2hpbmcuDQo+ID4gV2l0aCB0aGlzIHBhdGNoIGFu
-ZCB5b3VyIHBhdGNoLCBpdCB3b3VsZCBhbHNvIGludHJvZHVjZSB0d28gZmx1c2hpbmcuDQo+IA0K
-PiBIbW0gcG9zc2libHkuIEknbSBzdGlsbCBub3QgcXVpdGUgZmFtaWxpYXIgd2l0aCBBVFMsIGJ1
-dCBoZXJlIHdoYXQgd2UgbmVlZCB0bw0KPiBkbyBtYXkgYmUgdGhhdCB3ZSBmb3J3YXJkIHRoZXNl
-IGRldmljZS1pb3RsYiBpbnZhbGlkYXRpb25zIHRvIHRoZSBoYXJkd2FyZQ0KPiBiZWxvdywgaW5z
-dGVhZCBvZiBzZW5kaW5nIFVOTUFQIG5vdGlmaWVzLCByaWdodD8NCnllcywgdGhhdCB3b3VsZG7i
-gJl0IHJlc3VsdCBpbiBkdXBsaWNhdGUgcGFnZSB0YWJsZSB1cGRhdGluZyBpbiBob3N0Lg0KDQo+
-IA0KPiA+DQo+ID4gPiBIb3dldmVyLCB2aG9zdCBtYXkgcmVjZWl2ZSB0d28gaW52YWxpZGF0aW9u
-cyBoZXJlLCBidXQgaXQgd29uJ3QNCj4gPiA+IG1hdHRlciBtdWNoIHNpbmNlIHZob3N0IGlzIGp1
-c3QgZmx1c2hpbmcgY2FjaGVzIHR3aWNlLg0KPiA+DQo+ID4geWVhaCwgc28gZmFyIEkgZGlkbuKA
-mXQgc2VlIGZ1bmN0aW9uYWwgaXNzdWUsIG1heSBqdXN0IHJlZHVjZQ0KPiA+IHBlcmZvcm1hbmNl
-Xl9eDQo+ID4NCj4gPiA+ID4gSXQgbG9va3MgdG8gYmUNCj4gPiA+ID4gYSBkdXBsaWNhdGUgdXBk
-YXRlLiBQbHMgcmVmZXIgdG8gdGhlIGZvbGxvd2luZyBzbmFwc2hvdCBjYXB0dXJlZA0KPiA+ID4g
-PiBmcm9tIHNlY3Rpb24gNi41LjIuNSBvZiB2dGQgc3BlYy4NCj4gPiA+ID4NCj4gPiA+ID4gIlNp
-bmNlIHRyYW5zbGF0aW9uIHJlcXVlc3RzIGZyb20gYSBkZXZpY2UgbWF5IGJlIHNlcnZpY2VkIGJ5
-DQo+ID4gPiA+IGhhcmR3YXJlIGZyb20gdGhlIElPVExCLCBzb2Z0d2FyZSBtdXN0IGFsd2F5cyBy
-ZXF1ZXN0IElPVExCDQo+ID4gPiA+IGludmFsaWRhdGlvbg0KPiA+ID4gPiAoaW90bGJfaW52X2Rz
-YykgYmVmb3JlIHJlcXVlc3RpbmcgY29ycmVzcG9uZGluZyBEZXZpY2UtVExCDQo+ID4gPiA+IChk
-ZXZfdGxiX2ludl9kc2MpIGludmFsaWRhdGlvbi4iDQo+ID4gPiA+DQo+ID4gPiA+IE1heWJlIGZv
-ciBkZXZpY2UtaW90bGIsIHdlIG5lZWQgYSBzZXBhcmF0ZSBBUEkgd2hpY2gganVzdCBwYXNzDQo+
-ID4gPiA+IGRvd24gdGhlIGludmFsaWRhdGUgaW5mbyB3aXRob3V0IHVwZGF0aW5nIHBhZ2UgdGFi
-bGUuIEFueSB0aG91Z2h0cz8NCj4gPiA+DQo+ID4gPiBOb3cgaW1obyBJIHNsaWdodGx5IHByZWZl
-ciBqdXN0IHVzZSB0aGUgY3VycmVudCBVTk1BUCBub3RpZmllciB0eXBlDQo+ID4gPiBldmVuIGZv
-ciBkZXZpY2UgaW90bGIgZGV2aWNlLiBCdXQsIHdlIG1heSBuZWVkIHRvIGRvIG9uZSBtb3JlIGNo
-ZWNrDQo+ID4gPiB0aGF0IHdlIHNraXAgc2VuZGluZyBnZW5lcmFsIGlvdGxiIGludmFsaWRhdGlv
-bnMgdG8gQVRTIGVuYWJsZWQNCj4gPiA+IGRldmljZXMgbGlrZSB2aG9zdCwgdG8gYXZvaWQgZHVw
-bGljYXRlZCBjYWNoZSBmbHVzaGluZy4gRnJvbQ0KPiA+ID4gdmlydC1zdm0gc2lkZSwgZG8gd2Ug
-aGF2ZSBzcGVjaWZpYyByZXF1aXJlbWVudCB0byBpbnRyb2R1Y2UgYSBuZXcgZmxhZyBmb3IgaXQ/
-DQo+ID4gSSB0aGluayBpdCBpcyBhIHByYWN0aWNhbCBzb2x1dGlvbiB0byBkbyBzdWNoIGEgY2hl
-Y2sgdG8gYXZvaWQgZHVwbGljYXRlIGZsdXNoaW5nLg0KPiA+DQo+ID4gRm9yIHZpcnQtc3ZtLCBy
-ZXF1aXJlbWVudCBpcyBhIGxpdHRsZSBiaXQgZGlmZmVyZW50IHNpbmNlIGl0J3Mgbm90DQo+ID4g
-c2hhZG93aW5nIGFueSBndWVzdCBwYWdlIHRhYmxlLiBJdCBuZWVkcyB0byBzaGFkb3cgaW52YWxp
-ZGF0ZQ0KPiA+IG9wZXJhdGlvbnMuIFNvIHZpcnQtc3ZtIHdpbGwgbm90IHVzZSBNQVAvVU5NQVAg
-bm90aWZpZXIuIEluc3RlYWQsIGl0DQo+ID4gbWF5IHJlcXVpcmUgbm90aWZpZXIgd2hpY2ggcGFz
-c2Rvd24gaW52YWxpZGF0ZSBpbmZvIGFuZCB0aGVuIHN1Ym1pdA0KPiBpbnZhbGlkYXRpb24gZGly
-ZWN0bHkuKG5vIHBhZ2UgdGFibGUgdXBkYXRpbmcgaW4gaG9zdCkuDQo+IA0KPiBBZ2FpbiwganVz
-dCB3YW50IHRvIGtub3cgd2hldGhlciBteSBhYm92ZSB1bmRlcnN0YW5kaW5nIGlzIGNvcnJlY3Qu
-IElmIHNvLA0KPiBpbnN0ZWFkIG9mIGludHJvZHVjaW5nIGEgbmV3IGZsYWcsIG1heWJlIHdlIGp1
-c3QgbmVlZCB0byBlbmhhbmNlIGN1cnJlbnQNCj4gdnRkX3Byb2Nlc3NfZGV2aWNlX2lvdGxiX2Rl
-c2MoKSB0byBiZWhhdmUgZGlmZmVyZW50bHkgZGVwZW5kaW5nIG9uIHdoaWNoDQo+IGRldmljZSB0
-aGUgU0lEIGJlbG9uZ3MgdG8uIEUuZy46DQo+IA0KPiAoMSkgZm9yIGVtdWxhdGVkIGRldmljZXMg
-KHZpcnRpby1wY2kvdmhvc3QgaXMgb25lIG9mIHRoZW0pLCB3ZSBwYXNzDQo+ICAgICBkb3duIHVz
-aW5nIGEgVU5NQVAsIG9yIHNheSwgZG8gYSBjYWNoZSBmbHVzaA0KPiANCj4gKDIpIGZvciBhc3Np
-Z25lZCBkZXZpY2VzLCB3ZSBwYXNzIGl0IGRvd24gdG8gaGFyZHdhcmUgYnkgc29tZSB3YXkNCj4g
-DQo+IEkgZG9uJ3Qga25vdyB3aGV0aGVyIHRoZXJlJ2xsIGJlIGEgKDMpIHRob3VnaC4gQWxzbywg
-SSBkb24ndCBrbm93IHRoZSBiZXN0IHdheSB0bw0KPiBhY2hpZXZlICgyKSAobmV3IHZmaW8gZHJp
-dmVyIGludGVyZmFjZT8pLg0KeWVzLiB3ZSBjYW4gdGhpbmsgYWJvdXQgaXQuIFRpYW55dSBhbmQg
-bWUgYXJlIHByZXBhcmluZyBSRkMgcGF0Y2ggZm9yIHZpcnQtc3ZtLA0Kd2Ugd291bGQgaGF2ZSBt
-b3JlIGRpc2N1c3Npb24gb24gdGhpcyBwYXJ0Lg0KDQpSZWdhcmRzLA0KWWkgTA0K
+
+Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+
+> Hi Alex,
+>
+> I first tried "make docker-image-debian-armhf-cross NOUSER=1 V=1"
+> which worked fine, then "make docker-image-debian-armhf-cross
+> NOUSER=0" but got a "Image is up to date." I thought I should have to
+> remove the image manually so I typed "docker rmi
+> qemu:debian-armhf-cross" and tried again but still no change in my
+> tests/docker/dockerfiles/debian-armhf-cross.docker adding my username,
+> then I reviewed your change in the Makefile and got it, setting NOUSER
+> to '0' has the same behavior, it's just set. To build the image with
+> my user I had to _not_ use the flag or use it unset "NOUSER=" and it
+> worked like charm.
+
+Ahh yes. I followed the same pattern as NOCACHE which does the same
+thing. I've made it clearer:
+
+	@echo '    NOUSER               Define to disable adding current user to containers passwd.'
+
+>
+>
+> On 02/16/2017 09:34 AM, Alex Bennée wrote:
+>> Currently all docker builds are done by exporting a tarball to the
+>> docker container and running the build as the containers root user.
+>> Other use cases are possible however and it is possible to map a part
+>> of users file-system to the container. This is useful for example for
+>> doing cross-builds of arbitrary source trees. For this to work
+>> smoothly the container needs to have a user created that maps cleanly
+>> to the host system.
+>>
+>> This adds a -u option to the docker script so that:
+>>
+>>   DEB_ARCH=armhf DEB_TYPE=stable ./tests/docker/docker.py build \
+>>     -u --include-executable=arm-linux-user/qemu-arm \
+>>     debian:armhf ./tests/docker/dockerfiles/debian-bootstrap.docker
+>>
+>> Will build a container that can then be run like:
+>>
+>>   docker run --rm -it -v /home/alex/lsrc/qemu/risu.git/:/src \
+>>     --user=alex:alex -w /src/ debian:armhf \
+>>     sh -c "make clean && ./configure -s && make"
+>>
+>> All docker containers built will add the current user unless
+>> explicitly disabled by specifying NOUSER when invoking the Makefile:
+>>
+>>   make docker-image-debian-armhf-cross NOUSER=1
+>>
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>> Reviewed-by: Fam Zheng <famz@redhat.com>
+>
+> Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+Thanks
+
+>
+>> ---
+>> v2
+>>   - write the useradd directly
+>>   - change long option to --add-current-user
+>> v3
+>>   - images -> image's
+>>   - add r-b
+>>   - add USER to Makefile
+>> v4
+>>   - s/USER/NOUSER/ and default to on
+>>   - fix the add-user code to skip if user already setup (for chained images)
+>> ---
+>>  tests/docker/Makefile.include |  2 ++
+>>  tests/docker/docker.py        | 16 ++++++++++++++--
+>>  2 files changed, 16 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+>> index 3f15d5aea8..4778b27ca8 100644
+>> --- a/tests/docker/Makefile.include
+>> +++ b/tests/docker/Makefile.include
+>> @@ -50,6 +50,7 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
+>>  	$(call quiet-command,\
+>>  		$(SRC_PATH)/tests/docker/docker.py build qemu:$* $< \
+>>  		$(if $V,,--quiet) $(if $(NOCACHE),--no-cache) \
+>> +		$(if $(NOUSER),,--add-current-user) \
+>>  		$(if $(EXECUTABLE),--include-executable=$(EXECUTABLE)),\
+>>  		"BUILD","$*")
+>>
+>> @@ -99,6 +100,7 @@ docker:
+>>  	@echo '                         (default is 1)'
+>>  	@echo '    DEBUG=1              Stop and drop to shell in the created container'
+>>  	@echo '                         before running the command.'
+>> +	@echo '    NOUSER=1		Disable adding current user to containers passwd.'
+>>  	@echo '    NOCACHE=1            Ignore cache when build images.'
+>>  	@echo '    EXECUTABLE=<path>    Include executable in image.'
+>>
+>> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+>> index 37d83199e7..d277a2268f 100755
+>> --- a/tests/docker/docker.py
+>> +++ b/tests/docker/docker.py
+>> @@ -25,6 +25,7 @@ import signal
+>>  from tarfile import TarFile, TarInfo
+>>  from StringIO import StringIO
+>>  from shutil import copy, rmtree
+>> +from pwd import getpwuid
+>>
+>>
+>>  DEVNULL = open(os.devnull, 'wb')
+>> @@ -149,13 +150,21 @@ class Docker(object):
+>>          labels = json.loads(resp)[0]["Config"].get("Labels", {})
+>>          return labels.get("com.qemu.dockerfile-checksum", "")
+>>
+>> -    def build_image(self, tag, docker_dir, dockerfile, quiet=True, argv=None):
+>> +    def build_image(self, tag, docker_dir, dockerfile,
+>> +                    quiet=True, user=False, argv=None):
+>>          if argv == None:
+>>              argv = []
+>>
+>>          tmp_df = tempfile.NamedTemporaryFile(dir=docker_dir, suffix=".docker")
+>>          tmp_df.write(dockerfile)
+>>
+>> +        if user:
+>> +            uid = os.getuid()
+>> +            uname = getpwuid(uid).pw_name
+>> +            tmp_df.write("\n")
+>> +            tmp_df.write("RUN id %s || useradd -u %d -U %s" %
+>> +                         (uname, uid, uname))
+>> +
+>>          tmp_df.write("\n")
+>>          tmp_df.write("LABEL com.qemu.dockerfile-checksum=%s" %
+>>                       _text_checksum(dockerfile))
+>> @@ -225,6 +234,9 @@ class BuildCommand(SubCommand):
+>>                              help="""Specify a binary that will be copied to the
+>>                              container together with all its dependent
+>>                              libraries""")
+>> +        parser.add_argument("--add-current-user", "-u", dest="user",
+>> +                            action="store_true",
+>> +                            help="Add the current user to image's passwd")
+>>          parser.add_argument("tag",
+>>                              help="Image Tag")
+>>          parser.add_argument("dockerfile",
+>> @@ -261,7 +273,7 @@ class BuildCommand(SubCommand):
+>>                                         docker_dir)
+>>
+>>              dkr.build_image(tag, docker_dir, dockerfile,
+>> -                            quiet=args.quiet, argv=argv)
+>> +                            quiet=args.quiet, user=args.user, argv=argv)
+>>
+>>              rmtree(docker_dir)
+>>
+>>
+
+
+-- 
+Alex Bennée
