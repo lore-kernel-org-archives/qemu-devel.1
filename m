@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cfq0q-0006fa-BK
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:36:29 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cfq0q-0006fY-9j
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:36:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cfq0p-0003UQ-BE
+	(envelope-from <pm215@archaic.org.uk>) id 1cfq0p-0003UX-Bq
 	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:36:28 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Feb 2017 15:35:56 +0000
-Message-Id: <1487604965-23220-3-git-send-email-peter.maydell@linaro.org>
+Date: Mon, 20 Feb 2017 15:35:58 +0000
+Message-Id: <1487604965-23220-5-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1487604965-23220-1-git-send-email-peter.maydell@linaro.org>
 References: <1487604965-23220-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 02/11] armv7m: Move NVICState struct definition
- into header
+Subject: [Qemu-devel] [PATCH 04/11] armv7m: Use QOMified armv7m object in
+ armv7m_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,161 +23,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Alistair Francis <alistair23@gmail.com>, Michael Davidsaver <mdavidsaver@gmail.com>
 
-Move the NVICState struct definition into a header, so we can
-embed it into other QOM objects like SoCs.
+Make the legacy armv7m_init() function use the newly QOMified
+armv7m object rather than doing everything by hand.
+
+We can return the armv7m object rather than the NVIC from
+armv7m_init() because its interface to the rest of the
+board (GPIOs, etc) is identical.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/arm/armv7m_nvic.h | 66 ++++++++++++++++++++++++++++++++++++++++++++
- hw/intc/armv7m_nvic.c        | 49 +-------------------------------
- 2 files changed, 67 insertions(+), 48 deletions(-)
- create mode 100644 include/hw/arm/armv7m_nvic.h
+ hw/arm/armv7m.c | 49 ++++++++++++-------------------------------------
+ 1 file changed, 12 insertions(+), 37 deletions(-)
 
-diff --git a/include/hw/arm/armv7m_nvic.h b/include/hw/arm/armv7m_nvic.h
-new file mode 100644
-index 0000000..39b94ee
---- /dev/null
-+++ b/include/hw/arm/armv7m_nvic.h
-@@ -0,0 +1,66 @@
-+/*
-+ * ARMv7M NVIC object
-+ *
-+ * Copyright (c) 2017 Linaro Ltd
-+ * Written by Peter Maydell <peter.maydell@linaro.org>
-+ *
-+ * This code is licensed under the GPL version 2 or later.
-+ */
-+
-+#ifndef HW_ARM_ARMV7M_NVIC_H
-+#define HW_ARM_ARMV7M_NVIC_H
-+
-+#include "target/arm/cpu.h"
-+#include "hw/sysbus.h"
-+
-+#define TYPE_NVIC "armv7m_nvic"
-+
-+#define NVIC(obj) \
-+    OBJECT_CHECK(NVICState, (obj), TYPE_NVIC)
-+
-+/* Highest permitted number of exceptions (architectural limit) */
-+#define NVIC_MAX_VECTORS 512
-+
-+typedef struct VecInfo {
-+    /* Exception priorities can range from -3 to 255; only the unmodifiable
-+     * priority values for RESET, NMI and HardFault can be negative.
-+     */
-+    int16_t prio;
-+    uint8_t enabled;
-+    uint8_t pending;
-+    uint8_t active;
-+    uint8_t level; /* exceptions <=15 never set level */
-+} VecInfo;
-+
-+typedef struct NVICState {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+    /*< public >*/
-+
-+    ARMCPU *cpu;
-+
-+    VecInfo vectors[NVIC_MAX_VECTORS];
-+    uint32_t prigroup;
-+
-+    /* vectpending and exception_prio are both cached state that can
-+     * be recalculated from the vectors[] array and the prigroup field.
-+     */
-+    unsigned int vectpending; /* highest prio pending enabled exception */
-+    int exception_prio; /* group prio of the highest prio active exception */
-+
-+    struct {
-+        uint32_t control;
-+        uint32_t reload;
-+        int64_t tick;
-+        QEMUTimer *timer;
-+    } systick;
-+
-+    MemoryRegion sysregmem;
-+    MemoryRegion container;
-+
-+    uint32_t num_irq;
-+    qemu_irq excpout;
-+    qemu_irq sysresetreq;
-+} NVICState;
-+
-+#endif
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index 76097b4..f2ada39 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -17,6 +17,7 @@
- #include "hw/sysbus.h"
- #include "qemu/timer.h"
- #include "hw/arm/arm.h"
-+#include "hw/arm/armv7m_nvic.h"
- #include "target/arm/cpu.h"
- #include "exec/address-spaces.h"
- #include "qemu/log.h"
-@@ -47,7 +48,6 @@
-  * "exception" more or less interchangeably.
-  */
- #define NVIC_FIRST_IRQ 16
--#define NVIC_MAX_VECTORS 512
- #define NVIC_MAX_IRQ (NVIC_MAX_VECTORS - NVIC_FIRST_IRQ)
+diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
+index 56d02d4..36f213c 100644
+--- a/hw/arm/armv7m.c
++++ b/hw/arm/armv7m.c
+@@ -131,21 +131,6 @@ static void bitband_init(Object *obj)
+     sysbus_init_mmio(dev, &s->iomem);
+ }
  
- /* Effective running priority of the CPU when no exception is active
-@@ -55,53 +55,6 @@
-  */
- #define NVIC_NOEXC_PRIO 0x100
+-static void armv7m_bitband_init(void)
+-{
+-    DeviceState *dev;
+-
+-    dev = qdev_create(NULL, TYPE_BITBAND);
+-    qdev_prop_set_uint32(dev, "base", 0x20000000);
+-    qdev_init_nofail(dev);
+-    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0x22000000);
+-
+-    dev = qdev_create(NULL, TYPE_BITBAND);
+-    qdev_prop_set_uint32(dev, "base", 0x40000000);
+-    qdev_init_nofail(dev);
+-    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0x42000000);
+-}
+-
+ /* Board init.  */
  
--typedef struct VecInfo {
--    /* Exception priorities can range from -3 to 255; only the unmodifiable
--     * priority values for RESET, NMI and HardFault can be negative.
--     */
--    int16_t prio;
--    uint8_t enabled;
--    uint8_t pending;
--    uint8_t active;
--    uint8_t level; /* exceptions <=15 never set level */
--} VecInfo;
--
--typedef struct NVICState {
--    /*< private >*/
--    SysBusDevice parent_obj;
--    /*< public >*/
--
+ static const hwaddr bitband_input_addr[ARMV7M_NUM_BITBANDS] = {
+@@ -283,35 +268,25 @@ static void armv7m_reset(void *opaque)
+ 
+ /* Init CPU and memory for a v7-M based board.
+    mem_size is in bytes.
+-   Returns the NVIC array.  */
++   Returns the ARMv7M device.  */
+ 
+ DeviceState *armv7m_init(MemoryRegion *system_memory, int mem_size, int num_irq,
+                       const char *kernel_filename, const char *cpu_model)
+ {
 -    ARMCPU *cpu;
+-    CPUARMState *env;
+-    DeviceState *nvic;
++    DeviceState *armv7m;
+ 
+     if (cpu_model == NULL) {
+-	cpu_model = "cortex-m3";
++        cpu_model = "cortex-m3";
+     }
+-    cpu = cpu_arm_init(cpu_model);
+-    if (cpu == NULL) {
+-        fprintf(stderr, "Unable to find CPU definition\n");
+-        exit(1);
+-    }
+-    env = &cpu->env;
 -
--    VecInfo vectors[NVIC_MAX_VECTORS];
--    uint32_t prigroup;
+-    armv7m_bitband_init();
 -
--    /* vectpending and exception_prio are both cached state that can
--     * be recalculated from the vectors[] array and the prigroup field.
--     */
--    unsigned int vectpending; /* highest prio pending enabled exception */
--    int exception_prio; /* group prio of the highest prio active exception */
--
--    struct {
--        uint32_t control;
--        uint32_t reload;
--        int64_t tick;
--        QEMUTimer *timer;
--    } systick;
--
--    MemoryRegion sysregmem;
--    MemoryRegion container;
--
--    uint32_t num_irq;
--    qemu_irq excpout;
--    qemu_irq sysresetreq;
--} NVICState;
--
--#define TYPE_NVIC "armv7m_nvic"
--
--#define NVIC(obj) \
--    OBJECT_CHECK(NVICState, (obj), TYPE_NVIC)
--
- static const uint8_t nvic_id[] = {
-     0x00, 0xb0, 0x1b, 0x00, 0x0d, 0xe0, 0x05, 0xb1
- };
+-    nvic = qdev_create(NULL, "armv7m_nvic");
+-    qdev_prop_set_uint32(nvic, "num-irq", num_irq);
+-    env->nvic = nvic;
+-    qdev_init_nofail(nvic);
+-    sysbus_connect_irq(SYS_BUS_DEVICE(nvic), 0,
+-                       qdev_get_gpio_in(DEVICE(cpu), ARM_CPU_IRQ));
+-    armv7m_load_kernel(cpu, kernel_filename, mem_size);
+-    return nvic;
++
++    armv7m = qdev_create(NULL, "armv7m");
++    qdev_prop_set_uint32(armv7m, "num-irq", num_irq);
++    qdev_prop_set_string(armv7m, "cpu-model", cpu_model);
++    /* This will exit with an error if the user passed us a bad cpu_model */
++    qdev_init_nofail(armv7m);
++
++    armv7m_load_kernel(ARM_CPU(first_cpu), kernel_filename, mem_size);
++    return armv7m;
+ }
+ 
+ void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_size)
 -- 
 2.7.4
