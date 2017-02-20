@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34115)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cfmC0-0003Bj-V4
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 06:31:45 -0500
+	(envelope-from <ashmit602@gmail.com>) id 1cfmFB-00059r-EW
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 06:35:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cfmBw-0000qH-VN
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 06:31:44 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35936)
+	(envelope-from <ashmit602@gmail.com>) id 1cfmFA-0002QC-6d
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 06:35:01 -0500
+Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:36164)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cfmBw-0000q1-Pe
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 06:31:40 -0500
-Received: by mail-wm0-x241.google.com with SMTP id r18so13827503wmd.3
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 03:31:40 -0800 (PST)
-Date: Mon, 20 Feb 2017 11:31:37 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170220113137.GH21255@stefanha-x1.localdomain>
-References: <CAJSP0QWX0_stkyrkyL42QFFnnBTaqYD+XYmpMBO0gY2pWFD53g@mail.gmail.com>
-	<20170216154707.GE19045@localhost.localdomain>
-	<20170216170702.GG8801@localhost.localdomain>
+	(Exim 4.71) (envelope-from <ashmit602@gmail.com>) id 1cfmFA-0002Px-20
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 06:35:00 -0500
+Received: by mail-it0-x243.google.com with SMTP id w185so4474203ita.3
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 03:34:59 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="NzX0AQGjRQPusK/O"
-Content-Disposition: inline
-In-Reply-To: <20170216170702.GG8801@localhost.localdomain>
-Subject: Re: [Qemu-devel] Missing rewrite rule for qemu.org/images/ links
+In-Reply-To: <20170220110235.GD21255@stefanha-x1.localdomain>
+References: <CAAo6VWOAnGQeDwc_bJ4M=FQsu7rOhAv=1Qk6PdzG+0pcVnku=A@mail.gmail.com>
+	<20170217214215.GK19045@localhost.localdomain>
+	<F23F188C-DAF9-49EA-9C0E-54F57945267A@veritas.com>
+	<20170220110235.GD21255@stefanha-x1.localdomain>
+From: ashish mittal <ashmit602@gmail.com>
+Date: Mon, 20 Feb 2017 03:34:57 -0800
+Message-ID: <CAAo6VWNwHbsQRxU18dNCjWaNfNrZNAV9FfOKW8=JeZCND2vHnQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
+ block device type called "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +31,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: qemu-devel@nongnu.org, thuth@redhat.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, Jeff Cody <jcody@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
 
+On Mon, Feb 20, 2017 at 3:02 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> On Sat, Feb 18, 2017 at 12:30:31AM +0000, Ketan Nilangekar wrote:
+>> On 2/17/17, 1:42 PM, "Jeff Cody" <jcody@redhat.com> wrote:
+>>
+>>     On Thu, Feb 16, 2017 at 02:24:19PM -0800, ashish mittal wrote:
+>>     > Hi,
+>>     >
+>>     > I am getting the following error with checkpatch.pl
+>>     >
+>>     > ERROR: externs should be avoided in .c files
+>>     > #78: FILE: block/vxhs.c:28:
+>>     > +QemuUUID qemu_uuid __attribute__ ((weak));
+>>     >
+>>     > Is there any way to get around this, or does it mean that I would have
+>>     > to add a vxhs.h just for this one entry?
+>>     >
+>>
+>>     I remain skeptical on the use of the qemu_uuid as a way to select the TLS
+>>     cert.
+>>
+>> [ketan]
+>> Is there another identity that can be used for uniquely identifying instances?
+>> The requirement was to enforce vdisk access to owner instances.
+>
+> The qemu_uuid weak attribute looks suspect.  What is going to provide a
+> strong qemu_uuid symbol?
+>
+> Why aren't configuration parameters like the UUID coming from the QEMU
+> command-line?
+>
+> Stefan
 
---NzX0AQGjRQPusK/O
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+UUID will in fact come from the QEMU command line. VxHS is not doing
+anything special here. It will just use the value already available to
+qemu-kvm process.
 
-On Thu, Feb 16, 2017 at 12:07:02PM -0500, Jeff Cody wrote:
-> On Thu, Feb 16, 2017 at 10:47:07AM -0500, Jeff Cody wrote:
-> > On Thu, Feb 16, 2017 at 03:30:25PM +0000, Stefan Hajnoczi wrote:
-> > > Hi Jeff,
-> > > The old qemu.org/images/ links are not being rewritten to
-> > > wiki.qemu-project.org/images/.
-> > >=20
-> > > For example, http://www.qemu-project.org/images/4/4e/Q35.pdf no longe=
-r works:
-> > > https://bugs.launchpad.net/qemu/+bug/1665344
-> > >=20
-> > > I do notice that qemu.org/Features/Q35 is working.  Is it possible to
-> > > set up a rewrite rule or HTTP redirect so existing /images/ links keep
-> > > working?
-> > >=20
-> > > Thanks,
-> > > Stefan
-> >=20
-> > Thanks for noticing, and pointing that out.  I'll get right on that.
-> >
->=20
-> Fixed now.
+QemuUUID qemu_uuid;
+bool qemu_uuid_set;
 
-Excellent, thanks for the quick fix!
+Both the above are defined in vl.c. vl.c will provide the strong
+symbol when available. There are certain binaries that do not get
+linked with vl.c (e.g. qemu-img). The weak symbol will come into
+affect for such binaries, and in this case, the default VXHS UUID will
+get picked up. I had, in a previous email, explained how we plan to
+use the default UUID. In the regular case, the VxHS controller will
+not allow access to the default UUID (non qemu-kvm) binaries, but it
+may choose to grant temporary access to specific vdisks for these
+binaries depending on the workflow.
 
-Stefan
-
---NzX0AQGjRQPusK/O
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYqtOZAAoJEJykq7OBq3PIhX8H/A1hnkxu/UBXAXslFttlp0JI
-d9EWABERwdCOsyggtcCY6AITR1YgAM7TsCdmaSEEofjOkLLV7iG7im7cx1xxm7G/
-WZh2e0GRQARmLjdhnRaGPz2fYL6SPwYV6Upl6WVaaWgqMIcQHSpzb/Z2jFE6djoO
-yha36ZB6mxlMU14H1j053FUg3Hx7d27ln3aE21PrXGO1tOZh9qjjGEXqpbuEjKBP
-8qFWRPR2rY65+79SuXdfIaWvl9ohSrs4592D1rG0yKcrP2YKx6VrWYM6tnqntLWz
-CLnCL0wCHoFR1LUBvP7vuAn4DNhLOaZahqjG+tDd7iCwQ4CXKG4IppAmez/g0EI=
-=dKNx
------END PGP SIGNATURE-----
-
---NzX0AQGjRQPusK/O--
+Regards,
+Ashish
