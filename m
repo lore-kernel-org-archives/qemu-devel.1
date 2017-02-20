@@ -1,20 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cft7A-0002Xu-Gp
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:55:13 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cftB3-0005xM-0h
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:59:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cft79-0003RY-IV
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:55:12 -0500
-Date: Mon, 20 Feb 2017 19:55:00 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170220195500.332a4844@nial.brq.redhat.com>
-In-Reply-To: <CAFEAcA9JWzUEmGa2Wxd5xPE4dVknOKBkt=wMda7CAgxzrgOc+w@mail.gmail.com>
-References: <1487357795-52614-1-git-send-email-imammedo@redhat.com>
-	<CAFEAcA9JWzUEmGa2Wxd5xPE4dVknOKBkt=wMda7CAgxzrgOc+w@mail.gmail.com>
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cftAz-0004PQ-NY
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:59:13 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40226
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cftAz-0004PB-Ha
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:59:09 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1KIrajc168597
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 13:59:08 -0500
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28r2pn943s-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 13:59:08 -0500
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Mon, 20 Feb 2017 18:59:06 -0000
+Date: Mon, 20 Feb 2017 19:59:01 +0100
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <20170217082939.33208-16-bjsdjshi@linux.vnet.ibm.com>
+References: <20170217082939.33208-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170217082939.33208-16-bjsdjshi@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 0/3] generalize parsing of cpu_model
+Message-Id: <20170220195901.252083fe.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v3 15/15] vfio: ccw: introduce support
+ for ccw0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,87 +43,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "patches@linaro.org" <patches@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-arm <qemu-arm@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, wkywang@linux.vnet.ibm.com
 
-On Fri, 17 Feb 2017 19:05:20 +0000
-Peter Maydell <peter.maydell@linaro.org> wrote:
+On Fri, 17 Feb 2017 09:29:39 +0100
+Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
 
-> On 17 February 2017 at 18:56, Igor Mammedov <imammedo@redhat.com> wrote:
-> > Some callers call CPUClass->parse_features manually to convert
-> > '-cpu cpufoo,featurestr' string to cpu type and featurestr
-> > into a set of global properties. And theni do controlled
-> > cpu creation with setting properties and completing it with realize.
-> > That's a lot of code duplication as they are practically
-> > reimplement the same parsing logic.
-> >
-> > Some don't and use cpu_generic_init() instead which does
-> > the same parsing along with creation/realizing cpu within one
-> > wrapper.
-> >
-> > And some trying to switch to controlled cpu creation,
-> > implement object_new()/set properties/realize steps
-> > but forget feature parsing logic witch lieads to 'bugs'
-> > commit 00909b585 (hw/arm/integratorcp: Support specifying features via -cpu)
-> >
-> >
-> > This series moves -cpu option parsing to generic machine code
-> > that removes a little of code duplication and makes cpus creation
-> > process more unified.  
+> Although Linux does not use format-0 channel command words (CCW0)
+> these are a non-optional part of the platform spec, and for the sake
+> of platform compliance, and possibly some non-Linux guests, we have
+> to support CCW0.
 > 
-> This API seems a little awkward for the SoC case, where
-> the board model doesn't actually know what the default
-> CPU model or the valid CPU models are, because it just
-> wants to say "create me a BCM2836 SoC" and let the SoC
-> object deal with determining whether it's always a cortex-a15
-> or if it might allow some user configurability either in
-> cpu choices or in optional flags.
-> Any thoughts about that use case?
-I've probably been too aggressive trying to force
-conversion of all boards, assuming that all boards support
-"-cpu CLI" option, currently option could be specified for
-any board but it is ignored if board doesn't care
-about it explicitly.
+> Making the kernel execute a format 0 channel program is too much hassle
+> because we would need to allocate and use memory which can be addressed
+> by 24 bit physical addresses (because of CCW0.cda). So we implement CCW0
+> support by translating the channel program into an equivalent CCW1
+> program instead.
+> 
+> Signed-off-by: Kai Yue Wang <wkywang@linux.vnet.ibm.com>
+> Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> ---
+>  arch/s390/Kconfig              |  7 +++++
+>  drivers/s390/cio/vfio_ccw_cp.c | 58 ++++++++++++++++++++++++++++++++++++++++--
+>  2 files changed, 63 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
+> index 32008b8..f25d077 100644
+> --- a/arch/s390/Kconfig
+> +++ b/arch/s390/Kconfig
+> @@ -680,6 +680,13 @@ config VFIO_CCW
+>  	  To compile this driver as a module, choose M here: the
+>  	  module will be called vfio_ccw.
+> 
+> +config VFIO_CCW_CCW0
+> +	def_bool n
+> +	prompt "Support for CCW0 translation"
+> +	depends on VFIO_CCW
+> +	help
+> +	  Enable translation for CCW0 programs for VFIO-CCW subchannels.
 
- "-cpu cpu_name,feat_str" handling is always based on
- availability of base CPU type supported by target as
- it's needed both for
-   - translating cpu_name to QOM CPU type
-       cpu_class_by_name(typename, name)
-   - converting feat_str into set of global properties
-     for matching QOM CPU type
-       cc->parse_features(object_class_get_name(oc), featurestr, &err);
+Hm... if ccw0 is non-optional for the architecture, why are you making
+it optional then?
 
-Boards that don't care/need '-cpu' support won't need
-to do anything as we can skip cpu_name,feat_str parsing
-if MachineClass::base_cpu_type isn't set (NULL by default),
-that way we won't break ignored CLI if we care.
-And currently we don't have convenient way to disable
-feat_str parsing, but machine could be extended
-with flag to [en|dis]able it explicitly.
+> +
+>  endmenu
+> 
+>  menu "Dump support"
+> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+> index 16bbb54..b0a8bc05 100644
+> --- a/drivers/s390/cio/vfio_ccw_cp.c
+> +++ b/drivers/s390/cio/vfio_ccw_cp.c
+> @@ -15,6 +15,26 @@
+> 
+>  #include "vfio_ccw_cp.h"
+> 
+> +#ifdef CONFIG_VFIO_CCW_CCW0
+> +/**
+> + * struct ccw0 - channel command word
+> + * @cmd_code: command code
+> + * @cda: data address
+> + * @flags: flags, like IDA addressing, etc.
+> + * @reserved: will be ignored
+> + * @count: byte count
+> + *
+> + * The format-0 ccw structure.
+> + */
+> +struct ccw0 {
+> +	__u8 cmd_code;
+> +	__u32 cda : 24;
+> +	__u8  flags;
+> +	__u8  reserved;
+> +	__u16 count;
+> +} __packed __aligned(8);
+> +#endif
 
-The goal of this series is generalizing/consolidating
-parsing of '-cpu' for boards that use it, removing
-code duplication scattered around codebase and trying
-normalize default cpu_model initialization.
+Would it be better to move this definition next to the struct ccw1
+definition? Even if the kernel does not build format-0 ccws, it makes
+sense from a logical POV.
 
-For SoC with fixed CPU type it would be better to use
-directly CPU type names directly but that hits legacy
-cpu_init()/cpu_foo_init() wall, which is currently
-cpu_model based and would be a lot of re-factoring.
-I would convert cpu_init(cpu_model) to cpu_init(cpu_type)
-and call '-cpu' handling logic from generic
-machine/user_[bsd|linux] code (3 places in total).
+> +
+>  /*
+>   * Max length for ccw chain.
+>   * XXX: Limit to 256, need to check more?
+> @@ -243,12 +263,42 @@ static long copy_from_iova(struct device *mdev,
+>  	return l;
+>  }
+> 
+> +#ifdef CONFIG_VFIO_CCW_CCW0
+> +static long copy_ccw_from_iova(struct channel_program *cp,
+> +			       struct ccw1 *to, u64 iova,
+> +			       unsigned long len)
+> +{
+> +	struct ccw0 ccw0;
+> +	struct ccw1 *pccw1;
+> +	int ret;
+> +	int i;
+> +
+> +	ret = copy_from_iova(cp->mdev, to, iova, len * sizeof(struct ccw1));
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (!cp->orb.cmd.fmt) {
+> +		pccw1 = to;
+> +		for (i = 0; i < len; i++) {
+> +			ccw0 = *(struct ccw0 *)pccw1;
+> +			pccw1->cmd_code = ccw0.cmd_code;
+> +			pccw1->flags = ccw0.flags;
+> +			pccw1->count = ccw0.count;
+> +			pccw1->cda = ccw0.cda;
+> +			pccw1++;
+> +		}
 
-> (The stm32f205 SoC object has a "cpu-model" QOM property
-> that the board sets, but I think that's as much because
-> we somewhat awkwardly need to pass it into armv7m_init()
-> as a deliberate design choice.)
-its sole user netduino2 board has cpu_model hardcodded
-at board level which could be left alone or converted
-to this API. Using API would make code more consistent
-at the cost of more code for default/valid callbacks.
+IIRC there are one or two very subtle differences between what format-0
+and what format-1 ccws allow (see the ccw interpretation in qemu --
+probably easier than combing through the PoP). We should either check
+this or add a comment why we don't.
+
+> +	}
+> +
+> +	return ret;
+> +}
+> +#else
+>  static long copy_ccw_from_iova(struct channel_program *cp,
+>  			       struct ccw1 *to, u64 iova,
+>  			       unsigned long len)
+>  {
+>  	return copy_from_iova(cp->mdev, to, iova, len * sizeof(struct ccw1));
+>  }
+> +#endif
+
+This would be nicer without #ifdefs :)
 
 > 
-> thanks
-> -- PMM
+>  /*
+>   * Helpers to operate ccwchain.
+> @@ -616,10 +666,14 @@ int cp_init(struct channel_program *cp, struct device *mdev, union orb *orb)
+>  	 * Only support prefetch enable mode now.
+>  	 * Only support 64bit addressing idal.
+>  	 * Only support 4k IDAW.
+> -	 * Only support ccw1.
+>  	 */
+> -	if (!orb->cmd.pfch || !orb->cmd.c64 || orb->cmd.i2k || !orb->cmd.fmt)
+> +	if (!orb->cmd.pfch || !orb->cmd.c64 || orb->cmd.i2k)
+> +		return -EOPNOTSUPP;
+> +
+> +#ifndef CONFIG_VFIO_CCW_CCW0
+> +	if (!orb->cmd.fmt)
+>  		return -EOPNOTSUPP;
+> +#endif
+
+dito
+
+> 
+>  	INIT_LIST_HEAD(&cp->ccwchain_list);
+>  	memcpy(&cp->orb, orb, sizeof(*orb));
+
+The "translate format-0 into format-1 ccws" approach is fine, but I
+think you need to double check the subtle differences I mentioned.
