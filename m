@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33724)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cfnu8-0004ok-Q7
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 08:21:25 -0500
+	(envelope-from <shorne@gmail.com>) id 1cfnuy-0005bG-TD
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 08:22:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cfnu7-0006xt-S5
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 08:21:24 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1487161136-9018-1-git-send-email-armbru@redhat.com>
-	<575ab227-e44e-8d66-7b58-3e68e1df8491@redhat.com>
-	<878tp7tx98.fsf@dusky.pond.sub.org>
-	<ca73f39c-04b2-ce0b-1f80-5eef0e4861ce@redhat.com>
-	<87poidkqv4.fsf@dusky.pond.sub.org>
-	<35ce9aed-b82a-3270-a4a9-12f2e1782b9d@redhat.com>
-Date: Mon, 20 Feb 2017 14:21:14 +0100
-In-Reply-To: <35ce9aed-b82a-3270-a4a9-12f2e1782b9d@redhat.com> (Paolo
-	Bonzini's message of "Mon, 20 Feb 2017 13:53:49 +0100")
-Message-ID: <878tp1yp4l.fsf@dusky.pond.sub.org>
+	(envelope-from <shorne@gmail.com>) id 1cfnuu-00078e-LP
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 08:22:16 -0500
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:33232)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1cfnuu-000786-E5
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 08:22:12 -0500
+Received: by mail-pg0-x241.google.com with SMTP id 5so12910278pgj.0
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 05:22:12 -0800 (PST)
+Date: Mon, 20 Feb 2017 22:22:07 +0900
+From: Stafford Horne <shorne@gmail.com>
+Message-ID: <20170220132207.GD2379@lianli.shorne-pla.net>
+References: <mailman.51026.1486615955.22738.qemu-devel@nongnu.org>
+	<8C14E9D0-F376-4CDC-BF24-A0609A329977@gmail.com>
+	<20170210003916.GL32144@lianli.shorne-pla.net>
+	<ec491d8c-3fb0-3ce9-5558-ac4ab1455f7f@twiddle.net>
+	<4BE06A79-02EC-48A8-8081-F21CEACE396F@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] hw: Deprecate unwanted use -drive
- if=scsi
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4BE06A79-02EC-48A8-8081-F21CEACE396F@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 00/22] target/openrisc updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,77 +32,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: Programmingkid <programmingkidx@gmail.com>
+Cc: Richard Henderson <rth@twiddle.net>, Openrisc <openrisc@lists.librecores.org>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On Mon, Feb 13, 2017 at 10:33:09PM -0500, Programmingkid wrote:
+> 
+> On Feb 13, 2017, at 10:25 PM, Richard Henderson wrote:
+> 
+> > On 02/10/2017 11:39 AM, Stafford Horne wrote:
+> >> On Thu, Feb 09, 2017 at 09:10:51AM -0500, G 3 wrote:
+> >>> 
+> >>> On Feb 8, 2017, at 11:52 PM, qemu-devel-request@nongnu.org wrote:
+> >>> 
+> >>>> Message: 6
+> >>>> Date: Wed,  8 Feb 2017 20:51:32 -0800
+> >>>> From: Richard Henderson <rth@twiddle.net>
+> >>>> To: qemu-devel@nongnu.org
+> >>>> Cc: shorne@gmail.com
+> >>>> Subject: [Qemu-devel] [PATCH 00/22] target/openrisc updates
+> >>>> Message-ID: <20170209045154.16868-1-rth@twiddle.net>
+> >>>> 
+> >>>> The bulk of this patch set is 2-3 years old, and was mostly
+> >>>> reviewed by Bastian Koppelmann.  But it languished because
+> >>>> there were reports of it not booting kernel images, and I
+> >>>> had problems putting together a set of tools that could even
+> >>>> build a kernel.
+> >>>> 
+> >>>> The OpenRISC community has picked up activity recently,
+> >>>> with Stafford Horne upstreaming some of the compiler tools.
+> >>>> He has even done some testing for me of this patch set.
+> >>>> 
+> >>>> 
+> >>>> r~
+> >>> 
+> >>> I see you are working on OpenRISC. Would you be able to help
+> >>> me improve its wiki page?
+> >>> 
+> >>> http://wiki.qemu-project.org/Documentation/Platforms/OpenRISC
+> >>> 
+> >>> Right now there isn't much information on OpenRISC here. I'm
+> >>> hoping to make it a lot useful to anyone who is interesting in this
+> >>> platform.
+> >>> 
+> >>> Would you know of any links to software that works in OpenRISC?
+> >>> 
+> >>> Pictures of the OpenRISC target running anything would be great also.
+> >>> 
+> >>> What is your suggested command-line for using OpenRISC?
+> >>> 
+> >>> If you have any suggestions on how to improve the page place don't
+> >>> hesitate to let me know.
+> >>> 
+> >> 
+> >> Hi Richard, G 3,
+> >> 
+> >> I am not sure if Richard has the time for this.  But I kind of got him
+> >> started back on the openrisc work, it would be my fault to burden him
+> >> with even more work :).  Also, I was helping to do some tests so I have
+> >> some example commands.
+> > 
+> > :-)
+> > 
+> >> I don't have a lot of time, but I think I can help to update the above.
+> >> Probably Richard and I could work together?
+> >> 
+> >> I was recently working on updating the openrisc page
+> >> 
+> >>  http://openrisc.io
+> >> 
+> >> I think I could link between the two for toolchain compile guides and
+> >> software guides (i.e. debugging and linux).
+> >> 
+> >> Richard what do you think?
+> > 
+> > Probably the most beneficial thing that we can do is create a kernel+initrd that boots into a busybox root shell.  Similar to the other test images that we have at
+> > 
+> >  http://wiki.qemu-project.org/Testing/System_Images
+> > 
+> > 
+> > r~
+> > 
+> 
+> We could do both the test image and a wiki page.
 
-> On 20/02/2017 13:07, Markus Armbruster wrote:
->> Paolo Bonzini <pbonzini@redhat.com> writes:
->> 
->>> On 15/02/2017 14:10, Markus Armbruster wrote:
->>>> Paolo Bonzini <pbonzini@redhat.com> writes:
->>>>
->>>>> On 15/02/2017 13:18, Markus Armbruster wrote:
->>>>>> Drives defined with if=scsi get connected to buses created with
->>>>>> -device, unlike other interface types.  Deprecate this usage.
->>>>>>
->>>>>> There is no good default SCSI HBA for PC machines.  Deprecate if=scsi
->>>>>> there entirely.
->>>>>>
->>>>>> Before this series, frontends for -drive if=scsi get created by SCSI
->>>>>> HBAs.  Frontends for other interface types get created by machine
->>>>>> initialization.
->>>>>>
->>>>>> After this series, they get created by machine initialization, except
->>>>>> for deprecated cases, which get created by new function
->>>>>> scsi_legacy_handle_cmdline().
->>>>>>
->>>>>> Based on "[PATCH v3 0/8] More sensible default for -drive interface
->>>>>> type".
->>>>>>
->>>>>> v2:
->>>>>> * Trivially rebased
->>>>>> * PATCH 2: Suppress warning for default drives
->>>>>> * PATCH 3: Update user manual and qemu-iotests/051.pc.out
->>>>>>
->>>>>> Markus Armbruster (3):
->>>>>>   hw/scsi: Concentrate -drive if=scsi auto-create in one place
->>>>>>   hw: Deprecate -drive if=scsi with non-onboard HBAs
->>>>>>   hw/i386: Deprecate -drive if=scsi with PC machine types
->>>>>>
->>>>>>  hw/arm/realview.c             |  2 +-
->>>>>>  hw/arm/versatilepb.c          |  2 +-
->>>>>>  hw/i386/pc.c                  |  6 +++++
->>>>>>  hw/scsi/esp-pci.c             |  3 ---
->>>>>>  hw/scsi/esp.c                 |  6 -----
->>>>>>  hw/scsi/lsi53c895a.c          | 10 +++++---
->>>>>>  hw/scsi/megasas.c             |  4 ----
->>>>>>  hw/scsi/mptsas.c              |  4 ----
->>>>>>  hw/scsi/scsi-bus.c            | 56 +++++++++++++++++++++++++++++++++++++------
->>>>>>  hw/scsi/spapr_vscsi.c         |  5 ++--
->>>>>>  hw/scsi/virtio-scsi.c         |  8 -------
->>>>>>  include/hw/pci/pci.h          |  2 ++
->>>>>>  include/hw/scsi/scsi.h        |  3 ++-
->>>>>>  qemu-options.hx               |  5 ----
->>>>>>  tests/qemu-iotests/051.pc.out | 12 ++++++----
->>>>>>  vl.c                          | 10 ++++++++
->>>>>>  16 files changed, 88 insertions(+), 50 deletions(-)
->>>>>>
->>>>>
->>>>> Because of the ESC characters in 051.pc.out, please send the pull
->>>>> request for this yourself.
->>>>
->>>> Is that an Acked-by?
->>>
->>> Not a sufficient one because the patch touches files outside my area of
->>> maintenance, but for hw/scsi you can treat it as one.
->> 
->> Okay, that covers PATCH 1/3.
->> 
->> What about PATCH 3/3?  It's actually your idea...
->
-> Yep, hw/i386 too I guess.
+Could you create me an account on the wiki then?
 
-Do you mean the he/i386 part of PATCH 2/3?  How would I express that?
-Acked-by goes into the commit message, not individual files...
+-Stafford
