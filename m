@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59796)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cfkLS-0006cZ-Oj
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:33:23 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cfkLT-0006cl-VF
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:33:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cfkLO-00077U-1N
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:33:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44036)
+	(envelope-from <stefanha@redhat.com>) id 1cfkLT-000792-Ae
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:33:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43048)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cfkLN-00076m-QQ
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:33:17 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cfkLT-00078e-5v
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:33:23 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon, 20 Feb 2017 09:32:40 +0000
-Message-Id: <20170220093304.20515-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 00/24] Block patches
+Date: Mon, 20 Feb 2017 09:32:43 +0000
+Message-Id: <20170220093304.20515-4-stefanha@redhat.com>
+In-Reply-To: <20170220093304.20515-1-stefanha@redhat.com>
+References: <20170220093304.20515-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PULL 03/24] block-backend: allow blk_prw from
+ coroutine context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,132 +25,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-The following changes since commit 5dae13cd71f0755a1395b5a4cde635b8a6ee3f58:
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-  Merge remote-tracking branch 'remotes/rth/tags/pull-or-20170214' into staging (2017-02-14 09:55:48 +0000)
+qcow2_create2 calls this.  Do not run a nested event loop, as that
+breaks when aio_co_wake tries to queue the coroutine on the co_queue_wakeup
+list of the currently running one.
 
-are available in the git repository at:
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
+Message-id: 20170213135235.12274-4-pbonzini@redhat.com
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ block/block-backend.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-  git://github.com/stefanha/qemu.git tags/block-pull-request
-
-for you to fetch changes up to decc18f33adecb1316437a47fff0cf0a7665906a:
-
-  coroutine-lock: make CoRwlock thread-safe and fair (2017-02-16 17:17:34 +0000)
-
-----------------------------------------------------------------
-
-----------------------------------------------------------------
-
-Paolo Bonzini (24):
-  block: move AioContext, QEMUTimer, main-loop to libqemuutil
-  aio: introduce aio_co_schedule and aio_co_wake
-  block-backend: allow blk_prw from coroutine context
-  test-thread-pool: use generic AioContext infrastructure
-  io: add methods to set I/O handlers on AioContext
-  io: make qio_channel_yield aware of AioContexts
-  nbd: convert to use qio_channel_yield
-  coroutine-lock: reschedule coroutine on the AioContext it was running
-    on
-  blkdebug: reschedule coroutine on the AioContext it is running on
-  qed: introduce qed_aio_start_io and qed_aio_next_io_cb
-  aio: push aio_context_acquire/release down to dispatching
-  block: explicitly acquire aiocontext in timers that need it
-  block: explicitly acquire aiocontext in callbacks that need it
-  block: explicitly acquire aiocontext in bottom halves that need it
-  block: explicitly acquire aiocontext in aio callbacks that need it
-  aio-posix: partially inline aio_dispatch into aio_poll
-  async: remove unnecessary inc/dec pairs
-  block: document fields protected by AioContext lock
-  coroutine-lock: make CoMutex thread-safe
-  coroutine-lock: add limited spinning to CoMutex
-  test-aio-multithread: add performance comparison with thread-based
-    mutexes
-  coroutine-lock: place CoMutex before CoQueue in header
-  coroutine-lock: add mutex argument to CoQueue APIs
-  coroutine-lock: make CoRwlock thread-safe and fair
-
- Makefile.objs                       |   4 -
- stubs/Makefile.objs                 |   1 +
- tests/Makefile.include              |  19 +-
- util/Makefile.objs                  |   6 +-
- block/nbd-client.h                  |   2 +-
- block/qed.h                         |   3 +
- include/block/aio.h                 |  38 ++-
- include/block/block_int.h           |  64 +++--
- include/io/channel.h                |  72 +++++-
- include/qemu/coroutine.h            |  84 ++++---
- include/qemu/coroutine_int.h        |  11 +-
- include/sysemu/block-backend.h      |  14 +-
- tests/iothread.h                    |  25 ++
- block/backup.c                      |   2 +-
- block/blkdebug.c                    |   9 +-
- block/blkreplay.c                   |   2 +-
- block/block-backend.c               |  13 +-
- block/curl.c                        |  44 +++-
- block/gluster.c                     |   9 +-
- block/io.c                          |  42 +---
- block/iscsi.c                       |  15 +-
- block/linux-aio.c                   |  10 +-
- block/mirror.c                      |  12 +-
- block/nbd-client.c                  | 119 +++++----
- block/nfs.c                         |   9 +-
- block/qcow2-cluster.c               |   4 +-
- block/qed-cluster.c                 |   2 +
- block/qed-table.c                   |  12 +-
- block/qed.c                         |  58 +++--
- block/sheepdog.c                    |  31 +--
- block/ssh.c                         |  29 +--
- block/throttle-groups.c             |   4 +-
- block/win32-aio.c                   |   9 +-
- dma-helpers.c                       |   2 +
- hw/9pfs/9p.c                        |   2 +-
- hw/block/virtio-blk.c               |  19 +-
- hw/scsi/scsi-bus.c                  |   2 +
- hw/scsi/scsi-disk.c                 |  15 ++
- hw/scsi/scsi-generic.c              |  20 +-
- hw/scsi/virtio-scsi.c               |   6 +
- io/channel-command.c                |  13 +
- io/channel-file.c                   |  11 +
- io/channel-socket.c                 |  16 +-
- io/channel-tls.c                    |  12 +
- io/channel-watch.c                  |   6 +
- io/channel.c                        |  97 ++++++--
- nbd/client.c                        |   2 +-
- nbd/common.c                        |   9 +-
- nbd/server.c                        |  94 +++-----
- stubs/linux-aio.c                   |  32 +++
- stubs/set-fd-handler.c              |  11 -
- tests/iothread.c                    |  91 +++++++
- tests/test-aio-multithread.c        | 463 ++++++++++++++++++++++++++++++++++++
- tests/test-thread-pool.c            |  12 +-
- aio-posix.c => util/aio-posix.c     |  62 ++---
- aio-win32.c => util/aio-win32.c     |  30 +--
- util/aiocb.c                        |  55 +++++
- async.c => util/async.c             |  84 ++++++-
- iohandler.c => util/iohandler.c     |   0
- main-loop.c => util/main-loop.c     |   0
- util/qemu-coroutine-lock.c          | 254 ++++++++++++++++++--
- util/qemu-coroutine-sleep.c         |   2 +-
- util/qemu-coroutine.c               |   8 +
- qemu-timer.c => util/qemu-timer.c   |   0
- thread-pool.c => util/thread-pool.c |   8 +-
- trace-events                        |  11 -
- util/trace-events                   |  17 +-
- 67 files changed, 1711 insertions(+), 533 deletions(-)
- create mode 100644 tests/iothread.h
- create mode 100644 stubs/linux-aio.c
- create mode 100644 tests/iothread.c
- create mode 100644 tests/test-aio-multithread.c
- rename aio-posix.c => util/aio-posix.c (94%)
- rename aio-win32.c => util/aio-win32.c (95%)
- create mode 100644 util/aiocb.c
- rename async.c => util/async.c (82%)
- rename iohandler.c => util/iohandler.c (100%)
- rename main-loop.c => util/main-loop.c (100%)
- rename qemu-timer.c => util/qemu-timer.c (100%)
- rename thread-pool.c => util/thread-pool.c (97%)
-
+diff --git a/block/block-backend.c b/block/block-backend.c
+index efbf398..1177598 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -880,7 +880,6 @@ static int blk_prw(BlockBackend *blk, int64_t offset, uint8_t *buf,
+ {
+     QEMUIOVector qiov;
+     struct iovec iov;
+-    Coroutine *co;
+     BlkRwCo rwco;
+ 
+     iov = (struct iovec) {
+@@ -897,9 +896,14 @@ static int blk_prw(BlockBackend *blk, int64_t offset, uint8_t *buf,
+         .ret    = NOT_DONE,
+     };
+ 
+-    co = qemu_coroutine_create(co_entry, &rwco);
+-    qemu_coroutine_enter(co);
+-    BDRV_POLL_WHILE(blk_bs(blk), rwco.ret == NOT_DONE);
++    if (qemu_in_coroutine()) {
++        /* Fast-path if already in coroutine context */
++        co_entry(&rwco);
++    } else {
++        Coroutine *co = qemu_coroutine_create(co_entry, &rwco);
++        qemu_coroutine_enter(co);
++        BDRV_POLL_WHILE(blk_bs(blk), rwco.ret == NOT_DONE);
++    }
+ 
+     return rwco.ret;
+ }
 -- 
 2.9.3
