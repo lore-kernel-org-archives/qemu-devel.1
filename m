@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cft4v-0000aZ-DB
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:52:54 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cft7A-0002Xu-Gp
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:55:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cft4u-00034v-A9
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:52:53 -0500
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:36576)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cft4u-00034D-4J
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:52:52 -0500
-Received: by mail-wr0-x22b.google.com with SMTP id 89so64940126wrr.3
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 10:52:51 -0800 (PST)
+	(envelope-from <imammedo@redhat.com>) id 1cft79-0003RY-IV
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:55:12 -0500
+Date: Mon, 20 Feb 2017 19:55:00 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170220195500.332a4844@nial.brq.redhat.com>
+In-Reply-To: <CAFEAcA9JWzUEmGa2Wxd5xPE4dVknOKBkt=wMda7CAgxzrgOc+w@mail.gmail.com>
+References: <1487357795-52614-1-git-send-email-imammedo@redhat.com>
+	<CAFEAcA9JWzUEmGa2Wxd5xPE4dVknOKBkt=wMda7CAgxzrgOc+w@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1487597638-28323-1-git-send-email-armbru@redhat.com>
-References: <1487597638-28323-1-git-send-email-armbru@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Feb 2017 18:52:30 +0000
-Message-ID: <CAFEAcA8T1cHdxR3dTMiCVbD0rQktLkKawUkG6n5o=7OwQz1=9Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 0/2] QAPI patches for 2017-02-20
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 0/3] generalize parsing of cpu_model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +23,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "patches@linaro.org" <patches@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-arm <qemu-arm@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 20 February 2017 at 13:33, Markus Armbruster <armbru@redhat.com> wrote:
-> The following changes since commit d514cfd763b271b4e97a9fc6adaabc8fd50084=
-ab:
->
->   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into stagi=
-ng (2017-02-20 09:53:59 +0000)
->
-> are available in the git repository at:
->
->   git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2017-02-20
->
-> for you to fetch changes up to fea346f569d4132296f7c26367374fcace80e096:
->
->   Makefile: Put VERSION info into version.texi rather than using -D (2017=
--02-20 14:11:07 +0100)
->
-> ----------------------------------------------------------------
-> QAPI patches for 2017-02-20
->
-> ----------------------------------------------------------------
-> Marc-Andr=C3=A9 Lureau (1):
->       qapi2texi: replace quotation by bold section name
->
-> Peter Maydell (1):
->       Makefile: Put VERSION info into version.texi rather than using -D
->
->  .gitignore             |  1 +
->  Makefile               | 17 ++++++++++-------
->  docs/qemu-ga-ref.texi  |  2 ++
->  docs/qemu-qmp-ref.texi |  2 ++
->  scripts/qapi2texi.py   | 10 ++++------
->  5 files changed, 19 insertions(+), 13 deletions(-)
->
-> Marc-Andr=C3=A9 Lureau (1):
->   qapi2texi: replace quotation by bold section name
->
-> Peter Maydell (1):
->   Makefile: Put VERSION info into version.texi rather than using -D
->
+On Fri, 17 Feb 2017 19:05:20 +0000
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
-Applied, thanks.
+> On 17 February 2017 at 18:56, Igor Mammedov <imammedo@redhat.com> wrote:
+> > Some callers call CPUClass->parse_features manually to convert
+> > '-cpu cpufoo,featurestr' string to cpu type and featurestr
+> > into a set of global properties. And theni do controlled
+> > cpu creation with setting properties and completing it with realize.
+> > That's a lot of code duplication as they are practically
+> > reimplement the same parsing logic.
+> >
+> > Some don't and use cpu_generic_init() instead which does
+> > the same parsing along with creation/realizing cpu within one
+> > wrapper.
+> >
+> > And some trying to switch to controlled cpu creation,
+> > implement object_new()/set properties/realize steps
+> > but forget feature parsing logic witch lieads to 'bugs'
+> > commit 00909b585 (hw/arm/integratorcp: Support specifying features via -cpu)
+> >
+> >
+> > This series moves -cpu option parsing to generic machine code
+> > that removes a little of code duplication and makes cpus creation
+> > process more unified.  
+> 
+> This API seems a little awkward for the SoC case, where
+> the board model doesn't actually know what the default
+> CPU model or the valid CPU models are, because it just
+> wants to say "create me a BCM2836 SoC" and let the SoC
+> object deal with determining whether it's always a cortex-a15
+> or if it might allow some user configurability either in
+> cpu choices or in optional flags.
+> Any thoughts about that use case?
+I've probably been too aggressive trying to force
+conversion of all boards, assuming that all boards support
+"-cpu CLI" option, currently option could be specified for
+any board but it is ignored if board doesn't care
+about it explicitly.
 
--- PMM
+ "-cpu cpu_name,feat_str" handling is always based on
+ availability of base CPU type supported by target as
+ it's needed both for
+   - translating cpu_name to QOM CPU type
+       cpu_class_by_name(typename, name)
+   - converting feat_str into set of global properties
+     for matching QOM CPU type
+       cc->parse_features(object_class_get_name(oc), featurestr, &err);
+
+Boards that don't care/need '-cpu' support won't need
+to do anything as we can skip cpu_name,feat_str parsing
+if MachineClass::base_cpu_type isn't set (NULL by default),
+that way we won't break ignored CLI if we care.
+And currently we don't have convenient way to disable
+feat_str parsing, but machine could be extended
+with flag to [en|dis]able it explicitly.
+
+The goal of this series is generalizing/consolidating
+parsing of '-cpu' for boards that use it, removing
+code duplication scattered around codebase and trying
+normalize default cpu_model initialization.
+
+For SoC with fixed CPU type it would be better to use
+directly CPU type names directly but that hits legacy
+cpu_init()/cpu_foo_init() wall, which is currently
+cpu_model based and would be a lot of re-factoring.
+I would convert cpu_init(cpu_model) to cpu_init(cpu_type)
+and call '-cpu' handling logic from generic
+machine/user_[bsd|linux] code (3 places in total).
+
+> (The stm32f205 SoC object has a "cpu-model" QOM property
+> that the board sets, but I think that's as much because
+> we somewhat awkwardly need to pass it into armv7m_init()
+> as a deliberate design choice.)
+its sole user netduino2 board has cpu_model hardcodded
+at board level which could be left alone or converted
+to this API. Using API would make code more consistent
+at the cost of more code for default/valid callbacks.
+
+> 
+> thanks
+> -- PMM
