@@ -1,25 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cftEh-0001bC-DL
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 14:03:00 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cftFn-0002QK-86
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 14:04:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cftEc-0005cT-42
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 14:02:59 -0500
-Resent-Message-Id: <E1cftEc-0005cT-42@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21476)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cftEb-0005cI-TY
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 14:02:54 -0500
-In-Reply-To: <20170220185020.774-1-dgilbert@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148761736267.30.11528201163896027208@0e2666bad730>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 20 Feb 2017 11:02:43 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v4 0/5] SLIRP VMStatification
+	(envelope-from <pm215@archaic.org.uk>) id 1cftFm-00066t-Do
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 14:04:07 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 20 Feb 2017 18:41:12 +0000
+Message-Id: <1487616072-9226-5-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1487616072-9226-1-git-send-email-peter.maydell@linaro.org>
+References: <1487616072-9226-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 4/4] arm: Fix APSR writes via M profile MSR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +19,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: dgilbert@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com, quintela@redhat.com
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Michael Davidsaver <mdavidsaver@gmail.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjQgMC81XSBTTElSUCBWTVN0YXRpZmljYXRpb24K
-TWVzc2FnZS1pZDogMjAxNzAyMjAxODUwMjAuNzc0LTEtZGdpbGJlcnRAcmVkaGF0LmNvbQoKPT09
-IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0k
-KGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdp
-dCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9
-JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNo
-ZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4u
-IgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3Bh
-dGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwog
-ICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBF
-TkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0
-CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAtIFt0YWcgdXBk
-YXRlXSAgICAgIHBhdGNoZXcvMTQ4NzU5NzYzOC0yODMyMy0xLWdpdC1zZW5kLWVtYWlsLWFybWJy
-dUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMTQ4NzU5NzYzOC0yODMyMy0xLWdpdC1zZW5kLWVtYWls
-LWFybWJydUByZWRoYXQuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAxNzAyMjAx
-ODUwMjAuNzc0LTEtZGdpbGJlcnRAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTcwMjIwMTg1MDIw
-Ljc3NC0xLWRnaWxiZXJ0QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0
-Jwo0MmVjNmU0IHNsaXJwOiBWTVN0YXRpZnkgcmVtYWluaW5nIGV4Y2VwdCBmb3IgbG9vcAo4Mjc4
-MjI4IHNsaXJwOiBWTVN0YXRpZnkgc29ja2V0IGxldmVsCmIyY2QxN2Mgc2xpcnA6IENvbW1vbiBs
-aG9zdC9maG9zdCB1bmlvbgphZjgxOTJmIHNsaXJwOiBWTVN0YXRpZnkgc2J1ZgozYmI1NzJjIHNs
-aXJwOiBWTVN0YXRlIGNvbnZlcnNpb247IHRjcGNiCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVj
-a2luZyBQQVRDSCAxLzU6IHNsaXJwOiBWTVN0YXRlIGNvbnZlcnNpb247IHRjcGNiLi4uCkVSUk9S
-OiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzIxMTogRklMRTogc2xpcnAvdGNw
-X3Zhci5oOjUxOgorXkl1aW50OF90IHRfZm9yY2U7XkleSS8qIDEgaWYgZm9yY2luZyBvdXQgYSBi
-eXRlICovJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjIxOiBG
-SUxFOiBzbGlycC90Y3BfdmFyLmg6MTEyOgorXkl1aW50OF90Xkl0X29vYmZsYWdzO15JXkkvKiBo
-YXZlIHNvbWUgKi8kCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMy
-MjI6IEZJTEU6IHNsaXJwL3RjcF92YXIuaDoxMTM6CiteSXVpbnQ4X3ReSXRfaW9iYzteSV5JXkkv
-KiBpbnB1dCBjaGFyYWN0ZXIgKi8kCgp0b3RhbDogMyBlcnJvcnMsIDAgd2FybmluZ3MsIDE5NSBs
-aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
-dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
-bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVj
-a2luZyBQQVRDSCAyLzU6IHNsaXJwOiBWTVN0YXRpZnkgc2J1Zi4uLgpFUlJPUjogY29kZSBpbmRl
-bnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMyNjogRklMRTogc2xpcnAvc2J1Zi5oOjE1OgorXkl1
-aW50MzJfdCBzYl9jYzteSV5JLyogYWN0dWFsIGNoYXJzIGluIGJ1ZmZlciAqLyQKCkVSUk9SOiBj
-b2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzI3OiBGSUxFOiBzbGlycC9zYnVmLmg6
-MTY6CiteSXVpbnQzMl90IHNiX2RhdGFsZW47XkkvKiBMZW5ndGggb2YgZGF0YSAgKi8kCgp0b3Rh
-bDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDE1NSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAzLzU6IHNsaXJwOiBDb21t
-b24gbGhvc3QvZmhvc3QgdW5pb24uLi4KQ2hlY2tpbmcgUEFUQ0ggNC81OiBzbGlycDogVk1TdGF0
-aWZ5IHNvY2tldCBsZXZlbC4uLgpFUlJPUjogaWYgdGhpcyBjb2RlIGlzIHJlZHVuZGFudCBjb25z
-aWRlciByZW1vdmluZyBpdAojOTY6IEZJTEU6IHNsaXJwL3NsaXJwLmM6MTI5NzoKKyNpZiAwCgp0
-b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDIxNyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA1LzU6IHNsaXJwOiBW
-TVN0YXRpZnkgcmVtYWluaW5nIGV4Y2VwdCBmb3IgbG9vcC4uLgo9PT0gT1VUUFVUIEVORCA9PT0K
-ClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBh
-dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2Vu
-ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+Our implementation of writes to the APSR for M-profile via the MSR
+instruction was badly broken.
+
+First and worst, we had the sense wrong on the test of bit 2 of the
+SYSm field -- this is supposed to request an APSR write if bit 2 is 0
+but we were doing it if bit 2 was 1.  This bug was introduced in
+commit 58117c9bb429cd, so hasn't been in a QEMU release.
+
+Secondly, the choice of exactly which parts of APSR should be written
+is defined by bits in the 'mask' field.  We were not passing these
+through from instruction decode, making it impossible to check them
+in the helper.
+
+Pass the mask bits through from the instruction decode to the helper
+function and process them appropriately; fix the wrong sense of the
+SYSm bit 2 check.
+
+Invalid mask values and invalid combinations of mask and register
+number are UNPREDICTABLE; we choose to treat them as if the mask
+values were valid.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/helper.c    | 26 ++++++++++++++++++++++----
+ target/arm/translate.c |  3 ++-
+ 2 files changed, 24 insertions(+), 5 deletions(-)
+
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 948aba2..8349e1f 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -8478,8 +8478,18 @@ uint32_t HELPER(v7m_mrs)(CPUARMState *env, uint32_t reg)
+     }
+ }
+ 
+-void HELPER(v7m_msr)(CPUARMState *env, uint32_t reg, uint32_t val)
+-{
++void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
++{
++    /* We're passed bits [11..0] of the instruction; extract
++     * SYSm and the mask bits.
++     * Invalid combinations of SYSm and mask are UNPREDICTABLE;
++     * we choose to treat them as if the mask bits were valid.
++     * NB that the pseudocode 'mask' variable is bits [11..10],
++     * whereas ours is [11..8].
++     */
++    uint32_t mask = extract32(maskreg, 8, 4);
++    uint32_t reg = extract32(maskreg, 0, 8);
++
+     if (arm_current_el(env) == 0 && reg > 7) {
+         /* only xPSR sub-fields may be written by unprivileged */
+         return;
+@@ -8488,8 +8498,16 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t reg, uint32_t val)
+     switch (reg) {
+     case 0 ... 7: /* xPSR sub-fields */
+         /* only APSR is actually writable */
+-        if (reg & 4) {
+-            xpsr_write(env, val, 0xf8000000); /* APSR */
++        if (!(reg & 4)) {
++            uint32_t apsrmask = 0;
++
++            if (mask & 8) {
++                apsrmask |= 0xf8000000; /* APSR NZCVQ */
++            }
++            if ((mask & 4) && arm_feature(env, ARM_FEATURE_THUMB_DSP)) {
++                apsrmask |= 0x000f0000; /* APSR GE[3:0] */
++            }
++            xpsr_write(env, val, apsrmask);
+         }
+         break;
+     case 8: /* MSP */
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 9090356..ce7f19f 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -10391,7 +10391,8 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
+                     case 0: /* msr cpsr.  */
+                         if (arm_dc_feature(s, ARM_FEATURE_M)) {
+                             tmp = load_reg(s, rn);
+-                            addr = tcg_const_i32(insn & 0xff);
++                            /* the constant is the mask and SYSm fields */
++                            addr = tcg_const_i32(insn & 0xfff);
+                             gen_helper_v7m_msr(cpu_env, addr, tmp);
+                             tcg_temp_free_i32(addr);
+                             tcg_temp_free_i32(tmp);
+-- 
+2.7.4
