@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cfk7F-00017b-Ke
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:18:43 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1cfk8z-00022S-VR
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:20:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cfk7C-0001sU-A1
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:18:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49840)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cfk7C-0001sA-0s
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:18:38 -0500
-References: <1484026704-28027-1-git-send-email-mst@redhat.com>
-	<1484026704-28027-9-git-send-email-mst@redhat.com>
-	<A2975661238FB949B60364EF0F2C25743900AAEF@shsmsx102.ccr.corp.intel.com>
-	<c1f86fba-6b22-8316-156f-2024bee46b0c@redhat.com>
-	<A2975661238FB949B60364EF0F2C25743900B73D@shsmsx102.ccr.corp.intel.com>
-	<e9022e3a-5fa5-45c3-cc84-cb78d3ff9cdc@redhat.com>
-	<A2975661238FB949B60364EF0F2C25743900C602@shsmsx102.ccr.corp.intel.com>
-	<60ec34e3-2585-123f-7bc0-9d7bb143fc38@redhat.com>
-	<A2975661238FB949B60364EF0F2C25743900C6A9@shsmsx102.ccr.corp.intel.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <b4b73c71-2a2b-ed2d-7e55-04d9304761b6@redhat.com>
-Date: Mon, 20 Feb 2017 17:18:23 +0800
+	(envelope-from <arei.gonglei@huawei.com>) id 1cfk8w-0002pw-PL
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:20:29 -0500
+Received: from [45.249.212.187] (port=2534 helo=dggrg01-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1cfk8w-0002oW-4N
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:20:26 -0500
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Mon, 20 Feb 2017 09:19:01 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA1C13C3@DGGEMA505-MBX.china.huawei.com>
+References: <589C099A.9090605@huawei.com>
+	<AF60004D-7133-44D1-8A9F-7DB9822D84AF@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA1B4379@DGGEMA505-MBX.china.huawei.com>
+	<105e5774-38c3-0683-ca08-64f6ed53c643@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA1B6988@DGGEMA505-MBX.china.huawei.com>
+	<2127602137.20489688.1486827559449.JavaMail.zimbra@redhat.com>
+	<1486980300.17184.28.camel@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA1BD1CA@DGGEMA505-MBX.china.huawei.com>
+	<ea1dbe94-7343-ef9e-56e1-9c6d8bcd78d6@redhat.com>
+In-Reply-To: <ea1dbe94-7343-ef9e-56e1-9c6d8bcd78d6@redhat.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743900C6A9@shsmsx102.ccr.corp.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 08/41] intel_iommu: support device iotlb
- descriptor
+Subject: Re: [Qemu-devel] [Help] Windows2012 as Guest 64+cores on KVM Halts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,157 +35,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "Lan, Tianyu" <tianyu.lan@intel.com>, Peter Maydell <peter.maydell@linaro.org>, "Tian, Kevin" <kevin.tian@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Xu <peterx@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Paolo Bonzini <pbonzini@redhat.com>, Vadim Rozenfeld <vrozenfe@redhat.com>
+Cc: Yan Vugenfirer <yvugenfi@redhat.com>, Hangaohuai <hangaohuai@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Radim Krcmar <rkrcmar@redhat.com>
 
-
-
-On 2017=E5=B9=B402=E6=9C=8820=E6=97=A5 17:13, Liu, Yi L wrote:
->> -----Original Message-----
->> From: Jason Wang [mailto:jasowang@redhat.com]
->> Sent: Monday, February 20, 2017 5:04 PM
->> To: Liu, Yi L <yi.l.liu@intel.com>; Michael S. Tsirkin <mst@redhat.com=
->; qemu-
->> devel@nongnu.org
->> Cc: Lan, Tianyu <tianyu.lan@intel.com>; Peter Maydell
->> <peter.maydell@linaro.org>; Tian, Kevin <kevin.tian@intel.com>; Eduard=
-o
->> Habkost <ehabkost@redhat.com>; Peter Xu <peterx@redhat.com>; Alex
->> Williamson <alex.williamson@redhat.com>; Paolo Bonzini
->> <pbonzini@redhat.com>; Richard Henderson <rth@twiddle.net>
->> Subject: Re: [Qemu-devel] [PULL 08/41] intel_iommu: support device iot=
-lb
->> descriptor
->>
->>
->>
->> On 2017=E5=B9=B402=E6=9C=8820=E6=97=A5 16:27, Liu, Yi L wrote:
->>>> -----Original Message-----
->>>> From: Jason Wang [mailto:jasowang@redhat.com]
->>>> Sent: Friday, February 17, 2017 2:43 PM
->>>> To: Liu, Yi L <yi.l.liu@intel.com>; Michael S. Tsirkin
->>>> <mst@redhat.com>; qemu- devel@nongnu.org
->>>> Cc: Peter Maydell <peter.maydell@linaro.org>; Eduardo Habkost
->>>> <ehabkost@redhat.com>; Peter Xu <peterx@redhat.com>; Paolo Bonzini
->>>> <pbonzini@redhat.com>; Richard Henderson <rth@twiddle.net>; Tian,
->>>> Kevin <kevin.tian@intel.com>; Lan, Tianyu <tianyu.lan@intel.com>;
->>>> Alex Williamson <alex.williamson@redhat.com>
->>>> Subject: Re: [Qemu-devel] [PULL 08/41] intel_iommu: support device
->>>> iotlb descriptor
->>>>
->>>>
->>>>
->>>> On 2017=E5=B9=B402=E6=9C=8817=E6=97=A5 14:18, Liu, Yi L wrote:
->>>>>> -----Original Message-----
->>>>>> From: Jason Wang [mailto:jasowang@redhat.com]
->>>>>> Sent: Thursday, February 16, 2017 1:44 PM
->>>>>> To: Liu, Yi L <yi.l.liu@intel.com>; Michael S. Tsirkin
->>>>>> <mst@redhat.com>; qemu- devel@nongnu.org
->>>>>> Cc: Peter Maydell <peter.maydell@linaro.org>; Eduardo Habkost
->>>>>> <ehabkost@redhat.com>; Peter Xu <peterx@redhat.com>; Paolo Bonzini
->>>>>> <pbonzini@redhat.com>; Richard Henderson <rth@twiddle.net>; Tian,
->>>>>> Kevin <kevin.tian@intel.com>; Lan, Tianyu <tianyu.lan@intel.com>;
->>>>>> Alex Williamson <alex.williamson@redhat.com>
->>>>>> Subject: Re: [Qemu-devel] [PULL 08/41] intel_iommu: support device
->>>>>> iotlb descriptor
->>>>>>
->>>>>>
->>>>>>
->>>>>> On 2017=E5=B9=B402=E6=9C=8816=E6=97=A5 13:36, Liu, Yi L wrote:
->>>>>>>> -----Original Message-----
->>>>>>>> From: Qemu-devel
->>>>>>>> [mailto:qemu-devel-bounces+yi.l.liu=3Dintel.com@nongnu.org]
->>>>>>>> On Behalf Of Michael S. Tsirkin
->>>>>>>> Sent: Tuesday, January 10, 2017 1:40 PM
->>>>>>>> To: qemu-devel@nongnu.org
->>>>>>>> Cc: Peter Maydell <peter.maydell@linaro.org>; Eduardo Habkost
->>>>>>>> <ehabkost@redhat.com>; Jason Wang <jasowang@redhat.com>; Peter
->>>> Xu
->>>>>>>> <peterx@redhat.com>; Paolo Bonzini <pbonzini@redhat.com>; Richar=
-d
->>>>>>>> Henderson <rth@twiddle.net>
->>>>>>>> Subject: [Qemu-devel] [PULL 08/41] intel_iommu: support device
->>>>>>>> iotlb descriptor
->>>>>>>>
->>>>>>>> From: Jason Wang <jasowang@redhat.com>
->>>>>>>>
->>>>>>>> This patch enables device IOTLB support for intel iommu. The
->>>>>>>> major work is to implement QI device IOTLB descriptor processing
->>>>>>>> and notify the device through iommu notifier.
->>>>>>>>
->>>>>>> Hi Jason/Michael,
->>>>>>>
->>>>>>> Recently Peter Xu's patch also touched intel-iommu emulation. His
->>>>>>> patch shadows second-level page table by capturing iotlb flush
->>>>>>> from guest. It would result in page table updating in host. Does
->>>>>>> this patch also use the same map/umap API provided by VFIO?
->>>>>> Yes, it depends on the iommu notifier too.
->>>>>>
->>>>>>> If it is, then I think it would also update page table in host. I=
-t
->>>>>>> looks to be a duplicate update. Pls refer to the following
->>>>>>> snapshot captured from section 6.5.2.5 of vtd spec.
->>>>>>>
->>>>>>> "Since translation requests from a device may be serviced by
->>>>>>> hardware from the IOTLB, software must always request IOTLB
->>>>>>> invalidation
->>>>>>> (iotlb_inv_dsc) before requesting corresponding Device-TLB
->>>>>>> (dev_tlb_inv_dsc) invalidation."
->>>>>>>
->>>>>>> Maybe for device-iotlb, we need a separate API which just pass
->>>>>>> down the invalidate info without updating page table. Any thought=
-s?
->>>>>> cc Alex.
->>>>>>
->>>>>> If we want ATS to be visible for guest (but I'm not sure if VFIO
->>>>>> support this), we probably need another notifier or a new flag.
->>>>> Jason, for assigned device, I think guest could see ATS if the
->>>>> assigned device supports ATS. I can see it when passthru iGPU.
->>>>>
->>>>> Regards,
->>>>> Yi L
->>>> Good to know this.
->>>>
->>>> If I understand your suggestion correctly, you want a dedicated API
->>>> to flush a hardware device IOTLB. I'm not sure this is really needed=
-.
->>> yes, I'd like to have an extra API besides the current MAP/UNMAP.
->> I'm think whether or not we can do this without extra API or even don'=
-t need to
->> care about this.
->>
->>>> There's some discussion of similar issue in the past (when ATS is
->>>> used for virtio- net/vhost), looks like we could solve this by not
->>>> trigger the UNMAP notifier unless it was device IOTLB inv desc if AT=
-S
->>>> is enabled for the device? With this remote IOMMU/IOTLB can only get
->>>> invalidation request once. For VFIO, the under layer IOMMU can deal
->>>> with hardware device IOTLB without any extra efforts.
->>> If I catch the background, I think it should be "not trigger the UNMA=
-P
->>> notifier when unless it was device IOTLB inv desc if ATS is enabled f=
-or the
->> device"
->>
->> Seems not :)
->>
->> I mean, if ATS is enabled for the device, only trigger UNMAP notifier =
-when
->> processing device IOTLB. Then we can only have flush once. And host IO=
-MMU
->> driver will take care of device IOTLB flush too.
-> hmmm, how about the iotlb inv desc which is prior to device-iotlb?
-
-Any issue in this case?
-
-> I'm not sure
-> if it is practical to ignore the iotlb inv des since there is no SID in=
-fo in it.
-
-Yes, this needs some changes maybe.
-
-Thanks
-
->
-> Regards,
-> Yi L
+SGkgUGFvbG8sDQoNCj4gDQo+IA0KPiBPbiAxNi8wMi8yMDE3IDAyOjMxLCBHb25nbGVpIChBcmVp
+KSB3cm90ZToNCj4gPiBBbmQgdGhlIGJlbG93IHBhdGNoIHdvcmtzIGZvciBtZSwgSSBjYW4gc3Vw
+cG9ydCBtYXggMjU1IHZjcHVzIGZvciBXUzIwMTINCj4gPiB3aXRoIGh5cGVyLXYgZW5saWdodGVu
+bWVudHMuDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvdGFyZ2V0L2kzODYva3ZtLmMgYi90YXJnZXQv
+aTM4Ni9rdm0uYw0KPiA+IGluZGV4IDI3ZmQwNTAuLmVmZTNjYmMgMTAwNjQ0DQo+ID4gLS0tIGEv
+dGFyZ2V0L2kzODYva3ZtLmMNCj4gPiArKysgYi90YXJnZXQvaTM4Ni9rdm0uYw0KPiA+IEBAIC03
+NzIsNyArNzcyLDcgQEAgaW50IGt2bV9hcmNoX2luaXRfdmNwdShDUFVTdGF0ZSAqY3MpDQo+ID4N
+Cj4gPiAgICAgICAgICBjID0gJmNwdWlkX2RhdGEuZW50cmllc1tjcHVpZF9pKytdOw0KPiA+ICAg
+ICAgICAgIGMtPmZ1bmN0aW9uID0gSFlQRVJWX0NQVUlEX0lNUExFTUVOVF9MSU1JVFM7DQo+ID4g
+LSAgICAgICAgYy0+ZWF4ID0gMHg0MDsNCj4gPiArICAgICAgICBjLT5lYXggPSAtMTsNCj4gPiAg
+ICAgICAgICBjLT5lYnggPSAweDQwOw0KPiA+DQo+ID4gICAgICAgICAga3ZtX2Jhc2UgPSBLVk1f
+Q1BVSURfU0lHTkFUVVJFX05FWFQ7DQo+IA0KPiBUaGlzIG5lZWRzIHRvIGRlcGVuZCBvbiB0aGUg
+bWFjaGluZSB0eXBlLCBidXQgYXBhcnQgZnJvbSB0aGF0IEkgdGhpbmsNCg0KSSBkb24ndCBrbm93
+IHdoeS4gQmVjYXVzZSB0aGUgbmVnYXRpdmUgZWZmZWN0cyBmb3IgdGhpcyBjaGFuZ2UgZG9uJ3Qg
+ZXhpc3QNCm9uIGN1cnJlbnQgUUVNVSBJSVVDLCBhbmQgd2UgZG9uJ3QgaGF2ZSBjb21wYXRpYmxl
+IHByb2JsZW1zIGZvciBsaXZlIG1pZ3JhdGlvbi4NCg0KPiB5b3Ugc2hvdWxkIHN1Ym1pdCB0aGUg
+cGF0Y2ggZm9yIDIuOS4NCj4gDQoNClRoYW5rcywNCi1Hb25nbGVpDQo=
