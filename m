@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cftM8-0007q8-Gh
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 14:10:41 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cftMp-0008J0-Gx
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 14:11:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cftM7-0007h7-EJ
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 14:10:40 -0500
-Date: Mon, 20 Feb 2017 20:10:29 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170220201029.441d825b@nial.brq.redhat.com>
-In-Reply-To: <1486996099-15820-5-git-send-email-peter.maydell@linaro.org>
-References: <1486996099-15820-1-git-send-email-peter.maydell@linaro.org>
-	<1486996099-15820-5-git-send-email-peter.maydell@linaro.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1cftMo-00083R-CG
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 14:11:23 -0500
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:33920)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cftMo-00082z-4P
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 14:11:22 -0500
+Received: by mail-wr0-x233.google.com with SMTP id z61so69599681wrc.1
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 11:11:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/4] hw/arm/virt: Use new cpu_generic_new()
+In-Reply-To: <20170220195500.332a4844@nial.brq.redhat.com>
+References: <1487357795-52614-1-git-send-email-imammedo@redhat.com>
+	<CAFEAcA9JWzUEmGa2Wxd5xPE4dVknOKBkt=wMda7CAgxzrgOc+w@mail.gmail.com>
+	<20170220195500.332a4844@nial.brq.redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 20 Feb 2017 19:11:00 +0000
+Message-ID: <CAFEAcA-VAY8LM+8jE4B-L=0QdcY5FLvwmwGVbUhcXjnC9-AW+w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [RFC 0/3] generalize parsing of cpu_model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,84 +30,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, patches@linaro.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "patches@linaro.org" <patches@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-arm <qemu-arm@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Mon, 13 Feb 2017 14:28:19 +0000
-Peter Maydell <peter.maydell@linaro.org> wrote:
+On 20 February 2017 at 18:55, Igor Mammedov <imammedo@redhat.com> wrote:
+> Peter Maydell <peter.maydell@linaro.org> wrote:
+>> This API seems a little awkward for the SoC case, where
+>> the board model doesn't actually know what the default
+>> CPU model or the valid CPU models are, because it just
+>> wants to say "create me a BCM2836 SoC" and let the SoC
+>> object deal with determining whether it's always a cortex-a15
+>> or if it might allow some user configurability either in
+>> cpu choices or in optional flags.
+>> Any thoughts about that use case?
+>
+> I've probably been too aggressive trying to force
+> conversion of all boards, assuming that all boards support
+> "-cpu CLI" option, currently option could be specified for
+> any board but it is ignored if board doesn't care
+> about it explicitly.
 
-> Use the new cpu_generic_new() rather than calling
-> parse_features by hand.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/arm/virt.c | 24 ++----------------------
->  1 file changed, 2 insertions(+), 22 deletions(-)
-> 
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index f3440f2..bcb9a6d 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -172,7 +172,6 @@ static const char *valid_cpus[] = {
->  static bool cpuname_valid(const char *cpu)
->  {
->      int i;
-> -
->      for (i = 0; i < ARRAY_SIZE(valid_cpus); i++) {
->          if (strcmp(cpu, valid_cpus[i]) == 0) {
->              return true;
-> @@ -1206,10 +1205,6 @@ static void machvirt_init(MachineState *machine)
->      MemoryRegion *ram = g_new(MemoryRegion, 1);
->      const char *cpu_model = machine->cpu_model;
->      char **cpustr;
-> -    ObjectClass *oc;
-> -    const char *typename;
-> -    CPUClass *cc;
-> -    Error *err = NULL;
->      bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
->      uint8_t clustersz;
->  
-> @@ -1240,6 +1235,7 @@ static void machvirt_init(MachineState *machine)
->          error_report("mach-virt: CPU %s not supported", cpustr[0]);
->          exit(1);
->      }
-> +    g_strfreev(cpustr);
->  
->      /* If we have an EL3 boot ROM then the assumption is that it will
->       * implement PSCI itself, so disable QEMU's internal implementation
-> @@ -1309,24 +1305,8 @@ static void machvirt_init(MachineState *machine)
->  
->      create_fdt(vms);
->  
-> -    oc = cpu_class_by_name(TYPE_ARM_CPU, cpustr[0]);
-> -    if (!oc) {
-> -        error_report("Unable to find CPU definition");
-> -        exit(1);
-> -    }
-> -    typename = object_class_get_name(oc);
-> -
-> -    /* convert -smp CPU options specified by the user into global props */
-> -    cc = CPU_CLASS(oc);
-> -    cc->parse_features(typename, cpustr[1], &err);
-> -    g_strfreev(cpustr);
-> -    if (err) {
-> -        error_report_err(err);
-> -        exit(1);
-> -    }
-> -
->      for (n = 0; n < smp_cpus; n++) {
-> -        Object *cpuobj = object_new(typename);
-> +        Object *cpuobj = OBJECT(cpu_generic_new(TYPE_ARM_CPU, cpu_model));
-It unnecessarily pushes cpu_model parsing farther down the call stack
-when all we need for CPU creation is type name.
+I think the conversion in this patchset is OK for
+the boards you've touched. It's the ones that it
+doesn't touch that I need to think a little more about.
 
-Since I'm looking at adding '-device cpu' support to virt-arm,
-I would prefer to leave object_new() here so that creation logic
-would be similar to device_add and not mix '-cpu' parsing to typename
-+ global properties that could be moved to generic machine code
-with actual CPU creation.
+>  "-cpu cpu_name,feat_str" handling is always based on
+>  availability of base CPU type supported by target as
+>  it's needed both for
+>    - translating cpu_name to QOM CPU type
+>        cpu_class_by_name(typename, name)
+>    - converting feat_str into set of global properties
+>      for matching QOM CPU type
+>        cc->parse_features(object_class_get_name(oc), featurestr, &err);
 
+> Boards that don't care/need '-cpu' support won't need
+> to do anything as we can skip cpu_name,feat_str parsing
+> if MachineClass::base_cpu_type isn't set (NULL by default),
+> that way we won't break ignored CLI if we care.
+> And currently we don't have convenient way to disable
+> feat_str parsing, but machine could be extended
+> with flag to [en|dis]able it explicitly.
+>
+> The goal of this series is generalizing/consolidating
+> parsing of '-cpu' for boards that use it, removing
+> code duplication scattered around codebase and trying
+> normalize default cpu_model initialization.
 
->          if (!vmc->disallow_affinity_adjustment) {
->              /* Adjust MPIDR like 64-bit KVM hosts, which incorporate the
->               * GIC's target-list limitations. 32-bit KVM hosts currently
+Yeah, I definitely like the cleanup to avoid all the
+duplicate parse calls.
+
+> For SoC with fixed CPU type it would be better to use
+> directly CPU type names directly but that hits legacy
+> cpu_init()/cpu_foo_init() wall, which is currently
+> cpu_model based and would be a lot of re-factoring.
+> I would convert cpu_init(cpu_model) to cpu_init(cpu_type)
+> and call '-cpu' handling logic from generic
+> machine/user_[bsd|linux] code (3 places in total).
+>
+>> (The stm32f205 SoC object has a "cpu-model" QOM property
+>> that the board sets, but I think that's as much because
+>> we somewhat awkwardly need to pass it into armv7m_init()
+>> as a deliberate design choice.)
+
+> its sole user netduino2 board has cpu_model hardcodded
+> at board level which could be left alone or converted
+> to this API.
+
+I think this may be for the benefit of the not-yet-in-tree
+netduinoplus2 board, which is a very similar SoC but
+with a cortex-m4. There are likely other ways we could
+model that, though.
+
+> Using API would make code more consistent
+> at the cost of more code for default/valid callbacks.
+
+Mmm, we could have the board code just forward the
+default/valid callbacks through to the SoC (which
+would then either implement them or forward them again).
+But I think we should definitely see if we can make
+the code for handling "the CPU is actually inside some
+other object" as clean as we can, because I think
+that's by far the most common case. Machines like
+the x86 pc and the ARM virt board where the CPU is
+instantiated directly in the board code are the
+non-standard cases I think. We have a lot of boards
+where we do instantiate the CPU in the board code
+just for legacy reasons where we don't properly
+model the SoC the CPU is inside. But hardware that
+really has the CPU as a top level pluggable object
+is rare.
+
+thanks
+-- PMM
