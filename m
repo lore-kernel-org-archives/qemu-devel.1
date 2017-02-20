@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52820)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cfp4D-0002Yz-Ba
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:35:54 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cfp74-00053n-Sb
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:38:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cfp4A-0002fy-46
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:35:53 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37235)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cfp49-0002fd-Qs
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:35:50 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cfp47-0003wt-SP
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 14:35:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B5C972E80C9
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 14:35:47 +0000 (UTC)
+	(envelope-from <peter.maydell@linaro.org>) id 1cfp73-0003D3-Na
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:38:50 -0500
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:36455)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cfp73-0003CY-H8
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:38:49 -0500
+Received: by mail-wr0-x233.google.com with SMTP id 89so60756152wrr.3
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 06:38:49 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <73cbda87-adc5-e97d-d46d-f1f3d29cd46c@kaod.org>
+References: <1486997062-23227-1-git-send-email-clg@kaod.org>
+	<1486997062-23227-2-git-send-email-clg@kaod.org>
+	<CAFEAcA-q-VSup75PO-To9N11+0WCm=LNiFQ-SQXaTQMroyHFbw@mail.gmail.com>
+	<73cbda87-adc5-e97d-d46d-f1f3d29cd46c@kaod.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 20 Feb 2017 14:38:27 +0000
+Message-ID: <CAFEAcA-1tzbEJ-kLF6iBR8LeXq_iiMgr92zh_HAgO9jVkMhCDg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 20 Feb 2017 14:28:06 -0000
-From: Paolo Bonzini <bonzini@gnu.org>
-Reply-To: Bug 1665389 <1665389@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170216160426.5716.21453.malonedeb@soybean.canonical.com>
-Message-Id: <20170220142806.30362.41236.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1665389] Re: Nested kvm guest fails to start on a
- emulated Westmere CPU guest under a Broadwell CPU host
+Subject: Re: [Qemu-devel] [PATCH 1/2] aspeed/smc: add a 'sdram_base' property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,134 +32,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Yes, I mean '-cpu host' in the bare metal.  There is no workaround; it
-worked by chance and it triggered other hard to find bugs.
+On 20 February 2017 at 14:30, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> On 02/20/2017 02:51 PM, Peter Maydell wrote:
+>> On 13 February 2017 at 14:44, C=C3=A9dric Le Goater <clg@kaod.org> wrote=
+:
+>>> The setting of the DRAM address of the DMA transaction depends on the
+>>> DRAM base address of the SoC. Let's add a property to give this
+>>> information to the SMC controller model.
+>>>
+>>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>>> Reviewed-by: Joel Stanley <joel@jms.id.au>
+>>> Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
+>>> --
+>>
+>> This seems a bit weird -- what does it actually do in hardware?
+>> (Does it really have the ability to dma anywhere in the
+>> address space and just use an odd base address, or is it
+>> DMA'ing to a more restricted address space?)
+>
+> For the AST2500, the valid address range for the DRAM side start
+> address of the DMA is [ 0x80000000 - 0xBFFFFFFF ] which is the
+> full 1024M SDRAM space. It will wrap back in case of overflow.
+>
+> For the AST2400, it is [ 0x40000000 - 0x5FFFFFFF ] which is the
+> full 512M SDRAM space.
+>
+> And the length of the DMA goes from 4 bytes to 32MB [ O - 0x7FFFFF ]
 
--- =
+So if I do a DMA access to 0x800000 that's the same as an
+access at 0x0, or does it fail?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1665389
+I ask because the other option for modelling this kind of thing
+would be that you make the DMA controller device take a link
+property which is a MemoryRegion*. Then inside the DMA device
+you create the AddressSpace* which you use to do DMA accesses,
+and in the board code you pass the DMA device a suitably
+constructed MemoryRegion that contains the things that the
+device can DMA to.
 
-Title:
-  Nested kvm guest fails to start on a emulated Westmere CPU guest under
-  a Broadwell CPU host
+You don't have to do it that way (and I don't think we
+have much in the way of examples of doing it like that,
+except for the ARM CPU handling of secure and nonsecure
+memory address spaces), but if it seems to fit better
+with what the hardware's doing it might be worth the effort.
 
-Status in QEMU:
-  New
-
-Bug description:
-  Using latest master(5dae13), qemu fails to start any nested guest in a
-  Westmere emulated guest(layer 1), under a Broadwell host(layer 0),
-  with the error:
-
-  qemu-custom: /root/qemu/target/i386/kvm.c:1849: kvm_put_msrs:
-  Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
-
-  The qemu command used(though other CPUs didn't work either):
-  /usr/bin/qemu-custom -name guest=3D12ed9230-vm-el73,debug-threads=3Don -S=
- -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/d=
-omain-5-12ed9230-vm-el73/master-key.aes -machine pc-i440fx-2.9,accel=3Dkvm,=
-usb=3Doff -cpu Westmere,+vmx -m 512 -realtime mlock=3Doff -smp 2,sockets=3D=
-2,cores=3D1,threads=3D1 -object iothread,id=3Diothread1 -uuid f4ce4eba-985f=
--42a3-94c4-6e4a8a530347 -nographic -no-user-config -nodefaults -chardev soc=
-ket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-5-12ed9230-vm-el73=
-/monitor.sock,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3D=
-control -rtc base=3Dutc -no-shutdown -boot menu=3Doff,strict=3Don -device v=
-irtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x3 -drive file=3D/=
-root/lago/.lago/default/images/vm-el73_root.qcow2,format=3Dqcow2,if=3Dnone,=
-id=3Ddrive-virtio-disk0,serial=3D1,discard=3Dunmap -device virtio-blk-pci,s=
-csi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Ddrive-virtio-disk0,id=3Dvirtio-dis=
-k0,bootindex=3D1 -netdev tap,fd=3D26,id=3Dhostnet0,vhost=3Don,vhostfd=3D28 =
--device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D54:52:c0:a7:c8:02,=
-bus=3Dpci.0,addr=3D0x2 -chardev pty,id=3Dcharserial0 -device isa-serial,cha=
-rdev=3Dcharserial0,id=3Dserial0 -chardev socket,id=3Dcharchannel0,path=3D/v=
-ar/lib/libvirt/qemu/channel/target/domain-5-12ed9230-vm-el73/org.qemu.guest=
-_agent.0,server,nowait -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1=
-,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu.guest_agent.0 -object=
- rng-random,id=3Dobjrng0,filename=3D/dev/random -device virtio-rng-pci,rng=
-=3Dobjrng0,id=3Drng0,bus=3Dpci.0,addr=3D0x9 -msg timestamp=3Don
-  2017-02-16T15:14:45.840412Z qemu-custom: -chardev pty,id=3Dcharserial0: c=
-har device redirected to /dev/pts/2 (label charserial0)
-  qemu-custom: /root/qemu/target/i386/kvm.c:1849: kvm_put_msrs: Assertion `=
-ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
-
-  =
-
-  The CPU flags in the Westmere guest:
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush mmx fxsr sse sse2 syscall nx lm constant_tsc rep_good nopl =
-pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 x2apic popcnt aes hypervisor lah=
-f_lm arat tpr_shadow vnmi flexpriority ept vpid
-
-  The guest kernel is 3.10.0-514.2.2.el7.x86_64.
-
-  The CPU flags of the host(Broadwell): =
-
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb =
-rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology no=
-nstop_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx smx e=
-st tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt=
- tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch epb=
- intel_pt tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hl=
-e avx2 smep bmi2 erms invpcid rtm mpx rdseed adx smap clflushopt xsaveopt x=
-savec xgetbv1 xsaves dtherm ida arat pln pts hwp hwp_notify hwp_act_window =
-hwp_epp
-
-  qemu command on the host - Broadwell(which works):
-  /usr/bin/qemu-kvm -name 4ffcd448-vm-el73,debug-threads=3Don -S -machine p=
-c-i440fx-2.6,accel=3Dkvm,usb=3Doff -cpu Westmere,+x2apic,+vmx,+vme -m 4096 =
--realtime mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -object ioth=
-read,id=3Diothread1 -uuid 8cc0a2cf-d25a-4014-acdb-f159c376a532 -nographic -=
-no-user-config -nodefaults -chardev socket,id=3Dcharmonitor,path=3D/var/lib=
-/libvirt/qemu/domain-4-4ffcd448-vm-el73/monitor.sock,server,nowait -mon cha=
-rdev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc -no-shutdown=
- -boot menu=3Doff,strict=3Don -device virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.=
-0,addr=3D0x3 -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=
-=3D0x4 -drive file=3D/home/ngoldin/src/nvgoldin.github.com/lago-init-files/=
-.lago/flags-tests/default/images/vm-el73_root.qcow2,format=3Dqcow2,if=3Dnon=
-e,id=3Ddrive-virtio-disk0,serial=3D1,discard=3Dunmap -device virtio-blk-pci=
-,scsi=3Doff,bus=3Dpci.0,addr=3D0x5,drive=3Ddrive-virtio-disk0,id=3Dvirtio-d=
-isk0,bootindex=3D1 -drive file=3D/home/ngoldin/src/nvgoldin.github.com/lago=
--init-files/.lago/flags-tests/default/images/vm-el73_additonal.qcow2,format=
-=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0,serial=3D2,discard=3Dunmap -devic=
-e scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,drive=3Ddrive-scsi0=
--0-0-0,id=3Dscsi0-0-0-0,bootindex=3D2 -netdev tap,fd=3D29,id=3Dhostnet0,vho=
-st=3Don,vhostfd=3D31 -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=
-=3D54:52:c0:a8:c9:02,bus=3Dpci.0,addr=3D0x2 -chardev pty,id=3Dcharserial0 -=
-device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev socket,id=3Dc=
-harchannel0,path=3D/var/lib/libvirt/qemu/channel/target/domain-4-4ffcd448-v=
-m-el73/org.qemu.guest_agent.0,server,nowait -device virtserialport,bus=3Dvi=
-rtio-serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu.=
-guest_agent.0 -object rng-random,id=3Dobjrng0,filename=3D/dev/random -devic=
-e virtio-rng-pci,rng=3Dobjrng0,id=3Drng0,bus=3Dpci.0,addr=3D0x9 -msg timest=
-amp=3Don
-
-  On the Broadwell host I'm using a distribution package if it matters
-  (qemu-kvm-2.6.2-5.fc24.x86_64 and 4.8.15-200.fc24.x86_64)
-
-  As the error indicates, I think this assertion was put in:
-  commit 48e1a45c3166d659f781171a47dabf4a187ed7a5
-  Author: Paolo Bonzini <pbonzini@redhat.com>
-  Date:   Wed Mar 30 22:55:29 2016 +0200
-
-      target-i386: assert that KVM_GET/SET_MSRS can set all requested MSRs
-      =
-
-      This would have caught the bug in the previous patch.
-      =
-
-      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-  I tried going back one commit before to 273c515, and then the error is go=
-ne and the nested guest comes up as expected. If I try to run with head at =
-the above commit(48e145c) the error output is slightly different, though it=
- looks the same:
-  /root/qemu/target-i386/kvm.c:1713: kvm_put_msrs: Assertion `ret =3D=3D n'=
- failed.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1665389/+subscriptions
+thanks
+-- PMM
