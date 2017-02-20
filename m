@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40361)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cft2Z-0006mD-S9
+	(envelope-from <dgilbert@redhat.com>) id 1cft2a-0006mE-Fn
 	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:50:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cft2X-0002RN-Ri
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:50:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56322)
+	(envelope-from <dgilbert@redhat.com>) id 1cft2Z-0002S5-5T
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:50:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57174)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cft2X-0002Qu-IU
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:50:25 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cft2Y-0002Re-Sc
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:50:27 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon, 20 Feb 2017 18:50:16 +0000
-Message-Id: <20170220185020.774-2-dgilbert@redhat.com>
+Date: Mon, 20 Feb 2017 18:50:17 +0000
+Message-Id: <20170220185020.774-3-dgilbert@redhat.com>
 In-Reply-To: <20170220185020.774-1-dgilbert@redhat.com>
 References: <20170220185020.774-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 1/5] slirp: VMState conversion; tcpcb
+Subject: [Qemu-devel] [PATCH v4 2/5] slirp: VMStatify sbuf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,228 +28,186 @@ Cc: quintela@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Convert the migration of the struct tcpcb to use a VMStateDescription,
-the rest of it will come later.
-
-Mostly mechanical, except for conversion of some 'char' to uint8_t
-to ensure portability.
+Convert the sbuf structure to a VMStateDescription.
+Note this uses the VMSTATE_WITH_TMP mechanism to calculate
+and reload the offsets based on the pointers.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
+Acked-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/slirp.c   | 149 ++++++++++++++++++++------------------------------------
- slirp/tcp_var.h |   6 +--
- 2 files changed, 57 insertions(+), 98 deletions(-)
+ slirp/sbuf.h  |   4 +-
+ slirp/slirp.c | 116 ++++++++++++++++++++++++++++++++++++++--------------------
+ 2 files changed, 78 insertions(+), 42 deletions(-)
 
+diff --git a/slirp/sbuf.h b/slirp/sbuf.h
+index efcec39..a722ecb 100644
+--- a/slirp/sbuf.h
++++ b/slirp/sbuf.h
+@@ -12,8 +12,8 @@
+ #define sbspace(sb) ((sb)->sb_datalen - (sb)->sb_cc)
+ 
+ struct sbuf {
+-	u_int	sb_cc;		/* actual chars in buffer */
+-	u_int	sb_datalen;	/* Length of data  */
++	uint32_t sb_cc;		/* actual chars in buffer */
++	uint32_t sb_datalen;	/* Length of data  */
+ 	char	*sb_wptr;	/* write pointer. points to where the next
+ 				 * bytes should be written in the sbuf */
+ 	char	*sb_rptr;	/* read pointer. points to where the next
 diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 60539de..276d8cb 100644
+index 276d8cb..178c2b6 100644
 --- a/slirp/slirp.c
 +++ b/slirp/slirp.c
-@@ -1129,53 +1129,62 @@ void slirp_socket_recv(Slirp *slirp, struct in_addr guest_addr, int guest_port,
-         tcp_output(sototcpcb(so));
- }
+@@ -1185,19 +1185,72 @@ static const VMStateDescription vmstate_slirp_tcp = {
+     }
+ };
  
--static void slirp_tcp_save(QEMUFile *f, struct tcpcb *tp)
-+static int slirp_tcp_post_load(void *opaque, int version)
+-static void slirp_sbuf_save(QEMUFile *f, struct sbuf *sbuf)
++/* The sbuf has a pair of pointers that are migrated as offsets;
++ * we calculate the offsets and restore the pointers using
++ * pre_save/post_load on a tmp structure.
++ */
++struct sbuf_tmp {
++    struct sbuf *parent;
++    uint32_t roff, woff;
++};
++
++static void sbuf_tmp_pre_save(void *opaque)
++{
++    struct sbuf_tmp *tmp = opaque;
++    tmp->woff = tmp->parent->sb_wptr - tmp->parent->sb_data;
++    tmp->roff = tmp->parent->sb_rptr - tmp->parent->sb_data;
++}
++
++static int sbuf_tmp_post_load(void *opaque, int version)
  {
--    int i;
-+    tcp_template((struct tcpcb *)opaque);
- 
--    qemu_put_sbe16(f, tp->t_state);
--    for (i = 0; i < TCPT_NTIMERS; i++)
--        qemu_put_sbe16(f, tp->t_timer[i]);
--    qemu_put_sbe16(f, tp->t_rxtshift);
--    qemu_put_sbe16(f, tp->t_rxtcur);
--    qemu_put_sbe16(f, tp->t_dupacks);
--    qemu_put_be16(f, tp->t_maxseg);
--    qemu_put_sbyte(f, tp->t_force);
--    qemu_put_be16(f, tp->t_flags);
--    qemu_put_be32(f, tp->snd_una);
--    qemu_put_be32(f, tp->snd_nxt);
--    qemu_put_be32(f, tp->snd_up);
--    qemu_put_be32(f, tp->snd_wl1);
--    qemu_put_be32(f, tp->snd_wl2);
--    qemu_put_be32(f, tp->iss);
--    qemu_put_be32(f, tp->snd_wnd);
--    qemu_put_be32(f, tp->rcv_wnd);
--    qemu_put_be32(f, tp->rcv_nxt);
--    qemu_put_be32(f, tp->rcv_up);
--    qemu_put_be32(f, tp->irs);
--    qemu_put_be32(f, tp->rcv_adv);
--    qemu_put_be32(f, tp->snd_max);
--    qemu_put_be32(f, tp->snd_cwnd);
--    qemu_put_be32(f, tp->snd_ssthresh);
--    qemu_put_sbe16(f, tp->t_idle);
--    qemu_put_sbe16(f, tp->t_rtt);
--    qemu_put_be32(f, tp->t_rtseq);
--    qemu_put_sbe16(f, tp->t_srtt);
--    qemu_put_sbe16(f, tp->t_rttvar);
--    qemu_put_be16(f, tp->t_rttmin);
--    qemu_put_be32(f, tp->max_sndwnd);
--    qemu_put_byte(f, tp->t_oobflags);
--    qemu_put_byte(f, tp->t_iobc);
--    qemu_put_sbe16(f, tp->t_softerror);
--    qemu_put_byte(f, tp->snd_scale);
--    qemu_put_byte(f, tp->rcv_scale);
--    qemu_put_byte(f, tp->request_r_scale);
--    qemu_put_byte(f, tp->requested_s_scale);
--    qemu_put_be32(f, tp->ts_recent);
--    qemu_put_be32(f, tp->ts_recent_age);
--    qemu_put_be32(f, tp->last_ack_sent);
+-    uint32_t off;
+-
+-    qemu_put_be32(f, sbuf->sb_cc);
+-    qemu_put_be32(f, sbuf->sb_datalen);
+-    off = (uint32_t)(sbuf->sb_wptr - sbuf->sb_data);
+-    qemu_put_sbe32(f, off);
+-    off = (uint32_t)(sbuf->sb_rptr - sbuf->sb_data);
+-    qemu_put_sbe32(f, off);
+-    qemu_put_buffer(f, (unsigned char*)sbuf->sb_data, sbuf->sb_datalen);
++    struct sbuf_tmp *tmp = opaque;
++    uint32_t requested_len = tmp->parent->sb_datalen;
++
++    /* Allocate the buffer space used by the field after the tmp */
++    sbreserve(tmp->parent, tmp->parent->sb_datalen);
++
++    if (tmp->parent->sb_datalen != requested_len) {
++        return -ENOMEM;
++    }
++    if (tmp->woff >= requested_len ||
++        tmp->roff >= requested_len) {
++        error_report("invalid sbuf offsets r/w=%u/%u len=%u",
++                     tmp->roff, tmp->woff, requested_len);
++        return -EINVAL;
++    }
++
++    tmp->parent->sb_wptr = tmp->parent->sb_data + tmp->woff;
++    tmp->parent->sb_rptr = tmp->parent->sb_data + tmp->roff;
++
 +    return 0;
  }
  
-+static const VMStateDescription vmstate_slirp_tcp = {
-+    .name = "slirp-tcp",
++
++static const VMStateDescription vmstate_slirp_sbuf_tmp = {
++    .name = "slirp-sbuf-tmp",
++    .post_load = sbuf_tmp_post_load,
++    .pre_save  = sbuf_tmp_pre_save,
 +    .version_id = 0,
-+    .post_load = slirp_tcp_post_load,
 +    .fields = (VMStateField[]) {
-+        VMSTATE_INT16(t_state, struct tcpcb),
-+        VMSTATE_INT16_ARRAY(t_timer, struct tcpcb, TCPT_NTIMERS),
-+        VMSTATE_INT16(t_rxtshift, struct tcpcb),
-+        VMSTATE_INT16(t_rxtcur, struct tcpcb),
-+        VMSTATE_INT16(t_dupacks, struct tcpcb),
-+        VMSTATE_UINT16(t_maxseg, struct tcpcb),
-+        VMSTATE_UINT8(t_force, struct tcpcb),
-+        VMSTATE_UINT16(t_flags, struct tcpcb),
-+        VMSTATE_UINT32(snd_una, struct tcpcb),
-+        VMSTATE_UINT32(snd_nxt, struct tcpcb),
-+        VMSTATE_UINT32(snd_up, struct tcpcb),
-+        VMSTATE_UINT32(snd_wl1, struct tcpcb),
-+        VMSTATE_UINT32(snd_wl2, struct tcpcb),
-+        VMSTATE_UINT32(iss, struct tcpcb),
-+        VMSTATE_UINT32(snd_wnd, struct tcpcb),
-+        VMSTATE_UINT32(rcv_wnd, struct tcpcb),
-+        VMSTATE_UINT32(rcv_nxt, struct tcpcb),
-+        VMSTATE_UINT32(rcv_up, struct tcpcb),
-+        VMSTATE_UINT32(irs, struct tcpcb),
-+        VMSTATE_UINT32(rcv_adv, struct tcpcb),
-+        VMSTATE_UINT32(snd_max, struct tcpcb),
-+        VMSTATE_UINT32(snd_cwnd, struct tcpcb),
-+        VMSTATE_UINT32(snd_ssthresh, struct tcpcb),
-+        VMSTATE_INT16(t_idle, struct tcpcb),
-+        VMSTATE_INT16(t_rtt, struct tcpcb),
-+        VMSTATE_UINT32(t_rtseq, struct tcpcb),
-+        VMSTATE_INT16(t_srtt, struct tcpcb),
-+        VMSTATE_INT16(t_rttvar, struct tcpcb),
-+        VMSTATE_UINT16(t_rttmin, struct tcpcb),
-+        VMSTATE_UINT32(max_sndwnd, struct tcpcb),
-+        VMSTATE_UINT8(t_oobflags, struct tcpcb),
-+        VMSTATE_UINT8(t_iobc, struct tcpcb),
-+        VMSTATE_INT16(t_softerror, struct tcpcb),
-+        VMSTATE_UINT8(snd_scale, struct tcpcb),
-+        VMSTATE_UINT8(rcv_scale, struct tcpcb),
-+        VMSTATE_UINT8(request_r_scale, struct tcpcb),
-+        VMSTATE_UINT8(requested_s_scale, struct tcpcb),
-+        VMSTATE_UINT32(ts_recent, struct tcpcb),
-+        VMSTATE_UINT32(ts_recent_age, struct tcpcb),
-+        VMSTATE_UINT32(last_ack_sent, struct tcpcb),
++        VMSTATE_UINT32(woff, struct sbuf_tmp),
++        VMSTATE_UINT32(roff, struct sbuf_tmp),
 +        VMSTATE_END_OF_LIST()
 +    }
 +};
 +
- static void slirp_sbuf_save(QEMUFile *f, struct sbuf *sbuf)
++static const VMStateDescription vmstate_slirp_sbuf = {
++    .name = "slirp-sbuf",
++    .version_id = 0,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32(sb_cc, struct sbuf),
++        VMSTATE_UINT32(sb_datalen, struct sbuf),
++        VMSTATE_WITH_TMP(struct sbuf, struct sbuf_tmp, vmstate_slirp_sbuf_tmp),
++        VMSTATE_VBUFFER_UINT32(sb_data, struct sbuf, 0, NULL, sb_datalen),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++
+ static void slirp_socket_save(QEMUFile *f, struct socket *so)
  {
-     uint32_t off;
-@@ -1218,7 +1227,7 @@ static void slirp_socket_save(QEMUFile *f, struct socket *so)
+     qemu_put_be32(f, so->so_urgc);
+@@ -1225,8 +1278,9 @@ static void slirp_socket_save(QEMUFile *f, struct socket *so)
+     qemu_put_byte(f, so->so_emu);
+     qemu_put_byte(f, so->so_type);
      qemu_put_be32(f, so->so_state);
-     slirp_sbuf_save(f, &so->so_rcv);
-     slirp_sbuf_save(f, &so->so_snd);
--    slirp_tcp_save(f, so->so_tcpcb);
-+    vmstate_save_state(f, &vmstate_slirp_tcp, so->so_tcpcb, 0);
+-    slirp_sbuf_save(f, &so->so_rcv);
+-    slirp_sbuf_save(f, &so->so_snd);
++    /* TODO: Build vmstate at this level */
++    vmstate_save_state(f, &vmstate_slirp_sbuf, &so->so_rcv, 0);
++    vmstate_save_state(f, &vmstate_slirp_sbuf, &so->so_snd, 0);
+     vmstate_save_state(f, &vmstate_slirp_tcp, so->so_tcpcb, 0);
  }
  
- static void slirp_bootp_save(QEMUFile *f, Slirp *slirp)
-@@ -1254,54 +1263,6 @@ static void slirp_state_save(QEMUFile *f, void *opaque)
+@@ -1263,31 +1317,9 @@ static void slirp_state_save(QEMUFile *f, void *opaque)
      slirp_bootp_save(f, slirp);
  }
  
--static void slirp_tcp_load(QEMUFile *f, struct tcpcb *tp)
+-static int slirp_sbuf_load(QEMUFile *f, struct sbuf *sbuf)
 -{
--    int i;
+-    uint32_t off, sb_cc, sb_datalen;
 -
--    tp->t_state = qemu_get_sbe16(f);
--    for (i = 0; i < TCPT_NTIMERS; i++)
--        tp->t_timer[i] = qemu_get_sbe16(f);
--    tp->t_rxtshift = qemu_get_sbe16(f);
--    tp->t_rxtcur = qemu_get_sbe16(f);
--    tp->t_dupacks = qemu_get_sbe16(f);
--    tp->t_maxseg = qemu_get_be16(f);
--    tp->t_force = qemu_get_sbyte(f);
--    tp->t_flags = qemu_get_be16(f);
--    tp->snd_una = qemu_get_be32(f);
--    tp->snd_nxt = qemu_get_be32(f);
--    tp->snd_up = qemu_get_be32(f);
--    tp->snd_wl1 = qemu_get_be32(f);
--    tp->snd_wl2 = qemu_get_be32(f);
--    tp->iss = qemu_get_be32(f);
--    tp->snd_wnd = qemu_get_be32(f);
--    tp->rcv_wnd = qemu_get_be32(f);
--    tp->rcv_nxt = qemu_get_be32(f);
--    tp->rcv_up = qemu_get_be32(f);
--    tp->irs = qemu_get_be32(f);
--    tp->rcv_adv = qemu_get_be32(f);
--    tp->snd_max = qemu_get_be32(f);
--    tp->snd_cwnd = qemu_get_be32(f);
--    tp->snd_ssthresh = qemu_get_be32(f);
--    tp->t_idle = qemu_get_sbe16(f);
--    tp->t_rtt = qemu_get_sbe16(f);
--    tp->t_rtseq = qemu_get_be32(f);
--    tp->t_srtt = qemu_get_sbe16(f);
--    tp->t_rttvar = qemu_get_sbe16(f);
--    tp->t_rttmin = qemu_get_be16(f);
--    tp->max_sndwnd = qemu_get_be32(f);
--    tp->t_oobflags = qemu_get_byte(f);
--    tp->t_iobc = qemu_get_byte(f);
--    tp->t_softerror = qemu_get_sbe16(f);
--    tp->snd_scale = qemu_get_byte(f);
--    tp->rcv_scale = qemu_get_byte(f);
--    tp->request_r_scale = qemu_get_byte(f);
--    tp->requested_s_scale = qemu_get_byte(f);
--    tp->ts_recent = qemu_get_be32(f);
--    tp->ts_recent_age = qemu_get_be32(f);
--    tp->last_ack_sent = qemu_get_be32(f);
--    tcp_template(tp);
--}
+-    sb_cc = qemu_get_be32(f);
+-    sb_datalen = qemu_get_be32(f);
 -
- static int slirp_sbuf_load(QEMUFile *f, struct sbuf *sbuf)
- {
-     uint32_t off, sb_cc, sb_datalen;
-@@ -1367,9 +1328,7 @@ static int slirp_socket_load(QEMUFile *f, struct socket *so, int version_id)
-         return -ENOMEM;
-     if (slirp_sbuf_load(f, &so->so_snd) < 0)
-         return -ENOMEM;
--    slirp_tcp_load(f, so->so_tcpcb);
+-    sbreserve(sbuf, sb_datalen);
+-
+-    if (sbuf->sb_datalen != sb_datalen)
+-        return -ENOMEM;
+-
+-    sbuf->sb_cc = sb_cc;
+-
+-    off = qemu_get_sbe32(f);
+-    sbuf->sb_wptr = sbuf->sb_data + off;
+-    off = qemu_get_sbe32(f);
+-    sbuf->sb_rptr = sbuf->sb_data + off;
+-    qemu_get_buffer(f, (unsigned char*)sbuf->sb_data, sbuf->sb_datalen);
 -
 -    return 0;
-+    return vmstate_load_state(f, &vmstate_slirp_tcp, so->so_tcpcb, 0);
+-}
+-
+ static int slirp_socket_load(QEMUFile *f, struct socket *so, int version_id)
+ {
++    int ret = 0;
+     if (tcp_attach(so) < 0)
+         return -ENOMEM;
+ 
+@@ -1324,11 +1356,15 @@ static int slirp_socket_load(QEMUFile *f, struct socket *so, int version_id)
+     so->so_emu = qemu_get_byte(f);
+     so->so_type = qemu_get_byte(f);
+     so->so_state = qemu_get_be32(f);
+-    if (slirp_sbuf_load(f, &so->so_rcv) < 0)
+-        return -ENOMEM;
+-    if (slirp_sbuf_load(f, &so->so_snd) < 0)
+-        return -ENOMEM;
+-    return vmstate_load_state(f, &vmstate_slirp_tcp, so->so_tcpcb, 0);
++    /* TODO: VMState at this level */
++    ret = vmstate_load_state(f, &vmstate_slirp_sbuf, &so->so_rcv, 0);
++    if (!ret) {
++        ret = vmstate_load_state(f, &vmstate_slirp_sbuf, &so->so_snd, 0);
++    }
++    if (!ret) {
++        ret = vmstate_load_state(f, &vmstate_slirp_tcp, so->so_tcpcb, 0);
++    }
++    return ret;
  }
  
  static void slirp_bootp_load(QEMUFile *f, Slirp *slirp)
-diff --git a/slirp/tcp_var.h b/slirp/tcp_var.h
-index 0f8f187..895ef6d 100644
---- a/slirp/tcp_var.h
-+++ b/slirp/tcp_var.h
-@@ -48,7 +48,7 @@ struct tcpcb {
- 	short	t_rxtcur;		/* current retransmit value */
- 	short	t_dupacks;		/* consecutive dup acks recd */
- 	u_short	t_maxseg;		/* maximum segment size */
--	char	t_force;		/* 1 if forcing out a byte */
-+	uint8_t t_force;		/* 1 if forcing out a byte */
- 	u_short	t_flags;
- #define	TF_ACKNOW	0x0001		/* ack peer immediately */
- #define	TF_DELACK	0x0002		/* ack, but try to delay it */
-@@ -109,8 +109,8 @@ struct tcpcb {
- 	uint32_t max_sndwnd;		/* largest window peer has offered */
- 
- /* out-of-band data */
--	char	t_oobflags;		/* have some */
--	char	t_iobc;			/* input character */
-+	uint8_t	t_oobflags;		/* have some */
-+	uint8_t	t_iobc;			/* input character */
- #define	TCPOOB_HAVEDATA	0x01
- #define	TCPOOB_HADDATA	0x02
- 	short	t_softerror;		/* possible error not yet reported */
 -- 
 2.9.3
