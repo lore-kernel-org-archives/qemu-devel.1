@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cfeX6-0000yW-Th
-	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 22:21:02 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cfekP-0003Rb-Vt
+	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 22:34:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cfeX3-0003RK-Mw
-	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 22:21:00 -0500
-Resent-Message-Id: <E1cfeX3-0003RK-Mw@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21433)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cfeX3-0003Qq-G2
-	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 22:20:57 -0500
-In-Reply-To: <20170220111716.10471-1-xiong.y.zhang@intel.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148756082246.30.9905794325202397837@0e2666bad730>
+	(envelope-from <jasowang@redhat.com>) id 1cfekM-0007rH-Sk
+	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 22:34:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35968)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cfekM-0007qw-Nh
+	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 22:34:42 -0500
+References: <1487299994-98348-1-git-send-email-zhang.zhanghailiang@huawei.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <cc504369-ca7c-f654-1110-5f64ee0a4fb4@redhat.com>
+Date: Mon, 20 Feb 2017 11:34:35 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 19 Feb 2017 19:20:23 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] vfio/pci-quirks.c: Disable stolen memory
- for igd VFIO
+In-Reply-To: <1487299994-98348-1-git-send-email-zhang.zhanghailiang@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] colo-compare: fix some bugs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,118 +26,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: xiong.y.zhang@intel.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, jike.song@intel.com, zhiyuan.lv@intel.com, zhi.a.wang@intel.com
+To: zhanghailiang <zhang.zhanghailiang@huawei.com>, zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com
+Cc: qemu-devel@nongnu.org, xuquan8@huawei.com, pss.wulizhen@huawei.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIHZmaW8vcGNpLXF1aXJrcy5jOiBEaXNhYmxlIHN0
-b2xlbiBtZW1vcnkgZm9yIGlnZCBWRklPCk1lc3NhZ2UtaWQ6IDIwMTcwMjIwMTExNzE2LjEwNDcx
-LTEteGlvbmcueS56aGFuZ0BpbnRlbC5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEv
-YmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4u
-IHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1
-ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9y
-IGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQo
-Z2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1m
-b3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4K
-ICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUK
-CmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTlj
-MjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9w
-YXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTcwMjIw
-MTExNzE2LjEwNDcxLTEteGlvbmcueS56aGFuZ0BpbnRlbC5jb20gLT4gcGF0Y2hldy8yMDE3MDIy
-MDExMTcxNi4xMDQ3MS0xLXhpb25nLnkuemhhbmdAaW50ZWwuY29tClN3aXRjaGVkIHRvIGEgbmV3
-IGJyYW5jaCAndGVzdCcKZjUzM2RjMyB2ZmlvL3BjaS1xdWlya3MuYzogRGlzYWJsZSBzdG9sZW4g
-bWVtb3J5IGZvciBpZ2QgVkZJTwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0gg
-MS8xOiB2ZmlvL3BjaS1xdWlya3MuYzogRGlzYWJsZSBzdG9sZW4gbWVtb3J5IGZvciBpZ2QgVkZJ
-Ty4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzODogRklMRTog
-aHcvdmZpby9wY2ktcXVpcmtzLmM6MTM3MDoKK15JLyogVGhpcyBtdXN0IGJlIGFuIEludGVsIFZH
-QSBkZXZpY2UuICovJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwoj
-Mzk6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjEzNzE6CiteSWlmICghdmZpb19wY2lfaXMo
-dmRldiwgUENJX1ZFTkRPUl9JRF9JTlRFTCwgUENJX0FOWV9JRCkgfHwkCgpFUlJPUjogYnJhY2Vz
-IHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMzOTogRklM
-RTogaHcvdmZpby9wY2ktcXVpcmtzLmM6MTM3MToKKwlpZiAoIXZmaW9fcGNpX2lzKHZkZXYsIFBD
-SV9WRU5ET1JfSURfSU5URUwsIFBDSV9BTllfSUQpIHx8ClsuLi5dCgpFUlJPUjogY29kZSBpbmRl
-bnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0MDogRklMRTogaHcvdmZpby9wY2ktcXVpcmtzLmM6
-MTM3MjoKK15JXkkhdmZpb19pc192Z2EodmRldikgfHwgbnIgIT0gNCkkCgpFUlJPUjogY29kZSBp
-bmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0MTogRklMRTogaHcvdmZpby9wY2ktcXVpcmtz
-LmM6MTM3MzoKK15JXklyZXR1cm47JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1
-c2UgdGFicwojNDM6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjEzNzU6CiteSS8qJAoKRVJS
-T1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDQ6IEZJTEU6IGh3L3ZmaW8v
-cGNpLXF1aXJrcy5jOjEzNzY6CiteSSAqIElHRCBpcyBub3QgYSBzdGFuZGFyZCwgdGhleSBsaWtl
-IHRvIGNoYW5nZSB0aGVpciBzcGVjcyBvZnRlbi4gIFdlJAoKRVJST1I6IGNvZGUgaW5kZW50IHNo
-b3VsZCBuZXZlciB1c2UgdGFicwojNDU6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjEzNzc6
-CiteSSAqIG9ubHkgYXR0ZW1wdCB0byBzdXBwb3J0IGJhY2sgdG8gU2FuZEJyaWRnZSBhbmQgd2Ug
-aG9wZSB0aGF0IG5ld2VyJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFi
-cwojNDY6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjEzNzg6CiteSSAqIGRldmljZXMgbWFp
-bnRhaW4gY29tcGF0aWJpbGl0eSB3aXRoIGdlbmVyYXRpb24gOC4kCgpFUlJPUjogY29kZSBpbmRl
-bnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0NzogRklMRTogaHcvdmZpby9wY2ktcXVpcmtzLmM6
-MTM3OToKK15JICovJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwoj
-NDg6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjEzODA6CiteSWdlbiA9IGlnZF9nZW4odmRl
-dik7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDk6IEZJTEU6
-IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjEzODE6CiteSWlmIChnZW4gIT0gNiAmJiBnZW4gIT0gOCkg
-eyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzUwOiBGSUxFOiBo
-dy92ZmlvL3BjaS1xdWlya3MuYzoxMzgyOgorXkleSWVycm9yX3JlcG9ydCgiSUdEIGRldmljZSAl
-cyBpcyB1bnN1cHBvcnRlZCBpbiBsZWdhY3kgbW9kZSwgIiQKCkVSUk9SOiBjb2RlIGluZGVudCBz
-aG91bGQgbmV2ZXIgdXNlIHRhYnMKIzUxOiBGSUxFOiBody92ZmlvL3BjaS1xdWlya3MuYzoxMzgz
-OgorXkleSV5JICAgICAidHJ5IFNhbmR5QnJpZGdlIG9yIG5ld2VyIiwgdmRldi0+dmJhc2VkZXYu
-bmFtZSk7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNTI6IEZJ
-TEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjEzODQ6CiteSV5JcmV0dXJuOyQKCkVSUk9SOiBjb2Rl
-IGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzUzOiBGSUxFOiBody92ZmlvL3BjaS1xdWly
-a3MuYzoxMzg1OgorXkl9JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFi
-cwojNTQ6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjEzODY6CiteSS8qJAoKRVJST1I6IGNv
-ZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNTU6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1
-aXJrcy5jOjEzODc6CiteSSAqIElmIHRoaXMgaXNuJ3QgYXQgYWRkcmVzcyAwMDowMi4wLCBiaW9z
-IHdvbid0IHJlc2VydiBzdG9sZW4kCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVz
-ZSB0YWJzCiM1NjogRklMRTogaHcvdmZpby9wY2ktcXVpcmtzLmM6MTM4ODoKK15JICogbWVtb3J5
-IGluIEU4MjAsIHRoZW4gb3RoZXJzIGNvdWxkIHVzZSBzdG9sZW4gbWVtb3J5LiBJZiBndWVzdCQK
-CkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzU3OiBGSUxFOiBody92
-ZmlvL3BjaS1xdWlya3MuYzoxMzg5OgorXkkgKiBncmFwaGljIGRyaXZlciBzdGlsbCB1c2Ugc3Rv
-bGVuIG1lbW9yeSwgc3lzdGVtIG1heWJlIGhhbmcuJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3Vs
-ZCBuZXZlciB1c2UgdGFicwojNTg6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjEzOTA6Cite
-SSAqIHNvIHdlIHNldCBzdG9sZW4gbWVtb3J5IHNpemUgdG8gMCBhbmQgZ3Vlc3QgZ3JhcGhpYyBk
-cml2ZXIgd29uJ3QkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM1
-OTogRklMRTogaHcvdmZpby9wY2ktcXVpcmtzLmM6MTM5MToKK15JICogdXNlIHN0b2xlbiBtZW1v
-cnkuJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNjA6IEZJTEU6
-IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjEzOTI6CiteSSAqLyQKCkVSUk9SOiBjb2RlIGluZGVudCBz
-aG91bGQgbmV2ZXIgdXNlIHRhYnMKIzYxOiBGSUxFOiBody92ZmlvL3BjaS1xdWlya3MuYzoxMzkz
-OgorXklnbWNoID0gdmZpb19wY2lfcmVhZF9jb25maWcoJnZkZXYtPnBkZXYsIElHRF9HTUNILCA0
-KTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM2MjogRklMRTog
-aHcvdmZpby9wY2ktcXVpcmtzLmM6MTM5NDoKK15JZ21jaCAmPSB+KChnZW4gPCA4ID8gMHgxZiA6
-IDB4ZmYpIDw8IChnZW4gPCA4ID8gMyA6IDgpKTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxk
-IG5ldmVyIHVzZSB0YWJzCiM2NDogRklMRTogaHcvdmZpby9wY2ktcXVpcmtzLmM6MTM5NjoKK15J
-LyogR01DSCBpcyByZWFkLW9ubHksIGVtdWxhdGVkICovJAoKRVJST1I6IGNvZGUgaW5kZW50IHNo
-b3VsZCBuZXZlciB1c2UgdGFicwojNjU6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjEzOTc6
-CiteSXBjaV9zZXRfbG9uZyh2ZGV2LT5wZGV2LmNvbmZpZyArIElHRF9HTUNILCBnbWNoKTskCgpF
-UlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM2NjogRklMRTogaHcvdmZp
-by9wY2ktcXVpcmtzLmM6MTM5ODoKK15JcGNpX3NldF9sb25nKHZkZXYtPnBkZXYud21hc2sgKyBJ
-R0RfR01DSCwgMCk7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwoj
-Njc6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjEzOTk6CiteSXBjaV9zZXRfbG9uZyh2ZGV2
-LT5lbXVsYXRlZF9jb25maWdfYml0cyArIElHRF9HTUNILCB+MCk7JAoKRVJST1I6IGNvZGUgaW5k
-ZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNjk6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5j
-OjE0MDE6CiteSS8qJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwoj
-NzA6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjE0MDI6CiteSSAqIFRoaXMgbXVzdCBiZSBh
-dCBhZGRyZXNzIDAwOjAyLjAgZm9yIHVzIHRvIGV2ZW4gb25zaWRlciBlbmFibGluZyQKCkVSUk9S
-OiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzcxOiBGSUxFOiBody92ZmlvL3Bj
-aS1xdWlya3MuYzoxNDAzOgorXkkgKiBsZWdhY3kgbW9kZS4gIFRoZSB2QklPUyBoYXMgZGVwZW5k
-ZW5jaWVzIG9uIHRoZSBQQ0kgYnVzIGFkZHJlc3MuJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3Vs
-ZCBuZXZlciB1c2UgdGFicwojNzI6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjE0MDQ6Cite
-SSAqLyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzczOiBGSUxF
-OiBody92ZmlvL3BjaS1xdWlya3MuYzoxNDA1OgorXklpZiAoJnZkZXYtPnBkZXYgIT0gcGNpX2Zp
-bmRfZGV2aWNlKHBjaV9kZXZpY2Vfcm9vdF9idXMoJnZkZXYtPnBkZXYpLCQKCkVSUk9SOiBicmFj
-ZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzczOiBG
-SUxFOiBody92ZmlvL3BjaS1xdWlya3MuYzoxNDA1OgorCWlmICgmdmRldi0+cGRldiAhPSBwY2lf
-ZmluZF9kZXZpY2UocGNpX2RldmljZV9yb290X2J1cygmdmRldi0+cGRldiksClsuLi5dCgpFUlJP
-UjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM3NDogRklMRTogaHcvdmZpby9w
-Y2ktcXVpcmtzLmM6MTQwNjoKK15JXkleSV5JXkkgICAwLCBQQ0lfREVWRk4oMHgyLCAwKSkpJAoK
-RVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNzU6IEZJTEU6IGh3L3Zm
-aW8vcGNpLXF1aXJrcy5jOjE0MDc6CiteSV5JcmV0dXJuOyQKCkVSUk9SOiBjb2RlIGluZGVudCBz
-aG91bGQgbmV2ZXIgdXNlIHRhYnMKIzExNzogRklMRTogaHcvdmZpby9wY2ktcXVpcmtzLmM6MTU1
-MjoKK15JXkleSXBjaV9zZXRfbG9uZyh2ZGV2LT5wZGV2LmNvbmZpZyArIElHRF9HTUNILCBnbWNo
-KTskCgp0b3RhbDogMzggZXJyb3JzLCAwIHdhcm5pbmdzLCAxMDUgbGluZXMgY2hlY2tlZAoKWW91
-ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpU
-ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
-b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
-eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+
+
+On 2017=E5=B9=B402=E6=9C=8817=E6=97=A5 10:53, zhanghailiang wrote:
+> This series includes two parts: codes optimization and bug fix.
+> patch 1 tries to move timer process into colo compare thread as
+> a new coroutine.
+> patch 2 ~ 4 fixe some bugs of colo compare.
+>
+> v2->v3:
+>   - change the definition of remove_fd_in_watch() instead of
+>     introducing a function (Marc-Andr=C3=A9 Lureau's suggestion)
+> v1->v2:
+>   - Squash patch 3 of last version into patch 2. (ZhangChen's suggestio=
+n)
+>
+> zhanghailiang (4):
+>    colo-compare: use g_timeout_source_new() to process the stale packet=
+s
+>    colo-compare: kick compare thread to exit after some cleanup in
+>      finalization
+>    char: remove the right fd been watched in qemu_chr_fe_set_handlers()
+>    colo-compare: Fix removing fds been watched incorrectly in
+>      finalization
+>
+>   chardev/char-fd.c     |   6 +--
+>   chardev/char-io.c     |   8 ++--
+>   chardev/char-io.h     |   2 +-
+>   chardev/char-pty.c    |   2 +-
+>   chardev/char-socket.c |   4 +-
+>   chardev/char-udp.c    |   6 +--
+>   chardev/char.c        |   2 +-
+>   net/colo-compare.c    | 115 ++++++++++++++++++++++++++---------------=
+---------
+>   8 files changed, 74 insertions(+), 71 deletions(-)
+>
+
+Applied, thanks.
