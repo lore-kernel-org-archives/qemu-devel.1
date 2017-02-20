@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43097)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cfv6Z-0006sD-Gw
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 16:02:44 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1cfvEr-0001tx-AI
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 16:11:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cfv6V-0005cu-Ie
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 16:02:43 -0500
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:34301)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cfv6V-0005co-Dx
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 16:02:39 -0500
-Received: by mail-qt0-x244.google.com with SMTP id x35so4782113qtc.1
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 13:02:39 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170220185020.774-1-dgilbert@redhat.com>
-	<20170220185020.774-4-dgilbert@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <131d13b5-a960-fc5c-4400-cafdf3f96245@amsat.org>
-Date: Mon, 20 Feb 2017 18:02:34 -0300
+	(envelope-from <alex.williamson@redhat.com>) id 1cfvCp-0007Pf-7H
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 16:11:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44124)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1cfvCo-0007PV-Tp
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 16:09:11 -0500
+Date: Mon, 20 Feb 2017 14:09:08 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170220140908.2057953b@t450s.home>
+In-Reply-To: <1487554087-15347-5-git-send-email-tianyu.lan@intel.com>
+References: <1487554087-15347-1-git-send-email-tianyu.lan@intel.com>
+	<1487554087-15347-5-git-send-email-tianyu.lan@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20170220185020.774-4-dgilbert@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 3/5] slirp: Common lhost/fhost union
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Resend RFC PATCH 4/4] VFIO: Read IOMMU fault info
+ from kernel space when get fault event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,64 +29,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com
-Cc: quintela@redhat.com
+To: Lan Tianyu <tianyu.lan@intel.com>
+Cc: qemu-devel@nongnu.org, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, peterx@redhat.com, david@gibson.dropbear.id.au, yi.l.liu@intel.com
 
-On 02/20/2017 03:50 PM, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> The socket structure has a pair of unions for lhost and fhost
-> addresses; the unions are identical so split them out into
-> a separate union declaration.
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On Mon, 20 Feb 2017 09:28:07 +0800
+Lan Tianyu <tianyu.lan@intel.com> wrote:
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
+> This patch is to implement fault event handler with new vfio cmd to
+> get fault info and notify vIOMMU device model.
+> 
+> Signed-off-by: Lan Tianyu <tianyu.lan@intel.com>
 > ---
->  slirp/socket.h | 18 ++++++++----------
->  1 file changed, 8 insertions(+), 10 deletions(-)
->
-> diff --git a/slirp/socket.h b/slirp/socket.h
-> index 8feed2a..c1be77e 100644
-> --- a/slirp/socket.h
-> +++ b/slirp/socket.h
-> @@ -15,6 +15,12 @@
->   * Our socket structure
->   */
->
-> +union slirp_sockaddr {
-> +    struct sockaddr_storage ss;
-> +    struct sockaddr_in sin;
-> +    struct sockaddr_in6 sin6;
+>  hw/vfio/common.c           | 51 ++++++++++++++++++++++++++++++++++++++++++++++
+>  linux-headers/linux/vfio.h | 22 ++++++++++++++++++++
+>  2 files changed, 73 insertions(+)
+> 
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 628b424..4f76e26 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -297,6 +297,57 @@ static bool vfio_listener_skipped_section(MemoryRegionSection *section)
+>  
+>  static void vfio_iommu_fault(void *opaque)
+>  {
+> +    VFIOContainer *container = opaque;
+> +    struct vfio_iommu_type1_get_fault_info *info;
+> +    struct vfio_iommu_fault_info *fault_info;
+> +    MemoryRegion *mr = container->space->as->root;
+> +    int count = 0, i, ret;
+> +    IOMMUFaultInfo tmp;
+> +
+> +    if (!event_notifier_test_and_clear(&container->fault_notifier)) {
+> +        return;
+> +    }
+> +
+> +    info = g_malloc0(sizeof(*info));
+> +    if (!info) {
+> +        error_report("vfio: Fail to allocate memory");
+> +        return;
+> +    }
+> +
+> +    info->argsz = sizeof(*info);
+> +
+> +    ret = ioctl(container->fd, VFIO_IOMMU_GET_FAULT_INFO, info);
+> +    if (ret && ret != -ENOSPC) {
+> +        error_report("vfio: Can't get fault info");
+> +        goto err_exit;
+> +    }
+> +
+> +    count = info->count;
+> +    if (count <= 0) {
+> +        goto err_exit;
+> +    }
+> +
+> +    info = g_realloc(info, sizeof(*info) + count * sizeof(*fault_info));
+> +    info->argsz = sizeof(*info) + count * sizeof(*fault_info);
+> +    fault_info = info->fault_info;
+> +
+> +    ret = ioctl(container->fd, VFIO_IOMMU_GET_FAULT_INFO, info);
+> +    if (ret) {
+> +        error_report("vfio: Can't get fault info");
+> +        goto err_exit;
+> +    }
+> +
+> +    for (i = 0; i < info->count; i++) {
+> +        tmp.addr = fault_info[i].addr;
+> +        tmp.sid = fault_info[i].sid;
+> +        tmp.fault_reason = fault_info[i].fault_reason;
+> +        tmp.is_write = fault_info[i].is_write;
+> +
+> +        memory_region_iommu_fault_notify(mr, &tmp);
+> +    }
+
+Are there service requirements for handling these faults?  Can the
+device wait indefinitely?  Can userspace handling of such faults meet
+the device service requirements?  Is userspace handling sufficient for
+the device's performance needs?  Do we get one eventfd per fault entry?
+How do we know if the faults have overflowed?  Would an overflow be
+fatal or would there be a retry mechanism?
+
+> +
+> +err_exit:
+> +    g_free(info);
+>  }
+>  
+>  static int vfio_set_iommu_fault_notifier(struct VFIOContainer *container)
+> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+> index ca890ee..8b172f5 100644
+> --- a/linux-headers/linux/vfio.h
+> +++ b/linux-headers/linux/vfio.h
+> @@ -550,6 +550,28 @@ struct vfio_iommu_type1_set_fault_eventfd {
+>  
+>  #define VFIO_IOMMU_SET_FAULT_EVENTFD	_IO(VFIO_TYPE, VFIO_BASE + 17)
+>  
+> +/*
+> + * VFIO_IOMMU_GET_FAULT_INFO		_IO(VFIO_TYPE, VFIO_BASE + 18)
+> + *
+> + * Return IOMMU fault info to userspace.
+> + */
+> +
+> +struct vfio_iommu_fault_info {
+> +	__u64	addr;
+> +	__u16   sid;
+> +	__u8    fault_reason;
+> +	__u8	is_write:1;
 > +};
 > +
->  struct socket {
->    struct socket *so_next,*so_prev;      /* For a linked list of sockets */
->
-> @@ -31,22 +37,14 @@ struct socket {
->    struct tcpiphdr *so_ti;	   /* Pointer to the original ti within
->  				    * so_mconn, for non-blocking connections */
->    int so_urgc;
-> -  union {   /* foreign host */
-> -      struct sockaddr_storage ss;
-> -      struct sockaddr_in sin;
-> -      struct sockaddr_in6 sin6;
-> -  } fhost;
-> +  union slirp_sockaddr fhost;      /* Foreign host */
->  #define so_faddr fhost.sin.sin_addr
->  #define so_fport fhost.sin.sin_port
->  #define so_faddr6 fhost.sin6.sin6_addr
->  #define so_fport6 fhost.sin6.sin6_port
->  #define so_ffamily fhost.ss.ss_family
->
-> -  union {   /* local host */
-> -      struct sockaddr_storage ss;
-> -      struct sockaddr_in sin;
-> -      struct sockaddr_in6 sin6;
-> -  } lhost;
-> +  union slirp_sockaddr lhost;      /* Local host */
->  #define so_laddr lhost.sin.sin_addr
->  #define so_lport lhost.sin.sin_port
->  #define so_laddr6 lhost.sin6.sin6_addr
->
+> +struct vfio_iommu_type1_get_fault_info {
+> +	__u32	argsz;
+> +	__u32   flags;
+> +	__u32	count;
+> +	struct vfio_iommu_fault_info fault_info[];
+> +};
+> +
+> +#define VFIO_IOMMU_GET_FAULT_INFO	_IO(VFIO_TYPE, VFIO_BASE + 18)
+> +
+>  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
+>  
+>  /*
