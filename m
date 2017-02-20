@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59869)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cfkLZ-0006gn-32
+	(envelope-from <stefanha@redhat.com>) id 1cfkLf-0006kK-81
 	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:33:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cfkLX-0007AL-NQ
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:33:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55188)
+	(envelope-from <stefanha@redhat.com>) id 1cfkLe-0007C3-9z
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:33:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44134)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cfkLX-0007A7-FC
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:33:27 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cfkLe-0007Bp-5M
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:33:34 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon, 20 Feb 2017 09:32:45 +0000
-Message-Id: <20170220093304.20515-6-stefanha@redhat.com>
+Date: Mon, 20 Feb 2017 09:32:48 +0000
+Message-Id: <20170220093304.20515-9-stefanha@redhat.com>
 In-Reply-To: <20170220093304.20515-1-stefanha@redhat.com>
 References: <20170220093304.20515-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 05/24] io: add methods to set I/O handlers on
- AioContext
+Subject: [Qemu-devel] [PULL 08/24] coroutine-lock: reschedule coroutine on
+ the AioContext it was running on
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,242 +29,66 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
-This is in preparation for making qio_channel_yield work on
-AioContexts other than the main one.
+As a small step towards the introduction of multiqueue, we want
+coroutines to remain on the same AioContext that started them,
+unless they are moved explicitly with e.g. aio_co_schedule.  This patch
+avoids that coroutines switch AioContext when they use a CoMutex.
+For now it does not make much of a difference, because the CoMutex
+is not thread-safe and the AioContext itself is used to protect the
+CoMutex from concurrent access.  However, this is going to change.
 
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
-Message-id: 20170213135235.12274-6-pbonzini@redhat.com
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+Message-id: 20170213135235.12274-9-pbonzini@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- include/io/channel.h | 25 +++++++++++++++++++++++++
- io/channel-command.c | 13 +++++++++++++
- io/channel-file.c    | 11 +++++++++++
- io/channel-socket.c  | 16 +++++++++++-----
- io/channel-tls.c     | 12 ++++++++++++
- io/channel-watch.c   |  6 ++++++
- io/channel.c         | 11 +++++++++++
- 7 files changed, 89 insertions(+), 5 deletions(-)
+ util/qemu-coroutine-lock.c | 5 ++---
+ util/trace-events          | 1 -
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/include/io/channel.h b/include/io/channel.h
-index 32a9470..0bc7c3f 100644
---- a/include/io/channel.h
-+++ b/include/io/channel.h
-@@ -23,6 +23,7 @@
- 
- #include "qemu-common.h"
- #include "qom/object.h"
+diff --git a/util/qemu-coroutine-lock.c b/util/qemu-coroutine-lock.c
+index 14cf9ce..e6afd1a 100644
+--- a/util/qemu-coroutine-lock.c
++++ b/util/qemu-coroutine-lock.c
+@@ -27,6 +27,7 @@
+ #include "qemu/coroutine.h"
+ #include "qemu/coroutine_int.h"
+ #include "qemu/queue.h"
 +#include "block/aio.h"
+ #include "trace.h"
  
- #define TYPE_QIO_CHANNEL "qio-channel"
- #define QIO_CHANNEL(obj)                                    \
-@@ -132,6 +133,11 @@ struct QIOChannelClass {
-                      off_t offset,
-                      int whence,
-                      Error **errp);
-+    void (*io_set_aio_fd_handler)(QIOChannel *ioc,
-+                                  AioContext *ctx,
-+                                  IOHandler *io_read,
-+                                  IOHandler *io_write,
-+                                  void *opaque);
- };
+ void qemu_co_queue_init(CoQueue *queue)
+@@ -63,7 +64,6 @@ void qemu_co_queue_run_restart(Coroutine *co)
  
- /* General I/O handling functions */
-@@ -525,4 +531,23 @@ void qio_channel_yield(QIOChannel *ioc,
- void qio_channel_wait(QIOChannel *ioc,
-                       GIOCondition condition);
- 
-+/**
-+ * qio_channel_set_aio_fd_handler:
-+ * @ioc: the channel object
-+ * @ctx: the AioContext to set the handlers on
-+ * @io_read: the read handler
-+ * @io_write: the write handler
-+ * @opaque: the opaque value passed to the handler
-+ *
-+ * This is used internally by qio_channel_yield().  It can
-+ * be used by channel implementations to forward the handlers
-+ * to another channel (e.g. from #QIOChannelTLS to the
-+ * underlying socket).
-+ */
-+void qio_channel_set_aio_fd_handler(QIOChannel *ioc,
-+                                    AioContext *ctx,
-+                                    IOHandler *io_read,
-+                                    IOHandler *io_write,
-+                                    void *opaque);
-+
- #endif /* QIO_CHANNEL_H */
-diff --git a/io/channel-command.c b/io/channel-command.c
-index ad25313..319c5ed 100644
---- a/io/channel-command.c
-+++ b/io/channel-command.c
-@@ -328,6 +328,18 @@ static int qio_channel_command_close(QIOChannel *ioc,
- }
- 
- 
-+static void qio_channel_command_set_aio_fd_handler(QIOChannel *ioc,
-+                                                   AioContext *ctx,
-+                                                   IOHandler *io_read,
-+                                                   IOHandler *io_write,
-+                                                   void *opaque)
-+{
-+    QIOChannelCommand *cioc = QIO_CHANNEL_COMMAND(ioc);
-+    aio_set_fd_handler(ctx, cioc->readfd, false, io_read, NULL, NULL, opaque);
-+    aio_set_fd_handler(ctx, cioc->writefd, false, NULL, io_write, NULL, opaque);
-+}
-+
-+
- static GSource *qio_channel_command_create_watch(QIOChannel *ioc,
-                                                  GIOCondition condition)
+ static bool qemu_co_queue_do_restart(CoQueue *queue, bool single)
  {
-@@ -349,6 +361,7 @@ static void qio_channel_command_class_init(ObjectClass *klass,
-     ioc_klass->io_set_blocking = qio_channel_command_set_blocking;
-     ioc_klass->io_close = qio_channel_command_close;
-     ioc_klass->io_create_watch = qio_channel_command_create_watch;
-+    ioc_klass->io_set_aio_fd_handler = qio_channel_command_set_aio_fd_handler;
- }
+-    Coroutine *self = qemu_coroutine_self();
+     Coroutine *next;
  
- static const TypeInfo qio_channel_command_info = {
-diff --git a/io/channel-file.c b/io/channel-file.c
-index e1da243..b383273 100644
---- a/io/channel-file.c
-+++ b/io/channel-file.c
-@@ -186,6 +186,16 @@ static int qio_channel_file_close(QIOChannel *ioc,
- }
+     if (QSIMPLEQ_EMPTY(&queue->entries)) {
+@@ -72,8 +72,7 @@ static bool qemu_co_queue_do_restart(CoQueue *queue, bool single)
  
+     while ((next = QSIMPLEQ_FIRST(&queue->entries)) != NULL) {
+         QSIMPLEQ_REMOVE_HEAD(&queue->entries, co_queue_next);
+-        QSIMPLEQ_INSERT_TAIL(&self->co_queue_wakeup, next, co_queue_next);
+-        trace_qemu_co_queue_next(next);
++        aio_co_wake(next);
+         if (single) {
+             break;
+         }
+diff --git a/util/trace-events b/util/trace-events
+index 53bd70c..65c9787 100644
+--- a/util/trace-events
++++ b/util/trace-events
+@@ -28,7 +28,6 @@ qemu_coroutine_terminate(void *co) "self %p"
  
-+static void qio_channel_file_set_aio_fd_handler(QIOChannel *ioc,
-+                                                AioContext *ctx,
-+                                                IOHandler *io_read,
-+                                                IOHandler *io_write,
-+                                                void *opaque)
-+{
-+    QIOChannelFile *fioc = QIO_CHANNEL_FILE(ioc);
-+    aio_set_fd_handler(ctx, fioc->fd, false, io_read, io_write, NULL, opaque);
-+}
-+
- static GSource *qio_channel_file_create_watch(QIOChannel *ioc,
-                                               GIOCondition condition)
- {
-@@ -206,6 +216,7 @@ static void qio_channel_file_class_init(ObjectClass *klass,
-     ioc_klass->io_seek = qio_channel_file_seek;
-     ioc_klass->io_close = qio_channel_file_close;
-     ioc_klass->io_create_watch = qio_channel_file_create_watch;
-+    ioc_klass->io_set_aio_fd_handler = qio_channel_file_set_aio_fd_handler;
- }
- 
- static const TypeInfo qio_channel_file_info = {
-diff --git a/io/channel-socket.c b/io/channel-socket.c
-index f385233..f546c68 100644
---- a/io/channel-socket.c
-+++ b/io/channel-socket.c
-@@ -649,11 +649,6 @@ qio_channel_socket_set_blocking(QIOChannel *ioc,
-         qemu_set_block(sioc->fd);
-     } else {
-         qemu_set_nonblock(sioc->fd);
--#ifdef WIN32
--        WSAEventSelect(sioc->fd, ioc->event,
--                       FD_READ | FD_ACCEPT | FD_CLOSE |
--                       FD_CONNECT | FD_WRITE | FD_OOB);
--#endif
-     }
-     return 0;
- }
-@@ -733,6 +728,16 @@ qio_channel_socket_shutdown(QIOChannel *ioc,
-     return 0;
- }
- 
-+static void qio_channel_socket_set_aio_fd_handler(QIOChannel *ioc,
-+                                                  AioContext *ctx,
-+                                                  IOHandler *io_read,
-+                                                  IOHandler *io_write,
-+                                                  void *opaque)
-+{
-+    QIOChannelSocket *sioc = QIO_CHANNEL_SOCKET(ioc);
-+    aio_set_fd_handler(ctx, sioc->fd, false, io_read, io_write, NULL, opaque);
-+}
-+
- static GSource *qio_channel_socket_create_watch(QIOChannel *ioc,
-                                                 GIOCondition condition)
- {
-@@ -755,6 +760,7 @@ static void qio_channel_socket_class_init(ObjectClass *klass,
-     ioc_klass->io_set_cork = qio_channel_socket_set_cork;
-     ioc_klass->io_set_delay = qio_channel_socket_set_delay;
-     ioc_klass->io_create_watch = qio_channel_socket_create_watch;
-+    ioc_klass->io_set_aio_fd_handler = qio_channel_socket_set_aio_fd_handler;
- }
- 
- static const TypeInfo qio_channel_socket_info = {
-diff --git a/io/channel-tls.c b/io/channel-tls.c
-index f25ab0a..6182702 100644
---- a/io/channel-tls.c
-+++ b/io/channel-tls.c
-@@ -345,6 +345,17 @@ static int qio_channel_tls_close(QIOChannel *ioc,
-     return qio_channel_close(tioc->master, errp);
- }
- 
-+static void qio_channel_tls_set_aio_fd_handler(QIOChannel *ioc,
-+                                               AioContext *ctx,
-+                                               IOHandler *io_read,
-+                                               IOHandler *io_write,
-+                                               void *opaque)
-+{
-+    QIOChannelTLS *tioc = QIO_CHANNEL_TLS(ioc);
-+
-+    qio_channel_set_aio_fd_handler(tioc->master, ctx, io_read, io_write, opaque);
-+}
-+
- static GSource *qio_channel_tls_create_watch(QIOChannel *ioc,
-                                              GIOCondition condition)
- {
-@@ -372,6 +383,7 @@ static void qio_channel_tls_class_init(ObjectClass *klass,
-     ioc_klass->io_close = qio_channel_tls_close;
-     ioc_klass->io_shutdown = qio_channel_tls_shutdown;
-     ioc_klass->io_create_watch = qio_channel_tls_create_watch;
-+    ioc_klass->io_set_aio_fd_handler = qio_channel_tls_set_aio_fd_handler;
- }
- 
- static const TypeInfo qio_channel_tls_info = {
-diff --git a/io/channel-watch.c b/io/channel-watch.c
-index cf1cdff..8640d1c 100644
---- a/io/channel-watch.c
-+++ b/io/channel-watch.c
-@@ -285,6 +285,12 @@ GSource *qio_channel_create_socket_watch(QIOChannel *ioc,
-     GSource *source;
-     QIOChannelSocketSource *ssource;
- 
-+#ifdef WIN32
-+    WSAEventSelect(socket, ioc->event,
-+                   FD_READ | FD_ACCEPT | FD_CLOSE |
-+                   FD_CONNECT | FD_WRITE | FD_OOB);
-+#endif
-+
-     source = g_source_new(&qio_channel_socket_source_funcs,
-                           sizeof(QIOChannelSocketSource));
-     ssource = (QIOChannelSocketSource *)source;
-diff --git a/io/channel.c b/io/channel.c
-index 80924c1..ce470d7 100644
---- a/io/channel.c
-+++ b/io/channel.c
-@@ -154,6 +154,17 @@ GSource *qio_channel_create_watch(QIOChannel *ioc,
- }
- 
- 
-+void qio_channel_set_aio_fd_handler(QIOChannel *ioc,
-+                                    AioContext *ctx,
-+                                    IOHandler *io_read,
-+                                    IOHandler *io_write,
-+                                    void *opaque)
-+{
-+    QIOChannelClass *klass = QIO_CHANNEL_GET_CLASS(ioc);
-+
-+    klass->io_set_aio_fd_handler(ioc, ctx, io_read, io_write, opaque);
-+}
-+
- guint qio_channel_add_watch(QIOChannel *ioc,
-                             GIOCondition condition,
-                             QIOChannelFunc func,
+ # util/qemu-coroutine-lock.c
+ qemu_co_queue_run_restart(void *co) "co %p"
+-qemu_co_queue_next(void *nxt) "next %p"
+ qemu_co_mutex_lock_entry(void *mutex, void *self) "mutex %p self %p"
+ qemu_co_mutex_lock_return(void *mutex, void *self) "mutex %p self %p"
+ qemu_co_mutex_unlock_entry(void *mutex, void *self) "mutex %p self %p"
 -- 
 2.9.3
