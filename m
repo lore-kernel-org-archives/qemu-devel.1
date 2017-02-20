@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cfhAO-0006O7-07
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 01:09:45 -0500
+	(envelope-from <vijay.kilari@gmail.com>) id 1cfhLm-0000MQ-6P
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 01:21:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cfhAK-0008Vs-1H
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 01:09:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45484)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cfhAJ-0008Vn-RW
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 01:09:39 -0500
-References: <20170217082704.23270-1-skiver.cloud.yzy@gmail.com>
-	<20170217082704.23270-2-skiver.cloud.yzy@gmail.com>
-	<5c9a78b3-bd37-d263-b7c2-d7a2db92c0a8@amsat.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <6dccacf7-688c-1009-8c34-7887b70469c7@redhat.com>
-Date: Mon, 20 Feb 2017 07:09:35 +0100
+	(envelope-from <vijay.kilari@gmail.com>) id 1cfhLl-0003CE-2P
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 01:21:30 -0500
 MIME-Version: 1.0
-In-Reply-To: <5c9a78b3-bd37-d263-b7c2-d7a2db92c0a8@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] monitor.c: make mon_get_cpu return
- NULL when there is no CPU
+In-Reply-To: <CAFEAcA8618+LGejFq6SpBEwGrNpfamBBX3MFWjss-ZxJ7Xk8mg@mail.gmail.com>
+References: <1487313115-9510-1-git-send-email-vijay.kilari@gmail.com>
+	<1487313115-9510-3-git-send-email-vijay.kilari@gmail.com>
+	<CAFEAcA8618+LGejFq6SpBEwGrNpfamBBX3MFWjss-ZxJ7Xk8mg@mail.gmail.com>
+From: Vijay Kilari <vijay.kilari@gmail.com>
+Date: Mon, 20 Feb 2017 11:51:24 +0530
+Message-ID: <CALicx6tqxXZxBTxYvF55ydBg5CB1to3MsEkhaohucx4EAZcEJA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v8 2/5] hw/intc/arm_gicv3_kvm: Add
+ ICC_SRE_EL1 register to vmstate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,69 +24,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Ziyue Yang <skiver.cloud.yzy@gmail.com>
-Cc: Ziyue Yang <yzylivezh@hotmail.com>, Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>, Pavel Fedin <p.fedin@samsung.com>, Marc Zyngier <marc.zyngier@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 
-On 19.02.2017 04:55, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 02/17/2017 05:27 AM, Ziyue Yang wrote:
->> From: Ziyue Yang <yzylivezh@hotmail.com>
+Hi Peter,
+
+On Fri, Feb 17, 2017 at 7:25 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 17 February 2017 at 06:31,  <vijay.kilari@gmail.com> wrote:
+>> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 >>
->> Currently mon_get_cpu always dereferences first_cpu without checking
->> whether it's a valid pointer. This commit adds check before
->> dereferencing,
->> and reports "No CPU" info if there isn't any CPU then returns NULL.
+>> To Save and Restore ICC_SRE_EL1 register introduce vmstate
+>> subsection and load only if non-zero.
+>> Also initialize icc_sre_el1 with to 0x7 in pre_load
+>> function.
 >>
->> Signed-off-by: Ziyue Yang <skiver.cloud.yzy@gmail.com>
->=20
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->=20
+>> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 >> ---
->>  monitor.c | 10 +++++++---
->>  1 file changed, 7 insertions(+), 3 deletions(-)
+>>  hw/intc/arm_gicv3_common.c         | 32 ++++++++++++++++++++++++++++++++
+>>  include/hw/intc/arm_gicv3_common.h |  1 +
+>>  2 files changed, 33 insertions(+)
 >>
->> diff --git a/monitor.c b/monitor.c
->> index 3cd72a9bab..6b25cf7a2b 100644
->> --- a/monitor.c
->> +++ b/monitor.c
->> @@ -1026,6 +1026,10 @@ int monitor_set_cpu(int cpu_index)
->>  CPUState *mon_get_cpu(void)
->>  {
->>      if (!cur_mon->mon_cpu) {
->> +        if (!first_cpu) {
->> +            monitor_printf(cur_mon, "No CPU available on this
->> machine\n");
->> +            return NULL;
->> +        }
->>          monitor_set_cpu(first_cpu->cpu_index);
+>> diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
+>> index 16b9b0f..e62480e 100644
+>> --- a/hw/intc/arm_gicv3_common.c
+>> +++ b/hw/intc/arm_gicv3_common.c
+>> @@ -70,6 +70,34 @@ static const VMStateDescription vmstate_gicv3_cpu_virt = {
 >>      }
->>      cpu_synchronize_state(cur_mon->mon_cpu);
->> @@ -2495,11 +2499,11 @@ static int default_fmt_size =3D 4;
->>  static int is_valid_option(const char *c, const char *typestr)
->>  {
->>      char option[3];
->> -
+>>  };
+>>
+>> +static int icc_sre_el1_reg_pre_load(void *opaque)
+>> +{
+>> +    GICv3CPUState *cs = opaque;
 >> +
->>      option[0] =3D '-';
->>      option[1] =3D *c;
->>      option[2] =3D '\0';
->> -
+>> +    /* By default enable SRE and disable IRQ & FIQ bypass. */
+>> +    cs->icc_sre_el1 = 0x7;
+>
+> Why do we need the pre_load function? I would have
+> expected that reset would have given us these defaults
+> already.
+>
+>> +    return 0;
+>> +}
 >> +
->>      typestr =3D strstr(typestr, option);
->>      return (typestr !=3D NULL);
->>  }
->> @@ -2864,7 +2868,7 @@ static QDict *monitor_parse_arguments(Monitor *m=
-on,
->>                      p++;
->>                      if(c !=3D *p) {
->>                          if(!is_valid_option(p, typestr)) {
->> -
+>> +static bool icc_sre_el1_reg_needed(void *opaque)
+>> +{
+>> +    GICv3CPUState *cs = opaque;
 >> +
->>                              monitor_printf(mon, "%s: unsupported
->> option -%c\n",
->>                                             cmd->name, *p);
->>                              goto fail;
+>> +    return cs->icc_sre_el1 != 0;
+>
+> I expected this to say "we need to transfer the value if
+> it isn't 0x7" (since the current situation of migration
+> is "we assume that the value is 0x7").
+>
+> Something should probably fail inbound migration for TCG
+> if the value isn't 0x7, for that matter.
+>
+> Is there a situation where KVM might allow a value other
+> than 0x7?
 
-Your patch contains some unnecessary white space changes, please try to
-avoid that! (or send a separate "beautification" patch to fix these).
+In KVM, the SRE_EL1 value is 0x1. During save, value
+read from KVM is 0x1 though we reset to 0x7.
 
- Thomas
+>
+>> +}
+>> +
+>> +const VMStateDescription vmstate_gicv3_cpu_sre_el1 = {
+>> +    .name = "arm_gicv3_cpu/sre_el1",
+>> +    .version_id = 1,
+>> +    .minimum_version_id = 1,
+>> +    .pre_load = icc_sre_el1_reg_pre_load,
+>> +    .needed = icc_sre_el1_reg_needed,
+>> +    .fields = (VMStateField[]) {
+>> +        VMSTATE_UINT64(icc_sre_el1, GICv3CPUState),
+>> +        VMSTATE_END_OF_LIST()
+>> +    }
+>> +};
+>> +
+>>  static const VMStateDescription vmstate_gicv3_cpu = {
+>>      .name = "arm_gicv3_cpu",
+>>      .version_id = 1,
+>> @@ -100,6 +128,10 @@ static const VMStateDescription vmstate_gicv3_cpu = {
+>>      .subsections = (const VMStateDescription * []) {
+>>          &vmstate_gicv3_cpu_virt,
+>>          NULL
+>> +    },
+>> +    .subsections = (const VMStateDescription * []) {
+>> +        &vmstate_gicv3_cpu_sre_el1,
+>> +        NULL
+>>      }
+>>  };
+>>
+>> diff --git a/include/hw/intc/arm_gicv3_common.h b/include/hw/intc/arm_gicv3_common.h
+>> index 4156051..bccdfe1 100644
+>> --- a/include/hw/intc/arm_gicv3_common.h
+>> +++ b/include/hw/intc/arm_gicv3_common.h
+>> @@ -172,6 +172,7 @@ struct GICv3CPUState {
+>>      uint8_t gicr_ipriorityr[GIC_INTERNAL];
+>>
+>>      /* CPU interface */
+>> +    uint64_t icc_sre_el1;
+>>      uint64_t icc_ctlr_el1[2];
+>>      uint64_t icc_pmr_el1;
+>>      uint64_t icc_bpr[3];
+>> --
+>> 1.9.1
+>
+> thanks
+> -- PMM
