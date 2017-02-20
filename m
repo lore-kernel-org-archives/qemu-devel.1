@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60209)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cfkMN-0007Kz-M9
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:34:20 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cfkMN-0007LA-O5
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:34:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cfkMI-0007TO-JA
+	(envelope-from <stefanha@redhat.com>) id 1cfkMI-0007TZ-Ig
 	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:34:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33856)
+Received: from mx1.redhat.com ([209.132.183.28]:44302)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cfkMC-0007Rs-9Q
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cfkM6-0007OJ-8j
 	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:34:14 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon, 20 Feb 2017 09:33:04 +0000
-Message-Id: <20170220093304.20515-25-stefanha@redhat.com>
+Date: Mon, 20 Feb 2017 09:33:01 +0000
+Message-Id: <20170220093304.20515-22-stefanha@redhat.com>
 In-Reply-To: <20170220093304.20515-1-stefanha@redhat.com>
 References: <20170220093304.20515-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 24/24] coroutine-lock: make CoRwlock thread-safe
- and fair
+Subject: [Qemu-devel] [PULL 21/24] test-aio-multithread: add performance
+ comparison with thread-based mutexes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,108 +29,207 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
-This adds a CoMutex around the existing CoQueue.  Because the write-side
-can just take CoMutex, the old "writer" field is not necessary anymore.
-Instead of removing it altogether, count the number of pending writers
-during a read-side critical section and forbid further readers from
-entering.
+Add two implementations of the same benchmark as the previous patch,
+but using pthreads.  One uses a normal QemuMutex, the other is Linux
+only and implements a fair mutex based on MCS locks and futexes.
+This shows that the slower performance of the 5-thread case is due to
+the fairness of CoMutex, rather than to coroutines.  If fairness does
+not matter, as is the case with two threads, CoMutex can actually be
+faster than pthreads.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
-Message-id: 20170213181244.16297-7-pbonzini@redhat.com
+Message-id: 20170213181244.16297-4-pbonzini@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- include/qemu/coroutine.h   |  3 ++-
- util/qemu-coroutine-lock.c | 35 ++++++++++++++++++++++++-----------
- 2 files changed, 26 insertions(+), 12 deletions(-)
+ tests/test-aio-multithread.c | 164 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 164 insertions(+)
 
-diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
-index d2de268..e60beaf 100644
---- a/include/qemu/coroutine.h
-+++ b/include/qemu/coroutine.h
-@@ -204,8 +204,9 @@ bool qemu_co_queue_empty(CoQueue *queue);
- 
- 
- typedef struct CoRwlock {
--    bool writer;
-+    int pending_writer;
-     int reader;
-+    CoMutex mutex;
-     CoQueue queue;
- } CoRwlock;
- 
-diff --git a/util/qemu-coroutine-lock.c b/util/qemu-coroutine-lock.c
-index b0a554f..6328eed 100644
---- a/util/qemu-coroutine-lock.c
-+++ b/util/qemu-coroutine-lock.c
-@@ -346,16 +346,22 @@ void qemu_co_rwlock_init(CoRwlock *lock)
- {
-     memset(lock, 0, sizeof(*lock));
-     qemu_co_queue_init(&lock->queue);
-+    qemu_co_mutex_init(&lock->mutex);
+diff --git a/tests/test-aio-multithread.c b/tests/test-aio-multithread.c
+index 4fa2e9b..f11e990 100644
+--- a/tests/test-aio-multithread.c
++++ b/tests/test-aio-multithread.c
+@@ -278,6 +278,162 @@ static void test_multi_co_mutex_2_30(void)
+     test_multi_co_mutex(2, 30);
  }
  
- void qemu_co_rwlock_rdlock(CoRwlock *lock)
- {
-     Coroutine *self = qemu_coroutine_self();
- 
--    while (lock->writer) {
--        qemu_co_queue_wait(&lock->queue, NULL);
-+    qemu_co_mutex_lock(&lock->mutex);
-+    /* For fairness, wait if a writer is in line.  */
-+    while (lock->pending_writer) {
-+        qemu_co_queue_wait(&lock->queue, &lock->mutex);
-     }
-     lock->reader++;
-+    qemu_co_mutex_unlock(&lock->mutex);
++/* Same test with fair mutexes, for performance comparison.  */
 +
-+    /* The rest of the read-side critical section is run without the mutex.  */
-     self->locks_held++;
- }
++#ifdef CONFIG_LINUX
++#include "qemu/futex.h"
++
++/* The nodes for the mutex reside in this structure (on which we try to avoid
++ * false sharing).  The head of the mutex is in the "mutex_head" variable.
++ */
++static struct {
++    int next, locked;
++    int padding[14];
++} nodes[NUM_CONTEXTS] __attribute__((__aligned__(64)));
++
++static int mutex_head = -1;
++
++static void mcs_mutex_lock(void)
++{
++    int prev;
++
++    nodes[id].next = -1;
++    nodes[id].locked = 1;
++    prev = atomic_xchg(&mutex_head, id);
++    if (prev != -1) {
++        atomic_set(&nodes[prev].next, id);
++        qemu_futex_wait(&nodes[id].locked, 1);
++    }
++}
++
++static void mcs_mutex_unlock(void)
++{
++    int next;
++    if (nodes[id].next == -1) {
++        if (atomic_read(&mutex_head) == id &&
++            atomic_cmpxchg(&mutex_head, id, -1) == id) {
++            /* Last item in the list, exit.  */
++            return;
++        }
++        while (atomic_read(&nodes[id].next) == -1) {
++            /* mcs_mutex_lock did the xchg, but has not updated
++             * nodes[prev].next yet.
++             */
++        }
++    }
++
++    /* Wake up the next in line.  */
++    next = nodes[id].next;
++    nodes[next].locked = 0;
++    qemu_futex_wake(&nodes[next].locked, 1);
++}
++
++static void test_multi_fair_mutex_entry(void *opaque)
++{
++    while (!atomic_mb_read(&now_stopping)) {
++        mcs_mutex_lock();
++        counter++;
++        mcs_mutex_unlock();
++        atomic_inc(&atomic_counter);
++    }
++    atomic_dec(&running);
++}
++
++static void test_multi_fair_mutex(int threads, int seconds)
++{
++    int i;
++
++    assert(mutex_head == -1);
++    counter = 0;
++    atomic_counter = 0;
++    now_stopping = false;
++
++    create_aio_contexts();
++    assert(threads <= NUM_CONTEXTS);
++    running = threads;
++    for (i = 0; i < threads; i++) {
++        Coroutine *co1 = qemu_coroutine_create(test_multi_fair_mutex_entry, NULL);
++        aio_co_schedule(ctx[i], co1);
++    }
++
++    g_usleep(seconds * 1000000);
++
++    atomic_mb_set(&now_stopping, true);
++    while (running > 0) {
++        g_usleep(100000);
++    }
++
++    join_aio_contexts();
++    g_test_message("%d iterations/second\n", counter / seconds);
++    g_assert_cmpint(counter, ==, atomic_counter);
++}
++
++static void test_multi_fair_mutex_1(void)
++{
++    test_multi_fair_mutex(NUM_CONTEXTS, 1);
++}
++
++static void test_multi_fair_mutex_10(void)
++{
++    test_multi_fair_mutex(NUM_CONTEXTS, 10);
++}
++#endif
++
++/* Same test with pthread mutexes, for performance comparison and
++ * portability.  */
++
++static QemuMutex mutex;
++
++static void test_multi_mutex_entry(void *opaque)
++{
++    while (!atomic_mb_read(&now_stopping)) {
++        qemu_mutex_lock(&mutex);
++        counter++;
++        qemu_mutex_unlock(&mutex);
++        atomic_inc(&atomic_counter);
++    }
++    atomic_dec(&running);
++}
++
++static void test_multi_mutex(int threads, int seconds)
++{
++    int i;
++
++    qemu_mutex_init(&mutex);
++    counter = 0;
++    atomic_counter = 0;
++    now_stopping = false;
++
++    create_aio_contexts();
++    assert(threads <= NUM_CONTEXTS);
++    running = threads;
++    for (i = 0; i < threads; i++) {
++        Coroutine *co1 = qemu_coroutine_create(test_multi_mutex_entry, NULL);
++        aio_co_schedule(ctx[i], co1);
++    }
++
++    g_usleep(seconds * 1000000);
++
++    atomic_mb_set(&now_stopping, true);
++    while (running > 0) {
++        g_usleep(100000);
++    }
++
++    join_aio_contexts();
++    g_test_message("%d iterations/second\n", counter / seconds);
++    g_assert_cmpint(counter, ==, atomic_counter);
++}
++
++static void test_multi_mutex_1(void)
++{
++    test_multi_mutex(NUM_CONTEXTS, 1);
++}
++
++static void test_multi_mutex_10(void)
++{
++    test_multi_mutex(NUM_CONTEXTS, 10);
++}
++
+ /* End of tests.  */
  
-@@ -364,10 +370,13 @@ void qemu_co_rwlock_unlock(CoRwlock *lock)
-     Coroutine *self = qemu_coroutine_self();
- 
-     assert(qemu_in_coroutine());
--    if (lock->writer) {
--        lock->writer = false;
-+    if (!lock->reader) {
-+        /* The critical section started in qemu_co_rwlock_wrlock.  */
-         qemu_co_queue_restart_all(&lock->queue);
+ int main(int argc, char **argv)
+@@ -290,10 +446,18 @@ int main(int argc, char **argv)
+         g_test_add_func("/aio/multi/schedule", test_multi_co_schedule_1);
+         g_test_add_func("/aio/multi/mutex/contended", test_multi_co_mutex_1);
+         g_test_add_func("/aio/multi/mutex/handoff", test_multi_co_mutex_2_3);
++#ifdef CONFIG_LINUX
++        g_test_add_func("/aio/multi/mutex/mcs", test_multi_fair_mutex_1);
++#endif
++        g_test_add_func("/aio/multi/mutex/pthread", test_multi_mutex_1);
      } else {
-+        self->locks_held--;
-+
-+        qemu_co_mutex_lock(&lock->mutex);
-         lock->reader--;
-         assert(lock->reader >= 0);
-         /* Wakeup only one waiting writer */
-@@ -375,16 +384,20 @@ void qemu_co_rwlock_unlock(CoRwlock *lock)
-             qemu_co_queue_next(&lock->queue);
-         }
+         g_test_add_func("/aio/multi/schedule", test_multi_co_schedule_10);
+         g_test_add_func("/aio/multi/mutex/contended", test_multi_co_mutex_10);
+         g_test_add_func("/aio/multi/mutex/handoff", test_multi_co_mutex_2_30);
++#ifdef CONFIG_LINUX
++        g_test_add_func("/aio/multi/mutex/mcs", test_multi_fair_mutex_10);
++#endif
++        g_test_add_func("/aio/multi/mutex/pthread", test_multi_mutex_10);
      }
--    self->locks_held--;
-+    qemu_co_mutex_unlock(&lock->mutex);
- }
- 
- void qemu_co_rwlock_wrlock(CoRwlock *lock)
- {
--    Coroutine *self = qemu_coroutine_self();
--
--    while (lock->writer || lock->reader) {
--        qemu_co_queue_wait(&lock->queue, NULL);
-+    qemu_co_mutex_lock(&lock->mutex);
-+    lock->pending_writer++;
-+    while (lock->reader) {
-+        qemu_co_queue_wait(&lock->queue, &lock->mutex);
-     }
--    lock->writer = true;
--    self->locks_held++;
-+    lock->pending_writer--;
-+
-+    /* The rest of the write-side critical section is run with
-+     * the mutex taken, so that lock->reader remains zero.
-+     * There is no need to update self->locks_held.
-+     */
+     return g_test_run();
  }
 -- 
 2.9.3
