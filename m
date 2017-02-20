@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cffDb-0008SU-46
-	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 23:04:56 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1cffDd-0008UJ-Aw
+	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 23:05:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cffDa-0002VM-22
-	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 23:04:55 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1cffDc-0002Wb-Bc
+	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 23:04:57 -0500
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Mon, 20 Feb 2017 15:04:29 +1100
-Message-Id: <1487563478-22265-2-git-send-email-sjitindarsingh@gmail.com>
+Date: Mon, 20 Feb 2017 15:04:30 +1100
+Message-Id: <1487563478-22265-3-git-send-email-sjitindarsingh@gmail.com>
 In-Reply-To: <1487563478-22265-1-git-send-email-sjitindarsingh@gmail.com>
 References: <1487563478-22265-1-git-send-email-sjitindarsingh@gmail.com>
-Subject: [Qemu-devel] [QEMU-PPC] [PATCH V3 01/10] target/ppc/POWER9: Add
- ISAv3.00 MMU definition
+Subject: [Qemu-devel] [QEMU-PPC] [PATCH V3 02/10] target/ppc: Fix LPCR DPFD
+ mask define
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,70 +23,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org
 Cc: david@gibson.dropbear.id.au, agraf@suse.de, qemu-devel@nongnu.org, sam.bobroff@au1.ibm.com, sjitindarsingh@gmail.com
 
-POWER9 processors implement the mmu as defined in version 3.00 of the ISA.
-
-Add a definition for this mmu model and set the POWER9 cpu model to use
-this mmu model.
+The DPFD field in the LPCR is 3 bits wide. This has always been defined
+as 0x3 << shift which indicates a 2 bit field, which is incorrect.
+Correct this.
 
 Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 ---
- target/ppc/cpu-qom.h        | 5 ++++-
- target/ppc/mmu_helper.c     | 2 ++
- target/ppc/translate_init.c | 3 +--
- 3 files changed, 7 insertions(+), 3 deletions(-)
+ target/ppc/cpu.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-index b7977ba..4e3132b 100644
---- a/target/ppc/cpu-qom.h
-+++ b/target/ppc/cpu-qom.h
-@@ -86,10 +86,13 @@ enum powerpc_mmu_t {
-     POWERPC_MMU_2_07       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
-                              | POWERPC_MMU_64K
-                              | POWERPC_MMU_AMR | 0x00000004,
--    /* FIXME Add POWERPC_MMU_3_OO defines */
-     /* Architecture 2.07 "degraded" (no 1T segments)           */
-     POWERPC_MMU_2_07a      = POWERPC_MMU_64 | POWERPC_MMU_AMR
-                              | 0x00000004,
-+    /* Architecture 3.00 variant                               */
-+    POWERPC_MMU_3_00       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
-+                             | POWERPC_MMU_64K
-+                             | POWERPC_MMU_AMR | 0x00000005,
- };
- 
- /*****************************************************************************/
-diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
-index f746f53..172a305 100644
---- a/target/ppc/mmu_helper.c
-+++ b/target/ppc/mmu_helper.c
-@@ -1935,6 +1935,7 @@ void ppc_tlb_invalidate_all(CPUPPCState *env)
-     case POWERPC_MMU_2_06a:
-     case POWERPC_MMU_2_07:
-     case POWERPC_MMU_2_07a:
-+    case POWERPC_MMU_3_00:
- #endif /* defined(TARGET_PPC64) */
-         env->tlb_need_flush = 0;
-         tlb_flush(CPU(cpu));
-@@ -1974,6 +1975,7 @@ void ppc_tlb_invalidate_one(CPUPPCState *env, target_ulong addr)
-     case POWERPC_MMU_2_06a:
-     case POWERPC_MMU_2_07:
-     case POWERPC_MMU_2_07a:
-+    case POWERPC_MMU_3_00:
-         /* tlbie invalidate TLBs for all segments */
-         /* XXX: given the fact that there are too many segments to invalidate,
-          *      and we still don't have a tlb_flush_mask(env, n, mask) in QEMU,
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 76f79fa..84bf125 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -8816,8 +8816,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
-                     (1ull << MSR_PMM) |
-                     (1ull << MSR_RI) |
-                     (1ull << MSR_LE);
--    /* Using 2.07 defines until new radix model is added. */
--    pcc->mmu_model = POWERPC_MMU_2_07;
-+    pcc->mmu_model = POWERPC_MMU_3_00;
- #if defined(CONFIG_SOFTMMU)
-     pcc->handle_mmu_fault = ppc_hash64_handle_mmu_fault;
-     /* segment page size remain the same */
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index bc2a2ce..bb96dd5 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -381,7 +381,7 @@ struct ppc_slb_t {
+ #define LPCR_ISL          (1ull << (63 - 2))
+ #define LPCR_KBV          (1ull << (63 - 3))
+ #define LPCR_DPFD_SHIFT   (63 - 11)
+-#define LPCR_DPFD         (0x3ull << LPCR_DPFD_SHIFT)
++#define LPCR_DPFD         (0x7ull << LPCR_DPFD_SHIFT)
+ #define LPCR_VRMASD_SHIFT (63 - 16)
+ #define LPCR_VRMASD       (0x1full << LPCR_VRMASD_SHIFT)
+ #define LPCR_RMLS_SHIFT   (63 - 37)
 -- 
 2.5.5
