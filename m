@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cfjrr-0003gF-4r
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:02:48 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cfjtD-0004fs-PK
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:04:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cfjrn-0005NI-75
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:02:47 -0500
-Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:33137)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cfjrm-0005N3-TL
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:02:43 -0500
-Received: by mail-wr0-x236.google.com with SMTP id 35so19582848wrw.0
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 01:02:42 -0800 (PST)
-References: <20170216123456.28621-1-alex.bennee@linaro.org>
-	<20170216123456.28621-3-alex.bennee@linaro.org>
-	<9c369896-91c1-8479-40c6-2eb12ff3e40e@amsat.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <9c369896-91c1-8479-40c6-2eb12ff3e40e@amsat.org>
-Date: Mon, 20 Feb 2017 09:02:45 +0000
-Message-ID: <87ino5w7yi.fsf@linaro.org>
+	(envelope-from <jasowang@redhat.com>) id 1cfjt9-0005y2-Kl
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:04:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33832)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cfjt9-0005xU-C2
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:04:07 -0500
+References: <1484026704-28027-1-git-send-email-mst@redhat.com>
+	<1484026704-28027-9-git-send-email-mst@redhat.com>
+	<A2975661238FB949B60364EF0F2C25743900AAEF@shsmsx102.ccr.corp.intel.com>
+	<c1f86fba-6b22-8316-156f-2024bee46b0c@redhat.com>
+	<A2975661238FB949B60364EF0F2C25743900B73D@shsmsx102.ccr.corp.intel.com>
+	<e9022e3a-5fa5-45c3-cc84-cb78d3ff9cdc@redhat.com>
+	<A2975661238FB949B60364EF0F2C25743900C602@shsmsx102.ccr.corp.intel.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <60ec34e3-2585-123f-7bc0-9d7bb143fc38@redhat.com>
+Date: Mon, 20 Feb 2017 17:03:51 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 2/4] new: debian docker targets for
- cross-compiling
+In-Reply-To: <A2975661238FB949B60364EF0F2C25743900C602@shsmsx102.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 08/41] intel_iommu: support device iotlb
+ descriptor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,158 +33,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: "Liu, Yi L" <yi.l.liu@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "Lan, Tianyu" <tianyu.lan@intel.com>, Peter Maydell <peter.maydell@linaro.org>, "Tian, Kevin" <kevin.tian@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Xu <peterx@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
 
-Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
 
-> On 02/16/2017 09:34 AM, Alex Bennée wrote:
->> This provides a basic Debian install with access to the emdebian cross
->> compilers. The debian-armhf-cross and debian-arm64-cross targets build
->> on the basic Debian image to allow cross compiling to those targets.
+On 2017=E5=B9=B402=E6=9C=8820=E6=97=A5 16:27, Liu, Yi L wrote:
+>> -----Original Message-----
+>> From: Jason Wang [mailto:jasowang@redhat.com]
+>> Sent: Friday, February 17, 2017 2:43 PM
+>> To: Liu, Yi L <yi.l.liu@intel.com>; Michael S. Tsirkin <mst@redhat.com=
+>; qemu-
+>> devel@nongnu.org
+>> Cc: Peter Maydell <peter.maydell@linaro.org>; Eduardo Habkost
+>> <ehabkost@redhat.com>; Peter Xu <peterx@redhat.com>; Paolo Bonzini
+>> <pbonzini@redhat.com>; Richard Henderson <rth@twiddle.net>; Tian, Kevi=
+n
+>> <kevin.tian@intel.com>; Lan, Tianyu <tianyu.lan@intel.com>; Alex Willi=
+amson
+>> <alex.williamson@redhat.com>
+>> Subject: Re: [Qemu-devel] [PULL 08/41] intel_iommu: support device iot=
+lb
+>> descriptor
 >>
->> A new environment variable (QEMU_CONFIGURE_OPTS) is set as part of the
->> docker container and passed to the build to specify the
->> --cross-prefix. The user still calls the build in the usual way, for
->> example:
 >>
->>   make docker-test-build@debian-arm64-cross \
->>     TARGET_LIST="aarch64-softmmu,aarch64-linux-user"
 >>
->> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>> On 2017=E5=B9=B402=E6=9C=8817=E6=97=A5 14:18, Liu, Yi L wrote:
+>>>> -----Original Message-----
+>>>> From: Jason Wang [mailto:jasowang@redhat.com]
+>>>> Sent: Thursday, February 16, 2017 1:44 PM
+>>>> To: Liu, Yi L <yi.l.liu@intel.com>; Michael S. Tsirkin
+>>>> <mst@redhat.com>; qemu- devel@nongnu.org
+>>>> Cc: Peter Maydell <peter.maydell@linaro.org>; Eduardo Habkost
+>>>> <ehabkost@redhat.com>; Peter Xu <peterx@redhat.com>; Paolo Bonzini
+>>>> <pbonzini@redhat.com>; Richard Henderson <rth@twiddle.net>; Tian,
+>>>> Kevin <kevin.tian@intel.com>; Lan, Tianyu <tianyu.lan@intel.com>;
+>>>> Alex Williamson <alex.williamson@redhat.com>
+>>>> Subject: Re: [Qemu-devel] [PULL 08/41] intel_iommu: support device
+>>>> iotlb descriptor
+>>>>
+>>>>
+>>>>
+>>>> On 2017=E5=B9=B402=E6=9C=8816=E6=97=A5 13:36, Liu, Yi L wrote:
+>>>>>> -----Original Message-----
+>>>>>> From: Qemu-devel
+>>>>>> [mailto:qemu-devel-bounces+yi.l.liu=3Dintel.com@nongnu.org]
+>>>>>> On Behalf Of Michael S. Tsirkin
+>>>>>> Sent: Tuesday, January 10, 2017 1:40 PM
+>>>>>> To: qemu-devel@nongnu.org
+>>>>>> Cc: Peter Maydell <peter.maydell@linaro.org>; Eduardo Habkost
+>>>>>> <ehabkost@redhat.com>; Jason Wang <jasowang@redhat.com>; Peter
+>> Xu
+>>>>>> <peterx@redhat.com>; Paolo Bonzini <pbonzini@redhat.com>; Richard
+>>>>>> Henderson <rth@twiddle.net>
+>>>>>> Subject: [Qemu-devel] [PULL 08/41] intel_iommu: support device
+>>>>>> iotlb descriptor
+>>>>>>
+>>>>>> From: Jason Wang <jasowang@redhat.com>
+>>>>>>
+>>>>>> This patch enables device IOTLB support for intel iommu. The major
+>>>>>> work is to implement QI device IOTLB descriptor processing and
+>>>>>> notify the device through iommu notifier.
+>>>>>>
+>>>>> Hi Jason/Michael,
+>>>>>
+>>>>> Recently Peter Xu's patch also touched intel-iommu emulation. His
+>>>>> patch shadows second-level page table by capturing iotlb flush from
+>>>>> guest. It would result in page table updating in host. Does this
+>>>>> patch also use the same map/umap API provided by VFIO?
+>>>> Yes, it depends on the iommu notifier too.
+>>>>
+>>>>> If it is, then I think it would also update page table in host. It
+>>>>> looks to be a duplicate update. Pls refer to the following snapshot
+>>>>> captured from section 6.5.2.5 of vtd spec.
+>>>>>
+>>>>> "Since translation requests from a device may be serviced by
+>>>>> hardware from the IOTLB, software must always request IOTLB
+>>>>> invalidation
+>>>>> (iotlb_inv_dsc) before requesting corresponding Device-TLB
+>>>>> (dev_tlb_inv_dsc) invalidation."
+>>>>>
+>>>>> Maybe for device-iotlb, we need a separate API which just pass down
+>>>>> the invalidate info without updating page table. Any thoughts?
+>>>> cc Alex.
+>>>>
+>>>> If we want ATS to be visible for guest (but I'm not sure if VFIO
+>>>> support this), we probably need another notifier or a new flag.
+>>> Jason, for assigned device, I think guest could see ATS if the
+>>> assigned device supports ATS. I can see it when passthru iGPU.
+>>>
+>>> Regards,
+>>> Yi L
+>> Good to know this.
 >>
->> ---
->> v2
->>   - add clang (keep shippable happy)
->>   - rm adduser code (done direct now)
->>   - add aptitude (useful for debugging package clashes)
->> v3
->>   - split into debian, debian-armhf-cross and debian-aarch64-cross
->> v4
->>   - Add QEMU_CONFIGURE_OPTS
->> ---
->>  tests/docker/Makefile.include                      |  4 ++++
->>  tests/docker/common.rc                             |  2 +-
->>  tests/docker/dockerfiles/debian-arm64-cross.docker | 15 +++++++++++++
->>  tests/docker/dockerfiles/debian-armhf-cross.docker | 15 +++++++++++++
->>  tests/docker/dockerfiles/debian.docker             | 25 ++++++++++++++++++++++
->>  5 files changed, 60 insertions(+), 1 deletion(-)
->>  create mode 100644 tests/docker/dockerfiles/debian-arm64-cross.docker
->>  create mode 100644 tests/docker/dockerfiles/debian-armhf-cross.docker
->>  create mode 100644 tests/docker/dockerfiles/debian.docker
->>
->> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
->> index 4778b27ca8..84bdcc944a 100644
->> --- a/tests/docker/Makefile.include
->> +++ b/tests/docker/Makefile.include
->> @@ -54,6 +54,10 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
->>  		$(if $(EXECUTABLE),--include-executable=$(EXECUTABLE)),\
->>  		"BUILD","$*")
->>
->> +# Enforce dependancies for composite images
->> +docker-image-debian-armhf-cross: docker-image-debian
->> +docker-image-debian-arm64-cross: docker-image-debian
->> +
->>  # Expand all the pre-requistes for each docker image and test combination
->>  $(foreach i,$(DOCKER_IMAGES), \
->>  	$(foreach t,$(DOCKER_TESTS) $(DOCKER_TOOLS), \
->> diff --git a/tests/docker/common.rc b/tests/docker/common.rc
->> index 21657e87c6..6865689bb5 100755
->> --- a/tests/docker/common.rc
->> +++ b/tests/docker/common.rc
->> @@ -29,7 +29,7 @@ build_qemu()
->>      config_opts="--enable-werror \
->>                   ${TARGET_LIST:+--target-list=${TARGET_LIST}} \
->>                   --prefix=$PWD/install \
->> -                 $EXTRA_CONFIGURE_OPTS \
->> +                 $QEMU_CONFIGURE_OPTS $EXTRA_CONFIGURE_OPTS \
->>                   $@"
->>      echo "Configure options:"
->>      echo $config_opts
->> diff --git a/tests/docker/dockerfiles/debian-arm64-cross.docker b/tests/docker/dockerfiles/debian-arm64-cross.docker
->> new file mode 100644
->> index 0000000000..ce90da943f
->> --- /dev/null
->> +++ b/tests/docker/dockerfiles/debian-arm64-cross.docker
->> @@ -0,0 +1,15 @@
->> +#
->> +# Docker arm64 cross-compiler target
->> +#
->> +# This docker target builds on the base debian image.
->> +#
->> +FROM qemu:debian
->> +
->> +# Add the foreign architecture we want and install dependacies
+>> If I understand your suggestion correctly, you want a dedicated API to=
+ flush a
+>> hardware device IOTLB. I'm not sure this is really needed.
+> yes, I'd like to have an extra API besides the current MAP/UNMAP.
+
+I'm think whether or not we can do this without extra API or even don't=20
+need to care about this.
+
 >
-> typo "dependencies"
+>> There's some discussion of similar issue in the past (when ATS is used=
+ for virtio-
+>> net/vhost), looks like we could solve this by not trigger the UNMAP no=
+tifier
+>> unless it was device IOTLB inv desc if ATS is enabled for the device? =
+With this
+>> remote IOMMU/IOTLB can only get invalidation request once. For VFIO, t=
+he
+>> under layer IOMMU can deal with hardware device IOTLB without any extr=
+a
+>> efforts.
+> If I catch the background, I think it should be "not trigger the UNMAP =
+notifier
+> when unless it was device IOTLB inv desc if ATS is enabled for the devi=
+ce"
 
-Fixed, thanks.
+Seems not :)
+
+I mean, if ATS is enabled for the device, only trigger UNMAP notifier=20
+when processing device IOTLB. Then we can only have flush once. And host=20
+IOMMU driver will take care of device IOTLB flush too.
+
+Thanks
 
 >
-> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Feel free to correct me.
 >
->> +RUN dpkg --add-architecture arm64
->> +RUN apt update
->> +RUN apt install -yy crossbuild-essential-arm64
->> +RUN apt-get build-dep -yy -a arm64 qemu
->> +
->> +# Specify the cross prefix for this image (see tests/docker/common.rc)
->> +ENV QEMU_CONFIGURE_OPTS --cross-prefix=aarch64-linux-gnu-
->> diff --git a/tests/docker/dockerfiles/debian-armhf-cross.docker b/tests/docker/dockerfiles/debian-armhf-cross.docker
->> new file mode 100644
->> index 0000000000..e0f81a556d
->> --- /dev/null
->> +++ b/tests/docker/dockerfiles/debian-armhf-cross.docker
->> @@ -0,0 +1,15 @@
->> +#
->> +# Docker armhf cross-compiler target
->> +#
->> +# This docker target builds on the base debian image.
->> +#
->> +FROM qemu:debian
->> +
->> +# Add the foreign architecture we want and install dependacies
->> +RUN dpkg --add-architecture armhf
->> +RUN apt update
->> +RUN apt install -yy crossbuild-essential-armhf
->> +RUN apt-get build-dep -yy -a armhf qemu
->> +
->> +# Specify the cross prefix for this image (see tests/docker/common.rc)
->> +ENV QEMU_CONFIGURE_OPTS --cross-prefix=arm-linux-gnueabihf-
->> diff --git a/tests/docker/dockerfiles/debian.docker b/tests/docker/dockerfiles/debian.docker
->> new file mode 100644
->> index 0000000000..52bd79938e
->> --- /dev/null
->> +++ b/tests/docker/dockerfiles/debian.docker
->> @@ -0,0 +1,25 @@
->> +#
->> +# Docker multiarch cross-compiler target
->> +#
->> +# This docker target is builds on Debian and Emdebian's cross compiler targets
->> +# to build distro with a selection of cross compilers for building test binaries.
->> +#
->> +# On its own you can't build much but the docker-foo-cross targets
->> +# build on top of the base debian image.
->> +#
->> +FROM debian:stable-slim
->> +
->> +# Setup some basic tools we need
->> +RUN apt update
->> +RUN apt install -yy curl aptitude
->> +
->> +# Setup Emdebian
->> +RUN echo "deb http://emdebian.org/tools/debian/ jessie main" >> /etc/apt/sources.list
->> +RUN curl http://emdebian.org/tools/debian/emdebian-toolchain-archive.key | apt-key add -
->> +
->> +# Duplicate deb line as deb-src
->> +RUN cat /etc/apt/sources.list | sed "s/deb/deb-src/" >> /etc/apt/sources.list
->> +
->> +# Install common build utilities
->> +RUN apt update
->> +RUN apt install -yy build-essential clang
+> Thanks,
+> Yi L
+>> Does this make sense?
 >>
-
-
--- 
-Alex Bennée
+>> Thanks
