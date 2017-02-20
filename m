@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59856)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cfpXc-000432-Ko
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:06:18 -0500
+	(envelope-from <berrange@redhat.com>) id 1cfpef-0002gc-Qd
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:13:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cfpXY-0002nO-Do
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:06:16 -0500
-Received: from indium.canonical.com ([91.189.90.7]:50145)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cfpXY-0002kd-5p
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:06:12 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cfpXW-000639-Ql
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 15:06:10 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A47292E817B
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 15:06:09 +0000 (UTC)
+	(envelope-from <berrange@redhat.com>) id 1cfpee-00066K-9L
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:13:33 -0500
+Date: Mon, 20 Feb 2017 15:13:20 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170220151320.GU15874@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170203120254.15062-1-berrange@redhat.com>
+	<20170203120254.15062-7-berrange@redhat.com>
+	<2a209a6e-338c-f352-6634-555b36daafb9@redhat.com>
+	<20170220124652.GO15874@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 20 Feb 2017 15:00:13 -0000
-From: Nadav Goldin <1665389@bugs.launchpad.net>
-Reply-To: Bug 1665389 <1665389@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170216160426.5716.21453.malonedeb@soybean.canonical.com>
-Message-Id: <20170220150013.4374.56292.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1665389] Re: Nested kvm guest fails to start on a
- emulated Westmere CPU guest under a Broadwell CPU host
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170220124652.GO15874@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 6/6] qemu-img: copy *key-secret opts
+ when opening newly created files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,136 +27,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-> Yes, I mean '-cpu host' in the bare metal. There is no workaround; it
-worked by chance and it triggered other hard to find bugs.
+On Mon, Feb 20, 2017 at 12:46:52PM +0000, Daniel P. Berrange wrote:
+> On Fri, Feb 03, 2017 at 11:39:35PM +0100, Max Reitz wrote:
+> > On 03.02.2017 13:02, Daniel P. Berrange wrote:
+> > > The qemu-img dd/convert commands will create a image file and
+> > > then try to open it. Historically it has been possible to open
+> > > new files without passing any options. With encrypted files
+> > > though, the *key-secret options are mandatory, so we need to
+> > > provide those options when opening the newly created file.
+> > > 
+> > > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> > > ---
+> > >  qemu-img.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++----
+> > >  1 file changed, 47 insertions(+), 4 deletions(-)
+> > > 
+> > > diff --git a/qemu-img.c b/qemu-img.c
+> > > index dc4c6eb..98522dd 100644
+> > > --- a/qemu-img.c
+> > > +++ b/qemu-img.c
+> > > @@ -319,6 +319,49 @@ static BlockBackend *img_open_file(const char *filename,
+> > >  }
+> > >  
+> > >  
+> > > +static int img_add_key_secrets(void *opaque,
+> > > +                               const char *name, const char *value,
+> > > +                               Error **errp)
+> > > +{
+> > > +    QDict **options = opaque;
+> > > +
+> > > +    if (g_str_has_suffix(name, "key-secret")) {
+> > > +        if (!*options) {
+> > > +            *options = qdict_new();
+> > > +        }
+> > > +        qdict_put(*options, name, qstring_from_str(value));
+> > > +    }
+> > > +
+> > > +    return 0;
+> > > +}
+> > > +
+> > > +static BlockBackend *img_open_new_file(const char *filename,
+> > > +                                       QemuOpts *create_opts,
+> > > +                                       const char *fmt, int flags,
+> > > +                                       bool writethrough, bool quiet)
+> > > +{
+> > > +    BlockBackend *blk;
+> > > +    Error *local_err = NULL;
+> > > +    QDict *options = NULL;
+> > > +
+> > > +    if (fmt) {
+> > > +        options = qdict_new();
+> > > +        qdict_put(options, "driver", qstring_from_str(fmt));
+> > > +    }
+> > > +
+> > > +    qemu_opt_foreach(create_opts, img_add_key_secrets, &options, NULL);
+> > 
+> > It would probably be easier to just unconditionally create an options
+> > QDict. It doesn't hurt if it's empty.
+> 
+> Ok, I will make that change.
+> 
+> > Anyway:
+> > 
+> > Reviewed-by: Max Reitz <mreitz@redhat.com>
+> > 
+> > > +
+> > > +    blk = blk_new_open(filename, NULL, options, flags, &local_err);
+> > > +    if (!blk) {
+> > > +        error_reportf_err(local_err, "Could not open '%s': ", filename);
+> > > +        return NULL;
+> > > +    }
+> > > +    blk_set_enable_write_cache(blk, !writethrough);
+> > > +
+> > > +    return blk;
+> 
+> it seems I'm also leaking "options" so will adda  QDECREF too
 
-alright, thanks for clarifying that.
+Actually I'm wrong here - I forgot this is an unusual case where
+blk_new_open grabs the existing reference rather than incref'ing
+it.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1665389
-
-Title:
-  Nested kvm guest fails to start on a emulated Westmere CPU guest under
-  a Broadwell CPU host
-
-Status in QEMU:
-  New
-
-Bug description:
-  Using latest master(5dae13), qemu fails to start any nested guest in a
-  Westmere emulated guest(layer 1), under a Broadwell host(layer 0),
-  with the error:
-
-  qemu-custom: /root/qemu/target/i386/kvm.c:1849: kvm_put_msrs:
-  Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
-
-  The qemu command used(though other CPUs didn't work either):
-  /usr/bin/qemu-custom -name guest=3D12ed9230-vm-el73,debug-threads=3Don -S=
- -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/d=
-omain-5-12ed9230-vm-el73/master-key.aes -machine pc-i440fx-2.9,accel=3Dkvm,=
-usb=3Doff -cpu Westmere,+vmx -m 512 -realtime mlock=3Doff -smp 2,sockets=3D=
-2,cores=3D1,threads=3D1 -object iothread,id=3Diothread1 -uuid f4ce4eba-985f=
--42a3-94c4-6e4a8a530347 -nographic -no-user-config -nodefaults -chardev soc=
-ket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-5-12ed9230-vm-el73=
-/monitor.sock,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3D=
-control -rtc base=3Dutc -no-shutdown -boot menu=3Doff,strict=3Don -device v=
-irtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x3 -drive file=3D/=
-root/lago/.lago/default/images/vm-el73_root.qcow2,format=3Dqcow2,if=3Dnone,=
-id=3Ddrive-virtio-disk0,serial=3D1,discard=3Dunmap -device virtio-blk-pci,s=
-csi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Ddrive-virtio-disk0,id=3Dvirtio-dis=
-k0,bootindex=3D1 -netdev tap,fd=3D26,id=3Dhostnet0,vhost=3Don,vhostfd=3D28 =
--device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D54:52:c0:a7:c8:02,=
-bus=3Dpci.0,addr=3D0x2 -chardev pty,id=3Dcharserial0 -device isa-serial,cha=
-rdev=3Dcharserial0,id=3Dserial0 -chardev socket,id=3Dcharchannel0,path=3D/v=
-ar/lib/libvirt/qemu/channel/target/domain-5-12ed9230-vm-el73/org.qemu.guest=
-_agent.0,server,nowait -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1=
-,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu.guest_agent.0 -object=
- rng-random,id=3Dobjrng0,filename=3D/dev/random -device virtio-rng-pci,rng=
-=3Dobjrng0,id=3Drng0,bus=3Dpci.0,addr=3D0x9 -msg timestamp=3Don
-  2017-02-16T15:14:45.840412Z qemu-custom: -chardev pty,id=3Dcharserial0: c=
-har device redirected to /dev/pts/2 (label charserial0)
-  qemu-custom: /root/qemu/target/i386/kvm.c:1849: kvm_put_msrs: Assertion `=
-ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
-
-  =
-
-  The CPU flags in the Westmere guest:
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush mmx fxsr sse sse2 syscall nx lm constant_tsc rep_good nopl =
-pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 x2apic popcnt aes hypervisor lah=
-f_lm arat tpr_shadow vnmi flexpriority ept vpid
-
-  The guest kernel is 3.10.0-514.2.2.el7.x86_64.
-
-  The CPU flags of the host(Broadwell): =
-
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb =
-rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology no=
-nstop_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx smx e=
-st tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt=
- tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch epb=
- intel_pt tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hl=
-e avx2 smep bmi2 erms invpcid rtm mpx rdseed adx smap clflushopt xsaveopt x=
-savec xgetbv1 xsaves dtherm ida arat pln pts hwp hwp_notify hwp_act_window =
-hwp_epp
-
-  qemu command on the host - Broadwell(which works):
-  /usr/bin/qemu-kvm -name 4ffcd448-vm-el73,debug-threads=3Don -S -machine p=
-c-i440fx-2.6,accel=3Dkvm,usb=3Doff -cpu Westmere,+x2apic,+vmx,+vme -m 4096 =
--realtime mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -object ioth=
-read,id=3Diothread1 -uuid 8cc0a2cf-d25a-4014-acdb-f159c376a532 -nographic -=
-no-user-config -nodefaults -chardev socket,id=3Dcharmonitor,path=3D/var/lib=
-/libvirt/qemu/domain-4-4ffcd448-vm-el73/monitor.sock,server,nowait -mon cha=
-rdev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc -no-shutdown=
- -boot menu=3Doff,strict=3Don -device virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.=
-0,addr=3D0x3 -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=
-=3D0x4 -drive file=3D/home/ngoldin/src/nvgoldin.github.com/lago-init-files/=
-.lago/flags-tests/default/images/vm-el73_root.qcow2,format=3Dqcow2,if=3Dnon=
-e,id=3Ddrive-virtio-disk0,serial=3D1,discard=3Dunmap -device virtio-blk-pci=
-,scsi=3Doff,bus=3Dpci.0,addr=3D0x5,drive=3Ddrive-virtio-disk0,id=3Dvirtio-d=
-isk0,bootindex=3D1 -drive file=3D/home/ngoldin/src/nvgoldin.github.com/lago=
--init-files/.lago/flags-tests/default/images/vm-el73_additonal.qcow2,format=
-=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0,serial=3D2,discard=3Dunmap -devic=
-e scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,drive=3Ddrive-scsi0=
--0-0-0,id=3Dscsi0-0-0-0,bootindex=3D2 -netdev tap,fd=3D29,id=3Dhostnet0,vho=
-st=3Don,vhostfd=3D31 -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=
-=3D54:52:c0:a8:c9:02,bus=3Dpci.0,addr=3D0x2 -chardev pty,id=3Dcharserial0 -=
-device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev socket,id=3Dc=
-harchannel0,path=3D/var/lib/libvirt/qemu/channel/target/domain-4-4ffcd448-v=
-m-el73/org.qemu.guest_agent.0,server,nowait -device virtserialport,bus=3Dvi=
-rtio-serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu.=
-guest_agent.0 -object rng-random,id=3Dobjrng0,filename=3D/dev/random -devic=
-e virtio-rng-pci,rng=3Dobjrng0,id=3Drng0,bus=3Dpci.0,addr=3D0x9 -msg timest=
-amp=3Don
-
-  On the Broadwell host I'm using a distribution package if it matters
-  (qemu-kvm-2.6.2-5.fc24.x86_64 and 4.8.15-200.fc24.x86_64)
-
-  As the error indicates, I think this assertion was put in:
-  commit 48e1a45c3166d659f781171a47dabf4a187ed7a5
-  Author: Paolo Bonzini <pbonzini@redhat.com>
-  Date:   Wed Mar 30 22:55:29 2016 +0200
-
-      target-i386: assert that KVM_GET/SET_MSRS can set all requested MSRs
-      =
-
-      This would have caught the bug in the previous patch.
-      =
-
-      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-  I tried going back one commit before to 273c515, and then the error is go=
-ne and the nested guest comes up as expected. If I try to run with head at =
-the above commit(48e145c) the error output is slightly different, though it=
- looks the same:
-  /root/qemu/target-i386/kvm.c:1713: kvm_put_msrs: Assertion `ret =3D=3D n'=
- failed.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1665389/+subscriptions
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
