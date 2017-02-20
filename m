@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1cfjKc-00009a-4X
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 03:28:27 -0500
+	(envelope-from <peterx@redhat.com>) id 1cfjP4-00031D-UR
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 03:33:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1cfjKY-0004vK-3U
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 03:28:26 -0500
-Received: from mga02.intel.com ([134.134.136.20]:32332)
+	(envelope-from <peterx@redhat.com>) id 1cfjP1-0005qJ-HU
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 03:33:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43924)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1cfjKX-0004uf-OY
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 03:28:22 -0500
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-Date: Mon, 20 Feb 2017 08:27:54 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743900C602@shsmsx102.ccr.corp.intel.com>
-References: <1484026704-28027-1-git-send-email-mst@redhat.com>
-	<1484026704-28027-9-git-send-email-mst@redhat.com>
-	<A2975661238FB949B60364EF0F2C25743900AAEF@shsmsx102.ccr.corp.intel.com>
-	<c1f86fba-6b22-8316-156f-2024bee46b0c@redhat.com>
-	<A2975661238FB949B60364EF0F2C25743900B73D@shsmsx102.ccr.corp.intel.com>
-	<e9022e3a-5fa5-45c3-cc84-cb78d3ff9cdc@redhat.com>
-In-Reply-To: <e9022e3a-5fa5-45c3-cc84-cb78d3ff9cdc@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cfjP1-0005q8-8X
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 03:32:59 -0500
+Date: Mon, 20 Feb 2017 16:32:49 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170220083249.GE12693@pxdev.xzpeter.org>
+References: <1486456099-7345-1-git-send-email-peterx@redhat.com>
+	<20170217101835.58e59c41@t450s.home>
+	<20170220074731.GD12693@pxdev.xzpeter.org>
+	<A2975661238FB949B60364EF0F2C25743900C5D8@shsmsx102.ccr.corp.intel.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PULL 08/41] intel_iommu: support device iotlb
- descriptor
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <A2975661238FB949B60364EF0F2C25743900C5D8@shsmsx102.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v7 00/17] VT-d: vfio enablement and misc
+ enhances
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,86 +30,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Tian, Kevin" <kevin.tian@intel.com>, "Lan, Tianyu" <tianyu.lan@intel.com>, Alex Williamson <alex.williamson@redhat.com>
+To: "Liu, Yi L" <yi.l.liu@intel.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, "Lan, Tianyu" <tianyu.lan@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, "mst@redhat.com" <mst@redhat.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "bd.aviv@gmail.com" <bd.aviv@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBKYXNvbiBXYW5nIFttYWlsdG86
-amFzb3dhbmdAcmVkaGF0LmNvbV0NCj4gU2VudDogRnJpZGF5LCBGZWJydWFyeSAxNywgMjAxNyAy
-OjQzIFBNDQo+IFRvOiBMaXUsIFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT47IE1pY2hhZWwgUy4g
-VHNpcmtpbiA8bXN0QHJlZGhhdC5jb20+OyBxZW11LQ0KPiBkZXZlbEBub25nbnUub3JnDQo+IENj
-OiBQZXRlciBNYXlkZWxsIDxwZXRlci5tYXlkZWxsQGxpbmFyby5vcmc+OyBFZHVhcmRvIEhhYmtv
-c3QNCj4gPGVoYWJrb3N0QHJlZGhhdC5jb20+OyBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+
-OyBQYW9sbyBCb256aW5pDQo+IDxwYm9uemluaUByZWRoYXQuY29tPjsgUmljaGFyZCBIZW5kZXJz
-b24gPHJ0aEB0d2lkZGxlLm5ldD47IFRpYW4sIEtldmluDQo+IDxrZXZpbi50aWFuQGludGVsLmNv
-bT47IExhbiwgVGlhbnl1IDx0aWFueXUubGFuQGludGVsLmNvbT47IEFsZXggV2lsbGlhbXNvbg0K
-PiA8YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUWVtdS1kZXZl
-bF0gW1BVTEwgMDgvNDFdIGludGVsX2lvbW11OiBzdXBwb3J0IGRldmljZSBpb3RsYg0KPiBkZXNj
-cmlwdG9yDQo+IA0KPiANCj4gDQo+IE9uIDIwMTflubQwMuaciDE35pelIDE0OjE4LCBMaXUsIFlp
-IEwgd3JvdGU6DQo+ID4+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4+IEZyb206IEph
-c29uIFdhbmcgW21haWx0bzpqYXNvd2FuZ0ByZWRoYXQuY29tXQ0KPiA+PiBTZW50OiBUaHVyc2Rh
-eSwgRmVicnVhcnkgMTYsIDIwMTcgMTo0NCBQTQ0KPiA+PiBUbzogTGl1LCBZaSBMIDx5aS5sLmxp
-dUBpbnRlbC5jb20+OyBNaWNoYWVsIFMuIFRzaXJraW4NCj4gPj4gPG1zdEByZWRoYXQuY29tPjsg
-cWVtdS0gZGV2ZWxAbm9uZ251Lm9yZw0KPiA+PiBDYzogUGV0ZXIgTWF5ZGVsbCA8cGV0ZXIubWF5
-ZGVsbEBsaW5hcm8ub3JnPjsgRWR1YXJkbyBIYWJrb3N0DQo+ID4+IDxlaGFia29zdEByZWRoYXQu
-Y29tPjsgUGV0ZXIgWHUgPHBldGVyeEByZWRoYXQuY29tPjsgUGFvbG8gQm9uemluaQ0KPiA+PiA8
-cGJvbnppbmlAcmVkaGF0LmNvbT47IFJpY2hhcmQgSGVuZGVyc29uIDxydGhAdHdpZGRsZS5uZXQ+
-OyBUaWFuLA0KPiA+PiBLZXZpbiA8a2V2aW4udGlhbkBpbnRlbC5jb20+OyBMYW4sIFRpYW55dSA8
-dGlhbnl1LmxhbkBpbnRlbC5jb20+Ow0KPiA+PiBBbGV4IFdpbGxpYW1zb24gPGFsZXgud2lsbGlh
-bXNvbkByZWRoYXQuY29tPg0KPiA+PiBTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIFtQVUxMIDA4
-LzQxXSBpbnRlbF9pb21tdTogc3VwcG9ydCBkZXZpY2UNCj4gPj4gaW90bGIgZGVzY3JpcHRvcg0K
-PiA+Pg0KPiA+Pg0KPiA+Pg0KPiA+PiBPbiAyMDE35bm0MDLmnIgxNuaXpSAxMzozNiwgTGl1LCBZ
-aSBMIHdyb3RlOg0KPiA+Pj4+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4+Pj4gRnJv
-bTogUWVtdS1kZXZlbA0KPiA+Pj4+IFttYWlsdG86cWVtdS1kZXZlbC1ib3VuY2VzK3lpLmwubGl1
-PWludGVsLmNvbUBub25nbnUub3JnXQ0KPiA+Pj4+IE9uIEJlaGFsZiBPZiBNaWNoYWVsIFMuIFRz
-aXJraW4NCj4gPj4+PiBTZW50OiBUdWVzZGF5LCBKYW51YXJ5IDEwLCAyMDE3IDE6NDAgUE0NCj4g
-Pj4+PiBUbzogcWVtdS1kZXZlbEBub25nbnUub3JnDQo+ID4+Pj4gQ2M6IFBldGVyIE1heWRlbGwg
-PHBldGVyLm1heWRlbGxAbGluYXJvLm9yZz47IEVkdWFyZG8gSGFia29zdA0KPiA+Pj4+IDxlaGFi
-a29zdEByZWRoYXQuY29tPjsgSmFzb24gV2FuZyA8amFzb3dhbmdAcmVkaGF0LmNvbT47IFBldGVy
-DQo+IFh1DQo+ID4+Pj4gPHBldGVyeEByZWRoYXQuY29tPjsgUGFvbG8gQm9uemluaSA8cGJvbnpp
-bmlAcmVkaGF0LmNvbT47IFJpY2hhcmQNCj4gPj4+PiBIZW5kZXJzb24gPHJ0aEB0d2lkZGxlLm5l
-dD4NCj4gPj4+PiBTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMDgvNDFdIGludGVsX2lvbW11
-OiBzdXBwb3J0IGRldmljZQ0KPiA+Pj4+IGlvdGxiIGRlc2NyaXB0b3INCj4gPj4+Pg0KPiA+Pj4+
-IEZyb206IEphc29uIFdhbmcgPGphc293YW5nQHJlZGhhdC5jb20+DQo+ID4+Pj4NCj4gPj4+PiBU
-aGlzIHBhdGNoIGVuYWJsZXMgZGV2aWNlIElPVExCIHN1cHBvcnQgZm9yIGludGVsIGlvbW11LiBU
-aGUgbWFqb3INCj4gPj4+PiB3b3JrIGlzIHRvIGltcGxlbWVudCBRSSBkZXZpY2UgSU9UTEIgZGVz
-Y3JpcHRvciBwcm9jZXNzaW5nIGFuZA0KPiA+Pj4+IG5vdGlmeSB0aGUgZGV2aWNlIHRocm91Z2gg
-aW9tbXUgbm90aWZpZXIuDQo+ID4+Pj4NCj4gPj4+IEhpIEphc29uL01pY2hhZWwsDQo+ID4+Pg0K
-PiA+Pj4gUmVjZW50bHkgUGV0ZXIgWHUncyBwYXRjaCBhbHNvIHRvdWNoZWQgaW50ZWwtaW9tbXUg
-ZW11bGF0aW9uLiBIaXMNCj4gPj4+IHBhdGNoIHNoYWRvd3Mgc2Vjb25kLWxldmVsIHBhZ2UgdGFi
-bGUgYnkgY2FwdHVyaW5nIGlvdGxiIGZsdXNoIGZyb20NCj4gPj4+IGd1ZXN0LiBJdCB3b3VsZCBy
-ZXN1bHQgaW4gcGFnZSB0YWJsZSB1cGRhdGluZyBpbiBob3N0LiBEb2VzIHRoaXMNCj4gPj4+IHBh
-dGNoIGFsc28gdXNlIHRoZSBzYW1lIG1hcC91bWFwIEFQSSBwcm92aWRlZCBieSBWRklPPw0KPiA+
-PiBZZXMsIGl0IGRlcGVuZHMgb24gdGhlIGlvbW11IG5vdGlmaWVyIHRvby4NCj4gPj4NCj4gPj4+
-IElmIGl0IGlzLCB0aGVuIEkgdGhpbmsgaXQgd291bGQgYWxzbyB1cGRhdGUgcGFnZSB0YWJsZSBp
-biBob3N0LiBJdA0KPiA+Pj4gbG9va3MgdG8gYmUgYSBkdXBsaWNhdGUgdXBkYXRlLiBQbHMgcmVm
-ZXIgdG8gdGhlIGZvbGxvd2luZyBzbmFwc2hvdA0KPiA+Pj4gY2FwdHVyZWQgZnJvbSBzZWN0aW9u
-IDYuNS4yLjUgb2YgdnRkIHNwZWMuDQo+ID4+Pg0KPiA+Pj4gIlNpbmNlIHRyYW5zbGF0aW9uIHJl
-cXVlc3RzIGZyb20gYSBkZXZpY2UgbWF5IGJlIHNlcnZpY2VkIGJ5DQo+ID4+PiBoYXJkd2FyZSBm
-cm9tIHRoZSBJT1RMQiwgc29mdHdhcmUgbXVzdCBhbHdheXMgcmVxdWVzdCBJT1RMQg0KPiA+Pj4g
-aW52YWxpZGF0aW9uDQo+ID4+PiAoaW90bGJfaW52X2RzYykgYmVmb3JlIHJlcXVlc3RpbmcgY29y
-cmVzcG9uZGluZyBEZXZpY2UtVExCDQo+ID4+PiAoZGV2X3RsYl9pbnZfZHNjKSBpbnZhbGlkYXRp
-b24uIg0KPiA+Pj4NCj4gPj4+IE1heWJlIGZvciBkZXZpY2UtaW90bGIsIHdlIG5lZWQgYSBzZXBh
-cmF0ZSBBUEkgd2hpY2gganVzdCBwYXNzIGRvd24NCj4gPj4+IHRoZSBpbnZhbGlkYXRlIGluZm8g
-d2l0aG91dCB1cGRhdGluZyBwYWdlIHRhYmxlLiBBbnkgdGhvdWdodHM/DQo+ID4+IGNjIEFsZXgu
-DQo+ID4+DQo+ID4+IElmIHdlIHdhbnQgQVRTIHRvIGJlIHZpc2libGUgZm9yIGd1ZXN0IChidXQg
-SSdtIG5vdCBzdXJlIGlmIFZGSU8NCj4gPj4gc3VwcG9ydCB0aGlzKSwgd2UgcHJvYmFibHkgbmVl
-ZCBhbm90aGVyIG5vdGlmaWVyIG9yIGEgbmV3IGZsYWcuDQo+ID4gSmFzb24sIGZvciBhc3NpZ25l
-ZCBkZXZpY2UsIEkgdGhpbmsgZ3Vlc3QgY291bGQgc2VlIEFUUyBpZiB0aGUNCj4gPiBhc3NpZ25l
-ZCBkZXZpY2Ugc3VwcG9ydHMgQVRTLiBJIGNhbiBzZWUgaXQgd2hlbiBwYXNzdGhydSBpR1BVLg0K
-PiA+DQo+ID4gUmVnYXJkcywNCj4gPiBZaSBMDQo+IA0KPiBHb29kIHRvIGtub3cgdGhpcy4NCj4g
-DQo+IElmIEkgdW5kZXJzdGFuZCB5b3VyIHN1Z2dlc3Rpb24gY29ycmVjdGx5LCB5b3Ugd2FudCBh
-IGRlZGljYXRlZCBBUEkgdG8gZmx1c2ggYQ0KPiBoYXJkd2FyZSBkZXZpY2UgSU9UTEIuIEknbSBu
-b3Qgc3VyZSB0aGlzIGlzIHJlYWxseSBuZWVkZWQuDQp5ZXMsIEknZCBsaWtlIHRvIGhhdmUgYW4g
-ZXh0cmEgQVBJIGJlc2lkZXMgdGhlIGN1cnJlbnQgTUFQL1VOTUFQLg0KDQo+IFRoZXJlJ3Mgc29t
-ZSBkaXNjdXNzaW9uIG9mIHNpbWlsYXIgaXNzdWUgaW4gdGhlIHBhc3QgKHdoZW4gQVRTIGlzIHVz
-ZWQgZm9yIHZpcnRpby0NCj4gbmV0L3Zob3N0KSwgbG9va3MgbGlrZSB3ZSBjb3VsZCBzb2x2ZSB0
-aGlzIGJ5IG5vdCB0cmlnZ2VyIHRoZSBVTk1BUCBub3RpZmllcg0KPiB1bmxlc3MgaXQgd2FzIGRl
-dmljZSBJT1RMQiBpbnYgZGVzYyBpZiBBVFMgaXMgZW5hYmxlZCBmb3IgdGhlIGRldmljZT8gV2l0
-aCB0aGlzDQo+IHJlbW90ZSBJT01NVS9JT1RMQiBjYW4gb25seSBnZXQgaW52YWxpZGF0aW9uIHJl
-cXVlc3Qgb25jZS4gRm9yIFZGSU8sIHRoZQ0KPiB1bmRlciBsYXllciBJT01NVSBjYW4gZGVhbCB3
-aXRoIGhhcmR3YXJlIGRldmljZSBJT1RMQiB3aXRob3V0IGFueSBleHRyYQ0KPiBlZmZvcnRzLg0K
-SWYgSSBjYXRjaCB0aGUgYmFja2dyb3VuZCwgSSB0aGluayBpdCBzaG91bGQgYmUgIm5vdCB0cmln
-Z2VyIHRoZSBVTk1BUCBub3RpZmllcg0Kd2hlbiB1bmxlc3MgaXQgd2FzIGRldmljZSBJT1RMQiBp
-bnYgZGVzYyBpZiBBVFMgaXMgZW5hYmxlZCBmb3IgdGhlIGRldmljZSINCg0KRmVlbCBmcmVlIHRv
-IGNvcnJlY3QgbWUuDQoNClRoYW5rcywNCllpIEwNCj4gRG9lcyB0aGlzIG1ha2Ugc2Vuc2U/DQo+
-IA0KPiBUaGFua3MNCg==
+On Mon, Feb 20, 2017 at 08:17:32AM +0000, Liu, Yi L wrote:
+> > -----Original Message-----
+> > From: Qemu-devel [mailto:qemu-devel-bounces+yi.l.liu=intel.com@nongnu.org]
+> > On Behalf Of Peter Xu
+> > Sent: Monday, February 20, 2017 3:48 PM
+> > To: Alex Williamson <alex.williamson@redhat.com>
+> > Cc: Lan, Tianyu <tianyu.lan@intel.com>; Tian, Kevin <kevin.tian@intel.com>;
+> > mst@redhat.com; jan.kiszka@siemens.com; jasowang@redhat.com; qemu-
+> > devel@nongnu.org; bd.aviv@gmail.com; David Gibson
+> > <david@gibson.dropbear.id.au>
+> > Subject: Re: [Qemu-devel] [PATCH v7 00/17] VT-d: vfio enablement and misc
+> > enhances
+> > 
+> > On Fri, Feb 17, 2017 at 10:18:35AM -0700, Alex Williamson wrote:
+> > > On Tue,  7 Feb 2017 16:28:02 +0800
+> > > Peter Xu <peterx@redhat.com> wrote:
+> > >
+> > > > This is v7 of vt-d vfio enablement series.
+> > > [snip]
+> > > > =========
+> > > > Test Done
+> > > > =========
+> > > >
+> > > > Build test passed for x86_64/arm/ppc64.
+> > > >
+> > > > Simply tested with x86_64, assigning two PCI devices to a single VM,
+> > > > boot the VM using:
+> > > >
+> > > > bin=x86_64-softmmu/qemu-system-x86_64
+> > > > $bin -M q35,accel=kvm,kernel-irqchip=split -m 1G \
+> > > >      -device intel-iommu,intremap=on,eim=off,caching-mode=on \
+> > > >      -netdev user,id=net0,hostfwd=tcp::5555-:22 \
+> > > >      -device virtio-net-pci,netdev=net0 \
+> > > >      -device vfio-pci,host=03:00.0 \
+> > > >      -device vfio-pci,host=02:00.0 \
+> > > >      -trace events=".trace.vfio" \
+> > > >      /var/lib/libvirt/images/vm1.qcow2
+> > > >
+> > > > pxdev:bin [vtd-vfio-enablement]# cat .trace.vfio
+> > > > vtd_page_walk*
+> > > > vtd_replay*
+> > > > vtd_inv_desc*
+> > > >
+> > > > Then, in the guest, run the following tool:
+> > > >
+> > > >
+> > > > https://github.com/xzpeter/clibs/blob/master/gpl/userspace/vfio-bind
+> > > > -group/vfio-bind-group.c
+> > > >
+> > > > With parameter:
+> > > >
+> > > >   ./vfio-bind-group 00:03.0 00:04.0
+> > > >
+> > > > Check host side trace log, I can see pages are replayed and mapped
+> > > > in
+> > > > 00:04.0 device address space, like:
+> > > >
+> > > > ...
+> > > > vtd_replay_ce_valid replay valid context device 00:04.00 hi 0x401 lo
+> > > > 0x38fe1001 vtd_page_walk Page walk for ce (0x401, 0x38fe1001) iova
+> > > > range 0x0 - 0x8000000000 vtd_page_walk_level Page walk
+> > > > (base=0x38fe1000, level=3) iova range 0x0 - 0x8000000000
+> > > > vtd_page_walk_level Page walk (base=0x35d31000, level=2) iova range
+> > > > 0x0 - 0x40000000 vtd_page_walk_level Page walk (base=0x34979000,
+> > > > level=1) iova range 0x0 - 0x200000 vtd_page_walk_one Page walk
+> > > > detected map level 0x1 iova 0x0 -> gpa 0x22dc3000 mask 0xfff perm 3
+> > > > vtd_page_walk_one Page walk detected map level 0x1 iova 0x1000 ->
+> > > > gpa 0x22e25000 mask 0xfff perm 3 vtd_page_walk_one Page walk
+> > > > detected map level 0x1 iova 0x2000 -> gpa 0x22e12000 mask 0xfff perm
+> > > > 3 vtd_page_walk_one Page walk detected map level 0x1 iova 0x3000 ->
+> > > > gpa 0x22e2d000 mask 0xfff perm 3 vtd_page_walk_one Page walk
+> > > > detected map level 0x1 iova 0x4000 -> gpa 0x12a49000 mask 0xfff perm
+> > > > 3 vtd_page_walk_one Page walk detected map level 0x1 iova 0x5000 ->
+> > > > gpa 0x129bb000 mask 0xfff perm 3 vtd_page_walk_one Page walk
+> > > > detected map level 0x1 iova 0x6000 -> gpa 0x128db000 mask 0xfff perm 3
+> > vtd_page_walk_one Page walk detected map level 0x1 iova 0x7000 -> gpa
+> > 0x12a80000 mask 0xfff perm 3 vtd_page_walk_one Page walk detected map
+> > level 0x1 iova 0x8000 -> gpa 0x12a7e000 mask 0xfff perm 3
+> > vtd_page_walk_one Page walk detected map level 0x1 iova 0x9000 -> gpa
+> > 0x12b22000 mask 0xfff perm 3 vtd_page_walk_one Page walk detected map
+> > level 0x1 iova 0xa000 -> gpa 0x12b41000 mask 0xfff perm 3 ...
+> > >
+> > > Hi Peter,
+> > >
+> > > I'm trying to make use of this, with your vtd-vfio-enablement-v7
+> > > branch (HEAD 0c1c4e738095).  I'm assigning an 82576 PF to a VM.  It
+> > > works with iommu=pt, but if I remove that option, the device does not
+> > > work and vfio_iommu_map_notify is never called.  Any suggestions?  My
+> > > commandline is below.  Thanks,
+> > >
+> > > Alex
+> > >
+> > > /usr/local/bin/qemu-system-x86_64 \
+> > >         -name guest=l1,debug-threads=on -S \
+> > >         -machine pc-q35-2.9,accel=kvm,usb=off,dump-guest-core=off,kernel-
+> > irqchip=split \
+> > >         -cpu host -m 10240 -realtime mlock=off -smp
+> > 4,sockets=1,cores=2,threads=2 \
+> > >         -no-user-config -nodefaults -monitor stdio -rtc base=utc,driftfix=slew \
+> > >         -global kvm-pit.lost_tick_policy=discard -no-hpet -no-shutdown \
+> > >         -global ICH9-LPC.disable_s3=1 -global ICH9-LPC.disable_s4=1 \
+> > >         -boot strict=on \
+> > >         -device ioh3420,port=0x10,chassis=1,id=pci.1,bus=pcie.0,addr=0x2 \
+> > >         -device i82801b11-bridge,id=pci.2,bus=pcie.0,addr=0x1e \
+> > >         -device pci-bridge,chassis_nr=3,id=pci.3,bus=pci.2,addr=0x0 \
+> > >         -device ioh3420,port=0x18,chassis=4,id=pci.4,bus=pcie.0,addr=0x3 \
+> > >         -device ioh3420,port=0x20,chassis=5,id=pci.5,bus=pcie.0,addr=0x4 \
+> > >         -device ioh3420,port=0x28,chassis=6,id=pci.6,bus=pcie.0,addr=0x5 \
+> > >         -device ioh3420,port=0x30,chassis=7,id=pci.7,bus=pcie.0,addr=0x6 \
+> > >         -device ioh3420,port=0x38,chassis=8,id=pci.8,bus=pcie.0,addr=0x7 \
+> > >         -device ich9-usb-ehci1,id=usb,bus=pcie.0,addr=0x1d.0x7 \
+> > >         -device ich9-usb-
+> > uhci1,masterbus=usb.0,firstport=0,bus=pcie.0,multifunction=on,addr=0x1d \
+> > >         -device ich9-usb-
+> > uhci2,masterbus=usb.0,firstport=2,bus=pcie.0,addr=0x1d.0x1 \
+> > >         -device ich9-usb-
+> > uhci3,masterbus=usb.0,firstport=4,bus=pcie.0,addr=0x1d.0x2 \
+> > >         -device virtio-serial-pci,id=virtio-serial0,bus=pci.4,addr=0x0 \
+> > >         -drive file=/dev/vg_s20/lv_l1,format=raw,if=none,id=drive-virtio-
+> > disk0,cache=none,aio=native \
+> > >         -device virtio-blk-pci,scsi=off,bus=pci.5,addr=0x0,drive=drive-virtio-
+> > disk0,id=virtio-disk0,bootindex=1 \
+> > >         -netdev user,id=hostnet0 \
+> > >         -device virtio-net-
+> > pci,netdev=hostnet0,id=net0,mac=52:54:00:c2:62:30,bus=pci.1,addr=0x0 \
+> > >         -device usb-tablet,id=input0,bus=usb.0,port=1 \
+> > >         -vnc :0 -vga std \
+> > >         -device vfio-pci,host=01:00.0,id=hostdev0,bus=pci.8,addr=0x0 \
+> > >         -device intel-iommu,intremap=on,eim=off,caching-mode=on -trace
+> > > events=/trace-events.txt -msg timestamp=on
+> > 
+> > Alex,
+> > 
+> > Thanks for testing this series.
+> > 
+> > I think I reproduced it using my 10g nic as well. What I got is:
+> > 
+> > [   23.724787] ixgbe 0000:01:00.0 enp1s0: Detected Tx Unit Hang
+> > [   23.724787]   Tx Queue             <0>
+> > [   23.724787]   TDH, TDT             <0>, <1>
+> > [   23.724787]   next_to_use          <1>
+> > [   23.724787]   next_to_clean        <0>
+> > [   23.724787] tx_buffer_info[next_to_clean]
+> > [   23.724787]   time_stamp           <fffbb8bb>
+> > [   23.724787]   jiffies              <fffbc780>
+> > [   23.729580] ixgbe 0000:01:00.0 enp1s0: tx hang 1 detected on queue 0,
+> > resetting adapter
+> > [   23.730752] ixgbe 0000:01:00.0 enp1s0: initiating reset due to tx timeout
+> > [   23.731768] ixgbe 0000:01:00.0 enp1s0: Reset adapter
+> > 
+> > Is this the problem you have encountered? (adapter continuously reset)
+> > 
+> > Interestingly, I found that the problem solves itself after I move the "-device
+> > intel-iommu,..." line before all the other devices.
+> 
+> I also encountered this interesting thing. yes, it is. you must place
+> "-device intel-iommu" before the vfio-pci devices. If I remember correctly, 
+> if "device intel-iommu" is not in front the others, the vtd_realize is called after
+> vfio_initfn, which would result in no calling of the following code snapshot.
+> Then there is no channel between vfio device and intel-iommu, so everything
+> is possible if such channel is gone. So better to place "intel-iommu" first place^_^
+> 
+> hw/vfio/common.c: vfio_listener_region_add()
+>     if (memory_region_is_iommu(section->mr)) {
+>         VFIOGuestIOMMU *giommu;
+> 
+>         trace_vfio_listener_region_add_iommu(iova, end);
+>         /*
+>          * FIXME: For VFIO iommu types which have KVM acceleration to
+>          * avoid bouncing all map/unmaps through qemu this way, this
+>          * would be the right place to wire that up (tell the KVM
+>          * device emulation the VFIO iommu handles to use).
+>          */
+>         giommu = g_malloc0(sizeof(*giommu));
+>         giommu->iommu = section->mr;
+>         giommu->iommu_offset = section->offset_within_address_space -
+>                                section->offset_within_region;
+>         giommu->container = container;
+>         giommu->n.notify = vfio_iommu_map_notify;
+>         giommu->n.notifier_flags = IOMMU_NOTIFIER_ALL;
+
+Yeah. I think that's possibly because when we do "-device vfio-pci"
+first then "-device intel-iommu" then we are actually listening to the
+&address_space_memory and any real update on the IOMMU address space
+is lost.
+
+Imho forcing user to add "-device intel-iommu" first might be a little
+bit "tough" indeed. Not sure whether we should just provide (or do we
+have it?) a way to decide the init order of device list.
+
+Thanks,
+
+-- peterx
