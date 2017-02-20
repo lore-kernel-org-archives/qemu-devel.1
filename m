@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60283)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cfnpk-00018B-DV
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 08:16:53 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cfnqb-000236-UY
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 08:17:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cfnpj-0005K5-8e
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 08:16:52 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cfnqa-0005dH-V3
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 08:17:45 -0500
 References: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
-	<1487006583-24350-24-git-send-email-kwolf@redhat.com>
+	<1487006583-24350-21-git-send-email-kwolf@redhat.com>
+	<6f790f11-1427-7f23-83d1-d3212fb74ddc@redhat.com>
+	<20170220130525.GE4814@noname.redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <ccdcbaa6-16c4-dc1c-9055-dfe57130aa3e@redhat.com>
-Date: Mon, 20 Feb 2017 14:16:40 +0100
+Message-ID: <6279f1e2-0e1d-fba8-5e04-0b6034a1be16@redhat.com>
+Date: Mon, 20 Feb 2017 14:17:34 +0100
 MIME-Version: 1.0
-In-Reply-To: <1487006583-24350-24-git-send-email-kwolf@redhat.com>
+In-Reply-To: <20170220130525.GE4814@noname.redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="BteRNBUh97tWbmopGgpO7rUMdEnPw19Os"
-Subject: Re: [Qemu-devel] [RFC PATCH 23/41] block: Include details on
- permission errors in message
+	boundary="3VbWxTBMj25uhTOV11kuAvGtHsUWks0Hk"
+Subject: Re: [Qemu-devel] [RFC PATCH 20/41] hw/block: Introduce share-rw
+ qdev property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,173 +27,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---BteRNBUh97tWbmopGgpO7rUMdEnPw19Os
+--3VbWxTBMj25uhTOV11kuAvGtHsUWks0Hk
 From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
-Message-ID: <ccdcbaa6-16c4-dc1c-9055-dfe57130aa3e@redhat.com>
-Subject: Re: [RFC PATCH 23/41] block: Include details on permission errors in
- message
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, jcody@redhat.com, famz@redhat.com,
+ qemu-devel@nongnu.org
+Message-ID: <6279f1e2-0e1d-fba8-5e04-0b6034a1be16@redhat.com>
+Subject: Re: [RFC PATCH 20/41] hw/block: Introduce share-rw qdev property
 References: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
- <1487006583-24350-24-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1487006583-24350-24-git-send-email-kwolf@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
+ <1487006583-24350-21-git-send-email-kwolf@redhat.com>
+ <6f790f11-1427-7f23-83d1-d3212fb74ddc@redhat.com>
+ <20170220130525.GE4814@noname.redhat.com>
+In-Reply-To: <20170220130525.GE4814@noname.redhat.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: quoted-printable
 
-On 13.02.2017 18:22, Kevin Wolf wrote:
-> Instead of just telling that there was some conflict, we can be specifi=
-c
-> and tell which permissions were in conflict and which way the conflict
-> is.
+On 20.02.2017 14:05, Kevin Wolf wrote:
+> Am 20.02.2017 um 13:28 hat Max Reitz geschrieben:
+>> On 13.02.2017 18:22, Kevin Wolf wrote:
+>>> By default, don't allow another writer for block devices that are
+>>> attached to a guest device. For the cases where this setup is intende=
+d
+>>> (e.g. using a cluster filesystem on the disk), the new option can be
+>>> used to allow it.
+>>>
+>>> This change affects only devices using DEFINE_BLOCK_PROPERTIES().
+>>> Devices directly using DEFINE_PROP_DRIVE() still accept writers
+>>> unconditionally.
+>>>
+>>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>>> ---
+>>>  hw/block/block.c           | 14 ++++++------
+>>>  include/hw/block/block.h   |  4 +++-
+>>>  tests/qemu-iotests/172.out | 53 ++++++++++++++++++++++++++++++++++++=
+++++++++++
+>>>  3 files changed, 64 insertions(+), 7 deletions(-)
+>>>
+>>> diff --git a/hw/block/block.c b/hw/block/block.c
+>>> index c3d3901..3c218eb 100644
+>>> --- a/hw/block/block.c
+>>> +++ b/hw/block/block.c
+>>> @@ -56,7 +56,7 @@ void blkconf_apply_backend_options(BlockConf *conf,=
+ bool readonly,
+>>>  {
+>>>      BlockBackend *blk =3D conf->blk;
+>>>      BlockdevOnError rerror, werror;
+>>> -    uint64_t perm;
+>>> +    uint64_t perm, shared_perm;
+>>>      bool wce;
+>>>      int ret;
+>>> =20
+>>> @@ -65,11 +65,13 @@ void blkconf_apply_backend_options(BlockConf *con=
+f, bool readonly,
+>>>          perm |=3D BLK_PERM_WRITE;
+>>>      }
+>>> =20
+>>> -    /* TODO Remove BLK_PERM_WRITE unless explicitly configured so */=
+
+>>> -    ret =3D blk_set_perm(blk, perm,
+>>> -                       BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNC=
+HANGED |
+>>> -                       BLK_PERM_GRAPH_MOD | BLK_PERM_RESIZE | BLK_PE=
+RM_WRITE,
+>>> -                       errp);
+>>> +    shared_perm =3D BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHAN=
+GED |
+>>> +                  BLK_PERM_GRAPH_MOD | BLK_PERM_RESIZE;
+>>
+>> I'm not so sure BLK_PERM_RESIZE belongs here.
 >=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++++++---=
---------
->  1 file changed, 55 insertions(+), 11 deletions(-)
+> Where does it belong in your opinion?
+
+Not unconditionally here, probably.
+
+> An option that I considered was adding BLK_PERM_RESIZE in
+> blk_set_dev_ops() if op.resize_cb !=3D NULL, but it felt a bit too
+> implicit to me.
 >=20
-> diff --git a/block.c b/block.c
-> index 2116542..d743f50 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -1381,6 +1381,43 @@ static void bdrv_update_perm(BlockDriverState *b=
-s)
->      bdrv_set_perm(bs, cumulative_perms, cumulative_shared_perms);
->  }
-> =20
-> +static char *bdrv_child_link_name(BdrvChild *c)
-> +{
-> +    if (c->role->get_link_name) {
-> +        return c->role->get_link_name(c);
-> +    }
-> +
-> +    return g_strdup("another user");
+> Or I guess we can just add another bool parameter?
 
-=2E..now I'm a bit disappointed, not least because "another user" is not =
-a
-link name.
-
-But I don't think we want a link name anyway. I'd write it differently
-altogether. Looking at the code below, this will be used as "Conflicts
-with ${link_name}".
-
-Now, "Conflicts with backing file link from foo" reads weird. In fact,
-anything that actually reports a "link" is weird. I'd propose the followi=
-ng:
-
-"Conflicts with [use by] ${user} (used as ${c->name})"
-
-user is c->role->get_name() if that exists, or "another user" if it does
-not. If you implemented get_name() instead of get_link_name() for the
-backing file role, there wouldn't be any need for get_link_name() at
-all, IMO.
-
-Also, you can implement c->role->get_name() not only for child_backing,
-but also for child_file and child_format.
+It all depends on whether the device model can handle online resizes. I
+think a bool parameter would be fine.
 
 Max
 
-> +}
-> +
-> +static char *bdrv_perm_names(uint64_t perm)
-> +{
-> +    struct perm_name {
-> +        uint64_t perm;
-> +        const char *name;
-> +    } permissions[] =3D {
-> +        { BLK_PERM_CONSISTENT_READ, "consistent read" },
-> +        { BLK_PERM_WRITE,           "write" },
-> +        { BLK_PERM_WRITE_UNCHANGED, "write unchanged" },
-> +        { BLK_PERM_RESIZE,          "resize" },
-> +        { BLK_PERM_GRAPH_MOD,       "change children" },
-> +        { 0, NULL }
-> +    };
-> +
-> +    char *result =3D g_strdup("");
-> +    struct perm_name *p;
-> +
-> +    for (p =3D permissions; p->name; p++) {
-> +        if (perm & p->perm) {
-> +            char *old =3D result;
-> +            result =3D g_strdup_printf("%s%s%s", old, *old ? ", " : ""=
-, p->name);
-> +            g_free(old);
-> +        }
-> +    }
-> +
-> +    return result;
-> +}
-> +
->  static int bdrv_check_update_perm(BlockDriverState *bs, uint64_t new_u=
-sed_perm,
->                                    uint64_t new_shared_perm,
->                                    BdrvChild *ignore_child, Error **err=
-p)
-> @@ -1397,17 +1434,24 @@ static int bdrv_check_update_perm(BlockDriverSt=
-ate *bs, uint64_t new_used_perm,
->              continue;
->          }
-> =20
-> -        if ((new_used_perm & c->shared_perm) !=3D new_used_perm ||
-> -            (c->perm & new_shared_perm) !=3D c->perm)
-> -        {
-> -            const char *user =3D NULL;
-> -            if (c->role->get_name) {
-> -                user =3D c->role->get_name(c);
-> -                if (user && !*user) {
-> -                    user =3D NULL;
-> -                }
-> -            }
-> -            error_setg(errp, "Conflicts with %s", user ?: "another ope=
-ration");
-> +        if ((new_used_perm & c->shared_perm) !=3D new_used_perm) {
-> +            char *link =3D bdrv_child_link_name(c);
-> +            char *perm_names =3D bdrv_perm_names(new_used_perm & ~c->s=
-hared_perm);
-> +            error_setg(errp, "Conflicts with %s, which does not allow =
-'%s' "
-> +                             "on %s",
-> +                       link, perm_names, bdrv_get_node_name(c->bs));
-> +            g_free(link);
-> +            g_free(perm_names);
-> +            return -EPERM;
-> +        }
-> +
-> +        if ((c->perm & new_shared_perm) !=3D c->perm) {
-> +            char *link =3D bdrv_child_link_name(c);
-> +            char *perm_names =3D bdrv_perm_names(c->perm & ~new_shared=
-_perm);
-> +            error_setg(errp, "Conflicts with %s, which uses '%s' on %s=
-",
-> +                       link, perm_names, bdrv_get_node_name(c->bs));
-> +            g_free(link);
-> +            g_free(perm_names);
->              return -EPERM;
->          }
-> =20
->=20
 
-
-
---BteRNBUh97tWbmopGgpO7rUMdEnPw19Os
+--3VbWxTBMj25uhTOV11kuAvGtHsUWks0Hk
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliq7DgSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AtbgH/REvjgJgTA6VctNSi5vvcKJR/RMbnWFi
-WbB3vfxGtv5aGHbOfbJ77FOd9Uyoqguiw6zymEmlaZRz12bv/jmnuRg6kV28oKRk
-5K0R080icRodVVfMUtWZN2mntnNjLyhwncofX9gMNWlKbeM1zrKDN2n/aBpQmtNY
-dxvijBMc82rluT9qBUwktW+hb/+ENv0teDcXMe4fwOp5reN784UCkmyEtDD1/vb5
-cJ1xkU1JSdvRSBLXXR1K9C13py9XLNlLPL/oywMUhUflQVP/f1BVcSwDGHgvXk1D
-ujTzp/jxI3OHGtRETKt1iNPmf8tS59jmOYMcdmNhg3GxwcIXiAX0Uqw=
-=I42a
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliq7G4SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AeCYH/i2IlRpHxi5ZSASTDVnKjurdGnKwbh8R
+cOdqwbqfNYtopMniRBapr0I4t+8R5EdtjMo4vqCqSGXB8yho700/zuHr4qvVA+Le
+HZJOHOkQ1PK96ODFyb6LVBT6be2+7J4WBYoW7pxq1GBeAhVsljxiWTKg0+fTj/7a
+cWBkyi1gNUcKNU0T2s25QZ2UjFp9s91xwc+zimaKjd0nW/39PGxs62r+sa80q6Ru
+/DSZQvYApCdxNBCOvYnYoc6HfVY23WJyjgcBlak1/gFys9Tb0sqUe/Inm47N4xXo
+LAek9yvzcenmePhMo7E9oEiUeNk27V2eFodEcHaMnkBWEGobilplkvk=
+=/Vcu
 -----END PGP SIGNATURE-----
 
---BteRNBUh97tWbmopGgpO7rUMdEnPw19Os--
+--3VbWxTBMj25uhTOV11kuAvGtHsUWks0Hk--
