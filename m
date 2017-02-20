@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49138)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1cfvZ5-00019g-DA
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 16:32:12 -0500
+	(envelope-from <bobby.prani@gmail.com>) id 1cfxoj-0002Gj-4x
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 18:56:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1cfvZ2-0005I9-AJ
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 16:32:11 -0500
-Received: from mail-db5eur01on0130.outbound.protection.outlook.com
-	([104.47.2.130]:62462
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1cfvZ1-0005HL-Oa
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 16:32:08 -0500
-References: <1487614915-18710-1-git-send-email-den@openvz.org>
-	<1487614915-18710-3-git-send-email-den@openvz.org>
-	<7e55a8e9-0a5d-5602-7626-9c7976f6a49c@redhat.com>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <d97212a0-fa95-6614-bd5b-62225f789da9@openvz.org>
-Date: Mon, 20 Feb 2017 20:58:38 +0100
+	(envelope-from <bobby.prani@gmail.com>) id 1cfxog-0005VX-2Z
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 18:56:29 -0500
+Received: from mail-yw0-x242.google.com ([2607:f8b0:4002:c05::242]:35893)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1cfxof-0005VT-Tg
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 18:56:25 -0500
+Received: by mail-yw0-x242.google.com with SMTP id 2so3089515ywn.3
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 15:56:25 -0800 (PST)
+References: <20170220145335.591-1-bobby.prani@gmail.com>
+	<87fuj8x2gi.fsf@linaro.org>
+From: Pranith Kumar <bobby.prani@gmail.com>
+In-reply-to: <87fuj8x2gi.fsf@linaro.org>
+Date: Mon, 20 Feb 2017 18:56:23 -0500
+Message-ID: <87k28ko1qw.fsf@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <7e55a8e9-0a5d-5602-7626-9c7976f6a49c@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] qapi: flatten GuestPanicInformation
- union
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] mttcg: Set jmp_env to handle exit from
+ tb_gen_code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,51 +31,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>, Evgeniy Yakovlev <eyakovlev@virtuozzo.com>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, rth@twiddle.net
 
-On 02/20/2017 08:48 PM, Eric Blake wrote:
-> On 02/20/2017 12:21 PM, Denis V. Lunev wrote:
->> From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+
+Alex Bennée writes:
+
+> Pranith Kumar <bobby.prani@gmail.com> writes:
+>
+>> tb_gen_code() can exit execution using cpu_exit_loop() when it cannot
+>> allocate new tb's. To handle this, we need to properly set the jmp_env
+>> pointer ahead of calling tb_gen_code().
 >>
->> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
->> Signed-off-by: Denis V. Lunev <den@openvz.org>
->> CC: Paolo Bonzini <pbonzini@redhat.com>
->> CC: Eric Blake <eblake@redhat.com>
+>> CC:Alex Bennée <alex.bennee@linaro.org>
+>> CC: Richard Henderson <rth@twiddle.net>
+>> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
 >> ---
->>  qapi-schema.json  | 12 ++++++++++++
->>  target/i386/cpu.c | 15 ++++++---------
->>  vl.c              | 12 ++++++------
->>  3 files changed, 24 insertions(+), 15 deletions(-)
+>>  cpu-exec.c | 23 +++++++++++------------
+>>  1 file changed, 11 insertions(+), 12 deletions(-)
 >>
->> diff --git a/qapi-schema.json b/qapi-schema.json
->> index e9a6364..b142e15 100644
->> --- a/qapi-schema.json
->> +++ b/qapi-schema.json
->> @@ -5872,6 +5872,16 @@
->>    'data': [ 'pause', 'poweroff' ] }
->>  
->>  ##
->> +# @GuestPanicInformationType:
->> +#
->> +# An enumeration of the guest panic information types
->> +#
->> +# Since: 2.9
->> +##
->> +{ 'enum': 'GuestPanicInformationType',
->> +  'data': [ 'hyper-v'] }
-> Perhaps 'hyperv' is better? It's the difference between
-> GUEST_PANIC_INFORMATION_TYPE_HYPER_V and
-> GUEST_PANIC_INFORMATION_TYPE_HYPERV. But that's bikeshedding, so no need
-> to change it.
+>> diff --git a/cpu-exec.c b/cpu-exec.c
+>> index 97d79612d9..4b70988b24 100644
+>> --- a/cpu-exec.c
+>> +++ b/cpu-exec.c
+>> @@ -236,23 +236,22 @@ static void cpu_exec_step(CPUState *cpu)
+>>
+>>      cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
+>>      tb_lock();
+>> -    tb = tb_gen_code(cpu, pc, cs_base, flags,
+>> -                     1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
+>> -    tb->orig_tb = NULL;
+>> -    tb_unlock();
+>> -
+>> -    cc->cpu_exec_enter(cpu);
+>> -
 >
-> Must go into 2.9, so we aren't baking in bad API.
->
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->
-We can you plain 'hv', like all command line options controlling
-HyperV features.
+> It occurs to me we are also diverging in our locking pattern from
+> tb_find which takes mmap_lock first. This is a NOP for system emulation
+> but needed for user-emulation (for which we can do cpu_exec_step but not
+> cpu_exec_nocache).
 
-Roman, Evgeniy, do you have any opinion on that?
+Right. So we have to take the mmap_lock() before calling
+tb_gen_code(). However, this lock is released in the error path before calling
+cpu_loop_exit() if allocation of a new tb fails. The following is what I have
+after merging with the previous EXCP_ATOMIC handling patch.
 
-Den
+diff --git a/cpu-exec.c b/cpu-exec.c
+index a8e04bffbf..2bb3ba3672 100644
+--- a/cpu-exec.c
++++ b/cpu-exec.c
+@@ -228,6 +228,7 @@ static void cpu_exec_nocache(CPUState *cpu, int max_cycles,
+ 
+ static void cpu_exec_step(CPUState *cpu)
+ {
++    CPUClass *cc = CPU_GET_CLASS(cpu);
+     CPUArchState *env = (CPUArchState *)cpu->env_ptr;
+     TranslationBlock *tb;
+     target_ulong cs_base, pc;
+@@ -235,16 +236,24 @@ static void cpu_exec_step(CPUState *cpu)
+ 
+     cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
+     tb_lock();
+-    tb = tb_gen_code(cpu, pc, cs_base, flags,
+-                     1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
+-    tb->orig_tb = NULL;
+-    tb_unlock();
+-    /* execute the generated code */
+-    trace_exec_tb_nocache(tb, pc);
+-    cpu_tb_exec(cpu, tb);
+-    tb_lock();
+-    tb_phys_invalidate(tb, -1);
+-    tb_free(tb);
++    if (sigsetjmp(cpu->jmp_env, 0) == 0) {
++        mmap_lock();
++        tb = tb_gen_code(cpu, pc, cs_base, flags,
++                         1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
++        tb->orig_tb = NULL;
++        mmap_unlock();
++        tb_unlock();
++
++        cc->cpu_exec_enter(cpu);
++        /* execute the generated code */
++        trace_exec_tb_nocache(tb, pc);
++        cpu_tb_exec(cpu, tb);
++        cc->cpu_exec_exit(cpu);
++
++        tb_lock();
++        tb_phys_invalidate(tb, -1);
++        tb_free(tb);
++    }
+     tb_unlock();
+ }
+ 
+diff --git a/cpus.c b/cpus.c
+index 77bba08f9a..b39408b4b1 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1347,6 +1347,11 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
+                 if (r == EXCP_DEBUG) {
+                     cpu_handle_guest_debug(cpu);
+                     break;
++                } else if (r == EXCP_ATOMIC) {
++                    qemu_mutex_unlock_iothread();
++                    cpu_exec_step_atomic(cpu);
++                    qemu_mutex_lock_iothread();
++                    break;
+                 }
+             } else if (cpu->stop) {
+                 if (cpu->unplug) {
+@@ -1457,6 +1462,10 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+                  */
+                 g_assert(cpu->halted);
+                 break;
++            case EXCP_ATOMIC:
++                qemu_mutex_unlock_iothread();
++                cpu_exec_step_atomic(cpu);
++                qemu_mutex_lock_iothread();
+             default:
+                 /* Ignore everything else? */
+                 break;
+
+
+--
+Pranith
