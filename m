@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cfnTZ-0006Cz-34
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 07:53:58 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cfnTq-0006Lt-1j
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 07:54:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cfnTY-0004X7-84
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 07:53:57 -0500
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <1487161136-9018-1-git-send-email-armbru@redhat.com>
-	<575ab227-e44e-8d66-7b58-3e68e1df8491@redhat.com>
-	<878tp7tx98.fsf@dusky.pond.sub.org>
-	<ca73f39c-04b2-ce0b-1f80-5eef0e4861ce@redhat.com>
-	<87poidkqv4.fsf@dusky.pond.sub.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <35ce9aed-b82a-3270-a4a9-12f2e1782b9d@redhat.com>
-Date: Mon, 20 Feb 2017 13:53:49 +0100
+	(envelope-from <mreitz@redhat.com>) id 1cfnTp-0004nL-3t
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 07:54:14 -0500
+References: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
+	<1487006583-24350-23-git-send-email-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <d87634b5-544c-81ff-29ec-f53b4d7a714c@redhat.com>
+Date: Mon, 20 Feb 2017 13:54:04 +0100
 MIME-Version: 1.0
-In-Reply-To: <87poidkqv4.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] hw: Deprecate unwanted use -drive
- if=scsi
+In-Reply-To: <1487006583-24350-23-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="D5kDRAa8ctl7hDHoPtThSImxXg2cAopJk"
+Subject: Re: [Qemu-devel] [RFC PATCH 22/41] block: Add
+ BdrvChildRole.get_link_name()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +25,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--D5kDRAa8ctl7hDHoPtThSImxXg2cAopJk
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+Message-ID: <d87634b5-544c-81ff-29ec-f53b4d7a714c@redhat.com>
+Subject: Re: [RFC PATCH 22/41] block: Add BdrvChildRole.get_link_name()
+References: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
+ <1487006583-24350-23-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1487006583-24350-23-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
+
+On 13.02.2017 18:22, Kevin Wolf wrote:
+> For meaningful error messages in the permission system, we want to allo=
+w
+> the parent of a BdrvChild to generate some kind of human-readable
+> identifier for the link represented by the BdrvChild.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block.c                   |  8 ++++++++
+>  block/block-backend.c     | 20 ++++++++++++++++++++
+>  include/block/block_int.h |  4 ++++
+>  3 files changed, 32 insertions(+)
+>=20
+> diff --git a/block.c b/block.c
+> index fd06549..2116542 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -800,6 +800,13 @@ const BdrvChildRole child_format =3D {
+>      .drained_end     =3D bdrv_child_cb_drained_end,
+>  };
+> =20
+> +static char *bdrv_backing_link_name(BdrvChild *c)
+> +{
+> +    BlockDriverState *parent =3D c->opaque;
+> +    return g_strdup_printf("backing file link from %s",
+> +                           bdrv_get_device_or_node_name(parent));
+
+So in this case it's really about the edge in the BDS graph.
+
+> +}
+> +
+>  /*
+>   * Returns the options and flags that bs->backing should get, based on=
+ the
+>   * given options and flags for the parent BDS
+> @@ -825,6 +832,7 @@ static void bdrv_backing_options(int *child_flags, =
+QDict *child_options,
+>  }
+> =20
+>  static const BdrvChildRole child_backing =3D {
+> +    .get_link_name   =3D bdrv_backing_link_name,
+>      .inherit_options =3D bdrv_backing_options,
+>      .drained_begin   =3D bdrv_child_cb_drained_begin,
+>      .drained_end     =3D bdrv_child_cb_drained_end,
+> diff --git a/block/block-backend.c b/block/block-backend.c
+> index 0c23add..a314284 100644
+> --- a/block/block-backend.c
+> +++ b/block/block-backend.c
+> @@ -80,6 +80,7 @@ static const AIOCBInfo block_backend_aiocb_info =3D {=
+
+> =20
+>  static void drive_info_del(DriveInfo *dinfo);
+>  static BlockBackend *bdrv_first_blk(BlockDriverState *bs);
+> +static char *blk_get_attached_dev_id(BlockBackend *blk);
+> =20
+>  /* All BlockBackends */
+>  static QTAILQ_HEAD(, BlockBackend) block_backends =3D
+> @@ -102,6 +103,24 @@ static void blk_root_drained_end(BdrvChild *child)=
+;
+>  static void blk_root_change_media(BdrvChild *child, bool load);
+>  static void blk_root_resize(BdrvChild *child);
+> =20
+> +static char *blk_root_get_link_name(BdrvChild *child)
+> +{
+> +    BlockBackend *blk =3D child->opaque;
+> +    char *dev_id;
+> +
+> +    if (blk->name) {
+> +        return g_strdup(blk->name);
+
+This is considering the BB to be an edge in the BDS graph. I find that a
+bit weird, and the fact that it makes complete and total sense after
+thinking for some time doesn't change the fact that it is weird.
+
+> +    }
+> +
+> +    dev_id =3D blk_get_attached_dev_id(blk);
+> +    if (*dev_id) {
+> +        return dev_id;
+
+But the device model OTOH is definitely not an edge in the BDS graph.
+
+> +    } else {
+> +        g_free(dev_id);
+> +        return g_strdup("a block device");
+> +    }
+> +}
+> +
+>  static const char *blk_root_get_name(BdrvChild *child)
+>  {
+>      return blk_name(child->opaque);
+
+[...]
+
+Also, I'm curious what you are going to choose as a replacement if the
+function pointer is not set. I have a couple of ideas, but most of them
+are either not correct or would remove the need for
+bdrv_backing_link_name()... Well, I'm curious. :-)
+
+Max
 
 
+--D5kDRAa8ctl7hDHoPtThSImxXg2cAopJk
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 20/02/2017 13:07, Markus Armbruster wrote:
-> Paolo Bonzini <pbonzini@redhat.com> writes:
-> 
->> On 15/02/2017 14:10, Markus Armbruster wrote:
->>> Paolo Bonzini <pbonzini@redhat.com> writes:
->>>
->>>> On 15/02/2017 13:18, Markus Armbruster wrote:
->>>>> Drives defined with if=scsi get connected to buses created with
->>>>> -device, unlike other interface types.  Deprecate this usage.
->>>>>
->>>>> There is no good default SCSI HBA for PC machines.  Deprecate if=scsi
->>>>> there entirely.
->>>>>
->>>>> Before this series, frontends for -drive if=scsi get created by SCSI
->>>>> HBAs.  Frontends for other interface types get created by machine
->>>>> initialization.
->>>>>
->>>>> After this series, they get created by machine initialization, except
->>>>> for deprecated cases, which get created by new function
->>>>> scsi_legacy_handle_cmdline().
->>>>>
->>>>> Based on "[PATCH v3 0/8] More sensible default for -drive interface
->>>>> type".
->>>>>
->>>>> v2:
->>>>> * Trivially rebased
->>>>> * PATCH 2: Suppress warning for default drives
->>>>> * PATCH 3: Update user manual and qemu-iotests/051.pc.out
->>>>>
->>>>> Markus Armbruster (3):
->>>>>   hw/scsi: Concentrate -drive if=scsi auto-create in one place
->>>>>   hw: Deprecate -drive if=scsi with non-onboard HBAs
->>>>>   hw/i386: Deprecate -drive if=scsi with PC machine types
->>>>>
->>>>>  hw/arm/realview.c             |  2 +-
->>>>>  hw/arm/versatilepb.c          |  2 +-
->>>>>  hw/i386/pc.c                  |  6 +++++
->>>>>  hw/scsi/esp-pci.c             |  3 ---
->>>>>  hw/scsi/esp.c                 |  6 -----
->>>>>  hw/scsi/lsi53c895a.c          | 10 +++++---
->>>>>  hw/scsi/megasas.c             |  4 ----
->>>>>  hw/scsi/mptsas.c              |  4 ----
->>>>>  hw/scsi/scsi-bus.c            | 56 +++++++++++++++++++++++++++++++++++++------
->>>>>  hw/scsi/spapr_vscsi.c         |  5 ++--
->>>>>  hw/scsi/virtio-scsi.c         |  8 -------
->>>>>  include/hw/pci/pci.h          |  2 ++
->>>>>  include/hw/scsi/scsi.h        |  3 ++-
->>>>>  qemu-options.hx               |  5 ----
->>>>>  tests/qemu-iotests/051.pc.out | 12 ++++++----
->>>>>  vl.c                          | 10 ++++++++
->>>>>  16 files changed, 88 insertions(+), 50 deletions(-)
->>>>>
->>>>
->>>> Because of the ESC characters in 051.pc.out, please send the pull
->>>> request for this yourself.
->>>
->>> Is that an Acked-by?
->>
->> Not a sufficient one because the patch touches files outside my area of
->> maintenance, but for hw/scsi you can treat it as one.
-> 
-> Okay, that covers PATCH 1/3.
-> 
-> What about PATCH 3/3?  It's actually your idea...
+-----BEGIN PGP SIGNATURE-----
 
-Yep, hw/i386 too I guess.
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliq5uwSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A0q0IAI/ONNteEBnb/CIvmp2qA6LZ3/ZG8A/E
+CoCRx4j7lDo5BEhyTSuyjpHyFcriypH4R8MJ8SzO/qQkK9tcKP1ICIlRFmYJCq1W
+EttQP390E1DkvMFJ2ysqw6bYS17JJwzwzlhGIB0gcKWyRYYUorZqHxBixcj+Ljlq
+jTEut4oVBksPfr0kTmKYY+1bqkrJaVqnN/pc0nlRD1EU1Cm0aE85mtl3qA0Zi1ZP
+Ch7U4/Q5clxICubn0NA0yQcn8Humubqq656aclJYGBGz06z4VFlhKnMGHgGctvYY
+FsqErDIguZ0amKm3EH7KKGwmdHc8fMaaz2plWn2QUNcxfP1kfcplsnY=
+=MlVF
+-----END PGP SIGNATURE-----
 
-Paolo
+--D5kDRAa8ctl7hDHoPtThSImxXg2cAopJk--
