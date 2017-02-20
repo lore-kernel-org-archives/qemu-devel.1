@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56347)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cfpIb-000786-93
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:50:46 -0500
+	(envelope-from <bobby.prani@gmail.com>) id 1cfpLq-0001kZ-4C
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:54:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cfpIY-0006GQ-Jq
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:50:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52924)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cfpIY-0006GL-6G
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:50:42 -0500
-Date: Mon, 20 Feb 2017 15:50:38 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170220155038.35b08edf@nial.brq.redhat.com>
-In-Reply-To: <e35ffaa91eac609e1caa88b91ad6a930516d5451.1487286467.git.ben@skyportsystems.com>
-References: <cover.1487286467.git.ben@skyportsystems.com>
-	<e35ffaa91eac609e1caa88b91ad6a930516d5451.1487286467.git.ben@skyportsystems.com>
+	(envelope-from <bobby.prani@gmail.com>) id 1cfpLn-0006tA-KL
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:54:06 -0500
+Received: from mail-yb0-x243.google.com ([2607:f8b0:4002:c09::243]:36064)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1cfpLn-0006t5-Ft
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:54:03 -0500
+Received: by mail-yb0-x243.google.com with SMTP id d128so885866ybh.3
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 06:54:03 -0800 (PST)
+From: Pranith Kumar <bobby.prani@gmail.com>
+Date: Mon, 20 Feb 2017 09:53:35 -0500
+Message-Id: <20170220145335.591-1-bobby.prani@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 8/8] MAINTAINERS: Add VM Generation ID
- entries
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] mttcg: Set jmp_env to handle exit from
+ tb_gen_code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +28,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ben@skyportsystems.com
-Cc: qemu-devel@nongnu.org, lersek@redhat.com, mst@redhat.com
+To: alex.bennee@linaro.org
+Cc: qemu-devel@nongnu.org, rth@twiddle.net
 
-On Thu, 16 Feb 2017 15:15:40 -0800
-ben@skyportsystems.com wrote:
+tb_gen_code() can exit execution using cpu_exit_loop() when it cannot
+allocate new tb's. To handle this, we need to properly set the jmp_env
+pointer ahead of calling tb_gen_code().
 
-> From: Ben Warren <ben@skyportsystems.com>
-> 
-> Signed-off-by: Ben Warren <ben@skyportsystems.com>
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+CC:Alex Bennée <alex.bennee@linaro.org> 
+CC: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+---
+ cpu-exec.c | 23 +++++++++++------------
+ 1 file changed, 11 insertions(+), 12 deletions(-)
 
-> ---
->  MAINTAINERS | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 81d4baf..8f5dd35 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1125,6 +1125,15 @@ F: hw/nvram/chrp_nvram.c
->  F: include/hw/nvram/chrp_nvram.h
->  F: tests/prom-env-test.c
->  
-> +VM Generation ID
-> +M: Ben Warren <ben@skyportsystems.com>
-> +S: Maintained
-> +F: hw/acpi/vmgenid.c
-> +F: include/hw/acpi/vmgenid.h
-> +F: docs/specs/vmgenid.txt
-> +F: tests/vmgenid-test.c
-> +F: stubs/vmgenid.c
-> +
->  Subsystems
->  ----------
->  Audio
+diff --git a/cpu-exec.c b/cpu-exec.c
+index 97d79612d9..4b70988b24 100644
+--- a/cpu-exec.c
++++ b/cpu-exec.c
+@@ -236,23 +236,22 @@ static void cpu_exec_step(CPUState *cpu)
+ 
+     cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
+     tb_lock();
+-    tb = tb_gen_code(cpu, pc, cs_base, flags,
+-                     1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
+-    tb->orig_tb = NULL;
+-    tb_unlock();
+-
+-    cc->cpu_exec_enter(cpu);
+-
+     if (sigsetjmp(cpu->jmp_env, 0) == 0) {
++        tb = tb_gen_code(cpu, pc, cs_base, flags,
++                         1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
++        tb->orig_tb = NULL;
++        tb_unlock();
++
++        cc->cpu_exec_enter(cpu);
+         /* execute the generated code */
+         trace_exec_tb_nocache(tb, pc);
+         cpu_tb_exec(cpu, tb);
+-    }
++        cc->cpu_exec_exit(cpu);
+ 
+-    cc->cpu_exec_exit(cpu);
+-    tb_lock();
+-    tb_phys_invalidate(tb, -1);
+-    tb_free(tb);
++        tb_lock();
++        tb_phys_invalidate(tb, -1);
++        tb_free(tb);
++    }
+     tb_unlock();
+ }
+ 
+-- 
+2.11.0
