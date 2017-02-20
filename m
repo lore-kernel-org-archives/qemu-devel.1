@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cfoqd-0007pr-LA
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:21:52 -0500
+	(envelope-from <codyprime@gmail.com>) id 1cfou8-0002aC-9Z
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:25:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cfoqZ-0007cD-Kx
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:21:51 -0500
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:33219)
+	(envelope-from <codyprime@gmail.com>) id 1cfou7-0008O2-F3
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:25:28 -0500
+Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:33552)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cfoqZ-0007bv-F1
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:21:47 -0500
-Received: by mail-wr0-x244.google.com with SMTP id s27so2987060wrb.0
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 06:21:47 -0800 (PST)
-Date: Mon, 20 Feb 2017 14:21:43 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170220142143.GI21255@stefanha-x1.localdomain>
-References: <1487543454-20373-1-git-send-email-Ashish.Mittal@veritas.com>
+	(Exim 4.71) (envelope-from <codyprime@gmail.com>) id 1cfou7-0008Nn-9g
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:25:27 -0500
+Received: by mail-it0-x242.google.com with SMTP id e137so10904225itc.0
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 06:25:26 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="4LwthZj+AV2mq5CX"
-Content-Disposition: inline
-In-Reply-To: <1487543454-20373-1-git-send-email-Ashish.Mittal@veritas.com>
+In-Reply-To: <77eb6c23-fc16-c7ad-c69b-afd6cae5e339@redhat.com>
+References: <1487543454-20373-1-git-send-email-Ashish.Mittal@veritas.com>
+	<20170220100705.GD15874@redhat.com>
+	<77eb6c23-fc16-c7ad-c69b-afd6cae5e339@redhat.com>
+From: Jeff Cody <codyprime@gmail.com>
+Date: Mon, 20 Feb 2017 09:25:25 -0500
+Message-ID: <CAJ8Q05n8nx05KZD_1+xQQ1yfKsf45yieHnHSW=Uwjn+gaO7GeQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Subject: Re: [Qemu-devel] [PATCH v9 1/2] block/vxhs.c: Add support for a new
  block device type called "vxhs"
 List-Id: <qemu-devel.nongnu.org>
@@ -30,63 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashish Mittal <ashmit602@gmail.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, berrange@redhat.com, jcody@redhat.com, famz@redhat.com, ashish.mittal@veritas.com, jferlan@redhat.com, Buddhi.Madhav@veritas.com, Suraj.Singh@veritas.com, Nitin.Jerath@veritas.com, peter.maydell@linaro.org, rakesh.ranjan@veritas.com, venkatesha.mg@veritas.com, Ketan.Nilangekar@veritas.com, Abhijit.Dey@veritas.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Buddhi.Madhav@veritas.com, Daniel Berrange <berrange@redhat.com>, stefanha@gmail.com, qemu-devel@nongnu.org, venkatesha.mg@veritas.com, Abhijit.Dey@veritas.com, Nitin.Jerath@veritas.com, Suraj.Singh@veritas.com, rakesh.ranjan@veritas.com, peter.maydell@linaro.org, armbru@redhat.com, jcody@redhat.com, Ashish Mittal <ashmit602@gmail.com>, famz@redhat.com, ashish.mittal@veritas.com, jferlan@redhat.com, Ketan.Nilangekar@veritas.com, kwolf@redhat.com
+
+On Feb 20, 2017 8:49 AM, "Paolo Bonzini" <pbonzini@redhat.com> wrote:
 
 
---4LwthZj+AV2mq5CX
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Sun, Feb 19, 2017 at 02:30:53PM -0800, Ashish Mittal wrote:
-> v9 changelog:
-> (1) Fixes for all the review comments from v8. I have left the definition
->     of VXHS_UUID_DEF unchanged pending a better suggestion.
+On 20/02/2017 11:07, Daniel P. Berrange wrote:
+>> +        if (qemu_uuid_is_null(&qemu_uuid)) {
+> This is the wrong check - QEMU provides a 'qemu_uuid_set' boolean
+> to determine if 'qemu_uuid' is set or not. If it is not set, then
+> the code should return an error, not use a hardcoded uuid.
 
-If I understand correctly libvxhs has a global instance ID for choosing
-the SSL client certificate.
+Or otherwise that hardcoded uuid should be all zeroes (UUID_NONE).
 
-I would get rid of iio_init()/iio_fini() or at least avoid passing in
-anything besides int32_t version.  Let iio_open() take an instance ID
-and iio_cb_t callback.
 
-This gives applications more flexibility.  For example, you can write a
-utility that copies data from instance A disk#1 to instance B disk#2.
-Or an application with special requirements can process callbacks for
-different disks in different iio_cb_t functions if it wishes.  Today
-both of these things are not possible due to iio_init().
 
-QEMU block drivers must keep in mind:
+(Replying from phone, sorry for formatting issues)
 
-1. There may be more than one BlockDriverState (i.e. multiple disks for
-   a VM).
+I think the issue is that boolean is not defined when linking qemu-img, so
+if it is used in vxhs.c there will be a linking error.  I can't test that
+hypothesis right now, though, as I am traveling.
 
-2. Each BlockDriverState may be access from a different thread (i.e.
-   it's best if the library avoids global state so thread-safety is
-   easy).
+This also ties into the TLS certs, I believe.  The uuid is being used by
+libqnio to determine the cert path, to allow/disallow certain operations
+based on if it is being called by qemu-img/io or qemu, etc.
 
-So avoid the global iio_init() call.  Pass parameters into iio_open()
-=66rom the QEMU command-line instead of using globals.
 
-If the library wants to pool global resources like SSL/TCP connections
-it can do that internally in a thread-safe way.  There's no need to make
-configuration global via iio_init().
 
-Stefan
 
---4LwthZj+AV2mq5CX
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYqvt3AAoJEJykq7OBq3PIaIcH/0y1AbEcYMKQSlw3Di5Q4SNM
-GBrG5wSZH9ZkzVzhOPC9WJzk6kyH62FZo6luPng3Sg0f3NJiMDr49K5EqwlDdWbQ
-8KPHQpfxx1gtyCquSj2LuvkxmVzh2ut5BDy3u9B2KbI8ouUOyILwf2jXyo0a7ZlC
-T/0iooZOZUpGzGQfUlmUwxlwgydEdpJzEFe7PQPbkx62+afAxFOd6XoJQu3adWjf
-MaqR8oWlcrdjHEfHB/4lpXOUsw0ZTYPqce/Lnb9dsQ58zu74oNjAlaqC3Jpz88qJ
-WYXsJVCB2ib3kDA44Ye3XjQZycKlpuVwmXg+O+QIINB3AbCZxxpOszTdLaM4CFY=
-=XTRk
------END PGP SIGNATURE-----
-
---4LwthZj+AV2mq5CX--
+>> +            if (iio_init(QNIO_VERSION, vxhs_iio_callback,
+VXHS_UUID_DEF)) {
+>> +                return -ENODEV;
+>> +            }
