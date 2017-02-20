@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cfohY-0000l1-OB
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:12:29 -0500
+	(envelope-from <famz@redhat.com>) id 1cfojZ-0002NB-4t
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:14:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cfohU-00052a-0a
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:12:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56542)
+	(envelope-from <famz@redhat.com>) id 1cfojV-0005vV-4h
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:14:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56712)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cfohT-000526-R1
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:12:23 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 134448123A
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 14:12:24 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 20 Feb 2017 15:12:16 +0100
-Message-Id: <1487599939-4776-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 0/3] audio patch queue
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cfojU-0005ux-V6
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:14:29 -0500
+Date: Mon, 20 Feb 2017 22:14:24 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170220141424.GA358@lemon.lan>
+References: <20170220105139.21581-1-alex.bennee@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20170220105139.21581-1-alex.bennee@linaro.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 0/4] Docker cross-compile targets and
+ user build support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +28,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-  Hi,
+On Mon, 02/20 10:51, Alex Benn=E9e wrote:
+> Hi Fam,
+>=20
+> Hopefully this is the final iteration. A couple of minor typos fixes
+> and your suggestions taken into account. I have also added some
+> review/tesing tags from Philippe.
 
-Here is the audio queue, bringing support for replay and fixing audio
-with SDL2.
+Looks good to me, Thanks! Let me know if you want to merge it yourself,
+otherwise I'll send a pull request later this week.
 
-please pull,
-  Gerd
-
-The following changes since commit 5d42ff913bb294c661aed8dfcd386fed9e185148:
-
-  Merge remote-tracking branch 'remotes/huth/tags/coldfire-20170219' into staging (2017-02-20 11:55:37 +0000)
-
-are available in the git repository at:
-
-
-  git://git.kraxel.org/qemu tags/pull-audio-20170220-1
-
-for you to fetch changes up to 255a694376960826ead9a6e47c5c661d51b5e25b:
-
-  audio/sdlaudio: Allow audio playback with SDL2 (2017-02-20 14:24:51 +0100)
-
-----------------------------------------------------------------
-audio: add sdl2 support, add replay support.
-
-----------------------------------------------------------------
-Pavel Dovgalyuk (2):
-      replay: add record/replay for audio passthrough
-      audio: make audio poll timer deterministic
-
-Thomas Huth (1):
-      audio/sdlaudio: Allow audio playback with SDL2
-
- audio/audio.c            | 11 +++++--
- audio/audio.h            |  5 +++
- audio/mixeng.c           | 31 +++++++++++++++++++
- audio/sdlaudio.c         | 48 +++++++++++++++++++++++++++++
- docs/replay.txt          |  7 +++++
- include/sysemu/replay.h  |  7 +++++
- replay/Makefile.objs     |  1 +
- replay/replay-audio.c    | 79 ++++++++++++++++++++++++++++++++++++++++++++++++
- replay/replay-internal.h |  4 +++
- 9 files changed, 190 insertions(+), 3 deletions(-)
- create mode 100644 replay/replay-audio.c
+Fam
