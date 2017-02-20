@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cfkMN-0007L6-NZ
+	(envelope-from <stefanha@redhat.com>) id 1cfkMN-0007L8-N5
 	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:34:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cfkMI-0007TF-JO
+	(envelope-from <stefanha@redhat.com>) id 1cfkMI-0007TP-Ii
 	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:34:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43240)
+Received: from mx1.redhat.com ([209.132.183.28]:60688)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cfkLx-0007J2-T5
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cfkM4-0007Lh-Dm
 	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:34:14 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon, 20 Feb 2017 09:32:57 +0000
-Message-Id: <20170220093304.20515-18-stefanha@redhat.com>
+Date: Mon, 20 Feb 2017 09:33:00 +0000
+Message-Id: <20170220093304.20515-21-stefanha@redhat.com>
 In-Reply-To: <20170220093304.20515-1-stefanha@redhat.com>
 References: <20170220093304.20515-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 17/24] async: remove unnecessary inc/dec pairs
+Subject: [Qemu-devel] [PULL 20/24] coroutine-lock: add limited spinning to
+ CoMutex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,147 +29,159 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
-Pull the increment/decrement pair out of aio_bh_poll and into the
-callers.
+Running a very small critical section on pthread_mutex_t and CoMutex
+shows that pthread_mutex_t is much faster because it doesn't actually
+go to sleep.  What happens is that the critical section is shorter
+than the latency of entering the kernel and thus FUTEX_WAIT always
+fails.  With CoMutex there is no such latency but you still want to
+avoid wait and wakeup.  So introduce it artificially.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+This only works with one waiters; because CoMutex is fair, it will
+always have more waits and wakeups than a pthread_mutex_t.
+
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20170213135235.12274-18-pbonzini@redhat.com
+Message-id: 20170213181244.16297-3-pbonzini@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- util/aio-posix.c |  8 +++-----
- util/aio-win32.c |  8 ++++----
- util/async.c     | 12 ++++++------
- 3 files changed, 13 insertions(+), 15 deletions(-)
+ include/qemu/coroutine.h   |  5 +++++
+ util/qemu-coroutine-lock.c | 51 ++++++++++++++++++++++++++++++++++++++++------
+ util/qemu-coroutine.c      |  2 +-
+ 3 files changed, 51 insertions(+), 7 deletions(-)
 
-diff --git a/util/aio-posix.c b/util/aio-posix.c
-index 2173378..2d51239 100644
---- a/util/aio-posix.c
-+++ b/util/aio-posix.c
-@@ -425,9 +425,8 @@ static bool aio_dispatch_handlers(AioContext *ctx)
+diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
+index fce228f..12ce8e1 100644
+--- a/include/qemu/coroutine.h
++++ b/include/qemu/coroutine.h
+@@ -167,6 +167,11 @@ typedef struct CoMutex {
+      */
+     unsigned locked;
  
- void aio_dispatch(AioContext *ctx)
- {
-+    qemu_lockcnt_inc(&ctx->list_lock);
-     aio_bh_poll(ctx);
--
--    qemu_lockcnt_inc(&ctx->list_lock);
-     aio_dispatch_handlers(ctx);
-     qemu_lockcnt_dec(&ctx->list_lock);
- 
-@@ -679,16 +678,15 @@ bool aio_poll(AioContext *ctx, bool blocking)
-     }
- 
-     npfd = 0;
--    qemu_lockcnt_dec(&ctx->list_lock);
- 
-     progress |= aio_bh_poll(ctx);
- 
-     if (ret > 0) {
--        qemu_lockcnt_inc(&ctx->list_lock);
-         progress |= aio_dispatch_handlers(ctx);
--        qemu_lockcnt_dec(&ctx->list_lock);
-     }
- 
-+    qemu_lockcnt_dec(&ctx->list_lock);
++    /* Context that is holding the lock.  Useful to avoid spinning
++     * when two coroutines on the same AioContext try to get the lock. :)
++     */
++    AioContext *ctx;
 +
-     progress |= timerlistgroup_run_timers(&ctx->tlg);
- 
-     return progress;
-diff --git a/util/aio-win32.c b/util/aio-win32.c
-index 442a179..bca496a 100644
---- a/util/aio-win32.c
-+++ b/util/aio-win32.c
-@@ -253,8 +253,6 @@ static bool aio_dispatch_handlers(AioContext *ctx, HANDLE event)
-     bool progress = false;
-     AioHandler *tmp;
- 
--    qemu_lockcnt_inc(&ctx->list_lock);
--
-     /*
-      * We have to walk very carefully in case aio_set_fd_handler is
-      * called while we're walking.
-@@ -305,14 +303,15 @@ static bool aio_dispatch_handlers(AioContext *ctx, HANDLE event)
-         }
-     }
- 
--    qemu_lockcnt_dec(&ctx->list_lock);
-     return progress;
+     /* A queue of waiters.  Elements are added atomically in front of
+      * from_push.  to_pop is only populated, and popped from, by whoever
+      * is in charge of the next wakeup.  This can be an unlocker or,
+diff --git a/util/qemu-coroutine-lock.c b/util/qemu-coroutine-lock.c
+index 25da9fa..73fe77c 100644
+--- a/util/qemu-coroutine-lock.c
++++ b/util/qemu-coroutine-lock.c
+@@ -30,6 +30,7 @@
+ #include "qemu-common.h"
+ #include "qemu/coroutine.h"
+ #include "qemu/coroutine_int.h"
++#include "qemu/processor.h"
+ #include "qemu/queue.h"
+ #include "block/aio.h"
+ #include "trace.h"
+@@ -181,7 +182,18 @@ void qemu_co_mutex_init(CoMutex *mutex)
+     memset(mutex, 0, sizeof(*mutex));
  }
  
- void aio_dispatch(AioContext *ctx)
- {
-+    qemu_lockcnt_inc(&ctx->list_lock);
-     aio_bh_poll(ctx);
-     aio_dispatch_handlers(ctx, INVALID_HANDLE_VALUE);
-+    qemu_lockcnt_dec(&ctx->list_lock);
-     timerlistgroup_run_timers(&ctx->tlg);
- }
- 
-@@ -349,7 +348,6 @@ bool aio_poll(AioContext *ctx, bool blocking)
-         }
-     }
- 
--    qemu_lockcnt_dec(&ctx->list_lock);
-     first = true;
- 
-     /* ctx->notifier is always registered.  */
-@@ -392,6 +390,8 @@ bool aio_poll(AioContext *ctx, bool blocking)
-         progress |= aio_dispatch_handlers(ctx, event);
-     } while (count > 0);
- 
-+    qemu_lockcnt_dec(&ctx->list_lock);
+-static void coroutine_fn qemu_co_mutex_lock_slowpath(CoMutex *mutex)
++static void coroutine_fn qemu_co_mutex_wake(CoMutex *mutex, Coroutine *co)
++{
++    /* Read co before co->ctx; pairs with smp_wmb() in
++     * qemu_coroutine_enter().
++     */
++    smp_read_barrier_depends();
++    mutex->ctx = co->ctx;
++    aio_co_wake(co);
++}
 +
-     progress |= timerlistgroup_run_timers(&ctx->tlg);
-     return progress;
- }
-diff --git a/util/async.c b/util/async.c
-index 187bc5b..7d469eb 100644
---- a/util/async.c
-+++ b/util/async.c
-@@ -90,15 +90,16 @@ void aio_bh_call(QEMUBH *bh)
-     bh->cb(bh->opaque);
- }
- 
--/* Multiple occurrences of aio_bh_poll cannot be called concurrently */
-+/* Multiple occurrences of aio_bh_poll cannot be called concurrently.
-+ * The count in ctx->list_lock is incremented before the call, and is
-+ * not affected by the call.
-+ */
- int aio_bh_poll(AioContext *ctx)
++static void coroutine_fn qemu_co_mutex_lock_slowpath(AioContext *ctx,
++                                                     CoMutex *mutex)
  {
-     QEMUBH *bh, **bhp, *next;
-     int ret;
-     bool deleted = false;
- 
--    qemu_lockcnt_inc(&ctx->list_lock);
--
-     ret = 0;
-     for (bh = atomic_rcu_read(&ctx->first_bh); bh; bh = next) {
-         next = atomic_rcu_read(&bh->next);
-@@ -123,11 +124,10 @@ int aio_bh_poll(AioContext *ctx)
- 
-     /* remove deleted bhs */
-     if (!deleted) {
--        qemu_lockcnt_dec(&ctx->list_lock);
-         return ret;
-     }
- 
--    if (qemu_lockcnt_dec_and_lock(&ctx->list_lock)) {
-+    if (qemu_lockcnt_dec_if_lock(&ctx->list_lock)) {
-         bhp = &ctx->first_bh;
-         while (*bhp) {
-             bh = *bhp;
-@@ -138,7 +138,7 @@ int aio_bh_poll(AioContext *ctx)
-                 bhp = &bh->next;
-             }
+     Coroutine *self = qemu_coroutine_self();
+     CoWaitRecord w;
+@@ -206,10 +218,11 @@ static void coroutine_fn qemu_co_mutex_lock_slowpath(CoMutex *mutex)
+         if (co == self) {
+             /* We got the lock ourselves!  */
+             assert(to_wake == &w);
++            mutex->ctx = ctx;
+             return;
          }
--        qemu_lockcnt_unlock(&ctx->list_lock);
-+        qemu_lockcnt_inc_and_unlock(&ctx->list_lock);
+ 
+-        aio_co_wake(co);
++        qemu_co_mutex_wake(mutex, co);
      }
-     return ret;
- }
+ 
+     qemu_coroutine_yield();
+@@ -218,13 +231,39 @@ static void coroutine_fn qemu_co_mutex_lock_slowpath(CoMutex *mutex)
+ 
+ void coroutine_fn qemu_co_mutex_lock(CoMutex *mutex)
+ {
++    AioContext *ctx = qemu_get_current_aio_context();
+     Coroutine *self = qemu_coroutine_self();
++    int waiters, i;
+ 
+-    if (atomic_fetch_inc(&mutex->locked) == 0) {
++    /* Running a very small critical section on pthread_mutex_t and CoMutex
++     * shows that pthread_mutex_t is much faster because it doesn't actually
++     * go to sleep.  What happens is that the critical section is shorter
++     * than the latency of entering the kernel and thus FUTEX_WAIT always
++     * fails.  With CoMutex there is no such latency but you still want to
++     * avoid wait and wakeup.  So introduce it artificially.
++     */
++    i = 0;
++retry_fast_path:
++    waiters = atomic_cmpxchg(&mutex->locked, 0, 1);
++    if (waiters != 0) {
++        while (waiters == 1 && ++i < 1000) {
++            if (atomic_read(&mutex->ctx) == ctx) {
++                break;
++            }
++            if (atomic_read(&mutex->locked) == 0) {
++                goto retry_fast_path;
++            }
++            cpu_relax();
++        }
++        waiters = atomic_fetch_inc(&mutex->locked);
++    }
++
++    if (waiters == 0) {
+         /* Uncontended.  */
+         trace_qemu_co_mutex_lock_uncontended(mutex, self);
++        mutex->ctx = ctx;
+     } else {
+-        qemu_co_mutex_lock_slowpath(mutex);
++        qemu_co_mutex_lock_slowpath(ctx, mutex);
+     }
+     mutex->holder = self;
+     self->locks_held++;
+@@ -240,6 +279,7 @@ void coroutine_fn qemu_co_mutex_unlock(CoMutex *mutex)
+     assert(mutex->holder == self);
+     assert(qemu_in_coroutine());
+ 
++    mutex->ctx = NULL;
+     mutex->holder = NULL;
+     self->locks_held--;
+     if (atomic_fetch_dec(&mutex->locked) == 1) {
+@@ -252,8 +292,7 @@ void coroutine_fn qemu_co_mutex_unlock(CoMutex *mutex)
+         unsigned our_handoff;
+ 
+         if (to_wake) {
+-            Coroutine *co = to_wake->co;
+-            aio_co_wake(co);
++            qemu_co_mutex_wake(mutex, to_wake->co);
+             break;
+         }
+ 
+diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
+index 415600d..72412e5 100644
+--- a/util/qemu-coroutine.c
++++ b/util/qemu-coroutine.c
+@@ -118,7 +118,7 @@ void qemu_coroutine_enter(Coroutine *co)
+     co->ctx = qemu_get_current_aio_context();
+ 
+     /* Store co->ctx before anything that stores co.  Matches
+-     * barrier in aio_co_wake.
++     * barrier in aio_co_wake and qemu_co_mutex_wake.
+      */
+     smp_wmb();
+ 
 -- 
 2.9.3
