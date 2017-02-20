@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cfpzC-0005G9-AU
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:34:47 -0500
+	(envelope-from <lersek@redhat.com>) id 1cfpzX-0005Wn-D6
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:35:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cfpz9-0002uQ-1B
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:34:46 -0500
-Resent-Message-Id: <E1cfpz9-0002uQ-1B@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21450)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cfpz8-0002tU-P4
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:34:42 -0500
-In-Reply-To: <1487603763-14932-1-git-send-email-kraxel@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148760487755.30.18440037856821614050@0e2666bad730>
+	(envelope-from <lersek@redhat.com>) id 1cfpzU-000351-8w
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:35:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38712)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cfpzU-00034h-0k
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 10:35:04 -0500
+References: <cover.1487286467.git.ben@skyportsystems.com>
+	<88232638f9ff3b17b54987624468678ea14a3037.1487286467.git.ben@skyportsystems.com>
+	<20170217114321.6c8577e1@nial.brq.redhat.com>
+	<918524f7-26cf-3fce-d9e3-7316ca69285b@redhat.com>
+	<20170220102304.GC2372@work-vm>
+	<1ea5fff1-6216-8a8f-1e98-571253a3f596@redhat.com>
+	<20170220110014.GD2372@work-vm>
+	<1b2ce22b-3085-af08-332c-9519322b207e@redhat.com>
+	<20170220123240.GA4568@work-vm>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <94784a52-0e64-63e2-5686-2ef5b5ec2bfa@redhat.com>
+Date: Mon, 20 Feb 2017 16:35:00 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 20 Feb 2017 07:34:38 -0800 (PST)
-Subject: Re: [Qemu-devel] [RfC PATCH] vga: wire up -g <width>x<height>
- switch for virtio and qxl
+In-Reply-To: <20170220123240.GA4568@work-vm>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 4/8] ACPI: Add Virtual Machine
+ Generation ID support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +35,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, mst@redhat.com, dgilbert@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, ben@skyportsystems.com, qemu-devel@nongnu.org, mst@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUmZDIFBBVENIXSB2Z2E6IHdpcmUgdXAgLWcgPHdpZHRoPng8
-aGVpZ2h0PiBzd2l0Y2ggZm9yIHZpcnRpbyBhbmQgcXhsCk1lc3NhZ2UtaWQ6IDE0ODc2MDM3NjMt
-MTQ5MzItMS1naXQtc2VuZC1lbWFpbC1rcmF4ZWxAcmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBU
-IEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1v
-bmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNl
-ICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENI
-ICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBn
-aXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
-bGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49
-JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRh
-dGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6
-Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBh
-dGNoZXcvMTQ4NzYwMzc2My0xNDkzMi0xLWdpdC1zZW5kLWVtYWlsLWtyYXhlbEByZWRoYXQuY29t
-IC0+IHBhdGNoZXcvMTQ4NzYwMzc2My0xNDkzMi0xLWdpdC1zZW5kLWVtYWlsLWtyYXhlbEByZWRo
-YXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYWJiYWZlYSB2Z2E6IHdpcmUg
-dXAgLWcgPHdpZHRoPng8aGVpZ2h0PiBzd2l0Y2ggZm9yIHZpcnRpbyBhbmQgcXhsCgo9PT0gT1VU
-UFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IHZnYTogd2lyZSB1cCAtZyA8d2lkdGg+
-eDxoZWlnaHQ+IHN3aXRjaCBmb3IgdmlydGlvIGFuZCBxeGwuLi4KRVJST1I6IGlmIHRoaXMgY29k
-ZSBpcyByZWR1bmRhbnQgY29uc2lkZXIgcmVtb3ZpbmcgaXQKIzQ1OiBGSUxFOiBody9kaXNwbGF5
-L3F4bC5jOjM3MToKKyNpZiAwCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDc0IGxpbmVz
-IGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
-SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
-IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQ
-VVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwg
-Z2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10u
-ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+So Igor has now confirmed he's fine with v8 (thanks!), but I still
+wanted to respond here:
+
+On 02/20/17 13:32, Dr. David Alan Gilbert wrote:
+> * Laszlo Ersek (lersek@redhat.com) wrote:
+>> On 02/20/17 12:00, Dr. David Alan Gilbert wrote:
+>>> * Laszlo Ersek (lersek@redhat.com) wrote:
+>>>> On 02/20/17 11:23, Dr. David Alan Gilbert wrote:
+>>>>> * Laszlo Ersek (lersek@redhat.com) wrote:
+>>>>>> CC Dave
+>>>>>
+>>>>> This isn't an area I really understand; but if I'm
+>>>>> reading this right then 
+>>>>>    vmgenid is stored in fw_cfg?
+>>>>>    fw_cfg isn't migrated
+>>>>>
+>>>>> So why should any changes to it get migrated, except if it's already
+>>>>> been read by the guest (and if the guest reads it again aftwards what's
+>>>>> it expected to read?)
+>>>>
+>>>> This is what we have here:
+>>>> - QEMU formats read-only fw_cfg blob with GUID
+>>>> - guest downloads blob, places it in guest RAM
+>>>> - guest tells QEMU the guest-side address of the blob
+>>>> - during migration, guest RAM is transferred
+>>>> - after migration, in the device's post_load callback, QEMU overwrites
+>>>>   the GUID in guest RAM with a different value, and injects an SCI
+>>>>
+>>>> I CC'd you for the following reason: Igor reported that he didn't see
+>>>> either the fresh GUID or the SCI in the guest, on the target host, after
+>>>> migration. I figured that perhaps there was an ordering issue between
+>>>> RAM loading and post_load execution on the target host, and so I
+>>>> proposed to delay the RAM overwrite + SCI injection a bit more;
+>>>> following the pattern seen in your commit 90c647db8d59.
+>>>>
+>>>> However, since then, both Ben and myself tested the code with migration
+>>>> (using "virsh save" (Ben) and "virsh managedsave" (myself)), with
+>>>> Windows and Linux guests, and it works for us; there seems to be no
+>>>> ordering issue with the current code (= overwrite RAM + inject SCI in
+>>>> the post_load callback()).
+>>>>
+>>>> For now we don't understand why it doesn't work for Igor (Igor used
+>>>> exec/gzip migration to/from a local file using direct QEMU monitor
+>>>> commands / options, no libvirt). And, copying the pattern seen in your
+>>>> commit 90c647db8d59 didn't help in his case (while it wasn't even
+>>>> necessary for success in Ben's and my testing).
+>>>
+>>> One thing I noticed in Igor's test was that he did a 'stop' on the source
+>>> before the migate, and so it's probably still paused on the destination
+>>> after the migration is loaded, so anything the guest needs to do might
+>>> not have happened until it's started.
+>>
+>> Interesting! I hope Igor can double-check this!
+>>
+>> In the virsh docs, before doing my tests, I read that "managedsave"
+>> optionally took --running or --paused:
+>>
+>>     Normally, starting a managed save will decide between running or
+>>     paused based on the state the domain was in when the save was done;
+>>     passing either the --running or --paused flag will allow overriding
+>>     which state the start should use.
+>>
+>> I didn't pass any such flag ultimately, and I didn't stop the guests
+>> before the managedsave. Indeed they continued execution right after
+>> being loaded with "virsh start".
+>>
+>> (Side point: managedsave is awesome. :) )
+> 
+> If I've followed the bread crumbs correctly, I think managedsave
+> is just using a migrate to fd anyway, so the same code.
+
+Yes, I agree.
+
+My enthusiasm for "managedsave" is due to "virsh start"'s awareness as
+to whether it should boot the guest from zero, or in-migrate it from the
+"managed" saved state.
+
+Plain "save" is much more risky for the admin to mess up (because it
+needs specialized guest startup too).
+
+Of course, I also find QEMU's migration feature awesome in the first
+place. :)
+
+> 
+>>>
+>>> You say;
+>>>    'guest tells QEMU the guest-side address of the blob'
+>>> how is that stored/migrated/etc ?
+>>
+>> It is a uint8_t[8] array (little endian representation), linked into
+>> another (writeable) fw_cfg entry, and it's migrated explicitly (it has a
+>> descriptor in the device's vmstate descriptor). The post_load callback
+>> relies on this array being restored before the migration infrastructure
+>> calls post_load.
+> 
+> RAM normally comes back before other devices, so you should be OK;
+> although we frequently have problems with devices reading from RAM
+> during device init before migration has started, or writing to it
+> after migration has finished on the source.
+
+Thanks; we should be fine then. (We only write to RAM in post_load.)
+
+Laszlo
