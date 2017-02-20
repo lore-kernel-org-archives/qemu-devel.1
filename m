@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1cfuny-0001dq-Li
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:43:33 -0500
+	(envelope-from <eblake@redhat.com>) id 1cfuq1-00039S-O9
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:45:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1cfunx-00005t-Su
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:43:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34288)
+	(envelope-from <eblake@redhat.com>) id 1cfupw-0000gu-UB
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:45:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36020)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1cfunx-00005h-K0
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:43:29 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BF87580473
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 20:43:29 +0000 (UTC)
-From: Marcel Apfelbaum <marcel@redhat.com>
-Date: Mon, 20 Feb 2017 22:43:12 +0200
-Message-Id: <1487623393-2492-4-git-send-email-marcel@redhat.com>
-In-Reply-To: <1487623393-2492-1-git-send-email-marcel@redhat.com>
-References: <1487623393-2492-1-git-send-email-marcel@redhat.com>
-Subject: [Qemu-devel] [PATCH V2 3/4] hw/virtio: fix Link Control Register
- for PCI Express virtio devices
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cfupw-0000gk-LX
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:45:32 -0500
+References: <cover.1487286467.git.ben@skyportsystems.com>
+	<88232638f9ff3b17b54987624468678ea14a3037.1487286467.git.ben@skyportsystems.com>
+	<20170217114321.6c8577e1@nial.brq.redhat.com>
+	<918524f7-26cf-3fce-d9e3-7316ca69285b@redhat.com>
+	<20170220102304.GC2372@work-vm>
+	<3fb8499e-884c-99e8-b295-3d4603921075@redhat.com>
+	<20170220201923.GM2372@work-vm>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d51d4a21-5558-d4e5-5b7e-08f729fc1a5e@redhat.com>
+Date: Mon, 20 Feb 2017 14:45:29 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170220201923.GM2372@work-vm>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="J0qJUpL2JFjJIJmpkND02HlABwenbjFWw"
+Subject: Re: [Qemu-devel] [PATCH v8 4/8] ACPI: Add Virtual Machine
+ Generation ID support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,129 +34,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, marcel@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, ben@skyportsystems.com, mst@redhat.com
 
-Make several Link Control Register flags writable to conform
-with the PCI Express spec.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--J0qJUpL2JFjJIJmpkND02HlABwenbjFWw
+From: Eric Blake <eblake@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ qemu-devel@nongnu.org, ben@skyportsystems.com, mst@redhat.com
+Message-ID: <d51d4a21-5558-d4e5-5b7e-08f729fc1a5e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v8 4/8] ACPI: Add Virtual Machine Generation
+ ID support
+References: <cover.1487286467.git.ben@skyportsystems.com>
+ <88232638f9ff3b17b54987624468678ea14a3037.1487286467.git.ben@skyportsystems.com>
+ <20170217114321.6c8577e1@nial.brq.redhat.com>
+ <918524f7-26cf-3fce-d9e3-7316ca69285b@redhat.com>
+ <20170220102304.GC2372@work-vm>
+ <3fb8499e-884c-99e8-b295-3d4603921075@redhat.com>
+ <20170220201923.GM2372@work-vm>
+In-Reply-To: <20170220201923.GM2372@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
----
- hw/pci/pcie.c          | 14 ++++++++++++++
- hw/virtio/virtio-pci.c |  8 ++++++++
- hw/virtio/virtio-pci.h |  4 ++++
- include/hw/compat.h    |  4 ++++
- include/hw/pci/pcie.h  |  3 +++
- 5 files changed, 33 insertions(+)
+On 02/20/2017 02:19 PM, Dr. David Alan Gilbert wrote:
+> * Eric Blake (eblake@redhat.com) wrote:
+>> On 02/20/2017 04:23 AM, Dr. David Alan Gilbert wrote:
+>>> * Laszlo Ersek (lersek@redhat.com) wrote:
+>>>> CC Dave
+>>>
+>>> This isn't an area I really understand; but if I'm
+>>> reading this right then=20
+>>>    vmgenid is stored in fw_cfg?
+>>>    fw_cfg isn't migrated
+>>>
+>>> So why should any changes to it get migrated, except if it's already
+>>> been read by the guest (and if the guest reads it again aftwards what=
+'s
+>>> it expected to read?)
+>>
+>> Why are we expecting it to change on migration?  You want a new value
+>=20
+> I'm not; I was asking why a change made prior to migration would be
+> preserved across migration.
 
-diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-index 2526e3a..1804163 100644
---- a/hw/pci/pcie.c
-+++ b/hw/pci/pcie.c
-@@ -223,6 +223,20 @@ void pcie_cap_deverr_reset(PCIDevice *dev)
-                                  PCI_EXP_DEVCTL_FERE | PCI_EXP_DEVCTL_URRE);
- }
- 
-+void pcie_cap_lnkctl_init(PCIDevice *dev)
-+{
-+    uint32_t pos = dev->exp.exp_cap;
-+    pci_long_test_and_set_mask(dev->wmask + pos + PCI_EXP_LNKCTL,
-+                               PCI_EXP_LNKCTL_CCC | PCI_EXP_LNKCTL_ES);
-+}
-+
-+void pcie_cap_lnkctl_reset(PCIDevice *dev)
-+{
-+    uint8_t *lnkctl = dev->config + dev->exp.exp_cap + PCI_EXP_LNKCTL;
-+    pci_long_test_and_clear_mask(lnkctl,
-+                                 PCI_EXP_LNKCTL_CCC | PCI_EXP_LNKCTL_ES);
-+}
-+
- static void hotplug_event_update_event_status(PCIDevice *dev)
- {
-     uint32_t pos = dev->exp.exp_cap;
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 9e2bca6..1fb0a03 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -1824,6 +1824,11 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
-             pcie_cap_deverr_init(pci_dev);
-         }
- 
-+        if (proxy->flags & VIRTIO_PCI_FLAG_INIT_LNKCTL) {
-+            /* Init Link Control Register */
-+            pcie_cap_lnkctl_init(pci_dev);
-+        }
-+
-         if (proxy->flags & VIRTIO_PCI_FLAG_ATS) {
-             pcie_ats_init(pci_dev, 256);
-         }
-@@ -1867,6 +1872,7 @@ static void virtio_pci_reset(DeviceState *qdev)
- 
-     if (pci_is_express(dev)) {
-         pcie_cap_deverr_reset(dev);
-+        pcie_cap_lnkctl_reset(dev);
-     }
- }
- 
-@@ -1890,6 +1896,8 @@ static Property virtio_pci_properties[] = {
-                     VIRTIO_PCI_FLAG_ATS_BIT, false),
-     DEFINE_PROP_BIT("x-pcie-deverr-init", VirtIOPCIProxy, flags,
-                     VIRTIO_PCI_FLAG_INIT_DEVERR_BIT, true),
-+    DEFINE_PROP_BIT("x-pcie-lnkctl-init", VirtIOPCIProxy, flags,
-+                    VIRTIO_PCI_FLAG_INIT_LNKCTL_BIT, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
-index 120661d..9b5dd5a 100644
---- a/hw/virtio/virtio-pci.h
-+++ b/hw/virtio/virtio-pci.h
-@@ -74,6 +74,7 @@ enum {
-     VIRTIO_PCI_FLAG_PAGE_PER_VQ_BIT,
-     VIRTIO_PCI_FLAG_ATS_BIT,
-     VIRTIO_PCI_FLAG_INIT_DEVERR_BIT,
-+    VIRTIO_PCI_FLAG_INIT_LNKCTL_BIT,
- };
- 
- /* Need to activate work-arounds for buggy guests at vmstate load. */
-@@ -104,6 +105,9 @@ enum {
- /* Init error enabling flags */
- #define VIRTIO_PCI_FLAG_INIT_DEVERR (1 << VIRTIO_PCI_FLAG_INIT_DEVERR_BIT)
- 
-+/* Init Link Control register */
-+#define VIRTIO_PCI_FLAG_INIT_LNKCTL (1 << VIRTIO_PCI_FLAG_INIT_LNKCTL_BIT)
-+
- typedef struct {
-     MSIMessage msg;
-     int virq;
-diff --git a/include/hw/compat.h b/include/hw/compat.h
-index c98776a..0931aa5 100644
---- a/include/hw/compat.h
-+++ b/include/hw/compat.h
-@@ -26,6 +26,10 @@
-         .driver   = "virtio-pci",\
-         .property = "x-pcie-deverr-init",\
-         .value    = "off",\
-+    },{\
-+        .driver   = "virtio-pci",\
-+        .property = "x-pcie-lnkctl-init",\
-+        .value    = "off",\
-     },
- 
- #define HW_COMPAT_2_7 \
-diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
-index 163c519..11c6247 100644
---- a/include/hw/pci/pcie.h
-+++ b/include/hw/pci/pcie.h
-@@ -96,6 +96,9 @@ uint8_t pcie_cap_flags_get_vector(PCIDevice *dev);
- void pcie_cap_deverr_init(PCIDevice *dev);
- void pcie_cap_deverr_reset(PCIDevice *dev);
- 
-+void pcie_cap_lnkctl_init(PCIDevice *dev);
-+void pcie_cap_lnkctl_reset(PCIDevice *dev);
-+
- void pcie_cap_slot_init(PCIDevice *dev, uint16_t slot);
- void pcie_cap_slot_reset(PCIDevice *dev);
- void pcie_cap_slot_write_config(PCIDevice *dev,
--- 
-2.5.5
+Okay, so you're asking what happens if the source requests the vmgenid
+device, and sets an id, but the destination of the migration does not
+request anything - how does the guest on the destination see the same id
+as was in place on the source at the time migration started.
+
+>=20
+>=20
+>> when you load state from disk (you don't know how many times the same
+>> state has been loaded previously, so each load is effectively forking
+>> the VM and you want a different value), but for a single live migratio=
+n,
+>> you aren't forking the VM and don't need a new generation ID.
+>>
+>> I guess it all boils down to what command line you're using: if libvir=
+t
+>> is driving a live migration, it will request the same UUID in the
+>> command line of the destination as what is on the source; while if
+>> libvirt is loading from a [managed]save to restore state from a file, =
+it
+>> will either request a new UUID directly or request auto to let qemu
+>> generate the new id.
+>=20
+> Hmm now I've lost it a bit; I thought we would preserve the value
+> transmitted from the source, not the value on the command line of the d=
+estination.
+
+I guess I'm trying to figure out whether libvirt MUST read the current
+id and explicitly tell the destination of migration to reuse that id, or
+if libvirt can omit the id on migration and everything just works
+because the id was migrated from the source.
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--J0qJUpL2JFjJIJmpkND02HlABwenbjFWw
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYq1VpAAoJEKeha0olJ0Nq6gYIALAcNS9sesQ4zfXrfNXnwJro
+lvgWGFPpVVB1DEv1OEEYbT+OqLLXcTy4xekZTViiiTi3XwSTSMcXASyIXt4qJc6K
+24/RenNF0lzUcORMi5R3FYkihPfeCNdBqgQv5hRziyTtQhzI/z9SacWUWMIQ0Dej
+BhCkMv1rWGtU2ScPMRu6j060mhCp6ozzioyXjREdA4fvLBCNdYjpexN5JbXbT5dm
+xzheLLaF/6VSslvMWsR/wArk8JvGo0hKjp/Xg408F58j14Tg0MTxIH4i9F72bTpA
+dlHHhW0a9vVdWjkuPGLWxwmqnXcWsDl59LiUT4U8q/B6GgLC38f3UTCLx4zV+Mg=
+=rbmc
+-----END PGP SIGNATURE-----
+
+--J0qJUpL2JFjJIJmpkND02HlABwenbjFWw--
