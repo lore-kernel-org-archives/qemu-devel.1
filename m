@@ -1,14 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40187)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cfuuF-0006fM-Td
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:50:01 -0500
+	(envelope-from <lersek@redhat.com>) id 1cfuzu-0002t6-Ku
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:55:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cfuuA-0001k3-Ve
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:50:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36494)
+	(envelope-from <lersek@redhat.com>) id 1cfuzp-0003Kt-Me
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:55:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35974)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cfuuA-0001jj-Mm
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:49:54 -0500
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cfuzp-0003Kf-C6
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 15:55:45 -0500
 References: <cover.1487286467.git.ben@skyportsystems.com>
 	<88232638f9ff3b17b54987624468678ea14a3037.1487286467.git.ben@skyportsystems.com>
 	<20170217114321.6c8577e1@nial.brq.redhat.com>
@@ -16,12 +16,13 @@ References: <cover.1487286467.git.ben@skyportsystems.com>
 	<20170220102304.GC2372@work-vm>
 	<3fb8499e-884c-99e8-b295-3d4603921075@redhat.com>
 	<20170220201923.GM2372@work-vm>
+	<d51d4a21-5558-d4e5-5b7e-08f729fc1a5e@redhat.com>
 From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <11388990-8286-809e-78f7-99d44279a080@redhat.com>
-Date: Mon, 20 Feb 2017 21:49:50 +0100
+Message-ID: <0488d90c-f73c-916c-f84c-a1ffd2bad592@redhat.com>
+Date: Mon, 20 Feb 2017 21:55:40 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170220201923.GM2372@work-vm>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <d51d4a21-5558-d4e5-5b7e-08f729fc1a5e@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH v8 4/8] ACPI: Add Virtual Machine
  Generation ID support
@@ -33,70 +34,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, ben@skyportsystems.com, mst@redhat.com
 
-On 02/20/17 21:19, Dr. David Alan Gilbert wrote:
-> * Eric Blake (eblake@redhat.com) wrote:
->> On 02/20/2017 04:23 AM, Dr. David Alan Gilbert wrote:
->>> * Laszlo Ersek (lersek@redhat.com) wrote:
->>>> CC Dave
+On 02/20/17 21:45, Eric Blake wrote:
+> On 02/20/2017 02:19 PM, Dr. David Alan Gilbert wrote:
+>> * Eric Blake (eblake@redhat.com) wrote:
+>>> On 02/20/2017 04:23 AM, Dr. David Alan Gilbert wrote:
+>>>> * Laszlo Ersek (lersek@redhat.com) wrote:
+>>>>> CC Dave
+>>>>
+>>>> This isn't an area I really understand; but if I'm
+>>>> reading this right then 
+>>>>    vmgenid is stored in fw_cfg?
+>>>>    fw_cfg isn't migrated
+>>>>
+>>>> So why should any changes to it get migrated, except if it's already
+>>>> been read by the guest (and if the guest reads it again aftwards what's
+>>>> it expected to read?)
 >>>
->>> This isn't an area I really understand; but if I'm
->>> reading this right then 
->>>    vmgenid is stored in fw_cfg?
->>>    fw_cfg isn't migrated
->>>
->>> So why should any changes to it get migrated, except if it's already
->>> been read by the guest (and if the guest reads it again aftwards what's
->>> it expected to read?)
+>>> Why are we expecting it to change on migration?  You want a new value
 >>
->> Why are we expecting it to change on migration?  You want a new value
+>> I'm not; I was asking why a change made prior to migration would be
+>> preserved across migration.
 > 
-> I'm not; I was asking why a change made prior to migration would be
-> preserved across migration.
-> 
-> 
->> when you load state from disk (you don't know how many times the same
->> state has been loaded previously, so each load is effectively forking
->> the VM and you want a different value), but for a single live migration,
->> you aren't forking the VM and don't need a new generation ID.
->>
->> I guess it all boils down to what command line you're using: if libvirt
->> is driving a live migration, it will request the same UUID in the
->> command line of the destination as what is on the source; while if
->> libvirt is loading from a [managed]save to restore state from a file, it
->> will either request a new UUID directly or request auto to let qemu
->> generate the new id.
-> 
-> Hmm now I've lost it a bit; I thought we would preserve the value
-> transmitted from the source, not the value on the command line of the destination.
+> Okay, so you're asking what happens if the source requests the vmgenid
+> device, and sets an id, but the destination of the migration does not
+> request anything
 
-The are two relevant pieces of data here.
+This should never happen, as it means different QEMU command lines on
+source vs. target hosts. (Different as in "incorrectly different".)
 
-(a) the GUID in guest RAM
-(b) the guest-phys address of the GUID, written back by the guest fw to
-a guest-writeable fw_cfg file, to be dereferenced by QEMU, for updating
-the GUID in guest RAM
+Dave writes, "a change made prior to migration". Change made to what?
 
-For both live migration and restoring saved state from disk, (b) doesn't
-change. It is also not exposed on the QEMU command line. (It is
-configured by the guest firmware during initial boot.)
+- the GUID cannot be changed via the monitor once QEMU has been started.
+We dropped the monitor command for that, due to lack of a good use case,
+and due to lifecycle complexities. We have figured out a way to make it
+safe, but until there's a really convincing use case, we shouldn't add
+that complexity.
 
-(a) is taken from the QEMU command line. It can be "auto" (and then QEMU
-generates a random GUID), or a specific GUID string. This GUID is always
-written to guest RAM (assuming (b) has been configured) in the vmgenid
-device's post_load callback. However, whether the new GUID should be
-different from the one already present in guest RAM is a separate question.
-
-- For restoring state from disk, a different GUID (either generated by
-libvirt, or by QEMU due to "auto") makes sense.
-
-- For live migration, it makes sense for libvirt to pass in the same
-GUID on the target host as was used on the source host. The guest RAM
-update, and the ACPI interrupt (SCI), will occur on the target host, but
-the GUID won't change effectively. (The VMGENID spec explicitly permits
-spurious notifications, i.e., an SCI with no change to the GUID in RAM.)
+- the address of the GUID is changed (the firmware programs it from
+"zero" to an actual address, in a writeable fw_cfg file), and that piece
+of info is explicitly migrated, as part of the vmgenid device's vmsd.
 
 Thanks
 Laszlo
+
+
+> - how does the guest on the destination see the same id
+> as was in place on the source at the time migration started.
+> 
+>>
+>>
+>>> when you load state from disk (you don't know how many times the same
+>>> state has been loaded previously, so each load is effectively forking
+>>> the VM and you want a different value), but for a single live migration,
+>>> you aren't forking the VM and don't need a new generation ID.
+>>>
+>>> I guess it all boils down to what command line you're using: if libvirt
+>>> is driving a live migration, it will request the same UUID in the
+>>> command line of the destination as what is on the source; while if
+>>> libvirt is loading from a [managed]save to restore state from a file, it
+>>> will either request a new UUID directly or request auto to let qemu
+>>> generate the new id.
+>>
+>> Hmm now I've lost it a bit; I thought we would preserve the value
+>> transmitted from the source, not the value on the command line of the destination.
+> 
+> I guess I'm trying to figure out whether libvirt MUST read the current
+> id and explicitly tell the destination of migration to reuse that id, or
+> if libvirt can omit the id on migration and everything just works
+> because the id was migrated from the source.
+> 
