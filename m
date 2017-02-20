@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47820)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bsingharora@gmail.com>) id 1cfgL2-0003kn-Lv
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 00:16:41 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1cfgfS-000888-Se
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 00:37:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bsingharora@gmail.com>) id 1cfgL1-0003Hl-LS
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 00:16:40 -0500
-From: Balbir Singh <bsingharora@gmail.com>
-Date: Mon, 20 Feb 2017 16:16:26 +1100
-Message-ID: <20170220051626.GA661@balbir.ozlabs.ibm.com>
-References: <1487563478-22265-1-git-send-email-sjitindarsingh@gmail.com>
-	<1487563478-22265-2-git-send-email-sjitindarsingh@gmail.com>
+	(envelope-from <dovgaluk@ispras.ru>) id 1cfgfN-0008DU-Q4
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 00:37:46 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20170131115728.5244.21690.stgit@PASHA-ISP>
+	<000c01d285b6$abd99070$038cb150$@ru>
+In-Reply-To: <000c01d285b6$abd99070$038cb150$@ru>
+Date: Mon, 20 Feb 2017 08:36:16 +0300
+Message-ID: <000601d28b3b$42930b70$c7b92250$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1487563478-22265-2-git-send-email-sjitindarsingh@gmail.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [QEMU-PPC] [PATCH V3 01/10]
- target/ppc/POWER9: Add ISAv3.00 MMU definition
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH 0/3] block devices record/replay update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,40 +25,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, sam.bobroff@au1.ibm.com, david@gibson.dropbear.id.au
+To: 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, pbonzini@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-On Mon, Feb 20, 2017 at 03:04:29PM +1100, Suraj Jitindar Singh wrote:
-> POWER9 processors implement the mmu as defined in version 3.00 of the ISA.
-> 
-> Add a definition for this mmu model and set the POWER9 cpu model to use
-> this mmu model.
-> 
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> ---
->  target/ppc/cpu-qom.h        | 5 ++++-
->  target/ppc/mmu_helper.c     | 2 ++
->  target/ppc/translate_init.c | 3 +--
->  3 files changed, 7 insertions(+), 3 deletions(-)
-> 
-> diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-> index b7977ba..4e3132b 100644
-> --- a/target/ppc/cpu-qom.h
-> +++ b/target/ppc/cpu-qom.h
-> @@ -86,10 +86,13 @@ enum powerpc_mmu_t {
->      POWERPC_MMU_2_07       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
->                               | POWERPC_MMU_64K
->                               | POWERPC_MMU_AMR | 0x00000004,
-> -    /* FIXME Add POWERPC_MMU_3_OO defines */
->      /* Architecture 2.07 "degraded" (no 1T segments)           */
->      POWERPC_MMU_2_07a      = POWERPC_MMU_64 | POWERPC_MMU_AMR
->                               | 0x00000004,
-> +    /* Architecture 3.00 variant                               */
-> +    POWERPC_MMU_3_00       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
-> +                             | POWERPC_MMU_64K
-> +                             | POWERPC_MMU_AMR | 0x00000005,
+Destination host unreachable.
 
-I wonder if we need a POWERPC_MMU_RADIX that we can then attach
-with future versions
+Ping again.
 
-Balbir Singh.
+Pavel Dovgalyuk
+
+> -----Original Message-----
+> From: Pavel Dovgalyuk [mailto:dovgaluk@ispras.ru]
+> Sent: Monday, February 13, 2017 8:05 AM
+> To: 'Pavel Dovgalyuk'; qemu-devel@nongnu.org
+> Cc: kwolf@redhat.com; pbonzini@redhat.com; qemu-block@nongnu.org; mreitz@redhat.com
+> Subject: RE: [PATCH 0/3] block devices record/replay update
+> 
+> Ping?
+> 
+> Pavel Dovgalyuk
+> 
+> > -----Original Message-----
+> > From: Pavel Dovgalyuk [mailto:pavel.dovgaluk@ispras.ru]
+> > Sent: Tuesday, January 31, 2017 2:57 PM
+> > To: qemu-devel@nongnu.org
+> > Cc: kwolf@redhat.com; pbonzini@redhat.com; dovgaluk@ispras.ru; qemu-block@nongnu.org;
+> > mreitz@redhat.com
+> > Subject: [PATCH 0/3] block devices record/replay update
+> >
+> > This set of patches includes several fixes for preserving
+> > the state of the block device images while recording and replaying
+> > virtual machine execution.
+> >
+> > blkreplay driver now creates temporary overlay for underlaying devices
+> > This patch implicitly enables '-snapshot' behavior in record/replay mode.
+> > blkreplay layer creates temporary overlays on top of underlaying
+> > disk images. It is needed, because creating an overlay over blkreplay
+> > with explicit '-snapshot' option breaks the determinism.
+> >
+> > ---
+> >
+> > Pavel Dovgalyuk (3):
+> >       block: implement bdrv_snapshot_goto for blkreplay
+> >       blkreplay: create temporary overlay for underlaying devices
+> >       replay: disable default snapshot for record/replay
+> >
+> >
+> >  block/blkreplay.c |   84 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  stubs/replay.c    |    1 +
+> >  vl.c              |   10 +++++-
+> >  3 files changed, 93 insertions(+), 2 deletions(-)
+> >
+> > --
+> > Pavel Dovgalyuk
