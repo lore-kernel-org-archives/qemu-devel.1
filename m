@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cfljx-0005Gg-4I
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 06:02:49 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cfllj-00067A-Ah
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 06:04:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cfljr-0000ju-6r
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 06:02:45 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:32871)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cfljq-0000jp-Vk
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 06:02:39 -0500
-Received: by mail-wm0-x243.google.com with SMTP id v77so13687135wmv.0
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 03:02:38 -0800 (PST)
-Date: Mon, 20 Feb 2017 11:02:35 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170220110235.GD21255@stefanha-x1.localdomain>
-References: <CAAo6VWOAnGQeDwc_bJ4M=FQsu7rOhAv=1Qk6PdzG+0pcVnku=A@mail.gmail.com>
-	<20170217214215.GK19045@localhost.localdomain>
-	<F23F188C-DAF9-49EA-9C0E-54F57945267A@veritas.com>
+	(envelope-from <mreitz@redhat.com>) id 1cflli-0001Ng-Fu
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 06:04:35 -0500
+References: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
+	<1487006583-24350-17-git-send-email-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <ef9df6e6-6029-29ba-caa6-93bdbe835bae@redhat.com>
+Date: Mon, 20 Feb 2017 12:04:25 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ZJcv+A0YCCLh2VIg"
-Content-Disposition: inline
-In-Reply-To: <F23F188C-DAF9-49EA-9C0E-54F57945267A@veritas.com>
-Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
- block device type called "vxhs"
+In-Reply-To: <1487006583-24350-17-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="pgQxvB9he3sPpsvjwcTSxAV4dcEc9EX6h"
+Subject: Re: [Qemu-devel] [RFC PATCH 16/41] block: Add error parameter to
+ blk_insert_bs()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,61 +25,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ketan Nilangekar <Ketan.Nilangekar@veritas.com>
-Cc: Jeff Cody <jcody@redhat.com>, ashish mittal <ashmit602@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-
---ZJcv+A0YCCLh2VIg
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--pgQxvB9he3sPpsvjwcTSxAV4dcEc9EX6h
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+Message-ID: <ef9df6e6-6029-29ba-caa6-93bdbe835bae@redhat.com>
+Subject: Re: [RFC PATCH 16/41] block: Add error parameter to blk_insert_bs()
+References: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
+ <1487006583-24350-17-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1487006583-24350-17-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Feb 18, 2017 at 12:30:31AM +0000, Ketan Nilangekar wrote:
-> On 2/17/17, 1:42 PM, "Jeff Cody" <jcody@redhat.com> wrote:
->=20
->     On Thu, Feb 16, 2017 at 02:24:19PM -0800, ashish mittal wrote:
->     > Hi,
->     >=20
->     > I am getting the following error with checkpatch.pl
->     >=20
->     > ERROR: externs should be avoided in .c files
->     > #78: FILE: block/vxhs.c:28:
->     > +QemuUUID qemu_uuid __attribute__ ((weak));
->     >=20
->     > Is there any way to get around this, or does it mean that I would h=
-ave
->     > to add a vxhs.h just for this one entry?
->     >
->    =20
->     I remain skeptical on the use of the qemu_uuid as a way to select the=
- TLS
->     cert.
->=20
-> [ketan]
-> Is there another identity that can be used for uniquely identifying insta=
-nces?
-> The requirement was to enforce vdisk access to owner instances.
+On 13.02.2017 18:22, Kevin Wolf wrote:
+> Mow that blk_insert_bs() requests the BlockBackend permissions for the
+> node it attaches to, it can fail. Instead of aborting, pass the errors
+> to the callers.
 
-The qemu_uuid weak attribute looks suspect.  What is going to provide a
-strong qemu_uuid symbol?
+So it does qualify as a FIXME, but just for a single patch. Good. :-)
 
-Why aren't configuration parameters like the UUID coming from the QEMU
-command-line?
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/backup.c                   |  5 ++++-
+>  block/block-backend.c            | 12 ++++++++----
+>  block/commit.c                   | 38 ++++++++++++++++++++++++++++++--=
+------
+>  block/mirror.c                   | 15 ++++++++++++---
+>  blockdev.c                       |  6 +++++-
+>  blockjob.c                       |  7 ++++++-
+>  hmp.c                            |  6 +++++-
+>  hw/core/qdev-properties-system.c |  7 ++++++-
+>  include/sysemu/block-backend.h   |  2 +-
+>  migration/block.c                |  2 +-
+>  nbd/server.c                     |  6 +++++-
+>  tests/test-blockjob.c            |  2 +-
+>  12 files changed, 84 insertions(+), 24 deletions(-)
 
-Stefan
+[...]
 
---ZJcv+A0YCCLh2VIg
+> diff --git a/migration/block.c b/migration/block.c
+> index 6b7ffd4..d259936 100644
+> --- a/migration/block.c
+> +++ b/migration/block.c
+> @@ -446,7 +446,7 @@ static void init_blk_migration(QEMUFile *f)
+>          BlockDriverState *bs =3D bmds_bs[i].bs;
+> =20
+>          if (bmds) {
+> -            blk_insert_bs(bmds->blk, bs);
+> +            blk_insert_bs(bmds->blk, bs, &error_abort);
+
+I don't think it's obvious why this is correct. I assume it is because
+this was a legal configuration on the source, so it must be a legal
+configuration on the destination.
+
+But I'd certainly appreciate a comment to make that explicitly clear,
+especially considering that it isn't obvious that blk_insert_bs() can
+fail only because of op blockers and thus will always work if the
+configuration is known to be legal.
+
+Max
+
+> =20
+>              alloc_aio_bitmap(bmds);
+>              error_setg(&bmds->blocker, "block device is in use by migr=
+ation");
+
+
+--pgQxvB9he3sPpsvjwcTSxAV4dcEc9EX6h
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJYqszLAAoJEJykq7OBq3PIckoIAJXtHXuobOW8iSxx1fCxYkkF
-/6VmAyAF2jDGKO9+/1TfpV5S9S+ZQil+asU1gfs0hTUVwyqavqt9kCsC94ajrWuF
-eiWFPLBNDw7X8YH0XBLCTeT4iFcdSfsmXJplCz/HEgz1ymdVjtIt7/pviVafuKxe
-r0vcqgGvZHdox5hWii2NkFkKjxGF4iFZd10CEKcqGXovfTHQoNSXNNYXgb8jllwg
-40GhMuy2ghc76IC/OuklMZGr3jmf0DQRgYptk4OjK26TU9oUV2edS5UxhrdlmRHj
-udn/UQv+/+tNsNVFfO1dTH7PdfMtceE8f/Bj4W8gljtHqZw9NczDO14Nyb70V+o=
-=CFTR
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliqzToSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AlpkIALr2s7TIBTWjhGOr1KJSItgi1wWt4lA2
+lmUu3vTqWUnNVMPWl+1ev0JEQ+XU1PMOU7/79d1M8s9zLNW0kouteicWcwSxloLy
+sQrqEg6sG8HpDNSbvbJizRCjlbVm8NuqQkMu749SJCy54E3RuW3h6QkN+PpHockU
+srxNCx3y3WO708rolzypbjoFpNheVuzIV1i+z7i+LjU84YwToafgHzmDKyd1cCdj
+1f2cemu1CnXEYMB4ir4UwyuNvJHFZNYyqVBtRYawIZ85KIyG7FnkZY2i1r7kt0FX
+9zwU3Q2aXTyL7YOozpDRVz2yA+ZVbf2/OjUYJwu0es/WSQBWWMy41b4=
+=q2+F
 -----END PGP SIGNATURE-----
 
---ZJcv+A0YCCLh2VIg--
+--pgQxvB9he3sPpsvjwcTSxAV4dcEc9EX6h--
