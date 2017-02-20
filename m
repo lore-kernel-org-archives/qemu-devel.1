@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cfmrx-0005LN-U6
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 07:15:11 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cfn0H-0007Z6-QR
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 07:23:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cfmrw-0001Ah-JZ
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 07:15:05 -0500
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:32833)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cfmrw-0001Ab-Cb
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 07:15:04 -0500
-Received: by mail-wr0-x22e.google.com with SMTP id 35so22648578wrw.0
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 04:15:04 -0800 (PST)
+	(envelope-from <kwolf@redhat.com>) id 1cfn0G-0003pU-Hh
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 07:23:41 -0500
+Date: Mon, 20 Feb 2017 13:23:29 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170220122329.GC4814@noname.redhat.com>
+References: <fd790939-7ad7-1d74-c810-eceece98bbb7@virtuozzo.com>
+	<20170217124842.GE5338@noname.redhat.com>
+	<3a827d65-1028-d0fd-c3aa-cabe61dafbd9@openvz.org>
+	<20170217133430.GI5338@noname.redhat.com>
+	<635d98d9-0f65-4fa6-2208-02ff7d23a2e9@openvz.org>
+	<20170217142403.GJ5338@noname.redhat.com>
+	<89b7456e-e689-fdee-7ab0-89bb664f1cb6@virtuozzo.com>
+	<d41ae075-95db-6cf9-3cc7-58f2f337420b@openvz.org>
+	<20170220111535.GA4814@noname.redhat.com>
+	<72b9788d-e85d-b20d-b334-fe63154ba20d@openvz.org>
 MIME-Version: 1.0
-In-Reply-To: <20170219200231.30672-1-laurent@vivier.eu>
-References: <20170219200231.30672-1-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Feb 2017 12:14:42 +0000
-Message-ID: <CAFEAcA-wewMTE0qP1VB1VSTk=mNhZKxpQfrC79twv7iFk+Nedg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] risu-m68k: update fpregs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <72b9788d-e85d-b20d-b334-fe63154ba20d@openvz.org>
+Subject: Re: [Qemu-devel] [PATCH v15 08/25] block: introduce auto-loading
+ bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +32,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "Denis V. Lunev" <den@openvz.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
 
-On 19 February 2017 at 20:02, Laurent Vivier <laurent@vivier.eu> wrote:
-> f_fpregs is a 2d array, not 1d:
->
->  typedef struct fpregset
->  {
->    int f_pcr;
->    int f_psr;
->    int f_fpiaddr;
->  #ifdef __mcoldfire__
->    int f_fpregs[8][2];
->  #else
->    int f_fpregs[8][3];
->  #endif
->  } fpregset_t;
->
-> For the moment, we don't manage ColdFire case, only 680x0.
->
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Am 20.02.2017 um 12:21 hat Denis V. Lunev geschrieben:
+> On 02/20/2017 12:15 PM, Kevin Wolf wrote:
+> > Am 18.02.2017 um 11:54 hat Denis V. Lunev geschrieben:
+> >> On 02/17/2017 03:54 PM, Vladimir Sementsov-Ogievskiy wrote:
+> >>> 17.02.2017 17:24, Kevin Wolf wrote:
+> >>>> Am 17.02.2017 um 14:48 hat Denis V. Lunev geschrieben:
+> >>>>> On 02/17/2017 04:34 PM, Kevin Wolf wrote:
+> >>>>>> Am 17.02.2017 um 14:22 hat Denis V. Lunev geschrieben:
+> >>>>>>> But for sure this is bad from the downtime point of view.
+> >>>>>>> On migrate you will have to write to the image and re-read
+> >>>>>>> it again on the target. This would be very slow. This will
+> >>>>>>> not help for the migration with non-shared disk too.
+> >>>>>>>
+> >>>>>>> That is why we have specifically worked in a migration,
+> >>>>>>> which for a good does not influence downtime at all now.
+> >>>>>>>
+> >>>>>>> With a write we are issuing several write requests + sync.
+> >>>>>>> Our measurements shows that bdrv_drain could take around
+> >>>>>>> a second on an averagely loaded conventional system, which
+> >>>>>>> seems unacceptable addition to me.
+> >>>>>> I'm not arguing against optimising migration, I fully agree with
+> >>>>>> you. I
+> >>>>>> just think that we should start with a correct if slow base version
+> >>>>>> and
+> >>>>>> then add optimisation to that, instead of starting with a broken base
+> >>>>>> version and adding to that.
+> >>>>>>
+> >>>>>> Look, whether you do the expensive I/O on open/close and make that a
+> >>>>>> slow operation or whether you do it on invalidate_cache/inactivate
+> >>>>>> doesn't really make a difference in term of slowness because in
+> >>>>>> general
+> >>>>>> both operations are called exactly once. But it does make a difference
+> >>>>>> in terms of correctness.
+> >>>>>>
+> >>>>>> Once you do the optimisation, of course, you'll skip writing those
+> >>>>>> bitmaps that you transfer using a different channel, no matter whether
+> >>>>>> you skip it in bdrv_close() or in bdrv_inactivate().
+> >>>>>>
+> >>>>>> Kevin
+> >>>>> I do not understand this point as in order to optimize this
+> >>>>> we will have to create specific code path or option from
+> >>>>> the migration code and keep this as an ugly kludge forever.
+> >>>> The point that I don't understand is why it makes any difference for the
+> >>>> follow-up migration series whether the writeout is in bdrv_close() or
+> >>>> bdrv_inactivate(). I don't really see the difference between the two
+> >>>> from a migration POV; both need to be skipped if we transfer the bitmap
+> >>>> using a different channel.
+> >>>>
+> >>>> Maybe I would see the reason if I could find the time to look at the
+> >>>> migration patches first, but unfortunately I don't have this time at the
+> >>>> moment.
+> >>>>
+> >>>> My point is just that generally we want to have a correctly working qemu
+> >>>> after every single patch, and even more importantly after every series.
+> >>>> As the migration series is separate from this, I don't think it's a good
+> >>>> excuse for doing worse than we could easily do here.
+> >>>>
+> >>>> Kevin
+> >>> With open/close all is already ok - bitmaps will not be saved because
+> >>> of BDRV_O_INACTIVE  and will not be loaded because of IN_USE.
+> > If the contents of so-called persistent bitmaps is lost across
+> > migration and stale after bdrv_invalidate_cache, that's not "all ok" in
+> > my book. It's buggy.
+> >
+> >> in any case load/store happens outside of VM downtime.
+> >> The target is running at the moment of close on source,
+> >> the source is running at the moment of open on target.
+> > Which makes the operation in open/close meaningless: open reads data
+> > which may still by changed, and close cannot write to the image any more
+> > because ownership is already given up.
+> >
+> > Anyway, all of this isn't really productive. Please, can't you just
+> > answer that simple question that I asked you above: What problems would
+> > you get if you used invalidate_cache/inactivate instead of open/close
+> > for triggering these actions?
+> >
+> > If you can bring up some "this would break X", "it would be very hard to
+> > implement Y correctly then" or "in scenario Z, this would have unwanted
+> > effects", then we can figure out what to do. But not putting things in
+> > the proper place just because you don't feel like it isn't a very strong
+> > argument.
+> >
+> > Kevin
+> This will increase the downtime ~0.5-1 second for migrated VM
 
-Thanks; applied to target-arm.next.
+True before the optimisation is applied. But correctness trumps
+speed.
 
-I've also pushed out support for building risu into a separate
-build directory, and a 'build-all-archs' script that will
-build every target CPU arch that you have a cross compiler
-installed for (Debian and Ubuntu package cross compilers for
-everything, helpfully).
+> or will require very intrusive interface from migration code to
+> here to avoid bitmap save for inactivation on that path.
 
-thanks
--- PMM
+You already have a (very implicit) interface from migration code to
+bdrv_open/close. It consists of what Vladimir mentioned above: The
+BDRV_O_INACTIVE and IN_USE flags, which happen to be in the right state
+during migration so that they can be abused for controlling the
+handover.
+
+If moving the code means that we end up getting a more explicit
+interface, that's actually a plus for me.
+
+Kevin
