@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cfn0H-0007Z6-QR
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 07:23:43 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cfn2M-00008w-1y
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 07:25:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cfn0G-0003pU-Hh
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 07:23:41 -0500
-Date: Mon, 20 Feb 2017 13:23:29 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170220122329.GC4814@noname.redhat.com>
-References: <fd790939-7ad7-1d74-c810-eceece98bbb7@virtuozzo.com>
-	<20170217124842.GE5338@noname.redhat.com>
-	<3a827d65-1028-d0fd-c3aa-cabe61dafbd9@openvz.org>
-	<20170217133430.GI5338@noname.redhat.com>
-	<635d98d9-0f65-4fa6-2208-02ff7d23a2e9@openvz.org>
-	<20170217142403.GJ5338@noname.redhat.com>
-	<89b7456e-e689-fdee-7ab0-89bb664f1cb6@virtuozzo.com>
-	<d41ae075-95db-6cf9-3cc7-58f2f337420b@openvz.org>
-	<20170220111535.GA4814@noname.redhat.com>
-	<72b9788d-e85d-b20d-b334-fe63154ba20d@openvz.org>
+	(envelope-from <mreitz@redhat.com>) id 1cfn2L-0004IG-6f
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 07:25:50 -0500
+References: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
+	<1487006583-24350-20-git-send-email-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <c8592787-34e5-1ab3-7e33-596f97520cd3@redhat.com>
+Date: Mon, 20 Feb 2017 13:25:37 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <72b9788d-e85d-b20d-b334-fe63154ba20d@openvz.org>
-Subject: Re: [Qemu-devel] [PATCH v15 08/25] block: introduce auto-loading
- bitmaps
+In-Reply-To: <1487006583-24350-20-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="RqIee2TQfK3wBAgIgWKJNm9Cc8AvIIQWx"
+Subject: Re: [Qemu-devel] [RFC PATCH 19/41] hw/block: Request permissions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,107 +24,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-Am 20.02.2017 um 12:21 hat Denis V. Lunev geschrieben:
-> On 02/20/2017 12:15 PM, Kevin Wolf wrote:
-> > Am 18.02.2017 um 11:54 hat Denis V. Lunev geschrieben:
-> >> On 02/17/2017 03:54 PM, Vladimir Sementsov-Ogievskiy wrote:
-> >>> 17.02.2017 17:24, Kevin Wolf wrote:
-> >>>> Am 17.02.2017 um 14:48 hat Denis V. Lunev geschrieben:
-> >>>>> On 02/17/2017 04:34 PM, Kevin Wolf wrote:
-> >>>>>> Am 17.02.2017 um 14:22 hat Denis V. Lunev geschrieben:
-> >>>>>>> But for sure this is bad from the downtime point of view.
-> >>>>>>> On migrate you will have to write to the image and re-read
-> >>>>>>> it again on the target. This would be very slow. This will
-> >>>>>>> not help for the migration with non-shared disk too.
-> >>>>>>>
-> >>>>>>> That is why we have specifically worked in a migration,
-> >>>>>>> which for a good does not influence downtime at all now.
-> >>>>>>>
-> >>>>>>> With a write we are issuing several write requests + sync.
-> >>>>>>> Our measurements shows that bdrv_drain could take around
-> >>>>>>> a second on an averagely loaded conventional system, which
-> >>>>>>> seems unacceptable addition to me.
-> >>>>>> I'm not arguing against optimising migration, I fully agree with
-> >>>>>> you. I
-> >>>>>> just think that we should start with a correct if slow base version
-> >>>>>> and
-> >>>>>> then add optimisation to that, instead of starting with a broken base
-> >>>>>> version and adding to that.
-> >>>>>>
-> >>>>>> Look, whether you do the expensive I/O on open/close and make that a
-> >>>>>> slow operation or whether you do it on invalidate_cache/inactivate
-> >>>>>> doesn't really make a difference in term of slowness because in
-> >>>>>> general
-> >>>>>> both operations are called exactly once. But it does make a difference
-> >>>>>> in terms of correctness.
-> >>>>>>
-> >>>>>> Once you do the optimisation, of course, you'll skip writing those
-> >>>>>> bitmaps that you transfer using a different channel, no matter whether
-> >>>>>> you skip it in bdrv_close() or in bdrv_inactivate().
-> >>>>>>
-> >>>>>> Kevin
-> >>>>> I do not understand this point as in order to optimize this
-> >>>>> we will have to create specific code path or option from
-> >>>>> the migration code and keep this as an ugly kludge forever.
-> >>>> The point that I don't understand is why it makes any difference for the
-> >>>> follow-up migration series whether the writeout is in bdrv_close() or
-> >>>> bdrv_inactivate(). I don't really see the difference between the two
-> >>>> from a migration POV; both need to be skipped if we transfer the bitmap
-> >>>> using a different channel.
-> >>>>
-> >>>> Maybe I would see the reason if I could find the time to look at the
-> >>>> migration patches first, but unfortunately I don't have this time at the
-> >>>> moment.
-> >>>>
-> >>>> My point is just that generally we want to have a correctly working qemu
-> >>>> after every single patch, and even more importantly after every series.
-> >>>> As the migration series is separate from this, I don't think it's a good
-> >>>> excuse for doing worse than we could easily do here.
-> >>>>
-> >>>> Kevin
-> >>> With open/close all is already ok - bitmaps will not be saved because
-> >>> of BDRV_O_INACTIVE  and will not be loaded because of IN_USE.
-> > If the contents of so-called persistent bitmaps is lost across
-> > migration and stale after bdrv_invalidate_cache, that's not "all ok" in
-> > my book. It's buggy.
-> >
-> >> in any case load/store happens outside of VM downtime.
-> >> The target is running at the moment of close on source,
-> >> the source is running at the moment of open on target.
-> > Which makes the operation in open/close meaningless: open reads data
-> > which may still by changed, and close cannot write to the image any more
-> > because ownership is already given up.
-> >
-> > Anyway, all of this isn't really productive. Please, can't you just
-> > answer that simple question that I asked you above: What problems would
-> > you get if you used invalidate_cache/inactivate instead of open/close
-> > for triggering these actions?
-> >
-> > If you can bring up some "this would break X", "it would be very hard to
-> > implement Y correctly then" or "in scenario Z, this would have unwanted
-> > effects", then we can figure out what to do. But not putting things in
-> > the proper place just because you don't feel like it isn't a very strong
-> > argument.
-> >
-> > Kevin
-> This will increase the downtime ~0.5-1 second for migrated VM
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--RqIee2TQfK3wBAgIgWKJNm9Cc8AvIIQWx
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+Message-ID: <c8592787-34e5-1ab3-7e33-596f97520cd3@redhat.com>
+Subject: Re: [RFC PATCH 19/41] hw/block: Request permissions
+References: <1487006583-24350-1-git-send-email-kwolf@redhat.com>
+ <1487006583-24350-20-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1487006583-24350-20-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-True before the optimisation is applied. But correctness trumps
-speed.
+On 13.02.2017 18:22, Kevin Wolf wrote:
+> This makes all device emulations with a qdev drive property request
+> permissions on their BlockBackend. We don't block anything yet.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  hw/block/block.c                 | 19 ++++++++++++++++++-
+>  hw/block/fdc.c                   | 25 +++++++++++++++++++++++--
+>  hw/block/m25p80.c                |  8 ++++++++
+>  hw/block/nand.c                  |  7 +++++++
+>  hw/block/nvme.c                  |  8 +++++++-
+>  hw/block/onenand.c               |  7 +++++++
+>  hw/block/pflash_cfi01.c          | 18 ++++++++++++------
+>  hw/block/pflash_cfi02.c          | 19 +++++++++++++------
+>  hw/block/virtio-blk.c            |  8 +++++++-
+>  hw/core/qdev-properties-system.c |  1 -
+>  hw/ide/qdev.c                    |  7 +++++--
+>  hw/nvram/spapr_nvram.c           |  8 ++++++++
+>  hw/scsi/scsi-disk.c              |  8 ++++++--
 
-> or will require very intrusive interface from migration code to
-> here to avoid bitmap save for inactivation on that path.
+Since I have no idea how scsi-generic and all of that works, just an
+innocent question: Do we need to set permissions there, too?
 
-You already have a (very implicit) interface from migration code to
-bdrv_open/close. It consists of what Vladimir mentioned above: The
-BDRV_O_INACTIVE and IN_USE flags, which happen to be in the right state
-during migration so that they can be abused for controlling the
-handover.
+>  hw/sd/sd.c                       |  6 ++++++
+>  hw/usb/dev-storage.c             |  6 +++++-
+>  include/hw/block/block.h         |  3 ++-
+>  tests/qemu-iotests/051.pc.out    |  6 +++---
+>  17 files changed, 137 insertions(+), 27 deletions(-)
 
-If moving the code means that we end up getting a more explicit
-interface, that's actually a plus for me.
+[...]
 
-Kevin
+> diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
+> index 2d6eb46..190573c 100644
+> --- a/hw/block/m25p80.c
+> +++ b/hw/block/m25p80.c
+> @@ -1215,6 +1215,7 @@ static void m25p80_realize(SSISlave *ss, Error **=
+errp)
+>  {
+>      Flash *s =3D M25P80(ss);
+>      M25P80Class *mc =3D M25P80_GET_CLASS(s);
+> +    int ret;
+> =20
+>      s->pi =3D mc->pi;
+> =20
+> @@ -1222,6 +1223,13 @@ static void m25p80_realize(SSISlave *ss, Error *=
+*errp)
+>      s->dirty_page =3D -1;
+> =20
+>      if (s->blk) {
+> +        uint64_t perm =3D BLK_PERM_CONSISTENT_READ |
+> +                        (blk_is_read_only(s->blk) ? 0 : BLK_PERM_WRITE=
+);
+> +        ret =3D blk_set_perm(s->blk, perm, BLK_PERM_ALL, errp);
+
+Not sure whether it should be changed in this patch, but I don't know
+whether BLK_PERM_ALL is right here; and from a quick glance it doesn't
+look like any of the following patches change it.
+
+(Same for all of the block device emulation code that invokes
+blk_set_perm() directly.)
+
+Max
+
+> +        if (ret < 0) {
+> +            return;
+> +        }
+> +
+>          DB_PRINT_L(0, "Binding to IF_MTD drive\n");
+>          s->storage =3D blk_blockalign(s->blk, s->size);
+> =20
+
+[...]
+
+
+--RqIee2TQfK3wBAgIgWKJNm9Cc8AvIIQWx
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliq4EESHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9Af2IH/i13c0xUXpYL4jn3jecObYRaY0m86q4d
+KiTQz4EYpYLoIC4Lf4D52hMoQ8Zqvv4BYnQjTtMjTLOIW2MXiOy+s+XUpkbs09IE
+o0kvhgZZzQqoXn27DOTMvHUa0ZYCUJMRmKZmmVRBe7kOCYF75iALeMm5oiHETZhk
+kPfDy8nm0U5PzP8V73nDPKK4CWjJk2S/JCNStofk5PdRhrXLahHYP18+60Iev9vm
+Ld+YkSmNm1mbXCNi0MF1uakJ83PlmYMkxJe5C2xSfNmK8bm/V/g6ykxkuYcbxYJV
+jqTi7T4WlVnLWKiLfHk5oszRYJ5XMgir7otMkbOtLb6UQY2o6iQxwBM=
+=VOKf
+-----END PGP SIGNATURE-----
+
+--RqIee2TQfK3wBAgIgWKJNm9Cc8AvIIQWx--
