@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cfmkj-0002dR-Jc
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 07:07:38 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cfmrx-0005LN-U6
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 07:15:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cfmki-0007Gh-KO
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 07:07:37 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1487161136-9018-1-git-send-email-armbru@redhat.com>
-	<575ab227-e44e-8d66-7b58-3e68e1df8491@redhat.com>
-	<878tp7tx98.fsf@dusky.pond.sub.org>
-	<ca73f39c-04b2-ce0b-1f80-5eef0e4861ce@redhat.com>
-Date: Mon, 20 Feb 2017 13:07:27 +0100
-In-Reply-To: <ca73f39c-04b2-ce0b-1f80-5eef0e4861ce@redhat.com> (Paolo
-	Bonzini's message of "Wed, 15 Feb 2017 14:19:21 +0100")
-Message-ID: <87poidkqv4.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1cfmrw-0001Ah-JZ
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 07:15:05 -0500
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:32833)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cfmrw-0001Ab-Cb
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 07:15:04 -0500
+Received: by mail-wr0-x22e.google.com with SMTP id 35so22648578wrw.0
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 04:15:04 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] hw: Deprecate unwanted use -drive
- if=scsi
+In-Reply-To: <20170219200231.30672-1-laurent@vivier.eu>
+References: <20170219200231.30672-1-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 20 Feb 2017 12:14:42 +0000
+Message-ID: <CAFEAcA-wewMTE0qP1VB1VSTk=mNhZKxpQfrC79twv7iFk+Nedg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] risu-m68k: update fpregs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,72 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
-
-> On 15/02/2017 14:10, Markus Armbruster wrote:
->> Paolo Bonzini <pbonzini@redhat.com> writes:
->> 
->>> On 15/02/2017 13:18, Markus Armbruster wrote:
->>>> Drives defined with if=scsi get connected to buses created with
->>>> -device, unlike other interface types.  Deprecate this usage.
->>>>
->>>> There is no good default SCSI HBA for PC machines.  Deprecate if=scsi
->>>> there entirely.
->>>>
->>>> Before this series, frontends for -drive if=scsi get created by SCSI
->>>> HBAs.  Frontends for other interface types get created by machine
->>>> initialization.
->>>>
->>>> After this series, they get created by machine initialization, except
->>>> for deprecated cases, which get created by new function
->>>> scsi_legacy_handle_cmdline().
->>>>
->>>> Based on "[PATCH v3 0/8] More sensible default for -drive interface
->>>> type".
->>>>
->>>> v2:
->>>> * Trivially rebased
->>>> * PATCH 2: Suppress warning for default drives
->>>> * PATCH 3: Update user manual and qemu-iotests/051.pc.out
->>>>
->>>> Markus Armbruster (3):
->>>>   hw/scsi: Concentrate -drive if=scsi auto-create in one place
->>>>   hw: Deprecate -drive if=scsi with non-onboard HBAs
->>>>   hw/i386: Deprecate -drive if=scsi with PC machine types
->>>>
->>>>  hw/arm/realview.c             |  2 +-
->>>>  hw/arm/versatilepb.c          |  2 +-
->>>>  hw/i386/pc.c                  |  6 +++++
->>>>  hw/scsi/esp-pci.c             |  3 ---
->>>>  hw/scsi/esp.c                 |  6 -----
->>>>  hw/scsi/lsi53c895a.c          | 10 +++++---
->>>>  hw/scsi/megasas.c             |  4 ----
->>>>  hw/scsi/mptsas.c              |  4 ----
->>>>  hw/scsi/scsi-bus.c            | 56 +++++++++++++++++++++++++++++++++++++------
->>>>  hw/scsi/spapr_vscsi.c         |  5 ++--
->>>>  hw/scsi/virtio-scsi.c         |  8 -------
->>>>  include/hw/pci/pci.h          |  2 ++
->>>>  include/hw/scsi/scsi.h        |  3 ++-
->>>>  qemu-options.hx               |  5 ----
->>>>  tests/qemu-iotests/051.pc.out | 12 ++++++----
->>>>  vl.c                          | 10 ++++++++
->>>>  16 files changed, 88 insertions(+), 50 deletions(-)
->>>>
->>>
->>> Because of the ESC characters in 051.pc.out, please send the pull
->>> request for this yourself.
->> 
->> Is that an Acked-by?
+On 19 February 2017 at 20:02, Laurent Vivier <laurent@vivier.eu> wrote:
+> f_fpregs is a 2d array, not 1d:
 >
-> Not a sufficient one because the patch touches files outside my area of
-> maintenance, but for hw/scsi you can treat it as one.
+>  typedef struct fpregset
+>  {
+>    int f_pcr;
+>    int f_psr;
+>    int f_fpiaddr;
+>  #ifdef __mcoldfire__
+>    int f_fpregs[8][2];
+>  #else
+>    int f_fpregs[8][3];
+>  #endif
+>  } fpregset_t;
+>
+> For the moment, we don't manage ColdFire case, only 680x0.
+>
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 
-Okay, that covers PATCH 1/3.
+Thanks; applied to target-arm.next.
 
-What about PATCH 3/3?  It's actually your idea...
+I've also pushed out support for building risu into a separate
+build directory, and a 'build-all-archs' script that will
+build every target CPU arch that you have a cross compiler
+installed for (Debian and Ubuntu package cross compilers for
+everything, helpfully).
 
-Message-ID: <3512807d-d04e-50fa-9fcf-d1d5ba8ac350@redhat.com>
-https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg05037.html
+thanks
+-- PMM
