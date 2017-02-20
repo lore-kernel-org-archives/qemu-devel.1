@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vijay.kilari@gmail.com>) id 1cfhLm-0000MQ-6P
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 01:21:31 -0500
+	(envelope-from <bsingharora@gmail.com>) id 1cfiS1-0002YD-0E
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 02:32:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vijay.kilari@gmail.com>) id 1cfhLl-0003CE-2P
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 01:21:30 -0500
+	(envelope-from <bsingharora@gmail.com>) id 1cfiRz-0005bq-Vy
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 02:32:01 -0500
+From: Balbir Singh <bsingharora@gmail.com>
+Date: Mon, 20 Feb 2017 18:31:46 +1100
+Message-ID: <20170220073146.GC661@balbir.ozlabs.ibm.com>
+References: <1487563478-22265-1-git-send-email-sjitindarsingh@gmail.com>
+	<1487563478-22265-4-git-send-email-sjitindarsingh@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8618+LGejFq6SpBEwGrNpfamBBX3MFWjss-ZxJ7Xk8mg@mail.gmail.com>
-References: <1487313115-9510-1-git-send-email-vijay.kilari@gmail.com>
-	<1487313115-9510-3-git-send-email-vijay.kilari@gmail.com>
-	<CAFEAcA8618+LGejFq6SpBEwGrNpfamBBX3MFWjss-ZxJ7Xk8mg@mail.gmail.com>
-From: Vijay Kilari <vijay.kilari@gmail.com>
-Date: Mon, 20 Feb 2017 11:51:24 +0530
-Message-ID: <CALicx6tqxXZxBTxYvF55ydBg5CB1to3MsEkhaohucx4EAZcEJA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v8 2/5] hw/intc/arm_gicv3_kvm: Add
- ICC_SRE_EL1 register to vmstate
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1487563478-22265-4-git-send-email-sjitindarsingh@gmail.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [QEMU-PPC] [PATCH V3 03/10]
+ target/ppc/POWER9: Adapt LPCR handling for POWER9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,110 +24,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>, Pavel Fedin <p.fedin@samsung.com>, Marc Zyngier <marc.zyngier@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, sam.bobroff@au1.ibm.com, david@gibson.dropbear.id.au
 
-Hi Peter,
+On Mon, Feb 20, 2017 at 03:04:31PM +1100, Suraj Jitindar Singh wrote:
+> The logical partitioning control register controls a threads operation
+> based on the partition it is currently executing. Add new definitions and
+> update the mask used when writing to the LPCR based on the POWER9 spec.
+> 
+> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> ---
+>  target/ppc/cpu.h            | 18 ++++++++++++++++++
+>  target/ppc/mmu-hash64.c     |  8 ++++++++
+>  target/ppc/translate_init.c | 24 ++++++++++++++++++------
+>  3 files changed, 44 insertions(+), 6 deletions(-)
+> 
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index bb96dd5..425e79d 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -384,12 +384,19 @@ struct ppc_slb_t {
+>  #define LPCR_DPFD         (0x7ull << LPCR_DPFD_SHIFT)
+>  #define LPCR_VRMASD_SHIFT (63 - 16)
+>  #define LPCR_VRMASD       (0x1full << LPCR_VRMASD_SHIFT)
+> +/* P9: Power-saving mode Exit Cause Enable (Upper Section) Mask */
+> +#define LPCR_PECE_U_SHIFT (63 - 19)
+> +#define LPCR_PECE_U_MASK  (0x7ull << LPCR_PECE_U_SHIFT)
+> +#define LPCR_HVEE         (1ull << (63 - 17)) /* Hypervisor Virt Exit Enable */
+>  #define LPCR_RMLS_SHIFT   (63 - 37)
+>  #define LPCR_RMLS         (0xfull << LPCR_RMLS_SHIFT)
+>  #define LPCR_ILE          (1ull << (63 - 38))
+>  #define LPCR_AIL_SHIFT    (63 - 40)      /* Alternate interrupt location */
+>  #define LPCR_AIL          (3ull << LPCR_AIL_SHIFT)
+> +#define LPCR_UPRT         (1ull << (63 - 41)) /* Use Process Table */
+> +#define LPCR_EVIRT        (1ull << (63 - 42)) /* Enhanced Virtualisation */
+>  #define LPCR_ONL          (1ull << (63 - 45))
+> +#define LPCR_LD           (1ull << (63 - 46)) /* Large Decrementer */
+>  #define LPCR_P7_PECE0     (1ull << (63 - 49))
+>  #define LPCR_P7_PECE1     (1ull << (63 - 50))
+>  #define LPCR_P7_PECE2     (1ull << (63 - 51))
+> @@ -398,11 +405,22 @@ struct ppc_slb_t {
+>  #define LPCR_P8_PECE2     (1ull << (63 - 49))
+>  #define LPCR_P8_PECE3     (1ull << (63 - 50))
+>  #define LPCR_P8_PECE4     (1ull << (63 - 51))
+> +/* P9: Power-saving mode Exit Cause Enable (Lower Section) Mask */
+> +#define LPCR_PECE_L_SHIFT (63 - 51)
+> +#define LPCR_PECE_L_MASK  (0x1full << LPCR_PECE_L_SHIFT)
+> +#define LPCR_PDEE         (1ull << (63 - 47)) /* Privileged Doorbell Exit EN */
+> +#define LPCR_HDEE         (1ull << (63 - 48)) /* Hyperv Doorbell Exit Enable */
+> +#define LPCR_EEE          (1ull << (63 - 49)) /* External Exit Enable        */
+> +#define LPCR_DEE          (1ull << (63 - 50)) /* Decrementer Exit Enable     */
+> +#define LPCR_OEE          (1ull << (63 - 51)) /* Other Exit Enable           */
+>  #define LPCR_MER          (1ull << (63 - 52))
+> +#define LPCR_GTSE         (1ull << (63 - 53)) /* Guest Translation Shootdown */
+>  #define LPCR_TC           (1ull << (63 - 54))
+> +#define LPCR_HEIC         (1ull << (63 - 59)) /* HV Extern Interrupt Control */
+>  #define LPCR_LPES0        (1ull << (63 - 60))
+>  #define LPCR_LPES1        (1ull << (63 - 61))
+>  #define LPCR_RMI          (1ull << (63 - 62))
+> +#define LPCR_HVICE        (1ull << (63 - 62)) /* HV Virtualisation Int Enable */
+>  #define LPCR_HDICE        (1ull << (63 - 63))
 
-On Fri, Feb 17, 2017 at 7:25 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 17 February 2017 at 06:31,  <vijay.kilari@gmail.com> wrote:
->> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
->>
->> To Save and Restore ICC_SRE_EL1 register introduce vmstate
->> subsection and load only if non-zero.
->> Also initialize icc_sre_el1 with to 0x7 in pre_load
->> function.
->>
->> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
->> ---
->>  hw/intc/arm_gicv3_common.c         | 32 ++++++++++++++++++++++++++++++++
->>  include/hw/intc/arm_gicv3_common.h |  1 +
->>  2 files changed, 33 insertions(+)
->>
->> diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
->> index 16b9b0f..e62480e 100644
->> --- a/hw/intc/arm_gicv3_common.c
->> +++ b/hw/intc/arm_gicv3_common.c
->> @@ -70,6 +70,34 @@ static const VMStateDescription vmstate_gicv3_cpu_virt = {
->>      }
->>  };
->>
->> +static int icc_sre_el1_reg_pre_load(void *opaque)
->> +{
->> +    GICv3CPUState *cs = opaque;
->> +
->> +    /* By default enable SRE and disable IRQ & FIQ bypass. */
->> +    cs->icc_sre_el1 = 0x7;
->
-> Why do we need the pre_load function? I would have
-> expected that reset would have given us these defaults
-> already.
->
->> +    return 0;
->> +}
->> +
->> +static bool icc_sre_el1_reg_needed(void *opaque)
->> +{
->> +    GICv3CPUState *cs = opaque;
->> +
->> +    return cs->icc_sre_el1 != 0;
->
-> I expected this to say "we need to transfer the value if
-> it isn't 0x7" (since the current situation of migration
-> is "we assume that the value is 0x7").
->
-> Something should probably fail inbound migration for TCG
-> if the value isn't 0x7, for that matter.
->
-> Is there a situation where KVM might allow a value other
-> than 0x7?
+This patch is missing
 
-In KVM, the SRE_EL1 value is 0x1. During save, value
-read from KVM is 0x1 though we reset to 0x7.
+#define LPCR_HR	(1ull << (63 - 43))	/* HV uses Radix Tree Translation */
 
->
->> +}
->> +
->> +const VMStateDescription vmstate_gicv3_cpu_sre_el1 = {
->> +    .name = "arm_gicv3_cpu/sre_el1",
->> +    .version_id = 1,
->> +    .minimum_version_id = 1,
->> +    .pre_load = icc_sre_el1_reg_pre_load,
->> +    .needed = icc_sre_el1_reg_needed,
->> +    .fields = (VMStateField[]) {
->> +        VMSTATE_UINT64(icc_sre_el1, GICv3CPUState),
->> +        VMSTATE_END_OF_LIST()
->> +    }
->> +};
->> +
->>  static const VMStateDescription vmstate_gicv3_cpu = {
->>      .name = "arm_gicv3_cpu",
->>      .version_id = 1,
->> @@ -100,6 +128,10 @@ static const VMStateDescription vmstate_gicv3_cpu = {
->>      .subsections = (const VMStateDescription * []) {
->>          &vmstate_gicv3_cpu_virt,
->>          NULL
->> +    },
->> +    .subsections = (const VMStateDescription * []) {
->> +        &vmstate_gicv3_cpu_sre_el1,
->> +        NULL
->>      }
->>  };
->>
->> diff --git a/include/hw/intc/arm_gicv3_common.h b/include/hw/intc/arm_gicv3_common.h
->> index 4156051..bccdfe1 100644
->> --- a/include/hw/intc/arm_gicv3_common.h
->> +++ b/include/hw/intc/arm_gicv3_common.h
->> @@ -172,6 +172,7 @@ struct GICv3CPUState {
->>      uint8_t gicr_ipriorityr[GIC_INTERNAL];
->>
->>      /* CPU interface */
->> +    uint64_t icc_sre_el1;
->>      uint64_t icc_ctlr_el1[2];
->>      uint64_t icc_pmr_el1;
->>      uint64_t icc_bpr[3];
->> --
->> 1.9.1
->
-> thanks
-> -- PMM
+See arch/powerpc/include/asm/reg.h in the Linux kernel. 
+
+Balbir Singh.
