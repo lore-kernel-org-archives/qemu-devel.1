@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45870)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cftMp-0008J0-Gx
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 14:11:24 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1cftQz-0002lx-Sm
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 14:15:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cftMo-00083R-CG
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 14:11:23 -0500
-Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:33920)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cftMo-00082z-4P
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 14:11:22 -0500
-Received: by mail-wr0-x233.google.com with SMTP id z61so69599681wrc.1
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 11:11:22 -0800 (PST)
+	(envelope-from <alex.williamson@redhat.com>) id 1cftQv-000163-8Q
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 14:15:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52802)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1cftQu-00015v-VW
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 14:15:37 -0500
+Date: Mon, 20 Feb 2017 12:15:33 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170220121533.6914307b@t450s.home>
+In-Reply-To: <20170220074731.GD12693@pxdev.xzpeter.org>
+References: <1486456099-7345-1-git-send-email-peterx@redhat.com>
+	<20170217101835.58e59c41@t450s.home>
+	<20170220074731.GD12693@pxdev.xzpeter.org>
 MIME-Version: 1.0
-In-Reply-To: <20170220195500.332a4844@nial.brq.redhat.com>
-References: <1487357795-52614-1-git-send-email-imammedo@redhat.com>
-	<CAFEAcA9JWzUEmGa2Wxd5xPE4dVknOKBkt=wMda7CAgxzrgOc+w@mail.gmail.com>
-	<20170220195500.332a4844@nial.brq.redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Feb 2017 19:11:00 +0000
-Message-ID: <CAFEAcA-VAY8LM+8jE4B-L=0QdcY5FLvwmwGVbUhcXjnC9-AW+w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [RFC 0/3] generalize parsing of cpu_model
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 00/17] VT-d: vfio enablement and misc
+ enhances
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,95 +30,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "patches@linaro.org" <patches@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-arm <qemu-arm@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, David Gibson <david@gibson.dropbear.id.au>, bd.aviv@gmail.com
 
-On 20 February 2017 at 18:55, Igor Mammedov <imammedo@redhat.com> wrote:
-> Peter Maydell <peter.maydell@linaro.org> wrote:
->> This API seems a little awkward for the SoC case, where
->> the board model doesn't actually know what the default
->> CPU model or the valid CPU models are, because it just
->> wants to say "create me a BCM2836 SoC" and let the SoC
->> object deal with determining whether it's always a cortex-a15
->> or if it might allow some user configurability either in
->> cpu choices or in optional flags.
->> Any thoughts about that use case?
->
-> I've probably been too aggressive trying to force
-> conversion of all boards, assuming that all boards support
-> "-cpu CLI" option, currently option could be specified for
-> any board but it is ignored if board doesn't care
-> about it explicitly.
+On Mon, 20 Feb 2017 15:47:31 +0800
+Peter Xu <peterx@redhat.com> wrote:
 
-I think the conversion in this patchset is OK for
-the boards you've touched. It's the ones that it
-doesn't touch that I need to think a little more about.
+> On Fri, Feb 17, 2017 at 10:18:35AM -0700, Alex Williamson wrote:
+> > On Tue,  7 Feb 2017 16:28:02 +0800
+> > Peter Xu <peterx@redhat.com> wrote:
+> >   
+> > > This is v7 of vt-d vfio enablement series.  
+> > [snip]  
+> > > =========
+> > > Test Done
+> > > =========
+> > > 
+> > > Build test passed for x86_64/arm/ppc64.
+> > > 
+> > > Simply tested with x86_64, assigning two PCI devices to a single VM,
+> > > boot the VM using:
+> > > 
+> > > bin=x86_64-softmmu/qemu-system-x86_64
+> > > $bin -M q35,accel=kvm,kernel-irqchip=split -m 1G \
+> > >      -device intel-iommu,intremap=on,eim=off,caching-mode=on \
+> > >      -netdev user,id=net0,hostfwd=tcp::5555-:22 \
+> > >      -device virtio-net-pci,netdev=net0 \
+> > >      -device vfio-pci,host=03:00.0 \
+> > >      -device vfio-pci,host=02:00.0 \
+> > >      -trace events=".trace.vfio" \
+> > >      /var/lib/libvirt/images/vm1.qcow2
+> > > 
+> > > pxdev:bin [vtd-vfio-enablement]# cat .trace.vfio
+> > > vtd_page_walk*
+> > > vtd_replay*
+> > > vtd_inv_desc*
+> > > 
+> > > Then, in the guest, run the following tool:
+> > > 
+> > >   https://github.com/xzpeter/clibs/blob/master/gpl/userspace/vfio-bind-group/vfio-bind-group.c
+> > > 
+> > > With parameter:
+> > > 
+> > >   ./vfio-bind-group 00:03.0 00:04.0
+> > > 
+> > > Check host side trace log, I can see pages are replayed and mapped in
+> > > 00:04.0 device address space, like:
+> > > 
+> > > ...
+> > > vtd_replay_ce_valid replay valid context device 00:04.00 hi 0x401 lo 0x38fe1001
+> > > vtd_page_walk Page walk for ce (0x401, 0x38fe1001) iova range 0x0 - 0x8000000000
+> > > vtd_page_walk_level Page walk (base=0x38fe1000, level=3) iova range 0x0 - 0x8000000000
+> > > vtd_page_walk_level Page walk (base=0x35d31000, level=2) iova range 0x0 - 0x40000000
+> > > vtd_page_walk_level Page walk (base=0x34979000, level=1) iova range 0x0 - 0x200000
+> > > vtd_page_walk_one Page walk detected map level 0x1 iova 0x0 -> gpa 0x22dc3000 mask 0xfff perm 3
+> > > vtd_page_walk_one Page walk detected map level 0x1 iova 0x1000 -> gpa 0x22e25000 mask 0xfff perm 3
+> > > vtd_page_walk_one Page walk detected map level 0x1 iova 0x2000 -> gpa 0x22e12000 mask 0xfff perm 3
+> > > vtd_page_walk_one Page walk detected map level 0x1 iova 0x3000 -> gpa 0x22e2d000 mask 0xfff perm 3
+> > > vtd_page_walk_one Page walk detected map level 0x1 iova 0x4000 -> gpa 0x12a49000 mask 0xfff perm 3
+> > > vtd_page_walk_one Page walk detected map level 0x1 iova 0x5000 -> gpa 0x129bb000 mask 0xfff perm 3
+> > > vtd_page_walk_one Page walk detected map level 0x1 iova 0x6000 -> gpa 0x128db000 mask 0xfff perm 3
+> > > vtd_page_walk_one Page walk detected map level 0x1 iova 0x7000 -> gpa 0x12a80000 mask 0xfff perm 3
+> > > vtd_page_walk_one Page walk detected map level 0x1 iova 0x8000 -> gpa 0x12a7e000 mask 0xfff perm 3
+> > > vtd_page_walk_one Page walk detected map level 0x1 iova 0x9000 -> gpa 0x12b22000 mask 0xfff perm 3
+> > > vtd_page_walk_one Page walk detected map level 0x1 iova 0xa000 -> gpa 0x12b41000 mask 0xfff perm 3
+> > > ...  
+> > 
+> > Hi Peter,
+> > 
+> > I'm trying to make use of this, with your vtd-vfio-enablement-v7 branch
+> > (HEAD 0c1c4e738095).  I'm assigning an 82576 PF to a VM.  It works with
+> > iommu=pt, but if I remove that option, the device does not work and
+> > vfio_iommu_map_notify is never called.  Any suggestions?  My
+> > commandline is below.  Thanks,
+> > 
+> > Alex
+> > 
+> > /usr/local/bin/qemu-system-x86_64 \
+> >         -name guest=l1,debug-threads=on -S \
+> >         -machine pc-q35-2.9,accel=kvm,usb=off,dump-guest-core=off,kernel-irqchip=split \
+> >         -cpu host -m 10240 -realtime mlock=off -smp 4,sockets=1,cores=2,threads=2 \
+> >         -no-user-config -nodefaults -monitor stdio -rtc base=utc,driftfix=slew \
+> >         -global kvm-pit.lost_tick_policy=discard -no-hpet -no-shutdown \
+> >         -global ICH9-LPC.disable_s3=1 -global ICH9-LPC.disable_s4=1 \
+> >         -boot strict=on \
+> >         -device ioh3420,port=0x10,chassis=1,id=pci.1,bus=pcie.0,addr=0x2 \
+> >         -device i82801b11-bridge,id=pci.2,bus=pcie.0,addr=0x1e \
+> >         -device pci-bridge,chassis_nr=3,id=pci.3,bus=pci.2,addr=0x0 \
+> >         -device ioh3420,port=0x18,chassis=4,id=pci.4,bus=pcie.0,addr=0x3 \
+> >         -device ioh3420,port=0x20,chassis=5,id=pci.5,bus=pcie.0,addr=0x4 \
+> >         -device ioh3420,port=0x28,chassis=6,id=pci.6,bus=pcie.0,addr=0x5 \
+> >         -device ioh3420,port=0x30,chassis=7,id=pci.7,bus=pcie.0,addr=0x6 \
+> >         -device ioh3420,port=0x38,chassis=8,id=pci.8,bus=pcie.0,addr=0x7 \
+> >         -device ich9-usb-ehci1,id=usb,bus=pcie.0,addr=0x1d.0x7 \
+> >         -device ich9-usb-uhci1,masterbus=usb.0,firstport=0,bus=pcie.0,multifunction=on,addr=0x1d \
+> >         -device ich9-usb-uhci2,masterbus=usb.0,firstport=2,bus=pcie.0,addr=0x1d.0x1 \
+> >         -device ich9-usb-uhci3,masterbus=usb.0,firstport=4,bus=pcie.0,addr=0x1d.0x2 \
+> >         -device virtio-serial-pci,id=virtio-serial0,bus=pci.4,addr=0x0 \
+> >         -drive file=/dev/vg_s20/lv_l1,format=raw,if=none,id=drive-virtio-disk0,cache=none,aio=native \
+> >         -device virtio-blk-pci,scsi=off,bus=pci.5,addr=0x0,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1 \
+> >         -netdev user,id=hostnet0 \
+> >         -device virtio-net-pci,netdev=hostnet0,id=net0,mac=52:54:00:c2:62:30,bus=pci.1,addr=0x0 \
+> >         -device usb-tablet,id=input0,bus=usb.0,port=1 \
+> >         -vnc :0 -vga std \
+> >         -device vfio-pci,host=01:00.0,id=hostdev0,bus=pci.8,addr=0x0 \
+> >         -device intel-iommu,intremap=on,eim=off,caching-mode=on -trace events=/trace-events.txt -msg timestamp=on  
+> 
+> Alex,
+> 
+> Thanks for testing this series.
+> 
+> I think I reproduced it using my 10g nic as well. What I got is:
+> 
+> [   23.724787] ixgbe 0000:01:00.0 enp1s0: Detected Tx Unit Hang
+> [   23.724787]   Tx Queue             <0>
+> [   23.724787]   TDH, TDT             <0>, <1>
+> [   23.724787]   next_to_use          <1>
+> [   23.724787]   next_to_clean        <0>
+> [   23.724787] tx_buffer_info[next_to_clean]
+> [   23.724787]   time_stamp           <fffbb8bb>
+> [   23.724787]   jiffies              <fffbc780>
+> [   23.729580] ixgbe 0000:01:00.0 enp1s0: tx hang 1 detected on queue 0, resetting adapter
+> [   23.730752] ixgbe 0000:01:00.0 enp1s0: initiating reset due to tx timeout
+> [   23.731768] ixgbe 0000:01:00.0 enp1s0: Reset adapter
+> 
+> Is this the problem you have encountered? (adapter continuously reset)
+> 
+> Interestingly, I found that the problem solves itself after I move the
+> "-device intel-iommu,..." line before all the other devices.
+> 
+> Or say, this will be the much shorter reproducer meet the bug:
+> 
+> $qemu   -machine q35,accel=kvm,kernel-irqchip=split \
+>         -cpu host -smp 4 -m 2048 \
+>         -nographic -nodefaults -serial stdio \
+>         -device vfio-pci,host=05:00.0,bus=pci.1 \
+>         -device intel-iommu,intremap=on,eim=off,caching-mode=on \
+>         /images/fedora-25.qcow2
+> 
+> While this may possibly be okay at least on my host (switching the
+> order of the two devices):
+> 
+> $qemu   -machine q35,accel=kvm,kernel-irqchip=split \
+>         -cpu host -smp 4 -m 2048 \
+>         -nographic -nodefaults -serial stdio \
+>         -device intel-iommu,intremap=on,eim=off,caching-mode=on \
+>         -device vfio-pci,host=05:00.0,bus=pci.1 \
+>         /images/fedora-25.qcow2
+> 
+> So not sure how the ordering of realization of these two devices
+> (intel-iommu, vfio-pci) affected the behavior. One thing I suspect is
+> that in vfio_realize(), we have:
+> 
+>   group = vfio_get_group(groupid, pci_device_iommu_address_space(pdev), errp);
+> 
+> while here we possibly will be getting &address_space_memory here
+> instead of the correct DMA address space since Intel IOMMU device has
+> not yet been inited...
+> 
+> Before I go deeper, any thoughts?
 
->  "-cpu cpu_name,feat_str" handling is always based on
->  availability of base CPU type supported by target as
->  it's needed both for
->    - translating cpu_name to QOM CPU type
->        cpu_class_by_name(typename, name)
->    - converting feat_str into set of global properties
->      for matching QOM CPU type
->        cc->parse_features(object_class_get_name(oc), featurestr, &err);
 
-> Boards that don't care/need '-cpu' support won't need
-> to do anything as we can skip cpu_name,feat_str parsing
-> if MachineClass::base_cpu_type isn't set (NULL by default),
-> that way we won't break ignored CLI if we care.
-> And currently we don't have convenient way to disable
-> feat_str parsing, but machine could be extended
-> with flag to [en|dis]able it explicitly.
->
-> The goal of this series is generalizing/consolidating
-> parsing of '-cpu' for boards that use it, removing
-> code duplication scattered around codebase and trying
-> normalize default cpu_model initialization.
+Sounds theory, seems confirmed by Yi.  Makes it pretty impossible to
+test using libvirt <qemu:arg> support, which is how I derived my VM
+commandline.  Thanks,
 
-Yeah, I definitely like the cleanup to avoid all the
-duplicate parse calls.
-
-> For SoC with fixed CPU type it would be better to use
-> directly CPU type names directly but that hits legacy
-> cpu_init()/cpu_foo_init() wall, which is currently
-> cpu_model based and would be a lot of re-factoring.
-> I would convert cpu_init(cpu_model) to cpu_init(cpu_type)
-> and call '-cpu' handling logic from generic
-> machine/user_[bsd|linux] code (3 places in total).
->
->> (The stm32f205 SoC object has a "cpu-model" QOM property
->> that the board sets, but I think that's as much because
->> we somewhat awkwardly need to pass it into armv7m_init()
->> as a deliberate design choice.)
-
-> its sole user netduino2 board has cpu_model hardcodded
-> at board level which could be left alone or converted
-> to this API.
-
-I think this may be for the benefit of the not-yet-in-tree
-netduinoplus2 board, which is a very similar SoC but
-with a cortex-m4. There are likely other ways we could
-model that, though.
-
-> Using API would make code more consistent
-> at the cost of more code for default/valid callbacks.
-
-Mmm, we could have the board code just forward the
-default/valid callbacks through to the SoC (which
-would then either implement them or forward them again).
-But I think we should definitely see if we can make
-the code for handling "the CPU is actually inside some
-other object" as clean as we can, because I think
-that's by far the most common case. Machines like
-the x86 pc and the ARM virt board where the CPU is
-instantiated directly in the board code are the
-non-standard cases I think. We have a lot of boards
-where we do instantiate the CPU in the board code
-just for legacy reasons where we don't properly
-model the SoC the CPU is inside. But hardware that
-really has the CPU as a top level pluggable object
-is rare.
-
-thanks
--- PMM
+Alex
