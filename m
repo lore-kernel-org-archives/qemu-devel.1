@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xiong.y.zhang@intel.com>) id 1cfeTf-0008FM-Ij
-	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 22:17:28 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cfeX6-0000yW-Th
+	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 22:21:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xiong.y.zhang@intel.com>) id 1cfeTc-00020w-DC
-	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 22:17:27 -0500
-Received: from mga11.intel.com ([192.55.52.93]:44112)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <xiong.y.zhang@intel.com>)
-	id 1cfeTc-0001zt-2J
-	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 22:17:24 -0500
-From: Xiong Zhang <xiong.y.zhang@intel.com>
-Date: Mon, 20 Feb 2017 19:17:16 +0800
-Message-Id: <20170220111716.10471-1-xiong.y.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH] vfio/pci-quirks.c: Disable stolen memory for
- igd VFIO
+	(envelope-from <no-reply@patchew.org>) id 1cfeX3-0003RK-Mw
+	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 22:21:00 -0500
+Resent-Message-Id: <E1cfeX3-0003RK-Mw@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21433)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cfeX3-0003Qq-G2
+	for qemu-devel@nongnu.org; Sun, 19 Feb 2017 22:20:57 -0500
+In-Reply-To: <20170220111716.10471-1-xiong.y.zhang@intel.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148756082246.30.9905794325202397837@0e2666bad730>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 19 Feb 2017 19:20:23 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] vfio/pci-quirks.c: Disable stolen memory
+ for igd VFIO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,139 +29,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: jike.song@intel.com, zhi.a.wang@intel.com, zhiyuan.lv@intel.com, XiongZhang <xiong.y.zhang@intel.com>
+To: xiong.y.zhang@intel.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, jike.song@intel.com, zhiyuan.lv@intel.com, zhi.a.wang@intel.com
 
-From: XiongZhang <xiong.y.zhang@intel.com>
-
-If IGD isn't assigned at 00:02.0 in UPT and host bios enable stolen
-memory, seabios won't reseave stolen memory in E820 for guest. Then
-both Intel graphic driver and others in guest could use stolen
-memory, this will generate system hang. So we should disable stolen
-memory in this case.
-
-Bugzilla: https://bugs.freedesktop.org/show_bug.cgi?id=99028
-		https://bugs.freedesktop.org/show_bug.cgi?id=99025
-
-Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
-Tested-by: Terrence Xu <terrence.xu@intel.com>
----
- hw/vfio/pci-quirks.c | 71 +++++++++++++++++++++++++++++-----------------------
- 1 file changed, 39 insertions(+), 32 deletions(-)
-
-diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-index 1e97bc4..3c03577 100644
---- a/hw/vfio/pci-quirks.c
-+++ b/hw/vfio/pci-quirks.c
-@@ -1364,17 +1364,44 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
-     uint32_t gmch;
-     uint16_t cmd_orig, cmd;
- 
--    /*
--     * This must be an Intel VGA device at address 00:02.0 for us to even
--     * consider enabling legacy mode.  The vBIOS has dependencies on the
--     * PCI bus address.
--     */
--    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_INTEL, PCI_ANY_ID) ||
--        !vfio_is_vga(vdev) || nr != 4 ||
--        &vdev->pdev != pci_find_device(pci_device_root_bus(&vdev->pdev),
--                                       0, PCI_DEVFN(0x2, 0))) {
--        return;
--    }
-+	/* This must be an Intel VGA device. */
-+	if (!vfio_pci_is(vdev, PCI_VENDOR_ID_INTEL, PCI_ANY_ID) ||
-+		!vfio_is_vga(vdev) || nr != 4)
-+		return;
-+
-+	/*
-+	 * IGD is not a standard, they like to change their specs often.  We
-+	 * only attempt to support back to SandBridge and we hope that newer
-+	 * devices maintain compatibility with generation 8.
-+	 */
-+	gen = igd_gen(vdev);
-+	if (gen != 6 && gen != 8) {
-+		error_report("IGD device %s is unsupported in legacy mode, "
-+			     "try SandyBridge or newer", vdev->vbasedev.name);
-+		return;
-+	}
-+	/*
-+	 * If this isn't at address 00:02.0, bios won't reserv stolen
-+	 * memory in E820, then others could use stolen memory. If guest
-+	 * graphic driver still use stolen memory, system maybe hang.
-+	 * so we set stolen memory size to 0 and guest graphic driver won't
-+	 * use stolen memory.
-+	 */
-+	gmch = vfio_pci_read_config(&vdev->pdev, IGD_GMCH, 4);
-+	gmch &= ~((gen < 8 ? 0x1f : 0xff) << (gen < 8 ? 3 : 8));
-+
-+	/* GMCH is read-only, emulated */
-+	pci_set_long(vdev->pdev.config + IGD_GMCH, gmch);
-+	pci_set_long(vdev->pdev.wmask + IGD_GMCH, 0);
-+	pci_set_long(vdev->emulated_config_bits + IGD_GMCH, ~0);
-+
-+	/*
-+	 * This must be at address 00:02.0 for us to even onsider enabling
-+	 * legacy mode.  The vBIOS has dependencies on the PCI bus address.
-+	 */
-+	if (&vdev->pdev != pci_find_device(pci_device_root_bus(&vdev->pdev),
-+					   0, PCI_DEVFN(0x2, 0)))
-+		return;
- 
-     /*
-      * We need to create an LPC/ISA bridge at PCI bus address 00:1f.0 that we
-@@ -1391,18 +1418,6 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
-     }
- 
-     /*
--     * IGD is not a standard, they like to change their specs often.  We
--     * only attempt to support back to SandBridge and we hope that newer
--     * devices maintain compatibility with generation 8.
--     */
--    gen = igd_gen(vdev);
--    if (gen != 6 && gen != 8) {
--        error_report("IGD device %s is unsupported in legacy mode, "
--                     "try SandyBridge or newer", vdev->vbasedev.name);
--        return;
--    }
--
--    /*
-      * Most of what we're doing here is to enable the ROM to run, so if
-      * there's no ROM, there's no point in setting up this quirk.
-      * NB. We only seem to get BIOS ROMs, so a UEFI VM would need CSM support.
-@@ -1457,8 +1472,6 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
-         goto out;
-     }
- 
--    gmch = vfio_pci_read_config(&vdev->pdev, IGD_GMCH, 4);
--
-     /*
-      * If IGD VGA Disable is clear (expected) and VGA is not already enabled,
-      * try to enable it.  Probably shouldn't be using legacy mode without VGA,
-@@ -1526,12 +1539,11 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
-      * when IVD (IGD VGA Disable) is clear, but the claim is that it's unused,
-      * so let's not waste VM memory for it.
-      */
--    gmch &= ~((gen < 8 ? 0x1f : 0xff) << (gen < 8 ? 3 : 8));
--
-     if (vdev->igd_gms) {
-         if (vdev->igd_gms <= 0x10) {
-             gms_mb = vdev->igd_gms * 32;
-             gmch |= vdev->igd_gms << (gen < 8 ? 3 : 8);
-+			pci_set_long(vdev->pdev.config + IGD_GMCH, gmch);
-         } else {
-             error_report("Unsupported IGD GMS value 0x%x", vdev->igd_gms);
-             vdev->igd_gms = 0;
-@@ -1551,11 +1563,6 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
-     fw_cfg_add_file(fw_cfg_find(), "etc/igd-bdsm-size",
-                     bdsm_size, sizeof(*bdsm_size));
- 
--    /* GMCH is read-only, emulated */
--    pci_set_long(vdev->pdev.config + IGD_GMCH, gmch);
--    pci_set_long(vdev->pdev.wmask + IGD_GMCH, 0);
--    pci_set_long(vdev->emulated_config_bits + IGD_GMCH, ~0);
--
-     /* BDSM is read-write, emulated.  The BIOS needs to be able to write it */
-     pci_set_long(vdev->pdev.config + IGD_BDSM, 0);
-     pci_set_long(vdev->pdev.wmask + IGD_BDSM, ~0);
--- 
-2.9.3
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIHZmaW8vcGNpLXF1aXJrcy5jOiBEaXNhYmxlIHN0
+b2xlbiBtZW1vcnkgZm9yIGlnZCBWRklPCk1lc3NhZ2UtaWQ6IDIwMTcwMjIwMTExNzE2LjEwNDcx
+LTEteGlvbmcueS56aGFuZ0BpbnRlbC5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEv
+YmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4u
+IHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9j
+YWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1
+ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9y
+IGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQo
+Z2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1m
+b3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4K
+ICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUK
+CmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTlj
+MjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9w
+YXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTcwMjIw
+MTExNzE2LjEwNDcxLTEteGlvbmcueS56aGFuZ0BpbnRlbC5jb20gLT4gcGF0Y2hldy8yMDE3MDIy
+MDExMTcxNi4xMDQ3MS0xLXhpb25nLnkuemhhbmdAaW50ZWwuY29tClN3aXRjaGVkIHRvIGEgbmV3
+IGJyYW5jaCAndGVzdCcKZjUzM2RjMyB2ZmlvL3BjaS1xdWlya3MuYzogRGlzYWJsZSBzdG9sZW4g
+bWVtb3J5IGZvciBpZ2QgVkZJTwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0gg
+MS8xOiB2ZmlvL3BjaS1xdWlya3MuYzogRGlzYWJsZSBzdG9sZW4gbWVtb3J5IGZvciBpZ2QgVkZJ
+Ty4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzODogRklMRTog
+aHcvdmZpby9wY2ktcXVpcmtzLmM6MTM3MDoKK15JLyogVGhpcyBtdXN0IGJlIGFuIEludGVsIFZH
+QSBkZXZpY2UuICovJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwoj
+Mzk6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjEzNzE6CiteSWlmICghdmZpb19wY2lfaXMo
+dmRldiwgUENJX1ZFTkRPUl9JRF9JTlRFTCwgUENJX0FOWV9JRCkgfHwkCgpFUlJPUjogYnJhY2Vz
+IHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMzOTogRklM
+RTogaHcvdmZpby9wY2ktcXVpcmtzLmM6MTM3MToKKwlpZiAoIXZmaW9fcGNpX2lzKHZkZXYsIFBD
+SV9WRU5ET1JfSURfSU5URUwsIFBDSV9BTllfSUQpIHx8ClsuLi5dCgpFUlJPUjogY29kZSBpbmRl
+bnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0MDogRklMRTogaHcvdmZpby9wY2ktcXVpcmtzLmM6
+MTM3MjoKK15JXkkhdmZpb19pc192Z2EodmRldikgfHwgbnIgIT0gNCkkCgpFUlJPUjogY29kZSBp
+bmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0MTogRklMRTogaHcvdmZpby9wY2ktcXVpcmtz
+LmM6MTM3MzoKK15JXklyZXR1cm47JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1
+c2UgdGFicwojNDM6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjEzNzU6CiteSS8qJAoKRVJS
+T1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDQ6IEZJTEU6IGh3L3ZmaW8v
+cGNpLXF1aXJrcy5jOjEzNzY6CiteSSAqIElHRCBpcyBub3QgYSBzdGFuZGFyZCwgdGhleSBsaWtl
+IHRvIGNoYW5nZSB0aGVpciBzcGVjcyBvZnRlbi4gIFdlJAoKRVJST1I6IGNvZGUgaW5kZW50IHNo
+b3VsZCBuZXZlciB1c2UgdGFicwojNDU6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjEzNzc6
+CiteSSAqIG9ubHkgYXR0ZW1wdCB0byBzdXBwb3J0IGJhY2sgdG8gU2FuZEJyaWRnZSBhbmQgd2Ug
+aG9wZSB0aGF0IG5ld2VyJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFi
+cwojNDY6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjEzNzg6CiteSSAqIGRldmljZXMgbWFp
+bnRhaW4gY29tcGF0aWJpbGl0eSB3aXRoIGdlbmVyYXRpb24gOC4kCgpFUlJPUjogY29kZSBpbmRl
+bnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0NzogRklMRTogaHcvdmZpby9wY2ktcXVpcmtzLmM6
+MTM3OToKK15JICovJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwoj
+NDg6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjEzODA6CiteSWdlbiA9IGlnZF9nZW4odmRl
+dik7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDk6IEZJTEU6
+IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjEzODE6CiteSWlmIChnZW4gIT0gNiAmJiBnZW4gIT0gOCkg
+eyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzUwOiBGSUxFOiBo
+dy92ZmlvL3BjaS1xdWlya3MuYzoxMzgyOgorXkleSWVycm9yX3JlcG9ydCgiSUdEIGRldmljZSAl
+cyBpcyB1bnN1cHBvcnRlZCBpbiBsZWdhY3kgbW9kZSwgIiQKCkVSUk9SOiBjb2RlIGluZGVudCBz
+aG91bGQgbmV2ZXIgdXNlIHRhYnMKIzUxOiBGSUxFOiBody92ZmlvL3BjaS1xdWlya3MuYzoxMzgz
+OgorXkleSV5JICAgICAidHJ5IFNhbmR5QnJpZGdlIG9yIG5ld2VyIiwgdmRldi0+dmJhc2VkZXYu
+bmFtZSk7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNTI6IEZJ
+TEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjEzODQ6CiteSV5JcmV0dXJuOyQKCkVSUk9SOiBjb2Rl
+IGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzUzOiBGSUxFOiBody92ZmlvL3BjaS1xdWly
+a3MuYzoxMzg1OgorXkl9JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFi
+cwojNTQ6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjEzODY6CiteSS8qJAoKRVJST1I6IGNv
+ZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNTU6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1
+aXJrcy5jOjEzODc6CiteSSAqIElmIHRoaXMgaXNuJ3QgYXQgYWRkcmVzcyAwMDowMi4wLCBiaW9z
+IHdvbid0IHJlc2VydiBzdG9sZW4kCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVz
+ZSB0YWJzCiM1NjogRklMRTogaHcvdmZpby9wY2ktcXVpcmtzLmM6MTM4ODoKK15JICogbWVtb3J5
+IGluIEU4MjAsIHRoZW4gb3RoZXJzIGNvdWxkIHVzZSBzdG9sZW4gbWVtb3J5LiBJZiBndWVzdCQK
+CkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzU3OiBGSUxFOiBody92
+ZmlvL3BjaS1xdWlya3MuYzoxMzg5OgorXkkgKiBncmFwaGljIGRyaXZlciBzdGlsbCB1c2Ugc3Rv
+bGVuIG1lbW9yeSwgc3lzdGVtIG1heWJlIGhhbmcuJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3Vs
+ZCBuZXZlciB1c2UgdGFicwojNTg6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjEzOTA6Cite
+SSAqIHNvIHdlIHNldCBzdG9sZW4gbWVtb3J5IHNpemUgdG8gMCBhbmQgZ3Vlc3QgZ3JhcGhpYyBk
+cml2ZXIgd29uJ3QkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM1
+OTogRklMRTogaHcvdmZpby9wY2ktcXVpcmtzLmM6MTM5MToKK15JICogdXNlIHN0b2xlbiBtZW1v
+cnkuJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNjA6IEZJTEU6
+IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjEzOTI6CiteSSAqLyQKCkVSUk9SOiBjb2RlIGluZGVudCBz
+aG91bGQgbmV2ZXIgdXNlIHRhYnMKIzYxOiBGSUxFOiBody92ZmlvL3BjaS1xdWlya3MuYzoxMzkz
+OgorXklnbWNoID0gdmZpb19wY2lfcmVhZF9jb25maWcoJnZkZXYtPnBkZXYsIElHRF9HTUNILCA0
+KTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM2MjogRklMRTog
+aHcvdmZpby9wY2ktcXVpcmtzLmM6MTM5NDoKK15JZ21jaCAmPSB+KChnZW4gPCA4ID8gMHgxZiA6
+IDB4ZmYpIDw8IChnZW4gPCA4ID8gMyA6IDgpKTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxk
+IG5ldmVyIHVzZSB0YWJzCiM2NDogRklMRTogaHcvdmZpby9wY2ktcXVpcmtzLmM6MTM5NjoKK15J
+LyogR01DSCBpcyByZWFkLW9ubHksIGVtdWxhdGVkICovJAoKRVJST1I6IGNvZGUgaW5kZW50IHNo
+b3VsZCBuZXZlciB1c2UgdGFicwojNjU6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjEzOTc6
+CiteSXBjaV9zZXRfbG9uZyh2ZGV2LT5wZGV2LmNvbmZpZyArIElHRF9HTUNILCBnbWNoKTskCgpF
+UlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM2NjogRklMRTogaHcvdmZp
+by9wY2ktcXVpcmtzLmM6MTM5ODoKK15JcGNpX3NldF9sb25nKHZkZXYtPnBkZXYud21hc2sgKyBJ
+R0RfR01DSCwgMCk7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwoj
+Njc6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjEzOTk6CiteSXBjaV9zZXRfbG9uZyh2ZGV2
+LT5lbXVsYXRlZF9jb25maWdfYml0cyArIElHRF9HTUNILCB+MCk7JAoKRVJST1I6IGNvZGUgaW5k
+ZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNjk6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5j
+OjE0MDE6CiteSS8qJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwoj
+NzA6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjE0MDI6CiteSSAqIFRoaXMgbXVzdCBiZSBh
+dCBhZGRyZXNzIDAwOjAyLjAgZm9yIHVzIHRvIGV2ZW4gb25zaWRlciBlbmFibGluZyQKCkVSUk9S
+OiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzcxOiBGSUxFOiBody92ZmlvL3Bj
+aS1xdWlya3MuYzoxNDAzOgorXkkgKiBsZWdhY3kgbW9kZS4gIFRoZSB2QklPUyBoYXMgZGVwZW5k
+ZW5jaWVzIG9uIHRoZSBQQ0kgYnVzIGFkZHJlc3MuJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3Vs
+ZCBuZXZlciB1c2UgdGFicwojNzI6IEZJTEU6IGh3L3ZmaW8vcGNpLXF1aXJrcy5jOjE0MDQ6Cite
+SSAqLyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzczOiBGSUxF
+OiBody92ZmlvL3BjaS1xdWlya3MuYzoxNDA1OgorXklpZiAoJnZkZXYtPnBkZXYgIT0gcGNpX2Zp
+bmRfZGV2aWNlKHBjaV9kZXZpY2Vfcm9vdF9idXMoJnZkZXYtPnBkZXYpLCQKCkVSUk9SOiBicmFj
+ZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzczOiBG
+SUxFOiBody92ZmlvL3BjaS1xdWlya3MuYzoxNDA1OgorCWlmICgmdmRldi0+cGRldiAhPSBwY2lf
+ZmluZF9kZXZpY2UocGNpX2RldmljZV9yb290X2J1cygmdmRldi0+cGRldiksClsuLi5dCgpFUlJP
+UjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM3NDogRklMRTogaHcvdmZpby9w
+Y2ktcXVpcmtzLmM6MTQwNjoKK15JXkleSV5JXkkgICAwLCBQQ0lfREVWRk4oMHgyLCAwKSkpJAoK
+RVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNzU6IEZJTEU6IGh3L3Zm
+aW8vcGNpLXF1aXJrcy5jOjE0MDc6CiteSV5JcmV0dXJuOyQKCkVSUk9SOiBjb2RlIGluZGVudCBz
+aG91bGQgbmV2ZXIgdXNlIHRhYnMKIzExNzogRklMRTogaHcvdmZpby9wY2ktcXVpcmtzLmM6MTU1
+MjoKK15JXkleSXBjaV9zZXRfbG9uZyh2ZGV2LT5wZGV2LmNvbmZpZyArIElHRF9HTUNILCBnbWNo
+KTskCgp0b3RhbDogMzggZXJyb3JzLCAwIHdhcm5pbmdzLCAxMDUgbGluZXMgY2hlY2tlZAoKWW91
+ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpU
+ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
+b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
+eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
