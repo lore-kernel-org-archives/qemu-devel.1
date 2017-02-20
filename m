@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53439)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cfjqU-0002mO-I6
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:01:23 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cfjrr-0003gF-4r
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:02:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cfjqQ-00059f-LU
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:01:22 -0500
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:35055)
+	(envelope-from <alex.bennee@linaro.org>) id 1cfjrn-0005NI-75
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:02:47 -0500
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:33137)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cfjqQ-000596-Co
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:01:18 -0500
-Received: by mail-wr0-x230.google.com with SMTP id s27so12947842wrb.2
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 01:01:17 -0800 (PST)
+	id 1cfjrm-0005N3-TL
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:02:43 -0500
+Received: by mail-wr0-x236.google.com with SMTP id 35so19582848wrw.0
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 01:02:42 -0800 (PST)
 References: <20170216123456.28621-1-alex.bennee@linaro.org>
-	<20170216123456.28621-2-alex.bennee@linaro.org>
-	<622dafb3-11e0-92fd-f26d-13e096e8dda6@amsat.org>
+	<20170216123456.28621-3-alex.bennee@linaro.org>
+	<9c369896-91c1-8479-40c6-2eb12ff3e40e@amsat.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <622dafb3-11e0-92fd-f26d-13e096e8dda6@amsat.org>
-Date: Mon, 20 Feb 2017 09:01:21 +0000
-Message-ID: <87k28lw80u.fsf@linaro.org>
+In-reply-to: <9c369896-91c1-8479-40c6-2eb12ff3e40e@amsat.org>
+Date: Mon, 20 Feb 2017 09:02:45 +0000
+Message-ID: <87ino5w7yi.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 1/4] tests/docker: add basic user
- mapping support
+Subject: Re: [Qemu-devel] [PATCH v4 2/4] new: debian docker targets for
+ cross-compiling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,151 +38,150 @@ Cc: famz@redhat.com, qemu-devel@nongnu.org
 
 Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
 
-> Hi Alex,
->
-> I first tried "make docker-image-debian-armhf-cross NOUSER=1 V=1"
-> which worked fine, then "make docker-image-debian-armhf-cross
-> NOUSER=0" but got a "Image is up to date." I thought I should have to
-> remove the image manually so I typed "docker rmi
-> qemu:debian-armhf-cross" and tried again but still no change in my
-> tests/docker/dockerfiles/debian-armhf-cross.docker adding my username,
-> then I reviewed your change in the Makefile and got it, setting NOUSER
-> to '0' has the same behavior, it's just set. To build the image with
-> my user I had to _not_ use the flag or use it unset "NOUSER=" and it
-> worked like charm.
-
-Ahh yes. I followed the same pattern as NOCACHE which does the same
-thing. I've made it clearer:
-
-	@echo '    NOUSER               Define to disable adding current user to containers passwd.'
-
->
->
 > On 02/16/2017 09:34 AM, Alex Bennée wrote:
->> Currently all docker builds are done by exporting a tarball to the
->> docker container and running the build as the containers root user.
->> Other use cases are possible however and it is possible to map a part
->> of users file-system to the container. This is useful for example for
->> doing cross-builds of arbitrary source trees. For this to work
->> smoothly the container needs to have a user created that maps cleanly
->> to the host system.
+>> This provides a basic Debian install with access to the emdebian cross
+>> compilers. The debian-armhf-cross and debian-arm64-cross targets build
+>> on the basic Debian image to allow cross compiling to those targets.
 >>
->> This adds a -u option to the docker script so that:
+>> A new environment variable (QEMU_CONFIGURE_OPTS) is set as part of the
+>> docker container and passed to the build to specify the
+>> --cross-prefix. The user still calls the build in the usual way, for
+>> example:
 >>
->>   DEB_ARCH=armhf DEB_TYPE=stable ./tests/docker/docker.py build \
->>     -u --include-executable=arm-linux-user/qemu-arm \
->>     debian:armhf ./tests/docker/dockerfiles/debian-bootstrap.docker
->>
->> Will build a container that can then be run like:
->>
->>   docker run --rm -it -v /home/alex/lsrc/qemu/risu.git/:/src \
->>     --user=alex:alex -w /src/ debian:armhf \
->>     sh -c "make clean && ./configure -s && make"
->>
->> All docker containers built will add the current user unless
->> explicitly disabled by specifying NOUSER when invoking the Makefile:
->>
->>   make docker-image-debian-armhf-cross NOUSER=1
+>>   make docker-test-build@debian-arm64-cross \
+>>     TARGET_LIST="aarch64-softmmu,aarch64-linux-user"
 >>
 >> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->> Reviewed-by: Fam Zheng <famz@redhat.com>
->
-> Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-Thanks
-
->
+>>
 >> ---
 >> v2
->>   - write the useradd directly
->>   - change long option to --add-current-user
+>>   - add clang (keep shippable happy)
+>>   - rm adduser code (done direct now)
+>>   - add aptitude (useful for debugging package clashes)
 >> v3
->>   - images -> image's
->>   - add r-b
->>   - add USER to Makefile
+>>   - split into debian, debian-armhf-cross and debian-aarch64-cross
 >> v4
->>   - s/USER/NOUSER/ and default to on
->>   - fix the add-user code to skip if user already setup (for chained images)
+>>   - Add QEMU_CONFIGURE_OPTS
 >> ---
->>  tests/docker/Makefile.include |  2 ++
->>  tests/docker/docker.py        | 16 ++++++++++++++--
->>  2 files changed, 16 insertions(+), 2 deletions(-)
+>>  tests/docker/Makefile.include                      |  4 ++++
+>>  tests/docker/common.rc                             |  2 +-
+>>  tests/docker/dockerfiles/debian-arm64-cross.docker | 15 +++++++++++++
+>>  tests/docker/dockerfiles/debian-armhf-cross.docker | 15 +++++++++++++
+>>  tests/docker/dockerfiles/debian.docker             | 25 ++++++++++++++++++++++
+>>  5 files changed, 60 insertions(+), 1 deletion(-)
+>>  create mode 100644 tests/docker/dockerfiles/debian-arm64-cross.docker
+>>  create mode 100644 tests/docker/dockerfiles/debian-armhf-cross.docker
+>>  create mode 100644 tests/docker/dockerfiles/debian.docker
 >>
 >> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
->> index 3f15d5aea8..4778b27ca8 100644
+>> index 4778b27ca8..84bdcc944a 100644
 >> --- a/tests/docker/Makefile.include
 >> +++ b/tests/docker/Makefile.include
->> @@ -50,6 +50,7 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
->>  	$(call quiet-command,\
->>  		$(SRC_PATH)/tests/docker/docker.py build qemu:$* $< \
->>  		$(if $V,,--quiet) $(if $(NOCACHE),--no-cache) \
->> +		$(if $(NOUSER),,--add-current-user) \
+>> @@ -54,6 +54,10 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
 >>  		$(if $(EXECUTABLE),--include-executable=$(EXECUTABLE)),\
 >>  		"BUILD","$*")
 >>
->> @@ -99,6 +100,7 @@ docker:
->>  	@echo '                         (default is 1)'
->>  	@echo '    DEBUG=1              Stop and drop to shell in the created container'
->>  	@echo '                         before running the command.'
->> +	@echo '    NOUSER=1		Disable adding current user to containers passwd.'
->>  	@echo '    NOCACHE=1            Ignore cache when build images.'
->>  	@echo '    EXECUTABLE=<path>    Include executable in image.'
->>
->> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
->> index 37d83199e7..d277a2268f 100755
->> --- a/tests/docker/docker.py
->> +++ b/tests/docker/docker.py
->> @@ -25,6 +25,7 @@ import signal
->>  from tarfile import TarFile, TarInfo
->>  from StringIO import StringIO
->>  from shutil import copy, rmtree
->> +from pwd import getpwuid
->>
->>
->>  DEVNULL = open(os.devnull, 'wb')
->> @@ -149,13 +150,21 @@ class Docker(object):
->>          labels = json.loads(resp)[0]["Config"].get("Labels", {})
->>          return labels.get("com.qemu.dockerfile-checksum", "")
->>
->> -    def build_image(self, tag, docker_dir, dockerfile, quiet=True, argv=None):
->> +    def build_image(self, tag, docker_dir, dockerfile,
->> +                    quiet=True, user=False, argv=None):
->>          if argv == None:
->>              argv = []
->>
->>          tmp_df = tempfile.NamedTemporaryFile(dir=docker_dir, suffix=".docker")
->>          tmp_df.write(dockerfile)
->>
->> +        if user:
->> +            uid = os.getuid()
->> +            uname = getpwuid(uid).pw_name
->> +            tmp_df.write("\n")
->> +            tmp_df.write("RUN id %s || useradd -u %d -U %s" %
->> +                         (uname, uid, uname))
+>> +# Enforce dependancies for composite images
+>> +docker-image-debian-armhf-cross: docker-image-debian
+>> +docker-image-debian-arm64-cross: docker-image-debian
 >> +
->>          tmp_df.write("\n")
->>          tmp_df.write("LABEL com.qemu.dockerfile-checksum=%s" %
->>                       _text_checksum(dockerfile))
->> @@ -225,6 +234,9 @@ class BuildCommand(SubCommand):
->>                              help="""Specify a binary that will be copied to the
->>                              container together with all its dependent
->>                              libraries""")
->> +        parser.add_argument("--add-current-user", "-u", dest="user",
->> +                            action="store_true",
->> +                            help="Add the current user to image's passwd")
->>          parser.add_argument("tag",
->>                              help="Image Tag")
->>          parser.add_argument("dockerfile",
->> @@ -261,7 +273,7 @@ class BuildCommand(SubCommand):
->>                                         docker_dir)
->>
->>              dkr.build_image(tag, docker_dir, dockerfile,
->> -                            quiet=args.quiet, argv=argv)
->> +                            quiet=args.quiet, user=args.user, argv=argv)
->>
->>              rmtree(docker_dir)
->>
+>>  # Expand all the pre-requistes for each docker image and test combination
+>>  $(foreach i,$(DOCKER_IMAGES), \
+>>  	$(foreach t,$(DOCKER_TESTS) $(DOCKER_TOOLS), \
+>> diff --git a/tests/docker/common.rc b/tests/docker/common.rc
+>> index 21657e87c6..6865689bb5 100755
+>> --- a/tests/docker/common.rc
+>> +++ b/tests/docker/common.rc
+>> @@ -29,7 +29,7 @@ build_qemu()
+>>      config_opts="--enable-werror \
+>>                   ${TARGET_LIST:+--target-list=${TARGET_LIST}} \
+>>                   --prefix=$PWD/install \
+>> -                 $EXTRA_CONFIGURE_OPTS \
+>> +                 $QEMU_CONFIGURE_OPTS $EXTRA_CONFIGURE_OPTS \
+>>                   $@"
+>>      echo "Configure options:"
+>>      echo $config_opts
+>> diff --git a/tests/docker/dockerfiles/debian-arm64-cross.docker b/tests/docker/dockerfiles/debian-arm64-cross.docker
+>> new file mode 100644
+>> index 0000000000..ce90da943f
+>> --- /dev/null
+>> +++ b/tests/docker/dockerfiles/debian-arm64-cross.docker
+>> @@ -0,0 +1,15 @@
+>> +#
+>> +# Docker arm64 cross-compiler target
+>> +#
+>> +# This docker target builds on the base debian image.
+>> +#
+>> +FROM qemu:debian
+>> +
+>> +# Add the foreign architecture we want and install dependacies
+>
+> typo "dependencies"
+
+Fixed, thanks.
+
+>
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>
+>> +RUN dpkg --add-architecture arm64
+>> +RUN apt update
+>> +RUN apt install -yy crossbuild-essential-arm64
+>> +RUN apt-get build-dep -yy -a arm64 qemu
+>> +
+>> +# Specify the cross prefix for this image (see tests/docker/common.rc)
+>> +ENV QEMU_CONFIGURE_OPTS --cross-prefix=aarch64-linux-gnu-
+>> diff --git a/tests/docker/dockerfiles/debian-armhf-cross.docker b/tests/docker/dockerfiles/debian-armhf-cross.docker
+>> new file mode 100644
+>> index 0000000000..e0f81a556d
+>> --- /dev/null
+>> +++ b/tests/docker/dockerfiles/debian-armhf-cross.docker
+>> @@ -0,0 +1,15 @@
+>> +#
+>> +# Docker armhf cross-compiler target
+>> +#
+>> +# This docker target builds on the base debian image.
+>> +#
+>> +FROM qemu:debian
+>> +
+>> +# Add the foreign architecture we want and install dependacies
+>> +RUN dpkg --add-architecture armhf
+>> +RUN apt update
+>> +RUN apt install -yy crossbuild-essential-armhf
+>> +RUN apt-get build-dep -yy -a armhf qemu
+>> +
+>> +# Specify the cross prefix for this image (see tests/docker/common.rc)
+>> +ENV QEMU_CONFIGURE_OPTS --cross-prefix=arm-linux-gnueabihf-
+>> diff --git a/tests/docker/dockerfiles/debian.docker b/tests/docker/dockerfiles/debian.docker
+>> new file mode 100644
+>> index 0000000000..52bd79938e
+>> --- /dev/null
+>> +++ b/tests/docker/dockerfiles/debian.docker
+>> @@ -0,0 +1,25 @@
+>> +#
+>> +# Docker multiarch cross-compiler target
+>> +#
+>> +# This docker target is builds on Debian and Emdebian's cross compiler targets
+>> +# to build distro with a selection of cross compilers for building test binaries.
+>> +#
+>> +# On its own you can't build much but the docker-foo-cross targets
+>> +# build on top of the base debian image.
+>> +#
+>> +FROM debian:stable-slim
+>> +
+>> +# Setup some basic tools we need
+>> +RUN apt update
+>> +RUN apt install -yy curl aptitude
+>> +
+>> +# Setup Emdebian
+>> +RUN echo "deb http://emdebian.org/tools/debian/ jessie main" >> /etc/apt/sources.list
+>> +RUN curl http://emdebian.org/tools/debian/emdebian-toolchain-archive.key | apt-key add -
+>> +
+>> +# Duplicate deb line as deb-src
+>> +RUN cat /etc/apt/sources.list | sed "s/deb/deb-src/" >> /etc/apt/sources.list
+>> +
+>> +# Install common build utilities
+>> +RUN apt update
+>> +RUN apt install -yy build-essential clang
 >>
 
 
