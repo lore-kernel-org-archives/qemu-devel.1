@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cfkjG-0003yF-GI
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:58:02 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cfkjJ-00040f-19
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:58:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cfkjC-0005ip-Gw
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:57:58 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46015
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cfkjE-0005ko-On
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:58:01 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51580)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cfkjC-0005iG-B0
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:57:54 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	id 1cfkjE-0005jr-FU
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:57:56 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1K9rcik022519
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 04:57:53 -0500
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28pk55nyfu-1
+	v1K9rbaD117476
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 04:57:55 -0500
+Received: from e06smtp08.uk.ibm.com (e06smtp08.uk.ibm.com [195.75.94.104])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28pp6mfdpt-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 04:57:53 -0500
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 04:57:54 -0500
 Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp08.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Mon, 20 Feb 2017 09:57:51 -0000
+	Mon, 20 Feb 2017 09:57:52 -0000
 From: Cornelia Huck <cornelia.huck@de.ibm.com>
-Date: Mon, 20 Feb 2017 10:57:31 +0100
+Date: Mon, 20 Feb 2017 10:57:33 +0100
 In-Reply-To: <20170220095734.7890-1-cornelia.huck@de.ibm.com>
 References: <20170220095734.7890-1-cornelia.huck@de.ibm.com>
-Message-Id: <20170220095734.7890-10-cornelia.huck@de.ibm.com>
-Subject: [Qemu-devel] [PATCH 09/12] s390x: bump ADAPTER_ROUTES_MAX_GSI
+Message-Id: <20170220095734.7890-12-cornelia.huck@de.ibm.com>
+Subject: [Qemu-devel] [PATCH 11/12] s390x/arch_dump: use proper note name
+ and note size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,65 +39,131 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, Cornelia Huck <cornelia.huck@de.ibm.com>
 
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
 
-Let's increase ADAPTER_ROUTES_MAX_GSI to VIRTIO_QUEUE_MAX which is the
-largest demand foreseeable at the moment. Let us add a compatibility
-macro for the previous machines so client code can maintain backwards
-migration compatibility
+In binutils/libbfd (bfd/elf.c) it is enforced that all s390
+specific ELF notes like e.g. NT_S390_PREFIX or NT_S390_CTRS
+have "LINUX" specified as note name and that the namesz is
+6. Otherwise the notes are ignored.
 
-To not mess up migration compatibility for virtio-ccw
-VIRTIO_CCW_QUEUE_MAX is left at it's current value, and will be dropped
-when virtio-ccw is converted to use the capability of the flic
-introduced by this patch.
+QEMU currently uses "CORE" for these notes. Up to now this has
+not been a real problem because the dump analysis tool "crash"
+does handle that. But it will break all programs that use libbfd
+for processing ELF notes.
 
-Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+So fix this and use "LINUX" for all s390 specific notes to comply
+with libbfd. Also set the correct namesz.
+
+Reported-by: Philipp Rudo <prudo@linux.vnet.ibm.com>
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
 ---
- hw/s390x/s390-virtio-ccw.c   |  7 ++++++-
- include/hw/s390x/s390_flic.h | 10 ++++++++--
- 2 files changed, 14 insertions(+), 3 deletions(-)
+ target/s390x/arch_dump.c | 43 ++++++++++++++++++++++++++++---------------
+ 1 file changed, 28 insertions(+), 15 deletions(-)
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index e9a676797a..ea244bbf55 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -336,7 +336,12 @@ static const TypeInfo ccw_machine_info = {
-     type_init(ccw_machine_register_##suffix)
+diff --git a/target/s390x/arch_dump.c b/target/s390x/arch_dump.c
+index 4731869f6b..887cae947e 100644
+--- a/target/s390x/arch_dump.c
++++ b/target/s390x/arch_dump.c
+@@ -59,8 +59,7 @@ typedef struct S390xElfVregsHiStruct S390xElfVregsHi;
  
- #define CCW_COMPAT_2_8 \
--        HW_COMPAT_2_8
-+        HW_COMPAT_2_8 \
-+        {\
-+            .driver   = TYPE_S390_FLIC_COMMON,\
-+            .property = "adapter_routes_max_batch",\
-+            .value    = "64",\
-+        },
+ typedef struct noteStruct {
+     Elf64_Nhdr hdr;
+-    char name[5];
+-    char pad3[3];
++    char name[8];
+     union {
+         S390xElfPrstatus prstatus;
+         S390xElfFpregset fpregset;
+@@ -162,13 +161,19 @@ static void s390x_write_elf64_prefix(Note *note, S390CPU *cpu)
+ }
  
- #define CCW_COMPAT_2_7 \
-         HW_COMPAT_2_7
-diff --git a/include/hw/s390x/s390_flic.h b/include/hw/s390x/s390_flic.h
-index 9f0b05c71b..7f8ec7541b 100644
---- a/include/hw/s390x/s390_flic.h
-+++ b/include/hw/s390x/s390_flic.h
-@@ -17,8 +17,14 @@
- #include "hw/s390x/adapter.h"
- #include "hw/virtio/virtio.h"
  
--#define ADAPTER_ROUTES_MAX_GSI 64
--#define VIRTIO_CCW_QUEUE_MAX ADAPTER_ROUTES_MAX_GSI
-+/*
-+ * Reserve enough gsis to accommodate all virtio devices.
-+ * If any other user of adapter routes needs more of these,
-+ * we need to bump the value; but virtio looks like the
-+ * maximum right now.
-+ */
-+#define ADAPTER_ROUTES_MAX_GSI VIRTIO_QUEUE_MAX
-+#define VIRTIO_CCW_QUEUE_MAX 64
+-static const struct NoteFuncDescStruct {
++typedef struct NoteFuncDescStruct {
+     int contents_size;
+     void (*note_contents_func)(Note *note, S390CPU *cpu);
+-} note_func[] = {
++} NoteFuncDesc;
++
++static const NoteFuncDesc note_core[] = {
+     {sizeof(((Note *)0)->contents.prstatus), s390x_write_elf64_prstatus},
+-    {sizeof(((Note *)0)->contents.prefix),   s390x_write_elf64_prefix},
+     {sizeof(((Note *)0)->contents.fpregset), s390x_write_elf64_fpregset},
++    { 0, NULL}
++};
++
++static const NoteFuncDesc note_linux[] = {
++    {sizeof(((Note *)0)->contents.prefix),   s390x_write_elf64_prefix},
+     {sizeof(((Note *)0)->contents.ctrs),     s390x_write_elf64_ctrs},
+     {sizeof(((Note *)0)->contents.timer),    s390x_write_elf64_timer},
+     {sizeof(((Note *)0)->contents.todcmp),   s390x_write_elf64_todcmp},
+@@ -178,22 +183,20 @@ static const struct NoteFuncDescStruct {
+     { 0, NULL}
+ };
  
- typedef struct AdapterRoutes {
-     AdapterInfo adapter;
+-typedef struct NoteFuncDescStruct NoteFuncDesc;
+-
+-
+-static int s390x_write_all_elf64_notes(const char *note_name,
++static int s390x_write_elf64_notes(const char *note_name,
+                                        WriteCoreDumpFunction f,
+                                        S390CPU *cpu, int id,
+-                                       void *opaque)
++                                       void *opaque,
++                                       const NoteFuncDesc *funcs)
+ {
+     Note note;
+     const NoteFuncDesc *nf;
+     int note_size;
+     int ret = -1;
+ 
+-    for (nf = note_func; nf->note_contents_func; nf++) {
++    for (nf = funcs; nf->note_contents_func; nf++) {
+         memset(&note, 0, sizeof(note));
+-        note.hdr.n_namesz = cpu_to_be32(sizeof(note.name));
++        note.hdr.n_namesz = cpu_to_be32(strlen(note_name) + 1);
+         note.hdr.n_descsz = cpu_to_be32(nf->contents_size);
+         strncpy(note.name, note_name, sizeof(note.name));
+         (*nf->note_contents_func)(&note, cpu);
+@@ -215,7 +218,13 @@ int s390_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
+                               int cpuid, void *opaque)
+ {
+     S390CPU *cpu = S390_CPU(cs);
+-    return s390x_write_all_elf64_notes("CORE", f, cpu, cpuid, opaque);
++    int r;
++
++    r = s390x_write_elf64_notes("CORE", f, cpu, cpuid, opaque, note_core);
++    if (r) {
++        return r;
++    }
++    return s390x_write_elf64_notes("LINUX", f, cpu, cpuid, opaque, note_linux);
+ }
+ 
+ int cpu_get_dump_info(ArchDumpInfo *info,
+@@ -230,7 +239,7 @@ int cpu_get_dump_info(ArchDumpInfo *info,
+ 
+ ssize_t cpu_get_note_size(int class, int machine, int nr_cpus)
+ {
+-    int name_size = 8; /* "CORE" or "QEMU" rounded */
++    int name_size = 8; /* "LINUX" or "CORE" + pad */
+     size_t elf_note_size = 0;
+     int note_head_size;
+     const NoteFuncDesc *nf;
+@@ -240,7 +249,11 @@ ssize_t cpu_get_note_size(int class, int machine, int nr_cpus)
+ 
+     note_head_size = sizeof(Elf64_Nhdr);
+ 
+-    for (nf = note_func; nf->note_contents_func; nf++) {
++    for (nf = note_core; nf->note_contents_func; nf++) {
++        elf_note_size = elf_note_size + note_head_size + name_size +
++                        nf->contents_size;
++    }
++    for (nf = note_linux; nf->note_contents_func; nf++) {
+         elf_note_size = elf_note_size + note_head_size + name_size +
+                         nf->contents_size;
+     }
 -- 
 2.11.0
