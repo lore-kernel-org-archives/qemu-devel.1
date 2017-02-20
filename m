@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cfk5h-0000KA-6J
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:17:06 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cfk7F-00017b-Ke
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:18:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cfk5e-00010w-06
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:17:05 -0500
-Received: from indium.canonical.com ([91.189.90.7]:40508)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cfk5d-00010U-QO
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:17:01 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cfk5b-00025D-BF
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 09:16:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 06A6D2E80CB
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 09:16:59 +0000 (UTC)
+	(envelope-from <jasowang@redhat.com>) id 1cfk7C-0001sU-A1
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:18:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49840)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cfk7C-0001sA-0s
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 04:18:38 -0500
+References: <1484026704-28027-1-git-send-email-mst@redhat.com>
+	<1484026704-28027-9-git-send-email-mst@redhat.com>
+	<A2975661238FB949B60364EF0F2C25743900AAEF@shsmsx102.ccr.corp.intel.com>
+	<c1f86fba-6b22-8316-156f-2024bee46b0c@redhat.com>
+	<A2975661238FB949B60364EF0F2C25743900B73D@shsmsx102.ccr.corp.intel.com>
+	<e9022e3a-5fa5-45c3-cc84-cb78d3ff9cdc@redhat.com>
+	<A2975661238FB949B60364EF0F2C25743900C602@shsmsx102.ccr.corp.intel.com>
+	<60ec34e3-2585-123f-7bc0-9d7bb143fc38@redhat.com>
+	<A2975661238FB949B60364EF0F2C25743900C6A9@shsmsx102.ccr.corp.intel.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <b4b73c71-2a2b-ed2d-7e55-04d9304761b6@redhat.com>
+Date: Mon, 20 Feb 2017 17:18:23 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <A2975661238FB949B60364EF0F2C25743900C6A9@shsmsx102.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 20 Feb 2017 09:03:42 -0000
-From: Thomas Huth <741115@bugs.launchpad.net>
-Reply-To: Bug 741115 <741115@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20110323164949.17887.98157.malonedeb@soybean.canonical.com>
-Message-Id: <20170220090342.4151.10984.launchpad@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 741115] Re: Add support of coprocessor cp15,
- cp14 registers exposion in the embedded gdb server
+Subject: Re: [Qemu-devel] [PULL 08/41] intel_iommu: support device iotlb
+ descriptor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,33 +35,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Liu, Yi L" <yi.l.liu@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "Lan, Tianyu" <tianyu.lan@intel.com>, Peter Maydell <peter.maydell@linaro.org>, "Tian, Kevin" <kevin.tian@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Xu <peterx@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-** Changed in: qemu
-   Importance: Undecided =3D> Wishlist
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/741115
+On 2017=E5=B9=B402=E6=9C=8820=E6=97=A5 17:13, Liu, Yi L wrote:
+>> -----Original Message-----
+>> From: Jason Wang [mailto:jasowang@redhat.com]
+>> Sent: Monday, February 20, 2017 5:04 PM
+>> To: Liu, Yi L <yi.l.liu@intel.com>; Michael S. Tsirkin <mst@redhat.com=
+>; qemu-
+>> devel@nongnu.org
+>> Cc: Lan, Tianyu <tianyu.lan@intel.com>; Peter Maydell
+>> <peter.maydell@linaro.org>; Tian, Kevin <kevin.tian@intel.com>; Eduard=
+o
+>> Habkost <ehabkost@redhat.com>; Peter Xu <peterx@redhat.com>; Alex
+>> Williamson <alex.williamson@redhat.com>; Paolo Bonzini
+>> <pbonzini@redhat.com>; Richard Henderson <rth@twiddle.net>
+>> Subject: Re: [Qemu-devel] [PULL 08/41] intel_iommu: support device iot=
+lb
+>> descriptor
+>>
+>>
+>>
+>> On 2017=E5=B9=B402=E6=9C=8820=E6=97=A5 16:27, Liu, Yi L wrote:
+>>>> -----Original Message-----
+>>>> From: Jason Wang [mailto:jasowang@redhat.com]
+>>>> Sent: Friday, February 17, 2017 2:43 PM
+>>>> To: Liu, Yi L <yi.l.liu@intel.com>; Michael S. Tsirkin
+>>>> <mst@redhat.com>; qemu- devel@nongnu.org
+>>>> Cc: Peter Maydell <peter.maydell@linaro.org>; Eduardo Habkost
+>>>> <ehabkost@redhat.com>; Peter Xu <peterx@redhat.com>; Paolo Bonzini
+>>>> <pbonzini@redhat.com>; Richard Henderson <rth@twiddle.net>; Tian,
+>>>> Kevin <kevin.tian@intel.com>; Lan, Tianyu <tianyu.lan@intel.com>;
+>>>> Alex Williamson <alex.williamson@redhat.com>
+>>>> Subject: Re: [Qemu-devel] [PULL 08/41] intel_iommu: support device
+>>>> iotlb descriptor
+>>>>
+>>>>
+>>>>
+>>>> On 2017=E5=B9=B402=E6=9C=8817=E6=97=A5 14:18, Liu, Yi L wrote:
+>>>>>> -----Original Message-----
+>>>>>> From: Jason Wang [mailto:jasowang@redhat.com]
+>>>>>> Sent: Thursday, February 16, 2017 1:44 PM
+>>>>>> To: Liu, Yi L <yi.l.liu@intel.com>; Michael S. Tsirkin
+>>>>>> <mst@redhat.com>; qemu- devel@nongnu.org
+>>>>>> Cc: Peter Maydell <peter.maydell@linaro.org>; Eduardo Habkost
+>>>>>> <ehabkost@redhat.com>; Peter Xu <peterx@redhat.com>; Paolo Bonzini
+>>>>>> <pbonzini@redhat.com>; Richard Henderson <rth@twiddle.net>; Tian,
+>>>>>> Kevin <kevin.tian@intel.com>; Lan, Tianyu <tianyu.lan@intel.com>;
+>>>>>> Alex Williamson <alex.williamson@redhat.com>
+>>>>>> Subject: Re: [Qemu-devel] [PULL 08/41] intel_iommu: support device
+>>>>>> iotlb descriptor
+>>>>>>
+>>>>>>
+>>>>>>
+>>>>>> On 2017=E5=B9=B402=E6=9C=8816=E6=97=A5 13:36, Liu, Yi L wrote:
+>>>>>>>> -----Original Message-----
+>>>>>>>> From: Qemu-devel
+>>>>>>>> [mailto:qemu-devel-bounces+yi.l.liu=3Dintel.com@nongnu.org]
+>>>>>>>> On Behalf Of Michael S. Tsirkin
+>>>>>>>> Sent: Tuesday, January 10, 2017 1:40 PM
+>>>>>>>> To: qemu-devel@nongnu.org
+>>>>>>>> Cc: Peter Maydell <peter.maydell@linaro.org>; Eduardo Habkost
+>>>>>>>> <ehabkost@redhat.com>; Jason Wang <jasowang@redhat.com>; Peter
+>>>> Xu
+>>>>>>>> <peterx@redhat.com>; Paolo Bonzini <pbonzini@redhat.com>; Richar=
+d
+>>>>>>>> Henderson <rth@twiddle.net>
+>>>>>>>> Subject: [Qemu-devel] [PULL 08/41] intel_iommu: support device
+>>>>>>>> iotlb descriptor
+>>>>>>>>
+>>>>>>>> From: Jason Wang <jasowang@redhat.com>
+>>>>>>>>
+>>>>>>>> This patch enables device IOTLB support for intel iommu. The
+>>>>>>>> major work is to implement QI device IOTLB descriptor processing
+>>>>>>>> and notify the device through iommu notifier.
+>>>>>>>>
+>>>>>>> Hi Jason/Michael,
+>>>>>>>
+>>>>>>> Recently Peter Xu's patch also touched intel-iommu emulation. His
+>>>>>>> patch shadows second-level page table by capturing iotlb flush
+>>>>>>> from guest. It would result in page table updating in host. Does
+>>>>>>> this patch also use the same map/umap API provided by VFIO?
+>>>>>> Yes, it depends on the iommu notifier too.
+>>>>>>
+>>>>>>> If it is, then I think it would also update page table in host. I=
+t
+>>>>>>> looks to be a duplicate update. Pls refer to the following
+>>>>>>> snapshot captured from section 6.5.2.5 of vtd spec.
+>>>>>>>
+>>>>>>> "Since translation requests from a device may be serviced by
+>>>>>>> hardware from the IOTLB, software must always request IOTLB
+>>>>>>> invalidation
+>>>>>>> (iotlb_inv_dsc) before requesting corresponding Device-TLB
+>>>>>>> (dev_tlb_inv_dsc) invalidation."
+>>>>>>>
+>>>>>>> Maybe for device-iotlb, we need a separate API which just pass
+>>>>>>> down the invalidate info without updating page table. Any thought=
+s?
+>>>>>> cc Alex.
+>>>>>>
+>>>>>> If we want ATS to be visible for guest (but I'm not sure if VFIO
+>>>>>> support this), we probably need another notifier or a new flag.
+>>>>> Jason, for assigned device, I think guest could see ATS if the
+>>>>> assigned device supports ATS. I can see it when passthru iGPU.
+>>>>>
+>>>>> Regards,
+>>>>> Yi L
+>>>> Good to know this.
+>>>>
+>>>> If I understand your suggestion correctly, you want a dedicated API
+>>>> to flush a hardware device IOTLB. I'm not sure this is really needed=
+.
+>>> yes, I'd like to have an extra API besides the current MAP/UNMAP.
+>> I'm think whether or not we can do this without extra API or even don'=
+t need to
+>> care about this.
+>>
+>>>> There's some discussion of similar issue in the past (when ATS is
+>>>> used for virtio- net/vhost), looks like we could solve this by not
+>>>> trigger the UNMAP notifier unless it was device IOTLB inv desc if AT=
+S
+>>>> is enabled for the device? With this remote IOMMU/IOTLB can only get
+>>>> invalidation request once. For VFIO, the under layer IOMMU can deal
+>>>> with hardware device IOTLB without any extra efforts.
+>>> If I catch the background, I think it should be "not trigger the UNMA=
+P
+>>> notifier when unless it was device IOTLB inv desc if ATS is enabled f=
+or the
+>> device"
+>>
+>> Seems not :)
+>>
+>> I mean, if ATS is enabled for the device, only trigger UNMAP notifier =
+when
+>> processing device IOTLB. Then we can only have flush once. And host IO=
+MMU
+>> driver will take care of device IOTLB flush too.
+> hmmm, how about the iotlb inv desc which is prior to device-iotlb?
 
-Title:
-  Add support of coprocessor cp15, cp14 registers exposion in the
-  embedded gdb server
+Any issue in this case?
 
-Status in QEMU:
-  New
+> I'm not sure
+> if it is practical to ignore the iotlb inv des since there is no SID in=
+fo in it.
 
-Bug description:
-  Please add support of exposion of ARM coprocesor registers/logic at the e=
-mbedded gdb server,
-   for example of cp15, cp14, etc registers.
+Yes, this needs some changes maybe.
 
-  Related project http://jtagarmgdbsrvr.sourceforge.net/index.html
+Thanks
 
-  Also filled bug in the GDB
-  http://sourceware.org/bugzilla/show_bug.cgi?id=3D12602
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/741115/+subscriptions
+>
+> Regards,
+> Yi L
