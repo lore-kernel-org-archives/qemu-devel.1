@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1cfpNT-0003El-V7
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:55:49 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cfpPb-0005V3-17
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:57:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1cfpNR-00078Y-CT
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:55:48 -0500
-References: <8d7a5d17-7b1b-578a-67fc-c79beb196a4c@virtuozzo.com>
-	<20170217120935.GC5338@noname.redhat.com>
-	<fd790939-7ad7-1d74-c810-eceece98bbb7@virtuozzo.com>
-	<20170217124842.GE5338@noname.redhat.com>
-	<3a827d65-1028-d0fd-c3aa-cabe61dafbd9@openvz.org>
-	<20170217133430.GI5338@noname.redhat.com>
-	<635d98d9-0f65-4fa6-2208-02ff7d23a2e9@openvz.org>
-	<20170217142403.GJ5338@noname.redhat.com>
-	<89b7456e-e689-fdee-7ab0-89bb664f1cb6@virtuozzo.com>
-	<d41ae075-95db-6cf9-3cc7-58f2f337420b@openvz.org>
-	<20170220111535.GA4814@noname.redhat.com>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <72b9788d-e85d-b20d-b334-fe63154ba20d@openvz.org>
-Date: Mon, 20 Feb 2017 12:21:46 +0100
+	(envelope-from <imammedo@redhat.com>) id 1cfpPY-0007RD-IG
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:57:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38790)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cfpPY-0007R5-CI
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 09:57:56 -0500
+Date: Mon, 20 Feb 2017 15:57:52 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170220155752.32892bc3@nial.brq.redhat.com>
+In-Reply-To: <cover.1487286467.git.ben@skyportsystems.com>
+References: <cover.1487286467.git.ben@skyportsystems.com>
 MIME-Version: 1.0
-In-Reply-To: <20170220111535.GA4814@noname.redhat.com>
-Content-Type: text/plain; charset="windows-1252"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v15 08/25] block: introduce auto-loading
- bitmaps
+Subject: Re: [Qemu-devel] [PATCH v8 0/8] Add support for VM Generation ID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,95 +26,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
+To: ben@skyportsystems.com
+Cc: qemu-devel@nongnu.org, lersek@redhat.com, mst@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, Kevin O'Connor <kevin@koconnor.net>
 
-On 02/20/2017 12:15 PM, Kevin Wolf wrote:
-> Am 18.02.2017 um 11:54 hat Denis V. Lunev geschrieben:
->> On 02/17/2017 03:54 PM, Vladimir Sementsov-Ogievskiy wrote:
->>> 17.02.2017 17:24, Kevin Wolf wrote:
->>>> Am 17.02.2017 um 14:48 hat Denis V. Lunev geschrieben:
->>>>> On 02/17/2017 04:34 PM, Kevin Wolf wrote:
->>>>>> Am 17.02.2017 um 14:22 hat Denis V. Lunev geschrieben:
->>>>>>> But for sure this is bad from the downtime point of view.
->>>>>>> On migrate you will have to write to the image and re-read
->>>>>>> it again on the target. This would be very slow. This will
->>>>>>> not help for the migration with non-shared disk too.
->>>>>>>
->>>>>>> That is why we have specifically worked in a migration,
->>>>>>> which for a good does not influence downtime at all now.
->>>>>>>
->>>>>>> With a write we are issuing several write requests + sync.
->>>>>>> Our measurements shows that bdrv_drain could take around
->>>>>>> a second on an averagely loaded conventional system, which
->>>>>>> seems unacceptable addition to me.
->>>>>> I'm not arguing against optimising migration, I fully agree with
->>>>>> you. I
->>>>>> just think that we should start with a correct if slow base version
->>>>>> and
->>>>>> then add optimisation to that, instead of starting with a broken base
->>>>>> version and adding to that.
->>>>>>
->>>>>> Look, whether you do the expensive I/O on open/close and make that a
->>>>>> slow operation or whether you do it on invalidate_cache/inactivate
->>>>>> doesn't really make a difference in term of slowness because in
->>>>>> general
->>>>>> both operations are called exactly once. But it does make a difference
->>>>>> in terms of correctness.
->>>>>>
->>>>>> Once you do the optimisation, of course, you'll skip writing those
->>>>>> bitmaps that you transfer using a different channel, no matter whether
->>>>>> you skip it in bdrv_close() or in bdrv_inactivate().
->>>>>>
->>>>>> Kevin
->>>>> I do not understand this point as in order to optimize this
->>>>> we will have to create specific code path or option from
->>>>> the migration code and keep this as an ugly kludge forever.
->>>> The point that I don't understand is why it makes any difference for the
->>>> follow-up migration series whether the writeout is in bdrv_close() or
->>>> bdrv_inactivate(). I don't really see the difference between the two
->>>> from a migration POV; both need to be skipped if we transfer the bitmap
->>>> using a different channel.
->>>>
->>>> Maybe I would see the reason if I could find the time to look at the
->>>> migration patches first, but unfortunately I don't have this time at the
->>>> moment.
->>>>
->>>> My point is just that generally we want to have a correctly working qemu
->>>> after every single patch, and even more importantly after every series.
->>>> As the migration series is separate from this, I don't think it's a good
->>>> excuse for doing worse than we could easily do here.
->>>>
->>>> Kevin
->>> With open/close all is already ok - bitmaps will not be saved because
->>> of BDRV_O_INACTIVE  and will not be loaded because of IN_USE.
-> If the contents of so-called persistent bitmaps is lost across
-> migration and stale after bdrv_invalidate_cache, that's not "all ok" in
-> my book. It's buggy.
->
->> in any case load/store happens outside of VM downtime.
->> The target is running at the moment of close on source,
->> the source is running at the moment of open on target.
-> Which makes the operation in open/close meaningless: open reads data
-> which may still by changed, and close cannot write to the image any more
-> because ownership is already given up.
->
-> Anyway, all of this isn't really productive. Please, can't you just
-> answer that simple question that I asked you above: What problems would
-> you get if you used invalidate_cache/inactivate instead of open/close
-> for triggering these actions?
->
-> If you can bring up some "this would break X", "it would be very hard to
-> implement Y correctly then" or "in scenario Z, this would have unwanted
-> effects", then we can figure out what to do. But not putting things in
-> the proper place just because you don't feel like it isn't a very strong
-> argument.
->
-> Kevin
-This will increase the downtime ~0.5-1 second for migrated VM
-or will require very intrusive interface from migration code to
-here to avoid bitmap save for inactivation on that path.
+On Thu, 16 Feb 2017 15:15:32 -0800
+ben@skyportsystems.com wrote:
 
-No other arguments so far.
+> From: Ben Warren <ben@skyportsystems.com>
+> 
+> This patch set adds support for passing a GUID to Windows guests.  It is a
+> re-implementation of previous patch sets written by Igor Mammedov et al, but
+> this time passing the GUID data as a fw_cfg blob.
+> 
+> This patch set has dependencies on new guest functionality, in particular the
+> support for a new linker-loader command and the ability to write back data
+> to QEMU over a DMA link.  Work is in flight in both SeaBIOS and OVMF to support this.
+> 
+> v7->v8:
+>     - Rebased to top of tree.
+>     - Fixed two small bugs in "write pointer" function
+>     - minor re-ordering of data in patches
+>     - Fixed unit test by adding delays/retries to reading RSDP table
+Michael,
 
-Den
+series looks good for merging.
+Patch
+ [PATCH v8 7/8] tests: Add unit tests for the VM  Generation ID feature
+needs updated seabios blob to make 'make check' happy
+so we probably should merge/update seabios first
+  [PATCH v5 0/5] QEMU: Add capability to write back fw_cfg address to QEMU
+
+CCing Gerd and Kevin.
