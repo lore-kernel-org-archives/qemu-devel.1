@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cflZG-0006oB-H6
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 05:51:44 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cflhj-0003tG-5D
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 06:00:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cflZF-0006Np-1J
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 05:51:42 -0500
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:34418)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cflZE-0006NG-O8
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 05:51:40 -0500
-Received: by mail-wm0-x235.google.com with SMTP id 196so21563784wmm.1
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 02:51:40 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 20 Feb 2017 10:51:37 +0000
-Message-Id: <20170220105139.21581-3-alex.bennee@linaro.org>
-In-Reply-To: <20170220105139.21581-1-alex.bennee@linaro.org>
-References: <20170220105139.21581-1-alex.bennee@linaro.org>
+	(envelope-from <dgilbert@redhat.com>) id 1cflhg-0000Ui-4I
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 06:00:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38414)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cflhf-0000UH-Ry
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 06:00:24 -0500
+Date: Mon, 20 Feb 2017 11:00:15 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170220110014.GD2372@work-vm>
+References: <cover.1487286467.git.ben@skyportsystems.com>
+	<88232638f9ff3b17b54987624468678ea14a3037.1487286467.git.ben@skyportsystems.com>
+	<20170217114321.6c8577e1@nial.brq.redhat.com>
+	<918524f7-26cf-3fce-d9e3-7316ca69285b@redhat.com>
+	<20170220102304.GC2372@work-vm>
+	<1ea5fff1-6216-8a8f-1e98-571253a3f596@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 2/4] new: debian docker targets for
- cross-compiling
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1ea5fff1-6216-8a8f-1e98-571253a3f596@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v8 4/8] ACPI: Add Virtual Machine
+ Generation ID support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,148 +32,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, ben@skyportsystems.com, qemu-devel@nongnu.org, mst@redhat.com
 
-This provides a basic Debian install with access to the emdebian cross
-compilers. The debian-armhf-cross and debian-arm64-cross targets build
-on the basic Debian image to allow cross compiling to those targets.
+* Laszlo Ersek (lersek@redhat.com) wrote:
+> On 02/20/17 11:23, Dr. David Alan Gilbert wrote:
+> > * Laszlo Ersek (lersek@redhat.com) wrote:
+> >> CC Dave
+> > 
+> > This isn't an area I really understand; but if I'm
+> > reading this right then 
+> >    vmgenid is stored in fw_cfg?
+> >    fw_cfg isn't migrated
+> > 
+> > So why should any changes to it get migrated, except if it's already
+> > been read by the guest (and if the guest reads it again aftwards what's
+> > it expected to read?)
+> 
+> This is what we have here:
+> - QEMU formats read-only fw_cfg blob with GUID
+> - guest downloads blob, places it in guest RAM
+> - guest tells QEMU the guest-side address of the blob
+> - during migration, guest RAM is transferred
+> - after migration, in the device's post_load callback, QEMU overwrites
+>   the GUID in guest RAM with a different value, and injects an SCI
+> 
+> I CC'd you for the following reason: Igor reported that he didn't see
+> either the fresh GUID or the SCI in the guest, on the target host, after
+> migration. I figured that perhaps there was an ordering issue between
+> RAM loading and post_load execution on the target host, and so I
+> proposed to delay the RAM overwrite + SCI injection a bit more;
+> following the pattern seen in your commit 90c647db8d59.
+> 
+> However, since then, both Ben and myself tested the code with migration
+> (using "virsh save" (Ben) and "virsh managedsave" (myself)), with
+> Windows and Linux guests, and it works for us; there seems to be no
+> ordering issue with the current code (= overwrite RAM + inject SCI in
+> the post_load callback()).
+> 
+> For now we don't understand why it doesn't work for Igor (Igor used
+> exec/gzip migration to/from a local file using direct QEMU monitor
+> commands / options, no libvirt). And, copying the pattern seen in your
+> commit 90c647db8d59 didn't help in his case (while it wasn't even
+> necessary for success in Ben's and my testing).
 
-A new environment variable (QEMU_CONFIGURE_OPTS) is set as part of the
-docker container and passed to the build to specify the
---cross-prefix. The user still calls the build in the usual way, for
-example:
+One thing I noticed in Igor's test was that he did a 'stop' on the source
+before the migate, and so it's probably still paused on the destination
+after the migration is loaded, so anything the guest needs to do might
+not have happened until it's started.
 
-  make docker-test-build@debian-arm64-cross \
-    TARGET_LIST="aarch64-softmmu,aarch64-linux-user"
+You say;
+   'guest tells QEMU the guest-side address of the blob'
+how is that stored/migrated/etc ?
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
----
-v2
-  - add clang (keep shippable happy)
-  - rm adduser code (done direct now)
-  - add aptitude (useful for debugging package clashes)
-v3
-  - split into debian, debian-armhf-cross and debian-aarch64-cross
-v4
-  - Add QEMU_CONFIGURE_OPTS
-v5
-  - s/dependacies/dependencies/
-  - add r-b
----
- tests/docker/Makefile.include                      |  4 ++++
- tests/docker/common.rc                             |  2 +-
- tests/docker/dockerfiles/debian-arm64-cross.docker | 15 +++++++++++++
- tests/docker/dockerfiles/debian-armhf-cross.docker | 15 +++++++++++++
- tests/docker/dockerfiles/debian.docker             | 25 ++++++++++++++++++++++
- 5 files changed, 60 insertions(+), 1 deletion(-)
- create mode 100644 tests/docker/dockerfiles/debian-arm64-cross.docker
- create mode 100644 tests/docker/dockerfiles/debian-armhf-cross.docker
- create mode 100644 tests/docker/dockerfiles/debian.docker
+> So it seems that delaying the deed with
+> qemu_add_vm_change_state_handler() is neither needed nor effective in
+> this case; but then we still don't know why it doesn't work for Igor.
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index 3b5ffecb04..03eda37bf4 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -54,6 +54,10 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
- 		$(if $(EXECUTABLE),--include-executable=$(EXECUTABLE)),\
- 		"BUILD","$*")
- 
-+# Enforce dependancies for composite images
-+docker-image-debian-armhf-cross: docker-image-debian
-+docker-image-debian-arm64-cross: docker-image-debian
-+
- # Expand all the pre-requistes for each docker image and test combination
- $(foreach i,$(DOCKER_IMAGES), \
- 	$(foreach t,$(DOCKER_TESTS) $(DOCKER_TOOLS), \
-diff --git a/tests/docker/common.rc b/tests/docker/common.rc
-index 21657e87c6..6865689bb5 100755
---- a/tests/docker/common.rc
-+++ b/tests/docker/common.rc
-@@ -29,7 +29,7 @@ build_qemu()
-     config_opts="--enable-werror \
-                  ${TARGET_LIST:+--target-list=${TARGET_LIST}} \
-                  --prefix=$PWD/install \
--                 $EXTRA_CONFIGURE_OPTS \
-+                 $QEMU_CONFIGURE_OPTS $EXTRA_CONFIGURE_OPTS \
-                  $@"
-     echo "Configure options:"
-     echo $config_opts
-diff --git a/tests/docker/dockerfiles/debian-arm64-cross.docker b/tests/docker/dockerfiles/debian-arm64-cross.docker
-new file mode 100644
-index 0000000000..592b5d7055
---- /dev/null
-+++ b/tests/docker/dockerfiles/debian-arm64-cross.docker
-@@ -0,0 +1,15 @@
-+#
-+# Docker arm64 cross-compiler target
-+#
-+# This docker target builds on the base debian image.
-+#
-+FROM qemu:debian
-+
-+# Add the foreign architecture we want and install dependencies
-+RUN dpkg --add-architecture arm64
-+RUN apt update
-+RUN apt install -yy crossbuild-essential-arm64
-+RUN apt-get build-dep -yy -a arm64 qemu
-+
-+# Specify the cross prefix for this image (see tests/docker/common.rc)
-+ENV QEMU_CONFIGURE_OPTS --cross-prefix=aarch64-linux-gnu-
-diff --git a/tests/docker/dockerfiles/debian-armhf-cross.docker b/tests/docker/dockerfiles/debian-armhf-cross.docker
-new file mode 100644
-index 0000000000..668d60aeb3
---- /dev/null
-+++ b/tests/docker/dockerfiles/debian-armhf-cross.docker
-@@ -0,0 +1,15 @@
-+#
-+# Docker armhf cross-compiler target
-+#
-+# This docker target builds on the base debian image.
-+#
-+FROM qemu:debian
-+
-+# Add the foreign architecture we want and install dependencies
-+RUN dpkg --add-architecture armhf
-+RUN apt update
-+RUN apt install -yy crossbuild-essential-armhf
-+RUN apt-get build-dep -yy -a armhf qemu
-+
-+# Specify the cross prefix for this image (see tests/docker/common.rc)
-+ENV QEMU_CONFIGURE_OPTS --cross-prefix=arm-linux-gnueabihf-
-diff --git a/tests/docker/dockerfiles/debian.docker b/tests/docker/dockerfiles/debian.docker
-new file mode 100644
-index 0000000000..52bd79938e
---- /dev/null
-+++ b/tests/docker/dockerfiles/debian.docker
-@@ -0,0 +1,25 @@
-+#
-+# Docker multiarch cross-compiler target
-+#
-+# This docker target is builds on Debian and Emdebian's cross compiler targets
-+# to build distro with a selection of cross compilers for building test binaries.
-+#
-+# On its own you can't build much but the docker-foo-cross targets
-+# build on top of the base debian image.
-+#
-+FROM debian:stable-slim
-+
-+# Setup some basic tools we need
-+RUN apt update
-+RUN apt install -yy curl aptitude
-+
-+# Setup Emdebian
-+RUN echo "deb http://emdebian.org/tools/debian/ jessie main" >> /etc/apt/sources.list
-+RUN curl http://emdebian.org/tools/debian/emdebian-toolchain-archive.key | apt-key add -
-+
-+# Duplicate deb line as deb-src
-+RUN cat /etc/apt/sources.list | sed "s/deb/deb-src/" >> /etc/apt/sources.list
-+
-+# Install common build utilities
-+RUN apt update
-+RUN apt install -yy build-essential clang
--- 
-2.11.0
+Nod.
+
+Dave
+
+> 
+> Thanks
+> Laszlo
+> 
+> > 
+> > Dave
+> > 
+> >> On 02/17/17 11:43, Igor Mammedov wrote:
+> >>> On Thu, 16 Feb 2017 15:15:36 -0800
+> >>> ben@skyportsystems.com wrote:
+> >>>
+> >>>> From: Ben Warren <ben@skyportsystems.com>
+> >>>>
+> >>>> This implements the VM Generation ID feature by passing a 128-bit
+> >>>> GUID to the guest via a fw_cfg blob.
+> >>>> Any time the GUID changes, an ACPI notify event is sent to the guest
+> >>>>
+> >>>> The user interface is a simple device with one parameter:
+> >>>>  - guid (string, must be "auto" or in UUID format
+> >>>>    xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+> >>> I've given it some testing with WS2012R2 and v4 patches for Seabios,
+> >>>
+> >>> Windows is able to read initial GUID allocation and writeback
+> >>> seems to work somehow:
+> >>>
+> >>> (qemu) info vm-generation-id 
+> >>> c109c09b-0e8b-42d5-9b33-8409c9dcd16c
+> >>>
+> >>> vmgenid client in Windows reads it as 2 following 64bit integers:
+> >>> 42d50e8bc109c09b:6cd1dcc90984339b
+> >>>
+> >>> However update path/restore from snapshot doesn't
+> >>> here is as I've tested it:
+> >>>
+> >>> qemu-system-x86_64 -device vmgenid,id=testvgid,guid=auto -monitor stdio
+> >>> (qemu) info vm-generation-id 
+> >>> c109c09b-0e8b-42d5-9b33-8409c9dcd16c
+> >>> (qemu) stop
+> >>> (qemu) migrate "exec:gzip -c > STATEFILE.gz" 
+> >>> (qemu) quit
+> >>>
+> >>> qemu-system-x86_64 -device vmgenid,id=testvgid,guid=auto -monitor stdio
+> >>> -incoming "exec: gzip -c -d STATEFILE.gz"
+> >>> (qemu) info vm-generation-id 
+> >>> 28b587fa-991b-4267-80d7-9cf28b746fe9
+> >>>
+> >>> guest
+> >>>  1. doesn't get GPE notification that it must receive
+> >>>  2. vmgenid client in Windows reads the same value
+> >>>       42d50e8bc109c09b:6cd1dcc90984339b
+> >>
+> >> Hmmm, I wonder if we need something like this, in vmgenid_post_load():
+> >>
+> >> commit 90c647db8d59e47c9000affc0d81754eb346e939
+> >> Author: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> >> Date:   Fri Apr 15 12:41:30 2016 +0100
+> >>
+> >>     Fix pflash migration
+> >>
+> >> with the idea being that in a single device's post_load callback, we
+> >> shouldn't perform machine-wide actions (post_load is likely for fixing
+> >> up the device itself). If machine-wide actions are necessary, we should
+> >> temporarily register a "vm change state handler", and do the thing once
+> >> that handler is called (when the machine has been loaded fully and is
+> >> about to continue execution).
+> >>
+> >> Can you please try the attached patch on top? (Build tested only.)
+> >>
+> >> Thanks!
+> >> Laszlo
+> > 
+> >> diff --git a/include/hw/acpi/vmgenid.h b/include/hw/acpi/vmgenid.h
+> >> index db7fa0e63303..a2ae450b1f56 100644
+> >> --- a/include/hw/acpi/vmgenid.h
+> >> +++ b/include/hw/acpi/vmgenid.h
+> >> @@ -4,6 +4,7 @@
+> >>  #include "hw/acpi/bios-linker-loader.h"
+> >>  #include "hw/qdev.h"
+> >>  #include "qemu/uuid.h"
+> >> +#include "sysemu/sysemu.h"
+> >>  
+> >>  #define VMGENID_DEVICE           "vmgenid"
+> >>  #define VMGENID_GUID             "guid"
+> >> @@ -21,6 +22,7 @@ typedef struct VmGenIdState {
+> >>      DeviceClass parent_obj;
+> >>      QemuUUID guid;                /* The 128-bit GUID seen by the guest */
+> >>      uint8_t vmgenid_addr_le[8];   /* Address of the GUID (little-endian) */
+> >> +    VMChangeStateEntry *vmstate;
+> >>  } VmGenIdState;
+> >>  
+> >>  static inline Object *find_vmgenid_dev(void)
+> >> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+> >> index 9f97b722761b..0ae1d56ff297 100644
+> >> --- a/hw/acpi/vmgenid.c
+> >> +++ b/hw/acpi/vmgenid.c
+> >> @@ -177,10 +177,20 @@ static void vmgenid_set_guid(Object *obj, const char *value, Error **errp)
+> >>  /* After restoring an image, we need to update the guest memory and notify
+> >>   * it of a potential change to VM Generation ID
+> >>   */
+> >> +static void postload_update_guest_cb(void *opaque, int running, RunState state)
+> >> +{
+> >> +    VmGenIdState *vms = opaque;
+> >> +
+> >> +    qemu_del_vm_change_state_handler(vms->vmstate);
+> >> +    vms->vmstate = NULL;
+> >> +    vmgenid_update_guest(vms);
+> >> +}
+> >> +
+> >>  static int vmgenid_post_load(void *opaque, int version_id)
+> >>  {
+> >>      VmGenIdState *vms = opaque;
+> >> -    vmgenid_update_guest(vms);
+> >> +    vms->vmstate = qemu_add_vm_change_state_handler(postload_update_guest_cb,
+> >> +                                                    vms);
+> >>      return 0;
+> >>  }
+> >>  
+> > 
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
