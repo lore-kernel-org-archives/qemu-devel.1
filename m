@@ -1,21 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33234)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@openvz.org>) id 1cfsb7-0001Yf-Mh
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:22:06 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cfskC-0007lw-LT
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:31:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@openvz.org>) id 1cfsb2-00044n-VU
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:22:05 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:9778 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <den@openvz.org>) id 1cfsb2-00043J-Ju
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:22:00 -0500
-From: "Denis V. Lunev" <den@openvz.org>
-Date: Mon, 20 Feb 2017 21:21:53 +0300
-Message-Id: <1487614915-18710-2-git-send-email-den@openvz.org>
-In-Reply-To: <1487614915-18710-1-git-send-email-den@openvz.org>
-References: <1487614915-18710-1-git-send-email-den@openvz.org>
-Subject: [Qemu-devel] [PATCH 1/3] i386/cpu: release GuestPanicInformation
- memory
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cfsk8-0006UE-Kl
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:31:28 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49530)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cfsk8-0006Ty-Aw
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 13:31:24 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1KISs90047570
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 13:31:22 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28r3p7wrbh-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 13:31:22 -0500
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Mon, 20 Feb 2017 18:31:19 -0000
+Date: Mon, 20 Feb 2017 19:31:13 +0100
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <20170217082939.33208-5-bjsdjshi@linux.vnet.ibm.com>
+References: <20170217082939.33208-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170217082939.33208-5-bjsdjshi@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20170220193113.3ba5af2c.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v3 04/15] vfio: ccw: basic
+ implementation for vfio_ccw driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,86 +42,311 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: den@openvz.org, Anton Nefedov <anton.nefedov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, wkywang@linux.vnet.ibm.com
 
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+On Fri, 17 Feb 2017 09:29:28 +0100
+Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
 
-Do not make some foreign function do it.
+> To make vfio support subchannel devices, we need a css driver for
+> the vfio subchannels. This patch adds a basic vfio-ccw subchannel
+> driver for this purpose.
+> 
+> To enable VFIO for vfio-ccw, enable S390_CCW_IOMMU config option
+> and configure VFIO as required.
+> 
+> Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> Acked-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
+> ---
+>  arch/s390/Kconfig                   |  10 ++
+>  arch/s390/include/asm/isc.h         |   1 +
+>  drivers/iommu/Kconfig               |   8 ++
+>  drivers/s390/cio/Makefile           |   3 +
+>  drivers/s390/cio/vfio_ccw_drv.c     | 262 ++++++++++++++++++++++++++++++++++++
+>  drivers/s390/cio/vfio_ccw_private.h |  25 ++++
+>  6 files changed, 309 insertions(+)
+>  create mode 100644 drivers/s390/cio/vfio_ccw_drv.c
+>  create mode 100644 drivers/s390/cio/vfio_ccw_private.h
+> 
+> diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
+> index c6722112..b920df8 100644
+> --- a/arch/s390/Kconfig
+> +++ b/arch/s390/Kconfig
+> @@ -670,6 +670,16 @@ config EADM_SCH
+>  	  To compile this driver as a module, choose M here: the
+>  	  module will be called eadm_sch.
+> 
+> +config VFIO_CCW
+> +	def_tristate n
+> +	prompt "Support for VFIO-CCW subchannels"
+> +	depends on S390_CCW_IOMMU && VFIO
+> +	help
+> +	  This driver allows usage of VFIO-CCW subchannels.
 
-Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Signed-off-by: Denis V. Lunev <den@openvz.org>
-CC: Paolo Bonzini <pbonzini@redhat.com>
-CC: Eric Blake <eblake@redhat.com>
----
- kvm-all.c |  5 ++++-
- vl.c      | 22 +++++++++-------------
- 2 files changed, 13 insertions(+), 14 deletions(-)
+Hm...
 
-diff --git a/kvm-all.c b/kvm-all.c
-index 0c94637..ac07902 100644
---- a/kvm-all.c
-+++ b/kvm-all.c
-@@ -1909,6 +1909,7 @@ int kvm_cpu_exec(CPUState *cpu)
- 
-     do {
-         MemTxAttrs attrs;
-+        GuestPanicInformation *crash_info;
- 
-         if (cpu->kvm_vcpu_dirty) {
-             kvm_arch_put_registers(cpu, KVM_PUT_RUNTIME_STATE);
-@@ -2001,9 +2002,11 @@ int kvm_cpu_exec(CPUState *cpu)
-                 break;
-             case KVM_SYSTEM_EVENT_CRASH:
-                 kvm_cpu_synchronize_state(cpu);
-+                crash_info = cpu_get_crash_info(cpu);
-                 qemu_mutex_lock_iothread();
--                qemu_system_guest_panicked(cpu_get_crash_info(cpu));
-+                qemu_system_guest_panicked(crash_info);
-                 qemu_mutex_unlock_iothread();
-+                qapi_free_GuestPanicInformation(crash_info);
-                 ret = 0;
-                 break;
-             default:
-diff --git a/vl.c b/vl.c
-index 27d9829..81382b6 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1682,6 +1682,15 @@ void qemu_system_reset(bool report)
- void qemu_system_guest_panicked(GuestPanicInformation *info)
- {
-     qemu_log_mask(LOG_GUEST_ERROR, "Guest crashed\n");
-+    if (info && info->type == GUEST_PANIC_INFORMATION_KIND_HYPER_V) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "HV crash parameters: (%#"PRIx64
-+                      " %#"PRIx64" %#"PRIx64" %#"PRIx64" %#"PRIx64")\n",
-+                      info->u.hyper_v.data->arg1,
-+                      info->u.hyper_v.data->arg2,
-+                      info->u.hyper_v.data->arg3,
-+                      info->u.hyper_v.data->arg4,
-+                      info->u.hyper_v.data->arg5);
-+    }
- 
-     if (current_cpu) {
-         current_cpu->crash_occurred = true;
-@@ -1694,19 +1703,6 @@ void qemu_system_guest_panicked(GuestPanicInformation *info)
-                                        !!info, info, &error_abort);
-         qemu_system_shutdown_request();
-     }
--
--    if (info) {
--        if (info->type == GUEST_PANIC_INFORMATION_KIND_HYPER_V) {
--            qemu_log_mask(LOG_GUEST_ERROR, "HV crash parameters: (%#"PRIx64
--                          " %#"PRIx64" %#"PRIx64" %#"PRIx64" %#"PRIx64")\n",
--                          info->u.hyper_v.data->arg1,
--                          info->u.hyper_v.data->arg2,
--                          info->u.hyper_v.data->arg3,
--                          info->u.hyper_v.data->arg4,
--                          info->u.hyper_v.data->arg5);
--        }
--        qapi_free_GuestPanicInformation(info);
--    }
- }
- 
- void qemu_system_reset_request(void)
--- 
-2.7.4
+"This driver allows usage of I/O subchannels via VFIO-CCW."
+
+?
+
+> +
+> +	  To compile this driver as a module, choose M here: the
+> +	  module will be called vfio_ccw.
+> +
+>  endmenu
+> 
+>  menu "Dump support"
+> diff --git a/arch/s390/include/asm/isc.h b/arch/s390/include/asm/isc.h
+> index 68d7d68..8a0b721 100644
+> --- a/arch/s390/include/asm/isc.h
+> +++ b/arch/s390/include/asm/isc.h
+> @@ -16,6 +16,7 @@
+>  #define CONSOLE_ISC 1			/* console I/O subchannel */
+>  #define EADM_SCH_ISC 4			/* EADM subchannels */
+>  #define CHSC_SCH_ISC 7			/* CHSC subchannels */
+> +#define VFIO_CCW_ISC IO_SCH_ISC		/* VFIO-CCW I/O subchannels */
+
+This is OK for now, I guess; but do we want to have the isc
+configurable in the long run? I.e., if a host wants to run its own I/O
+devices at a different priority than the devices it passes to a guest?
+
+>  /* Adapter interrupts. */
+>  #define QDIO_AIRQ_ISC IO_SCH_ISC	/* I/O subchannel in qdio mode */
+>  #define PCI_ISC 2			/* PCI I/O subchannels */
+
+(...)
+
+> diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
+> new file mode 100644
+> index 0000000..b068207
+> --- /dev/null
+> +++ b/drivers/s390/cio/vfio_ccw_drv.c
+> @@ -0,0 +1,262 @@
+> +/*
+> + * VFIO based Physical Subchannel device driver
+> + *
+> + * Copyright IBM Corp. 2017
+> + *
+> + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> + *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> + */
+> +
+> +#include <linux/module.h>
+> +#include <linux/init.h>
+> +#include <linux/device.h>
+> +#include <linux/slab.h>
+> +
+> +#include <asm/isc.h>
+> +
+> +#include "vfio_ccw_private.h"
+> +
+> +/*
+> + * Helpers
+> + */
+> +static int vfio_ccw_sch_quiesce(struct subchannel *sch)
+> +{
+> +	struct vfio_ccw_private *private = dev_get_drvdata(&sch->dev);
+> +	DECLARE_COMPLETION_ONSTACK(completion);
+> +	int iretry, ret = 0;
+> +
+> +	spin_lock_irq(sch->lock);
+> +	if (!sch->schib.pmcw.ena)
+> +		goto out_unlock;
+> +	ret = cio_disable_subchannel(sch);
+> +	if (ret != -EBUSY)
+> +		goto out_unlock;
+> +
+> +	do {
+> +		iretry = 255;
+> +
+> +		ret = cio_cancel_halt_clear(sch, &iretry);
+> +		while (ret == -EBUSY) {
+> +			/*
+> +			 * Flushing all I/O and wait the
+
+"Flush all I/O and wait for..."
+
+> +			 * cancel/halt/clear completion.
+> +			 */
+> +			private->completion = &completion;
+> +			spin_unlock_irq(sch->lock);
+> +
+> +			wait_for_completion(&completion);
+
+What happens for cancel? It won't generate an interrupt.
+
+> +
+> +			spin_lock_irq(sch->lock);
+> +			private->completion = NULL;
+> +			ret = cio_cancel_halt_clear(sch, &iretry);
+> +		};
+> +
+> +		ret = cio_disable_subchannel(sch);
+> +	} while (ret == -EBUSY);
+> +
+> +out_unlock:
+> +	spin_unlock_irq(sch->lock);
+> +	return ret;
+> +}
+> +
+> +/*
+> + * Sysfs interfaces
+> + */
+> +static ssize_t chpids_show(struct device *dev,
+> +			   struct device_attribute *attr,
+> +			   char *buf)
+> +{
+> +	struct subchannel *sch = to_subchannel(dev);
+> +	struct chsc_ssd_info *ssd = &sch->ssd_info;
+> +	ssize_t ret = 0;
+> +	int chp;
+> +	int mask;
+> +
+> +	for (chp = 0; chp < 8; chp++) {
+> +		mask = 0x80 >> chp;
+> +		if (ssd->path_mask & mask)
+> +			ret += sprintf(buf + ret, "%02x ", ssd->chpid[chp].id);
+> +		else
+> +			ret += sprintf(buf + ret, "00 ");
+> +	}
+> +	ret += sprintf(buf+ret, "\n");
+> +	return ret;
+> +}
+> +
+> +static ssize_t pimpampom_show(struct device *dev,
+> +			      struct device_attribute *attr,
+> +			      char *buf)
+> +{
+> +	struct subchannel *sch = to_subchannel(dev);
+> +	struct pmcw *pmcw = &sch->schib.pmcw;
+> +
+> +	return sprintf(buf, "%02x %02x %02x\n",
+> +		       pmcw->pim, pmcw->pam, pmcw->pom);
+> +}
+> +
+> +static DEVICE_ATTR(chpids, 0444, chpids_show, NULL);
+> +static DEVICE_ATTR(pimpampom, 0444, pimpampom_show, NULL);
+
+Quick question: You need to duplicate these so that lscss shows a sane
+output for vfio-ccw subchannels?
+
+> +
+> +static struct attribute *vfio_subchannel_attrs[] = {
+> +	&dev_attr_chpids.attr,
+> +	&dev_attr_pimpampom.attr,
+> +	NULL,
+> +};
+> +
+> +static struct attribute_group vfio_subchannel_attr_group = {
+> +	.attrs = vfio_subchannel_attrs,
+> +};
+> +
+> +/*
+> + * Css driver callbacks
+> + */
+> +static void vfio_ccw_sch_irq(struct subchannel *sch)
+> +{
+> +	struct vfio_ccw_private *private = dev_get_drvdata(&sch->dev);
+> +
+> +	inc_irq_stat(IRQIO_CIO);
+> +
+> +	if (!private)
+> +		return;
+> +
+> +	if (private->completion)
+> +		complete(private->completion);
+> +}
+> +
+> +static int vfio_ccw_sch_probe(struct subchannel *sch)
+> +{
+> +	struct pmcw *pmcw = &sch->schib.pmcw;
+> +	struct vfio_ccw_private *private;
+> +	int ret;
+> +
+> +	if (pmcw->qf) {
+> +		dev_warn(&sch->dev, "vfio: ccw: do not support QDIO: %s\n",
+
+s/do/does/
+
+> +			 dev_name(&sch->dev));
+> +		return -ENOTTY;
+
+Is -ENOTTY the right return code here? -EINVAL?
+
+> +	}
+> +
+> +	private = kzalloc(sizeof(*private), GFP_KERNEL | GFP_DMA);
+> +	if (!private)
+> +		return -ENOMEM;
+> +	private->sch = sch;
+> +	dev_set_drvdata(&sch->dev, private);
+> +
+> +	spin_lock_irq(sch->lock);
+> +	sch->isc = VFIO_CCW_ISC;
+> +	ret = cio_enable_subchannel(sch, (u32)(unsigned long)sch);
+> +	spin_unlock_irq(sch->lock);
+> +	if (ret)
+> +		goto out_free;
+> +
+> +	ret = sysfs_create_group(&sch->dev.kobj, &vfio_subchannel_attr_group);
+> +	if (ret)
+> +		goto out_disable;
+> +
+> +	return 0;
+> +
+> +out_disable:
+> +	cio_disable_subchannel(sch);
+> +out_free:
+> +	dev_set_drvdata(&sch->dev, NULL);
+> +	kfree(private);
+> +	return ret;
+> +}
+> +
+
+(...)
+
+> +/**
+> + * vfio_ccw_sch_event - process subchannel event
+> + * @sch: subchannel
+> + * @process: non-zero if function is called in process context
+> + *
+> + * An unspecified event occurred for this subchannel. Adjust data according
+> + * to the current operational state of the subchannel. Return zero when the
+> + * event has been handled sufficiently or -EAGAIN when this function should
+> + * be called again in process context.
+> + */
+> +static int vfio_ccw_sch_event(struct subchannel *sch, int process)
+> +{
+> +	unsigned long flags;
+> +
+> +	spin_lock_irqsave(sch->lock, flags);
+> +	if (!device_is_registered(&sch->dev))
+> +		goto out_unlock;
+> +
+> +	if (work_pending(&sch->todo_work))
+> +		goto out_unlock;
+> +
+> +	if (cio_update_schib(sch)) {
+> +		/* Not operational. */
+> +		css_sched_sch_todo(sch, SCH_TODO_UNREG);
+> +
+> +		/*
+> +		 * TODO:
+> +		 * Probably we should send the machine check to the guest.
+
+Yes, we should do that later on. Will user space notice that the device
+is gone? (I think crw injection should be done by user space.)
+
+> +		 */
+> +		goto out_unlock;
+> +	}
+> +
+> +out_unlock:
+> +	spin_unlock_irqrestore(sch->lock, flags);
+> +
+> +	return 0;
+> +}
+
+(...)
+
+Looks sane in general from my POV.
