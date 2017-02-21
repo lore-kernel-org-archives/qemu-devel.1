@@ -1,22 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cg6h8-00027V-RM
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 04:25:15 -0500
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cg6iG-0002tD-9v
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 04:26:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cg6h7-00023N-RP
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 04:25:14 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1487067971-10443-1-git-send-email-armbru@redhat.com>
-	<1487067971-10443-24-git-send-email-armbru@redhat.com>
-	<20170220201647.GL2372@work-vm>
-Date: Tue, 21 Feb 2017 10:25:05 +0100
-In-Reply-To: <20170220201647.GL2372@work-vm> (David Alan Gilbert's message of
-	"Mon, 20 Feb 2017 20:16:48 +0000")
-Message-ID: <874lznnbf2.fsf@dusky.pond.sub.org>
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cg6iD-0002LG-J8
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 04:26:24 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54341)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1cg6iD-0002Kr-A7
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 04:26:21 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1L9NoHQ134024
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 04:26:19 -0500
+Received: from e28smtp05.in.ibm.com (e28smtp05.in.ibm.com [125.16.236.5])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28r120h48h-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 04:26:18 -0500
+Received: from localhost
+	by e28smtp05.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Tue, 21 Feb 2017 14:56:15 +0530
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+In-Reply-To: <165844eb-e94c-1955-2fe3-59f0a3931094@twiddle.net>
+References: <1487585521-19445-1-git-send-email-nikunj@linux.vnet.ibm.com>
+	<1487585521-19445-8-git-send-email-nikunj@linux.vnet.ibm.com>
+	<165844eb-e94c-1955-2fe3-59f0a3931094@twiddle.net>
+Date: Tue, 21 Feb 2017 14:56:11 +0530
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 23/24] util/cutils: Change qemu_strtosz*()
- from int64_t to uint64_t
+Message-Id: <878tozdhe4.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH v1 07/10] target/ppc: update ov/ov32 for
+ nego
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,103 +42,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, "open list:Block layer core" <qemu-block@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+To: Richard Henderson <rth@twiddle.net>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+Richard Henderson <rth@twiddle.net> writes:
 
-> * Markus Armbruster (armbru@redhat.com) wrote:
->> This will permit its use in parse_option_size().
->> 
->> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> Cc: Eduardo Habkost <ehabkost@redhat.com> (maintainer:X86)
->> Cc: Kevin Wolf <kwolf@redhat.com> (supporter:Block layer core)
->> Cc: Max Reitz <mreitz@redhat.com> (supporter:Block layer core)
->> Cc: qemu-block@nongnu.org (open list:Block layer core)
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  hmp.c                 |  5 +++--
->>  hw/misc/ivshmem.c     |  2 +-
->>  include/qemu/cutils.h |  6 +++---
->>  monitor.c             |  4 ++--
->>  qapi/opts-visitor.c   |  6 ++----
->>  qemu-img.c            |  5 ++++-
->>  qemu-io-cmds.c        |  5 ++++-
->>  target/i386/cpu.c     |  4 ++--
->>  tests/test-cutils.c   | 40 ++++++++++++++++++++--------------------
->>  util/cutils.c         | 14 +++++++++-----
->>  10 files changed, 50 insertions(+), 41 deletions(-)
->> 
->> diff --git a/hmp.c b/hmp.c
->> index 9846fa4..5b9e461 100644
->> --- a/hmp.c
->> +++ b/hmp.c
->> @@ -1338,7 +1338,7 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+> On 02/20/2017 09:11 PM, Nikunj A Dadhania wrote:
+>> For 64-bit mode if the register RA contains 0x8000_0000_0000_0000, OV
+>> and OV32 are set to 1.
+>>
+>> For 32-bit mode if the register RA contains 0x8000_0000, OV and OV32 are
+>> set to 1.
+>>
+>> Use the tcg-ops for negation (neg_tl) and drop gen_op_arith_neg() as
+>> nego was the last user.
+>>
+>> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+> @@ -1488,7 +1480,20 @@ static void gen_neg(DisasContext *ctx)
+>>
+>>  static void gen_nego(DisasContext *ctx)
 >>  {
->>      const char *param = qdict_get_str(qdict, "parameter");
->>      const char *valuestr = qdict_get_str(qdict, "value");
->> -    int64_t valuebw = 0;
->> +    uint64_t valuebw = 0;
->>      long valueint = 0;
->>      Error *err = NULL;
->>      bool use_int_value = false;
->> @@ -1379,7 +1379,8 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
->>              case MIGRATION_PARAMETER_MAX_BANDWIDTH:
->>                  p.has_max_bandwidth = true;
->>                  ret = qemu_strtosz_mebi(valuestr, NULL, &valuebw);
->> -                if (ret < 0 || (size_t)valuebw != valuebw) {
->> +                if (ret < 0 || valuebw > INT64_MAX
->> +                    || (size_t)valuebw != valuebw) {
+>> -    gen_op_arith_neg(ctx, 1);
+>> +    TCGv t0 = tcg_temp_new();
+>> +    TCGv zero = tcg_const_tl(0);
+>> +
+>> +    if (NARROW_MODE(ctx)) {
+>> +        tcg_gen_xori_tl(t0, cpu_gpr[rA(ctx->opcode)], INT32_MIN);
+>> +    } else {
+>> +        tcg_gen_xori_tl(t0, cpu_gpr[rA(ctx->opcode)], (target_ulong)INT64_MIN);
+>> +    }
+>> +
+>> +    tcg_gen_setcond_tl(TCG_COND_EQ, cpu_ov, t0, zero);
+>> +    tcg_gen_mov_tl(cpu_ov32, cpu_ov);
+>> +    tcg_gen_neg_tl(cpu_gpr[rD(ctx->opcode)], cpu_gpr[rA(ctx->opcode)]);
+>> +    tcg_temp_free(t0);
+>> +    tcg_temp_free(zero);
+>>  }
 >
-> We should probably just turn all of the parameters into size_t's - although that's
-> more work and there's some int64_t's in qemu_file for no good reason.
+> Again, you're forgetting "nego.".  Don't try to simplify from gen_op_arith_subf 
+> by hand.
 
-I guess that's a comment on migration parameters, not on the strosz
-family of functions.
+The reason of the simplification was the interpretation of ov and ov32.
+I will add a code to compute the Rc.
 
->>                      error_setg(&err, "Invalid size %s", valuestr);
->>                      goto cleanup;
->>                  }
-[...]
->> diff --git a/util/cutils.c b/util/cutils.c
->> index 08effe6..888c0fd 100644
->> --- a/util/cutils.c
->> +++ b/util/cutils.c
->> @@ -207,7 +207,7 @@ static int64_t suffix_mul(char suffix, int64_t unit)
->>   */
->>  static int do_strtosz(const char *nptr, char **end,
->>                        const char default_suffix, int64_t unit,
->> -                      int64_t *result)
->> +                      uint64_t *result)
->>  {
->>      int retval;
->>      char *endptr;
->> @@ -237,7 +237,11 @@ static int do_strtosz(const char *nptr, char **end,
->>          retval = -EINVAL;
->>          goto out;
->>      }
->> -    if ((val * mul >= INT64_MAX) || val < 0) {
->> +    /*
->> +     * Values >= 0xfffffffffffffc00 overflow uint64_t after their trip
->> +     * through double (53 bits of precision).
->> +     */
->> +    if ((val * mul >= 0xfffffffffffffc00) || val < 0) {
->
-> It would be great to get rid of the double's at some point.
-
-Maybe.
-
-53 bits of precision are fine in practice, if a bit awkward to document
-and test once you bother to document and test (read: only now, 6 years
-four months after its creation).  long double would give us 64 bits at
-least on common hosts, but would be even more bothersome to document and
-test.
-
-Could try to parse both as integer and as floating-point and see which
-one accepts more characters.
-
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-Thanks!
-
-[...]
+Regards
+Nikunj
