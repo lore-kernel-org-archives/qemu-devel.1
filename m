@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cgAxO-0002G0-VN
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:58:19 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cgAy3-0002sE-NX
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:59:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cgAxO-0003jo-D6
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:58:19 -0500
-Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:35383)
+	(envelope-from <peter.maydell@linaro.org>) id 1cgAy3-00045X-5A
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:58:59 -0500
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:37544)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cgAxO-0003iC-75
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:58:18 -0500
-Received: by mail-wr0-x233.google.com with SMTP id s27so35717225wrb.2
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 05:58:18 -0800 (PST)
+	id 1cgAy2-00045I-Ul
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:58:59 -0500
+Received: by mail-wm0-x234.google.com with SMTP id v77so76169670wmv.0
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 05:58:58 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <87poibr6kv.fsf@dusky.pond.sub.org>
-References: <1487357795-52614-1-git-send-email-imammedo@redhat.com>
-	<CAFEAcA9JWzUEmGa2Wxd5xPE4dVknOKBkt=wMda7CAgxzrgOc+w@mail.gmail.com>
-	<20170220195500.332a4844@nial.brq.redhat.com>
-	<CAFEAcA-VAY8LM+8jE4B-L=0QdcY5FLvwmwGVbUhcXjnC9-AW+w@mail.gmail.com>
-	<20170221134416.5803b3e5@nial.brq.redhat.com>
-	<CAFEAcA-MggU5T1fO8GonkSpLF0SNe0jtygEHtEBkpWC8hyShSw@mail.gmail.com>
-	<87poibr6kv.fsf@dusky.pond.sub.org>
+In-Reply-To: <20170221115644.28264-1-stefanha@redhat.com>
+References: <20170221115644.28264-1-stefanha@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 Feb 2017 13:57:56 +0000
-Message-ID: <CAFEAcA-75VPiOzPauZO4ukYVYWffB1cu1-tsQs6Hs8m8Vf41OQ@mail.gmail.com>
+Date: Tue, 21 Feb 2017 13:58:37 +0000
+Message-ID: <CAFEAcA94ETsJjufq9dGq6+QUON2H+vFOyS45mwEtU=gOm0QC3Q@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [RFC 0/3] generalize parsing of cpu_model
+Subject: Re: [Qemu-devel] [PULL v2 00/24] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,16 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "patches@linaro.org" <patches@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 21 February 2017 at 13:56, Markus Armbruster <armbru@redhat.com> wrote:
-> -global is a qdev thing.
+On 21 February 2017 at 11:56, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> The following changes since commit 56f9e46b841c7be478ca038d8d4085d776ab4b0d:
+>
+>   Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2017-02-20' into staging (2017-02-20 17:42:47 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/stefanha/qemu.git tags/block-pull-request
+>
+> for you to fetch changes up to a7b91d35bab97a2d3e779d0c64c9b837b52a6cf7:
+>
+>   coroutine-lock: make CoRwlock thread-safe and fair (2017-02-21 11:39:40 +0000)
+>
+> ----------------------------------------------------------------
+> Pull request
+>
+> v2:
+>  * Rebased to resolve scsi conflicts
+>
+> ----------------------------------------------------------------
 
-...which reminds me to ask: is there any hope for unifying
-our properties so we don't have both "qdev properties" and
-"qom properties" or are we doomed to two distinct sets of
-APIs forever?
+Applied, thanks.
 
-thanks
 -- PMM
