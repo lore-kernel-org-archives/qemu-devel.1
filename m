@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48518)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cg9ef-0007k7-6m
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:34:56 -0500
+	(envelope-from <armbru@redhat.com>) id 1cg9ei-0007mR-1w
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:34:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cg9ed-00086E-9K
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:34:53 -0500
+	(envelope-from <armbru@redhat.com>) id 1cg9ed-000869-80
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:34:56 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 21 Feb 2017 13:34:31 +0100
-Message-Id: <1487680479-15132-4-git-send-email-armbru@redhat.com>
+Date: Tue, 21 Feb 2017 13:34:33 +0100
+Message-Id: <1487680479-15132-6-git-send-email-armbru@redhat.com>
 In-Reply-To: <1487680479-15132-1-git-send-email-armbru@redhat.com>
 References: <1487680479-15132-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 03/11] hw: Default -drive to if=none instead of
- ide when ide cannot work
+Subject: [Qemu-devel] [PULL 05/11] hw/arm/highbank: Default -drive to if=ide
+ instead of if=scsi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,98 +21,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xensource.com, Michael Walle <michael@walle.cc>, Laurent Vivier <laurent@vivier.eu>, Anthony Green <green@moxielogic.com>, Jia Liu <proljc@gmail.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Magnus Damm <magnus.damm@gmail.com>, Fabien Chouteau <chouteau@adacore.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Max Filippov <jcmvbkbc@gmail.com>
+Cc: Rob Herring <robh@kernel.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
 
-Block backends defined with -drive if=ide are meant to be picked up by
-machine initialization code: a suitable frontend gets created and
-wired up automatically.
+These machines have no onboard SCSI HBA, and no way to plug one.
+-drive if=scsi therefore cannot work.  They do have an onboard IDE
+controller (sysbus-ahci), but fail to honor if=ide.
 
-if=ide drives not picked up that way can still be used with -device as
-if they had if=none, but that's unclean and best avoided.  Unused ones
-produce an "Orphaned drive without device" warning.
+Change their default to if=ide, and add a TODO comment on what needs
+to be done to actually honor -drive if=ide.
 
--drive parameter "if" is optional, and the default depends on the
-machine type.  If a machine type doesn't specify a default, the
-default is "ide".
-
-Many machine types implicitly default to if=ide that way, even though
-they don't actually have an IDE controller.  This makes no sense.
-
-Change the implicit default to if=none.  Affected machines:
-
-* all targets: none
-* aarch64/arm: akita ast2500 canon cheetah collie connex imx25
-  integratorcp kzm lm3s6965evb lm3s811evb mainstone musicpal n800 n810
-  netduino2 nuri palmetto realview romulus sabrelite smdkc210 sx1 sx1
-  verdex z2
-* cris: axis-dev88
-* i386/x86_64: xenpv
-* lm32: lm32-evr lm32-uclinux milkymist
-* m68k: an5206 dummy mcf5208evb
-* microblaze/microblazeel: petalogix-ml605 petalogix-s3adsp1800
-* mips/mips64/mips64el/mipsel: mipssim
-* moxie: moxiesim
-* or32: or32-sim
-* ppc/ppc64/ppcemb: bamboo ref405ep taihu virtex-ml507
-* ppc/ppc64: mpc8544ds ppce500
-* sh4/sh4eb: shix
-* sparc: leon3_generic
-* sparc64: niagara
-* tricore: tricore_testboard
-* unicore32: puv3
-* xtensa/xtensaeb: kc705 lx200 lx60 ml605 sim
-
-None of these machines have an IDE controller, let alone code to
-honor if=ide.
-
+Cc: Rob Herring <robh@kernel.org>
 Cc: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-arm@nongnu.org
-Cc: Edgar E. Iglesias <edgar.iglesias@gmail.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
-Cc: xen-devel@lists.xensource.com
-Cc: Michael Walle <michael@walle.cc>
-Cc: Laurent Vivier <laurent@vivier.eu>
-Cc: Anthony Green <green@moxielogic.com>
-Cc: Jia Liu <proljc@gmail.com>
-Cc: Alexander Graf <agraf@suse.de>
-Cc: qemu-ppc@nongnu.org
-Cc: Magnus Damm <magnus.damm@gmail.com>
-Cc: Fabien Chouteau <chouteau@adacore.com>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Artyom Tarasenko <atar4qemu@gmail.com>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Cc: Guan Xuetao <gxt@mprc.pku.edu.cn>
-Cc: Max Filippov <jcmvbkbc@gmail.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Acked-By: Artyom Tarasenko <atar4qemu@gmail.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1487153147-11530-4-git-send-email-armbru@redhat.com>
+Message-Id: <1487153147-11530-6-git-send-email-armbru@redhat.com>
 ---
- include/sysemu/blockdev.h | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ hw/arm/highbank.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/include/sysemu/blockdev.h b/include/sysemu/blockdev.h
-index 16432f3..351a039 100644
---- a/include/sysemu/blockdev.h
-+++ b/include/sysemu/blockdev.h
-@@ -19,12 +19,11 @@ void blockdev_auto_del(BlockBackend *blk);
- typedef enum {
-     IF_DEFAULT = -1,            /* for use with drive_add() only */
-     /*
--     * IF_IDE must be zero, because we want MachineClass member
--     * block_default_type to default-initialize to IF_IDE
-+     * IF_NONE must be zero, because we want MachineClass member
-+     * block_default_type to default-initialize to IF_NONE
-      */
--    IF_IDE = 0,
--    IF_NONE,
--    IF_SCSI, IF_FLOPPY, IF_PFLASH, IF_MTD, IF_SD, IF_VIRTIO, IF_XEN,
-+    IF_NONE = 0,
-+    IF_IDE, IF_SCSI, IF_FLOPPY, IF_PFLASH, IF_MTD, IF_SD, IF_VIRTIO, IF_XEN,
-     IF_COUNT
- } BlockInterfaceType;
+diff --git a/hw/arm/highbank.c b/hw/arm/highbank.c
+index 80e5fd4..0a4508c 100644
+--- a/hw/arm/highbank.c
++++ b/hw/arm/highbank.c
+@@ -363,6 +363,8 @@ static void calxeda_init(MachineState *machine, enum cxmachines machine_id)
+         sysbus_connect_irq(SYS_BUS_DEVICE(dev), 2, pic[82]);
+     }
+ 
++    /* TODO create and connect IDE devices for ide_drive_get() */
++
+     highbank_binfo.ram_size = ram_size;
+     highbank_binfo.kernel_filename = kernel_filename;
+     highbank_binfo.kernel_cmdline = kernel_cmdline;
+@@ -405,7 +407,8 @@ static void highbank_class_init(ObjectClass *oc, void *data)
+ 
+     mc->desc = "Calxeda Highbank (ECX-1000)";
+     mc->init = highbank_init;
+-    mc->block_default_type = IF_SCSI;
++    mc->block_default_type = IF_IDE;
++    mc->units_per_default_bus = 1;
+     mc->max_cpus = 4;
+ }
+ 
+@@ -421,7 +424,8 @@ static void midway_class_init(ObjectClass *oc, void *data)
+ 
+     mc->desc = "Calxeda Midway (ECX-2000)";
+     mc->init = midway_init;
+-    mc->block_default_type = IF_SCSI;
++    mc->block_default_type = IF_IDE;
++    mc->units_per_default_bus = 1;
+     mc->max_cpus = 4;
+ }
  
 -- 
 2.7.4
