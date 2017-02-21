@@ -1,15 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cgD57-0004X5-04
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:14:26 -0500
+	(envelope-from <mst@redhat.com>) id 1cgD7m-0006zZ-PJ
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:17:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cgD53-00066a-Ll
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:14:24 -0500
-From: Alberto Garcia <berto@igalia.com>
-Date: Tue, 21 Feb 2017 18:13:54 +0200
-Message-Id: <20170221161354.22204-1-berto@igalia.com>
-Subject: [Qemu-devel] [PATCH] block: Remove unnecessary cases of
- error_propagate()
+	(envelope-from <mst@redhat.com>) id 1cgD7k-00078i-RY
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:17:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60316)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cgD7k-00078Q-I7
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:17:08 -0500
+Date: Tue, 21 Feb 2017 18:17:06 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170221180947-mutt-send-email-mst@kernel.org>
+References: <918524f7-26cf-3fce-d9e3-7316ca69285b@redhat.com>
+	<20170220102304.GC2372@work-vm>
+	<3fb8499e-884c-99e8-b295-3d4603921075@redhat.com>
+	<20170220201923.GM2372@work-vm>
+	<d51d4a21-5558-d4e5-5b7e-08f729fc1a5e@redhat.com>
+	<0488d90c-f73c-916c-f84c-a1ffd2bad592@redhat.com>
+	<20170221034053-mutt-send-email-mst@kernel.org>
+	<5676cac1-b161-0500-e7ed-e93c273cc178@redhat.com>
+	<20170221161048-mutt-send-email-mst@kernel.org>
+	<9f52e1a6-9ed0-5736-6641-100c332899ab@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9f52e1a6-9ed0-5736-6641-100c332899ab@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v8 4/8] ACPI: Add Virtual Machine
+ Generation ID support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,205 +36,220 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, ben@skyportsystems.com
 
-There are several cases of local Error variables that are never used
-for checking actual errors:
+On Tue, Feb 21, 2017 at 05:08:40PM +0100, Laszlo Ersek wrote:
+> On 02/21/17 15:14, Michael S. Tsirkin wrote:
+> > On Tue, Feb 21, 2017 at 10:58:05AM +0100, Laszlo Ersek wrote:
+> >> On 02/21/17 02:43, Michael S. Tsirkin wrote:
+> >>> On Mon, Feb 20, 2017 at 09:55:40PM +0100, Laszlo Ersek wrote:
+> >>>> On 02/20/17 21:45, Eric Blake wrote:
+> >>>>> On 02/20/2017 02:19 PM, Dr. David Alan Gilbert wrote:
+> >>>>>> * Eric Blake (eblake@redhat.com) wrote:
+> >>>>>>> On 02/20/2017 04:23 AM, Dr. David Alan Gilbert wrote:
+> >>>>>>>> * Laszlo Ersek (lersek@redhat.com) wrote:
+> >>>>>>>>> CC Dave
+> >>>>>>>>
+> >>>>>>>> This isn't an area I really understand; but if I'm
+> >>>>>>>> reading this right then 
+> >>>>>>>>    vmgenid is stored in fw_cfg?
+> >>>>>>>>    fw_cfg isn't migrated
+> >>>>>>>>
+> >>>>>>>> So why should any changes to it get migrated, except if it's already
+> >>>>>>>> been read by the guest (and if the guest reads it again aftwards what's
+> >>>>>>>> it expected to read?)
+> >>>>>>>
+> >>>>>>> Why are we expecting it to change on migration?  You want a new value
+> >>>>>>
+> >>>>>> I'm not; I was asking why a change made prior to migration would be
+> >>>>>> preserved across migration.
+> >>>>>
+> >>>>> Okay, so you're asking what happens if the source requests the vmgenid
+> >>>>> device, and sets an id, but the destination of the migration does not
+> >>>>> request anything
+> >>>>
+> >>>> This should never happen, as it means different QEMU command lines on
+> >>>> source vs. target hosts. (Different as in "incorrectly different".)
+> >>>>
+> >>>> Dave writes, "a change made prior to migration". Change made to what?
+> >>>>
+> >>>> - the GUID cannot be changed via the monitor once QEMU has been started.
+> >>>> We dropped the monitor command for that, due to lack of a good use case,
+> >>>> and due to lifecycle complexities. We have figured out a way to make it
+> >>>> safe, but until there's a really convincing use case, we shouldn't add
+> >>>> that complexity.
+> >>>
+> >>> True but we might in the future, and it seems prudent to make
+> >>> migration stream future-proof for that.
+> >>
+> >> It is already.
+> >>
+> >> The monitor command, if we add it, can be implemented incrementally. I
+> >> described it as "approach (iii)" elsewhere in the thread. This is a more
+> >> detailed recap:
+> >>
+> >> - introduce a new device property (internal only), such as
+> >>   "x-enable-set-vmgenid". Make it reflect whether a given machine type
+> >>   supports the monitor command.
+> > 
+> > This is the part we can avoid at no real cost just
+> > by making sure the guid is migrated.
+> > 
+> > 
+> >> - change the /etc/vmgenid_guid fw_cfg blob from callback-less to one
+> >>   with a selection callback
+> >>
+> >> - add a new boolean latch to the vmgenid device, called
+> >>   "guid_blob_selected" or something similar
+> >>
+> >> - the reset handler sets the latch to FALSE
+> >>   (NB: the reset handler already sets /etc/vmgenid_addr to zero)
+> >>
+> >> - the select callback for /etc/vmgenid_guid sets the latch to TRUE
+> >>
+> >> - the latch is added to the migration stream as a subsection *if*
+> >>   x-enable-set-vmgenid is TRUE
+> >>
+> >> - the set-vmgenid monitor command checks all three of:
+> >>   x-enable-set-vmgenid, the latch, and the contents of
+> >>   /etc/vmgenid_addr:
+> >>
+> >>   - if x-enable-set-vmgenid is FALSE, the monitor command returns
+> >>     QERR_UNSUPPORTED (this is a generic error class, with an
+> >>     "unsupported" error message). Otherwise,
+> >>
+> >>   - if the latch is TRUE *and* /etc/vmgenid_addr is zero, then the
+> >>     guest firmware has executed (or started executing) ALLOCATE for
+> >>     /etc/vmgenid_guid, but it has not executed WRITE_POINTER yet.
+> >>     In this case updating the VMGENID from the monitor is unsafe
+> >>     (we cannot guarantee informing the guest successfully), so in this
+> >>     case the monitor command fails with ERROR_CLASS_DEVICE_NOT_ACTIVE.
+> >>     The caller should simply try a bit later. (By which time the
+> >>     firmware will likely have programmed /etc/vmgenid_addr.)
+> > 
+> > This makes no sense to me. Just update it in qemu memory
+> > and write when guest asks for it.
+> 
+> I designed the above (sorry if "designed" is a word too pompous for
+> this) quite explicitly to address your concern as to what would happen
+> if someone tried to massage the GUID via the monitor while the firmware
+> was between ALLOCATE and WRITE_POINTER.
+> 
+> Also, we don't know when the guest "asks" for the GUID (in guest RAM).
+> It just evaluates ADDR (maybe always, maybe only once, at guest driver
+> startup), and then it just looks at RAM whenever it wants to.
+> 
+> This is why this idea seeks to track the guest's state -- if the guest
+> is before ALLOCATE, it's okay to update the fw_cfg blob, if it is
+> between ALLOCATE and WRITE_POINTER, reject the monitor command
+> (temporarily), and if the guest is after WRITE_POINTER, update the RAM
+> and inject the SCI.
+> 
+> We cannot see *exactly* when the guest has just finished writing the
+> address. We have only select callbacks for fw_cfg items, not write
+> callbacks. And a select callback is no good for the address blob,
+> because it would be invoked *before* the guest writes the address.
+> 
+> We discussed these facts several days (weeks?) and several iterations
+> ago. The longer term remedy we came up was the above design. The shorter
+> term remedy was to drop the "set" monitor command, because we couldn't
+> figure out a management layer use case for that monitor command.
+> 
+> If you now (at v8) insist to future proof the design for a potential
+> "set" monitor command, that's exactly the same as if you were requiring
+> Ben to implement the monitor command right now. Except this is worse,
+> because we dropped the monitor command in v6 (from v5), and you didn't
+> protest.
 
-   ret = some_call(params, &local_err);
-   if (ret < 0) {
-       error_propagate(errp, local_err);
-       goto fail;
-   }
+I'm merging this as-is but I think the concerns are overblown.
+We have many fields which devices DMA into guest memory
+and changing them is easy.
 
-In these cases there's no need for local_err or error_propagate(), and
-we can use errp directly instead.
+It should be a simple matter to update guid copy in
+fw cfg blob, and *if we have the address*, DMA there
+and send SCI.
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- block.c    |  4 +---
- blockdev.c | 53 +++++++++++++++--------------------------------------
- 2 files changed, 16 insertions(+), 41 deletions(-)
+Yes we don't know when does guest look at guid but that
+is simply up to guest. It needs to look at it at the
+right time.
 
-diff --git a/block.c b/block.c
-index 743c349100..86e1023b96 100644
---- a/block.c
-+++ b/block.c
-@@ -2088,7 +2088,6 @@ int bdrv_reopen_multiple(AioContext *ctx, BlockReopenQueue *bs_queue, Error **er
- {
-     int ret = -1;
-     BlockReopenQueueEntry *bs_entry, *next;
--    Error *local_err = NULL;
- 
-     assert(bs_queue != NULL);
- 
-@@ -2097,8 +2096,7 @@ int bdrv_reopen_multiple(AioContext *ctx, BlockReopenQueue *bs_queue, Error **er
-     aio_context_acquire(ctx);
- 
-     QSIMPLEQ_FOREACH(bs_entry, bs_queue, entry) {
--        if (bdrv_reopen_prepare(&bs_entry->state, bs_queue, &local_err)) {
--            error_propagate(errp, local_err);
-+        if (bdrv_reopen_prepare(&bs_entry->state, bs_queue, errp)) {
-             goto cleanup;
-         }
-         bs_entry->prepared = true;
-diff --git a/blockdev.c b/blockdev.c
-index db82ac97e5..7db8248dad 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2221,7 +2221,6 @@ void qmp_eject(bool has_device, const char *device,
-                bool has_id, const char *id,
-                bool has_force, bool force, Error **errp)
- {
--    Error *local_err = NULL;
-     int rc;
- 
-     if (!has_force) {
-@@ -2230,12 +2229,10 @@ void qmp_eject(bool has_device, const char *device,
- 
-     rc = do_open_tray(has_device ? device : NULL,
-                       has_id ? id : NULL,
--                      force, &local_err);
-+                      force, errp);
-     if (rc && rc != -ENOSYS) {
--        error_propagate(errp, local_err);
-         return;
-     }
--    error_free(local_err);
- 
-     qmp_x_blockdev_remove_medium(has_device, device, has_id, id, errp);
- }
-@@ -2324,20 +2321,13 @@ void qmp_blockdev_open_tray(bool has_device, const char *device,
-                             bool has_force, bool force,
-                             Error **errp)
- {
--    Error *local_err = NULL;
--    int rc;
--
-     if (!has_force) {
-         force = false;
-     }
--    rc = do_open_tray(has_device ? device : NULL,
--                      has_id ? id : NULL,
--                      force, &local_err);
--    if (rc && rc != -ENOSYS && rc != -EINPROGRESS) {
--        error_propagate(errp, local_err);
--        return;
--    }
--    error_free(local_err);
-+
-+    do_open_tray(has_device ? device : NULL,
-+                 has_id ? id : NULL,
-+                 force, errp);
- }
- 
- void qmp_blockdev_close_tray(bool has_device, const char *device,
-@@ -2564,13 +2554,10 @@ void qmp_blockdev_change_medium(bool has_device, const char *device,
- 
-     rc = do_open_tray(has_device ? device : NULL,
-                       has_id ? id : NULL,
--                      false, &err);
-+                      false, errp);
-     if (rc && rc != -ENOSYS) {
--        error_propagate(errp, err);
-         goto fail;
-     }
--    error_free(err);
--    err = NULL;
- 
-     qmp_x_blockdev_remove_medium(has_device, device, has_id, id, &err);
-     if (err) {
-@@ -3011,7 +2998,6 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
-     BlockDriverState *iter;
-     BlockDriverState *base_bs, *top_bs;
-     AioContext *aio_context;
--    Error *local_err = NULL;
-     /* This will be part of the QMP command, if/when the
-      * BlockdevOnError change for blkmirror makes it in
-      */
-@@ -3026,15 +3012,14 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
-      *  live commit feature versions; for this to work, we must make sure to
-      *  perform the device lookup before any generic errors that may occur in a
-      *  scenario in which all optional arguments are omitted. */
--    bs = qmp_get_root_bs(device, &local_err);
-+    bs = qmp_get_root_bs(device, errp);
-     if (!bs) {
-         bs = bdrv_lookup_bs(device, device, NULL);
--        if (!bs) {
--            error_free(local_err);
-+        if (!bs && errp) {
-+            error_free(*errp);
-+            *errp = NULL;
-             error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
-                       "Device '%s' not found", device);
--        } else {
--            error_propagate(errp, local_err);
-         }
-         return;
-     }
-@@ -3095,7 +3080,7 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
-         }
-         commit_active_start(has_job_id ? job_id : NULL, bs, base_bs,
-                             BLOCK_JOB_DEFAULT, speed, on_error, NULL, NULL,
--                            &local_err, false);
-+                            errp, false);
-     } else {
-         BlockDriverState *overlay_bs = bdrv_find_overlay(bs, top_bs);
-         if (bdrv_op_is_blocked(overlay_bs, BLOCK_OP_TYPE_COMMIT_TARGET, errp)) {
-@@ -3103,11 +3088,7 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
-         }
-         commit_start(has_job_id ? job_id : NULL, bs, base_bs, top_bs, speed,
-                      on_error, has_backing_file ? backing_file : NULL,
--                     &local_err);
--    }
--    if (local_err != NULL) {
--        error_propagate(errp, local_err);
--        goto out;
-+                     errp);
-     }
- 
- out:
-@@ -3447,10 +3428,9 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
-             goto out;
-         }
- 
--        to_replace_bs = check_to_replace_node(bs, arg->replaces, &local_err);
-+        to_replace_bs = check_to_replace_node(bs, arg->replaces, errp);
- 
-         if (!to_replace_bs) {
--            error_propagate(errp, local_err);
-             goto out;
-         }
- 
-@@ -3527,9 +3507,8 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
-                            arg->has_on_source_error, arg->on_source_error,
-                            arg->has_on_target_error, arg->on_target_error,
-                            arg->has_unmap, arg->unmap,
--                           &local_err);
-+                           errp);
-     bdrv_unref(target_bs);
--    error_propagate(errp, local_err);
- out:
-     aio_context_release(aio_context);
- }
-@@ -3551,7 +3530,6 @@ void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
-     BlockDriverState *target_bs;
-     AioContext *aio_context;
-     BlockMirrorBackingMode backing_mode = MIRROR_LEAVE_BACKING_CHAIN;
--    Error *local_err = NULL;
- 
-     bs = qmp_get_root_bs(device, errp);
-     if (!bs) {
-@@ -3576,8 +3554,7 @@ void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
-                            has_on_source_error, on_source_error,
-                            has_on_target_error, on_target_error,
-                            true, true,
--                           &local_err);
--    error_propagate(errp, local_err);
-+                           errp);
- 
-     aio_context_release(aio_context);
- }
--- 
-2.11.0
+So the implementation is really easy I think.
+
+The real problem is that we will have migrated guid
+and command line guid and which one wins if they conflict.
+And that is IMO something we need to figure out now and
+not later.
+
+
+
+
+> > 
+> > 
+> >>     Libvirt can recognize this error specifically, because it is not the
+> >>     generic error class. ERROR_CLASS_DEVICE_NOT_ACTIVE stands for
+> >>     "EAGAIN", practically, in this case.
+> >>
+> >>   - Otherwise -- meaning latch is FALSE *or* /etc/vmgenid_addr is
+> >>     nonzero, that is, the guest has either not run ALLOCATE since
+> >>     reset, *or* it has, but it has also run WRITE_POINTER):
+> >>
+> >>     - refresh the GUID within the fw_cfg blob for /etc/vmgenid_guid
+> >>       in-place -- the guest will see this whenever it runs ALLOCATE for
+> >>       /etc/vmgenid_guid, *AND*
+> >>
+> >>     - if /etc/vmgenid_addr is not zero, then update the guest (that is,
+> >>       RAM write + SCI)
+> >>
+> >> Thanks
+> >> Laszlo
+> > 
+> > Seems way more painful than it has to be. Just migrate the guid
+> > and then management can write it at any time.
+> 
+> Yes, management would be able to do that, but we won't know when to
+> expose it to the guest. (Because, again, we don't exactly know when the
+> guest looks at the GUID in RAM, and if the address is not configured
+> yet, we cannot put the GUID anywhere in RAM.)
+> 
+> Do you intend to block v8 over this?
+> 
+> Thanks
+> Laszlo
+> 
+> > 
+> > 
+> >>>
+> >>>> - the address of the GUID is changed (the firmware programs it from
+> >>>> "zero" to an actual address, in a writeable fw_cfg file), and that piece
+> >>>> of info is explicitly migrated, as part of the vmgenid device's vmsd.
+> >>>>
+> >>>> Thanks
+> >>>> Laszlo
+> >>>>
+> >>>>
+> >>>>> - how does the guest on the destination see the same id
+> >>>>> as was in place on the source at the time migration started.
+> >>>>>
+> >>>>>>
+> >>>>>>
+> >>>>>>> when you load state from disk (you don't know how many times the same
+> >>>>>>> state has been loaded previously, so each load is effectively forking
+> >>>>>>> the VM and you want a different value), but for a single live migration,
+> >>>>>>> you aren't forking the VM and don't need a new generation ID.
+> >>>>>>>
+> >>>>>>> I guess it all boils down to what command line you're using: if libvirt
+> >>>>>>> is driving a live migration, it will request the same UUID in the
+> >>>>>>> command line of the destination as what is on the source; while if
+> >>>>>>> libvirt is loading from a [managed]save to restore state from a file, it
+> >>>>>>> will either request a new UUID directly or request auto to let qemu
+> >>>>>>> generate the new id.
+> >>>>>>
+> >>>>>> Hmm now I've lost it a bit; I thought we would preserve the value
+> >>>>>> transmitted from the source, not the value on the command line of the destination.
+> >>>>>
+> >>>>> I guess I'm trying to figure out whether libvirt MUST read the current
+> >>>>> id and explicitly tell the destination of migration to reuse that id, or
+> >>>>> if libvirt can omit the id on migration and everything just works
+> >>>>> because the id was migrated from the source.
+> >>>>>
