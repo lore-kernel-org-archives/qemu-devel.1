@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cg8j9-0005H4-Ga
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:35:28 -0500
+	(envelope-from <alistair23@gmail.com>) id 1cg8jQ-0005TT-3q
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:35:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cg8j8-0007dz-Cz
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:35:27 -0500
+	(envelope-from <alistair23@gmail.com>) id 1cg8jJ-0007kD-FE
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:35:44 -0500
 MIME-Version: 1.0
-In-Reply-To: <5ff4146f-3ec0-615e-ff57-6df1041662ba@amsat.org>
+In-Reply-To: <e6ebfe0d-c866-e28e-2366-d55ac5d77d47@amsat.org>
 References: <1487604965-23220-1-git-send-email-peter.maydell@linaro.org>
-	<1487604965-23220-12-git-send-email-peter.maydell@linaro.org>
-	<5ff4146f-3ec0-615e-ff57-6df1041662ba@amsat.org>
+	<1487604965-23220-2-git-send-email-peter.maydell@linaro.org>
+	<e6ebfe0d-c866-e28e-2366-d55ac5d77d47@amsat.org>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 21 Feb 2017 03:34:52 -0800
-Message-ID: <CAKmqyKPd-GZ8fhBQkpP4KQc0EOiufu0OXBpzCr1gXzCMAuKvSA@mail.gmail.com>
+Date: Tue, 21 Feb 2017 03:35:02 -0800
+Message-ID: <CAKmqyKMBX6QYDHDk2ZYp6qza8JKKa5SkHveTH1Oxe+ebbUU1Zw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 11/11] stm32f205: Rename 'nvic'
- local to 'armv7m'
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 01/11] armv7m: Abstract out the
+ "load kernel" code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,13 +28,16 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Michael Davidsaver <mdavidsaver@gmail.com>, Patch Tracking <patches@linaro.org>
 
-On Mon, Feb 20, 2017 at 9:46 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+On Mon, Feb 20, 2017 at 8:23 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
 rg> wrote:
-> On 02/20/2017 12:36 PM, Peter Maydell wrote:
+> On 02/20/2017 12:35 PM, Peter Maydell wrote:
 >>
->> The local variable 'nvic' in stm32f205_soc_realize() no longer
->> holds a direct pointer to the NVIC device; it is a pointer to
->> the ARMv7M container object. Rename it 'armv7m' accordingly.
+>> Abstract the "load kernel" code out of armv7m_init() into its own
+>> function.  This includes the registration of the CPU reset function,
+>> to parallel how we handle this for A profile cores.
+>>
+>> We make the function public so that boards which choose to
+>> directly instantiate an ARMv7M device object can call it.
 >>
 >> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 >
@@ -50,94 +53,92 @@ Alistair
 >
 >
 >> ---
->>  hw/arm/stm32f205_soc.c | 18 +++++++++---------
->>  1 file changed, 9 insertions(+), 9 deletions(-)
+>>  include/hw/arm/arm.h | 12 ++++++++++++
+>>  hw/arm/armv7m.c      | 23 ++++++++++++++++++-----
+>>  2 files changed, 30 insertions(+), 5 deletions(-)
 >>
->> diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
->> index e6bd73a..6e1260d 100644
->> --- a/hw/arm/stm32f205_soc.c
->> +++ b/hw/arm/stm32f205_soc.c
->> @@ -85,7 +85,7 @@ static void stm32f205_soc_initfn(Object *obj)
->>  static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
->>  {
->>      STM32F205State *s =3D STM32F205_SOC(dev_soc);
->> -    DeviceState *dev, *nvic;
->> +    DeviceState *dev, *armv7m;
->>      SysBusDevice *busdev;
->>      Error *err =3D NULL;
->>      int i;
->> @@ -113,9 +113,9 @@ static void stm32f205_soc_realize(DeviceState
->> *dev_soc, Error **errp)
->>      vmstate_register_ram_global(sram);
->>      memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, sram)=
-;
+>> diff --git a/include/hw/arm/arm.h b/include/hw/arm/arm.h
+>> index c175c0e..a3f79d3 100644
+>> --- a/include/hw/arm/arm.h
+>> +++ b/include/hw/arm/arm.h
+>> @@ -26,6 +26,18 @@ typedef enum {
+>>  /* armv7m.c */
+>>  DeviceState *armv7m_init(MemoryRegion *system_memory, int mem_size, int
+>> num_irq,
+>>                        const char *kernel_filename, const char
+>> *cpu_model);
+>> +/**
+>> + * armv7m_load_kernel:
+>> + * @cpu: CPU
+>> + * @kernel_filename: file to load
+>> + * @mem_size: mem_size: maximum image size to load
+>> + *
+>> + * Load the guest image for an ARMv7M system. This must be called by
+>> + * any ARMv7M board, either directly or via armv7m_init(). (This is
+>> + * necessary to ensure that the CPU resets correctly on system reset,
+>> + * as well as for kernel loading.)
+>> + */
+>> +void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int
+>> mem_size);
 >>
->> -    nvic =3D DEVICE(&s->armv7m);
->> -    qdev_prop_set_uint32(nvic, "num-irq", 96);
->> -    qdev_prop_set_string(nvic, "cpu-model", s->cpu_model);
->> +    armv7m =3D DEVICE(&s->armv7m);
->> +    qdev_prop_set_uint32(armv7m, "num-irq", 96);
->> +    qdev_prop_set_string(armv7m, "cpu-model", s->cpu_model);
->>      object_property_set_link(OBJECT(&s->armv7m),
->> OBJECT(get_system_memory()),
->>                                       "memory", &error_abort);
->>      object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err=
-);
->> @@ -133,7 +133,7 @@ static void stm32f205_soc_realize(DeviceState
->> *dev_soc, Error **errp)
->>      }
->>      busdev =3D SYS_BUS_DEVICE(dev);
->>      sysbus_mmio_map(busdev, 0, 0x40013800);
->> -    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(nvic, 71));
->> +    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, 71));
+>>  /*
+>>   * struct used as a parameter of the arm_load_kernel machine init
+>> diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
+>> index 0c9ca7b..b2cc6e9 100644
+>> --- a/hw/arm/armv7m.c
+>> +++ b/hw/arm/armv7m.c
+>> @@ -176,10 +176,6 @@ DeviceState *armv7m_init(MemoryRegion *system_memor=
+y,
+>> int mem_size, int num_irq,
+>>      ARMCPU *cpu;
+>>      CPUARMState *env;
+>>      DeviceState *nvic;
+>> -    int image_size;
+>> -    uint64_t entry;
+>> -    uint64_t lowaddr;
+>> -    int big_endian;
 >>
->>      /* Attach UART (uses USART registers) and USART controllers */
->>      for (i =3D 0; i < STM_NUM_USARTS; i++) {
->> @@ -147,7 +147,7 @@ static void stm32f205_soc_realize(DeviceState
->> *dev_soc, Error **errp)
+>>      if (cpu_model =3D=3D NULL) {
+>>         cpu_model =3D "cortex-m3";
+>> @@ -199,6 +195,16 @@ DeviceState *armv7m_init(MemoryRegion *system_memor=
+y,
+>> int mem_size, int num_irq,
+>>      qdev_init_nofail(nvic);
+>>      sysbus_connect_irq(SYS_BUS_DEVICE(nvic), 0,
+>>                         qdev_get_gpio_in(DEVICE(cpu), ARM_CPU_IRQ));
+>> +    armv7m_load_kernel(cpu, kernel_filename, mem_size);
+>> +    return nvic;
+>> +}
+>> +
+>> +void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int
+>> mem_size)
+>> +{
+>> +    int image_size;
+>> +    uint64_t entry;
+>> +    uint64_t lowaddr;
+>> +    int big_endian;
+>>
+>>  #ifdef TARGET_WORDS_BIGENDIAN
+>>      big_endian =3D 1;
+>> @@ -224,8 +230,15 @@ DeviceState *armv7m_init(MemoryRegion *system_memor=
+y,
+>> int mem_size, int num_irq,
 >>          }
->>          busdev =3D SYS_BUS_DEVICE(dev);
->>          sysbus_mmio_map(busdev, 0, usart_addr[i]);
->> -        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(nvic,
->> usart_irq[i]));
->> +        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m,
->> usart_irq[i]));
 >>      }
 >>
->>      /* Timer 2 to 5 */
->> @@ -161,7 +161,7 @@ static void stm32f205_soc_realize(DeviceState
->> *dev_soc, Error **errp)
->>          }
->>          busdev =3D SYS_BUS_DEVICE(dev);
->>          sysbus_mmio_map(busdev, 0, timer_addr[i]);
->> -        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(nvic,
->> timer_irq[i]));
->> +        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m,
->> timer_irq[i]));
->>      }
->>
->>      /* ADC 1 to 3 */
->> @@ -173,7 +173,7 @@ static void stm32f205_soc_realize(DeviceState
->> *dev_soc, Error **errp)
->>          return;
->>      }
->>      qdev_connect_gpio_out(DEVICE(s->adc_irqs), 0,
->> -                          qdev_get_gpio_in(nvic, ADC_IRQ));
->> +                          qdev_get_gpio_in(armv7m, ADC_IRQ));
->>
->>      for (i =3D 0; i < STM_NUM_ADCS; i++) {
->>          dev =3D DEVICE(&(s->adc[i]));
->> @@ -198,7 +198,7 @@ static void stm32f205_soc_realize(DeviceState
->> *dev_soc, Error **errp)
->>          }
->>          busdev =3D SYS_BUS_DEVICE(dev);
->>          sysbus_mmio_map(busdev, 0, spi_addr[i]);
->> -        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(nvic,
->> spi_irq[i]));
->> +        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m,
->> spi_irq[i]));
->>      }
+>> +    /* CPU objects (unlike devices) are not automatically reset on syst=
+em
+>> +     * reset, so we must always register a handler to do so. Unlike
+>> +     * A-profile CPUs, we don't need to do anything special in the
+>> +     * handler to arrange that it starts correctly.
+>> +     * This is arguably the wrong place to do this, but it matches the
+>> +     * way A-profile does it. Note that this means that every M profile
+>> +     * board must call this function!
+>> +     */
+>>      qemu_register_reset(armv7m_reset, cpu);
+>> -    return nvic;
 >>  }
 >>
+>>  static Property bitband_properties[] =3D {
 >>
 >
