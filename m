@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cgGpG-0007RC-MW
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 15:14:20 -0500
+	(envelope-from <armbru@redhat.com>) id 1cgGpI-0007Tc-TT
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 15:14:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cgGpC-0008WP-OZ
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 15:14:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41596)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cgGpC-0008V6-Er
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 15:14:14 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A85F0C04B326
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 20:14:14 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1cgGpH-00007N-O9
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 15:14:20 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 21 Feb 2017 21:13:59 +0100
-Message-Id: <1487708048-2131-16-git-send-email-armbru@redhat.com>
+Date: Tue, 21 Feb 2017 21:14:04 +0100
+Message-Id: <1487708048-2131-21-git-send-email-armbru@redhat.com>
 In-Reply-To: <1487708048-2131-1-git-send-email-armbru@redhat.com>
 References: <1487708048-2131-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 15/24] util/cutils: Rename qemu_strtosz() to
- qemu_strtosz_MiB()
+Subject: [Qemu-devel] [PATCH v2 20/24] qemu-img: Wrap cvtnum() around
+ qemu_strtosz()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,220 +21,148 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-With qemu_strtosz(), no suffix means mebibytes.  It's used rarely.
-I'm going to add a similar function where no suffix means bytes.
-Rename qemu_strtosz() to qemu_strtosz_MiB() to make the name
-qemu_strtosz() available for the new function.
-
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- hmp.c                 |  2 +-
- hw/misc/ivshmem.c     |  2 +-
- include/qemu/cutils.h |  2 +-
- monitor.c             |  2 +-
- tests/test-cutils.c   | 38 +++++++++++++++++++-------------------
- util/cutils.c         |  2 +-
- 6 files changed, 24 insertions(+), 24 deletions(-)
+ qemu-img.c | 58 +++++++++++++++++++++++++++++++---------------------------
+ 1 file changed, 31 insertions(+), 27 deletions(-)
 
-diff --git a/hmp.c b/hmp.c
-index 2bc4f06..5948cba 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1379,7 +1379,7 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
-                 break;
-             case MIGRATION_PARAMETER_MAX_BANDWIDTH:
-                 p.has_max_bandwidth = true;
--                valuebw = qemu_strtosz(valuestr, &endp);
-+                valuebw = qemu_strtosz_MiB(valuestr, &endp);
-                 if (valuebw < 0 || (size_t)valuebw != valuebw
-                     || *endp != '\0') {
-                     error_setg(&err, "Invalid size %s", valuestr);
-diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-index bf57e63..b3d9ed9 100644
---- a/hw/misc/ivshmem.c
-+++ b/hw/misc/ivshmem.c
-@@ -1268,7 +1268,7 @@ static void ivshmem_realize(PCIDevice *dev, Error **errp)
-         s->legacy_size = 4 << 20; /* 4 MB default */
-     } else {
-         char *end;
--        int64_t size = qemu_strtosz(s->sizearg, &end);
-+        int64_t size = qemu_strtosz_MiB(s->sizearg, &end);
-         if (size < 0 || (size_t)size != size || *end != '\0'
-             || !is_power_of_2(size)) {
-             error_setg(errp, "Invalid size %s", s->sizearg);
-diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
-index 81613d0..a08b1b0 100644
---- a/include/qemu/cutils.h
-+++ b/include/qemu/cutils.h
-@@ -153,9 +153,9 @@ int parse_uint_full(const char *s, unsigned long long *value, int base);
- #define QEMU_STRTOSZ_DEFSUFFIX_MB 'M'
- #define QEMU_STRTOSZ_DEFSUFFIX_KB 'K'
- #define QEMU_STRTOSZ_DEFSUFFIX_B 'B'
--int64_t qemu_strtosz(const char *nptr, char **end);
- int64_t qemu_strtosz_suffix(const char *nptr, char **end,
-                             const char default_suffix);
-+int64_t qemu_strtosz_MiB(const char *nptr, char **end);
- int64_t qemu_strtosz_metric(const char *nptr, char **end);
- 
- #define K_BYTE     (1ULL << 10)
-diff --git a/monitor.c b/monitor.c
-index 3cd72a9..6225804 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -2785,7 +2785,7 @@ static QDict *monitor_parse_arguments(Monitor *mon,
-                         break;
-                     }
-                 }
--                val = qemu_strtosz(p, &end);
-+                val = qemu_strtosz_MiB(p, &end);
-                 if (val < 0) {
-                     monitor_printf(mon, "invalid size\n");
-                     goto fail;
-diff --git a/tests/test-cutils.c b/tests/test-cutils.c
-index e1d4054..9bbfb8f 100644
---- a/tests/test-cutils.c
-+++ b/tests/test-cutils.c
-@@ -1376,16 +1376,16 @@ static void test_qemu_strtosz_simple(void)
-     int64_t res;
- 
-     str = "0";
--    res = qemu_strtosz(str, &endptr);
-+    res = qemu_strtosz_MiB(str, &endptr);
-     g_assert_cmpint(res, ==, 0);
-     g_assert(endptr == str + 1);
- 
-     str = "12345M";
--    res = qemu_strtosz(str, &endptr);
-+    res = qemu_strtosz_MiB(str, &endptr);
-     g_assert_cmpint(res, ==, 12345 * M_BYTE);
-     g_assert(endptr == str + 6);
- 
--    res = qemu_strtosz(str, NULL);
-+    res = qemu_strtosz_MiB(str, NULL);
-     g_assert_cmpint(res, ==, 12345 * M_BYTE);
- 
-     /* Note: precision is 53 bits since we're parsing with strtod() */
-@@ -1433,35 +1433,35 @@ static void test_qemu_strtosz_units(void)
-     int64_t res;
- 
-     /* default is M */
--    res = qemu_strtosz(none, &endptr);
-+    res = qemu_strtosz_MiB(none, &endptr);
-     g_assert_cmpint(res, ==, M_BYTE);
-     g_assert(endptr == none + 1);
- 
--    res = qemu_strtosz(b, &endptr);
-+    res = qemu_strtosz_MiB(b, &endptr);
-     g_assert_cmpint(res, ==, 1);
-     g_assert(endptr == b + 2);
- 
--    res = qemu_strtosz(k, &endptr);
-+    res = qemu_strtosz_MiB(k, &endptr);
-     g_assert_cmpint(res, ==, K_BYTE);
-     g_assert(endptr == k + 2);
- 
--    res = qemu_strtosz(m, &endptr);
-+    res = qemu_strtosz_MiB(m, &endptr);
-     g_assert_cmpint(res, ==, M_BYTE);
-     g_assert(endptr == m + 2);
- 
--    res = qemu_strtosz(g, &endptr);
-+    res = qemu_strtosz_MiB(g, &endptr);
-     g_assert_cmpint(res, ==, G_BYTE);
-     g_assert(endptr == g + 2);
- 
--    res = qemu_strtosz(t, &endptr);
-+    res = qemu_strtosz_MiB(t, &endptr);
-     g_assert_cmpint(res, ==, T_BYTE);
-     g_assert(endptr == t + 2);
- 
--    res = qemu_strtosz(p, &endptr);
-+    res = qemu_strtosz_MiB(p, &endptr);
-     g_assert_cmpint(res, ==, P_BYTE);
-     g_assert(endptr == p + 2);
- 
--    res = qemu_strtosz(e, &endptr);
-+    res = qemu_strtosz_MiB(e, &endptr);
-     g_assert_cmpint(res, ==, E_BYTE);
-     g_assert(endptr == e + 2);
- }
-@@ -1472,7 +1472,7 @@ static void test_qemu_strtosz_float(void)
-     char *endptr = NULL;
-     int64_t res;
- 
--    res = qemu_strtosz(str, &endptr);
-+    res = qemu_strtosz_MiB(str, &endptr);
-     g_assert_cmpint(res, ==, 12.345 * M_BYTE);
-     g_assert(endptr == str + 7);
- }
-@@ -1484,17 +1484,17 @@ static void test_qemu_strtosz_invalid(void)
-     int64_t res;
- 
-     str = "";
--    res = qemu_strtosz(str, &endptr);
-+    res = qemu_strtosz_MiB(str, &endptr);
-     g_assert_cmpint(res, ==, -EINVAL);
-     g_assert(endptr == str);
- 
-     str = " \t ";
--    res = qemu_strtosz(str, &endptr);
-+    res = qemu_strtosz_MiB(str, &endptr);
-     g_assert_cmpint(res, ==, -EINVAL);
-     g_assert(endptr == str);
- 
-     str = "crap";
--    res = qemu_strtosz(str, &endptr);
-+    res = qemu_strtosz_MiB(str, &endptr);
-     g_assert_cmpint(res, ==, -EINVAL);
-     g_assert(endptr == str);
- }
-@@ -1506,12 +1506,12 @@ static void test_qemu_strtosz_trailing(void)
-     int64_t res;
- 
-     str = "123xxx";
--    res = qemu_strtosz(str, &endptr);
-+    res = qemu_strtosz_MiB(str, &endptr);
-     g_assert_cmpint(res, ==, 123 * M_BYTE);
-     g_assert(endptr == str + 3);
- 
-     str = "1kiB";
--    res = qemu_strtosz(str, &endptr);
-+    res = qemu_strtosz_MiB(str, &endptr);
-     g_assert_cmpint(res, ==, 1024);
-     g_assert(endptr == str + 2);
- }
-@@ -1523,7 +1523,7 @@ static void test_qemu_strtosz_erange(void)
-     int64_t res;
- 
-     str = "-1";
--    res = qemu_strtosz(str, &endptr);
-+    res = qemu_strtosz_MiB(str, &endptr);
-     g_assert_cmpint(res, ==, -ERANGE);
-     g_assert(endptr == str + 2);
- 
-@@ -1543,7 +1543,7 @@ static void test_qemu_strtosz_erange(void)
-     g_assert(endptr == str + 19);
- 
-     str = "10E";
--    res = qemu_strtosz(str, &endptr);
-+    res = qemu_strtosz_MiB(str, &endptr);
-     g_assert_cmpint(res, ==, -ERANGE);
-     g_assert(endptr == str + 3);
- }
-diff --git a/util/cutils.c b/util/cutils.c
-index b46e254..9693add 100644
---- a/util/cutils.c
-+++ b/util/cutils.c
-@@ -254,7 +254,7 @@ int64_t qemu_strtosz_suffix(const char *nptr, char **end,
-     return do_strtosz(nptr, end, default_suffix, 1024);
+diff --git a/qemu-img.c b/qemu-img.c
+index f1c641c..4062917 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -368,6 +368,19 @@ static int add_old_style_options(const char *fmt, QemuOpts *opts,
+     return 0;
  }
  
--int64_t qemu_strtosz(const char *nptr, char **end)
-+int64_t qemu_strtosz_MiB(const char *nptr, char **end)
++static int64_t cvtnum(const char *s)
++{
++    char *end;
++    int64_t ret;
++
++    ret = qemu_strtosz(s, &end);
++    if (*end != '\0') {
++        /* Detritus at the end of the string */
++        return -EINVAL;
++    }
++    return ret;
++}
++
+ static int img_create(int argc, char **argv)
  {
-     return qemu_strtosz_suffix(nptr, end, QEMU_STRTOSZ_DEFSUFFIX_MB);
- }
+     int c;
+@@ -461,9 +474,9 @@ static int img_create(int argc, char **argv)
+     /* Get image size, if specified */
+     if (optind < argc) {
+         int64_t sval;
+-        char *end;
+-        sval = qemu_strtosz(argv[optind++], &end);
+-        if (sval < 0 || *end) {
++
++        sval = cvtnum(argv[optind++]);
++        if (sval < 0) {
+             if (sval == -ERANGE) {
+                 error_report("Image size must be less than 8 EiB!");
+             } else {
+@@ -1863,9 +1876,9 @@ static int img_convert(int argc, char **argv)
+         case 'S':
+         {
+             int64_t sval;
+-            char *end;
+-            sval = qemu_strtosz(optarg, &end);
+-            if (sval < 0 || *end) {
++
++            sval = cvtnum(optarg);
++            if (sval < 0) {
+                 error_report("Invalid minimum zero buffer size for sparse output specified");
+                 ret = -1;
+                 goto fail_getopt;
+@@ -3650,10 +3663,8 @@ static int img_bench(int argc, char **argv)
+             break;
+         case 'o':
+         {
+-            char *end;
+-            errno = 0;
+-            offset = qemu_strtosz(optarg, &end);
+-            if (offset < 0|| *end) {
++            offset = cvtnum(optarg);
++            if (offset < 0) {
+                 error_report("Invalid offset specified");
+                 return 1;
+             }
+@@ -3666,10 +3677,9 @@ static int img_bench(int argc, char **argv)
+         case 's':
+         {
+             int64_t sval;
+-            char *end;
+ 
+-            sval = qemu_strtosz(optarg, &end);
+-            if (sval < 0 || sval > INT_MAX || *end) {
++            sval = cvtnum(optarg);
++            if (sval < 0 || sval > INT_MAX) {
+                 error_report("Invalid buffer size specified");
+                 return 1;
+             }
+@@ -3680,10 +3690,9 @@ static int img_bench(int argc, char **argv)
+         case 'S':
+         {
+             int64_t sval;
+-            char *end;
+ 
+-            sval = qemu_strtosz(optarg, &end);
+-            if (sval < 0 || sval > INT_MAX || *end) {
++            sval = cvtnum(optarg);
++            if (sval < 0 || sval > INT_MAX) {
+                 error_report("Invalid step size specified");
+                 return 1;
+             }
+@@ -3842,12 +3851,11 @@ static int img_dd_bs(const char *arg,
+                      struct DdIo *in, struct DdIo *out,
+                      struct DdInfo *dd)
+ {
+-    char *end;
+     int64_t res;
+ 
+-    res = qemu_strtosz(arg, &end);
++    res = cvtnum(arg);
+ 
+-    if (res <= 0 || res > INT_MAX || *end) {
++    if (res <= 0 || res > INT_MAX) {
+         error_report("invalid number: '%s'", arg);
+         return 1;
+     }
+@@ -3860,11 +3868,9 @@ static int img_dd_count(const char *arg,
+                         struct DdIo *in, struct DdIo *out,
+                         struct DdInfo *dd)
+ {
+-    char *end;
++    dd->count = cvtnum(arg);
+ 
+-    dd->count = qemu_strtosz(arg, &end);
+-
+-    if (dd->count < 0 || *end) {
++    if (dd->count < 0) {
+         error_report("invalid number: '%s'", arg);
+         return 1;
+     }
+@@ -3894,11 +3900,9 @@ static int img_dd_skip(const char *arg,
+                        struct DdIo *in, struct DdIo *out,
+                        struct DdInfo *dd)
+ {
+-    char *end;
++    in->offset = cvtnum(arg);
+ 
+-    in->offset = qemu_strtosz(arg, &end);
+-
+-    if (in->offset < 0 || *end) {
++    if (in->offset < 0) {
+         error_report("invalid number: '%s'", arg);
+         return 1;
+     }
 -- 
 2.7.4
