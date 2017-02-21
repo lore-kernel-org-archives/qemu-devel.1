@@ -1,40 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1cgAbw-0006Qp-36
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:36:09 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cgBEk-0001Yo-LV
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:16:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1cgAbs-0002B5-Vw
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:36:08 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40629
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
-	id 1cgAbs-0002Al-PH
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:36:04 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1LDXcP5134590
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 08:36:03 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28rm7sxenu-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 08:36:03 -0500
-Received: from localhost
-	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
-	Tue, 21 Feb 2017 13:36:02 -0000
-References: <20170220141943.8426-1-cornelia.huck@de.ibm.com>
-	<9b1118e8-8b00-fa68-a3f8-9a8af2346e17@redhat.com>
-	<77cdf172-3321-7031-0e6e-f485c23393f2@suse.de>
-From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Date: Tue, 21 Feb 2017 14:35:57 +0100
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cgBEj-0004JJ-Gh
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:16:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60700)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1cgBEj-0004Ii-7n
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:16:13 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6B7EAC05AA6F
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 14:16:13 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue, 21 Feb 2017 18:14:38 +0400
+Message-Id: <20170221141451.28305-18-marcandre.lureau@redhat.com>
+In-Reply-To: <20170221141451.28305-1-marcandre.lureau@redhat.com>
+References: <20170221141451.28305-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <77cdf172-3321-7031-0e6e-f485c23393f2@suse.de>
-Content-Type: text/plain; charset=utf-8
-Message-Id: <27bf83d8-cfd0-c704-358b-2c7674b07448@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/5] s390x: network boot
+Subject: [Qemu-devel] [PATCH v2 17/30] tests: fix tco-test leaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,66 +33,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, jfrei@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On 20.02.2017 17:01, Alexander Graf wrote:
->=20
->=20
-> On 20/02/2017 07:43, Thomas Huth wrote:
->> On 20.02.2017 15:19, Cornelia Huck wrote:
->>> This patchset implements network boot for s390x. You need to build
->>> a s390-netboot.img to actually perform the work (not included).
->>
->> Do you plan to include this into the upstream QEMU repository later, o=
-r
->> will this stay an external binary?
->>
->>> Basically, we add support for virtio-net devices into the ipl code
->>> and update the ccw bios to handle this as well.
->>
->> Just out of curiosity: What's the reason for shipping an additional
->> binary here? Couldn't it be linked into the ccw bios as well (so that
->> it's easier for the user to select a different version with the -bios
->> parameter)?
->=20
-> The "other binary" (s390-netboot.img) is the equivalent of grub or
-> pxelinux in an x86 network boot environment. That one usually comes fro=
-m
-> a different entity and different department :).
-I'd rather compare the other binary to an option ROM.
-At this point in time we there's no netboot ROM, but a set of
-instructions on how to build a netboot binary from a kernel and a
-ramdisk, the series coverletter contains a brief version of that.
+Spotted by ASAN.
 
->=20
-> I haven't looked at the patches in detail, but do they follow the
-> "normal" PXE boot flow? Do they do a DHCP request, send a proper
-> Vendor-Class-Identifier for s390x, fetch the binary described by the
-> "filename" property in the DHCP ack via TFTP from next-server and run
-> that one then?
-It's currently not described with that level of detail, but the idea is
-to skip the step of loading a syslinux equivalent, and to immediately
-fetch the PXELINUX config file from the TFT next server aka siaddr and
-load the kernel and ramdisk specified therein.
-I.e. a simulation of the PXELINUX process is done in a similar fashion
-to petitboot PXE boot.
->=20
-> It would be very good to stick to that flow, so that you don't confuse
-> your network admins :).
->=20
->=20
-> Alex
->=20
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ tests/tco-test.c | 35 +++++++++++++++++++++--------------
+ 1 file changed, 21 insertions(+), 14 deletions(-)
 
-
+diff --git a/tests/tco-test.c b/tests/tco-test.c
+index ef02ec5903..c4c264eb3d 100644
+--- a/tests/tco-test.c
++++ b/tests/tco-test.c
+@@ -42,11 +42,18 @@ typedef struct {
+     bool noreboot;
+     QPCIDevice *dev;
+     QPCIBar tco_io_bar;
++    QPCIBus *bus;
+ } TestData;
+=20
++static void test_end(TestData *d)
++{
++    g_free(d->dev);
++    qpci_free_pc(d->bus);
++    qtest_end();
++}
++
+ static void test_init(TestData *d)
+ {
+-    QPCIBus *bus;
+     QTestState *qs;
+     char *s;
+=20
+@@ -57,8 +64,8 @@ static void test_init(TestData *d)
+     qtest_irq_intercept_in(qs, "ioapic");
+     g_free(s);
+=20
+-    bus =3D qpci_init_pc(NULL);
+-    d->dev =3D qpci_device_find(bus, QPCI_DEVFN(0x1f, 0x00));
++    d->bus =3D qpci_init_pc(NULL);
++    d->dev =3D qpci_device_find(d->bus, QPCI_DEVFN(0x1f, 0x00));
+     g_assert(d->dev !=3D NULL);
+=20
+     qpci_device_enable(d->dev);
+@@ -148,7 +155,7 @@ static void test_tco_defaults(void)
+                     SW_IRQ_GEN_DEFAULT);
+     g_assert_cmpint(qpci_io_readw(d.dev, d.tco_io_bar, TCO_TMR), =3D=3D,
+                     TCO_TMR_DEFAULT);
+-    qtest_end();
++    test_end(&d);
+ }
+=20
+ static void test_tco_timeout(void)
+@@ -192,7 +199,7 @@ static void test_tco_timeout(void)
+     g_assert(ret =3D=3D 1);
+=20
+     stop_tco(&d);
+-    qtest_end();
++    test_end(&d);
+ }
+=20
+ static void test_tco_max_timeout(void)
+@@ -225,7 +232,7 @@ static void test_tco_max_timeout(void)
+     g_assert(ret =3D=3D 1);
+=20
+     stop_tco(&d);
+-    qtest_end();
++    test_end(&d);
+ }
+=20
+ static QDict *get_watchdog_action(void)
+@@ -262,7 +269,7 @@ static void test_tco_second_timeout_pause(void)
+     QDECREF(ad);
+=20
+     stop_tco(&td);
+-    qtest_end();
++    test_end(&td);
+ }
+=20
+ static void test_tco_second_timeout_reset(void)
+@@ -287,7 +294,7 @@ static void test_tco_second_timeout_reset(void)
+     QDECREF(ad);
+=20
+     stop_tco(&td);
+-    qtest_end();
++    test_end(&td);
+ }
+=20
+ static void test_tco_second_timeout_shutdown(void)
+@@ -312,7 +319,7 @@ static void test_tco_second_timeout_shutdown(void)
+     QDECREF(ad);
+=20
+     stop_tco(&td);
+-    qtest_end();
++    test_end(&td);
+ }
+=20
+ static void test_tco_second_timeout_none(void)
+@@ -337,7 +344,7 @@ static void test_tco_second_timeout_none(void)
+     QDECREF(ad);
+=20
+     stop_tco(&td);
+-    qtest_end();
++    test_end(&td);
+ }
+=20
+ static void test_tco_ticks_counter(void)
+@@ -365,7 +372,7 @@ static void test_tco_ticks_counter(void)
+     } while (!(qpci_io_readw(d.dev, d.tco_io_bar, TCO1_STS) & TCO_TIMEOU=
+T));
+=20
+     stop_tco(&d);
+-    qtest_end();
++    test_end(&d);
+ }
+=20
+ static void test_tco1_control_bits(void)
+@@ -383,7 +390,7 @@ static void test_tco1_control_bits(void)
+     qpci_io_writew(d.dev, d.tco_io_bar, TCO1_CNT, val);
+     g_assert_cmpint(qpci_io_readw(d.dev, d.tco_io_bar, TCO1_CNT), =3D=3D=
+,
+                     TCO_LOCK);
+-    qtest_end();
++    test_end(&d);
+ }
+=20
+ static void test_tco1_status_bits(void)
+@@ -412,7 +419,7 @@ static void test_tco1_status_bits(void)
+     g_assert(ret =3D=3D 1);
+     qpci_io_writew(d.dev, d.tco_io_bar, TCO1_STS, val);
+     g_assert_cmpint(qpci_io_readw(d.dev, d.tco_io_bar, TCO1_STS), =3D=3D=
+, 0);
+-    qtest_end();
++    test_end(&d);
+ }
+=20
+ static void test_tco2_status_bits(void)
+@@ -439,7 +446,7 @@ static void test_tco2_status_bits(void)
+     g_assert(ret =3D=3D 1);
+     qpci_io_writew(d.dev, d.tco_io_bar, TCO2_STS, val);
+     g_assert_cmpint(qpci_io_readw(d.dev, d.tco_io_bar, TCO2_STS), =3D=3D=
+, 0);
+-    qtest_end();
++    test_end(&d);
+ }
+=20
+ int main(int argc, char **argv)
 --=20
-
-Mit freundlichen Gr=C3=BC=C3=9Fen/Kind Regards
-   Viktor Mihajlovski
-
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Martina K=C3=B6deritz
-Gesch=C3=A4ftsf=C3=BChrung: Dirk Wittkopp
-Sitz der Gesellschaft: B=C3=B6blingen
-Registergericht: Amtsgericht Stuttgart, HRB 243294
+2.11.0.295.gd7dffce1c.dirty
