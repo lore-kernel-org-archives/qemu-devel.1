@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cgDR0-0001Jm-GL
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:37:06 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cgDSn-0002ma-GY
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:38:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cgDQw-0004Cg-C0
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:37:02 -0500
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:35267)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1cgDQv-0004CT-OX
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:36:58 -0500
-Received: by mail-lf0-x244.google.com with SMTP id z127so9580899lfa.2
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 08:36:57 -0800 (PST)
+	(envelope-from <no-reply@patchew.org>) id 1cgDSk-0004tG-B3
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:38:53 -0500
+Resent-Message-Id: <E1cgDSk-0004tG-B3@eggs.gnu.org>
+In-Reply-To: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148769512474.66.9703353468341907035@0e2666bad730>
 MIME-Version: 1.0
-References: <20170221104256.5153-1-pbonzini@redhat.com>
-	<20170221104256.5153-2-pbonzini@redhat.com>
-	<aa2a3bf2-3c72-7682-c950-be580f8f5dd3@redhat.com>
-In-Reply-To: <aa2a3bf2-3c72-7682-c950-be580f8f5dd3@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 21 Feb 2017 16:36:44 +0000
-Message-ID: <CAJ+F1CLPGGmwnEzo9EJWu7MuuB5g7VCsVtL5sLWa_HE1O96oUA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/3] qom-qobject: introduce
- object_property_{g, s}et_ptr
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 21 Feb 2017 08:38:45 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 00/54] New op blocker system, part 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,545 +23,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: den@openvz.org, anton.nefedov@virtuozzo.com
+To: kwolf@redhat.com
+Cc: famz@redhat.com, qemu-block@nongnu.org, jcody@redhat.comfamz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
-Hi
-
-On Tue, Feb 21, 2017 at 4:17 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
-
->
->
-> On 21/02/2017 11:42, Paolo Bonzini wrote:
-> > The functions simplify the handling of QOM properties whose type
-> > is a QAPI struct.  They go through a QObject just like the other
-> > functions that access a QOM property through its C type.
-> >
-> > Like QAPI_CLONE, the functions are wrapped by macros that take a
-> > QAPI type name and use it to build the name of a visitor function.
-> >
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > ---
-> >  include/qom/qom-qobject.h               |  68 ++++++++++++
-> >  qom/qom-qobject.c                       |  49 +++++++++
-> >  tests/Makefile.include                  |   2 +-
-> >  tests/check-qom-proplist.c              | 185
-> +++++++++++++++++++++++++++++++-
-> >  tests/qapi-schema/qapi-schema-test.json |   8 ++
-> >  5 files changed, 309 insertions(+), 3 deletions(-)
->
-> Missing hunk:
->
-> diff --git a/tests/qapi-schema/qapi-schema-test.out
-> b/tests/qapi-schema/qapi-schema-test.out
-> index bc8d496..d3a2990 100644
-> --- a/tests/qapi-schema/qapi-schema-test.out
-> +++ b/tests/qapi-schema/qapi-schema-test.out
-> @@ -107,6 +107,9 @@ object UserDefOne
->      base UserDefZero
->      member string: str optional=3DFalse
->      member enum1: EnumOne optional=3DTrue
-> +object UserDefOneMore
-> +    base UserDefOne
-> +    member boolean: bool optional=3DFalse
->  object UserDefOptions
->      member i64: intList optional=3DTrue
->      member u64: uint64List optional=3DTrue
-> @@ -283,6 +286,9 @@ for testing override of default naming heuristic
->  doc symbol=3DUserDefOne expr=3D('struct', 'UserDefOne')
->      body=3D
->  for testing nested structs
-> +doc symbol=3DUserDefOneMore expr=3D('struct', 'UserDefOneMore')
-> +    body=3D
-> +for testing nested structs
->  doc symbol=3DEnumOne expr=3D('enum', 'EnumOne')
->  doc symbol=3DUserDefZero expr=3D('struct', 'UserDefZero')
->  doc symbol=3DUserDefTwoDictDict expr=3D('struct', 'UserDefTwoDictDict')
->
-> Paolo
->
-> > diff --git a/include/qom/qom-qobject.h b/include/qom/qom-qobject.h
-> > index 77cd717..ff1d307 100644
-> > --- a/include/qom/qom-qobject.h
-> > +++ b/include/qom/qom-qobject.h
-> > @@ -39,4 +39,72 @@ struct QObject *object_property_get_qobject(Object
-> *obj, const char *name,
-> >  void object_property_set_qobject(Object *obj, struct QObject *qobj,
-> >                                   const char *name, struct Error **errp=
-);
-> >
-> > +/**
-> > + * object_property_get_ptr:
-> > + * @obj: the object
-> > + * @ptr: The C struct that will be written to the property.
->
-
-drop that line
-
-
-> > + * @name: the name of the property
-> > + * @visit_type: the visitor function for @ptr's type.
-> > + * @errp: returns an error if this function fails
-> > + *
-> > + * Return: the value of an object's property, unmarshaled into a C
-> object
-> > + * through a QAPI type visitor, or NULL if an error occurs.
-> > + */
-> > +void *object_property_get_ptr(Object *obj, const char *name,
-> > +                              void (*visit_type)(Visitor *, const char
-> *,
-> > +                                                 void **, Error **),
-> > +                              Error **errp);
-> > +
-> > +/**
-> > + * OBJECT_PROPERTY_GET_PTR:
-> > + * @obj: the object
-> > + * @ptr: The C struct that will be written to the property.
->
-
-drop that line
-
-
-> > + * @name: the name of the property
-> > + * @type: the name of the C struct type pointed to by @ptr.
-> > + * @errp: returns an error if this function fails
-> > + *
-> > + * Return: the value of an object's property, unmarshaled into a C
-> object
-> > + * through a QAPI type visitor, or NULL if an error occurs.
-> > + */
-> > +#define OBJECT_PROPERTY_GET_PTR(obj, name, type, errp)
->     \
-> > +    ((type *)
->      \
-> > +     object_property_get_ptr(obj, name,
->      \
-> > +                             (void (*)(Visitor *, const char *,
-> void**,     \
-> > +                                       Error **))visit_type_ ## type,
->      \
-> > +                             errp))
-> > +
-> > +/**
-> > + * object_property_set_ptr:
-> > + * @obj: the object
-> > + * @ptr: The C struct that will be written to the property.
-> > + * @name: the name of the property
-> > + * @visit_type: the visitor function for @ptr's type.
-> > + * @errp: returns an error if this function fails
-> > + *
-> > + * Sets an object's property to a C object's value, using a QAPI
-> > + * type visitor to marshal the C struct into the object.
-> > + */
-> > +void object_property_set_ptr(Object *obj, void *ptr, const char *name,
-> > +                             void (*visit_type)(Visitor *, const char =
-*,
-> > +                                                void **, Error **),
-> > +                             Error **errp);
-> > +
-> > +/**
-> > + * OBJECT_PROPERTY_SET_PTR:
-> > + * @obj: the object
-> > + * @ptr: The C struct that will be written to the property.
-> > + * @name: the name of the property
-> > + * @type: the name of the C struct type pointed to by @ptr.
-> > + * @errp: returns an error if this function fails
-> > + *
-> > + * Sets an object's property to a C object's value, using a QAPI
-> > + * type visitor to marshal the C struct into the object.
-> > + */
-> > +#define OBJECT_PROPERTY_SET_PTR(obj, ptr, name, type, errp)
->      \
-> > +    object_property_set_ptr(obj, ptr + type_check(type, typeof(*ptr)),
->     \
-> > +                            name,
->      \
-> > +                            (void (*)(Visitor *, const char *, void**,
->     \
-> > +                                      Error **))visit_type_ ## type,
->     \
-> > +                            errp)
-> > +
-> >  #endif
-> > diff --git a/qom/qom-qobject.c b/qom/qom-qobject.c
-> > index 447e4a0..09a12e0 100644
-> > --- a/qom/qom-qobject.c
-> > +++ b/qom/qom-qobject.c
-> > @@ -44,3 +44,52 @@ QObject *object_property_get_qobject(Object *obj,
-> const char *name,
-> >      visit_free(v);
-> >      return ret;
-> >  }
-> > +
-> > +void object_property_set_ptr(Object *obj, void *ptr, const char *name,
-> > +                             void (*visit_type)(Visitor *, const char
-> *, void **, Error **),
-> > +                             Error **errp)
-> > +{
-> > +    Error *local_err =3D NULL;
-> > +    QObject *ret =3D NULL;
-> > +    Visitor *v;
-> > +    v =3D qobject_output_visitor_new(&ret);
-> > +    visit_type(v, name, &ptr, &local_err);
-> > +    if (local_err) {
-> > +        error_propagate(errp, local_err);
-> > +        visit_free(v);
-> > +        return;
-> > +    }
-> > +    visit_complete(v, &ret);
-> > +    visit_free(v);
-> > +
-> > +    /* Do not use object_property_set_qobject until we switch it
-> > +     * to use qobject_input_visitor_new in strict mode.  See the
-> > +     * /qom/proplist/get-set-ptr/contravariant unit test.
-> > +     */
-> > +    v =3D qobject_input_visitor_new(ret, true);
-> > +    object_property_set(obj, v, name, errp);
-> > +    visit_free(v);
-> > +    qobject_decref(ret);
-> > +}
-> > +
-> > +void *object_property_get_ptr(Object *obj, const char *name,
-> > +                              void (*visit_type)(Visitor *, const char
-> *, void **, Error **),
-> > +                              Error **errp)
-> > +{
-> > +    QObject *ret;
-> > +    Visitor *v;
-> > +    void *ptr =3D NULL;
-> > +
-> > +    ret =3D object_property_get_qobject(obj, name, errp);
-> > +    if (!ret) {
-> > +        return NULL;
-> > +    }
-> > +
-> > +    /* Do not enable strict mode to allow passing covariant
-> > +     * data types.
-> > +     */
-> > +    v =3D qobject_input_visitor_new(ret, false);
-> > +    visit_type(v, name, &ptr, errp);
-> > +    qobject_decref(ret);
->
-
-visit_free(v) ?
-
-
-> > +    return ptr;
-> > +}
-> > diff --git a/tests/Makefile.include b/tests/Makefile.include
-> > index 634394a..9de910b 100644
-> > --- a/tests/Makefile.include
-> > +++ b/tests/Makefile.include
-> > @@ -515,7 +515,7 @@ tests/check-qfloat$(EXESUF): tests/check-qfloat.o
-> $(test-util-obj-y)
-> >  tests/check-qnull$(EXESUF): tests/check-qnull.o $(test-util-obj-y)
-> >  tests/check-qjson$(EXESUF): tests/check-qjson.o $(test-util-obj-y)
-> >  tests/check-qom-interface$(EXESUF): tests/check-qom-interface.o
-> $(test-qom-obj-y)
-> > -tests/check-qom-proplist$(EXESUF): tests/check-qom-proplist.o
-> $(test-qom-obj-y)
-> > +tests/check-qom-proplist$(EXESUF): tests/check-qom-proplist.o
-> $(test-qom-obj-y) $(test-qapi-obj-y)
-> >
-> >  tests/test-char$(EXESUF): tests/test-char.o qemu-timer.o \
-> >       $(test-util-obj-y) $(qtest-obj-y) $(test-block-obj-y)
-> $(chardev-obj-y)
-> > diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
-> > index a16cefc..e0ad880 100644
-> > --- a/tests/check-qom-proplist.c
-> > +++ b/tests/check-qom-proplist.c
-> > @@ -22,8 +22,11 @@
-> >
-> >  #include "qapi/error.h"
-> >  #include "qom/object.h"
-> > +#include "qom/qom-qobject.h"
-> >  #include "qemu/module.h"
-> >
-> > +#include "test-qapi-types.h"
-> > +#include "test-qapi-visit.h"
-> >
-> >  #define TYPE_DUMMY "qemu-dummy"
-> >
-> > @@ -56,6 +59,8 @@ struct DummyObject {
-> >      bool bv;
-> >      DummyAnimal av;
-> >      char *sv;
-> > +
-> > +    UserDefOne *qv;
-> >  };
-> >
-> >  struct DummyObjectClass {
-> > @@ -120,12 +125,42 @@ static char *dummy_get_sv(Object *obj,
-> >
-> >  static void dummy_init(Object *obj)
-> >  {
-> > +    DummyObject *dobj =3D DUMMY_OBJECT(obj);
-> > +
-> >      object_property_add_bool(obj, "bv",
-> >                               dummy_get_bv,
-> >                               dummy_set_bv,
-> >                               NULL);
-> > +    dobj->qv =3D g_new0(UserDefOne, 1);
-> > +    dobj->qv->string =3D g_strdup("dummy string");
-> > +}
-> > +
-> > +
-> > +static void dummy_get_qv(Object *obj, Visitor *v, const char *name,
-> > +                         void *opaque, Error **errp)
-> > +{
-> > +    DummyObject *dobj =3D DUMMY_OBJECT(obj);
-> > +
-> > +    visit_type_UserDefOne(v, name, &dobj->qv, errp);
-> >  }
-> >
-> > +static void dummy_set_qv(Object *obj, Visitor *v, const char *name,
-> > +                         void *opaque, Error **errp)
-> > +{
-> > +    DummyObject *dobj =3D DUMMY_OBJECT(obj);
-> > +    UserDefOne *qv =3D NULL;
-> > +    Error *local_err =3D NULL;
-> > +
-> > +    visit_type_UserDefOne(v, name, &qv, &local_err);
-> > +    if (local_err) {
-> > +        g_assert(qv =3D=3D NULL);
-> > +        error_propagate(errp, local_err);
-> > +        return;
-> > +    }
-> > +
-> > +    qapi_free_UserDefOne(dobj->qv);
-> > +    dobj->qv =3D qv;
-> > +}
-> >
-> >  static void dummy_class_init(ObjectClass *cls, void *data)
-> >  {
-> > @@ -143,6 +178,13 @@ static void dummy_class_init(ObjectClass *cls, voi=
-d
-> *data)
-> >                                     dummy_get_av,
-> >                                     dummy_set_av,
-> >                                     NULL);
-> > +    object_class_property_add(cls, "qv",
-> > +                              "UserDefOne",
-> > +                              dummy_get_qv,
-> > +                              dummy_set_qv,
-> > +                              NULL,
-> > +                              NULL,
-> > +                              NULL);
-> >  }
-> >
-> >
-> > @@ -151,9 +193,9 @@ static void dummy_finalize(Object *obj)
-> >      DummyObject *dobj =3D DUMMY_OBJECT(obj);
-> >
-> >      g_free(dobj->sv);
-> > +    qapi_free_UserDefOne(dobj->qv);
-> >  }
-> >
-> > -
-> >  static const TypeInfo dummy_info =3D {
-> >      .name          =3D TYPE_DUMMY,
-> >      .parent        =3D TYPE_OBJECT,
-> > @@ -473,7 +515,8 @@ static void test_dummy_iterator(void)
-> >
-> >      ObjectProperty *prop;
-> >      ObjectPropertyIterator iter;
-> > -    bool seenbv =3D false, seensv =3D false, seenav =3D false, seentyp=
-e;
-> > +    bool seenbv =3D false, seensv =3D false, seenav =3D false;
-> > +    bool seenqv =3D false, seentype =3D false;
-> >
-> >      object_property_iter_init(&iter, OBJECT(dobj));
-> >      while ((prop =3D object_property_iter_next(&iter))) {
-> > @@ -483,6 +526,8 @@ static void test_dummy_iterator(void)
-> >              seensv =3D true;
-> >          } else if (g_str_equal(prop->name, "av")) {
-> >              seenav =3D true;
-> > +        } else if (g_str_equal(prop->name, "qv")) {
-> > +            seenqv =3D true;
-> >          } else if (g_str_equal(prop->name, "type")) {
-> >              /* This prop comes from the base Object class */
-> >              seentype =3D true;
-> > @@ -494,6 +539,7 @@ static void test_dummy_iterator(void)
-> >      g_assert(seenbv);
-> >      g_assert(seenav);
-> >      g_assert(seensv);
-> > +    g_assert(seenqv);
-> >      g_assert(seentype);
-> >
-> >      object_unparent(OBJECT(dobj));
-> > @@ -513,6 +559,137 @@ static void test_dummy_delchild(void)
-> >      object_unparent(OBJECT(dev));
-> >  }
-> >
-> > +static void test_dummy_get_set_ptr_struct(void)
-> > +{
-> > +    DummyObject *dobj =3D DUMMY_OBJECT(object_new(TYPE_DUMMY));
-> > +    Error *local_err =3D NULL;
-> > +    const char *s =3D "my other dummy string";
-> > +    UserDefOne *ret;
-> > +    UserDefOne val;
-> > +
-> > +    ret =3D OBJECT_PROPERTY_GET_PTR(OBJECT(dobj), "qv",
-> > +                                  UserDefOne, &local_err);
-> > +    g_assert(!local_err);
-> > +
-> > +    g_assert_cmpint(ret->integer, =3D=3D, 0);
-> > +    g_assert_cmpstr(ret->string, =3D=3D, "dummy string");
-> > +    g_assert(!ret->has_enum1);
-> > +    qapi_free_UserDefOne(ret);
-> > +
-> > +    val.integer =3D 42;
-> > +    val.string =3D g_strdup(s);
-> > +    val.has_enum1 =3D true;
-> > +    val.enum1 =3D ENUM_ONE_VALUE1;
-> > +    OBJECT_PROPERTY_SET_PTR(OBJECT(dobj), &val, "qv",
-> > +                            UserDefOne, &local_err);
-> > +    g_assert(!local_err);
-> > +
-> > +    ret =3D OBJECT_PROPERTY_GET_PTR(OBJECT(dobj), "qv",
-> > +                                  UserDefOne, &local_err);
-> > +    g_assert(!local_err);
-> > +
-> > +    g_assert_cmpint(ret->integer, =3D=3D, val.integer);
-> > +    g_assert_cmpstr(ret->string, =3D=3D, val.string);
-> > +    g_assert(ret->has_enum1);
-> > +    g_assert_cmpint(ret->enum1, =3D=3D, val.enum1);
-> > +    g_free(val.string);
-> > +    qapi_free_UserDefOne(ret);
-> > +}
-> > +
-> > +static void test_dummy_get_set_ptr_contravariant(void)
-> > +{
-> > +    DummyObject *dobj =3D DUMMY_OBJECT(object_new(TYPE_DUMMY));
-> > +    Error *local_err =3D NULL;
-> > +    UserDefOneMore *ret;
-> > +    UserDefOneMore val;
-> > +
-> > +    /* You cannot retrieve a contravariant (subclass) type... */
-> > +    ret =3D OBJECT_PROPERTY_GET_PTR(OBJECT(dobj), "qv",
-> > +                                  UserDefOneMore, &local_err);
-> > +    g_assert(local_err);
-> > +    g_assert(!ret);
-> > +    error_free(local_err);
-> > +    local_err =3D NULL;
-> > +
-> > +    /* And you cannot set one either.  */
-> > +    val.integer =3D 42;
-> > +    val.string =3D g_strdup("unused");
-> > +    val.has_enum1 =3D false;
-> > +    val.boolean =3D false;
-> > +
-> > +    OBJECT_PROPERTY_SET_PTR(OBJECT(dobj), &val, "qv",
-> > +                            UserDefOneMore, &local_err);
-> > +    g_assert(local_err);
-> > +}
-> > +
-> > +static void test_dummy_get_set_ptr_covariant(void)
-> > +{
-> > +    DummyObject *dobj =3D DUMMY_OBJECT(object_new(TYPE_DUMMY));
-> > +    Error *local_err =3D NULL;
-> > +    UserDefZero *ret;
-> > +    UserDefZero val;
-> > +
-> > +    /* You can retrieve a covariant (superclass) type... */
-> > +    ret =3D OBJECT_PROPERTY_GET_PTR(OBJECT(dobj), "qv",
-> > +                                  UserDefZero, &local_err);
-> > +    g_assert(!local_err);
-> > +
-> > +    g_assert_cmpint(ret->integer, =3D=3D, 0);
-> > +    qapi_free_UserDefZero(ret);
-> > +
-> > +    /* But you cannot set one.  */
-> > +    val.integer =3D 42;
-> > +    OBJECT_PROPERTY_SET_PTR(OBJECT(dobj), &val, "qv",
-> > +                            UserDefZero, &local_err);
-> > +    g_assert(local_err);
-> > +    error_free(local_err);
-> > +    local_err =3D NULL;
-> > +
-> > +    /* Test that the property has not been modified at all */
-> > +    ret =3D OBJECT_PROPERTY_GET_PTR(OBJECT(dobj), "qv",
-> > +                                  UserDefZero, &local_err);
-> > +    g_assert(!local_err);
-> > +
-> > +    g_assert_cmpint(ret->integer, =3D=3D, 0);
-> > +    qapi_free_UserDefZero(ret);
-> > +}
-> > +
-> > +static void test_dummy_get_set_ptr_error(void)
-> > +{
-> > +    DummyObject *dobj =3D DUMMY_OBJECT(object_new(TYPE_DUMMY));
-> > +    Error *local_err =3D NULL;
-> > +    const char *s =3D "my other dummy string";
-> > +    UserDefOne *ret;
-> > +    UserDefOne val;
-> > +
-> > +    ret =3D OBJECT_PROPERTY_GET_PTR(OBJECT(dobj), "blah",
-> > +                                  UserDefOne, &local_err);
-> > +    g_assert(local_err);
-> > +    g_assert(!ret);
-> > +    error_free(local_err);
-> > +    local_err =3D NULL;
-> > +
-> > +    val.integer =3D 42;
-> > +    val.string =3D g_strdup(s);
-> > +    val.has_enum1 =3D true;
-> > +    val.enum1 =3D 100;
-> > +    OBJECT_PROPERTY_SET_PTR(OBJECT(dobj), &val, "qv",
-> > +                            UserDefOne, &local_err);
-> > +    g_assert(local_err);
-> > +    error_free(local_err);
-> > +    local_err =3D NULL;
-> > +
-> > +    ret =3D OBJECT_PROPERTY_GET_PTR(OBJECT(dobj), "qv",
-> > +                                  UserDefOne, &local_err);
-> > +    g_assert(!local_err);
-> > +
-> > +    /* Test that the property has not been modified at all */
-> > +    g_assert_cmpint(ret->integer, =3D=3D, 0);
-> > +    g_assert_cmpstr(ret->string, =3D=3D, "dummy string");
-> > +    g_assert(!ret->has_enum1);
-> > +    qapi_free_UserDefOne(ret);
-> > +}
-> > +
-> >  int main(int argc, char **argv)
-> >  {
-> >      g_test_init(&argc, &argv, NULL);
-> > @@ -530,5 +707,9 @@ int main(int argc, char **argv)
-> >      g_test_add_func("/qom/proplist/iterator", test_dummy_iterator);
-> >      g_test_add_func("/qom/proplist/delchild", test_dummy_delchild);
-> >
-> > +    g_test_add_func("/qom/proplist/get-set-ptr/struct",
-> test_dummy_get_set_ptr_struct);
-> > +    g_test_add_func("/qom/proplist/get-set-ptr/error",
-> test_dummy_get_set_ptr_error);
-> > +    g_test_add_func("/qom/proplist/get-set-ptr/covariant",
-> test_dummy_get_set_ptr_covariant);
-> > +    g_test_add_func("/qom/proplist/get-set-ptr/contravariant",
-> test_dummy_get_set_ptr_contravariant);
-> >      return g_test_run();
-> >  }
-> > diff --git a/tests/qapi-schema/qapi-schema-test.json
-> b/tests/qapi-schema/qapi-schema-test.json
-> > index f4d8cc4..4e3f6ff 100644
-> > --- a/tests/qapi-schema/qapi-schema-test.json
-> > +++ b/tests/qapi-schema/qapi-schema-test.json
-> > @@ -91,6 +91,14 @@
-> >              '*enum1': 'EnumOne' } }   # intentional forward reference
-> >
-> >  ##
-> > +# @UserDefOneMore:
-> > +# for testing nested structs
-> > +##
-> > +{ 'struct': 'UserDefOneMore',
-> > +  'base': 'UserDefOne',
-> > +  'data': { 'boolean': 'bool' } }
-> > +
-> > +##
-> >  # @EnumOne:
-> >  ##
-> >  { 'enum': 'EnumOne',
-> >
->
-> --
-Marc-Andr=C3=A9 Lureau
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMDAvNTRdIE5ldyBvcCBibG9ja2VyIHN5c3RlbSwg
+cGFydCAxCk1lc3NhZ2UtaWQ6IDE0ODc2ODkxMzAtMzAzNzMtMS1naXQtc2VuZC1lbWFpbC1rd29s
+ZkByZWRoYXQuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNF
+PWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWls
+ZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1l
+bGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQo
+Z2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRz
+OyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAt
+LWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwg
+Li9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVk
+PTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQK
+PT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFk
+ZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0
+L3FlbXUKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8xNDg3MzYzOTA1LTk0ODAtMS1naXQt
+c2VuZC1lbWFpbC1hcm1icnVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzE0ODczNjM5MDUtOTQ4MC0x
+LWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgIHBh
+dGNoZXcvMTQ4NzY4OTEzMC0zMDM3My0xLWdpdC1zZW5kLWVtYWlsLWt3b2xmQHJlZGhhdC5jb20g
+LT4gcGF0Y2hldy8xNDg3Njg5MTMwLTMwMzczLTEtZ2l0LXNlbmQtZW1haWwta3dvbGZAcmVkaGF0
+LmNvbQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMTcwMjIxMTE1NTEyLjIxOTE4LTEt
+YmVycmFuZ2VAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTcwMjIxMTE1NTEyLjIxOTE4LTEtYmVy
+cmFuZ2VAcmVkaGF0LmNvbQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMTcwMjIxMTQx
+NDUxLjI4MzA1LTEtbWFyY2FuZHJlLmx1cmVhdUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxNzAy
+MjExNDE0NTEuMjgzMDUtMS1tYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8g
+YSBuZXcgYnJhbmNoICd0ZXN0Jwo2MjUwNjcwIGJsb2NrOiBBZGQgRXJyb3IgcGFyYW1ldGVyIHRv
+IGJkcnZfYXBwZW5kKCkKODFhZDkwOSBibG9jazogQWRkIEVycm9yIHBhcmFtZXRlciB0byBiZHJ2
+X3NldF9iYWNraW5nX2hkKCkKNzI3OWM3MiBibG9jazogQXNzZXJ0aW9ucyBmb3IgcmVzaXplIHBl
+cm1pc3Npb24KNzVlYjVmNCBibG9jazogQXNzZXJ0aW9ucyBmb3Igd3JpdGUgcGVybWlzc2lvbnMK
+ZWI3MjY1MSBibG9jazogUGFzcyBCZHJ2Q2hpbGQgdG8gYmRydl9hbGlnbmVkX3ByZWFkdi9wd3Jp
+dGV2CjVlZDZhYTYgdGVzdHM6IFJlbW92ZSBGSVhNRSBjb21tZW50cwpkZWNiNmUwIG5iZC9zZXJ2
+ZXI6IFVzZSByZWFsIHBlcm1pc3Npb25zIGZvciBOQkQgZXhwb3J0cwpjYThjOGY1IG1pZ3JhdGlv
+bi9ibG9jazogVXNlIHJlYWwgcGVybWlzc2lvbnMKNTBlMWUzNCBobXA6IFJlcXVlc3QgcGVybWlz
+c2lvbnMgaW4gcWVtdS1pbwphODM5ZTJlIGNvbW1pdDogQWRkIGZpbHRlci1ub2RlLW5hbWUgdG8g
+YmxvY2stY29tbWl0CjY2YTdiY2UgbWlycm9yOiBBZGQgZmlsdGVyLW5vZGUtbmFtZSB0byBibG9j
+a2Rldi1taXJyb3IKMjAyZjQ5NCBzdHJlYW06IFVzZSByZWFsIHBlcm1pc3Npb25zIGluIHN0cmVh
+bWluZyBibG9jayBqb2IKMjViZDNjZCBtaXJyb3I6IFVzZSByZWFsIHBlcm1pc3Npb25zIGluIG1p
+cnJvci9hY3RpdmUgY29tbWl0IGJsb2NrIGpvYgo1MWFjOGMzIGJsb2NrOiBBbGxvdyBiYWNraW5n
+IGZpbGUgbGlua3MgaW4gY2hhbmdlX3BhcmVudF9iYWNraW5nX2xpbmsoKQoyM2Y2NWQ4IGJsb2Nr
+OiBCZHJ2Q2hpbGRSb2xlLmF0dGFjaC9kZXRhY2goKSBjYWxsYmFja3MKNGU3NmJlZiBibG9jazog
+Rml4IHBlbmRpbmcgcmVxdWVzdHMgY2hlY2sgaW4gYmRydl9hcHBlbmQoKQpjN2I0YWU2IGJhY2t1
+cDogVXNlIHJlYWwgcGVybWlzc2lvbnMgaW4gYmFja3VwIGJsb2NrIGpvYgo0YmE1ZDkwIGNvbW1p
+dDogVXNlIHJlYWwgcGVybWlzc2lvbnMgZm9yIEhNUCAnY29tbWl0JwpjMDk2OTA3IGNvbW1pdDog
+VXNlIHJlYWwgcGVybWlzc2lvbnMgaW4gY29tbWl0IGJsb2NrIGpvYgoyZmJhMTg2IGJsb2Nram9i
+OiBBZGQgcGVybWlzc2lvbnMgdG8gYmxvY2tfam9iX2FkZF9iZHJ2KCkKZDA3ZmYzMCBibG9jazog
+QWRkIEJkcnZDaGlsZFJvbGUuc3RheV9hdF9ub2RlCmNlNGQ3YTcgYmxvY2s6IEluY2x1ZGUgZGV0
+YWlscyBvbiBwZXJtaXNzaW9uIGVycm9ycyBpbiBtZXNzYWdlCjEyZmZiMjcgYmxvY2s6IEFkZCBC
+ZHJ2Q2hpbGRSb2xlLmdldF9wYXJlbnRfZGVzYygpCmMyY2U2MDkgYmxvY2tqb2I6IEFkZCBwZXJt
+aXNzaW9ucyB0byBibG9ja19qb2JfY3JlYXRlKCkKNjJkM2U1ZSBody9ibG9jazogSW50cm9kdWNl
+IHNoYXJlLXJ3IHFkZXYgcHJvcGVydHkKY2UyYjQzMSBody9ibG9jazogUmVxdWVzdCBwZXJtaXNz
+aW9ucwo5NjBhZWZlIGJsb2NrOiBBbGxvdyBlcnJvciByZXR1cm4gaW4gQmxvY2tEZXZPcHMuY2hh
+bmdlX21lZGlhX2NiKCkKYjhmMmVjNiBibG9jazogUmVxdWVzdCByZWFsIHBlcm1pc3Npb25zIGlu
+IGJsa19uZXdfb3BlbigpCjFhMTQ1ODkgYmxvY2s6IEFkZCBCRFJWX09fUkVTSVpFIGZvciBibGtf
+bmV3X29wZW4oKQowOTljY2E5IGJsb2NrOiBBZGQgZXJyb3IgcGFyYW1ldGVyIHRvIGJsa19pbnNl
+cnRfYnMoKQo2YjdmOGE4IGJsb2NrOiBBZGQgcGVybWlzc2lvbnMgdG8gYmxrX25ldygpCjNmYWI1
+MDggYmxvY2s6IEFkZCBwZXJtaXNzaW9ucyB0byBCbG9ja0JhY2tlbmQKOWRjODU0MCBibG9jazog
+UmVxdWVzdCByZWFsIHBlcm1pc3Npb25zIGluIGJkcnZfYXR0YWNoX2NoaWxkKCkKMzZhYjk0YiBi
+bG9jazogUmVxdWlyZSAuYmRydl9jaGlsZF9wZXJtKCkgd2l0aCBjaGlsZCBub2RlcwpmMzhiODEw
+IHZ2ZmF0OiBJbXBsZW1lbnQgLmJkcnZfY2hpbGRfcGVybSgpCjcxZTZjMzkgYmxvY2s6IFJlcXVl
+c3QgY2hpbGQgcGVybWlzc2lvbnMgaW4gZm9ybWF0IGRyaXZlcnMKNzQzZjc2NiBibG9jazogRGVm
+YXVsdCAuYmRydl9jaGlsZF9wZXJtKCkgZm9yIGZvcm1hdCBkcml2ZXJzCjJiMGRlMTYgYmxvY2s6
+IFJlcXVlc3QgY2hpbGQgcGVybWlzc2lvbnMgaW4gZmlsdGVyIGRyaXZlcnMKYTM2MGRlOCBibG9j
+azogRGVmYXVsdCAuYmRydl9jaGlsZF9wZXJtKCkgZm9yIGZpbHRlciBkcml2ZXJzCmNmNGM1NzYg
+YmxvY2s6IEludm9sdmUgYmxvY2sgZHJpdmVycyBpbiBwZXJtaXNzaW9uIGdyYW50aW5nCjYxMDVh
+ZjMgYmxvY2s6IExldCBjYWxsZXJzIHJlcXVlc3QgcGVybWlzc2lvbnMgd2hlbiBhdHRhY2hpbmcg
+YSBjaGlsZCBub2RlCmVkZmVhNTcgYmxvY2s6IEFkZCBFcnJvciBhcmd1bWVudCB0byBiZHJ2X2F0
+dGFjaF9jaGlsZCgpCjc0MzMwYmQgYmxvY2s6IEFkZCBvcCBibG9ja2VyIHBlcm1pc3Npb24gY29u
+c3RhbnRzCmRhZWUyZmIgdGVzdHM6IFVzZSBvcGVuZWQgYmxvY2sgbm9kZSBmb3IgYmxvY2sgam9i
+IHRlc3RzCmE4MWY1ZDYgdnZmYXQ6IFVzZSBvcGVuZWQgbm9kZSBhcyBiYWNraW5nIGZpbGUKNjRi
+ZTJkYSBibG9jazogQWRkIGJkcnZfbmV3X29wZW5fZHJpdmVyKCkKOGU3NGE0ZiBibG9jazogRmFj
+dG9yIG91dCBiZHJ2X29wZW5fZHJpdmVyKCkKN2RhNGI4ZiBibG9jazogVXNlIEJsb2NrQmFja2Vu
+ZCBmb3IgaW1hZ2UgcHJvYmluZwoyMTBhZThkIGJsb2NrOiBGYWN0b3Igb3V0IGJkcnZfb3Blbl9j
+aGlsZF9icygpCjg1Njg2N2IgYmxvY2s6IEF0dGFjaCBicy0+ZmlsZSBvbmx5IGR1cmluZyAuYmRy
+dl9vcGVuKCkKZDVmMTcyNCBibG9jazogUGFzcyBCZHJ2Q2hpbGQgdG8gYmRydl90cnVuY2F0ZSgp
+CjhhMGRkNzkgbWlycm9yOiBSZXNpemUgYWN0aXZlIGNvbW1pdCBiYXNlIGluIG1pcnJvcl9ydW4o
+KQphMmYwYTg1IHFjb3cyOiBVc2UgQkIgZm9yIHJlc2l6aW5nIGluIHFjb3cyX2FtZW5kX29wdGlv
+bnMoKQowZGNkOWYzIGJsb2NrZGV2OiBVc2UgQmxvY2tCYWNrZW5kIHRvIHJlc2l6ZSBpbiBxbXBf
+YmxvY2tfcmVzaXplKCkKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNTQ6
+IGJsb2NrZGV2OiBVc2UgQmxvY2tCYWNrZW5kIHRvIHJlc2l6ZSBpbiBxbXBfYmxvY2tfcmVzaXpl
+KCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMi81NDogcWNvdzI6IFVzZSBCQiBmb3IgcmVzaXppbmcgaW4g
+cWNvdzJfYW1lbmRfb3B0aW9ucygpLi4uCkNoZWNraW5nIFBBVENIIDMvNTQ6IG1pcnJvcjogUmVz
+aXplIGFjdGl2ZSBjb21taXQgYmFzZSBpbiBtaXJyb3JfcnVuKCkuLi4KQ2hlY2tpbmcgUEFUQ0gg
+NC81NDogYmxvY2s6IFBhc3MgQmRydkNoaWxkIHRvIGJkcnZfdHJ1bmNhdGUoKS4uLgpDaGVja2lu
+ZyBQQVRDSCA1LzU0OiBibG9jazogQXR0YWNoIGJzLT5maWxlIG9ubHkgZHVyaW5nIC5iZHJ2X29w
+ZW4oKS4uLgpDaGVja2luZyBQQVRDSCA2LzU0OiBibG9jazogRmFjdG9yIG91dCBiZHJ2X29wZW5f
+Y2hpbGRfYnMoKS4uLgpFUlJPUjogImZvbyogYmFyIiBzaG91bGQgYmUgImZvbyAqYmFyIgojNDE6
+IEZJTEU6IGJsb2NrLmM6MTU1MToKKyAgICAgICAgICAgICAgICAgICBCbG9ja0RyaXZlclN0YXRl
+KiBwYXJlbnQsIGNvbnN0IEJkcnZDaGlsZFJvbGUgKmNoaWxkX3JvbGUsCgpFUlJPUjogImZvbyog
+YmFyIiBzaG91bGQgYmUgImZvbyAqYmFyIgojNzg6IEZJTEU6IGJsb2NrLmM6MTYwMjoKKyAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIEJsb2NrRHJpdmVyU3RhdGUqIHBhcmVudCwKCnRvdGFsOiAy
+IGVycm9ycywgMCB3YXJuaW5ncywgNzYgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5
+bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
+YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
+VENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNy81NDogYmxvY2s6IFVzZSBCbG9j
+a0JhY2tlbmQgZm9yIGltYWdlIHByb2JpbmcuLi4KQ2hlY2tpbmcgUEFUQ0ggOC81NDogYmxvY2s6
+IEZhY3RvciBvdXQgYmRydl9vcGVuX2RyaXZlcigpLi4uCkNoZWNraW5nIFBBVENIIDkvNTQ6IGJs
+b2NrOiBBZGQgYmRydl9uZXdfb3Blbl9kcml2ZXIoKS4uLgpDaGVja2luZyBQQVRDSCAxMC81NDog
+dnZmYXQ6IFVzZSBvcGVuZWQgbm9kZSBhcyBiYWNraW5nIGZpbGUuLi4KRVJST1I6ICIoZm9vKiki
+IHNob3VsZCBiZSAiKGZvbyAqKSIKIzMyOiBGSUxFOiBibG9jay92dmZhdC5jOjI5NzE6CisgICAg
+Lmluc3RhbmNlX3NpemUgICAgICA9IHNpemVvZih2b2lkKiksCgpFUlJPUjogIihmb28qKikiIHNo
+b3VsZCBiZSAiKGZvbyAqKikiCiM0MzogRklMRTogYmxvY2svdnZmYXQuYzozMDQyOgorICAgICoo
+dm9pZCoqKSBiYWNraW5nLT5vcGFxdWUgPSBzOwoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdz
+LCAyNSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
+IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
+cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
+CgpDaGVja2luZyBQQVRDSCAxMS81NDogdGVzdHM6IFVzZSBvcGVuZWQgYmxvY2sgbm9kZSBmb3Ig
+YmxvY2sgam9iIHRlc3RzLi4uCkNoZWNraW5nIFBBVENIIDEyLzU0OiBibG9jazogQWRkIG9wIGJs
+b2NrZXIgcGVybWlzc2lvbiBjb25zdGFudHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvNTQ6IGJsb2Nr
+OiBBZGQgRXJyb3IgYXJndW1lbnQgdG8gYmRydl9hdHRhY2hfY2hpbGQoKS4uLgpDaGVja2luZyBQ
+QVRDSCAxNC81NDogYmxvY2s6IExldCBjYWxsZXJzIHJlcXVlc3QgcGVybWlzc2lvbnMgd2hlbiBh
+dHRhY2hpbmcgYSBjaGlsZCBub2RlLi4uCkNoZWNraW5nIFBBVENIIDE1LzU0OiBibG9jazogSW52
+b2x2ZSBibG9jayBkcml2ZXJzIGluIHBlcm1pc3Npb24gZ3JhbnRpbmcuLi4KQ2hlY2tpbmcgUEFU
+Q0ggMTYvNTQ6IGJsb2NrOiBEZWZhdWx0IC5iZHJ2X2NoaWxkX3Blcm0oKSBmb3IgZmlsdGVyIGRy
+aXZlcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTcvNTQ6IGJsb2NrOiBSZXF1ZXN0IGNoaWxkIHBlcm1p
+c3Npb25zIGluIGZpbHRlciBkcml2ZXJzLi4uCkNoZWNraW5nIFBBVENIIDE4LzU0OiBibG9jazog
+RGVmYXVsdCAuYmRydl9jaGlsZF9wZXJtKCkgZm9yIGZvcm1hdCBkcml2ZXJzLi4uCkNoZWNraW5n
+IFBBVENIIDE5LzU0OiBibG9jazogUmVxdWVzdCBjaGlsZCBwZXJtaXNzaW9ucyBpbiBmb3JtYXQg
+ZHJpdmVycy4uLgpDaGVja2luZyBQQVRDSCAyMC81NDogdnZmYXQ6IEltcGxlbWVudCAuYmRydl9j
+aGlsZF9wZXJtKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMjEvNTQ6IGJsb2NrOiBSZXF1aXJlIC5iZHJ2
+X2NoaWxkX3Blcm0oKSB3aXRoIGNoaWxkIG5vZGVzLi4uCkNoZWNraW5nIFBBVENIIDIyLzU0OiBi
+bG9jazogUmVxdWVzdCByZWFsIHBlcm1pc3Npb25zIGluIGJkcnZfYXR0YWNoX2NoaWxkKCkuLi4K
+Q2hlY2tpbmcgUEFUQ0ggMjMvNTQ6IGJsb2NrOiBBZGQgcGVybWlzc2lvbnMgdG8gQmxvY2tCYWNr
+ZW5kLi4uCkNoZWNraW5nIFBBVENIIDI0LzU0OiBibG9jazogQWRkIHBlcm1pc3Npb25zIHRvIGJs
+a19uZXcoKS4uLgpDaGVja2luZyBQQVRDSCAyNS81NDogYmxvY2s6IEFkZCBlcnJvciBwYXJhbWV0
+ZXIgdG8gYmxrX2luc2VydF9icygpLi4uCkNoZWNraW5nIFBBVENIIDI2LzU0OiBibG9jazogQWRk
+IEJEUlZfT19SRVNJWkUgZm9yIGJsa19uZXdfb3BlbigpLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4
+MCBjaGFyYWN0ZXJzCiMxNTU6IEZJTEU6IGluY2x1ZGUvYmxvY2svYmxvY2suaDo4NToKKyNkZWZp
+bmUgQkRSVl9PX1JFU0laRSAgICAgIDB4MDAwNCAvKiByZXF1ZXN0cyBwZXJtaXNzaW9uIGZvciBy
+ZXNpemluZyB0aGUgbm9kZSAqLwoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA5NiBsaW5l
+cyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
+IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
+byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5n
+IFBBVENIIDI3LzU0OiBibG9jazogUmVxdWVzdCByZWFsIHBlcm1pc3Npb25zIGluIGJsa19uZXdf
+b3BlbigpLi4uCkNoZWNraW5nIFBBVENIIDI4LzU0OiBibG9jazogQWxsb3cgZXJyb3IgcmV0dXJu
+IGluIEJsb2NrRGV2T3BzLmNoYW5nZV9tZWRpYV9jYigpLi4uCkNoZWNraW5nIFBBVENIIDI5LzU0
+OiBody9ibG9jazogUmVxdWVzdCBwZXJtaXNzaW9ucy4uLgpDaGVja2luZyBQQVRDSCAzMC81NDog
+aHcvYmxvY2s6IEludHJvZHVjZSBzaGFyZS1ydyBxZGV2IHByb3BlcnR5Li4uCldBUk5JTkc6IGxp
+bmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM1NjogRklMRTogaW5jbHVkZS9ody9ibG9jay9ibG9jay5o
+OjU3OgorICAgIERFRklORV9QUk9QX09OX09GRl9BVVRPKCJ3cml0ZS1jYWNoZSIsIF9zdGF0ZSwg
+X2NvbmYud2NlLCBPTl9PRkZfQVVUT19BVVRPKSwgXAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5p
+bmdzLCA0MDMgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
+ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
+cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
+RVJTLgpDaGVja2luZyBQQVRDSCAzMS81NDogYmxvY2tqb2I6IEFkZCBwZXJtaXNzaW9ucyB0byBi
+bG9ja19qb2JfY3JlYXRlKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMzIvNTQ6IGJsb2NrOiBBZGQgQmRy
+dkNoaWxkUm9sZS5nZXRfcGFyZW50X2Rlc2MoKS4uLgpDaGVja2luZyBQQVRDSCAzMy81NDogYmxv
+Y2s6IEluY2x1ZGUgZGV0YWlscyBvbiBwZXJtaXNzaW9uIGVycm9ycyBpbiBtZXNzYWdlLi4uCkNo
+ZWNraW5nIFBBVENIIDM0LzU0OiBibG9jazogQWRkIEJkcnZDaGlsZFJvbGUuc3RheV9hdF9ub2Rl
+Li4uCkNoZWNraW5nIFBBVENIIDM1LzU0OiBibG9ja2pvYjogQWRkIHBlcm1pc3Npb25zIHRvIGJs
+b2NrX2pvYl9hZGRfYmRydigpLi4uCkNoZWNraW5nIFBBVENIIDM2LzU0OiBjb21taXQ6IFVzZSBy
+ZWFsIHBlcm1pc3Npb25zIGluIGNvbW1pdCBibG9jayBqb2IuLi4KQ2hlY2tpbmcgUEFUQ0ggMzcv
+NTQ6IGNvbW1pdDogVXNlIHJlYWwgcGVybWlzc2lvbnMgZm9yIEhNUCAnY29tbWl0Jy4uLgpDaGVj
+a2luZyBQQVRDSCAzOC81NDogYmFja3VwOiBVc2UgcmVhbCBwZXJtaXNzaW9ucyBpbiBiYWNrdXAg
+YmxvY2sgam9iLi4uCkNoZWNraW5nIFBBVENIIDM5LzU0OiBibG9jazogRml4IHBlbmRpbmcgcmVx
+dWVzdHMgY2hlY2sgaW4gYmRydl9hcHBlbmQoKS4uLgpDaGVja2luZyBQQVRDSCA0MC81NDogYmxv
+Y2s6IEJkcnZDaGlsZFJvbGUuYXR0YWNoL2RldGFjaCgpIGNhbGxiYWNrcy4uLgpDaGVja2luZyBQ
+QVRDSCA0MS81NDogYmxvY2s6IEFsbG93IGJhY2tpbmcgZmlsZSBsaW5rcyBpbiBjaGFuZ2VfcGFy
+ZW50X2JhY2tpbmdfbGluaygpLi4uCkNoZWNraW5nIFBBVENIIDQyLzU0OiBtaXJyb3I6IFVzZSBy
+ZWFsIHBlcm1pc3Npb25zIGluIG1pcnJvci9hY3RpdmUgY29tbWl0IGJsb2NrIGpvYi4uLgpXQVJO
+SU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjc3OiBGSUxFOiBibG9jay9taXJyb3IuYzox
+MTUyOgorICAgICAgICAgICAgLyogWFhYIEJMS19QRVJNX1dSSVRFIG5lZWRzIHRvIGJlIGFsbG93
+ZWQgc28gd2UgZG9uJ3QgYmxvY2sgb3Vyc2VsdmVzCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
+cmFjdGVycwojMjc4OiBGSUxFOiBibG9jay9taXJyb3IuYzoxMTUzOgorICAgICAgICAgICAgICog
+YXQgcy0+YmFzZS4gVGhlIG90aGVyIG9wdGlvbnMgd291bGQgYmUgYSBzZWNvbmQgZmlsdGVyIGRy
+aXZlciBhYm92ZQoKdG90YWw6IDAgZXJyb3JzLCAyIHdhcm5pbmdzLCAzMTMgbGluZXMgY2hlY2tl
+ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
+b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
+aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCA0
+My81NDogc3RyZWFtOiBVc2UgcmVhbCBwZXJtaXNzaW9ucyBpbiBzdHJlYW1pbmcgYmxvY2sgam9i
+Li4uCkNoZWNraW5nIFBBVENIIDQ0LzU0OiBtaXJyb3I6IEFkZCBmaWx0ZXItbm9kZS1uYW1lIHRv
+IGJsb2NrZGV2LW1pcnJvci4uLgpDaGVja2luZyBQQVRDSCA0NS81NDogY29tbWl0OiBBZGQgZmls
+dGVyLW5vZGUtbmFtZSB0byBibG9jay1jb21taXQuLi4KQ2hlY2tpbmcgUEFUQ0ggNDYvNTQ6IGht
+cDogUmVxdWVzdCBwZXJtaXNzaW9ucyBpbiBxZW11LWlvLi4uCkNoZWNraW5nIFBBVENIIDQ3LzU0
+OiBtaWdyYXRpb24vYmxvY2s6IFVzZSByZWFsIHBlcm1pc3Npb25zLi4uCkNoZWNraW5nIFBBVENI
+IDQ4LzU0OiBuYmQvc2VydmVyOiBVc2UgcmVhbCBwZXJtaXNzaW9ucyBmb3IgTkJEIGV4cG9ydHMu
+Li4KQ2hlY2tpbmcgUEFUQ0ggNDkvNTQ6IHRlc3RzOiBSZW1vdmUgRklYTUUgY29tbWVudHMuLi4K
+Q2hlY2tpbmcgUEFUQ0ggNTAvNTQ6IGJsb2NrOiBQYXNzIEJkcnZDaGlsZCB0byBiZHJ2X2FsaWdu
+ZWRfcHJlYWR2L3B3cml0ZXYuLi4KQ2hlY2tpbmcgUEFUQ0ggNTEvNTQ6IGJsb2NrOiBBc3NlcnRp
+b25zIGZvciB3cml0ZSBwZXJtaXNzaW9ucy4uLgpDaGVja2luZyBQQVRDSCA1Mi81NDogYmxvY2s6
+IEFzc2VydGlvbnMgZm9yIHJlc2l6ZSBwZXJtaXNzaW9uLi4uCkNoZWNraW5nIFBBVENIIDUzLzU0
+OiBibG9jazogQWRkIEVycm9yIHBhcmFtZXRlciB0byBiZHJ2X3NldF9iYWNraW5nX2hkKCkuLi4K
+Q2hlY2tpbmcgUEFUQ0ggNTQvNTQ6IGJsb2NrOiBBZGQgRXJyb3IgcGFyYW1ldGVyIHRvIGJkcnZf
+YXBwZW5kKCkuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
+Y29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
+dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
+LWRldmVsQGZyZWVsaXN0cy5vcmc=
