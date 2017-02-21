@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgBvI-0001Bp-Li
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:00:13 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cgBvJ-0001DN-5S
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:00:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgBvH-0008OH-CT
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:00:12 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cgBvD-0008Jg-7A
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:00:13 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 21 Feb 2017 15:58:40 +0100
-Message-Id: <1487689130-30373-45-git-send-email-kwolf@redhat.com>
+Date: Tue, 21 Feb 2017 15:58:36 +0100
+Message-Id: <1487689130-30373-41-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
 References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 44/54] mirror: Add filter-node-name to
- blockdev-mirror
+Subject: [Qemu-devel] [PATCH 40/54] block: BdrvChildRole.attach/detach()
+ callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,179 +23,180 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-Management tools need to be able to know about every node in the graph
-and need a way to address them. This new option to blockdev-mirror
-allows the client to set a node-name for the automatically inserted
-filter driver, and at the same time serves as a witness that this
-version of qemu does automatically insert a filter driver.
+Backing files are somewhat special compared to other kinds of children
+because they are attached and detached using bdrv_set_backing_hd()
+rather than the normal set of functions, which does a few more things
+like setting backing blockers, toggling the BDRV_O_NO_BACKING flag,
+setting parent_bs->backing_file, etc.
+
+These special features are a reason why change_parent_backing_link()
+can't handle backing files yet. With abstracting the additional features
+into .attach/.detach callbacks, we get a step closer to a function that
+can actually deal with this.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/mirror.c            | 14 ++++++++------
- blockdev.c                | 12 +++++++++++-
- include/block/block_int.h |  5 ++++-
- qapi/block-core.json      |  8 +++++++-
- 4 files changed, 30 insertions(+), 9 deletions(-)
+ block.c                   | 94 +++++++++++++++++++++++++++++------------------
+ include/block/block_int.h |  3 ++
+ 2 files changed, 62 insertions(+), 35 deletions(-)
 
-diff --git a/block/mirror.c b/block/mirror.c
-index 252107d..2e1cd16 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1046,7 +1046,7 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
-                              void *opaque, Error **errp,
-                              const BlockJobDriver *driver,
-                              bool is_none_mode, BlockDriverState *base,
--                             bool auto_complete)
-+                             bool auto_complete, const char *filter_node_name)
- {
-     MirrorBlockJob *s;
-     BlockDriverState *mirror_top_bs;
-@@ -1071,8 +1071,8 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
+diff --git a/block.c b/block.c
+index a800e81..97694fa 100644
+--- a/block.c
++++ b/block.c
+@@ -807,6 +807,57 @@ const BdrvChildRole child_format = {
+     .drained_end     = bdrv_child_cb_drained_end,
+ };
  
-     /* In the case of active commit, add dummy driver to provide consistent
-      * reads on the top, while disabling it in the intermediate nodes */
--    mirror_top_bs = bdrv_new_open_driver(&bdrv_mirror_top, NULL, BDRV_O_RDWR,
--                                         errp);
-+    mirror_top_bs = bdrv_new_open_driver(&bdrv_mirror_top, filter_node_name,
-+                                         BDRV_O_RDWR, errp);
-     if (mirror_top_bs == NULL) {
-         return;
++static void bdrv_backing_attach(BdrvChild *c)
++{
++    BlockDriverState *parent = c->opaque;
++    BlockDriverState *backing_hd = c->bs;
++
++    assert(!parent->backing_blocker);
++    error_setg(&parent->backing_blocker,
++               "node is used as backing hd of '%s'",
++               bdrv_get_device_or_node_name(parent));
++
++    parent->open_flags &= ~BDRV_O_NO_BACKING;
++    pstrcpy(parent->backing_file, sizeof(parent->backing_file),
++            backing_hd->filename);
++    pstrcpy(parent->backing_format, sizeof(parent->backing_format),
++            backing_hd->drv ? backing_hd->drv->format_name : "");
++
++    bdrv_op_block_all(backing_hd, parent->backing_blocker);
++    /* Otherwise we won't be able to commit or stream */
++    bdrv_op_unblock(backing_hd, BLOCK_OP_TYPE_COMMIT_TARGET,
++                    parent->backing_blocker);
++    bdrv_op_unblock(backing_hd, BLOCK_OP_TYPE_STREAM,
++                    parent->backing_blocker);
++    /*
++     * We do backup in 3 ways:
++     * 1. drive backup
++     *    The target bs is new opened, and the source is top BDS
++     * 2. blockdev backup
++     *    Both the source and the target are top BDSes.
++     * 3. internal backup(used for block replication)
++     *    Both the source and the target are backing file
++     *
++     * In case 1 and 2, neither the source nor the target is the backing file.
++     * In case 3, we will block the top BDS, so there is only one block job
++     * for the top BDS and its backing chain.
++     */
++    bdrv_op_unblock(backing_hd, BLOCK_OP_TYPE_BACKUP_SOURCE,
++                    parent->backing_blocker);
++    bdrv_op_unblock(backing_hd, BLOCK_OP_TYPE_BACKUP_TARGET,
++                    parent->backing_blocker);
++}
++
++static void bdrv_backing_detach(BdrvChild *c)
++{
++    BlockDriverState *parent = c->opaque;
++
++    assert(parent->backing_blocker);
++    bdrv_op_unblock_all(c->bs, parent->backing_blocker);
++    error_free(parent->backing_blocker);
++    parent->backing_blocker = NULL;
++}
++
+ /*
+  * Returns the options and flags that bs->backing should get, based on the
+  * given options and flags for the parent BDS
+@@ -833,6 +884,8 @@ static void bdrv_backing_options(int *child_flags, QDict *child_options,
+ 
+ const BdrvChildRole child_backing = {
+     .get_parent_desc = bdrv_child_get_parent_desc,
++    .attach          = bdrv_backing_attach,
++    .detach          = bdrv_backing_detach,
+     .inherit_options = bdrv_backing_options,
+     .drained_begin   = bdrv_child_cb_drained_begin,
+     .drained_end     = bdrv_child_cb_drained_end,
+@@ -1661,6 +1714,9 @@ static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs)
+         if (old_bs->quiesce_counter && child->role->drained_end) {
+             child->role->drained_end(child);
+         }
++        if (child->role->detach) {
++            child->role->detach(child);
++        }
+         QLIST_REMOVE(child, next_parent);
+         bdrv_update_perm(old_bs);
      }
-@@ -1181,7 +1181,7 @@ void mirror_start(const char *job_id, BlockDriverState *bs,
-                   MirrorSyncMode mode, BlockMirrorBackingMode backing_mode,
-                   BlockdevOnError on_source_error,
-                   BlockdevOnError on_target_error,
--                  bool unmap, Error **errp)
-+                  bool unmap, const char *filter_node_name, Error **errp)
- {
-     bool is_none_mode;
-     BlockDriverState *base;
-@@ -1195,7 +1195,8 @@ void mirror_start(const char *job_id, BlockDriverState *bs,
-     mirror_start_job(job_id, bs, BLOCK_JOB_DEFAULT, target, replaces,
-                      speed, granularity, buf_size, backing_mode,
-                      on_source_error, on_target_error, unmap, NULL, NULL, errp,
--                     &mirror_job_driver, is_none_mode, base, false);
-+                     &mirror_job_driver, is_none_mode, base, false,
-+                     filter_node_name);
+@@ -1673,6 +1729,9 @@ static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs)
+             child->role->drained_begin(child);
+         }
+         bdrv_update_perm(new_bs);
++        if (child->role->attach) {
++            child->role->attach(child);
++        }
+     }
  }
  
- void commit_active_start(const char *job_id, BlockDriverState *bs,
-@@ -1216,7 +1217,8 @@ void commit_active_start(const char *job_id, BlockDriverState *bs,
-     mirror_start_job(job_id, bs, creation_flags, base, NULL, speed, 0, 0,
-                      MIRROR_LEAVE_BACKING_CHAIN,
-                      on_error, on_error, true, cb, opaque, &local_err,
--                     &commit_active_job_driver, false, base, auto_complete);
-+                     &commit_active_job_driver, false, base, auto_complete,
-+                     NULL);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         goto error_restore_flags;
-diff --git a/blockdev.c b/blockdev.c
-index bcee23e..4314584 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3362,6 +3362,8 @@ static void blockdev_mirror_common(const char *job_id, BlockDriverState *bs,
-                                    bool has_on_target_error,
-                                    BlockdevOnError on_target_error,
-                                    bool has_unmap, bool unmap,
-+                                   bool has_filter_node_name,
-+                                   const char *filter_node_name,
-                                    Error **errp)
- {
- 
-@@ -3383,6 +3385,9 @@ static void blockdev_mirror_common(const char *job_id, BlockDriverState *bs,
-     if (!has_unmap) {
-         unmap = true;
+@@ -1807,52 +1866,17 @@ void bdrv_set_backing_hd(BlockDriverState *bs, BlockDriverState *backing_hd)
      }
-+    if (!has_filter_node_name) {
-+        filter_node_name = NULL;
-+    }
  
-     if (granularity != 0 && (granularity < 512 || granularity > 1048576 * 64)) {
-         error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "granularity",
-@@ -3412,7 +3417,8 @@ static void blockdev_mirror_common(const char *job_id, BlockDriverState *bs,
-     mirror_start(job_id, bs, target,
-                  has_replaces ? replaces : NULL,
-                  speed, granularity, buf_size, sync, backing_mode,
--                 on_source_error, on_target_error, unmap, errp);
-+                 on_source_error, on_target_error, unmap, filter_node_name,
-+                 errp);
+     if (bs->backing) {
+-        assert(bs->backing_blocker);
+-        bdrv_op_unblock_all(bs->backing->bs, bs->backing_blocker);
+         bdrv_unref_child(bs, bs->backing);
+-    } else if (backing_hd) {
+-        error_setg(&bs->backing_blocker,
+-                   "node is used as backing hd of '%s'",
+-                   bdrv_get_device_or_node_name(bs));
+     }
+ 
+     if (!backing_hd) {
+-        error_free(bs->backing_blocker);
+-        bs->backing_blocker = NULL;
+         bs->backing = NULL;
+         goto out;
+     }
+     /* FIXME Error handling */
+     bs->backing = bdrv_attach_child(bs, backing_hd, "backing", &child_backing,
+                                     &error_abort);
+-    bs->open_flags &= ~BDRV_O_NO_BACKING;
+-    pstrcpy(bs->backing_file, sizeof(bs->backing_file), backing_hd->filename);
+-    pstrcpy(bs->backing_format, sizeof(bs->backing_format),
+-            backing_hd->drv ? backing_hd->drv->format_name : "");
+ 
+-    bdrv_op_block_all(backing_hd, bs->backing_blocker);
+-    /* Otherwise we won't be able to commit or stream */
+-    bdrv_op_unblock(backing_hd, BLOCK_OP_TYPE_COMMIT_TARGET,
+-                    bs->backing_blocker);
+-    bdrv_op_unblock(backing_hd, BLOCK_OP_TYPE_STREAM,
+-                    bs->backing_blocker);
+-    /*
+-     * We do backup in 3 ways:
+-     * 1. drive backup
+-     *    The target bs is new opened, and the source is top BDS
+-     * 2. blockdev backup
+-     *    Both the source and the target are top BDSes.
+-     * 3. internal backup(used for block replication)
+-     *    Both the source and the target are backing file
+-     *
+-     * In case 1 and 2, neither the source nor the target is the backing file.
+-     * In case 3, we will block the top BDS, so there is only one block job
+-     * for the top BDS and its backing chain.
+-     */
+-    bdrv_op_unblock(backing_hd, BLOCK_OP_TYPE_BACKUP_SOURCE,
+-                    bs->backing_blocker);
+-    bdrv_op_unblock(backing_hd, BLOCK_OP_TYPE_BACKUP_TARGET,
+-                    bs->backing_blocker);
+ out:
+     bdrv_refresh_limits(bs, NULL);
  }
- 
- void qmp_drive_mirror(DriveMirror *arg, Error **errp)
-@@ -3550,6 +3556,7 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
-                            arg->has_on_source_error, arg->on_source_error,
-                            arg->has_on_target_error, arg->on_target_error,
-                            arg->has_unmap, arg->unmap,
-+                           false, NULL,
-                            &local_err);
-     bdrv_unref(target_bs);
-     error_propagate(errp, local_err);
-@@ -3568,6 +3575,8 @@ void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
-                          BlockdevOnError on_source_error,
-                          bool has_on_target_error,
-                          BlockdevOnError on_target_error,
-+                         bool has_filter_node_name,
-+                         const char *filter_node_name,
-                          Error **errp)
- {
-     BlockDriverState *bs;
-@@ -3599,6 +3608,7 @@ void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
-                            has_on_source_error, on_source_error,
-                            has_on_target_error, on_target_error,
-                            true, true,
-+                           has_filter_node_name, filter_node_name,
-                            &local_err);
-     error_propagate(errp, local_err);
- 
 diff --git a/include/block/block_int.h b/include/block/block_int.h
-index a5c704b..563b30c 100644
+index a0d9328..a5c704b 100644
 --- a/include/block/block_int.h
 +++ b/include/block/block_int.h
-@@ -824,6 +824,9 @@ void commit_active_start(const char *job_id, BlockDriverState *bs,
-  * @on_source_error: The action to take upon error reading from the source.
-  * @on_target_error: The action to take upon error writing to the target.
-  * @unmap: Whether to unmap target where source sectors only contain zeroes.
-+ * @filter_node_name: The node name that should be assigned to the filter
-+ * driver that the mirror job inserts into the graph above @bs. NULL means that
-+ * a node name should be autogenerated.
-  * @errp: Error object.
-  *
-  * Start a mirroring operation on @bs.  Clusters that are allocated
-@@ -837,7 +840,7 @@ void mirror_start(const char *job_id, BlockDriverState *bs,
-                   MirrorSyncMode mode, BlockMirrorBackingMode backing_mode,
-                   BlockdevOnError on_source_error,
-                   BlockdevOnError on_target_error,
--                  bool unmap, Error **errp);
-+                  bool unmap, const char *filter_node_name, Error **errp);
+@@ -472,6 +472,9 @@ struct BdrvChildRole {
+      */
+     void (*drained_begin)(BdrvChild *child);
+     void (*drained_end)(BdrvChild *child);
++
++    void (*attach)(BdrvChild *child);
++    void (*detach)(BdrvChild *child);
+ };
  
- /*
-  * backup_job_create:
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 932f5bb..893fa34 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1671,6 +1671,11 @@
- #                   default 'report' (no limitations, since this applies to
- #                   a different block device than @device).
- #
-+# @filter-node-name: #optional the node name that should be assigned to the
-+#                    filter driver that the mirror job inserts into the graph
-+#                    above @device. If this option is not given, a node name is
-+#                    autogenerated. (Since: 2.9)
-+#
- # Returns: nothing on success.
- #
- # Since: 2.6
-@@ -1690,7 +1695,8 @@
-             'sync': 'MirrorSyncMode',
-             '*speed': 'int', '*granularity': 'uint32',
-             '*buf-size': 'int', '*on-source-error': 'BlockdevOnError',
--            '*on-target-error': 'BlockdevOnError' } }
-+            '*on-target-error': 'BlockdevOnError',
-+            '*filter-node-name': 'str' } }
- 
- ##
- # @block_set_io_throttle:
+ extern const BdrvChildRole child_file;
 -- 
 1.8.3.1
