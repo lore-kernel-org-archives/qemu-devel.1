@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cgGpL-0007WN-Dp
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 15:14:25 -0500
+	(envelope-from <armbru@redhat.com>) id 1cgGpL-0007W3-9w
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 15:14:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cgGpJ-00009D-IP
+	(envelope-from <armbru@redhat.com>) id 1cgGpI-00008p-U9
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 15:14:23 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 21 Feb 2017 21:14:07 +0100
-Message-Id: <1487708048-2131-24-git-send-email-armbru@redhat.com>
+Date: Tue, 21 Feb 2017 21:14:05 +0100
+Message-Id: <1487708048-2131-22-git-send-email-armbru@redhat.com>
 In-Reply-To: <1487708048-2131-1-git-send-email-armbru@redhat.com>
 References: <1487708048-2131-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 23/24] util/cutils: Change qemu_strtosz*()
- from int64_t to uint64_t
+Subject: [Qemu-devel] [PATCH v2 21/24] util/cutils: Let qemu_strtosz*()
+ optionally reject trailing crap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,7 +23,15 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-This will permit its use in parse_option_size().
+Change the qemu_strtosz() & friends to return -EINVAL when @endptr is
+null and the conversion doesn't consume the string completely.
+Matches how qemu_strtol() & friends work.
+
+Only test_qemu_strtosz_simple() passes a null @endptr.  No functional
+change there, because its conversion consumes the string.
+
+Simplify callers that use @endptr only to fail when it doesn't point
+to '\0' to pass a null @endptr instead.
 
 Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Cc: Eduardo Habkost <ehabkost@redhat.com> (maintainer:X86)
@@ -34,347 +42,203 @@ Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hmp.c                 |  5 +++--
- hw/misc/ivshmem.c     |  2 +-
- include/qemu/cutils.h |  6 +++---
- monitor.c             |  4 ++--
- qapi/opts-visitor.c   |  6 ++----
- qemu-img.c            |  5 ++++-
- qemu-io-cmds.c        |  5 ++++-
- target/i386/cpu.c     |  4 ++--
- tests/test-cutils.c   | 40 ++++++++++++++++++++--------------------
- util/cutils.c         | 14 +++++++++-----
- 10 files changed, 50 insertions(+), 41 deletions(-)
+ hmp.c               |  6 ++----
+ hw/misc/ivshmem.c   |  6 ++----
+ qapi/opts-visitor.c |  5 ++---
+ qemu-img.c          |  7 +------
+ qemu-io-cmds.c      |  7 +------
+ target/i386/cpu.c   |  5 ++---
+ tests/test-cutils.c |  6 ++++++
+ util/cutils.c       | 14 +++++++++-----
+ 8 files changed, 25 insertions(+), 31 deletions(-)
 
 diff --git a/hmp.c b/hmp.c
-index 6c79262..a6a3a5b 100644
+index 5948cba..e09d5dd 100644
 --- a/hmp.c
 +++ b/hmp.c
-@@ -1338,7 +1338,7 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
- {
-     const char *param = qdict_get_str(qdict, "parameter");
+@@ -1340,7 +1340,6 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
      const char *valuestr = qdict_get_str(qdict, "value");
--    int64_t valuebw = 0;
-+    uint64_t valuebw = 0;
+     int64_t valuebw = 0;
      long valueint = 0;
+-    char *endp;
      Error *err = NULL;
      bool use_int_value = false;
-@@ -1379,7 +1379,8 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+     int i;
+@@ -1379,9 +1378,8 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+                 break;
              case MIGRATION_PARAMETER_MAX_BANDWIDTH:
                  p.has_max_bandwidth = true;
-                 ret = qemu_strtosz_MiB(valuestr, NULL, &valuebw);
--                if (ret < 0 || (size_t)valuebw != valuebw) {
-+                if (ret < 0 || valuebw > INT64_MAX
-+                    || (size_t)valuebw != valuebw) {
+-                valuebw = qemu_strtosz_MiB(valuestr, &endp);
+-                if (valuebw < 0 || (size_t)valuebw != valuebw
+-                    || *endp != '\0') {
++                valuebw = qemu_strtosz_MiB(valuestr, NULL);
++                if (valuebw < 0 || (size_t)valuebw != valuebw) {
                      error_setg(&err, "Invalid size %s", valuestr);
                      goto cleanup;
                  }
 diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-index 80856fd..82ce837 100644
+index b3d9ed9..848bebc 100644
 --- a/hw/misc/ivshmem.c
 +++ b/hw/misc/ivshmem.c
-@@ -1268,7 +1268,7 @@ static void ivshmem_realize(PCIDevice *dev, Error **errp)
+@@ -1267,10 +1267,8 @@ static void ivshmem_realize(PCIDevice *dev, Error **errp)
+     if (s->sizearg == NULL) {
          s->legacy_size = 4 << 20; /* 4 MB default */
      } else {
-         int ret;
--        int64_t size;
-+        uint64_t size;
- 
-         ret = qemu_strtosz_MiB(s->sizearg, NULL, &size);
-         if (ret < 0 || (size_t)size != size || !is_power_of_2(size)) {
-diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
-index 4c68d5c..f0878ea 100644
---- a/include/qemu/cutils.h
-+++ b/include/qemu/cutils.h
-@@ -139,9 +139,9 @@ int parse_uint(const char *s, unsigned long long *value, char **endptr,
-                int base);
- int parse_uint_full(const char *s, unsigned long long *value, int base);
- 
--int qemu_strtosz(const char *nptr, char **end, int64_t *result);
--int qemu_strtosz_MiB(const char *nptr, char **end, int64_t *result);
--int qemu_strtosz_metric(const char *nptr, char **end, int64_t *result);
-+int qemu_strtosz(const char *nptr, char **end, uint64_t *result);
-+int qemu_strtosz_MiB(const char *nptr, char **end, uint64_t *result);
-+int qemu_strtosz_metric(const char *nptr, char **end, uint64_t *result);
- 
- #define K_BYTE     (1ULL << 10)
- #define M_BYTE     (1ULL << 20)
-diff --git a/monitor.c b/monitor.c
-index 57a36fb..f795cac 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -2774,7 +2774,7 @@ static QDict *monitor_parse_arguments(Monitor *mon,
-         case 'o':
-             {
-                 int ret;
--                int64_t val;
-+                uint64_t val;
-                 char *end;
- 
-                 while (qemu_isspace(*p)) {
-@@ -2787,7 +2787,7 @@ static QDict *monitor_parse_arguments(Monitor *mon,
-                     }
-                 }
-                 ret = qemu_strtosz_MiB(p, &end, &val);
--                if (ret < 0) {
-+                if (ret < 0 || val > INT64_MAX) {
-                     monitor_printf(mon, "invalid size\n");
-                     goto fail;
-                 }
+-        char *end;
+-        int64_t size = qemu_strtosz_MiB(s->sizearg, &end);
+-        if (size < 0 || (size_t)size != size || *end != '\0'
+-            || !is_power_of_2(size)) {
++        int64_t size = qemu_strtosz_MiB(s->sizearg, NULL);
++        if (size < 0 || (size_t)size != size || !is_power_of_2(size)) {
+             error_setg(errp, "Invalid size %s", s->sizearg);
+             return;
+         }
 diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c
-index aac2e09..a0a7c0e 100644
+index 360d337..911a0ee 100644
 --- a/qapi/opts-visitor.c
 +++ b/qapi/opts-visitor.c
-@@ -481,7 +481,6 @@ opts_type_size(Visitor *v, const char *name, uint64_t *obj, Error **errp)
- {
+@@ -482,15 +482,14 @@ opts_type_size(Visitor *v, const char *name, uint64_t *obj, Error **errp)
      OptsVisitor *ov = to_ov(v);
      const QemuOpt *opt;
--    int64_t val;
-     int err;
+     int64_t val;
+-    char *endptr;
  
      opt = lookup_scalar(ov, name, errp);
-@@ -489,14 +488,13 @@ opts_type_size(Visitor *v, const char *name, uint64_t *obj, Error **errp)
+     if (!opt) {
          return;
      }
  
--    err = qemu_strtosz(opt->str ? opt->str : "", NULL, &val);
-+    err = qemu_strtosz(opt->str ? opt->str : "", NULL, obj);
-     if (err < 0) {
+-    val = qemu_strtosz(opt->str ? opt->str : "", &endptr);
+-    if (val < 0 || *endptr) {
++    val = qemu_strtosz(opt->str ? opt->str : "", NULL);
++    if (val < 0) {
          error_setg(errp, QERR_INVALID_PARAMETER_VALUE, opt->name,
--                   "a size value representible as a non-negative int64");
-+                   "a size value");
+                    "a size value representible as a non-negative int64");
          return;
-     }
- 
--    *obj = val;
-     processed(ov, name);
- }
- 
 diff --git a/qemu-img.c b/qemu-img.c
-index 37d1afb..df3aefd 100644
+index 4062917..39ef581 100644
 --- a/qemu-img.c
 +++ b/qemu-img.c
-@@ -371,12 +371,15 @@ static int add_old_style_options(const char *fmt, QemuOpts *opts,
+@@ -370,14 +370,9 @@ static int add_old_style_options(const char *fmt, QemuOpts *opts,
+ 
  static int64_t cvtnum(const char *s)
  {
-     int err;
--    int64_t value;
-+    uint64_t value;
+-    char *end;
+     int64_t ret;
  
-     err = qemu_strtosz(s, NULL, &value);
-     if (err < 0) {
-         return err;
-     }
-+    if (value > INT64_MAX) {
-+        return -ERANGE;
-+    }
-     return value;
+-    ret = qemu_strtosz(s, &end);
+-    if (*end != '\0') {
+-        /* Detritus at the end of the string */
+-        return -EINVAL;
+-    }
++    ret = qemu_strtosz(s, NULL);
+     return ret;
  }
  
 diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index 01a6dc6..7ac1576 100644
+index 0166cfa..973eb94 100644
 --- a/qemu-io-cmds.c
 +++ b/qemu-io-cmds.c
-@@ -138,12 +138,15 @@ static char **breakline(char *input, int *count)
+@@ -137,14 +137,9 @@ static char **breakline(char *input, int *count)
+ 
  static int64_t cvtnum(const char *s)
  {
-     int err;
--    int64_t value;
-+    uint64_t value;
+-    char *end;
+     int64_t ret;
  
-     err = qemu_strtosz(s, NULL, &value);
-     if (err < 0) {
-         return err;
-     }
-+    if (value > INT64_MAX) {
-+        return -ERANGE;
-+    }
-     return value;
+-    ret = qemu_strtosz(s, &end);
+-    if (*end != '\0') {
+-        /* Detritus at the end of the string */
+-        return -EINVAL;
+-    }
++    ret = qemu_strtosz(s, NULL);
+     return ret;
  }
  
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index d32af97..b6f157d 100644
+index 685ca36..58a05ec 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -2034,10 +2034,10 @@ static void x86_cpu_parse_featurestr(const char *typename, char *features,
+@@ -2034,10 +2034,9 @@ static void x86_cpu_parse_featurestr(const char *typename, char *features,
          /* Special case: */
          if (!strcmp(name, "tsc-freq")) {
-             int ret;
--            int64_t tsc_freq;
-+            uint64_t tsc_freq;
+             int64_t tsc_freq;
+-            char *err;
  
-             ret = qemu_strtosz_metric(val, NULL, &tsc_freq);
--            if (ret < 0) {
-+            if (ret < 0 || tsc_freq > INT64_MAX) {
+-            tsc_freq = qemu_strtosz_metric(val, &err);
+-            if (tsc_freq < 0 || *err) {
++            tsc_freq = qemu_strtosz_metric(val, NULL);
++            if (tsc_freq < 0) {
                  error_setg(errp, "bad numerical value %s", val);
                  return;
              }
 diff --git a/tests/test-cutils.c b/tests/test-cutils.c
-index d0137de..f64a49b 100644
+index c4437d9..f2ecb7a 100644
 --- a/tests/test-cutils.c
 +++ b/tests/test-cutils.c
-@@ -1374,7 +1374,7 @@ static void test_qemu_strtosz_simple(void)
-     const char *str;
-     char *endptr = NULL;
-     int err;
--    int64_t res = 0xbaadf00d;
-+    uint64_t res = 0xbaadf00d;
- 
-     str = "0";
-     err = qemu_strtosz(str, &endptr, &res);
-@@ -1412,17 +1412,17 @@ static void test_qemu_strtosz_simple(void)
-     g_assert_cmpint(res, ==, 0x20000000000000); /* rounded to 53 bits */
-     g_assert(endptr == str + 16);
- 
--    str = "9223372036854774784"; /* 0x7ffffffffffffc00 (53 msbs set) */
-+    str = "18446744073709549568"; /* 0xfffffffffffff800 (53 msbs set) */
-     err = qemu_strtosz(str, &endptr, &res);
-     g_assert_cmpint(err, ==, 0);
--    g_assert_cmpint(res, ==, 0x7ffffffffffffc00);
--    g_assert(endptr == str + 19);
-+    g_assert_cmpint(res, ==, 0xfffffffffffff800);
-+    g_assert(endptr == str + 20);
- 
--    str = "9223372036854775295"; /* 0x7ffffffffffffdff */
-+    str = "18446744073709550591"; /* 0xfffffffffffffbff */
-     err = qemu_strtosz(str, &endptr, &res);
-     g_assert_cmpint(err, ==, 0);
--    g_assert_cmpint(res, ==, 0x7ffffffffffffc00); /* rounded to 53 bits */
--    g_assert(endptr == str + 19);
-+    g_assert_cmpint(res, ==, 0xfffffffffffff800); /* rounded to 53 bits */
-+    g_assert(endptr == str + 20);
- 
-     /* 0x7ffffffffffffe00..0x7fffffffffffffff get rounded to
-      * 0x8000000000000000, thus -ERANGE; see test_qemu_strtosz_erange() */
-@@ -1440,7 +1440,7 @@ static void test_qemu_strtosz_units(void)
-     const char *e = "1E";
-     int err;
-     char *endptr = NULL;
--    int64_t res = 0xbaadf00d;
-+    uint64_t res = 0xbaadf00d;
- 
-     /* default is M */
-     err = qemu_strtosz_MiB(none, &endptr, &res);
-@@ -1489,7 +1489,7 @@ static void test_qemu_strtosz_float(void)
-     const char *str = "12.345M";
-     int err;
-     char *endptr = NULL;
--    int64_t res = 0xbaadf00d;
-+    uint64_t res = 0xbaadf00d;
- 
-     err = qemu_strtosz(str, &endptr, &res);
-     g_assert_cmpint(err, ==, 0);
-@@ -1502,7 +1502,7 @@ static void test_qemu_strtosz_invalid(void)
-     const char *str;
-     char *endptr = NULL;
-     int err;
--    int64_t res = 0xbaadf00d;
-+    uint64_t res = 0xbaadf00d;
- 
-     str = "";
-     err = qemu_strtosz(str, &endptr, &res);
-@@ -1525,7 +1525,7 @@ static void test_qemu_strtosz_trailing(void)
-     const char *str;
-     char *endptr = NULL;
-     int err;
--    int64_t res = 0xbaadf00d;
-+    uint64_t res = 0xbaadf00d;
- 
-     str = "123xxx";
-     err = qemu_strtosz_MiB(str, &endptr, &res);
-@@ -1550,29 +1550,29 @@ static void test_qemu_strtosz_erange(void)
-     const char *str;
-     char *endptr = NULL;
-     int err;
--    int64_t res = 0xbaadf00d;
-+    uint64_t res = 0xbaadf00d;
- 
-     str = "-1";
-     err = qemu_strtosz(str, &endptr, &res);
-     g_assert_cmpint(err, ==, -ERANGE);
-     g_assert(endptr == str + 2);
- 
--    str = "9223372036854775296"; /* 0x7ffffffffffffe00 */
-+    str = "18446744073709550592"; /* 0xfffffffffffffc00 */
-     err = qemu_strtosz(str, &endptr, &res);
-     g_assert_cmpint(err, ==, -ERANGE);
--    g_assert(endptr == str + 19);
-+    g_assert(endptr == str + 20);
- 
--    str = "9223372036854775807"; /* 2^63-1 */
-+    str = "18446744073709551615"; /* 2^64-1 */
-     err = qemu_strtosz(str, &endptr, &res);
-     g_assert_cmpint(err, ==, -ERANGE);
--    g_assert(endptr == str + 19);
-+    g_assert(endptr == str + 20);
- 
--    str = "9223372036854775808"; /* 2^63 */
-+    str = "18446744073709551616"; /* 2^64 */
-     err = qemu_strtosz(str, &endptr, &res);
-     g_assert_cmpint(err, ==, -ERANGE);
--    g_assert(endptr == str + 19);
-+    g_assert(endptr == str + 20);
- 
--    str = "10E";
-+    str = "20E";
-     err = qemu_strtosz(str, &endptr, &res);
-     g_assert_cmpint(err, ==, -ERANGE);
+@@ -1510,10 +1510,16 @@ static void test_qemu_strtosz_trailing(void)
+     g_assert_cmpint(res, ==, 123 * M_BYTE);
      g_assert(endptr == str + 3);
-@@ -1583,7 +1583,7 @@ static void test_qemu_strtosz_metric(void)
-     const char *str = "12345k";
-     int err;
-     char *endptr = NULL;
--    int64_t res = 0xbaadf00d;
-+    uint64_t res = 0xbaadf00d;
  
-     err = qemu_strtosz_metric(str, &endptr, &res);
-     g_assert_cmpint(err, ==, 0);
++    res = qemu_strtosz(str, NULL);
++    g_assert_cmpint(res, ==, -EINVAL);
++
+     str = "1kiB";
+     res = qemu_strtosz(str, &endptr);
+     g_assert_cmpint(res, ==, 1024);
+     g_assert(endptr == str + 2);
++
++    res = qemu_strtosz(str, NULL);
++    g_assert_cmpint(res, ==, -EINVAL);
+ }
+ 
+ static void test_qemu_strtosz_erange(void)
 diff --git a/util/cutils.c b/util/cutils.c
-index 7088ddc..50ad179 100644
+index 0ac8019..b991623 100644
 --- a/util/cutils.c
 +++ b/util/cutils.c
-@@ -207,7 +207,7 @@ static int64_t suffix_mul(char suffix, int64_t unit)
-  */
- static int do_strtosz(const char *nptr, char **end,
-                       const char default_suffix, int64_t unit,
--                      int64_t *result)
-+                      uint64_t *result)
+@@ -208,7 +208,7 @@ static int64_t suffix_mul(char suffix, int64_t unit)
+ static int64_t do_strtosz(const char *nptr, char **end,
+                           const char default_suffix, int64_t unit)
  {
-     int retval;
+-    int64_t retval = -EINVAL;
++    int64_t retval;
      char *endptr;
-@@ -237,7 +237,11 @@ static int do_strtosz(const char *nptr, char **end,
-         retval = -EINVAL;
-         goto out;
+     unsigned char c;
+     int mul_required = 0;
+@@ -217,7 +217,8 @@ static int64_t do_strtosz(const char *nptr, char **end,
+     errno = 0;
+     val = strtod(nptr, &endptr);
+     if (isnan(val) || endptr == nptr || errno != 0) {
+-        goto fail;
++        retval = -EINVAL;
++        goto out;
      }
--    if ((val * mul >= INT64_MAX) || val < 0) {
-+    /*
-+     * Values >= 0xfffffffffffffc00 overflow uint64_t after their trip
-+     * through double (53 bits of precision).
-+     */
-+    if ((val * mul >= 0xfffffffffffffc00) || val < 0) {
+     fraction = modf(val, &integral);
+     if (fraction != 0) {
+@@ -232,17 +233,20 @@ static int64_t do_strtosz(const char *nptr, char **end,
+         assert(mul >= 0);
+     }
+     if (mul == 1 && mul_required) {
+-        goto fail;
++        retval = -EINVAL;
++        goto out;
+     }
+     if ((val * mul >= INT64_MAX) || val < 0) {
          retval = -ERANGE;
-         goto out;
+-        goto fail;
++        goto out;
      }
-@@ -254,17 +258,17 @@ out:
+     retval = val * mul;
+ 
+-fail:
++out:
+     if (end) {
+         *end = endptr;
++    } else if (*endptr) {
++        retval = -EINVAL;
+     }
+ 
      return retval;
- }
- 
--int qemu_strtosz(const char *nptr, char **end, int64_t *result)
-+int qemu_strtosz(const char *nptr, char **end, uint64_t *result)
- {
-     return do_strtosz(nptr, end, 'B', 1024, result);
- }
- 
--int qemu_strtosz_MiB(const char *nptr, char **end, int64_t *result)
-+int qemu_strtosz_MiB(const char *nptr, char **end, uint64_t *result)
- {
-     return do_strtosz(nptr, end, 'M', 1024, result);
- }
- 
--int qemu_strtosz_metric(const char *nptr, char **end, int64_t *result)
-+int qemu_strtosz_metric(const char *nptr, char **end, uint64_t *result)
- {
-     return do_strtosz(nptr, end, 'B', 1000, result);
- }
 -- 
 2.7.4
