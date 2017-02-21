@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <okaya@codeaurora.org>) id 1cgC5G-0001nm-IH
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:10:31 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cgC5b-00026K-1Z
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:10:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <okaya@codeaurora.org>) id 1cgC5F-0003px-Dn
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:10:30 -0500
-References: <1487683100-16013-1-git-send-email-eric.auger@redhat.com>
-	<1487683100-16013-2-git-send-email-eric.auger@redhat.com>
-	<98d4d9e8-761c-76f9-ecb0-c5a4a658dfab@codeaurora.org>
-	<2dcc9002-ec06-c55e-c0a2-75d05fe05762@redhat.com>
-From: Sinan Kaya <okaya@codeaurora.org>
-Message-ID: <970561bf-0adc-4f60-bf2b-57bbafabb0aa@codeaurora.org>
-Date: Tue, 21 Feb 2017 10:10:19 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cgC5X-0003u6-1Y
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:10:51 -0500
+Date: Tue, 21 Feb 2017 15:10:40 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170221151040.GA9376@work-vm>
+References: <20170120230359.4244-1-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <2dcc9002-ec06-c55e-c0a2-75d05fe05762@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] vfio/platform: make the vfio-platform
- device non abstract
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170120230359.4244-1-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hmp: fix block_set_io_throttle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,93 +22,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com, peter.maydell@linaro.org, alex.williamson@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: shankerd@codeaurora.org, vikrams@codeaurora.org, agraf@suse.de, pelcan@codeaurora.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-stable@nongnu.org
 
-On 2/21/2017 9:59 AM, Auger Eric wrote:
-> Hi Sinan,
-> On 21/02/2017 15:45, Sinan Kaya wrote:
->> Hi Eric,
->> Thanks for the long anticipated patch.
->>
->> On 2/21/2017 8:18 AM, Eric Auger wrote:
->>> +    DEFINE_PROP_STRING("manufacturer", VFIOPlatformDevice, manufacturer),
->>> +    DEFINE_PROP_STRING("model", VFIOPlatformDevice, model),
->>
->> The OF string is not always of the format "manufacturer, model".
->>
->> HIDMA for instance uses a syntax of "qcom, hidma-1.0" and "qcom, hidma-2.0".
->> This syntax is used for cases where an IP gets used in multiple SOCs. 
->>
->> Maybe, we should call it just compatible-string and try not to make meaning
->> out of it.
->>
->> Sinan
->>
+* Eric Blake (eblake@redhat.com) wrote:
+> Commit 7a9877a made the 'device' parameter to BlockIOThrottle
+> optional, favoring 'id' instead.  But it forgot to update the
+> HMP usage to set has_device, which makes all attempts to change
+> throttling via HMP fail with "Need exactly one of 'device' and 'id'"
 > 
-> in  http://www.devicetree.org/specifications-pdf I found the description
-> at the bottom.
+> CC: qemu-stable@nongnu.org
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+
+Queued for HMP
+
+> ---
 > 
-> I your case what would prevent from creating 2 entries in the table and
-> then use either in qemu cmd line?
+>  hmp.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-
-I see your point. You are saying that hidma-1.0 would be the model and qcom
-would be the manufacturer. 
-
-This should work.
-
-However, I have more concerns below.
-
-> VFIO_PLATFORM_BINDING("qcom", "hidma-1.0", add_amd_hidma_fdt_node),
-> VFIO_PLATFORM_BINDING("qcom", "hidma-2.0", add_amd_hidma_fdt_node),
+> diff --git a/hmp.c b/hmp.c
+> index b869617..a3dc9d6 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -1551,6 +1551,7 @@ void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict)
+>  {
+>      Error *err = NULL;
+>      BlockIOThrottle throttle = {
+> +        .has_device = true,
+>          .device = (char *) qdict_get_str(qdict, "device"),
+>          .bps = qdict_get_int(qdict, "bps"),
+>          .bps_rd = qdict_get_int(qdict, "bps_rd"),
+> -- 
+> 2.9.3
 > 
-> The issue is the comma in the property is interpreted as a separator for
-> options, hence that choice of having 2 separate options.
-
-Note that the goal is to be able to instantiate any platform device by just
-passing a compatible string and the object from the host. We don't want
-to make changes to QEMU every time somebody comes up with a new platform device.
-This step is unnecessary. 
-
-A general purpose solution should be able to passthrough any platform device.
-
-I have AHCI compatible SATA drive and HIDMA use cases for this purposes. The
-code should be able to probe the given device with the compatible string without
-requiring any changes to QEMU.
-
-I didn't see this in the code. Maybe, it is just because I'm QEMU code
-illiterate.
-
-I shouldn't need to submit a patch to QEMU to add these two lines.
-
-VFIO_PLATFORM_BINDING("qcom", "hidma-1.0", add_qcom_hidma_fdt_node),
-VFIO_PLATFORM_BINDING("qcom", "hidma-2.0", add_qcom_hidma_fdt_node),
-
-
 > 
-> Besides I will fix the CONFIG_LINUX compilation issue asap.
-> 
-> Thanks
-> 
-> Eric
-> 
-> "
-> The recommended format is "manufacturer,model", where manufacturer is a
-> string describing the name of the manufacturer (such as a stock ticker
-> symbol), and model specifies the model number.
-> 
-> Example:
-> compatible = "fsl,mpc8641-uart", "ns16550";
-> In this example, an operating system would first try to locate a device
-> driver that supported
-> fsl,mpc8641-uart. If a driver was not found, it would then try to locate
-> a driver that supported the more general ns16550 device type.
-> "
-> 
-
-
--- 
-Sinan Kaya
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
