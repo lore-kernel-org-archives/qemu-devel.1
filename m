@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cgGpE-0007Q4-GL
+	(envelope-from <armbru@redhat.com>) id 1cgGpF-0007QB-2C
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 15:14:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cgGp9-0008T6-CO
+	(envelope-from <armbru@redhat.com>) id 1cgGpB-0008Un-DC
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 15:14:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56138)
+Received: from mx1.redhat.com ([209.132.183.28]:41586)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cgGp9-0008Sb-3K
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 15:14:11 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cgGpB-0008Tl-5E
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 15:14:13 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3A0863B717
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 20:14:11 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 66244C04B946
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 20:14:13 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 21 Feb 2017 21:13:46 +0100
-Message-Id: <1487708048-2131-3-git-send-email-armbru@redhat.com>
+Date: Tue, 21 Feb 2017 21:13:58 +0100
+Message-Id: <1487708048-2131-15-git-send-email-armbru@redhat.com>
 In-Reply-To: <1487708048-2131-1-git-send-email-armbru@redhat.com>
 References: <1487708048-2131-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 02/24] option: Assert value string isn't null
+Subject: [Qemu-devel] [PATCH v2 14/24] util/cutils: New qemu_strtosz_metric()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,162 +31,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Plenty of code relies on QemuOpt member @str not being null, including
-qemu_opts_print(), qemu_opts_to_qdict(), and callbacks passed to
-qemu_opt_foreach().
+To parse numbers with metric suffixes, we use
 
-Begs the question whether it can be null.  Only opt_set() creates
-QemuOpt.  It sets member @str to its argument @value.  Passing null
-for @value would plant a time bomb.  Callers:
+    qemu_strtosz_suffix_unit(nptr, &eptr, QEMU_STRTOSZ_DEFSUFFIX_B, 1000)
 
-* opts_do_parse() can't pass null.
+Capture this in a new function for legibility:
 
-* qemu_opt_set() passes its argument @value.  Callers:
+    qemu_strtosz_metric(nptr, &eptr)
 
-  - qemu_opts_from_qdict_1() can't pass null
+Replace test_qemu_strtosz_suffix_unit() by test_qemu_strtosz_metric().
 
-  - qemu_opts_set() passes its argument @value, but none of its
-    callers pass null.
-
-  - Many more outside qemu-option.c, but they shouldn't pass null,
-    either.
-
-Assert member @str isn't null, so that misuse is caught right away.
-
-Simplify parse_option_bool(), parse_option_number() and
-parse_option_size() accordingly.  Best viewed with whitespace changes
-ignored.
+Rename qemu_strtosz_suffix_unit() to do_strtosz() and give it internal
+linkage.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- util/qemu-option.c | 89 ++++++++++++++++++++++++------------------------------
- 1 file changed, 39 insertions(+), 50 deletions(-)
+ include/qemu/cutils.h |  4 ++--
+ target/i386/cpu.c     |  3 +--
+ tests/test-cutils.c   | 13 ++++++-------
+ util/cutils.c         | 11 ++++++++---
+ 4 files changed, 17 insertions(+), 14 deletions(-)
 
-diff --git a/util/qemu-option.c b/util/qemu-option.c
-index d611946..9708668 100644
---- a/util/qemu-option.c
-+++ b/util/qemu-option.c
-@@ -128,17 +128,13 @@ int get_param_value(char *buf, int buf_size,
- static void parse_option_bool(const char *name, const char *value, bool *ret,
-                               Error **errp)
+diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
+index f922223..81613d0 100644
+--- a/include/qemu/cutils.h
++++ b/include/qemu/cutils.h
+@@ -156,8 +156,8 @@ int parse_uint_full(const char *s, unsigned long long *value, int base);
+ int64_t qemu_strtosz(const char *nptr, char **end);
+ int64_t qemu_strtosz_suffix(const char *nptr, char **end,
+                             const char default_suffix);
+-int64_t qemu_strtosz_suffix_unit(const char *nptr, char **end,
+-                            const char default_suffix, int64_t unit);
++int64_t qemu_strtosz_metric(const char *nptr, char **end);
++
+ #define K_BYTE     (1ULL << 10)
+ #define M_BYTE     (1ULL << 20)
+ #define G_BYTE     (1ULL << 30)
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index fd7add2..685ca36 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -2036,8 +2036,7 @@ static void x86_cpu_parse_featurestr(const char *typename, char *features,
+             int64_t tsc_freq;
+             char *err;
+ 
+-            tsc_freq = qemu_strtosz_suffix_unit(val, &err,
+-                                           QEMU_STRTOSZ_DEFSUFFIX_B, 1000);
++            tsc_freq = qemu_strtosz_metric(val, &err);
+             if (tsc_freq < 0 || *err) {
+                 error_setg(errp, "bad numerical value %s", val);
+                 return;
+diff --git a/tests/test-cutils.c b/tests/test-cutils.c
+index df6c330..e1d4054 100644
+--- a/tests/test-cutils.c
++++ b/tests/test-cutils.c
+@@ -1548,16 +1548,15 @@ static void test_qemu_strtosz_erange(void)
+     g_assert(endptr == str + 3);
+ }
+ 
+-static void test_qemu_strtosz_suffix_unit(void)
++static void test_qemu_strtosz_metric(void)
  {
--    if (value != NULL) {
--        if (!strcmp(value, "on")) {
--            *ret = 1;
--        } else if (!strcmp(value, "off")) {
--            *ret = 0;
--        } else {
--            error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
--                       name, "'on' or 'off'");
--        }
--    } else {
-+    if (!strcmp(value, "on")) {
-         *ret = 1;
-+    } else if (!strcmp(value, "off")) {
-+        *ret = 0;
-+    } else {
-+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-+                   name, "'on' or 'off'");
-     }
+-    const char *str = "12345";
++    const char *str = "12345k";
+     char *endptr = NULL;
+     int64_t res;
+ 
+-    res = qemu_strtosz_suffix_unit(str, &endptr,
+-                                   QEMU_STRTOSZ_DEFSUFFIX_KB, 1000);
++    res = qemu_strtosz_metric(str, &endptr);
+     g_assert_cmpint(res, ==, 12345000);
+-    g_assert(endptr == str + 5);
++    g_assert(endptr == str + 6);
  }
  
-@@ -148,16 +144,12 @@ static void parse_option_number(const char *name, const char *value,
-     char *postfix;
-     uint64_t number;
+ int main(int argc, char **argv)
+@@ -1754,8 +1753,8 @@ int main(int argc, char **argv)
+                     test_qemu_strtosz_trailing);
+     g_test_add_func("/cutils/strtosz/erange",
+                     test_qemu_strtosz_erange);
+-    g_test_add_func("/cutils/strtosz/suffix-unit",
+-                    test_qemu_strtosz_suffix_unit);
++    g_test_add_func("/cutils/strtosz/metric",
++                    test_qemu_strtosz_metric);
  
--    if (value != NULL) {
--        number = strtoull(value, &postfix, 0);
--        if (*postfix != '\0') {
--            error_setg(errp, QERR_INVALID_PARAMETER_VALUE, name, "a number");
--            return;
--        }
--        *ret = number;
--    } else {
-+    number = strtoull(value, &postfix, 0);
-+    if (*postfix != '\0') {
-         error_setg(errp, QERR_INVALID_PARAMETER_VALUE, name, "a number");
-+        return;
-     }
-+    *ret = number;
+     return g_test_run();
+ }
+diff --git a/util/cutils.c b/util/cutils.c
+index 6397424..b46e254 100644
+--- a/util/cutils.c
++++ b/util/cutils.c
+@@ -205,8 +205,8 @@ static int64_t suffix_mul(char suffix, int64_t unit)
+  * in *end, if not NULL. Return -ERANGE on overflow, Return -EINVAL on
+  * other error.
+  */
+-int64_t qemu_strtosz_suffix_unit(const char *nptr, char **end,
+-                            const char default_suffix, int64_t unit)
++static int64_t do_strtosz(const char *nptr, char **end,
++                          const char default_suffix, int64_t unit)
+ {
+     int64_t retval = -EINVAL;
+     char *endptr;
+@@ -251,7 +251,7 @@ fail:
+ int64_t qemu_strtosz_suffix(const char *nptr, char **end,
+                             const char default_suffix)
+ {
+-    return qemu_strtosz_suffix_unit(nptr, end, default_suffix, 1024);
++    return do_strtosz(nptr, end, default_suffix, 1024);
  }
  
- static const QemuOptDesc *find_desc_by_name(const QemuOptDesc *desc,
-@@ -180,39 +172,35 @@ void parse_option_size(const char *name, const char *value,
-     char *postfix;
-     double sizef;
- 
--    if (value != NULL) {
--        sizef = strtod(value, &postfix);
--        if (sizef < 0 || sizef > UINT64_MAX) {
--            error_setg(errp, QERR_INVALID_PARAMETER_VALUE, name,
--                             "a non-negative number below 2^64");
--            return;
--        }
--        switch (*postfix) {
--        case 'T':
--            sizef *= 1024;
--            /* fall through */
--        case 'G':
--            sizef *= 1024;
--            /* fall through */
--        case 'M':
--            sizef *= 1024;
--            /* fall through */
--        case 'K':
--        case 'k':
--            sizef *= 1024;
--            /* fall through */
--        case 'b':
--        case '\0':
--            *ret = (uint64_t) sizef;
--            break;
--        default:
--            error_setg(errp, QERR_INVALID_PARAMETER_VALUE, name, "a size");
--            error_append_hint(errp, "You may use k, M, G or T suffixes for "
--                    "kilobytes, megabytes, gigabytes and terabytes.\n");
--            return;
--        }
--    } else {
-+    sizef = strtod(value, &postfix);
-+    if (sizef < 0 || sizef > UINT64_MAX) {
-+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, name,
-+                   "a non-negative number below 2^64");
-+        return;
-+    }
-+    switch (*postfix) {
-+    case 'T':
-+        sizef *= 1024;
-+        /* fall through */
-+    case 'G':
-+        sizef *= 1024;
-+        /* fall through */
-+    case 'M':
-+        sizef *= 1024;
-+        /* fall through */
-+    case 'K':
-+    case 'k':
-+        sizef *= 1024;
-+        /* fall through */
-+    case 'b':
-+    case '\0':
-+        *ret = (uint64_t) sizef;
-+        break;
-+    default:
-         error_setg(errp, QERR_INVALID_PARAMETER_VALUE, name, "a size");
-+        error_append_hint(errp, "You may use k, M, G or T suffixes for "
-+                          "kilobytes, megabytes, gigabytes and terabytes.\n");
-+        return;
-     }
+ int64_t qemu_strtosz(const char *nptr, char **end)
+@@ -259,6 +259,11 @@ int64_t qemu_strtosz(const char *nptr, char **end)
+     return qemu_strtosz_suffix(nptr, end, QEMU_STRTOSZ_DEFSUFFIX_MB);
  }
  
-@@ -566,6 +554,7 @@ static void opt_set(QemuOpts *opts, const char *name, const char *value,
-     }
-     opt->desc = desc;
-     opt->str = g_strdup(value);
-+    assert(opt->str);
-     qemu_opt_parse(opt, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
++int64_t qemu_strtosz_metric(const char *nptr, char **end)
++{
++    return do_strtosz(nptr, end, QEMU_STRTOSZ_DEFSUFFIX_B, 1000);
++}
++
+ /**
+  * Helper function for error checking after strtol() and the like
+  */
 -- 
 2.7.4
