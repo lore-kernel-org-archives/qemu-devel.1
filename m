@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cfzDD-0004LO-25
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 20:25:52 -0500
+	(envelope-from <mst@redhat.com>) id 1cfzU9-0008P6-3q
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 20:43:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cfzD9-00085t-Sx
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 20:25:51 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57346)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cfzD9-00085i-K5
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 20:25:47 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cfzD6-0007G7-N1
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 01:25:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AC69D2E80CB
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 01:25:44 +0000 (UTC)
+	(envelope-from <mst@redhat.com>) id 1cfzU6-0003gO-1R
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 20:43:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43456)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cfzU5-0003cy-Ou
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 20:43:17 -0500
+Date: Tue, 21 Feb 2017 03:43:12 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170221034053-mutt-send-email-mst@kernel.org>
+References: <cover.1487286467.git.ben@skyportsystems.com>
+	<88232638f9ff3b17b54987624468678ea14a3037.1487286467.git.ben@skyportsystems.com>
+	<20170217114321.6c8577e1@nial.brq.redhat.com>
+	<918524f7-26cf-3fce-d9e3-7316ca69285b@redhat.com>
+	<20170220102304.GC2372@work-vm>
+	<3fb8499e-884c-99e8-b295-3d4603921075@redhat.com>
+	<20170220201923.GM2372@work-vm>
+	<d51d4a21-5558-d4e5-5b7e-08f729fc1a5e@redhat.com>
+	<0488d90c-f73c-916c-f84c-a1ffd2bad592@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 21 Feb 2017 01:19:18 -0000
-From: Alistair Phipps <1653384@bugs.launchpad.net>
-Reply-To: Bug 1653384 <1653384@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20161231213844.1229.87554.malonedeb@soybean.canonical.com>
-Message-Id: <20170221011918.6484.45067.launchpad@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1653384] Re: Assertion failed with USB pass
- through with XHCI controller
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0488d90c-f73c-916c-f84c-a1ffd2bad592@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v8 4/8] ACPI: Add Virtual Machine
+ Generation ID support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,113 +35,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, ben@skyportsystems.com
 
-** Bug watch added: Debian Bug tracker #855659
-   http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D855659
+On Mon, Feb 20, 2017 at 09:55:40PM +0100, Laszlo Ersek wrote:
+> On 02/20/17 21:45, Eric Blake wrote:
+> > On 02/20/2017 02:19 PM, Dr. David Alan Gilbert wrote:
+> >> * Eric Blake (eblake@redhat.com) wrote:
+> >>> On 02/20/2017 04:23 AM, Dr. David Alan Gilbert wrote:
+> >>>> * Laszlo Ersek (lersek@redhat.com) wrote:
+> >>>>> CC Dave
+> >>>>
+> >>>> This isn't an area I really understand; but if I'm
+> >>>> reading this right then 
+> >>>>    vmgenid is stored in fw_cfg?
+> >>>>    fw_cfg isn't migrated
+> >>>>
+> >>>> So why should any changes to it get migrated, except if it's already
+> >>>> been read by the guest (and if the guest reads it again aftwards what's
+> >>>> it expected to read?)
+> >>>
+> >>> Why are we expecting it to change on migration?  You want a new value
+> >>
+> >> I'm not; I was asking why a change made prior to migration would be
+> >> preserved across migration.
+> > 
+> > Okay, so you're asking what happens if the source requests the vmgenid
+> > device, and sets an id, but the destination of the migration does not
+> > request anything
+> 
+> This should never happen, as it means different QEMU command lines on
+> source vs. target hosts. (Different as in "incorrectly different".)
+> 
+> Dave writes, "a change made prior to migration". Change made to what?
+> 
+> - the GUID cannot be changed via the monitor once QEMU has been started.
+> We dropped the monitor command for that, due to lack of a good use case,
+> and due to lifecycle complexities. We have figured out a way to make it
+> safe, but until there's a really convincing use case, we shouldn't add
+> that complexity.
 
-** Also affects: qemu (Debian) via
-   http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D855659
-   Importance: Unknown
-       Status: Unknown
+True but we might in the future, and it seems prudent to make
+migration stream future-proof for that.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1653384
-
-Title:
-  Assertion failed with USB pass through with XHCI controller
-
-Status in QEMU:
-  Fix Committed
-Status in qemu package in Debian:
-  Unknown
-
-Bug description:
-  Starting qemu 2.8.0 with XHCI controller and host device passed
-  through results in an assertion failure:
-
-  qemu-system-x86_64: hw/usb/core.c:623: usb_packet_cleanup: Assertion
-  `!usb_packet_is_inflight(p)' failed.
-
-  Can be reproduced with the following command (passing through a Lenovo
-  keyboard):
-
-  qemu-system-x86_64 -usb  -device nec-usb-xhci,id=3Dusb -device usb-
-  host,vendorid=3D0x04b3,productid=3D0x3025,id=3Dhostdev0,bus=3Dusb.0,port=
-=3D1
-
-  If nec-usb-xhci is changed to usb-ehci, qemu tries to boot without
-  assertion failures.
-
-  =
-
-  Can be reproduced with the latest master (commit dbe2b65) and v2.8.0.
-
-  Bisected the issue to following commit:
-  first bad commit: [94b037f2a451b3dc855f9f2c346e5049a361bd55] xhci: use li=
-nked list for transfers
-
-  =
-
-  Backtrace from commit dbe2b65:
-
-  #0  0x00007f2eb4657227 in __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/=
-unix/sysv/linux/raise.c:55
-          resultvar =3D 0
-          pid =3D 3453
-          selftid =3D 3453
-  #1  0x00007f2eb465867a in __GI_abort () at abort.c:89
-          save_stage =3D 2
-          act =3D {__sigaction_handler =3D {sa_handler =3D 0x4, sa_sigactio=
-n =3D 0x4}, sa_mask =3D {__val =3D {140734740550528, 93876690035339, =
-
-                140734740550624, 48833659808, 0, 0, 0, 21474836480, 1407347=
-40550792, 139838573009553, 140734740550560, 139838573043008, =
-
-                139838573024160, 93876666665872, 139838702616576, 139838573=
-024160}}, sa_flags =3D 1528954938, =
-
-            sa_restorer =3D 0x55615b2202c0 <__PRETTY_FUNCTION__.38612>}
-          sigs =3D {__val =3D {32, 0 <repeats 15 times>}}
-  #2  0x00007f2eb46502cd in __assert_fail_base (fmt=3D0x7f2eb47893a0 "%s%s%=
-s:%u: %s%sAssertion `%s' failed.\n%n", =
-
-      assertion=3Dassertion@entry=3D0x55615b22003a "!usb_packet_is_inflight=
-(p)", file=3Dfile@entry=3D0x55615b21fdf0 "hw/usb/core.c", line=3Dline@entry=
-=3D619, =
-
-      function=3Dfunction@entry=3D0x55615b2202c0 <__PRETTY_FUNCTION__.38612=
-> "usb_packet_cleanup") at assert.c:92
-          str =3D 0x55615cfdf510 ""
-          total =3D 4096
-  #3  0x00007f2eb4650382 in __GI___assert_fail (assertion=3D0x55615b22003a =
-"!usb_packet_is_inflight(p)", file=3D0x55615b21fdf0 "hw/usb/core.c", =
-
-      line=3D619, function=3D0x55615b2202c0 <__PRETTY_FUNCTION__.38612> "us=
-b_packet_cleanup") at assert.c:101
-  No locals.
-  #4  0x000055615afc385e in usb_packet_cleanup ()
-  No symbol table info available.
-  #5  0x000055615afda555 in xhci_ep_free_xfer ()
-  No symbol table info available.
-  #6  0x000055615afdc156 in xhci_kick_epctx ()
-  No symbol table info available.
-  #7  0x000055615afda099 in xhci_ep_kick_timer ()
-  No symbol table info available.
-  #8  0x000055615b08ceee in timerlist_run_timers ()
-  No symbol table info available.
-  #9  0x000055615b08cf36 in qemu_clock_run_timers ()
-  No symbol table info available.
-  #10 0x000055615b08d2df in qemu_clock_run_all_timers ()
-  No symbol table info available.
-  #11 0x000055615b08be40 in main_loop_wait ()
-  No symbol table info available.
-  #12 0x000055615ae3870f in main_loop ()
-  No symbol table info available.
-  #13 0x000055615ae4027b in main ()
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1653384/+subscriptions
+> - the address of the GUID is changed (the firmware programs it from
+> "zero" to an actual address, in a writeable fw_cfg file), and that piece
+> of info is explicitly migrated, as part of the vmgenid device's vmsd.
+> 
+> Thanks
+> Laszlo
+> 
+> 
+> > - how does the guest on the destination see the same id
+> > as was in place on the source at the time migration started.
+> > 
+> >>
+> >>
+> >>> when you load state from disk (you don't know how many times the same
+> >>> state has been loaded previously, so each load is effectively forking
+> >>> the VM and you want a different value), but for a single live migration,
+> >>> you aren't forking the VM and don't need a new generation ID.
+> >>>
+> >>> I guess it all boils down to what command line you're using: if libvirt
+> >>> is driving a live migration, it will request the same UUID in the
+> >>> command line of the destination as what is on the source; while if
+> >>> libvirt is loading from a [managed]save to restore state from a file, it
+> >>> will either request a new UUID directly or request auto to let qemu
+> >>> generate the new id.
+> >>
+> >> Hmm now I've lost it a bit; I thought we would preserve the value
+> >> transmitted from the source, not the value on the command line of the destination.
+> > 
+> > I guess I'm trying to figure out whether libvirt MUST read the current
+> > id and explicitly tell the destination of migration to reuse that id, or
+> > if libvirt can omit the id on migration and everything just works
+> > because the id was migrated from the source.
+> > 
