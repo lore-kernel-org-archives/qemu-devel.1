@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cg94W-0007AO-Qs
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:57:36 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cg94a-0007Iz-25
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:57:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cg94V-0005XD-L6
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:57:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47566)
+	(envelope-from <stefanha@redhat.com>) id 1cg94X-0005XY-FL
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:57:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35802)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cg94V-0005X3-D2
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:57:31 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cg94X-0005XL-6f
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:57:33 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 21 Feb 2017 11:56:40 +0000
-Message-Id: <20170221115644.28264-21-stefanha@redhat.com>
+Date: Tue, 21 Feb 2017 11:56:41 +0000
+Message-Id: <20170221115644.28264-22-stefanha@redhat.com>
 In-Reply-To: <20170221115644.28264-1-stefanha@redhat.com>
 References: <20170221115644.28264-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL v2 20/24] coroutine-lock: add limited spinning
- to CoMutex
+Subject: [Qemu-devel] [PULL v2 21/24] test-aio-multithread: add performance
+ comparison with thread-based mutexes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,159 +29,207 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
-Running a very small critical section on pthread_mutex_t and CoMutex
-shows that pthread_mutex_t is much faster because it doesn't actually
-go to sleep.  What happens is that the critical section is shorter
-than the latency of entering the kernel and thus FUTEX_WAIT always
-fails.  With CoMutex there is no such latency but you still want to
-avoid wait and wakeup.  So introduce it artificially.
-
-This only works with one waiters; because CoMutex is fair, it will
-always have more waits and wakeups than a pthread_mutex_t.
+Add two implementations of the same benchmark as the previous patch,
+but using pthreads.  One uses a normal QemuMutex, the other is Linux
+only and implements a fair mutex based on MCS locks and futexes.
+This shows that the slower performance of the 5-thread case is due to
+the fairness of CoMutex, rather than to coroutines.  If fairness does
+not matter, as is the case with two threads, CoMutex can actually be
+faster than pthreads.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
-Message-id: 20170213181244.16297-3-pbonzini@redhat.com
+Message-id: 20170213181244.16297-4-pbonzini@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- include/qemu/coroutine.h   |  5 +++++
- util/qemu-coroutine-lock.c | 51 ++++++++++++++++++++++++++++++++++++++++------
- util/qemu-coroutine.c      |  2 +-
- 3 files changed, 51 insertions(+), 7 deletions(-)
+ tests/test-aio-multithread.c | 164 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 164 insertions(+)
 
-diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
-index fce228f..12ce8e1 100644
---- a/include/qemu/coroutine.h
-+++ b/include/qemu/coroutine.h
-@@ -167,6 +167,11 @@ typedef struct CoMutex {
-      */
-     unsigned locked;
- 
-+    /* Context that is holding the lock.  Useful to avoid spinning
-+     * when two coroutines on the same AioContext try to get the lock. :)
-+     */
-+    AioContext *ctx;
-+
-     /* A queue of waiters.  Elements are added atomically in front of
-      * from_push.  to_pop is only populated, and popped from, by whoever
-      * is in charge of the next wakeup.  This can be an unlocker or,
-diff --git a/util/qemu-coroutine-lock.c b/util/qemu-coroutine-lock.c
-index 25da9fa..73fe77c 100644
---- a/util/qemu-coroutine-lock.c
-+++ b/util/qemu-coroutine-lock.c
-@@ -30,6 +30,7 @@
- #include "qemu-common.h"
- #include "qemu/coroutine.h"
- #include "qemu/coroutine_int.h"
-+#include "qemu/processor.h"
- #include "qemu/queue.h"
- #include "block/aio.h"
- #include "trace.h"
-@@ -181,7 +182,18 @@ void qemu_co_mutex_init(CoMutex *mutex)
-     memset(mutex, 0, sizeof(*mutex));
+diff --git a/tests/test-aio-multithread.c b/tests/test-aio-multithread.c
+index 4fa2e9b..f11e990 100644
+--- a/tests/test-aio-multithread.c
++++ b/tests/test-aio-multithread.c
+@@ -278,6 +278,162 @@ static void test_multi_co_mutex_2_30(void)
+     test_multi_co_mutex(2, 30);
  }
  
--static void coroutine_fn qemu_co_mutex_lock_slowpath(CoMutex *mutex)
-+static void coroutine_fn qemu_co_mutex_wake(CoMutex *mutex, Coroutine *co)
++/* Same test with fair mutexes, for performance comparison.  */
++
++#ifdef CONFIG_LINUX
++#include "qemu/futex.h"
++
++/* The nodes for the mutex reside in this structure (on which we try to avoid
++ * false sharing).  The head of the mutex is in the "mutex_head" variable.
++ */
++static struct {
++    int next, locked;
++    int padding[14];
++} nodes[NUM_CONTEXTS] __attribute__((__aligned__(64)));
++
++static int mutex_head = -1;
++
++static void mcs_mutex_lock(void)
 +{
-+    /* Read co before co->ctx; pairs with smp_wmb() in
-+     * qemu_coroutine_enter().
-+     */
-+    smp_read_barrier_depends();
-+    mutex->ctx = co->ctx;
-+    aio_co_wake(co);
++    int prev;
++
++    nodes[id].next = -1;
++    nodes[id].locked = 1;
++    prev = atomic_xchg(&mutex_head, id);
++    if (prev != -1) {
++        atomic_set(&nodes[prev].next, id);
++        qemu_futex_wait(&nodes[id].locked, 1);
++    }
 +}
 +
-+static void coroutine_fn qemu_co_mutex_lock_slowpath(AioContext *ctx,
-+                                                     CoMutex *mutex)
- {
-     Coroutine *self = qemu_coroutine_self();
-     CoWaitRecord w;
-@@ -206,10 +218,11 @@ static void coroutine_fn qemu_co_mutex_lock_slowpath(CoMutex *mutex)
-         if (co == self) {
-             /* We got the lock ourselves!  */
-             assert(to_wake == &w);
-+            mutex->ctx = ctx;
-             return;
-         }
- 
--        aio_co_wake(co);
-+        qemu_co_mutex_wake(mutex, co);
-     }
- 
-     qemu_coroutine_yield();
-@@ -218,13 +231,39 @@ static void coroutine_fn qemu_co_mutex_lock_slowpath(CoMutex *mutex)
- 
- void coroutine_fn qemu_co_mutex_lock(CoMutex *mutex)
- {
-+    AioContext *ctx = qemu_get_current_aio_context();
-     Coroutine *self = qemu_coroutine_self();
-+    int waiters, i;
- 
--    if (atomic_fetch_inc(&mutex->locked) == 0) {
-+    /* Running a very small critical section on pthread_mutex_t and CoMutex
-+     * shows that pthread_mutex_t is much faster because it doesn't actually
-+     * go to sleep.  What happens is that the critical section is shorter
-+     * than the latency of entering the kernel and thus FUTEX_WAIT always
-+     * fails.  With CoMutex there is no such latency but you still want to
-+     * avoid wait and wakeup.  So introduce it artificially.
-+     */
-+    i = 0;
-+retry_fast_path:
-+    waiters = atomic_cmpxchg(&mutex->locked, 0, 1);
-+    if (waiters != 0) {
-+        while (waiters == 1 && ++i < 1000) {
-+            if (atomic_read(&mutex->ctx) == ctx) {
-+                break;
-+            }
-+            if (atomic_read(&mutex->locked) == 0) {
-+                goto retry_fast_path;
-+            }
-+            cpu_relax();
++static void mcs_mutex_unlock(void)
++{
++    int next;
++    if (nodes[id].next == -1) {
++        if (atomic_read(&mutex_head) == id &&
++            atomic_cmpxchg(&mutex_head, id, -1) == id) {
++            /* Last item in the list, exit.  */
++            return;
 +        }
-+        waiters = atomic_fetch_inc(&mutex->locked);
++        while (atomic_read(&nodes[id].next) == -1) {
++            /* mcs_mutex_lock did the xchg, but has not updated
++             * nodes[prev].next yet.
++             */
++        }
 +    }
 +
-+    if (waiters == 0) {
-         /* Uncontended.  */
-         trace_qemu_co_mutex_lock_uncontended(mutex, self);
-+        mutex->ctx = ctx;
++    /* Wake up the next in line.  */
++    next = nodes[id].next;
++    nodes[next].locked = 0;
++    qemu_futex_wake(&nodes[next].locked, 1);
++}
++
++static void test_multi_fair_mutex_entry(void *opaque)
++{
++    while (!atomic_mb_read(&now_stopping)) {
++        mcs_mutex_lock();
++        counter++;
++        mcs_mutex_unlock();
++        atomic_inc(&atomic_counter);
++    }
++    atomic_dec(&running);
++}
++
++static void test_multi_fair_mutex(int threads, int seconds)
++{
++    int i;
++
++    assert(mutex_head == -1);
++    counter = 0;
++    atomic_counter = 0;
++    now_stopping = false;
++
++    create_aio_contexts();
++    assert(threads <= NUM_CONTEXTS);
++    running = threads;
++    for (i = 0; i < threads; i++) {
++        Coroutine *co1 = qemu_coroutine_create(test_multi_fair_mutex_entry, NULL);
++        aio_co_schedule(ctx[i], co1);
++    }
++
++    g_usleep(seconds * 1000000);
++
++    atomic_mb_set(&now_stopping, true);
++    while (running > 0) {
++        g_usleep(100000);
++    }
++
++    join_aio_contexts();
++    g_test_message("%d iterations/second\n", counter / seconds);
++    g_assert_cmpint(counter, ==, atomic_counter);
++}
++
++static void test_multi_fair_mutex_1(void)
++{
++    test_multi_fair_mutex(NUM_CONTEXTS, 1);
++}
++
++static void test_multi_fair_mutex_10(void)
++{
++    test_multi_fair_mutex(NUM_CONTEXTS, 10);
++}
++#endif
++
++/* Same test with pthread mutexes, for performance comparison and
++ * portability.  */
++
++static QemuMutex mutex;
++
++static void test_multi_mutex_entry(void *opaque)
++{
++    while (!atomic_mb_read(&now_stopping)) {
++        qemu_mutex_lock(&mutex);
++        counter++;
++        qemu_mutex_unlock(&mutex);
++        atomic_inc(&atomic_counter);
++    }
++    atomic_dec(&running);
++}
++
++static void test_multi_mutex(int threads, int seconds)
++{
++    int i;
++
++    qemu_mutex_init(&mutex);
++    counter = 0;
++    atomic_counter = 0;
++    now_stopping = false;
++
++    create_aio_contexts();
++    assert(threads <= NUM_CONTEXTS);
++    running = threads;
++    for (i = 0; i < threads; i++) {
++        Coroutine *co1 = qemu_coroutine_create(test_multi_mutex_entry, NULL);
++        aio_co_schedule(ctx[i], co1);
++    }
++
++    g_usleep(seconds * 1000000);
++
++    atomic_mb_set(&now_stopping, true);
++    while (running > 0) {
++        g_usleep(100000);
++    }
++
++    join_aio_contexts();
++    g_test_message("%d iterations/second\n", counter / seconds);
++    g_assert_cmpint(counter, ==, atomic_counter);
++}
++
++static void test_multi_mutex_1(void)
++{
++    test_multi_mutex(NUM_CONTEXTS, 1);
++}
++
++static void test_multi_mutex_10(void)
++{
++    test_multi_mutex(NUM_CONTEXTS, 10);
++}
++
+ /* End of tests.  */
+ 
+ int main(int argc, char **argv)
+@@ -290,10 +446,18 @@ int main(int argc, char **argv)
+         g_test_add_func("/aio/multi/schedule", test_multi_co_schedule_1);
+         g_test_add_func("/aio/multi/mutex/contended", test_multi_co_mutex_1);
+         g_test_add_func("/aio/multi/mutex/handoff", test_multi_co_mutex_2_3);
++#ifdef CONFIG_LINUX
++        g_test_add_func("/aio/multi/mutex/mcs", test_multi_fair_mutex_1);
++#endif
++        g_test_add_func("/aio/multi/mutex/pthread", test_multi_mutex_1);
      } else {
--        qemu_co_mutex_lock_slowpath(mutex);
-+        qemu_co_mutex_lock_slowpath(ctx, mutex);
+         g_test_add_func("/aio/multi/schedule", test_multi_co_schedule_10);
+         g_test_add_func("/aio/multi/mutex/contended", test_multi_co_mutex_10);
+         g_test_add_func("/aio/multi/mutex/handoff", test_multi_co_mutex_2_30);
++#ifdef CONFIG_LINUX
++        g_test_add_func("/aio/multi/mutex/mcs", test_multi_fair_mutex_10);
++#endif
++        g_test_add_func("/aio/multi/mutex/pthread", test_multi_mutex_10);
      }
-     mutex->holder = self;
-     self->locks_held++;
-@@ -240,6 +279,7 @@ void coroutine_fn qemu_co_mutex_unlock(CoMutex *mutex)
-     assert(mutex->holder == self);
-     assert(qemu_in_coroutine());
- 
-+    mutex->ctx = NULL;
-     mutex->holder = NULL;
-     self->locks_held--;
-     if (atomic_fetch_dec(&mutex->locked) == 1) {
-@@ -252,8 +292,7 @@ void coroutine_fn qemu_co_mutex_unlock(CoMutex *mutex)
-         unsigned our_handoff;
- 
-         if (to_wake) {
--            Coroutine *co = to_wake->co;
--            aio_co_wake(co);
-+            qemu_co_mutex_wake(mutex, to_wake->co);
-             break;
-         }
- 
-diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
-index 415600d..72412e5 100644
---- a/util/qemu-coroutine.c
-+++ b/util/qemu-coroutine.c
-@@ -118,7 +118,7 @@ void qemu_coroutine_enter(Coroutine *co)
-     co->ctx = qemu_get_current_aio_context();
- 
-     /* Store co->ctx before anything that stores co.  Matches
--     * barrier in aio_co_wake.
-+     * barrier in aio_co_wake and qemu_co_mutex_wake.
-      */
-     smp_wmb();
- 
+     return g_test_run();
+ }
 -- 
 2.9.3
