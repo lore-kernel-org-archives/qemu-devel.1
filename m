@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgBux-0000kO-TO
+	(envelope-from <kwolf@redhat.com>) id 1cgBuy-0000kd-59
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgBuw-00088I-ON
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:51 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cgBuw-00088S-Tv
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:52 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 21 Feb 2017 15:58:29 +0100
-Message-Id: <1487689130-30373-34-git-send-email-kwolf@redhat.com>
+Date: Tue, 21 Feb 2017 15:58:28 +0100
+Message-Id: <1487689130-30373-33-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
 References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 33/54] block: Include details on permission
- errors in message
+Subject: [Qemu-devel] [PATCH 32/54] block: Add
+ BdrvChildRole.get_parent_desc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,99 +23,119 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-Instead of just telling that there was some conflict, we can be specific
-and tell which permissions were in conflict and which way the conflict
-is.
+For meaningful error messages in the permission system, we need to get
+some human-readable description of the parent of a BdrvChild.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block.c | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 56 insertions(+), 11 deletions(-)
+ block.c                   |  9 +++++++++
+ block/block-backend.c     | 21 +++++++++++++++++++++
+ include/block/block_int.h |  6 ++++++
+ 3 files changed, 36 insertions(+)
 
 diff --git a/block.c b/block.c
-index 19cf3b0..a8a2fa7 100644
+index 9f46698..19cf3b0 100644
 --- a/block.c
 +++ b/block.c
-@@ -1461,6 +1461,43 @@ static void bdrv_update_perm(BlockDriverState *bs)
-     bdrv_set_perm(bs, cumulative_perms, cumulative_shared_perms);
+@@ -707,6 +707,12 @@ int bdrv_parse_cache_mode(const char *mode, int *flags, bool *writethrough)
+     return 0;
  }
  
-+static char *bdrv_child_user(BdrvChild *c)
++static char *bdrv_child_get_parent_desc(BdrvChild *c)
 +{
-+    if (c->role->get_parent_desc) {
-+        return c->role->get_parent_desc(c);
-+    }
-+
-+    return g_strdup("another user");
++    BlockDriverState *parent = c->opaque;
++    return g_strdup(bdrv_get_device_or_node_name(parent));
 +}
 +
-+static char *bdrv_perm_names(uint64_t perm)
+ static void bdrv_child_cb_drained_begin(BdrvChild *child)
+ {
+     BlockDriverState *bs = child->opaque;
+@@ -774,6 +780,7 @@ static void bdrv_inherited_options(int *child_flags, QDict *child_options,
+ }
+ 
+ const BdrvChildRole child_file = {
++    .get_parent_desc = bdrv_child_get_parent_desc,
+     .inherit_options = bdrv_inherited_options,
+     .drained_begin   = bdrv_child_cb_drained_begin,
+     .drained_end     = bdrv_child_cb_drained_end,
+@@ -794,6 +801,7 @@ static void bdrv_inherited_fmt_options(int *child_flags, QDict *child_options,
+ }
+ 
+ const BdrvChildRole child_format = {
++    .get_parent_desc = bdrv_child_get_parent_desc,
+     .inherit_options = bdrv_inherited_fmt_options,
+     .drained_begin   = bdrv_child_cb_drained_begin,
+     .drained_end     = bdrv_child_cb_drained_end,
+@@ -824,6 +832,7 @@ static void bdrv_backing_options(int *child_flags, QDict *child_options,
+ }
+ 
+ const BdrvChildRole child_backing = {
++    .get_parent_desc = bdrv_child_get_parent_desc,
+     .inherit_options = bdrv_backing_options,
+     .drained_begin   = bdrv_child_cb_drained_begin,
+     .drained_end     = bdrv_child_cb_drained_end,
+diff --git a/block/block-backend.c b/block/block-backend.c
+index fcc42b5..38a3858 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -80,6 +80,7 @@ static const AIOCBInfo block_backend_aiocb_info = {
+ 
+ static void drive_info_del(DriveInfo *dinfo);
+ static BlockBackend *bdrv_first_blk(BlockDriverState *bs);
++static char *blk_get_attached_dev_id(BlockBackend *blk);
+ 
+ /* All BlockBackends */
+ static QTAILQ_HEAD(, BlockBackend) block_backends =
+@@ -102,6 +103,25 @@ static void blk_root_drained_end(BdrvChild *child);
+ static void blk_root_change_media(BdrvChild *child, bool load);
+ static void blk_root_resize(BdrvChild *child);
+ 
++static char *blk_root_get_parent_desc(BdrvChild *child)
 +{
-+    struct perm_name {
-+        uint64_t perm;
-+        const char *name;
-+    } permissions[] = {
-+        { BLK_PERM_CONSISTENT_READ, "consistent read" },
-+        { BLK_PERM_WRITE,           "write" },
-+        { BLK_PERM_WRITE_UNCHANGED, "write unchanged" },
-+        { BLK_PERM_RESIZE,          "resize" },
-+        { BLK_PERM_GRAPH_MOD,       "change children" },
-+        { 0, NULL }
-+    };
++    BlockBackend *blk = child->opaque;
++    char *dev_id;
 +
-+    char *result = g_strdup("");
-+    struct perm_name *p;
-+
-+    for (p = permissions; p->name; p++) {
-+        if (perm & p->perm) {
-+            char *old = result;
-+            result = g_strdup_printf("%s%s%s", old, *old ? ", " : "", p->name);
-+            g_free(old);
-+        }
++    if (blk->name) {
++        return g_strdup(blk->name);
 +    }
 +
-+    return result;
++    dev_id = blk_get_attached_dev_id(blk);
++    if (*dev_id) {
++        return dev_id;
++    } else {
++        /* TODO Callback into the BB owner for something more detailed */
++        g_free(dev_id);
++        return g_strdup("a block device");
++    }
 +}
 +
- /*
-  * Checks whether a new reference to @bs can be added if the new user requires
-  * @new_used_perm/@new_shared_perm as its permissions. If @ignore_child is set,
-@@ -1485,17 +1522,25 @@ static int bdrv_check_update_perm(BlockDriverState *bs, uint64_t new_used_perm,
-             continue;
-         }
+ static const char *blk_root_get_name(BdrvChild *child)
+ {
+     return blk_name(child->opaque);
+@@ -113,6 +133,7 @@ static const BdrvChildRole child_root = {
+     .change_media       = blk_root_change_media,
+     .resize             = blk_root_resize,
+     .get_name           = blk_root_get_name,
++    .get_parent_desc    = blk_root_get_parent_desc,
  
--        if ((new_used_perm & c->shared_perm) != new_used_perm ||
--            (c->perm & new_shared_perm) != c->perm)
--        {
--            const char *user = NULL;
--            if (c->role->get_name) {
--                user = c->role->get_name(c);
--                if (user && !*user) {
--                    user = NULL;
--                }
--            }
--            error_setg(errp, "Conflicts with %s", user ?: "another operation");
-+        if ((new_used_perm & c->shared_perm) != new_used_perm) {
-+            char *user = bdrv_child_user(c);
-+            char *perm_names = bdrv_perm_names(new_used_perm & ~c->shared_perm);
-+            error_setg(errp, "Conflicts with use by %s as '%s', which does not "
-+                             "allow '%s' on %s",
-+                       user, c->name, perm_names, bdrv_get_node_name(c->bs));
-+            g_free(user);
-+            g_free(perm_names);
-+            return -EPERM;
-+        }
+     .drained_begin      = blk_root_drained_begin,
+     .drained_end        = blk_root_drained_end,
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index e00d0f4..3177b9f 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -452,6 +452,12 @@ struct BdrvChildRole {
+      * name), or NULL if the parent can't provide a better name. */
+     const char* (*get_name)(BdrvChild *child);
+ 
++    /* Returns a malloced string that describes the parent of the child for a
++     * human reader. This could be a node-name, BlockBackend name, qdev ID or
++     * QOM path of the device owning the BlockBackend, job type and ID etc. The
++     * caller is responsible for freeing the memory. */
++    char* (*get_parent_desc)(BdrvChild *child);
 +
-+        if ((c->perm & new_shared_perm) != c->perm) {
-+            char *user = bdrv_child_user(c);
-+            char *perm_names = bdrv_perm_names(c->perm & ~new_shared_perm);
-+            error_setg(errp, "Conflicts with use by %s as '%s', which uses "
-+                             "'%s' on %s",
-+                       user, c->name, perm_names, bdrv_get_node_name(c->bs));
-+            g_free(user);
-+            g_free(perm_names);
-             return -EPERM;
-         }
- 
+     /*
+      * If this pair of functions is implemented, the parent doesn't issue new
+      * requests after returning from .drained_begin() until .drained_end() is
 -- 
 1.8.3.1
