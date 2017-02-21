@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgBub-0000Am-5w
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:30 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cgBuc-0000Eb-4D
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgBua-0007vQ-23
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:29 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cgBub-0007vx-5N
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:30 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 21 Feb 2017 15:58:12 +0100
-Message-Id: <1487689130-30373-17-git-send-email-kwolf@redhat.com>
+Date: Tue, 21 Feb 2017 15:58:13 +0100
+Message-Id: <1487689130-30373-18-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
 References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 16/54] block: Default .bdrv_child_perm() for
+Subject: [Qemu-devel] [PATCH 17/54] block: Request child permissions in
  filter drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,73 +23,93 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-Most filters need permissions related to read and write for their
-children, but only if the node has a parent that wants to use the same
-operation on the filter. The same is true for resize.
-
-This adds a default implementation that simply forwards all necessary
-permissions to all children of the node and leaves the other permissions
-unchanged.
+All callers will have to request permissions for all of their child
+nodes. Block drivers that act as simply filters can use the default
+implementation of .bdrv_child_perm().
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block.c                   | 24 ++++++++++++++++++++++++
- include/block/block_int.h |  8 ++++++++
- 2 files changed, 32 insertions(+)
+ block/blkdebug.c    | 2 ++
+ block/blkreplay.c   | 1 +
+ block/blkverify.c   | 1 +
+ block/quorum.c      | 2 ++
+ block/raw-format.c  | 1 +
+ block/replication.c | 1 +
+ 6 files changed, 8 insertions(+)
 
-diff --git a/block.c b/block.c
-index 2a86781..523cbd3 100644
---- a/block.c
-+++ b/block.c
-@@ -1531,6 +1531,30 @@ int bdrv_child_try_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared,
-     return 0;
- }
+diff --git a/block/blkdebug.c b/block/blkdebug.c
+index 6117ce5..67e8024 100644
+--- a/block/blkdebug.c
++++ b/block/blkdebug.c
+@@ -734,6 +734,8 @@ static BlockDriver bdrv_blkdebug = {
+     .bdrv_file_open         = blkdebug_open,
+     .bdrv_close             = blkdebug_close,
+     .bdrv_reopen_prepare    = blkdebug_reopen_prepare,
++    .bdrv_child_perm        = bdrv_filter_default_perms,
++
+     .bdrv_getlength         = blkdebug_getlength,
+     .bdrv_truncate          = blkdebug_truncate,
+     .bdrv_refresh_filename  = blkdebug_refresh_filename,
+diff --git a/block/blkreplay.c b/block/blkreplay.c
+index cfc8c5b..e110211 100755
+--- a/block/blkreplay.c
++++ b/block/blkreplay.c
+@@ -137,6 +137,7 @@ static BlockDriver bdrv_blkreplay = {
  
-+#define DEFAULT_PERM_PASSTHROUGH (BLK_PERM_CONSISTENT_READ \
-+                                 | BLK_PERM_WRITE \
-+                                 | BLK_PERM_WRITE_UNCHANGED \
-+                                 | BLK_PERM_RESIZE)
-+#define DEFAULT_PERM_UNCHANGED (BLK_PERM_ALL & ~DEFAULT_PERM_PASSTHROUGH)
-+
-+void bdrv_filter_default_perms(BlockDriverState *bs, BdrvChild *c,
-+                               const BdrvChildRole *role,
-+                               uint64_t perm, uint64_t shared,
-+                               uint64_t *nperm, uint64_t *nshared)
-+{
-+    if (c == NULL) {
-+        *nperm = 0;
-+        *nshared = BLK_PERM_ALL;
-+        return;
-+    }
-+
-+    *nperm = (perm & DEFAULT_PERM_PASSTHROUGH) |
-+             (c->perm & DEFAULT_PERM_UNCHANGED);
-+    *nshared = (shared & DEFAULT_PERM_PASSTHROUGH) |
-+               (c->shared_perm & DEFAULT_PERM_UNCHANGED);
-+}
-+
-+
- static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs)
- {
-     BlockDriverState *old_bs = child->bs;
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index cef2b6e..17f4c2d 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -872,6 +872,14 @@ void bdrv_child_abort_perm_update(BdrvChild *c);
- int bdrv_child_try_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared,
-                             Error **errp);
+     .bdrv_file_open         = blkreplay_open,
+     .bdrv_close             = blkreplay_close,
++    .bdrv_child_perm        = bdrv_filter_default_perms,
+     .bdrv_getlength         = blkreplay_getlength,
  
-+/* Default implementation for BlockDriver.bdrv_child_perm() that can be used by
-+ * block filters: Forward CONSISTENT_READ, WRITE, WRITE_UNCHANGED and RESIZE to
-+ * all children */
-+void bdrv_filter_default_perms(BlockDriverState *bs, BdrvChild *c,
-+                               const BdrvChildRole *role,
-+                               uint64_t perm, uint64_t shared,
-+                               uint64_t *nperm, uint64_t *nshared);
-+
+     .bdrv_co_preadv         = blkreplay_co_preadv,
+diff --git a/block/blkverify.c b/block/blkverify.c
+index 43a940c..9a1e21c 100644
+--- a/block/blkverify.c
++++ b/block/blkverify.c
+@@ -320,6 +320,7 @@ static BlockDriver bdrv_blkverify = {
+     .bdrv_parse_filename              = blkverify_parse_filename,
+     .bdrv_file_open                   = blkverify_open,
+     .bdrv_close                       = blkverify_close,
++    .bdrv_child_perm                  = bdrv_filter_default_perms,
+     .bdrv_getlength                   = blkverify_getlength,
+     .bdrv_refresh_filename            = blkverify_refresh_filename,
  
- const char *bdrv_get_parent_name(const BlockDriverState *bs);
- void blk_dev_change_media_cb(BlockBackend *blk, bool load);
+diff --git a/block/quorum.c b/block/quorum.c
+index bdbcec6..40205fb 100644
+--- a/block/quorum.c
++++ b/block/quorum.c
+@@ -1133,6 +1133,8 @@ static BlockDriver bdrv_quorum = {
+     .bdrv_add_child                     = quorum_add_child,
+     .bdrv_del_child                     = quorum_del_child,
+ 
++    .bdrv_child_perm                    = bdrv_filter_default_perms,
++
+     .is_filter                          = true,
+     .bdrv_recurse_is_first_non_filter   = quorum_recurse_is_first_non_filter,
+ };
+diff --git a/block/raw-format.c b/block/raw-format.c
+index ce34d1b..86fbc65 100644
+--- a/block/raw-format.c
++++ b/block/raw-format.c
+@@ -467,6 +467,7 @@ BlockDriver bdrv_raw = {
+     .bdrv_reopen_abort    = &raw_reopen_abort,
+     .bdrv_open            = &raw_open,
+     .bdrv_close           = &raw_close,
++    .bdrv_child_perm      = bdrv_filter_default_perms,
+     .bdrv_create          = &raw_create,
+     .bdrv_co_preadv       = &raw_co_preadv,
+     .bdrv_co_pwritev      = &raw_co_pwritev,
+diff --git a/block/replication.c b/block/replication.c
+index eff85c7..91465cb 100644
+--- a/block/replication.c
++++ b/block/replication.c
+@@ -660,6 +660,7 @@ BlockDriver bdrv_replication = {
+ 
+     .bdrv_open                  = replication_open,
+     .bdrv_close                 = replication_close,
++    .bdrv_child_perm            = bdrv_filter_default_perms,
+ 
+     .bdrv_getlength             = replication_getlength,
+     .bdrv_co_readv              = replication_co_readv,
 -- 
 1.8.3.1
