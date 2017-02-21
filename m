@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38832)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cg94R-0006zR-0Z
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:57:28 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cg94N-0006vd-6r
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:57:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cg94P-0005WD-VV
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:57:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45048)
+	(envelope-from <stefanha@redhat.com>) id 1cg94M-0005VY-3o
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:57:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59866)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cg94P-0005W8-N2
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:57:25 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cg94L-0005VS-Qw
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:57:22 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 21 Feb 2017 11:56:38 +0000
-Message-Id: <20170221115644.28264-19-stefanha@redhat.com>
+Date: Tue, 21 Feb 2017 11:56:36 +0000
+Message-Id: <20170221115644.28264-17-stefanha@redhat.com>
 In-Reply-To: <20170221115644.28264-1-stefanha@redhat.com>
 References: <20170221115644.28264-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL v2 18/24] block: document fields protected by
- AioContext lock
+Subject: [Qemu-devel] [PULL v2 16/24] aio-posix: partially inline
+ aio_dispatch into aio_poll
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,157 +29,158 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
+This patch prepares for the removal of unnecessary lockcnt inc/dec pairs.
+Extract the dispatching loop for file descriptor handlers into a new
+function aio_dispatch_handlers, and then inline aio_dispatch into
+aio_poll.
+
+aio_dispatch can now become void.
+
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
 Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20170213135235.12274-19-pbonzini@redhat.com
+Message-id: 20170213135235.12274-17-pbonzini@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- include/block/block_int.h      | 64 +++++++++++++++++++++++++-----------------
- include/sysemu/block-backend.h | 14 ++++++---
- 2 files changed, 49 insertions(+), 29 deletions(-)
+ include/block/aio.h |  6 +-----
+ util/aio-posix.c    | 44 ++++++++++++++------------------------------
+ util/aio-win32.c    | 13 ++++---------
+ util/async.c        |  2 +-
+ 4 files changed, 20 insertions(+), 45 deletions(-)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 2d92d7e..1670941 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -430,8 +430,9 @@ struct BdrvChild {
-  * copied as well.
+diff --git a/include/block/aio.h b/include/block/aio.h
+index 614cbc6..677b6ff 100644
+--- a/include/block/aio.h
++++ b/include/block/aio.h
+@@ -310,12 +310,8 @@ bool aio_pending(AioContext *ctx);
+ /* Dispatch any pending callbacks from the GSource attached to the AioContext.
+  *
+  * This is used internally in the implementation of the GSource.
+- *
+- * @dispatch_fds: true to process fds, false to skip them
+- *                (can be used as an optimization by callers that know there
+- *                are no fds ready)
   */
- struct BlockDriverState {
--    int64_t total_sectors; /* if we are reading a disk image, give its
--                              size in sectors */
-+    /* Protected by big QEMU lock or read-only after opening.  No special
-+     * locking needed during I/O...
-+     */
-     int open_flags; /* flags used to open the file, re-used for re-open */
-     bool read_only; /* if true, the media is read only */
-     bool encrypted; /* if true, the media is encrypted */
-@@ -439,14 +440,6 @@ struct BlockDriverState {
-     bool sg;        /* if true, the device is a /dev/sg* */
-     bool probed;    /* if true, format was probed rather than specified */
+-bool aio_dispatch(AioContext *ctx, bool dispatch_fds);
++void aio_dispatch(AioContext *ctx);
  
--    int copy_on_read; /* if nonzero, copy read backing sectors into image.
--                         note this is a reference count */
+ /* Progress in completing AIO work to occur.  This can issue new pending
+  * aio as a result of executing I/O completion or bh callbacks.
+diff --git a/util/aio-posix.c b/util/aio-posix.c
+index 84cee43..2173378 100644
+--- a/util/aio-posix.c
++++ b/util/aio-posix.c
+@@ -386,12 +386,6 @@ static bool aio_dispatch_handlers(AioContext *ctx)
+     AioHandler *node, *tmp;
+     bool progress = false;
+ 
+-    /*
+-     * We have to walk very carefully in case aio_set_fd_handler is
+-     * called while we're walking.
+-     */
+-    qemu_lockcnt_inc(&ctx->list_lock);
 -
--    CoQueue flush_queue;            /* Serializing flush queue */
--    bool active_flush_req;          /* Flush request in flight? */
--    unsigned int write_gen;         /* Current data generation */
--    unsigned int flushed_gen;       /* Flushed write generation */
+     QLIST_FOREACH_SAFE_RCU(node, &ctx->aio_handlers, node, tmp) {
+         int revents;
+ 
+@@ -426,33 +420,18 @@ static bool aio_dispatch_handlers(AioContext *ctx)
+         }
+     }
+ 
+-    qemu_lockcnt_dec(&ctx->list_lock);
+     return progress;
+ }
+ 
+-/*
+- * Note that dispatch_fds == false has the side-effect of post-poning the
+- * freeing of deleted handlers.
+- */
+-bool aio_dispatch(AioContext *ctx, bool dispatch_fds)
++void aio_dispatch(AioContext *ctx)
+ {
+-    bool progress;
++    aio_bh_poll(ctx);
+ 
+-    /*
+-     * If there are callbacks left that have been queued, we need to call them.
+-     * Do not call select in this case, because it is possible that the caller
+-     * does not need a complete flush (as is the case for aio_poll loops).
+-     */
+-    progress = aio_bh_poll(ctx);
++    qemu_lockcnt_inc(&ctx->list_lock);
++    aio_dispatch_handlers(ctx);
++    qemu_lockcnt_dec(&ctx->list_lock);
+ 
+-    if (dispatch_fds) {
+-        progress |= aio_dispatch_handlers(ctx);
+-    }
 -
-     BlockDriver *drv; /* NULL means no media */
-     void *opaque;
- 
-@@ -468,18 +461,6 @@ struct BlockDriverState {
-     BdrvChild *backing;
-     BdrvChild *file;
- 
--    /* Callback before write request is processed */
--    NotifierWithReturnList before_write_notifiers;
+-    /* Run our timers */
+-    progress |= timerlistgroup_run_timers(&ctx->tlg);
 -
--    /* number of in-flight requests; overall and serialising */
--    unsigned int in_flight;
--    unsigned int serialising_in_flight;
+-    return progress;
++    timerlistgroup_run_timers(&ctx->tlg);
+ }
+ 
+ /* These thread-local variables are used only in a small part of aio_poll
+@@ -702,11 +681,16 @@ bool aio_poll(AioContext *ctx, bool blocking)
+     npfd = 0;
+     qemu_lockcnt_dec(&ctx->list_lock);
+ 
+-    /* Run dispatch even if there were no readable fds to run timers */
+-    if (aio_dispatch(ctx, ret > 0)) {
+-        progress = true;
++    progress |= aio_bh_poll(ctx);
++
++    if (ret > 0) {
++        qemu_lockcnt_inc(&ctx->list_lock);
++        progress |= aio_dispatch_handlers(ctx);
++        qemu_lockcnt_dec(&ctx->list_lock);
+     }
+ 
++    progress |= timerlistgroup_run_timers(&ctx->tlg);
++
+     return progress;
+ }
+ 
+diff --git a/util/aio-win32.c b/util/aio-win32.c
+index 20b63ce..442a179 100644
+--- a/util/aio-win32.c
++++ b/util/aio-win32.c
+@@ -309,16 +309,11 @@ static bool aio_dispatch_handlers(AioContext *ctx, HANDLE event)
+     return progress;
+ }
+ 
+-bool aio_dispatch(AioContext *ctx, bool dispatch_fds)
++void aio_dispatch(AioContext *ctx)
+ {
+-    bool progress;
 -
--    bool wakeup;
--
--    /* Offset after the highest byte written to */
--    uint64_t wr_highest_offset;
--
-     /* I/O Limits */
-     BlockLimits bl;
+-    progress = aio_bh_poll(ctx);
+-    if (dispatch_fds) {
+-        progress |= aio_dispatch_handlers(ctx, INVALID_HANDLE_VALUE);
+-    }
+-    progress |= timerlistgroup_run_timers(&ctx->tlg);
+-    return progress;
++    aio_bh_poll(ctx);
++    aio_dispatch_handlers(ctx, INVALID_HANDLE_VALUE);
++    timerlistgroup_run_timers(&ctx->tlg);
+ }
  
-@@ -497,11 +478,8 @@ struct BlockDriverState {
-     QTAILQ_ENTRY(BlockDriverState) bs_list;
-     /* element of the list of monitor-owned BDS */
-     QTAILQ_ENTRY(BlockDriverState) monitor_list;
--    QLIST_HEAD(, BdrvDirtyBitmap) dirty_bitmaps;
-     int refcnt;
+ bool aio_poll(AioContext *ctx, bool blocking)
+diff --git a/util/async.c b/util/async.c
+index c54da71..187bc5b 100644
+--- a/util/async.c
++++ b/util/async.c
+@@ -258,7 +258,7 @@ aio_ctx_dispatch(GSource     *source,
+     AioContext *ctx = (AioContext *) source;
  
--    QLIST_HEAD(, BdrvTrackedRequest) tracked_requests;
--
-     /* operation blockers */
-     QLIST_HEAD(, BdrvOpBlocker) op_blockers[BLOCK_OP_TYPE_MAX];
+     assert(callback == NULL);
+-    aio_dispatch(ctx, true);
++    aio_dispatch(ctx);
+     return true;
+ }
  
-@@ -522,6 +500,31 @@ struct BlockDriverState {
-     /* The error object in use for blocking operations on backing_hd */
-     Error *backing_blocker;
- 
-+    /* Protected by AioContext lock */
-+
-+    /* If true, copy read backing sectors into image.  Can be >1 if more
-+     * than one client has requested copy-on-read.
-+     */
-+    int copy_on_read;
-+
-+    /* If we are reading a disk image, give its size in sectors.
-+     * Generally read-only; it is written to by load_vmstate and save_vmstate,
-+     * but the block layer is quiescent during those.
-+     */
-+    int64_t total_sectors;
-+
-+    /* Callback before write request is processed */
-+    NotifierWithReturnList before_write_notifiers;
-+
-+    /* number of in-flight requests; overall and serialising */
-+    unsigned int in_flight;
-+    unsigned int serialising_in_flight;
-+
-+    bool wakeup;
-+
-+    /* Offset after the highest byte written to */
-+    uint64_t wr_highest_offset;
-+
-     /* threshold limit for writes, in bytes. "High water mark". */
-     uint64_t write_threshold_offset;
-     NotifierWithReturn write_threshold_notifier;
-@@ -529,6 +532,17 @@ struct BlockDriverState {
-     /* counter for nested bdrv_io_plug */
-     unsigned io_plugged;
- 
-+    QLIST_HEAD(, BdrvTrackedRequest) tracked_requests;
-+    CoQueue flush_queue;                  /* Serializing flush queue */
-+    bool active_flush_req;                /* Flush request in flight? */
-+    unsigned int write_gen;               /* Current data generation */
-+    unsigned int flushed_gen;             /* Flushed write generation */
-+
-+    QLIST_HEAD(, BdrvDirtyBitmap) dirty_bitmaps;
-+
-+    /* do we need to tell the quest if we have a volatile write cache? */
-+    int enable_write_cache;
-+
-     int quiesce_counter;
- };
- 
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
-index 6444e41..f365a51 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -64,14 +64,20 @@ typedef struct BlockDevOps {
-  * fields that must be public. This is in particular for QLIST_ENTRY() and
-  * friends so that BlockBackends can be kept in lists outside block-backend.c */
- typedef struct BlockBackendPublic {
--    /* I/O throttling.
--     * throttle_state tells us if this BlockBackend has I/O limits configured.
--     * io_limits_disabled tells us if they are currently being enforced */
-+    /* I/O throttling has its own locking, but also some fields are
-+     * protected by the AioContext lock.
-+     */
-+
-+    /* Protected by AioContext lock.  */
-     CoQueue      throttled_reqs[2];
-+
-+    /* Nonzero if the I/O limits are currently being ignored; generally
-+     * it is zero.  */
-     unsigned int io_limits_disabled;
- 
-     /* The following fields are protected by the ThrottleGroup lock.
--     * See the ThrottleGroup documentation for details. */
-+     * See the ThrottleGroup documentation for details.
-+     * throttle_state tells us if I/O limits are configured. */
-     ThrottleState *throttle_state;
-     ThrottleTimers throttle_timers;
-     unsigned       pending_reqs[2];
 -- 
 2.9.3
