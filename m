@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cg9QR-0002Nc-Jz
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:20:14 -0500
+	(envelope-from <lersek@redhat.com>) id 1cg9QU-0002PS-4t
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:20:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cg9QN-0004ct-Km
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:20:11 -0500
-Received: from bran.ispras.ru ([83.149.199.196]:35199 helo=smtp.ispras.ru)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batuzovk@ispras.ru>) id 1cg9QN-0004b9-6X
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:20:07 -0500
-Date: Tue, 21 Feb 2017 15:19:59 +0300 (MSK)
-From: Kirill Batuzov <batuzovk@ispras.ru>
-In-Reply-To: <1486046099-17726-1-git-send-email-batuzovk@ispras.ru>
-Message-ID: <alpine.DEB.2.11.1702211518470.2358@bulbul.intra.ispras.ru>
-References: <1486046099-17726-1-git-send-email-batuzovk@ispras.ru>
+	(envelope-from <lersek@redhat.com>) id 1cg9QQ-0004g0-5n
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:20:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58090)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cg9QP-0004eQ-Vr
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:20:10 -0500
+References: <cover.1487286467.git.ben@skyportsystems.com>
+	<20170220155752.32892bc3@nial.brq.redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <68ab0463-6f6a-bff8-51ef-e60ceeeba639@redhat.com>
+Date: Tue, 21 Feb 2017 13:20:05 +0100
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v2.1 00/20] Emulate guest vector operations
- with host vector operations
+In-Reply-To: <20170220155752.32892bc3@nial.brq.redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 0/8] Add support for VM Generation ID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,85 +27,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, =?ISO-8859-15?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>
+To: Igor Mammedov <imammedo@redhat.com>, ben@skyportsystems.com
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Kevin O'Connor <kevin@koconnor.net>, qemu-devel@nongnu.org, mst@redhat.com
 
-On Thu, 2 Feb 2017, Kirill Batuzov wrote:
+On 02/20/17 15:57, Igor Mammedov wrote:
+> On Thu, 16 Feb 2017 15:15:32 -0800
+> ben@skyportsystems.com wrote:
+> 
+>> From: Ben Warren <ben@skyportsystems.com>
+>>
+>> This patch set adds support for passing a GUID to Windows guests.  It is a
+>> re-implementation of previous patch sets written by Igor Mammedov et al, but
+>> this time passing the GUID data as a fw_cfg blob.
+>>
+>> This patch set has dependencies on new guest functionality, in particular the
+>> support for a new linker-loader command and the ability to write back data
+>> to QEMU over a DMA link.  Work is in flight in both SeaBIOS and OVMF to support this.
+>>
+>> v7->v8:
+>>     - Rebased to top of tree.
+>>     - Fixed two small bugs in "write pointer" function
+>>     - minor re-ordering of data in patches
+>>     - Fixed unit test by adding delays/retries to reading RSDP table
+> Michael,
+> 
+> series looks good for merging.
 
-> The goal of these patch series is to set up an infrastructure to emulate
-> guest vector operations using host vector operations. Preliminary
-> experiments show that simply translating loads and stores increases
-> performance of x264 video codec by 10%. The performance of a gcc vectorized
-> for loop increased 2x.
-> 
-> To be able to emulate guest vector operations using host vector operations,
-> several things need to be done.
-> 
-> 1. Corresponding vector types should be added to TCG. These series add
-> TCG_v128 and TCG_v64. I've made TCG_v64 a different type than TCG_i64
-> because it usually needs to be allocated to different registers and
-> supports different operations.
-> 
-> 2. Load/store operations for these new types need to be implemented.
-> 
-> 3. For seamless transition from current model to a new one we need to
-> handle cases where memory occupied by global variable can be accessed via
-> pointer to the CPUArchState structure. A very simple conservative alias
-> analysis has been added to do it. This analysis tracks memory loads and
-> stores that overlap with fields of CPUArchState and provides this
-> information to the register allocator. The allocator then spills and
-> reloads affected globals when needed.
-> 
-> 4. Allow overlapping globals. For scalar registers this is a rare case, and
-> overlapping registers can ba handled as a single one (ah, al, ax, eax,
-> rax). In ARM every Q-register consists of two D-register each consisting of
-> two S-registers. Handling 4 S-registers as one because they are parts of
-> the same Q-register is way too inefficient.
-> 
-> 5. Add new memory addressing mode to MMU code for large accesses and create
-> needed helpers. Only 128-bit vectors have been handled for now.
-> 
-> 6. Create TCG opcodes for vector operations. Only addition has beed handled
-> in these series. Each operation has a wrapper that checks if the backend
-> supports the corresponding operation or not. In one case the vector opcode
-> is generated, in the other the operation is emulated with scalar
-> operations. The emulation code is generated inline for performance reasons
-> (there is a huge performance difference between inline generation
-> and calling a helper). As a positive side effect this will eventually allow
->  to merge similar emulation code for vector instructions from different
-> frontends to target-independent implementation.
-> 
-> 7. Use new operations in the frontend (ARM was used in these series).
-> 
-> 8. Support new operations in the backend (x86_64 was used in these series).
-> 
-> For experiments I have used ARM guest on x86_64 host. I wanted some pair of
-> different architectures with vector extensions both. ARM and x86_64 pair
-> fits well.
-> 
-> v1 -> v2:
->  - represent v128 type with smaller types when it is not supported by the host
->  - detect AVX support and use AVX instructions when available
->  - tcg/README updated
->  - generate two v64 adds instead of one v128 when applicable
->  - rebased to newer master
->  - overlap detection for temps added (it needs to be explicitly called from
->    <arch>_translate_init)
->  - the stack is used to temporary store 128 bit variables to memory
->    (instead of the TCGContext field)
-> 
-> v2 -> v2.1
->  - automatic build failure fixed
-> 
-> Outstanding issues:
->  - qemu_ld_v128 and qemu_st_v128 do not generate fallback code if the host
->    does not support 128 bit registers. The reason is that I do not know how to
->    handle the host/guest different endianness (whether do we swap only bytes
->    in elements or whole vectors?). Different targets seem to have different
->    ideas on how this should be done.
->
+The OVMF patches for WRITE_POINTER are now upstream.
 
-Ping?
+Thanks
+Laszlo
 
--- 
-Kirill
+> Patch
+>  [PATCH v8 7/8] tests: Add unit tests for the VM  Generation ID feature
+> needs updated seabios blob to make 'make check' happy
+> so we probably should merge/update seabios first
+>   [PATCH v5 0/5] QEMU: Add capability to write back fw_cfg address to QEMU
+> 
+> CCing Gerd and Kevin.
+> 
