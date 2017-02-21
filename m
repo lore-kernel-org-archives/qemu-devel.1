@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53869)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cgIiK-0002qd-CG
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 17:15:17 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cgIiK-0002ql-JM
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 17:15:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cgIiH-0004Rx-6F
+	(envelope-from <kraxel@redhat.com>) id 1cgIiJ-0004TR-6Q
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 17:15:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41650)
+Received: from mx1.redhat.com ([209.132.183.28]:33124)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cgIiH-0004Rd-0R
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 17:15:13 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cgIiI-0004Sh-Uc
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 17:15:15 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 18E1480462
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 22:15:13 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2F71F61D03
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 22:15:15 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 21 Feb 2017 23:14:51 +0100
-Message-Id: <1487715299-21102-2-git-send-email-kraxel@redhat.com>
+Date: Tue, 21 Feb 2017 23:14:59 +0100
+Message-Id: <1487715299-21102-10-git-send-email-kraxel@redhat.com>
 In-Reply-To: <1487715299-21102-1-git-send-email-kraxel@redhat.com>
 References: <1487715299-21102-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/9] sysemu: add defines for sparc & ppc
- graphics_*
+Subject: [Qemu-devel] [PATCH 9/9] [RfC] stdvga: use graphic_* variables.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +30,206 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Add defines for the sparc and ppc arch specific graphics defaults.
-They return the graphic_* values these variables are non-zero, and
-the default values otherwise.
+Add two new registers to the qemu extended register range, carrying the
+suggested width and height of the display device.  In case the graphic_*
+variables are set (via -g switch), fill these new registers accordingly.
 
-After switching over ppc and sparc to use these we don't need the
-arch-specific initialization for the graphic_* variables any more.
+Additionally guest driver updates are needed to support the new
+registers.  These changes will probably land in linux kernel 4.12.
+
+TODO: add compat properties to turn off qemu-display-size for machine
+      types older than 2.9-or-10
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- include/sysemu/sysemu.h | 7 +++++++
- 1 file changed, 7 insertions(+)
+ hw/display/vga-pci.c    | 52 ++++++++++++++++++++++++++++++++++---------------
+ hw/display/vga_int.h    |  4 ++--
+ hw/display/virtio-vga.c |  3 ++-
+ 3 files changed, 40 insertions(+), 19 deletions(-)
 
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 576c7ce..9450788 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -142,9 +142,16 @@ typedef enum {
- extern int vga_interface_type;
- #define xenfb_enabled (vga_interface_type == VGA_XENFB)
+diff --git a/hw/display/vga-pci.c b/hw/display/vga-pci.c
+index ac9a764..78e00df 100644
+--- a/hw/display/vga-pci.c
++++ b/hw/display/vga-pci.c
+@@ -31,23 +31,28 @@
+ #include "ui/pixel_ops.h"
+ #include "qemu/timer.h"
+ #include "hw/loader.h"
++#include "sysemu/sysemu.h"
  
-+#define sparc_graphic_width  (graphic_width  ? graphic_width  : 1024)
-+#define sparc_graphic_height (graphic_height ? graphic_height :  768)
-+#define sparc_graphic_depth  (graphic_depth  ? graphic_depth  :    8)
-+#define ppc_graphic_width    (graphic_width  ? graphic_width  :  800)
-+#define ppc_graphic_height   (graphic_height ? graphic_height :  600)
-+#define ppc_graphic_depth    (graphic_depth  ? graphic_depth  :   32)
- extern int graphic_width;
- extern int graphic_height;
- extern int graphic_depth;
-+
- extern int display_opengl;
- extern const char *keyboard_layout;
- extern int win2k_install_hack;
+ #define PCI_VGA_IOPORT_OFFSET 0x400
+ #define PCI_VGA_IOPORT_SIZE   (0x3e0 - 0x3c0)
+ #define PCI_VGA_BOCHS_OFFSET  0x500
+ #define PCI_VGA_BOCHS_SIZE    (0x0b * 2)
+ #define PCI_VGA_QEXT_OFFSET   0x600
+-#define PCI_VGA_QEXT_SIZE     (2 * 4)
++#define PCI_VGA_QEXT_SIZE_V1  (2 * 4)
++#define PCI_VGA_QEXT_SIZE_V2  (4 * 4)
+ #define PCI_VGA_MMIO_SIZE     0x1000
+ 
+ #define PCI_VGA_QEXT_REG_SIZE         (0 * 4)
+ #define PCI_VGA_QEXT_REG_BYTEORDER    (1 * 4)
+ #define  PCI_VGA_QEXT_LITTLE_ENDIAN   0x1e1e1e1e
+ #define  PCI_VGA_QEXT_BIG_ENDIAN      0xbebebebe
++#define PCI_VGA_QEXT_REG_WIDTH        (2 * 4)
++#define PCI_VGA_QEXT_REG_HEIGHT       (3 * 4)
+ 
+ enum vga_pci_flags {
+-    PCI_VGA_FLAG_ENABLE_MMIO = 1,
+-    PCI_VGA_FLAG_ENABLE_QEXT = 2,
++    PCI_VGA_FLAG_ENABLE_MMIO    = 1,
++    PCI_VGA_FLAG_ENABLE_QEXT    = 2,
++    PCI_VGA_FLAG_ENABLE_QEXT_V2 = 3,
+ };
+ 
+ typedef struct PCIVGAState {
+@@ -157,10 +162,14 @@ static uint64_t pci_vga_qext_read(void *ptr, hwaddr addr, unsigned size)
+ 
+     switch (addr) {
+     case PCI_VGA_QEXT_REG_SIZE:
+-        return PCI_VGA_QEXT_SIZE;
++        return s->qext_size;
+     case PCI_VGA_QEXT_REG_BYTEORDER:
+         return s->big_endian_fb ?
+             PCI_VGA_QEXT_BIG_ENDIAN : PCI_VGA_QEXT_LITTLE_ENDIAN;
++    case PCI_VGA_QEXT_REG_WIDTH:
++        return graphic_width;
++    case PCI_VGA_QEXT_REG_HEIGHT:
++        return graphic_height;
+     default:
+         return 0;
+     }
+@@ -207,8 +216,7 @@ static const MemoryRegionOps pci_vga_qext_ops = {
+ 
+ void pci_std_vga_mmio_region_init(VGACommonState *s,
+                                   MemoryRegion *parent,
+-                                  MemoryRegion *subs,
+-                                  bool qext)
++                                  MemoryRegion *subs)
+ {
+     memory_region_init_io(&subs[0], NULL, &pci_vga_ioport_ops, s,
+                           "vga ioports remapped", PCI_VGA_IOPORT_SIZE);
+@@ -220,9 +228,9 @@ void pci_std_vga_mmio_region_init(VGACommonState *s,
+     memory_region_add_subregion(parent, PCI_VGA_BOCHS_OFFSET,
+                                 &subs[1]);
+ 
+-    if (qext) {
++    if (s->qext_size) {
+         memory_region_init_io(&subs[2], NULL, &pci_vga_qext_ops, s,
+-                              "qemu extended regs", PCI_VGA_QEXT_SIZE);
++                              "qemu extended regs", s->qext_size);
+         memory_region_add_subregion(parent, PCI_VGA_QEXT_OFFSET,
+                                     &subs[2]);
+     }
+@@ -232,7 +240,6 @@ static void pci_std_vga_realize(PCIDevice *dev, Error **errp)
+ {
+     PCIVGAState *d = PCI_VGA(dev);
+     VGACommonState *s = &d->vga;
+-    bool qext = false;
+ 
+     /* vga + console init */
+     vga_common_init(s, OBJECT(dev), true);
+@@ -249,10 +256,15 @@ static void pci_std_vga_realize(PCIDevice *dev, Error **errp)
+         memory_region_init(&d->mmio, NULL, "vga.mmio", 4096);
+ 
+         if (d->flags & (1 << PCI_VGA_FLAG_ENABLE_QEXT)) {
+-            qext = true;
+-            pci_set_byte(&d->dev.config[PCI_REVISION_ID], 2);
++            if (d->flags & (1 << PCI_VGA_FLAG_ENABLE_QEXT_V2)) {
++                s->qext_size = PCI_VGA_QEXT_SIZE_V2;
++                pci_set_byte(&d->dev.config[PCI_REVISION_ID], 3);
++            } else {
++                s->qext_size = PCI_VGA_QEXT_SIZE_V1;
++                pci_set_byte(&d->dev.config[PCI_REVISION_ID], 2);
++            }
+         }
+-        pci_std_vga_mmio_region_init(s, &d->mmio, d->mrs, qext);
++        pci_std_vga_mmio_region_init(s, &d->mmio, d->mrs);
+ 
+         pci_register_bar(&d->dev, 2, PCI_BASE_ADDRESS_SPACE_MEMORY, &d->mmio);
+     }
+@@ -274,7 +286,6 @@ static void pci_secondary_vga_realize(PCIDevice *dev, Error **errp)
+ {
+     PCIVGAState *d = PCI_VGA(dev);
+     VGACommonState *s = &d->vga;
+-    bool qext = false;
+ 
+     /* vga + console init */
+     vga_common_init(s, OBJECT(dev), false);
+@@ -284,10 +295,15 @@ static void pci_secondary_vga_realize(PCIDevice *dev, Error **errp)
+     memory_region_init(&d->mmio, OBJECT(dev), "vga.mmio", 4096);
+ 
+     if (d->flags & (1 << PCI_VGA_FLAG_ENABLE_QEXT)) {
+-        qext = true;
+-        pci_set_byte(&d->dev.config[PCI_REVISION_ID], 2);
++        if (d->flags & (1 << PCI_VGA_FLAG_ENABLE_QEXT_V2)) {
++            s->qext_size = PCI_VGA_QEXT_SIZE_V2;
++            pci_set_byte(&d->dev.config[PCI_REVISION_ID], 3);
++        } else {
++            s->qext_size = PCI_VGA_QEXT_SIZE_V1;
++            pci_set_byte(&d->dev.config[PCI_REVISION_ID], 2);
++        }
+     }
+-    pci_std_vga_mmio_region_init(s, &d->mmio, d->mrs, qext);
++    pci_std_vga_mmio_region_init(s, &d->mmio, d->mrs);
+ 
+     pci_register_bar(&d->dev, 0, PCI_BASE_ADDRESS_MEM_PREFETCH, &s->vram);
+     pci_register_bar(&d->dev, 2, PCI_BASE_ADDRESS_SPACE_MEMORY, &d->mmio);
+@@ -311,6 +327,8 @@ static Property vga_pci_properties[] = {
+     DEFINE_PROP_BIT("mmio", PCIVGAState, flags, PCI_VGA_FLAG_ENABLE_MMIO, true),
+     DEFINE_PROP_BIT("qemu-extended-regs",
+                     PCIVGAState, flags, PCI_VGA_FLAG_ENABLE_QEXT, true),
++    DEFINE_PROP_BIT("qemu-display-size",
++                    PCIVGAState, flags, PCI_VGA_FLAG_ENABLE_QEXT_V2, true),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+@@ -318,6 +336,8 @@ static Property secondary_pci_properties[] = {
+     DEFINE_PROP_UINT32("vgamem_mb", PCIVGAState, vga.vram_size_mb, 16),
+     DEFINE_PROP_BIT("qemu-extended-regs",
+                     PCIVGAState, flags, PCI_VGA_FLAG_ENABLE_QEXT, true),
++    DEFINE_PROP_BIT("qemu-display-size",
++                    PCIVGAState, flags, PCI_VGA_FLAG_ENABLE_QEXT_V2, true),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/hw/display/vga_int.h b/hw/display/vga_int.h
+index dd6c958..51217cf 100644
+--- a/hw/display/vga_int.h
++++ b/hw/display/vga_int.h
+@@ -162,6 +162,7 @@ typedef struct VGACommonState {
+     bool full_update_gfx;
+     bool big_endian_fb;
+     bool default_endian_fb;
++    uint32_t qext_size;
+     /* hardware mouse cursor support */
+     uint32_t invalidated_y_table[VGA_MAX_HEIGHT / 32];
+     uint32_t hw_cursor_x;
+@@ -223,7 +224,6 @@ extern const MemoryRegionOps vga_mem_ops;
+ /* vga-pci.c */
+ void pci_std_vga_mmio_region_init(VGACommonState *s,
+                                   MemoryRegion *parent,
+-                                  MemoryRegion *subs,
+-                                  bool qext);
++                                  MemoryRegion *subs);
+ 
+ #endif
+diff --git a/hw/display/virtio-vga.c b/hw/display/virtio-vga.c
+index f9b017d..8684dc0 100644
+--- a/hw/display/virtio-vga.c
++++ b/hw/display/virtio-vga.c
+@@ -153,8 +153,9 @@ static void virtio_vga_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+     }
+ 
+     /* add stdvga mmio regions */
++    vga->qext_size = 2 * 4; /* PCI_VGA_QEXT_SIZE_V1 */
+     pci_std_vga_mmio_region_init(vga, &vpci_dev->modern_bar,
+-                                 vvga->vga_mrs, true);
++                                 vvga->vga_mrs);
+ 
+     vga->con = g->scanout[0].con;
+     graphic_console_set_hwops(vga->con, &virtio_vga_ops, vvga);
 -- 
 1.8.3.1
