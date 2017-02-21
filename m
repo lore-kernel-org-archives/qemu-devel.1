@@ -1,24 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37774)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cg09f-0000wo-Hh
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 21:26:16 -0500
+	(envelope-from <eblake@redhat.com>) id 1cg0Pq-0005Ps-1x
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 21:42:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cg09c-0007XP-Ch
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 21:26:15 -0500
-Received: from [59.151.112.132] (port=4847 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cg09c-0007Tl-0I
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 21:26:12 -0500
-References: <1487577721-31084-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1487577721-31084-2-git-send-email-zhang.zhanghailiang@huawei.com>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <d3be835a-fd51-8ca5-27f9-e29fc63c1c98@cn.fujitsu.com>
-Date: Tue, 21 Feb 2017 10:25:13 +0800
-MIME-Version: 1.0
-In-Reply-To: <1487577721-31084-2-git-send-email-zhang.zhanghailiang@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] net/colo: fix memory double free error
+	(envelope-from <eblake@redhat.com>) id 1cg0Pp-0003O4-1C
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 21:42:58 -0500
+From: Eric Blake <eblake@redhat.com>
+Date: Mon, 20 Feb 2017 20:42:40 -0600
+Message-Id: <20170221024248.11027-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 0/8] Implement NBD_OPT_GO,
+ block size advertisement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,47 +18,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhanghailiang <zhang.zhanghailiang@huawei.com>, jasowang@redhat.com, lizhijian@cn.fujitsu.com
-Cc: qemu-devel@nongnu.org, xuquan8@huawei.com, pss.wulizhen@huawei.com
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, pbonzini@redhat.com, vsementsov@virtuozzo.com, den@virtuozzo.com
 
+A bit later than I planned, but still in time for soft freeze if
+we like it. The NBD protocol has a proposed extension that fixes
+several shortcomings with NBD_OPT_EXPORT_NAME (namely, no error
+reporting, no way for the server to advertise block sizes to the
+client):
+https://github.com/NetworkBlockDevice/nbd/blob/extension-info/doc/proto.md
 
+This sort of overlaps with the work Vladimir is proposing for
+implementing NBD_CMD_BLOCK_STATUS (in fact, I included his CVE
+fix because it was my bug that introduced the hole), but an initial
+version of my work has been on the list a lot longer; where it was
+posted as v3 of a larger series (see patches 37-44):
+https://lists.gnu.org/archive/html/qemu-devel/2016-04/msg03526.html
 
-On 02/20/2017 04:01 PM, zhanghailiang wrote:
-> The 'primary_list' and 'secondary_list' members of struct Connection
-> is not allocated through dynamically g_queue_new(), but we free it by using
-> g_queue_free(), which will lead to a double-free bug.
->
-> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> ---
->   net/colo.c | 2 --
->   1 file changed, 2 deletions(-)
->
-> diff --git a/net/colo.c b/net/colo.c
-> index 6a6eacd..7d5c423 100644
-> --- a/net/colo.c
-> +++ b/net/colo.c
-> @@ -147,9 +147,7 @@ void connection_destroy(void *opaque)
->       Connection *conn = opaque;
->   
->       g_queue_foreach(&conn->primary_list, packet_destroy, NULL);
-> -    g_queue_free(&conn->primary_list);
->       g_queue_foreach(&conn->secondary_list, packet_destroy, NULL);
-> -    g_queue_free(&conn->secondary_list);
+Difference since v3 (if it is even worth comparing):
 
-I think we need use g_queue_clear () here.
+001/8:[down] 'nbd/client: fix drop_sync [CVE-2017-2630]'
+002/8:[0034] [FC] 'nbd: Create struct for tracking export info'
+003/8:[down] 'block: Add blk_get_opt_transfer()'
+004/8:[down] 'nbd: Expose and debug more NBD constants'
+005/8:[0187] [FC] 'nbd: Implement NBD_OPT_GO on server'
+006/8:[0030] [FC] 'nbd: Implement NBD_OPT_GO on client'
+007/8:[down] 'nbd: Implement NBD_INFO_BLOCK_SIZE on server'
+008/8:[down] 'nbd: Implement NBD_INFO_BLOCK_SIZE on client'
 
-void
-g_queue_clear (GQueue *queue);
-Removes all the elements in queue . If queue elements contain 
-dynamically-allocated memory, they should be freed first.
+I built this on top of my blkdebug enhancements for testing
+purposes; I did not test this one without that but the two
+series should be relatively orthogonal:
+https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg03042.html
 
-Thanks
-Zhang Chen
+Also available as a tag at this location:
+git fetch git://repo.or.cz/qemu/ericb.git nbd-go-v4
 
->       g_slice_free(Connection, conn);
->   }
->   
+Eric Blake (7):
+  nbd: Create struct for tracking export info
+  block: Add blk_get_opt_transfer()
+  nbd: Expose and debug more NBD constants
+  nbd: Implement NBD_OPT_GO on server
+  nbd: Implement NBD_OPT_GO on client
+  nbd: Implement NBD_INFO_BLOCK_SIZE on server
+  nbd: Implement NBD_INFO_BLOCK_SIZE on client
+
+Vladimir Sementsov-Ogievskiy (1):
+  nbd/client: fix drop_sync [CVE-2017-2630]
+
+ block/nbd-client.h             |   3 +-
+ include/block/nbd.h            |  55 ++++++--
+ include/sysemu/block-backend.h |   1 +
+ nbd/nbd-internal.h             |  12 +-
+ block/block-backend.c          |  12 ++
+ block/nbd-client.c             |  22 +--
+ block/nbd.c                    |  16 ++-
+ nbd/client.c                   | 299 ++++++++++++++++++++++++++++++++++-------
+ nbd/common.c                   |  69 ++++++++++
+ nbd/server.c                   | 264 +++++++++++++++++++++++++++++++++---
+ qemu-nbd.c                     |  10 +-
+ 11 files changed, 656 insertions(+), 107 deletions(-)
 
 -- 
-Thanks
-Zhang Chen
+2.9.3
