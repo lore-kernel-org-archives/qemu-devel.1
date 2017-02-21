@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cg948-0006aq-5y
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:57:09 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cg94A-0006ca-1s
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:57:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cg945-0005Qj-5R
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:57:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44948)
+	(envelope-from <stefanha@redhat.com>) id 1cg949-0005Rb-3x
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:57:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48202)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cg944-0005Qd-VY
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:57:05 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cg948-0005R9-RE
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:57:09 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 21 Feb 2017 11:56:28 +0000
-Message-Id: <20170221115644.28264-9-stefanha@redhat.com>
+Date: Tue, 21 Feb 2017 11:56:30 +0000
+Message-Id: <20170221115644.28264-11-stefanha@redhat.com>
 In-Reply-To: <20170221115644.28264-1-stefanha@redhat.com>
 References: <20170221115644.28264-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL v2 08/24] coroutine-lock: reschedule coroutine
- on the AioContext it was running on
+Subject: [Qemu-devel] [PULL v2 10/24] qed: introduce qed_aio_start_io and
+ qed_aio_next_io_cb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,66 +29,145 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
-As a small step towards the introduction of multiqueue, we want
-coroutines to remain on the same AioContext that started them,
-unless they are moved explicitly with e.g. aio_co_schedule.  This patch
-avoids that coroutines switch AioContext when they use a CoMutex.
-For now it does not make much of a difference, because the CoMutex
-is not thread-safe and the AioContext itself is used to protect the
-CoMutex from concurrent access.  However, this is going to change.
+qed_aio_start_io and qed_aio_next_io will not have to acquire/release
+the AioContext, while qed_aio_next_io_cb will.  Split the functionality
+and gain a little type-safety in the process.
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
 Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20170213135235.12274-9-pbonzini@redhat.com
+Message-id: 20170213135235.12274-11-pbonzini@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- util/qemu-coroutine-lock.c | 5 ++---
- util/trace-events          | 1 -
- 2 files changed, 2 insertions(+), 4 deletions(-)
+ block/qed.c | 39 +++++++++++++++++++++++++--------------
+ 1 file changed, 25 insertions(+), 14 deletions(-)
 
-diff --git a/util/qemu-coroutine-lock.c b/util/qemu-coroutine-lock.c
-index 14cf9ce..e6afd1a 100644
---- a/util/qemu-coroutine-lock.c
-+++ b/util/qemu-coroutine-lock.c
-@@ -27,6 +27,7 @@
- #include "qemu/coroutine.h"
- #include "qemu/coroutine_int.h"
- #include "qemu/queue.h"
-+#include "block/aio.h"
- #include "trace.h"
+diff --git a/block/qed.c b/block/qed.c
+index 1a7ef0a..7f1c508 100644
+--- a/block/qed.c
++++ b/block/qed.c
+@@ -273,7 +273,19 @@ static CachedL2Table *qed_new_l2_table(BDRVQEDState *s)
+     return l2_table;
+ }
  
- void qemu_co_queue_init(CoQueue *queue)
-@@ -63,7 +64,6 @@ void qemu_co_queue_run_restart(Coroutine *co)
+-static void qed_aio_next_io(void *opaque, int ret);
++static void qed_aio_next_io(QEDAIOCB *acb, int ret);
++
++static void qed_aio_start_io(QEDAIOCB *acb)
++{
++    qed_aio_next_io(acb, 0);
++}
++
++static void qed_aio_next_io_cb(void *opaque, int ret)
++{
++    QEDAIOCB *acb = opaque;
++
++    qed_aio_next_io(acb, ret);
++}
  
- static bool qemu_co_queue_do_restart(CoQueue *queue, bool single)
+ static void qed_plug_allocating_write_reqs(BDRVQEDState *s)
  {
--    Coroutine *self = qemu_coroutine_self();
-     Coroutine *next;
+@@ -292,7 +304,7 @@ static void qed_unplug_allocating_write_reqs(BDRVQEDState *s)
  
-     if (QSIMPLEQ_EMPTY(&queue->entries)) {
-@@ -72,8 +72,7 @@ static bool qemu_co_queue_do_restart(CoQueue *queue, bool single)
+     acb = QSIMPLEQ_FIRST(&s->allocating_write_reqs);
+     if (acb) {
+-        qed_aio_next_io(acb, 0);
++        qed_aio_start_io(acb);
+     }
+ }
  
-     while ((next = QSIMPLEQ_FIRST(&queue->entries)) != NULL) {
-         QSIMPLEQ_REMOVE_HEAD(&queue->entries, co_queue_next);
--        QSIMPLEQ_INSERT_TAIL(&self->co_queue_wakeup, next, co_queue_next);
--        trace_qemu_co_queue_next(next);
-+        aio_co_wake(next);
-         if (single) {
-             break;
+@@ -959,7 +971,7 @@ static void qed_aio_complete(QEDAIOCB *acb, int ret)
+         QSIMPLEQ_REMOVE_HEAD(&s->allocating_write_reqs, next);
+         acb = QSIMPLEQ_FIRST(&s->allocating_write_reqs);
+         if (acb) {
+-            qed_aio_next_io(acb, 0);
++            qed_aio_start_io(acb);
+         } else if (s->header.features & QED_F_NEED_CHECK) {
+             qed_start_need_check_timer(s);
          }
-diff --git a/util/trace-events b/util/trace-events
-index 53bd70c..65c9787 100644
---- a/util/trace-events
-+++ b/util/trace-events
-@@ -28,7 +28,6 @@ qemu_coroutine_terminate(void *co) "self %p"
+@@ -984,7 +996,7 @@ static void qed_commit_l2_update(void *opaque, int ret)
+     acb->request.l2_table = qed_find_l2_cache_entry(&s->l2_cache, l2_offset);
+     assert(acb->request.l2_table != NULL);
  
- # util/qemu-coroutine-lock.c
- qemu_co_queue_run_restart(void *co) "co %p"
--qemu_co_queue_next(void *nxt) "next %p"
- qemu_co_mutex_lock_entry(void *mutex, void *self) "mutex %p self %p"
- qemu_co_mutex_lock_return(void *mutex, void *self) "mutex %p self %p"
- qemu_co_mutex_unlock_entry(void *mutex, void *self) "mutex %p self %p"
+-    qed_aio_next_io(opaque, ret);
++    qed_aio_next_io(acb, ret);
+ }
+ 
+ /**
+@@ -1032,11 +1044,11 @@ static void qed_aio_write_l2_update(QEDAIOCB *acb, int ret, uint64_t offset)
+     if (need_alloc) {
+         /* Write out the whole new L2 table */
+         qed_write_l2_table(s, &acb->request, 0, s->table_nelems, true,
+-                            qed_aio_write_l1_update, acb);
++                           qed_aio_write_l1_update, acb);
+     } else {
+         /* Write out only the updated part of the L2 table */
+         qed_write_l2_table(s, &acb->request, index, acb->cur_nclusters, false,
+-                            qed_aio_next_io, acb);
++                           qed_aio_next_io_cb, acb);
+     }
+     return;
+ 
+@@ -1088,7 +1100,7 @@ static void qed_aio_write_main(void *opaque, int ret)
+     }
+ 
+     if (acb->find_cluster_ret == QED_CLUSTER_FOUND) {
+-        next_fn = qed_aio_next_io;
++        next_fn = qed_aio_next_io_cb;
+     } else {
+         if (s->bs->backing) {
+             next_fn = qed_aio_write_flush_before_l2_update;
+@@ -1201,7 +1213,7 @@ static void qed_aio_write_alloc(QEDAIOCB *acb, size_t len)
+     if (acb->flags & QED_AIOCB_ZERO) {
+         /* Skip ahead if the clusters are already zero */
+         if (acb->find_cluster_ret == QED_CLUSTER_ZERO) {
+-            qed_aio_next_io(acb, 0);
++            qed_aio_start_io(acb);
+             return;
+         }
+ 
+@@ -1321,18 +1333,18 @@ static void qed_aio_read_data(void *opaque, int ret,
+     /* Handle zero cluster and backing file reads */
+     if (ret == QED_CLUSTER_ZERO) {
+         qemu_iovec_memset(&acb->cur_qiov, 0, 0, acb->cur_qiov.size);
+-        qed_aio_next_io(acb, 0);
++        qed_aio_start_io(acb);
+         return;
+     } else if (ret != QED_CLUSTER_FOUND) {
+         qed_read_backing_file(s, acb->cur_pos, &acb->cur_qiov,
+-                              &acb->backing_qiov, qed_aio_next_io, acb);
++                              &acb->backing_qiov, qed_aio_next_io_cb, acb);
+         return;
+     }
+ 
+     BLKDBG_EVENT(bs->file, BLKDBG_READ_AIO);
+     bdrv_aio_readv(bs->file, offset / BDRV_SECTOR_SIZE,
+                    &acb->cur_qiov, acb->cur_qiov.size / BDRV_SECTOR_SIZE,
+-                   qed_aio_next_io, acb);
++                   qed_aio_next_io_cb, acb);
+     return;
+ 
+ err:
+@@ -1342,9 +1354,8 @@ err:
+ /**
+  * Begin next I/O or complete the request
+  */
+-static void qed_aio_next_io(void *opaque, int ret)
++static void qed_aio_next_io(QEDAIOCB *acb, int ret)
+ {
+-    QEDAIOCB *acb = opaque;
+     BDRVQEDState *s = acb_to_s(acb);
+     QEDFindClusterFunc *io_fn = (acb->flags & QED_AIOCB_WRITE) ?
+                                 qed_aio_write_data : qed_aio_read_data;
+@@ -1400,7 +1411,7 @@ static BlockAIOCB *qed_aio_setup(BlockDriverState *bs,
+     qemu_iovec_init(&acb->cur_qiov, qiov->niov);
+ 
+     /* Start request */
+-    qed_aio_next_io(acb, 0);
++    qed_aio_start_io(acb);
+     return &acb->common;
+ }
+ 
 -- 
 2.9.3
