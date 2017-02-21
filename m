@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cgGIs-00081z-Nj
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 14:40:51 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cgGKF-0000S4-2r
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 14:42:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cgGIr-0006xW-SW
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 14:40:50 -0500
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:33640)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cgGIr-0006xG-Kr
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 14:40:49 -0500
-Received: by mail-wm0-x231.google.com with SMTP id t18so31196755wmt.0
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 11:40:49 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1cgGKB-00079g-UD
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 14:42:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52346)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cgGKB-00079S-Nx
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 14:42:11 -0500
+Date: Tue, 21 Feb 2017 19:42:06 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170221194206.GK2377@work-vm>
+References: <20170217082704.23270-1-skiver.cloud.yzy@gmail.com>
+	<5a03f6f2-f867-8dfe-28bb-6f481782f6af@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1c59cdd0-8cf5-9e66-6457-d01852a5ec37@redhat.com>
-References: <1487659615-15820-1-git-send-email-xyjxie@linux.vnet.ibm.com>
-	<20170221092137.5b6cecbb@t450s.home>
-	<27972408-a43b-60f9-86ad-e4e47f4f8f14@redhat.com>
-	<CAFEAcA-L-ofsPmyOMhnAxUnkhHy0Zs1j2uCbUVRHV6a+WG0Thw@mail.gmail.com>
-	<1c59cdd0-8cf5-9e66-6457-d01852a5ec37@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 Feb 2017 19:40:27 +0000
-Message-ID: <CAFEAcA80mkAoh4MRoFejK2tQ+_i6vbF1R5=3fJ96ozTVab3H5g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] memory: make ram device read/write endian
- sensitive
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5a03f6f2-f867-8dfe-28bb-6f481782f6af@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/2] fix segfaults caused by accessing CPU
+ in empty machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,30 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Alex Williamson <alex.williamson@redhat.com>, Yongji Xie <xyjxie@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, zhong@linux.vnet.ibm.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: Ziyue Yang <skiver.cloud.yzy@gmail.com>, qemu-devel@nongnu.org, Ziyue Yang <yzylivezh@hotmail.com>, Pavel Butsykin <pbutsykin@virtuozzo.com>
 
-On 21 February 2017 at 18:53, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 21/02/2017 19:09, Peter Maydell wrote:
->> In this instance I don't understand the patch. The ram_device
->> mem-ops are there to deal with memory regions backed by a
->> lump of RAM, right? Lumps of memory are always the endianness
->> of the host CPU by definition, so DEVICE_NATIVE_ENDIAN and
->> no swapping in the accessors seems like it ought to be the right
->> thing...
->
-> DEVICE_NATIVE_ENDIAN is the endianness of the target CPU however.
+* Thomas Huth (thuth@redhat.com) wrote:
+> On 17.02.2017 09:27, Ziyue Yang wrote:
+> > From: Ziyue Yang <yzylivezh@hotmail.com>
+> > 
+> > Many QEMU monitor commands, like "info lapic", "info tlb" and so on
+> > use mon_get_cpu or related wrappers to access CPU info without checking
+> > whether the CPU exists.
+> > This patch series fix the "info lapic" case, and is the base of the incoming
+> > patch series aiming to eliminate segfaults caused by other QEMU commands
+> > trying to access CPU that doesn't exist.
+> 
+>  Hi,
+> 
+> FYI, I've posted a patch for all of these monitor commands that crash
+> without CPU already last month:
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg02602.html
 
-...I meant 'target CPU' there (at any rate, endianness
-of the bus interface between target CPU and its RAM; CPUs
-like ARM with runtime configurable endianness do it by swapping
-data before it hits the bus interface, conceptually speaking).
+I've just sent that in my HMP pull:
+https://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg04939.html
 
-Endianness always confuses me, though (I think I understand
-it and then I realize I don't; I also have trouble telling
-whether I understand it and am discussing it with somebody who
-doesn't understand it, or whether I don't understand it and they
-do...)
+Ziyue Yang: Perhaps it's best to compare with the things in that
+pull and check to see if you have any items that were not in that pull.
 
-thanks
--- PMM
+Dave
+
+>  Thomas
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
