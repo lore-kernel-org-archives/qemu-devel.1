@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47811)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cgGGe-00070P-6V
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 14:38:35 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cgGIs-00081z-Nj
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 14:40:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cgGGb-0006Vd-2t
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 14:38:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43280)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cgGGa-0006Ul-St
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 14:38:29 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B966A3DE3F
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 19:38:28 +0000 (UTC)
-References: <1487363905-9480-1-git-send-email-armbru@redhat.com>
-	<1487363905-9480-12-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0806ec5e-ac80-2caa-5a61-73d211bba6b0@redhat.com>
-Date: Tue, 21 Feb 2017 13:38:26 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1cgGIr-0006xW-SW
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 14:40:50 -0500
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:33640)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cgGIr-0006xG-Kr
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 14:40:49 -0500
+Received: by mail-wm0-x231.google.com with SMTP id t18so31196755wmt.0
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 11:40:49 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1487363905-9480-12-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="WtxfIBW4cK57cvBNcjxjFjvTRSrcEfLtb"
-Subject: Re: [Qemu-devel] [PATCH 11/14] tests: Don't check qobject_type()
- before qobject_to_qfloat()
+In-Reply-To: <1c59cdd0-8cf5-9e66-6457-d01852a5ec37@redhat.com>
+References: <1487659615-15820-1-git-send-email-xyjxie@linux.vnet.ibm.com>
+	<20170221092137.5b6cecbb@t450s.home>
+	<27972408-a43b-60f9-86ad-e4e47f4f8f14@redhat.com>
+	<CAFEAcA-L-ofsPmyOMhnAxUnkhHy0Zs1j2uCbUVRHV6a+WG0Thw@mail.gmail.com>
+	<1c59cdd0-8cf5-9e66-6457-d01852a5ec37@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 21 Feb 2017 19:40:27 +0000
+Message-ID: <CAFEAcA80mkAoh4MRoFejK2tQ+_i6vbF1R5=3fJ96ozTVab3H5g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] memory: make ram device read/write endian
+ sensitive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,56 +33,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Alex Williamson <alex.williamson@redhat.com>, Yongji Xie <xyjxie@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, zhong@linux.vnet.ibm.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WtxfIBW4cK57cvBNcjxjFjvTRSrcEfLtb
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <0806ec5e-ac80-2caa-5a61-73d211bba6b0@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 11/14] tests: Don't check qobject_type()
- before qobject_to_qfloat()
-References: <1487363905-9480-1-git-send-email-armbru@redhat.com>
- <1487363905-9480-12-git-send-email-armbru@redhat.com>
-In-Reply-To: <1487363905-9480-12-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 21 February 2017 at 18:53, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 21/02/2017 19:09, Peter Maydell wrote:
+>> In this instance I don't understand the patch. The ram_device
+>> mem-ops are there to deal with memory regions backed by a
+>> lump of RAM, right? Lumps of memory are always the endianness
+>> of the host CPU by definition, so DEVICE_NATIVE_ENDIAN and
+>> no swapping in the accessors seems like it ought to be the right
+>> thing...
+>
+> DEVICE_NATIVE_ENDIAN is the endianness of the target CPU however.
 
-On 02/17/2017 02:38 PM, Markus Armbruster wrote:
-> qobject_to_qfloat(obj) returns NULL when obj isn't a QFloat.  Check
-> that instead of qobject_type(obj) =3D=3D QTYPE_QFLOAT.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  tests/check-qjson.c                 | 12 ++----------
->  tests/test-qobject-output-visitor.c |  8 ++++----
->  2 files changed, 6 insertions(+), 14 deletions(-)
->=20
+...I meant 'target CPU' there (at any rate, endianness
+of the bus interface between target CPU and its RAM; CPUs
+like ARM with runtime configurable endianness do it by swapping
+data before it hits the bus interface, conceptually speaking).
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Endianness always confuses me, though (I think I understand
+it and then I realize I don't; I also have trouble telling
+whether I understand it and am discussing it with somebody who
+doesn't understand it, or whether I don't understand it and they
+do...)
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---WtxfIBW4cK57cvBNcjxjFjvTRSrcEfLtb
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYrJcyAAoJEKeha0olJ0NqlJIH/jfRgU190smK9AdxgsamcvIc
-Mt9+0mXtqn93Mqum2Mcy2LCbSlnpNr0fONXgdvjBLvUCJtDO9YYa6pXrqjIenTSB
-yIIjkhFJZSJzqHB1KriCmFM7zVPaaOkYz1BnY1h2jKAgDRI8iGMXREAStgnqBl+v
-Wu9q0jtDja5F1J+VlCywAiuxpUQFVAdTED2c0tSZ4n1VPJBq84EWJxThMRL3s0bQ
-CeYwBVOyG+1z2ls5AZAgkS3TNwxqgbb0LeNjs5PaSNTsw45qeB0WcrcahKWfQg6F
-6NRvEJfBp8XaItuWmqC1AikkJ5Qi0C8DvtA+lLflco2+HYf2CEttMuXo1dK+psc=
-=0hgc
------END PGP SIGNATURE-----
-
---WtxfIBW4cK57cvBNcjxjFjvTRSrcEfLtb--
+thanks
+-- PMM
