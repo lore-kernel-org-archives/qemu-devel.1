@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cgAVl-0000Xd-4n
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:29:51 -0500
+	(envelope-from <batuzovk@ispras.ru>) id 1cgAW9-0000vw-PW
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:30:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cgAVh-0007qZ-9i
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:29:45 -0500
-Received: from greensocs.com ([193.104.36.180]:59932)
+	(envelope-from <batuzovk@ispras.ru>) id 1cgAW4-0007yE-RI
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:30:09 -0500
+Received: from bran.ispras.ru ([83.149.199.196]:48625 helo=smtp.ispras.ru)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cgAVg-0007pv-VN
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:29:41 -0500
-References: <5a80994b-3eeb-6ac8-9fbf-e6fae15dfd7a@kamp.de>
-	<1a244107-b611-1321-f56f-076ef008ef75@kamp.de>
-From: Frederic Konrad <fred.konrad@greensocs.com>
-Message-ID: <73c77ab9-64dd-5955-6935-b1e6a11334ee@greensocs.com>
-Date: Tue, 21 Feb 2017 14:29:38 +0100
+	(envelope-from <batuzovk@ispras.ru>) id 1cgAW4-0007x1-Jz
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:30:04 -0500
+Date: Tue, 21 Feb 2017 16:29:56 +0300 (MSK)
+From: Kirill Batuzov <batuzovk@ispras.ru>
+In-Reply-To: <32a902a1-e8c7-c2f7-ac66-148e02ee0b2d@amsat.org>
+Message-ID: <alpine.DEB.2.11.1702211623360.2358@bulbul.intra.ispras.ru>
+References: <1486046099-17726-1-git-send-email-batuzovk@ispras.ru>
+	<1486046099-17726-14-git-send-email-batuzovk@ispras.ru>
+	<2089cbe3-0e9b-fae2-0e35-224f2765dc28@amsat.org>
+	<32a902a1-e8c7-c2f7-ac66-148e02ee0b2d@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <1a244107-b611-1321-f56f-076ef008ef75@kamp.de>
-Content-Type: text/plain; charset=utf-8
+Content-Type: TEXT/PLAIN; charset=windows-1252
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Creating a dummy PCI device
+Subject: Re: [Qemu-devel] [PATCH v2.1 13/21] tcg/i386: support remaining
+ vector addition operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +30,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, =?ISO-8859-15?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
 
-Hi Peter,
+On Tue, 21 Feb 2017, Philippe Mathieu-Daud=E9 wrote:
 
-This won't be easy unfortunately, at least not clean :).
-The vendor_id device_id are part of the PCIDeviceClass.
-So I _think_ you can't use a qom parameter for that.
-But... it seems that these fields are used firstly in
-pci_qdev_realize (to be checked) so maybe it's okay to change them
-later before the device is realized with a parameter..
-
-This is really hackish.. sorry.. but that's a though :).
-
-Fred
-
-On 02/21/2017 01:41 PM, Peter Lieven wrote:
-> Am 03.02.2017 um 13:07 schrieb Peter Lieven:
->> Hi,
->>
->>
->> I have a special use case of creating a dummy PCI device with a
->> certain vendor/device ID. The device does not have to actually
->> function, it just
->>
->> has to be visible under lspci.
->>
->>
->> Any idea how to achieve this? I was thinking of modifying the edu pci
->> device to make the device/vendor ID passable via cmdline.
->>
->>
->> Don't know if thats a good idea.
->>
->>
->> Any thoughts?
+> Hi Kirill,
 >=20
-> anyone?
->=20
-> Thanks,
-> Peter
->=20
->=20
+> could you check my previous comment?
+>
+
+Hi Philippe,
+
+thank you for your comments. I've seen them and I'll apply changes you
+suggested in the next version of the series. I was just hoping to get
+a bit more feedback before I proceed to v3.
+
+--=20
+Kirill
