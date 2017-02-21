@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42825)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgBuY-0008Vd-Rd
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:28 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cgBub-0000Am-5w
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgBuS-0007sB-P7
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:26 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cgBua-0007vQ-23
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:29 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 21 Feb 2017 15:58:09 +0100
-Message-Id: <1487689130-30373-14-git-send-email-kwolf@redhat.com>
+Date: Tue, 21 Feb 2017 15:58:12 +0100
+Message-Id: <1487689130-30373-17-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
 References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 13/54] block: Add Error argument to
- bdrv_attach_child()
+Subject: [Qemu-devel] [PATCH 16/54] block: Default .bdrv_child_perm() for
+ filter drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,99 +23,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-It will have to return an error soon, so prepare the callers for it.
+Most filters need permissions related to read and write for their
+children, but only if the node has a parent that wants to use the same
+operation on the filter. The same is true for resize.
+
+This adds a default implementation that simply forwards all necessary
+permissions to all children of the node and leaves the other permissions
+unchanged.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block.c               | 16 +++++++++++++---
- block/quorum.c        |  9 ++++++++-
- include/block/block.h |  3 ++-
- 3 files changed, 23 insertions(+), 5 deletions(-)
+ block.c                   | 24 ++++++++++++++++++++++++
+ include/block/block_int.h |  8 ++++++++
+ 2 files changed, 32 insertions(+)
 
 diff --git a/block.c b/block.c
-index e166fe8..b2b6be0 100644
+index 2a86781..523cbd3 100644
 --- a/block.c
 +++ b/block.c
-@@ -1368,7 +1368,8 @@ BdrvChild *bdrv_root_attach_child(BlockDriverState *child_bs,
- BdrvChild *bdrv_attach_child(BlockDriverState *parent_bs,
-                              BlockDriverState *child_bs,
-                              const char *child_name,
--                             const BdrvChildRole *child_role)
-+                             const BdrvChildRole *child_role,
-+                             Error **errp)
- {
-     BdrvChild *child = bdrv_root_attach_child(child_bs, child_name, child_role,
-                                               parent_bs);
-@@ -1469,7 +1470,9 @@ void bdrv_set_backing_hd(BlockDriverState *bs, BlockDriverState *backing_hd)
-         bs->backing = NULL;
-         goto out;
-     }
--    bs->backing = bdrv_attach_child(bs, backing_hd, "backing", &child_backing);
-+    /* FIXME Error handling */
-+    bs->backing = bdrv_attach_child(bs, backing_hd, "backing", &child_backing,
-+                                    &error_abort);
-     bs->open_flags &= ~BDRV_O_NO_BACKING;
-     pstrcpy(bs->backing_file, sizeof(bs->backing_file), backing_hd->filename);
-     pstrcpy(bs->backing_format, sizeof(bs->backing_format),
-@@ -1648,6 +1651,7 @@ BdrvChild *bdrv_open_child(const char *filename,
-                            const BdrvChildRole *child_role,
-                            bool allow_none, Error **errp)
- {
-+    BdrvChild *c;
-     BlockDriverState *bs;
- 
-     bs = bdrv_open_child_bs(filename, options, bdref_key, parent, child_role,
-@@ -1656,7 +1660,13 @@ BdrvChild *bdrv_open_child(const char *filename,
-         return NULL;
-     }
- 
--    return bdrv_attach_child(parent, bs, bdref_key, child_role);
-+    c = bdrv_attach_child(parent, bs, bdref_key, child_role, errp);
-+    if (!c) {
-+        bdrv_unref(bs);
-+        return NULL;
-+    }
-+
-+    return c;
+@@ -1531,6 +1531,30 @@ int bdrv_child_try_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared,
+     return 0;
  }
  
- static BlockDriverState *bdrv_append_temp_snapshot(BlockDriverState *bs,
-diff --git a/block/quorum.c b/block/quorum.c
-index 86e2072..bdbcec6 100644
---- a/block/quorum.c
-+++ b/block/quorum.c
-@@ -1032,10 +1032,17 @@ static void quorum_add_child(BlockDriverState *bs, BlockDriverState *child_bs,
- 
-     /* We can safely add the child now */
-     bdrv_ref(child_bs);
--    child = bdrv_attach_child(bs, child_bs, indexstr, &child_format);
++#define DEFAULT_PERM_PASSTHROUGH (BLK_PERM_CONSISTENT_READ \
++                                 | BLK_PERM_WRITE \
++                                 | BLK_PERM_WRITE_UNCHANGED \
++                                 | BLK_PERM_RESIZE)
++#define DEFAULT_PERM_UNCHANGED (BLK_PERM_ALL & ~DEFAULT_PERM_PASSTHROUGH)
 +
-+    child = bdrv_attach_child(bs, child_bs, indexstr, &child_format, errp);
-+    if (child == NULL) {
-+        s->next_child_index--;
-+        bdrv_unref(child_bs);
-+        goto out;
++void bdrv_filter_default_perms(BlockDriverState *bs, BdrvChild *c,
++                               const BdrvChildRole *role,
++                               uint64_t perm, uint64_t shared,
++                               uint64_t *nperm, uint64_t *nshared)
++{
++    if (c == NULL) {
++        *nperm = 0;
++        *nshared = BLK_PERM_ALL;
++        return;
 +    }
-     s->children = g_renew(BdrvChild *, s->children, s->num_children + 1);
-     s->children[s->num_children++] = child;
++
++    *nperm = (perm & DEFAULT_PERM_PASSTHROUGH) |
++             (c->perm & DEFAULT_PERM_UNCHANGED);
++    *nshared = (shared & DEFAULT_PERM_PASSTHROUGH) |
++               (c->shared_perm & DEFAULT_PERM_UNCHANGED);
++}
++
++
+ static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs)
+ {
+     BlockDriverState *old_bs = child->bs;
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index cef2b6e..17f4c2d 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -872,6 +872,14 @@ void bdrv_child_abort_perm_update(BdrvChild *c);
+ int bdrv_child_try_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared,
+                             Error **errp);
  
-+out:
-     bdrv_drained_end(bs);
- }
++/* Default implementation for BlockDriver.bdrv_child_perm() that can be used by
++ * block filters: Forward CONSISTENT_READ, WRITE, WRITE_UNCHANGED and RESIZE to
++ * all children */
++void bdrv_filter_default_perms(BlockDriverState *bs, BdrvChild *c,
++                               const BdrvChildRole *role,
++                               uint64_t perm, uint64_t shared,
++                               uint64_t *nperm, uint64_t *nshared);
++
  
-diff --git a/include/block/block.h b/include/block/block.h
-index ac40c8d..2d6ed7d 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -519,7 +519,8 @@ void bdrv_unref_child(BlockDriverState *parent, BdrvChild *child);
- BdrvChild *bdrv_attach_child(BlockDriverState *parent_bs,
-                              BlockDriverState *child_bs,
-                              const char *child_name,
--                             const BdrvChildRole *child_role);
-+                             const BdrvChildRole *child_role,
-+                             Error **errp);
- 
- bool bdrv_op_is_blocked(BlockDriverState *bs, BlockOpType op, Error **errp);
- void bdrv_op_block(BlockDriverState *bs, BlockOpType op, Error *reason);
+ const char *bdrv_get_parent_name(const BlockDriverState *bs);
+ void blk_dev_change_media_cb(BlockBackend *blk, bool load);
 -- 
 1.8.3.1
