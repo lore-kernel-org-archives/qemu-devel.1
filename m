@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59253)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cg4gc-0002yc-4M
+	(envelope-from <kraxel@redhat.com>) id 1cg4gc-0002ye-4M
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 02:16:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cg4gY-00086Y-Sj
+	(envelope-from <kraxel@redhat.com>) id 1cg4ga-00087v-L9
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 02:16:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58462)
+Received: from mx1.redhat.com ([209.132.183.28]:41234)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cg4gY-00086M-Mi
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 02:16:30 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C2B2513CF3
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 07:16:30 +0000 (UTC)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cg4ga-000879-GV
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 02:16:32 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 21 Feb 2017 08:16:14 +0100
-Message-Id: <1487661385-7720-1-git-send-email-kraxel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/11] usb patch queue
+Date: Tue, 21 Feb 2017 08:16:15 +0100
+Message-Id: <1487661385-7720-2-git-send-email-kraxel@redhat.com>
+In-Reply-To: <1487661385-7720-1-git-send-email-kraxel@redhat.com>
+References: <1487661385-7720-1-git-send-email-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 01/11] usb: ehci: fix memory leak in ehci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,61 +24,79 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Li Qiang <liqiang6-s@360.cn>, Gerd Hoffmann <kraxel@redhat.com>
 
-  Hi,
+From: Li Qiang <liqiang6-s@360.cn>
 
-Here is the usb patch queue, bringing the usual share of bugfixes.
-Also a generic xhci device variant (qemu-xhci).
+In usb_ehci_init function, it initializes 's->ipacket', but there
+is no corresponding function to free this. As the ehci can be hotplug
+and unplug, this will leak host memory leak. In order to make the
+hierarchy clean, we should add a ehci pci finalize function, then call
+the clean function in ehci device.
 
-please pull,
-  Gerd
+Signed-off-by: Li Qiang <liqiang6-s@360.cn>
+Message-id: 589a85b8.3c2b9d0a.b8e6.1434@mx.google.com
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/usb/hcd-ehci-pci.c | 9 +++++++++
+ hw/usb/hcd-ehci.c     | 5 +++++
+ hw/usb/hcd-ehci.h     | 1 +
+ 3 files changed, 15 insertions(+)
 
-The following changes since commit 56f9e46b841c7be478ca038d8d4085d776ab4b=
-0d:
-
-  Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2017-02-20'=
- into staging (2017-02-20 17:42:47 +0000)
-
-are available in the git repository at:
-
-
-  git://git.kraxel.org/qemu tags/pull-usb-20170221-1
-
-for you to fetch changes up to 31fb4444a485a348f8e2699d7c3dd15e1819ad2c:
-
-  usb-ccid: add check message size checks (2017-02-21 08:11:43 +0100)
-
-----------------------------------------------------------------
-xhci: add qemu-xhci device, some followup cleanups.
-ccid: better sanity checking.
-ehci: fix memory leak
-ohci: bugfixes.
-
-----------------------------------------------------------------
-Gerd Hoffmann (8):
-      xhci: apply limits to loops
-      xhci: drop ER_FULL_HACK workaround
-      xhci: add qemu xhci controller
-      xhci: fix nec vendor quirk handling
-      xhci: drop via vendor command handling
-      usb-ccid: better bulk_out error handling
-      usb-ccid: move header size check
-      usb-ccid: add check message size checks
-
-Li Qiang (3):
-      usb: ehci: fix memory leak in ehci
-      usb: ohci: fix error return code in servicing iso td
-      usb: ohci: limit the number of link eds
-
- docs/specs/pci-ids.txt        |   1 +
- hw/usb/dev-smartcard-reader.c | 140 +++++++++++++-----------
- hw/usb/hcd-ehci-pci.c         |   9 ++
- hw/usb/hcd-ehci.c             |   5 +
- hw/usb/hcd-ehci.h             |   1 +
- hw/usb/hcd-ohci.c             |  11 +-
- hw/usb/hcd-xhci.c             | 247 +++++++++++++++---------------------=
-------
- hw/usb/trace-events           |   1 +
- include/hw/pci/pci.h          |   1 +
- 9 files changed, 193 insertions(+), 223 deletions(-)
+diff --git a/hw/usb/hcd-ehci-pci.c b/hw/usb/hcd-ehci-pci.c
+index 5657705..6dedcb8 100644
+--- a/hw/usb/hcd-ehci-pci.c
++++ b/hw/usb/hcd-ehci-pci.c
+@@ -89,6 +89,14 @@ static void usb_ehci_pci_init(Object *obj)
+     usb_ehci_init(s, DEVICE(obj));
+ }
+ 
++static void usb_ehci_pci_finalize(Object *obj)
++{
++    EHCIPCIState *i = PCI_EHCI(obj);
++    EHCIState *s = &i->ehci;
++
++    usb_ehci_finalize(s);
++}
++
+ static void usb_ehci_pci_exit(PCIDevice *dev)
+ {
+     EHCIPCIState *i = PCI_EHCI(dev);
+@@ -159,6 +167,7 @@ static const TypeInfo ehci_pci_type_info = {
+     .parent = TYPE_PCI_DEVICE,
+     .instance_size = sizeof(EHCIPCIState),
+     .instance_init = usb_ehci_pci_init,
++    .instance_finalize = usb_ehci_pci_finalize,
+     .abstract = true,
+     .class_init = ehci_class_init,
+ };
+diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
+index 7622a3a..50ef817 100644
+--- a/hw/usb/hcd-ehci.c
++++ b/hw/usb/hcd-ehci.c
+@@ -2545,6 +2545,11 @@ void usb_ehci_init(EHCIState *s, DeviceState *dev)
+                                 &s->mem_ports);
+ }
+ 
++void usb_ehci_finalize(EHCIState *s)
++{
++    usb_packet_cleanup(&s->ipacket);
++}
++
+ /*
+  * vim: expandtab ts=4
+  */
+diff --git a/hw/usb/hcd-ehci.h b/hw/usb/hcd-ehci.h
+index 3fd7038..938d8aa 100644
+--- a/hw/usb/hcd-ehci.h
++++ b/hw/usb/hcd-ehci.h
+@@ -323,6 +323,7 @@ struct EHCIState {
+ extern const VMStateDescription vmstate_ehci;
+ 
+ void usb_ehci_init(EHCIState *s, DeviceState *dev);
++void usb_ehci_finalize(EHCIState *s);
+ void usb_ehci_realize(EHCIState *s, DeviceState *dev, Error **errp);
+ void usb_ehci_unrealize(EHCIState *s, DeviceState *dev, Error **errp);
+ void ehci_reset(void *opaque);
+-- 
+1.8.3.1
