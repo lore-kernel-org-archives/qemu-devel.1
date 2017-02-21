@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cgC0Y-00066P-4h
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:05:39 -0500
+	(envelope-from <okaya@codeaurora.org>) id 1cgC5G-0001nm-IH
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:10:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cgC0U-00026n-7l
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:05:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38492)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cgC0U-00026N-2M
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:05:34 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3F37E80491
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 15:05:34 +0000 (UTC)
-References: <1487363905-9480-1-git-send-email-armbru@redhat.com>
-	<1487363905-9480-8-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2937d173-68d0-9a6f-4d0f-2e3c5cddda2b@redhat.com>
-Date: Tue, 21 Feb 2017 09:05:32 -0600
+	(envelope-from <okaya@codeaurora.org>) id 1cgC5F-0003px-Dn
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:10:30 -0500
+References: <1487683100-16013-1-git-send-email-eric.auger@redhat.com>
+	<1487683100-16013-2-git-send-email-eric.auger@redhat.com>
+	<98d4d9e8-761c-76f9-ecb0-c5a4a658dfab@codeaurora.org>
+	<2dcc9002-ec06-c55e-c0a2-75d05fe05762@redhat.com>
+From: Sinan Kaya <okaya@codeaurora.org>
+Message-ID: <970561bf-0adc-4f60-bf2b-57bbafabb0aa@codeaurora.org>
+Date: Tue, 21 Feb 2017 10:10:19 -0500
 MIME-Version: 1.0
-In-Reply-To: <1487363905-9480-8-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="SJQkjxdc0hNoX2m018NnqF3X4lTPLGL1I"
-Subject: Re: [Qemu-devel] [PATCH 07/14] Don't check qobject_type() before
- qobject_to_qdict()
+In-Reply-To: <2dcc9002-ec06-c55e-c0a2-75d05fe05762@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] vfio/platform: make the vfio-platform
+ device non abstract
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,52 +26,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com, peter.maydell@linaro.org, alex.williamson@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: shankerd@codeaurora.org, vikrams@codeaurora.org, agraf@suse.de, pelcan@codeaurora.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SJQkjxdc0hNoX2m018NnqF3X4lTPLGL1I
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <2937d173-68d0-9a6f-4d0f-2e3c5cddda2b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 07/14] Don't check qobject_type() before
- qobject_to_qdict()
-References: <1487363905-9480-1-git-send-email-armbru@redhat.com>
- <1487363905-9480-8-git-send-email-armbru@redhat.com>
-In-Reply-To: <1487363905-9480-8-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 2/21/2017 9:59 AM, Auger Eric wrote:
+> Hi Sinan,
+> On 21/02/2017 15:45, Sinan Kaya wrote:
+>> Hi Eric,
+>> Thanks for the long anticipated patch.
+>>
+>> On 2/21/2017 8:18 AM, Eric Auger wrote:
+>>> +    DEFINE_PROP_STRING("manufacturer", VFIOPlatformDevice, manufacturer),
+>>> +    DEFINE_PROP_STRING("model", VFIOPlatformDevice, model),
+>>
+>> The OF string is not always of the format "manufacturer, model".
+>>
+>> HIDMA for instance uses a syntax of "qcom, hidma-1.0" and "qcom, hidma-2.0".
+>> This syntax is used for cases where an IP gets used in multiple SOCs. 
+>>
+>> Maybe, we should call it just compatible-string and try not to make meaning
+>> out of it.
+>>
+>> Sinan
+>>
+> 
+> in  http://www.devicetree.org/specifications-pdf I found the description
+> at the bottom.
+> 
+> I your case what would prevent from creating 2 entries in the table and
+> then use either in qemu cmd line?
+> 
 
-On 02/17/2017 02:38 PM, Markus Armbruster wrote:
-> qobject_to_qdict(obj) returns NULL when obj isn't a QDict.  Check
-> that instead of qobject_type(obj) =3D=3D QTYPE_QDICT.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
+I see your point. You are saying that hidma-1.0 would be the model and qcom
+would be the manufacturer. 
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+This should work.
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+However, I have more concerns below.
+
+> VFIO_PLATFORM_BINDING("qcom", "hidma-1.0", add_amd_hidma_fdt_node),
+> VFIO_PLATFORM_BINDING("qcom", "hidma-2.0", add_amd_hidma_fdt_node),
+> 
+> The issue is the comma in the property is interpreted as a separator for
+> options, hence that choice of having 2 separate options.
+
+Note that the goal is to be able to instantiate any platform device by just
+passing a compatible string and the object from the host. We don't want
+to make changes to QEMU every time somebody comes up with a new platform device.
+This step is unnecessary. 
+
+A general purpose solution should be able to passthrough any platform device.
+
+I have AHCI compatible SATA drive and HIDMA use cases for this purposes. The
+code should be able to probe the given device with the compatible string without
+requiring any changes to QEMU.
+
+I didn't see this in the code. Maybe, it is just because I'm QEMU code
+illiterate.
+
+I shouldn't need to submit a patch to QEMU to add these two lines.
+
+VFIO_PLATFORM_BINDING("qcom", "hidma-1.0", add_qcom_hidma_fdt_node),
+VFIO_PLATFORM_BINDING("qcom", "hidma-2.0", add_qcom_hidma_fdt_node),
 
 
---SJQkjxdc0hNoX2m018NnqF3X4lTPLGL1I
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> 
+> Besides I will fix the CONFIG_LINUX compilation issue asap.
+> 
+> Thanks
+> 
+> Eric
+> 
+> "
+> The recommended format is "manufacturer,model", where manufacturer is a
+> string describing the name of the manufacturer (such as a stock ticker
+> symbol), and model specifies the model number.
+> 
+> Example:
+> compatible = "fsl,mpc8641-uart", "ns16550";
+> In this example, an operating system would first try to locate a device
+> driver that supported
+> fsl,mpc8641-uart. If a driver was not found, it would then try to locate
+> a driver that supported the more general ns16550 device type.
+> "
+> 
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYrFc8AAoJEKeha0olJ0Nq2bIH/0yaHhYiGY5GQybHUNG+A9XB
-8mnzzkGmIH8OCs/Syt50Vmiv4G6gT5Y7wWSdyg9Feko/oJ6O8QYGkDl0fGAmd0xH
-3H4BgHXWXalJBtZ0georXOoGS9xivnMP1RdD36bjHrhk+QB1+NJRQTsppmor9yP5
-X9HjFTrFJLc509z5B/Fw1mTEvDI0CnoHrvm4aaLqXwdQUseS2vsybXpIIbnnqsTW
-5YjLf699K34mdO5Ii9rAawvpazg24x6zjqVNlPVXsgaLHdIvnmFA4TQVTORtWJq1
-jjVQLjva+fxA08SX8nIIylG2EwXZgA/QQhslqHyQasZONK8cfcqUACEmYfjTKqQ=
-=Wg3C
------END PGP SIGNATURE-----
-
---SJQkjxdc0hNoX2m018NnqF3X4lTPLGL1I--
+-- 
+Sinan Kaya
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
