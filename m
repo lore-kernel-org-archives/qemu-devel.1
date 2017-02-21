@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cgGOh-0004B8-D8
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 14:46:52 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cgGY6-0007st-9h
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 14:56:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cgGOe-0008OW-8i
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 14:46:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36632)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cgGOd-0008OQ-VT
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 14:46:48 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 164F383F3E
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 19:46:48 +0000 (UTC)
-References: <1487363905-9480-1-git-send-email-armbru@redhat.com>
-	<1487363905-9480-15-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <26dcdf8d-3403-c8cb-52aa-4aceb90a75dc@redhat.com>
-Date: Tue, 21 Feb 2017 13:46:45 -0600
+	(envelope-from <rth7680@gmail.com>) id 1cgGY1-0002Yh-CR
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 14:56:34 -0500
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1487585521-19445-1-git-send-email-nikunj@linux.vnet.ibm.com>
+	<1487585521-19445-8-git-send-email-nikunj@linux.vnet.ibm.com>
+	<165844eb-e94c-1955-2fe3-59f0a3931094@twiddle.net>
+	<878tozdhe4.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <e2a02836-77d9-18f2-d8df-21856a6da0a8@twiddle.net>
+Date: Wed, 22 Feb 2017 06:56:17 +1100
 MIME-Version: 1.0
-In-Reply-To: <1487363905-9480-15-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="gteS6jE70UEQSu3KV1ITcgffh30egvQPr"
-Subject: Re: [Qemu-devel] [PATCH 14/14] block: Don't bother asserting type
- of output visitor's output
+In-Reply-To: <878tozdhe4.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 07/10] target/ppc: update ov/ov32 for
+ nego
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,64 +27,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---gteS6jE70UEQSu3KV1ITcgffh30egvQPr
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <26dcdf8d-3403-c8cb-52aa-4aceb90a75dc@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 14/14] block: Don't bother asserting type of
- output visitor's output
-References: <1487363905-9480-1-git-send-email-armbru@redhat.com>
- <1487363905-9480-15-git-send-email-armbru@redhat.com>
-In-Reply-To: <1487363905-9480-15-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 02/21/2017 08:26 PM, Nikunj A Dadhania wrote:
+> Richard Henderson <rth@twiddle.net> writes:
+>
+>> On 02/20/2017 09:11 PM, Nikunj A Dadhania wrote:
+>>> For 64-bit mode if the register RA contains 0x8000_0000_0000_0000, OV
+>>> and OV32 are set to 1.
+>>>
+>>> For 32-bit mode if the register RA contains 0x8000_0000, OV and OV32 are
+>>> set to 1.
+>>>
+>>> Use the tcg-ops for negation (neg_tl) and drop gen_op_arith_neg() as
+>>> nego was the last user.
+>>>
+>>> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+>> @@ -1488,7 +1480,20 @@ static void gen_neg(DisasContext *ctx)
+>>>
+>>>  static void gen_nego(DisasContext *ctx)
+>>>  {
+>>> -    gen_op_arith_neg(ctx, 1);
+>>> +    TCGv t0 = tcg_temp_new();
+>>> +    TCGv zero = tcg_const_tl(0);
+>>> +
+>>> +    if (NARROW_MODE(ctx)) {
+>>> +        tcg_gen_xori_tl(t0, cpu_gpr[rA(ctx->opcode)], INT32_MIN);
+>>> +    } else {
+>>> +        tcg_gen_xori_tl(t0, cpu_gpr[rA(ctx->opcode)], (target_ulong)INT64_MIN);
+>>> +    }
+>>> +
+>>> +    tcg_gen_setcond_tl(TCG_COND_EQ, cpu_ov, t0, zero);
+>>> +    tcg_gen_mov_tl(cpu_ov32, cpu_ov);
+>>> +    tcg_gen_neg_tl(cpu_gpr[rD(ctx->opcode)], cpu_gpr[rA(ctx->opcode)]);
+>>> +    tcg_temp_free(t0);
+>>> +    tcg_temp_free(zero);
+>>>  }
+>>
+>> Again, you're forgetting "nego.".  Don't try to simplify from gen_op_arith_subf
+>> by hand.
+>
+> The reason of the simplification was the interpretation of ov and ov32.
+> I will add a code to compute the Rc.
 
-On 02/17/2017 02:38 PM, Markus Armbruster wrote:
-> After a visit of a complex QAPI type FOO
->=20
->     ov =3D qobject_output_visitor_new(&foo);
->     visit_type_FOO(ov, NULL, expr, &error_abort);
->     visit_complete(ov, &foo);
->=20
-> we can safely assume qobject_type(foo) is QTYPE_QDICT.  We do in many
-> places, but occasionally assert qobject_type(obj) =3D=3D QTYPE_QDICT.
-> Don't.  The appropriate place to check such fundamental properties of
-> QAPI visitors is the test suite.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  block/nbd.c  | 2 --
->  block/nfs.c  | 2 --
->  block/qapi.c | 1 -
->  3 files changed, 5 deletions(-)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+Why do you believe that the computation for overflow is different between neg 
+and subf?
 
 
---gteS6jE70UEQSu3KV1ITcgffh30egvQPr
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYrJklAAoJEKeha0olJ0Nqa2YH/0/Ku3kQV60m2+r8Jp7yWkad
-dC8Oocg78Y1ukI+Y5IyWAUh30H8bh7klOXPn7RedhBi9k36Mj/bix9CPPGEXUTPq
-n6UvrXK1qA+DU74rdOH513YJp0Bfirt+s8z3PyanVAxvLKV9v3PmRGjUnJ/z//2i
-Eo4NWioKOGU4UR/DwFK95ml1KCQWcIAZYlmr6VnmVHHuWHGEF/kKncilV5LI3A7d
-UapEtgVVFVUnRGWdKt/Gtx72FrOWmAMJdq0Jdp+Bj1b1iF0D5ABAe2mKkwOOlXnD
-cP7XnUfDuiRb29B1qyJDHAhUfEvP8Rgna51U4NjOWJ8Va0yTD92qnbYQK+f7f6o=
-=tzvc
------END PGP SIGNATURE-----
-
---gteS6jE70UEQSu3KV1ITcgffh30egvQPr--
+r~
