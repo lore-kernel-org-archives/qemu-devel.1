@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cgEPN-00024x-GB
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 12:39:26 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cgEYl-0002Pw-7t
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 12:49:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cgEPJ-0000ph-Gj
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 12:39:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48876)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cgEPJ-0000or-6z
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 12:39:21 -0500
-Date: Tue, 21 Feb 2017 17:39:12 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170221173912.GO17041@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CAAo6VWOAnGQeDwc_bJ4M=FQsu7rOhAv=1Qk6PdzG+0pcVnku=A@mail.gmail.com>
-	<20170217214215.GK19045@localhost.localdomain>
-	<F23F188C-DAF9-49EA-9C0E-54F57945267A@veritas.com>
-	<20170220110235.GD21255@stefanha-x1.localdomain>
-	<CAAo6VWNwHbsQRxU18dNCjWaNfNrZNAV9FfOKW8=JeZCND2vHnQ@mail.gmail.com>
-	<20170221105918.GA22731@stefanha-x1.localdomain>
-	<A228B0EC-4D64-4174-A4FD-B3E00B836FD1@veritas.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cgEYk-0003vF-HX
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 12:49:07 -0500
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:33595)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cgEYk-0003v2-A6
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 12:49:06 -0500
+Received: by mail-wr0-x236.google.com with SMTP id 97so8262617wrb.0
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 09:49:06 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <A228B0EC-4D64-4174-A4FD-B3E00B836FD1@veritas.com>
-Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
- block device type called "vxhs"
+In-Reply-To: <20170221155856.GD2778@thinpad.lan.raisama.net>
+References: <1486996099-15820-1-git-send-email-peter.maydell@linaro.org>
+	<CAFEAcA98V-3EMDS+o9HnAdY14JDoY4i8yYyFP=OiK8QXMSWvmA@mail.gmail.com>
+	<20170221155856.GD2778@thinpad.lan.raisama.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 21 Feb 2017 17:48:44 +0000
+Message-ID: <CAFEAcA9762NB0ghnvdST2AGFn_y_i5f_KxT0sdiVbZgzA=fk8A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/4] cpu: Implement
+ cpu_generic_new()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,82 +31,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ketan Nilangekar <Ketan.Nilangekar@veritas.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, ashish mittal <ashmit602@gmail.com>, Jeff Cody <jcody@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-On Tue, Feb 21, 2017 at 05:21:46PM +0000, Ketan Nilangekar wrote:
-> 
-> 
-> On 2/21/17, 5:59 AM, "Stefan Hajnoczi" <stefanha@gmail.com> wrote:
-> 
->     On Mon, Feb 20, 2017 at 03:34:57AM -0800, ashish mittal wrote:
->     > On Mon, Feb 20, 2017 at 3:02 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
->     > > On Sat, Feb 18, 2017 at 12:30:31AM +0000, Ketan Nilangekar wrote:
->     > >> On 2/17/17, 1:42 PM, "Jeff Cody" <jcody@redhat.com> wrote:
->     > >>
->     > >>     On Thu, Feb 16, 2017 at 02:24:19PM -0800, ashish mittal wrote:
->     > >>     > Hi,
->     > >>     >
->     > >>     > I am getting the following error with checkpatch.pl
->     > >>     >
->     > >>     > ERROR: externs should be avoided in .c files
->     > >>     > #78: FILE: block/vxhs.c:28:
->     > >>     > +QemuUUID qemu_uuid __attribute__ ((weak));
->     > >>     >
->     > >>     > Is there any way to get around this, or does it mean that I would have
->     > >>     > to add a vxhs.h just for this one entry?
->     > >>     >
->     > >>
->     > >>     I remain skeptical on the use of the qemu_uuid as a way to select the TLS
->     > >>     cert.
->     > >>
->     > >> [ketan]
->     > >> Is there another identity that can be used for uniquely identifying instances?
->     > >> The requirement was to enforce vdisk access to owner instances.
->     > >
->     > > The qemu_uuid weak attribute looks suspect.  What is going to provide a
->     > > strong qemu_uuid symbol?
->     > >
->     > > Why aren't configuration parameters like the UUID coming from the QEMU
->     > > command-line?
->     > >
->     > > Stefan
->     > 
->     > UUID will in fact come from the QEMU command line. VxHS is not doing
->     > anything special here. It will just use the value already available to
->     > qemu-kvm process.
->     > 
->     > QemuUUID qemu_uuid;
->     > bool qemu_uuid_set;
->     > 
->     > Both the above are defined in vl.c. vl.c will provide the strong
->     > symbol when available. There are certain binaries that do not get
->     > linked with vl.c (e.g. qemu-img). The weak symbol will come into
->     > affect for such binaries, and in this case, the default VXHS UUID will
->     > get picked up. I had, in a previous email, explained how we plan to
->     > use the default UUID. In the regular case, the VxHS controller will
->     > not allow access to the default UUID (non qemu-kvm) binaries, but it
->     > may choose to grant temporary access to specific vdisks for these
->     > binaries depending on the workflow.
->     
->     That idea sounds like a security problem.  During this time window
->     anyone could use the default UUID to access the data?
->     
->     Just make the UUID (or TLS client certificate file) a command-line
->     parameter that qemu-system, qemu-img, and other tools accept (e.g.
->     qemu-img via the --image-opts/--object syntax).
->     
-> [Ketan]
-> Sounds fair. Would it be ok to take this up after the driver is
-> merged for the upcoming QEMU release?
+On 21 February 2017 at 15:58, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> On Thu, Feb 16, 2017 at 04:40:43PM +0000, Peter Maydell wrote:
+>> I know it's only been a few days, but I just wanted to
+>> say that I'd appreciate it if we could manage relatively
+>> quick review on this one, since I have a set of patches
+>> pending that depend on this and which it would be nice
+>> to get into 2.9 (softfreeze approaching rapidly).
+>
+> I was away from work for the past 3 weeks and I am catching up on
+> e-mail, right now. Is this proposal still up, or is this series
+> obsoleted by something else?
 
-I don't think we can merge code with known security flaws, particularly
-if fixing these flaws will involve adding and/or changing command line
-parameters for the block driver.
+Given Igor's view that this isn't the way we want to go, I have
+decoupled the other patches I mention above from this patchset
+(making them do an in-line call to parse_features etc like
+the virt.c code etc etc do at the moment). So there's no rush
+and we can take the time to decide what the right approach is
+(which we can then implement for QEMU 2.10, I expect).
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+thanks
+-- PMM
