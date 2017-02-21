@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cgAvG-00089m-J1
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:56:07 -0500
+	(envelope-from <quintela@redhat.com>) id 1cgAwW-00016H-QX
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:57:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cgAvF-0002vN-Lr
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:56:06 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1487357795-52614-1-git-send-email-imammedo@redhat.com>
-	<CAFEAcA9JWzUEmGa2Wxd5xPE4dVknOKBkt=wMda7CAgxzrgOc+w@mail.gmail.com>
-	<20170220195500.332a4844@nial.brq.redhat.com>
-	<CAFEAcA-VAY8LM+8jE4B-L=0QdcY5FLvwmwGVbUhcXjnC9-AW+w@mail.gmail.com>
-	<20170221134416.5803b3e5@nial.brq.redhat.com>
-	<CAFEAcA-MggU5T1fO8GonkSpLF0SNe0jtygEHtEBkpWC8hyShSw@mail.gmail.com>
-Date: Tue, 21 Feb 2017 14:56:00 +0100
-In-Reply-To: <CAFEAcA-MggU5T1fO8GonkSpLF0SNe0jtygEHtEBkpWC8hyShSw@mail.gmail.com>
-	(Peter Maydell's message of "Tue, 21 Feb 2017 12:55:20 +0000")
-Message-ID: <87poibr6kv.fsf@dusky.pond.sub.org>
+	(envelope-from <quintela@redhat.com>) id 1cgAwT-0003Nc-R2
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:57:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44934)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cgAwT-0003NP-L7
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:57:21 -0500
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170220185020.774-6-dgilbert@redhat.com> (David Alan Gilbert's
+	message of "Mon, 20 Feb 2017 18:50:20 +0000")
+References: <20170220185020.774-1-dgilbert@redhat.com>
+	<20170220185020.774-6-dgilbert@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Tue, 21 Feb 2017 14:57:15 +0100
+Message-ID: <87a89foddw.fsf@emacs.mitica>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC 0/3] generalize parsing of cpu_model
+Subject: Re: [Qemu-devel] [PATCH v4 5/5] slirp: VMStatify remaining except
+ for loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,43 +29,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "patches@linaro.org" <patches@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com
 
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> On 21 February 2017 at 12:44, Igor Mammedov <imammedo@redhat.com> wrote:
->> If we are to ditch legacy approach,
->> It would be cleaner for SoC to have fixed/unconfigurable
->> CPU type and each SoC being modeled as a separate
->> QOM object/type that would instantiate CPU directly
->> with QOM style, using type name, like:
->>
->>     cpu = object_new(TYPE_FOO_CPU)
->>     set props if necessary
->>     object_property_set_bool(cpu, true, "realized", &err)
->>     object_unref(cpu)
->>
->> or similar with extra check/logic on top of plain object_new()
->>
->>     prepare cpu_opts for cpu type TYPE_FOO_CPU
->>     cpu = qdev_device_add(cpu_opts)
->>     object_unref(cpu)
->>
->> instead of using cpu_init/cpu_foo_init/cpu_generic_init()
->> with cpu_model parsing logic which is not really needed
->> there as concrete SoC model knows exact CPU type.
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 >
-> Mmm, I think that's probably best. Would the end-user
-> still be able to set CPU properties if necessary via
-> a -global command line switch (since -cpu type,foo=on
-> wouldn't work)?
+> This converts the remaining components, except for the top level
+> loop, to VMState.
+>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
--global is a qdev thing.  It affects only instances of TYPE_DEVICE and
-its subtypes.  Since TYPE_CPU is one...
-
-> (I just worry slightly that we might have users doing
-> weird things which we'd break.)
-
-I suspect we'd hand out a foot or two of extra rope, in addition to the
-miles our users already got.
+Reviewed-by: Juan Quintela <quintela@redhat.com>
