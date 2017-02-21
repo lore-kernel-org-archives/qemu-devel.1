@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cgEq8-0000Dr-JW
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 13:07:05 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cgErR-0001OO-6l
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 13:08:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cgEq5-0000to-DN
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 13:07:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34736)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1cgEq5-0000tT-5f
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 13:07:01 -0500
-Date: Tue, 21 Feb 2017 13:06:58 -0500
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170221180658.GO19045@localhost.localdomain>
-References: <CAAo6VWOAnGQeDwc_bJ4M=FQsu7rOhAv=1Qk6PdzG+0pcVnku=A@mail.gmail.com>
-	<20170217214215.GK19045@localhost.localdomain>
-	<F23F188C-DAF9-49EA-9C0E-54F57945267A@veritas.com>
-	<20170220110235.GD21255@stefanha-x1.localdomain>
-	<CAAo6VWNwHbsQRxU18dNCjWaNfNrZNAV9FfOKW8=JeZCND2vHnQ@mail.gmail.com>
-	<20170221105918.GA22731@stefanha-x1.localdomain>
-	<A228B0EC-4D64-4174-A4FD-B3E00B836FD1@veritas.com>
-	<20170221173912.GO17041@redhat.com>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cgErO-0001IM-0b
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 13:08:25 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:35950)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cgErN-0001Ht-Pd
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 13:08:21 -0500
+Received: by mail-wm0-x242.google.com with SMTP id r18so21107768wmd.3
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 10:08:21 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <1487361200-29966-1-git-send-email-mst@redhat.com>
+	<1487361200-29966-13-git-send-email-mst@redhat.com>
+	<1487681835.2694.76.camel@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3692fe08-f779-b713-6405-357726ca564f@redhat.com>
+Date: Tue, 21 Feb 2017 19:08:17 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170221173912.GO17041@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
- block device type called "vxhs"
+In-Reply-To: <1487681835.2694.76.camel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 12/23] virtio: use VRingMemoryRegionCaches
+ for avail and used rings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,96 +33,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, Stefan Hajnoczi <stefanha@gmail.com>, ashish mittal <ashmit602@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Tue, Feb 21, 2017 at 05:39:12PM +0000, Daniel P. Berrange wrote:
-> On Tue, Feb 21, 2017 at 05:21:46PM +0000, Ketan Nilangekar wrote:
-> > 
-> > 
-> > On 2/21/17, 5:59 AM, "Stefan Hajnoczi" <stefanha@gmail.com> wrote:
-> > 
-> >     On Mon, Feb 20, 2017 at 03:34:57AM -0800, ashish mittal wrote:
-> >     > On Mon, Feb 20, 2017 at 3:02 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> >     > > On Sat, Feb 18, 2017 at 12:30:31AM +0000, Ketan Nilangekar wrote:
-> >     > >> On 2/17/17, 1:42 PM, "Jeff Cody" <jcody@redhat.com> wrote:
-> >     > >>
-> >     > >>     On Thu, Feb 16, 2017 at 02:24:19PM -0800, ashish mittal wrote:
-> >     > >>     > Hi,
-> >     > >>     >
-> >     > >>     > I am getting the following error with checkpatch.pl
-> >     > >>     >
-> >     > >>     > ERROR: externs should be avoided in .c files
-> >     > >>     > #78: FILE: block/vxhs.c:28:
-> >     > >>     > +QemuUUID qemu_uuid __attribute__ ((weak));
-> >     > >>     >
-> >     > >>     > Is there any way to get around this, or does it mean that I would have
-> >     > >>     > to add a vxhs.h just for this one entry?
-> >     > >>     >
-> >     > >>
-> >     > >>     I remain skeptical on the use of the qemu_uuid as a way to select the TLS
-> >     > >>     cert.
-> >     > >>
-> >     > >> [ketan]
-> >     > >> Is there another identity that can be used for uniquely identifying instances?
-> >     > >> The requirement was to enforce vdisk access to owner instances.
-> >     > >
-> >     > > The qemu_uuid weak attribute looks suspect.  What is going to provide a
-> >     > > strong qemu_uuid symbol?
-> >     > >
-> >     > > Why aren't configuration parameters like the UUID coming from the QEMU
-> >     > > command-line?
-> >     > >
-> >     > > Stefan
-> >     > 
-> >     > UUID will in fact come from the QEMU command line. VxHS is not doing
-> >     > anything special here. It will just use the value already available to
-> >     > qemu-kvm process.
-> >     > 
-> >     > QemuUUID qemu_uuid;
-> >     > bool qemu_uuid_set;
-> >     > 
-> >     > Both the above are defined in vl.c. vl.c will provide the strong
-> >     > symbol when available. There are certain binaries that do not get
-> >     > linked with vl.c (e.g. qemu-img). The weak symbol will come into
-> >     > affect for such binaries, and in this case, the default VXHS UUID will
-> >     > get picked up. I had, in a previous email, explained how we plan to
-> >     > use the default UUID. In the regular case, the VxHS controller will
-> >     > not allow access to the default UUID (non qemu-kvm) binaries, but it
-> >     > may choose to grant temporary access to specific vdisks for these
-> >     > binaries depending on the workflow.
-> >     
-> >     That idea sounds like a security problem.  During this time window
-> >     anyone could use the default UUID to access the data?
-> >     
-> >     Just make the UUID (or TLS client certificate file) a command-line
-> >     parameter that qemu-system, qemu-img, and other tools accept (e.g.
-> >     qemu-img via the --image-opts/--object syntax).
-> >     
-> > [Ketan]
-> > Sounds fair. Would it be ok to take this up after the driver is
-> > merged for the upcoming QEMU release?
+
+
+On 21/02/2017 13:57, Gerd Hoffmann wrote:
+> This change breaks ovmf for me, although it isn't obvious to me why.
+> Bisect landed here, and reverting indeed makes things going again.
 > 
-> I don't think we can merge code with known security flaws, particularly
-> if fixing these flaws will involve adding and/or changing command line
-> parameters for the block driver.
->
+> Using q35 machine type, pcie virtio devices, with the rhel ovmf build
+> (OVMF-20160608b-1.git988715a.el7.noarch).
+> 
+> First thing I've tried is swapping virtio-net for another nic,
+> suspecting this change might trigger a bug in the ovmf virtio-net
+> driver, but that didn't change things.
+> 
+> Effect is that qemu just exits, without logging some error, looks like a
+> normal guest shutdown.  Firmware log doesn't give a clue either, it just
+> stops at some point, again without any error message.  Here are the last
+> lines of the log:
+> 
+> SataControllerStart START
+> SataControllerStart error return status = Already started
+> SetPciIntLine: [00:1C.0] PciRoot(0x0)/Pci(0x1C,0x0) -> 0x0A
+> SetPciIntLine: [01:00.0] PciRoot(0x0)/Pci(0x1C,0x0)/Pci(0x0,0x0) -> 0x0A
+> SetPciIntLine: [00:1C.1] PciRoot(0x0)/Pci(0x1C,0x1) -> 0x0A
+> SetPciIntLine: [02:00.0] PciRoot(0x0)/Pci(0x1C,0x1)/Pci(0x0,0x0) -> 0x0A
+> SetPciIntLine: [00:1C.2] PciRoot(0x0)/Pci(0x1C,0x2) -> 0x0A
+> SetPciIntLine: [00:1C.3] PciRoot(0x0)/Pci(0x1C,0x3) -> 0x0A
+> SetPciIntLine: [00:1C.4] PciRoot(0x0)/Pci(0x1C,0x4) -> 0x0A
+> SetPciIntLine: [05:00.0] PciRoot(0x0)/Pci(0x1C,0x4)/Pci(0x0,0x0) -> 0x0A
+> SetPciIntLine: [05:00.1] PciRoot(0x0)/Pci(0x1C,0x4)/Pci(0x0,0x1) -> 0x0A
+> SetPciIntLine: [05:00.2] PciRoot(0x0)/Pci(0x1C,0x4)/Pci(0x0,0x2) -> 0x0A
+> SetPciIntLine: [00:1C.5] PciRoot(0x0)/Pci(0x1C,0x5) -> 0x0A
+> SetPciIntLine: [06:00.0] PciRoot(0x0)/Pci(0x1C,0x5)/Pci(0x0,0x0) -> 0x0A
+> SetPciIntLine: [00:1C.6] PciRoot(0x0)/Pci(0x1C,0x6) -> 0x0A
+> SetPciIntLine: [00:1C.7] PciRoot(0x0)/Pci(0x1C,0x7) -> 0x0A
+> SetPciIntLine: [00:1F.2] PciRoot(0x0)/Pci(0x1F,0x2) -> 0x0A
+> SetPciIntLine: [00:1F.3] PciRoot(0x0)/Pci(0x1F,0x3) -> 0x0A
+> Select Item: 0x8
+> Select Item: 0x17
+> qemu -kernel was not used.
 
-We do support some protocols, such as gluster, that do not have robust
-authentication frameworks over tcp/ip.  Of course, these protocols have been
-in as a driver for several years (and, gluster does support unix sockets).
+Command line?  I tried with
 
-We seem to be establishing a rule for QEMU, that is "no new protocol drivers
-without secure authentication".  That is a good thing. The existence of
-current protocol drivers that don't meet that criteria is potentially
-confusing for new contributors, however.  (As a side note to myself -- this
-is probably a good thing to add to the wiki, if it is not there already).
+x86_64-softmmu/qemu-system-x86_64 \
+  -pflash /usr/share/edk2/ovmf/OVMF_CODE.fd \
+  -pflash /usr/share/edk2/ovmf/OVMF_VARS.fd  \
+  --enable-kvm -M q35 -debugcon stdio \
+  -global isa-debugcon.iobase=0x402 \
+  -net nic,model=virtio \
+  -net bridge,helper=/usr/libexec/qemu-bridge-helper,br=virbr0 \
+  -snapshot foo.raw
 
-I think a non-secure scheme is worse than no scheme at all, because it
-becomes relied upon and promises something it cannot deliver.  In that vein,
-would you object to a vxhs protocol driver that did no authentication at all
-(similar to gluster), or do you think the above rule is a new hard rule for
-protocol drivers?
+and after the above lines I get:
 
+Select Item: 0x19
+[Bds]OsIndication: 0000000000000000
+[Bds]=============Begin Load Options Dumping ...=============
+  Driver Options:
+  SysPrep Options:
+  Boot Options:
+    Boot0000: UiApp              0x0109
+    Boot0001: UEFI QEMU DVD-ROM QM00005                  0x0001
+    Boot0002: UEFI QEMU HARDDISK QM00001                 0x0001
+    Boot0003: EFI Internal Shell                 0x0001
+  PlatformRecovery Options:
+    PlatformRecovery0000: Default PlatformRecovery               0x0001
 
-Jeff
+(but I'm using a different OVMF build,
+edk2-ovmf-20161105git3b25ca8-2.fc25.noarch; dinner time now).
+
+Thanks,
+
+Paolo
