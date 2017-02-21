@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48506)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cgGKF-0000S4-2r
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 14:42:15 -0500
+	(envelope-from <eblake@redhat.com>) id 1cgGMb-00026C-P8
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 14:44:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cgGKB-00079g-UD
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 14:42:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52346)
+	(envelope-from <eblake@redhat.com>) id 1cgGMY-0007ep-KM
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 14:44:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53448)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cgGKB-00079S-Nx
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 14:42:11 -0500
-Date: Tue, 21 Feb 2017 19:42:06 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170221194206.GK2377@work-vm>
-References: <20170217082704.23270-1-skiver.cloud.yzy@gmail.com>
-	<5a03f6f2-f867-8dfe-28bb-6f481782f6af@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cgGMY-0007eg-Dq
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 14:44:38 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7679F4DD4B
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 19:44:38 +0000 (UTC)
+References: <1487363905-9480-1-git-send-email-armbru@redhat.com>
+	<1487363905-9480-13-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <621b027f-2ecc-7fa2-bc04-c5cdbf91e9bb@redhat.com>
+Date: Tue, 21 Feb 2017 13:44:36 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5a03f6f2-f867-8dfe-28bb-6f481782f6af@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/2] fix segfaults caused by accessing CPU
- in empty machine
+In-Reply-To: <1487363905-9480-13-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="8GgkxgwDoQ9JV5EqOofAEK9sJP9UBswMd"
+Subject: Re: [Qemu-devel] [PATCH 12/14] tests: Don't check qobject_type()
+ before qobject_to_qbool()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +35,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Ziyue Yang <skiver.cloud.yzy@gmail.com>, qemu-devel@nongnu.org, Ziyue Yang <yzylivezh@hotmail.com>, Pavel Butsykin <pbutsykin@virtuozzo.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
-* Thomas Huth (thuth@redhat.com) wrote:
-> On 17.02.2017 09:27, Ziyue Yang wrote:
-> > From: Ziyue Yang <yzylivezh@hotmail.com>
-> > 
-> > Many QEMU monitor commands, like "info lapic", "info tlb" and so on
-> > use mon_get_cpu or related wrappers to access CPU info without checking
-> > whether the CPU exists.
-> > This patch series fix the "info lapic" case, and is the base of the incoming
-> > patch series aiming to eliminate segfaults caused by other QEMU commands
-> > trying to access CPU that doesn't exist.
-> 
->  Hi,
-> 
-> FYI, I've posted a patch for all of these monitor commands that crash
-> without CPU already last month:
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg02602.html
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--8GgkxgwDoQ9JV5EqOofAEK9sJP9UBswMd
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <621b027f-2ecc-7fa2-bc04-c5cdbf91e9bb@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 12/14] tests: Don't check qobject_type()
+ before qobject_to_qbool()
+References: <1487363905-9480-1-git-send-email-armbru@redhat.com>
+ <1487363905-9480-13-git-send-email-armbru@redhat.com>
+In-Reply-To: <1487363905-9480-13-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I've just sent that in my HMP pull:
-https://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg04939.html
+On 02/17/2017 02:38 PM, Markus Armbruster wrote:
+> qobject_to_qbool(obj) returns NULL when obj isn't a QBool.  Check
+> that instead of qobject_type(obj) =3D=3D QTYPE_QBOOL.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  tests/check-qjson.c                 | 24 ++++++------------------
+>  tests/test-qobject-output-visitor.c | 12 +++++-------
+>  2 files changed, 11 insertions(+), 25 deletions(-)
+>=20
 
-Ziyue Yang: Perhaps it's best to compare with the things in that
-pull and check to see if you have any items that were not in that pull.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Dave
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
->  Thomas
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+--8GgkxgwDoQ9JV5EqOofAEK9sJP9UBswMd
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYrJikAAoJEKeha0olJ0Nq9p4IAKM76vT14KvS45Jk43VXMOpK
+zb3mE2Ms0a7jTvkXrIaT1C/2a8QLWtX8RYlLP13E7Y6n5DdnbsU4Ih8VsvorhRrR
+DnSnE/dt3N2eY73/XLHio+jEDrYowt4R+oCH7O6KYbiBGqRulUIeCtQ1/pdx/Nqk
+L/1+HWeSewe98QP9C/dzGVBKruFnr2aqseQQjyz8Y9AatPWti6EFoL80gcOWWYKQ
+RCjQgNxzM/tUnZXD10y2AqhbZJPrllCSAQrRrFZv4edoKaOHoFUEZpoG95Xh3G4V
++wukm8zvnKpNMi3+TEpGJog7j/+ZeLkHr4tBSicwff1t8Hf/Htmd1heQdiRe6ks=
+=9RMD
+-----END PGP SIGNATURE-----
+
+--8GgkxgwDoQ9JV5EqOofAEK9sJP9UBswMd--
