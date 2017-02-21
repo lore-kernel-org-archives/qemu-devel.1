@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59327)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cg4gd-0002z9-PA
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 02:16:36 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cg4gb-00088D-1j
+	(envelope-from <kraxel@redhat.com>) id 1cg4gc-0002yf-4c
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 02:16:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36984)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <kraxel@redhat.com>) id 1cg4gZ-00087L-VK
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 02:16:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58472)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cg4ga-00087U-Oi
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 02:16:32 -0500
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cg4gZ-00086z-Pn
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 02:16:31 -0500
 Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
 	[10.5.11.28])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 02EF54E02B
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 07:16:33 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0E98912B24
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 07:16:32 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 21 Feb 2017 08:16:23 +0100
-Message-Id: <1487661385-7720-10-git-send-email-kraxel@redhat.com>
+Date: Tue, 21 Feb 2017 08:16:22 +0100
+Message-Id: <1487661385-7720-9-git-send-email-kraxel@redhat.com>
 In-Reply-To: <1487661385-7720-1-git-send-email-kraxel@redhat.com>
 References: <1487661385-7720-1-git-send-email-kraxel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 09/11] usb-ccid: better bulk_out error handling
+Subject: [Qemu-devel] [PULL 08/11] xhci: drop via vendor command handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,164 +32,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Add err goto label where we can jump to from all error conditions.
-STALL request on all errors.  Reset position on all errors.
-
-Normal request processing is not in a else branch any more, so this code
-is reintended, there are no code changes in that part of the code
-though.
+Seems pretty pointless, we don't emulate an via xhci controller.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-id: 1487250819-23764-2-git-send-email-kraxel@redhat.com
+Message-id: 1486382139-30630-5-git-send-email-kraxel@redhat.com
 ---
- hw/usb/dev-smartcard-reader.c | 116 ++++++++++++++++++++++--------------=
-------
- 1 file changed, 61 insertions(+), 55 deletions(-)
+ hw/usb/hcd-xhci.c | 31 -------------------------------
+ 1 file changed, 31 deletions(-)
 
-diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reader.=
-c
-index 1325ea1..badcfcb 100644
---- a/hw/usb/dev-smartcard-reader.c
-+++ b/hw/usb/dev-smartcard-reader.c
-@@ -1001,8 +1001,7 @@ static void ccid_handle_bulk_out(USBCCIDState *s, U=
-SBPacket *p)
-     CCID_Header *ccid_header;
-=20
-     if (p->iov.size + s->bulk_out_pos > BULK_OUT_DATA_SIZE) {
--        p->status =3D USB_RET_STALL;
--        return;
-+        goto err;
-     }
-     ccid_header =3D (CCID_Header *)s->bulk_out_data;
-     usb_packet_copy(p, s->bulk_out_data + s->bulk_out_pos, p->iov.size);
-@@ -1017,64 +1016,71 @@ static void ccid_handle_bulk_out(USBCCIDState *s,=
- USBPacket *p)
-         DPRINTF(s, 1,
-                 "%s: bad USB_TOKEN_OUT length, should be at least 10 byt=
-es\n",
-                 __func__);
--    } else {
--        DPRINTF(s, D_MORE_INFO, "%s %x %s\n", __func__,
--                ccid_header->bMessageType,
--                ccid_message_type_to_str(ccid_header->bMessageType));
--        switch (ccid_header->bMessageType) {
--        case CCID_MESSAGE_TYPE_PC_to_RDR_GetSlotStatus:
--            ccid_write_slot_status(s, ccid_header);
--            break;
--        case CCID_MESSAGE_TYPE_PC_to_RDR_IccPowerOn:
--            DPRINTF(s, 1, "%s: PowerOn: %d\n", __func__,
-+        goto err;
-+    }
-+
-+    DPRINTF(s, D_MORE_INFO, "%s %x %s\n", __func__,
-+            ccid_header->bMessageType,
-+            ccid_message_type_to_str(ccid_header->bMessageType));
-+    switch (ccid_header->bMessageType) {
-+    case CCID_MESSAGE_TYPE_PC_to_RDR_GetSlotStatus:
-+        ccid_write_slot_status(s, ccid_header);
-+        break;
-+    case CCID_MESSAGE_TYPE_PC_to_RDR_IccPowerOn:
-+        DPRINTF(s, 1, "%s: PowerOn: %d\n", __func__,
-                 ((CCID_IccPowerOn *)(ccid_header))->bPowerSelect);
--            s->powered =3D true;
--            if (!ccid_card_inserted(s)) {
--                ccid_report_error_failed(s, ERROR_ICC_MUTE);
--            }
--            /* atr is written regardless of error. */
--            ccid_write_data_block_atr(s, ccid_header);
--            break;
--        case CCID_MESSAGE_TYPE_PC_to_RDR_IccPowerOff:
--            ccid_reset_error_status(s);
--            s->powered =3D false;
--            ccid_write_slot_status(s, ccid_header);
--            break;
--        case CCID_MESSAGE_TYPE_PC_to_RDR_XfrBlock:
--            ccid_on_apdu_from_guest(s, (CCID_XferBlock *)s->bulk_out_dat=
-a);
--            break;
--        case CCID_MESSAGE_TYPE_PC_to_RDR_SetParameters:
--            ccid_reset_error_status(s);
--            ccid_set_parameters(s, ccid_header);
--            ccid_write_parameters(s, ccid_header);
--            break;
--        case CCID_MESSAGE_TYPE_PC_to_RDR_ResetParameters:
--            ccid_reset_error_status(s);
--            ccid_reset_parameters(s);
--            ccid_write_parameters(s, ccid_header);
--            break;
--        case CCID_MESSAGE_TYPE_PC_to_RDR_GetParameters:
--            ccid_reset_error_status(s);
--            ccid_write_parameters(s, ccid_header);
--            break;
--        case CCID_MESSAGE_TYPE_PC_to_RDR_Mechanical:
--            ccid_report_error_failed(s, 0);
--            ccid_write_slot_status(s, ccid_header);
--            break;
--        default:
--            DPRINTF(s, 1,
-+        s->powered =3D true;
-+        if (!ccid_card_inserted(s)) {
-+            ccid_report_error_failed(s, ERROR_ICC_MUTE);
-+        }
-+        /* atr is written regardless of error. */
-+        ccid_write_data_block_atr(s, ccid_header);
-+        break;
-+    case CCID_MESSAGE_TYPE_PC_to_RDR_IccPowerOff:
-+        ccid_reset_error_status(s);
-+        s->powered =3D false;
-+        ccid_write_slot_status(s, ccid_header);
-+        break;
-+    case CCID_MESSAGE_TYPE_PC_to_RDR_XfrBlock:
-+        ccid_on_apdu_from_guest(s, (CCID_XferBlock *)s->bulk_out_data);
-+        break;
-+    case CCID_MESSAGE_TYPE_PC_to_RDR_SetParameters:
-+        ccid_reset_error_status(s);
-+        ccid_set_parameters(s, ccid_header);
-+        ccid_write_parameters(s, ccid_header);
-+        break;
-+    case CCID_MESSAGE_TYPE_PC_to_RDR_ResetParameters:
-+        ccid_reset_error_status(s);
-+        ccid_reset_parameters(s);
-+        ccid_write_parameters(s, ccid_header);
-+        break;
-+    case CCID_MESSAGE_TYPE_PC_to_RDR_GetParameters:
-+        ccid_reset_error_status(s);
-+        ccid_write_parameters(s, ccid_header);
-+        break;
-+    case CCID_MESSAGE_TYPE_PC_to_RDR_Mechanical:
-+        ccid_report_error_failed(s, 0);
-+        ccid_write_slot_status(s, ccid_header);
-+        break;
-+    default:
-+        DPRINTF(s, 1,
-                 "handle_data: ERROR: unhandled message type %Xh\n",
-                 ccid_header->bMessageType);
--            /*
--             * The caller is expecting the device to respond, tell it we
--             * don't support the operation.
--             */
--            ccid_report_error_failed(s, ERROR_CMD_NOT_SUPPORTED);
--            ccid_write_slot_status(s, ccid_header);
--            break;
--        }
-+        /*
-+         * The caller is expecting the device to respond, tell it we
-+         * don't support the operation.
-+         */
-+        ccid_report_error_failed(s, ERROR_CMD_NOT_SUPPORTED);
-+        ccid_write_slot_status(s, ccid_header);
-+        break;
-     }
-     s->bulk_out_pos =3D 0;
-+    return;
-+
-+err:
-+    p->status =3D USB_RET_STALL;
-+    s->bulk_out_pos =3D 0;
-+    return;
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index 4ac67ae..28dd2f2 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -198,7 +198,6 @@ typedef enum TRBType {
+     ER_DEVICE_NOTIFICATION,
+     ER_MFINDEX_WRAP,
+     /* vendor specific bits */
+-    CR_VENDOR_VIA_CHALLENGE_RESPONSE = 48,
+     CR_VENDOR_NEC_FIRMWARE_REVISION  = 49,
+     CR_VENDOR_NEC_CHALLENGE_RESPONSE = 50,
+ } TRBType;
+@@ -554,7 +553,6 @@ static const char *TRBType_names[] = {
+     [ER_HOST_CONTROLLER]               = "ER_HOST_CONTROLLER",
+     [ER_DEVICE_NOTIFICATION]           = "ER_DEVICE_NOTIFICATION",
+     [ER_MFINDEX_WRAP]                  = "ER_MFINDEX_WRAP",
+-    [CR_VENDOR_VIA_CHALLENGE_RESPONSE] = "CR_VENDOR_VIA_CHALLENGE_RESPONSE",
+     [CR_VENDOR_NEC_FIRMWARE_REVISION]  = "CR_VENDOR_NEC_FIRMWARE_REVISION",
+     [CR_VENDOR_NEC_CHALLENGE_RESPONSE] = "CR_VENDOR_NEC_CHALLENGE_RESPONSE",
+ };
+@@ -2622,32 +2620,6 @@ static uint32_t xhci_nec_challenge(uint32_t hi, uint32_t lo)
+     return ~val;
  }
-=20
- static void ccid_bulk_in_copy_to_guest(USBCCIDState *s, USBPacket *p)
---=20
+ 
+-static void xhci_via_challenge(XHCIState *xhci, uint64_t addr)
+-{
+-    PCIDevice *pci_dev = PCI_DEVICE(xhci);
+-    uint32_t buf[8];
+-    uint32_t obuf[8];
+-    dma_addr_t paddr = xhci_mask64(addr);
+-
+-    pci_dma_read(pci_dev, paddr, &buf, 32);
+-
+-    memcpy(obuf, buf, sizeof(obuf));
+-
+-    if ((buf[0] & 0xff) == 2) {
+-        obuf[0] = 0x49932000 + 0x54dc200 * buf[2] + 0x7429b578 * buf[3];
+-        obuf[0] |=  (buf[2] * buf[3]) & 0xff;
+-        obuf[1] = 0x0132bb37 + 0xe89 * buf[2] + 0xf09 * buf[3];
+-        obuf[2] = 0x0066c2e9 + 0x2091 * buf[2] + 0x19bd * buf[3];
+-        obuf[3] = 0xd5281342 + 0x2cc9691 * buf[2] + 0x2367662 * buf[3];
+-        obuf[4] = 0x0123c75c + 0x1595 * buf[2] + 0x19ec * buf[3];
+-        obuf[5] = 0x00f695de + 0x26fd * buf[2] + 0x3e9 * buf[3];
+-        obuf[6] = obuf[2] ^ obuf[3] ^ 0x29472956;
+-        obuf[7] = obuf[2] ^ obuf[3] ^ 0x65866593;
+-    }
+-
+-    pci_dma_write(pci_dev, paddr, &obuf, 32);
+-}
+-
+ static void xhci_process_commands(XHCIState *xhci)
+ {
+     XHCITRB trb;
+@@ -2743,9 +2715,6 @@ static void xhci_process_commands(XHCIState *xhci)
+         case CR_GET_PORT_BANDWIDTH:
+             event.ccode = xhci_get_port_bandwidth(xhci, trb.parameter);
+             break;
+-        case CR_VENDOR_VIA_CHALLENGE_RESPONSE:
+-            xhci_via_challenge(xhci, trb.parameter);
+-            break;
+         case CR_VENDOR_NEC_FIRMWARE_REVISION:
+             if (xhci->nec_quirks) {
+                 event.type = 48; /* NEC reply */
+-- 
 1.8.3.1
