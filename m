@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cgBz6-00051C-Tk
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:04:13 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cgC0V-00064l-IJ
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:05:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cgBz2-0001VY-WE
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:04:08 -0500
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:36572)
+	(envelope-from <peter.maydell@linaro.org>) id 1cgC0U-00026u-Dx
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:05:35 -0500
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:38107)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cgBz2-0001V8-Ps
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:04:04 -0500
-Received: by mail-wm0-x234.google.com with SMTP id c85so113452631wmi.1
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 07:04:03 -0800 (PST)
-References: <20170220145335.591-1-bobby.prani@gmail.com>
-	<87fuj8x2gi.fsf@linaro.org> <87k28ko1qw.fsf@gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <87k28ko1qw.fsf@gmail.com>
-Date: Tue, 21 Feb 2017 15:04:06 +0000
-Message-ID: <878tozwpp5.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cgC0U-00026P-8E
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:05:34 -0500
+Received: by mail-wm0-x232.google.com with SMTP id r141so77968500wmg.1
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 07:05:34 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] mttcg: Set jmp_env to handle exit from
- tb_gen_code
+In-Reply-To: <1487680479-15132-1-git-send-email-armbru@redhat.com>
+References: <1487680479-15132-1-git-send-email-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 21 Feb 2017 15:05:12 +0000
+Message-ID: <CAFEAcA-LMO4vZBNSq7bAEj2oNnavSm1zUKZu8mPdNrhJuygqCw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 00/11] Changes to -drive without if= and
+ with if=scsi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,131 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pranith Kumar <bobby.prani@gmail.com>
-Cc: qemu-devel@nongnu.org, rth@twiddle.net
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-
-Pranith Kumar <bobby.prani@gmail.com> writes:
-
-> Alex Bennée writes:
+On 21 February 2017 at 12:34, Markus Armbruster <armbru@redhat.com> wrote:
+> The following changes since commit b856256179f14c33a513d0b9cc3e4be355b95f43:
 >
->> Pranith Kumar <bobby.prani@gmail.com> writes:
->>
->>> tb_gen_code() can exit execution using cpu_exit_loop() when it cannot
->>> allocate new tb's. To handle this, we need to properly set the jmp_env
->>> pointer ahead of calling tb_gen_code().
->>>
->>> CC:Alex Bennée <alex.bennee@linaro.org>
->>> CC: Richard Henderson <rth@twiddle.net>
->>> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
->>> ---
->>>  cpu-exec.c | 23 +++++++++++------------
->>>  1 file changed, 11 insertions(+), 12 deletions(-)
->>>
->>> diff --git a/cpu-exec.c b/cpu-exec.c
->>> index 97d79612d9..4b70988b24 100644
->>> --- a/cpu-exec.c
->>> +++ b/cpu-exec.c
->>> @@ -236,23 +236,22 @@ static void cpu_exec_step(CPUState *cpu)
->>>
->>>      cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
->>>      tb_lock();
->>> -    tb = tb_gen_code(cpu, pc, cs_base, flags,
->>> -                     1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
->>> -    tb->orig_tb = NULL;
->>> -    tb_unlock();
->>> -
->>> -    cc->cpu_exec_enter(cpu);
->>> -
->>
->> It occurs to me we are also diverging in our locking pattern from
->> tb_find which takes mmap_lock first. This is a NOP for system emulation
->> but needed for user-emulation (for which we can do cpu_exec_step but not
->> cpu_exec_nocache).
+>   Merge remote-tracking branch 'remotes/kraxel/tags/pull-usb-20170221-1' into staging (2017-02-21 09:35:15 +0000)
 >
-> Right. So we have to take the mmap_lock() before calling
-> tb_gen_code(). However, this lock is released in the error path before calling
-> cpu_loop_exit() if allocation of a new tb fails. The following is what I have
-> after merging with the previous EXCP_ATOMIC handling patch.
+> are available in the git repository at:
 >
-> diff --git a/cpu-exec.c b/cpu-exec.c
-> index a8e04bffbf..2bb3ba3672 100644
-> --- a/cpu-exec.c
-> +++ b/cpu-exec.c
-> @@ -228,6 +228,7 @@ static void cpu_exec_nocache(CPUState *cpu, int max_cycles,
+>   git://repo.or.cz/qemu/armbru.git tags/pull-block-2017-02-21
 >
->  static void cpu_exec_step(CPUState *cpu)
->  {
-> +    CPUClass *cc = CPU_GET_CLASS(cpu);
->      CPUArchState *env = (CPUArchState *)cpu->env_ptr;
->      TranslationBlock *tb;
->      target_ulong cs_base, pc;
-> @@ -235,16 +236,24 @@ static void cpu_exec_step(CPUState *cpu)
+> for you to fetch changes up to f778a82f0c179634892ea716970d4d35264dc841:
 >
->      cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
->      tb_lock();
-> -    tb = tb_gen_code(cpu, pc, cs_base, flags,
-> -                     1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
-> -    tb->orig_tb = NULL;
-> -    tb_unlock();
-> -    /* execute the generated code */
-> -    trace_exec_tb_nocache(tb, pc);
-> -    cpu_tb_exec(cpu, tb);
-> -    tb_lock();
-> -    tb_phys_invalidate(tb, -1);
-> -    tb_free(tb);
-> +    if (sigsetjmp(cpu->jmp_env, 0) == 0) {
-> +        mmap_lock();
+>   hw/i386: Deprecate -drive if=scsi with PC machine types (2017-02-21 13:17:45 +0100)
+>
+> ----------------------------------------------------------------
+> Changes to -drive without if= and with if=scsi
+>
+> ----------------------------------------------------------------
+> Markus Armbruster (11):
+>       hw: Default -drive to if=ide explicitly where it works
+>       hw/arm/cubieboard hw/arm/xlnx-ep108: Fix units_per_default_bus
+>       hw: Default -drive to if=none instead of ide when ide cannot work
+>       hw: Default -drive to if=none instead of scsi when scsi cannot work
+>       hw/arm/highbank: Default -drive to if=ide instead of if=scsi
+>       blockdev: Improve message for orphaned -drive
+>       blockdev: Make orphaned -drive fatal
+>       hw: Drop superfluous special checks for orphaned -drive
+>       hw/scsi: Concentrate -drive if=scsi auto-create in one place
+>       hw: Deprecate -drive if=scsi with non-onboard HBAs
+>       hw/i386: Deprecate -drive if=scsi with PC machine types
 
-That gets the locking order the wrong way around - I'm wary of that.
+Applied, thanks.
 
-> +        tb = tb_gen_code(cpu, pc, cs_base, flags,
-> +                         1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
-> +        tb->orig_tb = NULL;
-> +        mmap_unlock();
-> +        tb_unlock();
-> +
-> +        cc->cpu_exec_enter(cpu);
-> +        /* execute the generated code */
-> +        trace_exec_tb_nocache(tb, pc);
-> +        cpu_tb_exec(cpu, tb);
-> +        cc->cpu_exec_exit(cpu);
-> +
-> +        tb_lock();
-> +        tb_phys_invalidate(tb, -1);
-> +        tb_free(tb);
-> +    }
->      tb_unlock();
->  }
->
-> diff --git a/cpus.c b/cpus.c
-> index 77bba08f9a..b39408b4b1 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -1347,6 +1347,11 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
->                  if (r == EXCP_DEBUG) {
->                      cpu_handle_guest_debug(cpu);
->                      break;
-> +                } else if (r == EXCP_ATOMIC) {
-> +                    qemu_mutex_unlock_iothread();
-> +                    cpu_exec_step_atomic(cpu);
-> +                    qemu_mutex_lock_iothread();
-> +                    break;
->                  }
->              } else if (cpu->stop) {
->                  if (cpu->unplug) {
-> @@ -1457,6 +1462,10 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
->                   */
->                  g_assert(cpu->halted);
->                  break;
-> +            case EXCP_ATOMIC:
-> +                qemu_mutex_unlock_iothread();
-> +                cpu_exec_step_atomic(cpu);
-> +                qemu_mutex_lock_iothread();
->              default:
->                  /* Ignore everything else? */
->                  break;
-
-
---
-Alex Bennée
+-- PMM
