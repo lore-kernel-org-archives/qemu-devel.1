@@ -1,34 +1,50 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36295)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cfzze-0005wE-EM
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 21:15:55 -0500
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cg08Q-0000HG-AL
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 21:24:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cfzza-0003Mo-FH
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 21:15:54 -0500
-Received: from indium.canonical.com ([91.189.90.7]:34948)
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cg08N-0006tz-3d
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 21:24:58 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50903)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cfzza-0003MS-8o
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 21:15:50 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cfzzX-00077m-NZ
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 02:15:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B02AE2E80CC
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 02:15:47 +0000 (UTC)
+	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
+	id 1cg08M-0006tP-QH
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 21:24:55 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1L2Oe23030849
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 21:24:52 -0500
+Received: from e24smtp01.br.ibm.com (e24smtp01.br.ibm.com [32.104.18.85])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28r3p8c76j-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 21:24:52 -0500
+Received: from localhost
+	by e24smtp01.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
+	Mon, 20 Feb 2017 23:24:48 -0300
+Received: from d24relay02.br.ibm.com (d24relay02.br.ibm.com [9.18.232.42])
+	by d24dlp02.br.ibm.com (Postfix) with ESMTP id BBE981DC0054
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 21:24:47 -0500 (EST)
+Received: from d24av04.br.ibm.com (d24av04.br.ibm.com [9.8.31.97])
+	by d24relay02.br.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v1L2OkZr27066388
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 23:24:46 -0300
+Received: from d24av04.br.ibm.com (localhost [127.0.0.1])
+	by d24av04.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+	v1L2Ojmm011402
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 23:24:45 -0300
+Date: Mon, 20 Feb 2017 23:24:36 -0300
+From: joserz@linux.vnet.ibm.com
+References: <1478452528-13684-1-git-send-email-joserz@linux.vnet.ibm.com>
+	<1478452528-13684-8-git-send-email-joserz@linux.vnet.ibm.com>
+	<CAFEAcA9HTc9QH51w5yhNoMjLk3jB4aM+Zp2MWBDN+xGnqf-cOw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 21 Feb 2017 02:06:36 -0000
-From: Bug Watch Updater <1653384@bugs.launchpad.net>
-Reply-To: Bug 1653384 <1653384@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20161231213844.1229.87554.malonedeb@soybean.canonical.com>
-Message-Id: <20170221020637.5705.92483.launchpad@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1653384] Re: Assertion failed with USB pass
- through with XHCI controller
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA9HTc9QH51w5yhNoMjLk3jB4aM+Zp2MWBDN+xGnqf-cOw@mail.gmail.com>
+Message-Id: <20170221022436.GA14453@pacoca>
+Subject: Re: [Qemu-devel] [PATCH Risu v2 7/9] Add PPC64 in risu build system
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,108 +53,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-** Changed in: qemu (Debian)
-       Status: Unknown =3D> Confirmed
+On Sat, Feb 18, 2017 at 10:41:41PM +0000, Peter Maydell wrote:
+> On 6 November 2016 at 17:15, Jose Ricardo Ziviani
+> <joserz@linux.vnet.ibm.com> wrote:
+> > Recognizes PPC64 as a valid architecture and setup the environment
+> > variables to compile code for that.
+> >
+> > Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+> > ---
+> >  configure | 8 +++++++-
+> >  1 file changed, 7 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/configure b/configure
+> > index 748b48a..f81bdb5 100755
+> > --- a/configure
+> > +++ b/configure
+> > @@ -22,6 +22,12 @@ guess_arch() {
+> >          ARCH="arm"
+> >      elif check_define __aarch64__ ; then
+> >          ARCH="aarch64"
+> > +    elif check_define __powerpc64__ ; then
+> > +        if check_define __BIG_ENDIAN__; then
+> > +            ARCH="ppc64"
+> > +        else
+> > +            ARCH="ppc64le"
+> > +        fi
+> 
+> Does the BE ppc64 risu build work for you? I tried
+> installing the cross-compiler, but the build fails
+> because there's no risu_ppc64.c. (ppc64le works fine.)
+> If we don't support the big-endian variant yet maybe
+> we should drop it from the configure file.
 
--- =
+I want it to work to but I focused the efforts on LE only, never tested
+at all. I have a small patchset to send to you. I'll make an effort to fix BE as well,
+it's worth it.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1653384
+Thanks Peter!
 
-Title:
-  Assertion failed with USB pass through with XHCI controller
-
-Status in QEMU:
-  Fix Committed
-Status in qemu package in Debian:
-  Confirmed
-
-Bug description:
-  Starting qemu 2.8.0 with XHCI controller and host device passed
-  through results in an assertion failure:
-
-  qemu-system-x86_64: hw/usb/core.c:623: usb_packet_cleanup: Assertion
-  `!usb_packet_is_inflight(p)' failed.
-
-  Can be reproduced with the following command (passing through a Lenovo
-  keyboard):
-
-  qemu-system-x86_64 -usb  -device nec-usb-xhci,id=3Dusb -device usb-
-  host,vendorid=3D0x04b3,productid=3D0x3025,id=3Dhostdev0,bus=3Dusb.0,port=
-=3D1
-
-  If nec-usb-xhci is changed to usb-ehci, qemu tries to boot without
-  assertion failures.
-
-  =
-
-  Can be reproduced with the latest master (commit dbe2b65) and v2.8.0.
-
-  Bisected the issue to following commit:
-  first bad commit: [94b037f2a451b3dc855f9f2c346e5049a361bd55] xhci: use li=
-nked list for transfers
-
-  =
-
-  Backtrace from commit dbe2b65:
-
-  #0  0x00007f2eb4657227 in __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/=
-unix/sysv/linux/raise.c:55
-          resultvar =3D 0
-          pid =3D 3453
-          selftid =3D 3453
-  #1  0x00007f2eb465867a in __GI_abort () at abort.c:89
-          save_stage =3D 2
-          act =3D {__sigaction_handler =3D {sa_handler =3D 0x4, sa_sigactio=
-n =3D 0x4}, sa_mask =3D {__val =3D {140734740550528, 93876690035339, =
-
-                140734740550624, 48833659808, 0, 0, 0, 21474836480, 1407347=
-40550792, 139838573009553, 140734740550560, 139838573043008, =
-
-                139838573024160, 93876666665872, 139838702616576, 139838573=
-024160}}, sa_flags =3D 1528954938, =
-
-            sa_restorer =3D 0x55615b2202c0 <__PRETTY_FUNCTION__.38612>}
-          sigs =3D {__val =3D {32, 0 <repeats 15 times>}}
-  #2  0x00007f2eb46502cd in __assert_fail_base (fmt=3D0x7f2eb47893a0 "%s%s%=
-s:%u: %s%sAssertion `%s' failed.\n%n", =
-
-      assertion=3Dassertion@entry=3D0x55615b22003a "!usb_packet_is_inflight=
-(p)", file=3Dfile@entry=3D0x55615b21fdf0 "hw/usb/core.c", line=3Dline@entry=
-=3D619, =
-
-      function=3Dfunction@entry=3D0x55615b2202c0 <__PRETTY_FUNCTION__.38612=
-> "usb_packet_cleanup") at assert.c:92
-          str =3D 0x55615cfdf510 ""
-          total =3D 4096
-  #3  0x00007f2eb4650382 in __GI___assert_fail (assertion=3D0x55615b22003a =
-"!usb_packet_is_inflight(p)", file=3D0x55615b21fdf0 "hw/usb/core.c", =
-
-      line=3D619, function=3D0x55615b2202c0 <__PRETTY_FUNCTION__.38612> "us=
-b_packet_cleanup") at assert.c:101
-  No locals.
-  #4  0x000055615afc385e in usb_packet_cleanup ()
-  No symbol table info available.
-  #5  0x000055615afda555 in xhci_ep_free_xfer ()
-  No symbol table info available.
-  #6  0x000055615afdc156 in xhci_kick_epctx ()
-  No symbol table info available.
-  #7  0x000055615afda099 in xhci_ep_kick_timer ()
-  No symbol table info available.
-  #8  0x000055615b08ceee in timerlist_run_timers ()
-  No symbol table info available.
-  #9  0x000055615b08cf36 in qemu_clock_run_timers ()
-  No symbol table info available.
-  #10 0x000055615b08d2df in qemu_clock_run_all_timers ()
-  No symbol table info available.
-  #11 0x000055615b08be40 in main_loop_wait ()
-  No symbol table info available.
-  #12 0x000055615ae3870f in main_loop ()
-  No symbol table info available.
-  #13 0x000055615ae4027b in main ()
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1653384/+subscriptions
+> 
+> thanks
+> -- PMM
+> 
