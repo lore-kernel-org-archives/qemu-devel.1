@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cfzU9-0008P6-3q
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 20:43:22 -0500
+	(envelope-from <hualingson@foxmail.com>) id 1cfzZ0-0001fg-U0
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 20:48:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cfzU6-0003gO-1R
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 20:43:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43456)
+	(envelope-from <hualingson@foxmail.com>) id 1cfzYw-00055w-Bm
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 20:48:22 -0500
+Received: from smtpproxy19.qq.com ([184.105.206.84]:48314)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cfzU5-0003cy-Ou
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 20:43:17 -0500
-Date: Tue, 21 Feb 2017 03:43:12 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170221034053-mutt-send-email-mst@kernel.org>
-References: <cover.1487286467.git.ben@skyportsystems.com>
-	<88232638f9ff3b17b54987624468678ea14a3037.1487286467.git.ben@skyportsystems.com>
-	<20170217114321.6c8577e1@nial.brq.redhat.com>
-	<918524f7-26cf-3fce-d9e3-7316ca69285b@redhat.com>
-	<20170220102304.GC2372@work-vm>
-	<3fb8499e-884c-99e8-b295-3d4603921075@redhat.com>
-	<20170220201923.GM2372@work-vm>
-	<d51d4a21-5558-d4e5-5b7e-08f729fc1a5e@redhat.com>
-	<0488d90c-f73c-916c-f84c-a1ffd2bad592@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0488d90c-f73c-916c-f84c-a1ffd2bad592@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v8 4/8] ACPI: Add Virtual Machine
- Generation ID support
+	(Exim 4.71) (envelope-from <hualingson@foxmail.com>)
+	id 1cfzYv-00055b-KK
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 20:48:18 -0500
+From: "=?ISO-8859-1?B?eGl1Y2Fp?=" <hualingson@foxmail.com>
+Mime-Version: 1.0
+Date: Tue, 21 Feb 2017 09:48:09 +0800
+Message-ID: <tencent_6ACD11A47C2496DB56F175B1@qq.com>
+Content-Type: text/plain;
+	charset="ISO-8859-1"
+Content-Transfer-Encoding: base64
+Subject: [Qemu-devel] why it meets this error after putting
+ windows-virtio-dirvers into win7x64ultimate.iso using waik when
+ boot&install from the iso?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,79 +28,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, ben@skyportsystems.com
+To: =?ISO-8859-1?B?cWVtdS1kZXZlbA==?= <qemu-devel@nongnu.org>
 
-On Mon, Feb 20, 2017 at 09:55:40PM +0100, Laszlo Ersek wrote:
-> On 02/20/17 21:45, Eric Blake wrote:
-> > On 02/20/2017 02:19 PM, Dr. David Alan Gilbert wrote:
-> >> * Eric Blake (eblake@redhat.com) wrote:
-> >>> On 02/20/2017 04:23 AM, Dr. David Alan Gilbert wrote:
-> >>>> * Laszlo Ersek (lersek@redhat.com) wrote:
-> >>>>> CC Dave
-> >>>>
-> >>>> This isn't an area I really understand; but if I'm
-> >>>> reading this right then 
-> >>>>    vmgenid is stored in fw_cfg?
-> >>>>    fw_cfg isn't migrated
-> >>>>
-> >>>> So why should any changes to it get migrated, except if it's already
-> >>>> been read by the guest (and if the guest reads it again aftwards what's
-> >>>> it expected to read?)
-> >>>
-> >>> Why are we expecting it to change on migration?  You want a new value
-> >>
-> >> I'm not; I was asking why a change made prior to migration would be
-> >> preserved across migration.
-> > 
-> > Okay, so you're asking what happens if the source requests the vmgenid
-> > device, and sets an id, but the destination of the migration does not
-> > request anything
-> 
-> This should never happen, as it means different QEMU command lines on
-> source vs. target hosts. (Different as in "incorrectly different".)
-> 
-> Dave writes, "a change made prior to migration". Change made to what?
-> 
-> - the GUID cannot be changed via the monitor once QEMU has been started.
-> We dropped the monitor command for that, due to lack of a good use case,
-> and due to lifecycle complexities. We have figured out a way to make it
-> safe, but until there's a really convincing use case, we shouldn't add
-> that complexity.
-
-True but we might in the future, and it seems prudent to make
-migration stream future-proof for that.
-
-> - the address of the GUID is changed (the firmware programs it from
-> "zero" to an actual address, in a writeable fw_cfg file), and that piece
-> of info is explicitly migrated, as part of the vmgenid device's vmsd.
-> 
-> Thanks
-> Laszlo
-> 
-> 
-> > - how does the guest on the destination see the same id
-> > as was in place on the source at the time migration started.
-> > 
-> >>
-> >>
-> >>> when you load state from disk (you don't know how many times the same
-> >>> state has been loaded previously, so each load is effectively forking
-> >>> the VM and you want a different value), but for a single live migration,
-> >>> you aren't forking the VM and don't need a new generation ID.
-> >>>
-> >>> I guess it all boils down to what command line you're using: if libvirt
-> >>> is driving a live migration, it will request the same UUID in the
-> >>> command line of the destination as what is on the source; while if
-> >>> libvirt is loading from a [managed]save to restore state from a file, it
-> >>> will either request a new UUID directly or request auto to let qemu
-> >>> generate the new id.
-> >>
-> >> Hmm now I've lost it a bit; I thought we would preserve the value
-> >> transmitted from the source, not the value on the command line of the destination.
-> > 
-> > I guess I'm trying to figure out whether libvirt MUST read the current
-> > id and explicitly tell the destination of migration to reuse that id, or
-> > if libvirt can omit the id on migration and everything just works
-> > because the id was migrated from the source.
-> > 
+SGksDQoNCkJUVywgSSBhbHNvIGhhZCBwb3N0ZWQgdGhlIFEgQCBodHRwOi8vc3RhY2tvdmVy
+Zmxvdy5jb20vcXVlc3Rpb25zLzQyMzM2MTc1L3doeS1tZWV0LXRoaXMtd2lubG9hZC1leGUt
+ZXJyb3ItYWZ0ZXItcHV0LXZpcnRpby1kaXJ2ZXItaW50by13aW43eDY0dWx0aW1hdGUtaXNv
+Lg0KDQpNeSBhaW0gaXMgbWFraW5nIHdpbmRvd3MtdmlydGlvLWRyaXZlcnMgd2l0aGluIHdp
+bjd4NjR1bHRpbWF0ZS5pc28sIHNvIGl0IGNhbiBiZSB1c2VkIGRpcmVjdGx5IHVwb24gcWVt
+dS1rdm0gd2l0aCB2aXJ0aW8gYnVzLCBlc3BlY2lhbGx5IGJsb2NrIGRldmljZXMgYW5kIG5l
+dHdvcmsgaW50ZXJmYWNlcy4NCg0KDQpCdXQgaXQgbWVldHMgdGhpcyBlcnJvciB3aGVuIGJv
+b3QmaW5zdGFsbCBmcm9tIHRoZSBtb2RpZmllZCBpc28uDQoNCg0KDQpIZXJlIGlzIG15IG1h
+a2Vpc28ud2luN3g2NC5wczE6DQojIFRPRE86IHNpbXBsaWZ5IGxvZ2ljcyAjIEJ5IEJvYiAj
+IGRlZmluZSB2YXJpYWJsZXMgJFdBSUtQRVRvb2xzUGF0aD0iQzpcUHJvZ3JhbSBGaWxlc1xX
+aW5kb3dzIEFJS1xUb29sc1xQRVRvb2xzIiAkV0lNSW5zdGFsbFBhdGg9IkM6XHNpbXBsZVxp
+bnN0YWxsLndpbSIgJFdJTUJvb3RQYXRoPSJDOlxzaW1wbGVcYm9vdC53aW0iICRXaW5kb3dz
+VmlydElPRHJpdmVyc1BhdGg9IkM6XHNpbXBsZVx3aW5kb3dzLXZpcnRpby1kcml2ZXJzIiAk
+SW1hZ2VJbnN0YWxsTW91bnRQYXRoPSJDOlxzaW1wbGVcbW50XGluc3RhbGwiICRJbWFnZUJv
+b3RNb3VudFBhdGg9IkM6XHNpbXBsZVxtbnRcYm9vdCIgY2QgJFdBSUtQRVRvb2xzUGF0aCBw
+d2QgIyB0aGVuIG1vZGlmeSBpbnN0YWxsLndpbSBkaXNtIC9nZXQtd2ltaW5mbyAvd2ltZmls
+ZTokV0lNSW5zdGFsbFBhdGggIyBUT0RPOiBnZXQgJG4gZnJvbSB0aGlzIG91dHB1dCAkbj00
+IHdoaWxlKCRuIC1uZSAwKSB7ICAgICAkbmV3ZGlyPSRJbWFnZUluc3RhbGxNb3VudFBhdGgr
+JG4gICAgIG1rZGlyICRuZXdkaXIgICAgIGRpc20gL21vdW50LXdpbSAvd2ltZmlsZTokV0lN
+SW5zdGFsbFBhdGggL2luZGV4OiRuIC9tb3VudGRpcjokbmV3ZGlyICAgICBkaXNtIC9pbWFn
+ZTokbmV3ZGlyIC9nZXQtZHJpdmVycyAgICAgZGlzbSAvaW1hZ2U6JG5ld2RpciAvYWRkLWRy
+aXZlciAvZHJpdmVyOiRXaW5kb3dzVmlydElPRHJpdmVyc1BhdGhcQmFsbG9vblx3N1xhbWQ2
+NFxiYWxsb29uLmluZiAgICAgPCMgICAgIGRpc20gL2ltYWdlOiRuZXdkaXIgL2FkZC1kcml2
+ZXIgL2RyaXZlcjokV2luZG93c1ZpcnRJT0RyaXZlcnNQYXRoXE5ldEtWTVx3N1xhbWQ2NFxu
+ZXRrdm0uaW5mICAgICBkaXNtIC9pbWFnZTokbmV3ZGlyIC9hZGQtZHJpdmVyIC9kcml2ZXI6
+JFdpbmRvd3NWaXJ0SU9Ecml2ZXJzUGF0aFxwdnBhbmljXHc3XGFtZDY0XHB2cGFuaWMuaW5m
+ICAgICBkaXNtIC9pbWFnZTokbmV3ZGlyIC9hZGQtZHJpdmVyIC9kcml2ZXI6JFdpbmRvd3NW
+aXJ0SU9Ecml2ZXJzUGF0aFxxZW11cGNpc2VyaWFsXHFlbXVwY2lzZXJpYWwuaW5mICAgICBk
+aXNtIC9pbWFnZTokbmV3ZGlyIC9hZGQtZHJpdmVyIC9kcml2ZXI6JFdpbmRvd3NWaXJ0SU9E
+cml2ZXJzUGF0aFxxeGxcdzdcYW1kNjRccXhsLmluZiAgICAgZGlzbSAvaW1hZ2U6JG5ld2Rp
+ciAvYWRkLWRyaXZlciAvZHJpdmVyOiRXaW5kb3dzVmlydElPRHJpdmVyc1BhdGhcdmlvaW5w
+dXRcdzdcYW1kNjRcdmlvaW5wdXQuaW5mICAgICBkaXNtIC9pbWFnZTokbmV3ZGlyIC9hZGQt
+ZHJpdmVyIC9kcml2ZXI6JFdpbmRvd3NWaXJ0SU9Ecml2ZXJzUGF0aFx2aW9ybmdcdzdcYW1k
+NjRcdmlvcm5nLmluZiAgICAgZGlzbSAvaW1hZ2U6JG5ld2RpciAvYWRkLWRyaXZlciAvZHJp
+dmVyOiRXaW5kb3dzVmlydElPRHJpdmVyc1BhdGhcdmlvc2NzaVx3N1xhbWQ2NFx2aW9zY3Np
+LmluZiAgICAgZGlzbSAvaW1hZ2U6JG5ld2RpciAvYWRkLWRyaXZlciAvZHJpdmVyOiRXaW5k
+b3dzVmlydElPRHJpdmVyc1BhdGhcdmlvc2VyaWFsXHc3XGFtZDY0XHZpb3Nlci5pbmYgICAg
+ICM+ICAgICBkaXNtIC9pbWFnZTokbmV3ZGlyIC9hZGQtZHJpdmVyIC9kcml2ZXI6JFdpbmRv
+d3NWaXJ0SU9Ecml2ZXJzUGF0aFx2aW9zdG9yXHc3XGFtZDY0XHZpb3N0b3IuaW5mICAgICBk
+aXNtIC9pbWFnZTokbmV3ZGlyIC9nZXQtZHJpdmVycyAgICAgZGlzbSAvdW5tb3VudC13aW0g
+L21vdW50ZGlyOiRuZXdkaXIgL2NvbW1pdCAgICAgIyBybWRpciAkbmV3ZGlyIC1SZWN1cnNl
+IC1Gb3JjZSAtQ29uZmlybTokZmFsc2UgICAgICRuLS0gfSAjIHRoZW4gbW9kaWZ5IGJvb3Qu
+d2ltIGRpc20gL2dldC13aW1pbmZvIC93aW1maWxlOiRXSU1Cb290UGF0aCAjIFRPRE86IGdl
+dCAkbiBmcm9tIHRoaXMgb3V0cHV0ICRuPTIgd2hpbGUoJG4gLW5lIDApIHsgICAgICRuZXdk
+aXI9JEltYWdlQm9vdE1vdW50UGF0aCskbiAgICAgbWtkaXIgJG5ld2RpciAgICAgZGlzbSAv
+bW91bnQtd2ltIC93aW1maWxlOiRXSU1Cb290UGF0aCAvaW5kZXg6JG4gL21vdW50ZGlyOiRu
+ZXdkaXIgICAgIGRpc20gL2ltYWdlOiRuZXdkaXIgL2dldC1kcml2ZXJzICAgICBkaXNtIC9p
+bWFnZTokbmV3ZGlyIC9hZGQtZHJpdmVyIC9kcml2ZXI6JFdpbmRvd3NWaXJ0SU9Ecml2ZXJz
+UGF0aFxCYWxsb29uXHc3XGFtZDY0XGJhbGxvb24uaW5mICAgICA8IyAgICAgZGlzbSAvaW1h
+Z2U6JG5ld2RpciAvYWRkLWRyaXZlciAvZHJpdmVyOiRXaW5kb3dzVmlydElPRHJpdmVyc1Bh
+dGhcTmV0S1ZNXHc3XGFtZDY0XG5ldGt2bS5pbmYgICAgIGRpc20gL2ltYWdlOiRuZXdkaXIg
+L2FkZC1kcml2ZXIgL2RyaXZlcjokV2luZG93c1ZpcnRJT0RyaXZlcnNQYXRoXHB2cGFuaWNc
+dzdcYW1kNjRccHZwYW5pYy5pbmYgICAgIGRpc20gL2ltYWdlOiRuZXdkaXIgL2FkZC1kcml2
+ZXIgL2RyaXZlcjokV2luZG93c1ZpcnRJT0RyaXZlcnNQYXRoXHFlbXVwY2lzZXJpYWxccWVt
+dXBjaXNlcmlhbC5pbmYgICAgIGRpc20gL2ltYWdlOiRuZXdkaXIgL2FkZC1kcml2ZXIgL2Ry
+aXZlcjokV2luZG93c1ZpcnRJT0RyaXZlcnNQYXRoXHF4bFx3N1xhbWQ2NFxxeGwuaW5mICAg
+ICBkaXNtIC9pbWFnZTokbmV3ZGlyIC9hZGQtZHJpdmVyIC9kcml2ZXI6JFdpbmRvd3NWaXJ0
+SU9Ecml2ZXJzUGF0aFx2aW9pbnB1dFx3N1xhbWQ2NFx2aW9pbnB1dC5pbmYgICAgIGRpc20g
+L2ltYWdlOiRuZXdkaXIgL2FkZC1kcml2ZXIgL2RyaXZlcjokV2luZG93c1ZpcnRJT0RyaXZl
+cnNQYXRoXHZpb3JuZ1x3N1xhbWQ2NFx2aW9ybmcuaW5mICAgICBkaXNtIC9pbWFnZTokbmV3
+ZGlyIC9hZGQtZHJpdmVyIC9kcml2ZXI6JFdpbmRvd3NWaXJ0SU9Ecml2ZXJzUGF0aFx2aW9z
+Y3NpXHc3XGFtZDY0XHZpb3Njc2kuaW5mICAgICBkaXNtIC9pbWFnZTokbmV3ZGlyIC9hZGQt
+ZHJpdmVyIC9kcml2ZXI6JFdpbmRvd3NWaXJ0SU9Ecml2ZXJzUGF0aFx2aW9zZXJpYWxcdzdc
+YW1kNjRcdmlvc2VyLmluZiAgICAgIz4gICAgIGRpc20gL2ltYWdlOiRuZXdkaXIgL2FkZC1k
+cml2ZXIgL2RyaXZlcjokV2luZG93c1ZpcnRJT0RyaXZlcnNQYXRoXHZpb3N0b3JcdzdcYW1k
+NjRcdmlvc3Rvci5pbmYgICAgIGRpc20gL2ltYWdlOiRuZXdkaXIgL2dldC1kcml2ZXJzICAg
+ICBkaXNtIC91bm1vdW50LXdpbSAvbW91bnRkaXI6JG5ld2RpciAvY29tbWl0ICAgICAjIHJt
+ZGlyICRuZXdkaXIgLVJlY3Vyc2UgLUZvcmNlIC1Db25maXJtOiRmYWxzZSAgICAgJG4tLSB9
+ICMgZW5kDQoNCg0KDQoNCg0KDQpSZWdhcmRzIQ==
