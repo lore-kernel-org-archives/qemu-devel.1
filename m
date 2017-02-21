@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgBvc-0001Ye-4V
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:00:33 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cgBvT-0001Or-2A
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:00:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgBvX-00006S-8l
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:00:32 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cgBvS-0008V7-5K
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:00:23 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 21 Feb 2017 15:58:48 +0100
-Message-Id: <1487689130-30373-53-git-send-email-kwolf@redhat.com>
+Date: Tue, 21 Feb 2017 15:58:45 +0100
+Message-Id: <1487689130-30373-50-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
 References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 52/54] block: Assertions for resize permission
+Subject: [Qemu-devel] [PATCH 49/54] tests: Remove FIXME comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,27 +22,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-This adds an assertion that ensures that the necessary resize permission
-has been granted before bdrv_truncate() is called.
+Not requesting any permissions is actually correct for these test cases
+because no actual I/O or other operation covered by the permission
+system is performed.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block.c | 3 +++
- 1 file changed, 3 insertions(+)
+ tests/test-blockjob.c | 2 +-
+ tests/test-throttle.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block.c b/block.c
-index 560e84a..33e6415 100644
---- a/block.c
-+++ b/block.c
-@@ -3098,6 +3098,9 @@ int bdrv_truncate(BdrvChild *child, int64_t offset)
-     BlockDriverState *bs = child->bs;
-     BlockDriver *drv = bs->drv;
-     int ret;
-+
-+    assert(child->perm & BLK_PERM_RESIZE);
-+
-     if (!drv)
-         return -ENOMEDIUM;
-     if (!drv->bdrv_truncate)
+diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
+index 1afe17b..740e740 100644
+--- a/tests/test-blockjob.c
++++ b/tests/test-blockjob.c
+@@ -54,7 +54,7 @@ static BlockJob *do_test_id(BlockBackend *blk, const char *id,
+  * BlockDriverState inserted. */
+ static BlockBackend *create_blk(const char *name)
+ {
+-    /* FIXME Use real permissions */
++    /* No I/O is performed on this device */
+     BlockBackend *blk = blk_new(0, BLK_PERM_ALL);
+     BlockDriverState *bs;
+ 
+diff --git a/tests/test-throttle.c b/tests/test-throttle.c
+index 5846433..bd7c501 100644
+--- a/tests/test-throttle.c
++++ b/tests/test-throttle.c
+@@ -593,7 +593,7 @@ static void test_groups(void)
+     BlockBackend *blk1, *blk2, *blk3;
+     BlockBackendPublic *blkp1, *blkp2, *blkp3;
+ 
+-    /* FIXME Use real permissions */
++    /* No actual I/O is performed on these devices */
+     blk1 = blk_new(0, BLK_PERM_ALL);
+     blk2 = blk_new(0, BLK_PERM_ALL);
+     blk3 = blk_new(0, BLK_PERM_ALL);
 -- 
 1.8.3.1
