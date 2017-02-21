@@ -1,20 +1,51 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cgAWH-00016p-TN
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:30:18 -0500
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1cgAXa-0002Es-Ml
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:31:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cgAWD-000841-Aq
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:30:17 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20170221115512.21918-12-berrange@redhat.com>
-References: <20170221115512.21918-1-berrange@redhat.com>
-	<20170221115512.21918-12-berrange@redhat.com>
-Date: Tue, 21 Feb 2017 14:30:10 +0100
-Message-ID: <w51mvdfbrj1.fsf@maestria.local.igalia.com>
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1cgAXW-0000fD-Mh
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:31:38 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40042
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1cgAXW-0000et-Fy
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:31:34 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1LDTCud109329
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 08:31:33 -0500
+Received: from e24smtp03.br.ibm.com (e24smtp03.br.ibm.com [32.104.18.24])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28rp4p120y-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 08:31:33 -0500
+Received: from localhost
+	by e24smtp03.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Tue, 21 Feb 2017 10:31:31 -0300
+Received: from d24relay04.br.ibm.com (d24relay04.br.ibm.com [9.18.232.146])
+	by d24dlp01.br.ibm.com (Postfix) with ESMTP id BECDE3520068
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 08:30:55 -0500 (EST)
+Received: from d24av04.br.ibm.com (d24av04.br.ibm.com [9.8.31.97])
+	by d24relay04.br.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v1LDVT0l29884660
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 10:31:29 -0300
+Received: from d24av04.br.ibm.com (localhost [127.0.0.1])
+	by d24av04.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+	v1LDVSMg014995
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 10:31:28 -0300
+References: <20170220160316.16803-1-danielhb@linux.vnet.ibm.com>
+	<87ino3ncg5.fsf@dusky.pond.sub.org>
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Tue, 21 Feb 2017 10:31:25 -0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v5 11/18] qcow2: convert QCow2 to use
- QCryptoBlock for encryption
+In-Reply-To: <87ino3ncg5.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <e9388bc4-2c50-0656-e140-b5478f35237b@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2] Changing error message of QMP
+ 'migrate_set_downtime' to seconds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,58 +54,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com
 
-On Tue 21 Feb 2017 12:55:05 PM CET, Daniel P. Berrange wrote:
-> +    switch (s->crypt_method_header) {
-> +    case QCOW_CRYPT_NONE:
-> +        break;
-> +
-> +    case QCOW_CRYPT_AES:
-> +        r->crypto_opts = block_crypto_open_opts_init(
-> +            Q_CRYPTO_BLOCK_FORMAT_QCOW, opts, "aes-", errp);
-> +        break;
-> +
-> +    default:
-> +        error_setg(errp, "Unsupported encryption method %d",
-> +                   s->crypt_method_header);
-> +        break;
-> +    }
-> +    if (s->crypt_method_header && !r->crypto_opts) {
-> +        ret = -EINVAL;
-> +        goto fail;
-> +    }
 
-This last condition relies on the assumption that QCOW_CRYPT_NONE == 0.
 
-I think it's safe to assume that its value is never going to change and
-therefore this isn't too important, but I'm just pointing it out in case
-you want to make it explicit.
+On 02/21/2017 06:02 AM, Markus Armbruster wrote:
+> Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com> writes:
+>
+>> The previous error message was displaying the values in miliseconds,
+>> being misleading with the command that accepts the value in seconds:
+>>
+>> { "execute": "migrate_set_downtime", "arguments": {"value": 3000}}
+>> {"error": {"class": "GenericError", "desc": "Parameter 'downtime_limit'
+>> expects an integer in the range of 0 to 2000000 milliseconds"}}
+>>
+>> This patch changes it to '2000 seconds' to keep consistency with
+>> the expected parameter. The macro 'QERR_INVALID_PARAMETER_VALUE'
+>> was changed for a regular string that allows the use of the
+>> MAX_MIGRATE_SET_DOWNTIME as a parameter, instead of hardcoding
+>> the value in the error message.
+>>
+>> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+>> ---
+>>   migration/migration.c | 12 ++++++++----
+>>   1 file changed, 8 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/migration/migration.c b/migration/migration.c
+>> index c6ae69d..c05e764 100644
+>> --- a/migration/migration.c
+>> +++ b/migration/migration.c
+>> @@ -49,6 +49,9 @@
+>>    * for sending the last part */
+>>   #define DEFAULT_MIGRATE_SET_DOWNTIME 300
+>>   
+>> +/* Maximum migrate downtime set to 2000*1000 miliseconds */
+>> +#define MAX_MIGRATE_SET_DOWNTIME (2000 * 1000)
+>> +
+>>   /* Default compression thread count */
+>>   #define DEFAULT_MIGRATE_COMPRESS_THREAD_COUNT 8
+>>   /* Default decompression thread count, usually decompression is at
+>> @@ -843,10 +846,11 @@ void qmp_migrate_set_parameters(MigrationParameters *params, Error **errp)
+>>           return;
+>>       }
+>>       if (params->has_downtime_limit &&
+>> -        (params->downtime_limit < 0 || params->downtime_limit > 2000000)) {
+>> -        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+>> -                   "downtime_limit",
+>> -                   "an integer in the range of 0 to 2000000 milliseconds");
+>> +        (params->downtime_limit < 0 ||
+>> +         params->downtime_limit > MAX_MIGRATE_SET_DOWNTIME)) {
+>> +        error_setg(errp, "Parameter 'downtime_limit' expects an integer in "
+>> +                         "the range of 0 to %d seconds",
+>> +                         MAX_MIGRATE_SET_DOWNTIME / 1000);
+>>           return;
+>>       }
+>>       if (params->has_x_checkpoint_delay && (params->x_checkpoint_delay < 0)) {
+> Isn't this wrong for QMP migrate-set-parameters?  There, the unit is
+> milliseconds, i.e. the new error message is as wrong as the old one is
+> for migrate_set_downtime.
 
-> @@ -1122,6 +1145,24 @@ static int qcow2_open(BlockDriverState *bs, QDict *options, int flags,
->          goto fail;
->      }
->  
-> +    if (s->crypt_method_header == QCOW_CRYPT_AES) {
-> +        unsigned int cflags = 0;
-> +        if (flags & BDRV_O_NO_IO) {
-> +            cflags |= QCRYPTO_BLOCK_OPEN_NO_IO;
-> +        }
-> +        /* TODO how do we pass the same crypto opts down to the
-> +         * backing file by default, so we don't have to manually
-> +         * provide the same key-secret property against the full
-> +         * backing chain
-> +         */
-> +        s->crypto = qcrypto_block_open(s->crypto_opts, NULL, NULL,
-> +                                       cflags, errp);
-> +        if (!s->crypto) {
-> +            ret = -EINVAL;
-> +            goto fail;
-> +        }
-> +    }
+Actually the unit for migrate-set-parameters, as seen by the caller,
+is seconds. The underlying logic receives the input and multiplies it
+by 1000 in qmp_migrate_set_downtime().
+>
+> I'm afraid you need to fix the error message in
+> qmp_migrate_set_downtime().  If you assume qmp_migrate_set_parameters()
+> fails only in one way, replace its error object by one with a better
+> message[*].  If you'd rather not assume, you need to refactor things so
+> that each place can set the downtime and create an appropriate error on
+> failure.
 
-Actually this has the same problem that I mentioned for patch 9: if
-qcow2_open() fails then s->crypto is leaked.
+There is at least one similar usage of this error message just
+above this code in max_bandwidth param. Perhaps a new
+function/macro to deal with these cases is justified.
 
-Berto
+>
+> We might want to check other command wrappers that translate units.
+>
+> Time units are a hopeless mess in QMP.  We should've enforced uniform
+> usage of either seconds or nanoseconds.  The latter to placate
+> irrational fear of floating-point[**].
+
+I agree that my patch doesn't make it much better. I just set the
+error message to be in seconds to be consistent with the user input,
+but the code now feels 'awkward' when you do a verification
+in milliseconds and deliver the error message in seconds.
+
+One thing that can be done is to make migrate-set-downtime to
+accept milliseconds instead of seconds. I wasn't willing at first to
+change the migrate-set-downtime API because of an error
+message, however it really feels like the right thing to do here.
+Specially when you consider that the default value of this parameter,
+set by DEFAULT_MIGRATE_SET_DOWNTIME, is 300 - a value that
+in theory the user shouldn't be able to set in the API.
+
+
+
+
+Daniel
+
+>
+>
+> [*] If replacing messages turns out to be a common operation, we can add
+> a function to replace it within the same Error object.
+>
+> [**] If you think the rounding you can get when converting
+> floating-point seconds to integer milli-, micro- or nanoseconds matters,
+> I have time-keeping equipment to sell you.
+>
