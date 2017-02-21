@@ -1,14 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cg0Yz-0004kL-Nz
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 21:52:26 -0500
+	(envelope-from <eblake@redhat.com>) id 1cg0Zt-0005O5-K7
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 21:53:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cg0Yv-0005dQ-QG
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 21:52:25 -0500
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 21 Feb 2017 13:52:11 +1100
-Message-Id: <20170221025211.30007-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCH] target/ppc: Fix serious bug in HPTE writeback
+	(envelope-from <eblake@redhat.com>) id 1cg0Zp-00061h-Mo
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 21:53:21 -0500
+References: <CABHMSTVDnAxAvpp81+z_2fkAFO7tazLJs3cFXpuDuuGQj-Ek-A@mail.gmail.com>
+	<1933406e-2576-e687-3545-a72f3b999310@redhat.com>
+	<bf1410bc-bc6d-bb29-5591-55634f25d487@redhat.com>
+	<CABHMSTUsZy0u4b1b84YC5CgafKvD-Zms5dCQ=31+XnQphUQxLA@mail.gmail.com>
+	<20170217064327.GB21716@lemon.lan>
+	<CAFEAcA8_f8SVX+rirAFBJ76ZiXaKUwh9uO0AeBFoR7G_q8pGDg@mail.gmail.com>
+	<6ab86cf8-4780-ca76-f648-ac0ce211e27b@redhat.com>
+	<CABHMSTWN2KdAXDjEEbyWio6rNM2FuDk_NUj40mFW0HdyZFu68g@mail.gmail.com>
+	<CAFEAcA_N1j9tpxEBROG6D1per9vDMPZeuRyM93BRzNT5ZK3q0Q@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <24a2d084-e391-ae89-8b81-e910871a8edd@redhat.com>
+Date: Mon, 20 Feb 2017 20:53:14 -0600
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA_N1j9tpxEBROG6D1per9vDMPZeuRyM93BRzNT5ZK3q0Q@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="RIdWaw94ulp0T50BDtOeGWQTbsPbvh2Ea"
+Subject: Re: [Qemu-devel] Fix build break during configuration on musl-libc
+ based Linux systems.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,54 +32,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-stable@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, agraf@suse.de, aik@ozlabs.ru, thuth@redhat.com, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+To: Peter Maydell <peter.maydell@linaro.org>, Chad Joan <chadjoan@gmail.com>
+Cc: Fam Zheng <famz@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-ppc_hash64_store_hpte() is used to update HPTEs in the hashed page table
-(HPT) for 64-bit machines.  This is used when the (emulated) CPU needs to
-update the referenced (R) or changed (C) bits in the HPTE.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--RIdWaw94ulp0T50BDtOeGWQTbsPbvh2Ea
+From: Eric Blake <eblake@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Chad Joan <chadjoan@gmail.com>
+Cc: Fam Zheng <famz@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
+Message-ID: <24a2d084-e391-ae89-8b81-e910871a8edd@redhat.com>
+Subject: Re: [Qemu-devel] Fix build break during configuration on musl-libc
+ based Linux systems.
+References: <CABHMSTVDnAxAvpp81+z_2fkAFO7tazLJs3cFXpuDuuGQj-Ek-A@mail.gmail.com>
+ <1933406e-2576-e687-3545-a72f3b999310@redhat.com>
+ <bf1410bc-bc6d-bb29-5591-55634f25d487@redhat.com>
+ <CABHMSTUsZy0u4b1b84YC5CgafKvD-Zms5dCQ=31+XnQphUQxLA@mail.gmail.com>
+ <20170217064327.GB21716@lemon.lan>
+ <CAFEAcA8_f8SVX+rirAFBJ76ZiXaKUwh9uO0AeBFoR7G_q8pGDg@mail.gmail.com>
+ <6ab86cf8-4780-ca76-f648-ac0ce211e27b@redhat.com>
+ <CABHMSTWN2KdAXDjEEbyWio6rNM2FuDk_NUj40mFW0HdyZFu68g@mail.gmail.com>
+ <CAFEAcA_N1j9tpxEBROG6D1per9vDMPZeuRyM93BRzNT5ZK3q0Q@mail.gmail.com>
+In-Reply-To: <CAFEAcA_N1j9tpxEBROG6D1per9vDMPZeuRyM93BRzNT5ZK3q0Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Some time ago this was converted to take an HPTE index, instead of a
-raw offset to the HPTE within the HPT (similar functions for 32-bit still
-take an offset).  In the process a serious bug was introduced: we're
-still using the index parameter as though it was an offset, failing to
-multiply by the size of an HPTE, so it will update bits in the wrong part
-of the HPT.  This can corrupt the guests's HPT, causing crashes or data
-loss.
+On 02/17/2017 11:15 AM, Peter Maydell wrote:
+> The kernel docs have a longer list of mail clients with
+> notes about suitability:
+> https://kernel.org/doc/html/latest/process/email-clients.html
+> but the set of "just works" clients is very small.
 
-AFAICT the reason we haven't noticed this error earlier is that for 64-bit
-machines we've been testing almost exclusively with Linux guests.  Linux
-on ppc does not make use of the hardware R & C bits, so this writeback
-will never be triggered.  It also occurs only on TCG, not KVM, guests.
+Currently fails with 403 Forbidden
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- target/ppc/mmu-hash64.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+You don't have permission to access
+/doc/html/latest/process/email-clients.html on this server.
 
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index bb78fb5..dc3b5f7 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -894,12 +894,15 @@ void ppc_hash64_store_hpte(PowerPCCPU *cpu,
- 
-     pte_index *= HASH_PTE_SIZE_64;
-     if (env->external_htab) {
--        stq_p(env->external_htab + pte_index, pte0);
--        stq_p(env->external_htab + pte_index + HASH_PTE_SIZE_64 / 2, pte1);
-+        stq_p(env->external_htab + pte_index * HASH_PTE_SIZE_64, pte0);
-+        stq_p(env->external_htab + pte_index * HASH_PTE_SIZE_64
-+              + HASH_PTE_SIZE_64 / 2, pte1);
-     } else {
--        stq_phys(CPU(cpu)->as, env->htab_base + pte_index, pte0);
-         stq_phys(CPU(cpu)->as,
--                 env->htab_base + pte_index + HASH_PTE_SIZE_64 / 2, pte1);
-+                 env->htab_base + pte_index * HASH_PTE_SIZE_64, pte0);
-+        stq_phys(CPU(cpu)->as,
-+                 env->htab_base + pte_index * HASH_PTE_SIZE_64
-+                 + HASH_PTE_SIZE_64 / 2, pte1);
-     }
- }
- 
--- 
-2.9.3
+Hopefully its transient?
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--RIdWaw94ulp0T50BDtOeGWQTbsPbvh2Ea
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYq6uaAAoJEKeha0olJ0NqcjcIAKNm59OYl5PEMNVDwCFI5Y0M
+jr2QXIRwoAPXIpqnk3zy3m8409qGEoFODUfSZJkaFGbs/9PtHK+NVahAaHwpXSC4
+DyJjvWd4e0w7VpApd0g68hzpy9tR4cqb11Uod9tAhbERsU80hAqYpFNoozVeUyP4
+idepLG2YmwibNe/mzFESrDtI6q+RNQN4RIN4O0v+OIJD1YMe9hP4w20Q3+He45bx
+o1v0/PHd5/k0+rzzQ8BbtWM/e3X2KOIX5vPI3b5ti9v86J+OHOuJbBgxHnqHA9Rf
+KwxB4QyTHNQGccuazBqBeDu9wrvGoZEzm+EPqsPHVqSDLG/W5UPXiO5EkKIPnIQ=
+=fFPX
+-----END PGP SIGNATURE-----
+
+--RIdWaw94ulp0T50BDtOeGWQTbsPbvh2Ea--
