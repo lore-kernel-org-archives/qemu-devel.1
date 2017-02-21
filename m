@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43688)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgBvJ-0001DN-5S
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:00:14 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cgBvN-0001IN-EM
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:00:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgBvD-0008Jg-7A
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:00:13 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cgBvM-0008Ry-2V
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:00:17 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 21 Feb 2017 15:58:36 +0100
-Message-Id: <1487689130-30373-41-git-send-email-kwolf@redhat.com>
+Date: Tue, 21 Feb 2017 15:58:42 +0100
+Message-Id: <1487689130-30373-47-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
 References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 40/54] block: BdrvChildRole.attach/detach()
- callbacks
+Subject: [Qemu-devel] [PATCH 46/54] hmp: Request permissions in qemu-io
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,180 +22,178 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-Backing files are somewhat special compared to other kinds of children
-because they are attached and detached using bdrv_set_backing_hd()
-rather than the normal set of functions, which does a few more things
-like setting backing blockers, toggling the BDRV_O_NO_BACKING flag,
-setting parent_bs->backing_file, etc.
-
-These special features are a reason why change_parent_backing_link()
-can't handle backing files yet. With abstracting the additional features
-into .attach/.detach callbacks, we get a step closer to a function that
-can actually deal with this.
+The HMP command 'qemu-io' is a bit tricky because it wants to work on
+the original BlockBackend, but additional permissions could be required.
+The details are explained in a comment in the code, but in summary, just
+request whatever permissions the current qemu-io command needs.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block.c                   | 94 +++++++++++++++++++++++++++++------------------
- include/block/block_int.h |  3 ++
- 2 files changed, 62 insertions(+), 35 deletions(-)
+ block/block-backend.c          |  6 ++++++
+ hmp.c                          | 26 +++++++++++++++++++++++++-
+ include/qemu-io.h              |  1 +
+ include/sysemu/block-backend.h |  1 +
+ qemu-io-cmds.c                 | 28 ++++++++++++++++++++++++++++
+ 5 files changed, 61 insertions(+), 1 deletion(-)
 
-diff --git a/block.c b/block.c
-index a800e81..97694fa 100644
---- a/block.c
-+++ b/block.c
-@@ -807,6 +807,57 @@ const BdrvChildRole child_format = {
-     .drained_end     = bdrv_child_cb_drained_end,
- };
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 38a3858..daa7908 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -584,6 +584,12 @@ int blk_set_perm(BlockBackend *blk, uint64_t perm, uint64_t shared_perm,
+     return 0;
+ }
  
-+static void bdrv_backing_attach(BdrvChild *c)
++void blk_get_perm(BlockBackend *blk, uint64_t *perm, uint64_t *shared_perm)
 +{
-+    BlockDriverState *parent = c->opaque;
-+    BlockDriverState *backing_hd = c->bs;
++    *perm = blk->perm;
++    *shared_perm = blk->shared_perm;
++}
 +
-+    assert(!parent->backing_blocker);
-+    error_setg(&parent->backing_blocker,
-+               "node is used as backing hd of '%s'",
-+               bdrv_get_device_or_node_name(parent));
-+
-+    parent->open_flags &= ~BDRV_O_NO_BACKING;
-+    pstrcpy(parent->backing_file, sizeof(parent->backing_file),
-+            backing_hd->filename);
-+    pstrcpy(parent->backing_format, sizeof(parent->backing_format),
-+            backing_hd->drv ? backing_hd->drv->format_name : "");
-+
-+    bdrv_op_block_all(backing_hd, parent->backing_blocker);
-+    /* Otherwise we won't be able to commit or stream */
-+    bdrv_op_unblock(backing_hd, BLOCK_OP_TYPE_COMMIT_TARGET,
-+                    parent->backing_blocker);
-+    bdrv_op_unblock(backing_hd, BLOCK_OP_TYPE_STREAM,
-+                    parent->backing_blocker);
+ static int blk_do_attach_dev(BlockBackend *blk, void *dev)
+ {
+     if (blk->dev) {
+diff --git a/hmp.c b/hmp.c
+index 801fddb..fde5016 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -2045,7 +2045,6 @@ void hmp_qemu_io(Monitor *mon, const QDict *qdict)
+     if (!blk) {
+         BlockDriverState *bs = bdrv_lookup_bs(NULL, device, &err);
+         if (bs) {
+-            /* FIXME Use real permissions */
+             blk = local_blk = blk_new(0, BLK_PERM_ALL);
+             ret = blk_insert_bs(blk, bs, &err);
+             if (ret < 0) {
+@@ -2059,6 +2058,31 @@ void hmp_qemu_io(Monitor *mon, const QDict *qdict)
+     aio_context = blk_get_aio_context(blk);
+     aio_context_acquire(aio_context);
+ 
 +    /*
-+     * We do backup in 3 ways:
-+     * 1. drive backup
-+     *    The target bs is new opened, and the source is top BDS
-+     * 2. blockdev backup
-+     *    Both the source and the target are top BDSes.
-+     * 3. internal backup(used for block replication)
-+     *    Both the source and the target are backing file
++     * Notably absent: Proper permission management. This is sad, but it seems
++     * almost impossible to achieve without changing the semantics and thereby
++     * limiting the use cases of the qemu-io HMP command.
 +     *
-+     * In case 1 and 2, neither the source nor the target is the backing file.
-+     * In case 3, we will block the top BDS, so there is only one block job
-+     * for the top BDS and its backing chain.
++     * In an ideal world we would unconditionally create a new BlockBackend for
++     * qemuio_command(), but we have commands like 'reopen' and want them to
++     * take effect on the exact BlockBackend whose name the user passed instead
++     * of just on a temporary copy of it.
++     *
++     * Another problem is that deleting the temporary BlockBackend involves
++     * draining all requests on it first, but some qemu-iotests cases want to
++     * issue multiple aio_read/write requests and expect them to complete in
++     * the background while the monitor has already returned.
++     *
++     * This is also what prevents us from saving the original permissions and
++     * restoring them later: We can't revoke permissions until all requests
++     * have completed, and we don't know when that is nor can we really let
++     * anything else run before we have revoken them to avoid race conditions.
++     *
++     * What happens now is that command() in qemu-io-cmds.c can extend the
++     * permissions if necessary for the qemu-io command. And they simply stay
++     * extended, possibly resulting in a read-only guest device keeping write
++     * permissions. Ugly, but it appears to be the lesser evil.
 +     */
-+    bdrv_op_unblock(backing_hd, BLOCK_OP_TYPE_BACKUP_SOURCE,
-+                    parent->backing_blocker);
-+    bdrv_op_unblock(backing_hd, BLOCK_OP_TYPE_BACKUP_TARGET,
-+                    parent->backing_blocker);
-+}
-+
-+static void bdrv_backing_detach(BdrvChild *c)
-+{
-+    BlockDriverState *parent = c->opaque;
-+
-+    assert(parent->backing_blocker);
-+    bdrv_op_unblock_all(c->bs, parent->backing_blocker);
-+    error_free(parent->backing_blocker);
-+    parent->backing_blocker = NULL;
-+}
-+
- /*
-  * Returns the options and flags that bs->backing should get, based on the
-  * given options and flags for the parent BDS
-@@ -833,6 +884,8 @@ static void bdrv_backing_options(int *child_flags, QDict *child_options,
+     qemuio_command(blk, command);
  
- const BdrvChildRole child_backing = {
-     .get_parent_desc = bdrv_child_get_parent_desc,
-+    .attach          = bdrv_backing_attach,
-+    .detach          = bdrv_backing_detach,
-     .inherit_options = bdrv_backing_options,
-     .drained_begin   = bdrv_child_cb_drained_begin,
-     .drained_end     = bdrv_child_cb_drained_end,
-@@ -1661,6 +1714,9 @@ static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs)
-         if (old_bs->quiesce_counter && child->role->drained_end) {
-             child->role->drained_end(child);
+     aio_context_release(aio_context);
+diff --git a/include/qemu-io.h b/include/qemu-io.h
+index 4d402b9..196fde0 100644
+--- a/include/qemu-io.h
++++ b/include/qemu-io.h
+@@ -36,6 +36,7 @@ typedef struct cmdinfo {
+     const char  *args;
+     const char  *oneline;
+     helpfunc_t  help;
++    uint64_t    perm;
+ } cmdinfo_t;
+ 
+ extern bool qemuio_misalign;
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+index b23f683..096c17f 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -107,6 +107,7 @@ bool bdrv_has_blk(BlockDriverState *bs);
+ bool bdrv_is_root_node(BlockDriverState *bs);
+ int blk_set_perm(BlockBackend *blk, uint64_t perm, uint64_t shared_perm,
+                  Error **errp);
++void blk_get_perm(BlockBackend *blk, uint64_t *perm, uint64_t *shared_perm);
+ 
+ void blk_set_allow_write_beyond_eof(BlockBackend *blk, bool allow);
+ void blk_iostatus_enable(BlockBackend *blk);
+diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+index e415b03..035cb96 100644
+--- a/qemu-io-cmds.c
++++ b/qemu-io-cmds.c
+@@ -83,6 +83,29 @@ static int command(BlockBackend *blk, const cmdinfo_t *ct, int argc,
          }
-+        if (child->role->detach) {
-+            child->role->detach(child);
-+        }
-         QLIST_REMOVE(child, next_parent);
-         bdrv_update_perm(old_bs);
+         return 0;
      }
-@@ -1673,6 +1729,9 @@ static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs)
-             child->role->drained_begin(child);
-         }
-         bdrv_update_perm(new_bs);
-+        if (child->role->attach) {
-+            child->role->attach(child);
-+        }
-     }
- }
- 
-@@ -1807,52 +1866,17 @@ void bdrv_set_backing_hd(BlockDriverState *bs, BlockDriverState *backing_hd)
-     }
- 
-     if (bs->backing) {
--        assert(bs->backing_blocker);
--        bdrv_op_unblock_all(bs->backing->bs, bs->backing_blocker);
-         bdrv_unref_child(bs, bs->backing);
--    } else if (backing_hd) {
--        error_setg(&bs->backing_blocker,
--                   "node is used as backing hd of '%s'",
--                   bdrv_get_device_or_node_name(bs));
-     }
- 
-     if (!backing_hd) {
--        error_free(bs->backing_blocker);
--        bs->backing_blocker = NULL;
-         bs->backing = NULL;
-         goto out;
-     }
-     /* FIXME Error handling */
-     bs->backing = bdrv_attach_child(bs, backing_hd, "backing", &child_backing,
-                                     &error_abort);
--    bs->open_flags &= ~BDRV_O_NO_BACKING;
--    pstrcpy(bs->backing_file, sizeof(bs->backing_file), backing_hd->filename);
--    pstrcpy(bs->backing_format, sizeof(bs->backing_format),
--            backing_hd->drv ? backing_hd->drv->format_name : "");
- 
--    bdrv_op_block_all(backing_hd, bs->backing_blocker);
--    /* Otherwise we won't be able to commit or stream */
--    bdrv_op_unblock(backing_hd, BLOCK_OP_TYPE_COMMIT_TARGET,
--                    bs->backing_blocker);
--    bdrv_op_unblock(backing_hd, BLOCK_OP_TYPE_STREAM,
--                    bs->backing_blocker);
--    /*
--     * We do backup in 3 ways:
--     * 1. drive backup
--     *    The target bs is new opened, and the source is top BDS
--     * 2. blockdev backup
--     *    Both the source and the target are top BDSes.
--     * 3. internal backup(used for block replication)
--     *    Both the source and the target are backing file
--     *
--     * In case 1 and 2, neither the source nor the target is the backing file.
--     * In case 3, we will block the top BDS, so there is only one block job
--     * for the top BDS and its backing chain.
--     */
--    bdrv_op_unblock(backing_hd, BLOCK_OP_TYPE_BACKUP_SOURCE,
--                    bs->backing_blocker);
--    bdrv_op_unblock(backing_hd, BLOCK_OP_TYPE_BACKUP_TARGET,
--                    bs->backing_blocker);
- out:
-     bdrv_refresh_limits(bs, NULL);
- }
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index a0d9328..a5c704b 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -472,6 +472,9 @@ struct BdrvChildRole {
-      */
-     void (*drained_begin)(BdrvChild *child);
-     void (*drained_end)(BdrvChild *child);
 +
-+    void (*attach)(BdrvChild *child);
-+    void (*detach)(BdrvChild *child);
- };
- 
- extern const BdrvChildRole child_file;
++    /* Request additional permissions if necessary for this command. The caller
++     * is responsible for restoring the original permissions afterwards if this
++     * is what it wants. */
++    if (ct->perm && blk_is_available(blk)) {
++        uint64_t orig_perm, orig_shared_perm;
++        blk_get_perm(blk, &orig_perm, &orig_shared_perm);
++
++        if (ct->perm & ~orig_perm) {
++            uint64_t new_perm;
++            Error *local_err = NULL;
++            int ret;
++
++            new_perm = orig_perm | ct->perm;
++
++            ret = blk_set_perm(blk, new_perm, orig_shared_perm, &local_err);
++            if (ret < 0) {
++                error_report_err(local_err);
++                return 0;
++            }
++        }
++    }
++
+     optind = 0;
+     return ct->cfunc(blk, argc, argv);
+ }
+@@ -916,6 +939,7 @@ static const cmdinfo_t write_cmd = {
+     .name       = "write",
+     .altname    = "w",
+     .cfunc      = write_f,
++    .perm       = BLK_PERM_WRITE,
+     .argmin     = 2,
+     .argmax     = -1,
+     .args       = "[-bcCfquz] [-P pattern] off len",
+@@ -1091,6 +1115,7 @@ static int writev_f(BlockBackend *blk, int argc, char **argv);
+ static const cmdinfo_t writev_cmd = {
+     .name       = "writev",
+     .cfunc      = writev_f,
++    .perm       = BLK_PERM_WRITE,
+     .argmin     = 2,
+     .argmax     = -1,
+     .args       = "[-Cfq] [-P pattern] off len [len..]",
+@@ -1390,6 +1415,7 @@ static int aio_write_f(BlockBackend *blk, int argc, char **argv);
+ static const cmdinfo_t aio_write_cmd = {
+     .name       = "aio_write",
+     .cfunc      = aio_write_f,
++    .perm       = BLK_PERM_WRITE,
+     .argmin     = 2,
+     .argmax     = -1,
+     .args       = "[-Cfiquz] [-P pattern] off len [len..]",
+@@ -1554,6 +1580,7 @@ static const cmdinfo_t truncate_cmd = {
+     .name       = "truncate",
+     .altname    = "t",
+     .cfunc      = truncate_f,
++    .perm       = BLK_PERM_WRITE | BLK_PERM_RESIZE,
+     .argmin     = 1,
+     .argmax     = 1,
+     .args       = "off",
+@@ -1651,6 +1678,7 @@ static const cmdinfo_t discard_cmd = {
+     .name       = "discard",
+     .altname    = "d",
+     .cfunc      = discard_f,
++    .perm       = BLK_PERM_WRITE,
+     .argmin     = 2,
+     .argmax     = -1,
+     .args       = "[-Cq] off len",
 -- 
 1.8.3.1
