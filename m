@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cg0Q2-0005ZX-Oq
+	(envelope-from <eblake@redhat.com>) id 1cg0Q0-0005Yf-UQ
 	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 21:43:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cg0Q1-0003X8-29
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 21:43:10 -0500
+	(envelope-from <eblake@redhat.com>) id 1cg0Pz-0003VF-3g
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 21:43:09 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 20 Feb 2017 20:42:44 -0600
-Message-Id: <20170221024248.11027-5-eblake@redhat.com>
+Date: Mon, 20 Feb 2017 20:42:42 -0600
+Message-Id: <20170221024248.11027-3-eblake@redhat.com>
 In-Reply-To: <20170221024248.11027-1-eblake@redhat.com>
 References: <20170221024248.11027-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 4/8] nbd: Expose and debug more NBD constants
+Subject: [Qemu-devel] [PATCH v4 2/8] nbd: Create struct for tracking export
+ info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,353 +23,317 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, pbonzini@redhat.com, vsementsov@virtuozzo.com, den@virtuozzo.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-The NBD protocol has several constants defined in various extensions
-that we are about to implement.  Expose them to the code, along with
-an easy way to map various constants to strings during diagnostic
-messages.
-
-Doing this points out a debug message in server.c that got
-parameters mixed up.
+The NBD Protocol is introducing some additional information
+about exports, such as minimum request size and alignment, as
+well as an advertised maximum request size.  It will be easier
+to feed this information back to the block layer if we gather
+all the information into a struct, rather than adding yet more
+pointer parameters during negotiation.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
-v4: new patch
+v4: rebase to master
+v3: new patch
 ---
- include/block/nbd.h | 34 +++++++++++++++++++-------
- nbd/nbd-internal.h  |  9 +++----
- nbd/client.c        | 56 ++++++++++++++++++++++++++++---------------
- nbd/common.c        | 69 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- nbd/server.c        | 17 +++++++------
- 5 files changed, 145 insertions(+), 40 deletions(-)
+ block/nbd-client.h  |  3 +--
+ include/block/nbd.h | 15 +++++++++++----
+ block/nbd-client.c  | 18 ++++++++----------
+ block/nbd.c         |  2 +-
+ nbd/client.c        | 47 +++++++++++++++++++++++++----------------------
+ qemu-nbd.c          | 10 ++++------
+ 6 files changed, 50 insertions(+), 45 deletions(-)
 
+diff --git a/block/nbd-client.h b/block/nbd-client.h
+index f8d6006..098b65c 100644
+--- a/block/nbd-client.h
++++ b/block/nbd-client.h
+@@ -20,8 +20,7 @@
+ typedef struct NBDClientSession {
+     QIOChannelSocket *sioc; /* The master data channel */
+     QIOChannel *ioc; /* The current I/O channel which may differ (eg TLS) */
+-    uint16_t nbdflags;
+-    off_t size;
++    NBDExportInfo info;
+
+     CoMutex send_mutex;
+     CoQueue free_sema;
 diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 8cc9cbe..c84e022 100644
+index 3e373f0..8cc9cbe 100644
 --- a/include/block/nbd.h
 +++ b/include/block/nbd.h
-@@ -1,5 +1,5 @@
- /*
-- *  Copyright (C) 2016 Red Hat, Inc.
-+ *  Copyright (C) 2016-2017 Red Hat, Inc.
-  *  Copyright (C) 2005  Anthony Liguori <anthony@codemonkey.ws>
-  *
-  *  Network Block Device
-@@ -83,18 +83,36 @@ typedef struct NBDReply NBDReply;
- #define NBD_FLAG_C_FIXED_NEWSTYLE (1 << 0) /* Fixed newstyle protocol. */
- #define NBD_FLAG_C_NO_ZEROES      (1 << 1) /* End handshake without zeroes. */
+@@ -123,16 +123,23 @@ enum {
+  * aren't overflowing some other buffer. */
+ #define NBD_MAX_NAME_SIZE 256
 
--/* Reply types. */
-+/* Option requests. */
-+#define NBD_OPT_EXPORT_NAME     (1)
-+#define NBD_OPT_ABORT           (2)
-+#define NBD_OPT_LIST            (3)
-+/* #define NBD_OPT_PEEK_EXPORT  (4) not in use */
-+#define NBD_OPT_STARTTLS        (5)
-+#define NBD_OPT_INFO            (6)
-+#define NBD_OPT_GO              (7)
++/* Details collected by NBD_OPT_EXPORT_NAME and NBD_OPT_GO */
++struct NBDExportInfo {
++    uint64_t size;
++    uint16_t flags;
++};
++typedef struct NBDExportInfo NBDExportInfo;
 +
-+/* Option reply types. */
- #define NBD_REP_ERR(value) ((UINT32_C(1) << 31) | (value))
+ ssize_t nbd_wr_syncv(QIOChannel *ioc,
+                      struct iovec *iov,
+                      size_t niov,
+                      size_t length,
+                      bool do_read);
+-int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
++int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
+                           QCryptoTLSCreds *tlscreds, const char *hostname,
+-                          QIOChannel **outioc,
+-                          off_t *size, Error **errp);
+-int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size);
++                          QIOChannel **outioc, NBDExportInfo *info,
++                          Error **errp);
++int nbd_init(int fd, QIOChannelSocket *sioc, NBDExportInfo *info);
+ ssize_t nbd_send_request(QIOChannel *ioc, NBDRequest *request);
+ ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply *reply);
+ int nbd_client(int fd);
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index 06f1532..32d7c90 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -258,7 +258,7 @@ int nbd_client_co_pwritev(BlockDriverState *bs, uint64_t offset,
+     ssize_t ret;
 
- #define NBD_REP_ACK             (1)             /* Data sending finished. */
- #define NBD_REP_SERVER          (2)             /* Export description. */
-+#define NBD_REP_INFO            (3)             /* NBD_OPT_INFO/GO. */
+     if (flags & BDRV_REQ_FUA) {
+-        assert(client->nbdflags & NBD_FLAG_SEND_FUA);
++        assert(client->info.flags & NBD_FLAG_SEND_FUA);
+         request.flags |= NBD_CMD_FLAG_FUA;
+     }
 
--#define NBD_REP_ERR_UNSUP       NBD_REP_ERR(1)  /* Unknown option */
--#define NBD_REP_ERR_POLICY      NBD_REP_ERR(2)  /* Server denied */
--#define NBD_REP_ERR_INVALID     NBD_REP_ERR(3)  /* Invalid length */
--#define NBD_REP_ERR_PLATFORM    NBD_REP_ERR(4)  /* Not compiled in */
--#define NBD_REP_ERR_TLS_REQD    NBD_REP_ERR(5)  /* TLS required */
--#define NBD_REP_ERR_SHUTDOWN    NBD_REP_ERR(7)  /* Server shutting down */
-+#define NBD_REP_ERR_UNSUP           NBD_REP_ERR(1)  /* Unknown option */
-+#define NBD_REP_ERR_POLICY          NBD_REP_ERR(2)  /* Server denied */
-+#define NBD_REP_ERR_INVALID         NBD_REP_ERR(3)  /* Invalid length */
-+#define NBD_REP_ERR_PLATFORM        NBD_REP_ERR(4)  /* Not compiled in */
-+#define NBD_REP_ERR_TLS_REQD        NBD_REP_ERR(5)  /* TLS required */
-+#define NBD_REP_ERR_UNKNOWN         NBD_REP_ERR(6)  /* Export unknown */
-+#define NBD_REP_ERR_SHUTDOWN        NBD_REP_ERR(7)  /* Server shutting down */
-+#define NBD_REP_ERR_BLOCK_SIZE_REQD NBD_REP_ERR(8)  /* Need INFO_BLOCK_SIZE */
-+
-+/* Info types, used during NBD_REP_INFO */
-+#define NBD_INFO_EXPORT         0
-+#define NBD_INFO_NAME           1
-+#define NBD_INFO_DESCRIPTION    2
-+#define NBD_INFO_BLOCK_SIZE     3
+@@ -287,12 +287,12 @@ int nbd_client_co_pwrite_zeroes(BlockDriverState *bs, int64_t offset,
+     };
+     NBDReply reply;
 
- /* Request flags, sent from client to server during transmission phase */
- #define NBD_CMD_FLAG_FUA        (1 << 0) /* 'force unit access' during write */
-diff --git a/nbd/nbd-internal.h b/nbd/nbd-internal.h
-index f43d990..aa5b2fd 100644
---- a/nbd/nbd-internal.h
-+++ b/nbd/nbd-internal.h
-@@ -76,12 +76,6 @@
- #define NBD_SET_TIMEOUT         _IO(0xab, 9)
- #define NBD_SET_FLAGS           _IO(0xab, 10)
+-    if (!(client->nbdflags & NBD_FLAG_SEND_WRITE_ZEROES)) {
++    if (!(client->info.flags & NBD_FLAG_SEND_WRITE_ZEROES)) {
+         return -ENOTSUP;
+     }
 
--#define NBD_OPT_EXPORT_NAME     (1)
--#define NBD_OPT_ABORT           (2)
--#define NBD_OPT_LIST            (3)
--#define NBD_OPT_PEEK_EXPORT     (4)
--#define NBD_OPT_STARTTLS        (5)
--
- /* NBD errors are based on errno numbers, so there is a 1:1 mapping,
-  * but only a limited set of errno values is specified in the protocol.
-  * Everything else is squashed to EINVAL.
-@@ -122,5 +116,8 @@ struct NBDTLSHandshakeData {
+     if (flags & BDRV_REQ_FUA) {
+-        assert(client->nbdflags & NBD_FLAG_SEND_FUA);
++        assert(client->info.flags & NBD_FLAG_SEND_FUA);
+         request.flags |= NBD_CMD_FLAG_FUA;
+     }
+     if (!(flags & BDRV_REQ_MAY_UNMAP)) {
+@@ -317,7 +317,7 @@ int nbd_client_co_flush(BlockDriverState *bs)
+     NBDReply reply;
+     ssize_t ret;
 
- void nbd_tls_handshake(QIOTask *task,
-                        void *opaque);
-+const char *nbd_opt_lookup(uint32_t opt);
-+const char *nbd_rep_lookup(uint32_t rep);
-+const char *nbd_info_lookup(uint16_t info);
+-    if (!(client->nbdflags & NBD_FLAG_SEND_FLUSH)) {
++    if (!(client->info.flags & NBD_FLAG_SEND_FLUSH)) {
+         return 0;
+     }
 
- #endif
+@@ -346,7 +346,7 @@ int nbd_client_co_pdiscard(BlockDriverState *bs, int64_t offset, int count)
+     NBDReply reply;
+     ssize_t ret;
+
+-    if (!(client->nbdflags & NBD_FLAG_SEND_TRIM)) {
++    if (!(client->info.flags & NBD_FLAG_SEND_TRIM)) {
+         return 0;
+     }
+
+@@ -405,19 +405,17 @@ int nbd_client_init(BlockDriverState *bs,
+     qio_channel_set_blocking(QIO_CHANNEL(sioc), true, NULL);
+
+     ret = nbd_receive_negotiate(QIO_CHANNEL(sioc), export,
+-                                &client->nbdflags,
+                                 tlscreds, hostname,
+-                                &client->ioc,
+-                                &client->size, errp);
++                                &client->ioc, &client->info, errp);
+     if (ret < 0) {
+         logout("Failed to negotiate with the NBD server\n");
+         return ret;
+     }
+-    if (client->nbdflags & NBD_FLAG_SEND_FUA) {
++    if (client->info.flags & NBD_FLAG_SEND_FUA) {
+         bs->supported_write_flags = BDRV_REQ_FUA;
+         bs->supported_zero_flags |= BDRV_REQ_FUA;
+     }
+-    if (client->nbdflags & NBD_FLAG_SEND_WRITE_ZEROES) {
++    if (client->info.flags & NBD_FLAG_SEND_WRITE_ZEROES) {
+         bs->supported_zero_flags |= BDRV_REQ_MAY_UNMAP;
+     }
+
+diff --git a/block/nbd.c b/block/nbd.c
+index 35f24be..c43fa35 100644
+--- a/block/nbd.c
++++ b/block/nbd.c
+@@ -485,7 +485,7 @@ static int64_t nbd_getlength(BlockDriverState *bs)
+ {
+     BDRVNBDState *s = bs->opaque;
+
+-    return s->client.size;
++    return s->client.info.size;
+ }
+
+ static void nbd_detach_aio_context(BlockDriverState *bs)
 diff --git a/nbd/client.c b/nbd/client.c
-index 69f0e09..f96539b 100644
+index 0d16cd1..69f0e09 100644
 --- a/nbd/client.c
 +++ b/nbd/client.c
-@@ -1,5 +1,5 @@
- /*
-- *  Copyright (C) 2016 Red Hat, Inc.
-+ *  Copyright (C) 2016-2017 Red Hat, Inc.
-  *  Copyright (C) 2005  Anthony Liguori <anthony@codemonkey.ws>
-  *
-  *  Network Block Device Client Side
-@@ -130,7 +130,8 @@ static int nbd_send_option_request(QIOChannel *ioc, uint32_t opt,
-     if (len == -1) {
-         req.length = len = strlen(data);
-     }
--    TRACE("Sending option request %" PRIu32", len %" PRIu32, opt, len);
-+    TRACE("Sending option request %" PRIu32" (%s), len %" PRIu32, opt,
-+          nbd_opt_lookup(opt), len);
-
-     stq_be_p(&req.magic, NBD_OPTS_MAGIC);
-     stl_be_p(&req.option, opt);
-@@ -180,8 +181,10 @@ static int nbd_receive_option_reply(QIOChannel *ioc, uint32_t opt,
-     be32_to_cpus(&reply->type);
-     be32_to_cpus(&reply->length);
-
--    TRACE("Received option reply %" PRIx32", type %" PRIx32", len %" PRIu32,
--          reply->option, reply->type, reply->length);
-+    TRACE("Received option reply %" PRIx32" (%s), type %" PRIx32
-+          " (%s), len %" PRIu32,
-+          reply->option, nbd_opt_lookup(reply->option),
-+          reply->type, nbd_rep_lookup(reply->type), reply->length);
-
-     if (reply->magic != NBD_REP_MAGIC) {
-         error_setg(errp, "Unexpected option reply magic");
-@@ -215,12 +218,16 @@ static int nbd_handle_reply_err(QIOChannel *ioc, nbd_opt_reply *reply,
-
-     if (reply->length) {
-         if (reply->length > NBD_MAX_BUFFER_SIZE) {
--            error_setg(errp, "server's error message is too long");
-+            error_setg(errp, "server error 0x%" PRIx32
-+                       " (%s) message is too long",
-+                       reply->type, nbd_rep_lookup(reply->type));
-             goto cleanup;
-         }
-         msg = g_malloc(reply->length + 1);
-         if (read_sync(ioc, msg, reply->length) != reply->length) {
--            error_setg(errp, "failed to read option error message");
-+            error_setg(errp, "failed to read option error 0x%" PRIx32
-+                       " (%s) message",
-+                       reply->type, nbd_rep_lookup(reply->type));
-             goto cleanup;
-         }
-         msg[reply->length] = '\0';
-@@ -229,38 +236,49 @@ static int nbd_handle_reply_err(QIOChannel *ioc, nbd_opt_reply *reply,
-     switch (reply->type) {
-     case NBD_REP_ERR_UNSUP:
-         TRACE("server doesn't understand request %" PRIx32
--              ", attempting fallback", reply->option);
-+              " (%s), attempting fallback",
-+              reply->option, nbd_opt_lookup(reply->option));
-         result = 0;
-         goto cleanup;
-
-     case NBD_REP_ERR_POLICY:
--        error_setg(errp, "Denied by server for option %" PRIx32,
--                   reply->option);
-+        error_setg(errp, "Denied by server for option %" PRIx32 " (%s)",
-+                   reply->option, nbd_opt_lookup(reply->option));
-         break;
-
-     case NBD_REP_ERR_INVALID:
--        error_setg(errp, "Invalid data length for option %" PRIx32,
--                   reply->option);
-+        error_setg(errp, "Invalid data length for option %" PRIx32 " (%s)",
-+                   reply->option, nbd_opt_lookup(reply->option));
-         break;
-
-     case NBD_REP_ERR_PLATFORM:
--        error_setg(errp, "Server lacks support for option %" PRIx32,
--                   reply->option);
-+        error_setg(errp, "Server lacks support for option %" PRIx32 " (%s)",
-+                   reply->option, nbd_opt_lookup(reply->option));
-         break;
-
-     case NBD_REP_ERR_TLS_REQD:
--        error_setg(errp, "TLS negotiation required before option %" PRIx32,
--                   reply->option);
-+        error_setg(errp, "TLS negotiation required before option %" PRIx32
-+                   " (%s)", reply->option, nbd_opt_lookup(reply->option));
-+        break;
-+
-+    case NBD_REP_ERR_UNKNOWN:
-+        error_setg(errp, "Requested export not available for option %" PRIx32
-+                   " (%s)", reply->option, nbd_opt_lookup(reply->option));
-         break;
-
-     case NBD_REP_ERR_SHUTDOWN:
--        error_setg(errp, "Server shutting down before option %" PRIx32,
--                   reply->option);
-+        error_setg(errp, "Server shutting down before option %" PRIx32 " (%s)",
-+                   reply->option, nbd_opt_lookup(reply->option));
-+        break;
-+
-+    case NBD_REP_ERR_BLOCK_SIZE_REQD:
-+        error_setg(errp, "Server requires INFO_BLOCK_SIZE for option %" PRIx32
-+                   " (%s)", reply->option, nbd_opt_lookup(reply->option));
-         break;
-
-     default:
--        error_setg(errp, "Unknown error code when asking for option %" PRIx32,
--                   reply->option);
-+        error_setg(errp, "Unknown error code when asking for option %" PRIx32
-+                   " (%s)", reply->option, nbd_opt_lookup(reply->option));
-         break;
-     }
-
-diff --git a/nbd/common.c b/nbd/common.c
-index a5f39ea..85622f9 100644
---- a/nbd/common.c
-+++ b/nbd/common.c
-@@ -89,3 +89,72 @@ void nbd_tls_handshake(QIOTask *task,
-     data->complete = true;
-     g_main_loop_quit(data->loop);
+@@ -454,13 +454,13 @@ static QIOChannel *nbd_receive_starttls(QIOChannel *ioc,
  }
-+
-+
-+const char *nbd_opt_lookup(uint32_t opt)
-+{
-+    switch (opt) {
-+    case NBD_OPT_EXPORT_NAME:
-+        return "export name";
-+    case NBD_OPT_ABORT:
-+        return "abort";
-+    case NBD_OPT_LIST:
-+        return "list";
-+    case NBD_OPT_STARTTLS:
-+        return "starttls";
-+    case NBD_OPT_INFO:
-+        return "info";
-+    case NBD_OPT_GO:
-+        return "go";
-+    default:
-+        return "<unknown>";
-+    }
-+}
-+
-+
-+const char *nbd_rep_lookup(uint32_t rep)
-+{
-+    switch (rep) {
-+    case NBD_REP_ACK:
-+        return "ack";
-+    case NBD_REP_SERVER:
-+        return "server";
-+    case NBD_REP_INFO:
-+        return "info";
-+    case NBD_REP_ERR_UNSUP:
-+        return "unsupported";
-+    case NBD_REP_ERR_POLICY:
-+        return "denied by policy";
-+    case NBD_REP_ERR_INVALID:
-+        return "invalid";
-+    case NBD_REP_ERR_PLATFORM:
-+        return "platform lacks support";
-+    case NBD_REP_ERR_TLS_REQD:
-+        return "TLS required";
-+    case NBD_REP_ERR_UNKNOWN:
-+        return "export unknown";
-+    case NBD_REP_ERR_SHUTDOWN:
-+        return "server shutting down";
-+    case NBD_REP_ERR_BLOCK_SIZE_REQD:
-+        return "block size required";
-+    default:
-+        return "<unknown>";
-+    }
-+}
-+
-+
-+const char *nbd_info_lookup(uint16_t info)
-+{
-+    switch (info) {
-+    case NBD_INFO_EXPORT:
-+        return "export";
-+    case NBD_INFO_NAME:
-+        return "name";
-+    case NBD_INFO_DESCRIPTION:
-+        return "description";
-+    case NBD_INFO_BLOCK_SIZE:
-+        return "block size";
-+    default:
-+        return "<unknown>";
-+    }
-+}
-diff --git a/nbd/server.c b/nbd/server.c
-index efe5cb8..767ca0f 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -1,5 +1,5 @@
- /*
-- *  Copyright (C) 2016 Red Hat, Inc.
-+ *  Copyright (C) 2016-2017 Red Hat, Inc.
-  *  Copyright (C) 2005  Anthony Liguori <anthony@codemonkey.ws>
-  *
-  *  Network Block Device Server Side
-@@ -206,8 +206,8 @@ static int nbd_negotiate_send_rep_len(QIOChannel *ioc, uint32_t type,
+
+
+-int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
++int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
+                           QCryptoTLSCreds *tlscreds, const char *hostname,
+-                          QIOChannel **outioc,
+-                          off_t *size, Error **errp)
++                          QIOChannel **outioc, NBDExportInfo *info,
++                          Error **errp)
  {
-     uint64_t magic;
+     char buf[256];
+-    uint64_t magic, s;
++    uint64_t magic;
+     int rc;
+     bool zeroes = true;
 
--    TRACE("Reply opt=%" PRIx32 " type=%" PRIx32 " len=%" PRIu32,
--          type, opt, len);
-+    TRACE("Reply opt=%" PRIx32 " (%s), type=%" PRIx32 " (%s), len=%" PRIu32,
-+          opt, nbd_opt_lookup(opt), type, nbd_rep_lookup(type), len);
-
-     magic = cpu_to_be64(NBD_REP_MAGIC);
-     if (nbd_negotiate_write(ioc, &magic, sizeof(magic)) != sizeof(magic)) {
-@@ -493,7 +493,8 @@ static int nbd_negotiate_options(NBDClient *client)
+@@ -573,17 +573,19 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
          }
-         length = be32_to_cpu(length);
 
--        TRACE("Checking option 0x%" PRIx32, clientflags);
-+        TRACE("Checking option 0x%" PRIx32 " (%s)", clientflags,
-+              nbd_opt_lookup(clientflags));
-         if (client->tlscreds &&
-             client->ioc == (QIOChannel *)client->sioc) {
-             QIOChannel *tioc;
-@@ -581,8 +582,9 @@ static int nbd_negotiate_options(NBDClient *client)
-                                                  NBD_REP_ERR_UNSUP,
-                                                  clientflags,
-                                                  "Unsupported option 0x%"
--                                                 PRIx32,
--                                                 clientflags);
-+                                                 PRIx32 " (%s)",
-+                                                 clientflags,
-+                                                 nbd_opt_lookup(clientflags));
-                 if (ret < 0) {
-                     return ret;
-                 }
-@@ -598,7 +600,8 @@ static int nbd_negotiate_options(NBDClient *client)
-                 return nbd_negotiate_handle_export_name(client, length);
-
-             default:
--                TRACE("Unsupported option 0x%" PRIx32, clientflags);
-+                TRACE("Unsupported option 0x%" PRIx32 " (%s)", clientflags,
-+                      nbd_opt_lookup(clientflags));
-                 return -EINVAL;
-             }
+         /* Read the response */
+-        if (read_sync(ioc, &s, sizeof(s)) != sizeof(s)) {
++        if (read_sync(ioc, &info->size, sizeof(info->size)) !=
++            sizeof(info->size)) {
+             error_setg(errp, "Failed to read export length");
+             goto fail;
          }
+-        *size = be64_to_cpu(s);
++        be64_to_cpus(&info->size);
+
+-        if (read_sync(ioc, flags, sizeof(*flags)) != sizeof(*flags)) {
++        if (read_sync(ioc, &info->flags, sizeof(info->flags)) !=
++            sizeof(info->flags)) {
+             error_setg(errp, "Failed to read export flags");
+             goto fail;
+         }
+-        be16_to_cpus(flags);
++        be16_to_cpus(&info->flags);
+     } else if (magic == NBD_CLIENT_MAGIC) {
+         uint32_t oldflags;
+
+@@ -596,12 +598,12 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
+             goto fail;
+         }
+
+-        if (read_sync(ioc, &s, sizeof(s)) != sizeof(s)) {
++        if (read_sync(ioc, &info->size, sizeof(info->size)) !=
++            sizeof(info->size)) {
+             error_setg(errp, "Failed to read export length");
+             goto fail;
+         }
+-        *size = be64_to_cpu(s);
+-        TRACE("Size is %" PRIu64, *size);
++        be64_to_cpus(&info->size);
+
+         if (read_sync(ioc, &oldflags, sizeof(oldflags)) != sizeof(oldflags)) {
+             error_setg(errp, "Failed to read export flags");
+@@ -612,13 +614,14 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
+             error_setg(errp, "Unexpected export flags %0x" PRIx32, oldflags);
+             goto fail;
+         }
+-        *flags = oldflags;
++        info->flags = oldflags;
+     } else {
+         error_setg(errp, "Bad magic received");
+         goto fail;
+     }
+
+-    TRACE("Size is %" PRIu64 ", export flags %" PRIx16, *size, *flags);
++    TRACE("Size is %" PRIu64 ", export flags %" PRIx16,
++          info->size, info->flags);
+     if (zeroes && drop_sync(ioc, 124) != 124) {
+         error_setg(errp, "Failed to read reserved block");
+         goto fail;
+@@ -630,11 +633,11 @@ fail:
+ }
+
+ #ifdef __linux__
+-int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size)
++int nbd_init(int fd, QIOChannelSocket *sioc, NBDExportInfo *info)
+ {
+-    unsigned long sectors = size / BDRV_SECTOR_SIZE;
+-    if (size / BDRV_SECTOR_SIZE != sectors) {
+-        LOG("Export size %lld too large for 32-bit kernel", (long long) size);
++    unsigned long sectors = info->size / BDRV_SECTOR_SIZE;
++    if (info->size / BDRV_SECTOR_SIZE != sectors) {
++        LOG("Export size %" PRId64 " too large for 32-bit kernel", info->size);
+         return -E2BIG;
+     }
+
+@@ -655,9 +658,9 @@ int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size)
+     }
+
+     TRACE("Setting size to %lu block(s)", sectors);
+-    if (size % BDRV_SECTOR_SIZE) {
++    if (info->size % BDRV_SECTOR_SIZE) {
+         TRACE("Ignoring trailing %d bytes of export",
+-              (int) (size % BDRV_SECTOR_SIZE));
++              (int) (info->size % BDRV_SECTOR_SIZE));
+     }
+
+     if (ioctl(fd, NBD_SET_SIZE_BLOCKS, sectors) < 0) {
+@@ -666,9 +669,9 @@ int nbd_init(int fd, QIOChannelSocket *sioc, uint16_t flags, off_t size)
+         return -serrno;
+     }
+
+-    if (ioctl(fd, NBD_SET_FLAGS, (unsigned long) flags) < 0) {
++    if (ioctl(fd, NBD_SET_FLAGS, (unsigned long) info->flags) < 0) {
+         if (errno == ENOTTY) {
+-            int read_only = (flags & NBD_FLAG_READ_ONLY) != 0;
++            int read_only = (info->flags & NBD_FLAG_READ_ONLY) != 0;
+             TRACE("Setting readonly attribute");
+
+             if (ioctl(fd, BLKROSET, (unsigned long) &read_only) < 0) {
+@@ -726,7 +729,7 @@ int nbd_disconnect(int fd)
+ }
+
+ #else
+-int nbd_init(int fd, QIOChannelSocket *ioc, uint16_t flags, off_t size)
++int nbd_init(int fd, QIOChannelSocket *ioc, NBDExportInfo *info)
+ {
+     return -ENOTSUP;
+ }
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index e4fede6..c598cbe 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -254,8 +254,7 @@ static void *show_parts(void *arg)
+ static void *nbd_client_thread(void *arg)
+ {
+     char *device = arg;
+-    off_t size;
+-    uint16_t nbdflags;
++    NBDExportInfo info;
+     QIOChannelSocket *sioc;
+     int fd;
+     int ret;
+@@ -270,9 +269,8 @@ static void *nbd_client_thread(void *arg)
+         goto out;
+     }
+
+-    ret = nbd_receive_negotiate(QIO_CHANNEL(sioc), NULL, &nbdflags,
+-                                NULL, NULL, NULL,
+-                                &size, &local_error);
++    ret = nbd_receive_negotiate(QIO_CHANNEL(sioc), NULL,
++                                NULL, NULL, NULL, &info, &local_error);
+     if (ret < 0) {
+         if (local_error) {
+             error_report_err(local_error);
+@@ -287,7 +285,7 @@ static void *nbd_client_thread(void *arg)
+         goto out_socket;
+     }
+
+-    ret = nbd_init(fd, sioc, nbdflags, size);
++    ret = nbd_init(fd, sioc, &info);
+     if (ret < 0) {
+         goto out_fd;
+     }
 -- 
 2.9.3
