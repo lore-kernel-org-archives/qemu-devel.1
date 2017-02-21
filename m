@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38411)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cgAdp-0000Ey-2K
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:38:06 -0500
+	(envelope-from <quintela@redhat.com>) id 1cgAtR-0006Xn-J9
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:54:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cgAdk-0002tw-ND
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:38:05 -0500
-Resent-Message-Id: <E1cgAdk-0002tw-ND@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21481)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cgAdk-0002tg-EQ
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:38:00 -0500
-In-Reply-To: <1487680479-15132-1-git-send-email-armbru@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148768427721.33.4309540353951499212@0e2666bad730>
+	(envelope-from <quintela@redhat.com>) id 1cgAtO-0001zb-JH
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:54:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49022)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cgAtO-0001zE-9g
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:54:10 -0500
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <e9388bc4-2c50-0656-e140-b5478f35237b@linux.vnet.ibm.com> (Daniel
+	Henrique Barboza's message of "Tue, 21 Feb 2017 10:31:25 -0300")
+References: <20170220160316.16803-1-danielhb@linux.vnet.ibm.com>
+	<87ino3ncg5.fsf@dusky.pond.sub.org>
+	<e9388bc4-2c50-0656-e140-b5478f35237b@linux.vnet.ibm.com>
+Reply-To: quintela@redhat.com
+Date: Tue, 21 Feb 2017 14:54:04 +0100
+Message-ID: <87ino3odj7.fsf@emacs.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 21 Feb 2017 05:37:57 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/11] Changes to -drive without if= and
- with if=scsi
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2] Changing error message of QMP
+ 'migrate_set_downtime' to seconds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +30,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: armbru@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, dgilbert@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwMC8xMV0gQ2hhbmdlcyB0byAtZHJpdmUgd2l0aG91
-dCBpZj0gYW5kIHdpdGggaWY9c2NzaQpNZXNzYWdlLWlkOiAxNDg3NjgwNDc5LTE1MTMyLTEtZ2l0
-LXNlbmQtZW1haWwtYXJtYnJ1QHJlZGhhdC5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
-IyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFT
-RS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMg
-VHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIK
-Zm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6
-ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMg
-LS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRo
-ZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRv
-bmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1
-YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNv
-bS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzE0ODY1
-MzE0NjItMTM4ODItMS1naXQtc2VuZC1lbWFpbC16aGFuZ2NoZW4uZm5zdEBjbi5mdWppdHN1LmNv
-bSAtPiBwYXRjaGV3LzE0ODY1MzE0NjItMTM4ODItMS1naXQtc2VuZC1lbWFpbC16aGFuZ2NoZW4u
-Zm5zdEBjbi5mdWppdHN1LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzE0ODc2ODA0
-NzktMTUxMzItMS1naXQtc2VuZC1lbWFpbC1hcm1icnVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzE0
-ODc2ODA0NzktMTUxMzItMS1naXQtc2VuZC1lbWFpbC1hcm1icnVAcmVkaGF0LmNvbQogKiBbbmV3
-IHRhZ10gICAgICAgICBwYXRjaGV3LzE0ODc2ODIzMzItMjkxNTQtMS1naXQtc2VuZC1lbWFpbC1r
-cmF4ZWxAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzE0ODc2ODIzMzItMjkxNTQtMS1naXQtc2VuZC1l
-bWFpbC1rcmF4ZWxAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjhi
-ZmVmNDIgaHcvaTM4NjogRGVwcmVjYXRlIC1kcml2ZSBpZj1zY3NpIHdpdGggUEMgbWFjaGluZSB0
-eXBlcwo3NjM4ZDNmIGh3OiBEZXByZWNhdGUgLWRyaXZlIGlmPXNjc2kgd2l0aCBub24tb25ib2Fy
-ZCBIQkFzCmRjMTcxNDkgaHcvc2NzaTogQ29uY2VudHJhdGUgLWRyaXZlIGlmPXNjc2kgYXV0by1j
-cmVhdGUgaW4gb25lIHBsYWNlCjYxOTYwMDYgaHc6IERyb3Agc3VwZXJmbHVvdXMgc3BlY2lhbCBj
-aGVja3MgZm9yIG9ycGhhbmVkIC1kcml2ZQozZDg3Zjg2IGJsb2NrZGV2OiBNYWtlIG9ycGhhbmVk
-IC1kcml2ZSBmYXRhbAphNzQ3MmNhIGJsb2NrZGV2OiBJbXByb3ZlIG1lc3NhZ2UgZm9yIG9ycGhh
-bmVkIC1kcml2ZQo3ODFlMzA4IGh3L2FybS9oaWdoYmFuazogRGVmYXVsdCAtZHJpdmUgdG8gaWY9
-aWRlIGluc3RlYWQgb2YgaWY9c2NzaQowNGI3MjViIGh3OiBEZWZhdWx0IC1kcml2ZSB0byBpZj1u
-b25lIGluc3RlYWQgb2Ygc2NzaSB3aGVuIHNjc2kgY2Fubm90IHdvcmsKY2VjZDdhMiBodzogRGVm
-YXVsdCAtZHJpdmUgdG8gaWY9bm9uZSBpbnN0ZWFkIG9mIGlkZSB3aGVuIGlkZSBjYW5ub3Qgd29y
-awowMjdjNTk3IGh3L2FybS9jdWJpZWJvYXJkIGh3L2FybS94bG54LWVwMTA4OiBGaXggdW5pdHNf
-cGVyX2RlZmF1bHRfYnVzCmNjZmVjOWUgaHc6IERlZmF1bHQgLWRyaXZlIHRvIGlmPWlkZSBleHBs
-aWNpdGx5IHdoZXJlIGl0IHdvcmtzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRD
-SCAxLzExOiBodzogRGVmYXVsdCAtZHJpdmUgdG8gaWY9aWRlIGV4cGxpY2l0bHkgd2hlcmUgaXQg
-d29ya3MuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xMTogaHcvYXJtL2N1YmllYm9hcmQgaHcvYXJtL3hs
-bngtZXAxMDg6IEZpeCB1bml0c19wZXJfZGVmYXVsdF9idXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8x
-MTogaHc6IERlZmF1bHQgLWRyaXZlIHRvIGlmPW5vbmUgaW5zdGVhZCBvZiBpZGUgd2hlbiBpZGUg
-Y2Fubm90IHdvcmsuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8xMTogaHc6IERlZmF1bHQgLWRyaXZlIHRv
-IGlmPW5vbmUgaW5zdGVhZCBvZiBzY3NpIHdoZW4gc2NzaSBjYW5ub3Qgd29yay4uLgpDaGVja2lu
-ZyBQQVRDSCA1LzExOiBody9hcm0vaGlnaGJhbms6IERlZmF1bHQgLWRyaXZlIHRvIGlmPWlkZSBp
-bnN0ZWFkIG9mIGlmPXNjc2kuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8xMTogYmxvY2tkZXY6IEltcHJv
-dmUgbWVzc2FnZSBmb3Igb3JwaGFuZWQgLWRyaXZlLi4uCkNoZWNraW5nIFBBVENIIDcvMTE6IGJs
-b2NrZGV2OiBNYWtlIG9ycGhhbmVkIC1kcml2ZSBmYXRhbC4uLgpDaGVja2luZyBQQVRDSCA4LzEx
-OiBodzogRHJvcCBzdXBlcmZsdW91cyBzcGVjaWFsIGNoZWNrcyBmb3Igb3JwaGFuZWQgLWRyaXZl
-Li4uCkNoZWNraW5nIFBBVENIIDkvMTE6IGh3L3Njc2k6IENvbmNlbnRyYXRlIC1kcml2ZSBpZj1z
-Y3NpIGF1dG8tY3JlYXRlIGluIG9uZSBwbGFjZS4uLgpDaGVja2luZyBQQVRDSCAxMC8xMTogaHc6
-IERlcHJlY2F0ZSAtZHJpdmUgaWY9c2NzaSB3aXRoIG5vbi1vbmJvYXJkIEhCQXMuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMTEvMTE6IGh3L2kzODY6IERlcHJlY2F0ZSAtZHJpdmUgaWY9c2NzaSB3aXRoIFBD
-IG1hY2hpbmUgdHlwZXMuLi4KRVJST1I6IEludmFsaWQgVVRGLTgsIHBhdGNoIGFuZCBjb21taXQg
-bWVzc2FnZSBzaG91bGQgYmUgZW5jb2RlZCBpbiBVVEYtOAojNzI6IEZJTEU6IHRlc3RzL3FlbXUt
-aW90ZXN0cy8wNTEucGMub3V0OjEyMjoKK3EbW0sbW0RxdRtbSxtbRBtbRHF1aRtbSxtbRBtbRBtb
-RHF1aXQbW0sKICBeCgpFUlJPUjogSW52YWxpZCBVVEYtOCwgcGF0Y2ggYW5kIGNvbW1pdCBtZXNz
-YWdlIHNob3VsZCBiZSBlbmNvZGVkIGluIFVURi04CiM5MjogRklMRTogdGVzdHMvcWVtdS1pb3Rl
-c3RzLzA1MS5wYy5vdXQ6MTc4OgorcRtbSxtbRHF1G1tLG1tEG1tEcXVpG1tLG1tEG1tEG1tEcXVp
-dBtbSwogIF4KCkVSUk9SOiBJbnZhbGlkIFVURi04LCBwYXRjaCBhbmQgY29tbWl0IG1lc3NhZ2Ug
-c2hvdWxkIGJlIGVuY29kZWQgaW4gVVRGLTgKIzEwMjogRklMRTogdGVzdHMvcWVtdS1pb3Rlc3Rz
-LzA1MS5wYy5vdXQ6MTg4OgorcRtbSxtbRHF1G1tLG1tEG1tEcXVpG1tLG1tEG1tEG1tEcXVpdBtb
-SwogIF4KCnRvdGFsOiAzIGVycm9ycywgMCB3YXJuaW5ncywgNjMgbGluZXMgY2hlY2tlZAoKWW91
-ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpU
-ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
-b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
-eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com> wrote:
+> On 02/21/2017 06:02 AM, Markus Armbruster wrote:
+>> Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com> writes:
+>>
+>>> The previous error message was displaying the values in miliseconds,
+>>> being misleading with the command that accepts the value in seconds:
+>>>
+>>> { "execute": "migrate_set_downtime", "arguments": {"value": 3000}}
+>>> {"error": {"class": "GenericError", "desc": "Parameter 'downtime_limit'
+>>> expects an integer in the range of 0 to 2000000 milliseconds"}}
+>>>
+>>> This patch changes it to '2000 seconds' to keep consistency with
+>>> the expected parameter. The macro 'QERR_INVALID_PARAMETER_VALUE'
+>>> was changed for a regular string that allows the use of the
+>>> MAX_MIGRATE_SET_DOWNTIME as a parameter, instead of hardcoding
+>>> the value in the error message.
+>>>
+>>> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+>>> ---
+>>>   migration/migration.c | 12 ++++++++----
+>>>   1 file changed, 8 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/migration/migration.c b/migration/migration.c
+>>> index c6ae69d..c05e764 100644
+>>> --- a/migration/migration.c
+>>> +++ b/migration/migration.c
+>>> @@ -49,6 +49,9 @@
+>>>    * for sending the last part */
+>>>   #define DEFAULT_MIGRATE_SET_DOWNTIME 300
+>>>   +/* Maximum migrate downtime set to 2000*1000 miliseconds */
+>>> +#define MAX_MIGRATE_SET_DOWNTIME (2000 * 1000)
+>>> +
+>>>   /* Default compression thread count */
+>>>   #define DEFAULT_MIGRATE_COMPRESS_THREAD_COUNT 8
+>>>   /* Default decompression thread count, usually decompression is at
+>>> @@ -843,10 +846,11 @@ void qmp_migrate_set_parameters(MigrationParameters *params, Error **errp)
+>>>           return;
+>>>       }
+>>>       if (params->has_downtime_limit &&
+>>> -        (params->downtime_limit < 0 || params->downtime_limit > 2000000)) {
+>>> -        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+>>> -                   "downtime_limit",
+>>> -                   "an integer in the range of 0 to 2000000 milliseconds");
+>>> +        (params->downtime_limit < 0 ||
+>>> +         params->downtime_limit > MAX_MIGRATE_SET_DOWNTIME)) {
+>>> +        error_setg(errp, "Parameter 'downtime_limit' expects an integer in "
+>>> +                         "the range of 0 to %d seconds",
+>>> +                         MAX_MIGRATE_SET_DOWNTIME / 1000);
+>>>           return;
+>>>       }
+>>>       if (params->has_x_checkpoint_delay && (params->x_checkpoint_delay < 0)) {
+>> Isn't this wrong for QMP migrate-set-parameters?  There, the unit is
+>> milliseconds, i.e. the new error message is as wrong as the old one is
+>> for migrate_set_downtime.
+>
+> Actually the unit for migrate-set-parameters, as seen by the caller,
+> is seconds. The underlying logic receives the input and multiplies it
+> by 1000 in qmp_migrate_set_downtime().
+>>
+>> I'm afraid you need to fix the error message in
+>> qmp_migrate_set_downtime().  If you assume qmp_migrate_set_parameters()
+>> fails only in one way, replace its error object by one with a better
+>> message[*].  If you'd rather not assume, you need to refactor things so
+>> that each place can set the downtime and create an appropriate error on
+>> failure.
+>
+> There is at least one similar usage of this error message just
+> above this code in max_bandwidth param. Perhaps a new
+> function/macro to deal with these cases is justified.
+>
+>>
+>> We might want to check other command wrappers that translate units.
+>>
+>> Time units are a hopeless mess in QMP.  We should've enforced uniform
+>> usage of either seconds or nanoseconds.  The latter to placate
+>> irrational fear of floating-point[**].
+>
+> I agree that my patch doesn't make it much better. I just set the
+> error message to be in seconds to be consistent with the user input,
+> but the code now feels 'awkward' when you do a verification
+> in milliseconds and deliver the error message in seconds.
+>
+> One thing that can be done is to make migrate-set-downtime to
+> accept milliseconds instead of seconds. I wasn't willing at first to
+> change the migrate-set-downtime API because of an error
+> message, however it really feels like the right thing to do here.
+> Specially when you consider that the default value of this parameter,
+> set by DEFAULT_MIGRATE_SET_DOWNTIME, is 300 - a value that
+> in theory the user shouldn't be able to set in the API.
+
+libvirt and users use the API, I don't see how to change it in an easy
+way :-(
+
+I think that the better way we can do is change the error message and be
+done with it.
+
+Later, Juan.
