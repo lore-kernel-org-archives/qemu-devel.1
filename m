@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48410)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cg9eZ-0007ec-97
+	(envelope-from <armbru@redhat.com>) id 1cg9eZ-0007ea-8p
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:34:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cg9eV-00083H-W1
+	(envelope-from <armbru@redhat.com>) id 1cg9eW-00083f-9G
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:34:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53448)
+Received: from mx1.redhat.com ([209.132.183.28]:33314)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cg9eV-00082s-Qv
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:34:43 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cg9eW-000833-0s
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:34:44 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0BE373D95D
+	by mx1.redhat.com (Postfix) with ESMTPS id 37E014E33C
 	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 12:34:44 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
-	by int-mx10.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v1LCYgTv029938
+	by int-mx14.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v1LCYgnm026913
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
 	verify=NO)
 	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 07:34:43 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 21 Feb 2017 13:34:35 +0100
-Message-Id: <1487680479-15132-8-git-send-email-armbru@redhat.com>
+Date: Tue, 21 Feb 2017 13:34:38 +0100
+Message-Id: <1487680479-15132-11-git-send-email-armbru@redhat.com>
 In-Reply-To: <1487680479-15132-1-git-send-email-armbru@redhat.com>
 References: <1487680479-15132-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 07/11] blockdev: Make orphaned -drive fatal
+Subject: [Qemu-devel] [PULL 10/11] hw: Deprecate -drive if=scsi with
+ non-onboard HBAs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,75 +43,179 @@ Block backends defined with "-drive if=T" with T other than "none" are
 meant to be picked up by machine initialization code: a suitable
 frontend gets created and wired up automatically.
 
-If machine initialization code doesn't comply, the block backend
-remains unused.  This triggers a warning since commit a66c9dc, v2.2.0.
-Drives created by default are exempted; use -nodefaults to get rid of
-them.
+Drives defined with if=scsi are also picked up by SCSI HBAs added with
+-device, unlike other interface types.  Deprecate this usage, as follows.
 
-Turn this warning into an error.
+Create the frontends for onboard HBAs in machine initialization code,
+exactly like we do for if=ide and other interface types.  Change
+scsi_legacy_handle_cmdline() to create a frontend only when it's still
+missing, and warn that this usage is deprecated.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1487153147-11530-8-git-send-email-armbru@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
+Message-Id: <1487161136-9018-3-git-send-email-armbru@redhat.com>
 ---
- blockdev.c                | 14 +++++++-------
- include/sysemu/blockdev.h |  2 +-
- 2 files changed, 8 insertions(+), 8 deletions(-)
+ hw/arm/realview.c      |  2 +-
+ hw/arm/versatilepb.c   |  2 +-
+ hw/i386/pc.c           |  2 +-
+ hw/scsi/lsi53c895a.c   |  7 +++++++
+ hw/scsi/scsi-bus.c     | 15 +++++++++++++--
+ hw/scsi/spapr_vscsi.c  |  2 ++
+ include/hw/pci/pci.h   |  2 ++
+ include/hw/scsi/scsi.h |  2 +-
+ vl.c                   |  8 +++++++-
+ 9 files changed, 35 insertions(+), 7 deletions(-)
 
-diff --git a/blockdev.c b/blockdev.c
-index eb75f35..bbf9d4d 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -227,30 +227,30 @@ DriveInfo *drive_get(BlockInterfaceType type, int bus, int unit)
-     return NULL;
- }
- 
--bool drive_check_orphaned(void)
-+void drive_check_orphaned(void)
- {
-     BlockBackend *blk;
-     DriveInfo *dinfo;
-     Location loc;
--    bool rs = false;
-+    bool orphans = false;
- 
-     for (blk = blk_next(NULL); blk; blk = blk_next(blk)) {
-         dinfo = blk_legacy_dinfo(blk);
--        /* If dinfo->bdrv->dev is NULL, it has no device attached. */
--        /* Unless this is a default drive, this may be an oversight. */
-         if (!blk_get_attached_dev(blk) && !dinfo->is_default &&
-             dinfo->type != IF_NONE) {
-             loc_push_none(&loc);
-             qemu_opts_loc_restore(dinfo->opts);
--            error_report("warning: machine type does not support"
-+            error_report("machine type does not support"
-                          " if=%s,bus=%d,unit=%d",
-                          if_name[dinfo->type], dinfo->bus, dinfo->unit);
-             loc_pop(&loc);
--            rs = true;
-+            orphans = true;
+diff --git a/hw/arm/realview.c b/hw/arm/realview.c
+index 8c11c7a..b7d4753 100644
+--- a/hw/arm/realview.c
++++ b/hw/arm/realview.c
+@@ -259,7 +259,7 @@ static void realview_init(MachineState *machine,
+         }
+         n = drive_get_max_bus(IF_SCSI);
+         while (n >= 0) {
+-            pci_create_simple(pci_bus, -1, "lsi53c895a");
++            lsi53c895a_create(pci_bus);
+             n--;
          }
      }
+diff --git a/hw/arm/versatilepb.c b/hw/arm/versatilepb.c
+index 7b5cb36..b0e9f5b 100644
+--- a/hw/arm/versatilepb.c
++++ b/hw/arm/versatilepb.c
+@@ -290,7 +290,7 @@ static void versatile_init(MachineState *machine, int board_id)
+     }
+     n = drive_get_max_bus(IF_SCSI);
+     while (n >= 0) {
+-        pci_create_simple(pci_bus, -1, "lsi53c895a");
++        lsi53c895a_create(pci_bus);
+         n--;
+     }
  
--    return rs;
-+    if (orphans) {
-+        exit(1);
-+    }
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index a555c35..c2c75e2 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1652,7 +1652,7 @@ void pc_pci_device_init(PCIBus *pci_bus)
+ 
+     max_bus = drive_get_max_bus(IF_SCSI);
+     for (bus = 0; bus <= max_bus; bus++) {
+-        pci_create_simple(pci_bus, -1, "lsi53c895a");
++        lsi53c895a_create(pci_bus);
+     }
  }
  
- DriveInfo *drive_get_by_index(BlockInterfaceType type, int index)
-diff --git a/include/sysemu/blockdev.h b/include/sysemu/blockdev.h
-index 351a039..ac22f2a 100644
---- a/include/sysemu/blockdev.h
-+++ b/include/sysemu/blockdev.h
-@@ -48,7 +48,7 @@ BlockBackend *blk_by_legacy_dinfo(DriveInfo *dinfo);
- void override_max_devs(BlockInterfaceType type, int max_devs);
+diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
+index 292fa87..595c260 100644
+--- a/hw/scsi/lsi53c895a.c
++++ b/hw/scsi/lsi53c895a.c
+@@ -2268,3 +2268,10 @@ static void lsi53c895a_register_types(void)
+ }
  
- DriveInfo *drive_get(BlockInterfaceType type, int bus, int unit);
--bool drive_check_orphaned(void);
-+void drive_check_orphaned(void);
- DriveInfo *drive_get_by_index(BlockInterfaceType type, int index);
- int drive_get_max_bus(BlockInterfaceType type);
- int drive_get_max_devs(BlockInterfaceType type);
+ type_init(lsi53c895a_register_types)
++
++void lsi53c895a_create(PCIBus *bus)
++{
++    LSIState *s = LSI53C895A(pci_create_simple(bus, -1, "lsi53c895a"));
++
++    scsi_bus_legacy_handle_cmdline(&s->bus, false);
++}
+diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+index b9111ee..8cc80bf 100644
+--- a/hw/scsi/scsi-bus.c
++++ b/hw/scsi/scsi-bus.c
+@@ -261,7 +261,7 @@ SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, BlockBackend *blk,
+     return SCSI_DEVICE(dev);
+ }
+ 
+-void scsi_bus_legacy_handle_cmdline(SCSIBus *bus)
++void scsi_bus_legacy_handle_cmdline(SCSIBus *bus, bool deprecated)
+ {
+     Location loc;
+     DriveInfo *dinfo;
+@@ -274,6 +274,17 @@ void scsi_bus_legacy_handle_cmdline(SCSIBus *bus)
+             continue;
+         }
+         qemu_opts_loc_restore(dinfo->opts);
++        if (deprecated) {
++            /* Handling -drive not claimed by machine initialization */
++            if (blk_get_attached_dev(blk_by_legacy_dinfo(dinfo))) {
++                continue;       /* claimed */
++            }
++            if (!dinfo->is_default) {
++                error_report("warning: bus=%d,unit=%d is deprecated with this"
++                             " machine type",
++                             bus->busnr, unit);
++            }
++        }
+         scsi_bus_legacy_add_drive(bus, blk_by_legacy_dinfo(dinfo),
+                                   unit, false, -1, NULL, &error_fatal);
+     }
+@@ -304,7 +315,7 @@ static int scsi_legacy_handle_cmdline_cb(Object *obj, void *opaque)
+     SCSIBus *bus = (SCSIBus *)object_dynamic_cast(obj, TYPE_SCSI_BUS);
+ 
+     if (bus && is_scsi_hba_with_legacy_magic(OBJECT(bus->qbus.parent))) {
+-        scsi_bus_legacy_handle_cmdline(bus);
++        scsi_bus_legacy_handle_cmdline(bus, true);
+     }
+ 
+     return 0;
+diff --git a/hw/scsi/spapr_vscsi.c b/hw/scsi/spapr_vscsi.c
+index 7d44771..55ee48c 100644
+--- a/hw/scsi/spapr_vscsi.c
++++ b/hw/scsi/spapr_vscsi.c
+@@ -1215,6 +1215,8 @@ void spapr_vscsi_create(VIOsPAPRBus *bus)
+     dev = qdev_create(&bus->bus, "spapr-vscsi");
+ 
+     qdev_init_nofail(dev);
++    scsi_bus_legacy_handle_cmdline(&VIO_SPAPR_VSCSI_DEVICE(dev)->bus,
++                                   false);
+ }
+ 
+ static int spapr_vscsi_devnode(VIOsPAPRDevice *dev, void *fdt, int node_off)
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index 05ef14b..6983f13 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -688,6 +688,8 @@ PCIDevice *pci_create_simple_multifunction(PCIBus *bus, int devfn,
+ PCIDevice *pci_create(PCIBus *bus, int devfn, const char *name);
+ PCIDevice *pci_create_simple(PCIBus *bus, int devfn, const char *name);
+ 
++void lsi53c895a_create(PCIBus *bus);
++
+ qemu_irq pci_allocate_irq(PCIDevice *pci_dev);
+ void pci_set_irq(PCIDevice *pci_dev, int level);
+ 
+diff --git a/include/hw/scsi/scsi.h b/include/hw/scsi/scsi.h
+index eeef949..6b85786 100644
+--- a/include/hw/scsi/scsi.h
++++ b/include/hw/scsi/scsi.h
+@@ -177,7 +177,7 @@ static inline SCSIBus *scsi_bus_from_device(SCSIDevice *d)
+ SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, BlockBackend *blk,
+                                       int unit, bool removable, int bootindex,
+                                       const char *serial, Error **errp);
+-void scsi_bus_legacy_handle_cmdline(SCSIBus *bus);
++void scsi_bus_legacy_handle_cmdline(SCSIBus *bus, bool deprecated);
+ void scsi_legacy_handle_cmdline(void);
+ 
+ /*
+diff --git a/vl.c b/vl.c
+index ab40889..b5d0a19 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4510,7 +4510,13 @@ int main(int argc, char **argv, char **envp)
+ 
+     rom_reset_order_override();
+ 
+-    /* Create frontends for -drive if=scsi */
++    /*
++     * Create frontends for -drive if=scsi leftovers.
++     * Normally, frontends for -drive get created by machine
++     * initialization for onboard SCSI HBAs.  However, we create a few
++     * more ever since SCSI qdevification, but this is pretty much an
++     * implementation accident, and deprecated.
++     */
+     scsi_legacy_handle_cmdline();
+ 
+     /* Did we create any drives that we failed to create a device for? */
 -- 
 2.7.4
