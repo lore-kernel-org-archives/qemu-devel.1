@@ -1,29 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53885)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cgIiK-0002qk-Fq
+	(envelope-from <kraxel@redhat.com>) id 1cgIiK-0002qf-Ci
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 17:15:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cgIiI-0004T8-QE
+	(envelope-from <kraxel@redhat.com>) id 1cgIiH-0004SH-J7
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 17:15:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41664)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cgIiI-0004Sb-Kw
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 17:15:14 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C421E80461
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 22:15:14 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 21 Feb 2017 23:14:58 +0100
-Message-Id: <1487715299-21102-9-git-send-email-kraxel@redhat.com>
+Date: Tue, 21 Feb 2017 23:14:53 +0100
+Message-Id: <1487715299-21102-4-git-send-email-kraxel@redhat.com>
 In-Reply-To: <1487715299-21102-1-git-send-email-kraxel@redhat.com>
 References: <1487715299-21102-1-git-send-email-kraxel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 8/9] update -g command line switch documentation
+Subject: [Qemu-devel] [PATCH 3/9] ppc: use ppc_graphic_* defines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,39 +20,103 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, "open list:New World" <qemu-ppc@nongnu.org>
 
-Bring documentation in line with the recent changes.
-Text suggested by L=C3=A1szl=C3=B3 =C3=89rsek.
+This switches over ppc to use the new ppc_graphic_* defines.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- qemu-options.hx | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ hw/ppc/mac_newworld.c |  6 +++---
+ hw/ppc/mac_oldworld.c |  6 +++---
+ hw/ppc/prep.c         | 10 +++++-----
+ hw/ppc/spapr.c        |  6 +++---
+ 4 files changed, 14 insertions(+), 14 deletions(-)
 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 4e89610..ae62e0d 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -1241,7 +1241,18 @@ DEF("g", 1, QEMU_OPTION_g ,
- STEXI
- @item -g @var{width}x@var{height}[x@var{depth}]
- @findex -g
--Set the initial graphical resolution and depth (PPC, SPARC only).
-+Set the initial graphical resolution and depth.
-+
-+This setting may be masked by guest firmware temporarily.
-+
-+On PPC and SPARC, the guest firmware will configure the display from
-+this setting, and the guest OS will inherit the display resolution
-+and depth.
-+
-+On x86 and ARM, if the guest firmware is an edk2 (UEFI) platform,
-+the firmware may initially configure the display according to its own,
-+persistent, independent settings. The guest OS drivers, once loaded,
-+should adhere to "-g" however, for virtio and qxl adapters.
- ETEXI
-=20
- DEF("vnc", HAS_ARG, QEMU_OPTION_vnc ,
---=20
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index 2bfdb64..4722277 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -482,9 +482,9 @@ static void ppc_core99_init(MachineState *machine)
+     fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_SIZE, initrd_size);
+     fw_cfg_add_i16(fw_cfg, FW_CFG_BOOT_DEVICE, ppc_boot_device);
+ 
+-    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_WIDTH, graphic_width);
+-    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_HEIGHT, graphic_height);
+-    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_DEPTH, graphic_depth);
++    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_WIDTH, ppc_graphic_width);
++    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_HEIGHT, ppc_graphic_height);
++    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_DEPTH, ppc_graphic_depth);
+ 
+     fw_cfg_add_i32(fw_cfg, FW_CFG_PPC_IS_KVM, kvm_enabled());
+     if (kvm_enabled()) {
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index 56282c5..a79f011 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -335,9 +335,9 @@ static void ppc_heathrow_init(MachineState *machine)
+     fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_SIZE, initrd_size);
+     fw_cfg_add_i16(fw_cfg, FW_CFG_BOOT_DEVICE, ppc_boot_device);
+ 
+-    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_WIDTH, graphic_width);
+-    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_HEIGHT, graphic_height);
+-    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_DEPTH, graphic_depth);
++    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_WIDTH, ppc_graphic_width);
++    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_HEIGHT, ppc_graphic_height);
++    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_DEPTH, ppc_graphic_depth);
+ 
+     fw_cfg_add_i32(fw_cfg, FW_CFG_PPC_IS_KVM, kvm_enabled());
+     if (kvm_enabled()) {
+diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+index ca7959c..82bf6b5 100644
+--- a/hw/ppc/prep.c
++++ b/hw/ppc/prep.c
+@@ -677,7 +677,7 @@ static void ppc_prep_init(MachineState *machine)
+                          initrd_base, initrd_size,
+                          /* XXX: need an option to load a NVRAM image */
+                          0,
+-                         graphic_width, graphic_height, graphic_depth);
++                         ppc_graphic_width, ppc_graphic_height, ppc_graphic_depth);
+ }
+ 
+ static void prep_machine_init(MachineClass *mc)
+@@ -861,9 +861,9 @@ static void ibm_40p_init(MachineState *machine)
+     fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)machine->ram_size);
+     fw_cfg_add_i16(fw_cfg, FW_CFG_MACHINE_ID, ARCH_PREP);
+ 
+-    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_WIDTH, graphic_width);
+-    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_HEIGHT, graphic_height);
+-    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_DEPTH, graphic_depth);
++    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_WIDTH, ppc_graphic_width);
++    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_HEIGHT, ppc_graphic_height);
++    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_DEPTH, ppc_graphic_depth);
+ 
+     fw_cfg_add_i32(fw_cfg, FW_CFG_PPC_IS_KVM, kvm_enabled());
+     if (kvm_enabled()) {
+@@ -891,7 +891,7 @@ static void ibm_40p_init(MachineState *machine)
+                              initrd_base, initrd_size,
+                              /* XXX: need an option to load a NVRAM image */
+                              0,
+-                             graphic_width, graphic_height, graphic_depth);
++                             ppc_graphic_width, ppc_graphic_height, ppc_graphic_depth);
+     }
+ }
+ 
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index e465d7a..ba8f81e 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -824,9 +824,9 @@ static void spapr_dt_chosen(sPAPRMachineState *spapr, void *fdt)
+     if (boot_menu) {
+         _FDT((fdt_setprop_cell(fdt, chosen, "qemu,boot-menu", boot_menu)));
+     }
+-    _FDT(fdt_setprop_cell(fdt, chosen, "qemu,graphic-width", graphic_width));
+-    _FDT(fdt_setprop_cell(fdt, chosen, "qemu,graphic-height", graphic_height));
+-    _FDT(fdt_setprop_cell(fdt, chosen, "qemu,graphic-depth", graphic_depth));
++    _FDT(fdt_setprop_cell(fdt, chosen, "qemu,graphic-width", ppc_graphic_width));
++    _FDT(fdt_setprop_cell(fdt, chosen, "qemu,graphic-height", ppc_graphic_height));
++    _FDT(fdt_setprop_cell(fdt, chosen, "qemu,graphic-depth", ppc_graphic_depth));
+ 
+     if (cb && bootlist) {
+         int i;
+-- 
 1.8.3.1
