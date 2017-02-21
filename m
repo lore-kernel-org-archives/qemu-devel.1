@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55071)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cgIiK-0002ql-JM
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 17:15:18 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cgIni-0008EY-5c
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 17:20:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cgIiJ-0004TR-6Q
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 17:15:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33124)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cgIiI-0004Sh-Uc
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 17:15:15 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2F71F61D03
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 22:15:15 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 21 Feb 2017 23:14:59 +0100
-Message-Id: <1487715299-21102-10-git-send-email-kraxel@redhat.com>
-In-Reply-To: <1487715299-21102-1-git-send-email-kraxel@redhat.com>
-References: <1487715299-21102-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 9/9] [RfC] stdvga: use graphic_* variables.
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cgInh-0006OT-71
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 17:20:50 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1487684021-22713-1-git-send-email-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <971a7987-b369-d879-f2bb-80ab5de41a0a@amsat.org>
+Date: Tue, 21 Feb 2017 19:20:37 -0300
+MIME-Version: 1.0
+In-Reply-To: <1487684021-22713-1-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] hw/ppc/ppc405_uc.c: Avoid integer overflows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,207 +26,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, patches@linaro.org
 
-Add two new registers to the qemu extended register range, carrying the
-suggested width and height of the display device.  In case the graphic_*
-variables are set (via -g switch), fill these new registers accordingly.
+On 02/21/2017 10:33 AM, Peter Maydell wrote:
+> When performing clock calculations, the ppc405_uc code
+> has several places where it multiplies together two
+> 32-bit variables and assigns the result to a 64-bit
+> variable. This doesn't quite do what is intended because
+> C will compute a 32-bit multiply result. Add casts to
+> ensure we don't truncate the result.
+>
+> (Spotted by Coverity, CID 1005504, 1005505.)
 
-Additionally guest driver updates are needed to support the new
-registers.  These changes will probably land in linux kernel 4.12.
+well hidden...
 
-TODO: add compat properties to turn off qemu-display-size for machine
-      types older than 2.9-or-10
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/display/vga-pci.c    | 52 ++++++++++++++++++++++++++++++++++---------------
- hw/display/vga_int.h    |  4 ++--
- hw/display/virtio-vga.c |  3 ++-
- 3 files changed, 40 insertions(+), 19 deletions(-)
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-diff --git a/hw/display/vga-pci.c b/hw/display/vga-pci.c
-index ac9a764..78e00df 100644
---- a/hw/display/vga-pci.c
-+++ b/hw/display/vga-pci.c
-@@ -31,23 +31,28 @@
- #include "ui/pixel_ops.h"
- #include "qemu/timer.h"
- #include "hw/loader.h"
-+#include "sysemu/sysemu.h"
- 
- #define PCI_VGA_IOPORT_OFFSET 0x400
- #define PCI_VGA_IOPORT_SIZE   (0x3e0 - 0x3c0)
- #define PCI_VGA_BOCHS_OFFSET  0x500
- #define PCI_VGA_BOCHS_SIZE    (0x0b * 2)
- #define PCI_VGA_QEXT_OFFSET   0x600
--#define PCI_VGA_QEXT_SIZE     (2 * 4)
-+#define PCI_VGA_QEXT_SIZE_V1  (2 * 4)
-+#define PCI_VGA_QEXT_SIZE_V2  (4 * 4)
- #define PCI_VGA_MMIO_SIZE     0x1000
- 
- #define PCI_VGA_QEXT_REG_SIZE         (0 * 4)
- #define PCI_VGA_QEXT_REG_BYTEORDER    (1 * 4)
- #define  PCI_VGA_QEXT_LITTLE_ENDIAN   0x1e1e1e1e
- #define  PCI_VGA_QEXT_BIG_ENDIAN      0xbebebebe
-+#define PCI_VGA_QEXT_REG_WIDTH        (2 * 4)
-+#define PCI_VGA_QEXT_REG_HEIGHT       (3 * 4)
- 
- enum vga_pci_flags {
--    PCI_VGA_FLAG_ENABLE_MMIO = 1,
--    PCI_VGA_FLAG_ENABLE_QEXT = 2,
-+    PCI_VGA_FLAG_ENABLE_MMIO    = 1,
-+    PCI_VGA_FLAG_ENABLE_QEXT    = 2,
-+    PCI_VGA_FLAG_ENABLE_QEXT_V2 = 3,
- };
- 
- typedef struct PCIVGAState {
-@@ -157,10 +162,14 @@ static uint64_t pci_vga_qext_read(void *ptr, hwaddr addr, unsigned size)
- 
-     switch (addr) {
-     case PCI_VGA_QEXT_REG_SIZE:
--        return PCI_VGA_QEXT_SIZE;
-+        return s->qext_size;
-     case PCI_VGA_QEXT_REG_BYTEORDER:
-         return s->big_endian_fb ?
-             PCI_VGA_QEXT_BIG_ENDIAN : PCI_VGA_QEXT_LITTLE_ENDIAN;
-+    case PCI_VGA_QEXT_REG_WIDTH:
-+        return graphic_width;
-+    case PCI_VGA_QEXT_REG_HEIGHT:
-+        return graphic_height;
-     default:
-         return 0;
-     }
-@@ -207,8 +216,7 @@ static const MemoryRegionOps pci_vga_qext_ops = {
- 
- void pci_std_vga_mmio_region_init(VGACommonState *s,
-                                   MemoryRegion *parent,
--                                  MemoryRegion *subs,
--                                  bool qext)
-+                                  MemoryRegion *subs)
- {
-     memory_region_init_io(&subs[0], NULL, &pci_vga_ioport_ops, s,
-                           "vga ioports remapped", PCI_VGA_IOPORT_SIZE);
-@@ -220,9 +228,9 @@ void pci_std_vga_mmio_region_init(VGACommonState *s,
-     memory_region_add_subregion(parent, PCI_VGA_BOCHS_OFFSET,
-                                 &subs[1]);
- 
--    if (qext) {
-+    if (s->qext_size) {
-         memory_region_init_io(&subs[2], NULL, &pci_vga_qext_ops, s,
--                              "qemu extended regs", PCI_VGA_QEXT_SIZE);
-+                              "qemu extended regs", s->qext_size);
-         memory_region_add_subregion(parent, PCI_VGA_QEXT_OFFSET,
-                                     &subs[2]);
-     }
-@@ -232,7 +240,6 @@ static void pci_std_vga_realize(PCIDevice *dev, Error **errp)
- {
-     PCIVGAState *d = PCI_VGA(dev);
-     VGACommonState *s = &d->vga;
--    bool qext = false;
- 
-     /* vga + console init */
-     vga_common_init(s, OBJECT(dev), true);
-@@ -249,10 +256,15 @@ static void pci_std_vga_realize(PCIDevice *dev, Error **errp)
-         memory_region_init(&d->mmio, NULL, "vga.mmio", 4096);
- 
-         if (d->flags & (1 << PCI_VGA_FLAG_ENABLE_QEXT)) {
--            qext = true;
--            pci_set_byte(&d->dev.config[PCI_REVISION_ID], 2);
-+            if (d->flags & (1 << PCI_VGA_FLAG_ENABLE_QEXT_V2)) {
-+                s->qext_size = PCI_VGA_QEXT_SIZE_V2;
-+                pci_set_byte(&d->dev.config[PCI_REVISION_ID], 3);
-+            } else {
-+                s->qext_size = PCI_VGA_QEXT_SIZE_V1;
-+                pci_set_byte(&d->dev.config[PCI_REVISION_ID], 2);
-+            }
-         }
--        pci_std_vga_mmio_region_init(s, &d->mmio, d->mrs, qext);
-+        pci_std_vga_mmio_region_init(s, &d->mmio, d->mrs);
- 
-         pci_register_bar(&d->dev, 2, PCI_BASE_ADDRESS_SPACE_MEMORY, &d->mmio);
-     }
-@@ -274,7 +286,6 @@ static void pci_secondary_vga_realize(PCIDevice *dev, Error **errp)
- {
-     PCIVGAState *d = PCI_VGA(dev);
-     VGACommonState *s = &d->vga;
--    bool qext = false;
- 
-     /* vga + console init */
-     vga_common_init(s, OBJECT(dev), false);
-@@ -284,10 +295,15 @@ static void pci_secondary_vga_realize(PCIDevice *dev, Error **errp)
-     memory_region_init(&d->mmio, OBJECT(dev), "vga.mmio", 4096);
- 
-     if (d->flags & (1 << PCI_VGA_FLAG_ENABLE_QEXT)) {
--        qext = true;
--        pci_set_byte(&d->dev.config[PCI_REVISION_ID], 2);
-+        if (d->flags & (1 << PCI_VGA_FLAG_ENABLE_QEXT_V2)) {
-+            s->qext_size = PCI_VGA_QEXT_SIZE_V2;
-+            pci_set_byte(&d->dev.config[PCI_REVISION_ID], 3);
-+        } else {
-+            s->qext_size = PCI_VGA_QEXT_SIZE_V1;
-+            pci_set_byte(&d->dev.config[PCI_REVISION_ID], 2);
-+        }
-     }
--    pci_std_vga_mmio_region_init(s, &d->mmio, d->mrs, qext);
-+    pci_std_vga_mmio_region_init(s, &d->mmio, d->mrs);
- 
-     pci_register_bar(&d->dev, 0, PCI_BASE_ADDRESS_MEM_PREFETCH, &s->vram);
-     pci_register_bar(&d->dev, 2, PCI_BASE_ADDRESS_SPACE_MEMORY, &d->mmio);
-@@ -311,6 +327,8 @@ static Property vga_pci_properties[] = {
-     DEFINE_PROP_BIT("mmio", PCIVGAState, flags, PCI_VGA_FLAG_ENABLE_MMIO, true),
-     DEFINE_PROP_BIT("qemu-extended-regs",
-                     PCIVGAState, flags, PCI_VGA_FLAG_ENABLE_QEXT, true),
-+    DEFINE_PROP_BIT("qemu-display-size",
-+                    PCIVGAState, flags, PCI_VGA_FLAG_ENABLE_QEXT_V2, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-@@ -318,6 +336,8 @@ static Property secondary_pci_properties[] = {
-     DEFINE_PROP_UINT32("vgamem_mb", PCIVGAState, vga.vram_size_mb, 16),
-     DEFINE_PROP_BIT("qemu-extended-regs",
-                     PCIVGAState, flags, PCI_VGA_FLAG_ENABLE_QEXT, true),
-+    DEFINE_PROP_BIT("qemu-display-size",
-+                    PCIVGAState, flags, PCI_VGA_FLAG_ENABLE_QEXT_V2, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/hw/display/vga_int.h b/hw/display/vga_int.h
-index dd6c958..51217cf 100644
---- a/hw/display/vga_int.h
-+++ b/hw/display/vga_int.h
-@@ -162,6 +162,7 @@ typedef struct VGACommonState {
-     bool full_update_gfx;
-     bool big_endian_fb;
-     bool default_endian_fb;
-+    uint32_t qext_size;
-     /* hardware mouse cursor support */
-     uint32_t invalidated_y_table[VGA_MAX_HEIGHT / 32];
-     uint32_t hw_cursor_x;
-@@ -223,7 +224,6 @@ extern const MemoryRegionOps vga_mem_ops;
- /* vga-pci.c */
- void pci_std_vga_mmio_region_init(VGACommonState *s,
-                                   MemoryRegion *parent,
--                                  MemoryRegion *subs,
--                                  bool qext);
-+                                  MemoryRegion *subs);
- 
- #endif
-diff --git a/hw/display/virtio-vga.c b/hw/display/virtio-vga.c
-index f9b017d..8684dc0 100644
---- a/hw/display/virtio-vga.c
-+++ b/hw/display/virtio-vga.c
-@@ -153,8 +153,9 @@ static void virtio_vga_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-     }
- 
-     /* add stdvga mmio regions */
-+    vga->qext_size = 2 * 4; /* PCI_VGA_QEXT_SIZE_V1 */
-     pci_std_vga_mmio_region_init(vga, &vpci_dev->modern_bar,
--                                 vvga->vga_mrs, true);
-+                                 vvga->vga_mrs);
- 
-     vga->con = g->scanout[0].con;
-     graphic_console_set_hwops(vga->con, &virtio_vga_ops, vvga);
--- 
-1.8.3.1
+> ---
+>  hw/ppc/ppc405_uc.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/hw/ppc/ppc405_uc.c b/hw/ppc/ppc405_uc.c
+> index d6d3fc2..d5df94a 100644
+> --- a/hw/ppc/ppc405_uc.c
+> +++ b/hw/ppc/ppc405_uc.c
+> @@ -1881,7 +1881,7 @@ static void ppc405cr_clk_setup (ppc405cr_cpc_t *cpc)
+>          D1 = (((cpc->pllmr >> 20) - 1) & 0xF) + 1; /* FBDV */
+>          D2 = 8 - ((cpc->pllmr >> 16) & 0x7); /* FWDVA */
+>          M = D0 * D1 * D2;
+> -        VCO_out = cpc->sysclk * M;
+> +        VCO_out = (uint64_t)cpc->sysclk * M;
+>          if (VCO_out < 400000000 || VCO_out > 800000000) {
+>              /* PLL cannot lock */
+>              cpc->pllmr &= ~0x80000000;
+> @@ -1892,7 +1892,7 @@ static void ppc405cr_clk_setup (ppc405cr_cpc_t *cpc)
+>          /* Bypass PLL */
+>      bypass_pll:
+>          M = D0;
+> -        PLL_out = cpc->sysclk * M;
+> +        PLL_out = (uint64_t)cpc->sysclk * M;
+>      }
+>      CPU_clk = PLL_out;
+>      if (cpc->cr1 & 0x00800000)
+> @@ -2242,7 +2242,7 @@ static void ppc405ep_compute_clocks (ppc405ep_cpc_t *cpc)
+>  #ifdef DEBUG_CLOCKS_LL
+>          printf("FWDA %01" PRIx32 " %d\n", (cpc->pllmr[1] >> 16) & 0x7, D);
+>  #endif
+> -        VCO_out = cpc->sysclk * M * D;
+> +        VCO_out = (uint64_t)cpc->sysclk * M * D;
+>          if (VCO_out < 500000000UL || VCO_out > 1000000000UL) {
+>              /* Error - unlock the PLL */
+>              printf("VCO out of range %" PRIu64 "\n", VCO_out);
+>
