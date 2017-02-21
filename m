@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cg8gW-0003jL-SX
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:32:45 -0500
+	(envelope-from <berrange@redhat.com>) id 1cg8hs-0004M6-6i
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:34:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cg8gV-0006yK-P5
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:32:44 -0500
+	(envelope-from <berrange@redhat.com>) id 1cg8hp-0007EQ-4w
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:34:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59364)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cg8ho-0007EB-SZ
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:34:05 -0500
+Date: Tue, 21 Feb 2017 11:33:53 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170221113353.GC17041@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <CAAo6VWOAnGQeDwc_bJ4M=FQsu7rOhAv=1Qk6PdzG+0pcVnku=A@mail.gmail.com>
+	<20170217214215.GK19045@localhost.localdomain>
+	<F23F188C-DAF9-49EA-9C0E-54F57945267A@veritas.com>
+	<20170220110235.GD21255@stefanha-x1.localdomain>
+	<CAAo6VWNwHbsQRxU18dNCjWaNfNrZNAV9FfOKW8=JeZCND2vHnQ@mail.gmail.com>
+	<20170221105918.GA22731@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <f32893c7-5fa2-7075-4ca8-3d82b0f8eba7@amsat.org>
-References: <1487604965-23220-1-git-send-email-peter.maydell@linaro.org>
-	<1487604965-23220-11-git-send-email-peter.maydell@linaro.org>
-	<f32893c7-5fa2-7075-4ca8-3d82b0f8eba7@amsat.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 21 Feb 2017 03:32:09 -0800
-Message-ID: <CAKmqyKO_jKea0wm7KtgU=6_FbAKoWRFz_WC2omNpPLv8QHqobw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 10/11] stm32f205: Create armv7m
- object without using armv7m_init()
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170221105918.GA22731@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
+ block device type called "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,141 +33,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Michael Davidsaver <mdavidsaver@gmail.com>, Patch Tracking <patches@linaro.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: ashish mittal <ashmit602@gmail.com>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, Jeff Cody <jcody@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
 
-On Mon, Feb 20, 2017 at 9:45 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
-> On 02/20/2017 12:36 PM, Peter Maydell wrote:
->>
->> Switch the stm32f205 SoC to create the armv7m object directly
->> rather than via the armv7m_init() wrapper. This fits better
->> with the SoC model's very QOMified design.
->>
->> In particular this means we can push loading the guest image
->> out to the top level board code where it belongs, rather
->> than the SoC object having a QOM property for the filename
->> to load.
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->
->
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+On Tue, Feb 21, 2017 at 10:59:18AM +0000, Stefan Hajnoczi wrote:
+> On Mon, Feb 20, 2017 at 03:34:57AM -0800, ashish mittal wrote:
+> > On Mon, Feb 20, 2017 at 3:02 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> > > On Sat, Feb 18, 2017 at 12:30:31AM +0000, Ketan Nilangekar wrote:
+> > >> On 2/17/17, 1:42 PM, "Jeff Cody" <jcody@redhat.com> wrote:
+> > >>
+> > >>     On Thu, Feb 16, 2017 at 02:24:19PM -0800, ashish mittal wrote:
+> > >>     > Hi,
+> > >>     >
+> > >>     > I am getting the following error with checkpatch.pl
+> > >>     >
+> > >>     > ERROR: externs should be avoided in .c files
+> > >>     > #78: FILE: block/vxhs.c:28:
+> > >>     > +QemuUUID qemu_uuid __attribute__ ((weak));
+> > >>     >
+> > >>     > Is there any way to get around this, or does it mean that I would have
+> > >>     > to add a vxhs.h just for this one entry?
+> > >>     >
+> > >>
+> > >>     I remain skeptical on the use of the qemu_uuid as a way to select the TLS
+> > >>     cert.
+> > >>
+> > >> [ketan]
+> > >> Is there another identity that can be used for uniquely identifying instances?
+> > >> The requirement was to enforce vdisk access to owner instances.
+> > >
+> > > The qemu_uuid weak attribute looks suspect.  What is going to provide a
+> > > strong qemu_uuid symbol?
+> > >
+> > > Why aren't configuration parameters like the UUID coming from the QEMU
+> > > command-line?
+> > >
+> > > Stefan
+> > 
+> > UUID will in fact come from the QEMU command line. VxHS is not doing
+> > anything special here. It will just use the value already available to
+> > qemu-kvm process.
+> > 
+> > QemuUUID qemu_uuid;
+> > bool qemu_uuid_set;
+> > 
+> > Both the above are defined in vl.c. vl.c will provide the strong
+> > symbol when available. There are certain binaries that do not get
+> > linked with vl.c (e.g. qemu-img). The weak symbol will come into
+> > affect for such binaries, and in this case, the default VXHS UUID will
+> > get picked up. I had, in a previous email, explained how we plan to
+> > use the default UUID. In the regular case, the VxHS controller will
+> > not allow access to the default UUID (non qemu-kvm) binaries, but it
+> > may choose to grant temporary access to specific vdisks for these
+> > binaries depending on the workflow.
+> 
+> That idea sounds like a security problem.  During this time window
+> anyone could use the default UUID to access the data?
 
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Any use of the VM UUID as a means to control authorization on the
+server side is a security flaw, as this is a public value which
+cannot be trusted on its own.
 
-Thanks,
+There needs to be some kind of authentication step to verify the
+reported identity, eg a password associated with the VM UUID that
+is validated before trusting the VM UUID.
 
-Alistair
+Alternatively there needs to be a completely separate UUID, unrelated
+to the VM UUID, which is treated as a private value (eg uses the
+'-object secret' framework in QEMU)
 
->
->
->> ---
->>  include/hw/arm/stm32f205_soc.h |  4 +++-
->>  hw/arm/netduino2.c             |  7 ++++---
->>  hw/arm/stm32f205_soc.c         | 16 +++++++++++++---
->>  3 files changed, 20 insertions(+), 7 deletions(-)
->>
->> diff --git a/include/hw/arm/stm32f205_soc.h
->> b/include/hw/arm/stm32f205_soc.h
->> index 1332141..e2dce11 100644
->> --- a/include/hw/arm/stm32f205_soc.h
->> +++ b/include/hw/arm/stm32f205_soc.h
->> @@ -31,6 +31,7 @@
->>  #include "hw/adc/stm32f2xx_adc.h"
->>  #include "hw/or-irq.h"
->>  #include "hw/ssi/stm32f2xx_spi.h"
->> +#include "hw/arm/armv7m.h"
->>
->>  #define TYPE_STM32F205_SOC "stm32f205-soc"
->>  #define STM32F205_SOC(obj) \
->> @@ -51,9 +52,10 @@ typedef struct STM32F205State {
->>      SysBusDevice parent_obj;
->>      /*< public >*/
->>
->> -    char *kernel_filename;
->>      char *cpu_model;
->>
->> +    ARMv7MState armv7m;
->> +
->>      STM32F2XXSyscfgState syscfg;
->>      STM32F2XXUsartState usart[STM_NUM_USARTS];
->>      STM32F2XXTimerState timer[STM_NUM_TIMERS];
->> diff --git a/hw/arm/netduino2.c b/hw/arm/netduino2.c
->> index 23d7928..3cfe332 100644
->> --- a/hw/arm/netduino2.c
->> +++ b/hw/arm/netduino2.c
->> @@ -27,17 +27,18 @@
->>  #include "hw/boards.h"
->>  #include "qemu/error-report.h"
->>  #include "hw/arm/stm32f205_soc.h"
->> +#include "hw/arm/arm.h"
->>
->>  static void netduino2_init(MachineState *machine)
->>  {
->>      DeviceState *dev;
->>
->>      dev =3D qdev_create(NULL, TYPE_STM32F205_SOC);
->> -    if (machine->kernel_filename) {
->> -        qdev_prop_set_string(dev, "kernel-filename",
->> machine->kernel_filename);
->> -    }
->>      qdev_prop_set_string(dev, "cpu-model", "cortex-m3");
->>      object_property_set_bool(OBJECT(dev), true, "realized",
->> &error_fatal);
->> +
->> +    armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
->> +                       FLASH_SIZE);
->>  }
->>
->>  static void netduino2_machine_init(MachineClass *mc)
->> diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
->> index 38425bd..e6bd73a 100644
->> --- a/hw/arm/stm32f205_soc.c
->> +++ b/hw/arm/stm32f205_soc.c
->> @@ -49,6 +49,9 @@ static void stm32f205_soc_initfn(Object *obj)
->>      STM32F205State *s =3D STM32F205_SOC(obj);
->>      int i;
->>
->> +    object_initialize(&s->armv7m, sizeof(s->armv7m), TYPE_ARMV7M);
->> +    qdev_set_parent_bus(DEVICE(&s->armv7m), sysbus_get_default());
->> +
->>      object_initialize(&s->syscfg, sizeof(s->syscfg),
->> TYPE_STM32F2XX_SYSCFG);
->>      qdev_set_parent_bus(DEVICE(&s->syscfg), sysbus_get_default());
->>
->> @@ -110,8 +113,16 @@ static void stm32f205_soc_realize(DeviceState
->> *dev_soc, Error **errp)
->>      vmstate_register_ram_global(sram);
->>      memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, sram)=
-;
->>
->> -    nvic =3D armv7m_init(get_system_memory(), FLASH_SIZE, 96,
->> -                       s->kernel_filename, s->cpu_model);
->> +    nvic =3D DEVICE(&s->armv7m);
->> +    qdev_prop_set_uint32(nvic, "num-irq", 96);
->> +    qdev_prop_set_string(nvic, "cpu-model", s->cpu_model);
->> +    object_property_set_link(OBJECT(&s->armv7m),
->> OBJECT(get_system_memory()),
->> +                                     "memory", &error_abort);
->> +    object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err=
-);
->> +    if (err !=3D NULL) {
->> +        error_propagate(errp, err);
->> +        return;
->> +    }
->>
->>      /* System configuration controller */
->>      dev =3D DEVICE(&s->syscfg);
->> @@ -192,7 +203,6 @@ static void stm32f205_soc_realize(DeviceState
->> *dev_soc, Error **errp)
->>  }
->>
->>  static Property stm32f205_soc_properties[] =3D {
->> -    DEFINE_PROP_STRING("kernel-filename", STM32F205State,
->> kernel_filename),
->>      DEFINE_PROP_STRING("cpu-model", STM32F205State, cpu_model),
->>      DEFINE_PROP_END_OF_LIST(),
->>  };
->>
->
+> Just make the UUID (or TLS client certificate file) a command-line
+> parameter that qemu-system, qemu-img, and other tools accept (e.g.
+> qemu-img via the --image-opts/--object syntax).
+
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
