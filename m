@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cg816-0004LV-91
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 05:49:57 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cg81f-0004f8-5q
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 05:50:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cg811-0004R2-9L
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 05:49:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50878)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cg811-0004Qs-0Y
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 05:49:51 -0500
-Date: Tue, 21 Feb 2017 10:49:46 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170221104945.GC2377@work-vm>
-References: <20170216121140.9061-1-pasic@linux.vnet.ibm.com>
-	<20170216121140.9061-5-pasic@linux.vnet.ibm.com>
+	(envelope-from <no-reply@patchew.org>) id 1cg81a-0004c0-Kk
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 05:50:31 -0500
+Resent-Message-Id: <E1cg81a-0004c0-Kk@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21338)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cg81a-0004bg-DP
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 05:50:26 -0500
+In-Reply-To: <20170221104256.5153-1-pbonzini@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148767421725.33.6541225771564247235@0e2666bad730>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170216121140.9061-5-pasic@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 4/5] tests/test-vmstate.c: test array of
- ptr with null
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 21 Feb 2017 02:50:17 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/3] simplify struct QOM properties and use
+ the result for GUEST_PANICKED
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,102 +29,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, Amit Shah <amit.shah@redhat.com>
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, den@openvz.org, anton.nefedov@virtuozzo.com
 
-* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
-> Add test for VMSTATE_ARRAY_OF_POINTER_TO_STRUCT with an array
-> containing some null pointer.
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  tests/test-vmstate.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 51 insertions(+)
-> 
-> diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
-> index d0dd390..b68a0b3 100644
-> --- a/tests/test-vmstate.c
-> +++ b/tests/test-vmstate.c
-> @@ -487,6 +487,8 @@ const VMStateDescription vmsd_tst = {
->      }
->  };
->  
-> +/* test array migration */
-> +
->  #define AR_SIZE 4
->  
->  typedef struct {
-> @@ -542,6 +544,52 @@ static void test_arr_ptr_str_no0_load(void)
->      }
->  }
->  
-> +static void test_arr_ptr_str_0_save(void)
-> +{
-> +    TestStructTriv ar[AR_SIZE] = {{.i = 0}, {.i = 1}, {.i = 2}, {.i = 3} };
-> +    TestArrayOfPtrToStuct sample = {.ar = {&ar[0], NULL, &ar[2], &ar[3]} };
-> +    uint8_t wire_sample[] = {
-> +        0x00, 0x00, 0x00, 0x00,
-> +        VMS_NULLPTR_MARKER,
-> +        0x00, 0x00, 0x00, 0x02,
-> +        0x00, 0x00, 0x00, 0x03,
-> +        QEMU_VM_EOF
-> +    };
-> +
-> +    save_vmstate(&vmsd_arps, &sample);
-> +    compare_vmstate(wire_sample, sizeof(wire_sample));
-> +}
-> +
-> +static void test_arr_ptr_str_0_load(void)
-> +{
-> +    TestStructTriv ar_gt[AR_SIZE] = {{.i = 0}, {.i = 0}, {.i = 2}, {.i = 3} };
-> +    TestStructTriv ar[AR_SIZE] = {};
-> +    TestArrayOfPtrToStuct obj = {.ar = {&ar[0], NULL, &ar[2], &ar[3]} };
-> +    int idx;
-> +    uint8_t wire_sample[] = {
-> +        0x00, 0x00, 0x00, 0x00,
-> +        VMS_NULLPTR_MARKER,
-> +        0x00, 0x00, 0x00, 0x02,
-> +        0x00, 0x00, 0x00, 0x03,
-> +        QEMU_VM_EOF
-> +    };
-
-If possible; it would be better if you could share the wire_sample, and ar_gt between
-the two functions rather than copying them.
-
-Dave
-
-> +    save_buffer(wire_sample, sizeof(wire_sample));
-> +    SUCCESS(load_vmstate_one(&vmsd_arps, &obj, 1,
-> +                          wire_sample, sizeof(wire_sample)));
-> +    for (idx = 0; idx < AR_SIZE; ++idx) {
-> +        /* compare the target array ar with the ground truth array ar_gt */
-> +        g_assert_cmpint(ar_gt[idx].i, ==, ar[idx].i);
-> +    }
-> +    for (idx = 0; idx < AR_SIZE; ++idx) {
-> +        if (idx == 1) {
-> +            g_assert_cmpint((uint64_t)(obj.ar[idx]), ==, 0);
-> +        } else {
-> +            g_assert_cmpint((uint64_t)(obj.ar[idx]), !=, 0);
-> +        }
-> +    }
-> +}
-> +
->  /* test QTAILQ migration */
->  typedef struct TestQtailqElement TestQtailqElement;
->  
-> @@ -792,6 +840,9 @@ int main(int argc, char **argv)
->                      test_arr_ptr_str_no0_save);
->      g_test_add_func("/vmstate/array/ptr/str/no0/load",
->                      test_arr_ptr_str_no0_load);
-> +    g_test_add_func("/vmstate/array/ptr/str/0/save", test_arr_ptr_str_0_save);
-> +    g_test_add_func("/vmstate/array/ptr/str/0/load",
-> +                    test_arr_ptr_str_0_load);
->      g_test_add_func("/vmstate/qtailq/save/saveq", test_save_q);
->      g_test_add_func("/vmstate/qtailq/load/loadq", test_load_q);
->      g_test_add_func("/vmstate/tmp_struct", test_tmp_struct);
-> -- 
-> 2.8.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC8zXSBzaW1wbGlmeSBzdHJ1Y3QgUU9NIHByb3Bl
+cnRpZXMgYW5kIHVzZSB0aGUgcmVzdWx0IGZvciBHVUVTVF9QQU5JQ0tFRApNZXNzYWdlLWlkOiAy
+MDE3MDIyMTEwNDI1Ni41MTUzLTEtcGJvbnppbmlAcmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1v
+bmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdp
+dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNl
+ICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENI
+ICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBn
+aXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
+bGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49
+JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRh
+dGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6
+Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBh
+dGNoZXcvMTQ4NzY2OTg0MS0xMzY2OC0xLWdpdC1zZW5kLWVtYWlsLWtyYXhlbEByZWRoYXQuY29t
+IC0+IHBhdGNoZXcvMTQ4NzY2OTg0MS0xMzY2OC0xLWdpdC1zZW5kLWVtYWlsLWtyYXhlbEByZWRo
+YXQuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAxNzAyMjExMDQyNTYuNTE1My0x
+LXBib256aW5pQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE3MDIyMTEwNDI1Ni41MTUzLTEtcGJv
+bnppbmlAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjcwYjMyOWEg
+dmw6IHBhc3MgQ1BVU3RhdGUgdG8gcWVtdV9zeXN0ZW1fZ3Vlc3RfcGFuaWNrZWQKZTE1Yjk1ZiBj
+cHU6IGltcGxlbWVudCBnZXRfY3Jhc2hfaW5mbyB0aHJvdWdoIFFPTSBwcm9wZXJ0aWVzCmI0OGM0
+MzkgcW9tLXFvYmplY3Q6IGludHJvZHVjZSBvYmplY3RfcHJvcGVydHlfe2csIHN9ZXRfcHRyCgo9
+PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzM6IHFvbS1xb2JqZWN0OiBpbnRy
+b2R1Y2Ugb2JqZWN0X3Byb3BlcnR5X3tnLCBzfWV0X3B0ci4uLgpFUlJPUjogbGluZSBvdmVyIDkw
+IGNoYXJhY3RlcnMKIzEwMzogRklMRTogcW9tL3FvbS1xb2JqZWN0LmM6NDk6CisgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIHZvaWQgKCp2aXNpdF90eXBlKShWaXNpdG9yICosIGNvbnN0IGNo
+YXIgKiwgdm9pZCAqKiwgRXJyb3IgKiopLAoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJz
+CiMxMzA6IEZJTEU6IHFvbS9xb20tcW9iamVjdC5jOjc2OgorICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgdm9pZCAoKnZpc2l0X3R5cGUpKFZpc2l0b3IgKiwgY29uc3QgY2hhciAqLCB2b2lk
+ICoqLCBFcnJvciAqKiksCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNDI1OiBG
+SUxFOiB0ZXN0cy9jaGVjay1xb20tcHJvcGxpc3QuYzo3MTA6CisgICAgZ190ZXN0X2FkZF9mdW5j
+KCIvcW9tL3Byb3BsaXN0L2dldC1zZXQtcHRyL3N0cnVjdCIsIHRlc3RfZHVtbXlfZ2V0X3NldF9w
+dHJfc3RydWN0KTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0MjY6IEZJTEU6
+IHRlc3RzL2NoZWNrLXFvbS1wcm9wbGlzdC5jOjcxMToKKyAgICBnX3Rlc3RfYWRkX2Z1bmMoIi9x
+b20vcHJvcGxpc3QvZ2V0LXNldC1wdHIvZXJyb3IiLCB0ZXN0X2R1bW15X2dldF9zZXRfcHRyX2Vy
+cm9yKTsKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNDI3OiBGSUxFOiB0ZXN0cy9j
+aGVjay1xb20tcHJvcGxpc3QuYzo3MTI6CisgICAgZ190ZXN0X2FkZF9mdW5jKCIvcW9tL3Byb3Bs
+aXN0L2dldC1zZXQtcHRyL2NvdmFyaWFudCIsIHRlc3RfZHVtbXlfZ2V0X3NldF9wdHJfY292YXJp
+YW50KTsKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNDI4OiBGSUxFOiB0ZXN0cy9j
+aGVjay1xb20tcHJvcGxpc3QuYzo3MTM6CisgICAgZ190ZXN0X2FkZF9mdW5jKCIvcW9tL3Byb3Bs
+aXN0L2dldC1zZXQtcHRyL2NvbnRyYXZhcmlhbnQiLCB0ZXN0X2R1bW15X2dldF9zZXRfcHRyX2Nv
+bnRyYXZhcmlhbnQpOwoKdG90YWw6IDQgZXJyb3JzLCAyIHdhcm5pbmdzLCA0MDAgbGluZXMgY2hl
+Y2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
+bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
+IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFU
+Q0ggMi8zOiBjcHU6IGltcGxlbWVudCBnZXRfY3Jhc2hfaW5mbyB0aHJvdWdoIFFPTSBwcm9wZXJ0
+aWVzLi4uCkNoZWNraW5nIFBBVENIIDMvMzogdmw6IHBhc3MgQ1BVU3RhdGUgdG8gcWVtdV9zeXN0
+ZW1fZ3Vlc3RfcGFuaWNrZWQuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhp
+dGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQ
+YXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
+byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
