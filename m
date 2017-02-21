@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45048)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cgByk-0004iG-7d
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:03:47 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cgBz6-00051C-Tk
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:04:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cgByg-0001O6-BB
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:03:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54674)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cgByg-0001Nj-5Z
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:03:42 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4E9002E604C
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 15:03:42 +0000 (UTC)
-References: <1487363905-9480-1-git-send-email-armbru@redhat.com>
-	<1487363905-9480-7-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5472db9a-9382-cae6-5021-d16afaff688a@redhat.com>
-Date: Tue, 21 Feb 2017 09:03:40 -0600
+	(envelope-from <alex.bennee@linaro.org>) id 1cgBz2-0001VY-WE
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:04:08 -0500
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:36572)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cgBz2-0001V8-Ps
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:04:04 -0500
+Received: by mail-wm0-x234.google.com with SMTP id c85so113452631wmi.1
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 07:04:03 -0800 (PST)
+References: <20170220145335.591-1-bobby.prani@gmail.com>
+	<87fuj8x2gi.fsf@linaro.org> <87k28ko1qw.fsf@gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <87k28ko1qw.fsf@gmail.com>
+Date: Tue, 21 Feb 2017 15:04:06 +0000
+Message-ID: <878tozwpp5.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1487363905-9480-7-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="3odkiFO1hkQBsaPigSuKx67aw0s8QiaIq"
-Subject: Re: [Qemu-devel] [PATCH 06/14] test-qmp-event: Simplify and tighten
- event_test_emit()
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] mttcg: Set jmp_env to handle exit from
+ tb_gen_code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,56 +31,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3odkiFO1hkQBsaPigSuKx67aw0s8QiaIq
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <5472db9a-9382-cae6-5021-d16afaff688a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 06/14] test-qmp-event: Simplify and tighten
- event_test_emit()
-References: <1487363905-9480-1-git-send-email-armbru@redhat.com>
- <1487363905-9480-7-git-send-email-armbru@redhat.com>
-In-Reply-To: <1487363905-9480-7-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 02/17/2017 02:38 PM, Markus Armbruster wrote:
-> Use qdict_get_qdict() and qdict_get_try_int() to simplify.
->=20
-> While there, add a sanity check for seconds.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  tests/test-qmp-event.c | 14 ++++----------
->  1 file changed, 4 insertions(+), 10 deletions(-)
->=20
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+To: Pranith Kumar <bobby.prani@gmail.com>
+Cc: qemu-devel@nongnu.org, rth@twiddle.net
 
 
---3odkiFO1hkQBsaPigSuKx67aw0s8QiaIq
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Pranith Kumar <bobby.prani@gmail.com> writes:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+> Alex Bennée writes:
+>
+>> Pranith Kumar <bobby.prani@gmail.com> writes:
+>>
+>>> tb_gen_code() can exit execution using cpu_exit_loop() when it cannot
+>>> allocate new tb's. To handle this, we need to properly set the jmp_env
+>>> pointer ahead of calling tb_gen_code().
+>>>
+>>> CC:Alex Bennée <alex.bennee@linaro.org>
+>>> CC: Richard Henderson <rth@twiddle.net>
+>>> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+>>> ---
+>>>  cpu-exec.c | 23 +++++++++++------------
+>>>  1 file changed, 11 insertions(+), 12 deletions(-)
+>>>
+>>> diff --git a/cpu-exec.c b/cpu-exec.c
+>>> index 97d79612d9..4b70988b24 100644
+>>> --- a/cpu-exec.c
+>>> +++ b/cpu-exec.c
+>>> @@ -236,23 +236,22 @@ static void cpu_exec_step(CPUState *cpu)
+>>>
+>>>      cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
+>>>      tb_lock();
+>>> -    tb = tb_gen_code(cpu, pc, cs_base, flags,
+>>> -                     1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
+>>> -    tb->orig_tb = NULL;
+>>> -    tb_unlock();
+>>> -
+>>> -    cc->cpu_exec_enter(cpu);
+>>> -
+>>
+>> It occurs to me we are also diverging in our locking pattern from
+>> tb_find which takes mmap_lock first. This is a NOP for system emulation
+>> but needed for user-emulation (for which we can do cpu_exec_step but not
+>> cpu_exec_nocache).
+>
+> Right. So we have to take the mmap_lock() before calling
+> tb_gen_code(). However, this lock is released in the error path before calling
+> cpu_loop_exit() if allocation of a new tb fails. The following is what I have
+> after merging with the previous EXCP_ATOMIC handling patch.
+>
+> diff --git a/cpu-exec.c b/cpu-exec.c
+> index a8e04bffbf..2bb3ba3672 100644
+> --- a/cpu-exec.c
+> +++ b/cpu-exec.c
+> @@ -228,6 +228,7 @@ static void cpu_exec_nocache(CPUState *cpu, int max_cycles,
+>
+>  static void cpu_exec_step(CPUState *cpu)
+>  {
+> +    CPUClass *cc = CPU_GET_CLASS(cpu);
+>      CPUArchState *env = (CPUArchState *)cpu->env_ptr;
+>      TranslationBlock *tb;
+>      target_ulong cs_base, pc;
+> @@ -235,16 +236,24 @@ static void cpu_exec_step(CPUState *cpu)
+>
+>      cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
+>      tb_lock();
+> -    tb = tb_gen_code(cpu, pc, cs_base, flags,
+> -                     1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
+> -    tb->orig_tb = NULL;
+> -    tb_unlock();
+> -    /* execute the generated code */
+> -    trace_exec_tb_nocache(tb, pc);
+> -    cpu_tb_exec(cpu, tb);
+> -    tb_lock();
+> -    tb_phys_invalidate(tb, -1);
+> -    tb_free(tb);
+> +    if (sigsetjmp(cpu->jmp_env, 0) == 0) {
+> +        mmap_lock();
 
-iQEcBAEBCAAGBQJYrFbMAAoJEKeha0olJ0Nq3aMIAJsq9mRYhRDQPx/5JCnIhnDm
-psxj8az5LzUiPwyllAmd9ugIbgXmkjsXp1lZF7JcToHMZWDYxTmpMTQKzNV0m9Fo
-F6T5X6GwiWL1zNO9opXZf1i3emj9A7rC5yXVZg1ER4Uwz3ZyvPq/rUCUbTISpuPP
-Ol0ks2pYD7Boy+UCzLvPa8BDxiYjbNI89JBVNbBlY11keKkZFRLoQev9Cp8zT2zi
-/4IfQF/JMK+Obw5FIOctjaZ3yL+XfJz8HxltmVZ0a1f+AHvBZl5b4mvb5zUCuQu2
-M2NPQ6Pl97IYZdvf44K8dgyvlogGabYTnDi/Ft9rEmQXKeAQRGJ6pCi4ksmV6xM=
-=ZaK8
------END PGP SIGNATURE-----
+That gets the locking order the wrong way around - I'm wary of that.
 
---3odkiFO1hkQBsaPigSuKx67aw0s8QiaIq--
+> +        tb = tb_gen_code(cpu, pc, cs_base, flags,
+> +                         1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
+> +        tb->orig_tb = NULL;
+> +        mmap_unlock();
+> +        tb_unlock();
+> +
+> +        cc->cpu_exec_enter(cpu);
+> +        /* execute the generated code */
+> +        trace_exec_tb_nocache(tb, pc);
+> +        cpu_tb_exec(cpu, tb);
+> +        cc->cpu_exec_exit(cpu);
+> +
+> +        tb_lock();
+> +        tb_phys_invalidate(tb, -1);
+> +        tb_free(tb);
+> +    }
+>      tb_unlock();
+>  }
+>
+> diff --git a/cpus.c b/cpus.c
+> index 77bba08f9a..b39408b4b1 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -1347,6 +1347,11 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
+>                  if (r == EXCP_DEBUG) {
+>                      cpu_handle_guest_debug(cpu);
+>                      break;
+> +                } else if (r == EXCP_ATOMIC) {
+> +                    qemu_mutex_unlock_iothread();
+> +                    cpu_exec_step_atomic(cpu);
+> +                    qemu_mutex_lock_iothread();
+> +                    break;
+>                  }
+>              } else if (cpu->stop) {
+>                  if (cpu->unplug) {
+> @@ -1457,6 +1462,10 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+>                   */
+>                  g_assert(cpu->halted);
+>                  break;
+> +            case EXCP_ATOMIC:
+> +                qemu_mutex_unlock_iothread();
+> +                cpu_exec_step_atomic(cpu);
+> +                qemu_mutex_lock_iothread();
+>              default:
+>                  /* Ignore everything else? */
+>                  break;
+
+
+--
+Alex Bennée
