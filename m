@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cfyQX-0003Lx-SP
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 19:35:34 -0500
+	(envelope-from <bounces@canonical.com>) id 1cfzDD-0004LO-25
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 20:25:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cfyQT-0005oz-VO
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 19:35:33 -0500
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:35028)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cfyQT-0005om-Ly
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 19:35:29 -0500
-Received: by mail-wr0-x230.google.com with SMTP id s27so26278030wrb.2
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 16:35:29 -0800 (PST)
-References: <20170220145335.591-1-bobby.prani@gmail.com>
-	<87fuj8x2gi.fsf@linaro.org> <87k28ko1qw.fsf@gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <87k28ko1qw.fsf@gmail.com>
-Date: Tue, 21 Feb 2017 00:35:33 +0000
-Message-ID: <87d1ecwfca.fsf@linaro.org>
+	(envelope-from <bounces@canonical.com>) id 1cfzD9-00085t-Sx
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 20:25:51 -0500
+Received: from indium.canonical.com ([91.189.90.7]:57346)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cfzD9-00085i-K5
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 20:25:47 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cfzD6-0007G7-N1
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 01:25:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id AC69D2E80CB
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 01:25:44 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] mttcg: Set jmp_env to handle exit from
- tb_gen_code
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 21 Feb 2017 01:19:18 -0000
+From: Alistair Phipps <1653384@bugs.launchpad.net>
+Reply-To: Bug 1653384 <1653384@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20161231213844.1229.87554.malonedeb@soybean.canonical.com>
+Message-Id: <20170221011918.6484.45067.launchpad@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1653384] Re: Assertion failed with USB pass
+ through with XHCI controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,133 +37,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pranith Kumar <bobby.prani@gmail.com>
-Cc: qemu-devel@nongnu.org, rth@twiddle.net
+To: qemu-devel@nongnu.org
 
+** Bug watch added: Debian Bug tracker #855659
+   http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D855659
 
-Pranith Kumar <bobby.prani@gmail.com> writes:
+** Also affects: qemu (Debian) via
+   http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D855659
+   Importance: Unknown
+       Status: Unknown
 
-> Alex Bennée writes:
->
->> Pranith Kumar <bobby.prani@gmail.com> writes:
->>
->>> tb_gen_code() can exit execution using cpu_exit_loop() when it cannot
->>> allocate new tb's. To handle this, we need to properly set the jmp_env
->>> pointer ahead of calling tb_gen_code().
->>>
->>> CC:Alex Bennée <alex.bennee@linaro.org>
->>> CC: Richard Henderson <rth@twiddle.net>
->>> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
->>> ---
->>>  cpu-exec.c | 23 +++++++++++------------
->>>  1 file changed, 11 insertions(+), 12 deletions(-)
->>>
->>> diff --git a/cpu-exec.c b/cpu-exec.c
->>> index 97d79612d9..4b70988b24 100644
->>> --- a/cpu-exec.c
->>> +++ b/cpu-exec.c
->>> @@ -236,23 +236,22 @@ static void cpu_exec_step(CPUState *cpu)
->>>
->>>      cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
->>>      tb_lock();
->>> -    tb = tb_gen_code(cpu, pc, cs_base, flags,
->>> -                     1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
->>> -    tb->orig_tb = NULL;
->>> -    tb_unlock();
->>> -
->>> -    cc->cpu_exec_enter(cpu);
->>> -
->>
->> It occurs to me we are also diverging in our locking pattern from
->> tb_find which takes mmap_lock first. This is a NOP for system emulation
->> but needed for user-emulation (for which we can do cpu_exec_step but not
->> cpu_exec_nocache).
->
-> Right. So we have to take the mmap_lock() before calling
-> tb_gen_code(). However, this lock is released in the error path before calling
-> cpu_loop_exit() if allocation of a new tb fails. The following is what I have
-> after merging with the previous EXCP_ATOMIC handling patch.
+-- =
 
-Hmm we are a start/end_exclusive() though so what could we be racing
-against that also wants the mmap_lock()? Could it be held by anything at
-this point as every user needs to be woken up?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1653384
 
->
-> diff --git a/cpu-exec.c b/cpu-exec.c
-> index a8e04bffbf..2bb3ba3672 100644
-> --- a/cpu-exec.c
-> +++ b/cpu-exec.c
-> @@ -228,6 +228,7 @@ static void cpu_exec_nocache(CPUState *cpu, int max_cycles,
->
->  static void cpu_exec_step(CPUState *cpu)
->  {
-> +    CPUClass *cc = CPU_GET_CLASS(cpu);
->      CPUArchState *env = (CPUArchState *)cpu->env_ptr;
->      TranslationBlock *tb;
->      target_ulong cs_base, pc;
-> @@ -235,16 +236,24 @@ static void cpu_exec_step(CPUState *cpu)
->
->      cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
->      tb_lock();
-> -    tb = tb_gen_code(cpu, pc, cs_base, flags,
-> -                     1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
-> -    tb->orig_tb = NULL;
-> -    tb_unlock();
-> -    /* execute the generated code */
-> -    trace_exec_tb_nocache(tb, pc);
-> -    cpu_tb_exec(cpu, tb);
-> -    tb_lock();
-> -    tb_phys_invalidate(tb, -1);
-> -    tb_free(tb);
-> +    if (sigsetjmp(cpu->jmp_env, 0) == 0) {
-> +        mmap_lock();
-> +        tb = tb_gen_code(cpu, pc, cs_base, flags,
-> +                         1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
-> +        tb->orig_tb = NULL;
-> +        mmap_unlock();
-> +        tb_unlock();
-> +
-> +        cc->cpu_exec_enter(cpu);
-> +        /* execute the generated code */
-> +        trace_exec_tb_nocache(tb, pc);
-> +        cpu_tb_exec(cpu, tb);
-> +        cc->cpu_exec_exit(cpu);
-> +
-> +        tb_lock();
-> +        tb_phys_invalidate(tb, -1);
-> +        tb_free(tb);
-> +    }
->      tb_unlock();
->  }
->
-> diff --git a/cpus.c b/cpus.c
-> index 77bba08f9a..b39408b4b1 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -1347,6 +1347,11 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
->                  if (r == EXCP_DEBUG) {
->                      cpu_handle_guest_debug(cpu);
->                      break;
-> +                } else if (r == EXCP_ATOMIC) {
-> +                    qemu_mutex_unlock_iothread();
-> +                    cpu_exec_step_atomic(cpu);
-> +                    qemu_mutex_lock_iothread();
-> +                    break;
->                  }
->              } else if (cpu->stop) {
->                  if (cpu->unplug) {
-> @@ -1457,6 +1462,10 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
->                   */
->                  g_assert(cpu->halted);
->                  break;
-> +            case EXCP_ATOMIC:
-> +                qemu_mutex_unlock_iothread();
-> +                cpu_exec_step_atomic(cpu);
-> +                qemu_mutex_lock_iothread();
->              default:
->                  /* Ignore everything else? */
->                  break;
+Title:
+  Assertion failed with USB pass through with XHCI controller
 
+Status in QEMU:
+  Fix Committed
+Status in qemu package in Debian:
+  Unknown
 
---
-Alex Bennée
+Bug description:
+  Starting qemu 2.8.0 with XHCI controller and host device passed
+  through results in an assertion failure:
+
+  qemu-system-x86_64: hw/usb/core.c:623: usb_packet_cleanup: Assertion
+  `!usb_packet_is_inflight(p)' failed.
+
+  Can be reproduced with the following command (passing through a Lenovo
+  keyboard):
+
+  qemu-system-x86_64 -usb  -device nec-usb-xhci,id=3Dusb -device usb-
+  host,vendorid=3D0x04b3,productid=3D0x3025,id=3Dhostdev0,bus=3Dusb.0,port=
+=3D1
+
+  If nec-usb-xhci is changed to usb-ehci, qemu tries to boot without
+  assertion failures.
+
+  =
+
+  Can be reproduced with the latest master (commit dbe2b65) and v2.8.0.
+
+  Bisected the issue to following commit:
+  first bad commit: [94b037f2a451b3dc855f9f2c346e5049a361bd55] xhci: use li=
+nked list for transfers
+
+  =
+
+  Backtrace from commit dbe2b65:
+
+  #0  0x00007f2eb4657227 in __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/=
+unix/sysv/linux/raise.c:55
+          resultvar =3D 0
+          pid =3D 3453
+          selftid =3D 3453
+  #1  0x00007f2eb465867a in __GI_abort () at abort.c:89
+          save_stage =3D 2
+          act =3D {__sigaction_handler =3D {sa_handler =3D 0x4, sa_sigactio=
+n =3D 0x4}, sa_mask =3D {__val =3D {140734740550528, 93876690035339, =
+
+                140734740550624, 48833659808, 0, 0, 0, 21474836480, 1407347=
+40550792, 139838573009553, 140734740550560, 139838573043008, =
+
+                139838573024160, 93876666665872, 139838702616576, 139838573=
+024160}}, sa_flags =3D 1528954938, =
+
+            sa_restorer =3D 0x55615b2202c0 <__PRETTY_FUNCTION__.38612>}
+          sigs =3D {__val =3D {32, 0 <repeats 15 times>}}
+  #2  0x00007f2eb46502cd in __assert_fail_base (fmt=3D0x7f2eb47893a0 "%s%s%=
+s:%u: %s%sAssertion `%s' failed.\n%n", =
+
+      assertion=3Dassertion@entry=3D0x55615b22003a "!usb_packet_is_inflight=
+(p)", file=3Dfile@entry=3D0x55615b21fdf0 "hw/usb/core.c", line=3Dline@entry=
+=3D619, =
+
+      function=3Dfunction@entry=3D0x55615b2202c0 <__PRETTY_FUNCTION__.38612=
+> "usb_packet_cleanup") at assert.c:92
+          str =3D 0x55615cfdf510 ""
+          total =3D 4096
+  #3  0x00007f2eb4650382 in __GI___assert_fail (assertion=3D0x55615b22003a =
+"!usb_packet_is_inflight(p)", file=3D0x55615b21fdf0 "hw/usb/core.c", =
+
+      line=3D619, function=3D0x55615b2202c0 <__PRETTY_FUNCTION__.38612> "us=
+b_packet_cleanup") at assert.c:101
+  No locals.
+  #4  0x000055615afc385e in usb_packet_cleanup ()
+  No symbol table info available.
+  #5  0x000055615afda555 in xhci_ep_free_xfer ()
+  No symbol table info available.
+  #6  0x000055615afdc156 in xhci_kick_epctx ()
+  No symbol table info available.
+  #7  0x000055615afda099 in xhci_ep_kick_timer ()
+  No symbol table info available.
+  #8  0x000055615b08ceee in timerlist_run_timers ()
+  No symbol table info available.
+  #9  0x000055615b08cf36 in qemu_clock_run_timers ()
+  No symbol table info available.
+  #10 0x000055615b08d2df in qemu_clock_run_all_timers ()
+  No symbol table info available.
+  #11 0x000055615b08be40 in main_loop_wait ()
+  No symbol table info available.
+  #12 0x000055615ae3870f in main_loop ()
+  No symbol table info available.
+  #13 0x000055615ae4027b in main ()
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1653384/+subscriptions
