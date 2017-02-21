@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgBuS-0008Eq-0X
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:20 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1cgBuS-0008Ez-3B
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgBuR-0007qq-76
+	(envelope-from <eric.auger@redhat.com>) id 1cgBuR-0007qv-8H
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:20 -0500
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 21 Feb 2017 15:58:08 +0100
-Message-Id: <1487689130-30373-13-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
-References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 12/54] block: Add op blocker permission
- constants
+References: <1487683100-16013-1-git-send-email-eric.auger@redhat.com>
+	<1487683100-16013-2-git-send-email-eric.auger@redhat.com>
+	<98d4d9e8-761c-76f9-ecb0-c5a4a658dfab@codeaurora.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <2dcc9002-ec06-c55e-c0a2-75d05fe05762@redhat.com>
+Date: Tue, 21 Feb 2017 15:59:08 +0100
+MIME-Version: 1.0
+In-Reply-To: <98d4d9e8-761c-76f9-ecb0-c5a4a658dfab@codeaurora.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] vfio/platform: make the vfio-platform
+ device non abstract
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,62 +25,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+To: Sinan Kaya <okaya@codeaurora.org>, eric.auger.pro@gmail.com, peter.maydell@linaro.org, alex.williamson@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: shankerd@codeaurora.org, vikrams@codeaurora.org, agraf@suse.de, pelcan@codeaurora.org
 
-This patch defines the permission categories that will be used by the
-new op blocker system.
+Hi Sinan,
+On 21/02/2017 15:45, Sinan Kaya wrote:
+> Hi Eric,
+> Thanks for the long anticipated patch.
+> 
+> On 2/21/2017 8:18 AM, Eric Auger wrote:
+>> +    DEFINE_PROP_STRING("manufacturer", VFIOPlatformDevice, manufacturer),
+>> +    DEFINE_PROP_STRING("model", VFIOPlatformDevice, model),
+> 
+> The OF string is not always of the format "manufacturer, model".
+> 
+> HIDMA for instance uses a syntax of "qcom, hidma-1.0" and "qcom, hidma-2.0".
+> This syntax is used for cases where an IP gets used in multiple SOCs. 
+> 
+> Maybe, we should call it just compatible-string and try not to make meaning
+> out of it.
+> 
+> Sinan
+> 
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- include/block/block.h | 35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+in  http://www.devicetree.org/specifications-pdf I found the description
+at the bottom.
 
-diff --git a/include/block/block.h b/include/block/block.h
-index bde5ebd..ac40c8d 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -187,6 +187,41 @@ typedef enum BlockOpType {
-     BLOCK_OP_TYPE_MAX,
- } BlockOpType;
- 
-+/* Block node permission constants */
-+enum {
-+    /**
-+     * A user that has the "permission" of consistent reads is guaranteed that
-+     * their view of the contents of the block device is complete and
-+     * self-consistent, repesenting the contents of a disk at a specific point.
-+     *
-+     * For most block devices (including their backing files) this is true, but
-+     * the property cannot be maintained in a few situations like for
-+     * intermediate nodes of a commit block job.
-+     */
-+    BLK_PERM_CONSISTENT_READ    = 0x01,
-+
-+    /** This permission is required to change the visible disk contents. */
-+    BLK_PERM_WRITE              = 0x02,
-+
-+    /**
-+     * This permission (which is weaker than BLK_PERM_WRITE) is both enough and
-+     * required for writes to the block node when the caller promises that
-+     * this visible disk contents doesn't change.
-+     */
-+    BLK_PERM_WRITE_UNCHANGED    = 0x04,
-+
-+    /** This permission is required to change the size of a block node. */
-+    BLK_PERM_RESIZE             = 0x08,
-+
-+    /**
-+     * This permission is required to change the node that this BdrvChild
-+     * points to.
-+     */
-+    BLK_PERM_GRAPH_MOD          = 0x10,
-+
-+    BLK_PERM_ALL                = 0x1f,
-+};
-+
- /* disk I/O throttling */
- void bdrv_init(void);
- void bdrv_init_with_whitelist(void);
--- 
-1.8.3.1
+I your case what would prevent from creating 2 entries in the table and
+then use either in qemu cmd line?
+
+VFIO_PLATFORM_BINDING("qcom", "hidma-1.0", add_amd_hidma_fdt_node),
+VFIO_PLATFORM_BINDING("qcom", "hidma-2.0", add_amd_hidma_fdt_node),
+
+The issue is the comma in the property is interpreted as a separator for
+options, hence that choice of having 2 separate options.
+
+Besides I will fix the CONFIG_LINUX compilation issue asap.
+
+Thanks
+
+Eric
+
+"
+The recommended format is "manufacturer,model", where manufacturer is a
+string describing the name of the manufacturer (such as a stock ticker
+symbol), and model specifies the model number.
+
+Example:
+compatible = "fsl,mpc8641-uart", "ns16550";
+In this example, an operating system would first try to locate a device
+driver that supported
+fsl,mpc8641-uart. If a driver was not found, it would then try to locate
+a driver that supported the more general ns16550 device type.
+"
