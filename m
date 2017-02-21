@@ -1,40 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cg7Rc-0004s5-1Z
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 05:13:16 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cg7TB-0005gA-IF
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 05:14:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cg7RX-0001E4-3H
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 05:13:15 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40168
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cg7RW-0001Dm-SN
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 05:13:11 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1LA8fhH109692
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 05:13:09 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28rk5e1554-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 05:13:09 -0500
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Tue, 21 Feb 2017 10:13:07 -0000
-Date: Tue, 21 Feb 2017 11:13:01 +0100
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <967f7397-9995-0d24-bf35-682da2c732ff@redhat.com>
-References: <20170220141943.8426-1-cornelia.huck@de.ibm.com>
-	<20170220141943.8426-2-cornelia.huck@de.ibm.com>
-	<967f7397-9995-0d24-bf35-682da2c732ff@redhat.com>
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cg7T6-0001Yd-KS
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 05:14:53 -0500
+Received: from [59.151.112.132] (port=28262 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cg7T6-0001VY-89
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 05:14:48 -0500
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Message-ID: <58AC14C1.60603@cn.fujitsu.com>
+Date: Tue, 21 Feb 2017 18:21:53 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20170221111301.4a3f0c28.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/5] elf-loader: Allow late loading of elf
+Subject: [Qemu-devel] seek help for AER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,32 +24,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, jfrei@linux.vnet.ibm.com, agraf@suse.de, Farhan Ali <alifm@linux.vnet.ibm.com>, Peter Maydell <peter.maydell@linaro.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-(restored cc:s)
+Hi,
 
-On Mon, 20 Feb 2017 16:33:36 +0100
-Thomas Huth <thuth@redhat.com> wrote:
+First, sorry for such a long time delay on the AER job. I was on 12 days
+holiday, and start to work on the patch 2 weeks ago, because I use a
+newer version kernel(4.10 rc8) to start off the work, several tiny
+problems slow me.
 
-> On 20.02.2017 15:19, Cornelia Huck wrote:
-> > From: Farhan Ali <alifm@linux.vnet.ibm.com>
-> > 
-> > The current QEMU ROM infrastructure rejects late loading of ROMs.
-> > And ELFs are currently loaded as ROM, this prevents delayed loading
-> > of ELFs. So when loading ELF, allow the user to specify if ELF should
-> > be loaded as ROM or not.
-> > 
-> > If an ELF is not loaded as ROM, then they are not restored on a
-> > guest reboot/reset and so its upto the user to handle the reloading.
-> 
-> Could you maybe also explain here why you need such a delayed ELF
-> loading? Why can't you load the s390-netboot.img at the same time as
-> s390-ccw.img?
-> 
->  Thomas
-> 
-> 
+Now I meet a confusing issue on aer_inject module. When I use aer_inject
+command before, it says:
 
-Why should we load the netboot image in all cases, and not just when we
-actually need it?
+    Error: Failed to write, No such device
+
+then in dmesg, it says:
+
+    pcieport 0000:00:09.0: aer_inject: AER device not found
+
+and then I add some debug line in find_aer_device_iter() to check
+device->bus-name, find that it is "pci", so that is why I can't inject,
+it should have been "pci_express". But everything is same as before
+except a newer host kernel.
+
+I still don't have a clue on this problem for almost 2 days, could you help?
+
+The topology is my host is:
+
++-09.0-[06]--+-00.0 Intel Corporation 82576 Gigabit Network Connection
+| \-00.1 Intel Corporation 82576 Gigabit Network Connection
+
+-- 
+Sincerely,
+Cao jin
