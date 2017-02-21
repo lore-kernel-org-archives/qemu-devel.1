@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44518)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cgDWH-00063f-8X
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:42:30 -0500
+	id 1cgDWl-0006Yv-08
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:42:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cgDWE-0005hZ-6C
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:42:29 -0500
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:34847)
+	id 1cgDWh-0005oB-TS
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:42:59 -0500
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:34319)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cgDWE-0005hT-2P
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:42:26 -0500
-Received: by mail-qt0-x241.google.com with SMTP id b16so14886729qte.2
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 08:42:25 -0800 (PST)
+	id 1cgDWh-0005o6-PG
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:42:55 -0500
+Received: by mail-qt0-x242.google.com with SMTP id x35so7635272qtc.1
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 08:42:55 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20170221141451.28305-1-marcandre.lureau@redhat.com>
-	<20170221141451.28305-15-marcandre.lureau@redhat.com>
+	<20170221141451.28305-19-marcandre.lureau@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3951110e-f03b-9f4e-bf14-e3ba37e101bd@amsat.org>
-Date: Tue, 21 Feb 2017 13:42:22 -0300
+Message-ID: <8651fcbd-9f36-0fc4-0024-15ca8f93789d@amsat.org>
+Date: Tue, 21 Feb 2017 13:42:52 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170221141451.28305-15-marcandre.lureau@redhat.com>
+In-Reply-To: <20170221141451.28305-19-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 14/30] tests: fix ipmi-bt-test leak
+Subject: Re: [Qemu-devel] [PATCH v2 18/30] tests: fix e1000-test leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,19 +44,19 @@ On 02/21/2017 11:14 AM, Marc-André Lureau wrote:
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  tests/ipmi-bt-test.c | 1 +
+>  tests/e1000-test.c | 1 +
 >  1 file changed, 1 insertion(+)
 >
-> diff --git a/tests/ipmi-bt-test.c b/tests/ipmi-bt-test.c
-> index e84dd6889b..7e21a9bbcb 100644
-> --- a/tests/ipmi-bt-test.c
-> +++ b/tests/ipmi-bt-test.c
-> @@ -420,6 +420,7 @@ int main(int argc, char **argv)
->            " -device ipmi-bmc-extern,chardev=ipmi0,id=bmc0"
->            " -device isa-ipmi-bt,bmc=bmc0", emu_port);
->      qtest_start(cmdline);
-> +    g_free(cmdline);
->      qtest_irq_intercept_in(global_qtest, "ioapic");
->      qtest_add_func("/ipmi/extern/connect", test_connect);
->      qtest_add_func("/ipmi/extern/bt_base", test_bt_base);
+> diff --git a/tests/e1000-test.c b/tests/e1000-test.c
+> index 59cab68a60..0c5fcdcc44 100644
+> --- a/tests/e1000-test.c
+> +++ b/tests/e1000-test.c
+> @@ -44,6 +44,7 @@ int main(int argc, char **argv)
+>
+>          path = g_strdup_printf("e1000/%s", models[i]);
+>          qtest_add_data_func(path, models[i], test_device);
+> +        g_free(path);
+>      }
+>
+>      return g_test_run();
 >
