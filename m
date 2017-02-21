@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51759)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cg9q9-0001ZP-25
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:46:47 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cg9xM-0000Cq-8A
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:54:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cg9q7-0003Ba-Ny
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:46:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43254)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cg9q7-0003BF-Hq
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:46:43 -0500
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 21 Feb 2017 13:46:37 +0100
-Message-Id: <20170221124638.19573-3-pbonzini@redhat.com>
-In-Reply-To: <20170221124638.19573-1-pbonzini@redhat.com>
-References: <20170221124638.19573-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/3] replay: check icount in cpu exec loop
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cg9xJ-0004fC-4X
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:54:12 -0500
+Received: from [45.249.212.188] (port=2932 helo=dggrg02-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cg9xI-0004eG-H0
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:54:09 -0500
+References: <1486531462-13882-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1486531462-13882-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <58AC384D.4090408@huawei.com>
+Date: Tue, 21 Feb 2017 20:53:33 +0800
+MIME-Version: 1.0
+In-Reply-To: <1486531462-13882-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V7 1/2] Add a new qmp command to start/stop
+ replication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,73 +28,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pavel.dovgaluk@ispras.ru, peter.maydell@linaro.orgPavel Dovgalyuk <dovgaluk@ispras.ru>
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>
+Cc: xuquan8@huawei.com, Li Zhijian <lizhijian@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>, "eddie . dong" <eddie.dong@intel.com>, Wen Congyang <wencongyang@gmail.com>, bian naimeng <biannm@cn.fujitsu.com>
 
-From: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+On 2017/2/8 13:24, Zhang Chen wrote:
+> We can call this qmp command to start/stop replication outside of qemu.
+> Like Xen colo need this function.
+>
+> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+> Signed-off-by: Wen Congyang <wencongyang@gmail.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+>
 
-This patch adds check to break cpu loop when icount expires without
-setting the TB_EXIT_ICOUNT_EXPIRED flag. It happens when there is no
-available translated blocks and all instructions were executed.
-In icount replay mode unnecessary tb_find will be called (which may
-cause an exception) and execution will be non-deterministic.
+Reviewed-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-Because cpu_loop_exec_tb does not longjmp anymore after exhausting the
-icount decrementer, it can use the align_clocks call in cpu_exec.  Remove
-the one in cpu_loop_exec_tb, as well as the SyncClocks *sc argument.
-
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Message-Id: <002801d2810f$18809c20$4981d460$@ru>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- cpu-exec.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
-
-diff --git a/cpu-exec.c b/cpu-exec.c
-index 18e1973..bf126dd 100644
---- a/cpu-exec.c
-+++ b/cpu-exec.c
-@@ -517,7 +517,10 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
-             *last_tb = NULL;
-         }
-     }
--    if (unlikely(atomic_read(&cpu->exit_request) || replay_has_interrupt())) {
-+
-+    /* Finally, check if we need to exit to the main loop.  */
-+    if (unlikely(atomic_read(&cpu->exit_request)
-+        || (use_icount && cpu->icount_decr.u16.low + cpu->icount_extra == 0))) {
-         atomic_set(&cpu->exit_request, 0);
-         cpu->exception_index = EXCP_INTERRUPT;
-         return true;
-@@ -527,8 +530,7 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
- }
- 
- static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
--                                    TranslationBlock **last_tb, int *tb_exit,
--                                    SyncClocks *sc)
-+                                    TranslationBlock **last_tb, int *tb_exit)
- {
-     uintptr_t ret;
-     int32_t insns_left;
-@@ -578,10 +580,7 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
-          */
-         if (insns_left > 0) {
-             cpu_exec_nocache(cpu, insns_left, tb, false);
--            align_clocks(sc, cpu);
-         }
--        cpu->exception_index = EXCP_INTERRUPT;
--        cpu_loop_exit(cpu);
-     }
- }
- 
-@@ -641,7 +640,7 @@ int cpu_exec(CPUState *cpu)
- 
-         while (!cpu_handle_interrupt(cpu, &last_tb)) {
-             TranslationBlock *tb = tb_find(cpu, last_tb, tb_exit);
--            cpu_loop_exec_tb(cpu, tb, &last_tb, &tb_exit, &sc);
-+            cpu_loop_exec_tb(cpu, tb, &last_tb, &tb_exit);
-             /* Try to align the host and virtual clocks
-                if the guest is in advance */
-             align_clocks(&sc, cpu);
--- 
-2.9.3
+> ---
+>   migration/colo.c | 23 +++++++++++++++++++++++
+>   qapi-schema.json | 25 +++++++++++++++++++++++++
+>   2 files changed, 48 insertions(+)
+>
+> diff --git a/migration/colo.c b/migration/colo.c
+> index 93c85c5..6fc2ade 100644
+> --- a/migration/colo.c
+> +++ b/migration/colo.c
+> @@ -19,6 +19,8 @@
+>   #include "qemu/error-report.h"
+>   #include "qapi/error.h"
+>   #include "migration/failover.h"
+> +#include "replication.h"
+> +#include "qmp-commands.h"
+>
+>   #define COLO_BUFFER_BASE_SIZE (4 * 1024 * 1024)
+>
+> @@ -104,6 +106,27 @@ void colo_do_failover(MigrationState *s)
+>       }
+>   }
+>
+> +void qmp_xen_set_replication(bool enable, bool primary,
+> +                             bool has_failover, bool failover,
+> +                             Error **errp)
+> +{
+> +    ReplicationMode mode = primary ?
+> +                           REPLICATION_MODE_PRIMARY :
+> +                           REPLICATION_MODE_SECONDARY;
+> +
+> +    if (has_failover && enable) {
+> +        error_setg(errp, "Parameter 'failover' is only for"
+> +                   " stopping replication");
+> +        return;
+> +    }
+> +
+> +    if (enable) {
+> +        replication_start_all(mode, errp);
+> +    } else {
+> +        replication_stop_all(failover, failover ? NULL : errp);
+> +    }
+> +}
+> +
+>   static void colo_send_message(QEMUFile *f, COLOMessage msg,
+>                                 Error **errp)
+>   {
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index cbdffdd..9445b93 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -5906,6 +5906,31 @@
+>   { 'command': 'xen-load-devices-state', 'data': {'filename': 'str'} }
+>
+>   ##
+> +# @xen-set-replication:
+> +#
+> +# Enable or disable replication.
+> +#
+> +# @enable: true to enable, false to disable.
+> +#
+> +# @primary: true for primary or false for secondary.
+> +#
+> +# @failover: #optional true to do failover, false to stop. but cannot be
+> +#            specified if 'enable' is true. default value is false.
+> +#
+> +# Returns: nothing.
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "xen-set-replication",
+> +#      "arguments": {"enable": true, "primary": false} }
+> +# <- { "return": {} }
+> +#
+> +# Since: 2.9
+> +##
+> +{ 'command': 'xen-set-replication',
+> +  'data': { 'enable': 'bool', 'primary': 'bool', '*failover' : 'bool' } }
+> +
+> +##
+>   # @GICCapability:
+>   #
+>   # The struct describes capability for a specific GIC (Generic
+>
