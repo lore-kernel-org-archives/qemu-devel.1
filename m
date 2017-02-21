@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1cg5ru-0006XN-KN
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 03:32:19 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cg60B-0000OE-F0
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 03:40:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1cg5rr-00049p-DN
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 03:32:18 -0500
-Received: from mx5-phx2.redhat.com ([209.132.183.37]:40969)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1cg5rr-00048d-50
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 03:32:15 -0500
-Date: Tue, 21 Feb 2017 03:32:04 -0500 (EST)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>
-Message-ID: <910332417.8403823.1487665924940.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1487665107-88004-1-git-send-email-liqiang6-s@360.cn>
-References: <1487665107-88004-1-git-send-email-liqiang6-s@360.cn>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cg60A-0006RA-KP
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 03:40:51 -0500
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <1487067971-10443-1-git-send-email-armbru@redhat.com>
+	<1487067971-10443-24-git-send-email-armbru@redhat.com>
+	<20170220201647.GL2372@work-vm>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0468dc5a-8de8-4a96-bc4b-1999be862fda@redhat.com>
+Date: Tue, 21 Feb 2017 09:40:42 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] spice-char: fix segfault in
- char_spice_finalize
+In-Reply-To: <20170220201647.GL2372@work-vm>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 23/24] util/cutils: Change qemu_strtosz*()
+ from int64_t to uint64_t
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +26,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>
-Cc: pbonzini@redhat.com, marcandre lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Li Qiang <liqiang6-s@360.cn>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, "open list:Block layer core" <qemu-block@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 
-Hi
 
------ Original Message -----
-> In 'qemu_chr_open_spice_vmc' if the 'psubtype' is NULL, it will
-> call 'char_spice_finalize'. But as the SpiceChardev is not inserted
-> in the 'spice_chars' list, the 'QLIST_REMOVE' will cause a segfault.
-> Add a detect to avoid it.
->=20
-> Signed-off-by: Li Qiang <liqiang6-s@360.cn>
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On 20/02/2017 21:16, Dr. David Alan Gilbert wrote:
+>>                  p.has_max_bandwidth = true;
+>>                  ret = qemu_strtosz_mebi(valuestr, NULL, &valuebw);
+>> -                if (ret < 0 || (size_t)valuebw != valuebw) {
+>> +                if (ret < 0 || valuebw > INT64_MAX
+>> +                    || (size_t)valuebw != valuebw) {
+> 
+> We should probably just turn all of the parameters into size_t's - although that's
+> more work and there's some int64_t's in qemu_file for no good reason.
 
-> ---
->  spice-qemu-char.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->=20
-> diff --git a/spice-qemu-char.c b/spice-qemu-char.c
-> index 6f46f46..4d1c76e 100644
-> --- a/spice-qemu-char.c
-> +++ b/spice-qemu-char.c
-> @@ -215,7 +215,10 @@ static void char_spice_finalize(Object *obj)
->      SpiceChardev *s =3D SPICE_CHARDEV(obj);
-> =20
->      vmc_unregister_interface(s);
-> -    QLIST_REMOVE(s, next);
-> +
-> +    if (s->next.le_prev) {
-> +        QLIST_REMOVE(s, next);
-> +    }
-> =20
->      g_free((char *)s->sin.subtype);
->  #if SPICE_SERVER_VERSION >=3D 0x000c02
-> --
-> 1.8.3.1
->=20
->=20
+I disagree, there's no reason why 32-bit should not support a bandwidth
+specification of 10 Gbps.
+
+size_t is related to pointers, and it should only be used for those.
+
+Paolo
