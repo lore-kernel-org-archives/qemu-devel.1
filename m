@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cgJR8-0002PS-6u
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 18:01:35 -0500
+	(envelope-from <eyakovlev@virtuozzo.com>) id 1cgKCE-0000rj-8R
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 18:50:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cgJR5-0001ga-6J
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 18:01:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45256)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cgJR5-0001gL-0I
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 18:01:31 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F07993D941
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 23:01:30 +0000 (UTC)
-Message-ID: <1487718088.20449.3.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 22 Feb 2017 00:01:28 +0100
-In-Reply-To: <20170221141451.28305-27-marcandre.lureau@redhat.com>
-References: <20170221141451.28305-1-marcandre.lureau@redhat.com>
-	<20170221141451.28305-27-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 26/30] tests: allows to run single test
- in usb-hcd-ehci-test
+	(envelope-from <eyakovlev@virtuozzo.com>) id 1cgKC9-0008RG-V1
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 18:50:13 -0500
+Received: from mail-db5eur01on0098.outbound.protection.outlook.com
+	([104.47.2.98]:21818
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eyakovlev@virtuozzo.com>)
+	id 1cgKC9-0008Ny-6B
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 18:50:09 -0500
+References: <1487614915-18710-1-git-send-email-den@openvz.org>
+	<1487614915-18710-3-git-send-email-den@openvz.org>
+	<7e55a8e9-0a5d-5602-7626-9c7976f6a49c@redhat.com>
+	<d97212a0-fa95-6614-bd5b-62225f789da9@openvz.org>
+From: Evgeny Yakovlev <eyakovlev@virtuozzo.com>
+Message-ID: <28e2ab5f-3bfd-17a8-6fab-6a67f41e0b47@virtuozzo.com>
+Date: Tue, 21 Feb 2017 11:15:08 +0300
+MIME-Version: 1.0
+In-Reply-To: <d97212a0-fa95-6614-bd5b-62225f789da9@openvz.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/3] qapi: flatten GuestPanicInformation
+ union
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,17 +33,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: "Denis V. Lunev" <den@openvz.org>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>
 
-On Di, 2017-02-21 at 18:14 +0400, Marc-Andr=C3=A9 Lureau wrote:
-> pci_init() shouldn't be a test function, but instead called before any
-> test. This allows to run a single test with -p /x86_64/ehci/....
 
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 
-/me assumes you'll go send a pull request for the whole series?
-Or do you want me cherry-pick the usb patches into the usb queue?
+On 20.02.2017 22:58, Denis V. Lunev wrote:
+> On 02/20/2017 08:48 PM, Eric Blake wrote:
+>> On 02/20/2017 12:21 PM, Denis V. Lunev wrote:
+>>> From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+>>>
+>>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+>>> Signed-off-by: Denis V. Lunev <den@openvz.org>
+>>> CC: Paolo Bonzini <pbonzini@redhat.com>
+>>> CC: Eric Blake <eblake@redhat.com>
+>>> ---
+>>>   qapi-schema.json  | 12 ++++++++++++
+>>>   target/i386/cpu.c | 15 ++++++---------
+>>>   vl.c              | 12 ++++++------
+>>>   3 files changed, 24 insertions(+), 15 deletions(-)
+>>>
+>>> diff --git a/qapi-schema.json b/qapi-schema.json
+>>> index e9a6364..b142e15 100644
+>>> --- a/qapi-schema.json
+>>> +++ b/qapi-schema.json
+>>> @@ -5872,6 +5872,16 @@
+>>>     'data': [ 'pause', 'poweroff' ] }
+>>>   
+>>>   ##
+>>> +# @GuestPanicInformationType:
+>>> +#
+>>> +# An enumeration of the guest panic information types
+>>> +#
+>>> +# Since: 2.9
+>>> +##
+>>> +{ 'enum': 'GuestPanicInformationType',
+>>> +  'data': [ 'hyper-v'] }
+>> Perhaps 'hyperv' is better? It's the difference between
+>> GUEST_PANIC_INFORMATION_TYPE_HYPER_V and
+>> GUEST_PANIC_INFORMATION_TYPE_HYPERV. But that's bikeshedding, so no need
+>> to change it.
+>>
+>> Must go into 2.9, so we aren't baking in bad API.
+>>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>>
+> We can you plain 'hv', like all command line options controlling
+> HyperV features.
+>
+> Roman, Evgeniy, do you have any opinion on that?
 
-cheers,
-  Gerd
+In vmbus we've settled on using "hyperv-" prefixes for stuff related to 
+QAPI namespace and QOM objects' property names: "hyperv-synic", 
+"hyperv-sint-route", etc. We might as well stick to it.
+
+>
+> Den
