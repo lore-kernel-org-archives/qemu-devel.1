@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50942)
 	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1cg9lB-0005AW-A2
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:41:38 -0500
+	id 1cg9mo-00078G-3M
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:43:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1cg9l8-0001bM-72
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:41:37 -0500
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:51358 helo=mx01.kamp.de)
+	(envelope-from <pl@kamp.de>) id 1cg9ml-0002Ve-1A
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:43:18 -0500
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:35650 helo=mx01.kamp.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1cg9l7-0001au-TN
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:41:34 -0500
-References: <5a80994b-3eeb-6ac8-9fbf-e6fae15dfd7a@kamp.de>
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1cg9mk-0002Rk-NU
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:43:14 -0500
 From: Peter Lieven <pl@kamp.de>
-Message-ID: <1a244107-b611-1321-f56f-076ef008ef75@kamp.de>
-Date: Tue, 21 Feb 2017 13:41:31 +0100
+Message-ID: <9533ba99-b143-b577-0115-742119d089a4@kamp.de>
+Date: Tue, 21 Feb 2017 13:43:13 +0100
 MIME-Version: 1.0
-In-Reply-To: <5a80994b-3eeb-6ac8-9fbf-e6fae15dfd7a@kamp.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Creating a dummy PCI device
+Subject: [Qemu-devel] Qemu and Changed Block Tracking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,24 +26,14 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Am 03.02.2017 um 13:07 schrieb Peter Lieven:
-> Hi,
->
->
-> I have a special use case of creating a dummy PCI device with a certain vendor/device ID. The device does not have to actually function, it just
->
-> has to be visible under lspci.
->
->
-> Any idea how to achieve this? I was thinking of modifying the edu pci device to make the device/vendor ID passable via cmdline.
->
->
-> Don't know if thats a good idea.
->
->
-> Any thoughts?
+Hi,
 
-anyone?
+
+is there anyone ever thought about implementing something like VMware CBT in Qemu?
+
+
+https://kb.vmware.com/selfservice/microsites/search.do?language=en_US&cmd=displayKC&externalId=1020128
+
 
 Thanks,
 Peter
