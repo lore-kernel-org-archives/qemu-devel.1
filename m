@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42032)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cgDOy-0007JA-Hp
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:34:57 -0500
+	(envelope-from <eblake@redhat.com>) id 1cgDQ3-0008F8-2e
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:36:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cgDOv-0003Nl-Ei
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:34:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42756)
+	(envelope-from <eblake@redhat.com>) id 1cgDQ1-0003pC-A8
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:36:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57030)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cgDOv-0003NE-5O
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:34:53 -0500
-References: <1487659615-15820-1-git-send-email-xyjxie@linux.vnet.ibm.com>
-	<20170221092137.5b6cecbb@t450s.home>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <27972408-a43b-60f9-86ad-e4e47f4f8f14@redhat.com>
-Date: Tue, 21 Feb 2017 17:34:50 +0100
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cgDQ1-0003p1-2T
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:36:01 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E7BC4624D3
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 16:36:00 +0000 (UTC)
+References: <1487363905-9480-1-git-send-email-armbru@redhat.com>
+	<1487363905-9480-9-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d6b669f6-2da9-f007-890b-208660d4bf2c@redhat.com>
+Date: Tue, 21 Feb 2017 10:35:58 -0600
 MIME-Version: 1.0
-In-Reply-To: <20170221092137.5b6cecbb@t450s.home>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] memory: make ram device read/write endian
- sensitive
+In-Reply-To: <1487363905-9480-9-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="nlehl3GkkRp1RRTpOKs17AJd7PWGA5WUt"
+Subject: Re: [Qemu-devel] [PATCH 08/14] tests: Don't check qobject_type()
+ before qobject_to_qlist()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,88 +35,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>, Yongji Xie <xyjxie@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, aik@ozlabs.ru, zhong@linux.vnet.ibm.com
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--nlehl3GkkRp1RRTpOKs17AJd7PWGA5WUt
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <d6b669f6-2da9-f007-890b-208660d4bf2c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 08/14] tests: Don't check qobject_type()
+ before qobject_to_qlist()
+References: <1487363905-9480-1-git-send-email-armbru@redhat.com>
+ <1487363905-9480-9-git-send-email-armbru@redhat.com>
+In-Reply-To: <1487363905-9480-9-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 02/17/2017 02:38 PM, Markus Armbruster wrote:
+> qobject_to_qlist(obj) returns NULL when obj isn't a QList.  Check
+> that instead of qobject_type(obj) =3D=3D QTYPE_QLIST.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  tests/test-qobject-output-visitor.c | 7 ++-----
+>  1 file changed, 2 insertions(+), 5 deletions(-)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
+--nlehl3GkkRp1RRTpOKs17AJd7PWGA5WUt
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 21/02/2017 17:21, Alex Williamson wrote:
-> On Tue, 21 Feb 2017 14:46:55 +0800
-> Yongji Xie <xyjxie@linux.vnet.ibm.com> wrote:
-> 
->> At the moment ram device's memory regions are NATIVE_ENDIAN. This does
->> not work on PPC64 because VFIO PCI device is little endian but PPC64
->> always defines static macro TARGET_WORDS_BIGENDIAN.
->>
->> This fixes endianness for ram device the same way as it is done
->> for VFIO region in commit 6758008e2c4e79fb6bd04fe8e7a41665fa583965.
-> 
-> The referenced commit was to vfio code where the endianness is fixed,
-> here you're modifying shared generic code to assume the same
-> endianness as vfio.  That seems wrong.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Is the goal to have the same endianness as VFIO?  Or is it just a trick
-to ensure the number of swaps is always 0 or 2, so that they cancel away?
+iQEcBAEBCAAGBQJYrGxuAAoJEKeha0olJ0NqOvYH/jV+qpIbR2oH8Zm7h34KFnKK
+1z02LQQMq4i1M3qMpOLUG2ZgNp6fJ0pKufafZ1yTSqJFMiuwvkSkZ+E2wct9w7QT
+JI4y27Uk4vraZN44grN5URgHaS5goAEOSt0RDnB2v7QQeEA4C7McV2Ytc0vDMLD6
+amjDR/uCv/ac4sIS02AgaXJYZKaVKJi/wD+Z67uJyJWU16kThRVg/7WMO7Ep3UNG
+LEEpfj0QntsoYMraJRmK+ObJN3lSsdRO0jrNc0W2jv4/PfjsJY0wQDNGuqoAdXYn
+gQEjXaSEU3+NYwClsmWPoSReeTkRZ2qEf+y9S8TQQcyCWvJ7vvJoD1QWf4jwogE=
+=4skm
+-----END PGP SIGNATURE-----
 
-In other words, would Yongji's patch just work if it used
-DEVICE_BIG_ENDIAN and beNN_to_cpu/cpu_to_beNN?  If so, then I think the
-patch is okay.
-
-Paolo
-
-> 
-> Alex
->  
->> Signed-off-by: Yongji Xie <xyjxie@linux.vnet.ibm.com>
->> ---
->>  memory.c |   14 +++++++-------
->>  1 files changed, 7 insertions(+), 7 deletions(-)
->>
->> diff --git a/memory.c b/memory.c
->> index 6c58373..1ccb99f 100644
->> --- a/memory.c
->> +++ b/memory.c
->> @@ -1139,13 +1139,13 @@ static uint64_t memory_region_ram_device_read(void *opaque,
->>          data = *(uint8_t *)(mr->ram_block->host + addr);
->>          break;
->>      case 2:
->> -        data = *(uint16_t *)(mr->ram_block->host + addr);
->> +        data = le16_to_cpu(*(uint16_t *)(mr->ram_block->host + addr));
->>          break;
->>      case 4:
->> -        data = *(uint32_t *)(mr->ram_block->host + addr);
->> +        data = le32_to_cpu(*(uint32_t *)(mr->ram_block->host + addr));
->>          break;
->>      case 8:
->> -        data = *(uint64_t *)(mr->ram_block->host + addr);
->> +        data = le64_to_cpu(*(uint64_t *)(mr->ram_block->host + addr));
->>          break;
->>      }
->>  
->> @@ -1166,13 +1166,13 @@ static void memory_region_ram_device_write(void *opaque, hwaddr addr,
->>          *(uint8_t *)(mr->ram_block->host + addr) = (uint8_t)data;
->>          break;
->>      case 2:
->> -        *(uint16_t *)(mr->ram_block->host + addr) = (uint16_t)data;
->> +        *(uint16_t *)(mr->ram_block->host + addr) = cpu_to_le16((uint16_t)data);
->>          break;
->>      case 4:
->> -        *(uint32_t *)(mr->ram_block->host + addr) = (uint32_t)data;
->> +        *(uint32_t *)(mr->ram_block->host + addr) = cpu_to_le32((uint32_t)data);
->>          break;
->>      case 8:
->> -        *(uint64_t *)(mr->ram_block->host + addr) = data;
->> +        *(uint64_t *)(mr->ram_block->host + addr) = cpu_to_le64(data);
->>          break;
->>      }
->>  }
->> @@ -1180,7 +1180,7 @@ static void memory_region_ram_device_write(void *opaque, hwaddr addr,
->>  static const MemoryRegionOps ram_device_mem_ops = {
->>      .read = memory_region_ram_device_read,
->>      .write = memory_region_ram_device_write,
->> -    .endianness = DEVICE_NATIVE_ENDIAN,
->> +    .endianness = DEVICE_LITTLE_ENDIAN,
->>      .valid = {
->>          .min_access_size = 1,
->>          .max_access_size = 8,
-> 
+--nlehl3GkkRp1RRTpOKs17AJd7PWGA5WUt--
