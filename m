@@ -1,40 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cg8IF-0007X0-RV
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:07:40 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cg8JB-0007zN-U3
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:08:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cg8IB-0008Tj-QW
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:07:39 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59843)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1cg8IB-0008TV-GT
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:07:35 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1LB6vUk021950
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 06:07:34 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28rm0194t2-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 06:07:33 -0500
-Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Tue, 21 Feb 2017 11:07:31 -0000
-References: <20170216121140.9061-1-pasic@linux.vnet.ibm.com>
-	<20170216121140.9061-5-pasic@linux.vnet.ibm.com>
-	<20170221104945.GC2377@work-vm>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Tue, 21 Feb 2017 12:07:28 +0100
+	(envelope-from <stefanha@gmail.com>) id 1cg8J7-0000N7-Ta
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:08:37 -0500
+Date: Tue, 21 Feb 2017 11:08:30 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170221110830.GB22731@stefanha-x1.localdomain>
+References: <1487347224-8667-1-git-send-email-pl@kamp.de>
+	<20170220145011.GJ21255@stefanha-x1.localdomain>
+	<73412b92-353d-7109-cfbe-9c61bf91e7eb@kamp.de>
 MIME-Version: 1.0
-In-Reply-To: <20170221104945.GC2377@work-vm>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Message-Id: <7e2a4544-21a9-36ed-0af5-503261d2619b@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 4/5] tests/test-vmstate.c: test array of
- ptr with null
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="E39vaYmALEf/7YXx"
+Content-Disposition: inline
+In-Reply-To: <73412b92-353d-7109-cfbe-9c61bf91e7eb@kamp.de>
+Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH V4] qemu-img: make convert
+ async
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,52 +26,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Amit Shah <amit.shah@redhat.com>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: Peter Lieven <pl@kamp.de>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
 
+--E39vaYmALEf/7YXx
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 02/21/2017 11:49 AM, Dr. David Alan Gilbert wrote:
->> +static void test_arr_ptr_str_0_save(void)
->> +{
->> +    TestStructTriv ar[AR_SIZE] = {{.i = 0}, {.i = 1}, {.i = 2}, {.i = 3} };
->> +    TestArrayOfPtrToStuct sample = {.ar = {&ar[0], NULL, &ar[2], &ar[3]} };
->> +    uint8_t wire_sample[] = {
->> +        0x00, 0x00, 0x00, 0x00,
->> +        VMS_NULLPTR_MARKER,
->> +        0x00, 0x00, 0x00, 0x02,
->> +        0x00, 0x00, 0x00, 0x03,
->> +        QEMU_VM_EOF
->> +    };
->> +
->> +    save_vmstate(&vmsd_arps, &sample);
->> +    compare_vmstate(wire_sample, sizeof(wire_sample));
->> +}
->> +
->> +static void test_arr_ptr_str_0_load(void)
->> +{
->> +    TestStructTriv ar_gt[AR_SIZE] = {{.i = 0}, {.i = 0}, {.i = 2}, {.i = 3} };
->> +    TestStructTriv ar[AR_SIZE] = {};
->> +    TestArrayOfPtrToStuct obj = {.ar = {&ar[0], NULL, &ar[2], &ar[3]} };
->> +    int idx;
->> +    uint8_t wire_sample[] = {
->> +        0x00, 0x00, 0x00, 0x00,
->> +        VMS_NULLPTR_MARKER,
->> +        0x00, 0x00, 0x00, 0x02,
->> +        0x00, 0x00, 0x00, 0x03,
->> +        QEMU_VM_EOF
->> +    };
-> If possible; it would be better if you could share the wire_sample, and ar_gt between
-> the two functions rather than copying them.
-> 
-> Dave
-> 
+On Mon, Feb 20, 2017 at 03:59:42PM +0100, Peter Lieven wrote:
+> Am 20.02.2017 um 15:50 schrieb Stefan Hajnoczi:
+> > On Fri, Feb 17, 2017 at 05:00:24PM +0100, Peter Lieven wrote:
+> > > +        if (s->wr_in_order) {
+> > > +            /* reenter the coroutine that might have waited
+> > > +             * for this write to complete */
+> > > +            s->wr_offs =3D sector_num + n;
+> > > +            for (i =3D 0; i < s->num_coroutines; i++) {
+> > > +                if (s->co[i] && s->wait_sector_num[i] =3D=3D s->wr_o=
+ffs) {
+> > > +                    qemu_coroutine_enter(s->co[i]);
+> > > +                    break;
+> > This qemu_coroutine_enter() call relies on the yield pattern between
+> > sibling coroutines having no recursive qemu_coroutine_enter() calls.
+> > QEMU aborts if there is a code path where coroutine A enters B and then
+> > B enters A again before yielding.
+> >=20
+> > Paolo's new aio_co_wake() API solves this issue by deferring the
+> > qemu_coroutine_enter() to the event loop.  It's similar to CoQueue
+> > wakeup.  aio_co_wake() is part of my latest block pull request (should
+> > be merged into qemu.git soon).
+> >=20
+> > I *think* this patch has no A -> B -> A situation thanks to yields in
+> > the code path, but it would be nicer to use aio_co_wake() where this can
+> > never happen.
+>=20
+> I also believe this can't happen. Would it be also okay to use
+> qemu_coroutine_enter_if_inactive() here?
 
-Certainly possible. I did it this way because I prefer
-unit tests as self contained as possible, but consistent
-style is also important.
+Perhaps this comment is enough:
 
-Will factor wire_sample out for the next version.
+  /*
+   * A -> B -> A cannot occur because A has s->wait_sector_num[i] =3D=3D -1
+   * during A -> B.  Therefore B will never enter A during this time
+   * window.
+   */
+  qemu_coroutine_enter(s->co[i]);
 
-Cheers,
-Halil
+Normally a comment isn't necessary because qemu_coroutine_enter() is
+used for parent-child relationships.  But here it's a sibling
+relationship so we need proof that A -> B -> A doesn't occur.
+
+--E39vaYmALEf/7YXx
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYrB+uAAoJEJykq7OBq3PIpDcIAKke/i2AiZLXXm0PhYgvtIX9
+7tf+kPukzRFkZR1dteheuHx6rUHRuo6k/sflCMRC1Aa9hurZh1/Rtfejc4e1kkCs
+M+QiKIm2EqBQmAUtkpcBO4JxiY7nH1N04kDlvzcDLK5MkBb3U5PfpfBCfSHRjFOr
+2eOgR2HVf6gKoIsB0NDT+lyV+pm2J6xpCqBespd+Y0rHHkqQrlEK/OHLiwTELP2C
+UYcD4pvNj9k9fIsVVOLg1mVZvIcWMN3em+dzKH+8QCmWWjZzTcDSr5pEmMaWY6+P
+AvnpJdeTieUs6LEtCt2y4XUvYZlh72fUZgkGwbPzhsCYs/0Q4qD6xLeXsvM5btM=
+=AU4S
+-----END PGP SIGNATURE-----
+
+--E39vaYmALEf/7YXx--
