@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgBuS-0008Es-1h
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:21 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cgBuS-0008Eq-0X
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgBuR-0007qj-1t
+	(envelope-from <kwolf@redhat.com>) id 1cgBuR-0007qq-76
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:20 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 21 Feb 2017 15:58:06 +0100
-Message-Id: <1487689130-30373-11-git-send-email-kwolf@redhat.com>
+Date: Tue, 21 Feb 2017 15:58:08 +0100
+Message-Id: <1487689130-30373-13-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
 References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 10/54] vvfat: Use opened node as backing file
+Subject: [Qemu-devel] [PATCH 12/54] block: Add op blocker permission
+ constants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,56 +23,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-We should not try to assign a not yet opened node as the backing file,
-because as soon as the permission system is added it will fail.  The
-just added bdrv_new_open_driver() function is the right tool to open a
-file with an internal driver, use it.
-
-In case anyone wonders whether that magic fake backing file to trigger a
-special action on 'commit' actually works today: No, not for me. One
-reason is that we've been adding a raw format driver on top for several
-years now and raw doesn't support commit. Other reasons include that the
-backing file isn't writable and the driver doesn't support reopen, and
-it's also size 0 and the driver doesn't support bdrv_truncate. All of
-these are easily fixable, but then 'commit' ended up in an infinite loop
-deep in the vvfat code for me, so I thought I'd best leave it alone. I'm
-not really sure what it was supposed to do anyway.
+This patch defines the permission categories that will be used by the
+new op blocker system.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/vvfat.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ include/block/block.h | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
-diff --git a/block/vvfat.c b/block/vvfat.c
-index c6bf67e..7f230be 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -2968,6 +2968,7 @@ static void write_target_close(BlockDriverState *bs) {
+diff --git a/include/block/block.h b/include/block/block.h
+index bde5ebd..ac40c8d 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -187,6 +187,41 @@ typedef enum BlockOpType {
+     BLOCK_OP_TYPE_MAX,
+ } BlockOpType;
  
- static BlockDriver vvfat_write_target = {
-     .format_name        = "vvfat_write_target",
-+    .instance_size      = sizeof(void*),
-     .bdrv_co_pwritev    = write_target_commit,
-     .bdrv_close         = write_target_close,
- };
-@@ -3036,14 +3037,13 @@ static int enable_write_target(BlockDriverState *bs, Error **errp)
-     unlink(s->qcow_filename);
- #endif
- 
--    backing = bdrv_new();
-+    backing = bdrv_new_open_driver(&vvfat_write_target, NULL, BDRV_O_ALLOW_RDWR,
-+                                   &error_abort);
-+    *(void**) backing->opaque = s;
++/* Block node permission constants */
++enum {
++    /**
++     * A user that has the "permission" of consistent reads is guaranteed that
++     * their view of the contents of the block device is complete and
++     * self-consistent, repesenting the contents of a disk at a specific point.
++     *
++     * For most block devices (including their backing files) this is true, but
++     * the property cannot be maintained in a few situations like for
++     * intermediate nodes of a commit block job.
++     */
++    BLK_PERM_CONSISTENT_READ    = 0x01,
 +
-     bdrv_set_backing_hd(s->bs, backing);
-     bdrv_unref(backing);
- 
--    s->bs->backing->bs->drv = &vvfat_write_target;
--    s->bs->backing->bs->opaque = g_new(void *, 1);
--    *(void**)s->bs->backing->bs->opaque = s;
--
-     return 0;
- 
- err:
++    /** This permission is required to change the visible disk contents. */
++    BLK_PERM_WRITE              = 0x02,
++
++    /**
++     * This permission (which is weaker than BLK_PERM_WRITE) is both enough and
++     * required for writes to the block node when the caller promises that
++     * this visible disk contents doesn't change.
++     */
++    BLK_PERM_WRITE_UNCHANGED    = 0x04,
++
++    /** This permission is required to change the size of a block node. */
++    BLK_PERM_RESIZE             = 0x08,
++
++    /**
++     * This permission is required to change the node that this BdrvChild
++     * points to.
++     */
++    BLK_PERM_GRAPH_MOD          = 0x10,
++
++    BLK_PERM_ALL                = 0x1f,
++};
++
+ /* disk I/O throttling */
+ void bdrv_init(void);
+ void bdrv_init_with_whitelist(void);
 -- 
 1.8.3.1
