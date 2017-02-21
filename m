@@ -1,14 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jazeltq@gmail.com>) id 1cg1Pa-0002Ok-7j
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 22:46:47 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cg1TG-0003lq-8B
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 22:50:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jazeltq@gmail.com>) id 1cg1PZ-000407-80
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 22:46:46 -0500
-From: jazeltq@gmail.com
-Date: Tue, 21 Feb 2017 11:43:36 +0800
-Message-Id: <20170221034336.10097-1-jazeltq@gmail.com>
-Subject: [Qemu-devel] [RFC v6] RBD: Add support readv,writev for rbd
+	(envelope-from <no-reply@patchew.org>) id 1cg1TD-0005WE-6U
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 22:50:34 -0500
+Resent-Message-Id: <E1cg1TD-0005WE-6U@eggs.gnu.org>
+In-Reply-To: <20170221034336.10097-1-jazeltq@gmail.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148764901699.33.10189630070314402937@0e2666bad730>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 20 Feb 2017 19:50:18 -0800 (PST)
+Subject: Re: [Qemu-devel] [RFC v6] RBD: Add support readv,writev for rbd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,176 +23,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jdurgin@redhat.com, jcody@redhat.com, dillaman@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, ceph-devel@vger.kernel.org, jazeltq@gmail.com, tianqing <tianqing@unitedstack.com>
+To: jazeltq@gmail.com
+Cc: famz@redhat.com, jdurgin@redhat.com, jcody@redhat.com, dillaman@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, tianqing@unitedstack.com, ceph-devel@vger.kernel.org, qemu-devel@nongnu.org
 
-From: tianqing <tianqing@unitedstack.com>
-
-Rbd can do readv and writev directly, so wo do not need to transform
-iov to buf or vice versa any more.
-
-Signed-off-by: tianqing <tianqing@unitedstack.com>
----
- block/rbd.c | 79 ++++++++++++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 54 insertions(+), 25 deletions(-)
-
-diff --git a/block/rbd.c b/block/rbd.c
-index a57b3e3..5373680 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -62,6 +62,13 @@
- #define RBD_MAX_SNAP_NAME_SIZE 128
- #define RBD_MAX_SNAPS 100
- 
-+/* The LIBRBD_SUPPORTS_IOVEC is defined in librbd.h */
-+#ifdef LIBRBD_SUPPORTS_IOVEC
-+#define LIBRBD_USE_IOVEC 1
-+#else
-+#define LIBRBD_USE_IOVEC 0
-+#endif
-+
- typedef enum {
-     RBD_AIO_READ,
-     RBD_AIO_WRITE,
-@@ -310,6 +317,17 @@ static int qemu_rbd_set_conf(rados_t cluster, const char *conf,
-     return ret;
- }
- 
-+static void qemu_rbd_memset(RADOSCB *rcb, int64_t offs)
-+{
-+    if(LIBRBD_USE_IOVEC){
-+        RBDAIOCB *acb = rcb->acb;
-+        iov_memset(acb->qiov->iov, acb->qiov->niov, offs, 0,
-+                   acb->qiov->size - offs);
-+    } else {
-+        memset(rcb->buf + offs, 0, rcb->size - offs);
-+    }
-+}
-+
- static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
- {
-     Error *local_err = NULL;
-@@ -426,11 +444,11 @@ static void qemu_rbd_complete_aio(RADOSCB *rcb)
-         }
-     } else {
-         if (r < 0) {
--            memset(rcb->buf, 0, rcb->size);
-+            qemu_rbd_memset(rcb, 0);
-             acb->ret = r;
-             acb->error = 1;
-         } else if (r < rcb->size) {
--            memset(rcb->buf + r, 0, rcb->size - r);
-+            qemu_rbd_memset(rcb, r);
-             if (!acb->error) {
-                 acb->ret = rcb->size;
-             }
-@@ -440,11 +458,14 @@ static void qemu_rbd_complete_aio(RADOSCB *rcb)
-     }
- 
-     g_free(rcb);
--
--    if (acb->cmd == RBD_AIO_READ) {
--        qemu_iovec_from_buf(acb->qiov, 0, acb->bounce, acb->qiov->size);
-+ 
-+    if(!LIBRBD_USE_IOVEC){
-+         if (acb->cmd == RBD_AIO_READ) {
-+             qemu_iovec_from_buf(acb->qiov, 0, acb->bounce, acb->qiov->size);
-+         }
-+         qemu_vfree(acb->bounce);
-     }
--    qemu_vfree(acb->bounce);
-+
-     acb->common.cb(acb->common.opaque, (acb->ret > 0 ? 0 : acb->ret));
- 
-     qemu_aio_unref(acb);
-@@ -655,7 +676,6 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
-     RBDAIOCB *acb;
-     RADOSCB *rcb = NULL;
-     rbd_completion_t c;
--    char *buf;
-     int r;
- 
-     BDRVRBDState *s = bs->opaque;
-@@ -664,27 +684,29 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
-     acb->cmd = cmd;
-     acb->qiov = qiov;
-     assert(!qiov || qiov->size == size);
--    if (cmd == RBD_AIO_DISCARD || cmd == RBD_AIO_FLUSH) {
--        acb->bounce = NULL;
--    } else {
--        acb->bounce = qemu_try_blockalign(bs, qiov->size);
--        if (acb->bounce == NULL) {
--            goto failed;
-+
-+    rcb = g_new(RADOSCB, 1);
-+
-+    if(!LIBRBD_USE_IOVEC){
-+        if (cmd == RBD_AIO_DISCARD || cmd == RBD_AIO_FLUSH) {
-+            acb->bounce = NULL;
-+        } else {
-+            acb->bounce = qemu_try_blockalign(bs, qiov->size);
-+            if (acb->bounce == NULL) {
-+                goto failed;
-+            }
-         }
-+        if (cmd == RBD_AIO_WRITE) {
-+            qemu_iovec_to_buf(acb->qiov, 0, acb->bounce, qiov->size);
-+        }
-+        rcb->buf = acb->bounce;
-     }
-+
-     acb->ret = 0;
-     acb->error = 0;
-     acb->s = s;
- 
--    if (cmd == RBD_AIO_WRITE) {
--        qemu_iovec_to_buf(acb->qiov, 0, acb->bounce, qiov->size);
--    }
--
--    buf = acb->bounce;
--
--    rcb = g_new(RADOSCB, 1);
-     rcb->acb = acb;
--    rcb->buf = buf;
-     rcb->s = acb->s;
-     rcb->size = size;
-     r = rbd_aio_create_completion(rcb, (rbd_callback_t) rbd_finish_aiocb, &c);
-@@ -694,10 +716,16 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
- 
-     switch (cmd) {
-     case RBD_AIO_WRITE:
--        r = rbd_aio_write(s->image, off, size, buf, c);
-+        if(!LIBRBD_USE_IOVEC)
-+            r = rbd_aio_write(s->image, off, size, rcb->buf, c);
-+        else
-+            r = rbd_aio_writev(s->image, qiov->iov, qiov->niov, off, c);
-         break;
-     case RBD_AIO_READ:
--        r = rbd_aio_read(s->image, off, size, buf, c);
-+        if(!LIBRBD_USE_IOVEC)
-+            r = rbd_aio_read(s->image, off, size, rcb->buf, c);
-+        else
-+            r = rbd_aio_readv(s->image, qiov->iov, qiov->niov, off, c);
-         break;
-     case RBD_AIO_DISCARD:
-         r = rbd_aio_discard_wrapper(s->image, off, size, c);
-@@ -712,14 +740,15 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
-     if (r < 0) {
-         goto failed_completion;
-     }
--
-     return &acb->common;
- 
- failed_completion:
-     rbd_aio_release(c);
- failed:
-     g_free(rcb);
--    qemu_vfree(acb->bounce);
-+    if(!LIBRBD_USE_IOVEC)
-+        qemu_vfree(acb->bounce);
-+
-     qemu_aio_unref(acb);
-     return NULL;
- }
--- 
-2.10.2
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUkZDIHY2XSBSQkQ6IEFkZCBzdXBwb3J0IHJlYWR2LHdyaXRl
+diBmb3IgcmJkCk1lc3NhZ2UtaWQ6IDIwMTcwMjIxMDM0MzM2LjEwMDk3LTEtamF6ZWx0cUBnbWFp
+bC5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpu
+PTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgoj
+IFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAw
+CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9n
+IC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAg
+ICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0
+PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Njcmlw
+dHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAg
+ICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVT
+VCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRi
+ZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQog
+KiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTcwMjIxMDM0MzM2LjEwMDk3LTEtamF6ZWx0
+cUBnbWFpbC5jb20gLT4gcGF0Y2hldy8yMDE3MDIyMTAzNDMzNi4xMDA5Ny0xLWphemVsdHFAZ21h
+aWwuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZGM4MzkwMyBSQkQ6IEFkZCBz
+dXBwb3J0IHJlYWR2LHdyaXRldiBmb3IgcmJkCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2lu
+ZyBQQVRDSCAxLzE6IFJCRDogQWRkIHN1cHBvcnQgcmVhZHYsd3JpdGV2IGZvciByYmQuLi4KRVJS
+T1I6IHNwYWNlIHJlcXVpcmVkIGJlZm9yZSB0aGUgb3BlbiBicmFjZSAneycKIzM2OiBGSUxFOiBi
+bG9jay9yYmQuYzozMjI6CisgICAgaWYoTElCUkJEX1VTRV9JT1ZFQyl7CgpFUlJPUjogc3BhY2Ug
+cmVxdWlyZWQgYmVmb3JlIHRoZSBvcGVuIHBhcmVudGhlc2lzICcoJwojMzY6IEZJTEU6IGJsb2Nr
+L3JiZC5jOjMyMjoKKyAgICBpZihMSUJSQkRfVVNFX0lPVkVDKXsKCkVSUk9SOiB0cmFpbGluZyB3
+aGl0ZXNwYWNlCiM2OTogRklMRTogYmxvY2svcmJkLmM6NDYxOgorICQKCkVSUk9SOiBzdXNwZWN0
+IGNvZGUgaW5kZW50IGZvciBjb25kaXRpb25hbCBzdGF0ZW1lbnRzICg0LCA5KQojNzA6IEZJTEU6
+IGJsb2NrL3JiZC5jOjQ2MjoKKyAgICBpZighTElCUkJEX1VTRV9JT1ZFQyl7CisgICAgICAgICBp
+ZiAoYWNiLT5jbWQgPT0gUkJEX0FJT19SRUFEKSB7CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYmVm
+b3JlIHRoZSBvcGVuIGJyYWNlICd7JwojNzA6IEZJTEU6IGJsb2NrL3JiZC5jOjQ2MjoKKyAgICBp
+ZighTElCUkJEX1VTRV9JT1ZFQyl7CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoZSBv
+cGVuIHBhcmVudGhlc2lzICcoJwojNzA6IEZJTEU6IGJsb2NrL3JiZC5jOjQ2MjoKKyAgICBpZigh
+TElCUkJEX1VTRV9JT1ZFQyl7CgpFUlJPUjogc3VzcGVjdCBjb2RlIGluZGVudCBmb3IgY29uZGl0
+aW9uYWwgc3RhdGVtZW50cyAoOSwgMTMpCiM3MTogRklMRTogYmxvY2svcmJkLmM6NDYzOgorICAg
+ICAgICAgaWYgKGFjYi0+Y21kID09IFJCRF9BSU9fUkVBRCkgeworICAgICAgICAgICAgIHFlbXVf
+aW92ZWNfZnJvbV9idWYoYWNiLT5xaW92LCAwLCBhY2ItPmJvdW5jZSwgYWNiLT5xaW92LT5zaXpl
+KTsKCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBiZWZvcmUgdGhlIG9wZW4gYnJhY2UgJ3snCiMxMDI6
+IEZJTEU6IGJsb2NrL3JiZC5jOjY5MDoKKyAgICBpZighTElCUkJEX1VTRV9JT1ZFQyl7CgpFUlJP
+Ujogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoZSBvcGVuIHBhcmVudGhlc2lzICcoJwojMTAyOiBG
+SUxFOiBibG9jay9yYmQuYzo2OTA6CisgICAgaWYoIUxJQlJCRF9VU0VfSU9WRUMpewoKRVJST1I6
+IHNwYWNlIHJlcXVpcmVkIGJlZm9yZSB0aGUgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzEzODogRklM
+RTogYmxvY2svcmJkLmM6NzE5OgorICAgICAgICBpZighTElCUkJEX1VTRV9JT1ZFQykKCkVSUk9S
+OiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQK
+IzEzODogRklMRTogYmxvY2svcmJkLmM6NzE5OgorICAgICAgICBpZighTElCUkJEX1VTRV9JT1ZF
+QykKWy4uLl0KKyAgICAgICAgZWxzZQpbLi4uXQoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGJlZm9y
+ZSB0aGUgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzE0NTogRklMRTogYmxvY2svcmJkLmM6NzI1Ogor
+ICAgICAgICBpZighTElCUkJEX1VTRV9JT1ZFQykKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vz
+c2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzE0NTogRklMRTogYmxvY2svcmJk
+LmM6NzI1OgorICAgICAgICBpZighTElCUkJEX1VTRV9JT1ZFQykKWy4uLl0KKyAgICAgICAgZWxz
+ZQpbLi4uXQoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGJlZm9yZSB0aGUgb3BlbiBwYXJlbnRoZXNp
+cyAnKCcKIzE2NDogRklMRTogYmxvY2svcmJkLmM6NzQ5OgorICAgIGlmKCFMSUJSQkRfVVNFX0lP
+VkVDKQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlz
+IHN0YXRlbWVudAojMTY0OiBGSUxFOiBibG9jay9yYmQuYzo3NDk6CisgICAgaWYoIUxJQlJCRF9V
+U0VfSU9WRUMpClsuLi5dCgp0b3RhbDogMTUgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNDYgbGluZXMg
+Y2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
+ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
+dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBV
+VCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBn
+ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4K
+UGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
