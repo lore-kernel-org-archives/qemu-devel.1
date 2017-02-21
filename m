@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cg9Dq-0007Hr-I4
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:07:11 -0500
+	(envelope-from <batuzovk@ispras.ru>) id 1cg9QR-0002Nc-Jz
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:20:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cg9Dl-0008A4-HK
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:07:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38514)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cg9Dl-00089w-8m
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:07:05 -0500
-Date: Tue, 21 Feb 2017 12:07:00 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170221120700.GE2377@work-vm>
-References: <20170216121140.9061-1-pasic@linux.vnet.ibm.com>
-	<20170216121140.9061-3-pasic@linux.vnet.ibm.com>
+	(envelope-from <batuzovk@ispras.ru>) id 1cg9QN-0004ct-Km
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:20:11 -0500
+Received: from bran.ispras.ru ([83.149.199.196]:35199 helo=smtp.ispras.ru)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <batuzovk@ispras.ru>) id 1cg9QN-0004b9-6X
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:20:07 -0500
+Date: Tue, 21 Feb 2017 15:19:59 +0300 (MSK)
+From: Kirill Batuzov <batuzovk@ispras.ru>
+In-Reply-To: <1486046099-17726-1-git-send-email-batuzovk@ispras.ru>
+Message-ID: <alpine.DEB.2.11.1702211518470.2358@bulbul.intra.ispras.ru>
+References: <1486046099-17726-1-git-send-email-batuzovk@ispras.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170216121140.9061-3-pasic@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 2/5] migration/vmstate: split up
- vmstate_base_addr
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v2.1 00/20] Emulate guest vector operations
+ with host vector operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,119 +26,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, =?ISO-8859-15?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>
 
-* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
-> Currently vmstate_base_addr does several things: it pinpoints the field
-> within the struct, possibly allocates memory and possibly does the first
-> pointer dereference. Obviously allocation is needed only for load.
+On Thu, 2 Feb 2017, Kirill Batuzov wrote:
+
+> The goal of these patch series is to set up an infrastructure to emulate
+> guest vector operations using host vector operations. Preliminary
+> experiments show that simply translating loads and stores increases
+> performance of x264 video codec by 10%. The performance of a gcc vectorized
+> for loop increased 2x.
 > 
-> Let us split up the functionality in vmstate_base_addr and move the
-> address manipulations (that is everything but the allocation logic) to
-> load and save so it becomes more obvious what is actually going on. Like
-> this all the address calculations (and the handling of the flags
-> controlling these) is in one place and the sequence is more obvious.
+> To be able to emulate guest vector operations using host vector operations,
+> several things need to be done.
 > 
-> The newly introduced function vmstate_handle_alloc also fixes the
-> allocation for the unused VMS_VBUFFER| VMS_MULTIPLY scenario and is
-> substantially simpler than the original vmstate_base_addr.
-
-Note that VMSTATE_VBUFFER_MULTIPLY does use VMS_VBUFFER|VMS_MULTIPLY - but
-not with alloc (and I started using VMSTATE_VBUFFER_MULTIPLY in a recent
-patch that went in).  I'm not sure I see what the error is that you fixed.
-
-However, I'm ok with it:
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> In load and save some asserts are added so it's easier to debug
-> situations where we would end up with a null pointer dereference.
+> 1. Corresponding vector types should be added to TCG. These series add
+> TCG_v128 and TCG_v64. I've made TCG_v64 a different type than TCG_i64
+> because it usually needs to be allocated to different registers and
+> supports different operations.
 > 
-> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> ---
->  migration/vmstate.c | 39 +++++++++++++++++----------------------
->  1 file changed, 17 insertions(+), 22 deletions(-)
+> 2. Load/store operations for these new types need to be implemented.
 > 
-> diff --git a/migration/vmstate.c b/migration/vmstate.c
-> index 36efa80..836a7a4 100644
-> --- a/migration/vmstate.c
-> +++ b/migration/vmstate.c
-> @@ -52,29 +52,15 @@ static int vmstate_size(void *opaque, VMStateField *field)
->      return size;
->  }
->  
-> -static void *vmstate_base_addr(void *opaque, VMStateField *field, bool alloc)
-> +static void vmstate_handle_alloc(void *ptr, VMStateField *field, void *opaque)
+> 3. For seamless transition from current model to a new one we need to
+> handle cases where memory occupied by global variable can be accessed via
+> pointer to the CPUArchState structure. A very simple conservative alias
+> analysis has been added to do it. This analysis tracks memory loads and
+> stores that overlap with fields of CPUArchState and provides this
+> information to the register allocator. The allocator then spills and
+> reloads affected globals when needed.
+> 
+> 4. Allow overlapping globals. For scalar registers this is a rare case, and
+> overlapping registers can ba handled as a single one (ah, al, ax, eax,
+> rax). In ARM every Q-register consists of two D-register each consisting of
+> two S-registers. Handling 4 S-registers as one because they are parts of
+> the same Q-register is way too inefficient.
+> 
+> 5. Add new memory addressing mode to MMU code for large accesses and create
+> needed helpers. Only 128-bit vectors have been handled for now.
+> 
+> 6. Create TCG opcodes for vector operations. Only addition has beed handled
+> in these series. Each operation has a wrapper that checks if the backend
+> supports the corresponding operation or not. In one case the vector opcode
+> is generated, in the other the operation is emulated with scalar
+> operations. The emulation code is generated inline for performance reasons
+> (there is a huge performance difference between inline generation
+> and calling a helper). As a positive side effect this will eventually allow
+>  to merge similar emulation code for vector instructions from different
+> frontends to target-independent implementation.
+> 
+> 7. Use new operations in the frontend (ARM was used in these series).
+> 
+> 8. Support new operations in the backend (x86_64 was used in these series).
+> 
+> For experiments I have used ARM guest on x86_64 host. I wanted some pair of
+> different architectures with vector extensions both. ARM and x86_64 pair
+> fits well.
+> 
+> v1 -> v2:
+>  - represent v128 type with smaller types when it is not supported by the host
+>  - detect AVX support and use AVX instructions when available
+>  - tcg/README updated
+>  - generate two v64 adds instead of one v128 when applicable
+>  - rebased to newer master
+>  - overlap detection for temps added (it needs to be explicitly called from
+>    <arch>_translate_init)
+>  - the stack is used to temporary store 128 bit variables to memory
+>    (instead of the TCGContext field)
+> 
+> v2 -> v2.1
+>  - automatic build failure fixed
+> 
+> Outstanding issues:
+>  - qemu_ld_v128 and qemu_st_v128 do not generate fallback code if the host
+>    does not support 128 bit registers. The reason is that I do not know how to
+>    handle the host/guest different endianness (whether do we swap only bytes
+>    in elements or whole vectors?). Different targets seem to have different
+>    ideas on how this should be done.
+>
 
->  {
-> -    void *base_addr = opaque + field->offset;
-> -
-> -    if (field->flags & VMS_POINTER) {
-> -        if (alloc && (field->flags & VMS_ALLOC)) {
-> -            gsize size = 0;
-> -            if (field->flags & VMS_VBUFFER) {
-> -                size = vmstate_size(opaque, field);
-> -            } else {
-> -                int n_elems = vmstate_n_elems(opaque, field);
-> -                if (n_elems) {
-> -                    size = n_elems * field->size;
-> -                }
-> -            }
-> -            if (size) {
-> -                *(void **)base_addr = g_malloc(size);
-> -            }
-> +    if (field->flags & VMS_POINTER && field->flags & VMS_ALLOC) {
-> +        gsize size = vmstate_size(opaque, field);
-> +        size *= vmstate_n_elems(opaque, field);
-> +        if (size) {
-> +            *(void **)ptr = g_malloc(size);
->          }
-> -        base_addr = *(void **)base_addr;
->      }
-> -
-> -    return base_addr;
->  }
->  
->  int vmstate_load_state(QEMUFile *f, const VMStateDescription *vmsd,
-> @@ -116,10 +102,15 @@ int vmstate_load_state(QEMUFile *f, const VMStateDescription *vmsd,
->               field->field_exists(opaque, version_id)) ||
->              (!field->field_exists &&
->               field->version_id <= version_id)) {
-> -            void *first_elem = vmstate_base_addr(opaque, field, true);
-> +            void *first_elem = opaque + field->offset;
->              int i, n_elems = vmstate_n_elems(opaque, field);
->              int size = vmstate_size(opaque, field);
->  
-> +            vmstate_handle_alloc(first_elem, field, opaque);
-> +            if (field->flags & VMS_POINTER) {
-> +                first_elem = *(void **)first_elem;
-> +                assert(first_elem  || !n_elems);
-> +            }
->              for (i = 0; i < n_elems; i++) {
->                  void *curr_elem = first_elem + size * i;
->  
-> @@ -321,13 +312,17 @@ void vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
->      while (field->name) {
->          if (!field->field_exists ||
->              field->field_exists(opaque, vmsd->version_id)) {
-> -            void *first_elem = vmstate_base_addr(opaque, field, false);
-> +            void *first_elem = opaque + field->offset;
->              int i, n_elems = vmstate_n_elems(opaque, field);
->              int size = vmstate_size(opaque, field);
->              int64_t old_offset, written_bytes;
->              QJSON *vmdesc_loop = vmdesc;
->  
->              trace_vmstate_save_state_loop(vmsd->name, field->name, n_elems);
-> +            if (field->flags & VMS_POINTER) {
-> +                first_elem = *(void **)first_elem;
-> +                assert(first_elem  || !n_elems);
-> +            }
->              for (i = 0; i < n_elems; i++) {
->                  void *curr_elem = first_elem + size * i;
->  
-> -- 
-> 2.8.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Ping?
+
+-- 
+Kirill
