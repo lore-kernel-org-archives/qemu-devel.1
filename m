@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgBuS-0008FK-D1
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:21 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cgBuP-0008CC-Sd
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgBuR-0007rJ-Jj
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:20 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cgBuL-0007n5-1J
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:17 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 21 Feb 2017 15:58:07 +0100
-Message-Id: <1487689130-30373-12-git-send-email-kwolf@redhat.com>
+Date: Tue, 21 Feb 2017 15:58:04 +0100
+Message-Id: <1487689130-30373-9-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
 References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 11/54] tests: Use opened block node for block
- job tests
+Subject: [Qemu-devel] [PATCH 08/54] block: Factor out bdrv_open_driver()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,64 +22,160 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-blk_insert_bs() and block job related functions will soon require an
-opened block node (permission calculations will involve the block
-driver), so let our tests be consistent with the real users in this
-respect.
+This is a function that doesn't do any option parsing, but just does
+some basic BlockDriverState setup and calls the .bdrv_open() function of
+the block driver.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/test-blockjob-txn.c | 6 +++++-
- tests/test-blockjob.c     | 6 +++++-
- 2 files changed, 10 insertions(+), 2 deletions(-)
+ block.c | 112 +++++++++++++++++++++++++++++++++++++---------------------------
+ 1 file changed, 65 insertions(+), 47 deletions(-)
 
-diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
-index b132e39..f6dfd08 100644
---- a/tests/test-blockjob-txn.c
-+++ b/tests/test-blockjob-txn.c
-@@ -96,7 +96,10 @@ static BlockJob *test_block_job_start(unsigned int iterations,
-     char job_id[24];
+diff --git a/block.c b/block.c
+index 0f17576..03fc115 100644
+--- a/block.c
++++ b/block.c
+@@ -925,6 +925,67 @@ out:
+     g_free(gen_node_name);
+ }
  
-     data = g_new0(TestBlockJobCBData, 1);
--    bs = bdrv_new();
++static int bdrv_open_driver(BlockDriverState *bs, BlockDriver *drv,
++                            const char *node_name, QDict *options,
++                            int open_flags, Error **errp)
++{
++    Error *local_err = NULL;
++    int ret;
 +
-+    bs = bdrv_open("null-co://", NULL, NULL, 0, &error_abort);
-+    g_assert_nonnull(bs);
++    bdrv_assign_node_name(bs, node_name, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return -EINVAL;
++    }
 +
-     snprintf(job_id, sizeof(job_id), "job%u", counter++);
-     s = block_job_create(job_id, &test_block_job_driver, bs, 0,
-                          BLOCK_JOB_DEFAULT, test_block_job_cb,
-@@ -242,6 +245,7 @@ static void test_pair_jobs_fail_cancel_race(void)
- int main(int argc, char **argv)
- {
-     qemu_init_main_loop(&error_abort);
-+    bdrv_init();
- 
-     g_test_init(&argc, &argv, NULL);
-     g_test_add_func("/single/success", test_single_job_success);
-diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
-index 60b78a3..068c9e4 100644
---- a/tests/test-blockjob.c
-+++ b/tests/test-blockjob.c
-@@ -54,7 +54,10 @@ static BlockJob *do_test_id(BlockBackend *blk, const char *id,
- static BlockBackend *create_blk(const char *name)
- {
-     BlockBackend *blk = blk_new();
--    BlockDriverState *bs = bdrv_new();
-+    BlockDriverState *bs;
++    bs->drv = drv;
++    bs->opaque = g_malloc0(drv->instance_size);
 +
-+    bs = bdrv_open("null-co://", NULL, NULL, 0, &error_abort);
-+    g_assert_nonnull(bs);
++    if (drv->bdrv_file_open) {
++        assert(!drv->bdrv_needs_filename || bs->filename[0]);
++        ret = drv->bdrv_file_open(bs, options, open_flags, &local_err);
++    } else {
++        ret = drv->bdrv_open(bs, options, open_flags, &local_err);
++    }
++
++    if (ret < 0) {
++        if (local_err) {
++            error_propagate(errp, local_err);
++        } else if (bs->filename[0]) {
++            error_setg_errno(errp, -ret, "Could not open '%s'", bs->filename);
++        } else {
++            error_setg_errno(errp, -ret, "Could not open image");
++        }
++        goto free_and_fail;
++    }
++
++    ret = refresh_total_sectors(bs, bs->total_sectors);
++    if (ret < 0) {
++        error_setg_errno(errp, -ret, "Could not refresh total sector count");
++        goto free_and_fail;
++    }
++
++    bdrv_refresh_limits(bs, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        ret = -EINVAL;
++        goto free_and_fail;
++    }
++
++    assert(bdrv_opt_mem_align(bs) != 0);
++    assert(bdrv_min_mem_align(bs) != 0);
++    assert(is_power_of_2(bs->bl.request_alignment));
++
++    return 0;
++
++free_and_fail:
++    /* FIXME Close bs first if already opened*/
++    g_free(bs->opaque);
++    bs->opaque = NULL;
++    bs->drv = NULL;
++    return ret;
++}
++
+ QemuOptsList bdrv_runtime_opts = {
+     .name = "bdrv_common",
+     .head = QTAILQ_HEAD_INITIALIZER(bdrv_runtime_opts.head),
+@@ -1019,14 +1080,6 @@ static int bdrv_open_common(BlockDriverState *bs, BlockBackend *file,
+     trace_bdrv_open_common(bs, filename ?: "", bs->open_flags,
+                            drv->format_name);
  
-     blk_insert_bs(blk, bs);
-     bdrv_unref(bs);
-@@ -140,6 +143,7 @@ static void test_job_ids(void)
- int main(int argc, char **argv)
- {
-     qemu_init_main_loop(&error_abort);
-+    bdrv_init();
+-    node_name = qemu_opt_get(opts, "node-name");
+-    bdrv_assign_node_name(bs, node_name, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        ret = -EINVAL;
+-        goto fail_opts;
+-    }
+-
+     bs->read_only = !(bs->open_flags & BDRV_O_RDWR);
  
-     g_test_init(&argc, &argv, NULL);
-     g_test_add_func("/blockjob/ids", test_job_ids);
+     if (use_bdrv_whitelist && !bdrv_is_whitelisted(drv, bs->read_only)) {
+@@ -1092,54 +1145,19 @@ static int bdrv_open_common(BlockDriverState *bs, BlockBackend *file,
+     }
+     pstrcpy(bs->exact_filename, sizeof(bs->exact_filename), bs->filename);
+ 
+-    bs->drv = drv;
+-    bs->opaque = g_malloc0(drv->instance_size);
+-
+     /* Open the image, either directly or using a protocol */
+     open_flags = bdrv_open_flags(bs, bs->open_flags);
+-    if (drv->bdrv_file_open) {
+-        assert(file == NULL);
+-        assert(!drv->bdrv_needs_filename || filename != NULL);
+-        ret = drv->bdrv_file_open(bs, options, open_flags, &local_err);
+-    } else {
+-        ret = drv->bdrv_open(bs, options, open_flags, &local_err);
+-    }
+-
+-    if (ret < 0) {
+-        if (local_err) {
+-            error_propagate(errp, local_err);
+-        } else if (bs->filename[0]) {
+-            error_setg_errno(errp, -ret, "Could not open '%s'", bs->filename);
+-        } else {
+-            error_setg_errno(errp, -ret, "Could not open image");
+-        }
+-        goto free_and_fail;
+-    }
++    node_name = qemu_opt_get(opts, "node-name");
+ 
+-    ret = refresh_total_sectors(bs, bs->total_sectors);
++    assert(!drv->bdrv_file_open || file == NULL);
++    ret = bdrv_open_driver(bs, drv, node_name, options, open_flags, errp);
+     if (ret < 0) {
+-        error_setg_errno(errp, -ret, "Could not refresh total sector count");
+-        goto free_and_fail;
+-    }
+-
+-    bdrv_refresh_limits(bs, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        ret = -EINVAL;
+-        goto free_and_fail;
++        goto fail_opts;
+     }
+ 
+-    assert(bdrv_opt_mem_align(bs) != 0);
+-    assert(bdrv_min_mem_align(bs) != 0);
+-    assert(is_power_of_2(bs->bl.request_alignment));
+-
+     qemu_opts_del(opts);
+     return 0;
+ 
+-free_and_fail:
+-    g_free(bs->opaque);
+-    bs->opaque = NULL;
+-    bs->drv = NULL;
+ fail_opts:
+     qemu_opts_del(opts);
+     return ret;
 -- 
 1.8.3.1
