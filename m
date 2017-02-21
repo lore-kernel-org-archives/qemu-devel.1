@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cgAcL-0006mH-BX
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:36:34 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cgAdp-0000Ey-2K
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:38:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cgAcK-0002Mu-Do
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:36:33 -0500
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:35844)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1cgAcK-0002MX-2R
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:36:32 -0500
-Received: by mail-lf0-x244.google.com with SMTP id 90so3641856lfr.3
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 05:36:31 -0800 (PST)
+	(envelope-from <no-reply@patchew.org>) id 1cgAdk-0002tw-ND
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:38:05 -0500
+Resent-Message-Id: <E1cgAdk-0002tw-ND@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21481)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cgAdk-0002tg-EQ
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 08:38:00 -0500
+In-Reply-To: <1487680479-15132-1-git-send-email-armbru@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148768427721.33.4309540353951499212@0e2666bad730>
 MIME-Version: 1.0
-References: <1487682332-29154-1-git-send-email-kraxel@redhat.com>
-In-Reply-To: <1487682332-29154-1-git-send-email-kraxel@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 21 Feb 2017 13:36:19 +0000
-Message-ID: <CAJ+F1C+djF=11xOhrSgYB9b41d0ARN1f7qDj673imMz8KM-2sA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] vnc: fix double free issues
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 21 Feb 2017 05:37:57 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 00/11] Changes to -drive without if= and
+ with if=scsi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +29,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: armbru@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-On Tue, Feb 21, 2017 at 5:34 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
-
-> Reported by Coverity: CID 1371242, 1371243, 1371244.
->
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Daniel P. Berrange <berrange@redhat.com>
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
->
-
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-
----
->  ui/vnc.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/ui/vnc.c b/ui/vnc.c
-> index 62e85ed..51f4b30 100644
-> --- a/ui/vnc.c
-> +++ b/ui/vnc.c
-> @@ -3181,6 +3181,7 @@ static void vnc_display_close(VncDisplay *vd)
->      g_free(vd->lsock);
->      g_free(vd->lsock_tag);
->      vd->lsock =3D NULL;
-> +    vd->lsock_tag =3D NULL;
->      vd->nlsock =3D 0;
->
->      for (i =3D 0; i < vd->nlwebsock; i++) {
-> @@ -3192,6 +3193,7 @@ static void vnc_display_close(VncDisplay *vd)
->      g_free(vd->lwebsock);
->      g_free(vd->lwebsock_tag);
->      vd->lwebsock =3D NULL;
-> +    vd->lwebsock_tag =3D NULL;
->      vd->nlwebsock =3D 0;
->
->      vd->auth =3D VNC_AUTH_INVALID;
-> @@ -3204,6 +3206,7 @@ static void vnc_display_close(VncDisplay *vd)
->      vd->tlsaclname =3D NULL;
->      if (vd->lock_key_sync) {
->          qemu_remove_led_event_handler(vd->led);
-> +        vd->led =3D NULL;
->      }
->  }
->
-> --
-> 1.8.3.1
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwMC8xMV0gQ2hhbmdlcyB0byAtZHJpdmUgd2l0aG91
+dCBpZj0gYW5kIHdpdGggaWY9c2NzaQpNZXNzYWdlLWlkOiAxNDg3NjgwNDc5LTE1MTMyLTEtZ2l0
+LXNlbmQtZW1haWwtYXJtYnJ1QHJlZGhhdC5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
+IyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFT
+RS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMg
+VHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIK
+Zm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6
+ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMg
+LS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRo
+ZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRv
+bmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1
+YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNv
+bS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzE0ODY1
+MzE0NjItMTM4ODItMS1naXQtc2VuZC1lbWFpbC16aGFuZ2NoZW4uZm5zdEBjbi5mdWppdHN1LmNv
+bSAtPiBwYXRjaGV3LzE0ODY1MzE0NjItMTM4ODItMS1naXQtc2VuZC1lbWFpbC16aGFuZ2NoZW4u
+Zm5zdEBjbi5mdWppdHN1LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzE0ODc2ODA0
+NzktMTUxMzItMS1naXQtc2VuZC1lbWFpbC1hcm1icnVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzE0
+ODc2ODA0NzktMTUxMzItMS1naXQtc2VuZC1lbWFpbC1hcm1icnVAcmVkaGF0LmNvbQogKiBbbmV3
+IHRhZ10gICAgICAgICBwYXRjaGV3LzE0ODc2ODIzMzItMjkxNTQtMS1naXQtc2VuZC1lbWFpbC1r
+cmF4ZWxAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzE0ODc2ODIzMzItMjkxNTQtMS1naXQtc2VuZC1l
+bWFpbC1rcmF4ZWxAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjhi
+ZmVmNDIgaHcvaTM4NjogRGVwcmVjYXRlIC1kcml2ZSBpZj1zY3NpIHdpdGggUEMgbWFjaGluZSB0
+eXBlcwo3NjM4ZDNmIGh3OiBEZXByZWNhdGUgLWRyaXZlIGlmPXNjc2kgd2l0aCBub24tb25ib2Fy
+ZCBIQkFzCmRjMTcxNDkgaHcvc2NzaTogQ29uY2VudHJhdGUgLWRyaXZlIGlmPXNjc2kgYXV0by1j
+cmVhdGUgaW4gb25lIHBsYWNlCjYxOTYwMDYgaHc6IERyb3Agc3VwZXJmbHVvdXMgc3BlY2lhbCBj
+aGVja3MgZm9yIG9ycGhhbmVkIC1kcml2ZQozZDg3Zjg2IGJsb2NrZGV2OiBNYWtlIG9ycGhhbmVk
+IC1kcml2ZSBmYXRhbAphNzQ3MmNhIGJsb2NrZGV2OiBJbXByb3ZlIG1lc3NhZ2UgZm9yIG9ycGhh
+bmVkIC1kcml2ZQo3ODFlMzA4IGh3L2FybS9oaWdoYmFuazogRGVmYXVsdCAtZHJpdmUgdG8gaWY9
+aWRlIGluc3RlYWQgb2YgaWY9c2NzaQowNGI3MjViIGh3OiBEZWZhdWx0IC1kcml2ZSB0byBpZj1u
+b25lIGluc3RlYWQgb2Ygc2NzaSB3aGVuIHNjc2kgY2Fubm90IHdvcmsKY2VjZDdhMiBodzogRGVm
+YXVsdCAtZHJpdmUgdG8gaWY9bm9uZSBpbnN0ZWFkIG9mIGlkZSB3aGVuIGlkZSBjYW5ub3Qgd29y
+awowMjdjNTk3IGh3L2FybS9jdWJpZWJvYXJkIGh3L2FybS94bG54LWVwMTA4OiBGaXggdW5pdHNf
+cGVyX2RlZmF1bHRfYnVzCmNjZmVjOWUgaHc6IERlZmF1bHQgLWRyaXZlIHRvIGlmPWlkZSBleHBs
+aWNpdGx5IHdoZXJlIGl0IHdvcmtzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRD
+SCAxLzExOiBodzogRGVmYXVsdCAtZHJpdmUgdG8gaWY9aWRlIGV4cGxpY2l0bHkgd2hlcmUgaXQg
+d29ya3MuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xMTogaHcvYXJtL2N1YmllYm9hcmQgaHcvYXJtL3hs
+bngtZXAxMDg6IEZpeCB1bml0c19wZXJfZGVmYXVsdF9idXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8x
+MTogaHc6IERlZmF1bHQgLWRyaXZlIHRvIGlmPW5vbmUgaW5zdGVhZCBvZiBpZGUgd2hlbiBpZGUg
+Y2Fubm90IHdvcmsuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8xMTogaHc6IERlZmF1bHQgLWRyaXZlIHRv
+IGlmPW5vbmUgaW5zdGVhZCBvZiBzY3NpIHdoZW4gc2NzaSBjYW5ub3Qgd29yay4uLgpDaGVja2lu
+ZyBQQVRDSCA1LzExOiBody9hcm0vaGlnaGJhbms6IERlZmF1bHQgLWRyaXZlIHRvIGlmPWlkZSBp
+bnN0ZWFkIG9mIGlmPXNjc2kuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8xMTogYmxvY2tkZXY6IEltcHJv
+dmUgbWVzc2FnZSBmb3Igb3JwaGFuZWQgLWRyaXZlLi4uCkNoZWNraW5nIFBBVENIIDcvMTE6IGJs
+b2NrZGV2OiBNYWtlIG9ycGhhbmVkIC1kcml2ZSBmYXRhbC4uLgpDaGVja2luZyBQQVRDSCA4LzEx
+OiBodzogRHJvcCBzdXBlcmZsdW91cyBzcGVjaWFsIGNoZWNrcyBmb3Igb3JwaGFuZWQgLWRyaXZl
+Li4uCkNoZWNraW5nIFBBVENIIDkvMTE6IGh3L3Njc2k6IENvbmNlbnRyYXRlIC1kcml2ZSBpZj1z
+Y3NpIGF1dG8tY3JlYXRlIGluIG9uZSBwbGFjZS4uLgpDaGVja2luZyBQQVRDSCAxMC8xMTogaHc6
+IERlcHJlY2F0ZSAtZHJpdmUgaWY9c2NzaSB3aXRoIG5vbi1vbmJvYXJkIEhCQXMuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMTEvMTE6IGh3L2kzODY6IERlcHJlY2F0ZSAtZHJpdmUgaWY9c2NzaSB3aXRoIFBD
+IG1hY2hpbmUgdHlwZXMuLi4KRVJST1I6IEludmFsaWQgVVRGLTgsIHBhdGNoIGFuZCBjb21taXQg
+bWVzc2FnZSBzaG91bGQgYmUgZW5jb2RlZCBpbiBVVEYtOAojNzI6IEZJTEU6IHRlc3RzL3FlbXUt
+aW90ZXN0cy8wNTEucGMub3V0OjEyMjoKK3EbW0sbW0RxdRtbSxtbRBtbRHF1aRtbSxtbRBtbRBtb
+RHF1aXQbW0sKICBeCgpFUlJPUjogSW52YWxpZCBVVEYtOCwgcGF0Y2ggYW5kIGNvbW1pdCBtZXNz
+YWdlIHNob3VsZCBiZSBlbmNvZGVkIGluIFVURi04CiM5MjogRklMRTogdGVzdHMvcWVtdS1pb3Rl
+c3RzLzA1MS5wYy5vdXQ6MTc4OgorcRtbSxtbRHF1G1tLG1tEG1tEcXVpG1tLG1tEG1tEG1tEcXVp
+dBtbSwogIF4KCkVSUk9SOiBJbnZhbGlkIFVURi04LCBwYXRjaCBhbmQgY29tbWl0IG1lc3NhZ2Ug
+c2hvdWxkIGJlIGVuY29kZWQgaW4gVVRGLTgKIzEwMjogRklMRTogdGVzdHMvcWVtdS1pb3Rlc3Rz
+LzA1MS5wYy5vdXQ6MTg4OgorcRtbSxtbRHF1G1tLG1tEG1tEcXVpG1tLG1tEG1tEG1tEcXVpdBtb
+SwogIF4KCnRvdGFsOiAzIGVycm9ycywgMCB3YXJuaW5ncywgNjMgbGluZXMgY2hlY2tlZAoKWW91
+ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpU
+ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
+b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
+eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
