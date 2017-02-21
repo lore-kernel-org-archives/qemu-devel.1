@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48424)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cg9eZ-0007fA-N0
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:34:48 -0500
+	(envelope-from <armbru@redhat.com>) id 1cg9eZ-0007ee-9s
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:34:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cg9eX-00084S-7J
+	(envelope-from <armbru@redhat.com>) id 1cg9eV-00083F-W1
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:34:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53454)
+Received: from mx1.redhat.com ([209.132.183.28]:38318)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cg9eW-00083r-Vp
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:34:45 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cg9eV-00082q-QA
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:34:43 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 026A97FB67
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 12:34:44 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
+	[10.36.116.55])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id BF2E965410
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 12:34:43 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 21 Feb 2017 13:34:36 +0100
-Message-Id: <1487680479-15132-9-git-send-email-armbru@redhat.com>
+Date: Tue, 21 Feb 2017 13:34:34 +0100
+Message-Id: <1487680479-15132-7-git-send-email-armbru@redhat.com>
 In-Reply-To: <1487680479-15132-1-git-send-email-armbru@redhat.com>
 References: <1487680479-15132-1-git-send-email-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 08/11] hw: Drop superfluous special checks for
- orphaned -drive
+Subject: [Qemu-devel] [PULL 06/11] blockdev: Improve message for orphaned
+ -drive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,116 +35,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: John Snow <jsnow@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-We've traditionally rejected orphans here and there, but not
-systematically.  For instance, the sun4m machines have an onboard SCSI
-HBA (bus=3D0), and have always rejected bus>0.  Other machines with an
-onboard SCSI HBA don't.
+We warn when a -drive isn't supported by the machine type (commit
+a66c9dc):
 
-Commit a66c9dc made all orphans trigger a warning, and the previous
-commit turned this into an error.  The checks "here and there" are now
-redundant.  Drop them.
+    $ qemu-system-x86_64 -S -display none -drive if=mtd
+    Warning: Orphaned drive without device: id=mtd0,file=,if=mtd,bus=0,unit=0
 
-Note that the one in mips_jazz.c was wrong: it rejected bus > MAX_FD,
-but MAX_FD is the number of floppy drives per bus.
+Improve this to point to the offending bit of configuration:
 
-Error messages change from
+    qemu-system-x86_64: -drive if=mtd: warning: machine type does not support if=mtd,bus=0,unit=0
 
-    $ qemu-system-x86_64 -drive if=3Dide,bus=3D2
-    qemu-system-x86_64: Too many IDE buses defined (3 > 2)
-    $ qemu-system-mips64 -M magnum,accel=3Dqtest -drive if=3Dfloppy,bus=3D=
-2,id=3Dfd1
-    qemu: too many floppy drives
-    $ qemu-system-sparc -M LX -drive if=3Dscsi,bus=3D1
-    qemu: too many SCSI bus
+Especially nice when it's hidden behind -readconfig foo.cfg:
 
-to
+    qemu-system-x86_64:foo.cfg:140: warning: machine type does not support if=mtd,bus=0,unit=0
 
-    $ qemu-system-x86_64 -drive if=3Dide,bus=3D2
-    qemu-system-x86_64: -drive if=3Dide,bus=3D2: machine type does not su=
-pport if=3Dide,bus=3D2,unit=3D0
-    $ qemu-system-mips64 -M magnum,accel=3Dqtest -drive if=3Dfloppy,bus=3D=
-2,id=3Dfd1
-    qemu-system-mips64: -drive if=3Dfloppy,bus=3D2,id=3Dfd1: machine type=
- does not support if=3Dfloppy,bus=3D2,unit=3D0
-    $ qemu-system-sparc -M LX -drive if=3Dscsi,bus=3D1
-    qemu-system-sparc: -drive if=3Dscsi,bus=3D1: machine type does not su=
-pport if=3Dscsi,bus=3D1,unit=3D0
-
-Cc: John Snow <jsnow@redhat.com>
-Cc: "Herv=C3=A9 Poussineau" <hpoussin@reactos.org>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1487153147-11530-9-git-send-email-armbru@redhat.com>
+Message-Id: <1487153147-11530-7-git-send-email-armbru@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- hw/ide/core.c       | 17 -----------------
- hw/mips/mips_jazz.c |  4 ----
- hw/sparc/sun4m.c    |  5 -----
- 3 files changed, 26 deletions(-)
+ blockdev.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/hw/ide/core.c b/hw/ide/core.c
-index 43709e5..cfa5de6 100644
---- a/hw/ide/core.c
-+++ b/hw/ide/core.c
-@@ -2840,23 +2840,6 @@ const VMStateDescription vmstate_ide_bus =3D {
- void ide_drive_get(DriveInfo **hd, int n)
+diff --git a/blockdev.c b/blockdev.c
+index db82ac9..eb75f35 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -231,6 +231,7 @@ bool drive_check_orphaned(void)
  {
-     int i;
--    int highest_bus =3D drive_get_max_bus(IF_IDE) + 1;
--    int max_devs =3D drive_get_max_devs(IF_IDE);
--    int n_buses =3D max_devs ? (n / max_devs) : n;
--
--    /*
--     * Note: The number of actual buses available is not known.
--     * We compute this based on the size of the DriveInfo* array, n.
--     * If it is less than max_devs * <num_real_buses>,
--     * We will stop looking for drives prematurely instead of overfillin=
-g
--     * the array.
--     */
--
--    if (highest_bus > n_buses) {
--        error_report("Too many IDE buses defined (%d > %d)",
--                     highest_bus, n_buses);
--        exit(1);
--    }
-=20
-     for (i =3D 0; i < n; i++) {
-         hd[i] =3D drive_get_by_index(IF_IDE, i);
-diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-index 73f6c9f..1cef581 100644
---- a/hw/mips/mips_jazz.c
-+++ b/hw/mips/mips_jazz.c
-@@ -291,10 +291,6 @@ static void mips_jazz_init(MachineState *machine,
-              qdev_get_gpio_in(rc4030, 5), &esp_reset, &dma_enable);
-=20
-     /* Floppy */
--    if (drive_get_max_bus(IF_FLOPPY) >=3D MAX_FD) {
--        fprintf(stderr, "qemu: too many floppy drives\n");
--        exit(1);
--    }
-     for (n =3D 0; n < MAX_FD; n++) {
-         fds[n] =3D drive_get(IF_FLOPPY, 0, n);
+     BlockBackend *blk;
+     DriveInfo *dinfo;
++    Location loc;
+     bool rs = false;
+ 
+     for (blk = blk_next(NULL); blk; blk = blk_next(blk)) {
+@@ -239,10 +240,12 @@ bool drive_check_orphaned(void)
+         /* Unless this is a default drive, this may be an oversight. */
+         if (!blk_get_attached_dev(blk) && !dinfo->is_default &&
+             dinfo->type != IF_NONE) {
+-            fprintf(stderr, "Warning: Orphaned drive without device: "
+-                    "id=%s,file=%s,if=%s,bus=%d,unit=%d\n",
+-                    blk_name(blk), blk_bs(blk) ? blk_bs(blk)->filename : "",
+-                    if_name[dinfo->type], dinfo->bus, dinfo->unit);
++            loc_push_none(&loc);
++            qemu_opts_loc_restore(dinfo->opts);
++            error_report("warning: machine type does not support"
++                         " if=%s,bus=%d,unit=%d",
++                         if_name[dinfo->type], dinfo->bus, dinfo->unit);
++            loc_pop(&loc);
+             rs = true;
+         }
      }
-diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index f5b6efd..61416a6 100644
---- a/hw/sparc/sun4m.c
-+++ b/hw/sparc/sun4m.c
-@@ -989,11 +989,6 @@ static void sun4m_hw_init(const struct sun4m_hwdef *=
-hwdef,
-     slavio_misc_init(hwdef->slavio_base, hwdef->aux1_base, hwdef->aux2_b=
-ase,
-                      slavio_irq[30], fdc_tc);
-=20
--    if (drive_get_max_bus(IF_SCSI) > 0) {
--        fprintf(stderr, "qemu: too many SCSI bus\n");
--        exit(1);
--    }
--
-     esp_init(hwdef->esp_base, 2,
-              espdma_memory_read, espdma_memory_write,
-              espdma, espdma_irq, &esp_reset, &dma_enable);
---=20
+-- 
 2.7.4
