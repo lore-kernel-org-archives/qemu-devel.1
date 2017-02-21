@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cgBdr-0000Yr-SX
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:42:12 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cgBe9-0001J0-UE
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:42:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cgBdo-0007Wo-Pd
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:42:11 -0500
-Received: from smtp.mail.uni-mannheim.de ([134.155.96.80]:60625)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1cgBdo-0007WJ-J0
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:42:08 -0500
-References: <20170221141451.28305-1-marcandre.lureau@redhat.com>
-	<20170221141451.28305-17-marcandre.lureau@redhat.com>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <792b8e5a-9b56-d51f-ed8d-4b49af38089d@weilnetz.de>
-Date: Tue, 21 Feb 2017 15:42:08 +0100
-MIME-Version: 1.0
-In-Reply-To: <20170221141451.28305-17-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <kraxel@redhat.com>) id 1cgBe6-0007eJ-P2
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:42:29 -0500
+Message-ID: <1487688140.2694.84.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 21 Feb 2017 15:42:20 +0100
+In-Reply-To: <02a49a30-aa68-6484-0957-85009948296e@redhat.com>
+References: <1487603763-14932-1-git-send-email-kraxel@redhat.com>
+	<02a49a30-aa68-6484-0957-85009948296e@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 16/30] tests: fix eepro100-test leak
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [RfC PATCH] vga: wire up -g <width>x<height>
+ switch for virtio and qxl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,28 +24,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>qemu-ppc@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
 
-Am 21.02.2017 um 15:14 schrieb Marc-Andr=C3=A9 Lureau:
-> Spotted by ASAN.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  tests/eepro100-test.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/tests/eepro100-test.c b/tests/eepro100-test.c
-> index ed23258b0f..bdc8a67d57 100644
-> --- a/tests/eepro100-test.c
-> +++ b/tests/eepro100-test.c
-> @@ -54,6 +54,7 @@ int main(int argc, char **argv)
-> =20
->          path =3D g_strdup_printf("eepro100/%s", models[i]);
->          qtest_add_data_func(path, models[i], test_device);
-> +        g_free(path);
->      }
-> =20
->      return g_test_run();
->=20
+  Hi,
 
-Reviewed-by: Stefan Weil <sw@weilnetz.de>
+> I think the basic idea of the patch is good, but I'd remove the qxl
+> FIXMEs for the final version of the patch (spice is likely not working
+> on Sparc and PPC anyway yet).
+
+Sure, just wanted have a rfc out of the door before going debug the qxl
+issue.
+
+> > -#ifdef TARGET_SPARC
+> > +#if defined(TARGET_SPARC)
+> >  int graphic_width =3D 1024;
+> >  int graphic_height =3D 768;
+> >  int graphic_depth =3D 8;
+> > -#else
+> > +#elif defined(TARGET_PPC)
+> >  int graphic_width =3D 800;
+> >  int graphic_height =3D 600;
+> >  int graphic_depth =3D 32;
+> > +#else
+> > +int graphic_width;
+> > +int graphic_height;
+> > +int graphic_depth;
+> >  #endif
+>=20
+> IMHO we could also switch the default resolution on ppc to 1024x768, so
+> you could simplify that code to something like that:
+
+Cc'ing qemu-ppc list.  Comments on the suggestion?
+
+> And maybe Sparc can even work fine with 32 bpp nowadays, too, so you
+> could completely get rid of the ifdefery here?
+
+Depends on the sparc display devices, so no for the general case.
+
+I think the better policy would be to just not initialize the graphics_*
+variables and let the machine and/or display adapter pick a sane default
+then.
+
+cheers,
+  Gerd
