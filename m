@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hualingson@foxmail.com>) id 1cfzZ0-0001fg-U0
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 20:48:24 -0500
+	(envelope-from <bounces@canonical.com>) id 1cfzze-0005wE-EM
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 21:15:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hualingson@foxmail.com>) id 1cfzYw-00055w-Bm
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 20:48:22 -0500
-Received: from smtpproxy19.qq.com ([184.105.206.84]:48314)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <hualingson@foxmail.com>)
-	id 1cfzYv-00055b-KK
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 20:48:18 -0500
-From: "=?ISO-8859-1?B?eGl1Y2Fp?=" <hualingson@foxmail.com>
-Mime-Version: 1.0
-Date: Tue, 21 Feb 2017 09:48:09 +0800
-Message-ID: <tencent_6ACD11A47C2496DB56F175B1@qq.com>
-Content-Type: text/plain;
-	charset="ISO-8859-1"
-Content-Transfer-Encoding: base64
-Subject: [Qemu-devel] why it meets this error after putting
- windows-virtio-dirvers into win7x64ultimate.iso using waik when
- boot&install from the iso?
+	(envelope-from <bounces@canonical.com>) id 1cfzza-0003Mo-FH
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 21:15:54 -0500
+Received: from indium.canonical.com ([91.189.90.7]:34948)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cfzza-0003MS-8o
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 21:15:50 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cfzzX-00077m-NZ
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 02:15:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B02AE2E80CC
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 02:15:47 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 21 Feb 2017 02:06:36 -0000
+From: Bug Watch Updater <1653384@bugs.launchpad.net>
+Reply-To: Bug 1653384 <1653384@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20161231213844.1229.87554.malonedeb@soybean.canonical.com>
+Message-Id: <20170221020637.5705.92483.launchpad@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1653384] Re: Assertion failed with USB pass
+ through with XHCI controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,74 +37,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-1?B?cWVtdS1kZXZlbA==?= <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-SGksDQoNCkJUVywgSSBhbHNvIGhhZCBwb3N0ZWQgdGhlIFEgQCBodHRwOi8vc3RhY2tvdmVy
-Zmxvdy5jb20vcXVlc3Rpb25zLzQyMzM2MTc1L3doeS1tZWV0LXRoaXMtd2lubG9hZC1leGUt
-ZXJyb3ItYWZ0ZXItcHV0LXZpcnRpby1kaXJ2ZXItaW50by13aW43eDY0dWx0aW1hdGUtaXNv
-Lg0KDQpNeSBhaW0gaXMgbWFraW5nIHdpbmRvd3MtdmlydGlvLWRyaXZlcnMgd2l0aGluIHdp
-bjd4NjR1bHRpbWF0ZS5pc28sIHNvIGl0IGNhbiBiZSB1c2VkIGRpcmVjdGx5IHVwb24gcWVt
-dS1rdm0gd2l0aCB2aXJ0aW8gYnVzLCBlc3BlY2lhbGx5IGJsb2NrIGRldmljZXMgYW5kIG5l
-dHdvcmsgaW50ZXJmYWNlcy4NCg0KDQpCdXQgaXQgbWVldHMgdGhpcyBlcnJvciB3aGVuIGJv
-b3QmaW5zdGFsbCBmcm9tIHRoZSBtb2RpZmllZCBpc28uDQoNCg0KDQpIZXJlIGlzIG15IG1h
-a2Vpc28ud2luN3g2NC5wczE6DQojIFRPRE86IHNpbXBsaWZ5IGxvZ2ljcyAjIEJ5IEJvYiAj
-IGRlZmluZSB2YXJpYWJsZXMgJFdBSUtQRVRvb2xzUGF0aD0iQzpcUHJvZ3JhbSBGaWxlc1xX
-aW5kb3dzIEFJS1xUb29sc1xQRVRvb2xzIiAkV0lNSW5zdGFsbFBhdGg9IkM6XHNpbXBsZVxp
-bnN0YWxsLndpbSIgJFdJTUJvb3RQYXRoPSJDOlxzaW1wbGVcYm9vdC53aW0iICRXaW5kb3dz
-VmlydElPRHJpdmVyc1BhdGg9IkM6XHNpbXBsZVx3aW5kb3dzLXZpcnRpby1kcml2ZXJzIiAk
-SW1hZ2VJbnN0YWxsTW91bnRQYXRoPSJDOlxzaW1wbGVcbW50XGluc3RhbGwiICRJbWFnZUJv
-b3RNb3VudFBhdGg9IkM6XHNpbXBsZVxtbnRcYm9vdCIgY2QgJFdBSUtQRVRvb2xzUGF0aCBw
-d2QgIyB0aGVuIG1vZGlmeSBpbnN0YWxsLndpbSBkaXNtIC9nZXQtd2ltaW5mbyAvd2ltZmls
-ZTokV0lNSW5zdGFsbFBhdGggIyBUT0RPOiBnZXQgJG4gZnJvbSB0aGlzIG91dHB1dCAkbj00
-IHdoaWxlKCRuIC1uZSAwKSB7ICAgICAkbmV3ZGlyPSRJbWFnZUluc3RhbGxNb3VudFBhdGgr
-JG4gICAgIG1rZGlyICRuZXdkaXIgICAgIGRpc20gL21vdW50LXdpbSAvd2ltZmlsZTokV0lN
-SW5zdGFsbFBhdGggL2luZGV4OiRuIC9tb3VudGRpcjokbmV3ZGlyICAgICBkaXNtIC9pbWFn
-ZTokbmV3ZGlyIC9nZXQtZHJpdmVycyAgICAgZGlzbSAvaW1hZ2U6JG5ld2RpciAvYWRkLWRy
-aXZlciAvZHJpdmVyOiRXaW5kb3dzVmlydElPRHJpdmVyc1BhdGhcQmFsbG9vblx3N1xhbWQ2
-NFxiYWxsb29uLmluZiAgICAgPCMgICAgIGRpc20gL2ltYWdlOiRuZXdkaXIgL2FkZC1kcml2
-ZXIgL2RyaXZlcjokV2luZG93c1ZpcnRJT0RyaXZlcnNQYXRoXE5ldEtWTVx3N1xhbWQ2NFxu
-ZXRrdm0uaW5mICAgICBkaXNtIC9pbWFnZTokbmV3ZGlyIC9hZGQtZHJpdmVyIC9kcml2ZXI6
-JFdpbmRvd3NWaXJ0SU9Ecml2ZXJzUGF0aFxwdnBhbmljXHc3XGFtZDY0XHB2cGFuaWMuaW5m
-ICAgICBkaXNtIC9pbWFnZTokbmV3ZGlyIC9hZGQtZHJpdmVyIC9kcml2ZXI6JFdpbmRvd3NW
-aXJ0SU9Ecml2ZXJzUGF0aFxxZW11cGNpc2VyaWFsXHFlbXVwY2lzZXJpYWwuaW5mICAgICBk
-aXNtIC9pbWFnZTokbmV3ZGlyIC9hZGQtZHJpdmVyIC9kcml2ZXI6JFdpbmRvd3NWaXJ0SU9E
-cml2ZXJzUGF0aFxxeGxcdzdcYW1kNjRccXhsLmluZiAgICAgZGlzbSAvaW1hZ2U6JG5ld2Rp
-ciAvYWRkLWRyaXZlciAvZHJpdmVyOiRXaW5kb3dzVmlydElPRHJpdmVyc1BhdGhcdmlvaW5w
-dXRcdzdcYW1kNjRcdmlvaW5wdXQuaW5mICAgICBkaXNtIC9pbWFnZTokbmV3ZGlyIC9hZGQt
-ZHJpdmVyIC9kcml2ZXI6JFdpbmRvd3NWaXJ0SU9Ecml2ZXJzUGF0aFx2aW9ybmdcdzdcYW1k
-NjRcdmlvcm5nLmluZiAgICAgZGlzbSAvaW1hZ2U6JG5ld2RpciAvYWRkLWRyaXZlciAvZHJp
-dmVyOiRXaW5kb3dzVmlydElPRHJpdmVyc1BhdGhcdmlvc2NzaVx3N1xhbWQ2NFx2aW9zY3Np
-LmluZiAgICAgZGlzbSAvaW1hZ2U6JG5ld2RpciAvYWRkLWRyaXZlciAvZHJpdmVyOiRXaW5k
-b3dzVmlydElPRHJpdmVyc1BhdGhcdmlvc2VyaWFsXHc3XGFtZDY0XHZpb3Nlci5pbmYgICAg
-ICM+ICAgICBkaXNtIC9pbWFnZTokbmV3ZGlyIC9hZGQtZHJpdmVyIC9kcml2ZXI6JFdpbmRv
-d3NWaXJ0SU9Ecml2ZXJzUGF0aFx2aW9zdG9yXHc3XGFtZDY0XHZpb3N0b3IuaW5mICAgICBk
-aXNtIC9pbWFnZTokbmV3ZGlyIC9nZXQtZHJpdmVycyAgICAgZGlzbSAvdW5tb3VudC13aW0g
-L21vdW50ZGlyOiRuZXdkaXIgL2NvbW1pdCAgICAgIyBybWRpciAkbmV3ZGlyIC1SZWN1cnNl
-IC1Gb3JjZSAtQ29uZmlybTokZmFsc2UgICAgICRuLS0gfSAjIHRoZW4gbW9kaWZ5IGJvb3Qu
-d2ltIGRpc20gL2dldC13aW1pbmZvIC93aW1maWxlOiRXSU1Cb290UGF0aCAjIFRPRE86IGdl
-dCAkbiBmcm9tIHRoaXMgb3V0cHV0ICRuPTIgd2hpbGUoJG4gLW5lIDApIHsgICAgICRuZXdk
-aXI9JEltYWdlQm9vdE1vdW50UGF0aCskbiAgICAgbWtkaXIgJG5ld2RpciAgICAgZGlzbSAv
-bW91bnQtd2ltIC93aW1maWxlOiRXSU1Cb290UGF0aCAvaW5kZXg6JG4gL21vdW50ZGlyOiRu
-ZXdkaXIgICAgIGRpc20gL2ltYWdlOiRuZXdkaXIgL2dldC1kcml2ZXJzICAgICBkaXNtIC9p
-bWFnZTokbmV3ZGlyIC9hZGQtZHJpdmVyIC9kcml2ZXI6JFdpbmRvd3NWaXJ0SU9Ecml2ZXJz
-UGF0aFxCYWxsb29uXHc3XGFtZDY0XGJhbGxvb24uaW5mICAgICA8IyAgICAgZGlzbSAvaW1h
-Z2U6JG5ld2RpciAvYWRkLWRyaXZlciAvZHJpdmVyOiRXaW5kb3dzVmlydElPRHJpdmVyc1Bh
-dGhcTmV0S1ZNXHc3XGFtZDY0XG5ldGt2bS5pbmYgICAgIGRpc20gL2ltYWdlOiRuZXdkaXIg
-L2FkZC1kcml2ZXIgL2RyaXZlcjokV2luZG93c1ZpcnRJT0RyaXZlcnNQYXRoXHB2cGFuaWNc
-dzdcYW1kNjRccHZwYW5pYy5pbmYgICAgIGRpc20gL2ltYWdlOiRuZXdkaXIgL2FkZC1kcml2
-ZXIgL2RyaXZlcjokV2luZG93c1ZpcnRJT0RyaXZlcnNQYXRoXHFlbXVwY2lzZXJpYWxccWVt
-dXBjaXNlcmlhbC5pbmYgICAgIGRpc20gL2ltYWdlOiRuZXdkaXIgL2FkZC1kcml2ZXIgL2Ry
-aXZlcjokV2luZG93c1ZpcnRJT0RyaXZlcnNQYXRoXHF4bFx3N1xhbWQ2NFxxeGwuaW5mICAg
-ICBkaXNtIC9pbWFnZTokbmV3ZGlyIC9hZGQtZHJpdmVyIC9kcml2ZXI6JFdpbmRvd3NWaXJ0
-SU9Ecml2ZXJzUGF0aFx2aW9pbnB1dFx3N1xhbWQ2NFx2aW9pbnB1dC5pbmYgICAgIGRpc20g
-L2ltYWdlOiRuZXdkaXIgL2FkZC1kcml2ZXIgL2RyaXZlcjokV2luZG93c1ZpcnRJT0RyaXZl
-cnNQYXRoXHZpb3JuZ1x3N1xhbWQ2NFx2aW9ybmcuaW5mICAgICBkaXNtIC9pbWFnZTokbmV3
-ZGlyIC9hZGQtZHJpdmVyIC9kcml2ZXI6JFdpbmRvd3NWaXJ0SU9Ecml2ZXJzUGF0aFx2aW9z
-Y3NpXHc3XGFtZDY0XHZpb3Njc2kuaW5mICAgICBkaXNtIC9pbWFnZTokbmV3ZGlyIC9hZGQt
-ZHJpdmVyIC9kcml2ZXI6JFdpbmRvd3NWaXJ0SU9Ecml2ZXJzUGF0aFx2aW9zZXJpYWxcdzdc
-YW1kNjRcdmlvc2VyLmluZiAgICAgIz4gICAgIGRpc20gL2ltYWdlOiRuZXdkaXIgL2FkZC1k
-cml2ZXIgL2RyaXZlcjokV2luZG93c1ZpcnRJT0RyaXZlcnNQYXRoXHZpb3N0b3JcdzdcYW1k
-NjRcdmlvc3Rvci5pbmYgICAgIGRpc20gL2ltYWdlOiRuZXdkaXIgL2dldC1kcml2ZXJzICAg
-ICBkaXNtIC91bm1vdW50LXdpbSAvbW91bnRkaXI6JG5ld2RpciAvY29tbWl0ICAgICAjIHJt
-ZGlyICRuZXdkaXIgLVJlY3Vyc2UgLUZvcmNlIC1Db25maXJtOiRmYWxzZSAgICAgJG4tLSB9
-ICMgZW5kDQoNCg0KDQoNCg0KDQpSZWdhcmRzIQ==
+** Changed in: qemu (Debian)
+       Status: Unknown =3D> Confirmed
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1653384
+
+Title:
+  Assertion failed with USB pass through with XHCI controller
+
+Status in QEMU:
+  Fix Committed
+Status in qemu package in Debian:
+  Confirmed
+
+Bug description:
+  Starting qemu 2.8.0 with XHCI controller and host device passed
+  through results in an assertion failure:
+
+  qemu-system-x86_64: hw/usb/core.c:623: usb_packet_cleanup: Assertion
+  `!usb_packet_is_inflight(p)' failed.
+
+  Can be reproduced with the following command (passing through a Lenovo
+  keyboard):
+
+  qemu-system-x86_64 -usb  -device nec-usb-xhci,id=3Dusb -device usb-
+  host,vendorid=3D0x04b3,productid=3D0x3025,id=3Dhostdev0,bus=3Dusb.0,port=
+=3D1
+
+  If nec-usb-xhci is changed to usb-ehci, qemu tries to boot without
+  assertion failures.
+
+  =
+
+  Can be reproduced with the latest master (commit dbe2b65) and v2.8.0.
+
+  Bisected the issue to following commit:
+  first bad commit: [94b037f2a451b3dc855f9f2c346e5049a361bd55] xhci: use li=
+nked list for transfers
+
+  =
+
+  Backtrace from commit dbe2b65:
+
+  #0  0x00007f2eb4657227 in __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/=
+unix/sysv/linux/raise.c:55
+          resultvar =3D 0
+          pid =3D 3453
+          selftid =3D 3453
+  #1  0x00007f2eb465867a in __GI_abort () at abort.c:89
+          save_stage =3D 2
+          act =3D {__sigaction_handler =3D {sa_handler =3D 0x4, sa_sigactio=
+n =3D 0x4}, sa_mask =3D {__val =3D {140734740550528, 93876690035339, =
+
+                140734740550624, 48833659808, 0, 0, 0, 21474836480, 1407347=
+40550792, 139838573009553, 140734740550560, 139838573043008, =
+
+                139838573024160, 93876666665872, 139838702616576, 139838573=
+024160}}, sa_flags =3D 1528954938, =
+
+            sa_restorer =3D 0x55615b2202c0 <__PRETTY_FUNCTION__.38612>}
+          sigs =3D {__val =3D {32, 0 <repeats 15 times>}}
+  #2  0x00007f2eb46502cd in __assert_fail_base (fmt=3D0x7f2eb47893a0 "%s%s%=
+s:%u: %s%sAssertion `%s' failed.\n%n", =
+
+      assertion=3Dassertion@entry=3D0x55615b22003a "!usb_packet_is_inflight=
+(p)", file=3Dfile@entry=3D0x55615b21fdf0 "hw/usb/core.c", line=3Dline@entry=
+=3D619, =
+
+      function=3Dfunction@entry=3D0x55615b2202c0 <__PRETTY_FUNCTION__.38612=
+> "usb_packet_cleanup") at assert.c:92
+          str =3D 0x55615cfdf510 ""
+          total =3D 4096
+  #3  0x00007f2eb4650382 in __GI___assert_fail (assertion=3D0x55615b22003a =
+"!usb_packet_is_inflight(p)", file=3D0x55615b21fdf0 "hw/usb/core.c", =
+
+      line=3D619, function=3D0x55615b2202c0 <__PRETTY_FUNCTION__.38612> "us=
+b_packet_cleanup") at assert.c:101
+  No locals.
+  #4  0x000055615afc385e in usb_packet_cleanup ()
+  No symbol table info available.
+  #5  0x000055615afda555 in xhci_ep_free_xfer ()
+  No symbol table info available.
+  #6  0x000055615afdc156 in xhci_kick_epctx ()
+  No symbol table info available.
+  #7  0x000055615afda099 in xhci_ep_kick_timer ()
+  No symbol table info available.
+  #8  0x000055615b08ceee in timerlist_run_timers ()
+  No symbol table info available.
+  #9  0x000055615b08cf36 in qemu_clock_run_timers ()
+  No symbol table info available.
+  #10 0x000055615b08d2df in qemu_clock_run_all_timers ()
+  No symbol table info available.
+  #11 0x000055615b08be40 in main_loop_wait ()
+  No symbol table info available.
+  #12 0x000055615ae3870f in main_loop ()
+  No symbol table info available.
+  #13 0x000055615ae4027b in main ()
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1653384/+subscriptions
