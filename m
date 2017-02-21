@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cg9Yl-0002LI-MK
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:28:48 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cg9ZP-0002uK-1e
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:29:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cg9Yh-0006ID-Na
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:28:47 -0500
-Received: from [59.151.112.132] (port=29863 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cg9Yh-0006Hm-CH
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:28:43 -0500
-References: <1487597638-28323-1-git-send-email-armbru@redhat.com>
-	<8ed45bc8-6051-ccae-6227-52d8553c04af@cn.fujitsu.com>
-	<871surzt5o.fsf@dusky.pond.sub.org>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <72553efc-b0f6-343f-2adc-3c52c150d13b@cn.fujitsu.com>
-Date: Tue, 21 Feb 2017 20:28:04 +0800
-MIME-Version: 1.0
-In-Reply-To: <871surzt5o.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 0/2] QAPI patches for 2017-02-20
+	(envelope-from <pbonzini@redhat.com>) id 1cg9ZL-0006OY-3B
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:29:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35532)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cg9ZK-0006OT-T9
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:29:23 -0500
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 21 Feb 2017 13:29:18 +0100
+Message-Id: <20170221122920.16245-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/2] update Linux headers to 4.11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +21,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: zhangchen.fnst@cn.fujitsu.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: cornelia.huck@de.ibm.com, mst@redhat.com
 
+Pretty large update, requiring a few changes to the script too
+(patch 1).
 
+Paolo Bonzini (2):
+  update Linux headers to 4.11
+  update-linux-headers: update for 4.11
 
-On 02/21/2017 07:21 PM, Markus Armbruster wrote:
-> Zhang Chen <zhangchen.fnst@cn.fujitsu.com> writes:
->
->> Hi~ Markus.
->>
->> This patch set has been reviewed for a long time, can you pick up it?
->>
->> [PATCH V7 0/2] Add new qmp commands to suppurt Xen COLO
-> I think this should go through a COLO maintainer chain, or perhaps the
-> Xen maintainer, but not the QAPI maintainer (me).  QAPI guys should
-> provide review, so I just had a look.
->
-
-OK, I got your point.
-
-Thanks
-Zhang Chen
-
->
+ include/standard-headers/linux/input-event-codes.h |   2 +-
+ include/standard-headers/linux/pci_regs.h          |   8 +
+ include/standard-headers/linux/virtio_ids.h        |   1 +
+ linux-headers/asm-arm/kvm.h                        |  15 +
+ linux-headers/asm-arm/unistd-common.h              | 357 ++++++++++++++++++
+ linux-headers/asm-arm/unistd-eabi.h                |   5 +
+ linux-headers/asm-arm/unistd-oabi.h                |  17 +
+ linux-headers/asm-arm/unistd.h                     | 419 +--------------------
+ linux-headers/asm-arm64/kvm.h                      |  13 +
+ linux-headers/asm-powerpc/kvm.h                    |  27 ++
+ linux-headers/asm-powerpc/unistd.h                 |   1 +
+ linux-headers/asm-x86/kvm_para.h                   |  13 +-
+ linux-headers/linux/kvm.h                          |  24 +-
+ linux-headers/linux/kvm_para.h                     |   2 +
+ linux-headers/linux/vfio.h                         |  10 +
+ scripts/update-linux-headers.sh                    |  13 +-
+ 16 files changed, 506 insertions(+), 421 deletions(-)
+ create mode 100644 linux-headers/asm-arm/unistd-common.h
+ create mode 100644 linux-headers/asm-arm/unistd-eabi.h
+ create mode 100644 linux-headers/asm-arm/unistd-oabi.h
 
 -- 
-Thanks
-Zhang Chen
+2.9.3
