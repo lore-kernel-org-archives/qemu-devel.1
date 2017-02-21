@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgBuc-0000GE-Et
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:31 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cgBud-0000Lo-OL
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgBub-0007wA-Be
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:30 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cgBuc-0007wk-AC
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:31 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 21 Feb 2017 15:58:14 +0100
-Message-Id: <1487689130-30373-19-git-send-email-kwolf@redhat.com>
+Date: Tue, 21 Feb 2017 15:58:15 +0100
+Message-Id: <1487689130-30373-20-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
 References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 18/54] block: Default .bdrv_child_perm() for
+Subject: [Qemu-devel] [PATCH 19/54] block: Request child permissions in
  format drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,94 +23,173 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-Almost all format drivers have the same characteristics as far as
-permissions are concerned: They have one or more children for storing
-their own data and, more importantly, metadata (can be written to and
-grow even without external write requests, must be protected against
-other writers and present consistent data) and optionally a backing file
-(this is just data, so like for a filter, it only depends on what the
-parent nodes need).
+This makes use of the .bdrv_child_perm() implementation for formats that
+we just added. All format drivers expose the permissions they actually
+need nows, so that they can be set accordingly and updated when parents
+are attached or detached.
 
-This provides a default implementation that can be shared by most of
-our format drivers.
+The only format not included here is raw, which was already converted
+with the other filter drivers.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block.c                   | 42 ++++++++++++++++++++++++++++++++++++++++++
- include/block/block_int.h |  8 ++++++++
- 2 files changed, 50 insertions(+)
+ block/bochs.c     | 1 +
+ block/cloop.c     | 1 +
+ block/crypto.c    | 1 +
+ block/dmg.c       | 1 +
+ block/parallels.c | 1 +
+ block/qcow.c      | 1 +
+ block/qcow2.c     | 1 +
+ block/qed.c       | 1 +
+ block/vdi.c       | 1 +
+ block/vhdx.c      | 1 +
+ block/vmdk.c      | 1 +
+ block/vpc.c       | 1 +
+ 12 files changed, 12 insertions(+)
 
-diff --git a/block.c b/block.c
-index 523cbd3..f2e7178 100644
---- a/block.c
-+++ b/block.c
-@@ -1554,6 +1554,48 @@ void bdrv_filter_default_perms(BlockDriverState *bs, BdrvChild *c,
-                (c->shared_perm & DEFAULT_PERM_UNCHANGED);
- }
+diff --git a/block/bochs.c b/block/bochs.c
+index 7dd2ac4..516da56 100644
+--- a/block/bochs.c
++++ b/block/bochs.c
+@@ -293,6 +293,7 @@ static BlockDriver bdrv_bochs = {
+     .instance_size	= sizeof(BDRVBochsState),
+     .bdrv_probe		= bochs_probe,
+     .bdrv_open		= bochs_open,
++    .bdrv_child_perm     = bdrv_format_default_perms,
+     .bdrv_refresh_limits = bochs_refresh_limits,
+     .bdrv_co_preadv = bochs_co_preadv,
+     .bdrv_close		= bochs_close,
+diff --git a/block/cloop.c b/block/cloop.c
+index 877c9b0..a6c7b9d 100644
+--- a/block/cloop.c
++++ b/block/cloop.c
+@@ -290,6 +290,7 @@ static BlockDriver bdrv_cloop = {
+     .instance_size  = sizeof(BDRVCloopState),
+     .bdrv_probe     = cloop_probe,
+     .bdrv_open      = cloop_open,
++    .bdrv_child_perm     = bdrv_format_default_perms,
+     .bdrv_refresh_limits = cloop_refresh_limits,
+     .bdrv_co_preadv = cloop_co_preadv,
+     .bdrv_close     = cloop_close,
+diff --git a/block/crypto.c b/block/crypto.c
+index 7cb2ff2..4a20388 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -628,6 +628,7 @@ BlockDriver bdrv_crypto_luks = {
+     .bdrv_probe         = block_crypto_probe_luks,
+     .bdrv_open          = block_crypto_open_luks,
+     .bdrv_close         = block_crypto_close,
++    .bdrv_child_perm    = bdrv_format_default_perms,
+     .bdrv_create        = block_crypto_create_luks,
+     .bdrv_truncate      = block_crypto_truncate,
+     .create_opts        = &block_crypto_create_opts_luks,
+diff --git a/block/dmg.c b/block/dmg.c
+index 8e387cd..a7d25fc 100644
+--- a/block/dmg.c
++++ b/block/dmg.c
+@@ -697,6 +697,7 @@ static BlockDriver bdrv_dmg = {
+     .bdrv_probe     = dmg_probe,
+     .bdrv_open      = dmg_open,
+     .bdrv_refresh_limits = dmg_refresh_limits,
++    .bdrv_child_perm     = bdrv_format_default_perms,
+     .bdrv_co_preadv = dmg_co_preadv,
+     .bdrv_close     = dmg_close,
+ };
+diff --git a/block/parallels.c b/block/parallels.c
+index b2ec09f..6b0c0a9 100644
+--- a/block/parallels.c
++++ b/block/parallels.c
+@@ -762,6 +762,7 @@ static BlockDriver bdrv_parallels = {
+     .bdrv_probe		= parallels_probe,
+     .bdrv_open		= parallels_open,
+     .bdrv_close		= parallels_close,
++    .bdrv_child_perm          = bdrv_format_default_perms,
+     .bdrv_co_get_block_status = parallels_co_get_block_status,
+     .bdrv_has_zero_init       = bdrv_has_zero_init_1,
+     .bdrv_co_flush_to_os      = parallels_co_flush_to_os,
+diff --git a/block/qcow.c b/block/qcow.c
+index 038b05a..eb5d54c 100644
+--- a/block/qcow.c
++++ b/block/qcow.c
+@@ -1052,6 +1052,7 @@ static BlockDriver bdrv_qcow = {
+     .bdrv_probe		= qcow_probe,
+     .bdrv_open		= qcow_open,
+     .bdrv_close		= qcow_close,
++    .bdrv_child_perm        = bdrv_format_default_perms,
+     .bdrv_reopen_prepare    = qcow_reopen_prepare,
+     .bdrv_create            = qcow_create,
+     .bdrv_has_zero_init     = bdrv_has_zero_init_1,
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 21e6142..ef028f6 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -3403,6 +3403,7 @@ BlockDriver bdrv_qcow2 = {
+     .bdrv_reopen_commit   = qcow2_reopen_commit,
+     .bdrv_reopen_abort    = qcow2_reopen_abort,
+     .bdrv_join_options    = qcow2_join_options,
++    .bdrv_child_perm      = bdrv_format_default_perms,
+     .bdrv_create        = qcow2_create,
+     .bdrv_has_zero_init = bdrv_has_zero_init_1,
+     .bdrv_co_get_block_status = qcow2_co_get_block_status,
+diff --git a/block/qed.c b/block/qed.c
+index 62a0a09..d8f947a 100644
+--- a/block/qed.c
++++ b/block/qed.c
+@@ -1704,6 +1704,7 @@ static BlockDriver bdrv_qed = {
+     .bdrv_open                = bdrv_qed_open,
+     .bdrv_close               = bdrv_qed_close,
+     .bdrv_reopen_prepare      = bdrv_qed_reopen_prepare,
++    .bdrv_child_perm          = bdrv_format_default_perms,
+     .bdrv_create              = bdrv_qed_create,
+     .bdrv_has_zero_init       = bdrv_has_zero_init_1,
+     .bdrv_co_get_block_status = bdrv_qed_co_get_block_status,
+diff --git a/block/vdi.c b/block/vdi.c
+index 18b4773..fd6e26d 100644
+--- a/block/vdi.c
++++ b/block/vdi.c
+@@ -891,6 +891,7 @@ static BlockDriver bdrv_vdi = {
+     .bdrv_open = vdi_open,
+     .bdrv_close = vdi_close,
+     .bdrv_reopen_prepare = vdi_reopen_prepare,
++    .bdrv_child_perm          = bdrv_format_default_perms,
+     .bdrv_create = vdi_create,
+     .bdrv_has_zero_init = bdrv_has_zero_init_1,
+     .bdrv_co_get_block_status = vdi_co_get_block_status,
+diff --git a/block/vhdx.c b/block/vhdx.c
+index 9918ee9..ab747f6 100644
+--- a/block/vhdx.c
++++ b/block/vhdx.c
+@@ -1983,6 +1983,7 @@ static BlockDriver bdrv_vhdx = {
+     .bdrv_open              = vhdx_open,
+     .bdrv_close             = vhdx_close,
+     .bdrv_reopen_prepare    = vhdx_reopen_prepare,
++    .bdrv_child_perm        = bdrv_format_default_perms,
+     .bdrv_co_readv          = vhdx_co_readv,
+     .bdrv_co_writev         = vhdx_co_writev,
+     .bdrv_create            = vhdx_create,
+diff --git a/block/vmdk.c b/block/vmdk.c
+index 9d68ec5..f5e2fb5 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -2359,6 +2359,7 @@ static BlockDriver bdrv_vmdk = {
+     .bdrv_open                    = vmdk_open,
+     .bdrv_check                   = vmdk_check,
+     .bdrv_reopen_prepare          = vmdk_reopen_prepare,
++    .bdrv_child_perm              = bdrv_format_default_perms,
+     .bdrv_co_preadv               = vmdk_co_preadv,
+     .bdrv_co_pwritev              = vmdk_co_pwritev,
+     .bdrv_co_pwritev_compressed   = vmdk_co_pwritev_compressed,
+diff --git a/block/vpc.c b/block/vpc.c
+index d0df2a1..b9c9832 100644
+--- a/block/vpc.c
++++ b/block/vpc.c
+@@ -1067,6 +1067,7 @@ static BlockDriver bdrv_vpc = {
+     .bdrv_open              = vpc_open,
+     .bdrv_close             = vpc_close,
+     .bdrv_reopen_prepare    = vpc_reopen_prepare,
++    .bdrv_child_perm        = bdrv_format_default_perms,
+     .bdrv_create            = vpc_create,
  
-+void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
-+                               const BdrvChildRole *role,
-+                               uint64_t perm, uint64_t shared,
-+                               uint64_t *nperm, uint64_t *nshared)
-+{
-+    bool backing = (role == &child_backing);
-+    assert(role == &child_backing || role == &child_file);
-+
-+    if (!backing) {
-+        /* Apart from the modifications below, the same permissions are
-+         * forwarded and left alone as for filters */
-+        bdrv_filter_default_perms(bs, c, role, perm, shared, &perm, &shared);
-+
-+        /* Format drivers may touch metadata even if the guest doesn't write */
-+        if (!bdrv_is_read_only(bs)) {
-+            perm |= BLK_PERM_WRITE | BLK_PERM_RESIZE;
-+        }
-+
-+        /* bs->file always needs to be consistent because of the metadata. We
-+         * can never allow other users to resize or write to it. */
-+        perm |= BLK_PERM_CONSISTENT_READ;
-+        shared &= ~(BLK_PERM_WRITE | BLK_PERM_RESIZE);
-+    } else {
-+        /* We want consistent read from backing files if the parent needs it.
-+         * No other operations are performed on backing files. */
-+        perm &= BLK_PERM_CONSISTENT_READ;
-+
-+        /* If the parent can deal with changing data, we're okay with a
-+         * writable and resizable backing file. */
-+        if (shared & BLK_PERM_WRITE) {
-+            shared = BLK_PERM_WRITE | BLK_PERM_RESIZE;
-+        } else {
-+            shared = 0;
-+        }
-+
-+        shared |= BLK_PERM_CONSISTENT_READ | BLK_PERM_GRAPH_MOD |
-+                  BLK_PERM_WRITE_UNCHANGED;
-+    }
-+
-+    *nperm = perm;
-+    *nshared = shared;
-+}
- 
- static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs)
- {
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 17f4c2d..eb0598e 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -880,6 +880,14 @@ void bdrv_filter_default_perms(BlockDriverState *bs, BdrvChild *c,
-                                uint64_t perm, uint64_t shared,
-                                uint64_t *nperm, uint64_t *nshared);
- 
-+/* Default implementation for BlockDriver.bdrv_child_perm() that can be used by
-+ * (non-raw) image formats: Like above for bs->backing, but for bs->file it
-+ * requires WRITE | RESIZE for read-write images, always requires
-+ * CONSISTENT_READ and doesn't share WRITE. */
-+void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
-+                               const BdrvChildRole *role,
-+                               uint64_t perm, uint64_t shared,
-+                               uint64_t *nperm, uint64_t *nshared);
- 
- const char *bdrv_get_parent_name(const BlockDriverState *bs);
- void blk_dev_change_media_cb(BlockBackend *blk, bool load);
+     .bdrv_co_preadv             = vpc_co_preadv,
 -- 
 1.8.3.1
