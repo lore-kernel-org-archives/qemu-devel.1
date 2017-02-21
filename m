@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55401)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cgBCp-0008Ea-Qi
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:14:17 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cgBDX-0000Og-GW
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:15:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cgBCk-0003MV-Nx
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:14:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:61822)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cgBDV-0003bi-7C
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:14:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42972)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cgBCk-0003M2-Et
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:14:10 -0500
-Date: Tue, 21 Feb 2017 16:14:08 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170221161048-mutt-send-email-mst@kernel.org>
-References: <88232638f9ff3b17b54987624468678ea14a3037.1487286467.git.ben@skyportsystems.com>
-	<20170217114321.6c8577e1@nial.brq.redhat.com>
-	<918524f7-26cf-3fce-d9e3-7316ca69285b@redhat.com>
-	<20170220102304.GC2372@work-vm>
-	<3fb8499e-884c-99e8-b295-3d4603921075@redhat.com>
-	<20170220201923.GM2372@work-vm>
-	<d51d4a21-5558-d4e5-5b7e-08f729fc1a5e@redhat.com>
-	<0488d90c-f73c-916c-f84c-a1ffd2bad592@redhat.com>
-	<20170221034053-mutt-send-email-mst@kernel.org>
-	<5676cac1-b161-0500-e7ed-e93c273cc178@redhat.com>
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1cgBDU-0003bL-V5
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:14:57 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6FB27804F3
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 14:14:56 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue, 21 Feb 2017 18:14:21 +0400
+Message-Id: <20170221141451.28305-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5676cac1-b161-0500-e7ed-e93c273cc178@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v8 4/8] ACPI: Add Virtual Machine
- Generation ID support
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 00/30] Various memory leak fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,153 +31,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, ben@skyportsystems.com
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On Tue, Feb 21, 2017 at 10:58:05AM +0100, Laszlo Ersek wrote:
-> On 02/21/17 02:43, Michael S. Tsirkin wrote:
-> > On Mon, Feb 20, 2017 at 09:55:40PM +0100, Laszlo Ersek wrote:
-> >> On 02/20/17 21:45, Eric Blake wrote:
-> >>> On 02/20/2017 02:19 PM, Dr. David Alan Gilbert wrote:
-> >>>> * Eric Blake (eblake@redhat.com) wrote:
-> >>>>> On 02/20/2017 04:23 AM, Dr. David Alan Gilbert wrote:
-> >>>>>> * Laszlo Ersek (lersek@redhat.com) wrote:
-> >>>>>>> CC Dave
-> >>>>>>
-> >>>>>> This isn't an area I really understand; but if I'm
-> >>>>>> reading this right then 
-> >>>>>>    vmgenid is stored in fw_cfg?
-> >>>>>>    fw_cfg isn't migrated
-> >>>>>>
-> >>>>>> So why should any changes to it get migrated, except if it's already
-> >>>>>> been read by the guest (and if the guest reads it again aftwards what's
-> >>>>>> it expected to read?)
-> >>>>>
-> >>>>> Why are we expecting it to change on migration?  You want a new value
-> >>>>
-> >>>> I'm not; I was asking why a change made prior to migration would be
-> >>>> preserved across migration.
-> >>>
-> >>> Okay, so you're asking what happens if the source requests the vmgenid
-> >>> device, and sets an id, but the destination of the migration does not
-> >>> request anything
-> >>
-> >> This should never happen, as it means different QEMU command lines on
-> >> source vs. target hosts. (Different as in "incorrectly different".)
-> >>
-> >> Dave writes, "a change made prior to migration". Change made to what?
-> >>
-> >> - the GUID cannot be changed via the monitor once QEMU has been started.
-> >> We dropped the monitor command for that, due to lack of a good use case,
-> >> and due to lifecycle complexities. We have figured out a way to make it
-> >> safe, but until there's a really convincing use case, we shouldn't add
-> >> that complexity.
-> > 
-> > True but we might in the future, and it seems prudent to make
-> > migration stream future-proof for that.
-> 
-> It is already.
-> 
-> The monitor command, if we add it, can be implemented incrementally. I
-> described it as "approach (iii)" elsewhere in the thread. This is a more
-> detailed recap:
-> 
-> - introduce a new device property (internal only), such as
->   "x-enable-set-vmgenid". Make it reflect whether a given machine type
->   supports the monitor command.
+After this series removing a few memory leaks, make check with ASAN
+enabled gives a "clean" run with x86_64-softmmu target (there are
+warnings related to coroutine makecontext/swapcontext).
 
-This is the part we can avoid at no real cost just
-by making sure the guid is migrated.
+This should help spot memory related regressions when introducing one.
 
+Note: some of these patches were sent and reviewed previously but not
+yet applied, I rebased them and included them here for completeness.
 
-> - change the /etc/vmgenid_guid fw_cfg blob from callback-less to one
->   with a selection callback
-> 
-> - add a new boolean latch to the vmgenid device, called
->   "guid_blob_selected" or something similar
-> 
-> - the reset handler sets the latch to FALSE
->   (NB: the reset handler already sets /etc/vmgenid_addr to zero)
-> 
-> - the select callback for /etc/vmgenid_guid sets the latch to TRUE
-> 
-> - the latch is added to the migration stream as a subsection *if*
->   x-enable-set-vmgenid is TRUE
-> 
-> - the set-vmgenid monitor command checks all three of:
->   x-enable-set-vmgenid, the latch, and the contents of
->   /etc/vmgenid_addr:
-> 
->   - if x-enable-set-vmgenid is FALSE, the monitor command returns
->     QERR_UNSUPPORTED (this is a generic error class, with an
->     "unsupported" error message). Otherwise,
-> 
->   - if the latch is TRUE *and* /etc/vmgenid_addr is zero, then the
->     guest firmware has executed (or started executing) ALLOCATE for
->     /etc/vmgenid_guid, but it has not executed WRITE_POINTER yet.
->     In this case updating the VMGENID from the monitor is unsafe
->     (we cannot guarantee informing the guest successfully), so in this
->     case the monitor command fails with ERROR_CLASS_DEVICE_NOT_ACTIVE.
->     The caller should simply try a bit later. (By which time the
->     firmware will likely have programmed /etc/vmgenid_addr.)
+v2:
+- add r-b tags
+- fix gtest compatibility with old glib
+- add "migration: fix id leak regression" patch
 
-This makes no sense to me. Just update it in qemu memory
-and write when guest asks for it.
+Igor Mammedov (1):
+  pc: pcihp: avoid adding ACPI_PCIHP_PROP_BSEL twice
 
+Marc-Andr=C3=A9 Lureau (29):
+  qtest: fix a memory leak
+  tests: fix qmp response leak
+  tests: fix leaks in test-io-channel-command
+  timer: use an inline function for free
+  glib-compat: add g_test_add_data_func_full fallback
+  tests: fix ptimer leaks
+  tests: fix endianness-test leaks
+  tests: fix q35-test leaks
+  tests: fix vhost-user-test leaks
+  tests: fix ide-test leaks
+  tests: fix hd-geo-test leaks
+  tests: fix bios-tables-test leak
+  tests: fix ipmi-kcs-test leak
+  tests: fix ipmi-bt-test leak
+  tests: fix eepro100-test leak
+  tests: fix tco-test leaks
+  tests: fix e1000-test leak
+  tests: fix i440fx-test leaks
+  tests: fix e1000e leaks
+  tests: fix virtio-scsi-test leak
+  tests: fix virtio-9p-test leaks
+  bus: do not unref hotplug handler
+  usb: replace handle_destroy with unrealize
+  usb: release the created buses
+  tests: allows to run single test in usb-hcd-ehci-test
+  tests: fix usb-test leaks
+  tests: add specialized device_find function
+  tests: fix virtio-blk-test leaks
+  migration: fix id leak regression
 
->     Libvirt can recognize this error specifically, because it is not the
->     generic error class. ERROR_CLASS_DEVICE_NOT_ACTIVE stands for
->     "EAGAIN", practically, in this case.
-> 
->   - Otherwise -- meaning latch is FALSE *or* /etc/vmgenid_addr is
->     nonzero, that is, the guest has either not run ALLOCATE since
->     reset, *or* it has, but it has also run WRITE_POINTER):
-> 
->     - refresh the GUID within the fw_cfg blob for /etc/vmgenid_guid
->       in-place -- the guest will see this whenever it runs ALLOCATE for
->       /etc/vmgenid_guid, *AND*
-> 
->     - if /etc/vmgenid_addr is not zero, then update the guest (that is,
->       RAM write + SCI)
-> 
-> Thanks
-> Laszlo
+ include/glib-compat.h           |  21 +++++++
+ include/hw/ptimer.h             |   1 +
+ include/hw/usb.h                |   5 --
+ include/qemu/timer.h            |   5 +-
+ tests/libqos/usb.h              |   1 +
+ tests/libqos/virtio-pci.h       |   6 +-
+ hw/acpi/pcihp.c                 |  11 ----
+ hw/core/bus.c                   |   2 +-
+ hw/core/ptimer.c                |   8 +++
+ hw/i386/acpi-build.c            |   4 +-
+ hw/usb/bus.c                    |   9 +--
+ hw/usb/dev-audio.c              |   4 +-
+ hw/usb/dev-bluetooth.c          |   4 +-
+ hw/usb/dev-hid.c                |   4 +-
+ hw/usb/dev-hub.c                |   4 +-
+ hw/usb/dev-network.c            |   4 +-
+ hw/usb/dev-smartcard-reader.c   |   4 +-
+ hw/usb/dev-storage.c            |  16 ++++++
+ hw/usb/dev-uas.c                |   6 +-
+ hw/usb/dev-wacom.c              |   4 +-
+ hw/usb/host-libusb.c            |   4 +-
+ hw/usb/redirect.c               |   4 +-
+ migration/savevm.c              |   1 +
+ qemu-timer.c                    |   5 --
+ qtest.c                         |   1 +
+ tests/bios-tables-test.c        |   2 +-
+ tests/e1000-test.c              |   1 +
+ tests/e1000e-test.c             |   6 +-
+ tests/eepro100-test.c           |   1 +
+ tests/endianness-test.c         |   3 +
+ tests/hd-geo-test.c             |  47 ++++++++++------
+ tests/i440fx-test.c             |   5 ++
+ tests/ide-test.c                |  12 ++++
+ tests/ipmi-bt-test.c            |   1 +
+ tests/ipmi-kcs-test.c           |   1 +
+ tests/libqos/usb.c              |   6 ++
+ tests/libqos/virtio-pci.c       |  38 +++++++++++--
+ tests/libqtest.c                |  10 ----
+ tests/postcopy-test.c           |   2 +-
+ tests/ptimer-test-stubs.c       |   5 ++
+ tests/ptimer-test.c             | 122 ++++++++++++++++++++++++----------=
+------
+ tests/pvpanic-test.c            |   1 +
+ tests/q35-test.c                |   3 +
+ tests/tco-test.c                |  35 +++++++-----
+ tests/test-filter-mirror.c      |   2 +-
+ tests/test-filter-redirector.c  |   4 +-
+ tests/test-io-channel-command.c |   6 +-
+ tests/usb-hcd-ehci-test.c       |  19 +++++--
+ tests/usb-hcd-uhci-test.c       |   1 +
+ tests/vhost-user-test.c         |  11 ++--
+ tests/virtio-9p-test.c          |   2 +-
+ tests/virtio-blk-test.c         |  29 +++++-----
+ tests/virtio-scsi-test.c        |   2 +-
+ 53 files changed, 338 insertions(+), 177 deletions(-)
 
-Seems way more painful than it has to be. Just migrate the guid
-and then management can write it at any time.
-
-
-> > 
-> >> - the address of the GUID is changed (the firmware programs it from
-> >> "zero" to an actual address, in a writeable fw_cfg file), and that piece
-> >> of info is explicitly migrated, as part of the vmgenid device's vmsd.
-> >>
-> >> Thanks
-> >> Laszlo
-> >>
-> >>
-> >>> - how does the guest on the destination see the same id
-> >>> as was in place on the source at the time migration started.
-> >>>
-> >>>>
-> >>>>
-> >>>>> when you load state from disk (you don't know how many times the same
-> >>>>> state has been loaded previously, so each load is effectively forking
-> >>>>> the VM and you want a different value), but for a single live migration,
-> >>>>> you aren't forking the VM and don't need a new generation ID.
-> >>>>>
-> >>>>> I guess it all boils down to what command line you're using: if libvirt
-> >>>>> is driving a live migration, it will request the same UUID in the
-> >>>>> command line of the destination as what is on the source; while if
-> >>>>> libvirt is loading from a [managed]save to restore state from a file, it
-> >>>>> will either request a new UUID directly or request auto to let qemu
-> >>>>> generate the new id.
-> >>>>
-> >>>> Hmm now I've lost it a bit; I thought we would preserve the value
-> >>>> transmitted from the source, not the value on the command line of the destination.
-> >>>
-> >>> I guess I'm trying to figure out whether libvirt MUST read the current
-> >>> id and explicitly tell the destination of migration to reuse that id, or
-> >>> if libvirt can omit the id on migration and everything just works
-> >>> because the id was migrated from the source.
-> >>>
+--=20
+2.11.0.295.gd7dffce1c.dirty
