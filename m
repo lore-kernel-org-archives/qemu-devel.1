@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gveitmic@redhat.com>) id 1cfy7y-0007d5-PZ
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 19:16:24 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cfyQX-0003Lx-SP
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 19:35:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gveitmic@redhat.com>) id 1cfy7t-0001UD-QR
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 19:16:22 -0500
-Received: from mail-yw0-f182.google.com ([209.85.161.182]:35593)
+	(envelope-from <alex.bennee@linaro.org>) id 1cfyQT-0005oz-VO
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 19:35:33 -0500
+Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:35028)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <gveitmic@redhat.com>) id 1cfy7t-0001U0-N0
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 19:16:17 -0500
-Received: by mail-yw0-f182.google.com with SMTP id l19so57133197ywc.2
-	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 16:16:16 -0800 (PST)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cfyQT-0005om-Ly
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 19:35:29 -0500
+Received: by mail-wr0-x230.google.com with SMTP id s27so26278030wrb.2
+	for <qemu-devel@nongnu.org>; Mon, 20 Feb 2017 16:35:29 -0800 (PST)
+References: <20170220145335.591-1-bobby.prani@gmail.com>
+	<87fuj8x2gi.fsf@linaro.org> <87k28ko1qw.fsf@gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <87k28ko1qw.fsf@gmail.com>
+Date: Tue, 21 Feb 2017 00:35:33 +0000
+Message-ID: <87d1ecwfca.fsf@linaro.org>
 MIME-Version: 1.0
-From: Germano Veit Michel <germano@redhat.com>
-Date: Tue, 21 Feb 2017 10:16:15 +1000
-Message-ID: <CANHSq5DhUak9fVpvjG=VyeetP7VQudHwyEa4VevC21BuieSstw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: [Qemu-devel] [PATCH V2] migration: expose qemu_announce_self() via
- qmp
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] mttcg: Set jmp_env to handle exit from
+ tb_gen_code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,121 +31,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Jose Quintela Carreira <quintela@redhat.com>, Amit Shah <amit.shah@redhat.com>
+To: Pranith Kumar <bobby.prani@gmail.com>
+Cc: qemu-devel@nongnu.org, rth@twiddle.net
 
-qemu_announce_self() is triggered by qemu at the end of migrations
-to update the network regarding the path to the guest l2addr.
 
-however it is also useful when there is a network change such as
-an active bond slave swap. Essentially, it's the same as a migration
-from a network perspective - the guest moves to a different point
-in the network topology.
+Pranith Kumar <bobby.prani@gmail.com> writes:
 
-this exposes the function via qmp.
+> Alex Bennée writes:
+>
+>> Pranith Kumar <bobby.prani@gmail.com> writes:
+>>
+>>> tb_gen_code() can exit execution using cpu_exit_loop() when it cannot
+>>> allocate new tb's. To handle this, we need to properly set the jmp_env
+>>> pointer ahead of calling tb_gen_code().
+>>>
+>>> CC:Alex Bennée <alex.bennee@linaro.org>
+>>> CC: Richard Henderson <rth@twiddle.net>
+>>> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+>>> ---
+>>>  cpu-exec.c | 23 +++++++++++------------
+>>>  1 file changed, 11 insertions(+), 12 deletions(-)
+>>>
+>>> diff --git a/cpu-exec.c b/cpu-exec.c
+>>> index 97d79612d9..4b70988b24 100644
+>>> --- a/cpu-exec.c
+>>> +++ b/cpu-exec.c
+>>> @@ -236,23 +236,22 @@ static void cpu_exec_step(CPUState *cpu)
+>>>
+>>>      cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
+>>>      tb_lock();
+>>> -    tb = tb_gen_code(cpu, pc, cs_base, flags,
+>>> -                     1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
+>>> -    tb->orig_tb = NULL;
+>>> -    tb_unlock();
+>>> -
+>>> -    cc->cpu_exec_enter(cpu);
+>>> -
+>>
+>> It occurs to me we are also diverging in our locking pattern from
+>> tb_find which takes mmap_lock first. This is a NOP for system emulation
+>> but needed for user-emulation (for which we can do cpu_exec_step but not
+>> cpu_exec_nocache).
+>
+> Right. So we have to take the mmap_lock() before calling
+> tb_gen_code(). However, this lock is released in the error path before calling
+> cpu_loop_exit() if allocation of a new tb fails. The following is what I have
+> after merging with the previous EXCP_ATOMIC handling patch.
 
-Signed-off-by: Germano Veit Michel <germano@redhat.com>
----
- include/migration/vmstate.h |  5 +++++
- migration/savevm.c          | 30 +++++++++++++++++++-----------
- qapi-schema.json            | 18 ++++++++++++++++++
- 3 files changed, 42 insertions(+), 11 deletions(-)
+Hmm we are a start/end_exclusive() though so what could we be racing
+against that also wants the mmap_lock()? Could it be held by anything at
+this point as every user needs to be woken up?
 
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index 63e7b02..a08715c 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -1042,6 +1042,11 @@ int64_t self_announce_delay(int round)
-     return 50 + (SELF_ANNOUNCE_ROUNDS - round - 1) * 100;
- }
+>
+> diff --git a/cpu-exec.c b/cpu-exec.c
+> index a8e04bffbf..2bb3ba3672 100644
+> --- a/cpu-exec.c
+> +++ b/cpu-exec.c
+> @@ -228,6 +228,7 @@ static void cpu_exec_nocache(CPUState *cpu, int max_cycles,
+>
+>  static void cpu_exec_step(CPUState *cpu)
+>  {
+> +    CPUClass *cc = CPU_GET_CLASS(cpu);
+>      CPUArchState *env = (CPUArchState *)cpu->env_ptr;
+>      TranslationBlock *tb;
+>      target_ulong cs_base, pc;
+> @@ -235,16 +236,24 @@ static void cpu_exec_step(CPUState *cpu)
+>
+>      cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
+>      tb_lock();
+> -    tb = tb_gen_code(cpu, pc, cs_base, flags,
+> -                     1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
+> -    tb->orig_tb = NULL;
+> -    tb_unlock();
+> -    /* execute the generated code */
+> -    trace_exec_tb_nocache(tb, pc);
+> -    cpu_tb_exec(cpu, tb);
+> -    tb_lock();
+> -    tb_phys_invalidate(tb, -1);
+> -    tb_free(tb);
+> +    if (sigsetjmp(cpu->jmp_env, 0) == 0) {
+> +        mmap_lock();
+> +        tb = tb_gen_code(cpu, pc, cs_base, flags,
+> +                         1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
+> +        tb->orig_tb = NULL;
+> +        mmap_unlock();
+> +        tb_unlock();
+> +
+> +        cc->cpu_exec_enter(cpu);
+> +        /* execute the generated code */
+> +        trace_exec_tb_nocache(tb, pc);
+> +        cpu_tb_exec(cpu, tb);
+> +        cc->cpu_exec_exit(cpu);
+> +
+> +        tb_lock();
+> +        tb_phys_invalidate(tb, -1);
+> +        tb_free(tb);
+> +    }
+>      tb_unlock();
+>  }
+>
+> diff --git a/cpus.c b/cpus.c
+> index 77bba08f9a..b39408b4b1 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -1347,6 +1347,11 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
+>                  if (r == EXCP_DEBUG) {
+>                      cpu_handle_guest_debug(cpu);
+>                      break;
+> +                } else if (r == EXCP_ATOMIC) {
+> +                    qemu_mutex_unlock_iothread();
+> +                    cpu_exec_step_atomic(cpu);
+> +                    qemu_mutex_lock_iothread();
+> +                    break;
+>                  }
+>              } else if (cpu->stop) {
+>                  if (cpu->unplug) {
+> @@ -1457,6 +1462,10 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+>                   */
+>                  g_assert(cpu->halted);
+>                  break;
+> +            case EXCP_ATOMIC:
+> +                qemu_mutex_unlock_iothread();
+> +                cpu_exec_step_atomic(cpu);
+> +                qemu_mutex_lock_iothread();
+>              default:
+>                  /* Ignore everything else? */
+>                  break;
 
-+struct AnnounceRound {
-+    QEMUTimer *timer;
-+    int count;
-+};
-+
- void dump_vmstate_json_to_file(FILE *out_fp);
 
- #endif
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 5ecd264..44e196b 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -118,29 +118,37 @@ static void qemu_announce_self_iter(NICState
-*nic, void *opaque)
-     qemu_send_packet_raw(qemu_get_queue(nic), buf, len);
- }
-
--
- static void qemu_announce_self_once(void *opaque)
- {
--    static int count = SELF_ANNOUNCE_ROUNDS;
--    QEMUTimer *timer = *(QEMUTimer **)opaque;
-+    struct AnnounceRound *round = opaque;
-
-     qemu_foreach_nic(qemu_announce_self_iter, NULL);
-
--    if (--count) {
-+    round->count--;
-+    if (round->count) {
-         /* delay 50ms, 150ms, 250ms, ... */
--        timer_mod(timer, qemu_clock_get_ms(QEMU_CLOCK_REALTIME) +
--                  self_announce_delay(count));
-+        timer_mod(round->timer, qemu_clock_get_ms(QEMU_CLOCK_REALTIME) +
-+                  self_announce_delay(round->count));
-     } else {
--            timer_del(timer);
--            timer_free(timer);
-+            timer_del(round->timer);
-+            timer_free(round->timer);
-+            g_free(round);
-     }
- }
-
- void qemu_announce_self(void)
- {
--    static QEMUTimer *timer;
--    timer = timer_new_ms(QEMU_CLOCK_REALTIME, qemu_announce_self_once, &timer);
--    qemu_announce_self_once(&timer);
-+    struct AnnounceRound *round = g_malloc(sizeof(struct AnnounceRound));
-+    if (!round)
-+        return;
-+    round->count = SELF_ANNOUNCE_ROUNDS;
-+    round->timer = timer_new_ms(QEMU_CLOCK_REALTIME,
-qemu_announce_self_once, round);
-+    qemu_announce_self_once(round);
-+}
-+
-+void qmp_announce_self(Error **errp)
-+{
-+    qemu_announce_self();
- }
-
- /***********************************************************/
-diff --git a/qapi-schema.json b/qapi-schema.json
-index baa0d26..0d9bffd 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -6080,3 +6080,21 @@
- #
- ##
- { 'command': 'query-hotpluggable-cpus', 'returns': ['HotpluggableCPU'] }
-+
-+##
-+# @announce-self:
-+#
-+# Trigger generation of broadcast RARP frames to update network switches.
-+# This can be useful when network bonds fail-over the active slave.
-+#
-+# Arguments: None.
-+#
-+# Example:
-+#
-+# -> { "execute": "announce-self" }
-+# <- { "return": {} }
-+#
-+# Since: 2.9
-+##
-+{ 'command': 'announce-self' }
-+
--- 
-2.9.3
+--
+Alex Bennée
