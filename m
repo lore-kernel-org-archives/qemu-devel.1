@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cg9eZ-0007eg-9y
+	(envelope-from <armbru@redhat.com>) id 1cg9eZ-0007ed-9l
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:34:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cg9eW-00083w-FN
+	(envelope-from <armbru@redhat.com>) id 1cg9eW-00083j-9e
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:34:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36468)
+Received: from mx1.redhat.com ([209.132.183.28]:52838)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cg9eW-000837-6m
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cg9eW-000835-1t
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:34:44 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 63851C06C9E8
+	by mx1.redhat.com (Postfix) with ESMTPS id 39CED61B91
 	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 12:34:44 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
-	by int-mx13.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v1LCYgd4012614
+	by int-mx11.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v1LCYgrK011832
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
 	verify=NO)
 	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 07:34:43 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 21 Feb 2017 13:34:39 +0100
-Message-Id: <1487680479-15132-12-git-send-email-armbru@redhat.com>
+Date: Tue, 21 Feb 2017 13:34:37 +0100
+Message-Id: <1487680479-15132-10-git-send-email-armbru@redhat.com>
 In-Reply-To: <1487680479-15132-1-git-send-email-armbru@redhat.com>
 References: <1487680479-15132-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 11/11] hw/i386: Deprecate -drive if=scsi with PC
- machine types
+Subject: [Qemu-devel] [PULL 09/11] hw/scsi: Concentrate -drive if=scsi
+ auto-create in one place
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,109 +39,270 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The PC machines (pc-q35-* pc-i440fx-* pc-* isapc xenfv) automatically
-create lsi53c895a SCSI HBAs and SCSI devices to honor -drive if=scsi.
-For giggles, try -drive if=scsi,bus=25,media=cdrom --- this makes QEMU
-create 25 of them.
+The logic to create frontends for -drive if=scsi is in SCSI HBAs.  For
+all other interface types, it's in machine initialization code.
 
-lsi53c895a is thoroughly obsolete (PCI Ultra2 SCSI, ca. 2000), and
-currently has no maintainer in QEMU.  megasas is a better choice,
-except with old OSes that lack drivers.  virtio-scsi is a much better
-choice when you have a driver, but only (newish) Linux comes with one
-in the box.  There is no good default that works for all guests.
+A few machine types create the SCSI HBAs necessary for that.  That's
+also not done for other interface types.
 
-Encourage users to pick a non-obsolete SCSI HBA that works for them by
-deprecating -drive if=scsi.
+I'm going to deprecate these SCSI eccentricities.  In preparation for
+that, create the frontends in main() instead of the SCSI HBAs, by
+calling new function scsi_legacy_handle_cmdline() there.
+
+Note that not all SCSI HBAs create frontends.  Take care not to change
+that.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1487161136-9018-4-git-send-email-armbru@redhat.com>
+Message-Id: <1487161136-9018-2-git-send-email-armbru@redhat.com>
 Acked-By: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/i386/pc.c                  |  8 +++++++-
- qemu-options.hx               |  5 -----
- tests/qemu-iotests/051.pc.out | 12 ++++++++----
- 3 files changed, 15 insertions(+), 10 deletions(-)
+ hw/scsi/esp-pci.c      |  3 ---
+ hw/scsi/esp.c          |  6 ------
+ hw/scsi/lsi53c895a.c   |  3 ---
+ hw/scsi/megasas.c      |  4 ----
+ hw/scsi/mptsas.c       |  4 ----
+ hw/scsi/scsi-bus.c     | 45 ++++++++++++++++++++++++++++++++++++++-------
+ hw/scsi/spapr_vscsi.c  |  3 ---
+ hw/scsi/virtio-scsi.c  |  8 --------
+ include/hw/scsi/scsi.h |  3 ++-
+ vl.c                   |  4 ++++
+ 10 files changed, 44 insertions(+), 39 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index c2c75e2..60b0946 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1650,9 +1650,15 @@ void pc_pci_device_init(PCIBus *pci_bus)
-     int max_bus;
-     int bus;
+diff --git a/hw/scsi/esp-pci.c b/hw/scsi/esp-pci.c
+index 595f88b..e295d88 100644
+--- a/hw/scsi/esp-pci.c
++++ b/hw/scsi/esp-pci.c
+@@ -367,9 +367,6 @@ static void esp_pci_scsi_realize(PCIDevice *dev, Error **errp)
+     s->irq = pci_allocate_irq(dev);
  
-+    /* Note: if=scsi is deprecated with PC machine types */
-     max_bus = drive_get_max_bus(IF_SCSI);
-     for (bus = 0; bus <= max_bus; bus++) {
--        lsi53c895a_create(pci_bus);
-+        pci_create_simple(pci_bus, -1, "lsi53c895a");
-+        /*
-+         * By not creating frontends here, we make
-+         * scsi_legacy_handle_cmdline() create them, and warn that
-+         * this usage is deprecated.
-+         */
-     }
+     scsi_bus_new(&s->bus, sizeof(s->bus), d, &esp_pci_scsi_info, NULL);
+-    if (!d->hotplugged) {
+-        scsi_bus_legacy_handle_cmdline(&s->bus, errp);
+-    }
  }
  
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 809b2b0..1e815ef 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -654,11 +654,6 @@ If you don't specify the "file=" argument, you define an empty drive:
- qemu-system-i386 -drive if=ide,index=1,media=cdrom
- @end example
+ static void esp_pci_scsi_uninit(PCIDevice *d)
+diff --git a/hw/scsi/esp.c b/hw/scsi/esp.c
+index 5a5a4e9..eee831e 100644
+--- a/hw/scsi/esp.c
++++ b/hw/scsi/esp.c
+@@ -690,7 +690,6 @@ static void sysbus_esp_realize(DeviceState *dev, Error **errp)
+     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+     SysBusESPState *sysbus = ESP(dev);
+     ESPState *s = &sysbus->esp;
+-    Error *err = NULL;
  
--You can connect a SCSI disk with unit ID 6 on the bus #0:
--@example
--qemu-system-i386 -drive file=file,if=scsi,bus=0,unit=6
--@end example
+     sysbus_init_irq(sbd, &s->irq);
+     assert(sysbus->it_shift != -1);
+@@ -703,11 +702,6 @@ static void sysbus_esp_realize(DeviceState *dev, Error **errp)
+     qdev_init_gpio_in(dev, sysbus_esp_gpio_demux, 2);
+ 
+     scsi_bus_new(&s->bus, sizeof(s->bus), dev, &esp_scsi_info, NULL);
+-    scsi_bus_legacy_handle_cmdline(&s->bus, &err);
+-    if (err != NULL) {
+-        error_propagate(errp, err);
+-        return;
+-    }
+ }
+ 
+ static void sysbus_esp_hard_reset(DeviceState *dev)
+diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
+index feb1191..292fa87 100644
+--- a/hw/scsi/lsi53c895a.c
++++ b/hw/scsi/lsi53c895a.c
+@@ -2216,9 +2216,6 @@ static void lsi_scsi_realize(PCIDevice *dev, Error **errp)
+     QTAILQ_INIT(&s->queue);
+ 
+     scsi_bus_new(&s->bus, sizeof(s->bus), d, &lsi_scsi_info, NULL);
+-    if (!d->hotplugged) {
+-        scsi_bus_legacy_handle_cmdline(&s->bus, errp);
+-    }
+ }
+ 
+ static void lsi_scsi_unrealize(DeviceState *dev, Error **errp)
+diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+index 1a8b04c..e3d59b7 100644
+--- a/hw/scsi/megasas.c
++++ b/hw/scsi/megasas.c
+@@ -2325,7 +2325,6 @@ static const struct SCSIBusInfo megasas_scsi_info = {
+ 
+ static void megasas_scsi_realize(PCIDevice *dev, Error **errp)
+ {
+-    DeviceState *d = DEVICE(dev);
+     MegasasState *s = MEGASAS(dev);
+     MegasasBaseClass *b = MEGASAS_DEVICE_GET_CLASS(s);
+     uint8_t *pci_conf;
+@@ -2426,9 +2425,6 @@ static void megasas_scsi_realize(PCIDevice *dev, Error **errp)
+ 
+     scsi_bus_new(&s->bus, sizeof(s->bus), DEVICE(dev),
+                  &megasas_scsi_info, NULL);
+-    if (!d->hotplugged) {
+-        scsi_bus_legacy_handle_cmdline(&s->bus, errp);
+-    }
+ }
+ 
+ static Property megasas_properties_gen1[] = {
+diff --git a/hw/scsi/mptsas.c b/hw/scsi/mptsas.c
+index ad87e78..2e091c0 100644
+--- a/hw/scsi/mptsas.c
++++ b/hw/scsi/mptsas.c
+@@ -1271,7 +1271,6 @@ static const struct SCSIBusInfo mptsas_scsi_info = {
+ 
+ static void mptsas_scsi_realize(PCIDevice *dev, Error **errp)
+ {
+-    DeviceState *d = DEVICE(dev);
+     MPTSASState *s = MPT_SAS(dev);
+     Error *err = NULL;
+     int ret;
+@@ -1326,9 +1325,6 @@ static void mptsas_scsi_realize(PCIDevice *dev, Error **errp)
+     QTAILQ_INIT(&s->pending);
+ 
+     scsi_bus_new(&s->bus, sizeof(s->bus), &dev->qdev, &mptsas_scsi_info, NULL);
+-    if (!d->hotplugged) {
+-        scsi_bus_legacy_handle_cmdline(&s->bus, errp);
+-    }
+ }
+ 
+ static void mptsas_scsi_uninit(PCIDevice *dev)
+diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+index 5940cb1..b9111ee 100644
+--- a/hw/scsi/scsi-bus.c
++++ b/hw/scsi/scsi-bus.c
+@@ -261,12 +261,11 @@ SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, BlockBackend *blk,
+     return SCSI_DEVICE(dev);
+ }
+ 
+-void scsi_bus_legacy_handle_cmdline(SCSIBus *bus, Error **errp)
++void scsi_bus_legacy_handle_cmdline(SCSIBus *bus)
+ {
+     Location loc;
+     DriveInfo *dinfo;
+     int unit;
+-    Error *err = NULL;
+ 
+     loc_push_none(&loc);
+     for (unit = 0; unit <= bus->info->max_target; unit++) {
+@@ -276,15 +275,47 @@ void scsi_bus_legacy_handle_cmdline(SCSIBus *bus, Error **errp)
+         }
+         qemu_opts_loc_restore(dinfo->opts);
+         scsi_bus_legacy_add_drive(bus, blk_by_legacy_dinfo(dinfo),
+-                                  unit, false, -1, NULL, &err);
+-        if (err != NULL) {
+-            error_propagate(errp, err);
+-            break;
+-        }
++                                  unit, false, -1, NULL, &error_fatal);
+     }
+     loc_pop(&loc);
+ }
+ 
++static bool is_scsi_hba_with_legacy_magic(Object *obj)
++{
++    static const char *magic[] = {
++        "am53c974", "dc390", "esp", "lsi53c810", "lsi53c895a",
++        "megasas", "megasas-gen2", "mptsas1068", "spapr-vscsi",
++        "virtio-scsi-device",
++        NULL
++    };
++    const char *typename = object_get_typename(obj);
++    int i;
++
++    for (i = 0; magic[i]; i++)
++        if (!strcmp(typename, magic[i])) {
++            return true;
++    }
++
++    return false;
++}
++
++static int scsi_legacy_handle_cmdline_cb(Object *obj, void *opaque)
++{
++    SCSIBus *bus = (SCSIBus *)object_dynamic_cast(obj, TYPE_SCSI_BUS);
++
++    if (bus && is_scsi_hba_with_legacy_magic(OBJECT(bus->qbus.parent))) {
++        scsi_bus_legacy_handle_cmdline(bus);
++    }
++
++    return 0;
++}
++
++void scsi_legacy_handle_cmdline(void)
++{
++    object_child_foreach_recursive(object_get_root(),
++                                   scsi_legacy_handle_cmdline_cb, NULL);
++}
++
+ static int32_t scsi_invalid_field(SCSIRequest *req, uint8_t *buf)
+ {
+     scsi_req_build_sense(req, SENSE_CODE(INVALID_FIELD));
+diff --git a/hw/scsi/spapr_vscsi.c b/hw/scsi/spapr_vscsi.c
+index 6090a20..7d44771 100644
+--- a/hw/scsi/spapr_vscsi.c
++++ b/hw/scsi/spapr_vscsi.c
+@@ -1206,9 +1206,6 @@ static void spapr_vscsi_realize(VIOsPAPRDevice *dev, Error **errp)
+ 
+     scsi_bus_new(&s->bus, sizeof(s->bus), DEVICE(dev),
+                  &vscsi_scsi_info, NULL);
+-    if (!dev->qdev.hotplugged) {
+-        scsi_bus_legacy_handle_cmdline(&s->bus, errp);
+-    }
+ }
+ 
+ void spapr_vscsi_create(VIOsPAPRBus *bus)
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index b01030b..4fb9259 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -897,14 +897,6 @@ static void virtio_scsi_device_realize(DeviceState *dev, Error **errp)
+     /* override default SCSI bus hotplug-handler, with virtio-scsi's one */
+     qbus_set_hotplug_handler(BUS(&s->bus), dev, &error_abort);
+ 
+-    if (!dev->hotplugged) {
+-        scsi_bus_legacy_handle_cmdline(&s->bus, &err);
+-        if (err != NULL) {
+-            error_propagate(errp, err);
+-            return;
+-        }
+-    }
 -
- Instead of @option{-fda}, @option{-fdb}, you can use:
- @example
- qemu-system-i386 -drive file=file,index=0,if=floppy
-diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.out
-index 603bb76..f8047a2 100644
---- a/tests/qemu-iotests/051.pc.out
-+++ b/tests/qemu-iotests/051.pc.out
-@@ -118,7 +118,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+     virtio_scsi_dataplane_setup(s, errp);
+ }
  
- Testing: -drive if=scsi,media=cdrom
- QEMU X.Y.Z monitor - type 'help' for more information
--(qemu) q[K[Dqu[K[D[Dqui[K[D[D[Dquit[K
-+(qemu) QEMU_PROG: -drive if=scsi,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
-+q[K[Dqu[K[D[Dqui[K[D[D[Dquit[K
+diff --git a/include/hw/scsi/scsi.h b/include/hw/scsi/scsi.h
+index 9bad49e..eeef949 100644
+--- a/include/hw/scsi/scsi.h
++++ b/include/hw/scsi/scsi.h
+@@ -177,7 +177,8 @@ static inline SCSIBus *scsi_bus_from_device(SCSIDevice *d)
+ SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, BlockBackend *blk,
+                                       int unit, bool removable, int bootindex,
+                                       const char *serial, Error **errp);
+-void scsi_bus_legacy_handle_cmdline(SCSIBus *bus, Error **errp);
++void scsi_bus_legacy_handle_cmdline(SCSIBus *bus);
++void scsi_legacy_handle_cmdline(void);
  
- Testing: -drive if=ide
- QEMU X.Y.Z monitor - type 'help' for more information
-@@ -127,7 +128,8 @@ QEMU_PROG: Initialization of device ide-hd failed: Device initialization failed.
+ /*
+  * Predefined sense codes
+diff --git a/vl.c b/vl.c
+index 27d9829..ab40889 100644
+--- a/vl.c
++++ b/vl.c
+@@ -62,6 +62,7 @@ int main(int argc, char **argv)
+ #include "hw/usb.h"
+ #include "hw/i386/pc.h"
+ #include "hw/isa/isa.h"
++#include "hw/scsi/scsi.h"
+ #include "hw/bt.h"
+ #include "sysemu/watchdog.h"
+ #include "hw/smbios/smbios.h"
+@@ -4509,6 +4510,9 @@ int main(int argc, char **argv, char **envp)
  
- Testing: -drive if=scsi
- QEMU X.Y.Z monitor - type 'help' for more information
--(qemu) QEMU_PROG: Initialization of device lsi53c895a failed: Device needs media, but drive is empty
-+(qemu) QEMU_PROG: -drive if=scsi: warning: bus=0,unit=0 is deprecated with this machine type
-+QEMU_PROG: -drive if=scsi: Device needs media, but drive is empty
+     rom_reset_order_override();
  
- Testing: -drive if=virtio
- QEMU X.Y.Z monitor - type 'help' for more information
-@@ -172,7 +174,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
++    /* Create frontends for -drive if=scsi */
++    scsi_legacy_handle_cmdline();
++
+     /* Did we create any drives that we failed to create a device for? */
+     drive_check_orphaned();
  
- Testing: -drive file=TEST_DIR/t.qcow2,if=scsi,media=cdrom,readonly=on
- QEMU X.Y.Z monitor - type 'help' for more information
--(qemu) q[K[Dqu[K[D[Dqui[K[D[D[Dquit[K
-+(qemu) QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=scsi,media=cdrom,readonly=on: warning: bus=0,unit=0 is deprecated with this machine type
-+q[K[Dqu[K[D[Dqui[K[D[D[Dquit[K
- 
- Testing: -drive file=TEST_DIR/t.qcow2,if=ide,readonly=on
- QEMU X.Y.Z monitor - type 'help' for more information
-@@ -181,7 +184,8 @@ QEMU_PROG: Initialization of device ide-hd failed: Device initialization failed.
- 
- Testing: -drive file=TEST_DIR/t.qcow2,if=scsi,readonly=on
- QEMU X.Y.Z monitor - type 'help' for more information
--(qemu) q[K[Dqu[K[D[Dqui[K[D[D[Dquit[K
-+(qemu) QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=scsi,readonly=on: warning: bus=0,unit=0 is deprecated with this machine type
-+q[K[Dqu[K[D[Dqui[K[D[D[Dquit[K
- 
- Testing: -drive file=TEST_DIR/t.qcow2,if=virtio,readonly=on
- QEMU X.Y.Z monitor - type 'help' for more information
 -- 
 2.7.4
