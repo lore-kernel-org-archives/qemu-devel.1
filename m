@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55021)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cgGpC-0007Pk-H7
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 15:14:18 -0500
+	(envelope-from <armbru@redhat.com>) id 1cgGpE-0007Q9-N1
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 15:14:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cgGp9-0008TH-LG
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 15:14:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40078)
+	(envelope-from <armbru@redhat.com>) id 1cgGpB-0008UJ-2e
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 15:14:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48616)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cgGp9-0008Sk-CS
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 15:14:11 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cgGpA-0008TX-Qs
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 15:14:13 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 99F9A4E02B
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 20:14:11 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0BC3B61BAC
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 20:14:13 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 21 Feb 2017 21:13:45 +0100
-Message-Id: <1487708048-2131-2-git-send-email-armbru@redhat.com>
+Date: Tue, 21 Feb 2017 21:13:51 +0100
+Message-Id: <1487708048-2131-8-git-send-email-armbru@redhat.com>
 In-Reply-To: <1487708048-2131-1-git-send-email-armbru@redhat.com>
 References: <1487708048-2131-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 01/24] test-qemu-opts: Cover
- qemu_opts_parse()
+Subject: [Qemu-devel] [PATCH v2 07/24] util/cutils: Clean up variable names
+ around qemu_strtol()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,378 +32,151 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The new tests demonstrate a few bugs, all clearly marked.
+Name same things the same, different things differently.
+
+* qemu_strtol()'s parameter @nptr is called @p in
+  check_strtox_error().  Rename the latter.
+
+* qemu_strtol()'s parameter @endptr is called @next in
+  check_strtox_error().  Rename the latter.
+
+* qemu_strtol()'s variable @p is called @endptr in
+  check_strtox_error().  Rename both to @ep.
+
+* qemu_strtol()'s variable @err is *negative* errno,
+  check_strtox_error()'s parameter @err is *positive*.  Rename the
+  latter to @libc_errno.
+
+Same for qemu_strtoul(), qemu_strtoi64(), qemu_strtou64(), of course.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/test-qemu-opts.c | 312 ++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 310 insertions(+), 2 deletions(-)
+ util/cutils.c | 42 +++++++++++++++++++++---------------------
+ 1 file changed, 21 insertions(+), 21 deletions(-)
 
-diff --git a/tests/test-qemu-opts.c b/tests/test-qemu-opts.c
-index a505a3e..d5dab12 100644
---- a/tests/test-qemu-opts.c
-+++ b/tests/test-qemu-opts.c
-@@ -8,6 +8,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/cutils.h"
- #include "qapi/error.h"
- #include "qapi/qmp/qstring.h"
- #include "qemu/config-file.h"
-@@ -29,6 +30,9 @@ static QemuOptsList opts_list_01 = {
-         },{
-             .name = "number1",
-             .type = QEMU_OPT_NUMBER,
-+        },{
-+            .name = "number2",
-+            .type = QEMU_OPT_NUMBER,
-         },
-         { /* end of list */ }
-     },
-@@ -42,14 +46,23 @@ static QemuOptsList opts_list_02 = {
-             .name = "str1",
-             .type = QEMU_OPT_STRING,
-         },{
-+            .name = "str2",
-+            .type = QEMU_OPT_STRING,
-+        },{
-             .name = "bool1",
-             .type = QEMU_OPT_BOOL,
-         },{
--            .name = "str2",
--            .type = QEMU_OPT_STRING,
-+            .name = "bool2",
-+            .type = QEMU_OPT_BOOL,
-         },{
-             .name = "size1",
-             .type = QEMU_OPT_SIZE,
-+        },{
-+            .name = "size2",
-+            .type = QEMU_OPT_SIZE,
-+        },{
-+            .name = "size3",
-+            .type = QEMU_OPT_SIZE,
-         },
-         { /* end of list */ }
-     },
-@@ -57,6 +70,7 @@ static QemuOptsList opts_list_02 = {
- 
- static QemuOptsList opts_list_03 = {
-     .name = "opts_list_03",
-+    .implied_opt_name = "implied",
-     .head = QTAILQ_HEAD_INITIALIZER(opts_list_03.head),
-     .desc = {
-         /* no elements => accept any params */
-@@ -421,6 +435,296 @@ static void test_qemu_opts_set(void)
-     g_assert(opts == NULL);
+diff --git a/util/cutils.c b/util/cutils.c
+index 0dc9b28..0fb0f82 100644
+--- a/util/cutils.c
++++ b/util/cutils.c
+@@ -260,21 +260,21 @@ int64_t qemu_strtosz(const char *nptr, char **end)
  }
  
-+static int opts_count_iter(void *opaque, const char *name, const char *value,
-+                           Error **errp)
-+{
-+    (*(size_t *)opaque)++;
-+    return 0;
-+}
-+
-+static size_t opts_count(QemuOpts *opts)
-+{
-+    size_t n = 0;
-+
-+    qemu_opt_foreach(opts, opts_count_iter, &n, NULL);
-+    return n;
-+}
-+
-+static void test_opts_parse(void)
-+{
-+    Error *err = NULL;
-+    QemuOpts *opts;
-+    char long_key[129];
-+    char *params;
-+
-+    /* Nothing */
-+    opts = qemu_opts_parse(&opts_list_03, "", false, &error_abort);
-+    g_assert_cmpuint(opts_count(opts), ==, 0);
-+
-+    /* Empty key */
-+    opts = qemu_opts_parse(&opts_list_03, "=val", false, &error_abort);
-+    g_assert_cmpuint(opts_count(opts), ==, 1);
-+    g_assert_cmpstr(qemu_opt_get(opts, ""), ==, "val");
-+
-+    /* Long key */
-+    memset(long_key, 'a', 127);
-+    long_key[127] = 'z';
-+    long_key[128] = 0;
-+    params = g_strdup_printf("%s=v", long_key);
-+    opts = qemu_opts_parse(&opts_list_03, params + 1, NULL, &error_abort);
-+    g_assert_cmpuint(opts_count(opts), ==, 1);
-+    g_assert_cmpstr(qemu_opt_get(opts, long_key + 1), ==, "v");
-+
-+    /* Overlong key gets truncated */
-+    opts = qemu_opts_parse(&opts_list_03, params, NULL, &error_abort);
-+    g_assert(opts_count(opts) == 1);
-+    long_key[127] = 0;
-+    g_assert_cmpstr(qemu_opt_get(opts, long_key), ==, "v");
-+    g_free(params);
-+
-+    /* Multiple keys, last one wins */
-+    opts = qemu_opts_parse(&opts_list_03, "a=1,b=2,,x,a=3",
-+                           false, &error_abort);
-+    g_assert_cmpuint(opts_count(opts), ==, 3);
-+    g_assert_cmpstr(qemu_opt_get(opts, "a"), ==, "3");
-+    g_assert_cmpstr(qemu_opt_get(opts, "b"), ==, "2,x");
-+
-+    /* Except when it doesn't */
-+    opts = qemu_opts_parse(&opts_list_03, "id=foo,id=bar",
-+                           false, &error_abort);
-+    g_assert_cmpuint(opts_count(opts), ==, 0);
-+    g_assert_cmpstr(qemu_opts_id(opts), ==, "foo");
-+
-+    /* Implied value */
-+    opts = qemu_opts_parse(&opts_list_03, "an,noaus,noaus=",
-+                           false, &error_abort);
-+    g_assert_cmpuint(opts_count(opts), ==, 3);
-+    g_assert_cmpstr(qemu_opt_get(opts, "an"), ==, "on");
-+    g_assert_cmpstr(qemu_opt_get(opts, "aus"), ==, "off");
-+    g_assert_cmpstr(qemu_opt_get(opts, "noaus"), ==, "");
-+
-+    /* Implied key */
-+    opts = qemu_opts_parse(&opts_list_03, "an,noaus,noaus=", true,
-+                           &error_abort);
-+    g_assert_cmpuint(opts_count(opts), ==, 3);
-+    g_assert_cmpstr(qemu_opt_get(opts, "implied"), ==, "an");
-+    g_assert_cmpstr(qemu_opt_get(opts, "aus"), ==, "off");
-+    g_assert_cmpstr(qemu_opt_get(opts, "noaus"), ==, "");
-+
-+    /* Trailing comma is ignored */
-+    opts = qemu_opts_parse(&opts_list_03, "x=y,", false, &error_abort);
-+    g_assert_cmpuint(opts_count(opts), ==, 1);
-+    g_assert_cmpstr(qemu_opt_get(opts, "x"), ==, "y");
-+
-+    /* Except when it isn't */
-+    opts = qemu_opts_parse(&opts_list_03, ",", false, &error_abort);
-+    g_assert_cmpuint(opts_count(opts), ==, 1);
-+    g_assert_cmpstr(qemu_opt_get(opts, ""), ==, "on");
-+
-+    /* Duplicate ID */
-+    opts = qemu_opts_parse(&opts_list_03, "x=y,id=foo", false, &err);
-+    error_free_or_abort(&err);
-+    g_assert(!opts);
-+    /* TODO Cover .merge_lists = true */
-+
-+    /* Buggy ID recognition */
-+    opts = qemu_opts_parse(&opts_list_03, "x=,,id=bar", false, &error_abort);
-+    g_assert_cmpuint(opts_count(opts), ==, 1);
-+    g_assert_cmpstr(qemu_opts_id(opts), ==, "bar"); /* BUG */
-+    g_assert_cmpstr(qemu_opt_get(opts, "x"), ==, ",id=bar");
-+
-+    /* Anti-social ID */
-+    opts = qemu_opts_parse(&opts_list_01, "id=666", false, &err);
-+    error_free_or_abort(&err);
-+    g_assert(!opts);
-+
-+    /* Unknown key */
-+    opts = qemu_opts_parse(&opts_list_01, "nonexistent=", false, &err);
-+    error_free_or_abort(&err);
-+    g_assert(!opts);
-+
-+    qemu_opts_reset(&opts_list_01);
-+    qemu_opts_reset(&opts_list_03);
-+}
-+
-+static void test_opts_parse_bool(void)
-+{
-+    Error *err = NULL;
-+    QemuOpts *opts;
-+
-+    opts = qemu_opts_parse(&opts_list_02, "bool1=on,bool2=off",
-+                           false, &error_abort);
-+    g_assert_cmpuint(opts_count(opts), ==, 2);
-+    g_assert(qemu_opt_get_bool(opts, "bool1", false));
-+    g_assert(!qemu_opt_get_bool(opts, "bool2", true));
-+
-+    opts = qemu_opts_parse(&opts_list_02, "bool1=offer", false, &err);
-+    error_free_or_abort(&err);
-+    g_assert(!opts);
-+
-+    qemu_opts_reset(&opts_list_02);
-+}
-+
-+static void test_opts_parse_number(void)
-+{
-+    Error *err = NULL;
-+    QemuOpts *opts;
-+
-+    /* Lower limit zero */
-+    opts = qemu_opts_parse(&opts_list_01, "number1=0", false, &error_abort);
-+    g_assert_cmpuint(opts_count(opts), ==, 1);
-+    g_assert_cmpuint(qemu_opt_get_number(opts, "number1", 1), ==, 0);
-+
-+    /* Upper limit 2^64-1 */
-+    opts = qemu_opts_parse(&opts_list_01,
-+                           "number1=18446744073709551615,number2=-1",
-+                           false, &error_abort);
-+    g_assert_cmpuint(opts_count(opts), ==, 2);
-+    g_assert_cmphex(qemu_opt_get_number(opts, "number1", 1), ==, UINT64_MAX);
-+    g_assert_cmphex(qemu_opt_get_number(opts, "number2", 0), ==, UINT64_MAX);
-+
-+    /* Above upper limit */
-+    opts = qemu_opts_parse(&opts_list_01, "number1=18446744073709551616",
-+                           false, &error_abort);
-+    /* BUG: should reject */
-+    g_assert_cmpuint(opts_count(opts), ==, 1);
-+    g_assert_cmpuint(qemu_opt_get_number(opts, "number1", 1), ==, UINT64_MAX);
-+
-+    /* Below lower limit */
-+    opts = qemu_opts_parse(&opts_list_01, "number1=-18446744073709551616",
-+                           false, &error_abort);
-+    /* BUG: should reject */
-+    g_assert_cmpuint(opts_count(opts), ==, 1);
-+    g_assert_cmpuint(qemu_opt_get_number(opts, "number1", 1), ==, UINT64_MAX);
-+
-+    /* Hex and octal */
-+    opts = qemu_opts_parse(&opts_list_01, "number1=0x2a,number2=052",
-+                           false, &error_abort);
-+    g_assert_cmpuint(opts_count(opts), ==, 2);
-+    g_assert_cmpuint(qemu_opt_get_number(opts, "number1", 1), ==, 42);
-+    g_assert_cmpuint(qemu_opt_get_number(opts, "number2", 0), ==, 42);
-+
-+    /* Invalid */
-+    opts = qemu_opts_parse(&opts_list_01, "number1=", false, &err);
-+    /* BUG: should reject */
-+    g_assert_cmpuint(opts_count(opts), ==, 1);
-+    g_assert_cmpuint(qemu_opt_get_number(opts, "number1", 1), ==, 0);
-+    opts = qemu_opts_parse(&opts_list_01, "number1=eins", false, &err);
-+    error_free_or_abort(&err);
-+    g_assert(!opts);
-+
-+    /* Leading whitespace */
-+    opts = qemu_opts_parse(&opts_list_01, "number1= \t42",
-+                           false, &error_abort);
-+    g_assert_cmpuint(opts_count(opts), ==, 1);
-+    g_assert_cmpuint(qemu_opt_get_number(opts, "number1", 1), ==, 42);
-+
-+    /* Trailing crap */
-+    opts = qemu_opts_parse(&opts_list_01, "number1=3.14", false, &err);
-+    error_free_or_abort(&err);
-+    g_assert(!opts);
-+    opts = qemu_opts_parse(&opts_list_01, "number1=08", false, &err);
-+    error_free_or_abort(&err);
-+    g_assert(!opts);
-+    opts = qemu_opts_parse(&opts_list_01, "number1=0 ", false, &err);
-+    error_free_or_abort(&err);
-+    g_assert(!opts);
-+
-+    qemu_opts_reset(&opts_list_01);
-+}
-+
-+static void test_opts_parse_size(void)
-+{
-+    Error *err = NULL;
-+    QemuOpts *opts;
-+
-+    /* Lower limit zero */
-+    opts = qemu_opts_parse(&opts_list_02, "size1=0", false, &error_abort);
-+    g_assert_cmpuint(opts_count(opts), ==, 1);
-+    g_assert_cmpuint(qemu_opt_get_size(opts, "size1", 1), ==, 0);
-+
-+    /* Note: precision is 53 bits since we're parsing with strtod() */
-+
-+    /* Around limit of precision: 2^53-1, 2^53, 2^54 */
-+    opts = qemu_opts_parse(&opts_list_02,
-+                           "size1=9007199254740991,"
-+                           "size2=9007199254740992,"
-+                           "size3=9007199254740993",
-+                           false, &error_abort);
-+    g_assert_cmpuint(opts_count(opts), ==, 3);
-+    g_assert_cmphex(qemu_opt_get_size(opts, "size1", 1),
-+                     ==, 0x1fffffffffffff);
-+    g_assert_cmphex(qemu_opt_get_size(opts, "size2", 1),
-+                     ==, 0x20000000000000);
-+    g_assert_cmphex(qemu_opt_get_size(opts, "size3", 1),
-+                     ==, 0x20000000000000);
-+
-+    /* Close to signed upper limit 0x7ffffffffffffc00 (53 msbs set) */
-+    opts = qemu_opts_parse(&opts_list_02,
-+                           "size1=9223372036854774784," /* 7ffffffffffffc00 */
-+                           "size2=9223372036854775295", /* 7ffffffffffffdff */
-+                           false, &error_abort);
-+    g_assert_cmpuint(opts_count(opts), ==, 2);
-+    g_assert_cmphex(qemu_opt_get_size(opts, "size1", 1),
-+                     ==, 0x7ffffffffffffc00);
-+    g_assert_cmphex(qemu_opt_get_size(opts, "size2", 1),
-+                     ==, 0x7ffffffffffffc00);
-+
-+    /* Close to actual upper limit 0xfffffffffffff800 (53 msbs set) */
-+    opts = qemu_opts_parse(&opts_list_02,
-+                           "size1=18446744073709549568," /* fffffffffffff800 */
-+                           "size2=18446744073709550591", /* fffffffffffffbff */
-+                           false, &error_abort);
-+    g_assert_cmpuint(opts_count(opts), ==, 2);
-+    g_assert_cmphex(qemu_opt_get_size(opts, "size1", 1),
-+                     ==, 0xfffffffffffff800);
-+    g_assert_cmphex(qemu_opt_get_size(opts, "size2", 1),
-+                     ==, 0xfffffffffffff800);
-+
-+    /* Beyond limits */
-+    opts = qemu_opts_parse(&opts_list_02, "size1=-1", false, &err);
-+    error_free_or_abort(&err);
-+    g_assert(!opts);
-+    opts = qemu_opts_parse(&opts_list_02,
-+                           "size1=18446744073709550592", /* fffffffffffffc00 */
-+                           false, &error_abort);
-+    /* BUG: should reject */
-+    g_assert_cmpuint(opts_count(opts), ==, 1);
-+    g_assert_cmpuint(qemu_opt_get_size(opts, "size1", 1), ==, 0);
-+
-+    /* Suffixes */
-+    opts = qemu_opts_parse(&opts_list_02, "size1=8b,size2=1.5k,size3=2M",
-+                           false, &error_abort);
-+    g_assert_cmpuint(opts_count(opts), ==, 3);
-+    g_assert_cmphex(qemu_opt_get_size(opts, "size1", 0), ==, 8);
-+    g_assert_cmphex(qemu_opt_get_size(opts, "size2", 0), ==, 1536);
-+    g_assert_cmphex(qemu_opt_get_size(opts, "size3", 0), ==, 2 * M_BYTE);
-+    opts = qemu_opts_parse(&opts_list_02, "size1=0.1G,size2=16777215T",
-+                           false, &error_abort);
-+    g_assert_cmpuint(opts_count(opts), ==, 2);
-+    g_assert_cmphex(qemu_opt_get_size(opts, "size1", 0), ==, G_BYTE / 10);
-+    g_assert_cmphex(qemu_opt_get_size(opts, "size2", 0),
-+                     ==, 16777215 * T_BYTE);
-+
-+    /* Beyond limit with suffix */
-+    opts = qemu_opts_parse(&opts_list_02, "size1=16777216T",
-+                           false, &error_abort);
-+    /* BUG: should reject */
-+    g_assert_cmpuint(opts_count(opts), ==, 1);
-+    g_assert_cmpuint(qemu_opt_get_size(opts, "size1", 1), ==, 0);
-+
-+    /* Trailing crap */
-+    opts = qemu_opts_parse(&opts_list_02, "size1=16E", false, &err);
-+    error_free_or_abort(&err);
-+    g_assert(!opts);
-+    opts = qemu_opts_parse(&opts_list_02, "size1=16Gi", false, &error_abort);
-+    /* BUG: should reject */
-+    g_assert_cmpuint(opts_count(opts), ==, 1);
-+    g_assert_cmpuint(qemu_opt_get_size(opts, "size1", 1), ==, 16 * G_BYTE);
-+
-+    qemu_opts_reset(&opts_list_02);
-+}
-+
- int main(int argc, char *argv[])
+ /**
+- * Helper function for qemu_strto*l() functions.
++ * Helper function for error checking after strtol() and the like
+  */
+-static int check_strtox_error(const char *p, char *endptr, const char **next,
+-                              int err)
++static int check_strtox_error(const char *nptr, char *ep,
++                              const char **endptr, int libc_errno)
  {
-     register_opts();
-@@ -435,6 +739,10 @@ int main(int argc, char *argv[])
-     g_test_add_func("/qemu-opts/opt_unset", test_qemu_opt_unset);
-     g_test_add_func("/qemu-opts/opts_reset", test_qemu_opts_reset);
-     g_test_add_func("/qemu-opts/opts_set", test_qemu_opts_set);
-+    g_test_add_func("/qemu-opts/opts_parse/general", test_opts_parse);
-+    g_test_add_func("/qemu-opts/opts_parse/bool", test_opts_parse_bool);
-+    g_test_add_func("/qemu-opts/opts_parse/number", test_opts_parse_number);
-+    g_test_add_func("/qemu-opts/opts_parse/size", test_opts_parse_size);
-     g_test_run();
-     return 0;
+-    if (err == 0 && endptr == p) {
+-        err = EINVAL;
++    if (libc_errno == 0 && ep == nptr) {
++        libc_errno = EINVAL;
+     }
+-    if (!next && *endptr) {
++    if (!endptr && *ep) {
+         return -EINVAL;
+     }
+-    if (next) {
+-        *next = endptr;
++    if (endptr) {
++        *endptr = ep;
+     }
+-    return -err;
++    return -libc_errno;
+ }
+ 
+ /**
+@@ -304,7 +304,7 @@ static int check_strtox_error(const char *p, char *endptr, const char **next,
+ int qemu_strtol(const char *nptr, const char **endptr, int base,
+                 long *result)
+ {
+-    char *p;
++    char *ep;
+     int err = 0;
+     if (!nptr) {
+         if (endptr) {
+@@ -313,8 +313,8 @@ int qemu_strtol(const char *nptr, const char **endptr, int base,
+         err = -EINVAL;
+     } else {
+         errno = 0;
+-        *result = strtol(nptr, &p, base);
+-        err = check_strtox_error(nptr, p, endptr, errno);
++        *result = strtol(nptr, &ep, base);
++        err = check_strtox_error(nptr, ep, endptr, errno);
+     }
+     return err;
+ }
+@@ -347,7 +347,7 @@ int qemu_strtol(const char *nptr, const char **endptr, int base,
+ int qemu_strtoul(const char *nptr, const char **endptr, int base,
+                  unsigned long *result)
+ {
+-    char *p;
++    char *ep;
+     int err = 0;
+     if (!nptr) {
+         if (endptr) {
+@@ -356,12 +356,12 @@ int qemu_strtoul(const char *nptr, const char **endptr, int base,
+         err = -EINVAL;
+     } else {
+         errno = 0;
+-        *result = strtoul(nptr, &p, base);
++        *result = strtoul(nptr, &ep, base);
+         /* Windows returns 1 for negative out-of-range values.  */
+         if (errno == ERANGE) {
+             *result = -1;
+         }
+-        err = check_strtox_error(nptr, p, endptr, errno);
++        err = check_strtox_error(nptr, ep, endptr, errno);
+     }
+     return err;
+ }
+@@ -375,7 +375,7 @@ int qemu_strtoul(const char *nptr, const char **endptr, int base,
+ int qemu_strtoi64(const char *nptr, const char **endptr, int base,
+                  int64_t *result)
+ {
+-    char *p;
++    char *ep;
+     int err = 0;
+     if (!nptr) {
+         if (endptr) {
+@@ -385,8 +385,8 @@ int qemu_strtoi64(const char *nptr, const char **endptr, int base,
+     } else {
+         errno = 0;
+         /* FIXME This assumes int64_t is long long */
+-        *result = strtoll(nptr, &p, base);
+-        err = check_strtox_error(nptr, p, endptr, errno);
++        *result = strtoll(nptr, &ep, base);
++        err = check_strtox_error(nptr, ep, endptr, errno);
+     }
+     return err;
+ }
+@@ -399,7 +399,7 @@ int qemu_strtoi64(const char *nptr, const char **endptr, int base,
+ int qemu_strtou64(const char *nptr, const char **endptr, int base,
+                   uint64_t *result)
+ {
+-    char *p;
++    char *ep;
+     int err = 0;
+     if (!nptr) {
+         if (endptr) {
+@@ -409,12 +409,12 @@ int qemu_strtou64(const char *nptr, const char **endptr, int base,
+     } else {
+         errno = 0;
+         /* FIXME This assumes uint64_t is unsigned long long */
+-        *result = strtoull(nptr, &p, base);
++        *result = strtoull(nptr, &ep, base);
+         /* Windows returns 1 for negative out-of-range values.  */
+         if (errno == ERANGE) {
+             *result = -1;
+         }
+-        err = check_strtox_error(nptr, p, endptr, errno);
++        err = check_strtox_error(nptr, ep, endptr, errno);
+     }
+     return err;
  }
 -- 
 2.7.4
