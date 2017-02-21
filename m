@@ -1,26 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cgF4U-0004Wr-JN
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 13:21:55 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cgFBW-0001r2-Eu
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 13:29:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cgF4T-0005Ku-GA
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 13:21:54 -0500
-Date: Tue, 21 Feb 2017 15:21:44 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1cgFBV-0008Km-Mc
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 13:29:10 -0500
+Date: Tue, 21 Feb 2017 15:28:59 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170221182144.GG2778@thinpad.lan.raisama.net>
+Message-ID: <20170221182859.GH2778@thinpad.lan.raisama.net>
 References: <1487357795-52614-1-git-send-email-imammedo@redhat.com>
-	<CAFEAcA9JWzUEmGa2Wxd5xPE4dVknOKBkt=wMda7CAgxzrgOc+w@mail.gmail.com>
-	<20170220195500.332a4844@nial.brq.redhat.com>
-	<CAFEAcA-VAY8LM+8jE4B-L=0QdcY5FLvwmwGVbUhcXjnC9-AW+w@mail.gmail.com>
-	<20170221134416.5803b3e5@nial.brq.redhat.com>
-	<CAFEAcA-MggU5T1fO8GonkSpLF0SNe0jtygEHtEBkpWC8hyShSw@mail.gmail.com>
-	<87poibr6kv.fsf@dusky.pond.sub.org>
-	<CAFEAcA-75VPiOzPauZO4ukYVYWffB1cu1-tsQs6Hs8m8Vf41OQ@mail.gmail.com>
-	<87fuj74k9q.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87fuj74k9q.fsf@dusky.pond.sub.org>
+In-Reply-To: <1487357795-52614-1-git-send-email-imammedo@redhat.com>
 Subject: Re: [Qemu-devel] [RFC 0/3] generalize parsing of cpu_model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,50 +22,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "patches@linaro.org" <patches@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, patches@linaro.org, Peter Maydell <peter.maydell@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Tue, Feb 21, 2017 at 04:48:49PM +0100, Markus Armbruster wrote:
-> Peter Maydell <peter.maydell@linaro.org> writes:
+On Fri, Feb 17, 2017 at 07:56:32PM +0100, Igor Mammedov wrote:
 > 
-> > On 21 February 2017 at 13:56, Markus Armbruster <armbru@redhat.com> wrote:
-> >> -global is a qdev thing.
-> >
-> > ...which reminds me to ask: is there any hope for unifying
-> > our properties so we don't have both "qdev properties" and
-> > "qom properties" or are we doomed to two distinct sets of
-> > APIs forever?
+> Some callers call CPUClass->parse_features manually to convert
+> '-cpu cpufoo,featurestr' string to cpu type and featurestr
+> into a set of global properties. And theni do controlled
+> cpu creation with setting properties and completing it with realize.
+> That's a lot of code duplication as they are practically
+> reimplement the same parsing logic.
 > 
-> Good question!  Paolo, Andreas, any ideas?
+> Some don't and use cpu_generic_init() instead which does
+> the same parsing along with creation/realizing cpu within one
+> wrapper.
+> 
+> And some trying to switch to controlled cpu creation,
+> implement object_new()/set properties/realize steps
+> but forget feature parsing logic witch lieads to 'bugs'
+> commit 00909b585 (hw/arm/integratorcp: Support specifying features via -cpu)
+> 
+> 
+> This series moves -cpu option parsing to generic machine code
+> that removes a little of code duplication and makes cpus creation
+> process more unified.
+> 
+> PS:
+> As I don't have time to rewrite this part QEMU, being busy
+> rewritting yet another part of QEMU,
+> SERIES IS UNFINISHED AND SERVERS TO SHOW IDEA HOW IT SHOULD
+> BE DONE. FEEL FREE TO PICK UP AND COMPLETE THIS PATCHES
+> TO HANDLE ALL BOARDS (series does it only for virt-arm/spapr/pc)
+> 
+> It compiles and pc machine even starts but otherwise is untested.
 
-qdev properties are supposed to be just wrappers to easily add
-QOM properties.
+The approach makes sense to me, but I haven't reviewed all the
+code yet.
 
-...in theory.
+That said, I don't think this excludes the possiblity of adding a
+temporary cpu_generic_new() wrapper in case it is useful in the
+meantime. After this series is applied, cpu_generic_new() could
+be automatically replaced by object_new(machine->cpu_typename).
 
-The current obstacles I see are:
-1) the qdev static property macros (DEFINE_PROP_*) are very
-   simple to use, and QOM property registration requires lots of
-   boilerplate code;
-2) The set of data types supported by the qdev macros doesn't
-   seem to be a subset of the data types supported by QOM
-   helpers.
-3) qdev properties have the extra check for dev->realized on the
-   setter functions.
-
-If we make QOM properties as powerful and easy to use as the qdev
-property system, replacing qdev properties with equivalent QOM
-counterparts would be straightforward. The exact path we should
-follow to do that is not clear to me, but cleanups going in that
-direction would be welcome.
-
-Some things I have considered, which may or may not be good
-ideas:
-* Getting rid of PropertyInfo structs that can't be represented
-  by QAPI types (e.g. qdev_prop_ptr).
-* Generating PropertyInfo structs for primitive types using QAPI.
-* Providing DEFINE_PROP_* macros for QOM, and make the qdev ones
-  just wrappers around the QOM macros.
+Peter, do you think a wrapper for parse_features + object_new()
+would still be necessary to avoid too much code duplication on
+arm boards in 2.9, or can we live without it until we apply
+Igor's series (probaly after 2.9)?
 
 -- 
 Eduardo
