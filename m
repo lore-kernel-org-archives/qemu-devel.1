@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cg8hs-0004M6-6i
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:34:09 -0500
+	(envelope-from <alistair23@gmail.com>) id 1cg8j9-0005H4-Ga
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:35:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cg8hp-0007EQ-4w
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:34:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59364)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cg8ho-0007EB-SZ
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:34:05 -0500
-Date: Tue, 21 Feb 2017 11:33:53 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170221113353.GC17041@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CAAo6VWOAnGQeDwc_bJ4M=FQsu7rOhAv=1Qk6PdzG+0pcVnku=A@mail.gmail.com>
-	<20170217214215.GK19045@localhost.localdomain>
-	<F23F188C-DAF9-49EA-9C0E-54F57945267A@veritas.com>
-	<20170220110235.GD21255@stefanha-x1.localdomain>
-	<CAAo6VWNwHbsQRxU18dNCjWaNfNrZNAV9FfOKW8=JeZCND2vHnQ@mail.gmail.com>
-	<20170221105918.GA22731@stefanha-x1.localdomain>
+	(envelope-from <alistair23@gmail.com>) id 1cg8j8-0007dz-Cz
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:35:27 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170221105918.GA22731@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
- block device type called "vxhs"
+In-Reply-To: <5ff4146f-3ec0-615e-ff57-6df1041662ba@amsat.org>
+References: <1487604965-23220-1-git-send-email-peter.maydell@linaro.org>
+	<1487604965-23220-12-git-send-email-peter.maydell@linaro.org>
+	<5ff4146f-3ec0-615e-ff57-6df1041662ba@amsat.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 21 Feb 2017 03:34:52 -0800
+Message-ID: <CAKmqyKPd-GZ8fhBQkpP4KQc0EOiufu0OXBpzCr1gXzCMAuKvSA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 11/11] stm32f205: Rename 'nvic'
+ local to 'armv7m'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,82 +25,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: ashish mittal <ashmit602@gmail.com>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, Jeff Cody <jcody@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Michael Davidsaver <mdavidsaver@gmail.com>, Patch Tracking <patches@linaro.org>
 
-On Tue, Feb 21, 2017 at 10:59:18AM +0000, Stefan Hajnoczi wrote:
-> On Mon, Feb 20, 2017 at 03:34:57AM -0800, ashish mittal wrote:
-> > On Mon, Feb 20, 2017 at 3:02 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> > > On Sat, Feb 18, 2017 at 12:30:31AM +0000, Ketan Nilangekar wrote:
-> > >> On 2/17/17, 1:42 PM, "Jeff Cody" <jcody@redhat.com> wrote:
-> > >>
-> > >>     On Thu, Feb 16, 2017 at 02:24:19PM -0800, ashish mittal wrote:
-> > >>     > Hi,
-> > >>     >
-> > >>     > I am getting the following error with checkpatch.pl
-> > >>     >
-> > >>     > ERROR: externs should be avoided in .c files
-> > >>     > #78: FILE: block/vxhs.c:28:
-> > >>     > +QemuUUID qemu_uuid __attribute__ ((weak));
-> > >>     >
-> > >>     > Is there any way to get around this, or does it mean that I would have
-> > >>     > to add a vxhs.h just for this one entry?
-> > >>     >
-> > >>
-> > >>     I remain skeptical on the use of the qemu_uuid as a way to select the TLS
-> > >>     cert.
-> > >>
-> > >> [ketan]
-> > >> Is there another identity that can be used for uniquely identifying instances?
-> > >> The requirement was to enforce vdisk access to owner instances.
-> > >
-> > > The qemu_uuid weak attribute looks suspect.  What is going to provide a
-> > > strong qemu_uuid symbol?
-> > >
-> > > Why aren't configuration parameters like the UUID coming from the QEMU
-> > > command-line?
-> > >
-> > > Stefan
-> > 
-> > UUID will in fact come from the QEMU command line. VxHS is not doing
-> > anything special here. It will just use the value already available to
-> > qemu-kvm process.
-> > 
-> > QemuUUID qemu_uuid;
-> > bool qemu_uuid_set;
-> > 
-> > Both the above are defined in vl.c. vl.c will provide the strong
-> > symbol when available. There are certain binaries that do not get
-> > linked with vl.c (e.g. qemu-img). The weak symbol will come into
-> > affect for such binaries, and in this case, the default VXHS UUID will
-> > get picked up. I had, in a previous email, explained how we plan to
-> > use the default UUID. In the regular case, the VxHS controller will
-> > not allow access to the default UUID (non qemu-kvm) binaries, but it
-> > may choose to grant temporary access to specific vdisks for these
-> > binaries depending on the workflow.
-> 
-> That idea sounds like a security problem.  During this time window
-> anyone could use the default UUID to access the data?
+On Mon, Feb 20, 2017 at 9:46 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+> On 02/20/2017 12:36 PM, Peter Maydell wrote:
+>>
+>> The local variable 'nvic' in stm32f205_soc_realize() no longer
+>> holds a direct pointer to the NVIC device; it is a pointer to
+>> the ARMv7M container object. Rename it 'armv7m' accordingly.
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>
+>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Any use of the VM UUID as a means to control authorization on the
-server side is a security flaw, as this is a public value which
-cannot be trusted on its own.
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
-There needs to be some kind of authentication step to verify the
-reported identity, eg a password associated with the VM UUID that
-is validated before trusting the VM UUID.
+Thanks,
 
-Alternatively there needs to be a completely separate UUID, unrelated
-to the VM UUID, which is treated as a private value (eg uses the
-'-object secret' framework in QEMU)
+Alistair
 
-> Just make the UUID (or TLS client certificate file) a command-line
-> parameter that qemu-system, qemu-img, and other tools accept (e.g.
-> qemu-img via the --image-opts/--object syntax).
-
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+>
+>
+>> ---
+>>  hw/arm/stm32f205_soc.c | 18 +++++++++---------
+>>  1 file changed, 9 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
+>> index e6bd73a..6e1260d 100644
+>> --- a/hw/arm/stm32f205_soc.c
+>> +++ b/hw/arm/stm32f205_soc.c
+>> @@ -85,7 +85,7 @@ static void stm32f205_soc_initfn(Object *obj)
+>>  static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+>>  {
+>>      STM32F205State *s =3D STM32F205_SOC(dev_soc);
+>> -    DeviceState *dev, *nvic;
+>> +    DeviceState *dev, *armv7m;
+>>      SysBusDevice *busdev;
+>>      Error *err =3D NULL;
+>>      int i;
+>> @@ -113,9 +113,9 @@ static void stm32f205_soc_realize(DeviceState
+>> *dev_soc, Error **errp)
+>>      vmstate_register_ram_global(sram);
+>>      memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, sram)=
+;
+>>
+>> -    nvic =3D DEVICE(&s->armv7m);
+>> -    qdev_prop_set_uint32(nvic, "num-irq", 96);
+>> -    qdev_prop_set_string(nvic, "cpu-model", s->cpu_model);
+>> +    armv7m =3D DEVICE(&s->armv7m);
+>> +    qdev_prop_set_uint32(armv7m, "num-irq", 96);
+>> +    qdev_prop_set_string(armv7m, "cpu-model", s->cpu_model);
+>>      object_property_set_link(OBJECT(&s->armv7m),
+>> OBJECT(get_system_memory()),
+>>                                       "memory", &error_abort);
+>>      object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err=
+);
+>> @@ -133,7 +133,7 @@ static void stm32f205_soc_realize(DeviceState
+>> *dev_soc, Error **errp)
+>>      }
+>>      busdev =3D SYS_BUS_DEVICE(dev);
+>>      sysbus_mmio_map(busdev, 0, 0x40013800);
+>> -    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(nvic, 71));
+>> +    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, 71));
+>>
+>>      /* Attach UART (uses USART registers) and USART controllers */
+>>      for (i =3D 0; i < STM_NUM_USARTS; i++) {
+>> @@ -147,7 +147,7 @@ static void stm32f205_soc_realize(DeviceState
+>> *dev_soc, Error **errp)
+>>          }
+>>          busdev =3D SYS_BUS_DEVICE(dev);
+>>          sysbus_mmio_map(busdev, 0, usart_addr[i]);
+>> -        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(nvic,
+>> usart_irq[i]));
+>> +        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m,
+>> usart_irq[i]));
+>>      }
+>>
+>>      /* Timer 2 to 5 */
+>> @@ -161,7 +161,7 @@ static void stm32f205_soc_realize(DeviceState
+>> *dev_soc, Error **errp)
+>>          }
+>>          busdev =3D SYS_BUS_DEVICE(dev);
+>>          sysbus_mmio_map(busdev, 0, timer_addr[i]);
+>> -        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(nvic,
+>> timer_irq[i]));
+>> +        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m,
+>> timer_irq[i]));
+>>      }
+>>
+>>      /* ADC 1 to 3 */
+>> @@ -173,7 +173,7 @@ static void stm32f205_soc_realize(DeviceState
+>> *dev_soc, Error **errp)
+>>          return;
+>>      }
+>>      qdev_connect_gpio_out(DEVICE(s->adc_irqs), 0,
+>> -                          qdev_get_gpio_in(nvic, ADC_IRQ));
+>> +                          qdev_get_gpio_in(armv7m, ADC_IRQ));
+>>
+>>      for (i =3D 0; i < STM_NUM_ADCS; i++) {
+>>          dev =3D DEVICE(&(s->adc[i]));
+>> @@ -198,7 +198,7 @@ static void stm32f205_soc_realize(DeviceState
+>> *dev_soc, Error **errp)
+>>          }
+>>          busdev =3D SYS_BUS_DEVICE(dev);
+>>          sysbus_mmio_map(busdev, 0, spi_addr[i]);
+>> -        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(nvic,
+>> spi_irq[i]));
+>> +        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m,
+>> spi_irq[i]));
+>>      }
+>>  }
+>>
+>>
+>
