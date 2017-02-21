@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cg4gc-0002ya-4K
+	(envelope-from <kraxel@redhat.com>) id 1cg4gc-0002yc-4M
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 02:16:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cg4ga-00087a-C4
+	(envelope-from <kraxel@redhat.com>) id 1cg4gY-00086Y-Sj
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 02:16:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44450)
+Received: from mx1.redhat.com ([209.132.183.28]:58462)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cg4ga-000871-3z
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 02:16:32 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cg4gY-00086M-Mi
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 02:16:30 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 51E77C05166B
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 07:16:32 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C2B2513CF3
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 07:16:30 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 21 Feb 2017 08:16:19 +0100
-Message-Id: <1487661385-7720-6-git-send-email-kraxel@redhat.com>
-In-Reply-To: <1487661385-7720-1-git-send-email-kraxel@redhat.com>
-References: <1487661385-7720-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 05/11] xhci: drop ER_FULL_HACK workaround
+Date: Tue, 21 Feb 2017 08:16:14 +0100
+Message-Id: <1487661385-7720-1-git-send-email-kraxel@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/11] usb patch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,230 +33,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-The nec/renesas driver problems have finally been debugged and root
-caused, see commit "7da76e1 xhci: fix event queue IRQ handling".
+  Hi,
 
-It's pretty clear now that
- (a) The whole "driver can't handle ring full" story is most likely
-     wrong.
- (b) The ER_FULL_HACK workaround based on the false assumtion doesn't
-     much.  It avoids the driver crashing (without commit 7da76e1), but
-     it doesn't make usb work.
- (c) With 7da76e1 applied it doesn't trigger any more.
+Here is the usb patch queue, bringing the usual share of bugfixes.
+Also a generic xhci device variant (qemu-xhci).
 
-So, lets kill it.  Or, to be exact, lets almost kill it.  Some data
-fields are kept unused in the state struct, for live migration backward
-compatibility.
+please pull,
+  Gerd
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 1486382139-30630-2-git-send-email-kraxel@redhat.com
----
- hw/usb/hcd-xhci.c | 117 +++++-------------------------------------------------
- 1 file changed, 11 insertions(+), 106 deletions(-)
+The following changes since commit 56f9e46b841c7be478ca038d8d4085d776ab4b=
+0d:
 
-diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-index f3f9579..cfb5f74 100644
---- a/hw/usb/hcd-xhci.c
-+++ b/hw/usb/hcd-xhci.c
-@@ -49,9 +49,6 @@
- 
- /* Very pessimistic, let's hope it's enough for all cases */
- #define EV_QUEUE (((3 * 24) + 16) * MAXSLOTS)
--/* Do not deliver ER Full events. NEC's driver does some things not bound
-- * to the specs when it gets them */
--#define ER_FULL_HACK
- 
- #define TRB_LINK_LIMIT  4
- #define COMMAND_LIMIT   256
-@@ -433,12 +430,14 @@ typedef struct XHCIInterrupter {
-     uint32_t erdp_low;
-     uint32_t erdp_high;
- 
--    bool msix_used, er_pcs, er_full;
-+    bool msix_used, er_pcs;
- 
-     dma_addr_t er_start;
-     uint32_t er_size;
-     unsigned int er_ep_idx;
- 
-+    /* kept for live migration compat only */
-+    bool er_full_unused;
-     XHCIEvent ev_buffer[EV_QUEUE];
-     unsigned int ev_buffer_put;
-     unsigned int ev_buffer_get;
-@@ -828,7 +827,7 @@ static void xhci_intr_raise(XHCIState *xhci, int v)
- 
- static inline int xhci_running(XHCIState *xhci)
- {
--    return !(xhci->usbsts & USBSTS_HCH) && !xhci->intr[0].er_full;
-+    return !(xhci->usbsts & USBSTS_HCH);
- }
- 
- static void xhci_die(XHCIState *xhci)
-@@ -867,74 +866,6 @@ static void xhci_write_event(XHCIState *xhci, XHCIEvent *event, int v)
-     }
- }
- 
--static void xhci_events_update(XHCIState *xhci, int v)
--{
--    XHCIInterrupter *intr = &xhci->intr[v];
--    dma_addr_t erdp;
--    unsigned int dp_idx;
--    bool do_irq = 0;
--
--    if (xhci->usbsts & USBSTS_HCH) {
--        return;
--    }
--
--    erdp = xhci_addr64(intr->erdp_low, intr->erdp_high);
--    if (erdp < intr->er_start ||
--        erdp >= (intr->er_start + TRB_SIZE*intr->er_size)) {
--        DPRINTF("xhci: ERDP out of bounds: "DMA_ADDR_FMT"\n", erdp);
--        DPRINTF("xhci: ER[%d] at "DMA_ADDR_FMT" len %d\n",
--                v, intr->er_start, intr->er_size);
--        xhci_die(xhci);
--        return;
--    }
--    dp_idx = (erdp - intr->er_start) / TRB_SIZE;
--    assert(dp_idx < intr->er_size);
--
--    /* NEC didn't read section 4.9.4 of the spec (v1.0 p139 top Note) and thus
--     * deadlocks when the ER is full. Hack it by holding off events until
--     * the driver decides to free at least half of the ring */
--    if (intr->er_full) {
--        int er_free = dp_idx - intr->er_ep_idx;
--        if (er_free <= 0) {
--            er_free += intr->er_size;
--        }
--        if (er_free < (intr->er_size/2)) {
--            DPRINTF("xhci_events_update(): event ring still "
--                    "more than half full (hack)\n");
--            return;
--        }
--    }
--
--    while (intr->ev_buffer_put != intr->ev_buffer_get) {
--        assert(intr->er_full);
--        if (((intr->er_ep_idx+1) % intr->er_size) == dp_idx) {
--            DPRINTF("xhci_events_update(): event ring full again\n");
--#ifndef ER_FULL_HACK
--            XHCIEvent full = {ER_HOST_CONTROLLER, CC_EVENT_RING_FULL_ERROR};
--            xhci_write_event(xhci, &full, v);
--#endif
--            do_irq = 1;
--            break;
--        }
--        XHCIEvent *event = &intr->ev_buffer[intr->ev_buffer_get];
--        xhci_write_event(xhci, event, v);
--        intr->ev_buffer_get++;
--        do_irq = 1;
--        if (intr->ev_buffer_get == EV_QUEUE) {
--            intr->ev_buffer_get = 0;
--        }
--    }
--
--    if (do_irq) {
--        xhci_intr_raise(xhci, v);
--    }
--
--    if (intr->er_full && intr->ev_buffer_put == intr->ev_buffer_get) {
--        DPRINTF("xhci_events_update(): event ring no longer full\n");
--        intr->er_full = 0;
--    }
--}
--
- static void xhci_event(XHCIState *xhci, XHCIEvent *event, int v)
- {
-     XHCIInterrupter *intr;
-@@ -947,19 +878,6 @@ static void xhci_event(XHCIState *xhci, XHCIEvent *event, int v)
-     }
-     intr = &xhci->intr[v];
- 
--    if (intr->er_full) {
--        DPRINTF("xhci_event(): ER full, queueing\n");
--        if (((intr->ev_buffer_put+1) % EV_QUEUE) == intr->ev_buffer_get) {
--            DPRINTF("xhci: event queue full, dropping event!\n");
--            return;
--        }
--        intr->ev_buffer[intr->ev_buffer_put++] = *event;
--        if (intr->ev_buffer_put == EV_QUEUE) {
--            intr->ev_buffer_put = 0;
--        }
--        return;
--    }
--
-     erdp = xhci_addr64(intr->erdp_low, intr->erdp_high);
-     if (erdp < intr->er_start ||
-         erdp >= (intr->er_start + TRB_SIZE*intr->er_size)) {
-@@ -973,21 +891,12 @@ static void xhci_event(XHCIState *xhci, XHCIEvent *event, int v)
-     dp_idx = (erdp - intr->er_start) / TRB_SIZE;
-     assert(dp_idx < intr->er_size);
- 
--    if ((intr->er_ep_idx+1) % intr->er_size == dp_idx) {
--        DPRINTF("xhci_event(): ER full, queueing\n");
--#ifndef ER_FULL_HACK
-+    if ((intr->er_ep_idx + 2) % intr->er_size == dp_idx) {
-+        DPRINTF("xhci: ER %d full, send ring full error\n", v);
-         XHCIEvent full = {ER_HOST_CONTROLLER, CC_EVENT_RING_FULL_ERROR};
--        xhci_write_event(xhci, &full);
--#endif
--        intr->er_full = 1;
--        if (((intr->ev_buffer_put+1) % EV_QUEUE) == intr->ev_buffer_get) {
--            DPRINTF("xhci: event queue full, dropping event!\n");
--            return;
--        }
--        intr->ev_buffer[intr->ev_buffer_put++] = *event;
--        if (intr->ev_buffer_put == EV_QUEUE) {
--            intr->ev_buffer_put = 0;
--        }
-+        xhci_write_event(xhci, &full, v);
-+    } else if ((intr->er_ep_idx + 1) % intr->er_size == dp_idx) {
-+        DPRINTF("xhci: ER %d full, drop event\n", v);
-     } else {
-         xhci_write_event(xhci, event, v);
-     }
-@@ -1127,7 +1036,6 @@ static void xhci_er_reset(XHCIState *xhci, int v)
- 
-     intr->er_ep_idx = 0;
-     intr->er_pcs = 1;
--    intr->er_full = 0;
- 
-     DPRINTF("xhci: event ring[%d]:" DMA_ADDR_FMT " [%d]\n",
-             v, intr->er_start, intr->er_size);
-@@ -2991,7 +2899,6 @@ static void xhci_reset(DeviceState *dev)
- 
-         xhci->intr[i].er_ep_idx = 0;
-         xhci->intr[i].er_pcs = 1;
--        xhci->intr[i].er_full = 0;
-         xhci->intr[i].ev_buffer_put = 0;
-         xhci->intr[i].ev_buffer_get = 0;
-     }
-@@ -3381,7 +3288,6 @@ static void xhci_runtime_write(void *ptr, hwaddr reg,
-         break;
-     case 0x1c: /* ERDP high */
-         intr->erdp_high = val;
--        xhci_events_update(xhci, v);
-         break;
-     default:
-         trace_usb_xhci_unimplemented("oper write", reg);
-@@ -3879,8 +3785,7 @@ static const VMStateDescription vmstate_xhci_event = {
- 
- static bool xhci_er_full(void *opaque, int version_id)
- {
--    struct XHCIInterrupter *intr = opaque;
--    return intr->er_full;
-+    return false;
- }
- 
- static const VMStateDescription vmstate_xhci_intr = {
-@@ -3904,7 +3809,7 @@ static const VMStateDescription vmstate_xhci_intr = {
-         VMSTATE_UINT32(er_ep_idx,     XHCIInterrupter),
- 
-         /* event queue (used if ring is full) */
--        VMSTATE_BOOL(er_full,         XHCIInterrupter),
-+        VMSTATE_BOOL(er_full_unused,  XHCIInterrupter),
-         VMSTATE_UINT32_TEST(ev_buffer_put, XHCIInterrupter, xhci_er_full),
-         VMSTATE_UINT32_TEST(ev_buffer_get, XHCIInterrupter, xhci_er_full),
-         VMSTATE_STRUCT_ARRAY_TEST(ev_buffer, XHCIInterrupter, EV_QUEUE,
--- 
-1.8.3.1
+  Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2017-02-20'=
+ into staging (2017-02-20 17:42:47 +0000)
+
+are available in the git repository at:
+
+
+  git://git.kraxel.org/qemu tags/pull-usb-20170221-1
+
+for you to fetch changes up to 31fb4444a485a348f8e2699d7c3dd15e1819ad2c:
+
+  usb-ccid: add check message size checks (2017-02-21 08:11:43 +0100)
+
+----------------------------------------------------------------
+xhci: add qemu-xhci device, some followup cleanups.
+ccid: better sanity checking.
+ehci: fix memory leak
+ohci: bugfixes.
+
+----------------------------------------------------------------
+Gerd Hoffmann (8):
+      xhci: apply limits to loops
+      xhci: drop ER_FULL_HACK workaround
+      xhci: add qemu xhci controller
+      xhci: fix nec vendor quirk handling
+      xhci: drop via vendor command handling
+      usb-ccid: better bulk_out error handling
+      usb-ccid: move header size check
+      usb-ccid: add check message size checks
+
+Li Qiang (3):
+      usb: ehci: fix memory leak in ehci
+      usb: ohci: fix error return code in servicing iso td
+      usb: ohci: limit the number of link eds
+
+ docs/specs/pci-ids.txt        |   1 +
+ hw/usb/dev-smartcard-reader.c | 140 +++++++++++++-----------
+ hw/usb/hcd-ehci-pci.c         |   9 ++
+ hw/usb/hcd-ehci.c             |   5 +
+ hw/usb/hcd-ehci.h             |   1 +
+ hw/usb/hcd-ohci.c             |  11 +-
+ hw/usb/hcd-xhci.c             | 247 +++++++++++++++---------------------=
+------
+ hw/usb/trace-events           |   1 +
+ include/hw/pci/pci.h          |   1 +
+ 9 files changed, 193 insertions(+), 223 deletions(-)
