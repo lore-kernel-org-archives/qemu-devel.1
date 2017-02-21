@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cg8Oe-0001sT-7h
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:14:17 -0500
+	(envelope-from <armbru@redhat.com>) id 1cg8QJ-00035s-Ei
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:16:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cg8Oa-0001lL-3x
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:14:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35566)
+	(envelope-from <armbru@redhat.com>) id 1cg8QF-0002XQ-CF
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:15:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47200)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cg8OZ-0001l7-Sj
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:14:12 -0500
-Date: Tue, 21 Feb 2017 11:14:06 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170221111406.GD2377@work-vm>
-References: <20170216121140.9061-1-pasic@linux.vnet.ibm.com>
-	<20170216121140.9061-6-pasic@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cg8QF-0002XJ-4Q
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 06:15:55 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1486531462-13882-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1486531462-13882-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Date: Tue, 21 Feb 2017 12:15:51 +0100
+In-Reply-To: <1486531462-13882-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	(Zhang Chen's message of "Wed, 8 Feb 2017 13:24:22 +0800")
+Message-ID: <8760k3zteg.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170216121140.9061-6-pasic@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 5/5] tests/test-vmstate.c: test array of
- ptr to primitive
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH V7 2/2] Add a new qmp command to do
+ checkpoint, query xen replication status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,113 +28,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, Amit Shah <amit.shah@redhat.com>
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Cc: qemu devel <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>, "eddie . dong" <eddie.dong@intel.com>, Wen Congyang <wencongyang@gmail.com>, bian naimeng <biannm@cn.fujitsu.com>
 
-* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
-> Let's have a test for ptr arrays to some primitive type with some
-> not-null and null ptrs intermixed.
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> 
+Zhang Chen <zhangchen.fnst@cn.fujitsu.com> writes:
+
+> We can call this qmp command to do checkpoint outside of qemu.
+> Xen colo will need this function.
+
+I know nothing about "Xen colo", but I'll try anyway.
+
+I *guess* "Xen colo" is a long-running activity, and the new commands
+interact with it.  Correct?
+
+>
+> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+> Signed-off-by: Wen Congyang <wencongyang@gmail.com>
 > ---
-> 
-> Mainly for the sake of completeness and also to demonstrate that it works
-> since in the previous version I wrongly stated it does not. If guys think
-> we do not need this, I'm happy with just dropping it.
-> ---
->  tests/test-vmstate.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 62 insertions(+)
-> 
-> diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
-> index b68a0b3..82ab743 100644
-> --- a/tests/test-vmstate.c
-> +++ b/tests/test-vmstate.c
-> @@ -590,6 +590,64 @@ static void test_arr_ptr_str_0_load(void)
+>  migration/colo.c | 17 ++++++++++++++++
+>  qapi-schema.json | 60 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 77 insertions(+)
+>
+> diff --git a/migration/colo.c b/migration/colo.c
+> index 6fc2ade..2f98a33 100644
+> --- a/migration/colo.c
+> +++ b/migration/colo.c
+> @@ -127,6 +127,23 @@ void qmp_xen_set_replication(bool enable, bool primary,
 >      }
 >  }
 >  
-> +typedef struct TestArrayOfPtrToInt {
-> +    int32_t *ar[AR_SIZE];
-> +} TestArrayOfPtrToInt;
-> +
-> +const VMStateDescription vmsd_arpp = {
-> +    .name = "test/arps",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_ARRAY_OF_POINTER(ar, TestArrayOfPtrToInt,
-> +                AR_SIZE, 0, vmstate_info_int32, int32_t*),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static void test_arr_ptr_prim_0_save(void)
+> +ReplicationResult *qmp_query_xen_replication_status(Error **errp)
 > +{
-> +    int32_t ar[AR_SIZE] = {0 , 1, 2, 3};
-> +    TestArrayOfPtrToInt  sample = {.ar = {&ar[0], NULL, &ar[2], &ar[3]} };
-> +    uint8_t wire_sample[] = {
-> +        0x00, 0x00, 0x00, 0x00,
-> +        VMS_NULLPTR_MARKER,
-> +        0x00, 0x00, 0x00, 0x02,
-> +        0x00, 0x00, 0x00, 0x03,
-> +        QEMU_VM_EOF
-> +    };
-> +
-> +    save_vmstate(&vmsd_arpp, &sample);
-> +    compare_vmstate(wire_sample, sizeof(wire_sample));
+> +    Error *err = NULL;
+> +    ReplicationResult *result = g_new0(ReplicationResult, 1);
+> +    replication_get_error_all(&err);
+> +    result->status = err ?
+> +                     REPLICATION_STATUS_ERROR :
+> +                     REPLICATION_STATUS_NORMAL;
+
+Reports only that there is an error, throws away the actual error
+message.  Naive question: could the error message be good to know for
+the QMP user?
+
+> +    error_free(err);
+> +    return result;
 > +}
 > +
-> +static void test_arr_ptr_prim_0_load(void)
+> +void qmp_xen_do_checkpoint(Error **errp)
 > +{
-> +    int32_t ar_gt[AR_SIZE] = {0, 1, 2, 3};
-> +    int32_t ar[AR_SIZE] = {3 , 42, 1, 0};
-> +    TestArrayOfPtrToInt obj = {.ar = {&ar[0], NULL, &ar[2], &ar[3]} };
-> +    int idx;
-> +    uint8_t wire_sample[] = {
-> +        0x00, 0x00, 0x00, 0x00,
-> +        VMS_NULLPTR_MARKER,
-> +        0x00, 0x00, 0x00, 0x02,
-> +        0x00, 0x00, 0x00, 0x03,
-> +        QEMU_VM_EOF
-> +    };
-
-Again you could share the wire_sample and ar_gt between these two functions,
-other than that:
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-Dave
-
-> +    save_buffer(wire_sample, sizeof(wire_sample));
-> +    SUCCESS(load_vmstate_one(&vmsd_arpp, &obj, 1,
-> +                          wire_sample, sizeof(wire_sample)));
-> +    for (idx = 0; idx < AR_SIZE; ++idx) {
-> +        /* compare the target array ar with the ground truth array ar_gt */
-> +        if (idx == 1) {
-> +            g_assert_cmpint(42, ==, ar[idx]);
-> +        } else {
-> +            g_assert_cmpint(ar_gt[idx], ==, ar[idx]);
-> +        }
-> +    }
+> +    replication_do_checkpoint_all(errp);
 > +}
 > +
->  /* test QTAILQ migration */
->  typedef struct TestQtailqElement TestQtailqElement;
+>  static void colo_send_message(QEMUFile *f, COLOMessage msg,
+>                                Error **errp)
+>  {
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 9445b93..719744a 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -5931,6 +5931,66 @@
+>    'data': { 'enable': 'bool', 'primary': 'bool', '*failover' : 'bool' } }
 >  
-> @@ -843,6 +901,10 @@ int main(int argc, char **argv)
->      g_test_add_func("/vmstate/array/ptr/str/0/save", test_arr_ptr_str_0_save);
->      g_test_add_func("/vmstate/array/ptr/str/0/load",
->                      test_arr_ptr_str_0_load);
-> +    g_test_add_func("/vmstate/array/ptr/prim/0/save",
-> +                    test_arr_ptr_prim_0_save);
-> +    g_test_add_func("/vmstate/array/ptr/prim/0/load",
-> +                    test_arr_ptr_prim_0_load);
->      g_test_add_func("/vmstate/qtailq/save/saveq", test_save_q);
->      g_test_add_func("/vmstate/qtailq/load/loadq", test_load_q);
->      g_test_add_func("/vmstate/tmp_struct", test_tmp_struct);
-> -- 
-> 2.8.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>  ##
+> +# @ReplicationStatus:
+> +#
+> +# Describe the status of replication.
+> +#
+> +# @error: Replication has an error.
+> +#
+> +# @normal: Replication is running normally.
+> +#
+> +# Since: 2.9
+> +##
+> +{ 'enum': 'ReplicationStatus',
+> +  'data': [ 'error', 'normal' ] }
+
+Do you expect more status values in the future?
+
+If yes, what should clients do when they see a status value they don't
+know?
+
+If no, why not simply use bool?
+
+> +
+> +##
+> +# @ReplicationResult:
+> +#
+> +# The result format for 'query-xen-replication-status'.
+> +#
+> +# @status: enum of @ReplicationStatus, which shows current
+> +#          replication error status
+> +#
+> +# Since: 2.9
+> +##
+> +{ 'struct': 'ReplicationResult',
+> +  'data': { 'status': 'ReplicationStatus'} }
+> +
+> +##
+> +# @query-xen-replication-status:
+> +#
+> +# Query replication status while the vm is running.
+> +#
+> +# Returns: A @ReplicationResult objects showing the status.
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "query-xen-replication-status" }
+> +# <- { "return": { "status": "normal" } }
+> +#
+> +# Since: 2.9
+> +##
+> +{ 'command': 'query-xen-replication-status',
+> +  'returns': 'ReplicationResult' }
+
+The naming is a bit unfortunate: query-xen-replication-status returns
+ReplicationResult, which contains ReplicationStatus.
+
+> +
+> +##
+> +# @xen-do-checkpoint:
+> +#
+> +# Xen uses this command to notify replication to trigger a checkpoint.
+> +#
+> +# Returns: nothing.
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "xen-do-checkpoint" }
+> +# <- { "return": {} }
+> +#
+> +# Since: 2.9
+> +##
+> +{ 'command': 'xen-do-checkpoint' }
+> +
+> +##
+>  # @GICCapability:
+>  #
+>  # The struct describes capability for a specific GIC (Generic
