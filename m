@@ -1,22 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42730)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1cgBuS-0008Ez-3B
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:21 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cgBuY-0008Vd-Rd
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1cgBuR-0007qv-8H
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:20 -0500
-References: <1487683100-16013-1-git-send-email-eric.auger@redhat.com>
-	<1487683100-16013-2-git-send-email-eric.auger@redhat.com>
-	<98d4d9e8-761c-76f9-ecb0-c5a4a658dfab@codeaurora.org>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <2dcc9002-ec06-c55e-c0a2-75d05fe05762@redhat.com>
-Date: Tue, 21 Feb 2017 15:59:08 +0100
-MIME-Version: 1.0
-In-Reply-To: <98d4d9e8-761c-76f9-ecb0-c5a4a658dfab@codeaurora.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] vfio/platform: make the vfio-platform
- device non abstract
+	(envelope-from <kwolf@redhat.com>) id 1cgBuS-0007sB-P7
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:26 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Tue, 21 Feb 2017 15:58:09 +0100
+Message-Id: <1487689130-30373-14-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
+References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH 13/54] block: Add Error argument to
+ bdrv_attach_child()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,56 +20,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sinan Kaya <okaya@codeaurora.org>, eric.auger.pro@gmail.com, peter.maydell@linaro.org, alex.williamson@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: shankerd@codeaurora.org, vikrams@codeaurora.org, agraf@suse.de, pelcan@codeaurora.org
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-Hi Sinan,
-On 21/02/2017 15:45, Sinan Kaya wrote:
-> Hi Eric,
-> Thanks for the long anticipated patch.
-> 
-> On 2/21/2017 8:18 AM, Eric Auger wrote:
->> +    DEFINE_PROP_STRING("manufacturer", VFIOPlatformDevice, manufacturer),
->> +    DEFINE_PROP_STRING("model", VFIOPlatformDevice, model),
-> 
-> The OF string is not always of the format "manufacturer, model".
-> 
-> HIDMA for instance uses a syntax of "qcom, hidma-1.0" and "qcom, hidma-2.0".
-> This syntax is used for cases where an IP gets used in multiple SOCs. 
-> 
-> Maybe, we should call it just compatible-string and try not to make meaning
-> out of it.
-> 
-> Sinan
-> 
+It will have to return an error soon, so prepare the callers for it.
 
-in  http://www.devicetree.org/specifications-pdf I found the description
-at the bottom.
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block.c               | 16 +++++++++++++---
+ block/quorum.c        |  9 ++++++++-
+ include/block/block.h |  3 ++-
+ 3 files changed, 23 insertions(+), 5 deletions(-)
 
-I your case what would prevent from creating 2 entries in the table and
-then use either in qemu cmd line?
-
-VFIO_PLATFORM_BINDING("qcom", "hidma-1.0", add_amd_hidma_fdt_node),
-VFIO_PLATFORM_BINDING("qcom", "hidma-2.0", add_amd_hidma_fdt_node),
-
-The issue is the comma in the property is interpreted as a separator for
-options, hence that choice of having 2 separate options.
-
-Besides I will fix the CONFIG_LINUX compilation issue asap.
-
-Thanks
-
-Eric
-
-"
-The recommended format is "manufacturer,model", where manufacturer is a
-string describing the name of the manufacturer (such as a stock ticker
-symbol), and model specifies the model number.
-
-Example:
-compatible = "fsl,mpc8641-uart", "ns16550";
-In this example, an operating system would first try to locate a device
-driver that supported
-fsl,mpc8641-uart. If a driver was not found, it would then try to locate
-a driver that supported the more general ns16550 device type.
-"
+diff --git a/block.c b/block.c
+index e166fe8..b2b6be0 100644
+--- a/block.c
++++ b/block.c
+@@ -1368,7 +1368,8 @@ BdrvChild *bdrv_root_attach_child(BlockDriverState *child_bs,
+ BdrvChild *bdrv_attach_child(BlockDriverState *parent_bs,
+                              BlockDriverState *child_bs,
+                              const char *child_name,
+-                             const BdrvChildRole *child_role)
++                             const BdrvChildRole *child_role,
++                             Error **errp)
+ {
+     BdrvChild *child = bdrv_root_attach_child(child_bs, child_name, child_role,
+                                               parent_bs);
+@@ -1469,7 +1470,9 @@ void bdrv_set_backing_hd(BlockDriverState *bs, BlockDriverState *backing_hd)
+         bs->backing = NULL;
+         goto out;
+     }
+-    bs->backing = bdrv_attach_child(bs, backing_hd, "backing", &child_backing);
++    /* FIXME Error handling */
++    bs->backing = bdrv_attach_child(bs, backing_hd, "backing", &child_backing,
++                                    &error_abort);
+     bs->open_flags &= ~BDRV_O_NO_BACKING;
+     pstrcpy(bs->backing_file, sizeof(bs->backing_file), backing_hd->filename);
+     pstrcpy(bs->backing_format, sizeof(bs->backing_format),
+@@ -1648,6 +1651,7 @@ BdrvChild *bdrv_open_child(const char *filename,
+                            const BdrvChildRole *child_role,
+                            bool allow_none, Error **errp)
+ {
++    BdrvChild *c;
+     BlockDriverState *bs;
+ 
+     bs = bdrv_open_child_bs(filename, options, bdref_key, parent, child_role,
+@@ -1656,7 +1660,13 @@ BdrvChild *bdrv_open_child(const char *filename,
+         return NULL;
+     }
+ 
+-    return bdrv_attach_child(parent, bs, bdref_key, child_role);
++    c = bdrv_attach_child(parent, bs, bdref_key, child_role, errp);
++    if (!c) {
++        bdrv_unref(bs);
++        return NULL;
++    }
++
++    return c;
+ }
+ 
+ static BlockDriverState *bdrv_append_temp_snapshot(BlockDriverState *bs,
+diff --git a/block/quorum.c b/block/quorum.c
+index 86e2072..bdbcec6 100644
+--- a/block/quorum.c
++++ b/block/quorum.c
+@@ -1032,10 +1032,17 @@ static void quorum_add_child(BlockDriverState *bs, BlockDriverState *child_bs,
+ 
+     /* We can safely add the child now */
+     bdrv_ref(child_bs);
+-    child = bdrv_attach_child(bs, child_bs, indexstr, &child_format);
++
++    child = bdrv_attach_child(bs, child_bs, indexstr, &child_format, errp);
++    if (child == NULL) {
++        s->next_child_index--;
++        bdrv_unref(child_bs);
++        goto out;
++    }
+     s->children = g_renew(BdrvChild *, s->children, s->num_children + 1);
+     s->children[s->num_children++] = child;
+ 
++out:
+     bdrv_drained_end(bs);
+ }
+ 
+diff --git a/include/block/block.h b/include/block/block.h
+index ac40c8d..2d6ed7d 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -519,7 +519,8 @@ void bdrv_unref_child(BlockDriverState *parent, BdrvChild *child);
+ BdrvChild *bdrv_attach_child(BlockDriverState *parent_bs,
+                              BlockDriverState *child_bs,
+                              const char *child_name,
+-                             const BdrvChildRole *child_role);
++                             const BdrvChildRole *child_role,
++                             Error **errp);
+ 
+ bool bdrv_op_is_blocked(BlockDriverState *bs, BlockOpType op, Error **errp);
+ void bdrv_op_block(BlockDriverState *bs, BlockOpType op, Error *reason);
+-- 
+1.8.3.1
