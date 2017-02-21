@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cgC0V-00064l-IJ
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:05:36 -0500
+	(envelope-from <eblake@redhat.com>) id 1cgC0Y-00066P-4h
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:05:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cgC0U-00026u-Dx
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:05:35 -0500
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:38107)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cgC0U-00026P-8E
+	(envelope-from <eblake@redhat.com>) id 1cgC0U-00026n-7l
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:05:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38492)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cgC0U-00026N-2M
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:05:34 -0500
-Received: by mail-wm0-x232.google.com with SMTP id r141so77968500wmg.1
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 07:05:34 -0800 (PST)
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3F37E80491
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 15:05:34 +0000 (UTC)
+References: <1487363905-9480-1-git-send-email-armbru@redhat.com>
+	<1487363905-9480-8-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2937d173-68d0-9a6f-4d0f-2e3c5cddda2b@redhat.com>
+Date: Tue, 21 Feb 2017 09:05:32 -0600
 MIME-Version: 1.0
-In-Reply-To: <1487680479-15132-1-git-send-email-armbru@redhat.com>
-References: <1487680479-15132-1-git-send-email-armbru@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 Feb 2017 15:05:12 +0000
-Message-ID: <CAFEAcA-LMO4vZBNSq7bAEj2oNnavSm1zUKZu8mPdNrhJuygqCw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 00/11] Changes to -drive without if= and
- with if=scsi
+In-Reply-To: <1487363905-9480-8-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="SJQkjxdc0hNoX2m018NnqF3X4lTPLGL1I"
+Subject: Re: [Qemu-devel] [PATCH 07/14] Don't check qobject_type() before
+ qobject_to_qdict()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +35,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
-On 21 February 2017 at 12:34, Markus Armbruster <armbru@redhat.com> wrote:
-> The following changes since commit b856256179f14c33a513d0b9cc3e4be355b95f43:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/pull-usb-20170221-1' into staging (2017-02-21 09:35:15 +0000)
->
-> are available in the git repository at:
->
->   git://repo.or.cz/qemu/armbru.git tags/pull-block-2017-02-21
->
-> for you to fetch changes up to f778a82f0c179634892ea716970d4d35264dc841:
->
->   hw/i386: Deprecate -drive if=scsi with PC machine types (2017-02-21 13:17:45 +0100)
->
-> ----------------------------------------------------------------
-> Changes to -drive without if= and with if=scsi
->
-> ----------------------------------------------------------------
-> Markus Armbruster (11):
->       hw: Default -drive to if=ide explicitly where it works
->       hw/arm/cubieboard hw/arm/xlnx-ep108: Fix units_per_default_bus
->       hw: Default -drive to if=none instead of ide when ide cannot work
->       hw: Default -drive to if=none instead of scsi when scsi cannot work
->       hw/arm/highbank: Default -drive to if=ide instead of if=scsi
->       blockdev: Improve message for orphaned -drive
->       blockdev: Make orphaned -drive fatal
->       hw: Drop superfluous special checks for orphaned -drive
->       hw/scsi: Concentrate -drive if=scsi auto-create in one place
->       hw: Deprecate -drive if=scsi with non-onboard HBAs
->       hw/i386: Deprecate -drive if=scsi with PC machine types
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--SJQkjxdc0hNoX2m018NnqF3X4lTPLGL1I
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <2937d173-68d0-9a6f-4d0f-2e3c5cddda2b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 07/14] Don't check qobject_type() before
+ qobject_to_qdict()
+References: <1487363905-9480-1-git-send-email-armbru@redhat.com>
+ <1487363905-9480-8-git-send-email-armbru@redhat.com>
+In-Reply-To: <1487363905-9480-8-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Applied, thanks.
+On 02/17/2017 02:38 PM, Markus Armbruster wrote:
+> qobject_to_qdict(obj) returns NULL when obj isn't a QDict.  Check
+> that instead of qobject_type(obj) =3D=3D QTYPE_QDICT.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
 
--- PMM
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--SJQkjxdc0hNoX2m018NnqF3X4lTPLGL1I
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYrFc8AAoJEKeha0olJ0Nq2bIH/0yaHhYiGY5GQybHUNG+A9XB
+8mnzzkGmIH8OCs/Syt50Vmiv4G6gT5Y7wWSdyg9Feko/oJ6O8QYGkDl0fGAmd0xH
+3H4BgHXWXalJBtZ0georXOoGS9xivnMP1RdD36bjHrhk+QB1+NJRQTsppmor9yP5
+X9HjFTrFJLc509z5B/Fw1mTEvDI0CnoHrvm4aaLqXwdQUseS2vsybXpIIbnnqsTW
+5YjLf699K34mdO5Ii9rAawvpazg24x6zjqVNlPVXsgaLHdIvnmFA4TQVTORtWJq1
+jjVQLjva+fxA08SX8nIIylG2EwXZgA/QQhslqHyQasZONK8cfcqUACEmYfjTKqQ=
+=Wg3C
+-----END PGP SIGNATURE-----
+
+--SJQkjxdc0hNoX2m018NnqF3X4lTPLGL1I--
