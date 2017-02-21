@@ -1,32 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41676)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cg0VT-0001nH-T8
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 21:48:48 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cg0Yz-0004kL-Nz
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 21:52:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cg0VP-0004eN-Uo
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 21:48:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43240)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cg0VP-0004eF-Ol
-	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 21:48:43 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CD439C054C2A
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 02:48:43 +0000 (UTC)
-References: <1487363905-9480-1-git-send-email-armbru@redhat.com>
-	<1487363905-9480-6-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1ba0737b-ac09-4158-0b87-8428f3fc56cb@redhat.com>
-Date: Mon, 20 Feb 2017 20:48:41 -0600
-MIME-Version: 1.0
-In-Reply-To: <1487363905-9480-6-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="4DqOoMBDFB0GPbIXoi6M1tHJCI5hGTMIw"
-Subject: Re: [Qemu-devel] [PATCH 05/14] libqtest: Clean up qmp_response() a
- bit
+	(envelope-from <dgibson@ozlabs.org>) id 1cg0Yv-0005dQ-QG
+	for qemu-devel@nongnu.org; Mon, 20 Feb 2017 21:52:25 -0500
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Tue, 21 Feb 2017 13:52:11 +1100
+Message-Id: <20170221025211.30007-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PATCH] target/ppc: Fix serious bug in HPTE writeback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,57 +17,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-stable@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com, agraf@suse.de, aik@ozlabs.ru, thuth@redhat.com, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4DqOoMBDFB0GPbIXoi6M1tHJCI5hGTMIw
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <1ba0737b-ac09-4158-0b87-8428f3fc56cb@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 05/14] libqtest: Clean up qmp_response() a
- bit
-References: <1487363905-9480-1-git-send-email-armbru@redhat.com>
- <1487363905-9480-6-git-send-email-armbru@redhat.com>
-In-Reply-To: <1487363905-9480-6-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+ppc_hash64_store_hpte() is used to update HPTEs in the hashed page table
+(HPT) for 64-bit machines.  This is used when the (emulated) CPU needs to
+update the referenced (R) or changed (C) bits in the HPTE.
 
-On 02/17/2017 02:38 PM, Markus Armbruster wrote:
-> Use qobject_to_qdict() instead of a type cast.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  tests/libqtest.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+Some time ago this was converted to take an HPTE index, instead of a
+raw offset to the HPTE within the HPT (similar functions for 32-bit still
+take an offset).  In the process a serious bug was introduced: we're
+still using the index parameter as though it was an offset, failing to
+multiply by the size of an HPTE, so it will update bits in the wrong part
+of the HPT.  This can corrupt the guests's HPT, causing crashes or data
+loss.
 
-Happens to be the same (because of our struct layout), but agree that
-the conversion function is safer if we ever change struct layout.
+AFAICT the reason we haven't noticed this error earlier is that for 64-bit
+machines we've been testing almost exclusively with Linux guests.  Linux
+on ppc does not make use of the hardware R & C bits, so this writeback
+will never be triggered.  It also occurs only on TCG, not KVM, guests.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ target/ppc/mmu-hash64.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---4DqOoMBDFB0GPbIXoi6M1tHJCI5hGTMIw
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYq6qJAAoJEKeha0olJ0NqB1YIAIGuJJMF/+mtm9DyyDQY94NB
-EKCoV3PZdvsbFZ8wN+k94+wdPxdNEjIR6Mx7Phj0jeG8s0+l0fSSUJkuFmciJF+j
-DUA0QQmDyXysyVrTsskumCdDxI6Y6XIYTBdcCUL2fKMY3Y/M41Xd5fTqY1RNbr0i
-Xt+WfomSFsuyo8UGVn8RTkNotAWanU6SVyli4+S1Ss19mnfJvOljiPY1BTJcYW5x
-rtVQnASm+d6Wsnz9kINkWSy2FvfZUtK3bk3WUJMAau415CXdhWn/CnFuOzU6hQPu
-EFPRLAyBRdIzb6duESXafE++1LlN/3hwvaEkUBc4QmOiZibswFllL8cauo24aAo=
-=Ohl3
------END PGP SIGNATURE-----
-
---4DqOoMBDFB0GPbIXoi6M1tHJCI5hGTMIw--
+diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+index bb78fb5..dc3b5f7 100644
+--- a/target/ppc/mmu-hash64.c
++++ b/target/ppc/mmu-hash64.c
+@@ -894,12 +894,15 @@ void ppc_hash64_store_hpte(PowerPCCPU *cpu,
+ 
+     pte_index *= HASH_PTE_SIZE_64;
+     if (env->external_htab) {
+-        stq_p(env->external_htab + pte_index, pte0);
+-        stq_p(env->external_htab + pte_index + HASH_PTE_SIZE_64 / 2, pte1);
++        stq_p(env->external_htab + pte_index * HASH_PTE_SIZE_64, pte0);
++        stq_p(env->external_htab + pte_index * HASH_PTE_SIZE_64
++              + HASH_PTE_SIZE_64 / 2, pte1);
+     } else {
+-        stq_phys(CPU(cpu)->as, env->htab_base + pte_index, pte0);
+         stq_phys(CPU(cpu)->as,
+-                 env->htab_base + pte_index + HASH_PTE_SIZE_64 / 2, pte1);
++                 env->htab_base + pte_index * HASH_PTE_SIZE_64, pte0);
++        stq_phys(CPU(cpu)->as,
++                 env->htab_base + pte_index * HASH_PTE_SIZE_64
++                 + HASH_PTE_SIZE_64 / 2, pte1);
+     }
+ }
+ 
+-- 
+2.9.3
