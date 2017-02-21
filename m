@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cgIiK-0002qi-DQ
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 17:15:17 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cgIiK-0002qg-Ct
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 17:15:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cgIiH-0004S7-88
+	(envelope-from <kraxel@redhat.com>) id 1cgIiH-0004Ry-5j
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 17:15:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42378)
+Received: from mx1.redhat.com ([209.132.183.28]:52236)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cgIiH-0004Rj-2k
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cgIiH-0004Rc-0V
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 17:15:13 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3E3FA4E326
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 22:15:13 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id F358983F42
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 22:15:12 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 21 Feb 2017 23:14:54 +0100
-Message-Id: <1487715299-21102-5-git-send-email-kraxel@redhat.com>
-In-Reply-To: <1487715299-21102-1-git-send-email-kraxel@redhat.com>
-References: <1487715299-21102-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/9] drop arch-specific graphic_*
- initialization.
+Date: Tue, 21 Feb 2017 23:14:50 +0100
+Message-Id: <1487715299-21102-1-git-send-email-kraxel@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/9] wire up -g <width>x<height> switch for
+ virtio and qxl.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,53 +32,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Now that sparc and ppc can deal with uninitialized graphic_* variables
-we can drop the #ifdefs and also move the variables out of arch_init.c
-as they are not arch specific any more.
+  Hi,
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- arch_init.c | 11 -----------
- vl.c        |  3 +++
- 2 files changed, 3 insertions(+), 11 deletions(-)
+Made a nice patch series out of it, first cleaning up graphics_* variable=
+s,
+then adding support for -g to virtio (just works), qxl (needs guest drive=
+r
+fixes) and stdvga (needs virtual hardware update, and therefore also an
+guest driver update for obvious reasons).
 
-diff --git a/arch_init.c b/arch_init.c
-index 0810116..f41af1c 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -34,17 +34,6 @@
- #include "hw/acpi/acpi.h"
- #include "qemu/help_option.h"
- 
--#ifdef TARGET_SPARC
--int graphic_width = 1024;
--int graphic_height = 768;
--int graphic_depth = 8;
--#else
--int graphic_width = 800;
--int graphic_height = 600;
--int graphic_depth = 32;
--#endif
--
--
- #if defined(TARGET_ALPHA)
- #define QEMU_ARCH QEMU_ARCH_ALPHA
- #elif defined(TARGET_ARM)
-diff --git a/vl.c b/vl.c
-index 27d9829..3be883e 100644
---- a/vl.c
-+++ b/vl.c
-@@ -135,6 +135,9 @@ const char *bios_name = NULL;
- enum vga_retrace_method vga_retrace_method = VGA_RETRACE_DUMB;
- int request_opengl = -1;
- int display_opengl;
-+int graphic_width;
-+int graphic_height;
-+int graphic_depth;
- const char* keyboard_layout = NULL;
- ram_addr_t ram_size;
- const char *mem_path = NULL;
--- 
+linux kernel patches to test qxl and stdvga are here:
+  https://www.kraxel.org/cgit/linux/log/?h=3Dqxl-display-size
+
+please review & test,
+  Gerd
+
+Gerd Hoffmann (9):
+  sysemu: add defines for sparc & ppc graphics_*
+  sparc: use sparc_graphic_* defines
+  ppc: use ppc_graphic_* defines
+  drop arch-specific graphic_* initialization.
+  enable -g command line switch for all archs
+  virtio-gpu: use graphic_* variables.
+  qxl: use graphic_* variables.
+  update -g command line switch documentation
+  [RfC] stdvga: use graphic_* variables.
+
+ arch_init.c             | 11 -----------
+ hw/display/qxl.c        | 32 ++++++++++++++++++++----------
+ hw/display/vga-pci.c    | 52 ++++++++++++++++++++++++++++++++++---------=
+------
+ hw/display/vga_int.h    |  4 ++--
+ hw/display/virtio-gpu.c |  9 +++++++--
+ hw/display/virtio-vga.c |  3 ++-
+ hw/ppc/mac_newworld.c   |  6 +++---
+ hw/ppc/mac_oldworld.c   |  6 +++---
+ hw/ppc/prep.c           | 10 +++++-----
+ hw/ppc/spapr.c          |  6 +++---
+ hw/sparc/sun4m.c        | 36 +++++++++++++++++-----------------
+ include/sysemu/sysemu.h |  7 +++++++
+ qemu-options.hx         | 15 ++++++++++++--
+ vl.c                    |  3 +++
+ 14 files changed, 124 insertions(+), 76 deletions(-)
+
+--=20
 1.8.3.1
