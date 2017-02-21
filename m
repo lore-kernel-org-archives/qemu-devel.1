@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgBuZ-00006F-Sy
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:29 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cgBuc-0000GE-Et
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgBuU-0007t8-V0
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:27 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cgBub-0007wA-Be
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:30 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 21 Feb 2017 15:58:10 +0100
-Message-Id: <1487689130-30373-15-git-send-email-kwolf@redhat.com>
+Date: Tue, 21 Feb 2017 15:58:14 +0100
+Message-Id: <1487689130-30373-19-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
 References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 14/54] block: Let callers request permissions
- when attaching a child node
+Subject: [Qemu-devel] [PATCH 18/54] block: Default .bdrv_child_perm() for
+ format drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,179 +23,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-When attaching a node as a child to a new parent, the required and
-shared permissions for this parent are checked against all other parents
-of the node now, and an error is returned if there is a conflict.
+Almost all format drivers have the same characteristics as far as
+permissions are concerned: They have one or more children for storing
+their own data and, more importantly, metadata (can be written to and
+grow even without external write requests, must be protected against
+other writers and present consistent data) and optionally a backing file
+(this is just data, so like for a filter, it only depends on what the
+parent nodes need).
 
-This allows error returns to a function that previously always
-succeeded, and the same is true for quite a few callers and their
-callers. Converting all of them within the same patch would be too much,
-so for now everyone tells that they don't need any permissions and allow
-everyone else to do anything. This way we can use &error_abort initially
-and convert caller by caller to pass actual permission requirements and
-implement error handling.
-
-All these places are marked with FIXME comments and it will be the job
-of the next patches to clean them up again.
+This provides a default implementation that can be shared by most of
+our format drivers.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block.c                   | 66 +++++++++++++++++++++++++++++++++++++++++------
- block/block-backend.c     |  8 ++++--
- include/block/block_int.h | 15 ++++++++++-
- 3 files changed, 78 insertions(+), 11 deletions(-)
+ block.c                   | 42 ++++++++++++++++++++++++++++++++++++++++++
+ include/block/block_int.h |  8 ++++++++
+ 2 files changed, 50 insertions(+)
 
 diff --git a/block.c b/block.c
-index b2b6be0..d9f2267 100644
+index 523cbd3..f2e7178 100644
 --- a/block.c
 +++ b/block.c
-@@ -1326,6 +1326,38 @@ static int bdrv_fill_options(QDict **options, const char *filename,
-     return 0;
+@@ -1554,6 +1554,48 @@ void bdrv_filter_default_perms(BlockDriverState *bs, BdrvChild *c,
+                (c->shared_perm & DEFAULT_PERM_UNCHANGED);
  }
  
-+static int bdrv_check_update_perm(BlockDriverState *bs, uint64_t new_used_perm,
-+                                  uint64_t new_shared_perm,
-+                                  BdrvChild *ignore_child, Error **errp)
++void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
++                               const BdrvChildRole *role,
++                               uint64_t perm, uint64_t shared,
++                               uint64_t *nperm, uint64_t *nshared)
 +{
-+    BdrvChild *c;
++    bool backing = (role == &child_backing);
++    assert(role == &child_backing || role == &child_file);
 +
-+    /* There is no reason why anyone couldn't tolerate write_unchanged */
-+    assert(new_shared_perm & BLK_PERM_WRITE_UNCHANGED);
++    if (!backing) {
++        /* Apart from the modifications below, the same permissions are
++         * forwarded and left alone as for filters */
++        bdrv_filter_default_perms(bs, c, role, perm, shared, &perm, &shared);
 +
-+    QLIST_FOREACH(c, &bs->parents, next_parent) {
-+        if (c == ignore_child) {
-+            continue;
++        /* Format drivers may touch metadata even if the guest doesn't write */
++        if (!bdrv_is_read_only(bs)) {
++            perm |= BLK_PERM_WRITE | BLK_PERM_RESIZE;
 +        }
 +
-+        if ((new_used_perm & c->shared_perm) != new_used_perm ||
-+            (c->perm & new_shared_perm) != c->perm)
-+        {
-+            const char *user = NULL;
-+            if (c->role->get_name) {
-+                user = c->role->get_name(c);
-+                if (user && !*user) {
-+                    user = NULL;
-+                }
-+            }
-+            error_setg(errp, "Conflicts with %s", user ?: "another operation");
-+            return -EPERM;
++        /* bs->file always needs to be consistent because of the metadata. We
++         * can never allow other users to resize or write to it. */
++        perm |= BLK_PERM_CONSISTENT_READ;
++        shared &= ~(BLK_PERM_WRITE | BLK_PERM_RESIZE);
++    } else {
++        /* We want consistent read from backing files if the parent needs it.
++         * No other operations are performed on backing files. */
++        perm &= BLK_PERM_CONSISTENT_READ;
++
++        /* If the parent can deal with changing data, we're okay with a
++         * writable and resizable backing file. */
++        if (shared & BLK_PERM_WRITE) {
++            shared = BLK_PERM_WRITE | BLK_PERM_RESIZE;
++        } else {
++            shared = 0;
 +        }
++
++        shared |= BLK_PERM_CONSISTENT_READ | BLK_PERM_GRAPH_MOD |
++                  BLK_PERM_WRITE_UNCHANGED;
 +    }
 +
-+    return 0;
++    *nperm = perm;
++    *nshared = shared;
 +}
-+
+ 
  static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs)
  {
-     BlockDriverState *old_bs = child->bs;
-@@ -1350,14 +1382,25 @@ static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs)
- BdrvChild *bdrv_root_attach_child(BlockDriverState *child_bs,
-                                   const char *child_name,
-                                   const BdrvChildRole *child_role,
--                                  void *opaque)
-+                                  uint64_t perm, uint64_t shared_perm,
-+                                  void *opaque, Error **errp)
- {
--    BdrvChild *child = g_new(BdrvChild, 1);
-+    BdrvChild *child;
-+    int ret;
-+
-+    ret = bdrv_check_update_perm(child_bs, perm, shared_perm, NULL, errp);
-+    if (ret < 0) {
-+        return NULL;
-+    }
-+
-+    child = g_new(BdrvChild, 1);
-     *child = (BdrvChild) {
--        .bs     = NULL,
--        .name   = g_strdup(child_name),
--        .role   = child_role,
--        .opaque = opaque,
-+        .bs             = NULL,
-+        .name           = g_strdup(child_name),
-+        .role           = child_role,
-+        .perm           = perm,
-+        .shared_perm    = shared_perm,
-+        .opaque         = opaque,
-     };
- 
-     bdrv_replace_child(child, child_bs);
-@@ -1371,8 +1414,15 @@ BdrvChild *bdrv_attach_child(BlockDriverState *parent_bs,
-                              const BdrvChildRole *child_role,
-                              Error **errp)
- {
--    BdrvChild *child = bdrv_root_attach_child(child_bs, child_name, child_role,
--                                              parent_bs);
-+    BdrvChild *child;
-+
-+    /* FIXME Use real permissions */
-+    child = bdrv_root_attach_child(child_bs, child_name, child_role,
-+                                   0, BLK_PERM_ALL, parent_bs, errp);
-+    if (child == NULL) {
-+        return NULL;
-+    }
-+
-     QLIST_INSERT_HEAD(&parent_bs->children, child, next);
-     return child;
- }
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 492e71e..9bb4528 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -163,7 +163,9 @@ BlockBackend *blk_new_open(const char *filename, const char *reference,
-         return NULL;
-     }
- 
--    blk->root = bdrv_root_attach_child(bs, "root", &child_root, blk);
-+    /* FIXME Use real permissions */
-+    blk->root = bdrv_root_attach_child(bs, "root", &child_root,
-+                                       0, BLK_PERM_ALL, blk, &error_abort);
- 
-     return blk;
- }
-@@ -498,7 +500,9 @@ void blk_remove_bs(BlockBackend *blk)
- void blk_insert_bs(BlockBackend *blk, BlockDriverState *bs)
- {
-     bdrv_ref(bs);
--    blk->root = bdrv_root_attach_child(bs, "root", &child_root, blk);
-+    /* FIXME Use real permissions */
-+    blk->root = bdrv_root_attach_child(bs, "root", &child_root,
-+                                       0, BLK_PERM_ALL, blk, &error_abort);
- 
-     notifier_list_notify(&blk->insert_bs_notifiers, blk);
-     if (blk->public.throttle_state) {
 diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 1670941..ed63bad 100644
+index 17f4c2d..eb0598e 100644
 --- a/include/block/block_int.h
 +++ b/include/block/block_int.h
-@@ -419,6 +419,18 @@ struct BdrvChild {
-     char *name;
-     const BdrvChildRole *role;
-     void *opaque;
-+
-+    /**
-+     * Granted permissions for operating on this BdrvChild (BLK_PERM_* bitmask)
-+     */
-+    uint64_t perm;
-+
-+    /**
-+     * Permissions that can still be granted to other users of @bs while this
-+     * BdrvChild is still attached to it. (BLK_PERM_* bitmask)
-+     */
-+    uint64_t shared_perm;
-+
-     QLIST_ENTRY(BdrvChild) next;
-     QLIST_ENTRY(BdrvChild) next_parent;
- };
-@@ -796,7 +808,8 @@ void hmp_drive_add_node(Monitor *mon, const char *optstr);
- BdrvChild *bdrv_root_attach_child(BlockDriverState *child_bs,
-                                   const char *child_name,
-                                   const BdrvChildRole *child_role,
--                                  void *opaque);
-+                                  uint64_t perm, uint64_t shared_perm,
-+                                  void *opaque, Error **errp);
- void bdrv_root_unref_child(BdrvChild *child);
+@@ -880,6 +880,14 @@ void bdrv_filter_default_perms(BlockDriverState *bs, BdrvChild *c,
+                                uint64_t perm, uint64_t shared,
+                                uint64_t *nperm, uint64_t *nshared);
+ 
++/* Default implementation for BlockDriver.bdrv_child_perm() that can be used by
++ * (non-raw) image formats: Like above for bs->backing, but for bs->file it
++ * requires WRITE | RESIZE for read-write images, always requires
++ * CONSISTENT_READ and doesn't share WRITE. */
++void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
++                               const BdrvChildRole *role,
++                               uint64_t perm, uint64_t shared,
++                               uint64_t *nperm, uint64_t *nshared);
  
  const char *bdrv_get_parent_name(const BlockDriverState *bs);
+ void blk_dev_change_media_cb(BlockBackend *blk, bool load);
 -- 
 1.8.3.1
