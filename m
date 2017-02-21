@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59255)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59254)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cg4gc-0002ye-4M
+	(envelope-from <kraxel@redhat.com>) id 1cg4gc-0002yd-4M
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 02:16:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cg4ga-00087v-L9
+	(envelope-from <kraxel@redhat.com>) id 1cg4gY-00086k-VL
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 02:16:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41234)
+Received: from mx1.redhat.com ([209.132.183.28]:36978)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cg4ga-000879-GV
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 02:16:32 -0500
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cg4gY-00086N-NC
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 02:16:30 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BAED24E024
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 07:16:30 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 21 Feb 2017 08:16:15 +0100
-Message-Id: <1487661385-7720-2-git-send-email-kraxel@redhat.com>
+Date: Tue, 21 Feb 2017 08:16:18 +0100
+Message-Id: <1487661385-7720-5-git-send-email-kraxel@redhat.com>
 In-Reply-To: <1487661385-7720-1-git-send-email-kraxel@redhat.com>
 References: <1487661385-7720-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 01/11] usb: ehci: fix memory leak in ehci
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 04/11] xhci: apply limits to loops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,79 +33,96 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Li Qiang <liqiang6-s@360.cn>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-From: Li Qiang <liqiang6-s@360.cn>
+Limits should be big enough that normal guest should not hit it.
+Add a tracepoint to log them, just in case.  Also, while being
+at it, log the existing link trb limit too.
 
-In usb_ehci_init function, it initializes 's->ipacket', but there
-is no corresponding function to free this. As the ehci can be hotplug
-and unplug, this will leak host memory leak. In order to make the
-hierarchy clean, we should add a ehci pci finalize function, then call
-the clean function in ehci device.
-
-Signed-off-by: Li Qiang <liqiang6-s@360.cn>
-Message-id: 589a85b8.3c2b9d0a.b8e6.1434@mx.google.com
+Reported-by: =E6=9D=8E=E5=BC=BA <liqiang6-s@360.cn>
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-id: 1486383669-6421-1-git-send-email-kraxel@redhat.com
 ---
- hw/usb/hcd-ehci-pci.c | 9 +++++++++
- hw/usb/hcd-ehci.c     | 5 +++++
- hw/usb/hcd-ehci.h     | 1 +
- 3 files changed, 15 insertions(+)
+ hw/usb/hcd-xhci.c   | 15 ++++++++++++++-
+ hw/usb/trace-events |  1 +
+ 2 files changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/hw/usb/hcd-ehci-pci.c b/hw/usb/hcd-ehci-pci.c
-index 5657705..6dedcb8 100644
---- a/hw/usb/hcd-ehci-pci.c
-+++ b/hw/usb/hcd-ehci-pci.c
-@@ -89,6 +89,14 @@ static void usb_ehci_pci_init(Object *obj)
-     usb_ehci_init(s, DEVICE(obj));
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index 54b3901..f3f9579 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -54,6 +54,8 @@
+ #define ER_FULL_HACK
+=20
+ #define TRB_LINK_LIMIT  4
++#define COMMAND_LIMIT   256
++#define TRANSFER_LIMIT  256
+=20
+ #define LEN_CAP         0x40
+ #define LEN_OPER        (0x400 + 0x10 * MAXPORTS)
+@@ -1032,6 +1034,7 @@ static TRBType xhci_ring_fetch(XHCIState *xhci, XHC=
+IRing *ring, XHCITRB *trb,
+             return type;
+         } else {
+             if (++link_cnt > TRB_LINK_LIMIT) {
++                trace_usb_xhci_enforced_limit("trb-link");
+                 return 0;
+             }
+             ring->dequeue =3D xhci_mask64(trb->parameter);
+@@ -2150,6 +2153,7 @@ static void xhci_kick_epctx(XHCIEPContext *epctx, u=
+nsigned int streamid)
+     XHCIRing *ring;
+     USBEndpoint *ep =3D NULL;
+     uint64_t mfindex;
++    unsigned int count =3D 0;
+     int length;
+     int i;
+=20
+@@ -2262,6 +2266,10 @@ static void xhci_kick_epctx(XHCIEPContext *epctx, =
+unsigned int streamid)
+             epctx->retry =3D xfer;
+             break;
+         }
++        if (count++ > TRANSFER_LIMIT) {
++            trace_usb_xhci_enforced_limit("transfers");
++            break;
++        }
+     }
+     epctx->kick_active--;
+=20
+@@ -2734,7 +2742,7 @@ static void xhci_process_commands(XHCIState *xhci)
+     TRBType type;
+     XHCIEvent event =3D {ER_COMMAND_COMPLETE, CC_SUCCESS};
+     dma_addr_t addr;
+-    unsigned int i, slotid =3D 0;
++    unsigned int i, slotid =3D 0, count =3D 0;
+=20
+     DPRINTF("xhci_process_commands()\n");
+     if (!xhci_running(xhci)) {
+@@ -2848,6 +2856,11 @@ static void xhci_process_commands(XHCIState *xhci)
+         }
+         event.slotid =3D slotid;
+         xhci_event(xhci, &event, 0);
++
++        if (count++ > COMMAND_LIMIT) {
++            trace_usb_xhci_enforced_limit("commands");
++            return;
++        }
+     }
  }
- 
-+static void usb_ehci_pci_finalize(Object *obj)
-+{
-+    EHCIPCIState *i = PCI_EHCI(obj);
-+    EHCIState *s = &i->ehci;
-+
-+    usb_ehci_finalize(s);
-+}
-+
- static void usb_ehci_pci_exit(PCIDevice *dev)
- {
-     EHCIPCIState *i = PCI_EHCI(dev);
-@@ -159,6 +167,7 @@ static const TypeInfo ehci_pci_type_info = {
-     .parent = TYPE_PCI_DEVICE,
-     .instance_size = sizeof(EHCIPCIState),
-     .instance_init = usb_ehci_pci_init,
-+    .instance_finalize = usb_ehci_pci_finalize,
-     .abstract = true,
-     .class_init = ehci_class_init,
- };
-diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
-index 7622a3a..50ef817 100644
---- a/hw/usb/hcd-ehci.c
-+++ b/hw/usb/hcd-ehci.c
-@@ -2545,6 +2545,11 @@ void usb_ehci_init(EHCIState *s, DeviceState *dev)
-                                 &s->mem_ports);
- }
- 
-+void usb_ehci_finalize(EHCIState *s)
-+{
-+    usb_packet_cleanup(&s->ipacket);
-+}
-+
- /*
-  * vim: expandtab ts=4
-  */
-diff --git a/hw/usb/hcd-ehci.h b/hw/usb/hcd-ehci.h
-index 3fd7038..938d8aa 100644
---- a/hw/usb/hcd-ehci.h
-+++ b/hw/usb/hcd-ehci.h
-@@ -323,6 +323,7 @@ struct EHCIState {
- extern const VMStateDescription vmstate_ehci;
- 
- void usb_ehci_init(EHCIState *s, DeviceState *dev);
-+void usb_ehci_finalize(EHCIState *s);
- void usb_ehci_realize(EHCIState *s, DeviceState *dev, Error **errp);
- void usb_ehci_unrealize(EHCIState *s, DeviceState *dev, Error **errp);
- void ehci_reset(void *opaque);
--- 
+=20
+diff --git a/hw/usb/trace-events b/hw/usb/trace-events
+index fdd1d29..0c323d4 100644
+--- a/hw/usb/trace-events
++++ b/hw/usb/trace-events
+@@ -174,6 +174,7 @@ usb_xhci_xfer_retry(void *xfer) "%p"
+ usb_xhci_xfer_success(void *xfer, uint32_t bytes) "%p: len %d"
+ usb_xhci_xfer_error(void *xfer, uint32_t ret) "%p: ret %d"
+ usb_xhci_unimplemented(const char *item, int nr) "%s (0x%x)"
++usb_xhci_enforced_limit(const char *item) "%s"
+=20
+ # hw/usb/desc.c
+ usb_desc_device(int addr, int len, int ret) "dev %d query device, len %d=
+, ret %d"
+--=20
 1.8.3.1
