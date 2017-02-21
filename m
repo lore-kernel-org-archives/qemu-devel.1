@@ -1,27 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56777)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cgCfF-0003ta-Mr
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:47:44 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cgCfR-00042r-9J
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:47:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cgCfA-0006Gr-W3
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:47:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54176)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cgCfA-0006GF-MU
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:47:36 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170220160316.16803-1-danielhb@linux.vnet.ibm.com>
-	<87ino3ncg5.fsf@dusky.pond.sub.org>
-	<e9388bc4-2c50-0656-e140-b5478f35237b@linux.vnet.ibm.com>
-	<87d1ebpr46.fsf@dusky.pond.sub.org> <20170221143222.GJ2377@work-vm>
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cgCfH-0006JT-RQ
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:47:48 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39873)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cgCfH-0006J5-HA
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 10:47:43 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1LFcYUc051929
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 10:47:42 -0500
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28rpx1w7e4-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 10:47:41 -0500
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Tue, 21 Feb 2017 15:47:38 -0000
 Date: Tue, 21 Feb 2017 16:47:33 +0100
-In-Reply-To: <20170221143222.GJ2377@work-vm> (David Alan Gilbert's message of
-	"Tue, 21 Feb 2017 14:32:23 +0000")
-Message-ID: <87k28j4kbu.fsf@dusky.pond.sub.org>
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <20170221085824.GN562@bjsdjshi@linux.vnet.ibm.com>
+References: <20170217082939.33208-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170217082939.33208-16-bjsdjshi@linux.vnet.ibm.com>
+	<20170220195901.252083fe.cornelia.huck@de.ibm.com>
+	<20170221085824.GN562@bjsdjshi@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2] Changing error message of QMP
- 'migrate_set_downtime' to seconds
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20170221164733.105ed0f7.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v3 15/15] vfio: ccw: introduce support
+ for ccw0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,146 +44,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-devel@nongnu.org, quintela@redhat.com
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, wkywang@linux.vnet.ibm.com
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+On Tue, 21 Feb 2017 16:58:24 +0800
+Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
 
-> * Markus Armbruster (armbru@redhat.com) wrote:
->> Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com> writes:
->> 
->> > On 02/21/2017 06:02 AM, Markus Armbruster wrote:
->> >> Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com> writes:
->> >>
->> >>> The previous error message was displaying the values in miliseconds,
->> >>> being misleading with the command that accepts the value in seconds:
->> >>>
->> >>> { "execute": "migrate_set_downtime", "arguments": {"value": 3000}}
->> >>> {"error": {"class": "GenericError", "desc": "Parameter 'downtime_limit'
->> >>> expects an integer in the range of 0 to 2000000 milliseconds"}}
->> >>>
->> >>> This patch changes it to '2000 seconds' to keep consistency with
->> >>> the expected parameter. The macro 'QERR_INVALID_PARAMETER_VALUE'
->> >>> was changed for a regular string that allows the use of the
->> >>> MAX_MIGRATE_SET_DOWNTIME as a parameter, instead of hardcoding
->> >>> the value in the error message.
->> >>>
->> >>> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
->> >>> ---
->> >>>   migration/migration.c | 12 ++++++++----
->> >>>   1 file changed, 8 insertions(+), 4 deletions(-)
->> >>>
->> >>> diff --git a/migration/migration.c b/migration/migration.c
->> >>> index c6ae69d..c05e764 100644
->> >>> --- a/migration/migration.c
->> >>> +++ b/migration/migration.c
->> >>> @@ -49,6 +49,9 @@
->> >>>    * for sending the last part */
->> >>>   #define DEFAULT_MIGRATE_SET_DOWNTIME 300
->> >>>   +/* Maximum migrate downtime set to 2000*1000 miliseconds */
->> >>> +#define MAX_MIGRATE_SET_DOWNTIME (2000 * 1000)
->> >>> +
->> >>>   /* Default compression thread count */
->> >>>   #define DEFAULT_MIGRATE_COMPRESS_THREAD_COUNT 8
->> >>>   /* Default decompression thread count, usually decompression is at
->> >>> @@ -843,10 +846,11 @@ void qmp_migrate_set_parameters(MigrationParameters *params, Error **errp)
->> >>>           return;
->> >>>       }
->> >>>       if (params->has_downtime_limit &&
->> >>> -        (params->downtime_limit < 0 || params->downtime_limit > 2000000)) {
->> >>> -        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
->> >>> -                   "downtime_limit",
->> >>> -                   "an integer in the range of 0 to 2000000 milliseconds");
->> >>> +        (params->downtime_limit < 0 ||
->> >>> +         params->downtime_limit > MAX_MIGRATE_SET_DOWNTIME)) {
->> >>> +        error_setg(errp, "Parameter 'downtime_limit' expects an integer in "
->> >>> +                         "the range of 0 to %d seconds",
->> >>> +                         MAX_MIGRATE_SET_DOWNTIME / 1000);
->> >>>           return;
->> >>>       }
->> >>>       if (params->has_x_checkpoint_delay && (params->x_checkpoint_delay < 0)) {
->> >> Isn't this wrong for QMP migrate-set-parameters?  There, the unit is
->> >> milliseconds, i.e. the new error message is as wrong as the old one is
->> >> for migrate_set_downtime.
->> >
->> > Actually the unit for migrate-set-parameters, as seen by the caller,
->> > is seconds. The underlying logic receives the input and multiplies it
->> > by 1000 in qmp_migrate_set_downtime().
->> 
->> Yes, QMP migrate_set_downtime takes seconds, but I'm talking about QMP
->> command migrate-set-parameters, which takes milliseconds.
->> 
->> >> I'm afraid you need to fix the error message in
->> >> qmp_migrate_set_downtime().  If you assume qmp_migrate_set_parameters()
->> >> fails only in one way, replace its error object by one with a better
->> >> message[*].  If you'd rather not assume, you need to refactor things so
->> >> that each place can set the downtime and create an appropriate error on
->> >> failure.
->> >
->> > There is at least one similar usage of this error message just
->> > above this code in max_bandwidth param. Perhaps a new
->> > function/macro to deal with these cases is justified.
->> >
->> >>
->> >> We might want to check other command wrappers that translate units.
->> >>
->> >> Time units are a hopeless mess in QMP.  We should've enforced uniform
->> >> usage of either seconds or nanoseconds.  The latter to placate
->> >> irrational fear of floating-point[**].
->> >
->> > I agree that my patch doesn't make it much better. I just set the
->> > error message to be in seconds to be consistent with the user input,
->> 
->> That's reasonable!  The problem is that you fix one error message by
->> breaking another one.
->> 
->> > but the code now feels 'awkward' when you do a verification
->> > in milliseconds and deliver the error message in seconds.
->> >
->> > One thing that can be done is to make migrate-set-downtime to
->> > accept milliseconds instead of seconds. I wasn't willing at first to
->> > change the migrate-set-downtime API because of an error
->> > message, however it really feels like the right thing to do here.
->> 
->> Changing QMP commands incompatibly is a big no-no.
->> 
->> > Specially when you consider that the default value of this parameter,
->> > set by DEFAULT_MIGRATE_SET_DOWNTIME, is 300 - a value that
->> > in theory the user shouldn't be able to set in the API.
->> 
->> I think that's a fine reason for deprecating the migrate_set_downtime
->> command, and ask people to use migrate-set-parameters instead.
->
-> OK, but you can set it to 300 from migrate_set_downtime by doing
-> HMP:
->    migrate_set_downtime 0.3 
-> QMP:
->    { "execute": "migrate_set_downtime", "arguments": { "value": 0.3 } }
->
-> so it's bogus to say that's a reason to ditch it.
+> * Cornelia Huck <cornelia.huck@de.ibm.com> [2017-02-20 19:59:01 +0100]:
+> 
+> > On Fri, 17 Feb 2017 09:29:39 +0100
+> > Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+> > 
+> > > Although Linux does not use format-0 channel command words (CCW0)
+> > > these are a non-optional part of the platform spec, and for the sake
+> > > of platform compliance, and possibly some non-Linux guests, we have
+> > > to support CCW0.
+> > > 
+> > > Making the kernel execute a format 0 channel program is too much hassle
+> > > because we would need to allocate and use memory which can be addressed
+> > > by 24 bit physical addresses (because of CCW0.cda). So we implement CCW0
+> > > support by translating the channel program into an equivalent CCW1
+> > > program instead.
+> > > 
+> > > Signed-off-by: Kai Yue Wang <wkywang@linux.vnet.ibm.com>
+> > > Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> > > ---
+> > >  arch/s390/Kconfig              |  7 +++++
+> > >  drivers/s390/cio/vfio_ccw_cp.c | 58 ++++++++++++++++++++++++++++++++++++++++--
+> > >  2 files changed, 63 insertions(+), 2 deletions(-)
 
-I bought Daniel's assertion without checking it.  Thanks for the
-correction.
+> > > +#ifdef CONFIG_VFIO_CCW_CCW0
+> > > +static long copy_ccw_from_iova(struct channel_program *cp,
+> > > +			       struct ccw1 *to, u64 iova,
+> > > +			       unsigned long len)
+> > > +{
+> > > +	struct ccw0 ccw0;
+> > > +	struct ccw1 *pccw1;
+> > > +	int ret;
+> > > +	int i;
+> > > +
+> > > +	ret = copy_from_iova(cp->mdev, to, iova, len * sizeof(struct ccw1));
+> > > +	if (ret)
+> > > +		return ret;
+> > > +
+> > > +	if (!cp->orb.cmd.fmt) {
+> > > +		pccw1 = to;
+> > > +		for (i = 0; i < len; i++) {
+> > > +			ccw0 = *(struct ccw0 *)pccw1;
+> > > +			pccw1->cmd_code = ccw0.cmd_code;
+> > > +			pccw1->flags = ccw0.flags;
+> > > +			pccw1->count = ccw0.count;
+> > > +			pccw1->cda = ccw0.cda;
+> > > +			pccw1++;
+> > > +		}
+> > 
+> > IIRC there are one or two very subtle differences between what format-0
+> > and what format-1 ccws allow (see the ccw interpretation in qemu --
+> > probably easier than combing through the PoP). We should either check
+> > this or add a comment why we don't.
+> > 
+> Cool! Thanks for pointing out this!
+> 
+> Transfer in Channel, 15-73, PoP:
+> --------------------8<-----------------------------
+> The contents of the second half of the format-0 CCW,
+> bit positions 32-63, are ignored. Similarly, the con-
+> tents of bit positions 0-3 of the format-0 CCW are
+> ignored.
+> 
+> Bit positions 0-3 and 8-32 of the format-1 CCW must
+> contain zeros; otherwise, a program-check condition
+> is generated.
+> -------------------->8-----------------------------
+> 
+> I will fix according to the above description.
 
-> This has all got rather complex for a simple patch to change an error
-> message.  Can't we just come up with a clear error message that works in
-> all cases.
+Yes. It's a bit unfortunate that we have to inspect the ccws, but it
+probably can't be helped if we want to be architecture compliant.
 
-I outlined how to fix migrate_set_downtime's error message without
-breaking migrate-set-parameters's in my review.
+> 
+> I also checked the code in qemu. It seems that it is not compliant with
+> the second paragraph above. Could I send out a separated patch to fix
+> that?
 
-If we can come up with a single message that works for both commands,
-even better.
+Please do, bugfixes are welcome :)
 
->
-> Dave
->
->> >> [*] If replacing messages turns out to be a common operation, we can add
->> >> a function to replace it within the same Error object.
->> >>
->> >> [**] If you think the rounding you can get when converting
->> >> floating-point seconds to integer milli-, micro- or nanoseconds matters,
->> >> I have time-keeping equipment to sell you.
->> >>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+> > > +	}
+> > > +
+> > > +	return ret;
+> > > +}
