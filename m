@@ -1,35 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33568)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1cg4vA-0006RZ-98
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 02:31:39 -0500
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cg500-0000vd-QQ
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 02:36:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1cg4v5-00031w-7W
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 02:31:36 -0500
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:43600)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1cg4v4-00031W-Uc
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 02:31:31 -0500
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout2.w1.samsung.com
-	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
-	2014)) with ESMTP id <0OLP00HYYRKEKC30@mailout2.w1.samsung.com> for
-	qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:31:26 +0000 (GMT)
-Date: Tue, 21 Feb 2017 10:31:23 +0300
-From: Alexey Perevalov <a.perevalov@samsung.com>
-Message-id: <20170221073115.GA5046@aperevalov-ubuntu>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
-Content-disposition: inline
-In-reply-to: <20170214193425.GF11561@work-vm>
-References: <20170206173306.20603-1-dgilbert@redhat.com>
-	<20170206174529.GI2524@work-vm>
-	<CGME20170213171108eucas1p147999fc8b6980ff89a67626b78b12e44@eucas1p1.samsung.com>
-	<20170213171058.GA4246@aperevalov-ubuntu>
-	<20170213181601.GG3086@work-vm>
-	<20170214162155.GB6645@aperevalov-ubuntu>
-	<20170214193425.GF11561@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v2 00/16] Postcopy: Hugepage support
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cg4zx-00049h-M9
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 02:36:36 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48134
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1cg4zx-00049Z-FU
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 02:36:33 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1L7NobZ141388
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 02:36:32 -0500
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28r2pnykgn-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 02:36:31 -0500
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Tue, 21 Feb 2017 00:36:31 -0700
+Date: Tue, 21 Feb 2017 15:36:23 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170217082939.33208-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170217082939.33208-5-bjsdjshi@linux.vnet.ibm.com>
+	<20170220193113.3ba5af2c.cornelia.huck@de.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170220193113.3ba5af2c.cornelia.huck@de.ibm.com>
+Message-Id: <20170221073623.GJ562@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v3 04/15] vfio: ccw: basic
+ implementation for vfio_ccw driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,274 +44,340 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: aarcange@redhat.com, qemu-devel@nongnu.org, quintela@redhat.com
+To: Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, wkywang@linux.vnet.ibm.com
 
+* Cornelia Huck <cornelia.huck@de.ibm.com> [2017-02-20 19:31:13 +0100]:
 
-Hello David,
+> On Fri, 17 Feb 2017 09:29:28 +0100
+> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+> 
+> > To make vfio support subchannel devices, we need a css driver for
+> > the vfio subchannels. This patch adds a basic vfio-ccw subchannel
+> > driver for this purpose.
+> > 
+> > To enable VFIO for vfio-ccw, enable S390_CCW_IOMMU config option
+> > and configure VFIO as required.
+> > 
+> > Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> > Acked-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
+> > ---
+> >  arch/s390/Kconfig                   |  10 ++
+> >  arch/s390/include/asm/isc.h         |   1 +
+> >  drivers/iommu/Kconfig               |   8 ++
+> >  drivers/s390/cio/Makefile           |   3 +
+> >  drivers/s390/cio/vfio_ccw_drv.c     | 262 ++++++++++++++++++++++++++++++++++++
+> >  drivers/s390/cio/vfio_ccw_private.h |  25 ++++
+> >  6 files changed, 309 insertions(+)
+> >  create mode 100644 drivers/s390/cio/vfio_ccw_drv.c
+> >  create mode 100644 drivers/s390/cio/vfio_ccw_private.h
+> > 
+> > diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
+> > index c6722112..b920df8 100644
+> > --- a/arch/s390/Kconfig
+> > +++ b/arch/s390/Kconfig
+> > @@ -670,6 +670,16 @@ config EADM_SCH
+> >  	  To compile this driver as a module, choose M here: the
+> >  	  module will be called eadm_sch.
+> > 
+> > +config VFIO_CCW
+> > +	def_tristate n
+> > +	prompt "Support for VFIO-CCW subchannels"
+> > +	depends on S390_CCW_IOMMU && VFIO
+> > +	help
+> > +	  This driver allows usage of VFIO-CCW subchannels.
+> 
+> Hm...
+> 
+> "This driver allows usage of I/O subchannels via VFIO-CCW."
+> 
+> ?
+> 
+This is better. Will change.
 
-On Tue, Feb 14, 2017 at 07:34:26PM +0000, Dr. David Alan Gilbert wrote:
-> * Alexey Perevalov (a.perevalov@samsung.com) wrote:
-> > Hi David,
+> > +
+> > +	  To compile this driver as a module, choose M here: the
+> > +	  module will be called vfio_ccw.
+> > +
+> >  endmenu
 > > 
-> > Thank your, now it's clear.
-> > 
-> > On Mon, Feb 13, 2017 at 06:16:02PM +0000, Dr. David Alan Gilbert wrote:
-> > > * Alexey Perevalov (a.perevalov@samsung.com) wrote:
-> > > >  Hello David!
-> > > 
-> > > Hi Alexey,
-> > > 
-> > > > I have checked you series with 1G hugepage, but only in 1 Gbit/sec network
-> > > > environment.
-> > > 
-> > > Can you show the qemu command line you're using?  I'm just trying
-> > > to make sure I understand where your hugepages are; running 1G hostpages
-> > > across a 1Gbit/sec network for postcopy would be pretty poor - it would take
-> > > ~10 seconds to transfer the page.
-> > 
-> > sure
-> > -hda ./Ubuntu.img -name PAU,debug-threads=on -boot d -net nic -net user
-> > -m 1024 -localtime -nographic -enable-kvm -incoming tcp:0:4444 -object
-> > memory-backend-file,id=mem,size=1G,mem-path=/dev/hugepages -mem-prealloc
-> > -numa node,memdev=mem -trace events=/tmp/events -chardev
-> > socket,id=charmonitor,path=/var/lib/migrate-vm-monitor.sock,server,nowait
-> > -mon chardev=charmonitor,id=monitor,mode=control
+> >  menu "Dump support"
+> > diff --git a/arch/s390/include/asm/isc.h b/arch/s390/include/asm/isc.h
+> > index 68d7d68..8a0b721 100644
+> > --- a/arch/s390/include/asm/isc.h
+> > +++ b/arch/s390/include/asm/isc.h
+> > @@ -16,6 +16,7 @@
+> >  #define CONSOLE_ISC 1			/* console I/O subchannel */
+> >  #define EADM_SCH_ISC 4			/* EADM subchannels */
+> >  #define CHSC_SCH_ISC 7			/* CHSC subchannels */
+> > +#define VFIO_CCW_ISC IO_SCH_ISC		/* VFIO-CCW I/O subchannels */
 > 
-> OK, it's a pretty unusual setup - a 1G page guest with 1G of guest RAM.
+> This is OK for now, I guess; but do we want to have the isc
+> configurable in the long run? I.e., if a host wants to run its own I/O
+> devices at a different priority than the devices it passes to a guest?
 > 
-> > > 
-> > > > I started Ubuntu just with console interface and gave to it only 1G of
-> > > > RAM, inside Ubuntu I started stress command
-> > > 
-> > > > (stress --cpu 4 --io 4 --vm 4 --vm-bytes 256000000 &)
-> > > > in such environment precopy live migration was impossible, it never
-> > > > being finished, in this case it infinitely sends pages (it looks like
-> > > > dpkg scenario).
-> > > > 
-> > > > Also I modified stress utility
-> > > > http://people.seas.harvard.edu/~apw/stress/stress-1.0.4.tar.gz
-> > > > due to it wrote into memory every time the same value `Z`. My
-> > > > modified version writes every allocation new incremented value.
-> > > 
-> > > I use google's stressapptest normally; although remember to turn
-> > > off the bit where it pauses.
-> > 
-> > I decided to use it too
-> > stressapptest -s 300 -M 256 -m 8 -W
-> > 
-> > > 
-> > > > I'm using Arcangeli's kernel only at the destination.
-> > > > 
-> > > > I got controversial results. Downtime for 1G hugepage is close to 2Mb
-> > > > hugepage and it took around 7 ms (in 2Mb hugepage scenario downtime was
-> > > > around 8 ms).
-> > > > I made that opinion by query-migrate.
-> > > > {"return": {"status": "completed", "setup-time": 6, "downtime": 6, "total-time": 9668, "ram": {"total": 1091379200, "postcopy-requests": 1, "dirty-sync-count": 2, "remaining": 0, "mbps": 879.786851, "transferred": 1063007296, "duplicate": 7449, "dirty-pages-rate": 0, "skipped": 0, "normal-bytes": 1060868096, "normal": 259001}}}
-> > > > 
-> > > > Documentation says about downtime field - measurement unit is ms.
-> > > 
-> > > The downtime measurement field is pretty meaningless for postcopy; it's only
-> > > the time from stopping the VM until the point where we tell the destination it
-> > > can start running.  Meaningful measurements are only from inside the guest
-> > > really, or the place latencys.
-> > >
-> > 
-> > Maybe improve it by receiving such information from destination?
-> > I wish to do that.
-> > > > So I traced it (I added additional trace into postcopy_place_page
-> > > > trace_postcopy_place_page_start(host, from, pagesize); )
-> > > > 
-> > > > postcopy_ram_fault_thread_request Request for HVA=7f6dc0000000 rb=/objects/mem offset=0
-> > > > postcopy_place_page_start host=0x7f6dc0000000 from=0x7f6d70000000, pagesize=40000000
-> > > > postcopy_place_page_start host=0x7f6e0e800000 from=0x55b665969619, pagesize=1000
-> > > > postcopy_place_page_start host=0x7f6e0e801000 from=0x55b6659684e8, pagesize=1000
-> > > > several pages with 4Kb step ...
-> > > > postcopy_place_page_start host=0x7f6e0e817000 from=0x55b6659694f0, pagesize=1000
-> > > > 
-> > > > 4K pages, started from 0x7f6e0e800000 address it's
-> > > > vga.ram, /rom@etc/acpi/tables etc.
-> > > > 
-> > > > Frankly saying, right now, I don't have any ideas why hugepage wasn't
-> > > > resent. Maybe my expectation of it is wrong as well as understanding )
-> > > 
-> > > That's pretty much what I expect to see - before you get into postcopy
-> > > mode everything is sent as individual 4k pages (in order); once we're
-> > > in postcopy mode we send each page no more than once.  So you're
-> > > huge page comes across once - and there it is.
-> > > 
-> > > > stress utility also duplicated for me value into appropriate file:
-> > > > sec_since_epoch.microsec:value
-> > > > 1487003192.728493:22
-> > > > 1487003197.335362:23
-> > > > *1487003213.367260:24*
-> > > > *1487003238.480379:25*
-> > > > 1487003243.315299:26
-> > > > 1487003250.775721:27
-> > > > 1487003255.473792:28
-> > > > 
-> > > > It mean rewriting 256Mb of memory per byte took around 5 sec, but at
-> > > > the moment of migration it took 25 sec.
-> > > 
-> > > right, now this is the thing that's more useful to measure.
-> > > That's not too surprising; when it migrates that data is changing rapidly
-> > > so it's going to have to pause and wait for that whole 1GB to be transferred.
-> > > Your 1Gbps network is going to take about 10 seconds to transfer that
-> > > 1GB page - and that's if you're lucky and it saturates the network.
-> > > SO it's going to take at least 10 seconds longer than it normally
-> > > would, plus any other overheads - so at least 15 seconds.
-> > > This is why I say it's a bad idea to use 1GB host pages with postcopy.
-> > > Of course it would be fun to find where the other 10 seconds went!
-> > > 
-> > > You might like to add timing to the tracing so you can see the time between the
-> > > fault thread requesting the page and it arriving.
-> > >
-> > yes, sorry I forgot about timing
-> > 20806@1487084818.270993:postcopy_ram_fault_thread_request Request for HVA=7f0280000000 rb=/objects/mem offset=0
-> > 20806@1487084818.271038:qemu_loadvm_state_section 8
-> > 20806@1487084818.271056:loadvm_process_command com=0x2 len=4
-> > 20806@1487084818.271089:qemu_loadvm_state_section 2
-> > 20806@1487084823.315919:postcopy_place_page_start host=0x7f0280000000 from=0x7f0240000000, pagesize=40000000
-> > 
-> > 1487084823.315919 - 1487084818.270993 = 5.044926 sec.
-> > Machines connected w/o any routers, directly by cable.
-> 
-> OK, the fact it's only 5 seconds not 10 I think suggests a lot of the memory was all zero
-> so didn't take up the whole bandwidth.
-I decided to measure downtime as a sum of intervals since fault happened
-and till page was load. I didn't relay on order, so I associated that
-interval with fault address.
+I think we can keep this as the default value, and provide a driver
+param to customize the ISC value in the future once we need this. I put
+this on my LATER list, or I do it in next version?
 
-For 2G ram vm - using 1G huge page, downtime measured on dst is around 12 sec,
-but for the same 2G ram vm with 2Mb huge page, downtime measured on dst
-is around 20 sec, and 320 page faults happened, 640 Mb was transmitted.
+> >  /* Adapter interrupts. */
+> >  #define QDIO_AIRQ_ISC IO_SCH_ISC	/* I/O subchannel in qdio mode */
+> >  #define PCI_ISC 2			/* PCI I/O subchannels */
+> 
+> (...)
+> 
+> > diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
+> > new file mode 100644
+> > index 0000000..b068207
+> > --- /dev/null
+> > +++ b/drivers/s390/cio/vfio_ccw_drv.c
+> > @@ -0,0 +1,262 @@
+> > +/*
+> > + * VFIO based Physical Subchannel device driver
+> > + *
+> > + * Copyright IBM Corp. 2017
+> > + *
+> > + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> > + *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+> > + */
+> > +
+> > +#include <linux/module.h>
+> > +#include <linux/init.h>
+> > +#include <linux/device.h>
+> > +#include <linux/slab.h>
+> > +
+> > +#include <asm/isc.h>
+> > +
+> > +#include "vfio_ccw_private.h"
+> > +
+> > +/*
+> > + * Helpers
+> > + */
+> > +static int vfio_ccw_sch_quiesce(struct subchannel *sch)
+> > +{
+> > +	struct vfio_ccw_private *private = dev_get_drvdata(&sch->dev);
+> > +	DECLARE_COMPLETION_ONSTACK(completion);
+> > +	int iretry, ret = 0;
+> > +
+> > +	spin_lock_irq(sch->lock);
+> > +	if (!sch->schib.pmcw.ena)
+> > +		goto out_unlock;
+> > +	ret = cio_disable_subchannel(sch);
+> > +	if (ret != -EBUSY)
+> > +		goto out_unlock;
+> > +
+> > +	do {
+> > +		iretry = 255;
+> > +
+> > +		ret = cio_cancel_halt_clear(sch, &iretry);
+> > +		while (ret == -EBUSY) {
+> > +			/*
+> > +			 * Flushing all I/O and wait the
+> 
+> "Flush all I/O and wait for..."
+> 
+Ok.
 
-My current method doesn't take into account multi core vcpu. I checked
-only with 1 CPU, but it's not proper case. So I think it's worth to
-count downtime per CPU, or calculate overlap of CPU downtimes.
-How do your think?
-Also I didn't yet finish IPC to provide such information to src host, where
-info_migrate is being called.
+> > +			 * cancel/halt/clear completion.
+> > +			 */
+> > +			private->completion = &completion;
+> > +			spin_unlock_irq(sch->lock);
+> > +
+> > +			wait_for_completion(&completion);
+> 
+> What happens for cancel? It won't generate an interrupt.
+> 
+Right! How about using:
+	wait_for_completion_timeout(&completion, 3*HZ);
 
+(I stole '3*HZ' from ccw_device_kill_io.)
 
+> > +
+> > +			spin_lock_irq(sch->lock);
+> > +			private->completion = NULL;
+> > +			ret = cio_cancel_halt_clear(sch, &iretry);
+> > +		};
+> > +
+> > +		ret = cio_disable_subchannel(sch);
+> > +	} while (ret == -EBUSY);
+> > +
+> > +out_unlock:
+> > +	spin_unlock_irq(sch->lock);
+> > +	return ret;
+> > +}
+> > +
+> > +/*
+> > + * Sysfs interfaces
+> > + */
+> > +static ssize_t chpids_show(struct device *dev,
+> > +			   struct device_attribute *attr,
+> > +			   char *buf)
+> > +{
+> > +	struct subchannel *sch = to_subchannel(dev);
+> > +	struct chsc_ssd_info *ssd = &sch->ssd_info;
+> > +	ssize_t ret = 0;
+> > +	int chp;
+> > +	int mask;
+> > +
+> > +	for (chp = 0; chp < 8; chp++) {
+> > +		mask = 0x80 >> chp;
+> > +		if (ssd->path_mask & mask)
+> > +			ret += sprintf(buf + ret, "%02x ", ssd->chpid[chp].id);
+> > +		else
+> > +			ret += sprintf(buf + ret, "00 ");
+> > +	}
+> > +	ret += sprintf(buf+ret, "\n");
+> > +	return ret;
+> > +}
+> > +
+> > +static ssize_t pimpampom_show(struct device *dev,
+> > +			      struct device_attribute *attr,
+> > +			      char *buf)
+> > +{
+> > +	struct subchannel *sch = to_subchannel(dev);
+> > +	struct pmcw *pmcw = &sch->schib.pmcw;
+> > +
+> > +	return sprintf(buf, "%02x %02x %02x\n",
+> > +		       pmcw->pim, pmcw->pam, pmcw->pom);
+> > +}
+> > +
+> > +static DEVICE_ATTR(chpids, 0444, chpids_show, NULL);
+> > +static DEVICE_ATTR(pimpampom, 0444, pimpampom_show, NULL);
 > 
-> > > > Another one request.
-> > > > QEMU could use mem_path in hugefs with share key simultaneously
-> > > > (-object memory-backend-file,id=mem,size=${mem_size},mem-path=${mem_path},share=on) and vm
-> > > > in this case will start and will properly work (it will allocate memory
-> > > > with mmap), but in case of destination for postcopy live migration
-> > > > UFFDIO_COPY ioctl will fail for
-> > > > such region, in Arcangeli's git tree there is such prevent check
-> > > > (if (!vma_is_shmem(dst_vma) && dst_vma->vm_flags & VM_SHARED).
-> > > > Is it possible to handle such situation at qemu?
-> > > 
-> > > Imagine that you had shared memory; what semantics would you like
-> > > to see ?  What happens to the other process?
-> > 
-> > Honestly, initially, I thought to handle such error, but I quit forgot
-> > about vhost-user in ovs-dpdk.
+> Quick question: You need to duplicate these so that lscss shows a sane
+> output for vfio-ccw subchannels?
 > 
-> Yes, I don't know much about vhost-user; but we'll have to think carefully
-> about the way things behave when they're accessing memory that's shared
-> with qemu during migration.  Writing to the source after we've started
-> the postcopy phase is not allowed.  Accessing the destination memory
-> during postcopy will produce pauses in the other processes accessing it
-> (I think) and they mustn't do various types of madvise etc - so
-> I'm sure there will be things we find out the hard way!
+Yes, and also for retrieving these values in QEMU.
+
+> > +
+> > +static struct attribute *vfio_subchannel_attrs[] = {
+> > +	&dev_attr_chpids.attr,
+> > +	&dev_attr_pimpampom.attr,
+> > +	NULL,
+> > +};
+> > +
+> > +static struct attribute_group vfio_subchannel_attr_group = {
+> > +	.attrs = vfio_subchannel_attrs,
+> > +};
+> > +
+> > +/*
+> > + * Css driver callbacks
+> > + */
+> > +static void vfio_ccw_sch_irq(struct subchannel *sch)
+> > +{
+> > +	struct vfio_ccw_private *private = dev_get_drvdata(&sch->dev);
+> > +
+> > +	inc_irq_stat(IRQIO_CIO);
+> > +
+> > +	if (!private)
+> > +		return;
+> > +
+> > +	if (private->completion)
+> > +		complete(private->completion);
+> > +}
+> > +
+> > +static int vfio_ccw_sch_probe(struct subchannel *sch)
+> > +{
+> > +	struct pmcw *pmcw = &sch->schib.pmcw;
+> > +	struct vfio_ccw_private *private;
+> > +	int ret;
+> > +
+> > +	if (pmcw->qf) {
+> > +		dev_warn(&sch->dev, "vfio: ccw: do not support QDIO: %s\n",
 > 
-> Dave
+> s/do/does/
 > 
-> > > Dave
-> > > 
-> > > > On Mon, Feb 06, 2017 at 05:45:30PM +0000, Dr. David Alan Gilbert wrote:
-> > > > > * Dr. David Alan Gilbert (git) (dgilbert@redhat.com) wrote:
-> > > > > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > > > > > 
-> > > > > > Hi,
-> > > > > >   The existing postcopy code, and the userfault kernel
-> > > > > > code that supports it, only works for normal anonymous memory.
-> > > > > > Kernel support for userfault on hugetlbfs is working
-> > > > > > it's way upstream; it's in the linux-mm tree,
-> > > > > > You can get a version at:
-> > > > > >    git://git.kernel.org/pub/scm/linux/kernel/git/andrea/aa.git
-> > > > > > on the origin/userfault branch.
-> > > > > > 
-> > > > > > Note that while this code supports arbitrary sized hugepages,
-> > > > > > it doesn't make sense with pages above the few-MB region,
-> > > > > > so while 2MB is fine, 1GB is probably a bad idea;
-> > > > > > this code waits for and transmits whole huge pages, and a
-> > > > > > 1GB page would take about 1 second to transfer over a 10Gbps
-> > > > > > link - which is way too long to pause the destination for.
-> > > > > > 
-> > > > > > Dave
-> > > > > 
-> > > > > Oops I missed the v2 changes from the message:
-> > > > > 
-> > > > > v2
-> > > > >   Flip ram-size summary word/compare individual page size patches around
-> > > > >   Individual page size comparison is done in ram_load if 'advise' has been
-> > > > >     received rather than checking migrate_postcopy_ram()
-> > > > >   Moved discard code into exec.c, reworked ram_discard_range
-> > > > > 
-> > > > > Dave
-> > > > 
-> > > > Thank your, right now it's not necessary to set
-> > > > postcopy-ram capability on destination machine.
-> > > > 
-> > > > 
-> > > > > 
-> > > > > > Dr. David Alan Gilbert (16):
-> > > > > >   postcopy: Transmit ram size summary word
-> > > > > >   postcopy: Transmit and compare individual page sizes
-> > > > > >   postcopy: Chunk discards for hugepages
-> > > > > >   exec: ram_block_discard_range
-> > > > > >   postcopy: enhance ram_block_discard_range for hugepages
-> > > > > >   Fold postcopy_ram_discard_range into ram_discard_range
-> > > > > >   postcopy: Record largest page size
-> > > > > >   postcopy: Plumb pagesize down into place helpers
-> > > > > >   postcopy: Use temporary for placing zero huge pages
-> > > > > >   postcopy: Load huge pages in one go
-> > > > > >   postcopy: Mask fault addresses to huge page boundary
-> > > > > >   postcopy: Send whole huge pages
-> > > > > >   postcopy: Allow hugepages
-> > > > > >   postcopy: Update userfaultfd.h header
-> > > > > >   postcopy: Check for userfault+hugepage feature
-> > > > > >   postcopy: Add doc about hugepages and postcopy
-> > > > > > 
-> > > > > >  docs/migration.txt                |  13 ++++
-> > > > > >  exec.c                            |  83 +++++++++++++++++++++++
-> > > > > >  include/exec/cpu-common.h         |   2 +
-> > > > > >  include/exec/memory.h             |   1 -
-> > > > > >  include/migration/migration.h     |   3 +
-> > > > > >  include/migration/postcopy-ram.h  |  13 ++--
-> > > > > >  linux-headers/linux/userfaultfd.h |  81 +++++++++++++++++++---
-> > > > > >  migration/migration.c             |   1 +
-> > > > > >  migration/postcopy-ram.c          | 138 +++++++++++++++++---------------------
-> > > > > >  migration/ram.c                   | 109 ++++++++++++++++++------------
-> > > > > >  migration/savevm.c                |  32 ++++++---
-> > > > > >  migration/trace-events            |   2 +-
-> > > > > >  12 files changed, 328 insertions(+), 150 deletions(-)
-> > > > > > 
-> > > > > > -- 
-> > > > > > 2.9.3
-> > > > > > 
-> > > > > > 
-> > > > > --
-> > > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > > > > 
-> > > --
-> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > > 
-> > 
-> > -- 
-> > 
-> > BR
-> > Alexey
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Ok.
+
+> > +			 dev_name(&sch->dev));
+> > +		return -ENOTTY;
 > 
+> Is -ENOTTY the right return code here? -EINVAL?
+> 
+Ok. Think it again. -EINVAL makes more sense. It's like:
+"hey, I know it's an I/O subchannel, but not the kind we support".
+
+> > +	}
+> > +
+> > +	private = kzalloc(sizeof(*private), GFP_KERNEL | GFP_DMA);
+> > +	if (!private)
+> > +		return -ENOMEM;
+> > +	private->sch = sch;
+> > +	dev_set_drvdata(&sch->dev, private);
+> > +
+> > +	spin_lock_irq(sch->lock);
+> > +	sch->isc = VFIO_CCW_ISC;
+> > +	ret = cio_enable_subchannel(sch, (u32)(unsigned long)sch);
+> > +	spin_unlock_irq(sch->lock);
+> > +	if (ret)
+> > +		goto out_free;
+> > +
+> > +	ret = sysfs_create_group(&sch->dev.kobj, &vfio_subchannel_attr_group);
+> > +	if (ret)
+> > +		goto out_disable;
+> > +
+> > +	return 0;
+> > +
+> > +out_disable:
+> > +	cio_disable_subchannel(sch);
+> > +out_free:
+> > +	dev_set_drvdata(&sch->dev, NULL);
+> > +	kfree(private);
+> > +	return ret;
+> > +}
+> > +
+> 
+> (...)
+> 
+> > +/**
+> > + * vfio_ccw_sch_event - process subchannel event
+> > + * @sch: subchannel
+> > + * @process: non-zero if function is called in process context
+> > + *
+> > + * An unspecified event occurred for this subchannel. Adjust data according
+> > + * to the current operational state of the subchannel. Return zero when the
+> > + * event has been handled sufficiently or -EAGAIN when this function should
+> > + * be called again in process context.
+> > + */
+> > +static int vfio_ccw_sch_event(struct subchannel *sch, int process)
+> > +{
+> > +	unsigned long flags;
+> > +
+> > +	spin_lock_irqsave(sch->lock, flags);
+> > +	if (!device_is_registered(&sch->dev))
+> > +		goto out_unlock;
+> > +
+> > +	if (work_pending(&sch->todo_work))
+> > +		goto out_unlock;
+> > +
+> > +	if (cio_update_schib(sch)) {
+> > +		/* Not operational. */
+> > +		css_sched_sch_todo(sch, SCH_TODO_UNREG);
+> > +
+> > +		/*
+> > +		 * TODO:
+> > +		 * Probably we should send the machine check to the guest.
+> 
+> Yes, we should do that later on. Will user space notice that the device
+> is gone? (I think crw injection should be done by user space.)
+> 
+Currently we lack this mechanism. I think there are many todos here. I
+will investigate latter.
+
+> > +		 */
+> > +		goto out_unlock;
+> > +	}
+> > +
+> > +out_unlock:
+> > +	spin_unlock_irqrestore(sch->lock, flags);
+> > +
+> > +	return 0;
+> > +}
+> 
+> (...)
+> 
+> Looks sane in general from my POV.
+Thanks for the comments.
 
 -- 
-
-BR
-Alexey
+Dong Jia
