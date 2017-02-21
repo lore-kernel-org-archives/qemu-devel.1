@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgBuo-0000Zk-Ou
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:44 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cgBuq-0000c5-I1
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgBum-00083E-Rd
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:42 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cgBup-00084Y-7n
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:59:44 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 21 Feb 2017 15:58:21 +0100
-Message-Id: <1487689130-30373-26-git-send-email-kwolf@redhat.com>
+Date: Tue, 21 Feb 2017 15:58:22 +0100
+Message-Id: <1487689130-30373-27-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
 References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 25/54] block: Add error parameter to
- blk_insert_bs()
+Subject: [Qemu-devel] [PATCH 26/54] block: Add BDRV_O_RESIZE for
+ blk_new_open()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,414 +23,182 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-Now that blk_insert_bs() requests the BlockBackend permissions for the
-node it attaches to, it can fail. Instead of aborting, pass the errors
-to the callers.
+blk_new_open() is a convenience function that processes flags rather
+than QDict options as a simple way to just open an image file.
+
+In order to keep it convenient in the future, it must automatically
+request the necessary permissions. This can easily be inferred from the
+flags for read and write, but we need another flag that tells us whether
+to get the resize permission.
+
+We can't just always request it because that means that no block jobs
+can run on the resulting BlockBackend (which is something that e.g.
+qemu-img commit wants to do), but we also can't request it never because
+most of the .bdrv_create() implementations call blk_truncate().
+
+The solution is to introduce another flag that is passed by all users
+that want to resize the image.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block.c                          |  5 ++++-
- block/backup.c                   |  5 ++++-
- block/block-backend.c            | 13 ++++++++-----
- block/commit.c                   | 38 ++++++++++++++++++++++++++++++--------
- block/mirror.c                   | 15 ++++++++++++---
- block/qcow2.c                    | 10 ++++++++--
- blockdev.c                       | 11 +++++++++--
- blockjob.c                       |  7 ++++++-
- hmp.c                            |  6 +++++-
- hw/core/qdev-properties-system.c |  7 ++++++-
- include/sysemu/block-backend.h   |  2 +-
- migration/block.c                |  2 +-
- nbd/server.c                     |  6 +++++-
- tests/test-blockjob.c            |  2 +-
- 14 files changed, 100 insertions(+), 29 deletions(-)
+ block/parallels.c     | 3 ++-
+ block/qcow.c          | 3 ++-
+ block/qcow2.c         | 3 ++-
+ block/qed.c           | 3 ++-
+ block/vdi.c           | 3 ++-
+ block/vhdx.c          | 3 ++-
+ block/vmdk.c          | 6 ++++--
+ block/vpc.c           | 3 ++-
+ include/block/block.h | 1 +
+ qemu-img.c            | 2 +-
+ 10 files changed, 20 insertions(+), 10 deletions(-)
 
-diff --git a/block.c b/block.c
-index ed37d17..9f46698 100644
---- a/block.c
-+++ b/block.c
-@@ -2171,8 +2171,11 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
-         }
-         if (file_bs != NULL) {
-             file = blk_new(BLK_PERM_CONSISTENT_READ, BLK_PERM_ALL);
--            blk_insert_bs(file, file_bs);
-+            blk_insert_bs(file, file_bs, &local_err);
-             bdrv_unref(file_bs);
-+            if (local_err) {
-+                goto fail;
-+            }
- 
-             qdict_put(options, "file",
-                       qstring_from_str(bdrv_get_node_name(file_bs)));
-diff --git a/block/backup.c b/block/backup.c
-index 4b3c94c..f38d1d0 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -626,7 +626,10 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
- 
-     /* FIXME Use real permissions */
-     job->target = blk_new(0, BLK_PERM_ALL);
--    blk_insert_bs(job->target, target);
-+    ret = blk_insert_bs(job->target, target, errp);
-+    if (ret < 0) {
-+        goto error;
-+    }
- 
-     job->on_source_error = on_source_error;
-     job->on_target_error = on_target_error;
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 0319220..299948f 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -508,19 +508,22 @@ void blk_remove_bs(BlockBackend *blk)
- /*
-  * Associates a new BlockDriverState with @blk.
-  */
--void blk_insert_bs(BlockBackend *blk, BlockDriverState *bs)
-+int blk_insert_bs(BlockBackend *blk, BlockDriverState *bs, Error **errp)
- {
--    bdrv_ref(bs);
--    /* FIXME Error handling */
-     blk->root = bdrv_root_attach_child(bs, "root", &child_root,
--                                       blk->perm, blk->shared_perm, blk,
--                                       &error_abort);
-+                                       blk->perm, blk->shared_perm, blk, errp);
-+    if (blk->root == NULL) {
-+        return -EPERM;
-+    }
-+    bdrv_ref(bs);
- 
-     notifier_list_notify(&blk->insert_bs_notifiers, blk);
-     if (blk->public.throttle_state) {
-         throttle_timers_attach_aio_context(
-             &blk->public.throttle_timers, bdrv_get_aio_context(bs));
-     }
-+
-+    return 0;
- }
- 
- /*
-diff --git a/block/commit.c b/block/commit.c
-index 1897e98..2ad8138 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -220,6 +220,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-     BlockDriverState *iter;
-     BlockDriverState *overlay_bs;
-     Error *local_err = NULL;
-+    int ret;
- 
-     assert(top != bs);
-     if (top == base) {
-@@ -256,8 +257,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-         bdrv_reopen_multiple(bdrv_get_aio_context(bs), reopen_queue, &local_err);
-         if (local_err != NULL) {
-             error_propagate(errp, local_err);
--            block_job_unref(&s->common);
--            return;
-+            goto fail;
-         }
+diff --git a/block/parallels.c b/block/parallels.c
+index 6b0c0a9..19935e2 100644
+--- a/block/parallels.c
++++ b/block/parallels.c
+@@ -488,7 +488,8 @@ static int parallels_create(const char *filename, QemuOpts *opts, Error **errp)
      }
  
-@@ -277,11 +277,17 @@ void commit_start(const char *job_id, BlockDriverState *bs,
- 
-     /* FIXME Use real permissions */
-     s->base = blk_new(0, BLK_PERM_ALL);
--    blk_insert_bs(s->base, base);
-+    ret = blk_insert_bs(s->base, base, errp);
-+    if (ret < 0) {
-+        goto fail;
-+    }
- 
-     /* FIXME Use real permissions */
-     s->top = blk_new(0, BLK_PERM_ALL);
--    blk_insert_bs(s->top, top);
-+    ret = blk_insert_bs(s->top, top, errp);
-+    if (ret < 0) {
-+        goto fail;
-+    }
- 
-     s->active = bs;
- 
-@@ -294,6 +300,16 @@ void commit_start(const char *job_id, BlockDriverState *bs,
- 
-     trace_commit_start(bs, base, top, s);
-     block_job_start(&s->common);
-+    return;
-+
-+fail:
-+    if (s->base) {
-+        blk_unref(s->base);
-+    }
-+    if (s->top) {
-+        blk_unref(s->top);
-+    }
-+    block_job_unref(&s->common);
- }
- 
- 
-@@ -332,11 +348,17 @@ int bdrv_commit(BlockDriverState *bs)
- 
-     /* FIXME Use real permissions */
-     src = blk_new(0, BLK_PERM_ALL);
--    blk_insert_bs(src, bs);
--
--    /* FIXME Use real permissions */
-     backing = blk_new(0, BLK_PERM_ALL);
--    blk_insert_bs(backing, bs->backing->bs);
-+
-+    ret = blk_insert_bs(src, bs, NULL);
-+    if (ret < 0) {
-+        goto ro_cleanup;
-+    }
-+
-+    ret = blk_insert_bs(backing, bs->backing->bs, NULL);
-+    if (ret < 0) {
-+        goto ro_cleanup;
-+    }
- 
-     length = blk_getlength(src);
-     if (length < 0) {
-diff --git a/block/mirror.c b/block/mirror.c
-index 8f015b2..c551bfc 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -523,9 +523,12 @@ static void mirror_exit(BlockJob *job, void *opaque)
-         bdrv_replace_in_backing_chain(to_replace, target_bs);
-         bdrv_drained_end(target_bs);
- 
--        /* We just changed the BDS the job BB refers to */
-+        /* We just changed the BDS the job BB refers to, so switch the BB back
-+         * so the cleanup does the right thing. We don't need any permissions
-+         * any more now. */
-         blk_remove_bs(job->blk);
--        blk_insert_bs(job->blk, src);
-+        blk_set_perm(job->blk, 0, BLK_PERM_ALL, &error_abort);
-+        blk_insert_bs(job->blk, src, &error_abort);
+     file = blk_new_open(filename, NULL, NULL,
+-                        BDRV_O_RDWR | BDRV_O_PROTOCOL, &local_err);
++                        BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
++                        &local_err);
+     if (file == NULL) {
+         error_propagate(errp, local_err);
+         return -EIO;
+diff --git a/block/qcow.c b/block/qcow.c
+index eb5d54c..9d6ac83 100644
+--- a/block/qcow.c
++++ b/block/qcow.c
+@@ -823,7 +823,8 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
      }
-     if (s->to_replace) {
-         bdrv_op_unblock_all(s->to_replace, s->replace_blocker);
-@@ -990,6 +993,7 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
-                              bool auto_complete)
- {
-     MirrorBlockJob *s;
-+    int ret;
  
-     if (granularity == 0) {
-         granularity = bdrv_get_default_bitmap_granularity(target);
-@@ -1014,7 +1018,12 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
- 
-     /* FIXME Use real permissions */
-     s->target = blk_new(0, BLK_PERM_ALL);
--    blk_insert_bs(s->target, target);
-+    ret = blk_insert_bs(s->target, target, errp);
-+    if (ret < 0) {
-+        blk_unref(s->target);
-+        block_job_unref(&s->common);
-+        return;
-+    }
- 
-     s->replaces = g_strdup(replaces);
-     s->on_source_error = on_source_error;
+     qcow_blk = blk_new_open(filename, NULL, NULL,
+-                            BDRV_O_RDWR | BDRV_O_PROTOCOL, &local_err);
++                            BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
++                            &local_err);
+     if (qcow_blk == NULL) {
+         error_propagate(errp, local_err);
+         ret = -EIO;
 diff --git a/block/qcow2.c b/block/qcow2.c
-index 0356e69..6f79df8 100644
+index 6f79df8..4ca9f24 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -3113,6 +3113,7 @@ static int qcow2_amend_options(BlockDriverState *bs, QemuOpts *opts,
-     uint64_t cluster_size = s->cluster_size;
-     bool encrypt;
-     int refcount_bits = s->refcount_bits;
-+    Error *local_err = NULL;
-     int ret;
-     QemuOptDesc *desc = opts->list->desc;
-     Qcow2AmendHelperCBInfo helper_cb_info;
-@@ -3263,10 +3264,15 @@ static int qcow2_amend_options(BlockDriverState *bs, QemuOpts *opts,
- 
-     if (new_size) {
-         BlockBackend *blk = blk_new(BLK_PERM_RESIZE, BLK_PERM_ALL);
--        blk_insert_bs(blk, bs);
-+        ret = blk_insert_bs(blk, bs, &local_err);
-+        if (ret < 0) {
-+            error_report_err(local_err);
-+            blk_unref(blk);
-+            return ret;
-+        }
-+
-         ret = blk_truncate(blk, new_size);
-         blk_unref(blk);
--
-         if (ret < 0) {
-             return ret;
-         }
-diff --git a/blockdev.c b/blockdev.c
-index 10a12d1..d01e313 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2432,6 +2432,7 @@ static void qmp_blockdev_insert_anon_medium(BlockBackend *blk,
-                                             BlockDriverState *bs, Error **errp)
- {
-     bool has_device;
-+    int ret;
- 
-     /* For BBs without a device, we can exchange the BDS tree at will */
-     has_device = blk_get_attached_dev(blk);
-@@ -2451,7 +2452,10 @@ static void qmp_blockdev_insert_anon_medium(BlockBackend *blk,
-         return;
+@@ -2266,7 +2266,8 @@ static int qcow2_create2(const char *filename, int64_t total_size,
+     options = qdict_new();
+     qdict_put(options, "driver", qstring_from_str("qcow2"));
+     blk = blk_new_open(filename, NULL, options,
+-                       BDRV_O_RDWR | BDRV_O_NO_FLUSH, &local_err);
++                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_NO_FLUSH,
++                       &local_err);
+     if (blk == NULL) {
+         error_propagate(errp, local_err);
+         ret = -EIO;
+diff --git a/block/qed.c b/block/qed.c
+index d8f947a..5ec7fd8 100644
+--- a/block/qed.c
++++ b/block/qed.c
+@@ -625,7 +625,8 @@ static int qed_create(const char *filename, uint32_t cluster_size,
      }
  
--    blk_insert_bs(blk, bs);
-+    ret = blk_insert_bs(blk, bs, errp);
-+    if (ret < 0) {
-+        return;
-+    }
- 
-     if (!blk_dev_has_tray(blk)) {
-         /* For tray-less devices, blockdev-close-tray is a no-op (or may not be
-@@ -2887,7 +2891,10 @@ void qmp_block_resize(bool has_device, const char *device,
+     blk = blk_new_open(filename, NULL, NULL,
+-                       BDRV_O_RDWR | BDRV_O_PROTOCOL, &local_err);
++                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
++                       &local_err);
+     if (blk == NULL) {
+         error_propagate(errp, local_err);
+         return -EIO;
+diff --git a/block/vdi.c b/block/vdi.c
+index fd6e26d..9b4f70e 100644
+--- a/block/vdi.c
++++ b/block/vdi.c
+@@ -763,7 +763,8 @@ static int vdi_create(const char *filename, QemuOpts *opts, Error **errp)
      }
  
-     blk = blk_new(BLK_PERM_RESIZE, BLK_PERM_ALL);
--    blk_insert_bs(blk, bs);
-+    ret = blk_insert_bs(blk, bs, errp);
-+    if (ret < 0) {
-+        goto out;
-+    }
- 
-     /* complete all in-flight operations before resizing the device */
-     bdrv_drain_all();
-diff --git a/blockjob.c b/blockjob.c
-index 508e0e5..72b7d4c 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -128,6 +128,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
- {
-     BlockBackend *blk;
-     BlockJob *job;
-+    int ret;
- 
-     if (bs->job) {
-         error_setg(errp, QERR_DEVICE_IN_USE, bdrv_get_device_name(bs));
-@@ -161,7 +162,11 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
- 
-     /* FIXME Use real permissions */
-     blk = blk_new(0, BLK_PERM_ALL);
--    blk_insert_bs(blk, bs);
-+    ret = blk_insert_bs(blk, bs, errp);
-+    if (ret < 0) {
-+        blk_unref(blk);
-+        return NULL;
-+    }
- 
-     job = g_malloc0(driver->instance_size);
-     error_setg(&job->blocker, "block device is in use by block job: %s",
-diff --git a/hmp.c b/hmp.c
-index 15fd3f7..801fddb 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -2039,6 +2039,7 @@ void hmp_qemu_io(Monitor *mon, const QDict *qdict)
-     const char* device = qdict_get_str(qdict, "device");
-     const char* command = qdict_get_str(qdict, "command");
-     Error *err = NULL;
-+    int ret;
- 
-     blk = blk_by_name(device);
-     if (!blk) {
-@@ -2046,7 +2047,10 @@ void hmp_qemu_io(Monitor *mon, const QDict *qdict)
-         if (bs) {
-             /* FIXME Use real permissions */
-             blk = local_blk = blk_new(0, BLK_PERM_ALL);
--            blk_insert_bs(blk, bs);
-+            ret = blk_insert_bs(blk, bs, &err);
-+            if (ret < 0) {
-+                goto fail;
-+            }
-         } else {
-             goto fail;
-         }
-diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
-index cca4775..66ba367 100644
---- a/hw/core/qdev-properties-system.c
-+++ b/hw/core/qdev-properties-system.c
-@@ -73,6 +73,7 @@ static void parse_drive(DeviceState *dev, const char *str, void **ptr,
- {
-     BlockBackend *blk;
-     bool blk_created = false;
-+    int ret;
- 
-     blk = blk_by_name(str);
-     if (!blk) {
-@@ -80,8 +81,12 @@ static void parse_drive(DeviceState *dev, const char *str, void **ptr,
-         if (bs) {
-             /* FIXME Use real permissions */
-             blk = blk_new(0, BLK_PERM_ALL);
--            blk_insert_bs(blk, bs);
-             blk_created = true;
-+
-+            ret = blk_insert_bs(blk, bs, errp);
-+            if (ret < 0) {
-+                goto fail;
-+            }
-         }
+     blk = blk_new_open(filename, NULL, NULL,
+-                       BDRV_O_RDWR | BDRV_O_PROTOCOL, &local_err);
++                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
++                       &local_err);
+     if (blk == NULL) {
+         error_propagate(errp, local_err);
+         ret = -EIO;
+diff --git a/block/vhdx.c b/block/vhdx.c
+index ab747f6..052a753 100644
+--- a/block/vhdx.c
++++ b/block/vhdx.c
+@@ -1859,7 +1859,8 @@ static int vhdx_create(const char *filename, QemuOpts *opts, Error **errp)
      }
+ 
+     blk = blk_new_open(filename, NULL, NULL,
+-                       BDRV_O_RDWR | BDRV_O_PROTOCOL, &local_err);
++                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
++                       &local_err);
+     if (blk == NULL) {
+         error_propagate(errp, local_err);
+         ret = -EIO;
+diff --git a/block/vmdk.c b/block/vmdk.c
+index f5e2fb5..a9bd22b 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -1703,7 +1703,8 @@ static int vmdk_create_extent(const char *filename, int64_t filesize,
+     }
+ 
+     blk = blk_new_open(filename, NULL, NULL,
+-                       BDRV_O_RDWR | BDRV_O_PROTOCOL, &local_err);
++                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
++                       &local_err);
+     if (blk == NULL) {
+         error_propagate(errp, local_err);
+         ret = -EIO;
+@@ -2071,7 +2072,8 @@ static int vmdk_create(const char *filename, QemuOpts *opts, Error **errp)
+     }
+ 
+     new_blk = blk_new_open(filename, NULL, NULL,
+-                           BDRV_O_RDWR | BDRV_O_PROTOCOL, &local_err);
++                           BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
++                           &local_err);
+     if (new_blk == NULL) {
+         error_propagate(errp, local_err);
+         ret = -EIO;
+diff --git a/block/vpc.c b/block/vpc.c
+index b9c9832..f591d4b 100644
+--- a/block/vpc.c
++++ b/block/vpc.c
+@@ -915,7 +915,8 @@ static int vpc_create(const char *filename, QemuOpts *opts, Error **errp)
+     }
+ 
+     blk = blk_new_open(filename, NULL, NULL,
+-                       BDRV_O_RDWR | BDRV_O_PROTOCOL, &local_err);
++                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
++                       &local_err);
+     if (blk == NULL) {
+         error_propagate(errp, local_err);
+         ret = -EIO;
+diff --git a/include/block/block.h b/include/block/block.h
+index 2d6ed7d..701d22b 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -82,6 +82,7 @@ typedef struct HDGeometry {
+ } HDGeometry;
+ 
+ #define BDRV_O_RDWR        0x0002
++#define BDRV_O_RESIZE      0x0004 /* requests permission for resizing the node */
+ #define BDRV_O_SNAPSHOT    0x0008 /* open the file read only and save writes in a snapshot */
+ #define BDRV_O_TEMPORARY   0x0010 /* delete the file after use */
+ #define BDRV_O_NOCACHE     0x0020 /* do not use the host page cache */
+diff --git a/qemu-img.c b/qemu-img.c
+index cff22e3..8d9195e 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -3275,7 +3275,7 @@ static int img_resize(int argc, char **argv)
+     qemu_opts_del(param);
+ 
+     blk = img_open(image_opts, filename, fmt,
+-                   BDRV_O_RDWR, false, quiet);
++                   BDRV_O_RDWR | BDRV_O_RESIZE, false, quiet);
      if (!blk) {
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
-index 6651f43..0861113 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -102,7 +102,7 @@ BlockBackend *blk_by_public(BlockBackendPublic *public);
- 
- BlockDriverState *blk_bs(BlockBackend *blk);
- void blk_remove_bs(BlockBackend *blk);
--void blk_insert_bs(BlockBackend *blk, BlockDriverState *bs);
-+int blk_insert_bs(BlockBackend *blk, BlockDriverState *bs, Error **errp);
- bool bdrv_has_blk(BlockDriverState *bs);
- bool bdrv_is_root_node(BlockDriverState *bs);
- int blk_set_perm(BlockBackend *blk, uint64_t perm, uint64_t shared_perm,
-diff --git a/migration/block.c b/migration/block.c
-index 6b7ffd4..d259936 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -446,7 +446,7 @@ static void init_blk_migration(QEMUFile *f)
-         BlockDriverState *bs = bmds_bs[i].bs;
- 
-         if (bmds) {
--            blk_insert_bs(bmds->blk, bs);
-+            blk_insert_bs(bmds->blk, bs, &error_abort);
- 
-             alloc_aio_bitmap(bmds);
-             error_setg(&bmds->blocker, "block device is in use by migration");
-diff --git a/nbd/server.c b/nbd/server.c
-index 936d5aa..89362ba 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -891,10 +891,14 @@ NBDExport *nbd_export_new(BlockDriverState *bs, off_t dev_offset, off_t size,
- {
-     BlockBackend *blk;
-     NBDExport *exp = g_malloc0(sizeof(NBDExport));
-+    int ret;
- 
-     /* FIXME Use real permissions */
-     blk = blk_new(0, BLK_PERM_ALL);
--    blk_insert_bs(blk, bs);
-+    ret = blk_insert_bs(blk, bs, errp);
-+    if (ret < 0) {
-+        goto fail;
-+    }
-     blk_set_enable_write_cache(blk, !writethrough);
- 
-     exp->refcount = 1;
-diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
-index 1dd1cfa..143ce96 100644
---- a/tests/test-blockjob.c
-+++ b/tests/test-blockjob.c
-@@ -60,7 +60,7 @@ static BlockBackend *create_blk(const char *name)
-     bs = bdrv_open("null-co://", NULL, NULL, 0, &error_abort);
-     g_assert_nonnull(bs);
- 
--    blk_insert_bs(blk, bs);
-+    blk_insert_bs(blk, bs, &error_abort);
-     bdrv_unref(bs);
- 
-     if (name) {
+         ret = -1;
+         goto out;
 -- 
 1.8.3.1
