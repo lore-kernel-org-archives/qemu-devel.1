@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cgB1w-0006if-Mo
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:03:01 -0500
+	(envelope-from <quintela@redhat.com>) id 1cgB31-0007T2-CG
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:04:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cgB1r-0006Tv-0j
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:03:00 -0500
-Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:33385)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cgB1q-0006T8-Q1
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:02:54 -0500
-Received: by mail-wr0-x22f.google.com with SMTP id 97so4044837wrb.0
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 06:02:54 -0800 (PST)
+	(envelope-from <quintela@redhat.com>) id 1cgB2v-0006u9-J0
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:04:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51518)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cgB2v-0006tt-DX
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 09:04:01 -0500
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170220185020.774-5-dgilbert@redhat.com> (David Alan Gilbert's
+	message of "Mon, 20 Feb 2017 18:50:19 +0000")
+References: <20170220185020.774-1-dgilbert@redhat.com>
+	<20170220185020.774-5-dgilbert@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Tue, 21 Feb 2017 15:03:56 +0100
+Message-ID: <8760k3od2r.fsf@emacs.mitica>
 MIME-Version: 1.0
-In-Reply-To: <1487681108-14452-1-git-send-email-eric.auger@redhat.com>
-References: <1487681108-14452-1-git-send-email-eric.auger@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 Feb 2017 14:02:32 +0000
-Message-ID: <CAFEAcA_MYmGBwPtVXFvywjp5DQ-R+opo2nvVJbHfASwdY9Do-A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v3] hw/arm/virt: Add a user option to
- disallow ITS instantiation
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 4/5] slirp: VMStatify socket level
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,20 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Vijay Kilari <vijay.kilari@gmail.com>, Andrew Jones <drjones@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com
 
-On 21 February 2017 at 12:45, Eric Auger <eric.auger@redhat.com> wrote:
-> In 2.9 ITS will block save/restore and migration use cases. As such,
-> let's introduce a user option that allows to turn its instantiation
-> off, along with GICv3. With the "its" option turned false, migration
-> will be possible, obviously at the expense of MSI support (with GICv3).
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 >
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Working up the stack, this replaces the slirp_socket_load/save
+> with VMState definitions.
 >
+> A place holder for IPv6 support is added as a comment; it needs
+> testing once the rest of the IPv6 code is there.
+>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 
 
+> +/* Win has a signed family number */
+> +#define VMSTATE_SS_FAMILY(f, s) VMSTATE_INT16(f, s)
 
-Applied to target-arm.next, thanks.
+Great!
+Just hope that there is no 32000 families soon :-)
 
--- PMM
+
+> +#if 0
+> +        /* Untested: Needs checking by someone with IPv6 test */
+> +        VMSTATE_BUFFER_TEST(sin6.sin6_addr, union slirp_sockaddr,
+> +                            slirp_family_inet6),
+> +        VMSTATE_UINT16_TEST(sin6.sin6_port, union slirp_sockaddr,
+> +                            slirp_family_inet6),
+> +        VMSTATE_UINT32_TEST(sin6.sin6_flowinfo, union slirp_sockaddr,
+> +                            slirp_family_inet6),
+> +        VMSTATE_UINT32_TEST(sin6.sin6_scope_id, union slirp_sockaddr,
+> +                            slirp_family_inet6),
+> +#endif
+
+I think this is wrong, we have different fieldbs depending in if it is
+ipv6 or not?
+
+Later, Juan.
