@@ -1,26 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cg6Bf-0004Zv-He
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 03:52:44 -0500
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cg6Hr-0006Ju-89
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 03:59:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cg6Be-0001VB-HF
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 03:52:43 -0500
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:36150)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1cg6Be-0001Uq-6M
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 03:52:42 -0500
-Received: by mail-lf0-x244.google.com with SMTP id 90so3013989lfr.3
-	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 00:52:41 -0800 (PST)
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cg6Ho-0003Mw-2g
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 03:59:07 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49502
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1cg6Hn-0003Mi-Sd
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 03:59:04 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1L8x10b162582
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 03:59:02 -0500
+Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28r2pp2exr-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 03:59:01 -0500
+Received: from localhost
+	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Tue, 21 Feb 2017 03:58:30 -0500
+Date: Tue, 21 Feb 2017 16:58:24 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170217082939.33208-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170217082939.33208-16-bjsdjshi@linux.vnet.ibm.com>
+	<20170220195901.252083fe.cornelia.huck@de.ibm.com>
 MIME-Version: 1.0
-References: <1487663858-11731-1-git-send-email-kraxel@redhat.com>
-In-Reply-To: <1487663858-11731-1-git-send-email-kraxel@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 21 Feb 2017 08:52:29 +0000
-Message-ID: <CAJ+F1CLK3aPi+aDgHGUjCCF2Xbi1V=g5UjM_BAko_PSfau33KA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] spice: add display & head options
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170220195901.252083fe.cornelia.huck@de.ibm.com>
+Message-Id: <20170221085824.GN562@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v3 15/15] vfio: ccw: introduce support
+ for ccw0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,90 +44,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, wkywang@linux.vnet.ibm.com
 
-Hi
+* Cornelia Huck <cornelia.huck@de.ibm.com> [2017-02-20 19:59:01 +0100]:
 
-On Tue, Feb 21, 2017 at 11:58 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
+> On Fri, 17 Feb 2017 09:29:39 +0100
+> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+> 
+> > Although Linux does not use format-0 channel command words (CCW0)
+> > these are a non-optional part of the platform spec, and for the sake
+> > of platform compliance, and possibly some non-Linux guests, we have
+> > to support CCW0.
+> > 
+> > Making the kernel execute a format 0 channel program is too much hassle
+> > because we would need to allocate and use memory which can be addressed
+> > by 24 bit physical addresses (because of CCW0.cda). So we implement CCW0
+> > support by translating the channel program into an equivalent CCW1
+> > program instead.
+> > 
+> > Signed-off-by: Kai Yue Wang <wkywang@linux.vnet.ibm.com>
+> > Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> > ---
+> >  arch/s390/Kconfig              |  7 +++++
+> >  drivers/s390/cio/vfio_ccw_cp.c | 58 ++++++++++++++++++++++++++++++++++++++++--
+> >  2 files changed, 63 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
+> > index 32008b8..f25d077 100644
+> > --- a/arch/s390/Kconfig
+> > +++ b/arch/s390/Kconfig
+> > @@ -680,6 +680,13 @@ config VFIO_CCW
+> >  	  To compile this driver as a module, choose M here: the
+> >  	  module will be called vfio_ccw.
+> > 
+> > +config VFIO_CCW_CCW0
+> > +	def_bool n
+> > +	prompt "Support for CCW0 translation"
+> > +	depends on VFIO_CCW
+> > +	help
+> > +	  Enable translation for CCW0 programs for VFIO-CCW subchannels.
+> 
+> Hm... if ccw0 is non-optional for the architecture, why are you making
+> it optional then?
+> 
+Yes, this is an unnecessary move. I overthought to give the user the
+freedom to make their own choice. Will remove this.
 
-> This allows to specify display and head to use, simliar to vnc.
->
->
-Does "head" in qemu always match the head for multi-monitor spice? (with a
-single qxl/virtio). I don't clearly understand the relation, I would need
-to do some research.
+> > +
+> >  endmenu
+> > 
+> >  menu "Dump support"
+> > diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+> > index 16bbb54..b0a8bc05 100644
+> > --- a/drivers/s390/cio/vfio_ccw_cp.c
+> > +++ b/drivers/s390/cio/vfio_ccw_cp.c
+> > @@ -15,6 +15,26 @@
+> > 
+> >  #include "vfio_ccw_cp.h"
+> > 
+> > +#ifdef CONFIG_VFIO_CCW_CCW0
+> > +/**
+> > + * struct ccw0 - channel command word
+> > + * @cmd_code: command code
+> > + * @cda: data address
+> > + * @flags: flags, like IDA addressing, etc.
+> > + * @reserved: will be ignored
+> > + * @count: byte count
+> > + *
+> > + * The format-0 ccw structure.
+> > + */
+> > +struct ccw0 {
+> > +	__u8 cmd_code;
+> > +	__u32 cda : 24;
+> > +	__u8  flags;
+> > +	__u8  reserved;
+> > +	__u16 count;
+> > +} __packed __aligned(8);
+> > +#endif
+> 
+> Would it be better to move this definition next to the struct ccw1
+> definition? Even if the kernel does not build format-0 ccws, it makes
+> sense from a logical POV.
+> 
+Ok.
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  ui/spice-core.c    |  6 ++++++
->  ui/spice-display.c | 22 +++++++++++++++++++++-
->  2 files changed, 27 insertions(+), 1 deletion(-)
->
-> diff --git a/ui/spice-core.c b/ui/spice-core.c
-> index d613f1a..e18ad77 100644
-> --- a/ui/spice-core.c
-> +++ b/ui/spice-core.c
-> @@ -498,6 +498,12 @@ static QemuOptsList qemu_spice_opts =3D {
->          },{
->              .name =3D "seamless-migration",
->              .type =3D QEMU_OPT_BOOL,
-> +        },{
-> +            .name =3D "display",
-> +            .type =3D QEMU_OPT_STRING,
-> +        },{
-> +            .name =3D "head",
-> +            .type =3D QEMU_OPT_NUMBER,
->  #ifdef HAVE_SPICE_GL
->          },{
->              .name =3D "gl",
-> diff --git a/ui/spice-display.c b/ui/spice-display.c
-> index 64e472e..9c58e5a 100644
-> --- a/ui/spice-display.c
-> +++ b/ui/spice-display.c
-> @@ -1029,9 +1029,26 @@ static void qemu_spice_display_init_one(QemuConsol=
-e
-> *con)
->
->  void qemu_spice_display_init(void)
->  {
-> -    QemuConsole *con;
-> +    QemuOptsList *olist =3D qemu_find_opts("spice");
-> +    QemuOpts *opts =3D QTAILQ_FIRST(&olist->head);
-> +    QemuConsole *spice_con, *con;
-> +    const char *str;
->      int i;
->
-> +    str =3D qemu_opt_get(opts, "display");
-> +    if (str) {
-> +        int head =3D qemu_opt_get_number(opts, "head", 0);
-> +        Error *err =3D NULL;
-> +
-> +        spice_con =3D qemu_console_lookup_by_device_name(str, head, &err=
-);
-> +        if (err) {
-> +            error_report("Failed to lookup display/head");
-> +            exit(1);
-> +        }
-> +    } else {
-> +        spice_con =3D NULL;
-> +    }
-> +
->      for (i =3D 0;; i++) {
->          con =3D qemu_console_lookup_by_index(i);
->          if (!con || !qemu_console_is_graphic(con)) {
-> @@ -1040,6 +1057,9 @@ void qemu_spice_display_init(void)
->          if (qemu_spice_have_display_interface(con)) {
->              continue;
->          }
-> +        if (spice_con !=3D NULL && spice_con !=3D con) {
-> +            continue;
-> +        }
->          qemu_spice_display_init_one(con);
->      }
->  }
-> --
-> 1.8.3.1
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+> > +
+> >  /*
+> >   * Max length for ccw chain.
+> >   * XXX: Limit to 256, need to check more?
+> > @@ -243,12 +263,42 @@ static long copy_from_iova(struct device *mdev,
+> >  	return l;
+> >  }
+> > 
+> > +#ifdef CONFIG_VFIO_CCW_CCW0
+> > +static long copy_ccw_from_iova(struct channel_program *cp,
+> > +			       struct ccw1 *to, u64 iova,
+> > +			       unsigned long len)
+> > +{
+> > +	struct ccw0 ccw0;
+> > +	struct ccw1 *pccw1;
+> > +	int ret;
+> > +	int i;
+> > +
+> > +	ret = copy_from_iova(cp->mdev, to, iova, len * sizeof(struct ccw1));
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	if (!cp->orb.cmd.fmt) {
+> > +		pccw1 = to;
+> > +		for (i = 0; i < len; i++) {
+> > +			ccw0 = *(struct ccw0 *)pccw1;
+> > +			pccw1->cmd_code = ccw0.cmd_code;
+> > +			pccw1->flags = ccw0.flags;
+> > +			pccw1->count = ccw0.count;
+> > +			pccw1->cda = ccw0.cda;
+> > +			pccw1++;
+> > +		}
+> 
+> IIRC there are one or two very subtle differences between what format-0
+> and what format-1 ccws allow (see the ccw interpretation in qemu --
+> probably easier than combing through the PoP). We should either check
+> this or add a comment why we don't.
+> 
+Cool! Thanks for pointing out this!
+
+Transfer in Channel, 15-73, PoP:
+--------------------8<-----------------------------
+The contents of the second half of the format-0 CCW,
+bit positions 32-63, are ignored. Similarly, the con-
+tents of bit positions 0-3 of the format-0 CCW are
+ignored.
+
+Bit positions 0-3 and 8-32 of the format-1 CCW must
+contain zeros; otherwise, a program-check condition
+is generated.
+-------------------->8-----------------------------
+
+I will fix according to the above description.
+
+I also checked the code in qemu. It seems that it is not compliant with
+the second paragraph above. Could I send out a separated patch to fix
+that?
+
+> > +	}
+> > +
+> > +	return ret;
+> > +}
+> > +#else
+> >  static long copy_ccw_from_iova(struct channel_program *cp,
+> >  			       struct ccw1 *to, u64 iova,
+> >  			       unsigned long len)
+> >  {
+> >  	return copy_from_iova(cp->mdev, to, iova, len * sizeof(struct ccw1));
+> >  }
+> > +#endif
+> 
+> This would be nicer without #ifdefs :)
+> 
+No problem. Since I will remove CONFIG_VFIO_CCW_CCW0, this will
+disappear either.
+
+> > 
+> >  /*
+> >   * Helpers to operate ccwchain.
+> > @@ -616,10 +666,14 @@ int cp_init(struct channel_program *cp, struct device *mdev, union orb *orb)
+> >  	 * Only support prefetch enable mode now.
+> >  	 * Only support 64bit addressing idal.
+> >  	 * Only support 4k IDAW.
+> > -	 * Only support ccw1.
+> >  	 */
+> > -	if (!orb->cmd.pfch || !orb->cmd.c64 || orb->cmd.i2k || !orb->cmd.fmt)
+> > +	if (!orb->cmd.pfch || !orb->cmd.c64 || orb->cmd.i2k)
+> > +		return -EOPNOTSUPP;
+> > +
+> > +#ifndef CONFIG_VFIO_CCW_CCW0
+> > +	if (!orb->cmd.fmt)
+> >  		return -EOPNOTSUPP;
+> > +#endif
+> 
+> dito
+> 
+Ok.
+
+> > 
+> >  	INIT_LIST_HEAD(&cp->ccwchain_list);
+> >  	memcpy(&cp->orb, orb, sizeof(*orb));
+> 
+> The "translate format-0 into format-1 ccws" approach is fine, but I
+> think you need to double check the subtle differences I mentioned.
+Thansk for the comments. Will do!
+
+-- 
+Dong Jia
