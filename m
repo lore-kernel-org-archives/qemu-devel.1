@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cgD7m-0006zZ-PJ
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:17:14 -0500
+	(envelope-from <bobby.prani@gmail.com>) id 1cgD8e-0008FS-Df
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:18:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cgD7k-00078i-RY
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:17:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60316)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cgD7k-00078Q-I7
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:17:08 -0500
-Date: Tue, 21 Feb 2017 18:17:06 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170221180947-mutt-send-email-mst@kernel.org>
-References: <918524f7-26cf-3fce-d9e3-7316ca69285b@redhat.com>
-	<20170220102304.GC2372@work-vm>
-	<3fb8499e-884c-99e8-b295-3d4603921075@redhat.com>
-	<20170220201923.GM2372@work-vm>
-	<d51d4a21-5558-d4e5-5b7e-08f729fc1a5e@redhat.com>
-	<0488d90c-f73c-916c-f84c-a1ffd2bad592@redhat.com>
-	<20170221034053-mutt-send-email-mst@kernel.org>
-	<5676cac1-b161-0500-e7ed-e93c273cc178@redhat.com>
-	<20170221161048-mutt-send-email-mst@kernel.org>
-	<9f52e1a6-9ed0-5736-6641-100c332899ab@redhat.com>
+	(envelope-from <bobby.prani@gmail.com>) id 1cgD8b-0007UG-55
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:18:04 -0500
+Received: from mail-yb0-x241.google.com ([2607:f8b0:4002:c09::241]:33137)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1cgD8b-0007Tx-1G
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 11:18:01 -0500
+Received: by mail-yb0-x241.google.com with SMTP id n76so2274105ybg.0
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 08:17:59 -0800 (PST)
+References: <20170220145335.591-1-bobby.prani@gmail.com>
+	<87fuj8x2gi.fsf@linaro.org> <87k28ko1qw.fsf@gmail.com>
+	<878tozwpp5.fsf@linaro.org>
+From: Pranith Kumar <bobby.prani@gmail.com>
+In-reply-to: <878tozwpp5.fsf@linaro.org>
+Date: Tue, 21 Feb 2017 11:17:57 -0500
+Message-ID: <871surv7pm.fsf@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9f52e1a6-9ed0-5736-6641-100c332899ab@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v8 4/8] ACPI: Add Virtual Machine
- Generation ID support
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] mttcg: Set jmp_env to handle exit from
+ tb_gen_code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,220 +32,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, ben@skyportsystems.com
-
-On Tue, Feb 21, 2017 at 05:08:40PM +0100, Laszlo Ersek wrote:
-> On 02/21/17 15:14, Michael S. Tsirkin wrote:
-> > On Tue, Feb 21, 2017 at 10:58:05AM +0100, Laszlo Ersek wrote:
-> >> On 02/21/17 02:43, Michael S. Tsirkin wrote:
-> >>> On Mon, Feb 20, 2017 at 09:55:40PM +0100, Laszlo Ersek wrote:
-> >>>> On 02/20/17 21:45, Eric Blake wrote:
-> >>>>> On 02/20/2017 02:19 PM, Dr. David Alan Gilbert wrote:
-> >>>>>> * Eric Blake (eblake@redhat.com) wrote:
-> >>>>>>> On 02/20/2017 04:23 AM, Dr. David Alan Gilbert wrote:
-> >>>>>>>> * Laszlo Ersek (lersek@redhat.com) wrote:
-> >>>>>>>>> CC Dave
-> >>>>>>>>
-> >>>>>>>> This isn't an area I really understand; but if I'm
-> >>>>>>>> reading this right then 
-> >>>>>>>>    vmgenid is stored in fw_cfg?
-> >>>>>>>>    fw_cfg isn't migrated
-> >>>>>>>>
-> >>>>>>>> So why should any changes to it get migrated, except if it's already
-> >>>>>>>> been read by the guest (and if the guest reads it again aftwards what's
-> >>>>>>>> it expected to read?)
-> >>>>>>>
-> >>>>>>> Why are we expecting it to change on migration?  You want a new value
-> >>>>>>
-> >>>>>> I'm not; I was asking why a change made prior to migration would be
-> >>>>>> preserved across migration.
-> >>>>>
-> >>>>> Okay, so you're asking what happens if the source requests the vmgenid
-> >>>>> device, and sets an id, but the destination of the migration does not
-> >>>>> request anything
-> >>>>
-> >>>> This should never happen, as it means different QEMU command lines on
-> >>>> source vs. target hosts. (Different as in "incorrectly different".)
-> >>>>
-> >>>> Dave writes, "a change made prior to migration". Change made to what?
-> >>>>
-> >>>> - the GUID cannot be changed via the monitor once QEMU has been started.
-> >>>> We dropped the monitor command for that, due to lack of a good use case,
-> >>>> and due to lifecycle complexities. We have figured out a way to make it
-> >>>> safe, but until there's a really convincing use case, we shouldn't add
-> >>>> that complexity.
-> >>>
-> >>> True but we might in the future, and it seems prudent to make
-> >>> migration stream future-proof for that.
-> >>
-> >> It is already.
-> >>
-> >> The monitor command, if we add it, can be implemented incrementally. I
-> >> described it as "approach (iii)" elsewhere in the thread. This is a more
-> >> detailed recap:
-> >>
-> >> - introduce a new device property (internal only), such as
-> >>   "x-enable-set-vmgenid". Make it reflect whether a given machine type
-> >>   supports the monitor command.
-> > 
-> > This is the part we can avoid at no real cost just
-> > by making sure the guid is migrated.
-> > 
-> > 
-> >> - change the /etc/vmgenid_guid fw_cfg blob from callback-less to one
-> >>   with a selection callback
-> >>
-> >> - add a new boolean latch to the vmgenid device, called
-> >>   "guid_blob_selected" or something similar
-> >>
-> >> - the reset handler sets the latch to FALSE
-> >>   (NB: the reset handler already sets /etc/vmgenid_addr to zero)
-> >>
-> >> - the select callback for /etc/vmgenid_guid sets the latch to TRUE
-> >>
-> >> - the latch is added to the migration stream as a subsection *if*
-> >>   x-enable-set-vmgenid is TRUE
-> >>
-> >> - the set-vmgenid monitor command checks all three of:
-> >>   x-enable-set-vmgenid, the latch, and the contents of
-> >>   /etc/vmgenid_addr:
-> >>
-> >>   - if x-enable-set-vmgenid is FALSE, the monitor command returns
-> >>     QERR_UNSUPPORTED (this is a generic error class, with an
-> >>     "unsupported" error message). Otherwise,
-> >>
-> >>   - if the latch is TRUE *and* /etc/vmgenid_addr is zero, then the
-> >>     guest firmware has executed (or started executing) ALLOCATE for
-> >>     /etc/vmgenid_guid, but it has not executed WRITE_POINTER yet.
-> >>     In this case updating the VMGENID from the monitor is unsafe
-> >>     (we cannot guarantee informing the guest successfully), so in this
-> >>     case the monitor command fails with ERROR_CLASS_DEVICE_NOT_ACTIVE.
-> >>     The caller should simply try a bit later. (By which time the
-> >>     firmware will likely have programmed /etc/vmgenid_addr.)
-> > 
-> > This makes no sense to me. Just update it in qemu memory
-> > and write when guest asks for it.
-> 
-> I designed the above (sorry if "designed" is a word too pompous for
-> this) quite explicitly to address your concern as to what would happen
-> if someone tried to massage the GUID via the monitor while the firmware
-> was between ALLOCATE and WRITE_POINTER.
-> 
-> Also, we don't know when the guest "asks" for the GUID (in guest RAM).
-> It just evaluates ADDR (maybe always, maybe only once, at guest driver
-> startup), and then it just looks at RAM whenever it wants to.
-> 
-> This is why this idea seeks to track the guest's state -- if the guest
-> is before ALLOCATE, it's okay to update the fw_cfg blob, if it is
-> between ALLOCATE and WRITE_POINTER, reject the monitor command
-> (temporarily), and if the guest is after WRITE_POINTER, update the RAM
-> and inject the SCI.
-> 
-> We cannot see *exactly* when the guest has just finished writing the
-> address. We have only select callbacks for fw_cfg items, not write
-> callbacks. And a select callback is no good for the address blob,
-> because it would be invoked *before* the guest writes the address.
-> 
-> We discussed these facts several days (weeks?) and several iterations
-> ago. The longer term remedy we came up was the above design. The shorter
-> term remedy was to drop the "set" monitor command, because we couldn't
-> figure out a management layer use case for that monitor command.
-> 
-> If you now (at v8) insist to future proof the design for a potential
-> "set" monitor command, that's exactly the same as if you were requiring
-> Ben to implement the monitor command right now. Except this is worse,
-> because we dropped the monitor command in v6 (from v5), and you didn't
-> protest.
-
-I'm merging this as-is but I think the concerns are overblown.
-We have many fields which devices DMA into guest memory
-and changing them is easy.
-
-It should be a simple matter to update guid copy in
-fw cfg blob, and *if we have the address*, DMA there
-and send SCI.
-
-Yes we don't know when does guest look at guid but that
-is simply up to guest. It needs to look at it at the
-right time.
-
-So the implementation is really easy I think.
-
-The real problem is that we will have migrated guid
-and command line guid and which one wins if they conflict.
-And that is IMO something we need to figure out now and
-not later.
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, rth@twiddle.net
 
 
+Alex Bennée writes:
 
+> Pranith Kumar <bobby.prani@gmail.com> writes:
+>
+>> Alex Bennée writes:
+>>
+>>> Pranith Kumar <bobby.prani@gmail.com> writes:
+>>>
+>>>> tb_gen_code() can exit execution using cpu_exit_loop() when it cannot
+>>>> allocate new tb's. To handle this, we need to properly set the jmp_env
+>>>> pointer ahead of calling tb_gen_code().
+>>>>
+>>>> CC:Alex Bennée <alex.bennee@linaro.org>
+>>>> CC: Richard Henderson <rth@twiddle.net>
+>>>> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+>>>> ---
+>>>>  cpu-exec.c | 23 +++++++++++------------
+>>>>  1 file changed, 11 insertions(+), 12 deletions(-)
+>>>>
+>>>> diff --git a/cpu-exec.c b/cpu-exec.c
+>>>> index 97d79612d9..4b70988b24 100644
+>>>> --- a/cpu-exec.c
+>>>> +++ b/cpu-exec.c
+>>>> @@ -236,23 +236,22 @@ static void cpu_exec_step(CPUState *cpu)
+>>>>
+>>>>      cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
+>>>>      tb_lock();
+>>>> -    tb = tb_gen_code(cpu, pc, cs_base, flags,
+>>>> -                     1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
+>>>> -    tb->orig_tb = NULL;
+>>>> -    tb_unlock();
+>>>> -
+>>>> -    cc->cpu_exec_enter(cpu);
+>>>> -
+>>>
+>>> It occurs to me we are also diverging in our locking pattern from
+>>> tb_find which takes mmap_lock first. This is a NOP for system emulation
+>>> but needed for user-emulation (for which we can do cpu_exec_step but not
+>>> cpu_exec_nocache).
+>>
+>> Right. So we have to take the mmap_lock() before calling
+>> tb_gen_code(). However, this lock is released in the error path before calling
+>> cpu_loop_exit() if allocation of a new tb fails. The following is what I have
+>> after merging with the previous EXCP_ATOMIC handling patch.
+>>
+>> diff --git a/cpu-exec.c b/cpu-exec.c
+>> index a8e04bffbf..2bb3ba3672 100644
+>> --- a/cpu-exec.c
+>> +++ b/cpu-exec.c
+>> @@ -228,6 +228,7 @@ static void cpu_exec_nocache(CPUState *cpu, int max_cycles,
+>>
+>>  static void cpu_exec_step(CPUState *cpu)
+>>  {
+>> +    CPUClass *cc = CPU_GET_CLASS(cpu);
+>>      CPUArchState *env = (CPUArchState *)cpu->env_ptr;
+>>      TranslationBlock *tb;
+>>      target_ulong cs_base, pc;
+>> @@ -235,16 +236,24 @@ static void cpu_exec_step(CPUState *cpu)
+>>
+>>      cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
+>>      tb_lock();
+>> -    tb = tb_gen_code(cpu, pc, cs_base, flags,
+>> -                     1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
+>> -    tb->orig_tb = NULL;
+>> -    tb_unlock();
+>> -    /* execute the generated code */
+>> -    trace_exec_tb_nocache(tb, pc);
+>> -    cpu_tb_exec(cpu, tb);
+>> -    tb_lock();
+>> -    tb_phys_invalidate(tb, -1);
+>> -    tb_free(tb);
+>> +    if (sigsetjmp(cpu->jmp_env, 0) == 0) {
+>> +        mmap_lock();
+>
+> That gets the locking order the wrong way around - I'm wary of that.
+>
 
-> > 
-> > 
-> >>     Libvirt can recognize this error specifically, because it is not the
-> >>     generic error class. ERROR_CLASS_DEVICE_NOT_ACTIVE stands for
-> >>     "EAGAIN", practically, in this case.
-> >>
-> >>   - Otherwise -- meaning latch is FALSE *or* /etc/vmgenid_addr is
-> >>     nonzero, that is, the guest has either not run ALLOCATE since
-> >>     reset, *or* it has, but it has also run WRITE_POINTER):
-> >>
-> >>     - refresh the GUID within the fw_cfg blob for /etc/vmgenid_guid
-> >>       in-place -- the guest will see this whenever it runs ALLOCATE for
-> >>       /etc/vmgenid_guid, *AND*
-> >>
-> >>     - if /etc/vmgenid_addr is not zero, then update the guest (that is,
-> >>       RAM write + SCI)
-> >>
-> >> Thanks
-> >> Laszlo
-> > 
-> > Seems way more painful than it has to be. Just migrate the guid
-> > and then management can write it at any time.
-> 
-> Yes, management would be able to do that, but we won't know when to
-> expose it to the guest. (Because, again, we don't exactly know when the
-> guest looks at the GUID in RAM, and if the address is not configured
-> yet, we cannot put the GUID anywhere in RAM.)
-> 
-> Do you intend to block v8 over this?
-> 
-> Thanks
-> Laszlo
-> 
-> > 
-> > 
-> >>>
-> >>>> - the address of the GUID is changed (the firmware programs it from
-> >>>> "zero" to an actual address, in a writeable fw_cfg file), and that piece
-> >>>> of info is explicitly migrated, as part of the vmgenid device's vmsd.
-> >>>>
-> >>>> Thanks
-> >>>> Laszlo
-> >>>>
-> >>>>
-> >>>>> - how does the guest on the destination see the same id
-> >>>>> as was in place on the source at the time migration started.
-> >>>>>
-> >>>>>>
-> >>>>>>
-> >>>>>>> when you load state from disk (you don't know how many times the same
-> >>>>>>> state has been loaded previously, so each load is effectively forking
-> >>>>>>> the VM and you want a different value), but for a single live migration,
-> >>>>>>> you aren't forking the VM and don't need a new generation ID.
-> >>>>>>>
-> >>>>>>> I guess it all boils down to what command line you're using: if libvirt
-> >>>>>>> is driving a live migration, it will request the same UUID in the
-> >>>>>>> command line of the destination as what is on the source; while if
-> >>>>>>> libvirt is loading from a [managed]save to restore state from a file, it
-> >>>>>>> will either request a new UUID directly or request auto to let qemu
-> >>>>>>> generate the new id.
-> >>>>>>
-> >>>>>> Hmm now I've lost it a bit; I thought we would preserve the value
-> >>>>>> transmitted from the source, not the value on the command line of the destination.
-> >>>>>
-> >>>>> I guess I'm trying to figure out whether libvirt MUST read the current
-> >>>>> id and explicitly tell the destination of migration to reuse that id, or
-> >>>>> if libvirt can omit the id on migration and everything just works
-> >>>>> because the id was migrated from the source.
-> >>>>>
+But we are in exclusive execution now, and we are releasing all the lock taken
+before coming out of it. I think that should be OK. If your concern is that
+this is not the normal locking pattern, then I agree. Otherwise, it should be fine.
+
+-- 
+Pranith
