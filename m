@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cg9ZP-0002uK-1e
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:29:28 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cg9ZP-0002uN-23
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:29:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cg9ZL-0006OY-3B
+	(envelope-from <pbonzini@redhat.com>) id 1cg9ZM-0006Oj-I4
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:29:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35532)
+Received: from mx1.redhat.com ([209.132.183.28]:49236)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cg9ZK-0006OT-T9
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:29:23 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cg9ZM-0006Od-Bb
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 07:29:24 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 21 Feb 2017 13:29:18 +0100
-Message-Id: <20170221122920.16245-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/2] update Linux headers to 4.11
+Date: Tue, 21 Feb 2017 13:29:19 +0100
+Message-Id: <20170221122920.16245-2-pbonzini@redhat.com>
+In-Reply-To: <20170221122920.16245-1-pbonzini@redhat.com>
+References: <20170221122920.16245-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/2] update-linux-headers: update for 4.11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,33 +26,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: cornelia.huck@de.ibm.com, mst@redhat.com
 
-Pretty large update, requiring a few changes to the script too
-(patch 1).
+The linux-headers/asm-arm/unistd.h file has been split in three
+sub-files, copy them along.  However, building them requires
+setting ARCH rather than SRCARCH.
 
-Paolo Bonzini (2):
-  update Linux headers to 4.11
-  update-linux-headers: update for 4.11
+SRCARCH defaults to $(ARCH) anyway; to avoid future occurrence of
+the same problem use ARCH for all architectures where SRCARCH=ARCH.
+Currently these are all except x86, sparc, sh and tile.
 
- include/standard-headers/linux/input-event-codes.h |   2 +-
- include/standard-headers/linux/pci_regs.h          |   8 +
- include/standard-headers/linux/virtio_ids.h        |   1 +
- linux-headers/asm-arm/kvm.h                        |  15 +
- linux-headers/asm-arm/unistd-common.h              | 357 ++++++++++++++++++
- linux-headers/asm-arm/unistd-eabi.h                |   5 +
- linux-headers/asm-arm/unistd-oabi.h                |  17 +
- linux-headers/asm-arm/unistd.h                     | 419 +--------------------
- linux-headers/asm-arm64/kvm.h                      |  13 +
- linux-headers/asm-powerpc/kvm.h                    |  27 ++
- linux-headers/asm-powerpc/unistd.h                 |   1 +
- linux-headers/asm-x86/kvm_para.h                   |  13 +-
- linux-headers/linux/kvm.h                          |  24 +-
- linux-headers/linux/kvm_para.h                     |   2 +
- linux-headers/linux/vfio.h                         |  10 +
- scripts/update-linux-headers.sh                    |  13 +-
- 16 files changed, 506 insertions(+), 421 deletions(-)
- create mode 100644 linux-headers/asm-arm/unistd-common.h
- create mode 100644 linux-headers/asm-arm/unistd-eabi.h
- create mode 100644 linux-headers/asm-arm/unistd-oabi.h
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ scripts/update-linux-headers.sh | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
+diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
+index 72cf1fb..6a370a8 100755
+--- a/scripts/update-linux-headers.sh
++++ b/scripts/update-linux-headers.sh
+@@ -75,7 +75,13 @@ for arch in $ARCHLIST; do
+         continue
+     fi
+ 
+-    make -C "$linux" INSTALL_HDR_PATH="$tmpdir" SRCARCH=$arch headers_install
++    if [ "$arch" = x86 ]; then
++        arch_var=SRCARCH
++    else
++        arch_var=ARCH
++    fi
++
++    make -C "$linux" INSTALL_HDR_PATH="$tmpdir" $arch_var=$arch headers_install
+ 
+     rm -rf "$output/linux-headers/asm-$arch"
+     mkdir -p "$output/linux-headers/asm-$arch"
+@@ -92,6 +98,11 @@ for arch in $ARCHLIST; do
+         cp_portable "$tmpdir/include/asm/kvm_virtio.h" "$output/include/standard-headers/asm-s390/"
+         cp_portable "$tmpdir/include/asm/virtio-ccw.h" "$output/include/standard-headers/asm-s390/"
+     fi
++    if [ $arch = arm ]; then
++        cp "$tmpdir/include/asm/unistd-eabi.h" "$output/linux-headers/asm-arm/"
++        cp "$tmpdir/include/asm/unistd-oabi.h" "$output/linux-headers/asm-arm/"
++        cp "$tmpdir/include/asm/unistd-common.h" "$output/linux-headers/asm-arm/"
++    fi
+     if [ $arch = x86 ]; then
+         cp_portable "$tmpdir/include/asm/hyperv.h" "$output/include/standard-headers/asm-x86/"
+         cp "$tmpdir/include/asm/unistd_32.h" "$output/linux-headers/asm-x86/"
 -- 
 2.9.3
