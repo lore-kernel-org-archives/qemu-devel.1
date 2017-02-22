@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37512)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37551)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cgQV0-0002wv-3g
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:34:03 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cgQV1-0002wz-0g
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:34:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cgQUx-0007os-1P
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:34:02 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cgQUz-0007u3-KQ
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:34:03 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 22 Feb 2017 17:33:08 +1100
-Message-Id: <20170222063348.32176-4-david@gibson.dropbear.id.au>
+Date: Wed, 22 Feb 2017 17:33:21 +1100
+Message-Id: <20170222063348.32176-17-david@gibson.dropbear.id.au>
 In-Reply-To: <20170222063348.32176-1-david@gibson.dropbear.id.au>
 References: <20170222063348.32176-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 03/43] spapr: make cpu core unplug follow
- expected hotunplug call flow
+Subject: [Qemu-devel] [PULL 16/43] target-ppc: add slbsync implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,84 +20,51 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, thuth@redhat.com, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, imammedo@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, thuth@redhat.com, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, imammedo@redhat.com, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Igor Mammedov <imammedo@redhat.com>
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-spapr_core_unplug() were essentially spapr_core_unplug_request()
-handler that requested CPU removal and registered callback
-which did actual cpu core removali but it was called from
-spapr_machine_device_unplug() which is intended for actual object
-removal. Commit (cf632463 spapr: Memory hot-unplug support)
-sort of fixed it introducing spapr_machine_device_unplug_request()
-and calling spapr_core_unplug() but it hasn't renamed callback and
-by mistake calls it from spapr_machine_device_unplug().
+slbsync: SLB Synchoronize
 
-However spapr_machine_device_unplug() isn't ever called for
-cpu core since spapr_core_release() doesn't follow expected
-hotunplug call flow which is:
- 1: device_del() ->
-        hotplug_handler_unplug_request() ->
-            set destroy_cb()
- 2: destroy_cb() ->
-        hotplug_handler_unplug() ->
-            object_unparent // actual device removal
+The instruction provides an ordering function for the effects of all
+slbieg instructions executed by the thread executing the slbsync
+instruction.
 
-Fix it by renaming spapr_core_unplug() to spapr_core_unplug_request()
-which is called from spapr_machine_device_unplug_request() and
-making spapr_core_release() call hotplug_handler_unplug() which
-will call spapr_machine_device_unplug() -> spapr_core_unplug()
-to remove cpu core.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reveiwed-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+ target/ppc/translate.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 8c2efd8..37cb338 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2488,7 +2488,8 @@ void *spapr_populate_hotplug_cpu_dt(CPUState *cs, int *fdt_offset,
-     return fdt;
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index b0f3c3b..b1a6aee 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -4497,6 +4497,17 @@ static void gen_slbieg(DisasContext *ctx)
+ #endif /* defined(CONFIG_USER_ONLY) */
  }
  
--static void spapr_core_release(DeviceState *dev, void *opaque)
-+static void spapr_core_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
-+                              Error **errp)
- {
-     sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-     CPUCore *cc = CPU_CORE(dev);
-@@ -2497,8 +2498,17 @@ static void spapr_core_release(DeviceState *dev, void *opaque)
-     object_unparent(OBJECT(dev));
- }
- 
--static void spapr_core_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
--                              Error **errp)
-+static void spapr_core_release(DeviceState *dev, void *opaque)
++/* slbsync */
++static void gen_slbsync(DisasContext *ctx)
 +{
-+    HotplugHandler *hotplug_ctrl;
-+
-+    hotplug_ctrl = qdev_get_hotplug_handler(dev);
-+    hotplug_handler_unplug(hotplug_ctrl, dev, &error_abort);
++#if defined(CONFIG_USER_ONLY)
++    GEN_PRIV;
++#else
++    CHK_SV;
++    gen_check_tlb_flush(ctx, true);
++#endif /* defined(CONFIG_USER_ONLY) */
 +}
 +
-+static
-+void spapr_core_unplug_request(HotplugHandler *hotplug_dev, DeviceState *dev,
-+                               Error **errp)
- {
-     CPUCore *cc = CPU_CORE(dev);
-     int smt = kvmppc_smt_threads();
-@@ -2719,7 +2729,7 @@ static void spapr_machine_device_unplug_request(HotplugHandler *hotplug_dev,
-             error_setg(errp, "CPU hot unplug not supported on this machine");
-             return;
-         }
--        spapr_core_unplug(hotplug_dev, dev, errp);
-+        spapr_core_unplug_request(hotplug_dev, dev, errp);
-     }
- }
+ #endif  /* defined(TARGET_PPC64) */
  
+ /***                              External control                         ***/
+@@ -6453,6 +6464,7 @@ GEN_HANDLER(tlbsync, 0x1F, 0x16, 0x11, 0x03FFF801, PPC_MEM_TLBSYNC),
+ GEN_HANDLER(slbia, 0x1F, 0x12, 0x0F, 0x031FFC01, PPC_SLBI),
+ GEN_HANDLER(slbie, 0x1F, 0x12, 0x0D, 0x03FF0001, PPC_SLBI),
+ GEN_HANDLER_E(slbieg, 0x1F, 0x12, 0x0E, 0x001F0001, PPC_NONE, PPC2_ISA300),
++GEN_HANDLER_E(slbsync, 0x1F, 0x12, 0x0A, 0x03FFF801, PPC_NONE, PPC2_ISA300),
+ #endif
+ GEN_HANDLER(eciwx, 0x1F, 0x16, 0x0D, 0x00000001, PPC_EXTERN),
+ GEN_HANDLER(ecowx, 0x1F, 0x16, 0x09, 0x00000001, PPC_EXTERN),
 -- 
 2.9.3
