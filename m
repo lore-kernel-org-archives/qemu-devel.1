@@ -1,17 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48670)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cgUle-00014U-0F
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:07:32 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cgUr5-0005Xu-JU
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:13:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cgUlZ-0001XG-9i
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:07:29 -0500
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Wed, 22 Feb 2017 12:07:21 +0100
-Message-Id: <1487761641-93357-1-git-send-email-imammedo@redhat.com>
-In-Reply-To: <20170222063348.32176-39-david@gibson.dropbear.id.au>
-References: <20170222063348.32176-39-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCH 38/43] machine: unify
- [pc_|spapr_]query_hotpluggable_cpus() callbacks
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cgUr1-00033u-JX
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:13:07 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60703
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cgUr1-00033B-Cy
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:13:03 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1MB657i006152
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 06:13:02 -0500
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28s9fpr9a4-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 06:13:01 -0500
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Wed, 22 Feb 2017 11:12:59 -0000
+Date: Wed, 22 Feb 2017 12:12:54 +0100
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <b7b0cb2d-8987-9fe9-e294-a517981453ef@redhat.com>
+References: <20170221185901.3256-1-stefanha@redhat.com>
+	<20170221185901.3256-3-stefanha@redhat.com>
+	<20170222101653.4df25bc4.cornelia.huck@de.ibm.com>
+	<b7b0cb2d-8987-9fe9-e294-a517981453ef@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20170222121254.06358542.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] virtio: add missing region cache init
+ in virtio_load()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,212 +45,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: agraf@suse.de, thuth@redhat.com, lvivier@redhat.com, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>, peter.maydell@linaro.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-All callbacks FOO_query_hotpluggable_cpus() are practically
-the same except of setting vcpus_count to different values.
-Convert them to a generic machine_query_hotpluggable_cpus()
-callback by moving vcpus_count initialization to per machine
-specific callback possible_cpu_arch_ids().
+On Wed, 22 Feb 2017 11:19:45 +0100
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
-v2:
-  - fix rebase conflict due to dropping comment in previous
-    patch
----
- include/hw/boards.h |  3 +++
- hw/core/machine.c   | 31 +++++++++++++++++++++++++++++++
- hw/i386/pc.c        | 36 ++----------------------------------
- hw/ppc/spapr.c      | 34 ++--------------------------------
- 4 files changed, 38 insertions(+), 66 deletions(-)
+> On 22/02/2017 10:16, Cornelia Huck wrote:
+> >> +
+> >> +            /* All ring addresses have been loaded now... */
+> >> +            virtio_init_region_cache(vdev, i);
+> > It feels a bit weird that the region cache was already initialized when
+> > update rings was called. Should the call to init_region_cache be moved
+> > from update_rings() to virtio_queue_set_addr()?
+> 
+> virtio_queue_set_addr isn't called at all, is it?
+> 
+> The alternative would be to call virtio_init_region_cache from a
+> postload callback of vmstate_virtqueue, but Stefan's patch is fine too IMHO.
 
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 60209df..9040dbb 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -41,15 +41,18 @@ int machine_phandle_start(MachineState *machine);
- bool machine_dump_guest_core(MachineState *machine);
- bool machine_mem_merge(MachineState *machine);
- void machine_register_compat_props(MachineState *machine);
-+HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine);
- 
- /**
-  * CPUArchId:
-  * @arch_id - architecture-dependent CPU ID of present or possible CPU
-  * @cpu - pointer to corresponding CPU object if it's present on NULL otherwise
-  * @props - CPU object properties, initialized by board
-+ * #vcpus_count - number of threads provided by @cpu object
-  */
- typedef struct {
-     uint64_t arch_id;
-+    int64_t vcpus_count;
-     CpuInstanceProperties props;
-     Object *cpu;
- } CPUArchId;
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index b0fd91f..0699750 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -357,6 +357,37 @@ static void machine_init_notify(Notifier *notifier, void *data)
-     foreach_dynamic_sysbus_device(error_on_sysbus_device, NULL);
- }
- 
-+HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine)
-+{
-+    int i;
-+    Object *cpu;
-+    HotpluggableCPUList *head = NULL;
-+    const char *cpu_type;
-+
-+    cpu = machine->possible_cpus->cpus[0].cpu;
-+    assert(cpu); /* Boot cpu is always present */
-+    cpu_type = object_get_typename(cpu);
-+    for (i = 0; i < machine->possible_cpus->len; i++) {
-+        HotpluggableCPUList *list_item = g_new0(typeof(*list_item), 1);
-+        HotpluggableCPU *cpu_item = g_new0(typeof(*cpu_item), 1);
-+
-+        cpu_item->type = g_strdup(cpu_type);
-+        cpu_item->vcpus_count = machine->possible_cpus->cpus[i].vcpus_count;
-+        cpu_item->props = g_memdup(&machine->possible_cpus->cpus[i].props,
-+                                   sizeof(*cpu_item->props));
-+
-+        cpu = machine->possible_cpus->cpus[i].cpu;
-+        if (cpu) {
-+            cpu_item->has_qom_path = true;
-+            cpu_item->qom_path = object_get_canonical_path(cpu);
-+        }
-+        list_item->value = cpu_item;
-+        list_item->next = head;
-+        head = list_item;
-+    }
-+    return head;
-+}
-+
- static void machine_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc = MACHINE_CLASS(oc);
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index afaae15..548628f 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -2266,6 +2266,7 @@ static const CPUArchIdList *pc_possible_cpu_arch_ids(MachineState *ms)
-     for (i = 0; i < ms->possible_cpus->len; i++) {
-         X86CPUTopoInfo topo;
- 
-+        ms->possible_cpus->cpus[i].vcpus_count = 1;
-         ms->possible_cpus->cpus[i].arch_id = x86_cpu_apic_id_from_index(i);
-         x86_topo_ids_from_apicid(ms->possible_cpus->cpus[i].arch_id,
-                                  smp_cores, smp_threads, &topo);
-@@ -2279,39 +2280,6 @@ static const CPUArchIdList *pc_possible_cpu_arch_ids(MachineState *ms)
-     return ms->possible_cpus;
- }
- 
--static HotpluggableCPUList *pc_query_hotpluggable_cpus(MachineState *machine)
--{
--    int i;
--    Object *cpu;
--    HotpluggableCPUList *head = NULL;
--    const char *cpu_type;
--
--    cpu = machine->possible_cpus->cpus[0].cpu;
--    assert(cpu); /* BSP is always present */
--    cpu_type = object_get_typename(cpu);
--
--    for (i = 0; i < machine->possible_cpus->len; i++) {
--        HotpluggableCPUList *list_item = g_new0(typeof(*list_item), 1);
--        HotpluggableCPU *cpu_item = g_new0(typeof(*cpu_item), 1);
--
--        cpu_item->type = g_strdup(cpu_type);
--        cpu_item->vcpus_count = 1;
--        cpu_item->props = g_memdup(&machine->possible_cpus->cpus[i].props,
--                                   sizeof(*cpu_item->props));
--
--        cpu = machine->possible_cpus->cpus[i].cpu;
--        if (cpu) {
--            cpu_item->has_qom_path = true;
--            cpu_item->qom_path = object_get_canonical_path(cpu);
--        }
--
--        list_item->value = cpu_item;
--        list_item->next = head;
--        head = list_item;
--    }
--    return head;
--}
--
- static void x86_nmi(NMIState *n, int cpu_index, Error **errp)
- {
-     /* cpu index isn't used */
-@@ -2352,7 +2320,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     mc->get_hotplug_handler = pc_get_hotpug_handler;
-     mc->cpu_index_to_socket_id = pc_cpu_index_to_socket_id;
-     mc->possible_cpu_arch_ids = pc_possible_cpu_arch_ids;
--    mc->query_hotpluggable_cpus = pc_query_hotpluggable_cpus;
-+    mc->query_hotpluggable_cpus = machine_query_hotpluggable_cpus;
-     mc->default_boot_order = "cad";
-     mc->hot_add_cpu = pc_hot_add_cpu;
-     mc->max_cpus = 255;
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 735f53d..49768eb 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2799,6 +2799,7 @@ static const CPUArchIdList *spapr_possible_cpu_arch_ids(MachineState *machine)
-     for (i = 0; i < machine->possible_cpus->len; i++) {
-         int core_id = i * smp_threads;
- 
-+        machine->possible_cpus->cpus[i].vcpus_count = smp_threads;
-         machine->possible_cpus->cpus[i].arch_id = core_id;
-         machine->possible_cpus->cpus[i].props.has_core_id = true;
-         machine->possible_cpus->cpus[i].props.core_id = core_id;
-@@ -2808,37 +2809,6 @@ static const CPUArchIdList *spapr_possible_cpu_arch_ids(MachineState *machine)
-     return machine->possible_cpus;
- }
- 
--static HotpluggableCPUList *spapr_query_hotpluggable_cpus(MachineState *machine)
--{
--    int i;
--    Object *cpu;
--    HotpluggableCPUList *head = NULL;
--    const char *cpu_type;
--
--    cpu = machine->possible_cpus->cpus[0].cpu;
--    assert(cpu); /* Boot cpu is always present */
--    cpu_type = object_get_typename(cpu);
--    for (i = 0; i < machine->possible_cpus->len; i++) {
--        HotpluggableCPUList *list_item = g_new0(typeof(*list_item), 1);
--        HotpluggableCPU *cpu_item = g_new0(typeof(*cpu_item), 1);
--
--        cpu_item->type = g_strdup(cpu_type);
--        cpu_item->vcpus_count = smp_threads;
--        cpu_item->props = g_memdup(&machine->possible_cpus->cpus[i].props,
--                                   sizeof(*cpu_item->props));
--
--        cpu = machine->possible_cpus->cpus[i].cpu;
--        if (cpu) {
--            cpu_item->has_qom_path = true;
--            cpu_item->qom_path = object_get_canonical_path(cpu);
--        }
--        list_item->value = cpu_item;
--        list_item->next = head;
--        head = list_item;
--    }
--    return head;
--}
--
- static void spapr_phb_placement(sPAPRMachineState *spapr, uint32_t index,
-                                 uint64_t *buid, hwaddr *pio,
-                                 hwaddr *mmio32, hwaddr *mmio64,
-@@ -2927,7 +2897,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
- 
-     smc->dr_lmb_enabled = true;
-     smc->tcg_default_cpu = "POWER8";
--    mc->query_hotpluggable_cpus = spapr_query_hotpluggable_cpus;
-+    mc->query_hotpluggable_cpus = machine_query_hotpluggable_cpus;
-     fwc->get_dev_path = spapr_get_fw_dev_path;
-     nc->nmi_monitor_handler = spapr_nmi;
-     smc->phb_placement = spapr_phb_placement;
--- 
-2.7.4
+What I meant was:
+
+We currently have
+
+set_addr -> update_rings -> init_region_cache
+
+and for virtio-1
+
+set_rings -> init_region_cache
+
+The code with Stefan's fix now sets up a region cache via update_rings
+and replaces it later via the call introduced above - which is fine,
+but adds an extra iteration.
+
+If we move to
+
+set_addr -> update_rings
+            init_region_cache
+
+we get the same call pattern for both legacy and virtio-1 layouts and
+save the extra iteration. But we can do that in an additional cleanup
+patch, and I think the patch is fine as-is, so
+
+Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
