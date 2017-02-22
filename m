@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cgcNZ-0004iI-U2
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 14:15:13 -0500
+	(envelope-from <armbru@redhat.com>) id 1cgcNU-0004dC-RO
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 14:15:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cgcNT-0000f3-0z
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 14:15:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41184)
+	(envelope-from <armbru@redhat.com>) id 1cgcNS-0000en-Oz
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 14:15:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57188)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cgcNS-0000e9-P7
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cgcNS-0000dv-Hd
 	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 14:15:02 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 06B196AADE
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 19:15:03 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C37D024A
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 19:15:02 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
-	by int-mx09.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v1MJF14h025339
+	by int-mx14.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v1MJF1ti019411
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
 	verify=NO)
 	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 14:15:02 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 22 Feb 2017 20:14:56 +0100
-Message-Id: <1487790898-24921-15-git-send-email-armbru@redhat.com>
+Date: Wed, 22 Feb 2017 20:14:48 +0100
+Message-Id: <1487790898-24921-7-git-send-email-armbru@redhat.com>
 In-Reply-To: <1487790898-24921-1-git-send-email-armbru@redhat.com>
 References: <1487790898-24921-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 14/16] tests: Don't check qobject_type() before
- qobject_to_qbool()
+Subject: [Qemu-devel] [PULL 06/16] check-qjson: Simplify around
+ compare_litqobj_to_qobj()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,105 +39,97 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-qobject_to_qbool(obj) returns NULL when obj isn't a QBool.  Check
-that instead of qobject_type(obj) == QTYPE_QBOOL.
+Make compare_litqobj_to_qobj() cope with null, and drop non-null
+assertions from callers.
+
+compare_litqobj_to_qobj() already checks the QType matches; drop the
+redundant assertions from callers.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1487363905-9480-13-git-send-email-armbru@redhat.com>
+Message-Id: <1487363905-9480-5-git-send-email-armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/check-qjson.c                 | 24 ++++++------------------
- tests/test-qobject-output-visitor.c | 12 +++++-------
- 2 files changed, 11 insertions(+), 25 deletions(-)
+ tests/check-qjson.c | 22 +---------------------
+ 1 file changed, 1 insertion(+), 21 deletions(-)
 
 diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index 591b70a..e6d6935 100644
+index 0b21a22..49e02591 100644
 --- a/tests/check-qjson.c
 +++ b/tests/check-qjson.c
-@@ -966,10 +966,8 @@ static void keyword_literal(void)
-     QString *str;
+@@ -1110,7 +1110,7 @@ static void compare_helper(QObject *obj, void *opaque)
  
-     obj = qobject_from_json("true");
--    g_assert(obj != NULL);
--    g_assert(qobject_type(obj) == QTYPE_QBOOL);
--
-     qbool = qobject_to_qbool(obj);
-+    g_assert(qbool);
-     g_assert(qbool_get_bool(qbool) == true);
- 
-     str = qobject_to_json(obj);
-@@ -979,10 +977,8 @@ static void keyword_literal(void)
-     QDECREF(qbool);
- 
-     obj = qobject_from_json("false");
--    g_assert(obj != NULL);
--    g_assert(qobject_type(obj) == QTYPE_QBOOL);
--
-     qbool = qobject_to_qbool(obj);
-+    g_assert(qbool);
-     g_assert(qbool_get_bool(qbool) == false);
- 
-     str = qobject_to_json(obj);
-@@ -991,23 +987,15 @@ static void keyword_literal(void)
- 
-     QDECREF(qbool);
- 
--    obj = qobject_from_jsonf("%i", false);
--    g_assert(obj != NULL);
--    g_assert(qobject_type(obj) == QTYPE_QBOOL);
--
--    qbool = qobject_to_qbool(obj);
-+    qbool = qobject_to_qbool(qobject_from_jsonf("%i", false));
-+    g_assert(qbool);
-     g_assert(qbool_get_bool(qbool) == false);
--
-     QDECREF(qbool);
- 
-     /* Test that non-zero values other than 1 get collapsed to true */
--    obj = qobject_from_jsonf("%i", 2);
--    g_assert(obj != NULL);
--    g_assert(qobject_type(obj) == QTYPE_QBOOL);
--
--    qbool = qobject_to_qbool(obj);
-+    qbool = qobject_to_qbool(qobject_from_jsonf("%i", 2));
-+    g_assert(qbool);
-     g_assert(qbool_get_bool(qbool) == true);
--
-     QDECREF(qbool);
- 
-     obj = qobject_from_json("null");
-diff --git a/tests/test-qobject-output-visitor.c b/tests/test-qobject-output-visitor.c
-index 5617fd3..500b452 100644
---- a/tests/test-qobject-output-visitor.c
-+++ b/tests/test-qobject-output-visitor.c
-@@ -71,13 +71,13 @@ static void test_visitor_out_bool(TestOutputVisitorData *data,
-                                   const void *unused)
+ static int compare_litqobj_to_qobj(LiteralQObject *lhs, QObject *rhs)
  {
-     bool value = true;
--    QObject *obj;
-+    QBool *qbool;
+-    if (lhs->type != qobject_type(rhs)) {
++    if (!rhs || lhs->type != qobject_type(rhs)) {
+         return 0;
+     }
  
-     visit_type_bool(data->ov, NULL, &value, &error_abort);
+@@ -1184,18 +1184,12 @@ static void simple_dict(void)
+         QString *str;
  
--    obj = visitor_get(data);
--    g_assert(qobject_type(obj) == QTYPE_QBOOL);
--    g_assert(qbool_get_bool(qobject_to_qbool(obj)) == value);
-+    qbool = qobject_to_qbool(visitor_get(data));
-+    g_assert(qbool);
-+    g_assert(qbool_get_bool(qbool) == value);
- }
+         obj = qobject_from_json(test_cases[i].encoded);
+-        g_assert(obj != NULL);
+-        g_assert(qobject_type(obj) == QTYPE_QDICT);
+-
+         g_assert(compare_litqobj_to_qobj(&test_cases[i].decoded, obj) == 1);
  
- static void test_visitor_out_number(TestOutputVisitorData *data,
-@@ -356,9 +356,7 @@ static void test_visitor_out_any(TestOutputVisitorData *data,
-     qint = qobject_to_qint(qdict_get(qdict, "integer"));
-     g_assert(qint);
-     g_assert_cmpint(qint_get_int(qint), ==, -42);
--    qobj = qdict_get(qdict, "boolean");
--    g_assert(qobj);
--    qbool = qobject_to_qbool(qobj);
-+    qbool = qobject_to_qbool(qdict_get(qdict, "boolean"));
-     g_assert(qbool);
-     g_assert(qbool_get_bool(qbool) == true);
-     qstring = qobject_to_qstring(qdict_get(qdict, "string"));
+         str = qobject_to_json(obj);
+         qobject_decref(obj);
+ 
+         obj = qobject_from_json(qstring_get_str(str));
+-        g_assert(obj != NULL);
+-        g_assert(qobject_type(obj) == QTYPE_QDICT);
+-
+         g_assert(compare_litqobj_to_qobj(&test_cases[i].decoded, obj) == 1);
+         qobject_decref(obj);
+         QDECREF(str);
+@@ -1299,18 +1293,12 @@ static void simple_list(void)
+         QString *str;
+ 
+         obj = qobject_from_json(test_cases[i].encoded);
+-        g_assert(obj != NULL);
+-        g_assert(qobject_type(obj) == QTYPE_QLIST);
+-
+         g_assert(compare_litqobj_to_qobj(&test_cases[i].decoded, obj) == 1);
+ 
+         str = qobject_to_json(obj);
+         qobject_decref(obj);
+ 
+         obj = qobject_from_json(qstring_get_str(str));
+-        g_assert(obj != NULL);
+-        g_assert(qobject_type(obj) == QTYPE_QLIST);
+-
+         g_assert(compare_litqobj_to_qobj(&test_cases[i].decoded, obj) == 1);
+         qobject_decref(obj);
+         QDECREF(str);
+@@ -1367,18 +1355,12 @@ static void simple_whitespace(void)
+         QString *str;
+ 
+         obj = qobject_from_json(test_cases[i].encoded);
+-        g_assert(obj != NULL);
+-        g_assert(qobject_type(obj) == QTYPE_QLIST);
+-
+         g_assert(compare_litqobj_to_qobj(&test_cases[i].decoded, obj) == 1);
+ 
+         str = qobject_to_json(obj);
+         qobject_decref(obj);
+ 
+         obj = qobject_from_json(qstring_get_str(str));
+-        g_assert(obj != NULL);
+-        g_assert(qobject_type(obj) == QTYPE_QLIST);
+-
+         g_assert(compare_litqobj_to_qobj(&test_cases[i].decoded, obj) == 1);
+ 
+         qobject_decref(obj);
+@@ -1403,8 +1385,6 @@ static void simple_varargs(void)
+     g_assert(embedded_obj != NULL);
+ 
+     obj = qobject_from_jsonf("[%d, 2, %p]", 1, embedded_obj);
+-    g_assert(obj != NULL);
+-
+     g_assert(compare_litqobj_to_qobj(&decoded, obj) == 1);
+ 
+     qobject_decref(obj);
 -- 
 2.7.4
