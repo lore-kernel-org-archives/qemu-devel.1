@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36460)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cggMH-0002BQ-8C
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 18:30:06 -0500
+	(envelope-from <eblake@redhat.com>) id 1cggR2-00052e-Re
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 18:35:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cggMG-0006w5-5J
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 18:30:05 -0500
-References: <1487710908-26356-1-git-send-email-armbru@redhat.com>
-	<1487710908-26356-6-git-send-email-armbru@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1cggQy-0007tJ-1X
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 18:35:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39638)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cggQx-0007sB-Pk
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 18:34:55 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C2EE761D03
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 23:34:55 +0000 (UTC)
+References: <20170222180423.26571-1-pbonzini@redhat.com>
+	<20170222180423.26571-2-pbonzini@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <5eb9cc1f-527b-16a9-3ae9-e9993856b829@redhat.com>
-Date: Wed, 22 Feb 2017 17:29:54 -0600
+Message-ID: <bc6385db-f8b1-41ca-c798-0564941b5618@redhat.com>
+Date: Wed, 22 Feb 2017 17:34:53 -0600
 MIME-Version: 1.0
-In-Reply-To: <1487710908-26356-6-git-send-email-armbru@redhat.com>
+In-Reply-To: <20170222180423.26571-2-pbonzini@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="1NGt9JeEX2prPX3txqqhgcqpVGBwqUbbv"
-Subject: Re: [Qemu-devel] [PATCH RFC v3 5/5] block: Crude initial
- implementation of -blockdev
+	boundary="Uqq5HQ0PrCnC82ABN70nSuvm84LFwv0mI"
+Subject: Re: [Qemu-devel] [PATCH 1/3] qom-qobject: introduce
+ object_property_{g, s}et_ptr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,120 +35,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---1NGt9JeEX2prPX3txqqhgcqpVGBwqUbbv
+--Uqq5HQ0PrCnC82ABN70nSuvm84LFwv0mI
 From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org
-Message-ID: <5eb9cc1f-527b-16a9-3ae9-e9993856b829@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v3 5/5] block: Crude initial
- implementation of -blockdev
-References: <1487710908-26356-1-git-send-email-armbru@redhat.com>
- <1487710908-26356-6-git-send-email-armbru@redhat.com>
-In-Reply-To: <1487710908-26356-6-git-send-email-armbru@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com
+Message-ID: <bc6385db-f8b1-41ca-c798-0564941b5618@redhat.com>
+Subject: Re: [PATCH 1/3] qom-qobject: introduce object_property_{g,s}et_ptr
+References: <20170222180423.26571-1-pbonzini@redhat.com>
+ <20170222180423.26571-2-pbonzini@redhat.com>
+In-Reply-To: <20170222180423.26571-2-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 02/21/2017 03:01 PM, Markus Armbruster wrote:
-> The new command line option -blockdev works like QMP command
-> blockdev-add.
+On 02/22/2017 12:04 PM, Paolo Bonzini wrote:
+> The functions simplify the handling of QOM properties whose type
+> is a QAPI struct.  They go through a QObject just like the other
+> functions that access a QOM property through its C type.
 >=20
-> The option argument may be given in JSON syntax, exactly as in QMP.
-> Example usage:
+> Like QAPI_CLONE, the functions are wrapped by macros that take a
+> QAPI type name and use it to build the name of a visitor function.
 >=20
->     -blockdev '{"node-name": "foo", "driver": "raw", "file": {"driver":=
- "file", "filename": "foo.img"} }'
->=20
-> The JSON argument doesn't exactly blend into the existing option
-> syntax, so the traditional KEY=3DVALUE,... syntax is also supported,
-> using dotted keys to do the nesting:
->=20
->     -blockdev node-name=3Dfoo,driver=3Draw,file.driver=3Dfile,file.file=
-name=3Dfoo.img
-
-Some of the list ideas were allowing mix-and-match or re-opening the
-dict; do we want to allow any of these? (maybe as followups?)
-
--blockdev
-node-name=3Dfoo,driver=3Draw,file=3D'{"driver":"file"}',file.filename=3Df=
-oo.img
-
-
->=20
-> Note that calling qmp_blockdev_add() (say via qmp_marshal_block_add())
-> right away would crash.  We need to stash the configuration for later
-> instead.  This is crudely done, and bypasses QemuOpts, even though
-> storing configuration is what QemuOpts is for.  Need to revamp option
-> infrastructure to support QAPI types like BlockdevOptions.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  qemu-options.hx |  3 +++
->  vl.c            | 50 +++++++++++++++++++++++++++++++++++++++++++++++++=
-+
->  2 files changed, 53 insertions(+)
+>  include/qom/qom-qobject.h               |  68 +++++++++++-
+>  qom/qom-qobject.c                       |  52 ++++++++++
+>  tests/Makefile.include                  |   2 +-
+>  tests/check-qom-proplist.c              | 177 ++++++++++++++++++++++++=
++++++++-
+>  tests/qapi-schema/qapi-schema-test.json |   8 ++
+>  tests/qapi-schema/qapi-schema-test.out  |   6 ++
+>  6 files changed, 309 insertions(+), 4 deletions(-)
 >=20
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 9936cf3..36a38d7 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -512,6 +512,9 @@ Use @var{file} as CD-ROM image (you cannot use @opt=
-ion{-hdc} and
->  using @file{/dev/cdrom} as filename (@pxref{host_drives}).
->  ETEXI
-> =20
-> +DEF("blockdev", HAS_ARG, QEMU_OPTION_blockdev,
-> +    "-blockdev FIXME document\n", QEMU_OPTION_blockdev)
 
-Adequate for an RFC, but I can see how you want to improve it.
-
-> @@ -3095,6 +3104,37 @@ int main(int argc, char **argv, char **envp)
->                  drive_add(IF_DEFAULT, popt->index - QEMU_OPTION_hda, o=
-ptarg,
->                            HD_OPTS);
->                  break;
-> +            case QEMU_OPTION_blockdev:
-> +                {
-> +                    BlockdevOptions_queue *bdo =3D g_new(BlockdevOptio=
-ns_queue, 1);
-> +                    bool is_json =3D optarg[0] =3D=3D '{';
-> +                    QObject *obj;
-> +                    QDict *args;
-> +                    Visitor *v;
-> +
-> +                    if (is_json) {
-> +                        obj =3D qobject_from_json(optarg);
-> +                        // TODO get error out of parser
-
-Yeah, that's something we still need to improve.
-
-> +                        if (!obj) {
-> +                            error_report("invalid JSON");
-> +                            exit(1);
-> +                        }
-> +                        args =3D qobject_to_qdict(obj);
-> +                        assert(args);
-> +                        v =3D qobject_input_visitor_new(QOBJECT(args),=
- true);
-> +                    } else {
-> +                        args =3D keyval_parse(optarg, "driver", &error=
-_fatal);
-> +                        v =3D qobject_input_visitor_new_autocast(QOBJE=
-CT(args));
-> +                    }
-
-Pretty slick!  And answers my question: no mix-and-match of JSON and
-dotted (all one or the other) within a single -blockdev argument.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
 Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---1NGt9JeEX2prPX3txqqhgcqpVGBwqUbbv
+--Uqq5HQ0PrCnC82ABN70nSuvm84LFwv0mI
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -148,13 +88,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYrh7yAAoJEKeha0olJ0NqxOEH/jXra4Tfv+6TmMaSAHtQ3aPH
-YgXteY5O1/rTKdW+UiE0f/5buFT00Eh9DozvCavginVJr5zx9TSxFcAsRYFWw5ZW
-9qwhtEPVtW10vVLpB8e6Hj40xnIoB9MCzFVTc2rcNBIIucnhJ2PagdUZ8jfrgjbl
-Rs8uNWpjV6CERiOqYKrlRn1a8wUEv6WpKb2hMX102pwLdEZBmJyZy/uJZx6NvuBk
-+7MoUWldx0H8D3mSC8AjOvp94oaLRqp2ZJYpo1n8nbaqJsUyTylf9qbhw0XJGBOk
-xw2jxWzQx3uZ3siEgyfIinYAp0ikCpdF7pq42yDG5/abIP1zP8xfm/oDYI+vV5Y=
-=gv/a
+iQEcBAEBCAAGBQJYriAdAAoJEKeha0olJ0Nq8aoIAJaebo830LeQSbXmcoQf4xJ0
+NxW8sRFGNUvhj7CWCcyj/maZxfV1jCqJt8xFlCu9EAbmxpnVWohnZiXugEqh5D9b
+9OkNJr6iYWVJeLcoJ+H/C85C1xR7X+C8begIMNSjt1RUL4b+7zElfyR+8dMR/wTL
++T3yvgWdEzw0T0LIza0u5JUNQSK2FrVXmVdWIBam03WioCxQiki4inqjfa/I/gvg
+viA9oqBAYJ5Jqu6lY1P4Qc9/ERVIFbazB7+aJ73t0e+Gam8aR5NqFbMolMg6hwOC
+gpHU7mYaDCmCKl0Jn3HjHilrgKjjcrxYVJ/s8g39fDf/c78BtaebGfkOTO5xbVk=
+=GrdE
 -----END PGP SIGNATURE-----
 
---1NGt9JeEX2prPX3txqqhgcqpVGBwqUbbv--
+--Uqq5HQ0PrCnC82ABN70nSuvm84LFwv0mI--
