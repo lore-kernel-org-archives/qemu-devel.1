@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cgYmC-00018X-EC
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 10:24:21 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cgYsw-0004eh-Jr
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 10:31:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cgYm9-0006z2-3L
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 10:24:20 -0500
-Date: Wed, 22 Feb 2017 15:24:13 +0000
+	(envelope-from <stefanha@gmail.com>) id 1cgYst-0001Q5-CD
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 10:31:18 -0500
+Date: Wed, 22 Feb 2017 15:31:11 +0000
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170222152413.GE10201@stefanha-x1.localdomain>
-References: <20170217194028.8398-1-pbonzini@redhat.com>
-	<20170217194028.8398-4-pbonzini@redhat.com>
+Message-ID: <20170222153111.GF10201@stefanha-x1.localdomain>
+References: <1487680191-13096-1-git-send-email-pl@kamp.de>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="+SfteS7bOf3dGlBC"
+	protocol="application/pgp-signature"; boundary="Bqc0IY4JZZt50bUr"
 Content-Disposition: inline
-In-Reply-To: <20170217194028.8398-4-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 3/3] iscsi: do not use
- aio_context_acquire/release
+In-Reply-To: <1487680191-13096-1-git-send-email-pl@kamp.de>
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: make convert async
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,44 +23,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Peter Lieven <pl@kamp.de>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, ct@flyingcircus.io, mreitz@redhat.com, famz@redhat.com, eblake@redhat.com
 
 
---+SfteS7bOf3dGlBC
+--Bqc0IY4JZZt50bUr
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 17, 2017 at 08:40:28PM +0100, Paolo Bonzini wrote:
-> Now that all bottom halves and callbacks take care of taking the
-> AioContext lock, we can migrate some users away from it and to a
-> specific QemuMutex or CoMutex.
+On Tue, Feb 21, 2017 at 01:29:51PM +0100, Peter Lieven wrote:
+> the convert process is currently completely implemented with sync operati=
+ons.
+> That means it reads one buffer and then writes it. No parallelism and eac=
+h sync
+> request takes as long as it takes until it is completed.
 >=20
-> Protect libiscsi calls with a QemuMutex.  Callbacks are invoked
-> using bottom halves, so we don't even have to drop it around
-> callback invocations.
+> This can be a big performance hit when the convert process reads and writ=
+es
+> to devices which do not benefit from kernel readahead or pagecache.
+> In our environment we heavily have the following two use cases when using
+> qemu-img convert.
 >=20
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> a) reading from NFS and writing to iSCSI for deploying templates
+> b) reading from iSCSI and writing to NFS for backups
+>=20
+> In both processes we use libiscsi and libnfs so we have no kernel cache.
+>=20
+> This patch changes the convert process to work with parallel running coro=
+utines
+> which can significantly improve performance for network storage devices:
+>=20
+> qemu-img (master)
+>  nfs -> iscsi 22.8 secs
+>  nfs -> ram   11.7 secs
+>  ram -> iscsi 12.3 secs
+>=20
+> qemu-img-async (8 coroutines, in-order write disabled)
+>  nfs -> iscsi 11.0 secs
+>  nfs -> ram   10.4 secs
+>  ram -> iscsi  9.0 secs
+>=20
+> This patches introduces 2 new cmdline parameters. The -m parameter to spe=
+cify
+> the number of coroutines running in parallel (defaults to 8). And the -W =
+paremeter to
+> allow qemu-img to write to the target out of order rather than sequential=
+=2E This improves
+> performance as the writes do not have to wait for each other to complete.
+>=20
+> Signed-off-by: Peter Lieven <pl@kamp.de>
 > ---
->  block/iscsi.c | 83 +++++++++++++++++++++++++++++++++++++++++++++--------=
+>    RFC->V1: - add documentation
+>             - add missing coroutine_fn annotation [Stefan]
+>             - add a comment why it is safe to call coroutine_enter [Stefa=
+n]
+>             - check -m paramater for values < 1 [Stefan]
+>             - disallow -W parameter with compression [Stefan]
+>=20
+> RFC V3->V4: - avoid to prepare a request queue upfront [Kevin]
+>             - do not ignore the BLK_BACKING_FILE status [Kevin]
+>             - redesign the interface to the read and write routines [Kevi=
+n]
+>    =20
+> RFC V2->V3: - updated stats in the commit msg from a host with a better n=
+etwork card
+>             - only wake up the coroutine that is acutally waiting for a w=
+rite to complete.
+>               this was not only overhead, but also breaking at least linu=
+x AIO.
+>             - fix coding style complaints
+>             - rename some variables and structs
+>    =20
+> RFC V1->V2: - using coroutine as worker "threads". [Max]
+>             - keeping the request queue as otherwise it happens
+>               that we wait on BLK_ZERO chunks while keeping the write ord=
+er.
+>               it also avoids redundant calls to get_block_status and helps
+>               to skip some conditions for fully allocated imaged (!s->min=
+_sparse)
+>=20
+>  qemu-img-cmds.hx |   4 +-
+>  qemu-img.c       | 276 ++++++++++++++++++++++++++++++++++++++++---------=
 ------
->  1 file changed, 64 insertions(+), 19 deletions(-)
+>  qemu-img.texi    |  16 +++-
+>  3 files changed, 220 insertions(+), 76 deletions(-)
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---+SfteS7bOf3dGlBC
+> @@ -326,6 +332,14 @@ skipped. This is useful for formats such as @code{rb=
+d} if the target
+>  volume has already been created with site specific options that cannot
+>  be supplied through qemu-img.
+> =20
+> +With option @code{-W} specified, it is allowed to write out of order to =
+the target.
+> +This is option improves performance, but is only recommened for prealloc=
+ated devices
+
+Minor nit.  Suggested rewording:
+
+Out of order writes can be enabled with @code{-W} to improve
+performance.  This is only recommended for preallocated devices
+
+> +like host devices or other raw block devices. Out of order write does no=
+t work
+> +in combination with creating compressed images.
+> +
+> +@var{num_coroutines} specifies how many coroutines work in parallel duri=
+ng
+> +the convert process (defaults to 8).
+> +
+>  @item dd [-f @var{fmt}] [-O @var{output_fmt}] [bs=3D@var{block_size}] [c=
+ount=3D@var{blocks}] [skip=3D@var{blocks}] if=3D@var{input} of=3D@var{outpu=
+t}
+> =20
+>  Dd copies from @var{input} file to @var{output} file converting it from
+> --=20
+> 1.9.1
+>=20
+
+--Bqc0IY4JZZt50bUr
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJYra0dAAoJEJykq7OBq3PIQecH/3Socz4ay6HKvX7hl9TIrRTX
-mMjleeH75YaemjgA8O/dmDD8l+B7gIqVbb9oSDn67BNEC5eeGO0gDT3q72i9ETSb
-n/SiE3ASGN09X/xG3CLEIlq9nDm9lpuzAheSBh2GS+R1yqOdkQCvfc6z1yxxdl8X
-J/kgx871Clo6UUpxnOgdSpZNFiu1qgEO3FVz5LwSVPcGr22tG1cVW3eXlUH4e1kp
-xIjTr/vObvLCjikQY7phzofa8uHpEi/nvBX545A0DMrdKRNOttUv/B5qb8hffiSF
-gUeSTQ1kdI6yFqndwibWvN6sPTAhXhBGhODoLOXwQTA5R+9+HarnZ4IGbJ4Ta0U=
-=JZsP
+iQEcBAEBAgAGBQJYra6/AAoJEJykq7OBq3PIH8cIAJ7BOpbiP5ViVLTWiDN2sY7Q
+ZJD7ORG4J5fimySssyvjul5ptA3xr7qjDg81hLLdQaL+9qO+MFfKoJ/6MapTRcNz
+VR9NKACsdXrk8FEpEN3Fiz6ZBLz03DQkyDmWsLPw6wp3/iXpLVhawQsyRhuN7P03
+EXmI4ea8jG9j/T2qioeY9DPc8GTccsjW+zy5UQpFzHWCF4AyMsbC+jzMTH57gwGH
+asBZSIlRjBy9ok9HlSGvvQXYFAgZrjaFYTVO25xapmIc4LYxTpWN2l7n1RnUXzGn
+JlJm+TfaOfPhK/kC//ImG2MuSxVCIS4glCQiaZhtrBmmY7v8XUUSzfENg44surw=
+=BHp1
 -----END PGP SIGNATURE-----
 
---+SfteS7bOf3dGlBC--
+--Bqc0IY4JZZt50bUr--
