@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clement.deschamps@antfield.fr>) id 1cgV1X-00021o-AS
+	(envelope-from <clement.deschamps@antfield.fr>) id 1cgV1X-00022I-Oj
 	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:23:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clement.deschamps@antfield.fr>) id 1cgV1V-0006Q6-Hk
+	(envelope-from <clement.deschamps@antfield.fr>) id 1cgV1V-0006QJ-Vl
 	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:23:55 -0500
 From: Clement Deschamps <clement.deschamps@antfield.fr>
-Date: Wed, 22 Feb 2017 12:23:37 +0100
-Message-Id: <20170222112338.25492-3-clement.deschamps@antfield.fr>
+Date: Wed, 22 Feb 2017 12:23:36 +0100
+Message-Id: <20170222112338.25492-2-clement.deschamps@antfield.fr>
 In-Reply-To: <20170222112338.25492-1-clement.deschamps@antfield.fr>
 References: <20170222112338.25492-1-clement.deschamps@antfield.fr>
-Subject: [Qemu-devel] [PATCH v2 2/3] bcm2835_gpio: add bcm2835 gpio
+Subject: [Qemu-devel] [PATCH v2 1/3] bcm2835_sdhost: add bcm2835 sdhost
  controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,38 +23,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Clement Deschamps <clement.deschamps@antfield.fr>, qemu-arm@nongnu.org, peter.maydell@linaro.org, andrew.baumann@microsoft.com
 
-This adds the BCM2835 GPIO controller.
-
-It implements:
-- The 54 GPIOs as outputs (qemu_irq)
-- The SD controller selection via alternate function of GPIOs 48-53
+This adds the BCM2835 SDHost controller from Arasan.
 
 Signed-off-by: Clement Deschamps <clement.deschamps@antfield.fr>
 ---
- hw/gpio/Makefile.objs          |   1 +
- hw/gpio/bcm2835_gpio.c         | 361 +++++++++++++++++++++++++++++++++++++++++
- include/hw/gpio/bcm2835_gpio.h |  38 +++++
- 3 files changed, 400 insertions(+)
- create mode 100644 hw/gpio/bcm2835_gpio.c
- create mode 100644 include/hw/gpio/bcm2835_gpio.h
+ hw/sd/Makefile.objs            |   1 +
+ hw/sd/bcm2835_sdhost.c         | 429 +++++++++++++++++++++++++++++++++++++++++
+ include/hw/sd/bcm2835_sdhost.h |  48 +++++
+ 3 files changed, 478 insertions(+)
+ create mode 100644 hw/sd/bcm2835_sdhost.c
+ create mode 100644 include/hw/sd/bcm2835_sdhost.h
 
-diff --git a/hw/gpio/Makefile.objs b/hw/gpio/Makefile.objs
-index a43c7cf442..fa0a72e6d0 100644
---- a/hw/gpio/Makefile.objs
-+++ b/hw/gpio/Makefile.objs
-@@ -7,3 +7,4 @@ common-obj-$(CONFIG_GPIO_KEY) += gpio_key.o
- 
- obj-$(CONFIG_OMAP) += omap_gpio.o
- obj-$(CONFIG_IMX) += imx_gpio.o
-+obj-$(CONFIG_RASPI) += bcm2835_gpio.o
-diff --git a/hw/gpio/bcm2835_gpio.c b/hw/gpio/bcm2835_gpio.c
+diff --git a/hw/sd/Makefile.objs b/hw/sd/Makefile.objs
+index 31c83308f2..c2b7664264 100644
+--- a/hw/sd/Makefile.objs
++++ b/hw/sd/Makefile.objs
+@@ -6,3 +6,4 @@ common-obj-$(CONFIG_SDHCI) += sdhci.o
+ obj-$(CONFIG_MILKYMIST) += milkymist-memcard.o
+ obj-$(CONFIG_OMAP) += omap_mmc.o
+ obj-$(CONFIG_PXA2XX) += pxa2xx_mmci.o
++obj-$(CONFIG_RASPI) += bcm2835_sdhost.o
+diff --git a/hw/sd/bcm2835_sdhost.c b/hw/sd/bcm2835_sdhost.c
 new file mode 100644
-index 0000000000..a75f0ebb6b
+index 0000000000..03c93ddb25
 --- /dev/null
-+++ b/hw/gpio/bcm2835_gpio.c
-@@ -0,0 +1,361 @@
++++ b/hw/sd/bcm2835_sdhost.c
+@@ -0,0 +1,429 @@
 +/*
-+ * Raspberry Pi (BCM2835) GPIO Controller
++ * Raspberry Pi (BCM2835) SD Host Controller
 + *
 + * Copyright (c) 2017 Antfield SAS
 + *
@@ -68,360 +64,428 @@ index 0000000000..a75f0ebb6b
 +
 +#include "qemu/osdep.h"
 +#include "qemu/log.h"
-+#include "qemu/timer.h"
-+#include "qapi/error.h"
-+#include "hw/sysbus.h"
-+#include "hw/sd/sd.h"
-+#include "hw/gpio/bcm2835_gpio.h"
++#include "sysemu/blockdev.h"
++#include "hw/sd/bcm2835_sdhost.h"
 +
-+#define GPFSEL0   0x00
-+#define GPFSEL1   0x04
-+#define GPFSEL2   0x08
-+#define GPFSEL3   0x0C
-+#define GPFSEL4   0x10
-+#define GPFSEL5   0x14
-+#define GPSET0    0x1C
-+#define GPSET1    0x20
-+#define GPCLR0    0x28
-+#define GPCLR1    0x2C
-+#define GPLEV0    0x34
-+#define GPLEV1    0x38
-+#define GPEDS0    0x40
-+#define GPEDS1    0x44
-+#define GPREN0    0x4C
-+#define GPREN1    0x50
-+#define GPFEN0    0x58
-+#define GPFEN1    0x5C
-+#define GPHEN0    0x64
-+#define GPHEN1    0x68
-+#define GPLEN0    0x70
-+#define GPLEN1    0x74
-+#define GPAREN0   0x7C
-+#define GPAREN1   0x80
-+#define GPAFEN0   0x88
-+#define GPAFEN1   0x8C
-+#define GPPUD     0x94
-+#define GPPUDCLK0 0x98
-+#define GPPUDCLK1 0x9C
++#define TYPE_BCM2835_SDHOST_BUS "bcm2835-sdhost-bus"
++#define BCM2835_SDHOST_BUS(obj) \
++    OBJECT_CHECK(SDBus, (obj), TYPE_BCM2835_SDHOST_BUS)
 +
-+static uint32_t gpfsel_get(BCM2835GpioState *s, uint8_t reg)
++#define SDCMD  0x00 /* Command to SD card              - 16 R/W */
++#define SDARG  0x04 /* Argument to SD card             - 32 R/W */
++#define SDTOUT 0x08 /* Start value for timeout counter - 32 R/W */
++#define SDCDIV 0x0c /* Start value for clock divider   - 11 R/W */
++#define SDRSP0 0x10 /* SD card rsp (31:0)         - 32 R   */
++#define SDRSP1 0x14 /* SD card rsp (63:32)        - 32 R   */
++#define SDRSP2 0x18 /* SD card rsp (95:64)        - 32 R   */
++#define SDRSP3 0x1c /* SD card rsp (127:96)       - 32 R   */
++#define SDHSTS 0x20 /* SD host status                  - 11 R   */
++#define SDVDD  0x30 /* SD card power control           -  1 R/W */
++#define SDEDM  0x34 /* Emergency Debug Mode            - 13 R/W */
++#define SDHCFG 0x38 /* Host configuration              -  2 R/W */
++#define SDHBCT 0x3c /* Host byte count (debug)         - 32 R/W */
++#define SDDATA 0x40 /* Data to/from SD card            - 32 R/W */
++#define SDHBLC 0x50 /* Host block count (SDIO/SDHC)    -  9 R/W */
++
++#define SDCMD_NEW_FLAG                  0x8000
++#define SDCMD_FAIL_FLAG                 0x4000
++#define SDCMD_BUSYWAIT                  0x800
++#define SDCMD_NO_RESPONSE               0x400
++#define SDCMD_LONG_RESPONSE             0x200
++#define SDCMD_WRITE_CMD                 0x80
++#define SDCMD_READ_CMD                  0x40
++#define SDCMD_CMD_MASK                  0x3f
++
++#define SDCDIV_MAX_CDIV                 0x7ff
++
++#define SDHSTS_BUSY_IRPT                0x400
++#define SDHSTS_BLOCK_IRPT               0x200
++#define SDHSTS_SDIO_IRPT                0x100
++#define SDHSTS_REW_TIME_OUT             0x80
++#define SDHSTS_CMD_TIME_OUT             0x40
++#define SDHSTS_CRC16_ERROR              0x20
++#define SDHSTS_CRC7_ERROR               0x10
++#define SDHSTS_FIFO_ERROR               0x08
++/* Reserved */
++/* Reserved */
++#define SDHSTS_DATA_FLAG                0x01
++
++#define SDHCFG_BUSY_IRPT_EN     (1 << 10)
++#define SDHCFG_BLOCK_IRPT_EN    (1 << 8)
++#define SDHCFG_SDIO_IRPT_EN     (1 << 5)
++#define SDHCFG_DATA_IRPT_EN     (1 << 4)
++#define SDHCFG_SLOW_CARD        (1 << 3)
++#define SDHCFG_WIDE_EXT_BUS     (1 << 2)
++#define SDHCFG_WIDE_INT_BUS     (1 << 1)
++#define SDHCFG_REL_CMD_LINE     (1 << 0)
++
++#define SDEDM_FORCE_DATA_MODE   (1 << 19)
++#define SDEDM_CLOCK_PULSE       (1 << 20)
++#define SDEDM_BYPASS            (1 << 21)
++
++#define SDEDM_WRITE_THRESHOLD_SHIFT 9
++#define SDEDM_READ_THRESHOLD_SHIFT 14
++#define SDEDM_THRESHOLD_MASK     0x1f
++
++#define SDEDM_FSM_MASK           0xf
++#define SDEDM_FSM_IDENTMODE      0x0
++#define SDEDM_FSM_DATAMODE       0x1
++#define SDEDM_FSM_READDATA       0x2
++#define SDEDM_FSM_WRITEDATA      0x3
++#define SDEDM_FSM_READWAIT       0x4
++#define SDEDM_FSM_READCRC        0x5
++#define SDEDM_FSM_WRITECRC       0x6
++#define SDEDM_FSM_WRITEWAIT1     0x7
++#define SDEDM_FSM_POWERDOWN      0x8
++#define SDEDM_FSM_POWERUP        0x9
++#define SDEDM_FSM_WRITESTART1    0xa
++#define SDEDM_FSM_WRITESTART2    0xb
++#define SDEDM_FSM_GENPULSES      0xc
++#define SDEDM_FSM_WRITEWAIT2     0xd
++#define SDEDM_FSM_STARTPOWDOWN   0xf
++
++#define SDDATA_FIFO_WORDS        16
++
++static void bcm2835_sdhost_update_irq(BCM2835SDHostState *s)
 +{
-+    int i;
-+    uint32_t value = 0;
-+    for (i = 0; i < 10; i++) {
-+        uint32_t index = 10 * reg + i;
-+        if (index < sizeof(s->fsel)) {
-+            value |= (s->fsel[index] & 0x7) << (3 * i);
++    uint32_t irq = s->status &
++        (SDHSTS_BUSY_IRPT | SDHSTS_BLOCK_IRPT | SDHSTS_SDIO_IRPT);
++    qemu_set_irq(s->irq, !!irq);
++}
++
++static void bcm2835_sdhost_send_command(BCM2835SDHostState *s)
++{
++    SDRequest request;
++    uint8_t rsp[16];
++    int rlen;
++
++    request.cmd = s->cmd & SDCMD_CMD_MASK;
++    request.arg = s->cmdarg;
++
++    rlen = sdbus_do_command(&s->sdbus, &request, rsp);
++    if (rlen < 0) {
++        goto error;
++    }
++    if (!(s->cmd & SDCMD_NO_RESPONSE)) {
++#define RWORD(n) (((uint32_t)rsp[n] << 24) | (rsp[n + 1] << 16) \
++                  | (rsp[n + 2] << 8) | rsp[n + 3])
++        if (rlen == 0 || (rlen == 4 && (s->cmd & SDCMD_LONG_RESPONSE))) {
++            goto error;
 +        }
-+    }
-+    return value;
-+}
-+
-+static void sdbus_reparent_card(SDBus *from, SDBus *to)
-+{
-+    BusChild *kid = QTAILQ_FIRST(&from->qbus.children);
-+    if(kid == NULL) {
-+        return;
-+    }
-+    SDState *card = SD_CARD(kid->child);
-+
-+    sdbus_set_inserted(from, false);
-+    object_unparent(OBJECT(kid));
-+    qdev_set_parent_bus(DEVICE(card), &to->qbus);
-+    sdbus_set_inserted(to, true);
-+}
-+
-+static void gpfsel_set(BCM2835GpioState *s, uint8_t reg, uint32_t value)
-+{
-+    int i;
-+    for (i = 0; i < 10; i++) {
-+        uint32_t index = 10 * reg + i;
-+        if (index < sizeof(s->fsel)) {
-+            int fsel = (value >> (3 * i)) & 0x7;
-+            s->fsel[index] = fsel;
++        if (rlen != 4 && rlen != 16) {
++            goto error;
 +        }
-+    }
-+
-+    /* SD controller selection (48-53) */
-+    if (s->sd_fsel != 0
-+            && (s->fsel[48] == 0) /* SD_CLK_R */
-+            && (s->fsel[49] == 0) /* SD_CMD_R */
-+            && (s->fsel[50] == 0) /* SD_DATA0_R */
-+            && (s->fsel[51] == 0) /* SD_DATA1_R */
-+            && (s->fsel[52] == 0) /* SD_DATA2_R */
-+            && (s->fsel[53] == 0) /* SD_DATA3_R */
-+            ) {
-+        /* SDHCI controller selected */
-+        sdbus_reparent_card(&s->sdhost->sdbus, &s->sdhci->sdbus);
-+        s->sd_fsel = 0;
-+    } else if (s->sd_fsel != 4
-+            && (s->fsel[48] == 4) /* SD_CLK_R */
-+            && (s->fsel[49] == 4) /* SD_CMD_R */
-+            && (s->fsel[50] == 4) /* SD_DATA0_R */
-+            && (s->fsel[51] == 4) /* SD_DATA1_R */
-+            && (s->fsel[52] == 4) /* SD_DATA2_R */
-+            && (s->fsel[53] == 4) /* SD_DATA3_R */
-+            ) {
-+        /* SDHost controller selected */
-+        sdbus_reparent_card(&s->sdhci->sdbus, &s->sdhost->sdbus);
-+        s->sd_fsel = 4;
-+    }
-+}
-+
-+static int gpfsel_is_out(BCM2835GpioState *s, int index)
-+{
-+    if (index >= 0 && index < 54) {
-+        return s->fsel[index] == 1;
-+    }
-+    return 0;
-+}
-+
-+static void gpset(BCM2835GpioState *s,
-+        uint32_t val, uint8_t start, uint8_t count, uint32_t *lev)
-+{
-+    uint32_t changes = val & ~*lev;
-+    uint32_t cur = 1;
-+
-+    int i;
-+    for (i = 0; i < count; i++) {
-+        if ((changes & cur) && (gpfsel_is_out(s, start + i))) {
-+            qemu_set_irq(s->out[start + i], 1);
++        if (rlen == 4) {
++            s->rsp[0] = RWORD(0);
++            s->rsp[1] = s->rsp[2] = s->rsp[3] = 0;
++        } else {
++            s->rsp[0] = RWORD(12);
++            s->rsp[1] = RWORD(8);
++            s->rsp[2] = RWORD(4);
++            s->rsp[3] = RWORD(0);
 +        }
-+        cur <<= 1;
-+    }
-+
-+    *lev |= val;
-+}
-+
-+static void gpclr(BCM2835GpioState *s,
-+        uint32_t val, uint8_t start, uint8_t count, uint32_t *lev)
-+{
-+    uint32_t changes = val & *lev;
-+    uint32_t cur = 1;
-+
-+    int i;
-+    for (i = 0; i < count; i++) {
-+        if ((changes & cur) && (gpfsel_is_out(s, start + i))) {
-+            qemu_set_irq(s->out[start + i], 0);
-+        }
-+        cur <<= 1;
-+    }
-+
-+    *lev &= ~val;
-+}
-+
-+static uint64_t bcm2835_gpio_read(void *opaque, hwaddr offset,
-+        unsigned size)
-+{
-+    BCM2835GpioState *s = (BCM2835GpioState *)opaque;
-+
-+    switch (offset) {
-+    case GPFSEL0:
-+    case GPFSEL1:
-+    case GPFSEL2:
-+    case GPFSEL3:
-+    case GPFSEL4:
-+    case GPFSEL5:
-+        return gpfsel_get(s, offset / 4);
-+    case GPSET0:
-+    case GPSET1:
-+        /* Write Only */
-+        return 0;
-+    case GPCLR0:
-+    case GPCLR1:
-+        /* Write Only */
-+        return 0;
-+    case GPLEV0:
-+        return s->lev0;
-+    case GPLEV1:
-+        return s->lev1;
-+    case GPEDS0:
-+    case GPEDS1:
-+    case GPREN0:
-+    case GPREN1:
-+    case GPFEN0:
-+    case GPFEN1:
-+    case GPHEN0:
-+    case GPHEN1:
-+    case GPLEN0:
-+    case GPLEN1:
-+    case GPAREN0:
-+    case GPAREN1:
-+    case GPAFEN0:
-+    case GPAFEN1:
-+    case GPPUD:
-+    case GPPUDCLK0:
-+    case GPPUDCLK1:
-+        /* Not implemented */
-+        return 0;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n",
-+                __func__, offset);
-+        break;
-+    }
-+
-+    return 0;
-+}
-+
-+static void bcm2835_gpio_write(void *opaque, hwaddr offset,
-+        uint64_t value, unsigned size)
-+{
-+    BCM2835GpioState *s = (BCM2835GpioState *)opaque;
-+
-+    switch (offset) {
-+    case GPFSEL0:
-+    case GPFSEL1:
-+    case GPFSEL2:
-+    case GPFSEL3:
-+    case GPFSEL4:
-+    case GPFSEL5:
-+        gpfsel_set(s, offset / 4, value);
-+        break;
-+    case GPSET0:
-+        gpset(s, value, 0, 32, &s->lev0);
-+        break;
-+    case GPSET1:
-+        gpset(s, value, 32, 22, &s->lev1);
-+        break;
-+    case GPCLR0:
-+        gpclr(s, value, 0, 32, &s->lev0);
-+        break;
-+    case GPCLR1:
-+        gpclr(s, value, 32, 22, &s->lev1);
-+        break;
-+    case GPLEV0:
-+    case GPLEV1:
-+        /* Read Only */
-+        break;
-+    case GPEDS0:
-+    case GPEDS1:
-+    case GPREN0:
-+    case GPREN1:
-+    case GPFEN0:
-+    case GPFEN1:
-+    case GPHEN0:
-+    case GPHEN1:
-+    case GPLEN0:
-+    case GPLEN1:
-+    case GPAREN0:
-+    case GPAREN1:
-+    case GPAFEN0:
-+    case GPAFEN1:
-+    case GPPUD:
-+    case GPPUDCLK0:
-+    case GPPUDCLK1:
-+        /* Not implemented */
-+        break;
-+    default:
-+        goto err_out;
++#undef RWORD
 +    }
 +    return;
 +
-+err_out:
-+    qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n",
-+            __func__, offset);
++error:
++    s->cmd |= SDCMD_FAIL_FLAG;
++    s->status |= SDHSTS_CMD_TIME_OUT;
 +}
 +
-+static void bcm2835_gpio_reset(DeviceState *dev)
++static void bcm2835_sdhost_fifo_push(BCM2835SDHostState *s, uint32_t value)
 +{
-+    BCM2835GpioState *s = BCM2835_GPIO(dev);
++    int n;
 +
-+    int i;
-+    for (i = 0; i < 6; i++) {
-+        gpfsel_set(s, i, 0);
++    if (s->fifo_len == BCM2835_SDHOST_FIFO_LEN) {
++        /* FIFO overflow */
++        return;
++    }
++    n = (s->fifo_pos + s->fifo_len) & (BCM2835_SDHOST_FIFO_LEN - 1);
++    s->fifo_len++;
++    s->fifo[n] = value;
++}
++
++static uint32_t bcm2835_sdhost_fifo_pop(BCM2835SDHostState *s)
++{
++    uint32_t value;
++
++    if (s->fifo_len == 0) {
++        /* FIFO underflow */
++        return 0;
++    }
++    value = s->fifo[s->fifo_pos];
++    s->fifo_len--;
++    s->fifo_pos = (s->fifo_pos + 1) & (BCM2835_SDHOST_FIFO_LEN - 1);
++    return value;
++}
++
++static void bcm2835_sdhost_fifo_run(BCM2835SDHostState *s)
++{
++    uint32_t value = 0;
++    int n;
++    int is_read;
++
++    is_read = (s->cmd & SDCMD_READ_CMD) != 0;
++    if (s->datacnt != 0 && (!is_read || sdbus_data_ready(&s->sdbus))) {
++        if (is_read) {
++            n = 0;
++            while (s->datacnt && s->fifo_len < BCM2835_SDHOST_FIFO_LEN) {
++                value |= (uint32_t)sdbus_read_data(&s->sdbus) << (n * 8);
++                s->datacnt--;
++                n++;
++                if (n == 4) {
++                    bcm2835_sdhost_fifo_push(s, value);
++                    n = 0;
++                    value = 0;
++                }
++            }
++            if (n != 0) {
++                bcm2835_sdhost_fifo_push(s, value);
++            }
++        } else { /* write */
++            n = 0;
++            while (s->datacnt > 0 && (s->fifo_len > 0 || n > 0)) {
++                if (n == 0) {
++                    value = bcm2835_sdhost_fifo_pop(s);
++                    n = 4;
++                }
++                n--;
++                s->datacnt--;
++                sdbus_write_data(&s->sdbus, value & 0xff);
++                value >>= 8;
++            }
++        }
++    }
++    if (s->datacnt == 0) {
++        s->status |= SDHSTS_DATA_FLAG;
++
++        s->edm &= ~0xf;
++        s->edm |= SDEDM_FSM_DATAMODE;
++
++        if (s->config & SDHCFG_DATA_IRPT_EN) {
++            s->status |= SDHSTS_SDIO_IRPT;
++        }
++
++        if ((s->cmd & SDCMD_BUSYWAIT) && (s->config & SDHCFG_BUSY_IRPT_EN)) {
++            s->status |= SDHSTS_BUSY_IRPT;
++        }
++
++        if ((s->cmd & SDCMD_WRITE_CMD) && (s->config & SDHCFG_BLOCK_IRPT_EN)) {
++            s->status |= SDHSTS_BLOCK_IRPT;
++        }
++
++        bcm2835_sdhost_update_irq(s);
 +    }
 +
-+    s->sd_fsel = 0;
-+
-+    s->lev0 = 0;
-+    s->lev1 = 0;
++    s->edm &= ~(0x1f << 4);
++    s->edm |= ((s->fifo_len & 0x1f) << 4);
 +}
 +
-+static const MemoryRegionOps bcm2835_gpio_ops = {
-+    .read = bcm2835_gpio_read,
-+    .write = bcm2835_gpio_write,
++static uint64_t bcm2835_sdhost_read(void *opaque, hwaddr offset,
++    unsigned size)
++{
++    BCM2835SDHostState *s = (BCM2835SDHostState *)opaque;
++    uint32_t res = 0;
++
++    switch (offset) {
++    case SDCMD:
++        res = s->cmd;
++        break;
++    case SDHSTS:
++        res = s->status;
++        break;
++    case SDRSP0:
++        res = s->rsp[0];
++        break;
++    case SDRSP1:
++        res = s->rsp[1];
++        break;
++    case SDRSP2:
++        res = s->rsp[2];
++        break;
++    case SDRSP3:
++        res = s->rsp[3];
++        break;
++    case SDEDM:
++        res = s->edm;
++        break;
++    case SDVDD:
++        res = s->vdd;
++        break;
++    case SDDATA:
++        res = bcm2835_sdhost_fifo_pop(s);
++        bcm2835_sdhost_fifo_run(s);
++        break;
++    case SDHBCT:
++        res = s->hbct;
++        break;
++    case SDHBLC:
++        res = s->hblc;
++        break;
++
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n",
++                      __func__, offset);
++        res = 0;
++        break;
++    }
++
++    return res;
++}
++
++static void bcm2835_sdhost_write(void *opaque, hwaddr offset,
++    uint64_t value, unsigned size)
++{
++    BCM2835SDHostState *s = (BCM2835SDHostState *)opaque;
++
++    switch (offset) {
++    case SDCMD:
++        s->cmd = value;
++        if (value & SDCMD_NEW_FLAG) {
++            bcm2835_sdhost_send_command(s);
++            bcm2835_sdhost_fifo_run(s);
++            s->cmd &= ~SDCMD_NEW_FLAG;
++        }
++        break;
++    case SDTOUT:
++        break;
++    case SDCDIV:
++        break;
++    case SDHSTS:
++        s->status &= ~value;
++        bcm2835_sdhost_update_irq(s);
++        break;
++    case SDARG:
++        s->cmdarg = value;
++        break;
++    case SDEDM:
++        if ((value & 0xf) == 0xf) {
++            /* power down */
++            value &= ~0xf;
++        }
++        s->edm = value;
++        break;
++    case SDHCFG:
++        s->config = value;
++        bcm2835_sdhost_fifo_run(s);
++        break;
++    case SDVDD:
++        s->vdd = value;
++        break;
++    case SDDATA:
++        bcm2835_sdhost_fifo_push(s, value);
++        bcm2835_sdhost_fifo_run(s);
++        break;
++    case SDHBCT:
++        s->hbct = value;
++        break;
++    case SDHBLC:
++        s->hblc = value;
++        s->datacnt = s->hblc * s->hbct;
++        bcm2835_sdhost_fifo_run(s);
++        break;
++
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n",
++                      __func__, offset);
++        break;
++    }
++}
++
++static const MemoryRegionOps bcm2835_sdhost_ops = {
++    .read = bcm2835_sdhost_read,
++    .write = bcm2835_sdhost_write,
 +    .endianness = DEVICE_NATIVE_ENDIAN,
 +};
 +
-+static const VMStateDescription vmstate_bcm2835_gpio = {
-+    .name = "bcm2835_gpio",
++static const VMStateDescription vmstate_bcm2835_sdhost = {
++    .name = TYPE_BCM2835_SDHOST,
 +    .version_id = 1,
 +    .minimum_version_id = 1,
 +    .fields = (VMStateField[]) {
-+        VMSTATE_UINT8_ARRAY(fsel, BCM2835GpioState, 54),
-+        VMSTATE_UINT32(lev0, BCM2835GpioState),
-+        VMSTATE_UINT32(lev1, BCM2835GpioState),
-+        VMSTATE_UINT8(sd_fsel, BCM2835GpioState),
++        VMSTATE_UINT32(cmd, BCM2835SDHostState),
++        VMSTATE_UINT32(cmdarg, BCM2835SDHostState),
++        VMSTATE_UINT32(status, BCM2835SDHostState),
++        VMSTATE_UINT32_ARRAY(rsp, BCM2835SDHostState, 4),
++        VMSTATE_UINT32(config, BCM2835SDHostState),
++        VMSTATE_UINT32(edm, BCM2835SDHostState),
++        VMSTATE_UINT32(vdd, BCM2835SDHostState),
++        VMSTATE_UINT32(hbct, BCM2835SDHostState),
++        VMSTATE_UINT32(hblc, BCM2835SDHostState),
++        VMSTATE_INT32(fifo_pos, BCM2835SDHostState),
++        VMSTATE_INT32(fifo_len, BCM2835SDHostState),
++        VMSTATE_UINT32_ARRAY(fifo, BCM2835SDHostState, BCM2835_SDHOST_FIFO_LEN),
++        VMSTATE_UINT32(datacnt, BCM2835SDHostState),
 +        VMSTATE_END_OF_LIST()
 +    }
 +};
 +
-+static void bcm2835_gpio_init(Object *obj)
++static void bcm2835_sdhost_init(Object *obj)
 +{
-+    BCM2835GpioState *s = BCM2835_GPIO(obj);
-+    DeviceState *dev = DEVICE(obj);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++    BCM2835SDHostState *s = BCM2835_SDHOST(obj);
 +
-+    memory_region_init_io(&s->iomem, obj,
-+            &bcm2835_gpio_ops, s, "bcm2835_gpio", 0x1000);
-+    sysbus_init_mmio(sbd, &s->iomem);
-+    qdev_init_gpio_out(dev, s->out, 54);
++    qbus_create_inplace(&s->sdbus, sizeof(s->sdbus),
++                        TYPE_BCM2835_SDHOST_BUS, DEVICE(s), "sd-bus");
++
++    memory_region_init_io(&s->iomem, obj, &bcm2835_sdhost_ops, s,
++                          TYPE_BCM2835_SDHOST, 0x1000);
++    sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->iomem);
++    sysbus_init_irq(SYS_BUS_DEVICE(s), &s->irq);
 +}
 +
-+static void bcm2835_gpio_realize(DeviceState *dev, Error **errp)
++static void bcm2835_sdhost_reset(DeviceState *dev)
 +{
-+    BCM2835GpioState *s = BCM2835_GPIO(dev);
-+    Object *obj;
-+    Error *err = NULL;
++    BCM2835SDHostState *s = BCM2835_SDHOST(dev);
 +
-+    obj = object_property_get_link(OBJECT(dev), "sdhci", &err);
-+    if (obj == NULL) {
-+        error_setg(errp, "%s: required sdhci link not found: %s",
-+                __func__, error_get_pretty(err));
-+        return;
-+    }
-+    s->sdhci = SYSBUS_SDHCI(obj);
-+
-+    obj = object_property_get_link(OBJECT(dev), "sdhost", &err);
-+    if (obj == NULL) {
-+        error_setg(errp, "%s: required sdhost link not found: %s",
-+                __func__, error_get_pretty(err));
-+        return;
-+    }
-+    s->sdhost = BCM2835_SDHOST(obj);
++    s->cmd = 0;
++    s->cmdarg = 0;
++    s->edm = 0x0000c60f;
++    s->config = 0;
++    s->hbct = 0;
++    s->hblc = 0;
++    s->datacnt = 0;
++    s->fifo_pos = 0;
++    s->fifo_len = 0;
 +}
 +
-+static void bcm2835_gpio_class_init(ObjectClass *klass, void *data)
++static void bcm2835_sdhost_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +
-+    dc->vmsd = &vmstate_bcm2835_gpio;
-+    dc->realize = &bcm2835_gpio_realize;
-+    dc->reset = &bcm2835_gpio_reset;
++    dc->reset = bcm2835_sdhost_reset;
++    dc->vmsd = &vmstate_bcm2835_sdhost;
 +}
 +
-+static const TypeInfo bcm2835_gpio_info = {
-+    .name          = TYPE_BCM2835_GPIO,
++static TypeInfo bcm2835_sdhost_info = {
++    .name          = TYPE_BCM2835_SDHOST,
 +    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(BCM2835GpioState),
-+    .instance_init = bcm2835_gpio_init,
-+    .class_init    = bcm2835_gpio_class_init,
++    .instance_size = sizeof(BCM2835SDHostState),
++    .class_init    = bcm2835_sdhost_class_init,
++    .instance_init = bcm2835_sdhost_init,
 +};
 +
-+static void bcm2835_gpio_register_types(void)
++static const TypeInfo bcm2835_sdhost_bus_info = {
++    .name = TYPE_BCM2835_SDHOST_BUS,
++    .parent = TYPE_SD_BUS,
++    .instance_size = sizeof(SDBus),
++};
++
++static void bcm2835_sdhost_register_types(void)
 +{
-+    type_register_static(&bcm2835_gpio_info);
++    type_register_static(&bcm2835_sdhost_info);
++    type_register_static(&bcm2835_sdhost_bus_info);
 +}
 +
-+type_init(bcm2835_gpio_register_types)
-diff --git a/include/hw/gpio/bcm2835_gpio.h b/include/hw/gpio/bcm2835_gpio.h
++type_init(bcm2835_sdhost_register_types)
+diff --git a/include/hw/sd/bcm2835_sdhost.h b/include/hw/sd/bcm2835_sdhost.h
 new file mode 100644
-index 0000000000..c03862b793
+index 0000000000..d716dbcd83
 --- /dev/null
-+++ b/include/hw/gpio/bcm2835_gpio.h
-@@ -0,0 +1,38 @@
++++ b/include/hw/sd/bcm2835_sdhost.h
+@@ -0,0 +1,48 @@
 +/*
-+ * Raspberry Pi (BCM2835) GPIO Controller
++ * Raspberry Pi (BCM2835) SD Host Controller
 + *
 + * Copyright (c) 2017 Antfield SAS
 + *
@@ -433,29 +497,39 @@ index 0000000000..c03862b793
 + * See the COPYING file in the top-level directory.
 + */
 +
-+#ifndef BCM2835_GPIO_H
-+#define BCM2835_GPIO_H
++#ifndef BCM2835_SDHOST_H
++#define BCM2835_SDHOST_H
 +
-+#include "hw/sd/sdhci.h"
-+#include "hw/sd/bcm2835_sdhost.h"
++#include "hw/sysbus.h"
++#include "hw/sd/sd.h"
 +
-+typedef struct BCM2835GpioState {
-+    SysBusDevice parent_obj;
++#define TYPE_BCM2835_SDHOST "bcm2835-sdhost"
++#define BCM2835_SDHOST(obj) \
++        OBJECT_CHECK(BCM2835SDHostState, (obj), TYPE_BCM2835_SDHOST)
 +
++#define BCM2835_SDHOST_FIFO_LEN 16
++
++typedef struct {
++    SysBusDevice busdev;
++    SDBus sdbus;
 +    MemoryRegion iomem;
 +
-+    SDHCIState *sdhci;
-+    BCM2835SDHostState *sdhost;
++    uint32_t cmd;
++    uint32_t cmdarg;
++    uint32_t status;
++    uint32_t rsp[4];
++    uint32_t config;
++    uint32_t edm;
++    uint32_t vdd;
++    uint32_t hbct;
++    uint32_t hblc;
++    int32_t fifo_pos;
++    int32_t fifo_len;
++    uint32_t fifo[BCM2835_SDHOST_FIFO_LEN];
++    uint32_t datacnt;
 +
-+    uint8_t fsel[54];
-+    uint32_t lev0, lev1;
-+    uint8_t sd_fsel;
-+    qemu_irq out[54];
-+} BCM2835GpioState;
-+
-+#define TYPE_BCM2835_GPIO "bcm2835_gpio"
-+#define BCM2835_GPIO(obj) \
-+    OBJECT_CHECK(BCM2835GpioState, (obj), TYPE_BCM2835_GPIO)
++    qemu_irq irq;
++} BCM2835SDHostState;
 +
 +#endif
 -- 
