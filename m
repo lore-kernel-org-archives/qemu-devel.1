@@ -1,26 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cgbp1-0007qJ-8J
+	(envelope-from <ehabkost@redhat.com>) id 1cgbp1-0007qK-8T
 	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 13:39:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cgboz-00074o-9G
+	(envelope-from <ehabkost@redhat.com>) id 1cgboy-00074d-3s
 	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 13:39:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48810)
+Received: from mx1.redhat.com ([209.132.183.28]:48790)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cgboy-00074i-W8
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 13:39:25 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 265F44D69C
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 18:39:25 +0000 (UTC)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cgbox-00073S-UV
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 13:39:24 -0500
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Wed, 22 Feb 2017 15:39:17 -0300
-Message-Id: <20170222183919.11928-2-ehabkost@redhat.com>
-In-Reply-To: <20170222183919.11928-1-ehabkost@redhat.com>
-References: <20170222183919.11928-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/3] i386: Create "max" CPU model
+Date: Wed, 22 Feb 2017 15:39:16 -0300
+Message-Id: <20170222183919.11928-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/3] i386: Add "max" CPU model to TCG and KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,144 +22,51 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: "Richard W.M. Jones" <rjones@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P. Berrange" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>, Christian Borntraeger <borntraeger@de.ibm.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Rename the existing "host" CPU model to "max, and set it to
-kvm_enabled=false. The new "max" CPU model will be able to enable
-all features supported by TCG out of the box, because its logic
-is based on x86_cpu_get_supported_feature_word(), which already
-works with TCG.
-
-A new KVM-specific "host" class was added, that simply inherits
-everything from "max" except the 'ordering' and 'description'
-fields.
-
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
 Changes v1 -> v2:
 * Fix build without CONFIG_KVM at lmce_supported()
----
- target/i386/cpu.c | 46 ++++++++++++++++++++++++++++++++--------------
- 1 file changed, 32 insertions(+), 14 deletions(-)
+* Rebased on top of my x86-next branch:
+  https://github.com/ehabkost/qemu x86-next
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index feb2110872..f7bd59617e 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1503,15 +1503,15 @@ void x86_cpu_change_kvm_default(const char *prop, const char *value)
- static uint32_t x86_cpu_get_supported_feature_word(FeatureWord w,
-                                                    bool migratable_only);
- 
--#ifdef CONFIG_KVM
--
- static bool lmce_supported(void)
- {
--    uint64_t mce_cap;
-+    uint64_t mce_cap = 0;
- 
-+#ifdef CONFIG_KVM
-     if (kvm_ioctl(kvm_state, KVM_X86_GET_MCE_CAP_SUPPORTED, &mce_cap) < 0) {
-         return false;
-     }
-+#endif
- 
-     return !!(mce_cap & MCG_LMCE_P);
- }
-@@ -1533,23 +1533,22 @@ static int cpu_x86_fill_model_id(char *str)
- 
- static X86CPUDefinition host_cpudef;
- 
--static Property host_x86_cpu_properties[] = {
-+static Property max_x86_cpu_properties[] = {
-     DEFINE_PROP_BOOL("migratable", X86CPU, migratable, true),
-     DEFINE_PROP_BOOL("host-cache-info", X86CPU, cache_info_passthrough, false),
-     DEFINE_PROP_END_OF_LIST()
- };
- 
--/* class_init for the "host" CPU model
-+/* class_init for the "max" CPU model
-  *
-  * This function may be called before KVM is initialized.
-  */
--static void host_x86_cpu_class_init(ObjectClass *oc, void *data)
-+static void max_x86_cpu_class_init(ObjectClass *oc, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(oc);
-     X86CPUClass *xcc = X86_CPU_CLASS(oc);
-     uint32_t eax = 0, ebx = 0, ecx = 0, edx = 0;
- 
--    xcc->kvm_required = true;
-     xcc->ordering = 9;
- 
-     host_cpuid(0x0, 0, &eax, &ebx, &ecx, &edx);
-@@ -1564,17 +1563,16 @@ static void host_x86_cpu_class_init(ObjectClass *oc, void *data)
- 
-     xcc->cpu_def = &host_cpudef;
-     xcc->model_description =
--        "KVM processor with all supported host features "
--        "(only available in KVM mode)";
-+        "Enables all features supported by the accelerator in the current host";
- 
-     /* level, xlevel, xlevel2, and the feature words are initialized on
-      * instance_init, because they require KVM to be initialized.
-      */
- 
--    dc->props = host_x86_cpu_properties;
-+    dc->props = max_x86_cpu_properties;
- }
- 
--static void host_x86_cpu_initfn(Object *obj)
-+static void max_x86_cpu_initfn(Object *obj)
- {
-     X86CPU *cpu = X86_CPU(obj);
-     CPUX86State *env = &cpu->env;
-@@ -1585,7 +1583,6 @@ static void host_x86_cpu_initfn(Object *obj)
-      */
-     cpu->max_features = true;
- 
--    /* If KVM is disabled, x86_cpu_realizefn() will report an error later */
-     if (kvm_enabled()) {
-         env->cpuid_min_level =
-             kvm_arch_get_supported_cpuid(s, 0x0, 0, R_EAX);
-@@ -1602,10 +1599,30 @@ static void host_x86_cpu_initfn(Object *obj)
-     object_property_set_bool(OBJECT(cpu), true, "pmu", &error_abort);
- }
- 
-+static const TypeInfo max_x86_cpu_type_info = {
-+    .name = X86_CPU_TYPE_NAME("max"),
-+    .parent = TYPE_X86_CPU,
-+    .instance_init = max_x86_cpu_initfn,
-+    .class_init = max_x86_cpu_class_init,
-+};
-+
-+#ifdef CONFIG_KVM
-+
-+static void host_x86_cpu_class_init(ObjectClass *oc, void *data)
-+{
-+    X86CPUClass *xcc = X86_CPU_CLASS(oc);
-+
-+    xcc->kvm_required = true;
-+    xcc->ordering = 8;
-+
-+    xcc->model_description =
-+        "KVM processor with all supported host features "
-+        "(only available in KVM mode)";
-+}
-+
- static const TypeInfo host_x86_cpu_type_info = {
-     .name = X86_CPU_TYPE_NAME("host"),
--    .parent = TYPE_X86_CPU,
--    .instance_init = host_x86_cpu_initfn,
-+    .parent = X86_CPU_TYPE_NAME("max"),
-     .class_init = host_x86_cpu_class_init,
- };
- 
-@@ -3781,6 +3798,7 @@ static void x86_cpu_register_types(void)
-     for (i = 0; i < ARRAY_SIZE(builtin_x86_defs); i++) {
-         x86_register_cpudef_type(&builtin_x86_defs[i]);
-     }
-+    type_register_static(&max_x86_cpu_type_info);
- #ifdef CONFIG_KVM
-     type_register_static(&host_x86_cpu_type_info);
- #endif
+Git branch for testing:
+  https://github.com/ehabkost/qemu-hacks work/x86-cpu-max-tcg
+
+libvirt code to use the new feature already exist, and were
+submitted to libvir-list, at:
+  https://www.mail-archive.com/libvir-list@redhat.com/msg142168.html
+
+---
+
+This is a replacement for the previous series that enabled the
+"host" CPU model on TCG. Now a new "max" CPU is being added,
+while keeping "host" KVM-specific.
+
+In addition to simply adding "max" as a copy of the existing
+"host" CPU model, additional patches change it to not use any
+host CPUID information when in TCG mode.
+
+---
+Cc: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>
+Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Jiri Denemark <jdenemar@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+
+Eduardo Habkost (3):
+  i386: Create "max" CPU model
+  i386: Make "max" model not use any host CPUID info on TCG
+  i386: Don't set CPUClass::cpu_def on "max" model
+
+ target/i386/cpu-qom.h |  4 ++-
+ target/i386/cpu.c     | 98 ++++++++++++++++++++++++++++++++-------------------
+ 2 files changed, 64 insertions(+), 38 deletions(-)
+
 -- 
 2.11.0.259.g40922b1
