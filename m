@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cgXa5-0001Ps-S1
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 09:07:46 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cgXb3-0002fm-KU
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 09:08:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cgXa4-0000nr-VF
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 09:07:45 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cgXb2-0001Kk-OP
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 09:08:45 -0500
 References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
-	<1487689130-30373-18-git-send-email-kwolf@redhat.com>
+	<1487689130-30373-19-git-send-email-kwolf@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <b72cc2cd-73f5-108d-cc5d-4a6ac10b829c@redhat.com>
-Date: Wed, 22 Feb 2017 15:07:35 +0100
+Message-ID: <7a65cd44-b141-bd46-2727-1c96aa3b965f@redhat.com>
+Date: Wed, 22 Feb 2017 15:08:34 +0100
 MIME-Version: 1.0
-In-Reply-To: <1487689130-30373-18-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1487689130-30373-19-git-send-email-kwolf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="3JqN4r14voap8aLCDPSr7g204drgnm3x4"
-Subject: Re: [Qemu-devel] [PATCH 17/54] block: Request child permissions in
- filter drivers
+	boundary="LKcwwU5njos9Jfq7iHx2anAdH2SVwLTj7"
+Subject: Re: [Qemu-devel] [PATCH 18/54] block: Default .bdrv_child_perm()
+ for format drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +29,57 @@ To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3JqN4r14voap8aLCDPSr7g204drgnm3x4
+--LKcwwU5njos9Jfq7iHx2anAdH2SVwLTj7
 From: Max Reitz <mreitz@redhat.com>
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
-Message-ID: <b72cc2cd-73f5-108d-cc5d-4a6ac10b829c@redhat.com>
-Subject: Re: [PATCH 17/54] block: Request child permissions in filter drivers
+Message-ID: <7a65cd44-b141-bd46-2727-1c96aa3b965f@redhat.com>
+Subject: Re: [PATCH 18/54] block: Default .bdrv_child_perm() for format
+ drivers
 References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
- <1487689130-30373-18-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1487689130-30373-18-git-send-email-kwolf@redhat.com>
+ <1487689130-30373-19-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1487689130-30373-19-git-send-email-kwolf@redhat.com>
 Content-Type: text/plain; charset=iso-8859-15
 Content-Transfer-Encoding: quoted-printable
 
 On 21.02.2017 15:58, Kevin Wolf wrote:
-> All callers will have to request permissions for all of their child
-> nodes. Block drivers that act as simply filters can use the default
-> implementation of .bdrv_child_perm().
+> Almost all format drivers have the same characteristics as far as
+> permissions are concerned: They have one or more children for storing
+> their own data and, more importantly, metadata (can be written to and
+> grow even without external write requests, must be protected against
+> other writers and present consistent data) and optionally a backing fil=
+e
+> (this is just data, so like for a filter, it only depends on what the
+> parent nodes need).
+>=20
+> This provides a default implementation that can be shared by most of
+> our format drivers.
 >=20
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  block/blkdebug.c    | 2 ++
->  block/blkreplay.c   | 1 +
->  block/blkverify.c   | 1 +
->  block/quorum.c      | 2 ++
->  block/raw-format.c  | 1 +
->  block/replication.c | 1 +
->  6 files changed, 8 insertions(+)
+>  block.c                   | 42 +++++++++++++++++++++++++++++++++++++++=
++++
+>  include/block/block_int.h |  8 ++++++++
+>  2 files changed, 50 insertions(+)
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---3JqN4r14voap8aLCDPSr7g204drgnm3x4
+--LKcwwU5njos9Jfq7iHx2anAdH2SVwLTj7
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlitmycSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AaogH/jyhNf/QGtYVSck3KDytTryqJHJ/j7Oz
-rHfS6rFzZ51arA6PINMrC3SkVkf+lzuChZVnh8FhrgCvUe9CWI8AdNM4xN1lQ3aQ
-WpBU367kVziIx2bupLRw3hDAWfVIeCm0IvnTeiAwSMbYEWwvkmF82IQM/wFUi5OK
-Wdg4Ws2L2gO6Z5umIaA04kB/0uKlN7rWFCEY/tBNWT8KBCsbJBDXWyEm9s2Lkk7d
-X1M1quwv5Ao3okDldhSH8XBAPD1i0LAuTMsGKX6vVN2cuUc2JT+igAy9AbvdiBOU
-rnXYGKR286Pe89KHNsK4w4jEPH83/mFAlZh8tM/e9sUFDFFTy1kmRDc=
-=+ozY
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlitm2ISHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AhGQH/1qqzQ/5G+9m/PBmWE+1tDfQV5QsJEi9
+KGq+gfw8ke9uMTTQDczhyazQ2tx+UXKKZ5/6ZaoRpoGbBs05oizgqP1zQ0H7MZHG
+eUG53+by5EusrStq5zbp4lVg9s6Lo4jv+hzz5ocDisYThPKCPtRdGvq3ce3LpPXK
+DDAPINxFCFFiWdYdfMpaP+fN23a3CzBAhAtpCaMoAMiqBD3YFxNs6PhKLHcmvKJL
+KZ02mU4+pmzWLdoLeOPJxG+0o1nbg41lwI2XFHNeGqbMOztpBxpVLHaBYPhprmDB
+se0Fm0Llroet72KUM+ozY9ot5WlFReazvKMVtss8L0hZxfDSlrLCNBo=
+=3mpD
 -----END PGP SIGNATURE-----
 
---3JqN4r14voap8aLCDPSr7g204drgnm3x4--
+--LKcwwU5njos9Jfq7iHx2anAdH2SVwLTj7--
