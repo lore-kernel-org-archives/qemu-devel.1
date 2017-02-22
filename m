@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cgfdR-0003eC-QO
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 17:43:47 -0500
+	(envelope-from <clement.deschamps@antfield.fr>) id 1cgfsr-000055-Ax
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 17:59:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cgfdO-00035u-IV
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 17:43:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49552)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cgfdO-00033g-9E
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 17:43:42 -0500
-References: <20170222192647.19690-1-ehabkost@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f2e5c730-c47c-8a06-d5b0-820e6db61d5e@redhat.com>
-Date: Wed, 22 Feb 2017 16:43:37 -0600
+	(envelope-from <clement.deschamps@antfield.fr>) id 1cgfsq-0007XT-GS
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 17:59:41 -0500
+References: <20170222112338.25492-1-clement.deschamps@antfield.fr>
+	<20170222112338.25492-4-clement.deschamps@antfield.fr>
+	<DM5PR03MB2827C1EEB91C11DEF0FBE9D89E500@DM5PR03MB2827.namprd03.prod.outlook.com>
+From: Clement Deschamps <clement.deschamps@antfield.fr>
+Message-ID: <fd715c76-862b-2f05-bef7-bdc73275070d@antfield.fr>
+Date: Wed, 22 Feb 2017 23:59:37 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170222192647.19690-1-ehabkost@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="6upa1rsK6OtR6vc94gJWCH5dllwmdwpqH"
-Subject: Re: [Qemu-devel] [libvirt] [PATCH RESEND] qdev: Make "hotplugged"
- property read-only
+In-Reply-To: <DM5PR03MB2827C1EEB91C11DEF0FBE9D89E500@DM5PR03MB2827.namprd03.prod.outlook.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] bcm2835: add sdhost and gpio
+ controllers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,108 +25,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, Laine Stump <laine@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
+To: Andrew Baumann <Andrew.Baumann@microsoft.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6upa1rsK6OtR6vc94gJWCH5dllwmdwpqH
-From: Eric Blake <eblake@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com,
- Laine Stump <laine@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?=
- <afaerber@suse.de>
-Message-ID: <f2e5c730-c47c-8a06-d5b0-820e6db61d5e@redhat.com>
-Subject: Re: [libvirt] [PATCH RESEND] qdev: Make "hotplugged" property
- read-only
-References: <20170222192647.19690-1-ehabkost@redhat.com>
-In-Reply-To: <20170222192647.19690-1-ehabkost@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 02/22/2017 01:26 PM, Eduardo Habkost wrote:
-> The "hotplugged" property is user visible, but it was never meant
-> to be set by the user. There are probably multiple ways to break
-> or crash device code by overriding the property. For example, we
-> recently fixed a crash in rtc_set_memory() related to the
-> property (commit 26ef65beab852caf2b1ef4976e3473f2d525164d).
->=20
-> There has been some discussion about making management software
-> use "hotplugged=3Don" on migration, to indicate devices that were
-> hotplugged in the migration source. There were other suggestions
-> to address this, like including the "hotplugged" field in the
-> migration stream instead of requiring it to be set propertly.
-
-s/propertly/properly/
-
->=20
-> Whatever solution we choose in the future, this patch disables
-> setting "hotplugged" explicitly in the command-line by now,
-> because the ability to set the property is unused, untested, and
-> undocumented.
->=20
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  hw/core/qdev.c | 9 +--------
->  1 file changed, 1 insertion(+), 8 deletions(-)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
->=20
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 06ba02e2a3..800c9ca23f 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -1016,13 +1016,6 @@ static bool device_get_hotplugged(Object *obj, E=
-rror **err)
->      return dev->hotplugged;
->  }
-> =20
-> -static void device_set_hotplugged(Object *obj, bool value, Error **err=
-)
-> -{
-> -    DeviceState *dev =3D DEVICE(obj);
-> -
-> -    dev->hotplugged =3D value;
-> -}
-> -
->  static void device_initfn(Object *obj)
->  {
->      DeviceState *dev =3D DEVICE(obj);
-> @@ -1042,7 +1035,7 @@ static void device_initfn(Object *obj)
->      object_property_add_bool(obj, "hotpluggable",
->                               device_get_hotpluggable, NULL, NULL);
->      object_property_add_bool(obj, "hotplugged",
-> -                             device_get_hotplugged, device_set_hotplug=
-ged,
-> +                             device_get_hotplugged, NULL,
->                               &error_abort);
-> =20
->      class =3D object_get_class(OBJECT(dev));
->=20
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+Hello,
 
 
---6upa1rsK6OtR6vc94gJWCH5dllwmdwpqH
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+On 02/22/2017 07:27 PM, Andrew Baumann wrote:
+> Hi,
+>
+>> From: Clement Deschamps [mailto:clement.deschamps@antfield.fr]
+>> Sent: Wednesday, 22 February 2017 3:24
+>> Subject: [PATCH v2 3/3] bcm2835: add sdhost and gpio controllers
+>>
+>> This adds the bcm2835_sdhost and bcm2835_gpio to the BCM2835 platform.=
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+>>
+>> The bcm2835_gpio has a link to both the sdhci and sdhost controllers f=
+or
+>> supporting the alternate function of GPIOs 48-53 (SD controller select=
+ion)
+>>
+>> Signed-off-by: Clement Deschamps <clement.deschamps@antfield.fr>
+> [...]
+>> +    /* SDHOST */
+>> +    object_property_set_bool(OBJECT(&s->sdhost), true, "realized", &e=
+rr);
+>> +    if (err) {
+>> +        error_propagate(errp, err);
+>> +        return;
+>> +    }
+>> +
+>> +    memory_region_add_subregion(&s->peri_mr, MMCI0_OFFSET,
+>> +                sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->sdhost), 0)=
+);
+>> +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->sdhost), 0,
+>> +        qdev_get_gpio_in_named(DEVICE(&s->ic), BCM2835_IC_GPU_IRQ,
+>> +                               INTERRUPT_SDIO));
+>> +    object_property_add_alias(OBJECT(s), "sd-bus-2", OBJECT(&s->sdhos=
+t),
+>> +                              "sd-bus", &err);
+> Is this alias still meaningful / needed, or is it a relic from the prev=
+ious version? Right now it doesn't appear to be used, and I'm thinking th=
+at if someone did try to use it (e.g. at the board level by connecting an=
+ SD card) then the new GPIO logic would allow swapping the two SD cards b=
+etween the two controllers, which doesn't sound like a faithful recreatio=
+n of the hardware.
+>
+> Otherwise,
+> Reviewed-by: Andrew Baumann <Andrew.Baumann@microsoft.com>
+>
+> Cheers,
+> Andrew
 
-iQEcBAEBCAAGBQJYrhQZAAoJEKeha0olJ0NqYkYH/iD5vHGqLx51Cm2xqqozgWgW
-NR/e6N6MnklYiRrYQtRysLboFkjg2yPWe/pxGM+nMpY1RTaiPS+YbWzJxPwUF+9q
-U39OAhE89OTJCTUm32f32Cs+rIH/5Ax+o+fPWmGlxfwR8DkHLFkC7BzhyilfJWRT
-jM5kPH5Jfu7Chk8ZA6J3CJGYrLE5bufR5pGoPPlnbqO/GNBCWWd0NANVSxaOjRw7
-eQkBv3gxCdjWG5bbCmm+/OO1+KDiV+scdYe1F80IEG2ceMAB8S1XVIR6mFOGTAwl
-SglwQUkWvi6QZzphwB99gfom8sayt+kFWsFqlXvPwwTUhRI3+2f+jaQ2G7BwNug=
-=AqFF
------END PGP SIGNATURE-----
+Thank you Andrew for your review.
 
---6upa1rsK6OtR6vc94gJWCH5dllwmdwpqH--
+You're right, we don't need to expose anymore the sdbus of the sdhost.
+We can remove this alias.
+
+
+Peter, do you agree with the sdcard reparenting function I implemented
+in the GPIO controller (following your advices) ?
+
+
+Best,
+Cl=E9ment
