@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cgake-0007Jx-ER
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:30:53 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cgbBa-0006tW-9q
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:58:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cgakb-0005iy-A6
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:30:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49028)
+	(envelope-from <dgilbert@redhat.com>) id 1cgbBX-0004WP-8z
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:58:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55538)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1cgakb-0005iK-1c
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:30:49 -0500
-Date: Wed, 22 Feb 2017 10:30:47 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170222103047.2c1b63f2@t450s.home>
-In-Reply-To: <1487742565-2513-1-git-send-email-peterx@redhat.com>
-References: <1487742565-2513-1-git-send-email-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cgbBX-0004WD-44
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:58:39 -0500
+Date: Wed, 22 Feb 2017 17:58:33 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170222175832.GB2352@work-vm>
+References: <20170222162507.25987-1-alex.bennee@linaro.org>
+	<CAFEAcA8VQAE9_THkm45SS5YoO8cAnf60bCJ4iTaoH+6aL-Qo3w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] intel_iommu: make sure its init before PCI
- dev
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8VQAE9_THkm45SS5YoO8cAnf60bCJ4iTaoH+6aL-Qo3w@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hmp: add PC information for ARM vCPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,109 +28,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, yi.l.liu@intel.com, "\\  Michael S . Tsirkin \\ " <mst@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Wed, 22 Feb 2017 13:49:25 +0800
-Peter Xu <peterx@redhat.com> wrote:
+* Peter Maydell (peter.maydell@linaro.org) wrote:
+> On 22 February 2017 at 16:25, Alex Benn=E9e <alex.bennee@linaro.org> wr=
+ote:
+> > Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> > ---
+> >  cpus.c           |  6 ++++++
+> >  hmp.c            |  3 +++
+> >  qapi-schema.json | 14 +++++++++++++-
+> >  3 files changed, 22 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/cpus.c b/cpus.c
+> > index 559a0805bc..dc8dbfb0f0 100644
+> > --- a/cpus.c
+> > +++ b/cpus.c
+> > @@ -1869,6 +1869,9 @@ CpuInfoList *qmp_query_cpus(Error **errp)
+> >  #elif defined(TARGET_TRICORE)
+> >          TriCoreCPU *tricore_cpu =3D TRICORE_CPU(cpu);
+> >          CPUTriCoreState *env =3D &tricore_cpu->env;
+> > +#elif defined(TARGET_AARCH64)
+> > +        ARMCPU *arm_cpu =3D ARM_CPU(cpu);
+> > +        CPUARMState *env =3D &arm_cpu->env;
+> >  #endif
+> >
+> >          cpu_synchronize_state(cpu);
+> > @@ -1896,6 +1899,9 @@ CpuInfoList *qmp_query_cpus(Error **errp)
+> >  #elif defined(TARGET_TRICORE)
+> >          info->value->arch =3D CPU_INFO_ARCH_TRICORE;
+> >          info->value->u.tricore.PC =3D env->PC;
+> > +#elif defined(TARGET_AARCH64)
+> > +        info->value->arch =3D CPU_INFO_ARCH_ARM;
+> > +        info->value->u.arm.pc =3D env->pc;
+> >  #else
+> >          info->value->arch =3D CPU_INFO_ARCH_OTHER;
+> >  #endif
+>=20
+> My standard reaction when I see patches adding another
+> arm to a target-ifdef ladder like this is to ask whether
+> we can refactor this so that the target-specific
+> code lives in target/$ARCH instead...
 
-> Intel vIOMMU devices are created with "-device" parameter, while here
-> actually we need to make sure this device will be created before some
-> other PCI devices (like vfio-pci devices) so that we know iommu_fn will
-> be setup correctly before realizations of those PCI devices.
-> 
-> Here we do explicit check to make sure intel-iommu device will be inited
-> before all the rest of the PCI devices. This is done by checking against
-> the devices dangled under current root PCIe bus and we should see
-> nothing there besides integrated ICH9 ones.
-> 
-> If the user violated this rule, we abort the program.
-> 
-> Maybe one day we will be able to manage the ordering of device
-> initialization, and then we can grant VT-d devices a higher init
-> priority. But before that, let's have this explicit check to make sure
-> of it.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  hw/i386/intel_iommu.c | 40 ++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 40 insertions(+)
-> 
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 22d8226..db74124 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -31,6 +31,7 @@
->  #include "hw/i386/apic-msidef.h"
->  #include "hw/boards.h"
->  #include "hw/i386/x86-iommu.h"
-> +#include "hw/i386/ich9.h"
->  #include "hw/pci-host/q35.h"
->  #include "sysemu/kvm.h"
->  #include "hw/i386/apic_internal.h"
-> @@ -2560,6 +2561,41 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
->      return true;
->  }
->  
-> +static bool vtd_has_inited_pci_devices(PCIBus *bus, Error **errp)
-> +{
-> +    int i;
-> +    uint8_t func;
-> +
-> +    /* We check against root bus */
-> +    assert(bus && pci_bus_is_root(bus));
-> +
-> +    /*
-> +     * We need to make sure vIOMMU device is created before other PCI
-> +     * devices other than the integrated ICH9 ones, so that they can
-> +     * get correct iommu_fn setup even during its realize(). Some
-> +     * devices (e.g., vfio-pci) will need a correct iommu_fn to work.
-> +     */
-> +    for (i = 1; i < PCI_FUNC_MAX * PCI_SLOT_MAX; i++) {
-> +        /* Skip the checking against ICH9 integrated devices */
-> +        if (PCI_SLOT(i) == ICH9_LPC_DEV) {
-> +            func = PCI_FUNC(i);
-> +            if (func == ICH9_LPC_FUNC ||
-> +                func == ICH9_SATA1_FUNC ||
-> +                func == ICH9_SMB_FUNC) {
-> +                continue;
-> +            }
-> +        }
+It feels like that should be possible with PC; but then you get
+the weird outliers; x86 that adds in CS, but OK that could be wrapped
+up in a target function; and then SPARC that's got pc and npc
+just to be different.
 
+Dave
 
-Whitelisting specific devfns seems pretty sketchy and fragile.  Can we
-even assume we're on a Q35 chipset?  I don't see that vtd_realize()
-takes any particular precautions not to allow initialization on 440fx,
-or whatever generic chipset we come up with next that may not have
-these specific devices.  It would probably be a better idea to use
-object_dynamic_cast() if you want to whitelist specific devices.
-Perhaps this could even be used to validate the chipset as well.
-Thanks,
-
-Alex
-
-> +
-> +        if (bus->devices[i]) {
-> +            error_setg(errp, "Please init intel-iommu before "
-> +                       "other PCI devices");
-> +            return true;
-> +        }
-> +    }
-> +
-> +    return false;
-> +}
-> +
->  static void vtd_realize(DeviceState *dev, Error **errp)
->  {
->      PCMachineState *pcms = PC_MACHINE(qdev_get_machine());
-> @@ -2567,6 +2603,10 @@ static void vtd_realize(DeviceState *dev, Error **errp)
->      IntelIOMMUState *s = INTEL_IOMMU_DEVICE(dev);
->      X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(dev);
->  
-> +    if (vtd_has_inited_pci_devices(bus, errp)) {
-> +        return;
-> +    }
-> +
->      VTD_DPRINTF(GENERAL, "");
->      x86_iommu->type = TYPE_INTEL;
->  
+> thanks
+> -- PMM
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
