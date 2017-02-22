@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paulus@ozlabs.org>) id 1cgPQd-0000kP-EH
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 00:25:28 -0500
+	(envelope-from <peterx@redhat.com>) id 1cgPo0-0006iL-Tt
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 00:49:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paulus@ozlabs.org>) id 1cgPQZ-0008JI-CS
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 00:25:27 -0500
-Received: from ozlabs.org ([103.22.144.67]:45441)
+	(envelope-from <peterx@redhat.com>) id 1cgPnz-0005bi-KA
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 00:49:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56348)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <paulus@ozlabs.org>) id 1cgPQZ-0008Gc-0o
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 00:25:23 -0500
-Date: Wed, 22 Feb 2017 16:25:11 +1100
-From: Paul Mackerras <paulus@ozlabs.org>
-Message-ID: <20170222052511.GA4313@fergus.ozlabs.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] Background to Yong Ji's patch
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cgPnz-0005ba-BT
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 00:49:35 -0500
+From: Peter Xu <peterx@redhat.com>
+Date: Wed, 22 Feb 2017 13:49:25 +0800
+Message-Id: <1487742565-2513-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH] intel_iommu: make sure its init before PCI dev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,46 +22,94 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Alex Williamson <alex.williamson@redhat.com>, yi.l.liu@intel.com, "\\  Michael S . Tsirkin \\ " <mst@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>, peterx@redhat.com
 
-I thought it might help to explain some more of the background to Yong
-Ji's recent patch "memory: make ram device read/write endian
-sensitive".  I don't know whether that patch touches the right code or
-not, but with a bit more background, maybe somebody can tell us what
-code does need to be fixed.
+Intel vIOMMU devices are created with "-device" parameter, while here
+actually we need to make sure this device will be created before some
+other PCI devices (like vfio-pci devices) so that we know iommu_fn will
+be setup correctly before realizations of those PCI devices.
 
-This patch fixes an issue with passing through a Chelsio 10Gb network
-adapter to a guest on POWER8.  The host is running a recent upstream
-kernel plus a patch from Yong Ji to align PCI BARs to the system page
-size.  The guest is running Ubuntu 16.04.  Both host and guest are
-little-endian.
+Here we do explicit check to make sure intel-iommu device will be inited
+before all the rest of the PCI devices. This is done by checking against
+the devices dangled under current root PCIe bus and we should see
+nothing there besides integrated ICH9 ones.
 
-A critical factor here is QEMU commit 95251725, also from Yong Ji.  If
-the guest is run using a qemu from the parent of that commit, it works
-properly.  With a qemu built from 95251725, or a qemu built from v2.8,
-it doesn't work.
+If the user violated this rule, we abort the program.
 
-The problem in the failing case boils down to MMIO reads from BAR 0 of
-the device coming back byte-swapped.
+Maybe one day we will be able to manage the ordering of device
+initialization, and then we can grant VT-d devices a higher init
+priority. But before that, let's have this explicit check to make sure
+of it.
 
-In each case, BAR 0 starts out page-aligned in the host, but the guest
-reassigns it to a non-page-aligned address.  That means that the guest
-doesn't access the device registers in BAR 0 directly; instead the
-MMIO accesses are emulated by QEMU.
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ hw/i386/intel_iommu.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
-Before 95251725, it seems that QEMU never attempts to make the BAR
-directly accessible (I think because the BAR is smaller than a page).
-With 95251725, I believe QEMU initially makes the BAR directly
-accessible, and then when the guest changes the BAR address to a
-non-page-aligned value, QEMU switches it back to emulation.  The
-emulation in this case must be using a different code path from the
-emulation that was being done prior to 95251725, since we get
-byte-swapped values in this case but not the prior case.
-
-Then, with 95251725 plus the recent patch from Yong Ji, the values
-read from BAR 0 are no longer byte-swapped, and the driver works
-correctly.
-
-Please keep me cc'd on any replies, since I'm not subscribed to this
-list.
-
-Paul.
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 22d8226..db74124 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -31,6 +31,7 @@
+ #include "hw/i386/apic-msidef.h"
+ #include "hw/boards.h"
+ #include "hw/i386/x86-iommu.h"
++#include "hw/i386/ich9.h"
+ #include "hw/pci-host/q35.h"
+ #include "sysemu/kvm.h"
+ #include "hw/i386/apic_internal.h"
+@@ -2560,6 +2561,41 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+     return true;
+ }
+ 
++static bool vtd_has_inited_pci_devices(PCIBus *bus, Error **errp)
++{
++    int i;
++    uint8_t func;
++
++    /* We check against root bus */
++    assert(bus && pci_bus_is_root(bus));
++
++    /*
++     * We need to make sure vIOMMU device is created before other PCI
++     * devices other than the integrated ICH9 ones, so that they can
++     * get correct iommu_fn setup even during its realize(). Some
++     * devices (e.g., vfio-pci) will need a correct iommu_fn to work.
++     */
++    for (i = 1; i < PCI_FUNC_MAX * PCI_SLOT_MAX; i++) {
++        /* Skip the checking against ICH9 integrated devices */
++        if (PCI_SLOT(i) == ICH9_LPC_DEV) {
++            func = PCI_FUNC(i);
++            if (func == ICH9_LPC_FUNC ||
++                func == ICH9_SATA1_FUNC ||
++                func == ICH9_SMB_FUNC) {
++                continue;
++            }
++        }
++
++        if (bus->devices[i]) {
++            error_setg(errp, "Please init intel-iommu before "
++                       "other PCI devices");
++            return true;
++        }
++    }
++
++    return false;
++}
++
+ static void vtd_realize(DeviceState *dev, Error **errp)
+ {
+     PCMachineState *pcms = PC_MACHINE(qdev_get_machine());
+@@ -2567,6 +2603,10 @@ static void vtd_realize(DeviceState *dev, Error **errp)
+     IntelIOMMUState *s = INTEL_IOMMU_DEVICE(dev);
+     X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(dev);
+ 
++    if (vtd_has_inited_pci_devices(bus, errp)) {
++        return;
++    }
++
+     VTD_DPRINTF(GENERAL, "");
+     x86_iommu->type = TYPE_INTEL;
+ 
+-- 
+2.7.4
