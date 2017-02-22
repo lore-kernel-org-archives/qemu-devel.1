@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgNpO-0004iA-Gt
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgNpO-0004iC-NP
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 22:42:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgNpJ-0002tj-Fa
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgNpJ-0002uk-R7
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 22:42:54 -0500
-Received: from [45.249.212.187] (port=2539 helo=dggrg01-dlp.huawei.com)
+Received: from [45.249.212.187] (port=2538 helo=dggrg01-dlp.huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgNpI-0002pl-RL
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgNpI-0002pk-Rb
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 22:42:49 -0500
 From: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Date: Wed, 22 Feb 2017 11:42:05 +0800
-Message-ID: <1487734936-43472-5-git-send-email-zhang.zhanghailiang@huawei.com>
+Date: Wed, 22 Feb 2017 11:42:02 +0800
+Message-ID: <1487734936-43472-2-git-send-email-zhang.zhanghailiang@huawei.com>
 In-Reply-To: <1487734936-43472-1-git-send-email-zhang.zhanghailiang@huawei.com>
 References: <1487734936-43472-1-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 04/15] COLO: integrate colo compare with colo
- frame
+Subject: [Qemu-devel] [PATCH 01/15] net/colo: Add notifier/callback related
+ helpers for filter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,118 +29,156 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, dgilbert@redhat.com, zhangchen.fnst@cn.fujitsu.com
 Cc: lizhijian@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Jason Wang <jasowang@redhat.com>
 
-For COLO FT, both the PVM and SVM run at the same time,
-only sync the state while it needs.
-
-So here, let SVM runs while not doing checkpoint,
-Besides, change DEFAULT_MIGRATE_X_CHECKPOINT_DELAY to 200*100.
+We will use this notifier to help COLO to notify filter object
+to do something, like do checkpoint, or process failover event.
 
 Cc: Jason Wang <jasowang@redhat.com>
 Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 ---
- migration/colo.c      | 25 +++++++++++++++++++++++++
- migration/migration.c |  2 +-
- 2 files changed, 26 insertions(+), 1 deletion(-)
+ net/colo.c | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ net/colo.h | 18 ++++++++++++
+ 2 files changed, 110 insertions(+)
 
-diff --git a/migration/colo.c b/migration/colo.c
-index 712308e..fb8d8fd 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -19,8 +19,11 @@
- #include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "migration/failover.h"
-+#include "net/colo-compare.h"
-+#include "net/colo.h"
+diff --git a/net/colo.c b/net/colo.c
+index 8cc166b..1697150 100644
+--- a/net/colo.c
++++ b/net/colo.c
+@@ -15,6 +15,7 @@
+ #include "qemu/osdep.h"
+ #include "trace.h"
+ #include "net/colo.h"
++#include "qapi/error.h"
  
- static bool vmstate_loading;
-+static Notifier packets_compare_notifier;
+ uint32_t connection_key_hash(const void *opaque)
+ {
+@@ -209,3 +210,94 @@ Connection *connection_get(GHashTable *connection_track_table,
  
- #define COLO_BUFFER_BASE_SIZE (4 * 1024 * 1024)
- 
-@@ -263,6 +266,7 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
-     if (local_err) {
-         goto out;
-     }
-+
-     /* Reset channel-buffer directly */
-     qio_channel_io_seek(QIO_CHANNEL(bioc), 0, 0, NULL);
-     bioc->usage = 0;
-@@ -283,6 +287,11 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
-         goto out;
-     }
- 
-+    colo_notify_compares_event(NULL, COLO_CHECKPOINT, &local_err);
-+    if (local_err) {
-+        goto out;
-+    }
-+
-     /* Disable block migration */
-     s->params.blk = 0;
-     s->params.shared = 0;
-@@ -341,6 +350,11 @@ out:
-     return ret;
+     return conn;
  }
- 
-+static void colo_compare_notify_checkpoint(Notifier *notifier, void *data)
++
++static gboolean
++filter_notify_prepare(GSource *source, gint *timeout)
 +{
-+    colo_checkpoint_notify(data);
++    *timeout = -1;
++
++    return FALSE;
 +}
 +
- static void colo_process_checkpoint(MigrationState *s)
- {
-     QIOChannelBuffer *bioc;
-@@ -357,6 +371,9 @@ static void colo_process_checkpoint(MigrationState *s)
-         goto out;
-     }
- 
-+    packets_compare_notifier.notify = colo_compare_notify_checkpoint;
-+    colo_compare_register_notifier(&packets_compare_notifier);
++static gboolean
++filter_notify_check(GSource *source)
++{
++    FilterNotifier *notify = (FilterNotifier *)source;
 +
-     /*
-      * Wait for Secondary finish loading VM states and enter COLO
-      * restore.
-@@ -402,6 +419,7 @@ out:
-         qemu_fclose(fb);
-     }
- 
-+    colo_compare_unregister_notifier(&packets_compare_notifier);
-     timer_del(s->colo_delay_timer);
- 
-     /* Hope this not to be too long to wait here */
-@@ -518,6 +536,11 @@ void *colo_process_incoming_thread(void *opaque)
-             goto out;
-         }
- 
-+        qemu_mutex_lock_iothread();
-+        vm_stop_force_state(RUN_STATE_COLO);
-+        trace_colo_vm_state_change("run", "stop");
-+        qemu_mutex_unlock_iothread();
++    return notify->pfd.revents & (G_IO_IN | G_IO_HUP | G_IO_ERR);
++}
 +
-         /* FIXME: This is unnecessary for periodic checkpoint mode */
-         colo_send_message(mis->to_src_file, COLO_MESSAGE_CHECKPOINT_REPLY,
-                      &local_err);
-@@ -571,6 +594,8 @@ void *colo_process_incoming_thread(void *opaque)
-         }
++static gboolean
++filter_notify_dispatch(GSource *source,
++                       GSourceFunc callback,
++                       gpointer user_data)
++{
++    FilterNotifier *notify = (FilterNotifier *)source;
++    int revents;
++    int ret;
++
++    revents = notify->pfd.revents & notify->pfd.events;
++    if (revents & (G_IO_IN | G_IO_HUP | G_IO_ERR)) {
++        ret = event_notifier_test_and_clear(&notify->event);
++        if (notify->cb) {
++            notify->cb(notify, ret);
++        }
++    }
++    return TRUE;
++}
++
++static void
++filter_notify_finalize(GSource *source)
++{
++    FilterNotifier *notify = (FilterNotifier *)source;
++
++    event_notifier_cleanup(&notify->event);
++}
++
++static GSourceFuncs notifier_source_funcs = {
++    filter_notify_prepare,
++    filter_notify_check,
++    filter_notify_dispatch,
++    filter_notify_finalize,
++};
++
++FilterNotifier *filter_noitifier_new(FilterNotifierCallback *cb,
++                    void *opaque, Error **errp)
++{
++    FilterNotifier *notify;
++    int ret;
++
++    notify = (FilterNotifier *)g_source_new(&notifier_source_funcs,
++                sizeof(FilterNotifier));
++    ret = event_notifier_init(&notify->event, false);
++    if (ret < 0) {
++        error_setg_errno(errp, -ret, "Failed to initialize event notifier");
++        goto fail;
++    }
++    notify->pfd.fd = event_notifier_get_fd(&notify->event);
++    notify->pfd.events = G_IO_IN | G_IO_HUP | G_IO_ERR;
++    notify->cb = cb;
++    notify->opaque = opaque;
++    g_source_add_poll(&notify->source, &notify->pfd);
++
++    return notify;
++
++fail:
++    g_source_destroy(&notify->source);
++    return NULL;
++}
++
++int filter_notifier_set(FilterNotifier *notify, uint64_t value)
++{
++    ssize_t ret;
++
++    do {
++        ret = write(notify->event.wfd, &value, sizeof(value));
++    } while (ret < 0 && errno == EINTR);
++
++    /* EAGAIN is fine, a read must be pending.  */
++    if (ret < 0 && errno != EAGAIN) {
++        return -errno;
++    }
++    return 0;
++}
+diff --git a/net/colo.h b/net/colo.h
+index cd9027f..00f03b5 100644
+--- a/net/colo.h
++++ b/net/colo.h
+@@ -19,6 +19,7 @@
+ #include "qemu/jhash.h"
+ #include "qemu/timer.h"
+ #include "slirp/tcp.h"
++#include "qemu/event_notifier.h"
  
-         vmstate_loading = false;
-+        vm_start();
-+        trace_colo_vm_state_change("stop", "run");
-         qemu_mutex_unlock_iothread();
+ #define HASHTABLE_MAX_SIZE 16384
  
-         if (failover_get_state() == FAILOVER_STATUS_RELAUNCH) {
-diff --git a/migration/migration.c b/migration/migration.c
-index c6ae69d..2339be7 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -66,7 +66,7 @@
- /* The delay time (in ms) between two COLO checkpoints
-  * Note: Please change this default value to 10000 when we support hybrid mode.
-  */
--#define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY 200
-+#define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY (200 * 100)
+@@ -89,4 +90,21 @@ void connection_hashtable_reset(GHashTable *connection_track_table);
+ Packet *packet_new(const void *data, int size);
+ void packet_destroy(void *opaque, void *user_data);
  
- static NotifierList migration_state_notifiers =
-     NOTIFIER_LIST_INITIALIZER(migration_state_notifiers);
++typedef void FilterNotifierCallback(void *opaque, int value);
++typedef struct FilterNotifier {
++    GSource source;
++    EventNotifier event;
++    GPollFD pfd;
++    FilterNotifierCallback *cb;
++    void *opaque;
++} FilterNotifier;
++
++FilterNotifier *filter_noitifier_new(FilterNotifierCallback *cb,
++                    void *opaque, Error **errp);
++int filter_notifier_set(FilterNotifier *notify, uint64_t value);
++
++enum {
++    COLO_CHECKPOINT = 2,
++    COLO_FAILOVER,
++};
+ #endif /* QEMU_COLO_PROXY_H */
 -- 
 1.8.3.1
