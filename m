@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cgYcp-0002Qb-3b
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 10:14:40 -0500
+	(envelope-from <eblake@redhat.com>) id 1cgYee-0003t0-Q7
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 10:16:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cgYcm-0003A6-0C
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 10:14:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55814)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cgYcl-00038e-NO
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 10:14:35 -0500
-References: <1487709988-14322-1-git-send-email-armbru@redhat.com>
-	<1487709988-14322-4-git-send-email-armbru@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1cgYed-000421-LB
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 10:16:32 -0500
+References: <1487710908-26356-1-git-send-email-armbru@redhat.com>
+	<1487710908-26356-2-git-send-email-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <ba4677a9-6ef4-0e7e-43d4-7314aea26933@redhat.com>
-Date: Wed, 22 Feb 2017 09:14:32 -0600
+Message-ID: <4d06e4ca-b10b-0c91-ae12-06f4f3e972c4@redhat.com>
+Date: Wed, 22 Feb 2017 09:16:19 -0600
 MIME-Version: 1.0
-In-Reply-To: <1487709988-14322-4-git-send-email-armbru@redhat.com>
+In-Reply-To: <1487710908-26356-2-git-send-email-armbru@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="5Mj7g4FDRwr45qbvSpwKlJBG2J5WXGoeF"
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] i386/cpu: net: Flatten simple union
- GuestPanicInformationType
+	boundary="pkh67tcEwAwi80wT17N0QskEEuIUur5nG"
+Subject: Re: [Qemu-devel] [PATCH RFC v3 1/5] tests: Fix
+ gcov-files-test-qemu-opts-y, gcov-files-test-logging-y
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,52 +26,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>, "Denis V . Lunev" <den@openvz.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---5Mj7g4FDRwr45qbvSpwKlJBG2J5WXGoeF
+--pkh67tcEwAwi80wT17N0QskEEuIUur5nG
 From: Eric Blake <eblake@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>,
- "Denis V . Lunev" <den@openvz.org>, Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ba4677a9-6ef4-0e7e-43d4-7314aea26933@redhat.com>
-Subject: Re: [PATCH v2 3/3] i386/cpu: net: Flatten simple union
- GuestPanicInformationType
-References: <1487709988-14322-1-git-send-email-armbru@redhat.com>
- <1487709988-14322-4-git-send-email-armbru@redhat.com>
-In-Reply-To: <1487709988-14322-4-git-send-email-armbru@redhat.com>
+Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org
+Message-ID: <4d06e4ca-b10b-0c91-ae12-06f4f3e972c4@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v3 1/5] tests: Fix
+ gcov-files-test-qemu-opts-y, gcov-files-test-logging-y
+References: <1487710908-26356-1-git-send-email-armbru@redhat.com>
+ <1487710908-26356-2-git-send-email-armbru@redhat.com>
+In-Reply-To: <1487710908-26356-2-git-send-email-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 02/21/2017 02:46 PM, Markus Armbruster wrote:
-> Simple unions are simpler than flat unions in the schema, but more
-> complicated in C and on the QMP wire: there's extra indirection in C
-> and extra nesting on the wire, both pointless.  They're best avoided
-> in new code.  Fix up recent commit d187e08 accordingly.
->=20
-> Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> Cc: Denis V. Lunev <den@openvz.org>
+On 02/21/2017 03:01 PM, Markus Armbruster wrote:
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  qapi-schema.json  | 14 ++++++++++++--
->  target/i386/cpu.c | 17 ++++++-----------
->  vl.c              | 12 ++++++------
->  3 files changed, 24 insertions(+), 19 deletions(-)
-
-Very similar to Anton's patch which is on Paolo's queue:
-https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg04448.html
-
-I don't care which version goes in, but will leave it to Markus and
-Paolo to decide which queue it should go through.
+>  tests/Makefile.include | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
+
+>=20
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index e60bb6c..5591f60 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -94,7 +94,7 @@ gcov-files-check-qom-interface-y =3D qom/object.c
+>  check-unit-y +=3D tests/check-qom-proplist$(EXESUF)
+>  gcov-files-check-qom-proplist-y =3D qom/object.c
+>  check-unit-y +=3D tests/test-qemu-opts$(EXESUF)
+> -gcov-files-test-qemu-opts-y =3D qom/test-qemu-opts.c
+> +gcov-files-test-qemu-opts-y =3D util/qemu-option.c
+>  check-unit-y +=3D tests/test-write-threshold$(EXESUF)
+>  gcov-files-test-write-threshold-y =3D block/write-threshold.c
+>  check-unit-y +=3D tests/test-crypto-hash$(EXESUF)
+> @@ -119,8 +119,8 @@ check-unit-y +=3D tests/test-crypto-ivgen$(EXESUF)
+>  check-unit-y +=3D tests/test-crypto-afsplit$(EXESUF)
+>  check-unit-y +=3D tests/test-crypto-xts$(EXESUF)
+>  check-unit-y +=3D tests/test-crypto-block$(EXESUF)
+> -gcov-files-test-logging-y =3D tests/test-logging.c
+>  check-unit-y +=3D tests/test-logging$(EXESUF)
+> +gcov-files-test-logging-y =3D util/log.c
+>  check-unit-$(CONFIG_REPLICATION) +=3D tests/test-replication$(EXESUF)
+>  check-unit-y +=3D tests/test-bufferiszero$(EXESUF)
+>  gcov-files-check-bufferiszero-y =3D util/bufferiszero.c
+>=20
 
 --=20
 Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---5Mj7g4FDRwr45qbvSpwKlJBG2J5WXGoeF
+--pkh67tcEwAwi80wT17N0QskEEuIUur5nG
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -85,13 +91,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYrarYAAoJEKeha0olJ0NqUgoIAKqcc2dbA9eulfau/GwHGIQ4
-ulnnz1hfmC75U9UL+rXn1YrEkVHdTN/q5mdKhV5SQrN9GVnt3qmGymhc6wpLIkF4
-7pww/ZSm9yprNdBbrwv8LtjYRYSihcHSWa53RJPx+ZjXocTGLhKkJY9L4a1jt3wk
-rZcYqE+Vf1p7oTWuGa8UWeEaAuh2ZFIT9ou6giFYCj/zyTGWs1wnUzbMgGxWQXEf
-BKANDYJ+ZQCfg/TnV1tkSfEN05CV8UEjMacv1nQxNYkMKhghpG9ndjqQLFN+530f
-4ZGQevog5iIlBYHHfEad0j+TSf/VAhb76dyhXaRsx8LOB6aU5NWaM0Z0RF33u6A=
-=nOT/
+iQEcBAEBCAAGBQJYratDAAoJEKeha0olJ0NqAEYH/AuB3xtG5Kh+4LqDTPCYBnXM
+b96/5ca/0EccmlM2bjGQt8EGv/XbrRrbTxmsBIWc932NeqMlwrIIjnTxYI9FAj8R
+WZqc/KamKjDyee2HmfyOvFcel7Mt8sK+gxCqfIkIoUO4d9WfYCNUpx/HqL9mBgYn
+lABd0E4HSa1tUxJb5ZP5zOLzp6084gzwDurni+7Ew7Tz/QzukwaictMTRQtQLmFI
+YpXCmUwcm9ZKMzbZrExcXLiSGd9cPYG0YOH1K1RXoFyfHEpX23sCx4arG+PmO6pt
+Ysx86Hb9i/kte/rdR/V5zBdMk5E/szdM66JCvxRflPB3QfM4AI2uQCkrkndujE4=
+=EJ+o
 -----END PGP SIGNATURE-----
 
---5Mj7g4FDRwr45qbvSpwKlJBG2J5WXGoeF--
+--pkh67tcEwAwi80wT17N0QskEEuIUur5nG--
