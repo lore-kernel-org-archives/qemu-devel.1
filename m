@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47835)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cgOPR-0000id-BR
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 23:20:10 -0500
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cgP9b-0003ce-3L
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 00:07:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cgOPP-0006gc-SQ
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 23:20:09 -0500
-Date: Wed, 22 Feb 2017 14:34:23 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170222033423.GK12577@umbus.fritz.box>
-References: <1487252865-12064-1-git-send-email-clg@kaod.org>
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cgP9X-0004Pg-5o
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 00:07:51 -0500
+Received: from [59.151.112.132] (port=24455 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cgP9W-0004Od-Gm
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 00:07:47 -0500
+References: <1487645041-28919-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<58ACEDCA.3070404@huawei.com>
+	<63feb0fc-76f7-91ab-d877-5b21dd48a253@redhat.com>
+	<3ee2a276-57f3-1d0b-b284-1895cef817b6@redhat.com>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <793674ad-6127-4d4b-b86e-e765f2f40a58@cn.fujitsu.com>
+Date: Wed, 22 Feb 2017 13:06:54 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="mPOSj6iWmtyhwOMz"
-Content-Disposition: inline
-In-Reply-To: <1487252865-12064-1-git-send-email-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v2 00/22] ppc/xics: simplify ICS and ICP
- creation
+In-Reply-To: <3ee2a276-57f3-1d0b-b284-1895cef817b6@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] net/colo-compare: Fix memory free error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,133 +29,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Jason Wang <jasowang@redhat.com>, Hailiang Zhang <zhang.zhanghailiang@huawei.com>, qemu devel <qemu-devel@nongnu.org>
+Cc: zhangchen.fnst@cn.fujitsu.com, xuquan8@huawei.com
 
 
---mPOSj6iWmtyhwOMz
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 16, 2017 at 02:47:23PM +0100, C=E9dric Le Goater wrote:
-> Hello,
->=20
-> The goal behind this series is to simplify the XICS interface by
-> moving back in the machine the way the ICS and ICP objects interact
-> together. It's up to the machine to implement this "fabric" logic by
-> providing a set of handlers of a QOM interface. These handlers are
-> used to grab an ICS or an ICP object and also do irq resends. This
-> idea was suggested by David Gibson.
->=20
-> The patchset is organised as follow. It starts with a preliminary
-> cleanup to get rid of the set_nr_irqs() and set_nr_servers()
-> handlers. It also moves the creation of the ICS and ICP objects from
-> the XICS object to the sPAPR machine. This simplifies the code
-> significantly and prepares ground for future changes.
->=20
-> As the sPAPR machine only makes use of a single ICS, we can store it
-> at the machine level. This lets us remove dependencies on the list of
-> ICS of the XICS object and simplify even more the code for the
-> following changes.
->=20
-> The QOM interface to interact with the ICS and ICP objects is then
-> introduced. These are moved under the machine and cleanups are done
-> accordingly.
->=20
-> Finally, the XICSState classes are removed as they have been
-> deprecated by the QOM interface.
->=20
->=20
-> After the initial cleanups, which are rather big, I have tried to keep
-> the each patch small enough to ease the review and to spot any
-> problem. Each should be bisectable. The tree is available here :
->=20
-> 	   https://github.com/legoater/qemu/tree/ppc-2.9
+On 02/22/2017 11:15 AM, Jason Wang wrote:
+>
+>
+> On 2017年02月22日 11:09, Jason Wang wrote:
+>>
+>>
+>> On 2017年02月22日 09:47, Hailiang Zhang wrote:
+>>> On 2017/2/21 10:44, Zhang Chen wrote:
+>>>> We use g_queue_init() to init s->conn_list, so we should use 
+>>>> g_queue_clear()
+>>>> to instead of g_queue_free().
+>>>>
+>>>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+>>>
+>>> Reviewed-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+>>>
+>>
+>> Applied, thanks.
+>
+> Actually reverted. The patch does not apply cleanly on -net.
+>
+> Please re-send the patch on top of 
+> https://github.com/jasowang/qemu.git net
 
-So, after you posted this, I discover the patch I sent the other day -
-changing XICS away from a SysBusDevice breaks the postcopy migration
-test on KVM.  I haven't had a chance to debug this yet, so for the
-time being I've pulled my patch from ppc-for-2.9.  I've moved it into
-a new 'xics-cleanup' branch.
+OK~~
 
->=20
->=20
-> Thanks,
->=20
-> C.
->=20
->=20
-> Changes since v1:
->=20
->  - address the full picture.
->=20
-> C=E9dric Le Goater (22):
->   ppc/xics: remove set_nr_irqs() handler from XICSStateClass
->   ppc/xics: remove set_nr_servers() handler from XICSStateClass
->   ppc/xics: store the ICS object under the sPAPR machine
->   ppc/xics: add an InterruptStatsProvider interface to ICS and ICP
->     objects
->   ppc/xics: introduce a QOM interface to handle ICSs
->   ppc/xics: use the QOM interface under the sPAPR machine
->   ppc/xics: use the QOM interface to get irqs
->   ppc/xics: use the QOM interface to resend irqs
->   ppc/xics: remove xics_find_source()
->   ppc/xics: register the reset handler of ICS objects
->   ppc/xics: remove the XICS list of ICS
->   ppc/xics: extend the QOM interface to handle ICPs
->   ppc/xics: simplify the cpu_setup() handler
->   ppc/xics: use the QOM interface to grab an ICP
->   ppc/xics: simplify spapr_dt_xics() interface
->   ppc/xics: register the reset handler of ICP objects
->   ppc/xics: move the ICP array under the sPAPR machine
->   ppc/xics: move kernel_xics_fd out of KVMXICSState
->   ppc/xics: move the cpu_setup() handler under the ICPState class
->   ppc/xics: remove the 'xics' backlinks
->   ppc/xics: export the XICS init routines
->   ppc/xics: remove the XICSState classes
->=20
->  hw/intc/xics.c              | 295 +++++++++++++-------------------------=
-------
->  hw/intc/xics_kvm.c          | 154 ++++++-----------------
->  hw/intc/xics_spapr.c        | 128 ++++---------------
->  hw/ppc/spapr.c              | 116 +++++++++++++----
->  hw/ppc/spapr_cpu_core.c     |   4 +-
->  hw/ppc/spapr_events.c       |  10 +-
->  hw/ppc/spapr_pci.c          |  10 +-
->  hw/ppc/spapr_vio.c          |   2 +-
->  include/hw/pci-host/spapr.h |   2 +-
->  include/hw/ppc/spapr.h      |   5 +-
->  include/hw/ppc/spapr_vio.h  |   2 +-
->  include/hw/ppc/xics.h       |  93 ++++++--------
->  12 files changed, 294 insertions(+), 527 deletions(-)
->=20
+Thanks
+Zhang Chen
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+>
+> Thanks
+>
+>>
+>>>> ---
+>>>>   net/colo-compare.c | 2 +-
+>>>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/net/colo-compare.c b/net/colo-compare.c
+>>>> index 162fd6a..cf8c4c9 100644
+>>>> --- a/net/colo-compare.c
+>>>> +++ b/net/colo-compare.c
+>>>> @@ -715,7 +715,7 @@ static void colo_compare_finalize(Object *obj)
+>>>>       qemu_chr_fe_deinit(&s->chr_sec_in);
+>>>>       qemu_chr_fe_deinit(&s->chr_out);
+>>>>
+>>>> -    g_queue_free(&s->conn_list);
+>>>> +    g_queue_clear(&s->conn_list);
+>>>>
+>>>>       if (qemu_thread_is_self(&s->thread)) {
+>>>>           /* compare connection */
+>>>>
+>>>
+>>
+>>
+>
+>
+>
+> .
+>
 
---mPOSj6iWmtyhwOMz
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJYrQa9AAoJEGw4ysog2bOS0dUP/1rXzLMdPO/Pir3sMlffI+wF
-Ka7GrF9u6kM6zhOYCdpSKvuYXZDnopKAuX8LJEbbaL23QWzoGckZW5B1tCrLNeN2
-zAqqiyVYZQqwdRfXYZLAjLyw48tM10huj3JI44w+yDG9iueRhW3Y7FhgCDj0tuWF
-qyo20OeYwGGFJ4m3rEY+SzWkITh7hG1laDKlCHjKyVylIYqSQyqPEv6it0uTn9Rt
-jo7wDA9A3FWU2XVYuOv9wXr7nau6Bp0yH4JvqTRsm6/Z4EGLO5Yla5q3nOvg6Ukb
-riggsm+Z4r80JML43JDT1DWhCGcFitKanRYGz435L2pCBJpbl7j7dCIZIhqBHLGz
-KPPoW1VOpI/P/uDRboLrmnRF4qeKmJ4m4RJ009tc/jjmb+/ocPm7v5M9SAKvR+gQ
-ZEFCNk2ReQXfXNSR3tt4FXkz21l9Pv5tnS6G9pf+OEIMdII/lwNlaYJx393fNN/c
-qXHP8mmTwwyj7re2/yPpm//z4Gi/8K2mnhlQMeJtQTpUPmPNw4/VilGKQjB182IQ
-Nah28ls61aDeUKpLudNhGFXTqAbdRpQ0sOO19hUUqhxy55z1WLx8L8WruMrtpEgx
-QDbqp7/8/iRCHIfZJ7bKKqn8foAQnIUJXlDgZo4CPRAkznhP5qwxUV2RoVVIyJ+k
-vxx+lDXcN41q/M12adW2
-=Ex7D
------END PGP SIGNATURE-----
-
---mPOSj6iWmtyhwOMz--
+-- 
+Thanks
+Zhang Chen
