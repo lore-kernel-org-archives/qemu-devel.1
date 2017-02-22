@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cgQVB-00038A-AQ
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:34:17 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cgQVG-0003Ej-Kw
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:34:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cgQV8-00088q-10
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:34:13 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cgQVC-0008Ee-3y
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:34:18 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 22 Feb 2017 17:33:39 +1100
-Message-Id: <20170222063348.32176-35-david@gibson.dropbear.id.au>
+Date: Wed, 22 Feb 2017 17:33:44 +1100
+Message-Id: <20170222063348.32176-40-david@gibson.dropbear.id.au>
 In-Reply-To: <20170222063348.32176-1-david@gibson.dropbear.id.au>
 References: <20170222063348.32176-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 34/43] pc: calculate topology only once when
- possible_cpus is initialised
+Subject: [Qemu-devel] [PULL 39/43] machine: replace
+ query_hotpluggable_cpus() callback with has_hotpluggable_cpus flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,84 +25,201 @@ Cc: agraf@suse.de, thuth@redhat.com, lvivier@redhat.com, qemu-devel@nongnu.org, 
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-Fill in CpuInstanceProperties once at board init time and
-just copy them whenever query_hotpluggable_cpus() is called.
-It will keep topology info always available without need
-to recalculate it every time it's needed.
-Considering it has NUMA node id, it will be used to keep
-NUMA node to cpu mapping instead of numa_info[i].node_cpu
-bitmasks.
+Generic helper machine_query_hotpluggable_cpus() replaced
+target specific query_hotpluggable_cpus() callbacks so
+there is no need in it anymore. However inon NULL callback
+value is used to detect/report hotpluggable cpus support,
+therefore it can be removed completely.
+Replace it with MachineClass.has_hotpluggable_cpus boolean
+which is sufficient for the task.
 
+Suggested-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/i386/pc.c        | 24 ++++++++++++------------
- include/hw/boards.h |  2 ++
- 2 files changed, 14 insertions(+), 12 deletions(-)
+ hw/i386/pc.c        |  4 ++--
+ hw/ppc/spapr.c      | 20 ++++++++++----------
+ include/hw/boards.h |  8 +++-----
+ monitor.c           |  4 ++--
+ vl.c                |  2 +-
+ 5 files changed, 18 insertions(+), 20 deletions(-)
 
 diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index a187748..50ba977 100644
+index f96cfc6..d24388e 100644
 --- a/hw/i386/pc.c
 +++ b/hw/i386/pc.c
-@@ -2268,7 +2268,17 @@ static const CPUArchIdList *pc_possible_cpu_arch_ids(MachineState *ms)
-                                   sizeof(CPUArchId) * max_cpus);
-     ms->possible_cpus->len = max_cpus;
-     for (i = 0; i < ms->possible_cpus->len; i++) {
-+        X86CPUTopoInfo topo;
-+
-         ms->possible_cpus->cpus[i].arch_id = x86_cpu_apic_id_from_index(i);
-+        x86_topo_ids_from_apicid(ms->possible_cpus->cpus[i].arch_id,
-+                                 smp_cores, smp_threads, &topo);
-+        ms->possible_cpus->cpus[i].props.has_socket_id = true;
-+        ms->possible_cpus->cpus[i].props.socket_id = topo.pkg_id;
-+        ms->possible_cpus->cpus[i].props.has_core_id = true;
-+        ms->possible_cpus->cpus[i].props.core_id = topo.core_id;
-+        ms->possible_cpus->cpus[i].props.has_thread_id = true;
-+        ms->possible_cpus->cpus[i].props.thread_id = topo.smt_id;
+@@ -1955,7 +1955,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
      }
-     return ms->possible_cpus;
+ 
+     /* if 'address' properties socket-id/core-id/thread-id are not set, set them
+-     * so that query_hotpluggable_cpus would show correct values
++     * so that machine_query_hotpluggable_cpus would show correct values
+      */
+     /* TODO: move socket_id/core_id/thread_id checks into x86_cpu_realizefn()
+      * once -smp refactoring is complete and there will be CPU private
+@@ -2326,7 +2326,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+     mc->get_hotplug_handler = pc_get_hotpug_handler;
+     mc->cpu_index_to_socket_id = pc_cpu_index_to_socket_id;
+     mc->possible_cpu_arch_ids = pc_possible_cpu_arch_ids;
+-    mc->query_hotpluggable_cpus = machine_query_hotpluggable_cpus;
++    mc->has_hotpluggable_cpus = true;
+     mc->default_boot_order = "cad";
+     mc->hot_add_cpu = pc_hot_add_cpu;
+     mc->block_default_type = IF_IDE;
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 49768eb..6f37288 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -958,7 +958,7 @@ static void *spapr_build_fdt(sPAPRMachineState *spapr,
+         _FDT(spapr_drc_populate_dt(fdt, 0, NULL, SPAPR_DR_CONNECTOR_TYPE_LMB));
+     }
+ 
+-    if (mc->query_hotpluggable_cpus) {
++    if (mc->has_hotpluggable_cpus) {
+         int offset = fdt_path_offset(fdt, "/cpus");
+         ret = spapr_drc_populate_dt(fdt, offset, NULL,
+                                     SPAPR_DR_CONNECTOR_TYPE_CPU);
+@@ -1781,7 +1781,7 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
+     }
+ 
+     possible_cpus = mc->possible_cpu_arch_ids(machine);
+-    if (mc->query_hotpluggable_cpus) {
++    if (mc->has_hotpluggable_cpus) {
+         if (smp_cpus % smp_threads) {
+             error_report("smp_cpus (%u) must be multiple of threads (%u)",
+                          smp_cpus, smp_threads);
+@@ -1803,7 +1803,7 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
+     for (i = 0; i < possible_cpus->len; i++) {
+         int core_id = i * smp_threads;
+ 
+-        if (mc->query_hotpluggable_cpus) {
++        if (mc->has_hotpluggable_cpus) {
+             sPAPRDRConnector *drc =
+                 spapr_dr_connector_new(OBJECT(spapr),
+                                        SPAPR_DR_CONNECTOR_TYPE_CPU,
+@@ -2575,7 +2575,7 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     }
+     drc = spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_CPU, index * smt);
+ 
+-    g_assert(drc || !mc->query_hotpluggable_cpus);
++    g_assert(drc || !mc->has_hotpluggable_cpus);
+ 
+     /*
+      * Setup CPU DT entries only for hotplugged CPUs. For boot time or
+@@ -2626,7 +2626,7 @@ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     CPUArchId *core_slot;
+     int index;
+ 
+-    if (dev->hotplugged && !mc->query_hotpluggable_cpus) {
++    if (dev->hotplugged && !mc->has_hotpluggable_cpus) {
+         error_setg(&local_err, "CPU hotplug not supported for this machine");
+         goto out;
+     }
+@@ -2719,7 +2719,7 @@ static void spapr_machine_device_unplug(HotplugHandler *hotplug_dev,
+             error_setg(errp, "Memory hot unplug not supported for this guest");
+         }
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
+-        if (!mc->query_hotpluggable_cpus) {
++        if (!mc->has_hotpluggable_cpus) {
+             error_setg(errp, "CPU hot unplug not supported on this machine");
+             return;
+         }
+@@ -2746,7 +2746,7 @@ static void spapr_machine_device_unplug_request(HotplugHandler *hotplug_dev,
+             error_setg(errp, "Memory hot unplug not supported for this guest");
+         }
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
+-        if (!mc->query_hotpluggable_cpus) {
++        if (!mc->has_hotpluggable_cpus) {
+             error_setg(errp, "CPU hot unplug not supported on this machine");
+             return;
+         }
+@@ -2785,7 +2785,7 @@ static const CPUArchIdList *spapr_possible_cpu_arch_ids(MachineState *machine)
+     int spapr_max_cores = max_cpus / smp_threads;
+     MachineClass *mc = MACHINE_GET_CLASS(machine);
+ 
+-    if (!mc->query_hotpluggable_cpus) {
++    if (!mc->has_hotpluggable_cpus) {
+         spapr_max_cores = QEMU_ALIGN_UP(smp_cpus, smp_threads) / smp_threads;
+     }
+     if (machine->possible_cpus) {
+@@ -2897,7 +2897,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+ 
+     smc->dr_lmb_enabled = true;
+     smc->tcg_default_cpu = "POWER8";
+-    mc->query_hotpluggable_cpus = machine_query_hotpluggable_cpus;
++    mc->has_hotpluggable_cpus = true;
+     fwc->get_dev_path = spapr_get_fw_dev_path;
+     nc->nmi_monitor_handler = spapr_nmi;
+     smc->phb_placement = spapr_phb_placement;
+@@ -3097,7 +3097,7 @@ static void spapr_machine_2_6_instance_options(MachineState *machine)
+ static void spapr_machine_2_6_class_options(MachineClass *mc)
+ {
+     spapr_machine_2_7_class_options(mc);
+-    mc->query_hotpluggable_cpus = NULL;
++    mc->has_hotpluggable_cpus = false;
+     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_6);
  }
-@@ -2285,23 +2295,13 @@ static HotpluggableCPUList *pc_query_hotpluggable_cpus(MachineState *machine)
-     cpu_type = object_class_get_name(OBJECT_CLASS(CPU_GET_CLASS(cpu)));
  
-     for (i = 0; i < machine->possible_cpus->len; i++) {
--        X86CPUTopoInfo topo;
-         HotpluggableCPUList *list_item = g_new0(typeof(*list_item), 1);
-         HotpluggableCPU *cpu_item = g_new0(typeof(*cpu_item), 1);
--        CpuInstanceProperties *cpu_props = g_new0(typeof(*cpu_props), 1);
--        const uint32_t apic_id = machine->possible_cpus->cpus[i].arch_id;
--
--        x86_topo_ids_from_apicid(apic_id, smp_cores, smp_threads, &topo);
- 
-         cpu_item->type = g_strdup(cpu_type);
-         cpu_item->vcpus_count = 1;
--        cpu_props->has_socket_id = true;
--        cpu_props->socket_id = topo.pkg_id;
--        cpu_props->has_core_id = true;
--        cpu_props->core_id = topo.core_id;
--        cpu_props->has_thread_id = true;
--        cpu_props->thread_id = topo.smt_id;
--        cpu_item->props = cpu_props;
-+        cpu_item->props = g_memdup(&machine->possible_cpus->cpus[i].props,
-+                                   sizeof(*cpu_item->props));
- 
-         cpu = machine->possible_cpus->cpus[i].cpu;
-         if (cpu) {
 diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 64e8c07..4023b38 100644
+index 9040dbb..269d0ba 100644
 --- a/include/hw/boards.h
 +++ b/include/hw/boards.h
-@@ -46,9 +46,11 @@ void machine_register_compat_props(MachineState *machine);
-  * CPUArchId:
-  * @arch_id - architecture-dependent CPU ID of present or possible CPU
-  * @cpu - pointer to corresponding CPU object if it's present on NULL otherwise
-+ * @props - CPU object properties, initialized by board
-  */
- typedef struct {
-     uint64_t arch_id;
-+    CpuInstanceProperties props;
-     struct CPUState *cpu;
- } CPUArchId;
+@@ -87,10 +87,8 @@ typedef struct {
+  *    Returns an array of @CPUArchId architecture-dependent CPU IDs
+  *    which includes CPU IDs for present and possible to hotplug CPUs.
+  *    Caller is responsible for freeing returned list.
+- * @query_hotpluggable_cpus:
+- *    Returns a @HotpluggableCPUList, which describes CPUs objects which
+- *    could be added with -device/device_add.
+- *    Caller is responsible for freeing returned list.
++ * @has_hotpluggable_cpus:
++ *    If true, board supports CPUs creation with -device/device_add.
+  * @minimum_page_bits:
+  *    If non-zero, the board promises never to create a CPU with a page size
+  *    smaller than this, so QEMU can use a more efficient larger page
+@@ -136,12 +134,12 @@ struct MachineClass {
+     bool option_rom_has_mr;
+     bool rom_file_has_mr;
+     int minimum_page_bits;
++    bool has_hotpluggable_cpus;
  
+     HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
+                                            DeviceState *dev);
+     unsigned (*cpu_index_to_socket_id)(unsigned cpu_index);
+     const CPUArchIdList *(*possible_cpu_arch_ids)(MachineState *machine);
+-    HotpluggableCPUList *(*query_hotpluggable_cpus)(MachineState *machine);
+ };
+ 
+ /**
+diff --git a/monitor.c b/monitor.c
+index 3cd72a9..18bf2f8e 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -4155,10 +4155,10 @@ HotpluggableCPUList *qmp_query_hotpluggable_cpus(Error **errp)
+     MachineState *ms = MACHINE(qdev_get_machine());
+     MachineClass *mc = MACHINE_GET_CLASS(ms);
+ 
+-    if (!mc->query_hotpluggable_cpus) {
++    if (!mc->has_hotpluggable_cpus) {
+         error_setg(errp, QERR_FEATURE_DISABLED, "query-hotpluggable-cpus");
+         return NULL;
+     }
+ 
+-    return mc->query_hotpluggable_cpus(ms);
++    return machine_query_hotpluggable_cpus(ms);
+ }
+diff --git a/vl.c b/vl.c
+index b5d0a19..904e34b 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1492,7 +1492,7 @@ MachineInfoList *qmp_query_machines(Error **errp)
+ 
+         info->name = g_strdup(mc->name);
+         info->cpu_max = !mc->max_cpus ? 1 : mc->max_cpus;
+-        info->hotpluggable_cpus = !!mc->query_hotpluggable_cpus;
++        info->hotpluggable_cpus = mc->has_hotpluggable_cpus;
+ 
+         entry = g_malloc0(sizeof(*entry));
+         entry->value = info;
 -- 
 2.9.3
