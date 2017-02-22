@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37515)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cgQV0-0002wx-4m
+	(envelope-from <dgibson@ozlabs.org>) id 1cgQV0-0002wv-3g
 	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:34:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cgQUw-0007og-V4
+	(envelope-from <dgibson@ozlabs.org>) id 1cgQUx-0007os-1P
 	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:34:02 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 22 Feb 2017 17:33:06 +1100
-Message-Id: <20170222063348.32176-2-david@gibson.dropbear.id.au>
+Date: Wed, 22 Feb 2017 17:33:08 +1100
+Message-Id: <20170222063348.32176-4-david@gibson.dropbear.id.au>
 In-Reply-To: <20170222063348.32176-1-david@gibson.dropbear.id.au>
 References: <20170222063348.32176-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 01/43] spapr: cpu core: separate child threads
- destruction from machine state operations
+Subject: [Qemu-devel] [PULL 03/43] spapr: make cpu core unplug follow
+ expected hotunplug call flow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,67 +25,80 @@ Cc: agraf@suse.de, thuth@redhat.com, lvivier@redhat.com, qemu-devel@nongnu.org, 
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-Split off destroying VCPU threads from drc callback
-spapr_core_release() into new spapr_cpu_core_unrealizefn()
-which takes care of internal cpu core state cleanup (i.e.
-VCPU threads) and is called when object_unparent(core)
-is called.
+spapr_core_unplug() were essentially spapr_core_unplug_request()
+handler that requested CPU removal and registered callback
+which did actual cpu core removali but it was called from
+spapr_machine_device_unplug() which is intended for actual object
+removal. Commit (cf632463 spapr: Memory hot-unplug support)
+sort of fixed it introducing spapr_machine_device_unplug_request()
+and calling spapr_core_unplug() but it hasn't renamed callback and
+by mistake calls it from spapr_machine_device_unplug().
 
-That leaves spapr_core_release() only with board mgmt
-code, which will be moved to board related file in
-follow up patch along with the rest on hotplug callbacks.
+However spapr_machine_device_unplug() isn't ever called for
+cpu core since spapr_core_release() doesn't follow expected
+hotunplug call flow which is:
+ 1: device_del() ->
+        hotplug_handler_unplug_request() ->
+            set destroy_cb()
+ 2: destroy_cb() ->
+        hotplug_handler_unplug() ->
+            object_unparent // actual device removal
+
+Fix it by renaming spapr_core_unplug() to spapr_core_unplug_request()
+which is called from spapr_machine_device_unplug_request() and
+making spapr_core_release() call hotplug_handler_unplug() which
+will call spapr_machine_device_unplug() -> spapr_core_unplug()
+to remove cpu core.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Reveiwed-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_cpu_core.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+ hw/ppc/spapr.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 9dddaeb..b9e5f80 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -111,11 +111,19 @@ char *spapr_get_cpu_core_type(const char *model)
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 8c2efd8..37cb338 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2488,7 +2488,8 @@ void *spapr_populate_hotplug_cpu_dt(CPUState *cs, int *fdt_offset,
+     return fdt;
+ }
  
- static void spapr_core_release(DeviceState *dev, void *opaque)
+-static void spapr_core_release(DeviceState *dev, void *opaque)
++static void spapr_core_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
++                              Error **errp)
  {
-+    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-+    CPUCore *cc = CPU_CORE(dev);
+     sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+     CPUCore *cc = CPU_CORE(dev);
+@@ -2497,8 +2498,17 @@ static void spapr_core_release(DeviceState *dev, void *opaque)
+     object_unparent(OBJECT(dev));
+ }
+ 
+-static void spapr_core_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
+-                              Error **errp)
++static void spapr_core_release(DeviceState *dev, void *opaque)
++{
++    HotplugHandler *hotplug_ctrl;
 +
-+    spapr->cores[cc->core_id / smp_threads] = NULL;
-+    object_unparent(OBJECT(dev));
++    hotplug_ctrl = qdev_get_hotplug_handler(dev);
++    hotplug_handler_unplug(hotplug_ctrl, dev, &error_abort);
 +}
 +
-+static void spapr_cpu_core_unrealizefn(DeviceState *dev, Error **errp)
-+{
-     sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
-     sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
-     const char *typename = object_class_get_name(scc->cpu_class);
-     size_t size = object_type_get_instance_size(typename);
--    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
++static
++void spapr_core_unplug_request(HotplugHandler *hotplug_dev, DeviceState *dev,
++                               Error **errp)
+ {
      CPUCore *cc = CPU_CORE(dev);
-     int i;
- 
-@@ -129,11 +137,7 @@ static void spapr_core_release(DeviceState *dev, void *opaque)
-         cpu_remove_sync(cs);
-         object_unparent(obj);
+     int smt = kvmppc_smt_threads();
+@@ -2719,7 +2729,7 @@ static void spapr_machine_device_unplug_request(HotplugHandler *hotplug_dev,
+             error_setg(errp, "CPU hot unplug not supported on this machine");
+             return;
+         }
+-        spapr_core_unplug(hotplug_dev, dev, errp);
++        spapr_core_unplug_request(hotplug_dev, dev, errp);
      }
--
--    spapr->cores[cc->core_id / smp_threads] = NULL;
--
-     g_free(sc->threads);
--    object_unparent(OBJECT(dev));
  }
  
- void spapr_core_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
-@@ -368,6 +372,7 @@ void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
-     sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_CLASS(oc);
- 
-     dc->realize = spapr_cpu_core_realize;
-+    dc->unrealize = spapr_cpu_core_unrealizefn;
-     scc->cpu_class = cpu_class_by_name(TYPE_POWERPC_CPU, data);
-     g_assert(scc->cpu_class);
- }
 -- 
 2.9.3
