@@ -1,40 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47067)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cgUfm-0003lh-9C
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:01:30 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cgUj1-0006xf-03
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:04:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cgUfh-0008Uz-FW
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:01:26 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46132
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cgUfh-0008Um-9a
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:01:21 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1MAxopF146119
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 06:01:20 -0500
-Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28s6qeeku7-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 06:01:19 -0500
-Received: from localhost
-	by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Wed, 22 Feb 2017 21:01:16 +1000
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <7d08191a-b509-758a-fba3-f49b6606f512@twiddle.net>
-References: <1487755788-16415-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<1487755788-16415-7-git-send-email-nikunj@linux.vnet.ibm.com>
-	<7d08191a-b509-758a-fba3-f49b6606f512@twiddle.net>
-Date: Wed, 22 Feb 2017 16:30:05 +0530
+	(envelope-from <kwolf@redhat.com>) id 1cgUj0-00014X-35
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:04:47 -0500
+Date: Wed, 22 Feb 2017 12:04:36 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170222110436.GG4112@noname.str.redhat.com>
+References: <20170220151921.22842-1-berrange@redhat.com>
+	<20170220151921.22842-4-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Message-Id: <871suqbidm.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH v2 06/11] target/ppc: update overflow flags
- for add/sub
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170220151921.22842-4-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 3/4] qemu-img: introduce
+ --target-image-opts for 'convert' command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,42 +24,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
-Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>
 
-Richard Henderson <rth@twiddle.net> writes:
+Am 20.02.2017 um 16:19 hat Daniel P. Berrange geschrieben:
+> The '--image-opts' flags indicates whether the source filename
+> includes options. The target filename has to remain in the
+> plain filename format though, since it needs to be passed to
+> bdrv_create().  When using --skip-create though, it would be
+> possible to use image-opts syntax. This adds --target-image-opts
+> to indicate that the target filename includes options. Currently
+> this mandates use of the --skip-create flag too.
+> 
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 
-> On 02/22/2017 08:29 PM, Nikunj A Dadhania wrote:
->> * SO and OV reflects overflow of the 64-bit result in 64-bit mode and
->>   overflow of the low-order 32-bit result in 32-bit mode
->>
->> * OV32 reflects overflow of the low-order 32-bit independent of the mode
->>
->> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
->> ---
->>  target/ppc/translate.c | 14 +++++++++++---
->>  1 file changed, 11 insertions(+), 3 deletions(-)
->>
->> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
->> index 184d10f..74185ba 100644
->> --- a/target/ppc/translate.c
->> +++ b/target/ppc/translate.c
->> @@ -809,10 +809,18 @@ static inline void gen_op_arith_compute_ov(DisasContext *ctx, TCGv arg0,
->>          tcg_gen_andc_tl(cpu_ov, cpu_ov, t0);
->>      }
->>      tcg_temp_free(t0);
->> -    if (NARROW_MODE(ctx)) {
->> -        tcg_gen_ext32s_tl(cpu_ov, cpu_ov);
->> +    if (is_isa300(ctx)) {
->> +        tcg_gen_extract_tl(cpu_ov32, cpu_ov, 31, 1);
->> +        tcg_gen_extract_tl(cpu_ov, cpu_ov, 63, 1);
->> +        if (NARROW_MODE(ctx)) {
->> +            tcg_gen_mov_tl(cpu_ov, cpu_ov32);
->> +        }
->
-> Again, you're computing cpu_ov twice.
+Hm, okay, with a separate --target-image-opts here, too, I guess the
+'qemu-img dd' interface would be consistent after all.
 
-I lost the corrected code in patch juggling :(
-
-Regards,
-Nikunj
+Kevin
