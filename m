@@ -1,22 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cgUIe-0002b2-6Z
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 05:37:33 -0500
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cgUJ4-0002tu-J6
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 05:37:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cgUIb-0001fD-3X
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 05:37:32 -0500
-Sender: Richard Henderson <rth7680@gmail.com>
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cgUJ1-0001pk-Gf
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 05:37:58 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45302
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1cgUJ1-0001pJ-8t
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 05:37:55 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1MAYa2N112073
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 05:37:54 -0500
+Received: from e28smtp07.in.ibm.com (e28smtp07.in.ibm.com [125.16.236.7])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28rm7ua7bc-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 05:37:53 -0500
+Received: from localhost
+	by e28smtp07.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Wed, 22 Feb 2017 16:07:50 +0530
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+In-Reply-To: <e1087dd8-3bc2-002a-2293-83366eed6ee2@twiddle.net>
 References: <1487755788-16415-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<1487755788-16415-7-git-send-email-nikunj@linux.vnet.ibm.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <7d08191a-b509-758a-fba3-f49b6606f512@twiddle.net>
-Date: Wed, 22 Feb 2017 21:37:19 +1100
+	<1487755788-16415-5-git-send-email-nikunj@linux.vnet.ibm.com>
+	<e1087dd8-3bc2-002a-2293-83366eed6ee2@twiddle.net>
+Date: Wed, 22 Feb 2017 16:07:44 +0530
 MIME-Version: 1.0
-In-Reply-To: <1487755788-16415-7-git-send-email-nikunj@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 06/11] target/ppc: update overflow flags
- for add/sub
+Content-Type: text/plain
+Message-Id: <87a89ebjev.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH v2 04/11] target/ppc: update ca32 in
+ arithmetic add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,47 +43,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: Richard Henderson <rth@twiddle.net>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
-On 02/22/2017 08:29 PM, Nikunj A Dadhania wrote:
-> * SO and OV reflects overflow of the 64-bit result in 64-bit mode and
->   overflow of the low-order 32-bit result in 32-bit mode
->
-> * OV32 reflects overflow of the low-order 32-bit independent of the mode
->
-> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-> ---
->  target/ppc/translate.c | 14 +++++++++++---
->  1 file changed, 11 insertions(+), 3 deletions(-)
->
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index 184d10f..74185ba 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -809,10 +809,18 @@ static inline void gen_op_arith_compute_ov(DisasContext *ctx, TCGv arg0,
->          tcg_gen_andc_tl(cpu_ov, cpu_ov, t0);
->      }
->      tcg_temp_free(t0);
-> -    if (NARROW_MODE(ctx)) {
-> -        tcg_gen_ext32s_tl(cpu_ov, cpu_ov);
-> +    if (is_isa300(ctx)) {
-> +        tcg_gen_extract_tl(cpu_ov32, cpu_ov, 31, 1);
-> +        tcg_gen_extract_tl(cpu_ov, cpu_ov, 63, 1);
-> +        if (NARROW_MODE(ctx)) {
-> +            tcg_gen_mov_tl(cpu_ov, cpu_ov32);
-> +        }
+Richard Henderson <rth@twiddle.net> writes:
 
-Again, you're computing cpu_ov twice.
+> On 02/22/2017 08:29 PM, Nikunj A Dadhania wrote:
+>> +            tcg_gen_mov_tl(cpu_ca32, cpu_ca);
+>
+> Should also be conditional on isa300.
 
-> +    } else {
-> +        if (NARROW_MODE(ctx)) {
-> +            tcg_gen_ext32s_tl(cpu_ov, cpu_ov);
-> +        }
-> +        tcg_gen_shri_tl(cpu_ov, cpu_ov, TARGET_LONG_BITS - 1);
->      }
-> -    tcg_gen_shri_tl(cpu_ov, cpu_ov, TARGET_LONG_BITS - 1);
->      tcg_gen_or_tl(cpu_so, cpu_so, cpu_ov);
->  }
->
->
+Ah yes, will fix it.
+
+Regards
+Nikunj
