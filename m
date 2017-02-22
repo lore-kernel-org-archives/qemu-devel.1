@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgNpO-0004iC-NP
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 22:42:55 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgNpO-0004i5-3l
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 22:42:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgNpJ-0002uk-R7
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgNpJ-0002uP-NZ
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 22:42:54 -0500
-Received: from [45.249.212.187] (port=2538 helo=dggrg01-dlp.huawei.com)
+Received: from [45.249.212.189] (port=2399 helo=dggrg03-dlp.huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgNpI-0002pk-Rb
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgNpI-0002pf-RQ
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 22:42:49 -0500
 From: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Date: Wed, 22 Feb 2017 11:42:02 +0800
-Message-ID: <1487734936-43472-2-git-send-email-zhang.zhanghailiang@huawei.com>
+Date: Wed, 22 Feb 2017 11:42:08 +0800
+Message-ID: <1487734936-43472-8-git-send-email-zhang.zhanghailiang@huawei.com>
 In-Reply-To: <1487734936-43472-1-git-send-email-zhang.zhanghailiang@huawei.com>
 References: <1487734936-43472-1-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 01/15] net/colo: Add notifier/callback related
- helpers for filter
+Subject: [Qemu-devel] [PATCH 07/15] COLO: Load PVM's dirty pages into SVM's
+ RAM cache temporarily
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,158 +27,202 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, dgilbert@redhat.com, zhangchen.fnst@cn.fujitsu.com
-Cc: lizhijian@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Jason Wang <jasowang@redhat.com>
+Cc: lizhijian@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>
 
-We will use this notifier to help COLO to notify filter object
-to do something, like do checkpoint, or process failover event.
+We should not load PVM's state directly into SVM, because there maybe some
+errors happen when SVM is receving data, which will break SVM.
 
-Cc: Jason Wang <jasowang@redhat.com>
+We need to ensure receving all data before load the state into SVM. We use
+an extra memory to cache these data (PVM's ram). The ram cache in secondary side
+is initially the same as SVM/PVM's memory. And in the process of checkpoint,
+we cache the dirty pages of PVM into this ram cache firstly, so this ram cache
+always the same as PVM's memory at every checkpoint, then we flush this cached ram
+to SVM after we receive all PVM's state.
+
+Cc: Juan Quintela <quintela@redhat.com>
 Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- net/colo.c | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- net/colo.h | 18 ++++++++++++
- 2 files changed, 110 insertions(+)
+ include/exec/ram_addr.h       |  1 +
+ include/migration/migration.h |  4 +++
+ migration/colo.c              | 14 +++++++++
+ migration/ram.c               | 73 ++++++++++++++++++++++++++++++++++++++++++-
+ 4 files changed, 91 insertions(+), 1 deletion(-)
 
-diff --git a/net/colo.c b/net/colo.c
-index 8cc166b..1697150 100644
---- a/net/colo.c
-+++ b/net/colo.c
-@@ -15,6 +15,7 @@
- #include "qemu/osdep.h"
- #include "trace.h"
- #include "net/colo.h"
-+#include "qapi/error.h"
- 
- uint32_t connection_key_hash(const void *opaque)
- {
-@@ -209,3 +210,94 @@ Connection *connection_get(GHashTable *connection_track_table,
- 
-     return conn;
- }
+diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+index 3e79466..44e1190 100644
+--- a/include/exec/ram_addr.h
++++ b/include/exec/ram_addr.h
+@@ -27,6 +27,7 @@ struct RAMBlock {
+     struct rcu_head rcu;
+     struct MemoryRegion *mr;
+     uint8_t *host;
++    uint8_t *colo_cache; /* For colo, VM's ram cache */
+     ram_addr_t offset;
+     ram_addr_t used_length;
+     ram_addr_t max_length;
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index 1735d66..93c6148 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -379,4 +379,8 @@ int ram_save_queue_pages(MigrationState *ms, const char *rbname,
+ PostcopyState postcopy_state_get(void);
+ /* Set the state and return the old state */
+ PostcopyState postcopy_state_set(PostcopyState new_state);
 +
-+static gboolean
-+filter_notify_prepare(GSource *source, gint *timeout)
-+{
-+    *timeout = -1;
-+
-+    return FALSE;
-+}
-+
-+static gboolean
-+filter_notify_check(GSource *source)
-+{
-+    FilterNotifier *notify = (FilterNotifier *)source;
-+
-+    return notify->pfd.revents & (G_IO_IN | G_IO_HUP | G_IO_ERR);
-+}
-+
-+static gboolean
-+filter_notify_dispatch(GSource *source,
-+                       GSourceFunc callback,
-+                       gpointer user_data)
-+{
-+    FilterNotifier *notify = (FilterNotifier *)source;
-+    int revents;
++/* ram cache */
++int colo_init_ram_cache(void);
++void colo_release_ram_cache(void);
+ #endif
+diff --git a/migration/colo.c b/migration/colo.c
+index 1e3e975..edb7f00 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -551,6 +551,7 @@ void *colo_process_incoming_thread(void *opaque)
+     uint64_t total_size;
+     uint64_t value;
+     Error *local_err = NULL;
 +    int ret;
+ 
+     qemu_sem_init(&mis->colo_incoming_sem, 0);
+ 
+@@ -572,6 +573,12 @@ void *colo_process_incoming_thread(void *opaque)
+      */
+     qemu_file_set_blocking(mis->from_src_file, true);
+ 
++    ret = colo_init_ram_cache();
++    if (ret < 0) {
++        error_report("Failed to initialize ram cache");
++        goto out;
++    }
 +
-+    revents = notify->pfd.revents & notify->pfd.events;
-+    if (revents & (G_IO_IN | G_IO_HUP | G_IO_ERR)) {
-+        ret = event_notifier_test_and_clear(&notify->event);
-+        if (notify->cb) {
-+            notify->cb(notify, ret);
+     bioc = qio_channel_buffer_new(COLO_BUFFER_BASE_SIZE);
+     fb = qemu_fopen_channel_input(QIO_CHANNEL(bioc));
+     object_unref(OBJECT(bioc));
+@@ -705,11 +712,18 @@ out:
+     if (fb) {
+         qemu_fclose(fb);
+     }
++    /*
++     * We can ensure BH is hold the global lock, and will join COLO
++     * incoming thread, so here it is not necessary to lock here again,
++     * Or there will be a deadlock error.
++     */
++    colo_release_ram_cache();
+ 
+     /* Hope this not to be too long to loop here */
+     qemu_sem_wait(&mis->colo_incoming_sem);
+     qemu_sem_destroy(&mis->colo_incoming_sem);
+     /* Must be called after failover BH is completed */
++
+     if (mis->to_src_file) {
+         qemu_fclose(mis->to_src_file);
+     }
+diff --git a/migration/ram.c b/migration/ram.c
+index f289fcd..b588990 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -219,6 +219,7 @@ static RAMBlock *last_sent_block;
+ static ram_addr_t last_offset;
+ static QemuMutex migration_bitmap_mutex;
+ static uint64_t migration_dirty_pages;
++static bool ram_cache_enable;
+ static uint32_t last_version;
+ static bool ram_bulk_stage;
+ 
+@@ -2227,6 +2228,20 @@ static inline void *host_from_ram_block_offset(RAMBlock *block,
+     return block->host + offset;
+ }
+ 
++static inline void *colo_cache_from_block_offset(RAMBlock *block,
++                                                 ram_addr_t offset)
++{
++    if (!offset_in_ramblock(block, offset)) {
++        return NULL;
++    }
++    if (!block->colo_cache) {
++        error_report("%s: colo_cache is NULL in block :%s",
++                     __func__, block->idstr);
++        return NULL;
++    }
++    return block->colo_cache + offset;
++}
++
+ /*
+  * If a page (or a whole RDMA chunk) has been
+  * determined to be zero, then zap it.
+@@ -2542,7 +2557,12 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+                      RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE)) {
+             RAMBlock *block = ram_block_from_stream(f, flags);
+ 
+-            host = host_from_ram_block_offset(block, addr);
++            /* After going into COLO, we should load the Page into colo_cache */
++            if (ram_cache_enable) {
++                host = colo_cache_from_block_offset(block, addr);
++            } else {
++                host = host_from_ram_block_offset(block, addr);
++            }
+             if (!host) {
+                 error_report("Illegal RAM offset " RAM_ADDR_FMT, addr);
+                 ret = -EINVAL;
+@@ -2637,6 +2657,57 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+     return ret;
+ }
+ 
++/*
++ * colo cache: this is for secondary VM, we cache the whole
++ * memory of the secondary VM, it will be called after first migration.
++ */
++int colo_init_ram_cache(void)
++{
++    RAMBlock *block;
++
++    rcu_read_lock();
++    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
++        block->colo_cache = qemu_anon_ram_alloc(block->used_length, NULL);
++        if (!block->colo_cache) {
++            error_report("%s: Can't alloc memory for COLO cache of block %s,"
++                         "size 0x" RAM_ADDR_FMT, __func__, block->idstr,
++                         block->used_length);
++            goto out_locked;
++        }
++        memcpy(block->colo_cache, block->host, block->used_length);
++    }
++    rcu_read_unlock();
++    ram_cache_enable = true;
++    return 0;
++
++out_locked:
++    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
++        if (block->colo_cache) {
++            qemu_anon_ram_free(block->colo_cache, block->used_length);
++            block->colo_cache = NULL;
 +        }
 +    }
-+    return TRUE;
++
++    rcu_read_unlock();
++    return -errno;
 +}
 +
-+static void
-+filter_notify_finalize(GSource *source)
++void colo_release_ram_cache(void)
 +{
-+    FilterNotifier *notify = (FilterNotifier *)source;
++    RAMBlock *block;
 +
-+    event_notifier_cleanup(&notify->event);
-+}
++    ram_cache_enable = false;
 +
-+static GSourceFuncs notifier_source_funcs = {
-+    filter_notify_prepare,
-+    filter_notify_check,
-+    filter_notify_dispatch,
-+    filter_notify_finalize,
-+};
-+
-+FilterNotifier *filter_noitifier_new(FilterNotifierCallback *cb,
-+                    void *opaque, Error **errp)
-+{
-+    FilterNotifier *notify;
-+    int ret;
-+
-+    notify = (FilterNotifier *)g_source_new(&notifier_source_funcs,
-+                sizeof(FilterNotifier));
-+    ret = event_notifier_init(&notify->event, false);
-+    if (ret < 0) {
-+        error_setg_errno(errp, -ret, "Failed to initialize event notifier");
-+        goto fail;
++    rcu_read_lock();
++    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
++        if (block->colo_cache) {
++            qemu_anon_ram_free(block->colo_cache, block->used_length);
++            block->colo_cache = NULL;
++        }
 +    }
-+    notify->pfd.fd = event_notifier_get_fd(&notify->event);
-+    notify->pfd.events = G_IO_IN | G_IO_HUP | G_IO_ERR;
-+    notify->cb = cb;
-+    notify->opaque = opaque;
-+    g_source_add_poll(&notify->source, &notify->pfd);
-+
-+    return notify;
-+
-+fail:
-+    g_source_destroy(&notify->source);
-+    return NULL;
++    rcu_read_unlock();
 +}
 +
-+int filter_notifier_set(FilterNotifier *notify, uint64_t value)
-+{
-+    ssize_t ret;
-+
-+    do {
-+        ret = write(notify->event.wfd, &value, sizeof(value));
-+    } while (ret < 0 && errno == EINTR);
-+
-+    /* EAGAIN is fine, a read must be pending.  */
-+    if (ret < 0 && errno != EAGAIN) {
-+        return -errno;
-+    }
-+    return 0;
-+}
-diff --git a/net/colo.h b/net/colo.h
-index cd9027f..00f03b5 100644
---- a/net/colo.h
-+++ b/net/colo.h
-@@ -19,6 +19,7 @@
- #include "qemu/jhash.h"
- #include "qemu/timer.h"
- #include "slirp/tcp.h"
-+#include "qemu/event_notifier.h"
- 
- #define HASHTABLE_MAX_SIZE 16384
- 
-@@ -89,4 +90,21 @@ void connection_hashtable_reset(GHashTable *connection_track_table);
- Packet *packet_new(const void *data, int size);
- void packet_destroy(void *opaque, void *user_data);
- 
-+typedef void FilterNotifierCallback(void *opaque, int value);
-+typedef struct FilterNotifier {
-+    GSource source;
-+    EventNotifier event;
-+    GPollFD pfd;
-+    FilterNotifierCallback *cb;
-+    void *opaque;
-+} FilterNotifier;
-+
-+FilterNotifier *filter_noitifier_new(FilterNotifierCallback *cb,
-+                    void *opaque, Error **errp);
-+int filter_notifier_set(FilterNotifier *notify, uint64_t value);
-+
-+enum {
-+    COLO_CHECKPOINT = 2,
-+    COLO_FAILOVER,
-+};
- #endif /* QEMU_COLO_PROXY_H */
+ static SaveVMHandlers savevm_ram_handlers = {
+     .save_live_setup = ram_save_setup,
+     .save_live_iterate = ram_save_iterate,
 -- 
 1.8.3.1
