@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cgaTl-0006d9-An
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:13:27 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cgaTk-0006cI-4M
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:13:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cgaTi-0000Tn-Jn
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:13:25 -0500
-Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:35746)
+	(envelope-from <alex.bennee@linaro.org>) id 1cgaTh-0000TV-HA
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:13:24 -0500
+Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:32955)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cgaTi-0000TZ-AF
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:13:22 -0500
-Received: by mail-wr0-x232.google.com with SMTP id s27so6627893wrb.2
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 09:13:22 -0800 (PST)
+	id 1cgaTh-0000TO-7K
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:13:21 -0500
+Received: by mail-wr0-x229.google.com with SMTP id 97so6628136wrb.0
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 09:13:21 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed, 22 Feb 2017 17:13:04 +0000
-Message-Id: <20170222171327.26624-2-alex.bennee@linaro.org>
-In-Reply-To: <20170222171327.26624-1-alex.bennee@linaro.org>
-References: <20170222171327.26624-1-alex.bennee@linaro.org>
+Date: Wed, 22 Feb 2017 17:13:03 +0000
+Message-Id: <20170222171327.26624-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v13 01/24] docs: new design document
- multi-thread-tcg.txt
+Subject: [Qemu-devel] [PATCH v13 00/24] MTTCG Base enabling patches with ARM
+ enablement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,418 +31,120 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: rth@twiddle.net, peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This documents the current design for upgrading TCG emulation to take
-advantage of modern CPUs by running a thread-per-CPU. The document goes
-through the various areas of the code affected by such a change and
-proposes design requirements for each part of the solution.
+Hi Richard/Peter,
 
-The text marked with (Current solution[s]) to document what the current
-approaches being used are.
+I'm hoping this is the final version and we are ready to submit a
+pull-request to merge MTTCG upstream. Apart from the final set of
+architecture reviewed-by's the following patches have had minor
+tweaks:
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+  tcg: handle EXCP_ATOMIC exception for system emulation
 
----
-v1
-  - initial version
-v2
-  - update discussion on locks
-  - bit more detail on vCPU scheduling
-  - explicitly mention Translation Blocks
-  - emulated hardware state already covered by iomutex
-  - a few minor rewords
-v3
-  - mention this covers system-mode
-  - describe main main-loop and lookup hot-path
-  - mention multi-concurrent-reader lookups
-  - enumerate reasons for invalidation
-  - add more details on lookup structures
-  - describe the softmmu hot-path better
-  - mention store-after-load barrier problem
-v4
-  - mention some cross-over between linux-user/system emulation
-  - various minor grammar and scanning fixes
-  - fix reference to tb_ctx.htbale
-  - describe the solution for hot-path
-  - more detail on TB flushing and invalidation
-  - add (Current solution) following design requirements
-  - more detail on iothread/BQL mutex
-  - mention implicit memory barriers
-  - add links to current LL/SC and cmpxchg patch sets
-  - add TLB flag setting as an additional requirement
-v6
- - remove DRAFTING, update copyright dates
- - document current solutions to each design requirement
- - tb_lock() serialisation for codegen/patch
- - cputlb changes to defer cross-vCPU flushes
- - cputlb atomic updates for slow-path
- - BQL usage for hardware serialisation
- - cmpxchg as initial atomic/synchronisation support mechanism
-v7
- - minor format fix
- - include target-mips in list of MB aware front-ends
- - mention BQL around IRQ raising
- - update with notes on _all_cpus and the wait flag
----
- docs/multi-thread-tcg.txt | 350 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 350 insertions(+)
+  Fixed to handle yet another corner case of tb-flush being triggered
+  during an EXCP_ATOMIC exceptions. Also the mmap_lock is now correctly
+  taken (as EXCP_ATOMIC can be taken for linux-user).
+
+  tcg: remove global exit_request
+
+  In the single threaded round robin we also check for
+  cpu->queued_work_first and bail the loop if needed. Otherwise we run
+  into strangeness when the "target-arm: ensure all cross vCPUs TLB
+  flushes complete" runs in single-threaded mode. The tail end of the
+  commit message has been tweaked to explain this.
+
+  tcg: enable thread-per-vCPU
+
+  Pranith found a regression running linux-user tests/atomic_bench
+  which was due to the fact we previously removed a setting of
+  cpu->exit_request to 0 in cpu_handle_interrupt. Because the
+  linux-user loop doesn't have the outer loop of system emulation this
+  caused it to hang - always exiting the TB. There was a knock on
+  effect w.r.t to safe work for single-threaded execution but this was
+  fixed in commit above.
+
+So if you are happy are you going to be able to submit the pull
+request before the soft-freeze kicks in?
+
+Regards,
+
+Alex.
+
+Alex Bennée (18):
+  docs: new design document multi-thread-tcg.txt
+  tcg: move TCG_MO/BAR types into own file
+  tcg: add kick timer for single-threaded vCPU emulation
+  tcg: rename tcg_current_cpu to tcg_current_rr_cpu
+  tcg: remove global exit_request
+  tcg: enable tb_lock() for SoftMMU
+  tcg: enable thread-per-vCPU
+  cputlb: add assert_cpu_is_self checks
+  cputlb: tweak qemu_ram_addr_from_host_nofail reporting
+  cputlb and arm/sparc targets: convert mmuidx flushes from varg to
+    bitmap
+  cputlb: add tlb_flush_by_mmuidx async routines
+  cputlb: atomically update tlb fields used by tlb_reset_dirty
+  cputlb: introduce tlb_flush_*_all_cpus[_synced]
+  target-arm/powerctl: defer cpu reset work to CPU context
+  target-arm: don't generate WFE/YIELD calls for MTTCG
+  target-arm: ensure all cross vCPUs TLB flushes complete
+  hw/misc/imx6_src: defer clearing of SRC_SCR reset bits
+  tcg: enable MTTCG by default for ARM on x86 hosts
+
+Jan Kiszka (1):
+  tcg: drop global lock during TCG code execution
+
+KONRAD Frederic (2):
+  tcg: add options for enabling MTTCG
+  cputlb: introduce tlb_flush_* async work.
+
+Pranith Kumar (3):
+  mttcg: translate-all: Enable locking debug in a debug build
+  mttcg: Add missing tb_lock/unlock() in cpu_exec_step()
+  tcg: handle EXCP_ATOMIC exception for system emulation
+
+ configure                  |   6 +
+ cpu-exec-common.c          |   3 -
+ cpu-exec.c                 |  85 ++++++---
+ cpus.c                     | 345 ++++++++++++++++++++++++++-------
+ cputlb.c                   | 463 +++++++++++++++++++++++++++++++++++++--------
+ docs/multi-thread-tcg.txt  | 350 ++++++++++++++++++++++++++++++++++
+ exec.c                     |  12 +-
+ hw/core/irq.c              |   1 +
+ hw/i386/kvmvapic.c         |   4 +-
+ hw/intc/arm_gicv3_cpuif.c  |   3 +
+ hw/misc/imx6_src.c         |  58 +++++-
+ hw/ppc/ppc.c               |  16 +-
+ hw/ppc/spapr.c             |   3 +
+ include/exec/cputlb.h      |   2 -
+ include/exec/exec-all.h    | 132 +++++++++++--
+ include/qom/cpu.h          |  16 ++
+ include/sysemu/cpus.h      |   2 +
+ memory.c                   |   2 +
+ qemu-options.hx            |  20 ++
+ qom/cpu.c                  |  10 +
+ target/arm/arm-powerctl.c  | 202 +++++++++++++-------
+ target/arm/arm-powerctl.h  |   2 +
+ target/arm/cpu.c           |   4 +-
+ target/arm/cpu.h           |  18 +-
+ target/arm/helper.c        | 219 ++++++++++-----------
+ target/arm/kvm.c           |   7 +-
+ target/arm/machine.c       |  41 +++-
+ target/arm/op_helper.c     |  50 ++++-
+ target/arm/psci.c          |   4 +-
+ target/arm/translate-a64.c |   8 +-
+ target/arm/translate.c     |  20 +-
+ target/i386/smm_helper.c   |   7 +
+ target/s390x/misc_helper.c |   5 +-
+ target/sparc/ldst_helper.c |   8 +-
+ tcg/i386/tcg-target.h      |  11 ++
+ tcg/tcg-mo.h               |  48 +++++
+ tcg/tcg.h                  |  27 +--
+ translate-all.c            |  66 ++-----
+ translate-common.c         |  21 +-
+ vl.c                       |  49 ++++-
+ 40 files changed, 1874 insertions(+), 476 deletions(-)
  create mode 100644 docs/multi-thread-tcg.txt
+ create mode 100644 tcg/tcg-mo.h
 
-diff --git a/docs/multi-thread-tcg.txt b/docs/multi-thread-tcg.txt
-new file mode 100644
-index 0000000000..a99b4564c6
---- /dev/null
-+++ b/docs/multi-thread-tcg.txt
-@@ -0,0 +1,350 @@
-+Copyright (c) 2015-2016 Linaro Ltd.
-+
-+This work is licensed under the terms of the GNU GPL, version 2 or
-+later. See the COPYING file in the top-level directory.
-+
-+Introduction
-+============
-+
-+This document outlines the design for multi-threaded TCG system-mode
-+emulation. The current user-mode emulation mirrors the thread
-+structure of the translated executable. Some of the work will be
-+applicable to both system and linux-user emulation.
-+
-+The original system-mode TCG implementation was single threaded and
-+dealt with multiple CPUs with simple round-robin scheduling. This
-+simplified a lot of things but became increasingly limited as systems
-+being emulated gained additional cores and per-core performance gains
-+for host systems started to level off.
-+
-+vCPU Scheduling
-+===============
-+
-+We introduce a new running mode where each vCPU will run on its own
-+user-space thread. This will be enabled by default for all FE/BE
-+combinations that have had the required work done to support this
-+safely.
-+
-+In the general case of running translated code there should be no
-+inter-vCPU dependencies and all vCPUs should be able to run at full
-+speed. Synchronisation will only be required while accessing internal
-+shared data structures or when the emulated architecture requires a
-+coherent representation of the emulated machine state.
-+
-+Shared Data Structures
-+======================
-+
-+Main Run Loop
-+-------------
-+
-+Even when there is no code being generated there are a number of
-+structures associated with the hot-path through the main run-loop.
-+These are associated with looking up the next translation block to
-+execute. These include:
-+
-+    tb_jmp_cache (per-vCPU, cache of recent jumps)
-+    tb_ctx.htable (global hash table, phys address->tb lookup)
-+
-+As TB linking only occurs when blocks are in the same page this code
-+is critical to performance as looking up the next TB to execute is the
-+most common reason to exit the generated code.
-+
-+DESIGN REQUIREMENT: Make access to lookup structures safe with
-+multiple reader/writer threads. Minimise any lock contention to do it.
-+
-+The hot-path avoids using locks where possible. The tb_jmp_cache is
-+updated with atomic accesses to ensure consistent results. The fall
-+back QHT based hash table is also designed for lockless lookups. Locks
-+are only taken when code generation is required or TranslationBlocks
-+have their block-to-block jumps patched.
-+
-+Global TCG State
-+----------------
-+
-+We need to protect the entire code generation cycle including any post
-+generation patching of the translated code. This also implies a shared
-+translation buffer which contains code running on all cores. Any
-+execution path that comes to the main run loop will need to hold a
-+mutex for code generation. This also includes times when we need flush
-+code or entries from any shared lookups/caches. Structures held on a
-+per-vCPU basis won't need locking unless other vCPUs will need to
-+modify them.
-+
-+DESIGN REQUIREMENT: Add locking around all code generation and TB
-+patching.
-+
-+(Current solution)
-+
-+Mainly as part of the linux-user work all code generation is
-+serialised with a tb_lock(). For the SoftMMU tb_lock() also takes the
-+place of mmap_lock() in linux-user.
-+
-+Translation Blocks
-+------------------
-+
-+Currently the whole system shares a single code generation buffer
-+which when full will force a flush of all translations and start from
-+scratch again. Some operations also force a full flush of translations
-+including:
-+
-+  - debugging operations (breakpoint insertion/removal)
-+  - some CPU helper functions
-+
-+This is done with the async_safe_run_on_cpu() mechanism to ensure all
-+vCPUs are quiescent when changes are being made to shared global
-+structures.
-+
-+More granular translation invalidation events are typically due
-+to a change of the state of a physical page:
-+
-+  - code modification (self modify code, patching code)
-+  - page changes (new page mapping in linux-user mode)
-+
-+While setting the invalid flag in a TranslationBlock will stop it
-+being used when looked up in the hot-path there are a number of other
-+book-keeping structures that need to be safely cleared.
-+
-+Any TranslationBlocks which have been patched to jump directly to the
-+now invalid blocks need the jump patches reversing so they will return
-+to the C code.
-+
-+There are a number of look-up caches that need to be properly updated
-+including the:
-+
-+  - jump lookup cache
-+  - the physical-to-tb lookup hash table
-+  - the global page table
-+
-+The global page table (l1_map) which provides a multi-level look-up
-+for PageDesc structures which contain pointers to the start of a
-+linked list of all Translation Blocks in that page (see page_next).
-+
-+Both the jump patching and the page cache involve linked lists that
-+the invalidated TranslationBlock needs to be removed from.
-+
-+DESIGN REQUIREMENT: Safely handle invalidation of TBs
-+                      - safely patch/revert direct jumps
-+                      - remove central PageDesc lookup entries
-+                      - ensure lookup caches/hashes are safely updated
-+
-+(Current solution)
-+
-+The direct jump themselves are updated atomically by the TCG
-+tb_set_jmp_target() code. Modification to the linked lists that allow
-+searching for linked pages are done under the protect of the
-+tb_lock().
-+
-+The global page table is protected by the tb_lock() in system-mode and
-+mmap_lock() in linux-user mode.
-+
-+The lookup caches are updated atomically and the lookup hash uses QHT
-+which is designed for concurrent safe lookup.
-+
-+
-+Memory maps and TLBs
-+--------------------
-+
-+The memory handling code is fairly critical to the speed of memory
-+access in the emulated system. The SoftMMU code is designed so the
-+hot-path can be handled entirely within translated code. This is
-+handled with a per-vCPU TLB structure which once populated will allow
-+a series of accesses to the page to occur without exiting the
-+translated code. It is possible to set flags in the TLB address which
-+will ensure the slow-path is taken for each access. This can be done
-+to support:
-+
-+  - Memory regions (dividing up access to PIO, MMIO and RAM)
-+  - Dirty page tracking (for code gen, SMC detection, migration and display)
-+  - Virtual TLB (for translating guest address->real address)
-+
-+When the TLB tables are updated by a vCPU thread other than their own
-+we need to ensure it is done in a safe way so no inconsistent state is
-+seen by the vCPU thread.
-+
-+Some operations require updating a number of vCPUs TLBs at the same
-+time in a synchronised manner.
-+
-+DESIGN REQUIREMENTS:
-+
-+  - TLB Flush All/Page
-+    - can be across-vCPUs
-+    - cross vCPU TLB flush may need other vCPU brought to halt
-+    - change may need to be visible to the calling vCPU immediately
-+  - TLB Flag Update
-+    - usually cross-vCPU
-+    - want change to be visible as soon as possible
-+  - TLB Update (update a CPUTLBEntry, via tlb_set_page_with_attrs)
-+    - This is a per-vCPU table - by definition can't race
-+    - updated by its own thread when the slow-path is forced
-+
-+(Current solution)
-+
-+We have updated cputlb.c to defer operations when a cross-vCPU
-+operation with async_run_on_cpu() which ensures each vCPU sees a
-+coherent state when it next runs its work (in a few instructions
-+time).
-+
-+A new set up operations (tlb_flush_*_all_cpus) take an additional flag
-+which when set will force synchronisation by setting the source vCPUs
-+work as "safe work" and exiting the cpu run loop. This ensure by the
-+time execution restarts all flush operations have completed.
-+
-+TLB flag updates are all done atomically and are also protected by the
-+tb_lock() which is used by the functions that update the TLB in bulk.
-+
-+(Known limitation)
-+
-+Not really a limitation but the wait mechanism is overly strict for
-+some architectures which only need flushes completed by a barrier
-+instruction. This could be a future optimisation.
-+
-+Emulated hardware state
-+-----------------------
-+
-+Currently thanks to KVM work any access to IO memory is automatically
-+protected by the global iothread mutex, also known as the BQL (Big
-+Qemu Lock). Any IO region that doesn't use global mutex is expected to
-+do its own locking.
-+
-+However IO memory isn't the only way emulated hardware state can be
-+modified. Some architectures have model specific registers that
-+trigger hardware emulation features. Generally any translation helper
-+that needs to update more than a single vCPUs of state should take the
-+BQL.
-+
-+As the BQL, or global iothread mutex is shared across the system we
-+push the use of the lock as far down into the TCG code as possible to
-+minimise contention.
-+
-+(Current solution)
-+
-+MMIO access automatically serialises hardware emulation by way of the
-+BQL. Currently ARM targets serialise all ARM_CP_IO register accesses
-+and also defer the reset/startup of vCPUs to the vCPU context by way
-+of async_run_on_cpu().
-+
-+Updates to interrupt state are also protected by the BQL as they can
-+often be cross vCPU.
-+
-+Memory Consistency
-+==================
-+
-+Between emulated guests and host systems there are a range of memory
-+consistency models. Even emulating weakly ordered systems on strongly
-+ordered hosts needs to ensure things like store-after-load re-ordering
-+can be prevented when the guest wants to.
-+
-+Memory Barriers
-+---------------
-+
-+Barriers (sometimes known as fences) provide a mechanism for software
-+to enforce a particular ordering of memory operations from the point
-+of view of external observers (e.g. another processor core). They can
-+apply to any memory operations as well as just loads or stores.
-+
-+The Linux kernel has an excellent write-up on the various forms of
-+memory barrier and the guarantees they can provide [1].
-+
-+Barriers are often wrapped around synchronisation primitives to
-+provide explicit memory ordering semantics. However they can be used
-+by themselves to provide safe lockless access by ensuring for example
-+a change to a signal flag will only be visible once the changes to
-+payload are.
-+
-+DESIGN REQUIREMENT: Add a new tcg_memory_barrier op
-+
-+This would enforce a strong load/store ordering so all loads/stores
-+complete at the memory barrier. On single-core non-SMP strongly
-+ordered backends this could become a NOP.
-+
-+Aside from explicit standalone memory barrier instructions there are
-+also implicit memory ordering semantics which comes with each guest
-+memory access instruction. For example all x86 load/stores come with
-+fairly strong guarantees of sequential consistency where as ARM has
-+special variants of load/store instructions that imply acquire/release
-+semantics.
-+
-+In the case of a strongly ordered guest architecture being emulated on
-+a weakly ordered host the scope for a heavy performance impact is
-+quite high.
-+
-+DESIGN REQUIREMENTS: Be efficient with use of memory barriers
-+       - host systems with stronger implied guarantees can skip some barriers
-+       - merge consecutive barriers to the strongest one
-+
-+(Current solution)
-+
-+The system currently has a tcg_gen_mb() which will add memory barrier
-+operations if code generation is being done in a parallel context. The
-+tcg_optimize() function attempts to merge barriers up to their
-+strongest form before any load/store operations. The solution was
-+originally developed and tested for linux-user based systems. All
-+backends have been converted to emit fences when required. So far the
-+following front-ends have been updated to emit fences when required:
-+
-+    - target-i386
-+    - target-arm
-+    - target-aarch64
-+    - target-alpha
-+    - target-mips
-+
-+Memory Control and Maintenance
-+------------------------------
-+
-+This includes a class of instructions for controlling system cache
-+behaviour. While QEMU doesn't model cache behaviour these instructions
-+are often seen when code modification has taken place to ensure the
-+changes take effect.
-+
-+Synchronisation Primitives
-+--------------------------
-+
-+There are two broad types of synchronisation primitives found in
-+modern ISAs: atomic instructions and exclusive regions.
-+
-+The first type offer a simple atomic instruction which will guarantee
-+some sort of test and conditional store will be truly atomic w.r.t.
-+other cores sharing access to the memory. The classic example is the
-+x86 cmpxchg instruction.
-+
-+The second type offer a pair of load/store instructions which offer a
-+guarantee that an region of memory has not been touched between the
-+load and store instructions. An example of this is ARM's ldrex/strex
-+pair where the strex instruction will return a flag indicating a
-+successful store only if no other CPU has accessed the memory region
-+since the ldrex.
-+
-+Traditionally TCG has generated a series of operations that work
-+because they are within the context of a single translation block so
-+will have completed before another CPU is scheduled. However with
-+the ability to have multiple threads running to emulate multiple CPUs
-+we will need to explicitly expose these semantics.
-+
-+DESIGN REQUIREMENTS:
-+  - Support classic atomic instructions
-+  - Support load/store exclusive (or load link/store conditional) pairs
-+  - Generic enough infrastructure to support all guest architectures
-+CURRENT OPEN QUESTIONS:
-+  - How problematic is the ABA problem in general?
-+
-+(Current solution)
-+
-+The TCG provides a number of atomic helpers (tcg_gen_atomic_*) which
-+can be used directly or combined to emulate other instructions like
-+ARM's ldrex/strex instructions. While they are susceptible to the ABA
-+problem so far common guests have not implemented patterns where
-+this may be a problem - typically presenting a locking ABI which
-+assumes cmpxchg like semantics.
-+
-+The code also includes a fall-back for cases where multi-threaded TCG
-+ops can't work (e.g. guest atomic width > host atomic width). In this
-+case an EXCP_ATOMIC exit occurs and the instruction is emulated with
-+an exclusive lock which ensures all emulation is serialised.
-+
-+While the atomic helpers look good enough for now there may be a need
-+to look at solutions that can more closely model the guest
-+architectures semantics.
-+
-+==========
-+
-+[1] https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/plain/Documentation/memory-barriers.txt
 -- 
 2.11.0
