@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cgQVB-00038k-Om
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:34:16 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cgQV9-0008Bt-Ie
+	(envelope-from <dgibson@ozlabs.org>) id 1cgQV8-000357-Lt
 	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:34:13 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1cgQV5-00083p-Vx
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:34:10 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 22 Feb 2017 17:33:33 +1100
-Message-Id: <20170222063348.32176-29-david@gibson.dropbear.id.au>
+Date: Wed, 22 Feb 2017 17:33:28 +1100
+Message-Id: <20170222063348.32176-24-david@gibson.dropbear.id.au>
 In-Reply-To: <20170222063348.32176-1-david@gibson.dropbear.id.au>
 References: <20170222063348.32176-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 28/43] target/ppc/POWER9: Add ISAv3.00 MMU
- definition
+Subject: [Qemu-devel] [PULL 23/43] softfloat: Add
+ float128_to_uint64_round_to_zero()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,75 +21,105 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, thuth@redhat.com, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, imammedo@redhat.com, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, thuth@redhat.com, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, imammedo@redhat.com, Bharata B Rao <bharata@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-POWER9 processors implement the mmu as defined in version 3.00 of the ISA.
+Implement float128_to_uint64() and use that to implement
+float128_to_uint64_round_to_zero()
 
-Add a definition for this mmu model and set the POWER9 cpu model to use
-this mmu model.
+This is required by xscvqpudz instruction of PowerPC ISA 3.0.
 
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/cpu-qom.h        | 5 ++++-
- target/ppc/mmu_helper.c     | 2 ++
- target/ppc/translate_init.c | 3 +--
- 3 files changed, 7 insertions(+), 3 deletions(-)
+ fpu/softfloat.c         | 59 +++++++++++++++++++++++++++++++++++++++++++++++++
+ include/fpu/softfloat.h |  2 ++
+ 2 files changed, 61 insertions(+)
 
-diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-index b7977ba..4e3132b 100644
---- a/target/ppc/cpu-qom.h
-+++ b/target/ppc/cpu-qom.h
-@@ -86,10 +86,13 @@ enum powerpc_mmu_t {
-     POWERPC_MMU_2_07       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
-                              | POWERPC_MMU_64K
-                              | POWERPC_MMU_AMR | 0x00000004,
--    /* FIXME Add POWERPC_MMU_3_OO defines */
-     /* Architecture 2.07 "degraded" (no 1T segments)           */
-     POWERPC_MMU_2_07a      = POWERPC_MMU_64 | POWERPC_MMU_AMR
-                              | 0x00000004,
-+    /* Architecture 3.00 variant                               */
-+    POWERPC_MMU_3_00       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
-+                             | POWERPC_MMU_64K
-+                             | POWERPC_MMU_AMR | 0x00000005,
- };
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index 5ccba76..47e4646 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -6128,6 +6128,65 @@ int64_t float128_to_int64_round_to_zero(float128 a, float_status *status)
+ }
  
- /*****************************************************************************/
-diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
-index f746f53..172a305 100644
---- a/target/ppc/mmu_helper.c
-+++ b/target/ppc/mmu_helper.c
-@@ -1935,6 +1935,7 @@ void ppc_tlb_invalidate_all(CPUPPCState *env)
-     case POWERPC_MMU_2_06a:
-     case POWERPC_MMU_2_07:
-     case POWERPC_MMU_2_07a:
-+    case POWERPC_MMU_3_00:
- #endif /* defined(TARGET_PPC64) */
-         env->tlb_need_flush = 0;
-         tlb_flush(CPU(cpu));
-@@ -1974,6 +1975,7 @@ void ppc_tlb_invalidate_one(CPUPPCState *env, target_ulong addr)
-     case POWERPC_MMU_2_06a:
-     case POWERPC_MMU_2_07:
-     case POWERPC_MMU_2_07a:
-+    case POWERPC_MMU_3_00:
-         /* tlbie invalidate TLBs for all segments */
-         /* XXX: given the fact that there are too many segments to invalidate,
-          *      and we still don't have a tlb_flush_mask(env, n, mask) in QEMU,
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 76f79fa..84bf125 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -8816,8 +8816,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
-                     (1ull << MSR_PMM) |
-                     (1ull << MSR_RI) |
-                     (1ull << MSR_LE);
--    /* Using 2.07 defines until new radix model is added. */
--    pcc->mmu_model = POWERPC_MMU_2_07;
-+    pcc->mmu_model = POWERPC_MMU_3_00;
- #if defined(CONFIG_SOFTMMU)
-     pcc->handle_mmu_fault = ppc_hash64_handle_mmu_fault;
-     /* segment page size remain the same */
+ /*----------------------------------------------------------------------------
++| Returns the result of converting the quadruple-precision floating-point value
++| `a' to the 64-bit unsigned integer format.  The conversion is
++| performed according to the IEC/IEEE Standard for Binary Floating-Point
++| Arithmetic---which means in particular that the conversion is rounded
++| according to the current rounding mode.  If `a' is a NaN, the largest
++| positive integer is returned.  If the conversion overflows, the
++| largest unsigned integer is returned.  If 'a' is negative, the value is
++| rounded and zero is returned; negative values that do not round to zero
++| will raise the inexact exception.
++*----------------------------------------------------------------------------*/
++
++uint64_t float128_to_uint64(float128 a, float_status *status)
++{
++    flag aSign;
++    int aExp;
++    int shiftCount;
++    uint64_t aSig0, aSig1;
++
++    aSig0 = extractFloat128Frac0(a);
++    aSig1 = extractFloat128Frac1(a);
++    aExp = extractFloat128Exp(a);
++    aSign = extractFloat128Sign(a);
++    if (aSign && (aExp > 0x3FFE)) {
++        float_raise(float_flag_invalid, status);
++        if (float128_is_any_nan(a)) {
++            return LIT64(0xFFFFFFFFFFFFFFFF);
++        } else {
++            return 0;
++        }
++    }
++    if (aExp) {
++        aSig0 |= LIT64(0x0001000000000000);
++    }
++    shiftCount = 0x402F - aExp;
++    if (shiftCount <= 0) {
++        if (0x403E < aExp) {
++            float_raise(float_flag_invalid, status);
++            return LIT64(0xFFFFFFFFFFFFFFFF);
++        }
++        shortShift128Left(aSig0, aSig1, -shiftCount, &aSig0, &aSig1);
++    } else {
++        shift64ExtraRightJamming(aSig0, aSig1, shiftCount, &aSig0, &aSig1);
++    }
++    return roundAndPackUint64(aSign, aSig0, aSig1, status);
++}
++
++uint64_t float128_to_uint64_round_to_zero(float128 a, float_status *status)
++{
++    uint64_t v;
++    signed char current_rounding_mode = status->float_rounding_mode;
++
++    set_float_rounding_mode(float_round_to_zero, status);
++    v = float128_to_uint64(a, status);
++    set_float_rounding_mode(current_rounding_mode, status);
++
++    return v;
++}
++
++/*----------------------------------------------------------------------------
+ | Returns the result of converting the quadruple-precision floating-point
+ | value `a' to the single-precision floating-point format.  The conversion
+ | is performed according to the IEC/IEEE Standard for Binary Floating-Point
+diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+index 8a39028..a09ad0e 100644
+--- a/include/fpu/softfloat.h
++++ b/include/fpu/softfloat.h
+@@ -714,6 +714,8 @@ int32_t float128_to_int32(float128, float_status *status);
+ int32_t float128_to_int32_round_to_zero(float128, float_status *status);
+ int64_t float128_to_int64(float128, float_status *status);
+ int64_t float128_to_int64_round_to_zero(float128, float_status *status);
++uint64_t float128_to_uint64(float128, float_status *status);
++uint64_t float128_to_uint64_round_to_zero(float128, float_status *status);
+ float32 float128_to_float32(float128, float_status *status);
+ float64 float128_to_float64(float128, float_status *status);
+ floatx80 float128_to_floatx80(float128, float_status *status);
 -- 
 2.9.3
