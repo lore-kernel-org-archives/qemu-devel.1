@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cgcNV-0004dY-Sr
+	(envelope-from <armbru@redhat.com>) id 1cgcNW-0004du-7r
 	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 14:15:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cgcNU-0000fw-9X
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 14:15:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39000)
+	(envelope-from <armbru@redhat.com>) id 1cgcNU-0000g1-Aw
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 14:15:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47436)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cgcNU-0000fX-4X
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cgcNU-0000fY-4k
 	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 14:15:04 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6155E3D95F
+	by mx1.redhat.com (Postfix) with ESMTPS id 61A997FB76
 	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 19:15:04 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
-	by int-mx10.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v1MJF3FW023373
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=NO)
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 14:15:04 -0500
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 27F60B122B
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 19:15:04 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 22 Feb 2017 20:14:58 +0100
-Message-Id: <1487790898-24921-17-git-send-email-armbru@redhat.com>
+Date: Wed, 22 Feb 2017 20:14:57 +0100
+Message-Id: <1487790898-24921-16-git-send-email-armbru@redhat.com>
 In-Reply-To: <1487790898-24921-1-git-send-email-armbru@redhat.com>
 References: <1487790898-24921-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 16/16] block: Don't bother asserting type of
- output visitor's output
+Subject: [Qemu-devel] [PULL 15/16] monitor: Clean up handle_hmp_command() a
+ bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,63 +36,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-After a visit of a complex QAPI type FOO
-
-    ov = qobject_output_visitor_new(&foo);
-    visit_type_FOO(ov, NULL, expr, &error_abort);
-    visit_complete(ov, &foo);
-
-we can safely assume qobject_type(foo) is QTYPE_QDICT.  We do in many
-places, but occasionally assert qobject_type(obj) == QTYPE_QDICT.
-Don't.  The appropriate place to check such fundamental properties of
-QAPI visitors is the test suite.
+Leave checking qobject_type(req) to qmp_check_input_obj().  Rework
+handling of json_parser_parse_err() failing without setting an error.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1487363905-9480-15-git-send-email-armbru@redhat.com>
+Message-Id: <1487363905-9480-14-git-send-email-armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/nbd.c  | 2 --
- block/nfs.c  | 2 --
- block/qapi.c | 1 -
- 3 files changed, 5 deletions(-)
+ monitor.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/block/nbd.c b/block/nbd.c
-index 35f24be..a7f9108 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -537,8 +537,6 @@ static void nbd_refresh_filename(BlockDriverState *bs, QDict *options)
-     visit_type_SocketAddress(ov, NULL, &s->saddr, &error_abort);
-     visit_complete(ov, &saddr_qdict);
-     visit_free(ov);
--    assert(qobject_type(saddr_qdict) == QTYPE_QDICT);
--
-     qdict_put_obj(opts, "server", saddr_qdict);
+diff --git a/monitor.c b/monitor.c
+index 493bed9..1e352a6 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -3735,10 +3735,11 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
+     Error *err = NULL;
  
-     if (s->export) {
-diff --git a/block/nfs.c b/block/nfs.c
-index 08b43dd..0cf115e 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -805,8 +805,6 @@ static void nfs_refresh_filename(BlockDriverState *bs, QDict *options)
-     ov = qobject_output_visitor_new(&server_qdict);
-     visit_type_NFSServer(ov, NULL, &client->server, &error_abort);
-     visit_complete(ov, &server_qdict);
--    assert(qobject_type(server_qdict) == QTYPE_QDICT);
--
-     qdict_put_obj(opts, "server", server_qdict);
-     qdict_put(opts, "path", qstring_from_str(client->path));
+     req = json_parser_parse_err(tokens, NULL, &err);
+-    if (err || !req || qobject_type(req) != QTYPE_QDICT) {
+-        if (!err) {
+-            error_setg(&err, QERR_JSON_PARSING);
+-        }
++    if (!req && !err) {
++        /* json_parser_parse_err() sucks: can fail without setting @err */
++        error_setg(&err, QERR_JSON_PARSING);
++    }
++    if (err) {
+         goto err_out;
+     }
  
-diff --git a/block/qapi.c b/block/qapi.c
-index ac480aa..a40922e 100644
---- a/block/qapi.c
-+++ b/block/qapi.c
-@@ -682,7 +682,6 @@ void bdrv_image_info_specific_dump(fprintf_function func_fprintf, void *f,
- 
-     visit_type_ImageInfoSpecific(v, NULL, &info_spec, &error_abort);
-     visit_complete(v, &obj);
--    assert(qobject_type(obj) == QTYPE_QDICT);
-     data = qdict_get(qobject_to_qdict(obj), "data");
-     dump_qobject(func_fprintf, f, 1, data);
-     qobject_decref(obj);
 -- 
 2.7.4
