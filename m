@@ -1,35 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cgZMJ-0005OC-O4
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 11:01:43 -0500
+	(envelope-from <Chris.Friesen@windriver.com>) id 1cgZZt-0000Xc-Cy
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 11:15:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cgZMF-0002vD-RJ
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 11:01:39 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54721)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1cgZMF-0002uq-Hm
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 11:01:35 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1MFwmpN114792
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 11:01:34 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28rt1kyyq5-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 11:01:33 -0500
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Wed, 22 Feb 2017 16:01:31 -0000
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Wed, 22 Feb 2017 17:01:19 +0100
-In-Reply-To: <20170222160119.52771-1-pasic@linux.vnet.ibm.com>
-References: <20170222160119.52771-1-pasic@linux.vnet.ibm.com>
-Message-Id: <20170222160119.52771-6-pasic@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 5/5] tests/test-vmstate.c: test array of ptr
- to primitive
+	(envelope-from <Chris.Friesen@windriver.com>) id 1cgZZq-0007Og-5c
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 11:15:41 -0500
+Received: from mail.windriver.com ([147.11.1.11]:40904)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Chris.Friesen@windriver.com>)
+	id 1cgZZp-0007Nb-SF
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 11:15:38 -0500
+Message-ID: <58AD92AE.6040502@windriver.com>
+Date: Wed, 22 Feb 2017 07:31:26 -0600
+From: Chris Friesen <chris.friesen@windriver.com>
+MIME-Version: 1.0
+References: <589C7E96.9060905@huawei.com> <589D83CE.1090803@huawei.com>
+	<589DDC05.9010807@windriver.com> <58AA51D6.6020508@huawei.com>
+	<1487565495.3740.27.camel@intel.com> <58AD0094.90304@windriver.com>
+	<4dd92012-626a-2d80-9adb-0be398f73eb1@redhat.com>
+In-Reply-To: <4dd92012-626a-2d80-9adb-0be398f73eb1@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] kvm bug in __rmap_clear_dirty during live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,89 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, Amit Shah <amit.shah@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, "Han, Huaitong" <huaitong.han@intel.com>, "hangaohuai@huawei.com" <hangaohuai@huawei.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "fangying1@huawei.com" <fangying1@huawei.com>, "herongguang.he@huawei.com" <herongguang.he@huawei.com>, "xudong.hao@linux.intel.com" <xudong.hao@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "wangxinxin.wang@huawei.com" <wangxinxin.wang@huawei.com>, "kai.huang@linux.intel.com" <kai.huang@linux.intel.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "guangrong.xiao@linux.intel.com" <guangrong.xiao@linux.intel.com>
 
-Let's have a test for ptr arrays to some primitive type with some
-not-null and null ptrs intermixed.
+On 02/22/2017 05:15 AM, Paolo Bonzini wrote:
+>
+>
+> On 22/02/2017 04:08, Chris Friesen wrote:
+>> On 02/19/2017 10:38 PM, Han, Huaitong wrote:
+>>> Hi, Gaohuai
+>>>
+>>> I tried to debug the problem, and I found the indirect cause may be that
+>>> the rmap value is not cleared when KVM mmu page is freed. I have read
+>>> code without the root cause. Can you stable reproduce the the issue?
+>>> Many guesses need to be verified.
+>>
+>> In both cases it seems to have been triggered by repeatedly
+>> live-migrating a KVM virtual machine between two hypervisors with
+>> Broadwell CPUs running the latest CentOS 7.
+>>
+>> It's a race of some sort, it doesn't happen every time.
+>
+> Can you reproduce it with kernel 4.8+?  I'm suspecting commmit
+> 4e59516a12a6 ("kvm: vmx: ensure VMCS is current while enabling PML",
+> 2016-07-14) to be the fix.
 
-Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+I can't easily try with a newer kernel, the software package we're using has 
+kernel patches that would have to be ported.
 
----
+I'm at a conference, don't really have time to set up a pair of test machines 
+from scratch with a custom kernel.
 
-Mainly for the sake of completeness and also to demonstrate that it works
-since in the previous version I wrongly stated it does not. If guys think
-we do not need this, I'm happy with just dropping it.
----
- tests/test-vmstate.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
-
-diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
-index eafef94..3abdc1a 100644
---- a/tests/test-vmstate.c
-+++ b/tests/test-vmstate.c
-@@ -568,6 +568,50 @@ static void test_arr_ptr_str_0_load(void)
-     }
- }
- 
-+typedef struct TestArrayOfPtrToInt {
-+    int32_t *ar[AR_SIZE];
-+} TestArrayOfPtrToInt;
-+
-+const VMStateDescription vmsd_arpp = {
-+    .name = "test/arps",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_ARRAY_OF_POINTER(ar, TestArrayOfPtrToInt,
-+                AR_SIZE, 0, vmstate_info_int32, int32_t*),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void test_arr_ptr_prim_0_save(void)
-+{
-+    int32_t ar[AR_SIZE] = {0 , 1, 2, 3};
-+    TestArrayOfPtrToInt  sample = {.ar = {&ar[0], NULL, &ar[2], &ar[3]} };
-+
-+    save_vmstate(&vmsd_arpp, &sample);
-+    compare_vmstate(wire_arr_ptr_0, sizeof(wire_arr_ptr_0));
-+}
-+
-+static void test_arr_ptr_prim_0_load(void)
-+{
-+    int32_t ar_gt[AR_SIZE] = {0, 1, 2, 3};
-+    int32_t ar[AR_SIZE] = {3 , 42, 1, 0};
-+    TestArrayOfPtrToInt obj = {.ar = {&ar[0], NULL, &ar[2], &ar[3]} };
-+    int idx;
-+
-+    save_buffer(wire_arr_ptr_0, sizeof(wire_arr_ptr_0));
-+    SUCCESS(load_vmstate_one(&vmsd_arpp, &obj, 1,
-+                          wire_arr_ptr_0, sizeof(wire_arr_ptr_0)));
-+    for (idx = 0; idx < AR_SIZE; ++idx) {
-+        /* compare the target array ar with the ground truth array ar_gt */
-+        if (idx == 1) {
-+            g_assert_cmpint(42, ==, ar[idx]);
-+        } else {
-+            g_assert_cmpint(ar_gt[idx], ==, ar[idx]);
-+        }
-+    }
-+}
-+
- /* test QTAILQ migration */
- typedef struct TestQtailqElement TestQtailqElement;
- 
-@@ -821,6 +865,10 @@ int main(int argc, char **argv)
-     g_test_add_func("/vmstate/array/ptr/str/0/save", test_arr_ptr_str_0_save);
-     g_test_add_func("/vmstate/array/ptr/str/0/load",
-                     test_arr_ptr_str_0_load);
-+    g_test_add_func("/vmstate/array/ptr/prim/0/save",
-+                    test_arr_ptr_prim_0_save);
-+    g_test_add_func("/vmstate/array/ptr/prim/0/load",
-+                    test_arr_ptr_prim_0_load);
-     g_test_add_func("/vmstate/qtailq/save/saveq", test_save_q);
-     g_test_add_func("/vmstate/qtailq/load/loadq", test_load_q);
-     g_test_add_func("/vmstate/tmp_struct", test_tmp_struct);
--- 
-2.8.4
+Chris
