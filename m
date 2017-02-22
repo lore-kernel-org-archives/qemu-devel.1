@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cgV9C-0007KO-5N
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:31:51 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cgV9X-0007i0-3l
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:32:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cgV9B-0008KD-2Q
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:31:50 -0500
-Date: Wed, 22 Feb 2017 11:31:39 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170222113139.GJ28937@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170220151921.22842-1-berrange@redhat.com>
-	<20170220151921.22842-3-berrange@redhat.com>
-	<20170222104606.GF4112@noname.str.redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1cgV9U-0008QA-1P
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:32:11 -0500
+Resent-Message-Id: <E1cgV9U-0008QA-1P@eggs.gnu.org>
+In-Reply-To: <20170222112338.25492-1-clement.deschamps@antfield.fr>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148776308488.129.17265389250289731388@0e2666bad730>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170222104606.GF4112@noname.str.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/4] qemu-img: fix --image-opts usage
- with dd command
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 22 Feb 2017 03:31:25 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] add sdhost and gpio controllers to
+ the bcm2835 platform
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,39 +24,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>
+To: clement.deschamps@antfield.fr
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org, andrew.baumann@microsoft.com
 
-On Wed, Feb 22, 2017 at 11:46:06AM +0100, Kevin Wolf wrote:
-> Am 20.02.2017 um 16:19 hat Daniel P. Berrange geschrieben:
-> > The --image-opts flag can only be used to affect the parsing
-> > of the source image. The target image has to be specified in
-> > the traditional style regardless, since it needs to be passed
-> > to the bdrv_create() API which does not support the new style
-> > opts.
-> > 
-> > Reviewed-by: Max Reitz <mreitz@redhat.com>
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> 
-> Hm. This means that...
-> 
-> 1. --image-opts never worked for 'qemu-img dd'
-> 
-> 2. If we ever change bdrv_create() to be more flexible, with this patch
->    we'd be stuck with an inconsistent "filename for target, options for
->    source" interface because we can't change the semantics any more.
-> 
-> Should we just remove --image-opts from qemu-img dd instead until we can
-> provide the real thing?
-
-We're already in that situation wrt bdrv_create() for other commands, so
-we need a separate flag to request use of image opts for the target
-image. So I don't think we want to special case dd in this respect.
-
-
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC8zXSBhZGQgc2Rob3N0IGFuZCBncGlvIGNv
+bnRyb2xsZXJzIHRvIHRoZSBiY20yODM1IHBsYXRmb3JtCk1lc3NhZ2UtaWQ6IDIwMTcwMjIyMTEy
+MzM4LjI1NDkyLTEtY2xlbWVudC5kZXNjaGFtcHNAYW50ZmllbGQuZnIKCj09PSBURVNUIFNDUklQ
+VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0t
+b25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJz
+ZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRD
+SCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEg
+Z2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
+aWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBu
+PSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
+YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBz
+Oi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBw
+YXRjaGV3LzIwMTcwMjIxMTg1OTAxLjMyNTYtMS1zdGVmYW5oYUByZWRoYXQuY29tIC0+IHBhdGNo
+ZXcvMjAxNzAyMjExODU5MDEuMzI1Ni0xLXN0ZWZhbmhhQHJlZGhhdC5jb20KICogW25ldyB0YWdd
+ICAgICAgICAgcGF0Y2hldy8yMDE3MDIyMjExMjMzOC4yNTQ5Mi0xLWNsZW1lbnQuZGVzY2hhbXBz
+QGFudGZpZWxkLmZyIC0+IHBhdGNoZXcvMjAxNzAyMjIxMTIzMzguMjU0OTItMS1jbGVtZW50LmRl
+c2NoYW1wc0BhbnRmaWVsZC5mcgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmE0ODEx
+YzIgYmNtMjgzNTogYWRkIHNkaG9zdCBhbmQgZ3BpbyBjb250cm9sbGVycwo3ZTM4MzM0IGJjbTI4
+MzVfZ3BpbzogYWRkIGJjbTI4MzUgZ3BpbyBjb250cm9sbGVyCmFmODI0YzMgYmNtMjgzNV9zZGhv
+c3Q6IGFkZCBiY20yODM1IHNkaG9zdCBjb250cm9sbGVyCgo9PT0gT1VUUFVUIEJFR0lOID09PQpD
+aGVja2luZyBQQVRDSCAxLzM6IGJjbTI4MzVfc2Rob3N0OiBhZGQgYmNtMjgzNSBzZGhvc3QgY29u
+dHJvbGxlci4uLgpDaGVja2luZyBQQVRDSCAyLzM6IGJjbTI4MzVfZ3BpbzogYWRkIGJjbTI4MzUg
+Z3BpbyBjb250cm9sbGVyLi4uCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBiZWZvcmUgdGhlIG9wZW4g
+cGFyZW50aGVzaXMgJygnCiM5NzogRklMRTogaHcvZ3Bpby9iY20yODM1X2dwaW8uYzo2ODoKKyAg
+ICBpZihraWQgPT0gTlVMTCkgewoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0MDMgbGlu
+ZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
+ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
+dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tp
+bmcgUEFUQ0ggMy8zOiBiY20yODM1OiBhZGQgc2Rob3N0IGFuZCBncGlvIGNvbnRyb2xsZXJzLi4u
+Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgot
+LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
+ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVl
+bGlzdHMub3Jn
