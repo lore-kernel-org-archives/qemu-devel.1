@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38049)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cgQVB-00038p-S5
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:34:17 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cgQV7-000334-H5
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:34:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cgQV9-0008C7-Po
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:34:13 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cgQV4-00081b-SS
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:34:09 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 22 Feb 2017 17:33:38 +1100
-Message-Id: <20170222063348.32176-34-david@gibson.dropbear.id.au>
+Date: Wed, 22 Feb 2017 17:33:29 +1100
+Message-Id: <20170222063348.32176-25-david@gibson.dropbear.id.au>
 In-Reply-To: <20170222063348.32176-1-david@gibson.dropbear.id.au>
 References: <20170222063348.32176-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 33/43] pc: move pcms->possible_cpus init out of
- pc_cpus_init()
+Subject: [Qemu-devel] [PULL 24/43] softfloat: Add
+ float128_to_uint32_round_to_zero()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,84 +21,71 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, thuth@redhat.com, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, imammedo@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, thuth@redhat.com, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, imammedo@redhat.com, Bharata B Rao <bharata@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Igor Mammedov <imammedo@redhat.com>
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-possible_cpus could be initialized earlier then cpu objects,
-i.e. when -smp is parsed so move init code to possible_cpu_arch_ids()
-interface func and do initialization on the first call.
+float128_to_uint32_round_to_zero() is needed by xscvqpuwz instruction
+of PowerPC ISA 3.0.
 
-it should help later with making -numa cpu/-smp parsing a machine state
-properties.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/i386/pc.c | 35 ++++++++++++++++++++++++-----------
- 1 file changed, 24 insertions(+), 11 deletions(-)
+ fpu/softfloat.c         | 28 ++++++++++++++++++++++++++++
+ include/fpu/softfloat.h |  1 +
+ 2 files changed, 29 insertions(+)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 04c6e59..a187748 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1144,7 +1144,9 @@ void pc_cpus_init(PCMachineState *pcms)
-     ObjectClass *oc;
-     const char *typename;
-     gchar **model_pieces;
-+    const CPUArchIdList *possible_cpus;
-     MachineState *machine = MACHINE(pcms);
-+    MachineClass *mc = MACHINE_GET_CLASS(pcms);
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index 47e4646..485a006 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -6188,6 +6188,34 @@ uint64_t float128_to_uint64_round_to_zero(float128 a, float_status *status)
  
-     /* init CPUs */
-     if (machine->cpu_model == NULL) {
-@@ -1179,14 +1181,9 @@ void pc_cpus_init(PCMachineState *pcms)
-      * This is used for FW_CFG_MAX_CPUS. See comments on bochs_bios_init().
-      */
-     pcms->apic_id_limit = x86_cpu_apic_id_from_index(max_cpus - 1) + 1;
--    machine->possible_cpus = g_malloc0(sizeof(CPUArchIdList) +
--                                       sizeof(CPUArchId) * max_cpus);
--    for (i = 0; i < max_cpus; i++) {
--        machine->possible_cpus->cpus[i].arch_id = x86_cpu_apic_id_from_index(i);
--        machine->possible_cpus->len++;
--        if (i < smp_cpus) {
--            pc_new_cpu(typename, x86_cpu_apic_id_from_index(i), &error_fatal);
--        }
-+    possible_cpus = mc->possible_cpu_arch_ids(machine);
-+    for (i = 0; i < smp_cpus; i++) {
-+        pc_new_cpu(typename, possible_cpus->cpus[i].arch_id, &error_fatal);
-     }
- }
- 
-@@ -2254,10 +2251,26 @@ static unsigned pc_cpu_index_to_socket_id(unsigned cpu_index)
-     return topo.pkg_id;
- }
- 
--static const CPUArchIdList *pc_possible_cpu_arch_ids(MachineState *machine)
-+static const CPUArchIdList *pc_possible_cpu_arch_ids(MachineState *ms)
- {
--    assert(machine->possible_cpus);
--    return machine->possible_cpus;
-+    int i;
+ /*----------------------------------------------------------------------------
+ | Returns the result of converting the quadruple-precision floating-point
++| value `a' to the 32-bit unsigned integer format.  The conversion
++| is performed according to the IEC/IEEE Standard for Binary Floating-Point
++| Arithmetic except that the conversion is always rounded toward zero.
++| If `a' is a NaN, the largest positive integer is returned.  Otherwise,
++| if the conversion overflows, the largest unsigned integer is returned.
++| If 'a' is negative, the value is rounded and zero is returned; negative
++| values that do not round to zero will raise the inexact exception.
++*----------------------------------------------------------------------------*/
 +
-+    if (ms->possible_cpus) {
-+        /*
-+         * make sure that max_cpus hasn't changed since the first use, i.e.
-+         * -smp hasn't been parsed after it
-+        */
-+        assert(ms->possible_cpus->len == max_cpus);
-+        return ms->possible_cpus;
-+    }
++uint32_t float128_to_uint32_round_to_zero(float128 a, float_status *status)
++{
++    uint64_t v;
++    uint32_t res;
++    int old_exc_flags = get_float_exception_flags(status);
 +
-+    ms->possible_cpus = g_malloc0(sizeof(CPUArchIdList) +
-+                                  sizeof(CPUArchId) * max_cpus);
-+    ms->possible_cpus->len = max_cpus;
-+    for (i = 0; i < ms->possible_cpus->len; i++) {
-+        ms->possible_cpus->cpus[i].arch_id = x86_cpu_apic_id_from_index(i);
++    v = float128_to_uint64_round_to_zero(a, status);
++    if (v > 0xffffffff) {
++        res = 0xffffffff;
++    } else {
++        return v;
 +    }
-+    return ms->possible_cpus;
- }
- 
- static HotpluggableCPUList *pc_query_hotpluggable_cpus(MachineState *machine)
++    set_float_exception_flags(old_exc_flags, status);
++    float_raise(float_flag_invalid, status);
++    return res;
++}
++
++/*----------------------------------------------------------------------------
++| Returns the result of converting the quadruple-precision floating-point
+ | value `a' to the single-precision floating-point format.  The conversion
+ | is performed according to the IEC/IEEE Standard for Binary Floating-Point
+ | Arithmetic.
+diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+index a09ad0e..f1288ef 100644
+--- a/include/fpu/softfloat.h
++++ b/include/fpu/softfloat.h
+@@ -716,6 +716,7 @@ int64_t float128_to_int64(float128, float_status *status);
+ int64_t float128_to_int64_round_to_zero(float128, float_status *status);
+ uint64_t float128_to_uint64(float128, float_status *status);
+ uint64_t float128_to_uint64_round_to_zero(float128, float_status *status);
++uint32_t float128_to_uint32_round_to_zero(float128, float_status *status);
+ float32 float128_to_float32(float128, float_status *status);
+ float64 float128_to_float64(float128, float_status *status);
+ floatx80 float128_to_floatx80(float128, float_status *status);
 -- 
 2.9.3
