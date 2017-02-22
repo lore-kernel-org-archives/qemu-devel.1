@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40303)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cgXwy-0003ZH-RS
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 09:31:25 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cgXxp-00052N-7a
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 09:32:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cgXwx-0006XL-RE
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 09:31:24 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cgXxo-0006gz-ET
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 09:32:17 -0500
 References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
-	<1487689130-30373-23-git-send-email-kwolf@redhat.com>
+	<1487689130-30373-24-git-send-email-kwolf@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <a6bf4bc1-c673-17fa-336d-f9d45686cba5@redhat.com>
-Date: Wed, 22 Feb 2017 15:31:13 +0100
+Message-ID: <02a68e0c-ec16-2e95-ee3e-7555b3e7e0a5@redhat.com>
+Date: Wed, 22 Feb 2017 15:32:05 +0100
 MIME-Version: 1.0
-In-Reply-To: <1487689130-30373-23-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1487689130-30373-24-git-send-email-kwolf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="Q3aOxuhlKa0KxaPPu68pBvk9dIjrLpEC1"
-Subject: Re: [Qemu-devel] [PATCH 22/54] block: Request real permissions in
- bdrv_attach_child()
+	boundary="9e4j5UkC67Qi87BxoIBKAQKrQcWgC2H9v"
+Subject: Re: [Qemu-devel] [PATCH 23/54] block: Add permissions to
+ BlockBackend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,82 +29,48 @@ To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Q3aOxuhlKa0KxaPPu68pBvk9dIjrLpEC1
+--9e4j5UkC67Qi87BxoIBKAQKrQcWgC2H9v
 From: Max Reitz <mreitz@redhat.com>
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
-Message-ID: <a6bf4bc1-c673-17fa-336d-f9d45686cba5@redhat.com>
-Subject: Re: [PATCH 22/54] block: Request real permissions in
- bdrv_attach_child()
+Message-ID: <02a68e0c-ec16-2e95-ee3e-7555b3e7e0a5@redhat.com>
+Subject: Re: [PATCH 23/54] block: Add permissions to BlockBackend
 References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
- <1487689130-30373-23-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1487689130-30373-23-git-send-email-kwolf@redhat.com>
-Content-Type: text/plain; charset=UTF-8
+ <1487689130-30373-24-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1487689130-30373-24-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
 Content-Transfer-Encoding: quoted-printable
 
 On 21.02.2017 15:58, Kevin Wolf wrote:
-> Now that all block drivers with children tell us what permissions they
-> need from each of their children, bdrv_attach_child() can use this
-> information and make the right requirements while trying to attach new
-> children.
+> The BlockBackend can now store the permissions that its user requires.
+> This is necessary because nodes can be ejected from or inserted into a
+> BlockBackend and all of these operations must make sure that the user
+> still gets what it requested initially.
 >=20
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  block.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
->=20
-> diff --git a/block.c b/block.c
-> index 1c5f211..054e6f0 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -1659,10 +1659,14 @@ BdrvChild *bdrv_attach_child(BlockDriverState *=
-parent_bs,
->                               Error **errp)
->  {
->      BdrvChild *child;
-> +    uint64_t perm, shared_perm;
-> +
-> +    assert(parent_bs->drv);
-> +    parent_bs->drv->bdrv_child_perm(parent_bs, NULL, child_role,
-> +                                    0, BLK_PERM_ALL, &perm, &shared_pe=
-rm);
+>  block/block-backend.c          | 27 +++++++++++++++++++++++++++
+>  include/sysemu/block-backend.h |  2 ++
+>  2 files changed, 29 insertions(+)
 
-Another Second Thought=E2=84=A2: Why do we request no permissions for the=
- new
-child here? Seems weird to me. Shouldn't the caller specify the
-necessary permissions and what can be shared?
-
-Max
-
-> =20
-> -    /* FIXME Use real permissions */
->      child =3D bdrv_root_attach_child(child_bs, child_name, child_role,=
-
-> -                                   0, BLK_PERM_ALL, parent_bs, errp);
-> +                                   perm, shared_perm, parent_bs, errp)=
-;
->      if (child =3D=3D NULL) {
->          return NULL;
->      }
->=20
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
-
---Q3aOxuhlKa0KxaPPu68pBvk9dIjrLpEC1
+--9e4j5UkC67Qi87BxoIBKAQKrQcWgC2H9v
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlitoLESHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AbesH/iXwde28WDOX9kCTQbZ3GwL0tMppGgBv
-Z+HglPReATic7i1l6Mbm0Ypc1mV8+HMhtQeanRZsHbN3M81XUeAuir1h7Jq3f6++
-psKaU+rn3c/Rnw49v+NlvH1XVvHwjtGGCXPhnGuBt7ciyxY+2jDCrG9CPlFH1rgr
-Tg0PH3zldSr9BxGiLT+jWMKPPCrUTo999VRTPb8OHU06AKopY6kZMHPBShXOv8+j
-ijsVAc10s6J7CWhHHzY4UUxNumJOf2zNHVUFiP0GEIugaKLgSIfbhqjROdhu5k9D
-mm7hE0EpM52bPMfIyNl3nWt1Ja2xMsT5ZIvhnobQnsDkUKUe4t6+XXk=
-=6YxG
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlitoOUSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AEUEIAMBPz0MmNYMFEZLbfdcBUXe/Cozis4vY
+d5eIiXZ545/mmb42g5D47fKAeQRoqD6nBmlkWMLMF3/0Bph/oAL7IBLn+Hv+easF
+5nvgpfEVyVrIr2J1Z8yZY6Alwvu47vnrvrD+zn6s6/Y0Lwfqvd89UX/hfX+UtwJp
+vLq/5G4TNAEi1bXVB/+3/do0d04Q5hpLhnT/OXmOuFpjRl3grG7zCxdpgkHexaGG
+z7BYgsHjqNOhuOKhLGuhRAOhDbVder90ruao1Awsq6YUn45qIhsXGesXhLqLPf+x
+PSLKqJbqNGAG1pW91Idnl6tFfyWzIk430XzB4OXLCAfgPJkH8lA/5QM=
+=l5WR
 -----END PGP SIGNATURE-----
 
---Q3aOxuhlKa0KxaPPu68pBvk9dIjrLpEC1--
+--9e4j5UkC67Qi87BxoIBKAQKrQcWgC2H9v--
