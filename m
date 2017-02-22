@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cgags-0003Lz-El
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:26:59 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cgagz-0003Zt-C1
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:27:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cgagp-0004P0-Bv
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:26:58 -0500
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1487763883-4877-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<1487763883-4877-7-git-send-email-nikunj@linux.vnet.ibm.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <945770e2-dff8-1344-d445-85deaa15e8f0@twiddle.net>
-Date: Thu, 23 Feb 2017 04:26:45 +1100
+	(envelope-from <peter.maydell@linaro.org>) id 1cgagy-0004QM-94
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:27:05 -0500
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:36331)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cgagy-0004QD-3P
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:27:04 -0500
+Received: by mail-wm0-x22f.google.com with SMTP id v77so4877454wmv.1
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 09:27:04 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1487763883-4877-7-git-send-email-nikunj@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 06/10] target/ppc: update overflow flags
- for add/sub
+In-Reply-To: <20170222162507.25987-1-alex.bennee@linaro.org>
+References: <20170222162507.25987-1-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 22 Feb 2017 17:26:42 +0000
+Message-ID: <CAFEAcA8VQAE9_THkm45SS5YoO8cAnf60bCJ4iTaoH+6aL-Qo3w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hmp: add PC information for ARM vCPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
-Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On 02/22/2017 10:44 PM, Nikunj A Dadhania wrote:
-> * SO and OV reflects overflow of the 64-bit result in 64-bit mode and
->   overflow of the low-order 32-bit result in 32-bit mode
->
-> * OV32 reflects overflow of the low-order 32-bit independent of the mode
->
-> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+On 22 February 2017 at 16:25, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 > ---
->  target/ppc/translate.c | 15 ++++++++++++---
->  1 file changed, 12 insertions(+), 3 deletions(-)
+>  cpus.c           |  6 ++++++
+>  hmp.c            |  3 +++
+>  qapi-schema.json | 14 +++++++++++++-
+>  3 files changed, 22 insertions(+), 1 deletion(-)
 >
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index f3f92aa..43366e7 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -809,10 +809,19 @@ static inline void gen_op_arith_compute_ov(DisasContext *ctx, TCGv arg0,
->          tcg_gen_andc_tl(cpu_ov, cpu_ov, t0);
->      }
->      tcg_temp_free(t0);
-> -    if (NARROW_MODE(ctx)) {
-> -        tcg_gen_ext32s_tl(cpu_ov, cpu_ov);
-> +    if (is_isa300(ctx)) {
-> +        tcg_gen_extract_tl(cpu_ov32, cpu_ov, 31, 1);
-> +        if (NARROW_MODE(ctx)) {
-> +            tcg_gen_mov_tl(cpu_ov, cpu_ov32);
-> +        } else {
-> +            tcg_gen_extract_tl(cpu_ov, cpu_ov, 63, 1);
-> +        }
-> +    } else {
-> +        if (NARROW_MODE(ctx)) {
-> +            tcg_gen_ext32s_tl(cpu_ov, cpu_ov);
-> +        }
-> +        tcg_gen_shri_tl(cpu_ov, cpu_ov, TARGET_LONG_BITS - 1);
->      }
-> -    tcg_gen_shri_tl(cpu_ov, cpu_ov, TARGET_LONG_BITS - 1);
+> diff --git a/cpus.c b/cpus.c
+> index 559a0805bc..dc8dbfb0f0 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -1869,6 +1869,9 @@ CpuInfoList *qmp_query_cpus(Error **errp)
+>  #elif defined(TARGET_TRICORE)
+>          TriCoreCPU *tricore_cpu =3D TRICORE_CPU(cpu);
+>          CPUTriCoreState *env =3D &tricore_cpu->env;
+> +#elif defined(TARGET_AARCH64)
+> +        ARMCPU *arm_cpu =3D ARM_CPU(cpu);
+> +        CPUARMState *env =3D &arm_cpu->env;
+>  #endif
+>
+>          cpu_synchronize_state(cpu);
+> @@ -1896,6 +1899,9 @@ CpuInfoList *qmp_query_cpus(Error **errp)
+>  #elif defined(TARGET_TRICORE)
+>          info->value->arch =3D CPU_INFO_ARCH_TRICORE;
+>          info->value->u.tricore.PC =3D env->PC;
+> +#elif defined(TARGET_AARCH64)
+> +        info->value->arch =3D CPU_INFO_ARCH_ARM;
+> +        info->value->u.arm.pc =3D env->pc;
+>  #else
+>          info->value->arch =3D CPU_INFO_ARCH_OTHER;
+>  #endif
 
-We're computing this two different ways for no reason.  How about
+My standard reaction when I see patches adding another
+arm to a target-ifdef ladder like this is to ask whether
+we can refactor this so that the target-specific
+code lives in target/$ARCH instead...
 
-   if (NARROW_MODE(ctx)) {
-     tcg_gen_extract_tl(cpu_ov, cpu_ov, 31, 1);
-     if (is_isa300(ctx)) {
-         tcg_gen_mov_tl(cpu_ov32, cpu_ov);
-     }
-   } else {
-     if (is_isa300(ctx)) {
-         tcg_gen_extract_tl(cpu_ov32, cpu_ov, 31, 1);
-     }
-     tcg_gen_extract_tl(cpu_ov, cpu_ov, 63, 1);
-   }
-
-
-r~
+thanks
+-- PMM
