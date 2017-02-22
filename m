@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eyakovlev@virtuozzo.com>) id 1cgKCE-0000rj-8R
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 18:50:15 -0500
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cgKiD-0000VG-2h
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 19:23:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eyakovlev@virtuozzo.com>) id 1cgKC9-0008RG-V1
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 18:50:13 -0500
-Received: from mail-db5eur01on0098.outbound.protection.outlook.com
-	([104.47.2.98]:21818
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eyakovlev@virtuozzo.com>)
-	id 1cgKC9-0008Ny-6B
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 18:50:09 -0500
-References: <1487614915-18710-1-git-send-email-den@openvz.org>
-	<1487614915-18710-3-git-send-email-den@openvz.org>
-	<7e55a8e9-0a5d-5602-7626-9c7976f6a49c@redhat.com>
-	<d97212a0-fa95-6614-bd5b-62225f789da9@openvz.org>
-From: Evgeny Yakovlev <eyakovlev@virtuozzo.com>
-Message-ID: <28e2ab5f-3bfd-17a8-6fab-6a67f41e0b47@virtuozzo.com>
-Date: Tue, 21 Feb 2017 11:15:08 +0300
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cgKi9-0002We-2n
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 19:23:17 -0500
+Received: from mailapp01.imgtec.com ([195.59.15.196]:57030)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cgKi8-0002VL-T6
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 19:23:13 -0500
+Received: from hhmail02.hh.imgtec.org (unknown [10.100.10.20])
+	by Forcepoint Email with ESMTPS id 6B3DE85B7CB08
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 00:23:04 +0000 (GMT)
+From: Yongbok Kim <yongbok.kim@imgtec.com>
+Date: Wed, 22 Feb 2017 00:21:01 +0000
+Message-ID: <1487722868-9111-2-git-send-email-yongbok.kim@imgtec.com>
+In-Reply-To: <1487722868-9111-1-git-send-email-yongbok.kim@imgtec.com>
+References: <1487722868-9111-1-git-send-email-yongbok.kim@imgtec.com>
 MIME-Version: 1.0
-In-Reply-To: <d97212a0-fa95-6614-bd5b-62225f789da9@openvz.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] qapi: flatten GuestPanicInformation
- union
+Content-Type: text/plain
+Subject: [Qemu-devel] [PULL v2 1/8] hw/mips_cmgcr: allow GCR base to be moved
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,59 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>
+To: qemu-devel@nongnu.org
 
+From: Paul Burton <paul.burton@imgtec.com>
 
+Support moving the GCR base address & updating the CPU's CP0 CMGCRBase
+register appropriately. This is required if a platform needs to move its
+GCRs away from other memory, as the MIPS Boston development board does
+to avoid its flash memory.
 
-On 20.02.2017 22:58, Denis V. Lunev wrote:
-> On 02/20/2017 08:48 PM, Eric Blake wrote:
->> On 02/20/2017 12:21 PM, Denis V. Lunev wrote:
->>> From: Anton Nefedov <anton.nefedov@virtuozzo.com>
->>>
->>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
->>> Signed-off-by: Denis V. Lunev <den@openvz.org>
->>> CC: Paolo Bonzini <pbonzini@redhat.com>
->>> CC: Eric Blake <eblake@redhat.com>
->>> ---
->>>   qapi-schema.json  | 12 ++++++++++++
->>>   target/i386/cpu.c | 15 ++++++---------
->>>   vl.c              | 12 ++++++------
->>>   3 files changed, 24 insertions(+), 15 deletions(-)
->>>
->>> diff --git a/qapi-schema.json b/qapi-schema.json
->>> index e9a6364..b142e15 100644
->>> --- a/qapi-schema.json
->>> +++ b/qapi-schema.json
->>> @@ -5872,6 +5872,16 @@
->>>     'data': [ 'pause', 'poweroff' ] }
->>>   
->>>   ##
->>> +# @GuestPanicInformationType:
->>> +#
->>> +# An enumeration of the guest panic information types
->>> +#
->>> +# Since: 2.9
->>> +##
->>> +{ 'enum': 'GuestPanicInformationType',
->>> +  'data': [ 'hyper-v'] }
->> Perhaps 'hyperv' is better? It's the difference between
->> GUEST_PANIC_INFORMATION_TYPE_HYPER_V and
->> GUEST_PANIC_INFORMATION_TYPE_HYPERV. But that's bikeshedding, so no need
->> to change it.
->>
->> Must go into 2.9, so we aren't baking in bad API.
->>
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->>
-> We can you plain 'hv', like all command line options controlling
-> HyperV features.
->
-> Roman, Evgeniy, do you have any opinion on that?
+Signed-off-by: Paul Burton <paul.burton@imgtec.com>
+Reviewed-by: Leon Alrae <leon.alrae@imgtec.com>
+Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
+---
+ hw/misc/mips_cmgcr.c         | 17 +++++++++++++++++
+ include/hw/misc/mips_cmgcr.h |  3 +++
+ 2 files changed, 20 insertions(+)
 
-In vmbus we've settled on using "hyperv-" prefixes for stuff related to 
-QAPI namespace and QOM objects' property names: "hyperv-synic", 
-"hyperv-sint-route", etc. We might as well stick to it.
-
->
-> Den
+diff --git a/hw/misc/mips_cmgcr.c b/hw/misc/mips_cmgcr.c
+index b3ba166..a1edb53 100644
+--- a/hw/misc/mips_cmgcr.c
++++ b/hw/misc/mips_cmgcr.c
+@@ -29,6 +29,20 @@ static inline bool is_gic_connected(MIPSGCRState *s)
+     return s->gic_mr != NULL;
+ }
+ 
++static inline void update_gcr_base(MIPSGCRState *gcr, uint64_t val)
++{
++    CPUState *cpu;
++    MIPSCPU *mips_cpu;
++
++    gcr->gcr_base = val & GCR_BASE_GCRBASE_MSK;
++    memory_region_set_address(&gcr->iomem, gcr->gcr_base);
++
++    CPU_FOREACH(cpu) {
++        mips_cpu = MIPS_CPU(cpu);
++        mips_cpu->env.CP0_CMGCRBase = gcr->gcr_base >> 4;
++    }
++}
++
+ static inline void update_cpc_base(MIPSGCRState *gcr, uint64_t val)
+ {
+     if (is_cpc_connected(gcr)) {
+@@ -117,6 +131,9 @@ static void gcr_write(void *opaque, hwaddr addr, uint64_t data, unsigned size)
+     MIPSGCRVPState *other_vps = &gcr->vps[current_vps->other];
+ 
+     switch (addr) {
++    case GCR_BASE_OFS:
++        update_gcr_base(gcr, data);
++        break;
+     case GCR_GIC_BASE_OFS:
+         update_gic_base(gcr, data);
+         break;
+diff --git a/include/hw/misc/mips_cmgcr.h b/include/hw/misc/mips_cmgcr.h
+index a209d91..c9dfcb4 100644
+--- a/include/hw/misc/mips_cmgcr.h
++++ b/include/hw/misc/mips_cmgcr.h
+@@ -41,6 +41,9 @@
+ #define GCR_L2_CONFIG_BYPASS_SHF    20
+ #define GCR_L2_CONFIG_BYPASS_MSK    ((0x1ULL) << GCR_L2_CONFIG_BYPASS_SHF)
+ 
++/* GCR_BASE register fields */
++#define GCR_BASE_GCRBASE_MSK     0xffffffff8000ULL
++
+ /* GCR_GIC_BASE register fields */
+ #define GCR_GIC_BASE_GICEN_MSK   1
+ #define GCR_GIC_BASE_GICBASE_MSK 0xFFFFFFFE0000ULL
+-- 
+2.7.4
