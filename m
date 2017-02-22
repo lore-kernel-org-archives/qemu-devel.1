@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1cgRok-0001Uh-PY
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 02:58:31 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cgRxP-0004uC-4H
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 03:07:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1cgRog-0006qO-0K
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 02:58:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59256)
+	(envelope-from <jasowang@redhat.com>) id 1cgRxL-0000G3-4b
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 03:07:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33854)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1cgRof-0006qD-Qa
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 02:58:25 -0500
-References: <20170222021801.28658-1-famz@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <3c05ba9c-a83b-ddfb-cc13-627dcd9b9e56@redhat.com>
-Date: Wed, 22 Feb 2017 08:58:21 +0100
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cgRxK-0000Fy-Rw
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 03:07:23 -0500
+References: <1487735198-127300-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1487735198-127300-3-git-send-email-zhang.zhanghailiang@huawei.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <b0b04c02-7c97-ea04-1e38-99fd9344edae@redhat.com>
+Date: Wed, 22 Feb 2017 16:07:14 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170222021801.28658-1-famz@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] docker: Install python2 explicitly in
- docker image
+In-Reply-To: <1487735198-127300-3-git-send-email-zhang.zhanghailiang@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] filter-rewriter: fix memory leak
+ for connection in connection_track_table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +28,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: zhanghailiang <zhang.zhanghailiang@huawei.com>, zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com
+Cc: qemu-devel@nongnu.org, xuquan8@huawei.com, pss.wulizhen@huawei.com
 
-Hi Fam,
 
-On 22/02/2017 03:18, Fam Zheng wrote:
-> Python is no longer installed implicitly, but the QEMU build system
-> requires it. List it in PACKAGES.
-> 
-> Reported-by: Auger Eric <eric.auger@redhat.com>
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-Tested-by: Eric Auger <eric.auger@redhat.com>
 
-Thanks!
+On 2017=E5=B9=B402=E6=9C=8822=E6=97=A5 11:46, zhanghailiang wrote:
+> After a net connection is closed, we didn't clear its releated resource=
+s
+> in connection_track_table, which will lead to memory leak.
 
-Eric
+Not a real leak but would lead reset of hash table if too many closed=20
+connections.
 
+>
+> Let't track the state of net connection, if it is closed, its related
+> resources will be cleared up.
+
+The issue is the state were tracked partially, do we need a full state=20
+machine here?
+
+>
+> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 > ---
->  tests/docker/dockerfiles/fedora.docker | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
-> index 478163b..c4f80ad 100644
-> --- a/tests/docker/dockerfiles/fedora.docker
-> +++ b/tests/docker/dockerfiles/fedora.docker
-> @@ -1,6 +1,6 @@
->  FROM fedora:latest
->  ENV PACKAGES \
-> -    ccache git tar PyYAML sparse flex bison \
-> +    ccache git tar PyYAML sparse flex bison python2 \
->      glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
->      gcc gcc-c++ clang make perl which bc findutils \
->      mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg-config \
-> 
+>   net/colo.h            |  4 +++
+>   net/filter-rewriter.c | 70 ++++++++++++++++++++++++++++++++++++++++++=
++++------
+>   2 files changed, 67 insertions(+), 7 deletions(-)
+>
+> diff --git a/net/colo.h b/net/colo.h
+> index 7c524f3..cd9027f 100644
+> --- a/net/colo.h
+> +++ b/net/colo.h
+> @@ -18,6 +18,7 @@
+>   #include "slirp/slirp.h"
+>   #include "qemu/jhash.h"
+>   #include "qemu/timer.h"
+> +#include "slirp/tcp.h"
+>  =20
+>   #define HASHTABLE_MAX_SIZE 16384
+>  =20
+> @@ -69,6 +70,9 @@ typedef struct Connection {
+>        * run once in independent tcp connection
+>        */
+>       int syn_flag;
+> +
+> +    int tcp_state; /* TCP FSM state */
+> +    tcp_seq fin_ack_seq; /* the seq of 'fin=3D1,ack=3D1' */
+>   } Connection;
+>  =20
+>   uint32_t connection_key_hash(const void *opaque);
+> diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
+> index c4ab91c..7e7ec35 100644
+> --- a/net/filter-rewriter.c
+> +++ b/net/filter-rewriter.c
+> @@ -60,9 +60,9 @@ static int is_tcp_packet(Packet *pkt)
+>   }
+>  =20
+>   /* handle tcp packet from primary guest */
+> -static int handle_primary_tcp_pkt(NetFilterState *nf,
+> +static int handle_primary_tcp_pkt(RewriterState *rf,
+>                                     Connection *conn,
+> -                                  Packet *pkt)
+> +                                  Packet *pkt, ConnectionKey *key)
+>   {
+>       struct tcphdr *tcp_pkt;
+>  =20
+> @@ -97,15 +97,45 @@ static int handle_primary_tcp_pkt(NetFilterState *n=
+f,
+>           tcp_pkt->th_ack =3D htonl(ntohl(tcp_pkt->th_ack) + conn->offs=
+et);
+>  =20
+>           net_checksum_calculate((uint8_t *)pkt->data, pkt->size);
+> +        /*
+> +         * Case 1:
+> +         * The *server* side of this connect is VM, *client* tries to =
+close
+> +         * the connection.
+> +         *
+> +         * We got 'ack=3D1' packets from client side, it acks 'fin=3D1=
+, ack=3D1'
+> +         * packet from server side. From this point, we can ensure tha=
+t there
+> +         * will be no packets in the connection, except that, some err=
+ors
+> +         * happen between the path of 'filter object' and vNIC, if thi=
+s rare
+> +         * case really happen, we can still create a new connection,
+> +         * So it is safe to remove the connection from connection_trac=
+k_table.
+> +         *
+> +         */
+> +        if ((conn->tcp_state =3D=3D TCPS_LAST_ACK) &&
+> +            (ntohl(tcp_pkt->th_ack) =3D=3D (conn->fin_ack_seq + 1))) {
+> +            fprintf(stderr, "Remove conn "
+
+Can this even compile?
+
+> +            g_hash_table_remove(rf->connection_track_table, key);
+> +        }
+> +    }
+> +    /*
+> +     * Case 2:
+> +     * The *server* side of this connect is VM, *server* tries to clos=
+e
+> +     * the connection.
+> +     *
+> +     * We got 'fin=3D1, ack=3D1' packet from client side, we need to
+> +     * record the seq of 'fin=3D1, ack=3D1' packet.
+> +     */
+> +    if ((tcp_pkt->th_flags & (TH_ACK | TH_FIN)) =3D=3D (TH_ACK | TH_FI=
+N)) {
+> +        conn->fin_ack_seq =3D htonl(tcp_pkt->th_seq);
+> +        conn->tcp_state =3D TCPS_LAST_ACK;
+>       }
+>  =20
+>       return 0;
+>   }
+>  =20
+>   /* handle tcp packet from secondary guest */
+> -static int handle_secondary_tcp_pkt(NetFilterState *nf,
+> +static int handle_secondary_tcp_pkt(RewriterState *rf,
+>                                       Connection *conn,
+> -                                    Packet *pkt)
+> +                                    Packet *pkt, ConnectionKey *key)
+>   {
+>       struct tcphdr *tcp_pkt;
+>  =20
+> @@ -133,8 +163,34 @@ static int handle_secondary_tcp_pkt(NetFilterState=
+ *nf,
+>           tcp_pkt->th_seq =3D htonl(ntohl(tcp_pkt->th_seq) - conn->offs=
+et);
+>  =20
+>           net_checksum_calculate((uint8_t *)pkt->data, pkt->size);
+> +        /*
+> +         * Case 2:
+> +         * The *server* side of this connect is VM, *server* tries to =
+close
+> +         * the connection.
+> +         *
+> +         * We got 'ack=3D1' packets from server side, it acks 'fin=3D1=
+, ack=3D1'
+> +         * packet from client side. Like Case 1, there should be no pa=
+ckets
+> +         * in the connection from now know, But the difference here is
+> +         * if the packet is lost, We will get the resent 'fin=3D1,ack=3D=
+1' packet.
+> +         * TODO: Fix above case.
+> +         */
+> +        if ((conn->tcp_state =3D=3D TCPS_LAST_ACK) &&
+> +            (ntohl(tcp_pkt->th_ack) =3D=3D (conn->fin_ack_seq + 1))) {
+> +            g_hash_table_remove(rf->connection_track_table, key);
+> +        }
+> +    }
+> +    /*
+> +     * Case 1:
+> +     * The *server* side of this connect is VM, *client* tries to clos=
+e
+> +     * the connection.
+> +     *
+> +     * We got 'fin=3D1, ack=3D1' packet from server side, we need to
+> +     * record the seq of 'fin=3D1, ack=3D1' packet.
+> +     */
+> +    if ((tcp_pkt->th_flags & (TH_ACK | TH_FIN)) =3D=3D (TH_ACK | TH_FI=
+N)) {
+> +        conn->fin_ack_seq =3D ntohl(tcp_pkt->th_seq);
+> +        conn->tcp_state =3D TCPS_LAST_ACK;
+
+I thought the tcp_state should store the state of TCP from the view of=20
+secondary VM? So TCPS_LAST_ACK is wrong and bring lots of confusion. And=20
+the handle of active close needs more states here. E.g if connection is=20
+in FIN_WAIT_2, the connection is only half closed, remote peer can still=20
+send packet to us unless we receive a FIN.
+
+Thanks
+
+>       }
+> -
+>       return 0;
+>   }
+>  =20
+> @@ -178,7 +234,7 @@ static ssize_t colo_rewriter_receive_iov(NetFilterS=
+tate *nf,
+>  =20
+>           if (sender =3D=3D nf->netdev) {
+>               /* NET_FILTER_DIRECTION_TX */
+> -            if (!handle_primary_tcp_pkt(nf, conn, pkt)) {
+> +            if (!handle_primary_tcp_pkt(s, conn, pkt, &key)) {
+>                   qemu_net_queue_send(s->incoming_queue, sender, 0,
+>                   (const uint8_t *)pkt->data, pkt->size, NULL);
+>                   packet_destroy(pkt, NULL);
+> @@ -191,7 +247,7 @@ static ssize_t colo_rewriter_receive_iov(NetFilterS=
+tate *nf,
+>               }
+>           } else {
+>               /* NET_FILTER_DIRECTION_RX */
+> -            if (!handle_secondary_tcp_pkt(nf, conn, pkt)) {
+> +            if (!handle_secondary_tcp_pkt(s, conn, pkt, &key)) {
+>                   qemu_net_queue_send(s->incoming_queue, sender, 0,
+>                   (const uint8_t *)pkt->data, pkt->size, NULL);
+>                   packet_destroy(pkt, NULL);
