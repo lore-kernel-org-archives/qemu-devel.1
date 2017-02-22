@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cgf4J-0006sr-AI
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 17:07:28 -0500
+	(envelope-from <eblake@redhat.com>) id 1cgfdR-0003eC-QO
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 17:43:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cgf4I-0002cC-9j
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 17:07:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36374)
+	(envelope-from <eblake@redhat.com>) id 1cgfdO-00035u-IV
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 17:43:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49552)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cgf4I-0002bw-46
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 17:07:26 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5A282C04B93A
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 22:07:26 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Wed, 22 Feb 2017 19:07:09 -0300
-Message-Id: <20170222220709.3707-4-ehabkost@redhat.com>
-In-Reply-To: <20170222220709.3707-1-ehabkost@redhat.com>
-References: <20170222220709.3707-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/3] i386: Change stepping of Haswell to
- non-blacklisted value
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cgfdO-00033g-9E
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 17:43:42 -0500
+References: <20170222192647.19690-1-ehabkost@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f2e5c730-c47c-8a06-d5b0-820e6db61d5e@redhat.com>
+Date: Wed, 22 Feb 2017 16:43:37 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170222192647.19690-1-ehabkost@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="6upa1rsK6OtR6vc94gJWCH5dllwmdwpqH"
+Subject: Re: [Qemu-devel] [libvirt] [PATCH RESEND] qdev: Make "hotplugged"
+ property read-only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +28,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: libvir-list@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, Laine Stump <laine@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
 
-glibc blacklists TSX on Haswell CPUs with model==60 and
-stepping < 4. To make the Haswell CPU model more useful, make
-those guests actually use TSX by changing CPU stepping to 4.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--6upa1rsK6OtR6vc94gJWCH5dllwmdwpqH
+From: Eric Blake <eblake@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com,
+ Laine Stump <laine@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?=
+ <afaerber@suse.de>
+Message-ID: <f2e5c730-c47c-8a06-d5b0-820e6db61d5e@redhat.com>
+Subject: Re: [libvirt] [PATCH RESEND] qdev: Make "hotplugged" property
+ read-only
+References: <20170222192647.19690-1-ehabkost@redhat.com>
+In-Reply-To: <20170222192647.19690-1-ehabkost@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-References:
-* glibc commit 2702856bf45c82cf8e69f2064f5aa15c0ceb6359
-  https://sourceware.org/git/?p=glibc.git;a=commit;h=2702856bf45c82cf8e69f2064f5aa15c0ceb6359
+On 02/22/2017 01:26 PM, Eduardo Habkost wrote:
+> The "hotplugged" property is user visible, but it was never meant
+> to be set by the user. There are probably multiple ways to break
+> or crash device code by overriding the property. For example, we
+> recently fixed a crash in rtc_set_memory() related to the
+> property (commit 26ef65beab852caf2b1ef4976e3473f2d525164d).
+>=20
+> There has been some discussion about making management software
+> use "hotplugged=3Don" on migration, to indicate devices that were
+> hotplugged in the migration source. There were other suggestions
+> to address this, like including the "hotplugged" field in the
+> migration stream instead of requiring it to be set propertly.
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- include/hw/i386/pc.h | 5 +++++
- target/i386/cpu.c    | 2 +-
- 2 files changed, 6 insertions(+), 1 deletion(-)
+s/propertly/properly/
 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 079e8d9393..2ada479138 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -390,6 +390,11 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-         .driver   = TYPE_X86_CPU,\
-         .property = "vmware-cpuid-freq",\
-         .value    = "off",\
-+    },\
-+    {\
-+        .driver   = "Haswell-" TYPE_X86_CPU,\
-+        .property = "stepping",\
-+        .value    = "1",\
-     },
- 
- #define PC_COMPAT_2_7 \
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index a8e4f37e27..eab1ad7935 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1190,7 +1190,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
-         .vendor = CPUID_VENDOR_INTEL,
-         .family = 6,
-         .model = 60,
--        .stepping = 1,
-+        .stepping = 4,
-         .features[FEAT_1_EDX] =
-             CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
-             CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
--- 
-2.11.0.259.g40922b1
+>=20
+> Whatever solution we choose in the future, this patch disables
+> setting "hotplugged" explicitly in the command-line by now,
+> because the ability to set the property is unused, untested, and
+> undocumented.
+>=20
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  hw/core/qdev.c | 9 +--------
+>  1 file changed, 1 insertion(+), 8 deletions(-)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+>=20
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index 06ba02e2a3..800c9ca23f 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -1016,13 +1016,6 @@ static bool device_get_hotplugged(Object *obj, E=
+rror **err)
+>      return dev->hotplugged;
+>  }
+> =20
+> -static void device_set_hotplugged(Object *obj, bool value, Error **err=
+)
+> -{
+> -    DeviceState *dev =3D DEVICE(obj);
+> -
+> -    dev->hotplugged =3D value;
+> -}
+> -
+>  static void device_initfn(Object *obj)
+>  {
+>      DeviceState *dev =3D DEVICE(obj);
+> @@ -1042,7 +1035,7 @@ static void device_initfn(Object *obj)
+>      object_property_add_bool(obj, "hotpluggable",
+>                               device_get_hotpluggable, NULL, NULL);
+>      object_property_add_bool(obj, "hotplugged",
+> -                             device_get_hotplugged, device_set_hotplug=
+ged,
+> +                             device_get_hotplugged, NULL,
+>                               &error_abort);
+> =20
+>      class =3D object_get_class(OBJECT(dev));
+>=20
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--6upa1rsK6OtR6vc94gJWCH5dllwmdwpqH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYrhQZAAoJEKeha0olJ0NqYkYH/iD5vHGqLx51Cm2xqqozgWgW
+NR/e6N6MnklYiRrYQtRysLboFkjg2yPWe/pxGM+nMpY1RTaiPS+YbWzJxPwUF+9q
+U39OAhE89OTJCTUm32f32Cs+rIH/5Ax+o+fPWmGlxfwR8DkHLFkC7BzhyilfJWRT
+jM5kPH5Jfu7Chk8ZA6J3CJGYrLE5bufR5pGoPPlnbqO/GNBCWWd0NANVSxaOjRw7
+eQkBv3gxCdjWG5bbCmm+/OO1+KDiV+scdYe1F80IEG2ceMAB8S1XVIR6mFOGTAwl
+SglwQUkWvi6QZzphwB99gfom8sayt+kFWsFqlXvPwwTUhRI3+2f+jaQ2G7BwNug=
+=AqFF
+-----END PGP SIGNATURE-----
+
+--6upa1rsK6OtR6vc94gJWCH5dllwmdwpqH--
