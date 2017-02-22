@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35390)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1cgSXz-0004Xt-Gx
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 03:45:16 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35474)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgSYF-0004g3-Ly
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 03:45:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1cgSXw-0003D6-E3
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 03:45:15 -0500
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:55760 helo=mx01.kamp.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1cgSXw-0003CV-4t
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 03:45:12 -0500
-References: <9533ba99-b143-b577-0115-742119d089a4@kamp.de>
-	<9292fef8-929a-e89e-eca5-cd247ca9334b@redhat.com>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <f0eb7ff1-47d7-42d0-c7b5-946d2224e986@kamp.de>
-Date: Wed, 22 Feb 2017 09:45:07 +0100
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgSYC-0003EK-GN
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 03:45:31 -0500
+Received: from [45.249.212.189] (port=2402 helo=dggrg03-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgSYB-0003Dq-Jc
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 03:45:28 -0500
+References: <1487735198-127300-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1487735198-127300-3-git-send-email-zhang.zhanghailiang@huawei.com>
+	<b0b04c02-7c97-ea04-1e38-99fd9344edae@redhat.com>
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <58AD4F8F.5030703@huawei.com>
+Date: Wed, 22 Feb 2017 16:45:03 +0800
 MIME-Version: 1.0
-In-Reply-To: <9292fef8-929a-e89e-eca5-cd247ca9334b@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Qemu and Changed Block Tracking
+In-Reply-To: <b0b04c02-7c97-ea04-1e38-99fd9344edae@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] filter-rewriter: fix memory leak
+ for connection in connection_track_table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,74 +29,218 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Christian Theune <ct@flyingcircus.io>
+To: Jason Wang <jasowang@redhat.com>, zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com
+Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, pss.wulizhen@huawei.com
 
-
-Am 21.02.2017 um 22:13 schrieb John Snow:
+On 2017/2/22 16:07, Jason Wang wrote:
 >
-> On 02/21/2017 07:43 AM, Peter Lieven wrote:
->> Hi,
->>
->>
->> is there anyone ever thought about implementing something like VMware
->> CBT in Qemu?
->>
->>
->> https://kb.vmware.com/selfservice/microsites/search.do?language=en_US&cmd=displayKC&externalId=1020128
->>
->>
->>
->> Thanks,
->> Peter
->>
->>
-> A bit outdated now, but:
-> http://wiki.qemu-project.org/Features/IncrementalBackup
 >
-> and also a summary I wrote not too far back (PDF):
-> https://drive.google.com/file/d/0B3CFr1TuHydWalVJaEdPaE5PbFE
+> On 2017年02月22日 11:46, zhanghailiang wrote:
+>> After a net connection is closed, we didn't clear its releated resources
+>> in connection_track_table, which will lead to memory leak.
 >
-> and I'm sure the Virtuozzo developers could chime in on this subject,
-> but basically we do have something similar in the works, as eblake says.
+> Not a real leak but would lead reset of hash table if too many closed
+> connections.
+>
 
-Hi John, Hi Erik,
+Yes, you are right, there will be lots of stale connection data in hash table
+if we don't remove it while it is been closed. Which
 
-thanks for your feedback. Are you both the ones working primary on this topic?
-If there is anything to review or help needed, please let me know.
+>>
+>> Let't track the state of net connection, if it is closed, its related
+>> resources will be cleared up.
+>
+> The issue is the state were tracked partially, do we need a full state
+> machine here?
+>
 
-My 2 cents:
-I thing I had in mind if there is no image fleecing available, but fetching the dirty bitmap
-from external would be a feauture to put a write lock on a block device.
-Write lock means, drain all pending writes and queue all further writes until unlock (as if they
-were throttled to zero). This could help fetch consistent backups from storage device (thinking of iSCSI SAN) without
-the help of the hypervisor to actually transfer data (no load in the frontend network or the host). What would further
-be needed is a write generation for each block, not just only a dirty bitmap.
+Not, IMHO, we only care about the last state of it, because, we will do nothing
+even if we track the intermedial states.
 
-In this case something like this via QMP (and external software) should work:
----8<---
- gen =  write generation of last backup (or 0 for full backup)
- do {
-     nextgen = fetch current write generation (via QMP)
-     dirtymap = send all block whose write generation is greater than 'gen' (via QMP)
-     dirtycnt = 0
-     foreach block in dirtymap {
-               copy to backup via external software
-               dirtycnt++
-     }
-     gen = nextgen
- } while (dirtycnt < X)         <--- to achieve this a thorttling or similar might be needed
+>>
+>> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+>> ---
+>>    net/colo.h            |  4 +++
+>>    net/filter-rewriter.c | 70 +++++++++++++++++++++++++++++++++++++++++++++------
+>>    2 files changed, 67 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/net/colo.h b/net/colo.h
+>> index 7c524f3..cd9027f 100644
+>> --- a/net/colo.h
+>> +++ b/net/colo.h
+>> @@ -18,6 +18,7 @@
+>>    #include "slirp/slirp.h"
+>>    #include "qemu/jhash.h"
+>>    #include "qemu/timer.h"
+>> +#include "slirp/tcp.h"
+>>
+>>    #define HASHTABLE_MAX_SIZE 16384
+>>
+>> @@ -69,6 +70,9 @@ typedef struct Connection {
+>>         * run once in independent tcp connection
+>>         */
+>>        int syn_flag;
+>> +
+>> +    int tcp_state; /* TCP FSM state */
+>> +    tcp_seq fin_ack_seq; /* the seq of 'fin=1,ack=1' */
+>>    } Connection;
+>>
+>>    uint32_t connection_key_hash(const void *opaque);
+>> diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
+>> index c4ab91c..7e7ec35 100644
+>> --- a/net/filter-rewriter.c
+>> +++ b/net/filter-rewriter.c
+>> @@ -60,9 +60,9 @@ static int is_tcp_packet(Packet *pkt)
+>>    }
+>>
+>>    /* handle tcp packet from primary guest */
+>> -static int handle_primary_tcp_pkt(NetFilterState *nf,
+>> +static int handle_primary_tcp_pkt(RewriterState *rf,
+>>                                      Connection *conn,
+>> -                                  Packet *pkt)
+>> +                                  Packet *pkt, ConnectionKey *key)
+>>    {
+>>        struct tcphdr *tcp_pkt;
+>>
+>> @@ -97,15 +97,45 @@ static int handle_primary_tcp_pkt(NetFilterState *nf,
+>>            tcp_pkt->th_ack = htonl(ntohl(tcp_pkt->th_ack) + conn->offset);
+>>
+>>            net_checksum_calculate((uint8_t *)pkt->data, pkt->size);
+>> +        /*
+>> +         * Case 1:
+>> +         * The *server* side of this connect is VM, *client* tries to close
+>> +         * the connection.
+>> +         *
+>> +         * We got 'ack=1' packets from client side, it acks 'fin=1, ack=1'
+>> +         * packet from server side. From this point, we can ensure that there
+>> +         * will be no packets in the connection, except that, some errors
+>> +         * happen between the path of 'filter object' and vNIC, if this rare
+>> +         * case really happen, we can still create a new connection,
+>> +         * So it is safe to remove the connection from connection_track_table.
+>> +         *
+>> +         */
+>> +        if ((conn->tcp_state == TCPS_LAST_ACK) &&
+>> +            (ntohl(tcp_pkt->th_ack) == (conn->fin_ack_seq + 1))) {
+>> +            fprintf(stderr, "Remove conn "
+>
+> Can this even compile?
+>
 
-fsfreeze (optional)
-write lock (via QMP)
-backupgen = fetch current write generation (via QMP)
-dirtymap = send all block whose write generation is greater than 'gen' (via QMP)
-foreach block in dirtymap {
-               copy to backup via external software
-}
-unlock (via QMP)
-fsthaw (optional)
---->8---
+Oops, i forgot to remove it, will remove it in next version.
 
-As far as I understand CBT in VMware is not just only a dirty bitmap, but also a write generation tracking for blocks (size 64kb or whatever)
+>> +            g_hash_table_remove(rf->connection_track_table, key);
+>> +        }
+>> +    }
+>> +    /*
+>> +     * Case 2:
+>> +     * The *server* side of this connect is VM, *server* tries to close
+>> +     * the connection.
+>> +     *
+>> +     * We got 'fin=1, ack=1' packet from client side, we need to
+>> +     * record the seq of 'fin=1, ack=1' packet.
+>> +     */
+>> +    if ((tcp_pkt->th_flags & (TH_ACK | TH_FIN)) == (TH_ACK | TH_FIN)) {
+>> +        conn->fin_ack_seq = htonl(tcp_pkt->th_seq);
+>> +        conn->tcp_state = TCPS_LAST_ACK;
+>>        }
+>>
+>>        return 0;
+>>    }
+>>
+>>    /* handle tcp packet from secondary guest */
+>> -static int handle_secondary_tcp_pkt(NetFilterState *nf,
+>> +static int handle_secondary_tcp_pkt(RewriterState *rf,
+>>                                        Connection *conn,
+>> -                                    Packet *pkt)
+>> +                                    Packet *pkt, ConnectionKey *key)
+>>    {
+>>        struct tcphdr *tcp_pkt;
+>>
+>> @@ -133,8 +163,34 @@ static int handle_secondary_tcp_pkt(NetFilterState *nf,
+>>            tcp_pkt->th_seq = htonl(ntohl(tcp_pkt->th_seq) - conn->offset);
+>>
+>>            net_checksum_calculate((uint8_t *)pkt->data, pkt->size);
+>> +        /*
+>> +         * Case 2:
+>> +         * The *server* side of this connect is VM, *server* tries to close
+>> +         * the connection.
+>> +         *
+>> +         * We got 'ack=1' packets from server side, it acks 'fin=1, ack=1'
+>> +         * packet from client side. Like Case 1, there should be no packets
+>> +         * in the connection from now know, But the difference here is
+>> +         * if the packet is lost, We will get the resent 'fin=1,ack=1' packet.
+>> +         * TODO: Fix above case.
+>> +         */
+>> +        if ((conn->tcp_state == TCPS_LAST_ACK) &&
+>> +            (ntohl(tcp_pkt->th_ack) == (conn->fin_ack_seq + 1))) {
+>> +            g_hash_table_remove(rf->connection_track_table, key);
+>> +        }
+>> +    }
+>> +    /*
+>> +     * Case 1:
+>> +     * The *server* side of this connect is VM, *client* tries to close
+>> +     * the connection.
+>> +     *
+>> +     * We got 'fin=1, ack=1' packet from server side, we need to
+>> +     * record the seq of 'fin=1, ack=1' packet.
+>> +     */
+>> +    if ((tcp_pkt->th_flags & (TH_ACK | TH_FIN)) == (TH_ACK | TH_FIN)) {
+>> +        conn->fin_ack_seq = ntohl(tcp_pkt->th_seq);
+>> +        conn->tcp_state = TCPS_LAST_ACK;
+>
+> I thought the tcp_state should store the state of TCP from the view of
+> secondary VM? So TCPS_LAST_ACK is wrong and bring lots of confusion. And
+> the handle of active close needs more states here. E.g if connection is
+> in FIN_WAIT_2, the connection is only half closed, remote peer can still
+> send packet to us unless we receive a FIN.
+>
 
-Peter
+Yes, i know what you mean, actually, here, we try to only track the last
+two steps for closing a connection, that is 'fin=1,ack=1,seq=2,ack=u+1'
+and 'ack=1,seq=u+1,ack=w+1', because if we get a 'fin=1,ack=1', we can
+ensure that the 'fin=1,seq=u' packet has been posted.
+
+Another reason is we may can't track the 'fin=1,seq=u' packet while
+we start COLO while one connection is closing, which the 'fin=1,seq=u' packet
+has been posted.
+
+Actually, here, if we start COLO while one connection is closing, which the
+'fin=1,ack=1' has been posted, we can only track 'ack=1' packet. In this
+case, the connection will be left in hash table for ever though it is harmless.
+Any ideas for this case ?
+
+For the above codes question, i'd like to change tcp_state to tap_closing_wait,
+is it OK ?
+
+Thanks.
+Hailiang
+
+> Thanks
+>
+>>        }
+>> -
+>>        return 0;
+>>    }
+>>
+>> @@ -178,7 +234,7 @@ static ssize_t colo_rewriter_receive_iov(NetFilterState *nf,
+>>
+>>            if (sender == nf->netdev) {
+>>                /* NET_FILTER_DIRECTION_TX */
+>> -            if (!handle_primary_tcp_pkt(nf, conn, pkt)) {
+>> +            if (!handle_primary_tcp_pkt(s, conn, pkt, &key)) {
+>>                    qemu_net_queue_send(s->incoming_queue, sender, 0,
+>>                    (const uint8_t *)pkt->data, pkt->size, NULL);
+>>                    packet_destroy(pkt, NULL);
+>> @@ -191,7 +247,7 @@ static ssize_t colo_rewriter_receive_iov(NetFilterState *nf,
+>>                }
+>>            } else {
+>>                /* NET_FILTER_DIRECTION_RX */
+>> -            if (!handle_secondary_tcp_pkt(nf, conn, pkt)) {
+>> +            if (!handle_secondary_tcp_pkt(s, conn, pkt, &key)) {
+>>                    qemu_net_queue_send(s->incoming_queue, sender, 0,
+>>                    (const uint8_t *)pkt->data, pkt->size, NULL);
+>>                    packet_destroy(pkt, NULL);
+>
+>
+> .
+>
