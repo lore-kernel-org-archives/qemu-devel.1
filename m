@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54558)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cgVAp-00005g-3b
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:33:31 -0500
+	(envelope-from <berrange@redhat.com>) id 1cgVAp-00006I-Tw
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:33:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cgVAm-0000NN-0K
+	(envelope-from <berrange@redhat.com>) id 1cgVAo-0000Nc-QW
 	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:33:31 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35377)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cgVAl-0000ND-Ow
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:33:27 -0500
-Received: by mail-wm0-x241.google.com with SMTP id u63so1791686wmu.2
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 03:33:27 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20170221141451.28305-1-marcandre.lureau@redhat.com>
-	<20170221141451.28305-24-marcandre.lureau@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <967ff11e-ed7c-85b9-2c67-b3fb5335769e@redhat.com>
-Date: Wed, 22 Feb 2017 12:33:25 +0100
+Date: Wed, 22 Feb 2017 11:33:21 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170222113321.GK28937@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170220151921.22842-1-berrange@redhat.com>
+	<20170220151921.22842-5-berrange@redhat.com>
+	<20170222112036.GH4112@noname.str.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170221141451.28305-24-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 23/30] bus: do not unref hotplug handler
+Content-Disposition: inline
+In-Reply-To: <20170222112036.GH4112@noname.str.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 4/4] qemu-img: copy *key-secret opts
+ when opening newly created files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,53 +26,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>
 
+On Wed, Feb 22, 2017 at 12:20:36PM +0100, Kevin Wolf wrote:
+> Am 20.02.2017 um 16:19 hat Daniel P. Berrange geschrieben:
+> > The qemu-img dd/convert commands will create a image file and
+> > then try to open it. Historically it has been possible to open
+> > new files without passing any options. With encrypted files
+> > though, the *key-secret options are mandatory, so we need to
+> > provide those options when opening the newly created file.
+> > 
+> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> > ---
+> >  qemu-img.c | 44 ++++++++++++++++++++++++++++++++++++++++++--
+> >  1 file changed, 42 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/qemu-img.c b/qemu-img.c
+> > index e48e676..bad19fd 100644
+> > --- a/qemu-img.c
+> > +++ b/qemu-img.c
+> > @@ -317,6 +317,46 @@ static BlockBackend *img_open_file(const char *filename,
+> >  }
+> >  
+> >  
+> > +static int img_add_key_secrets(void *opaque,
+> > +                               const char *name, const char *value,
+> > +                               Error **errp)
+> > +{
+> > +    QDict *options = opaque;
+> > +
+> > +    if (g_str_has_suffix(name, "key-secret")) {
+> > +        qdict_put(options, name, qstring_from_str(value));
+> > +    }
+> > +
+> > +    return 0;
+> > +}
+> > +
+> > +static BlockBackend *img_open_new_file(const char *filename,
+> > +                                       QemuOpts *create_opts,
+> > +                                       const char *fmt, int flags,
+> > +                                       bool writethrough, bool quiet)
+> > +{
+> > +    BlockBackend *blk;
+> > +    Error *local_err = NULL;
+> > +    QDict *options = NULL;
+> > +
+> > +    options = qdict_new();
+> > +    if (fmt) {
+> > +        qdict_put(options, "driver", qstring_from_str(fmt));
+> > +    }
+> > +
+> > +    qemu_opt_foreach(create_opts, img_add_key_secrets, options, NULL);
+> > +
+> > +    blk = blk_new_open(filename, NULL, options, flags, &local_err);
+> > +    if (!blk) {
+> > +        error_reportf_err(local_err, "Could not open '%s': ", filename);
+> > +        return NULL;
+> > +    }
+> > +    blk_set_enable_write_cache(blk, !writethrough);
+> > +
+> > +    return blk;
+> > +}
+> 
+> Why not make this a small wrapper around img_open_file(), which does
+> almost the same except that it can ask for a password? Leaving out the
+> img_open_password() call means that simple '-o encryption=on' breaks,
+> so it's a bug anyway:
+> 
+> $ ./qemu-img convert -O qcow2 -o encryption ~/images/hd.img /tmp/crypt.qcow2
+> qemu-img: block/qcow2.c:1613: qcow2_co_pwritev: Assertion `s->cipher' failed.
 
+I had written this after my conversion of qcow2 to use secrets, but I
+presume you just tested this series in isolation. If this series merges
+before my qcow2+luks series, then yeah, we'd need to handle the scearnio
+you describe.
 
-On 21/02/2017 15:14, Marc-André Lureau wrote:
-> Apparently, none of the bus owner give a reference to the hotplug
-> handler property, do not unref it on bus release.
-> 
-> Furthermore, a bus is allowed to be its own hotplug handler, which can
-> be seen in qbus_set_bus_hotplug_handler() function. However, in this
-> case, the reference can't be given to the property, or this will create
-> a cyclic dependency and the bus will never be free.
-> 
-> Each bus owner should manage the lifecycle of the hotplug handler.
-> 
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-
-Almost all qbus_set_hotplug_handler callers are using it to set the
-parent device (that is, the "adapter" or "bridge", whatever you want to
-call it) as the hotplug handler.
-
-The exception is piix4_update_bus_hotplug.  This one is the only case
-where OBJ_PROP_LINK_UNREF_ON_RELEASE would be right.  Luckily, there
-_is_ a reference to that device somewhere else to keep it alive, namely
-in /machine's acpi-device prop.  So this case is a bit hacky (not your
-fault) but works as well.  In addition the PIIX4_PM device is not
-hot(un)pluggable.
-
-Can you please add a comment to piix4_update_bus_hotplug explaining that
-the PIIX4PMState cannot outlive the PCIBus, because /machine keeps it alive?
-
-> 
-> diff --git a/hw/core/bus.c b/hw/core/bus.c
-> index cf383fc1af..4651f24486 100644
-> --- a/hw/core/bus.c
-> +++ b/hw/core/bus.c
-> @@ -197,7 +197,7 @@ static void qbus_initfn(Object *obj)
->                               TYPE_HOTPLUG_HANDLER,
->                               (Object **)&bus->hotplug_handler,
->                               object_property_allow_set_link,
-> -                             OBJ_PROP_LINK_UNREF_ON_RELEASE,
-> +                             0,
->                               NULL);
->      object_property_add_bool(obj, "realized",
->                               bus_get_realized, bus_set_realized, NULL);
-> -- 
-> 2.11.0.295.gd7dffce1c.dirty
-> 
-> 
-> 
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
