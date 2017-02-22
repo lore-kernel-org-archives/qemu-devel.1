@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cgc9Y-0004KP-QU
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 14:00:42 -0500
+	(envelope-from <armbru@redhat.com>) id 1cgcNU-0004d7-Ed
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 14:15:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cgc9X-0004ba-Fe
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 14:00:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41896)
+	(envelope-from <armbru@redhat.com>) id 1cgcNS-0000ec-N9
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 14:15:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51444)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cgc9X-0004bB-60
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 14:00:39 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cgcNS-0000dz-HT
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 14:15:02 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 45D63C04D2F2
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 19:00:39 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Wed, 22 Feb 2017 16:00:28 -0300
-Message-Id: <20170222190029.17243-3-ehabkost@redhat.com>
-In-Reply-To: <20170222190029.17243-1-ehabkost@redhat.com>
-References: <20170222190029.17243-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 2/3] target-i386: Implement
- query-cpu-model-expansion QMP command
+	by mx1.redhat.com (Postfix) with ESMTPS id C2E6C4DD7C
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 19:15:02 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
+	[10.36.116.55])
+	by int-mx11.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v1MJF1xD004707
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=NO)
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 14:15:02 -0500
+From: Markus Armbruster <armbru@redhat.com>
+Date: Wed, 22 Feb 2017 20:14:50 +0100
+Message-Id: <1487790898-24921-9-git-send-email-armbru@redhat.com>
+In-Reply-To: <1487790898-24921-1-git-send-email-armbru@redhat.com>
+References: <1487790898-24921-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PULL 08/16] test-qmp-event: Simplify and tighten
+ event_test_emit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,279 +38,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: libvir-list@redhat.com, Jiri Denemark <jdenemar@redhat.com>
 
-Implement query-cpu-model-expansion for target-i386.
+Use qdict_get_qdict() and qdict_get_try_int() to simplify.
 
-This should meet all the requirements while being simple. In the
-case of static expansion, it will use the new "base" CPU model,
-and in the case of full expansion, it will keep the original CPU
-model name+props, and append extra properties.
+While there, add a sanity check for seconds.
 
-A future follow-up should improve the implementation of
-type=full, so that it returns more detailed data, including every
-writable QOM property in the CPU object.
-
-Cc: libvir-list@redhat.com
-Cc: Jiri Denemark <jdenemar@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <1487363905-9480-7-git-send-email-armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
-Changes v1 -> v2:
-* Fix typos
-  * Reported-by: Markus Armbruster <armbru@redhat.com>
-* Removed static/migration-safe field from return value
-  (they will be added by a separate patch)
-* Use a dictionary to keep track of the properties that
-  should be included in the expansion, instead of hardcoding them
-* Removed test case to keep series simple (test case will be
-  submitted as a separate series)
----
- monitor.c         |   4 +-
- target/i386/cpu.c | 191 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 193 insertions(+), 2 deletions(-)
+ tests/test-qmp-event.c | 14 ++++----------
+ 1 file changed, 4 insertions(+), 10 deletions(-)
 
-diff --git a/monitor.c b/monitor.c
-index 3cd72a9bab..8e987cd27f 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -984,8 +984,10 @@ static void qmp_unregister_commands_hack(void)
- #ifndef TARGET_ARM
-     qmp_unregister_command("query-gic-capabilities");
- #endif
--#if !defined(TARGET_S390X)
-+#if !defined(TARGET_S390X) && !defined(TARGET_I386)
-     qmp_unregister_command("query-cpu-model-expansion");
-+#endif
-+#if !defined(TARGET_S390X)
-     qmp_unregister_command("query-cpu-model-baseline");
-     qmp_unregister_command("query-cpu-model-comparison");
- #endif
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 4241f56e8a..6e76eac268 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -29,10 +29,16 @@
- #include "qemu/option.h"
- #include "qemu/config-file.h"
- #include "qapi/qmp/qerror.h"
-+#include "qapi/qmp/qstring.h"
-+#include "qapi/qmp/qdict.h"
-+#include "qapi/qmp/qbool.h"
-+#include "qapi/qmp/qint.h"
-+#include "qapi/qmp/qfloat.h"
+diff --git a/tests/test-qmp-event.c b/tests/test-qmp-event.c
+index 633dc87..7bb621b 100644
+--- a/tests/test-qmp-event.c
++++ b/tests/test-qmp-event.c
+@@ -95,24 +95,18 @@ static bool qdict_cmp_simple(QDict *a, QDict *b)
+    correctness. */
+ static void event_test_emit(test_QAPIEvent event, QDict *d, Error **errp)
+ {
+-    QObject *obj;
+     QDict *t;
+     int64_t s, ms;
  
- #include "qapi-types.h"
- #include "qapi-visit.h"
- #include "qapi/visitor.h"
-+#include "qom/qom-qobject.h"
- #include "sysemu/arch_init.h"
- 
- #if defined(CONFIG_KVM)
-@@ -2289,7 +2295,7 @@ static void x86_cpu_apply_props(X86CPU *cpu, PropValue *props)
+     /* Verify that we have timestamp, then remove it to compare other fields */
+-    obj = qdict_get(d, "timestamp");
+-    g_assert(obj);
+-    t = qobject_to_qdict(obj);
++    t = qdict_get_qdict(d, "timestamp");
+     g_assert(t);
+-    obj = qdict_get(t, "seconds");
+-    g_assert(obj && qobject_type(obj) == QTYPE_QINT);
+-    s = qint_get_int(qobject_to_qint(obj));
+-    obj = qdict_get(t, "microseconds");
+-    g_assert(obj && qobject_type(obj) == QTYPE_QINT);
+-    ms = qint_get_int(qobject_to_qint(obj));
++    s = qdict_get_try_int(t, "seconds", -2);
++    ms = qdict_get_try_int(t, "microseconds", -2);
+     if (s == -1) {
+         g_assert(ms == -1);
+     } else {
++        g_assert(s >= 0);
+         g_assert(ms >= 0 && ms <= 999999);
      }
- }
- 
--/* Load data from X86CPUDefinition
-+/* Load data from X86CPUDefinition into a X86CPU object
-  */
- static void x86_cpu_load_def(X86CPU *cpu, X86CPUDefinition *def, Error **errp)
- {
-@@ -2298,6 +2304,11 @@ static void x86_cpu_load_def(X86CPU *cpu, X86CPUDefinition *def, Error **errp)
-     char host_vendor[CPUID_VENDOR_SZ + 1];
-     FeatureWord w;
- 
-+    /*NOTE: any property set by this function should be returned by
-+     * x86_cpu_static_props(), so static expansion of
-+     * query-cpu-model-expansion is always complete.
-+     */
-+
-     /* CPU models only set _minimum_ values for level/xlevel: */
-     object_property_set_int(OBJECT(cpu), def->level, "min-level", errp);
-     object_property_set_int(OBJECT(cpu), def->xlevel, "min-xlevel", errp);
-@@ -2342,6 +2353,184 @@ static void x86_cpu_load_def(X86CPU *cpu, X86CPUDefinition *def, Error **errp)
- 
- }
- 
-+/* Return a QDict containing keys for all properties that can be included
-+ * in static expansion of CPU models. All properties set by x86_cpu_load_def()
-+ * must be included in the dictionary.
-+ */
-+static QDict *x86_cpu_static_props(void)
-+{
-+    FeatureWord w;
-+    int i;
-+    static const char *props[] = {
-+        "min-level",
-+        "min-xlevel",
-+        "family",
-+        "model",
-+        "stepping",
-+        "model-id",
-+        "vendor",
-+        "lmce",
-+        NULL,
-+    };
-+    static QDict *d;
-+
-+    if (d) {
-+        return d;
-+    }
-+
-+    d = qdict_new();
-+    for (i = 0; props[i]; i++) {
-+        qdict_put_obj(d, props[i], qnull());
-+    }
-+
-+    for (w = 0; w < FEATURE_WORDS; w++) {
-+        FeatureWordInfo *fi = &feature_word_info[w];
-+        int bit;
-+        for (bit = 0; bit < 32; bit++) {
-+            if (!fi->feat_names[bit]) {
-+                continue;
-+            }
-+            qdict_put_obj(d, fi->feat_names[bit], qnull());
-+        }
-+    }
-+
-+    return d;
-+}
-+
-+/* Add an entry to @props dict, with the value for property. */
-+static void x86_cpu_expand_prop(X86CPU *cpu, QDict *props, const char *prop)
-+{
-+    QObject *value = object_property_get_qobject(OBJECT(cpu), prop,
-+                                                 &error_abort);
-+
-+    qdict_put_obj(props, prop, value);
-+}
-+
-+/* Convert CPU model data from X86CPU object to a property dictionary
-+ * that can recreate exactly the same CPU model.
-+ */
-+static void x86_cpu_to_dict(X86CPU *cpu, QDict *props)
-+{
-+    QDict *sprops = x86_cpu_static_props();
-+    const QDictEntry *e;
-+
-+    for (e = qdict_first(sprops); e; e = qdict_next(sprops, e)) {
-+        const char *prop = qdict_entry_key(e);
-+        x86_cpu_expand_prop(cpu, props, prop);
-+    }
-+}
-+
-+static void object_apply_props(Object *obj, QDict *props, Error **errp)
-+{
-+    const QDictEntry *prop;
-+    Error *err = NULL;
-+
-+    for (prop = qdict_first(props); prop; prop = qdict_next(props, prop)) {
-+        object_property_set_qobject(obj, qdict_entry_value(prop),
-+                                         qdict_entry_key(prop), &err);
-+        if (err) {
-+            break;
-+        }
-+    }
-+
-+    error_propagate(errp, err);
-+}
-+
-+/* Create X86CPU object according to model+props specification */
-+static X86CPU *x86_cpu_from_model(const char *model, QDict *props, Error **errp)
-+{
-+    X86CPU *xc = NULL;
-+    X86CPUClass *xcc;
-+    Error *err = NULL;
-+
-+    xcc = X86_CPU_CLASS(cpu_class_by_name(TYPE_X86_CPU, model));
-+    if (xcc == NULL) {
-+        error_setg(&err, "CPU model '%s' not found", model);
-+        goto out;
-+    }
-+
-+    xc = X86_CPU(object_new(object_class_get_name(OBJECT_CLASS(xcc))));
-+    if (props) {
-+        object_apply_props(OBJECT(xc), props, &err);
-+        if (err) {
-+            goto out;
-+        }
-+    }
-+
-+    x86_cpu_expand_features(xc, &err);
-+    if (err) {
-+        goto out;
-+    }
-+
-+out:
-+    if (err) {
-+        error_propagate(errp, err);
-+        object_unref(OBJECT(xc));
-+        xc = NULL;
-+    }
-+    return xc;
-+}
-+
-+CpuModelExpansionInfo *
-+arch_query_cpu_model_expansion(CpuModelExpansionType type,
-+                                                      CpuModelInfo *model,
-+                                                      Error **errp)
-+{
-+    X86CPU *xc = NULL;
-+    Error *err = NULL;
-+    CpuModelExpansionInfo *ret = g_new0(CpuModelExpansionInfo, 1);
-+    QDict *props = NULL;
-+    const char *base_name;
-+
-+    xc = x86_cpu_from_model(model->name,
-+                            model->has_props ?
-+                                qobject_to_qdict(model->props) :
-+                                NULL, &err);
-+    if (err) {
-+        goto out;
-+    }
-+
-+
-+    switch (type) {
-+    case CPU_MODEL_EXPANSION_TYPE_STATIC:
-+        /* Static expansion will be based on "base" only */
-+        base_name = "base";
-+    break;
-+    case CPU_MODEL_EXPANSION_TYPE_FULL:
-+        /* As we don't return every single property, full expansion needs
-+         * to keep the original model name+props, and add extra
-+         * properties on top of that.
-+         */
-+        base_name = model->name;
-+        if (model->has_props && model->props) {
-+            props = qdict_clone_shallow(qobject_to_qdict(model->props));
-+        }
-+    break;
-+    default:
-+        error_setg(&err, "Unsupportted expansion type");
-+        goto out;
-+    }
-+
-+    if (!props) {
-+        props = qdict_new();
-+    }
-+    x86_cpu_to_dict(xc, props);
-+
-+    ret->model = g_new0(CpuModelInfo, 1);
-+    ret->model->name = g_strdup(base_name);
-+    ret->model->props = QOBJECT(props);
-+    ret->model->has_props = true;
-+
-+out:
-+    object_unref(OBJECT(xc));
-+    if (err) {
-+        error_propagate(errp, err);
-+        qapi_free_CpuModelExpansionInfo(ret);
-+        ret = NULL;
-+    }
-+    return ret;
-+}
-+
- X86CPU *cpu_x86_init(const char *cpu_model)
- {
-     return X86_CPU(cpu_generic_init(TYPE_X86_CPU, cpu_model));
+     g_assert(qdict_size(t) == 2);
 -- 
-2.11.0.259.g40922b1
+2.7.4
