@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cgKwN-00031c-93
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 19:37:56 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cgLpR-00081U-R5
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 20:34:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cgKwJ-0001zE-Q5
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 19:37:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33080)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cgKwJ-0001x9-Jr
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 19:37:51 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7F33E83F47
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 00:37:51 +0000 (UTC)
-References: <1487715299-21102-1-git-send-email-kraxel@redhat.com>
-	<1487715299-21102-9-git-send-email-kraxel@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <6600b955-a474-7dc5-3dc0-5b951d12934a@redhat.com>
-Date: Wed, 22 Feb 2017 01:37:48 +0100
+	(envelope-from <dgibson@ozlabs.org>) id 1cgLpQ-0008Gn-HC
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 20:34:49 -0500
+Date: Wed, 22 Feb 2017 11:57:57 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170222005757.GB12577@umbus.fritz.box>
+References: <1487684021-22713-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1487715299-21102-9-git-send-email-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 8/9] update -g command line switch
- documentation
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="l76fUT7nc3MelDdI"
+Content-Disposition: inline
+In-Reply-To: <1487684021-22713-1-git-send-email-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH] hw/ppc/ppc405_uc.c: Avoid integer overflows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,60 +23,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, patches@linaro.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
 
-On 02/21/17 23:14, Gerd Hoffmann wrote:
-> Bring documentation in line with the recent changes.
-> Text suggested by L=C3=A1szl=C3=B3 =C3=89rsek.
+
+--l76fUT7nc3MelDdI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Feb 21, 2017 at 01:33:41PM +0000, Peter Maydell wrote:
+> When performing clock calculations, the ppc405_uc code
+> has several places where it multiplies together two
+> 32-bit variables and assigns the result to a 64-bit
+> variable. This doesn't quite do what is intended because
+> C will compute a 32-bit multiply result. Add casts to
+> ensure we don't truncate the result.
 >=20
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> (Spotted by Coverity, CID 1005504, 1005505.)
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Ouch.  Applied to ppc-for-2.9.
+
 > ---
->  qemu-options.hx | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
+>  hw/ppc/ppc405_uc.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 >=20
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 4e89610..ae62e0d 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -1241,7 +1241,18 @@ DEF("g", 1, QEMU_OPTION_g ,
->  STEXI
->  @item -g @var{width}x@var{height}[x@var{depth}]
->  @findex -g
-> -Set the initial graphical resolution and depth (PPC, SPARC only).
-> +Set the initial graphical resolution and depth.
-> +
-> +This setting may be masked by guest firmware temporarily.
-> +
-> +On PPC and SPARC, the guest firmware will configure the display from
-> +this setting, and the guest OS will inherit the display resolution
-> +and depth.
-> +
-> +On x86 and ARM, if the guest firmware is an edk2 (UEFI) platform,
-> +the firmware may initially configure the display according to its own,
-> +persistent, independent settings. The guest OS drivers, once loaded,
-> +should adhere to "-g" however, for virtio and qxl adapters.
+> diff --git a/hw/ppc/ppc405_uc.c b/hw/ppc/ppc405_uc.c
+> index d6d3fc2..d5df94a 100644
+> --- a/hw/ppc/ppc405_uc.c
+> +++ b/hw/ppc/ppc405_uc.c
+> @@ -1881,7 +1881,7 @@ static void ppc405cr_clk_setup (ppc405cr_cpc_t *cpc)
+>          D1 =3D (((cpc->pllmr >> 20) - 1) & 0xF) + 1; /* FBDV */
+>          D2 =3D 8 - ((cpc->pllmr >> 16) & 0x7); /* FWDVA */
+>          M =3D D0 * D1 * D2;
+> -        VCO_out =3D cpc->sysclk * M;
+> +        VCO_out =3D (uint64_t)cpc->sysclk * M;
+>          if (VCO_out < 400000000 || VCO_out > 800000000) {
+>              /* PLL cannot lock */
+>              cpc->pllmr &=3D ~0x80000000;
+> @@ -1892,7 +1892,7 @@ static void ppc405cr_clk_setup (ppc405cr_cpc_t *cpc)
+>          /* Bypass PLL */
+>      bypass_pll:
+>          M =3D D0;
+> -        PLL_out =3D cpc->sysclk * M;
+> +        PLL_out =3D (uint64_t)cpc->sysclk * M;
+>      }
+>      CPU_clk =3D PLL_out;
+>      if (cpc->cr1 & 0x00800000)
+> @@ -2242,7 +2242,7 @@ static void ppc405ep_compute_clocks (ppc405ep_cpc_t=
+ *cpc)
+>  #ifdef DEBUG_CLOCKS_LL
+>          printf("FWDA %01" PRIx32 " %d\n", (cpc->pllmr[1] >> 16) & 0x7, D=
+);
+>  #endif
+> -        VCO_out =3D cpc->sysclk * M * D;
+> +        VCO_out =3D (uint64_t)cpc->sysclk * M * D;
+>          if (VCO_out < 500000000UL || VCO_out > 1000000000UL) {
+>              /* Error - unlock the PLL */
+>              printf("VCO out of range %" PRIu64 "\n", VCO_out);
 
-I think I made a small mistake here in my earlier suggestion; I think I
-should have restricted qxl to x86 only, something like:
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-  ... should adhere to "-g" however, for virtio (x86, ARM) and qxl
-  (x86 only) adapters
+--l76fUT7nc3MelDdI
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Lest we appear to suggest that QXL will ever be available in aarch64
-guests :)
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
->  ETEXI
-> =20
->  DEF("vnc", HAS_ARG, QEMU_OPTION_vnc ,
->=20
+iQIcBAEBCAAGBQJYrOITAAoJEGw4ysog2bOSIIgP/3RTo9krfMWp91BWPogygsVz
+uPckOtI/MLYTPb2x5NLRIbqqiZWKK4JFqSXUiR1fYfpY9zCjPJhIujG4ENsgoxg9
+pQk0UHAJWKPzzQaCLQt9plC+WHFYzbWRdeHql8zhl95B6wKz6+L04FUnbJoISfqd
+kJZ4gwdjftqehZGWNCpogF73xHB5dAVn6hvxMU20jGfsB8l3yOrPd19qY2Jr5YFd
+dnP7LkgRXQGkj5mq2tK4CRn/rTfB+9Nxjf3H35Urnsn8Dv0cMJSUWbsD2jS7ty+o
+LKlM77VG8MlzkeO23SO1HHUd3IhvukW1rMEFBmBLu2W/4++2I21zYCZU7apnsR75
+S5imerG99MvsqvSOMBQQSsKJPF8I2GWPltsWgfQzhTJikBj8muoAuLWWCsXls8Wr
+nLmgnJdOxDcRkrUUMyz8r54HqaSgoanyD0Nj+6vbVepzOxXpu2iQhFtrLG8kOXo7
+Dcq2z3OXSu+8ttqttclAyo0z9NuDIMEWPyD7PYayktuIi2NTUtBRBIxEjTdo/v7T
+fY5GrqaZcqZuCL03Z4ZBz5SHeW1v2UmZTG8ldq9672OoxoARx62tLmx8Iiq/vky5
+TVRvA3D5XlZZkMFuWX+i4jZMXqtVYKa3dqaeY5BOEMiw6FGeWyYhduyoHCyCPsoT
+HqEoDWnwHsDi8mshwsoD
+=f96Z
+-----END PGP SIGNATURE-----
 
-Looks good to me (and thank you for considering my response earlier).
-With the above tweak:
-
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-
-Furthermore, once patch #9 becomes a real patch, this documentation
-should be updated again, adding "VGA (x86 only)" as well.
-
-Thanks!
-Laszlo
+--l76fUT7nc3MelDdI--
