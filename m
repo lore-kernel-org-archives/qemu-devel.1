@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43743)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cgWJM-0001bO-OT
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 07:46:25 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cgWKG-00034N-6p
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 07:47:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cgWJM-00038X-0d
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 07:46:24 -0500
-References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
-	<1487689130-30373-7-git-send-email-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <bfbcb037-643e-a65c-ca6c-4c7028394b83@redhat.com>
-Date: Wed, 22 Feb 2017 13:46:13 +0100
+	(envelope-from <kwolf@redhat.com>) id 1cgWKF-0003OH-Ce
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 07:47:20 -0500
+Date: Wed, 22 Feb 2017 13:47:10 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170222124710.GL4112@noname.str.redhat.com>
+References: <1487349541-10201-1-git-send-email-pl@kamp.de>
+	<1487349541-10201-3-git-send-email-pl@kamp.de>
+	<20170217213715.GJ19045@localhost.localdomain>
+	<feb6aa92-5e7f-9af9-12cb-bd7beae47750@redhat.com>
+	<20170217215117.GM19045@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <1487689130-30373-7-git-send-email-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="kJqiKEO91IfT7DAtVLmFwiO66UGtX1jbp"
-Subject: Re: [Qemu-devel] [PATCH 06/54] block: Factor out
- bdrv_open_child_bs()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170217215117.GM19045@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH 2/2] block/nfs: try to avoid the bounce
+ buffer in pwritev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,53 +27,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+To: Jeff Cody <jcody@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kJqiKEO91IfT7DAtVLmFwiO66UGtX1jbp
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
-Message-ID: <bfbcb037-643e-a65c-ca6c-4c7028394b83@redhat.com>
-Subject: Re: [PATCH 06/54] block: Factor out bdrv_open_child_bs()
-References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
- <1487689130-30373-7-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1487689130-30373-7-git-send-email-kwolf@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
+Am 17.02.2017 um 22:51 hat Jeff Cody geschrieben:
+> On Fri, Feb 17, 2017 at 03:42:52PM -0600, Eric Blake wrote:
+> > On 02/17/2017 03:37 PM, Jeff Cody wrote:
+> > > On Fri, Feb 17, 2017 at 05:39:01PM +0100, Peter Lieven wrote:
+> > >> if the passed qiov contains exactly one iov we can
+> > >> pass the buffer directly.
+> > >>
+> > >> Signed-off-by: Peter Lieven <pl@kamp.de>
+> > >> ---
+> > >>  block/nfs.c | 23 ++++++++++++++++-------
+> > >>  1 file changed, 16 insertions(+), 7 deletions(-)
+> > >>
+> > >> diff --git a/block/nfs.c b/block/nfs.c
+> > >> index ab5dcc2..bb4b75f 100644
+> > >> --- a/block/nfs.c
+> > >> +++ b/block/nfs.c
+> > >> @@ -295,20 +295,27 @@ static int coroutine_fn nfs_co_pwritev(BlockDriverState *bs, uint64_t offset,
+> > >>      NFSClient *client = bs->opaque;
+> > >>      NFSRPC task;
+> > >>      char *buf = NULL;
+> > >> +    bool my_buffer = false;
+> > > 
+> > > g_free() is a nop if buf is NULL, so there is no need for the my_buffer
+> > > variable & check.
+> > 
+> > Umm, yes there is:
+> > 
+> > >> +    if (iov->niov != 1) {
+> > >> +        buf = g_try_malloc(bytes);
+> > >> +        if (bytes && buf == NULL) {
+> > >> +            return -ENOMEM;
+> > >> +        }
+> > >> +        qemu_iovec_to_buf(iov, 0, buf, bytes);
+> > >> +        my_buffer = true;
+> > >> +    } else {
+> > >> +        buf = iov->iov[0].iov_base;
+> > 
+> > If we took the else branch, then we definitely do not want to be calling
+> > g_free(buf).
+> 
+> Doh!
+> 
+> > 
+> > >>      }
+> > >>  
+> > >> -    qemu_iovec_to_buf(iov, 0, buf, bytes);
+> > >> -
+> > >>      if (nfs_pwrite_async(client->context, client->fh,
+> > >>                           offset, bytes, buf,
+> > >>                           nfs_co_generic_cb, &task) != 0) {
+> > >> -        g_free(buf);
+> > >> +        if (my_buffer) {
+> > >> +            g_free(buf);
+> > >> +        }
+> > 
+> > It looks correct as-is to me.
+> 
+> Indeed.
+> 
+> Reviewed-by: Jeff Cody <jcody@redhat.com>
 
-On 21.02.2017 15:58, Kevin Wolf wrote:
-> This is the part of bdrv_open_child() that opens a BDS with option
-> inheritance, but doesn't attach it as a child to the parent yet.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block.c | 61 +++++++++++++++++++++++++++++++++++++--------------------=
-----
->  1 file changed, 37 insertions(+), 24 deletions(-)
+You gave R-b for both patches, but did not merge it - who is supposed to
+do that?
 
-Modulo the errors patchew noted (same applies to all of my R-bs):
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
-
---kJqiKEO91IfT7DAtVLmFwiO66UGtX1jbp
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlitiBUSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ACWcH/0UzS9DY86mWAE4OgPKPv7t6a7rkOOXF
-u1pu/dGrdzcYNgn4vibjK/nJEoI4t0xaotVuWN4FZouMJWXaaharixD9g4sJL9Fo
-0pDVfPjHnNB5vAFdP97znh+EP8P0Uy1GL/s+U3/lA3DXRXRG0jXcL3yL3/YBn3OX
-nZvjQGKQQiI+EA3CxVpmd6Ei3d4ALR/DD+Pb+FJD7c7Y47jka29sDMivhtb3rAs4
-fjQ3GlyqeI/WCHgA/jJUYWY/z37F9R/AygK8uUwejc34Z09RpQiKjWl2os7a3oc2
-EitFhEk2E8o6dIL4bEZNQTggcGNE2puyHhbDzaZUbM5DYxj7XBlK/wo=
-=kTfd
------END PGP SIGNATURE-----
-
---kJqiKEO91IfT7DAtVLmFwiO66UGtX1jbp--
+Kevin
