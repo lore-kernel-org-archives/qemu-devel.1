@@ -1,38 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34364)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cgaOk-0003TB-GX
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:08:16 -0500
+	(envelope-from <eblake@redhat.com>) id 1cgaSI-0005E1-Qg
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:11:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cgaOh-0006rA-QY
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:08:14 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38171
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cgaOh-0006qK-KY
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:08:11 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1MGwedv113555
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 12:08:10 -0500
-Received: from e06smtp09.uk.ibm.com (e06smtp09.uk.ibm.com [195.75.94.105])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28s9xgqh0f-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 12:08:10 -0500
-Received: from localhost
-	by e06smtp09.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Wed, 22 Feb 2017 17:08:08 -0000
-Date: Wed, 22 Feb 2017 18:08:04 +0100
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <20170222121527.7009-1-cornelia.huck@de.ibm.com>
-References: <20170222121527.7009-1-cornelia.huck@de.ibm.com>
+	(envelope-from <eblake@redhat.com>) id 1cgaSH-0008Oz-QJ
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:11:54 -0500
+References: <20170221024248.11027-1-eblake@redhat.com>
+	<20170221024248.11027-8-eblake@redhat.com>
+	<ecab92ba-94d4-7b1d-c854-fa2ff9b93acc@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5d651e79-bfdf-fb10-472f-89aef48afaf7@redhat.com>
+Date: Wed, 22 Feb 2017 11:11:47 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170222180804.1dbf3175.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 0/8] s390x: basic support for 3270 devices
+In-Reply-To: <ecab92ba-94d4-7b1d-c854-fa2ff9b93acc@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="GcdM7fiOhUXpEFWmNQiNBWE2qrcpSjGKa"
+Subject: Re: [Qemu-devel] [PATCH v4 7/8] nbd: Implement NBD_INFO_BLOCK_SIZE
+ on server
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,72 +26,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, pbonzini@redhat.com, marcandre.lureau@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, vsementsov@virtuozzo.com, den@virtuozzo.com
 
-On Wed, 22 Feb 2017 13:15:19 +0100
-Cornelia Huck <cornelia.huck@de.ibm.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--GcdM7fiOhUXpEFWmNQiNBWE2qrcpSjGKa
+From: Eric Blake <eblake@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, vsementsov@virtuozzo.com, den@virtuozzo.com
+Message-ID: <5d651e79-bfdf-fb10-472f-89aef48afaf7@redhat.com>
+Subject: Re: [PATCH v4 7/8] nbd: Implement NBD_INFO_BLOCK_SIZE on server
+References: <20170221024248.11027-1-eblake@redhat.com>
+ <20170221024248.11027-8-eblake@redhat.com>
+ <ecab92ba-94d4-7b1d-c854-fa2ff9b93acc@redhat.com>
+In-Reply-To: <ecab92ba-94d4-7b1d-c854-fa2ff9b93acc@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Initial support for channel-attached 3270 devices (yes, these are the
-> classic 'green-screen' consoles). Acks/reviews for the telnet integration
-> (tn3270) are especially solicited.
-> 
-> To actually make use of this, you need a 3270 emulator (for example,
-> x3270). You can use the 3270 in a Linux guest either as a console
-> (probably not very useful) or as an additional tty (described below).
-> 
-> Limitations:
-> The 3270 feature is experimental and it only supports one 3270 device,
-> Linux as guest, x3270 as client. It doesn't support live migration,
-> SSL/TLS encryption, or x3270 client resizing when re-connecting. Multiple
-> commands in one inbound packet, which are usually caused by pressing the
-> "Reset" key during poor network traffic, are not supported right now.
-> Currently, we terminate the connection in that case.
-> 
-> Usage:
-> Configure a device, for example with the following command line:
->   -chardev socket,id=char_0,host=0.0.0.0,port=23,nowait,server,tn3270 \
->   -device x-terminal3270,chardev=char_0,devno=fe.0.000a,id=terminal_0
-> 
-> The guest needs to be configured in the following way:
-> - Make sure that the 3270 channel device is activated (e.g. via
->   chccwdev -e 0.0.000a for the example above).
-> - Start a getty on the respective device node under /dev/3270/ once
->   it shows up.
-> 
-> After starting the guest via qemu, connect x3270 to <host ip>:<port>.
+On 02/22/2017 10:51 AM, Paolo Bonzini wrote:
+>=20
+>=20
+> On 21/02/2017 03:42, Eric Blake wrote:
+>> +    /* Send NBD_INFO_BLOCK_SIZE always, but tweak the minimum size
+>> +     * according to whether the client requested it, and according to=
 
-Some more verbose documentation here: http://wiki.qemu-project.org/Features/3270
+>> +     * whether this is OPT_INFO or OPT_GO. */
+>> +    /* minimum - 1 for back-compat, or 512 if client is new enough.
+>> +     * TODO: consult blk_bs(blk)->request_align? */
+>> +    sizes[0] =3D (opt =3D=3D NBD_OPT_INFO || blocksize) ? BDRV_SECTOR=
+_SIZE : 1;
+>> +    /* preferred - At least 4096, but larger as appropriate. */
+>> +    sizes[1] =3D MAX(blk_get_opt_transfer(exp->blk), 4096);
+>=20
+> Can we just say zero if the preferred transfer size is unknown?
 
-(Not sure yet where to hook this up inside the wiki.)
+The NBD specification requires a non-zero power-of-2 number if the
+server transmits the block size at all; 1 is the ideal number, followed
+by whatever actual size we learn from the request_align of the device.
 
-> 
-> Jing Liu (6):
->   chardev: Basic support for TN3270
->   s390x/css: Add an algorithm to find a free chpid
->   s390x/3270: 3270 data stream handling
->   s390x/3270: Add the TCP socket events handler for 3270
->   s390x/3270: Detect for continued presence of a 3270 client
->   s390x/3270: Mark non-migratable and enable the device
-> 
-> Yang Chen (2):
->   s390x/3270: Add abstract emulated ccw-attached 3270 device
->   s390x/3270: Add emulated terminal3270 device
-> 
->  chardev/char-socket.c             |  76 +++++++---
->  chardev/char.c                    |  11 +-
->  default-configs/s390x-softmmu.mak |   1 +
->  hw/char/Makefile.objs             |   1 +
->  hw/char/terminal3270.c            | 293 ++++++++++++++++++++++++++++++++++++++
->  hw/s390x/3270-ccw.c               | 169 ++++++++++++++++++++++
->  hw/s390x/Makefile.objs            |   1 +
->  hw/s390x/css.c                    |  24 ++++
->  include/hw/s390x/3270-ccw.h       |  53 +++++++
->  include/hw/s390x/css.h            |   2 +
->  include/sysemu/char.h             |   8 ++
->  qapi-schema.json                  |   3 +
->  12 files changed, 620 insertions(+), 22 deletions(-)
->  create mode 100644 hw/char/terminal3270.c
->  create mode 100644 hw/s390x/3270-ccw.c
->  create mode 100644 include/hw/s390x/3270-ccw.h
-> 
+
+I added blk_get_opt_transfer() in 3/8; maybe I should just respin the
+series to also add blk_get_request_align() as well and get rid of the
+TODO here.  In other words, my TODO is probably the result of me not
+remembering to complete my rebase (since v3 of the series was posted so
+many months ago).
+
+>=20
+> Apart from this, it looks good.
+
+Thanks; I'll get a respin out soon, with R-b added where they make
+sense, and with the TODO removed.
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--GcdM7fiOhUXpEFWmNQiNBWE2qrcpSjGKa
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYrcZTAAoJEKeha0olJ0Nq6H4H/A4v07XnmsimHXWYEAc3Pm7i
+DJ/ZlSBzMf42J2McHF2qMB7bwMPP2c1YTk+6VrjBtiRe0AM9kGjWXnpk9PF6if3W
+fcDUPjD9ebhnDk0X2QVOlA359RTT04RNHV5XhB5O/3f6hQ0COj8JLS55pryVq9GP
+0N/QmxR3FuNRxRQhD0B72CTx8u+7Zco+AFC6KKLSoWKBBHRVEsy6KurdhtyiZ5v9
+TxSRw0PGtO3rFiEmuymtPVAd1Z/bTH+vPWPVHr8WZbxRR8FzmISx6ByrY/CYVfuU
+F1Lr0E43PBUaL/OYmrWohrtpMJ20zH7MK3jfvUc5z6ODNknDfQMdHKvPd7OSMZY=
+=/BWA
+-----END PGP SIGNATURE-----
+
+--GcdM7fiOhUXpEFWmNQiNBWE2qrcpSjGKa--
