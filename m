@@ -1,34 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cgaLR-0000LI-ST
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:04:50 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cgaOk-0003TB-GX
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:08:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cgaLO-0003yt-LW
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:04:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33718)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cgaLO-0003xr-Dr
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:04:46 -0500
-References: <1486123043-26493-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1486123043-26493-2-git-send-email-pradeep.jagadeesh@huawei.com>
-	<71b1733d-7638-5e27-e828-fad57f76f507@redhat.com>
-	<20170207001533.3f18e4ea@bahia.lan> <20170207113231.44e35be6@bahia.lan>
-	<6b702369-7891-4e38-7240-57ad643657bd@redhat.com>
-	<20170207172933.05574f60@bahia.lan>
-	<20170214132122.GH23310@stefanha-x1.localdomain>
-	<20170222144153.131dee9d@bahia.lan>
-	<18735c6a-e21e-6aaf-4283-53f980afae3f@redhat.com>
-	<20170222175917.53c27906@bahia.lan>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c3877ffd-4506-f8f3-57bc-0c00e4e3a6f4@redhat.com>
-Date: Wed, 22 Feb 2017 11:04:42 -0600
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cgaOh-0006rA-QY
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:08:14 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38171
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cgaOh-0006qK-KY
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:08:11 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1MGwedv113555
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 12:08:10 -0500
+Received: from e06smtp09.uk.ibm.com (e06smtp09.uk.ibm.com [195.75.94.105])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28s9xgqh0f-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 12:08:10 -0500
+Received: from localhost
+	by e06smtp09.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Wed, 22 Feb 2017 17:08:08 -0000
+Date: Wed, 22 Feb 2017 18:08:04 +0100
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <20170222121527.7009-1-cornelia.huck@de.ibm.com>
+References: <20170222121527.7009-1-cornelia.huck@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170222175917.53c27906@bahia.lan>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ClbBtacONKRAa3HH9TIFpwTqPtlToCiRp"
-Subject: Re: [Qemu-devel] [PATCH 1/2 v16] fsdev: add IO throttle support to
- fsdev devices
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20170222180804.1dbf3175.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 0/8] s390x: basic support for 3270 devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,76 +41,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Alberto Garcia <berto@igalia.com>, Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, pbonzini@redhat.com, marcandre.lureau@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ClbBtacONKRAa3HH9TIFpwTqPtlToCiRp
-From: Eric Blake <eblake@redhat.com>
-To: Greg Kurz <groug@kaod.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>,
- Pradeep Jagadeesh <pradeepkiruvale@gmail.com>,
- "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>,
- Alberto Garcia <berto@igalia.com>,
- Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, qemu-devel@nongnu.org,
- Fam Zheng <famz@redhat.com>
-Message-ID: <c3877ffd-4506-f8f3-57bc-0c00e4e3a6f4@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2 v16] fsdev: add IO throttle support to
- fsdev devices
-References: <1486123043-26493-1-git-send-email-pradeep.jagadeesh@huawei.com>
- <1486123043-26493-2-git-send-email-pradeep.jagadeesh@huawei.com>
- <71b1733d-7638-5e27-e828-fad57f76f507@redhat.com>
- <20170207001533.3f18e4ea@bahia.lan> <20170207113231.44e35be6@bahia.lan>
- <6b702369-7891-4e38-7240-57ad643657bd@redhat.com>
- <20170207172933.05574f60@bahia.lan>
- <20170214132122.GH23310@stefanha-x1.localdomain>
- <20170222144153.131dee9d@bahia.lan>
- <18735c6a-e21e-6aaf-4283-53f980afae3f@redhat.com>
- <20170222175917.53c27906@bahia.lan>
-In-Reply-To: <20170222175917.53c27906@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, 22 Feb 2017 13:15:19 +0100
+Cornelia Huck <cornelia.huck@de.ibm.com> wrote:
 
-On 02/22/2017 10:59 AM, Greg Kurz wrote:
+> Initial support for channel-attached 3270 devices (yes, these are the
+> classic 'green-screen' consoles). Acks/reviews for the telnet integration
+> (tn3270) are especially solicited.
+> 
+> To actually make use of this, you need a 3270 emulator (for example,
+> x3270). You can use the 3270 in a Linux guest either as a console
+> (probably not very useful) or as an additional tty (described below).
+> 
+> Limitations:
+> The 3270 feature is experimental and it only supports one 3270 device,
+> Linux as guest, x3270 as client. It doesn't support live migration,
+> SSL/TLS encryption, or x3270 client resizing when re-connecting. Multiple
+> commands in one inbound packet, which are usually caused by pressing the
+> "Reset" key during poor network traffic, are not supported right now.
+> Currently, we terminate the connection in that case.
+> 
+> Usage:
+> Configure a device, for example with the following command line:
+>   -chardev socket,id=char_0,host=0.0.0.0,port=23,nowait,server,tn3270 \
+>   -device x-terminal3270,chardev=char_0,devno=fe.0.000a,id=terminal_0
+> 
+> The guest needs to be configured in the following way:
+> - Make sure that the 3270 channel device is activated (e.g. via
+>   chccwdev -e 0.0.000a for the example above).
+> - Start a getty on the respective device node under /dev/3270/ once
+>   it shows up.
+> 
+> After starting the guest via qemu, connect x3270 to <host ip>:<port>.
 
->>>> I see these parameter names as stable.  There is little risk that th=
-ey
->>>> would change. =20
->>
->> We just need to be sure that when we do add QMP, that it doesn't use
->> names that differ from the command line (blockdev is an example where =
-we
->> weren't careful in 2.8, and had to rename things in 2.9 to be
->> consistent, and I want to avoid repeating that mistake).
->>
->=20
-> Can you provide some pointers on what had to be fixed in blockdev ?
+Some more verbose documentation here: http://wiki.qemu-project.org/Features/3270
 
-See for example commits f67409a, 4230e5d, 1a417e4 showing several cases
-where we had to fix up inconsistencies.
+(Not sure yet where to hook this up inside the wiki.)
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---ClbBtacONKRAa3HH9TIFpwTqPtlToCiRp
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYrcSqAAoJEKeha0olJ0Nq0P4IAKPBDKrih876sME1pNjVPzx8
-Eebu1OPKriP6zvNpWTf/Sn13tnWecE1HY235QkjJkmDHeWxTUbQlc63vTGBSfAdm
-QsJ2sOB28NCLD1lNm0BL7s/hNz/BNpkm8IqmEsN12N8lE2b/ibUv2+a4TRGykfPC
-oRWV27BDV6Cr2s0T+MRDK2juusoEKO+mquY/yS9I/aTeIfdbpwl26FHctY3Zwjhe
-LeN1Yu/EUjUMCUcHYpRRnYDbBWjD0nhO7ceHB0iBuPd+W+wfjlftjKkNEbdKjVjh
-xbQqyst4FWV0rRz6/siFwwZEqZLCPTtKgcmKC5Mv29WQYmD+xVBSjCnTxdXw1Rs=
-=sb+K
------END PGP SIGNATURE-----
-
---ClbBtacONKRAa3HH9TIFpwTqPtlToCiRp--
+> 
+> Jing Liu (6):
+>   chardev: Basic support for TN3270
+>   s390x/css: Add an algorithm to find a free chpid
+>   s390x/3270: 3270 data stream handling
+>   s390x/3270: Add the TCP socket events handler for 3270
+>   s390x/3270: Detect for continued presence of a 3270 client
+>   s390x/3270: Mark non-migratable and enable the device
+> 
+> Yang Chen (2):
+>   s390x/3270: Add abstract emulated ccw-attached 3270 device
+>   s390x/3270: Add emulated terminal3270 device
+> 
+>  chardev/char-socket.c             |  76 +++++++---
+>  chardev/char.c                    |  11 +-
+>  default-configs/s390x-softmmu.mak |   1 +
+>  hw/char/Makefile.objs             |   1 +
+>  hw/char/terminal3270.c            | 293 ++++++++++++++++++++++++++++++++++++++
+>  hw/s390x/3270-ccw.c               | 169 ++++++++++++++++++++++
+>  hw/s390x/Makefile.objs            |   1 +
+>  hw/s390x/css.c                    |  24 ++++
+>  include/hw/s390x/3270-ccw.h       |  53 +++++++
+>  include/hw/s390x/css.h            |   2 +
+>  include/sysemu/char.h             |   8 ++
+>  qapi-schema.json                  |   3 +
+>  12 files changed, 620 insertions(+), 22 deletions(-)
+>  create mode 100644 hw/char/terminal3270.c
+>  create mode 100644 hw/s390x/3270-ccw.c
+>  create mode 100644 include/hw/s390x/3270-ccw.h
+> 
