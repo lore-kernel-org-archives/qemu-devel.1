@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sebastien.fremal@gmail.com>) id 1cgY1F-0006nq-AT
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 09:35:50 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cgY2O-0007OR-Nv
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 09:37:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sebastien.fremal@gmail.com>) id 1cgY1E-0007Zh-DU
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 09:35:49 -0500
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:34598)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sebastien.fremal@gmail.com>)
-	id 1cgY1E-0007ZO-3g
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 09:35:48 -0500
-Received: by mail-ot0-x241.google.com with SMTP id w44so454649otw.1
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 06:35:46 -0800 (PST)
+	(envelope-from <mreitz@redhat.com>) id 1cgY2N-0007jZ-S3
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 09:37:00 -0500
+References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
+	<1487689130-30373-25-git-send-email-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <64b46b03-6ea1-6f7c-dfab-6d722a707714@redhat.com>
+Date: Wed, 22 Feb 2017 15:36:50 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CLmHPAVJhmgEDMOrbUmWCn2FqSWa4aUJNA9csfy_Yu54w@mail.gmail.com>
-References: <CAOV6k-Am5hxdjueMMzaOVygtq16L7KJur_jkDi5snjeLJqDU2w@mail.gmail.com>
-	<CAJ+F1CLmHPAVJhmgEDMOrbUmWCn2FqSWa4aUJNA9csfy_Yu54w@mail.gmail.com>
-From: =?UTF-8?B?U8OpYmFzdGllbiBGcsOpbWFs?= <sebastien.fremal@gmail.com>
-Date: Wed, 22 Feb 2017 15:35:25 +0100
-Message-ID: <CAOV6k-APzvSWDMR-bY+kxgvYm28ye5L5hyqcboprFr+9cYw1Jw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] How to access to ivshmem device in VM ?
+In-Reply-To: <1487689130-30373-25-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="RS3eCIFMP4lxAFchwibF9OxuXHgoqTrdj"
+Subject: Re: [Qemu-devel] [PATCH 24/54] block: Add permissions to blk_new()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,32 +24,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-M. Lureau,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--RS3eCIFMP4lxAFchwibF9OxuXHgoqTrdj
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+Message-ID: <64b46b03-6ea1-6f7c-dfab-6d722a707714@redhat.com>
+Subject: Re: [PATCH 24/54] block: Add permissions to blk_new()
+References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
+ <1487689130-30373-25-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1487689130-30373-25-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-Thank you for your reply ! I had misunderstood some informations indicating
-that the device would create an entry in the /dev/shm of virtual machines.
-The lspci command assured me that the device is properly accessible in my
-virtual machine.
+On 21.02.2017 15:58, Kevin Wolf wrote:
+> We want every user to be specific about the permissions it needs, so
+> we'll pass the initial permissions as parameters to blk_new(). A user
+> only needs to call blk_set_perm() if it wants to change the permissions=
 
- "Note that ivshmem is not well regarded by the qemu community, what are
-you trying to accomplish?"
+> after the fact.
+>=20
+> The permissions are stored in the BlockBackend and applied whenever a
+> BlockDriverState should be attached in blk_insert_bs().
+>=20
+> This does not include actually choosing the right set of permissions
+> everywhere yet. Instead, the usual FIXME comment is added to each place=
 
-Ivshmem breaks one of the most important virtualization's principal : the
-isolation of virtual machines. I know some people don't like it. I'm
-working in the GPGPU context. We are working (again) on sharing available
-GPUs of a physical machine between the virtual machines running on that
-machine. To do so, we created a direct access shared buffer : data are
-written and read directly in a ring buffer without any kind of copy. That
-reduces transfer times but it requires memory pages to be shared between
-communicating processes. I used to work with Xen but Xen was incompatible
-with NVIDIA GPUs when I began working on this project. Therefore I went for
-Qemu as it's compatible with GPGPU on NVIDIA ! Ivshmem is a danger for
-public clusters, but it could bring speed-up for private infrastructures !
+> and will be addressed in individual patches.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block.c                          |  2 +-
+>  block/backup.c                   |  3 ++-
+>  block/block-backend.c            | 21 ++++++++++++++-------
+>  block/commit.c                   | 12 ++++++++----
+>  block/mirror.c                   |  3 ++-
+>  block/qcow2.c                    |  2 +-
+>  blockdev.c                       |  4 ++--
+>  blockjob.c                       |  3 ++-
+>  hmp.c                            |  3 ++-
+>  hw/block/fdc.c                   |  3 ++-
+>  hw/core/qdev-properties-system.c |  3 ++-
+>  hw/ide/qdev.c                    |  3 ++-
+>  hw/scsi/scsi-disk.c              |  3 ++-
+>  include/sysemu/block-backend.h   |  2 +-
+>  migration/block.c                |  3 ++-
+>  nbd/server.c                     |  3 ++-
+>  tests/test-blockjob.c            |  3 ++-
+>  tests/test-throttle.c            |  7 ++++---
+>  18 files changed, 53 insertions(+), 30 deletions(-)
 
-Best regards,
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-Sebastien Fremal
-=E2=80=8B
+
+--RS3eCIFMP4lxAFchwibF9OxuXHgoqTrdj
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlitogISHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AajkH/i1pyN//FZv2xR9JS2nFG7rg2dZ0STxY
+DVw0GEMvAD6WRpkPobBdAB1PD0IfzExTq5Utk0ZURjjJRLuR6v8YOylnoQVsgphK
+o1xmGELVP5YYyy03KsJ6W2T4+uB8Uk/VEVBZyhot/H3ntBpK363EidDafQtfoCKs
+jvJeNxRf/Nf8U+RuNVk6Rurne21Hfumqn7M1lBvYS+kOWASJCxN+N4rJmoCrB0qf
+Sk/KHq6Kh2y956ZL+FjRwYsIK5yG21ZHTvQrej/FwAU2JS4WAD3DfhNk1fndvcRB
+DCFC1bN7RaKi3Ha/iq+VnlFQcfkQVrOjDv6/ZVcgZ96zK3vYY5iYbBQ=
+=tTrv
+-----END PGP SIGNATURE-----
+
+--RS3eCIFMP4lxAFchwibF9OxuXHgoqTrdj--
