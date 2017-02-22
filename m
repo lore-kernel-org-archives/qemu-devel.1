@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cgaTa-0006Vs-Nj
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:13:15 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cgaTk-0006cU-Cy
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:13:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cgaTY-0000Sd-3H
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:13:14 -0500
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1487755788-16415-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<1487755788-16415-9-git-send-email-nikunj@linux.vnet.ibm.com>
-	<c023ac73-b983-885e-961c-f744b3c91cc6@twiddle.net>
-	<87y3wya3n4.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <0b1690e6-5118-7fae-7e35-7118f9446cb8@twiddle.net>
-Date: Thu, 23 Feb 2017 04:13:02 +1100
+	(envelope-from <alex.bennee@linaro.org>) id 1cgaTj-0000Tu-4X
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:13:24 -0500
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:38579)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cgaTi-0000Tb-Rn
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:13:23 -0500
+Received: by mail-wm0-x229.google.com with SMTP id r141so6934362wmg.1
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 09:13:22 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Wed, 22 Feb 2017 17:13:05 +0000
+Message-Id: <20170222171327.26624-3-alex.bennee@linaro.org>
+In-Reply-To: <20170222171327.26624-1-alex.bennee@linaro.org>
+References: <20170222171327.26624-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <87y3wya3n4.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 08/11] target/ppc: update ov/ov32 for
- nego
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v13 02/24] mttcg: translate-all: Enable locking
+ debug in a debug build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,71 +30,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
-Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
+To: rth@twiddle.net, peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-On 02/22/2017 10:03 PM, Nikunj A Dadhania wrote:
-> Richard Henderson <rth@twiddle.net> writes:
->
->> On 02/22/2017 08:29 PM, Nikunj A Dadhania wrote:
->>> For 64-bit mode if the register RA contains 0x8000_0000_0000_0000, OV
->>> and OV32 are set to 1.
->>>
->>> For 32-bit mode if the register RA contains 0x8000_0000, OV and OV32 are
->>> set to 1.
->>>
->>> Use the tcg-ops for negation (neg_tl) and drop gen_op_arith_neg() as
->>> nego was the last user.
->>>
->>> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
->>> ---
->>>  target/ppc/translate.c | 26 +++++++++++++++++---------
->>>  1 file changed, 17 insertions(+), 9 deletions(-)
->>>
->>> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
->>> index eecdfe9..2a9f508 100644
->>> --- a/target/ppc/translate.c
->>> +++ b/target/ppc/translate.c
->>> @@ -1473,14 +1473,6 @@ static void gen_subfic(DisasContext *ctx)
->>>  }
->>>
->>>  /* neg neg. nego nego. */
->>> -static inline void gen_op_arith_neg(DisasContext *ctx, bool compute_ov)
->>> -{
->>> -    TCGv zero = tcg_const_tl(0);
->>> -    gen_op_arith_subf(ctx, cpu_gpr[rD(ctx->opcode)], cpu_gpr[rA(ctx->opcode)],
->>> -                      zero, 0, 0, compute_ov, Rc(ctx->opcode));
->>> -    tcg_temp_free(zero);
->>> -}
->>> -
->>>  static void gen_neg(DisasContext *ctx)
->>>  {
->>>      tcg_gen_neg_tl(cpu_gpr[rD(ctx->opcode)], cpu_gpr[rA(ctx->opcode)]);
->>> @@ -1491,7 +1483,23 @@ static void gen_neg(DisasContext *ctx)
->>>
->>>  static void gen_nego(DisasContext *ctx)
->>>  {
->>> -    gen_op_arith_neg(ctx, 1);
->>> +    TCGv t0 = tcg_temp_new();
->>> +    TCGv zero = tcg_const_tl(0);
->>> +
->>> +    if (NARROW_MODE(ctx)) {
->>> +        tcg_gen_xori_tl(t0, cpu_gpr[rA(ctx->opcode)], INT32_MIN);
->>> +    } else {
->>> +        tcg_gen_xori_tl(t0, cpu_gpr[rA(ctx->opcode)], (target_ulong)INT64_MIN);
->>> +    }
->>> +
->>> +    tcg_gen_setcond_tl(TCG_COND_EQ, cpu_ov, t0, zero);
->>> +    tcg_gen_mov_tl(cpu_ov32, cpu_ov);
->>
->> I think we just now covered this is wrong in the v1 thread.
->
-> With respect to the simulator, right?
->
-> I will restore the same neg/nego behaviour using subf, as OV/OV32 will
-> be updated as per the simulator.
+From: Pranith Kumar <bobby.prani@gmail.com>
 
-Yes.  It's the only solution that makes sense to me.
+Enable tcg lock debug asserts in a debug build by default instead of
+relying on DEBUG_LOCKING. None of the other DEBUG_* macros have
+asserts, so this patch removes DEBUG_LOCKING and enable these asserts
+in a debug build.
 
+CC: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+[AJB: tweak ifdefs so can be early in series]
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+---
+ translate-all.c | 52 ++++++++++++++++------------------------------------
+ 1 file changed, 16 insertions(+), 36 deletions(-)
 
-r~
+diff --git a/translate-all.c b/translate-all.c
+index 5f44ec844e..8a861cb583 100644
+--- a/translate-all.c
++++ b/translate-all.c
+@@ -59,7 +59,6 @@
+ 
+ /* #define DEBUG_TB_INVALIDATE */
+ /* #define DEBUG_TB_FLUSH */
+-/* #define DEBUG_LOCKING */
+ /* make various TB consistency checks */
+ /* #define DEBUG_TB_CHECK */
+ 
+@@ -74,20 +73,10 @@
+  * access to the memory related structures are protected with the
+  * mmap_lock.
+  */
+-#ifdef DEBUG_LOCKING
+-#define DEBUG_MEM_LOCKS 1
+-#else
+-#define DEBUG_MEM_LOCKS 0
+-#endif
+-
+ #ifdef CONFIG_SOFTMMU
+ #define assert_memory_lock() do { /* nothing */ } while (0)
+ #else
+-#define assert_memory_lock() do {               \
+-        if (DEBUG_MEM_LOCKS) {                  \
+-            g_assert(have_mmap_lock());         \
+-        }                                       \
+-    } while (0)
++#define assert_memory_lock() tcg_debug_assert(have_mmap_lock())
+ #endif
+ 
+ #define SMC_BITMAP_USE_THRESHOLD 10
+@@ -169,10 +158,18 @@ static void page_table_config_init(void)
+     assert(v_l2_levels >= 0);
+ }
+ 
++#ifdef CONFIG_USER_ONLY
++#define assert_tb_locked() tcg_debug_assert(have_tb_lock)
++#define assert_tb_unlocked() tcg_debug_assert(!have_tb_lock)
++#else
++#define assert_tb_locked()  do { /* nothing */ } while (0)
++#define assert_tb_unlocked()  do { /* nothing */ } while (0)
++#endif
++
+ void tb_lock(void)
+ {
+ #ifdef CONFIG_USER_ONLY
+-    assert(!have_tb_lock);
++    assert_tb_unlocked();
+     qemu_mutex_lock(&tcg_ctx.tb_ctx.tb_lock);
+     have_tb_lock++;
+ #endif
+@@ -181,7 +178,7 @@ void tb_lock(void)
+ void tb_unlock(void)
+ {
+ #ifdef CONFIG_USER_ONLY
+-    assert(have_tb_lock);
++    assert_tb_locked();
+     have_tb_lock--;
+     qemu_mutex_unlock(&tcg_ctx.tb_ctx.tb_lock);
+ #endif
+@@ -197,23 +194,6 @@ void tb_lock_reset(void)
+ #endif
+ }
+ 
+-#ifdef DEBUG_LOCKING
+-#define DEBUG_TB_LOCKS 1
+-#else
+-#define DEBUG_TB_LOCKS 0
+-#endif
+-
+-#ifdef CONFIG_SOFTMMU
+-#define assert_tb_lock() do { /* nothing */ } while (0)
+-#else
+-#define assert_tb_lock() do {               \
+-        if (DEBUG_TB_LOCKS) {               \
+-            g_assert(have_tb_lock);         \
+-        }                                   \
+-    } while (0)
+-#endif
+-
+-
+ static TranslationBlock *tb_find_pc(uintptr_t tc_ptr);
+ 
+ void cpu_gen_init(void)
+@@ -847,7 +827,7 @@ static TranslationBlock *tb_alloc(target_ulong pc)
+ {
+     TranslationBlock *tb;
+ 
+-    assert_tb_lock();
++    assert_tb_locked();
+ 
+     if (tcg_ctx.tb_ctx.nb_tbs >= tcg_ctx.code_gen_max_blocks) {
+         return NULL;
+@@ -862,7 +842,7 @@ static TranslationBlock *tb_alloc(target_ulong pc)
+ /* Called with tb_lock held.  */
+ void tb_free(TranslationBlock *tb)
+ {
+-    assert_tb_lock();
++    assert_tb_locked();
+ 
+     /* In practice this is mostly used for single use temporary TB
+        Ignore the hard cases and just back up if this TB happens to
+@@ -1104,7 +1084,7 @@ void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr)
+     uint32_t h;
+     tb_page_addr_t phys_pc;
+ 
+-    assert_tb_lock();
++    assert_tb_locked();
+ 
+     atomic_set(&tb->invalid, true);
+ 
+@@ -1421,7 +1401,7 @@ static void tb_invalidate_phys_range_1(tb_page_addr_t start, tb_page_addr_t end)
+ #ifdef CONFIG_SOFTMMU
+ void tb_invalidate_phys_range(tb_page_addr_t start, tb_page_addr_t end)
+ {
+-    assert_tb_lock();
++    assert_tb_locked();
+     tb_invalidate_phys_range_1(start, end);
+ }
+ #else
+@@ -1464,7 +1444,7 @@ void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t end,
+ #endif /* TARGET_HAS_PRECISE_SMC */
+ 
+     assert_memory_lock();
+-    assert_tb_lock();
++    assert_tb_locked();
+ 
+     p = page_find(start >> TARGET_PAGE_BITS);
+     if (!p) {
+-- 
+2.11.0
