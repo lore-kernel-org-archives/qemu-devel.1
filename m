@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35627)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cgaTs-0006jy-U6
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:13:38 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cgaTx-0006ot-N2
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:13:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cgaTr-0000YN-Ny
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:13:32 -0500
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:35524)
+	(envelope-from <alex.bennee@linaro.org>) id 1cgaTw-0000bJ-6r
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:13:37 -0500
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:33228)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cgaTr-0000Xu-Ei
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:13:31 -0500
-Received: by mail-wm0-x233.google.com with SMTP id v186so146711678wmd.0
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 09:13:31 -0800 (PST)
+	id 1cgaTv-0000b2-Th
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:13:36 -0500
+Received: by mail-wm0-x233.google.com with SMTP id t18so36487533wmt.0
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 09:13:35 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed, 22 Feb 2017 17:13:15 +0000
-Message-Id: <20170222171327.26624-13-alex.bennee@linaro.org>
+Date: Wed, 22 Feb 2017 17:13:20 +0000
+Message-Id: <20170222171327.26624-18-alex.bennee@linaro.org>
 In-Reply-To: <20170222171327.26624-1-alex.bennee@linaro.org>
 References: <20170222171327.26624-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v13 12/24] tcg: handle EXCP_ATOMIC exception
- for system emulation
+Subject: [Qemu-devel] [PATCH v13 17/24] cputlb: add tlb_flush_by_mmuidx
+ async routines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,122 +33,220 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: rth@twiddle.net, peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-From: Pranith Kumar <bobby.prani@gmail.com>
+This converts the remaining TLB flush routines to use async work when
+detecting a cross-vCPU flush. The only minor complication is having to
+serialise the var_list of MMU indexes into a form that can be punted
+to an asynchronous job.
 
-The patch enables handling atomic code in the guest. This should be
-preferably done in cpu_handle_exception(), but the current assumptions
-regarding when we can execute atomic sections cause a deadlock.
+The pending_tlb_flush field on QOM's CPU structure also becomes a
+bitfield rather than a boolean.
 
-The current mechanism discards the flags which were set in atomic
-execution. We ensure they are properly saved by calling the
-cc->cpu_exec_enter/leave() functions around the loop.
-
-As we are running cpu_exec_step_atomic() from the outermost loop we
-need to avoid an abort() when single stepping over atomic code since
-debug exception longjmp will point to the the setlongjmp in
-cpu_exec(). We do this by setting a new jmp_env so that it jumps back
-here on an exception.
-
-Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
-[AJB: tweak title, merge with new patches, add mmap_lock]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
-CC: Paolo Bonzini <pbonzini@redhat.com>
-
 ---
-v13
-  - merge in mttcg: Set jmp_env to handle exit from tb_gen_code
+v7
+  - un-merged from the atomic cputlb patch in the last series
+  - fix long line reported by checkpatch
+v8
+  - re-base merge/fixes
 ---
- cpu-exec.c | 43 +++++++++++++++++++++++++++++++------------
- cpus.c     |  9 +++++++++
- 2 files changed, 40 insertions(+), 12 deletions(-)
+ cputlb.c          | 110 +++++++++++++++++++++++++++++++++++++++++++-----------
+ include/qom/cpu.h |   2 +-
+ 2 files changed, 89 insertions(+), 23 deletions(-)
 
-diff --git a/cpu-exec.c b/cpu-exec.c
-index 6514bc77ee..f3c78a97a4 100644
---- a/cpu-exec.c
-+++ b/cpu-exec.c
-@@ -228,24 +228,43 @@ static void cpu_exec_nocache(CPUState *cpu, int max_cycles,
+diff --git a/cputlb.c b/cputlb.c
+index 97e5c12de8..c50254be26 100644
+--- a/cputlb.c
++++ b/cputlb.c
+@@ -68,6 +68,11 @@
+  * target_ulong even on 32 bit builds */
+ QEMU_BUILD_BUG_ON(sizeof(target_ulong) > sizeof(run_on_cpu_data));
  
- static void cpu_exec_step(CPUState *cpu)
++/* We currently can't handle more than 16 bits in the MMUIDX bitmask.
++ */
++QEMU_BUILD_BUG_ON(NB_MMU_MODES > 16);
++#define ALL_MMUIDX_BITS ((1 << NB_MMU_MODES) - 1)
++
+ /* statistics */
+ int tlb_flush_count;
+ 
+@@ -102,7 +107,7 @@ static void tlb_flush_nocheck(CPUState *cpu)
+ 
+     tb_unlock();
+ 
+-    atomic_mb_set(&cpu->pending_tlb_flush, false);
++    atomic_mb_set(&cpu->pending_tlb_flush, 0);
+ }
+ 
+ static void tlb_flush_global_async_work(CPUState *cpu, run_on_cpu_data data)
+@@ -113,7 +118,8 @@ static void tlb_flush_global_async_work(CPUState *cpu, run_on_cpu_data data)
+ void tlb_flush(CPUState *cpu)
  {
-+    CPUClass *cc = CPU_GET_CLASS(cpu);
-     CPUArchState *env = (CPUArchState *)cpu->env_ptr;
-     TranslationBlock *tb;
-     target_ulong cs_base, pc;
-     uint32_t flags;
+     if (cpu->created && !qemu_cpu_is_self(cpu)) {
+-        if (atomic_cmpxchg(&cpu->pending_tlb_flush, false, true) == true) {
++        if (atomic_mb_read(&cpu->pending_tlb_flush) != ALL_MMUIDX_BITS) {
++            atomic_mb_set(&cpu->pending_tlb_flush, ALL_MMUIDX_BITS);
+             async_run_on_cpu(cpu, tlb_flush_global_async_work,
+                              RUN_ON_CPU_NULL);
+         }
+@@ -122,17 +128,18 @@ void tlb_flush(CPUState *cpu)
+     }
+ }
  
-     cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
--    tb_lock();
--    tb = tb_gen_code(cpu, pc, cs_base, flags,
--                     1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
--    tb->orig_tb = NULL;
--    tb_unlock();
--    /* execute the generated code */
--    trace_exec_tb_nocache(tb, pc);
--    cpu_tb_exec(cpu, tb);
--    tb_lock();
--    tb_phys_invalidate(tb, -1);
--    tb_free(tb);
--    tb_unlock();
-+    if (sigsetjmp(cpu->jmp_env, 0) == 0) {
-+        mmap_lock();
-+        tb_lock();
-+        tb = tb_gen_code(cpu, pc, cs_base, flags,
-+                         1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
-+        tb->orig_tb = NULL;
-+        tb_unlock();
-+        mmap_unlock();
+-static inline void v_tlb_flush_by_mmuidx(CPUState *cpu, uint16_t idxmap)
++static void tlb_flush_by_mmuidx_async_work(CPUState *cpu, run_on_cpu_data data)
+ {
+     CPUArchState *env = cpu->env_ptr;
+-    unsigned long mmu_idx_bitmask = idxmap;
++    unsigned long mmu_idx_bitmask = data.host_int;
+     int mmu_idx;
+ 
+     assert_cpu_is_self(cpu);
+-    tlb_debug("start\n");
+ 
+     tb_lock();
+ 
++    tlb_debug("start: mmu_idx:0x%04lx\n", mmu_idx_bitmask);
 +
-+        cc->cpu_exec_enter(cpu);
-+        /* execute the generated code */
-+        trace_exec_tb_nocache(tb, pc);
-+        cpu_tb_exec(cpu, tb);
-+        cc->cpu_exec_exit(cpu);
+     for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
+ 
+         if (test_bit(mmu_idx, &mmu_idx_bitmask)) {
+@@ -145,12 +152,30 @@ static inline void v_tlb_flush_by_mmuidx(CPUState *cpu, uint16_t idxmap)
+ 
+     memset(cpu->tb_jmp_cache, 0, sizeof(cpu->tb_jmp_cache));
+ 
++    tlb_debug("done\n");
 +
-+        tb_lock();
-+        tb_phys_invalidate(tb, -1);
-+        tb_free(tb);
-+        tb_unlock();
+     tb_unlock();
+ }
+ 
+ void tlb_flush_by_mmuidx(CPUState *cpu, uint16_t idxmap)
+ {
+-    v_tlb_flush_by_mmuidx(cpu, idxmap);
++    tlb_debug("mmu_idx: 0x%" PRIx16 "\n", idxmap);
++
++    if (!qemu_cpu_is_self(cpu)) {
++        uint16_t pending_flushes = idxmap;
++        pending_flushes &= ~atomic_mb_read(&cpu->pending_tlb_flush);
++
++        if (pending_flushes) {
++            tlb_debug("reduced mmu_idx: 0x%" PRIx16 "\n", pending_flushes);
++
++            atomic_or(&cpu->pending_tlb_flush, pending_flushes);
++            async_run_on_cpu(cpu, tlb_flush_by_mmuidx_async_work,
++                             RUN_ON_CPU_HOST_INT(pending_flushes));
++        }
 +    } else {
-+        /* We may have exited due to another problem here, so we need
-+         * to reset any tb_locks we may have taken but didn't release.
-+         * The mmap_lock is dropped by tb_gen_code if it runs out of
-+         * memory.
-+         */
-+#ifndef CONFIG_SOFTMMU
-+        tcg_debug_assert(!have_mmap_lock());
-+#endif
-+        tb_lock_reset();
++        tlb_flush_by_mmuidx_async_work(cpu,
++                                       RUN_ON_CPU_HOST_INT(idxmap));
 +    }
  }
  
- void cpu_exec_step_atomic(CPUState *cpu)
-diff --git a/cpus.c b/cpus.c
-index 6315a1f86a..559a0805bc 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1348,6 +1348,11 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
-                 if (r == EXCP_DEBUG) {
-                     cpu_handle_guest_debug(cpu);
-                     break;
-+                } else if (r == EXCP_ATOMIC) {
-+                    qemu_mutex_unlock_iothread();
-+                    cpu_exec_step_atomic(cpu);
-+                    qemu_mutex_lock_iothread();
-+                    break;
-                 }
-             } else if (cpu->stop) {
-                 if (cpu->unplug) {
-@@ -1458,6 +1463,10 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
-                  */
-                 g_assert(cpu->halted);
-                 break;
-+            case EXCP_ATOMIC:
-+                qemu_mutex_unlock_iothread();
-+                cpu_exec_step_atomic(cpu);
-+                qemu_mutex_lock_iothread();
-             default:
-                 /* Ignore everything else? */
-                 break;
+ static inline void tlb_flush_entry(CPUTLBEntry *tlb_entry, target_ulong addr)
+@@ -215,27 +240,26 @@ void tlb_flush_page(CPUState *cpu, target_ulong addr)
+     }
+ }
+ 
+-void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr, uint16_t idxmap)
++/* As we are going to hijack the bottom bits of the page address for a
++ * mmuidx bit mask we need to fail to build if we can't do that
++ */
++QEMU_BUILD_BUG_ON(NB_MMU_MODES > TARGET_PAGE_BITS_MIN);
++
++static void tlb_flush_page_by_mmuidx_async_work(CPUState *cpu,
++                                                run_on_cpu_data data)
+ {
+     CPUArchState *env = cpu->env_ptr;
+-    unsigned long mmu_idx_bitmap = idxmap;
+-    int i, page, mmu_idx;
++    target_ulong addr_and_mmuidx = (target_ulong) data.target_ptr;
++    target_ulong addr = addr_and_mmuidx & TARGET_PAGE_MASK;
++    unsigned long mmu_idx_bitmap = addr_and_mmuidx & ALL_MMUIDX_BITS;
++    int page = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
++    int mmu_idx;
++    int i;
+ 
+     assert_cpu_is_self(cpu);
+-    tlb_debug("addr "TARGET_FMT_lx"\n", addr);
+-
+-    /* Check if we need to flush due to large pages.  */
+-    if ((addr & env->tlb_flush_mask) == env->tlb_flush_addr) {
+-        tlb_debug("forced full flush ("
+-                  TARGET_FMT_lx "/" TARGET_FMT_lx ")\n",
+-                  env->tlb_flush_addr, env->tlb_flush_mask);
+-
+-        v_tlb_flush_by_mmuidx(cpu, idxmap);
+-        return;
+-    }
+ 
+-    addr &= TARGET_PAGE_MASK;
+-    page = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
++    tlb_debug("page:%d addr:"TARGET_FMT_lx" mmu_idx:0x%lx\n",
++              page, addr, mmu_idx_bitmap);
+ 
+     for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
+         if (test_bit(mmu_idx, &mmu_idx_bitmap)) {
+@@ -251,6 +275,48 @@ void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr, uint16_t idxmap)
+     tb_flush_jmp_cache(cpu, addr);
+ }
+ 
++static void tlb_check_page_and_flush_by_mmuidx_async_work(CPUState *cpu,
++                                                          run_on_cpu_data data)
++{
++    CPUArchState *env = cpu->env_ptr;
++    target_ulong addr_and_mmuidx = (target_ulong) data.target_ptr;
++    target_ulong addr = addr_and_mmuidx & TARGET_PAGE_MASK;
++    unsigned long mmu_idx_bitmap = addr_and_mmuidx & ALL_MMUIDX_BITS;
++
++    tlb_debug("addr:"TARGET_FMT_lx" mmu_idx: %04lx\n", addr, mmu_idx_bitmap);
++
++    /* Check if we need to flush due to large pages.  */
++    if ((addr & env->tlb_flush_mask) == env->tlb_flush_addr) {
++        tlb_debug("forced full flush ("
++                  TARGET_FMT_lx "/" TARGET_FMT_lx ")\n",
++                  env->tlb_flush_addr, env->tlb_flush_mask);
++
++        tlb_flush_by_mmuidx_async_work(cpu,
++                                       RUN_ON_CPU_HOST_INT(mmu_idx_bitmap));
++    } else {
++        tlb_flush_page_by_mmuidx_async_work(cpu, data);
++    }
++}
++
++void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr, uint16_t idxmap)
++{
++    target_ulong addr_and_mmu_idx;
++
++    tlb_debug("addr: "TARGET_FMT_lx" mmu_idx:%" PRIx16 "\n", addr, idxmap);
++
++    /* This should already be page aligned */
++    addr_and_mmu_idx = addr & TARGET_PAGE_MASK;
++    addr_and_mmu_idx |= idxmap;
++
++    if (!qemu_cpu_is_self(cpu)) {
++        async_run_on_cpu(cpu, tlb_check_page_and_flush_by_mmuidx_async_work,
++                         RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
++    } else {
++        tlb_check_page_and_flush_by_mmuidx_async_work(
++            cpu, RUN_ON_CPU_TARGET_PTR(addr_and_mmu_idx));
++    }
++}
++
+ void tlb_flush_page_all(target_ulong addr)
+ {
+     CPUState *cpu;
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index e80bf7a64a..3e61c880da 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -407,7 +407,7 @@ struct CPUState {
+      * avoid potential races. The aim of the flag is to avoid
+      * unnecessary flushes.
+      */
+-    bool pending_tlb_flush;
++    uint16_t pending_tlb_flush;
+ };
+ 
+ QTAILQ_HEAD(CPUTailQ, CPUState);
 -- 
 2.11.0
