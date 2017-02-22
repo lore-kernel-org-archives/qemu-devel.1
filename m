@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1cgQHI-0005rK-DV
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:19:53 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cgQLF-0007h3-65
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:23:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1cgQHD-00049r-EV
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:19:52 -0500
-Received: from smtp2-g21.free.fr ([2a01:e0c:1:1599::11]:57829)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <hpoussin@reactos.org>)
-	id 1cgQHD-00049X-5c
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:19:47 -0500
-References: <1479509016-8673-1-git-send-email-hpoussin@reactos.org>
-From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-Message-ID: <2eee690a-04b0-4fc1-3a1b-17232d1ed09f@reactos.org>
-Date: Wed, 22 Feb 2017 07:19:33 +0100
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cgQLC-0005B3-15
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:23:57 -0500
+Received: from [59.151.112.132] (port=2761 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cgQLB-000580-J2
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:23:53 -0500
+References: <58AC14C1.60603@cn.fujitsu.com>
+	<20170221090745.7aea1461@t450s.home>
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Message-ID: <58AD3036.2010204@cn.fujitsu.com>
+Date: Wed, 22 Feb 2017 14:31:18 +0800
 MIME-Version: 1.0
-In-Reply-To: <1479509016-8673-1-git-send-email-hpoussin@reactos.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.8] dma/rc4030: translate memory
- accesses only when they occur
+In-Reply-To: <20170221090745.7aea1461@t450s.home>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] seek help for AER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,272 +27,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Prasad J Pandit <pjp@fedoraproject.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-Ping?
 
-Le 18/11/2016 =C3=A0 23:43, Herv=C3=A9 Poussineau a =C3=A9crit :
-> This simplifies the code a lot, and this fixes big memory leaks
-> introduced in a3d586f704609a45b6037534cb2f34da5dfd8895
->
-> Windows NT is now able to boot without using gigabytes of ram on the ho=
-st.
->
-> Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
-> ---
->  hw/dma/rc4030.c | 158 +++++++++++++-----------------------------------=
---------
->  1 file changed, 36 insertions(+), 122 deletions(-)
->
-> diff --git a/hw/dma/rc4030.c b/hw/dma/rc4030.c
-> index 41fc043..5f10b9d 100644
-> --- a/hw/dma/rc4030.c
-> +++ b/hw/dma/rc4030.c
-> @@ -34,8 +34,6 @@
->  /********************************************************/
->  /* rc4030 emulation                                     */
->
-> -#define MAX_TL_ENTRIES 512
-> -
->  typedef struct dma_pagetable_entry {
->      int32_t frame;
->      int32_t owner;
-> @@ -91,14 +89,8 @@ typedef struct rc4030State
->      qemu_irq timer_irq;
->      qemu_irq jazz_bus_irq;
->
-> -    /* biggest translation table */
-> -    MemoryRegion dma_tt;
-> -    /* translation table memory region alias, added to system RAM */
-> -    MemoryRegion dma_tt_alias;
->      /* whole DMA memory region, root of DMA address space */
->      MemoryRegion dma_mr;
-> -    /* translation table entry aliases, added to DMA memory region */
-> -    MemoryRegion dma_mrs[MAX_TL_ENTRIES];
->      AddressSpace dma_as;
->
->      MemoryRegion iomem_chipset;
-> @@ -256,96 +248,6 @@ static uint64_t rc4030_read(void *opaque, hwaddr a=
-ddr, unsigned int size)
->      return val;
->  }
->
-> -static void rc4030_dma_as_update_one(rc4030State *s, int index, uint32=
-_t frame)
-> -{
-> -    if (index < MAX_TL_ENTRIES) {
-> -        memory_region_set_enabled(&s->dma_mrs[index], false);
-> -    }
-> -
-> -    if (!frame) {
-> -        return;
-> -    }
-> -
-> -    if (index >=3D MAX_TL_ENTRIES) {
-> -        qemu_log_mask(LOG_UNIMP,
-> -                      "rc4030: trying to use too high "
-> -                      "translation table entry %d (max allowed=3D%d)",
-> -                      index, MAX_TL_ENTRIES);
-> -        return;
-> -    }
-> -    memory_region_set_alias_offset(&s->dma_mrs[index], frame);
-> -    memory_region_set_enabled(&s->dma_mrs[index], true);
-> -}
-> -
-> -static void rc4030_dma_tt_write(void *opaque, hwaddr addr, uint64_t da=
-ta,
-> -                                unsigned int size)
-> -{
-> -    rc4030State *s =3D opaque;
-> -
-> -    /* write memory */
-> -    memcpy(memory_region_get_ram_ptr(&s->dma_tt) + addr, &data, size);
-> -
-> -    /* update dma address space (only if frame field has been written)=
- */
-> -    if (addr % sizeof(dma_pagetable_entry) =3D=3D 0) {
-> -        int index =3D addr / sizeof(dma_pagetable_entry);
-> -        memory_region_transaction_begin();
-> -        rc4030_dma_as_update_one(s, index, (uint32_t)data);
-> -        memory_region_transaction_commit();
-> -    }
-> -}
-> -
-> -static const MemoryRegionOps rc4030_dma_tt_ops =3D {
-> -    .write =3D rc4030_dma_tt_write,
-> -    .impl.min_access_size =3D 4,
-> -    .impl.max_access_size =3D 4,
-> -};
-> -
-> -static void rc4030_dma_tt_update(rc4030State *s, uint32_t new_tl_base,
-> -                                 uint32_t new_tl_limit)
-> -{
-> -    int entries, i;
-> -    dma_pagetable_entry *dma_tl_contents;
-> -
-> -    if (s->dma_tl_limit) {
-> -        /* write old dma tl table to physical memory */
-> -        memory_region_del_subregion(get_system_memory(), &s->dma_tt_al=
-ias);
-> -        cpu_physical_memory_write(s->dma_tl_limit & 0x7fffffff,
-> -                                  memory_region_get_ram_ptr(&s->dma_tt=
-),
-> -                                  memory_region_size(&s->dma_tt_alias)=
-);
-> -    }
-> -    object_unparent(OBJECT(&s->dma_tt_alias));
-> -
-> -    s->dma_tl_base =3D new_tl_base;
-> -    s->dma_tl_limit =3D new_tl_limit;
-> -    new_tl_base &=3D 0x7fffffff;
-> -
-> -    if (s->dma_tl_limit) {
-> -        uint64_t dma_tt_size;
-> -        if (s->dma_tl_limit <=3D memory_region_size(&s->dma_tt)) {
-> -            dma_tt_size =3D s->dma_tl_limit;
-> -        } else {
-> -            dma_tt_size =3D memory_region_size(&s->dma_tt);
-> -        }
-> -        memory_region_init_alias(&s->dma_tt_alias, OBJECT(s),
-> -                                 "dma-table-alias",
-> -                                 &s->dma_tt, 0, dma_tt_size);
-> -        dma_tl_contents =3D memory_region_get_ram_ptr(&s->dma_tt);
-> -        cpu_physical_memory_read(new_tl_base, dma_tl_contents, dma_tt_=
-size);
-> -
-> -        memory_region_transaction_begin();
-> -        entries =3D dma_tt_size / sizeof(dma_pagetable_entry);
-> -        for (i =3D 0; i < entries; i++) {
-> -            rc4030_dma_as_update_one(s, i, dma_tl_contents[i].frame);
-> -        }
-> -        memory_region_add_subregion(get_system_memory(), new_tl_base,
-> -                                    &s->dma_tt_alias);
-> -        memory_region_transaction_commit();
-> -    } else {
-> -        memory_region_init(&s->dma_tt_alias, OBJECT(s),
-> -                           "dma-table-alias", 0);
-> -    }
-> -}
-> -
->  static void rc4030_write(void *opaque, hwaddr addr, uint64_t data,
->                           unsigned int size)
->  {
-> @@ -362,11 +264,11 @@ static void rc4030_write(void *opaque, hwaddr add=
-r, uint64_t data,
->          break;
->      /* DMA transl. table base */
->      case 0x0018:
-> -        rc4030_dma_tt_update(s, val, s->dma_tl_limit);
-> +        s->dma_tl_base =3D val;
->          break;
->      /* DMA transl. table limit */
->      case 0x0020:
-> -        rc4030_dma_tt_update(s, s->dma_tl_base, val);
-> +        s->dma_tl_limit =3D val;
->          break;
->      /* DMA transl. table invalidated */
->      case 0x0028:
-> @@ -586,6 +488,38 @@ static const MemoryRegionOps jazzio_ops =3D {
->      .endianness =3D DEVICE_NATIVE_ENDIAN,
->  };
->
-> +static IOMMUTLBEntry rc4030_dma_translate(MemoryRegion *iommu, hwaddr =
-addr,
-> +                                          bool is_write)
-> +{
-> +    rc4030State *s =3D container_of(iommu, rc4030State, dma_mr);
-> +    IOMMUTLBEntry ret =3D {
-> +        .target_as =3D &address_space_memory,
-> +        .iova =3D addr & ~(DMA_PAGESIZE - 1),
-> +        .translated_addr =3D 0,
-> +        .addr_mask =3D DMA_PAGESIZE - 1,
-> +        .perm =3D IOMMU_NONE,
-> +    };
-> +    uint64_t i, entry_address;
-> +    dma_pagetable_entry entry;
-> +
-> +    i =3D addr / DMA_PAGESIZE;
-> +    if (i < s->dma_tl_limit / sizeof(entry)) {
-> +        entry_address =3D (s->dma_tl_base & 0x7fffffff) + i * sizeof(e=
-ntry);
-> +        if (address_space_read(ret.target_as, entry_address,
-> +                               MEMTXATTRS_UNSPECIFIED, (unsigned char =
-*)&entry,
-> +                               sizeof(entry)) =3D=3D MEMTX_OK) {
-> +            ret.translated_addr =3D entry.frame & ~(DMA_PAGESIZE - 1);
-> +            ret.perm =3D IOMMU_RW;
-> +        }
-> +    }
-> +
-> +    return ret;
-> +}
-> +
-> +static const MemoryRegionIOMMUOps rc4030_dma_ops =3D {
-> +    .translate =3D rc4030_dma_translate,
-> +};
-> +
->  static void rc4030_reset(DeviceState *dev)
->  {
->      rc4030State *s =3D RC4030(dev);
-> @@ -596,7 +530,6 @@ static void rc4030_reset(DeviceState *dev)
->      s->invalid_address_register =3D 0;
->
->      memset(s->dma_regs, 0, sizeof(s->dma_regs));
-> -    rc4030_dma_tt_update(s, 0, 0);
->
->      s->remote_failed_address =3D s->memory_failed_address =3D 0;
->      s->cache_maint =3D 0;
-> @@ -735,7 +668,6 @@ static void rc4030_realize(DeviceState *dev, Error =
-**errp)
->  {
->      rc4030State *s =3D RC4030(dev);
->      Object *o =3D OBJECT(dev);
-> -    int i;
->
->      s->periodic_timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL,
->                                       rc4030_periodic_timer, s);
-> @@ -745,37 +677,19 @@ static void rc4030_realize(DeviceState *dev, Erro=
-r **errp)
->      memory_region_init_io(&s->iomem_jazzio, NULL, &jazzio_ops, s,
->                            "rc4030.jazzio", 0x00001000);
->
-> -    memory_region_init_rom_device(&s->dma_tt, o,
-> -                                  &rc4030_dma_tt_ops, s, "dma-table",
-> -                                  MAX_TL_ENTRIES * sizeof(dma_pagetabl=
-e_entry),
-> -                                  NULL);
-> -    memory_region_init(&s->dma_tt_alias, o, "dma-table-alias", 0);
-> -    memory_region_init(&s->dma_mr, o, "dma", INT32_MAX);
-> -    for (i =3D 0; i < MAX_TL_ENTRIES; ++i) {
-> -        memory_region_init_alias(&s->dma_mrs[i], o, "dma-alias",
-> -                                 get_system_memory(), 0, DMA_PAGESIZE)=
-;
-> -        memory_region_set_enabled(&s->dma_mrs[i], false);
-> -        memory_region_add_subregion(&s->dma_mr, i * DMA_PAGESIZE,
-> -                                    &s->dma_mrs[i]);
-> -    }
-> +    memory_region_init_iommu(&s->dma_mr, o, &rc4030_dma_ops,
-> +                             "rc4030.dma", UINT32_MAX);
->      address_space_init(&s->dma_as, &s->dma_mr, "rc4030-dma");
->  }
->
->  static void rc4030_unrealize(DeviceState *dev, Error **errp)
->  {
->      rc4030State *s =3D RC4030(dev);
-> -    int i;
->
->      timer_free(s->periodic_timer);
->
->      address_space_destroy(&s->dma_as);
-> -    object_unparent(OBJECT(&s->dma_tt));
-> -    object_unparent(OBJECT(&s->dma_tt_alias));
->      object_unparent(OBJECT(&s->dma_mr));
-> -    for (i =3D 0; i < MAX_TL_ENTRIES; ++i) {
-> -        memory_region_del_subregion(&s->dma_mr, &s->dma_mrs[i]);
-> -        object_unparent(OBJECT(&s->dma_mrs[i]));
-> -    }
->  }
->
->  static void rc4030_class_init(ObjectClass *klass, void *class_data)
->
+
+On 02/22/2017 12:07 AM, Alex Williamson wrote:
+> On Tue, 21 Feb 2017 18:21:53 +0800
+> Cao jin <caoj.fnst@cn.fujitsu.com> wrote:
+> 
+>> Hi,
+>>
+>> First, sorry for such a long time delay on the AER job. I was on 12 days
+>> holiday, and start to work on the patch 2 weeks ago, because I use a
+>> newer version kernel(4.10 rc8) to start off the work, several tiny
+>> problems slow me.
+>>
+>> Now I meet a confusing issue on aer_inject module. When I use aer_inject
+>> command before, it says:
+>>
+>>     Error: Failed to write, No such device
+>>
+>> then in dmesg, it says:
+>>
+>>     pcieport 0000:00:09.0: aer_inject: AER device not found
+>>
+>> and then I add some debug line in find_aer_device_iter() to check
+>> device->bus-name, find that it is "pci", so that is why I can't inject,
+>> it should have been "pci_express". But everything is same as before
+>> except a newer host kernel.
+>>
+>> I still don't have a clue on this problem for almost 2 days, could you help?
+> 
+> If it only happens with a new host kernel, I would suggest finding a
+> kernel where it works and bisecting between working and non-working
+> kernels to find the commit that introduced the change.  You may have
+> found a regression in the kernel that should be reported upstream.
+> Thanks,
+> 
+> Alex
+> 
+
+Finally find the reason, I missed a kernel command line parameter
+pcie_ports=native. Sorry for the noise.
+
+It seems when make install the kernel, it will blow away the content of
+old grub.cfg, so that I cannot check the parameters used in previous kernel.
+
+-- 
+Sincerely,
+Cao jin
