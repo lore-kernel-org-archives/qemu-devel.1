@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38022)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cgQVB-00038D-Bi
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:34:16 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cgQV5-000316-N0
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:34:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cgQV8-00089e-H2
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:34:13 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cgQV3-0007zY-E2
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 01:34:07 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 22 Feb 2017 17:33:24 +1100
-Message-Id: <20170222063348.32176-20-david@gibson.dropbear.id.au>
+Date: Wed, 22 Feb 2017 17:33:15 +1100
+Message-Id: <20170222063348.32176-11-david@gibson.dropbear.id.au>
 In-Reply-To: <20170222063348.32176-1-david@gibson.dropbear.id.au>
 References: <20170222063348.32176-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 19/43] mac99: replace debug printf with trace
- points
+Subject: [Qemu-devel] [PULL 10/43] target-ppc: Add xsmaxjdp and xsminjdp
+ instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,81 +21,127 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, thuth@redhat.com, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, imammedo@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, thuth@redhat.com, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, imammedo@redhat.com, Bharata B Rao <bharata@linux.vnet.ibm.com>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Laurent Vivier <lvivier@redhat.com>
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+xsmaxjdp: VSX Scalar Maximum Type-J Double-Precision
+xsminjdp: VSX Scalar Minimum Type-J Double-Precision
+
+Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/mac_newworld.c | 15 +++------------
- hw/ppc/trace-events   |  4 ++++
- 2 files changed, 7 insertions(+), 12 deletions(-)
+ target/ppc/fpu_helper.c             | 55 +++++++++++++++++++++++++++++++++++++
+ target/ppc/helper.h                 |  2 ++
+ target/ppc/translate/vsx-impl.inc.c |  2 ++
+ target/ppc/translate/vsx-ops.inc.c  |  2 ++
+ 4 files changed, 61 insertions(+)
 
-diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-index 716aea6..68aaedc 100644
---- a/hw/ppc/mac_newworld.c
-+++ b/hw/ppc/mac_newworld.c
-@@ -72,6 +72,7 @@
- #include "exec/address-spaces.h"
- #include "hw/sysbus.h"
- #include "qemu/cutils.h"
-+#include "trace.h"
-=20
- #define MAX_IDE_BUS 2
- #define CFG_ADDR 0xf0000510
-@@ -79,21 +80,11 @@
- #define CLOCKFREQ (266UL * 1000UL * 1000UL)
- #define BUSFREQ (100UL * 1000UL * 1000UL)
-=20
--/* debug UniNorth */
--//#define DEBUG_UNIN
--
--#ifdef DEBUG_UNIN
--#define UNIN_DPRINTF(fmt, ...)                                  \
--    do { printf("UNIN: " fmt , ## __VA_ARGS__); } while (0)
--#else
--#define UNIN_DPRINTF(fmt, ...)
--#endif
--
- /* UniN device */
- static void unin_write(void *opaque, hwaddr addr, uint64_t value,
-                        unsigned size)
- {
--    UNIN_DPRINTF("write addr " TARGET_FMT_plx " val %"PRIx64"\n", addr, =
-value);
-+    trace_mac99_uninorth_write(addr, value);
-     if (addr =3D=3D 0x0) {
-         *(int*)opaque =3D value;
-     }
-@@ -109,7 +100,7 @@ static uint64_t unin_read(void *opaque, hwaddr addr, =
-unsigned size)
-         value =3D *(int*)opaque;
-     }
-=20
--    UNIN_DPRINTF("readl addr " TARGET_FMT_plx " val %x\n", addr, value);
-+    trace_mac99_uninorth_read(addr, value);
-=20
-     return value;
- }
-diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
-index f46995c..6122a12 100644
---- a/hw/ppc/trace-events
-+++ b/hw/ppc/trace-events
-@@ -85,3 +85,7 @@ rs6000mc_presence_read(uint32_t addr, uint32_t val) "re=
-ad addr=3D%x val=3D%x"
- rs6000mc_size_read(uint32_t addr, uint32_t val) "read addr=3D%x val=3D%x=
-"
- rs6000mc_size_write(uint32_t addr, uint32_t val) "write addr=3D%x val=3D=
-%x"
- rs6000mc_parity_read(uint32_t addr, uint32_t val) "read addr=3D%x val=3D=
-%x"
+diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+index 9d2688e..1b6cd3b 100644
+--- a/target/ppc/fpu_helper.c
++++ b/target/ppc/fpu_helper.c
+@@ -2717,6 +2717,61 @@ void helper_##name(CPUPPCState *env, uint32_t opcode)                         \
+ VSX_MAX_MINC(xsmaxcdp, 1);
+ VSX_MAX_MINC(xsmincdp, 0);
+ 
++#define VSX_MAX_MINJ(name, max)                                               \
++void helper_##name(CPUPPCState *env, uint32_t opcode)                         \
++{                                                                             \
++    ppc_vsr_t xt, xa, xb;                                                     \
++    bool vxsnan_flag = false, vex_flag = false;                               \
++                                                                              \
++    getVSR(rA(opcode) + 32, &xa, env);                                        \
++    getVSR(rB(opcode) + 32, &xb, env);                                        \
++    getVSR(rD(opcode) + 32, &xt, env);                                        \
++                                                                              \
++    if (unlikely(float64_is_any_nan(xa.VsrD(0)))) {                           \
++        if (float64_is_signaling_nan(xa.VsrD(0), &env->fp_status)) {          \
++            vxsnan_flag = true;                                               \
++        }                                                                     \
++        xt.VsrD(0) = xa.VsrD(0);                                              \
++    } else if (unlikely(float64_is_any_nan(xb.VsrD(0)))) {                    \
++        if (float64_is_signaling_nan(xb.VsrD(0), &env->fp_status)) {          \
++            vxsnan_flag = true;                                               \
++        }                                                                     \
++        xt.VsrD(0) = xb.VsrD(0);                                              \
++    } else if (float64_is_zero(xa.VsrD(0)) && float64_is_zero(xb.VsrD(0))) {  \
++        if (max) {                                                            \
++            if (!float64_is_neg(xa.VsrD(0)) || !float64_is_neg(xb.VsrD(0))) { \
++                xt.VsrD(0) = 0ULL;                                            \
++            } else {                                                          \
++                xt.VsrD(0) = 0x8000000000000000ULL;                           \
++            }                                                                 \
++        } else {                                                              \
++            if (float64_is_neg(xa.VsrD(0)) || float64_is_neg(xb.VsrD(0))) {   \
++                xt.VsrD(0) = 0x8000000000000000ULL;                           \
++            } else {                                                          \
++                xt.VsrD(0) = 0ULL;                                            \
++            }                                                                 \
++        }                                                                     \
++    } else if ((max &&                                                        \
++               !float64_lt(xa.VsrD(0), xb.VsrD(0), &env->fp_status)) ||       \
++               (!max &&                                                       \
++               float64_lt(xa.VsrD(0), xb.VsrD(0), &env->fp_status))) {        \
++        xt.VsrD(0) = xa.VsrD(0);                                              \
++    } else {                                                                  \
++        xt.VsrD(0) = xb.VsrD(0);                                              \
++    }                                                                         \
++                                                                              \
++    vex_flag = fpscr_ve & vxsnan_flag;                                        \
++    if (vxsnan_flag) {                                                        \
++            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0);            \
++    }                                                                         \
++    if (!vex_flag) {                                                          \
++        putVSR(rD(opcode) + 32, &xt, env);                                    \
++    }                                                                         \
++}                                                                             \
 +
-+# hw/ppc/mac_newworld.c
-+mac99_uninorth_write(uint64_t addr, uint64_t value) "addr=3D0x%" PRIx64 =
-" val=3D0x%"PRIx64
-+mac99_uninorth_read(uint64_t addr, uint64_t value) "addr=3D0x%" PRIx64 "=
- val=3D0x%"PRIx64
---=20
++VSX_MAX_MINJ(xsmaxjdp, 1);
++VSX_MAX_MINJ(xsminjdp, 0);
++
+ /* VSX_CMP - VSX floating point compare
+  *   op    - instruction mnemonic
+  *   nels  - number of elements (1, 2 or 4)
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index fe3267e..cc81709 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -433,6 +433,8 @@ DEF_HELPER_2(xsmaxdp, void, env, i32)
+ DEF_HELPER_2(xsmindp, void, env, i32)
+ DEF_HELPER_2(xsmaxcdp, void, env, i32)
+ DEF_HELPER_2(xsmincdp, void, env, i32)
++DEF_HELPER_2(xsmaxjdp, void, env, i32)
++DEF_HELPER_2(xsminjdp, void, env, i32)
+ DEF_HELPER_2(xscvdphp, void, env, i32)
+ DEF_HELPER_2(xscvdpqp, void, env, i32)
+ DEF_HELPER_2(xscvdpsp, void, env, i32)
+diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
+index 3251dca..8de8cd0 100644
+--- a/target/ppc/translate/vsx-impl.inc.c
++++ b/target/ppc/translate/vsx-impl.inc.c
+@@ -810,6 +810,8 @@ GEN_VSX_HELPER_2(xsmaxdp, 0x00, 0x14, 0, PPC2_VSX)
+ GEN_VSX_HELPER_2(xsmindp, 0x00, 0x15, 0, PPC2_VSX)
+ GEN_VSX_HELPER_2(xsmaxcdp, 0x00, 0x10, 0, PPC2_ISA300)
+ GEN_VSX_HELPER_2(xsmincdp, 0x00, 0x11, 0, PPC2_ISA300)
++GEN_VSX_HELPER_2(xsmaxjdp, 0x00, 0x12, 0, PPC2_ISA300)
++GEN_VSX_HELPER_2(xsminjdp, 0x00, 0x12, 0, PPC2_ISA300)
+ GEN_VSX_HELPER_2(xscvdphp, 0x16, 0x15, 0x11, PPC2_ISA300)
+ GEN_VSX_HELPER_2(xscvdpsp, 0x12, 0x10, 0, PPC2_VSX)
+ GEN_VSX_HELPER_2(xscvdpqp, 0x04, 0x1A, 0x16, PPC2_ISA300)
+diff --git a/target/ppc/translate/vsx-ops.inc.c b/target/ppc/translate/vsx-ops.inc.c
+index 16a135f..c1b71ad 100644
+--- a/target/ppc/translate/vsx-ops.inc.c
++++ b/target/ppc/translate/vsx-ops.inc.c
+@@ -202,6 +202,8 @@ GEN_XX3FORM(xsmaxdp, 0x00, 0x14, PPC2_VSX),
+ GEN_XX3FORM(xsmindp, 0x00, 0x15, PPC2_VSX),
+ GEN_XX3FORM(xsmaxcdp, 0x00, 0x10, PPC2_ISA300),
+ GEN_XX3FORM(xsmincdp, 0x00, 0x11, PPC2_ISA300),
++GEN_XX3FORM(xsmaxjdp, 0x00, 0x12, PPC2_ISA300),
++GEN_XX3FORM(xsminjdp, 0x00, 0x13, PPC2_ISA300),
+ GEN_XX2FORM_EO(xscvdphp, 0x16, 0x15, 0x11, PPC2_ISA300),
+ GEN_XX2FORM(xscvdpsp, 0x12, 0x10, PPC2_VSX),
+ GEN_XX2FORM(xscvdpspn, 0x16, 0x10, PPC2_VSX207),
+-- 
 2.9.3
