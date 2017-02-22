@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52646)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cgbRS-0002hN-3p
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 13:15:07 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cgbYG-0005pM-0N
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 13:22:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cgbRN-0000hw-60
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 13:15:06 -0500
-Resent-Message-Id: <E1cgbRN-0000hw-60@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21332)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cgbRM-0000gy-Uf
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 13:15:01 -0500
-In-Reply-To: <20170222180423.26571-1-pbonzini@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148778721562.150.15626605307563768311@0e2666bad730>
+	(envelope-from <ehabkost@redhat.com>) id 1cgbYB-0002jg-3B
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 13:22:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60910)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cgbYA-0002jP-TG
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 13:22:03 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3407B61BAD
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 18:22:02 +0000 (UTC)
+Received: from localhost (ovpn-116-33.gru2.redhat.com [10.97.116.33])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id BD5B784CF7
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 18:22:01 +0000 (UTC)
+Date: Wed, 22 Feb 2017 15:21:58 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170222182158.GA28403@thinpad.lan.raisama.net>
+References: <20170119210449.11991-1-ehabkost@redhat.com>
+	<20170119210449.11991-2-ehabkost@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 22 Feb 2017 10:13:36 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] simplify struct QOM properties and
- use the result for GUEST_PANICKED
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170119210449.11991-2-ehabkost@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/6] i386: Unset
+ cannot_destroy_with_object_finalize_yet on "host" model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +37,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, marcandre.lureau@redhat.com
+To: qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC8zXSBzaW1wbGlmeSBzdHJ1Y3QgUU9NIHBy
-b3BlcnRpZXMgYW5kIHVzZSB0aGUgcmVzdWx0IGZvciBHVUVTVF9QQU5JQ0tFRApNZXNzYWdlLWlk
-OiAyMDE3MDIyMjE4MDQyMy4yNjU3MS0xLXBib256aW5pQHJlZGhhdC5jb20KCj09PSBURVNUIFND
-UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9n
-IC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9u
-cwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2Nh
-bCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2
-ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQ
-QVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlm
-ICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAt
-LW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAg
-ICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
-VXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hl
-ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjNjMjM2Mzkgdmw6IHBhc3MgQ1BVU3RhdGUgdG8gcWVt
-dV9zeXN0ZW1fZ3Vlc3RfcGFuaWNrZWQKZTIyZWIzYSBjcHU6IGltcGxlbWVudCBnZXRfY3Jhc2hf
-aW5mbyB0aHJvdWdoIFFPTSBwcm9wZXJ0aWVzCmEzNTlhMzYgcW9tLXFvYmplY3Q6IGludHJvZHVj
-ZSBvYmplY3RfcHJvcGVydHlfe2csIHN9ZXRfcHRyCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVj
-a2luZyBQQVRDSCAxLzM6IHFvbS1xb2JqZWN0OiBpbnRyb2R1Y2Ugb2JqZWN0X3Byb3BlcnR5X3tn
-LCBzfWV0X3B0ci4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNDI3OiBGSUxF
-OiB0ZXN0cy9jaGVjay1xb20tcHJvcGxpc3QuYzo3MDI6CisgICAgZ190ZXN0X2FkZF9mdW5jKCIv
-cW9tL3Byb3BsaXN0L2dldC1zZXQtcHRyL3N0cnVjdCIsIHRlc3RfZHVtbXlfZ2V0X3NldF9wdHJf
-c3RydWN0KTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0Mjg6IEZJTEU6IHRl
-c3RzL2NoZWNrLXFvbS1wcm9wbGlzdC5jOjcwMzoKKyAgICBnX3Rlc3RfYWRkX2Z1bmMoIi9xb20v
-cHJvcGxpc3QvZ2V0LXNldC1wdHIvZXJyb3IiLCB0ZXN0X2R1bW15X2dldF9zZXRfcHRyX2Vycm9y
-KTsKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNDI5OiBGSUxFOiB0ZXN0cy9jaGVj
-ay1xb20tcHJvcGxpc3QuYzo3MDQ6CisgICAgZ190ZXN0X2FkZF9mdW5jKCIvcW9tL3Byb3BsaXN0
-L2dldC1zZXQtcHRyL2NvdmFyaWFudCIsIHRlc3RfZHVtbXlfZ2V0X3NldF9wdHJfY292YXJpYW50
-KTsKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNDMwOiBGSUxFOiB0ZXN0cy9jaGVj
-ay1xb20tcHJvcGxpc3QuYzo3MDU6CisgICAgZ190ZXN0X2FkZF9mdW5jKCIvcW9tL3Byb3BsaXN0
-L2dldC1zZXQtcHRyL2NvbnRyYXZhcmlhbnQiLCB0ZXN0X2R1bW15X2dldF9zZXRfcHRyX2NvbnRy
-YXZhcmlhbnQpOwoKdG90YWw6IDIgZXJyb3JzLCAyIHdhcm5pbmdzLCA0MTkgbGluZXMgY2hlY2tl
-ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
-b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
-aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0gg
-Mi8zOiBjcHU6IGltcGxlbWVudCBnZXRfY3Jhc2hfaW5mbyB0aHJvdWdoIFFPTSBwcm9wZXJ0aWVz
-Li4uCkNoZWNraW5nIFBBVENIIDMvMzogdmw6IHBhc3MgQ1BVU3RhdGUgdG8gcWVtdV9zeXN0ZW1f
-Z3Vlc3RfcGFuaWNrZWQuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
-IHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
-aGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
-YXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On Thu, Jan 19, 2017 at 07:04:44PM -0200, Eduardo Habkost wrote:
+> The class is now safe because the assert(kvm_enabled()) line was
+> removed by commit e435601058e656e6d24e3e87b187e5518f7bf16a.
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+
+Applied to x86-next.
+
+-- 
+Eduardo
