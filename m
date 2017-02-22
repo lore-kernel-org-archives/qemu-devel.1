@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51643)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgUyU-00009q-26
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:20:46 -0500
+	(envelope-from <clement.deschamps@antfield.fr>) id 1cgV1V-0001zv-K5
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:23:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgUyT-00058i-0a
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:20:46 -0500
-Date: Wed, 22 Feb 2017 12:20:36 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170222112036.GH4112@noname.str.redhat.com>
-References: <20170220151921.22842-1-berrange@redhat.com>
-	<20170220151921.22842-5-berrange@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170220151921.22842-5-berrange@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] qemu-img: copy *key-secret opts
- when opening newly created files
+	(envelope-from <clement.deschamps@antfield.fr>) id 1cgV1U-0006Pq-Rs
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:23:53 -0500
+From: Clement Deschamps <clement.deschamps@antfield.fr>
+Date: Wed, 22 Feb 2017 12:23:35 +0100
+Message-Id: <20170222112338.25492-1-clement.deschamps@antfield.fr>
+Subject: [Qemu-devel] [PATCH v2 0/3] add sdhost and gpio controllers to the
+ bcm2835 platform
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,74 +18,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Clement Deschamps <clement.deschamps@antfield.fr>, qemu-arm@nongnu.org, peter.maydell@linaro.org, andrew.baumann@microsoft.com
 
-Am 20.02.2017 um 16:19 hat Daniel P. Berrange geschrieben:
-> The qemu-img dd/convert commands will create a image file and
-> then try to open it. Historically it has been possible to open
-> new files without passing any options. With encrypted files
-> though, the *key-secret options are mandatory, so we need to
-> provide those options when opening the newly created file.
-> 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  qemu-img.c | 44 ++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 42 insertions(+), 2 deletions(-)
-> 
-> diff --git a/qemu-img.c b/qemu-img.c
-> index e48e676..bad19fd 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -317,6 +317,46 @@ static BlockBackend *img_open_file(const char *filename,
->  }
->  
->  
-> +static int img_add_key_secrets(void *opaque,
-> +                               const char *name, const char *value,
-> +                               Error **errp)
-> +{
-> +    QDict *options = opaque;
-> +
-> +    if (g_str_has_suffix(name, "key-secret")) {
-> +        qdict_put(options, name, qstring_from_str(value));
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +static BlockBackend *img_open_new_file(const char *filename,
-> +                                       QemuOpts *create_opts,
-> +                                       const char *fmt, int flags,
-> +                                       bool writethrough, bool quiet)
-> +{
-> +    BlockBackend *blk;
-> +    Error *local_err = NULL;
-> +    QDict *options = NULL;
-> +
-> +    options = qdict_new();
-> +    if (fmt) {
-> +        qdict_put(options, "driver", qstring_from_str(fmt));
-> +    }
-> +
-> +    qemu_opt_foreach(create_opts, img_add_key_secrets, options, NULL);
-> +
-> +    blk = blk_new_open(filename, NULL, options, flags, &local_err);
-> +    if (!blk) {
-> +        error_reportf_err(local_err, "Could not open '%s': ", filename);
-> +        return NULL;
-> +    }
-> +    blk_set_enable_write_cache(blk, !writethrough);
-> +
-> +    return blk;
-> +}
+This patches add the Arasan SDHost controller and the GPIO controller to the BCM2835/36 platforms.
 
-Why not make this a small wrapper around img_open_file(), which does
-almost the same except that it can ask for a password? Leaving out the
-img_open_password() call means that simple '-o encryption=on' breaks,
-so it's a bug anyway:
+This patches have been tested with raspbian 2015-09-24 (which uses the SDHCI controller),
+and raspbian 2017-01-11 (which dynamically switches to the SDHost controller).
 
-$ ./qemu-img convert -O qcow2 -o encryption ~/images/hd.img /tmp/crypt.qcow2
-qemu-img: block/qcow2.c:1613: qcow2_co_pwritev: Assertion `s->cipher' failed.
+Note: In order to properly boot the kernel, you will first need to apply the
+BCM2835 hardware RNG patch submitted recently.
 
-Kevin
+v2:
+- implements the GPIO controller for supporting SD controller selection via alternate functions of GPIOs 48-53
+
+Clement Deschamps (3):
+  bcm2835_sdhost: add bcm2835 sdhost controller
+  bcm2835_gpio: add bcm2835 gpio controller
+  bcm2835: add sdhost and gpio controllers
+
+ hw/arm/bcm2835_peripherals.c         |  44 ++++
+ hw/gpio/Makefile.objs                |   1 +
+ hw/gpio/bcm2835_gpio.c               | 361 +++++++++++++++++++++++++++++
+ hw/sd/Makefile.objs                  |   1 +
+ hw/sd/bcm2835_sdhost.c               | 429 +++++++++++++++++++++++++++++++++++
+ include/hw/arm/bcm2835_peripherals.h |   4 +
+ include/hw/gpio/bcm2835_gpio.h       |  38 ++++
+ include/hw/sd/bcm2835_sdhost.h       |  48 ++++
+ 8 files changed, 926 insertions(+)
+ create mode 100644 hw/gpio/bcm2835_gpio.c
+ create mode 100644 hw/sd/bcm2835_sdhost.c
+ create mode 100644 include/hw/gpio/bcm2835_gpio.h
+ create mode 100644 include/hw/sd/bcm2835_sdhost.h
+
+-- 
+2.11.1
