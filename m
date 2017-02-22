@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cgV9X-0007i0-3l
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:32:12 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cgVAp-00005g-3b
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:33:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cgV9U-0008QA-1P
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:32:11 -0500
-Resent-Message-Id: <E1cgV9U-0008QA-1P@eggs.gnu.org>
-In-Reply-To: <20170222112338.25492-1-clement.deschamps@antfield.fr>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148776308488.129.17265389250289731388@0e2666bad730>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cgVAm-0000NN-0K
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:33:31 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35377)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cgVAl-0000ND-Ow
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:33:27 -0500
+Received: by mail-wm0-x241.google.com with SMTP id u63so1791686wmu.2
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 03:33:27 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20170221141451.28305-1-marcandre.lureau@redhat.com>
+	<20170221141451.28305-24-marcandre.lureau@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <967ff11e-ed7c-85b9-2c67-b3fb5335769e@redhat.com>
+Date: Wed, 22 Feb 2017 12:33:25 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 22 Feb 2017 03:31:25 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] add sdhost and gpio controllers to
- the bcm2835 platform
+In-Reply-To: <20170221141451.28305-24-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 23/30] bus: do not unref hotplug handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,43 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: clement.deschamps@antfield.fr
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org, andrew.baumann@microsoft.com
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC8zXSBhZGQgc2Rob3N0IGFuZCBncGlvIGNv
-bnRyb2xsZXJzIHRvIHRoZSBiY20yODM1IHBsYXRmb3JtCk1lc3NhZ2UtaWQ6IDIwMTcwMjIyMTEy
-MzM4LjI1NDkyLTEtY2xlbWVudC5kZXNjaGFtcHNAYW50ZmllbGQuZnIKCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0t
-b25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJz
-ZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRD
-SCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEg
-Z2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
-aWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBu
-PSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
-YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBz
-Oi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBw
-YXRjaGV3LzIwMTcwMjIxMTg1OTAxLjMyNTYtMS1zdGVmYW5oYUByZWRoYXQuY29tIC0+IHBhdGNo
-ZXcvMjAxNzAyMjExODU5MDEuMzI1Ni0xLXN0ZWZhbmhhQHJlZGhhdC5jb20KICogW25ldyB0YWdd
-ICAgICAgICAgcGF0Y2hldy8yMDE3MDIyMjExMjMzOC4yNTQ5Mi0xLWNsZW1lbnQuZGVzY2hhbXBz
-QGFudGZpZWxkLmZyIC0+IHBhdGNoZXcvMjAxNzAyMjIxMTIzMzguMjU0OTItMS1jbGVtZW50LmRl
-c2NoYW1wc0BhbnRmaWVsZC5mcgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmE0ODEx
-YzIgYmNtMjgzNTogYWRkIHNkaG9zdCBhbmQgZ3BpbyBjb250cm9sbGVycwo3ZTM4MzM0IGJjbTI4
-MzVfZ3BpbzogYWRkIGJjbTI4MzUgZ3BpbyBjb250cm9sbGVyCmFmODI0YzMgYmNtMjgzNV9zZGhv
-c3Q6IGFkZCBiY20yODM1IHNkaG9zdCBjb250cm9sbGVyCgo9PT0gT1VUUFVUIEJFR0lOID09PQpD
-aGVja2luZyBQQVRDSCAxLzM6IGJjbTI4MzVfc2Rob3N0OiBhZGQgYmNtMjgzNSBzZGhvc3QgY29u
-dHJvbGxlci4uLgpDaGVja2luZyBQQVRDSCAyLzM6IGJjbTI4MzVfZ3BpbzogYWRkIGJjbTI4MzUg
-Z3BpbyBjb250cm9sbGVyLi4uCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBiZWZvcmUgdGhlIG9wZW4g
-cGFyZW50aGVzaXMgJygnCiM5NzogRklMRTogaHcvZ3Bpby9iY20yODM1X2dwaW8uYzo2ODoKKyAg
-ICBpZihraWQgPT0gTlVMTCkgewoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0MDMgbGlu
-ZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tp
-bmcgUEFUQ0ggMy8zOiBiY20yODM1OiBhZGQgc2Rob3N0IGFuZCBncGlvIGNvbnRyb2xsZXJzLi4u
-Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgot
-LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
-ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVl
-bGlzdHMub3Jn
+
+
+On 21/02/2017 15:14, Marc-André Lureau wrote:
+> Apparently, none of the bus owner give a reference to the hotplug
+> handler property, do not unref it on bus release.
+> 
+> Furthermore, a bus is allowed to be its own hotplug handler, which can
+> be seen in qbus_set_bus_hotplug_handler() function. However, in this
+> case, the reference can't be given to the property, or this will create
+> a cyclic dependency and the bus will never be free.
+> 
+> Each bus owner should manage the lifecycle of the hotplug handler.
+> 
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+
+Almost all qbus_set_hotplug_handler callers are using it to set the
+parent device (that is, the "adapter" or "bridge", whatever you want to
+call it) as the hotplug handler.
+
+The exception is piix4_update_bus_hotplug.  This one is the only case
+where OBJ_PROP_LINK_UNREF_ON_RELEASE would be right.  Luckily, there
+_is_ a reference to that device somewhere else to keep it alive, namely
+in /machine's acpi-device prop.  So this case is a bit hacky (not your
+fault) but works as well.  In addition the PIIX4_PM device is not
+hot(un)pluggable.
+
+Can you please add a comment to piix4_update_bus_hotplug explaining that
+the PIIX4PMState cannot outlive the PCIBus, because /machine keeps it alive?
+
+> 
+> diff --git a/hw/core/bus.c b/hw/core/bus.c
+> index cf383fc1af..4651f24486 100644
+> --- a/hw/core/bus.c
+> +++ b/hw/core/bus.c
+> @@ -197,7 +197,7 @@ static void qbus_initfn(Object *obj)
+>                               TYPE_HOTPLUG_HANDLER,
+>                               (Object **)&bus->hotplug_handler,
+>                               object_property_allow_set_link,
+> -                             OBJ_PROP_LINK_UNREF_ON_RELEASE,
+> +                             0,
+>                               NULL);
+>      object_property_add_bool(obj, "realized",
+>                               bus_get_realized, bus_set_realized, NULL);
+> -- 
+> 2.11.0.295.gd7dffce1c.dirty
+> 
+> 
+> 
