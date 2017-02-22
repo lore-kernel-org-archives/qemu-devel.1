@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cgY9A-0003tl-Ba
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 09:44:01 -0500
+	(envelope-from <jcody@redhat.com>) id 1cgY9N-00041B-KA
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 09:44:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cgY97-00014y-0O
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 09:44:00 -0500
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:33348)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cgY96-00014r-Qe
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 09:43:56 -0500
-Received: by mail-wr0-x244.google.com with SMTP id s27so642485wrb.0
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 06:43:56 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <589C7E96.9060905@huawei.com> <589D83CE.1090803@huawei.com>
-	<589DDC05.9010807@windriver.com> <58AA51D6.6020508@huawei.com>
-	<1487565495.3740.27.camel@intel.com> <58AD0094.90304@windriver.com>
-	<4dd92012-626a-2d80-9adb-0be398f73eb1@redhat.com>
-	<58AD92AE.6040502@windriver.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6c5567f4-192d-aefd-90e4-89f53479c24e@redhat.com>
-Date: Wed, 22 Feb 2017 15:43:54 +0100
+	(envelope-from <jcody@redhat.com>) id 1cgY9K-00016p-Bo
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 09:44:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46290)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1cgY9K-00016d-3T
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 09:44:10 -0500
+Date: Wed, 22 Feb 2017 09:44:07 -0500
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170222144407.GS19045@localhost.localdomain>
+References: <CAAo6VWOAnGQeDwc_bJ4M=FQsu7rOhAv=1Qk6PdzG+0pcVnku=A@mail.gmail.com>
+	<20170217214215.GK19045@localhost.localdomain>
+	<F23F188C-DAF9-49EA-9C0E-54F57945267A@veritas.com>
+	<20170220110235.GD21255@stefanha-x1.localdomain>
+	<CAAo6VWNwHbsQRxU18dNCjWaNfNrZNAV9FfOKW8=JeZCND2vHnQ@mail.gmail.com>
+	<20170221105918.GA22731@stefanha-x1.localdomain>
+	<20170221113353.GC17041@redhat.com>
+	<20170222140920.GA10201@stefanha-x1.localdomain>
+	<20170222142230.GR28937@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <58AD92AE.6040502@windriver.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] kvm bug in __rmap_clear_dirty during live migration
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170222142230.GR28937@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
+ block device type called "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,24 +35,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Chris Friesen <chris.friesen@windriver.com>, "Han, Huaitong" <huaitong.han@intel.com>, "hangaohuai@huawei.com" <hangaohuai@huawei.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "fangying1@huawei.com" <fangying1@huawei.com>, "herongguang.he@huawei.com" <herongguang.he@huawei.com>, "xudong.hao@linux.intel.com" <xudong.hao@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "wangxinxin.wang@huawei.com" <wangxinxin.wang@huawei.com>, "kai.huang@linux.intel.com" <kai.huang@linux.intel.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "guangrong.xiao@linux.intel.com" <guangrong.xiao@linux.intel.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, ashish mittal <ashmit602@gmail.com>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
 
-
-
-On 22/02/2017 14:31, Chris Friesen wrote:
->>>
->>
->> Can you reproduce it with kernel 4.8+?  I'm suspecting commmit
->> 4e59516a12a6 ("kvm: vmx: ensure VMCS is current while enabling PML",
->> 2016-07-14) to be the fix.
+On Wed, Feb 22, 2017 at 02:22:30PM +0000, Daniel P. Berrange wrote:
+> On Wed, Feb 22, 2017 at 02:09:20PM +0000, Stefan Hajnoczi wrote:
+> > On Tue, Feb 21, 2017 at 11:33:53AM +0000, Daniel P. Berrange wrote:
+> > > On Tue, Feb 21, 2017 at 10:59:18AM +0000, Stefan Hajnoczi wrote:
+> > > > On Mon, Feb 20, 2017 at 03:34:57AM -0800, ashish mittal wrote:
+> > > > > On Mon, Feb 20, 2017 at 3:02 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> > > > > > On Sat, Feb 18, 2017 at 12:30:31AM +0000, Ketan Nilangekar wrote:
+> > > > > >> On 2/17/17, 1:42 PM, "Jeff Cody" <jcody@redhat.com> wrote:
+> > > > > >>
+> > > > > >>     On Thu, Feb 16, 2017 at 02:24:19PM -0800, ashish mittal wrote:
+> > > > > >>     > Hi,
+> > > > > >>     >
+> > > > > >>     > I am getting the following error with checkpatch.pl
+> > > > > >>     >
+> > > > > >>     > ERROR: externs should be avoided in .c files
+> > > > > >>     > #78: FILE: block/vxhs.c:28:
+> > > > > >>     > +QemuUUID qemu_uuid __attribute__ ((weak));
+> > > > > >>     >
+> > > > > >>     > Is there any way to get around this, or does it mean that I would have
+> > > > > >>     > to add a vxhs.h just for this one entry?
+> > > > > >>     >
+> > > > > >>
+> > > > > >>     I remain skeptical on the use of the qemu_uuid as a way to select the TLS
+> > > > > >>     cert.
+> > > > > >>
+> > > > > >> [ketan]
+> > > > > >> Is there another identity that can be used for uniquely identifying instances?
+> > > > > >> The requirement was to enforce vdisk access to owner instances.
+> > > > > >
+> > > > > > The qemu_uuid weak attribute looks suspect.  What is going to provide a
+> > > > > > strong qemu_uuid symbol?
+> > > > > >
+> > > > > > Why aren't configuration parameters like the UUID coming from the QEMU
+> > > > > > command-line?
+> > > > > >
+> > > > > > Stefan
+> > > > > 
+> > > > > UUID will in fact come from the QEMU command line. VxHS is not doing
+> > > > > anything special here. It will just use the value already available to
+> > > > > qemu-kvm process.
+> > > > > 
+> > > > > QemuUUID qemu_uuid;
+> > > > > bool qemu_uuid_set;
+> > > > > 
+> > > > > Both the above are defined in vl.c. vl.c will provide the strong
+> > > > > symbol when available. There are certain binaries that do not get
+> > > > > linked with vl.c (e.g. qemu-img). The weak symbol will come into
+> > > > > affect for such binaries, and in this case, the default VXHS UUID will
+> > > > > get picked up. I had, in a previous email, explained how we plan to
+> > > > > use the default UUID. In the regular case, the VxHS controller will
+> > > > > not allow access to the default UUID (non qemu-kvm) binaries, but it
+> > > > > may choose to grant temporary access to specific vdisks for these
+> > > > > binaries depending on the workflow.
+> > > > 
+> > > > That idea sounds like a security problem.  During this time window
+> > > > anyone could use the default UUID to access the data?
+> > > 
+> > > Any use of the VM UUID as a means to control authorization on the
+> > > server side is a security flaw, as this is a public value which
+> > > cannot be trusted on its own.
+> > > 
+> > > There needs to be some kind of authentication step to verify the
+> > > reported identity, eg a password associated with the VM UUID that
+> > > is validated before trusting the VM UUID.
+> > > 
+> > > Alternatively there needs to be a completely separate UUID, unrelated
+> > > to the VM UUID, which is treated as a private value (eg uses the
+> > > '-object secret' framework in QEMU)
+> > 
+> > I thought the UUID is used to select the TLS client certificate and
+> > associated private key.  So the UUID provides authorization although
+> > what really matters is the client certificate, not the actual value of
+> > the UUID.
 > 
-> I can't easily try with a newer kernel, the software package we're using
-> has kernel patches that would have to be ported.
+> The message shown a few replies earlier said:
 > 
-> I'm at a conference, don't really have time to set up a pair of test
-> machines from scratch with a custom kernel.
+>   "VxHS controller will not allow access to the default UUID (non qemu-kvm)
+>    binaries, but it may choose to grant temporary access to specific
+>    vdisks"
+> 
+> which suggests the VxHS server is making authorization decisions based
+> on UUID, but perhaps this is incorrect interpretation and it really is
+> making decisions based on the x509 cert identity or something else ?
+> 
+> 
+> In any case hardcoding a policy of using the UUID to select a cert path
+> is a flawed design. We can't assume that everyone deploying QEMU is going
+> to be willing to configure a separate certificate per QEMU VM instance
+> launched. People's CA management policies are often so burdensome that
+> it will be impractical to generate a new cert for VMs on the fly. So we
+> should expect that many people will just deploy one cert per host, with
+> the cert being statically created at the time they setup the host. Thus
+> we need to just be able to specify certs used explicitly when adding a
+> disk to QEMU, so we can support different deployment models for cert
+> usage
+>
 
-Hopefully Gaohuai and Rongguang can help with this too.
+I do believe it is using the UUID to select the cert/key files; from
+libqnio:
 
-Paolo
+https://github.com/VeritasHyperScale/libqnio/blob/securify/src/lib/qnio/utils.c#L81
+
+That instanceid is the UUID passed in during the initial call to iio_init().
+
+Also, does QEMU make any promises about qemu_uuid either being 0 or
+undefined for qemu-img and qemu-io in the future?  If that assumption
+changes in the future, it would also break the scheme in the these patches.
+
+-Jeff
