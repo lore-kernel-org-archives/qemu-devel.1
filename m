@@ -1,20 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cgRNM-000087-OA
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 02:30:14 -0500
+	(envelope-from <xyjxie@linux.vnet.ibm.com>) id 1cgRki-0006oU-EB
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 02:54:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cgRNK-0001Oa-Vs
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 02:30:12 -0500
-Resent-Message-Id: <E1cgRNK-0001Oa-Vs@eggs.gnu.org>
-In-Reply-To: <20170222063348.32176-1-david@gibson.dropbear.id.au>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148774859337.108.8860958007860825295@0e2666bad730>
+	(envelope-from <xyjxie@linux.vnet.ibm.com>) id 1cgRkd-0005rp-Fp
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 02:54:20 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37438)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <xyjxie@linux.vnet.ibm.com>)
+	id 1cgRkd-0005rh-5O
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 02:54:15 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1M7om0Q120517
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 02:54:12 -0500
+Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28s411n9e1-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 02:54:11 -0500
+Received: from localhost
+	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <xyjxie@linux.vnet.ibm.com>;
+	Wed, 22 Feb 2017 00:54:10 -0700
+References: <1487659615-15820-1-git-send-email-xyjxie@linux.vnet.ibm.com>
+	<20170221092137.5b6cecbb@t450s.home>
+	<27972408-a43b-60f9-86ad-e4e47f4f8f14@redhat.com>
+	<CAFEAcA-L-ofsPmyOMhnAxUnkhHy0Zs1j2uCbUVRHV6a+WG0Thw@mail.gmail.com>
+	<20170221114435.2025350d@t450s.home>
+From: Yongji Xie <xyjxie@linux.vnet.ibm.com>
+Date: Wed, 22 Feb 2017 15:54:01 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 21 Feb 2017 23:29:54 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/43] ppc-for-2.9 queue 20170222
+In-Reply-To: <20170221114435.2025350d@t450s.home>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <19478f0d-c138-5ddb-d9c1-4598ae0d2cd2@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] memory: make ram device read/write endian
+ sensitive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,155 +45,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: david@gibson.dropbear.id.au
-Cc: famz@redhat.com, peter.maydell@linaro.org, lvivier@redhat.com, thuth@redhat.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, agraf@suse.de, qemu-ppc@nongnu.org, imammedo@redhat.com
+To: Alex Williamson <alex.williamson@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, QEMU Developers <qemu-devel@nongnu.org>, zhong@linux.vnet.ibm.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwMC80M10gcHBjLWZvci0yLjkgcXVldWUgMjAxNzAy
-MjIKTWVzc2FnZS1pZDogMjAxNzAyMjIwNjMzNDguMzIxNzYtMS1kYXZpZEBnaWJzb24uZHJvcGJl
-YXIuaWQuYXUKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFz
-ZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0w
-CgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQg
-bG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRv
-CiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9y
-bWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Nj
-cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQog
-ICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0g
-VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
-NDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVt
-dQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTcwMjIyMDYzMzQ4LjMyMTc2LTEtZGF2
-aWRAZ2lic29uLmRyb3BiZWFyLmlkLmF1IC0+IHBhdGNoZXcvMjAxNzAyMjIwNjMzNDguMzIxNzYt
-MS1kYXZpZEBnaWJzb24uZHJvcGJlYXIuaWQuYXUKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
-ZXN0Jwo2MmQ2ZjA2IGh3L3BwYy9wcGM0MDVfdWMuYzogQXZvaWQgaW50ZWdlciBvdmVyZmxvd3MK
-ZWM5OGU0MCBody9wcGMvc3BhcHI6IENoZWNrIGZvciB2YWxpZCBwYWdlIHNpemUgd2hlbiBob3Qg
-cGx1Z2dpbmcgbWVtb3J5CjEwYTM4YTcgdGFyZ2V0LXBwYzogZml4IEJvb2stRSBUTEIgbWF0Y2hp
-bmcKMWY1MmUxMSBody9uZXQvc3BhcHJfbGxhbjogNiBieXRlIG1hYyBhZGRyZXNzIGRldmljZSB0
-cmVlIGVudHJ5CjgwYWQxN2EgbWFjaGluZTogcmVwbGFjZSBxdWVyeV9ob3RwbHVnZ2FibGVfY3B1
-cygpIGNhbGxiYWNrIHdpdGggaGFzX2hvdHBsdWdnYWJsZV9jcHVzIGZsYWcKN2JkN2JhZiBtYWNo
-aW5lOiB1bmlmeSBbcGNffHNwYXByX11xdWVyeV9ob3RwbHVnZ2FibGVfY3B1cygpIGNhbGxiYWNr
-cwpkMzQwZmI0IHNwYXByOiByZXVzZSBtYWNoaW5lLT5wb3NzaWJsZV9jcHVzIGluc3RlYWQgb2Yg
-Y29yZXNbXQo2N2ExY2M4IGNoYW5nZSBDUFVBcmNoSWQuY3B1IHR5cGUgdG8gT2JqZWN0KgpmYjA1
-MmNjIHBjOiBwYXNzIGFwaWNfaWQgdG8gcGNfZmluZF9jcHVfc2xvdCgpIGRpcmVjdGx5IHNvIGxv
-b2t1cCBjb3VsZCBiZSBkb25lIHdpdGhvdXQgQ1BVIG9iamVjdAo0MTUyODMxIHBjOiBjYWxjdWxh
-dGUgdG9wb2xvZ3kgb25seSBvbmNlIHdoZW4gcG9zc2libGVfY3B1cyBpcyBpbml0aWFsaXNlZAoy
-M2EyMzdkIHBjOiBtb3ZlIHBjbXMtPnBvc3NpYmxlX2NwdXMgaW5pdCBvdXQgb2YgcGNfY3B1c19p
-bml0KCkKZDE1ZWRjYSBtYWNoaW5lOiBtb3ZlIHBvc3NpYmxlX2NwdXMgdG8gTWFjaGluZVN0YXRl
-CjFiZjg0ZTEgaHcvcGNpLWhvc3QvcHJlcDogRG8gbm90IHVzZSBod19lcnJvcigpIGluIHJlYWxp
-emUgZnVuY3Rpb24KZmE4YTNkZCB0YXJnZXQvcHBjL1BPV0VSOTogRGlyZWN0IGFsbCBpbnN0ciBh
-bmQgZGF0YSBzdG9yYWdlIGludGVycnVwdHMgdG8gdGhlIGh5cHYKYTdiNGY5MCB0YXJnZXQvcHBj
-L1BPV0VSOTogQWRhcHQgTFBDUiBoYW5kbGluZyBmb3IgUE9XRVI5CjJiZTcxMmIgdGFyZ2V0L3Bw
-Yy9QT1dFUjk6IEFkZCBJU0F2My4wMCBNTVUgZGVmaW5pdGlvbgo3NDY3MDdhIHRhcmdldC9wcGM6
-IEZpeCBMUENSIERQRkQgbWFzayBkZWZpbmUKYWEyNTY4MSB0YXJnZXQtcHBjOiBBZGQgeHNjdnFw
-dWR6IGFuZCB4c2N2cXB1d3ogaW5zdHJ1Y3Rpb25zCjU3MTZkNjggdGFyZ2V0LXBwYzogSW1wbGVt
-ZW50IHJvdW5kIHRvIG9kZCB2YXJpYW50cyBvZiBxdWFkIEZQIGluc3RydWN0aW9ucwpkMTA1MDU4
-IHNvZnRmbG9hdDogQWRkIGZsb2F0MTI4X3RvX3VpbnQzMl9yb3VuZF90b196ZXJvKCkKYzFhYzlh
-ZCBzb2Z0ZmxvYXQ6IEFkZCBmbG9hdDEyOF90b191aW50NjRfcm91bmRfdG9femVybygpCmI0NzM1
-ZjQgc29mdGZsb2F0OiBBZGQgcm91bmQtdG8tb2RkIHJvdW5kaW5nIG1vZGUKNDJjZTViOCBzcGFw
-cjogcmVwbGFjZSBkZWJ1ZyBwcmludGYgd2l0aCB0cmFjZSBwb2ludHMKYzRjZTMyMiBwcGM0eHg6
-IHJlcGxhY2UgZGVidWcgcHJpbnRmIHdpdGggdHJhY2UgcG9pbnRzCmI0NzdjNTEgbWFjOTk6IHJl
-cGxhY2UgZGVidWcgcHJpbnRmIHdpdGggdHJhY2UgcG9pbnRzCjI3YzQzNzIgdGFyZ2V0LXBwYywg
-dGNnOiBmaXggdXNlcm1vZGUgc2VnZmF1bHQgd2l0aCBwdGhyZWFkX2NyZWF0ZSgpCmRjNjRiYWIg
-dGFyZ2V0LXBwYzogYWRkIHdhaXQgaW5zdHJ1Y3Rpb24KMGRjNTYzZCB0YXJnZXQtcHBjOiBhZGQg
-c2xic3luYyBpbXBsZW1lbnRhdGlvbgpjYTg3YmYxIHRhcmdldC1wcGM6IGFkZCBzbGJpZWcgaW5z
-dHJ1Y3Rpb24KZmVlMjEzYSB0YXJnZXQtcHBjOiBnZW5lcmF0ZSBleGNlcHRpb24gZm9yIGNvcHkv
-cGFzdGUKYjJmZTc4ZCB0YXJnZXQtcHBjOiBpbXBsZW1lbnQgc3RvcmUgYXRvbWljIGluc3RydWN0
-aW9uCmVjZTlmMTQgdGFyZ2V0LXBwYzogaW1wbGVtZW50IGxvYWQgYXRvbWljIGluc3RydWN0aW9u
-CjBjOGZlZWQgc3BhcHI6IGZpeCBvZmYtYnktb25lIGVycm9yIGluIHNwYXByX292ZWNfcG9wdWxh
-dGVfZHQoKQoyZDU3ZWZjIHRhcmdldC1wcGM6IEFkZCB4c21heGpkcCBhbmQgeHNtaW5qZHAgaW5z
-dHJ1Y3Rpb25zCmRlNTg5ZjQgdGFyZ2V0LXBwYzogQWRkIHhzbWF4Y2RwIGFuZCB4c21pbmNkcCBp
-bnN0cnVjdGlvbnMKYzFkMzdhZSBody9wcGMvcG52OiBSZW1vdmUgc3VwZXJmbHVvdXMgInFlbXUi
-IHByZWZpeCBmcm9tIGVycm9yIHN0cmluZ3MKZWQ5NDU2MiBwcGM6IGltcGxlbWVudCB4c3N1YnFw
-IGluc3RydWN0aW9uCmY3OWUyOWYgcHBjOiBpbXBsZW1lbnQgeHNzcXJ0cXAgaW5zdHJ1Y3Rpb24K
-ODM2MDIxZSBwcGM6IGltcGxlbWVudCB4c3JxcHhwIGluc3RydWN0aW9uCjk4MWJiMzQgcHBjOiBp
-bXBsZW1lbnQgeHNycXBpW3hdIGluc3RydWN0aW9uCmQxMWU5MTcgc3BhcHI6IG1ha2UgY3B1IGNv
-cmUgdW5wbHVnIGZvbGxvdyBleHBlY3RlZCBob3R1bnBsdWcgY2FsbCBmbG93Cjk4Y2JkNzMgc3Bh
-cHI6IG1vdmUgc3BhcHJfY29yZV9bZm9vXXBsdWcoKSBjYWxsYmFja3MgY2xvc2UgdG8gbWFjaGlu
-ZSBjb2RlIGluIHNwYXByLmMKYmNmYzhiNSBzcGFwcjogY3B1IGNvcmU6IHNlcGFyYXRlIGNoaWxk
-IHRocmVhZHMgZGVzdHJ1Y3Rpb24gZnJvbSBtYWNoaW5lIHN0YXRlIG9wZXJhdGlvbnMKCj09PSBP
-VVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNDM6IHNwYXByOiBjcHUgY29yZTogc2Vw
-YXJhdGUgY2hpbGQgdGhyZWFkcyBkZXN0cnVjdGlvbiBmcm9tIG1hY2hpbmUgc3RhdGUgb3BlcmF0
-aW9ucy4uLgpDaGVja2luZyBQQVRDSCAyLzQzOiBzcGFwcjogbW92ZSBzcGFwcl9jb3JlX1tmb29d
-cGx1ZygpIGNhbGxiYWNrcyBjbG9zZSB0byBtYWNoaW5lIGNvZGUgaW4gc3BhcHIuYy4uLgpDaGVj
-a2luZyBQQVRDSCAzLzQzOiBzcGFwcjogbWFrZSBjcHUgY29yZSB1bnBsdWcgZm9sbG93IGV4cGVj
-dGVkIGhvdHVucGx1ZyBjYWxsIGZsb3cuLi4KQ2hlY2tpbmcgUEFUQ0ggNC80MzogcHBjOiBpbXBs
-ZW1lbnQgeHNycXBpW3hdIGluc3RydWN0aW9uLi4uCkVSUk9SOiBNYWNyb3Mgd2l0aCBjb21wbGV4
-IHZhbHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMKIzEyNTogRklMRTogdGFy
-Z2V0L3BwYy90cmFuc2xhdGUvdnN4LW9wcy5pbmMuYzoxMDY6CisjZGVmaW5lIEdFTl9WU1hfWjIz
-Rk9STV8zMDAobmFtZSwgb3BjMiwgb3BjMywgb3BjNCwgaW52YWwpIFwKK0dFTl9WU1hfWEZPUk1f
-MzAwX0VPKG5hbWUsIG9wYzIsIG9wYzMgfCAweDAwLCBvcGM0IHwgMHgwLCBpbnZhbCksIFwKK0dF
-Tl9WU1hfWEZPUk1fMzAwX0VPKG5hbWUsIG9wYzIsIG9wYzMgfCAweDA4LCBvcGM0IHwgMHgwLCBp
-bnZhbCksIFwKK0dFTl9WU1hfWEZPUk1fMzAwX0VPKG5hbWUsIG9wYzIsIG9wYzMgfCAweDEwLCBv
-cGM0IHwgMHgwLCBpbnZhbCksIFwKK0dFTl9WU1hfWEZPUk1fMzAwX0VPKG5hbWUsIG9wYzIsIG9w
-YzMgfCAweDE4LCBvcGM0IHwgMHgwLCBpbnZhbCksIFwKK0dFTl9WU1hfWEZPUk1fMzAwX0VPKG5h
-bWUsIG9wYzIsIG9wYzMgfCAweDAwLCBvcGM0IHwgMHgxLCBpbnZhbCksIFwKK0dFTl9WU1hfWEZP
-Uk1fMzAwX0VPKG5hbWUsIG9wYzIsIG9wYzMgfCAweDA4LCBvcGM0IHwgMHgxLCBpbnZhbCksIFwK
-K0dFTl9WU1hfWEZPUk1fMzAwX0VPKG5hbWUsIG9wYzIsIG9wYzMgfCAweDEwLCBvcGM0IHwgMHgx
-LCBpbnZhbCksIFwKK0dFTl9WU1hfWEZPUk1fMzAwX0VPKG5hbWUsIG9wYzIsIG9wYzMgfCAweDE4
-LCBvcGM0IHwgMHgxLCBpbnZhbCkKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTAyIGxp
-bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNr
-aW5nIFBBVENIIDUvNDM6IHBwYzogaW1wbGVtZW50IHhzcnFweHAgaW5zdHJ1Y3Rpb24uLi4KQ2hl
-Y2tpbmcgUEFUQ0ggNi80MzogcHBjOiBpbXBsZW1lbnQgeHNzcXJ0cXAgaW5zdHJ1Y3Rpb24uLi4K
-Q2hlY2tpbmcgUEFUQ0ggNy80MzogcHBjOiBpbXBsZW1lbnQgeHNzdWJxcCBpbnN0cnVjdGlvbi4u
-LgpDaGVja2luZyBQQVRDSCA4LzQzOiBody9wcGMvcG52OiBSZW1vdmUgc3VwZXJmbHVvdXMgInFl
-bXUiIHByZWZpeCBmcm9tIGVycm9yIHN0cmluZ3MuLi4KQ2hlY2tpbmcgUEFUQ0ggOS80MzogdGFy
-Z2V0LXBwYzogQWRkIHhzbWF4Y2RwIGFuZCB4c21pbmNkcCBpbnN0cnVjdGlvbnMuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMTAvNDM6IHRhcmdldC1wcGM6IEFkZCB4c21heGpkcCBhbmQgeHNtaW5qZHAgaW5z
-dHJ1Y3Rpb25zLi4uCkNoZWNraW5nIFBBVENIIDExLzQzOiBzcGFwcjogZml4IG9mZi1ieS1vbmUg
-ZXJyb3IgaW4gc3BhcHJfb3ZlY19wb3B1bGF0ZV9kdCgpLi4uCkNoZWNraW5nIFBBVENIIDEyLzQz
-OiB0YXJnZXQtcHBjOiBpbXBsZW1lbnQgbG9hZCBhdG9taWMgaW5zdHJ1Y3Rpb24uLi4KQ2hlY2tp
-bmcgUEFUQ0ggMTMvNDM6IHRhcmdldC1wcGM6IGltcGxlbWVudCBzdG9yZSBhdG9taWMgaW5zdHJ1
-Y3Rpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggMTQvNDM6IHRhcmdldC1wcGM6IGdlbmVyYXRlIGV4Y2Vw
-dGlvbiBmb3IgY29weS9wYXN0ZS4uLgpDaGVja2luZyBQQVRDSCAxNS80MzogdGFyZ2V0LXBwYzog
-YWRkIHNsYmllZyBpbnN0cnVjdGlvbi4uLgpDaGVja2luZyBQQVRDSCAxNi80MzogdGFyZ2V0LXBw
-YzogYWRkIHNsYnN5bmMgaW1wbGVtZW50YXRpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggMTcvNDM6IHRh
-cmdldC1wcGM6IGFkZCB3YWl0IGluc3RydWN0aW9uLi4uCkNoZWNraW5nIFBBVENIIDE4LzQzOiB0
-YXJnZXQtcHBjLCB0Y2c6IGZpeCB1c2VybW9kZSBzZWdmYXVsdCB3aXRoIHB0aHJlYWRfY3JlYXRl
-KCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMTkvNDM6IG1hYzk5OiByZXBsYWNlIGRlYnVnIHByaW50ZiB3
-aXRoIHRyYWNlIHBvaW50cy4uLgpDaGVja2luZyBQQVRDSCAyMC80MzogcHBjNHh4OiByZXBsYWNl
-IGRlYnVnIHByaW50ZiB3aXRoIHRyYWNlIHBvaW50cy4uLgpDaGVja2luZyBQQVRDSCAyMS80Mzog
-c3BhcHI6IHJlcGxhY2UgZGVidWcgcHJpbnRmIHdpdGggdHJhY2UgcG9pbnRzLi4uCkNoZWNraW5n
-IFBBVENIIDIyLzQzOiBzb2Z0ZmxvYXQ6IEFkZCByb3VuZC10by1vZGQgcm91bmRpbmcgbW9kZS4u
-LgpDaGVja2luZyBQQVRDSCAyMy80Mzogc29mdGZsb2F0OiBBZGQgZmxvYXQxMjhfdG9fdWludDY0
-X3JvdW5kX3RvX3plcm8oKS4uLgpDaGVja2luZyBQQVRDSCAyNC80Mzogc29mdGZsb2F0OiBBZGQg
-ZmxvYXQxMjhfdG9fdWludDMyX3JvdW5kX3RvX3plcm8oKS4uLgpDaGVja2luZyBQQVRDSCAyNS80
-MzogdGFyZ2V0LXBwYzogSW1wbGVtZW50IHJvdW5kIHRvIG9kZCB2YXJpYW50cyBvZiBxdWFkIEZQ
-IGluc3RydWN0aW9ucy4uLgpDaGVja2luZyBQQVRDSCAyNi80MzogdGFyZ2V0LXBwYzogQWRkIHhz
-Y3ZxcHVkeiBhbmQgeHNjdnFwdXd6IGluc3RydWN0aW9ucy4uLgpDaGVja2luZyBQQVRDSCAyNy80
-MzogdGFyZ2V0L3BwYzogRml4IExQQ1IgRFBGRCBtYXNrIGRlZmluZS4uLgpDaGVja2luZyBQQVRD
-SCAyOC80MzogdGFyZ2V0L3BwYy9QT1dFUjk6IEFkZCBJU0F2My4wMCBNTVUgZGVmaW5pdGlvbi4u
-LgpDaGVja2luZyBQQVRDSCAyOS80MzogdGFyZ2V0L3BwYy9QT1dFUjk6IEFkYXB0IExQQ1IgaGFu
-ZGxpbmcgZm9yIFBPV0VSOS4uLgpDaGVja2luZyBQQVRDSCAzMC80MzogdGFyZ2V0L3BwYy9QT1dF
-Ujk6IERpcmVjdCBhbGwgaW5zdHIgYW5kIGRhdGEgc3RvcmFnZSBpbnRlcnJ1cHRzIHRvIHRoZSBo
-eXB2Li4uCkNoZWNraW5nIFBBVENIIDMxLzQzOiBody9wY2ktaG9zdC9wcmVwOiBEbyBub3QgdXNl
-IGh3X2Vycm9yKCkgaW4gcmVhbGl6ZSBmdW5jdGlvbi4uLgpDaGVja2luZyBQQVRDSCAzMi80Mzog
-bWFjaGluZTogbW92ZSBwb3NzaWJsZV9jcHVzIHRvIE1hY2hpbmVTdGF0ZS4uLgpDaGVja2luZyBQ
-QVRDSCAzMy80MzogcGM6IG1vdmUgcGNtcy0+cG9zc2libGVfY3B1cyBpbml0IG91dCBvZiBwY19j
-cHVzX2luaXQoKS4uLgpDaGVja2luZyBQQVRDSCAzNC80MzogcGM6IGNhbGN1bGF0ZSB0b3BvbG9n
-eSBvbmx5IG9uY2Ugd2hlbiBwb3NzaWJsZV9jcHVzIGlzIGluaXRpYWxpc2VkLi4uCkNoZWNraW5n
-IFBBVENIIDM1LzQzOiBwYzogcGFzcyBhcGljX2lkIHRvIHBjX2ZpbmRfY3B1X3Nsb3QoKSBkaXJl
-Y3RseSBzbyBsb29rdXAgY291bGQgYmUgZG9uZSB3aXRob3V0IENQVSBvYmplY3QuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMzYvNDM6IGNoYW5nZSBDUFVBcmNoSWQuY3B1IHR5cGUgdG8gT2JqZWN0Ki4uLgpD
-aGVja2luZyBQQVRDSCAzNy80Mzogc3BhcHI6IHJldXNlIG1hY2hpbmUtPnBvc3NpYmxlX2NwdXMg
-aW5zdGVhZCBvZiBjb3Jlc1tdLi4uCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwoj
-MjY2OiBGSUxFOiBody9wcGMvc3BhcHIuYzoyODI2OgorICAgICAgICBjcHVfaXRlbS0+dmNwdXNf
-Y291bnQgPSBzbXBfdGhyZWFkczsgLy8gVE9ETzogPz8/IGdlbmVyYWxpemUKCnRvdGFsOiAxIGVy
-cm9ycywgMCB3YXJuaW5ncywgMjU4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxl
-IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
-c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
-SCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDM4LzQzOiBtYWNoaW5lOiB1bmlmeSBb
-cGNffHNwYXByX11xdWVyeV9ob3RwbHVnZ2FibGVfY3B1cygpIGNhbGxiYWNrcy4uLgpDaGVja2lu
-ZyBQQVRDSCAzOS80MzogbWFjaGluZTogcmVwbGFjZSBxdWVyeV9ob3RwbHVnZ2FibGVfY3B1cygp
-IGNhbGxiYWNrIHdpdGggaGFzX2hvdHBsdWdnYWJsZV9jcHVzIGZsYWcuLi4KQ2hlY2tpbmcgUEFU
-Q0ggNDAvNDM6IGh3L25ldC9zcGFwcl9sbGFuOiA2IGJ5dGUgbWFjIGFkZHJlc3MgZGV2aWNlIHRy
-ZWUgZW50cnkuLi4KQ2hlY2tpbmcgUEFUQ0ggNDEvNDM6IHRhcmdldC1wcGM6IGZpeCBCb29rLUUg
-VExCIG1hdGNoaW5nLi4uCkNoZWNraW5nIFBBVENIIDQyLzQzOiBody9wcGMvc3BhcHI6IENoZWNr
-IGZvciB2YWxpZCBwYWdlIHNpemUgd2hlbiBob3QgcGx1Z2dpbmcgbWVtb3J5Li4uCkNoZWNraW5n
-IFBBVENIIDQzLzQzOiBody9wcGMvcHBjNDA1X3VjLmM6IEF2b2lkIGludGVnZXIgb3ZlcmZsb3dz
-Li4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
-CgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3Bh
-dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBm
-cmVlbGlzdHMub3Jn
+on 2017/2/22 2:44, Alex Williamson wrote:
+
+> On Tue, 21 Feb 2017 18:09:04 +0000
+> Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+>> On 21 February 2017 at 16:34, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>>
+>>> On 21/02/2017 17:21, Alex Williamson wrote:
+>>>> On Tue, 21 Feb 2017 14:46:55 +0800
+>>>> Yongji Xie <xyjxie@linux.vnet.ibm.com> wrote:
+>>>>   
+>>>>> At the moment ram device's memory regions are NATIVE_ENDIAN. This does
+>>>>> not work on PPC64 because VFIO PCI device is little endian but PPC64
+>>>>> always defines static macro TARGET_WORDS_BIGENDIAN.
+>>>>>
+>>>>> This fixes endianness for ram device the same way as it is done
+>>>>> for VFIO region in commit 6758008e2c4e79fb6bd04fe8e7a41665fa583965.
+>>>> The referenced commit was to vfio code where the endianness is fixed,
+>>>> here you're modifying shared generic code to assume the same
+>>>> endianness as vfio.  That seems wrong.
+>>> Is the goal to have the same endianness as VFIO?  Or is it just a trick
+>>> to ensure the number of swaps is always 0 or 2, so that they cancel away?
+>>>
+>>> In other words, would Yongji's patch just work if it used
+>>> DEVICE_BIG_ENDIAN and beNN_to_cpu/cpu_to_beNN?  If so, then I think the
+>>> patch is okay.
+>> I think any patch that proposes adding or removing one or more
+>> endianness related swaps should come with a commit message that
+>> states very clearly why this exact point in the stack is the
+>> correct place to do these swaps, from a design point of view.
+>> (This is so we can avoid the pitfall of putting in enough swaps
+>> to cancel each other out but at the wrong point in the design.)
+>>
+>> In this instance I don't understand the patch. The ram_device
+>> mem-ops are there to deal with memory regions backed by a
+>> lump of RAM, right? Lumps of memory are always the endianness
+>> of the host CPU by definition, so DEVICE_NATIVE_ENDIAN and
+>> no swapping in the accessors seems like it ought to be the right
+>> thing...
+> I'm glad I'm not the only one confused.  The clarity I can add is that
+> for vfio, we define that any read/write to the vfio file descriptor is
+> little endian.  The kernel does cpu_to_leXX/leXX_to_cpu around the
+> ioreadXX/iowriteXX calls.  For better or worse, this gets us around the
+> implicit CPU endianness of the data there and gives us a standard
+> endianness.  mmaps are of course device native endian, but the point of
+> the ram device was that some devices (realtek NICs) don't respond well
+> to using memcpy through the mmap and we're better off using explicit
+> reads and writes.
+>
+> The part where I get lost is that if PPC64 always sets the target
+> to big endian, then adjust_endianness() we will always bswap after a
+> read and before a write.  I don't follow how that bswap necessarily
+> gets us to QEMU CPU endian such that the cpu_to_leXX/leXX_to_cpu in the
+> access functions always do the right thing.  I know we do this
+> elsewhere in vfio, perhaps I've deferred to someone convincing me it
+> was the right thing at the time, but I'm not able to derive it myself
+> currently.
+>
+> To answer Paolo's question, if PPC64 sets TARGET_WORDS_BIGENDIAN, which
+> is a compile time setting, then using DEVICE_BIG_ENDIAN would
+> deterministically remove the bswap from adjust_endianness(), but I
+> don't know how anything is deterministic about CPU-relative byte swaps
+> since (I think) PPC64 could actually be running in either.  +1 to being
+> very explicit about which swaps are occurring where.  Thanks,
+>
+
+Actually I also have some confusions about the endianness during fixing 
+this issue...
+
+I assume that kvm_run->mmio.data is stored as the endianness of device that
+guest try to accesss. For one mmio write,  we may do the *first* bswap in
+address_space_write_continue(). The ldX_p() will do the bswap when 
+target and
+host endianness are different. Then adjust_endianness() may do the 
+*second* bswap
+when target and device endianness are different.
+
+Here are all possible cases:
+
+run->mmio.data    device    target    host    for mr->ops->write()
+============================================================
+little        native    big    big    little
+little        native    little    little    little
+little        native    big    little    big (this is the wrong case we 
+found)
+little        native    little    big    big
+==============================================================
+little        little    big    big    big (could be fixed by cpu_to_leXX)
+little        little    little    little    little
+little        little    big    little    little
+little        little    little    big    big (could be fixed by cpu_to_leXX)
+==============================================================
+big        native    big    big    big
+big        native    little    little    big
+big        native    big    little    little
+big        native    little    big    little
+==============================================================
+big        big    big    big    big
+big        big    little    little    little (could be fixed by cpu_to_beXX)
+big        big    big    little    little (could be fixed by cpu_to_beXX)
+big        big    little    big    big
+
+We can easily find that native_endian device doesn't work when target 
+and host
+endianness are different. So I fix it like this patch does. But I'm 
+wrong to
+assume the same endianness as vfio in this patch like Alex said. So maybe
+we should consider an endian option in memory_region_init_ram_device_ptr().
+
+Back to my confusion, I failed to understand the objective of those two 
+swaps.
+Is it possible to pass the run->mmio.data directly to mr->ops->write()? 
+Seems
+like those two swaps are based on the fact that run->mmio.data is stored as
+host-endian rather than the endianness of device that guest try to 
+accesss. Am
+I missed something important here?
+
+Thanks,
+Yongji
