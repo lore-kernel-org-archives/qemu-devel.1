@@ -1,23 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgNtc-0008QL-HY
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 22:47:17 -0500
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cgO0L-0006wk-PA
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 22:54:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgNtb-0004np-FV
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 22:47:16 -0500
-Received: from [45.249.212.187] (port=2982 helo=dggrg01-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgNta-0004m3-Pj
-	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 22:47:15 -0500
-From: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Date: Wed, 22 Feb 2017 11:46:38 +0800
-Message-ID: <1487735198-127300-4-git-send-email-zhang.zhanghailiang@huawei.com>
-In-Reply-To: <1487735198-127300-1-git-send-email-zhang.zhanghailiang@huawei.com>
-References: <1487735198-127300-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cgO0H-0006u4-Sl
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 22:54:13 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60206
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1cgO0H-0006pD-MA
+	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 22:54:09 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1M3rqAt057859
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 22:54:06 -0500
+Received: from e28smtp01.in.ibm.com (e28smtp01.in.ibm.com [125.16.236.1])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28rwnhtmr8-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 21 Feb 2017 22:54:06 -0500
+Received: from localhost
+	by e28smtp01.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Wed, 22 Feb 2017 09:24:03 +0530
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+In-Reply-To: <e2a02836-77d9-18f2-d8df-21856a6da0a8@twiddle.net>
+References: <1487585521-19445-1-git-send-email-nikunj@linux.vnet.ibm.com>
+	<1487585521-19445-8-git-send-email-nikunj@linux.vnet.ibm.com>
+	<165844eb-e94c-1955-2fe3-59f0a3931094@twiddle.net>
+	<878tozdhe4.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<e2a02836-77d9-18f2-d8df-21856a6da0a8@twiddle.net>
+Date: Wed, 22 Feb 2017 09:23:57 +0530
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 3/3] filter-rewriter: skip
- net_checksum_calculate() while offset = 0
+Message-Id: <87r32q7uei.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH v1 07/10] target/ppc: update ov/ov32 for
+ nego
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,62 +45,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jasowang@redhat.com, zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com
-Cc: qemu-devel@nongnu.org, xuquan8@huawei.com, pss.wulizhen@huawei.com, zhanghailiang <zhang.zhanghailiang@huawei.com>
+To: Richard Henderson <rth@twiddle.net>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
-While the offset of packets's sequence for primary side and
-secondary side is zero, it is unnecessary to call net_checksum_calculate()
-to recalculate the checksume value of packets.
+Richard Henderson <rth@twiddle.net> writes:
 
-Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
----
- net/filter-rewriter.c | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+> On 02/21/2017 08:26 PM, Nikunj A Dadhania wrote:
+>> Richard Henderson <rth@twiddle.net> writes:
+>>
+>>> On 02/20/2017 09:11 PM, Nikunj A Dadhania wrote:
+>>>> For 64-bit mode if the register RA contains 0x8000_0000_0000_0000, OV
+>>>> and OV32 are set to 1.
+>>>>
+>>>> For 32-bit mode if the register RA contains 0x8000_0000, OV and OV32 are
+>>>> set to 1.
+>>>>
+>>>> Use the tcg-ops for negation (neg_tl) and drop gen_op_arith_neg() as
+>>>> nego was the last user.
+>>>>
+>>>> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+>>> @@ -1488,7 +1480,20 @@ static void gen_neg(DisasContext *ctx)
+>>>>
+>>>>  static void gen_nego(DisasContext *ctx)
+>>>>  {
+>>>> -    gen_op_arith_neg(ctx, 1);
+>>>> +    TCGv t0 = tcg_temp_new();
+>>>> +    TCGv zero = tcg_const_tl(0);
+>>>> +
+>>>> +    if (NARROW_MODE(ctx)) {
+>>>> +        tcg_gen_xori_tl(t0, cpu_gpr[rA(ctx->opcode)], INT32_MIN);
+>>>> +    } else {
+>>>> +        tcg_gen_xori_tl(t0, cpu_gpr[rA(ctx->opcode)], (target_ulong)INT64_MIN);
+>>>> +    }
+>>>> +
+>>>> +    tcg_gen_setcond_tl(TCG_COND_EQ, cpu_ov, t0, zero);
+>>>> +    tcg_gen_mov_tl(cpu_ov32, cpu_ov);
+>>>> +    tcg_gen_neg_tl(cpu_gpr[rD(ctx->opcode)], cpu_gpr[rA(ctx->opcode)]);
+>>>> +    tcg_temp_free(t0);
+>>>> +    tcg_temp_free(zero);
+>>>>  }
+>>>
+>>> Again, you're forgetting "nego.".  Don't try to simplify from gen_op_arith_subf
+>>> by hand.
+>>
+>> The reason of the simplification was the interpretation of ov and ov32.
+>> I will add a code to compute the Rc.
+>
+> Why do you believe that the computation for overflow is different between neg 
+> and subf?
 
-diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
-index 7e7ec35..c9a6d43 100644
---- a/net/filter-rewriter.c
-+++ b/net/filter-rewriter.c
-@@ -93,10 +93,12 @@ static int handle_primary_tcp_pkt(RewriterState *rf,
-             conn->offset -= (ntohl(tcp_pkt->th_ack) - 1);
-             conn->syn_flag = 0;
-         }
--        /* handle packets to the secondary from the primary */
--        tcp_pkt->th_ack = htonl(ntohl(tcp_pkt->th_ack) + conn->offset);
-+        if (conn->offset) {
-+            /* handle packets to the secondary from the primary */
-+            tcp_pkt->th_ack = htonl(ntohl(tcp_pkt->th_ack) + conn->offset);
- 
--        net_checksum_calculate((uint8_t *)pkt->data, pkt->size);
-+            net_checksum_calculate((uint8_t *)pkt->data, pkt->size);
-+        }
-         /*
-          * Case 1:
-          * The *server* side of this connect is VM, *client* tries to close
-@@ -112,7 +114,6 @@ static int handle_primary_tcp_pkt(RewriterState *rf,
-          */
-         if ((conn->tcp_state == TCPS_LAST_ACK) &&
-             (ntohl(tcp_pkt->th_ack) == (conn->fin_ack_seq + 1))) {
--            fprintf(stderr, "Remove conn "
-             g_hash_table_remove(rf->connection_track_table, key);
-         }
-     }
-@@ -159,10 +160,13 @@ static int handle_secondary_tcp_pkt(RewriterState *rf,
-     }
- 
-     if ((tcp_pkt->th_flags & (TH_ACK | TH_SYN)) == TH_ACK) {
--        /* handle packets to the primary from the secondary*/
--        tcp_pkt->th_seq = htonl(ntohl(tcp_pkt->th_seq) - conn->offset);
-+        /* Only need to adjust seq while offset is Non-zero */
-+        if (conn->offset) {
-+            /* handle packets to the primary from the secondary*/
-+            tcp_pkt->th_seq = htonl(ntohl(tcp_pkt->th_seq) - conn->offset);
- 
--        net_checksum_calculate((uint8_t *)pkt->data, pkt->size);
-+            net_checksum_calculate((uint8_t *)pkt->data, pkt->size);
-+        }
-         /*
-          * Case 2:
-          * The *server* side of this connect is VM, *server* tries to close
--- 
-1.8.3.1
+For example in 64-bit mode, if we negate INT64_MIN(nego[.]), both OV and
+OV32 has to be set to 1 according to ISA 3.0. If I use subf, only OV is
+set to 1.
+
+Regards
+Nikunj
