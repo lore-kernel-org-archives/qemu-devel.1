@@ -1,42 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cgUr5-0005Xu-JU
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:13:08 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cgUtt-0006db-IR
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:16:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cgUr1-00033u-JX
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:13:07 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60703
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cgUr1-00033B-Cy
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:13:03 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1MB657i006152
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 06:13:02 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28s9fpr9a4-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 06:13:01 -0500
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Wed, 22 Feb 2017 11:12:59 -0000
-Date: Wed, 22 Feb 2017 12:12:54 +0100
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <b7b0cb2d-8987-9fe9-e294-a517981453ef@redhat.com>
-References: <20170221185901.3256-1-stefanha@redhat.com>
-	<20170221185901.3256-3-stefanha@redhat.com>
-	<20170222101653.4df25bc4.cornelia.huck@de.ibm.com>
-	<b7b0cb2d-8987-9fe9-e294-a517981453ef@redhat.com>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cgUtp-0003vw-Iw
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:16:01 -0500
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:36835)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cgUtp-0003vs-CU
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:15:57 -0500
+Received: by mail-wr0-x242.google.com with SMTP id z61so1057197wrc.3
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 03:15:57 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <589C7E96.9060905@huawei.com> <589D83CE.1090803@huawei.com>
+	<589DDC05.9010807@windriver.com> <58AA51D6.6020508@huawei.com>
+	<1487565495.3740.27.camel@intel.com> <58AD0094.90304@windriver.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4dd92012-626a-2d80-9adb-0be398f73eb1@redhat.com>
+Date: Wed, 22 Feb 2017 12:15:54 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <58AD0094.90304@windriver.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20170222121254.06358542.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] virtio: add missing region cache init
- in virtio_load()
+Subject: Re: [Qemu-devel] kvm bug in __rmap_clear_dirty during live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,46 +32,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Chris Friesen <chris.friesen@windriver.com>, "Han, Huaitong" <huaitong.han@intel.com>, "hangaohuai@huawei.com" <hangaohuai@huawei.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "fangying1@huawei.com" <fangying1@huawei.com>, "herongguang.he@huawei.com" <herongguang.he@huawei.com>, "xudong.hao@linux.intel.com" <xudong.hao@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "wangxinxin.wang@huawei.com" <wangxinxin.wang@huawei.com>, "kai.huang@linux.intel.com" <kai.huang@linux.intel.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "guangrong.xiao@linux.intel.com" <guangrong.xiao@linux.intel.com>
 
-On Wed, 22 Feb 2017 11:19:45 +0100
-Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-> On 22/02/2017 10:16, Cornelia Huck wrote:
-> >> +
-> >> +            /* All ring addresses have been loaded now... */
-> >> +            virtio_init_region_cache(vdev, i);
-> > It feels a bit weird that the region cache was already initialized when
-> > update rings was called. Should the call to init_region_cache be moved
-> > from update_rings() to virtio_queue_set_addr()?
+
+On 22/02/2017 04:08, Chris Friesen wrote:
+> On 02/19/2017 10:38 PM, Han, Huaitong wrote:
+>> Hi, Gaohuai
+>>
+>> I tried to debug the problem, and I found the indirect cause may be that
+>> the rmap value is not cleared when KVM mmu page is freed. I have read
+>> code without the root cause. Can you stable reproduce the the issue?
+>> Many guesses need to be verified.
 > 
-> virtio_queue_set_addr isn't called at all, is it?
+> In both cases it seems to have been triggered by repeatedly
+> live-migrating a KVM virtual machine between two hypervisors with
+> Broadwell CPUs running the latest CentOS 7.
 > 
-> The alternative would be to call virtio_init_region_cache from a
-> postload callback of vmstate_virtqueue, but Stefan's patch is fine too IMHO.
+> It's a race of some sort, it doesn't happen every time.
 
-What I meant was:
+Can you reproduce it with kernel 4.8+?  I'm suspecting commmit
+4e59516a12a6 ("kvm: vmx: ensure VMCS is current while enabling PML",
+2016-07-14) to be the fix.
 
-We currently have
-
-set_addr -> update_rings -> init_region_cache
-
-and for virtio-1
-
-set_rings -> init_region_cache
-
-The code with Stefan's fix now sets up a region cache via update_rings
-and replaces it later via the call introduced above - which is fine,
-but adds an extra iteration.
-
-If we move to
-
-set_addr -> update_rings
-            init_region_cache
-
-we get the same call pattern for both legacy and virtio-1 layouts and
-save the extra iteration. But we can do that in an additional cleanup
-patch, and I think the patch is fine as-is, so
-
-Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+Paolo
