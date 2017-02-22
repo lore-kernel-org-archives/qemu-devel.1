@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39042)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgU9w-0003iJ-5t
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 05:28:33 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cgUDA-0006UQ-Cg
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 05:31:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cgU9v-0007Ms-Dw
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 05:28:32 -0500
-Date: Wed, 22 Feb 2017 11:28:23 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170222102823.GE4112@noname.str.redhat.com>
-References: <20170131115728.5244.21690.stgit@PASHA-ISP>
-	<20170131115745.5244.36762.stgit@PASHA-ISP>
+	(envelope-from <rth7680@gmail.com>) id 1cgUD7-0008Sa-9h
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 05:31:52 -0500
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1487755788-16415-1-git-send-email-nikunj@linux.vnet.ibm.com>
+	<1487755788-16415-4-git-send-email-nikunj@linux.vnet.ibm.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <6ab5f39d-af42-8f03-01fe-002fdd04d51d@twiddle.net>
+Date: Wed, 22 Feb 2017 21:31:40 +1100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170131115745.5244.36762.stgit@PASHA-ISP>
-Subject: Re: [Qemu-devel] [PATCH 3/3] replay: disable default snapshot for
- record/replay
+In-Reply-To: <1487755788-16415-4-git-send-email-nikunj@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 03/11] target/ppc: support for 32-bit
+ carry and overflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,18 +25,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
-Am 31.01.2017 um 12:57 hat Pavel Dovgalyuk geschrieben:
-> This patch disables setting '-snapshot' option on by default
-> in record/replay mode. This is needed for creating vmstates in record
-> and replay modes.
-> 
-> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+On 02/22/2017 08:29 PM, Nikunj A Dadhania wrote:
+>  target_ulong cpu_read_xer(CPUPPCState *env)
+>  {
+> -    return env->xer | (env->so << XER_SO) | (env->ov << XER_OV) |
+> +    target_ulong xer;
+> +
+> +    xer = env->xer | (env->so << XER_SO) | (env->ov << XER_OV) |
+>          (env->ca << XER_CA);
+> +
+> +    if (is_isa300(env)) {
+> +        xer |= (env->ov32 << XER_OV32) | (env->ca32 << XER_CA32);
+> +    }
+> +    return xer;
+>  }
+>
+>  void cpu_write_xer(CPUPPCState *env, target_ulong xer)
+> @@ -32,5 +39,13 @@ void cpu_write_xer(CPUPPCState *env, target_ulong xer)
+>      env->so = (xer >> XER_SO) & 1;
+>      env->ov = (xer >> XER_OV) & 1;
+>      env->ca = (xer >> XER_CA) & 1;
+> -    env->xer = xer & ~((1u << XER_SO) | (1u << XER_OV) | (1u << XER_CA));
+> +    if (is_isa300(env)) {
+> +        env->ov32 = (xer >> XER_OV32) & 1;
+> +        env->ca32 = (xer >> XER_CA32) & 1;
+> +        env->xer = xer & ~((1ul << XER_SO) |
+> +                           (1ul << XER_OV) | (1ul << XER_CA) |
+> +                           (1ul << XER_OV32) | (1ul << XER_CA32));
+> +    } else {
+> +        env->xer = xer & ~((1u << XER_SO) | (1u << XER_OV) | (1u << XER_CA));
+> +    }
+>  }
 
-Looks good the me. (Though obviously, record/replay mode really comes
-with a lot more restrictions for block devices that aren't checked yet.
-But it's a start.)
+Do cpus before power9 really save all of the bits you write to it?
+I.e. if you write -1 to XER, do you read -1 back?
 
-Kevin
+If so, then I suppose I'll have to revise my previous advice; there's no point 
+in NOT storing bit 19 in env->ov32, because we can always read it back out.
+
+
+r~
