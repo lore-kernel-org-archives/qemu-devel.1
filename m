@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cgbHI-000276-Gw
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 13:04:38 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cgbHK-00028X-Cz
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 13:04:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cgbHG-0006Dm-JG
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 13:04:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56240)
+	(envelope-from <pbonzini@redhat.com>) id 1cgbHJ-0006Ew-ET
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 13:04:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59346)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cgbHG-0006CT-8T
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 13:04:34 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cgbHJ-0006EW-8s
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 13:04:37 -0500
 Received: from int-mx10.intmail.prod.int.phx2.redhat.com
 	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5A1263B720
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 18:04:34 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 604DA6AAEB
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 18:04:37 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 22 Feb 2017 19:04:21 +0100
-Message-Id: <20170222180423.26571-2-pbonzini@redhat.com>
+Date: Wed, 22 Feb 2017 19:04:22 +0100
+Message-Id: <20170222180423.26571-3-pbonzini@redhat.com>
 In-Reply-To: <20170222180423.26571-1-pbonzini@redhat.com>
 References: <20170222180423.26571-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/3] qom-qobject: introduce object_property_{g,
- s}et_ptr
+Subject: [Qemu-devel] [PATCH 2/3] cpu: implement get_crash_info through QOM
+ properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,482 +33,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, marcandre.lureau@redhat.com
 
-The functions simplify the handling of QOM properties whose type
-is a QAPI struct.  They go through a QObject just like the other
-functions that access a QOM property through its C type.
+Provide a generic implementation for all CPU subclasses.
 
-Like QAPI_CLONE, the functions are wrapped by macros that take a
-QAPI type name and use it to build the name of a visitor function.
-
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/qom/qom-qobject.h               |  68 +++++++++++-
- qom/qom-qobject.c                       |  52 ++++++++++
- tests/Makefile.include                  |   2 +-
- tests/check-qom-proplist.c              | 177 +++++++++++++++++++++++++++++++-
- tests/qapi-schema/qapi-schema-test.json |   8 ++
- tests/qapi-schema/qapi-schema-test.out  |   6 ++
- 6 files changed, 309 insertions(+), 4 deletions(-)
+ include/qom/cpu.h |  1 -
+ qom/cpu.c         | 11 ++++-------
+ target/i386/cpu.c |  2 +-
+ 3 files changed, 5 insertions(+), 9 deletions(-)
 
-diff --git a/include/qom/qom-qobject.h b/include/qom/qom-qobject.h
-index 77cd717..fab9c4f 100644
---- a/include/qom/qom-qobject.h
-+++ b/include/qom/qom-qobject.h
-@@ -30,7 +30,7 @@ struct QObject *object_property_get_qobject(Object *obj, const char *name,
- /**
-  * object_property_set_qobject:
-  * @obj: the object
-- * @ret: The value that will be written to the property.
-+ * @ret: The value that will be written to the property
-  * @name: the name of the property
-  * @errp: returns an error if this function fails
-  *
-@@ -39,4 +39,70 @@ struct QObject *object_property_get_qobject(Object *obj, const char *name,
- void object_property_set_qobject(Object *obj, struct QObject *qobj,
-                                  const char *name, struct Error **errp);
- 
-+/**
-+ * object_property_get_ptr:
-+ * @obj: the object
-+ * @name: the name of the property
-+ * @visit_type: the visitor function for the returned object
-+ * @errp: returns an error if this function fails
-+ *
-+ * Return: the value of an object's property, unmarshaled into a C object
-+ * through a QAPI type visitor, or NULL if an error occurs.
-+ */
-+void *object_property_get_ptr(Object *obj, const char *name,
-+                              void (*visit_type)(Visitor *, const char *,
-+                                                 void **, Error **),
-+                              Error **errp);
-+
-+/**
-+ * OBJECT_PROPERTY_GET_PTR:
-+ * @obj: the object
-+ * @name: the name of the property
-+ * @type: the name of the C struct type that is returned
-+ * @errp: returns an error if this function fails
-+ *
-+ * Return: the value of an object's property, unmarshaled into a C object
-+ * through a QAPI type visitor, or NULL if an error occurs.
-+ */
-+#define OBJECT_PROPERTY_GET_PTR(obj, name, type, errp)                      \
-+    ((type *)                                                               \
-+     object_property_get_ptr(obj, name,                                     \
-+                             (void (*)(Visitor *, const char *, void**,     \
-+                                       Error **))visit_type_ ## type,       \
-+                             errp))
-+
-+/**
-+ * object_property_set_ptr:
-+ * @obj: the object
-+ * @ptr: The C struct that will be written to the property
-+ * @name: the name of the property
-+ * @visit_type: the visitor function for @ptr's type
-+ * @errp: returns an error if this function fails
-+ *
-+ * Sets an object's property to a C object's value, using a QAPI
-+ * type visitor to marshal the C struct into the property value.
-+ */
-+void object_property_set_ptr(Object *obj, void *ptr, const char *name,
-+                             void (*visit_type)(Visitor *, const char *,
-+                                                void **, Error **),
-+                             Error **errp);
-+
-+/**
-+ * OBJECT_PROPERTY_SET_PTR:
-+ * @obj: the object
-+ * @ptr: The C struct that will be written to the property
-+ * @name: the name of the property
-+ * @type: the name of the C struct type pointed to by @ptr
-+ * @errp: returns an error if this function fails
-+ *
-+ * Sets an object's property to a C object's value, using a QAPI
-+ * type visitor to marshal the C struct into the property value.
-+ */
-+#define OBJECT_PROPERTY_SET_PTR(obj, ptr, name, type, errp)                 \
-+    object_property_set_ptr(obj, ptr + type_check(type, typeof(*ptr)),      \
-+                            name,                                           \
-+                            (void (*)(Visitor *, const char *, void**,      \
-+                                      Error **))visit_type_ ## type,        \
-+                            errp)
-+
- #endif
-diff --git a/qom/qom-qobject.c b/qom/qom-qobject.c
-index 447e4a0..d4675be 100644
---- a/qom/qom-qobject.c
-+++ b/qom/qom-qobject.c
-@@ -44,3 +44,55 @@ QObject *object_property_get_qobject(Object *obj, const char *name,
-     visit_free(v);
-     return ret;
- }
-+
-+void object_property_set_ptr(Object *obj, void *ptr, const char *name,
-+                             void (*visit_type)(Visitor *, const char *,
-+                                                void **, Error **),
-+                             Error **errp)
-+{
-+    Error *local_err = NULL;
-+    QObject *ret = NULL;
-+    Visitor *v;
-+    v = qobject_output_visitor_new(&ret);
-+    visit_type(v, name, &ptr, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        visit_free(v);
-+        return;
-+    }
-+    visit_complete(v, &ret);
-+    visit_free(v);
-+
-+    /* Do not use object_property_set_qobject until we switch it
-+     * to use qobject_input_visitor_new in strict mode.  See the
-+     * /qom/proplist/get-set-ptr/contravariant unit test.
-+     */
-+    v = qobject_input_visitor_new(ret, true);
-+    object_property_set(obj, v, name, errp);
-+    visit_free(v);
-+    qobject_decref(ret);
-+}
-+
-+void *object_property_get_ptr(Object *obj, const char *name,
-+                              void (*visit_type)(Visitor *, const char *,
-+                                                 void **, Error **),
-+                              Error **errp)
-+{
-+    QObject *ret;
-+    Visitor *v;
-+    void *ptr = NULL;
-+
-+    ret = object_property_get_qobject(obj, name, errp);
-+    if (!ret) {
-+        return NULL;
-+    }
-+
-+    /* Do not enable strict mode to allow passing covariant
-+     * data types.
-+     */
-+    v = qobject_input_visitor_new(ret, false);
-+    visit_type(v, name, &ptr, errp);
-+    qobject_decref(ret);
-+    visit_free(v);
-+    return ptr;
-+}
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index e60bb6c..1a1b6e2 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -519,7 +519,7 @@ tests/check-qfloat$(EXESUF): tests/check-qfloat.o $(test-util-obj-y)
- tests/check-qnull$(EXESUF): tests/check-qnull.o $(test-util-obj-y)
- tests/check-qjson$(EXESUF): tests/check-qjson.o $(test-util-obj-y)
- tests/check-qom-interface$(EXESUF): tests/check-qom-interface.o $(test-qom-obj-y)
--tests/check-qom-proplist$(EXESUF): tests/check-qom-proplist.o $(test-qom-obj-y)
-+tests/check-qom-proplist$(EXESUF): tests/check-qom-proplist.o $(test-qom-obj-y) $(test-qapi-obj-y)
- 
- tests/test-char$(EXESUF): tests/test-char.o $(test-util-obj-y) $(qtest-obj-y) $(test-io-obj-y) $(chardev-obj-y)
- tests/test-coroutine$(EXESUF): tests/test-coroutine.o $(test-block-obj-y)
-diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
-index a16cefc..1bf0320 100644
---- a/tests/check-qom-proplist.c
-+++ b/tests/check-qom-proplist.c
-@@ -22,8 +22,11 @@
- 
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 1bc3ad2..04d3a2c 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -158,7 +158,6 @@ typedef struct CPUClass {
+                            uint8_t *buf, int len, bool is_write);
+     void (*dump_state)(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+                        int flags);
+-    GuestPanicInformation* (*get_crash_info)(CPUState *cpu);
+     void (*dump_statistics)(CPUState *cpu, FILE *f,
+                             fprintf_function cpu_fprintf, int flags);
+     int64_t (*get_arch_id)(CPUState *cpu);
+diff --git a/qom/cpu.c b/qom/cpu.c
+index 7e005af..a9482ce 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -22,6 +22,8 @@
  #include "qapi/error.h"
- #include "qom/object.h"
+ #include "qemu-common.h"
+ #include "qom/cpu.h"
 +#include "qom/qom-qobject.h"
- #include "qemu/module.h"
++#include "qapi-visit.h"
+ #include "sysemu/hw_accel.h"
+ #include "qemu/notify.h"
+ #include "qemu/log.h"
+@@ -220,13 +222,8 @@ static bool cpu_common_exec_interrupt(CPUState *cpu, int int_req)
  
-+#include "test-qapi-types.h"
-+#include "test-qapi-visit.h"
- 
- #define TYPE_DUMMY "qemu-dummy"
- 
-@@ -56,6 +59,8 @@ struct DummyObject {
-     bool bv;
-     DummyAnimal av;
-     char *sv;
-+
-+    UserDefOne *qv;
- };
- 
- struct DummyObjectClass {
-@@ -120,12 +125,42 @@ static char *dummy_get_sv(Object *obj,
- 
- static void dummy_init(Object *obj)
+ GuestPanicInformation *cpu_get_crash_info(CPUState *cpu)
  {
-+    DummyObject *dobj = DUMMY_OBJECT(obj);
-+
-     object_property_add_bool(obj, "bv",
-                              dummy_get_bv,
-                              dummy_set_bv,
-                              NULL);
-+    dobj->qv = g_new0(UserDefOne, 1);
-+    dobj->qv->string = g_strdup("dummy string");
-+}
-+
-+
-+static void dummy_get_qv(Object *obj, Visitor *v, const char *name,
-+                         void *opaque, Error **errp)
-+{
-+    DummyObject *dobj = DUMMY_OBJECT(obj);
-+
-+    visit_type_UserDefOne(v, name, &dobj->qv, errp);
- }
- 
-+static void dummy_set_qv(Object *obj, Visitor *v, const char *name,
-+                         void *opaque, Error **errp)
-+{
-+    DummyObject *dobj = DUMMY_OBJECT(obj);
-+    UserDefOne *qv = NULL;
-+    Error *local_err = NULL;
-+
-+    visit_type_UserDefOne(v, name, &qv, &local_err);
-+    if (local_err) {
-+        g_assert(qv == NULL);
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+    qapi_free_UserDefOne(dobj->qv);
-+    dobj->qv = qv;
-+}
- 
- static void dummy_class_init(ObjectClass *cls, void *data)
- {
-@@ -143,6 +178,13 @@ static void dummy_class_init(ObjectClass *cls, void *data)
-                                    dummy_get_av,
-                                    dummy_set_av,
-                                    NULL);
-+    object_class_property_add(cls, "qv",
-+                              "UserDefOne",
-+                              dummy_get_qv,
-+                              dummy_set_qv,
-+                              NULL,
-+                              NULL,
-+                              NULL);
- }
- 
- 
-@@ -151,9 +193,9 @@ static void dummy_finalize(Object *obj)
-     DummyObject *dobj = DUMMY_OBJECT(obj);
- 
-     g_free(dobj->sv);
-+    qapi_free_UserDefOne(dobj->qv);
- }
- 
+-    CPUClass *cc = CPU_GET_CLASS(cpu);
+-    GuestPanicInformation *res = NULL;
 -
- static const TypeInfo dummy_info = {
-     .name          = TYPE_DUMMY,
-     .parent        = TYPE_OBJECT,
-@@ -473,7 +515,8 @@ static void test_dummy_iterator(void)
- 
-     ObjectProperty *prop;
-     ObjectPropertyIterator iter;
--    bool seenbv = false, seensv = false, seenav = false, seentype;
-+    bool seenbv = false, seensv = false, seenav = false;
-+    bool seenqv = false, seentype = false;
- 
-     object_property_iter_init(&iter, OBJECT(dobj));
-     while ((prop = object_property_iter_next(&iter))) {
-@@ -483,6 +526,8 @@ static void test_dummy_iterator(void)
-             seensv = true;
-         } else if (g_str_equal(prop->name, "av")) {
-             seenav = true;
-+        } else if (g_str_equal(prop->name, "qv")) {
-+            seenqv = true;
-         } else if (g_str_equal(prop->name, "type")) {
-             /* This prop comes from the base Object class */
-             seentype = true;
-@@ -494,6 +539,7 @@ static void test_dummy_iterator(void)
-     g_assert(seenbv);
-     g_assert(seenav);
-     g_assert(seensv);
-+    g_assert(seenqv);
-     g_assert(seentype);
- 
-     object_unparent(OBJECT(dobj));
-@@ -513,6 +559,129 @@ static void test_dummy_delchild(void)
-     object_unparent(OBJECT(dev));
+-    if (cc->get_crash_info) {
+-        res = cc->get_crash_info(cpu);
+-    }
+-    return res;
++    return OBJECT_PROPERTY_GET_PTR(OBJECT(cpu), "crash-information",
++                                   GuestPanicInformation, NULL);
  }
  
-+static void test_dummy_get_set_ptr_struct(void)
-+{
-+    DummyObject *dobj = DUMMY_OBJECT(object_new(TYPE_DUMMY));
-+    Error *local_err = NULL;
-+    const char *s = "my other dummy string";
-+    UserDefOne *ret;
-+    UserDefOne val;
-+
-+    ret = OBJECT_PROPERTY_GET_PTR(OBJECT(dobj), "qv",
-+                                  UserDefOne, &local_err);
-+    g_assert(!local_err);
-+
-+    g_assert_cmpint(ret->integer, ==, 0);
-+    g_assert_cmpstr(ret->string, ==, "dummy string");
-+    g_assert(!ret->has_enum1);
-+    qapi_free_UserDefOne(ret);
-+
-+    val.integer = 42;
-+    val.string = g_strdup(s);
-+    val.has_enum1 = true;
-+    val.enum1 = ENUM_ONE_VALUE1;
-+    OBJECT_PROPERTY_SET_PTR(OBJECT(dobj), &val, "qv",
-+                            UserDefOne, &local_err);
-+    g_assert(!local_err);
-+
-+    ret = OBJECT_PROPERTY_GET_PTR(OBJECT(dobj), "qv",
-+                                  UserDefOne, &local_err);
-+    g_assert(!local_err);
-+
-+    g_assert_cmpint(ret->integer, ==, val.integer);
-+    g_assert_cmpstr(ret->string, ==, val.string);
-+    g_assert(ret->has_enum1);
-+    g_assert_cmpint(ret->enum1, ==, val.enum1);
-+    g_free(val.string);
-+    qapi_free_UserDefOne(ret);
-+}
-+
-+static void test_dummy_get_set_ptr_contravariant(void)
-+{
-+    DummyObject *dobj = DUMMY_OBJECT(object_new(TYPE_DUMMY));
-+    Error *local_err = NULL;
-+    UserDefOneMore *ret;
-+    UserDefOneMore val;
-+
-+    /* You cannot retrieve a contravariant (subclass) type... */
-+    ret = OBJECT_PROPERTY_GET_PTR(OBJECT(dobj), "qv",
-+                                  UserDefOneMore, &local_err);
-+    error_free_or_abort(&local_err);
-+    g_assert(!ret);
-+
-+    /* And you cannot set one either.  */
-+    val.integer = 42;
-+    val.string = g_strdup("unused");
-+    val.has_enum1 = false;
-+    val.boolean = false;
-+
-+    OBJECT_PROPERTY_SET_PTR(OBJECT(dobj), &val, "qv",
-+                            UserDefOneMore, &local_err);
-+    g_assert(local_err);
-+}
-+
-+static void test_dummy_get_set_ptr_covariant(void)
-+{
-+    DummyObject *dobj = DUMMY_OBJECT(object_new(TYPE_DUMMY));
-+    Error *local_err = NULL;
-+    UserDefZero *ret;
-+    UserDefZero val;
-+
-+    /* You can retrieve a covariant (superclass) type... */
-+    ret = OBJECT_PROPERTY_GET_PTR(OBJECT(dobj), "qv",
-+                                  UserDefZero, &local_err);
-+    g_assert(!local_err);
-+
-+    g_assert_cmpint(ret->integer, ==, 0);
-+    qapi_free_UserDefZero(ret);
-+
-+    /* But you cannot set one.  */
-+    val.integer = 42;
-+    OBJECT_PROPERTY_SET_PTR(OBJECT(dobj), &val, "qv",
-+                            UserDefZero, &local_err);
-+    error_free_or_abort(&local_err);
-+
-+    /* Test that the property has not been modified at all */
-+    ret = OBJECT_PROPERTY_GET_PTR(OBJECT(dobj), "qv",
-+                                  UserDefZero, &local_err);
-+    g_assert(!local_err);
-+
-+    g_assert_cmpint(ret->integer, ==, 0);
-+    qapi_free_UserDefZero(ret);
-+}
-+
-+static void test_dummy_get_set_ptr_error(void)
-+{
-+    DummyObject *dobj = DUMMY_OBJECT(object_new(TYPE_DUMMY));
-+    Error *local_err = NULL;
-+    const char *s = "my other dummy string";
-+    UserDefOne *ret;
-+    UserDefOne val;
-+
-+    ret = OBJECT_PROPERTY_GET_PTR(OBJECT(dobj), "blah",
-+                                  UserDefOne, &local_err);
-+    error_free_or_abort(&local_err);
-+    g_assert(!ret);
-+
-+    val.integer = 42;
-+    val.string = g_strdup(s);
-+    val.has_enum1 = true;
-+    val.enum1 = 100;
-+    OBJECT_PROPERTY_SET_PTR(OBJECT(dobj), &val, "qv",
-+                            UserDefOne, &local_err);
-+    error_free_or_abort(&local_err);
-+
-+    ret = OBJECT_PROPERTY_GET_PTR(OBJECT(dobj), "qv",
-+                                  UserDefOne, &local_err);
-+    g_assert(!local_err);
-+
-+    /* Test that the property has not been modified at all */
-+    g_assert_cmpint(ret->integer, ==, 0);
-+    g_assert_cmpstr(ret->string, ==, "dummy string");
-+    g_assert(!ret->has_enum1);
-+    qapi_free_UserDefOne(ret);
-+}
-+
- int main(int argc, char **argv)
- {
-     g_test_init(&argc, &argv, NULL);
-@@ -530,5 +699,9 @@ int main(int argc, char **argv)
-     g_test_add_func("/qom/proplist/iterator", test_dummy_iterator);
-     g_test_add_func("/qom/proplist/delchild", test_dummy_delchild);
+ void cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 63be816..3071769 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -3516,6 +3516,7 @@ static GuestPanicInformation *x86_cpu_get_crash_info(CPUState *cs)
  
-+    g_test_add_func("/qom/proplist/get-set-ptr/struct", test_dummy_get_set_ptr_struct);
-+    g_test_add_func("/qom/proplist/get-set-ptr/error", test_dummy_get_set_ptr_error);
-+    g_test_add_func("/qom/proplist/get-set-ptr/covariant", test_dummy_get_set_ptr_covariant);
-+    g_test_add_func("/qom/proplist/get-set-ptr/contravariant", test_dummy_get_set_ptr_contravariant);
-     return g_test_run();
+     return panic_info;
  }
-diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/qapi-schema-test.json
-index f4d8cc4..4e3f6ff 100644
---- a/tests/qapi-schema/qapi-schema-test.json
-+++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -91,6 +91,14 @@
-             '*enum1': 'EnumOne' } }   # intentional forward reference
- 
- ##
-+# @UserDefOneMore:
-+# for testing nested structs
-+##
-+{ 'struct': 'UserDefOneMore',
-+  'base': 'UserDefOne',
-+  'data': { 'boolean': 'bool' } }
 +
-+##
- # @EnumOne:
- ##
- { 'enum': 'EnumOne',
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/qapi-schema-test.out
-index bc8d496..d3a2990 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -107,6 +107,9 @@ object UserDefOne
-     base UserDefZero
-     member string: str optional=False
-     member enum1: EnumOne optional=True
-+object UserDefOneMore
-+    base UserDefOne
-+    member boolean: bool optional=False
- object UserDefOptions
-     member i64: intList optional=True
-     member u64: uint64List optional=True
-@@ -283,6 +286,9 @@ for testing override of default naming heuristic
- doc symbol=UserDefOne expr=('struct', 'UserDefOne')
-     body=
- for testing nested structs
-+doc symbol=UserDefOneMore expr=('struct', 'UserDefOneMore')
-+    body=
-+for testing nested structs
- doc symbol=EnumOne expr=('enum', 'EnumOne')
- doc symbol=UserDefZero expr=('struct', 'UserDefZero')
- doc symbol=UserDefTwoDictDict expr=('struct', 'UserDefTwoDictDict')
+ static void x86_cpu_get_crash_info_qom(Object *obj, Visitor *v,
+                                        const char *name, void *opaque,
+                                        Error **errp)
+@@ -3731,7 +3732,6 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
+     cc->do_interrupt = x86_cpu_do_interrupt;
+     cc->cpu_exec_interrupt = x86_cpu_exec_interrupt;
+     cc->dump_state = x86_cpu_dump_state;
+-    cc->get_crash_info = x86_cpu_get_crash_info;
+     cc->set_pc = x86_cpu_set_pc;
+     cc->synchronize_from_tb = x86_cpu_synchronize_from_tb;
+     cc->gdb_read_register = x86_cpu_gdb_read_register;
 -- 
 2.9.3
