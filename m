@@ -1,49 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jl4312@columbia.edu>) id 1cgVK5-0007ao-Ll
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:43:07 -0500
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cgVMK-0000N7-21
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:45:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jl4312@columbia.edu>) id 1cgVK0-0002hJ-Ls
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:43:05 -0500
-Received: from outprodmail02.cc.columbia.edu ([128.59.72.51]:50825)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jl4312@columbia.edu>) id 1cgVK0-0002cr-G2
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:43:00 -0500
-Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
-	by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
-	v1MBg7Ah018413
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 06:42:54 -0500
-Received: from hazelnut (localhost.localdomain [127.0.0.1])
-	by hazelnut (Postfix) with ESMTP id EB6CE81
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 06:42:53 -0500 (EST)
-Received: from sendprodmail01.cc.columbia.edu (sendprodmail01.cc.columbia.edu
-	[128.59.72.13]) by hazelnut (Postfix) with ESMTP id D5E1481
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 06:42:53 -0500 (EST)
-Received: from mail-vk0-f70.google.com (mail-vk0-f70.google.com
-	[209.85.213.70])
-	by sendprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
-	v1MBgrmB062579
-	(version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 06:42:53 -0500
-Received: by mail-vk0-f70.google.com with SMTP id x75so4314637vke.5
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 03:42:53 -0800 (PST)
-Received: from mail-ua0-f182.google.com (mail-ua0-f182.google.com.
-	[209.85.217.182])
-	by smtp.gmail.com with ESMTPSA id i62sm200170uai.22.2017.02.22.03.42.52
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 22 Feb 2017 03:42:52 -0800 (PST)
-Received: by mail-ua0-f182.google.com with SMTP id g30so3132740uac.3
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 03:42:52 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <1487742565-2513-1-git-send-email-peterx@redhat.com>
-References: <1487742565-2513-1-git-send-email-peterx@redhat.com>
-From: Jintack Lim <jintack@cs.columbia.edu>
-Date: Wed, 22 Feb 2017 06:42:51 -0500
-Message-ID: <CAHyh4xjJ+U8XGAHP4TqzZJqmrZBeeHGA3_Kmg5YrMdy3VbCLJQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] intel_iommu: make sure its init before PCI
- dev
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cgVMF-0003ag-Qo
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:45:24 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51142
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1cgVMF-0003aS-KR
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 06:45:19 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1MBi364095008
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 06:45:18 -0500
+Received: from e28smtp04.in.ibm.com (e28smtp04.in.ibm.com [125.16.236.4])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28s9xg88ff-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 06:45:18 -0500
+Received: from localhost
+	by e28smtp04.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Wed, 22 Feb 2017 17:15:15 +0530
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Date: Wed, 22 Feb 2017 17:14:34 +0530
+In-Reply-To: <1487763883-4877-1-git-send-email-nikunj@linux.vnet.ibm.com>
+References: <1487763883-4877-1-git-send-email-nikunj@linux.vnet.ibm.com>
+Message-Id: <1487763883-4877-2-git-send-email-nikunj@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 01/10] target/ppc: move cpu_[read,
+ write]_xer to cpu.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -52,123 +39,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, yi.l.liu@intel.com, "\\ Michael S . Tsirkin \\" <mst@redhat.com>
+To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
+Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
 
-On Wed, Feb 22, 2017 at 12:49 AM, Peter Xu <peterx@redhat.com> wrote:
+Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+---
+ target/ppc/Makefile.objs |  1 +
+ target/ppc/cpu.c         | 36 ++++++++++++++++++++++++++++++++++++
+ target/ppc/cpu.h         | 14 ++------------
+ 3 files changed, 39 insertions(+), 12 deletions(-)
+ create mode 100644 target/ppc/cpu.c
 
-> Intel vIOMMU devices are created with "-device" parameter, while here
-> actually we need to make sure this device will be created before some
-> other PCI devices (like vfio-pci devices) so that we know iommu_fn will
-> be setup correctly before realizations of those PCI devices.
->
-> Here we do explicit check to make sure intel-iommu device will be inited
-> before all the rest of the PCI devices. This is done by checking against
-> the devices dangled under current root PCIe bus and we should see
-> nothing there besides integrated ICH9 ones.
->
-> If the user violated this rule, we abort the program.
->
-
-Hi Peter,
-
-After applying this patch, qemu gave the following error and was
-terminated, but I believe I passed parameters in a right order?
-
-[kvm-node ~]$sudo qemu-system-x86_64 \
-> -device intel-iommu,intremap=on,eim=off,caching-mode=on \
-> -M q35,accel=kvm,kernel-irqchip=split \
-> -m 12G \
-> -drive file=/mydata/guest0.img,format=raw --nographic -cpu host \
-> -smp 4,sockets=4,cores=1,threads=1 \
-> -device vfio-pci,host=08:00.0
-qemu-system-x86_64: -device
-intel-iommu,intremap=on,eim=off,caching-mode=on: Please init intel-iommu
-before other PCI devices
-
- Thanks,
-Jintack
-
-
-> Maybe one day we will be able to manage the ordering of device
-> initialization, and then we can grant VT-d devices a higher init
-> priority. But before that, let's have this explicit check to make sure
-> of it.
->
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  hw/i386/intel_iommu.c | 40 ++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 40 insertions(+)
->
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 22d8226..db74124 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -31,6 +31,7 @@
->  #include "hw/i386/apic-msidef.h"
->  #include "hw/boards.h"
->  #include "hw/i386/x86-iommu.h"
-> +#include "hw/i386/ich9.h"
->  #include "hw/pci-host/q35.h"
->  #include "sysemu/kvm.h"
->  #include "hw/i386/apic_internal.h"
-> @@ -2560,6 +2561,41 @@ static bool vtd_decide_config(IntelIOMMUState *s,
-> Error **errp)
->      return true;
->  }
->
-> +static bool vtd_has_inited_pci_devices(PCIBus *bus, Error **errp)
-> +{
-> +    int i;
-> +    uint8_t func;
-> +
-> +    /* We check against root bus */
-> +    assert(bus && pci_bus_is_root(bus));
-> +
-> +    /*
-> +     * We need to make sure vIOMMU device is created before other PCI
-> +     * devices other than the integrated ICH9 ones, so that they can
-> +     * get correct iommu_fn setup even during its realize(). Some
-> +     * devices (e.g., vfio-pci) will need a correct iommu_fn to work.
-> +     */
-> +    for (i = 1; i < PCI_FUNC_MAX * PCI_SLOT_MAX; i++) {
-> +        /* Skip the checking against ICH9 integrated devices */
-> +        if (PCI_SLOT(i) == ICH9_LPC_DEV) {
-> +            func = PCI_FUNC(i);
-> +            if (func == ICH9_LPC_FUNC ||
-> +                func == ICH9_SATA1_FUNC ||
-> +                func == ICH9_SMB_FUNC) {
-> +                continue;
-> +            }
-> +        }
-> +
-> +        if (bus->devices[i]) {
-> +            error_setg(errp, "Please init intel-iommu before "
-> +                       "other PCI devices");
-> +            return true;
-> +        }
-> +    }
-> +
-> +    return false;
-> +}
-> +
->  static void vtd_realize(DeviceState *dev, Error **errp)
->  {
->      PCMachineState *pcms = PC_MACHINE(qdev_get_machine());
-> @@ -2567,6 +2603,10 @@ static void vtd_realize(DeviceState *dev, Error
-> **errp)
->      IntelIOMMUState *s = INTEL_IOMMU_DEVICE(dev);
->      X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(dev);
->
-> +    if (vtd_has_inited_pci_devices(bus, errp)) {
-> +        return;
-> +    }
-> +
->      VTD_DPRINTF(GENERAL, "");
->      x86_iommu->type = TYPE_INTEL;
->
-> --
-> 2.7.4
->
->
->
+diff --git a/target/ppc/Makefile.objs b/target/ppc/Makefile.objs
+index a8c7a30..4f4168f 100644
+--- a/target/ppc/Makefile.objs
++++ b/target/ppc/Makefile.objs
+@@ -1,4 +1,5 @@
+ obj-y += cpu-models.o
++obj-y += cpu.o
+ obj-y += translate.o
+ ifeq ($(CONFIG_SOFTMMU),y)
+ obj-y += machine.o mmu_helper.o mmu-hash32.o monitor.o
+diff --git a/target/ppc/cpu.c b/target/ppc/cpu.c
+new file mode 100644
+index 0000000..de3004b
+--- /dev/null
++++ b/target/ppc/cpu.c
+@@ -0,0 +1,36 @@
++/*
++ *  PowerPC CPU routines for qemu.
++ *
++ * Copyright (c) 2017 Nikunj A Dadhania, IBM Corporation.
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "cpu.h"
++#include "cpu-models.h"
++
++target_ulong cpu_read_xer(CPUPPCState *env)
++{
++    return env->xer | (env->so << XER_SO) | (env->ov << XER_OV) |
++        (env->ca << XER_CA);
++}
++
++void cpu_write_xer(CPUPPCState *env, target_ulong xer)
++{
++    env->so = (xer >> XER_SO) & 1;
++    env->ov = (xer >> XER_OV) & 1;
++    env->ca = (xer >> XER_CA) & 1;
++    env->xer = xer & ~((1u << XER_SO) | (1u << XER_OV) | (1u << XER_CA));
++}
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 425e79d..b559b67 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -2343,18 +2343,8 @@ enum {
+ 
+ /*****************************************************************************/
+ 
+-static inline target_ulong cpu_read_xer(CPUPPCState *env)
+-{
+-    return env->xer | (env->so << XER_SO) | (env->ov << XER_OV) | (env->ca << XER_CA);
+-}
+-
+-static inline void cpu_write_xer(CPUPPCState *env, target_ulong xer)
+-{
+-    env->so = (xer >> XER_SO) & 1;
+-    env->ov = (xer >> XER_OV) & 1;
+-    env->ca = (xer >> XER_CA) & 1;
+-    env->xer = xer & ~((1u << XER_SO) | (1u << XER_OV) | (1u << XER_CA));
+-}
++target_ulong cpu_read_xer(CPUPPCState *env);
++void cpu_write_xer(CPUPPCState *env, target_ulong xer);
+ 
+ static inline void cpu_get_tb_cpu_state(CPUPPCState *env, target_ulong *pc,
+                                         target_ulong *cs_base, uint32_t *flags)
+-- 
+2.7.4
