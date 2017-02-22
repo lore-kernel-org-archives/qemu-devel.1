@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52468)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cgRlD-00072c-Aa
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 02:54:52 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1cgRok-0001Uh-PY
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 02:58:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cgRl9-0005wM-3S
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 02:54:51 -0500
-Received: from [59.151.112.132] (port=52712 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cgRl8-0005vs-3w
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 02:54:47 -0500
-References: <1486531462-13882-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1486531462-13882-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<8760k3zteg.fsf@dusky.pond.sub.org>
-	<3f2d885b-f4c3-e26c-348b-b3996ad5410e@cn.fujitsu.com>
-	<87fuj7r61e.fsf@dusky.pond.sub.org>
-	<f72d07f6-e00d-8a9c-0e15-e2bab5b83ee2@redhat.com>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <868d3cc4-8788-8731-ea7a-4e1336863f45@cn.fujitsu.com>
-Date: Wed, 22 Feb 2017 15:54:00 +0800
+	(envelope-from <eric.auger@redhat.com>) id 1cgRog-0006qO-0K
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 02:58:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59256)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1cgRof-0006qD-Qa
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 02:58:25 -0500
+References: <20170222021801.28658-1-famz@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <3c05ba9c-a83b-ddfb-cc13-627dcd9b9e56@redhat.com>
+Date: Wed, 22 Feb 2017 08:58:21 +0100
 MIME-Version: 1.0
-In-Reply-To: <f72d07f6-e00d-8a9c-0e15-e2bab5b83ee2@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20170222021801.28658-1-famz@redhat.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V7 2/2] Add a new qmp command to do
- checkpoint, query xen replication status
+Subject: Re: [Qemu-devel] [PATCH] docker: Install python2 explicitly in
+ docker image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,128 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: zhangchen.fnst@cn.fujitsu.com, Li Zhijian <lizhijian@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>, "eddie . dong" <eddie.dong@intel.com>, qemu devel <qemu-devel@nongnu.org>, Wen Congyang <wencongyang@gmail.com>, bian naimeng <biannm@cn.fujitsu.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
+Hi Fam,
 
+On 22/02/2017 03:18, Fam Zheng wrote:
+> Python is no longer installed implicitly, but the QEMU build system
+> requires it. List it in PACKAGES.
+> 
+> Reported-by: Auger Eric <eric.auger@redhat.com>
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+Tested-by: Eric Auger <eric.auger@redhat.com>
 
-On 02/22/2017 12:20 AM, Eric Blake wrote:
-> On 02/21/2017 08:07 AM, Markus Armbruster wrote:
->> Zhang Chen <zhangchen.fnst@cn.fujitsu.com> writes:
->>
->>> On 02/21/2017 07:15 PM, Markus Armbruster wrote:
->>>> Zhang Chen <zhangchen.fnst@cn.fujitsu.com> writes:
->>>>
->>>>> We can call this qmp command to do checkpoint outside of qemu.
->>>>> Xen colo will need this function.
->>>> I know nothing about "Xen colo", but I'll try anyway.
->>>>
->>>> I *guess* "Xen colo" is a long-running activity, and the new commands
->>>> interact with it.  Correct?
->>> Yes, you are right.
->> We need to build a generic framework for interacting with long-running
->> activities.  But asking you to wait for it wouldn't be fair.
->>
->>> By the way this patch has been reviewed by Eric black.
->>>
->>> https://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg03435.html
-> Blake, but you're not the first to mis-type it.
+Thanks!
 
-I'm very sorry about this typo. =_=!.
+Eric
 
->
->>>>> +{
->>>>> +    Error *err = NULL;
->>>>> +    ReplicationResult *result = g_new0(ReplicationResult, 1);
->>>>> +    replication_get_error_all(&err);
->>>>> +    result->status = err ?
->>>>> +                     REPLICATION_STATUS_ERROR :
->>>>> +                     REPLICATION_STATUS_NORMAL;
->>>> Reports only that there is an error, throws away the actual error
->>>> message.  Naive question: could the error message be good to know for
->>>> the QMP user?
->>> Yes, Xen colo will handle it.
->> Is that "yes, the QMP user could use the error message, but we're not
->> giving it to him regardless", or "no, the QMP user does not need to
->> know, and that's because we don't give it to him"?
->>
->> Even if we want QMP clients to treat all errors the same, transmitting
->> the error message can still be useful for troubleshooting.
-> Ah, as in:
->
-> if (err) {
->    result->status = REPLICATION_STATUS_ERROR;
->    result->has_desc = true;
->    result->desc = ...extract string from err
-> } else {
->    result->status = REPLICATION_STATUS_NORMAL;
-> }
->
-> by modifying the JSON [1]
-
-I got your point, but I don't understand this:
-
-result->desc = ...extract string from err
-
-Where we can get the string from err?
-Can you give me a example?
-
-
-
->
->>>>> +##
->>>>> +{ 'enum': 'ReplicationStatus',
->>>>> +  'data': [ 'error', 'normal' ] }
->>>> Do you expect more status values in the future?
->>>>
->>>> If yes, what should clients do when they see a status value they don't
->>>> know?
->>> We will add other status for it, now, that's enough.
->> What should a QMP client do when it sees a ReplicationStatus value other
->> than 'error' and 'normal'?
->>
->> You need to provide some guidance, or else you won't be able to add
->> status values without breaking clients!
->>
->>>> If no, why not simply use bool?
-> Off-hand, what other states do you envision adding?
-
-OK, I will change it to bool in next version.
-
->
->>>>> +
->>>>> +##
->>>>> +# @ReplicationResult:
->>>>> +#
->>>>> +# The result format for 'query-xen-replication-status'.
->>>>> +#
->>>>> +# @status: enum of @ReplicationStatus, which shows current
->>>>> +#          replication error status
->>>>> +#
->>>>> +# Since: 2.9
->>>>> +##
->>>>> +{ 'struct': 'ReplicationResult',
->>>>> +  'data': { 'status': 'ReplicationStatus'} }
-> [1] the modification would be:
->
-> 'data': { 'status': 'ReplicationStatus', '*desc': 'str' }
->
-> with documentation that @desc is #optional, is only for human
-> consumption, and is only present when @status indicates an error.
-
-I don't know how to get the 'desc'.
-Please tell me.
-
-Thanks
-Zhang Chen
-
->
-
-
-
-
-
-
--- 
-Thanks
-Zhang Chen
+> ---
+>  tests/docker/dockerfiles/fedora.docker | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
+> index 478163b..c4f80ad 100644
+> --- a/tests/docker/dockerfiles/fedora.docker
+> +++ b/tests/docker/dockerfiles/fedora.docker
+> @@ -1,6 +1,6 @@
+>  FROM fedora:latest
+>  ENV PACKAGES \
+> -    ccache git tar PyYAML sparse flex bison \
+> +    ccache git tar PyYAML sparse flex bison python2 \
+>      glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
+>      gcc gcc-c++ clang make perl which bc findutils \
+>      mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg-config \
+> 
