@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cgaTq-0006hT-6c
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:13:32 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cgaTu-0006lJ-7f
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:13:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cgaTo-0000XE-W6
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:13:30 -0500
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:33217)
+	(envelope-from <alex.bennee@linaro.org>) id 1cgaTt-0000Yr-FG
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:13:34 -0500
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:37100)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cgaTo-0000Ws-MC
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:13:28 -0500
-Received: by mail-wm0-x230.google.com with SMTP id t18so36486786wmt.0
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 09:13:28 -0800 (PST)
+	id 1cgaTt-0000Ya-9q
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 12:13:33 -0500
+Received: by mail-wm0-x22b.google.com with SMTP id v77so6904407wmv.0
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 09:13:33 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed, 22 Feb 2017 17:13:12 +0000
-Message-Id: <20170222171327.26624-10-alex.bennee@linaro.org>
+Date: Wed, 22 Feb 2017 17:13:17 +0000
+Message-Id: <20170222171327.26624-15-alex.bennee@linaro.org>
 In-Reply-To: <20170222171327.26624-1-alex.bennee@linaro.org>
 References: <20170222171327.26624-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v13 09/24] tcg: remove global exit_request
+Subject: [Qemu-devel] [PATCH v13 14/24] cputlb: tweak
+ qemu_ram_addr_from_host_nofail reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,162 +33,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: rth@twiddle.net, peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-There are now only two uses of the global exit_request left.
-
-The first ensures we exit the run_loop when we first start to process
-pending work and in the kick handler. This is just as easily done by
-setting the first_cpu->exit_request flag.
-
-The second use is in the round robin kick routine. The global
-exit_request ensured every vCPU would set its local exit_request and
-cause a full exit of the loop. Now the iothread isn't being held while
-running we can just rely on the kick handler to push us out as intended.
-
-We lightly re-factor the main vCPU thread to ensure cpu->exit_requests
-cause us to exit the main loop and process any IO requests that might
-come along. As an cpu->exit_request may legitimately get squashed
-while processing the EXCP_INTERRUPT exception we also check
-cpu->queued_work_first to ensure queued work is expedited as soon as
-possible.
+This moves the helper function closer to where it is called and updates
+the error message to report via error_report instead of the deprecated
+fprintf.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
-v13
-  - also check cpu->queued_work_first in main loop.
-v5
-  - minor merge conflict with kick patch
-v4
-  - moved to after iothread unlocking patch
-  - needed to remove kick exit_request as well.
-  - remove extraneous cpu->exit_request check
-  - remove stray exit_request setting
-  - remove needless atomic operation
----
- cpu-exec-common.c       |  2 --
- cpu-exec.c              | 20 +++++++-------------
- cpus.c                  | 19 +++++++++++--------
- include/exec/exec-all.h |  3 ---
- 4 files changed, 18 insertions(+), 26 deletions(-)
+ cputlb.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/cpu-exec-common.c b/cpu-exec-common.c
-index e2bc053372..0504a9457b 100644
---- a/cpu-exec-common.c
-+++ b/cpu-exec-common.c
-@@ -23,8 +23,6 @@
- #include "exec/exec-all.h"
- #include "exec/memory-internal.h"
+diff --git a/cputlb.c b/cputlb.c
+index af0e65cd2c..94fa9977c5 100644
+--- a/cputlb.c
++++ b/cputlb.c
+@@ -246,18 +246,6 @@ void tlb_reset_dirty_range(CPUTLBEntry *tlb_entry, uintptr_t start,
+     }
+ }
  
--bool exit_request;
+-static inline ram_addr_t qemu_ram_addr_from_host_nofail(void *ptr)
+-{
+-    ram_addr_t ram_addr;
 -
- /* exit the current TB, but without causing any exception to be raised */
- void cpu_loop_exit_noexc(CPUState *cpu)
- {
-diff --git a/cpu-exec.c b/cpu-exec.c
-index 1d43fc1b2d..64367216e6 100644
---- a/cpu-exec.c
-+++ b/cpu-exec.c
-@@ -564,15 +564,13 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
-     *tb_exit = ret & TB_EXIT_MASK;
-     switch (*tb_exit) {
-     case TB_EXIT_REQUESTED:
--        /* Something asked us to stop executing
--         * chained TBs; just continue round the main
--         * loop. Whatever requested the exit will also
--         * have set something else (eg exit_request or
--         * interrupt_request) which we will handle
--         * next time around the loop.  But we need to
--         * ensure the zeroing of tcg_exit_req (see cpu_tb_exec)
--         * comes before the next read of cpu->exit_request
--         * or cpu->interrupt_request.
-+        /* Something asked us to stop executing chained TBs; just
-+         * continue round the main loop. Whatever requested the exit
-+         * will also have set something else (eg interrupt_request)
-+         * which we will handle next time around the loop.  But we
-+         * need to ensure the tcg_exit_req read in generated code
-+         * comes before the next read of cpu->exit_request or
-+         * cpu->interrupt_request.
-          */
-         smp_mb();
-         *last_tb = NULL;
-@@ -626,10 +624,6 @@ int cpu_exec(CPUState *cpu)
- 
-     rcu_read_lock();
- 
--    if (unlikely(atomic_mb_read(&exit_request))) {
--        cpu->exit_request = 1;
+-    ram_addr = qemu_ram_addr_from_host(ptr);
+-    if (ram_addr == RAM_ADDR_INVALID) {
+-        fprintf(stderr, "Bad ram pointer %p\n", ptr);
+-        abort();
 -    }
+-    return ram_addr;
+-}
 -
-     cc->cpu_exec_enter(cpu);
- 
-     /* Calculate difference between guest clock and host clock.
-diff --git a/cpus.c b/cpus.c
-index c879b34a92..9e1e13c2f0 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -793,7 +793,6 @@ static inline int64_t qemu_tcg_next_kick(void)
- static void qemu_cpu_kick_rr_cpu(void)
+ void tlb_reset_dirty(CPUState *cpu, ram_addr_t start1, ram_addr_t length)
  {
-     CPUState *cpu;
--    atomic_mb_set(&exit_request, 1);
-     do {
-         cpu = atomic_mb_read(&tcg_current_rr_cpu);
-         if (cpu) {
-@@ -1316,11 +1315,11 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+     CPUArchState *env;
+@@ -469,6 +457,18 @@ static void report_bad_exec(CPUState *cpu, target_ulong addr)
+     log_cpu_state_mask(LOG_GUEST_ERROR, cpu, CPU_DUMP_FPU | CPU_DUMP_CCOP);
+ }
  
-     start_tcg_kick_timer();
- 
--    /* process any pending work */
--    atomic_mb_set(&exit_request, 1);
--
-     cpu = first_cpu;
- 
-+    /* process any pending work */
-+    cpu->exit_request = 1;
++static inline ram_addr_t qemu_ram_addr_from_host_nofail(void *ptr)
++{
++    ram_addr_t ram_addr;
 +
-     while (1) {
-         /* Account partial waits to QEMU_CLOCK_VIRTUAL.  */
-         qemu_account_warp_timer();
-@@ -1329,7 +1328,8 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
-             cpu = first_cpu;
-         }
- 
--        for (; cpu != NULL && !exit_request; cpu = CPU_NEXT(cpu)) {
-+        while (cpu && !cpu->queued_work_first && !cpu->exit_request) {
++    ram_addr = qemu_ram_addr_from_host(ptr);
++    if (ram_addr == RAM_ADDR_INVALID) {
++        error_report("Bad ram pointer %p", ptr);
++        abort();
++    }
++    return ram_addr;
++}
 +
-             atomic_mb_set(&tcg_current_rr_cpu, cpu);
- 
-             qemu_clock_enable(QEMU_CLOCK_VIRTUAL,
-@@ -1349,12 +1349,15 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
-                 break;
-             }
- 
--        } /* for cpu.. */
-+            cpu = CPU_NEXT(cpu);
-+        } /* while (cpu && !cpu->exit_request).. */
-+
-         /* Does not need atomic_mb_set because a spurious wakeup is okay.  */
-         atomic_set(&tcg_current_rr_cpu, NULL);
- 
--        /* Pairs with smp_wmb in qemu_cpu_kick.  */
--        atomic_mb_set(&exit_request, 0);
-+        if (cpu && cpu->exit_request) {
-+            atomic_mb_set(&cpu->exit_request, 0);
-+        }
- 
-         handle_icount_deadline();
- 
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 4e34fc4cc1..82f0e12327 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -404,7 +404,4 @@ bool memory_region_is_unassigned(MemoryRegion *mr);
- /* vl.c */
- extern int singlestep;
- 
--/* cpu-exec.c, accessed with atomic_mb_read/atomic_mb_set */
--extern bool exit_request;
--
- #endif
+ /* NOTE: this function can trigger an exception */
+ /* NOTE2: the returned address is not exactly the physical address: it
+  * is actually a ram_addr_t (in system mode; the user mode emulation
 -- 
 2.11.0
