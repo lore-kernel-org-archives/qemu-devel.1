@@ -1,35 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cgVpm-0006hz-JA
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 07:15:53 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cgVso-0001ac-Ng
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 07:18:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cgVpj-0003j8-9K
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 07:15:50 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51586
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cgVpj-0003it-0O
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 07:15:47 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1MC9gmu032079
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 07:15:46 -0500
-Received: from e06smtp08.uk.ibm.com (e06smtp08.uk.ibm.com [195.75.94.104])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28s6qehqks-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 07:15:46 -0500
-Received: from localhost
-	by e06smtp08.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Wed, 22 Feb 2017 12:15:44 -0000
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-Date: Wed, 22 Feb 2017 13:15:24 +0100
-In-Reply-To: <20170222121527.7009-1-cornelia.huck@de.ibm.com>
-References: <20170222121527.7009-1-cornelia.huck@de.ibm.com>
-Message-Id: <20170222121527.7009-6-cornelia.huck@de.ibm.com>
-Subject: [Qemu-devel] [PATCH 5/8] s390x/3270: 3270 data stream handling
+	(envelope-from <kwolf@redhat.com>) id 1cgVsn-0004uf-Ni
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 07:18:58 -0500
+Date: Wed, 22 Feb 2017 13:18:49 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170222121849.GI4112@noname.str.redhat.com>
+References: <20170220151921.22842-1-berrange@redhat.com>
+	<20170220151921.22842-5-berrange@redhat.com>
+	<20170222112036.GH4112@noname.str.redhat.com>
+	<20170222113321.GK28937@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170222113321.GK28937@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 4/4] qemu-img: copy *key-secret opts
+ when opening newly created files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,373 +26,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, Jing Liu <liujbjl@linux.vnet.ibm.com>, Yang Chen <bjcyang@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>
 
-From: Jing Liu <liujbjl@linux.vnet.ibm.com>
+Am 22.02.2017 um 12:33 hat Daniel P. Berrange geschrieben:
+> On Wed, Feb 22, 2017 at 12:20:36PM +0100, Kevin Wolf wrote:
+> > Am 20.02.2017 um 16:19 hat Daniel P. Berrange geschrieben:
+> > > The qemu-img dd/convert commands will create a image file and
+> > > then try to open it. Historically it has been possible to open
+> > > new files without passing any options. With encrypted files
+> > > though, the *key-secret options are mandatory, so we need to
+> > > provide those options when opening the newly created file.
+> > > 
+> > > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> > > ---
+> > >  qemu-img.c | 44 ++++++++++++++++++++++++++++++++++++++++++--
+> > >  1 file changed, 42 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/qemu-img.c b/qemu-img.c
+> > > index e48e676..bad19fd 100644
+> > > --- a/qemu-img.c
+> > > +++ b/qemu-img.c
+> > > @@ -317,6 +317,46 @@ static BlockBackend *img_open_file(const char *filename,
+> > >  }
+> > >  
+> > >  
+> > > +static int img_add_key_secrets(void *opaque,
+> > > +                               const char *name, const char *value,
+> > > +                               Error **errp)
+> > > +{
+> > > +    QDict *options = opaque;
+> > > +
+> > > +    if (g_str_has_suffix(name, "key-secret")) {
+> > > +        qdict_put(options, name, qstring_from_str(value));
+> > > +    }
+> > > +
+> > > +    return 0;
+> > > +}
+> > > +
+> > > +static BlockBackend *img_open_new_file(const char *filename,
+> > > +                                       QemuOpts *create_opts,
+> > > +                                       const char *fmt, int flags,
+> > > +                                       bool writethrough, bool quiet)
+> > > +{
+> > > +    BlockBackend *blk;
+> > > +    Error *local_err = NULL;
+> > > +    QDict *options = NULL;
+> > > +
+> > > +    options = qdict_new();
+> > > +    if (fmt) {
+> > > +        qdict_put(options, "driver", qstring_from_str(fmt));
+> > > +    }
+> > > +
+> > > +    qemu_opt_foreach(create_opts, img_add_key_secrets, options, NULL);
+> > > +
+> > > +    blk = blk_new_open(filename, NULL, options, flags, &local_err);
+> > > +    if (!blk) {
+> > > +        error_reportf_err(local_err, "Could not open '%s': ", filename);
+> > > +        return NULL;
+> > > +    }
+> > > +    blk_set_enable_write_cache(blk, !writethrough);
+> > > +
+> > > +    return blk;
+> > > +}
+> > 
+> > Why not make this a small wrapper around img_open_file(), which does
+> > almost the same except that it can ask for a password? Leaving out the
+> > img_open_password() call means that simple '-o encryption=on' breaks,
+> > so it's a bug anyway:
+> > 
+> > $ ./qemu-img convert -O qcow2 -o encryption ~/images/hd.img /tmp/crypt.qcow2
+> > qemu-img: block/qcow2.c:1613: qcow2_co_pwritev: Assertion `s->cipher' failed.
+> 
+> I had written this after my conversion of qcow2 to use secrets, but I
+> presume you just tested this series in isolation. If this series merges
+> before my qcow2+luks series, then yeah, we'd need to handle the scearnio
+> you describe.
 
-This introduces the input and output handlers for 3270 device, setting
-up the data tunnel among guest kernel, qemu and the 3270 client.
+I see. Your commit message doesn't make clear that it depends on the
+qcow2 series, so I was thinking that this could go into 2.9 even if the
+qcow2 series might not make it (I think it touches the I/O path, so I'm
+a bit more cautious there so short before the freeze).
 
-After the client connected and TN3270 handshake done, signal the not-ready
-to ready status by an unsolicited device-end interrupt, and then the 3270
-data stream could be handled correctly between the channel and socket.
-Multiple commands generated by "Reset" key on x3270 are not supported now,
-just simply terminate the connection.
+Anyway, doesn't the wrapper instead of duplicating code make sense
+anyway, even if the duplication didn't result in a bug?
 
-Signed-off-by: Jing Liu <liujbjl@linux.vnet.ibm.com>
-Signed-off-by: Yang Chen <bjcyang@linux.vnet.ibm.com>
-Reviewed-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
----
- hw/char/terminal3270.c      | 180 ++++++++++++++++++++++++++++++++++++++++++++
- hw/s390x/3270-ccw.c         |  75 ++++++++++++++++++
- hw/s390x/css.c              |   3 +
- include/hw/s390x/3270-ccw.h |   9 +++
- 4 files changed, 267 insertions(+)
-
-diff --git a/hw/char/terminal3270.c b/hw/char/terminal3270.c
-index bef3812c18..55eed5622a 100644
---- a/hw/char/terminal3270.c
-+++ b/hw/char/terminal3270.c
-@@ -12,16 +12,114 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "sysemu/char.h"
- #include "hw/s390x/3270-ccw.h"
- 
-+/* Enough spaces for different window sizes. */
-+#define INPUT_BUFFER_SIZE  1000
-+/*
-+ * 1 for header, 1024*2 for datastream, 2 for tail
-+ * Reserve enough spaces for telnet IAC escape.
-+ */
-+#define OUTPUT_BUFFER_SIZE 2051
-+
- typedef struct Terminal3270 {
-     EmulatedCcw3270Device cdev;
-+    CharBackend chr;
-+    uint8_t inv[INPUT_BUFFER_SIZE];
-+    uint8_t outv[OUTPUT_BUFFER_SIZE];
-+    int in_len;
-+    int out_len;
-+    bool handshake_done;
- } Terminal3270;
- 
- #define TYPE_TERMINAL_3270 "x-terminal3270"
-+#define TERMINAL_3270(obj) \
-+        OBJECT_CHECK(Terminal3270, (obj), TYPE_TERMINAL_3270)
-+
-+static int terminal_can_read(void *opaque)
-+{
-+    Terminal3270 *t = opaque;
-+
-+    return INPUT_BUFFER_SIZE - t->in_len;
-+}
-+
-+/*
-+ * Protocol handshake done,
-+ * signal guest by an unsolicited DE irq.
-+ */
-+static void TN3270_handshake_done(Terminal3270 *t)
-+{
-+    CcwDevice *ccw_dev = CCW_DEVICE(t);
-+    SubchDev *sch = ccw_dev->sch;
-+
-+    t->handshake_done = true;
-+    sch->curr_status.scsw.dstat = SCSW_DSTAT_DEVICE_END;
-+    css_conditional_io_interrupt(sch);
-+}
-+
-+/*
-+ * Receive inbound data from socket.
-+ * For data given to guest, drop the data boundary IAC, IAC_EOR.
-+ * TODO:
-+ * Using "Reset" key on x3270 may result multiple commands in one packet.
-+ * This usually happens when the user meets a poor traffic of the network.
-+ * As of now, for such case, we simply terminate the connection,
-+ * and we should come back here later with a better solution.
-+ */
-+static void terminal_read(void *opaque, const uint8_t *buf, int size)
-+{
-+    Terminal3270 *t = opaque;
-+    CcwDevice *ccw_dev = CCW_DEVICE(t);
-+    SubchDev *sch = ccw_dev->sch;
-+    int end;
-+
-+    assert(size <= (INPUT_BUFFER_SIZE - t->in_len));
-+
-+    memcpy(&t->inv[t->in_len], buf, size);
-+    t->in_len += size;
-+    if (t->in_len < 2) {
-+        return;
-+    }
-+
-+    if (!t->handshake_done) {
-+        /*
-+         * Receiving Terminal Type is the last step of handshake.
-+         * The data format: IAC SB Terminal-Type IS <terminal type> IAC SE
-+         * The code for Terminal-Type is 0x18, for IS is 0.
-+         * Simply check the data format and mark handshake_done.
-+         */
-+        if (t->in_len > 6 && t->inv[2] == 0x18 && t->inv[3] == 0x0 &&
-+            t->inv[t->in_len - 2] == IAC && t->inv[t->in_len - 1] == IAC_SE) {
-+            TN3270_handshake_done(t);
-+            t->in_len = 0;
-+        }
-+        return;
-+    }
-+
-+    for (end = 0; end < t->in_len - 1; end++) {
-+        if (t->inv[end] == IAC && t->inv[end + 1] == IAC_EOR) {
-+            break;
-+        }
-+    }
-+    if (end == t->in_len - 2) {
-+        /* Data is valid for consuming. */
-+        t->in_len -= 2;
-+        sch->curr_status.scsw.dstat = SCSW_DSTAT_ATTENTION;
-+        css_conditional_io_interrupt(sch);
-+    } else if (end < t->in_len - 2) {
-+        /* "Reset" key is used. */
-+        qemu_chr_fe_disconnect(&t->chr);
-+    } else {
-+        /* Gathering data. */
-+        return;
-+    }
-+}
- 
- static void terminal_init(EmulatedCcw3270Device *dev, Error **errp)
- {
-+    Terminal3270 *t = TERMINAL_3270(dev);
-     static bool terminal_available;
- 
-     if (terminal_available) {
-@@ -29,13 +127,95 @@ static void terminal_init(EmulatedCcw3270Device *dev, Error **errp)
-         return;
-     }
-     terminal_available = true;
-+    qemu_chr_fe_set_handlers(&t->chr, terminal_can_read,
-+                             terminal_read, NULL, t, NULL, true);
-+}
-+
-+static int read_payload_3270(EmulatedCcw3270Device *dev, uint32_t cda,
-+                             uint16_t count)
-+{
-+    Terminal3270 *t = TERMINAL_3270(dev);
-+    int len;
-+
-+    len = MIN(count, t->in_len);
-+    cpu_physical_memory_write(cda, t->inv, len);
-+    t->in_len -= len;
-+
-+    return len;
-+}
-+
-+/* TN3270 uses binary transmission, which needs escape IAC to IAC IAC */
-+static int insert_IAC_escape_char(uint8_t *outv, int out_len)
-+{
-+    int IAC_num = 0, new_out_len, i, j;
-+
-+    for (i = 0; i < out_len; i++) {
-+        if (outv[i] == IAC) {
-+            IAC_num++;
-+        }
-+    }
-+    if (IAC_num == 0) {
-+        return out_len;
-+    }
-+    new_out_len = out_len + IAC_num;
-+    for (i = out_len - 1, j = new_out_len - 1; j > i && i >= 0; i--, j--) {
-+        outv[j] = outv[i];
-+        if (outv[i] == IAC) {
-+            outv[--j] = IAC;
-+        }
-+    }
-+    return new_out_len;
- }
- 
-+/*
-+ * Write 3270 outbound to socket.
-+ * Return the count of 3270 data field if succeeded, zero if failed.
-+ */
-+static int write_payload_3270(EmulatedCcw3270Device *dev, uint8_t cmd,
-+                              uint32_t cda, uint16_t count)
-+{
-+    Terminal3270 *t = TERMINAL_3270(dev);
-+    int retval = 0;
-+
-+    assert(count <= (OUTPUT_BUFFER_SIZE - 3) / 2);
-+
-+    if (!t->handshake_done) {
-+        /*
-+         * Before having finished 3270 negotiation,
-+         * sending outbound data is prohibited.
-+         */
-+        return 0;
-+    }
-+    if (!qemu_chr_fe_get_driver(&t->chr)) {
-+        /* We just say we consumed all data if there's no backend. */
-+        return count;
-+    }
-+    t->outv[0] = cmd;
-+    cpu_physical_memory_read(cda, &t->outv[1], count);
-+    t->out_len = count + 1;
-+
-+    t->out_len = insert_IAC_escape_char(t->outv, t->out_len);
-+    t->outv[t->out_len++] = IAC;
-+    t->outv[t->out_len++] = IAC_EOR;
-+
-+    retval = qemu_chr_fe_write_all(&t->chr, t->outv, t->out_len);
-+    return (retval <= 0) ? 0 : (retval - 3);
-+}
-+
-+static Property terminal_properties[] = {
-+    DEFINE_PROP_CHR("chardev", Terminal3270, chr),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
- static void terminal_class_init(ObjectClass *klass, void *data)
- {
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-     EmulatedCcw3270Class *ck = EMULATED_CCW_3270_CLASS(klass);
- 
-+    dc->props = terminal_properties;
-     ck->init = terminal_init;
-+    ck->read_payload_3270 = read_payload_3270;
-+    ck->write_payload_3270 = write_payload_3270;
- }
- 
- static const TypeInfo ccw_terminal_info = {
-diff --git a/hw/s390x/3270-ccw.c b/hw/s390x/3270-ccw.c
-index 3a84c5b9dc..1f203abe0a 100644
---- a/hw/s390x/3270-ccw.c
-+++ b/hw/s390x/3270-ccw.c
-@@ -17,6 +17,80 @@
- #include "hw/s390x/css-bridge.h"
- #include "hw/s390x/3270-ccw.h"
- 
-+/* Handle READ ccw commands from guest */
-+static int handle_payload_3270_read(EmulatedCcw3270Device *dev, CCW1 *ccw)
-+{
-+    EmulatedCcw3270Class *ck = EMULATED_CCW_3270_GET_CLASS(dev);
-+    CcwDevice *ccw_dev = CCW_DEVICE(dev);
-+    int len;
-+
-+    if (!ccw->cda) {
-+        return -EFAULT;
-+    }
-+
-+    len = ck->read_payload_3270(dev, ccw->cda, ccw->count);
-+    ccw_dev->sch->curr_status.scsw.count = ccw->count - len;
-+
-+    return 0;
-+}
-+
-+/* Handle WRITE ccw commands to write data to client */
-+static int handle_payload_3270_write(EmulatedCcw3270Device *dev, CCW1 *ccw)
-+{
-+    EmulatedCcw3270Class *ck = EMULATED_CCW_3270_GET_CLASS(dev);
-+    CcwDevice *ccw_dev = CCW_DEVICE(dev);
-+    int len;
-+
-+    if (!ccw->cda) {
-+        return -EFAULT;
-+    }
-+
-+    len = ck->write_payload_3270(dev, ccw->cmd_code, ccw->cda, ccw->count);
-+
-+    if (len <= 0) {
-+        return -EIO;
-+    }
-+
-+    ccw_dev->sch->curr_status.scsw.count = ccw->count - len;
-+    return 0;
-+}
-+
-+static int emulated_ccw_3270_cb(SubchDev *sch, CCW1 ccw)
-+{
-+    int rc = 0;
-+    EmulatedCcw3270Device *dev = sch->driver_data;
-+
-+    switch (ccw.cmd_code) {
-+    case TC_WRITESF:
-+    case TC_WRITE:
-+    case TC_EWRITE:
-+    case TC_EWRITEA:
-+        rc = handle_payload_3270_write(dev, &ccw);
-+        break;
-+    case TC_RDBUF:
-+    case TC_READMOD:
-+        rc = handle_payload_3270_read(dev, &ccw);
-+        break;
-+    default:
-+        rc = -ENOSYS;
-+        break;
-+    }
-+
-+    if (rc == -EIO) {
-+        /* I/O error, specific devices generate specific conditions */
-+        SCSW *s = &sch->curr_status.scsw;
-+
-+        sch->curr_status.scsw.dstat = SCSW_DSTAT_UNIT_CHECK;
-+        sch->sense_data[0] = 0x40;    /* intervention-req */
-+        s->ctrl &= ~SCSW_ACTL_START_PEND;
-+        s->ctrl &= ~SCSW_CTRL_MASK_STCTL;
-+        s->ctrl |= SCSW_STCTL_PRIMARY | SCSW_STCTL_SECONDARY |
-+                   SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND;
-+    }
-+
-+    return rc;
-+}
-+
- static void emulated_ccw_3270_realize(DeviceState *ds, Error **errp)
- {
-     uint16_t chpid;
-@@ -47,6 +121,7 @@ static void emulated_ccw_3270_realize(DeviceState *ds, Error **errp)
-     sch->id.cu_type = EMULATED_CCW_3270_CU_TYPE;
-     css_sch_build_virtual_schib(sch, (uint8_t)chpid,
-                                 EMULATED_CCW_3270_CHPID_TYPE);
-+    sch->ccw_cb = emulated_ccw_3270_cb;
- 
-     ck->init(dev, &err);
-     if (err) {
-diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index ecafaab096..03f36970ed 100644
---- a/hw/s390x/css.c
-+++ b/hw/s390x/css.c
-@@ -552,6 +552,9 @@ static void sch_handle_start_func(SubchDev *sch, ORB *orb)
-             s->dstat = SCSW_DSTAT_CHANNEL_END | SCSW_DSTAT_DEVICE_END;
-             s->cpa = sch->channel_prog + 8;
-             break;
-+        case -EIO:
-+            /* I/O errors, status depends on specific devices */
-+            break;
-         case -ENOSYS:
-             /* unsupported command, generate unit check (command reject) */
-             s->ctrl &= ~SCSW_ACTL_START_PEND;
-diff --git a/include/hw/s390x/3270-ccw.h b/include/hw/s390x/3270-ccw.h
-index 45ea515e9f..46bee2533c 100644
---- a/include/hw/s390x/3270-ccw.h
-+++ b/include/hw/s390x/3270-ccw.h
-@@ -21,6 +21,15 @@
- #define EMULATED_CCW_3270_CHPID_TYPE 0x1a
- 
- #define TYPE_EMULATED_CCW_3270 "emulated-ccw-3270"
-+
-+/* Local Channel Commands */
-+#define TC_WRITE   0x01         /* Write */
-+#define TC_RDBUF   0x02         /* Read buffer */
-+#define TC_EWRITE  0x05         /* Erase write */
-+#define TC_READMOD 0x06         /* Read modified */
-+#define TC_EWRITEA 0x0d         /* Erase write alternate */
-+#define TC_WRITESF 0x11         /* Write structured field */
-+
- #define EMULATED_CCW_3270(obj) \
-      OBJECT_CHECK(EmulatedCcw3270Device, (obj), TYPE_EMULATED_CCW_3270)
- #define EMULATED_CCW_3270_CLASS(klass) \
--- 
-2.11.0
+Kevin
