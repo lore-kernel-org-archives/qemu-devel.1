@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgNpO-0004i7-5c
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgNpO-0004iA-Gt
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 22:42:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgNpJ-0002tb-F0
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgNpJ-0002tj-Fa
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 22:42:54 -0500
-Received: from [45.249.212.189] (port=2396 helo=dggrg03-dlp.huawei.com)
+Received: from [45.249.212.187] (port=2539 helo=dggrg01-dlp.huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgNpI-0002pc-R7
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgNpI-0002pl-RL
 	for qemu-devel@nongnu.org; Tue, 21 Feb 2017 22:42:49 -0500
 From: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Date: Wed, 22 Feb 2017 11:42:09 +0800
-Message-ID: <1487734936-43472-9-git-send-email-zhang.zhanghailiang@huawei.com>
+Date: Wed, 22 Feb 2017 11:42:05 +0800
+Message-ID: <1487734936-43472-5-git-send-email-zhang.zhanghailiang@huawei.com>
 In-Reply-To: <1487734936-43472-1-git-send-email-zhang.zhanghailiang@huawei.com>
 References: <1487734936-43472-1-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 08/15] ram/COLO: Record the dirty pages that
- SVM received
+Subject: [Qemu-devel] [PATCH 04/15] COLO: integrate colo compare with colo
+ frame
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,90 +27,120 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, dgilbert@redhat.com, zhangchen.fnst@cn.fujitsu.com
-Cc: lizhijian@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Juan Quintela <quintela@redhat.com>
+Cc: lizhijian@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Jason Wang <jasowang@redhat.com>
 
-We record the address of the dirty pages that received,
-it will help flushing pages that cached into SVM.
-We record them by re-using migration dirty bitmap.
+For COLO FT, both the PVM and SVM run at the same time,
+only sync the state while it needs.
 
-Cc: Juan Quintela <quintela@redhat.com>
+So here, let SVM runs while not doing checkpoint,
+Besides, change DEFAULT_MIGRATE_X_CHECKPOINT_DELAY to 200*100.
+
+Cc: Jason Wang <jasowang@redhat.com>
 Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/ram.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ migration/colo.c      | 25 +++++++++++++++++++++++++
+ migration/migration.c |  2 +-
+ 2 files changed, 26 insertions(+), 1 deletion(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index b588990..ed3b606 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2231,6 +2231,9 @@ static inline void *host_from_ram_block_offset(RAMBlock *block,
- static inline void *colo_cache_from_block_offset(RAMBlock *block,
-                                                  ram_addr_t offset)
- {
-+    unsigned long *bitmap;
-+    long k;
-+
-     if (!offset_in_ramblock(block, offset)) {
-         return NULL;
+diff --git a/migration/colo.c b/migration/colo.c
+index 712308e..fb8d8fd 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -19,8 +19,11 @@
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
+ #include "migration/failover.h"
++#include "net/colo-compare.h"
++#include "net/colo.h"
+ 
+ static bool vmstate_loading;
++static Notifier packets_compare_notifier;
+ 
+ #define COLO_BUFFER_BASE_SIZE (4 * 1024 * 1024)
+ 
+@@ -263,6 +266,7 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
+     if (local_err) {
+         goto out;
      }
-@@ -2239,6 +2242,17 @@ static inline void *colo_cache_from_block_offset(RAMBlock *block,
-                      __func__, block->idstr);
-         return NULL;
-     }
 +
-+    k = (memory_region_get_ram_addr(block->mr) + offset) >> TARGET_PAGE_BITS;
-+    bitmap = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
-+    /*
-+    * During colo checkpoint, we need bitmap of these migrated pages.
-+    * It help us to decide which pages in ram cache should be flushed
-+    * into VM's RAM later.
-+    */
-+    if (!test_and_set_bit(k, bitmap)) {
-+        migration_dirty_pages++;
+     /* Reset channel-buffer directly */
+     qio_channel_io_seek(QIO_CHANNEL(bioc), 0, 0, NULL);
+     bioc->usage = 0;
+@@ -283,6 +287,11 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
+         goto out;
+     }
+ 
++    colo_notify_compares_event(NULL, COLO_CHECKPOINT, &local_err);
++    if (local_err) {
++        goto out;
 +    }
-     return block->colo_cache + offset;
++
+     /* Disable block migration */
+     s->params.blk = 0;
+     s->params.shared = 0;
+@@ -341,6 +350,11 @@ out:
+     return ret;
  }
  
-@@ -2664,6 +2678,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
- int colo_init_ram_cache(void)
++static void colo_compare_notify_checkpoint(Notifier *notifier, void *data)
++{
++    colo_checkpoint_notify(data);
++}
++
+ static void colo_process_checkpoint(MigrationState *s)
  {
-     RAMBlock *block;
-+    int64_t ram_cache_pages = last_ram_offset() >> TARGET_PAGE_BITS;
- 
-     rcu_read_lock();
-     QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-@@ -2678,6 +2693,15 @@ int colo_init_ram_cache(void)
+     QIOChannelBuffer *bioc;
+@@ -357,6 +371,9 @@ static void colo_process_checkpoint(MigrationState *s)
+         goto out;
      }
-     rcu_read_unlock();
-     ram_cache_enable = true;
-+    /*
-+    * Record the dirty pages that sent by PVM, we use this dirty bitmap together
-+    * with to decide which page in cache should be flushed into SVM's RAM. Here
-+    * we use the same name 'migration_bitmap_rcu' as for migration.
-+    */
-+    migration_bitmap_rcu = g_new0(struct BitmapRcu, 1);
-+    migration_bitmap_rcu->bmap = bitmap_new(ram_cache_pages);
-+    migration_dirty_pages = 0;
+ 
++    packets_compare_notifier.notify = colo_compare_notify_checkpoint;
++    colo_compare_register_notifier(&packets_compare_notifier);
 +
-     return 0;
+     /*
+      * Wait for Secondary finish loading VM states and enter COLO
+      * restore.
+@@ -402,6 +419,7 @@ out:
+         qemu_fclose(fb);
+     }
  
- out_locked:
-@@ -2695,9 +2719,15 @@ out_locked:
- void colo_release_ram_cache(void)
- {
-     RAMBlock *block;
-+    struct BitmapRcu *bitmap = migration_bitmap_rcu;
++    colo_compare_unregister_notifier(&packets_compare_notifier);
+     timer_del(s->colo_delay_timer);
  
-     ram_cache_enable = false;
+     /* Hope this not to be too long to wait here */
+@@ -518,6 +536,11 @@ void *colo_process_incoming_thread(void *opaque)
+             goto out;
+         }
  
-+    atomic_rcu_set(&migration_bitmap_rcu, NULL);
-+    if (bitmap) {
-+        call_rcu(bitmap, migration_bitmap_free, rcu);
-+    }
++        qemu_mutex_lock_iothread();
++        vm_stop_force_state(RUN_STATE_COLO);
++        trace_colo_vm_state_change("run", "stop");
++        qemu_mutex_unlock_iothread();
 +
-     rcu_read_lock();
-     QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-         if (block->colo_cache) {
+         /* FIXME: This is unnecessary for periodic checkpoint mode */
+         colo_send_message(mis->to_src_file, COLO_MESSAGE_CHECKPOINT_REPLY,
+                      &local_err);
+@@ -571,6 +594,8 @@ void *colo_process_incoming_thread(void *opaque)
+         }
+ 
+         vmstate_loading = false;
++        vm_start();
++        trace_colo_vm_state_change("stop", "run");
+         qemu_mutex_unlock_iothread();
+ 
+         if (failover_get_state() == FAILOVER_STATUS_RELAUNCH) {
+diff --git a/migration/migration.c b/migration/migration.c
+index c6ae69d..2339be7 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -66,7 +66,7 @@
+ /* The delay time (in ms) between two COLO checkpoints
+  * Note: Please change this default value to 10000 when we support hybrid mode.
+  */
+-#define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY 200
++#define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY (200 * 100)
+ 
+ static NotifierList migration_state_notifiers =
+     NOTIFIER_LIST_INITIALIZER(migration_state_notifiers);
 -- 
 1.8.3.1
