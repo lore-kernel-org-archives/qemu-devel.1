@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53234)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cgtcV-0003gN-M4
+	(envelope-from <bounces@canonical.com>) id 1cgtcV-0003gP-Me
 	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 08:39:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cgtcS-0002Y2-E8
+	(envelope-from <bounces@canonical.com>) id 1cgtcU-0002Yt-9d
 	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 08:39:43 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42844)
+Received: from indium.canonical.com ([91.189.90.7]:42910)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cgtcS-0002Xi-7R
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 08:39:40 -0500
+	id 1cgtcU-0002YY-3o
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 08:39:42 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cgtcQ-0003s2-ME
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 13:39:38 +0000
+	id 1cgtcS-0003ry-Jn
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 13:39:40 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1622D2E80E6
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 13:39:38 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 734382E80D9
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 13:39:40 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 23 Feb 2017 13:22:50 -0000
+Date: Thu, 23 Feb 2017 13:26:52 -0000
 From: ChristianEhrhardt <1490611@bugs.launchpad.net>
 Reply-To: Bug 1490611 <1490611@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20150831152901.21817.58033.malonedeb@gac.canonical.com>
-Message-Id: <20170223132250.4421.24458.malone@chaenomeles.canonical.com>
+Message-Id: <20170223132652.9827.97476.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1490611] Re: Using qemu >=2.2.1 to convert
  raw->VHD (fixed) adds extra padding to the result file,
@@ -40,18 +40,22 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-I could confirm the fix on its raw alignment:
-Image with 4G
-Pre Fix (4295467520-512)/1024/1024 =3D 4096,4765625
-With Fix (4295467520-512)/1024/1024 =3D 4096,4765625
-With Fix + force_size set: (4294967808-512)/1024/1024 =3D 4096
+Simplified steps to reproduce (without Azure cli / credentials)
 
-That means
-1. no change without opt in
-2. the desired effect when option is set
-
-Waiting a few days for the other bugs in the SRU suggestion ppa to
-resolve/confirm fixes (or be dropped) and then moving to the actual SRU.
+1. Start as in the SRU Template:
+2. qemu-img convert -f raw -o subformat=3Dfixed,force_size -O vpc source-di=
+sk.img dest-disk-old.vhd
+3. upgrade
+4. qemu-img convert -f raw -o subformat=3Dfixed,force_size -O vpc source-di=
+sk.img dest-disk-new.vhd
+5. qemu-img convert -f raw -o subformat=3Dfixed -O vpc source-disk.img dest=
+-disk-new-forced.vhd
+6. check alignment:
+$ stat dest-disk-old.vhd dest-disk-new.vhd dest-disk-new-forced.vhd | awk '=
+/^  Size:/ {print ($2-512)/1024/1024}'
+4096.48
+4096.48
+4096
 
 -- =
 
