@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cguhA-0005St-R8
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:48:37 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cgui2-00063v-Qs
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:49:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cguh5-0004zR-TD
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:48:36 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:35541)
+	(envelope-from <peter.maydell@linaro.org>) id 1cguhy-0005HA-Pn
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:49:30 -0500
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:35413)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cguh5-0004z4-MO
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:48:31 -0500
-Received: by mail-wm0-x244.google.com with SMTP id u63so233190wmu.2
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 06:48:31 -0800 (PST)
-Date: Thu, 23 Feb 2017 14:48:28 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170223144828.GO30636@stefanha-x1.localdomain>
-References: <148760155821.31154.13876757160410915057.stgit@bahia.lan>
-	<148760167688.31154.15169118370965638805.stgit@bahia.lan>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cguhy-0005Gw-J7
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:49:26 -0500
+Received: by mail-wm0-x22f.google.com with SMTP id v186so174068306wmd.0
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 06:49:26 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="f9b3biUB1f7FHqGn"
-Content-Disposition: inline
-In-Reply-To: <148760167688.31154.15169118370965638805.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 15/29] 9pfs: local: statfs: don't follow
- symlinks
+In-Reply-To: <20170223135800.GB7958@codeaurora.org>
+References: <1486750082-12324-1-git-send-email-peter.maydell@linaro.org>
+	<1486750082-12324-4-git-send-email-peter.maydell@linaro.org>
+	<20170223135800.GB7958@codeaurora.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 23 Feb 2017 14:49:04 +0000
+Message-ID: <CAFEAcA_vWZ4pLT+40XK2CeVckcREFZ9DW2yGKMCuZjPMGSNZEg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 03/12] target-arm: Add support for PMU
+ register PMINTENSET_EL1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,44 +31,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Aaron Lindsay <alindsay@codeaurora.org>
+Cc: Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
+On 23 February 2017 at 13:58, Aaron Lindsay <alindsay@codeaurora.org> wrote:
+> Wei, Peter,
+>
+> On Feb 10 18:07, Peter Maydell wrote:
+>> From: Wei Huang <wei@redhat.com>
+>>
+>> This patch adds access support for PMINTENSET_EL1.
+>>
+>> Signed-off-by: Wei Huang <wei@redhat.com>
+>> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>> Message-id: 1486504171-26807-4-git-send-email-wei@redhat.com
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>>  target/arm/cpu.h    |  2 +-
+>>  target/arm/helper.c | 10 +++++++++-
+>>  2 files changed, 10 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+>> index edc1f76..0956a54 100644
+>> --- a/target/arm/cpu.h
+>> +++ b/target/arm/cpu.h
+>> @@ -309,7 +309,7 @@ typedef struct CPUARMState {
+>>          uint32_t c9_pmovsr; /* perf monitor overflow status */
+>>          uint32_t c9_pmuserenr; /* perf monitor user enable */
+>>          uint64_t c9_pmselr; /* perf monitor counter selection register */
+>> -        uint32_t c9_pminten; /* perf monitor interrupt enables */
+>> +        uint64_t c9_pminten; /* perf monitor interrupt enables */
+>
+> PMINTENSET_EL1 and PMINTENCLR_EL1 are both 32-bit registers, just like
+> their AArch32 counterparts. Is there a reason I'm missing for why this
+> has been changed to a uint64_t? There are a number of other 32-bit PMU
+> registers also currently being represented by uint64_t.
 
---f9b3biUB1f7FHqGn
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Two reasons:
 
-On Mon, Feb 20, 2017 at 03:41:16PM +0100, Greg Kurz wrote:
-> The local_statfs() callback is vulnerable to symlink attacks because it
-> calls statfs() which follows symbolic links in all path elements.
->=20
-> This patch converts local_statfs() to rely on open_nofollow() and fstatfs=
-()
-> instead.
->=20
-> This partly fixes CVE-2016-9602.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  hw/9pfs/9p-local.c |   10 ++++------
->  1 file changed, 4 insertions(+), 6 deletions(-)
+ (1) The conceptual reason. In AArch64 "32-bit system register" is just
+a convenient shorthand for "64-bit system register where the upper 32
+bits are RAZ/WI". The register itself is still 64 bits and in a future
+architecture revision it might end up with defined bits in the upper
+half (this has happened already for a few registers).
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+ (2) The QEMU implementation reason. The way we implement system register
+access instructions typically ends up in generating a simple "load/store
+64 bit value from address" instruction. Rather than having the generic
+"handle a system register access" code  have two codepaths to cope with
+"64-bit sysreg that's stored in a 32-bit field" and "64-bit sysreg that's
+stored in a 64-bit field", we choose to require that the fields are always
+64-bits wide, so that the code that accesses them doesn't have to care.
 
---f9b3biUB1f7FHqGn
-Content-Type: application/pgp-signature; name="signature.asc"
+(The implementation reason derives from the conceptual reason:
+architecturally there is no real different "32-bit system register"
+concept, so we don't need to implement handling differently. For
+AArch32 we do distinguish between 32-bit and 64-bit coprocessor
+registers, because they're really different things and need
+different handling.)
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYrvY8AAoJEJykq7OBq3PIL0YH/1i5opo1CwZW5RarUNvyedwR
-sJ4X2OEUnkq7/TummniLbD+M92RRZKe742fhF1X+dvyS+oN5YBgw7OIwj6thfetz
-EvFzPec77r1Bkj+sX0GsYHUMV9mY7HkMiycCn1MImVr4RltwxvWeMD3WIJFRK78h
-JhegoCtFbJagT1sJfPaiKyXUYN6vzrdGN6siZ+xlesJGrWfQgEuSXxgQDeK4zrJz
-wC9ds9zYK5NpFqyBrTpmMNPgkvIg1PWOL5/rCm9nKoGToCY2Nwd0SqZHX5vhtrdP
-ohxhsLmCOsOqjTuTq3caH339khiLabrTx2xrD7Paf2MMncGJcR27QYWFFBZKudU=
-=+S8b
------END PGP SIGNATURE-----
-
---f9b3biUB1f7FHqGn--
+thanks
+-- PMM
