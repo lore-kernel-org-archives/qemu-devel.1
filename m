@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cgk1Z-0002Gh-Mn
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 22:24:59 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cgk4a-0004MZ-Kg
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 22:28:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cgk1W-0001RV-HV
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 22:24:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56400)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1cgk1W-0001Qk-8F
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 22:24:54 -0500
-Date: Wed, 22 Feb 2017 20:24:51 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170222202451.458de865@t450s.home>
-In-Reply-To: <20170223030647.GB4015@pxdev.xzpeter.org>
-References: <1487742565-2513-1-git-send-email-peterx@redhat.com>
-	<20170222103047.2c1b63f2@t450s.home>
-	<20170223030647.GB4015@pxdev.xzpeter.org>
+	(envelope-from <dgibson@ozlabs.org>) id 1cgk4Z-000275-KV
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 22:28:04 -0500
+Date: Thu, 23 Feb 2017 14:27:49 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170223032749.GE12577@umbus.fritz.box>
+References: <1487763883-4877-1-git-send-email-nikunj@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] intel_iommu: make sure its init before PCI
- dev
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="95nVhCDQCgPWiQqT"
+Content-Disposition: inline
+In-Reply-To: <1487763883-4877-1-git-send-email-nikunj@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 00/10] POWER9 TCG enablements - part15
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,123 +23,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, yi.l.liu@intel.com, "\\  Michael S . Tsirkin \\ " <mst@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Cc: qemu-ppc@nongnu.org, rth@twiddle.net, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
-On Thu, 23 Feb 2017 11:06:47 +0800
-Peter Xu <peterx@redhat.com> wrote:
 
-> On Wed, Feb 22, 2017 at 10:30:47AM -0700, Alex Williamson wrote:
-> > On Wed, 22 Feb 2017 13:49:25 +0800
-> > Peter Xu <peterx@redhat.com> wrote:
-> >   
-> > > Intel vIOMMU devices are created with "-device" parameter, while here
-> > > actually we need to make sure this device will be created before some
-> > > other PCI devices (like vfio-pci devices) so that we know iommu_fn will
-> > > be setup correctly before realizations of those PCI devices.
-> > > 
-> > > Here we do explicit check to make sure intel-iommu device will be inited
-> > > before all the rest of the PCI devices. This is done by checking against
-> > > the devices dangled under current root PCIe bus and we should see
-> > > nothing there besides integrated ICH9 ones.
-> > > 
-> > > If the user violated this rule, we abort the program.
-> > > 
-> > > Maybe one day we will be able to manage the ordering of device
-> > > initialization, and then we can grant VT-d devices a higher init
-> > > priority. But before that, let's have this explicit check to make sure
-> > > of it.
-> > > 
-> > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > ---
-> > >  hw/i386/intel_iommu.c | 40 ++++++++++++++++++++++++++++++++++++++++
-> > >  1 file changed, 40 insertions(+)
-> > > 
-> > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > > index 22d8226..db74124 100644
-> > > --- a/hw/i386/intel_iommu.c
-> > > +++ b/hw/i386/intel_iommu.c
-> > > @@ -31,6 +31,7 @@
-> > >  #include "hw/i386/apic-msidef.h"
-> > >  #include "hw/boards.h"
-> > >  #include "hw/i386/x86-iommu.h"
-> > > +#include "hw/i386/ich9.h"
-> > >  #include "hw/pci-host/q35.h"
-> > >  #include "sysemu/kvm.h"
-> > >  #include "hw/i386/apic_internal.h"
-> > > @@ -2560,6 +2561,41 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
-> > >      return true;
-> > >  }
-> > >  
-> > > +static bool vtd_has_inited_pci_devices(PCIBus *bus, Error **errp)
-> > > +{
-> > > +    int i;
-> > > +    uint8_t func;
-> > > +
-> > > +    /* We check against root bus */
-> > > +    assert(bus && pci_bus_is_root(bus));
-> > > +
-> > > +    /*
-> > > +     * We need to make sure vIOMMU device is created before other PCI
-> > > +     * devices other than the integrated ICH9 ones, so that they can
-> > > +     * get correct iommu_fn setup even during its realize(). Some
-> > > +     * devices (e.g., vfio-pci) will need a correct iommu_fn to work.
-> > > +     */
-> > > +    for (i = 1; i < PCI_FUNC_MAX * PCI_SLOT_MAX; i++) {
-> > > +        /* Skip the checking against ICH9 integrated devices */
-> > > +        if (PCI_SLOT(i) == ICH9_LPC_DEV) {
-> > > +            func = PCI_FUNC(i);
-> > > +            if (func == ICH9_LPC_FUNC ||
-> > > +                func == ICH9_SATA1_FUNC ||
-> > > +                func == ICH9_SMB_FUNC) {
-> > > +                continue;
-> > > +            }
-> > > +        }  
-> > 
-> > 
-> > Whitelisting specific devfns seems pretty sketchy and fragile.  Can we
-> > even assume we're on a Q35 chipset?  I don't see that vtd_realize()
-> > takes any particular precautions not to allow initialization on 440fx,
-> > or whatever generic chipset we come up with next that may not have
-> > these specific devices.  
-> 
-> Yes. IIUC VT-d now can only work with Q35, right? Cc Marcel and Paolo
-> in case I misunderstood it.
+--95nVhCDQCgPWiQqT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-440FX is not a PCIe chipset therefore on bare metal there'd be no such
-thing as requester IDs with which to lookup context entries.  Of course
-a VM doesn't care about those details, but I think it best not to tempt
-users with invalid configs.
- 
-> If so, maybe here we should check against q35 in vtd realization. How
-> about something like:
-> 
->     if (!object_property_find((Object *)pcms, "q35", NULL)) {
->         error_setg(errp, "Currently Intel vIOMMU only support Q35 platform. "
->                    "Please specify \"-M q35\" to enable it.");
->         return;
->     }
-> 
-> ?
-> 
-> > It would probably be a better idea to use
-> > object_dynamic_cast() if you want to whitelist specific devices.
-> > Perhaps this could even be used to validate the chipset as well.  
-> 
-> Now Jintack reported another issue, that we may have two default
-> devices there if not specifying "-nodefaults", and that two devices
-> will always be the first ones to be inited.
-> 
-> How about here we just explicitly check against vfio-pci devices, so
-> we just make sure vfio-pci devices will be put after intel-iommu?
-> Since actually vfio-pci devices are the only ones that we know we need
-> to be inited explicitly after the VT-d device.
+On Wed, Feb 22, 2017 at 05:14:33PM +0530, Nikunj A Dadhania wrote:
+> This series contains implentation of CA32 and OV32 bits added to the=20
+> ISA 3.0. Various fixed-point arithmetic instructions are updated to take
+> care of the newer flags.=20
+>=20
+> Finally the last patch adds new instruction mcrxrx, that helps reading=20
+> the carry (CA and CA32) and the overflow (OV and OV32) flags
 
-I was afraid you were going to come to this conclusion.  That works,
-BUT it just means the problem gets ignored as a vfio problem when
-really vfio is doing nothing wrong other than caring about the device
-address space during its initialization.  Then users have a perfectly
-working config, add a vfio-pci device and things explode.  If you want
-to impose a user ordering requirement, do it consistently.  Thanks,
+I've applied patches 1 & 2 to ppc-for-2.9.
 
-Alex
+The rest I've left for a resend pending my comments and rth's.
+
+>=20
+> Changelog:
+> v2:=20
+> * Add missing condition in narrow mode(add/subf), multiply and divide
+> * Drop nego patch, subf implementation is sufficient for setting OV and O=
+V32
+> * Retaining neg[.], as the code is simplified.
+> * Fix OV resetting in compute_ov()
+>=20
+> v1:=20
+> * Use these ISA 3.0 flag to enable CA32 and OV32
+> * Re-write ca32 compute routine
+> * Add setting of flags for "neg." and "nego."
+>=20
+> Nikunj A Dadhania (10):
+>   target/ppc: move cpu_[read, write]_xer to cpu.c
+>   target/ppc: optimize gen_write_xer()
+>   target/ppc: support for 32-bit carry and overflow
+>   target/ppc: update ca32 in arithmetic add
+>   target/ppc: update ca32 in arithmetic substract
+>   target/ppc: update overflow flags for add/sub
+>   target/ppc: use tcg ops for neg instruction
+>   target/ppc: add ov32 flag for multiply low insns
+>   target/ppc: add ov32 flag in divide operations
+>   target/ppc: add mcrxrx instruction
+>=20
+>  target/ppc/Makefile.objs    |   1 +
+>  target/ppc/cpu.c            |  51 ++++++++++++++++++
+>  target/ppc/cpu.h            |  21 ++++----
+>  target/ppc/int_helper.c     |  53 +++++++-----------
+>  target/ppc/translate.c      | 128 ++++++++++++++++++++++++++++++++++++++=
+------
+>  target/ppc/translate_init.c |   4 +-
+>  6 files changed, 194 insertions(+), 64 deletions(-)
+>  create mode 100644 target/ppc/cpu.c
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--95nVhCDQCgPWiQqT
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYrla0AAoJEGw4ysog2bOSJuAQAK2vMWPzylQcspQIuiiFUEo0
+8hl10pBYDfaD8ncQg/dptCOmEL7zOTvcUvWQCsvEVx2FCmE4kgFifLiAQENBYSKB
+9CdXQ4PquTJIxyO1KzXIt0dztZmFz4Wg6dcK21DvlJgnouKcylm8XSFU/cEdy/bA
+OkYhwhKIJmoiE10/Vb+LhmemODn/DltahuZfjPZKsiw1F/JjbGKaj9AiXVkwIx1S
+CpIPqHVziFdQXjBrWiIwn4Jo3NqQOMl4aipCEiGG5V1X8xr+7jh9iF6RlPdETOxH
+mhuBZZTEDWzpfK1BlZQLw6fs5uaxL8dJDZRL9QnQdCe0QZuc7XXeFHQrzUkl0zRY
+LZYWmnOQOMFr0f3Li1NFzJCP4DZZPnlIZxEAMgW+bUPM1kuT8p3gkGwPCBbbQaal
+1lj2wc3aBq/vNqLXviii5KNZBIWy70m0D28VamnnvVsc9BgDjtV9dymzo7KLAa6b
+ApSvECAh3WL8sq5/e40ac1imqsxTqECftlGGGH9mgpc2UmzzQP7sQ0J6DBCjiFid
+PODorz24JteRFQ6gHshtf7gzoxPj5JWS4r8jdUHlRg1S+RuJ4bwvYJNOW+F+Lfnm
+dC3jDZQbRyFsaQCZZ3NfahxuwdAJIJuT+0OGwlCBSJypi2VZposEXuxwcJ5IEB4E
+dTF1lHFSAYEnkvGC/lSB
+=Ptqw
+-----END PGP SIGNATURE-----
+
+--95nVhCDQCgPWiQqT--
