@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46460)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cgyHN-0004oR-M2
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 13:38:14 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cgyNh-0002sH-Of
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 13:44:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cgyHM-0000zo-Su
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 13:38:13 -0500
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:36641)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cgyHM-0000zX-MO
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 13:38:12 -0500
-Received: by mail-wm0-x235.google.com with SMTP id v77so37706928wmv.1
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 10:38:12 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1cgyNd-0002c3-1H
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 13:44:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44260)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cgyNc-0002aJ-Ot
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 13:44:40 -0500
+Date: Thu, 23 Feb 2017 18:44:35 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170223184434.GG2383@work-vm>
+References: <1487734936-43472-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1487734936-43472-9-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <1487850673-26455-6-git-send-email-vijay.kilari@gmail.com>
-References: <1487850673-26455-1-git-send-email-vijay.kilari@gmail.com>
-	<1487850673-26455-6-git-send-email-vijay.kilari@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 23 Feb 2017 18:37:51 +0000
-Message-ID: <CAFEAcA-wQwM=g-geopcn+9Y28UL22ugTWKwUOqmdbV=YD5Q1Rg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v9 5/5] hw/intc/arm_gicv3_kvm: Reset GICv3
- cpu interface registers
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1487734936-43472-9-git-send-email-zhang.zhanghailiang@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH 08/15] ram/COLO: Record the dirty pages
+ that SVM received
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +28,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vijay Kilari <vijay.kilari@gmail.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@redhat.com>, Pavel Fedin <p.fedin@samsung.com>, Marc Zyngier <marc.zyngier@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+To: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Cc: qemu-devel@nongnu.org, zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com, Juan Quintela <quintela@redhat.com>
 
-On 23 February 2017 at 11:51,  <vijay.kilari@gmail.com> wrote:
-> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
->
-> Reset CPU interface registers of GICv3 when CPU is reset.
-> For this, ARMCPRegInfo struct is registered with one ICC
-> register whose resetfn is called when cpu is reset.
->
-> All the ICC registers are reset under one single register
-> reset function instead of calling resetfn for each ICC
-> register.
->
-> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+* zhanghailiang (zhang.zhanghailiang@huawei.com) wrote:
+> We record the address of the dirty pages that received,
+> it will help flushing pages that cached into SVM.
+> We record them by re-using migration dirty bitmap.
+> 
+> Cc: Juan Quintela <quintela@redhat.com>
+> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > ---
->  hw/intc/arm_gicv3_kvm.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 60 insertions(+)
+>  migration/ram.c | 30 ++++++++++++++++++++++++++++++
+>  1 file changed, 30 insertions(+)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index b588990..ed3b606 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -2231,6 +2231,9 @@ static inline void *host_from_ram_block_offset(RAMBlock *block,
+>  static inline void *colo_cache_from_block_offset(RAMBlock *block,
+>                                                   ram_addr_t offset)
+>  {
+> +    unsigned long *bitmap;
+> +    long k;
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+You could use a better name than 'k'.
 
-thanks
--- PMM
+Dave
+
+>      if (!offset_in_ramblock(block, offset)) {
+>          return NULL;
+>      }
+> @@ -2239,6 +2242,17 @@ static inline void *colo_cache_from_block_offset(RAMBlock *block,
+>                       __func__, block->idstr);
+>          return NULL;
+>      }
+> +
+> +    k = (memory_region_get_ram_addr(block->mr) + offset) >> TARGET_PAGE_BITS;
+> +    bitmap = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
+> +    /*
+> +    * During colo checkpoint, we need bitmap of these migrated pages.
+> +    * It help us to decide which pages in ram cache should be flushed
+> +    * into VM's RAM later.
+> +    */
+> +    if (!test_and_set_bit(k, bitmap)) {
+> +        migration_dirty_pages++;
+> +    }
+>      return block->colo_cache + offset;
+>  }
+>  
+> @@ -2664,6 +2678,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>  int colo_init_ram_cache(void)
+>  {
+>      RAMBlock *block;
+> +    int64_t ram_cache_pages = last_ram_offset() >> TARGET_PAGE_BITS;
+>  
+>      rcu_read_lock();
+>      QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+> @@ -2678,6 +2693,15 @@ int colo_init_ram_cache(void)
+>      }
+>      rcu_read_unlock();
+>      ram_cache_enable = true;
+> +    /*
+> +    * Record the dirty pages that sent by PVM, we use this dirty bitmap together
+> +    * with to decide which page in cache should be flushed into SVM's RAM. Here
+> +    * we use the same name 'migration_bitmap_rcu' as for migration.
+> +    */
+> +    migration_bitmap_rcu = g_new0(struct BitmapRcu, 1);
+> +    migration_bitmap_rcu->bmap = bitmap_new(ram_cache_pages);
+> +    migration_dirty_pages = 0;
+> +
+>      return 0;
+>  
+>  out_locked:
+> @@ -2695,9 +2719,15 @@ out_locked:
+>  void colo_release_ram_cache(void)
+>  {
+>      RAMBlock *block;
+> +    struct BitmapRcu *bitmap = migration_bitmap_rcu;
+>  
+>      ram_cache_enable = false;
+>  
+> +    atomic_rcu_set(&migration_bitmap_rcu, NULL);
+> +    if (bitmap) {
+> +        call_rcu(bitmap, migration_bitmap_free, rcu);
+> +    }
+> +
+>      rcu_read_lock();
+>      QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+>          if (block->colo_cache) {
+> -- 
+> 1.8.3.1
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
