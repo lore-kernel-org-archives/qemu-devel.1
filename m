@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cgzi1-0001bW-32
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 15:09:50 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cgzvS-0007qm-IN
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 15:23:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cgzhx-0005nD-Q2
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 15:09:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46422)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cgzhx-0005n1-Jx
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 15:09:45 -0500
-Date: Thu, 23 Feb 2017 17:09:42 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170223200942.GP2778@thinpad.lan.raisama.net>
-References: <20170222190029.17243-1-ehabkost@redhat.com>
+	(envelope-from <rth7680@gmail.com>) id 1cgzvP-0000nV-FA
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 15:23:42 -0500
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1487879800-12352-1-git-send-email-nikunj@linux.vnet.ibm.com>
+	<1487879800-12352-3-git-send-email-nikunj@linux.vnet.ibm.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <7ceb696b-d4b3-86a6-a1db-47e46de7dcb4@twiddle.net>
+Date: Fri, 24 Feb 2017 07:23:31 +1100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170222190029.17243-1-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] target-i386: Implement
- query-cpu-model-expansion
+In-Reply-To: <1487879800-12352-3-git-send-email-nikunj@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 02/15] target/ppc: update ov flag from
+ remaining paths
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +25,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, libvir-list@redhat.com, Jiri Denemark <jdenemar@redhat.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Richard Henderson <rth@twiddle.net>, Igor Mammedov <imammedo@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
-On Wed, Feb 22, 2017 at 04:00:26PM -0300, Eduardo Habkost wrote:
-> This series implements query-cpu-model-expansion on target-i386.
-> 
-> Changes v2 -> v3:
-> -----------------
-> 
-> * Rebased on top of my x86-next branch:
->   https://github.com/ehabkost/qemu x86-next
-> * Added new patch that will extend type=full expansion to
->   return every (writeable) QOM property from the CPU object
-> 
-> Git branch for testing:
->   https://github.com/ehabkost/qemu-hacks work/x86-query-cpu-expansion
-> 
-> libvirt code to use the new feature already exist, and were
-> submitted to libvir-list, at:
->   https://www.mail-archive.com/libvir-list@redhat.com/msg142168.html
-> 
+On 02/24/2017 06:56 AM, Nikunj A Dadhania wrote:
+> @@ -320,22 +320,24 @@ target_ulong helper_divo(CPUPPCState *env, target_ulong arg1,
+>                           target_ulong arg2)
+>  {
+>      uint64_t tmp = (uint64_t)arg1 << 32 | env->spr[SPR_MQ];
+> +    int ov;
+>
+>      if (((int32_t)tmp == INT32_MIN && (int32_t)arg2 == (int32_t)-1) ||
+>          (int32_t)arg2 == 0) {
+> -        env->so = env->ov = 1;
+> +        ov = 1;
+>          env->spr[SPR_MQ] = 0;
+>          return INT32_MIN;
+>      } else {
+>          env->spr[SPR_MQ] = tmp % arg2;
+>          tmp /= (int32_t)arg2;
+>          if ((int32_t)tmp != tmp) {
+> -            env->so = env->ov = 1;
+> +            ov = 1;
+>          } else {
+> -            env->ov = 0;
+> +            ov = 0;
+>          }
+>          return tmp;
+>      }
+> +    helper_update_ov_legacy(env, ov);
+>  }
+>
 
-As v2 was sitting on the list since Jan 16, I plan to include
-this on my next pull request before soft freeze if there are no
-objections.
+You're attempting to run the helper after "return".
 
--- 
-Eduardo
+
+r~
