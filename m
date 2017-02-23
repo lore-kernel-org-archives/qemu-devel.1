@@ -1,33 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41115)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cgzVi-0005ER-Ol
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:57:08 -0500
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cgzVl-0005LV-5k
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:57:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cgzVe-0001iF-Pt
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:57:06 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59988
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cgzVj-0001lk-SK
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:57:09 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60110
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cgzVe-0001i4-Kf
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:57:02 -0500
+	id 1cgzVj-0001l5-L3
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:57:07 -0500
 Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1NJtLBS043955
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 14:57:02 -0500
-Received: from e28smtp01.in.ibm.com (e28smtp01.in.ibm.com [125.16.236.1])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28t3cwqybt-1
+	v1NJtNoI044104
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 14:57:07 -0500
+Received: from e28smtp03.in.ibm.com (e28smtp03.in.ibm.com [125.16.236.3])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28t3cwqyfc-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 14:57:01 -0500
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 14:57:06 -0500
 Received: from localhost
-	by e28smtp01.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e28smtp03.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Fri, 24 Feb 2017 01:26:58 +0530
+	Fri, 24 Feb 2017 01:27:03 +0530
 From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Date: Fri, 24 Feb 2017 01:26:25 +0530
-Message-Id: <1487879800-12352-1-git-send-email-nikunj@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v4 00/15] POWER9 TCG enablements - part15
+Date: Fri, 24 Feb 2017 01:26:33 +0530
+In-Reply-To: <1487879800-12352-1-git-send-email-nikunj@linux.vnet.ibm.com>
+References: <1487879800-12352-1-git-send-email-nikunj@linux.vnet.ibm.com>
+Message-Id: <1487879800-12352-9-git-send-email-nikunj@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v4 08/15] target/ppc: update ca32 in arithmetic
+ add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,60 +42,115 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
 Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
 
-Patches:
-01-06  Cleans up the XER split out variables and now the 
-       flag bits are stored in XER at their respective places 
+Adds routine to compute ca32 - gen_op_arith_compute_ca32
 
-07-14  Contains implentation of CA32 and OV32 bits added to the 
-       ISA 3.0. Various fixed-point arithmetic instructions are 
-       updated to take care of the newer flags.
+For 64-bit mode use the compute ca32 routine. While for 32-bit mode, CA
+and CA32 will have same value.
+
+Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+---
+ target/ppc/translate.c | 47 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 46 insertions(+), 1 deletion(-)
+
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 5be1bb9..c98e708 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -799,6 +799,28 @@ static inline void gen_op_update_ca_legacy(TCGv ca)
+     tcg_temp_free(t0);
+ }
  
-15     Finally the last patch adds new instruction mcrxrx, that helps
-       reading the carry (CA and CA32) and the overflow (OV and OV32) flags
-
-
-Booted the POWER8 guest fine, needs more testing as changes are 
-intrusive in nature.
-
-Changelog:
-v3:
-* Get rid of cpu_ca, cpu_ov, cpu_so split out variables
-* As most of the patches under went changes, dropped the 
-  reviewed-bys(except neg[.] patch)
-
-v2: 
-* Add missing condition in narrow mode(add/subf), multiply and divide
-* Drop nego patch, subf implementation is sufficient for setting OV and OV32
-* Retaining neg[.], as the code is simplified.
-* Fix OV resetting in compute_ov()
-
-v1: 
-* Use these ISA 3.0 flag to enable CA32 and OV32
-* Re-write ca32 compute routine
-* Add setting of flags for "neg." and "nego."
-
-Nikunj A Dadhania (15):
-  target/ppc: introduce helper_update_ov_legacy
-  target/ppc: update ov flag from remaining paths
-  target/ppc: introduce helper_update_ca_legacy
-  target/ppc: add gen_op_update_ca_legacy() helper
-  target/ppc: add gen_op_update_ov_legacy() helper
-  target/ppc: remove xer split-out flags(so, ov, ca)
-  target/ppc: support for 32-bit carry and overflow
-  target/ppc: update ca32 in arithmetic add
-  target/ppc: update ca32 in arithmetic substract
-  target/ppc: add gen_op_update_ov_isa300()
-  target/ppc: update OV/OV32 for mull[d,w] insns
-  target/ppc: update OV/OV32 for divide operations
-  target/ppc: update OV/OV32 flags for add/sub
-  target/ppc: use tcg ops for neg instruction
-  target/ppc: add mcrxrx instruction
-
- target/ppc/cpu.c        |   8 +-
- target/ppc/cpu.h        |  33 ++--
- target/ppc/int_helper.c |  90 ++++++-----
- target/ppc/translate.c  | 396 +++++++++++++++++++++++++++++++++++-------------
- 4 files changed, 371 insertions(+), 156 deletions(-)
-
++static inline void gen_op_update_ca_isa300(TCGv ca, TCGv ca32)
++{
++    TCGv t0 = tcg_temp_new();
++
++    tcg_gen_movi_tl(t0, XER_CA | XER_CA32);
++    tcg_gen_andc_tl(cpu_xer, cpu_xer, t0);
++    tcg_gen_shli_tl(t0, ca, XER_CA_BIT);
++    tcg_gen_or_tl(cpu_xer, cpu_xer, t0);
++    tcg_gen_shli_tl(t0, ca32, XER_CA32_BIT);
++    tcg_gen_or_tl(cpu_xer, cpu_xer, t0);
++    tcg_temp_free(t0);
++}
++
++static inline void gen_op_update_ca(DisasContext *ctx, TCGv ca, TCGv ca32)
++{
++    if (is_isa300(ctx)) {
++        gen_op_update_ca_isa300(ca, ca32);
++    } else {
++        gen_op_update_ca_legacy(ca);
++    }
++}
++
+ static inline void gen_op_update_ov_legacy(TCGv ov)
+ {
+     TCGv t1 = tcg_temp_new();
+@@ -844,6 +866,23 @@ static inline void gen_op_arith_compute_ov(DisasContext *ctx, TCGv arg0,
+     tcg_temp_free(ov);
+ }
+ 
++static inline void gen_op_arith_compute_ca32(DisasContext *ctx, TCGv ca32,
++                                             TCGv res, TCGv arg0, TCGv arg1,
++                                             int sub)
++{
++    TCGv t0;
++
++    if (!is_isa300(ctx)) {
++        return;
++    }
++
++    t0 = tcg_temp_new();
++    tcg_gen_xor_tl(t0, arg0, arg1);
++    tcg_gen_xor_tl(t0, t0, res);
++    tcg_gen_extract_tl(ca32, t0, 32, 1);
++    tcg_temp_free(t0);
++}
++
+ /* Common add function */
+ static inline void gen_op_arith_add(DisasContext *ctx, TCGv ret, TCGv arg1,
+                                     TCGv arg2, bool add_ca, bool compute_ca,
+@@ -851,6 +890,7 @@ static inline void gen_op_arith_add(DisasContext *ctx, TCGv ret, TCGv arg1,
+ {
+     TCGv t0 = ret;
+     TCGv ca = tcg_temp_new();
++    TCGv ca32 = tcg_temp_new();
+ 
+     if (compute_ca || compute_ov) {
+         t0 = tcg_temp_new();
+@@ -874,6 +914,9 @@ static inline void gen_op_arith_add(DisasContext *ctx, TCGv ret, TCGv arg1,
+             tcg_gen_xor_tl(ca, t0, t1);        /* bits changed w/ carry */
+             tcg_temp_free(t1);
+             tcg_gen_extract_tl(ca, ca, 32, 1);
++            if (is_isa300(ctx)) {
++                tcg_gen_mov_tl(ca32, ca);
++            }
+         } else {
+             TCGv zero = tcg_const_tl(0);
+             if (add_ca) {
+@@ -882,6 +925,7 @@ static inline void gen_op_arith_add(DisasContext *ctx, TCGv ret, TCGv arg1,
+             } else {
+                 tcg_gen_add2_tl(t0, ca, arg1, zero, arg2, zero);
+             }
++            gen_op_arith_compute_ca32(ctx, ca32, t0, arg1, arg2, 0);
+             tcg_temp_free(zero);
+         }
+     } else {
+@@ -895,7 +939,7 @@ static inline void gen_op_arith_add(DisasContext *ctx, TCGv ret, TCGv arg1,
+         gen_op_arith_compute_ov(ctx, t0, arg1, arg2, 0);
+     }
+     if (compute_ca) {
+-        gen_op_update_ca_legacy(ca);
++        gen_op_update_ca(ctx, ca, ca32);
+     }
+     if (unlikely(compute_rc0)) {
+         gen_set_Rc0(ctx, t0);
+@@ -906,6 +950,7 @@ static inline void gen_op_arith_add(DisasContext *ctx, TCGv ret, TCGv arg1,
+         tcg_temp_free(t0);
+     }
+     tcg_temp_free(ca);
++    tcg_temp_free(ca32);
+ }
+ /* Add functions with two operands */
+ #define GEN_INT_ARITH_ADD(name, opc3, add_ca, compute_ca, compute_ov)         \
 -- 
 2.7.4
