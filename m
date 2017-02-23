@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39432)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cguiv-0006sI-0s
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:50:25 -0500
+	(envelope-from <eblake@redhat.com>) id 1cgukg-0000nG-Of
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:52:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cguiq-0005ZA-3J
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:50:25 -0500
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:32900)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cguip-0005Z2-RZ
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:50:20 -0500
-Received: by mail-wr0-x241.google.com with SMTP id s27so4190157wrb.0
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 06:50:19 -0800 (PST)
-Date: Thu, 23 Feb 2017 14:50:16 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170223145016.GP30636@stefanha-x1.localdomain>
-References: <148760155821.31154.13876757160410915057.stgit@bahia.lan>
-	<148760168489.31154.7921066936280376884.stgit@bahia.lan>
+	(envelope-from <eblake@redhat.com>) id 1cgukb-0005yj-V6
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:52:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43912)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cgukb-0005ya-Ly
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:52:09 -0500
+References: <CAFEAcA8AZup28Sho8hLeCRVf4iSdLdeFHvz1h4-X7FwVBcANyg@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <448f3a5f-044e-bcac-60bd-2ce074021be9@redhat.com>
+Date: Thu, 23 Feb 2017 08:52:01 -0600
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="9pS2hy4/DrI8BQlq"
-Content-Disposition: inline
-In-Reply-To: <148760168489.31154.7921066936280376884.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 16/29] 9pfs: local: truncate: don't follow
- symlinks
+In-Reply-To: <CAFEAcA8AZup28Sho8hLeCRVf4iSdLdeFHvz1h4-X7FwVBcANyg@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="iCSdo9tLCCqKjO4KpcGSQ5B5aTD0G7u9P"
+Subject: Re: [Qemu-devel] using fdt_setprop() to set properties to empty
+ values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +28,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
 
-
---9pS2hy4/DrI8BQlq
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--iCSdo9tLCCqKjO4KpcGSQ5B5aTD0G7u9P
+From: Eric Blake <eblake@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <448f3a5f-044e-bcac-60bd-2ce074021be9@redhat.com>
+Subject: Re: [Qemu-devel] using fdt_setprop() to set properties to empty
+ values
+References: <CAFEAcA8AZup28Sho8hLeCRVf4iSdLdeFHvz1h4-X7FwVBcANyg@mail.gmail.com>
+In-Reply-To: <CAFEAcA8AZup28Sho8hLeCRVf4iSdLdeFHvz1h4-X7FwVBcANyg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 20, 2017 at 03:41:24PM +0100, Greg Kurz wrote:
-> The local_truncate() callback is vulnerable to symlink attacks because
-> it calls truncate() which follows symbolic links in all path elements.
+On 02/23/2017 06:33 AM, Peter Maydell wrote:
+> What's the right way to use libfdt's fdt_setprop to set a property
+> to have an empty value? At the moment in QEMU we tend to use
+>   fdt_setprop(fdt, nodeoffset, "propertyname", NULL, 0);
 >=20
-> This patch converts local_truncate() to rely on open_nofollow() and
-> ftruncate() instead.
+> and git grep 'fdt_setprop.*NULL' produces examples of this usage in
+> PPC and ARM fdt creation code.
 >=20
-> This partly fixes CVE-2016-9602.
+> However the fdt_setprop() documentation doesn't document that a NULL
+> value pointer is OK if the length is 0, and indeed the implementation
+> unconditionally calls memcpy(prop->data, val, len), which is
+> undefined behaviour, and warned about by clang sanitizers if you
+> build libfdt with them:
+>  dtc/libfdt/fdt_rw.c:288:21: runtime error: null pointer passed
+>    as argument 2, which is declared to never be null
 >=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  hw/9pfs/9p-local.c |   13 +++++++------
->  1 file changed, 7 insertions(+), 6 deletions(-)
+> So what's the best thing to do here? I can't offhand think of a
+> non-ugly/non-confusing way to pass a valid pointer here...
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Does fdt_setprop(fdt, nodeoffset, "propertyname", "", 0) do the right thi=
+ng?
 
---9pS2hy4/DrI8BQlq
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--iCSdo9tLCCqKjO4KpcGSQ5B5aTD0G7u9P
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBAgAGBQJYrvaoAAoJEJykq7OBq3PIM/MH/26aOlNyrk4sMkuAeZ1hTi4B
-iu2DwM0p+/3Ko9x0qULaU5ZIj6JUylqX82HOOUPHKldUsqK4HzgDJafbpea0ILIJ
-H43Z/G5VxImHdITCGKv9jRnN9P7GT9QjngZ2bu3rDoQpx9Nvzy2awcWL8u/XPbrT
-sTHqDz9QxMSi7LJHiLpamMCYuYT/ag0zifkn/RLvgCmaxGxQ02LsUh1WIvMECD1o
-cN0CcPYjbuU5qDI3xVkqO1eWrChZZmvhF3yWVayYFNy45V8AiQkWc3n0heSLEAOB
-hrVG6bB4VOJrnWtHo1Q7OJ+fkg1bxyx/Y9TTOJM/50Z0dWd6YSTT6KDqNKbi43g=
-=EN+U
+iQEcBAEBCAAGBQJYrvcRAAoJEKeha0olJ0NqxHIH/jfzulnBbWwj8eb/aF+FmtXr
+TPTK309oiTE64QsjeUPDKeOT/HR5S25lvOAVlArqhun2QRFqnWSGQG9gOeWXKAM3
+3k6gbPccMM4B8DMCRX/05B2tCUpE4I27yo5uA3p5SYmBmy1dKSsf9XVP9eyjgYcX
+5pEFs77/ntWHsasl/lpE2F2rB3a2o3otDKE4Tpji/KrA8pa5ljXZ25Wg6GPga3yS
+cquUh2fj9S/QuAXWLQon5BZFYdMPdsUGgN21eNslg7NSRDsXTH9hdddWRRNGgxDp
+ft0RsOdMZKQ4TQo19e443d2fOzaI6Q/b+EV99U9fjj1iGbRTDnhwBrLSiIote8s=
+=uyd0
 -----END PGP SIGNATURE-----
 
---9pS2hy4/DrI8BQlq--
+--iCSdo9tLCCqKjO4KpcGSQ5B5aTD0G7u9P--
