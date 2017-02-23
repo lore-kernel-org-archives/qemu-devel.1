@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cgjkf-0003wU-Ah
+	(envelope-from <dgibson@ozlabs.org>) id 1cgjkf-0003we-EK
 	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 22:07:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cgjkd-0005Me-L3
+	(envelope-from <dgibson@ozlabs.org>) id 1cgjkd-0005MY-Jx
 	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 22:07:29 -0500
-Date: Thu, 23 Feb 2017 13:21:53 +1100
+Date: Thu, 23 Feb 2017 13:39:46 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170223022153.GU12577@umbus.fritz.box>
+Message-ID: <20170223023946.GA12577@umbus.fritz.box>
 References: <1487252865-12064-1-git-send-email-clg@kaod.org>
-	<1487252865-12064-7-git-send-email-clg@kaod.org>
+	<1487252865-12064-13-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="pzbqGaOtRNiVr7w4"
+	protocol="application/pgp-signature"; boundary="va9XEZk9/dJ5GUjX"
 Content-Disposition: inline
-In-Reply-To: <1487252865-12064-7-git-send-email-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v2 06/22] ppc/xics: use the QOM interface
- under the sPAPR machine
+In-Reply-To: <1487252865-12064-13-git-send-email-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v2 12/22] ppc/xics: extend the QOM
+ interface to handle ICPs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,101 +29,99 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---pzbqGaOtRNiVr7w4
+--va9XEZk9/dJ5GUjX
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 16, 2017 at 02:47:29PM +0100, C=E9dric Le Goater wrote:
-> Add 'ics_get' and 'ics_resend' handlers to the sPAPR machine. These
-> are relatively simple for a single ICS.
+On Thu, Feb 16, 2017 at 02:47:35PM +0100, C=E9dric Le Goater wrote:
+> Let's add two new handlers for ICPs. One is to get an ICP object from
+> a server number and a second is to resend the irqs when needed.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
 > ---
 >  hw/intc/xics.c        |  2 +-
->  hw/ppc/spapr.c        | 18 ++++++++++++++++++
->  include/hw/ppc/xics.h |  1 +
->  3 files changed, 20 insertions(+), 1 deletion(-)
+>  hw/ppc/spapr.c        | 20 ++++++++++++++++++++
+>  include/hw/ppc/xics.h |  3 +++
+>  3 files changed, 24 insertions(+), 1 deletion(-)
 >=20
 > diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> index 3e80d2d0f0d9..39c442f70116 100644
+> index 5131587ce088..7168c2cfd8a1 100644
 > --- a/hw/intc/xics.c
 > +++ b/hw/intc/xics.c
-> @@ -193,7 +193,7 @@ static void ics_reject(ICSState *ics, uint32_t nr)
->      }
+> @@ -216,7 +216,7 @@ static void icp_check_ipi(ICPState *ss)
+>      qemu_irq_raise(ss->output);
 >  }
 > =20
-> -static void ics_resend(ICSState *ics)
-> +void ics_resend(ICSState *ics)
+> -static void icp_resend(XICSInterface *xi, ICPState *ss)
+> +void icp_resend(XICSInterface *xi, ICPState *ss)
 >  {
->      ICSStateClass *k =3D ICS_BASE_GET_CLASS(ics);
+>      XICSInterfaceClass *xic =3D XICS_INTERFACE_GET_CLASS(xi);
 > =20
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 045f2323a4e9..85a973cce7ae 100644
+> index d1946ebcac69..eb7da32296d8 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -2901,6 +2901,20 @@ static void spapr_phb_placement(sPAPRMachineState =
-*spapr, uint32_t index,
->      *mmio64 =3D SPAPR_PCI_BASE + (index + 1) * SPAPR_PCI_MEM64_WIN_SIZE;
+> @@ -2915,6 +2915,24 @@ static void spapr_ics_resend(XICSInterface *dev)
+>      ics_resend(spapr->ics);
 >  }
 > =20
-> +static ICSState *spapr_ics_get(XICSInterface *dev, int irq)
+> +static ICPState *spapr_icp_get(XICSInterface *xi, int server)
 > +{
-> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(dev);
+> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
 > +
-> +    return ics_valid_irq(spapr->ics, irq) ? spapr->ics : NULL;
+> +    return (server < spapr->xics->nr_servers) ? &spapr->xics->ss[server]=
+ :
+> +        NULL;
 > +}
 > +
-> +static void spapr_ics_resend(XICSInterface *dev)
+> +static void spapr_icp_resend(XICSInterface *xi)
 > +{
-> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(dev);
+> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+> +    int i;
 > +
-> +    ics_resend(spapr->ics);
+> +    for (i =3D 0; i < spapr->xics->nr_servers; i++) {
+> +        icp_resend(xi, &spapr->xics->ss[i]);
+> +    }
 > +}
+
+I'm not quite sure where you plan to use the resend hook.  AFAICT all
+the existing users of this path can do fine using icp_get() then
+icp_resend() directly.
+
 > +
 >  static void spapr_machine_class_init(ObjectClass *oc, void *data)
 >  {
 >      MachineClass *mc =3D MACHINE_CLASS(oc);
-> @@ -2909,6 +2923,7 @@ static void spapr_machine_class_init(ObjectClass *o=
+> @@ -2959,6 +2977,8 @@ static void spapr_machine_class_init(ObjectClass *o=
 c, void *data)
->      NMIClass *nc =3D NMI_CLASS(oc);
->      HotplugHandlerClass *hc =3D HOTPLUG_HANDLER_CLASS(oc);
->      PPCVirtualHypervisorClass *vhc =3D PPC_VIRTUAL_HYPERVISOR_CLASS(oc);
-> +    XICSInterfaceClass *xic =3D XICS_INTERFACE_CLASS(oc);
-> =20
->      mc->desc =3D "pSeries Logical Partition (PAPR compliant)";
-> =20
-> @@ -2942,6 +2957,8 @@ static void spapr_machine_class_init(ObjectClass *o=
-c, void *data)
->      nc->nmi_monitor_handler =3D spapr_nmi;
->      smc->phb_placement =3D spapr_phb_placement;
 >      vhc->hypercall =3D emulate_spapr_hypercall;
-> +    xic->ics_get =3D spapr_ics_get;
-> +    xic->ics_resend =3D spapr_ics_resend;
+>      xic->ics_get =3D spapr_ics_get;
+>      xic->ics_resend =3D spapr_ics_resend;
+> +    xic->icp_get =3D spapr_icp_get;
+> +    xic->icp_resend =3D spapr_icp_resend;
 >  }
 > =20
 >  static const TypeInfo spapr_machine_info =3D {
-> @@ -2958,6 +2975,7 @@ static const TypeInfo spapr_machine_info =3D {
->          { TYPE_NMI },
->          { TYPE_HOTPLUG_HANDLER },
->          { TYPE_PPC_VIRTUAL_HYPERVISOR },
-> +        { TYPE_XICS_INTERFACE },
->          { }
->      },
->  };
 > diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> index fe2bb5c8ef54..640603b3d76d 100644
+> index c15d8e2a8ae6..7004c851e250 100644
 > --- a/include/hw/ppc/xics.h
 > +++ b/include/hw/ppc/xics.h
-> @@ -222,5 +222,6 @@ void ics_simple_write_xive(ICSState *ics, int nr, int=
+> @@ -191,6 +191,8 @@ typedef struct XICSInterfaceClass {
+>      InterfaceClass parent;
+>      ICSState *(*ics_get)(XICSInterface *xi, int irq);
+>      void (*ics_resend)(XICSInterface *xi);
+> +    ICPState *(*icp_get)(XICSInterface *xi, int server);
+> +    void (*icp_resend)(XICSInterface *xi);
+>  } XICSInterfaceClass;
+> =20
+>  #define XICS_IRQS_SPAPR               1024
+> @@ -221,5 +223,6 @@ void ics_simple_write_xive(ICSState *ics, int nr, int=
  server,
 >  void ics_set_irq_type(ICSState *ics, int srcno, bool lsi);
 > =20
->  ICSState *xics_find_source(XICSState *icp, int irq);
-> +void ics_resend(ICSState *ics);
+>  void ics_resend(ICSState *ics);
+> +void icp_resend(XICSInterface *xi, ICPState *ss);
 > =20
 >  #endif /* XICS_H */
 
@@ -133,25 +131,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---pzbqGaOtRNiVr7w4
+--va9XEZk9/dJ5GUjX
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYrkdBAAoJEGw4ysog2bOSg/kQAJ9F/zUOKPEiNpb69p0jaxCd
-SEuokPkm7Eglwcow/COBPqtYnTNrB2mQ0dWVuXYEmAuUc8M7kYSQxlp4fGUba1gV
-cynftkXOEDz1VzKsVKpbfRiwXn2qRS2DkS2j7GTfiNInvGfYa7LdeaIfDchYPI7S
-XMDwE9oVOi5Mtxp1ZdvVOimICK1qvDaWJ4PesNnzXnE+NGaQQpXDc1YHwKl60m+M
-GYriJs0yO+GAMz9pEYTDeA/E2ASZrbyq6dHgEVNXKMFBbdd70J9j3LpGDQS/5oT8
-TCOt8ysqYAKar8kg1AIB5eSy1HgMtuZAsD5xoVZKKrM9m9YoJ0hYuoyz2+1g6fyx
-NBxSCZLEwzPxPalFFJjenvvaXpYD95gc9EM42JMuoi5F7dQ+u399FIUF5IENIXNe
-ZbYMha7ipsBgKyrFOLCtGLeIqpvFGpQqT08V8z76DjVqB0xuzbzpUAfZHHNH/3Ek
-kWqJBXaYAMCftOaYzH5Rtpn04mrTtBJTjTerfHwP8OJPladdfp5MbSZSLM1UfHzN
-xNs2gFyUxlsZj26OkliPH5kfR6z7DJjdk3X65V/5nYDvuK8uSimRvvvRbj/Mh1rI
-Jb7/0InaY4S8ln6pBgUT85wEKO3cph4ZaUkZzF2QU109Bq1QvzevmBZPTFhekkA2
-1LLwRaRJofdNLXjGOCG7
-=t9Dq
+iQIcBAEBCAAGBQJYrktyAAoJEGw4ysog2bOSt9QP/3hKFGA3UdFU6juUYzC78SJn
+O9Tx2kOAnkyBraEbS3ikk+af2LyqFK0+UOoCCuWBATmuUNmCP5NfBfNujoZAP3iQ
+GnmbJcfnBiYnGAebWYguB1SDptAacjiv+xSUVRvbdgykgrg6PrPZtIEcQQZ2TpHp
+gOnrs4AlKLnq/9A5PMmAmkBFYb1aL2DyoNbcCD1hUEK7YTovbvkfZesBMq9zdJGC
+ucHj0YDzvOjQF7CIHdeEHPo+Z0vMXCdFPBgDbRjZhNPpsk3rXBh8W4KjTSY4LBA3
+fGhjAjqg1pi/1Lo7IHd4Ek9F3t7mUPr53snMK5fCtPbsnTNzcRyz7eRUazvu3+R3
+cAPugzmKavXvosqBfc9WYOl+I2b9iM38+/oA8zaUQZJOZh+gkppIxzv52TYgzWg6
+YLNbiLPv4spR9b6e4LX5Zb3gflBJXVdYnEDp6Qrkvd76XvYSOLmvSf0Xou+Ik75j
+VZBMgrLK9va9wAjpW7395jR+yGygs7k94L8NsEA1GT5M6t7nwdJHsb9JD+45McfD
+qH31r6hgAaU2fQeN/ThygTK3dKcy2IyaIiU+LlHuCgNFjohmpTAHK4doNWRdsqES
+bM32+weT1oBo16MnHWmUF77C+bn70H+YXND6dy5ijSYtT7AA/2CgWCRwIzTTNFbC
+1Ky1g7zQGS+3zx89j9Wq
+=sJKR
 -----END PGP SIGNATURE-----
 
---pzbqGaOtRNiVr7w4--
+--va9XEZk9/dJ5GUjX--
