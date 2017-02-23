@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cgzCv-0001ov-Nz
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:37:43 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cgzNs-0007S4-EV
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:49:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cgzCr-0003dC-84
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:37:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55260)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1cgzCq-0003cr-Vr
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:37:37 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 216447FB7D
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 19:37:37 +0000 (UTC)
-From: Alex Williamson <alex.williamson@redhat.com>
-Date: Thu, 23 Feb 2017 12:37:35 -0700
-Message-ID: <20170223193724.17158.84397.stgit@gimli.home>
-In-Reply-To: <20170223193048.16909.25661.stgit@gimli.home>
-References: <20170223193048.16909.25661.stgit@gimli.home>
+	(envelope-from <alex.bennee@linaro.org>) id 1cgzNo-0007X2-EK
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:49:00 -0500
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:32976)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cgzNo-0007WT-7r
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:48:56 -0500
+Received: by mail-wm0-x234.google.com with SMTP id t18so5171285wmt.0
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 11:48:55 -0800 (PST)
+References: <CAJSP0QVjokCyvVtDcyWBhDqsWKwdNX6zyAo1uL9VmyzMfakS9A@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAJSP0QVjokCyvVtDcyWBhDqsWKwdNX6zyAo1uL9VmyzMfakS9A@mail.gmail.com>
+Date: Thu, 23 Feb 2017 19:48:52 +0000
+Message-ID: <87y3wwy9gb.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PULL 3/3] vfio/pci-quirks.c: Disable stolen memory
- for igd VFIO
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] Hang in aio/multi/mutex/mcs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,136 +29,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-From: XiongZhang <xiong.y.zhang@intel.com>
 
-Regardless of running in UPT or legacy mode, the guest igd
-drivers may attempt to use stolen memory, however only legacy
-mode has BIOS support for reserving stolen memmory in the
-guest VM. We zero out the stolen memory size in all cases,
-then guest igd driver won't use stolen memory.
-In legacy mode, user could use x-igd-gms option to specify the
-amount of stolen memory which will be pre-allocated and reserved
-by bios for igd use.
+Stefan Hajnoczi <stefanha@gmail.com> writes:
 
-Bugzilla: https://bugs.freedesktop.org/show_bug.cgi?id=99028
-          https://bugs.freedesktop.org/show_bug.cgi?id=99025
+> Hi Paolo,
+> Alex Benne reported that Travis CI is hanging in aio/multi/mutex/mcs:
+>
+> https://travis-ci.org/qemu/qemu/builds/203811867
+>
+> 0x00007fe9d680052d in nanosleep () from
+> target:/lib/x86_64-linux-gnu/libpthread.so.0
+> (gdb) info threads
+>   Id   Target Id         Frame
+> * 1    LWP 15116 "test-aio-multit" 0x00007fe9d680052d in nanosleep ()
+> from target:/lib/x86_64-linux-gnu/libpthread.so.0
+> (gdb) bt
+> #0  0x00007fe9d680052d in nanosleep () from
+> target:/lib/x86_64-linux-gnu/libpthread.so.0
+> #1  0x00007fe9d74c6072 in g_usleep () from
+> target:/lib/x86_64-linux-gnu/libglib-2.0.so.0
+> #2  0x000055b90b2e9dca in test_multi_fair_mutex (seconds=1, threads=5)
+> at /tmp/qemu-test/src/tests/test-aio-multithread.c:363
+> #3  0x00007fe9d74c365b in ?? () from
+> target:/lib/x86_64-linux-gnu/libglib-2.0.so.0
+> #4  0x00007fe9d74c37d6 in ?? () from
+> target:/lib/x86_64-linux-gnu/libglib-2.0.so.0
+> #5  0x00007fe9d74c37d6 in ?? () from
+> target:/lib/x86_64-linux-gnu/libglib-2.0.so.0
+> #6  0x00007fe9d74c37d6 in ?? () from
+> target:/lib/x86_64-linux-gnu/libglib-2.0.so.0
+> #7  0x00007fe9d74c3b2b in g_test_run_suite () from
+> target:/lib/x86_64-linux-gnu/libglib-2.0.so.0
+> #8  0x000055b90b2e758c in main (argc=1, argv=0x7ffd65cb4928) at
+> /tmp/qemu-test/src/tests/test-aio-multithread.c:462
 
-Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
-Tested-by: Terrence Xu <terrence.xu@intel.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- hw/vfio/pci-quirks.c |   65 +++++++++++++++++++++++++++++---------------------
- 1 file changed, 38 insertions(+), 27 deletions(-)
+To reproduce:
 
-diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-index e9b493b939db..e995e32deedf 100644
---- a/hw/vfio/pci-quirks.c
-+++ b/hw/vfio/pci-quirks.c
-@@ -1367,14 +1367,45 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
-     uint16_t cmd_orig, cmd;
-     Error *err = NULL;
- 
-+    /* This must be an Intel VGA device. */
-+    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_INTEL, PCI_ANY_ID) ||
-+        !vfio_is_vga(vdev) || nr != 4) {
-+        return;
-+    }
-+
-     /*
--     * This must be an Intel VGA device at address 00:02.0 for us to even
--     * consider enabling legacy mode.  The vBIOS has dependencies on the
--     * PCI bus address.
-+     * IGD is not a standard, they like to change their specs often.  We
-+     * only attempt to support back to SandBridge and we hope that newer
-+     * devices maintain compatibility with generation 8.
-      */
--    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_INTEL, PCI_ANY_ID) ||
--        !vfio_is_vga(vdev) || nr != 4 ||
--        &vdev->pdev != pci_find_device(pci_device_root_bus(&vdev->pdev),
-+    gen = igd_gen(vdev);
-+    if (gen != 6 && gen != 8) {
-+        error_report("IGD device %s is unsupported by IGD quirks, "
-+                     "try SandyBridge or newer", vdev->vbasedev.name);
-+        return;
-+    }
-+
-+    /*
-+     * Regardless of running in UPT or legacy mode, the guest graphics
-+     * driver may attempt to use stolen memory, however only legacy mode
-+     * has BIOS support for reserving stolen memory in the guest VM.
-+     * Emulate the GMCH register in all cases and zero out the stolen
-+     * memory size here. Legacy mode may request allocation and re-write
-+     * this below.
-+     */
-+    gmch = vfio_pci_read_config(&vdev->pdev, IGD_GMCH, 4);
-+    gmch &= ~((gen < 8 ? 0x1f : 0xff) << (gen < 8 ? 3 : 8));
-+
-+    /* GMCH is read-only, emulated */
-+    pci_set_long(vdev->pdev.config + IGD_GMCH, gmch);
-+    pci_set_long(vdev->pdev.wmask + IGD_GMCH, 0);
-+    pci_set_long(vdev->emulated_config_bits + IGD_GMCH, ~0);
-+
-+    /*
-+     * This must be at address 00:02.0 for us to even onsider enabling
-+     * legacy mode.  The vBIOS has dependencies on the PCI bus address.
-+     */
-+    if (&vdev->pdev != pci_find_device(pci_device_root_bus(&vdev->pdev),
-                                        0, PCI_DEVFN(0x2, 0))) {
-         return;
-     }
-@@ -1394,18 +1425,6 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
-     }
- 
-     /*
--     * IGD is not a standard, they like to change their specs often.  We
--     * only attempt to support back to SandBridge and we hope that newer
--     * devices maintain compatibility with generation 8.
--     */
--    gen = igd_gen(vdev);
--    if (gen != 6 && gen != 8) {
--        error_report("IGD device %s is unsupported in legacy mode, "
--                     "try SandyBridge or newer", vdev->vbasedev.name);
--        return;
--    }
--
--    /*
-      * Most of what we're doing here is to enable the ROM to run, so if
-      * there's no ROM, there's no point in setting up this quirk.
-      * NB. We only seem to get BIOS ROMs, so a UEFI VM would need CSM support.
-@@ -1460,8 +1479,6 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
-         goto out;
-     }
- 
--    gmch = vfio_pci_read_config(&vdev->pdev, IGD_GMCH, 4);
--
-     /*
-      * If IGD VGA Disable is clear (expected) and VGA is not already enabled,
-      * try to enable it.  Probably shouldn't be using legacy mode without VGA,
-@@ -1532,12 +1549,11 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
-      * when IVD (IGD VGA Disable) is clear, but the claim is that it's unused,
-      * so let's not waste VM memory for it.
-      */
--    gmch &= ~((gen < 8 ? 0x1f : 0xff) << (gen < 8 ? 3 : 8));
--
-     if (vdev->igd_gms) {
-         if (vdev->igd_gms <= 0x10) {
-             gms_mb = vdev->igd_gms * 32;
-             gmch |= vdev->igd_gms << (gen < 8 ? 3 : 8);
-+            pci_set_long(vdev->pdev.config + IGD_GMCH, gmch);
-         } else {
-             error_report("Unsupported IGD GMS value 0x%x", vdev->igd_gms);
-             vdev->igd_gms = 0;
-@@ -1557,11 +1573,6 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
-     fw_cfg_add_file(fw_cfg_find(), "etc/igd-bdsm-size",
-                     bdsm_size, sizeof(*bdsm_size));
- 
--    /* GMCH is read-only, emulated */
--    pci_set_long(vdev->pdev.config + IGD_GMCH, gmch);
--    pci_set_long(vdev->pdev.wmask + IGD_GMCH, 0);
--    pci_set_long(vdev->emulated_config_bits + IGD_GMCH, ~0);
--
-     /* BDSM is read-write, emulated.  The BIOS needs to be able to write it */
-     pci_set_long(vdev->pdev.config + IGD_BDSM, 0);
-     pci_set_long(vdev->pdev.wmask + IGD_BDSM, ~0);
+  make docker-test-quick@travis J=4 DEBUG=1
+  /tmp/qemu-test/src/tests/docker/test-quick
+
+This usually hangs for me. In another winder you can run:
+
+  docker exec -it $CONTAINER_NAME bash
+
+To get access to the filesystem and see the hung tasks.
+
+If it doesn't trigger during this stage you may need to:
+
+  cd /var/tmp/qemu-build
+  ./tests/test-aio-multithread
+
+Hope that helps the debugging ;-)
+
+--
+Alex Bennée
