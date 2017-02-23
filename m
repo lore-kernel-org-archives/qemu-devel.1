@@ -1,26 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34966)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1cguOf-00052G-S1
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:29:31 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36422)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <peter.maydell@linaro.org>) id 1cguUp-0008D9-MT
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:35:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1cguOc-0007Wk-KL
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:29:29 -0500
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:34197 helo=mx01.kamp.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1cguOc-0007W7-An
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:29:26 -0500
-References: <9533ba99-b143-b577-0115-742119d089a4@kamp.de>
-	<9292fef8-929a-e89e-eca5-cd247ca9334b@redhat.com>
-	<f0eb7ff1-47d7-42d0-c7b5-946d2224e986@kamp.de>
-	<61a4e9c2-9298-2d62-af90-8057a34b64d6@redhat.com>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <4412d38d-7626-c765-5fa9-e175007280ce@kamp.de>
-Date: Thu, 23 Feb 2017 15:29:24 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1cguUo-0000zI-VO
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:35:51 -0500
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:36963)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cguUo-0000z1-MP
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:35:50 -0500
+Received: by mail-wm0-x22c.google.com with SMTP id v77so913931wmv.0
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 06:35:50 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <61a4e9c2-9298-2d62-af90-8057a34b64d6@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Qemu and Changed Block Tracking
+In-Reply-To: <41630a89-e645-7d7e-b7c2-356fd6dcadee@redhat.com>
+References: <1487659615-15820-1-git-send-email-xyjxie@linux.vnet.ibm.com>
+	<5edff645-12e8-d3e0-1849-302b6986c232@ozlabs.ru>
+	<fdcb2b07-aae8-69bf-ee94-a43777009c3a@redhat.com>
+	<CAFEAcA--bSo7PJH0Px9ytQspaYuS55CSsM_EN6zt0djhkqKNPw@mail.gmail.com>
+	<5a0773de-6bc7-474a-82ab-2edd37ce8a93@redhat.com>
+	<CAFEAcA99xi4k57h2XGw2deGO24E95AS5jyGL+4GzjqNgMb9wcg@mail.gmail.com>
+	<92580ca9-47fe-a943-7720-d3cb1fc6d2eb@redhat.com>
+	<CAFEAcA8769a_8xwk57FS6Ko+Lioud20+70JRSafeEic6GB_RAw@mail.gmail.com>
+	<3d5e7b5e-4501-86b7-093d-47fb09af585e@redhat.com>
+	<CAFEAcA9gcArSqhbRi6-YdR=5eE9dtq66C7N0qTbCuBiY_Zr+tA@mail.gmail.com>
+	<41630a89-e645-7d7e-b7c2-356fd6dcadee@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 23 Feb 2017 14:35:28 +0000
+Message-ID: <CAFEAcA_Mh9ZrJeu4f==ko1k2yLkfPe2AwNbUHcxkmS6Lzuvk0Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] memory: make ram device read/write endian
+ sensitive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,95 +39,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Christian Theune <ct@flyingcircus.io>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Yongji Xie <xyjxie@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, zhong@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>, Paul Mackerras <paulus@samba.org>
 
-Am 22.02.2017 um 22:17 schrieb John Snow:
+On 23 February 2017 at 12:53, Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> On 02/22/2017 03:45 AM, Peter Lieven wrote:
->> Am 21.02.2017 um 22:13 schrieb John Snow:
->>> On 02/21/2017 07:43 AM, Peter Lieven wrote:
->>>> Hi,
->>>>
->>>>
->>>> is there anyone ever thought about implementing something like VMware
->>>> CBT in Qemu?
->>>>
->>>>
->>>> https://kb.vmware.com/selfservice/microsites/search.do?language=en_US&cmd=displayKC&externalId=1020128
->>>>
->>>>
->>>>
->>>> Thanks,
->>>> Peter
->>>>
->>>>
->>> A bit outdated now, but:
->>> http://wiki.qemu-project.org/Features/IncrementalBackup
+>
+> On 23/02/2017 13:26, Peter Maydell wrote:
+>> On 23 February 2017 at 11:43, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>> On 23/02/2017 12:34, Peter Maydell wrote:
+>>>> We should probably update the doc comment to note that the
+>>>> pointer is to host-endianness memory (and that this is not
+>>>> like normal RAM which is target-endian)...
 >>>
->>> and also a summary I wrote not too far back (PDF):
->>> https://drive.google.com/file/d/0B3CFr1TuHydWalVJaEdPaE5PbFE
+>>> I wouldn't call it host-endianness memory, and I disagree that normal
+>>> RAM is target-endian---in both cases it's just a bunch of bytes.
 >>>
->>> and I'm sure the Virtuozzo developers could chime in on this subject,
->>> but basically we do have something similar in the works, as eblake says.
->> Hi John, Hi Erik,
+>>> However, the access done by the MemoryRegionOps callbacks needs to match
+>>> the endianness declared by the MemoryRegionOps themselves.
 >>
->> thanks for your feedback. Are you both the ones working primary on this topic?
->> If there is anything to review or help needed, please let me know.
->>
-> I've been working on incremental backups; Fam and I now co-maintain
-> block/dirty-bitmap.c.
+>> Well, if the guest stores a bunch of integers to the memory, which
+>> way round do you see them when you look at the bunch of bytes?
 >
-> Vladimir Sementsov-Ogievskiy has been working on bitmap persistence and
-> migration from Virtuozzo; as well as the NBD specification amendment to
-> allow us to fleece images with dirty bitmaps.
->
-> (Check the wiki and the whitepaper I linked!)
->
-> Eric has been guiding the review process for the NBD side of things.
->
->> My 2 cents:
->> I thing I had in mind if there is no image fleecing available, but fetching the dirty bitmap
->> from external would be a feauture to put a write lock on a block device.
->> Write lock means, drain all pending writes and queue all further writes until unlock (as if they
->> were throttled to zero). This could help fetch consistent backups from storage device (thinking of iSCSI SAN) without
->> the help of the hypervisor to actually transfer data (no load in the frontend network or the host). What would further
->> be needed is a write generation for each block, not just only a dirty bitmap.
->>
->> In this case something like this via QMP (and external software) should work:
->> ---8<---
->>   gen =  write generation of last backup (or 0 for full backup)
->>   do {
->>       nextgen = fetch current write generation (via QMP)
-> As Eric said, there's a lot of hostility to using QMP as a metadata
-> transmission protocol.
->
->>       dirtymap = send all block whose write generation is greater than 'gen' (via QMP)
->>       dirtycnt = 0
->>       foreach block in dirtymap {
->>                 copy to backup via external software
->>                 dirtycnt++
->>       }
->>       gen = nextgen
->>   } while (dirtycnt < X)         <--- to achieve this a thorttling or similar might be needed
->>
->> fsfreeze (optional)
->> write lock (via QMP)
->> backupgen = fetch current write generation (via QMP)
->> dirtymap = send all block whose write generation is greater than 'gen' (via QMP)
->> foreach block in dirtymap {
->>                 copy to backup via external software
->> }
->> unlock (via QMP)
->> fsthaw (optional)
->> --->8---
->>
->> As far as I understand CBT in VMware is not just only a dirty bitmap, but also a write generation tracking for blocks (size 64kb or whatever)
->>
-> I think at the moment I'm worried about getting the basic features out
-> the door, but I'm not opposed to adding fancier features if there's
-> justification or demand for them.
+> You see them in whatever endianness the guest used.
 
-Sure, the basic features are most important. I was just thinking of the above scenario to interact with a NAS and have Qemu's "help"
-to create incremental backups.
+I'm confused. I said "normal RAM and this ramdevice memory are
+different", and you seem to be saying they're the same. I don't
+think they are (in particular I think with a BE guest on an
+LE host they'll look different).
 
-Peter
+thanks
+-- PMM
