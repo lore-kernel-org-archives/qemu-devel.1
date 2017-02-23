@@ -1,24 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cgvId-0000fR-27
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:27:20 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cgvLU-00027K-9x
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:30:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cgvIZ-0001Me-OO
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:27:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50030)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cgvIZ-0001MM-G9
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:27:15 -0500
-Date: Thu, 23 Feb 2017 15:27:10 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170223152709.GD2383@work-vm>
-References: <1487009088-23891-1-git-send-email-ashijeetacharya@gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cgvLT-0002VQ-Cu
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:30:16 -0500
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:38607)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cgvLT-0002Tr-7C
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:30:15 -0500
+Received: by mail-wm0-x232.google.com with SMTP id r141so2414898wmg.1
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 07:30:15 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1487009088-23891-1-git-send-email-ashijeetacharya@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v4] migrate: Introduce a 'dc->vmsd' check
- to avoid segfault for --only-migratable
+In-Reply-To: <2565ef99-9c16-e836-08c6-0915f5d4b0f8@redhat.com>
+References: <1487659615-15820-1-git-send-email-xyjxie@linux.vnet.ibm.com>
+	<5edff645-12e8-d3e0-1849-302b6986c232@ozlabs.ru>
+	<fdcb2b07-aae8-69bf-ee94-a43777009c3a@redhat.com>
+	<CAFEAcA--bSo7PJH0Px9ytQspaYuS55CSsM_EN6zt0djhkqKNPw@mail.gmail.com>
+	<5a0773de-6bc7-474a-82ab-2edd37ce8a93@redhat.com>
+	<CAFEAcA99xi4k57h2XGw2deGO24E95AS5jyGL+4GzjqNgMb9wcg@mail.gmail.com>
+	<92580ca9-47fe-a943-7720-d3cb1fc6d2eb@redhat.com>
+	<CAFEAcA8769a_8xwk57FS6Ko+Lioud20+70JRSafeEic6GB_RAw@mail.gmail.com>
+	<3d5e7b5e-4501-86b7-093d-47fb09af585e@redhat.com>
+	<CAFEAcA9gcArSqhbRi6-YdR=5eE9dtq66C7N0qTbCuBiY_Zr+tA@mail.gmail.com>
+	<41630a89-e645-7d7e-b7c2-356fd6dcadee@redhat.com>
+	<CAFEAcA_Mh9ZrJeu4f==ko1k2yLkfPe2AwNbUHcxkmS6Lzuvk0Q@mail.gmail.com>
+	<2565ef99-9c16-e836-08c6-0915f5d4b0f8@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 23 Feb 2017 15:29:53 +0000
+Message-ID: <CAFEAcA_BgiXrjW9aRNFkXEEjS+kjibJ_UisJtiLgrPh=0re5qA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] memory: make ram device read/write endian
+ sensitive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,220 +41,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Cc: quintela@redhat.com, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Yongji Xie <xyjxie@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, zhong@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>, Paul Mackerras <paulus@samba.org>
 
-* Ashijeet Acharya (ashijeetacharya@gmail.com) wrote:
-> Commit a3a3d8c7 introduced a segfault bug while checking for
-> 'dc->vmsd->unmigratable' which caused QEMU to crash when trying to add
-> devices which do no set their 'dc->vmsd' yet while initialization.
-> Place a 'dc->vmsd' check prior to it so that we do not segfault for
-> such devices.
-> 
-> NOTE: This doesn't compromise the functioning of --only-migratable
-> option as all the unmigratable devices do set their 'dc->vmsd'.
-> 
-> Introduce a new function check_migratable() and move the
-> only_migratable check inside it, also use stubs to avoid user-mode qemu
-> build failures.
-> 
-> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+On 23 February 2017 at 15:21, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+>
+> On 23/02/2017 15:35, Peter Maydell wrote:
+>> On 23 February 2017 at 12:53, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>>
+>>>
+>>> On 23/02/2017 13:26, Peter Maydell wrote:
+>>>> On 23 February 2017 at 11:43, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>>>> On 23/02/2017 12:34, Peter Maydell wrote:
+>>>>>> We should probably update the doc comment to note that the
+>>>>>> pointer is to host-endianness memory (and that this is not
+>>>>>> like normal RAM which is target-endian)...
+>>>>>
+>>>>> I wouldn't call it host-endianness memory, and I disagree that normal
+>>>>> RAM is target-endian---in both cases it's just a bunch of bytes.
+>>>>>
+>>>>> However, the access done by the MemoryRegionOps callbacks needs to match
+>>>>> the endianness declared by the MemoryRegionOps themselves.
+>>>>
+>>>> Well, if the guest stores a bunch of integers to the memory, which
+>>>> way round do you see them when you look at the bunch of bytes?
+>>>
+>>> You see them in whatever endianness the guest used.
+>>
+>> I'm confused. I said "normal RAM and this ramdevice memory are
+>> different", and you seem to be saying they're the same. I don't
+>> think they are (in particular I think with a BE guest on an
+>> LE host they'll look different).
+>
+> No, they look entirely the same.  The only difference is that they go
+> through MemoryRegionOps instead of memcpy.
 
-Yep, I think that should work.
+Then we have a different problem, because the thing this patch
+is claiming to fix is that the memory the device is backed by
+(from vfio) is little-endian and we're not accessing it right.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+RAM of the usual sort is target-endian (by which I mean "when the guest
+does a write of 32-bits 0x12345678, and you look at the memory byte
+by byte then the order of bytes is either 0x12 0x34 0x56 0x78 if
+TARGET_LITTLE_ENDIAN or 0x78 0x56 0x34 0x12 if TARGET_BIG_ENDIAN").
 
-> ---
-> Changes in v4:
-> - introduce new check_migratable() function and use stubs
-> Changes is v3:
-> - move only_migratable check inside device_set_realized() to avoid code
-> - duplication
-> - I have dropped Juan's R-b tag for this one
-> Changes in v2:
-> - place dc->vmsd check in hw/usb/bus.c as well
-> ---
->  hw/core/qdev.c                |  7 +++++++
->  hw/usb/bus.c                  | 19 -------------------
->  include/migration/migration.h |  3 +++
->  migration/migration.c         | 15 +++++++++++++++
->  qdev-monitor.c                |  9 ---------
->  stubs/vmstate.c               |  6 ++++++
->  6 files changed, 31 insertions(+), 28 deletions(-)
-> 
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 5783442..4f49cfe 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -37,6 +37,7 @@
->  #include "hw/boards.h"
->  #include "hw/sysbus.h"
->  #include "qapi-event.h"
-> +#include "migration/migration.h"
->  
->  int qdev_hotplug = 0;
->  static bool qdev_hot_added = false;
-> @@ -889,6 +890,7 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
->      Error *local_err = NULL;
->      bool unattached_parent = false;
->      static int unattached_count;
-> +    int ret;
->  
->      if (dev->hotplugged && !dc->hotpluggable) {
->          error_setg(errp, QERR_DEVICE_NO_HOTPLUG, object_get_typename(obj));
-> @@ -896,6 +898,11 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
->      }
->  
->      if (value && !dev->realized) {
-> +        ret = check_migratable(obj, &local_err);
-> +        if (ret < 0) {
-> +            goto fail;
-> +        }
-> +
->          if (!obj->parent) {
->              gchar *name = g_strdup_printf("device[%d]", unattached_count++);
->  
-> diff --git a/hw/usb/bus.c b/hw/usb/bus.c
-> index 1dcc35c..25913ad 100644
-> --- a/hw/usb/bus.c
-> +++ b/hw/usb/bus.c
-> @@ -8,7 +8,6 @@
->  #include "monitor/monitor.h"
->  #include "trace.h"
->  #include "qemu/cutils.h"
-> -#include "migration/migration.h"
->  
->  static void usb_bus_dev_print(Monitor *mon, DeviceState *qdev, int indent);
->  
-> @@ -687,8 +686,6 @@ USBDevice *usbdevice_create(const char *cmdline)
->      const char *params;
->      int len;
->      USBDevice *dev;
-> -    ObjectClass *klass;
-> -    DeviceClass *dc;
->  
->      params = strchr(cmdline,':');
->      if (params) {
-> @@ -723,22 +720,6 @@ USBDevice *usbdevice_create(const char *cmdline)
->          return NULL;
->      }
->  
-> -    klass = object_class_by_name(f->name);
-> -    if (klass == NULL) {
-> -        error_report("Device '%s' not found", f->name);
-> -        return NULL;
-> -    }
-> -
-> -    dc = DEVICE_CLASS(klass);
-> -
-> -    if (only_migratable) {
-> -        if (dc->vmsd->unmigratable) {
-> -            error_report("Device %s is not migratable, but --only-migratable "
-> -                         "was specified", f->name);
-> -            return NULL;
-> -        }
-> -    }
-> -
->      if (f->usbdevice_init) {
->          dev = f->usbdevice_init(bus, params);
->      } else {
-> diff --git a/include/migration/migration.h b/include/migration/migration.h
-> index af9135f..a6868cd 100644
-> --- a/include/migration/migration.h
-> +++ b/include/migration/migration.h
-> @@ -22,6 +22,7 @@
->  #include "qapi-types.h"
->  #include "exec/cpu-common.h"
->  #include "qemu/coroutine_int.h"
-> +#include "qom/object.h"
->  
->  #define QEMU_VM_FILE_MAGIC           0x5145564d
->  #define QEMU_VM_FILE_VERSION_COMPAT  0x00000002
-> @@ -305,6 +306,8 @@ int migrate_add_blocker(Error *reason, Error **errp);
->   */
->  void migrate_del_blocker(Error *reason);
->  
-> +int check_migratable(Object *obj, Error **err);
-> +
->  bool migrate_postcopy_ram(void);
->  bool migrate_zero_blocks(void);
->  
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 2766d2f..00b33f3 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1146,6 +1146,21 @@ void migrate_del_blocker(Error *reason)
->      migration_blockers = g_slist_remove(migration_blockers, reason);
->  }
->  
-> +int check_migratable(Object *obj, Error **err)
-> +{
-> +    DeviceClass *dc = DEVICE_GET_CLASS(obj);
-> +    if (only_migratable && dc->vmsd) {
-> +        if (dc->vmsd->unmigratable) {
-> +            error_setg(err, "Device %s is not migratable, but "
-> +                       "--only-migratable was specified",
-> +                       object_get_typename(obj));
-> +            return -1;
-> +        }
-> +    }
-> +
-> +    return 0;
-> +}
-> +
->  void qmp_migrate_incoming(const char *uri, Error **errp)
->  {
->      Error *local_err = NULL;
-> diff --git a/qdev-monitor.c b/qdev-monitor.c
-> index 549f45f..5f2fcdf 100644
-> --- a/qdev-monitor.c
-> +++ b/qdev-monitor.c
-> @@ -29,7 +29,6 @@
->  #include "qemu/error-report.h"
->  #include "qemu/help_option.h"
->  #include "sysemu/block-backend.h"
-> -#include "migration/migration.h"
->  
->  /*
->   * Aliases were a bad idea from the start.  Let's keep them
-> @@ -579,14 +578,6 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
->          return NULL;
->      }
->  
-> -    if (only_migratable) {
-> -        if (dc->vmsd->unmigratable) {
-> -            error_setg(errp, "Device %s is not migratable, but "
-> -                       "--only-migratable was specified", driver);
-> -            return NULL;
-> -        }
-> -    }
-> -
->      /* find bus */
->      path = qemu_opt_get(opts, "bus");
->      if (path != NULL) {
-> diff --git a/stubs/vmstate.c b/stubs/vmstate.c
-> index 6590627..5a71770 100644
-> --- a/stubs/vmstate.c
-> +++ b/stubs/vmstate.c
-> @@ -1,6 +1,7 @@
->  #include "qemu/osdep.h"
->  #include "qemu-common.h"
->  #include "migration/vmstate.h"
-> +#include "migration/migration.h"
->  
->  const VMStateDescription vmstate_dummy = {};
->  
-> @@ -18,3 +19,8 @@ void vmstate_unregister(DeviceState *dev,
->                          void *opaque)
->  {
->  }
-> +
-> +int check_migratable(Object *obj, Error **err)
-> +{
-> +    return 0;
-> +}
-> -- 
-> 2.6.2
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+AIUI what we want for this VFIO case is "when the guest does
+a 32-bit write of 0x12345678 then the bytes are 0x12 0x34 0x56 0x78
+regardless of whether TARGET_BIG_ENDIAN or not".
+
+thanks
+-- PMM
