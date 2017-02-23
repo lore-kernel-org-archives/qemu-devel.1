@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cgi4z-0006Pn-FJ
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 20:20:22 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cgimu-0001QU-8v
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 21:05:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cgi4w-0002kG-9s
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 20:20:21 -0500
-Received: from mail-yb0-x243.google.com ([2607:f8b0:4002:c09::243]:34289)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cgimq-0006sF-UQ
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 21:05:44 -0500
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33576)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1cgi4w-0002k8-2y
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 20:20:18 -0500
-Received: by mail-yb0-x243.google.com with SMTP id i66so798836yba.1
-	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 17:20:18 -0800 (PST)
-From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Wed, 22 Feb 2017 20:20:14 -0500
-Message-Id: <1487812814-17055-1-git-send-email-bobby.prani@gmail.com>
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cgimq-0006s0-Pn
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 21:05:40 -0500
+Received: by mail-qk0-x244.google.com with SMTP id x71so3054813qkb.0
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 18:05:38 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170205133727.23424-1-zxq_yx_007@163.com>
+	<20170205133727.23424-4-zxq_yx_007@163.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <1edab58f-9806-587e-d814-110e650a442a@amsat.org>
+Date: Wed, 22 Feb 2017 23:05:34 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20170205133727.23424-4-zxq_yx_007@163.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] mttcg/i386: Patch instruction using
- async_safe_* framework
+Subject: Re: [Qemu-devel] [RESEND PATCH 3/9] hw/dma: QOM'ify sun4m_iommu.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,184 +34,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: xiaoqiang zhao <zxq_yx_007@163.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, mark.cave-ayland@ilande.co.uk, atar4qemu@gmail.com, peter.maydell@linaro.org
 
-In mttcg, calling pause_all_vcpus() during execution from the
-generated TBs causes a deadlock if some vCPU is waiting for exclusive
-execution in start_exclusive(). Fix this by using the aync_safe_*
-framework instead of pausing vcpus for patching instructions.
+On 02/05/2017 10:37 AM, xiaoqiang zhao wrote:
+> Drop the old SysBus init function and use instance_init
+>
+> Signed-off-by: xiaoqiang zhao <zxq_yx_007@163.com>
 
-CC: Richard Henderson <rth@twiddle.net>
-CC: Peter Maydell <peter.maydell@linaro.org>
-CC: Alex BennÃ©e <alex.bennee@linaro.org>
-Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
----
- hw/i386/kvmvapic.c | 104 ++++++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 76 insertions(+), 28 deletions(-)
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
-index 82a4955..15eb39d 100644
---- a/hw/i386/kvmvapic.c
-+++ b/hw/i386/kvmvapic.c
-@@ -383,8 +383,7 @@ static void patch_byte(X86CPU *cpu, target_ulong addr, uint8_t byte)
-     cpu_memory_rw_debug(CPU(cpu), addr, &byte, 1, 1);
- }
- 
--static void patch_call(VAPICROMState *s, X86CPU *cpu, target_ulong ip,
--                       uint32_t target)
-+static void patch_call(X86CPU *cpu, target_ulong ip, uint32_t target)
- {
-     uint32_t offset;
- 
-@@ -393,17 +392,74 @@ static void patch_call(VAPICROMState *s, X86CPU *cpu, target_ulong ip,
-     cpu_memory_rw_debug(CPU(cpu), ip + 1, (void *)&offset, sizeof(offset), 1);
- }
- 
--static void patch_instruction(VAPICROMState *s, X86CPU *cpu, target_ulong ip)
-+struct PatchInfo {
-+    VAPICHandlers *handler;
-+    target_ulong ip;
-+};
-+
-+static void do_patch_instruction(CPUState *cs, run_on_cpu_data data)
- {
--    CPUState *cs = CPU(cpu);
--    CPUX86State *env = &cpu->env;
--    VAPICHandlers *handlers;
-+    X86CPU *x86_cpu = X86_CPU(cs);
-+    CPUX86State *env = &x86_cpu->env;
-+    struct PatchInfo *info = (struct PatchInfo *) data.host_ptr;
-+    VAPICHandlers *handlers = info->handler;
-+    target_ulong ip = info->ip;
-     uint8_t opcode[2];
-     uint32_t imm32 = 0;
-     target_ulong current_pc = 0;
-     target_ulong current_cs_base = 0;
-     uint32_t current_flags = 0;
- 
-+    cpu_get_tb_cpu_state(env, &current_pc, &current_cs_base,
-+                         &current_flags);
-+    /* Account this instruction, because we will exit the tb.
-+       This is the first instruction in the block. Therefore
-+       there is no need in restoring CPU state. */
-+    if (use_icount) {
-+        --cs->icount_decr.u16.low;
-+    }
-+
-+    cpu_memory_rw_debug(cs, ip, opcode, sizeof(opcode), 0);
-+
-+    switch (opcode[0]) {
-+    case 0x89: /* mov r32 to r/m32 */
-+        patch_byte(x86_cpu, ip, 0x50 + modrm_reg(opcode[1]));  /* push reg */
-+        patch_call(x86_cpu, ip + 1, handlers->set_tpr);
-+        break;
-+    case 0x8b: /* mov r/m32 to r32 */
-+        patch_byte(x86_cpu, ip, 0x90);
-+        patch_call(x86_cpu, ip + 1, handlers->get_tpr[modrm_reg(opcode[1])]);
-+        break;
-+    case 0xa1: /* mov abs to eax */
-+        patch_call(x86_cpu, ip, handlers->get_tpr[0]);
-+        break;
-+    case 0xa3: /* mov eax to abs */
-+        patch_call(x86_cpu, ip, handlers->set_tpr_eax);
-+        break;
-+    case 0xc7: /* mov imm32, r/m32 (c7/0) */
-+        patch_byte(x86_cpu, ip, 0x68);  /* push imm32 */
-+        cpu_memory_rw_debug(cs, ip + 6, (void *)&imm32, sizeof(imm32), 0);
-+        cpu_memory_rw_debug(cs, ip + 1, (void *)&imm32, sizeof(imm32), 1);
-+        patch_call(x86_cpu, ip + 5, handlers->set_tpr);
-+        break;
-+    case 0xff: /* push r/m32 */
-+        patch_byte(x86_cpu, ip, 0x50); /* push eax */
-+        patch_call(x86_cpu, ip + 1, handlers->get_tpr_stack);
-+        break;
-+    default:
-+        abort();
-+    }
-+
-+    g_free(info);
-+}
-+
-+static void patch_instruction(VAPICROMState *s, X86CPU *cpu, target_ulong ip)
-+{
-+    CPUState *cs = CPU(cpu);
-+    VAPICHandlers *handlers;
-+    uint8_t opcode[2];
-+    uint32_t imm32 = 0;
-+
-     if (smp_cpus == 1) {
-         handlers = &s->rom_state.up;
-     } else {
-@@ -411,14 +467,14 @@ static void patch_instruction(VAPICROMState *s, X86CPU *cpu, target_ulong ip)
-     }
- 
-     if (!kvm_enabled()) {
--        cpu_get_tb_cpu_state(env, &current_pc, &current_cs_base,
--                             &current_flags);
--        /* Account this instruction, because we will exit the tb.
--           This is the first instruction in the block. Therefore
--           there is no need in restoring CPU state. */
--        if (use_icount) {
--            --cs->icount_decr.u16.low;
--        }
-+        struct PatchInfo *info = g_new(struct PatchInfo, 1);
-+        const run_on_cpu_func fn = do_patch_instruction;
-+        info->handler = handlers;
-+        info->ip = ip;
-+
-+        async_safe_run_on_cpu(cs, fn, RUN_ON_CPU_HOST_PTR(info));
-+        cs->exception_index = EXCP_INTERRUPT;
-+        cpu_loop_exit(cs);
-     }
- 
-     pause_all_vcpus();
-@@ -428,41 +484,33 @@ static void patch_instruction(VAPICROMState *s, X86CPU *cpu, target_ulong ip)
-     switch (opcode[0]) {
-     case 0x89: /* mov r32 to r/m32 */
-         patch_byte(cpu, ip, 0x50 + modrm_reg(opcode[1]));  /* push reg */
--        patch_call(s, cpu, ip + 1, handlers->set_tpr);
-+        patch_call(cpu, ip + 1, handlers->set_tpr);
-         break;
-     case 0x8b: /* mov r/m32 to r32 */
-         patch_byte(cpu, ip, 0x90);
--        patch_call(s, cpu, ip + 1, handlers->get_tpr[modrm_reg(opcode[1])]);
-+        patch_call(cpu, ip + 1, handlers->get_tpr[modrm_reg(opcode[1])]);
-         break;
-     case 0xa1: /* mov abs to eax */
--        patch_call(s, cpu, ip, handlers->get_tpr[0]);
-+        patch_call(cpu, ip, handlers->get_tpr[0]);
-         break;
-     case 0xa3: /* mov eax to abs */
--        patch_call(s, cpu, ip, handlers->set_tpr_eax);
-+        patch_call(cpu, ip, handlers->set_tpr_eax);
-         break;
-     case 0xc7: /* mov imm32, r/m32 (c7/0) */
-         patch_byte(cpu, ip, 0x68);  /* push imm32 */
-         cpu_memory_rw_debug(cs, ip + 6, (void *)&imm32, sizeof(imm32), 0);
-         cpu_memory_rw_debug(cs, ip + 1, (void *)&imm32, sizeof(imm32), 1);
--        patch_call(s, cpu, ip + 5, handlers->set_tpr);
-+        patch_call(cpu, ip + 5, handlers->set_tpr);
-         break;
-     case 0xff: /* push r/m32 */
-         patch_byte(cpu, ip, 0x50); /* push eax */
--        patch_call(s, cpu, ip + 1, handlers->get_tpr_stack);
-+        patch_call(cpu, ip + 1, handlers->get_tpr_stack);
-         break;
-     default:
-         abort();
-     }
- 
-     resume_all_vcpus();
--
--    if (!kvm_enabled()) {
--        /* Both tb_lock and iothread_mutex will be reset when
--         *  longjmps back into the cpu_exec loop. */
--        tb_lock();
--        tb_gen_code(cs, current_pc, current_cs_base, current_flags, 1);
--        cpu_loop_exit_noexc(cs);
--    }
- }
- 
- void vapic_report_tpr_access(DeviceState *dev, CPUState *cs, target_ulong ip,
--- 
-2.7.4
+> ---
+>  hw/dma/sun4m_iommu.c | 12 +++++-------
+>  1 file changed, 5 insertions(+), 7 deletions(-)
+>
+> diff --git a/hw/dma/sun4m_iommu.c b/hw/dma/sun4m_iommu.c
+> index b3cbc54c23..335ef63cbc 100644
+> --- a/hw/dma/sun4m_iommu.c
+> +++ b/hw/dma/sun4m_iommu.c
+> @@ -349,17 +349,16 @@ static void iommu_reset(DeviceState *d)
+>      s->regs[IOMMU_MASK_ID] = IOMMU_TS_MASK;
+>  }
+>
+> -static int iommu_init1(SysBusDevice *dev)
+> +static void iommu_init(Object *obj)
+>  {
+> -    IOMMUState *s = SUN4M_IOMMU(dev);
+> +    IOMMUState *s = SUN4M_IOMMU(obj);
+> +    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
+>
+>      sysbus_init_irq(dev, &s->irq);
+>
+> -    memory_region_init_io(&s->iomem, OBJECT(s), &iommu_mem_ops, s, "iommu",
+> +    memory_region_init_io(&s->iomem, obj, &iommu_mem_ops, s, "iommu",
+>                            IOMMU_NREGS * sizeof(uint32_t));
+>      sysbus_init_mmio(dev, &s->iomem);
+> -
+> -    return 0;
+>  }
+>
+>  static Property iommu_properties[] = {
+> @@ -370,9 +369,7 @@ static Property iommu_properties[] = {
+>  static void iommu_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+> -    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
+>
+> -    k->init = iommu_init1;
+>      dc->reset = iommu_reset;
+>      dc->vmsd = &vmstate_iommu;
+>      dc->props = iommu_properties;
+> @@ -382,6 +379,7 @@ static const TypeInfo iommu_info = {
+>      .name          = TYPE_SUN4M_IOMMU,
+>      .parent        = TYPE_SYS_BUS_DEVICE,
+>      .instance_size = sizeof(IOMMUState),
+> +    .instance_init = iommu_init,
+>      .class_init    = iommu_class_init,
+>  };
+>
+>
