@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55234)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ch0WD-0007x4-4u
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 16:01:42 -0500
+	(envelope-from <armbru@redhat.com>) id 1ch1CV-0007l5-Vh
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 16:45:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ch0W9-0002PO-T5
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 16:01:41 -0500
-Received: from 16.mo6.mail-out.ovh.net ([87.98.139.208]:41544)
+	(envelope-from <armbru@redhat.com>) id 1ch1CU-0004bV-FM
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 16:45:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59856)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ch0W9-0002Oo-Mt
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 16:01:37 -0500
-Received: from player761.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id D38C6AFA8F
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 22:01:35 +0100 (CET)
-Date: Thu, 23 Feb 2017 22:01:29 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170223220129.73fe54c2@bahia.lan>
-In-Reply-To: <2e9357a4-34ad-9cc1-db39-5ed00bdc015d@redhat.com>
-References: <148760155821.31154.13876757160410915057.stgit@bahia.lan>
-	<148760161575.31154.505252736798591155.stgit@bahia.lan>
-	<2e9357a4-34ad-9cc1-db39-5ed00bdc015d@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/WPbtYG+1GW.AA=nI3PUFsXS";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH 07/29] 9pfs: local: introduce
- symlink-attack safe xattr helpers
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ch1CU-0004b7-8i
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 16:45:22 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6533061E7B
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 21:45:22 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
+	[10.36.116.55])
+	by int-mx11.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v1NLjLjs030170
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=NO)
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 16:45:22 -0500
+From: Markus Armbruster <armbru@redhat.com>
+Date: Thu, 23 Feb 2017 22:45:05 +0100
+Message-Id: <1487886317-27400-10-git-send-email-armbru@redhat.com>
+In-Reply-To: <1487886317-27400-1-git-send-email-armbru@redhat.com>
+References: <1487886317-27400-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH 09/21] qapi: Improve a QObject input visitor
+ error message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,52 +37,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
 
---Sig_/WPbtYG+1GW.AA=nI3PUFsXS
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+The QObject input visitor has three error message formats:
 
-On Thu, 23 Feb 2017 09:02:39 -0600
-Eric Blake <eblake@redhat.com> wrote:
+* Parameter '%s' is missing
+* "Invalid parameter type for '%s', expected: %s"
+* "QMP input object member '%s' is unexpected"
 
-> On 02/20/2017 08:40 AM, Greg Kurz wrote:
-> > All operations dealing with extended attributes are vulnerable to symli=
-nk
-> > attacks because they use path-based syscalls which can traverse symbolic
-> > links while walking through the dirname part of the path.
-> >=20
-> > The solution is to introduce helpers based on opendir_nofollow(). This
-> > calls for "at" versions of the extended attribute syscalls, which don't
-> > exist unfortunately. This patch implement them by simulating the "at"
-> > behavior with fchdir(). Since the current working directory is process
-> > wide, and we don't want to confuse another thread in QEMU, all the work
-> > is done in a separate process. =20
->=20
-> Can you emulate *at using /proc/fd/nnn/xyz?  Coreutils was one of the
-> early adopters of the power of *at functions, and found that emulation
-> of *at via procfs was a LOT more efficient than emulation via fchdir
-> (although both emulations still exist in gnulib, since procfs is not
-> universal).
->=20
+The '%s' are member names (or "null", but I'll fix that later).
 
-Yeah, Stefan suggested this on irc. I had also found a tentative patchset to
-implement genuine f*xattrat() calls in the kernel 3 yrs ago, that never got
-merged. The author, Florian Weimer, also told me /proc was the way to go.
+The last error message calls the thing "QMP input object member"
+instead of "parameter".  Misleading when the visitor is used on
+QObjects that don't come from QMP.  Change it to "Parameter '%s' is
+unexpected".
 
-It looks like we have a consensus :)
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ qapi/qobject-input-visitor.c | 3 +--
+ tests/test-qga.c             | 2 +-
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
---Sig_/WPbtYG+1GW.AA=nI3PUFsXS
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlivTakACgkQAvw66wEB28LHGgCfTmxqsV3DKkMV4wDqoxOFAzcG
-X3IAn2aNdKZEXCAFnqar1cUDL5XLfS9i
-=Wu1Q
------END PGP SIGNATURE-----
-
---Sig_/WPbtYG+1GW.AA=nI3PUFsXS--
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index ed6c24c..f3b6713 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -140,8 +140,7 @@ static void qobject_input_check_struct(Visitor *v, Error **errp)
+ 
+             g_hash_table_iter_init(&iter, top_ht);
+             if (g_hash_table_iter_next(&iter, (void **)&key, NULL)) {
+-                error_setg(errp, "QMP input object member '%s' is unexpected",
+-                           key);
++                error_setg(errp, "Parameter '%s' is unexpected", key);
+             }
+         }
+     }
+diff --git a/tests/test-qga.c b/tests/test-qga.c
+index 868b02a..ae97b57 100644
+--- a/tests/test-qga.c
++++ b/tests/test-qga.c
+@@ -213,7 +213,7 @@ static void test_qga_invalid_args(gconstpointer fix)
+     desc = qdict_get_try_str(error, "desc");
+ 
+     g_assert_cmpstr(class, ==, "GenericError");
+-    g_assert_cmpstr(desc, ==, "QMP input object member 'foo' is unexpected");
++    g_assert_cmpstr(desc, ==, "Parameter 'foo' is unexpected");
+ 
+     QDECREF(ret);
+ }
+-- 
+2.7.4
