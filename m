@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ch2iz-0003ee-5M
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 18:23:02 -0500
+	(envelope-from <mst@redhat.com>) id 1ch2mD-0006eP-UE
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 18:26:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ch2iv-0005sx-V3
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 18:23:01 -0500
-Received: from ozlabs.org ([103.22.144.67]:60955)
+	(envelope-from <mst@redhat.com>) id 1ch2mA-0006dv-Ow
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 18:26:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48846)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ch2iv-0005ri-4m
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 18:22:57 -0500
-Date: Fri, 24 Feb 2017 09:49:11 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170223224911.GC17615@umbus.fritz.box>
-References: <CAFEAcA8AZup28Sho8hLeCRVf4iSdLdeFHvz1h4-X7FwVBcANyg@mail.gmail.com>
-	<448f3a5f-044e-bcac-60bd-2ce074021be9@redhat.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ch2mA-0006dr-IV
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 18:26:18 -0500
+Date: Fri, 24 Feb 2017 01:26:15 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170224012200-mutt-send-email-mst@kernel.org>
+References: <1487742565-2513-1-git-send-email-peterx@redhat.com>
+	<20170222103047.2c1b63f2@t450s.home>
+	<20170223030647.GB4015@pxdev.xzpeter.org>
+	<20170222202451.458de865@t450s.home>
+	<20170223054234.GF4015@pxdev.xzpeter.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="0vzXIDBeUiKkjNJl"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <448f3a5f-044e-bcac-60bd-2ce074021be9@redhat.com>
-Subject: Re: [Qemu-devel] using fdt_setprop() to set properties to empty
- values
+In-Reply-To: <20170223054234.GF4015@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH] intel_iommu: make sure its init before PCI
+ dev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +31,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, yi.l.liu@intel.com, Jintack Lim <jintack@cs.columbia.edu>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+
+On Thu, Feb 23, 2017 at 01:42:34PM +0800, Peter Xu wrote:
+> On Wed, Feb 22, 2017 at 08:24:51PM -0700, Alex Williamson wrote:
+> 
+> [...]
+> 
+> > > Now Jintack reported another issue, that we may have two default
+> > > devices there if not specifying "-nodefaults", and that two devices
+> > > will always be the first ones to be inited.
+> > > 
+> > > How about here we just explicitly check against vfio-pci devices, so
+> > > we just make sure vfio-pci devices will be put after intel-iommu?
+> > > Since actually vfio-pci devices are the only ones that we know we need
+> > > to be inited explicitly after the VT-d device.
+> > 
+> > I was afraid you were going to come to this conclusion.  That works,
+> > BUT it just means the problem gets ignored as a vfio problem when
+> > really vfio is doing nothing wrong other than caring about the device
+> > address space during its initialization.
+
+And that part is broken at this stage.  We can add a flag
+"uses_address_space_in_init". Would that be better?
 
 
---0vzXIDBeUiKkjNJl
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+>  Then users have a perfectly
+> > working config, add a vfio-pci device and things explode.  If you want
+> > to impose a user ordering requirement, do it consistently.
 
-On Thu, Feb 23, 2017 at 08:52:01AM -0600, Eric Blake wrote:
-> On 02/23/2017 06:33 AM, Peter Maydell wrote:
-> > What's the right way to use libfdt's fdt_setprop to set a property
-> > to have an empty value? At the moment in QEMU we tend to use
-> >   fdt_setprop(fdt, nodeoffset, "propertyname", NULL, 0);
+This is not a new thing however. vfio previously did not work with
+an iommu either. It seems reasonable to make sure iommu
+is initialized first.
 
-That's what I've always used..
+But it also seems reasonable to enable that gradually
+and not require removing ordering requirements upfront.
 
-> > and git grep 'fdt_setprop.*NULL' produces examples of this usage in
-> > PPC and ARM fdt creation code.
-> >=20
-> > However the fdt_setprop() documentation doesn't document that a NULL
-> > value pointer is OK if the length is 0, and indeed the implementation
-> > unconditionally calls memcpy(prop->data, val, len), which is
-> > undefined behaviour, and warned about by clang sanitizers if you
-> > build libfdt with them:
-> >  dtc/libfdt/fdt_rw.c:288:21: runtime error: null pointer passed
-> >    as argument 2, which is declared to never be null
 
-=2E.but indeed that isn't really technically right.
-
-> > So what's the best thing to do here? I can't offhand think of a
-> > non-ugly/non-confusing way to pass a valid pointer here...
->=20
-> Does fdt_setprop(fdt, nodeoffset, "propertyname", "", 0) do the right thi=
-ng?
-
-That should work, but it's a bit clunky.
-
-I guess I should add an fdt_setprop_empty() to libfdt.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---0vzXIDBeUiKkjNJl
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJYr2bkAAoJEGw4ysog2bOSFsQQAM3hVa4HQrPqieglSnzU9cz6
-H1kQhO4Gg8wU07TPeiZYwdBSv/hyIKCck6w4r4q+iczEZyDsKKbCdNTdg4sZGxZo
-hnSy16cI2qL1dr4UrbDR60L+yO+DphR4RH2ztCsmtZ6ODwBTcc4k91xhM4zes3dO
-+8sMX/MoCQzTAvMQ6t2iAyZD7Seozf0JIwGlCRvg57k0A1bRgJNqnk4sMVqrWHtY
-HEbzPD7lyZbJ2JmrGgqORkElD9Z2rquLxfWBEJOKmZ6HuLckNNmIYdMp965VW3XH
-OM0k1bNNZkjz4h8n+ulHqK5D08eahSGFoZ0bBVoZ2pTQCTBjL0Z571JxNdIA+YXK
-24PlW1z6zCYULMsr2N5lS3gg/e6UBUuB6gXlhZgKoREM/fnyX7NpJz6VOlVPZ24K
-YYuQrGJMV9oKU8eLhnCjFpjaR/o1SWnrnHNV/zkWoOrx9emLq98zfiQjQ1XQ6jne
-wp0jyC/Dbfcds7lf5cKA7vn1IbLGDJSZCy+3tchnTAnx9TlPAm7PKC99XDm3QRz+
-3uzHfMDq9l09axdBghxQrUaGgPRhNzIPgy1EJ624y2nkzBYS6sXxGzzHhGMriXZq
-/9ecxe4sHwj6kVRGShyWYt91Usi7MXLJsQ/Mlrso6F6WXVqFL6MdJzbaDZaaHUaZ
-nJJt7h3pOFrRnrTklf81
-=Y/B7
------END PGP SIGNATURE-----
-
---0vzXIDBeUiKkjNJl--
+>  Thanks,
+> 
+> We cannot guarantee that guest won't "explode" only if we
+> automatically order the device init, but that's something I am not
+> quite sure about that we will need now, especially I don't know
+> whether it would be a 2.9 material, considering that 2.9 soft freeze
+> should be on Feb 28th. :(
+> 
+> I kind of understand your concern, but would that really a so-called
+> explosion? The user will just be warned that he/she should move the
+> intel-iommu line slightly higher. Imho that's tolerable, since the
+> user is definitely adding something new to the parameters, and it's
+> possible the new command line just don't work. Also, imho it's not
+> anyone's fault if it happens, it's just a new rule that we need to
+> make sure things work properly...
+> 
+> I just want to know what would be the most feasible approach that we
+> can safely have the vtd vfio series in before 2.9. Any further input
+> would be welcomed.
+> 
+> Thanks,
+> 
+> -- peterx
