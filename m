@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cgkel-00042m-LE
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 23:05:28 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1cgki8-000656-Jq
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 23:08:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cgkei-0003Qk-Hd
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 23:05:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59762)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cgkei-0003Qa-8a
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 23:05:24 -0500
-Date: Thu, 23 Feb 2017 01:05:19 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170223040519.GL2778@thinpad.lan.raisama.net>
-References: <20170222192647.19690-1-ehabkost@redhat.com>
-	<f2e5c730-c47c-8a06-d5b0-820e6db61d5e@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f2e5c730-c47c-8a06-d5b0-820e6db61d5e@redhat.com>
-Subject: Re: [Qemu-devel] [libvirt] [PATCH RESEND] qdev: Make "hotplugged"
- property read-only
+	(envelope-from <sjitindarsingh@gmail.com>) id 1cgki7-0004ju-1s
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 23:08:56 -0500
+Message-ID: <1487822920.23895.1.camel@gmail.com>
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Date: Thu, 23 Feb 2017 15:08:40 +1100
+In-Reply-To: <20170223020936.29220-2-david@gibson.dropbear.id.au>
+References: <20170223020936.29220-1-david@gibson.dropbear.id.au>
+	<20170223020936.29220-2-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/6] pseries: Minor cleanups to HPT
+ management hypercalls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,82 +24,220 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, Laine Stump <laine@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>
+To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, aik@ozlabs.ru
+Cc: qemu-devel@nongnu.org, agraf@suse.de, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, paulus@samba.org
 
-On Wed, Feb 22, 2017 at 04:43:37PM -0600, Eric Blake wrote:
-> On 02/22/2017 01:26 PM, Eduardo Habkost wrote:
-> > The "hotplugged" property is user visible, but it was never meant
-> > to be set by the user. There are probably multiple ways to break
-> > or crash device code by overriding the property. For example, we
-> > recently fixed a crash in rtc_set_memory() related to the
-> > property (commit 26ef65beab852caf2b1ef4976e3473f2d525164d).
-> > 
-> > There has been some discussion about making management software
-> > use "hotplugged=on" on migration, to indicate devices that were
-> > hotplugged in the migration source. There were other suggestions
-> > to address this, like including the "hotplugged" field in the
-> > migration stream instead of requiring it to be set propertly.
+On Thu, 2017-02-23 at 13:09 +1100, David Gibson wrote:
+>  * Standardize on 'ptex' instead of 'pte_index' for HPTE index
+> variables
+>    for consistency and brevity
+>  * Avoid variables named 'index'; shadowing index(3) from libc can
+> lead to
+>    surprising bugs if the variable is removed, because compiler
+> errors
+>    might not appear for remaining references
+>  * Clarify index calculations in h_enter() - we have two cases,
+> H_EXACT
+>    where the exact HPTE slot is given, and !H_EXACT where we search
+> for
+>    an empty slot within the hash bucket.  Make the calculation more
+>    consistent between the cases.
 > 
-> s/propertly/properly/
-
-Actually, I think I meant "requiring it to be set explicitly". I
-will fix this in my branch. Thanks!
-
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/ppc/spapr_hcall.c | 58 +++++++++++++++++++++++++-----------------
+> ----------
+>  1 file changed, 28 insertions(+), 30 deletions(-)
 > 
-> > 
-> > Whatever solution we choose in the future, this patch disables
-> > setting "hotplugged" explicitly in the command-line by now,
-> > because the ability to set the property is unused, untested, and
-> > undocumented.
-> > 
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> >  hw/core/qdev.c | 9 +--------
-> >  1 file changed, 1 insertion(+), 8 deletions(-)
-> 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 42d20e0..3298a14 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -47,12 +47,12 @@ static bool has_spr(PowerPCCPU *cpu, int spr)
+>      return cpu->env.spr_cb[spr].name != NULL;
+>  }
+>  
+> -static inline bool valid_pte_index(CPUPPCState *env, target_ulong
+> pte_index)
+> +static inline bool valid_ptex(PowerPCCPU *cpu, target_ulong ptex)
+>  {
+>      /*
+>       * hash value/pteg group index is normalized by htab_mask
+>       */
+> -    if (((pte_index & ~7ULL) / HPTES_PER_GROUP) & ~env->htab_mask) {
+> +    if (((ptex & ~7ULL) / HPTES_PER_GROUP) & ~cpu->env.htab_mask) {
+>          return false;
+>      }
+>      return true;
+> @@ -77,14 +77,13 @@ static bool is_ram_address(sPAPRMachineState
+> *spapr, hwaddr addr)
+>  static target_ulong h_enter(PowerPCCPU *cpu, sPAPRMachineState
+> *spapr,
+>                              target_ulong opcode, target_ulong *args)
+>  {
+> -    CPUPPCState *env = &cpu->env;
+>      target_ulong flags = args[0];
+> -    target_ulong pte_index = args[1];
+> +    target_ulong ptex = args[1];
+>      target_ulong pteh = args[2];
+>      target_ulong ptel = args[3];
+>      unsigned apshift;
+>      target_ulong raddr;
+> -    target_ulong index;
+> +    target_ulong slot;
+>      uint64_t token;
+>  
+>      apshift = ppc_hash64_hpte_page_shift_noslb(cpu, pteh, ptel);
+> @@ -116,25 +115,26 @@ static target_ulong h_enter(PowerPCCPU *cpu,
+> sPAPRMachineState *spapr,
+>  
+>      pteh &= ~0x60ULL;
+>  
+> -    if (!valid_pte_index(env, pte_index)) {
+> +    if (!valid_ptex(cpu, ptex)) {
+>          return H_PARAMETER;
+>      }
+>  
+> -    index = 0;
+> +    slot = ptex & 7ULL;
+> +    ptex = ptex & ~7ULL;
+> +
+>      if (likely((flags & H_EXACT) == 0)) {
+> -        pte_index &= ~7ULL;
+> -        token = ppc_hash64_start_access(cpu, pte_index);
+> -        for (; index < 8; index++) {
+> -            if (!(ppc_hash64_load_hpte0(cpu, token, index) &
+> HPTE64_V_VALID)) {
+> +        token = ppc_hash64_start_access(cpu, ptex);
+> +        for (slot = 0; slot < 8; slot++) {
+> +            if (!(ppc_hash64_load_hpte0(cpu, token, slot) &
+> HPTE64_V_VALID)) {
+>                  break;
+>              }
+>          }
+>          ppc_hash64_stop_access(cpu, token);
+> -        if (index == 8) {
+> +        if (slot == 8) {
+>              return H_PTEG_FULL;
+>          }
+>      } else {
+> -        token = ppc_hash64_start_access(cpu, pte_index);
+> +        token = ppc_hash64_start_access(cpu, ptex);
+>          if (ppc_hash64_load_hpte0(cpu, token, 0) & HPTE64_V_VALID) {
+>              ppc_hash64_stop_access(cpu, token);
+>              return H_PTEG_FULL;
+> @@ -142,10 +142,9 @@ static target_ulong h_enter(PowerPCCPU *cpu,
+> sPAPRMachineState *spapr,
+>          ppc_hash64_stop_access(cpu, token);
+>      }
+>  
+> -    ppc_hash64_store_hpte(cpu, pte_index + index,
+> -                          pteh | HPTE64_V_HPTE_DIRTY, ptel);
+> +    ppc_hash64_store_hpte(cpu, ptex + slot, pteh |
+> HPTE64_V_HPTE_DIRTY, ptel);
+>  
+> -    args[0] = pte_index + index;
+> +    args[0] = ptex + slot;
+>      return H_SUCCESS;
+>  }
+>  
+> @@ -161,11 +160,10 @@ static RemoveResult remove_hpte(PowerPCCPU
+> *cpu, target_ulong ptex,
+>                                  target_ulong flags,
+>                                  target_ulong *vp, target_ulong *rp)
+>  {
+> -    CPUPPCState *env = &cpu->env;
+>      uint64_t token;
+>      target_ulong v, r;
+>  
+> -    if (!valid_pte_index(env, ptex)) {
+> +    if (!valid_ptex(cpu, ptex)) {
+>          return REMOVE_PARM;
+>      }
+>  
+> @@ -191,11 +189,11 @@ static target_ulong h_remove(PowerPCCPU *cpu,
+> sPAPRMachineState *spapr,
+>  {
+>      CPUPPCState *env = &cpu->env;
+>      target_ulong flags = args[0];
+> -    target_ulong pte_index = args[1];
+> +    target_ulong ptex = args[1];
+>      target_ulong avpn = args[2];
+>      RemoveResult ret;
+>  
+> -    ret = remove_hpte(cpu, pte_index, avpn, flags,
+> +    ret = remove_hpte(cpu, ptex, avpn, flags,
+>                        &args[0], &args[1]);
+>  
+>      switch (ret) {
+> @@ -291,16 +289,16 @@ static target_ulong h_protect(PowerPCCPU *cpu,
+> sPAPRMachineState *spapr,
+>  {
+>      CPUPPCState *env = &cpu->env;
+>      target_ulong flags = args[0];
+> -    target_ulong pte_index = args[1];
+> +    target_ulong ptex = args[1];
+>      target_ulong avpn = args[2];
+>      uint64_t token;
+>      target_ulong v, r;
+>  
+> -    if (!valid_pte_index(env, pte_index)) {
+> +    if (!valid_ptex(cpu, ptex)) {
+>          return H_PARAMETER;
+>      }
+>  
+> -    token = ppc_hash64_start_access(cpu, pte_index);
+> +    token = ppc_hash64_start_access(cpu, ptex);
+>      v = ppc_hash64_load_hpte0(cpu, token, 0);
+>      r = ppc_hash64_load_hpte1(cpu, token, 0);
+>      ppc_hash64_stop_access(cpu, token);
+> @@ -315,13 +313,13 @@ static target_ulong h_protect(PowerPCCPU *cpu,
+> sPAPRMachineState *spapr,
+>      r |= (flags << 55) & HPTE64_R_PP0;
+>      r |= (flags << 48) & HPTE64_R_KEY_HI;
+>      r |= flags & (HPTE64_R_PP | HPTE64_R_N | HPTE64_R_KEY_LO);
+> -    ppc_hash64_store_hpte(cpu, pte_index,
+> +    ppc_hash64_store_hpte(cpu, ptex,
+>                            (v & ~HPTE64_V_VALID) |
+> HPTE64_V_HPTE_DIRTY, 0);
+> -    ppc_hash64_tlb_flush_hpte(cpu, pte_index, v, r);
+> +    ppc_hash64_tlb_flush_hpte(cpu, ptex, v, r);
+>      /* Flush the tlb */
+>      check_tlb_flush(env, true);
+>      /* Don't need a memory barrier, due to qemu's global lock */
+> -    ppc_hash64_store_hpte(cpu, pte_index, v | HPTE64_V_HPTE_DIRTY,
+> r);
+> +    ppc_hash64_store_hpte(cpu, ptex, v | HPTE64_V_HPTE_DIRTY, r);
+>      return H_SUCCESS;
+>  }
+>  
+> @@ -330,21 +328,21 @@ static target_ulong h_read(PowerPCCPU *cpu,
+> sPAPRMachineState *spapr,
+>  {
+>      CPUPPCState *env = &cpu->env;
+>      target_ulong flags = args[0];
+> -    target_ulong pte_index = args[1];
+> +    target_ulong ptex = args[1];
+>      uint8_t *hpte;
+>      int i, ridx, n_entries = 1;
+>  
+> -    if (!valid_pte_index(env, pte_index)) {
+> +    if (!valid_ptex(cpu, ptex)) {
+>          return H_PARAMETER;
+>      }
+>  
+>      if (flags & H_READ_4) {
+>          /* Clear the two low order bits */
+> -        pte_index &= ~(3ULL);
+> +        ptex &= ~(3ULL);
+>          n_entries = 4;
+>      }
+>  
+> -    hpte = env->external_htab + (pte_index * HASH_PTE_SIZE_64);
+> +    hpte = env->external_htab + (ptex * HASH_PTE_SIZE_64);
+>  
+>      for (i = 0, ridx = 0; i < n_entries; i++) {
+>          args[ridx++] = ldq_p(hpte);
+I wholeheartedly agree with this rename.
 
-Thanks!
-
-> 
-> > 
-> > diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> > index 06ba02e2a3..800c9ca23f 100644
-> > --- a/hw/core/qdev.c
-> > +++ b/hw/core/qdev.c
-> > @@ -1016,13 +1016,6 @@ static bool device_get_hotplugged(Object *obj, Error **err)
-> >      return dev->hotplugged;
-> >  }
-> >  
-> > -static void device_set_hotplugged(Object *obj, bool value, Error **err)
-> > -{
-> > -    DeviceState *dev = DEVICE(obj);
-> > -
-> > -    dev->hotplugged = value;
-> > -}
-> > -
-> >  static void device_initfn(Object *obj)
-> >  {
-> >      DeviceState *dev = DEVICE(obj);
-> > @@ -1042,7 +1035,7 @@ static void device_initfn(Object *obj)
-> >      object_property_add_bool(obj, "hotpluggable",
-> >                               device_get_hotpluggable, NULL, NULL);
-> >      object_property_add_bool(obj, "hotplugged",
-> > -                             device_get_hotplugged, device_set_hotplugged,
-> > +                             device_get_hotplugged, NULL,
-> >                               &error_abort);
-> >  
-> >      class = object_get_class(OBJECT(dev));
-> > 
-> 
-> -- 
-> Eric Blake   eblake redhat com    +1-919-301-3266
-> Libvirt virtualization library http://libvirt.org
-> 
-
-
-
-
--- 
-Eduardo
+Reviewed-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
