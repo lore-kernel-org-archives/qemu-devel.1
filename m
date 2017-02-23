@@ -1,24 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cgvVJ-0000iN-12
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:40:26 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cgvcA-00078d-TF
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:47:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cgvVI-0006pM-0L
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:40:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57252)
+	(envelope-from <pbonzini@redhat.com>) id 1cgvc7-0002EG-Q2
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:47:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42350)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cgvVH-0006oz-QT
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:40:23 -0500
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 23 Feb 2017 16:40:13 +0100
-Message-Id: <1487864414-25485-3-git-send-email-kraxel@redhat.com>
-In-Reply-To: <1487864414-25485-1-git-send-email-kraxel@redhat.com>
-References: <1487864414-25485-1-git-send-email-kraxel@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cgvc7-0002Dw-HR
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:47:27 -0500
+References: <1487659615-15820-1-git-send-email-xyjxie@linux.vnet.ibm.com>
+	<5edff645-12e8-d3e0-1849-302b6986c232@ozlabs.ru>
+	<fdcb2b07-aae8-69bf-ee94-a43777009c3a@redhat.com>
+	<CAFEAcA--bSo7PJH0Px9ytQspaYuS55CSsM_EN6zt0djhkqKNPw@mail.gmail.com>
+	<5a0773de-6bc7-474a-82ab-2edd37ce8a93@redhat.com>
+	<CAFEAcA99xi4k57h2XGw2deGO24E95AS5jyGL+4GzjqNgMb9wcg@mail.gmail.com>
+	<92580ca9-47fe-a943-7720-d3cb1fc6d2eb@redhat.com>
+	<CAFEAcA8769a_8xwk57FS6Ko+Lioud20+70JRSafeEic6GB_RAw@mail.gmail.com>
+	<3d5e7b5e-4501-86b7-093d-47fb09af585e@redhat.com>
+	<CAFEAcA9gcArSqhbRi6-YdR=5eE9dtq66C7N0qTbCuBiY_Zr+tA@mail.gmail.com>
+	<41630a89-e645-7d7e-b7c2-356fd6dcadee@redhat.com>
+	<CAFEAcA_Mh9ZrJeu4f==ko1k2yLkfPe2AwNbUHcxkmS6Lzuvk0Q@mail.gmail.com>
+	<2565ef99-9c16-e836-08c6-0915f5d4b0f8@redhat.com>
+	<20170223083908.657bf257@t450s.home>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <643953df-0954-210c-6fc5-ff229fbcac84@redhat.com>
+Date: Thu, 23 Feb 2017 16:47:23 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 2/3] usb: ohci: fix error return code in
- servicing td
+In-Reply-To: <20170223083908.657bf257@t450s.home>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] memory: make ram device read/write endian
+ sensitive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,35 +40,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Li Qiang <liq3ea@gmail.com>, Li Qiang <liqiang6-s@360.cn>, Gerd Hoffmann <kraxel@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Yongji Xie <xyjxie@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, zhong@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>, Paul Mackerras <paulus@samba.org>
 
-From: Li Qiang <liq3ea@gmail.com>
 
-It should return 1 if an error occurs when reading td.
-This will avoid an infinite loop issue in ohci_service_ed_list.
 
-Signed-off-by: Li Qiang <liqiang6-s@360.cn>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-id: 1487760990-115925-1-git-send-email-liqiang6-s@360.cn
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/usb/hcd-ohci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 23/02/2017 16:39, Alex Williamson wrote:
+> On Thu, 23 Feb 2017 16:21:47 +0100
+> Paolo Bonzini <pbonzini@redhat.com> wrote:
+> 
+>> On 23/02/2017 15:35, Peter Maydell wrote:
+>>> On 23 February 2017 at 12:53, Paolo Bonzini <pbonzini@redhat.com> wrote:  
+>>>>
+>>>>
+>>>> On 23/02/2017 13:26, Peter Maydell wrote:  
+>>>>> On 23 February 2017 at 11:43, Paolo Bonzini <pbonzini@redhat.com> wrote:  
+>>>>>> On 23/02/2017 12:34, Peter Maydell wrote:  
+>>>>>>> We should probably update the doc comment to note that the
+>>>>>>> pointer is to host-endianness memory (and that this is not
+>>>>>>> like normal RAM which is target-endian)...  
+>>>>>>
+>>>>>> I wouldn't call it host-endianness memory, and I disagree that normal
+>>>>>> RAM is target-endian---in both cases it's just a bunch of bytes.
+>>>>>>
+>>>>>> However, the access done by the MemoryRegionOps callbacks needs to match
+>>>>>> the endianness declared by the MemoryRegionOps themselves.  
+>>>>>
+>>>>> Well, if the guest stores a bunch of integers to the memory, which
+>>>>> way round do you see them when you look at the bunch of bytes?  
+>>>>
+>>>> You see them in whatever endianness the guest used.  
+>>>
+>>> I'm confused. I said "normal RAM and this ramdevice memory are
+>>> different", and you seem to be saying they're the same. I don't
+>>> think they are (in particular I think with a BE guest on an
+>>> LE host they'll look different).  
+>>
+>> No, they look entirely the same.  The only difference is that they go
+>> through MemoryRegionOps instead of memcpy.
+> 
+> Is this true for vfio use case?  If we use memcpy we're talking directly
+> to the device with no endian conversions.  If we use read/write then
+> there is an endian conversion in the host kernel.
 
-diff --git a/hw/usb/hcd-ohci.c b/hw/usb/hcd-ohci.c
-index 21c93e0..fe8406a 100644
---- a/hw/usb/hcd-ohci.c
-+++ b/hw/usb/hcd-ohci.c
-@@ -1001,7 +1001,7 @@ static int ohci_service_td(OHCIState *ohci, struct =
-ohci_ed *ed)
-     if (ohci_read_td(ohci, addr, &td)) {
-         trace_usb_ohci_td_read_error(addr);
-         ohci_die(ohci);
--        return 0;
-+        return 1;
-     }
-=20
-     dir =3D OHCI_BM(ed->flags, ED_D);
---=20
-1.8.3.1
+But ramd MemoryRegionOps do not use file read/write, they use memory
+read/write, so they talk directly to the device.
+
+Paolo
