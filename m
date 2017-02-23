@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50391)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ch0AA-00075G-1Z
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 15:38:55 -0500
+	(envelope-from <groug@kaod.org>) id 1ch0Pq-0003JV-Ik
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 15:55:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ch0A5-0004er-GP
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 15:38:54 -0500
-Resent-Message-Id: <E1ch0A5-0004er-GP@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21499)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1ch0A5-0004ea-9B
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 15:38:49 -0500
-In-Reply-To: <1487879642-16139-1-git-send-email-armbru@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148788226990.177.7895155368309577004@0e2666bad730>
+	(envelope-from <groug@kaod.org>) id 1ch0Pm-0000HT-L4
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 15:55:06 -0500
+Received: from 5.mo6.mail-out.ovh.net ([46.105.54.31]:50678)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ch0Pm-0000H8-FA
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 15:55:02 -0500
+Received: from player761.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id E29ADB049F
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 21:55:00 +0100 (CET)
+Date: Thu, 23 Feb 2017 21:54:54 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170223215454.6b2d8da2@bahia.lan>
+In-Reply-To: <20170223134441.GG30636@stefanha-x1.localdomain>
+References: <148760155821.31154.13876757160410915057.stgit@bahia.lan>
+	<148760161575.31154.505252736798591155.stgit@bahia.lan>
+	<20170223134441.GG30636@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 23 Feb 2017 12:37:50 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/24] option cutils: Fix and clean up
- number conversions
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/WD+LVhFxAv+bpaw743iG906";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH 07/29] 9pfs: local: introduce
+ symlink-attack safe xattr helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,118 +33,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: armbru@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ4
-Nzg3OTY0Mi0xNjEzOS0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tClR5cGU6IHNl
-cmllcwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMDAvMjRdIG9wdGlvbiBjdXRpbHM6IEZp
-eCBhbmQgY2xlYW4gdXAgbnVtYmVyIGNvbnZlcnNpb25zCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
-PT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUg
-JEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
-bWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0Uu
-LikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRv
-dGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93
-ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAt
-OyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEp
-KQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNj
-OGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1
-Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8x
-NDg3ODc5NjQyLTE2MTM5LTEtZ2l0LXNlbmQtZW1haWwtYXJtYnJ1QHJlZGhhdC5jb20gLT4gcGF0
-Y2hldy8xNDg3ODc5NjQyLTE2MTM5LTEtZ2l0LXNlbmQtZW1haWwtYXJtYnJ1QHJlZGhhdC5jb20K
-U3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo2YzJkYzZiIG9wdGlvbjogRml4IGNoZWNr
-aW5nIG9mIHNpemVzIGZvciBvdmVyZmxvdyBhbmQgdHJhaWxpbmcgY3JhcAplZmI4NDllIHV0aWwv
-Y3V0aWxzOiBDaGFuZ2UgcWVtdV9zdHJ0b3N6KigpIGZyb20gaW50NjRfdCB0byB1aW50NjRfdAph
-M2MyYWY4IHV0aWwvY3V0aWxzOiBSZXR1cm4gcWVtdV9zdHJ0b3N6KigpIGVycm9yIGFuZCB2YWx1
-ZSBzZXBhcmF0ZWx5CmU4OGUyYzcgdXRpbC9jdXRpbHM6IExldCBxZW11X3N0cnRvc3oqKCkgb3B0
-aW9uYWxseSByZWplY3QgdHJhaWxpbmcgY3JhcAplZTAzOWI2IHFlbXUtaW1nOiBXcmFwIGN2dG51
-bSgpIGFyb3VuZCBxZW11X3N0cnRvc3ooKQowMzFiNGYyIHRlc3QtY3V0aWxzOiBEcm9wIHN1ZmZp
-eCBmcm9tIHRlc3RfcWVtdV9zdHJ0b3N6X3NpbXBsZSgpCmU1OWQ4ZTYgdGVzdC1jdXRpbHM6IFVz
-ZSBxZW11X3N0cnRvc3ooKSBtb3JlIG9mdGVuCjY5Mzg3MGIgdXRpbC9jdXRpbHM6IERyb3AgUUVN
-VV9TVFJUT1NaX0RFRlNVRkZJWF8qIG1hY3Jvcwo3ODc4ODAzIHV0aWwvY3V0aWxzOiBOZXcgcWVt
-dV9zdHJ0b3N6KCkKMGY3MGU1OCB1dGlsL2N1dGlsczogUmVuYW1lIHFlbXVfc3RydG9zeigpIHRv
-IHFlbXVfc3RydG9zel9NaUIoKQphOGM4MGNkIHV0aWwvY3V0aWxzOiBOZXcgcWVtdV9zdHJ0b3N6
-X21ldHJpYygpCjlmOTA0MWMgdGVzdC1jdXRpbHM6IENvdmVyIHFlbXVfc3RydG9zeigpIGFyb3Vu
-ZCByYW5nZSBsaW1pdHMKYjZlM2EzNCB0ZXN0LWN1dGlsczogQ292ZXIgcWVtdV9zdHJ0b3N6KCkg
-d2l0aCB0cmFpbGluZyBjcmFwCjY4MzQ3YTggdGVzdC1jdXRpbHM6IENvdmVyIHFlbXVfc3RydG9z
-eigpIGludmFsaWQgaW5wdXQKYTU0ZTVlMyB0ZXN0LWN1dGlsczogQWRkIG1pc3NpbmcgcWVtdV9z
-dHJ0b3N6KCkuLi4gZW5kcHRyIGNoZWNrcwo1MjIzNjkyIG9wdGlvbjogRml4IHRvIHJlamVjdCBp
-bnZhbGlkIGFuZCBvdmVyZmxvd2luZyBudW1iZXJzCjNjM2IyNzggdXRpbC9jdXRpbHM6IENsZWFu
-IHVwIGNvbnRyb2wgZmxvdyBhcm91bmQgcWVtdV9zdHJ0b2woKSBhIGJpdApmOGZiNzg3IHV0aWwv
-Y3V0aWxzOiBDbGVhbiB1cCB2YXJpYWJsZSBuYW1lcyBhcm91bmQgcWVtdV9zdHJ0b2woKQozZjc2
-OTA2IHV0aWwvY3V0aWxzOiBSZW5hbWUgcWVtdV9zdHJ0b2xsKCksIHFlbXVfc3RydG91bGwoKQo2
-Y2FhYTY4IHV0aWwvY3V0aWxzOiBSZXdyaXRlIGRvY3VtZW50YXRpb24gb2YgcWVtdV9zdHJ0b2wo
-KSAmIGZyaWVuZHMKYTgxODkyZiB0ZXN0LWN1dGlsczogQ2xlYW4gdXAgcWVtdV9zdHJ0b3VsKCkg
-cmVzdWx0IGNoZWNrcwpjYzNjY2Q4IHRlc3QtY3V0aWxzOiBBZGQgbWlzc2luZyBxZW11X3N0cnRv
-bCgpLi4uIGVuZHB0ciBjaGVja3MKMDZkN2Q3ZSBvcHRpb246IEFzc2VydCB2YWx1ZSBzdHJpbmcg
-aXNuJ3QgbnVsbAo1MjAyZDc1IHRlc3QtcWVtdS1vcHRzOiBDb3ZlciBxZW11X29wdHNfcGFyc2Uo
-KQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8yNDogdGVzdC1xZW11LW9w
-dHM6IENvdmVyIHFlbXVfb3B0c19wYXJzZSgpLi4uCkNoZWNraW5nIFBBVENIIDIvMjQ6IG9wdGlv
-bjogQXNzZXJ0IHZhbHVlIHN0cmluZyBpc24ndCBudWxsLi4uCkVSUk9SOiBjb25zaWRlciB1c2lu
-ZyBxZW11X3N0cnRvdWxsIGluIHByZWZlcmVuY2UgdG8gc3RydG91bGwKIzc3OiBGSUxFOiB1dGls
-L3FlbXUtb3B0aW9uLmM6MTQ3OgorICAgIG51bWJlciA9IHN0cnRvdWxsKHZhbHVlLCAmcG9zdGZp
-eCwgMCk7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDExNyBsaW5lcyBjaGVja2VkCgpZ
-b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAzLzI0
-OiB0ZXN0LWN1dGlsczogQWRkIG1pc3NpbmcgcWVtdV9zdHJ0b2woKS4uLiBlbmRwdHIgY2hlY2tz
-Li4uCkNoZWNraW5nIFBBVENIIDQvMjQ6IHRlc3QtY3V0aWxzOiBDbGVhbiB1cCBxZW11X3N0cnRv
-dWwoKSByZXN1bHQgY2hlY2tzLi4uCkNoZWNraW5nIFBBVENIIDUvMjQ6IHV0aWwvY3V0aWxzOiBS
-ZXdyaXRlIGRvY3VtZW50YXRpb24gb2YgcWVtdV9zdHJ0b2woKSAmIGZyaWVuZHMuLi4KQ2hlY2tp
-bmcgUEFUQ0ggNi8yNDogdXRpbC9jdXRpbHM6IFJlbmFtZSBxZW11X3N0cnRvbGwoKSwgcWVtdV9z
-dHJ0b3VsbCgpLi4uCkNoZWNraW5nIFBBVENIIDcvMjQ6IHV0aWwvY3V0aWxzOiBDbGVhbiB1cCB2
-YXJpYWJsZSBuYW1lcyBhcm91bmQgcWVtdV9zdHJ0b2woKS4uLgpFUlJPUjogY29uc2lkZXIgdXNp
-bmcgcWVtdV9zdHJ0b2wgaW4gcHJlZmVyZW5jZSB0byBzdHJ0b2wKIzc4OiBGSUxFOiB1dGlsL2N1
-dGlscy5jOjMxNjoKKyAgICAgICAgKnJlc3VsdCA9IHN0cnRvbChucHRyLCAmZXAsIGJhc2UpOwoK
-RVJST1I6IGNvbnNpZGVyIHVzaW5nIHFlbXVfc3RydG91bCBpbiBwcmVmZXJlbmNlIHRvIHN0cnRv
-dWwKIzk3OiBGSUxFOiB1dGlsL2N1dGlscy5jOjM1OToKKyAgICAgICAgKnJlc3VsdCA9IHN0cnRv
-dWwobnB0ciwgJmVwLCBiYXNlKTsKCkVSUk9SOiBjb25zaWRlciB1c2luZyBxZW11X3N0cnRvbGwg
-aW4gcHJlZmVyZW5jZSB0byBzdHJ0b2xsCiMxMjI6IEZJTEU6IHV0aWwvY3V0aWxzLmM6Mzg4Ogor
-ICAgICAgICAqcmVzdWx0ID0gc3RydG9sbChucHRyLCAmZXAsIGJhc2UpOwoKRVJST1I6IGNvbnNp
-ZGVyIHVzaW5nIHFlbXVfc3RydG91bGwgaW4gcHJlZmVyZW5jZSB0byBzdHJ0b3VsbAojMTQxOiBG
-SUxFOiB1dGlsL2N1dGlscy5jOjQxMjoKKyAgICAgICAgKnJlc3VsdCA9IHN0cnRvdWxsKG5wdHIs
-ICZlcCwgYmFzZSk7Cgp0b3RhbDogNCBlcnJvcnMsIDAgd2FybmluZ3MsIDExMCBsaW5lcyBjaGVj
-a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRD
-SCA4LzI0OiB1dGlsL2N1dGlsczogQ2xlYW4gdXAgY29udHJvbCBmbG93IGFyb3VuZCBxZW11X3N0
-cnRvbCgpIGEgYml0Li4uCkVSUk9SOiBjb25zaWRlciB1c2luZyBxZW11X3N0cnRvbCBpbiBwcmVm
-ZXJlbmNlIHRvIHN0cnRvbAojODM6IEZJTEU6IHV0aWwvY3V0aWxzLmM6MzIyOgorICAgICpyZXN1
-bHQgPSBzdHJ0b2wobnB0ciwgJmVwLCBiYXNlKTsKCkVSUk9SOiBjb25zaWRlciB1c2luZyBxZW11
-X3N0cnRvdWwgaW4gcHJlZmVyZW5jZSB0byBzdHJ0b3VsCiMxMTE6IEZJTEU6IHV0aWwvY3V0aWxz
-LmM6MzY0OgorICAgICpyZXN1bHQgPSBzdHJ0b3VsKG5wdHIsICZlcCwgYmFzZSk7CgpFUlJPUjog
-Y29uc2lkZXIgdXNpbmcgcWVtdV9zdHJ0b2xsIGluIHByZWZlcmVuY2UgdG8gc3RydG9sbAojMTQz
-OiBGSUxFOiB1dGlsL2N1dGlscy5jOjM5MjoKKyAgICAqcmVzdWx0ID0gc3RydG9sbChucHRyLCAm
-ZXAsIGJhc2UpOwoKRVJST1I6IGNvbnNpZGVyIHVzaW5nIHFlbXVfc3RydG91bGwgaW4gcHJlZmVy
-ZW5jZSB0byBzdHJ0b3VsbAojMTczOiBGSUxFOiB1dGlsL2N1dGlscy5jOjQxNToKKyAgICAqcmVz
-dWx0ID0gc3RydG91bGwobnB0ciwgJmVwLCBiYXNlKTsKCnRvdGFsOiA0IGVycm9ycywgMCB3YXJu
-aW5ncywgMTQwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
-IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
-TkVSUy4KCkNoZWNraW5nIFBBVENIIDkvMjQ6IG9wdGlvbjogRml4IHRvIHJlamVjdCBpbnZhbGlk
-IGFuZCBvdmVyZmxvd2luZyBudW1iZXJzLi4uCkNoZWNraW5nIFBBVENIIDEwLzI0OiB0ZXN0LWN1
-dGlsczogQWRkIG1pc3NpbmcgcWVtdV9zdHJ0b3N6KCkuLi4gZW5kcHRyIGNoZWNrcy4uLgpDaGVj
-a2luZyBQQVRDSCAxMS8yNDogdGVzdC1jdXRpbHM6IENvdmVyIHFlbXVfc3RydG9zeigpIGludmFs
-aWQgaW5wdXQuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvMjQ6IHRlc3QtY3V0aWxzOiBDb3ZlciBxZW11
-X3N0cnRvc3ooKSB3aXRoIHRyYWlsaW5nIGNyYXAuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvMjQ6IHRl
-c3QtY3V0aWxzOiBDb3ZlciBxZW11X3N0cnRvc3ooKSBhcm91bmQgcmFuZ2UgbGltaXRzLi4uCkNo
-ZWNraW5nIFBBVENIIDE0LzI0OiB1dGlsL2N1dGlsczogTmV3IHFlbXVfc3RydG9zel9tZXRyaWMo
-KS4uLgpDaGVja2luZyBQQVRDSCAxNS8yNDogdXRpbC9jdXRpbHM6IFJlbmFtZSBxZW11X3N0cnRv
-c3ooKSB0byBxZW11X3N0cnRvc3pfTWlCKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMTYvMjQ6IHV0aWwv
-Y3V0aWxzOiBOZXcgcWVtdV9zdHJ0b3N6KCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMTcvMjQ6IHV0aWwv
-Y3V0aWxzOiBEcm9wIFFFTVVfU1RSVE9TWl9ERUZTVUZGSVhfKiBtYWNyb3MuLi4KQ2hlY2tpbmcg
-UEFUQ0ggMTgvMjQ6IHRlc3QtY3V0aWxzOiBVc2UgcWVtdV9zdHJ0b3N6KCkgbW9yZSBvZnRlbi4u
-LgpDaGVja2luZyBQQVRDSCAxOS8yNDogdGVzdC1jdXRpbHM6IERyb3Agc3VmZml4IGZyb20gdGVz
-dF9xZW11X3N0cnRvc3pfc2ltcGxlKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMjAvMjQ6IHFlbXUtaW1n
-OiBXcmFwIGN2dG51bSgpIGFyb3VuZCBxZW11X3N0cnRvc3ooKS4uLgpDaGVja2luZyBQQVRDSCAy
-MS8yNDogdXRpbC9jdXRpbHM6IExldCBxZW11X3N0cnRvc3oqKCkgb3B0aW9uYWxseSByZWplY3Qg
-dHJhaWxpbmcgY3JhcC4uLgpDaGVja2luZyBQQVRDSCAyMi8yNDogdXRpbC9jdXRpbHM6IFJldHVy
-biBxZW11X3N0cnRvc3oqKCkgZXJyb3IgYW5kIHZhbHVlIHNlcGFyYXRlbHkuLi4KQ2hlY2tpbmcg
-UEFUQ0ggMjMvMjQ6IHV0aWwvY3V0aWxzOiBDaGFuZ2UgcWVtdV9zdHJ0b3N6KigpIGZyb20gaW50
-NjRfdCB0byB1aW50NjRfdC4uLgpDaGVja2luZyBQQVRDSCAyNC8yNDogb3B0aW9uOiBGaXggY2hl
-Y2tpbmcgb2Ygc2l6ZXMgZm9yIG92ZXJmbG93IGFuZCB0cmFpbGluZyBjcmFwLi4uCj09PSBPVVRQ
-VVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwg
-Z2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10u
-ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+--Sig_/WD+LVhFxAv+bpaw743iG906
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, 23 Feb 2017 13:44:41 +0000
+Stefan Hajnoczi <stefanha@gmail.com> wrote:
+
+> On Mon, Feb 20, 2017 at 03:40:15PM +0100, Greg Kurz wrote:
+> > +static ssize_t do_xattrat_op(int op_type, int dirfd, const char *path,
+> > +                             const char *name, void *value, size_t siz=
+e,
+> > +                             int flags)
+> > +{
+> > +    struct xattrat_data *data;
+> > +    pid_t pid;
+> > +    ssize_t ret =3D -1;
+> > +    int wstatus;
+> > +
+> > +    data =3D mmap(NULL, sizeof(*data) + size, PROT_READ | PROT_WRITE,
+> > +                MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+> > +    if (data =3D=3D MAP_FAILED) {
+> > +        return -1;
+> > +    }
+> > +    data->ret =3D -1;
+> > +
+> > +    pid =3D fork();
+> > +    if (pid < 0) {
+> > +        goto err_out;
+> > +    } else if (pid =3D=3D 0) {
+> > +        if (fchdir(dirfd) =3D=3D 0) {
+> > +            switch (op_type) {
+> > +            case XATTRAT_OP_GET:
+> > +                data->ret =3D lgetxattr(path, name, data->value, size);
+> > +                break;
+> > +            case XATTRAT_OP_LIST:
+> > +                data->ret =3D llistxattr(path, data->value, size);
+> > +                break;
+> > +            case XATTRAT_OP_SET:
+> > +                data->ret =3D lsetxattr(path, name, value, size, flags=
+);
+> > +                break;
+> > +            case XATTRAT_OP_REMOVE:
+> > +                data->ret =3D lremovexattr(path, name);
+> > +                break;
+> > +            default:
+> > +                g_assert_not_reached();
+> > +            }
+> > +        }
+> > +        data->serrno =3D errno;
+> > +        _exit(0);
+> > +    }
+> > +    assert(waitpid(pid, &wstatus, 0) =3D=3D pid && WIFEXITED(wstatus));
+> > +
+> > +    ret =3D data->ret;
+> > +    if (ret < 0) {
+> > +        errno =3D data->serrno;
+> > +        goto err_out;
+> > +    }
+> > +    if (value) {
+> > +        memcpy(value, data->value, data->ret);
+> > +    }
+> > +err_out:
+> > +    munmap_preserver_errno(data, sizeof(*data) + size);
+> > +    return ret;
+> > +} =20
+>=20
+> Forking is ugly since QEMU is a multi-threaded program.  We brainstormed
+
+Yeah, forking is ugly and it completely ruins metadata performance (x30
+slower in passthrough mode and x300 slower in mapped-xattr mode).
+
+> alternatives on IRC like using /proc/self/fd/$fd to work around the
+> missing getxattrat() API.
+>=20
+
+This should do the trick indeed. If we have to call getxattr()
+on some untrusted $path that may be modified by the guest. We
+can do:
+
+dirfd =3D openat_nofollow($mount_fd, dirname($path))
+filename =3D basename($path)
+
+and then we can safely call:
+
+lgetxattr("/proc/self/fd/$dirfd/$filename")
+
+since "/proc/self/fd/$dirfd" is trusted.
+
+> Stefan
+
+
+--Sig_/WD+LVhFxAv+bpaw743iG906
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAlivTB4ACgkQAvw66wEB28IzjgCeLjyAPWFDE5/ajriVlmhr0Kiq
+CkQAn1OrGILWlYbhdAphyOWW9xjk7Wf3
+=EHwr
+-----END PGP SIGNATURE-----
+
+--Sig_/WD+LVhFxAv+bpaw743iG906--
