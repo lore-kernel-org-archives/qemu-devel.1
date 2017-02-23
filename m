@@ -1,31 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1cgvjH-0001F8-4a
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:54:52 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cgvn8-0004ZW-Fi
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:58:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1cgvjE-0005Vy-0u
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:54:51 -0500
-Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:36450)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1cgvjD-0005Tr-Qg
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:54:47 -0500
-Received: by mail-it0-x242.google.com with SMTP id w185so616842ita.3
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 07:54:46 -0800 (PST)
-In-Reply-To: <20170223140944.GK2449@lianli.shorne-pla.net>
-References: <mailman.51026.1486615955.22738.qemu-devel@nongnu.org>
-	<8C14E9D0-F376-4CDC-BF24-A0609A329977@gmail.com>
-	<20170210003916.GL32144@lianli.shorne-pla.net>
-	<ec491d8c-3fb0-3ce9-5558-ac4ab1455f7f@twiddle.net>
-	<4BE06A79-02EC-48A8-8081-F21CEACE396F@gmail.com>
-	<20170223140944.GK2449@lianli.shorne-pla.net>
-Mime-Version: 1.0 (Apple Message framework v753.1)
-Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
-Message-Id: <C90ADBA7-AAB2-4392-8C64-3BB12545AE2F@gmail.com>
-Content-Transfer-Encoding: 7bit
-From: G 3 <programmingkidx@gmail.com>
-Date: Thu, 23 Feb 2017 10:54:43 -0500
-Subject: Re: [Qemu-devel] [PATCH 00/22] target/openrisc updates
+	(envelope-from <pbonzini@redhat.com>) id 1cgvn2-0006xp-Fs
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:58:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35092)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cgvn2-0006xO-8C
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:58:44 -0500
+References: <1487659615-15820-1-git-send-email-xyjxie@linux.vnet.ibm.com>
+	<5edff645-12e8-d3e0-1849-302b6986c232@ozlabs.ru>
+	<fdcb2b07-aae8-69bf-ee94-a43777009c3a@redhat.com>
+	<CAFEAcA--bSo7PJH0Px9ytQspaYuS55CSsM_EN6zt0djhkqKNPw@mail.gmail.com>
+	<5a0773de-6bc7-474a-82ab-2edd37ce8a93@redhat.com>
+	<CAFEAcA99xi4k57h2XGw2deGO24E95AS5jyGL+4GzjqNgMb9wcg@mail.gmail.com>
+	<92580ca9-47fe-a943-7720-d3cb1fc6d2eb@redhat.com>
+	<CAFEAcA8769a_8xwk57FS6Ko+Lioud20+70JRSafeEic6GB_RAw@mail.gmail.com>
+	<3d5e7b5e-4501-86b7-093d-47fb09af585e@redhat.com>
+	<CAFEAcA9gcArSqhbRi6-YdR=5eE9dtq66C7N0qTbCuBiY_Zr+tA@mail.gmail.com>
+	<41630a89-e645-7d7e-b7c2-356fd6dcadee@redhat.com>
+	<CAFEAcA_Mh9ZrJeu4f==ko1k2yLkfPe2AwNbUHcxkmS6Lzuvk0Q@mail.gmail.com>
+	<2565ef99-9c16-e836-08c6-0915f5d4b0f8@redhat.com>
+	<CAFEAcA_BgiXrjW9aRNFkXEEjS+kjibJ_UisJtiLgrPh=0re5qA@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c76578aa-ec76-f904-b0fc-72676e4ce515@redhat.com>
+Date: Thu, 23 Feb 2017 16:58:40 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA_BgiXrjW9aRNFkXEEjS+kjibJ_UisJtiLgrPh=0re5qA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] memory: make ram device read/write endian
+ sensitive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,133 +40,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stafford Horne <shorne@gmail.com>
-Cc: Richard Henderson <rth@twiddle.net>, Openrisc <openrisc@lists.librecores.org>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Yongji Xie <xyjxie@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, zhong@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>, Paul Mackerras <paulus@samba.org>
 
 
-On Feb 23, 2017, at 9:09 AM, Stafford Horne wrote:
 
-> On Mon, Feb 13, 2017 at 10:33:09PM -0500, Programmingkid wrote:
->>
->> On Feb 13, 2017, at 10:25 PM, Richard Henderson wrote:
->>
->>> On 02/10/2017 11:39 AM, Stafford Horne wrote:
->>>> On Thu, Feb 09, 2017 at 09:10:51AM -0500, G 3 wrote:
->>>>>
->>>>> On Feb 8, 2017, at 11:52 PM, qemu-devel-request@nongnu.org wrote:
->>>>>
->>>>>> Message: 6
->>>>>> Date: Wed,  8 Feb 2017 20:51:32 -0800
->>>>>> From: Richard Henderson <rth@twiddle.net>
->>>>>> To: qemu-devel@nongnu.org
->>>>>> Cc: shorne@gmail.com
->>>>>> Subject: [Qemu-devel] [PATCH 00/22] target/openrisc updates
->>>>>> Message-ID: <20170209045154.16868-1-rth@twiddle.net>
->>>>>>
->>>>>> The bulk of this patch set is 2-3 years old, and was mostly
->>>>>> reviewed by Bastian Koppelmann.  But it languished because
->>>>>> there were reports of it not booting kernel images, and I
->>>>>> had problems putting together a set of tools that could even
->>>>>> build a kernel.
->>>>>>
->>>>>> The OpenRISC community has picked up activity recently,
->>>>>> with Stafford Horne upstreaming some of the compiler tools.
->>>>>> He has even done some testing for me of this patch set.
->>>>>>
->>>>>>
->>>>>> r~
->>>>>
->>>>> I see you are working on OpenRISC. Would you be able to help
->>>>> me improve its wiki page?
->>>>>
->>>>> http://wiki.qemu-project.org/Documentation/Platforms/OpenRISC
->>>>>
->>>>> Right now there isn't much information on OpenRISC here. I'm
->>>>> hoping to make it a lot useful to anyone who is interesting in  
->>>>> this
->>>>> platform.
->>>>>
->>>>> Would you know of any links to software that works in OpenRISC?
->>>>>
->>>>> Pictures of the OpenRISC target running anything would be great  
->>>>> also.
->>>>>
->>>>> What is your suggested command-line for using OpenRISC?
->>>>>
->>>>> If you have any suggestions on how to improve the page place don't
->>>>> hesitate to let me know.
->>>>>
->>>>
->>>> Hi Richard, G 3,
->>>>
->>>> I am not sure if Richard has the time for this.  But I kind of  
->>>> got him
->>>> started back on the openrisc work, it would be my fault to  
->>>> burden him
->>>> with even more work :).  Also, I was helping to do some tests so  
->>>> I have
->>>> some example commands.
->>>
->>> :-)
->>>
->>>> I don't have a lot of time, but I think I can help to update the  
->>>> above.
->>>> Probably Richard and I could work together?
->>>>
->>>> I was recently working on updating the openrisc page
->>>>
->>>>  http://openrisc.io
->>>>
->>>> I think I could link between the two for toolchain compile  
->>>> guides and
->>>> software guides (i.e. debugging and linux).
->>>>
->>>> Richard what do you think?
->>>
->>> Probably the most beneficial thing that we can do is create a  
->>> kernel+initrd that boots into a busybox root shell.  Similar to  
->>> the other test images that we have at
->>>
->>>  http://wiki.qemu-project.org/Testing/System_Images
->>>
->>>
->>> r~
->>>
->>
->> We could do both the test image and a wiki page.
->
-> I posted a test image to the wiki
->
->  http://wiki.qemu-project.org/Testing/System_Images
->
-> However, someone on the #qemu irc room mentioned its not ideal to post
-> any images on the wiki and existing images should be taken down due to
-> copyright issues.  I don't quite follow, should we be concerned?
+On 23/02/2017 16:29, Peter Maydell wrote:
+>> No, they look entirely the same.  The only difference is that they go
+>> through MemoryRegionOps instead of memcpy.
+> Then we have a different problem, because the thing this patch
+> is claiming to fix is that the memory the device is backed by
+> (from vfio) is little-endian and we're not accessing it right.
+>=20
+> RAM of the usual sort is target-endian (by which I mean "when the guest
+> does a write of 32-bits 0x12345678, and you look at the memory byte
+> by byte then the order of bytes is either 0x12 0x34 0x56 0x78 if
+> TARGET_LITTLE_ENDIAN or 0x78 0x56 0x34 0x12 if TARGET_BIG_ENDIAN").
 
-If this is a Linux test image, it should be fine. Could we add a link  
-to the test image to the wiki page?
+Okay, I think I see what you mean.
 
->
-> Also, I did start adding some commands to the wiki, any feedback
-> appreciated.
->
->   http://wiki.qemu-project.org/Documentation/Platforms/OpenRISC
->
-> -Stafford
+MMIO regions do not expect their datum in any endianness; they just get
+a uint64_t representing an 8/16/32/64-bit value.  The datum undergoes a
+conversion if necessary, according to target and MemoryRegionOps
+endiannesses, before the callback is invoked.
 
-Thank you so much for all your work. The wiki page looks great. For  
-the maintainer, is Jia Liu still maintaining it? I never received a  
-reply from him.  Would you be interested in being a maintainer?
+In the ramd case, the ops convert between
+bunch-of-bytes-stored-into-RAM-by-host and uint64_t (to uint64_t for
+read, from uint64_t for write).  The conversion from/to target
+endianness has been done already by the memory.c core code.  The ops'
+task is to ensure that this bunch of bytes has the exact order that the
+guest desired.  There's more than one way to do it---all that's needed
+is that the order used by the ops matches the one specified by the ops'
+endianness, resulting in an even number of swaps.
 
-This line in the wiki doesn't sound right:
-"To get good traces you can also add the following, this will output  
-trace info the a file z"
+However, DEVICE_NATIVE_ENDIAN would have to be paired with tswap, which
+the current code does not do, hence the bug.  To have no swap at all,
+you'd need DEVICE_HOST_ENDIAN.
 
-Maybe this:
-"To get good traces you can also add the following, this will output  
-trace info to the file z"
+> AIUI what we want for this VFIO case is "when the guest does
+> a 32-bit write of 0x12345678 then the bytes are 0x12 0x34 0x56 0x78
+> regardless of whether TARGET_BIG_ENDIAN or not".
 
-If z is a file, I really suggest renaming it to something more  
-descriptive.
+No, I don't think so.  This is not specific to VFIO.  You can do it with
+any device, albeit VFIO is currently the only one using ramd regions.
 
-Thank you.
+Paolo
