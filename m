@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cgpZ1-0006Es-Rp
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 04:19:53 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cgpje-0006vq-1Z
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 04:30:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cgpYy-0003Ly-LJ
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 04:19:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48296)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cgpYy-0003Lr-F1
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 04:19:48 -0500
-Date: Thu, 23 Feb 2017 09:19:43 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170223091943.GA10047@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CAJy91Cav17O8N++OzmOJUUeZKa7_tZyRNgQ-KZkwR-wcv1oX=Q@mail.gmail.com>
+	(envelope-from <no-reply@patchew.org>) id 1cgpjZ-0006tk-G7
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 04:30:50 -0500
+Resent-Message-Id: <E1cgpjZ-0006tk-G7@eggs.gnu.org>
+In-Reply-To: <20170223091845.18523-1-famz@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148784211287.156.16038060950231812105@0e2666bad730>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAJy91Cav17O8N++OzmOJUUeZKa7_tZyRNgQ-KZkwR-wcv1oX=Q@mail.gmail.com>
-Subject: Re: [Qemu-devel] QEMU pipe implementation for Windows(host)
- Linux(guest) interaction
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 23 Feb 2017 01:28:33 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 0/6] block: Add VFIO based driver for
+ NVMe device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +24,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jiahuan Zhang <jiahuanzhang90@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: famz@redhat.com
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com, krister@redhat.com
 
-On Thu, Feb 23, 2017 at 08:45:17AM +0100, Jiahuan Zhang wrote:
-> Dear QEMU developers,
-> 
-> I am a student working on the host-guest interaction for a Windows Host and
-> Linux Quest. Actually, I aim to make a universal pipe implementation for
-> any host-guest interaction.
-
-FWIW, there's already two general purpose host<->guest communication
-channels for QEMU - virtio-serial (like a traditional serial port
-but giving them names & allowing many to be create) and virtio-vsock
-(like UNIX domain sockets, but across host/guest - alternatively like
-TCP/IP sockets, but without network devices involved)
-
-> I am now using a serial port to redirect to a pipe. This is working with
-> LInux host and Linux guest by using "mkfifo" to create the pipe. However, I
-> don't know how to create a pipe in Windows for QEMU usage.
-
-IIUC, you don't need to pre-create the pipe on Windows with QEMU chardevs.
-It looks like the code takes the filename you set, appends ".pipe" and
-then calls CreateNamedPipe to create it pipe.
-
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzAyMjMwOTE4NDUuMTg1MjMtMS1mYW16QHJlZGhhdC5jb20KVHlwZTogc2VyaWVzClN1YmplY3Q6
+IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC82XSBibG9jazogQWRkIFZGSU8gYmFzZWQgZHJpdmVy
+IGZvciBOVk1lIGRldmljZQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoK
+QkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkK
+ZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
+bmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRz
+PSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29t
+bWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1u
+IDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFp
+bCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZh
+aWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFp
+bGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2
+NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJv
+amVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAxNzAyMjMwOTE4NDUuMTg1
+MjMtMS1mYW16QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE3MDIyMzA5MTg0NS4xODUyMy0xLWZh
+bXpAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjJhZTA4NmEgcWVt
+dS1pbWc6IGRtYSBtYXAgYnVmZmVycwowZDZiZWQwIGJsb2NrL252bWU6IEltcGxlbWVudCAuYmRy
+dl9kbWFfbWFwIGFuZCAuYmRydl9kbWFfdW5tYXAKZGRjMjA0NCBibG9jazogSW50cm9kdWNlIGJk
+cnZfZG1hX21hcCBhbmQgYmRydl9kbWFfdW5tYXAKZmVjNGE1ZSBibG9jazogQWRkIFZGSU8gYmFz
+ZWQgTlZNZSBkcml2ZXIKNTc1MTdhOCBzdHViczogQWRkIHN0dWJzIGZvciByYW0gYmxvY2sgbm90
+aWZpZXIgQVBJCjk4YjBlNWYgbnZtZTogTW92ZSBOVk1lIGRlZmluaXRpb25zIHRvIGEgc2VwYXJh
+dGUgaGVhZGVyCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzY6IG52bWU6
+IE1vdmUgTlZNZSBkZWZpbml0aW9ucyB0byBhIHNlcGFyYXRlIGhlYWRlci4uLgpDaGVja2luZyBQ
+QVRDSCAyLzY6IHN0dWJzOiBBZGQgc3R1YnMgZm9yIHJhbSBibG9jayBub3RpZmllciBBUEkuLi4K
+Q2hlY2tpbmcgUEFUQ0ggMy82OiBibG9jazogQWRkIFZGSU8gYmFzZWQgTlZNZSBkcml2ZXIuLi4K
+V0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE4NzogRklMRTogYmxvY2svbnZtZS12
+ZmlvLmM6MTMxOgorICAgIGlmIChpb2N0bChzLT5kZXZpY2UsIFZGSU9fREVWSUNFX0dFVF9SRUdJ
+T05fSU5GTywgJnMtPmJhcl9yZWdpb25faW5mb1tpbmRleF0pKSB7CgpXQVJOSU5HOiBsaW5lIG92
+ZXIgODAgY2hhcmFjdGVycwojMjY1OiBGSUxFOiBibG9jay9udm1lLXZmaW8uYzoyMDk6CitzdGF0
+aWMgaW50IG52bWVfdmZpb19wY2lfcmVhZF9jb25maWcoTlZNZVZGSU9TdGF0ZSAqcywgdm9pZCAq
+YnVmLCBpbnQgc2l6ZSwgaW50IG9mcykKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJz
+CiMyNjc6IEZJTEU6IGJsb2NrL252bWUtdmZpby5jOjIxMToKKyAgICBpZiAocHJlYWQocy0+ZGV2
+aWNlLCBidWYsIHNpemUsIHMtPmNvbmZpZ19yZWdpb25faW5mby5vZmZzZXQgKyBvZnMpID09IHNp
+emUpIHsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyNzM6IEZJTEU6IGJsb2Nr
+L252bWUtdmZpby5jOjIxNzoKK3N0YXRpYyBpbnQgbnZtZV92ZmlvX3BjaV93cml0ZV9jb25maWco
+TlZNZVZGSU9TdGF0ZSAqcywgdm9pZCAqYnVmLCBpbnQgc2l6ZSwgaW50IG9mcykKCldBUk5JTkc6
+IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0MDk6IEZJTEU6IGJsb2NrL252bWUtdmZpby5jOjM1
+MzoKK3N0YXRpYyB2b2lkIG52bWVfdmZpb19yYW1fYmxvY2tfYWRkZWQoUkFNQmxvY2tOb3RpZmll
+ciAqbiwgdm9pZCAqaG9zdCwgc2l6ZV90IHNpemUpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
+cmFjdGVycwojNDE2OiBGSUxFOiBibG9jay9udm1lLXZmaW8uYzozNjA6CitzdGF0aWMgdm9pZCBu
+dm1lX3ZmaW9fcmFtX2Jsb2NrX3JlbW92ZWQoUkFNQmxvY2tOb3RpZmllciAqbiwgdm9pZCAqaG9z
+dCwgc2l6ZV90IHNpemUpCgpFUlJPUjogVXNlIG9mIHZvbGF0aWxlIGlzIHVzdWFsbHkgd3Jvbmc6
+IHNlZSBEb2N1bWVudGF0aW9uL3ZvbGF0aWxlLWNvbnNpZGVyZWQtaGFybWZ1bC50eHQKIzc5Nzog
+RklMRTogYmxvY2svbnZtZS5jOjM0OgorICAgIHZvbGF0aWxlIHVpbnQzMl90ICpkb29yYmVsbDsK
+CkVSUk9SOiBVc2Ugb2Ygdm9sYXRpbGUgaXMgdXN1YWxseSB3cm9uZzogc2VlIERvY3VtZW50YXRp
+b24vdm9sYXRpbGUtY29uc2lkZXJlZC1oYXJtZnVsLnR4dAojODIzOiBGSUxFOiBibG9jay9udm1l
+LmM6NjA6Cit0eXBlZGVmIHZvbGF0aWxlIHN0cnVjdCB7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAg
+Y2hhcmFjdGVycwojMTMwMjogRklMRTogYmxvY2svbnZtZS5jOjUzOToKKyAgICAgICAgICAgIGVy
+cm9yX3NldGcoZXJycCwgIlRpbWVvdXQgd2hpbGUgd2FpdGluZyBmb3IgZGV2aWNlIHRvIHJlc2V0
+ICglbGQgbXMpIiwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMzMxOiBGSUxF
+OiBibG9jay9udm1lLmM6NTY4OgorICAgICAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiVGltZW91
+dCB3aGlsZSB3YWl0aW5nIGZvciBkZXZpY2UgdG8gc3RhcnQgKCVsZCBtcykiLAoKdG90YWw6IDIg
+ZXJyb3JzLCA4IHdhcm5pbmdzLCAxODAwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDQvNjogYmxvY2s6IEludHJvZHVj
+ZSBiZHJ2X2RtYV9tYXAgYW5kIGJkcnZfZG1hX3VubWFwLi4uCkNoZWNraW5nIFBBVENIIDUvNjog
+YmxvY2svbnZtZTogSW1wbGVtZW50IC5iZHJ2X2RtYV9tYXAgYW5kIC5iZHJ2X2RtYV91bm1hcC4u
+LgpDaGVja2luZyBQQVRDSCA2LzY6IHFlbXUtaW1nOiBkbWEgbWFwIGJ1ZmZlcnMuLi4KPT09IE9V
+VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
+XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5v
+cmc=
