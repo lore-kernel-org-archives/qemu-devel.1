@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cgy95-0004G3-Bl
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 13:29:41 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cgy98-0004J8-8M
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 13:29:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cgy93-0006QU-Gf
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 13:29:39 -0500
-Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:32944)
+	(envelope-from <alex.bennee@linaro.org>) id 1cgy96-0006U5-Bv
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 13:29:42 -0500
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:36643)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cgy93-0006Ox-85
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 13:29:37 -0500
-Received: by mail-wr0-x22f.google.com with SMTP id u47so337789wrb.0
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 10:29:37 -0800 (PST)
+	id 1cgy96-0006Si-3A
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 13:29:40 -0500
+Received: by mail-wm0-x232.google.com with SMTP id v77so37503123wmv.1
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 10:29:39 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 23 Feb 2017 18:29:08 +0000
-Message-Id: <20170223182927.7166-6-alex.bennee@linaro.org>
+Date: Thu, 23 Feb 2017 18:29:14 +0000
+Message-Id: <20170223182927.7166-12-alex.bennee@linaro.org>
 In-Reply-To: <20170223182927.7166-1-alex.bennee@linaro.org>
 References: <20170223182927.7166-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v14 05/24] tcg: add options for enabling MTTCG
+Subject: [Qemu-devel] [PATCH v14 11/24] tcg: enable thread-per-vCPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,330 +32,365 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: rth@twiddle.net, peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-From: KONRAD Frederic <fred.konrad@greensocs.com>
+There are a couple of changes that occur at the same time here:
 
-We know there will be cases where MTTCG won't work until additional work
-is done in the front/back ends to support. It will however be useful to
-be able to turn it on.
+  - introduce a single vCPU qemu_tcg_cpu_thread_fn
 
-As a result MTTCG will default to off unless the combination is
-supported. However the user can turn it on for the sake of testing.
+  One of these is spawned per vCPU with its own Thread and Condition
+  variables. qemu_tcg_rr_cpu_thread_fn is the new name for the old
+  single threaded function.
+
+  - the TLS current_cpu variable is now live for the lifetime of MTTCG
+    vCPU threads. This is for future work where async jobs need to know
+    the vCPU context they are operating in.
+
+The user to switch on multi-thread behaviour and spawn a thread
+per-vCPU. For a simple test kvm-unit-test like:
+
+  ./arm/run ./arm/locking-test.flat -smp 4 -accel tcg,thread=multi
+
+Will now use 4 vCPU threads and have an expected FAIL (instead of the
+unexpected PASS) as the default mode of the test has no protection when
+incrementing a shared variable.
+
+We enable the parallel_cpus flag to ensure we generate correct barrier
+and atomic code if supported by the front and backends. This doesn't
+automatically enable MTTCG until default_mttcg_enabled() is updated to
+check the configuration is supported.
 
 Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
-[AJB: move to -accel tcg,thread=multi|single, defaults]
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+[AJB: Some fixes, conditionally, commit rewording]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
-v1:
-  - merge with add mttcg option.
-  - update commit message
-v2:
-  - machine_init->opts_init
-v3:
-  - moved from -tcg to -accel tcg,thread=single|multi
+v1 (ajb):
+  - fix merge conflicts
+  - maintain single-thread approach
+v2
+  - re-base fixes (no longer has tb_find_fast lock tweak ahead)
+  - remove bogus break condition on cpu->stop/stopped
+  - only process exiting cpus exit_request
+  - handle all cpus idle case (fixes shutdown issues)
+  - sleep on EXCP_HALTED in mttcg mode (prevent crash on start-up)
+  - move icount timer into helper
+v3
+  - update the commit message
+  - rm kick_timer tweaks (move to earlier tcg_current_cpu tweaks)
+  - ensure linux-user clears cpu->exit_request in loop
+  - purging of global exit_request and tcg_current_cpu in earlier patches
   - fix checkpatch warnings
-v4:
-  - make mttcg_enabled extern, qemu_tcg_mttcg_enabled() now just macro
-  - qemu_tcg_configure now propagates Error instead of exiting
-  - better error checking of thread=foo
-  - use CONFIG flags for default_mttcg_enabled()
-  - disable mttcg with icount, error if both forced on
+v4
+  - don't break loop on stopped, we may never schedule next in RR mode
+  - make sure we flush iorequests of current cpu if we exited on one
+  - add tcg_cpu_exec_start/end wraps for async work functions
+  - stop killing of current_cpu on loop exit
+  - set current_cpu in the single thread function
+  - remove sleep special case, add qemu_tcg_should_sleep() for mttcg
+  - no need to atomic set cpu->exit_request going into the loop
+  - removed extraneous setting of exit_request
+  - split tb_lock() part of patch
+  - rename single thread fn to qemu_tcg_rr_cpu_thread_fn
+v5
+  - enable parallel_cpus for MTTCG (for barriers/atomics)
+  - expand on CONFIG_ flags in commit message
 v7
-  - explicitly disable MTTCG for TCG_OVERSIZED_GUEST
-  - use check_tcg_memory_orders_compatible() instead of CONFIG_MTTCG_HOST
-  - change CONFIG_MTTCG_TARGET to TARGET_SUPPORTS_MTTCG
-v8
-  - fix missing include tcg.h
-  - change mismatched MOs to a warning instead of error
-v10
-  - TCG_DEFAULT_MO -> TCG_GUEST_DEFAULT_MO
-v11
-  - tweak warning message
-v14
-  - add a space to warning message
+  - move parallel_cpus down into the mttcg leg
+  - minor ws merge fix
+v13
+  - Allow squashing of cpu->exit_request when setting EXCP_INTERRUPT
+    (this is because linux-user doesn't clear this in its loop)
+  - slightly re-word end of commit message w.r.t. default_mttcg_enabled
 ---
- cpus.c                | 73 +++++++++++++++++++++++++++++++++++++++++++++++++++
- include/qom/cpu.h     |  9 +++++++
- include/sysemu/cpus.h |  2 ++
- qemu-options.hx       | 20 ++++++++++++++
- tcg/tcg.h             |  9 +++++++
- vl.c                  | 49 +++++++++++++++++++++++++++++++++-
- 6 files changed, 161 insertions(+), 1 deletion(-)
+ cpu-exec.c |   4 --
+ cpus.c     | 134 +++++++++++++++++++++++++++++++++++++++++++++++--------------
+ 2 files changed, 103 insertions(+), 35 deletions(-)
 
+diff --git a/cpu-exec.c b/cpu-exec.c
+index 85f14d4194..2edd26e823 100644
+--- a/cpu-exec.c
++++ b/cpu-exec.c
+@@ -396,7 +396,6 @@ static inline bool cpu_handle_halt(CPUState *cpu)
+         }
+ #endif
+         if (!cpu_has_work(cpu)) {
+-            current_cpu = NULL;
+             return true;
+         }
+ 
+@@ -675,8 +674,5 @@ int cpu_exec(CPUState *cpu)
+     cc->cpu_exec_exit(cpu);
+     rcu_read_unlock();
+ 
+-    /* fail safe : never use current_cpu outside cpu_exec() */
+-    current_cpu = NULL;
+-
+     return ret;
+ }
 diff --git a/cpus.c b/cpus.c
-index 0bcb5b50b6..c94b3307e5 100644
+index e165d18785..bfee326d30 100644
 --- a/cpus.c
 +++ b/cpus.c
-@@ -25,6 +25,7 @@
- /* Needed early for CONFIG_BSD etc. */
- #include "qemu/osdep.h"
- #include "qemu-common.h"
-+#include "qemu/config-file.h"
- #include "cpu.h"
- #include "monitor/monitor.h"
- #include "qapi/qmp/qerror.h"
-@@ -45,6 +46,7 @@
- #include "qemu/main-loop.h"
- #include "qemu/bitmap.h"
- #include "qemu/seqlock.h"
-+#include "tcg.h"
- #include "qapi-event.h"
- #include "hw/nmi.h"
- #include "sysemu/replay.h"
-@@ -150,6 +152,77 @@ typedef struct TimersState {
- } TimersState;
+@@ -809,7 +809,7 @@ static void kick_tcg_thread(void *opaque)
  
- static TimersState timers_state;
-+bool mttcg_enabled;
-+
-+/*
-+ * We default to false if we know other options have been enabled
-+ * which are currently incompatible with MTTCG. Otherwise when each
-+ * guest (target) has been updated to support:
-+ *   - atomic instructions
-+ *   - memory ordering primitives (barriers)
-+ * they can set the appropriate CONFIG flags in ${target}-softmmu.mak
-+ *
-+ * Once a guest architecture has been converted to the new primitives
-+ * there are two remaining limitations to check.
-+ *
-+ * - The guest can't be oversized (e.g. 64 bit guest on 32 bit host)
-+ * - The host must have a stronger memory order than the guest
-+ *
-+ * It may be possible in future to support strong guests on weak hosts
-+ * but that will require tagging all load/stores in a guest with their
-+ * implicit memory order requirements which would likely slow things
-+ * down a lot.
-+ */
-+
-+static bool check_tcg_memory_orders_compatible(void)
-+{
-+#if defined(TCG_GUEST_DEFAULT_MO) && defined(TCG_TARGET_DEFAULT_MO)
-+    return (TCG_GUEST_DEFAULT_MO & ~TCG_TARGET_DEFAULT_MO) == 0;
-+#else
-+    return false;
-+#endif
-+}
-+
-+static bool default_mttcg_enabled(void)
-+{
-+    QemuOpts *icount_opts = qemu_find_opts_singleton("icount");
-+    const char *rr = qemu_opt_get(icount_opts, "rr");
-+
-+    if (rr || TCG_OVERSIZED_GUEST) {
-+        return false;
-+    } else {
-+#ifdef TARGET_SUPPORTS_MTTCG
-+        return check_tcg_memory_orders_compatible();
-+#else
-+        return false;
-+#endif
-+    }
-+}
-+
-+void qemu_tcg_configure(QemuOpts *opts, Error **errp)
-+{
-+    const char *t = qemu_opt_get(opts, "thread");
-+    if (t) {
-+        if (strcmp(t, "multi") == 0) {
-+            if (TCG_OVERSIZED_GUEST) {
-+                error_setg(errp, "No MTTCG when guest word size > hosts");
-+            } else {
-+                if (!check_tcg_memory_orders_compatible()) {
-+                    error_report("Guest expects a stronger memory ordering "
-+                                 "than the host provides");
-+                    error_printf("This may cause strange/hard to debug errors");
-+                }
-+                mttcg_enabled = true;
-+            }
-+        } else if (strcmp(t, "single") == 0) {
-+            mttcg_enabled = false;
-+        } else {
-+            error_setg(errp, "Invalid 'thread' setting %s", t);
-+        }
-+    } else {
-+        mttcg_enabled = default_mttcg_enabled();
-+    }
-+}
- 
- int64_t cpu_get_icount_raw(void)
+ static void start_tcg_kick_timer(void)
  {
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index f69b2407ea..2cf4ecf144 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -416,6 +416,15 @@ extern struct CPUTailQ cpus;
- extern __thread CPUState *current_cpu;
+-    if (!tcg_kick_vcpu_timer && CPU_NEXT(first_cpu)) {
++    if (!mttcg_enabled && !tcg_kick_vcpu_timer && CPU_NEXT(first_cpu)) {
+         tcg_kick_vcpu_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
+                                            kick_tcg_thread, NULL);
+         timer_mod(tcg_kick_vcpu_timer, qemu_tcg_next_kick());
+@@ -1063,27 +1063,34 @@ static void qemu_tcg_destroy_vcpu(CPUState *cpu)
  
- /**
-+ * qemu_tcg_mttcg_enabled:
-+ * Check whether we are running MultiThread TCG or not.
-+ *
-+ * Returns: %true if we are in MTTCG mode %false otherwise.
-+ */
-+extern bool mttcg_enabled;
-+#define qemu_tcg_mttcg_enabled() (mttcg_enabled)
+ static void qemu_wait_io_event_common(CPUState *cpu)
+ {
++    atomic_mb_set(&cpu->thread_kicked, false);
+     if (cpu->stop) {
+         cpu->stop = false;
+         cpu->stopped = true;
+         qemu_cond_broadcast(&qemu_pause_cond);
+     }
+     process_queued_cpu_work(cpu);
+-    cpu->thread_kicked = false;
++}
 +
-+/**
-  * cpu_paging_enabled:
-  * @cpu: The CPU whose state is to be inspected.
-  *
-diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
-index 3728a1ea7e..a73b5d4bce 100644
---- a/include/sysemu/cpus.h
-+++ b/include/sysemu/cpus.h
-@@ -36,4 +36,6 @@ extern int smp_threads;
++static bool qemu_tcg_should_sleep(CPUState *cpu)
++{
++    if (mttcg_enabled) {
++        return cpu_thread_is_idle(cpu);
++    } else {
++        return all_cpu_threads_idle();
++    }
+ }
  
- void list_cpus(FILE *f, fprintf_function cpu_fprintf, const char *optarg);
+ static void qemu_tcg_wait_io_event(CPUState *cpu)
+ {
+-    while (all_cpu_threads_idle()) {
++    while (qemu_tcg_should_sleep(cpu)) {
+         stop_tcg_kick_timer();
+         qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
+     }
  
-+void qemu_tcg_configure(QemuOpts *opts, Error **errp);
-+
- #endif
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 9936cf38f3..bf458f83c3 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -95,6 +95,26 @@ STEXI
- Select CPU model (@code{-cpu help} for list and additional feature selection)
- ETEXI
+     start_tcg_kick_timer();
  
-+DEF("accel", HAS_ARG, QEMU_OPTION_accel,
-+    "-accel [accel=]accelerator[,thread=single|multi]\n"
-+    "               select accelerator ('-accel help for list')\n"
-+    "               thread=single|multi (enable multi-threaded TCG)", QEMU_ARCH_ALL)
-+STEXI
-+@item -accel @var{name}[,prop=@var{value}[,...]]
-+@findex -accel
-+This is used to enable an accelerator. Depending on the target architecture,
-+kvm, xen, or tcg can be available. By default, tcg is used. If there is more
-+than one accelerator specified, the next one is used if the previous one fails
-+to initialize.
-+@table @option
-+@item thread=single|multi
-+Controls number of TCG threads. When the TCG is multi-threaded there will be one
-+thread per vCPU therefor taking advantage of additional host cores. The default
-+is to enable multi-threading where both the back-end and front-ends support it and
-+no incompatible TCG features have been enabled (e.g. icount/replay).
-+@end table
-+ETEXI
-+
- DEF("smp", HAS_ARG, QEMU_OPTION_smp,
-     "-smp [cpus=]n[,maxcpus=cpus][,cores=cores][,threads=threads][,sockets=sockets]\n"
-     "                set the number of CPUs to 'n' [default=1]\n"
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index f946452049..4c7f258220 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -80,6 +80,15 @@ typedef uint64_t tcg_target_ulong;
- #error unsupported
- #endif
+-    CPU_FOREACH(cpu) {
+-        qemu_wait_io_event_common(cpu);
+-    }
++    qemu_wait_io_event_common(cpu);
+ }
  
-+/* Oversized TCG guests make things like MTTCG hard
-+ * as we can't use atomics for cputlb updates.
-+ */
-+#if TARGET_LONG_BITS > TCG_TARGET_REG_BITS
-+#define TCG_OVERSIZED_GUEST 1
-+#else
-+#define TCG_OVERSIZED_GUEST 0
-+#endif
-+
- #if TCG_TARGET_NB_REGS <= 32
- typedef uint32_t TCGRegSet;
- #elif TCG_TARGET_NB_REGS <= 64
-diff --git a/vl.c b/vl.c
-index b5d0a19811..ea7f4320af 100644
---- a/vl.c
-+++ b/vl.c
-@@ -300,6 +300,26 @@ static QemuOptsList qemu_machine_opts = {
-     },
- };
+ static void qemu_kvm_wait_io_event(CPUState *cpu)
+@@ -1154,6 +1161,7 @@ static void *qemu_dummy_cpu_thread_fn(void *arg)
+     qemu_thread_get_self(cpu->thread);
+     cpu->thread_id = qemu_get_thread_id();
+     cpu->can_do_io = 1;
++    current_cpu = cpu;
  
-+static QemuOptsList qemu_accel_opts = {
-+    .name = "accel",
-+    .implied_opt_name = "accel",
-+    .head = QTAILQ_HEAD_INITIALIZER(qemu_accel_opts.head),
-+    .merge_lists = true,
-+    .desc = {
-+        {
-+            .name = "accel",
-+            .type = QEMU_OPT_STRING,
-+            .help = "Select the type of accelerator",
-+        },
-+        {
-+            .name = "thread",
-+            .type = QEMU_OPT_STRING,
-+            .help = "Enable/disable multi-threaded TCG",
-+        },
-+        { /* end of list */ }
-+    },
-+};
-+
- static QemuOptsList qemu_boot_opts = {
-     .name = "boot-opts",
-     .implied_opt_name = "order",
-@@ -2928,7 +2948,8 @@ int main(int argc, char **argv, char **envp)
-     const char *boot_once = NULL;
-     DisplayState *ds;
-     int cyls, heads, secs, translation;
--    QemuOpts *hda_opts = NULL, *opts, *machine_opts, *icount_opts = NULL;
-+    QemuOpts *opts, *machine_opts;
-+    QemuOpts *hda_opts = NULL, *icount_opts = NULL, *accel_opts = NULL;
-     QemuOptsList *olist;
-     int optind;
-     const char *optarg;
-@@ -2983,6 +3004,7 @@ int main(int argc, char **argv, char **envp)
-     qemu_add_opts(&qemu_trace_opts);
-     qemu_add_opts(&qemu_option_rom_opts);
-     qemu_add_opts(&qemu_machine_opts);
-+    qemu_add_opts(&qemu_accel_opts);
-     qemu_add_opts(&qemu_mem_opts);
-     qemu_add_opts(&qemu_smp_opts);
-     qemu_add_opts(&qemu_boot_opts);
-@@ -3675,6 +3697,26 @@ int main(int argc, char **argv, char **envp)
-                 qdev_prop_register_global(&kvm_pit_lost_tick_policy);
-                 break;
-             }
-+            case QEMU_OPTION_accel:
-+                accel_opts = qemu_opts_parse_noisily(qemu_find_opts("accel"),
-+                                                     optarg, true);
-+                optarg = qemu_opt_get(accel_opts, "accel");
-+
-+                olist = qemu_find_opts("machine");
-+                if (strcmp("kvm", optarg) == 0) {
-+                    qemu_opts_parse_noisily(olist, "accel=kvm", false);
-+                } else if (strcmp("xen", optarg) == 0) {
-+                    qemu_opts_parse_noisily(olist, "accel=xen", false);
-+                } else if (strcmp("tcg", optarg) == 0) {
-+                    qemu_opts_parse_noisily(olist, "accel=tcg", false);
-+                } else {
-+                    if (!is_help_option(optarg)) {
-+                        error_printf("Unknown accelerator: %s", optarg);
-+                    }
-+                    error_printf("Supported accelerators: kvm, xen, tcg\n");
-+                    exit(1);
-+                }
-+                break;
-             case QEMU_OPTION_usb:
-                 olist = qemu_find_opts("machine");
-                 qemu_opts_parse_noisily(olist, "usb=on", false);
-@@ -3983,6 +4025,8 @@ int main(int argc, char **argv, char **envp)
+     sigemptyset(&waitset);
+     sigaddset(&waitset, SIG_IPI);
+@@ -1162,9 +1170,7 @@ static void *qemu_dummy_cpu_thread_fn(void *arg)
+     cpu->created = true;
+     qemu_cond_signal(&qemu_cpu_cond);
  
-     replay_configure(icount_opts);
- 
-+    qemu_tcg_configure(accel_opts, &error_fatal);
-+
-     machine_class = select_machine();
- 
-     set_memory_options(&ram_slots, &maxram_size, machine_class);
-@@ -4349,6 +4393,9 @@ int main(int argc, char **argv, char **envp)
-         if (!tcg_enabled()) {
-             error_report("-icount is not allowed with hardware virtualization");
+-    current_cpu = cpu;
+     while (1) {
+-        current_cpu = NULL;
+         qemu_mutex_unlock_iothread();
+         do {
+             int sig;
+@@ -1175,7 +1181,6 @@ static void *qemu_dummy_cpu_thread_fn(void *arg)
              exit(1);
-+        } else if (qemu_tcg_mttcg_enabled()) {
-+            error_report("-icount does not currently work with MTTCG");
-+            exit(1);
          }
-         configure_icount(icount_opts, &error_abort);
-         qemu_opts_del(icount_opts);
+         qemu_mutex_lock_iothread();
+-        current_cpu = cpu;
+         qemu_wait_io_event_common(cpu);
+     }
+ 
+@@ -1287,7 +1292,7 @@ static void deal_with_unplugged_cpus(void)
+  * elsewhere.
+  */
+ 
+-static void *qemu_tcg_cpu_thread_fn(void *arg)
++static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
+ {
+     CPUState *cpu = arg;
+ 
+@@ -1309,6 +1314,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+ 
+         /* process any pending work */
+         CPU_FOREACH(cpu) {
++            current_cpu = cpu;
+             qemu_wait_io_event_common(cpu);
+         }
+     }
+@@ -1331,6 +1337,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+         while (cpu && !cpu->queued_work_first && !cpu->exit_request) {
+ 
+             atomic_mb_set(&tcg_current_rr_cpu, cpu);
++            current_cpu = cpu;
+ 
+             qemu_clock_enable(QEMU_CLOCK_VIRTUAL,
+                               (cpu->singlestep_enabled & SSTEP_NOTIMER) == 0);
+@@ -1342,7 +1349,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+                     cpu_handle_guest_debug(cpu);
+                     break;
+                 }
+-            } else if (cpu->stop || cpu->stopped) {
++            } else if (cpu->stop) {
+                 if (cpu->unplug) {
+                     cpu = CPU_NEXT(cpu);
+                 }
+@@ -1361,7 +1368,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+ 
+         handle_icount_deadline();
+ 
+-        qemu_tcg_wait_io_event(QTAILQ_FIRST(&cpus));
++        qemu_tcg_wait_io_event(cpu ? cpu : QTAILQ_FIRST(&cpus));
+         deal_with_unplugged_cpus();
+     }
+ 
+@@ -1408,6 +1415,64 @@ static void CALLBACK dummy_apc_func(ULONG_PTR unused)
+ }
+ #endif
+ 
++/* Multi-threaded TCG
++ *
++ * In the multi-threaded case each vCPU has its own thread. The TLS
++ * variable current_cpu can be used deep in the code to find the
++ * current CPUState for a given thread.
++ */
++
++static void *qemu_tcg_cpu_thread_fn(void *arg)
++{
++    CPUState *cpu = arg;
++
++    rcu_register_thread();
++
++    qemu_mutex_lock_iothread();
++    qemu_thread_get_self(cpu->thread);
++
++    cpu->thread_id = qemu_get_thread_id();
++    cpu->created = true;
++    cpu->can_do_io = 1;
++    current_cpu = cpu;
++    qemu_cond_signal(&qemu_cpu_cond);
++
++    /* process any pending work */
++    cpu->exit_request = 1;
++
++    while (1) {
++        if (cpu_can_run(cpu)) {
++            int r;
++            r = tcg_cpu_exec(cpu);
++            switch (r) {
++            case EXCP_DEBUG:
++                cpu_handle_guest_debug(cpu);
++                break;
++            case EXCP_HALTED:
++                /* during start-up the vCPU is reset and the thread is
++                 * kicked several times. If we don't ensure we go back
++                 * to sleep in the halted state we won't cleanly
++                 * start-up when the vCPU is enabled.
++                 *
++                 * cpu->halted should ensure we sleep in wait_io_event
++                 */
++                g_assert(cpu->halted);
++                break;
++            default:
++                /* Ignore everything else? */
++                break;
++            }
++        }
++
++        handle_icount_deadline();
++
++        atomic_mb_set(&cpu->exit_request, 0);
++        qemu_tcg_wait_io_event(cpu);
++    }
++
++    return NULL;
++}
++
+ static void qemu_cpu_kick_thread(CPUState *cpu)
+ {
+ #ifndef _WIN32
+@@ -1438,7 +1503,7 @@ void qemu_cpu_kick(CPUState *cpu)
+     qemu_cond_broadcast(cpu->halt_cond);
+     if (tcg_enabled()) {
+         cpu_exit(cpu);
+-        /* Also ensure current RR cpu is kicked */
++        /* NOP unless doing single-thread RR */
+         qemu_cpu_kick_rr_cpu();
+     } else {
+         if (hax_enabled()) {
+@@ -1514,13 +1579,6 @@ void pause_all_vcpus(void)
+ 
+     if (qemu_in_vcpu_thread()) {
+         cpu_stop_current();
+-        if (!kvm_enabled()) {
+-            CPU_FOREACH(cpu) {
+-                cpu->stop = false;
+-                cpu->stopped = true;
+-            }
+-            return;
+-        }
+     }
+ 
+     while (!all_vcpus_paused()) {
+@@ -1569,29 +1627,43 @@ void cpu_remove_sync(CPUState *cpu)
+ static void qemu_tcg_init_vcpu(CPUState *cpu)
+ {
+     char thread_name[VCPU_THREAD_NAME_SIZE];
+-    static QemuCond *tcg_halt_cond;
+-    static QemuThread *tcg_cpu_thread;
++    static QemuCond *single_tcg_halt_cond;
++    static QemuThread *single_tcg_cpu_thread;
+ 
+-    /* share a single thread for all cpus with TCG */
+-    if (!tcg_cpu_thread) {
++    if (qemu_tcg_mttcg_enabled() || !single_tcg_cpu_thread) {
+         cpu->thread = g_malloc0(sizeof(QemuThread));
+         cpu->halt_cond = g_malloc0(sizeof(QemuCond));
+         qemu_cond_init(cpu->halt_cond);
+-        tcg_halt_cond = cpu->halt_cond;
+-        snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/TCG",
++
++        if (qemu_tcg_mttcg_enabled()) {
++            /* create a thread per vCPU with TCG (MTTCG) */
++            parallel_cpus = true;
++            snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/TCG",
+                  cpu->cpu_index);
+-        qemu_thread_create(cpu->thread, thread_name, qemu_tcg_cpu_thread_fn,
+-                           cpu, QEMU_THREAD_JOINABLE);
++
++            qemu_thread_create(cpu->thread, thread_name, qemu_tcg_cpu_thread_fn,
++                               cpu, QEMU_THREAD_JOINABLE);
++
++        } else {
++            /* share a single thread for all cpus with TCG */
++            snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "ALL CPUs/TCG");
++            qemu_thread_create(cpu->thread, thread_name,
++                               qemu_tcg_rr_cpu_thread_fn,
++                               cpu, QEMU_THREAD_JOINABLE);
++
++            single_tcg_halt_cond = cpu->halt_cond;
++            single_tcg_cpu_thread = cpu->thread;
++        }
+ #ifdef _WIN32
+         cpu->hThread = qemu_thread_get_handle(cpu->thread);
+ #endif
+         while (!cpu->created) {
+             qemu_cond_wait(&qemu_cpu_cond, &qemu_global_mutex);
+         }
+-        tcg_cpu_thread = cpu->thread;
+     } else {
+-        cpu->thread = tcg_cpu_thread;
+-        cpu->halt_cond = tcg_halt_cond;
++        /* For non-MTTCG cases we share the thread */
++        cpu->thread = single_tcg_cpu_thread;
++        cpu->halt_cond = single_tcg_halt_cond;
+     }
+ }
+ 
 -- 
 2.11.0
