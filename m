@@ -1,40 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cgnRT-0006v7-OD
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 02:03:56 -0500
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cgndu-00028Z-HB
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 02:16:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cgnRQ-0004Fh-ME
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 02:03:55 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58343
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cgnRQ-0004EX-Gf
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 02:03:52 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1N6xKVk122533
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 02:03:51 -0500
-Received: from e23smtp09.au.ibm.com (e23smtp09.au.ibm.com [202.81.31.142])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28sqc6f8q1-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 02:03:50 -0500
-Received: from localhost
-	by e23smtp09.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Thu, 23 Feb 2017 17:03:48 +1000
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <20170223032118.GD12577@umbus.fritz.box>
-References: <1487763883-4877-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<1487763883-4877-4-git-send-email-nikunj@linux.vnet.ibm.com>
-	<20170223032118.GD12577@umbus.fritz.box>
-Date: Thu, 23 Feb 2017 12:32:44 +0530
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cgndp-0007I3-GZ
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 02:16:46 -0500
+Received: from [59.151.112.132] (port=45958 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cgndp-0007Hq-4D
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 02:16:41 -0500
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Date: Thu, 23 Feb 2017 15:14:28 +0800
+Message-ID: <1487834070-31374-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Message-Id: <8760k1tmnf.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH v3 03/10] target/ppc: support for 32-bit
- carry and overflow
+Subject: [Qemu-devel] [PATCH V8 0/2] Add new qmp commands to suppurt Xen COLO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,30 +23,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, rth@twiddle.net, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
+To: qemu devel <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Markus Armbruster <armbru@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
+Cc: Jason Wang <jasowang@redhat.com>, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>
 
-David Gibson <david@gibson.dropbear.id.au> writes:
+Xen COLO depend on qemu COLO replication function.
+So, We need new qmp commands for Xen to use qemu replication.
 
-> -static void gen_read_xer(TCGv dst)
->> +static void gen_read_xer(DisasContext *ctx, TCGv dst)
->>  {
->>      TCGv t0 = tcg_temp_new();
->>      TCGv t1 = tcg_temp_new();
->> @@ -3715,15 +3719,30 @@ static void gen_read_xer(TCGv dst)
->>      tcg_gen_or_tl(t0, t0, t1);
->>      tcg_gen_or_tl(dst, dst, t2);
->>      tcg_gen_or_tl(dst, dst, t0);
->> +    if (is_isa300(ctx)) {
->> +        tcg_gen_shli_tl(t0, cpu_ov32, XER_OV32);
->> +        tcg_gen_or_tl(dst, dst, t0);
->> +        tcg_gen_shli_tl(t0, cpu_ca32, XER_CA32);
->> +        tcg_gen_or_tl(dst, dst, t0);
->
-> Could you use 2 deposits here, instead of 2 shifts and 2 ors?
+Corresponding libxl patches already in xen.git.
+Commit ID:
 
-I checked the implementation of tcg_gen_deposit_i64, resultant will have much
-more than 2 shifts + 2 ors.
+ed37ef1f91c20f0ab162ce60f8c38400b917fa64
+COLO: introduce new API to prepare/start/do/get_error/stop replication
 
-Regards,
-Nikunj
+a0ddc0b359375b2418213966dfbdbfab593ecc6f
+tools/libxl: introduction of libxl__qmp_restore to load qemu state
+
+
+note: V8 address Zhanghailiang, Eric Blake and Markus Armbruster's comments.
+
+Zhang Chen (2):
+  Add a new qmp command to start/stop replication
+  Add a new qmp command to do checkpoint, query xen replication status
+
+ migration/colo.c | 46 +++++++++++++++++++++++++++++++++++
+ qapi-schema.json | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 119 insertions(+)
+
+-- 
+2.7.4
