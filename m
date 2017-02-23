@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cgzBy-0000S3-BS
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:36:46 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1cgzCv-0001ov-Nz
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:37:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cgzBx-0003Un-2f
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:36:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36272)
+	(envelope-from <alex.williamson@redhat.com>) id 1cgzCr-0003dC-84
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:37:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55260)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1cgzBw-0003Uc-QO
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:36:41 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	id 1cgzCq-0003cr-Vr
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:37:37 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ED90583F38
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 19:36:40 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 216447FB7D
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 19:37:37 +0000 (UTC)
 From: Alex Williamson <alex.williamson@redhat.com>
-Date: Thu, 23 Feb 2017 12:36:39 -0700
-Message-ID: <20170223193621.17110.40016.stgit@gimli.home>
+Date: Thu, 23 Feb 2017 12:37:35 -0700
+Message-ID: <20170223193724.17158.84397.stgit@gimli.home>
 In-Reply-To: <20170223193048.16909.25661.stgit@gimli.home>
 References: <20170223193048.16909.25661.stgit@gimli.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PULL 2/3] vfio/pci: Improve extended capability
- comments, skip masked caps
+Subject: [Qemu-devel] [PULL 3/3] vfio/pci-quirks.c: Disable stolen memory
+ for igd VFIO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,75 +36,134 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Since commit 4bb571d857d9 ("pci/pcie: don't assume cap id 0 is
-reserved") removes the internal use of extended capability ID 0, the
-comment here becomes invalid.  However, peeling back the onion, the
-code is still correct and we still can't seed the capability chain
-with ID 0, unless we want to muck with using the version number to
-force the header to be non-zero, which is much uglier to deal with.
-The comment also now covers some of the subtleties of using cap ID 0,
-such as transparently indicating absence of capabilities if none are
-added.  This doesn't detract from the correctness of the referenced
-commit as vfio in the kernel also uses capability ID zero to mask
-capabilties.  In fact, we should skip zero capabilities precisely
-because the kernel might also expose such a capability at the head
-position and re-introduce the problem.
+From: XiongZhang <xiong.y.zhang@intel.com>
 
+Regardless of running in UPT or legacy mode, the guest igd
+drivers may attempt to use stolen memory, however only legacy
+mode has BIOS support for reserving stolen memmory in the
+guest VM. We zero out the stolen memory size in all cases,
+then guest igd driver won't use stolen memory.
+In legacy mode, user could use x-igd-gms option to specify the
+amount of stolen memory which will be pre-allocated and reserved
+by bios for igd use.
+
+Bugzilla: https://bugs.freedesktop.org/show_bug.cgi?id=99028
+          https://bugs.freedesktop.org/show_bug.cgi?id=99025
+
+Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
+Tested-by: Terrence Xu <terrence.xu@intel.com>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Tested-by: Peter Xu <peterx@redhat.com>
-Reported-by: Jintack Lim <jintack@cs.columbia.edu>
-Tested-by: Jintack Lim <jintack@cs.columbia.edu>
 ---
- hw/vfio/pci.c |   31 +++++++++++++++++++++----------
- 1 file changed, 21 insertions(+), 10 deletions(-)
+ hw/vfio/pci-quirks.c |   65 +++++++++++++++++++++++++++++---------------------
+ 1 file changed, 38 insertions(+), 27 deletions(-)
 
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index f2ba9b6cfafc..03a3d0154976 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -1880,16 +1880,26 @@ static void vfio_add_ext_cap(VFIOPCIDevice *vdev)
-     /*
-      * Extended capabilities are chained with each pointing to the next, so we
-      * can drop anything other than the head of the chain simply by modifying
--     * the previous next pointer.  For the head of the chain, we can modify the
--     * capability ID to something that cannot match a valid capability.  ID
--     * 0 is reserved for this since absence of capabilities is indicated by
--     * 0 for the ID, version, AND next pointer.  However, pcie_add_capability()
--     * uses ID 0 as reserved for list management and will incorrectly match and
--     * assert if we attempt to pre-load the head of the chain with this ID.
--     * Use ID 0xFFFF temporarily since it is also seems to be reserved in
--     * part for identifying absence of capabilities in a root complex register
--     * block.  If the ID still exists after adding capabilities, switch back to
--     * zero.  We'll mark this entire first dword as emulated for this purpose.
-+     * the previous next pointer.  Seed the head of the chain here such that
-+     * we can simply skip any capabilities we want to drop below, regardless
-+     * of their position in the chain.  If this stub capability still exists
-+     * after we add the capabilities we want to expose, update the capability
-+     * ID to zero.  Note that we cannot seed with the capability header being
-+     * zero as this conflicts with definition of an absent capability chain
-+     * and prevents capabilities beyond the head of the list from being added.
-+     * By replacing the dummy capability ID with zero after walking the device
-+     * chain, we also transparently mark extended capabilities as absent if
-+     * no capabilities were added.  Note that the PCIe spec defines an absence
-+     * of extended capabilities to be determined by a value of zero for the
-+     * capability ID, version, AND next pointer.  A non-zero next pointer
-+     * should be sufficient to indicate additional capabilities are present,
-+     * which will occur if we call pcie_add_capability() below.  The entire
-+     * first dword is emulated to support this.
-+     *
-+     * NB. The kernel side does similar masking, so be prepared that our
-+     * view of the device may also contain a capability ID zero in the head
-+     * of the chain.  Skip it for the same reason that we cannot seed the
-+     * chain with a zero capability.
-      */
-     pci_set_long(pdev->config + PCI_CONFIG_SPACE_SIZE,
-                  PCI_EXT_CAP(0xFFFF, 0, 0));
-@@ -1915,6 +1925,7 @@ static void vfio_add_ext_cap(VFIOPCIDevice *vdev)
-                                    PCI_EXT_CAP_NEXT_MASK);
+diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+index e9b493b939db..e995e32deedf 100644
+--- a/hw/vfio/pci-quirks.c
++++ b/hw/vfio/pci-quirks.c
+@@ -1367,14 +1367,45 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+     uint16_t cmd_orig, cmd;
+     Error *err = NULL;
  
-         switch (cap_id) {
-+        case 0: /* kernel masked capability */
-         case PCI_EXT_CAP_ID_SRIOV: /* Read-only VF BARs confuse OVMF */
-         case PCI_EXT_CAP_ID_ARI: /* XXX Needs next function virtualization */
-             trace_vfio_add_ext_cap_dropped(vdev->vbasedev.name, cap_id, next);
++    /* This must be an Intel VGA device. */
++    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_INTEL, PCI_ANY_ID) ||
++        !vfio_is_vga(vdev) || nr != 4) {
++        return;
++    }
++
+     /*
+-     * This must be an Intel VGA device at address 00:02.0 for us to even
+-     * consider enabling legacy mode.  The vBIOS has dependencies on the
+-     * PCI bus address.
++     * IGD is not a standard, they like to change their specs often.  We
++     * only attempt to support back to SandBridge and we hope that newer
++     * devices maintain compatibility with generation 8.
+      */
+-    if (!vfio_pci_is(vdev, PCI_VENDOR_ID_INTEL, PCI_ANY_ID) ||
+-        !vfio_is_vga(vdev) || nr != 4 ||
+-        &vdev->pdev != pci_find_device(pci_device_root_bus(&vdev->pdev),
++    gen = igd_gen(vdev);
++    if (gen != 6 && gen != 8) {
++        error_report("IGD device %s is unsupported by IGD quirks, "
++                     "try SandyBridge or newer", vdev->vbasedev.name);
++        return;
++    }
++
++    /*
++     * Regardless of running in UPT or legacy mode, the guest graphics
++     * driver may attempt to use stolen memory, however only legacy mode
++     * has BIOS support for reserving stolen memory in the guest VM.
++     * Emulate the GMCH register in all cases and zero out the stolen
++     * memory size here. Legacy mode may request allocation and re-write
++     * this below.
++     */
++    gmch = vfio_pci_read_config(&vdev->pdev, IGD_GMCH, 4);
++    gmch &= ~((gen < 8 ? 0x1f : 0xff) << (gen < 8 ? 3 : 8));
++
++    /* GMCH is read-only, emulated */
++    pci_set_long(vdev->pdev.config + IGD_GMCH, gmch);
++    pci_set_long(vdev->pdev.wmask + IGD_GMCH, 0);
++    pci_set_long(vdev->emulated_config_bits + IGD_GMCH, ~0);
++
++    /*
++     * This must be at address 00:02.0 for us to even onsider enabling
++     * legacy mode.  The vBIOS has dependencies on the PCI bus address.
++     */
++    if (&vdev->pdev != pci_find_device(pci_device_root_bus(&vdev->pdev),
+                                        0, PCI_DEVFN(0x2, 0))) {
+         return;
+     }
+@@ -1394,18 +1425,6 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+     }
+ 
+     /*
+-     * IGD is not a standard, they like to change their specs often.  We
+-     * only attempt to support back to SandBridge and we hope that newer
+-     * devices maintain compatibility with generation 8.
+-     */
+-    gen = igd_gen(vdev);
+-    if (gen != 6 && gen != 8) {
+-        error_report("IGD device %s is unsupported in legacy mode, "
+-                     "try SandyBridge or newer", vdev->vbasedev.name);
+-        return;
+-    }
+-
+-    /*
+      * Most of what we're doing here is to enable the ROM to run, so if
+      * there's no ROM, there's no point in setting up this quirk.
+      * NB. We only seem to get BIOS ROMs, so a UEFI VM would need CSM support.
+@@ -1460,8 +1479,6 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+         goto out;
+     }
+ 
+-    gmch = vfio_pci_read_config(&vdev->pdev, IGD_GMCH, 4);
+-
+     /*
+      * If IGD VGA Disable is clear (expected) and VGA is not already enabled,
+      * try to enable it.  Probably shouldn't be using legacy mode without VGA,
+@@ -1532,12 +1549,11 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+      * when IVD (IGD VGA Disable) is clear, but the claim is that it's unused,
+      * so let's not waste VM memory for it.
+      */
+-    gmch &= ~((gen < 8 ? 0x1f : 0xff) << (gen < 8 ? 3 : 8));
+-
+     if (vdev->igd_gms) {
+         if (vdev->igd_gms <= 0x10) {
+             gms_mb = vdev->igd_gms * 32;
+             gmch |= vdev->igd_gms << (gen < 8 ? 3 : 8);
++            pci_set_long(vdev->pdev.config + IGD_GMCH, gmch);
+         } else {
+             error_report("Unsupported IGD GMS value 0x%x", vdev->igd_gms);
+             vdev->igd_gms = 0;
+@@ -1557,11 +1573,6 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+     fw_cfg_add_file(fw_cfg_find(), "etc/igd-bdsm-size",
+                     bdsm_size, sizeof(*bdsm_size));
+ 
+-    /* GMCH is read-only, emulated */
+-    pci_set_long(vdev->pdev.config + IGD_GMCH, gmch);
+-    pci_set_long(vdev->pdev.wmask + IGD_GMCH, 0);
+-    pci_set_long(vdev->emulated_config_bits + IGD_GMCH, ~0);
+-
+     /* BDSM is read-write, emulated.  The BIOS needs to be able to write it */
+     pci_set_long(vdev->pdev.config + IGD_BDSM, 0);
+     pci_set_long(vdev->pdev.wmask + IGD_BDSM, ~0);
