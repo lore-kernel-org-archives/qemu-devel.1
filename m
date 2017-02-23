@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cgkzz-0001YF-HL
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 23:27:24 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1cgl4j-00053X-GO
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 23:32:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cgkzy-00012e-Hn
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 23:27:23 -0500
-Message-ID: <1487824031.23895.8.camel@gmail.com>
+	(envelope-from <sjitindarsingh@gmail.com>) id 1cgl4i-0002dJ-Ew
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 23:32:17 -0500
+Message-ID: <1487824324.23895.10.camel@gmail.com>
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Thu, 23 Feb 2017 15:27:11 +1100
-In-Reply-To: <20170223020936.29220-3-david@gibson.dropbear.id.au>
+Date: Thu, 23 Feb 2017 15:32:04 +1100
+In-Reply-To: <20170223020936.29220-4-david@gibson.dropbear.id.au>
 References: <20170223020936.29220-1-david@gibson.dropbear.id.au>
-	<20170223020936.29220-3-david@gibson.dropbear.id.au>
+	<20170223020936.29220-4-david@gibson.dropbear.id.au>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/6] target/ppc: Merge cpu_ppc_set_vhyp()
- with cpu_ppc_set_papr()
+Subject: Re: [Qemu-devel] [PATCH 3/6] target/ppc: SDR1 is a hypervisor
+ resource
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,82 +28,85 @@ To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, aik@ozlabs.
 Cc: qemu-devel@nongnu.org, agraf@suse.de, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, paulus@samba.org
 
 On Thu, 2017-02-23 at 13:09 +1100, David Gibson wrote:
-> cpu_ppc_set_papr() sets up various aspects of CPU state for use with
-> PAPR
-> paravirtualized guests.  However, it doesn't set the virtual
-> hypervisor,
-> so callers must also call cpu_ppc_set_vhyp() so that PAPR hypercalls
-> are
-> handled properly.  This is a bit silly, so fold setting the virtual
-> hypervisor into cpu_ppc_set_papr().
+> At present the SDR1 register - the base of the system's hashed page
+> table
+> (HPT) - is represented as an SPR with supervisor read and write
+> permission.
+> However, on CPUs which have a hypervisor mode, the SDR1 is a
+> hypervisor
+> only resource.  Change the permission checking on the SPR to reflect
+> this.
+> 
+> Now that this is done, we don't need to check for an external HPT
+> executing
+> mtsdr1: an external HPT only applies when we're emulating the
+> behaviour of
+> a hypervisor, rather than modelling the CPU's hypervisor mode
+> internally,
+> so if we're permitted to execute mtsdr1, we don't have an external
+> HPT.
 > 
 > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  hw/ppc/spapr_cpu_core.c     |  3 +--
->  target/ppc/cpu.h            |  3 +--
->  target/ppc/translate_init.c | 10 +++-------
->  3 files changed, 5 insertions(+), 11 deletions(-)
+>  target/ppc/misc_helper.c    |  8 +++-----
+>  target/ppc/translate_init.c | 20 ++++++++++++++++----
+>  2 files changed, 19 insertions(+), 9 deletions(-)
 > 
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 55cd045..76563c4 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -57,8 +57,7 @@ static void spapr_cpu_init(sPAPRMachineState
-> *spapr, PowerPCCPU *cpu,
->      cpu_ppc_tb_init(env, SPAPR_TIMEBASE_FREQ);
+> diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
+> index ab432ba..fa573dd 100644
+> --- a/target/ppc/misc_helper.c
+> +++ b/target/ppc/misc_helper.c
+> @@ -82,11 +82,9 @@ void helper_store_sdr1(CPUPPCState *env,
+> target_ulong val)
+>  {
+>      PowerPCCPU *cpu = ppc_env_get_cpu(env);
 >  
->      /* Enable PAPR mode in TCG or KVM */
-> -    cpu_ppc_set_vhyp(cpu, PPC_VIRTUAL_HYPERVISOR(spapr));
-> -    cpu_ppc_set_papr(cpu);
-> +    cpu_ppc_set_papr(cpu, PPC_VIRTUAL_HYPERVISOR(spapr));
->  
->      if (cpu->max_compat) {
->          Error *local_err = NULL;
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index 425e79d..f99bcae 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -1300,8 +1300,7 @@ void store_booke_tcr (CPUPPCState *env,
-> target_ulong val);
->  void store_booke_tsr (CPUPPCState *env, target_ulong val);
->  void ppc_tlb_invalidate_all (CPUPPCState *env);
->  void ppc_tlb_invalidate_one (CPUPPCState *env, target_ulong addr);
-> -void cpu_ppc_set_vhyp(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp);
-> -void cpu_ppc_set_papr(PowerPCCPU *cpu);
-> +void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp);
->  #endif
->  #endif
+> -    if (!env->external_htab) {
+> -        if (env->spr[SPR_SDR1] != val) {
+> -            ppc_store_sdr1(env, val);
+> -            tlb_flush(CPU(cpu));
+> -        }
+
+It may have been the case we didn't have to check this before anyway...
+Oh well
+
+> +    if (env->spr[SPR_SDR1] != val) {
+> +        ppc_store_sdr1(env, val);
+> +        tlb_flush(CPU(cpu));
+>      }
+>  }
 >  
 > diff --git a/target/ppc/translate_init.c
 > b/target/ppc/translate_init.c
-> index be35cbd..a1405e9 100644
+> index a1405e9..c92435d 100644
 > --- a/target/ppc/translate_init.c
 > +++ b/target/ppc/translate_init.c
-> @@ -8835,18 +8835,14 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void
-> *data)
+> @@ -740,10 +740,22 @@ static void gen_spr_ne_601 (CPUPPCState *env)
+>                   &spr_read_decr, &spr_write_decr,
+>                   0x00000000);
+>      /* Memory management */
+> -    spr_register(env, SPR_SDR1, "SDR1",
+> -                 SPR_NOACCESS, SPR_NOACCESS,
+> -                 &spr_read_generic, &spr_write_sdr1,
+> -                 0x00000000);
+> +#ifndef CONFIG_USER_ONLY
+> +    if (env->has_hv_mode) {
+> +        /* SDR1 is a hypervisor resource on CPUs which have a
+> +         * hypervisor mode */
+> +        spr_register_hv(env, SPR_SDR1, "SDR1",
+> +                        SPR_NOACCESS, SPR_NOACCESS,
+> +                        SPR_NOACCESS, SPR_NOACCESS,
+> +                        &spr_read_generic, &spr_write_sdr1,
+> +                        0x00000000);
+> +    } else {
+> +        spr_register(env, SPR_SDR1, "SDR1",
+> +                     SPR_NOACCESS, SPR_NOACCESS,
+> +                     &spr_read_generic, &spr_write_sdr1,
+> +                     0x00000000);
+> +    }
+> +#endif
 >  }
 >  
->  #if !defined(CONFIG_USER_ONLY)
-> -
-> -void cpu_ppc_set_vhyp(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp)
-> -{
-> -    cpu->vhyp = vhyp;
-> -}
-> -
-> -void cpu_ppc_set_papr(PowerPCCPU *cpu)
-> +void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp)
->  {
->      CPUPPCState *env = &cpu->env;
->      ppc_spr_t *lpcr = &env->spr_cb[SPR_LPCR];
->      ppc_spr_t *amor = &env->spr_cb[SPR_AMOR];
->  
-> +    cpu->vhyp = vhyp;
-> +
->      /* PAPR always has exception vectors in RAM not ROM. To ensure
-> this,
->       * MSR[IP] should never be set.
->       *
-
-Sounds Good
+>  /* BATs 0-3 */
 
 Reviewed-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
