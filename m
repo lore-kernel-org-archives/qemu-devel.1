@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59216)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cgu51-0002Gv-0q
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:09:11 -0500
+	(envelope-from <shorne@gmail.com>) id 1cgu5i-0002lR-A4
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:09:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cgu4w-000265-3L
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:09:11 -0500
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:36576)
+	(envelope-from <shorne@gmail.com>) id 1cgu5d-0002Qn-V5
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:09:54 -0500
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:35167)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cgu4v-00025w-Ss
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:09:06 -0500
-Received: by mail-wr0-x244.google.com with SMTP id z61so4033476wrc.3
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 06:09:05 -0800 (PST)
-Date: Thu, 23 Feb 2017 14:09:02 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170223140902.GK30636@stefanha-x1.localdomain>
-References: <148760155821.31154.13876757160410915057.stgit@bahia.lan>
-	<148760164565.31154.18106542980362196249.stgit@bahia.lan>
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1cgu5d-0002NM-Ou
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:09:49 -0500
+Received: by mail-pg0-x244.google.com with SMTP id 1so4693476pgz.2
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 06:09:48 -0800 (PST)
+Date: Thu, 23 Feb 2017 23:09:44 +0900
+From: Stafford Horne <shorne@gmail.com>
+Message-ID: <20170223140944.GK2449@lianli.shorne-pla.net>
+References: <mailman.51026.1486615955.22738.qemu-devel@nongnu.org>
+	<8C14E9D0-F376-4CDC-BF24-A0609A329977@gmail.com>
+	<20170210003916.GL32144@lianli.shorne-pla.net>
+	<ec491d8c-3fb0-3ce9-5558-ac4ab1455f7f@twiddle.net>
+	<4BE06A79-02EC-48A8-8081-F21CEACE396F@gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="j/HO4hzKTNbM1mOX"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <148760164565.31154.18106542980362196249.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 11/29] 9pfs: local: lremovexattr: don't
- follow symlinks
+In-Reply-To: <4BE06A79-02EC-48A8-8081-F21CEACE396F@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 00/22] target/openrisc updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,47 +32,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Programmingkid <programmingkidx@gmail.com>
+Cc: Richard Henderson <rth@twiddle.net>, Openrisc <openrisc@lists.librecores.org>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
+On Mon, Feb 13, 2017 at 10:33:09PM -0500, Programmingkid wrote:
+> 
+> On Feb 13, 2017, at 10:25 PM, Richard Henderson wrote:
+> 
+> > On 02/10/2017 11:39 AM, Stafford Horne wrote:
+> >> On Thu, Feb 09, 2017 at 09:10:51AM -0500, G 3 wrote:
+> >>> 
+> >>> On Feb 8, 2017, at 11:52 PM, qemu-devel-request@nongnu.org wrote:
+> >>> 
+> >>>> Message: 6
+> >>>> Date: Wed,  8 Feb 2017 20:51:32 -0800
+> >>>> From: Richard Henderson <rth@twiddle.net>
+> >>>> To: qemu-devel@nongnu.org
+> >>>> Cc: shorne@gmail.com
+> >>>> Subject: [Qemu-devel] [PATCH 00/22] target/openrisc updates
+> >>>> Message-ID: <20170209045154.16868-1-rth@twiddle.net>
+> >>>> 
+> >>>> The bulk of this patch set is 2-3 years old, and was mostly
+> >>>> reviewed by Bastian Koppelmann.  But it languished because
+> >>>> there were reports of it not booting kernel images, and I
+> >>>> had problems putting together a set of tools that could even
+> >>>> build a kernel.
+> >>>> 
+> >>>> The OpenRISC community has picked up activity recently,
+> >>>> with Stafford Horne upstreaming some of the compiler tools.
+> >>>> He has even done some testing for me of this patch set.
+> >>>> 
+> >>>> 
+> >>>> r~
+> >>> 
+> >>> I see you are working on OpenRISC. Would you be able to help
+> >>> me improve its wiki page?
+> >>> 
+> >>> http://wiki.qemu-project.org/Documentation/Platforms/OpenRISC
+> >>> 
+> >>> Right now there isn't much information on OpenRISC here. I'm
+> >>> hoping to make it a lot useful to anyone who is interesting in this
+> >>> platform.
+> >>> 
+> >>> Would you know of any links to software that works in OpenRISC?
+> >>> 
+> >>> Pictures of the OpenRISC target running anything would be great also.
+> >>> 
+> >>> What is your suggested command-line for using OpenRISC?
+> >>> 
+> >>> If you have any suggestions on how to improve the page place don't
+> >>> hesitate to let me know.
+> >>> 
+> >> 
+> >> Hi Richard, G 3,
+> >> 
+> >> I am not sure if Richard has the time for this.  But I kind of got him
+> >> started back on the openrisc work, it would be my fault to burden him
+> >> with even more work :).  Also, I was helping to do some tests so I have
+> >> some example commands.
+> > 
+> > :-)
+> > 
+> >> I don't have a lot of time, but I think I can help to update the above.
+> >> Probably Richard and I could work together?
+> >> 
+> >> I was recently working on updating the openrisc page
+> >> 
+> >>  http://openrisc.io
+> >> 
+> >> I think I could link between the two for toolchain compile guides and
+> >> software guides (i.e. debugging and linux).
+> >> 
+> >> Richard what do you think?
+> > 
+> > Probably the most beneficial thing that we can do is create a kernel+initrd that boots into a busybox root shell.  Similar to the other test images that we have at
+> > 
+> >  http://wiki.qemu-project.org/Testing/System_Images
+> > 
+> > 
+> > r~
+> > 
+> 
+> We could do both the test image and a wiki page.
 
---j/HO4hzKTNbM1mOX
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I posted a test image to the wiki
 
-On Mon, Feb 20, 2017 at 03:40:45PM +0100, Greg Kurz wrote:
-> The local_lremovexattr() callback is vulnerable to symlink attacks because
-> it calls lremovexattr() which follows symbolic links in all path elements=
- but
-> the rightmost one.
->=20
-> This patch converts local_lremovexattr() to rely on opendir_nofollow() and
-> fremovexattrat_nofollow() instead.
->=20
-> This partly fixes CVE-2016-9602.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  hw/9pfs/9p-posix-acl.c  |   10 ++--------
->  hw/9pfs/9p-xattr-user.c |    8 +-------
->  hw/9pfs/9p-xattr.c      |    8 +-------
->  3 files changed, 4 insertions(+), 22 deletions(-)
+ http://wiki.qemu-project.org/Testing/System_Images
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+However, someone on the #qemu irc room mentioned its not ideal to post
+any images on the wiki and existing images should be taken down due to
+copyright issues.  I don't quite follow, should we be concerned?
 
---j/HO4hzKTNbM1mOX
-Content-Type: application/pgp-signature; name="signature.asc"
+Also, I did start adding some commands to the wiki, any feedback
+appreciated.
 
------BEGIN PGP SIGNATURE-----
+  http://wiki.qemu-project.org/Documentation/Platforms/OpenRISC
 
-iQEcBAEBAgAGBQJYruz+AAoJEJykq7OBq3PIc18H/iuVQhFUThEw81iFE4h8Pfpg
-TGZll9YyVn4zT659IKA1mXygs953LwqK9owx06RyKQOp8THGQ32fAGSXLwYSur0n
-iZK48F6bhR16i4nptrIR9ZRS8XNcO6Zze9kdhBkb/z6x9rTEhu6KGp2oW0CFW4ji
-XrqOAxqYXXNyKIAqCM1VOlvRll2prwr3L2uo83PjS8iyGsMWun0EXVjP8WUbvdzt
-Po/EaxeAo0Wm3WfxGBA/AzWAeRAGpl5CxtNt+YKzTdLrX3ewUf82OCS+7RD+1/ML
-ILlgU/FU51+Mn63nR0RkeqWTG+3YP7EOxda9cQm5YHWqjW4g965sFl7ZhhsVLCw=
-=VlKC
------END PGP SIGNATURE-----
-
---j/HO4hzKTNbM1mOX--
+-Stafford
