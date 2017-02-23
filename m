@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cgtDM-0007zS-Jm
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 08:13:45 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cgtI6-0001eq-PA
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 08:18:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cgtDL-0002yT-K1
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 08:13:44 -0500
-References: <20170221024248.11027-1-eblake@redhat.com>
-	<20170221024248.11027-8-eblake@redhat.com>
-	<ecab92ba-94d4-7b1d-c854-fa2ff9b93acc@redhat.com>
-	<5d651e79-bfdf-fb10-472f-89aef48afaf7@redhat.com>
-	<cfab822e-e63a-7c1e-d740-309c6edd0031@redhat.com>
-	<f647c37e-a9cb-e052-6a8a-210b826f96f6@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6432baa5-7d6a-0e03-e543-693be6a363d7@redhat.com>
-Date: Thu, 23 Feb 2017 14:13:32 +0100
+	(envelope-from <stefanha@gmail.com>) id 1cgtI3-0004Af-FJ
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 08:18:38 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33514)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cgtI3-0004AK-7n
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 08:18:35 -0500
+Received: by mail-wm0-x241.google.com with SMTP id v77so2718829wmv.0
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 05:18:35 -0800 (PST)
+Date: Thu, 23 Feb 2017 13:18:31 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170223131831.GF30636@stefanha-x1.localdomain>
+References: <148760155821.31154.13876757160410915057.stgit@bahia.lan>
+	<148760160738.31154.14112432972227976652.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <f647c37e-a9cb-e052-6a8a-210b826f96f6@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="MaV3hWcdqb0NvgcAgUWR9djmA1dEUmwlf"
-Subject: Re: [Qemu-devel] [PATCH v4 7/8] nbd: Implement NBD_INFO_BLOCK_SIZE
- on server
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="NQTVMVnDVuULnIzU"
+Content-Disposition: inline
+In-Reply-To: <148760160738.31154.14112432972227976652.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH 06/29] 9pfs: local: open/opendir: don't
+ follow symlinks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,96 +31,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, vsementsov@virtuozzo.com, den@virtuozzo.com
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---MaV3hWcdqb0NvgcAgUWR9djmA1dEUmwlf
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, vsementsov@virtuozzo.com, den@virtuozzo.com
-Message-ID: <6432baa5-7d6a-0e03-e543-693be6a363d7@redhat.com>
-Subject: Re: [PATCH v4 7/8] nbd: Implement NBD_INFO_BLOCK_SIZE on server
-References: <20170221024248.11027-1-eblake@redhat.com>
- <20170221024248.11027-8-eblake@redhat.com>
- <ecab92ba-94d4-7b1d-c854-fa2ff9b93acc@redhat.com>
- <5d651e79-bfdf-fb10-472f-89aef48afaf7@redhat.com>
- <cfab822e-e63a-7c1e-d740-309c6edd0031@redhat.com>
- <f647c37e-a9cb-e052-6a8a-210b826f96f6@redhat.com>
-In-Reply-To: <f647c37e-a9cb-e052-6a8a-210b826f96f6@redhat.com>
-Content-Type: text/plain; charset=utf-8
+
+--NQTVMVnDVuULnIzU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-
-
-On 22/02/2017 21:34, Eric Blake wrote:
+On Mon, Feb 20, 2017 at 03:40:07PM +0100, Greg Kurz wrote:
+> The local_open() and local_opendir() callbacks are vulnerable to symlink
+> attacks because they call:
 >=20
->> Oh, so it's the smallest "good" transfer size, or the preferred
->> alignment.  That's not the same as the SCSI definition, which is:
->>
->>    If a device server receives one of these commands with a transfer
->>    size greater than this value, then the device server may incur
->>    delays in processing the command. An OPTIMAL TRANSFER LENGTH field
->>    set to 0000_0000h indicates that the device server does not report
->>    an optimal transfer size.
-> Hmm - that's yet another limit. I don't know if our block layer exposes=
-
-> it, or if it should expose it.
-
-It exposes it in opt_transfer. :)  The only driver that sets
-opt_transfer is the iSCSI driver and uses the SCSI meaning.
-
->> It's more similar to the physical block size:
->
-> Indeed; at least that was my intent (picking a size that will avoid
-> read-modify-write pessimations, as well as reflecting granularity of
-> trim/zero operations).
-
-The two are not necessarily related.  Granularity of trim/zero is
-usually a multiple of the sector size (for example qcow2 will have
-physical block size =3D host physical block size, and unmap granularity =3D=
-
-cluster size).
-
->>    When using logical block access commands (see 4.2.2), application
->>    clients should:
->>    a) specify an LBA that is aligned to a physical block boundary; and=
-
->>    b) access an integral number of physical blocks, provided that the
->>    access does not go beyond the last LBA on the medium.
->>
->> So I'd rather ignore it in the client, and send 4096 in the server.
-> Does that mean our BlockLimits structure documentation needs a tweak,
-> too?  It currently reads:
+> (1) open(O_NOFOLLOW) which follows symbolic links in all path elements but
+>     the rightmost one
+> (2) opendir() which follows symbolic links in all path elements
 >=20
->     /* Optimal transfer length in bytes.  A power of 2 is best but not
->      * mandatory.  Must be a multiple of bl.request_alignment, or 0 if
->      * no preferred size */
->     uint32_t opt_transfer;
+> This patch converts both callbacks to use new helpers based on
+> openat_nofollow() to only open files and directories if they are
+> below the virtfs shared folder
 >=20
-> Are we trying to track both optimum size in the SCSI sense _and_ block
-> size in the O_DIRECT sense?
+> This partly fixes CVE-2016-9602.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>  hw/9pfs/9p-local.c |   31 +++++++++++++++++++++----------
+>  hw/9pfs/9p-local.h |   20 ++++++++++++++++++++
+>  2 files changed, 41 insertions(+), 10 deletions(-)
+>  create mode 100644 hw/9pfs/9p-local.h
 
-As of now, just in the SCSI sense.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Paolo
-
-
---MaV3hWcdqb0NvgcAgUWR9djmA1dEUmwlf
+--NQTVMVnDVuULnIzU
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
 
-iQEcBAEBCAAGBQJYrt/8AAoJEL/70l94x66D+DUH/00KD55KWL04y6KR/L/cnDqT
-y6+RA1ubll0TOPcTC6SE6vvwHcgGD3iHtKbuED9DarbBX3pIET68q4MS0vd9zGt3
-yw7NGc8Dsey0rZfBhpsP4PoaMhSB5ygCocbAEFAtSAiFgwKPDPVq3oLDPjKgZTTz
-v3SLFgxz2KpwawhzVWNSFBDLzdWizy725IyTa/7uOlJ/iMsK4PsQYwjULsOk/GrO
-sEYlLBJmo/4iayKFcL6xTSl2uLrC8RkxvnxvKWc+ec1+1/z897iqN4EKakdC/sMT
-/7HUWt17dRvz/3TX2JV1sU/p3ymIEBvWDTTWIu3gsjugehfZBHFWeS13iUwL4Fc=
-=c987
+iQEcBAEBAgAGBQJYruEnAAoJEJykq7OBq3PI/lwH/2kVCqK4StoomRlqzpjZXgK3
+8gGE7Ch239hqmZXq4ftrudbPHJavA1/6/7J6WZvCGqBiB/5L4FODGv3/JHym5kIl
+NI0u0UsGdSuvt10fM6PVmbCJ6J8GHTDfsBN5HlfYpOLpvAIDvfs2qyONOc4UW7SD
+SA+1brsOuBh4NtgTiGY0FNEb7h+b8/gFvlmWmwt37noMxs9lb9wxbVR74r6qtWUU
+sTb65ErFZls7r1N0L068v61b2asxtvYP7dHvGPYcWCiwDaJL9ZSjSNsOfkd/s54Z
+gU32XU8B8PAiasyanEI8FRRVs3SWn+wam2JEckUWSpAYOPcdAEGaHh43W2JeVao=
+=Jvqr
 -----END PGP SIGNATURE-----
 
---MaV3hWcdqb0NvgcAgUWR9djmA1dEUmwlf--
+--NQTVMVnDVuULnIzU--
