@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40586)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cgqZ2-0001ct-2Z
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 05:23:56 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cgqdk-0003mJ-Rp
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 05:28:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cgqZ1-00073A-4A
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 05:23:56 -0500
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:35928)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cgqZ0-000735-Sd
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 05:23:55 -0500
-Received: by mail-wm0-x22c.google.com with SMTP id v77so24750549wmv.1
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 02:23:54 -0800 (PST)
+	(envelope-from <kwolf@redhat.com>) id 1cgqdj-0007m0-U9
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 05:28:48 -0500
+Date: Thu, 23 Feb 2017 11:28:39 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170223102839.GB6931@noname.redhat.com>
+References: <20170221115512.21918-1-berrange@redhat.com>
+	<20170221115512.21918-3-berrange@redhat.com>
+	<20170222151833.GM4112@noname.str.redhat.com>
+	<20170222154925.GT28937@redhat.com>
+	<21ccca53-659f-aa79-3b81-6a8cf1e66ba3@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <5a0773de-6bc7-474a-82ab-2edd37ce8a93@redhat.com>
-References: <1487659615-15820-1-git-send-email-xyjxie@linux.vnet.ibm.com>
-	<5edff645-12e8-d3e0-1849-302b6986c232@ozlabs.ru>
-	<fdcb2b07-aae8-69bf-ee94-a43777009c3a@redhat.com>
-	<CAFEAcA--bSo7PJH0Px9ytQspaYuS55CSsM_EN6zt0djhkqKNPw@mail.gmail.com>
-	<5a0773de-6bc7-474a-82ab-2edd37ce8a93@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 23 Feb 2017 10:23:33 +0000
-Message-ID: <CAFEAcA99xi4k57h2XGw2deGO24E95AS5jyGL+4GzjqNgMb9wcg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] memory: make ram device read/write endian
- sensitive
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="jRHKVT23PllUwdXP"
+Content-Disposition: inline
+In-Reply-To: <21ccca53-659f-aa79-3b81-6a8cf1e66ba3@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 02/18] block: add ability to set a
+ prefix for opt names
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,34 +28,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Yongji Xie <xyjxie@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, zhong@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>, Paul Mackerras <paulus@samba.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-On 23 February 2017 at 10:10, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 23/02/2017 11:02, Peter Maydell wrote:
->> I'm really not convinced we need DEVICE_HOST_ENDIAN. RAM
->> areas should be target-endian (you can probably define
->> "target endianness" as "the endianness that RAM areas have".)
->
-> This is not RAM.  This is MMIO, backed by a MMIO area in the host.
 
-Hmm, I see...the naming is a bit unfortunate if it's not RAM.
+--jRHKVT23PllUwdXP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> The
-> MemoryRegionOps read from the MMIO area (so the data has host
-> endianness) and do not do any further swap:
->
->         data = *(uint16_t *)(mr->ram_block->host + addr);
->
-> Here, the dereference is basically the same as ldl_he_p.
->
-> If you wanted to make the MemoryRegion use DEVICE_NATIVE_ENDIAN, you'd
-> need to tswap around the access.  Or you can use ldl_le_p and
-> DEVICE_LITTLE_ENDIAN (this is what Yongji's patch open codes), or
-> ldl_be_p and DEVICE_BIG_ENDIAN.  They are all the same in the end.
+Am 22.02.2017 um 19:28 hat Eric Blake geschrieben:
+> Using '.' would mean a layer of {} nesting on the wire, maybe as in:
+>=20
+> { "driver": "qcow2", ..., "luks" : { "hash-alg": ... } }
+>=20
+> but conceptually, I like that a bit better, as it consolidates all the
+> luks-related options in one place, and may indeed make it possible to
+> reuse the type rather than having two variants (one prefixed, one not,
+> depending on whether it is standalone or qcow2).
 
-Using stl_p &c in a DEVICE_NATIVE_ENDIAN MR would work too, right?
-(This is how all the NATIVE_ENDIAN MRs in exec.c work.)
+Right, and this extra nesting to keep everything luks related in one
+place is exactly what I wanted to achieve with it.
 
-thanks
--- PMM
+> I'm also looking later in your series (13/18), where you have:
+>=20
+>=20
+> @@ -2344,7 +2348,8 @@
+>              '*l2-cache-size': 'int',
+>              '*refcount-cache-size': 'int',
+>              '*cache-clean-interval': 'int',
+> -            '*aes-key-secret': 'str' } }
+> +            '*aes-key-secret': 'str',
+> +            '*luks-key-secret': 'str' } }
+>=20
+>=20
+> Uggh - we have two optional parameters, that must not both be present at
+> once.  I'm wondering if we can instead do this (hmm, my patches for
+> anonymous base/branches in a flat union haven't been taken yet, but you
+> get the idea):
+>=20
+> ...
+> '*cache-clean-interval': 'int',
+> '*encryption': 'Qcow2Encryption' } }
+>=20
+> { 'enum': 'Qcow2EncryptionType': [ 'aes', 'luks' ] }
+> { 'union': 'Qcow2Encryption', 'base': { 'type': 'Qcow2EncryptionType' },
+>   'discriminator': 'type', 'data': {
+>     'aes': { 'key-secret': 'str' },
+>     'luks': { 'key-secret': 'str', '*hash-alg': ..., '*slot': 'int' } } }
+>=20
+> so that you can only provide one encryption type, but once you have that
+> type, you can then provide all the associated fields for that type.  So
+> the QMP would look like:
+>=20
+> { "driver": "qcow2", ..., "encryption" : { "type": "luks", "hash-alg":
+> ... } }
+
+That's actually even better, a more accurate description of the options
+on the QAPI level. I like it.
+
+> > Hence, I wanted to have separation between the legacy AES & LUKS
+> > namespaces, to make it clear what applies to what scenario.
+>=20
+> Again, I think the idea of a flat union, with the discriminator, makes
+> it easier to enforce mutual exclusion, rather than having two top-level
+> optional fields that cannot both be specified at once.  Maybe we should
+> also consider making qapi flat unions support a default discriminator,
+> so that the "type":"luks" can be omitted, but that's sugar.
+
+With the default discriminator, I'm not sure if that's still "sugar" or
+already "too much magic".
+
+Kevin
+
+--jRHKVT23PllUwdXP
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJYrrlXAAoJEH8JsnLIjy/WMe0P/Ajnwk5XWF2pm2ZxBCtfvf+A
+dhIHRw8UTo7O/745JX+6DlnOq4Cg/w0EOELAJbrqFjGXibvPcGWVB5tJbraDgqw8
+/GHAPyArm37HffvTuVPFTI39vP83I6doOUWFsttlSgoujaXSs8Q1x/6TZDMQQxFo
+5e1EuPrIDeTeuaMjYNdEKhUcCle19WR/H7eGFSzfG30Awq1TQJL2qISMosbyCkcR
+fj3GQjwfVXoLJEQOvogkvZHUtJs4U3SW5QKVyS6w/iKA/7dzNY+jEoCbrBO6pJX3
+96RikqF74/Avn6bUADmFeVpw1WOTz2WZqFtlSdvvMtHbtehtPKChw4d2orztKbdc
+vBzdS5YTw7fTqvmov6d77ALehK1412n9iRcASOiqA+h0q3cYnDjWzX8mVECLdqlg
+mYMErsA0pm2XfufR4TNFn0eLn6N0VmwC4x5fyCuZxGA5z6UePshuaXWrqVF6fnSx
+OezR8yEzQTty2Ra5EkME1QulEV3Oe6M5X6v7szhSBSZAnN+Q6KpwLRb5H+cOqaNz
+lTejVO4UwDcC42AmhzPjN32VDtW1JfX73TvHMX73S+dzHRBsY7r180vxdbynSKfj
+dcUDeJKKLs6S2GU9ygnbXyNGzf4cINcPhaEQHmQywAMwGWcqoxh+AgndNg/XUDzD
+G5PqG3BzZAPGTqvg4b9V
+=okQ1
+-----END PGP SIGNATURE-----
+
+--jRHKVT23PllUwdXP--
