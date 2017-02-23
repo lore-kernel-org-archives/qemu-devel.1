@@ -1,37 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sam.bobroff@au1.ibm.com>) id 1cgmSo-0008GA-3V
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 01:01:19 -0500
+	(envelope-from <sam.bobroff@au1.ibm.com>) id 1cgmTB-00008x-KU
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 01:01:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sam.bobroff@au1.ibm.com>) id 1cgmSl-0001e7-Ku
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 01:01:14 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59965)
+	(envelope-from <sam.bobroff@au1.ibm.com>) id 1cgmT8-0001iU-G7
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 01:01:37 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42587
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sam.bobroff@au1.ibm.com>)
-	id 1cgmSl-0001cz-Bz
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 01:01:11 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1N5rcoH045301
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 01:01:09 -0500
-Received: from e23smtp06.au.ibm.com (e23smtp06.au.ibm.com [202.81.31.148])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28sku8mk5t-1
+	id 1cgmT8-0001hq-AZ
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 01:01:34 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1N5reUO013186
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 01:01:33 -0500
+Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28sqms4v53-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 01:01:09 -0500
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 01:01:33 -0500
 Received: from localhost
-	by e23smtp06.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <sam.bobroff@au1.ibm.com>;
-	Thu, 23 Feb 2017 16:01:05 +1000
+	Thu, 23 Feb 2017 16:01:30 +1000
 From: Sam Bobroff <sam.bobroff@au1.ibm.com>
-Date: Thu, 23 Feb 2017 16:59:54 +1100
+Date: Thu, 23 Feb 2017 17:00:01 +1100
 In-Reply-To: <cover.1487829585.git.sam.bobroff@au1.ibm.com>
 References: <cover.1487829585.git.sam.bobroff@au1.ibm.com>
 In-Reply-To: <cover.1487829585.git.sam.bobroff@au1.ibm.com>
 References: <cover.1487829585.git.sam.bobroff@au1.ibm.com>
-Message-Id: <aee5e40fa506e88de7db0ba7b8fc8e431723a206.1487829585.git.sam.bobroff@au1.ibm.com>
-Subject: [Qemu-devel] [RFC PATCH v2 01/12] spapr: Small cleanup of PPC MMU
- enums
+Message-Id: <034945c1bbc8d4a97e5f568d4d463af2c9a24080.1487829585.git.sam.bobroff@au1.ibm.com>
+Subject: [Qemu-devel] [RFC PATCH v2 08/12] spapr: Only setup HTP if
+ necessary.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,299 +44,102 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org
 Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, sjitindarsingh@gmail.com
 
-The PPC MMU types are sometimes treated as if they were a bit field
-and sometime as if they were an enum which causes maintenance
-problems: flipping bits in the MMU type (which is done on both the 1TB
-segment and 64K segment bits) currently produces new MMU type
-values that are not handled in every "switch" on it, sometimes causing
-an abort().
-
-This patch provides some macros that can be used to filter out the
-"bit field-like" bits so that the remainder of the value can be
-switched on, like an enum. This allows removal of all of the
-"degraded" types from the list and should ease maintenance.
+If QEMU is using KVM, and KVM is capable of running in radix mode,
+guests can be run in real-mode without allocating a HPT (because KVM
+will use a minimal RPT). So in this case, we avoid creating the HPT
+at reset time and later (during CAS) create it if it is necessary.
 
 Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
 ---
- hw/ppc/spapr.c          |  8 +++---
- target/ppc/cpu-qom.h    | 12 ++++-----
- target/ppc/kvm.c        |  8 +++---
- target/ppc/mmu-hash64.c | 10 ++++----
- target/ppc/mmu_helper.c | 67 ++++++++++++++++++++-----------------------------
- target/ppc/translate.c  | 12 ++++-----
- 6 files changed, 50 insertions(+), 67 deletions(-)
+v2:
+
+* This patch has been mostly rewritten to move the late HPT allocation to CAS.
+This allows a guest to start in radix mode (when it's in real mode) and then
+change to hash, even if it is a legacy guest and will not call
+h_register_process_table().
+* Added an exported function to spapr.c to perform HPT allocation and adjust
+the vrma if necessary. This makes it possible to allocate the HPT from
+h_client_architecture_support() in spapr_hcall.c.
+
+ hw/ppc/spapr.c         | 24 +++++++++++++++---------
+ hw/ppc/spapr_hcall.c   | 10 ++++++++++
+ include/hw/ppc/spapr.h |  1 +
+ 3 files changed, 26 insertions(+), 9 deletions(-)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 5904e6498f..cceb35f083 100644
+index ca3812555f..dfee0f685f 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -359,14 +359,12 @@ static void spapr_populate_pa_features(CPUPPCState *env, void *fdt, int offset)
-     uint8_t *pa_features;
-     size_t pa_size;
- 
--    switch (env->mmu_model) {
--    case POWERPC_MMU_2_06:
--    case POWERPC_MMU_2_06a:
-+    switch (POWERPC_MMU_VER(env->mmu_model)) {
-+    case POWERPC_MMU_VER_2_06:
-         pa_features = pa_features_206;
-         pa_size = sizeof(pa_features_206);
-         break;
--    case POWERPC_MMU_2_07:
--    case POWERPC_MMU_2_07a:
-+    case POWERPC_MMU_VER_2_07:
-         pa_features = pa_features_207;
-         pa_size = sizeof(pa_features_207);
-         break;
-diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-index 4e3132b56b..4807f4d86c 100644
---- a/target/ppc/cpu-qom.h
-+++ b/target/ppc/cpu-qom.h
-@@ -79,21 +79,21 @@ enum powerpc_mmu_t {
-     POWERPC_MMU_2_06       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
-                              | POWERPC_MMU_64K
-                              | POWERPC_MMU_AMR | 0x00000003,
--    /* Architecture 2.06 "degraded" (no 1T segments)           */
--    POWERPC_MMU_2_06a      = POWERPC_MMU_64 | POWERPC_MMU_AMR
--                             | 0x00000003,
-     /* Architecture 2.07 variant                               */
-     POWERPC_MMU_2_07       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
-                              | POWERPC_MMU_64K
-                              | POWERPC_MMU_AMR | 0x00000004,
--    /* Architecture 2.07 "degraded" (no 1T segments)           */
--    POWERPC_MMU_2_07a      = POWERPC_MMU_64 | POWERPC_MMU_AMR
--                             | 0x00000004,
-     /* Architecture 3.00 variant                               */
-     POWERPC_MMU_3_00       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
-                              | POWERPC_MMU_64K
-                              | POWERPC_MMU_AMR | 0x00000005,
- };
-+#define POWERPC_MMU_VER(x) ((x) & (POWERPC_MMU_64 | 0xFFFF))
-+#define POWERPC_MMU_VER_64B POWERPC_MMU_VER(POWERPC_MMU_64B)
-+#define POWERPC_MMU_VER_2_03 POWERPC_MMU_VER(POWERPC_MMU_2_03)
-+#define POWERPC_MMU_VER_2_06 POWERPC_MMU_VER(POWERPC_MMU_2_06)
-+#define POWERPC_MMU_VER_2_07 POWERPC_MMU_VER(POWERPC_MMU_2_07)
-+#define POWERPC_MMU_VER_3_00 POWERPC_MMU_VER(POWERPC_MMU_3_00)
- 
- /*****************************************************************************/
- /* Exception model                                                           */
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 52bbea514a..d53ede8b4a 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -282,8 +282,8 @@ static void kvm_get_fallback_smmu_info(PowerPCCPU *cpu,
-             info->flags |= KVM_PPC_1T_SEGMENTS;
-         }
- 
--        if (env->mmu_model == POWERPC_MMU_2_06 ||
--            env->mmu_model == POWERPC_MMU_2_07) {
-+        if (POWERPC_MMU_VER(env->mmu_model) == POWERPC_MMU_VER_2_06 ||
-+           POWERPC_MMU_VER(env->mmu_model) == POWERPC_MMU_VER_2_07) {
-             info->slb_size = 32;
-         } else {
-             info->slb_size = 64;
-@@ -297,8 +297,8 @@ static void kvm_get_fallback_smmu_info(PowerPCCPU *cpu,
-         i++;
- 
-         /* 64K on MMU 2.06 and later */
--        if (env->mmu_model == POWERPC_MMU_2_06 ||
--            env->mmu_model == POWERPC_MMU_2_07) {
-+        if (POWERPC_MMU_VER(env->mmu_model) == POWERPC_MMU_VER_2_06 ||
-+            POWERPC_MMU_VER(env->mmu_model) == POWERPC_MMU_VER_2_07) {
-             info->sps[i].page_shift = 16;
-             info->sps[i].slb_enc = 0x110;
-             info->sps[i].enc[0].page_shift = 16;
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index 76669ed82c..6346167b48 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -1032,8 +1032,8 @@ void helper_store_lpcr(CPUPPCState *env, target_ulong val)
-     uint64_t lpcr = 0;
- 
-     /* Filter out bits */
--    switch (env->mmu_model) {
--    case POWERPC_MMU_64B: /* 970 */
-+    switch (POWERPC_MMU_VER(env->mmu_model)) {
-+    case POWERPC_MMU_VER_64B: /* 970 */
-         if (val & 0x40) {
-             lpcr |= LPCR_LPES0;
-         }
-@@ -1059,19 +1059,19 @@ void helper_store_lpcr(CPUPPCState *env, target_ulong val)
-          * to dig HRMOR out of HID5
-          */
-         break;
--    case POWERPC_MMU_2_03: /* P5p */
-+    case POWERPC_MMU_VER_2_03: /* P5p */
-         lpcr = val & (LPCR_RMLS | LPCR_ILE |
-                       LPCR_LPES0 | LPCR_LPES1 |
-                       LPCR_RMI | LPCR_HDICE);
-         break;
--    case POWERPC_MMU_2_06: /* P7 */
-+    case POWERPC_MMU_VER_2_06: /* P7 */
-         lpcr = val & (LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_DPFD |
-                       LPCR_VRMASD | LPCR_RMLS | LPCR_ILE |
-                       LPCR_P7_PECE0 | LPCR_P7_PECE1 | LPCR_P7_PECE2 |
-                       LPCR_MER | LPCR_TC |
-                       LPCR_LPES0 | LPCR_LPES1 | LPCR_HDICE);
-         break;
--    case POWERPC_MMU_2_07: /* P8 */
-+    case POWERPC_MMU_VER_2_07: /* P8 */
-         lpcr = val & (LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_KBV |
-                       LPCR_DPFD | LPCR_VRMASD | LPCR_RMLS | LPCR_ILE |
-                       LPCR_AIL | LPCR_ONL | LPCR_P8_PECE0 | LPCR_P8_PECE1 |
-diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
-index eb2d482ef7..0f6016ff0d 100644
---- a/target/ppc/mmu_helper.c
-+++ b/target/ppc/mmu_helper.c
-@@ -1260,7 +1260,7 @@ static void mmu6xx_dump_mmu(FILE *f, fprintf_function cpu_fprintf,
- 
- void dump_mmu(FILE *f, fprintf_function cpu_fprintf, CPUPPCState *env)
- {
--    switch (env->mmu_model) {
-+    switch (POWERPC_MMU_VER(env->mmu_model)) {
-     case POWERPC_MMU_BOOKE:
-         mmubooke_dump_mmu(f, cpu_fprintf, env);
-         break;
-@@ -1272,12 +1272,10 @@ void dump_mmu(FILE *f, fprintf_function cpu_fprintf, CPUPPCState *env)
-         mmu6xx_dump_mmu(f, cpu_fprintf, env);
-         break;
- #if defined(TARGET_PPC64)
--    case POWERPC_MMU_64B:
--    case POWERPC_MMU_2_03:
--    case POWERPC_MMU_2_06:
--    case POWERPC_MMU_2_06a:
--    case POWERPC_MMU_2_07:
--    case POWERPC_MMU_2_07a:
-+    case POWERPC_MMU_VER_64B:
-+    case POWERPC_MMU_VER_2_03:
-+    case POWERPC_MMU_VER_2_06:
-+    case POWERPC_MMU_VER_2_07:
-         dump_slb(f, cpu_fprintf, ppc_env_get_cpu(env));
-         break;
- #endif
-@@ -1412,14 +1410,12 @@ hwaddr ppc_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-     CPUPPCState *env = &cpu->env;
-     mmu_ctx_t ctx;
- 
--    switch (env->mmu_model) {
-+    switch (POWERPC_MMU_VER(env->mmu_model)) {
- #if defined(TARGET_PPC64)
--    case POWERPC_MMU_64B:
--    case POWERPC_MMU_2_03:
--    case POWERPC_MMU_2_06:
--    case POWERPC_MMU_2_06a:
--    case POWERPC_MMU_2_07:
--    case POWERPC_MMU_2_07a:
-+    case POWERPC_MMU_VER_64B:
-+    case POWERPC_MMU_VER_2_03:
-+    case POWERPC_MMU_VER_2_06:
-+    case POWERPC_MMU_VER_2_07:
-         return ppc_hash64_get_phys_page_debug(cpu, addr);
- #endif
- 
-@@ -1904,6 +1900,12 @@ void ppc_tlb_invalidate_all(CPUPPCState *env)
- {
-     PowerPCCPU *cpu = ppc_env_get_cpu(env);
- 
-+#if defined(TARGET_PPC64)
-+    if (env->mmu_model & POWERPC_MMU_64) {
-+        env->tlb_need_flush = 0;
-+        tlb_flush(CPU(cpu));
-+    } else
-+#endif /* defined(TARGET_PPC64) */
-     switch (env->mmu_model) {
-     case POWERPC_MMU_SOFT_6xx:
-     case POWERPC_MMU_SOFT_74xx:
-@@ -1928,21 +1930,12 @@ void ppc_tlb_invalidate_all(CPUPPCState *env)
-         break;
-     case POWERPC_MMU_32B:
-     case POWERPC_MMU_601:
--#if defined(TARGET_PPC64)
--    case POWERPC_MMU_64B:
--    case POWERPC_MMU_2_03:
--    case POWERPC_MMU_2_06:
--    case POWERPC_MMU_2_06a:
--    case POWERPC_MMU_2_07:
--    case POWERPC_MMU_2_07a:
--    case POWERPC_MMU_3_00:
--#endif /* defined(TARGET_PPC64) */
-         env->tlb_need_flush = 0;
-         tlb_flush(CPU(cpu));
-         break;
-     default:
-         /* XXX: TODO */
--        cpu_abort(CPU(cpu), "Unknown MMU model %d\n", env->mmu_model);
-+        cpu_abort(CPU(cpu), "Unknown MMU model %x\n", env->mmu_model);
-         break;
+@@ -1123,6 +1123,17 @@ static void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
      }
  }
-@@ -1951,6 +1944,16 @@ void ppc_tlb_invalidate_one(CPUPPCState *env, target_ulong addr)
- {
- #if !defined(FLUSH_ALL_TLBS)
-     addr &= TARGET_PAGE_MASK;
-+#if defined(TARGET_PPC64)
-+    if (env->mmu_model & POWERPC_MMU_64) {
-+        /* tlbie invalidate TLBs for all segments */
-+        /* XXX: given the fact that there are too many segments to invalidate,
-+         *      and we still don't have a tlb_flush_mask(env, n, mask) in QEMU,
-+         *      we just invalidate all TLBs
-+         */
-+        env->tlb_need_flush |= TLB_NEED_LOCAL_FLUSH;
-+    } else
-+#endif /* defined(TARGET_PPC64) */
-     switch (env->mmu_model) {
-     case POWERPC_MMU_SOFT_6xx:
-     case POWERPC_MMU_SOFT_74xx:
-@@ -1968,22 +1971,6 @@ void ppc_tlb_invalidate_one(CPUPPCState *env, target_ulong addr)
-          */
-         env->tlb_need_flush |= TLB_NEED_LOCAL_FLUSH;
-         break;
--#if defined(TARGET_PPC64)
--    case POWERPC_MMU_64B:
--    case POWERPC_MMU_2_03:
--    case POWERPC_MMU_2_06:
--    case POWERPC_MMU_2_06a:
--    case POWERPC_MMU_2_07:
--    case POWERPC_MMU_2_07a:
--    case POWERPC_MMU_3_00:
--        /* tlbie invalidate TLBs for all segments */
--        /* XXX: given the fact that there are too many segments to invalidate,
--         *      and we still don't have a tlb_flush_mask(env, n, mask) in QEMU,
--         *      we just invalidate all TLBs
--         */
--        env->tlb_need_flush |= TLB_NEED_LOCAL_FLUSH;
--        break;
--#endif /* defined(TARGET_PPC64) */
-     default:
-         /* Should never reach here with other MMU models */
-         assert(0);
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index b09e16ff76..2a24d1de67 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -6988,18 +6988,16 @@ void ppc_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
-     if (env->spr_cb[SPR_LPCR].name)
-         cpu_fprintf(f, " LPCR " TARGET_FMT_lx "\n", env->spr[SPR_LPCR]);
  
--    switch (env->mmu_model) {
-+    switch (POWERPC_MMU_VER(env->mmu_model)) {
-     case POWERPC_MMU_32B:
-     case POWERPC_MMU_601:
-     case POWERPC_MMU_SOFT_6xx:
-     case POWERPC_MMU_SOFT_74xx:
- #if defined(TARGET_PPC64)
--    case POWERPC_MMU_64B:
--    case POWERPC_MMU_2_03:
--    case POWERPC_MMU_2_06:
--    case POWERPC_MMU_2_06a:
--    case POWERPC_MMU_2_07:
--    case POWERPC_MMU_2_07a:
-+    case POWERPC_MMU_VER_64B:
-+    case POWERPC_MMU_VER_2_03:
-+    case POWERPC_MMU_VER_2_06:
-+    case POWERPC_MMU_VER_2_07:
- #endif
-         cpu_fprintf(f, " SDR1 " TARGET_FMT_lx "   DAR " TARGET_FMT_lx
-                        "  DSISR " TARGET_FMT_lx "\n", env->spr[SPR_SDR1],
++void spapr_setup_hpt_and_vrma(sPAPRMachineState *spapr)
++{
++    spapr_reallocate_hpt(spapr,
++                     spapr_hpt_shift_for_ramsize(MACHINE(qdev_get_machine())->maxram_size),
++                     &error_fatal);
++    if (spapr->vrma_adjust) {
++        spapr->rma_size = kvmppc_rma_size(spapr_node0_size(),
++                                          spapr->htab_shift);
++    }
++}
++
+ static void find_unknown_sysbus_device(SysBusDevice *sbdev, void *opaque)
+ {
+     bool matched = false;
+@@ -1151,15 +1162,10 @@ static void ppc_spapr_reset(void)
+     /* Check for unknown sysbus devices */
+     foreach_dynamic_sysbus_device(find_unknown_sysbus_device, NULL);
+ 
+-    /* Allocate and/or reset the hash page table */
+-    spapr_reallocate_hpt(spapr,
+-                         spapr_hpt_shift_for_ramsize(machine->maxram_size),
+-                         &error_fatal);
+-
+-    /* Update the RMA size if necessary */
+-    if (spapr->vrma_adjust) {
+-        spapr->rma_size = kvmppc_rma_size(spapr_node0_size(),
+-                                          spapr->htab_shift);
++    /* If using KVM with radix mode available, VCPUs can be started
++     * without a HPT because KVM will start them in radix mode. */
++    if (!(kvm_enabled() && kvmppc_has_cap_mmu_radix())) {
++        spapr_setup_hpt_and_vrma(spapr);
+     }
+ 
+     qemu_devices_reset();
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 42d20e0b92..cea34073aa 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1002,6 +1002,16 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+     ov5_updates = spapr_ovec_new();
+     spapr->cas_reboot = spapr_ovec_diff(ov5_updates,
+                                         ov5_cas_old, spapr->ov5_cas);
++    if (kvm_enabled()) {
++        if (kvmppc_has_cap_mmu_radix()) {
++            /* If the HPT hasn't yet been set up (see
++             * ppc_spapr_reset()), and it's needed, do it now: */
++            if (!spapr_ovec_test(ov5_updates, OV5_MMU_RADIX)) {
++                /* legacy hash or new hash: */
++                spapr_setup_hpt_and_vrma(spapr);
++            }
++        }
++    }
+ 
+     if (!spapr->cas_reboot) {
+         spapr->cas_reboot =
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index f9b17d860a..a30cbc485c 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -590,6 +590,7 @@ void spapr_dt_events(sPAPRMachineState *sm, void *fdt);
+ int spapr_h_cas_compose_response(sPAPRMachineState *sm,
+                                  target_ulong addr, target_ulong size,
+                                  sPAPROptionVector *ov5_updates);
++void spapr_setup_hpt_and_vrma(sPAPRMachineState *spapr);
+ sPAPRTCETable *spapr_tce_new_table(DeviceState *owner, uint32_t liobn);
+ void spapr_tce_table_enable(sPAPRTCETable *tcet,
+                             uint32_t page_shift, uint64_t bus_offset,
 -- 
 2.11.0
