@@ -1,33 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sam.bobroff@au1.ibm.com>) id 1cgmSn-0008G5-Ed
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 01:01:18 -0500
+	(envelope-from <sam.bobroff@au1.ibm.com>) id 1cgmSo-0008GA-3V
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 01:01:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sam.bobroff@au1.ibm.com>) id 1cgmSk-0001ce-B5
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 01:01:13 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48524
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <sam.bobroff@au1.ibm.com>) id 1cgmSl-0001e7-Ku
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 01:01:14 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59965)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sam.bobroff@au1.ibm.com>)
-	id 1cgmSk-0001cJ-4r
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 01:01:10 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1N5s4ro135825
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 01:01:08 -0500
+	id 1cgmSl-0001cz-Bz
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 01:01:11 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1N5rcoH045301
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 01:01:09 -0500
 Received: from e23smtp06.au.ibm.com (e23smtp06.au.ibm.com [202.81.31.148])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28sjf0f7jb-1
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28sku8mk5t-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 01:01:08 -0500
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 01:01:09 -0500
 Received: from localhost
 	by e23smtp06.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <sam.bobroff@au1.ibm.com>;
 	Thu, 23 Feb 2017 16:01:05 +1000
 From: Sam Bobroff <sam.bobroff@au1.ibm.com>
-Date: Thu, 23 Feb 2017 16:59:53 +1100
-Message-Id: <cover.1487829585.git.sam.bobroff@au1.ibm.com>
-Subject: [Qemu-devel] [RFC PATCH v2 00/12] ISA 3.00 KVM guest support
+Date: Thu, 23 Feb 2017 16:59:54 +1100
+In-Reply-To: <cover.1487829585.git.sam.bobroff@au1.ibm.com>
+References: <cover.1487829585.git.sam.bobroff@au1.ibm.com>
+In-Reply-To: <cover.1487829585.git.sam.bobroff@au1.ibm.com>
+References: <cover.1487829585.git.sam.bobroff@au1.ibm.com>
+Message-Id: <aee5e40fa506e88de7db0ba7b8fc8e431723a206.1487829585.git.sam.bobroff@au1.ibm.com>
+Subject: [Qemu-devel] [RFC PATCH v2 01/12] spapr: Small cleanup of PPC MMU
+ enums
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,148 +43,299 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org
 Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, sjitindarsingh@gmail.com
 
+The PPC MMU types are sometimes treated as if they were a bit field
+and sometime as if they were an enum which causes maintenance
+problems: flipping bits in the MMU type (which is done on both the 1TB
+segment and 64K segment bits) currently produces new MMU type
+values that are not handled in every "switch" on it, sometimes causing
+an abort().
 
-Update notes:
+This patch provides some macros that can be used to filter out the
+"bit field-like" bits so that the remainder of the value can be
+switched on, like an enum. This allows removal of all of the
+"degraded" types from the list and should ease maintenance.
 
-Since the last version, there has been a change to specification of the values
-used during client architecture support, regarding the bits in option vector 5,
-so some bits and other processing have changed a bit.
+Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
+---
+ hw/ppc/spapr.c          |  8 +++---
+ target/ppc/cpu-qom.h    | 12 ++++-----
+ target/ppc/kvm.c        |  8 +++---
+ target/ppc/mmu-hash64.c | 10 ++++----
+ target/ppc/mmu_helper.c | 67 ++++++++++++++++++++-----------------------------
+ target/ppc/translate.c  | 12 ++++-----
+ 6 files changed, 50 insertions(+), 67 deletions(-)
 
-This version has not been as well tested as the last. Testing is ongoing.
-
-General intro:
-
-Because KVM will soon provide the necessary infrastructure for KVM guests to
-run on POWER9 CPUs, we can now start exploiting this new functionality from
-QEMU. See:
-https://lists.ozlabs.org/pipermail/linuxppc-dev/2017-January/153433.html
-
-This work is not yet complete but it is functional and is presented for early
-review. It overlaps in some places with current work supporting the same guests
-under full emulation.
-
-This set aims to support only the following scenarios:
-* A POWER9 host running in radix mode, running a guest in radix mode.
-* A POWER9 host running in hash mode, running a guest in hash mode.
-* A POWER9 host running in hash mode, running a guest in legacy(+) mode.
-(+) Where legacy means that the guest does not support ISA 3.00.
-
-Hash or radix mode for the host is controlled via the "disable_radix" kernel
-command line parameter: the host will use radix unless disable_radix is given.
-For the guest it should be automatically selected to match the host.
-
-Bad legacy guests: There are some recent kernels (e.g. 4.9) that will, when run
-as a KVM guest and if the ibm,pa-features entry in the device tree has the
-Radix MMU bit set, attempt to initialize the MMU as if they were a host (which
-will cause them to crash). To avoid exposing this problem, the Radix MMU bit
-is removed from ibm,pa-features when a legacy guest is detected.
-
-Final Notes:
-* Migration/snapshots are not yet investigated.
-* This set is based on the ppc-for-2.9 branch of David Gibson's tree
-at https://github.com/dgibson/qemu.git
-* It also relies on some work already posted here:
-https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg02527.html
-Specifically patches 1..4 which set up the new CPU and MMU models.
-
-Changes v1 -> v2:
-Patch 1/12: scripts/update-linux-headers.sh: refactor extra files
-
-I've factored the script to make it easier to add new files.
-
-Patch 2/12: scripts/update-linux-headers.sh: add new files for ARM
-
-* Added the two new arm headers.
-
-Patch 3/12: Move virtio_mmio.h to fix update-linux-headers.sh
-* FWIW, here's one way of fixing it.
-
-Patch 4/12: Update headers using update-linux-headers.sh
-
-* Added information about where the headers came from.
-
-Patch 5/12: spapr: Add ibm,processor-radix-AP-encodings to the device tree
-
-* ppc_radix_page_info now kept in native format, conversion to BE done when adding to the device tree.
-* radix_page_info moved into the CPU class, cleaning up some code.
-
-Patch 6/12: target-ppc: support KVM_CAP_PPC_MMU_RADIX, KVM_CAP_PPC_MMU_HASH_V3
-
-* cap_mmu_hash renamed to cap_mmu_hash_v3.
-
-Patch 7/12: spapr: Only setup HTP if necessary.
-
-* This patch has been mostly rewritten to move the late HPT allocation to CAS.
-This allows a guest to start in radix mode (when it's in real mode) and then
-change to hash, even if it is a legacy guest and will not call
-h_register_process_table().
-* Added an exported function to spapr.c to perform HPT allocation and adjust
-the vrma if necessary. This makes it possible to allocate the HPT from
-h_client_architecture_support() in spapr_hcall.c.
-
-Patch 8/12: spapr: Add h_register_process_table() hypercall
-
-* I haven't addressed review comments for this patch because it overlaps with
-Suraj's implementation of the same function and we'll work together to
-integrate them.
-
-Patch 10/12: spapr: Enable ISA 3.0 MMU mode selection via CAS
-
-* Unused bits removed.
-* Logic and bit definitions changed due to architectural change.
-* Cleanly terminate QEMU if the guest requests an unavailable mode (as required
-  by the new architecture).
-* Legacy guest workaround moved to it's own patch.
-* I'm sorry for the bitfield constants in spapr_dt_ov5_platform_support() but
-  there don't seem to be convienent macros for converting an option vector
-  specifier (OV_BIT(x,y)) into a byte-mask. I'm open to suggestions.
-
-
-Sam Bobroff (12):
-  spapr: Small cleanup of PPC MMU enums
-  scripts/update-linux-headers.sh: refactor extra files
-  scripts/update-linux-headers.sh: add new files for ARM
-  Move virtio_mmio.h to fix update-linux-headers.sh
-  Update headers using update-linux-headers.sh
-  spapr: Add ibm,processor-radix-AP-encodings to the device tree
-  target-ppc: support KVM_CAP_PPC_MMU_RADIX, KVM_CAP_PPC_MMU_HASH_V3
-  spapr: Only setup HTP if necessary.
-  spapr: Add h_register_process_table() hypercall
-  spapr: move spapr_populate_pa_features()
-  spapr: Enable ISA 3.0 MMU mode selection via CAS
-  spapr: Workaround for broken radix guests
-
- hw/ppc/spapr.c                                     | 190 +++++++---
- hw/ppc/spapr_hcall.c                               |  84 ++++-
- hw/virtio/virtio-mmio.c                            |   2 +-
- include/hw/ppc/spapr.h                             |   3 +
- include/hw/ppc/spapr_ovec.h                        |   8 +
- .../linux/virtio_mmio.h                            |   0
- include/standard-headers/linux/input-event-codes.h |   2 +-
- include/standard-headers/linux/pci_regs.h          |   8 +
- include/standard-headers/linux/virtio_ids.h        |   1 +
- include/sysemu/kvm.h                               |   1 +
- linux-headers/asm-arm/kvm.h                        |   2 +
- linux-headers/asm-arm/unistd-eabi.h                |   5 +
- linux-headers/asm-arm/unistd-oabi.h                |  17 +
- linux-headers/asm-arm/unistd.h                     | 419 +--------------------
- linux-headers/asm-powerpc/kvm.h                    |  27 ++
- linux-headers/asm-powerpc/unistd.h                 |   1 +
- linux-headers/asm-x86/kvm_para.h                   |   4 +-
- linux-headers/linux/kvm.h                          |  20 +-
- linux-headers/linux/vfio.h                         |  10 +
- scripts/update-linux-headers.sh                    |  26 +-
- target/ppc/cpu-qom.h                               |  13 +-
- target/ppc/cpu.h                                   |   4 +
- target/ppc/kvm.c                                   |  61 ++-
- target/ppc/kvm_ppc.h                               |  13 +
- target/ppc/mmu-hash64.c                            |  10 +-
- target/ppc/mmu_helper.c                            |  67 ++--
- target/ppc/translate.c                             |  12 +-
- 27 files changed, 457 insertions(+), 553 deletions(-)
- rename include/{standard-headers => kernel-headers}/linux/virtio_mmio.h (100%)
- create mode 100644 linux-headers/asm-arm/unistd-eabi.h
- create mode 100644 linux-headers/asm-arm/unistd-oabi.h
-
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 5904e6498f..cceb35f083 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -359,14 +359,12 @@ static void spapr_populate_pa_features(CPUPPCState *env, void *fdt, int offset)
+     uint8_t *pa_features;
+     size_t pa_size;
+ 
+-    switch (env->mmu_model) {
+-    case POWERPC_MMU_2_06:
+-    case POWERPC_MMU_2_06a:
++    switch (POWERPC_MMU_VER(env->mmu_model)) {
++    case POWERPC_MMU_VER_2_06:
+         pa_features = pa_features_206;
+         pa_size = sizeof(pa_features_206);
+         break;
+-    case POWERPC_MMU_2_07:
+-    case POWERPC_MMU_2_07a:
++    case POWERPC_MMU_VER_2_07:
+         pa_features = pa_features_207;
+         pa_size = sizeof(pa_features_207);
+         break;
+diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+index 4e3132b56b..4807f4d86c 100644
+--- a/target/ppc/cpu-qom.h
++++ b/target/ppc/cpu-qom.h
+@@ -79,21 +79,21 @@ enum powerpc_mmu_t {
+     POWERPC_MMU_2_06       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
+                              | POWERPC_MMU_64K
+                              | POWERPC_MMU_AMR | 0x00000003,
+-    /* Architecture 2.06 "degraded" (no 1T segments)           */
+-    POWERPC_MMU_2_06a      = POWERPC_MMU_64 | POWERPC_MMU_AMR
+-                             | 0x00000003,
+     /* Architecture 2.07 variant                               */
+     POWERPC_MMU_2_07       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
+                              | POWERPC_MMU_64K
+                              | POWERPC_MMU_AMR | 0x00000004,
+-    /* Architecture 2.07 "degraded" (no 1T segments)           */
+-    POWERPC_MMU_2_07a      = POWERPC_MMU_64 | POWERPC_MMU_AMR
+-                             | 0x00000004,
+     /* Architecture 3.00 variant                               */
+     POWERPC_MMU_3_00       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
+                              | POWERPC_MMU_64K
+                              | POWERPC_MMU_AMR | 0x00000005,
+ };
++#define POWERPC_MMU_VER(x) ((x) & (POWERPC_MMU_64 | 0xFFFF))
++#define POWERPC_MMU_VER_64B POWERPC_MMU_VER(POWERPC_MMU_64B)
++#define POWERPC_MMU_VER_2_03 POWERPC_MMU_VER(POWERPC_MMU_2_03)
++#define POWERPC_MMU_VER_2_06 POWERPC_MMU_VER(POWERPC_MMU_2_06)
++#define POWERPC_MMU_VER_2_07 POWERPC_MMU_VER(POWERPC_MMU_2_07)
++#define POWERPC_MMU_VER_3_00 POWERPC_MMU_VER(POWERPC_MMU_3_00)
+ 
+ /*****************************************************************************/
+ /* Exception model                                                           */
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 52bbea514a..d53ede8b4a 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -282,8 +282,8 @@ static void kvm_get_fallback_smmu_info(PowerPCCPU *cpu,
+             info->flags |= KVM_PPC_1T_SEGMENTS;
+         }
+ 
+-        if (env->mmu_model == POWERPC_MMU_2_06 ||
+-            env->mmu_model == POWERPC_MMU_2_07) {
++        if (POWERPC_MMU_VER(env->mmu_model) == POWERPC_MMU_VER_2_06 ||
++           POWERPC_MMU_VER(env->mmu_model) == POWERPC_MMU_VER_2_07) {
+             info->slb_size = 32;
+         } else {
+             info->slb_size = 64;
+@@ -297,8 +297,8 @@ static void kvm_get_fallback_smmu_info(PowerPCCPU *cpu,
+         i++;
+ 
+         /* 64K on MMU 2.06 and later */
+-        if (env->mmu_model == POWERPC_MMU_2_06 ||
+-            env->mmu_model == POWERPC_MMU_2_07) {
++        if (POWERPC_MMU_VER(env->mmu_model) == POWERPC_MMU_VER_2_06 ||
++            POWERPC_MMU_VER(env->mmu_model) == POWERPC_MMU_VER_2_07) {
+             info->sps[i].page_shift = 16;
+             info->sps[i].slb_enc = 0x110;
+             info->sps[i].enc[0].page_shift = 16;
+diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+index 76669ed82c..6346167b48 100644
+--- a/target/ppc/mmu-hash64.c
++++ b/target/ppc/mmu-hash64.c
+@@ -1032,8 +1032,8 @@ void helper_store_lpcr(CPUPPCState *env, target_ulong val)
+     uint64_t lpcr = 0;
+ 
+     /* Filter out bits */
+-    switch (env->mmu_model) {
+-    case POWERPC_MMU_64B: /* 970 */
++    switch (POWERPC_MMU_VER(env->mmu_model)) {
++    case POWERPC_MMU_VER_64B: /* 970 */
+         if (val & 0x40) {
+             lpcr |= LPCR_LPES0;
+         }
+@@ -1059,19 +1059,19 @@ void helper_store_lpcr(CPUPPCState *env, target_ulong val)
+          * to dig HRMOR out of HID5
+          */
+         break;
+-    case POWERPC_MMU_2_03: /* P5p */
++    case POWERPC_MMU_VER_2_03: /* P5p */
+         lpcr = val & (LPCR_RMLS | LPCR_ILE |
+                       LPCR_LPES0 | LPCR_LPES1 |
+                       LPCR_RMI | LPCR_HDICE);
+         break;
+-    case POWERPC_MMU_2_06: /* P7 */
++    case POWERPC_MMU_VER_2_06: /* P7 */
+         lpcr = val & (LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_DPFD |
+                       LPCR_VRMASD | LPCR_RMLS | LPCR_ILE |
+                       LPCR_P7_PECE0 | LPCR_P7_PECE1 | LPCR_P7_PECE2 |
+                       LPCR_MER | LPCR_TC |
+                       LPCR_LPES0 | LPCR_LPES1 | LPCR_HDICE);
+         break;
+-    case POWERPC_MMU_2_07: /* P8 */
++    case POWERPC_MMU_VER_2_07: /* P8 */
+         lpcr = val & (LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_KBV |
+                       LPCR_DPFD | LPCR_VRMASD | LPCR_RMLS | LPCR_ILE |
+                       LPCR_AIL | LPCR_ONL | LPCR_P8_PECE0 | LPCR_P8_PECE1 |
+diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
+index eb2d482ef7..0f6016ff0d 100644
+--- a/target/ppc/mmu_helper.c
++++ b/target/ppc/mmu_helper.c
+@@ -1260,7 +1260,7 @@ static void mmu6xx_dump_mmu(FILE *f, fprintf_function cpu_fprintf,
+ 
+ void dump_mmu(FILE *f, fprintf_function cpu_fprintf, CPUPPCState *env)
+ {
+-    switch (env->mmu_model) {
++    switch (POWERPC_MMU_VER(env->mmu_model)) {
+     case POWERPC_MMU_BOOKE:
+         mmubooke_dump_mmu(f, cpu_fprintf, env);
+         break;
+@@ -1272,12 +1272,10 @@ void dump_mmu(FILE *f, fprintf_function cpu_fprintf, CPUPPCState *env)
+         mmu6xx_dump_mmu(f, cpu_fprintf, env);
+         break;
+ #if defined(TARGET_PPC64)
+-    case POWERPC_MMU_64B:
+-    case POWERPC_MMU_2_03:
+-    case POWERPC_MMU_2_06:
+-    case POWERPC_MMU_2_06a:
+-    case POWERPC_MMU_2_07:
+-    case POWERPC_MMU_2_07a:
++    case POWERPC_MMU_VER_64B:
++    case POWERPC_MMU_VER_2_03:
++    case POWERPC_MMU_VER_2_06:
++    case POWERPC_MMU_VER_2_07:
+         dump_slb(f, cpu_fprintf, ppc_env_get_cpu(env));
+         break;
+ #endif
+@@ -1412,14 +1410,12 @@ hwaddr ppc_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+     CPUPPCState *env = &cpu->env;
+     mmu_ctx_t ctx;
+ 
+-    switch (env->mmu_model) {
++    switch (POWERPC_MMU_VER(env->mmu_model)) {
+ #if defined(TARGET_PPC64)
+-    case POWERPC_MMU_64B:
+-    case POWERPC_MMU_2_03:
+-    case POWERPC_MMU_2_06:
+-    case POWERPC_MMU_2_06a:
+-    case POWERPC_MMU_2_07:
+-    case POWERPC_MMU_2_07a:
++    case POWERPC_MMU_VER_64B:
++    case POWERPC_MMU_VER_2_03:
++    case POWERPC_MMU_VER_2_06:
++    case POWERPC_MMU_VER_2_07:
+         return ppc_hash64_get_phys_page_debug(cpu, addr);
+ #endif
+ 
+@@ -1904,6 +1900,12 @@ void ppc_tlb_invalidate_all(CPUPPCState *env)
+ {
+     PowerPCCPU *cpu = ppc_env_get_cpu(env);
+ 
++#if defined(TARGET_PPC64)
++    if (env->mmu_model & POWERPC_MMU_64) {
++        env->tlb_need_flush = 0;
++        tlb_flush(CPU(cpu));
++    } else
++#endif /* defined(TARGET_PPC64) */
+     switch (env->mmu_model) {
+     case POWERPC_MMU_SOFT_6xx:
+     case POWERPC_MMU_SOFT_74xx:
+@@ -1928,21 +1930,12 @@ void ppc_tlb_invalidate_all(CPUPPCState *env)
+         break;
+     case POWERPC_MMU_32B:
+     case POWERPC_MMU_601:
+-#if defined(TARGET_PPC64)
+-    case POWERPC_MMU_64B:
+-    case POWERPC_MMU_2_03:
+-    case POWERPC_MMU_2_06:
+-    case POWERPC_MMU_2_06a:
+-    case POWERPC_MMU_2_07:
+-    case POWERPC_MMU_2_07a:
+-    case POWERPC_MMU_3_00:
+-#endif /* defined(TARGET_PPC64) */
+         env->tlb_need_flush = 0;
+         tlb_flush(CPU(cpu));
+         break;
+     default:
+         /* XXX: TODO */
+-        cpu_abort(CPU(cpu), "Unknown MMU model %d\n", env->mmu_model);
++        cpu_abort(CPU(cpu), "Unknown MMU model %x\n", env->mmu_model);
+         break;
+     }
+ }
+@@ -1951,6 +1944,16 @@ void ppc_tlb_invalidate_one(CPUPPCState *env, target_ulong addr)
+ {
+ #if !defined(FLUSH_ALL_TLBS)
+     addr &= TARGET_PAGE_MASK;
++#if defined(TARGET_PPC64)
++    if (env->mmu_model & POWERPC_MMU_64) {
++        /* tlbie invalidate TLBs for all segments */
++        /* XXX: given the fact that there are too many segments to invalidate,
++         *      and we still don't have a tlb_flush_mask(env, n, mask) in QEMU,
++         *      we just invalidate all TLBs
++         */
++        env->tlb_need_flush |= TLB_NEED_LOCAL_FLUSH;
++    } else
++#endif /* defined(TARGET_PPC64) */
+     switch (env->mmu_model) {
+     case POWERPC_MMU_SOFT_6xx:
+     case POWERPC_MMU_SOFT_74xx:
+@@ -1968,22 +1971,6 @@ void ppc_tlb_invalidate_one(CPUPPCState *env, target_ulong addr)
+          */
+         env->tlb_need_flush |= TLB_NEED_LOCAL_FLUSH;
+         break;
+-#if defined(TARGET_PPC64)
+-    case POWERPC_MMU_64B:
+-    case POWERPC_MMU_2_03:
+-    case POWERPC_MMU_2_06:
+-    case POWERPC_MMU_2_06a:
+-    case POWERPC_MMU_2_07:
+-    case POWERPC_MMU_2_07a:
+-    case POWERPC_MMU_3_00:
+-        /* tlbie invalidate TLBs for all segments */
+-        /* XXX: given the fact that there are too many segments to invalidate,
+-         *      and we still don't have a tlb_flush_mask(env, n, mask) in QEMU,
+-         *      we just invalidate all TLBs
+-         */
+-        env->tlb_need_flush |= TLB_NEED_LOCAL_FLUSH;
+-        break;
+-#endif /* defined(TARGET_PPC64) */
+     default:
+         /* Should never reach here with other MMU models */
+         assert(0);
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index b09e16ff76..2a24d1de67 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -6988,18 +6988,16 @@ void ppc_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
+     if (env->spr_cb[SPR_LPCR].name)
+         cpu_fprintf(f, " LPCR " TARGET_FMT_lx "\n", env->spr[SPR_LPCR]);
+ 
+-    switch (env->mmu_model) {
++    switch (POWERPC_MMU_VER(env->mmu_model)) {
+     case POWERPC_MMU_32B:
+     case POWERPC_MMU_601:
+     case POWERPC_MMU_SOFT_6xx:
+     case POWERPC_MMU_SOFT_74xx:
+ #if defined(TARGET_PPC64)
+-    case POWERPC_MMU_64B:
+-    case POWERPC_MMU_2_03:
+-    case POWERPC_MMU_2_06:
+-    case POWERPC_MMU_2_06a:
+-    case POWERPC_MMU_2_07:
+-    case POWERPC_MMU_2_07a:
++    case POWERPC_MMU_VER_64B:
++    case POWERPC_MMU_VER_2_03:
++    case POWERPC_MMU_VER_2_06:
++    case POWERPC_MMU_VER_2_07:
+ #endif
+         cpu_fprintf(f, " SDR1 " TARGET_FMT_lx "   DAR " TARGET_FMT_lx
+                        "  DSISR " TARGET_FMT_lx "\n", env->spr[SPR_SDR1],
 -- 
 2.11.0
