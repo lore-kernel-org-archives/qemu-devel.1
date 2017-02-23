@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cgy9G-0004Rs-VS
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 13:29:53 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cgy9J-0004Un-2r
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 13:29:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cgy9F-0006ii-KK
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 13:29:50 -0500
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:36702)
+	(envelope-from <alex.bennee@linaro.org>) id 1cgy9G-0006la-JM
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 13:29:53 -0500
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:36708)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cgy9F-0006h0-FK
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 13:29:49 -0500
-Received: by mail-wm0-x22d.google.com with SMTP id v77so37506765wmv.1
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 10:29:49 -0800 (PST)
+	id 1cgy9G-0006k0-D4
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 13:29:50 -0500
+Received: by mail-wm0-x234.google.com with SMTP id v77so37507164wmv.1
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 10:29:50 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 23 Feb 2017 18:29:24 +0000
-Message-Id: <20170223182927.7166-22-alex.bennee@linaro.org>
+Date: Thu, 23 Feb 2017 18:29:27 +0000
+Message-Id: <20170223182927.7166-25-alex.bennee@linaro.org>
 In-Reply-To: <20170223182927.7166-1-alex.bennee@linaro.org>
 References: <20170223182927.7166-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v14 21/24] target-arm: don't generate WFE/YIELD
- calls for MTTCG
+Subject: [Qemu-devel] [PATCH v14 24/24] tcg: enable MTTCG by default for ARM
+ on x86 hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,99 +33,116 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: rth@twiddle.net, peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-The WFE and YIELD instructions are really only hints and in TCG's case
-they were useful to move the scheduling on from one vCPU to the next. In
-the parallel context (MTTCG) this just causes an unnecessary cpu_exit
-and contention of the BQL.
+This enables the multi-threaded system emulation by default for ARMv7
+and ARMv8 guests using the x86_64 TCG backend. This is because on the
+guest side:
+
+  - The ARM translate.c/translate-64.c have been converted to
+    - use MTTCG safe atomic primitives
+    - emit the appropriate barrier ops
+  - The ARM machine has been updated to
+    - hold the BQL when modifying shared cross-vCPU state
+    - defer powerctl changes to async safe work
+
+All the host backends support the barrier and atomic primitives but
+need to provide same-or-better support for normal load/store
+operations.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/op_helper.c     |  7 +++++++
- target/arm/translate-a64.c |  8 ++++++--
- target/arm/translate.c     | 20 ++++++++++++++++----
- 3 files changed, 29 insertions(+), 6 deletions(-)
+Acked-by: Peter Maydell <peter.maydell@linaro.org>
+Tested-by: Pranith Kumar <bobby.prani@gmail.com>
+Reviewed-by: Pranith Kumar <bobby.prani@gmail.com>
 
-diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-index 5f3e3bdae2..d64c8670fa 100644
---- a/target/arm/op_helper.c
-+++ b/target/arm/op_helper.c
-@@ -436,6 +436,13 @@ void HELPER(yield)(CPUARMState *env)
-     ARMCPU *cpu = arm_env_get_cpu(env);
-     CPUState *cs = CPU(cpu);
+---
+v7
+  - drop configure check for backend
+  - declare backend memory order for x86
+  - declare guest memory order for ARM
+  - add configure snippet to set TARGET_SUPPORTS_MTTCG
+v8
+  - TCG_DEFAULT_MO -> TCG_GUEST_DEFAULT_MO
+  - ~TCG_MO_LD_ST -> ~TCG_MO_ST_LD
+v10
+  - moved TCG_DEFAULT_MO -> TCG_GUEST_DEFAULT_MO to original commit
+v11
+  - add Pranith's tested/review-by tags
+  - s/defer reset/defer powerctl/ in commit message
+---
+ configure             |  6 ++++++
+ target/arm/cpu.h      |  3 +++
+ tcg/i386/tcg-target.h | 11 +++++++++++
+ 3 files changed, 20 insertions(+)
+
+diff --git a/configure b/configure
+index 8e8f18de1e..df58e91285 100755
+--- a/configure
++++ b/configure
+@@ -5879,6 +5879,7 @@ mkdir -p $target_dir
+ echo "# Automatically generated by configure - do not modify" > $config_target_mak
  
-+    /* When running in MTTCG we don't generate jumps to the yield and
-+     * WFE helpers as it won't affect the scheduling of other vCPUs.
-+     * If we wanted to more completely model WFE/SEV so we don't busy
-+     * spin unnecessarily we would need to do something more involved.
-+     */
-+    g_assert(!parallel_cpus);
+ bflt="no"
++mttcg="no"
+ interp_prefix1=$(echo "$interp_prefix" | sed "s/%M/$target_name/g")
+ gdb_xml_files=""
+ 
+@@ -5897,11 +5898,13 @@ case "$target_name" in
+   arm|armeb)
+     TARGET_ARCH=arm
+     bflt="yes"
++    mttcg="yes"
+     gdb_xml_files="arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
+   ;;
+   aarch64)
+     TARGET_BASE_ARCH=arm
+     bflt="yes"
++    mttcg="yes"
+     gdb_xml_files="aarch64-core.xml aarch64-fpu.xml arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
+   ;;
+   cris)
+@@ -6066,6 +6069,9 @@ if test "$target_bigendian" = "yes" ; then
+ fi
+ if test "$target_softmmu" = "yes" ; then
+   echo "CONFIG_SOFTMMU=y" >> $config_target_mak
++  if test "$mttcg" = "yes" ; then
++    echo "TARGET_SUPPORTS_MTTCG=y" >> $config_target_mak
++  fi
+ fi
+ if test "$target_user_only" = "yes" ; then
+   echo "CONFIG_USER_ONLY=y" >> $config_target_mak
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index e285ba3b4b..38a8e00908 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -30,6 +30,9 @@
+ #  define TARGET_LONG_BITS 32
+ #endif
+ 
++/* ARM processors have a weak memory model */
++#define TCG_GUEST_DEFAULT_MO      (0)
 +
-     /* This is a non-trappable hint instruction that generally indicates
-      * that the guest is currently busy-looping. Yield control back to the
-      * top level loop so that a more deserving VCPU has a chance to run.
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index e61bbd6b3b..e15eae6d41 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -1328,10 +1328,14 @@ static void handle_hint(DisasContext *s, uint32_t insn,
-         s->is_jmp = DISAS_WFI;
-         return;
-     case 1: /* YIELD */
--        s->is_jmp = DISAS_YIELD;
-+        if (!parallel_cpus) {
-+            s->is_jmp = DISAS_YIELD;
-+        }
-         return;
-     case 2: /* WFE */
--        s->is_jmp = DISAS_WFE;
-+        if (!parallel_cpus) {
-+            s->is_jmp = DISAS_WFE;
-+        }
-         return;
-     case 4: /* SEV */
-     case 5: /* SEVL */
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 4436d8f3a2..abc1f77ee4 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -4404,20 +4404,32 @@ static void gen_exception_return(DisasContext *s, TCGv_i32 pc)
-     gen_rfe(s, pc, load_cpu_field(spsr));
+ #define CPUArchState struct CPUARMState
+ 
+ #include "qemu-common.h"
+diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
+index 21d96ec35c..4275787db9 100644
+--- a/tcg/i386/tcg-target.h
++++ b/tcg/i386/tcg-target.h
+@@ -165,4 +165,15 @@ static inline void flush_icache_range(uintptr_t start, uintptr_t stop)
+ {
  }
  
-+/*
-+ * For WFI we will halt the vCPU until an IRQ. For WFE and YIELD we
-+ * only call the helper when running single threaded TCG code to ensure
-+ * the next round-robin scheduled vCPU gets a crack. In MTTCG mode we
-+ * just skip this instruction. Currently the SEV/SEVL instructions
-+ * which are *one* of many ways to wake the CPU from WFE are not
-+ * implemented so we can't sleep like WFI does.
++/* This defines the natural memory order supported by this
++ * architecture before guarantees made by various barrier
++ * instructions.
++ *
++ * The x86 has a pretty strong memory ordering which only really
++ * allows for some stores to be re-ordered after loads.
 + */
- static void gen_nop_hint(DisasContext *s, int val)
- {
-     switch (val) {
-     case 1: /* yield */
--        gen_set_pc_im(s, s->pc);
--        s->is_jmp = DISAS_YIELD;
-+        if (!parallel_cpus) {
-+            gen_set_pc_im(s, s->pc);
-+            s->is_jmp = DISAS_YIELD;
-+        }
-         break;
-     case 3: /* wfi */
-         gen_set_pc_im(s, s->pc);
-         s->is_jmp = DISAS_WFI;
-         break;
-     case 2: /* wfe */
--        gen_set_pc_im(s, s->pc);
--        s->is_jmp = DISAS_WFE;
-+        if (!parallel_cpus) {
-+            gen_set_pc_im(s, s->pc);
-+            s->is_jmp = DISAS_WFE;
-+        }
-         break;
-     case 4: /* sev */
-     case 5: /* sevl */
++#include "tcg-mo.h"
++
++#define TCG_TARGET_DEFAULT_MO (TCG_MO_ALL & ~TCG_MO_ST_LD)
++
+ #endif
 -- 
 2.11.0
