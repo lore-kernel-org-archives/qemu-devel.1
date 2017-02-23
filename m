@@ -1,26 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cgsBE-0001uZ-BW
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 07:07:29 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cgsCj-0003Id-SX
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 07:09:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cgsBC-0008Kb-M0
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 07:07:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42588)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cgsBC-0008KV-GS
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 07:07:26 -0500
-Date: Thu, 23 Feb 2017 12:07:20 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170223120720.GM10047@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170223105922.22989-1-berrange@redhat.com>
-	<57a2a646-cce2-2b65-bce5-793ffaa1ec9b@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <57a2a646-cce2-2b65-bce5-793ffaa1ec9b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] os: don't corrupt pre-existing
- memory-backend data with prealloc
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cgsCe-0000EZ-Ru
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 07:09:01 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42492)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cgsCe-0000EP-JY
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 07:08:56 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1NC8rR6075778
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 07:08:55 -0500
+Received: from e06smtp08.uk.ibm.com (e06smtp08.uk.ibm.com [195.75.94.104])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28srg4r5ws-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 07:08:54 -0500
+Received: from localhost
+	by e06smtp08.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Thu, 23 Feb 2017 12:08:33 -0000
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+Date: Thu, 23 Feb 2017 13:08:27 +0100
+In-Reply-To: <20170223120827.8942-1-cornelia.huck@de.ibm.com>
+References: <20170223120827.8942-1-cornelia.huck@de.ibm.com>
+Message-Id: <20170223120827.8942-2-cornelia.huck@de.ibm.com>
+Subject: [Qemu-devel] [PATCH 1/1] s390x/css: handle format-0 TIC CCW
+ correctly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +38,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michal Privoznik <mprivozn@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jitendra Kolhe <jitendra.kolhe@hpe.com>
+To: qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
 
-On Thu, Feb 23, 2017 at 01:05:33PM +0100, Michal Privoznik wrote:
-> On 02/23/2017 11:59 AM, Daniel P. Berrange wrote:
-> > When using a memory-backend object with prealloc turned on, QEMU
-> > will memset() the first byte in every memory page to zero. While
-> > this might have been acceptable for memory backends associated
-> > with RAM, this corrupts application data for NVDIMMs.
-> > 
-> > Instead of setting every page to zero, read the current byte
-> > value and then just write that same value back, so we are not
-> > corrupting the original data.
-> > 
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> > ---
-> > 
-> > I'm unclear if this is actually still safe in practice ? Is the
-> > compiler permitted to optimize away the read+write since it doesn't
-> > change the memory value. I'd hope not, but I've been surprised
-> > before...
-> > 
-> > IMHO this is another factor in favour of requesting an API from
-> > the kernel to provide the prealloc behaviour we want.
-> > 
-> >  util/oslib-posix.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> > index 35012b9..8f5b656 100644
-> > --- a/util/oslib-posix.c
-> > +++ b/util/oslib-posix.c
-> > @@ -355,7 +355,8 @@ void os_mem_prealloc(int fd, char *area, size_t memory, Error **errp)
-> >  
-> >          /* MAP_POPULATE silently ignores failures */
-> >          for (i = 0; i < numpages; i++) {
-> > -            memset(area + (hpagesize * i), 0, 1);
-> > +            char val = *(area + (hpagesize * i));
-> > +            memset(area + (hpagesize * i), 0, val);
-> 
-> I think you wanted:
-> 
-> memset(area + (hpagesize * i), val, 1);
-> 
-> because what you are suggesting will overwrite even more than the first
-> byte with zeroes.
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 
-Lol, yes, I'm stupid.
+For TIC CCW, bit positions 8-32 of the format-1 CCW must contain zeros;
+otherwise, a program-check condition is generated. For format-0 TIC CCWs,
+bits 32-63 are ignored.
 
-Anyway, rather than repost this yet, I'm interested if this is actually
-the right way to fix the problem or if we should do something totally
-different....
+To convert TIC from format-0 CCW to format-1 CCW correctly, let's clear
+bits 8-32 to guarantee compatibility.
 
-Regards,
-Daniel
+Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+---
+ hw/s390x/css.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+index 0f2580d644..e32b2a4d42 100644
+--- a/hw/s390x/css.c
++++ b/hw/s390x/css.c
+@@ -368,13 +368,16 @@ static CCW1 copy_ccw_from_guest(hwaddr addr, bool fmt1)
+         ret.cda = be32_to_cpu(tmp1.cda);
+     } else {
+         cpu_physical_memory_read(addr, &tmp0, sizeof(tmp0));
+-        ret.cmd_code = tmp0.cmd_code;
+-        ret.flags = tmp0.flags;
+-        ret.count = be16_to_cpu(tmp0.count);
+-        ret.cda = be16_to_cpu(tmp0.cda1) | (tmp0.cda0 << 16);
+-        if ((ret.cmd_code & 0x0f) == CCW_CMD_TIC) {
+-            ret.cmd_code &= 0x0f;
++        if ((tmp0.cmd_code & 0x0f) == CCW_CMD_TIC) {
++            ret.cmd_code = CCW_CMD_TIC;
++            ret.flags = 0;
++            ret.count = 0;
++        } else {
++            ret.cmd_code = tmp0.cmd_code;
++            ret.flags = tmp0.flags;
++            ret.count = be16_to_cpu(tmp0.count);
+         }
++        ret.cda = be16_to_cpu(tmp0.cda1) | (tmp0.cda0 << 16);
+     }
+     return ret;
+ }
 -- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+2.11.0
