@@ -1,36 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cguUp-0008D9-MT
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:35:52 -0500
+	(envelope-from <kchamart@redhat.com>) id 1cguZX-000210-6O
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:40:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cguUo-0000zI-VO
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:35:51 -0500
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:36963)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cguUo-0000z1-MP
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:35:50 -0500
-Received: by mail-wm0-x22c.google.com with SMTP id v77so913931wmv.0
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 06:35:50 -0800 (PST)
+	(envelope-from <kchamart@redhat.com>) id 1cguZU-0002m4-1G
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:40:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45048)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1cguZT-0002lE-PD
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:40:39 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EA341C05091C
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 14:40:38 +0000 (UTC)
+Date: Thu, 23 Feb 2017 15:40:34 +0100
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20170223144034.b2bhgsvwfyyymxwk@eukaryote>
 MIME-Version: 1.0
-In-Reply-To: <41630a89-e645-7d7e-b7c2-356fd6dcadee@redhat.com>
-References: <1487659615-15820-1-git-send-email-xyjxie@linux.vnet.ibm.com>
-	<5edff645-12e8-d3e0-1849-302b6986c232@ozlabs.ru>
-	<fdcb2b07-aae8-69bf-ee94-a43777009c3a@redhat.com>
-	<CAFEAcA--bSo7PJH0Px9ytQspaYuS55CSsM_EN6zt0djhkqKNPw@mail.gmail.com>
-	<5a0773de-6bc7-474a-82ab-2edd37ce8a93@redhat.com>
-	<CAFEAcA99xi4k57h2XGw2deGO24E95AS5jyGL+4GzjqNgMb9wcg@mail.gmail.com>
-	<92580ca9-47fe-a943-7720-d3cb1fc6d2eb@redhat.com>
-	<CAFEAcA8769a_8xwk57FS6Ko+Lioud20+70JRSafeEic6GB_RAw@mail.gmail.com>
-	<3d5e7b5e-4501-86b7-093d-47fb09af585e@redhat.com>
-	<CAFEAcA9gcArSqhbRi6-YdR=5eE9dtq66C7N0qTbCuBiY_Zr+tA@mail.gmail.com>
-	<41630a89-e645-7d7e-b7c2-356fd6dcadee@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 23 Feb 2017 14:35:28 +0000
-Message-ID: <CAFEAcA_Mh9ZrJeu4f==ko1k2yLkfPe2AwNbUHcxkmS6Lzuvk0Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] memory: make ram device read/write endian
- sensitive
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] Adding an overlay with 'blockdev-add' fails with:
+ "Parameter 'driver' is missing"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,34 +31,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Yongji Xie <xyjxie@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, zhong@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>, Paul Mackerras <paulus@samba.org>
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com
 
-On 23 February 2017 at 12:53, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
->
-> On 23/02/2017 13:26, Peter Maydell wrote:
->> On 23 February 2017 at 11:43, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>> On 23/02/2017 12:34, Peter Maydell wrote:
->>>> We should probably update the doc comment to note that the
->>>> pointer is to host-endianness memory (and that this is not
->>>> like normal RAM which is target-endian)...
->>>
->>> I wouldn't call it host-endianness memory, and I disagree that normal
->>> RAM is target-endian---in both cases it's just a bunch of bytes.
->>>
->>> However, the access done by the MemoryRegionOps callbacks needs to match
->>> the endianness declared by the MemoryRegionOps themselves.
->>
->> Well, if the guest stores a bunch of integers to the memory, which
->> way round do you see them when you look at the bunch of bytes?
->
-> You see them in whatever endianness the guest used.
+TL;DR: Using `blockdev-add` to create an overlay file succeeds with QEMU
+       2.7.0, however the *same* test fails with QEMU from Git (plus a
+       couple of patch series from mailing list).  Details below.
 
-I'm confused. I said "normal RAM and this ramdevice memory are
-different", and you seem to be saying they're the same. I don't
-think they are (in particular I think with a BE guest on an
-LE host they'll look different).
+QEMU invocation:
 
-thanks
--- PMM
+  $ qemu-system-x86_64 -display none \
+     -nodefconfig -nodefaults -m 512 -device virtio-scsi-pci,id=scsi \
+     -device virtio-serial-pci \
+     -drive file=./base.qcow2,format=qcow2,if=virtio \
+     -monitor stdio -qmp unix:./qmp-sock,server,nowait
+
+With QEMU 2.7.0
+---------------
+
+$ qemu-system-x86_64 --version
+QEMU emulator version 2.7.0(qemu-2.7.0-8.fc24) [...]
+
+Create the overlay file: 
+
+    $ qemu-img create -f qcow2 /export/target.qcow2 1G
+
+$ ./qmp-shell -v -p /export/qmp-sock
+
+(QEMU) blockdev-add options={"id":"virtio1","driver":"qcow2","file":{"driver":"file","filename":"/export/target.qcow2"},"backing":"virtio0"}
+{
+    "execute": "blockdev-add", 
+    "arguments": {
+        "options": {
+            "backing": "virtio0", 
+            "driver": "qcow2", 
+            "id": "virtio1", 
+            "file": {
+                "driver": "file", 
+                "filename": "/export/target.qcow2"
+            }
+        }
+    }
+}
+{
+    "return": {}
+}
+(QEMU) 
+
+* * *
+
+With Git Master (v2.8.0-1462-g612bb5d-dirty)
+--------------------------------------------
+
+Note: I applied these three patch series:
+
+  - [PATCH v2 00/24] QemuOpts util/cutils: Fix and clean up number
+    conversions"
+  - [PATCH 00/14] qobject: Cleanups, mostly in tests
+  - [PATCH 0/2] qapi: Improve qobject input visitor error reporting
+
+So, I'm here:
+
+  $ git describe
+	pull-block-2017-02-21-81-g612bb5d
+
+The same test as above (but with the QEMU from Git + above patch
+series):
+
+- Stop system QEMU
+- Start QEMU built from Git (with the above patches)
+- Try to add 'target.qcow2' block device via `blockdev-add`, it now
+  fails as below:
+
+  [...]
+  (QEMU)
+  {
+      "execute": "blockdev-add", 
+      "arguments": {
+          "options": {
+              "backing": "virtio0", 
+              "driver": "qcow2", 
+              "id": "virtio1", 
+              "file": {
+                  "driver": "file", 
+                  "filename": "/export/target.qcow2"
+              }
+          }
+      }
+  }
+  {
+      "error": {
+          "class": "GenericError", 
+          "desc": "Parameter 'driver' is missing"
+      }
+  }
+  (QEMU) 
+
+* * *
+
+Is this a regression or am I missing something?
+
+-- 
+/kashyap
