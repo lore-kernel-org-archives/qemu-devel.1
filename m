@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ch2ix-0003dY-8i
+	(envelope-from <dgibson@ozlabs.org>) id 1ch2ix-0003dd-B7
 	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 18:23:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ch2iv-0005t2-W6
+	(envelope-from <dgibson@ozlabs.org>) id 1ch2iw-0005t9-1u
 	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 18:22:59 -0500
-Date: Fri, 24 Feb 2017 09:57:19 +1100
+Date: Fri, 24 Feb 2017 09:53:58 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170223225719.GF17615@umbus.fritz.box>
-References: <20170105054618.GA12106@umbus.fritz.box>
-	<20170106125758.4643fb35@bahia.lan>
-	<20170112035219.GK14026@umbus.fritz.box>
-	<0bfaa82a-d5f5-eb0f-14a9-f7d13239cee5@ozlabs.ru>
-	<20170112100823.2a906117@bahia.lan>
-	<20170113044831.GP13656@umbus.fritz.box>
-	<20170113095828.302b77f2@bahia.lan>
-	<20170222120825.0253f2d6@bahia.lan>
-	<20170223021152.GR12577@umbus.fritz.box>
-	<20170223082350.4c118d7e@bahia.lan>
+Message-ID: <20170223225358.GD17615@umbus.fritz.box>
+References: <1487763883-4877-1-git-send-email-nikunj@linux.vnet.ibm.com>
+	<1487763883-4877-4-git-send-email-nikunj@linux.vnet.ibm.com>
+	<913ec2bb-2fd4-3488-e142-75d3574dfaf1@twiddle.net>
+	<87a89dtnox.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<98b51c07-f7b2-ddb3-7b59-336d109d005b@twiddle.net>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="m1UC1K4AOz1Ywdkx"
+	protocol="application/pgp-signature"; boundary="zS7rBR6csb6tI2e1"
 Content-Disposition: inline
-In-Reply-To: <20170223082350.4c118d7e@bahia.lan>
-Subject: Re: [Qemu-devel] [Qemu-ppc] Proposal PCI/PCIe device placement on
- PAPR guests
+In-Reply-To: <98b51c07-f7b2-ddb3-7b59-336d109d005b@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH v3 03/10] target/ppc: support for 32-bit
+ carry and overflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,34 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: lvivier@redhat.com, thuth@redhat.com, ehabkost@redhat.com, qemu-devel@nongnu.org, abologna@redhat.com, mdroth@linux.vnet.ibm.com, libvir-list@redhat.com, qemu-ppc@nongnu.org, marcel@redhat.com
+To: Richard Henderson <rth@twiddle.net>
+Cc: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
 
---m1UC1K4AOz1Ywdkx
+--zS7rBR6csb6tI2e1
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 23, 2017 at 08:23:50AM +0100, Greg Kurz wrote:
-> On Thu, 23 Feb 2017 13:11:52 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Wed, Feb 22, 2017 at 12:08:25PM +0100, Greg Kurz wrote:
-> > > David,
-> > >=20
-> > > I don't see the "spapr_pci: Allow PCI-Express devices" patch in your
-> > > ppc-for-2.9 tree. Do you still consider merging it ? =20
+On Fri, Feb 24, 2017 at 09:34:32AM +1100, Richard Henderson wrote:
+> On 02/23/2017 05:40 PM, Nikunj A Dadhania wrote:
+> > Richard Henderson <rth@twiddle.net> writes:
+> > > These functions are becoming quite large.  Are they performance criti=
+cal enough
+> > > that they need to stay as inline code, or should they be moved to hel=
+pers and
+> > > share code with cpu_read/write_xer?
 > >=20
-> > No.  After discussions with Marcel Apfelbaum and others I'm looking at
-> > a different approach for PCIe support.
+> > Just to boot to login prompt, these are the numbers for gen_read/write_=
+xer:
 > >=20
+> > helper_myprint - rd_count 231103, wr_count 68897
+> >=20
+> > And it keeps on incrementing, maybe scope of optimization here.
 >=20
-> Oh, I had missed that... Is it the following thread ?
+> That's not very large considering the total number of instructions execut=
+ed
+> during a boot to prompt.
 >=20
-> https://lists.gnu.org/archive/html/qemu-ppc/2017-02/msg00203.html
+> Thoughts, David?
 
-That's the one.
+Hm, I'm not clear if that's the number of executions, or the number of
+translations.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -68,25 +68,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---m1UC1K4AOz1Ywdkx
+--zS7rBR6csb6tI2e1
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYr2jOAAoJEGw4ysog2bOSSagQAMWlnZ8mnNyTWXUD1Z9txmZN
-EhNQNzQ9HuPfP+XjbVYPgAaPEPiDVkvChSa5kc+u0tTmY2i4kVPfbg1NXZ7FnqRd
-tO//7anoZnwbC7BKC/Wo7B/I2Gf5eSlUTl+iXRyBIDXVcxC5KT/bLkVOxOT8Xnzn
-Iy4GkEEVroObKVjToVuWs+ZpX49Okg0lhOSomPoV0x5BdN8YOHColXbWA6j1AfjL
-25Hfs5Hx09toaZwXnrRK4PQkloFG6TbEJSSbO7wx727BXibbB0BA0fdPCNYMr1rV
-WOvPFBn0bEsjs8d77clVp2sLsKxxIaqCwZEgjGOuyPzlaIadckKtIiLMEmPEGFFU
-2k3ugTUSf2QgMXR6+Igu9J/N2O6w8+TLTnf2Hu8+B5sSNkFrgTCGLsTtLEcv0sjq
-RE0gr2E+8SHsXCT503zAUfCF/KbRHlID88xxIwC0Z+xP58DPPojHTDcUqXyh5eyh
-MoSRmB+g4zIPdnlvdgoWKTwekooIn3kn8vQ9iyjAyhtBORnqpfKX3vpK28yW2pMh
-iD4nRuYZK/kAVhd1Ml57Mzc+UtzjfuGyGweGJ7t0xTQPAr7Q8CwLKCtQR1lIZ8oa
-FPekU2SoD6h//xjdJueM/E1t2pmB2fmmPDrGQcZyfKq8uV1jRYAPn3paAkJxhVPD
-ESL9zX5LPeS5K6pxcRtf
-=0fcH
+iQIcBAEBCAAGBQJYr2gGAAoJEGw4ysog2bOSGMcP/3bKI2DEsTKcxBjeu/sLRHav
+AVODERBScacq2Gfl6TWU9gX9M5oZFk2npl40uhcqoSTivYyxJQUMY4Vl1BzfrLud
+SU7w0tyCGJM/SAekCl9bqN3EIrkpCzl9yC8kdF4rgcPkQRzhb+GTH73fPrCmXr5U
+ZznDdbJLhn2HYaXKnocfo667GLaRlErcgrLppywcBdr0GthxLndL416GCEQOei2c
+nxBj7rDUKjMhhSL04sP38FMs8U601yi7HoHior+rPgfEUvTZjfTpCJHdVpdQwnqv
+j+MOEbe8QtqONyA4fxo4WJWcJAn5aBjDlZFhSGBihhUE387tFjEbNIDL1KJ5XekK
+DogT5LJcuQ7EZ9HZyetGVfrhb7amKbeLBbu/r2ZLGdouHR9UuwplRbyovfsYpUR8
+wJ0gYodxRbL2Jo2sXNUEsJexdmMeu3UabecfAmevO0XNWYrYsV/HAsYjlHWv2Tjc
+R3fsRGEnbGLWUPrQqKUkreL80CgX/nORZUMXfKZ0Crn+iFm/bCxUb4ORy4EuORXX
+ejJa9eJvibZRT3DFt/yWg4AXq50ESMHlEWaOp8x7dUAoiL6XgqUindjw5iAX1San
+cgyubT7bXeA10GaroNh7qLAKJqVdQYaL0jMH2l1AZwU4ZZgk2FDg25sXymi3knm7
+YOjlI6V1yqL1hBHQJmlB
+=ZQZ6
 -----END PGP SIGNATURE-----
 
---m1UC1K4AOz1Ywdkx--
+--zS7rBR6csb6tI2e1--
