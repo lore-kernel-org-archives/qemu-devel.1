@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42408)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cgorN-00071j-Au
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 03:34:46 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cgosi-0007yP-Cg
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 03:36:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cgorM-00014O-3I
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 03:34:45 -0500
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:33236)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1cgorL-00014A-Of
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 03:34:44 -0500
-Received: by mail-lf0-x241.google.com with SMTP id j2so553158lfe.0
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 00:34:43 -0800 (PST)
+	(envelope-from <pbonzini@redhat.com>) id 1cgosf-0001Jg-A2
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 03:36:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34324)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cgosf-0001JV-4K
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 03:36:05 -0500
+References: <1487659615-15820-1-git-send-email-xyjxie@linux.vnet.ibm.com>
+	<5edff645-12e8-d3e0-1849-302b6986c232@ozlabs.ru>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <fdcb2b07-aae8-69bf-ee94-a43777009c3a@redhat.com>
+Date: Thu, 23 Feb 2017 09:35:59 +0100
 MIME-Version: 1.0
-References: <20170222180423.26571-1-pbonzini@redhat.com>
-In-Reply-To: <20170222180423.26571-1-pbonzini@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 23 Feb 2017 08:34:31 +0000
-Message-ID: <CAJ+F1CL_gVsYSwx7JXF07rjmeQTPXiJFRcLo0KSt3k3xR_iuOQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] simplify struct QOM properties and
- use the result for GUEST_PANICKED
+In-Reply-To: <5edff645-12e8-d3e0-1849-302b6986c232@ozlabs.ru>
+Content-Type: text/plain; charset=koi8-r
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] memory: make ram device read/write endian
+ sensitive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +28,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-
-On Wed, Feb 22, 2017 at 10:07 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
-
-> This is an alternative approach to simplifying the crash information
-> patches.
->
-> Currently, crash information is exposed twice, through a QOM property
-> and through a method.  This is because accessing QOM properties with
-> QAPI struct types is a huge pain in the neck.  Patch 1 fixes this by
-> providing a simple and well-tested API, that takes care of integrating
-> the QOM->QObject->QAPI steps into a single function.
->
-> Patch 2 then eliminates the get_crash_info method.  Patch 3 finally
-> cleans up qemu_system_guest_panicked by passing a CPUState* argument
-> instead of a GuestPanicInformation struct.
->
-> Paolo
->
-> v1->v2:
->        include missing changes to tests/qapi-schema/qapi-schema-test.out
->        tweaks to doc comments
->        wrap long lines
->
-> Paolo Bonzini (3):
->   qom-qobject: introduce object_property_{g,s}et_ptr
->   cpu: implement get_crash_info through QOM properties
->   vl: pass CPUState to qemu_system_guest_panicked
->
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, Yongji Xie <xyjxie@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, alex.williamson@redhat.com, zhong@linux.vnet.ibm.com, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Paul Mackerras <paulus@samba.org>
 
 
-With the test leaks fixed,
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On 23/02/2017 05:20, Alexey Kardashevskiy wrote:
+> First, Paolo is right and ram_device_mem_ops::endianness should be
+> host-endian which happens to be little in our test case (ppc64le)
 
+So you tested a ppc64 BE guest and it works?
 
->
->
->  include/qom/cpu.h                       |   1 -
->  include/qom/qom-qobject.h               |  68 +++++++++++-
->  include/sysemu/sysemu.h                 |   2 +-
->  kvm-all.c                               |   2 +-
->  qom/cpu.c                               |  11 +-
->  qom/qom-qobject.c                       |  52 ++++++++++
->  target/i386/cpu.c                       |   2 +-
->  tests/Makefile.include                  |   2 +-
->  tests/check-qom-proplist.c              | 177
-> +++++++++++++++++++++++++++++++-
->  tests/qapi-schema/qapi-schema-test.json |   8 ++
->  tests/qapi-schema/qapi-schema-test.out  |   6 ++
->  vl.c                                    |  13 ++-
->  12 files changed, 326 insertions(+), 18 deletions(-)
->
-> --
-> 2.9.3
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+> Keep things where they are in the VFIO department and just fix
+> ram_device_mem_ops::endianness?
+
+I would fix the ram_device_mem_ops.  Either by introducing
+DEVICE_HOST_ENDIAN(*) or with Yongji's patch.
+
+(*) DEVICE_NATIVE_ENDIAN is special cased all over the place
+    because the same device (in a file that's compiled just once)
+    can be either little- or big-endian.  DEVICE_HOST_ENDIAN can
+    be a simple #define to either DEVICE_LITTLE_ENDIAN or
+    DEVICE_BIG_ENDIAN, because host endianness is the same for
+    all QEMU binaries.  It's literally half a dozen lines of code.
+
+Paolo
