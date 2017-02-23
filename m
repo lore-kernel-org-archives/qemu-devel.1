@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cgjke-0003vx-Kj
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 22:07:29 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cgjke-0003vk-92
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 22:07:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cgjkd-0005MM-ID
+	(envelope-from <dgibson@ozlabs.org>) id 1cgjka-0005Ko-5U
 	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 22:07:28 -0500
-Date: Thu, 23 Feb 2017 13:29:33 +1100
+Date: Thu, 23 Feb 2017 13:15:31 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170223022933.GW12577@umbus.fritz.box>
+Message-ID: <20170223021531.GS12577@umbus.fritz.box>
 References: <1487252865-12064-1-git-send-email-clg@kaod.org>
-	<1487252865-12064-9-git-send-email-clg@kaod.org>
+	<1487252865-12064-5-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="mz5eWKkhz39mMVQV"
+	protocol="application/pgp-signature"; boundary="Bk6L21jbBNK7V1Rv"
 Content-Disposition: inline
-In-Reply-To: <1487252865-12064-9-git-send-email-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v2 08/22] ppc/xics: use the QOM interface
- to resend irqs
+In-Reply-To: <1487252865-12064-5-git-send-email-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v2 04/22] ppc/xics: add an
+ InterruptStatsProvider interface to ICS and ICP objects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,106 +29,191 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---mz5eWKkhz39mMVQV
+--Bk6L21jbBNK7V1Rv
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 16, 2017 at 02:47:31PM +0100, C=E9dric Le Goater wrote:
+On Thu, Feb 16, 2017 at 02:47:27PM +0100, C=E9dric Le Goater wrote:
+> This is, again, to reduce the use of the list of ICS objects. Let's
+> make each individual ICS and ICP object an InterruptStatsProvider and
+> remove this same interface from XICSState.
+>=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+
+I'm a little hesitant about this, because it means that getting the
+interrupt stats information is now spread out over the qom tree,
+whereas previously there was a single location to get a good summary
+of the systems overall interrupt status.  The previous behaviour seems
+like it would be more convenient for debugging.
+
+That said, I see the structural advantages of this split.  Hmm.. still
+thinking..
+
 > ---
->  hw/intc/xics.c | 26 ++++++++++++++------------
->  1 file changed, 14 insertions(+), 12 deletions(-)
+>  hw/intc/xics.c | 76 +++++++++++++++++++++++++++++++---------------------=
+------
+>  1 file changed, 41 insertions(+), 35 deletions(-)
 >=20
 > diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> index 0ffdf09c5304..2decb921e4e3 100644
+> index 9f22814815c9..b1294417a0ae 100644
 > --- a/hw/intc/xics.c
 > +++ b/hw/intc/xics.c
-> @@ -229,16 +229,15 @@ static void icp_check_ipi(ICPState *ss)
->      qemu_irq_raise(ss->output);
+> @@ -92,44 +92,44 @@ void xics_cpu_setup(XICSState *xics, PowerPCCPU *cpu)
+>      }
 >  }
 > =20
-> -static void icp_resend(ICPState *ss)
-> +static void icp_resend(XICSInterface *xi, ICPState *ss)
+> -static void xics_common_pic_print_info(InterruptStatsProvider *obj,
+> -                                       Monitor *mon)
+> +static void icp_pic_print_info(InterruptStatsProvider *obj,
+> +                           Monitor *mon)
 >  {
+> -    XICSState *xics =3D XICS_COMMON(obj);
 > -    ICSState *ics;
-> +    XICSInterfaceClass *xic =3D XICS_INTERFACE_GET_CLASS(xi);
-> =20
->      if (ss->mfrr < CPPR(ss)) {
->          icp_check_ipi(ss);
->      }
-> -    QLIST_FOREACH(ics, &ss->xics->ics, list) {
-> -        ics_resend(ics);
-> -    }
+> +    ICPState *icp =3D ICP(obj);
+> +    int cpu_index =3D icp->cs ? icp->cs->cpu_index : -1;
 > +
-> +    xic->ics_resend(xi);
->  }
+> +    if (!icp->output) {
+> +        return;
+> +    }
+> +    monitor_printf(mon, "CPU %d XIRR=3D%08x (%p) PP=3D%02x MFRR=3D%02x\n=
+",
+> +                   cpu_index, icp->xirr, icp->xirr_owner,
+> +                   icp->pending_priority, icp->mfrr);
+> +}
+> +
+> +static void ics_simple_pic_print_info(InterruptStatsProvider *obj,
+> +                                      Monitor *mon)
+> +{
+> +    ICSState *ics =3D ICS_SIMPLE(obj);
+>      uint32_t i;
 > =20
->  void icp_set_cppr(ICPState *ss, uint8_t cppr)
-> @@ -262,7 +261,7 @@ void icp_set_cppr(ICPState *ss, uint8_t cppr)
->          }
->      } else {
->          if (!XISR(ss)) {
-> -            icp_resend(ss);
-> +            icp_resend(XICS_INTERFACE(qdev_get_machine()), ss);
-
-Here you're assuming that the machine is the implementor of the xics
-interface, which is kinda ugly.  The ICP should have a pointer to the
-xics interface, which will eventually replace the pointer to the
-overall xics object it has now.
-
-But I haven't read the rest of the series yet, maybe this is just
-transitional.
-
->          }
->      }
->  }
-> @@ -299,6 +298,8 @@ uint32_t icp_ipoll(ICPState *ss, uint32_t *mfrr)
+> -    for (i =3D 0; i < xics->nr_servers; i++) {
+> -        ICPState *icp =3D &xics->ss[i];
+> +    monitor_printf(mon, "ICS %4x..%4x %p\n",
+> +                   ics->offset, ics->offset + ics->nr_irqs - 1, ics);
 > =20
->  void icp_eoi(ICPState *ss, uint32_t xirr)
->  {
-> +    XICSInterface *xi =3D XICS_INTERFACE(qdev_get_machine());
-> +    XICSInterfaceClass *xic =3D XICS_INTERFACE_GET_CLASS(xi);
->      ICSState *ics;
->      uint32_t irq;
-> =20
-> @@ -306,13 +307,13 @@ void icp_eoi(ICPState *ss, uint32_t xirr)
->      ss->xirr =3D (ss->xirr & ~CPPR_MASK) | (xirr & CPPR_MASK);
->      trace_xics_icp_eoi(ss->cs->cpu_index, xirr, ss->xirr);
->      irq =3D xirr & XISR_MASK;
-> -    QLIST_FOREACH(ics, &ss->xics->ics, list) {
-> -        if (ics_valid_irq(ics, irq)) {
-> -            ics_eoi(ics, irq);
+> -        if (!icp->output) {
+> -            continue;
 > -        }
-> +
-> +    ics =3D xic->ics_get(xi, irq);
-> +    if (ics) {
-> +        ics_eoi(ics, irq);
+> -        monitor_printf(mon, "CPU %d XIRR=3D%08x (%p) PP=3D%02x MFRR=3D%0=
+2x\n",
+> -                       i, icp->xirr, icp->xirr_owner,
+> -                       icp->pending_priority, icp->mfrr);
+> +    if (!ics->irqs) {
+> +        return;
 >      }
->      if (!XISR(ss)) {
-> -        icp_resend(ss);
-> +        icp_resend(xi, ss);
+> =20
+> -    QLIST_FOREACH(ics, &xics->ics, list) {
+> -        monitor_printf(mon, "ICS %4x..%4x %p\n",
+> -                       ics->offset, ics->offset + ics->nr_irqs - 1, ics);
+> +    for (i =3D 0; i < ics->nr_irqs; i++) {
+> +        ICSIRQState *irq =3D ics->irqs + i;
+> =20
+> -        if (!ics->irqs) {
+> +        if (!(irq->flags & XICS_FLAGS_IRQ_MASK)) {
+>              continue;
+>          }
+> -
+> -        for (i =3D 0; i < ics->nr_irqs; i++) {
+> -            ICSIRQState *irq =3D ics->irqs + i;
+> -
+> -            if (!(irq->flags & XICS_FLAGS_IRQ_MASK)) {
+> -                continue;
+> -            }
+> -            monitor_printf(mon, "  %4x %s %02x %02x\n",
+> -                           ics->offset + i,
+> -                           (irq->flags & XICS_FLAGS_IRQ_LSI) ?
+> -                           "LSI" : "MSI",
+> -                           irq->priority, irq->status);
+> -        }
+> +        monitor_printf(mon, "  %4x %s %02x %02x\n",
+> +                       ics->offset + i,
+> +                       (irq->flags & XICS_FLAGS_IRQ_LSI) ?
+> +                       "LSI" : "MSI",
+> +                       irq->priority, irq->status);
 >      }
 >  }
 > =20
-> @@ -592,10 +593,11 @@ static void ics_simple_reset(DeviceState *dev)
-> =20
->  static int ics_simple_post_load(ICSState *ics, int version_id)
+> @@ -161,10 +161,8 @@ static void xics_common_initfn(Object *obj)
+>  static void xics_common_class_init(ObjectClass *oc, void *data)
 >  {
-> +    XICSInterface *xi =3D XICS_INTERFACE(qdev_get_machine());
->      int i;
+>      DeviceClass *dc =3D DEVICE_CLASS(oc);
+> -    InterruptStatsProviderClass *ic =3D INTERRUPT_STATS_PROVIDER_CLASS(o=
+c);
 > =20
->      for (i =3D 0; i < ics->xics->nr_servers; i++) {
-> -        icp_resend(&ics->xics->ss[i]);
-> +        icp_resend(xi, &ics->xics->ss[i]);
->      }
-
-This resend triggering needs to get moved to the xics interface
-implementor - i.e. the machine.  It's actually already broken right
-now, since it incorrectly relies on the ordering of the ics and icp
-restore during migration.
-
->      return 0;
+>      dc->reset =3D xics_common_reset;
+> -    ic->print_info =3D xics_common_pic_print_info;
+>  }
+> =20
+>  static const TypeInfo xics_common_info =3D {
+> @@ -174,10 +172,6 @@ static const TypeInfo xics_common_info =3D {
+>      .class_size    =3D sizeof(XICSStateClass),
+>      .instance_init =3D xics_common_initfn,
+>      .class_init    =3D xics_common_class_init,
+> -    .interfaces =3D (InterfaceInfo[]) {
+> -        { TYPE_INTERRUPT_STATS_PROVIDER },
+> -        { }
+> -    },
+>  };
+> =20
+>  /*
+> @@ -414,10 +408,12 @@ static void icp_realize(DeviceState *dev, Error **e=
+rrp)
+>  static void icp_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> +    InterruptStatsProviderClass *ic =3D INTERRUPT_STATS_PROVIDER_CLASS(k=
+lass);
+> =20
+>      dc->reset =3D icp_reset;
+>      dc->vmsd =3D &vmstate_icp_server;
+>      dc->realize =3D icp_realize;
+> +    ic->print_info =3D icp_pic_print_info;
+>  }
+> =20
+>  static const TypeInfo icp_info =3D {
+> @@ -426,6 +422,10 @@ static const TypeInfo icp_info =3D {
+>      .instance_size =3D sizeof(ICPState),
+>      .class_init =3D icp_class_init,
+>      .class_size =3D sizeof(ICPStateClass),
+> +    .interfaces =3D (InterfaceInfo[]) {
+> +        { TYPE_INTERRUPT_STATS_PROVIDER },
+> +        { }
+> +    },
+>  };
+> =20
+>  /*
+> @@ -692,6 +692,7 @@ static void ics_simple_class_init(ObjectClass *klass,=
+ void *data)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+>      ICSStateClass *isc =3D ICS_BASE_CLASS(klass);
+> +    InterruptStatsProviderClass *ic =3D INTERRUPT_STATS_PROVIDER_CLASS(k=
+lass);
+> =20
+>      dc->realize =3D ics_simple_realize;
+>      dc->props =3D ics_simple_properties;
+> @@ -701,6 +702,7 @@ static void ics_simple_class_init(ObjectClass *klass,=
+ void *data)
+>      isc->reject =3D ics_simple_reject;
+>      isc->resend =3D ics_simple_resend;
+>      isc->eoi =3D ics_simple_eoi;
+> +    ic->print_info =3D ics_simple_pic_print_info;
+>  }
+> =20
+>  static const TypeInfo ics_simple_info =3D {
+> @@ -710,6 +712,10 @@ static const TypeInfo ics_simple_info =3D {
+>      .class_init =3D ics_simple_class_init,
+>      .class_size =3D sizeof(ICSStateClass),
+>      .instance_init =3D ics_simple_initfn,
+> +    .interfaces =3D (InterfaceInfo[]) {
+> +        { TYPE_INTERRUPT_STATS_PROVIDER },
+> +        { }
+> +    },
+>  };
+> =20
+>  static const TypeInfo ics_base_info =3D {
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -136,25 +221,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---mz5eWKkhz39mMVQV
+--Bk6L21jbBNK7V1Rv
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYrkkNAAoJEGw4ysog2bOSAjUP/3RovH/6+ltxxG0tNn1FykJx
-MdPLN5xduwaCUiNmS2EoHl5vxRjpq4QSGGWVDjxyREg0FLeWk7z3YtgSWqF2xN+o
-gWnF6vjvfeN7WNBb2/ZDC8O7VJCVjNp6LuZ0clumr20gWFX4eggP0gzPqwBTknbM
-yiLTvrwlTCgzDiMcKevsEARsA5nzGZW5e4jIV0jwdsQ0e4v9jEK5wgXrCaMghC8L
-PAcBVciLhUofNTGfCJ7N/jjh0kxe5rlVf9klbe6TwdZ1HPkmCci62EJsKX4AwT9h
-0BljcxnzVTH7kX+WAtHT30FJFXlw7cfckTIB+7HKlRXyr0/7oGleNBdwF8J+Xx+p
-ItFYvyvENXtISQPD2enIH4gLbLMZbwytb4aVPi2XlNwJfl4LXOnsBlDPSfsY5NwU
-fHZY+bsy+5HWzjJhw5Og+xWcQA225sgc5V4L6MdURNvAtyOGQ0VGspBBxYNlMOD8
-MbEcX6F2mIJowyIVCMv3b84Ij8f7PEZejmvPY2nf/ma5QIF+fFJswd+eo3cq0mag
-vHtOx+zK1jr4N9CrG5MXrJysZkhU5Xk/Aq2N/RXGjwfpiguvnmJtRDkjr3UZu8+N
-ZXA7nPuHBEw0JB5GmwqSZ0yDwpj4Ua4bZEqXSH5knl3xVsfwySiyOCs0BaTXjCy7
-U0UCDh7QG0VjDHI2tPF4
-=0X17
+iQIcBAEBCAAGBQJYrkXDAAoJEGw4ysog2bOSA74QAJMiRJ4r8jyCw2z9+e0tVJ6n
+DuYDlxeznjcaVcryhbrdETNTMj4quTQeqtZQFeXZcU1uxa8A27pQjmpWIibha7BT
+jA2hjmdzvy2bQMuNRwdJHEk560XchS+auAgqGDj8WhIuyc7v1cfolwSqs4XejvL7
+mcqst+4TA5H8V03eg9UqU2kOx1BN/zyMrWxH7SRIuSdNUtXVXhmnr/2jIh3jXNOD
+YkWh1wqoTCcaL0B5GeigxdMFyOkQY29JMzIOUcZrzgef9tKSo1a6OFWOfNbs/TGi
+PJSVG79D5ndVIlbQ/YOvjpw8J+23Ro4vsbcBi2I6zpThbX9qIinm4EtRypV61XNs
+1kK4yKVoq3ES1vk0UoIi5yVHBjZWCKQ3YQWLjKfTPSyjOilpabn8dGXZ+UoiL6Eh
+ygy+53e2RfFNvuh6F5usoNNDD4C2pC1JgfF//QcKm4D8qtWTtBcgWMPzyV87Dokn
+Z/wVG/tpPGTmqxBzW0MbZ4+5I9L1VpcHT9KLQQKVQ1a5pLrUX5mSCLHjT4dYdgyl
+CEk3z03sbSrrq/wfxNc25G0xxGwYHltrEHSBhAymnfDEgy/gwFlxzSfUxG4qXj2l
+v8JyVkLIpC85PP7n3z4fKfmRR/9qd/wQ41C6LXMnwJBmgteD8JOFJOtW2gD2iy2h
+OSgG8MaYNCQkzEPDBcEZ
+=0m1H
 -----END PGP SIGNATURE-----
 
---mz5eWKkhz39mMVQV--
+--Bk6L21jbBNK7V1Rv--
