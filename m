@@ -1,37 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cgzSs-0001xy-Fw
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:54:13 -0500
+	(envelope-from <armbru@redhat.com>) id 1cgzSy-00023Q-Hp
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:54:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cgzSq-0000pq-RB
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:54:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45094)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cgzSq-0000p5-M4
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:54:08 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BB1F183F38
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 19:54:08 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
-	[10.36.116.55])
-	by int-mx13.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v1NJs7IH014480
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=NO)
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 14:54:08 -0500
+	(envelope-from <armbru@redhat.com>) id 1cgzSx-0000wS-EK
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:54:16 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 23 Feb 2017 20:53:55 +0100
-Message-Id: <1487879642-16139-18-git-send-email-armbru@redhat.com>
+Date: Thu, 23 Feb 2017 20:53:58 +0100
+Message-Id: <1487879642-16139-21-git-send-email-armbru@redhat.com>
 In-Reply-To: <1487879642-16139-1-git-send-email-armbru@redhat.com>
 References: <1487879642-16139-1-git-send-email-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 17/24] util/cutils: Drop
- QEMU_STRTOSZ_DEFSUFFIX_* macros
+Subject: [Qemu-devel] [PULL 20/24] qemu-img: Wrap cvtnum() around
+ qemu_strtosz()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,80 +21,149 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-Writing QEMU_STRTOSZ_DEFSUFFIX_* instead of '*' gains nothing.  Get
-rid of these eyesores.
-
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <1487708048-2131-18-git-send-email-armbru@redhat.com>
+Message-Id: <1487708048-2131-21-git-send-email-armbru@redhat.com>
 ---
- util/cutils.c | 28 ++++++++++------------------
- 1 file changed, 10 insertions(+), 18 deletions(-)
+ qemu-img.c | 58 +++++++++++++++++++++++++++++++---------------------------
+ 1 file changed, 31 insertions(+), 27 deletions(-)
 
-diff --git a/util/cutils.c b/util/cutils.c
-index 97ec130..0ac8019 100644
---- a/util/cutils.c
-+++ b/util/cutils.c
-@@ -178,30 +178,22 @@ int fcntl_setfl(int fd, int flag)
+diff --git a/qemu-img.c b/qemu-img.c
+index f1c641c..4062917 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -368,6 +368,19 @@ static int add_old_style_options(const char *fmt, QemuOpts *opts,
+     return 0;
  }
- #endif
-=20
--#define QEMU_STRTOSZ_DEFSUFFIX_EB 'E'
--#define QEMU_STRTOSZ_DEFSUFFIX_PB 'P'
--#define QEMU_STRTOSZ_DEFSUFFIX_TB 'T'
--#define QEMU_STRTOSZ_DEFSUFFIX_GB 'G'
--#define QEMU_STRTOSZ_DEFSUFFIX_MB 'M'
--#define QEMU_STRTOSZ_DEFSUFFIX_KB 'K'
--#define QEMU_STRTOSZ_DEFSUFFIX_B 'B'
--
- static int64_t suffix_mul(char suffix, int64_t unit)
+ 
++static int64_t cvtnum(const char *s)
++{
++    char *end;
++    int64_t ret;
++
++    ret = qemu_strtosz(s, &end);
++    if (*end != '\0') {
++        /* Detritus at the end of the string */
++        return -EINVAL;
++    }
++    return ret;
++}
++
+ static int img_create(int argc, char **argv)
  {
-     switch (qemu_toupper(suffix)) {
--    case QEMU_STRTOSZ_DEFSUFFIX_B:
-+    case 'B':
+     int c;
+@@ -461,9 +474,9 @@ static int img_create(int argc, char **argv)
+     /* Get image size, if specified */
+     if (optind < argc) {
+         int64_t sval;
+-        char *end;
+-        sval = qemu_strtosz(argv[optind++], &end);
+-        if (sval < 0 || *end) {
++
++        sval = cvtnum(argv[optind++]);
++        if (sval < 0) {
+             if (sval == -ERANGE) {
+                 error_report("Image size must be less than 8 EiB!");
+             } else {
+@@ -1863,9 +1876,9 @@ static int img_convert(int argc, char **argv)
+         case 'S':
+         {
+             int64_t sval;
+-            char *end;
+-            sval = qemu_strtosz(optarg, &end);
+-            if (sval < 0 || *end) {
++
++            sval = cvtnum(optarg);
++            if (sval < 0) {
+                 error_report("Invalid minimum zero buffer size for sparse output specified");
+                 ret = -1;
+                 goto fail_getopt;
+@@ -3650,10 +3663,8 @@ static int img_bench(int argc, char **argv)
+             break;
+         case 'o':
+         {
+-            char *end;
+-            errno = 0;
+-            offset = qemu_strtosz(optarg, &end);
+-            if (offset < 0|| *end) {
++            offset = cvtnum(optarg);
++            if (offset < 0) {
+                 error_report("Invalid offset specified");
+                 return 1;
+             }
+@@ -3666,10 +3677,9 @@ static int img_bench(int argc, char **argv)
+         case 's':
+         {
+             int64_t sval;
+-            char *end;
+ 
+-            sval = qemu_strtosz(optarg, &end);
+-            if (sval < 0 || sval > INT_MAX || *end) {
++            sval = cvtnum(optarg);
++            if (sval < 0 || sval > INT_MAX) {
+                 error_report("Invalid buffer size specified");
+                 return 1;
+             }
+@@ -3680,10 +3690,9 @@ static int img_bench(int argc, char **argv)
+         case 'S':
+         {
+             int64_t sval;
+-            char *end;
+ 
+-            sval = qemu_strtosz(optarg, &end);
+-            if (sval < 0 || sval > INT_MAX || *end) {
++            sval = cvtnum(optarg);
++            if (sval < 0 || sval > INT_MAX) {
+                 error_report("Invalid step size specified");
+                 return 1;
+             }
+@@ -3842,12 +3851,11 @@ static int img_dd_bs(const char *arg,
+                      struct DdIo *in, struct DdIo *out,
+                      struct DdInfo *dd)
+ {
+-    char *end;
+     int64_t res;
+ 
+-    res = qemu_strtosz(arg, &end);
++    res = cvtnum(arg);
+ 
+-    if (res <= 0 || res > INT_MAX || *end) {
++    if (res <= 0 || res > INT_MAX) {
+         error_report("invalid number: '%s'", arg);
          return 1;
--    case QEMU_STRTOSZ_DEFSUFFIX_KB:
-+    case 'K':
-         return unit;
--    case QEMU_STRTOSZ_DEFSUFFIX_MB:
-+    case 'M':
-         return unit * unit;
--    case QEMU_STRTOSZ_DEFSUFFIX_GB:
-+    case 'G':
-         return unit * unit * unit;
--    case QEMU_STRTOSZ_DEFSUFFIX_TB:
-+    case 'T':
-         return unit * unit * unit * unit;
--    case QEMU_STRTOSZ_DEFSUFFIX_PB:
-+    case 'P':
-         return unit * unit * unit * unit * unit;
--    case QEMU_STRTOSZ_DEFSUFFIX_EB:
-+    case 'E':
-         return unit * unit * unit * unit * unit * unit;
      }
-     return -1;
-@@ -258,17 +250,17 @@ fail:
-=20
- int64_t qemu_strtosz(const char *nptr, char **end)
+@@ -3860,11 +3868,9 @@ static int img_dd_count(const char *arg,
+                         struct DdIo *in, struct DdIo *out,
+                         struct DdInfo *dd)
  {
--    return do_strtosz(nptr, end, QEMU_STRTOSZ_DEFSUFFIX_B, 1024);
-+    return do_strtosz(nptr, end, 'B', 1024);
- }
-=20
- int64_t qemu_strtosz_MiB(const char *nptr, char **end)
+-    char *end;
++    dd->count = cvtnum(arg);
+ 
+-    dd->count = qemu_strtosz(arg, &end);
+-
+-    if (dd->count < 0 || *end) {
++    if (dd->count < 0) {
+         error_report("invalid number: '%s'", arg);
+         return 1;
+     }
+@@ -3894,11 +3900,9 @@ static int img_dd_skip(const char *arg,
+                        struct DdIo *in, struct DdIo *out,
+                        struct DdInfo *dd)
  {
--    return do_strtosz(nptr, end, QEMU_STRTOSZ_DEFSUFFIX_MB, 1024);
-+    return do_strtosz(nptr, end, 'M', 1024);
- }
-=20
- int64_t qemu_strtosz_metric(const char *nptr, char **end)
- {
--    return do_strtosz(nptr, end, QEMU_STRTOSZ_DEFSUFFIX_B, 1000);
-+    return do_strtosz(nptr, end, 'B', 1000);
- }
-=20
- /**
---=20
+-    char *end;
++    in->offset = cvtnum(arg);
+ 
+-    in->offset = qemu_strtosz(arg, &end);
+-
+-    if (in->offset < 0 || *end) {
++    if (in->offset < 0) {
+         error_report("invalid number: '%s'", arg);
+         return 1;
+     }
+-- 
 2.7.4
