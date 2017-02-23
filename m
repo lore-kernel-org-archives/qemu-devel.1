@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54040)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cgpje-0006vq-1Z
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 04:30:51 -0500
+	(envelope-from <clg@kaod.org>) id 1cgpmv-0000is-D0
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 04:34:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cgpjZ-0006tk-G7
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 04:30:50 -0500
-Resent-Message-Id: <E1cgpjZ-0006tk-G7@eggs.gnu.org>
-In-Reply-To: <20170223091845.18523-1-famz@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148784211287.156.16038060950231812105@0e2666bad730>
+	(envelope-from <clg@kaod.org>) id 1cgpmq-0007x9-Ci
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 04:34:13 -0500
+Received: from 5.mo2.mail-out.ovh.net ([87.98.181.248]:46104)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cgpmq-0007vw-6I
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 04:34:08 -0500
+Received: from player796.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id E2E635A215
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 10:34:05 +0100 (CET)
+References: <1487361200-29966-1-git-send-email-mst@redhat.com>
+	<1487361200-29966-13-git-send-email-mst@redhat.com>
+	<1487681835.2694.76.camel@redhat.com>
+	<c0d16fc6-e149-861d-8f82-5a96619606bd@redhat.com>
+	<83a2d0c9-23a4-32b1-ffe7-b33bbe9ea25d@redhat.com>
+	<726a3292-9e27-6748-9669-a7c21cbf3b6e@redhat.com>
+	<20170222173225.4f48dd99@t450s.home>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <76987077-886a-5c6d-1291-c1734a5bc3b0@kaod.org>
+Date: Thu, 23 Feb 2017 10:33:43 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 23 Feb 2017 01:28:33 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] block: Add VFIO based driver for
- NVMe device
+In-Reply-To: <20170222173225.4f48dd99@t450s.home>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 12/23] virtio: use VRingMemoryRegionCaches
+ for avail and used rings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,71 +36,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com, krister@redhat.com
+To: Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Laszlo Ersek <lersek@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzAyMjMwOTE4NDUuMTg1MjMtMS1mYW16QHJlZGhhdC5jb20KVHlwZTogc2VyaWVzClN1YmplY3Q6
-IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC82XSBibG9jazogQWRkIFZGSU8gYmFzZWQgZHJpdmVy
-IGZvciBOVk1lIGRldmljZQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoK
-QkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkK
-ZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
-bmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRz
-PSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29t
-bWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1u
-IDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFp
-bCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZh
-aWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFp
-bGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2
-NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJv
-amVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAxNzAyMjMwOTE4NDUuMTg1
-MjMtMS1mYW16QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE3MDIyMzA5MTg0NS4xODUyMy0xLWZh
-bXpAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjJhZTA4NmEgcWVt
-dS1pbWc6IGRtYSBtYXAgYnVmZmVycwowZDZiZWQwIGJsb2NrL252bWU6IEltcGxlbWVudCAuYmRy
-dl9kbWFfbWFwIGFuZCAuYmRydl9kbWFfdW5tYXAKZGRjMjA0NCBibG9jazogSW50cm9kdWNlIGJk
-cnZfZG1hX21hcCBhbmQgYmRydl9kbWFfdW5tYXAKZmVjNGE1ZSBibG9jazogQWRkIFZGSU8gYmFz
-ZWQgTlZNZSBkcml2ZXIKNTc1MTdhOCBzdHViczogQWRkIHN0dWJzIGZvciByYW0gYmxvY2sgbm90
-aWZpZXIgQVBJCjk4YjBlNWYgbnZtZTogTW92ZSBOVk1lIGRlZmluaXRpb25zIHRvIGEgc2VwYXJh
-dGUgaGVhZGVyCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzY6IG52bWU6
-IE1vdmUgTlZNZSBkZWZpbml0aW9ucyB0byBhIHNlcGFyYXRlIGhlYWRlci4uLgpDaGVja2luZyBQ
-QVRDSCAyLzY6IHN0dWJzOiBBZGQgc3R1YnMgZm9yIHJhbSBibG9jayBub3RpZmllciBBUEkuLi4K
-Q2hlY2tpbmcgUEFUQ0ggMy82OiBibG9jazogQWRkIFZGSU8gYmFzZWQgTlZNZSBkcml2ZXIuLi4K
-V0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE4NzogRklMRTogYmxvY2svbnZtZS12
-ZmlvLmM6MTMxOgorICAgIGlmIChpb2N0bChzLT5kZXZpY2UsIFZGSU9fREVWSUNFX0dFVF9SRUdJ
-T05fSU5GTywgJnMtPmJhcl9yZWdpb25faW5mb1tpbmRleF0pKSB7CgpXQVJOSU5HOiBsaW5lIG92
-ZXIgODAgY2hhcmFjdGVycwojMjY1OiBGSUxFOiBibG9jay9udm1lLXZmaW8uYzoyMDk6CitzdGF0
-aWMgaW50IG52bWVfdmZpb19wY2lfcmVhZF9jb25maWcoTlZNZVZGSU9TdGF0ZSAqcywgdm9pZCAq
-YnVmLCBpbnQgc2l6ZSwgaW50IG9mcykKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJz
-CiMyNjc6IEZJTEU6IGJsb2NrL252bWUtdmZpby5jOjIxMToKKyAgICBpZiAocHJlYWQocy0+ZGV2
-aWNlLCBidWYsIHNpemUsIHMtPmNvbmZpZ19yZWdpb25faW5mby5vZmZzZXQgKyBvZnMpID09IHNp
-emUpIHsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyNzM6IEZJTEU6IGJsb2Nr
-L252bWUtdmZpby5jOjIxNzoKK3N0YXRpYyBpbnQgbnZtZV92ZmlvX3BjaV93cml0ZV9jb25maWco
-TlZNZVZGSU9TdGF0ZSAqcywgdm9pZCAqYnVmLCBpbnQgc2l6ZSwgaW50IG9mcykKCldBUk5JTkc6
-IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0MDk6IEZJTEU6IGJsb2NrL252bWUtdmZpby5jOjM1
-MzoKK3N0YXRpYyB2b2lkIG52bWVfdmZpb19yYW1fYmxvY2tfYWRkZWQoUkFNQmxvY2tOb3RpZmll
-ciAqbiwgdm9pZCAqaG9zdCwgc2l6ZV90IHNpemUpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
-cmFjdGVycwojNDE2OiBGSUxFOiBibG9jay9udm1lLXZmaW8uYzozNjA6CitzdGF0aWMgdm9pZCBu
-dm1lX3ZmaW9fcmFtX2Jsb2NrX3JlbW92ZWQoUkFNQmxvY2tOb3RpZmllciAqbiwgdm9pZCAqaG9z
-dCwgc2l6ZV90IHNpemUpCgpFUlJPUjogVXNlIG9mIHZvbGF0aWxlIGlzIHVzdWFsbHkgd3Jvbmc6
-IHNlZSBEb2N1bWVudGF0aW9uL3ZvbGF0aWxlLWNvbnNpZGVyZWQtaGFybWZ1bC50eHQKIzc5Nzog
-RklMRTogYmxvY2svbnZtZS5jOjM0OgorICAgIHZvbGF0aWxlIHVpbnQzMl90ICpkb29yYmVsbDsK
-CkVSUk9SOiBVc2Ugb2Ygdm9sYXRpbGUgaXMgdXN1YWxseSB3cm9uZzogc2VlIERvY3VtZW50YXRp
-b24vdm9sYXRpbGUtY29uc2lkZXJlZC1oYXJtZnVsLnR4dAojODIzOiBGSUxFOiBibG9jay9udm1l
-LmM6NjA6Cit0eXBlZGVmIHZvbGF0aWxlIHN0cnVjdCB7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAg
-Y2hhcmFjdGVycwojMTMwMjogRklMRTogYmxvY2svbnZtZS5jOjUzOToKKyAgICAgICAgICAgIGVy
-cm9yX3NldGcoZXJycCwgIlRpbWVvdXQgd2hpbGUgd2FpdGluZyBmb3IgZGV2aWNlIHRvIHJlc2V0
-ICglbGQgbXMpIiwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMzMxOiBGSUxF
-OiBibG9jay9udm1lLmM6NTY4OgorICAgICAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiVGltZW91
-dCB3aGlsZSB3YWl0aW5nIGZvciBkZXZpY2UgdG8gc3RhcnQgKCVsZCBtcykiLAoKdG90YWw6IDIg
-ZXJyb3JzLCA4IHdhcm5pbmdzLCAxODAwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
-eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
-ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDQvNjogYmxvY2s6IEludHJvZHVj
-ZSBiZHJ2X2RtYV9tYXAgYW5kIGJkcnZfZG1hX3VubWFwLi4uCkNoZWNraW5nIFBBVENIIDUvNjog
-YmxvY2svbnZtZTogSW1wbGVtZW50IC5iZHJ2X2RtYV9tYXAgYW5kIC5iZHJ2X2RtYV91bm1hcC4u
-LgpDaGVja2luZyBQQVRDSCA2LzY6IHFlbXUtaW1nOiBkbWEgbWFwIGJ1ZmZlcnMuLi4KPT09IE9V
-VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFp
-bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
-XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5v
-cmc=
+Hello,
+
+On 02/23/2017 01:32 AM, Alex Williamson wrote:
+> On Wed, 22 Feb 2017 10:03:56 +0100
+> Paolo Bonzini <pbonzini@redhat.com> wrote:
+> 
+>> On 21/02/2017 18:54, Laszlo Ersek wrote:
+>>> Actually, QEMU segfaults. From the dmesg:
+>>>
+>>> [Tue Feb 21 18:47:28 2017] CPU 0/KVM[8298]: segfault at 48 ip
+>>> 00007fcb5dd02105 sp 00007fcb49efc270 error 4 in
+>>> qemu-system-x86_64[7fcb5dae3000+905000]
+>>>
+>>> Complete backtrace below. (Thread 11 seems to be the one
+>>> segfaulting.)  
+>>
+>> Indeed.  It's the virtio-blk device that is segfaulting, please try
+>> this one liner (haven't reproduced it, but it seems obvious with the
+>> backtrace and some sleep).
+> 
+> I hit this as well, the patch below resolves it.
+
+I still have migration issues with this patch on ppc, which fails
+on the target guest with : 
+
+qemu-system-ppc64: VQ 0 size 0x80 < last_avail_idx 0xe1e - used_idx 0x0
+qemu-system-ppc64: Failed to load virtio-blk:virtio
+qemu-system-ppc64: error while loading state for instance 0x0 of device 'pci@800000020000000:01.0/virtio-blk'
+qemu-system-ppc64: load of migration failed: Operation not permitted
+
+Thanks,
+
+C. 
+
+> Tested-by: Alex Williamson <alex.williamson@redhat.com>
+>  
+>> commit c1aa478c7181c543606ca81404c59e126d66213d
+>> Author: Paolo Bonzini <pbonzini@redhat.com>
+>> Date:   Wed Feb 22 10:02:37 2017 +0100
+>>
+>>     virtio: check for vring setup in virtio_queue_empty
+>>     
+>>     If the vring has not been set up, there is nothing in the virtqueue.
+>>     virtio_queue_host_notifier_aio_poll calls virtio_queue_empty even in
+>>     this case; we have to filter it out just like virtio_queue_notify_aio_vq.
+>>     
+>>     Reported-by: Gerd Hoffmann <kraxel@redhat.com>
+>>     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>>
+>> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+>> index 23483c7..e487e36 100644
+>> --- a/hw/virtio/virtio.c
+>> +++ b/hw/virtio/virtio.c
+>> @@ -2291,7 +2291,7 @@ static bool virtio_queue_host_notifier_aio_poll(void *opaque)
+>>      VirtQueue *vq = container_of(n, VirtQueue, host_notifier);
+>>      bool progress;
+>>  
+>> -    if (virtio_queue_empty(vq)) {
+>> +    if (!vq->vring.desc || virtio_queue_empty(vq)) {
+>>          return false;
+>>      }
+>>  
+>>
+> 
+> 
