@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vijay.kilari@gmail.com>) id 1cgs9k-00081z-Ap
+	(envelope-from <vijay.kilari@gmail.com>) id 1cgs9j-0007ow-LI
 	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 07:06:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vijay.kilari@gmail.com>) id 1cgrwC-0004bz-8Y
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 06:51:57 -0500
+	(envelope-from <vijay.kilari@gmail.com>) id 1cgrwH-0004cq-34
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 06:52:04 -0500
 From: vijay.kilari@gmail.com
-Date: Thu, 23 Feb 2017 17:21:12 +0530
-Message-Id: <1487850673-26455-5-git-send-email-vijay.kilari@gmail.com>
+Date: Thu, 23 Feb 2017 17:21:13 +0530
+Message-Id: <1487850673-26455-6-git-send-email-vijay.kilari@gmail.com>
 In-Reply-To: <1487850673-26455-1-git-send-email-vijay.kilari@gmail.com>
 References: <1487850673-26455-1-git-send-email-vijay.kilari@gmail.com>
-Subject: [Qemu-devel] [PATCH v9 4/5] target-arm: Add GICv3CPUState in
- CPUARMState struct
+Subject: [Qemu-devel] [PATCH v9 5/5] hw/intc/arm_gicv3_kvm: Reset GICv3 cpu
+ interface registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,77 +25,103 @@ Cc: p.fedin@samsung.com, marc.zyngier@arm.com, qemu-devel@nongnu.org, Vijaya Kum
 
 From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 
-Add gicv3state void pointer to CPUARMState struct
-to store GICv3CPUState.
+Reset CPU interface registers of GICv3 when CPU is reset.
+For this, ARMCPRegInfo struct is registered with one ICC
+register whose resetfn is called when cpu is reset.
 
-In case of usecase like CPU reset, we need to reset
-GICv3CPUState of the CPU. In such scenario, this pointer
-becomes handy.
+All the ICC registers are reset under one single register
+reset function instead of calling resetfn for each ICC
+register.
 
 Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/intc/arm_gicv3_common.c | 2 ++
- hw/intc/arm_gicv3_cpuif.c  | 8 ++++++++
- hw/intc/gicv3_internal.h   | 2 ++
- target/arm/cpu.h           | 2 ++
- 4 files changed, 14 insertions(+)
+ hw/intc/arm_gicv3_kvm.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 60 insertions(+)
 
-diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
-index 5b0e456..c6493d6 100644
---- a/hw/intc/arm_gicv3_common.c
-+++ b/hw/intc/arm_gicv3_common.c
-@@ -252,6 +252,8 @@ static void arm_gicv3_common_realize(DeviceState *dev, Error **errp)
- 
-         s->cpu[i].cpu = cpu;
-         s->cpu[i].gic = s;
-+        /* Store GICv3CPUState in CPUARMState gicv3state pointer */
-+        gicv3_set_gicv3state(cpu, &s->cpu[i]);
- 
-         /* Pre-construct the GICR_TYPER:
-          * For our implementation:
-diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
-index c25ee03..7849783 100644
---- a/hw/intc/arm_gicv3_cpuif.c
-+++ b/hw/intc/arm_gicv3_cpuif.c
-@@ -18,6 +18,14 @@
- #include "gicv3_internal.h"
- #include "cpu.h"
- 
-+void gicv3_set_gicv3state(CPUState *cpu, GICv3CPUState *s)
-+{
-+    ARMCPU *arm_cpu = ARM_CPU(cpu);
-+    CPUARMState *env = &arm_cpu->env;
-+
-+    env->gicv3state = (void *)s;
-+};
-+
- static GICv3CPUState *icc_cs_from_env(CPUARMState *env)
- {
-     /* Given the CPU, find the right GICv3CPUState struct.
-diff --git a/hw/intc/gicv3_internal.h b/hw/intc/gicv3_internal.h
-index 457118e..05303a5 100644
---- a/hw/intc/gicv3_internal.h
-+++ b/hw/intc/gicv3_internal.h
-@@ -408,4 +408,6 @@ static inline void gicv3_cache_all_target_cpustates(GICv3State *s)
+diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+index cda1af4..81f0403 100644
+--- a/hw/intc/arm_gicv3_kvm.c
++++ b/hw/intc/arm_gicv3_kvm.c
+@@ -604,6 +604,32 @@ static void kvm_arm_gicv3_get(GICv3State *s)
      }
  }
  
-+void gicv3_set_gicv3state(CPUState *cpu, GICv3CPUState *s);
++static void arm_gicv3_icc_reset(CPUARMState *env, const ARMCPRegInfo *ri)
++{
++    ARMCPU *cpu;
++    GICv3State *s;
++    GICv3CPUState *c;
 +
- #endif /* QEMU_ARM_GICV3_INTERNAL_H */
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 0956a54..d2eb7bf 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -517,6 +517,8 @@ typedef struct CPUARMState {
++    c = (GICv3CPUState *)env->gicv3state;
++    s = c->gic;
++    cpu = ARM_CPU(c->cpu);
++
++    /* Initialize to actual HW supported configuration */
++    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS,
++                      KVM_VGIC_ATTR(ICC_CTLR_EL1, cpu->mp_affinity),
++                      &c->icc_ctlr_el1[GICV3_NS], false);
++
++    c->icc_ctlr_el1[GICV3_S] = c->icc_ctlr_el1[GICV3_NS];
++    c->icc_pmr_el1 = 0;
++    c->icc_bpr[GICV3_G0] = GIC_MIN_BPR;
++    c->icc_bpr[GICV3_G1] = GIC_MIN_BPR;
++    c->icc_bpr[GICV3_G1NS] = GIC_MIN_BPR;
++
++    c->icc_sre_el1 = 0x7;
++    memset(c->icc_apr, 0, sizeof(c->icc_apr));
++    memset(c->icc_igrpen, 0, sizeof(c->icc_igrpen));
++}
++
+ static void kvm_arm_gicv3_reset(DeviceState *dev)
+ {
+     GICv3State *s = ARM_GICV3_COMMON(dev);
+@@ -621,6 +647,34 @@ static void kvm_arm_gicv3_reset(DeviceState *dev)
+     kvm_arm_gicv3_put(s);
+ }
  
-     void *nvic;
-     const struct arm_boot_info *boot_info;
-+    /* Store GICv3CPUState to access from this struct */
-+    void *gicv3state;
- } CPUARMState;
++/*
++ * CPU interface registers of GIC needs to be reset on CPU reset.
++ * For the calling arm_gicv3_icc_reset() on CPU reset, we register
++ * below ARMCPRegInfo. As we reset the whole cpu interface under single
++ * register reset, we define only one register of CPU interface instead
++ * of defining all the registers.
++ */
++static const ARMCPRegInfo gicv3_cpuif_reginfo[] = {
++    { .name = "ICC_CTLR_EL1", .state = ARM_CP_STATE_BOTH,
++      .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 12, .opc2 = 4,
++      /*
++       * If ARM_CP_NOP is used, resetfn is not called,
++       * So ARM_CP_NO_RAW is appropriate type.
++       */
++      .type = ARM_CP_NO_RAW,
++      .access = PL1_RW,
++      .readfn = arm_cp_read_zero,
++      .writefn = arm_cp_write_ignore,
++      /*
++       * We hang the whole cpu interface reset routine off here
++       * rather than parcelling it out into one little function
++       * per register
++       */
++      .resetfn = arm_gicv3_icc_reset,
++    },
++    REGINFO_SENTINEL
++};
++
+ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
+ {
+     GICv3State *s = KVM_ARM_GICV3(dev);
+@@ -644,6 +698,12 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
  
- /**
+     gicv3_init_irqs_and_mmio(s, kvm_arm_gicv3_set_irq, NULL);
+ 
++    for (i = 0; i < s->num_cpu; i++) {
++        ARMCPU *cpu = ARM_CPU(qemu_get_cpu(i));
++
++        define_arm_cp_regs(cpu, gicv3_cpuif_reginfo);
++    }
++
+     /* Try to create the device via the device control API */
+     s->dev_fd = kvm_create_device(kvm_state, KVM_DEV_TYPE_ARM_VGIC_V3, false);
+     if (s->dev_fd < 0) {
 -- 
 1.9.1
