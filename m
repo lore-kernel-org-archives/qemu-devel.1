@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cgzvS-0007qm-IN
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 15:23:43 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cgzyJ-0002AU-He
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 15:26:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cgzvP-0000nV-FA
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 15:23:42 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cgzyG-0001ML-EW
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 15:26:39 -0500
 Sender: Richard Henderson <rth7680@gmail.com>
 References: <1487879800-12352-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<1487879800-12352-3-git-send-email-nikunj@linux.vnet.ibm.com>
+	<1487879800-12352-7-git-send-email-nikunj@linux.vnet.ibm.com>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <7ceb696b-d4b3-86a6-a1db-47e46de7dcb4@twiddle.net>
-Date: Fri, 24 Feb 2017 07:23:31 +1100
+Message-ID: <755c77c5-0930-b5ee-0b3b-1e0608301c8d@twiddle.net>
+Date: Fri, 24 Feb 2017 07:26:30 +1100
 MIME-Version: 1.0
-In-Reply-To: <1487879800-12352-3-git-send-email-nikunj@linux.vnet.ibm.com>
+In-Reply-To: <1487879800-12352-7-git-send-email-nikunj@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 02/15] target/ppc: update ov flag from
- remaining paths
+Subject: Re: [Qemu-devel] [PATCH v4 06/15] target/ppc: remove xer split-out
+ flags(so, ov, ca)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +29,18 @@ To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, david@gi
 Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
 On 02/24/2017 06:56 AM, Nikunj A Dadhania wrote:
-> @@ -320,22 +320,24 @@ target_ulong helper_divo(CPUPPCState *env, target_ulong arg1,
->                           target_ulong arg2)
->  {
->      uint64_t tmp = (uint64_t)arg1 << 32 | env->spr[SPR_MQ];
-> +    int ov;
+> Now get rid all the split out variables so, ca, ov. After this patch,
+> all the bits are stored in CPUPPCState::xer at appropriate places.
 >
->      if (((int32_t)tmp == INT32_MIN && (int32_t)arg2 == (int32_t)-1) ||
->          (int32_t)arg2 == 0) {
-> -        env->so = env->ov = 1;
-> +        ov = 1;
->          env->spr[SPR_MQ] = 0;
->          return INT32_MIN;
->      } else {
->          env->spr[SPR_MQ] = tmp % arg2;
->          tmp /= (int32_t)arg2;
->          if ((int32_t)tmp != tmp) {
-> -            env->so = env->ov = 1;
-> +            ov = 1;
->          } else {
-> -            env->ov = 0;
-> +            ov = 0;
->          }
->          return tmp;
->      }
-> +    helper_update_ov_legacy(env, ov);
->  }
->
+> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+> ---
+>  target/ppc/cpu.c        |   8 +---
+>  target/ppc/cpu.h        |  26 ++++++------
+>  target/ppc/int_helper.c |  12 +++---
+>  target/ppc/translate.c  | 106 +++++++++++++++++++++++++-----------------------
+>  4 files changed, 78 insertions(+), 74 deletions(-)
 
-You're attempting to run the helper after "return".
+I do not think this is a good direction to take this.
 
 
 r~
