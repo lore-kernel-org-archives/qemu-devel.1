@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cgkxn-0007dZ-BF
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 23:25:09 -0500
+	(envelope-from <bounces@canonical.com>) id 1cgkyO-00087n-Iv
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 23:25:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cgkxl-0000bO-F9
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 23:25:07 -0500
-Message-ID: <1487823894.23895.6.camel@gmail.com>
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Thu, 23 Feb 2017 15:24:54 +1100
-In-Reply-To: <20170223040856.GM12577@umbus.fritz.box>
-References: <1487563478-22265-1-git-send-email-sjitindarsingh@gmail.com>
-	<1487563478-22265-8-git-send-email-sjitindarsingh@gmail.com>
-	<20170223040856.GM12577@umbus.fritz.box>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH V3 07/10] target/ppc/POWER9: Add
- POWER9 mmu fault handler
+	(envelope-from <bounces@canonical.com>) id 1cgkyL-0000ir-CW
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 23:25:44 -0500
+Received: from indium.canonical.com ([91.189.90.7]:48578)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cgkyL-0000ig-0I
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 23:25:41 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cgkyI-0001OC-LA
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 04:25:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9CB202E80C6
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 04:25:38 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 23 Feb 2017 04:17:23 -0000
+From: Launchpad Bug Tracker <1652333@bugs.launchpad.net>
+Reply-To: Bug 1652333 <1652333@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20161223152652.14283.5770.malonedeb@wampee.canonical.com>
+Message-Id: <20170223041724.20146.1407.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1652333] Re: TCG mode fails to boot Linux kernel
+ with qemu 2.6.0 and libvirt 2.0.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,259 +37,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, agraf@suse.de, qemu-devel@nongnu.org, sam.bobroff@au1.ibm.com
+To: qemu-devel@nongnu.org
 
-On Thu, 2017-02-23 at 15:08 +1100, David Gibson wrote:
-> On Mon, Feb 20, 2017 at 03:04:35PM +1100, Suraj Jitindar Singh wrote:
-> > 
-> > Add a new mmu fault handler for the POWER9 cpu and add it as the
-> > handler
-> > for the POWER9 cpu definition.
-> > 
-> > This handler checks if the guest is radix or hash based on the
-> > value in the
-> > partition table entry and calls the correct fault handler
-> > accordingly.
-> > 
-> > The hash fault handling code has also been updated to check if the
-> > partition is using segment tables.
-> > 
-> > Currently only legacy hash (no segment tables) is supported.
-> > 
-> > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> > 
-> > ---
-> > 
-> > V2->V3:
-> > - error_report on attempt to use segment tables instead of just
-> > LOG()
-> > - Rename mmu.h -> mmu-book3s-v3.h
-> > ---
-> >  target/ppc/mmu-book3s-v3.h  | 50
-> > +++++++++++++++++++++++++++++++++++++++++++++
-> >  target/ppc/mmu-hash64.c     |  8 ++++++++
-> >  target/ppc/mmu_helper.c     | 40
-> > ++++++++++++++++++++++++++++++++++++
-> >  target/ppc/translate_init.c |  3 ++-
-> >  4 files changed, 100 insertions(+), 1 deletion(-)
-> >  create mode 100644 target/ppc/mmu-book3s-v3.h
-> > 
-> > diff --git a/target/ppc/mmu-book3s-v3.h b/target/ppc/mmu-book3s-
-> > v3.h
-> > new file mode 100644
-> > index 0000000..9375921
-> > --- /dev/null
-> > +++ b/target/ppc/mmu-book3s-v3.h
-> > @@ -0,0 +1,50 @@
-> > +/*
-> > + *  PowerPC emulation generic mmu definitions for qemu.
-> > + *
-> > + *  Copyright (c) 2017 Suraj Jitindar Singh, IBM Corporation
-> > + *
-> > + * This library is free software; you can redistribute it and/or
-> > + * modify it under the terms of the GNU Lesser General Public
-> > + * License as published by the Free Software Foundation; either
-> > + * version 2 of the License, or (at your option) any later
-> > version.
-> > + *
-> > + * This library is distributed in the hope that it will be useful,
-> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> > GNU
-> > + * Lesser General Public License for more details.
-> > + *
-> > + * You should have received a copy of the GNU Lesser General
-> > Public
-> > + * License along with this library; if not, see <http://www.gnu.or
-> > g/licenses/>.
-> > + */
-> > +
-> > +#ifndef MMU_H
-> > +#define MMU_H
-> > +
-> > +#ifndef CONFIG_USER_ONLY
-> > +
-> > +/* Partition Table Entry Fields */
-> > +#define PATBE1_GR 0x8000000000000000
-> > +
-> > +#ifdef TARGET_PPC64
-> > +
-> > +static inline bool ppc64_use_proc_tbl(PowerPCCPU *cpu)
-> > +{
-> > +    return !!(cpu->env.spr[SPR_LPCR] & LPCR_UPRT);
-> > +}
-> > +
-> > +static inline bool ppc64_radix_guest(PowerPCCPU *cpu)
-> > +{
-> > +    PPCVirtualHypervisorClass *vhc =
-> > +        PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
-> > +
-> > +    return !!(vhc->get_patbe(cpu->vhyp) & PATBE1_GR);
-> > +}
-> > +
-> > +int ppc64_v3_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int
-> > rwx,
-> > +                              int mmu_idx);
-> > +
-> > +#endif /* TARGET_PPC64 */
-> > +
-> > +#endif /* CONFIG_USER_ONLY */
-> > +
-> > +#endif /* MMU_H */
-> > diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-> > index 3e17a9f..a581b50 100644
-> > --- a/target/ppc/mmu-hash64.c
-> > +++ b/target/ppc/mmu-hash64.c
-> > @@ -27,6 +27,7 @@
-> >  #include "kvm_ppc.h"
-> >  #include "mmu-hash64.h"
-> >  #include "exec/log.h"
-> > +#include "mmu-book3s-v3.h"
-> >  
-> >  //#define DEBUG_SLB
-> >  
-> > @@ -767,6 +768,13 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU
-> > *cpu, vaddr eaddr,
-> >      /* 2. Translation is on, so look up the SLB */
-> >      slb = slb_lookup(cpu, eaddr);
-> >      if (!slb) {
-> > +        /* No entry found, check if in-memory segment tables are
-> > in use */
-> > +        if (ppc64_use_proc_tbl(cpu)) {
-> > +            /* TODO - Unsupported */
-> > +            error_report("Segment Table Support Unimplemented");
-> > +            abort();
-> > +        }
-> > +        /* Segment still not found, generate the appropriate
-> > interrupt */
-> >          if (rwx == 2) {
-> >              cs->exception_index = POWERPC_EXCP_ISEG;
-> >              env->error_code = 0;
-> > diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
-> > index 2911266..527123c 100644
-> > --- a/target/ppc/mmu_helper.c
-> > +++ b/target/ppc/mmu_helper.c
-> > @@ -28,6 +28,8 @@
-> >  #include "exec/cpu_ldst.h"
-> >  #include "exec/log.h"
-> >  #include "helper_regs.h"
-> > +#include "qemu/error-report.h"
-> > +#include "mmu-book3s-v3.h"
-> >  
-> >  //#define DEBUG_MMU
-> >  //#define DEBUG_BATS
-> > @@ -1280,6 +1282,17 @@ void dump_mmu(FILE *f, fprintf_function
-> > cpu_fprintf, CPUPPCState *env)
-> >      case POWERPC_MMU_2_07a:
-> >          dump_slb(f, cpu_fprintf, ppc_env_get_cpu(env));
-> >          break;
-> > +    case POWERPC_MMU_3_00:
-> > +        if (ppc64_radix_guest(ppc_env_get_cpu(env))) {
-> > +            /* TODO - Unsupported */
-> > +        } else {
-> > +            if (ppc64_use_proc_tbl(ppc_env_get_cpu(env))) {
-> > +                /* TODO - Unsupported */
-> > +            } else {
-> > +                dump_slb(f, cpu_fprintf, ppc_env_get_cpu(env));
-> > +                break;
-> > +            }
-> > +        }
-> >  #endif
-> >      default:
-> >          qemu_log_mask(LOG_UNIMP, "%s: unimplemented\n", __func__);
-> > @@ -1421,6 +1434,17 @@ hwaddr ppc_cpu_get_phys_page_debug(CPUState
-> > *cs, vaddr addr)
-> >      case POWERPC_MMU_2_07:
-> >      case POWERPC_MMU_2_07a:
-> >          return ppc_hash64_get_phys_page_debug(cpu, addr);
-> > +    case POWERPC_MMU_3_00:
-> > +        if (ppc64_radix_guest(ppc_env_get_cpu(env))) {
-> > +            /* TODO - Unsupported */
-> > +        } else {
-> > +            if (ppc64_use_proc_tbl(ppc_env_get_cpu(env))) {
-> > +                /* TODO - Unsupported */
-> > +            } else {
-> > +                return ppc_hash64_get_phys_page_debug(cpu, addr);
-> > +            }
-> I don't think you need the inner if in this case -
-> ppc_hash64_get_phys_page_debug() will be basically right for both
-> cases, except it will (eventually) need an internal check to consult
-> segment tables if they're there.
+[Expired for QEMU because there has been no activity for 60 days.]
 
-Good point
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-> 
-> One interesting wrinkle here is that this debug path is exactly a
-> case
-> where it could be useful to consult the segment tables if the OS
-> provides them, even if the actual hardware MMU doesn't use them.
+-- =
 
-Given a guest won't register one yet this isn't an issue. But would be
-nice for debugging when we do.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1652333
 
-Thats a job for the next rainy day...
+Title:
+  TCG mode fails to boot Linux kernel with qemu 2.6.0 and libvirt 2.0.0
 
-> 
-> > 
-> > +        }
-> > +        break;
-> >  #endif
-> >  
-> >      case POWERPC_MMU_32B:
-> > @@ -2907,3 +2931,19 @@ void tlb_fill(CPUState *cs, target_ulong
-> > addr, MMUAccessType access_type,
-> >                                 retaddr);
-> >      }
-> >  }
-> > +
-> > +/*****************************************************************
-> > *************/
-> > +
-> > +/* ISA v3.00 (POWER9) Generic MMU Helpers */
-> > +
-> > +int ppc64_v3_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int
-> > rwx,
-> > +                              int mmu_idx)
-> > +{
-> > +    if (ppc64_radix_guest(cpu)) { /* Guest uses radix */
-> > +        /* TODO - Unsupported */
-> > +        error_report("Guest Radix Support Unimplemented");
-> > +        abort();
-> > +    } else { /* Guest uses hash */
-> > +        return ppc_hash64_handle_mmu_fault(cpu, eaddr, rwx,
-> > mmu_idx);
-> > +    }
-> > +}
-> This can go into a new mmu-books-v3.c, small for now, but it can take
-> the radix stuff as well once it gets implemented.
-> 
+Status in QEMU:
+  Expired
 
-I was putting the radix stuff into mmu-radix64.c. That being said a v3
-helper file isn't a bad idea, I'll create and move this to mmu-books-
-v3.c.
+Bug description:
+  Trying to boot a Cirros (minimal Linux) VM with qemu 2.6.0 and libvirt
+  2.0.0 in TCG mode fails for me. The VM gets stuck in "Starting up ..."
+  and never moves on. The command line used to boot the VM was:
 
-> > 
-> > diff --git a/target/ppc/translate_init.c
-> > b/target/ppc/translate_init.c
-> > index 32c1619..7661c21 100644
-> > --- a/target/ppc/translate_init.c
-> > +++ b/target/ppc/translate_init.c
-> > @@ -32,6 +32,7 @@
-> >  #include "qapi/visitor.h"
-> >  #include "hw/qdev-properties.h"
-> >  #include "hw/ppc/ppc.h"
-> > +#include "mmu-book3s-v3.h"
-> >  
-> >  //#define PPC_DUMP_CPU
-> >  //#define PPC_DEBUG_SPR
-> > @@ -8898,7 +8899,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void
-> > *data)
-> >                      (1ull << MSR_LE);
-> >      pcc->mmu_model = POWERPC_MMU_3_00;
-> >  #if defined(CONFIG_SOFTMMU)
-> > -    pcc->handle_mmu_fault = ppc_hash64_handle_mmu_fault;
-> > +    pcc->handle_mmu_fault = ppc64_v3_handle_mmu_fault;
-> >      /* segment page size remain the same */
-> >      pcc->sps = &POWER7_POWER8_sps;
-> >  #endif
+  LC_ALL=3DC PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+  QEMU_AUDIO_DRV=3Dnone /usr/libexec/qemu-kvm -name
+  guest=3Dinstance-00000002,debug-threads=3Don -S -object
+  secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-1=
+-instance-00000002
+  /master-key.aes -machine pc-i440fx-rhel7.3.0,accel=3Dtcg,usb=3Doff -cpu
+  SandyBridge,+osxsave,+hypervisor,+xsaveopt -m 512 -realtime mlock=3Doff
+  -smp 1,sockets=3D1,cores=3D1,threads=3D1 -uuid ae38b0e1-b3ae-41ec-
+  8e50-c89669a2ec1c -smbios 'type=3D1,manufacturer=3DRed
+  Hat,product=3DOpenStack Compute,version=3D14.0.2-7.el7ost,serial=3Dedd3a6=
+7d-
+  6ce5-4c36-8f20-085d1097abb7,uuid=3Dae38b0e1-b3ae-41ec-
+  8e50-c89669a2ec1c,family=3DVirtual Machine' -no-user-config -nodefaults
+  -chardev
+  socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-1-instance-00=
+000002/monitor.sock,server,nowait
+  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc -n=
+o-
+  shutdown -boot strict=3Don -device piix3-usb-
+  uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive
+  file=3D/var/lib/nova/instances/ae38b0e1-b3ae-41ec-
+  8e50-c89669a2ec1c/disk,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-
+  disk0,cache=3Dnone -device virtio-blk-
+  pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Ddrive-virtio-disk0,id=3Dvir=
+tio-
+  disk0,bootindex=3D1 -netdev tap,fd=3D28,id=3Dhostnet0 -device virtio-net-
+  pci,netdev=3Dhostnet0,id=3Dnet0,mac=3Dfa:16:3e:c1:27:73,bus=3Dpci.0,addr=
+=3D0x3
+  -add-fd set=3D1,fd=3D31 -chardev
+  file,id=3Dcharserial0,path=3D/dev/fdset/1,append=3Don -device isa-
+  serial,chardev=3Dcharserial0,id=3Dserial0 -chardev pty,id=3Dcharserial1
+  -device isa-serial,chardev=3Dcharserial1,id=3Dserial1 -device usb-
+  tablet,id=3Dinput0,bus=3Dusb.0,port=3D1 -vnc 0.0.0.0:0 -k en-us -device
+  cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D0x2 -device virtio-balloon-
+  pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 -msg timestamp=3Don
+
+  A qcow2 image can be downloaded from http://download.cirros-
+  cloud.net/0.3.4/cirros-0.3.4-x86_64-disk.img to reproduce the issue.
+  I've seen a similar failure with a CentOS 7.2 image.
+
+  I am also attaching the libvirt log from the failed VM.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1652333/+subscriptions
