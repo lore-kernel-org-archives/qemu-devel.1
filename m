@@ -1,37 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cgvU7-0008Jg-Vi
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:39:12 -0500
+	(envelope-from <eblake@redhat.com>) id 1cgvU7-0008Ja-OO
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:39:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cgvU7-00062x-4B
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:39:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36626)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1cgvU6-00062W-U8
+	(envelope-from <eblake@redhat.com>) id 1cgvU4-00061N-KR
 	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:39:11 -0500
-Date: Thu, 23 Feb 2017 08:39:08 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170223083908.657bf257@t450s.home>
-In-Reply-To: <2565ef99-9c16-e836-08c6-0915f5d4b0f8@redhat.com>
-References: <1487659615-15820-1-git-send-email-xyjxie@linux.vnet.ibm.com>
-	<5edff645-12e8-d3e0-1849-302b6986c232@ozlabs.ru>
-	<fdcb2b07-aae8-69bf-ee94-a43777009c3a@redhat.com>
-	<CAFEAcA--bSo7PJH0Px9ytQspaYuS55CSsM_EN6zt0djhkqKNPw@mail.gmail.com>
-	<5a0773de-6bc7-474a-82ab-2edd37ce8a93@redhat.com>
-	<CAFEAcA99xi4k57h2XGw2deGO24E95AS5jyGL+4GzjqNgMb9wcg@mail.gmail.com>
-	<92580ca9-47fe-a943-7720-d3cb1fc6d2eb@redhat.com>
-	<CAFEAcA8769a_8xwk57FS6Ko+Lioud20+70JRSafeEic6GB_RAw@mail.gmail.com>
-	<3d5e7b5e-4501-86b7-093d-47fb09af585e@redhat.com>
-	<CAFEAcA9gcArSqhbRi6-YdR=5eE9dtq66C7N0qTbCuBiY_Zr+tA@mail.gmail.com>
-	<41630a89-e645-7d7e-b7c2-356fd6dcadee@redhat.com>
-	<CAFEAcA_Mh9ZrJeu4f==ko1k2yLkfPe2AwNbUHcxkmS6Lzuvk0Q@mail.gmail.com>
-	<2565ef99-9c16-e836-08c6-0915f5d4b0f8@redhat.com>
+References: <20170221024248.11027-1-eblake@redhat.com>
+	<20170221024248.11027-8-eblake@redhat.com>
+	<ecab92ba-94d4-7b1d-c854-fa2ff9b93acc@redhat.com>
+	<5d651e79-bfdf-fb10-472f-89aef48afaf7@redhat.com>
+	<cfab822e-e63a-7c1e-d740-309c6edd0031@redhat.com>
+	<f647c37e-a9cb-e052-6a8a-210b826f96f6@redhat.com>
+	<6432baa5-7d6a-0e03-e543-693be6a363d7@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5b0b0894-e9a8-55dd-ebbb-cd62f0b877d3@redhat.com>
+Date: Thu, 23 Feb 2017 09:38:56 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] memory: make ram device read/write endian
- sensitive
+In-Reply-To: <6432baa5-7d6a-0e03-e543-693be6a363d7@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="kbrW3Q8Jlg4DcTX0MnC24UmE6vpd33nVu"
+Subject: Re: [Qemu-devel] [PATCH v4 7/8] nbd: Implement NBD_INFO_BLOCK_SIZE
+ on server
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,42 +30,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Yongji Xie <xyjxie@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, zhong@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>, Paul Mackerras <paulus@samba.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, vsementsov@virtuozzo.com, den@virtuozzo.com
 
-On Thu, 23 Feb 2017 16:21:47 +0100
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--kbrW3Q8Jlg4DcTX0MnC24UmE6vpd33nVu
+From: Eric Blake <eblake@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, vsementsov@virtuozzo.com, den@virtuozzo.com
+Message-ID: <5b0b0894-e9a8-55dd-ebbb-cd62f0b877d3@redhat.com>
+Subject: Re: [PATCH v4 7/8] nbd: Implement NBD_INFO_BLOCK_SIZE on server
+References: <20170221024248.11027-1-eblake@redhat.com>
+ <20170221024248.11027-8-eblake@redhat.com>
+ <ecab92ba-94d4-7b1d-c854-fa2ff9b93acc@redhat.com>
+ <5d651e79-bfdf-fb10-472f-89aef48afaf7@redhat.com>
+ <cfab822e-e63a-7c1e-d740-309c6edd0031@redhat.com>
+ <f647c37e-a9cb-e052-6a8a-210b826f96f6@redhat.com>
+ <6432baa5-7d6a-0e03-e543-693be6a363d7@redhat.com>
+In-Reply-To: <6432baa5-7d6a-0e03-e543-693be6a363d7@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On 23/02/2017 15:35, Peter Maydell wrote:
-> > On 23 February 2017 at 12:53, Paolo Bonzini <pbonzini@redhat.com> wrote:  
-> >>
-> >>
-> >> On 23/02/2017 13:26, Peter Maydell wrote:  
-> >>> On 23 February 2017 at 11:43, Paolo Bonzini <pbonzini@redhat.com> wrote:  
-> >>>> On 23/02/2017 12:34, Peter Maydell wrote:  
-> >>>>> We should probably update the doc comment to note that the
-> >>>>> pointer is to host-endianness memory (and that this is not
-> >>>>> like normal RAM which is target-endian)...  
-> >>>>
-> >>>> I wouldn't call it host-endianness memory, and I disagree that normal
-> >>>> RAM is target-endian---in both cases it's just a bunch of bytes.
-> >>>>
-> >>>> However, the access done by the MemoryRegionOps callbacks needs to match
-> >>>> the endianness declared by the MemoryRegionOps themselves.  
-> >>>
-> >>> Well, if the guest stores a bunch of integers to the memory, which
-> >>> way round do you see them when you look at the bunch of bytes?  
-> >>
-> >> You see them in whatever endianness the guest used.  
-> > 
-> > I'm confused. I said "normal RAM and this ramdevice memory are
-> > different", and you seem to be saying they're the same. I don't
-> > think they are (in particular I think with a BE guest on an
-> > LE host they'll look different).  
-> 
-> No, they look entirely the same.  The only difference is that they go
-> through MemoryRegionOps instead of memcpy.
+On 02/23/2017 07:13 AM, Paolo Bonzini wrote:
+>=20
+>=20
+> On 22/02/2017 21:34, Eric Blake wrote:
+>>
+>>> Oh, so it's the smallest "good" transfer size, or the preferred
+>>> alignment.  That's not the same as the SCSI definition, which is:
+>>>
+>>>    If a device server receives one of these commands with a transfer
+>>>    size greater than this value, then the device server may incur
+>>>    delays in processing the command. An OPTIMAL TRANSFER LENGTH field=
 
-Is this true for vfio use case?  If we use memcpy we're talking directly
-to the device with no endian conversions.  If we use read/write then
-there is an endian conversion in the host kernel.
+>>>    set to 0000_0000h indicates that the device server does not report=
+
+>>>    an optimal transfer size.
+>> Hmm - that's yet another limit. I don't know if our block layer expose=
+s
+>> it, or if it should expose it.
+>=20
+> It exposes it in opt_transfer. :)  The only driver that sets
+> opt_transfer is the iSCSI driver and uses the SCSI meaning.
+
+>> Does that mean our BlockLimits structure documentation needs a tweak,
+>> too?  It currently reads:
+>>
+>>     /* Optimal transfer length in bytes.  A power of 2 is best but not=
+
+>>      * mandatory.  Must be a multiple of bl.request_alignment, or 0 if=
+
+>>      * no preferred size */
+>>     uint32_t opt_transfer;
+>>
+>> Are we trying to track both optimum size in the SCSI sense _and_ block=
+
+>> size in the O_DIRECT sense?
+>=20
+> As of now, just in the SCSI sense.
+
+Okay, sounds like I need a pre-requisite patch to beef up the
+BlockLimits documentation, and maybe adding in a preferred size for yet
+another parameter that we learn from stat() on files (there really are
+performance benefits for performing I/O on a file in aligned requests,
+even if it can do byte-wise manipulations).  And maybe the NBD
+documentation needs a tweak too - which values are the most beneficial
+to expose over the wire?  Should NBD be exposing more than just
+min/preferred/max?
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--kbrW3Q8Jlg4DcTX0MnC24UmE6vpd33nVu
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYrwIQAAoJEKeha0olJ0Nq5GAIAKSG2hd3kf2mcmLMiobjQh0v
+UVxevASKvrjNr2/rq4mwoJQ813JkVuXKSYg6+DxbdPlVqMXCAI24DItVNRYxFfjZ
+tf/a4qBpxQWkxu+l5IXdb0D5z1fiMG4LcGWrsHWsAHzW0/H7pvWhPpq5wGP9H0IC
+Mlb3HRyKi53HqZ+J9miexeHWwEUHOWkcBYCIa5RXPD1z7VIwauc/+k43zSm1QLrL
+9wG2LjE7rbnqRs7WJmwTexsDkusMe8ZPFEkar/desVKmRSNlFGMreiVYW2JmDxQG
+Nvjq8XgrqQJxDHFeX+HSGZdTjMkVH/R32uD/88EqGtkY49epcrz9Y17pNvNrbXo=
+=NLAk
+-----END PGP SIGNATURE-----
+
+--kbrW3Q8Jlg4DcTX0MnC24UmE6vpd33nVu--
