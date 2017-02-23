@@ -1,19 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cgvwl-00018b-5Y
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 11:08:48 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cgw3J-0005eB-Pn
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 11:15:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cgvwg-0001yC-7N
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 11:08:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50896)
+	(envelope-from <pbonzini@redhat.com>) id 1cgw3G-0005BD-M2
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 11:15:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:32790)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1cgvwf-0001xa-Uo
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 11:08:42 -0500
-Date: Thu, 23 Feb 2017 09:08:39 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170223090839.148b0f3f@t450s.home>
-In-Reply-To: <643953df-0954-210c-6fc5-ff229fbcac84@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cgw3G-0005Ax-G3
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 11:15:30 -0500
 References: <1487659615-15820-1-git-send-email-xyjxie@linux.vnet.ibm.com>
 	<5edff645-12e8-d3e0-1849-302b6986c232@ozlabs.ru>
 	<fdcb2b07-aae8-69bf-ee94-a43777009c3a@redhat.com>
@@ -27,10 +22,15 @@ References: <1487659615-15820-1-git-send-email-xyjxie@linux.vnet.ibm.com>
 	<41630a89-e645-7d7e-b7c2-356fd6dcadee@redhat.com>
 	<CAFEAcA_Mh9ZrJeu4f==ko1k2yLkfPe2AwNbUHcxkmS6Lzuvk0Q@mail.gmail.com>
 	<2565ef99-9c16-e836-08c6-0915f5d4b0f8@redhat.com>
-	<20170223083908.657bf257@t450s.home>
-	<643953df-0954-210c-6fc5-ff229fbcac84@redhat.com>
+	<CAFEAcA_BgiXrjW9aRNFkXEEjS+kjibJ_UisJtiLgrPh=0re5qA@mail.gmail.com>
+	<c76578aa-ec76-f904-b0fc-72676e4ce515@redhat.com>
+	<CAFEAcA_waGB88XyzGxFbE_OyLAPnY70aEVQYzbS0k3KR+FF9DA@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <dac5dcb6-7beb-1c33-0a4e-b7977fce69b6@redhat.com>
+Date: Thu, 23 Feb 2017 17:15:26 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CAFEAcA_waGB88XyzGxFbE_OyLAPnY70aEVQYzbS0k3KR+FF9DA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH] memory: make ram device read/write endian
  sensitive
@@ -42,51 +42,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Yongji Xie <xyjxie@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, zhong@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>, Paul Mackerras <paulus@samba.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Yongji Xie <xyjxie@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, zhong@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>, Paul Mackerras <paulus@samba.org>
 
-On Thu, 23 Feb 2017 16:47:23 +0100
-Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-> On 23/02/2017 16:39, Alex Williamson wrote:
-> > On Thu, 23 Feb 2017 16:21:47 +0100
-> > Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >   
-> >> On 23/02/2017 15:35, Peter Maydell wrote:  
-> >>> On 23 February 2017 at 12:53, Paolo Bonzini <pbonzini@redhat.com> wrote:    
-> >>>>
-> >>>>
-> >>>> On 23/02/2017 13:26, Peter Maydell wrote:    
-> >>>>> On 23 February 2017 at 11:43, Paolo Bonzini <pbonzini@redhat.com> wrote:    
-> >>>>>> On 23/02/2017 12:34, Peter Maydell wrote:    
-> >>>>>>> We should probably update the doc comment to note that the
-> >>>>>>> pointer is to host-endianness memory (and that this is not
-> >>>>>>> like normal RAM which is target-endian)...    
-> >>>>>>
-> >>>>>> I wouldn't call it host-endianness memory, and I disagree that normal
-> >>>>>> RAM is target-endian---in both cases it's just a bunch of bytes.
-> >>>>>>
-> >>>>>> However, the access done by the MemoryRegionOps callbacks needs to match
-> >>>>>> the endianness declared by the MemoryRegionOps themselves.    
-> >>>>>
-> >>>>> Well, if the guest stores a bunch of integers to the memory, which
-> >>>>> way round do you see them when you look at the bunch of bytes?    
-> >>>>
-> >>>> You see them in whatever endianness the guest used.    
-> >>>
-> >>> I'm confused. I said "normal RAM and this ramdevice memory are
-> >>> different", and you seem to be saying they're the same. I don't
-> >>> think they are (in particular I think with a BE guest on an
-> >>> LE host they'll look different).    
-> >>
-> >> No, they look entirely the same.  The only difference is that they go
-> >> through MemoryRegionOps instead of memcpy.  
-> > 
-> > Is this true for vfio use case?  If we use memcpy we're talking directly
-> > to the device with no endian conversions.  If we use read/write then
-> > there is an endian conversion in the host kernel.  
+
+On 23/02/2017 17:08, Peter Maydell wrote:
+> On 23 February 2017 at 15:58, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>> However, DEVICE_NATIVE_ENDIAN would have to be paired with tswap, which
+>> the current code does not do, hence the bug.  To have no swap at all,
+>> you'd need DEVICE_HOST_ENDIAN.
 > 
-> But ramd MemoryRegionOps do not use file read/write, they use memory
-> read/write, so they talk directly to the device.
+> Yes, I agree that the current ramdevice code has this bug (and
+> that we can fix it by any of the various options).
 
-Ah ha!  Ding! ;)  Sorry, I forgot that.
+Good. :)
+
+>>> AIUI what we want for this VFIO case is "when the guest does
+>>> a 32-bit write of 0x12345678 then the bytes are 0x12 0x34 0x56 0x78
+>>> regardless of whether TARGET_BIG_ENDIAN or not".
+>>
+>> No, I don't think so.  This is not specific to VFIO.  You can do it with
+>> any device, albeit VFIO is currently the only one using ramd regions.
+> 
+> The commit message in the patch that started this thread off
+> says specifically that "VFIO PCI device is little endian".
+> Is that wrong?
+
+Yes, I think it's a red herring.  Hence my initial confusion, when I
+asked "would Yongji's patch just work if it used DEVICE_BIG_ENDIAN and
+beNN_to_cpu/cpu_to_beNN".
+
+Paolo
