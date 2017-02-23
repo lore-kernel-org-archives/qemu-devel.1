@@ -1,39 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45861)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cgt3s-0002FD-Nm
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 08:03:57 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cgt45-0002LF-HK
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 08:04:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cgt3p-0007yF-KK
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 08:03:56 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39105)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cgt3p-0007y6-CO
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 08:03:53 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1ND1MUc057199
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 08:03:51 -0500
-Received: from e06smtp09.uk.ibm.com (e06smtp09.uk.ibm.com [195.75.94.105])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28sku93p65-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 08:03:50 -0500
-Received: from localhost
-	by e06smtp09.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Thu, 23 Feb 2017 13:03:47 -0000
-Date: Thu, 23 Feb 2017 14:03:42 +0100
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <5a3c1652-f5eb-85a5-44f4-35c7c12d3f4b@redhat.com>
-References: <20170222121527.7009-1-cornelia.huck@de.ibm.com>
-	<20170222121527.7009-2-cornelia.huck@de.ibm.com>
-	<5a3c1652-f5eb-85a5-44f4-35c7c12d3f4b@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1cgt42-00084Q-EF
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 08:04:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48228)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cgt42-00082a-5T
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 08:04:06 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B62B0C05B1D3
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 13:04:04 +0000 (UTC)
+Date: Thu, 23 Feb 2017 14:03:59 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170223140359.3cd5bd48@nial.brq.redhat.com>
+In-Reply-To: <1487851157-9354-1-git-send-email-marcel@redhat.com>
+References: <1487851157-9354-1-git-send-email-marcel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20170223140342.57c291e4.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/8] chardev: Basic support for TN3270
+Subject: Re: [Qemu-devel] [PATCH V2] hw/pxb-pcie: fix PCI Express hotplug
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,56 +33,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Jing Liu <liujbjl@linux.vnet.ibm.com>, agraf@suse.de, borntraeger@de.ibm.com, jfrei@linux.vnet.ibm.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, Yang Chen <bjcyang@linux.vnet.ibm.com>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com
 
-On Wed, 22 Feb 2017 09:40:23 -0600
-Eric Blake <eblake@redhat.com> wrote:
+On Thu, 23 Feb 2017 13:59:17 +0200
+Marcel Apfelbaum <marcel@redhat.com> wrote:
 
-> On 02/22/2017 06:15 AM, Cornelia Huck wrote:
-> > From: Jing Liu <liujbjl@linux.vnet.ibm.com>
-> > 
-> > This introduces basic support for TN3270, which needs to negotiate
-> > three Telnet options during handshake:
-> >   - End of Record
-> >   - Binary Transmission
-> >   - Terminal-Type
-> > 
-> > As a basic implementation, this simply ignores NOP and Interrupt
-> > Process(IP) commands. More work should be done for them later.
-> > 
-> > For more details, please refer to RFC 854 and 1576.
-> > 
-> > Signed-off-by: Jing Liu <liujbjl@linux.vnet.ibm.com>
-> > Signed-off-by: Yang Chen <bjcyang@linux.vnet.ibm.com>
-> > Reviewed-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-> > Acked-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> > Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
-> > ---
+> Add the missing osc method for pxb-pcie devices as APCI spec recommends,
+> see 6.2.10.3 OSC Implementation Example for PCI Host Bridge Devices, ACPI 5.0:
 > 
-> > +++ b/qapi-schema.json
-> > @@ -4774,6 +4774,8 @@
-> >  # @nodelay: #optional set TCP_NODELAY socket option (default: false)
-> >  # @telnet: #optional enable telnet protocol on server
-> >  #          sockets (default: false)
-> > +# @tn3270: #optional enable tn3270 protocol on server
-> > +#          sockets (default: false)
+>     It is recommended that a machine with multiple host bridge devices
+>     should report the same capabilities for all host bridges, and also
+>     negotiate control of the features described in the Control Field in
+>     the same way for all host bridges.
 > 
-> Missing a '(since 2.9)' designation
+> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+> ---
+> 
+> Note to maintainer:
+>  Please update ACPI test files.
+> 
+> V1 -> V2:
+>     Addressed Michael S. Tsirkin's comments:
+>       - Added documentation to q35 osc function
+>       - Made _osc serialized. I did not add compat property
+>         since it seems guest OSs do not care anyway about the OSC
+>         being serialized.
+>       - Kept the SUPP field even if is not used and also
+>         left both SUPP and CTRL out of the _osc because all
+>         systems I checked and the ACPI spec keep them that way,
+>         maybe is some kind of documentation contract.
+> 
+> Thanks,
+> Marcel
+> 
+> 
+>  hw/i386/acpi-build.c | 41 +++++++++++++++++++++++++++++++++++------
+>  1 file changed, 35 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 1c928ab..dca4609 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -1796,7 +1796,7 @@ static void build_piix4_pci_hotplug(Aml *table)
+>      aml_append(table, scope);
+>  }
+>  
+> -static Aml *build_q35_osc_method(void)
+> +static void build_q35_osc_method(Aml *dev)
+>  {
+>      Aml *if_ctx;
+>      Aml *if_ctx2;
+> @@ -1805,7 +1805,35 @@ static Aml *build_q35_osc_method(void)
+>      Aml *a_cwd1 = aml_name("CDW1");
+>      Aml *a_ctrl = aml_name("CTRL");
+>  
+> -    method = aml_method("_OSC", 4, AML_NOTSERIALIZED);
+> +    /*
+> +     * Bits defined in the Support Field provide information
+> +     * regarding OS supported features.
+> +     *
+> +     * This field is not actually used and can be removed,
+> +     * however it appears even if unused on most DSDTs.
+> +     *
+> +     * See:
+> +     *     Table 6-148 Interpretation of _OSC Support Field,
+> +     *     Passed in via Arg2, APCI 5.0
+it's 2nd dword in Arg3
 
-Thanks, added.
+with this fixed 
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-> 
-> >  # @reconnect: #optional For a client socket, if a socket is disconnected,
-> >  #          then attempt a reconnect after the given number of seconds.
-> >  #          Setting this to zero disables this function. (default: 0)
-> > @@ -4787,6 +4789,7 @@
-> >                                       '*wait'      : 'bool',
-> >                                       '*nodelay'   : 'bool',
-> >                                       '*telnet'    : 'bool',
-> > +                                     '*tn3270'    : 'bool',
-> >                                       '*reconnect' : 'int' },
-> >    'base': 'ChardevCommon' }
-> >  
-> > 
-> 
+
+> +     */
+> +    aml_append(dev, aml_name_decl("SUPP", aml_int(0)));
+> +
+> +    /*
+> +     * Bits defined in the Control Field are used to submit
+> +     * request by the OS for control/handling of the associated feature
+> +     *
+> +     * See: Table 6-149 Interpretation of _OSC Control Field,
+> +     *      Passed in via Arg3, ACPI 5.0
+> +     *      Table 6-150 Interpretation of _OSC Control Field,
+> +     *      Returned Value, APCI 5.0
+> +     */
+> +    aml_append(dev, aml_name_decl("CTRL", aml_int(0)));
+> +
+> +
+> +
+> +   /*
+> +    * 6.2.10 _OSC (Operating System Capabilities), APCI 5.0
+> +    */
+> +    method = aml_method("_OSC", 4, AML_SERIALIZED);
+>      aml_append(method, aml_create_dword_field(aml_arg(3), aml_int(0), "CDW1"));
+>  
+>      if_ctx = aml_if(aml_equal(
+> @@ -1842,7 +1870,7 @@ static Aml *build_q35_osc_method(void)
+>      aml_append(method, else_ctx);
+>  
+>      aml_append(method, aml_return(aml_arg(3)));
+> -    return method;
+> +    aml_append(dev, method);
+>  }
+>  
+>  static void
+> @@ -1898,9 +1926,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>          aml_append(dev, aml_name_decl("_CID", aml_eisaid("PNP0A03")));
+>          aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
+>          aml_append(dev, aml_name_decl("_UID", aml_int(1)));
+> -        aml_append(dev, aml_name_decl("SUPP", aml_int(0)));
+> -        aml_append(dev, aml_name_decl("CTRL", aml_int(0)));
+> -        aml_append(dev, build_q35_osc_method());
+> +        build_q35_osc_method(dev);
+>          aml_append(sb_scope, dev);
+>          aml_append(dsdt, sb_scope);
+>  
+> @@ -1964,6 +1990,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>              aml_append(dev, aml_name_decl("_UID", aml_int(bus_num)));
+>              aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A03")));
+>              aml_append(dev, aml_name_decl("_BBN", aml_int(bus_num)));
+> +            if (pci_bus_is_express(bus)) {
+> +                build_q35_osc_method(dev);
+> +            }
+>  
+>              if (numa_node != NUMA_NODE_UNASSIGNED) {
+>                  aml_append(dev, aml_name_decl("_PXM", aml_int(numa_node)));
