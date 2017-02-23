@@ -1,40 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cglfG-0000qe-Sd
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 00:10:03 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cglkt-0003nU-G4
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 00:15:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cglfB-0005N8-UC
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 00:10:02 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58583
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cglfB-0005My-Mr
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 00:09:57 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1N58cFm050028
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 00:09:56 -0500
-Received: from e28smtp07.in.ibm.com (e28smtp07.in.ibm.com [125.16.236.7])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28sr62j8yq-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 00:09:56 -0500
-Received: from localhost
-	by e28smtp07.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Thu, 23 Feb 2017 10:39:53 +0530
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <20170223032118.GD12577@umbus.fritz.box>
-References: <1487763883-4877-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<1487763883-4877-4-git-send-email-nikunj@linux.vnet.ibm.com>
-	<20170223032118.GD12577@umbus.fritz.box>
-Date: Thu, 23 Feb 2017 10:39:47 +0530
+	(envelope-from <dgibson@ozlabs.org>) id 1cglkr-0006uX-Sp
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 00:15:51 -0500
+Date: Thu, 23 Feb 2017 16:11:29 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170223051129.GA12616@umbus.fritz.box>
+References: <20170223020936.29220-1-david@gibson.dropbear.id.au>
+	<20170223020936.29220-4-david@gibson.dropbear.id.au>
+	<1487824324.23895.10.camel@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Message-Id: <87d1e9trvo.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH v3 03/10] target/ppc: support for 32-bit
- carry and overflow
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="+HP7ph2BbKc20aGI"
+Content-Disposition: inline
+In-Reply-To: <1487824324.23895.10.camel@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 3/6] target/ppc: SDR1 is a hypervisor
+ resource
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,77 +26,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, rth@twiddle.net, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: qemu-ppc@nongnu.org, aik@ozlabs.ru, qemu-devel@nongnu.org, agraf@suse.de, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, paulus@samba.org
 
-David Gibson <david@gibson.dropbear.id.au> writes:
->> 
->> diff --git a/target/ppc/cpu.c b/target/ppc/cpu.c
->> index de3004b..89c1ccb 100644
->> --- a/target/ppc/cpu.c
->> +++ b/target/ppc/cpu.c
->> @@ -23,8 +23,15 @@
->>  
->>  target_ulong cpu_read_xer(CPUPPCState *env)
->>  {
->> -    return env->xer | (env->so << XER_SO) | (env->ov << XER_OV) |
->> +    target_ulong xer;
->> +
->> +    xer = env->xer | (env->so << XER_SO) | (env->ov << XER_OV) |
->>          (env->ca << XER_CA);
->> +
->> +    if (is_isa300(env)) {
->> +        xer |= (env->ov32 << XER_OV32) | (env->ca32 << XER_CA32);
->> +    }
->> +    return xer;
->>  }
->>  
->>  void cpu_write_xer(CPUPPCState *env, target_ulong xer)
->> @@ -32,5 +39,13 @@ void cpu_write_xer(CPUPPCState *env, target_ulong xer)
->>      env->so = (xer >> XER_SO) & 1;
->>      env->ov = (xer >> XER_OV) & 1;
->>      env->ca = (xer >> XER_CA) & 1;
->> -    env->xer = xer & ~((1u << XER_SO) | (1u << XER_OV) | (1u << XER_CA));
->> +    if (is_isa300(env)) {
->> +        env->ov32 = (xer >> XER_OV32) & 1;
->> +        env->ca32 = (xer >> XER_CA32) & 1;
+
+--+HP7ph2BbKc20aGI
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Feb 23, 2017 at 03:32:04PM +1100, Suraj Jitindar Singh wrote:
+> On Thu, 2017-02-23 at 13:09 +1100, David Gibson wrote:
+> > At present the SDR1 register - the base of the system's hashed page
+> > table
+> > (HPT) - is represented as an SPR with supervisor read and write
+> > permission.
+> > However, on CPUs which have a hypervisor mode, the SDR1 is a
+> > hypervisor
+> > only resource.=A0=A0Change the permission checking on the SPR to reflect
+> > this.
+> >=20
+> > Now that this is done, we don't need to check for an external HPT
+> > executing
+> > mtsdr1: an external HPT only applies when we're emulating the
+> > behaviour of
+> > a hypervisor, rather than modelling the CPU's hypervisor mode
+> > internally,
+> > so if we're permitted to execute mtsdr1, we don't have an external
+> > HPT.
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+> > =A0target/ppc/misc_helper.c=A0=A0=A0=A0|=A0=A08 +++-----
+> > =A0target/ppc/translate_init.c | 20 ++++++++++++++++----
+> > =A02 files changed, 19 insertions(+), 9 deletions(-)
+> >=20
+> > diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
+> > index ab432ba..fa573dd 100644
+> > --- a/target/ppc/misc_helper.c
+> > +++ b/target/ppc/misc_helper.c
+> > @@ -82,11 +82,9 @@ void helper_store_sdr1(CPUPPCState *env,
+> > target_ulong val)
+> > =A0{
+> > =A0=A0=A0=A0=A0PowerPCCPU *cpu =3D ppc_env_get_cpu(env);
+> > =A0
+> > -=A0=A0=A0=A0if (!env->external_htab) {
+> > -=A0=A0=A0=A0=A0=A0=A0=A0if (env->spr[SPR_SDR1] !=3D val) {
+> > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0ppc_store_sdr1(env, val);
+> > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0tlb_flush(CPU(cpu));
+> > -=A0=A0=A0=A0=A0=A0=A0=A0}
+>=20
+> It may have been the case we didn't have to check this before anyway...
+> Oh well
+
+Actually I think we did.  At least with a TCG (and maybe KVM PR)
+guest, because the SDR1 was previously treated as a supervisor
+resource, the guest could have issued an mtsdr1, changing the size of
+the HPT.  We still would have read from the external_htab, but if the
+size was changed the guest could have triggered accesses beyond the
+end of it, crashing qemu.
+
+With this check in place the behaviour of mtsdr1 was wrong (it was a
+no-op instead of causing a privlieged instruction exception), but not
+dangerous.
+
 >
-> I think these might as well be unconditional - as long as the read_xer
-> doesn't read the bits back, the guest won't care that we track them in
-> internal state.
+> > +=A0=A0=A0=A0if (env->spr[SPR_SDR1] !=3D val) {
+> > +=A0=A0=A0=A0=A0=A0=A0=A0ppc_store_sdr1(env, val);
+> > +=A0=A0=A0=A0=A0=A0=A0=A0tlb_flush(CPU(cpu));
+> > =A0=A0=A0=A0=A0}
+> > =A0}
+> > =A0
+> > diff --git a/target/ppc/translate_init.c
+> > b/target/ppc/translate_init.c
+> > index a1405e9..c92435d 100644
+> > --- a/target/ppc/translate_init.c
+> > +++ b/target/ppc/translate_init.c
+> > @@ -740,10 +740,22 @@ static void gen_spr_ne_601 (CPUPPCState *env)
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0&spr_read_decr, &=
+spr_write_decr,
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A00x00000000);
+> > =A0=A0=A0=A0=A0/* Memory management */
+> > -=A0=A0=A0=A0spr_register(env, SPR_SDR1, "SDR1",
+> > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0SPR_NOACCESS, SPR_N=
+OACCESS,
+> > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0&spr_read_generic, =
+&spr_write_sdr1,
+> > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A00x00000000);
+> > +#ifndef CONFIG_USER_ONLY
+> > +=A0=A0=A0=A0if (env->has_hv_mode) {
+> > +=A0=A0=A0=A0=A0=A0=A0=A0/* SDR1 is a hypervisor resource on CPUs which=
+ have a
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0* hypervisor mode */
+> > +=A0=A0=A0=A0=A0=A0=A0=A0spr_register_hv(env, SPR_SDR1, "SDR1",
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0SPR_NOACCESS, SPR_NOACCESS,
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0SPR_NOACCESS, SPR_NOACCESS,
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0&spr_read_generic, &spr_write_sdr1,
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A00x00000000);
+> > +=A0=A0=A0=A0} else {
+> > +=A0=A0=A0=A0=A0=A0=A0=A0spr_register(env, SPR_SDR1, "SDR1",
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0SPR_NOA=
+CCESS, SPR_NOACCESS,
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0&spr_re=
+ad_generic, &spr_write_sdr1,
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A00x00000=
+000);
+> > +=A0=A0=A0=A0}
+> > +#endif
+> > =A0}
+> > =A0
+> > =A0/* BATs 0-3 */
+>=20
+> Reviewed-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+>=20
 
-Sure.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
+--+HP7ph2BbKc20aGI
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> I'm also wondering if it might be worth adding a xer_mask to the env,
-> instead of explicitly checking isa300 all over the place.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-Let me try that out.
+iQIcBAEBCAAGBQJYrm7+AAoJEGw4ysog2bOSjmIP/1Rge4ll8pRBa7JgQr5uco7K
+j2pik3ZheJAglqgCcg6uD4DgDqMWQ5kq0mztjHvs/b9fKjXx97P9Y8F/VUNQe651
+XUrA55cOTlR2RE31ZGGw5OX986zbkRmNU7ZK+DagahE5FSO5X+Tm2U08RaeTaTal
+WF8Qjv5eSpA9CT2l9HzF47wOqSFLTLnIgK30IaUjFK7GXWaM94LDaWGskMR8m4w8
+E7BnLikAxjMcN0F3wibMwk3qIxYY1i2rJEitpdA4L90UrMCz1RQQ6LO9eFn+Ew+h
+cboSd368cYimECSIN1lgsIsZmNPeDEIKnenmheKYT6hFVvJvx0kDXQAakTCyblhB
+DK+UiD5mYJNCNgt6xnobaLfsHAjqH5mKjGeLflMcMVkuEQ6Q1PBFivaoS4Gyy90Y
+0uVENNLMu3pEGffOQIvule6NW1U8rE0FyxiVDcF0F8BTAt+IjCIs+ybnAt39NxzK
+eQo62LiIwXnWKBQ+ebFkcMvkESFU6e2JElBEQaiVDV/3HiEI/5Y+VUGeY74+hsm2
+Go2abJiNQz/4eKQK8twZUsYtrgbeI8dLFAMzxrFqX99VZjCFAnUFXG20KX/qhnKW
+d3QEqou9eW0p6XHgjSqt2mkuoFZg+QSoPx55wy4iIJTnypk7JGSi9F+xUsE7kpz4
+Cf+m1CC34Z7WYXdjcj1i
+=B+gh
+-----END PGP SIGNATURE-----
 
-Can we also update ov32/ca32 in all the arithmetic operations as if its
-supported. And as you suggested, whenever there is a read attempted,
-only give relevant bits back(xer_mask). This would save lot of
-conditions in translations (couple of more tcg-ops for non-isa300)
-
->
->> +        env->xer = xer & ~((1ul << XER_SO) |
->> +                           (1ul << XER_OV) | (1ul << XER_CA) |
->> +                           (1ul << XER_OV32) | (1ul << XER_CA32));
->> +    } else {
->> +        env->xer = xer & ~((1u << XER_SO) | (1u << XER_OV) | (1u << XER_CA));
->> +    }
->
-> And you can definitely use the stricer mask for both archs.  If it's
-> ISA300, you've stashed them elsewhere, if it's not those bits are
-> invalid anyway,
->
-> (Incidentally given the modern balance between the cost of
-> instructions and cachelines, I wonder if all these split out bits of
-> the XER are a good idea in any case, but that would be a big change
-> out  of scope for what you're attempting here)
-
-Will have a look at this after finishing isa300. I have faced issues
-with RISU wrt having the state stashed in different tcg variables.
-
-Regards
-Nikunj
+--+HP7ph2BbKc20aGI--
