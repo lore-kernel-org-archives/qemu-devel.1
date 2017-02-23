@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cgoZg-0007jS-9O
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 03:16:29 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cgoci-0001UB-VB
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 03:19:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cgoZc-0004Ti-6e
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 03:16:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33230)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cgoZc-0004Tc-0z
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 03:16:24 -0500
-Date: Thu, 23 Feb 2017 16:16:16 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170223081616.GI4015@pxdev.xzpeter.org>
-References: <1487742565-2513-1-git-send-email-peterx@redhat.com>
-	<20170222103047.2c1b63f2@t450s.home>
-	<20170223030647.GB4015@pxdev.xzpeter.org>
-	<7cd743a2-b4c2-1d96-892e-c3a7db07da16@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1cgoce-00059N-Pf
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 03:19:36 -0500
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:34376)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cgoce-00059J-Hi
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 03:19:32 -0500
+Received: by mail-wr0-x231.google.com with SMTP id z61so16826565wrc.1
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 00:19:32 -0800 (PST)
+References: <20170222171327.26624-1-alex.bennee@linaro.org>
+	<148778745330.150.5479386803551876071@0e2666bad730>
+	<8737f6vw37.fsf@linaro.org> <871suqvt0z.fsf@linaro.org>
+	<CAJhHMCAwFVfW1u7VnCE2WVDtueD1+BJhq9EpSjOTGO85Q3fytw@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAJhHMCAwFVfW1u7VnCE2WVDtueD1+BJhq9EpSjOTGO85Q3fytw@mail.gmail.com>
+Date: Thu, 23 Feb 2017 08:19:39 +0000
+Message-ID: <87zihduxno.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <7cd743a2-b4c2-1d96-892e-c3a7db07da16@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] intel_iommu: make sure its init before PCI
- dev
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v13 00/24] MTTCG Base enabling patches with
+ ARM enablement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +33,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, yi.l.liu@intel.com, "\\ Michael S . Tsirkin \\ " <mst@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>, Paolo Bonzini <pbonzini@redhat.com>
+To: Pranith Kumar <bobby.prani@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, MTTCG Devel <mttcg@listserver.greensocs.com>, nikunj@linux.vnet.ibm.com, Jan Kiszka <jan.kiszka@siemens.com>, Mark Burton <mark.burton@greensocs.com>, alvise rigo <a.rigo@virtualopensystems.com>, "Emilio G. Cota" <cota@braap.org>, Sergey Fedorov <serge.fdrv@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Bamvor Zhang Jian <bamvor.zhangjian@linaro.org>, KONRAD =?utf-8?B?RnLDqWTDqXJpYw==?= <fred.konrad@greensocs.com>
 
-On Thu, Feb 23, 2017 at 10:10:57AM +0200, Marcel Apfelbaum wrote:
-> On 02/23/2017 05:06 AM, Peter Xu wrote:
-> >On Wed, Feb 22, 2017 at 10:30:47AM -0700, Alex Williamson wrote:
-> >>On Wed, 22 Feb 2017 13:49:25 +0800
-> >>Peter Xu <peterx@redhat.com> wrote:
-> >>
-> >>>Intel vIOMMU devices are created with "-device" parameter, while here
-> >>>actually we need to make sure this device will be created before some
-> >>>other PCI devices (like vfio-pci devices) so that we know iommu_fn will
-> >>>be setup correctly before realizations of those PCI devices.
-> >>>
-> >>>Here we do explicit check to make sure intel-iommu device will be inited
-> >>>before all the rest of the PCI devices. This is done by checking against
-> >>>the devices dangled under current root PCIe bus and we should see
-> >>>nothing there besides integrated ICH9 ones.
-> 
-> Hi,
-> 
-> Commit b86eacb8 (hw/pci: delay bus_master_enable_region initialization)
-> creates the IOMMU memory region at machine_done time so the
-> devices creation order wouldn't matter.
-> 
-> I don't think we use the iommu_fn before machine_done.
-> What have I missed?
 
-Hi, Marcel,
+Pranith Kumar <bobby.prani@gmail.com> writes:
 
-The problem is that vfio-pci will need to fetch the pci address space
-during realization (pci_device_iommu_address_space() is called in
-vfio_realize()).
+> On Wed, Feb 22, 2017 at 4:02 PM, Alex Bennée <alex.bennee@linaro.org> wrote:
+>>
+>> Alex Bennée <alex.bennee@linaro.org> writes:
+>>
+>>> no-reply@patchew.org writes:
+>>>
+>>>> Hi,
+>>>>
+>>>> This series failed build test on s390x host. Please find the details
+>>>> below.
+>>
+>> It also failed on x86-on-x86 MTTCG as well as other tests:
+>>
+>>>> ERROR:/var/tmp/patchew-tester-tmp-_186415r/src/cpus.c:1554:qemu_mutex_lock_iothread: assertion failed: (!qemu_mutex_iothread_locked())
+>>>> GTester: last random seed: R02Sf1ce767b432f1559eaf8cc0c5a31eb02
+>>>
+>>> Well I've seen this before if the IRQ chain doesn't do locking properly
+>>> but I'm at a loss why this breaks on an s390 host as the code is common.
+>>>
+>>> Does anyone have a spare s390 that I can test on?
+>>
+>> Look like I'll have to roll this in:
+>>
+>>   https://github.com/stsquad/qemu/commit/c6f4245ffd9df8ffcd2d4d655c322189c19a6c1a
+>>
+>
+> I am able to successfully boot my test images using this patch (they
+> fail without it). Another approach might be to reset the lock in the
+> outer loop:
+>
+> diff --git a/cpu-exec.c b/cpu-exec.c
+> index f3c78a9..8327050 100644
+> --- a/cpu-exec.c
+> +++ b/cpu-exec.c
+> @@ -684,6 +684,9 @@ int cpu_exec(CPUState *cpu)
+>                 if the guest is in advance */
+>              align_clocks(&sc, cpu);
+>          }
+> +        if (qemu_mutex_iothread_locked()) {
+> +          qemu_mutex_unlock_iothread();
+> +        }
 
-Any thoughts? Thanks,
+The only aesthetic objection I have is not aligning the unlocks with
+where the lock are taken. That said my patch is fairly ugly in that
+regard ;-)
 
--- peterx
+>      }
+>
+>      cc->cpu_exec_exit(cpu);
+>
+>
+> I think either patch is fine.
+
+
+
+
+--
+Alex Bennée
