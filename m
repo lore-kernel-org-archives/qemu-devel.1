@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cguoJ-0003fr-Sc
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:56:00 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cgupY-0005hw-Kq
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:57:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cguoE-0007VK-UY
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:55:59 -0500
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:33875)
+	(envelope-from <stefanha@gmail.com>) id 1cgupT-0007pt-O5
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:57:16 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:34581)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cguoE-0007VC-MS
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:55:54 -0500
-Received: by mail-wr0-x243.google.com with SMTP id 89so4197056wrr.1
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 06:55:54 -0800 (PST)
-Date: Thu, 23 Feb 2017 14:55:51 +0000
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cgupT-0007pk-Hi
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:57:11 -0500
+Received: by mail-wm0-x244.google.com with SMTP id m70so283494wma.1
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 06:57:11 -0800 (PST)
+Date: Thu, 23 Feb 2017 14:57:08 +0000
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170223145551.GR30636@stefanha-x1.localdomain>
+Message-ID: <20170223145708.GS30636@stefanha-x1.localdomain>
 References: <148760155821.31154.13876757160410915057.stgit@bahia.lan>
-	<148760170128.31154.5884656729259031522.stgit@bahia.lan>
+	<148760170950.31154.10269855132369692301.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="XAEV7zm15O60d1Zf"
+	protocol="application/pgp-signature"; boundary="/U0GMd1Pus0mbMSS"
 Content-Disposition: inline
-In-Reply-To: <148760170128.31154.5884656729259031522.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 18/29] 9pfs: local: lstat: don't follow
+In-Reply-To: <148760170950.31154.10269855132369692301.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH 19/29] 9pfs: local: renameat: don't follow
  symlinks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -35,53 +35,40 @@ To: Greg Kurz <groug@kaod.org>
 Cc: qemu-devel@nongnu.org, Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
 
---XAEV7zm15O60d1Zf
+--/U0GMd1Pus0mbMSS
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 20, 2017 at 03:41:41PM +0100, Greg Kurz wrote:
-> The local_lstat() callback is vulnerable to symlink attacks because it
-> calls:
+On Mon, Feb 20, 2017 at 03:41:49PM +0100, Greg Kurz wrote:
+> The local_renameat() callback is currently a wrapper around local_rename()
+> which is vulnerable to symlink attacks.
 >=20
-> (1) lstat() which follows symbolic links in all path elements but the
->     rightmost one
-> (2) getxattr() which follows symbolic links in all path elements
-> (3) local_mapped_file_attr()->local_fopen()->openat(O_NOFOLLOW) which
->     follows symbolic links in all path elements but the rightmost
->     one
->=20
-> This patch converts local_lstat() to rely on opendir_nofollow() and
-> fstatat(AT_SYMLINK_NOFOLLOW) to fix (1), fgetxattrat_nofollow() to
-> fix (2).
->=20
-> A new local_fopenat() helper is introduced as a replacement to
-> local_fopen() to fix (3). No effort is made to factor out code
-> because local_fopen() will be dropped when all users have been
-> converted to call local_fopenat().
+> This patch rewrites local_renameat() to have its own implementation, based
+> on local_opendir_nofollow() and renameat().
 >=20
 > This partly fixes CVE-2016-9602.
 >=20
 > Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
->  hw/9pfs/9p-local.c |   78 +++++++++++++++++++++++++++++++++++++++++-----=
+>  hw/9pfs/9p-local.c |   71 ++++++++++++++++++++++++++++++++++++++++++++++=
 ------
->  1 file changed, 61 insertions(+), 17 deletions(-)
+>  1 file changed, 63 insertions(+), 8 deletions(-)
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---XAEV7zm15O60d1Zf
+--/U0GMd1Pus0mbMSS
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJYrvf3AAoJEJykq7OBq3PIrSYH/1BfK0gcUl54lZRiOGtCd8dl
-0ZRXdQQgTVkEOPJDPxXlJ7oQfzyd84JX/Xmrt6YkK1p1FT0SCvL2TclQALGuGArm
-+HdTzCnHEDVQH82oPq1g8OxfEbSTWD379v0/pUDM0g1w8jm79uyv55whhX4aUTtZ
-q/NiJkI7iDZEGOIqr8wdh+qaZgqDyHVLEJnmWBTwDMOlc9mX/lr0s2JTX/LKYwF9
-u9V9icbYTMp7NaBISyZQdjqge42sCxRoz+SWZ5PtD+uRJnCmODw+Gizp2+D5uWdV
-LadN/uGjCtmkVAEpj7Sn3hueeI1blFmbRI5JOhQ3d7fIc7g3pEwSrwtV3DJMynw=
-=Sykn
+iQEcBAEBAgAGBQJYrvhEAAoJEJykq7OBq3PIBCQH/2wHTFhzzRrrI73mydP+M2t5
++FyGLyfwNSvb6t5AvWghptWXjE4nzseU0NVShXmAl1CucUis9z5zB2QSLoHAtB7K
+II+NW4SePcQN7wWRIkJjHCMjdSWIMFTx353IIPPBOlKoi05aqA5+FBvGU1eulP8y
+ip5T3w/zNT35Zp/AZJArEJNohTY0/62cWzoIgvlSHeCUKbFLRkj8DIk1QMTENUMf
+lrNKM+7V2EuxTsLajf7qwHImXRSw4Vzhuhuc/fI2u8GznioKYXMx+G3itYEeCeWJ
+StbodjndIaLbX4sY3ZmpyKknlcMMjP1xMZ1nhIU6Xcb+/dlbTDoJfwujucPvM34=
+=vSKu
 -----END PGP SIGNATURE-----
 
---XAEV7zm15O60d1Zf--
+--/U0GMd1Pus0mbMSS--
