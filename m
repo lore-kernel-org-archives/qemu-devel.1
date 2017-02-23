@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cgv81-0006As-Dj
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:16:23 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cgv8k-0006sI-At
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:17:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cgv80-0005uk-Hq
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:16:21 -0500
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:33866)
+	(envelope-from <stefanha@gmail.com>) id 1cgv8h-0006Dj-1J
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:17:06 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34566)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cgv80-0005uQ-BT
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:16:20 -0500
-Received: by mail-wr0-x242.google.com with SMTP id 89so4260592wrr.1
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 07:16:20 -0800 (PST)
-Date: Thu, 23 Feb 2017 15:16:17 +0000
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cgv8g-0006DV-Qy
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 10:17:02 -0500
+Received: by mail-wm0-x243.google.com with SMTP id m70so384836wma.1
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 07:17:02 -0800 (PST)
+Date: Thu, 23 Feb 2017 15:16:59 +0000
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170223151617.GZ30636@stefanha-x1.localdomain>
+Message-ID: <20170223151659.GA30636@stefanha-x1.localdomain>
 References: <148760155821.31154.13876757160410915057.stgit@bahia.lan>
-	<148760176237.31154.7566198284512559524.stgit@bahia.lan>
+	<148760177071.31154.11710584398661216674.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="McORcswOES2gGXLb"
+	protocol="application/pgp-signature"; boundary="tK3TaB1xs9ylLrl6"
 Content-Disposition: inline
-In-Reply-To: <148760176237.31154.7566198284512559524.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 26/29] 9pfs: local: mknod: don't follow
+In-Reply-To: <148760177071.31154.11710584398661216674.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH 27/29] 9pfs: local: mkdir: don't follow
  symlinks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -35,16 +35,16 @@ To: Greg Kurz <groug@kaod.org>
 Cc: qemu-devel@nongnu.org, Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
 
---McORcswOES2gGXLb
+--tK3TaB1xs9ylLrl6
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 20, 2017 at 03:42:42PM +0100, Greg Kurz wrote:
-> The local_mknod() callback is vulnerable to symlink attacks because it
+On Mon, Feb 20, 2017 at 03:42:50PM +0100, Greg Kurz wrote:
+> The local_mkdir() callback is vulnerable to symlink attacks because it
 > calls:
 >=20
-> (1) mknod() which follows symbolic links for all path elements but the
+> (1) mkdir() which follows symbolic links for all path elements but the
 >     rightmost one
 > (2) local_set_xattr()->setxattr() which follows symbolic links for all
 >     path elements
@@ -54,43 +54,37 @@ On Mon, Feb 20, 2017 at 03:42:42PM +0100, Greg Kurz wrote:
 > (4) local_post_create_passthrough() which calls in turn lchown() and
 >     chmod(), both functions also following symbolic links
 >=20
-> This patch converts local_mknod() to rely on opendir_nofollow() and
-> mknodat() to fix (1), as well as local_set_xattrat() and
-> local_set_mapped_file_attrat() to fix (2) and (3) respectively.
->=20
-> A new local_set_cred_passthrough() helper based on fchownat() and fchmod()
-> is introduced as a replacement to local_post_create_passthrough() to fix =
-(4).
-> No effort is made to factor out code because local_post_create_passthroug=
-h()
-> will be dropped when all users have been converted to call the new helper.
+> This patch converts local_mkdir() to rely on opendir_nofollow() and
+> mkdirat() to fix (1), as well as local_set_xattrat(),
+> local_set_mapped_file_attrat() and local_set_cred_passthrough() to
+> fix (2), (3) and (4) respectively.
 >=20
 > The mapped and mapped-file security modes are supposed to be identical,
 > except for the place where credentials and file modes are stored. While
-> here, we also make that explicit by sharing the call to mknodat().
+> here, we also make that explicit by sharing the call to mkdirat().
 >=20
 > This partly fixes CVE-2016-9602.
 >=20
 > Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
->  hw/9pfs/9p-local.c |   82 +++++++++++++++++++++++++++++++---------------=
+>  hw/9pfs/9p-local.c |   55 +++++++++++++++++++---------------------------=
 ------
->  1 file changed, 49 insertions(+), 33 deletions(-)
+>  1 file changed, 20 insertions(+), 35 deletions(-)
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---McORcswOES2gGXLb
+--tK3TaB1xs9ylLrl6
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJYrvzBAAoJEJykq7OBq3PICmAH/04SnYl6zzI1i9ayLlFU1Rm+
-k0Kq5Yy84pkN3HVyQsfsZS26QVHj1pbJrCktPKzxTbjZBqpAmH2B4HVGucYY3fB6
-LMI067NXYV6L31wxxroMWAWFi4pRBhFeYta9W1OSiF5tmmZhZnAxaCyeakyVx0aB
-T4YvCy6I8AyJ1X8Tc5NMx/kvdPUabTT4zAYxi62RjY81gWVSus3XIhlhS7MqcxEA
-JEMt2TMJfpWB8nvoJedXz0QCqbHxOR5KuoyQUi6ZVEfoteoDuZjAMEt2TVI/nkw/
-0OXOnA1SrvNYybEJu56d4/1tI6NhXxO8AbtIpnfWI/fWSe2fUSyqzYsPpeghvaU=
-=A0s+
+iQEcBAEBAgAGBQJYrvzrAAoJEJykq7OBq3PId4EH/i3W3nR44dLL01IljGHc3L1R
+8hhY2svtQP+h8jxUbwl7Fm1wgONvqtIniEQNJCiMFMBJEwVFGqXzp2SklnrLn9j/
+TShTq7TVM7EVYlVSiWMjeP5SpC4r+g0/G45wLwiP/8JRPs64tl0ubbCukbHdjvWc
+RMkn8wR60uQWkrqaqHpyuxFj0Z8xrU85aR/kXfflQYtW9tbX3A3Vgjewd9/TXm5T
+JEpvIww57GTCU23x8qGZIL91Ls20Mc7imeLljC1oKo3vKB0AxGKjcT9nG8X7sEee
+Nr1VzvvltukoXjjM3wOYB7kBLU1OA2cMq5HhxgyCXx2XbUcsgl0r8XDrjIbTglM=
+=Bk+b
 -----END PGP SIGNATURE-----
 
---McORcswOES2gGXLb--
+--tK3TaB1xs9ylLrl6--
