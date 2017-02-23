@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cgroH-0001xA-CJ
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 06:43:46 -0500
+	(envelope-from <marcel@redhat.com>) id 1cgs96-0007j4-8D
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 07:05:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cgroE-0002pr-AU
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 06:43:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53059)
+	(envelope-from <marcel@redhat.com>) id 1cgs69-000729-18
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 07:02:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36152)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cgroE-0002pj-1h
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 06:43:42 -0500
-References: <1487659615-15820-1-git-send-email-xyjxie@linux.vnet.ibm.com>
-	<5edff645-12e8-d3e0-1849-302b6986c232@ozlabs.ru>
-	<fdcb2b07-aae8-69bf-ee94-a43777009c3a@redhat.com>
-	<CAFEAcA--bSo7PJH0Px9ytQspaYuS55CSsM_EN6zt0djhkqKNPw@mail.gmail.com>
-	<5a0773de-6bc7-474a-82ab-2edd37ce8a93@redhat.com>
-	<CAFEAcA99xi4k57h2XGw2deGO24E95AS5jyGL+4GzjqNgMb9wcg@mail.gmail.com>
-	<92580ca9-47fe-a943-7720-d3cb1fc6d2eb@redhat.com>
-	<CAFEAcA8769a_8xwk57FS6Ko+Lioud20+70JRSafeEic6GB_RAw@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3d5e7b5e-4501-86b7-093d-47fb09af585e@redhat.com>
-Date: Thu, 23 Feb 2017 12:43:37 +0100
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1cgs68-000722-SW
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 07:02:12 -0500
+References: <1487742565-2513-1-git-send-email-peterx@redhat.com>
+	<20170222103047.2c1b63f2@t450s.home>
+	<20170223030647.GB4015@pxdev.xzpeter.org>
+	<7cd743a2-b4c2-1d96-892e-c3a7db07da16@redhat.com>
+	<20170223081616.GI4015@pxdev.xzpeter.org>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <52e4d43f-c51f-0ac5-7409-f3087f61f44e@redhat.com>
+Date: Thu, 23 Feb 2017 14:02:07 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8769a_8xwk57FS6Ko+Lioud20+70JRSafeEic6GB_RAw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170223081616.GI4015@pxdev.xzpeter.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] memory: make ram device read/write endian
- sensitive
+Subject: Re: [Qemu-devel] [PATCH] intel_iommu: make sure its init before PCI
+ dev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,65 +31,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Yongji Xie <xyjxie@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, zhong@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>, Paul Mackerras <paulus@samba.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, yi.l.liu@intel.com, "\\ Michael S . Tsirkin \\ " <mst@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>, Paolo Bonzini <pbonzini@redhat.com>
 
-
-
-On 23/02/2017 12:34, Peter Maydell wrote:
-> On 23 February 2017 at 10:33, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->>
->> On 23/02/2017 11:23, Peter Maydell wrote:
->>> On 23 February 2017 at 10:10, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>>> On 23/02/2017 11:02, Peter Maydell wrote:
->>>>> I'm really not convinced we need DEVICE_HOST_ENDIAN. RAM
->>>>> areas should be target-endian (you can probably define
->>>>> "target endianness" as "the endianness that RAM areas have".)
+On 02/23/2017 10:16 AM, Peter Xu wrote:
+> On Thu, Feb 23, 2017 at 10:10:57AM +0200, Marcel Apfelbaum wrote:
+>> On 02/23/2017 05:06 AM, Peter Xu wrote:
+>>> On Wed, Feb 22, 2017 at 10:30:47AM -0700, Alex Williamson wrote:
+>>>> On Wed, 22 Feb 2017 13:49:25 +0800
+>>>> Peter Xu <peterx@redhat.com> wrote:
 >>>>
->>>> This is not RAM.  This is MMIO, backed by a MMIO area in the host.
->>>
->>> Hmm, I see...the naming is a bit unfortunate if it's not RAM.
+>>>>> Intel vIOMMU devices are created with "-device" parameter, while here
+>>>>> actually we need to make sure this device will be created before some
+>>>>> other PCI devices (like vfio-pci devices) so that we know iommu_fn will
+>>>>> be setup correctly before realizations of those PCI devices.
+>>>>>
+>>>>> Here we do explicit check to make sure intel-iommu device will be inited
+>>>>> before all the rest of the PCI devices. This is done by checking against
+>>>>> the devices dangled under current root PCIe bus and we should see
+>>>>> nothing there besides integrated ICH9 ones.
 >>
->> Yeah, it's called like that because it is backed by a RAMBlock but it
->> returns false for memory_access_is_direct.
-> 
-> We should probably update the doc comment to note that the
-> pointer is to host-endianness memory (and that this is not
-> like normal RAM which is target-endian)...
-
-I wouldn't call it host-endianness memory, and I disagree that normal
-RAM is target-endian---in both cases it's just a bunch of bytes.
-
-However, the access done by the MemoryRegionOps callbacks needs to match
-the endianness declared by the MemoryRegionOps themselves.
-
-Paolo
-
->>>> The
->>>> MemoryRegionOps read from the MMIO area (so the data has host
->>>> endianness) and do not do any further swap:
->>>>
->>>>         data = *(uint16_t *)(mr->ram_block->host + addr);
->>>>
->>>> Here, the dereference is basically the same as ldl_he_p.
->>>>
->>>> If you wanted to make the MemoryRegion use DEVICE_NATIVE_ENDIAN, you'd
->>>> need to tswap around the access.  Or you can use ldl_le_p and
->>>> DEVICE_LITTLE_ENDIAN (this is what Yongji's patch open codes), or
->>>> ldl_be_p and DEVICE_BIG_ENDIAN.  They are all the same in the end.
->>>
->>> Using stl_p &c in a DEVICE_NATIVE_ENDIAN MR would work too, right?
->>> (This is how all the NATIVE_ENDIAN MRs in exec.c work.)
+>> Hi,
 >>
->> Yes, it should, as long as the memcpy(...) of {ld,st}*_he_p is compiled
->> to a single access, which should be the case.
-> 
-> ...and whichever of these approaches we take, we should have
-> a comment which notes that we are converting from the host
-> endianness memory to the endianness specified by the MemoryRegion
-> endianness attribute.
-> 
-> thanks
-> -- PMM
-> 
+>> Commit b86eacb8 (hw/pci: delay bus_master_enable_region initialization)
+>> creates the IOMMU memory region at machine_done time so the
+>> devices creation order wouldn't matter.
+>>
+>> I don't think we use the iommu_fn before machine_done.
+>> What have I missed?
+>
+> Hi, Marcel,
+>
+> The problem is that vfio-pci will need to fetch the pci address space
+> during realization (pci_device_iommu_address_space() is called in
+> vfio_realize()).
+>
+> Any thoughts? Thanks,
+
+Sure, I'll try to find a solution, but first I need to
+understand why vfio-pci need to access the pci_device_iommu_address_space
+so early. Maybe we can delay this also to machine_done stage.
+
+Thanks,
+Marcel
+
+>
+> -- peterx
+>
