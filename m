@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33358)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cguIk-0001JH-Dj
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:23:23 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34558)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1cguMu-0003C5-7z
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:27:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cguIg-0005bb-FZ
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:23:22 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:36526)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cguIg-0005bJ-7S
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:23:18 -0500
-Received: by mail-wm0-x241.google.com with SMTP id r18so84696wmd.3
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 06:23:18 -0800 (PST)
-Date: Thu, 23 Feb 2017 14:23:15 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170223142315.GM30636@stefanha-x1.localdomain>
-References: <148760155821.31154.13876757160410915057.stgit@bahia.lan>
-	<148760166051.31154.9036980312875397552.stgit@bahia.lan>
+	(envelope-from <pl@kamp.de>) id 1cguMq-0006tK-9v
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:27:40 -0500
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:57936 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1cguMq-0006t8-0X
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:27:36 -0500
+References: <9533ba99-b143-b577-0115-742119d089a4@kamp.de>
+	<9292fef8-929a-e89e-eca5-cd247ca9334b@redhat.com>
+	<f0eb7ff1-47d7-42d0-c7b5-946d2224e986@kamp.de>
+	<c207e00d-25a6-45bb-a849-235d0cd2be0d@redhat.com>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <2b0840d7-7540-d732-36ac-af7a512d2c8f@kamp.de>
+Date: Thu, 23 Feb 2017 15:27:32 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="/t6ASE28jIy1gGy9"
-Content-Disposition: inline
-In-Reply-To: <148760166051.31154.9036980312875397552.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 13/29] 9pfs: local: remove: don't follow
- symlinks
+In-Reply-To: <c207e00d-25a6-45bb-a849-235d0cd2be0d@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Qemu and Changed Block Tracking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +29,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Christian Theune <ct@flyingcircus.io>
 
+Am 22.02.2017 um 13:32 schrieb Eric Blake:
+> On 02/22/2017 02:45 AM, Peter Lieven wrote:
+>>> A bit outdated now, but:
+>>> http://wiki.qemu-project.org/Features/IncrementalBackup
+>>>
+>>> and also a summary I wrote not too far back (PDF):
+>>> https://drive.google.com/file/d/0B3CFr1TuHydWalVJaEdPaE5PbFE
+>>>
+>>> and I'm sure the Virtuozzo developers could chime in on this subject,
+>>> but basically we do have something similar in the works, as eblake says.
+>> Hi John, Hi Erik,
+> It's Eric, but you're not the first to make that typo :)
+>
+>> thanks for your feedback. Are you both the ones working primary on this topic?
+>> If there is anything to review or help needed, please let me know.
+>>
+>> My 2 cents:
+>> I thing I had in mind if there is no image fleecing available, but fetching the dirty bitmap
+>> from external would be a feauture to put a write lock on a block device.
+> The whole idea is to use a dirty bitmap coupled with image fleecing,
+> where the point-in-time of the image fleecing is done at a window where
+> the guest I/O is quiescent in order to get a stable fleecing point.  We
+> already support write locks (guest quiesence) using qga to do fsfreeze.
+> You want the time that guest I/O is frozen to be as small as possible
+> (in particular, the Windows implementation of quiescence will fail if
+> you hold things frozen for more than a couple of seconds).
+>
+> Right now, the qcow2 image format does not track write generations, and
+> I don't think we plan on adding that directly into qcow2.  However, you
+> can externally simulate write generations by keeping track of how many
+> image fleecing points you have created (each fleecing point is another
+> write generation).
+>
+>
+>> In this case something like this via QMP (and external software) should work:
+>> ---8<---
+>>   gen =  write generation of last backup (or 0 for full backup)
+>>   do {
+>>       nextgen = fetch current write generation (via QMP)
+>>       dirtymap = send all block whose write generation is greater than 'gen' (via QMP)
+> No, we are NOT going to send dirty information via QMP.  Rather, we are
+> going to send it via NBD's extension NBD_CMD_BLOCK_STATUS.  The idea is
+> that a client connects and asks which qemu blocks are dirty, then uses
+> that information to read only the dirty blocks.
 
---/t6ASE28jIy1gGy9
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I understand, that for the case of local storage connecting via NBD to Qemu to grep a snapshot
+might be a good idea, but consider that you have a NAS for your vServer images. May it be NFS,
+iSCSI, CEPH or whatever. In an enterprise scenario I would generally except to have a NAS rather
+than local storage.
 
-On Mon, Feb 20, 2017 at 03:41:00PM +0100, Greg Kurz wrote:
-> +    dirfd =3D local_opendir_nofollow(ctx, dirpath);
-> +    if (dirfd) {
-> +        goto out;
->      }
-> =20
-> -    buffer =3D rpath(ctx, path);
-> -    err =3D remove(buffer);
-> -    g_free(buffer);
-> +    if (fstatat(dirfd, path, &stbuf, AT_SYMLINK_NOFOLLOW) < 0) {
-> +        goto err_out;
-> +    }
-> +
-> +    if (S_ISDIR(stbuf.st_mode)) {
-> +        flags |=3D AT_REMOVEDIR;
-> +    }
-> +
-> +    err =3D local_unlinkat_common(ctx, dirfd, name, flags);
+When you are going to backup your vServer (full or incremental) you shuffle all the traffic through
+Qemu and your Node running the vServer. In this case you run all the traffic over the wire twice.
 
-The alternative is optimistically skip fstat but then do:
+NAS -> Node -> Qemu - > Backup Server
 
-  if (err =3D=3D EISDIR) {
-      err =3D local_unlinkat_common(ctx, dirfd, name, flags | AT_REMOVEDIR);
-  }
+But the Backup Server could instead connect to the NAS directly avoiding load on the frontent LAN
+and the Qemu Node.
 
-It might be faster.
+I would like to find a nice solution for this scenario. If not in the first step it would maybe be good to
+have this in mind when implementing a dirty block tracking.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---/t6ASE28jIy1gGy9
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYrvBTAAoJEJykq7OBq3PIORUIAKjl2XLioaPRGLSyBsrz3T0M
-EY74nelYHZ+eOjuGdZ+VwKAc8KZZWN/NZmDAIQc5yayNuBpoOBEo0KAbfEYOvXJ6
-GnQAu1L9xzdOJAVGN2gaA4tQBVJT/mrCgWoGV8LdzfbONJg+YD9yuJ+MW2LMv12i
-nOdEP9JZ77Jj5+O8G6IS8VmBHrw8ICKfT5fShLSH9lJASv7I9OBVRisvnKLKzyml
-sJtemdlBkv4Zncux0qJIGwcVFoRknpJDZ8Venf1lScTjdmlkF7cPADfS0c2ReBpA
-NrGMZUJxKkplu7kR2OL4LbHtKdKp0F+pUCAENjSVSIET7oO8x1VmjJ6bF9PimKI=
-=IjNU
------END PGP SIGNATURE-----
-
---/t6ASE28jIy1gGy9--
+Peter
