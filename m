@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cgqDV-0007nZ-So
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 05:01:47 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cgqDz-00089H-Mq
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 05:02:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cgqDS-0001BA-5V
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 05:01:42 -0500
-Date: Thu, 23 Feb 2017 18:01:28 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170223100128.GA14175@lemon.lan>
-References: <20170223091845.18523-1-famz@redhat.com>
-	<20170223091845.18523-4-famz@redhat.com>
-	<21422231-2868-49fa-2b3b-363054b09797@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1cgqDu-0001JY-4A
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 05:02:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39842)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cgqDt-0001JP-Ud
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 05:02:06 -0500
+References: <1487843773-22344-1-git-send-email-jitendra.kolhe@hpe.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a70a9dff-c42a-75dc-eb20-a9f2377f2ddd@redhat.com>
+Date: Thu, 23 Feb 2017 11:01:59 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <21422231-2868-49fa-2b3b-363054b09797@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] block: Add VFIO based NVMe driver
+In-Reply-To: <1487843773-22344-1-git-send-email-jitendra.kolhe@hpe.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3] mem-prealloc: reduce large guest
+ start-up and migration time.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +27,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Karl Rister <krister@redhat.com>
+To: Jitendra Kolhe <jitendra.kolhe@hpe.com>, qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, imammedo@redhat.com, crosthwaite.peter@gmail.com, eblake@redhat.com, armbru@redhat.com, peter.maydell@linaro.org, kwolf@redhat.com, pl@kamp.de, sw@weilnetz.de, quintela@redhat.com, dgilbert@redhat.com, berrange@redhat.com, renganathan.meenakshisundaram@hpe.com, mohan_parthasarathy@hpe.com
 
-On Thu, 02/23 10:43, Paolo Bonzini wrote:
-> 
-> 
-> On 23/02/2017 10:18, Fam Zheng wrote:
-> > +    for (i = 0; i < s->nr_queues; ++i) {
-> > +        s->queues[i]->free_req_queue_bh =
-> > +            aio_bh_new(new_context, nvme_free_req_queue_cb, s->queues[i]);
-> > +    }
-> 
-> aio_bh_new has the issue that you can complete two requests in one
-> nvme_process_completion call, but you would only invoke the bottom half
-> once.  Because this is a rare event, I think it's enough to use
-> aio_bh_schedule_oneshot instead of aio_bh_new.
 
-Yes, that should work.
 
-> 
-> > +static coroutine_fn int nvme_cmd_unmap_qiov(BlockDriverState *bs,
-> > +                                            QEMUIOVector *qiov)
-> > +{
-> > +    int r = 0;
-> > +    BDRVNVMeState *s = bs->opaque;
-> > +
-> > +    if (!s->inflight && !qemu_co_queue_empty(&s->dma_flush_queue)) {
-> > +        r = nvme_vfio_dma_reset_temporary(s->vfio);
-> > +        qemu_co_queue_next(&s->dma_flush_queue);
-> > +    }
-> > +    return r;
-> > +}
-> 
-> Should this be qemu_co_queue_restart_all instead?
+On 23/02/2017 10:56, Jitendra Kolhe wrote:
+>      if (sigsetjmp(sigjump, 1)) {
+> -        error_setg(errp, "os_mem_prealloc: Insufficient free host memory "
+> -            "pages available to allocate guest RAM\n");
+> +        memset_thread_failed = true;
 
-You are right, will fix!
+This sigsetjmp is not needed, no one can siglongjmp to it.
 
-Fam
+The SIG_UNBLOCK/SIG_BLOCK in the main thread is not necessary, either.
+
+>      } else {
+> -        int i;
+>          size_t hpagesize = qemu_fd_getpagesize(fd);
+>          size_t numpages = DIV_ROUND_UP(memory, hpagesize);
+>  
+> -        /* MAP_POPULATE silently ignores failures */
+> -        for (i = 0; i < numpages; i++) {
+> -            memset(area + (hpagesize * i), 0, 1);
+> -        }
+> +        /* touch pages simultaneously */
+> +        touch_all_pages(area, hpagesize, numpages, smp_cpus);
+
+... and now touch_all_pages can just return memset_thread_failed, which
+simplifies the code a bit.
+
+Paolo
+
+> +    }
+> +    if (memset_thread_failed) {
+> +        error_setg(errp, "os_mem_prealloc: Insufficient free host memory "
+> +            "pages available to allocate guest RAM");
+>      }
