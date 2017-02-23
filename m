@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cgoci-0001UB-VB
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 03:19:38 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cgoeG-0002K4-A9
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 03:21:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cgoce-00059N-Pf
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 03:19:36 -0500
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:34376)
+	(envelope-from <alex.bennee@linaro.org>) id 1cgoeC-0005kJ-7a
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 03:21:12 -0500
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:38082)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cgoce-00059J-Hi
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 03:19:32 -0500
-Received: by mail-wr0-x231.google.com with SMTP id z61so16826565wrc.1
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 00:19:32 -0800 (PST)
+	id 1cgoeC-0005k6-1a
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 03:21:08 -0500
+Received: by mail-wm0-x22b.google.com with SMTP id r141so4830167wmg.1
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 00:21:07 -0800 (PST)
 References: <20170222171327.26624-1-alex.bennee@linaro.org>
-	<148778745330.150.5479386803551876071@0e2666bad730>
-	<8737f6vw37.fsf@linaro.org> <871suqvt0z.fsf@linaro.org>
-	<CAJhHMCAwFVfW1u7VnCE2WVDtueD1+BJhq9EpSjOTGO85Q3fytw@mail.gmail.com>
+	<20170222171327.26624-6-alex.bennee@linaro.org>
+	<CAJhHMCAJ9ci+qhmQD48WZHzUiGqodaUfhd=bNrhU27o=VEYG_Q@mail.gmail.com>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAJhHMCAwFVfW1u7VnCE2WVDtueD1+BJhq9EpSjOTGO85Q3fytw@mail.gmail.com>
-Date: Thu, 23 Feb 2017 08:19:39 +0000
-Message-ID: <87zihduxno.fsf@linaro.org>
+In-reply-to: <CAJhHMCAJ9ci+qhmQD48WZHzUiGqodaUfhd=bNrhU27o=VEYG_Q@mail.gmail.com>
+Date: Thu, 23 Feb 2017 08:21:15 +0000
+Message-ID: <87y3wxuxl0.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v13 00/24] MTTCG Base enabling patches with
- ARM enablement
+Subject: Re: [Qemu-devel] [PATCH v13 05/24] tcg: add options for enabling
+ MTTCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,66 +33,95 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Pranith Kumar <bobby.prani@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, MTTCG Devel <mttcg@listserver.greensocs.com>, nikunj@linux.vnet.ibm.com, Jan Kiszka <jan.kiszka@siemens.com>, Mark Burton <mark.burton@greensocs.com>, alvise rigo <a.rigo@virtualopensystems.com>, "Emilio G. Cota" <cota@braap.org>, Sergey Fedorov <serge.fdrv@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Bamvor Zhang Jian <bamvor.zhangjian@linaro.org>, KONRAD =?utf-8?B?RnLDqWTDqXJpYw==?= <fred.konrad@greensocs.com>
+Cc: Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel <qemu-devel@nongnu.org>, MTTCG Devel <mttcg@listserver.greensocs.com>, KONRAD =?utf-8?B?RnLDqWTDqXJpYw==?= <fred.konrad@greensocs.com>, alvise rigo <a.rigo@virtualopensystems.com>, "Emilio G. Cota" <cota@braap.org>, nikunj@linux.vnet.ibm.com, Mark Burton <mark.burton@greensocs.com>, Paolo Bonzini <pbonzini@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Sergey Fedorov <serge.fdrv@gmail.com>, Bamvor Zhang Jian <bamvor.zhangjian@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
 
 Pranith Kumar <bobby.prani@gmail.com> writes:
 
-> On Wed, Feb 22, 2017 at 4:02 PM, Alex Bennée <alex.bennee@linaro.org> wrote:
->>
->> Alex Bennée <alex.bennee@linaro.org> writes:
->>
->>> no-reply@patchew.org writes:
->>>
->>>> Hi,
->>>>
->>>> This series failed build test on s390x host. Please find the details
->>>> below.
->>
->> It also failed on x86-on-x86 MTTCG as well as other tests:
->>
->>>> ERROR:/var/tmp/patchew-tester-tmp-_186415r/src/cpus.c:1554:qemu_mutex_lock_iothread: assertion failed: (!qemu_mutex_iothread_locked())
->>>> GTester: last random seed: R02Sf1ce767b432f1559eaf8cc0c5a31eb02
->>>
->>> Well I've seen this before if the IRQ chain doesn't do locking properly
->>> but I'm at a loss why this breaks on an s390 host as the code is common.
->>>
->>> Does anyone have a spare s390 that I can test on?
->>
->> Look like I'll have to roll this in:
->>
->>   https://github.com/stsquad/qemu/commit/c6f4245ffd9df8ffcd2d4d655c322189c19a6c1a
->>
+> Hi Alex,
 >
-> I am able to successfully boot my test images using this patch (they
-> fail without it). Another approach might be to reset the lock in the
-> outer loop:
+> On Wed, Feb 22, 2017 at 12:13 PM, Alex Bennée <alex.bennee@linaro.org> wrote:
+>> From: KONRAD Frederic <fred.konrad@greensocs.com>
+>>
+>> We know there will be cases where MTTCG won't work until additional work
+>> is done in the front/back ends to support. It will however be useful to
+>> be able to turn it on.
+>>
+>> As a result MTTCG will default to off unless the combination is
+>> supported. However the user can turn it on for the sake of testing.
+>>
+>> Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
+>> [AJB: move to -accel tcg,thread=multi|single, defaults]
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>> Reviewed-by: Richard Henderson <rth@twiddle.net>
+>> ---
+>> v1:
+>>   - merge with add mttcg option.
+>>   - update commit message
+>> v2:
+>>   - machine_init->opts_init
+>> v3:
+>>   - moved from -tcg to -accel tcg,thread=single|multi
+>>   - fix checkpatch warnings
+>> v4:
+>>   - make mttcg_enabled extern, qemu_tcg_mttcg_enabled() now just macro
+>>   - qemu_tcg_configure now propagates Error instead of exiting
+>>   - better error checking of thread=foo
+>>   - use CONFIG flags for default_mttcg_enabled()
+>>   - disable mttcg with icount, error if both forced on
+>> v7
+>>   - explicitly disable MTTCG for TCG_OVERSIZED_GUEST
+>>   - use check_tcg_memory_orders_compatible() instead of CONFIG_MTTCG_HOST
+>>   - change CONFIG_MTTCG_TARGET to TARGET_SUPPORTS_MTTCG
+>> v8
+>>   - fix missing include tcg.h
+>>   - change mismatched MOs to a warning instead of error
+>> v10
+>>   - TCG_DEFAULT_MO -> TCG_GUEST_DEFAULT_MO
+>> v11
+>>   - tweak warning message
+>> ---
+>>  cpus.c                | 73 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  include/qom/cpu.h     |  9 +++++++
+>>  include/sysemu/cpus.h |  2 ++
+>>  qemu-options.hx       | 20 ++++++++++++++
+>>  tcg/tcg.h             |  9 +++++++
+>>  vl.c                  | 49 +++++++++++++++++++++++++++++++++-
+>>  6 files changed, 161 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/cpus.c b/cpus.c
+>> index 0bcb5b50b6..c296ec715f 100644
+>> --- a/cpus.c
+>> +++ b/cpus.c
+> <...>
+>> +void qemu_tcg_configure(QemuOpts *opts, Error **errp)
+>> +{
+>> +    const char *t = qemu_opt_get(opts, "thread");
+>> +    if (t) {
+>> +        if (strcmp(t, "multi") == 0) {
+>> +            if (TCG_OVERSIZED_GUEST) {
+>> +                error_setg(errp, "No MTTCG when guest word size > hosts");
+>> +            } else {
+>> +                if (!check_tcg_memory_orders_compatible()) {
+>> +                    error_report("Guest expects a stronger memory ordering than"
+>> +                                 "the host provides");
+>> +                    error_printf("This may cause strange/hard to debug errors");
+>> +                }
 >
-> diff --git a/cpu-exec.c b/cpu-exec.c
-> index f3c78a9..8327050 100644
-> --- a/cpu-exec.c
-> +++ b/cpu-exec.c
-> @@ -684,6 +684,9 @@ int cpu_exec(CPUState *cpu)
->                 if the guest is in advance */
->              align_clocks(&sc, cpu);
->          }
-> +        if (qemu_mutex_iothread_locked()) {
-> +          qemu_mutex_unlock_iothread();
-> +        }
-
-The only aesthetic objection I have is not aligning the unlocks with
-where the lock are taken. That said my patch is fairly ugly in that
-regard ;-)
-
->      }
+> This prints it as:
 >
->      cc->cpu_exec_exit(cpu);
+> Guest expects a stronger memory ordering thanthe host provides
 >
->
-> I think either patch is fine.
+> Please add a space between 'than' and 'the'.
 
+Will do.
 
+> Also why are you using
+> error_report() for the first line and error_printf() for the second?
 
+There is only one error to report, quoth HACKING:
+
+"Use error_printf() & friends to print additional information."
 
 --
 Alex Bennée
