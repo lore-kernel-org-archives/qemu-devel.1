@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cghKj-0006Te-5z
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 19:32:34 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cghoA-0008J6-2d
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 20:02:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cghKe-0004Xc-9N
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 19:32:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43858)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1cghKe-0004XN-31
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 19:32:28 -0500
-Date: Wed, 22 Feb 2017 17:32:25 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170222173225.4f48dd99@t450s.home>
-In-Reply-To: <726a3292-9e27-6748-9669-a7c21cbf3b6e@redhat.com>
-References: <1487361200-29966-1-git-send-email-mst@redhat.com>
-	<1487361200-29966-13-git-send-email-mst@redhat.com>
-	<1487681835.2694.76.camel@redhat.com>
-	<c0d16fc6-e149-861d-8f82-5a96619606bd@redhat.com>
-	<83a2d0c9-23a4-32b1-ffe7-b33bbe9ea25d@redhat.com>
-	<726a3292-9e27-6748-9669-a7c21cbf3b6e@redhat.com>
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgho5-0005ge-T5
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 20:02:58 -0500
+Received: from [45.249.212.189] (port=2403 helo=dggrg03-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgho5-0005Vn-9Z
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 20:02:53 -0500
+References: <1487734936-43472-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1487734936-43472-3-git-send-email-zhang.zhanghailiang@huawei.com>
+	<134776c2-a85d-d06f-5f98-2e664f9c8ca9@cn.fujitsu.com>
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <58AE349E.2020704@huawei.com>
+Date: Thu, 23 Feb 2017 09:02:22 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <134776c2-a85d-d06f-5f98-2e664f9c8ca9@cn.fujitsu.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 12/23] virtio: use VRingMemoryRegionCaches
- for avail and used rings
+Subject: Re: [Qemu-devel] [PATCH 02/15] colo-compare: implement the process
+ of checkpoint
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,54 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
+Cc: xuquan8@huawei.com, dgilbert@redhat.com, lizhijian@cn.fujitsu.com, xiecl.fnst@cn.fujitsu.com
 
-On Wed, 22 Feb 2017 10:03:56 +0100
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+Hi,
 
-> On 21/02/2017 18:54, Laszlo Ersek wrote:
-> > Actually, QEMU segfaults. From the dmesg:
-> > 
-> > [Tue Feb 21 18:47:28 2017] CPU 0/KVM[8298]: segfault at 48 ip
-> > 00007fcb5dd02105 sp 00007fcb49efc270 error 4 in
-> > qemu-system-x86_64[7fcb5dae3000+905000]
-> > 
-> > Complete backtrace below. (Thread 11 seems to be the one
-> > segfaulting.)  
-> 
-> Indeed.  It's the virtio-blk device that is segfaulting, please try
-> this one liner (haven't reproduced it, but it seems obvious with the
-> backtrace and some sleep).
+On 2017/2/22 17:31, Zhang Chen wrote:
+>
+>
+> On 02/22/2017 11:42 AM, zhanghailiang wrote:
+>> While do checkpoint, we need to flush all the unhandled packets,
+>> By using the filter notifier mechanism, we can easily to notify
+>> every compare object to do this process, which runs inside
+>> of compare threads as a coroutine.
+>
+> Hi~ Jason and Hailiang.
+>
+> I will send a patch set later about colo-compare notify mechanism for
+> Xen like this patch.
+> I want to add a new chardev socket way in colo-comapre connect to Xen
+> colo, for notify
+> checkpoint or failover, Because We have no choice to use this way
+> communicate with Xen codes.
+> That's means we will have two notify mechanism.
+> What do you think about this?
+>
 
-I hit this as well, the patch below resolves it.
+I don't think you need another mechanism, what you need to do is to
+realize a qmp command which calls colo_notify_compares_event(),
+It will not  return until the event (checkpoint or failover) be
+handled by all compares. Will this satisfy your requirement ?
 
-Tested-by: Alex Williamson <alex.williamson@redhat.com>
- 
-> commit c1aa478c7181c543606ca81404c59e126d66213d
-> Author: Paolo Bonzini <pbonzini@redhat.com>
-> Date:   Wed Feb 22 10:02:37 2017 +0100
-> 
->     virtio: check for vring setup in virtio_queue_empty
->     
->     If the vring has not been set up, there is nothing in the virtqueue.
->     virtio_queue_host_notifier_aio_poll calls virtio_queue_empty even in
->     this case; we have to filter it out just like virtio_queue_notify_aio_vq.
->     
->     Reported-by: Gerd Hoffmann <kraxel@redhat.com>
->     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index 23483c7..e487e36 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -2291,7 +2291,7 @@ static bool virtio_queue_host_notifier_aio_poll(void *opaque)
->      VirtQueue *vq = container_of(n, VirtQueue, host_notifier);
->      bool progress;
->  
-> -    if (virtio_queue_empty(vq)) {
-> +    if (!vq->vring.desc || virtio_queue_empty(vq)) {
->          return false;
->      }
->  
-> 
+Thanks,
+Hailiang
+
+>
+> Thanks
+> Zhang Chen
+>
+>>
+>> Cc: Jason Wang <jasowang@redhat.com>
+>> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+>> ---
+>>    net/colo-compare.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>    net/colo-compare.h | 20 +++++++++++++++
+>>    2 files changed, 92 insertions(+)
+>>    create mode 100644 net/colo-compare.h
+>>
+>
