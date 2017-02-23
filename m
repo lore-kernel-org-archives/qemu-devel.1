@@ -1,24 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cgtXj-00012x-TP
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 08:34:49 -0500
+	(envelope-from <bounces@canonical.com>) id 1cgtcV-0003gN-M4
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 08:39:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cgtXg-0000az-Ph
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 08:34:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36020)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cgtXg-0000ac-HE
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 08:34:44 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 86253C04BD41
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 13:34:44 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Thu, 23 Feb 2017 13:34:41 +0000
-Message-Id: <20170223133441.16010-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH] x86: Work around SMI migration breakages
+	(envelope-from <bounces@canonical.com>) id 1cgtcS-0002Y2-E8
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 08:39:43 -0500
+Received: from indium.canonical.com ([91.189.90.7]:42844)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cgtcS-0002Xi-7R
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 08:39:40 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cgtcQ-0003s2-ME
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 13:39:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1622D2E80E6
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 13:39:38 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 23 Feb 2017 13:22:50 -0000
+From: ChristianEhrhardt <1490611@bugs.launchpad.net>
+Reply-To: Bug 1490611 <1490611@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150831152901.21817.58033.malonedeb@gac.canonical.com>
+Message-Id: <20170223132250.4421.24458.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1490611] Re: Using qemu >=2.2.1 to convert
+ raw->VHD (fixed) adds extra padding to the result file,
+ which Microsoft Azure rejects as invalid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,102 +38,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, pbonzini@redhat.com, lersek@redhat.com
+To: qemu-devel@nongnu.org
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+I could confirm the fix on its raw alignment:
+Image with 4G
+Pre Fix (4295467520-512)/1024/1024 =3D 4096,4765625
+With Fix (4295467520-512)/1024/1024 =3D 4096,4765625
+With Fix + force_size set: (4294967808-512)/1024/1024 =3D 4096
 
-Migration from a 2.3.0 qemu results in a reboot on the receiving QEMU
-due to a disagreement about SM (System management) interrupts.
+That means
+1. no change without opt in
+2. the desired effect when option is set
 
-2.3.0 didn't have much SMI support, but it did set CPU_INTERRUPT_SMI
-and this gets into the migration stream, but on 2.3.0 it
-never got delivered.
+Waiting a few days for the other bugs in the SRU suggestion ppa to
+resolve/confirm fixes (or be dropped) and then moving to the actual SRU.
 
-~2.4.0 SMI interrupt support was added but was broken - so
-that when a 2.3.0 stream was received it cleared the CPU_INTERRUPT_SMI
-but never actually caused an interrupt.
+-- =
 
-The SMI delivery was recently fixed by 68c6efe07a, but the
-effect now is that an incoming 2.3.0 stream takes the interrupt it
-had flagged but it's bios can't actually handle it(I think
-partly due to the original interrupt not being taken during boot?).
-The consequence is a triple(?) fault and a reboot.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1490611
 
-Tested from:
-  2.3.1 -M 2.3.0
-  2.7.0 -M 2.3.0
-  2.8.0 -M 2.3.0
-  2.8.0 -M 2.8.0
+Title:
+  Using qemu >=3D2.2.1 to convert raw->VHD (fixed) adds extra padding to
+  the result file, which Microsoft Azure rejects as invalid
 
-This corresponds to RH bugzilla entry 1420679.
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Xenial:
+  In Progress
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- include/hw/i386/pc.h | 4 ++++
- target/i386/cpu.c    | 2 ++
- target/i386/cpu.h    | 3 +++
- target/i386/kvm.c    | 7 ++++++-
- 4 files changed, 15 insertions(+), 1 deletion(-)
+Bug description:
+  [Impact]
 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 079e8d9..cb49826 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -624,6 +624,10 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-         .driver   = "Broadwell-noTSX" "-" TYPE_X86_CPU,\
-         .property = "xlevel",\
-         .value    = stringify(0x8000000a),\
-+    },{\
-+        .driver = TYPE_X86_CPU,\
-+        .property = "kvm-no-smi-migration",\
-+        .value    = "on",\
-     },
- 
- #define PC_COMPAT_2_2 \
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index fd7add2..b2058cd 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -3708,6 +3708,8 @@ static Property x86_cpu_properties[] = {
-     DEFINE_PROP_BOOL("cpuid-0xb", X86CPU, enable_cpuid_0xb, true),
-     DEFINE_PROP_BOOL("lmce", X86CPU, enable_lmce, false),
-     DEFINE_PROP_BOOL("l3-cache", X86CPU, enable_l3_cache, true),
-+    DEFINE_PROP_BOOL("kvm-no-smi-migration", X86CPU, kvm_no_smi_migration,
-+                     false),
-     DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, true),
-     DEFINE_PROP_END_OF_LIST()
- };
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 8df124f..c5dfef8 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1255,6 +1255,9 @@ struct X86CPU {
-     /* if true override the phys_bits value with a value read from the host */
-     bool host_phys_bits;
- 
-+    /* Stop SMI delivery for migration compatibility with old machines */
-+    bool kvm_no_smi_migration;
-+
-     /* Number of physical address bits supported */
-     uint32_t phys_bits;
- 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 27fd050..5bfe633 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -2531,7 +2531,12 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int level)
-             events.smi.pending = 0;
-             events.smi.latched_init = 0;
-         }
--        events.flags |= KVM_VCPUEVENT_VALID_SMM;
-+        /* Stop SMI delivery on old machine types to avoid a reboot
-+         * on an inward migration of an old VM.
-+         */
-+        if (!cpu->kvm_no_smi_migration) {
-+            events.flags |= KVM_VCPUEVENT_VALID_SMM;
-+        }
-     }
- 
-     if (level >= KVM_PUT_RESET_STATE) {
--- 
-2.9.3
+  =C2=A0* Starting with a raw disk image, using "qemu-img convert" to conve=
+rt
+  from raw to VHD results in the output VHD file's virtual size being
+  aligned to the nearest 516096 bytes (16 heads x 63 sectors per head x
+  512 bytes per sector), instead of preserving the input file's size as
+  the output VHD's virtual disk size.
+
+  =C2=A0* Microsoft Azure requires that disk images (VHDs) submitted for
+  upload have virtual sizes aligned to a megabyte boundary. (Ex. 4096MB,
+  4097MB, 4098MB, etc. are OK, 4096.5MB is rejected with an error.) This
+  is reflected in Microsoft's documentation: https://azure.microsoft.com
+  /en-us/documentation/articles/virtual-machines-linux-create-upload-
+  vhd-generic/
+
+  =C2=A0* The fix for this bug is a backport from upstream.
+  http://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Dfb9245c2610932d33ce14
+
+  [Test Case]
+
+  =C2=A0* This is reproducible with the following set of commands (including
+  the Azure command line tools from https://github.com/Azure/azure-
+  xplat-cli). For the following example, I used qemu version 2.2.1:
+
+  $ dd if=3D/dev/zero of=3Dsource-disk.img bs=3D1M count=3D4096
+
+  $ stat source-disk.img
+  =C2=A0=C2=A0File: =E2=80=98source-disk.img=E2=80=99
+  =C2=A0=C2=A0Size: 4294967296      Blocks: 798656     IO Block: 4096   reg=
+ular file
+  Device: fc01h/64513d    Inode: 13247963    Links: 1
+  Access: (0644/-rw-r--r--)  Uid: ( 1000/  smkent)   Gid: ( 1000/  smkent)
+  Access: 2015-08-18 09:48:02.613988480 -0700
+  Modify: 2015-08-18 09:48:02.825985646 -0700
+  Change: 2015-08-18 09:48:02.825985646 -0700
+  =C2=A0Birth: -
+
+  $ qemu-img convert -f raw -o subformat=3Dfixed -O vpc source-disk.img
+  dest-disk.vhd
+
+  $ stat dest-disk.vhd
+  =C2=A0=C2=A0File: =E2=80=98dest-disk.vhd=E2=80=99
+  =C2=A0=C2=A0Size: 4296499712      Blocks: 535216     IO Block: 4096   reg=
+ular file
+  Device: fc01h/64513d    Inode: 13247964    Links: 1
+  Access: (0644/-rw-r--r--)  Uid: ( 1000/  smkent)   Gid: ( 1000/  smkent)
+  Access: 2015-08-18 09:50:22.252077624 -0700
+  Modify: 2015-08-18 09:49:24.424868868 -0700
+  Change: 2015-08-18 09:49:24.424868868 -0700
+  =C2=A0Birth: -
+
+  $ azure vm image create testimage1 dest-disk.vhd -o linux -l "West US"
+  info:    Executing command vm image create
+  + Retrieving storage accounts
+  info:    VHD size : 4097 MB
+  info:    Uploading 4195800.5 KB
+  Requested:100.0% Completed:100.0% Running:   0 Time: 1m 0s Speed:  6744 K=
+B/s
+  info:    https://[redacted].blob.core.windows.net/vm-images/dest-disk.vhd=
+ was uploaded successfully
+  error:   The VHD https://[redacted].blob.core.windows.net/vm-images/dest-=
+disk.vhd has an unsupported virtual size of 4296499200 bytes.  The size mus=
+t be a whole number (in MBs).
+  info:    Error information has been recorded to /home/smkent/.azure/azure=
+.err
+  error:   vm image create command failed
+
+  =C2=A0* A fixed qemu-img will not result in an error during azure image
+  creation. It will require passing -o force_size, which will leverage
+  the backported functionality.
+
+  [Regression Potential]
+
+  =C2=A0* The upstream fix introduces a qemu-img option (-o force_size) whi=
+ch
+  is unset by default. The regression potential is very low, as a
+  result.
+
+  ...
+
+  I also ran the above commands using qemu 2.4.0, which resulted in the
+  same error as the conversion behavior is the same.
+
+  However, qemu 2.1.1 and earlier (including qemu 2.0.0 installed by
+  Ubuntu 14.04) does not pad the virtual disk size during conversion.
+  Using qemu-img convert from qemu versions <=3D2.1.1 results in a VHD
+  that is exactly the size of the raw input file plus 512 bytes (for the
+  VHD footer). Those qemu versions do not attempt to realign the disk.
+  As a result, Azure accepts VHD files created using those versions of
+  qemu-img convert for upload.
+
+  Is there a reason why newer qemu realigns the converted VHD file? It
+  would be useful if an option were added to disable this feature, as
+  current versions of qemu cannot be used to create VHD files for Azure
+  using Microsoft's official instructions.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1490611/+subscriptions
