@@ -1,37 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sam.bobroff@au1.ibm.com>) id 1cgmTB-00008p-HT
+	(envelope-from <sam.bobroff@au1.ibm.com>) id 1cgmTB-00008d-9T
 	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 01:01:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sam.bobroff@au1.ibm.com>) id 1cgmT8-0001iH-Er
+	(envelope-from <sam.bobroff@au1.ibm.com>) id 1cgmT8-0001hy-6S
 	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 01:01:37 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34365)
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49275
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sam.bobroff@au1.ibm.com>)
-	id 1cgmT8-0001hi-5o
+	id 1cgmT8-0001hm-0U
 	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 01:01:34 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1N5t2sf044382
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1N5rewr043711
 	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 01:01:33 -0500
-Received: from e23smtp07.au.ibm.com (e23smtp07.au.ibm.com [202.81.31.140])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28srg4b14n-1
+Received: from e23smtp01.au.ibm.com (e23smtp01.au.ibm.com [202.81.31.143])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28sdf5w51g-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 01:01:32 -0500
 Received: from localhost
-	by e23smtp07.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e23smtp01.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <sam.bobroff@au1.ibm.com>;
-	Thu, 23 Feb 2017 16:01:29 +1000
+	Thu, 23 Feb 2017 16:01:30 +1000
 From: Sam Bobroff <sam.bobroff@au1.ibm.com>
-Date: Thu, 23 Feb 2017 16:59:59 +1100
+Date: Thu, 23 Feb 2017 17:00:02 +1100
 In-Reply-To: <cover.1487829585.git.sam.bobroff@au1.ibm.com>
 References: <cover.1487829585.git.sam.bobroff@au1.ibm.com>
 In-Reply-To: <cover.1487829585.git.sam.bobroff@au1.ibm.com>
 References: <cover.1487829585.git.sam.bobroff@au1.ibm.com>
-Message-Id: <ca5b4ee7d0dc010a545e5ace603dcf019d8d0c02.1487829585.git.sam.bobroff@au1.ibm.com>
-Subject: [Qemu-devel] [RFC PATCH v2 06/12] spapr: Add ibm,
- processor-radix-AP-encodings to the device tree
+Message-Id: <a655f7b902f69387fbb3f46400603cf3cfbaf2b1.1487829585.git.sam.bobroff@au1.ibm.com>
+Subject: [Qemu-devel] [RFC PATCH v2 09/12] spapr: Add
+ h_register_process_table() hypercall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,144 +44,137 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org
 Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, sjitindarsingh@gmail.com
 
-Use the new ioctl, KVM_PPC_GET_RMMU_INFO, to fetch radix MMU
-information from KVM and present the page encodings in the device tree
-under ibm,processor-radix-AP-encodings. This provides page size
-information to the guest which is necessary for it to use radix mode.
+Both radix and hash modes require guests to use
+h_register_process_table() to set up the MMU. Implement it using the
+new KVM ioctl KVM_PPC_CONFIGURE_V3_MMU.
 
-Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
+This hypercall is also necessary for fully emulated guests, so it will
+need to be reworked to integrate with Suraj's TCG patchset.
 ---
 v2:
 
-* ppc_radix_page_info now kept in native format, conversion to BE done when adding to the device tree.
-* radix_page_info moved into the CPU class, cleaning up some code.
+* I haven't addressed review comments for this patch because it overlaps with
+Suraj's implementation of the same function and we'll work together to
+integrate them.
 
- hw/ppc/spapr.c       | 12 ++++++++++++
- include/sysemu/kvm.h |  1 +
- target/ppc/cpu-qom.h |  1 +
- target/ppc/cpu.h     |  4 ++++
- target/ppc/kvm.c     | 27 +++++++++++++++++++++++++++
- 5 files changed, 45 insertions(+)
+ hw/ppc/spapr_hcall.c   | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/ppc/spapr.h |  1 +
+ target/ppc/kvm.c       | 12 ++++++++++++
+ target/ppc/kvm_ppc.h   |  1 +
+ 4 files changed, 62 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index cceb35f083..ca3812555f 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -409,6 +409,8 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
-     sPAPRDRConnector *drc;
-     sPAPRDRConnectorClass *drck;
-     int drc_index;
-+    uint32_t radix_AP_encodings[PPC_PAGE_SIZES_MAX_SZ];
-+    int i;
- 
-     drc = spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_CPU, index);
-     if (drc) {
-@@ -494,6 +496,16 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
-     _FDT(spapr_fixup_cpu_numa_dt(fdt, offset, cs));
- 
-     _FDT(spapr_fixup_cpu_smt_dt(fdt, offset, cpu, compat_smt));
-+
-+    if (pcc->radix_page_info) {
-+        for (i = 0; i < pcc->radix_page_info->count; i++) {
-+            radix_AP_encodings[i] = cpu_to_be32(pcc->radix_page_info->entries[i]);
-+        }
-+        _FDT((fdt_setprop(fdt, offset, "ibm,processor-radix-AP-encodings",
-+                          radix_AP_encodings,
-+                          pcc->radix_page_info->count *
-+                          sizeof(radix_AP_encodings[0]))));
-+    }
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index cea34073aa..9391619ed6 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1027,6 +1027,50 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+     return H_SUCCESS;
  }
  
- static void spapr_populate_cpus_dt_node(void *fdt, sPAPRMachineState *spapr)
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 3045ee7678..01a8db1180 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -526,5 +526,6 @@ int kvm_set_one_reg(CPUState *cs, uint64_t id, void *source);
-  * Returns: 0 on success, or a negative errno on failure.
-  */
- int kvm_get_one_reg(CPUState *cs, uint64_t id, void *target);
-+struct ppc_radix_page_info *kvm_get_radix_page_info(void);
- int kvm_get_max_memslots(void);
- #endif
-diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-index 4807f4d86c..0efb543912 100644
---- a/target/ppc/cpu-qom.h
-+++ b/target/ppc/cpu-qom.h
-@@ -195,6 +195,7 @@ typedef struct PowerPCCPUClass {
-     int bfd_mach;
-     uint32_t l1_dcache_size, l1_icache_size;
-     const struct ppc_segment_page_sizes *sps;
-+    struct ppc_radix_page_info *radix_page_info;
-     void (*init_proc)(CPUPPCState *env);
-     int  (*check_pow)(CPUPPCState *env);
-     int (*handle_mmu_fault)(PowerPCCPU *cpu, vaddr eaddr, int rwx, int mmu_idx);
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index b559b67073..a6c8c5ff4c 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -934,6 +934,10 @@ struct ppc_segment_page_sizes {
-     struct ppc_one_seg_page_size sps[PPC_PAGE_SIZES_MAX_SZ];
- };
++static target_ulong h_register_process_table(PowerPCCPU *cpu,
++                                             sPAPRMachineState *spapr,
++                                             target_ulong opcode,
++                                             target_ulong *args)
++{
++    static target_ulong last_process_table;
++    target_ulong flags = args[0];
++    target_ulong proc_tbl = args[1];
++    target_ulong page_size = args[2];
++    target_ulong table_size = args[3];
++    uint64_t cflags, cproc;
++
++    cflags = (flags & 4) ? KVM_PPC_MMUV3_RADIX : 0;
++    cflags |= (flags & 1) ? KVM_PPC_MMUV3_GTSE : 0;
++    cproc = (flags & 4) ? (1ul << 63) : 0;
++    if (!(flags & 0x10)) {
++        if ((last_process_table & (1ul << 63)) != cproc) {
++            return H_PARAMETER;
++        }
++        cproc = last_process_table;
++    } else if (!(flags & 0x8)) {
++        ; /* do nothing */
++    } else if (flags & 4) {
++        /* radix */
++        if (table_size > 24 || (proc_tbl & 0xfff) || (proc_tbl >> 60)) {
++            return H_PARAMETER;
++        }
++        cproc |= proc_tbl | table_size;
++    } else {
++        /* hash, possibly with process table */
++        if (table_size > 24 || (proc_tbl >> 38) || page_size > 7) {
++            return H_PARAMETER;
++        }
++        cproc = (proc_tbl << 25) | (page_size << 5) | table_size;
++    }
++    last_process_table = cproc;
++    fprintf(stderr, "calling config mmu flags=%lx proctbl=%lx\n",
++            cflags, cproc);
++    if  (!kvmppc_configure_v3_mmu(cpu, cflags, cproc)) {
++        return H_HARDWARE;
++    }
++    return H_SUCCESS;
++}
++
+ static spapr_hcall_fn papr_hypercall_table[(MAX_HCALL_OPCODE / 4) + 1];
+ static spapr_hcall_fn kvmppc_hypercall_table[KVMPPC_HCALL_MAX - KVMPPC_HCALL_BASE + 1];
  
-+struct ppc_radix_page_info {
-+    uint32_t count;
-+    uint32_t entries[PPC_PAGE_SIZES_MAX_SZ];
-+};
+@@ -1115,6 +1159,10 @@ static void hypercall_register_types(void)
  
- /*****************************************************************************/
- /* The whole PowerPC CPU context */
+     /* ibm,client-architecture-support support */
+     spapr_register_hypercall(KVMPPC_H_CAS, h_client_architecture_support);
++
++    /* Power9 MMU support */
++    spapr_register_hypercall(H_REGISTER_PROC_TBL,
++                             h_register_process_table);
+ }
+ 
+ type_init(hypercall_register_types)
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index a30cbc485c..d523db3b4a 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -346,6 +346,7 @@ struct sPAPRMachineState {
+ #define H_XIRR_X                0x2FC
+ #define H_RANDOM                0x300
+ #define H_SET_MODE              0x31C
++#define H_REGISTER_PROC_TBL     0x37C
+ #define H_SIGNAL_SYS_RESET      0x380
+ #define MAX_HCALL_OPCODE        H_SIGNAL_SYS_RESET
+ 
 diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index d53ede8b4a..cf62a42c1f 100644
+index 8b153808fd..34dde45eef 100644
 --- a/target/ppc/kvm.c
 +++ b/target/ppc/kvm.c
-@@ -48,6 +48,7 @@
- #if defined(TARGET_PPC64)
- #include "hw/ppc/spapr_cpu_core.h"
- #endif
-+#include "sysemu/kvm_int.h"
- 
- //#define DEBUG_KVM
- 
-@@ -329,6 +330,30 @@ static void kvm_get_smmu_info(PowerPCCPU *cpu, struct kvm_ppc_smmu_info *info)
-     kvm_get_fallback_smmu_info(cpu, info);
+@@ -358,6 +358,18 @@ struct ppc_radix_page_info *kvm_get_radix_page_info(void)
+     return radix_page_info;
  }
  
-+struct ppc_radix_page_info *kvm_get_radix_page_info(void)
++bool kvmppc_configure_v3_mmu(PowerPCCPU *cpu, uint64_t flags, uint64_t proc_tbl)
 +{
-+    KVMState *s = KVM_STATE(current_machine->accelerator);
-+    struct ppc_radix_page_info *radix_page_info;
-+    struct kvm_ppc_rmmu_info rmmu_info;
-+    int i;
++    CPUState *cs = CPU(cpu);
++    int ret;
++    struct kvm_ppc_mmuv3_cfg cfg;
 +
-+    if (!kvm_check_extension(s, KVM_CAP_PPC_MMU_RADIX)) {
-+        return NULL;
-+    }
-+    if (kvm_vm_ioctl(s, KVM_PPC_GET_RMMU_INFO, &rmmu_info)) {
-+        return NULL;
-+    }
-+    radix_page_info = g_malloc0(sizeof(*radix_page_info));
-+    radix_page_info->count = 0;
-+    for (i = 0; i < PPC_PAGE_SIZES_MAX_SZ; i++) {
-+        if (rmmu_info.ap_encodings[i]) {
-+            radix_page_info->entries[i] = rmmu_info.ap_encodings[i];
-+            radix_page_info->count++;
-+        }
-+    }
-+    return radix_page_info;
++    cfg.flags = flags;
++    cfg.process_table = proc_tbl;
++    ret = kvm_vm_ioctl(cs->kvm_state, KVM_PPC_CONFIGURE_V3_MMU, &cfg);
++    return ret == 0;
 +}
 +
  static long gethugepagesize(const char *mem_path)
  {
      struct statfs fs;
-@@ -2379,6 +2404,8 @@ static void kvmppc_host_cpu_class_init(ObjectClass *oc, void *data)
-         pcc->l1_icache_size = icache_size;
-     }
- 
-+    pcc->radix_page_info = kvm_enabled() ? kvm_get_radix_page_info() : NULL;
-+
-     /* Reason: kvmppc_host_cpu_initfn() dies when !kvm_enabled() */
-     dc->cannot_destroy_with_object_finalize_yet = true;
- }
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index 56e222dfc2..441fa6a2db 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -33,6 +33,7 @@ int kvmppc_clear_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits);
+ int kvmppc_or_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits);
+ int kvmppc_set_tcr(PowerPCCPU *cpu);
+ int kvmppc_booke_watchdog_enable(PowerPCCPU *cpu);
++bool kvmppc_configure_v3_mmu(PowerPCCPU *cpu, uint64_t flags, uint64_t proctbl);
+ #ifndef CONFIG_USER_ONLY
+ off_t kvmppc_alloc_rma(void **rma);
+ bool kvmppc_spapr_use_multitce(void);
 -- 
 2.11.0
