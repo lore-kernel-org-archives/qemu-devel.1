@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cgjFs-0001yx-PI
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 21:35:41 -0500
+	(envelope-from <peterx@redhat.com>) id 1cgjkC-0003Z3-KA
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 22:07:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cgjFo-0006Po-R8
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 21:35:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37742)
+	(envelope-from <peterx@redhat.com>) id 1cgjk7-0005FR-Ig
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 22:07:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50372)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cgjFo-0006Pg-EW
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 21:35:36 -0500
-Date: Thu, 23 Feb 2017 10:35:29 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cgjk7-0005FG-9s
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 22:06:55 -0500
+Date: Thu, 23 Feb 2017 11:06:47 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170223023529.GA4015@pxdev.xzpeter.org>
+Message-ID: <20170223030647.GB4015@pxdev.xzpeter.org>
 References: <1487742565-2513-1-git-send-email-peterx@redhat.com>
-	<CAHyh4xjJ+U8XGAHP4TqzZJqmrZBeeHGA3_Kmg5YrMdy3VbCLJQ@mail.gmail.com>
-	<CAHyh4xjELha5V5n+dLwmQsoJ=kfahiZsamo7WEEfMtRgXvRsbw@mail.gmail.com>
+	<20170222103047.2c1b63f2@t450s.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAHyh4xjELha5V5n+dLwmQsoJ=kfahiZsamo7WEEfMtRgXvRsbw@mail.gmail.com>
+In-Reply-To: <20170222103047.2c1b63f2@t450s.home>
 Subject: Re: [Qemu-devel] [PATCH] intel_iommu: make sure its init before PCI
  dev
 List-Id: <qemu-devel.nongnu.org>
@@ -29,48 +28,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jintack Lim <jintack@cs.columbia.edu>
-Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, yi.l.liu@intel.com, "\\ Michael S . Tsirkin \\" <mst@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, yi.l.liu@intel.com, "\\  Michael S . Tsirkin \\ " <mst@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Wed, Feb 22, 2017 at 08:37:32AM -0500, Jintack Lim wrote:
-> On Wed, Feb 22, 2017 at 6:42 AM, Jintack Lim <jintack@cs.columbia.edu>
-> wrote:
+On Wed, Feb 22, 2017 at 10:30:47AM -0700, Alex Williamson wrote:
+> On Wed, 22 Feb 2017 13:49:25 +0800
+> Peter Xu <peterx@redhat.com> wrote:
 > 
-> >
-> >
-> > On Wed, Feb 22, 2017 at 12:49 AM, Peter Xu <peterx@redhat.com> wrote:
-> >
-> >> Intel vIOMMU devices are created with "-device" parameter, while here
-> >> actually we need to make sure this device will be created before some
-> >> other PCI devices (like vfio-pci devices) so that we know iommu_fn will
-> >> be setup correctly before realizations of those PCI devices.
-> >>
-> >> Here we do explicit check to make sure intel-iommu device will be inited
-> >> before all the rest of the PCI devices. This is done by checking against
-> >> the devices dangled under current root PCIe bus and we should see
-> >> nothing there besides integrated ICH9 ones.
-> >>
-> >> If the user violated this rule, we abort the program.
-> >>
-> >
-> > Hi Peter,
-> >
-> > After applying this patch, qemu gave the following error and was
-> > terminated, but I believe I passed parameters in a right order?
-> >
+> > Intel vIOMMU devices are created with "-device" parameter, while here
+> > actually we need to make sure this device will be created before some
+> > other PCI devices (like vfio-pci devices) so that we know iommu_fn will
+> > be setup correctly before realizations of those PCI devices.
+> > 
+> > Here we do explicit check to make sure intel-iommu device will be inited
+> > before all the rest of the PCI devices. This is done by checking against
+> > the devices dangled under current root PCIe bus and we should see
+> > nothing there besides integrated ICH9 ones.
+> > 
+> > If the user violated this rule, we abort the program.
+> > 
+> > Maybe one day we will be able to manage the ordering of device
+> > initialization, and then we can grant VT-d devices a higher init
+> > priority. But before that, let's have this explicit check to make sure
+> > of it.
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  hw/i386/intel_iommu.c | 40 ++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 40 insertions(+)
+> > 
+> > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> > index 22d8226..db74124 100644
+> > --- a/hw/i386/intel_iommu.c
+> > +++ b/hw/i386/intel_iommu.c
+> > @@ -31,6 +31,7 @@
+> >  #include "hw/i386/apic-msidef.h"
+> >  #include "hw/boards.h"
+> >  #include "hw/i386/x86-iommu.h"
+> > +#include "hw/i386/ich9.h"
+> >  #include "hw/pci-host/q35.h"
+> >  #include "sysemu/kvm.h"
+> >  #include "hw/i386/apic_internal.h"
+> > @@ -2560,6 +2561,41 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+> >      return true;
+> >  }
+> >  
+> > +static bool vtd_has_inited_pci_devices(PCIBus *bus, Error **errp)
+> > +{
+> > +    int i;
+> > +    uint8_t func;
+> > +
+> > +    /* We check against root bus */
+> > +    assert(bus && pci_bus_is_root(bus));
+> > +
+> > +    /*
+> > +     * We need to make sure vIOMMU device is created before other PCI
+> > +     * devices other than the integrated ICH9 ones, so that they can
+> > +     * get correct iommu_fn setup even during its realize(). Some
+> > +     * devices (e.g., vfio-pci) will need a correct iommu_fn to work.
+> > +     */
+> > +    for (i = 1; i < PCI_FUNC_MAX * PCI_SLOT_MAX; i++) {
+> > +        /* Skip the checking against ICH9 integrated devices */
+> > +        if (PCI_SLOT(i) == ICH9_LPC_DEV) {
+> > +            func = PCI_FUNC(i);
+> > +            if (func == ICH9_LPC_FUNC ||
+> > +                func == ICH9_SATA1_FUNC ||
+> > +                func == ICH9_SMB_FUNC) {
+> > +                continue;
+> > +            }
+> > +        }
 > 
-> FYI, I've applied this patch to your vtd-vfio-enablement-v7 branch.
+> 
+> Whitelisting specific devfns seems pretty sketchy and fragile.  Can we
+> even assume we're on a Q35 chipset?  I don't see that vtd_realize()
+> takes any particular precautions not to allow initialization on 440fx,
+> or whatever generic chipset we come up with next that may not have
+> these specific devices.
 
-I think the problem is that I was always testing with "-nodefaults",
-while that's not your case... And without "-nodefaults" we'll have
-these two devices created before all the rest:
+Yes. IIUC VT-d now can only work with Q35, right? Cc Marcel and Paolo
+in case I misunderstood it.
 
-00:01.0 VGA compatible controller: Device 1234:1111 (rev 02)
-00:02.0 Ethernet controller: Intel Corporation 82540EM Gigabit Ethernet Controller (rev 03)
+If so, maybe here we should check against q35 in vtd realization. How
+about something like:
 
-So Intel vIOMMU complaint. :(
+    if (!object_property_find((Object *)pcms, "q35", NULL)) {
+        error_setg(errp, "Currently Intel vIOMMU only support Q35 platform. "
+                   "Please specify \"-M q35\" to enable it.");
+        return;
+    }
 
-Thanks for the report! I'll think of something better and prepare
-another version.
+?
+
+> It would probably be a better idea to use
+> object_dynamic_cast() if you want to whitelist specific devices.
+> Perhaps this could even be used to validate the chipset as well.
+
+Now Jintack reported another issue, that we may have two default
+devices there if not specifying "-nodefaults", and that two devices
+will always be the first ones to be inited.
+
+How about here we just explicitly check against vfio-pci devices, so
+we just make sure vfio-pci devices will be put after intel-iommu?
+Since actually vfio-pci devices are the only ones that we know we need
+to be inited explicitly after the VT-d device.
+
+Thanks,
+
+> Thanks,
+> 
+> Alex
+> 
+> > +
+> > +        if (bus->devices[i]) {
+> > +            error_setg(errp, "Please init intel-iommu before "
+> > +                       "other PCI devices");
+> > +            return true;
+> > +        }
+> > +    }
+> > +
+> > +    return false;
+> > +}
+> > +
+> >  static void vtd_realize(DeviceState *dev, Error **errp)
+> >  {
+> >      PCMachineState *pcms = PC_MACHINE(qdev_get_machine());
+> > @@ -2567,6 +2603,10 @@ static void vtd_realize(DeviceState *dev, Error **errp)
+> >      IntelIOMMUState *s = INTEL_IOMMU_DEVICE(dev);
+> >      X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(dev);
+> >  
+> > +    if (vtd_has_inited_pci_devices(bus, errp)) {
+> > +        return;
+> > +    }
+> > +
+> >      VTD_DPRINTF(GENERAL, "");
+> >      x86_iommu->type = TYPE_INTEL;
+> >  
+> 
 
 -- peterx
