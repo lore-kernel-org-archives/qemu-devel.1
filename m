@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cgjkf-0003we-EK
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 22:07:30 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cgjkf-0003x5-Te
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 22:07:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cgjkd-0005MY-Jx
+	(envelope-from <dgibson@ozlabs.org>) id 1cgjkd-0005Mn-V3
 	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 22:07:29 -0500
-Date: Thu, 23 Feb 2017 13:39:46 +1100
+Date: Thu, 23 Feb 2017 13:42:38 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170223023946.GA12577@umbus.fritz.box>
+Message-ID: <20170223024238.GB12577@umbus.fritz.box>
 References: <1487252865-12064-1-git-send-email-clg@kaod.org>
-	<1487252865-12064-13-git-send-email-clg@kaod.org>
+	<1487252865-12064-17-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="va9XEZk9/dJ5GUjX"
+	protocol="application/pgp-signature"; boundary="03sphU6jKm9HdgU1"
 Content-Disposition: inline
-In-Reply-To: <1487252865-12064-13-git-send-email-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v2 12/22] ppc/xics: extend the QOM
- interface to handle ICPs
+In-Reply-To: <1487252865-12064-17-git-send-email-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v2 16/22] ppc/xics: register the reset
+ handler of ICP objects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,101 +29,80 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---va9XEZk9/dJ5GUjX
+--03sphU6jKm9HdgU1
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 16, 2017 at 02:47:35PM +0100, C=E9dric Le Goater wrote:
-> Let's add two new handlers for ICPs. One is to get an ICP object from
-> a server number and a second is to resend the irqs when needed.
+On Thu, Feb 16, 2017 at 02:47:39PM +0100, C=E9dric Le Goater wrote:
+> The reset of the ICP objects is currently handled by XICS but this can
+> be done for each individual ICP.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+
+Hrm.  I think whether device_reset() gets called automatically depends
+on how the device is wired into the composition tree, and I'm not sure
+the icps are in the right place for it to work.
+
+This doesn't replace the code in xics_common_reset() so if it does
+work it means we must have previously been resetting the ICPs twice.
+Is that right?
+
 > ---
->  hw/intc/xics.c        |  2 +-
->  hw/ppc/spapr.c        | 20 ++++++++++++++++++++
->  include/hw/ppc/xics.h |  3 +++
->  3 files changed, 24 insertions(+), 1 deletion(-)
+>  hw/intc/xics.c | 18 ------------------
+>  hw/ppc/spapr.c |  1 +
+>  2 files changed, 1 insertion(+), 18 deletions(-)
 >=20
 > diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> index 5131587ce088..7168c2cfd8a1 100644
+> index dd41340d41a5..3ad7e8cf8ec4 100644
 > --- a/hw/intc/xics.c
 > +++ b/hw/intc/xics.c
-> @@ -216,7 +216,7 @@ static void icp_check_ipi(ICPState *ss)
->      qemu_irq_raise(ss->output);
->  }
+> @@ -137,29 +137,11 @@ static void ics_simple_pic_print_info(InterruptStat=
+sProvider *obj,
+>  /*
+>   * XICS Common class - parent for emulated XICS and KVM-XICS
+>   */
+> -static void xics_common_reset(DeviceState *d)
+> -{
+> -    XICSState *xics =3D XICS_COMMON(d);
+> -    int i;
+> -
+> -    for (i =3D 0; i < xics->nr_servers; i++) {
+> -        device_reset(DEVICE(&xics->ss[i]));
+> -    }
+> -}
+> -
+> -static void xics_common_class_init(ObjectClass *oc, void *data)
+> -{
+> -    DeviceClass *dc =3D DEVICE_CLASS(oc);
+> -
+> -    dc->reset =3D xics_common_reset;
+> -}
+> -
+>  static const TypeInfo xics_common_info =3D {
+>      .name          =3D TYPE_XICS_COMMON,
+>      .parent        =3D TYPE_DEVICE,
+>      .instance_size =3D sizeof(XICSState),
+>      .class_size    =3D sizeof(XICSStateClass),
+> -    .class_init    =3D xics_common_class_init,
+>  };
 > =20
-> -static void icp_resend(XICSInterface *xi, ICPState *ss)
-> +void icp_resend(XICSInterface *xi, ICPState *ss)
->  {
->      XICSInterfaceClass *xic =3D XICS_INTERFACE_GET_CLASS(xi);
-> =20
+>  /*
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index d1946ebcac69..eb7da32296d8 100644
+> index 9c1772f93155..445d9a6ddad4 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -2915,6 +2915,24 @@ static void spapr_ics_resend(XICSInterface *dev)
->      ics_resend(spapr->ics);
->  }
+> @@ -130,6 +130,7 @@ static XICSState *try_create_xics(sPAPRMachineState *=
+spapr,
+>          ICPState *icp =3D &xics->ss[i];
 > =20
-> +static ICPState *spapr_icp_get(XICSInterface *xi, int server)
-> +{
-> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
-> +
-> +    return (server < spapr->xics->nr_servers) ? &spapr->xics->ss[server]=
- :
-> +        NULL;
-> +}
-> +
-> +static void spapr_icp_resend(XICSInterface *xi)
-> +{
-> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
-> +    int i;
-> +
-> +    for (i =3D 0; i < spapr->xics->nr_servers; i++) {
-> +        icp_resend(xi, &spapr->xics->ss[i]);
-> +    }
-> +}
-
-I'm not quite sure where you plan to use the resend hook.  AFAICT all
-the existing users of this path can do fine using icp_get() then
-icp_resend() directly.
-
-> +
->  static void spapr_machine_class_init(ObjectClass *oc, void *data)
->  {
->      MachineClass *mc =3D MACHINE_CLASS(oc);
-> @@ -2959,6 +2977,8 @@ static void spapr_machine_class_init(ObjectClass *o=
-c, void *data)
->      vhc->hypercall =3D emulate_spapr_hypercall;
->      xic->ics_get =3D spapr_ics_get;
->      xic->ics_resend =3D spapr_ics_resend;
-> +    xic->icp_get =3D spapr_icp_get;
-> +    xic->icp_resend =3D spapr_icp_resend;
->  }
-> =20
->  static const TypeInfo spapr_machine_info =3D {
-> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> index c15d8e2a8ae6..7004c851e250 100644
-> --- a/include/hw/ppc/xics.h
-> +++ b/include/hw/ppc/xics.h
-> @@ -191,6 +191,8 @@ typedef struct XICSInterfaceClass {
->      InterfaceClass parent;
->      ICSState *(*ics_get)(XICSInterface *xi, int irq);
->      void (*ics_resend)(XICSInterface *xi);
-> +    ICPState *(*icp_get)(XICSInterface *xi, int server);
-> +    void (*icp_resend)(XICSInterface *xi);
->  } XICSInterfaceClass;
-> =20
->  #define XICS_IRQS_SPAPR               1024
-> @@ -221,5 +223,6 @@ void ics_simple_write_xive(ICSState *ics, int nr, int=
- server,
->  void ics_set_irq_type(ICSState *ics, int srcno, bool lsi);
-> =20
->  void ics_resend(ICSState *ics);
-> +void icp_resend(XICSInterface *xi, ICPState *ss);
-> =20
->  #endif /* XICS_H */
+>          object_initialize(icp, sizeof(*icp), type_icp);
+> +        qdev_set_parent_bus(DEVICE(icp), sysbus_get_default());
+>          object_property_add_child(OBJECT(xics), "icp[*]", OBJECT(icp), N=
+ULL);
+>          object_property_add_const_link(OBJECT(icp), "xics", OBJECT(xics)=
+, NULL);
+>          object_property_set_bool(OBJECT(icp), true, "realized", &err);
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -131,25 +110,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---va9XEZk9/dJ5GUjX
+--03sphU6jKm9HdgU1
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYrktyAAoJEGw4ysog2bOSt9QP/3hKFGA3UdFU6juUYzC78SJn
-O9Tx2kOAnkyBraEbS3ikk+af2LyqFK0+UOoCCuWBATmuUNmCP5NfBfNujoZAP3iQ
-GnmbJcfnBiYnGAebWYguB1SDptAacjiv+xSUVRvbdgykgrg6PrPZtIEcQQZ2TpHp
-gOnrs4AlKLnq/9A5PMmAmkBFYb1aL2DyoNbcCD1hUEK7YTovbvkfZesBMq9zdJGC
-ucHj0YDzvOjQF7CIHdeEHPo+Z0vMXCdFPBgDbRjZhNPpsk3rXBh8W4KjTSY4LBA3
-fGhjAjqg1pi/1Lo7IHd4Ek9F3t7mUPr53snMK5fCtPbsnTNzcRyz7eRUazvu3+R3
-cAPugzmKavXvosqBfc9WYOl+I2b9iM38+/oA8zaUQZJOZh+gkppIxzv52TYgzWg6
-YLNbiLPv4spR9b6e4LX5Zb3gflBJXVdYnEDp6Qrkvd76XvYSOLmvSf0Xou+Ik75j
-VZBMgrLK9va9wAjpW7395jR+yGygs7k94L8NsEA1GT5M6t7nwdJHsb9JD+45McfD
-qH31r6hgAaU2fQeN/ThygTK3dKcy2IyaIiU+LlHuCgNFjohmpTAHK4doNWRdsqES
-bM32+weT1oBo16MnHWmUF77C+bn70H+YXND6dy5ijSYtT7AA/2CgWCRwIzTTNFbC
-1Ky1g7zQGS+3zx89j9Wq
-=sJKR
+iQIcBAEBCAAGBQJYrkweAAoJEGw4ysog2bOSIOkQAKZOftryfdNiGlNMHdesvdiB
+7ntPLQ9RCwOGI/J3c+rFh+GOzYwG1wFQGMZkj9NAeCr1h+O41OuUrvhiBCrwCOha
+Hfz0qn1ZcywS1LaZslY8RJ9lPhjkJcHEFKupkzojeBnsepENd8BcV/YuTBox/qrr
+7hmoPKuhcpoJlITNWVlC5AtGYX4vbKfTN2vivsVZNFpKuRckPkjaFpvA98tBH97k
+lZZaMO1isVole1LOktvIKNElBpqCphTTyUIkRlNOacUgVt6xOcHkOIuTb4x0Iklp
+lmTpz/npuwzaC/zOpdYVOPK1elZVS/agrMEktvLRY8oHSTWbYPwEV2VLptdDDvuU
+0dZgJSoFFns63M1/a5NMgl38056ZVTDGT9XfLnP7WYeQvOqTqqTtq85K+kgqUJIW
++FnlE06u3TJLfNzFKnG7GSPkNkBzHBwZyUrb4hHTDRB8Ac+1Tu/TBFl1a420umj8
+eUyZsQ1gBDwI4Oj0skrpr8IMg4sS+km4+fu1k1tybm2aU16c+ZQhuZPkh/UkSdqX
+/st1HWE+sjfgZMfB+KG+7in4gSgCraQtMqBgqSKtVcfPLUu3cWJcosnCgfk42Bn1
+sRi+lz2WnFh4UYnBmKnZj/xXuah1OX39pPpF2ZqUztPx/cdKoKoIbolCo24XavRt
+bHQiOq1SjVNFC2wC1Zk+
+=7XyJ
 -----END PGP SIGNATURE-----
 
---va9XEZk9/dJ5GUjX--
+--03sphU6jKm9HdgU1--
