@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cgkiz-0006Vk-9B
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 23:09:51 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cgkpy-0001HK-Kk
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 23:17:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cgkiw-0004xY-1r
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 23:09:49 -0500
-Date: Thu, 23 Feb 2017 15:08:56 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170223040856.GM12577@umbus.fritz.box>
-References: <1487563478-22265-1-git-send-email-sjitindarsingh@gmail.com>
-	<1487563478-22265-8-git-send-email-sjitindarsingh@gmail.com>
+	(envelope-from <jasowang@redhat.com>) id 1cgkpv-00072c-CD
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 23:17:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60824)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cgkpv-00072S-2h
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 23:16:59 -0500
+References: <1487735198-127300-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1487735198-127300-3-git-send-email-zhang.zhanghailiang@huawei.com>
+	<b0b04c02-7c97-ea04-1e38-99fd9344edae@redhat.com>
+	<58AD4F8F.5030703@huawei.com> <58AD5125.4010306@huawei.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <b792c68e-d67a-ac24-26ea-aaf24f1f9437@redhat.com>
+Date: Thu, 23 Feb 2017 12:16:50 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ngshnjhd05HsCES+"
-Content-Disposition: inline
-In-Reply-To: <1487563478-22265-8-git-send-email-sjitindarsingh@gmail.com>
-Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH V3 07/10] target/ppc/POWER9: Add
- POWER9 mmu fault handler
+In-Reply-To: <58AD5125.4010306@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] filter-rewriter: fix memory leak
+ for connection in connection_track_table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,263 +30,320 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: qemu-ppc@nongnu.org, agraf@suse.de, qemu-devel@nongnu.org, sam.bobroff@au1.ibm.com
+To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>, zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com
+Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, pss.wulizhen@huawei.com
 
 
---ngshnjhd05HsCES+
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 20, 2017 at 03:04:35PM +1100, Suraj Jitindar Singh wrote:
-> Add a new mmu fault handler for the POWER9 cpu and add it as the handler
-> for the POWER9 cpu definition.
->=20
-> This handler checks if the guest is radix or hash based on the value in t=
-he
-> partition table entry and calls the correct fault handler accordingly.
->=20
-> The hash fault handling code has also been updated to check if the
-> partition is using segment tables.
->=20
-> Currently only legacy hash (no segment tables) is supported.
->=20
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
->=20
-> ---
->=20
-> V2->V3:
-> - error_report on attempt to use segment tables instead of just LOG()
-> - Rename mmu.h -> mmu-book3s-v3.h
-> ---
->  target/ppc/mmu-book3s-v3.h  | 50 +++++++++++++++++++++++++++++++++++++++=
-++++++
->  target/ppc/mmu-hash64.c     |  8 ++++++++
->  target/ppc/mmu_helper.c     | 40 ++++++++++++++++++++++++++++++++++++
->  target/ppc/translate_init.c |  3 ++-
->  4 files changed, 100 insertions(+), 1 deletion(-)
->  create mode 100644 target/ppc/mmu-book3s-v3.h
->=20
-> diff --git a/target/ppc/mmu-book3s-v3.h b/target/ppc/mmu-book3s-v3.h
-> new file mode 100644
-> index 0000000..9375921
-> --- /dev/null
-> +++ b/target/ppc/mmu-book3s-v3.h
-> @@ -0,0 +1,50 @@
-> +/*
-> + *  PowerPC emulation generic mmu definitions for qemu.
-> + *
-> + *  Copyright (c) 2017 Suraj Jitindar Singh, IBM Corporation
-> + *
-> + * This library is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU Lesser General Public
-> + * License as published by the Free Software Foundation; either
-> + * version 2 of the License, or (at your option) any later version.
-> + *
-> + * This library is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + * Lesser General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU Lesser General Public
-> + * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
-> + */
-> +
-> +#ifndef MMU_H
-> +#define MMU_H
-> +
-> +#ifndef CONFIG_USER_ONLY
-> +
-> +/* Partition Table Entry Fields */
-> +#define PATBE1_GR 0x8000000000000000
-> +
-> +#ifdef TARGET_PPC64
-> +
-> +static inline bool ppc64_use_proc_tbl(PowerPCCPU *cpu)
-> +{
-> +    return !!(cpu->env.spr[SPR_LPCR] & LPCR_UPRT);
-> +}
-> +
-> +static inline bool ppc64_radix_guest(PowerPCCPU *cpu)
-> +{
-> +    PPCVirtualHypervisorClass *vhc =3D
-> +        PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
-> +
-> +    return !!(vhc->get_patbe(cpu->vhyp) & PATBE1_GR);
-> +}
-> +
-> +int ppc64_v3_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
-> +                              int mmu_idx);
-> +
-> +#endif /* TARGET_PPC64 */
-> +
-> +#endif /* CONFIG_USER_ONLY */
-> +
-> +#endif /* MMU_H */
-> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-> index 3e17a9f..a581b50 100644
-> --- a/target/ppc/mmu-hash64.c
-> +++ b/target/ppc/mmu-hash64.c
-> @@ -27,6 +27,7 @@
->  #include "kvm_ppc.h"
->  #include "mmu-hash64.h"
->  #include "exec/log.h"
-> +#include "mmu-book3s-v3.h"
-> =20
->  //#define DEBUG_SLB
-> =20
-> @@ -767,6 +768,13 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vad=
-dr eaddr,
->      /* 2. Translation is on, so look up the SLB */
->      slb =3D slb_lookup(cpu, eaddr);
->      if (!slb) {
-> +        /* No entry found, check if in-memory segment tables are in use =
-*/
-> +        if (ppc64_use_proc_tbl(cpu)) {
-> +            /* TODO - Unsupported */
-> +            error_report("Segment Table Support Unimplemented");
-> +            abort();
-> +        }
-> +        /* Segment still not found, generate the appropriate interrupt */
->          if (rwx =3D=3D 2) {
->              cs->exception_index =3D POWERPC_EXCP_ISEG;
->              env->error_code =3D 0;
-> diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
-> index 2911266..527123c 100644
-> --- a/target/ppc/mmu_helper.c
-> +++ b/target/ppc/mmu_helper.c
-> @@ -28,6 +28,8 @@
->  #include "exec/cpu_ldst.h"
->  #include "exec/log.h"
->  #include "helper_regs.h"
-> +#include "qemu/error-report.h"
-> +#include "mmu-book3s-v3.h"
-> =20
->  //#define DEBUG_MMU
->  //#define DEBUG_BATS
-> @@ -1280,6 +1282,17 @@ void dump_mmu(FILE *f, fprintf_function cpu_fprint=
-f, CPUPPCState *env)
->      case POWERPC_MMU_2_07a:
->          dump_slb(f, cpu_fprintf, ppc_env_get_cpu(env));
->          break;
-> +    case POWERPC_MMU_3_00:
-> +        if (ppc64_radix_guest(ppc_env_get_cpu(env))) {
-> +            /* TODO - Unsupported */
-> +        } else {
-> +            if (ppc64_use_proc_tbl(ppc_env_get_cpu(env))) {
-> +                /* TODO - Unsupported */
-> +            } else {
-> +                dump_slb(f, cpu_fprintf, ppc_env_get_cpu(env));
-> +                break;
-> +            }
-> +        }
->  #endif
->      default:
->          qemu_log_mask(LOG_UNIMP, "%s: unimplemented\n", __func__);
-> @@ -1421,6 +1434,17 @@ hwaddr ppc_cpu_get_phys_page_debug(CPUState *cs, v=
-addr addr)
->      case POWERPC_MMU_2_07:
->      case POWERPC_MMU_2_07a:
->          return ppc_hash64_get_phys_page_debug(cpu, addr);
-> +    case POWERPC_MMU_3_00:
-> +        if (ppc64_radix_guest(ppc_env_get_cpu(env))) {
-> +            /* TODO - Unsupported */
-> +        } else {
-> +            if (ppc64_use_proc_tbl(ppc_env_get_cpu(env))) {
-> +                /* TODO - Unsupported */
-> +            } else {
-> +                return ppc_hash64_get_phys_page_debug(cpu, addr);
-> +            }
+On 2017=E5=B9=B402=E6=9C=8822=E6=97=A5 16:51, Hailiang Zhang wrote:
+> On 2017/2/22 16:45, Hailiang Zhang wrote:
+>> On 2017/2/22 16:07, Jason Wang wrote:
+>>>
+>>>
+>>> On 2017=E5=B9=B402=E6=9C=8822=E6=97=A5 11:46, zhanghailiang wrote:
+>>>> After a net connection is closed, we didn't clear its releated=20
+>>>> resources
+>>>> in connection_track_table, which will lead to memory leak.
+>>>
+>>> Not a real leak but would lead reset of hash table if too many closed
+>>> connections.
+>>>
+>>
+>> Yes, you are right, there will be lots of stale connection data in=20
+>> hash table
+>> if we don't remove it while it is been closed. Which
 
-I don't think you need the inner if in this case -
-ppc_hash64_get_phys_page_debug() will be basically right for both
-cases, except it will (eventually) need an internal check to consult
-segment tables if they're there.
 
-One interesting wrinkle here is that this debug path is exactly a case
-where it could be useful to consult the segment tables if the OS
-provides them, even if the actual hardware MMU doesn't use them.
+Ok, so let's come up with a better title of the patch.
 
-> +        }
-> +        break;
->  #endif
-> =20
->      case POWERPC_MMU_32B:
-> @@ -2907,3 +2931,19 @@ void tlb_fill(CPUState *cs, target_ulong addr, MMU=
-AccessType access_type,
->                                 retaddr);
->      }
->  }
-> +
-> +/***********************************************************************=
-*******/
-> +
-> +/* ISA v3.00 (POWER9) Generic MMU Helpers */
-> +
-> +int ppc64_v3_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
-> +                              int mmu_idx)
-> +{
-> +    if (ppc64_radix_guest(cpu)) { /* Guest uses radix */
-> +        /* TODO - Unsupported */
-> +        error_report("Guest Radix Support Unimplemented");
-> +        abort();
-> +    } else { /* Guest uses hash */
-> +        return ppc_hash64_handle_mmu_fault(cpu, eaddr, rwx, mmu_idx);
-> +    }
-> +}
+>>
+>>>>
+>>>> Let't track the state of net connection, if it is closed, its relate=
+d
+>>>> resources will be cleared up.
+>>>
+>>> The issue is the state were tracked partially, do we need a full stat=
+e
+>>> machine here?
+>>>
+>>
+>> Not, IMHO, we only care about the last state of it, because, we will=20
+>> do nothing
+>> even if we track the intermedial states.
 
-This can go into a new mmu-books-v3.c, small for now, but it can take
-the radix stuff as well once it gets implemented.
+Well, you care at least syn state too. Without a complete state machine,=20
+it's very hard to track even partial state I believe. And you will fail=20
+to track some state transition for sure which makes the code fragile.
 
-> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> index 32c1619..7661c21 100644
-> --- a/target/ppc/translate_init.c
-> +++ b/target/ppc/translate_init.c
-> @@ -32,6 +32,7 @@
->  #include "qapi/visitor.h"
->  #include "hw/qdev-properties.h"
->  #include "hw/ppc/ppc.h"
-> +#include "mmu-book3s-v3.h"
-> =20
->  //#define PPC_DUMP_CPU
->  //#define PPC_DEBUG_SPR
-> @@ -8898,7 +8899,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
->                      (1ull << MSR_LE);
->      pcc->mmu_model =3D POWERPC_MMU_3_00;
->  #if defined(CONFIG_SOFTMMU)
-> -    pcc->handle_mmu_fault =3D ppc_hash64_handle_mmu_fault;
-> +    pcc->handle_mmu_fault =3D ppc64_v3_handle_mmu_fault;
->      /* segment page size remain the same */
->      pcc->sps =3D &POWER7_POWER8_sps;
->  #endif
+>>
+>>>>
+>>>> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+>>>> ---
+>>>>     net/colo.h            |  4 +++
+>>>>     net/filter-rewriter.c | 70=20
+>>>> +++++++++++++++++++++++++++++++++++++++++++++------
+>>>>     2 files changed, 67 insertions(+), 7 deletions(-)
+>>>>
+>>>> diff --git a/net/colo.h b/net/colo.h
+>>>> index 7c524f3..cd9027f 100644
+>>>> --- a/net/colo.h
+>>>> +++ b/net/colo.h
+>>>> @@ -18,6 +18,7 @@
+>>>>     #include "slirp/slirp.h"
+>>>>     #include "qemu/jhash.h"
+>>>>     #include "qemu/timer.h"
+>>>> +#include "slirp/tcp.h"
+>>>>
+>>>>     #define HASHTABLE_MAX_SIZE 16384
+>>>>
+>>>> @@ -69,6 +70,9 @@ typedef struct Connection {
+>>>>          * run once in independent tcp connection
+>>>>          */
+>>>>         int syn_flag;
+>>>> +
+>>>> +    int tcp_state; /* TCP FSM state */
+>>>> +    tcp_seq fin_ack_seq; /* the seq of 'fin=3D1,ack=3D1' */
+>>>>     } Connection;
+>>>>
+>>>>     uint32_t connection_key_hash(const void *opaque);
+>>>> diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
+>>>> index c4ab91c..7e7ec35 100644
+>>>> --- a/net/filter-rewriter.c
+>>>> +++ b/net/filter-rewriter.c
+>>>> @@ -60,9 +60,9 @@ static int is_tcp_packet(Packet *pkt)
+>>>>     }
+>>>>
+>>>>     /* handle tcp packet from primary guest */
+>>>> -static int handle_primary_tcp_pkt(NetFilterState *nf,
+>>>> +static int handle_primary_tcp_pkt(RewriterState *rf,
+>>>>                                       Connection *conn,
+>>>> -                                  Packet *pkt)
+>>>> +                                  Packet *pkt, ConnectionKey *key)
+>>>>     {
+>>>>         struct tcphdr *tcp_pkt;
+>>>>
+>>>> @@ -97,15 +97,45 @@ static int=20
+>>>> handle_primary_tcp_pkt(NetFilterState *nf,
+>>>>             tcp_pkt->th_ack =3D htonl(ntohl(tcp_pkt->th_ack) +=20
+>>>> conn->offset);
+>>>>
+>>>>             net_checksum_calculate((uint8_t *)pkt->data, pkt->size);
+>>>> +        /*
+>>>> +         * Case 1:
+>>>> +         * The *server* side of this connect is VM, *client* tries=20
+>>>> to close
+>>>> +         * the connection.
+>>>> +         *
+>>>> +         * We got 'ack=3D1' packets from client side, it acks=20
+>>>> 'fin=3D1, ack=3D1'
+>>>> +         * packet from server side. From this point, we can ensure=20
+>>>> that there
+>>>> +         * will be no packets in the connection, except that, some=20
+>>>> errors
+>>>> +         * happen between the path of 'filter object' and vNIC, if=20
+>>>> this rare
+>>>> +         * case really happen, we can still create a new connection=
+,
+>>>> +         * So it is safe to remove the connection from=20
+>>>> connection_track_table.
+>>>> +         *
+>>>> +         */
+>>>> +        if ((conn->tcp_state =3D=3D TCPS_LAST_ACK) &&
+>>>> +            (ntohl(tcp_pkt->th_ack) =3D=3D (conn->fin_ack_seq + 1))=
+) {
+>>>> +            fprintf(stderr, "Remove conn "
+>>>
+>>> Can this even compile?
+>>>
+>>
+>> Oops, i forgot to remove it, will remove it in next version.
+>>
+>>>> + g_hash_table_remove(rf->connection_track_table, key);
+>>>> +        }
+>>>> +    }
+>>>> +    /*
+>>>> +     * Case 2:
+>>>> +     * The *server* side of this connect is VM, *server* tries to=20
+>>>> close
+>>>> +     * the connection.
+>>>> +     *
+>>>> +     * We got 'fin=3D1, ack=3D1' packet from client side, we need t=
+o
+>>>> +     * record the seq of 'fin=3D1, ack=3D1' packet.
+>>>> +     */
+>>>> +    if ((tcp_pkt->th_flags & (TH_ACK | TH_FIN)) =3D=3D (TH_ACK |=20
+>>>> TH_FIN)) {
+>>>> +        conn->fin_ack_seq =3D htonl(tcp_pkt->th_seq);
+>>>> +        conn->tcp_state =3D TCPS_LAST_ACK;
+>>>>         }
+>>>>
+>>>>         return 0;
+>>>>     }
+>>>>
+>>>>     /* handle tcp packet from secondary guest */
+>>>> -static int handle_secondary_tcp_pkt(NetFilterState *nf,
+>>>> +static int handle_secondary_tcp_pkt(RewriterState *rf,
+>>>>                                         Connection *conn,
+>>>> -                                    Packet *pkt)
+>>>> +                                    Packet *pkt, ConnectionKey *key=
+)
+>>>>     {
+>>>>         struct tcphdr *tcp_pkt;
+>>>>
+>>>> @@ -133,8 +163,34 @@ static int=20
+>>>> handle_secondary_tcp_pkt(NetFilterState *nf,
+>>>>             tcp_pkt->th_seq =3D htonl(ntohl(tcp_pkt->th_seq) -=20
+>>>> conn->offset);
+>>>>
+>>>>             net_checksum_calculate((uint8_t *)pkt->data, pkt->size);
+>>>> +        /*
+>>>> +         * Case 2:
+>>>> +         * The *server* side of this connect is VM, *server* tries=20
+>>>> to close
+>>>> +         * the connection.
+>>>> +         *
+>>>> +         * We got 'ack=3D1' packets from server side, it acks=20
+>>>> 'fin=3D1, ack=3D1'
+>>>> +         * packet from client side. Like Case 1, there should be=20
+>>>> no packets
+>>>> +         * in the connection from now know, But the difference=20
+>>>> here is
+>>>> +         * if the packet is lost, We will get the resent=20
+>>>> 'fin=3D1,ack=3D1' packet.
+>>>> +         * TODO: Fix above case.
+>>>> +         */
+>>>> +        if ((conn->tcp_state =3D=3D TCPS_LAST_ACK) &&
+>>>> +            (ntohl(tcp_pkt->th_ack) =3D=3D (conn->fin_ack_seq + 1))=
+) {
+>>>> + g_hash_table_remove(rf->connection_track_table, key);
+>>>> +        }
+>>>> +    }
+>>>> +    /*
+>>>> +     * Case 1:
+>>>> +     * The *server* side of this connect is VM, *client* tries to=20
+>>>> close
+>>>> +     * the connection.
+>>>> +     *
+>>>> +     * We got 'fin=3D1, ack=3D1' packet from server side, we need t=
+o
+>>>> +     * record the seq of 'fin=3D1, ack=3D1' packet.
+>>>> +     */
+>>>> +    if ((tcp_pkt->th_flags & (TH_ACK | TH_FIN)) =3D=3D (TH_ACK |=20
+>>>> TH_FIN)) {
+>>>> +        conn->fin_ack_seq =3D ntohl(tcp_pkt->th_seq);
+>>>> +        conn->tcp_state =3D TCPS_LAST_ACK;
+>>>
+>>> I thought the tcp_state should store the state of TCP from the view o=
+f
+>>> secondary VM? So TCPS_LAST_ACK is wrong and bring lots of confusion.=20
+>>> And
+>>> the handle of active close needs more states here. E.g if connection =
+is
+>>> in FIN_WAIT_2, the connection is only half closed, remote peer can=20
+>>> still
+>>> send packet to us unless we receive a FIN.
+>>>
+>>
+>> Yes, i know what you mean, actually, here, we try to only track the la=
+st
+>> two steps for closing a connection, that is 'fin=3D1,ack=3D1,seq=3D2,a=
+ck=3Du+1'
+>                                              ^=20
+> 'FIN=3D1,ACK=3D1,seq=3Dw,ack=3Du+1'
+>
+>> and 'ack=3D1,seq=3Du+1,ack=3Dw+1', because if we get a 'fin=3D1,ack=3D=
+1', we can
+>      ^ 'ACK=3D1,seq=3Du+1,ack=3Dw+1'                     ^ 'FIN=3D1=EF=BC=
+=8CACK=3D1'
+>
+>> ensure that the 'fin=3D1,seq=3Du' packet has been posted.
+>>
+>                   ^ 'FIN=3D1,seq=3Du'
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+That's just the case I'm saying, the transition above is in fact:
 
---ngshnjhd05HsCES+
-Content-Type: application/pgp-signature; name="signature.asc"
+secondary(ESTABLISHED)
+secondary(FIN_WAIT_1): ->  FIN,seq=3Dw,ack=3Du+1   -> :remote
+secondary(FIN_WAIT_2): <-  seq=3Du+1,ack=3Dw+1     <- :remote
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+So we are in fact in FIN_WAIT_2, which means the connection is only half=20
+closed, but your patch will treat this as fully closed connection and=20
+will remove the connection from the hashtable.
 
-iQIcBAEBCAAGBQJYrmBVAAoJEGw4ysog2bOSDuEQAN8UcP+ElGlMEH6jICEGcHlJ
-n4rO+jAWzGfLt/hoaJq+zqv3kpziAOtzfB8uuIbyQqu9e7KJR48Jd+r30YS5UZBQ
-6eywlIQmwXAjog1/OlgRK6JpmLu+TSJD8VSb22WQVWtKVgPiLHwHccgttyT2alWI
-pGmIZpRL5BO/GNuLUHTlzjGLtq2840Cm4sOv51hm2HSSGD31f6etulFr8v9sohwD
-at7WlZtnBfu7zljTjtZelhH3J+ULofjErVOSSL9Qq8zYxrIdI5xpNQ6ArLQDZQ6b
-wyLfjMSfFMNcogu+VY5WVFj6Lx+vZchBjm34BoubTAbguQOYBUN4Y4uay98p40Es
-BjhOZ05YWQPMcrc9BGrGg9gv6qJrTU9ryeHT+W0KRV0ieVEfQCm6123eGTvf/swS
-yJmFm2KDVbhdShda/b2pBCdUIA7nL0uWbZPPP8QkFFGBOVQhbnO3tBurU/A/ccNb
-54DCLwf9wISeM5ChDhHnwjSJaGObeRXhyetoHCCgJUXbxDChT0vumnxsSrNQ6V7k
-ioDCoDJ7D8e1s4DO9tb6ozrlwTdbUjWqHYjsRvaF6X4i1CFQxpSGKaWl4dzZWibk
-7ArLLUop7i9kS9BD8xxUG/Iqw48ghOyvfIPujl1DpAwvokZVzjZZ+7BvGUaYa+Xm
-n6v2AJOfwbFj1FuKOHJW
-=Dqoa
------END PGP SIGNATURE-----
+What's more I don't think we can decide passive or active close by:
 
---ngshnjhd05HsCES+--
+
++    if ((tcp_pkt->th_flags & (TH_ACK | TH_FIN)) =3D=3D (TH_ACK | TH_FIN)=
+) {
+
+Since both cases will send FIN,ACK for sure.
+
+>
+>> Another reason is we may can't track the 'fin=3D1,seq=3Du' packet whil=
+e
+>> we start COLO while one connection is closing, which the=20
+>> 'fin=3D1,seq=3Du' packet
+>> has been posted.
+>>
+>> Actually, here, if we start COLO while one connection is closing,=20
+>> which the
+>> 'fin=3D1,ack=3D1' has been posted, we can only track 'ack=3D1' packet.=
+ In this
+>
+>  ^ 'FIN=3D1,ACK=3D1'
+>
+> Sorry for the typo. :)
+>
+>> case, the connection will be left in hash table for ever though it is=20
+>> harmless.
+>> Any ideas for this case ?
+
+Sorry I don't follow the question.
+
+>>
+>> For the above codes question, i'd like to change tcp_state to=20
+>> tap_closing_wait,
+>> is it OK ?
+
+You mean "tcp_closing_wait". I think we need first figure out if we can=20
+track the state correctly first.
+
+Thanks
+
+>>
+>> Thanks.
+>> Hailiang
+>>
+>>> Thanks
+>>>
+>>>>         }
+>>>> -
+>>>>         return 0;
+>>>>     }
+>>>>
+>>>> @@ -178,7 +234,7 @@ static ssize_t=20
+>>>> colo_rewriter_receive_iov(NetFilterState *nf,
+>>>>
+>>>>             if (sender =3D=3D nf->netdev) {
+>>>>                 /* NET_FILTER_DIRECTION_TX */
+>>>> -            if (!handle_primary_tcp_pkt(nf, conn, pkt)) {
+>>>> +            if (!handle_primary_tcp_pkt(s, conn, pkt, &key)) {
+>>>> qemu_net_queue_send(s->incoming_queue, sender, 0,
+>>>>                     (const uint8_t *)pkt->data, pkt->size, NULL);
+>>>>                     packet_destroy(pkt, NULL);
+>>>> @@ -191,7 +247,7 @@ static ssize_t=20
+>>>> colo_rewriter_receive_iov(NetFilterState *nf,
+>>>>                 }
+>>>>             } else {
+>>>>                 /* NET_FILTER_DIRECTION_RX */
+>>>> -            if (!handle_secondary_tcp_pkt(nf, conn, pkt)) {
+>>>> +            if (!handle_secondary_tcp_pkt(s, conn, pkt, &key)) {
+>>>> qemu_net_queue_send(s->incoming_queue, sender, 0,
+>>>>                     (const uint8_t *)pkt->data, pkt->size, NULL);
+>>>>                     packet_destroy(pkt, NULL);
+>>>
+>>>
+>>> .
+>>>
+>
+>
