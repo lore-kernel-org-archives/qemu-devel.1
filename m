@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40504)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=220d765e8=Paul.Durrant@citrix.com>)
-	id 1cgumS-000206-LX
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:54:05 -0500
+	id 1cgumS-000208-M1
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:54:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=220d765e8=Paul.Durrant@citrix.com>)
-	id 1cgumO-0006Y9-Jq
+	id 1cgumN-0006Xf-Ml
 	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:54:04 -0500
 Received: from smtp02.citrix.com ([66.165.176.63]:58916)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
 	(envelope-from <prvs=220d765e8=Paul.Durrant@citrix.com>)
-	id 1cgumO-0006Wt-A3
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:54:00 -0500
+	id 1cgumN-0006Wt-Gb
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:53:59 -0500
 From: Paul Durrant <paul.durrant@citrix.com>
-Date: Thu, 23 Feb 2017 14:53:54 +0000
-Message-ID: <1487861635-17560-5-git-send-email-paul.durrant@citrix.com>
-In-Reply-To: <1487861635-17560-1-git-send-email-paul.durrant@citrix.com>
-References: <1487861635-17560-1-git-send-email-paul.durrant@citrix.com>
+Date: Thu, 23 Feb 2017 14:53:50 +0000
+Message-ID: <1487861635-17560-1-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 4/5] configure: detect presence of
- libxendevicemodel
+Subject: [Qemu-devel] [PATCH 0/5] xen: use new xendevicemodel library
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +27,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
+Cc: Paul Durrant <paul.durrant@citrix.com>
 
-This patch adds code in configure to set CONFIG_XEN_CTRL_INTERFACE_VERSION
-to a new value of 490 if libxendevicemodel is present in the build
-environment.
+My recent patches to Xen [1] introduced a new library to support
+running device models for HVM guests.
+This series ports QEMU onto the new library if it is available in the
+build environment.
 
-Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
----
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
----
- configure | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+Paul Durrant (5):
+  xen: make use of xen_xc implicit in xen_common.h inlines
+  xen: rename xen_modified_memory() to xen_hvm_modified_memory()
+  xen: create wrappers for all other uses of xc_hvm_XXX() functions
+  configure: detect presence of libxendevicemodel
+  xen: use libxendevicemodel when available
 
-diff --git a/configure b/configure
-index 8e8f18d..fc1e12b 100755
---- a/configure
-+++ b/configure
-@@ -1980,6 +1980,25 @@ EOF
-   # Xen unstable
-   elif
-       cat > $TMPC <<EOF &&
-+#undef XC_WANT_COMPAT_DEVICEMODEL_API
-+#define __XEN_TOOLS__
-+#include <xendevicemodel.h>
-+int main(void) {
-+  xendevicemodel_handle *xd;
-+
-+  xd = xendevicemodel_open(0, 0);
-+  xendevicemodel_close(xd);
-+
-+  return 0;
-+}
-+EOF
-+      compile_prog "" "$xen_libs $xen_stable_libs -lxendevicemodel"
-+    then
-+    xen_stable_libs="$xen_stable_libs -lxendevicemodel"
-+    xen_ctrl_version=490
-+    xen=yes
-+  elif
-+      cat > $TMPC <<EOF &&
- /*
-  * If we have stable libs the we don't want the libxc compat
-  * layers, regardless of what CFLAGS we may have been given.
+ configure                    |  19 ++++
+ hw/i386/xen/xen_platform.c   |   2 +-
+ hw/xen/xen_backend.c         |   2 -
+ include/exec/ram_addr.h      |   4 +-
+ include/hw/xen/xen.h         |   2 +-
+ include/hw/xen/xen_backend.h |   2 -
+ include/hw/xen/xen_common.h  | 200 ++++++++++++++++++++++++++++++++-----------
+ xen-common.c                 |  11 +++
+ xen-hvm-stub.c               |   2 +-
+ xen-hvm.c                    |  49 ++++++-----
+ 10 files changed, 207 insertions(+), 86 deletions(-)
+
 -- 
 2.1.4
