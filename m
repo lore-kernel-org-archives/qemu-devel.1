@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53424)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ch2hz-0002LG-6Y
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 18:22:00 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ch2ix-0003dY-8i
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 18:23:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ch2hw-0005b8-0a
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 18:21:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44326)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ch2hv-0005ai-OW
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 18:21:55 -0500
-Date: Fri, 24 Feb 2017 01:21:52 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170224012000-mutt-send-email-mst@kernel.org>
-References: <1487742565-2513-1-git-send-email-peterx@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1ch2iv-0005t2-W6
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 18:22:59 -0500
+Date: Fri, 24 Feb 2017 09:57:19 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170223225719.GF17615@umbus.fritz.box>
+References: <20170105054618.GA12106@umbus.fritz.box>
+	<20170106125758.4643fb35@bahia.lan>
+	<20170112035219.GK14026@umbus.fritz.box>
+	<0bfaa82a-d5f5-eb0f-14a9-f7d13239cee5@ozlabs.ru>
+	<20170112100823.2a906117@bahia.lan>
+	<20170113044831.GP13656@umbus.fritz.box>
+	<20170113095828.302b77f2@bahia.lan>
+	<20170222120825.0253f2d6@bahia.lan>
+	<20170223021152.GR12577@umbus.fritz.box>
+	<20170223082350.4c118d7e@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="m1UC1K4AOz1Ywdkx"
 Content-Disposition: inline
-In-Reply-To: <1487742565-2513-1-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] intel_iommu: make sure its init before PCI
- dev
+In-Reply-To: <20170223082350.4c118d7e@bahia.lan>
+Subject: Re: [Qemu-devel] [Qemu-ppc] Proposal PCI/PCIe device placement on
+ PAPR guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,105 +33,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, yi.l.liu@intel.com, Jintack Lim <jintack@cs.columbia.edu>
-
-On Wed, Feb 22, 2017 at 01:49:25PM +0800, Peter Xu wrote:
-> Intel vIOMMU devices are created with "-device" parameter, while here
-> actually we need to make sure this device will be created before some
-> other PCI devices (like vfio-pci devices) so that we know iommu_fn will
-> be setup correctly before realizations of those PCI devices.
-> Here we do explicit check to make sure intel-iommu device will be inited
-> before all the rest of the PCI devices. This is done by checking against
-> the devices dangled under current root PCIe bus and we should see
-> nothing there besides integrated ICH9 ones.
-> 
-> If the user violated this rule, we abort the program.
-> 
-> Maybe one day we will be able to manage the ordering of device
-> initialization, and then we can grant VT-d devices a higher init
-> priority. But before that, let's have this explicit check to make sure
-> of it.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  hw/i386/intel_iommu.c | 40 ++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 40 insertions(+)
-> 
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 22d8226..db74124 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -31,6 +31,7 @@
->  #include "hw/i386/apic-msidef.h"
->  #include "hw/boards.h"
->  #include "hw/i386/x86-iommu.h"
-> +#include "hw/i386/ich9.h"
->  #include "hw/pci-host/q35.h"
->  #include "sysemu/kvm.h"
->  #include "hw/i386/apic_internal.h"
-> @@ -2560,6 +2561,41 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
->      return true;
->  }
->  
-> +static bool vtd_has_inited_pci_devices(PCIBus *bus, Error **errp)
-> +{
-> +    int i;
-> +    uint8_t func;
-> +
-> +    /* We check against root bus */
-> +    assert(bus && pci_bus_is_root(bus));
-> +
-> +    /*
-> +     * We need to make sure vIOMMU device is created before other PCI
-> +     * devices other than the integrated ICH9 ones,
+To: Greg Kurz <groug@kaod.org>
+Cc: lvivier@redhat.com, thuth@redhat.com, ehabkost@redhat.com, qemu-devel@nongnu.org, abologna@redhat.com, mdroth@linux.vnet.ibm.com, libvir-list@redhat.com, qemu-ppc@nongnu.org, marcel@redhat.com
 
 
-Why wouldn't this apply to integrated ICH9 ones?
+--m1UC1K4AOz1Ywdkx
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Feb 23, 2017 at 08:23:50AM +0100, Greg Kurz wrote:
+> On Thu, 23 Feb 2017 13:11:52 +1100
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > On Wed, Feb 22, 2017 at 12:08:25PM +0100, Greg Kurz wrote:
+> > > David,
+> > >=20
+> > > I don't see the "spapr_pci: Allow PCI-Express devices" patch in your
+> > > ppc-for-2.9 tree. Do you still consider merging it ? =20
+> >=20
+> > No.  After discussions with Marcel Apfelbaum and others I'm looking at
+> > a different approach for PCIe support.
+> >=20
+>=20
+> Oh, I had missed that... Is it the following thread ?
+>=20
+> https://lists.gnu.org/archive/html/qemu-ppc/2017-02/msg00203.html
 
-> so that they can
-> +     * get correct iommu_fn setup even during its realize(). Some
-> +     * devices (e.g., vfio-pci) will need a correct iommu_fn to work.
+That's the one.
 
-If there's something special about vfio devices, then just check
-the device type.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-> +     */
-> +    for (i = 1; i < PCI_FUNC_MAX * PCI_SLOT_MAX; i++) {
-> +        /* Skip the checking against ICH9 integrated devices */
-> +        if (PCI_SLOT(i) == ICH9_LPC_DEV) {
-> +            func = PCI_FUNC(i);
-> +            if (func == ICH9_LPC_FUNC ||
-> +                func == ICH9_SATA1_FUNC ||
-> +                func == ICH9_SMB_FUNC) {
-> +                continue;
-> +            }
-> +        }
-> +
-> +        if (bus->devices[i]) {
-> +            error_setg(errp, "Please init intel-iommu before "
-> +                       "other PCI devices");
-> +            return true;
-> +        }
-> +    }
-> +
-> +    return false;
-> +}
-> +
->  static void vtd_realize(DeviceState *dev, Error **errp)
->  {
->      PCMachineState *pcms = PC_MACHINE(qdev_get_machine());
-> @@ -2567,6 +2603,10 @@ static void vtd_realize(DeviceState *dev, Error **errp)
->      IntelIOMMUState *s = INTEL_IOMMU_DEVICE(dev);
->      X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(dev);
->  
-> +    if (vtd_has_inited_pci_devices(bus, errp)) {
-> +        return;
-> +    }
-> +
->      VTD_DPRINTF(GENERAL, "");
->      x86_iommu->type = TYPE_INTEL;
->  
-> -- 
-> 2.7.4
+--m1UC1K4AOz1Ywdkx
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYr2jOAAoJEGw4ysog2bOSSagQAMWlnZ8mnNyTWXUD1Z9txmZN
+EhNQNzQ9HuPfP+XjbVYPgAaPEPiDVkvChSa5kc+u0tTmY2i4kVPfbg1NXZ7FnqRd
+tO//7anoZnwbC7BKC/Wo7B/I2Gf5eSlUTl+iXRyBIDXVcxC5KT/bLkVOxOT8Xnzn
+Iy4GkEEVroObKVjToVuWs+ZpX49Okg0lhOSomPoV0x5BdN8YOHColXbWA6j1AfjL
+25Hfs5Hx09toaZwXnrRK4PQkloFG6TbEJSSbO7wx727BXibbB0BA0fdPCNYMr1rV
+WOvPFBn0bEsjs8d77clVp2sLsKxxIaqCwZEgjGOuyPzlaIadckKtIiLMEmPEGFFU
+2k3ugTUSf2QgMXR6+Igu9J/N2O6w8+TLTnf2Hu8+B5sSNkFrgTCGLsTtLEcv0sjq
+RE0gr2E+8SHsXCT503zAUfCF/KbRHlID88xxIwC0Z+xP58DPPojHTDcUqXyh5eyh
+MoSRmB+g4zIPdnlvdgoWKTwekooIn3kn8vQ9iyjAyhtBORnqpfKX3vpK28yW2pMh
+iD4nRuYZK/kAVhd1Ml57Mzc+UtzjfuGyGweGJ7t0xTQPAr7Q8CwLKCtQR1lIZ8oa
+FPekU2SoD6h//xjdJueM/E1t2pmB2fmmPDrGQcZyfKq8uV1jRYAPn3paAkJxhVPD
+ESL9zX5LPeS5K6pxcRtf
+=0fcH
+-----END PGP SIGNATURE-----
+
+--m1UC1K4AOz1Ywdkx--
