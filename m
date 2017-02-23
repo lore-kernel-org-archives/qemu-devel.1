@@ -1,35 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35798)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cgsO0-0006Ds-4t
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cgsO0-0006EO-HJ
 	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 07:20:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cgsNv-0002sD-Ur
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 07:20:39 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33908
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cgsNw-0002sU-HV
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 07:20:40 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36861)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cgsNv-0002s4-Gd
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 07:20:35 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1NCIsOp039477
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 07:20:35 -0500
-Received: from e06smtp06.uk.ibm.com (e06smtp06.uk.ibm.com [195.75.94.102])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28swwx4cey-1
+	id 1cgsNw-0002s6-3T
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 07:20:36 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1NCIudG023191
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 07:20:34 -0500
+Received: from e06smtp08.uk.ibm.com (e06smtp08.uk.ibm.com [195.75.94.104])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28sts0v3hw-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 07:20:34 -0500
 Received: from localhost
-	by e06smtp06.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp08.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Thu, 23 Feb 2017 12:20:33 -0000
+	Thu, 23 Feb 2017 12:20:31 -0000
 From: Cornelia Huck <cornelia.huck@de.ibm.com>
-Date: Thu, 23 Feb 2017 13:20:23 +0100
+Date: Thu, 23 Feb 2017 13:20:21 +0100
 In-Reply-To: <20170223122025.10420-1-cornelia.huck@de.ibm.com>
 References: <20170223122025.10420-1-cornelia.huck@de.ibm.com>
-Message-Id: <20170223122025.10420-4-cornelia.huck@de.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 3/5] s390x/ipl: Load network boot image
+Message-Id: <20170223122025.10420-2-cornelia.huck@de.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 1/5] elf-loader: Allow late loading of elf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,182 +38,135 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, Farhan Ali <alifm@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, Farhan Ali <alifm@linux.vnet.ibm.com>, Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cornelia.huck@de.ibm.com>
 
 From: Farhan Ali <alifm@linux.vnet.ibm.com>
 
-Load the network boot image into guest RAM when the boot
-device selected is a network device. Use some of the reserved
-space in IplBlockCcw to store the start address of the netboot
-image.
+The current QEMU ROM infrastructure rejects late loading of ROMs.
+And ELFs are currently loaded as ROM, this prevents delayed loading
+of ELFs. So when loading ELF, allow the user to specify if ELF should
+be loaded as ROM or not.
 
-A user could also use 'chreipl'(diag 308/5) to change the boot device.
-So every time we update the IPLB, we need to verify if the selected
-boot device is a network device so we can appropriately load the
-network boot image.
+If an ELF is not loaded as ROM, then they are not restored on a
+guest reboot/reset and so its upto the user to handle the reloading.
 
 Signed-off-by: Farhan Ali <alifm@linux.vnet.ibm.com>
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
 ---
- hw/s390x/ipl.c | 89 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- hw/s390x/ipl.h |  4 ++-
- 2 files changed, 92 insertions(+), 1 deletion(-)
+ hw/core/loader.c     | 17 +++++++++++++++--
+ include/hw/elf_ops.h | 13 +++++++++----
+ include/hw/loader.h  | 13 ++++++++++++-
+ 3 files changed, 36 insertions(+), 7 deletions(-)
 
-diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index fd656718a7..195cac559f 100644
---- a/hw/s390x/ipl.c
-+++ b/hw/s390x/ipl.c
-@@ -20,6 +20,7 @@
- #include "hw/s390x/virtio-ccw.h"
- #include "hw/s390x/css.h"
- #include "ipl.h"
-+#include "qemu/error-report.h"
- 
- #define KERN_IMAGE_START                0x010000UL
- #define KERN_PARM_AREA                  0x010480UL
-@@ -227,6 +228,12 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl)
-                 TYPE_VIRTIO_CCW_DEVICE);
-         SCSIDevice *sd = (SCSIDevice *) object_dynamic_cast(OBJECT(dev_st),
-                                                             TYPE_SCSI_DEVICE);
-+        VirtIONet *vn = (VirtIONet *) object_dynamic_cast(OBJECT(dev_st),
-+                                                          TYPE_VIRTIO_NET);
-+
-+        if (vn) {
-+            ipl->netboot = true;
-+        }
-         if (virtio_ccw_dev) {
-             CcwDevice *ccw_dev = CCW_DEVICE(virtio_ccw_dev);
- 
-@@ -259,12 +266,86 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl)
-     return false;
- }
- 
-+static int load_netboot_image(Error **errp)
-+{
-+    S390IPLState *ipl = get_ipl_device();
-+    char *netboot_filename;
-+    MemoryRegion *sysmem =  get_system_memory();
-+    MemoryRegion *mr = NULL;
-+    void *ram_ptr = NULL;
-+    int img_size = -1;
-+
-+    mr = memory_region_find(sysmem, 0, 1).mr;
-+    if (!mr) {
-+        error_setg(errp, "Failed to find memory region at address 0");
-+        return -1;
-+    }
-+
-+    ram_ptr = memory_region_get_ram_ptr(mr);
-+    if (!ram_ptr) {
-+        error_setg(errp, "No RAM found");
-+        goto unref_mr;
-+    }
-+
-+    netboot_filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, ipl->netboot_fw);
-+    if (netboot_filename == NULL) {
-+        error_setg(errp, "Could not find network bootloader");
-+        goto unref_mr;
-+    }
-+
-+    img_size = load_elf_ram(netboot_filename, NULL, NULL, &ipl->start_addr,
-+                            NULL, NULL, 1, EM_S390, 0, 0, NULL, false);
-+
-+    if (img_size < 0) {
-+        img_size = load_image_size(netboot_filename, ram_ptr, ram_size);
-+        ipl->start_addr = KERN_IMAGE_START;
-+    }
-+
-+    if (img_size < 0) {
-+        error_setg(errp, "Failed to load network bootloader");
-+    }
-+
-+    g_free(netboot_filename);
-+
-+unref_mr:
-+    memory_region_unref(mr);
-+    return img_size;
+diff --git a/hw/core/loader.c b/hw/core/loader.c
+index ee5abd6eb7..9d1af1f6f3 100644
+--- a/hw/core/loader.c
++++ b/hw/core/loader.c
+@@ -435,6 +435,19 @@ int load_elf_as(const char *filename,
+                 uint64_t *highaddr, int big_endian, int elf_machine,
+                 int clear_lsb, int data_swab, AddressSpace *as)
+ {
++    return load_elf_ram(filename, translate_fn, translate_opaque,
++                        pentry, lowaddr, highaddr, big_endian, elf_machine,
++                        clear_lsb, data_swab, as, true);
 +}
 +
-+static bool is_virtio_net_device(IplParameterBlock *iplb)
++/* return < 0 if error, otherwise the number of bytes loaded in memory */
++int load_elf_ram(const char *filename,
++                 uint64_t (*translate_fn)(void *, uint64_t),
++                 void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
++                 uint64_t *highaddr, int big_endian, int elf_machine,
++                 int clear_lsb, int data_swab, AddressSpace *as,
++                 bool load_rom)
 +{
-+    uint8_t cssid;
-+    uint8_t ssid;
-+    uint16_t devno;
-+    uint16_t schid;
-+    SubchDev *sch = NULL;
-+
-+    if (iplb->pbt != S390_IPL_TYPE_CCW) {
-+        return false;
-+    }
-+
-+    devno = be16_to_cpu(iplb->ccw.devno);
-+    ssid = iplb->ccw.ssid & 3;
-+
-+    for (schid = 0; schid < MAX_SCHID; schid++) {
-+        for (cssid = 0; cssid < MAX_CSSID; cssid++) {
-+            sch = css_find_subch(1, cssid, ssid, schid);
-+
-+            if (sch && sch->devno == devno) {
-+                return sch->id.cu_model == VIRTIO_ID_NET;
-+            }
-+        }
-+    }
-+   return false;
-+}
-+
- void s390_ipl_update_diag308(IplParameterBlock *iplb)
- {
-     S390IPLState *ipl = get_ipl_device();
+     int fd, data_order, target_data_order, must_swab, ret = ELF_LOAD_FAILED;
+     uint8_t e_ident[EI_NIDENT];
  
-     ipl->iplb = *iplb;
-     ipl->iplb_valid = true;
-+    ipl->netboot = is_virtio_net_device(iplb);
- }
- 
- IplParameterBlock *s390_ipl_get_iplb(void)
-@@ -288,6 +369,7 @@ void s390_reipl_request(void)
- void s390_ipl_prepare_cpu(S390CPU *cpu)
- {
-     S390IPLState *ipl = get_ipl_device();
-+    Error *err = NULL;
- 
-     cpu->env.psw.addr = ipl->start_addr;
-     cpu->env.psw.mask = IPL_PSW_MASK;
-@@ -298,6 +380,13 @@ void s390_ipl_prepare_cpu(S390CPU *cpu)
-             ipl->iplb_valid = s390_gen_initial_iplb(ipl);
-         }
+@@ -473,11 +486,11 @@ int load_elf_as(const char *filename,
+     if (e_ident[EI_CLASS] == ELFCLASS64) {
+         ret = load_elf64(filename, fd, translate_fn, translate_opaque, must_swab,
+                          pentry, lowaddr, highaddr, elf_machine, clear_lsb,
+-                         data_swab, as);
++                         data_swab, as, load_rom);
+     } else {
+         ret = load_elf32(filename, fd, translate_fn, translate_opaque, must_swab,
+                          pentry, lowaddr, highaddr, elf_machine, clear_lsb,
+-                         data_swab, as);
++                         data_swab, as, load_rom);
      }
-+    if (ipl->netboot) {
-+        if (load_netboot_image(&err) < 0) {
-+            error_report_err(err);
-+            vm_stop(RUN_STATE_INTERNAL_ERROR);
-+        }
-+        ipl->iplb.ccw.netboot_start_addr = ipl->start_addr;
-+    }
- }
  
- static void s390_ipl_reset(DeviceState *dev)
-diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
-index 4ad9a7c05e..46930e4c64 100644
---- a/hw/s390x/ipl.h
-+++ b/hw/s390x/ipl.h
-@@ -16,7 +16,8 @@
- #include "cpu.h"
+  fail:
+diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
+index 25659b93be..a172a6068a 100644
+--- a/include/hw/elf_ops.h
++++ b/include/hw/elf_ops.h
+@@ -264,7 +264,7 @@ static int glue(load_elf, SZ)(const char *name, int fd,
+                               int must_swab, uint64_t *pentry,
+                               uint64_t *lowaddr, uint64_t *highaddr,
+                               int elf_machine, int clear_lsb, int data_swab,
+-                              AddressSpace *as)
++                              AddressSpace *as, bool load_rom)
+ {
+     struct elfhdr ehdr;
+     struct elf_phdr *phdr = NULL, *ph;
+@@ -403,10 +403,15 @@ static int glue(load_elf, SZ)(const char *name, int fd,
+                 *pentry = ehdr.e_entry - ph->p_vaddr + ph->p_paddr;
+             }
  
- struct IplBlockCcw {
--    uint8_t  reserved0[85];
-+    uint64_t netboot_start_addr;
-+    uint8_t  reserved0[77];
-     uint8_t  ssid;
-     uint16_t devno;
-     uint8_t  vm_flags;
-@@ -100,6 +101,7 @@ struct S390IPLState {
-     IplParameterBlock iplb;
-     bool iplb_valid;
-     bool reipl_requested;
-+    bool netboot;
+-            snprintf(label, sizeof(label), "phdr #%d: %s", i, name);
++            if (load_rom) {
++                snprintf(label, sizeof(label), "phdr #%d: %s", i, name);
  
-     /*< public >*/
-     char *kernel;
+-            /* rom_add_elf_program() seize the ownership of 'data' */
+-            rom_add_elf_program(label, data, file_size, mem_size, addr, as);
++                /* rom_add_elf_program() seize the ownership of 'data' */
++                rom_add_elf_program(label, data, file_size, mem_size, addr, as);
++            } else {
++                cpu_physical_memory_write(addr, data, file_size);
++                g_free(data);
++            }
+ 
+             total_size += mem_size;
+             if (addr < low)
+diff --git a/include/hw/loader.h b/include/hw/loader.h
+index 0dbd8d6bf3..3df4d73398 100644
+--- a/include/hw/loader.h
++++ b/include/hw/loader.h
+@@ -65,7 +65,7 @@ int load_image_gzipped(const char *filename, hwaddr addr, uint64_t max_sz);
+ #define ELF_LOAD_WRONG_ENDIAN -4
+ const char *load_elf_strerror(int error);
+ 
+-/** load_elf_as:
++/** load_elf_ram:
+  * @filename: Path of ELF file
+  * @translate_fn: optional function to translate load addresses
+  * @translate_opaque: opaque data passed to @translate_fn
+@@ -81,6 +81,7 @@ const char *load_elf_strerror(int error);
+  *             words and 3 for within doublewords.
+  * @as: The AddressSpace to load the ELF to. The value of address_space_memory
+  *      is used if nothing is supplied here.
++ * @load_rom : Load ELF binary as ROM
+  *
+  * Load an ELF file's contents to the emulated system's address space.
+  * Clients may optionally specify a callback to perform address
+@@ -93,6 +94,16 @@ const char *load_elf_strerror(int error);
+  * If @elf_machine is EM_NONE then the machine type will be read from the
+  * ELF header and no checks will be carried out against the machine type.
+  */
++int load_elf_ram(const char *filename,
++                 uint64_t (*translate_fn)(void *, uint64_t),
++                 void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
++                 uint64_t *highaddr, int big_endian, int elf_machine,
++                 int clear_lsb, int data_swab, AddressSpace *as,
++                 bool load_rom);
++
++/** load_elf_as:
++ * Same as load_elf_ram(), but always loads the elf as ROM
++ */
+ int load_elf_as(const char *filename,
+                 uint64_t (*translate_fn)(void *, uint64_t),
+                 void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
 -- 
 2.11.0
