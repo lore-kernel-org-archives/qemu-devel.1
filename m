@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cgjkf-0003wH-1R
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 22:07:30 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1cgk1Z-0002Gh-Mn
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 22:24:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cgjkd-0005MT-Je
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 22:07:28 -0500
-Date: Thu, 23 Feb 2017 13:33:28 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170223023328.GZ12577@umbus.fritz.box>
-References: <1487252865-12064-1-git-send-email-clg@kaod.org>
-	<1487252865-12064-12-git-send-email-clg@kaod.org>
+	(envelope-from <alex.williamson@redhat.com>) id 1cgk1W-0001RV-HV
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 22:24:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56400)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1cgk1W-0001Qk-8F
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 22:24:54 -0500
+Date: Wed, 22 Feb 2017 20:24:51 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170222202451.458de865@t450s.home>
+In-Reply-To: <20170223030647.GB4015@pxdev.xzpeter.org>
+References: <1487742565-2513-1-git-send-email-peterx@redhat.com>
+	<20170222103047.2c1b63f2@t450s.home>
+	<20170223030647.GB4015@pxdev.xzpeter.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="vM12nk/63StVgfqY"
-Content-Disposition: inline
-In-Reply-To: <1487252865-12064-12-git-send-email-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v2 11/22] ppc/xics: remove the XICS list of
- ICS
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] intel_iommu: make sure its init before PCI
+ dev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,113 +30,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, yi.l.liu@intel.com, "\\  Michael S . Tsirkin \\ " <mst@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
+On Thu, 23 Feb 2017 11:06:47 +0800
+Peter Xu <peterx@redhat.com> wrote:
 
---vM12nk/63StVgfqY
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Wed, Feb 22, 2017 at 10:30:47AM -0700, Alex Williamson wrote:
+> > On Wed, 22 Feb 2017 13:49:25 +0800
+> > Peter Xu <peterx@redhat.com> wrote:
+> >   
+> > > Intel vIOMMU devices are created with "-device" parameter, while here
+> > > actually we need to make sure this device will be created before some
+> > > other PCI devices (like vfio-pci devices) so that we know iommu_fn will
+> > > be setup correctly before realizations of those PCI devices.
+> > > 
+> > > Here we do explicit check to make sure intel-iommu device will be inited
+> > > before all the rest of the PCI devices. This is done by checking against
+> > > the devices dangled under current root PCIe bus and we should see
+> > > nothing there besides integrated ICH9 ones.
+> > > 
+> > > If the user violated this rule, we abort the program.
+> > > 
+> > > Maybe one day we will be able to manage the ordering of device
+> > > initialization, and then we can grant VT-d devices a higher init
+> > > priority. But before that, let's have this explicit check to make sure
+> > > of it.
+> > > 
+> > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > ---
+> > >  hw/i386/intel_iommu.c | 40 ++++++++++++++++++++++++++++++++++++++++
+> > >  1 file changed, 40 insertions(+)
+> > > 
+> > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> > > index 22d8226..db74124 100644
+> > > --- a/hw/i386/intel_iommu.c
+> > > +++ b/hw/i386/intel_iommu.c
+> > > @@ -31,6 +31,7 @@
+> > >  #include "hw/i386/apic-msidef.h"
+> > >  #include "hw/boards.h"
+> > >  #include "hw/i386/x86-iommu.h"
+> > > +#include "hw/i386/ich9.h"
+> > >  #include "hw/pci-host/q35.h"
+> > >  #include "sysemu/kvm.h"
+> > >  #include "hw/i386/apic_internal.h"
+> > > @@ -2560,6 +2561,41 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+> > >      return true;
+> > >  }
+> > >  
+> > > +static bool vtd_has_inited_pci_devices(PCIBus *bus, Error **errp)
+> > > +{
+> > > +    int i;
+> > > +    uint8_t func;
+> > > +
+> > > +    /* We check against root bus */
+> > > +    assert(bus && pci_bus_is_root(bus));
+> > > +
+> > > +    /*
+> > > +     * We need to make sure vIOMMU device is created before other PCI
+> > > +     * devices other than the integrated ICH9 ones, so that they can
+> > > +     * get correct iommu_fn setup even during its realize(). Some
+> > > +     * devices (e.g., vfio-pci) will need a correct iommu_fn to work.
+> > > +     */
+> > > +    for (i = 1; i < PCI_FUNC_MAX * PCI_SLOT_MAX; i++) {
+> > > +        /* Skip the checking against ICH9 integrated devices */
+> > > +        if (PCI_SLOT(i) == ICH9_LPC_DEV) {
+> > > +            func = PCI_FUNC(i);
+> > > +            if (func == ICH9_LPC_FUNC ||
+> > > +                func == ICH9_SATA1_FUNC ||
+> > > +                func == ICH9_SMB_FUNC) {
+> > > +                continue;
+> > > +            }
+> > > +        }  
+> > 
+> > 
+> > Whitelisting specific devfns seems pretty sketchy and fragile.  Can we
+> > even assume we're on a Q35 chipset?  I don't see that vtd_realize()
+> > takes any particular precautions not to allow initialization on 440fx,
+> > or whatever generic chipset we come up with next that may not have
+> > these specific devices.  
+> 
+> Yes. IIUC VT-d now can only work with Q35, right? Cc Marcel and Paolo
+> in case I misunderstood it.
 
-On Thu, Feb 16, 2017 at 02:47:34PM +0100, C=E9dric Le Goater wrote:
-> This is not used anymore.
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+440FX is not a PCIe chipset therefore on bare metal there'd be no such
+thing as requester IDs with which to lookup context entries.  Of course
+a VM doesn't care about those details, but I think it best not to tempt
+users with invalid configs.
+ 
+> If so, maybe here we should check against q35 in vtd realization. How
+> about something like:
+> 
+>     if (!object_property_find((Object *)pcms, "q35", NULL)) {
+>         error_setg(errp, "Currently Intel vIOMMU only support Q35 platform. "
+>                    "Please specify \"-M q35\" to enable it.");
+>         return;
+>     }
+> 
+> ?
+> 
+> > It would probably be a better idea to use
+> > object_dynamic_cast() if you want to whitelist specific devices.
+> > Perhaps this could even be used to validate the chipset as well.  
+> 
+> Now Jintack reported another issue, that we may have two default
+> devices there if not specifying "-nodefaults", and that two devices
+> will always be the first ones to be inited.
+> 
+> How about here we just explicitly check against vfio-pci devices, so
+> we just make sure vfio-pci devices will be put after intel-iommu?
+> Since actually vfio-pci devices are the only ones that we know we need
+> to be inited explicitly after the VT-d device.
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+I was afraid you were going to come to this conclusion.  That works,
+BUT it just means the problem gets ignored as a vfio problem when
+really vfio is doing nothing wrong other than caring about the device
+address space during its initialization.  Then users have a perfectly
+working config, add a vfio-pci device and things explode.  If you want
+to impose a user ordering requirement, do it consistently.  Thanks,
 
-> ---
->  hw/intc/xics.c        | 8 --------
->  hw/ppc/spapr.c        | 1 -
->  include/hw/ppc/xics.h | 2 --
->  3 files changed, 11 deletions(-)
->=20
-> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> index d679313cd49f..5131587ce088 100644
-> --- a/hw/intc/xics.c
-> +++ b/hw/intc/xics.c
-> @@ -146,13 +146,6 @@ static void xics_common_reset(DeviceState *d)
->      }
->  }
-> =20
-> -static void xics_common_initfn(Object *obj)
-> -{
-> -    XICSState *xics =3D XICS_COMMON(obj);
-> -
-> -    QLIST_INIT(&xics->ics);
-> -}
-> -
->  static void xics_common_class_init(ObjectClass *oc, void *data)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(oc);
-> @@ -165,7 +158,6 @@ static const TypeInfo xics_common_info =3D {
->      .parent        =3D TYPE_DEVICE,
->      .instance_size =3D sizeof(XICSState),
->      .class_size    =3D sizeof(XICSStateClass),
-> -    .instance_init =3D xics_common_initfn,
->      .class_init    =3D xics_common_class_init,
->  };
-> =20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index a2a64d7de41d..d1946ebcac69 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -122,7 +122,6 @@ static XICSState *try_create_xics(sPAPRMachineState *=
-spapr,
->      if (err) {
->          goto error;
->      }
-> -    QLIST_INSERT_HEAD(&xics->ics, spapr->ics, list);
-> =20
->      xics->ss =3D g_malloc0(nr_servers * sizeof(ICPState));
->      xics->nr_servers =3D nr_servers;
-> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> index e10426e98e31..c15d8e2a8ae6 100644
-> --- a/include/hw/ppc/xics.h
-> +++ b/include/hw/ppc/xics.h
-> @@ -82,7 +82,6 @@ struct XICSState {
->      /*< public >*/
->      uint32_t nr_servers;
->      ICPState *ss;
-> -    QLIST_HEAD(, ICSState) ics;
->  };
-> =20
->  #define TYPE_ICP "icp"
-> @@ -152,7 +151,6 @@ struct ICSState {
->      qemu_irq *qirqs;
->      ICSIRQState *irqs;
->      XICSState *xics;
-> -    QLIST_ENTRY(ICSState) list;
->  };
-> =20
->  static inline bool ics_valid_irq(ICSState *ics, uint32_t nr)
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---vM12nk/63StVgfqY
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJYrkn4AAoJEGw4ysog2bOSb08P/3R7MzPqcgQYGMayYQY44P74
-bwjemZDvl/4kMhVBt0ylUoshrFAirI490wiOlj3wNzl5UXkNZLjuDaNKQidjRnFE
-NrVG1NkbAQcQKOczO1gmRJFjNlRSKOMw6M4iM12aHYyDVYmBdYMgkr38DYYwrqV7
-OZhsUi+WiyE4va5xIJHzH46mrIgxPEW7QnOQzpvB5V711OvWO5/+W5owJOh6AgFr
-8W7eOVPil8mMcBQuHn274WWdBKhndl/uLS3u8p/5WNqxx51Z8FUCgjzAu1PTfyXv
-zeTMiu9f2u6UEV0SEUiFmEB2Fh75Rw9S9AkiOtV/uz0xI1SmkyR0C6MGm+SLYCpW
-DkwGejv5DRA9JsP1QXO+VG24Idj1c2D7lRJdjRiB853qGGKkSFSoLchfQpx2RBCo
-qEfYjm27/EpQNCClKxMheMy47osvJIqnwQjkQ9QZKrgmBlWZex6WAUlxwjFVIDzA
-yLgANtrvNJGh/45r/tW33hvd6XIL2+nY141oREDkOlkgU/RdyD1wyeRHIR+6YCKB
-2ecuBUw51wxKkud5DSGY3XaAJTibIHRgNAe9u/7GzHV+Fg032MOd2Hrd5jw9flEz
-W8/4LcAblzlTYwS4zeejt388z5oiKmzNnNpo3dWDq09TrPSNvpxyYPz6jVkWgwdH
-oJfHQQyeXHcAaneF7zU1
-=BeM4
------END PGP SIGNATURE-----
-
---vM12nk/63StVgfqY--
+Alex
