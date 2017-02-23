@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60916)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vijay.kilari@gmail.com>) id 1cgs9p-0007j4-8N
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 07:06:02 -0500
+	(envelope-from <vijay.kilari@gmail.com>) id 1cgs9o-0007ow-P7
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 07:06:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vijay.kilari@gmail.com>) id 1cgrvz-0004ZK-5A
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 06:51:44 -0500
+	(envelope-from <vijay.kilari@gmail.com>) id 1cgrw4-0004a3-EM
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 06:51:51 -0500
 From: vijay.kilari@gmail.com
-Date: Thu, 23 Feb 2017 17:21:08 +0530
-Message-Id: <1487850673-26455-1-git-send-email-vijay.kilari@gmail.com>
-Subject: [Qemu-devel] [PATCH v9 0/5] GICv3 live migration support
+Date: Thu, 23 Feb 2017 17:21:10 +0530
+Message-Id: <1487850673-26455-3-git-send-email-vijay.kilari@gmail.com>
+In-Reply-To: <1487850673-26455-1-git-send-email-vijay.kilari@gmail.com>
+References: <1487850673-26455-1-git-send-email-vijay.kilari@gmail.com>
+Subject: [Qemu-devel] [PATCH v9 2/5] hw/intc/arm_gicv3_kvm: Add ICC_SRE_EL1
+ register to vmstate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,80 +25,82 @@ Cc: p.fedin@samsung.com, marc.zyngier@arm.com, qemu-devel@nongnu.org, Vijaya Kum
 
 From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 
-This series introduces support for GICv3 live migration with
-new VGIC implementation in 4.7-rc3 kernel.
-In this series, patch 1 of the previous implementation
-are ported.
-https://lists.nongnu.org/archive/html/qemu-devel/2015-10/msg05284.html
+To Save and Restore ICC_SRE_EL1 register introduce vmstate
+subsection and load only if non-zero.
+Also initialize icc_sre_el1 with to 0x7 in pre_load
+function.
 
-Patch 2, is based on below implementation.
-http://patchwork.ozlabs.org/patch/626746/
+Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+---
+ hw/intc/arm_gicv3_common.c         | 36 ++++++++++++++++++++++++++++++++++++
+ include/hw/intc/arm_gicv3_common.h |  1 +
+ 2 files changed, 37 insertions(+)
 
-Latest kernel patches
-https://www.spinics.net/lists/arm-kernel/msg558046.html
-
-This API definition is as per version of VGICv3 specification
-in linux kernel Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-
-Tested Live migration of Idle VM running with 4 VCPUs and 8GB RAM.
-
-v8 => v9:
- - Updated icc_sre_el1_reg_needed() return condition to
-   cs->icc_sre_el1 != 0x7;
- - Dropped assert in arm_gicv3_icc_reset()
- - Added comments at required places
-
-v7 => v8:
- - Introduced vmstate subsection to add icc_ctrl_el1 register to
-   VMStateDescription
- - Introduced new function gicv3_set_gicv3state() in arm_gicv3_cpuif.c
-   to update gicv3state variable in CPUARMState struct.
- - Used arm_cp_read_zero & arm_cp_write_ignore for ARMCPRegInfo[].
-
-v6 => v7:
- - Rebased on top of v2.8.0-rc4 release.
- - Added patch to add icc_ctrl_el1 to vmstruct before live migration
-   patch.
- - Added patch to add gicv3state variable to CPUARMState struct to
-   store GICv3CPUState pointer.
- - Added patch to register ARMCPRegInfo[] struct and reset on CPU reset.
-
-v5 => v6:
- - Added separate patch for Reseting ICC* register
- - Added seperate patch for save and restore of ICC_CTLR_EL1
- - Dropped translate_fn mechanism and coded open functions
-   for edge_trigger and priority save and restore.
- - Save and Restore APnR registers based on ICC_CTLR_EL1.PRIBITS
-
-v4 => v5:
- - Initialized ICC registers before reset.
-
-v3 => v4:
- - Reintroduced offset GICR_SGI_OFFSET
- - Implement save and restore of ICC_SRE_EL1
- - Updated kvm.h header file in sync with KVM v4 patches
-
-v2 => v3:
- - Dropped offset GICR_SGI_OFFSET
- - Implement save/restore of irq line level using
-   KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO
- - Fixed bug with save/restore of edge_trigger
-Vijaya Kumar K (5):
-  kernel: Add definitions for GICv3 attributes
-  hw/intc/arm_gicv3_kvm: Add ICC_SRE_EL1 register to vmstate
-  hw/intc/arm_gicv3_kvm: Implement get/put functions
-  target-arm: Add GICv3CPUState in CPUARMState struct
-  hw/intc/arm_gicv3_kvm: Reset GICv3 cpu interface registers
-
- hw/intc/arm_gicv3_common.c         |  38 +++
- hw/intc/arm_gicv3_cpuif.c          |   8 +
- hw/intc/arm_gicv3_kvm.c            | 629 ++++++++++++++++++++++++++++++++++++-
- hw/intc/gicv3_internal.h           |   3 +
- include/hw/intc/arm_gicv3_common.h |   1 +
- linux-headers/asm-arm/kvm.h        |  12 +
- linux-headers/asm-arm64/kvm.h      |  12 +
- target/arm/cpu.h                   |   2 +
- 8 files changed, 691 insertions(+), 14 deletions(-)
-
+diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
+index 16b9b0f..5b0e456 100644
+--- a/hw/intc/arm_gicv3_common.c
++++ b/hw/intc/arm_gicv3_common.c
+@@ -70,6 +70,38 @@ static const VMStateDescription vmstate_gicv3_cpu_virt = {
+     }
+ };
+ 
++static int icc_sre_el1_reg_pre_load(void *opaque)
++{
++    GICv3CPUState *cs = opaque;
++
++   /*
++    * If the sre_el1 subsection is not transferred this
++    * means SRE_EL1 is 0x7 (which might not be the same as
++    * our reset value).
++    */
++    cs->icc_sre_el1 = 0x7;
++    return 0;
++}
++
++static bool icc_sre_el1_reg_needed(void *opaque)
++{
++    GICv3CPUState *cs = opaque;
++
++    return cs->icc_sre_el1 != 7;
++}
++
++const VMStateDescription vmstate_gicv3_cpu_sre_el1 = {
++    .name = "arm_gicv3_cpu/sre_el1",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .pre_load = icc_sre_el1_reg_pre_load,
++    .needed = icc_sre_el1_reg_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT64(icc_sre_el1, GICv3CPUState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static const VMStateDescription vmstate_gicv3_cpu = {
+     .name = "arm_gicv3_cpu",
+     .version_id = 1,
+@@ -100,6 +132,10 @@ static const VMStateDescription vmstate_gicv3_cpu = {
+     .subsections = (const VMStateDescription * []) {
+         &vmstate_gicv3_cpu_virt,
+         NULL
++    },
++    .subsections = (const VMStateDescription * []) {
++        &vmstate_gicv3_cpu_sre_el1,
++        NULL
+     }
+ };
+ 
+diff --git a/include/hw/intc/arm_gicv3_common.h b/include/hw/intc/arm_gicv3_common.h
+index 4156051..bccdfe1 100644
+--- a/include/hw/intc/arm_gicv3_common.h
++++ b/include/hw/intc/arm_gicv3_common.h
+@@ -172,6 +172,7 @@ struct GICv3CPUState {
+     uint8_t gicr_ipriorityr[GIC_INTERNAL];
+ 
+     /* CPU interface */
++    uint64_t icc_sre_el1;
+     uint64_t icc_ctlr_el1[2];
+     uint64_t icc_pmr_el1;
+     uint64_t icc_bpr[3];
 -- 
 1.9.1
