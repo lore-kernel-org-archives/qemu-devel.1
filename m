@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cguDW-0007HK-OC
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:17:59 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cguIk-0001JH-Dj
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:23:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cguDS-0004Rr-QH
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:17:58 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:34973)
+	(envelope-from <stefanha@gmail.com>) id 1cguIg-0005bb-FZ
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:23:22 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:36526)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cguDS-0004Qu-Ia
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:17:54 -0500
-Received: by mail-wm0-x241.google.com with SMTP id u63so63827wmu.2
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 06:17:52 -0800 (PST)
-Date: Thu, 23 Feb 2017 14:17:49 +0000
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cguIg-0005bJ-7S
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 09:23:18 -0500
+Received: by mail-wm0-x241.google.com with SMTP id r18so84696wmd.3
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 06:23:18 -0800 (PST)
+Date: Thu, 23 Feb 2017 14:23:15 +0000
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170223141749.GL30636@stefanha-x1.localdomain>
+Message-ID: <20170223142315.GM30636@stefanha-x1.localdomain>
 References: <148760155821.31154.13876757160410915057.stgit@bahia.lan>
-	<148760165308.31154.3129759292082239824.stgit@bahia.lan>
+	<148760166051.31154.9036980312875397552.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Qgd2S+2VS1hsWwXW"
+	protocol="application/pgp-signature"; boundary="/t6ASE28jIy1gGy9"
 Content-Disposition: inline
-In-Reply-To: <148760165308.31154.3129759292082239824.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 12/29] 9pfs: local: unlinkat: don't follow
+In-Reply-To: <148760166051.31154.9036980312875397552.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH 13/29] 9pfs: local: remove: don't follow
  symlinks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -35,45 +35,52 @@ To: Greg Kurz <groug@kaod.org>
 Cc: qemu-devel@nongnu.org, Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
 
---Qgd2S+2VS1hsWwXW
+--/t6ASE28jIy1gGy9
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 20, 2017 at 03:40:53PM +0100, Greg Kurz wrote:
-> The local_unlinkat() callback is vulnerable to symlink attacks because it
-> calls remove() which follows symbolic links in all path elements but the
-> rightmost one.
->=20
-> This patch converts local_unlinkat() to rely on opendir_nofollow() and
-> unlinkat() instead.
->=20
-> Most of the code is moved to a separate local_unlinkat_common() helper
-> which will be reused in a subsequent patch to fix the same issue in
-> local_remove().
->=20
-> This partly fixes CVE-2016-9602.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  hw/9pfs/9p-local.c |  100 ++++++++++++++++++++++++++++++----------------=
-------
->  1 file changed, 57 insertions(+), 43 deletions(-)
+On Mon, Feb 20, 2017 at 03:41:00PM +0100, Greg Kurz wrote:
+> +    dirfd =3D local_opendir_nofollow(ctx, dirpath);
+> +    if (dirfd) {
+> +        goto out;
+>      }
+> =20
+> -    buffer =3D rpath(ctx, path);
+> -    err =3D remove(buffer);
+> -    g_free(buffer);
+> +    if (fstatat(dirfd, path, &stbuf, AT_SYMLINK_NOFOLLOW) < 0) {
+> +        goto err_out;
+> +    }
+> +
+> +    if (S_ISDIR(stbuf.st_mode)) {
+> +        flags |=3D AT_REMOVEDIR;
+> +    }
+> +
+> +    err =3D local_unlinkat_common(ctx, dirfd, name, flags);
+
+The alternative is optimistically skip fstat but then do:
+
+  if (err =3D=3D EISDIR) {
+      err =3D local_unlinkat_common(ctx, dirfd, name, flags | AT_REMOVEDIR);
+  }
+
+It might be faster.
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---Qgd2S+2VS1hsWwXW
+--/t6ASE28jIy1gGy9
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJYru8NAAoJEJykq7OBq3PIRdkH/2D69T2NDBZbYq1K+ATttWA0
-uyNOOS7i3UZXPtbTmUn2LV56zoeQCq6rP0hXxN2TVa5ZQThK43TP2EDFOnM1ZFZK
-LSSKrCg5eYCJ7aTSVLBYGYAGmbQnaqFBr9KMcw+YXNvHrTOATjUfCg4Mzdadv4GF
-+PcX+cVBhgVuZha5DWYNx0BrMX1PjZrWo78cdxuwp/vI3DYWJXxQz0olUmfXFwp/
-9otXxhr/TjI/PC+YaF1v3iFhFb106aExwkbiSdEYAxQYbA4zMbyciKSfvYmIV0lp
-/oVJjmpQWP9xzKfEMZy/rumDPJTu3OSVWT/sNOrThH1rL2S9W/GZEBp63+oAUTw=
-=OYku
+iQEcBAEBAgAGBQJYrvBTAAoJEJykq7OBq3PIORUIAKjl2XLioaPRGLSyBsrz3T0M
+EY74nelYHZ+eOjuGdZ+VwKAc8KZZWN/NZmDAIQc5yayNuBpoOBEo0KAbfEYOvXJ6
+GnQAu1L9xzdOJAVGN2gaA4tQBVJT/mrCgWoGV8LdzfbONJg+YD9yuJ+MW2LMv12i
+nOdEP9JZ77Jj5+O8G6IS8VmBHrw8ICKfT5fShLSH9lJASv7I9OBVRisvnKLKzyml
+sJtemdlBkv4Zncux0qJIGwcVFoRknpJDZ8Venf1lScTjdmlkF7cPADfS0c2ReBpA
+NrGMZUJxKkplu7kR2OL4LbHtKdKp0F+pUCAENjSVSIET7oO8x1VmjJ6bF9PimKI=
+=IjNU
 -----END PGP SIGNATURE-----
 
---Qgd2S+2VS1hsWwXW--
+--/t6ASE28jIy1gGy9--
