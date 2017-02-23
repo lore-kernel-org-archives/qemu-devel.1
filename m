@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cgki8-000656-Jq
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 23:08:58 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cgkix-0006Uo-N6
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 23:09:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cgki7-0004ju-1s
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 23:08:56 -0500
-Message-ID: <1487822920.23895.1.camel@gmail.com>
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Thu, 23 Feb 2017 15:08:40 +1100
-In-Reply-To: <20170223020936.29220-2-david@gibson.dropbear.id.au>
-References: <20170223020936.29220-1-david@gibson.dropbear.id.au>
-	<20170223020936.29220-2-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/6] pseries: Minor cleanups to HPT
- management hypercalls
+	(envelope-from <dgibson@ozlabs.org>) id 1cgkiw-0004xg-G3
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 23:09:47 -0500
+Date: Thu, 23 Feb 2017 15:09:36 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170223040936.GN12577@umbus.fritz.box>
+References: <1487563478-22265-1-git-send-email-sjitindarsingh@gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="aWauiwyUFlp3+edf"
+Content-Disposition: inline
+In-Reply-To: <1487563478-22265-1-git-send-email-sjitindarsingh@gmail.com>
+Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH V3 00/10] target/ppc: Implement
+ POWER9 pseries tcg legacy support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,220 +24,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, aik@ozlabs.ru
-Cc: qemu-devel@nongnu.org, agraf@suse.de, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, paulus@samba.org
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: qemu-ppc@nongnu.org, agraf@suse.de, qemu-devel@nongnu.org, sam.bobroff@au1.ibm.com
 
-On Thu, 2017-02-23 at 13:09 +1100, David Gibson wrote:
->  * Standardize on 'ptex' instead of 'pte_index' for HPTE index
-> variables
->    for consistency and brevity
->  * Avoid variables named 'index'; shadowing index(3) from libc can
-> lead to
->    surprising bugs if the variable is removed, because compiler
-> errors
->    might not appear for remaining references
->  * Clarify index calculations in h_enter() - we have two cases,
-> H_EXACT
->    where the exact HPTE slot is given, and !H_EXACT where we search
-> for
->    an empty slot within the hash bucket.  Make the calculation more
->    consistent between the cases.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/ppc/spapr_hcall.c | 58 +++++++++++++++++++++++++-----------------
-> ----------
->  1 file changed, 28 insertions(+), 30 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 42d20e0..3298a14 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -47,12 +47,12 @@ static bool has_spr(PowerPCCPU *cpu, int spr)
->      return cpu->env.spr_cb[spr].name != NULL;
->  }
->  
-> -static inline bool valid_pte_index(CPUPPCState *env, target_ulong
-> pte_index)
-> +static inline bool valid_ptex(PowerPCCPU *cpu, target_ulong ptex)
->  {
->      /*
->       * hash value/pteg group index is normalized by htab_mask
->       */
-> -    if (((pte_index & ~7ULL) / HPTES_PER_GROUP) & ~env->htab_mask) {
-> +    if (((ptex & ~7ULL) / HPTES_PER_GROUP) & ~cpu->env.htab_mask) {
->          return false;
->      }
->      return true;
-> @@ -77,14 +77,13 @@ static bool is_ram_address(sPAPRMachineState
-> *spapr, hwaddr addr)
->  static target_ulong h_enter(PowerPCCPU *cpu, sPAPRMachineState
-> *spapr,
->                              target_ulong opcode, target_ulong *args)
->  {
-> -    CPUPPCState *env = &cpu->env;
->      target_ulong flags = args[0];
-> -    target_ulong pte_index = args[1];
-> +    target_ulong ptex = args[1];
->      target_ulong pteh = args[2];
->      target_ulong ptel = args[3];
->      unsigned apshift;
->      target_ulong raddr;
-> -    target_ulong index;
-> +    target_ulong slot;
->      uint64_t token;
->  
->      apshift = ppc_hash64_hpte_page_shift_noslb(cpu, pteh, ptel);
-> @@ -116,25 +115,26 @@ static target_ulong h_enter(PowerPCCPU *cpu,
-> sPAPRMachineState *spapr,
->  
->      pteh &= ~0x60ULL;
->  
-> -    if (!valid_pte_index(env, pte_index)) {
-> +    if (!valid_ptex(cpu, ptex)) {
->          return H_PARAMETER;
->      }
->  
-> -    index = 0;
-> +    slot = ptex & 7ULL;
-> +    ptex = ptex & ~7ULL;
-> +
->      if (likely((flags & H_EXACT) == 0)) {
-> -        pte_index &= ~7ULL;
-> -        token = ppc_hash64_start_access(cpu, pte_index);
-> -        for (; index < 8; index++) {
-> -            if (!(ppc_hash64_load_hpte0(cpu, token, index) &
-> HPTE64_V_VALID)) {
-> +        token = ppc_hash64_start_access(cpu, ptex);
-> +        for (slot = 0; slot < 8; slot++) {
-> +            if (!(ppc_hash64_load_hpte0(cpu, token, slot) &
-> HPTE64_V_VALID)) {
->                  break;
->              }
->          }
->          ppc_hash64_stop_access(cpu, token);
-> -        if (index == 8) {
-> +        if (slot == 8) {
->              return H_PTEG_FULL;
->          }
->      } else {
-> -        token = ppc_hash64_start_access(cpu, pte_index);
-> +        token = ppc_hash64_start_access(cpu, ptex);
->          if (ppc_hash64_load_hpte0(cpu, token, 0) & HPTE64_V_VALID) {
->              ppc_hash64_stop_access(cpu, token);
->              return H_PTEG_FULL;
-> @@ -142,10 +142,9 @@ static target_ulong h_enter(PowerPCCPU *cpu,
-> sPAPRMachineState *spapr,
->          ppc_hash64_stop_access(cpu, token);
->      }
->  
-> -    ppc_hash64_store_hpte(cpu, pte_index + index,
-> -                          pteh | HPTE64_V_HPTE_DIRTY, ptel);
-> +    ppc_hash64_store_hpte(cpu, ptex + slot, pteh |
-> HPTE64_V_HPTE_DIRTY, ptel);
->  
-> -    args[0] = pte_index + index;
-> +    args[0] = ptex + slot;
->      return H_SUCCESS;
->  }
->  
-> @@ -161,11 +160,10 @@ static RemoveResult remove_hpte(PowerPCCPU
-> *cpu, target_ulong ptex,
->                                  target_ulong flags,
->                                  target_ulong *vp, target_ulong *rp)
->  {
-> -    CPUPPCState *env = &cpu->env;
->      uint64_t token;
->      target_ulong v, r;
->  
-> -    if (!valid_pte_index(env, ptex)) {
-> +    if (!valid_ptex(cpu, ptex)) {
->          return REMOVE_PARM;
->      }
->  
-> @@ -191,11 +189,11 @@ static target_ulong h_remove(PowerPCCPU *cpu,
-> sPAPRMachineState *spapr,
->  {
->      CPUPPCState *env = &cpu->env;
->      target_ulong flags = args[0];
-> -    target_ulong pte_index = args[1];
-> +    target_ulong ptex = args[1];
->      target_ulong avpn = args[2];
->      RemoveResult ret;
->  
-> -    ret = remove_hpte(cpu, pte_index, avpn, flags,
-> +    ret = remove_hpte(cpu, ptex, avpn, flags,
->                        &args[0], &args[1]);
->  
->      switch (ret) {
-> @@ -291,16 +289,16 @@ static target_ulong h_protect(PowerPCCPU *cpu,
-> sPAPRMachineState *spapr,
->  {
->      CPUPPCState *env = &cpu->env;
->      target_ulong flags = args[0];
-> -    target_ulong pte_index = args[1];
-> +    target_ulong ptex = args[1];
->      target_ulong avpn = args[2];
->      uint64_t token;
->      target_ulong v, r;
->  
-> -    if (!valid_pte_index(env, pte_index)) {
-> +    if (!valid_ptex(cpu, ptex)) {
->          return H_PARAMETER;
->      }
->  
-> -    token = ppc_hash64_start_access(cpu, pte_index);
-> +    token = ppc_hash64_start_access(cpu, ptex);
->      v = ppc_hash64_load_hpte0(cpu, token, 0);
->      r = ppc_hash64_load_hpte1(cpu, token, 0);
->      ppc_hash64_stop_access(cpu, token);
-> @@ -315,13 +313,13 @@ static target_ulong h_protect(PowerPCCPU *cpu,
-> sPAPRMachineState *spapr,
->      r |= (flags << 55) & HPTE64_R_PP0;
->      r |= (flags << 48) & HPTE64_R_KEY_HI;
->      r |= flags & (HPTE64_R_PP | HPTE64_R_N | HPTE64_R_KEY_LO);
-> -    ppc_hash64_store_hpte(cpu, pte_index,
-> +    ppc_hash64_store_hpte(cpu, ptex,
->                            (v & ~HPTE64_V_VALID) |
-> HPTE64_V_HPTE_DIRTY, 0);
-> -    ppc_hash64_tlb_flush_hpte(cpu, pte_index, v, r);
-> +    ppc_hash64_tlb_flush_hpte(cpu, ptex, v, r);
->      /* Flush the tlb */
->      check_tlb_flush(env, true);
->      /* Don't need a memory barrier, due to qemu's global lock */
-> -    ppc_hash64_store_hpte(cpu, pte_index, v | HPTE64_V_HPTE_DIRTY,
-> r);
-> +    ppc_hash64_store_hpte(cpu, ptex, v | HPTE64_V_HPTE_DIRTY, r);
->      return H_SUCCESS;
->  }
->  
-> @@ -330,21 +328,21 @@ static target_ulong h_read(PowerPCCPU *cpu,
-> sPAPRMachineState *spapr,
->  {
->      CPUPPCState *env = &cpu->env;
->      target_ulong flags = args[0];
-> -    target_ulong pte_index = args[1];
-> +    target_ulong ptex = args[1];
->      uint8_t *hpte;
->      int i, ridx, n_entries = 1;
->  
-> -    if (!valid_pte_index(env, pte_index)) {
-> +    if (!valid_ptex(cpu, ptex)) {
->          return H_PARAMETER;
->      }
->  
->      if (flags & H_READ_4) {
->          /* Clear the two low order bits */
-> -        pte_index &= ~(3ULL);
-> +        ptex &= ~(3ULL);
->          n_entries = 4;
->      }
->  
-> -    hpte = env->external_htab + (pte_index * HASH_PTE_SIZE_64);
-> +    hpte = env->external_htab + (ptex * HASH_PTE_SIZE_64);
->  
->      for (i = 0, ridx = 0; i < n_entries; i++) {
->          args[ridx++] = ldq_p(hpte);
-I wholeheartedly agree with this rename.
 
-Reviewed-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+--aWauiwyUFlp3+edf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Feb 20, 2017 at 03:04:28PM +1100, Suraj Jitindar Singh wrote:
+> This is V3 of the patch series to implement tcg emulation support for a
+> POWER9 cpu model for the pseries machine type running a legacy kernel.
+> That is a kernel which doesn't use the new radix mmu mode or the new hash
+> mmu mode with segment tables.
+>=20
+> To use a POWER9 cpu provide the command line option "-cpu POWER9".
+>=20
+> This series attempts to avoid precluding KVM-HV support for the POWER9
+> cpu model but doesn't attempt to support KVM-PR or the powernv machine
+> for the POWER9 cpu model as these aren't currently supported or
+> implemented and further code changes will be required in the event these
+> are implemented.
+>=20
+> This series is used as a base to implement radix support.
+
+This is looking pretty good.  Main thing is it will need some rework
+to rebase on my HPT cleanup as discussed.  I've made a few other
+comments, but they're all small things.
+>=20
+> The changes from V2 are as follows:
+>=20
+>  - Only migrate the partition table entry on non-zero value
+>  - Change how register generation works to simplify adding/removing
+>    registers
+>  - Rename mmu.h -> mmu-book3s-v3.h
+>  - Error report and abort on attempt to use segment tables
+>=20
+> Suraj Jitindar Singh (10):
+>   target/ppc/POWER9: Add ISAv3.00 MMU definition
+>   target/ppc: Fix LPCR DPFD mask define
+>   target/ppc/POWER9: Adapt LPCR handling for POWER9
+>   target/ppc/POWER9: Direct all instr and data storage interrupts to the
+>     hypv
+>   target/ppc: Add patb_entry to sPAPRMachineState
+>   target/ppc: Don't gen an SDR1 on POWER9 and rework register creation
+>   target/ppc/POWER9: Add POWER9 mmu fault handler
+>   target/ppc/POWER9: Add POWER9 pa-features definition
+>   target/ppc/POWER9: Add cpu_has_work function for POWER9
+>   hw/ppc/spapr: Add POWER9 to pseries cpu models
+>=20
+>  hw/ppc/spapr.c              |  47 ++++++
+>  hw/ppc/spapr_cpu_core.c     |   3 +
+>  include/hw/ppc/spapr.h      |   1 +
+>  target/ppc/cpu-qom.h        |   5 +-
+>  target/ppc/cpu.h            |  21 ++-
+>  target/ppc/mmu-book3s-v3.h  |  50 ++++++
+>  target/ppc/mmu-hash64.c     |  53 +++++-
+>  target/ppc/mmu-hash64.h     |   4 +-
+>  target/ppc/mmu_helper.c     |  44 ++++-
+>  target/ppc/translate.c      |   7 +-
+>  target/ppc/translate_init.c | 391 ++++++++++++++++++++++++++++++--------=
+------
+>  11 files changed, 485 insertions(+), 141 deletions(-)
+>  create mode 100644 target/ppc/mmu-book3s-v3.h
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--aWauiwyUFlp3+edf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYrmCAAAoJEGw4ysog2bOSHkgP/09OKdRxOJnVuZG5gy8eZuTx
+APBuvVtBDQDADPV5UV+eWEFoHyshM3gt5n6GLkuwGZgaxc7QpDwyu7CtSsXPPYLo
+ql6CIBDu6qmBujECJQk60Wd1NFUpnk18k3mJItP0SGbck/dBa0dJ7QsucOBe/diI
+Z1I0ljv+D7KSmxPfuymwsCg5oExnc1fJkP9U0joQKcIHgOmmXKn16gNza5Rrr0by
+UxIGtjoOt1H/vINZzS58BkeiV590KlMX9IXdeIXDBdzJDBGzjcQ8+vw8XHEzifMY
+opCeUI5aM9to/KoM2d54re8YTsipZ6fA0LqEZlJQs+hC2SvhgTXMfenkwQDPmnpX
++NwN7tf4/x4vl7EE4Fqw3D5aqOqERTUDbMUbaLl4oJ6gOWtixpUvz8LuWR+52E4X
+MFvSzaDx9LXNEAPk5SjD82n9LDkWHwG1C3ls40mj+nZ0O1jQlWiV9xjrv25cUIRb
+MWNE6xENUEUfIa9YR2f8r4pY9+qrUIxcIIIxVrfxoOtO+ZrsCiug/NmXW9heMxn+
+HvweyG/hZrBAfqB/1ZB6J/sw0KMEHvlqXawrY6+4ItuaBgJzgeG5jtQ6xfylo2Ly
+jjSoqSfEwyiKgOImB107MlYXLKSHPNG1oTfmMgkkM202pzsHeZ8ZrCtpGz5FuvHS
+UMhVJBZnnlC8l8Puq+1J
+=RgNh
+-----END PGP SIGNATURE-----
+
+--aWauiwyUFlp3+edf--
