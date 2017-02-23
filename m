@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgi0V-0003vU-Vm
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 20:15:45 -0500
+	(envelope-from <bobby.prani@gmail.com>) id 1cgi4z-0006Pn-FJ
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 20:20:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgi0S-0001me-NX
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 20:15:43 -0500
-Received: from [45.249.212.187] (port=2983 helo=dggrg01-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cgi0S-0001l7-2a
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 20:15:40 -0500
-References: <1487734936-43472-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1487734936-43472-6-git-send-email-zhang.zhanghailiang@huawei.com>
-	<176b99f5-34fe-460d-8f23-1bb2ee94fa3a@redhat.com>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <58AE37A1.5080908@huawei.com>
-Date: Thu, 23 Feb 2017 09:15:13 +0800
+	(envelope-from <bobby.prani@gmail.com>) id 1cgi4w-0002kG-9s
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 20:20:21 -0500
+Received: from mail-yb0-x243.google.com ([2607:f8b0:4002:c09::243]:34289)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1cgi4w-0002k8-2y
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 20:20:18 -0500
+Received: by mail-yb0-x243.google.com with SMTP id i66so798836yba.1
+	for <qemu-devel@nongnu.org>; Wed, 22 Feb 2017 17:20:18 -0800 (PST)
+From: Pranith Kumar <bobby.prani@gmail.com>
+Date: Wed, 22 Feb 2017 20:20:14 -0500
+Message-Id: <1487812814-17055-1-git-send-email-bobby.prani@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <176b99f5-34fe-460d-8f23-1bb2ee94fa3a@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 05/15] COLO: Handle shutdown command for VM
- in COLO state
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] mttcg/i386: Patch instruction using
+ async_safe_* framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +28,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, dgilbert@redhat.com, zhangchen.fnst@cn.fujitsu.com
-Cc: xuquan8@huawei.com, Paolo Bonzini <pbonzini@redhat.com>, xiecl.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Hi Eric,
+In mttcg, calling pause_all_vcpus() during execution from the
+generated TBs causes a deadlock if some vCPU is waiting for exclusive
+execution in start_exclusive(). Fix this by using the aync_safe_*
+framework instead of pausing vcpus for patching instructions.
 
-On 2017/2/22 23:35, Eric Blake wrote:
-> On 02/21/2017 09:42 PM, zhanghailiang wrote:
->> If VM is in COLO FT state, we need to do some extra works before
->> starting normal shutdown process.
->>
->> Secondary VM will ignore the shutdown command if users issue it directly
->> to Secondary VM. COLO will capture shutdown command and after
->> shutdown request from user.
->>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
->> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
->> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> ---
->> v19:
->> - fix title and comment
->
-> Did you miss putting v19 in the subject line?
->
+CC: Richard Henderson <rth@twiddle.net>
+CC: Peter Maydell <peter.maydell@linaro.org>
+CC: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+---
+ hw/i386/kvmvapic.c | 104 ++++++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 76 insertions(+), 28 deletions(-)
 
-Er, some patches of this series are split from previous
-v18 version, but most patches of that series has been merged
-into upstream, so that's why it has a tag here.
-I think it is better to remove this comment instead of using
-v19 tag for this series.
-
->
->> +++ b/qapi-schema.json
->> @@ -1157,12 +1157,14 @@
->>   #
->>   # @vmstate-loaded: VM's state has been loaded by SVM.
->>   #
->> +# @guest-shutdown: shutdown require from PVM to SVM
->
-> maybe s/require/requested/ ?
->
-
-Yes.
-
-> Missing '(since 2.9)'
->
-
-Will fix this in next version, thanks.
-
->> +#
->>   # Since: 2.8
->>   ##
->>   { 'enum': 'COLOMessage',
->>     'data': [ 'checkpoint-ready', 'checkpoint-request', 'checkpoint-reply',
->>               'vmstate-send', 'vmstate-size', 'vmstate-received',
->> -            'vmstate-loaded' ] }
->> +            'vmstate-loaded', 'guest-shutdown' ] }
->>
->
+diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
+index 82a4955..15eb39d 100644
+--- a/hw/i386/kvmvapic.c
++++ b/hw/i386/kvmvapic.c
+@@ -383,8 +383,7 @@ static void patch_byte(X86CPU *cpu, target_ulong addr, uint8_t byte)
+     cpu_memory_rw_debug(CPU(cpu), addr, &byte, 1, 1);
+ }
+ 
+-static void patch_call(VAPICROMState *s, X86CPU *cpu, target_ulong ip,
+-                       uint32_t target)
++static void patch_call(X86CPU *cpu, target_ulong ip, uint32_t target)
+ {
+     uint32_t offset;
+ 
+@@ -393,17 +392,74 @@ static void patch_call(VAPICROMState *s, X86CPU *cpu, target_ulong ip,
+     cpu_memory_rw_debug(CPU(cpu), ip + 1, (void *)&offset, sizeof(offset), 1);
+ }
+ 
+-static void patch_instruction(VAPICROMState *s, X86CPU *cpu, target_ulong ip)
++struct PatchInfo {
++    VAPICHandlers *handler;
++    target_ulong ip;
++};
++
++static void do_patch_instruction(CPUState *cs, run_on_cpu_data data)
+ {
+-    CPUState *cs = CPU(cpu);
+-    CPUX86State *env = &cpu->env;
+-    VAPICHandlers *handlers;
++    X86CPU *x86_cpu = X86_CPU(cs);
++    CPUX86State *env = &x86_cpu->env;
++    struct PatchInfo *info = (struct PatchInfo *) data.host_ptr;
++    VAPICHandlers *handlers = info->handler;
++    target_ulong ip = info->ip;
+     uint8_t opcode[2];
+     uint32_t imm32 = 0;
+     target_ulong current_pc = 0;
+     target_ulong current_cs_base = 0;
+     uint32_t current_flags = 0;
+ 
++    cpu_get_tb_cpu_state(env, &current_pc, &current_cs_base,
++                         &current_flags);
++    /* Account this instruction, because we will exit the tb.
++       This is the first instruction in the block. Therefore
++       there is no need in restoring CPU state. */
++    if (use_icount) {
++        --cs->icount_decr.u16.low;
++    }
++
++    cpu_memory_rw_debug(cs, ip, opcode, sizeof(opcode), 0);
++
++    switch (opcode[0]) {
++    case 0x89: /* mov r32 to r/m32 */
++        patch_byte(x86_cpu, ip, 0x50 + modrm_reg(opcode[1]));  /* push reg */
++        patch_call(x86_cpu, ip + 1, handlers->set_tpr);
++        break;
++    case 0x8b: /* mov r/m32 to r32 */
++        patch_byte(x86_cpu, ip, 0x90);
++        patch_call(x86_cpu, ip + 1, handlers->get_tpr[modrm_reg(opcode[1])]);
++        break;
++    case 0xa1: /* mov abs to eax */
++        patch_call(x86_cpu, ip, handlers->get_tpr[0]);
++        break;
++    case 0xa3: /* mov eax to abs */
++        patch_call(x86_cpu, ip, handlers->set_tpr_eax);
++        break;
++    case 0xc7: /* mov imm32, r/m32 (c7/0) */
++        patch_byte(x86_cpu, ip, 0x68);  /* push imm32 */
++        cpu_memory_rw_debug(cs, ip + 6, (void *)&imm32, sizeof(imm32), 0);
++        cpu_memory_rw_debug(cs, ip + 1, (void *)&imm32, sizeof(imm32), 1);
++        patch_call(x86_cpu, ip + 5, handlers->set_tpr);
++        break;
++    case 0xff: /* push r/m32 */
++        patch_byte(x86_cpu, ip, 0x50); /* push eax */
++        patch_call(x86_cpu, ip + 1, handlers->get_tpr_stack);
++        break;
++    default:
++        abort();
++    }
++
++    g_free(info);
++}
++
++static void patch_instruction(VAPICROMState *s, X86CPU *cpu, target_ulong ip)
++{
++    CPUState *cs = CPU(cpu);
++    VAPICHandlers *handlers;
++    uint8_t opcode[2];
++    uint32_t imm32 = 0;
++
+     if (smp_cpus == 1) {
+         handlers = &s->rom_state.up;
+     } else {
+@@ -411,14 +467,14 @@ static void patch_instruction(VAPICROMState *s, X86CPU *cpu, target_ulong ip)
+     }
+ 
+     if (!kvm_enabled()) {
+-        cpu_get_tb_cpu_state(env, &current_pc, &current_cs_base,
+-                             &current_flags);
+-        /* Account this instruction, because we will exit the tb.
+-           This is the first instruction in the block. Therefore
+-           there is no need in restoring CPU state. */
+-        if (use_icount) {
+-            --cs->icount_decr.u16.low;
+-        }
++        struct PatchInfo *info = g_new(struct PatchInfo, 1);
++        const run_on_cpu_func fn = do_patch_instruction;
++        info->handler = handlers;
++        info->ip = ip;
++
++        async_safe_run_on_cpu(cs, fn, RUN_ON_CPU_HOST_PTR(info));
++        cs->exception_index = EXCP_INTERRUPT;
++        cpu_loop_exit(cs);
+     }
+ 
+     pause_all_vcpus();
+@@ -428,41 +484,33 @@ static void patch_instruction(VAPICROMState *s, X86CPU *cpu, target_ulong ip)
+     switch (opcode[0]) {
+     case 0x89: /* mov r32 to r/m32 */
+         patch_byte(cpu, ip, 0x50 + modrm_reg(opcode[1]));  /* push reg */
+-        patch_call(s, cpu, ip + 1, handlers->set_tpr);
++        patch_call(cpu, ip + 1, handlers->set_tpr);
+         break;
+     case 0x8b: /* mov r/m32 to r32 */
+         patch_byte(cpu, ip, 0x90);
+-        patch_call(s, cpu, ip + 1, handlers->get_tpr[modrm_reg(opcode[1])]);
++        patch_call(cpu, ip + 1, handlers->get_tpr[modrm_reg(opcode[1])]);
+         break;
+     case 0xa1: /* mov abs to eax */
+-        patch_call(s, cpu, ip, handlers->get_tpr[0]);
++        patch_call(cpu, ip, handlers->get_tpr[0]);
+         break;
+     case 0xa3: /* mov eax to abs */
+-        patch_call(s, cpu, ip, handlers->set_tpr_eax);
++        patch_call(cpu, ip, handlers->set_tpr_eax);
+         break;
+     case 0xc7: /* mov imm32, r/m32 (c7/0) */
+         patch_byte(cpu, ip, 0x68);  /* push imm32 */
+         cpu_memory_rw_debug(cs, ip + 6, (void *)&imm32, sizeof(imm32), 0);
+         cpu_memory_rw_debug(cs, ip + 1, (void *)&imm32, sizeof(imm32), 1);
+-        patch_call(s, cpu, ip + 5, handlers->set_tpr);
++        patch_call(cpu, ip + 5, handlers->set_tpr);
+         break;
+     case 0xff: /* push r/m32 */
+         patch_byte(cpu, ip, 0x50); /* push eax */
+-        patch_call(s, cpu, ip + 1, handlers->get_tpr_stack);
++        patch_call(cpu, ip + 1, handlers->get_tpr_stack);
+         break;
+     default:
+         abort();
+     }
+ 
+     resume_all_vcpus();
+-
+-    if (!kvm_enabled()) {
+-        /* Both tb_lock and iothread_mutex will be reset when
+-         *  longjmps back into the cpu_exec loop. */
+-        tb_lock();
+-        tb_gen_code(cs, current_pc, current_cs_base, current_flags, 1);
+-        cpu_loop_exit_noexc(cs);
+-    }
+ }
+ 
+ void vapic_report_tpr_access(DeviceState *dev, CPUState *cs, target_ulong ip,
+-- 
+2.7.4
