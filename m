@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39460)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cgsU8-0004tO-Ny
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 07:27:01 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cgsan-0003EZ-V3
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 07:33:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cgsU7-000515-VM
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 07:27:00 -0500
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:38795)
+	(envelope-from <peter.maydell@linaro.org>) id 1cgsan-00078n-6m
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 07:33:53 -0500
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:36649)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cgsU7-00050m-Mz
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 07:26:59 -0500
-Received: by mail-wm0-x22b.google.com with SMTP id r141so9720141wmg.1
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 04:26:58 -0800 (PST)
+	id 1cgsan-00077a-11
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 07:33:53 -0500
+Received: by mail-wr0-x22a.google.com with SMTP id 89so20816543wrr.3
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 04:33:52 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <3d5e7b5e-4501-86b7-093d-47fb09af585e@redhat.com>
-References: <1487659615-15820-1-git-send-email-xyjxie@linux.vnet.ibm.com>
-	<5edff645-12e8-d3e0-1849-302b6986c232@ozlabs.ru>
-	<fdcb2b07-aae8-69bf-ee94-a43777009c3a@redhat.com>
-	<CAFEAcA--bSo7PJH0Px9ytQspaYuS55CSsM_EN6zt0djhkqKNPw@mail.gmail.com>
-	<5a0773de-6bc7-474a-82ab-2edd37ce8a93@redhat.com>
-	<CAFEAcA99xi4k57h2XGw2deGO24E95AS5jyGL+4GzjqNgMb9wcg@mail.gmail.com>
-	<92580ca9-47fe-a943-7720-d3cb1fc6d2eb@redhat.com>
-	<CAFEAcA8769a_8xwk57FS6Ko+Lioud20+70JRSafeEic6GB_RAw@mail.gmail.com>
-	<3d5e7b5e-4501-86b7-093d-47fb09af585e@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 23 Feb 2017 12:26:36 +0000
-Message-ID: <CAFEAcA9gcArSqhbRi6-YdR=5eE9dtq66C7N0qTbCuBiY_Zr+tA@mail.gmail.com>
+Date: Thu, 23 Feb 2017 12:33:31 +0000
+Message-ID: <CAFEAcA8AZup28Sho8hLeCRVf4iSdLdeFHvz1h4-X7FwVBcANyg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] memory: make ram device read/write endian
- sensitive
+Subject: [Qemu-devel] using fdt_setprop() to set properties to empty values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,25 +26,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Yongji Xie <xyjxie@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, zhong@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>, Paul Mackerras <paulus@samba.org>
+To: QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
 
-On 23 February 2017 at 11:43, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 23/02/2017 12:34, Peter Maydell wrote:
->> We should probably update the doc comment to note that the
->> pointer is to host-endianness memory (and that this is not
->> like normal RAM which is target-endian)...
->
-> I wouldn't call it host-endianness memory, and I disagree that normal
-> RAM is target-endian---in both cases it's just a bunch of bytes.
->
-> However, the access done by the MemoryRegionOps callbacks needs to match
-> the endianness declared by the MemoryRegionOps themselves.
+What's the right way to use libfdt's fdt_setprop to set a property
+to have an empty value? At the moment in QEMU we tend to use
+  fdt_setprop(fdt, nodeoffset, "propertyname", NULL, 0);
 
-Well, if the guest stores a bunch of integers to the memory, which
-way round do you see them when you look at the bunch of bytes? The
-answer is different for the two things, so something is different
-about their endianness...
+and git grep 'fdt_setprop.*NULL' produces examples of this usage in
+PPC and ARM fdt creation code.
+
+However the fdt_setprop() documentation doesn't document that a NULL
+value pointer is OK if the length is 0, and indeed the implementation
+unconditionally calls memcpy(prop->data, val, len), which is
+undefined behaviour, and warned about by clang sanitizers if you
+build libfdt with them:
+ dtc/libfdt/fdt_rw.c:288:21: runtime error: null pointer passed
+   as argument 2, which is declared to never be null
+
+So what's the best thing to do here? I can't offhand think of a
+non-ugly/non-confusing way to pass a valid pointer here...
 
 thanks
 -- PMM
