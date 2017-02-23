@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cgiqn-0004OW-0d
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 21:09:45 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cgiqo-0004Pb-DL
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 21:09:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cgiqm-0007aQ-0x
-	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 21:09:44 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cgiql-0007Ze-8v
+	for qemu-devel@nongnu.org; Wed, 22 Feb 2017 21:09:46 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 23 Feb 2017 13:09:30 +1100
-Message-Id: <20170223020936.29220-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCH 0/6] Cleanups to handling of hash MMU
+Date: Thu, 23 Feb 2017 13:09:32 +1100
+Message-Id: <20170223020936.29220-3-david@gibson.dropbear.id.au>
+In-Reply-To: <20170223020936.29220-1-david@gibson.dropbear.id.au>
+References: <20170223020936.29220-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PATCH 2/6] target/ppc: Merge cpu_ppc_set_vhyp() with
+ cpu_ppc_set_papr()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,45 +23,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, aik@ozlabs.ru, sjitindarsingh@gmail.com
 Cc: qemu-devel@nongnu.org, agraf@suse.de, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, paulus@samba.org, David Gibson <david@gibson.dropbear.id.au>
 
-This series has an assortment of cleanups to the handling of the hash
-based MMU for 64-bit ppc machines.  In particular it better handles
-the case of "external" hash table - this is used on the pseries
-machine type, which being a paravirtualized platform has the hashed
-page table - along with other hypervisor resources - outside the
-direct reach of the guest OS.  This series integrates the handling of
-the external HPT with the externalized handling of hypercalls via the
-"virtual hypervisor" mechanism.
+cpu_ppc_set_papr() sets up various aspects of CPU state for use with PAPR
+paravirtualized guests.  However, it doesn't set the virtual hypervisor,
+so callers must also call cpu_ppc_set_vhyp() so that PAPR hypercalls are
+handled properly.  This is a bit silly, so fold setting the virtual
+hypervisor into cpu_ppc_set_papr().
 
-These cleanups are expected to make integrating the new MMU model for
-POWER9 easier; in particular dealing with both the new POWER9 radix
-MMU and also the POWER9 legacy hash compatibility mode.
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/ppc/spapr_cpu_core.c     |  3 +--
+ target/ppc/cpu.h            |  3 +--
+ target/ppc/translate_init.c | 10 +++-------
+ 3 files changed, 5 insertions(+), 11 deletions(-)
 
-This series is based on my current ppc-for-2.9 branch, which I've just
-sent a pull request for.
-
-David Gibson (6):
-  pseries: Minor cleanups to HPT management hypercalls
-  target/ppc: Merge cpu_ppc_set_vhyp() with cpu_ppc_set_papr()
-  target/ppc: SDR1 is a hypervisor resource
-  target/ppc: Cleanup HPTE accessors for 64-bit hash MMU
-  target/ppc: Eliminate htab_base and htab_mask variables
-  target/ppc: Manage external HPT via virtual hypervisor
-
- hw/ppc/spapr.c              |  58 +++++++++++++++
- hw/ppc/spapr_cpu_core.c     |  20 ++++-
- hw/ppc/spapr_hcall.c        |  89 +++++++++++-----------
- target/ppc/cpu.h            |  24 +++---
- target/ppc/kvm.c            |  27 +++----
- target/ppc/kvm_ppc.h        |  43 +++++------
- target/ppc/machine.c        |   5 +-
- target/ppc/misc_helper.c    |   8 +-
- target/ppc/mmu-hash32.c     |  14 ++--
- target/ppc/mmu-hash32.h     |  32 ++++----
- target/ppc/mmu-hash64.c     | 177 ++++++++++++++++++--------------------------
- target/ppc/mmu-hash64.h     |  66 +++++++++--------
- target/ppc/mmu_helper.c     |  34 +++++----
- target/ppc/translate_init.c |  30 +++++---
- 14 files changed, 332 insertions(+), 295 deletions(-)
-
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index 55cd045..76563c4 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -57,8 +57,7 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, PowerPCCPU *cpu,
+     cpu_ppc_tb_init(env, SPAPR_TIMEBASE_FREQ);
+ 
+     /* Enable PAPR mode in TCG or KVM */
+-    cpu_ppc_set_vhyp(cpu, PPC_VIRTUAL_HYPERVISOR(spapr));
+-    cpu_ppc_set_papr(cpu);
++    cpu_ppc_set_papr(cpu, PPC_VIRTUAL_HYPERVISOR(spapr));
+ 
+     if (cpu->max_compat) {
+         Error *local_err = NULL;
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 425e79d..f99bcae 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1300,8 +1300,7 @@ void store_booke_tcr (CPUPPCState *env, target_ulong val);
+ void store_booke_tsr (CPUPPCState *env, target_ulong val);
+ void ppc_tlb_invalidate_all (CPUPPCState *env);
+ void ppc_tlb_invalidate_one (CPUPPCState *env, target_ulong addr);
+-void cpu_ppc_set_vhyp(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp);
+-void cpu_ppc_set_papr(PowerPCCPU *cpu);
++void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp);
+ #endif
+ #endif
+ 
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index be35cbd..a1405e9 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -8835,18 +8835,14 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
+ }
+ 
+ #if !defined(CONFIG_USER_ONLY)
+-
+-void cpu_ppc_set_vhyp(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp)
+-{
+-    cpu->vhyp = vhyp;
+-}
+-
+-void cpu_ppc_set_papr(PowerPCCPU *cpu)
++void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp)
+ {
+     CPUPPCState *env = &cpu->env;
+     ppc_spr_t *lpcr = &env->spr_cb[SPR_LPCR];
+     ppc_spr_t *amor = &env->spr_cb[SPR_AMOR];
+ 
++    cpu->vhyp = vhyp;
++
+     /* PAPR always has exception vectors in RAM not ROM. To ensure this,
+      * MSR[IP] should never be set.
+      *
 -- 
 2.9.3
