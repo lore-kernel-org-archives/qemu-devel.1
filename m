@@ -1,17 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cgzSy-00023Q-Hp
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:54:20 -0500
+	(envelope-from <armbru@redhat.com>) id 1cgzSs-0001xi-Ce
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:54:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cgzSx-0000wS-EK
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:54:16 -0500
+	(envelope-from <armbru@redhat.com>) id 1cgzSo-0000mE-99
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:54:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38442)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cgzSn-0000lS-Ve
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 14:54:06 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8D194C04B93A
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 19:54:05 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
+	[10.36.116.55])
+	by int-mx10.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v1NJs48C029913
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=NO)
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 14:54:05 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 23 Feb 2017 20:53:58 +0100
-Message-Id: <1487879642-16139-21-git-send-email-armbru@redhat.com>
+Date: Thu, 23 Feb 2017 20:53:42 +0100
+Message-Id: <1487879642-16139-5-git-send-email-armbru@redhat.com>
 In-Reply-To: <1487879642-16139-1-git-send-email-armbru@redhat.com>
 References: <1487879642-16139-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 20/24] qemu-img: Wrap cvtnum() around
- qemu_strtosz()
+Subject: [Qemu-devel] [PULL 04/24] test-cutils: Clean up qemu_strtoul()
+ result checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,149 +38,290 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org
+Use unsigned comparisons to check the result of qemu_strtoul() and
+strtoull().
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <1487708048-2131-21-git-send-email-armbru@redhat.com>
+Message-Id: <1487708048-2131-5-git-send-email-armbru@redhat.com>
 ---
- qemu-img.c | 58 +++++++++++++++++++++++++++++++---------------------------
- 1 file changed, 31 insertions(+), 27 deletions(-)
+ tests/test-cutils.c | 60 ++++++++++++++++++++++++++---------------------------
+ 1 file changed, 30 insertions(+), 30 deletions(-)
 
-diff --git a/qemu-img.c b/qemu-img.c
-index f1c641c..4062917 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -368,6 +368,19 @@ static int add_old_style_options(const char *fmt, QemuOpts *opts,
-     return 0;
+diff --git a/tests/test-cutils.c b/tests/test-cutils.c
+index 71681dc..749aaa9 100644
+--- a/tests/test-cutils.c
++++ b/tests/test-cutils.c
+@@ -523,7 +523,7 @@ static void test_qemu_strtoul_correct(void)
+     err = qemu_strtoul(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, 0);
+-    g_assert_cmpint(res, ==, 12345);
++    g_assert_cmpuint(res, ==, 12345);
+     g_assert(endptr == str + 5);
  }
  
-+static int64_t cvtnum(const char *s)
-+{
-+    char *end;
-+    int64_t ret;
-+
-+    ret = qemu_strtosz(s, &end);
-+    if (*end != '\0') {
-+        /* Detritus at the end of the string */
-+        return -EINVAL;
-+    }
-+    return ret;
-+}
-+
- static int img_create(int argc, char **argv)
- {
-     int c;
-@@ -461,9 +474,9 @@ static int img_create(int argc, char **argv)
-     /* Get image size, if specified */
-     if (optind < argc) {
-         int64_t sval;
--        char *end;
--        sval = qemu_strtosz(argv[optind++], &end);
--        if (sval < 0 || *end) {
-+
-+        sval = cvtnum(argv[optind++]);
-+        if (sval < 0) {
-             if (sval == -ERANGE) {
-                 error_report("Image size must be less than 8 EiB!");
-             } else {
-@@ -1863,9 +1876,9 @@ static int img_convert(int argc, char **argv)
-         case 'S':
-         {
-             int64_t sval;
--            char *end;
--            sval = qemu_strtosz(optarg, &end);
--            if (sval < 0 || *end) {
-+
-+            sval = cvtnum(optarg);
-+            if (sval < 0) {
-                 error_report("Invalid minimum zero buffer size for sparse output specified");
-                 ret = -1;
-                 goto fail_getopt;
-@@ -3650,10 +3663,8 @@ static int img_bench(int argc, char **argv)
-             break;
-         case 'o':
-         {
--            char *end;
--            errno = 0;
--            offset = qemu_strtosz(optarg, &end);
--            if (offset < 0|| *end) {
-+            offset = cvtnum(optarg);
-+            if (offset < 0) {
-                 error_report("Invalid offset specified");
-                 return 1;
-             }
-@@ -3666,10 +3677,9 @@ static int img_bench(int argc, char **argv)
-         case 's':
-         {
-             int64_t sval;
--            char *end;
+@@ -593,7 +593,7 @@ static void test_qemu_strtoul_trailing(void)
+     err = qemu_strtoul(str, &endptr, 0, &res);
  
--            sval = qemu_strtosz(optarg, &end);
--            if (sval < 0 || sval > INT_MAX || *end) {
-+            sval = cvtnum(optarg);
-+            if (sval < 0 || sval > INT_MAX) {
-                 error_report("Invalid buffer size specified");
-                 return 1;
-             }
-@@ -3680,10 +3690,9 @@ static int img_bench(int argc, char **argv)
-         case 'S':
-         {
-             int64_t sval;
--            char *end;
+     g_assert_cmpint(err, ==, 0);
+-    g_assert_cmpint(res, ==, 123);
++    g_assert_cmpuint(res, ==, 123);
+     g_assert(endptr == str + 3);
+ }
  
--            sval = qemu_strtosz(optarg, &end);
--            if (sval < 0 || sval > INT_MAX || *end) {
-+            sval = cvtnum(optarg);
-+            if (sval < 0 || sval > INT_MAX) {
-                 error_report("Invalid step size specified");
-                 return 1;
-             }
-@@ -3842,12 +3851,11 @@ static int img_dd_bs(const char *arg,
-                      struct DdIo *in, struct DdIo *out,
-                      struct DdInfo *dd)
- {
--    char *end;
-     int64_t res;
+@@ -608,7 +608,7 @@ static void test_qemu_strtoul_octal(void)
+     err = qemu_strtoul(str, &endptr, 8, &res);
  
--    res = qemu_strtosz(arg, &end);
-+    res = cvtnum(arg);
+     g_assert_cmpint(err, ==, 0);
+-    g_assert_cmpint(res, ==, 0123);
++    g_assert_cmpuint(res, ==, 0123);
+     g_assert(endptr == str + strlen(str));
  
--    if (res <= 0 || res > INT_MAX || *end) {
-+    if (res <= 0 || res > INT_MAX) {
-         error_report("invalid number: '%s'", arg);
-         return 1;
-     }
-@@ -3860,11 +3868,9 @@ static int img_dd_count(const char *arg,
-                         struct DdIo *in, struct DdIo *out,
-                         struct DdInfo *dd)
- {
--    char *end;
-+    dd->count = cvtnum(arg);
+     res = 999;
+@@ -616,7 +616,7 @@ static void test_qemu_strtoul_octal(void)
+     err = qemu_strtoul(str, &endptr, 0, &res);
  
--    dd->count = qemu_strtosz(arg, &end);
--
--    if (dd->count < 0 || *end) {
-+    if (dd->count < 0) {
-         error_report("invalid number: '%s'", arg);
-         return 1;
-     }
-@@ -3894,11 +3900,9 @@ static int img_dd_skip(const char *arg,
-                        struct DdIo *in, struct DdIo *out,
-                        struct DdInfo *dd)
- {
--    char *end;
-+    in->offset = cvtnum(arg);
+     g_assert_cmpint(err, ==, 0);
+-    g_assert_cmpint(res, ==, 0123);
++    g_assert_cmpuint(res, ==, 0123);
+     g_assert(endptr == str + strlen(str));
+ }
  
--    in->offset = qemu_strtosz(arg, &end);
--
--    if (in->offset < 0 || *end) {
-+    if (in->offset < 0) {
-         error_report("invalid number: '%s'", arg);
-         return 1;
-     }
+@@ -631,7 +631,7 @@ static void test_qemu_strtoul_decimal(void)
+     err = qemu_strtoul(str, &endptr, 10, &res);
+ 
+     g_assert_cmpint(err, ==, 0);
+-    g_assert_cmpint(res, ==, 123);
++    g_assert_cmpuint(res, ==, 123);
+     g_assert(endptr == str + strlen(str));
+ 
+     str = "123";
+@@ -640,7 +640,7 @@ static void test_qemu_strtoul_decimal(void)
+     err = qemu_strtoul(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, 0);
+-    g_assert_cmpint(res, ==, 123);
++    g_assert_cmpuint(res, ==, 123);
+     g_assert(endptr == str + strlen(str));
+ }
+ 
+@@ -655,7 +655,7 @@ static void test_qemu_strtoul_hex(void)
+     err = qemu_strtoul(str, &endptr, 16, &res);
+ 
+     g_assert_cmpint(err, ==, 0);
+-    g_assert_cmpint(res, ==, 0x123);
++    g_assert_cmphex(res, ==, 0x123);
+     g_assert(endptr == str + strlen(str));
+ 
+     str = "0x123";
+@@ -664,7 +664,7 @@ static void test_qemu_strtoul_hex(void)
+     err = qemu_strtoul(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, 0);
+-    g_assert_cmpint(res, ==, 0x123);
++    g_assert_cmphex(res, ==, 0x123);
+     g_assert(endptr == str + strlen(str));
+ }
+ 
+@@ -679,7 +679,7 @@ static void test_qemu_strtoul_max(void)
+     err = qemu_strtoul(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, 0);
+-    g_assert_cmpint(res, ==, ULONG_MAX);
++    g_assert_cmphex(res, ==, ULONG_MAX);
+     g_assert(endptr == str + strlen(str));
+     g_free(str);
+ }
+@@ -695,7 +695,7 @@ static void test_qemu_strtoul_overflow(void)
+     err = qemu_strtoul(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, -ERANGE);
+-    g_assert_cmpint(res, ==, ULONG_MAX);
++    g_assert_cmphex(res, ==, ULONG_MAX);
+     g_assert(endptr == str + strlen(str));
+ }
+ 
+@@ -710,7 +710,7 @@ static void test_qemu_strtoul_underflow(void)
+     err  = qemu_strtoul(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, -ERANGE);
+-    g_assert_cmpint(res, ==, -1ul);
++    g_assert_cmpuint(res, ==, -1ul);
+     g_assert(endptr == str + strlen(str));
+ }
+ 
+@@ -725,7 +725,7 @@ static void test_qemu_strtoul_negative(void)
+     err = qemu_strtoul(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, 0);
+-    g_assert_cmpint(res, ==, -321ul);
++    g_assert_cmpuint(res, ==, -321ul);
+     g_assert(endptr == str + strlen(str));
+ }
+ 
+@@ -738,7 +738,7 @@ static void test_qemu_strtoul_full_correct(void)
+     err = qemu_strtoul(str, NULL, 0, &res);
+ 
+     g_assert_cmpint(err, ==, 0);
+-    g_assert_cmpint(res, ==, 123);
++    g_assert_cmpuint(res, ==, 123);
+ }
+ 
+ static void test_qemu_strtoul_full_null(void)
+@@ -769,7 +769,7 @@ static void test_qemu_strtoul_full_negative(void)
+ 
+     err = qemu_strtoul(str, NULL, 0, &res);
+     g_assert_cmpint(err, ==, 0);
+-    g_assert_cmpint(res, ==, -321ul);
++    g_assert_cmpuint(res, ==, -321ul);
+ }
+ 
+ static void test_qemu_strtoul_full_trailing(void)
+@@ -792,7 +792,7 @@ static void test_qemu_strtoul_full_max(void)
+     err = qemu_strtoul(str, NULL, 0, &res);
+ 
+     g_assert_cmpint(err, ==, 0);
+-    g_assert_cmpint(res, ==, ULONG_MAX);
++    g_assert_cmphex(res, ==, ULONG_MAX);
+     g_free(str);
+ }
+ 
+@@ -1094,7 +1094,7 @@ static void test_qemu_strtoull_correct(void)
+     err = qemu_strtoull(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, 0);
+-    g_assert_cmpint(res, ==, 12345);
++    g_assert_cmpuint(res, ==, 12345);
+     g_assert(endptr == str + 5);
+ }
+ 
+@@ -1164,7 +1164,7 @@ static void test_qemu_strtoull_trailing(void)
+     err = qemu_strtoull(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, 0);
+-    g_assert_cmpint(res, ==, 123);
++    g_assert_cmpuint(res, ==, 123);
+     g_assert(endptr == str + 3);
+ }
+ 
+@@ -1179,7 +1179,7 @@ static void test_qemu_strtoull_octal(void)
+     err = qemu_strtoull(str, &endptr, 8, &res);
+ 
+     g_assert_cmpint(err, ==, 0);
+-    g_assert_cmpint(res, ==, 0123);
++    g_assert_cmpuint(res, ==, 0123);
+     g_assert(endptr == str + strlen(str));
+ 
+     endptr = &f;
+@@ -1187,7 +1187,7 @@ static void test_qemu_strtoull_octal(void)
+     err = qemu_strtoull(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, 0);
+-    g_assert_cmpint(res, ==, 0123);
++    g_assert_cmpuint(res, ==, 0123);
+     g_assert(endptr == str + strlen(str));
+ }
+ 
+@@ -1202,7 +1202,7 @@ static void test_qemu_strtoull_decimal(void)
+     err = qemu_strtoull(str, &endptr, 10, &res);
+ 
+     g_assert_cmpint(err, ==, 0);
+-    g_assert_cmpint(res, ==, 123);
++    g_assert_cmpuint(res, ==, 123);
+     g_assert(endptr == str + strlen(str));
+ 
+     str = "123";
+@@ -1211,7 +1211,7 @@ static void test_qemu_strtoull_decimal(void)
+     err = qemu_strtoull(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, 0);
+-    g_assert_cmpint(res, ==, 123);
++    g_assert_cmpuint(res, ==, 123);
+     g_assert(endptr == str + strlen(str));
+ }
+ 
+@@ -1226,7 +1226,7 @@ static void test_qemu_strtoull_hex(void)
+     err = qemu_strtoull(str, &endptr, 16, &res);
+ 
+     g_assert_cmpint(err, ==, 0);
+-    g_assert_cmpint(res, ==, 0x123);
++    g_assert_cmphex(res, ==, 0x123);
+     g_assert(endptr == str + strlen(str));
+ 
+     str = "0x123";
+@@ -1235,7 +1235,7 @@ static void test_qemu_strtoull_hex(void)
+     err = qemu_strtoull(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, 0);
+-    g_assert_cmpint(res, ==, 0x123);
++    g_assert_cmphex(res, ==, 0x123);
+     g_assert(endptr == str + strlen(str));
+ }
+ 
+@@ -1250,7 +1250,7 @@ static void test_qemu_strtoull_max(void)
+     err = qemu_strtoull(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, 0);
+-    g_assert_cmpint(res, ==, ULLONG_MAX);
++    g_assert_cmphex(res, ==, ULLONG_MAX);
+     g_assert(endptr == str + strlen(str));
+     g_free(str);
+ }
+@@ -1266,7 +1266,7 @@ static void test_qemu_strtoull_overflow(void)
+     err = qemu_strtoull(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, -ERANGE);
+-    g_assert_cmpint(res, ==, ULLONG_MAX);
++    g_assert_cmphex(res, ==, ULLONG_MAX);
+     g_assert(endptr == str + strlen(str));
+ }
+ 
+@@ -1281,7 +1281,7 @@ static void test_qemu_strtoull_underflow(void)
+     err  = qemu_strtoull(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, -ERANGE);
+-    g_assert_cmpint(res, ==, -1);
++    g_assert_cmphex(res, ==, -1ull);
+     g_assert(endptr == str + strlen(str));
+ }
+ 
+@@ -1296,7 +1296,7 @@ static void test_qemu_strtoull_negative(void)
+     err = qemu_strtoull(str, &endptr, 0, &res);
+ 
+     g_assert_cmpint(err, ==, 0);
+-    g_assert_cmpint(res, ==, -321);
++    g_assert_cmpuint(res, ==, -321ull);
+     g_assert(endptr == str + strlen(str));
+ }
+ 
+@@ -1309,7 +1309,7 @@ static void test_qemu_strtoull_full_correct(void)
+     err = qemu_strtoull(str, NULL, 0, &res);
+ 
+     g_assert_cmpint(err, ==, 0);
+-    g_assert_cmpint(res, ==, 18446744073709551614LLU);
++    g_assert_cmpuint(res, ==, 18446744073709551614ull);
+ }
+ 
+ static void test_qemu_strtoull_full_null(void)
+@@ -1342,7 +1342,7 @@ static void test_qemu_strtoull_full_negative(void)
+     err = qemu_strtoull(str, NULL, 0, &res);
+ 
+     g_assert_cmpint(err, ==, 0);
+-    g_assert_cmpint(res, ==, 18446744073709551295LLU);
++    g_assert_cmpuint(res, ==, -321ull);
+ }
+ 
+ static void test_qemu_strtoull_full_trailing(void)
+@@ -1365,7 +1365,7 @@ static void test_qemu_strtoull_full_max(void)
+     err = qemu_strtoull(str, NULL, 0, &res);
+ 
+     g_assert_cmpint(err, ==, 0);
+-    g_assert_cmpint(res, ==, ULLONG_MAX);
++    g_assert_cmphex(res, ==, ULLONG_MAX);
+     g_free(str);
+ }
+ 
 -- 
 2.7.4
