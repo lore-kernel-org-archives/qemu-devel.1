@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cgy9A-0004LR-QE
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 13:29:46 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cgy9C-0004Mt-4N
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 13:29:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cgy99-0006ZU-9w
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 13:29:44 -0500
-Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:36193)
+	(envelope-from <alex.bennee@linaro.org>) id 1cgy9A-0006cj-Q5
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 13:29:46 -0500
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:38009)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cgy99-0006YI-4g
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 13:29:43 -0500
-Received: by mail-wr0-x22a.google.com with SMTP id 89so27033788wrr.3
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 10:29:43 -0800 (PST)
+	id 1cgy9A-0006aU-GY
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 13:29:44 -0500
+Received: by mail-wm0-x229.google.com with SMTP id r141so7048469wmg.1
+	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 10:29:44 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 23 Feb 2017 18:29:16 +0000
-Message-Id: <20170223182927.7166-14-alex.bennee@linaro.org>
+Date: Thu, 23 Feb 2017 18:29:12 +0000
+Message-Id: <20170223182927.7166-10-alex.bennee@linaro.org>
 In-Reply-To: <20170223182927.7166-1-alex.bennee@linaro.org>
 References: <20170223182927.7166-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v14 13/24] cputlb: add assert_cpu_is_self checks
+Subject: [Qemu-devel] [PATCH v14 09/24] tcg: remove global exit_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,100 +32,162 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: rth@twiddle.net, peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, bamvor.zhangjian@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-For SoftMMU the TLB flushes are an example of a task that can be
-triggered on one vCPU by another. To deal with this properly we need to
-use safe work to ensure these changes are done safely. The new assert
-can be enabled while debugging to catch these cases.
+There are now only two uses of the global exit_request left.
+
+The first ensures we exit the run_loop when we first start to process
+pending work and in the kick handler. This is just as easily done by
+setting the first_cpu->exit_request flag.
+
+The second use is in the round robin kick routine. The global
+exit_request ensured every vCPU would set its local exit_request and
+cause a full exit of the loop. Now the iothread isn't being held while
+running we can just rely on the kick handler to push us out as intended.
+
+We lightly re-factor the main vCPU thread to ensure cpu->exit_requests
+cause us to exit the main loop and process any IO requests that might
+come along. As an cpu->exit_request may legitimately get squashed
+while processing the EXCP_INTERRUPT exception we also check
+cpu->queued_work_first to ensure queued work is expedited as soon as
+possible.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
- cputlb.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+v13
+  - also check cpu->queued_work_first in main loop.
+v5
+  - minor merge conflict with kick patch
+v4
+  - moved to after iothread unlocking patch
+  - needed to remove kick exit_request as well.
+  - remove extraneous cpu->exit_request check
+  - remove stray exit_request setting
+  - remove needless atomic operation
+---
+ cpu-exec-common.c       |  2 --
+ cpu-exec.c              | 20 +++++++-------------
+ cpus.c                  | 19 +++++++++++--------
+ include/exec/exec-all.h |  3 ---
+ 4 files changed, 18 insertions(+), 26 deletions(-)
 
-diff --git a/cputlb.c b/cputlb.c
-index 1cc9d9da51..af0e65cd2c 100644
---- a/cputlb.c
-+++ b/cputlb.c
-@@ -58,6 +58,12 @@
-     } \
- } while (0)
+diff --git a/cpu-exec-common.c b/cpu-exec-common.c
+index e2bc053372..0504a9457b 100644
+--- a/cpu-exec-common.c
++++ b/cpu-exec-common.c
+@@ -23,8 +23,6 @@
+ #include "exec/exec-all.h"
+ #include "exec/memory-internal.h"
  
-+#define assert_cpu_is_self(this_cpu) do {                         \
-+        if (DEBUG_TLB_GATE) {                                     \
-+            g_assert(!cpu->created || qemu_cpu_is_self(cpu));     \
-+        }                                                         \
-+    } while (0)
-+
- /* statistics */
- int tlb_flush_count;
- 
-@@ -70,6 +76,9 @@ void tlb_flush(CPUState *cpu)
+-bool exit_request;
+-
+ /* exit the current TB, but without causing any exception to be raised */
+ void cpu_loop_exit_noexc(CPUState *cpu)
  {
-     CPUArchState *env = cpu->env_ptr;
+diff --git a/cpu-exec.c b/cpu-exec.c
+index 1bd3d72002..85f14d4194 100644
+--- a/cpu-exec.c
++++ b/cpu-exec.c
+@@ -568,15 +568,13 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
+     *tb_exit = ret & TB_EXIT_MASK;
+     switch (*tb_exit) {
+     case TB_EXIT_REQUESTED:
+-        /* Something asked us to stop executing
+-         * chained TBs; just continue round the main
+-         * loop. Whatever requested the exit will also
+-         * have set something else (eg exit_request or
+-         * interrupt_request) which we will handle
+-         * next time around the loop.  But we need to
+-         * ensure the zeroing of tcg_exit_req (see cpu_tb_exec)
+-         * comes before the next read of cpu->exit_request
+-         * or cpu->interrupt_request.
++        /* Something asked us to stop executing chained TBs; just
++         * continue round the main loop. Whatever requested the exit
++         * will also have set something else (eg interrupt_request)
++         * which we will handle next time around the loop.  But we
++         * need to ensure the tcg_exit_req read in generated code
++         * comes before the next read of cpu->exit_request or
++         * cpu->interrupt_request.
+          */
+         smp_mb();
+         *last_tb = NULL;
+@@ -630,10 +628,6 @@ int cpu_exec(CPUState *cpu)
  
-+    assert_cpu_is_self(cpu);
-+    tlb_debug("(count: %d)\n", tlb_flush_count++);
-+
-     memset(env->tlb_table, -1, sizeof(env->tlb_table));
-     memset(env->tlb_v_table, -1, sizeof(env->tlb_v_table));
-     memset(cpu->tb_jmp_cache, 0, sizeof(cpu->tb_jmp_cache));
-@@ -77,13 +86,13 @@ void tlb_flush(CPUState *cpu)
-     env->vtlb_index = 0;
-     env->tlb_flush_addr = -1;
-     env->tlb_flush_mask = 0;
--    tlb_flush_count++;
- }
+     rcu_read_lock();
  
- static inline void v_tlb_flush_by_mmuidx(CPUState *cpu, va_list argp)
+-    if (unlikely(atomic_mb_read(&exit_request))) {
+-        cpu->exit_request = 1;
+-    }
+-
+     cc->cpu_exec_enter(cpu);
+ 
+     /* Calculate difference between guest clock and host clock.
+diff --git a/cpus.c b/cpus.c
+index 0ae8f69be5..e165d18785 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -793,7 +793,6 @@ static inline int64_t qemu_tcg_next_kick(void)
+ static void qemu_cpu_kick_rr_cpu(void)
  {
-     CPUArchState *env = cpu->env_ptr;
+     CPUState *cpu;
+-    atomic_mb_set(&exit_request, 1);
+     do {
+         cpu = atomic_mb_read(&tcg_current_rr_cpu);
+         if (cpu) {
+@@ -1316,11 +1315,11 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
  
-+    assert_cpu_is_self(cpu);
-     tlb_debug("start\n");
+     start_tcg_kick_timer();
  
-     for (;;) {
-@@ -128,6 +137,7 @@ void tlb_flush_page(CPUState *cpu, target_ulong addr)
-     int i;
-     int mmu_idx;
+-    /* process any pending work */
+-    atomic_mb_set(&exit_request, 1);
+-
+     cpu = first_cpu;
  
-+    assert_cpu_is_self(cpu);
-     tlb_debug("page :" TARGET_FMT_lx "\n", addr);
- 
-     /* Check if we need to flush due to large pages.  */
-@@ -165,6 +175,7 @@ void tlb_flush_page_by_mmuidx(CPUState *cpu, target_ulong addr, ...)
- 
-     va_start(argp, addr);
- 
-+    assert_cpu_is_self(cpu);
-     tlb_debug("addr "TARGET_FMT_lx"\n", addr);
- 
-     /* Check if we need to flush due to large pages.  */
-@@ -253,6 +264,8 @@ void tlb_reset_dirty(CPUState *cpu, ram_addr_t start1, ram_addr_t length)
- 
-     int mmu_idx;
- 
-+    assert_cpu_is_self(cpu);
++    /* process any pending work */
++    cpu->exit_request = 1;
 +
-     env = cpu->env_ptr;
-     for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
-         unsigned int i;
-@@ -284,6 +297,8 @@ void tlb_set_dirty(CPUState *cpu, target_ulong vaddr)
-     int i;
-     int mmu_idx;
+     while (1) {
+         /* Account partial waits to QEMU_CLOCK_VIRTUAL.  */
+         qemu_account_warp_timer();
+@@ -1329,7 +1328,8 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+             cpu = first_cpu;
+         }
  
-+    assert_cpu_is_self(cpu);
+-        for (; cpu != NULL && !exit_request; cpu = CPU_NEXT(cpu)) {
++        while (cpu && !cpu->queued_work_first && !cpu->exit_request) {
 +
-     vaddr &= TARGET_PAGE_MASK;
-     i = (vaddr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
-     for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
-@@ -343,6 +358,7 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
-     unsigned vidx = env->vtlb_index++ % CPU_VTLB_SIZE;
-     int asidx = cpu_asidx_from_attrs(cpu, attrs);
+             atomic_mb_set(&tcg_current_rr_cpu, cpu);
  
-+    assert_cpu_is_self(cpu);
-     assert(size >= TARGET_PAGE_SIZE);
-     if (size != TARGET_PAGE_SIZE) {
-         tlb_add_large_page(env, vaddr, size);
+             qemu_clock_enable(QEMU_CLOCK_VIRTUAL,
+@@ -1349,12 +1349,15 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+                 break;
+             }
+ 
+-        } /* for cpu.. */
++            cpu = CPU_NEXT(cpu);
++        } /* while (cpu && !cpu->exit_request).. */
++
+         /* Does not need atomic_mb_set because a spurious wakeup is okay.  */
+         atomic_set(&tcg_current_rr_cpu, NULL);
+ 
+-        /* Pairs with smp_wmb in qemu_cpu_kick.  */
+-        atomic_mb_set(&exit_request, 0);
++        if (cpu && cpu->exit_request) {
++            atomic_mb_set(&cpu->exit_request, 0);
++        }
+ 
+         handle_icount_deadline();
+ 
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index 4e34fc4cc1..82f0e12327 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -404,7 +404,4 @@ bool memory_region_is_unassigned(MemoryRegion *mr);
+ /* vl.c */
+ extern int singlestep;
+ 
+-/* cpu-exec.c, accessed with atomic_mb_read/atomic_mb_set */
+-extern bool exit_request;
+-
+ #endif
 -- 
 2.11.0
