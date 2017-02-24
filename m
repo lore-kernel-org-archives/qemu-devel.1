@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1chF5N-0008Ox-Uy
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:34:59 -0500
+	(envelope-from <atar4qemu@gmail.com>) id 1chF6C-0000Xr-Vr
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:35:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1chF5K-0007L6-Sb
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:34:57 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41178)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1chF5K-0007Jr-Ml
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:34:54 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1chF5J-0000zM-BC
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 12:34:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 521052E80CD
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 12:34:53 +0000 (UTC)
+	(envelope-from <atar4qemu@gmail.com>) id 1chF6B-00007C-Om
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:35:48 -0500
+Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:35895)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1chF6B-0008WP-K4
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:35:47 -0500
+Received: by mail-it0-x242.google.com with SMTP id w185so3177280ita.3
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 04:35:45 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 24 Feb 2017 12:21:52 -0000
-From: Martin Husemann <martin@NetBSD.org>
-Reply-To: Bug 1014099 <1014099@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20120616165038.8986.77631.malonedeb@gac.canonical.com>
-Message-Id: <20170224122152.5013.90483.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1014099] Re: hw/esp.c does not properly deal with
- TEST_UNIT_READY in NetBSD/sparc
+In-Reply-To: <CAFEAcA9iAsAgOidpsdniDHpy6enwca=hr_ALdf+svJP4gvXXWg@mail.gmail.com>
+References: <1484779123-18968-1-git-send-email-atar4qemu@gmail.com>
+	<1484779123-18968-31-git-send-email-atar4qemu@gmail.com>
+	<CAFEAcA8=gKjbo9YaRAzGHi-tP6AWY08ps_tEPOSzpNFXBC6M+Q@mail.gmail.com>
+	<CACXAS8COsHWMAqoQTDqs6zh=-f0_u7posLQ1nUe6TKRfBaBSEg@mail.gmail.com>
+	<CAFEAcA8cS8DMbHsVU8oWVtB1JsSQJGi1igyFZVMcuzXXjpVkEQ@mail.gmail.com>
+	<CAFEAcA9iAsAgOidpsdniDHpy6enwca=hr_ALdf+svJP4gvXXWg@mail.gmail.com>
+From: Artyom Tarasenko <atar4qemu@gmail.com>
+Date: Fri, 24 Feb 2017 13:35:24 +0100
+Message-ID: <CACXAS8Dh1KFr6QgKMo+f=n+EvKn_eWxb+n6X90kj4aymmzpoUw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 30/30] target-sparc: fix up niagara machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,36 +32,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <rth@twiddle.net>
 
-Yes. Just to make sure I tested qemu 2.8 against an old disk image from
-2012 and it boots fine w/o any  complaints during the device probes.
+On Fri, Feb 24, 2017 at 12:50 PM, Peter Maydell
+<peter.maydell@linaro.org> wrote:
+> On 23 January 2017 at 14:24, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> On 23 January 2017 at 14:10, Artyom Tarasenko <atar4qemu@gmail.com> wrote:
+>>> On Mon, Jan 23, 2017 at 1:40 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>>>> I see that 'make check' now warns:
+>>>>   GTESTER check-qtest-sparc64
+>>>> Could not open option rom 'nvram1': No such file or directory
+>>>> Could not open option rom '1up-md.bin': No such file or directory
+>>>> Could not open option rom '1up-hv.bin': No such file or directory
+>>>> Could not open option rom 'reset.bin': No such file or directory
+>>>> Could not open option rom 'q.bin': No such file or directory
+>>>> Could not open option rom 'openboot.bin': No such file or directory
+>>>>
+>>>> (though the tests still pass).
+>
+>> One thing we could do is only warn if !qtest_enabled().
+>
+> I notice that 'make check' still warns about these missing option
+> rom files...could somebody write a patch to silence it, please?
 
-** Changed in: qemu
-       Status: Incomplete =3D> Fix Released
+Actually I sent a patch one month ago:
+http://lists.gnu.org/archive/html/qemu-devel/2017-01/msg05272.html
 
--- =
+I think I've waited long enough  for nacks.
+Will send a pull request with it.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1014099
+-- 
+Regards,
+Artyom Tarasenko
 
-Title:
-  hw/esp.c does not properly deal with TEST_UNIT_READY in NetBSD/sparc
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  The NetBSD ncr53c9x.c driver does a TEST_UNIT_READY command with
-  SELATN but dma disabled sometimes (early during bus enumeration). This
-  is fine, as the command will not produce nor consume any data, and
-  works on real hardware.
-
-  However, the qemu emulation does not allow this (for reasons I don't
-  understand).
-
-  The change below fixes the problem.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1014099/+subscriptions
+SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
