@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1chJxW-0006IR-Ra
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:47:12 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1chK2z-00069J-1q
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:52:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1chJxV-0004ux-RL
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:47:10 -0500
-From: Jeff Cody <jcody@redhat.com>
-Date: Fri, 24 Feb 2017 12:47:00 -0500
-Message-Id: <20170224174700.30816-4-jcody@redhat.com>
-In-Reply-To: <20170224174700.30816-1-jcody@redhat.com>
-References: <20170224174700.30816-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL 3/3] RBD: Add support readv,writev for rbd
+	(envelope-from <eric.auger@redhat.com>) id 1chK2x-00079Q-U3
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:52:49 -0500
+References: <1487850673-26455-1-git-send-email-vijay.kilari@gmail.com>
+	<1487850673-26455-6-git-send-email-vijay.kilari@gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <0b7e4ab6-c487-d4d2-3336-89ef253dc445@redhat.com>
+Date: Fri, 24 Feb 2017 18:52:38 +0100
+MIME-Version: 1.0
+In-Reply-To: <1487850673-26455-6-git-send-email-vijay.kilari@gmail.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v9 5/5] hw/intc/arm_gicv3_kvm: Reset GICv3
+ cpu interface registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,179 +24,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: peter.maydell@linaro.org, jcody@redhat.com, qemu-devel@nongnu.org
+To: vijay.kilari@gmail.com, qemu-arm@nongnu.org, peter.maydell@linaro.org, christoffer.dall@linaro.org
+Cc: p.fedin@samsung.com, marc.zyngier@arm.com, qemu-devel@nongnu.org, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 
-From: tianqing <tianqing@unitedstack.com>
+Hi
 
-Rbd can do readv and writev directly, so wo do not need to transform
-iov to buf or vice versa any more.
+On 23/02/2017 12:51, vijay.kilari@gmail.com wrote:
+> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+> 
+> Reset CPU interface registers of GICv3 when CPU is reset.
+> For this, ARMCPRegInfo struct is registered with one ICC
+> register whose resetfn is called when cpu is reset.
+> 
+> All the ICC registers are reset under one single register
+> reset function instead of calling resetfn for each ICC
+> register.
+> 
+> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Signed-off-by: tianqing <tianqing@unitedstack.com>
-Reviewed-by: Jeff Cody <jcody@redhat.com>
-Signed-off-by: Jeff Cody <jcody@redhat.com>
----
- block/rbd.c | 80 ++++++++++++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 56 insertions(+), 24 deletions(-)
-
-diff --git a/block/rbd.c b/block/rbd.c
-index a57b3e3..22e8e69 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -62,6 +62,13 @@
- #define RBD_MAX_SNAP_NAME_SIZE 128
- #define RBD_MAX_SNAPS 100
- 
-+/* The LIBRBD_SUPPORTS_IOVEC is defined in librbd.h */
-+#ifdef LIBRBD_SUPPORTS_IOVEC
-+#define LIBRBD_USE_IOVEC 1
-+#else
-+#define LIBRBD_USE_IOVEC 0
-+#endif
-+
- typedef enum {
-     RBD_AIO_READ,
-     RBD_AIO_WRITE,
-@@ -310,6 +317,17 @@ static int qemu_rbd_set_conf(rados_t cluster, const char *conf,
-     return ret;
- }
- 
-+static void qemu_rbd_memset(RADOSCB *rcb, int64_t offs)
-+{
-+    if (LIBRBD_USE_IOVEC) {
-+        RBDAIOCB *acb = rcb->acb;
-+        iov_memset(acb->qiov->iov, acb->qiov->niov, offs, 0,
-+                   acb->qiov->size - offs);
-+    } else {
-+        memset(rcb->buf + offs, 0, rcb->size - offs);
-+    }
-+}
-+
- static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
- {
-     Error *local_err = NULL;
-@@ -426,11 +444,11 @@ static void qemu_rbd_complete_aio(RADOSCB *rcb)
-         }
-     } else {
-         if (r < 0) {
--            memset(rcb->buf, 0, rcb->size);
-+            qemu_rbd_memset(rcb, 0);
-             acb->ret = r;
-             acb->error = 1;
-         } else if (r < rcb->size) {
--            memset(rcb->buf + r, 0, rcb->size - r);
-+            qemu_rbd_memset(rcb, r);
-             if (!acb->error) {
-                 acb->ret = rcb->size;
-             }
-@@ -441,10 +459,13 @@ static void qemu_rbd_complete_aio(RADOSCB *rcb)
- 
-     g_free(rcb);
- 
--    if (acb->cmd == RBD_AIO_READ) {
--        qemu_iovec_from_buf(acb->qiov, 0, acb->bounce, acb->qiov->size);
-+    if (!LIBRBD_USE_IOVEC) {
-+        if (acb->cmd == RBD_AIO_READ) {
-+            qemu_iovec_from_buf(acb->qiov, 0, acb->bounce, acb->qiov->size);
-+        }
-+        qemu_vfree(acb->bounce);
-     }
--    qemu_vfree(acb->bounce);
-+
-     acb->common.cb(acb->common.opaque, (acb->ret > 0 ? 0 : acb->ret));
- 
-     qemu_aio_unref(acb);
-@@ -655,7 +676,6 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
-     RBDAIOCB *acb;
-     RADOSCB *rcb = NULL;
-     rbd_completion_t c;
--    char *buf;
-     int r;
- 
-     BDRVRBDState *s = bs->opaque;
-@@ -664,27 +684,29 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
-     acb->cmd = cmd;
-     acb->qiov = qiov;
-     assert(!qiov || qiov->size == size);
--    if (cmd == RBD_AIO_DISCARD || cmd == RBD_AIO_FLUSH) {
--        acb->bounce = NULL;
--    } else {
--        acb->bounce = qemu_try_blockalign(bs, qiov->size);
--        if (acb->bounce == NULL) {
--            goto failed;
-+
-+    rcb = g_new(RADOSCB, 1);
-+
-+    if (!LIBRBD_USE_IOVEC) {
-+        if (cmd == RBD_AIO_DISCARD || cmd == RBD_AIO_FLUSH) {
-+            acb->bounce = NULL;
-+        } else {
-+            acb->bounce = qemu_try_blockalign(bs, qiov->size);
-+            if (acb->bounce == NULL) {
-+                goto failed;
-+            }
-         }
-+        if (cmd == RBD_AIO_WRITE) {
-+            qemu_iovec_to_buf(acb->qiov, 0, acb->bounce, qiov->size);
-+        }
-+        rcb->buf = acb->bounce;
-     }
-+
-     acb->ret = 0;
-     acb->error = 0;
-     acb->s = s;
- 
--    if (cmd == RBD_AIO_WRITE) {
--        qemu_iovec_to_buf(acb->qiov, 0, acb->bounce, qiov->size);
--    }
--
--    buf = acb->bounce;
--
--    rcb = g_new(RADOSCB, 1);
-     rcb->acb = acb;
--    rcb->buf = buf;
-     rcb->s = acb->s;
-     rcb->size = size;
-     r = rbd_aio_create_completion(rcb, (rbd_callback_t) rbd_finish_aiocb, &c);
-@@ -694,10 +716,18 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
- 
-     switch (cmd) {
-     case RBD_AIO_WRITE:
--        r = rbd_aio_write(s->image, off, size, buf, c);
-+#ifdef LIBRBD_SUPPORTS_IOVEC
-+            r = rbd_aio_writev(s->image, qiov->iov, qiov->niov, off, c);
-+#else
-+            r = rbd_aio_write(s->image, off, size, rcb->buf, c);
-+#endif
-         break;
-     case RBD_AIO_READ:
--        r = rbd_aio_read(s->image, off, size, buf, c);
-+#ifdef LIBRBD_SUPPORTS_IOVEC
-+            r = rbd_aio_readv(s->image, qiov->iov, qiov->niov, off, c);
-+#else
-+            r = rbd_aio_read(s->image, off, size, rcb->buf, c);
-+#endif
-         break;
-     case RBD_AIO_DISCARD:
-         r = rbd_aio_discard_wrapper(s->image, off, size, c);
-@@ -712,14 +742,16 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
-     if (r < 0) {
-         goto failed_completion;
-     }
--
-     return &acb->common;
- 
- failed_completion:
-     rbd_aio_release(c);
- failed:
-     g_free(rcb);
--    qemu_vfree(acb->bounce);
-+    if (!LIBRBD_USE_IOVEC) {
-+        qemu_vfree(acb->bounce);
-+    }
-+
-     qemu_aio_unref(acb);
-     return NULL;
- }
--- 
-2.9.3
+Eric
+> ---
+>  hw/intc/arm_gicv3_kvm.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 60 insertions(+)
+> 
+> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+> index cda1af4..81f0403 100644
+> --- a/hw/intc/arm_gicv3_kvm.c
+> +++ b/hw/intc/arm_gicv3_kvm.c
+> @@ -604,6 +604,32 @@ static void kvm_arm_gicv3_get(GICv3State *s)
+>      }
+>  }
+>  
+> +static void arm_gicv3_icc_reset(CPUARMState *env, const ARMCPRegInfo *ri)
+> +{
+> +    ARMCPU *cpu;
+> +    GICv3State *s;
+> +    GICv3CPUState *c;
+> +
+> +    c = (GICv3CPUState *)env->gicv3state;
+> +    s = c->gic;
+> +    cpu = ARM_CPU(c->cpu);
+> +
+> +    /* Initialize to actual HW supported configuration */
+> +    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS,
+> +                      KVM_VGIC_ATTR(ICC_CTLR_EL1, cpu->mp_affinity),
+> +                      &c->icc_ctlr_el1[GICV3_NS], false);
+> +
+> +    c->icc_ctlr_el1[GICV3_S] = c->icc_ctlr_el1[GICV3_NS];
+> +    c->icc_pmr_el1 = 0;
+> +    c->icc_bpr[GICV3_G0] = GIC_MIN_BPR;
+> +    c->icc_bpr[GICV3_G1] = GIC_MIN_BPR;
+> +    c->icc_bpr[GICV3_G1NS] = GIC_MIN_BPR;
+> +
+> +    c->icc_sre_el1 = 0x7;
+> +    memset(c->icc_apr, 0, sizeof(c->icc_apr));
+> +    memset(c->icc_igrpen, 0, sizeof(c->icc_igrpen));
+> +}
+> +
+>  static void kvm_arm_gicv3_reset(DeviceState *dev)
+>  {
+>      GICv3State *s = ARM_GICV3_COMMON(dev);
+> @@ -621,6 +647,34 @@ static void kvm_arm_gicv3_reset(DeviceState *dev)
+>      kvm_arm_gicv3_put(s);
+>  }
+>  
+> +/*
+> + * CPU interface registers of GIC needs to be reset on CPU reset.
+> + * For the calling arm_gicv3_icc_reset() on CPU reset, we register
+> + * below ARMCPRegInfo. As we reset the whole cpu interface under single
+> + * register reset, we define only one register of CPU interface instead
+> + * of defining all the registers.
+> + */
+> +static const ARMCPRegInfo gicv3_cpuif_reginfo[] = {
+> +    { .name = "ICC_CTLR_EL1", .state = ARM_CP_STATE_BOTH,
+> +      .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 12, .opc2 = 4,
+> +      /*
+> +       * If ARM_CP_NOP is used, resetfn is not called,
+> +       * So ARM_CP_NO_RAW is appropriate type.
+> +       */
+> +      .type = ARM_CP_NO_RAW,
+> +      .access = PL1_RW,
+> +      .readfn = arm_cp_read_zero,
+> +      .writefn = arm_cp_write_ignore,
+> +      /*
+> +       * We hang the whole cpu interface reset routine off here
+> +       * rather than parcelling it out into one little function
+> +       * per register
+> +       */
+> +      .resetfn = arm_gicv3_icc_reset,
+> +    },
+> +    REGINFO_SENTINEL
+> +};
+> +
+>  static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
+>  {
+>      GICv3State *s = KVM_ARM_GICV3(dev);
+> @@ -644,6 +698,12 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
+>  
+>      gicv3_init_irqs_and_mmio(s, kvm_arm_gicv3_set_irq, NULL);
+>  
+> +    for (i = 0; i < s->num_cpu; i++) {
+> +        ARMCPU *cpu = ARM_CPU(qemu_get_cpu(i));
+> +
+> +        define_arm_cp_regs(cpu, gicv3_cpuif_reginfo);
+> +    }
+> +
+>      /* Try to create the device via the device control API */
+>      s->dev_fd = kvm_create_device(kvm_state, KVM_DEV_TYPE_ARM_VGIC_V3, false);
+>      if (s->dev_fd < 0) {
+> 
