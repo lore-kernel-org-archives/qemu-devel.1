@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1chLTH-0007t4-MK
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:24:05 -0500
+	(envelope-from <eblake@redhat.com>) id 1chLVG-0000Ud-Gj
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:26:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1chLTD-0003vY-05
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:24:03 -0500
-Resent-Message-Id: <E1chLTD-0003vY-05@eggs.gnu.org>
-In-Reply-To: <1487960230-18054-1-git-send-email-kwolf@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148796417876.177.6896138934478016477@0e2666bad730>
+	(envelope-from <eblake@redhat.com>) id 1chLVF-0005L4-3x
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:26:06 -0500
+References: <1487710908-26356-1-git-send-email-armbru@redhat.com>
+	<1487710908-26356-3-git-send-email-armbru@redhat.com>
+	<5f90e39c-e4ea-8638-d057-25eff232ad3d@redhat.com>
+	<878toxmeol.fsf@dusky.pond.sub.org> <877f4g2f6m.fsf@dusky.pond.sub.org>
+	<c00ea08f-f596-6e3e-4084-7f183c92a04d@redhat.com>
+	<87h93j2ytj.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <86ea8b80-f2ae-088f-ae2d-cf529d2db02b@redhat.com>
+Date: Fri, 24 Feb 2017 13:25:53 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 24 Feb 2017 11:22:59 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/19] Block layer patches
+In-Reply-To: <87h93j2ytj.fsf@dusky.pond.sub.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="lScd1AD2K791g1eDa0LCR2nX34Memp9Ee"
+Subject: Re: [Qemu-devel] [PATCH RFC v3 2/5] keyval: New keyval_parse()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,80 +28,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kwolf@redhat.com
-Cc: famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ4
-Nzk2MDIzMC0xODA1NC0xLWdpdC1zZW5kLWVtYWlsLWt3b2xmQHJlZGhhdC5jb20KVHlwZTogc2Vy
-aWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwMC8xOV0gQmxvY2sgbGF5ZXIgcGF0Y2hl
-cwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0
-b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCiMgVXNl
-ZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1m
-b3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVj
-aG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMg
-JGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9j
-aGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAg
-ZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFND
-UklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4
-NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAtIFt0
-YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMTQ4Nzg1MDY3My0yNjQ1NS0xLWdpdC1zZW5kLWVtYWls
-LXZpamF5LmtpbGFyaUBnbWFpbC5jb20gLT4gcGF0Y2hldy8xNDg3ODUwNjczLTI2NDU1LTEtZ2l0
-LXNlbmQtZW1haWwtdmlqYXkua2lsYXJpQGdtYWlsLmNvbQogKiBbbmV3IHRhZ10gICAgICAgICBw
-YXRjaGV3LzE0ODc5NjAyMzAtMTgwNTQtMS1naXQtc2VuZC1lbWFpbC1rd29sZkByZWRoYXQuY29t
-IC0+IHBhdGNoZXcvMTQ4Nzk2MDIzMC0xODA1NC0xLWdpdC1zZW5kLWVtYWlsLWt3b2xmQHJlZGhh
-dC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo4OGYwNDZkIHRlc3RzOiBVc2Ug
-b3BlbmVkIGJsb2NrIG5vZGUgZm9yIGJsb2NrIGpvYiB0ZXN0cwozYjI2ZmM5IHZ2ZmF0OiBVc2Ug
-b3BlbmVkIG5vZGUgYXMgYmFja2luZyBmaWxlCmI3ZGVhMzcgYmxvY2s6IEFkZCBiZHJ2X25ld19v
-cGVuX2RyaXZlcigpCjA2ZTBkMTAgYmxvY2s6IEZhY3RvciBvdXQgYmRydl9vcGVuX2RyaXZlcigp
-CmE1MDYzZDUgYmxvY2s6IFVzZSBCbG9ja0JhY2tlbmQgZm9yIGltYWdlIHByb2JpbmcKZTcxZTY4
-NCBibG9jazogRmFjdG9yIG91dCBiZHJ2X29wZW5fY2hpbGRfYnMoKQowYTY3Zjc4IGJsb2NrOiBB
-dHRhY2ggYnMtPmZpbGUgb25seSBkdXJpbmcgLmJkcnZfb3BlbigpCjk1MzJlNzEgYmxvY2s6IFBh
-c3MgQmRydkNoaWxkIHRvIGJkcnZfdHJ1bmNhdGUoKQoxOWQ1YzQxIG1pcnJvcjogUmVzaXplIGFj
-dGl2ZSBjb21taXQgYmFzZSBpbiBtaXJyb3JfcnVuKCkKYWQ0NGQ1NSBxY293MjogVXNlIEJCIGZv
-ciByZXNpemluZyBpbiBxY293Ml9hbWVuZF9vcHRpb25zKCkKZGY1NGNjNCBibG9ja2RldjogVXNl
-IEJsb2NrQmFja2VuZCB0byByZXNpemUgaW4gcW1wX2Jsb2NrX3Jlc2l6ZSgpCmM0MzcyMDYgaW90
-ZXN0czogRml4IGFub3RoZXIgcmFjZSBpbiAwMzAKNDk0YjBhZSBxZW11LWltZzogSW1wcm92ZSBk
-b2N1bWVudGF0aW9uIGZvciBQUkVBTExPQ19NT0RFX0ZBTExPQwozOWVlMTU1IHFlbXUtaW1nOiBU
-cnVuY2F0ZSBiZWZvcmUgZnVsbCBwcmVhbGxvY2F0aW9uCjcyMzYwZTMgcWVtdS1pbWc6IEFkZCB0
-ZXN0cyBmb3IgcmF3IGltYWdlIHByZWFsbG9jYXRpb24KZjliZjRmOSBxZW11LWltZzogRG8gbm90
-IHRydW5jYXRlIGJlZm9yZSBwcmVhbGxvY2F0aW9uCjM1MTVjMDggcWVtdS1pb3Rlc3RzOiByZWRp
-cmVjdCBuYmQgc2VydmVyIHN0ZG91dCB0byAvZGV2L251bGwKZGM3MjhjZSBxZW11LWlvdGVzdHM6
-IGFkZCBhYmlsaXR5IHRvIGV4Y2x1ZGUgY2VydGFpbiBwcm90b2NvbHMgZnJvbSB0ZXN0cwphYmMy
-ZjlkIHFlbXUtaW90ZXN0czogVGVzdCAxMzcgb25seSBzdXBwb3J0cyAnZmlsZScgcHJvdG9jb2wK
-Cj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTk6IHFlbXUtaW90ZXN0czog
-VGVzdCAxMzcgb25seSBzdXBwb3J0cyAnZmlsZScgcHJvdG9jb2wuLi4KQ2hlY2tpbmcgUEFUQ0gg
-Mi8xOTogcWVtdS1pb3Rlc3RzOiBhZGQgYWJpbGl0eSB0byBleGNsdWRlIGNlcnRhaW4gcHJvdG9j
-b2xzIGZyb20gdGVzdHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8xOTogcWVtdS1pb3Rlc3RzOiByZWRp
-cmVjdCBuYmQgc2VydmVyIHN0ZG91dCB0byAvZGV2L251bGwuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8x
-OTogcWVtdS1pbWc6IERvIG5vdCB0cnVuY2F0ZSBiZWZvcmUgcHJlYWxsb2NhdGlvbi4uLgpDaGVj
-a2luZyBQQVRDSCA1LzE5OiBxZW11LWltZzogQWRkIHRlc3RzIGZvciByYXcgaW1hZ2UgcHJlYWxs
-b2NhdGlvbi4uLgpDaGVja2luZyBQQVRDSCA2LzE5OiBxZW11LWltZzogVHJ1bmNhdGUgYmVmb3Jl
-IGZ1bGwgcHJlYWxsb2NhdGlvbi4uLgpDaGVja2luZyBQQVRDSCA3LzE5OiBxZW11LWltZzogSW1w
-cm92ZSBkb2N1bWVudGF0aW9uIGZvciBQUkVBTExPQ19NT0RFX0ZBTExPQy4uLgpDaGVja2luZyBQ
-QVRDSCA4LzE5OiBpb3Rlc3RzOiBGaXggYW5vdGhlciByYWNlIGluIDAzMC4uLgpDaGVja2luZyBQ
-QVRDSCA5LzE5OiBibG9ja2RldjogVXNlIEJsb2NrQmFja2VuZCB0byByZXNpemUgaW4gcW1wX2Js
-b2NrX3Jlc2l6ZSgpLi4uCkNoZWNraW5nIFBBVENIIDEwLzE5OiBxY293MjogVXNlIEJCIGZvciBy
-ZXNpemluZyBpbiBxY293Ml9hbWVuZF9vcHRpb25zKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMTk6
-IG1pcnJvcjogUmVzaXplIGFjdGl2ZSBjb21taXQgYmFzZSBpbiBtaXJyb3JfcnVuKCkuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMTIvMTk6IGJsb2NrOiBQYXNzIEJkcnZDaGlsZCB0byBiZHJ2X3RydW5jYXRl
-KCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvMTk6IGJsb2NrOiBBdHRhY2ggYnMtPmZpbGUgb25seSBk
-dXJpbmcgLmJkcnZfb3BlbigpLi4uCkNoZWNraW5nIFBBVENIIDE0LzE5OiBibG9jazogRmFjdG9y
-IG91dCBiZHJ2X29wZW5fY2hpbGRfYnMoKS4uLgpDaGVja2luZyBQQVRDSCAxNS8xOTogYmxvY2s6
-IFVzZSBCbG9ja0JhY2tlbmQgZm9yIGltYWdlIHByb2JpbmcuLi4KQ2hlY2tpbmcgUEFUQ0ggMTYv
-MTk6IGJsb2NrOiBGYWN0b3Igb3V0IGJkcnZfb3Blbl9kcml2ZXIoKS4uLgpDaGVja2luZyBQQVRD
-SCAxNy8xOTogYmxvY2s6IEFkZCBiZHJ2X25ld19vcGVuX2RyaXZlcigpLi4uCkNoZWNraW5nIFBB
-VENIIDE4LzE5OiB2dmZhdDogVXNlIG9wZW5lZCBub2RlIGFzIGJhY2tpbmcgZmlsZS4uLgpFUlJP
-UjogIihmb28qKSIgc2hvdWxkIGJlICIoZm9vICopIgojMzM6IEZJTEU6IGJsb2NrL3Z2ZmF0LmM6
-Mjk3MToKKyAgICAuaW5zdGFuY2Vfc2l6ZSAgICAgID0gc2l6ZW9mKHZvaWQqKSwKCkVSUk9SOiAi
-KGZvbyoqKSIgc2hvdWxkIGJlICIoZm9vICoqKSIKIzQ0OiBGSUxFOiBibG9jay92dmZhdC5jOjMw
-NDI6CisgICAgKih2b2lkKiopIGJhY2tpbmctPm9wYXF1ZSA9IHM7Cgp0b3RhbDogMiBlcnJvcnMs
-IDAgd2FybmluZ3MsIDI1IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
-ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
-aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
-QUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDE5LzE5OiB0ZXN0czogVXNlIG9wZW5lZCBibG9j
-ayBub2RlIGZvciBibG9jayBqb2IgdGVzdHMuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNv
-bW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
-YWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
-ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--lScd1AD2K791g1eDa0LCR2nX34Memp9Ee
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
+Message-ID: <86ea8b80-f2ae-088f-ae2d-cf529d2db02b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v3 2/5] keyval: New keyval_parse()
+References: <1487710908-26356-1-git-send-email-armbru@redhat.com>
+ <1487710908-26356-3-git-send-email-armbru@redhat.com>
+ <5f90e39c-e4ea-8638-d057-25eff232ad3d@redhat.com>
+ <878toxmeol.fsf@dusky.pond.sub.org> <877f4g2f6m.fsf@dusky.pond.sub.org>
+ <c00ea08f-f596-6e3e-4084-7f183c92a04d@redhat.com>
+ <87h93j2ytj.fsf@dusky.pond.sub.org>
+In-Reply-To: <87h93j2ytj.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 02/24/2017 01:06 PM, Markus Armbruster wrote:
+
+>=20
+> The value of an implied key is not subject to key desugaring.
+
+And that's a good thing.
+
+>=20
+> Without an implied key, the "node" would desugar to "de=3Doff".
+>=20
+>> How about:
+>>
+>> for 2.9: -blockdev has no magic at all (you HAVE to spell 'foo=3Doff'
+>> rather than 'foo' for any boolean parameters that you want disabled in=
+
+>> -blockdev);
+>=20
+> You mean "rather than 'nofoo'".
+
+Yes.  Thanks for catching the intent.
+
+>=20
+> "No magic at all" implies you also have to spell "foo=3Don" rather than=
+
+> "foo".
+
+I'm a little more lenient for allowing 'foo' meaning 'foo=3Don' as a
+shortcut (although making it force a QBool rather than a string "on" may
+be nicer).  I'm also okay if -blockdev has no sugar at all in 2.9 (we
+can add "foo" =3D> "foo=3Don" sugar later if it makes QemuOpts conversion=
+
+easier in 2.10; that's much more palatable than adding "nofoo" =3D>
+"foo=3Doff" sugar).
+
+>=20
+> I believe we need to have both or none in 2.9.  If we have only the "on=
+"
+> sugar, "no-flush" works, and we can't add the "off" sugar without
+> breaking it.
+
+I think the "off" sugar should die, if we can convince ourselves that no
+one is using it that can't catch up to modern usage.
+
+>=20
+>> -blockdev); and in QemuOpts, we issue deprecation warnings but keep
+>> existing behavior any time someone uses 'noFOO' that we turn into
+>> 'FOO=3Dno'.  Then, for 2.10, we can decide to remove the deprecation
+>> warnings if they pointed out real (ab)use of the sugar in the wild, or=
+
+>> (hopefully) to kill the sugar entirely (as part of converting QemuOpts=
+
+>> over to keyval_parse).
+>>
+>> In short, getting rid of the 'no' prefix magic, after suitable
+>> deprecation warnings, seems like a good plan to me; and having -blockd=
+ev
+>> be slightly tighter than the rest of command line options for 2.9 only=
+
+>> is no real loss (no one uses -blockdev yet, so they can be written to
+>> avoid the use of 'no' magic to begin with).
+>=20
+> Okay, I'll post QemuOpts patch to deprecate noKEY sugar.  Let's see
+> whether anyone screams.
+
+Summarizing to make sure we're on the same track:
+
+2.9:
+QemuOpts:
+  "noFOO" =3D> "FOO=3Doff" sugar - deprecation warning
+  "FOO" =3D> "FOO=3Don" sugar - silently stays the same
+
+-blockdev option 1:
+  "FOO" =3D> error, no '=3D' present (we haven't decided on sugaring this=
+ yet)
+  "noFOO" =3D> error, no '=3D' present (no off sugar, but also avoids
+"noFOO" =3D> "noFOO=3Don" sugar)
+
+-blockdev option 2:
+  "FOO" =3D> "FOO=3Don" - enabled boolean sugar remains compact, if it is=
+
+not ambiguous, but anything we can do to limit it to just boolean values
+rather than the string "on" might be nice
+  "noFOO" =3D> "noFOO=3Don" - different behavior than QemuOpts, but less =
+magic
+
+2.10:
+QemuOpts will be implemented on keyval_parse(), behaving the same as
+-blockdev. If we took option 1 in 2.9, we have:
+  "noFOO" =3D> "noFOO=3Don" (which probably triggers an error that "noFOO=
+"
+is not an option when strict parsing is in effect) (the deprecation
+period is over, so we changed command-line behavior, but only for people
+that didn't pay attention to the warnings in 2.9)
+  "FOO" =3D> "FOO=3Don" - keep this one to minimize back-compat breakage
+
+If we took option 2 in 2.9, we can still turn on "FOO" =3D> "FOO=3Don" su=
+gar
+to get back to option 1 in 2.10
+
+or we can stick to option 2 forevermore:
+  "FOO" =3D> error, no '=3D' present. No longer possible to specify boole=
+ans
+without the more verbose "FOO=3Don"
+
+I have a preference for option 1 in the long run, but as it seems to be
+upwards compatible from option 2 for -blockdev in 2.9, I'm leaning
+towards option 2 for this release.
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--lScd1AD2K791g1eDa0LCR2nX34Memp9Ee
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYsIjBAAoJEKeha0olJ0NqnxkH/RkVkGG3RjzfvBETIhrVUbnn
+rFFlpJ0a6/HQQnY2q9HPy4Y709cStfEoS1HwTAUI6lPudl1A0xGTfzgw95CIQeQz
+1FndX3s7fifIJx4rQEBf94UzBh4gmHoR4XzYHzDysoY99sgWRHRxRquYBuitc2Bh
+XgFlRc/AykKCT/hNMHvdcf0RoY5CrknJruhetX5ujeZykLvt0Oj1SdF+P4srVvbM
+6oitlJ8OZqABolChgL7vp5Ftm+NB2sBF73U22inRTjeXK0WwpWyqBrm1wARXJOag
+kczypZ61fDklli6WIxFnwXmUkb0sYTbmOXlyJp4LygFQqWVXuiNilcWU1xnA2Sc=
+=r3c7
+-----END PGP SIGNATURE-----
+
+--lScd1AD2K791g1eDa0LCR2nX34Memp9Ee--
