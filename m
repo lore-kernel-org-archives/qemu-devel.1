@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60772)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1chGAx-0005cj-Fu
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:44:48 -0500
+	(envelope-from <mreitz@redhat.com>) id 1chGCT-0006mV-T6
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:46:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1chGAu-0001ek-Cj
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:44:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51024)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1chGAu-0001eZ-6X
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:44:44 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 32A60C04B93B
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 13:44:44 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 24 Feb 2017 14:44:36 +0100
-Message-Id: <1487943877-17318-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL v2 0/1] cirrus: add blit_is_unsafe call to
- cirrus_bitblt_cputovideo (CVE-2017-2620)
+	(envelope-from <mreitz@redhat.com>) id 1chGCS-0002FH-Vt
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:46:21 -0500
+References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
+	<1487689130-30373-30-git-send-email-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <6f2ae71a-bac2-3332-a716-21b344f540d6@redhat.com>
+Date: Fri, 24 Feb 2017 14:46:12 +0100
+MIME-Version: 1.0
+In-Reply-To: <1487689130-30373-30-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="97kurrmev1B83PgEx8I5hR1JRMXkwFn4O"
+Subject: Re: [Qemu-devel] [PATCH 29/54] hw/block: Request permissions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +24,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-  Hi,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--97kurrmev1B83PgEx8I5hR1JRMXkwFn4O
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+Message-ID: <6f2ae71a-bac2-3332-a716-21b344f540d6@redhat.com>
+Subject: Re: [PATCH 29/54] hw/block: Request permissions
+References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
+ <1487689130-30373-30-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1487689130-30373-30-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-v2, this time with qemu-stable Cc'ed.
+On 21.02.2017 15:58, Kevin Wolf wrote:
+> This makes all device emulations with a qdev drive property request
+> permissions on their BlockBackend. The only thing we block at this poin=
+t
+> is resizing images for some devices that can't support it.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  hw/block/block.c                 | 22 +++++++++++++++++++++-
+>  hw/block/fdc.c                   | 25 +++++++++++++++++++++++--
+>  hw/block/m25p80.c                |  8 ++++++++
+>  hw/block/nand.c                  |  7 +++++++
+>  hw/block/nvme.c                  |  8 +++++++-
+>  hw/block/onenand.c               |  7 +++++++
+>  hw/block/pflash_cfi01.c          | 18 ++++++++++++------
+>  hw/block/pflash_cfi02.c          | 19 +++++++++++++------
+>  hw/block/virtio-blk.c            |  8 +++++++-
+>  hw/core/qdev-properties-system.c |  1 -
+>  hw/ide/qdev.c                    |  7 +++++--
+>  hw/nvram/spapr_nvram.c           |  8 ++++++++
+>  hw/scsi/scsi-disk.c              |  9 +++++++--
+>  hw/sd/sd.c                       |  6 ++++++
+>  hw/usb/dev-storage.c             |  6 +++++-
+>  include/hw/block/block.h         |  3 ++-
+>  tests/qemu-iotests/051.pc.out    |  6 +++---
+>  17 files changed, 141 insertions(+), 27 deletions(-)
 
-please pull,
-  Gerd
+For all the SCSI disks, shouldn't @resizable be true only if the qdev
+type is TYPE_DISK? At least hw/scsi/scsi-disk.c:scsi_realize() looks as
+if that is not necessarily the case.
 
-The following changes since commit 10f25e4844cb9b3f02fb032f88051dd5b65b4206:
+OTOH, I'm not sure how useful the condition in scsi_disk_resize_cb() is
+in the first place. In my understanding, the SCSI device should always
+be of TYPE_DISK there.
 
-  Merge remote-tracking branch 'remotes/yongbok/tags/mips-20170222' into staging (2017-02-23 09:59:40 +0000)
+And for IDE devices, @resizable should be true only if the device is not
+a CD ROM drive.
 
-are available in the git repository at:
+Max
 
 
-  git://git.kraxel.org/qemu tags/pull-cve-2017-2620-20170224-1
+--97kurrmev1B83PgEx8I5hR1JRMXkwFn4O
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-for you to fetch changes up to 92f2b88cea48c6aeba8de568a45f2ed958f3c298:
+-----BEGIN PGP SIGNATURE-----
 
-  cirrus: add blit_is_unsafe call to cirrus_bitblt_cputovideo (CVE-2017-2620) (2017-02-24 14:35:50 +0100)
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliwOSQSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AwOMH/je27dD7F7MdPD6+1wvgU+5HCykzPU3F
+3dqMZUNUIXiWBh6oHQV7DRmpNaJ9REHqo5tUgHbBWwVSU31HGNM37MKPQdLECGVw
+iH2nKkXct4UtYdr/4+541a2VZ2oRteFqAjE3neL7iPxK7BQSlf9M/ERR+4HQpVGF
+uOJU+BJ83lbsnQOiSLqDzU05UVFGzGeNKa4bsSGOSjMSzeenZvqzCperb0vT/PJE
+bXzEVVKWNPICtn/zOwQbzdRJ1vlWgXfOjutQoUc9U/6iZYKRb16U/5VTYgHDjP6x
+lzLVE8wSypKzzUA4ZQ/KNPGlwU7/gvaBk6X4ZJZEqoB8L2zvPcOQeZM=
+=0TbU
+-----END PGP SIGNATURE-----
 
-----------------------------------------------------------------
-cirrus: add blit_is_unsafe call to cirrus_bitblt_cputovideo (CVE-2017-2620)
-
-----------------------------------------------------------------
-Gerd Hoffmann (1):
-      cirrus: add blit_is_unsafe call to cirrus_bitblt_cputovideo (CVE-2017-2620)
-
- hw/display/cirrus_vga.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+--97kurrmev1B83PgEx8I5hR1JRMXkwFn4O--
