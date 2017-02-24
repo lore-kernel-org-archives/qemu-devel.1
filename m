@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1chHHc-00047l-Qb
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:55:45 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1chHJO-0005z8-61
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:57:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1chHHc-0001zF-1q
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:55:44 -0500
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:35150)
+	(envelope-from <peter.maydell@linaro.org>) id 1chHJN-0002dh-1j
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:57:34 -0500
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:35827)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1chHHb-0001yf-SC
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:55:43 -0500
-Received: by mail-wm0-x22e.google.com with SMTP id v186so16484453wmd.0
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 06:55:43 -0800 (PST)
+	id 1chHJM-0002dL-Rq
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:57:32 -0500
+Received: by mail-wr0-x22a.google.com with SMTP id g10so12919124wrg.2
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 06:57:32 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <5077e2a9732e1b9afcb0754e93624b787589ac61.1487522123.git.balaton@eik.bme.hu>
-References: <cover.1487522123.git.balaton@eik.bme.hu>
-	<5077e2a9732e1b9afcb0754e93624b787589ac61.1487522123.git.balaton@eik.bme.hu>
+In-Reply-To: <87shn3lkj3.fsf@linaro.org>
+References: <1487262963-11519-1-git-send-email-peter.maydell@linaro.org>
+	<CAFEAcA-MMw0_ombzTD+kQYpeNKywtcKY2UczcpR-hFDwGZhZJw@mail.gmail.com>
+	<87wpcflmmb.fsf@linaro.org>
+	<CAFEAcA-OhSMFKgRYsCWUrb6OBxxrWokkkpJyioveEur-p4-g2A@mail.gmail.com>
+	<87shn3lkj3.fsf@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Feb 2017 14:55:21 +0000
-Message-ID: <CAFEAcA8gde7GfWhyRLyOB5yL_5zrm4b7tj4pH=GTj=RwZO_4wg@mail.gmail.com>
+Date: Fri, 24 Feb 2017 14:57:10 +0000
+Message-ID: <CAFEAcA-e5s6Tru_Kfba9hQHL827r2N5jyBvbpwbro7fHX2m1KA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 10/10] ppc: Add SM501 device in config for
- ppc and ppcemb targets
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 00/13] Rewrite NVIC to not
+ depend on the GIC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,19 +34,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-On 19 February 2017 at 16:35, BALATON Zoltan <balaton@eik.bme.hu> wrote:
-> This is not used by default on any emulated machine yet but it is
-> still useful to have it compiled so it can be added from the command
-> line for clients that can use it (e.g. MorphOS has no driver for any
-> other emulated video cards but can output via SM501)
+On 24 February 2017 at 14:40, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+> The tests currently fail to build:
 >
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> /usr/bin/arm-none-eabi-objcopy -S -O binary test6-kern.elf test6-kern.bin
+> test7.c: In function 'usage':
+> test7.c:58:9: error: format '%x' expects argument of type 'unsigned int',=
+ but argument 2 has type 'uint32_t' [-Werror=3Dformat=3D]
+>          testDiag("Ignoring bogus LR %x, doing return to handler", old_lr=
+);
+>          ^
+> test7.c:76:9: error: format '%x' expects argument of type 'unsigned int',=
+ but argument 2 has type 'uint32_t' [-Werror=3Dformat=3D]
+>          testDiag("Ignoring bogus LR %x, doing return to thread", old_lr)=
+;
+>          ^
+> test7.c: In function 'svc':
+> test7.c:105:9: error: format '%x' expects argument of type 'unsigned int'=
+, but argument 2 has type 'uint32_t' [-Werror=3Dformat=3D]
+>          testDiag("New xPSR %x", sframe[7]);
+>          ^
+> test7.c:109:9: error: format '%x' expects argument of type 'unsigned int'=
+, but argument 2 has type 'uint32_t' [-Werror=3Dformat=3D]
+>          testDiag("old xPSR %x", sframe[7]);
+>          ^
+> test7.c:116:9: error: format '%x' expects argument of type 'unsigned int'=
+, but argument 2 has type 'uint32_t' [-Werror=3Dformat=3D]
+>          testDiag("In SVC handler (direct call from main with LR %x)", ol=
+d_lr);
+>          ^
+> /usr/bin/arm-none-eabi-objcopy -S -O binary test8-kern.elf test8-kern.bin
+> /usr/bin/arm-none-eabi-objcopy -S -O binary test9-kern.elf test9-kern.bin
+> /usr/bin/arm-none-eabi-objcopy -S -O binary test10-kern.elf test10-kern.b=
+in
+> /usr/bin/arm-none-eabi-objcopy -S -O binary test11-kern.elf test11-kern.b=
+in
+> /usr/bin/arm-none-eabi-objcopy -S -O binary test13-kern.elf test13-kern.b=
+in
+> /usr/bin/arm-none-eabi-objcopy -S -O binary test14-kern.elf test14-kern.b=
+in
+> cc1: all warnings being treated as errors
+> Makefile:49: recipe for target 'test7.o' failed
+> make: *** [test7.o] Error 1
+> make: Target 'all' not remade because of errors.
+>
+> I suspect its the same thing as I came across with kvm-unit-tests that
+> compilers targeting the same abi can still disagree about sizes:
+>
+>   https://git.kernel.org/cgit/virt/kvm/kvm-unit-tests.git/commit/?id=3D52=
+9046c397059b8c5ef4dc5fb3c258d86fafb126
 
-If this is a generic PCI device then shouldn't it go into
-default-configs/pci.mak ?
+Could be. I use arm-linux-gnueabihf-gcc to build. If you use
+PRIx32 does it build OK?
 
 thanks
 -- PMM
