@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1chC3i-0000XX-Es
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:21:03 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1chC3q-0000cI-6V
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:21:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1chC3e-0003we-Dq
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:21:02 -0500
-Date: Fri, 24 Feb 2017 10:20:54 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170224102054.7bdee6b5@nial.brq.redhat.com>
-In-Reply-To: <1487784248-112130-1-git-send-email-imammedo@redhat.com>
-References: <1487784248-112130-1-git-send-email-imammedo@redhat.com>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1chC3l-0003z6-8g
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:21:10 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:33529)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1chC3l-0003yr-0m
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:21:05 -0500
+Received: by mail-wm0-x243.google.com with SMTP id v77so1999245wmv.0
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 01:21:04 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <1487715299-21102-1-git-send-email-kraxel@redhat.com>
+	<1487715299-21102-7-git-send-email-kraxel@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ce5372a6-4fd7-fcff-f773-e8529727b4de@redhat.com>
+Date: Fri, 24 Feb 2017 10:21:03 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <1487715299-21102-7-git-send-email-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] spapr: ensure that all threads within core
- are on the same NUMA node
+Subject: Re: [Qemu-devel] [PATCH 6/9] virtio-gpu: use graphic_* variables.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,100 +31,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, thuth@redhat.com, agraf@suse.de, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
 
-On Wed, 22 Feb 2017 18:24:08 +0100
-Igor Mammedov <imammedo@redhat.com> wrote:
 
-> Threads within a core probably shouldn't be on different
-> NUMA nodes, so if user has misconfured command line make
-> fail to start and let user fix it.
-> For now use the first thread on the core as source
-> of core's node-id.
-> 
-> I'm suggesting this to make sure that it would be possible
-> later map legacy cpu-index based CLI to core-id based
-> internal map in possible_cpus array and completly eleminate
-> numa_info[XXX].node_cpu bitmaps, leaving only possible_cpus
-> as storage of mapping information.
-> 
-> CCing SPAPR mantainers for oppinion if enforcement
-> makas sense from plaform poin of view and if we could go
-> ahead with this or I should look for another way
-> to deal with legacy -numa CLI.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> CC: qemu-ppc@nongnu.org
-> CC: lvivier@redhat.com
-> CC: David Gibson <david@gibson.dropbear.id.au>
-> CC: thuth@redhat.com
-> CC: mdroth@linux.vnet.ibm.com
-> CC: agraf@suse.de
-Considering there aren't any objections I'm reposting it
-as a patch with fixed/sanitized commit message.
 
+On 21/02/2017 23:14, Gerd Hoffmann wrote:
+> If graphic_* variables are set (via -g switch), pass on
+> that information to the guest so the driver can use it.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 > ---
->  hw/ppc/spapr_cpu_core.c | 23 +++++++++++++++--------
->  1 file changed, 15 insertions(+), 8 deletions(-)
+>  hw/display/virtio-gpu.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
 > 
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 55cd045..1499a8b 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -50,8 +50,6 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, PowerPCCPU *cpu,
->                             Error **errp)
->  {
->      CPUPPCState *env = &cpu->env;
-> -    CPUState *cs = CPU(cpu);
-> -    int i;
+> diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+> index 9b530ab..04ba221 100644
+> --- a/hw/display/virtio-gpu.c
+> +++ b/hw/display/virtio-gpu.c
+> @@ -1170,8 +1170,13 @@ static void virtio_gpu_device_realize(DeviceState *qdev, Error **errp)
+>      virtio_init(VIRTIO_DEVICE(g), "virtio-gpu", VIRTIO_ID_GPU,
+>                  g->config_size);
 >  
->      /* Set time-base frequency to 512 MHz */
->      cpu_ppc_tb_init(env, SPAPR_TIMEBASE_FREQ);
-> @@ -70,12 +68,6 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, PowerPCCPU *cpu,
->          }
->      }
->  
-> -    /* Set NUMA node for the added CPUs  */
-> -    i = numa_get_node_for_cpu(cs->cpu_index);
-> -    if (i < nb_numa_nodes) {
-> -            cs->numa_node = i;
-> -    }
-> -
->      xics_cpu_setup(spapr->xics, cpu);
->  
->      qemu_register_reset(spapr_cpu_reset, cpu);
-> @@ -159,11 +151,13 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
->      const char *typename = object_class_get_name(scc->cpu_class);
->      size_t size = object_type_get_instance_size(typename);
->      Error *local_err = NULL;
-> +    int core_node_id = numa_get_node_for_cpu(cc->core_id);;
->      void *obj;
->      int i, j;
->  
->      sc->threads = g_malloc0(size * cc->nr_threads);
->      for (i = 0; i < cc->nr_threads; i++) {
-> +        int node_id;
->          char id[32];
->          CPUState *cs;
->  
-> @@ -172,6 +166,19 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
->          object_initialize(obj, size, typename);
->          cs = CPU(obj);
->          cs->cpu_index = cc->core_id + i;
-> +
-> +        /* Set NUMA node for the added CPUs  */
-> +        node_id = numa_get_node_for_cpu(cs->cpu_index);
-> +        if (node_id != core_node_id) {
-> +            error_setg(&local_err, "Invalid node-id=%d of thread[cpu-index: %d]"
-> +                " on CPU[core-id: %d, node-id: %d], node-id must be the same",
-> +                 node_id, cs->cpu_index, cc->core_id, core_node_id);
-> +            goto err;
-> +        }
-> +        if (node_id < nb_numa_nodes) {
-> +            cs->numa_node = node_id;
-> +        }
-> +
->          snprintf(id, sizeof(id), "thread[%d]", i);
->          object_property_add_child(OBJECT(sc), id, obj, &local_err);
->          if (local_err) {
+> -    g->req_state[0].width = 1024;
+> -    g->req_state[0].height = 768;
+> +    if (graphic_width && graphic_height) {
+> +        g->req_state[0].width = graphic_width;
+> +        g->req_state[0].height = graphic_height;
+> +    } else {
+> +        g->req_state[0].width = 1024;
+> +        g->req_state[0].height = 768;
+> +    }
+
+What about adding properties for this, and only using graphic_* as a
+fallback?
+
+Paolo
+
+>      if (virtio_gpu_virgl_enabled(g->conf)) {
+>          /* use larger control queue in 3d mode */
+> 
