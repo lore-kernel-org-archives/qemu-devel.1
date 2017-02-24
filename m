@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1chKQk-0006Eq-41
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:17:23 -0500
+	(envelope-from <kwolf@redhat.com>) id 1chKQm-0006HH-1F
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:17:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1chKQj-0002gQ-AO
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:17:22 -0500
+	(envelope-from <kwolf@redhat.com>) id 1chKQl-0002hh-09
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:17:24 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 24 Feb 2017 19:16:54 +0100
-Message-Id: <1487960230-18054-4-git-send-email-kwolf@redhat.com>
+Date: Fri, 24 Feb 2017 19:16:55 +0100
+Message-Id: <1487960230-18054-5-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1487960230-18054-1-git-send-email-kwolf@redhat.com>
 References: <1487960230-18054-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 03/19] qemu-iotests: redirect nbd server stdout
- to /dev/null
+Subject: [Qemu-devel] [PULL 04/19] qemu-img: Do not truncate before
+ preallocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,31 +23,99 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Jeff Cody <jcody@redhat.com>
+From: Nir Soffer <nirsof@gmail.com>
 
-Some iotests (e.g. 174) try to filter the output of _make_test_image by
-piping the stdout.  Pipe the server stdout to /dev/null, so that filter
-pipe does not need to wait until process completion.
+When using file system that does not support fallocate() (e.g. NFS <
+4.2), truncating the file only when preallocation=OFF speeds up creating
+raw file.
 
-Signed-off-by: Jeff Cody <jcody@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Here is example run, tested on Fedora 24 machine, creating raw file on
+NFS version 3 server.
+
+$ time ./qemu-img-master create -f raw -o preallocation=falloc mnt/test 1g
+Formatting 'mnt/test', fmt=raw size=1073741824 preallocation=falloc
+
+real	0m21.185s
+user	0m0.022s
+sys	0m0.574s
+
+$ time ./qemu-img-fix create -f raw -o preallocation=falloc mnt/test 1g
+Formatting 'mnt/test', fmt=raw size=1073741824 preallocation=falloc
+
+real	0m11.601s
+user	0m0.016s
+sys	0m0.525s
+
+$ time dd if=/dev/zero of=mnt/test bs=1M count=1024 oflag=direct
+1024+0 records in
+1024+0 records out
+1073741824 bytes (1.1 GB, 1.0 GiB) copied, 15.6627 s, 68.6 MB/s
+
+real	0m16.104s
+user	0m0.009s
+sys	0m0.220s
+
+Running with strace we can see that without this change we do one
+pread() and one pwrite() for each block. With this change, we do only
+one pwrite() per block.
+
+$ strace ./qemu-img-master create -f raw -o preallocation=falloc mnt/test 8192
+...
+pread64(9, "\0", 1, 4095)               = 1
+pwrite64(9, "\0", 1, 4095)              = 1
+pread64(9, "\0", 1, 8191)               = 1
+pwrite64(9, "\0", 1, 8191)              = 1
+
+$ strace ./qemu-img-fix create -f raw -o preallocation=falloc mnt/test 8192
+...
+pwrite64(9, "\0", 1, 4095)              = 1
+pwrite64(9, "\0", 1, 8191)              = 1
+
+This happens because posix_fallocate is checking if each block is
+allocated before writing a byte to the block, and when truncating the
+file before preallocation, all blocks are unallocated.
+
+Signed-off-by: Nir Soffer <nirsof@gmail.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/common.rc | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/file-posix.c | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
 
-diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
-index 6c0fd4c..08065dc 100644
---- a/tests/qemu-iotests/common.rc
-+++ b/tests/qemu-iotests/common.rc
-@@ -172,7 +172,7 @@ _make_test_img()
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 2134e0e..442f080 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -1591,12 +1591,6 @@ static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
+ #endif
+     }
  
-     # Start an NBD server on the image file, which is what we'll be talking to
-     if [ $IMGPROTO = "nbd" ]; then
--        eval "$QEMU_NBD -v -t -b 127.0.0.1 -p 10810 -f $IMGFMT  $TEST_IMG_FILE &"
-+        eval "$QEMU_NBD -v -t -b 127.0.0.1 -p 10810 -f $IMGFMT  $TEST_IMG_FILE >/dev/null &"
-         sleep 1 # FIXME: qemu-nbd needs to be listening before we continue
-     fi
- }
+-    if (ftruncate(fd, total_size) != 0) {
+-        result = -errno;
+-        error_setg_errno(errp, -result, "Could not resize file");
+-        goto out_close;
+-    }
+-
+     switch (prealloc) {
+ #ifdef CONFIG_POSIX_FALLOCATE
+     case PREALLOC_MODE_FALLOC:
+@@ -1636,6 +1630,10 @@ static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
+         break;
+     }
+     case PREALLOC_MODE_OFF:
++        if (ftruncate(fd, total_size) != 0) {
++            result = -errno;
++            error_setg_errno(errp, -result, "Could not resize file");
++        }
+         break;
+     default:
+         result = -EINVAL;
+@@ -1644,7 +1642,6 @@ static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
+         break;
+     }
+ 
+-out_close:
+     if (qemu_close(fd) != 0 && result == 0) {
+         result = -errno;
+         error_setg_errno(errp, -result, "Could not close the new file");
 -- 
 1.8.3.1
