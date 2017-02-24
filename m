@@ -1,35 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1chC5r-000396-Km
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:23:17 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1chC5r-00038n-8z
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:23:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1chC5p-0004Sa-7k
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1chC5m-0004R2-PP
 	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:23:15 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49344
-	helo=mx0a-001b2d01.pphosted.com)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53214)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1chC5p-0004S9-0n
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:23:13 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1O9JEIF145835
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 04:23:12 -0500
-Received: from e06smtp06.uk.ibm.com (e06smtp06.uk.ibm.com [195.75.94.102])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28tb3jg40g-1
+	id 1chC5m-0004QO-GP
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:23:10 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1O9K3sE038908
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 04:23:09 -0500
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28td8c3c1j-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 04:23:12 -0500
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 04:23:09 -0500
 Received: from localhost
-	by e06smtp06.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Fri, 24 Feb 2017 09:23:10 -0000
+	Fri, 24 Feb 2017 09:23:06 -0000
 From: Cornelia Huck <cornelia.huck@de.ibm.com>
-Date: Fri, 24 Feb 2017 10:22:51 +0100
+Date: Fri, 24 Feb 2017 10:22:48 +0100
 In-Reply-To: <20170224092259.16483-1-cornelia.huck@de.ibm.com>
 References: <20170224092259.16483-1-cornelia.huck@de.ibm.com>
-Message-Id: <20170224092259.16483-6-cornelia.huck@de.ibm.com>
-Subject: [Qemu-devel] [PULL 05/13] virtio-ccw: add virtio-crypto-ccw device
+Message-Id: <20170224092259.16483-3-cornelia.huck@de.ibm.com>
+Subject: [Qemu-devel] [PULL 02/13] s390x/kvm: detect some program check loops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,134 +38,99 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, qemu-devel@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>
 
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
 
-Wire up virtio-crypto for the CCW based VIRTIO.
+Sometimes (e.g. early boot) a guest is broken in such ways that it loops
+100% delivering operation exceptions (illegal operation) but the pgm new
+PSW is not set properly. This will result in code being read from
+address zero, which usually contains another illegal op. Let's detect
+this case and put the guest in crashed state. Instead of only detecting
+this for address zero apply a heuristic that will work for any program
+check new psw so that it will also reach the crashed state if you
+provide some random elf file to the -kernel option.
+We do not want guest problem state to be able to trigger a guest panic,
+e.g. by faulting on an address that is the same as the program check
+new PSW, so we check for the problem state bit being off.
 
-Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+With this we
+a: get rid of CPU consumption of such broken guests
+b: keep the program old PSW. This allows to find out the original illegal
+   operation - making debugging such early boot issues much easier than
+   with single stepping
+
+This relies on the kernel using a similar heuristic and passing such
+operation exceptions to user space.
+
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
 ---
- hw/s390x/virtio-ccw.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++
- hw/s390x/virtio-ccw.h | 12 ++++++++++
- 2 files changed, 73 insertions(+)
+ target/s390x/kvm.c | 43 ++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 40 insertions(+), 3 deletions(-)
 
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index 32c414f23d..613d8c6615 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -894,6 +894,24 @@ static void virtio_ccw_rng_realize(VirtioCcwDevice *ccw_dev, Error **errp)
-                              NULL);
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 25367807f4..5ec050cf89 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -1867,6 +1867,40 @@ static void unmanageable_intercept(S390CPU *cpu, const char *str, int pswoffset)
+     qemu_system_guest_panicked(NULL);
  }
  
-+static void virtio_ccw_crypto_realize(VirtioCcwDevice *ccw_dev, Error **errp)
++/* try to detect pgm check loops */
++static int handle_oper_loop(S390CPU *cpu, struct kvm_run *run)
 +{
-+    VirtIOCryptoCcw *dev = VIRTIO_CRYPTO_CCW(ccw_dev);
-+    DeviceState *vdev = DEVICE(&dev->vdev);
-+    Error *err = NULL;
++    CPUState *cs = CPU(cpu);
++    PSW oldpsw, newpsw;
 +
-+    qdev_set_parent_bus(vdev, BUS(&ccw_dev->bus));
-+    object_property_set_bool(OBJECT(vdev), true, "realized", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
++    cpu_synchronize_state(cs);
++    newpsw.mask = ldq_phys(cs->as, cpu->env.psa +
++                           offsetof(LowCore, program_new_psw));
++    newpsw.addr = ldq_phys(cs->as, cpu->env.psa +
++                           offsetof(LowCore, program_new_psw) + 8);
++    oldpsw.mask  = run->psw_mask;
++    oldpsw.addr  = run->psw_addr;
++    /*
++     * Avoid endless loops of operation exceptions, if the pgm new
++     * PSW will cause a new operation exception.
++     * The heuristic checks if the pgm new psw is within 6 bytes before
++     * the faulting psw address (with same DAT, AS settings) and the
++     * new psw is not a wait psw and the fault was not triggered by
++     * problem state. In that case go into crashed state.
++     */
++
++    if (oldpsw.addr - newpsw.addr <= 6 &&
++        !(newpsw.mask & PSW_MASK_WAIT) &&
++        !(oldpsw.mask & PSW_MASK_PSTATE) &&
++        (newpsw.mask & PSW_MASK_ASC) == (oldpsw.mask & PSW_MASK_ASC) &&
++        (newpsw.mask & PSW_MASK_DAT) == (oldpsw.mask & PSW_MASK_DAT)) {
++        unmanageable_intercept(cpu, "operation exception loop",
++                               offsetof(LowCore, program_new_psw));
++        return EXCP_HALTED;
 +    }
-+
-+    object_property_set_link(OBJECT(vdev),
-+                             OBJECT(dev->vdev.conf.cryptodev), "cryptodev",
-+                             NULL);
++    return 0;
 +}
 +
- /* DeviceState to VirtioCcwDevice. Note: used on datapath,
-  * be careful and test performance if you change this.
-  */
-@@ -1534,6 +1552,48 @@ static const TypeInfo virtio_ccw_rng = {
-     .class_init    = virtio_ccw_rng_class_init,
- };
- 
-+static Property virtio_ccw_crypto_properties[] = {
-+    DEFINE_PROP_CSS_DEV_ID("devno", VirtioCcwDevice, parent_obj.bus_id),
-+    DEFINE_PROP_BIT("ioeventfd", VirtioCcwDevice, flags,
-+                    VIRTIO_CCW_FLAG_USE_IOEVENTFD_BIT, true),
-+    DEFINE_PROP_UINT32("max_revision", VirtioCcwDevice, max_rev,
-+                       VIRTIO_CCW_MAX_REV),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void virtio_ccw_crypto_instance_init(Object *obj)
-+{
-+    VirtIOCryptoCcw *dev = VIRTIO_CRYPTO_CCW(obj);
-+    VirtioCcwDevice *ccw_dev = VIRTIO_CCW_DEVICE(obj);
-+
-+    ccw_dev->force_revision_1 = true;
-+    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-+                                TYPE_VIRTIO_CRYPTO);
-+
-+    object_property_add_alias(obj, "cryptodev", OBJECT(&dev->vdev),
-+                              "cryptodev", &error_abort);
-+}
-+
-+static void virtio_ccw_crypto_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
-+
-+    k->realize = virtio_ccw_crypto_realize;
-+    k->exit = virtio_ccw_exit;
-+    dc->reset = virtio_ccw_reset;
-+    dc->props = virtio_ccw_crypto_properties;
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-+}
-+
-+static const TypeInfo virtio_ccw_crypto = {
-+    .name          = TYPE_VIRTIO_CRYPTO_CCW,
-+    .parent        = TYPE_VIRTIO_CCW_DEVICE,
-+    .instance_size = sizeof(VirtIOCryptoCcw),
-+    .instance_init = virtio_ccw_crypto_instance_init,
-+    .class_init    = virtio_ccw_crypto_class_init,
-+};
-+
- static void virtio_ccw_busdev_realize(DeviceState *dev, Error **errp)
+ static int handle_intercept(S390CPU *cpu)
  {
-     VirtioCcwDevice *_dev = (VirtioCcwDevice *)dev;
-@@ -1736,6 +1796,7 @@ static void virtio_ccw_register(void)
- #ifdef CONFIG_VHOST_VSOCK
-     type_register_static(&vhost_vsock_ccw_info);
- #endif
-+    type_register_static(&virtio_ccw_crypto);
- }
- 
- type_init(virtio_ccw_register)
-diff --git a/hw/s390x/virtio-ccw.h b/hw/s390x/virtio-ccw.h
-index 6a04e94f66..41d4010378 100644
---- a/hw/s390x/virtio-ccw.h
-+++ b/hw/s390x/virtio-ccw.h
-@@ -22,6 +22,7 @@
- #endif
- #include "hw/virtio/virtio-balloon.h"
- #include "hw/virtio/virtio-rng.h"
-+#include "hw/virtio/virtio-crypto.h"
- #include "hw/virtio/virtio-bus.h"
- #ifdef CONFIG_VHOST_VSOCK
- #include "hw/virtio/vhost-vsock.h"
-@@ -183,6 +184,17 @@ typedef struct VirtIORNGCcw {
-     VirtIORNG vdev;
- } VirtIORNGCcw;
- 
-+/* virtio-crypto-ccw */
-+
-+#define TYPE_VIRTIO_CRYPTO_CCW "virtio-crypto-ccw"
-+#define VIRTIO_CRYPTO_CCW(obj) \
-+        OBJECT_CHECK(VirtIOCryptoCcw, (obj), TYPE_VIRTIO_CRYPTO_CCW)
-+
-+typedef struct VirtIOCryptoCcw {
-+    VirtioCcwDevice parent_obj;
-+    VirtIOCrypto vdev;
-+} VirtIOCryptoCcw;
-+
- VirtIODevice *virtio_ccw_get_vdev(SubchDev *sch);
- 
- #ifdef CONFIG_VIRTFS
+     CPUState *cs = CPU(cpu);
+@@ -1914,11 +1948,14 @@ static int handle_intercept(S390CPU *cpu)
+             r = EXCP_HALTED;
+             break;
+         case ICPT_OPEREXC:
+-            /* currently only instr 0x0000 after enabled via capability */
++            /* check for break points */
+             r = handle_sw_breakpoint(cpu, run);
+             if (r == -ENOENT) {
+-                enter_pgmcheck(cpu, PGM_OPERATION);
+-                r = 0;
++                /* Then check for potential pgm check loops */
++                r = handle_oper_loop(cpu, run);
++                if (r == 0) {
++                    enter_pgmcheck(cpu, PGM_OPERATION);
++                }
+             }
+             break;
+         case ICPT_SOFT_INTERCEPT:
 -- 
 2.11.0
