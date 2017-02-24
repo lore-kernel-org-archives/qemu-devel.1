@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1chDTt-0005gR-4e
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 05:52:10 -0500
+	(envelope-from <kchamart@redhat.com>) id 1chDV1-0006uh-QD
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 05:53:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1chDTq-0008FN-1R
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 05:52:09 -0500
-Received: from 19.mo5.mail-out.ovh.net ([46.105.35.78]:52019)
+	(envelope-from <kchamart@redhat.com>) id 1chDUy-0001Pw-L9
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 05:53:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36684)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1chDTp-0008DP-Ri
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 05:52:05 -0500
-Received: from player734.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 309A3DBC6F
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 11:52:04 +0100 (CET)
-References: <1487252865-12064-1-git-send-email-clg@kaod.org>
-	<1487252865-12064-5-git-send-email-clg@kaod.org>
-	<20170223021531.GS12577@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <eeec3567-d024-a09a-8a58-304a27c0bb95@kaod.org>
-Date: Fri, 24 Feb 2017 11:52:01 +0100
+	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1chDUy-0001Nr-Cl
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 05:53:16 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7774C7FB83
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 10:53:16 +0000 (UTC)
+Date: Fri, 24 Feb 2017 11:53:12 +0100
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20170224105312.7lephvjbipszrb3p@eukaryote>
+References: <20170223144034.b2bhgsvwfyyymxwk@eukaryote>
+	<87ino1gcx2.fsf@dusky.pond.sub.org>
+	<20170223163315.w2nekel42grwtbkc@eukaryote>
+	<36a8c750-8490-1c5d-ca12-cc2b8c594334@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170223021531.GS12577@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 04/22] ppc/xics: add an
- InterruptStatsProvider interface to ICS and ICP objects
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <36a8c750-8490-1c5d-ca12-cc2b8c594334@redhat.com>
+Subject: Re: [Qemu-devel] Adding an overlay with 'blockdev-add' fails with:
+ "Parameter 'driver' is missing"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,81 +36,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
-On 02/23/2017 03:15 AM, David Gibson wrote:
-> On Thu, Feb 16, 2017 at 02:47:27PM +0100, C=E9dric Le Goater wrote:
->> This is, again, to reduce the use of the list of ICS objects. Let's
->> make each individual ICS and ICP object an InterruptStatsProvider and
->> remove this same interface from XICSState.
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->=20
-> I'm a little hesitant about this, because it means that getting the
-> interrupt stats information is now spread out over the qom tree,
-> whereas previously there was a single location to get a good summary
-> of the systems overall interrupt status.  The previous behaviour seems
-> like it would be more convenient for debugging.
->=20
-> That said, I see the structural advantages of this split.  Hmm.. still
-> thinking..
+On Thu, Feb 23, 2017 at 10:51:38AM -0600, Eric Blake wrote:
+> On 02/23/2017 10:33 AM, Kashyap Chamarthy wrote:
 
-This is true. Another argument in favour of what you are saying=20
-is the order in which these are printed. See below. =20
+[...]
 
-What we could do after the cleanup is to make the machine an=20
-InterruptStatsProvider to clarify things.=20
+> > I tried to come up with the below JSON, after looking at the QAPI schema
+> > documentation (from qemu/qapi/block-core.json), still I seem to be
+> > tripping up somewhere.  Now it doesn't recognize the 'backing' option:
+> > 
+> > $ socat UNIX:./qmp-sock READLINE,history=$HOME/.qmp_history,prompt='QMP> '
+> > [...]
+> > QMP> {
+> > QMP>   "execute":"blockdev-add",
+> > QMP>   "arguments":{
+> > QMP>     "driver":"qcow2",
+> > QMP>     "node-name":"node1"
+> > QMP>   },
+> 
+> Oops, you ended your arguments too soon.
 
-Thanks,
+Sigh, that was a stray closing bracket that I didn't clean up (it was
+part of the "cache" section that I borrowed from the schema docs).
 
-C.=20
+> > QMP>   "file":{
+> > QMP>     "driver":"file",
+> > QMP>     "filename":"/export/target.qcow2"
+> > QMP>   },
+> > QMP>   "backing":{
+> 
+> Here, you passed "file" and "backing" as siblings of "execute", but they
+> should be children of "arguments".
 
+Oops, you're right.
 
-(qemu) info pic=20
-CPU 18 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 0 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 21 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 2 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 23 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 4 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 11 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 25 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 6 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 13 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 27 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 8 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 15 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 29 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 30 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 17 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 20 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 19 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 1 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-ICS 1000..13ff 0x10018f1ea40
-  1000 MSI ff 00
-  1001 MSI ff 00
-  1002 MSI ff 00
-  1003 MSI ff 00
-  1004 LSI ff 00
-  1005 LSI ff 00
-  1006 LSI ff 00
-  1007 LSI ff 00
-  1008 MSI ff 00
-  1009 MSI ff 00
-  100a MSI ff 00
-  100b MSI ff 00
-  100c MSI ff 00
-CPU 22 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 3 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 10 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 24 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 5 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 12 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 26 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 7 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 14 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 28 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 9 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 16 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-CPU 31 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+[...]
+
+> Try (untested on my end) this rewrite of your original post (just
+> removing the '"options":{' and corresponding '}' from that listing):
+> 
+> {
+>     "execute": "blockdev-add",
+>     "arguments": {
+>             "backing": "virtio0",
+>             "driver": "qcow2",
+>             "id": "virtio1",
+>             "file": {
+>                 "driver": "file",
+>                 "filename": "/export/target.qcow2"
+>             }
+>     }
+> }
+
+This does not work (tested), because my current QEMU build from Git,
+will reject the "id" key (Kevin mentioned so on IRC, but I couldn't
+find the relevant Git commit from my `grep`ing in the Git history):
+
+{"error": {"class": "GenericError", "desc": "QMP input object member 'id' is unexpected"}}
+ 
+> or this attempt at your current post:
+> 
+> {   "execute":"blockdev-add",
+>     "arguments":{
+>      "driver":"qcow2",
+>      "node-name":"node1"
+
+A comma missing here :-)  With that fixed, it returns success.  
+
+However, bizzarely enough, when I ran `query-block` after `blockdev-add`
+succeeded (well, at least after it returned success), I don't see the
+new node ('target.qcow2') reflected in the return output.  Me
+investigates.
+
+https://kashyapc.fedorapeople.org/virt/temp/blockdev-add-followed-by-buggy-query-block.txt
+
+>      "file":{
+>       "driver":"file",
+>       "filename":"/export/target.qcow2"
+>      },
+>      "backing":{
+>       "driver":"qcow2",
+>       "file":{
+>         "driver":"file",
+>         "filename":"/export/base.qcow2"
+>       }
+>      }
+>     }
+> }
+
+Just for completeness, the new working incantation (that removes the
+need for "options" indirection, and the "id" key) that takes
+'node-name':
+
+--------------------------------------------
+{
+  "execute":"blockdev-add",
+  "arguments":{
+    "driver":"qcow2",
+    "node-name":"node1",
+    "file":{
+      "driver":"file",
+      "filename":"/export/target.qcow2"
+    },
+    "backing":{
+      "driver":"qcow2",
+      "file":{
+        "driver":"file",
+        "filename":"/export/base.qcow2"
+      }
+    }
+  }
+}
+--------------------------------------------
+
+-- 
+/kashyap
