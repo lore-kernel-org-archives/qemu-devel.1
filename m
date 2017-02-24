@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1chHiY-0000tb-09
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 10:23:35 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1chHoM-0005xY-HK
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 10:29:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1chHiU-00050G-17
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 10:23:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45358)
+	(envelope-from <pbonzini@redhat.com>) id 1chHoI-0007Y8-Gz
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 10:29:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54428)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1chHiT-000508-O9
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 10:23:29 -0500
-References: <148760155821.31154.13876757160410915057.stgit@bahia.lan>
-	<148760173919.31154.7555675803159581620.stgit@bahia.lan>
-	<20170223151042.GW30636@stefanha-x1.localdomain>
-	<20170224113402.07a0fb44@bahia.lan>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b3f08f09-9678-2142-c4d7-5a66f49b173d@redhat.com>
-Date: Fri, 24 Feb 2017 09:23:25 -0600
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1chHoI-0007Xv-88
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 10:29:30 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 27C81C04BD4F
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 15:29:30 +0000 (UTC)
+References: <20170222180423.26571-1-pbonzini@redhat.com>
+	<20170222180423.26571-2-pbonzini@redhat.com>
+	<87d1e7abbb.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <09c6aaf5-0575-0445-b8bc-400c026a8a68@redhat.com>
+Date: Fri, 24 Feb 2017 16:29:27 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170224113402.07a0fb44@bahia.lan>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="5MDGE0E9igk1obFoVhH0bIMFahEmMrrEW"
-Subject: Re: [Qemu-devel] [PATCH 23/29] 9pfs: local: chmod: don't follow
- symlinks
+In-Reply-To: <87d1e7abbb.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/3] qom-qobject: introduce
+ object_property_{g, s}et_ptr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,143 +35,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---5MDGE0E9igk1obFoVhH0bIMFahEmMrrEW
-From: Eric Blake <eblake@redhat.com>
-To: Greg Kurz <groug@kaod.org>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, Jann Horn <jannh@google.com>,
- Prasad J Pandit <prasad@redhat.com>,
- "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <b3f08f09-9678-2142-c4d7-5a66f49b173d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 23/29] 9pfs: local: chmod: don't follow
- symlinks
-References: <148760155821.31154.13876757160410915057.stgit@bahia.lan>
- <148760173919.31154.7555675803159581620.stgit@bahia.lan>
- <20170223151042.GW30636@stefanha-x1.localdomain>
- <20170224113402.07a0fb44@bahia.lan>
-In-Reply-To: <20170224113402.07a0fb44@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 02/24/2017 04:34 AM, Greg Kurz wrote:
-> On Thu, 23 Feb 2017 15:10:42 +0000
-> Stefan Hajnoczi <stefanha@gmail.com> wrote:
+
+On 24/02/2017 15:54, Markus Armbruster wrote:
+>> +    /* Do not use object_property_set_qobject until we switch it
+>> +     * to use qobject_input_visitor_new in strict mode.  See the
+>> +     * /qom/proplist/get-set-ptr/contravariant unit test.
+>> +     */
 >=20
->> On Mon, Feb 20, 2017 at 03:42:19PM +0100, Greg Kurz wrote:
->>> The local_chmod() callback is vulnerable to symlink attacks because i=
-t
->>> calls:
->>>
->>> (1) chmod() which follows symbolic links for all path elements
->>> (2) local_set_xattr()->setxattr() which follows symbolic links for al=
-l
->>>     path elements
->>> (3) local_set_mapped_file_attr() which calls in turn local_fopen() an=
-d
->>>     mkdir(), both functions following symbolic links for all path
->>>     elements but the rightmost one
->>>
+> So no conflict with my "[PATCH 15/21] qom: Make
+> object_property_set_qobject()'s input visitor strict".
 
->>> +        fd =3D local_open_nofollow(fs_ctx, fs_path->data, O_RDONLY, =
-0);
->>> +        if (fd =3D=3D -1) {
->>> +            return -1;
->>> +        }
->>> +        ret =3D fchmod(fd, credp->fc_mode);
->>> +        close_preserve_errno(fd); =20
->>
->> As mentioned on IRC, not sure this is workable since chmod(2) must not=
+No, and in fact this comment would be an example of why that patch is
+good.  With 15/21 we could just use object_property_set_qobject.
 
->> require read permission on the file.  This patch introduces failures
->> when the file isn't readable.
->>
+> Here's a non-ducky way to convert between QAPI types.  QAPI guarantees
+> that a pointer to a QAPI type is also valid as pointer to its base type=
+.
+> One can do:
 >=20
-> Yeah :-\ This one is the more painful issue to address. I need a
-> chmod() variant that would fail on symlinks instead of following
-> them... and I'm kinda suffering to implement this in a race-free
-> manner.
+>     UserDefOne *one;
+>     UserDefOneMore *more;
+>=20
+>     *(UserDefOne *)more =3D *one; // get UserDefOne into UserDefOneMore
+>                                 // members not in one are untouched
+>     *one =3D *(UserDefOne *)more; // set UserDefOne from UserDefOneMore
+>                                 // members not in one are ignored
+>=20
+> Would this technique suffice for your problem?
 
-BSD has lchmod(), but Linux does not.  And Linux does not yet properly
-implement AT_SYMLINK_NOFOLLOW.  (The BSD semantics are pretty cool:
-restricting mode bits on a symlink can create scenarios where some users
-can dereference the symlink but others get ENOENT failures - but I don't
-know of any effort to add those semantics to the Linux kernel)
+I am not sure.  What I'm trying to do here is to keep backwards
+compatibility in case a device provides UserDefOneMore for a well-known
+property name, and another device provides UserDefOneAnother.  As long
+as all devices provide the same (duck-typed) base class, things work.
 
-POSIX says support for AT_SYMLINK_NOFOLLOW is optional, precisely
-because POSIX does not require permissions on symlinks to matter, but
-the way it requires it is that AT_SYMLINK_NOFOLLOW is supposed to be a
-no-op for regular files, and cause an EOPNOTSUPP failure for symlinks.
+Maybe the right thing to do would be to define a union, but I wasn't
+sure it was possible to do that in a fully backwards compatible way (can
+you define a union where the discriminator is optional, for example?).
 
-Unfortunately, the Linux man page says that Linux fails with ENOTSUP
-(which is identical to EOPNOTSUPP) any time AT_SYMLINK_NOFOLLOW is set,
-and not just if it is attempted on a symlink.  And I just verified that
-poor behavior as follows:
+>> +
+>> +static void test_dummy_get_set_ptr_covariant(void)
+>> +{
+>> +    DummyObject *dobj =3D DUMMY_OBJECT(object_new(TYPE_DUMMY));
+>> +    Error *local_err =3D NULL;
+>> +    UserDefZero *ret;
+>> +    UserDefZero val;
+>> +
+>> +    /* You can retrieve a covariant (superclass) type... */
+>> +    ret =3D OBJECT_PROPERTY_GET_PTR(OBJECT(dobj), "qv",
+>> +                                  UserDefZero, &local_err);
+>> +    g_assert(!local_err);
+>> +
+>> +    g_assert_cmpint(ret->integer, =3D=3D, 0);
+>> +    qapi_free_UserDefZero(ret);
+>> +
+>> +    /* But you cannot set one.  */
+>> +    val.integer =3D 42;
+>> +    OBJECT_PROPERTY_SET_PTR(OBJECT(dobj), &val, "qv",
+>> +                            UserDefZero, &local_err);
+>> +    error_free_or_abort(&local_err);
+>> +
+>> +    /* Test that the property has not been modified at all */
+>> +    ret =3D OBJECT_PROPERTY_GET_PTR(OBJECT(dobj), "qv",
+>> +                                  UserDefZero, &local_err);
+>> +    g_assert(!local_err);
+>> +
+>> +    g_assert_cmpint(ret->integer, =3D=3D, 0);
+>> +    qapi_free_UserDefZero(ret);
+>> +}
+> This one tests getting and setting UserDefZero, which is UserDefOne's
+> base (but that doesn't matter).  Members:
+>=20
+>     integer
+>=20
+> OBJECT_PROPERTY_GET_PTR() gets UserDefOne into UserDefZero.  It succeed=
+s
+> because the output visitor again populates integer, string and enum1,
+> and the (non-strict) input visitor ignores string and enum1.
+>=20
+> OBJECT_PROPERTY_SET_PTR() sets UserDefOne from UserDefZero.  It fails
+> because the output visitor populates only integer, and the input visito=
+r
+> then chokes on missing string and boolean.
+>=20
+> The assymetry is between this and the previous test is a bit odd.
 
-$ cat foo.c
-#include <stdio.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <errno.h>
+That's true, but it makes sense I think; unlike OOP languages we don't
+have a QAPI equivalent of virtual methods, which is what makes it useful
+to have contravariant arguments (i.e. passing an Apple* to a food(Meal*)
+method).
 
-int main(int argc, char **argv)
-{
-    int ret =3D 1;
-    if (symlink("a", "l") < 0)
-        goto cleanup;
-    if (fchmodat(AT_FDCWD, "l", 0600, AT_SYMLINK_NOFOLLOW) =3D=3D 0)
-        printf("kernel supports mode bits on symlinks\n");
-    else if (errno !=3D EOPNOTSUPP) {
-        printf("Oops, kernel failed with %m on symlink\n");
-        goto cleanup;
-    }
-    if (creat("f", 0600) < 0)
-        goto cleanup;
-    if (fchmodat(AT_FDCWD, "f", 0600, AT_SYMLINK_NOFOLLOW) < 0) {
-        printf("Oops, kernel failed with %m on regular file\n");
-        goto cleanup;
-    }
-    ret =3D 0;
- cleanup:
-    remove("l");
-    remove("f");
-    return ret;
-}
-$ ./foo
-Oops, kernel failed with Operation not supported on regular file
+If you're setting UserDefOne from UserDefOneMore, some of the values are
+going to be lost.  Presumably there was a reason why you used
+UserDefOneMore, and therefore an error is the safe bet.
 
-If you were to get that kernel bug fixed, then you could use fchmodat()
-to do a safe chmod() which does not chase through a final symlink, and
-relative to a safe directory fd that you obtain for the rest of the path
-(as done elsewhere in the series).  Use the CVE nature of the problem as
-leverage on the kernel developers, if that's what it takes.
+If you're getting UserDefOne from UserDefOneMore, some of the values are
+going to be lost.  However, it's reasonable that you didn't even know
+that UserDefOneMore existed, which makes it sensible to allow reading
+into a covariant type.
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+>> +
+>> +static void test_dummy_get_set_ptr_error(void)
+>> +{
+>> +    DummyObject *dobj =3D DUMMY_OBJECT(object_new(TYPE_DUMMY));
+>> +    Error *local_err =3D NULL;
+>> +    const char *s =3D "my other dummy string";
+>> +    UserDefOne *ret;
+>> +    UserDefOne val;
+>> +
+>> +    ret =3D OBJECT_PROPERTY_GET_PTR(OBJECT(dobj), "blah",
+>> +                                  UserDefOne, &local_err);
+>> +    error_free_or_abort(&local_err);
+>> +    g_assert(!ret);
+>> +
+>> +    val.integer =3D 42;
+>> +    val.string =3D g_strdup(s);
+>> +    val.has_enum1 =3D true;
+>> +    val.enum1 =3D 100;
+>> +    OBJECT_PROPERTY_SET_PTR(OBJECT(dobj), &val, "qv",
+>> +                            UserDefOne, &local_err);
+>> +    error_free_or_abort(&local_err);
+>> +
+>> +    ret =3D OBJECT_PROPERTY_GET_PTR(OBJECT(dobj), "qv",
+>> +                                  UserDefOne, &local_err);
+>> +    g_assert(!local_err);
+>> +
+>> +    /* Test that the property has not been modified at all */
+>> +    g_assert_cmpint(ret->integer, =3D=3D, 0);
+>> +    g_assert_cmpstr(ret->string, =3D=3D, "dummy string");
+>> +    g_assert(!ret->has_enum1);
+>> +    qapi_free_UserDefOne(ret);
+>> +}
+>=20
+> Not immediately obvious what exactly this one tests.  Totally different
+> types?
 
+enum1 is out of range, so the set fails.  The test checks that integer
+and string parts of the property were not touched.
 
---5MDGE0E9igk1obFoVhH0bIMFahEmMrrEW
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+I'm leaving these three patches out of the pull request (and 2.9) while
+the discussion goes on.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYsE/tAAoJEKeha0olJ0Nqea0H/Ro8QjCZycaYYVU3stlSzCFT
-Q9psWrWe5R7mXq/MVC7mTMwNUokNc4t+2zeXOGBQI/DmMbiNAHV8hNmHf+HC/1I7
-kQ1MJtYpIMDi6JeRLJhvjTx0elcR0UfchEBsPknKX0HmsQhpXC2IrrC/rZLXmT8d
-gqM8Yfv7RyW2Qvag+IfbOb9tfvJhqcq2RPVom1E64tIpFSa/MCu2e/0CTQBm7JAq
-OLdQXHOkIcN6lX6Ujq+KnmZ+Obzbk6aV32+Af5ShRKBZDNvpMjv7jleGrqFFNTaC
-DHahvmGYJU8LLzgY3bQv5hdkKH0hubx4f+URzplWZEFbOaEbcCOETCjrEOjpMaw=
-=UTWc
------END PGP SIGNATURE-----
-
---5MDGE0E9igk1obFoVhH0bIMFahEmMrrEW--
+Paolo
