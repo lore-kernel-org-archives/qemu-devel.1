@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1chIey-0008Ga-Al
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:23:57 -0500
+	(envelope-from <eblake@redhat.com>) id 1chIfW-0000l6-KJ
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:24:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1chIev-0002KB-3k
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:23:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45840)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1chIeu-0002Jt-Ti
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:23:53 -0500
-References: <20170222183919.11928-1-ehabkost@redhat.com>
-	<CAFEAcA8_SsbdXWFbAt+qKXF-XGBjAt=ZbDgzSaeXYFzYPL1KTQ@mail.gmail.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <6c2f2984-336b-8f03-8be2-4152e683b69a@redhat.com>
-Date: Fri, 24 Feb 2017 17:23:48 +0100
+	(envelope-from <eblake@redhat.com>) id 1chIfV-0002Vb-Gs
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:24:30 -0500
+References: <1487710908-26356-1-git-send-email-armbru@redhat.com>
+	<1487710908-26356-3-git-send-email-armbru@redhat.com>
+	<5f90e39c-e4ea-8638-d057-25eff232ad3d@redhat.com>
+	<878toxmeol.fsf@dusky.pond.sub.org> <877f4g2f6m.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c00ea08f-f596-6e3e-4084-7f183c92a04d@redhat.com>
+Date: Fri, 24 Feb 2017 10:24:21 -0600
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8_SsbdXWFbAt+qKXF-XGBjAt=ZbDgzSaeXYFzYPL1KTQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] i386: Add "max" CPU model to TCG
- and KVM
+In-Reply-To: <877f4g2f6m.fsf@dusky.pond.sub.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="nUE3OEiblC9ge8VSOHtN4QPOnC1rjbpo1"
+Subject: Re: [Qemu-devel] [PATCH RFC v3 2/5] keyval: New keyval_parse()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +26,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Richard W.M. Jones" <rjones@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P. Berrange" <berrange@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>, Christian Borntraeger <borntraeger@de.ibm.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org
 
-Am 24.02.2017 um 14:48 schrieb Peter Maydell:
-> On 22 February 2017 at 18:39, Eduardo Habkost <ehabkost@redhat.com> wrote:
->> Changes v1 -> v2:
->> * Fix build without CONFIG_KVM at lmce_supported()
->> * Rebased on top of my x86-next branch:
->>   https://github.com/ehabkost/qemu x86-next
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--nUE3OEiblC9ge8VSOHtN4QPOnC1rjbpo1
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com,
+ qemu-block@nongnu.org
+Message-ID: <c00ea08f-f596-6e3e-4084-7f183c92a04d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v3 2/5] keyval: New keyval_parse()
+References: <1487710908-26356-1-git-send-email-armbru@redhat.com>
+ <1487710908-26356-3-git-send-email-armbru@redhat.com>
+ <5f90e39c-e4ea-8638-d057-25eff232ad3d@redhat.com>
+ <878toxmeol.fsf@dusky.pond.sub.org> <877f4g2f6m.fsf@dusky.pond.sub.org>
+In-Reply-To: <877f4g2f6m.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 02/24/2017 01:58 AM, Markus Armbruster wrote:
+
+>> I hate the 'no$key' sugar, and would love to get rid of it.  It makes
+>> things ambiguous (thus confusing) for precious little gain: 'novocaine=
+'
+>> can mean 'novocaine=3Don' or 'vocaine=3Doff'.  QemuOpts picks the latt=
+er,
+>> even when a QemuOpt named 'novocaine' has been declared.
 >>
->> Git branch for testing:
->>   https://github.com/ehabkost/qemu-hacks work/x86-cpu-max-tcg
->>
->> libvirt code to use the new feature already exist, and were
->> submitted to libvir-list, at:
->>   https://www.mail-archive.com/libvir-list@redhat.com/msg142168.html
->>
->> ---
->>
->> This is a replacement for the previous series that enabled the
->> "host" CPU model on TCG. Now a new "max" CPU is being added,
->> while keeping "host" KVM-specific.
->>
->> In addition to simply adding "max" as a copy of the existing
->> "host" CPU model, additional patches change it to not use any
->> host CPUID information when in TCG mode.
-> 
-> 
-> I had a look at implementing this for ARM, and ran into problems
-> because of how we've done '-cpu host'. For us the "host" CPU
-> type is registered dynamically when kvm_init() is called,
-> because (a) it only exists if -enable-kvm and (b) it probes
-> the kernel to find out what's available. So I could easily
-> add 'max' in the same place; but then where should I add the
-> type definition of 'max' for the non-KVM case?
-> 
-> Any suggestions?
+>> keyval_parse() is meant to behave like QemuOpts, so I'm reproducing th=
+is
+>> bit of bad sugar, reluctantly.
+>=20
+> Implied value alternatives / variations:
+>=20
+> (1) Don't implement the "no" sugar
+>=20
+>     I think we'd have to deprecate it in QemuOpts now, to give users
+>     some time to adapt before keyval_parse() replaces QemuOpts.
+>=20
 
-Maybe switch to some late initialization?
+>=20
+> If we're happy with bad sugar like "can't abbreviate novocaine=3Don to
+> novocaine" (confusing), "filename without a value gets you the file
+> 'on'", we reimplement the bad sugar and move on.
+>=20
+> If not, we have the choice between less magic or more magic.
+>=20
+> Less magic: (1) and/or (2).
+>=20
+> More magic: (3) or something like it.
+>=20
+> If we don't want to decide right now, we can do
+>=20
+> (4) Don't implement any implied value sugar for now
+>=20
+>     You have to spell out =3Don and =3Doff.  Big fat comment to remind =
+us
+>     about the QemuOpts incompatibility.
+>=20
+> I think this would be acceptable for -blockdev in 2.9.
+>=20
+> Opinions?
 
-On s390x, we register the host model right away, but fill it with life
-in the initfn. If KVM is disabled, the host model will be available, but
-we will deny to use it (via kvm_required).
+Do any existing blockdev sub-parameters begin with 'no'?  Ouch:
+BlockdevOptions has '*cache':'BlockdevCacheOptions' which in turn has
+'*no-flush':'bool'.  Even worse, I think you could abuse 'nono-flush' to
+enable flushing - my head hurts.
 
-For max, it would be the same thing. The initfn will simply inititalize
-the model differently, depending on the selected accelerator.
+And of course, there's the obvious BlockDevOptions '*node-name':'str'.
+No one in their right mind would expect 'node-name' without parameters
+to result in 'de-name=3Dno'.
 
-When the models are inititalized, kvm is already up and running, so it
-the kernel can be properly probed.
+Also, I found that at least libvirt has existing command line usage
+-numa node,nodeid=3D0, where qemu_numa_opts uses .implied_opt_name=3D"typ=
+e",
+=2Edesc =3D {{0}} to be visited by OptsVisitor.  Because of the implied o=
+pt,
+we get the desired "type=3Dnode" rather than the accidental "de=3Dno", bu=
+t
+the magic of implied keys can certainly make it weird to think about.
 
-Not sure if that helps :)
+How about:
 
--- 
-Thanks,
+for 2.9: -blockdev has no magic at all (you HAVE to spell 'foo=3Doff'
+rather than 'foo' for any boolean parameters that you want disabled in
+-blockdev); and in QemuOpts, we issue deprecation warnings but keep
+existing behavior any time someone uses 'noFOO' that we turn into
+'FOO=3Dno'.  Then, for 2.10, we can decide to remove the deprecation
+warnings if they pointed out real (ab)use of the sugar in the wild, or
+(hopefully) to kill the sugar entirely (as part of converting QemuOpts
+over to keyval_parse).
 
-David
+In short, getting rid of the 'no' prefix magic, after suitable
+deprecation warnings, seems like a good plan to me; and having -blockdev
+be slightly tighter than the rest of command line options for 2.9 only
+is no real loss (no one uses -blockdev yet, so they can be written to
+avoid the use of 'no' magic to begin with).
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--nUE3OEiblC9ge8VSOHtN4QPOnC1rjbpo1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYsF41AAoJEKeha0olJ0Nq/nEH/ihMueEXCnfC9637t7f0S3gF
+PTzR2PE1w+EVchsPcECj2yrK5ziTrsmojrAd8BpZEclIA+O7RhPQ49OLL/VASpiR
+hw2VFDVf1Eh43OiGbXmE/2ih9FIMCwuo9Unpgpt7Tp8gJ/W466DMYaDkRyobTR4c
+xb+gf4I7aY2cLeBvL8n6eyDa0lv0K+aeJ+Kn+pJn37tWATAANCEFHqOgoYNht151
+kABCn2sir4POvxY/qNUzsMICA4jMFDSuKe2H30Kh8CZkhtuKRAXux8tWHU31EeU8
+/OGBzFHknqCZLnzwnfn1l9IOZKQRincKqhVKwXNdxhyYWvc5+IXAfp7BJJWah/s=
+=SjgZ
+-----END PGP SIGNATURE-----
+
+--nUE3OEiblC9ge8VSOHtN4QPOnC1rjbpo1--
