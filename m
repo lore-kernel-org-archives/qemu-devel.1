@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1chGyr-00024a-9V
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:36:22 -0500
+	(envelope-from <lvivier@redhat.com>) id 1chH0a-0003YW-H6
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:38:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1chGyn-0008VB-Va
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:36:21 -0500
-Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:35011)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1chGyn-0008UU-NX
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:36:17 -0500
-Received: by mail-wr0-x233.google.com with SMTP id g10so12518494wrg.2
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 06:36:17 -0800 (PST)
-References: <1487914949-1294-1-git-send-email-bobby.prani@gmail.com>
-	<87y3wvlwhx.fsf@linaro.org> <87zihbaddl.fsf@gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <87zihbaddl.fsf@gmail.com>
-Date: Fri, 24 Feb 2017 14:36:14 +0000
-Message-ID: <87tw7jlkpt.fsf@linaro.org>
+	(envelope-from <lvivier@redhat.com>) id 1chH0U-0000z0-SR
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:38:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41152)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1chH0U-0000x7-K5
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:38:02 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8C0DD7E9D5
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 14:38:02 +0000 (UTC)
+References: <20170206173306.20603-1-dgilbert@redhat.com>
+	<20170206173306.20603-8-dgilbert@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <6ca55fb7-1127-c0bd-5771-fb1a50afcb3e@redhat.com>
+Date: Fri, 24 Feb 2017 15:37:59 +0100
 MIME-Version: 1.0
+In-Reply-To: <20170206173306.20603-8-dgilbert@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] mttcg/i386: Patch instruction using
- async_safe_* framework
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 07/16] postcopy: Record largest page size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,88 +33,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pranith Kumar <bobby.prani@gmail.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com
+Cc: aarcange@redhat.com
 
-
-Pranith Kumar <bobby.prani@gmail.com> writes:
-
-> Hi Alex,
->
-> Alex Bennée writes:
->
->> Pranith Kumar <bobby.prani@gmail.com> writes:
->>
->>> In mttcg, calling pause_all_vcpus() during execution from the
->>> generated TBs causes a deadlock if some vCPU is waiting for exclusive
->>> execution in start_exclusive(). Fix this by using the aync_safe_*
->>> framework instead of pausing vcpus for patching instructions.
->>>
->
-> <...>
->
->>> diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
->>> index 82a4955..11b0d49 100644
->>> --- a/hw/i386/kvmvapic.c
->>>
->>> -    resume_all_vcpus();
->>> +    g_free(info);
->>> +}
->>> +
->>> +static void patch_instruction(VAPICROMState *s, X86CPU *cpu, target_ulong ip)
->>> +{
->>> +    CPUState *cs = CPU(cpu);
->>> +    VAPICHandlers *handlers;
->>> +    struct PatchInfo *info;
->>> +
->>> +    if (smp_cpus == 1) {
->>> +        handlers = &s->rom_state.up;
->>> +    } else {
->>> +        handlers = &s->rom_state.mp;
->>> +    }
->>> +
->>> +    info  = g_new(struct PatchInfo, 1);
->>> +    info->handler = handlers;
->>> +    info->ip = ip;
->>>
->>>      if (!kvm_enabled()) {
->>> -        /* Both tb_lock and iothread_mutex will be reset when
->>> -         *  longjmps back into the cpu_exec loop. */
->>> -        tb_lock();
->>> -        tb_gen_code(cs, current_pc, current_cs_base, current_flags, 1);
->>> -        cpu_loop_exit_noexc(cs);
->>> +        const run_on_cpu_func fn = do_patch_instruction;
->>> +
->>> +        async_safe_run_on_cpu(cs, fn, RUN_ON_CPU_HOST_PTR(info));
->>> +        cs->exception_index = EXCP_INTERRUPT;
->>> +        cpu_loop_exit(cs);
->>>      }
->>> +
->>> +    pause_all_vcpus();
->>> +
->>> +    do_patch_instruction(cs, RUN_ON_CPU_HOST_PTR(info));
->>> +
->>> +    resume_all_vcpus();
->>> +    g_free(info);
->>
->> I don't know if there is any benefit scheduling this as async work for
->> KVM but I'll leave that up to Paolo to decide. From a TCG point of view
->> I think its good:
->>
->
-> We are scheduling this as async work only for non-KVM cases. For KVM, we use
-> go to the pause/resume path above and patch it there itself.
-
-No I mean would it be more efficient to do that for KVM as safe work. To
-be honest the code to pause_all_vcpus() seems a little hokey given
-cpu_stop_current() somehow stops itself while cpu_exit'ing the rest of
-the vcpus. But I guess you would involve an additional KVM transition
-for the calling thread, I'm not sure hence the deference to the KVM
-experts ;-)
-
->
-> Thanks,
-
-
---
-Alex Bennée
+On 06/02/2017 18:32, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> Record the largest page size in use; we'll need it soon for allocating
+> temporary buffers.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  exec.c                        | 13 +++++++++++++
+>  include/exec/cpu-common.h     |  1 +
+>  include/migration/migration.h |  1 +
+>  migration/migration.c         |  1 +
+>  4 files changed, 16 insertions(+)
+> 
+> diff --git a/exec.c b/exec.c
+> index c25f6b3..59f3b6b 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -1524,6 +1524,19 @@ size_t qemu_ram_pagesize(RAMBlock *rb)
+>      return rb->page_size;
+>  }
+>  
+> +/* Returns the largest size of page in use */
+> +size_t qemu_ram_pagesize_largest(void)
+> +{
+> +    RAMBlock *block;
+> +    size_t largest = 0;
+> +
+> +    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+> +        largest = MAX(largest, qemu_ram_pagesize(block));
+> +    }
+> +
+> +    return largest;
+> +}
+> +
+>  static int memory_try_enable_merging(void *addr, size_t len)
+>  {
+>      if (!machine_mem_merge(current_machine)) {
+> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+> index 1350c2e..8c305aa 100644
+> --- a/include/exec/cpu-common.h
+> +++ b/include/exec/cpu-common.h
+> @@ -64,6 +64,7 @@ void qemu_ram_set_idstr(RAMBlock *block, const char *name, DeviceState *dev);
+>  void qemu_ram_unset_idstr(RAMBlock *block);
+>  const char *qemu_ram_get_idstr(RAMBlock *rb);
+>  size_t qemu_ram_pagesize(RAMBlock *block);
+> +size_t qemu_ram_pagesize_largest(void);
+>  
+>  void cpu_physical_memory_rw(hwaddr addr, uint8_t *buf,
+>                              int len, int is_write);
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index 96c9d6e..c9c1d5f 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -92,6 +92,7 @@ struct MigrationIncomingState {
+>       */
+>      QemuEvent main_thread_load_event;
+>  
+> +    size_t         largest_page_size;
+>      bool           have_fault_thread;
+>      QemuThread     fault_thread;
+>      QemuSemaphore  fault_thread_sem;
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 283677c..e0fdafc 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -387,6 +387,7 @@ static void process_incoming_migration_co(void *opaque)
+>      int ret;
+>  
+>      mis = migration_incoming_state_new(f);
+> +    mis->largest_page_size = qemu_ram_pagesize_largest();
+>      postcopy_state_set(POSTCOPY_INCOMING_NONE);
+>      migrate_set_state(&mis->state, MIGRATION_STATUS_NONE,
+>                        MIGRATION_STATUS_ACTIVE);
+> 
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
