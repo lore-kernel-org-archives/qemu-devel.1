@@ -1,21 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1chIuV-00033J-CD
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:40:00 -0500
+	(envelope-from <clement.deschamps@antfield.fr>) id 1chIux-0003OA-QE
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:40:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1chIuU-0000xq-Dx
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:39:59 -0500
-Date: Fri, 24 Feb 2017 16:39:48 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170224163948.GG17452@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <87bmukmlau.fsf@dusky.pond.sub.org>
-	<87o9xr60dp.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87o9xr60dp.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] Non-flat command line option argument syntax
+	(envelope-from <clement.deschamps@antfield.fr>) id 1chIuw-0001CK-Mq
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:40:27 -0500
+From: Clement Deschamps <clement.deschamps@antfield.fr>
+Date: Fri, 24 Feb 2017 17:40:19 +0100
+Message-Id: <20170224164021.9066-3-clement.deschamps@antfield.fr>
+In-Reply-To: <20170224164021.9066-1-clement.deschamps@antfield.fr>
+References: <20170224164021.9066-1-clement.deschamps@antfield.fr>
+Subject: [Qemu-devel] [PATCH v3 2/4] hw/sd: add card-reparenting function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,58 +19,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Clement Deschamps <clement.deschamps@antfield.fr>, qemu-arm@nongnu.org, peter.maydell@linaro.org, andrew.baumann@microsoft.com
 
-On Fri, Feb 24, 2017 at 05:04:34PM +0100, Markus Armbruster wrote:
-> Markus Armbruster <armbru@redhat.com> writes:
-> 
-> [...]
-> > === Dotted keys ===
-> >
-> > One sufficiently powerful syntax extension already exists: the dotted
-> > key convention.  It's syntactically unambiguous only when none of the
-> > KEYs involved contains '.'  To adopt it across the board, we'd have to
-> > outlaw '.' in KEYs.  QAPI outlaws '.' already,
-> 
-> *Except* in __RFQDN_ prefixes.
-> 
-> Say example.com needs to add a downstream extension to block driver
-> "raw".  Following QAPI rules, they add to to struct BlockdevOptionsRaw a
-> new optional member:
-> 
->     '*__com.example_medium-rare': 'bool'
-> 
-> On the command line, this looks like
-> 
->     -blockdev node-name=foo,driver=raw,__com.example_medium-rare=on,file.driver=file,file.filename=foo.img
-> 
-> Dotted keys parse this as a reference to member __com's member
-> example_medium-rare.
-> 
-> Possible solutions:
-> 
-> (a) Outlaw domain names with '_'.  If KEY starts with "__", everything
->     up to the third '_' is an __RFQDN_ prefix.
-> 
-> (b) Outlaw '_' in the name part that follows __RFQDN_.  If KEY starts
->     with "__", everything up to the last '_' is an __RFQDN_ prefix.
-> 
-> (c) Your bright idea.
+Provide a new function sdbus_reparent_card() in sd core for reparenting
+a card from a SDBus to another one.
 
-Define a new downstream vendor naming convention. IMHO it is reasonable
-to argue that the downstream vendor extensions are outside the scope of
-backwards compatibility guarantees we normally apply for our CLI args.
+This function is required by the raspi platform, where the two SD
+controllers can be dynamically switched.
 
-Thus, simply say that vendors must replace all '.' with _ in their
-namespace prefix. eg They should use '__com_example_medium.rare=on'
-which would mean a property '__com_example_medium' which is a struct
-containing a property rare with value on
+Signed-off-by: Clement Deschamps <clement.deschamps@antfield.fr>
+---
+ hw/sd/core.c       | 30 ++++++++++++++++++++++++++++++
+ include/hw/sd/sd.h |  1 +
+ 2 files changed, 31 insertions(+)
 
-
-Regards,
-Daniel
+diff --git a/hw/sd/core.c b/hw/sd/core.c
+index 14c2bdf27b..a8f24f505f 100644
+--- a/hw/sd/core.c
++++ b/hw/sd/core.c
+@@ -131,6 +131,36 @@ void sdbus_set_readonly(SDBus *sdbus, bool readonly)
+     }
+ }
+ 
++void sdbus_reparent_card(SDBus *from, SDBus *to)
++{
++    BusChild *kid = QTAILQ_FIRST(&from->qbus.children);
++    SDState *card;
++    SDCardClass *sc;
++    bool readonly;
++
++    /* We directly reparent the card object rather than implementing this
++     * as a hotpluggable connection because we don't want to expose SD cards
++     * to users as being hotpluggable, and we can get away with it in this
++     * limited use case. This could perhaps be implemented more cleanly in
++     * future by adding support to the hotplug infrastructure for "device
++     * can be hotplugged only via code, not by user".
++     */
++
++    if (!kid) {
++        return;
++    }
++
++    card = SD_CARD(kid->child);
++    sc = SD_CARD_GET_CLASS(card);
++    readonly = sc->get_readonly(card);
++
++    sdbus_set_inserted(from, false);
++    object_unparent(OBJECT(kid));
++    qdev_set_parent_bus(DEVICE(card), &to->qbus);
++    sdbus_set_inserted(to, true);
++    sdbus_set_readonly(to, readonly);
++}
++
+ static const TypeInfo sd_bus_info = {
+     .name = TYPE_SD_BUS,
+     .parent = TYPE_BUS,
+diff --git a/include/hw/sd/sd.h b/include/hw/sd/sd.h
+index 79909b2478..54eaf9b554 100644
+--- a/include/hw/sd/sd.h
++++ b/include/hw/sd/sd.h
+@@ -140,6 +140,7 @@ uint8_t sdbus_read_data(SDBus *sd);
+ bool sdbus_data_ready(SDBus *sd);
+ bool sdbus_get_inserted(SDBus *sd);
+ bool sdbus_get_readonly(SDBus *sd);
++void sdbus_reparent_card(SDBus *from, SDBus *to);
+ 
+ /* Functions to be used by SD devices to report back to qdevified controllers */
+ void sdbus_set_inserted(SDBus *sd, bool inserted);
 -- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+2.11.1
