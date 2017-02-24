@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60761)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1chCyl-00063f-6M
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 05:20:00 -0500
+	(envelope-from <clg@kaod.org>) id 1chCyp-00067A-Lu
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 05:20:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1chCyh-0007ZG-3p
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 05:19:59 -0500
-Received: from 3.mo5.mail-out.ovh.net ([46.105.40.108]:35823)
+	(envelope-from <clg@kaod.org>) id 1chCyl-0007i5-Li
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 05:20:03 -0500
+Received: from 8.mo5.mail-out.ovh.net ([178.32.116.78]:58922)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1chCyg-0007Vb-Uh
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 05:19:55 -0500
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1chCyl-0007gi-Eb
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 05:19:59 -0500
 Received: from player734.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 96446DCA9C
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 11:19:53 +0100 (CET)
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 75AE0D9687
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 11:19:58 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 24 Feb 2017 11:18:12 +0100
-Message-Id: <1487931503-10607-14-git-send-email-clg@kaod.org>
+Date: Fri, 24 Feb 2017 11:18:13 +0100
+Message-Id: <1487931503-10607-15-git-send-email-clg@kaod.org>
 In-Reply-To: <1487931503-10607-1-git-send-email-clg@kaod.org>
 References: <1487931503-10607-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 13/24] ppc/xics: remove the XICS list of ICS
+Subject: [Qemu-devel] [PATCH v3 14/24] ppc/xics: extend the QOM interface to
+ handle ICPs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,73 +33,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-This is not used anymore.
+Let's add two new handlers for ICPs. One is to get an ICP object from
+a server number and a second is to resend the irqs when needed.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/intc/xics.c        | 8 --------
- hw/ppc/spapr.c        | 1 -
- include/hw/ppc/xics.h | 2 --
- 3 files changed, 11 deletions(-)
+ hw/intc/xics.c        |  2 +-
+ hw/ppc/spapr.c        | 20 ++++++++++++++++++++
+ include/hw/ppc/xics.h |  3 +++
+ 3 files changed, 24 insertions(+), 1 deletion(-)
 
 diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index 0673253330d4..2dd0c3165609 100644
+index 2dd0c3165609..05922a040fb5 100644
 --- a/hw/intc/xics.c
 +++ b/hw/intc/xics.c
-@@ -146,13 +146,6 @@ static void xics_common_reset(DeviceState *d)
-     }
+@@ -216,7 +216,7 @@ static void icp_check_ipi(ICPState *ss)
+     qemu_irq_raise(ss->output);
  }
 =20
--static void xics_common_initfn(Object *obj)
--{
--    XICSState *xics =3D XICS_COMMON(obj);
--
--    QLIST_INIT(&xics->ics);
--}
--
- static void xics_common_class_init(ObjectClass *oc, void *data)
+-static void icp_resend(XICSFabric *xi, ICPState *ss)
++void icp_resend(XICSFabric *xi, ICPState *ss)
  {
-     DeviceClass *dc =3D DEVICE_CLASS(oc);
-@@ -165,7 +158,6 @@ static const TypeInfo xics_common_info =3D {
-     .parent        =3D TYPE_DEVICE,
-     .instance_size =3D sizeof(XICSState),
-     .class_size    =3D sizeof(XICSStateClass),
--    .instance_init =3D xics_common_initfn,
-     .class_init    =3D xics_common_class_init,
- };
+     XICSFabricClass *xic =3D XICS_FABRIC_GET_CLASS(xi);
 =20
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index ed109bfb11fa..f2528255c9e9 100644
+index f2528255c9e9..fa589d5d260c 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -122,7 +122,6 @@ static XICSState *try_create_xics(sPAPRMachineState *=
-spapr,
-     if (err) {
-         goto error;
-     }
--    QLIST_INSERT_HEAD(&xics->ics, spapr->ics, list);
+@@ -2923,6 +2923,24 @@ static void spapr_ics_resend(XICSFabric *dev)
+     ics_resend(spapr->ics);
+ }
 =20
-     xics->ss =3D g_malloc0(nr_servers * sizeof(ICPState));
-     xics->nr_servers =3D nr_servers;
++static ICPState *spapr_icp_get(XICSFabric *xi, int server)
++{
++    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
++
++    return (server < spapr->xics->nr_servers) ? &spapr->xics->ss[server]=
+ :
++        NULL;
++}
++
++static void spapr_icp_resend(XICSFabric *xi)
++{
++    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
++    int i;
++
++    for (i =3D 0; i < spapr->xics->nr_servers; i++) {
++        icp_resend(xi, &spapr->xics->ss[i]);
++    }
++}
++
+ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc =3D MACHINE_CLASS(oc);
+@@ -2967,6 +2985,8 @@ static void spapr_machine_class_init(ObjectClass *o=
+c, void *data)
+     vhc->hypercall =3D emulate_spapr_hypercall;
+     xic->ics_get =3D spapr_ics_get;
+     xic->ics_resend =3D spapr_ics_resend;
++    xic->icp_get =3D spapr_icp_get;
++    xic->icp_resend =3D spapr_icp_resend;
+ }
+=20
+ static const TypeInfo spapr_machine_info =3D {
 diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index aaf84b451d3f..f333500b473d 100644
+index f333500b473d..814f7ebe2246 100644
 --- a/include/hw/ppc/xics.h
 +++ b/include/hw/ppc/xics.h
-@@ -82,7 +82,6 @@ struct XICSState {
-     /*< public >*/
-     uint32_t nr_servers;
-     ICPState *ss;
--    QLIST_HEAD(, ICSState) ics;
- };
+@@ -191,6 +191,8 @@ typedef struct XICSFabricClass {
+     InterfaceClass parent;
+     ICSState *(*ics_get)(XICSFabric *xi, int irq);
+     void (*ics_resend)(XICSFabric *xi);
++    ICPState *(*icp_get)(XICSFabric *xi, int server);
++    void (*icp_resend)(XICSFabric *xi);
+ } XICSFabricClass;
 =20
- #define TYPE_ICP "icp"
-@@ -152,7 +151,6 @@ struct ICSState {
-     qemu_irq *qirqs;
-     ICSIRQState *irqs;
-     XICSState *xics;
--    QLIST_ENTRY(ICSState) list;
- };
+ #define XICS_IRQS_SPAPR               1024
+@@ -221,5 +223,6 @@ void ics_simple_write_xive(ICSState *ics, int nr, int=
+ server,
+ void ics_set_irq_type(ICSState *ics, int srcno, bool lsi);
 =20
- static inline bool ics_valid_irq(ICSState *ics, uint32_t nr)
+ void ics_resend(ICSState *ics);
++void icp_resend(XICSFabric *xi, ICPState *ss);
+=20
+ #endif /* XICS_H */
 --=20
 2.7.4
