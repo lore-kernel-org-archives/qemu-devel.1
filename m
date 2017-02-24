@@ -1,27 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51805)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1chA17-0005he-0z
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 02:10:14 -0500
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1chA37-0007SH-Bd
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 02:12:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1chA12-0001Oc-25
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 02:10:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57735)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1chA11-0001LX-Pr
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 02:10:07 -0500
-Date: Fri, 24 Feb 2017 15:10:01 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170224071001.GE10022@pxdev.xzpeter.org>
-References: <1487910561-17825-1-git-send-email-peterx@redhat.com>
-	<153715427.26269614.1487912853628.JavaMail.zimbra@redhat.com>
-	<20170224055005.GC10022@pxdev.xzpeter.org>
-	<750665985.26278283.1487918110693.JavaMail.zimbra@redhat.com>
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1chA32-0001iL-Tu
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 02:12:17 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47703)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1chA32-0001hj-KR
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 02:12:12 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1O793YU115619
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 02:12:11 -0500
+Received: from e28smtp06.in.ibm.com (e28smtp06.in.ibm.com [125.16.236.6])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28t0avyvc8-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 02:12:11 -0500
+Received: from localhost
+	by e28smtp06.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Fri, 24 Feb 2017 12:42:07 +0530
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+In-Reply-To: <87o9xs2hnl.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+References: <1487879800-12352-1-git-send-email-nikunj@linux.vnet.ibm.com>
+	<1487879800-12352-7-git-send-email-nikunj@linux.vnet.ibm.com>
+	<755c77c5-0930-b5ee-0b3b-1e0608301c8d@twiddle.net>
+	<87a89cza5l.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170224025841.GN17615@umbus.fritz.box>
+	<4a13acc6-8a7e-f259-fdb7-6c3156b9ac6c@twiddle.net>
+	<87o9xs2hnl.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Date: Fri, 24 Feb 2017 12:42:01 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <750665985.26278283.1487918110693.JavaMail.zimbra@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] intel_iommu: check misordered init when
- realize
+Content-Type: text/plain
+Message-Id: <87lgsw2hby.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v4 06/15] target/ppc: remove xer
+ split-out flags(so, ov, ca)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,98 +46,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>
-Cc: qemu-devel@nongnu.org, yi l liu <yi.l.liu@intel.com>, "\\ Michael S . Tsirkin \"; \"Alex Williamson\";
-	\"Marcel Apfelbaum\" <marcel@redhat.com>;
-	\"Jintack Lim" <alex.williamson@redhat.com>
+To: Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
-On Fri, Feb 24, 2017 at 01:35:10AM -0500, Pankaj Gupta wrote:
-> 
-> > 
-> > On Fri, Feb 24, 2017 at 12:07:33AM -0500, Pankaj Gupta wrote:
-> > > Hello Peter,
-> > 
-> > Hi, Pankaj!
-> > 
-> > > 
-> > > This solution looks to check dependency of 'vfio-pci' over 'intel-iommu'
-> > > before 'intel-iommu' is not initialized.
-> > > 
-> > > Overall it looks good to me, just a small nit below.
-> > >  
-> > > > 
-> > > > Intel vIOMMU devices are created with "-device" parameter, while here
-> > > > actually we need to make sure the dmar device be created before other
-> > > > PCI devices (like vfio-pci) so that we know iommu_fn will be setup
-> > > > correctly before realizations of those PCI devices (it is sensible that
-> > > > PCI device fetch these info during its realization). Now this ordering
-> > > > yet cannot be achieved elsewhere, and devices will be created in the
-> > > > order that user specified. That might be dangerous.
-> > > > 
-> > > > Here we add one more function to detect this kind of misordering issue,
-> > > > then report to guest. Currently, the only known device that is affected
-> > > > by this VT-d defect is the vfio-pci typed devices. So for now we just
-> > > > check against it to make sure we are safe.
-> > > > 
-> > > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > > ---
-> > > >  hw/i386/intel_iommu.c | 22 ++++++++++++++++++++++
-> > > >  1 file changed, 22 insertions(+)
-> > > > 
-> > > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > > > index 22d8226..b723ece 100644
-> > > > --- a/hw/i386/intel_iommu.c
-> > > > +++ b/hw/i386/intel_iommu.c
-> > > > @@ -2560,6 +2560,24 @@ static bool vtd_decide_config(IntelIOMMUState *s,
-> > > > Error **errp)
-> > > >      return true;
-> > > >  }
-> > > >  
-> > > > +/*
-> > > > + * TODO: we should have a better way to achieve the ordering rather
-> > > > + * than this misorder check explicitly against vfio-pci. After all, no
-> > > > + * one should be blamed for this, and vfio-pci did nothing wrong.
-> > > > + */
-> > > > +static bool vtd_detected_misorder_init(Error **errp)
-> > > > +{
-> > > > +    Object *dev = object_resolve_path_type("", "vfio-pci", NULL);
-> > > > +
-> > > > +    if (dev) {
-> > > > +        error_setg(errp, "Please specify \"intel-iommu\" before all the
-> > > > rest
-> > > 
-> > >             "before all the rest" does not give much clue to user. Do you
-> > >             think better
-> > >             error message would help? just a thought.
-> > 
-> > Yes this is my intention to emphasize that we should possibly put
-> > intel-iommu even before all the PCI devices. As mentioned above (and
-> > also in the commit message), although vfio-pci is the only one that is
-> > affected by this, we should probably put intel-iommu even before all
-> > the rest of PCI devices. E.g., in the future we can have new devices
-> > that need this dependency as well (that vt-d being inited before that
-> > device), which is still legal imho.
-> 
-> yes, something like this can help "intel-iommu should be specified as first device"?
+Nikunj A Dadhania <nikunj@linux.vnet.ibm.com> writes:
 
-I can switch this description if you prefer this one. :) Not sure
-whether this can be touched up during merge if this patch is good for
-2.9, or I'll just repost with yours if there is further comments.
+> Richard Henderson <rth@twiddle.net> writes:
+>
+>> On 02/24/2017 01:58 PM, David Gibson wrote:
+>>> On Fri, Feb 24, 2017 at 06:18:22AM +0530, Nikunj A Dadhania wrote:
+>>>> Richard Henderson <rth@twiddle.net> writes:
+>>>>
+>>>>> On 02/24/2017 06:56 AM, Nikunj A Dadhania wrote:
+>>>>>> Now get rid all the split out variables so, ca, ov. After this patch,
+>>>>>> all the bits are stored in CPUPPCState::xer at appropriate places.
+>>>>>>
+>>>>>> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+>>>>>> ---
+>>>>>>  target/ppc/cpu.c        |   8 +---
+>>>>>>  target/ppc/cpu.h        |  26 ++++++------
+>>>>>>  target/ppc/int_helper.c |  12 +++---
+>>>>>>  target/ppc/translate.c  | 106 +++++++++++++++++++++++++-----------------------
+>>>>>>  4 files changed, 78 insertions(+), 74 deletions(-)
+>>>>>
+>>>>> I do not think this is a good direction to take this.
+>>>>
+>>>> Hmm, any particular reason?
+>>>
+>>> Right, I suggested this, but based only a suspicion that the split
+>>> variables weren't worth the complexity.  I'm happy to be corrected by
+>>> someone with better knowledge of TCG, but it'd be nice to know why.
+>>
+>> Normally we're interested in minimizing the size of the generated code, 
+>> delaying computation until we can show it being used.
+>>
+>> Now, ppc is a bit different from other targets (which might compute overflow 
+>> for any addition insn) in that it only computes overflow when someone asks for 
+>> it.  Moreover, it's fairly rare for the addo/subo/nego instructions to
+>> be used.
+>
+>> Therefore, I'm not 100% sure what the "best" solution is.
+>
+> Agreed, with that logic, wont it be more efficient to move the OV/CA
+> updationg to respective callers, and when xer_read/write happens, its
+> just one tcg_ops.
 
-> Or we can just check for "intel-iommu" as first device at the start in place of
-> checking for "vfio-pci". This will also help us to check for all other devices. 
+BTW, i haven't seen remarkable difference in the boot time after this
+change.
 
-Actually your suggestion is just what I did in version 1. The problem
-is that, it's not easy to let vt-d really be the first device to be
-inited... Please check pc_q35_init(), within that we have:
-
-    pc_vga_init(isa_bus, host_bus);
-    pc_nic_init(isa_bus, host_bus);
-
-These are integrated devices along with ICH9. Such devices are
-possibly pci devices as well, but they are created much earlier than
-vt-d device, since that's still during machine init.
-
-Thanks,
-
--- peterx
+Regards
+Nikunj
