@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1chKQp-0006Lf-UF
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:17:29 -0500
+	(envelope-from <kwolf@redhat.com>) id 1chKQs-0006PR-7g
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:17:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1chKQn-0002jh-F3
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:17:27 -0500
+	(envelope-from <kwolf@redhat.com>) id 1chKQr-0002nI-Hh
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:17:30 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 24 Feb 2017 19:16:57 +0100
-Message-Id: <1487960230-18054-7-git-send-email-kwolf@redhat.com>
+Date: Fri, 24 Feb 2017 19:16:59 +0100
+Message-Id: <1487960230-18054-9-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1487960230-18054-1-git-send-email-kwolf@redhat.com>
 References: <1487960230-18054-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 06/19] qemu-img: Truncate before full
- preallocation
+Subject: [Qemu-devel] [PULL 08/19] iotests: Fix another race in 030
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,54 +22,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Nir Soffer <nirsof@gmail.com>
+From: John Snow <jsnow@redhat.com>
 
-In a previous commit (qemu-img: Do not truncate before preallocation) we
-moved truncate to the PREALLOC_MODE_OFF branch to avoid slowdown in
-posix_fallocate().
+We can't rely on a non-paused job to be present and running for us.
+Assume that if the job is not present that it completed already.
 
-However this change is not optimal when using PREALLOC_MODE_FULL, since
-knowing the final size from the beginning could allow the file system
-driver to do less allocations and possibly avoid fragmentation of the
-file.
-
-Now we truncate also before doing full preallocation.
-
-Signed-off-by: Nir Soffer <nirsof@gmail.com>
+Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/file-posix.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ tests/qemu-iotests/030 | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 442f080..d24e34b 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1604,6 +1604,17 @@ static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
- #endif
-     case PREALLOC_MODE_FULL:
-     {
-+        /*
-+         * Knowing the final size from the beginning could allow the file
-+         * system driver to do less allocations and possibly avoid
-+         * fragmentation of the file.
-+         */
-+        if (ftruncate(fd, total_size) != 0) {
-+            result = -errno;
-+            error_setg_errno(errp, -result, "Could not resize file");
-+            goto out_close;
-+        }
-+
-         int64_t num = 0, left = total_size;
-         buf = g_malloc0(65536);
- 
-@@ -1642,6 +1653,7 @@ static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
-         break;
-     }
- 
-+out_close:
-     if (qemu_close(fd) != 0 && result == 0) {
-         result = -errno;
-         error_setg_errno(errp, -result, "Could not close the new file");
+diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
+index 54db54a..0d472d5 100755
+--- a/tests/qemu-iotests/030
++++ b/tests/qemu-iotests/030
+@@ -547,11 +547,14 @@ class TestEIO(TestErrors):
+         while not completed:
+             for event in self.vm.get_qmp_events(wait=True):
+                 if event['event'] == 'BLOCK_JOB_ERROR':
++                    error = True
+                     self.assert_qmp(event, 'data/device', 'drive0')
+                     self.assert_qmp(event, 'data/operation', 'read')
+                     result = self.vm.qmp('query-block-jobs')
++                    if result == {'return': []}:
++                        # Job finished too quickly
++                        continue
+                     self.assert_qmp(result, 'return[0]/paused', False)
+-                    error = True
+                 elif event['event'] == 'BLOCK_JOB_COMPLETED':
+                     self.assertTrue(error, 'job completed unexpectedly')
+                     self.assert_qmp(event, 'data/type', 'stream')
 -- 
 1.8.3.1
