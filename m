@@ -1,18 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mmarek@suse.cz>) id 1chGAt-0005Zf-1W
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:44:44 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1chH23-0005LV-HW
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:39:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mmarek@suse.cz>) id 1chGAp-0001dN-UI
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:44:43 -0500
-Received: from mx2.suse.de ([195.135.220.15]:44724)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mmarek@suse.cz>) id 1chGAp-0001cG-KP
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:44:39 -0500
-From: Michal Marek <mmarek@suse.com>
-Date: Fri, 24 Feb 2017 14:44:11 +0100
-Message-Id: <20170224134411.28882-1-mmarek@suse.com>
-Subject: [Qemu-devel] [PATCH] target-s390x: Implement stfl and stfle
+	(envelope-from <peter.maydell@linaro.org>) id 1chH22-0001yR-3A
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:39:39 -0500
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:34113)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1chH21-0001xw-Pv
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:39:38 -0500
+Received: by mail-wr0-x234.google.com with SMTP id o22so8837242wro.1
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 06:39:37 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <c2915d0d2f3966ddb92005129b680727a69a3bcd.1487522123.git.balaton@eik.bme.hu>
+References: <cover.1487522123.git.balaton@eik.bme.hu>
+	<c2915d0d2f3966ddb92005129b680727a69a3bcd.1487522123.git.balaton@eik.bme.hu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 24 Feb 2017 14:39:15 +0000
+Message-ID: <CAFEAcA8YGAyG3_uKwGJhff+ruearUP6eyQ0DROqZhGmdcaq6dw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH 03/10] sm501: QOMify
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,163 +29,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
-Cc: qemu-devel@nongnu.org, Miroslav Benes <mbenes@suse.cz>, Eric Bischoff <ebischoff@suse.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-The implementation is partially cargo cult based, but it works for the
-linux kernel use case.
+On 19 February 2017 at 16:35, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> ---
+>  hw/display/sm501.c   | 133 +++++++++++++++++++++++++++++++++++----------------
+>  hw/sh4/r2d.c         |  11 ++++-
+>  include/hw/devices.h |   5 --
+>  3 files changed, 101 insertions(+), 48 deletions(-)
+>
+> diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+> index 4eb085c..b592022 100644
+> --- a/hw/display/sm501.c
+> +++ b/hw/display/sm501.c
+> @@ -58,8 +58,8 @@
+>  #define SM501_DPRINTF(fmt, ...) do {} while (0)
+>  #endif
+>
+> -
+>  #define MMIO_BASE_OFFSET 0x3e00000
+> +#define MMIO_SIZE 0x200000
+>
+>  /* SM501 register definitions taken from "linux/include/linux/sm501-regs.h" */
+>
+> @@ -464,6 +464,7 @@ typedef struct SM501State {
+>      uint32_t local_mem_size_index;
+>      uint8_t *local_mem;
+>      MemoryRegion local_mem_region;
+> +    MemoryRegion mmio_region;
+>      uint32_t last_width;
+>      uint32_t last_height;
+>
+> @@ -1396,20 +1397,14 @@ static const GraphicHwOps sm501_ops = {
+>      .gfx_update  = sm501_update_display,
+>  };
+>
+> -void sm501_init(MemoryRegion *address_space_mem, uint32_t base,
+> -                uint32_t local_mem_bytes, qemu_irq irq, Chardev *chr)
+> +static void sm501_init(SM501State *s, DeviceState *dev, uint32_t base,
+> +                       uint32_t local_mem_bytes)
+>  {
+> -    SM501State *s;
+> -    DeviceState *dev;
+> -    MemoryRegion *sm501_system_config = g_new(MemoryRegion, 1);
+> -    MemoryRegion *sm501_disp_ctrl = g_new(MemoryRegion, 1);
+> -    MemoryRegion *sm501_2d_engine = g_new(MemoryRegion, 1);
+> -
+> -    /* allocate management data region */
+> -    s = g_new0(SM501State, 1);
+> +    MemoryRegion *mr;
+> +
+>      s->base = base;
+>      s->local_mem_size_index = get_local_mem_size_index(local_mem_bytes);
+> -    SM501_DPRINTF("local mem size=%x. index=%d\n", get_local_mem_size(s),
+> +    SM501_DPRINTF("sm501 local mem size=%x. index=%d\n", get_local_mem_size(s),
+>                    s->local_mem_size_index);
+>      s->system_control = 0x00100000; /* 2D engine FIFO empty */
+>      s->misc_control = SM501_MISC_IRQ_INVERT; /* assumes SH, active=low */
+> @@ -1417,46 +1412,102 @@ void sm501_init(MemoryRegion *address_space_mem, uint32_t base,
+>      s->dc_crt_control = 0x00010000;
+>
+>      /* allocate local memory */
+> -    memory_region_init_ram(&s->local_mem_region, NULL, "sm501.local",
+> +    memory_region_init_ram(&s->local_mem_region, OBJECT(dev), "sm501.local",
+>                             local_mem_bytes, &error_fatal);
+>      vmstate_register_ram_global(&s->local_mem_region);
+>      memory_region_set_log(&s->local_mem_region, true, DIRTY_MEMORY_VGA);
+>      s->local_mem = memory_region_get_ram_ptr(&s->local_mem_region);
+> -    memory_region_add_subregion(address_space_mem, base, &s->local_mem_region);
+> -
+> -    /* map mmio */
+> -    memory_region_init_io(sm501_system_config, NULL, &sm501_system_config_ops,
+> -                          s, "sm501-system-config", 0x6c);
+> -    memory_region_add_subregion(address_space_mem, base + MMIO_BASE_OFFSET,
+> -                                sm501_system_config);
+> -    memory_region_init_io(sm501_disp_ctrl, NULL, &sm501_disp_ctrl_ops, s,
+> +
+> +    /* allocate mmio */
+> +    memory_region_init(&s->mmio_region, OBJECT(dev), "sm501.mmio", MMIO_SIZE);
+> +    mr = g_new(MemoryRegion, 1);
 
-Signed-off-by: Michal Marek <mmarek@suse.com>
----
- target/s390x/cpu_features.c |  6 ++++--
- target/s390x/cpu_features.h |  2 +-
- target/s390x/helper.h       |  2 ++
- target/s390x/insn-data.def  |  2 ++
- target/s390x/misc_helper.c  | 32 ++++++++++++++++++++++++++++++++
- target/s390x/translate.c    | 18 ++++++++++--------
- 6 files changed, 51 insertions(+), 11 deletions(-)
+There's no need to dynamically allocate any of these memory regions;
+just make them be MemoryRegion fields inside SM501State.
 
-diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-index 42fd9d792bc8..d77c560380c4 100644
---- a/target/s390x/cpu_features.c
-+++ b/target/s390x/cpu_features.c
-@@ -286,11 +286,11 @@ void s390_init_feat_bitmap(const S390FeatInit init, S390FeatBitmap bitmap)
-     }
- }
- 
--void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
-+int s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
-                           uint8_t *data)
- {
-     S390Feat feat;
--    int bit_nr;
-+    int bit_nr, res = 0;
- 
-     if (type == S390_FEAT_TYPE_STFL && test_bit(S390_FEAT_ZARCH, features)) {
-         /* z/Architecture is always active if around */
-@@ -303,9 +303,11 @@ void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
-             bit_nr = s390_features[feat].bit;
-             /* big endian on uint8_t array */
-             data[bit_nr / 8] |= 0x80 >> (bit_nr % 8);
-+            res = MAX(res, bit_nr / 8 + 1);
-         }
-         feat = find_next_bit(features, S390_FEAT_MAX, feat + 1);
-     }
-+    return res;
- }
- 
- void s390_add_from_feat_block(S390FeatBitmap features, S390FeatType type,
-diff --git a/target/s390x/cpu_features.h b/target/s390x/cpu_features.h
-index d66912178680..e3c41be08060 100644
---- a/target/s390x/cpu_features.h
-+++ b/target/s390x/cpu_features.h
-@@ -56,7 +56,7 @@ typedef uint64_t S390FeatInit[S390_FEAT_MAX / 64 + 1];
- const S390FeatDef *s390_feat_def(S390Feat feat);
- S390Feat s390_feat_by_type_and_bit(S390FeatType type, int bit);
- void s390_init_feat_bitmap(const S390FeatInit init, S390FeatBitmap bitmap);
--void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
-+int s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
-                           uint8_t *data);
- void s390_add_from_feat_block(S390FeatBitmap features, S390FeatType type,
-                           uint8_t *data);
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 9102071d0aa4..4d703990d5d7 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -95,6 +95,8 @@ DEF_HELPER_FLAGS_1(stckc, TCG_CALL_NO_RWG, i64, env)
- DEF_HELPER_FLAGS_2(spt, TCG_CALL_NO_RWG, void, env, i64)
- DEF_HELPER_FLAGS_1(stpt, TCG_CALL_NO_RWG, i64, env)
- DEF_HELPER_4(stsi, i32, env, i64, i64, i64)
-+DEF_HELPER_1(stfl, void, env)
-+DEF_HELPER_3(stfle, i64, env, i64, i64)
- DEF_HELPER_FLAGS_4(lctl, TCG_CALL_NO_WG, void, env, i32, i64, i32)
- DEF_HELPER_FLAGS_4(lctlg, TCG_CALL_NO_WG, void, env, i32, i64, i32)
- DEF_HELPER_FLAGS_4(stctl, TCG_CALL_NO_WG, void, env, i32, i64, i32)
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 075ff597c3de..be830a42ed8d 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -899,6 +899,8 @@
-     C(0xb202, STIDP,   S,     Z,   la2, 0, new, m1_64, stidp, 0)
- /* STORE CPU TIMER */
-     C(0xb209, STPT,    S,     Z,   la2, 0, new, m1_64, stpt, 0)
-+/* STORE FACILITY LIST EXTENDED */
-+    C(0xb2b0, STFLE,   S,  SFLE,   0, a2, 0, 0, stfle, 0)
- /* STORE FACILITY LIST */
-     C(0xb2b1, STFL,    S,     Z,   0, 0, 0, 0, stfl, 0)
- /* STORE PREFIX */
-diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-index c9604ea9c728..b513c0c66541 100644
---- a/target/s390x/misc_helper.c
-+++ b/target/s390x/misc_helper.c
-@@ -500,6 +500,38 @@ uint32_t HELPER(stsi)(CPUS390XState *env, uint64_t a0,
-     return cc;
- }
- 
-+static int do_stfle(CPUS390XState *env, uint64_t addr, int len)
-+{
-+    S390CPU *cpu = s390_env_get_cpu(env);
-+    uint8_t data[64];
-+    int res;
-+
-+    memset(data, 0, sizeof(data));
-+    res = s390_fill_feat_block(cpu->model->features, S390_FEAT_TYPE_STFL, data);
-+    cpu_physical_memory_write(addr, data, MIN(res, len));
-+
-+    return res;
-+}
-+
-+uint64_t HELPER(stfle)(CPUS390XState *env, uint64_t a0, uint64_t r0)
-+{
-+    int need, len = r0 & 0xff;
-+
-+    need = do_stfle(env, a0, len * 8);
-+    need = DIV_ROUND_UP(need, 8);
-+    if (need <= len)
-+        env->cc_op = 0;
-+    else
-+        env->cc_op = 3;
-+
-+    return (r0 & ~0xffLL) | (need - 1);
-+}
-+
-+void HELPER(stfl)(CPUS390XState *env)
-+{
-+    do_stfle(env, 200, 4);
-+}
-+
- uint32_t HELPER(sigp)(CPUS390XState *env, uint64_t order_code, uint32_t r1,
-                       uint64_t cpu_addr)
- {
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 01c62176bf70..aff9a0bef549 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -3628,15 +3628,17 @@ static ExitStatus op_spt(DisasContext *s, DisasOps *o)
- 
- static ExitStatus op_stfl(DisasContext *s, DisasOps *o)
- {
--    TCGv_i64 f, a;
--    /* We really ought to have more complete indication of facilities
--       that we implement.  Address this when STFLE is implemented.  */
-     check_privileged(s);
--    f = tcg_const_i64(0xc0000000);
--    a = tcg_const_i64(200);
--    tcg_gen_qemu_st32(f, a, get_mem_index(s));
--    tcg_temp_free_i64(f);
--    tcg_temp_free_i64(a);
-+    gen_helper_stfl(cpu_env);
-+    return NO_EXIT;
-+}
-+
-+static ExitStatus op_stfle(DisasContext *s, DisasOps *o)
-+{
-+    check_privileged(s);
-+    potential_page_fault(s);
-+    gen_helper_stfle(regs[0], cpu_env, o->in2, regs[0]);
-+    set_cc_static(s);
-     return NO_EXIT;
- }
- 
--- 
-2.10.2
+> +    memory_region_init_io(mr, OBJECT(dev), &sm501_system_config_ops, s,
+> +                          "sm501-system-config", 0x6c);
+> +    memory_region_add_subregion(&s->mmio_region, SM501_SYS_CONFIG, mr);
+> +    mr = g_new(MemoryRegion, 1);
+> +    memory_region_init_io(mr, OBJECT(dev), &sm501_disp_ctrl_ops, s,
+>                            "sm501-disp-ctrl", 0x1000);
+> -    memory_region_add_subregion(address_space_mem,
+> -                                base + MMIO_BASE_OFFSET + SM501_DC,
+> -                                sm501_disp_ctrl);
+> -    memory_region_init_io(sm501_2d_engine, NULL, &sm501_2d_engine_ops, s,
+> +    memory_region_add_subregion(&s->mmio_region, SM501_DC, mr);
+> +    mr = g_new(MemoryRegion, 1);
+> +    memory_region_init_io(mr, OBJECT(dev), &sm501_2d_engine_ops, s,
+>                            "sm501-2d-engine", 0x54);
+> -    memory_region_add_subregion(address_space_mem,
+> -                                base + MMIO_BASE_OFFSET + SM501_2D_ENGINE,
+> -                                sm501_2d_engine);
+> +    memory_region_add_subregion(&s->mmio_region, SM501_2D_ENGINE, mr);
+> +
+> +    /* create qemu graphic console */
+> +    s->con = graphic_console_init(DEVICE(dev), 0, &sm501_ops, s);
+> +}
+> +
+> +#define TYPE_SYSBUS_SM501 "sysbus-sm501"
+> +#define SYSBUS_SM501(obj) \
+> +    OBJECT_CHECK(SM501SysBusState, (obj), TYPE_SYSBUS_SM501)
+> +
+> +typedef struct {
+> +    /*< private >*/
+> +    SysBusDevice parent_obj;
+> +    /*< public >*/
+> +    SM501State state;
+> +    uint32_t vram_size;
+> +    uint32_t base;
+> +    void *chr_state;
+> +} SM501SysBusState;
+> +
+> +static void sm501_realize_sysbus(DeviceState *dev, Error **errp)
+> +{
+> +    SM501SysBusState *s = SYSBUS_SM501(dev);
+> +    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+> +    DeviceState *usb_dev;
+> +
+> +    sm501_init(&s->state, dev, s->base, s->vram_size);
+> +    sysbus_init_mmio(sbd, &s->state.local_mem_region);
+> +    sysbus_init_mmio(sbd, &s->state.mmio_region);
+>
+>      /* bridge to usb host emulation module */
+> -    dev = qdev_create(NULL, "sysbus-ohci");
+> -    qdev_prop_set_uint32(dev, "num-ports", 2);
+> -    qdev_prop_set_uint64(dev, "dma-offset", base);
+> -    qdev_init_nofail(dev);
+> -    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0,
+> -                    base + MMIO_BASE_OFFSET + SM501_USB_HOST);
+> -    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, irq);
+> +    usb_dev = qdev_create(NULL, "sysbus-ohci");
+> +    qdev_prop_set_uint32(usb_dev, "num-ports", 2);
+> +    qdev_prop_set_uint64(usb_dev, "dma-offset", s->base);
+> +    qdev_init_nofail(usb_dev);
+
+Why is a display controller device creating a USB controller?
+This looks like something that should be being done by the board.
+
+> +    memory_region_add_subregion(&s->state.mmio_region, SM501_USB_HOST,
+> +                       sysbus_mmio_get_region(SYS_BUS_DEVICE(usb_dev), 0));
+> +    sysbus_pass_irq(sbd, SYS_BUS_DEVICE(usb_dev));
+>
+>      /* bridge to serial emulation module */
+> -    if (chr) {
+> -        serial_mm_init(address_space_mem,
+> -                       base + MMIO_BASE_OFFSET + SM501_UART0, 2,
+> +    if (s->chr_state) {
+> +        serial_mm_init(&s->state.mmio_region, SM501_UART0, 2,
+>                         NULL, /* TODO : chain irq to IRL */
+> -                       115200, chr, DEVICE_NATIVE_ENDIAN);
+> +                       115200, s->chr_state, DEVICE_NATIVE_ENDIAN);
+>      }
+> +}
+
+Similarly, what's going on here with the serial?
+
+>
+> -    /* create qemu graphic console */
+> -    s->con = graphic_console_init(DEVICE(dev), 0, &sm501_ops, s);
+> +static Property sm501_sysbus_properties[] = {
+> +    DEFINE_PROP_UINT32("vram-size", SM501SysBusState, vram_size, 0),
+> +    DEFINE_PROP_UINT32("base", SM501SysBusState, base, 0),
+> +    DEFINE_PROP_PTR("chr-state", SM501SysBusState, chr_state),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+
+> +static void sm501_sysbus_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->realize = sm501_realize_sysbus;
+> +    set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
+> +    dc->desc = "SM501 Multimedia Companion";
+> +    dc->props = sm501_sysbus_properties;
+> +/* Note: pointer property "chr-state" may remain null, thus
+> + * no need for dc->cannot_instantiate_with_device_add_yet = true;
+> + */
+> }
+
+You also need a VMState struct registered in dc->vmsd and a reset
+function registered in dc->reset.
+
+thanks
+-- PMM
