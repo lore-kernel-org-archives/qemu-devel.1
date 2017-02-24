@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1chA7D-0000vQ-2L
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 02:16:31 -0500
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1chAEp-0004p8-9v
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 02:24:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1chA79-00030s-4U
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 02:16:31 -0500
-Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:33410)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1chA78-00030m-UL
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 02:16:27 -0500
-Received: by mail-wr0-x22f.google.com with SMTP id u47so7318437wrb.0
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 23:16:26 -0800 (PST)
-References: <20170223182927.7166-1-alex.bennee@linaro.org>
-	<fd54d371-fdc2-5eb7-ac94-5817cf7a4eb5@twiddle.net>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <fd54d371-fdc2-5eb7-ac94-5817cf7a4eb5@twiddle.net>
-Date: Fri, 24 Feb 2017 07:16:24 +0000
-Message-ID: <87wpcgxdmf.fsf@linaro.org>
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1chAEl-0005An-CL
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 02:24:23 -0500
+Received: from [59.151.112.132] (port=7392 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1chAEl-00059n-05
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 02:24:19 -0500
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Date: Fri, 24 Feb 2017 15:22:49 +0800
+Message-ID: <1487920971-16519-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v14 00/24] MTTCG Base enabling patches with
- ARM enablement
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH V9 0/2] Add new qmp commands to suppurt Xen COLO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +23,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, bamvor.zhangjian@linaro.org
+To: qemu devel <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Markus Armbruster <armbru@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
+Cc: Jason Wang <jasowang@redhat.com>, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>
+
+Xen COLO depend on qemu COLO replication function.
+So, We need new qmp commands for Xen to use qemu replication.
+
+Corresponding libxl patches already in xen.git.
+Commit ID:
+
+ed37ef1f91c20f0ab162ce60f8c38400b917fa64
+COLO: introduce new API to prepare/start/do/get_error/stop replication
+
+a0ddc0b359375b2418213966dfbdbfab593ecc6f
+tools/libxl: introduction of libxl__qmp_restore to load qemu state
 
 
-Richard Henderson <rth@twiddle.net> writes:
+Zhang Chen (2):
+  Add a new qmp command to start/stop replication
+  Add a new qmp command to do checkpoint, query xen replication status
 
-> On 02/24/2017 05:29 AM, Alex Bennée wrote:
->> Hi Richard/Peter,
->>
->> Well obviously it was expecting a bit much for v13 to pass with flying
->> colours. A merge failure which didn't affect ARM caused the
->> regressions on other platforms resulting in the iothread not being
->> released during cpu_handle_interrupt. This fix has been merged into
->> Jan's drop global lock patch. I also fixed a whitespace issue on the
->> error_report/printf for the memory order check.
->
-> LGTM.  I've re-tested with Alpha and everything seems to be ok.
-> You've got all of my R-B already.
+ migration/colo.c | 49 +++++++++++++++++++++++++++++++++++++
+ qapi-schema.json | 74 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 123 insertions(+)
 
-Cool.
-
->> So if you are happy are you going to be able to submit the pull
->> request before the soft-freeze kicks in?
->
-> Are you looking for someone else to sent the pull?  I suspect that
-> Peter and I are happy for you to do so.
-
-I was following convention:
-
-  "Generally only existing submaintainers of a tree will need to submit
-  pull requests, although occasionally for a large patch series we might
-  ask a submitter to send a pull request. "
-
-So if Peter is happy I'll send the pullreq today. Peter?
-
---
-Alex Bennée
+-- 
+2.7.4
