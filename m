@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1chHMX-0000uS-7y
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 10:00:50 -0500
+	(envelope-from <armbru@redhat.com>) id 1chHNq-0002sK-Jv
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 10:02:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1chHMW-00046o-E4
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 10:00:49 -0500
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:36693)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1chHMW-00046W-7k
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 10:00:48 -0500
-Received: by mail-wm0-x231.google.com with SMTP id v77so16446740wmv.1
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 07:00:47 -0800 (PST)
+	(envelope-from <armbru@redhat.com>) id 1chHNn-0004eA-Ia
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 10:02:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52856)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1chHNn-0004dh-DU
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 10:02:07 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7538580496
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 15:02:07 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <1487886317-27400-1-git-send-email-armbru@redhat.com>
+	<1487886317-27400-18-git-send-email-armbru@redhat.com>
+	<6ab9e2cd-edbe-b167-8a16-bf9c00c110ac@redhat.com>
+Date: Fri, 24 Feb 2017 16:02:03 +0100
+In-Reply-To: <6ab9e2cd-edbe-b167-8a16-bf9c00c110ac@redhat.com> (Paolo
+	Bonzini's message of "Fri, 24 Feb 2017 10:27:15 +0100")
+Message-ID: <87bmtraaz8.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1487943877-17318-1-git-send-email-kraxel@redhat.com>
-References: <1487943877-17318-1-git-send-email-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Feb 2017 15:00:26 +0000
-Message-ID: <CAFEAcA8LTg6hb_R6NVvPFMUmnY5VNqE+SRF1Tg0ChxbK09D2VQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL v2 0/1] cirrus: add blit_is_unsafe call to
- cirrus_bitblt_cputovideo (CVE-2017-2620)
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 17/21] qapi: Drop unused non-strict qobject
+ input visitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +35,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 24 February 2017 at 13:44, Gerd Hoffmann <kraxel@redhat.com> wrote:
->   Hi,
->
-> v2, this time with qemu-stable Cc'ed.
->
-> please pull,
->   Gerd
->
-> The following changes since commit 10f25e4844cb9b3f02fb032f88051dd5b65b4206:
->
->   Merge remote-tracking branch 'remotes/yongbok/tags/mips-20170222' into staging (2017-02-23 09:59:40 +0000)
->
-> are available in the git repository at:
->
->
->   git://git.kraxel.org/qemu tags/pull-cve-2017-2620-20170224-1
->
-> for you to fetch changes up to 92f2b88cea48c6aeba8de568a45f2ed958f3c298:
->
->   cirrus: add blit_is_unsafe call to cirrus_bitblt_cputovideo (CVE-2017-2620) (2017-02-24 14:35:50 +0100)
->
-> ----------------------------------------------------------------
-> cirrus: add blit_is_unsafe call to cirrus_bitblt_cputovideo (CVE-2017-2620)
->
-> ----------------------------------------------------------------
-> Gerd Hoffmann (1):
->       cirrus: add blit_is_unsafe call to cirrus_bitblt_cputovideo (CVE-2017-2620)
->
->  hw/display/cirrus_vga.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
->
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Applied, thanks.
+> On 23/02/2017 22:45, Markus Armbruster wrote:
+>> The split between tests/test-qobject-input-visitor.c and
+>> tests/test-qobject-input-strict.c now makes less sense than ever.  The
+>> next commit will take care of that.
+>
+> I'm actually adding a use for non-strict visitors (and one that makes
+> sense IMHO, with comments, testcases and all that :)).  See
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg432069.html.
 
--- PMM
+I replied.
+
+> For what it's worth, however, I believe that even non-strict visits
+> should detect unvisited list tails.
+
+Bit of an asymmetry.  Not sure it matters, because to not visit list
+tails, you have to put in some effort.
