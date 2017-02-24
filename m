@@ -1,19 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1chIMO-00023Y-92
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:04:45 -0500
+	(envelope-from <lvivier@redhat.com>) id 1chIO2-00039L-K6
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:06:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1chIMN-0003F8-9O
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:04:44 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <87bmukmlau.fsf@dusky.pond.sub.org>
-Date: Fri, 24 Feb 2017 17:04:34 +0100
-In-Reply-To: <87bmukmlau.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-	of "Thu, 02 Feb 2017 20:42:33 +0100")
-Message-ID: <87o9xr60dp.fsf@dusky.pond.sub.org>
+	(envelope-from <lvivier@redhat.com>) id 1chINy-0003fc-9P
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:06:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49308)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1chINy-0003fE-2c
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:06:22 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4ED57C04B927
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 16:06:22 +0000 (UTC)
+References: <20170206173306.20603-1-dgilbert@redhat.com>
+	<20170206173306.20603-13-dgilbert@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <310a2727-de95-97f0-aa3e-34d1774cbe41@redhat.com>
+Date: Fri, 24 Feb 2017 17:06:19 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] Non-flat command line option argument syntax
+In-Reply-To: <20170206173306.20603-13-dgilbert@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 12/16] postcopy: Send whole huge pages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,59 +33,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com
+Cc: aarcange@redhat.com
 
-Markus Armbruster <armbru@redhat.com> writes:
-
-[...]
-> === Dotted keys ===
->
-> One sufficiently powerful syntax extension already exists: the dotted
-> key convention.  It's syntactically unambiguous only when none of the
-> KEYs involved contains '.'  To adopt it across the board, we'd have to
-> outlaw '.' in KEYs.  QAPI outlaws '.' already,
-
-*Except* in __RFQDN_ prefixes.
-
-Say example.com needs to add a downstream extension to block driver
-"raw".  Following QAPI rules, they add to to struct BlockdevOptionsRaw a
-new optional member:
-
-    '*__com.example_medium-rare': 'bool'
-
-On the command line, this looks like
-
-    -blockdev node-name=foo,driver=raw,__com.example_medium-rare=on,file.driver=file,file.filename=foo.img
-
-Dotted keys parse this as a reference to member __com's member
-example_medium-rare.
-
-Possible solutions:
-
-(a) Outlaw domain names with '_'.  If KEY starts with "__", everything
-    up to the third '_' is an __RFQDN_ prefix.
-
-(b) Outlaw '_' in the name part that follows __RFQDN_.  If KEY starts
-    with "__", everything up to the last '_' is an __RFQDN_ prefix.
-
-(c) Your bright idea.
-
-I think (b) should do.  QAPI prefers '-' over '_' for new member names
-anyway.
-
->                                                but we have a bunch of
-> QOM properties names with '.'.  We'd have to rename at least the ones
-> that need to be accessible in -object.
->
-> Dotted keys can't express member names that look like integers.  We'd
-> have to outlaw them at least for the objects that are accessible on the
-> command line.  Once again, QAPI outlaws such names already.  QOM is
-> anarchy when it comes to names, however.
->
-> The way dotted keys do arrays is inconsistent with how QOM's automatic
-> arrayification (commit 3396590) do them: foo.0 vs. foo[0].  Backward
-> compatibility makes changing the dotted key convention awkward.  Perhaps
-> we can still change QOM.
-
-[...]
+On 06/02/2017 18:33, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> The RAM save code uses ram_save_host_page to send whole
+> host pages at a time;  change this to use the host page size associated
+> with the RAM Block which may be a huge page.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  migration/ram.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 88d9444..2350f71 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -1281,6 +1281,8 @@ static int ram_save_target_page(MigrationState *ms, QEMUFile *f,
+>   *                     offset to point into the middle of a host page
+>   *                     in which case the remainder of the hostpage is sent.
+>   *                     Only dirty target pages are sent.
+> + *                     Note that the host page size may be a huge page for this
+> + *                     block.
+>   *
+>   * Returns: Number of pages written.
+>   *
+> @@ -1299,6 +1301,8 @@ static int ram_save_host_page(MigrationState *ms, QEMUFile *f,
+>                                ram_addr_t dirty_ram_abs)
+>  {
+>      int tmppages, pages = 0;
+> +    size_t pagesize = qemu_ram_pagesize(pss->block);
+> +
+>      do {
+>          tmppages = ram_save_target_page(ms, f, pss, last_stage,
+>                                          bytes_transferred, dirty_ram_abs);
+> @@ -1309,7 +1313,7 @@ static int ram_save_host_page(MigrationState *ms, QEMUFile *f,
+>          pages += tmppages;
+>          pss->offset += TARGET_PAGE_SIZE;
+>          dirty_ram_abs += TARGET_PAGE_SIZE;
+> -    } while (pss->offset & (qemu_host_page_size - 1));
+> +    } while (pss->offset & (pagesize - 1));
+>  
+>      /* The offset we leave with is the last one we looked at */
+>      pss->offset -= TARGET_PAGE_SIZE;
+> 
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
