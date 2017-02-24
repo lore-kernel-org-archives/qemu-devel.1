@@ -1,19 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1chHOh-0003vg-FK
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 10:03:04 -0500
+	(envelope-from <Chris.Friesen@windriver.com>) id 1chHW4-00011C-WD
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 10:10:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1chHOg-0005G5-1N
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 10:03:03 -0500
-Date: Fri, 24 Feb 2017 16:02:50 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170224150250.GB4429@noname.redhat.com>
-References: <1487680191-13096-1-git-send-email-pl@kamp.de>
+	(envelope-from <Chris.Friesen@windriver.com>) id 1chHW0-0000Le-09
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 10:10:40 -0500
+Received: from mail5.windriver.com ([192.103.53.11]:42344 helo=mail5.wrs.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Chris.Friesen@windriver.com>)
+	id 1chHVz-0000KZ-MH
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 10:10:35 -0500
+Message-ID: <58B04CD3.7010304@windriver.com>
+Date: Fri, 24 Feb 2017 09:10:11 -0600
+From: Chris Friesen <chris.friesen@windriver.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1487680191-13096-1-git-send-email-pl@kamp.de>
-Subject: Re: [Qemu-devel] [PATCH] qemu-img: make convert async
+References: <589C7E96.9060905@huawei.com> <589D83CE.1090803@huawei.com>
+	<589DDC05.9010807@windriver.com> <58AA51D6.6020508@huawei.com>
+	<1487565495.3740.27.camel@intel.com> <58AD0094.90304@windriver.com>
+	<4dd92012-626a-2d80-9adb-0be398f73eb1@redhat.com>
+	<58AD92AE.6040502@windriver.com>
+	<6c5567f4-192d-aefd-90e4-89f53479c24e@redhat.com>
+	<58AF9921.6060201@huawei.com>
+In-Reply-To: <58AF9921.6060201@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] kvm bug in __rmap_clear_dirty during live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,216 +33,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, stefanha@gmail.com, ct@flyingcircus.io, mreitz@redhat.com, famz@redhat.com, eblake@redhat.com
+To: "Herongguang (Stephen)" <herongguang.he@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, "Han, Huaitong" <huaitong.han@intel.com>, "hangaohuai@huawei.com" <hangaohuai@huawei.com>, stable@vger.kernel.org
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "fangying1@huawei.com" <fangying1@huawei.com>, "xudong.hao@linux.intel.com" <xudong.hao@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "wangxinxin.wang@huawei.com" <wangxinxin.wang@huawei.com>, "kai.huang@linux.intel.com" <kai.huang@linux.intel.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "guangrong.xiao@linux.intel.com" <guangrong.xiao@linux.intel.com>, linux-kernel@vger.kernel.org
 
-Am 21.02.2017 um 13:29 hat Peter Lieven geschrieben:
-> the convert process is currently completely implemented with sync operations.
-> That means it reads one buffer and then writes it. No parallelism and each sync
-> request takes as long as it takes until it is completed.
-> 
-> This can be a big performance hit when the convert process reads and writes
-> to devices which do not benefit from kernel readahead or pagecache.
-> In our environment we heavily have the following two use cases when using
-> qemu-img convert.
-> 
-> a) reading from NFS and writing to iSCSI for deploying templates
-> b) reading from iSCSI and writing to NFS for backups
-> 
-> In both processes we use libiscsi and libnfs so we have no kernel cache.
-> 
-> This patch changes the convert process to work with parallel running coroutines
-> which can significantly improve performance for network storage devices:
-> 
-> qemu-img (master)
->  nfs -> iscsi 22.8 secs
->  nfs -> ram   11.7 secs
->  ram -> iscsi 12.3 secs
-> 
-> qemu-img-async (8 coroutines, in-order write disabled)
->  nfs -> iscsi 11.0 secs
->  nfs -> ram   10.4 secs
->  ram -> iscsi  9.0 secs
-> 
-> This patches introduces 2 new cmdline parameters. The -m parameter to specify
-> the number of coroutines running in parallel (defaults to 8). And the -W paremeter to
-> allow qemu-img to write to the target out of order rather than sequential. This improves
-> performance as the writes do not have to wait for each other to complete.
-> 
-> Signed-off-by: Peter Lieven <pl@kamp.de>
+On 02/23/2017 08:23 PM, Herongguang (Stephen) wrote:
 
-> @@ -1563,9 +1581,13 @@ static int convert_read(ImgConvertState *s, int64_t sector_num, int nb_sectors,
->          blk = s->src[s->src_cur];
->          bs_sectors = s->src_sectors[s->src_cur];
->  
->          n = MIN(nb_sectors, bs_sectors - (sector_num - s->src_cur_offset));
+> On 2017/2/22 22:43, Paolo Bonzini wrote:
 
-convert_co_read() uses global state here (s->src, s->src_cur,
-s->src_cur_offset) while not running under a lock. Are you sure that
-this is correct when some coroutines are operating on the first source
-image, but others are already working on the second one?
+>> Hopefully Gaohuai and Rongguang can help with this too.
+>>
+>> Paolo
+>>
+>> .
+>>
+> Yes, we are looking into and testing this.
+>
+> I think this can result in any memory corruption, if VM1 writes its
+> PML buffer into VM2=E2=80=99s VMCS (since sched_in/sched_out notifier o=
+f VM1
+> is not registered yet), then VM1 is destroyed (hence its PML buffer
+> is freed back to kernel), after that, VM2 starts migration, so CPU
+> logs VM2=E2=80=99s dirty GFNS into a freed memory, results in any memor=
+y corruption.
+>
+> As its severity, this commit
+> (http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/=
+?id=3D4e59516a12a6ef6dcb660cb3a3f70c64bd60cfec)
+>
+> is eligible to back port to kernel stable.
+>
 
-The same variables are used in convert_iteration_sectors(), but I think
-there it's okay because we're just starting a new request and are
-holding s->lock.
+Are we expecting that fix to resolve the original issue, or is it a separ=
+ate=20
+issue that needs fixing in stable?
 
-> @@ -1651,12 +1685,122 @@ static int convert_write(ImgConvertState *s, int64_t sector_num, int nb_sectors,
->      return 0;
->  }
->  
-> -static int convert_do_copy(ImgConvertState *s)
-> +static void coroutine_fn convert_co_do_copy(void *opaque)
->  {
-> +    ImgConvertState *s = opaque;
->      uint8_t *buf = NULL;
-> -    int64_t sector_num, allocated_done;
-> -    int ret;
-> -    int n;
-> +    int ret, i;
-> +    int index = -1;
-> +
-> +    for (i = 0; i < s->num_coroutines; i++) {
-> +        if (s->co[i] == qemu_coroutine_self()) {
-> +            index = i;
-> +            break;
-> +        }
-> +    }
-> +    assert(index >= 0);
-> +
-> +    s->running_coroutines++;
-> +    buf = blk_blockalign(s->target, s->buf_sectors * BDRV_SECTOR_SIZE);
-> +
-> +    while (1) {
-> +        int n;
-> +        int64_t sector_num;
-> +        enum ImgConvertBlockStatus status;
-> +
-> +        qemu_co_mutex_lock(&s->lock);
-> +        if (s->ret != -EINPROGRESS || s->sector_num >= s->total_sectors) {
-> +            qemu_co_mutex_unlock(&s->lock);
-> +            goto out;
-> +        }
-> +        n = convert_iteration_sectors(s, s->sector_num);
-> +        if (n < 0) {
-> +            qemu_co_mutex_unlock(&s->lock);
-> +            s->ret = n;
-> +            goto out;
-> +        }
-> +        /* safe current sector and allocation status to local variables */
-
-s/safe/save/
-
-> +        sector_num = s->sector_num;
-> +        status = s->status;
-> +        if (!s->min_sparse && s->status == BLK_ZERO) {
-> +            n = MIN(n, s->buf_sectors);
-> +        }
-> +        /* increment global sector counter so that other coroutines can
-> +         * already continue reading beyond this request */
-> +        s->sector_num += n;
-> +        qemu_co_mutex_unlock(&s->lock);
-
-Here we unlock, so after this point we can only access globally valid
-values from s, but not request-specific ones like s->status or
-s->sector_num...
-
-> +        if (status == BLK_DATA || (!s->min_sparse && s->status == BLK_ZERO)) {
-
-...but s->status is used here...
-
-> +            s->allocated_done += n;
-> +            qemu_progress_print(100.0 * s->allocated_done /
-> +                                        s->allocated_sectors, 0);
-> +        }
-> +
-> +        if (status == BLK_DATA) {
-> +            ret = convert_co_read(s, sector_num, n, buf);
-> +            if (ret < 0) {
-> +                error_report("error while reading sector %" PRId64
-> +                             ": %s", sector_num, strerror(-ret));
-> +                s->ret = ret;
-> +                goto out;
-> +            }
-> +        } else if (!s->min_sparse && s->status == BLK_ZERO) {
-
-...and here.
-
-> +            status = BLK_DATA;
-> +            memset(buf, 0x00, n * BDRV_SECTOR_SIZE);
-> +        }
-> +
-> +        if (s->wr_in_order) {
-> +            /* keep writes in order */
-> +            while (s->wr_offs != sector_num) {
-> +                if (s->ret != -EINPROGRESS) {
-> +                    goto out;
-> +                }
-> +                s->wait_sector_num[index] = sector_num;
-> +                qemu_coroutine_yield();
-> +            }
-> +            s->wait_sector_num[index] = -1;
-> +        }
-> +
-> +        ret = convert_co_write(s, sector_num, n, buf, status);
-> +        if (ret < 0) {
-> +            error_report("error while writing sector %" PRId64
-> +                         ": %s", sector_num, strerror(-ret));
-> +            s->ret = ret;
-> +            goto out;
-> +        }
-> +
-> +        if (s->wr_in_order) {
-> +            /* reenter the coroutine that might have waited
-> +             * for this write to complete */
-> +            s->wr_offs = sector_num + n;
-> +            for (i = 0; i < s->num_coroutines; i++) {
-> +                if (s->co[i] && s->wait_sector_num[i] == s->wr_offs) {
-> +                    /*
-> +                     * A -> B -> A cannot occur because A has
-> +                     * s->wait_sector_num[i] == -1 during A -> B. Therefore
-> +                     * B will never enter A during this time window.
-> +                     */
-> +                    qemu_coroutine_enter(s->co[i]);
-> +                    break;
-> +                }
-> +            }
-> +        }
-> +    }
-> +
-> +out:
-> +    qemu_vfree(buf);
-> +    s->co[index] = NULL;
-> +    s->running_coroutines--;
-> +    if (!s->running_coroutines && s->ret == -EINPROGRESS) {
-> +        /* the convert job finished successfully */
-> +        s->ret = 0;
-> +    }
-> +}
-> diff --git a/qemu-img.texi b/qemu-img.texi
-> index 174aae3..6715ff3 100644
-> --- a/qemu-img.texi
-> +++ b/qemu-img.texi
-> @@ -137,6 +137,12 @@ Parameters to convert subcommand:
->  
->  @item -n
->  Skip the creation of the target volume
-> +@item -m
-> +Number of parallel coroutines for the convert process
-> +@item -W
-> +Allow to write out of order to the destination. This is option improves performance,
-> +but is only recommened for preallocated devices like host devices or other
-> +raw block devices.
->  @end table
->  
->  Parameters to dd subcommand:
-> @@ -296,7 +302,7 @@ Error on reading data
->  
->  @end table
->  
-> -@item convert [-c] [-p] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-o @var{options}] [-s @var{snapshot_id_or_name}] [-l @var{snapshot_param}] [-S @var{sparse_size}] @var{filename} [@var{filename2} [...]] @var{output_filename}
-> +@item convert [-c] [-p] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-o @var{options}] [-s @var{snapshot_id_or_name}] [-l @var{snapshot_param}] [-m @var{num_coroutines}] [-W] {[-S @var{sparse_size}] @var{filename} [@var{filename2} [...]] @var{output_filename}
-
-The extra { before -S causes 'make qemu-doc.html' to fail (as reported
-by patchew).
-
-Kevin
+Chris
