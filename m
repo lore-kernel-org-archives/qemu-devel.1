@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clement.deschamps@antfield.fr>) id 1chCTB-0002LT-Pp
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:47:22 -0500
+	(envelope-from <gregkh@linuxfoundation.org>) id 1chCfU-00017X-W9
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 05:00:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clement.deschamps@antfield.fr>) id 1chCTB-0002Sy-42
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:47:21 -0500
-References: <20170222112338.25492-1-clement.deschamps@antfield.fr>
-	<20170222112338.25492-3-clement.deschamps@antfield.fr>
-	<CAFEAcA_jPaQxfoXKz82WaQ+62krkbQ7RCm66DeELj30jOE7_Xg@mail.gmail.com>
-From: Clement Deschamps <clement.deschamps@antfield.fr>
-Message-ID: <5e429ced-9e7b-cf9e-ed73-1b9dd8baa46b@antfield.fr>
-Date: Fri, 24 Feb 2017 10:47:19 +0100
+	(envelope-from <gregkh@linuxfoundation.org>) id 1chCfR-000732-S2
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 05:00:05 -0500
+Received: from mail.linuxfoundation.org ([140.211.169.12]:51318)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <gregkh@linuxfoundation.org>)
+	id 1chCfR-0006y8-NO
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 05:00:01 -0500
+Date: Fri, 24 Feb 2017 10:59:51 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+Message-ID: <20170224095951.GA11626@kroah.com>
+References: <589D83CE.1090803@huawei.com> <589DDC05.9010807@windriver.com>
+	<58AA51D6.6020508@huawei.com> <1487565495.3740.27.camel@intel.com>
+	<58AD0094.90304@windriver.com>
+	<4dd92012-626a-2d80-9adb-0be398f73eb1@redhat.com>
+	<58AD92AE.6040502@windriver.com>
+	<6c5567f4-192d-aefd-90e4-89f53479c24e@redhat.com>
+	<58AF9921.6060201@huawei.com> <58AFFE55.20306@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_jPaQxfoXKz82WaQ+62krkbQ7RCm66DeELj30jOE7_Xg@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="WCpnN4GM5KEoATTgS600qIr1QjMf4Lrlg"
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] bcm2835_gpio: add bcm2835 gpio
- controller
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <58AFFE55.20306@huawei.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] kvm bug in __rmap_clear_dirty during live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,65 +34,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrew Baumann <andrew.baumann@microsoft.com>
+To: "Herongguang (Stephen)" <herongguang.he@huawei.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Chris Friesen <chris.friesen@windriver.com>, "Han, Huaitong" <huaitong.han@intel.com>, "hangaohuai@huawei.com" <hangaohuai@huawei.com>, stable@vger.kernel.org, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "fangying1@huawei.com" <fangying1@huawei.com>, "xudong.hao@linux.intel.com" <xudong.hao@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "wangxinxin.wang@huawei.com" <wangxinxin.wang@huawei.com>, "kai.huang@linux.intel.com" <kai.huang@linux.intel.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "guangrong.xiao@linux.intel.com" <guangrong.xiao@linux.intel.com>, linux-kernel@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WCpnN4GM5KEoATTgS600qIr1QjMf4Lrlg
-From: Clement Deschamps <clement.deschamps@antfield.fr>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- Andrew Baumann <andrew.baumann@microsoft.com>
-Message-ID: <5e429ced-9e7b-cf9e-ed73-1b9dd8baa46b@antfield.fr>
-Subject: Re: [PATCH v2 2/3] bcm2835_gpio: add bcm2835 gpio controller
-References: <20170222112338.25492-1-clement.deschamps@antfield.fr>
- <20170222112338.25492-3-clement.deschamps@antfield.fr>
- <CAFEAcA_jPaQxfoXKz82WaQ+62krkbQ7RCm66DeELj30jOE7_Xg@mail.gmail.com>
-In-Reply-To: <CAFEAcA_jPaQxfoXKz82WaQ+62krkbQ7RCm66DeELj30jOE7_Xg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Feb 24, 2017 at 05:35:17PM +0800, Herongguang (Stephen) wrote:
+>=20
+>=20
+> On 2017/2/24 10:23, Herongguang (Stephen) wrote:
+> >=20
+> >=20
+> > On 2017/2/22 22:43, Paolo Bonzini wrote:
+> > >=20
+> > >=20
+> > > On 22/02/2017 14:31, Chris Friesen wrote:
+> > > > > >=20
+> > > > >=20
+> > > > > Can you reproduce it with kernel 4.8+?  I'm suspecting commmit
+> > > > > 4e59516a12a6 ("kvm: vmx: ensure VMCS is current while enabling =
+PML",
+> > > > > 2016-07-14) to be the fix.
+> > > >=20
+> > > > I can't easily try with a newer kernel, the software package we'r=
+e using
+> > > > has kernel patches that would have to be ported.
+> > > >=20
+> > > > I'm at a conference, don't really have time to set up a pair of t=
+est
+> > > > machines from scratch with a custom kernel.
+> > >=20
+> > > Hopefully Gaohuai and Rongguang can help with this too.
+> > >=20
+> > > Paolo
+> > >=20
+> > > .
+> > >=20
+> > Yes, we are looking into and testing this.
+> >=20
+> > I think this can result in any memory corruption, if VM1 writes its
+> > PML buffer into VM2=E2=80=99s VMCS (since sched_in/sched_out notifier=
+ of VM1
+> > is not registered yet), then VM1 is destroyed (hence its PML buffer
+> > is freed back to kernel), after that, VM2 starts migration, so CPU
+> > logs VM2=E2=80=99s dirty GFNS into a freed memory, results in any mem=
+ory corruption.
+> >=20
+> > As its severity, this commit (http://git.kernel.org/cgit/linux/kernel=
+/git/torvalds/linux.git/commit/?id=3D4e59516a12a6ef6dcb660cb3a3f70c64bd60=
+cfec)
+> > is eligible to back port to kernel stable.
+>=20
+> Hi, Greg, can you cherry pick commit 4e59516a12a6ef6dcb660cb3a3f70c64bd=
+60cfec to 4.4-y?
 
-On 02/23/2017 08:08 PM, Peter Maydell wrote:
+If the KVM maintainers say it is ok to do so, yes, I will.
 
-> Do we also need to call the SD card object's reset method?
+thanks,
 
-On the real Raspberry Pi, I think that the card is not reset when
-switching SD controllers.
-
-> Apart from my comments above about the card-reparenting function
-> this looks OK to me (and I'd like to squeeze it into 2.9 if we
-> can; deadline for "patches reviewed and in pull requests is very
-> near though, 28th).
-
-Sounds great! I'll send a v3 ASAP.
-
-
-Best,
-Cl=C3=A9ment
-
-
-
---WCpnN4GM5KEoATTgS600qIr1QjMf4Lrlg
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJSBAEBCAA8FiEEaNi9eUaRP9BYKowJomWY3rxByn8FAliwASceHGNsZW1lbnQu
-ZGVzY2hhbXBzQGFudGZpZWxkLmZyAAoJEKJlmN68Qcp/eG8QAJzyiFOW04/aRzNV
-BeeEiKHd9pHT4YIZzgAd3zutMz3vPnlXsyfkYXq/J5z07vjghF1CyuMjZkYHu8eR
-82nMmIlx6F+ubmX52kUl/V9FYTIraAZukRdhy8ny3lq7UYt0JDOO1gzgxls69+uJ
-jXORsuVr8Kxf0ZMKlwvillbOG49JZWbn4452qPxg/Pu4DANTocfrIN7gyevZkBbk
-EPovez5oeA+FuCPmpAbiz90r2/ImqidOnv1R/w8bSETV6V8yhjDfGi8c+CvItRK5
-6N44eudxmD1YK1w234Zx3+GWaRhG0D0Cx4nNl6zG2zodsZf0dx70odWSAZe06h+L
-5rWUBJGTGwF4e46RjXEpKo9+gYfjFvSFxo2Nr/JVYgV/vnbmT9H0VkLBD/j5FppN
-kVc2b6rBbo4MerlfyJ4vrX7a29CkUsMItJFKWfn21j5HMznMAV8QZIYzm/OjH4UB
-2U51P375neJT1SyHujGavIjO9PNsAGWtCzh7pHZfYL7dahCfG7aPaiww7eMfAeWS
-+dxozKnNXQ0qDkMmdJJ8N+J2ej73eMD1SUAoj4RHSUMO1vOw6OQy50h1rQAojNlb
-IrdeUgM1uFRnfv4A12+4kkhtdwWVV5UNnNdzdlyt7lLVkg+1om0iaE7hh2budQwE
-BhpLMCRYItZOkID8XUjhPb77omnP
-=Xdmh
------END PGP SIGNATURE-----
-
---WCpnN4GM5KEoATTgS600qIr1QjMf4Lrlg--
+greg k-h
