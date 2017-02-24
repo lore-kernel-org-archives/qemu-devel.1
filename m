@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1chDwF-0007Gh-0t
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:21:28 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1chDwG-0007IB-FO
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:21:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1chDwC-0000Lo-Vp
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:21:26 -0500
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:36551)
+	(envelope-from <alex.bennee@linaro.org>) id 1chDwF-0000QU-7P
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:21:28 -0500
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:35695)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1chDwC-0000KH-QI
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:21:24 -0500
-Received: by mail-wm0-x235.google.com with SMTP id v77so11956428wmv.1
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 03:21:24 -0800 (PST)
+	id 1chDwF-0000PP-0x
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:21:27 -0500
+Received: by mail-wr0-x22d.google.com with SMTP id g10so9238029wrg.2
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 03:21:26 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 24 Feb 2017 11:20:57 +0000
-Message-Id: <20170224112109.3147-13-alex.bennee@linaro.org>
+Date: Fri, 24 Feb 2017 11:20:59 +0000
+Message-Id: <20170224112109.3147-15-alex.bennee@linaro.org>
 In-Reply-To: <20170224112109.3147-1-alex.bennee@linaro.org>
 References: <20170224112109.3147-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 12/24] tcg: handle EXCP_ATOMIC exception for
- system emulation
+Subject: [Qemu-devel] [PULL 14/24] cputlb: tweak
+ qemu_ram_addr_from_host_nofail reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,120 +31,59 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, Pranith Kumar <bobby.prani@gmail.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-From: Pranith Kumar <bobby.prani@gmail.com>
+This moves the helper function closer to where it is called and updates
+the error message to report via error_report instead of the deprecated
+fprintf.
 
-The patch enables handling atomic code in the guest. This should be
-preferably done in cpu_handle_exception(), but the current assumptions
-regarding when we can execute atomic sections cause a deadlock.
-
-The current mechanism discards the flags which were set in atomic
-execution. We ensure they are properly saved by calling the
-cc->cpu_exec_enter/leave() functions around the loop.
-
-As we are running cpu_exec_step_atomic() from the outermost loop we
-need to avoid an abort() when single stepping over atomic code since
-debug exception longjmp will point to the the setlongjmp in
-cpu_exec(). We do this by setting a new jmp_env so that it jumps back
-here on an exception.
-
-Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
-[AJB: tweak title, merge with new patches, add mmap_lock]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
-CC: Paolo Bonzini <pbonzini@redhat.com>
 ---
- cpu-exec.c | 43 +++++++++++++++++++++++++++++++------------
- cpus.c     |  9 +++++++++
- 2 files changed, 40 insertions(+), 12 deletions(-)
+ cputlb.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/cpu-exec.c b/cpu-exec.c
-index 2edd26e823..1a5ad4889d 100644
---- a/cpu-exec.c
-+++ b/cpu-exec.c
-@@ -228,24 +228,43 @@ static void cpu_exec_nocache(CPUState *cpu, int max_cycles,
- 
- static void cpu_exec_step(CPUState *cpu)
- {
-+    CPUClass *cc = CPU_GET_CLASS(cpu);
-     CPUArchState *env = (CPUArchState *)cpu->env_ptr;
-     TranslationBlock *tb;
-     target_ulong cs_base, pc;
-     uint32_t flags;
- 
-     cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
--    tb_lock();
--    tb = tb_gen_code(cpu, pc, cs_base, flags,
--                     1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
--    tb->orig_tb = NULL;
--    tb_unlock();
--    /* execute the generated code */
--    trace_exec_tb_nocache(tb, pc);
--    cpu_tb_exec(cpu, tb);
--    tb_lock();
--    tb_phys_invalidate(tb, -1);
--    tb_free(tb);
--    tb_unlock();
-+    if (sigsetjmp(cpu->jmp_env, 0) == 0) {
-+        mmap_lock();
-+        tb_lock();
-+        tb = tb_gen_code(cpu, pc, cs_base, flags,
-+                         1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
-+        tb->orig_tb = NULL;
-+        tb_unlock();
-+        mmap_unlock();
-+
-+        cc->cpu_exec_enter(cpu);
-+        /* execute the generated code */
-+        trace_exec_tb_nocache(tb, pc);
-+        cpu_tb_exec(cpu, tb);
-+        cc->cpu_exec_exit(cpu);
-+
-+        tb_lock();
-+        tb_phys_invalidate(tb, -1);
-+        tb_free(tb);
-+        tb_unlock();
-+    } else {
-+        /* We may have exited due to another problem here, so we need
-+         * to reset any tb_locks we may have taken but didn't release.
-+         * The mmap_lock is dropped by tb_gen_code if it runs out of
-+         * memory.
-+         */
-+#ifndef CONFIG_SOFTMMU
-+        tcg_debug_assert(!have_mmap_lock());
-+#endif
-+        tb_lock_reset();
-+    }
+diff --git a/cputlb.c b/cputlb.c
+index af0e65cd2c..94fa9977c5 100644
+--- a/cputlb.c
++++ b/cputlb.c
+@@ -246,18 +246,6 @@ void tlb_reset_dirty_range(CPUTLBEntry *tlb_entry, uintptr_t start,
+     }
  }
  
- void cpu_exec_step_atomic(CPUState *cpu)
-diff --git a/cpus.c b/cpus.c
-index bfee326d30..8200ac6b75 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1348,6 +1348,11 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
-                 if (r == EXCP_DEBUG) {
-                     cpu_handle_guest_debug(cpu);
-                     break;
-+                } else if (r == EXCP_ATOMIC) {
-+                    qemu_mutex_unlock_iothread();
-+                    cpu_exec_step_atomic(cpu);
-+                    qemu_mutex_lock_iothread();
-+                    break;
-                 }
-             } else if (cpu->stop) {
-                 if (cpu->unplug) {
-@@ -1458,6 +1463,10 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
-                  */
-                 g_assert(cpu->halted);
-                 break;
-+            case EXCP_ATOMIC:
-+                qemu_mutex_unlock_iothread();
-+                cpu_exec_step_atomic(cpu);
-+                qemu_mutex_lock_iothread();
-             default:
-                 /* Ignore everything else? */
-                 break;
+-static inline ram_addr_t qemu_ram_addr_from_host_nofail(void *ptr)
+-{
+-    ram_addr_t ram_addr;
+-
+-    ram_addr = qemu_ram_addr_from_host(ptr);
+-    if (ram_addr == RAM_ADDR_INVALID) {
+-        fprintf(stderr, "Bad ram pointer %p\n", ptr);
+-        abort();
+-    }
+-    return ram_addr;
+-}
+-
+ void tlb_reset_dirty(CPUState *cpu, ram_addr_t start1, ram_addr_t length)
+ {
+     CPUArchState *env;
+@@ -469,6 +457,18 @@ static void report_bad_exec(CPUState *cpu, target_ulong addr)
+     log_cpu_state_mask(LOG_GUEST_ERROR, cpu, CPU_DUMP_FPU | CPU_DUMP_CCOP);
+ }
+ 
++static inline ram_addr_t qemu_ram_addr_from_host_nofail(void *ptr)
++{
++    ram_addr_t ram_addr;
++
++    ram_addr = qemu_ram_addr_from_host(ptr);
++    if (ram_addr == RAM_ADDR_INVALID) {
++        error_report("Bad ram pointer %p", ptr);
++        abort();
++    }
++    return ram_addr;
++}
++
+ /* NOTE: this function can trigger an exception */
+ /* NOTE2: the returned address is not exactly the physical address: it
+  * is actually a ram_addr_t (in system mode; the user mode emulation
 -- 
 2.11.0
