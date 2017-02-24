@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1chDwL-0007ME-07
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:21:37 -0500
+	(envelope-from <david@redhat.com>) id 1chDzQ-0002kA-2k
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:24:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1chDwJ-0000Z9-5u
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:21:32 -0500
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:32917)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1chDwI-0000WK-Sr
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:21:31 -0500
-Received: by mail-wr0-x231.google.com with SMTP id u47so11057747wrb.0
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 03:21:30 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 24 Feb 2017 11:21:07 +0000
-Message-Id: <20170224112109.3147-23-alex.bennee@linaro.org>
-In-Reply-To: <20170224112109.3147-1-alex.bennee@linaro.org>
-References: <20170224112109.3147-1-alex.bennee@linaro.org>
+	(envelope-from <david@redhat.com>) id 1chDzM-0004uk-27
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:24:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41744)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1chDzL-0004tN-Ox
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:24:39 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B8AA680467
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 11:24:39 +0000 (UTC)
+References: <20170222190029.17243-1-ehabkost@redhat.com>
+	<20170222190029.17243-2-ehabkost@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <0409eedf-7956-7edd-2ad0-b7a0be377ade@redhat.com>
+Date: Fri, 24 Feb 2017 12:24:36 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 22/24] target-arm: ensure all cross vCPUs TLB
- flushes complete
+In-Reply-To: <20170222190029.17243-2-ehabkost@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] target-i386: Define static "base"
+ CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,340 +34,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 
-Previously flushes on other vCPUs would only get serviced when they
-exited their TranslationBlocks. While this isn't overly problematic it
-violates the semantics of TLB flush from the point of view of source
-vCPU.
+Am 22.02.2017 um 20:00 schrieb Eduardo Habkost:
+> The query-cpu-model-expand QMP command needs at least one static
+> model, to allow the "static" expansion mode to be implemented.
+> Instead of defining static versions of every CPU model, define a
+> "base" CPU model that has absolutely no feature flag enabled.
+> 
+> Despite having no CPUID data set at all, "-cpu base" is even a
+> functional CPU:
+> 
+> * It can boot a Slackware Linux 1.01 image with a Linux 0.99.12
+>   kernel[1].
+> * It is even possible to boot[2] a modern Fedora x86_64 guest by
+>   manually enabling the following CPU features:
+>   -cpu base,+lm,+msr,+pae,+fpu,+cx8,+cmov,+sse,+sse2,+fxsr
+> 
+> [1] http://www.qemu-advent-calendar.org/2014/#day-1
+> [2] This is what can be seen in the guest:
+>     [root@localhost ~]# cat /proc/cpuinfo
+>     processor       : 0
+>     vendor_id       : unknown
+>     cpu family      : 0
+>     model           : 0
+>     model name      : 00/00
+>     stepping        : 0
+>     physical id     : 0
+>     siblings        : 1
+>     core id         : 0
+>     cpu cores       : 1
+>     apicid          : 0
+>     initial apicid  : 0
+>     fpu             : yes
+>     fpu_exception   : yes
+>     cpuid level     : 1
+>     wp              : yes
+>     flags           : fpu msr pae cx8 cmov fxsr sse sse2 lm nopl
+>     bugs            :
+>     bogomips        : 5832.70
+>     clflush size    : 64
+>     cache_alignment : 64
+>     address sizes   : 36 bits physical, 48 bits virtual
+>     power management:
+> 
+>     [root@localhost ~]# x86info -v -a
+>     x86info v1.30.  Dave Jones 2001-2011
+>     Feedback to <davej@redhat.com>.
+> 
+>     No TSC, MHz calculation cannot be performed.
+>     Unknown vendor (0)
+>     MP Table:
+> 
+>     Family: 0 Model: 0 Stepping: 0
+>     CPU Model (x86info's best guess):
+> 
+>     eax in: 0x00000000, eax = 00000001 ebx = 00000000 ecx = 00000000 edx = 00000000
+>     eax in: 0x00000001, eax = 00000000 ebx = 00000800 ecx = 00000000 edx = 07008161
+> 
+>     eax in: 0x80000000, eax = 80000001 ebx = 00000000 ecx = 00000000 edx = 00000000
+>     eax in: 0x80000001, eax = 00000000 ebx = 00000000 ecx = 00000000 edx = 20000000
+> 
+>     Feature flags:
+>      fpu            Onboard FPU
+>      msr            Model-Specific Registers
+>      pae            Physical Address Extensions
+>      cx8            CMPXCHG8 instruction
+>      cmov           CMOV instruction
+>      fxsr           FXSAVE and FXRSTOR instructions
+>      sse            SSE support
+>      sse2           SSE2 support
+> 
+>     Long NOPs supported: yes
+> 
+>     Address sizes : 0 bits physical, 0 bits virtual
+>     0MHz processor (estimate).
+> 
+>      running at an estimated 0MHz
+>     [root@localhost ~]#
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  target/i386/cpu-qom.h |  2 ++
+>  target/i386/cpu.c     | 20 ++++++++++++++++++++
+>  2 files changed, 22 insertions(+)
+> 
+> diff --git a/target/i386/cpu-qom.h b/target/i386/cpu-qom.h
+> index f6c704c3a9..c2205e6077 100644
+> --- a/target/i386/cpu-qom.h
+> +++ b/target/i386/cpu-qom.h
+> @@ -50,6 +50,7 @@ typedef struct X86CPUDefinition X86CPUDefinition;
+>   * @kvm_required: Whether CPU model requires KVM to be enabled.
+>   * @ordering: Ordering on the "-cpu help" CPU model list.
+>   * @migration_safe: See CpuDefinitionInfo::migration_safe
+> + * @static_model: See CpuDefinitionInfo::static
+>   * @parent_realize: The parent class' realize handler.
+>   * @parent_reset: The parent class' reset handler.
+>   *
+> @@ -68,6 +69,7 @@ typedef struct X86CPUClass {
+>      bool kvm_required;
+>      int ordering;
+>      bool migration_safe;
+> +    bool static_model;
+>  
+>      /* Optional description of CPU model.
+>       * If unavailable, cpu_def->model_id is used */
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index c6f62367b0..4241f56e8a 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -2230,6 +2230,7 @@ static void x86_cpu_definition_entry(gpointer data, gpointer user_data)
+>      info->q_typename = g_strdup(object_class_get_name(oc));
+>      info->migration_safe = cc->migration_safe;
+>      info->has_migration_safe = true;
+> +    info->q_static = cc->static_model;
+>  
+>      entry = g_malloc0(sizeof(*entry));
+>      entry->value = info;
+> @@ -3836,6 +3837,24 @@ static const TypeInfo x86_cpu_type_info = {
+>      .class_init = x86_cpu_common_class_init,
+>  };
+>  
+> +
+> +/* "base" CPU model, used by query-cpu-model-expansion */
+> +static void x86_cpu_base_class_init(ObjectClass *oc, void *data)
+> +{
+> +    X86CPUClass *xcc = X86_CPU_CLASS(oc);
+> +
+> +    xcc->static_model = true;
+> +    xcc->migration_safe = true;
+> +    xcc->model_description = "base CPU model type with no feature enabled";
 
-To solve this we call the cputlb *_all_cpus_synced() functions to do
-the flushes which ensures all flushes are completed by the time the
-vCPU next schedules its own work. As the TLB instructions are modelled
-as CP writes the TB ends at this point meaning cpu->exit_request will
-be checked before the next instruction is executed.
+s/feature/features/ ? (no native speaker ;) )
 
-Deferring the work until the architectural sync point is a possible
-future optimisation.
+> +    xcc->ordering = 8;
+> +}
+> +
+> +static const TypeInfo x86_base_cpu_type_info = {
+> +        .name = X86_CPU_TYPE_NAME("base"),
+> +        .parent = TYPE_X86_CPU,
+> +        .class_init = x86_cpu_base_class_init,
+> +};
+> +
+>  static void x86_cpu_register_types(void)
+>  {
+>      int i;
+> @@ -3845,6 +3864,7 @@ static void x86_cpu_register_types(void)
+>          x86_register_cpudef_type(&builtin_x86_defs[i]);
+>      }
+>      type_register_static(&max_x86_cpu_type_info);
+> +    type_register_static(&x86_base_cpu_type_info);
+>  #ifdef CONFIG_KVM
+>      type_register_static(&host_x86_cpu_type_info);
+>  #endif
+> 
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/helper.c | 165 ++++++++++++++++++++++------------------------------
- 1 file changed, 69 insertions(+), 96 deletions(-)
+Looks sane to me!
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index b41d0494d1..bcedb4a808 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -536,41 +536,33 @@ static void tlbimvaa_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbiall_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                              uint64_t value)
- {
--    CPUState *other_cs;
-+    CPUState *cs = ENV_GET_CPU(env);
- 
--    CPU_FOREACH(other_cs) {
--        tlb_flush(other_cs);
--    }
-+    tlb_flush_all_cpus_synced(cs);
- }
- 
- static void tlbiasid_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                              uint64_t value)
- {
--    CPUState *other_cs;
-+    CPUState *cs = ENV_GET_CPU(env);
- 
--    CPU_FOREACH(other_cs) {
--        tlb_flush(other_cs);
--    }
-+    tlb_flush_all_cpus_synced(cs);
- }
- 
- static void tlbimva_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                              uint64_t value)
- {
--    CPUState *other_cs;
-+    CPUState *cs = ENV_GET_CPU(env);
- 
--    CPU_FOREACH(other_cs) {
--        tlb_flush_page(other_cs, value & TARGET_PAGE_MASK);
--    }
-+    tlb_flush_page_all_cpus_synced(cs, value & TARGET_PAGE_MASK);
- }
- 
- static void tlbimvaa_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                              uint64_t value)
- {
--    CPUState *other_cs;
-+    CPUState *cs = ENV_GET_CPU(env);
- 
--    CPU_FOREACH(other_cs) {
--        tlb_flush_page(other_cs, value & TARGET_PAGE_MASK);
--    }
-+    tlb_flush_page_all_cpus_synced(cs, value & TARGET_PAGE_MASK);
- }
- 
- static void tlbiall_nsnh_write(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -587,14 +579,12 @@ static void tlbiall_nsnh_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbiall_nsnh_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                   uint64_t value)
- {
--    CPUState *other_cs;
-+    CPUState *cs = ENV_GET_CPU(env);
- 
--    CPU_FOREACH(other_cs) {
--        tlb_flush_by_mmuidx(other_cs,
--                            (1 << ARMMMUIdx_S12NSE1) |
--                            (1 << ARMMMUIdx_S12NSE0) |
--                            (1 << ARMMMUIdx_S2NS));
--    }
-+    tlb_flush_by_mmuidx_all_cpus_synced(cs,
-+                                        (1 << ARMMMUIdx_S12NSE1) |
-+                                        (1 << ARMMMUIdx_S12NSE0) |
-+                                        (1 << ARMMMUIdx_S2NS));
- }
- 
- static void tlbiipas2_write(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -621,7 +611,7 @@ static void tlbiipas2_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbiipas2_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                uint64_t value)
- {
--    CPUState *other_cs;
-+    CPUState *cs = ENV_GET_CPU(env);
-     uint64_t pageaddr;
- 
-     if (!arm_feature(env, ARM_FEATURE_EL2) || !(env->cp15.scr_el3 & SCR_NS)) {
-@@ -630,9 +620,8 @@ static void tlbiipas2_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
- 
-     pageaddr = sextract64(value << 12, 0, 40);
- 
--    CPU_FOREACH(other_cs) {
--        tlb_flush_page_by_mmuidx(other_cs, pageaddr, (1 << ARMMMUIdx_S2NS));
--    }
-+    tlb_flush_page_by_mmuidx_all_cpus_synced(cs, pageaddr,
-+                                             (1 << ARMMMUIdx_S2NS));
- }
- 
- static void tlbiall_hyp_write(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -646,11 +635,9 @@ static void tlbiall_hyp_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbiall_hyp_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                  uint64_t value)
- {
--    CPUState *other_cs;
-+    CPUState *cs = ENV_GET_CPU(env);
- 
--    CPU_FOREACH(other_cs) {
--        tlb_flush_by_mmuidx(other_cs, (1 << ARMMMUIdx_S1E2));
--    }
-+    tlb_flush_by_mmuidx_all_cpus_synced(cs, (1 << ARMMMUIdx_S1E2));
- }
- 
- static void tlbimva_hyp_write(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -665,12 +652,11 @@ static void tlbimva_hyp_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbimva_hyp_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                  uint64_t value)
- {
--    CPUState *other_cs;
-+    CPUState *cs = ENV_GET_CPU(env);
-     uint64_t pageaddr = value & ~MAKE_64BIT_MASK(0, 12);
- 
--    CPU_FOREACH(other_cs) {
--        tlb_flush_page_by_mmuidx(other_cs, pageaddr, (1 << ARMMMUIdx_S1E2));
--    }
-+    tlb_flush_page_by_mmuidx_all_cpus_synced(cs, pageaddr,
-+                                             (1 << ARMMMUIdx_S1E2));
- }
- 
- static const ARMCPRegInfo cp_reginfo[] = {
-@@ -2904,8 +2890,7 @@ static CPAccessResult aa64_cacheop_access(CPUARMState *env,
- static void tlbi_aa64_vmalle1_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                     uint64_t value)
- {
--    ARMCPU *cpu = arm_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    CPUState *cs = ENV_GET_CPU(env);
- 
-     if (arm_is_secure_below_el3(env)) {
-         tlb_flush_by_mmuidx(cs,
-@@ -2921,19 +2906,17 @@ static void tlbi_aa64_vmalle1_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbi_aa64_vmalle1is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                       uint64_t value)
- {
-+    CPUState *cs = ENV_GET_CPU(env);
-     bool sec = arm_is_secure_below_el3(env);
--    CPUState *other_cs;
- 
--    CPU_FOREACH(other_cs) {
--        if (sec) {
--            tlb_flush_by_mmuidx(other_cs,
--                                (1 << ARMMMUIdx_S1SE1) |
--                                (1 << ARMMMUIdx_S1SE0));
--        } else {
--            tlb_flush_by_mmuidx(other_cs,
--                                (1 << ARMMMUIdx_S12NSE1) |
--                                (1 << ARMMMUIdx_S12NSE0));
--        }
-+    if (sec) {
-+        tlb_flush_by_mmuidx_all_cpus_synced(cs,
-+                                            (1 << ARMMMUIdx_S1SE1) |
-+                                            (1 << ARMMMUIdx_S1SE0));
-+    } else {
-+        tlb_flush_by_mmuidx_all_cpus_synced(cs,
-+                                            (1 << ARMMMUIdx_S12NSE1) |
-+                                            (1 << ARMMMUIdx_S12NSE0));
-     }
- }
- 
-@@ -2990,46 +2973,40 @@ static void tlbi_aa64_alle1is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-      * stage 2 translations, whereas most other scopes only invalidate
-      * stage 1 translations.
-      */
-+    CPUState *cs = ENV_GET_CPU(env);
-     bool sec = arm_is_secure_below_el3(env);
-     bool has_el2 = arm_feature(env, ARM_FEATURE_EL2);
--    CPUState *other_cs;
--
--    CPU_FOREACH(other_cs) {
--        if (sec) {
--            tlb_flush_by_mmuidx(other_cs,
--                                (1 << ARMMMUIdx_S1SE1) |
--                                (1 << ARMMMUIdx_S1SE0));
--        } else if (has_el2) {
--            tlb_flush_by_mmuidx(other_cs,
--                                (1 << ARMMMUIdx_S12NSE1) |
--                                (1 << ARMMMUIdx_S12NSE0) |
--                                (1 << ARMMMUIdx_S2NS));
--        } else {
--            tlb_flush_by_mmuidx(other_cs,
--                                (1 << ARMMMUIdx_S12NSE1) |
--                                (1 << ARMMMUIdx_S12NSE0));
--        }
-+
-+    if (sec) {
-+        tlb_flush_by_mmuidx_all_cpus_synced(cs,
-+                                            (1 << ARMMMUIdx_S1SE1) |
-+                                            (1 << ARMMMUIdx_S1SE0));
-+    } else if (has_el2) {
-+        tlb_flush_by_mmuidx_all_cpus_synced(cs,
-+                                            (1 << ARMMMUIdx_S12NSE1) |
-+                                            (1 << ARMMMUIdx_S12NSE0) |
-+                                            (1 << ARMMMUIdx_S2NS));
-+    } else {
-+          tlb_flush_by_mmuidx_all_cpus_synced(cs,
-+                                              (1 << ARMMMUIdx_S12NSE1) |
-+                                              (1 << ARMMMUIdx_S12NSE0));
-     }
- }
- 
- static void tlbi_aa64_alle2is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                     uint64_t value)
- {
--    CPUState *other_cs;
-+    CPUState *cs = ENV_GET_CPU(env);
- 
--    CPU_FOREACH(other_cs) {
--        tlb_flush_by_mmuidx(other_cs, (1 << ARMMMUIdx_S1E2));
--    }
-+    tlb_flush_by_mmuidx_all_cpus_synced(cs, (1 << ARMMMUIdx_S1E2));
- }
- 
- static void tlbi_aa64_alle3is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                     uint64_t value)
- {
--    CPUState *other_cs;
-+    CPUState *cs = ENV_GET_CPU(env);
- 
--    CPU_FOREACH(other_cs) {
--        tlb_flush_by_mmuidx(other_cs, (1 << ARMMMUIdx_S1E3));
--    }
-+    tlb_flush_by_mmuidx_all_cpus_synced(cs, (1 << ARMMMUIdx_S1E3));
- }
- 
- static void tlbi_aa64_vae1_write(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -3086,43 +3063,40 @@ static void tlbi_aa64_vae3_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbi_aa64_vae1is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                    uint64_t value)
- {
-+    ARMCPU *cpu = arm_env_get_cpu(env);
-+    CPUState *cs = CPU(cpu);
-     bool sec = arm_is_secure_below_el3(env);
--    CPUState *other_cs;
-     uint64_t pageaddr = sextract64(value << 12, 0, 56);
- 
--    CPU_FOREACH(other_cs) {
--        if (sec) {
--            tlb_flush_page_by_mmuidx(other_cs, pageaddr,
--                                     (1 << ARMMMUIdx_S1SE1) |
--                                     (1 << ARMMMUIdx_S1SE0));
--        } else {
--            tlb_flush_page_by_mmuidx(other_cs, pageaddr,
--                                     (1 << ARMMMUIdx_S12NSE1) |
--                                     (1 << ARMMMUIdx_S12NSE0));
--        }
-+    if (sec) {
-+        tlb_flush_page_by_mmuidx_all_cpus_synced(cs, pageaddr,
-+                                                 (1 << ARMMMUIdx_S1SE1) |
-+                                                 (1 << ARMMMUIdx_S1SE0));
-+    } else {
-+        tlb_flush_page_by_mmuidx_all_cpus_synced(cs, pageaddr,
-+                                                 (1 << ARMMMUIdx_S12NSE1) |
-+                                                 (1 << ARMMMUIdx_S12NSE0));
-     }
- }
- 
- static void tlbi_aa64_vae2is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                    uint64_t value)
- {
--    CPUState *other_cs;
-+    CPUState *cs = ENV_GET_CPU(env);
-     uint64_t pageaddr = sextract64(value << 12, 0, 56);
- 
--    CPU_FOREACH(other_cs) {
--        tlb_flush_page_by_mmuidx(other_cs, pageaddr, (1 << ARMMMUIdx_S1E2));
--    }
-+    tlb_flush_page_by_mmuidx_all_cpus_synced(cs, pageaddr,
-+                                             (1 << ARMMMUIdx_S1E2));
- }
- 
- static void tlbi_aa64_vae3is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                    uint64_t value)
- {
--    CPUState *other_cs;
-+    CPUState *cs = ENV_GET_CPU(env);
-     uint64_t pageaddr = sextract64(value << 12, 0, 56);
- 
--    CPU_FOREACH(other_cs) {
--        tlb_flush_page_by_mmuidx(other_cs, pageaddr, (1 << ARMMMUIdx_S1E3));
--    }
-+    tlb_flush_page_by_mmuidx_all_cpus_synced(cs, pageaddr,
-+                                             (1 << ARMMMUIdx_S1E3));
- }
- 
- static void tlbi_aa64_ipas2e1_write(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -3150,7 +3124,7 @@ static void tlbi_aa64_ipas2e1_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbi_aa64_ipas2e1is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                       uint64_t value)
- {
--    CPUState *other_cs;
-+    CPUState *cs = ENV_GET_CPU(env);
-     uint64_t pageaddr;
- 
-     if (!arm_feature(env, ARM_FEATURE_EL2) || !(env->cp15.scr_el3 & SCR_NS)) {
-@@ -3159,9 +3133,8 @@ static void tlbi_aa64_ipas2e1is_write(CPUARMState *env, const ARMCPRegInfo *ri,
- 
-     pageaddr = sextract64(value << 12, 0, 48);
- 
--    CPU_FOREACH(other_cs) {
--        tlb_flush_page_by_mmuidx(other_cs, pageaddr, (1 << ARMMMUIdx_S2NS));
--    }
-+    tlb_flush_page_by_mmuidx_all_cpus_synced(cs, pageaddr,
-+                                             (1 << ARMMMUIdx_S2NS));
- }
- 
- static CPAccessResult aa64_zva_access(CPUARMState *env, const ARMCPRegInfo *ri,
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
 -- 
-2.11.0
+Thanks,
+
+David
