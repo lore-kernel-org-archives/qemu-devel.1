@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1chF0c-0004sD-UI
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:30:04 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1chF34-0007BB-PR
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:32:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1chF0Z-00019W-Oi
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:30:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43094)
+	(envelope-from <ehabkost@redhat.com>) id 1chF31-0004M9-Lj
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:32:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38880)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1chF0Z-00018T-GH
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:29:59 -0500
-Date: Fri, 24 Feb 2017 12:29:55 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170224122954.GA8830@work-vm>
-References: <20170222160119.52771-1-pasic@linux.vnet.ibm.com>
-	<20170222160119.52771-4-pasic@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1chF31-0004L5-FN
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:32:31 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9046E7E9D5
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 12:32:31 +0000 (UTC)
+Date: Fri, 24 Feb 2017 09:32:28 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170224123228.GR2778@thinpad.lan.raisama.net>
+References: <20170222183919.11928-1-ehabkost@redhat.com>
+	<20170222183919.11928-3-ehabkost@redhat.com>
+	<f3922aa6-75de-b0ca-6e56-150c166c297b@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170222160119.52771-4-pasic@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] migration/vmstate: fix array of ptr
- with nullptrs
+In-Reply-To: <f3922aa6-75de-b0ca-6e56-150c166c297b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] i386: Make "max" model not use any
+ host CPUID info on TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,116 +35,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
-> Make VMS_ARRAY_OF_POINTER cope with null pointers. Previously the
-> reward for trying to migrate an array with some null pointers in it was
-> an illegal memory access, that is a swift and painless death of the
-> process.  Let's make vmstate cope with this scenario.
+On Fri, Feb 24, 2017 at 12:09:32PM +0100, David Hildenbrand wrote:
+> Am 22.02.2017 um 19:39 schrieb Eduardo Habkost:
+> > Instead of reporting host CPUID data on "max", use the qemu64 CPU
+> Two questions:
 > 
-> The general approach is, when we encounter a null pointer (element),
-> instead of following the pointer to save/load the data behind it, we
-> save/load a placeholder. This way we can detect if we expected a null
-> pointer at the load side but not null data was saved instead.
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> Reviewed-by: Guenther Hutzl <hutzl@linux.vnet.ibm.com>
+> 1. Shouldn't "max" use cpuid of qemu64 with TARGET_X86_64 and qemu32
+> with !TARGET_X86_64?
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+qemu32 has family=6,model=6,stepping=3 too, and the only
+difference on TCG's "max" model on !TARGET_X86_64 will be the
+lack of CPUID_EXT2_SYSCALL and CPUID_EXT2_LM.
 
-> ---
-> We will need this to load/save some on demand created state in the
-> (s390x) channel subsystem (see ChannelSubSys.css in hw/s390x/css.c for
-> an example).
-> ---
->  include/migration/vmstate.h |  4 ++++
->  migration/vmstate.c         | 40 ++++++++++++++++++++++++++++++++++++++--
->  2 files changed, 42 insertions(+), 2 deletions(-)
 > 
-> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-> index 63e7b02..f2dbf84 100644
-> --- a/include/migration/vmstate.h
-> +++ b/include/migration/vmstate.h
-> @@ -253,6 +253,10 @@ extern const VMStateInfo vmstate_info_uint16;
->  extern const VMStateInfo vmstate_info_uint32;
->  extern const VMStateInfo vmstate_info_uint64;
->  
-> +/** Put this in the stream when migrating a null pointer.*/
-> +#define VMS_NULLPTR_MARKER (0x30U) /* '0' */
-> +extern const VMStateInfo vmstate_info_nullptr;
-> +
->  extern const VMStateInfo vmstate_info_float64;
->  extern const VMStateInfo vmstate_info_cpudouble;
->  
-> diff --git a/migration/vmstate.c b/migration/vmstate.c
-> index 836a7a4..78b3cd4 100644
-> --- a/migration/vmstate.c
-> +++ b/migration/vmstate.c
-> @@ -117,7 +117,11 @@ int vmstate_load_state(QEMUFile *f, const VMStateDescription *vmsd,
->                  if (field->flags & VMS_ARRAY_OF_POINTER) {
->                      curr_elem = *(void **)curr_elem;
->                  }
-> -                if (field->flags & VMS_STRUCT) {
-> +                if (!curr_elem) {
-> +                    /* if null pointer check placeholder and do not follow */
-> +                    assert(field->flags & VMS_ARRAY_OF_POINTER);
-> +                    ret = vmstate_info_nullptr.get(f, curr_elem, size, NULL);
-> +                } else if (field->flags & VMS_STRUCT) {
->                      ret = vmstate_load_state(f, field->vmsd, curr_elem,
->                                               field->vmsd->version_id);
->                  } else {
-> @@ -332,7 +336,11 @@ void vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
->                      assert(curr_elem);
->                      curr_elem = *(void **)curr_elem;
->                  }
-> -                if (field->flags & VMS_STRUCT) {
-> +                if (!curr_elem) {
-> +                    /* if null pointer write placeholder and do not follow */
-> +                    assert(field->flags & VMS_ARRAY_OF_POINTER);
-> +                    vmstate_info_nullptr.put(f, curr_elem, size, NULL, NULL);
-> +                } else if (field->flags & VMS_STRUCT) {
->                      vmstate_save_state(f, field->vmsd, curr_elem, vmdesc_loop);
->                  } else {
->                      field->info->put(f, curr_elem, size, field, vmdesc_loop);
-> @@ -747,6 +755,34 @@ const VMStateInfo vmstate_info_uint64 = {
->      .put  = put_uint64,
->  };
->  
-> +static int get_nullptr(QEMUFile *f, void *pv, size_t size, VMStateField *field)
-> +
-> +{
-> +    if (qemu_get_byte(f) == VMS_NULLPTR_MARKER) {
-> +        return  0;
-> +    }
-> +    error_report("vmstate: get_nullptr expected VMS_NULLPTR_MARKER");
-> +    return -EINVAL;
-> +}
-> +
-> +static int put_nullptr(QEMUFile *f, void *pv, size_t size,
-> +                        VMStateField *field, QJSON *vmdesc)
-> +
-> +{
-> +    if (pv == NULL) {
-> +        qemu_put_byte(f, VMS_NULLPTR_MARKER);
-> +        return 0;
-> +    }
-> +    error_report("vmstate: put_nullptr must be called with pv == NULL");
-> +    return -EINVAL;
-> +}
-> +
-> +const VMStateInfo vmstate_info_nullptr = {
-> +    .name = "uint64",
-> +    .get  = get_nullptr,
-> +    .put  = put_nullptr,
-> +};
-> +
->  /* 64 bit unsigned int. See that the received value is the same than the one
->     in the field */
->  
+> 2. Should we then change linux-user/main.c:main() to use the "max" model?
+
+We could, but I would like this to be done by somebody more
+experienced with linux-user code, who could test it properly.
+
+> 
+> > model as reference to initialize CPUID
+> > vendor/family/model/stepping/model-id.
+> > 
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> >  target/i386/cpu.c | 9 +++++++++
+> >  1 file changed, 9 insertions(+)
+> > 
+> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > index f7bd59617e..5164cd9ed5 100644
+> > --- a/target/i386/cpu.c
+> > +++ b/target/i386/cpu.c
+> > @@ -1594,6 +1594,15 @@ static void max_x86_cpu_initfn(Object *obj)
+> >          if (lmce_supported()) {
+> >              object_property_set_bool(OBJECT(cpu), true, "lmce", &error_abort);
+> >          }
+> > +    } else {
+> > +        object_property_set_str(OBJECT(cpu), CPUID_VENDOR_AMD,
+> > +                                "vendor", &error_abort);
+> > +        object_property_set_int(OBJECT(cpu), 6, "family", &error_abort);
+> > +        object_property_set_int(OBJECT(cpu), 6, "model", &error_abort);
+> > +        object_property_set_int(OBJECT(cpu), 3, "stepping", &error_abort);
+> > +        object_property_set_str(OBJECT(cpu),
+> > +                                "QEMU TCG CPU version " QEMU_HW_VERSION,
+> > +                                "model-id", &error_abort);
+> >      }
+> >  
+> >      object_property_set_bool(OBJECT(cpu), true, "pmu", &error_abort);
+> > 
+> 
+> 
 > -- 
-> 2.8.4
+> Thanks,
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> David
+
+-- 
+Eduardo
