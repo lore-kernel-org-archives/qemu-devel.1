@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59476)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1chLsm-0002h8-9r
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:50:26 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1chLtk-0003G5-H5
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:51:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1chLsj-0005QX-2V
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:50:24 -0500
-Resent-Message-Id: <E1chLsj-0005QX-2V@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21473)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1chLsi-0005NG-Qv
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:50:20 -0500
-In-Reply-To: <1487886317-27400-1-git-send-email-armbru@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148796576380.177.7962131506577566263@0e2666bad730>
+	(envelope-from <dgilbert@redhat.com>) id 1chLtj-00075Y-JB
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:51:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40630)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1chLtj-00074T-DG
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:51:23 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 90EE44E4D6
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 19:51:22 +0000 (UTC)
+Date: Fri, 24 Feb 2017 19:51:18 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170224195117.GR8830@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 24 Feb 2017 11:49:24 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 00/21] qapi: QMP dispatch and input visitor
- work
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] make check: crash in vhost-user chardev cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,103 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: armbru@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: marcandre.lureau@redhat.com, qemu-devel@nongnu.org
+Cc: mst@redhat.com, armbru@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ4
-Nzg4NjMxNy0yNzQwMC0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tClR5cGU6IHNl
-cmllcwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAwLzIxXSBxYXBpOiBRTVAgZGlzcGF0
-Y2ggYW5kIGlucHV0IHZpc2l0b3Igd29yawoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
-aW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4g
-fCB3YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2Nh
-bCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVl
-Cgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3Ig
-YyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChn
-aXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZv
-cm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgog
-ICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoK
-ZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMy
-MWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3Bh
-dGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTQ4Nzg4NjMx
-Ny0yNzQwMC0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMTQ4
-Nzg4NjMxNy0yNzQwMC0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tClN3aXRjaGVk
-IHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNzAwYTJhYyBxYXBpOiBJbXByb3ZlIHFvYmplY3Qgdmlz
-aXRvciBkb2N1bWVudGF0aW9uCjE3NWYyM2YgcWFwaTogTWFrZSBpbnB1dCB2aXNpdG9ycyBkZXRl
-Y3QgdW52aXNpdGVkIGxpc3QgdGFpbHMKZjhjYTBiMSB0ZXN0czogQ292ZXIgcGFydGlhbCBpbnB1
-dCB2aXNpdCBvZiBsaXN0Cjc1NmZkYWEgdGVzdHMtcW9iamVjdC1pbnB1dC1zdHJpY3Q6IE1lcmdl
-IGludG8gdGVzdC1xb2JqZWN0LWlucHV0LXZpc2l0b3IKZWI5NDEwYyBxYXBpOiBEcm9wIHVudXNl
-ZCBub24tc3RyaWN0IHFvYmplY3QgaW5wdXQgdmlzaXRvcgoxNzJmNTkzIHRlc3QtcW9iamVjdC1p
-bnB1dC12aXNpdG9yOiBVc2Ugc3RyaWN0IHZpc2l0b3IKNTY4NWVjZSBxb206IE1ha2Ugb2JqZWN0
-X3Byb3BlcnR5X3NldF9xb2JqZWN0KCkncyBpbnB1dCB2aXNpdG9yIHN0cmljdAo2ZWEwNWRmIHFh
-cGk6IE1ha2Ugc3RyaW5nIGlucHV0IGFuZCBvcHRzIHZpc2l0b3IgcmVxdWlyZSBub24tbnVsbCBp
-bnB1dAo5MTEyZDg5IHFhcGk6IERyb3Agc3RyaW5nIGlucHV0IHZpc2l0b3IgbWV0aG9kIG9wdGlv
-bmFsKCkKZGFlOGI2YSBxYXBpOiBJbXByb3ZlIHFvYmplY3QgaW5wdXQgdmlzaXRvciBlcnJvciBy
-ZXBvcnRpbmcKOTJjNGY3YiBxYXBpOiBNYWtlIFFPYmplY3QgaW5wdXQgdmlzaXRvciBzZXQgKmxp
-c3QgcmVsaWFibHkKMDE1YWUwMiBxYXBpOiBDbGVhbiB1cCBhZnRlciBjb21taXQgM2QzNDRjMgo0
-ODg0OGFmIHFhcGk6IEltcHJvdmUgYSBRT2JqZWN0IGlucHV0IHZpc2l0b3IgZXJyb3IgbWVzc2Fn
-ZQpmNTMxMzUyIHFtcDogSW1wcm92ZSBRTVAgZGlzcGF0Y2ggZXJyb3IgbWVzc2FnZXMKMGZhNGFl
-NCBxbXA6IEVsaW1pbmF0ZSBzaWxseSBRRVJSX1FNUF8qIG1hY3Jvcwo0NThmNzYyIHFtcDogRHJv
-cCBkdXBsaWNhdGVkIFFNUCBjb21tYW5kIG9iamVjdCBjaGVja3MKMGMzMjcwMyBxbXA6IENsZWFu
-IHVwIGhvdyB3ZSBlbmZvcmNlIGNhcGFiaWxpdHkgbmVnb3RpYXRpb24KZTJhMzcyNCBxbXA6IER1
-bWIgZG93biBob3cgd2UgcnVuIFFNUCBjb21tYW5kIHJlZ2lzdHJhdGlvbgoxNmU3YmNmIHFtcC10
-ZXN0OiBOZXcsIGNvdmVyaW5nIGJhc2ljIFFNUCBwcm90b2NvbAoxNzNmZDkxIGxpYnF0ZXN0OiBX
-b3JrIGFyb3VuZCBhICJRTVAgd2FudHMgYSBuZXdsaW5lIiBidWcKN2QxYzgyMiBxZ2E6IEZpeCBj
-cmFzaCBvbiBub24tZGljdGlvbmFyeSBRTVAgYXJndW1lbnQKCj09PSBPVVRQVVQgQkVHSU4gPT09
-CkNoZWNraW5nIFBBVENIIDEvMjE6IHFnYTogRml4IGNyYXNoIG9uIG5vbi1kaWN0aW9uYXJ5IFFN
-UCBhcmd1bWVudC4uLgpDaGVja2luZyBQQVRDSCAyLzIxOiBsaWJxdGVzdDogV29yayBhcm91bmQg
-YSAiUU1QIHdhbnRzIGEgbmV3bGluZSIgYnVnLi4uCkNoZWNraW5nIFBBVENIIDMvMjE6IHFtcC10
-ZXN0OiBOZXcsIGNvdmVyaW5nIGJhc2ljIFFNUCBwcm90b2NvbC4uLgpDaGVja2luZyBQQVRDSCA0
-LzIxOiBxbXA6IER1bWIgZG93biBob3cgd2UgcnVuIFFNUCBjb21tYW5kIHJlZ2lzdHJhdGlvbi4u
-LgpDaGVja2luZyBQQVRDSCA1LzIxOiBxbXA6IENsZWFuIHVwIGhvdyB3ZSBlbmZvcmNlIGNhcGFi
-aWxpdHkgbmVnb3RpYXRpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggNi8yMTogcW1wOiBEcm9wIGR1cGxp
-Y2F0ZWQgUU1QIGNvbW1hbmQgb2JqZWN0IGNoZWNrcy4uLgpDaGVja2luZyBQQVRDSCA3LzIxOiBx
-bXA6IEVsaW1pbmF0ZSBzaWxseSBRRVJSX1FNUF8qIG1hY3Jvcy4uLgpDaGVja2luZyBQQVRDSCA4
-LzIxOiBxbXA6IEltcHJvdmUgUU1QIGRpc3BhdGNoIGVycm9yIG1lc3NhZ2VzLi4uCkNoZWNraW5n
-IFBBVENIIDkvMjE6IHFhcGk6IEltcHJvdmUgYSBRT2JqZWN0IGlucHV0IHZpc2l0b3IgZXJyb3Ig
-bWVzc2FnZS4uLgpDaGVja2luZyBQQVRDSCAxMC8yMTogcWFwaTogQ2xlYW4gdXAgYWZ0ZXIgY29t
-bWl0IDNkMzQ0YzIuLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMjE6IHFhcGk6IE1ha2UgUU9iamVjdCBp
-bnB1dCB2aXNpdG9yIHNldCAqbGlzdCByZWxpYWJseS4uLgpDaGVja2luZyBQQVRDSCAxMi8yMTog
-cWFwaTogSW1wcm92ZSBxb2JqZWN0IGlucHV0IHZpc2l0b3IgZXJyb3IgcmVwb3J0aW5nLi4uCkNo
-ZWNraW5nIFBBVENIIDEzLzIxOiBxYXBpOiBEcm9wIHN0cmluZyBpbnB1dCB2aXNpdG9yIG1ldGhv
-ZCBvcHRpb25hbCgpLi4uCkNoZWNraW5nIFBBVENIIDE0LzIxOiBxYXBpOiBNYWtlIHN0cmluZyBp
-bnB1dCBhbmQgb3B0cyB2aXNpdG9yIHJlcXVpcmUgbm9uLW51bGwgaW5wdXQuLi4KQ2hlY2tpbmcg
-UEFUQ0ggMTUvMjE6IHFvbTogTWFrZSBvYmplY3RfcHJvcGVydHlfc2V0X3FvYmplY3QoKSdzIGlu
-cHV0IHZpc2l0b3Igc3RyaWN0Li4uCkNoZWNraW5nIFBBVENIIDE2LzIxOiB0ZXN0LXFvYmplY3Qt
-aW5wdXQtdmlzaXRvcjogVXNlIHN0cmljdCB2aXNpdG9yLi4uCkNoZWNraW5nIFBBVENIIDE3LzIx
-OiBxYXBpOiBEcm9wIHVudXNlZCBub24tc3RyaWN0IHFvYmplY3QgaW5wdXQgdmlzaXRvci4uLgpD
-aGVja2luZyBQQVRDSCAxOC8yMTogdGVzdHMtcW9iamVjdC1pbnB1dC1zdHJpY3Q6IE1lcmdlIGlu
-dG8gdGVzdC1xb2JqZWN0LWlucHV0LXZpc2l0b3IuLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFy
-YWN0ZXJzCiM0ODQ6IEZJTEU6IHRlc3RzL3Rlc3QtcW9iamVjdC1pbnB1dC12aXNpdG9yLmM6ODQ3
-OgorICAgIHYgPSB2aXNpdG9yX2lucHV0X3Rlc3RfaW5pdChkYXRhLCAieyAnaW50ZWdlcic6IC00
-MiwgJ2Jvb2xlYW4nOiB0cnVlLCAnc3RyaW5nJzogJ2ZvbycsICdleHRyYSc6IDQyIH0iKTsKCkVS
-Uk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNDk4OiBGSUxFOiB0ZXN0cy90ZXN0LXFvYmpl
-Y3QtaW5wdXQtdmlzaXRvci5jOjg2MToKKyAgICB2ID0gdmlzaXRvcl9pbnB1dF90ZXN0X2luaXQo
-ZGF0YSwgInsgJ3N0cmluZzAnOiAnc3RyaW5nMCcsICdkaWN0MSc6IHsgJ3N0cmluZzEnOiAnc3Ry
-aW5nMScsICdkaWN0Mic6IHsgJ3VzZXJkZWYxJzogeyAnaW50ZWdlcic6IDQyLCAnc3RyaW5nJzog
-J3N0cmluZycsICdleHRyYSc6IFs0MiwgMjMsIHsnZm9vJzonYmFyJ31dIH0sICdzdHJpbmcyJzog
-J3N0cmluZzInfX19Iik7CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzUxMjogRklM
-RTogdGVzdHMvdGVzdC1xb2JqZWN0LWlucHV0LXZpc2l0b3IuYzo4NzU6CisgICAgdiA9IHZpc2l0
-b3JfaW5wdXRfdGVzdF9pbml0KGRhdGEsICJbIHsgJ3N0cmluZyc6ICdzdHJpbmcwJywgJ2ludGVn
-ZXInOiA0MiB9LCB7ICdzdHJpbmcnOiAnc3RyaW5nMScsICdpbnRlZ2VyJzogNDMgfSwgeyAnc3Ry
-aW5nJzogJ3N0cmluZzInLCAnaW50ZWdlcic6IDQ0LCAnZXh0cmEnOiAnZ2dnJyB9IF0iKTsKCkVS
-Uk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNTg1OiBGSUxFOiB0ZXN0cy90ZXN0LXFvYmpl
-Y3QtaW5wdXQtdmlzaXRvci5jOjk0ODoKKyAgICB2ID0gdmlzaXRvcl9pbnB1dF90ZXN0X2luaXQo
-ZGF0YSwgInsgJ3N0cmluZyc6ICdjJywgJ2ludGVnZXInOiA0MSwgJ2Jvb2xlYW4nOiB0cnVlIH0i
-KTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM1OTI6IEZJTEU6IHRlc3RzL3Rl
-c3QtcW9iamVjdC1pbnB1dC12aXNpdG9yLmM6OTU1Ogorc3RhdGljIHZvaWQgdGVzdF92aXNpdG9y
-X2luX2ZhaWxfdW5pb25fZmxhdF9ub19kaXNjcmltKFRlc3RJbnB1dFZpc2l0b3JEYXRhICpkYXRh
-LAoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM2MDA6IEZJTEU6IHRlc3RzL3Rlc3Qt
-cW9iamVjdC1pbnB1dC12aXNpdG9yLmM6OTYzOgorICAgIHYgPSB2aXNpdG9yX2lucHV0X3Rlc3Rf
-aW5pdChkYXRhLCAieyAnaW50ZWdlcic6IDQyLCAnc3RyaW5nJzogJ2MnLCAnc3RyaW5nMSc6ICdk
-JywgJ3N0cmluZzInOiAnZScgfSIpOwoKdG90YWw6IDUgZXJyb3JzLCAxIHdhcm5pbmdzLCAyMzMg
-bGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hl
-Y2tpbmcgUEFUQ0ggMTkvMjE6IHRlc3RzOiBDb3ZlciBwYXJ0aWFsIGlucHV0IHZpc2l0IG9mIGxp
-c3QuLi4KQ2hlY2tpbmcgUEFUQ0ggMjAvMjE6IHFhcGk6IE1ha2UgaW5wdXQgdmlzaXRvcnMgZGV0
-ZWN0IHVudmlzaXRlZCBsaXN0IHRhaWxzLi4uCkNoZWNraW5nIFBBVENIIDIxLzIxOiBxYXBpOiBJ
-bXByb3ZlIHFvYmplY3QgdmlzaXRvciBkb2N1bWVudGF0aW9uLi4uCj09PSBPVVRQVVQgRU5EID09
-PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVk
-IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBz
-ZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+Hi,
+  I'm seeing a hang+crash doing a make check that
+looks like it's coming from vhost-user's chardev cleanup,
+so I'm suspecting your e0b283e7c.
+The synptom is that the make check hangs in the qtest
+part, and a dmesg shows that a qemu crashed.
+I got a backtrace that shows:
+
+(gdb) where
+#0  0x0000560d3344f03e in qemu_chr_fe_read_all (be=be@entry=0x0, buf=buf@entry=0x7ffea7a2f520 "\v", len=len@entry=12) at /home/dgilbert/git/qemu/chardev/char.c:209
+#1  0x0000560d33199d64 in vhost_user_read (msg=msg@entry=0x7ffea7a2f520, dev=<optimized out>)
+    at /home/dgilbert/git/qemu/hw/virtio/vhost-user.c:125
+#2  0x0000560d3319a11f in vhost_user_get_vring_base (dev=0x560d35a614a0, ring=0x7ffea7a2f670)
+    at /home/dgilbert/git/qemu/hw/virtio/vhost-user.c:417
+#3  0x0000560d33196abb in vhost_virtqueue_stop (dev=dev@entry=0x560d35a614a0, vdev=vdev@entry=0x560d3729cc00, vq=0x560d35a61678, idx=1) at /home/dgilbert/git/qemu/hw/virtio/vhost.c:1070
+#4  0x0000560d33198cd4 in vhost_dev_stop (hdev=hdev@entry=0x560d35a614a0, vdev=vdev@entry=0x560d3729cc00)
+    at /home/dgilbert/git/qemu/hw/virtio/vhost.c:1533
+#5  0x0000560d3317bfd8 in vhost_net_stop_one (net=0x560d35a614a0, dev=0x560d3729cc00)
+    at /home/dgilbert/git/qemu/hw/net/vhost_net.c:288
+#6  0x0000560d3317c4aa in vhost_net_stop (dev=dev@entry=0x560d3729cc00, ncs=<optimized out>, total_queues=total_queues@entry=1) at /home/dgilbert/git/qemu/hw/net/vhost_net.c:367
+#7  0x0000560d33179201 in virtio_net_vhost_status (status=<optimized out>, n=0x560d3729cc00)
+    at /home/dgilbert/git/qemu/hw/net/virtio-net.c:176
+#8  0x0000560d33179201 in virtio_net_set_status (vdev=0x560d3729cc00, status=7 '\a')
+    at /home/dgilbert/git/qemu/hw/net/virtio-net.c:250
+#9  0x0000560d3339ce99 in qemu_del_net_client (nc=0x560d35a61250) at /home/dgilbert/git/qemu/net/net.c:390
+#10 0x0000560d3339e30d in net_cleanup () at /home/dgilbert/git/qemu/net/net.c:1454
+#11 0x0000560d330ee940 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>)
+    at /home/dgilbert/git/qemu/vl.c:4637
+(gdb) 
+
+#0  qemu_chr_fe_read_all (be=be@entry=0x0, buf=buf@entry=0x7ffea7a2f520 "\v", len=len@entry=12)
+    at /home/dgilbert/git/qemu/chardev/char.c:209
+209         Chardev *s = be->chr;
+
+Dave
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
