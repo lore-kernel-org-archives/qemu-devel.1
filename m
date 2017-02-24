@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clement.deschamps@antfield.fr>) id 1chIv0-0003QR-3F
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:40:31 -0500
+	(envelope-from <mst@redhat.com>) id 1chIvQ-0003mT-98
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:40:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clement.deschamps@antfield.fr>) id 1chIuy-0001DH-Cl
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:40:30 -0500
-From: Clement Deschamps <clement.deschamps@antfield.fr>
-Date: Fri, 24 Feb 2017 17:40:20 +0100
-Message-Id: <20170224164021.9066-4-clement.deschamps@antfield.fr>
-In-Reply-To: <20170224164021.9066-1-clement.deschamps@antfield.fr>
-References: <20170224164021.9066-1-clement.deschamps@antfield.fr>
-Subject: [Qemu-devel] [PATCH v3 3/4] bcm2835_gpio: add bcm2835 gpio
- controller
+	(envelope-from <mst@redhat.com>) id 1chIvN-0001Jc-Gy
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:40:56 -0500
+Date: Fri, 24 Feb 2017 18:40:41 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170224183952-mutt-send-email-mst@kernel.org>
+References: <cover.1487829585.git.sam.bobroff@au1.ibm.com>
+	<983a6cd6c33f273c0bcb7cb6632a8c23626d9fda.1487829585.git.sam.bobroff@au1.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <983a6cd6c33f273c0bcb7cb6632a8c23626d9fda.1487829585.git.sam.bobroff@au1.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 04/12] Move virtio_mmio.h to fix
+ update-linux-headers.sh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,436 +24,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Clement Deschamps <clement.deschamps@antfield.fr>, qemu-arm@nongnu.org, peter.maydell@linaro.org, andrew.baumann@microsoft.com
+To: Sam Bobroff <sam.bobroff@au1.ibm.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, sjitindarsingh@gmail.com, david@gibson.dropbear.id.au
 
-This adds the BCM2835 GPIO controller.
+On Thu, Feb 23, 2017 at 04:59:57PM +1100, Sam Bobroff wrote:
+> Currently, running update-linux-headers.sh will produce a patch that
+> deletes virtio_mmio.h, which is still needed. This happens because
+> virtio_mmio.h is in the directory used to store headers from the linux
+> kernel that are copied by the kernel's "make headers_install" target
+> (used by the update script) but it is not one of the files in that
+> set.
+> 
+> Fix this by moving that file into a new directory.
+> 
+> In the future if that file is added to the "headers_install" target
+> then this change should be reverted.
+> 
+> Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
 
-It currently implements:
-- The 54 GPIOs as outputs (qemu_irq)
-- The SD controller selection via alternate function of GPIOs 48-53
+This is a temporary condition. I'm merging a patch
+exporting virtio_mmio.h for next linux and we'll
+want to stay in sync, so I don't think we should make this
+change.
 
-Signed-off-by: Clement Deschamps <clement.deschamps@antfield.fr>
----
- hw/gpio/Makefile.objs          |   1 +
- hw/gpio/bcm2835_gpio.c         | 353 +++++++++++++++++++++++++++++++++++++++++
- include/hw/gpio/bcm2835_gpio.h |  39 +++++
- 3 files changed, 393 insertions(+)
- create mode 100644 hw/gpio/bcm2835_gpio.c
- create mode 100644 include/hw/gpio/bcm2835_gpio.h
-
-diff --git a/hw/gpio/Makefile.objs b/hw/gpio/Makefile.objs
-index a43c7cf442..fa0a72e6d0 100644
---- a/hw/gpio/Makefile.objs
-+++ b/hw/gpio/Makefile.objs
-@@ -7,3 +7,4 @@ common-obj-$(CONFIG_GPIO_KEY) += gpio_key.o
- 
- obj-$(CONFIG_OMAP) += omap_gpio.o
- obj-$(CONFIG_IMX) += imx_gpio.o
-+obj-$(CONFIG_RASPI) += bcm2835_gpio.o
-diff --git a/hw/gpio/bcm2835_gpio.c b/hw/gpio/bcm2835_gpio.c
-new file mode 100644
-index 0000000000..acc2e3cf9e
---- /dev/null
-+++ b/hw/gpio/bcm2835_gpio.c
-@@ -0,0 +1,353 @@
-+/*
-+ * Raspberry Pi (BCM2835) GPIO Controller
-+ *
-+ * Copyright (c) 2017 Antfield SAS
-+ *
-+ * Authors:
-+ *  Clement Deschamps <clement.deschamps@antfield.fr>
-+ *  Luc Michel <luc.michel@antfield.fr>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "qemu/timer.h"
-+#include "qapi/error.h"
-+#include "hw/sysbus.h"
-+#include "hw/sd/sd.h"
-+#include "hw/gpio/bcm2835_gpio.h"
-+
-+#define GPFSEL0   0x00
-+#define GPFSEL1   0x04
-+#define GPFSEL2   0x08
-+#define GPFSEL3   0x0C
-+#define GPFSEL4   0x10
-+#define GPFSEL5   0x14
-+#define GPSET0    0x1C
-+#define GPSET1    0x20
-+#define GPCLR0    0x28
-+#define GPCLR1    0x2C
-+#define GPLEV0    0x34
-+#define GPLEV1    0x38
-+#define GPEDS0    0x40
-+#define GPEDS1    0x44
-+#define GPREN0    0x4C
-+#define GPREN1    0x50
-+#define GPFEN0    0x58
-+#define GPFEN1    0x5C
-+#define GPHEN0    0x64
-+#define GPHEN1    0x68
-+#define GPLEN0    0x70
-+#define GPLEN1    0x74
-+#define GPAREN0   0x7C
-+#define GPAREN1   0x80
-+#define GPAFEN0   0x88
-+#define GPAFEN1   0x8C
-+#define GPPUD     0x94
-+#define GPPUDCLK0 0x98
-+#define GPPUDCLK1 0x9C
-+
-+static uint32_t gpfsel_get(BCM2835GpioState *s, uint8_t reg)
-+{
-+    int i;
-+    uint32_t value = 0;
-+    for (i = 0; i < 10; i++) {
-+        uint32_t index = 10 * reg + i;
-+        if (index < sizeof(s->fsel)) {
-+            value |= (s->fsel[index] & 0x7) << (3 * i);
-+        }
-+    }
-+    return value;
-+}
-+
-+static void gpfsel_set(BCM2835GpioState *s, uint8_t reg, uint32_t value)
-+{
-+    int i;
-+    for (i = 0; i < 10; i++) {
-+        uint32_t index = 10 * reg + i;
-+        if (index < sizeof(s->fsel)) {
-+            int fsel = (value >> (3 * i)) & 0x7;
-+            s->fsel[index] = fsel;
-+        }
-+    }
-+
-+    /* SD controller selection (48-53) */
-+    if (s->sd_fsel != 0
-+            && (s->fsel[48] == 0) /* SD_CLK_R */
-+            && (s->fsel[49] == 0) /* SD_CMD_R */
-+            && (s->fsel[50] == 0) /* SD_DATA0_R */
-+            && (s->fsel[51] == 0) /* SD_DATA1_R */
-+            && (s->fsel[52] == 0) /* SD_DATA2_R */
-+            && (s->fsel[53] == 0) /* SD_DATA3_R */
-+            ) {
-+        /* SDHCI controller selected */
-+        sdbus_reparent_card(s->sdbus_sdhost, s->sdbus_sdhci);
-+        s->sd_fsel = 0;
-+    } else if (s->sd_fsel != 4
-+            && (s->fsel[48] == 4) /* SD_CLK_R */
-+            && (s->fsel[49] == 4) /* SD_CMD_R */
-+            && (s->fsel[50] == 4) /* SD_DATA0_R */
-+            && (s->fsel[51] == 4) /* SD_DATA1_R */
-+            && (s->fsel[52] == 4) /* SD_DATA2_R */
-+            && (s->fsel[53] == 4) /* SD_DATA3_R */
-+            ) {
-+        /* SDHost controller selected */
-+        sdbus_reparent_card(s->sdbus_sdhci, s->sdbus_sdhost);
-+        s->sd_fsel = 4;
-+    }
-+}
-+
-+static int gpfsel_is_out(BCM2835GpioState *s, int index)
-+{
-+    if (index >= 0 && index < 54) {
-+        return s->fsel[index] == 1;
-+    }
-+    return 0;
-+}
-+
-+static void gpset(BCM2835GpioState *s,
-+        uint32_t val, uint8_t start, uint8_t count, uint32_t *lev)
-+{
-+    uint32_t changes = val & ~*lev;
-+    uint32_t cur = 1;
-+
-+    int i;
-+    for (i = 0; i < count; i++) {
-+        if ((changes & cur) && (gpfsel_is_out(s, start + i))) {
-+            qemu_set_irq(s->out[start + i], 1);
-+        }
-+        cur <<= 1;
-+    }
-+
-+    *lev |= val;
-+}
-+
-+static void gpclr(BCM2835GpioState *s,
-+        uint32_t val, uint8_t start, uint8_t count, uint32_t *lev)
-+{
-+    uint32_t changes = val & *lev;
-+    uint32_t cur = 1;
-+
-+    int i;
-+    for (i = 0; i < count; i++) {
-+        if ((changes & cur) && (gpfsel_is_out(s, start + i))) {
-+            qemu_set_irq(s->out[start + i], 0);
-+        }
-+        cur <<= 1;
-+    }
-+
-+    *lev &= ~val;
-+}
-+
-+static uint64_t bcm2835_gpio_read(void *opaque, hwaddr offset,
-+        unsigned size)
-+{
-+    BCM2835GpioState *s = (BCM2835GpioState *)opaque;
-+
-+    switch (offset) {
-+    case GPFSEL0:
-+    case GPFSEL1:
-+    case GPFSEL2:
-+    case GPFSEL3:
-+    case GPFSEL4:
-+    case GPFSEL5:
-+        return gpfsel_get(s, offset / 4);
-+    case GPSET0:
-+    case GPSET1:
-+        /* Write Only */
-+        return 0;
-+    case GPCLR0:
-+    case GPCLR1:
-+        /* Write Only */
-+        return 0;
-+    case GPLEV0:
-+        return s->lev0;
-+    case GPLEV1:
-+        return s->lev1;
-+    case GPEDS0:
-+    case GPEDS1:
-+    case GPREN0:
-+    case GPREN1:
-+    case GPFEN0:
-+    case GPFEN1:
-+    case GPHEN0:
-+    case GPHEN1:
-+    case GPLEN0:
-+    case GPLEN1:
-+    case GPAREN0:
-+    case GPAREN1:
-+    case GPAFEN0:
-+    case GPAFEN1:
-+    case GPPUD:
-+    case GPPUDCLK0:
-+    case GPPUDCLK1:
-+        /* Not implemented */
-+        return 0;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n",
-+                __func__, offset);
-+        break;
-+    }
-+
-+    return 0;
-+}
-+
-+static void bcm2835_gpio_write(void *opaque, hwaddr offset,
-+        uint64_t value, unsigned size)
-+{
-+    BCM2835GpioState *s = (BCM2835GpioState *)opaque;
-+
-+    switch (offset) {
-+    case GPFSEL0:
-+    case GPFSEL1:
-+    case GPFSEL2:
-+    case GPFSEL3:
-+    case GPFSEL4:
-+    case GPFSEL5:
-+        gpfsel_set(s, offset / 4, value);
-+        break;
-+    case GPSET0:
-+        gpset(s, value, 0, 32, &s->lev0);
-+        break;
-+    case GPSET1:
-+        gpset(s, value, 32, 22, &s->lev1);
-+        break;
-+    case GPCLR0:
-+        gpclr(s, value, 0, 32, &s->lev0);
-+        break;
-+    case GPCLR1:
-+        gpclr(s, value, 32, 22, &s->lev1);
-+        break;
-+    case GPLEV0:
-+    case GPLEV1:
-+        /* Read Only */
-+        break;
-+    case GPEDS0:
-+    case GPEDS1:
-+    case GPREN0:
-+    case GPREN1:
-+    case GPFEN0:
-+    case GPFEN1:
-+    case GPHEN0:
-+    case GPHEN1:
-+    case GPLEN0:
-+    case GPLEN1:
-+    case GPAREN0:
-+    case GPAREN1:
-+    case GPAFEN0:
-+    case GPAFEN1:
-+    case GPPUD:
-+    case GPPUDCLK0:
-+    case GPPUDCLK1:
-+        /* Not implemented */
-+        break;
-+    default:
-+        goto err_out;
-+    }
-+    return;
-+
-+err_out:
-+    qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n",
-+            __func__, offset);
-+}
-+
-+static void bcm2835_gpio_reset(DeviceState *dev)
-+{
-+    BCM2835GpioState *s = BCM2835_GPIO(dev);
-+
-+    int i;
-+    for (i = 0; i < 6; i++) {
-+        gpfsel_set(s, i, 0);
-+    }
-+
-+    s->sd_fsel = 0;
-+
-+    /* SDHCI is selected by default */
-+    sdbus_reparent_card(&s->sdbus, s->sdbus_sdhci);
-+
-+    s->lev0 = 0;
-+    s->lev1 = 0;
-+}
-+
-+static const MemoryRegionOps bcm2835_gpio_ops = {
-+    .read = bcm2835_gpio_read,
-+    .write = bcm2835_gpio_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+};
-+
-+static const VMStateDescription vmstate_bcm2835_gpio = {
-+    .name = "bcm2835_gpio",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT8_ARRAY(fsel, BCM2835GpioState, 54),
-+        VMSTATE_UINT32(lev0, BCM2835GpioState),
-+        VMSTATE_UINT32(lev1, BCM2835GpioState),
-+        VMSTATE_UINT8(sd_fsel, BCM2835GpioState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void bcm2835_gpio_init(Object *obj)
-+{
-+    BCM2835GpioState *s = BCM2835_GPIO(obj);
-+    DeviceState *dev = DEVICE(obj);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+
-+    qbus_create_inplace(&s->sdbus, sizeof(s->sdbus),
-+                        TYPE_SD_BUS, DEVICE(s), "sd-bus");
-+
-+    memory_region_init_io(&s->iomem, obj,
-+            &bcm2835_gpio_ops, s, "bcm2835_gpio", 0x1000);
-+    sysbus_init_mmio(sbd, &s->iomem);
-+    qdev_init_gpio_out(dev, s->out, 54);
-+}
-+
-+static void bcm2835_gpio_realize(DeviceState *dev, Error **errp)
-+{
-+    BCM2835GpioState *s = BCM2835_GPIO(dev);
-+    Object *obj;
-+    Error *err = NULL;
-+
-+    obj = object_property_get_link(OBJECT(dev), "sdbus-sdhci", &err);
-+    if (obj == NULL) {
-+        error_setg(errp, "%s: required sdhci link not found: %s",
-+                __func__, error_get_pretty(err));
-+        return;
-+    }
-+    s->sdbus_sdhci = SD_BUS(obj);
-+
-+    obj = object_property_get_link(OBJECT(dev), "sdbus-sdhost", &err);
-+    if (obj == NULL) {
-+        error_setg(errp, "%s: required sdhost link not found: %s",
-+                __func__, error_get_pretty(err));
-+        return;
-+    }
-+    s->sdbus_sdhost = SD_BUS(obj);
-+}
-+
-+static void bcm2835_gpio_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->vmsd = &vmstate_bcm2835_gpio;
-+    dc->realize = &bcm2835_gpio_realize;
-+    dc->reset = &bcm2835_gpio_reset;
-+}
-+
-+static const TypeInfo bcm2835_gpio_info = {
-+    .name          = TYPE_BCM2835_GPIO,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(BCM2835GpioState),
-+    .instance_init = bcm2835_gpio_init,
-+    .class_init    = bcm2835_gpio_class_init,
-+};
-+
-+static void bcm2835_gpio_register_types(void)
-+{
-+    type_register_static(&bcm2835_gpio_info);
-+}
-+
-+type_init(bcm2835_gpio_register_types)
-diff --git a/include/hw/gpio/bcm2835_gpio.h b/include/hw/gpio/bcm2835_gpio.h
-new file mode 100644
-index 0000000000..9f8e0c720c
---- /dev/null
-+++ b/include/hw/gpio/bcm2835_gpio.h
-@@ -0,0 +1,39 @@
-+/*
-+ * Raspberry Pi (BCM2835) GPIO Controller
-+ *
-+ * Copyright (c) 2017 Antfield SAS
-+ *
-+ * Authors:
-+ *  Clement Deschamps <clement.deschamps@antfield.fr>
-+ *  Luc Michel <luc.michel@antfield.fr>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef BCM2835_GPIO_H
-+#define BCM2835_GPIO_H
-+
-+#include "hw/sd/sd.h"
-+
-+typedef struct BCM2835GpioState {
-+    SysBusDevice parent_obj;
-+
-+    MemoryRegion iomem;
-+
-+    /* SDBus selector */
-+    SDBus sdbus;
-+    SDBus *sdbus_sdhci;
-+    SDBus *sdbus_sdhost;
-+
-+    uint8_t fsel[54];
-+    uint32_t lev0, lev1;
-+    uint8_t sd_fsel;
-+    qemu_irq out[54];
-+} BCM2835GpioState;
-+
-+#define TYPE_BCM2835_GPIO "bcm2835_gpio"
-+#define BCM2835_GPIO(obj) \
-+    OBJECT_CHECK(BCM2835GpioState, (obj), TYPE_BCM2835_GPIO)
-+
-+#endif
--- 
-2.11.1
+> ---
+> v2:
+> * FWIW, here's one way of fixing it.
+> 
+>  hw/virtio/virtio-mmio.c                                          | 2 +-
+>  include/{standard-headers => kernel-headers}/linux/virtio_mmio.h | 0
+>  2 files changed, 1 insertion(+), 1 deletion(-)
+>  rename include/{standard-headers => kernel-headers}/linux/virtio_mmio.h (100%)
+> 
+> diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
+> index 5807aa87fe..cc6afa9da1 100644
+> --- a/hw/virtio/virtio-mmio.c
+> +++ b/hw/virtio/virtio-mmio.c
+> @@ -20,7 +20,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "standard-headers/linux/virtio_mmio.h"
+> +#include "kernel-headers/linux/virtio_mmio.h"
+>  #include "hw/sysbus.h"
+>  #include "hw/virtio/virtio.h"
+>  #include "qemu/host-utils.h"
+> diff --git a/include/standard-headers/linux/virtio_mmio.h b/include/kernel-headers/linux/virtio_mmio.h
+> similarity index 100%
+> rename from include/standard-headers/linux/virtio_mmio.h
+> rename to include/kernel-headers/linux/virtio_mmio.h
+> -- 
+> 2.11.0
+> 
