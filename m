@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <herongguang.he@huawei.com>) id 1ch5tq-0004qJ-Vt
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 21:46:28 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ch6Ah-0004I4-GP
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 22:03:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <herongguang.he@huawei.com>) id 1ch5tn-0006oT-Uk
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 21:46:27 -0500
-Received: from [45.249.212.187] (port=2989 helo=dggrg01-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <herongguang.he@huawei.com>) id 1ch5tm-0006oD-5u
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 21:46:23 -0500
-References: <589C7E96.9060905@huawei.com> <589D83CE.1090803@huawei.com>
-	<589DDC05.9010807@windriver.com> <58AA51D6.6020508@huawei.com>
-	<1487565495.3740.27.camel@intel.com> <58AD0094.90304@windriver.com>
-	<4dd92012-626a-2d80-9adb-0be398f73eb1@redhat.com>
-	<58AD92AE.6040502@windriver.com>
-	<6c5567f4-192d-aefd-90e4-89f53479c24e@redhat.com>
-From: "Herongguang (Stephen)" <herongguang.he@huawei.com>
-Message-ID: <58AF9921.6060201@huawei.com>
-Date: Fri, 24 Feb 2017 10:23:29 +0800
+	(envelope-from <dgibson@ozlabs.org>) id 1ch6Ad-00023X-HN
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 22:03:51 -0500
+Date: Fri, 24 Feb 2017 13:58:41 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170224025841.GN17615@umbus.fritz.box>
+References: <1487879800-12352-1-git-send-email-nikunj@linux.vnet.ibm.com>
+	<1487879800-12352-7-git-send-email-nikunj@linux.vnet.ibm.com>
+	<755c77c5-0930-b5ee-0b3b-1e0608301c8d@twiddle.net>
+	<87a89cza5l.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
 MIME-Version: 1.0
-In-Reply-To: <6c5567f4-192d-aefd-90e4-89f53479c24e@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] kvm bug in __rmap_clear_dirty during live migration
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="QQNwO3VdVfodZayb"
+Content-Disposition: inline
+In-Reply-To: <87a89cza5l.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH v4 06/15] target/ppc: remove xer split-out
+ flags(so, ov, ca)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +27,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Chris Friesen <chris.friesen@windriver.com>, "Han, Huaitong" <huaitong.han@intel.com>, "hangaohuai@huawei.com" <hangaohuai@huawei.com>, stable@vger.kernel.org
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "fangying1@huawei.com" <fangying1@huawei.com>, "xudong.hao@linux.intel.com" <xudong.hao@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "wangxinxin.wang@huawei.com" <wangxinxin.wang@huawei.com>, "kai.huang@linux.intel.com" <kai.huang@linux.intel.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "guangrong.xiao@linux.intel.com" <guangrong.xiao@linux.intel.com>, linux-kernel@vger.kernel.org
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Cc: Richard Henderson <rth@twiddle.net>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
 
+--QQNwO3VdVfodZayb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 2017/2/22 22:43, Paolo Bonzini wrote:
->
->
-> On 22/02/2017 14:31, Chris Friesen wrote:
->>>>
->>>
->>> Can you reproduce it with kernel 4.8+?  I'm suspecting commmit
->>> 4e59516a12a6 ("kvm: vmx: ensure VMCS is current while enabling PML",
->>> 2016-07-14) to be the fix.
->>
->> I can't easily try with a newer kernel, the software package we're using
->> has kernel patches that would have to be ported.
->>
->> I'm at a conference, don't really have time to set up a pair of test
->> machines from scratch with a custom kernel.
->
-> Hopefully Gaohuai and Rongguang can help with this too.
->
-> Paolo
->
-> .
->
-Yes, we are looking into and testing this.
+On Fri, Feb 24, 2017 at 06:18:22AM +0530, Nikunj A Dadhania wrote:
+> Richard Henderson <rth@twiddle.net> writes:
+>=20
+> > On 02/24/2017 06:56 AM, Nikunj A Dadhania wrote:
+> >> Now get rid all the split out variables so, ca, ov. After this patch,
+> >> all the bits are stored in CPUPPCState::xer at appropriate places.
+> >>
+> >> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+> >> ---
+> >>  target/ppc/cpu.c        |   8 +---
+> >>  target/ppc/cpu.h        |  26 ++++++------
+> >>  target/ppc/int_helper.c |  12 +++---
+> >>  target/ppc/translate.c  | 106 +++++++++++++++++++++++++--------------=
+---------
+> >>  4 files changed, 78 insertions(+), 74 deletions(-)
+> >
+> > I do not think this is a good direction to take this.
+>=20
+> Hmm, any particular reason?
 
-I think this can result in any memory corruption, if VM1 writes its
-PML buffer into VM2’s VMCS (since sched_in/sched_out notifier of VM1
-is not registered yet), then VM1 is destroyed (hence its PML buffer
-is freed back to kernel), after that, VM2 starts migration, so CPU
-logs VM2’s dirty GFNS into a freed memory, results in any memory corruption.
+Right, I suggested this, but based only a suspicion that the split
+variables weren't worth the complexity.  I'm happy to be corrected by
+someone with better knowledge of TCG, but it'd be nice to know why.
 
-As its severity, this commit (http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=4e59516a12a6ef6dcb660cb3a3f70c64bd60cfec)
-is eligible to back port to kernel stable.
+> I can send back the v3 with suggested changes dropping the xer split out
+> changes.
+>=20
+> Regards
+> Nikunj
+>=20
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--QQNwO3VdVfodZayb
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYr6FhAAoJEGw4ysog2bOSXh0P/2mwJkWcSXO0FwrDBiikKo10
+UuVO422Wb9zpA+Jd/HnkpBYzMMFc0lGxFcrr5VpnXhqkBCiyGMy6VNx66KP/JcIO
+UA7CBibwDDcpNiUWNoPEZUBGVGUxWLwNxUltTV0vkbc+NopHI0f4OHG/Zz/WhQXb
+B2Q+b6bfr5w+q6W5kFZbSMp9yBKcK+81W2slLRhMoCUCLWbWBp4c4PjiOGv91wob
+pzWXZFL+Yh2tb5reMrVOIwEbClwmvNg79LUnT9q3UneP2IqPTXviTXqCuIRuHYwk
+yFQTtoFo2PJpjBYYogGLSUSZznb0L7TbEzhQ/RSrMY0fd6mUfOgCt4qITPo3A7go
+OKfv7EcOLYwhA1bVq+uJqHWAcuNvVKfha0zFa0GnhZb4vjA2YV5Hasza3Aiejk0b
+iyeFSci8GxYMcwK17ufmJ9rWIDVARXEvshDDXiH0u6jSp8EStvE9v/xkAFD7pbdG
+Xp42cn1XiaDuzIjdytv5ZBrOuu4sCeV5XOx83B8L/nH/cwctcKCSCtL7DJqsdmEb
+ajqLpQkReVLC1JXaYd3JJlGBMN3BOWEISBqmP2r4RnCpfXRt6XoYSQDSVN82K7iY
+IbKjAUjMBtooaHcPzytp0nhnvc2Jnl4987rnRThzASXL0rmqp/M9DOSgbwl+Zj9r
+hnMhsfA/JSWkXsf9rDve
+=5A+H
+-----END PGP SIGNATURE-----
+
+--QQNwO3VdVfodZayb--
