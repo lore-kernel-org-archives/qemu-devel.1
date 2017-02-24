@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1chFVU-0007kK-TZ
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:02:20 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1chFeB-0004bz-0t
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:10:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1chFUi-0006oF-Tw
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:01:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50954)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1chFUi-0006ll-Ig
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:01:08 -0500
-Date: Fri, 24 Feb 2017 13:01:02 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170224130101.GB8830@work-vm>
-References: <20161229091619.31049-1-fanc.fnst@cn.fujitsu.com>
-	<20170118051015.GA6649@localhost.localdomain>
-	<20170127120726.GD3323@work-vm>
-	<20170206062539.GA25117@localhost.localdomain>
+	(envelope-from <dgibson@ozlabs.org>) id 1chFe6-0004ts-Uu
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:10:54 -0500
+Date: Sat, 25 Feb 2017 00:03:57 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170224130357.GF17615@umbus.fritz.box>
+References: <20170222063348.32176-38-david@gibson.dropbear.id.au>
+	<1487761555-93223-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="L2zmpNdaDxUzilj2"
 Content-Disposition: inline
-In-Reply-To: <20170206062539.GA25117@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH RFC] migration: set cpu throttle value by
- workload
+In-Reply-To: <1487761555-93223-1-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 37/43] spapr: reuse machine->possible_cpus
+ instead of cores[]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,626 +25,383 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Chao Fan <fanc.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, amit.shah@redhat.com, douly.fnst@cn.fujitsu.com, caoj.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com, izumi.taku@jp.fujitsu.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, agraf@suse.de, thuth@redhat.com, lvivier@redhat.com, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, peter.maydell@linaro.org
 
-* Chao Fan (fanc.fnst@cn.fujitsu.com) wrote:
-> On Fri, Jan 27, 2017 at 12:07:27PM +0000, Dr. David Alan Gilbert wrote:
-> >* Chao Fan (fanc.fnst@cn.fujitsu.com) wrote:
-> >> Hi all,
-> >> 
-> >> This is a test for this RFC patch.
-> >> 
-> >> Start vm as following:
-> >> cmdline="./x86_64-softmmu/qemu-system-x86_64 -m 2560 \
-> >> -drive if=none,file=/nfs/img/fedora.qcow2,format=qcow2,id=foo \
-> >> -netdev tap,id=hn0,queues=1 \
-> >> -device virtio-net-pci,id=net-pci0,netdev=hn0 \
-> >> -device virtio-blk,drive=foo \
-> >> -enable-kvm -M pc -cpu host \
-> >> -vnc :3 \
-> >> -monitor stdio"
-> >> 
-> >> Continue running benchmark program named himeno[*](modified base on
-> >> original source). The code is in the attach file, make it in MIDDLE.
-> >> It costs much cpu calculation and memory. Then migrate the guest.
-> >> The source host and target host are in one switch.
-> >> 
-> >> "before" means the upstream version, "after" means applying this patch.
-> >> "idpr" means "inst_dirty_pages_rate", a new variable in this RFC PATCH.
-> >> "count" is "dirty sync count" in "info migrate".
-> >> "time" is "total time" in "info migrate".
-> >> "ct pct" is "cpu throttle percentage" in "info migrate".
-> >> 
-> >> -------------------------------------------- 
-> >> |     |    before    |        after        | 
-> >> |-----|--------------|---------------------| 
-> >> |count|time(s)|ct pct|time(s)| idpr |ct pct| 
-> >> |-----|-------|------|-------|------|------| 
-> >> |  1  |    3  |   0  |    4  |   x  |   0  | 
-> >> |  2  |   53  |   0  |   53  | 14237|   0  | 
-> >> |  3  |   97  |   0  |   95  |  3142|   0  | 
-> >> |  4  |  109  |   0  |  105  | 11085|   0  | 
-> >> |  5  |  117  |   0  |  113  | 12894|   0  | 
-> >> |  6  |  125  |  20  |  121  | 13549|  67  | 
-> >> |  7  |  133  |  20  |  130  | 13550|  67  | 
-> >> |  8  |  141  |  20  |  136  | 13587|  67  | 
-> >> |  9  |  149  |  30  |  144  | 13553|  99  | 
-> >> | 10  |  156  |  30  |  152  |  1474|  99  |  
-> >> | 11  |  164  |  30  |  152  |  1706|  99  |  
-> >> | 12  |  172  |  40  |  153  |   0  |  99  |  
-> >> | 13  |  180  |  40  |  153  |   0  |   x  |  
-> >> | 14  |  188  |  40  |---------------------|
-> >> | 15  |  195  |  50  |      completed      |  
-> >> | 16  |  203  |  50  |                     |  
-> >> | 17  |  211  |  50  |                     |  
-> >> | 18  |  219  |  60  |                     |  
-> >> | 19  |  227  |  60  |                     |  
-> >> | 20  |  235  |  60  |                     |  
-> >> | 21  |  242  |  70  |                     |  
-> >> | 22  |  250  |  70  |                     |  
-> >> | 23  |  258  |  70  |                     |  
-> >> | 24  |  266  |  80  |                     |  
-> >> | 25  |  274  |  80  |                     |  
-> >> | 26  |  281  |  80  |                     |  
-> >> | 27  |  289  |  90  |                     |  
-> >> | 28  |  297  |  90  |                     |  
-> >> | 29  |  305  |  90  |                     |  
-> >> | 30  |  315  |  99  |                     |  
-> >> | 31  |  320  |  99  |                     |  
-> >> | 32  |  320  |  99  |                     |  
-> >> | 33  |  321  |  99  |                     |  
-> >> | 34  |  321  |  99  |                     |  
-> >> |--------------------|                     |
-> >> |    completed       |                     |
-> >> --------------------------------------------
-> >> 
-> >> And the "info migrate" when completed:
-> >> 
-> >> before:
-> >> capabilities: xbzrle: off rdma-pin-all: off auto-converge: on
-> >> zero-blocks: off compress: off events: off postcopy-ram: off x-colo: off 
-> >> Migration status: completed
-> >> total time: 321091 milliseconds
-> >> downtime: 573 milliseconds
-> >> setup: 40 milliseconds
-> >> transferred ram: 10509346 kbytes
-> >> throughput: 268.13 mbps
-> >> remaining ram: 0 kbytes
-> >> total ram: 2638664 kbytes
-> >> duplicate: 362439 pages
-> >> skipped: 0 pages
-> >> normal: 2621414 pages
-> >> normal bytes: 10485656 kbytes
-> >> dirty sync count: 34
-> >> 
-> >> after:
-> >> capabilities: xbzrle: off rdma-pin-all: off auto-converge: on
-> >> zero-blocks: off compress: off events: off postcopy-ram: off x-colo: off 
-> >> Migration status: completed
-> >> total time: 152652 milliseconds
-> >> downtime: 290 milliseconds
-> >> setup: 47 milliseconds
-> >> transferred ram: 4997452 kbytes
-> >> throughput: 268.20 mbps
-> >> remaining ram: 0 kbytes
-> >> total ram: 2638664 kbytes
-> >> duplicate: 359598 pages
-> >> skipped: 0 pages
-> >> normal: 1246136 pages
-> >> normal bytes: 4984544 kbytes
-> >> dirty sync count: 13
-> >> 
-> >> It's clear that the total time is much better(321s VS 153s).
-> >> The guest began cpu throttle in the 6th dirty sync. But at this time,
-> >> the dirty pages born too much in this guest. So the default
-> >> cpu throttle percentage(20 and 10) is too small for this condition. I
-> >> just use (inst_dirty_pages_rate / 200) to calculate the cpu throttle
-> >> value. This is just an adhoc algorithm, not supported by any theories. 
-> >> 
-> >> Of course on the other hand, the cpu throttle percentage is higher, the
-> >> guest runs more slowly. But in the result, after applying this patch,
-> >> the guest spend 23s with the cpu throttle percentage is 67 (total time
-> >> from 121 to 144), and 9s with cpu throttle percentage is 99 (total time
-> >> from 144 to completed). But in the upstream version, the guest spend
-> >> 73s with the cpu throttle percentage is 70.80.90 (total time from 21 to
-> >> 30), 6s with the cpu throttle percentage is 99 (total time from 30 to
-> >> completed). So I think the influence to the guest performance after my
-> >> patch is fewer than the upstream version.
-> >> 
-> >> Any comments will be welcome.
-> Hi Dave,
-> Thanks for review and sorry for replying late, I was on holiday.
-> >
-> >Hi Chao Fan,
-> >  I think with this benchmark those results do show it's better;
-> >having 23s of high guest performance loss is better than 73s.
-> >
-> >The difficulty is as you say the ' / 200' is an adhoc algorithm,
-> 
-> Yes, in other conditions, ' / 200' may be not suitable.
-> 
-> >so for other benchmarks who knows what value we should use - higher
-> >or smaller?  Your test is only on a very small VM (1 CPU, 2.5GB RAM);
-> >what happens on a big VM (say 32 CPU, 256GB RAM).
-> >
-> >I think there are two parts to this:
-> >   a) Getting a better measure of how fast the guest changes memory
-> >   b) Modifying the auto-converge parameters
-> >
-> >  (a) would be good to do in QEMU
-> >  (b) We can leave to some higher level management system outside
-> >QEMU, as long as we provide (a) in the 'info migrate' status
-> >for that tool to use - it means we don't have to fix that '/ 200'
-> >in qemu.
-> 
-> Do you mean that just add an auto-converge parameter to show
-> how fast the guest changes memory, then users set the cpu
-> throttle value, instead of QEMU changing it automatic?
 
-Yes, because if QEMU sets it then we have to make decisions like that '/ 200'
-that will only work for some workloads and users.  Generally we leave
-decisions like that to the higher levels.
+--L2zmpNdaDxUzilj2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> >
-> >I'm surprised that your code for (a) goes direct to dirty_memory[]
-> >rather than using the migration_bitmap that we synchronise from;
-> >that only gets updated at the end of each pass and that's what we
-> >calculate the rate from - is your mechanism better than that?
-> 
-> Because cpu throttle makes migration faster by dcreasing the dirty
-> pages born, I think cpu throttle value should be caculated according
-> to how many *new dirty pages* born between two sync. So dirty_memory
-> is more helpfule. If I get from migration_bitmap, some dirty pages
-> will be migrated and some will be born, and also some dirty pages
-> may be migrated and dirtied again. migration_bitmap can not show
-> exactly how many new dirty pages born.
+On Wed, Feb 22, 2017 at 12:05:55PM +0100, Igor Mammedov wrote:
+> Replace SPAPR specific cores[] array with generic
+> machine->possible_cpus and store core objects there.
+> It makes cores bookkeeping similar to x86 cpus and
+> will allow to unify similar code.
+> It would allow to replace cpu_index based NUMA node
+> mapping with property based one (for -device created
+> cores) since possible_cpus carries board defined
+> topology/layout.
+>=20
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Acked-by: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 
-Yes, true, it's a little better.
+Sorry Igor, Peter has applied the original version.  Can you resend
+these updates as deltas against the applied versions of the patches.
 
-Dave
+> ---
+> v3:
+>   - drop "// TODO" comment as todo is completed in next patch anyway
+>     fixes checkpatch error wrt // comment
+> v2:
+>   - remove extra ';' at the end of expression (David Gibson)
+> ---
+>  include/hw/ppc/spapr.h |   1 -
+>  hw/ppc/spapr.c         | 127 ++++++++++++++++++++++++++++++++++---------=
+------
+>  2 files changed, 89 insertions(+), 39 deletions(-)
+>=20
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index a2d8964..f9b17d8 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -94,7 +94,6 @@ struct sPAPRMachineState {
+>      /*< public >*/
+>      char *kvm_type;
+>      MemoryHotplugState hotplug_memory;
+> -    Object **cores;
+>  };
+> =20
+>  #define H_SUCCESS         0
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 37cb338..735f53d 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1751,13 +1751,28 @@ static void spapr_validate_node_memory(MachineSta=
+te *machine, Error **errp)
+>      }
+>  }
+> =20
+> +/* find cpu slot in machine->possible_cpus by core_id */
+> +static CPUArchId *spapr_find_cpu_slot(MachineState *ms, uint32_t id, int=
+ *idx)
+> +{
+> +    int index =3D id / smp_threads;
+> +
+> +    if (index >=3D ms->possible_cpus->len) {
+> +        return NULL;
+> +    }
+> +    if (idx) {
+> +        *idx =3D index;
+> +    }
+> +    return &ms->possible_cpus->cpus[index];
+> +}
+> +
+>  static void spapr_init_cpus(sPAPRMachineState *spapr)
+>  {
+>      MachineState *machine =3D MACHINE(spapr);
+>      MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+>      char *type =3D spapr_get_cpu_core_type(machine->cpu_model);
+>      int smt =3D kvmppc_smt_threads();
+> -    int spapr_max_cores, spapr_cores;
+> +    const CPUArchIdList *possible_cpus;
+> +    int boot_cores_nr =3D smp_cpus / smp_threads;
+>      int i;
+> =20
+>      if (!type) {
+> @@ -1765,6 +1780,7 @@ static void spapr_init_cpus(sPAPRMachineState *spap=
+r)
+>          exit(1);
+>      }
+> =20
+> +    possible_cpus =3D mc->possible_cpu_arch_ids(machine);
+>      if (mc->query_hotpluggable_cpus) {
+>          if (smp_cpus % smp_threads) {
+>              error_report("smp_cpus (%u) must be multiple of threads (%u)=
+",
+> @@ -1776,21 +1792,15 @@ static void spapr_init_cpus(sPAPRMachineState *sp=
+apr)
+>                           max_cpus, smp_threads);
+>              exit(1);
+>          }
+> -
+> -        spapr_max_cores =3D max_cpus / smp_threads;
+> -        spapr_cores =3D smp_cpus / smp_threads;
+>      } else {
+>          if (max_cpus !=3D smp_cpus) {
+>              error_report("This machine version does not support CPU hotp=
+lug");
+>              exit(1);
+>          }
+> -
+> -        spapr_max_cores =3D QEMU_ALIGN_UP(smp_cpus, smp_threads) / smp_t=
+hreads;
+> -        spapr_cores =3D spapr_max_cores;
+> +        boot_cores_nr =3D possible_cpus->len;
+>      }
+> =20
+> -    spapr->cores =3D g_new0(Object *, spapr_max_cores);
+> -    for (i =3D 0; i < spapr_max_cores; i++) {
+> +    for (i =3D 0; i < possible_cpus->len; i++) {
+>          int core_id =3D i * smp_threads;
+> =20
+>          if (mc->query_hotpluggable_cpus) {
+> @@ -1802,7 +1812,7 @@ static void spapr_init_cpus(sPAPRMachineState *spap=
+r)
+>              qemu_register_reset(spapr_drc_reset, drc);
+>          }
+> =20
+> -        if (i < spapr_cores) {
+> +        if (i < boot_cores_nr) {
+>              Object *core  =3D object_new(type);
+>              int nr_threads =3D smp_threads;
+> =20
+> @@ -2491,10 +2501,11 @@ void *spapr_populate_hotplug_cpu_dt(CPUState *cs,=
+ int *fdt_offset,
+>  static void spapr_core_unplug(HotplugHandler *hotplug_dev, DeviceState *=
+dev,
+>                                Error **errp)
+>  {
+> -    sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+> +    MachineState *ms =3D MACHINE(qdev_get_machine());
+>      CPUCore *cc =3D CPU_CORE(dev);
+> +    CPUArchId *core_slot =3D spapr_find_cpu_slot(ms, cc->core_id, NULL);
+> =20
+> -    spapr->cores[cc->core_id / smp_threads] =3D NULL;
+> +    core_slot->cpu =3D NULL;
+>      object_unparent(OBJECT(dev));
+>  }
+> =20
+> @@ -2510,19 +2521,24 @@ static
+>  void spapr_core_unplug_request(HotplugHandler *hotplug_dev, DeviceState =
+*dev,
+>                                 Error **errp)
+>  {
+> -    CPUCore *cc =3D CPU_CORE(dev);
+> -    int smt =3D kvmppc_smt_threads();
+> -    int index =3D cc->core_id / smp_threads;
+> -    sPAPRDRConnector *drc =3D
+> -        spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_CPU, index * sm=
+t);
+> +    int index;
+> +    sPAPRDRConnector *drc;
+>      sPAPRDRConnectorClass *drck;
+>      Error *local_err =3D NULL;
+> +    CPUCore *cc =3D CPU_CORE(dev);
+> +    int smt =3D kvmppc_smt_threads();
+> =20
+> +    if (!spapr_find_cpu_slot(MACHINE(hotplug_dev), cc->core_id, &index))=
+ {
+> +        error_setg(errp, "Unable to find CPU core with core-id: %d",
+> +                   cc->core_id);
+> +        return;
+> +    }
+>      if (index =3D=3D 0) {
+>          error_setg(errp, "Boot CPU core may not be unplugged");
+>          return;
+>      }
+> =20
+> +    drc =3D spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_CPU, index =
+* smt);
+>      g_assert(drc);
+> =20
+>      drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+> @@ -2547,11 +2563,17 @@ static void spapr_core_plug(HotplugHandler *hotpl=
+ug_dev, DeviceState *dev,
+>      Error *local_err =3D NULL;
+>      void *fdt =3D NULL;
+>      int fdt_offset =3D 0;
+> -    int index =3D cc->core_id / smp_threads;
+>      int smt =3D kvmppc_smt_threads();
+> +    CPUArchId *core_slot;
+> +    int index;
+> =20
+> +    core_slot =3D spapr_find_cpu_slot(MACHINE(hotplug_dev), cc->core_id,=
+ &index);
+> +    if (!core_slot) {
+> +        error_setg(errp, "Unable to find CPU core with core-id: %d",
+> +                   cc->core_id);
+> +        return;
+> +    }
+>      drc =3D spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_CPU, index =
+* smt);
+> -    spapr->cores[index] =3D OBJECT(dev);
+> =20
+>      g_assert(drc || !mc->query_hotpluggable_cpus);
+> =20
+> @@ -2568,7 +2590,6 @@ static void spapr_core_plug(HotplugHandler *hotplug=
+_dev, DeviceState *dev,
+>          drck->attach(drc, dev, fdt, fdt_offset, !dev->hotplugged, &local=
+_err);
+>          if (local_err) {
+>              g_free(fdt);
+> -            spapr->cores[index] =3D NULL;
+>              error_propagate(errp, local_err);
+>              return;
+>          }
+> @@ -2590,6 +2611,7 @@ static void spapr_core_plug(HotplugHandler *hotplug=
+_dev, DeviceState *dev,
+>              drck->set_isolation_state(drc, SPAPR_DR_ISOLATION_STATE_UNIS=
+OLATED);
+>          }
+>      }
+> +    core_slot->cpu =3D OBJECT(dev);
+>  }
+> =20
+>  static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState=
+ *dev,
+> @@ -2597,13 +2619,12 @@ static void spapr_core_pre_plug(HotplugHandler *h=
+otplug_dev, DeviceState *dev,
+>  {
+>      MachineState *machine =3D MACHINE(OBJECT(hotplug_dev));
+>      MachineClass *mc =3D MACHINE_GET_CLASS(hotplug_dev);
+> -    sPAPRMachineState *spapr =3D SPAPR_MACHINE(OBJECT(hotplug_dev));
+> -    int spapr_max_cores =3D max_cpus / smp_threads;
+> -    int index;
+>      Error *local_err =3D NULL;
+>      CPUCore *cc =3D CPU_CORE(dev);
+>      char *base_core_type =3D spapr_get_cpu_core_type(machine->cpu_model);
+>      const char *type =3D object_get_typename(OBJECT(dev));
+> +    CPUArchId *core_slot;
+> +    int index;
+> =20
+>      if (dev->hotplugged && !mc->query_hotpluggable_cpus) {
+>          error_setg(&local_err, "CPU hotplug not supported for this machi=
+ne");
+> @@ -2620,13 +2641,13 @@ static void spapr_core_pre_plug(HotplugHandler *h=
+otplug_dev, DeviceState *dev,
+>          goto out;
+>      }
+> =20
+> -    index =3D cc->core_id / smp_threads;
+> -    if (index < 0 || index >=3D spapr_max_cores) {
+> +    core_slot =3D spapr_find_cpu_slot(MACHINE(hotplug_dev), cc->core_id,=
+ &index);
+> +    if (!core_slot) {
+>          error_setg(&local_err, "core id %d out of range", cc->core_id);
+>          goto out;
+>      }
+> =20
+> -    if (spapr->cores[index]) {
+> +    if (core_slot->cpu) {
+>          error_setg(&local_err, "core %d already populated", cc->core_id);
+>          goto out;
+>      }
+> @@ -2758,29 +2779,58 @@ static unsigned spapr_cpu_index_to_socket_id(unsi=
+gned cpu_index)
+>      return cpu_index / smp_threads / smp_cores;
+>  }
+> =20
+> +static const CPUArchIdList *spapr_possible_cpu_arch_ids(MachineState *ma=
+chine)
+> +{
+> +    int i;
+> +    int spapr_max_cores =3D max_cpus / smp_threads;
+> +    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+> +
+> +    if (!mc->query_hotpluggable_cpus) {
+> +        spapr_max_cores =3D QEMU_ALIGN_UP(smp_cpus, smp_threads) / smp_t=
+hreads;
+> +    }
+> +    if (machine->possible_cpus) {
+> +        assert(machine->possible_cpus->len =3D=3D spapr_max_cores);
+> +        return machine->possible_cpus;
+> +    }
+> +
+> +    machine->possible_cpus =3D g_malloc0(sizeof(CPUArchIdList) +
+> +                             sizeof(CPUArchId) * spapr_max_cores);
+> +    machine->possible_cpus->len =3D spapr_max_cores;
+> +    for (i =3D 0; i < machine->possible_cpus->len; i++) {
+> +        int core_id =3D i * smp_threads;
+> +
+> +        machine->possible_cpus->cpus[i].arch_id =3D core_id;
+> +        machine->possible_cpus->cpus[i].props.has_core_id =3D true;
+> +        machine->possible_cpus->cpus[i].props.core_id =3D core_id;
+> +        /* TODO: add 'has_node/node' here to describe
+> +           to which node core belongs */
+> +    }
+> +    return machine->possible_cpus;
+> +}
+> +
+>  static HotpluggableCPUList *spapr_query_hotpluggable_cpus(MachineState *=
+machine)
+>  {
+>      int i;
+> +    Object *cpu;
+>      HotpluggableCPUList *head =3D NULL;
+> -    sPAPRMachineState *spapr =3D SPAPR_MACHINE(machine);
+> -    int spapr_max_cores =3D max_cpus / smp_threads;
+> +    const char *cpu_type;
+> =20
+> -    for (i =3D 0; i < spapr_max_cores; i++) {
+> +    cpu =3D machine->possible_cpus->cpus[0].cpu;
+> +    assert(cpu); /* Boot cpu is always present */
+> +    cpu_type =3D object_get_typename(cpu);
+> +    for (i =3D 0; i < machine->possible_cpus->len; i++) {
+>          HotpluggableCPUList *list_item =3D g_new0(typeof(*list_item), 1);
+>          HotpluggableCPU *cpu_item =3D g_new0(typeof(*cpu_item), 1);
+> -        CpuInstanceProperties *cpu_props =3D g_new0(typeof(*cpu_props), =
+1);
+> =20
+> -        cpu_item->type =3D spapr_get_cpu_core_type(machine->cpu_model);
+> +        cpu_item->type =3D g_strdup(cpu_type);
+>          cpu_item->vcpus_count =3D smp_threads;
+> -        cpu_props->has_core_id =3D true;
+> -        cpu_props->core_id =3D i * smp_threads;
+> -        /* TODO: add 'has_node/node' here to describe
+> -           to which node core belongs */
+> +        cpu_item->props =3D g_memdup(&machine->possible_cpus->cpus[i].pr=
+ops,
+> +                                   sizeof(*cpu_item->props));
+> =20
+> -        cpu_item->props =3D cpu_props;
+> -        if (spapr->cores[i]) {
+> +        cpu =3D machine->possible_cpus->cpus[i].cpu;
+> +        if (cpu) {
+>              cpu_item->has_qom_path =3D true;
+> -            cpu_item->qom_path =3D object_get_canonical_path(spapr->core=
+s[i]);
+> +            cpu_item->qom_path =3D object_get_canonical_path(cpu);
+>          }
+>          list_item->value =3D cpu_item;
+>          list_item->next =3D head;
+> @@ -2872,6 +2922,7 @@ static void spapr_machine_class_init(ObjectClass *o=
+c, void *data)
+>      hc->plug =3D spapr_machine_device_plug;
+>      hc->unplug =3D spapr_machine_device_unplug;
+>      mc->cpu_index_to_socket_id =3D spapr_cpu_index_to_socket_id;
+> +    mc->possible_cpu_arch_ids =3D spapr_possible_cpu_arch_ids;
+>      hc->unplug_request =3D spapr_machine_device_unplug_request;
+> =20
+>      smc->dr_lmb_enabled =3D true;
 
-> Thanks,
-> Chao Fan
-> 
-> >
-> >Dave
-> >
-> >
-> >> [*]http://accc.riken.jp/en/supercom/himenobmt/
-> >> 
-> >> Thanks,
-> >> 
-> >> Chao FanOn Thu, Dec 29, 2016 at 05:16:19PM +0800, Chao Fan wrote:
-> >> >This RFC PATCH is my demo about the new feature, here is my POC mail:
-> >> >https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg00646.html
-> >> >
-> >> >When migration_bitmap_sync executed, get the time and read bitmap to
-> >> >calculate how many dirty pages born between two sync.
-> >> >Use inst_dirty_pages / (time_now - time_prev) / ram_size to get
-> >> >inst_dirty_pages_rate. Then map from the inst_dirty_pages_rate
-> >> >to cpu throttle value. I have no idea how to map it. So I just do
-> >> >that in a simple way. The mapping way is just a guess and should
-> >> >be improved.
-> >> >
-> >> >This is just a demo. There are more methods.
-> >> >1.In another file, calculate the inst_dirty_pages_rate every second
-> >> >  or two seconds or another fixed time. Then set the cpu throttle
-> >> >  value according to the inst_dirty_pages_rate
-> >> >2.When inst_dirty_pages_rate gets a threshold, begin cpu throttle
-> >> >  and set the throttle value.
-> >> >
-> >> >Any comments will be welcome.
-> >> >
-> >> >Signed-off-by: Chao Fan <fanc.fnst@cn.fujitsu.com>
-> >> >---
-> >> > include/qemu/bitmap.h | 17 +++++++++++++++++
-> >> > migration/ram.c       | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
-> >> > 2 files changed, 66 insertions(+)
-> >> >
-> >> >diff --git a/include/qemu/bitmap.h b/include/qemu/bitmap.h
-> >> >index 63ea2d0..dc99f9b 100644
-> >> >--- a/include/qemu/bitmap.h
-> >> >+++ b/include/qemu/bitmap.h
-> >> >@@ -235,4 +235,21 @@ static inline unsigned long *bitmap_zero_extend(unsigned long *old,
-> >> >     return new;
-> >> > }
-> >> > 
-> >> >+static inline unsigned long bitmap_weight(const unsigned long *src, long nbits)
-> >> >+{
-> >> >+    unsigned long i, count = 0, nlong = nbits / BITS_PER_LONG;
-> >> >+
-> >> >+    if (small_nbits(nbits)) {
-> >> >+        return hweight_long(*src & BITMAP_LAST_WORD_MASK(nbits));
-> >> >+    }
-> >> >+    for (i = 0; i < nlong; i++) {
-> >> >+        count += hweight_long(src[i]);
-> >> >+    }
-> >> >+    if (nbits % BITS_PER_LONG) {
-> >> >+        count += hweight_long(src[i] & BITMAP_LAST_WORD_MASK(nbits));
-> >> >+    }
-> >> >+
-> >> >+    return count;
-> >> >+}
-> >> >+
-> >> > #endif /* BITMAP_H */
-> >> >diff --git a/migration/ram.c b/migration/ram.c
-> >> >index a1c8089..f96e3e3 100644
-> >> >--- a/migration/ram.c
-> >> >+++ b/migration/ram.c
-> >> >@@ -44,6 +44,7 @@
-> >> > #include "exec/ram_addr.h"
-> >> > #include "qemu/rcu_queue.h"
-> >> > #include "migration/colo.h"
-> >> >+#include "hw/boards.h"
-> >> > 
-> >> > #ifdef DEBUG_MIGRATION_RAM
-> >> > #define DPRINTF(fmt, ...) \
-> >> >@@ -599,6 +600,9 @@ static int64_t num_dirty_pages_period;
-> >> > static uint64_t xbzrle_cache_miss_prev;
-> >> > static uint64_t iterations_prev;
-> >> > 
-> >> >+static int64_t dirty_pages_time_prev;
-> >> >+static int64_t dirty_pages_time_now;
-> >> >+
-> >> > static void migration_bitmap_sync_init(void)
-> >> > {
-> >> >     start_time = 0;
-> >> >@@ -606,6 +610,49 @@ static void migration_bitmap_sync_init(void)
-> >> >     num_dirty_pages_period = 0;
-> >> >     xbzrle_cache_miss_prev = 0;
-> >> >     iterations_prev = 0;
-> >> >+
-> >> >+    dirty_pages_time_prev = 0;
-> >> >+    dirty_pages_time_now = 0;
-> >> >+}
-> >> >+
-> >> >+static void migration_inst_rate(void)
-> >> >+{
-> >> >+    RAMBlock *block;
-> >> >+    MigrationState *s = migrate_get_current();
-> >> >+    int64_t inst_dirty_pages_rate, inst_dirty_pages = 0;
-> >> >+    int64_t i;
-> >> >+    unsigned long *num;
-> >> >+    unsigned long len = 0;
-> >> >+
-> >> >+    dirty_pages_time_now = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-> >> >+    if (dirty_pages_time_prev != 0) {
-> >> >+        rcu_read_lock();
-> >> >+        DirtyMemoryBlocks *blocks = atomic_rcu_read(
-> >> >+                         &ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION]);
-> >> >+        QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> >> >+            if (len == 0) {
-> >> >+                len = block->offset;
-> >> >+            }
-> >> >+            len += block->used_length;
-> >> >+        }
-> >> >+        ram_addr_t idx = (len >> TARGET_PAGE_BITS) / DIRTY_MEMORY_BLOCK_SIZE;
-> >> >+        if (((len >> TARGET_PAGE_BITS) % DIRTY_MEMORY_BLOCK_SIZE) != 0) {
-> >> >+            idx++;
-> >> >+        }
-> >> >+        for (i = 0; i < idx; i++) {
-> >> >+            num = blocks->blocks[i];
-> >> >+            inst_dirty_pages += bitmap_weight(num, DIRTY_MEMORY_BLOCK_SIZE);
-> >> >+        }
-> >> >+        rcu_read_unlock();
-> >> >+
-> >> >+        inst_dirty_pages_rate = inst_dirty_pages * TARGET_PAGE_SIZE *
-> >> >+                            1024 * 1024 * 1000 /
-> >> >+                            (dirty_pages_time_now - dirty_pages_time_prev) /
-> >> >+                            current_machine->ram_size;
-> >> >+        s->parameters.cpu_throttle_initial = inst_dirty_pages_rate / 200;
-> >> >+        s->parameters.cpu_throttle_increment = inst_dirty_pages_rate / 200;
-> >> >+    }
-> >> >+    dirty_pages_time_prev = dirty_pages_time_now;
-> >> > }
-> >> > 
-> >> > static void migration_bitmap_sync(void)
-> >> >@@ -629,6 +676,8 @@ static void migration_bitmap_sync(void)
-> >> >     trace_migration_bitmap_sync_start();
-> >> >     memory_global_dirty_log_sync();
-> >> > 
-> >> >+    migration_inst_rate();
-> >> >+
-> >> >     qemu_mutex_lock(&migration_bitmap_mutex);
-> >> >     rcu_read_lock();
-> >> >     QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> >> >-- 
-> >> >2.9.3
-> >> >
-> >> 
-> >> 
-> >
-> >> /********************************************************************
-> >> 
-> >>  This benchmark test program is measuring a cpu performance
-> >>  of floating point operation by a Poisson equation solver.
-> >> 
-> >>  If you have any question, please ask me via email.
-> >>  written by Ryutaro HIMENO, November 26, 2001.
-> >>  Version 3.0
-> >>  ----------------------------------------------
-> >>  Ryutaro Himeno, Dr. of Eng.
-> >>  Head of Computer Information Division,
-> >>  RIKEN (The Institute of Pysical and Chemical Research)
-> >>  Email : himeno@postman.riken.go.jp
-> >>  ---------------------------------------------------------------
-> >>  You can adjust the size of this benchmark code to fit your target
-> >>  computer. In that case, please chose following sets of
-> >>  (mimax,mjmax,mkmax):
-> >>  small : 33,33,65
-> >>  small : 65,65,129
-> >>  midium: 129,129,257
-> >>  large : 257,257,513
-> >>  ext.large: 513,513,1025
-> >>  This program is to measure a computer performance in MFLOPS
-> >>  by using a kernel which appears in a linear solver of pressure
-> >>  Poisson eq. which appears in an incompressible Navier-Stokes solver.
-> >>  A point-Jacobi method is employed in this solver as this method can 
-> >>  be easyly vectrized and be parallelized.
-> >>  ------------------
-> >>  Finite-difference method, curvilinear coodinate system
-> >>  Vectorizable and parallelizable on each grid point
-> >>  No. of grid points : imax x jmax x kmax including boundaries
-> >>  ------------------
-> >>  A,B,C:coefficient matrix, wrk1: source term of Poisson equation
-> >>  wrk2 : working area, OMEGA : relaxation parameter
-> >>  BND:control variable for boundaries and objects ( = 0 or 1)
-> >>  P: pressure
-> >> ********************************************************************/
-> >> 
-> >> #include <stdio.h>
-> >> 
-> >> #ifdef XSMALL
-> >> #define MIMAX            16
-> >> #define MJMAX            16
-> >> #define MKMAX            16
-> >> #endif
-> >> 
-> >> #ifdef SSSMALL
-> >> #define MIMAX            17
-> >> #define MJMAX            17
-> >> #define MKMAX            33
-> >> #endif
-> >> 
-> >> #ifdef SSMALL
-> >> #define MIMAX            33
-> >> #define MJMAX            33
-> >> #define MKMAX            65
-> >> #endif
-> >> 
-> >> #ifdef SMALL
-> >> #define MIMAX            65
-> >> #define MJMAX            65
-> >> #define MKMAX            129
-> >> #endif
-> >> 
-> >> #ifdef MIDDLE
-> >> #define MIMAX            129
-> >> #define MJMAX            129
-> >> #define MKMAX            257
-> >> #endif
-> >> 
-> >> #ifdef LARGE
-> >> #define MIMAX            257
-> >> #define MJMAX            257
-> >> #define MKMAX            513
-> >> #endif
-> >> 
-> >> #ifdef ELARGE
-> >> #define MIMAX            513
-> >> #define MJMAX            513
-> >> #define MKMAX            1025
-> >> #endif
-> >> 
-> >> double second();
-> >> float jacobi();
-> >> void initmt();
-> >> double fflop(int,int,int);
-> >> double mflops(int,double,double);
-> >> 
-> >> static float  p[MIMAX][MJMAX][MKMAX];
-> >> static float  a[4][MIMAX][MJMAX][MKMAX],
-> >>               b[3][MIMAX][MJMAX][MKMAX],
-> >>               c[3][MIMAX][MJMAX][MKMAX];
-> >> static float  bnd[MIMAX][MJMAX][MKMAX];
-> >> static float  wrk1[MIMAX][MJMAX][MKMAX],
-> >>               wrk2[MIMAX][MJMAX][MKMAX];
-> >> 
-> >> static int imax, jmax, kmax;
-> >> static float omega;
-> >> 
-> >> int
-> >> main()
-> >> {
-> >>   int    i,j,k,nn;
-> >>   float  gosa;
-> >>   double cpu,cpu0,cpu1,flop,target;
-> >> 
-> >>   target= 3.0;
-> >>   omega= 0.8;
-> >>   imax = MIMAX-1;
-> >>   jmax = MJMAX-1;
-> >>   kmax = MKMAX-1;
-> >> 
-> >>   /*
-> >>    *    Initializing matrixes
-> >>    */
-> >>   initmt();
-> >>   printf("mimax = %d mjmax = %d mkmax = %d\n",MIMAX, MJMAX, MKMAX);
-> >>   printf("imax = %d jmax = %d kmax =%d\n",imax,jmax,kmax);
-> >> 
-> >>   nn= 3;
-> >>   printf(" Start rehearsal measurement process.\n");
-> >>   printf(" Measure the performance in %d times.\n\n",nn);
-> >> 
-> >>   cpu0= second();
-> >>   gosa= jacobi(nn);
-> >>   cpu1= second();
-> >>   cpu= cpu1 - cpu0;
-> >> 
-> >>   flop= fflop(imax,jmax,kmax);
-> >>   
-> >>   printf(" MFLOPS: %f time(s): %f %e\n\n",
-> >>          mflops(nn,cpu,flop),cpu,gosa);
-> >> 
-> >>   nn= (int)(target/(cpu/3.0));
-> >> 
-> >>   printf(" Now, start the actual measurement process.\n");
-> >>   printf(" The loop will be excuted in %d times\n",nn);
-> >>   printf(" This will take about one minute.\n");
-> >>   printf(" Wait for a while\n\n");
-> >> 
-> >>   /*
-> >>    *    Start measuring
-> >>    */
-> >> while (1)
-> >> {
-> >>   cpu0 = second();
-> >>   gosa = jacobi(nn);
-> >>   cpu1 = second();
-> >> 
-> >>   cpu= cpu1 - cpu0;
-> >>   
-> >>   //printf(" Loop executed for %d times\n",nn);
-> >>   //printf(" Gosa : %e \n",gosa);
-> >>   printf(" MFLOPS measured : %f\tcpu : %f\n",mflops(nn,cpu,flop),cpu);
-> >>   fflush(stdout);
-> >>   //printf(" Score based on Pentium III 600MHz : %f\n",
-> >>   //       mflops(nn,cpu,flop)/82,84);
-> >> }  
-> >>   return (0);
-> >> }
-> >> 
-> >> void
-> >> initmt()
-> >> {
-> >> 	int i,j,k;
-> >> 
-> >>   for(i=0 ; i<MIMAX ; i++)
-> >>     for(j=0 ; j<MJMAX ; j++)
-> >>       for(k=0 ; k<MKMAX ; k++){
-> >>         a[0][i][j][k]=0.0;
-> >>         a[1][i][j][k]=0.0;
-> >>         a[2][i][j][k]=0.0;
-> >>         a[3][i][j][k]=0.0;
-> >>         b[0][i][j][k]=0.0;
-> >>         b[1][i][j][k]=0.0;
-> >>         b[2][i][j][k]=0.0;
-> >>         c[0][i][j][k]=0.0;
-> >>         c[1][i][j][k]=0.0;
-> >>         c[2][i][j][k]=0.0;
-> >>         p[i][j][k]=0.0;
-> >>         wrk1[i][j][k]=0.0;
-> >>         bnd[i][j][k]=0.0;
-> >>       }
-> >> 
-> >>   for(i=0 ; i<imax ; i++)
-> >>     for(j=0 ; j<jmax ; j++)
-> >>       for(k=0 ; k<kmax ; k++){
-> >>         a[0][i][j][k]=1.0;
-> >>         a[1][i][j][k]=1.0;
-> >>         a[2][i][j][k]=1.0;
-> >>         a[3][i][j][k]=1.0/6.0;
-> >>         b[0][i][j][k]=0.0;
-> >>         b[1][i][j][k]=0.0;
-> >>         b[2][i][j][k]=0.0;
-> >>         c[0][i][j][k]=1.0;
-> >>         c[1][i][j][k]=1.0;
-> >>         c[2][i][j][k]=1.0;
-> >>         p[i][j][k]=(float)(i*i)/(float)((imax-1)*(imax-1));
-> >>         wrk1[i][j][k]=0.0;
-> >>         bnd[i][j][k]=1.0;
-> >>       }
-> >> }
-> >> 
-> >> float
-> >> jacobi(int nn)
-> >> {
-> >>   int i,j,k,n;
-> >>   float gosa, s0, ss;
-> >> 
-> >>   for(n=0 ; n<nn ; ++n){
-> >>     gosa = 0.0;
-> >> 
-> >>     for(i=1 ; i<imax-1 ; i++)
-> >>       for(j=1 ; j<jmax-1 ; j++)
-> >>         for(k=1 ; k<kmax-1 ; k++){
-> >>           s0 = a[0][i][j][k] * p[i+1][j  ][k  ]
-> >>              + a[1][i][j][k] * p[i  ][j+1][k  ]
-> >>              + a[2][i][j][k] * p[i  ][j  ][k+1]
-> >>              + b[0][i][j][k] * ( p[i+1][j+1][k  ] - p[i+1][j-1][k  ]
-> >>                               - p[i-1][j+1][k  ] + p[i-1][j-1][k  ] )
-> >>              + b[1][i][j][k] * ( p[i  ][j+1][k+1] - p[i  ][j-1][k+1]
-> >>                                - p[i  ][j+1][k-1] + p[i  ][j-1][k-1] )
-> >>              + b[2][i][j][k] * ( p[i+1][j  ][k+1] - p[i-1][j  ][k+1]
-> >>                                - p[i+1][j  ][k-1] + p[i-1][j  ][k-1] )
-> >>              + c[0][i][j][k] * p[i-1][j  ][k  ]
-> >>              + c[1][i][j][k] * p[i  ][j-1][k  ]
-> >>              + c[2][i][j][k] * p[i  ][j  ][k-1]
-> >>              + wrk1[i][j][k];
-> >> 
-> >>           ss = ( s0 * a[3][i][j][k] - p[i][j][k] ) * bnd[i][j][k];
-> >> 
-> >>           gosa+= ss*ss;
-> >>           /* gosa= (gosa > ss*ss) ? a : b; */
-> >> 
-> >>           wrk2[i][j][k] = p[i][j][k] + omega * ss;
-> >>         }
-> >> 
-> >>     for(i=1 ; i<imax-1 ; ++i)
-> >>       for(j=1 ; j<jmax-1 ; ++j)
-> >>         for(k=1 ; k<kmax-1 ; ++k)
-> >>           p[i][j][k] = wrk2[i][j][k];
-> >>     
-> >>   } /* end n loop */
-> >> 
-> >>   return(gosa);
-> >> }
-> >> 
-> >> double
-> >> fflop(int mx,int my, int mz)
-> >> {
-> >>   return((double)(mz-2)*(double)(my-2)*(double)(mx-2)*34.0);
-> >> }
-> >> 
-> >> double
-> >> mflops(int nn,double cpu,double flop)
-> >> {
-> >>   return(flop/cpu*1.e-6*(double)nn);
-> >> }
-> >> 
-> >> double
-> >> second()
-> >> {
-> >> #include <sys/time.h>
-> >> 
-> >>   struct timeval tm;
-> >>   double t ;
-> >> 
-> >>   static int base_sec = 0,base_usec = 0;
-> >> 
-> >>   gettimeofday(&tm, NULL);
-> >>   
-> >>   if(base_sec == 0 && base_usec == 0)
-> >>     {
-> >>       base_sec = tm.tv_sec;
-> >>       base_usec = tm.tv_usec;
-> >>       t = 0.0;
-> >>   } else {
-> >>     t = (double) (tm.tv_sec-base_sec) + 
-> >>       ((double) (tm.tv_usec-base_usec))/1.0e6 ;
-> >>   }
-> >> 
-> >>   return t ;
-> >> }
-> >
-> >--
-> >Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >
-> >
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--L2zmpNdaDxUzilj2
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYsC86AAoJEGw4ysog2bOS0joQAKHlFBRdKY70JkyjbodJao8z
+N23obvwiP6xF0SVY+gD9AqBOvtDse/OYiQIVdWT8R8B5eXL/MvbvWoMcQ4NkeN6K
+1wgxseaA/qYiBjtPZ3xEWx2u8YCsn7YvcgdmdG5SQ5dwY+a1tZp7OSUvlmBuVCns
+oHpFrJrCFAlWxuHFWxaqqffQAzzJ5RFgtgxzLqoKVUsK8PZ5dT8tKqDRG7cK+X+S
+peaQP4cCKFZCjeQkHbyRYeuLvdHDPSSOxN5a4ij412p8cASRFAVL4geiNTM5XDVQ
+nTjulZhnj20KcPOG5PSLwa39QO0VxSmd/o/aOrTc37Htgu5u+vhuiHSn7BUcg3vW
+k5is+EFdKbQF1Lnc3q7sIiC0Nz2a5oxEvcyg4TskrT2Ucy8MMHQcMloGHLKRe89z
+O53UBlRbtH9rFyU61EpzF9HNq6WEHzWGOcu1QCjYT2SaVwZRG+rn201T3xdo/vOu
+1ELRNyBOKOkkJBpXzmCYDcofnvazoh8L26M6d17KK5GTBnmfOTX8FyzVMJTh+Kn4
+xYNoh9WxBO8z2VSdlCOfOnNwmn4LJNzS6YszugCLywhlaM88dYiq4hOqZXnTG//6
+VytMUgZmsDP+BMCXyy5ubgqI3d5Dgd/RiRvbYUMK4CxNyLEkFeOgZFdFWsDMc4aC
+36rSVgXwoBWf99oje/ct
+=0rs6
+-----END PGP SIGNATURE-----
+
+--L2zmpNdaDxUzilj2--
