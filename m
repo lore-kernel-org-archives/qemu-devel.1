@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1chIR8-0006h5-6G
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:09:39 -0500
+	(envelope-from <lvivier@redhat.com>) id 1chITb-000109-15
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:12:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1chIR4-0004sM-3z
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:09:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41838)
+	(envelope-from <lvivier@redhat.com>) id 1chITW-0005f8-Uh
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:12:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52656)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1chIR3-0004sA-RA
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:09:34 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1chITW-0005es-Nq
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:12:06 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 145FAC008B19
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 16:09:34 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8EAA8C04B93B
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 16:12:06 +0000 (UTC)
 References: <20170206173306.20603-1-dgilbert@redhat.com>
-	<20170206173306.20603-15-dgilbert@redhat.com>
+	<20170206173306.20603-16-dgilbert@redhat.com>
 From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <143ddfba-57f0-7164-88bc-f72b1c9bbcb8@redhat.com>
-Date: Fri, 24 Feb 2017 17:09:30 +0100
+Message-ID: <9e7a02a9-5463-0de8-16d4-c5585d741e58@redhat.com>
+Date: Fri, 24 Feb 2017 17:12:03 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170206173306.20603-15-dgilbert@redhat.com>
+In-Reply-To: <20170206173306.20603-16-dgilbert@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 14/16] postcopy: Update userfaultfd.h
- header
+Subject: Re: [Qemu-devel] [PATCH v2 15/16] postcopy: Check for
+ userfault+hugepage feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,160 +40,44 @@ Cc: aarcange@redhat.com
 On 06/02/2017 18:33, Dr. David Alan Gilbert (git) wrote:
 > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > 
-> We use a new userfaultfd define, so update the header.
-> (Not needed if someone just runs the update script once it's
-> gone into the main kernel).
+> We need extra Linux kernel support (~4.11) to support userfaults
+> on hugetlbfs; check for them.
 > 
 > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > Reviewed-by: Juan Quintela <quintela@redhat.com>
 > ---
->  linux-headers/linux/userfaultfd.h | 81 ++++++++++++++++++++++++++++++++++-----
->  1 file changed, 71 insertions(+), 10 deletions(-)
+>  migration/postcopy-ram.c | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
 > 
-> diff --git a/linux-headers/linux/userfaultfd.h b/linux-headers/linux/userfaultfd.h
-> index 19e8453..a7c1a62 100644
-> --- a/linux-headers/linux/userfaultfd.h
-> +++ b/linux-headers/linux/userfaultfd.h
-> @@ -11,13 +11,19 @@
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index 6b30b43..102fb61 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -81,6 +81,17 @@ static bool ufd_version_check(int ufd)
+>          return false;
+>      }
 >  
->  #include <linux/types.h>
+> +    if (getpagesize() != ram_pagesize_summary()) {
+> +        bool have_hp = false;
+> +        /* We've got a huge page */
+> +#ifdef UFFD_FEATURE_MISSING_HUGETLBFS
+> +        have_hp = api_struct.features & UFFD_FEATURE_MISSING_HUGETLBFS;
+> +#endif
+> +        if (!have_hp) {
+> +            error_report("Userfault on this host does not support huge pages");
+> +            return false;
+> +        }
+> +    }
+>      return true;
+>  }
 >  
-> -#define UFFD_API ((__u64)0xAA)
->  /*
-> - * After implementing the respective features it will become:
-> - * #define UFFD_API_FEATURES (UFFD_FEATURE_PAGEFAULT_FLAG_WP | \
-> - *			      UFFD_FEATURE_EVENT_FORK)
-> + * If the UFFDIO_API is upgraded someday, the UFFDIO_UNREGISTER and
-> + * UFFDIO_WAKE ioctls should be defined as _IOW and not as _IOR.  In
-> + * userfaultfd.h we assumed the kernel was reading (instead _IOC_READ
-> + * means the userland is reading).
->   */
-> -#define UFFD_API_FEATURES (0)
-> +#define UFFD_API ((__u64)0xAA)
-> +#define UFFD_API_FEATURES (UFFD_FEATURE_PAGEFAULT_FLAG_WP |	\
-> +			   UFFD_FEATURE_EVENT_FORK |		\
-> +			   UFFD_FEATURE_EVENT_REMAP |		\
-> +			   UFFD_FEATURE_EVENT_MADVDONTNEED |	\
-> +			   UFFD_FEATURE_MISSING_HUGETLBFS |	\
-> +			   UFFD_FEATURE_MISSING_SHMEM)
->  #define UFFD_API_IOCTLS				\
->  	((__u64)1 << _UFFDIO_REGISTER |		\
->  	 (__u64)1 << _UFFDIO_UNREGISTER |	\
-> @@ -25,7 +31,11 @@
->  #define UFFD_API_RANGE_IOCTLS			\
->  	((__u64)1 << _UFFDIO_WAKE |		\
->  	 (__u64)1 << _UFFDIO_COPY |		\
-> -	 (__u64)1 << _UFFDIO_ZEROPAGE)
-> +	 (__u64)1 << _UFFDIO_ZEROPAGE |		\
-> +	 (__u64)1 << _UFFDIO_WRITEPROTECT)
-> +#define UFFD_API_RANGE_IOCTLS_BASIC		\
-> +	((__u64)1 << _UFFDIO_WAKE |		\
-> +	 (__u64)1 << _UFFDIO_COPY)
+> @@ -115,7 +126,6 @@ bool postcopy_ram_supported_by_host(void)
+>      if (!ufd_version_check(ufd)) {
+>          goto out;
+>      }
+> -    /* TODO: Only allow huge pages if the kernel supports it */
 >  
->  /*
->   * Valid ioctl command number range with this API is from 0x00 to
-> @@ -40,6 +50,7 @@
->  #define _UFFDIO_WAKE			(0x02)
->  #define _UFFDIO_COPY			(0x03)
->  #define _UFFDIO_ZEROPAGE		(0x04)
-> +#define _UFFDIO_WRITEPROTECT		(0x05)
->  #define _UFFDIO_API			(0x3F)
->  
->  /* userfaultfd ioctl ids */
-> @@ -56,6 +67,8 @@
->  				      struct uffdio_copy)
->  #define UFFDIO_ZEROPAGE		_IOWR(UFFDIO, _UFFDIO_ZEROPAGE,	\
->  				      struct uffdio_zeropage)
-> +#define UFFDIO_WRITEPROTECT	_IOWR(UFFDIO, _UFFDIO_WRITEPROTECT, \
-> +				      struct uffdio_writeprotect)
->  
->  /* read() structure */
->  struct uffd_msg {
-> @@ -72,6 +85,21 @@ struct uffd_msg {
->  		} pagefault;
->  
->  		struct {
-> +			__u32	ufd;
-> +		} fork;
-> +
-> +		struct {
-> +			__u64	from;
-> +			__u64	to;
-> +			__u64	len;
-> +		} remap;
-> +
-> +		struct {
-> +			__u64	start;
-> +			__u64	end;
-> +		} madv_dn;
-> +
-> +		struct {
->  			/* unused reserved fields */
->  			__u64	reserved1;
->  			__u64	reserved2;
-> @@ -84,9 +112,9 @@ struct uffd_msg {
->   * Start at 0x12 and not at 0 to be more strict against bugs.
->   */
->  #define UFFD_EVENT_PAGEFAULT	0x12
-> -#if 0 /* not available yet */
->  #define UFFD_EVENT_FORK		0x13
-> -#endif
-> +#define UFFD_EVENT_REMAP	0x14
-> +#define UFFD_EVENT_MADVDONTNEED	0x15
->  
->  /* flags for UFFD_EVENT_PAGEFAULT */
->  #define UFFD_PAGEFAULT_FLAG_WRITE	(1<<0)	/* If this was a write fault */
-> @@ -104,11 +132,37 @@ struct uffdio_api {
->  	 * Note: UFFD_EVENT_PAGEFAULT and UFFD_PAGEFAULT_FLAG_WRITE
->  	 * are to be considered implicitly always enabled in all kernels as
->  	 * long as the uffdio_api.api requested matches UFFD_API.
-> +	 *
-> +	 * UFFD_FEATURE_MISSING_HUGETLBFS means an UFFDIO_REGISTER
-> +	 * with UFFDIO_REGISTER_MODE_MISSING mode will succeed on
-> +	 * hugetlbfs virtual memory ranges. Adding or not adding
-> +	 * UFFD_FEATURE_MISSING_HUGETLBFS to uffdio_api.features has
-> +	 * no real functional effect after UFFDIO_API returns, but
-> +	 * it's only useful for an initial feature set probe at
-> +	 * UFFDIO_API time. There are two ways to use it:
-> +	 *
-> +	 * 1) by adding UFFD_FEATURE_MISSING_HUGETLBFS to the
-> +	 *    uffdio_api.features before calling UFFDIO_API, an error
-> +	 *    will be returned by UFFDIO_API on a kernel without
-> +	 *    hugetlbfs missing support
-> +	 *
-> +	 * 2) the UFFD_FEATURE_MISSING_HUGETLBFS can not be added in
-> +	 *    uffdio_api.features and instead it will be set by the
-> +	 *    kernel in the uffdio_api.features if the kernel supports
-> +	 *    it, so userland can later check if the feature flag is
-> +	 *    present in uffdio_api.features after UFFDIO_API
-> +	 *    succeeded.
-> +	 *
-> +	 * UFFD_FEATURE_MISSING_SHMEM works the same as
-> +	 * UFFD_FEATURE_MISSING_HUGETLBFS, but it applies to shmem
-> +	 * (i.e. tmpfs and other shmem based APIs).
->  	 */
-> -#if 0 /* not available yet */
->  #define UFFD_FEATURE_PAGEFAULT_FLAG_WP		(1<<0)
->  #define UFFD_FEATURE_EVENT_FORK			(1<<1)
-> -#endif
-> +#define UFFD_FEATURE_EVENT_REMAP		(1<<2)
-> +#define UFFD_FEATURE_EVENT_MADVDONTNEED		(1<<3)
-> +#define UFFD_FEATURE_MISSING_HUGETLBFS		(1<<4)
-> +#define UFFD_FEATURE_MISSING_SHMEM		(1<<5)
->  	__u64 features;
->  
->  	__u64 ioctls;
-> @@ -164,4 +218,11 @@ struct uffdio_zeropage {
->  	__s64 zeropage;
->  };
->  
-> +struct uffdio_writeprotect {
-> +	struct uffdio_range range;
-> +	/* !WP means undo writeprotect. DONTWAKE is valid only with !WP */
-> +#define UFFDIO_WRITEPROTECT_MODE_WP		((__u64)1<<0)
-> +#define UFFDIO_WRITEPROTECT_MODE_DONTWAKE	((__u64)1<<1)
-> +	__u64 mode;
-> +};
->  #endif /* _LINUX_USERFAULTFD_H */
+>      /*
+>       * userfault and mlock don't go together; we'll put it back later if
 > 
 Reviewed-by: Laurent Vivier <lvivier@redhat.com>
