@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36201)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1chF6C-0000Xr-Vr
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:35:50 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1chFHo-0007cg-Ln
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:47:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1chF6B-00007C-Om
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:35:48 -0500
-Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:35895)
+	(envelope-from <peter.maydell@linaro.org>) id 1chFHn-0007Dl-Lu
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:47:48 -0500
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:37550)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1chF6B-0008WP-K4
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:35:47 -0500
-Received: by mail-it0-x242.google.com with SMTP id w185so3177280ita.3
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 04:35:45 -0800 (PST)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1chFHn-0007B5-Em
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:47:47 -0500
+Received: by mail-wm0-x231.google.com with SMTP id v77so13667034wmv.0
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 04:47:45 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9iAsAgOidpsdniDHpy6enwca=hr_ALdf+svJP4gvXXWg@mail.gmail.com>
-References: <1484779123-18968-1-git-send-email-atar4qemu@gmail.com>
-	<1484779123-18968-31-git-send-email-atar4qemu@gmail.com>
-	<CAFEAcA8=gKjbo9YaRAzGHi-tP6AWY08ps_tEPOSzpNFXBC6M+Q@mail.gmail.com>
-	<CACXAS8COsHWMAqoQTDqs6zh=-f0_u7posLQ1nUe6TKRfBaBSEg@mail.gmail.com>
-	<CAFEAcA8cS8DMbHsVU8oWVtB1JsSQJGi1igyFZVMcuzXXjpVkEQ@mail.gmail.com>
-	<CAFEAcA9iAsAgOidpsdniDHpy6enwca=hr_ALdf+svJP4gvXXWg@mail.gmail.com>
-From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Fri, 24 Feb 2017 13:35:24 +0100
-Message-ID: <CACXAS8Dh1KFr6QgKMo+f=n+EvKn_eWxb+n6X90kj4aymmzpoUw@mail.gmail.com>
+In-Reply-To: <20170222063348.32176-1-david@gibson.dropbear.id.au>
+References: <20170222063348.32176-1-david@gibson.dropbear.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 24 Feb 2017 12:47:23 +0000
+Message-ID: <CAFEAcA_xXVScYwPiQFORwcOw00Gbq800Ge9V14qK-427CSU6nw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 30/30] target-sparc: fix up niagara machine
+Subject: Re: [Qemu-devel] [PULL 00/43] ppc-for-2.9 queue 20170222
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,38 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <rth@twiddle.net>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Igor Mammedov <imammedo@redhat.com>
 
-On Fri, Feb 24, 2017 at 12:50 PM, Peter Maydell
-<peter.maydell@linaro.org> wrote:
-> On 23 January 2017 at 14:24, Peter Maydell <peter.maydell@linaro.org> wrote:
->> On 23 January 2017 at 14:10, Artyom Tarasenko <atar4qemu@gmail.com> wrote:
->>> On Mon, Jan 23, 2017 at 1:40 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
->>>> I see that 'make check' now warns:
->>>>   GTESTER check-qtest-sparc64
->>>> Could not open option rom 'nvram1': No such file or directory
->>>> Could not open option rom '1up-md.bin': No such file or directory
->>>> Could not open option rom '1up-hv.bin': No such file or directory
->>>> Could not open option rom 'reset.bin': No such file or directory
->>>> Could not open option rom 'q.bin': No such file or directory
->>>> Could not open option rom 'openboot.bin': No such file or directory
->>>>
->>>> (though the tests still pass).
+On 22 February 2017 at 06:33, David Gibson <david@gibson.dropbear.id.au> wrote:
+> The following changes since commit 796b288f7be875045670f963ce99991b3c8e96ac:
 >
->> One thing we could do is only warn if !qtest_enabled().
+>   Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' into staging (2017-02-21 15:48:22 +0000)
 >
-> I notice that 'make check' still warns about these missing option
-> rom files...could somebody write a patch to silence it, please?
+> are available in the git repository at:
+>
+>   git://github.com/dgibson/qemu.git tags/ppc-for-2.9-20170222
+>
+> for you to fetch changes up to fb6971c110387cf597b58c411658e3d15cc6c6fb:
+>
+>   hw/ppc/ppc405_uc.c: Avoid integer overflows (2017-02-22 14:28:53 +1100)
+>
+> NOTE: This pull request hasn't passed the full set of tests I usually
+> run, because there seem to be problems with those on current master
+> anyway: some of "make check" seems to wedge, and a number of travis
+> builds timed out.  AFAICT this series doesn't cause any failures that
+> aren't already present in upstream.
+>
+> ----------------------------------------------------------------
+> ppc patch queue for 2017-02-22
+>
+> This pull request has:
+>    * Yet more POWER9 instruction implementations
+>    * Some extensions to the softfloat code which are necesssary for
+>      some of those instructions
+>    * Some preliminary patches in preparation for POWER9 softmmu
+>      implementation
+>    * Igor Mammedov's cleanups to unify hotplug cpu handling across
+>      architectures
+>    * Assorted bugfixes
+>
+> The softfloat and cpu hotplug changes aren't entirely ppc specific (in
+> fact the hotplug stuff contains some pc specific patches).  However
+> they're included here because ppc is one of the main beneficiaries,
+> and the series depend on some ppc specific patches.
+>
+> ----------------------------------------------------------------
 
-Actually I sent a patch one month ago:
-http://lists.gnu.org/archive/html/qemu-devel/2017-01/msg05272.html
+Applied, thanks.
 
-I think I've waited long enough  for nacks.
-Will send a pull request with it.
-
--- 
-Regards,
-Artyom Tarasenko
-
-SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
+-- PMM
