@@ -1,29 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43834)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1chDqe-00020R-EM
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:15:41 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1chDqf-00021H-HT
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:15:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1chDqZ-0001li-Dy
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:15:40 -0500
-Received: from 2.mo5.mail-out.ovh.net ([178.33.109.111]:40136)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1chDqZ-0001k1-7l
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:15:35 -0500
-Received: from player734.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 6108EDCA1B
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 12:15:33 +0100 (CET)
-References: <1487252865-12064-1-git-send-email-clg@kaod.org>
-	<1487252865-12064-13-git-send-email-clg@kaod.org>
-	<20170223023946.GA12577@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <94cf0f58-fcda-abad-4c9c-bd23af9a30c4@kaod.org>
-Date: Fri, 24 Feb 2017 12:15:21 +0100
+	(envelope-from <borntraeger@de.ibm.com>) id 1chDqa-0001nM-IE
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:15:41 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34773
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1chDqa-0001mS-Ad
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:15:36 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1OB9Swd113803
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 06:15:35 -0500
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28thjb57e8-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 06:15:35 -0500
+Received: from localhost
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Fri, 24 Feb 2017 04:15:34 -0700
+References: <20170220141943.8426-1-cornelia.huck@de.ibm.com>
+	<20170220141943.8426-4-cornelia.huck@de.ibm.com>
+	<d8c1475a-765b-e980-cb48-255c29efdaf6@redhat.com>
+	<4340aa12-3289-9d19-6156-9121a9643749@linux.vnet.ibm.com>
+	<75631dfb-bd96-b905-6720-84980cbd477d@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Fri, 24 Feb 2017 12:15:29 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170223023946.GA12577@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 12/22] ppc/xics: extend the
- QOM interface to handle ICPs
+In-Reply-To: <75631dfb-bd96-b905-6720-84980cbd477d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Message-Id: <715482cf-c074-848f-5651-fd9fad535bb6@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 3/5] s390x/ipl: Load network boot image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,104 +45,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, Farhan Ali <alifm@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-devel@nongnu.org
+Cc: jfrei@linux.vnet.ibm.com, agraf@suse.de
 
-On 02/23/2017 03:39 AM, David Gibson wrote:
-> On Thu, Feb 16, 2017 at 02:47:35PM +0100, C=E9dric Le Goater wrote:
->> Let's add two new handlers for ICPs. One is to get an ICP object from
->> a server number and a second is to resend the irqs when needed.
+On 02/24/2017 11:11 AM, Thomas Huth wrote:
+
+>>> ... and then you do another error_report here again ... so one error
+>>> gets reported with two error message. Wouldn't it be nicer to rather do
+>>> error_setg(...) in load_netboot_image() and then report only one error
+>>> at this level here?
+>>>
 >>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->> ---
->>  hw/intc/xics.c        |  2 +-
->>  hw/ppc/spapr.c        | 20 ++++++++++++++++++++
->>  include/hw/ppc/xics.h |  3 +++
->>  3 files changed, 24 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
->> index 5131587ce088..7168c2cfd8a1 100644
->> --- a/hw/intc/xics.c
->> +++ b/hw/intc/xics.c
->> @@ -216,7 +216,7 @@ static void icp_check_ipi(ICPState *ss)
->>      qemu_irq_raise(ss->output);
->>  }
->> =20
->> -static void icp_resend(XICSInterface *xi, ICPState *ss)
->> +void icp_resend(XICSInterface *xi, ICPState *ss)
->>  {
->>      XICSInterfaceClass *xic =3D XICS_INTERFACE_GET_CLASS(xi);
->> =20
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index d1946ebcac69..eb7da32296d8 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -2915,6 +2915,24 @@ static void spapr_ics_resend(XICSInterface *dev=
-)
->>      ics_resend(spapr->ics);
->>  }
->> =20
->> +static ICPState *spapr_icp_get(XICSInterface *xi, int server)
->> +{
->> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
->> +
->> +    return (server < spapr->xics->nr_servers) ? &spapr->xics->ss[serv=
-er] :
->> +        NULL;
->> +}
->> +
->> +static void spapr_icp_resend(XICSInterface *xi)
->> +{
->> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
->> +    int i;
->> +
->> +    for (i =3D 0; i < spapr->xics->nr_servers; i++) {
->> +        icp_resend(xi, &spapr->xics->ss[i]);
->> +    }
->> +}
->=20
-> I'm not quite sure where you plan to use the resend hook.  AFAICT all
-> the existing users of this path can do fine using icp_get() then
-> icp_resend() directly.
+>> What would be the advantage of doing that?
+> 
+> It's just good coding style to report an error only once, at the
+> outermost calling function. Otherwise the same error gets reported
+> multiple times to the user, with different error messages, and that can
+> easily get confusing. It's likely not a big problem here yet, since the
+> call depths is only 2 functions, but imagine a situation where you've
+> got a call depth or 5 or more and an error is reported at every
+> depths... that's ugly. So this is why we've got error_setg() and friends
+> in QEMU.
+> 
+>  Thomas
 
-This is for ics_simple_post_load().
-
-C.
-
->=20
->> +
->>  static void spapr_machine_class_init(ObjectClass *oc, void *data)
->>  {
->>      MachineClass *mc =3D MACHINE_CLASS(oc);
->> @@ -2959,6 +2977,8 @@ static void spapr_machine_class_init(ObjectClass=
- *oc, void *data)
->>      vhc->hypercall =3D emulate_spapr_hypercall;
->>      xic->ics_get =3D spapr_ics_get;
->>      xic->ics_resend =3D spapr_ics_resend;
->> +    xic->icp_get =3D spapr_icp_get;
->> +    xic->icp_resend =3D spapr_icp_resend;
->>  }
->> =20
->>  static const TypeInfo spapr_machine_info =3D {
->> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
->> index c15d8e2a8ae6..7004c851e250 100644
->> --- a/include/hw/ppc/xics.h
->> +++ b/include/hw/ppc/xics.h
->> @@ -191,6 +191,8 @@ typedef struct XICSInterfaceClass {
->>      InterfaceClass parent;
->>      ICSState *(*ics_get)(XICSInterface *xi, int irq);
->>      void (*ics_resend)(XICSInterface *xi);
->> +    ICPState *(*icp_get)(XICSInterface *xi, int server);
->> +    void (*icp_resend)(XICSInterface *xi);
->>  } XICSInterfaceClass;
->> =20
->>  #define XICS_IRQS_SPAPR               1024
->> @@ -221,5 +223,6 @@ void ics_simple_write_xive(ICSState *ics, int nr, =
-int server,
->>  void ics_set_irq_type(ICSState *ics, int srcno, bool lsi);
->> =20
->>  void ics_resend(ICSState *ics);
->> +void icp_resend(XICSInterface *xi, ICPState *ss);
->> =20
->>  #endif /* XICS_H */
->=20
+Farhan was already convinced. Can you check v2 of this patch set?
+Thanks for doing the review :-)
