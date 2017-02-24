@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1chJrE-0007rD-8j
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:40:41 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1chJrE-0007rE-97
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:40:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1chJrA-0002Ec-24
+	(envelope-from <paolo.bonzini@gmail.com>) id 1chJrB-0002En-5y
 	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:40:40 -0500
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:37115)
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36851)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1chJr9-0002EY-Oj
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:40:35 -0500
-Received: by mail-wm0-x22e.google.com with SMTP id v77so19969780wmv.0
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 09:40:35 -0800 (PST)
+	id 1chJrA-0002Eg-SQ
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:40:37 -0500
+Received: by mail-wm0-x242.google.com with SMTP id r18so4053891wmd.3
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 09:40:36 -0800 (PST)
 Received: from 640k.lan (94-39-187-56.adsl-ull.clienti.tiscali.it.
 	[94.39.187.56]) by smtp.gmail.com with ESMTPSA id
-	s26sm8814533wra.66.2017.02.24.09.40.32 for <qemu-devel@nongnu.org>
+	s26sm8814533wra.66.2017.02.24.09.40.34 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 24 Feb 2017 09:40:33 -0800 (PST)
+	Fri, 24 Feb 2017 09:40:34 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 24 Feb 2017 18:40:13 +0100
-Message-Id: <1487958030-51417-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 00/17] KVM and cpu-exec patches for 2.9 soft
- freeze
+Date: Fri, 24 Feb 2017 18:40:14 +0100
+Message-Id: <1487958030-51417-2-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1487958030-51417-1-git-send-email-pbonzini@redhat.com>
+References: <1487958030-51417-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 01/17] cpu-exec: unify icount_decr and
+ tcg_exit_req
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,99 +35,319 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The following changes since commit a1cf5fac2b929ffa2abd1285401f2535ff8c6fea:
+The icount interrupt flag and tcg_exit_req serve almost the same
+purpose, let's make them completely the same.
 
-  Merge remote-tracking branch 'remotes/armbru/tags/pull-block-2017-02-21' into staging (2017-02-21 13:58:50 +0000)
+The former TB_EXIT_REQUESTED and TB_EXIT_ICOUNT_EXPIRED cases are
+unified, since we can distinguish them from the value of the
+interrupt flag.
 
-are available in the git repository at:
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ cpu-exec.c                | 70 ++++++++++++++++++++++-------------------------
+ include/exec/gen-icount.h | 53 +++++++++++++++++------------------
+ include/qom/cpu.h         | 15 +++++-----
+ qom/cpu.c                 |  2 +-
+ tcg/tcg.h                 |  1 -
+ translate-all.c           |  2 +-
+ translate-common.c        | 13 ++++-----
+ 7 files changed, 71 insertions(+), 85 deletions(-)
 
-
-  git://github.com/bonzini/qemu.git tags/for-upstream
-
-for you to fetch changes up to f9e640f9a1a7185591985e10a557f11fbe783b87:
-
-  qmp-events: fix GUEST_PANICKED description formatting (2017-02-24 16:19:44 +0100)
-
-----------------------------------------------------------------
-* kernel header update (requested by David and Vijay)
-* GuestPanicInformation fixups (Anton)
-* record/replay icount fixes (Pavel)
-* cpu-exec cleanup, unification of icount_decr with tcg_exit_req (me)
-* KVM_CAP_IMMEDIATE_EXIT support (me)
-* vmxcap update (me)
-
-----------------------------------------------------------------
-Anton Nefedov (2):
-      qapi: flatten GuestPanicInformation union
-      qmp-events: fix GUEST_PANICKED description formatting
-
-Paolo Bonzini (14):
-      cpu-exec: unify icount_decr and tcg_exit_req
-      cpu-exec: remove unnecessary check of cpu->exit_request
-      update-linux-headers: update for 4.11
-      update Linux headers to 4.11
-      cpus: remove ugly cast on sigbus_handler
-      KVM: x86: cleanup SIGBUS handlers
-      cpus: reorganize signal handling code
-      KVM: remove kvm_arch_on_sigbus
-      KVM: do not use sigtimedwait to catch SIGBUS
-      KVM: move SIG_IPI handling to kvm-all.c
-      kvm: use atomic_read/atomic_set to access cpu->exit_request
-      KVM: use KVM_CAP_IMMEDIATE_EXIT
-      vmxcap: port to Python 3
-      vmxcap: update for September 2016 SDM
-
-Pavel Dovgalyuk (1):
-      replay: check icount in cpu exec loop
-
- cpu-exec.c                                         |  83 ++--
- cpus.c                                             | 102 +----
- include/exec/gen-icount.h                          |  53 ++-
- include/qemu/compatfd.h                            |  42 ---
- include/qemu/osdep.h                               |  37 ++
- include/qom/cpu.h                                  |  15 +-
- include/standard-headers/asm-x86/hyperv.h          |   8 +
- include/standard-headers/linux/input-event-codes.h |   2 +-
- include/standard-headers/linux/pci_regs.h          |  25 ++
- include/standard-headers/linux/virtio_ids.h        |   1 +
- include/sysemu/kvm.h                               |  11 +-
- kvm-all.c                                          | 146 ++++++-
- kvm-stub.c                                         |  12 +-
- linux-headers/asm-arm/kvm.h                        |  15 +
- linux-headers/asm-arm/unistd-common.h              | 357 ++++++++++++++++++
- linux-headers/asm-arm/unistd-eabi.h                |   5 +
- linux-headers/asm-arm/unistd-oabi.h                |  17 +
- linux-headers/asm-arm/unistd.h                     | 419 +--------------------
- linux-headers/asm-arm64/kvm.h                      |  13 +
- linux-headers/asm-powerpc/kvm.h                    |  27 ++
- linux-headers/asm-powerpc/unistd.h                 |   1 +
- linux-headers/asm-x86/kvm_para.h                   |  13 +-
- linux-headers/linux/kvm.h                          |  24 +-
- linux-headers/linux/kvm_para.h                     |   2 +
- linux-headers/linux/userfaultfd.h                  |  67 +++-
- linux-headers/linux/vfio.h                         |  10 +
- qapi-schema.json                                   |  12 +
- qapi/event.json                                    |   4 +-
- qom/cpu.c                                          |   2 +-
- scripts/kvm/vmxcap                                 |  23 +-
- scripts/update-linux-headers.sh                    |  13 +-
- target/arm/kvm.c                                   |  10 -
- target/i386/cpu.c                                  |  15 +-
- target/i386/kvm.c                                  |  81 ++--
- target/mips/kvm.c                                  |  12 -
- target/ppc/kvm.c                                   |  10 -
- target/s390x/kvm.c                                 |  10 -
- tcg/tcg.h                                          |   1 -
- translate-all.c                                    |   2 +-
- translate-common.c                                 |  13 +-
- util/compatfd.c                                    |   1 -
- util/main-loop.c                                   |   5 +-
- util/oslib-posix.c                                 |  33 ++
- vl.c                                               |  12 +-
- 44 files changed, 960 insertions(+), 806 deletions(-)
- delete mode 100644 include/qemu/compatfd.h
- create mode 100644 linux-headers/asm-arm/unistd-common.h
- create mode 100644 linux-headers/asm-arm/unistd-eabi.h
- create mode 100644 linux-headers/asm-arm/unistd-oabi.h
+diff --git a/cpu-exec.c b/cpu-exec.c
+index 142a586..8f094c8 100644
+--- a/cpu-exec.c
++++ b/cpu-exec.c
+@@ -185,12 +185,6 @@ static inline tcg_target_ulong cpu_tb_exec(CPUState *cpu, TranslationBlock *itb)
+             cc->set_pc(cpu, last_tb->pc);
+         }
+     }
+-    if (tb_exit == TB_EXIT_REQUESTED) {
+-        /* We were asked to stop executing TBs (probably a pending
+-         * interrupt. We've now stopped, so clear the flag.
+-         */
+-        atomic_set(&cpu->tcg_exit_req, 0);
+-    }
+     return ret;
+ }
+ 
+@@ -537,6 +531,7 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
+                                     SyncClocks *sc)
+ {
+     uintptr_t ret;
++    int32_t insns_left;
+ 
+     if (unlikely(atomic_read(&cpu->exit_request))) {
+         return;
+@@ -546,8 +541,15 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
+     ret = cpu_tb_exec(cpu, tb);
+     tb = (TranslationBlock *)(ret & ~TB_EXIT_MASK);
+     *tb_exit = ret & TB_EXIT_MASK;
+-    switch (*tb_exit) {
+-    case TB_EXIT_REQUESTED:
++    if (*tb_exit != TB_EXIT_REQUESTED) {
++        *last_tb = tb;
++        return;
++    }
++
++    *last_tb = NULL;
++    insns_left = atomic_read(&cpu->icount_decr.u32);
++    atomic_set(&cpu->icount_decr.u16.high, 0);
++    if (insns_left < 0) {
+         /* Something asked us to stop executing
+          * chained TBs; just continue round the main
+          * loop. Whatever requested the exit will also
+@@ -559,38 +561,30 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
+          * or cpu->interrupt_request.
+          */
+         smp_mb();
+-        *last_tb = NULL;
+-        break;
+-    case TB_EXIT_ICOUNT_EXPIRED:
+-    {
+-        /* Instruction counter expired.  */
+-#ifdef CONFIG_USER_ONLY
+-        abort();
+-#else
+-        int insns_left = cpu->icount_decr.u32;
+-        *last_tb = NULL;
+-        if (cpu->icount_extra && insns_left >= 0) {
+-            /* Refill decrementer and continue execution.  */
+-            cpu->icount_extra += insns_left;
+-            insns_left = MIN(0xffff, cpu->icount_extra);
+-            cpu->icount_extra -= insns_left;
+-            cpu->icount_decr.u16.low = insns_left;
+-        } else {
+-            if (insns_left > 0) {
+-                /* Execute remaining instructions.  */
+-                cpu_exec_nocache(cpu, insns_left, tb, false);
+-                align_clocks(sc, cpu);
+-            }
+-            cpu->exception_index = EXCP_INTERRUPT;
+-            cpu_loop_exit(cpu);
+-        }
+-        break;
+-#endif
++        return;
+     }
+-    default:
+-        *last_tb = tb;
+-        break;
++
++    /* Instruction counter expired.  */
++    assert(use_icount);
++#ifndef CONFIG_USER_ONLY
++    if (cpu->icount_extra) {
++        /* Refill decrementer and continue execution.  */
++        cpu->icount_extra += insns_left;
++        insns_left = MIN(0xffff, cpu->icount_extra);
++        cpu->icount_extra -= insns_left;
++        cpu->icount_decr.u16.low = insns_left;
++    } else {
++        /* Execute any remaining instructions, then let the main loop
++         * handle the next event.
++         */
++        if (insns_left > 0) {
++            cpu_exec_nocache(cpu, insns_left, tb, false);
++            align_clocks(sc, cpu);
++        }
++        cpu->exception_index = EXCP_INTERRUPT;
++        cpu_loop_exit(cpu);
+     }
++#endif
+ }
+ 
+ /* main execution loop */
+diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
+index 050de59..62d462e 100644
+--- a/include/exec/gen-icount.h
++++ b/include/exec/gen-icount.h
+@@ -6,58 +6,55 @@
+ /* Helpers for instruction counting code generation.  */
+ 
+ static int icount_start_insn_idx;
+-static TCGLabel *icount_label;
+ static TCGLabel *exitreq_label;
+ 
+ static inline void gen_tb_start(TranslationBlock *tb)
+ {
+-    TCGv_i32 count, flag, imm;
++    TCGv_i32 count, imm;
+ 
+     exitreq_label = gen_new_label();
+-    flag = tcg_temp_new_i32();
+-    tcg_gen_ld_i32(flag, cpu_env,
+-                   offsetof(CPUState, tcg_exit_req) - ENV_OFFSET);
+-    tcg_gen_brcondi_i32(TCG_COND_NE, flag, 0, exitreq_label);
+-    tcg_temp_free_i32(flag);
+-
+-    if (!(tb->cflags & CF_USE_ICOUNT)) {
+-        return;
++    if (tb->cflags & CF_USE_ICOUNT) {
++        count = tcg_temp_local_new_i32();
++    } else {
++        count = tcg_temp_new_i32();
+     }
+ 
+-    icount_label = gen_new_label();
+-    count = tcg_temp_local_new_i32();
+     tcg_gen_ld_i32(count, cpu_env,
+                    -ENV_OFFSET + offsetof(CPUState, icount_decr.u32));
+ 
+-    imm = tcg_temp_new_i32();
+-    /* We emit a movi with a dummy immediate argument. Keep the insn index
+-     * of the movi so that we later (when we know the actual insn count)
+-     * can update the immediate argument with the actual insn count.  */
+-    icount_start_insn_idx = tcg_op_buf_count();
+-    tcg_gen_movi_i32(imm, 0xdeadbeef);
++    if (tb->cflags & CF_USE_ICOUNT) {
++        imm = tcg_temp_new_i32();
++        /* We emit a movi with a dummy immediate argument. Keep the insn index
++         * of the movi so that we later (when we know the actual insn count)
++         * can update the immediate argument with the actual insn count.  */
++        icount_start_insn_idx = tcg_op_buf_count();
++        tcg_gen_movi_i32(imm, 0xdeadbeef);
++
++        tcg_gen_sub_i32(count, count, imm);
++        tcg_temp_free_i32(imm);
++    }
++
++    tcg_gen_brcondi_i32(TCG_COND_LT, count, 0, exitreq_label);
+ 
+-    tcg_gen_sub_i32(count, count, imm);
+-    tcg_temp_free_i32(imm);
++    if (tb->cflags & CF_USE_ICOUNT) {
++        tcg_gen_st16_i32(count, cpu_env,
++                         -ENV_OFFSET + offsetof(CPUState, icount_decr.u16.low));
++    }
+ 
+-    tcg_gen_brcondi_i32(TCG_COND_LT, count, 0, icount_label);
+-    tcg_gen_st16_i32(count, cpu_env,
+-                     -ENV_OFFSET + offsetof(CPUState, icount_decr.u16.low));
+     tcg_temp_free_i32(count);
+ }
+ 
+ static void gen_tb_end(TranslationBlock *tb, int num_insns)
+ {
+-    gen_set_label(exitreq_label);
+-    tcg_gen_exit_tb((uintptr_t)tb + TB_EXIT_REQUESTED);
+-
+     if (tb->cflags & CF_USE_ICOUNT) {
+         /* Update the num_insn immediate parameter now that we know
+          * the actual insn count.  */
+         tcg_set_insn_param(icount_start_insn_idx, 1, num_insns);
+-        gen_set_label(icount_label);
+-        tcg_gen_exit_tb((uintptr_t)tb + TB_EXIT_ICOUNT_EXPIRED);
+     }
+ 
++    gen_set_label(exitreq_label);
++    tcg_gen_exit_tb((uintptr_t)tb + TB_EXIT_REQUESTED);
++
+     /* Terminate the linked list.  */
+     tcg_ctx.gen_op_buf[tcg_ctx.gen_op_buf[0].prev].next = 0;
+ }
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index f69b240..1bc3ad2 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -275,11 +275,11 @@ struct qemu_work_item;
+  * @stopped: Indicates the CPU has been artificially stopped.
+  * @unplug: Indicates a pending CPU unplug request.
+  * @crash_occurred: Indicates the OS reported a crash (panic) for this CPU
+- * @tcg_exit_req: Set to force TCG to stop executing linked TBs for this
+- *           CPU and return to its top level loop.
+  * @singlestep_enabled: Flags for single-stepping.
+  * @icount_extra: Instructions until next timer event.
+- * @icount_decr: Number of cycles left, with interrupt flag in high bit.
++ * @icount_decr: Low 16 bits: number of cycles left, only used in icount mode.
++ * High 16 bits: Set to -1 to force TCG to stop executing linked TBs for this
++ * CPU and return to its top level loop (even in non-icount mode).
+  * This allows a single read-compare-cbranch-write sequence to test
+  * for both decrementer underflow and exceptions.
+  * @can_do_io: Nonzero if memory-mapped IO is safe. Deterministic execution
+@@ -381,10 +381,6 @@ struct CPUState {
+     /* TODO Move common fields from CPUArchState here. */
+     int cpu_index; /* used by alpha TCG */
+     uint32_t halted; /* used by alpha, cris, ppc TCG */
+-    union {
+-        uint32_t u32;
+-        icount_decr_u16 u16;
+-    } icount_decr;
+     uint32_t can_do_io;
+     int32_t exception_index; /* used by m68k TCG */
+ 
+@@ -397,7 +393,10 @@ struct CPUState {
+        offset from AREG0.  Leave this field at the end so as to make the
+        (absolute value) offset as small as possible.  This reduces code
+        size, especially for hosts without large memory offsets.  */
+-    uint32_t tcg_exit_req;
++    union {
++        uint32_t u32;
++        icount_decr_u16 u16;
++    } icount_decr;
+ 
+     bool hax_vcpu_dirty;
+     struct hax_vcpu_state *hax_vcpu;
+diff --git a/qom/cpu.c b/qom/cpu.c
+index ed87c50..7e005af 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -123,7 +123,7 @@ void cpu_exit(CPUState *cpu)
+     atomic_set(&cpu->exit_request, 1);
+     /* Ensure cpu_exec will see the exit request after TCG has exited.  */
+     smp_wmb();
+-    atomic_set(&cpu->tcg_exit_req, 1);
++    atomic_set(&cpu->icount_decr.u16.high, -1);
+ }
+ 
+ int cpu_write_elf32_qemunote(WriteCoreDumpFunction f, CPUState *cpu,
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 631c6f6..167aa30 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -1108,7 +1108,6 @@ static inline unsigned get_mmuidx(TCGMemOpIdx oi)
+ #define TB_EXIT_MASK 3
+ #define TB_EXIT_IDX0 0
+ #define TB_EXIT_IDX1 1
+-#define TB_EXIT_ICOUNT_EXPIRED 2
+ #define TB_EXIT_REQUESTED 3
+ 
+ #ifdef HAVE_TCG_QEMU_TB_EXEC
+diff --git a/translate-all.c b/translate-all.c
+index 5f44ec8..1a21e3f 100644
+--- a/translate-all.c
++++ b/translate-all.c
+@@ -1958,7 +1958,7 @@ void dump_opcount_info(FILE *f, fprintf_function cpu_fprintf)
+ void cpu_interrupt(CPUState *cpu, int mask)
+ {
+     cpu->interrupt_request |= mask;
+-    cpu->tcg_exit_req = 1;
++    cpu->icount_decr.u16.high = -1;
+ }
+ 
+ /*
+diff --git a/translate-common.c b/translate-common.c
+index 5e989cd..77762fd 100644
+--- a/translate-common.c
++++ b/translate-common.c
+@@ -43,14 +43,11 @@ static void tcg_handle_interrupt(CPUState *cpu, int mask)
+         return;
+     }
+ 
+-    if (use_icount) {
+-        cpu->icount_decr.u16.high = 0xffff;
+-        if (!cpu->can_do_io
+-            && (mask & ~old_mask) != 0) {
+-            cpu_abort(cpu, "Raised interrupt while not in I/O function");
+-        }
+-    } else {
+-        cpu->tcg_exit_req = 1;
++    cpu->icount_decr.u16.high = -1;
++    if (use_icount &&
++        !cpu->can_do_io
++        && (mask & ~old_mask) != 0) {
++        cpu_abort(cpu, "Raised interrupt while not in I/O function");
+     }
+ }
+ 
 -- 
 1.8.3.1
