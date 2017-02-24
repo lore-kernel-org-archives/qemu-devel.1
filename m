@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45475)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1chDwB-0007Cu-0O
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:21:26 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1chDwG-0007Hw-9i
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:21:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1chDwA-0000Gq-10
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:21:22 -0500
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:36537)
+	(envelope-from <alex.bennee@linaro.org>) id 1chDwE-0000Ou-45
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:21:28 -0500
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:35691)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1chDw9-0000G4-Qk
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:21:21 -0500
-Received: by mail-wm0-x232.google.com with SMTP id v77so11955487wmv.1
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 03:21:21 -0800 (PST)
+	id 1chDwD-0000Md-SF
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:21:26 -0500
+Received: by mail-wr0-x22d.google.com with SMTP id g10so9237765wrg.2
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 03:21:25 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 24 Feb 2017 11:20:55 +0000
-Message-Id: <20170224112109.3147-11-alex.bennee@linaro.org>
+Date: Fri, 24 Feb 2017 11:20:56 +0000
+Message-Id: <20170224112109.3147-12-alex.bennee@linaro.org>
 In-Reply-To: <20170224112109.3147-1-alex.bennee@linaro.org>
 References: <20170224112109.3147-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 10/24] tcg: enable tb_lock() for SoftMMU
+Subject: [Qemu-devel] [PULL 11/24] tcg: enable thread-per-vCPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +30,329 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, KONRAD Frederic <fred.konrad@greensocs.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-tb_lock() has long been used for linux-user mode to protect code
-generation. By enabling it now we prepare for MTTCG and ensure all code
-generation is serialised by this lock. The other major structure that
-needs protecting is the l1_map and its PageDesc structures. For the
-SoftMMU case we also use tb_lock() to protect these structures instead
-of linux-user mmap_lock() which as the name suggests serialises updates
-to the structure as a result of guest mmap operations.
+There are a couple of changes that occur at the same time here:
 
+  - introduce a single vCPU qemu_tcg_cpu_thread_fn
+
+  One of these is spawned per vCPU with its own Thread and Condition
+  variables. qemu_tcg_rr_cpu_thread_fn is the new name for the old
+  single threaded function.
+
+  - the TLS current_cpu variable is now live for the lifetime of MTTCG
+    vCPU threads. This is for future work where async jobs need to know
+    the vCPU context they are operating in.
+
+The user to switch on multi-thread behaviour and spawn a thread
+per-vCPU. For a simple test kvm-unit-test like:
+
+  ./arm/run ./arm/locking-test.flat -smp 4 -accel tcg,thread=multi
+
+Will now use 4 vCPU threads and have an expected FAIL (instead of the
+unexpected PASS) as the default mode of the test has no protection when
+incrementing a shared variable.
+
+We enable the parallel_cpus flag to ensure we generate correct barrier
+and atomic code if supported by the front and backends. This doesn't
+automatically enable MTTCG until default_mttcg_enabled() is updated to
+check the configuration is supported.
+
+Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+[AJB: Some fixes, conditionally, commit rewording]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
- translate-all.c | 15 +--------------
- 1 file changed, 1 insertion(+), 14 deletions(-)
+ cpu-exec.c |   4 --
+ cpus.c     | 134 +++++++++++++++++++++++++++++++++++++++++++++++--------------
+ 2 files changed, 103 insertions(+), 35 deletions(-)
 
-diff --git a/translate-all.c b/translate-all.c
-index f810259c41..9bac061c9b 100644
---- a/translate-all.c
-+++ b/translate-all.c
-@@ -75,7 +75,7 @@
-  * mmap_lock.
-  */
- #ifdef CONFIG_SOFTMMU
--#define assert_memory_lock() do { /* nothing */ } while (0)
-+#define assert_memory_lock() tcg_debug_assert(have_tb_lock)
- #else
- #define assert_memory_lock() tcg_debug_assert(have_mmap_lock())
+diff --git a/cpu-exec.c b/cpu-exec.c
+index 85f14d4194..2edd26e823 100644
+--- a/cpu-exec.c
++++ b/cpu-exec.c
+@@ -396,7 +396,6 @@ static inline bool cpu_handle_halt(CPUState *cpu)
+         }
  #endif
-@@ -135,9 +135,7 @@ TCGContext tcg_ctx;
- bool parallel_cpus;
+         if (!cpu_has_work(cpu)) {
+-            current_cpu = NULL;
+             return true;
+         }
  
- /* translation block context */
--#ifdef CONFIG_USER_ONLY
- __thread int have_tb_lock;
--#endif
+@@ -675,8 +674,5 @@ int cpu_exec(CPUState *cpu)
+     cc->cpu_exec_exit(cpu);
+     rcu_read_unlock();
  
- static void page_table_config_init(void)
- {
-@@ -159,40 +157,29 @@ static void page_table_config_init(void)
-     assert(v_l2_levels >= 0);
+-    /* fail safe : never use current_cpu outside cpu_exec() */
+-    current_cpu = NULL;
+-
+     return ret;
  }
+diff --git a/cpus.c b/cpus.c
+index e165d18785..bfee326d30 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -809,7 +809,7 @@ static void kick_tcg_thread(void *opaque)
  
--#ifdef CONFIG_USER_ONLY
- #define assert_tb_locked() tcg_debug_assert(have_tb_lock)
- #define assert_tb_unlocked() tcg_debug_assert(!have_tb_lock)
--#else
--#define assert_tb_locked()  do { /* nothing */ } while (0)
--#define assert_tb_unlocked()  do { /* nothing */ } while (0)
--#endif
- 
- void tb_lock(void)
+ static void start_tcg_kick_timer(void)
  {
--#ifdef CONFIG_USER_ONLY
-     assert_tb_unlocked();
-     qemu_mutex_lock(&tcg_ctx.tb_ctx.tb_lock);
-     have_tb_lock++;
--#endif
- }
+-    if (!tcg_kick_vcpu_timer && CPU_NEXT(first_cpu)) {
++    if (!mttcg_enabled && !tcg_kick_vcpu_timer && CPU_NEXT(first_cpu)) {
+         tcg_kick_vcpu_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
+                                            kick_tcg_thread, NULL);
+         timer_mod(tcg_kick_vcpu_timer, qemu_tcg_next_kick());
+@@ -1063,27 +1063,34 @@ static void qemu_tcg_destroy_vcpu(CPUState *cpu)
  
- void tb_unlock(void)
+ static void qemu_wait_io_event_common(CPUState *cpu)
  {
--#ifdef CONFIG_USER_ONLY
-     assert_tb_locked();
-     have_tb_lock--;
-     qemu_mutex_unlock(&tcg_ctx.tb_ctx.tb_lock);
--#endif
- }
- 
- void tb_lock_reset(void)
- {
--#ifdef CONFIG_USER_ONLY
-     if (have_tb_lock) {
-         qemu_mutex_unlock(&tcg_ctx.tb_ctx.tb_lock);
-         have_tb_lock = 0;
++    atomic_mb_set(&cpu->thread_kicked, false);
+     if (cpu->stop) {
+         cpu->stop = false;
+         cpu->stopped = true;
+         qemu_cond_broadcast(&qemu_pause_cond);
      }
--#endif
+     process_queued_cpu_work(cpu);
+-    cpu->thread_kicked = false;
++}
++
++static bool qemu_tcg_should_sleep(CPUState *cpu)
++{
++    if (mttcg_enabled) {
++        return cpu_thread_is_idle(cpu);
++    } else {
++        return all_cpu_threads_idle();
++    }
  }
  
- static TranslationBlock *tb_find_pc(uintptr_t tc_ptr);
+ static void qemu_tcg_wait_io_event(CPUState *cpu)
+ {
+-    while (all_cpu_threads_idle()) {
++    while (qemu_tcg_should_sleep(cpu)) {
+         stop_tcg_kick_timer();
+         qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
+     }
+ 
+     start_tcg_kick_timer();
+ 
+-    CPU_FOREACH(cpu) {
+-        qemu_wait_io_event_common(cpu);
+-    }
++    qemu_wait_io_event_common(cpu);
+ }
+ 
+ static void qemu_kvm_wait_io_event(CPUState *cpu)
+@@ -1154,6 +1161,7 @@ static void *qemu_dummy_cpu_thread_fn(void *arg)
+     qemu_thread_get_self(cpu->thread);
+     cpu->thread_id = qemu_get_thread_id();
+     cpu->can_do_io = 1;
++    current_cpu = cpu;
+ 
+     sigemptyset(&waitset);
+     sigaddset(&waitset, SIG_IPI);
+@@ -1162,9 +1170,7 @@ static void *qemu_dummy_cpu_thread_fn(void *arg)
+     cpu->created = true;
+     qemu_cond_signal(&qemu_cpu_cond);
+ 
+-    current_cpu = cpu;
+     while (1) {
+-        current_cpu = NULL;
+         qemu_mutex_unlock_iothread();
+         do {
+             int sig;
+@@ -1175,7 +1181,6 @@ static void *qemu_dummy_cpu_thread_fn(void *arg)
+             exit(1);
+         }
+         qemu_mutex_lock_iothread();
+-        current_cpu = cpu;
+         qemu_wait_io_event_common(cpu);
+     }
+ 
+@@ -1287,7 +1292,7 @@ static void deal_with_unplugged_cpus(void)
+  * elsewhere.
+  */
+ 
+-static void *qemu_tcg_cpu_thread_fn(void *arg)
++static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
+ {
+     CPUState *cpu = arg;
+ 
+@@ -1309,6 +1314,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+ 
+         /* process any pending work */
+         CPU_FOREACH(cpu) {
++            current_cpu = cpu;
+             qemu_wait_io_event_common(cpu);
+         }
+     }
+@@ -1331,6 +1337,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+         while (cpu && !cpu->queued_work_first && !cpu->exit_request) {
+ 
+             atomic_mb_set(&tcg_current_rr_cpu, cpu);
++            current_cpu = cpu;
+ 
+             qemu_clock_enable(QEMU_CLOCK_VIRTUAL,
+                               (cpu->singlestep_enabled & SSTEP_NOTIMER) == 0);
+@@ -1342,7 +1349,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+                     cpu_handle_guest_debug(cpu);
+                     break;
+                 }
+-            } else if (cpu->stop || cpu->stopped) {
++            } else if (cpu->stop) {
+                 if (cpu->unplug) {
+                     cpu = CPU_NEXT(cpu);
+                 }
+@@ -1361,7 +1368,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+ 
+         handle_icount_deadline();
+ 
+-        qemu_tcg_wait_io_event(QTAILQ_FIRST(&cpus));
++        qemu_tcg_wait_io_event(cpu ? cpu : QTAILQ_FIRST(&cpus));
+         deal_with_unplugged_cpus();
+     }
+ 
+@@ -1408,6 +1415,64 @@ static void CALLBACK dummy_apc_func(ULONG_PTR unused)
+ }
+ #endif
+ 
++/* Multi-threaded TCG
++ *
++ * In the multi-threaded case each vCPU has its own thread. The TLS
++ * variable current_cpu can be used deep in the code to find the
++ * current CPUState for a given thread.
++ */
++
++static void *qemu_tcg_cpu_thread_fn(void *arg)
++{
++    CPUState *cpu = arg;
++
++    rcu_register_thread();
++
++    qemu_mutex_lock_iothread();
++    qemu_thread_get_self(cpu->thread);
++
++    cpu->thread_id = qemu_get_thread_id();
++    cpu->created = true;
++    cpu->can_do_io = 1;
++    current_cpu = cpu;
++    qemu_cond_signal(&qemu_cpu_cond);
++
++    /* process any pending work */
++    cpu->exit_request = 1;
++
++    while (1) {
++        if (cpu_can_run(cpu)) {
++            int r;
++            r = tcg_cpu_exec(cpu);
++            switch (r) {
++            case EXCP_DEBUG:
++                cpu_handle_guest_debug(cpu);
++                break;
++            case EXCP_HALTED:
++                /* during start-up the vCPU is reset and the thread is
++                 * kicked several times. If we don't ensure we go back
++                 * to sleep in the halted state we won't cleanly
++                 * start-up when the vCPU is enabled.
++                 *
++                 * cpu->halted should ensure we sleep in wait_io_event
++                 */
++                g_assert(cpu->halted);
++                break;
++            default:
++                /* Ignore everything else? */
++                break;
++            }
++        }
++
++        handle_icount_deadline();
++
++        atomic_mb_set(&cpu->exit_request, 0);
++        qemu_tcg_wait_io_event(cpu);
++    }
++
++    return NULL;
++}
++
+ static void qemu_cpu_kick_thread(CPUState *cpu)
+ {
+ #ifndef _WIN32
+@@ -1438,7 +1503,7 @@ void qemu_cpu_kick(CPUState *cpu)
+     qemu_cond_broadcast(cpu->halt_cond);
+     if (tcg_enabled()) {
+         cpu_exit(cpu);
+-        /* Also ensure current RR cpu is kicked */
++        /* NOP unless doing single-thread RR */
+         qemu_cpu_kick_rr_cpu();
+     } else {
+         if (hax_enabled()) {
+@@ -1514,13 +1579,6 @@ void pause_all_vcpus(void)
+ 
+     if (qemu_in_vcpu_thread()) {
+         cpu_stop_current();
+-        if (!kvm_enabled()) {
+-            CPU_FOREACH(cpu) {
+-                cpu->stop = false;
+-                cpu->stopped = true;
+-            }
+-            return;
+-        }
+     }
+ 
+     while (!all_vcpus_paused()) {
+@@ -1569,29 +1627,43 @@ void cpu_remove_sync(CPUState *cpu)
+ static void qemu_tcg_init_vcpu(CPUState *cpu)
+ {
+     char thread_name[VCPU_THREAD_NAME_SIZE];
+-    static QemuCond *tcg_halt_cond;
+-    static QemuThread *tcg_cpu_thread;
++    static QemuCond *single_tcg_halt_cond;
++    static QemuThread *single_tcg_cpu_thread;
+ 
+-    /* share a single thread for all cpus with TCG */
+-    if (!tcg_cpu_thread) {
++    if (qemu_tcg_mttcg_enabled() || !single_tcg_cpu_thread) {
+         cpu->thread = g_malloc0(sizeof(QemuThread));
+         cpu->halt_cond = g_malloc0(sizeof(QemuCond));
+         qemu_cond_init(cpu->halt_cond);
+-        tcg_halt_cond = cpu->halt_cond;
+-        snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/TCG",
++
++        if (qemu_tcg_mttcg_enabled()) {
++            /* create a thread per vCPU with TCG (MTTCG) */
++            parallel_cpus = true;
++            snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/TCG",
+                  cpu->cpu_index);
+-        qemu_thread_create(cpu->thread, thread_name, qemu_tcg_cpu_thread_fn,
+-                           cpu, QEMU_THREAD_JOINABLE);
++
++            qemu_thread_create(cpu->thread, thread_name, qemu_tcg_cpu_thread_fn,
++                               cpu, QEMU_THREAD_JOINABLE);
++
++        } else {
++            /* share a single thread for all cpus with TCG */
++            snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "ALL CPUs/TCG");
++            qemu_thread_create(cpu->thread, thread_name,
++                               qemu_tcg_rr_cpu_thread_fn,
++                               cpu, QEMU_THREAD_JOINABLE);
++
++            single_tcg_halt_cond = cpu->halt_cond;
++            single_tcg_cpu_thread = cpu->thread;
++        }
+ #ifdef _WIN32
+         cpu->hThread = qemu_thread_get_handle(cpu->thread);
+ #endif
+         while (!cpu->created) {
+             qemu_cond_wait(&qemu_cpu_cond, &qemu_global_mutex);
+         }
+-        tcg_cpu_thread = cpu->thread;
+     } else {
+-        cpu->thread = tcg_cpu_thread;
+-        cpu->halt_cond = tcg_halt_cond;
++        /* For non-MTTCG cases we share the thread */
++        cpu->thread = single_tcg_cpu_thread;
++        cpu->halt_cond = single_tcg_halt_cond;
+     }
+ }
+ 
 -- 
 2.11.0
