@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43964)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ch9Bf-00020K-3w
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 01:17:03 -0500
+	(envelope-from <rth7680@gmail.com>) id 1ch9Oo-0007Nv-BE
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 01:30:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ch9Bb-0004sr-44
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 01:17:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43232)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1ch9Ba-0004rx-Ty
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 01:16:59 -0500
-Date: Fri, 24 Feb 2017 14:16:55 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170224061655.GA32354@lemon.lan>
-References: <20170222021801.28658-1-famz@redhat.com>
+	(envelope-from <rth7680@gmail.com>) id 1ch9Ok-0008W5-Bs
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 01:30:38 -0500
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1487763883-4877-1-git-send-email-nikunj@linux.vnet.ibm.com>
+	<1487763883-4877-4-git-send-email-nikunj@linux.vnet.ibm.com>
+	<913ec2bb-2fd4-3488-e142-75d3574dfaf1@twiddle.net>
+	<87a89dtnox.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<98b51c07-f7b2-ddb3-7b59-336d109d005b@twiddle.net>
+	<20170223225358.GD17615@umbus.fritz.box>
+	<CALAZu3_3TkjFbLUAraQRgG5Ytm0a08QLzQSdYLKF5EYPD-imxA@mail.gmail.com>
+	<20170224045026.GV17615@umbus.fritz.box>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <e589819d-ab5e-3c45-0ed8-5783e23ea5d9@twiddle.net>
+Date: Fri, 24 Feb 2017 17:30:23 +1100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170222021801.28658-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] docker: Install python2 explicitly in
- docker image
+In-Reply-To: <20170224045026.GV17615@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v3 03/10] target/ppc: support
+ for 32-bit carry and overflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,35 +31,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Auger Eric <eric.auger@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>, Nikunj Dadhania <nikunj.dadhania@gmail.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-On Wed, 02/22 10:18, Fam Zheng wrote:
-> Python is no longer installed implicitly, but the QEMU build system
-> requires it. List it in PACKAGES.
-> 
-> Reported-by: Auger Eric <eric.auger@redhat.com>
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  tests/docker/dockerfiles/fedora.docker | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
-> index 478163b..c4f80ad 100644
-> --- a/tests/docker/dockerfiles/fedora.docker
-> +++ b/tests/docker/dockerfiles/fedora.docker
-> @@ -1,6 +1,6 @@
->  FROM fedora:latest
->  ENV PACKAGES \
-> -    ccache git tar PyYAML sparse flex bison \
-> +    ccache git tar PyYAML sparse flex bison python2 \
->      glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
->      gcc gcc-c++ clang make perl which bc findutils \
->      mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg-config \
-> -- 
-> 2.9.3
-> 
+On 02/24/2017 03:50 PM, David Gibson wrote:
+> Although I guess they'd shrink right down again if we put an
+> env->xer_mask in.  Thoughts on that option Richard?
 
-Applied to my staging tree.
+Why would xer_mask shrink the code?  I can't see that we'd be able to eliminate 
+any code using the mask.
 
-Fam
+
+r~
