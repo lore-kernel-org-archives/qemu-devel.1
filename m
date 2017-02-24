@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1chKc9-0001AI-JN
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:29:10 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1chKhM-00088U-B5
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:34:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1chKc8-00087I-Te
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:29:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50522)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1chKc8-00086h-NT
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:29:08 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E1D8C80484
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 18:29:08 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Fri, 24 Feb 2017 18:28:44 +0000
-Message-Id: <20170224182844.32452-17-dgilbert@redhat.com>
-In-Reply-To: <20170224182844.32452-1-dgilbert@redhat.com>
-References: <20170224182844.32452-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 16/16] postcopy: Add extra check for COPY
- function
+	(envelope-from <peter.maydell@linaro.org>) id 1chKhL-0001nm-HV
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:34:32 -0500
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:38705)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1chKhL-0001nX-B6
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:34:31 -0500
+Received: by mail-wm0-x236.google.com with SMTP id r141so21134201wmg.1
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 10:34:31 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20170223193048.16909.25661.stgit@gimli.home>
+References: <20170223193048.16909.25661.stgit@gimli.home>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 24 Feb 2017 18:34:09 +0000
+Message-ID: <CAFEAcA__LEFJAiP3UNsgEUx_1BG3AGw4kH-EAE+Q0bUx3PZYog@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 0/3] VFIO updates 2017-02-23
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, quintela@redhat.com, lvivier@redhat.com
-Cc: aarcange@redhat.com
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On 23 February 2017 at 19:32, Alex Williamson
+<alex.williamson@redhat.com> wrote:
+> The following changes since commit 796b288f7be875045670f963ce99991b3c8e96ac:
+>
+>   Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' into staging (2017-02-21 15:48:22 +0000)
+>
+> are available in the git repository at:
+>
+>
+>   git://github.com/awilliam/qemu-vfio.git tags/vfio-updates-20170223.0
+>
+> for you to fetch changes up to c2b2e158cc7b1cb431bd6039824ec13c3184a775:
+>
+>   vfio/pci-quirks.c: Disable stolen memory for igd VFIO (2017-02-22 13:19:59 -0700)
+>
+> ----------------------------------------------------------------
+> VFIO updates 2017-02-23
+>
+>  - Report qdev_unplug errors (Alex Williamson)
+>  - Fix ecap ID 0 handling, improve comment (Alex Williamson)
+>  - Disable IGD stolen memory in UPT mode too (Xiong Zhang)
+>
+> ----------------------------------------------------------------
 
-As an extra sanity check, make sure the region we're registering
-can perform UFFDIO_COPY;  the COPY will fail later but this
-gives a cleaner failure.
+Applied, thanks.
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- migration/postcopy-ram.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index 102fb61..effbeb6 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -378,6 +378,10 @@ static int ram_block_enable_notify(const char *block_name, void *host_addr,
-         error_report("%s userfault register: %s", __func__, strerror(errno));
-         return -1;
-     }
-+    if (!(reg_struct.ioctls & ((__u64)1 << _UFFDIO_COPY))) {
-+        error_report("%s userfault: Region doesn't support COPY", __func__);
-+        return -1;
-+    }
- 
-     return 0;
- }
--- 
-2.9.3
+-- PMM
