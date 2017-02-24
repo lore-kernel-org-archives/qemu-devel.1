@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Chris.Friesen@windriver.com>) id 1chHW4-00011C-WD
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 10:10:41 -0500
+	(envelope-from <lvivier@redhat.com>) id 1chHWM-000191-8K
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 10:10:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Chris.Friesen@windriver.com>) id 1chHW0-0000Le-09
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 10:10:40 -0500
-Received: from mail5.windriver.com ([192.103.53.11]:42344 helo=mail5.wrs.com)
+	(envelope-from <lvivier@redhat.com>) id 1chHWH-0000Q2-7I
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 10:10:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42472)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Chris.Friesen@windriver.com>)
-	id 1chHVz-0000KZ-MH
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 10:10:35 -0500
-Message-ID: <58B04CD3.7010304@windriver.com>
-Date: Fri, 24 Feb 2017 09:10:11 -0600
-From: Chris Friesen <chris.friesen@windriver.com>
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1chHWG-0000Pb-UB
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 10:10:53 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0FBE0C04B93B
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 15:10:53 +0000 (UTC)
+References: <20170206173306.20603-1-dgilbert@redhat.com>
+	<20170206173306.20603-9-dgilbert@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <9d7466c0-896b-9098-101c-c1552093cc71@redhat.com>
+Date: Fri, 24 Feb 2017 16:10:49 +0100
 MIME-Version: 1.0
-References: <589C7E96.9060905@huawei.com> <589D83CE.1090803@huawei.com>
-	<589DDC05.9010807@windriver.com> <58AA51D6.6020508@huawei.com>
-	<1487565495.3740.27.camel@intel.com> <58AD0094.90304@windriver.com>
-	<4dd92012-626a-2d80-9adb-0be398f73eb1@redhat.com>
-	<58AD92AE.6040502@windriver.com>
-	<6c5567f4-192d-aefd-90e4-89f53479c24e@redhat.com>
-	<58AF9921.6060201@huawei.com>
-In-Reply-To: <58AF9921.6060201@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] kvm bug in __rmap_clear_dirty during live migration
+In-Reply-To: <20170206173306.20603-9-dgilbert@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 08/16] postcopy: Plumb pagesize down
+ into place helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,38 +34,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Herongguang (Stephen)" <herongguang.he@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, "Han, Huaitong" <huaitong.han@intel.com>, "hangaohuai@huawei.com" <hangaohuai@huawei.com>, stable@vger.kernel.org
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "fangying1@huawei.com" <fangying1@huawei.com>, "xudong.hao@linux.intel.com" <xudong.hao@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "wangxinxin.wang@huawei.com" <wangxinxin.wang@huawei.com>, "kai.huang@linux.intel.com" <kai.huang@linux.intel.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "guangrong.xiao@linux.intel.com" <guangrong.xiao@linux.intel.com>, linux-kernel@vger.kernel.org
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com
+Cc: aarcange@redhat.com
 
-On 02/23/2017 08:23 PM, Herongguang (Stephen) wrote:
+On 06/02/2017 18:32, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> Now we deal with normal size pages and huge pages we need
+> to tell the place handlers the size we're dealing with
+> and make sure the temporary page is large enough.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  include/migration/postcopy-ram.h |  6 +++--
+>  migration/postcopy-ram.c         | 47 ++++++++++++++++++++++++----------------
+>  migration/ram.c                  | 15 +++++++------
+>  3 files changed, 40 insertions(+), 28 deletions(-)
+> 
+> diff --git a/include/migration/postcopy-ram.h b/include/migration/postcopy-ram.h
+> index 43bbbca..8e036b9 100644
+> --- a/include/migration/postcopy-ram.h
+> +++ b/include/migration/postcopy-ram.h
+> @@ -74,13 +74,15 @@ void postcopy_discard_send_finish(MigrationState *ms,
+>   *    to use other postcopy_ routines to allocate.
+>   * returns 0 on success
+>   */
+> -int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from);
+> +int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
+> +                        size_t pagesize);
+>  
+>  /*
+>   * Place a zero page at (host) atomically
+>   * returns 0 on success
+>   */
+> -int postcopy_place_page_zero(MigrationIncomingState *mis, void *host);
+> +int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
+> +                             size_t pagesize);
+>  
+>  /*
+>   * Allocate a page of memory that can be mapped at a later point in time
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index 1e3d22f..a8b7fed 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -321,7 +321,7 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
+>      migrate_send_rp_shut(mis, qemu_file_get_error(mis->from_src_file) != 0);
+>  
+>      if (mis->postcopy_tmp_page) {
+> -        munmap(mis->postcopy_tmp_page, getpagesize());
+> +        munmap(mis->postcopy_tmp_page, mis->largest_page_size);
+>          mis->postcopy_tmp_page = NULL;
+>      }
+>      trace_postcopy_ram_incoming_cleanup_exit();
+> @@ -543,13 +543,14 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+>   * Place a host page (from) at (host) atomically
+>   * returns 0 on success
+>   */
+> -int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from)
+> +int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
+> +                        size_t pagesize)
+>  {
+>      struct uffdio_copy copy_struct;
+>  
+>      copy_struct.dst = (uint64_t)(uintptr_t)host;
+>      copy_struct.src = (uint64_t)(uintptr_t)from;
+> -    copy_struct.len = getpagesize();
+> +    copy_struct.len = pagesize;
+>      copy_struct.mode = 0;
+>  
+>      /* copy also acks to the kernel waking the stalled thread up
+> @@ -559,8 +560,8 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from)
+>       */
+>      if (ioctl(mis->userfault_fd, UFFDIO_COPY, &copy_struct)) {
+>          int e = errno;
+> -        error_report("%s: %s copy host: %p from: %p",
+> -                     __func__, strerror(e), host, from);
+> +        error_report("%s: %s copy host: %p from: %p (size: %zd)",
+> +                     __func__, strerror(e), host, from, pagesize);
+>  
+>          return -e;
+>      }
+> @@ -573,23 +574,29 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from)
+>   * Place a zero page at (host) atomically
+>   * returns 0 on success
+>   */
+> -int postcopy_place_page_zero(MigrationIncomingState *mis, void *host)
+> +int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
+> +                             size_t pagesize)
+>  {
+> -    struct uffdio_zeropage zero_struct;
+> +    trace_postcopy_place_page_zero(host);
+>  
+> -    zero_struct.range.start = (uint64_t)(uintptr_t)host;
+> -    zero_struct.range.len = getpagesize();
+> -    zero_struct.mode = 0;
+> +    if (pagesize == getpagesize()) {
+> +        struct uffdio_zeropage zero_struct;
+> +        zero_struct.range.start = (uint64_t)(uintptr_t)host;
+> +        zero_struct.range.len = getpagesize();
+> +        zero_struct.mode = 0;
+>  
+> -    if (ioctl(mis->userfault_fd, UFFDIO_ZEROPAGE, &zero_struct)) {
+> -        int e = errno;
+> -        error_report("%s: %s zero host: %p",
+> -                     __func__, strerror(e), host);
+> +        if (ioctl(mis->userfault_fd, UFFDIO_ZEROPAGE, &zero_struct)) {
+> +            int e = errno;
+> +            error_report("%s: %s zero host: %p",
+> +                         __func__, strerror(e), host);
+>  
+> -        return -e;
+> +            return -e;
+> +        }
+> +    } else {
+> +        /* TODO: The kernel can't use UFFDIO_ZEROPAGE for hugepages */
+> +        assert(0);
+>      }
+>  
+> -    trace_postcopy_place_page_zero(host);
+>      return 0;
+>  }
+>  
+> @@ -604,7 +611,7 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host)
+>  void *postcopy_get_tmp_page(MigrationIncomingState *mis)
+>  {
+>      if (!mis->postcopy_tmp_page) {
+> -        mis->postcopy_tmp_page = mmap(NULL, getpagesize(),
+> +        mis->postcopy_tmp_page = mmap(NULL, mis->largest_page_size,
+>                               PROT_READ | PROT_WRITE, MAP_PRIVATE |
+>                               MAP_ANONYMOUS, -1, 0);
+>          if (mis->postcopy_tmp_page == MAP_FAILED) {
+> @@ -649,13 +656,15 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+>      return -1;
+>  }
+>  
+> -int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from)
+> +int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
+> +                        size_t pagesize)
+>  {
+>      assert(0);
+>      return -1;
+>  }
+>  
+> -int postcopy_place_page_zero(MigrationIncomingState *mis, void *host)
+> +int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
+> +                        size_t pagesize)
+>  {
+>      assert(0);
+>      return -1;
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 136996a..ff448ef 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -2354,6 +2354,7 @@ static int ram_load_postcopy(QEMUFile *f)
+>          void *host = NULL;
+>          void *page_buffer = NULL;
+>          void *place_source = NULL;
+> +        RAMBlock *block = NULL;
+>          uint8_t ch;
+>  
+>          addr = qemu_get_be64(f);
+> @@ -2363,7 +2364,7 @@ static int ram_load_postcopy(QEMUFile *f)
+>          trace_ram_load_postcopy_loop((uint64_t)addr, flags);
+>          place_needed = false;
+>          if (flags & (RAM_SAVE_FLAG_COMPRESS | RAM_SAVE_FLAG_PAGE)) {
+> -            RAMBlock *block = ram_block_from_stream(f, flags);
+> +            block = ram_block_from_stream(f, flags);
+>  
+>              host = host_from_ram_block_offset(block, addr);
+>              if (!host) {
+> @@ -2438,14 +2439,14 @@ static int ram_load_postcopy(QEMUFile *f)
+>  
+>          if (place_needed) {
+>              /* This gets called at the last target page in the host page */
+> +            void *place_dest = host + TARGET_PAGE_SIZE - block->page_size;
+> +
+>              if (all_zero) {
+> -                ret = postcopy_place_page_zero(mis,
+> -                                               host + TARGET_PAGE_SIZE -
+> -                                               qemu_host_page_size);
+> +                ret = postcopy_place_page_zero(mis, place_dest,
+> +                                               block->page_size);
+>              } else {
+> -                ret = postcopy_place_page(mis, host + TARGET_PAGE_SIZE -
+> -                                               qemu_host_page_size,
+> -                                               place_source);
+> +                ret = postcopy_place_page(mis, place_dest,
+> +                                          place_source, block->page_size);
+>              }
+>          }
+>          if (!ret) {
+> 
 
-> On 2017/2/22 22:43, Paolo Bonzini wrote:
+I think the "postcopy_tmp_page" part should be better in PATCH 07/16, so
+we know why you introduce the largest_page_size field, and this avoids
+to mix two kinds of change in this one (to place page and adjust tmp_page).
 
->> Hopefully Gaohuai and Rongguang can help with this too.
->>
->> Paolo
->>
->> .
->>
-> Yes, we are looking into and testing this.
->
-> I think this can result in any memory corruption, if VM1 writes its
-> PML buffer into VM2=E2=80=99s VMCS (since sched_in/sched_out notifier o=
-f VM1
-> is not registered yet), then VM1 is destroyed (hence its PML buffer
-> is freed back to kernel), after that, VM2 starts migration, so CPU
-> logs VM2=E2=80=99s dirty GFNS into a freed memory, results in any memor=
-y corruption.
->
-> As its severity, this commit
-> (http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/=
-?id=3D4e59516a12a6ef6dcb660cb3a3f70c64bd60cfec)
->
-> is eligible to back port to kernel stable.
->
-
-Are we expecting that fix to resolve the original issue, or is it a separ=
-ate=20
-issue that needs fixing in stable?
-
-Chris
+Anyway:
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
