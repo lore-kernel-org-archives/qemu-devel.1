@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1chKQm-0006HH-1F
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:17:25 -0500
+	(envelope-from <kwolf@redhat.com>) id 1chKQn-0006J6-LH
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:17:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1chKQl-0002hh-09
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:17:24 -0500
+	(envelope-from <kwolf@redhat.com>) id 1chKQm-0002iz-Ia
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:17:25 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 24 Feb 2017 19:16:55 +0100
-Message-Id: <1487960230-18054-5-git-send-email-kwolf@redhat.com>
+Date: Fri, 24 Feb 2017 19:16:56 +0100
+Message-Id: <1487960230-18054-6-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1487960230-18054-1-git-send-email-kwolf@redhat.com>
 References: <1487960230-18054-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 04/19] qemu-img: Do not truncate before
+Subject: [Qemu-devel] [PULL 05/19] qemu-img: Add tests for raw image
  preallocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,97 +25,118 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Nir Soffer <nirsof@gmail.com>
 
-When using file system that does not support fallocate() (e.g. NFS <
-4.2), truncating the file only when preallocation=OFF speeds up creating
-raw file.
-
-Here is example run, tested on Fedora 24 machine, creating raw file on
-NFS version 3 server.
-
-$ time ./qemu-img-master create -f raw -o preallocation=falloc mnt/test 1g
-Formatting 'mnt/test', fmt=raw size=1073741824 preallocation=falloc
-
-real	0m21.185s
-user	0m0.022s
-sys	0m0.574s
-
-$ time ./qemu-img-fix create -f raw -o preallocation=falloc mnt/test 1g
-Formatting 'mnt/test', fmt=raw size=1073741824 preallocation=falloc
-
-real	0m11.601s
-user	0m0.016s
-sys	0m0.525s
-
-$ time dd if=/dev/zero of=mnt/test bs=1M count=1024 oflag=direct
-1024+0 records in
-1024+0 records out
-1073741824 bytes (1.1 GB, 1.0 GiB) copied, 15.6627 s, 68.6 MB/s
-
-real	0m16.104s
-user	0m0.009s
-sys	0m0.220s
-
-Running with strace we can see that without this change we do one
-pread() and one pwrite() for each block. With this change, we do only
-one pwrite() per block.
-
-$ strace ./qemu-img-master create -f raw -o preallocation=falloc mnt/test 8192
-...
-pread64(9, "\0", 1, 4095)               = 1
-pwrite64(9, "\0", 1, 4095)              = 1
-pread64(9, "\0", 1, 8191)               = 1
-pwrite64(9, "\0", 1, 8191)              = 1
-
-$ strace ./qemu-img-fix create -f raw -o preallocation=falloc mnt/test 8192
-...
-pwrite64(9, "\0", 1, 4095)              = 1
-pwrite64(9, "\0", 1, 8191)              = 1
-
-This happens because posix_fallocate is checking if each block is
-allocated before writing a byte to the block, and when truncating the
-file before preallocation, all blocks are unallocated.
+Add tests for creating raw image with and without the preallocation
+option.
 
 Signed-off-by: Nir Soffer <nirsof@gmail.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/file-posix.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+ tests/qemu-iotests/175     | 61 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/175.out | 18 ++++++++++++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 80 insertions(+)
+ create mode 100755 tests/qemu-iotests/175
+ create mode 100644 tests/qemu-iotests/175.out
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 2134e0e..442f080 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1591,12 +1591,6 @@ static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
- #endif
-     }
- 
--    if (ftruncate(fd, total_size) != 0) {
--        result = -errno;
--        error_setg_errno(errp, -result, "Could not resize file");
--        goto out_close;
--    }
--
-     switch (prealloc) {
- #ifdef CONFIG_POSIX_FALLOCATE
-     case PREALLOC_MODE_FALLOC:
-@@ -1636,6 +1630,10 @@ static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
-         break;
-     }
-     case PREALLOC_MODE_OFF:
-+        if (ftruncate(fd, total_size) != 0) {
-+            result = -errno;
-+            error_setg_errno(errp, -result, "Could not resize file");
-+        }
-         break;
-     default:
-         result = -EINVAL;
-@@ -1644,7 +1642,6 @@ static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
-         break;
-     }
- 
--out_close:
-     if (qemu_close(fd) != 0 && result == 0) {
-         result = -errno;
-         error_setg_errno(errp, -result, "Could not close the new file");
+diff --git a/tests/qemu-iotests/175 b/tests/qemu-iotests/175
+new file mode 100755
+index 0000000..ca56e82
+--- /dev/null
++++ b/tests/qemu-iotests/175
+@@ -0,0 +1,61 @@
++#!/bin/bash
++#
++# Test creating raw image preallocation mode
++#
++# Copyright (C) 2017 Nir Soffer <nirsof@gmail.com>
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=nirsof@gmail.com
++
++seq=`basename $0`
++echo "QA output created by $seq"
++
++here=`pwd`
++status=1	# failure is the default!
++
++_cleanup()
++{
++	_cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++
++_supported_fmt raw
++_supported_proto file
++_supported_os Linux
++
++size=1m
++
++echo
++echo "== creating image with default preallocation =="
++_make_test_img $size | _filter_imgfmt
++stat -c "size=%s, blocks=%b" $TEST_IMG
++
++for mode in off full falloc; do
++    echo
++    echo "== creating image with preallocation $mode =="
++    IMGOPTS=preallocation=$mode _make_test_img $size | _filter_imgfmt
++    stat -c "size=%s, blocks=%b" $TEST_IMG
++done
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/175.out b/tests/qemu-iotests/175.out
+new file mode 100644
+index 0000000..76c02c6
+--- /dev/null
++++ b/tests/qemu-iotests/175.out
+@@ -0,0 +1,18 @@
++QA output created by 175
++
++== creating image with default preallocation ==
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
++size=1048576, blocks=0
++
++== creating image with preallocation off ==
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 preallocation=off
++size=1048576, blocks=0
++
++== creating image with preallocation full ==
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 preallocation=full
++size=1048576, blocks=2048
++
++== creating image with preallocation falloc ==
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 preallocation=falloc
++size=1048576, blocks=2048
++ *** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 985b9a6..1f4bf03 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -167,3 +167,4 @@
+ 172 auto
+ 173 rw auto
+ 174 auto
++175 auto quick
 -- 
 1.8.3.1
