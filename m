@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33375)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1chLx0-0006GT-CF
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:54:47 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39829)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1chMAH-0005aE-HK
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 15:08:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1chLwx-00014a-8z
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:54:46 -0500
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:47862 helo=mx01.kamp.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1chLww-00012q-VR
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:54:43 -0500
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.1 \(3251\))
-From: Peter Lieven <pl@kamp.de>
-In-Reply-To: <3f2dd35f-aed2-087e-6ed5-0b1ae47c0ff0@redhat.com>
-Date: Fri, 24 Feb 2017 20:54:36 +0100
+	(envelope-from <marcandre.lureau@gmail.com>) id 1chMAG-0002pj-6D
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 15:08:29 -0500
+Received: from mail-lf0-x236.google.com ([2a00:1450:4010:c07::236]:35109)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1chMAF-0002oa-Qw
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 15:08:28 -0500
+Received: by mail-lf0-x236.google.com with SMTP id z127so13281697lfa.2
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 12:08:27 -0800 (PST)
+MIME-Version: 1.0
+References: <20170224195117.GR8830@work-vm>
+In-Reply-To: <20170224195117.GR8830@work-vm>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 24 Feb 2017 20:08:14 +0000
+Message-ID: <CAJ+F1CKCY8hki2huXObFGqzEaPcava60GnonmbVUZAwSNp=hjg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <12913D3E-C367-4D6E-BD35-594A8F114ED6@kamp.de>
-References: <764ca07c-af5e-55e3-18c5-7870b9103ba4@kamp.de>
-	<3f2dd35f-aed2-087e-6ed5-0b1ae47c0ff0@redhat.com>
-Subject: Re: [Qemu-devel] RFC QCOW2 compression speed
+Subject: Re: [Qemu-devel] make check: crash in vhost-user chardev cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,83 +29,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, mst@redhat.com
+
+Hi
+
+On Fri, Feb 24, 2017 at 11:54 PM Dr. David Alan Gilbert <dgilbert@redhat.co=
+m>
+wrote:
+
+> Hi,
+>   I'm seeing a hang+crash doing a make check that
+> looks like it's coming from vhost-user's chardev cleanup,
+> so I'm suspecting your e0b283e7c.
+> The synptom is that the make check hangs in the qtest
+> part, and a dmesg shows that a qemu crashed.
+>
+
+See that thread:
+https://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg06015.html
 
 
-> Am 24.02.2017 um 12:36 schrieb Laszlo Ersek <lersek@redhat.com>:
->=20
-> On 02/24/17 10:33, Peter Lieven wrote:
->> Hi,
->>=20
->>=20
->> i have been experimenting with deflate compression paramters in the =
-past and found that the values chosen
->>=20
->> in QCOW2 are not that optimal. In fact creation of compressed QCOW2 =
-is very slow.
->=20
-> I agree, I find it slow as well.
->=20
->> And especially for backups
->>=20
->> compression would be good, but its so slow thats almost infeasible to =
-use.
->>=20
->>=20
->> The current settings to inflateinit2 are compression level 6 =
-(Z_DEFAULT_COMPRESSION) and windowBits 12.
->>=20
->> Increasing windowBits increases speed and yields better compression. =
-Lowering the compression level increases
->>=20
->> speed, but results in worse compression.
->>=20
->>=20
->> The issue here is that changing windowBits would (in theory) require =
-a change of the parameters to deflateInit2 in
->>=20
->> decompression which means that this change would make QCOW2 images =
-incompatible.
->>=20
->>=20
->> As for discussion here is my experiment of compression a Ubuntu1604 =
-installation in ram.
->>=20
->> level 6, windowBits 12   -> 42 seconds, 470MB size
->>=20
->> level 6, windowBits 15   -> 35 seconds, 448MB size
->>=20
->> level 1, windowBits 12   -> 30 seconds, 500MB size
->>=20
->> level 1, windowBits 15   -> 15 seconds, 483MB size
->>=20
->>=20
->> Strange enough decompression works with unchanged parameters for all =
-files. But the documentation of zlib claims
->>=20
->> it should produce an error if a windowBits 15 stream is deflated with =
-a smaller windowBits parameter.
->>=20
->>=20
->> What are your thoughts in introducing a switch and/or feature to use =
-alternate settings for inflate?
->>=20
->> If we need to introduce an incompatible feature for the bigger =
-windowBits might it be worth thinking of using
->>=20
->> an alternate compression algorithm like LZ4?
->=20
-> If the compression level was exposed with a command line option =
-(and/or
-> an environment variable, a la $GZIP), I would welcome it. I have
-> frequently missed this feature, but I always figured it wouldn't be
-> important enough to bother block people with it.
-
-Changing the compression level via environment or a QCOW2 parameter is =
-not a big deal. However, it helps not that much regarding speed. What =
-helps is increasing the window size, but this is an incompatible change. =
-And if we go for an incompatible change I would think about using a =
-better compression algorithm than zlib deflate.
-
-Peter=
+> I got a backtrace that shows:
+>
+> (gdb) where
+> #0  0x0000560d3344f03e in qemu_chr_fe_read_all (be=3Dbe@entry=3D0x0,
+> buf=3Dbuf@entry=3D0x7ffea7a2f520 "\v", len=3Dlen@entry=3D12) at
+> /home/dgilbert/git/qemu/chardev/char.c:209
+> #1  0x0000560d33199d64 in vhost_user_read (msg=3Dmsg@entry=3D0x7ffea7a2f5=
+20,
+> dev=3D<optimized out>)
+>     at /home/dgilbert/git/qemu/hw/virtio/vhost-user.c:125
+> #2  0x0000560d3319a11f in vhost_user_get_vring_base (dev=3D0x560d35a614a0=
+,
+> ring=3D0x7ffea7a2f670)
+>     at /home/dgilbert/git/qemu/hw/virtio/vhost-user.c:417
+> #3  0x0000560d33196abb in vhost_virtqueue_stop (dev=3Ddev@entry=3D0x560d3=
+5a614a0,
+> vdev=3Dvdev@entry=3D0x560d3729cc00, vq=3D0x560d35a61678, idx=3D1) at
+> /home/dgilbert/git/qemu/hw/virtio/vhost.c:1070
+> #4  0x0000560d33198cd4 in vhost_dev_stop (hdev=3Dhdev@entry=3D0x560d35a61=
+4a0,
+> vdev=3Dvdev@entry=3D0x560d3729cc00)
+>     at /home/dgilbert/git/qemu/hw/virtio/vhost.c:1533
+> #5  0x0000560d3317bfd8 in vhost_net_stop_one (net=3D0x560d35a614a0,
+> dev=3D0x560d3729cc00)
+>     at /home/dgilbert/git/qemu/hw/net/vhost_net.c:288
+> #6  0x0000560d3317c4aa in vhost_net_stop (dev=3Ddev@entry=3D0x560d3729cc0=
+0,
+> ncs=3D<optimized out>, total_queues=3Dtotal_queues@entry=3D1) at
+> /home/dgilbert/git/qemu/hw/net/vhost_net.c:367
+> #7  0x0000560d33179201 in virtio_net_vhost_status (status=3D<optimized ou=
+t>,
+> n=3D0x560d3729cc00)
+>     at /home/dgilbert/git/qemu/hw/net/virtio-net.c:176
+> #8  0x0000560d33179201 in virtio_net_set_status (vdev=3D0x560d3729cc00,
+> status=3D7 '\a')
+>     at /home/dgilbert/git/qemu/hw/net/virtio-net.c:250
+> #9  0x0000560d3339ce99 in qemu_del_net_client (nc=3D0x560d35a61250) at
+> /home/dgilbert/git/qemu/net/net.c:390
+> #10 0x0000560d3339e30d in net_cleanup () at
+> /home/dgilbert/git/qemu/net/net.c:1454
+> #11 0x0000560d330ee940 in main (argc=3D<optimized out>, argv=3D<optimized
+> out>, envp=3D<optimized out>)
+>     at /home/dgilbert/git/qemu/vl.c:4637
+> (gdb)
+>
+> #0  qemu_chr_fe_read_all (be=3Dbe@entry=3D0x0, buf=3Dbuf@entry=3D0x7ffea7=
+a2f520
+> "\v", len=3Dlen@entry=3D12)
+>     at /home/dgilbert/git/qemu/chardev/char.c:209
+> 209         Chardev *s =3D be->chr;
+>
+> Dave
+>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+> --
+Marc-Andr=C3=A9 Lureau
