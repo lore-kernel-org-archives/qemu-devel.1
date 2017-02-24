@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1chDwA-0007C6-8r
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:21:23 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1chDwB-0007Cu-0O
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:21:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1chDw8-0000Fn-Qx
+	(envelope-from <alex.bennee@linaro.org>) id 1chDwA-0000Gq-10
 	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:21:22 -0500
-Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:36781)
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:36537)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1chDw8-0000E9-IL
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:21:20 -0500
-Received: by mail-wr0-x233.google.com with SMTP id 89so10992602wrr.3
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 03:21:20 -0800 (PST)
+	id 1chDw9-0000G4-Qk
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:21:21 -0500
+Received: by mail-wm0-x232.google.com with SMTP id v77so11955487wmv.1
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 03:21:21 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 24 Feb 2017 11:20:52 +0000
-Message-Id: <20170224112109.3147-8-alex.bennee@linaro.org>
+Date: Fri, 24 Feb 2017 11:20:55 +0000
+Message-Id: <20170224112109.3147-11-alex.bennee@linaro.org>
 In-Reply-To: <20170224112109.3147-1-alex.bennee@linaro.org>
 References: <20170224112109.3147-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 07/24] tcg: rename tcg_current_cpu to
- tcg_current_rr_cpu
+Subject: [Qemu-devel] [PULL 10/24] tcg: enable tb_lock() for SoftMMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,171 +32,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-..and make the definition local to cpus. In preparation for MTTCG the
-concept of a global tcg_current_cpu will no longer make sense. However
-we still need to keep track of it in the single-threaded case to be able
-to exit quickly when required.
-
-qemu_cpu_kick_no_halt() moves and becomes qemu_cpu_kick_rr_cpu() to
-emphasise its use-case. qemu_cpu_kick now kicks the relevant cpu as
-well as qemu_kick_rr_cpu() which will become a no-op in MTTCG.
-
-For the time being the setting of the global exit_request remains.
+tb_lock() has long been used for linux-user mode to protect code
+generation. By enabling it now we prepare for MTTCG and ensure all code
+generation is serialised by this lock. The other major structure that
+needs protecting is the l1_map and its PageDesc structures. For the
+SoftMMU case we also use tb_lock() to protect these structures instead
+of linux-user mmap_lock() which as the name suggests serialises updates
+to the structure as a result of guest mmap operations.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Pranith Kumar <bobby.prani@gmail.com>
 ---
- cpu-exec-common.c       |  1 -
- cpu-exec.c              |  3 ---
- cpus.c                  | 41 ++++++++++++++++++++++-------------------
- include/exec/exec-all.h |  1 -
- 4 files changed, 22 insertions(+), 24 deletions(-)
+ translate-all.c | 15 +--------------
+ 1 file changed, 1 insertion(+), 14 deletions(-)
 
-diff --git a/cpu-exec-common.c b/cpu-exec-common.c
-index 767d9c6f0c..e2bc053372 100644
---- a/cpu-exec-common.c
-+++ b/cpu-exec-common.c
-@@ -24,7 +24,6 @@
- #include "exec/memory-internal.h"
- 
- bool exit_request;
--CPUState *tcg_current_cpu;
- 
- /* exit the current TB, but without causing any exception to be raised */
- void cpu_loop_exit_noexc(CPUState *cpu)
-diff --git a/cpu-exec.c b/cpu-exec.c
-index ec84fdb3d7..06a6b25564 100644
---- a/cpu-exec.c
-+++ b/cpu-exec.c
-@@ -612,7 +612,6 @@ int cpu_exec(CPUState *cpu)
-         return EXCP_HALTED;
-     }
- 
--    atomic_mb_set(&tcg_current_cpu, cpu);
-     rcu_read_lock();
- 
-     if (unlikely(atomic_mb_read(&exit_request))) {
-@@ -666,7 +665,5 @@ int cpu_exec(CPUState *cpu)
-     /* fail safe : never use current_cpu outside cpu_exec() */
-     current_cpu = NULL;
- 
--    /* Does not need atomic_mb_set because a spurious wakeup is okay.  */
--    atomic_set(&tcg_current_cpu, NULL);
-     return ret;
- }
-diff --git a/cpus.c b/cpus.c
-index 9fe56c9a76..860034a794 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -780,8 +780,7 @@ void configure_icount(QemuOpts *opts, Error **errp)
+diff --git a/translate-all.c b/translate-all.c
+index f810259c41..9bac061c9b 100644
+--- a/translate-all.c
++++ b/translate-all.c
+@@ -75,7 +75,7 @@
+  * mmap_lock.
   */
+ #ifdef CONFIG_SOFTMMU
+-#define assert_memory_lock() do { /* nothing */ } while (0)
++#define assert_memory_lock() tcg_debug_assert(have_tb_lock)
+ #else
+ #define assert_memory_lock() tcg_debug_assert(have_mmap_lock())
+ #endif
+@@ -135,9 +135,7 @@ TCGContext tcg_ctx;
+ bool parallel_cpus;
  
- static QEMUTimer *tcg_kick_vcpu_timer;
--
--static void qemu_cpu_kick_no_halt(void);
-+static CPUState *tcg_current_rr_cpu;
+ /* translation block context */
+-#ifdef CONFIG_USER_ONLY
+ __thread int have_tb_lock;
+-#endif
  
- #define TCG_KICK_PERIOD (NANOSECONDS_PER_SECOND / 10)
- 
-@@ -790,10 +789,23 @@ static inline int64_t qemu_tcg_next_kick(void)
-     return qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + TCG_KICK_PERIOD;
- }
- 
-+/* Kick the currently round-robin scheduled vCPU */
-+static void qemu_cpu_kick_rr_cpu(void)
-+{
-+    CPUState *cpu;
-+    atomic_mb_set(&exit_request, 1);
-+    do {
-+        cpu = atomic_mb_read(&tcg_current_rr_cpu);
-+        if (cpu) {
-+            cpu_exit(cpu);
-+        }
-+    } while (cpu != atomic_mb_read(&tcg_current_rr_cpu));
-+}
-+
- static void kick_tcg_thread(void *opaque)
+ static void page_table_config_init(void)
  {
-     timer_mod(tcg_kick_vcpu_timer, qemu_tcg_next_kick());
--    qemu_cpu_kick_no_halt();
-+    qemu_cpu_kick_rr_cpu();
+@@ -159,40 +157,29 @@ static void page_table_config_init(void)
+     assert(v_l2_levels >= 0);
  }
  
- static void start_tcg_kick_timer(void)
-@@ -813,7 +825,6 @@ static void stop_tcg_kick_timer(void)
+-#ifdef CONFIG_USER_ONLY
+ #define assert_tb_locked() tcg_debug_assert(have_tb_lock)
+ #define assert_tb_unlocked() tcg_debug_assert(!have_tb_lock)
+-#else
+-#define assert_tb_locked()  do { /* nothing */ } while (0)
+-#define assert_tb_unlocked()  do { /* nothing */ } while (0)
+-#endif
+ 
+ void tb_lock(void)
+ {
+-#ifdef CONFIG_USER_ONLY
+     assert_tb_unlocked();
+     qemu_mutex_lock(&tcg_ctx.tb_ctx.tb_lock);
+     have_tb_lock++;
+-#endif
+ }
+ 
+ void tb_unlock(void)
+ {
+-#ifdef CONFIG_USER_ONLY
+     assert_tb_locked();
+     have_tb_lock--;
+     qemu_mutex_unlock(&tcg_ctx.tb_ctx.tb_lock);
+-#endif
+ }
+ 
+ void tb_lock_reset(void)
+ {
+-#ifdef CONFIG_USER_ONLY
+     if (have_tb_lock) {
+         qemu_mutex_unlock(&tcg_ctx.tb_ctx.tb_lock);
+         have_tb_lock = 0;
      }
+-#endif
  }
  
--
- /***********************************************************/
- void hw_error(const char *fmt, ...)
- {
-@@ -1324,6 +1335,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
-         }
- 
-         for (; cpu != NULL && !exit_request; cpu = CPU_NEXT(cpu)) {
-+            atomic_mb_set(&tcg_current_rr_cpu, cpu);
- 
-             qemu_clock_enable(QEMU_CLOCK_VIRTUAL,
-                               (cpu->singlestep_enabled & SSTEP_NOTIMER) == 0);
-@@ -1343,6 +1355,8 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
-             }
- 
-         } /* for cpu.. */
-+        /* Does not need atomic_mb_set because a spurious wakeup is okay.  */
-+        atomic_set(&tcg_current_rr_cpu, NULL);
- 
-         /* Pairs with smp_wmb in qemu_cpu_kick.  */
-         atomic_mb_set(&exit_request, 0);
-@@ -1421,24 +1435,13 @@ static void qemu_cpu_kick_thread(CPUState *cpu)
- #endif
- }
- 
--static void qemu_cpu_kick_no_halt(void)
--{
--    CPUState *cpu;
--    /* Ensure whatever caused the exit has reached the CPU threads before
--     * writing exit_request.
--     */
--    atomic_mb_set(&exit_request, 1);
--    cpu = atomic_mb_read(&tcg_current_cpu);
--    if (cpu) {
--        cpu_exit(cpu);
--    }
--}
--
- void qemu_cpu_kick(CPUState *cpu)
- {
-     qemu_cond_broadcast(cpu->halt_cond);
-     if (tcg_enabled()) {
--        qemu_cpu_kick_no_halt();
-+        cpu_exit(cpu);
-+        /* Also ensure current RR cpu is kicked */
-+        qemu_cpu_kick_rr_cpu();
-     } else {
-         if (hax_enabled()) {
-             /*
-@@ -1486,7 +1489,7 @@ void qemu_mutex_lock_iothread(void)
-         atomic_dec(&iothread_requesting_mutex);
-     } else {
-         if (qemu_mutex_trylock(&qemu_global_mutex)) {
--            qemu_cpu_kick_no_halt();
-+            qemu_cpu_kick_rr_cpu();
-             qemu_mutex_lock(&qemu_global_mutex);
-         }
-         atomic_dec(&iothread_requesting_mutex);
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 21ab7bf3fd..4e34fc4cc1 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -405,7 +405,6 @@ bool memory_region_is_unassigned(MemoryRegion *mr);
- extern int singlestep;
- 
- /* cpu-exec.c, accessed with atomic_mb_read/atomic_mb_set */
--extern CPUState *tcg_current_cpu;
- extern bool exit_request;
- 
- #endif
+ static TranslationBlock *tb_find_pc(uintptr_t tc_ptr);
 -- 
 2.11.0
