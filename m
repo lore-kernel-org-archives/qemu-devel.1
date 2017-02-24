@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jannh@google.com>) id 1chIdp-0006qg-Fo
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:22:46 -0500
+	(envelope-from <david@redhat.com>) id 1chIey-0008Ga-Al
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:23:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jannh@google.com>) id 1chIdo-0001xp-GJ
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:22:45 -0500
-Received: from mail-it0-x22d.google.com ([2607:f8b0:4001:c0b::22d]:37360)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jannh@google.com>) id 1chIdo-0001wK-C0
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:22:44 -0500
-Received: by mail-it0-x22d.google.com with SMTP id 203so27263002ith.0
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 08:22:42 -0800 (PST)
+	(envelope-from <david@redhat.com>) id 1chIev-0002KB-3k
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:23:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45840)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1chIeu-0002Jt-Ti
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:23:53 -0500
+References: <20170222183919.11928-1-ehabkost@redhat.com>
+	<CAFEAcA8_SsbdXWFbAt+qKXF-XGBjAt=ZbDgzSaeXYFzYPL1KTQ@mail.gmail.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <6c2f2984-336b-8f03-8be2-4152e683b69a@redhat.com>
+Date: Fri, 24 Feb 2017 17:23:48 +0100
 MIME-Version: 1.0
-In-Reply-To: <b3f08f09-9678-2142-c4d7-5a66f49b173d@redhat.com>
-References: <148760155821.31154.13876757160410915057.stgit@bahia.lan>
-	<148760173919.31154.7555675803159581620.stgit@bahia.lan>
-	<20170223151042.GW30636@stefanha-x1.localdomain>
-	<20170224113402.07a0fb44@bahia.lan>
-	<b3f08f09-9678-2142-c4d7-5a66f49b173d@redhat.com>
-From: Jann Horn <jannh@google.com>
-Date: Fri, 24 Feb 2017 17:22:19 +0100
-Message-ID: <CAG48ez2Qgje31AN=MszVtHXoNQj-LGpRfaVZ0iV1kw+_vnq0gQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 23/29] 9pfs: local: chmod: don't follow
- symlinks
+In-Reply-To: <CAFEAcA8_SsbdXWFbAt+qKXF-XGBjAt=ZbDgzSaeXYFzYPL1KTQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] i386: Add "max" CPU model to TCG
+ and KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,85 +28,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Greg Kurz <groug@kaod.org>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Prasad J Pandit <prasad@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Richard W.M. Jones" <rjones@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P. Berrange" <berrange@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>, Christian Borntraeger <borntraeger@de.ibm.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Fri, Feb 24, 2017 at 4:23 PM, Eric Blake <eblake@redhat.com> wrote:
-> On 02/24/2017 04:34 AM, Greg Kurz wrote:
->> On Thu, 23 Feb 2017 15:10:42 +0000
->> Stefan Hajnoczi <stefanha@gmail.com> wrote:
+Am 24.02.2017 um 14:48 schrieb Peter Maydell:
+> On 22 February 2017 at 18:39, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>> Changes v1 -> v2:
+>> * Fix build without CONFIG_KVM at lmce_supported()
+>> * Rebased on top of my x86-next branch:
+>>   https://github.com/ehabkost/qemu x86-next
 >>
->>> On Mon, Feb 20, 2017 at 03:42:19PM +0100, Greg Kurz wrote:
->>>> The local_chmod() callback is vulnerable to symlink attacks because it
->>>> calls:
->>>>
->>>> (1) chmod() which follows symbolic links for all path elements
->>>> (2) local_set_xattr()->setxattr() which follows symbolic links for all
->>>>     path elements
->>>> (3) local_set_mapped_file_attr() which calls in turn local_fopen() and
->>>>     mkdir(), both functions following symbolic links for all path
->>>>     elements but the rightmost one
->>>>
->
->>>> +        fd = local_open_nofollow(fs_ctx, fs_path->data, O_RDONLY, 0);
->>>> +        if (fd == -1) {
->>>> +            return -1;
->>>> +        }
->>>> +        ret = fchmod(fd, credp->fc_mode);
->>>> +        close_preserve_errno(fd);
->>>
->>> As mentioned on IRC, not sure this is workable since chmod(2) must not
->>> require read permission on the file.  This patch introduces failures
->>> when the file isn't readable.
->>>
+>> Git branch for testing:
+>>   https://github.com/ehabkost/qemu-hacks work/x86-cpu-max-tcg
 >>
->> Yeah :-\ This one is the more painful issue to address. I need a
->> chmod() variant that would fail on symlinks instead of following
->> them... and I'm kinda suffering to implement this in a race-free
->> manner.
->
-> BSD has lchmod(), but Linux does not.  And Linux does not yet properly
-> implement AT_SYMLINK_NOFOLLOW.  (The BSD semantics are pretty cool:
-> restricting mode bits on a symlink can create scenarios where some users
-> can dereference the symlink but others get ENOENT failures - but I don't
-> know of any effort to add those semantics to the Linux kernel)
->
-> POSIX says support for AT_SYMLINK_NOFOLLOW is optional, precisely
-> because POSIX does not require permissions on symlinks to matter, but
-> the way it requires it is that AT_SYMLINK_NOFOLLOW is supposed to be a
-> no-op for regular files, and cause an EOPNOTSUPP failure for symlinks.
->
-> Unfortunately, the Linux man page says that Linux fails with ENOTSUP
-> (which is identical to EOPNOTSUPP) any time AT_SYMLINK_NOFOLLOW is set,
-> and not just if it is attempted on a symlink.
+>> libvirt code to use the new feature already exist, and were
+>> submitted to libvir-list, at:
+>>   https://www.mail-archive.com/libvir-list@redhat.com/msg142168.html
+>>
+>> ---
+>>
+>> This is a replacement for the previous series that enabled the
+>> "host" CPU model on TCG. Now a new "max" CPU is being added,
+>> while keeping "host" KVM-specific.
+>>
+>> In addition to simply adding "max" as a copy of the existing
+>> "host" CPU model, additional patches change it to not use any
+>> host CPUID information when in TCG mode.
+> 
+> 
+> I had a look at implementing this for ARM, and ran into problems
+> because of how we've done '-cpu host'. For us the "host" CPU
+> type is registered dynamically when kvm_init() is called,
+> because (a) it only exists if -enable-kvm and (b) it probes
+> the kernel to find out what's available. So I could easily
+> add 'max' in the same place; but then where should I add the
+> type definition of 'max' for the non-KVM case?
+> 
+> Any suggestions?
 
-And unfortunately, that flags argument is not actually present in the
-real syscall.
-See this glibc code:
+Maybe switch to some late initialization?
 
-int
-fchmodat (int fd, const char *file, mode_t mode, int flag)
-{
-  if (flag & ~AT_SYMLINK_NOFOLLOW)
-    return INLINE_SYSCALL_ERROR_RETURN_VALUE (EINVAL);
-#ifndef __NR_lchmod /* Linux so far has no lchmod syscall.  */
-  if (flag & AT_SYMLINK_NOFOLLOW)
-    return INLINE_SYSCALL_ERROR_RETURN_VALUE (ENOTSUP);
-#endif
+On s390x, we register the host model right away, but fill it with life
+in the initfn. If KVM is disabled, the host model will be available, but
+we will deny to use it (via kvm_required).
 
-  return INLINE_SYSCALL (fchmodat, 3, fd, file, mode);
-}
+For max, it would be the same thing. The initfn will simply inititalize
+the model differently, depending on the selected accelerator.
 
-and this kernel code:
+When the models are inititalized, kvm is already up and running, so it
+the kernel can be properly probed.
 
-SYSCALL_DEFINE3(fchmodat, int, dfd, const char __user *, filename,
-umode_t, mode)
-{
-  [...]
-}
+Not sure if that helps :)
 
-So to fix this, you'll probably have to add a new syscall fchmodat2()
-to the kernel,
-wire it up for all the architectures and get the various libc
-implementations to adopt
-that. That's going to be quite tedious. :(
+-- 
+Thanks,
+
+David
