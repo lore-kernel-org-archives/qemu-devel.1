@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1ch86V-0003uV-QB
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 00:07:40 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ch8Cl-0006H6-Ac
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 00:14:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1ch86S-0002ke-LS
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 00:07:39 -0500
-Received: from mx6-phx2.redhat.com ([209.132.183.39]:48249)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1ch86S-0002kC-CW
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 00:07:36 -0500
-Date: Fri, 24 Feb 2017 00:07:33 -0500 (EST)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <153715427.26269614.1487912853628.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1487910561-17825-1-git-send-email-peterx@redhat.com>
-References: <1487910561-17825-1-git-send-email-peterx@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1ch8Ck-0004jP-1v
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 00:14:07 -0500
+Date: Fri, 24 Feb 2017 15:46:30 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170224044630.GU17615@umbus.fritz.box>
+References: <20170217133134.10735-1-lvivier@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] intel_iommu: check misordered init when
- realize
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="AHVSF3we4xtO5oi5"
+Content-Disposition: inline
+In-Reply-To: <20170217133134.10735-1-lvivier@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 0/2] spapr: generate DT node names
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,85 +23,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, yi l liu <yi.l.liu@intel.com>, "\\ Michael S . Tsirkin \";
-	\"Alex Williamson\" <alex.williamson@redhat.com>;
-	\"Marcel Apfelbaum\" <marcel@redhat.com>; \"Jintack Lim" <mst@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, qemu-ppc@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>
 
-Hello Peter,
 
-This solution looks to check dependency of 'vfio-pci' over 'intel-iommu'
-before 'intel-iommu' is not initialized.
+--AHVSF3we4xtO5oi5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Overall it looks good to me, just a small nit below.
- 
-> 
-> Intel vIOMMU devices are created with "-device" parameter, while here
-> actually we need to make sure the dmar device be created before other
-> PCI devices (like vfio-pci) so that we know iommu_fn will be setup
-> correctly before realizations of those PCI devices (it is sensible that
-> PCI device fetch these info during its realization). Now this ordering
-> yet cannot be achieved elsewhere, and devices will be created in the
-> order that user specified. That might be dangerous.
-> 
-> Here we add one more function to detect this kind of misordering issue,
-> then report to guest. Currently, the only known device that is affected
-> by this VT-d defect is the vfio-pci typed devices. So for now we just
-> check against it to make sure we are safe.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  hw/i386/intel_iommu.c | 22 ++++++++++++++++++++++
->  1 file changed, 22 insertions(+)
-> 
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 22d8226..b723ece 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -2560,6 +2560,24 @@ static bool vtd_decide_config(IntelIOMMUState *s,
-> Error **errp)
->      return true;
->  }
->  
-> +/*
-> + * TODO: we should have a better way to achieve the ordering rather
-> + * than this misorder check explicitly against vfio-pci. After all, no
-> + * one should be blamed for this, and vfio-pci did nothing wrong.
-> + */
-> +static bool vtd_detected_misorder_init(Error **errp)
-> +{
-> +    Object *dev = object_resolve_path_type("", "vfio-pci", NULL);
-> +
-> +    if (dev) {
-> +        error_setg(errp, "Please specify \"intel-iommu\" before all the rest
+On Fri, Feb 17, 2017 at 02:31:32PM +0100, Laurent Vivier wrote:
+1;4601;0c> This series is a rebased series from September 2015, it has been
+> reviewed but has never reached the master branch.
+>=20
+> When DT node names for PCI devices are generated by SLOF,
+> they are generated according to the type of the device
+> (for instance, ethernet for virtio-net-pci device).
+>=20
+> Node name for hotplugged devices is generated by QEMU.
+> This series adds the mechanic to QEMU to create the node
+> name according to the device type too.
 
-            "before all the rest" does not give much clue to user. Do you think better
-            error message would help? just a thought.
-> "
-> +                   "of the devices.");
-> +        return true;
-> +    }
-> +
-> +    return false;
-> +}
-> +
->  static void vtd_realize(DeviceState *dev, Error **errp)
->  {
->      PCMachineState *pcms = PC_MACHINE(qdev_get_machine());
-> @@ -2567,6 +2585,10 @@ static void vtd_realize(DeviceState *dev, Error
-> **errp)
->      IntelIOMMUState *s = INTEL_IOMMU_DEVICE(dev);
->      X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(dev);
->  
-> +    if (vtd_detected_misorder_init(errp)) {
-> +        return;
-> +    }
-> +
->      VTD_DPRINTF(GENERAL, "");
->      x86_iommu->type = TYPE_INTEL;
->  
-> --
-> 2.7.4
-> 
-> 
-> 
+Applied to ppc-for-2.9, thanks.
+
+>=20
+> v6: rebase on master
+>=20
+> [Wed, 30 Sep 2015]
+> v5: store subclass and iface ids as-is (int) and mask them when
+>     we compare them.
+>=20
+> v4: move pci_ids.h to a separate patch, fix PCI_CLASS_NETWORK_WORDFIP
+>     remove  duplicate NL, remove 386, 486 and alpha subclasses
+>     rename "unknown-legacy-device", correctly check array size
+>     add Thomas and Michael "Reviewed-by".
+>=20
+> v3: use values from pci_ids.h, update pci_ids.h values
+>     keep only details for USB (xhci, ohci, ...) and PIC (IO-APIC, IO-XAPI=
+C)
+>=20
+> v2: Use CamelCase name, remove misc-* name,
+>     remove _OTHER entries to fallback to class name (as SLOF does).
+>     Fix typo (IPMI-bltr).
+>=20
+> Laurent Vivier (2):
+>   PCI: add missing classes in pci_ids.h to build device tree
+>   spapr: generate DT node names
+>=20
+>  hw/ppc/spapr_pci.c       | 290 +++++++++++++++++++++++++++++++++++++++++=
++++---
+>  include/hw/pci/pci_ids.h | 112 ++++++++++++++++--
+>  2 files changed, 379 insertions(+), 23 deletions(-)
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--AHVSF3we4xtO5oi5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYr7qkAAoJEGw4ysog2bOSmlIP/2KotXASXDVBHOxsB92SbSw7
+eIJyaK1d2d1KHaiJZFc1ZS/JKq/L/qkksdEcjuaY1AREYj3mcyptay/P+7zccImy
+kVhDCx9LzMeONf5N9xxG6k3tvyX+kkPwZt/POnwezrc95VNP0IwKlDSI4jF0ArwJ
+0ShmA6XIpQqtnBJndmBURtpVBT1WT0MD+CahUFMtGaZctSmhxEPKiyMFOE97fOZ8
+xSS0QHX6EpT3E/NwyBcBPAQQPKFY3mYzqV3KxCT/sD0Ak8Gxyb683fqbWTNmE8ij
+JwaQIPHdBJXe8YSHA+hwKf4yJFFyVud3IvzW9Vc72rMKl+CHuL8ZGNPHTibmFbBe
+H5sgdV+xwOtO8UFE68MfuA7q/8Bfv4gd6a1N2Sv4UfYxycPn32HnlbcLA/79ICAq
+JmYV8HKgwFYcKsmkCCE2pwxkeLbhut2Vsf/ZvLtOeojId3OwpUbB+reL4kKeqGe6
+kekmfAZSoyaeyQ7jjuq9QyfenT4DKxpM/tHtUK84hgta0seiwqeBkrfmm/dnJjf4
+fIH+qULMDd4rlwcyy3L/wq/14fRxh8SLVOhfuMYifcgUeF/yoFoxKnrr/qJ5H49i
+d37ZmCYsSZOM1Hy7UgiyF+YJ05ru6mZP8IqpfjPnSliBilNtG21QjDoShyxnmNjs
+qmqGQz1jAdHShdcDl9mc
+=iwee
+-----END PGP SIGNATURE-----
+
+--AHVSF3we4xtO5oi5--
