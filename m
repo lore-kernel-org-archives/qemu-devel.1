@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39264)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1chLAP-0007Qs-Vg
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:04:35 -0500
+	(envelope-from <armbru@redhat.com>) id 1chLCT-0000WA-Rt
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:06:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1chLAM-0007W1-SL
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:04:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52444)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1chLAM-0007Vd-K3
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:04:30 -0500
-References: <20170224172714.26026-1-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f4652c1e-44db-f2c4-028b-3777bcbe7fa0@redhat.com>
-Date: Fri, 24 Feb 2017 13:04:26 -0600
+	(envelope-from <armbru@redhat.com>) id 1chLCS-0000Ty-ON
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:06:41 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1487710908-26356-1-git-send-email-armbru@redhat.com>
+	<1487710908-26356-3-git-send-email-armbru@redhat.com>
+	<5f90e39c-e4ea-8638-d057-25eff232ad3d@redhat.com>
+	<878toxmeol.fsf@dusky.pond.sub.org>
+	<877f4g2f6m.fsf@dusky.pond.sub.org>
+	<c00ea08f-f596-6e3e-4084-7f183c92a04d@redhat.com>
+Date: Fri, 24 Feb 2017 20:06:32 +0100
+In-Reply-To: <c00ea08f-f596-6e3e-4084-7f183c92a04d@redhat.com> (Eric Blake's
+	message of "Fri, 24 Feb 2017 10:24:21 -0600")
+Message-ID: <87h93j2ytj.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170224172714.26026-1-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="GSbdIGPOm7mibNa2gFjrrRU2jtifkBBQP"
-Subject: Re: [Qemu-devel] [PATCH] os: don't corrupt pre-existing
- memory-backend data with prealloc
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH RFC v3 2/5] keyval: New keyval_parse()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,87 +27,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Jitendra Kolhe <jitendra.kolhe@hpe.com>, Michal Privoznik <mprivozn@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GSbdIGPOm7mibNa2gFjrrRU2jtifkBBQP
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Jitendra Kolhe <jitendra.kolhe@hpe.com>,
- Michal Privoznik <mprivozn@redhat.com>, Stefan Hajnoczi
- <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f4652c1e-44db-f2c4-028b-3777bcbe7fa0@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] os: don't corrupt pre-existing
- memory-backend data with prealloc
-References: <20170224172714.26026-1-berrange@redhat.com>
-In-Reply-To: <20170224172714.26026-1-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Eric Blake <eblake@redhat.com> writes:
 
-On 02/24/2017 11:27 AM, Daniel P. Berrange wrote:
-> When using a memory-backend object with prealloc turned on, QEMU
-> will memset() the first byte in every memory page to zero. While
-> this might have been acceptable for memory backends associated
-> with RAM, this corrupts application data for NVDIMMs.
->=20
-> Instead of setting every page to zero, read the current byte
-> value and then just write that same value back, so we are not
-> corrupting the original data. Directly write the value instead
-> of memset()ing it, since there's no benefit to memset for a
-> single byte write.
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->=20
+> On 02/24/2017 01:58 AM, Markus Armbruster wrote:
+>
+>>> I hate the 'no$key' sugar, and would love to get rid of it.  It makes
+>>> things ambiguous (thus confusing) for precious little gain: 'novocaine'
+>>> can mean 'novocaine=on' or 'vocaine=off'.  QemuOpts picks the latter,
+>>> even when a QemuOpt named 'novocaine' has been declared.
+>>>
+>>> keyval_parse() is meant to behave like QemuOpts, so I'm reproducing this
+>>> bit of bad sugar, reluctantly.
+>> 
+>> Implied value alternatives / variations:
+>> 
+>> (1) Don't implement the "no" sugar
+>> 
+>>     I think we'd have to deprecate it in QemuOpts now, to give users
+>>     some time to adapt before keyval_parse() replaces QemuOpts.
+>> 
+>
+>> 
+>> If we're happy with bad sugar like "can't abbreviate novocaine=on to
+>> novocaine" (confusing), "filename without a value gets you the file
+>> 'on'", we reimplement the bad sugar and move on.
+>> 
+>> If not, we have the choice between less magic or more magic.
+>> 
+>> Less magic: (1) and/or (2).
+>> 
+>> More magic: (3) or something like it.
+>> 
+>> If we don't want to decide right now, we can do
+>> 
+>> (4) Don't implement any implied value sugar for now
+>> 
+>>     You have to spell out =on and =off.  Big fat comment to remind us
+>>     about the QemuOpts incompatibility.
+>> 
+>> I think this would be acceptable for -blockdev in 2.9.
+>> 
+>> Opinions?
+>
+> Do any existing blockdev sub-parameters begin with 'no'?  Ouch:
+> BlockdevOptions has '*cache':'BlockdevCacheOptions' which in turn has
+> '*no-flush':'bool'.
 
->          /* MAP_POPULATE silently ignores failures */
->          for (i =3D 0; i < numpages; i++) {
-> -            memset(area + (hpagesize * i), 0, 1);
-> +            /*
-> +             * Read & write back the same value, so we don't
-> +             * corrupt existinng user/app data that might be
+I hate negative flags.
 
-s/existinng/existing/
+>                      Even worse, I think you could abuse 'nono-flush' to
+> enable flushing - my head hurts.
 
-> +             * stored.
-> +             *
-> +             * 'volatile' to stop compiler optimizing this away
-> +             * to a no-op
-> +             *
-> +             * TODO: get a better solution from kernel so we
-> +             * don't need to write at all so we don't cause
-> +             * wear on the storage backing the region...
-> +             */
-> +            volatile char val =3D *(area + (hpagesize * i));
-> +            *(area + (hpagesize * i)) =3D val;
->          }
->      }
-> =20
->=20
+"no-flush" gets desugared to "-flush=off", which doesn't work.
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+"nono-flush" gets desugared to "no-flush=off", which works.
 
+> And of course, there's the obvious BlockDevOptions '*node-name':'str'.
+> No one in their right mind would expect 'node-name' without parameters
+> to result in 'de-name=no'.
 
---GSbdIGPOm7mibNa2gFjrrRU2jtifkBBQP
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+This is something I'd be even willing to break for existing options.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+> Also, I found that at least libvirt has existing command line usage
+> -numa node,nodeid=0, where qemu_numa_opts uses .implied_opt_name="type",
+> .desc = {{0}} to be visited by OptsVisitor.  Because of the implied opt,
+> we get the desired "type=node" rather than the accidental "de=no", but
+> the magic of implied keys can certainly make it weird to think about.
 
-iQEcBAEBCAAGBQJYsIO6AAoJEKeha0olJ0NqK1QH/Rx4IMcHakudOwAUjIoBH01N
-b+04dlrzKJkhA8AEnSOkG+EFsDPEbVnMM4f2LfRDiSmpn190DhniySjvogK0czr9
-tjgIlPKhA9j1pvBcl0cZRqp77mYxC5BPaQV76XrAfWVXSfAtTrzZ8pjeFIXcb7LD
-/O1eQcy++S/cCt0vMtZkEqnrkqgnkztguCPOoDILJ2gxp3TdpunR/6NeklzyAFyr
-PNbzmzrFookKbpqESdu2FGjBE3BcdAx6PIIsXLk0Vus8nhc/TsU03fsnb1xXpAq+
-GOJoBjSkYOY80bEAEElVJf7aIzgMz4ChS+UTl3ehNCr2EL72CnsX67gWlWxlHxE=
-=deS5
------END PGP SIGNATURE-----
+Correct.
 
---GSbdIGPOm7mibNa2gFjrrRU2jtifkBBQP--
+The value of an implied key is not subject to key desugaring.
+
+Without an implied key, the "node" would desugar to "de=off".
+
+> How about:
+>
+> for 2.9: -blockdev has no magic at all (you HAVE to spell 'foo=off'
+> rather than 'foo' for any boolean parameters that you want disabled in
+> -blockdev);
+
+You mean "rather than 'nofoo'".
+
+"No magic at all" implies you also have to spell "foo=on" rather than
+"foo".
+
+I believe we need to have both or none in 2.9.  If we have only the "on"
+sugar, "no-flush" works, and we can't add the "off" sugar without
+breaking it.
+
+> -blockdev); and in QemuOpts, we issue deprecation warnings but keep
+> existing behavior any time someone uses 'noFOO' that we turn into
+> 'FOO=no'.  Then, for 2.10, we can decide to remove the deprecation
+> warnings if they pointed out real (ab)use of the sugar in the wild, or
+> (hopefully) to kill the sugar entirely (as part of converting QemuOpts
+> over to keyval_parse).
+>
+> In short, getting rid of the 'no' prefix magic, after suitable
+> deprecation warnings, seems like a good plan to me; and having -blockdev
+> be slightly tighter than the rest of command line options for 2.9 only
+> is no real loss (no one uses -blockdev yet, so they can be written to
+> avoid the use of 'no' magic to begin with).
+
+Okay, I'll post QemuOpts patch to deprecate noKEY sugar.  Let's see
+whether anyone screams.
