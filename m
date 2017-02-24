@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1chIO2-00039L-K6
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:06:27 -0500
+	(envelope-from <lvivier@redhat.com>) id 1chIOj-0004U9-EF
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:07:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1chINy-0003fc-9P
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:06:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49308)
+	(envelope-from <lvivier@redhat.com>) id 1chIOf-0003oy-CX
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:07:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:64313)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1chINy-0003fE-2c
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:06:22 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1chIOf-0003os-6W
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:07:05 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4ED57C04B927
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 16:06:22 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6BFF181235
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 16:07:05 +0000 (UTC)
 References: <20170206173306.20603-1-dgilbert@redhat.com>
-	<20170206173306.20603-13-dgilbert@redhat.com>
+	<20170206173306.20603-14-dgilbert@redhat.com>
 From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <310a2727-de95-97f0-aa3e-34d1774cbe41@redhat.com>
-Date: Fri, 24 Feb 2017 17:06:19 +0100
+Message-ID: <fea3dbcc-679c-797a-b844-97c32cce147d@redhat.com>
+Date: Fri, 24 Feb 2017 17:07:02 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170206173306.20603-13-dgilbert@redhat.com>
+In-Reply-To: <20170206173306.20603-14-dgilbert@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 12/16] postcopy: Send whole huge pages
+Subject: Re: [Qemu-devel] [PATCH v2 13/16] postcopy: Allow hugepages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,46 +39,63 @@ Cc: aarcange@redhat.com
 On 06/02/2017 18:33, Dr. David Alan Gilbert (git) wrote:
 > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > 
-> The RAM save code uses ram_save_host_page to send whole
-> host pages at a time;  change this to use the host page size associated
-> with the RAM Block which may be a huge page.
+> Allow huge pages in postcopy.
 > 
 > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > Reviewed-by: Juan Quintela <quintela@redhat.com>
 > ---
->  migration/ram.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+>  migration/postcopy-ram.c | 25 +------------------------
+>  1 file changed, 1 insertion(+), 24 deletions(-)
 > 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 88d9444..2350f71 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -1281,6 +1281,8 @@ static int ram_save_target_page(MigrationState *ms, QEMUFile *f,
->   *                     offset to point into the middle of a host page
->   *                     in which case the remainder of the hostpage is sent.
->   *                     Only dirty target pages are sent.
-> + *                     Note that the host page size may be a huge page for this
-> + *                     block.
->   *
->   * Returns: Number of pages written.
->   *
-> @@ -1299,6 +1301,8 @@ static int ram_save_host_page(MigrationState *ms, QEMUFile *f,
->                                ram_addr_t dirty_ram_abs)
->  {
->      int tmppages, pages = 0;
-> +    size_t pagesize = qemu_ram_pagesize(pss->block);
-> +
->      do {
->          tmppages = ram_save_target_page(ms, f, pss, last_stage,
->                                          bytes_transferred, dirty_ram_abs);
-> @@ -1309,7 +1313,7 @@ static int ram_save_host_page(MigrationState *ms, QEMUFile *f,
->          pages += tmppages;
->          pss->offset += TARGET_PAGE_SIZE;
->          dirty_ram_abs += TARGET_PAGE_SIZE;
-> -    } while (pss->offset & (qemu_host_page_size - 1));
-> +    } while (pss->offset & (pagesize - 1));
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index 03cbd6e..6b30b43 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -85,24 +85,6 @@ static bool ufd_version_check(int ufd)
+>  }
 >  
->      /* The offset we leave with is the last one we looked at */
->      pss->offset -= TARGET_PAGE_SIZE;
+>  /*
+> - * Check for things that postcopy won't support; returns 0 if the block
+> - * is fine.
+> - */
+> -static int check_range(const char *block_name, void *host_addr,
+> -                      ram_addr_t offset, ram_addr_t length, void *opaque)
+> -{
+> -    RAMBlock *rb = qemu_ram_block_by_name(block_name);
+> -
+> -    if (qemu_ram_pagesize(rb) > getpagesize()) {
+> -        error_report("Postcopy doesn't support large page sizes yet (%s)",
+> -                     block_name);
+> -        return -E2BIG;
+> -    }
+> -
+> -    return 0;
+> -}
+> -
+> -/*
+>   * Note: This has the side effect of munlock'ing all of RAM, that's
+>   * normally fine since if the postcopy succeeds it gets turned back on at the
+>   * end.
+> @@ -122,12 +104,6 @@ bool postcopy_ram_supported_by_host(void)
+>          goto out;
+>      }
+>  
+> -    /* Check for anything about the RAMBlocks we don't support */
+> -    if (qemu_ram_foreach_block(check_range, NULL)) {
+> -        /* check_range will have printed its own error */
+> -        goto out;
+> -    }
+> -
+>      ufd = syscall(__NR_userfaultfd, O_CLOEXEC);
+>      if (ufd == -1) {
+>          error_report("%s: userfaultfd not available: %s", __func__,
+> @@ -139,6 +115,7 @@ bool postcopy_ram_supported_by_host(void)
+>      if (!ufd_version_check(ufd)) {
+>          goto out;
+>      }
+> +    /* TODO: Only allow huge pages if the kernel supports it */
+>  
+>      /*
+>       * userfault and mlock don't go together; we'll put it back later if
 > 
 Reviewed-by: Laurent Vivier <lvivier@redhat.com>
