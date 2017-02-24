@@ -1,41 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41686)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alifm@linux.vnet.ibm.com>) id 1chGl8-00076t-Vb
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:22:12 -0500
+	(envelope-from <alifm@linux.vnet.ibm.com>) id 1chGnF-0000go-LN
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:24:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alifm@linux.vnet.ibm.com>) id 1chGl5-0001rm-Py
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:22:11 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48730)
+	(envelope-from <alifm@linux.vnet.ibm.com>) id 1chGnC-0002ve-Db
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:24:21 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57529
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <alifm@linux.vnet.ibm.com>)
-	id 1chGl5-0001rY-Fx
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:22:07 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1OEFG0m029899
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 09:22:05 -0500
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28tmw84m6p-1
+	id 1chGnC-0002vR-6P
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:24:18 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1OEFIsh140792
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 09:24:17 -0500
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28tm1vpu4e-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 09:22:05 -0500
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 09:24:17 -0500
 Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <alifm@linux.vnet.ibm.com>;
-	Fri, 24 Feb 2017 07:22:04 -0700
+	Fri, 24 Feb 2017 07:24:16 -0700
 References: <20170220141943.8426-1-cornelia.huck@de.ibm.com>
-	<20170220141943.8426-2-cornelia.huck@de.ibm.com>
-	<967f7397-9995-0d24-bf35-682da2c732ff@redhat.com>
-	<48b23a4f-ebd3-2306-ea0f-75b713817440@de.ibm.com>
-	<aade1638-9dd8-98e7-bf40-f12ab9322da6@redhat.com>
+	<20170220141943.8426-4-cornelia.huck@de.ibm.com>
+	<d8c1475a-765b-e980-cb48-255c29efdaf6@redhat.com>
+	<4340aa12-3289-9d19-6156-9121a9643749@linux.vnet.ibm.com>
+	<75631dfb-bd96-b905-6720-84980cbd477d@redhat.com>
 From: Farhan Ali <alifm@linux.vnet.ibm.com>
-Date: Fri, 24 Feb 2017 09:21:58 -0500
+Date: Fri, 24 Feb 2017 09:24:10 -0500
 MIME-Version: 1.0
-In-Reply-To: <aade1638-9dd8-98e7-bf40-f12ab9322da6@redhat.com>
+In-Reply-To: <75631dfb-bd96-b905-6720-84980cbd477d@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <35df55f3-03f3-c370-05e7-ea83a1b21f99@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/5] elf-loader: Allow late loading of elf
+Message-Id: <ca131ed7-2a25-3946-13c1-c48effe7e332@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 3/5] s390x/ipl: Load network boot image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,71 +45,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-devel@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>, Jens Freimann <jfrei@linux.vnet.ibm.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>
+To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, jfrei@linux.vnet.ibm.com, agraf@suse.de
 
 
 
-On 02/24/2017 05:44 AM, Thomas Huth wrote:
-> On 21.02.2017 11:23, Christian Borntraeger wrote:
->> On 02/20/2017 04:33 PM, Thomas Huth wrote:
+On 02/24/2017 05:11 AM, Thomas Huth wrote:
+> On 22.02.2017 16:01, Farhan Ali wrote:
+>> Hi Thomas,
+>>
+>> Thanks for the review.
+>>
+>> On 02/20/2017 10:28 AM, Thomas Huth wrote:
 >>> On 20.02.2017 15:19, Cornelia Huck wrote:
 >>>> From: Farhan Ali <alifm@linux.vnet.ibm.com>
->>>>
->>>> The current QEMU ROM infrastructure rejects late loading of ROMs.
->>>> And ELFs are currently loaded as ROM, this prevents delayed loading
->>>> of ELFs. So when loading ELF, allow the user to specify if ELF should
->>>> be loaded as ROM or not.
->>>>
->>>> If an ELF is not loaded as ROM, then they are not restored on a
->>>> guest reboot/reset and so its upto the user to handle the reloading.
+> [...]
+>>>> +    }
+>>>> +
+>>>> +    ram_ptr = memory_region_get_ram_ptr(mr);
+>>>> +    if (!ram_ptr) {
+>>>> +        error_report("No RAM found");
+>>>> +        goto unref_mr;
+>>>> +    }
+>>>> +
+>>>> +    netboot_filename = qemu_find_file(QEMU_FILE_TYPE_BIOS,
+>>>> ipl->netboot_fw);
+>>>> +    if (netboot_filename == NULL) {
+>>>> +        error_report("Could not find network bootloader");
+>>>> +        goto unref_mr;
+>>>> +    }
 >>>
->>> Could you maybe also explain here why you need such a delayed ELF
->>> loading? Why can't you load the s390-netboot.img at the same time as
->>> s390-ccw.img?
+>>> So you're doing error_report() here already ...
+>>>
+>>>> +    img_size = load_elf_ram(netboot_filename, NULL, NULL,
+>>>> &ipl->start_addr,
+>>>> +                            NULL, NULL, 1, EM_S390, 0, 0, NULL, false);
+>>>> +
+>>>> +    if (img_size < 0) {
+>>>> +        img_size = load_image_size(netboot_filename, ram_ptr,
+>>>> ram_size);
+>>>> +        ipl->start_addr = KERN_IMAGE_START;
+>>>> +    }
+>>>> +
+>>>> +    g_free(netboot_filename);
+>>>> +
+>>>> +unref_mr:
+>>>> +    memory_region_unref(mr);
+>>>> +out:
+>>>> +    return img_size;
+>>>> +}
+>>>> +
+>>>> +static bool is_virtio_net_device(IplParameterBlock *iplb)
+>>>> +{
+>>>> +    uint8_t cssid;
+>>>> +    uint8_t ssid;
+>>>> +    uint16_t devno;
+>>>> +    uint16_t schid;
+>>>> +    SubchDev *sch = NULL;
+>>>> +
+>>>> +    if (iplb->pbt != S390_IPL_TYPE_CCW) {
+>>>> +        return false;
+>>>> +    }
+>>>> +
+>>>> +    devno = be16_to_cpu(iplb->ccw.devno);
+>>>> +    ssid = iplb->ccw.ssid & 3;
+>>>> +
+>>>> +    for (schid = 0; schid < MAX_SCHID; schid++) {
+>>>> +        for (cssid = 0; cssid < MAX_CSSID; cssid++) {
+>>>> +            sch = css_find_subch(1, cssid, ssid, schid);
+>>>> +
+>>>> +            if (sch && sch->devno == devno) {
+>>>> +                return sch->id.cu_model == VIRTIO_ID_NET;
+>>>> +            }
+>>>> +        }
+>>>> +    }
+>>>> +   return false;
+>>>> +}
+>>>> +
+>>>>  void s390_ipl_update_diag308(IplParameterBlock *iplb)
+>>>>  {
+>>>>      S390IPLState *ipl = get_ipl_device();
+>>>>
+>>>>      ipl->iplb = *iplb;
+>>>>      ipl->iplb_valid = true;
+>>>> +    ipl->netboot = is_virtio_net_device(iplb);
+>>>>  }
+>>>>
+>>>>  IplParameterBlock *s390_ipl_get_iplb(void)
+>>>> @@ -298,6 +377,13 @@ void s390_ipl_prepare_cpu(S390CPU *cpu)
+>>>>              ipl->iplb_valid = s390_gen_initial_iplb(ipl);
+>>>>          }
+>>>>      }
+>>>> +    if (ipl->netboot) {
+>>>> +        if (load_netboot_image() < 0) {
+>>>> +            error_report("Failed to load network bootloader");
+>>>
+>>> ... and then you do another error_report here again ... so one error
+>>> gets reported with two error message. Wouldn't it be nicer to rather do
+>>> error_setg(...) in load_netboot_image() and then report only one error
+>>> at this level here?
+>>>
 >>
->> Please read the cover letter for some details how to build such a netrom.
+>> What would be the advantage of doing that?
 >
-> Sure, understood, but I still did not see an explanation why this can't
-> be loaded as "ROM", too / why it needs to be loaded "delayed"? Does the
-> image data need to be writable in memory? Or is the information not
-> available yet at that point in time, whether the user wants to do a
-> network boot or not? Don't get me wrong, I'm basically fine with this
-> patch, I'm just missing some explanation *why* you have to do it this way.
->
->> Long term we certainly want to have a look at implementing something in
->> the ccw bios, but this (tcp stack, virtio net, etc) will take some (a lot?)
->> more time.
->
-> Just an idea: There's a complete TFTP-boot-over-virtio-net stack in
-> SLOF, written by IBM ... maybe you could use that for s390x, too?
->
->> This patch (1) has another advantage.
->> Right now we load the ccw bios all the time, even for -kernel xxx boot,
->> to allow the guest user to use chreipl to reboot from a disk. With this
->> in place we can rework our ccw bios loader to load the ccw bios lazily
->> as well.
->
-> But this "RAM"-loader here has still the problem that the images are not
-> restored during reboot/reset, right? ... so before you're going to
-> implement that as well, let me ask another question: Did you already
-> have a look at the generic loader device? I think that might already
-> provide what you're trying to implement here, so your problem could
-> maybe be solved with some few lines of creating an instance of that
-> device instead (see
-> https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg05366.html for
-> an example how to use that device).
+> It's just good coding style to report an error only once, at the
+> outermost calling function. Otherwise the same error gets reported
+> multiple times to the user, with different error messages, and that can
+> easily get confusing. It's likely not a big problem here yet, since the
+> call depths is only 2 functions, but imagine a situation where you've
+> got a call depth or 5 or more and an error is reported at every
+> depths... that's ugly. So this is why we've got error_setg() and friends
+> in QEMU.
 >
 >  Thomas
 >
 
-Hi Thomas,
-
-I did think of the generic loader device, but doesn't the generic loader 
-device also load ELF's as ROMs? This would again bring us back to the 
-problem of ROMs cannot be loaded after initializations of the ROM. So if 
-a user wants to switch boot device from disk to network device we still 
-wouldn't be able to load the ROM?
+Yes, I realized it. We update with a version 2. Would appreciate your 
+feedback on it :)
 
 Thanks
 Farhan
