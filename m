@@ -1,36 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1chC5w-0003Dp-Pn
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:23:22 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1chC62-0003JR-1S
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:23:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1chC5s-0004V1-Fu
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:23:20 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54815
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1chC5x-0004ZE-40
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:23:26 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49998)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1chC5s-0004Uk-AO
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:23:16 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1O9JPp9072655
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 04:23:15 -0500
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28t1a2s6cj-1
+	id 1chC5w-0004YY-Qi
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:23:21 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1O9JDN1142673
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 04:23:19 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28tetefrv2-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 04:23:15 -0500
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 04:23:19 -0500
 Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Fri, 24 Feb 2017 09:23:13 -0000
+	Fri, 24 Feb 2017 09:23:17 -0000
 From: Cornelia Huck <cornelia.huck@de.ibm.com>
-Date: Fri, 24 Feb 2017 10:22:53 +0100
+Date: Fri, 24 Feb 2017 10:22:55 +0100
 In-Reply-To: <20170224092259.16483-1-cornelia.huck@de.ibm.com>
 References: <20170224092259.16483-1-cornelia.huck@de.ibm.com>
-Message-Id: <20170224092259.16483-8-cornelia.huck@de.ibm.com>
-Subject: [Qemu-devel] [PULL 07/13] s390x: add property
- adapter_routes_max_batch
+Message-Id: <20170224092259.16483-10-cornelia.huck@de.ibm.com>
+Subject: [Qemu-devel] [PULL 09/13] s390x: bump ADAPTER_ROUTES_MAX_GSI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,91 +42,61 @@ Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, qemu-devel@
 
 From: Halil Pasic <pasic@linux.vnet.ibm.com>
 
-To make virtio-ccw supports more that  64 virtqueues we will have to
-increase ADAPTER_ROUTES_MAX_GSI which is currently limiting the number if
-possible adapter routes. Of course increasing the number of supported
-routes can break backwards migration.
+Let's increase ADAPTER_ROUTES_MAX_GSI to VIRTIO_QUEUE_MAX which is the
+largest demand foreseeable at the moment. Let us add a compatibility
+macro for the previous machines so client code can maintain backwards
+migration compatibility
 
-Let us introduce a compatibility property adapter_routes_max_batch so
-client code can use the some old limit if in compatibility mode and
-retain the migration compatibility.
+To not mess up migration compatibility for virtio-ccw
+VIRTIO_CCW_QUEUE_MAX is left at it's current value, and will be dropped
+when virtio-ccw is converted to use the capability of the flic
+introduced by this patch.
 
 Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
 Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
 ---
- hw/intc/s390_flic.c          | 28 ++++++++++++++++++++++++++++
- include/hw/s390x/s390_flic.h |  2 ++
- 2 files changed, 30 insertions(+)
+ hw/s390x/s390-virtio-ccw.c   |  7 ++++++-
+ include/hw/s390x/s390_flic.h | 10 ++++++++--
+ 2 files changed, 14 insertions(+), 3 deletions(-)
 
-diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
-index 6ab29efc65..bef4caf980 100644
---- a/hw/intc/s390_flic.c
-+++ b/hw/intc/s390_flic.c
-@@ -16,6 +16,8 @@
- #include "migration/qemu-file.h"
- #include "hw/s390x/s390_flic.h"
- #include "trace.h"
-+#include "hw/qdev.h"
-+#include "qapi/error.h"
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index e9a676797a..ea244bbf55 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -336,7 +336,12 @@ static const TypeInfo ccw_machine_info = {
+     type_init(ccw_machine_register_##suffix)
  
- S390FLICState *s390_get_flic(void)
- {
-@@ -85,6 +87,30 @@ static void qemu_s390_flic_class_init(ObjectClass *oc, void *data)
-     fsc->clear_io_irq = qemu_s390_clear_io_flic;
- }
+ #define CCW_COMPAT_2_8 \
+-        HW_COMPAT_2_8
++        HW_COMPAT_2_8 \
++        {\
++            .driver   = TYPE_S390_FLIC_COMMON,\
++            .property = "adapter_routes_max_batch",\
++            .value    = "64",\
++        },
  
-+static Property s390_flic_common_properties[] = {
-+    DEFINE_PROP_UINT32("adapter_routes_max_batch", S390FLICState,
-+                       adapter_routes_max_batch, ADAPTER_ROUTES_MAX_GSI),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void s390_flic_common_realize(DeviceState *dev, Error **errp)
-+{
-+    uint32_t max_batch = S390_FLIC_COMMON(dev)->adapter_routes_max_batch;
-+
-+    if (max_batch > ADAPTER_ROUTES_MAX_GSI) {
-+        error_setg(errp, "flic adapter_routes_max_batch too big"
-+                   "%d (%d allowed)", max_batch, ADAPTER_ROUTES_MAX_GSI);
-+    }
-+}
-+
-+static void s390_flic_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+
-+    dc->props = s390_flic_common_properties;
-+    dc->realize = s390_flic_common_realize;
-+}
-+
- static const TypeInfo qemu_s390_flic_info = {
-     .name          = TYPE_QEMU_S390_FLIC,
-     .parent        = TYPE_S390_FLIC_COMMON,
-@@ -92,10 +118,12 @@ static const TypeInfo qemu_s390_flic_info = {
-     .class_init    = qemu_s390_flic_class_init,
- };
- 
-+
- static const TypeInfo s390_flic_common_info = {
-     .name          = TYPE_S390_FLIC_COMMON,
-     .parent        = TYPE_SYS_BUS_DEVICE,
-     .instance_size = sizeof(S390FLICState),
-+    .class_init    = s390_flic_class_init,
-     .class_size    = sizeof(S390FLICStateClass),
- };
- 
+ #define CCW_COMPAT_2_7 \
+         HW_COMPAT_2_7
 diff --git a/include/hw/s390x/s390_flic.h b/include/hw/s390x/s390_flic.h
-index 9094edadf5..9f0b05c71b 100644
+index 9f0b05c71b..7f8ec7541b 100644
 --- a/include/hw/s390x/s390_flic.h
 +++ b/include/hw/s390x/s390_flic.h
-@@ -32,6 +32,8 @@ typedef struct AdapterRoutes {
+@@ -17,8 +17,14 @@
+ #include "hw/s390x/adapter.h"
+ #include "hw/virtio/virtio.h"
  
- typedef struct S390FLICState {
-     SysBusDevice parent_obj;
-+    /* to limit AdapterRoutes.num_routes for compat */
-+    uint32_t adapter_routes_max_batch;
+-#define ADAPTER_ROUTES_MAX_GSI 64
+-#define VIRTIO_CCW_QUEUE_MAX ADAPTER_ROUTES_MAX_GSI
++/*
++ * Reserve enough gsis to accommodate all virtio devices.
++ * If any other user of adapter routes needs more of these,
++ * we need to bump the value; but virtio looks like the
++ * maximum right now.
++ */
++#define ADAPTER_ROUTES_MAX_GSI VIRTIO_QUEUE_MAX
++#define VIRTIO_CCW_QUEUE_MAX 64
  
- } S390FLICState;
- 
+ typedef struct AdapterRoutes {
+     AdapterInfo adapter;
 -- 
 2.11.0
