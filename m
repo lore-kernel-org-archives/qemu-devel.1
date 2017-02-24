@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1chKbz-0000zo-J2
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:29:00 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1chKbv-0000vL-3O
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:28:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1chKby-0007zM-4A
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:28:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44976)
+	(envelope-from <dgilbert@redhat.com>) id 1chKbu-0007x1-3W
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:28:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56806)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1chKbx-0007yi-U9
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:28:58 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1chKbt-0007wm-Tm
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:28:54 -0500
 Received: from int-mx09.intmail.prod.int.phx2.redhat.com
 	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1DD21804ED
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 18:28:58 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 22FBD8123D
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 18:28:54 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Fri, 24 Feb 2017 18:28:36 +0000
-Message-Id: <20170224182844.32452-9-dgilbert@redhat.com>
+Date: Fri, 24 Feb 2017 18:28:33 +0000
+Message-Id: <20170224182844.32452-6-dgilbert@redhat.com>
 In-Reply-To: <20170224182844.32452-1-dgilbert@redhat.com>
 References: <20170224182844.32452-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 08/16] postcopy: Use temporary for placing
- zero huge pages
+Subject: [Qemu-devel] [PATCH v3 05/16] postcopy: enhance
+ ram_block_discard_range for hugepages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,70 +35,61 @@ Cc: aarcange@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-The kernel can't do UFFDIO_ZEROPAGE for huge pages, so we have
-to allocate a temporary (always zero) page and use UFFDIO_COPYPAGE
-on it.
+Unfortunately madvise DONTNEED doesn't work on hugepagetlb
+so use fallocate(FALLOC_FL_PUNCH_HOLE)
+qemu_fd_getpagesize only sets the page based off a file
+if the file is from hugetlbfs.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 ---
- include/migration/migration.h |  1 +
- migration/postcopy-ram.c      | 23 +++++++++++++++++++++--
- 2 files changed, 22 insertions(+), 2 deletions(-)
+ exec.c | 24 ++++++++++++++++++++----
+ 1 file changed, 20 insertions(+), 4 deletions(-)
 
-diff --git a/include/migration/migration.h b/include/migration/migration.h
-index e8e2a7f..cbfe79c 100644
---- a/include/migration/migration.h
-+++ b/include/migration/migration.h
-@@ -108,6 +108,7 @@ struct MigrationIncomingState {
-     QEMUFile *to_src_file;
-     QemuMutex rp_mutex;    /* We send replies from multiple threads */
-     void     *postcopy_tmp_page;
-+    void     *postcopy_tmp_zero_page;
+diff --git a/exec.c b/exec.c
+index ddbc314..ec3a11f 100644
+--- a/exec.c
++++ b/exec.c
+@@ -46,6 +46,11 @@
+ #include "sysemu/xen-mapcache.h"
+ #include "trace-root.h"
  
-     QEMUBH *bh;
++#ifdef CONFIG_FALLOCATE_PUNCH_HOLE
++#include <fcntl.h>
++#include <linux/falloc.h>
++#endif
++
+ #endif
+ #include "exec/cpu-all.h"
+ #include "qemu/rcu_queue.h"
+@@ -3320,12 +3325,23 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
  
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index a8b7fed..4c736d2 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -324,6 +324,10 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
-         munmap(mis->postcopy_tmp_page, mis->largest_page_size);
-         mis->postcopy_tmp_page = NULL;
-     }
-+    if (mis->postcopy_tmp_zero_page) {
-+        munmap(mis->postcopy_tmp_zero_page, mis->largest_page_size);
-+        mis->postcopy_tmp_zero_page = NULL;
-+    }
-     trace_postcopy_ram_incoming_cleanup_exit();
-     return 0;
- }
-@@ -593,8 +597,23 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
-             return -e;
-         }
-     } else {
--        /* TODO: The kernel can't use UFFDIO_ZEROPAGE for hugepages */
--        assert(0);
-+        /* The kernel can't use UFFDIO_ZEROPAGE for hugepages */
-+        if (!mis->postcopy_tmp_zero_page) {
-+            mis->postcopy_tmp_zero_page = mmap(NULL, mis->largest_page_size,
-+                                               PROT_READ | PROT_WRITE,
-+                                               MAP_PRIVATE | MAP_ANONYMOUS,
-+                                               -1, 0);
-+            if (mis->postcopy_tmp_zero_page == MAP_FAILED) {
-+                int e = errno;
-+                mis->postcopy_tmp_zero_page = NULL;
-+                error_report("%s: %s mapping large zero page",
-+                             __func__, strerror(e));
-+                return -e;
-+            }
-+            memset(mis->postcopy_tmp_zero_page, '\0', mis->largest_page_size);
+         errno = ENOTSUP; /* If we are missing MADVISE etc */
+ 
++        if (rb->page_size == qemu_host_page_size) {
+ #if defined(CONFIG_MADVISE)
+-        /* Note: We need the madvise MADV_DONTNEED behaviour of definitely
+-         * freeing the page.
+-         */
+-        ret = madvise(host_startaddr, length, MADV_DONTNEED);
++            /* Note: We need the madvise MADV_DONTNEED behaviour of definitely
++             * freeing the page.
++             */
++            ret = madvise(host_startaddr, length, MADV_DONTNEED);
+ #endif
++        } else {
++            /* Huge page case  - unfortunately it can't do DONTNEED, but
++             * it can do the equivalent by FALLOC_FL_PUNCH_HOLE in the
++             * huge page file.
++             */
++#ifdef CONFIG_FALLOCATE_PUNCH_HOLE
++            ret = fallocate(rb->fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
++                            start, length);
++#endif
 +        }
-+        return postcopy_place_page(mis, host, mis->postcopy_tmp_zero_page,
-+                                   pagesize);
-     }
- 
-     return 0;
+         if (ret) {
+             ret = -errno;
+             error_report("ram_block_discard_range: Failed to discard range "
 -- 
 2.9.3
