@@ -1,35 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1chC64-0003LO-4F
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:23:32 -0500
+	(envelope-from <imammedo@redhat.com>) id 1chC9a-0006H5-GR
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:27:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1chC5z-0004aX-65
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:23:28 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59009)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1chC5y-0004Zh-T8
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:23:23 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1O9JCDh067023
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 04:23:21 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28th63t6jf-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 04:23:21 -0500
-Received: from localhost
-	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Fri, 24 Feb 2017 09:23:19 -0000
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-Date: Fri, 24 Feb 2017 10:22:57 +0100
-In-Reply-To: <20170224092259.16483-1-cornelia.huck@de.ibm.com>
-References: <20170224092259.16483-1-cornelia.huck@de.ibm.com>
-Message-Id: <20170224092259.16483-12-cornelia.huck@de.ibm.com>
-Subject: [Qemu-devel] [PULL 11/13] s390x/arch_dump: use proper note name and
- note size
+	(envelope-from <imammedo@redhat.com>) id 1chC9W-0005d0-F0
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:27:06 -0500
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Fri, 24 Feb 2017 10:26:56 +0100
+Message-Id: <1487928416-131310-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH] spapr: ensure that all threads within core are
+ on the same NUMA node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,132 +18,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, qemu-devel@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>, thuth@redhat.com, mdroth@linux.vnet.ibm.com, agraf@suse.de
 
-From: Christian Borntraeger <borntraeger@de.ibm.com>
+Threads within a core shouldn't be on different
+NUMA nodes, so if user has misconfgured command
+line, fail QEMU at start up to force user fix it.
 
-In binutils/libbfd (bfd/elf.c) it is enforced that all s390
-specific ELF notes like e.g. NT_S390_PREFIX or NT_S390_CTRS
-have "LINUX" specified as note name and that the namesz is
-6. Otherwise the notes are ignored.
+For now use the first thread on the core as source
+of core's node-id. Later when cpu-numa refactoring
+lands  it will be switched to core's node-id from
+possible_cpus[].
 
-QEMU currently uses "CORE" for these notes. Up to now this has
-not been a real problem because the dump analysis tool "crash"
-does handle that. But it will break all programs that use libbfd
-for processing ELF notes.
-
-So fix this and use "LINUX" for all s390 specific notes to comply
-with libbfd. Also set the correct namesz.
-
-Reported-by: Philipp Rudo <prudo@linux.vnet.ibm.com>
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- target/s390x/arch_dump.c | 43 ++++++++++++++++++++++++++++---------------
- 1 file changed, 28 insertions(+), 15 deletions(-)
+Enforcement is necessary to ensure that it would be
+possible to map legacy CPU index based CLI mapping
+to core based one and replace numa_info[XXX].node_cpu
+with possible_cpus[] as storage for mapping info.
 
-diff --git a/target/s390x/arch_dump.c b/target/s390x/arch_dump.c
-index 4731869f6b..887cae947e 100644
---- a/target/s390x/arch_dump.c
-+++ b/target/s390x/arch_dump.c
-@@ -59,8 +59,7 @@ typedef struct S390xElfVregsHiStruct S390xElfVregsHi;
- 
- typedef struct noteStruct {
-     Elf64_Nhdr hdr;
--    char name[5];
--    char pad3[3];
-+    char name[8];
-     union {
-         S390xElfPrstatus prstatus;
-         S390xElfFpregset fpregset;
-@@ -162,13 +161,19 @@ static void s390x_write_elf64_prefix(Note *note, S390CPU *cpu)
- }
- 
- 
--static const struct NoteFuncDescStruct {
-+typedef struct NoteFuncDescStruct {
-     int contents_size;
-     void (*note_contents_func)(Note *note, S390CPU *cpu);
--} note_func[] = {
-+} NoteFuncDesc;
-+
-+static const NoteFuncDesc note_core[] = {
-     {sizeof(((Note *)0)->contents.prstatus), s390x_write_elf64_prstatus},
--    {sizeof(((Note *)0)->contents.prefix),   s390x_write_elf64_prefix},
-     {sizeof(((Note *)0)->contents.fpregset), s390x_write_elf64_fpregset},
-+    { 0, NULL}
-+};
-+
-+static const NoteFuncDesc note_linux[] = {
-+    {sizeof(((Note *)0)->contents.prefix),   s390x_write_elf64_prefix},
-     {sizeof(((Note *)0)->contents.ctrs),     s390x_write_elf64_ctrs},
-     {sizeof(((Note *)0)->contents.timer),    s390x_write_elf64_timer},
-     {sizeof(((Note *)0)->contents.todcmp),   s390x_write_elf64_todcmp},
-@@ -178,22 +183,20 @@ static const struct NoteFuncDescStruct {
-     { 0, NULL}
- };
- 
--typedef struct NoteFuncDescStruct NoteFuncDesc;
--
--
--static int s390x_write_all_elf64_notes(const char *note_name,
-+static int s390x_write_elf64_notes(const char *note_name,
-                                        WriteCoreDumpFunction f,
-                                        S390CPU *cpu, int id,
--                                       void *opaque)
-+                                       void *opaque,
-+                                       const NoteFuncDesc *funcs)
+CC: qemu-ppc@nongnu.org
+CC: lvivier@redhat.com
+CC: David Gibson <david@gibson.dropbear.id.au>
+CC: thuth@redhat.com
+CC: mdroth@linux.vnet.ibm.com
+CC: agraf@suse.de
+---
+ hw/ppc/spapr_cpu_core.c | 23 +++++++++++++++--------
+ 1 file changed, 15 insertions(+), 8 deletions(-)
+
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index 55cd045..1499a8b 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -50,8 +50,6 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, PowerPCCPU *cpu,
+                            Error **errp)
  {
-     Note note;
-     const NoteFuncDesc *nf;
-     int note_size;
-     int ret = -1;
+     CPUPPCState *env = &cpu->env;
+-    CPUState *cs = CPU(cpu);
+-    int i;
  
--    for (nf = note_func; nf->note_contents_func; nf++) {
-+    for (nf = funcs; nf->note_contents_func; nf++) {
-         memset(&note, 0, sizeof(note));
--        note.hdr.n_namesz = cpu_to_be32(sizeof(note.name));
-+        note.hdr.n_namesz = cpu_to_be32(strlen(note_name) + 1);
-         note.hdr.n_descsz = cpu_to_be32(nf->contents_size);
-         strncpy(note.name, note_name, sizeof(note.name));
-         (*nf->note_contents_func)(&note, cpu);
-@@ -215,7 +218,13 @@ int s390_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
-                               int cpuid, void *opaque)
- {
-     S390CPU *cpu = S390_CPU(cs);
--    return s390x_write_all_elf64_notes("CORE", f, cpu, cpuid, opaque);
-+    int r;
-+
-+    r = s390x_write_elf64_notes("CORE", f, cpu, cpuid, opaque, note_core);
-+    if (r) {
-+        return r;
-+    }
-+    return s390x_write_elf64_notes("LINUX", f, cpu, cpuid, opaque, note_linux);
- }
- 
- int cpu_get_dump_info(ArchDumpInfo *info,
-@@ -230,7 +239,7 @@ int cpu_get_dump_info(ArchDumpInfo *info,
- 
- ssize_t cpu_get_note_size(int class, int machine, int nr_cpus)
- {
--    int name_size = 8; /* "CORE" or "QEMU" rounded */
-+    int name_size = 8; /* "LINUX" or "CORE" + pad */
-     size_t elf_note_size = 0;
-     int note_head_size;
-     const NoteFuncDesc *nf;
-@@ -240,7 +249,11 @@ ssize_t cpu_get_note_size(int class, int machine, int nr_cpus)
- 
-     note_head_size = sizeof(Elf64_Nhdr);
- 
--    for (nf = note_func; nf->note_contents_func; nf++) {
-+    for (nf = note_core; nf->note_contents_func; nf++) {
-+        elf_note_size = elf_note_size + note_head_size + name_size +
-+                        nf->contents_size;
-+    }
-+    for (nf = note_linux; nf->note_contents_func; nf++) {
-         elf_note_size = elf_note_size + note_head_size + name_size +
-                         nf->contents_size;
+     /* Set time-base frequency to 512 MHz */
+     cpu_ppc_tb_init(env, SPAPR_TIMEBASE_FREQ);
+@@ -70,12 +68,6 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, PowerPCCPU *cpu,
+         }
      }
+ 
+-    /* Set NUMA node for the added CPUs  */
+-    i = numa_get_node_for_cpu(cs->cpu_index);
+-    if (i < nb_numa_nodes) {
+-            cs->numa_node = i;
+-    }
+-
+     xics_cpu_setup(spapr->xics, cpu);
+ 
+     qemu_register_reset(spapr_cpu_reset, cpu);
+@@ -159,11 +151,13 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+     const char *typename = object_class_get_name(scc->cpu_class);
+     size_t size = object_type_get_instance_size(typename);
+     Error *local_err = NULL;
++    int core_node_id = numa_get_node_for_cpu(cc->core_id);;
+     void *obj;
+     int i, j;
+ 
+     sc->threads = g_malloc0(size * cc->nr_threads);
+     for (i = 0; i < cc->nr_threads; i++) {
++        int node_id;
+         char id[32];
+         CPUState *cs;
+ 
+@@ -172,6 +166,19 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+         object_initialize(obj, size, typename);
+         cs = CPU(obj);
+         cs->cpu_index = cc->core_id + i;
++
++        /* Set NUMA node for the added CPUs  */
++        node_id = numa_get_node_for_cpu(cs->cpu_index);
++        if (node_id != core_node_id) {
++            error_setg(&local_err, "Invalid node-id=%d of thread[cpu-index: %d]"
++                " on CPU[core-id: %d, node-id: %d], node-id must be the same",
++                 node_id, cs->cpu_index, cc->core_id, core_node_id);
++            goto err;
++        }
++        if (node_id < nb_numa_nodes) {
++            cs->numa_node = node_id;
++        }
++
+         snprintf(id, sizeof(id), "thread[%d]", i);
+         object_property_add_child(OBJECT(sc), id, obj, &local_err);
+         if (local_err) {
 -- 
-2.11.0
+2.7.4
