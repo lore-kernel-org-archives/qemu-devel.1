@@ -1,30 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1chH0a-0003YW-H6
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:38:09 -0500
+	(envelope-from <ebischoff@suse.com>) id 1chFmS-0003IQ-B3
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:19:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1chH0U-0000z0-SR
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:38:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41152)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1chH0U-0000x7-K5
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:38:02 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8C0DD7E9D5
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 14:38:02 +0000 (UTC)
-References: <20170206173306.20603-1-dgilbert@redhat.com>
-	<20170206173306.20603-8-dgilbert@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <6ca55fb7-1127-c0bd-5771-fb1a50afcb3e@redhat.com>
-Date: Fri, 24 Feb 2017 15:37:59 +0100
-MIME-Version: 1.0
-In-Reply-To: <20170206173306.20603-8-dgilbert@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 07/16] postcopy: Record largest page size
+	(envelope-from <ebischoff@suse.com>) id 1chFmP-0008V4-51
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:19:28 -0500
+Received: from nat.nue.novell.com ([195.135.221.2]:36736 helo=tegan.suse.de)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <ebischoff@suse.com>) id 1chFmO-0008QN-Sk
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:19:25 -0500
+From: Eric Bischoff <ebischoff@suse.com>
+Date: Fri, 24 Feb 2017 14:19:17 +0100
+Message-Id: <20170224131918.15480-1-ebischoff@suse.com>
+Subject: [Qemu-devel] (no subject)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,82 +21,6 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com
-Cc: aarcange@redhat.com
+To: qemu-devel@nongnu.org
 
-On 06/02/2017 18:32, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Record the largest page size in use; we'll need it soon for allocating
-> temporary buffers.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  exec.c                        | 13 +++++++++++++
->  include/exec/cpu-common.h     |  1 +
->  include/migration/migration.h |  1 +
->  migration/migration.c         |  1 +
->  4 files changed, 16 insertions(+)
-> 
-> diff --git a/exec.c b/exec.c
-> index c25f6b3..59f3b6b 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -1524,6 +1524,19 @@ size_t qemu_ram_pagesize(RAMBlock *rb)
->      return rb->page_size;
->  }
->  
-> +/* Returns the largest size of page in use */
-> +size_t qemu_ram_pagesize_largest(void)
-> +{
-> +    RAMBlock *block;
-> +    size_t largest = 0;
-> +
-> +    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +        largest = MAX(largest, qemu_ram_pagesize(block));
-> +    }
-> +
-> +    return largest;
-> +}
-> +
->  static int memory_try_enable_merging(void *addr, size_t len)
->  {
->      if (!machine_mem_merge(current_machine)) {
-> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-> index 1350c2e..8c305aa 100644
-> --- a/include/exec/cpu-common.h
-> +++ b/include/exec/cpu-common.h
-> @@ -64,6 +64,7 @@ void qemu_ram_set_idstr(RAMBlock *block, const char *name, DeviceState *dev);
->  void qemu_ram_unset_idstr(RAMBlock *block);
->  const char *qemu_ram_get_idstr(RAMBlock *rb);
->  size_t qemu_ram_pagesize(RAMBlock *block);
-> +size_t qemu_ram_pagesize_largest(void);
->  
->  void cpu_physical_memory_rw(hwaddr addr, uint8_t *buf,
->                              int len, int is_write);
-> diff --git a/include/migration/migration.h b/include/migration/migration.h
-> index 96c9d6e..c9c1d5f 100644
-> --- a/include/migration/migration.h
-> +++ b/include/migration/migration.h
-> @@ -92,6 +92,7 @@ struct MigrationIncomingState {
->       */
->      QemuEvent main_thread_load_event;
->  
-> +    size_t         largest_page_size;
->      bool           have_fault_thread;
->      QemuThread     fault_thread;
->      QemuSemaphore  fault_thread_sem;
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 283677c..e0fdafc 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -387,6 +387,7 @@ static void process_incoming_migration_co(void *opaque)
->      int ret;
->  
->      mis = migration_incoming_state_new(f);
-> +    mis->largest_page_size = qemu_ram_pagesize_largest();
->      postcopy_state_set(POSTCOPY_INCOMING_NONE);
->      migrate_set_state(&mis->state, MIGRATION_STATUS_NONE,
->                        MIGRATION_STATUS_ACTIVE);
-> 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+(forgot to CC the list, already sent to Richard Henderson and Alexander Graf)
