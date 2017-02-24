@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35231)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1chJmX-0003yZ-A9
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:35:51 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1chJrE-0007rD-8j
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:40:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1chJmQ-000595-DR
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:35:49 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48641)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1chJrA-0002Ec-24
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:40:40 -0500
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:37115)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1chJmQ-0004Og-4y
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:35:42 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Feb 2017 17:35:23 +0000
-Message-Id: <1487957728-8354-5-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1487957728-8354-1-git-send-email-peter.maydell@linaro.org>
-References: <1487957728-8354-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH risu 4/9] ppc64le,
- m68k: Make reginfo_dump() API match arm, aarch64
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1chJr9-0002EY-Oj
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:40:35 -0500
+Received: by mail-wm0-x22e.google.com with SMTP id v77so19969780wmv.0
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 09:40:35 -0800 (PST)
+Received: from 640k.lan (94-39-187-56.adsl-ull.clienti.tiscali.it.
+	[94.39.187.56]) by smtp.gmail.com with ESMTPSA id
+	s26sm8814533wra.66.2017.02.24.09.40.32 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 24 Feb 2017 09:40:33 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 24 Feb 2017 18:40:13 +0100
+Message-Id: <1487958030-51417-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 00/17] KVM and cpu-exec patches for 2.9 soft
+ freeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,224 +32,100 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Laurent Vivier <laurent@vivier.eu>
 
-Make the reginfo_dump() API for ppc64le and m68k match the one used
-for ARM and AArch64, which takes a FILE*, doesn't have a flag for
-is_master, and returns a success indication.
+The following changes since commit a1cf5fac2b929ffa2abd1285401f2535ff8c6fea:
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- risu_m68k.c            |  6 +++---
- risu_ppc64le.c         |  6 +++---
- risu_reginfo_m68k.c    | 21 +++++++++++----------
- risu_reginfo_m68k.h    |  4 ++--
- risu_reginfo_ppc64le.c | 49 +++++++++++++++++++++++++------------------------
- risu_reginfo_ppc64le.h |  4 ++--
- 6 files changed, 46 insertions(+), 44 deletions(-)
+  Merge remote-tracking branch 'remotes/armbru/tags/pull-block-2017-02-21' into staging (2017-02-21 13:58:50 +0000)
 
-diff --git a/risu_m68k.c b/risu_m68k.c
-index 8c138dd..87776ab 100644
---- a/risu_m68k.c
-+++ b/risu_m68k.c
-@@ -135,7 +135,7 @@ int report_match_status(void)
-         fprintf(stderr, "packet mismatch (probably disagreement "
-                 "about UNDEF on load/store)\n");
-         fprintf(stderr, "master reginfo:\n");
--        reginfo_dump(&master_ri, 0);
-+        reginfo_dump(&master_ri, stderr);
-     }
-     if (!reginfo_is_eq(&master_ri, &apprentice_ri, NULL)) {
-         fprintf(stderr, "mismatch on regs!\n");
-@@ -151,10 +151,10 @@ int report_match_status(void)
-     }
- 
-     fprintf(stderr, "master reginfo:\n");
--    reginfo_dump(&master_ri, 1);
-+    reginfo_dump(&master_ri, stderr);
- 
-     fprintf(stderr, "apprentice reginfo:\n");
--    reginfo_dump(&apprentice_ri, 0);
-+    reginfo_dump(&apprentice_ri, stderr);
- 
-     reginfo_dump_mismatch(&master_ri, &apprentice_ri, stderr);
-     return resp;
-diff --git a/risu_ppc64le.c b/risu_ppc64le.c
-index 43170ea..8757712 100644
---- a/risu_ppc64le.c
-+++ b/risu_ppc64le.c
-@@ -140,7 +140,7 @@ int report_match_status(void)
-         fprintf(stderr, "packet mismatch (probably disagreement "
-                 "about UNDEF on load/store)\n");
-         fprintf(stderr, "master reginfo:\n");
--        reginfo_dump(&master_ri, 0);
-+        reginfo_dump(&master_ri, stderr);
-     }
-     if (!reginfo_is_eq(&master_ri, &apprentice_ri)) {
-         fprintf(stderr, "mismatch on regs!\n");
-@@ -156,10 +156,10 @@ int report_match_status(void)
-     }
- 
-     fprintf(stderr, "master reginfo:\n");
--    reginfo_dump(&master_ri, 1);
-+    reginfo_dump(&master_ri, stderr);
- 
-     fprintf(stderr, "apprentice reginfo:\n");
--    reginfo_dump(&apprentice_ri, 0);
-+    reginfo_dump(&apprentice_ri, stderr);
- 
-     reginfo_dump_mismatch(&master_ri, &apprentice_ri, stderr);
-     return resp;
-diff --git a/risu_reginfo_m68k.c b/risu_reginfo_m68k.c
-index d0d47d9..3988d71 100644
---- a/risu_reginfo_m68k.c
-+++ b/risu_reginfo_m68k.c
-@@ -75,29 +75,30 @@ int reginfo_is_eq(struct reginfo *m, struct reginfo *a, ucontext_t *uc)
- }
- 
- /* reginfo_dump: print state to a stream, returns nonzero on success */
--void reginfo_dump(struct reginfo *ri, int is_master)
-+int reginfo_dump(struct reginfo *ri, FILE *f)
- {
-     int i;
--    if (is_master) {
--        fprintf(stderr, "  pc            \e[1;101;37m0x%08x\e[0m\n",
--                ri->pc);
--    }
--    fprintf(stderr, "\tPC: %08x\n", ri->gregs[R_PC]);
--    fprintf(stderr, "\tPS: %04x\n", ri->gregs[R_PS]);
-+    fprintf(f, "  pc            \e[1;101;37m0x%08x\e[0m\n",
-+            ri->pc);
-+
-+    fprintf(f, "\tPC: %08x\n", ri->gregs[R_PC]);
-+    fprintf(f, "\tPS: %04x\n", ri->gregs[R_PS]);
- 
-     for (i = 0; i < 8; i++) {
--        fprintf(stderr, "\tD%d: %8x\tA%d: %8x\n", i, ri->gregs[i],
-+        fprintf(f, "\tD%d: %8x\tA%d: %8x\n", i, ri->gregs[i],
-                 i, ri->gregs[i + 8]);
-     }
- 
- 
-     for (i = 0; i < 8; i++) {
--        fprintf(stderr, "\tFP%d: %08x %08x %08x\n", i,
-+        fprintf(f, "\tFP%d: %08x %08x %08x\n", i,
-                 ri->fpregs.f_fpregs[i][0], ri->fpregs.f_fpregs[i][1],
-                 ri->fpregs.f_fpregs[i][2]);
-     }
- 
--    fprintf(stderr, "\n");
-+    fprintf(f, "\n");
-+
-+    return !ferror(f);
- }
- 
- int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
-diff --git a/risu_reginfo_m68k.h b/risu_reginfo_m68k.h
-index 9dd8f32..3922bf6 100644
---- a/risu_reginfo_m68k.h
-+++ b/risu_reginfo_m68k.h
-@@ -23,8 +23,8 @@ void reginfo_init(struct reginfo *ri, ucontext_t *uc);
- /* return 1 if structs are equal, 0 otherwise. */
- int reginfo_is_eq(struct reginfo *r1, struct reginfo *r2, ucontext_t *uc);
- 
--/* print reginfo state to a stream */
--void reginfo_dump(struct reginfo *ri, int is_master);
-+/* print reginfo state to a stream, returns 1 on success, 0 on failure */
-+int reginfo_dump(struct reginfo *ri, FILE *f);
- 
- /* reginfo_dump_mismatch: print mismatch details to a stream, ret nonzero=ok */
- int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f);
-diff --git a/risu_reginfo_ppc64le.c b/risu_reginfo_ppc64le.c
-index 585d8b7..9e673e1 100644
---- a/risu_reginfo_ppc64le.c
-+++ b/risu_reginfo_ppc64le.c
-@@ -93,46 +93,47 @@ int reginfo_is_eq(struct reginfo *m, struct reginfo *a)
- }
- 
- /* reginfo_dump: print state to a stream, returns nonzero on success */
--void reginfo_dump(struct reginfo *ri, int is_master)
-+int reginfo_dump(struct reginfo *ri, FILE *f)
- {
-     int i;
--    if (is_master) {
--        fprintf(stderr, "  faulting insn 0x%x\n", ri->faulting_insn);
--        fprintf(stderr, "  prev insn     0x%x\n", ri->prev_insn);
--        fprintf(stderr, "  prev addr    0x%" PRIx64 "\n\n", ri->nip);
--    }
-+
-+    fprintf(f, "  faulting insn 0x%x\n", ri->faulting_insn);
-+    fprintf(f, "  prev insn     0x%x\n", ri->prev_insn);
-+    fprintf(f, "  prev addr    0x%" PRIx64 "\n\n", ri->nip);
- 
-     for (i = 0; i < 16; i++) {
--        fprintf(stderr, "\tr%2d: %16lx\tr%2d: %16lx\n", i, ri->gregs[i],
-+        fprintf(f, "\tr%2d: %16lx\tr%2d: %16lx\n", i, ri->gregs[i],
-                 i + 16, ri->gregs[i + 16]);
-     }
- 
--    fprintf(stderr, "\n");
--    fprintf(stderr, "\tnip    : %16lx\n", ri->gregs[32]);
--    fprintf(stderr, "\tmsr    : %16lx\n", ri->gregs[33]);
--    fprintf(stderr, "\torig r3: %16lx\n", ri->gregs[34]);
--    fprintf(stderr, "\tctr    : %16lx\n", ri->gregs[35]);
--    fprintf(stderr, "\tlnk    : %16lx\n", ri->gregs[36]);
--    fprintf(stderr, "\txer    : %16lx\n", ri->gregs[37]);
--    fprintf(stderr, "\tccr    : %16lx\n", ri->gregs[38]);
--    fprintf(stderr, "\tmq     : %16lx\n", ri->gregs[39]);
--    fprintf(stderr, "\ttrap   : %16lx\n", ri->gregs[40]);
--    fprintf(stderr, "\tdar    : %16lx\n", ri->gregs[41]);
--    fprintf(stderr, "\tdsisr  : %16lx\n", ri->gregs[42]);
--    fprintf(stderr, "\tresult : %16lx\n", ri->gregs[43]);
--    fprintf(stderr, "\tdscr   : %16lx\n\n", ri->gregs[44]);
-+    fprintf(f, "\n");
-+    fprintf(f, "\tnip    : %16lx\n", ri->gregs[32]);
-+    fprintf(f, "\tmsr    : %16lx\n", ri->gregs[33]);
-+    fprintf(f, "\torig r3: %16lx\n", ri->gregs[34]);
-+    fprintf(f, "\tctr    : %16lx\n", ri->gregs[35]);
-+    fprintf(f, "\tlnk    : %16lx\n", ri->gregs[36]);
-+    fprintf(f, "\txer    : %16lx\n", ri->gregs[37]);
-+    fprintf(f, "\tccr    : %16lx\n", ri->gregs[38]);
-+    fprintf(f, "\tmq     : %16lx\n", ri->gregs[39]);
-+    fprintf(f, "\ttrap   : %16lx\n", ri->gregs[40]);
-+    fprintf(f, "\tdar    : %16lx\n", ri->gregs[41]);
-+    fprintf(f, "\tdsisr  : %16lx\n", ri->gregs[42]);
-+    fprintf(f, "\tresult : %16lx\n", ri->gregs[43]);
-+    fprintf(f, "\tdscr   : %16lx\n\n", ri->gregs[44]);
- 
-     for (i = 0; i < 16; i++) {
--        fprintf(stderr, "\tf%2d: %.4f\tr%2d: %.4f\n", i, ri->fpregs[i],
-+        fprintf(f, "\tf%2d: %.4f\tr%2d: %.4f\n", i, ri->fpregs[i],
-                 i + 16, ri->fpregs[i + 16]);
-     }
--    fprintf(stderr, "\tfpscr: %f\n\n", ri->fpregs[32]);
-+    fprintf(f, "\tfpscr: %f\n\n", ri->fpregs[32]);
- 
-     for (i = 0; i < 32; i++) {
--        fprintf(stderr, "vr%02d: %8x, %8x, %8x, %8x\n", i,
-+        fprintf(f, "vr%02d: %8x, %8x, %8x, %8x\n", i,
-                 ri->vrregs.vrregs[i][0], ri->vrregs.vrregs[i][1],
-                 ri->vrregs.vrregs[i][2], ri->vrregs.vrregs[i][3]);
-     }
-+
-+    return !ferror(f);
- }
- 
- int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
-diff --git a/risu_reginfo_ppc64le.h b/risu_reginfo_ppc64le.h
-index 49bb1aa..9f74cd3 100644
---- a/risu_reginfo_ppc64le.h
-+++ b/risu_reginfo_ppc64le.h
-@@ -31,8 +31,8 @@ void reginfo_init(struct reginfo *ri, ucontext_t *uc);
- /* return 1 if structs are equal, 0 otherwise. */
- int reginfo_is_eq(struct reginfo *r1, struct reginfo *r2);
- 
--/* print reginfo state to a stream */
--void reginfo_dump(struct reginfo *ri, int is_master);
-+/* print reginfo state to a stream, returns 1 on success, 0 on failure */
-+int reginfo_dump(struct reginfo *ri, FILE *f);
- 
- /* reginfo_dump_mismatch: print mismatch details to a stream, ret nonzero=ok */
- int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f);
+are available in the git repository at:
+
+
+  git://github.com/bonzini/qemu.git tags/for-upstream
+
+for you to fetch changes up to f9e640f9a1a7185591985e10a557f11fbe783b87:
+
+  qmp-events: fix GUEST_PANICKED description formatting (2017-02-24 16:19:44 +0100)
+
+----------------------------------------------------------------
+* kernel header update (requested by David and Vijay)
+* GuestPanicInformation fixups (Anton)
+* record/replay icount fixes (Pavel)
+* cpu-exec cleanup, unification of icount_decr with tcg_exit_req (me)
+* KVM_CAP_IMMEDIATE_EXIT support (me)
+* vmxcap update (me)
+
+----------------------------------------------------------------
+Anton Nefedov (2):
+      qapi: flatten GuestPanicInformation union
+      qmp-events: fix GUEST_PANICKED description formatting
+
+Paolo Bonzini (14):
+      cpu-exec: unify icount_decr and tcg_exit_req
+      cpu-exec: remove unnecessary check of cpu->exit_request
+      update-linux-headers: update for 4.11
+      update Linux headers to 4.11
+      cpus: remove ugly cast on sigbus_handler
+      KVM: x86: cleanup SIGBUS handlers
+      cpus: reorganize signal handling code
+      KVM: remove kvm_arch_on_sigbus
+      KVM: do not use sigtimedwait to catch SIGBUS
+      KVM: move SIG_IPI handling to kvm-all.c
+      kvm: use atomic_read/atomic_set to access cpu->exit_request
+      KVM: use KVM_CAP_IMMEDIATE_EXIT
+      vmxcap: port to Python 3
+      vmxcap: update for September 2016 SDM
+
+Pavel Dovgalyuk (1):
+      replay: check icount in cpu exec loop
+
+ cpu-exec.c                                         |  83 ++--
+ cpus.c                                             | 102 +----
+ include/exec/gen-icount.h                          |  53 ++-
+ include/qemu/compatfd.h                            |  42 ---
+ include/qemu/osdep.h                               |  37 ++
+ include/qom/cpu.h                                  |  15 +-
+ include/standard-headers/asm-x86/hyperv.h          |   8 +
+ include/standard-headers/linux/input-event-codes.h |   2 +-
+ include/standard-headers/linux/pci_regs.h          |  25 ++
+ include/standard-headers/linux/virtio_ids.h        |   1 +
+ include/sysemu/kvm.h                               |  11 +-
+ kvm-all.c                                          | 146 ++++++-
+ kvm-stub.c                                         |  12 +-
+ linux-headers/asm-arm/kvm.h                        |  15 +
+ linux-headers/asm-arm/unistd-common.h              | 357 ++++++++++++++++++
+ linux-headers/asm-arm/unistd-eabi.h                |   5 +
+ linux-headers/asm-arm/unistd-oabi.h                |  17 +
+ linux-headers/asm-arm/unistd.h                     | 419 +--------------------
+ linux-headers/asm-arm64/kvm.h                      |  13 +
+ linux-headers/asm-powerpc/kvm.h                    |  27 ++
+ linux-headers/asm-powerpc/unistd.h                 |   1 +
+ linux-headers/asm-x86/kvm_para.h                   |  13 +-
+ linux-headers/linux/kvm.h                          |  24 +-
+ linux-headers/linux/kvm_para.h                     |   2 +
+ linux-headers/linux/userfaultfd.h                  |  67 +++-
+ linux-headers/linux/vfio.h                         |  10 +
+ qapi-schema.json                                   |  12 +
+ qapi/event.json                                    |   4 +-
+ qom/cpu.c                                          |   2 +-
+ scripts/kvm/vmxcap                                 |  23 +-
+ scripts/update-linux-headers.sh                    |  13 +-
+ target/arm/kvm.c                                   |  10 -
+ target/i386/cpu.c                                  |  15 +-
+ target/i386/kvm.c                                  |  81 ++--
+ target/mips/kvm.c                                  |  12 -
+ target/ppc/kvm.c                                   |  10 -
+ target/s390x/kvm.c                                 |  10 -
+ tcg/tcg.h                                          |   1 -
+ translate-all.c                                    |   2 +-
+ translate-common.c                                 |  13 +-
+ util/compatfd.c                                    |   1 -
+ util/main-loop.c                                   |   5 +-
+ util/oslib-posix.c                                 |  33 ++
+ vl.c                                               |  12 +-
+ 44 files changed, 960 insertions(+), 806 deletions(-)
+ delete mode 100644 include/qemu/compatfd.h
+ create mode 100644 linux-headers/asm-arm/unistd-common.h
+ create mode 100644 linux-headers/asm-arm/unistd-eabi.h
+ create mode 100644 linux-headers/asm-arm/unistd-oabi.h
 -- 
-2.7.4
+1.8.3.1
