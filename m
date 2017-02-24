@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1chBSV-0001vh-1z
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 03:42:36 -0500
+	(envelope-from <mprivozn@redhat.com>) id 1chBob-0002Ib-1k
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:05:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1chBSR-0002yC-Vm
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 03:42:35 -0500
-Received: from mx4-phx2.redhat.com ([209.132.183.25]:35260)
+	(envelope-from <mprivozn@redhat.com>) id 1chBoX-0000Zx-T2
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:05:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57478)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1chBSR-0002xj-NL
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 03:42:31 -0500
-Date: Fri, 24 Feb 2017 03:42:29 -0500 (EST)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <627376359.26348799.1487925749952.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20170224071001.GE10022@pxdev.xzpeter.org>
-References: <1487910561-17825-1-git-send-email-peterx@redhat.com>
-	<153715427.26269614.1487912853628.JavaMail.zimbra@redhat.com>
-	<20170224055005.GC10022@pxdev.xzpeter.org>
-	<750665985.26278283.1487918110693.JavaMail.zimbra@redhat.com>
-	<20170224071001.GE10022@pxdev.xzpeter.org>
+	(Exim 4.71) (envelope-from <mprivozn@redhat.com>) id 1chBoX-0000Zh-LD
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:05:21 -0500
+References: <20170223105922.22989-1-berrange@redhat.com>
+	<57a2a646-cce2-2b65-bce5-793ffaa1ec9b@redhat.com>
+	<20170223120720.GM10047@redhat.com>
+From: Michal Privoznik <mprivozn@redhat.com>
+Message-ID: <bbca2b55-aeba-8e46-cdfc-2552af587c47@redhat.com>
+Date: Fri, 24 Feb 2017 10:05:17 +0100
 MIME-Version: 1.0
+In-Reply-To: <20170223120720.GM10047@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] intel_iommu: check misordered init when
- realize
+Subject: Re: [Qemu-devel] [PATCH] os: don't corrupt pre-existing
+ memory-backend data with prealloc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,118 +29,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, yi l liu <yi.l.liu@intel.com>, "\\ Michael S . Tsirkin \"; \"Alex Williamson\"; \"Marcel Apfelbaum\";
-	\"Jintack Lim" <marcel@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Jitendra Kolhe <jitendra.kolhe@hpe.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+
+On 02/23/2017 01:07 PM, Daniel P. Berrange wrote:
+> On Thu, Feb 23, 2017 at 01:05:33PM +0100, Michal Privoznik wrote:
+>> On 02/23/2017 11:59 AM, Daniel P. Berrange wrote:
+>>> When using a memory-backend object with prealloc turned on, QEMU
+>>> will memset() the first byte in every memory page to zero. While
+>>> this might have been acceptable for memory backends associated
+>>> with RAM, this corrupts application data for NVDIMMs.
+>>>
+>>> Instead of setting every page to zero, read the current byte
+>>> value and then just write that same value back, so we are not
+>>> corrupting the original data.
+>>>
+>>> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+>>> ---
+>>>
+>>> I'm unclear if this is actually still safe in practice ? Is the
+>>> compiler permitted to optimize away the read+write since it doesn't
+>>> change the memory value. I'd hope not, but I've been surprised
+>>> before...
+>>>
+>>> IMHO this is another factor in favour of requesting an API from
+>>> the kernel to provide the prealloc behaviour we want.
+>>>
+>>>  util/oslib-posix.c | 3 ++-
+>>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+>>> index 35012b9..8f5b656 100644
+>>> --- a/util/oslib-posix.c
+>>> +++ b/util/oslib-posix.c
+>>> @@ -355,7 +355,8 @@ void os_mem_prealloc(int fd, char *area, size_t memory, Error **errp)
+>>>  
+>>>          /* MAP_POPULATE silently ignores failures */
+>>>          for (i = 0; i < numpages; i++) {
+>>> -            memset(area + (hpagesize * i), 0, 1);
+>>> +            char val = *(area + (hpagesize * i));
+>>> +            memset(area + (hpagesize * i), 0, val);
+>>
+>> I think you wanted:
+>>
+>> memset(area + (hpagesize * i), val, 1);
+>>
+>> because what you are suggesting will overwrite even more than the first
+>> byte with zeroes.
+> 
+> Lol, yes, I'm stupid.
+> 
+> Anyway, rather than repost this yet, I'm interested if this is actually
+> the right way to fix the problem or if we should do something totally
+> different....
+
+So, I've done some analysis and if the optimizations are enabled, this
+whole body is optimized away. Not the loop though. Here's what I've tested:
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int main(int argc, char *argv[])
+{
+    int ret = EXIT_FAILURE;
+    unsigned char *ptr;
+    size_t i, j;
+
+    if (!(ptr = malloc(1024 * 4))) {
+        perror("malloc");
+        goto cleanup;
+    }
+
+    for (i = 0; i < 4; i++) {
+        unsigned char val = ptr[i*1024];
+        memset(ptr + i * 1024, val, 1);
+    }
+
+    ret = EXIT_SUCCESS;
+ cleanup:
+    free(ptr);
+    return ret;
+}
 
 
-> On Fri, Feb 24, 2017 at 01:35:10AM -0500, Pankaj Gupta wrote:
-> > 
-> > > 
-> > > On Fri, Feb 24, 2017 at 12:07:33AM -0500, Pankaj Gupta wrote:
-> > > > Hello Peter,
-> > > 
-> > > Hi, Pankaj!
-> > > 
-> > > > 
-> > > > This solution looks to check dependency of 'vfio-pci' over
-> > > > 'intel-iommu'
-> > > > before 'intel-iommu' is not initialized.
-> > > > 
-> > > > Overall it looks good to me, just a small nit below.
-> > > >  
-> > > > > 
-> > > > > Intel vIOMMU devices are created with "-device" parameter, while here
-> > > > > actually we need to make sure the dmar device be created before other
-> > > > > PCI devices (like vfio-pci) so that we know iommu_fn will be setup
-> > > > > correctly before realizations of those PCI devices (it is sensible
-> > > > > that
-> > > > > PCI device fetch these info during its realization). Now this
-> > > > > ordering
-> > > > > yet cannot be achieved elsewhere, and devices will be created in the
-> > > > > order that user specified. That might be dangerous.
-> > > > > 
-> > > > > Here we add one more function to detect this kind of misordering
-> > > > > issue,
-> > > > > then report to guest. Currently, the only known device that is
-> > > > > affected
-> > > > > by this VT-d defect is the vfio-pci typed devices. So for now we just
-> > > > > check against it to make sure we are safe.
-> > > > > 
-> > > > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > > > ---
-> > > > >  hw/i386/intel_iommu.c | 22 ++++++++++++++++++++++
-> > > > >  1 file changed, 22 insertions(+)
-> > > > > 
-> > > > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > > > > index 22d8226..b723ece 100644
-> > > > > --- a/hw/i386/intel_iommu.c
-> > > > > +++ b/hw/i386/intel_iommu.c
-> > > > > @@ -2560,6 +2560,24 @@ static bool vtd_decide_config(IntelIOMMUState
-> > > > > *s,
-> > > > > Error **errp)
-> > > > >      return true;
-> > > > >  }
-> > > > >  
-> > > > > +/*
-> > > > > + * TODO: we should have a better way to achieve the ordering rather
-> > > > > + * than this misorder check explicitly against vfio-pci. After all,
-> > > > > no
-> > > > > + * one should be blamed for this, and vfio-pci did nothing wrong.
-> > > > > + */
-> > > > > +static bool vtd_detected_misorder_init(Error **errp)
-> > > > > +{
-> > > > > +    Object *dev = object_resolve_path_type("", "vfio-pci", NULL);
-> > > > > +
-> > > > > +    if (dev) {
-> > > > > +        error_setg(errp, "Please specify \"intel-iommu\" before all
-> > > > > the
-> > > > > rest
-> > > > 
-> > > >             "before all the rest" does not give much clue to user. Do
-> > > >             you
-> > > >             think better
-> > > >             error message would help? just a thought.
-> > > 
-> > > Yes this is my intention to emphasize that we should possibly put
-> > > intel-iommu even before all the PCI devices. As mentioned above (and
-> > > also in the commit message), although vfio-pci is the only one that is
-> > > affected by this, we should probably put intel-iommu even before all
-> > > the rest of PCI devices. E.g., in the future we can have new devices
-> > > that need this dependency as well (that vt-d being inited before that
-> > > device), which is still legal imho.
-> > 
-> > yes, something like this can help "intel-iommu should be specified as first
-> > device"?
-> 
-> I can switch this description if you prefer this one. :) Not sure
-> whether this can be touched up during merge if this patch is good for
-> 2.9, or I'll just repost with yours if there is further comments.
+But if I make @val volatile, I can enforce the compiler to include the
+body of the loop and actually read and write some bytes. BTW: if I
+replace memset with *(ptr + i * 1024) = val; and don't make @val
+volatile even the loop is optimized away.
 
-Sure.
-> 
-> > Or we can just check for "intel-iommu" as first device at the start in
-> > place of
-> > checking for "vfio-pci". This will also help us to check for all other
-> > devices.
-> 
-> Actually your suggestion is just what I did in version 1. The problem
-> is that, it's not easy to let vt-d really be the first device to be
-> inited... Please check pc_q35_init(), within that we have:
-> 
->     pc_vga_init(isa_bus, host_bus);
->     pc_nic_init(isa_bus, host_bus);
-> 
-> These are integrated devices along with ICH9. Such devices are
-> possibly pci devices as well, but they are created much earlier than
-> vt-d device, since that's still during machine init.
+I was compiling with:
 
-o.k. 
+gcc -S -O3 -o test.S test.c
 
-Thanks,
-Pankaj
-> 
-> Thanks,
-> 
-> -- peterx
-> 
+Michal
