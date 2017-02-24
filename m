@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1chDw5-00077I-54
+	(envelope-from <alex.bennee@linaro.org>) id 1chDw5-00077Q-9T
 	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:21:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1chDw1-00006A-4u
+	(envelope-from <alex.bennee@linaro.org>) id 1chDw4-00008z-28
 	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:21:17 -0500
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:36495)
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:32857)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1chDw0-00005K-Tg
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:21:13 -0500
-Received: by mail-wm0-x22e.google.com with SMTP id v77so11952870wmv.1
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 03:21:12 -0800 (PST)
+	id 1chDw3-00008S-Rs
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:21:15 -0500
+Received: by mail-wr0-x22d.google.com with SMTP id u47so11053788wrb.0
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 03:21:15 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 24 Feb 2017 11:20:45 +0000
-Message-Id: <20170224112109.3147-1-alex.bennee@linaro.org>
+Date: Fri, 24 Feb 2017 11:20:49 +0000
+Message-Id: <20170224112109.3147-5-alex.bennee@linaro.org>
+In-Reply-To: <20170224112109.3147-1-alex.bennee@linaro.org>
+References: <20170224112109.3147-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 00/24] MTTCG Base enabling patches with ARM
- enablement
+Subject: [Qemu-devel] [PULL 04/24] tcg: move TCG_MO/BAR types into own file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,100 +30,109 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
 
-The following changes since commit 2d896b454a0e19ec4c1ddbb0e0b65b7e54fcedf3:
+We'll be using the memory ordering definitions to define values for
+both the host and guest. To avoid fighting with circular header
+dependencies just move these types into their own minimal header.
 
-  Revert "hw/mips: MIPS Boston board support" (2017-02-23 18:04:45 +0000)
-
-are available in the git repository at:
-
-  https://github.com/stsquad/qemu.git tags/pull-mttcg-240217-1
-
-for you to fetch changes up to ca759f9e387db87e1719911f019bc60c74be9ed8:
-
-  tcg: enable MTTCG by default for ARM on x86 hosts (2017-02-24 10:32:46 +0000)
-
-----------------------------------------------------------------
-This is the MTTCG pull-request as posted yesterday.
-
-----------------------------------------------------------------
-Alex Bennée (18):
-      docs: new design document multi-thread-tcg.txt
-      tcg: move TCG_MO/BAR types into own file
-      tcg: add kick timer for single-threaded vCPU emulation
-      tcg: rename tcg_current_cpu to tcg_current_rr_cpu
-      tcg: remove global exit_request
-      tcg: enable tb_lock() for SoftMMU
-      tcg: enable thread-per-vCPU
-      cputlb: add assert_cpu_is_self checks
-      cputlb: tweak qemu_ram_addr_from_host_nofail reporting
-      cputlb and arm/sparc targets: convert mmuidx flushes from varg to bitmap
-      cputlb: add tlb_flush_by_mmuidx async routines
-      cputlb: atomically update tlb fields used by tlb_reset_dirty
-      cputlb: introduce tlb_flush_*_all_cpus[_synced]
-      target-arm/powerctl: defer cpu reset work to CPU context
-      target-arm: don't generate WFE/YIELD calls for MTTCG
-      target-arm: ensure all cross vCPUs TLB flushes complete
-      hw/misc/imx6_src: defer clearing of SRC_SCR reset bits
-      tcg: enable MTTCG by default for ARM on x86 hosts
-
-Jan Kiszka (1):
-      tcg: drop global lock during TCG code execution
-
-KONRAD Frederic (2):
-      tcg: add options for enabling MTTCG
-      cputlb: introduce tlb_flush_* async work.
-
-Pranith Kumar (3):
-      mttcg: translate-all: Enable locking debug in a debug build
-      mttcg: Add missing tb_lock/unlock() in cpu_exec_step()
-      tcg: handle EXCP_ATOMIC exception for system emulation
-
- configure                  |   6 +
- cpu-exec-common.c          |   3 -
- cpu-exec.c                 |  89 ++++++---
- cpus.c                     | 345 ++++++++++++++++++++++++++-------
- cputlb.c                   | 463 +++++++++++++++++++++++++++++++++++++--------
- docs/multi-thread-tcg.txt  | 350 ++++++++++++++++++++++++++++++++++
- exec.c                     |  12 +-
- hw/core/irq.c              |   1 +
- hw/i386/kvmvapic.c         |   4 +-
- hw/intc/arm_gicv3_cpuif.c  |   3 +
- hw/misc/imx6_src.c         |  58 +++++-
- hw/ppc/ppc.c               |  16 +-
- hw/ppc/spapr.c             |   3 +
- include/exec/cputlb.h      |   2 -
- include/exec/exec-all.h    | 132 +++++++++++--
- include/qom/cpu.h          |  16 ++
- include/sysemu/cpus.h      |   2 +
- memory.c                   |   2 +
- qemu-options.hx            |  20 ++
- qom/cpu.c                  |  10 +
- target/arm/arm-powerctl.c  | 202 +++++++++++++-------
- target/arm/arm-powerctl.h  |   2 +
- target/arm/cpu.c           |   4 +-
- target/arm/cpu.h           |  18 +-
- target/arm/helper.c        | 219 ++++++++++-----------
- target/arm/kvm.c           |   7 +-
- target/arm/machine.c       |  41 +++-
- target/arm/op_helper.c     |  50 ++++-
- target/arm/psci.c          |   4 +-
- target/arm/translate-a64.c |   8 +-
- target/arm/translate.c     |  20 +-
- target/i386/smm_helper.c   |   7 +
- target/s390x/misc_helper.c |   5 +-
- target/sparc/ldst_helper.c |   8 +-
- tcg/i386/tcg-target.h      |  11 ++
- tcg/tcg-mo.h               |  48 +++++
- tcg/tcg.h                  |  27 +--
- translate-all.c            |  66 ++-----
- translate-common.c         |  21 +-
- vl.c                       |  49 ++++-
- 40 files changed, 1878 insertions(+), 476 deletions(-)
- create mode 100644 docs/multi-thread-tcg.txt
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+---
+ tcg/tcg-mo.h | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ tcg/tcg.h    | 18 +-----------------
+ 2 files changed, 49 insertions(+), 17 deletions(-)
  create mode 100644 tcg/tcg-mo.h
 
-
+diff --git a/tcg/tcg-mo.h b/tcg/tcg-mo.h
+new file mode 100644
+index 0000000000..c2c55704e1
+--- /dev/null
++++ b/tcg/tcg-mo.h
+@@ -0,0 +1,48 @@
++/*
++ * Tiny Code Generator for QEMU
++ *
++ * Copyright (c) 2008 Fabrice Bellard
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#ifndef TCG_MO_H
++#define TCG_MO_H
++
++typedef enum {
++    /* Used to indicate the type of accesses on which ordering
++       is to be ensured.  Modeled after SPARC barriers.
++
++       This is of the form TCG_MO_A_B where A is before B in program order.
++    */
++    TCG_MO_LD_LD  = 0x01,
++    TCG_MO_ST_LD  = 0x02,
++    TCG_MO_LD_ST  = 0x04,
++    TCG_MO_ST_ST  = 0x08,
++    TCG_MO_ALL    = 0x0F,  /* OR of the above */
++
++    /* Used to indicate the kind of ordering which is to be ensured by the
++       instruction.  These types are derived from x86/aarch64 instructions.
++       It should be noted that these are different from C11 semantics.  */
++    TCG_BAR_LDAQ  = 0x10,  /* Following ops will not come forward */
++    TCG_BAR_STRL  = 0x20,  /* Previous ops will not be delayed */
++    TCG_BAR_SC    = 0x30,  /* No ops cross barrier; OR of the above */
++} TCGBar;
++
++#endif /* TCG_MO_H */
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 631c6f69b1..f946452049 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -29,6 +29,7 @@
+ #include "cpu.h"
+ #include "exec/tb-context.h"
+ #include "qemu/bitops.h"
++#include "tcg-mo.h"
+ #include "tcg-target.h"
+ 
+ /* XXX: make safe guess about sizes */
+@@ -498,23 +499,6 @@ static inline intptr_t QEMU_ARTIFICIAL GET_TCGV_PTR(TCGv_ptr t)
+ #define TCG_CALL_DUMMY_TCGV     MAKE_TCGV_I32(-1)
+ #define TCG_CALL_DUMMY_ARG      ((TCGArg)(-1))
+ 
+-typedef enum {
+-    /* Used to indicate the type of accesses on which ordering
+-       is to be ensured.  Modeled after SPARC barriers.  */
+-    TCG_MO_LD_LD  = 0x01,
+-    TCG_MO_ST_LD  = 0x02,
+-    TCG_MO_LD_ST  = 0x04,
+-    TCG_MO_ST_ST  = 0x08,
+-    TCG_MO_ALL    = 0x0F,  /* OR of the above */
+-
+-    /* Used to indicate the kind of ordering which is to be ensured by the
+-       instruction.  These types are derived from x86/aarch64 instructions.
+-       It should be noted that these are different from C11 semantics.  */
+-    TCG_BAR_LDAQ  = 0x10,  /* Following ops will not come forward */
+-    TCG_BAR_STRL  = 0x20,  /* Previous ops will not be delayed */
+-    TCG_BAR_SC    = 0x30,  /* No ops cross barrier; OR of the above */
+-} TCGBar;
+-
+ /* Conditions.  Note that these are laid out for easy manipulation by
+    the functions below:
+      bit 0 is used for inverting;
 -- 
 2.11.0
