@@ -1,26 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1chPGt-0003gy-Vb
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 18:27:33 -0500
+	(envelope-from <ashmit602@gmail.com>) id 1chPJh-0004jN-GM
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 18:30:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1chPGo-0002Kp-MS
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 18:27:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55036)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1chPGo-0002KU-Ce
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 18:27:26 -0500
-Date: Fri, 24 Feb 2017 16:27:24 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170224162724.6dd2eb0e@t450s.home>
-In-Reply-To: <20170217082939.33208-12-bjsdjshi@linux.vnet.ibm.com>
-References: <20170217082939.33208-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170217082939.33208-12-bjsdjshi@linux.vnet.ibm.com>
+	(envelope-from <ashmit602@gmail.com>) id 1chPJf-0004Mu-Os
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 18:30:25 -0500
+Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:34867)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ashmit602@gmail.com>) id 1chPJf-0004Mi-JG
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 18:30:23 -0500
+Received: by mail-io0-x241.google.com with SMTP id v13so517253iov.2
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 15:30:23 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC v3 11/15] vfio: ccw: realize
- VFIO_DEVICE_G(S)ET_IRQ_INFO ioctls
+In-Reply-To: <20170224091916.GD3702@redhat.com>
+References: <20170217214215.GK19045@localhost.localdomain>
+	<F23F188C-DAF9-49EA-9C0E-54F57945267A@veritas.com>
+	<20170220110235.GD21255@stefanha-x1.localdomain>
+	<CAAo6VWNwHbsQRxU18dNCjWaNfNrZNAV9FfOKW8=JeZCND2vHnQ@mail.gmail.com>
+	<20170221105918.GA22731@stefanha-x1.localdomain>
+	<20170221113353.GC17041@redhat.com>
+	<20170222140920.GA10201@stefanha-x1.localdomain>
+	<20170222142230.GR28937@redhat.com>
+	<20170222144407.GS19045@localhost.localdomain>
+	<CAAo6VWPWjRTE3t9myt7Q6gTnZcvP72ypTE03PCFfJkvb2UWLTA@mail.gmail.com>
+	<20170224091916.GD3702@redhat.com>
+From: ashish mittal <ashmit602@gmail.com>
+Date: Fri, 24 Feb 2017 15:30:21 -0800
+Message-ID: <CAAo6VWPyQrjSp2qjvxqXRPS8=5N85i0-DJdkWhiGaXmND_8+qA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
+ block device type called "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,247 +38,280 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, wkywang@linux.vnet.ibm.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
 
-On Fri, 17 Feb 2017 09:29:35 +0100
-Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+Thanks!
 
-> Realize VFIO_DEVICE_GET_IRQ_INFO ioctl to retrieve
-> VFIO_CCW_IO_IRQ information.
-> 
-> Realize VFIO_DEVICE_SET_IRQS ioctl to set an eventfd fd for
-> VFIO_CCW_IO_IRQ. Once a write operation to the ccw_io_region
-> was performed, trigger a signal on this fd.
-> 
-> Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
-> ---
->  drivers/s390/cio/vfio_ccw_ops.c     | 123 +++++++++++++++++++++++++++++++++++-
->  drivers/s390/cio/vfio_ccw_private.h |   4 ++
->  include/uapi/linux/vfio.h           |  10 ++-
->  3 files changed, 134 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw_ops.c
-> index 125818c..ebc38fb 100644
-> --- a/drivers/s390/cio/vfio_ccw_ops.c
-> +++ b/drivers/s390/cio/vfio_ccw_ops.c
-> @@ -202,6 +202,9 @@ static ssize_t vfio_ccw_mdev_write(struct mdev_device *mdev,
->  	if (region->ret_code != 0)
->  		return region->ret_code;
->  
-> +	if (private->io_trigger)
-> +		eventfd_signal(private->io_trigger, 1);
-> +
->  	return count;
->  }
->  
-> @@ -209,7 +212,7 @@ static int vfio_ccw_mdev_get_device_info(struct vfio_device_info *info)
->  {
->  	info->flags = VFIO_DEVICE_FLAGS_CCW | VFIO_DEVICE_FLAGS_RESET;
->  	info->num_regions = VFIO_CCW_NUM_REGIONS;
-> -	info->num_irqs = 0;
-> +	info->num_irqs = VFIO_CCW_NUM_IRQS;
->  
->  	return 0;
->  }
-> @@ -230,6 +233,83 @@ static int vfio_ccw_mdev_get_region_info(struct vfio_region_info *info,
->  	}
->  }
->  
-> +int vfio_ccw_mdev_get_irq_info(struct vfio_irq_info *info)
-> +{
-> +	if (info->index != VFIO_CCW_IO_IRQ_INDEX)
-> +		return -EINVAL;
-> +
-> +	info->count = 1;
-> +	info->flags = VFIO_IRQ_INFO_EVENTFD | VFIO_IRQ_INFO_NORESIZE;
+I hope the following is in line with what you suggested -
 
-I tend to think that NORESIZE isn't relevant when count is one.  We
-don't expose this flag on vfio-pci for INTx where there's only a single
-interrupt.  I don't really see how it applies, it's really trying to
-indicate if there are multiple sub-indexes within an index, if some are
-enabled, we cannot enable others without first disabling them all.
-Thus we can't resize the number of enabled sub-indexes.  There really
-are no sub-indexes when count is one.  Thanks,
+We will error out in case either of username, secret-id, or password
+are missing.
 
-Alex
+Good case, passing password via a file -
+$ ./qemu-io --trace enable=vxhs* --object
+secret,id=xvxhspasswd,file=/tmp/some/file/path  -c 'read 66000 128k'
+'json:{"server.host": "127.0.0.1", "server.port": "9999", "vdisk-id":
+"/test.raw", "driver": "vxhs", "user": "ashish",  "password-secret":
+"xvxhspasswd"}'
+1132@1487977829.151064:vxhs_open_vdiskid Opening vdisk-id /test.raw
 
-> +
-> +	return 0;
-> +}
-> +
-> +static int vfio_ccw_mdev_set_irqs(struct mdev_device *mdev,
-> +				  uint32_t flags,
-> +				  void __user *data)
-> +{
-> +	struct vfio_ccw_private *private;
-> +	struct eventfd_ctx **ctx;
-> +
-> +	if (!(flags & VFIO_IRQ_SET_ACTION_TRIGGER))
-> +		return -EINVAL;
-> +
-> +	private = dev_get_drvdata(mdev_parent_dev(mdev));
-> +	if (!private)
-> +		return -ENODEV;
-> +
-> +	ctx = &private->io_trigger;
-> +
-> +	switch (flags & VFIO_IRQ_SET_DATA_TYPE_MASK) {
-> +	case VFIO_IRQ_SET_DATA_NONE:
-> +	{
-> +		if (*ctx)
-> +			eventfd_signal(*ctx, 1);
-> +		return 0;
-> +	}
-> +	case VFIO_IRQ_SET_DATA_BOOL:
-> +	{
-> +		uint8_t trigger;
-> +
-> +		if (get_user(trigger, (uint8_t __user *)data))
-> +			return -EFAULT;
-> +
-> +		if (trigger && *ctx)
-> +			eventfd_signal(*ctx, 1);
-> +		return 0;
-> +	}
-> +	case VFIO_IRQ_SET_DATA_EVENTFD:
-> +	{
-> +		int32_t fd;
-> +
-> +		if (get_user(fd, (int32_t __user *)data))
-> +			return -EFAULT;
-> +
-> +		if (fd == -1) {
-> +			if (*ctx)
-> +				eventfd_ctx_put(*ctx);
-> +			*ctx = NULL;
-> +		} else if (fd >= 0) {
-> +			struct eventfd_ctx *efdctx;
-> +
-> +			efdctx = eventfd_ctx_fdget(fd);
-> +			if (IS_ERR(efdctx))
-> +				return PTR_ERR(efdctx);
-> +
-> +			if (*ctx)
-> +				eventfd_ctx_put(*ctx);
-> +
-> +			*ctx = efdctx;
-> +		} else
-> +			return -EINVAL;
-> +
-> +		return 0;
-> +	}
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +}
-> +
->  static ssize_t vfio_ccw_mdev_ioctl(struct mdev_device *mdev,
->  				   unsigned int cmd,
->  				   unsigned long arg)
-> @@ -277,6 +357,47 @@ static ssize_t vfio_ccw_mdev_ioctl(struct mdev_device *mdev,
->  
->  		return copy_to_user((void __user *)arg, &info, minsz);
->  	}
-> +	case VFIO_DEVICE_GET_IRQ_INFO:
-> +	{
-> +		struct vfio_irq_info info;
-> +
-> +		minsz = offsetofend(struct vfio_irq_info, count);
-> +
-> +		if (copy_from_user(&info, (void __user *)arg, minsz))
-> +			return -EFAULT;
-> +
-> +		if (info.argsz < minsz || info.index >= VFIO_CCW_NUM_IRQS)
-> +			return -EINVAL;
-> +
-> +		ret = vfio_ccw_mdev_get_irq_info(&info);
-> +		if (ret)
-> +			return ret;
-> +
-> +		if (info.count == -1)
-> +			return -EINVAL;
-> +
-> +		return copy_to_user((void __user *)arg, &info, minsz);
-> +	}
-> +	case VFIO_DEVICE_SET_IRQS:
-> +	{
-> +		struct vfio_irq_set hdr;
-> +		size_t data_size;
-> +		void __user *data;
-> +
-> +		minsz = offsetofend(struct vfio_irq_set, count);
-> +
-> +		if (copy_from_user(&hdr, (void __user *)arg, minsz))
-> +			return -EFAULT;
-> +
-> +		ret = vfio_set_irqs_validate_and_prepare(&hdr, 1,
-> +							 VFIO_CCW_NUM_IRQS,
-> +							 &data_size);
-> +		if (ret)
-> +			return ret;
-> +
-> +		data = (void __user *)(arg + minsz);
-> +		return vfio_ccw_mdev_set_irqs(mdev, hdr.flags, data);
-> +	}
->  	case VFIO_DEVICE_RESET:
->  		return vfio_ccw_mdev_reset(mdev);
->  	default:
-> diff --git a/drivers/s390/cio/vfio_ccw_private.h b/drivers/s390/cio/vfio_ccw_private.h
-> index 79e5337..dddab52 100644
-> --- a/drivers/s390/cio/vfio_ccw_private.h
-> +++ b/drivers/s390/cio/vfio_ccw_private.h
-> @@ -11,6 +11,7 @@
->  #define _VFIO_CCW_PRIVATE_H_
->  
->  #include <linux/completion.h>
-> +#include <linux/eventfd.h>
->  #include <linux/vfio_ccw.h>
->  
->  #include "css.h"
-> @@ -29,6 +30,7 @@
->   * @cp: channel program for the current I/O operation
->   * @irb: irb info received from interrupt
->   * @scsw: scsw info
-> + * @io_trigger: eventfd ctx for signaling userspace I/O results
->   */
->  struct vfio_ccw_private {
->  	struct subchannel	*sch;
-> @@ -43,6 +45,8 @@ struct vfio_ccw_private {
->  	struct channel_program	cp;
->  	struct irb		irb;
->  	union scsw		scsw;
-> +
-> +	struct eventfd_ctx	*io_trigger;
->  } __aligned(8);
->  
->  extern int vfio_ccw_mdev_reg(struct subchannel *sch);
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 3fd70ff..ae46105 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -449,8 +449,9 @@ enum {
->  };
->  
->  /*
-> - * The vfio-ccw bus driver makes use of the following fixed region.
-> - * Unimplemented regions return a size of zero.
-> + * The vfio-ccw bus driver makes use of the following fixed region and
-> + * IRQ index mapping. Unimplemented regions return a size of zero.
-> + * Unimplemented IRQ types return a count of zero.
->   */
->  
->  enum {
-> @@ -458,6 +459,11 @@ enum {
->  	VFIO_CCW_NUM_REGIONS
->  };
->  
-> +enum {
-> +	VFIO_CCW_IO_IRQ_INDEX,
-> +	VFIO_CCW_NUM_IRQS
-> +};
-> +
->  /**
->   * VFIO_DEVICE_GET_PCI_HOT_RESET_INFO - _IORW(VFIO_TYPE, VFIO_BASE + 12,
->   *					      struct vfio_pci_hot_reset_info)
+1132@1487977829.151141:vxhs_get_creds User ashish, SecretID
+xvxhspasswd, Password Str0ngP@ssw0rd   <=== ****  NOTE WILL NOT PRINT
+PASSWORD IN FINAL CODE ****
+
+1132@1487977829.151168:vxhs_open_hostinfo Adding host 127.0.0.1:9999
+to BDRVVXHSState
+1132@1487977829.173062:vxhs_get_vdisk_stat vDisk /test.raw stat ioctl
+returned size 196616
+read 131072/131072 bytes at offset 66000
+128 KiB, 1 ops; 0.0012 sec (99.049 MiB/sec and 792.3930 ops/sec)
+1132@1487977829.175141:vxhs_close Closing vdisk /test.raw
+
+
+Bad case, missing user -
+$ ./qemu-io --trace enable=vxhs* --object
+secret,id=xvxhspasswd,data=/tmp/some/file/path  -c 'read 66000 128k'
+'json:{"server.host": "127.0.0.1", "server.port": "9999", "vdisk-id":
+"/test.raw", "driver": "vxhs"}'
+1310@1487978547.771234:vxhs_open_vdiskid Opening vdisk-id /test.raw
+can't open device json:{"server.host": "127.0.0.1", "server.port":
+"9999", "vdisk-id": "/test.raw", "driver": "vxhs"}: please specify the
+user for authenticating to target
+
+diff --git a/block/vxhs.c b/block/vxhs.c
+index 4f0633e..9b60ddf 100644
+--- a/block/vxhs.c
++++ b/block/vxhs.c
+@@ -17,12 +17,16 @@
+ #include "qemu/uri.h"
+ #include "qapi/error.h"
+ #include "qemu/uuid.h"
++#include "crypto/secret.h"
+
+ #define VXHS_OPT_FILENAME           "filename"
+ #define VXHS_OPT_VDISK_ID           "vdisk-id"
+ #define VXHS_OPT_SERVER             "server"
+ #define VXHS_OPT_HOST               "host"
+ #define VXHS_OPT_PORT               "port"
++#define VXHS_OPT_USER               "user"
++#define VXHS_OPT_PASSWORD           "password"
++#define VXHS_OPT_SECRETID           "password-secret"
+ #define VXHS_UUID_DEF "12345678-1234-1234-1234-123456789012"
+
+ QemuUUID qemu_uuid __attribute__ ((weak));
+@@ -136,6 +140,22 @@ static QemuOptsList runtime_opts = {
+             .type = QEMU_OPT_STRING,
+             .help = "UUID of the VxHS vdisk",
+         },
++        {
++            .name = VXHS_OPT_USER,
++            .type = QEMU_OPT_STRING,
++            .help = "username for authentication to target",
++        },
++        {
++            .name = VXHS_OPT_PASSWORD,
++            .type = QEMU_OPT_STRING,
++            .help = "password for authentication to target",
++        },
++        {
++            .name = VXHS_OPT_SECRETID,
++            .type = QEMU_OPT_STRING,
++            .help = "ID of the secret providing password for"
++                    "authentication to target",
++        },
+         { /* end of list */ }
+     },
+ };
+@@ -257,6 +277,9 @@ static int vxhs_open(BlockDriverState *bs, QDict *options,
+     const char *server_host_opt;
+     char *str = NULL;
+     int ret = 0;
++    const char *user = NULL;
++    const char *secretid = NULL;
++    const char *password = NULL;
+
+     ret = vxhs_init_and_ref();
+     if (ret < 0) {
+@@ -320,6 +343,35 @@ static int vxhs_open(BlockDriverState *bs, QDict *options,
+         goto out;
+     }
+
++    /* check if we got username and secretid via the options */
++    user = qemu_opt_get(opts, VXHS_OPT_USER);
++    if (!user) {
++        error_setg(&local_err, "please specify the user for authenticating to "
++                   "target");
++        qdict_del(backing_options, str);
++        ret = -EINVAL;
++        goto out;
++    }
++
++    secretid = qemu_opt_get(opts, VXHS_OPT_SECRETID);
++    if (!secretid) {
++        error_setg(&local_err, "please specify the ID of the secret to be "
++                   "used for authenticating to target");
++        qdict_del(backing_options, str);
++        ret = -EINVAL;
++        goto out;
++    }
++
++    /* check if we got password via the --object argument */
++    password = qcrypto_secret_lookup_as_utf8(secretid, &local_err);
++    if (local_err != NULL) {
++        trace_vxhs_get_creds(user, secretid, password);
++        qdict_del(backing_options, str);
++        ret = -EINVAL;
++        goto out;
++    }
++    trace_vxhs_get_creds(user, secretid, password);
++
+     s->vdisk_hostinfo.host = g_strdup(server_host_opt);
+
+     s->vdisk_hostinfo.port = g_ascii_strtoll(qemu_opt_get(tcp_opts,
+
+Regards,
+Ashish
+
+
+On Fri, Feb 24, 2017 at 1:19 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
+> On Thu, Feb 23, 2017 at 08:19:29PM -0800, ashish mittal wrote:
+>> Hi,
+>>
+>> Just want to check if the following mechanism for accepting the secret
+>> password looks OK?
+>>
+>> We have yet to internally discuss the semantics of how we plan to use
+>> the user-ID/password for authentication. This diff is just to
+>> understand how I am expected to accept the secret from the command
+>> line.
+>>
+>> Example specifying the username and password:
+>>
+>> $ ./qemu-io --trace enable=vxhs* --object
+>> secret,id=ashish,data=asd888d989s  -c 'read 66000 128k'
+>> 'json:{"server.host": "127.0.0.1", "server.port": "9999", "vdisk-id":
+>> "/test.raw", "driver": "vxhs", "user": "ashish"}'
+>> 17396@1487908905.546890:vxhs_open_vdiskid Opening vdisk-id /test.raw
+>> 17396@1487908905.546969:vxhs_get_creds SecretID ashish, Password
+>> asd888d989s   <==== NOTE!!!!!
+>> 17396@1487908905.546994:vxhs_open_hostinfo Adding host 127.0.0.1:9999
+>> to BDRVVXHSState
+>> 17396@1487908905.568370:vxhs_get_vdisk_stat vDisk /test.raw stat ioctl
+>> returned size 196616
+>> read 131072/131072 bytes at offset 66000
+>> 128 KiB, 1 ops; 0.0017 sec (72.844 MiB/sec and 582.7506 ops/sec)
+>> 17396@1487908905.570917:vxhs_close Closing vdisk /test.raw
+>> [root@rhel72ga-build-upstream qemu] 2017-02-23 20:01:45$
+>>
+>> Example where username and password are missing:
+>>
+>> [root@rhel72ga-build-upstream qemu] 2017-02-23 19:30:16$ ./qemu-io
+>> --trace enable=vxhs* -c 'read 66000 128k' 'json:{"server.host":
+>> "127.0.0.1", "server.port": "9999", "vdisk-id": "/test.raw", "driver":
+>> "vxhs"}'
+>> 16120@1487907025.251167:vxhs_open_vdiskid Opening vdisk-id /test.raw
+>> 16120@1487907025.251245:vxhs_get_creds SecretID user, Password (null)
+>> can't open device json:{"server.host": "127.0.0.1", "server.port":
+>> "9999", "vdisk-id": "/test.raw", "driver": "vxhs"}: No secret with id
+>> 'user'      <==== NOTE!!!!!
+>> [root@rhel72ga-build-upstream qemu] 2017-02-23 19:30:25$
+>
+> It is close but not quite correct approach. You're overloading a
+> single property to provide two different things - the username
+> and as a key to lookup the password secret - you want different
+> properties.
+>
+>
+> The 'secret' object only needs to be used for data that must be
+> kept private. By convention the block drivers try to use a property
+> 'password-secret' to reference the ID of the secret object.
+>
+> So, as an example, if you had a username "fred" and passwd "letmein"
+> then a suitable syntax would be
+>
+>  $ ./qemu-io \
+>     --object secret,id=vxhspasswd,data=letmein
+>     -c 'read 66000 128k'
+>     'json:{"server.host": "127.0.0.1", "server.port": "9999",
+>            "vdisk-id": "/test.raw", "driver": "vxhs",
+>            "user": "fred", "password-secret": "xvxhspasswd"}'
+>
+> (obviously in real world, we'd not send across the password
+> in clear text in the data= parameter of the secret - we'd
+> use the file= parameter instead, but its fine for dev testing.
+>
+>> diff --git a/block/vxhs.c b/block/vxhs.c
+>> index 4f0633e..f3e70ce 100644
+>> --- a/block/vxhs.c
+>> +++ b/block/vxhs.c
+>> @@ -17,6 +17,7 @@
+>>  #include "qemu/uri.h"
+>>  #include "qapi/error.h"
+>>  #include "qemu/uuid.h"
+>> +#include "crypto/secret.h"
+>>
+>>  #define VXHS_OPT_FILENAME           "filename"
+>>  #define VXHS_OPT_VDISK_ID           "vdisk-id"
+>> @@ -136,6 +137,14 @@ static QemuOptsList runtime_opts = {
+>>              .type = QEMU_OPT_STRING,
+>>              .help = "UUID of the VxHS vdisk",
+>>          },
+>> +        {
+>> +            .name = "user",
+>> +            .type = QEMU_OPT_STRING,
+>> +        },
+>> +        {
+>> +            .name = "password",
+>> +            .type = QEMU_OPT_STRING,
+>> +        },
+>>          { /* end of list */ }
+>>      },
+>>  };
+>> @@ -257,6 +266,8 @@ static int vxhs_open(BlockDriverState *bs, QDict *options,
+>>      const char *server_host_opt;
+>>      char *str = NULL;
+>>      int ret = 0;
+>> +    const char *user = NULL;
+>> +    const char *password = NULL;
+>>
+>>      ret = vxhs_init_and_ref();
+>>      if (ret < 0) {
+>> @@ -320,6 +331,23 @@ static int vxhs_open(BlockDriverState *bs, QDict *options,
+>>          goto out;
+>>      }
+>>
+>> +    /* check if we got username via the options */
+>> +    user = qemu_opt_get(opts, "user");
+>> +    if (!user) {
+>> +        //trace_vxhs_get_creds(user, password);
+>> +        user = "user";
+>
+> We should not default any login credentials - if no username was
+> provided we should simply not use any username - if the server
+> mandates a username this obviously means connection would fail
+> and that's ok.
+>
+>> +        //return;
+>> +    }
+>> +
+>> +    password = qcrypto_secret_lookup_as_utf8(user, &local_err);
+>
+> Instead of passing 'user' into this method, you need to call
+> qemu_opt_get(opts, "password-secret") and use that result
+>
+>> +    if (local_err != NULL) {
+>> +        trace_vxhs_get_creds(user, password);
+>> +        qdict_del(backing_options, str);
+>> +        ret = -EINVAL;
+>> +        goto out;
+>> +    }
+>> +    trace_vxhs_get_creds(user, password);
+>> +
+>
+> Regards,
+> Daniel
+> --
+> |: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+> |: http://libvirt.org              -o-             http://virt-manager.org :|
+> |: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
