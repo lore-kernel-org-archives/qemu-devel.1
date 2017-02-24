@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50155)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1chKR0-0006gt-JO
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:17:39 -0500
+	(envelope-from <kwolf@redhat.com>) id 1chKR2-0006js-FF
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:17:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1chKQz-0002v9-Gu
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:17:38 -0500
+	(envelope-from <kwolf@redhat.com>) id 1chKR1-0002xC-6p
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:17:40 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 24 Feb 2017 19:17:05 +0100
-Message-Id: <1487960230-18054-15-git-send-email-kwolf@redhat.com>
+Date: Fri, 24 Feb 2017 19:17:07 +0100
+Message-Id: <1487960230-18054-17-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1487960230-18054-1-git-send-email-kwolf@redhat.com>
 References: <1487960230-18054-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 14/19] block: Factor out bdrv_open_child_bs()
+Subject: [Qemu-devel] [PULL 16/19] block: Factor out bdrv_open_driver()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,96 +22,161 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-This is the part of bdrv_open_child() that opens a BDS with option
-inheritance, but doesn't attach it as a child to the parent yet.
+This is a function that doesn't do any option parsing, but just does
+some basic BlockDriverState setup and calls the .bdrv_open() function of
+the block driver.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c | 61 +++++++++++++++++++++++++++++++++++++------------------------
- 1 file changed, 37 insertions(+), 24 deletions(-)
+ block.c | 112 +++++++++++++++++++++++++++++++++++++---------------------------
+ 1 file changed, 65 insertions(+), 47 deletions(-)
 
 diff --git a/block.c b/block.c
-index 40c4dee..6987400 100644
+index 5f1e8aa..f96d26b 100644
 --- a/block.c
 +++ b/block.c
-@@ -1546,28 +1546,12 @@ free_exit:
-     return ret;
+@@ -925,6 +925,67 @@ out:
+     g_free(gen_node_name);
  }
  
--/*
-- * Opens a disk image whose options are given as BlockdevRef in another block
-- * device's options.
-- *
-- * If allow_none is true, no image will be opened if filename is false and no
-- * BlockdevRef is given. NULL will be returned, but errp remains unset.
-- *
-- * bdrev_key specifies the key for the image's BlockdevRef in the options QDict.
-- * That QDict has to be flattened; therefore, if the BlockdevRef is a QDict
-- * itself, all options starting with "${bdref_key}." are considered part of the
-- * BlockdevRef.
-- *
-- * The BlockdevRef will be removed from the options QDict.
-- */
--BdrvChild *bdrv_open_child(const char *filename,
--                           QDict *options, const char *bdref_key,
--                           BlockDriverState* parent,
--                           const BdrvChildRole *child_role,
--                           bool allow_none, Error **errp)
-+static BlockDriverState *
-+bdrv_open_child_bs(const char *filename, QDict *options, const char *bdref_key,
-+                   BlockDriverState *parent, const BdrvChildRole *child_role,
-+                   bool allow_none, Error **errp)
- {
--    BdrvChild *c = NULL;
--    BlockDriverState *bs;
-+    BlockDriverState *bs = NULL;
-     QDict *image_options;
-     char *bdref_key_dot;
-     const char *reference;
-@@ -1594,11 +1578,40 @@ BdrvChild *bdrv_open_child(const char *filename,
-         goto done;
-     }
- 
--    c = bdrv_attach_child(parent, bs, bdref_key, child_role);
--
- done:
-     qdict_del(options, bdref_key);
--    return c;
-+    return bs;
-+}
-+
-+/*
-+ * Opens a disk image whose options are given as BlockdevRef in another block
-+ * device's options.
-+ *
-+ * If allow_none is true, no image will be opened if filename is false and no
-+ * BlockdevRef is given. NULL will be returned, but errp remains unset.
-+ *
-+ * bdrev_key specifies the key for the image's BlockdevRef in the options QDict.
-+ * That QDict has to be flattened; therefore, if the BlockdevRef is a QDict
-+ * itself, all options starting with "${bdref_key}." are considered part of the
-+ * BlockdevRef.
-+ *
-+ * The BlockdevRef will be removed from the options QDict.
-+ */
-+BdrvChild *bdrv_open_child(const char *filename,
-+                           QDict *options, const char *bdref_key,
-+                           BlockDriverState *parent,
-+                           const BdrvChildRole *child_role,
-+                           bool allow_none, Error **errp)
++static int bdrv_open_driver(BlockDriverState *bs, BlockDriver *drv,
++                            const char *node_name, QDict *options,
++                            int open_flags, Error **errp)
 +{
-+    BlockDriverState *bs;
++    Error *local_err = NULL;
++    int ret;
 +
-+    bs = bdrv_open_child_bs(filename, options, bdref_key, parent, child_role,
-+                            allow_none, errp);
-+    if (bs == NULL) {
-+        return NULL;
++    bdrv_assign_node_name(bs, node_name, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return -EINVAL;
 +    }
 +
-+    return bdrv_attach_child(parent, bs, bdref_key, child_role);
- }
++    bs->drv = drv;
++    bs->opaque = g_malloc0(drv->instance_size);
++
++    if (drv->bdrv_file_open) {
++        assert(!drv->bdrv_needs_filename || bs->filename[0]);
++        ret = drv->bdrv_file_open(bs, options, open_flags, &local_err);
++    } else {
++        ret = drv->bdrv_open(bs, options, open_flags, &local_err);
++    }
++
++    if (ret < 0) {
++        if (local_err) {
++            error_propagate(errp, local_err);
++        } else if (bs->filename[0]) {
++            error_setg_errno(errp, -ret, "Could not open '%s'", bs->filename);
++        } else {
++            error_setg_errno(errp, -ret, "Could not open image");
++        }
++        goto free_and_fail;
++    }
++
++    ret = refresh_total_sectors(bs, bs->total_sectors);
++    if (ret < 0) {
++        error_setg_errno(errp, -ret, "Could not refresh total sector count");
++        goto free_and_fail;
++    }
++
++    bdrv_refresh_limits(bs, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        ret = -EINVAL;
++        goto free_and_fail;
++    }
++
++    assert(bdrv_opt_mem_align(bs) != 0);
++    assert(bdrv_min_mem_align(bs) != 0);
++    assert(is_power_of_2(bs->bl.request_alignment));
++
++    return 0;
++
++free_and_fail:
++    /* FIXME Close bs first if already opened*/
++    g_free(bs->opaque);
++    bs->opaque = NULL;
++    bs->drv = NULL;
++    return ret;
++}
++
+ QemuOptsList bdrv_runtime_opts = {
+     .name = "bdrv_common",
+     .head = QTAILQ_HEAD_INITIALIZER(bdrv_runtime_opts.head),
+@@ -1019,14 +1080,6 @@ static int bdrv_open_common(BlockDriverState *bs, BlockBackend *file,
+     trace_bdrv_open_common(bs, filename ?: "", bs->open_flags,
+                            drv->format_name);
  
- static BlockDriverState *bdrv_append_temp_snapshot(BlockDriverState *bs,
+-    node_name = qemu_opt_get(opts, "node-name");
+-    bdrv_assign_node_name(bs, node_name, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        ret = -EINVAL;
+-        goto fail_opts;
+-    }
+-
+     bs->read_only = !(bs->open_flags & BDRV_O_RDWR);
+ 
+     if (use_bdrv_whitelist && !bdrv_is_whitelisted(drv, bs->read_only)) {
+@@ -1092,54 +1145,19 @@ static int bdrv_open_common(BlockDriverState *bs, BlockBackend *file,
+     }
+     pstrcpy(bs->exact_filename, sizeof(bs->exact_filename), bs->filename);
+ 
+-    bs->drv = drv;
+-    bs->opaque = g_malloc0(drv->instance_size);
+-
+     /* Open the image, either directly or using a protocol */
+     open_flags = bdrv_open_flags(bs, bs->open_flags);
+-    if (drv->bdrv_file_open) {
+-        assert(file == NULL);
+-        assert(!drv->bdrv_needs_filename || filename != NULL);
+-        ret = drv->bdrv_file_open(bs, options, open_flags, &local_err);
+-    } else {
+-        ret = drv->bdrv_open(bs, options, open_flags, &local_err);
+-    }
+-
+-    if (ret < 0) {
+-        if (local_err) {
+-            error_propagate(errp, local_err);
+-        } else if (bs->filename[0]) {
+-            error_setg_errno(errp, -ret, "Could not open '%s'", bs->filename);
+-        } else {
+-            error_setg_errno(errp, -ret, "Could not open image");
+-        }
+-        goto free_and_fail;
+-    }
++    node_name = qemu_opt_get(opts, "node-name");
+ 
+-    ret = refresh_total_sectors(bs, bs->total_sectors);
++    assert(!drv->bdrv_file_open || file == NULL);
++    ret = bdrv_open_driver(bs, drv, node_name, options, open_flags, errp);
+     if (ret < 0) {
+-        error_setg_errno(errp, -ret, "Could not refresh total sector count");
+-        goto free_and_fail;
+-    }
+-
+-    bdrv_refresh_limits(bs, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        ret = -EINVAL;
+-        goto free_and_fail;
++        goto fail_opts;
+     }
+ 
+-    assert(bdrv_opt_mem_align(bs) != 0);
+-    assert(bdrv_min_mem_align(bs) != 0);
+-    assert(is_power_of_2(bs->bl.request_alignment));
+-
+     qemu_opts_del(opts);
+     return 0;
+ 
+-free_and_fail:
+-    g_free(bs->opaque);
+-    bs->opaque = NULL;
+-    bs->drv = NULL;
+ fail_opts:
+     qemu_opts_del(opts);
+     return ret;
 -- 
 1.8.3.1
