@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1chNSD-0001PO-Q8
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 16:31:06 -0500
+	(envelope-from <jsnow@redhat.com>) id 1chNSv-0001sw-IJ
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 16:31:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1chNS9-0003dS-Nb
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 16:31:05 -0500
-Received: from mail-ve1eur01on0115.outbound.protection.outlook.com
-	([104.47.1.115]:21856
-	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1chNS9-0003c1-51
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 16:31:01 -0500
-References: <1486041504-23627-1-git-send-email-den@openvz.org>
-	<CAJ+F1CL06FJvVrSmLE4-p208ocFoP7d-w_7mBkOmvnTrBxA5qQ@mail.gmail.com>
-	<871sunzovz.fsf@dusky.pond.sub.org>
-	<CAJ+F1CJZUW8jTnCYQ7RDsRHK3fmucRVZMr2uDm62Esjdrcn6sw@mail.gmail.com>
-	<06eccfa8-6a4e-a892-576a-ac06e61a0e2f@redhat.com>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <119846a6-561b-83a2-59fb-758bf692c967@openvz.org>
-Date: Fri, 24 Feb 2017 16:57:04 +0100
+	(envelope-from <jsnow@redhat.com>) id 1chNSr-0003uB-Gj
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 16:31:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51822)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1chNSr-0003ti-7m
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 16:31:45 -0500
+References: <9533ba99-b143-b577-0115-742119d089a4@kamp.de>
+	<9292fef8-929a-e89e-eca5-cd247ca9334b@redhat.com>
+	<f0eb7ff1-47d7-42d0-c7b5-946d2224e986@kamp.de>
+	<c207e00d-25a6-45bb-a849-235d0cd2be0d@redhat.com>
+	<2b0840d7-7540-d732-36ac-af7a512d2c8f@kamp.de>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <b59eb68b-5dac-b18b-c2f7-1ea820f4d747@redhat.com>
+Date: Fri, 24 Feb 2017 16:31:42 -0500
 MIME-Version: 1.0
-In-Reply-To: <06eccfa8-6a4e-a892-576a-ac06e61a0e2f@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] qemu-char: socket backend:
- disconnect on write error
+In-Reply-To: <2b0840d7-7540-d732-36ac-af7a512d2c8f@kamp.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Qemu and Changed Block Tracking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,39 +30,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Anton
-	Nefedov <anton.nefedov@virtuozzo.com>
+To: Peter Lieven <pl@kamp.de>, Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Christian Theune <ct@flyingcircus.io>
 
-On 02/24/2017 04:31 PM, Paolo Bonzini wrote:
->
-> On 24/02/2017 15:46, Marc-Andr=C3=A9 Lureau wrote:
->>>> +        if (ret < 0 && errno !=3D EAGAIN) {
->>>> +            if (tcp_chr_read_poll(chr) <=3D 0) {
->>>> +                tcp_chr_disconnect(chr);
->>>> +                return len;
+
+
+On 02/23/2017 09:27 AM, Peter Lieven wrote:
+> Am 22.02.2017 um 13:32 schrieb Eric Blake:
+>> On 02/22/2017 02:45 AM, Peter Lieven wrote:
+>>>> A bit outdated now, but:
+>>>> http://wiki.qemu-project.org/Features/IncrementalBackup
 >>>>
->>> This change breaks a number of assumption in vhost-user code. Until now=
-, a
->>> vhost-user function assumed that dev->vhost_ops would remain as long as=
- the
->>> function is running, so it may call vhost_ops callbacks several time, w=
-hich
->>> may eventually fail to do io, but no crash would occur. The disconnecti=
-on
->>> would be handled later with the HUP handler. Now, vhost_ops may be clea=
-red
->>> during a write (chr_disconnect -> CHR_EVENT_CLOSED in
->>> net_vhost_user_event). This can be randomly reproduced with
->>> vhost-user-test -p /x86_64/vhost-user/flags-mismatch/subprocess
-> Would it work to call tcp_chr_disconnect from an idle source (and
-> destroy the source on the next connect)?
->
-> Paolo
-I think no, but will think more on Monday. Unfortunately
-today is official holiday in Russia :(
+>>>> and also a summary I wrote not too far back (PDF):
+>>>> https://drive.google.com/file/d/0B3CFr1TuHydWalVJaEdPaE5PbFE
+>>>>
+>>>> and I'm sure the Virtuozzo developers could chime in on this subject,
+>>>> but basically we do have something similar in the works, as eblake
+>>>> says.
+>>> Hi John, Hi Erik,
+>> It's Eric, but you're not the first to make that typo :)
+>>
+>>> thanks for your feedback. Are you both the ones working primary on
+>>> this topic?
+>>> If there is anything to review or help needed, please let me know.
+>>>
+>>> My 2 cents:
+>>> I thing I had in mind if there is no image fleecing available, but
+>>> fetching the dirty bitmap
+>>> from external would be a feauture to put a write lock on a block device.
+>> The whole idea is to use a dirty bitmap coupled with image fleecing,
+>> where the point-in-time of the image fleecing is done at a window where
+>> the guest I/O is quiescent in order to get a stable fleecing point.  We
+>> already support write locks (guest quiesence) using qga to do fsfreeze.
+>> You want the time that guest I/O is frozen to be as small as possible
+>> (in particular, the Windows implementation of quiescence will fail if
+>> you hold things frozen for more than a couple of seconds).
+>>
+>> Right now, the qcow2 image format does not track write generations, and
+>> I don't think we plan on adding that directly into qcow2.  However, you
+>> can externally simulate write generations by keeping track of how many
+>> image fleecing points you have created (each fleecing point is another
+>> write generation).
+>>
+>>
+>>> In this case something like this via QMP (and external software)
+>>> should work:
+>>> ---8<---
+>>>   gen =  write generation of last backup (or 0 for full backup)
+>>>   do {
+>>>       nextgen = fetch current write generation (via QMP)
+>>>       dirtymap = send all block whose write generation is greater
+>>> than 'gen' (via QMP)
+>> No, we are NOT going to send dirty information via QMP.  Rather, we are
+>> going to send it via NBD's extension NBD_CMD_BLOCK_STATUS.  The idea is
+>> that a client connects and asks which qemu blocks are dirty, then uses
+>> that information to read only the dirty blocks.
+> 
+> I understand, that for the case of local storage connecting via NBD to
+> Qemu to grep a snapshot
+> might be a good idea, but consider that you have a NAS for your vServer
+> images. May it be NFS,
+> iSCSI, CEPH or whatever. In an enterprise scenario I would generally
+> except to have a NAS rather
+> than local storage.
+> 
+> When you are going to backup your vServer (full or incremental) you
+> shuffle all the traffic through
+> Qemu and your Node running the vServer. In this case you run all the
+> traffic over the wire twice.
+> 
+> NAS -> Node -> Qemu - > Backup Server
+> 
+> But the Backup Server could instead connect to the NAS directly avoiding
+> load on the frontent LAN
+> and the Qemu Node.
+> 
 
-Right now the code loops forever. May be we should notify the
-guest that the problem really happens.
+In a live backup I don't see how you will be removing QEMU from the data
+transfer loop. QEMU is the only process that knows what the correct view
+of the image is, and needs to facilitate.
 
-Den
+It's not safe to copy the blocks directly without QEMU's mediation.
+
+--js
+
+> I would like to find a nice solution for this scenario. If not in the
+> first step it would maybe be good to
+> have this in mind when implementing a dirty block tracking.
+> 
+> Peter
