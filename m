@@ -1,37 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36410)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1ch8pQ-0004NK-NP
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 00:54:05 -0500
+	(envelope-from <armbru@redhat.com>) id 1ch92r-0005yt-7U
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 01:07:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1ch8pN-0007Zj-Le
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 00:54:04 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47671)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1ch8pN-0007ZW-Cd
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 00:54:01 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1O5rdLA111578
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 00:54:00 -0500
-Received: from e28smtp01.in.ibm.com (e28smtp01.in.ibm.com [125.16.236.1])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28t61rknrq-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 00:53:59 -0500
-Received: from localhost
-	by e28smtp01.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Fri, 24 Feb 2017 11:23:56 +0530
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <20170224050242.GA17615@umbus.fritz.box>
-References: <1487879800-12352-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<20170224050242.GA17615@umbus.fritz.box>
-Date: Fri, 24 Feb 2017 11:23:51 +0530
+	(envelope-from <armbru@redhat.com>) id 1ch92m-00030n-7s
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 01:07:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60118)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ch92m-0002zE-1d
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 01:07:52 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1487886317-27400-1-git-send-email-armbru@redhat.com>
+	<1487886317-27400-2-git-send-email-armbru@redhat.com>
+	<12466fb1-5182-e97c-f82c-40d124fbbbcb@redhat.com>
+	<f0f8abd7-18e8-f0b2-5232-f505866590f0@redhat.com>
+Date: Fri, 24 Feb 2017 07:07:48 +0100
+In-Reply-To: <f0f8abd7-18e8-f0b2-5232-f505866590f0@redhat.com> (Eric Blake's
+	message of "Thu, 23 Feb 2017 16:50:44 -0600")
+Message-ID: <87wpcg2kaz.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Message-Id: <87poi88780.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH v4 00/15] POWER9 TCG enablements - part15
+Subject: Re: [Qemu-devel] [PATCH 01/21] qga: Fix crash on non-dictionary QMP
+ argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,30 +30,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, rth@twiddle.net, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-David Gibson <david@gibson.dropbear.id.au> writes:
+Eric Blake <eblake@redhat.com> writes:
 
-> [ Unknown signature status ]
-> On Fri, Feb 24, 2017 at 01:26:25AM +0530, Nikunj A Dadhania wrote:
->> Patches:
->> 01-06  Cleans up the XER split out variables and now the 
->>        flag bits are stored in XER at their respective places 
->> 
->> 07-14  Contains implentation of CA32 and OV32 bits added to the 
->>        ISA 3.0. Various fixed-point arithmetic instructions are 
->>        updated to take care of the newer flags.
->>  
->> 15     Finally the last patch adds new instruction mcrxrx, that helps
->>        reading the carry (CA and CA32) and the overflow (OV and OV32) flags
+> On 02/23/2017 04:46 PM, Eric Blake wrote:
+>> On 02/23/2017 03:44 PM, Markus Armbruster wrote:
+>>> The value of key 'arguments' must be a JSON object.  qemu-ga neglects
+>>> to check, and crashes.  To reproduce, send
+>>>
+>>>     { 'execute': 'guest-sync', 'arguments': [] }
+>>>
+>>> to qemu-ga.
+>>>
+>>> do_qmp_dispatch() uses qdict_get_qdict() to get the arguments.  When
+>>> not a JSON object, this gets a null pointer, which flows through the
+>>> generated marshalling function to qobject_input_visitor_new(), where
+>>> it fails the assertion.  qmp_dispatch_check_obj() needs to catch this
+>>> error.
+>>>
+>>> QEMU isn't affected, because it runs qmp_check_input_obj() first,
+>>> which basically duplicates qmp_check_input_obj()'s checks, plus the
 >
-> I've applied 1/15, I've rest the left pending correction of 2/15 and
-> discussions on the rest.
+> This sentence is weird (func A can't duplicate func A's checks; you're
+> missing a func B, but I'm not sure which instance is wrong, nor what B
+> should be).
 
-I thought of changing back to previous implementation, and posted v5 :-)
+B is qmp_dispatch_check_obj().  I'll fix it.
 
-/me needs to slow down !
+>>> missing one.
+>>>
+>>> Fix by copying the missing one from qmp_check_input_obj() to
+>>> qmp_dispatch_check_obj().
+>>>
+>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>> Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+>>> ---
+>>>  qapi/qmp-dispatch.c | 8 +++++++-
+>>>  1 file changed, 7 insertions(+), 1 deletion(-)
+>> 
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Regards,
-Nikunj
+Thanks!
