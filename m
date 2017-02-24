@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1chLCT-0000WA-Rt
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:06:42 -0500
+	(envelope-from <armbru@redhat.com>) id 1chLL2-0000UC-EW
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:15:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1chLCS-0000Ty-ON
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:06:41 -0500
+	(envelope-from <armbru@redhat.com>) id 1chLL1-0006uV-6I
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:15:32 -0500
 From: Markus Armbruster <armbru@redhat.com>
-References: <1487710908-26356-1-git-send-email-armbru@redhat.com>
-	<1487710908-26356-3-git-send-email-armbru@redhat.com>
-	<5f90e39c-e4ea-8638-d057-25eff232ad3d@redhat.com>
-	<878toxmeol.fsf@dusky.pond.sub.org>
-	<877f4g2f6m.fsf@dusky.pond.sub.org>
-	<c00ea08f-f596-6e3e-4084-7f183c92a04d@redhat.com>
-Date: Fri, 24 Feb 2017 20:06:32 +0100
-In-Reply-To: <c00ea08f-f596-6e3e-4084-7f183c92a04d@redhat.com> (Eric Blake's
-	message of "Fri, 24 Feb 2017 10:24:21 -0600")
-Message-ID: <87h93j2ytj.fsf@dusky.pond.sub.org>
+References: <87bmukmlau.fsf@dusky.pond.sub.org>
+	<87o9xr60dp.fsf@dusky.pond.sub.org>
+	<20170224163948.GG17452@redhat.com>
+	<2a42e86c-7c21-4a1b-067d-f842533593a3@redhat.com>
+Date: Fri, 24 Feb 2017 20:15:23 +0100
+In-Reply-To: <2a42e86c-7c21-4a1b-067d-f842533593a3@redhat.com> (Eric Blake's
+	message of "Fri, 24 Feb 2017 11:17:33 -0600")
+Message-ID: <87bmtr2yes.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH RFC v3 2/5] keyval: New keyval_parse()
+Subject: Re: [Qemu-devel] Non-flat command line option argument syntax
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,108 +26,83 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eric Blake <eblake@redhat.com>
-Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
 Eric Blake <eblake@redhat.com> writes:
 
-> On 02/24/2017 01:58 AM, Markus Armbruster wrote:
->
->>> I hate the 'no$key' sugar, and would love to get rid of it.  It makes
->>> things ambiguous (thus confusing) for precious little gain: 'novocaine'
->>> can mean 'novocaine=on' or 'vocaine=off'.  QemuOpts picks the latter,
->>> even when a QemuOpt named 'novocaine' has been declared.
+> On 02/24/2017 10:39 AM, Daniel P. Berrange wrote:
+>> On Fri, Feb 24, 2017 at 05:04:34PM +0100, Markus Armbruster wrote:
+>>> Markus Armbruster <armbru@redhat.com> writes:
 >>>
->>> keyval_parse() is meant to behave like QemuOpts, so I'm reproducing this
->>> bit of bad sugar, reluctantly.
->> 
->> Implied value alternatives / variations:
->> 
->> (1) Don't implement the "no" sugar
->> 
->>     I think we'd have to deprecate it in QemuOpts now, to give users
->>     some time to adapt before keyval_parse() replaces QemuOpts.
->> 
+>>> [...]
+>>>> === Dotted keys ===
+>>>>
+>>>> One sufficiently powerful syntax extension already exists: the dotted
+>>>> key convention.  It's syntactically unambiguous only when none of the
+>>>> KEYs involved contains '.'  To adopt it across the board, we'd have to
+>>>> outlaw '.' in KEYs.  QAPI outlaws '.' already,
+>>>
+>>> *Except* in __RFQDN_ prefixes.
+>>>
 >
->> 
->> If we're happy with bad sugar like "can't abbreviate novocaine=on to
->> novocaine" (confusing), "filename without a value gets you the file
->> 'on'", we reimplement the bad sugar and move on.
->> 
->> If not, we have the choice between less magic or more magic.
->> 
->> Less magic: (1) and/or (2).
->> 
->> More magic: (3) or something like it.
->> 
->> If we don't want to decide right now, we can do
->> 
->> (4) Don't implement any implied value sugar for now
->> 
->>     You have to spell out =on and =off.  Big fat comment to remind us
->>     about the QemuOpts incompatibility.
->> 
->> I think this would be acceptable for -blockdev in 2.9.
->> 
->> Opinions?
+>>> Possible solutions:
+>>>
+>>> (a) Outlaw domain names with '_'.  If KEY starts with "__", everything
+>>>     up to the third '_' is an __RFQDN_ prefix.
 >
-> Do any existing blockdev sub-parameters begin with 'no'?  Ouch:
-> BlockdevOptions has '*cache':'BlockdevCacheOptions' which in turn has
-> '*no-flush':'bool'.
+> While there ARE valid DNS names with _ (such as
+> _http._sctp.www.example.com mentioned on
+> https://en.wikipedia.org/wiki/Hostname), we are at least told by RFC 952
+> that _ is not valid in hostnames.  Note that '-' is permitted, and that
+> transliterates to '_', so from the flattened name used in C code it's
+> harder to tell what is meant, but from the QMP side, I think we are
+> guaranteed that no RFQDN will confuse us with any extra _.
 
-I hate negative flags.
+DNS registrars may fail to enforce the hostname rules.  But we can
+specify that only __RFQDN_ prefixes derived from conforming hostnames
+are allowed.  If someone breaks dotted keys by insisting on deriving his
+from a non-conforming hostname, they get to keep the pieces.
 
->                      Even worse, I think you could abuse 'nono-flush' to
-> enable flushing - my head hurts.
+We better clarify qapi-code-gen.txt, though.
 
-"no-flush" gets desugared to "-flush=off", which doesn't work.
-
-"nono-flush" gets desugared to "no-flush=off", which works.
-
-> And of course, there's the obvious BlockDevOptions '*node-name':'str'.
-> No one in their right mind would expect 'node-name' without parameters
-> to result in 'de-name=no'.
-
-This is something I'd be even willing to break for existing options.
-
-> Also, I found that at least libvirt has existing command line usage
-> -numa node,nodeid=0, where qemu_numa_opts uses .implied_opt_name="type",
-> .desc = {{0}} to be visited by OptsVisitor.  Because of the implied opt,
-> we get the desired "type=node" rather than the accidental "de=no", but
-> the magic of implied keys can certainly make it weird to think about.
-
-Correct.
-
-The value of an implied key is not subject to key desugaring.
-
-Without an implied key, the "node" would desugar to "de=off".
-
-> How about:
+>>>
+>>> (b) Outlaw '_' in the name part that follows __RFQDN_.  If KEY starts
+>>>     with "__", everything up to the last '_' is an __RFQDN_ prefix.
 >
-> for 2.9: -blockdev has no magic at all (you HAVE to spell 'foo=off'
-> rather than 'foo' for any boolean parameters that you want disabled in
-> -blockdev);
-
-You mean "rather than 'nofoo'".
-
-"No magic at all" implies you also have to spell "foo=on" rather than
-"foo".
-
-I believe we need to have both or none in 2.9.  If we have only the "on"
-sugar, "no-flush" works, and we can't add the "off" sugar without
-breaking it.
-
-> -blockdev); and in QemuOpts, we issue deprecation warnings but keep
-> existing behavior any time someone uses 'noFOO' that we turn into
-> 'FOO=no'.  Then, for 2.10, we can decide to remove the deprecation
-> warnings if they pointed out real (ab)use of the sugar in the wild, or
-> (hopefully) to kill the sugar entirely (as part of converting QemuOpts
-> over to keyval_parse).
+> Reasonable enough, since we ask new interfaces to use '-' rather than
+> '_'. But does break existing vendors (a quick grep of RHEL 7.3
+> downstream finds at least:
 >
-> In short, getting rid of the 'no' prefix magic, after suitable
-> deprecation warnings, seems like a good plan to me; and having -blockdev
-> be slightly tighter than the rest of command line options for 2.9 only
-> is no real loss (no one uses -blockdev yet, so they can be written to
-> avoid the use of 'no' magic to begin with).
+> qapi-schema.json:{ 'command': '__com.redhat_qxl_screendump', 'data': {
+> 'id' : 'str',
+>
+> So we'd have to get downstream buy-in to this plan, and downstreams may
+> have to hack around our new restrictions for a while.
+>
+>>>
+>>> (c) Your bright idea.
+>> 
+>> Define a new downstream vendor naming convention. IMHO it is reasonable
+>> to argue that the downstream vendor extensions are outside the scope of
+>> backwards compatibility guarantees we normally apply for our CLI args.
+>> 
+>> Thus, simply say that vendors must replace all '.' with _ in their
+>> namespace prefix. eg They should use '__com_example_medium.rare=on'
+>> which would mean a property '__com_example_medium' which is a struct
+>> containing a property rare with value on
 
-Okay, I'll post QemuOpts patch to deprecate noKEY sugar.  Let's see
-whether anyone screams.
+Certainly simpler, and arguably what we should've done back when we
+created the convention for QMP.  But changing it now would be a pain.
+
+> Same argument as (b) - we'd have to get downstream buy-in (and in this
+> case, it affects even more cases: ALL downstream extensions have to be
+> changed, rather than just the ones using _ after the __RFQDN_ portion).
+> But has the slightly nice appeal of avoiding the '.' vs. '_'
+> transliteration confusion that catches us only on downstream extensions
+> (it's hard to special-case '.' as being permitted in QAPI, but only for
+> downstream, because we can easily forget to test it).
+>
+> If we are happy with the change forced on downstream vendors, I'm okay
+> with (c); if not, I think (a) is safe.
+
+Looks like (a) is the least painful.  I'll give it a try.
