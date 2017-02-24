@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1chGne-0000sO-8N
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:24:47 -0500
+	(envelope-from <kwolf@redhat.com>) id 1chGo7-0001Ch-4O
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:25:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1chGna-000303-I8
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:24:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33792)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1chGna-0002zo-Bx
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:24:42 -0500
-References: <20170222163734.13104-1-stefanha@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <3455495c-2375-0327-a46d-3eeaa1e1aad6@redhat.com>
-Date: Fri, 24 Feb 2017 15:24:38 +0100
+	(envelope-from <kwolf@redhat.com>) id 1chGo6-0003E8-1s
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:25:15 -0500
+Date: Fri, 24 Feb 2017 15:25:05 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170224142505.GA4429@noname.redhat.com>
+References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170222163734.13104-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] virtio: migration fixes for memory
- region cache
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 00/54] New op blocker system, part 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +22,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-block@nongnu.org
+Cc: mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-Hi Stephan,
-
-On 22/02/2017 17:37, Stefan Hajnoczi wrote:
-> v2:
->  * Avoid early region cache initialization in virtio_load() with wrong ring
->    addresses for VIRTIO-1 in Patch 2 [Cornelia]
+Am 21.02.2017 um 15:57 hat Kevin Wolf geschrieben:
+> This series is the first part of implementing the new op blocker system
+> whose design was agreed on quite a while ago, but proved a bit tricky to
+> implement in places. There is more work to do to fully replace the old op
+> blocker system, but realistically we don't have that much time until the 2.9
+> freeze. So let's merge this series to complement the traditional op blockers
+> and plan with a second part for the 2.10 timeframe.
 > 
-> Bug fixes for the recently added memory region cache in virtio.  This series
-> fixes live migration, see patches for details.
+> The basic idea is that every user of a block node (including things outside the
+> block layer that go through a BlockBackend, and also other block nodes that
+> hold references to it) has to declare which low-level operations/permissions it
+> needs and which operation it allows other users to perform on the same node.
+> Depending on these declarations, conflicts are avoided by returning an error
+> for attempts to attach a conflicting user to the same node.
 > 
-> Stefan Hajnoczi (2):
->   virtio: invalidate memory in vring_set_avail_event()
->   virtio: add missing region cache init in virtio_load()
+> After this series, all users request permissions, and hopefully all of the
+> permissions they need. For writes and resize, getting the permission first is
+> actually enforced with assertions. Asserting it for consistent reads is in
+> theory doable, but would mean introducing a request flag that tell us that
+> inconsistent reads are okay - and that in all block drivers to recursively
+> propagate this flag through the backing chain. It might not be worth it.
 > 
->  hw/virtio/virtio.c | 26 ++++++++++++++++++++------
->  1 file changed, 20 insertions(+), 6 deletions(-)
-> 
+> As stated above, the series doesn't remove the old op blockers yet, though in
+> theory the new op blockers should block everything that needs to be blocked.
+> In practice, the read/write/resize blockers should be okay, but
+> BLK_PERM_GRAPH_MOD isn't to be taken too seriously at the moment. It isn't
+> really applied consistently and doesn't do much useful yet. Making proper use
+> of it is left for the part 2 series.
 
-For me this fixes virtio-net migration issue caused by "virtio: use
-VRingMemoryRegionCaches for avail and used rings".
+In order to keep the pull request next week at least a bit smaller, I
+applied the already reviewed patches 1-11 to the block branch (i.e.
+the preparations before the actual op blocker patches start).
 
-Tested-by: Eric Auger <eric.auger@redhat.com>
-
-Thanks
-
-Eric
+Kevin
