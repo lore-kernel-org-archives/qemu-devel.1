@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1chKRG-0007NF-V4
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:17:55 -0500
+	(envelope-from <thuth@redhat.com>) id 1chKWy-0003jG-4A
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:23:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1chKRG-0003A5-59
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:17:54 -0500
-Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:36452)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1chKRF-00039d-U2
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:17:54 -0500
-Received: by mail-wr0-x22a.google.com with SMTP id 89so18256185wrr.3
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 10:17:53 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1chKWu-0005xK-VN
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:23:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60472)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1chKWu-0005x7-NZ
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:23:44 -0500
+References: <20170220141943.8426-1-cornelia.huck@de.ibm.com>
+	<20170220141943.8426-2-cornelia.huck@de.ibm.com>
+	<967f7397-9995-0d24-bf35-682da2c732ff@redhat.com>
+	<48b23a4f-ebd3-2306-ea0f-75b713817440@de.ibm.com>
+	<aade1638-9dd8-98e7-bf40-f12ab9322da6@redhat.com>
+	<35df55f3-03f3-c370-05e7-ea83a1b21f99@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <f1927829-6661-7c6f-65df-fcb8d37bffbc@redhat.com>
+Date: Fri, 24 Feb 2017 19:23:37 +0100
 MIME-Version: 1.0
-In-Reply-To: <619a06f3-1b9a-ba3e-2469-76e57bf838f0@vivier.eu>
-References: <1487957728-8354-1-git-send-email-peter.maydell@linaro.org>
-	<619a06f3-1b9a-ba3e-2469-76e57bf838f0@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Feb 2017 18:17:32 +0000
-Message-ID: <CAFEAcA_zHEr2QYi7FkeRhHiT2rCvU3+3JSOAHgWOFiG_zHibgw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <35df55f3-03f3-c370-05e7-ea83a1b21f99@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH risu 0/9] risu: refactor and reduce
- CPU-specific code
+Subject: Re: [Qemu-devel] [PATCH 1/5] elf-loader: Allow late loading of elf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,19 +31,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+To: Farhan Ali <alifm@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>, Jens Freimann <jfrei@linux.vnet.ibm.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>
 
-On 24 February 2017 at 18:15, Laurent Vivier <laurent@vivier.eu> wrote:
-> Le 24/02/2017 =C3=A0 18:35, Peter Maydell a =C3=A9crit :
->> My motivation for all this, incidentally, is that I wanted to have
->> a go at resurrecting the x86 backend as a test case for how we
->> should support variable-length instruction sets.
->
-> I think m68k is needing that too.
+On 24.02.2017 15:21, Farhan Ali wrote:
+>=20
+>=20
+> On 02/24/2017 05:44 AM, Thomas Huth wrote:
+>> On 21.02.2017 11:23, Christian Borntraeger wrote:
+>>> On 02/20/2017 04:33 PM, Thomas Huth wrote:
+>>>> On 20.02.2017 15:19, Cornelia Huck wrote:
+>>>>> From: Farhan Ali <alifm@linux.vnet.ibm.com>
+>>>>>
+>>>>> The current QEMU ROM infrastructure rejects late loading of ROMs.
+>>>>> And ELFs are currently loaded as ROM, this prevents delayed loading
+>>>>> of ELFs. So when loading ELF, allow the user to specify if ELF shou=
+ld
+>>>>> be loaded as ROM or not.
+>>>>>
+>>>>> If an ELF is not loaded as ROM, then they are not restored on a
+>>>>> guest reboot/reset and so its upto the user to handle the reloading=
+.
+>>>>
+>>>> Could you maybe also explain here why you need such a delayed ELF
+>>>> loading? Why can't you load the s390-netboot.img at the same time as
+>>>> s390-ccw.img?
+>>>
+>>> Please read the cover letter for some details how to build such a
+>>> netrom.
+>>
+>> Sure, understood, but I still did not see an explanation why this can'=
+t
+>> be loaded as "ROM", too / why it needs to be loaded "delayed"? Does th=
+e
+>> image data need to be writable in memory? Or is the information not
+>> available yet at that point in time, whether the user wants to do a
+>> network boot or not? Don't get me wrong, I'm basically fine with this
+>> patch, I'm just missing some explanation *why* you have to do it this
+>> way.
+>>
+>>> Long term we certainly want to have a look at implementing something =
+in
+>>> the ccw bios, but this (tcp stack, virtio net, etc) will take some (a
+>>> lot?)
+>>> more time.
+>>
+>> Just an idea: There's a complete TFTP-boot-over-virtio-net stack in
+>> SLOF, written by IBM ... maybe you could use that for s390x, too?
+>>
+>>> This patch (1) has another advantage.
+>>> Right now we load the ccw bios all the time, even for -kernel xxx boo=
+t,
+>>> to allow the guest user to use chreipl to reboot from a disk. With th=
+is
+>>> in place we can rework our ccw bios loader to load the ccw bios lazil=
+y
+>>> as well.
+>>
+>> But this "RAM"-loader here has still the problem that the images are n=
+ot
+>> restored during reboot/reset, right? ... so before you're going to
+>> implement that as well, let me ask another question: Did you already
+>> have a look at the generic loader device? I think that might already
+>> provide what you're trying to implement here, so your problem could
+>> maybe be solved with some few lines of creating an instance of that
+>> device instead (see
+>> https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg05366.html fo=
+r
+>> an example how to use that device).
+>>
+>>  Thomas
+>>
+>=20
+> Hi Thomas,
+>=20
+> I did think of the generic loader device, but doesn't the generic loade=
+r
+> device also load ELF's as ROMs? This would again bring us back to the
+> problem of ROMs cannot be loaded after initializations of the ROM. So i=
+f
+> a user wants to switch boot device from disk to network device we still
+> wouldn't be able to load the ROM?
 
-Yep; but I don't have an m68k to hand, whereas I do have
-x86-64 ;-)
+OK, never mind, I just had another look at the generic loader code, and
+it seems like the ELF loading is also only done there during the
+realize() function, not during the reset() function. Sorry, I somehow
+got that wrong when I looked at that code for the first time... :-/
 
-thanks
--- PMM
+ Thomas
