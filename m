@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mbenes@suse.cz>) id 1chGGs-0002rj-Pc
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:50:55 -0500
+	(envelope-from <ebischoff@suse.com>) id 1chFmS-0003IR-Bs
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:19:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mbenes@suse.cz>) id 1chGGn-00045H-Lv
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:50:54 -0500
-Received: from mx2.suse.de ([195.135.220.15]:45024)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mbenes@suse.cz>) id 1chGGn-00044l-Ff
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:50:49 -0500
-From: Miroslav Benes <mbenes@suse.cz>
-Date: Fri, 24 Feb 2017 14:50:45 +0100
-Message-Id: <20170224135045.10613-1-mbenes@suse.cz>
-Subject: [Qemu-devel] [PATCH] target-s390x: Implement lpp instruction
+	(envelope-from <ebischoff@suse.com>) id 1chFmP-0008Vx-Nh
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:19:28 -0500
+Received: from nat.nue.novell.com ([195.135.221.2]:36738 helo=tegan.suse.de)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <ebischoff@suse.com>) id 1chFmP-0008V3-Dl
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:19:25 -0500
+From: Eric Bischoff <ebischoff@suse.com>
+Date: Fri, 24 Feb 2017 14:19:18 +0100
+Message-Id: <20170224131918.15480-2-ebischoff@suse.com>
+In-Reply-To: <20170224131918.15480-1-ebischoff@suse.com>
+References: <20170224131918.15480-1-ebischoff@suse.com>
+Subject: [Qemu-devel] [PATCH] Adding support for LPD and LPDG instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,59 +23,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: rth@twiddle.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org, mmarek@suse.com, ebischoff@suse.com, Miroslav Benes <mbenes@suse.cz>
+To: qemu-devel@nongnu.org
+Cc: Eric Bischoff <ebischoff@nerim.net>
 
-Linux arch/s390/kernel/head(64).S uses lpp instruction if it is
-available in facilities list provided by stfl/stfle instruction. This is
-the case of newer z/System generations and their qemu definition.
+From: Eric Bischoff <ebischoff@nerim.net>
 
-Signed-off-by: Miroslav Benes <mbenes@suse.cz>
+LPD = LOAD PAIR DISJOINT
 ---
- target/s390x/insn-data.def |  2 ++
- target/s390x/translate.c   | 10 ++++++++++
- 2 files changed, 12 insertions(+)
+ target/s390x/insn-data.def |  4 +++-
+ target/s390x/translate.c   | 16 ++++++++++++++++
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index be830a42ed8d..d6dd391fabeb 100644
+index 075ff59..5a0231f 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -843,6 +843,8 @@
- /* LOAD CONTROL */
-     C(0xb700, LCTL,    RS_a,  Z,   0, a2, 0, 0, lctl, 0)
-     C(0xeb2f, LCTLG,   RSY_a, Z,   0, a2, 0, 0, lctlg, 0)
-+/* LOAD PROGRAM PARAMETER */
-+    C(0xb280, LPP,     S,   LPP,   0, m2_64, 0, 0, lpp, 0)
- /* LOAD PSW */
-     C(0x8200, LPSW,    S,     Z,   0, a2, 0, 0, lpsw, 0)
- /* LOAD PSW EXTENDED */
+@@ -504,7 +504,9 @@
+     C(0xb9e2, LOCGR,   RRF_c, LOC, r1, r2, r1, 0, loc, 0)
+     C(0xebf2, LOC,     RSY_b, LOC, r1, m2_32u, new, r1_32, loc, 0)
+     C(0xebe2, LOCG,    RSY_b, LOC, r1, m2_64, r1, 0, loc, 0)
+-/* LOAD PAIR DISJOINT TODO */
++/* LOAD PAIR DISJOINT */
++    C(0xc804, LPD,     SSF,   ILA, m1_32s, m2_32s, 0, r3_P32, movx, 0)
++    C(0xc805, LPDG,    SSF,   ILA, m1_64, m2_64, 0, r3_P64, movx, 0)
+ /* LOAD POSITIVE */
+     C(0x1000, LPR,     RR_a,  Z,   0, r2_32s, new, r1_32, abs, abs32)
+     C(0xb900, LPGR,    RRE,   Z,   0, r2, r1, 0, abs, abs64)
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 141167948ee8..eb9e13e59b7d 100644
+index 01c6217..70397b6 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -1194,6 +1194,7 @@ typedef enum DisasFacility {
-     FAC_SCF,                /* store clock fast */
-     FAC_SFLE,               /* store facility list extended */
-     FAC_ILA,                /* interlocked access facility 1 */
-+    FAC_LPP,                /* load-program-parameter */
- } DisasFacility;
- 
- struct DisasInsn {
-@@ -2567,6 +2568,15 @@ static ExitStatus op_lra(DisasContext *s, DisasOps *o)
-     return NO_EXIT;
+@@ -4420,6 +4420,22 @@ static void wout_r1_D32(DisasContext *s, DisasFields *f, DisasOps *o)
  }
+ #define SPEC_wout_r1_D32 SPEC_r1_even
  
-+static ExitStatus op_lpp(DisasContext *s, DisasOps *o)
++static void wout_r3_P32(DisasContext *s, DisasFields *f, DisasOps *o)
 +{
-+    check_privileged(s);
-+    potential_page_fault(s);
-+
-+    tcg_gen_st_i64(o->in2, cpu_env, offsetof(CPUS390XState, pp));
-+    return NO_EXIT;
++    int r3 = get_field(f, r3);
++    store_reg32_i64(r3, o->out);
++    store_reg32_i64(r3 + 1, o->out2);
 +}
++#define SPEC_wout_r3_P32 SPEC_r3_even
 +
- static ExitStatus op_lpsw(DisasContext *s, DisasOps *o)
++static void wout_r3_P64(DisasContext *s, DisasFields *f, DisasOps *o)
++{
++    int r3 = get_field(f, r3);
++    store_reg(r3, o->out);
++    store_reg(r3 + 1, o->out2);
++}
++#define SPEC_wout_r3_P64 SPEC_r3_even
++
+ static void wout_e1(DisasContext *s, DisasFields *f, DisasOps *o)
  {
-     TCGv_i64 t1, t2;
+     store_freg32_i64(get_field(f, r1), o->out);
 -- 
-2.11.0
+2.10.2
