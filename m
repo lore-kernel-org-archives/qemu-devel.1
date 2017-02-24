@@ -1,36 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1chC61-0003JG-Pd
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:23:30 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1chC63-0003L4-R8
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:23:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1chC5w-0004Yv-PL
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:23:25 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54935
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1chC5z-0004aO-0S
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:23:27 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49566
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1chC5w-0004Yg-IW
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:23:20 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	id 1chC5y-0004Zr-RE
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:23:22 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1O9JQgk072776
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 04:23:20 -0500
-Received: from e06smtp09.uk.ibm.com (e06smtp09.uk.ibm.com [195.75.94.105])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28t1a2s6f8-1
+	v1O9JEf1145834
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 04:23:22 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28tb3jg46y-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 04:23:19 -0500
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 04:23:22 -0500
 Received: from localhost
-	by e06smtp09.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Fri, 24 Feb 2017 09:23:17 -0000
+	Fri, 24 Feb 2017 09:23:20 -0000
 From: Cornelia Huck <cornelia.huck@de.ibm.com>
-Date: Fri, 24 Feb 2017 10:22:58 +0100
+Date: Fri, 24 Feb 2017 10:22:59 +0100
 In-Reply-To: <20170224092259.16483-1-cornelia.huck@de.ibm.com>
 References: <20170224092259.16483-1-cornelia.huck@de.ibm.com>
-Message-Id: <20170224092259.16483-13-cornelia.huck@de.ibm.com>
-Subject: [Qemu-devel] [PULL 12/13] s390x/arch_dump: pass cpuid into notes
- sections
+Message-Id: <20170224092259.16483-14-cornelia.huck@de.ibm.com>
+Subject: [Qemu-devel] [PULL 13/13] s390x/css: handle format-0 TIC CCW
+ correctly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,129 +40,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, qemu-devel@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, qemu-devel@nongnu.org, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
 
-From: Christian Borntraeger <borntraeger@de.ibm.com>
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 
-we need to pass the cpuid into the pid field of the notes
-section, otherwise the notes for different CPUs all have 0:
+For TIC CCW, bit positions 8-32 of the format-1 CCW must contain zeros;
+otherwise, a program-check condition is generated. For format-0 TIC CCWs,
+bits 32-63 are ignored.
 
-e.g. objdump -h shows:
-old:
-  5 .reg-s390-prefix/0 00000004  0000000000000000  0000000000000000
-  6 .reg-s390-prefix 00000004  0000000000000000  0000000000000000
- 21 .reg-s390-prefix/0 00000004  0000000000000000  0000000000000000
-new:
-  5 .reg-s390-prefix/1 00000004  0000000000000000  0000000000000000
-  6 .reg-s390-prefix 00000004  0000000000000000  0000000000000000
- 21 .reg-s390-prefix/2 00000004  0000000000000000  0000000000000000
+To convert TIC from format-0 CCW to format-1 CCW correctly, let's clear
+bits 8-32 to guarantee compatibility.
 
-Reported-by: Philipp Rudo <prudo@linux.vnet.ibm.com>
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
 ---
- target/s390x/arch_dump.c | 23 ++++++++++++-----------
- 1 file changed, 12 insertions(+), 11 deletions(-)
+ hw/s390x/css.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/target/s390x/arch_dump.c b/target/s390x/arch_dump.c
-index 887cae947e..105ae9a5d8 100644
---- a/target/s390x/arch_dump.c
-+++ b/target/s390x/arch_dump.c
-@@ -73,7 +73,7 @@ typedef struct noteStruct {
-     } contents;
- } QEMU_PACKED Note;
- 
--static void s390x_write_elf64_prstatus(Note *note, S390CPU *cpu)
-+static void s390x_write_elf64_prstatus(Note *note, S390CPU *cpu, int id)
- {
-     int i;
-     S390xUserRegs *regs;
-@@ -87,9 +87,10 @@ static void s390x_write_elf64_prstatus(Note *note, S390CPU *cpu)
-         regs->acrs[i] = cpu_to_be32(cpu->env.aregs[i]);
-         regs->gprs[i] = cpu_to_be64(cpu->env.regs[i]);
+diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+index 0f2580d644..e32b2a4d42 100644
+--- a/hw/s390x/css.c
++++ b/hw/s390x/css.c
+@@ -368,13 +368,16 @@ static CCW1 copy_ccw_from_guest(hwaddr addr, bool fmt1)
+         ret.cda = be32_to_cpu(tmp1.cda);
+     } else {
+         cpu_physical_memory_read(addr, &tmp0, sizeof(tmp0));
+-        ret.cmd_code = tmp0.cmd_code;
+-        ret.flags = tmp0.flags;
+-        ret.count = be16_to_cpu(tmp0.count);
+-        ret.cda = be16_to_cpu(tmp0.cda1) | (tmp0.cda0 << 16);
+-        if ((ret.cmd_code & 0x0f) == CCW_CMD_TIC) {
+-            ret.cmd_code &= 0x0f;
++        if ((tmp0.cmd_code & 0x0f) == CCW_CMD_TIC) {
++            ret.cmd_code = CCW_CMD_TIC;
++            ret.flags = 0;
++            ret.count = 0;
++        } else {
++            ret.cmd_code = tmp0.cmd_code;
++            ret.flags = tmp0.flags;
++            ret.count = be16_to_cpu(tmp0.count);
+         }
++        ret.cda = be16_to_cpu(tmp0.cda1) | (tmp0.cda0 << 16);
      }
-+    note->contents.prstatus.pid = id;
+     return ret;
  }
- 
--static void s390x_write_elf64_fpregset(Note *note, S390CPU *cpu)
-+static void s390x_write_elf64_fpregset(Note *note, S390CPU *cpu, int id)
- {
-     int i;
-     CPUS390XState *cs = &cpu->env;
-@@ -101,7 +102,7 @@ static void s390x_write_elf64_fpregset(Note *note, S390CPU *cpu)
-     }
- }
- 
--static void s390x_write_elf64_vregslo(Note *note, S390CPU *cpu)
-+static void s390x_write_elf64_vregslo(Note *note, S390CPU *cpu,  int id)
- {
-     int i;
- 
-@@ -111,7 +112,7 @@ static void s390x_write_elf64_vregslo(Note *note, S390CPU *cpu)
-     }
- }
- 
--static void s390x_write_elf64_vregshi(Note *note, S390CPU *cpu)
-+static void s390x_write_elf64_vregshi(Note *note, S390CPU *cpu, int id)
- {
-     int i;
-     S390xElfVregsHi *temp_vregshi;
-@@ -125,25 +126,25 @@ static void s390x_write_elf64_vregshi(Note *note, S390CPU *cpu)
-     }
- }
- 
--static void s390x_write_elf64_timer(Note *note, S390CPU *cpu)
-+static void s390x_write_elf64_timer(Note *note, S390CPU *cpu, int id)
- {
-     note->hdr.n_type = cpu_to_be32(NT_S390_TIMER);
-     note->contents.timer = cpu_to_be64((uint64_t)(cpu->env.cputm));
- }
- 
--static void s390x_write_elf64_todcmp(Note *note, S390CPU *cpu)
-+static void s390x_write_elf64_todcmp(Note *note, S390CPU *cpu, int id)
- {
-     note->hdr.n_type = cpu_to_be32(NT_S390_TODCMP);
-     note->contents.todcmp = cpu_to_be64((uint64_t)(cpu->env.ckc));
- }
- 
--static void s390x_write_elf64_todpreg(Note *note, S390CPU *cpu)
-+static void s390x_write_elf64_todpreg(Note *note, S390CPU *cpu, int id)
- {
-     note->hdr.n_type = cpu_to_be32(NT_S390_TODPREG);
-     note->contents.todpreg = cpu_to_be32((uint32_t)(cpu->env.todpr));
- }
- 
--static void s390x_write_elf64_ctrs(Note *note, S390CPU *cpu)
-+static void s390x_write_elf64_ctrs(Note *note, S390CPU *cpu, int id)
- {
-     int i;
- 
-@@ -154,7 +155,7 @@ static void s390x_write_elf64_ctrs(Note *note, S390CPU *cpu)
-     }
- }
- 
--static void s390x_write_elf64_prefix(Note *note, S390CPU *cpu)
-+static void s390x_write_elf64_prefix(Note *note, S390CPU *cpu, int id)
- {
-     note->hdr.n_type = cpu_to_be32(NT_S390_PREFIX);
-     note->contents.prefix = cpu_to_be32((uint32_t)(cpu->env.psa));
-@@ -163,7 +164,7 @@ static void s390x_write_elf64_prefix(Note *note, S390CPU *cpu)
- 
- typedef struct NoteFuncDescStruct {
-     int contents_size;
--    void (*note_contents_func)(Note *note, S390CPU *cpu);
-+    void (*note_contents_func)(Note *note, S390CPU *cpu, int id);
- } NoteFuncDesc;
- 
- static const NoteFuncDesc note_core[] = {
-@@ -199,7 +200,7 @@ static int s390x_write_elf64_notes(const char *note_name,
-         note.hdr.n_namesz = cpu_to_be32(strlen(note_name) + 1);
-         note.hdr.n_descsz = cpu_to_be32(nf->contents_size);
-         strncpy(note.name, note_name, sizeof(note.name));
--        (*nf->note_contents_func)(&note, cpu);
-+        (*nf->note_contents_func)(&note, cpu, id);
- 
-         note_size = sizeof(note) - sizeof(note.contents) + nf->contents_size;
-         ret = f(&note, note_size, opaque);
 -- 
 2.11.0
