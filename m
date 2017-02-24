@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1chGCT-0006mV-T6
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:46:22 -0500
+	(envelope-from <lvivier@redhat.com>) id 1chGEQ-00011Z-VG
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:48:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1chGCS-0002FH-Vt
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:46:21 -0500
-References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
-	<1487689130-30373-30-git-send-email-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <6f2ae71a-bac2-3332-a716-21b344f540d6@redhat.com>
-Date: Fri, 24 Feb 2017 14:46:12 +0100
+	(envelope-from <lvivier@redhat.com>) id 1chGEM-0002m6-3H
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:48:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50628)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1chGEL-0002lp-QU
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:48:18 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E75FB4E4D0
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 13:48:17 +0000 (UTC)
+References: <20170206173306.20603-1-dgilbert@redhat.com>
+	<20170206173306.20603-4-dgilbert@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <f54b483e-7fce-cf29-4582-a9f8c96f427b@redhat.com>
+Date: Fri, 24 Feb 2017 14:48:13 +0100
 MIME-Version: 1.0
-In-Reply-To: <1487689130-30373-30-git-send-email-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="97kurrmev1B83PgEx8I5hR1JRMXkwFn4O"
-Subject: Re: [Qemu-devel] [PATCH 29/54] hw/block: Request permissions
+In-Reply-To: <20170206173306.20603-4-dgilbert@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 03/16] postcopy: Chunk discards for
+ hugepages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,78 +34,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com
+Cc: aarcange@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---97kurrmev1B83PgEx8I5hR1JRMXkwFn4O
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
-Message-ID: <6f2ae71a-bac2-3332-a716-21b344f540d6@redhat.com>
-Subject: Re: [PATCH 29/54] hw/block: Request permissions
-References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
- <1487689130-30373-30-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1487689130-30373-30-git-send-email-kwolf@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
+On 06/02/2017 18:32, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> At the start of the postcopy phase, partially sent huge pages
+> must be discarded.  The code for dealing with host page sizes larger
+> than the target page size can be reused for this case.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
 
-On 21.02.2017 15:58, Kevin Wolf wrote:
-> This makes all device emulations with a qdev drive property request
-> permissions on their BlockBackend. The only thing we block at this poin=
-t
-> is resizing images for some devices that can't support it.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+
 > ---
->  hw/block/block.c                 | 22 +++++++++++++++++++++-
->  hw/block/fdc.c                   | 25 +++++++++++++++++++++++--
->  hw/block/m25p80.c                |  8 ++++++++
->  hw/block/nand.c                  |  7 +++++++
->  hw/block/nvme.c                  |  8 +++++++-
->  hw/block/onenand.c               |  7 +++++++
->  hw/block/pflash_cfi01.c          | 18 ++++++++++++------
->  hw/block/pflash_cfi02.c          | 19 +++++++++++++------
->  hw/block/virtio-blk.c            |  8 +++++++-
->  hw/core/qdev-properties-system.c |  1 -
->  hw/ide/qdev.c                    |  7 +++++--
->  hw/nvram/spapr_nvram.c           |  8 ++++++++
->  hw/scsi/scsi-disk.c              |  9 +++++++--
->  hw/sd/sd.c                       |  6 ++++++
->  hw/usb/dev-storage.c             |  6 +++++-
->  include/hw/block/block.h         |  3 ++-
->  tests/qemu-iotests/051.pc.out    |  6 +++---
->  17 files changed, 141 insertions(+), 27 deletions(-)
-
-For all the SCSI disks, shouldn't @resizable be true only if the qdev
-type is TYPE_DISK? At least hw/scsi/scsi-disk.c:scsi_realize() looks as
-if that is not necessarily the case.
-
-OTOH, I'm not sure how useful the condition in scsi_disk_resize_cb() is
-in the first place. In my understanding, the SCSI device should always
-be of TYPE_DISK there.
-
-And for IDE devices, @resizable should be true only if the device is not
-a CD ROM drive.
-
-Max
-
-
---97kurrmev1B83PgEx8I5hR1JRMXkwFn4O
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliwOSQSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AwOMH/je27dD7F7MdPD6+1wvgU+5HCykzPU3F
-3dqMZUNUIXiWBh6oHQV7DRmpNaJ9REHqo5tUgHbBWwVSU31HGNM37MKPQdLECGVw
-iH2nKkXct4UtYdr/4+541a2VZ2oRteFqAjE3neL7iPxK7BQSlf9M/ERR+4HQpVGF
-uOJU+BJ83lbsnQOiSLqDzU05UVFGzGeNKa4bsSGOSjMSzeenZvqzCperb0vT/PJE
-bXzEVVKWNPICtn/zOwQbzdRJ1vlWgXfOjutQoUc9U/6iZYKRb16U/5VTYgHDjP6x
-lzLVE8wSypKzzUA4ZQ/KNPGlwU7/gvaBk6X4ZJZEqoB8L2zvPcOQeZM=
-=0TbU
------END PGP SIGNATURE-----
-
---97kurrmev1B83PgEx8I5hR1JRMXkwFn4O--
+>  migration/ram.c | 17 +++++++++--------
+>  1 file changed, 9 insertions(+), 8 deletions(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 5726563..d33bd21 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -1627,12 +1627,17 @@ static void postcopy_chunk_hostpages_pass(MigrationState *ms, bool unsent_pass,
+>  {
+>      unsigned long *bitmap;
+>      unsigned long *unsentmap;
+> -    unsigned int host_ratio = qemu_host_page_size / TARGET_PAGE_SIZE;
+> +    unsigned int host_ratio = block->page_size / TARGET_PAGE_SIZE;
+>      unsigned long first = block->offset >> TARGET_PAGE_BITS;
+>      unsigned long len = block->used_length >> TARGET_PAGE_BITS;
+>      unsigned long last = first + (len - 1);
+>      unsigned long run_start;
+>  
+> +    if (block->page_size == TARGET_PAGE_SIZE) {
+> +        /* Easy case - TPS==HPS for a non-huge page RAMBlock */
+> +        return;
+> +    }
+> +
+>      bitmap = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
+>      unsentmap = atomic_rcu_read(&migration_bitmap_rcu)->unsentmap;
+>  
+> @@ -1736,7 +1741,8 @@ static void postcopy_chunk_hostpages_pass(MigrationState *ms, bool unsent_pass,
+>   * Utility for the outgoing postcopy code.
+>   *
+>   * Discard any partially sent host-page size chunks, mark any partially
+> - * dirty host-page size chunks as all dirty.
+> + * dirty host-page size chunks as all dirty.  In this case the host-page
+> + * is the host-page for the particular RAMBlock, i.e. it might be a huge page
+>   *
+>   * Returns: 0 on success
+>   */
+> @@ -1744,11 +1750,6 @@ static int postcopy_chunk_hostpages(MigrationState *ms)
+>  {
+>      struct RAMBlock *block;
+>  
+> -    if (qemu_host_page_size == TARGET_PAGE_SIZE) {
+> -        /* Easy case - TPS==HPS - nothing to be done */
+> -        return 0;
+> -    }
+> -
+>      /* Easiest way to make sure we don't resume in the middle of a host-page */
+>      last_seen_block = NULL;
+>      last_sent_block = NULL;
+> @@ -1804,7 +1805,7 @@ int ram_postcopy_send_discard_bitmap(MigrationState *ms)
+>          return -EINVAL;
+>      }
+>  
+> -    /* Deal with TPS != HPS */
+> +    /* Deal with TPS != HPS and huge pages */
+>      ret = postcopy_chunk_hostpages(ms);
+>      if (ret) {
+>          rcu_read_unlock();
+> 
