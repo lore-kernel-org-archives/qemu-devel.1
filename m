@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45917)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1chNSv-0001sw-IJ
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 16:31:50 -0500
+	(envelope-from <eblake@redhat.com>) id 1chNff-0007o2-Ut
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 16:45:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1chNSr-0003uB-Gj
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 16:31:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51822)
+	(envelope-from <eblake@redhat.com>) id 1chNfc-0004mr-QJ
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 16:44:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44160)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1chNSr-0003ti-7m
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 16:31:45 -0500
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1chNfc-0004ld-Fu
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 16:44:56 -0500
 References: <9533ba99-b143-b577-0115-742119d089a4@kamp.de>
 	<9292fef8-929a-e89e-eca5-cd247ca9334b@redhat.com>
 	<f0eb7ff1-47d7-42d0-c7b5-946d2224e986@kamp.de>
 	<c207e00d-25a6-45bb-a849-235d0cd2be0d@redhat.com>
 	<2b0840d7-7540-d732-36ac-af7a512d2c8f@kamp.de>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <b59eb68b-5dac-b18b-c2f7-1ea820f4d747@redhat.com>
-Date: Fri, 24 Feb 2017 16:31:42 -0500
+	<b59eb68b-5dac-b18b-c2f7-1ea820f4d747@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <589533ff-2e7d-0ffb-e0b9-5b2e055813b6@redhat.com>
+Date: Fri, 24 Feb 2017 15:44:53 -0600
 MIME-Version: 1.0
-In-Reply-To: <2b0840d7-7540-d732-36ac-af7a512d2c8f@kamp.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <b59eb68b-5dac-b18b-c2f7-1ea820f4d747@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="gTkRW3QoU7mURpwnl1MOxjrxpqlFioIqG"
 Subject: Re: [Qemu-devel] Qemu and Changed Block Tracking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,91 +32,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>, Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Christian Theune <ct@flyingcircus.io>
+To: John Snow <jsnow@redhat.com>, Peter Lieven <pl@kamp.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Christian Theune <ct@flyingcircus.io>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--gTkRW3QoU7mURpwnl1MOxjrxpqlFioIqG
+From: Eric Blake <eblake@redhat.com>
+To: John Snow <jsnow@redhat.com>, Peter Lieven <pl@kamp.de>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Christian Theune <ct@flyingcircus.io>
+Message-ID: <589533ff-2e7d-0ffb-e0b9-5b2e055813b6@redhat.com>
+Subject: Re: [Qemu-devel] Qemu and Changed Block Tracking
+References: <9533ba99-b143-b577-0115-742119d089a4@kamp.de>
+ <9292fef8-929a-e89e-eca5-cd247ca9334b@redhat.com>
+ <f0eb7ff1-47d7-42d0-c7b5-946d2224e986@kamp.de>
+ <c207e00d-25a6-45bb-a849-235d0cd2be0d@redhat.com>
+ <2b0840d7-7540-d732-36ac-af7a512d2c8f@kamp.de>
+ <b59eb68b-5dac-b18b-c2f7-1ea820f4d747@redhat.com>
+In-Reply-To: <b59eb68b-5dac-b18b-c2f7-1ea820f4d747@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-
-On 02/23/2017 09:27 AM, Peter Lieven wrote:
-> Am 22.02.2017 um 13:32 schrieb Eric Blake:
->> On 02/22/2017 02:45 AM, Peter Lieven wrote:
->>>> A bit outdated now, but:
->>>> http://wiki.qemu-project.org/Features/IncrementalBackup
->>>>
->>>> and also a summary I wrote not too far back (PDF):
->>>> https://drive.google.com/file/d/0B3CFr1TuHydWalVJaEdPaE5PbFE
->>>>
->>>> and I'm sure the Virtuozzo developers could chime in on this subject,
->>>> but basically we do have something similar in the works, as eblake
->>>> says.
->>> Hi John, Hi Erik,
->> It's Eric, but you're not the first to make that typo :)
+On 02/24/2017 03:31 PM, John Snow wrote:
 >>
->>> thanks for your feedback. Are you both the ones working primary on
->>> this topic?
->>> If there is anything to review or help needed, please let me know.
->>>
->>> My 2 cents:
->>> I thing I had in mind if there is no image fleecing available, but
->>> fetching the dirty bitmap
->>> from external would be a feauture to put a write lock on a block device.
->> The whole idea is to use a dirty bitmap coupled with image fleecing,
->> where the point-in-time of the image fleecing is done at a window where
->> the guest I/O is quiescent in order to get a stable fleecing point.  We
->> already support write locks (guest quiesence) using qga to do fsfreeze.
->> You want the time that guest I/O is frozen to be as small as possible
->> (in particular, the Windows implementation of quiescence will fail if
->> you hold things frozen for more than a couple of seconds).
+>> But the Backup Server could instead connect to the NAS directly avoidi=
+ng
+>> load on the frontent LAN
+>> and the Qemu Node.
 >>
->> Right now, the qcow2 image format does not track write generations, and
->> I don't think we plan on adding that directly into qcow2.  However, you
->> can externally simulate write generations by keeping track of how many
->> image fleecing points you have created (each fleecing point is another
->> write generation).
->>
->>
->>> In this case something like this via QMP (and external software)
->>> should work:
->>> ---8<---
->>>   gen =  write generation of last backup (or 0 for full backup)
->>>   do {
->>>       nextgen = fetch current write generation (via QMP)
->>>       dirtymap = send all block whose write generation is greater
->>> than 'gen' (via QMP)
->> No, we are NOT going to send dirty information via QMP.  Rather, we are
->> going to send it via NBD's extension NBD_CMD_BLOCK_STATUS.  The idea is
->> that a client connects and asks which qemu blocks are dirty, then uses
->> that information to read only the dirty blocks.
-> 
-> I understand, that for the case of local storage connecting via NBD to
-> Qemu to grep a snapshot
-> might be a good idea, but consider that you have a NAS for your vServer
-> images. May it be NFS,
-> iSCSI, CEPH or whatever. In an enterprise scenario I would generally
-> except to have a NAS rather
-> than local storage.
-> 
-> When you are going to backup your vServer (full or incremental) you
-> shuffle all the traffic through
-> Qemu and your Node running the vServer. In this case you run all the
-> traffic over the wire twice.
-> 
-> NAS -> Node -> Qemu - > Backup Server
-> 
-> But the Backup Server could instead connect to the NAS directly avoiding
-> load on the frontent LAN
-> and the Qemu Node.
-> 
+>=20
+> In a live backup I don't see how you will be removing QEMU from the dat=
+a
+> transfer loop. QEMU is the only process that knows what the correct vie=
+w
+> of the image is, and needs to facilitate.
+>=20
+> It's not safe to copy the blocks directly without QEMU's mediation.
 
-In a live backup I don't see how you will be removing QEMU from the data
-transfer loop. QEMU is the only process that knows what the correct view
-of the image is, and needs to facilitate.
+Although we may already have enough tools in place to help achieve that:
+create a temporary qcow2 wrapper around the primary image via external
+snapshot, so that the primary image is now read-only in qemu; then use
+whatever block-status mechanism (whether the NBD block status extension,
+or directly reading from a persistent bitmap) to facilitate whatever
+more efficient offline transfer of just the relevant portions of that
+main file, then live block-commit to get qemu to start writing to the
+file again.
 
-It's not safe to copy the blocks directly without QEMU's mediation.
+In other words, any time your algorithm wants to cause an I/O freeze to
+a particular file, the solution is to add a qcow2 external snapshot
+followed by a live commit.
 
---js
+So tweaking the proposal a few mails ago:
 
-> I would like to find a nice solution for this scenario. If not in the
-> first step it would maybe be good to
-> have this in mind when implementing a dirty block tracking.
-> 
-> Peter
+fsfreeze (optional)
+create qcow2 snapshot wrapper as a write lock (via QMP)
+fsthaw - now with no risk of violating guest timing constraints
+dirtymap =3D find all blocks that are dirty since last backup (via named
+bitmap/NBD block status)
+foreach block in dirtymap {
+               copy to backup via external software
+}
+live commit image (via QMP)
+
+The window where guest I/O is frozen is small (the freeze/snapshot
+create/thaw steps can be done in less than a second), while the window
+where you are extracting incremental backup data is longer (during that
+time, guest I/O is happening into a wrapper qcow2 file).
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--gTkRW3QoU7mURpwnl1MOxjrxpqlFioIqG
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYsKlVAAoJEKeha0olJ0NqO9cH/iMJDziVEhvCprSjSGshYiKt
++D3aOspUqqlIFUcnt9VCAavx0rSIrVHOKqSw1eXtQMnLwbYrRuQqpoz0Gea0aJ45
+ObPL+Ok8VEaZxhrZxGqlKEPkN2A5C3ugH8zoEOQWq+Z9PuOdTg9VUvjvPgNZEaqA
+J6zu+lbL6caGY319++oiy3JqxuSAUAo6P/0+k3j4EB9QI6YE7gJLqI424IF54yl5
+z/+FEHK7RUlnfvV3y2ZbWahJFbW/cwFlW+bEtChpTHYfLe9tGRzLPJxTfunwSvNh
+mZJeABDRoTKAnbezFkPIFil95711mjYBRHMP4GB881+u5ZrukW0QfJFRnLJOu78=
+=8Vyt
+-----END PGP SIGNATURE-----
+
+--gTkRW3QoU7mURpwnl1MOxjrxpqlFioIqG--
