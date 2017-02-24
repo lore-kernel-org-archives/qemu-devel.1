@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1chJxW-0006IC-JH
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:47:11 -0500
+	(envelope-from <jcody@redhat.com>) id 1chJxW-0006IR-Ra
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:47:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1chJxV-0004un-J3
+	(envelope-from <jcody@redhat.com>) id 1chJxV-0004ux-RL
 	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:47:10 -0500
 From: Jeff Cody <jcody@redhat.com>
-Date: Fri, 24 Feb 2017 12:46:58 -0500
-Message-Id: <20170224174700.30816-2-jcody@redhat.com>
+Date: Fri, 24 Feb 2017 12:47:00 -0500
+Message-Id: <20170224174700.30816-4-jcody@redhat.com>
 In-Reply-To: <20170224174700.30816-1-jcody@redhat.com>
 References: <20170224174700.30816-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL 1/3] block/nfs: convert to preadv / pwritev
+Subject: [Qemu-devel] [PULL 3/3] RBD: Add support readv,writev for rbd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,99 +22,176 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: peter.maydell@linaro.org, jcody@redhat.com, qemu-devel@nongnu.org
 
-From: Peter Lieven <pl@kamp.de>
+From: tianqing <tianqing@unitedstack.com>
 
-Signed-off-by: Peter Lieven <pl@kamp.de>
+Rbd can do readv and writev directly, so wo do not need to transform
+iov to buf or vice versa any more.
+
+Signed-off-by: tianqing <tianqing@unitedstack.com>
 Reviewed-by: Jeff Cody <jcody@redhat.com>
-Message-id: 1487349541-10201-2-git-send-email-pl@kamp.de
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- block/nfs.c | 33 +++++++++++++++------------------
- 1 file changed, 15 insertions(+), 18 deletions(-)
+ block/rbd.c | 80 ++++++++++++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 56 insertions(+), 24 deletions(-)
 
-diff --git a/block/nfs.c b/block/nfs.c
-index 0cf115e..c11c4c9 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -263,9 +263,9 @@ nfs_co_generic_cb(int ret, struct nfs_context *nfs, void *data,
-                             nfs_co_generic_bh_cb, task);
+diff --git a/block/rbd.c b/block/rbd.c
+index a57b3e3..22e8e69 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -62,6 +62,13 @@
+ #define RBD_MAX_SNAP_NAME_SIZE 128
+ #define RBD_MAX_SNAPS 100
+ 
++/* The LIBRBD_SUPPORTS_IOVEC is defined in librbd.h */
++#ifdef LIBRBD_SUPPORTS_IOVEC
++#define LIBRBD_USE_IOVEC 1
++#else
++#define LIBRBD_USE_IOVEC 0
++#endif
++
+ typedef enum {
+     RBD_AIO_READ,
+     RBD_AIO_WRITE,
+@@ -310,6 +317,17 @@ static int qemu_rbd_set_conf(rados_t cluster, const char *conf,
+     return ret;
  }
  
--static int coroutine_fn nfs_co_readv(BlockDriverState *bs,
--                                     int64_t sector_num, int nb_sectors,
--                                     QEMUIOVector *iov)
-+static int coroutine_fn nfs_co_preadv(BlockDriverState *bs, uint64_t offset,
-+                                      uint64_t bytes, QEMUIOVector *iov,
-+                                      int flags)
++static void qemu_rbd_memset(RADOSCB *rcb, int64_t offs)
++{
++    if (LIBRBD_USE_IOVEC) {
++        RBDAIOCB *acb = rcb->acb;
++        iov_memset(acb->qiov->iov, acb->qiov->niov, offs, 0,
++                   acb->qiov->size - offs);
++    } else {
++        memset(rcb->buf + offs, 0, rcb->size - offs);
++    }
++}
++
+ static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
  {
-     NFSClient *client = bs->opaque;
-     NFSRPC task;
-@@ -274,9 +274,7 @@ static int coroutine_fn nfs_co_readv(BlockDriverState *bs,
-     task.iov = iov;
+     Error *local_err = NULL;
+@@ -426,11 +444,11 @@ static void qemu_rbd_complete_aio(RADOSCB *rcb)
+         }
+     } else {
+         if (r < 0) {
+-            memset(rcb->buf, 0, rcb->size);
++            qemu_rbd_memset(rcb, 0);
+             acb->ret = r;
+             acb->error = 1;
+         } else if (r < rcb->size) {
+-            memset(rcb->buf + r, 0, rcb->size - r);
++            qemu_rbd_memset(rcb, r);
+             if (!acb->error) {
+                 acb->ret = rcb->size;
+             }
+@@ -441,10 +459,13 @@ static void qemu_rbd_complete_aio(RADOSCB *rcb)
  
-     if (nfs_pread_async(client->context, client->fh,
--                        sector_num * BDRV_SECTOR_SIZE,
--                        nb_sectors * BDRV_SECTOR_SIZE,
--                        nfs_co_generic_cb, &task) != 0) {
-+                        offset, bytes, nfs_co_generic_cb, &task) != 0) {
-         return -ENOMEM;
+     g_free(rcb);
+ 
+-    if (acb->cmd == RBD_AIO_READ) {
+-        qemu_iovec_from_buf(acb->qiov, 0, acb->bounce, acb->qiov->size);
++    if (!LIBRBD_USE_IOVEC) {
++        if (acb->cmd == RBD_AIO_READ) {
++            qemu_iovec_from_buf(acb->qiov, 0, acb->bounce, acb->qiov->size);
++        }
++        qemu_vfree(acb->bounce);
      }
+-    qemu_vfree(acb->bounce);
++
+     acb->common.cb(acb->common.opaque, (acb->ret > 0 ? 0 : acb->ret));
  
-@@ -297,9 +295,9 @@ static int coroutine_fn nfs_co_readv(BlockDriverState *bs,
-     return 0;
+     qemu_aio_unref(acb);
+@@ -655,7 +676,6 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
+     RBDAIOCB *acb;
+     RADOSCB *rcb = NULL;
+     rbd_completion_t c;
+-    char *buf;
+     int r;
+ 
+     BDRVRBDState *s = bs->opaque;
+@@ -664,27 +684,29 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
+     acb->cmd = cmd;
+     acb->qiov = qiov;
+     assert(!qiov || qiov->size == size);
+-    if (cmd == RBD_AIO_DISCARD || cmd == RBD_AIO_FLUSH) {
+-        acb->bounce = NULL;
+-    } else {
+-        acb->bounce = qemu_try_blockalign(bs, qiov->size);
+-        if (acb->bounce == NULL) {
+-            goto failed;
++
++    rcb = g_new(RADOSCB, 1);
++
++    if (!LIBRBD_USE_IOVEC) {
++        if (cmd == RBD_AIO_DISCARD || cmd == RBD_AIO_FLUSH) {
++            acb->bounce = NULL;
++        } else {
++            acb->bounce = qemu_try_blockalign(bs, qiov->size);
++            if (acb->bounce == NULL) {
++                goto failed;
++            }
+         }
++        if (cmd == RBD_AIO_WRITE) {
++            qemu_iovec_to_buf(acb->qiov, 0, acb->bounce, qiov->size);
++        }
++        rcb->buf = acb->bounce;
+     }
++
+     acb->ret = 0;
+     acb->error = 0;
+     acb->s = s;
+ 
+-    if (cmd == RBD_AIO_WRITE) {
+-        qemu_iovec_to_buf(acb->qiov, 0, acb->bounce, qiov->size);
+-    }
+-
+-    buf = acb->bounce;
+-
+-    rcb = g_new(RADOSCB, 1);
+     rcb->acb = acb;
+-    rcb->buf = buf;
+     rcb->s = acb->s;
+     rcb->size = size;
+     r = rbd_aio_create_completion(rcb, (rbd_callback_t) rbd_finish_aiocb, &c);
+@@ -694,10 +716,18 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
+ 
+     switch (cmd) {
+     case RBD_AIO_WRITE:
+-        r = rbd_aio_write(s->image, off, size, buf, c);
++#ifdef LIBRBD_SUPPORTS_IOVEC
++            r = rbd_aio_writev(s->image, qiov->iov, qiov->niov, off, c);
++#else
++            r = rbd_aio_write(s->image, off, size, rcb->buf, c);
++#endif
+         break;
+     case RBD_AIO_READ:
+-        r = rbd_aio_read(s->image, off, size, buf, c);
++#ifdef LIBRBD_SUPPORTS_IOVEC
++            r = rbd_aio_readv(s->image, qiov->iov, qiov->niov, off, c);
++#else
++            r = rbd_aio_read(s->image, off, size, rcb->buf, c);
++#endif
+         break;
+     case RBD_AIO_DISCARD:
+         r = rbd_aio_discard_wrapper(s->image, off, size, c);
+@@ -712,14 +742,16 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
+     if (r < 0) {
+         goto failed_completion;
+     }
+-
+     return &acb->common;
+ 
+ failed_completion:
+     rbd_aio_release(c);
+ failed:
+     g_free(rcb);
+-    qemu_vfree(acb->bounce);
++    if (!LIBRBD_USE_IOVEC) {
++        qemu_vfree(acb->bounce);
++    }
++
+     qemu_aio_unref(acb);
+     return NULL;
  }
- 
--static int coroutine_fn nfs_co_writev(BlockDriverState *bs,
--                                        int64_t sector_num, int nb_sectors,
--                                        QEMUIOVector *iov)
-+static int coroutine_fn nfs_co_pwritev(BlockDriverState *bs, uint64_t offset,
-+                                       uint64_t bytes, QEMUIOVector *iov,
-+                                       int flags)
- {
-     NFSClient *client = bs->opaque;
-     NFSRPC task;
-@@ -307,17 +305,16 @@ static int coroutine_fn nfs_co_writev(BlockDriverState *bs,
- 
-     nfs_co_init_task(bs, &task);
- 
--    buf = g_try_malloc(nb_sectors * BDRV_SECTOR_SIZE);
--    if (nb_sectors && buf == NULL) {
-+    buf = g_try_malloc(bytes);
-+    if (bytes && buf == NULL) {
-         return -ENOMEM;
-     }
- 
--    qemu_iovec_to_buf(iov, 0, buf, nb_sectors * BDRV_SECTOR_SIZE);
-+    qemu_iovec_to_buf(iov, 0, buf, bytes);
- 
-     if (nfs_pwrite_async(client->context, client->fh,
--                         sector_num * BDRV_SECTOR_SIZE,
--                         nb_sectors * BDRV_SECTOR_SIZE,
--                         buf, nfs_co_generic_cb, &task) != 0) {
-+                         offset, bytes, buf,
-+                         nfs_co_generic_cb, &task) != 0) {
-         g_free(buf);
-         return -ENOMEM;
-     }
-@@ -329,7 +326,7 @@ static int coroutine_fn nfs_co_writev(BlockDriverState *bs,
- 
-     g_free(buf);
- 
--    if (task.ret != nb_sectors * BDRV_SECTOR_SIZE) {
-+    if (task.ret != bytes) {
-         return task.ret < 0 ? task.ret : -EIO;
-     }
- 
-@@ -861,8 +858,8 @@ static BlockDriver bdrv_nfs = {
-     .bdrv_create                    = nfs_file_create,
-     .bdrv_reopen_prepare            = nfs_reopen_prepare,
- 
--    .bdrv_co_readv                  = nfs_co_readv,
--    .bdrv_co_writev                 = nfs_co_writev,
-+    .bdrv_co_preadv                 = nfs_co_preadv,
-+    .bdrv_co_pwritev                = nfs_co_pwritev,
-     .bdrv_co_flush_to_disk          = nfs_co_flush,
- 
-     .bdrv_detach_aio_context        = nfs_detach_aio_context,
 -- 
 2.9.3
