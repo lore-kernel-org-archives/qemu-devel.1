@@ -1,40 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1ch43n-0002Eo-LW
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 19:48:36 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ch4HJ-0007zJ-UE
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 20:02:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1ch43k-00020P-K5
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 19:48:35 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40864
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1ch43k-00020B-D7
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 19:48:32 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1O0htvb113005
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 19:48:31 -0500
-Received: from e28smtp07.in.ibm.com (e28smtp07.in.ibm.com [125.16.236.7])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28t4yqmua5-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 23 Feb 2017 19:48:31 -0500
-Received: from localhost
-	by e28smtp07.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Fri, 24 Feb 2017 06:18:28 +0530
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <755c77c5-0930-b5ee-0b3b-1e0608301c8d@twiddle.net>
-References: <1487879800-12352-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<1487879800-12352-7-git-send-email-nikunj@linux.vnet.ibm.com>
-	<755c77c5-0930-b5ee-0b3b-1e0608301c8d@twiddle.net>
-Date: Fri, 24 Feb 2017 06:18:22 +0530
+	(envelope-from <dgibson@ozlabs.org>) id 1ch4HG-0005Oi-SG
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 20:02:34 -0500
+Received: from ozlabs.org ([103.22.144.67]:38573)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ch4HG-0005OU-5Q
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 20:02:30 -0500
+Date: Fri, 24 Feb 2017 11:16:13 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170224001613.GG17615@umbus.fritz.box>
+References: <CAFEAcA8AZup28Sho8hLeCRVf4iSdLdeFHvz1h4-X7FwVBcANyg@mail.gmail.com>
+	<448f3a5f-044e-bcac-60bd-2ce074021be9@redhat.com>
+	<20170223224911.GC17615@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain
-Message-Id: <87a89cza5l.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH v4 06/15] target/ppc: remove xer split-out
- flags(so, ov, ca)
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="GdbWtwDHkcXqP16f"
+Content-Disposition: inline
+In-Reply-To: <20170223224911.GC17615@umbus.fritz.box>
+Subject: Re: [Qemu-devel] using fdt_setprop() to set properties to empty
+ values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,29 +30,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
-Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
+To: Eric Blake <eblake@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Richard Henderson <rth@twiddle.net> writes:
 
-> On 02/24/2017 06:56 AM, Nikunj A Dadhania wrote:
->> Now get rid all the split out variables so, ca, ov. After this patch,
->> all the bits are stored in CPUPPCState::xer at appropriate places.
->>
->> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
->> ---
->>  target/ppc/cpu.c        |   8 +---
->>  target/ppc/cpu.h        |  26 ++++++------
->>  target/ppc/int_helper.c |  12 +++---
->>  target/ppc/translate.c  | 106 +++++++++++++++++++++++++-----------------------
->>  4 files changed, 78 insertions(+), 74 deletions(-)
->
-> I do not think this is a good direction to take this.
+--GdbWtwDHkcXqP16f
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Hmm, any particular reason?
+On Fri, Feb 24, 2017 at 09:49:11AM +1100, David Gibson wrote:
+> On Thu, Feb 23, 2017 at 08:52:01AM -0600, Eric Blake wrote:
+> > On 02/23/2017 06:33 AM, Peter Maydell wrote:
+> > > What's the right way to use libfdt's fdt_setprop to set a property
+> > > to have an empty value? At the moment in QEMU we tend to use
+> > >   fdt_setprop(fdt, nodeoffset, "propertyname", NULL, 0);
+>=20
+> That's what I've always used..
+>=20
+> > > and git grep 'fdt_setprop.*NULL' produces examples of this usage in
+> > > PPC and ARM fdt creation code.
+> > >=20
+> > > However the fdt_setprop() documentation doesn't document that a NULL
+> > > value pointer is OK if the length is 0, and indeed the implementation
+> > > unconditionally calls memcpy(prop->data, val, len), which is
+> > > undefined behaviour, and warned about by clang sanitizers if you
+> > > build libfdt with them:
+> > >  dtc/libfdt/fdt_rw.c:288:21: runtime error: null pointer passed
+> > >    as argument 2, which is declared to never be null
+>=20
+> ..but indeed that isn't really technically right.
+>=20
+> > > So what's the best thing to do here? I can't offhand think of a
+> > > non-ugly/non-confusing way to pass a valid pointer here...
+> >=20
+> > Does fdt_setprop(fdt, nodeoffset, "propertyname", "", 0) do the right t=
+hing?
+>=20
+> That should work, but it's a bit clunky.
+>=20
+> I guess I should add an fdt_setprop_empty() to libfdt.
 
-I can send back the v3 with suggested changes dropping the xer split out
-changes.
+Ok, I've pushed libfdt upstream patches to (a) make passing NULL to
+setprop() with zero length explicitly safe and (b) add an
+fdt_setprop_empty() helper macro.  Do you want me to make a pullreq to
+update the qemu submodule?
 
-Regards
-Nikunj
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--GdbWtwDHkcXqP16f
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYr3tKAAoJEGw4ysog2bOSAhUQAMm4U9hEQeO54jwHmqwBhSWD
+ScI+xx2qcyji/g9WRVLunrRvTfioSCfiPVG5E9j/HZyD+q3de8oXz3naQC/UyerH
+T2dC+AdGrK8knR1JMJirLduVzc0BKBdMrb2Gz+jdgJ6sw6qAek/jggAIz7Syelq4
+AP8BtkD2qRshthuSCQeZOeos6KFTJq3RAosZuIS181gwIqP0JAmIpwAOV/BiMG+n
+80m20iyl8UC9aduh/CcCu7kHcC4PTIr46Leg+o1bBdeJ+yCVYNzJW7HmY7TkcLhx
+5u26jkx/KDnxB4Bo+hOdrSWManHwV3MwOhNcQ8BOefk03imPbOLN/Uux6nVcqwFc
+RZ1UhPgdDZCPMp0JrkeUxi/+fnAaELos4uue/bcNzEcblGF+/u2Z1hdHKo2v0kU5
+UNIQQYJAfcDlusf29gWuB40Rm6gfcXfH4U07V/UrS5LzJxQ+isd/IKnb3l8XSBVN
+4HNX3alMmhVWpN/w1M9c3olMa+MjhZWpJeBpvu42ij2RPmReUsTjSKd7CbcsiHKj
+57b+fI/WHTrJ1SAQGBGnDXBjoeY9zqunvKygYOm3a+VvbGTxXd/EaL+GgpwiNtOn
+Ncry1iXtR435FffvxaUQS47xFxgH0hKgr0Mj8NMuQ016EkPDERdtZJ3eLZRNIOyX
+82I07TJaCUcwORZUGNLi
+=NEWD
+-----END PGP SIGNATURE-----
+
+--GdbWtwDHkcXqP16f--
