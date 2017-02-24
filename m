@@ -1,19 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1chGo7-0001Ch-4O
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:25:16 -0500
+	(envelope-from <lvivier@redhat.com>) id 1chGpc-0002C4-93
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:26:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1chGo6-0003E8-1s
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:25:15 -0500
-Date: Fri, 24 Feb 2017 15:25:05 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170224142505.GA4429@noname.redhat.com>
-References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
+	(envelope-from <lvivier@redhat.com>) id 1chGpZ-0003mf-06
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:26:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39376)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1chGpY-0003mI-NR
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:26:44 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DC5364E4C5
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 14:26:44 +0000 (UTC)
+References: <20170206173306.20603-1-dgilbert@redhat.com>
+	<20170206173306.20603-7-dgilbert@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <2b67acaa-7a65-3198-c51a-d23cac8c31e3@redhat.com>
+Date: Fri, 24 Feb 2017 15:26:41 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 00/54] New op blocker system, part 1
+In-Reply-To: <20170206173306.20603-7-dgilbert@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 06/16] Fold postcopy_ram_discard_range
+ into ram_discard_range
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,40 +34,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com
+Cc: aarcange@redhat.com
 
-Am 21.02.2017 um 15:57 hat Kevin Wolf geschrieben:
-> This series is the first part of implementing the new op blocker system
-> whose design was agreed on quite a while ago, but proved a bit tricky to
-> implement in places. There is more work to do to fully replace the old op
-> blocker system, but realistically we don't have that much time until the 2.9
-> freeze. So let's merge this series to complement the traditional op blockers
-> and plan with a second part for the 2.10 timeframe.
+On 06/02/2017 18:32, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > 
-> The basic idea is that every user of a block node (including things outside the
-> block layer that go through a BlockBackend, and also other block nodes that
-> hold references to it) has to declare which low-level operations/permissions it
-> needs and which operation it allows other users to perform on the same node.
-> Depending on these declarations, conflicts are avoided by returning an error
-> for attempts to attach a conflicting user to the same node.
+> Using the previously created ram_block_discard_range,
+> kill off postcopy_ram_discard_range.
+> ram_discard_range is just a wrapper that does the name lookup.
 > 
-> After this series, all users request permissions, and hopefully all of the
-> permissions they need. For writes and resize, getting the permission first is
-> actually enforced with assertions. Asserting it for consistent reads is in
-> theory doable, but would mean introducing a request flag that tell us that
-> inconsistent reads are okay - and that in all block drivers to recursively
-> propagate this flag through the backing chain. It might not be worth it.
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  include/migration/postcopy-ram.h |  7 -------
+>  migration/postcopy-ram.c         | 30 +-----------------------------
+>  migration/ram.c                  | 24 +++---------------------
+>  migration/trace-events           |  2 +-
+>  4 files changed, 5 insertions(+), 58 deletions(-)
 > 
-> As stated above, the series doesn't remove the old op blockers yet, though in
-> theory the new op blockers should block everything that needs to be blocked.
-> In practice, the read/write/resize blockers should be okay, but
-> BLK_PERM_GRAPH_MOD isn't to be taken too seriously at the moment. It isn't
-> really applied consistently and doesn't do much useful yet. Making proper use
-> of it is left for the part 2 series.
+> diff --git a/include/migration/postcopy-ram.h b/include/migration/postcopy-ram.h
+> index b6a7491f..43bbbca 100644
+> --- a/include/migration/postcopy-ram.h
+> +++ b/include/migration/postcopy-ram.h
+> @@ -35,13 +35,6 @@ int postcopy_ram_incoming_init(MigrationIncomingState *mis, size_t ram_pages);
+>  int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis);
+>  
+>  /*
+> - * Discard the contents of 'length' bytes from 'start'
+> - * We can assume that if we've been called postcopy_ram_hosttest returned true
+> - */
+> -int postcopy_ram_discard_range(MigrationIncomingState *mis, uint8_t *start,
+> -                               size_t length);
+> -
+> -/*
+>   * Userfault requires us to mark RAM as NOHUGEPAGE prior to discard
+>   * however leaving it until after precopy means that most of the precopy
+>   * data is still THPd
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index a40dddb..1e3d22f 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -200,27 +200,6 @@ out:
+>      return ret;
+>  }
+>  
+> -/**
+> - * postcopy_ram_discard_range: Discard a range of memory.
+> - * We can assume that if we've been called postcopy_ram_hosttest returned true.
+> - *
+> - * @mis: Current incoming migration state.
+> - * @start, @length: range of memory to discard.
+> - *
+> - * returns: 0 on success.
+> - */
+> -int postcopy_ram_discard_range(MigrationIncomingState *mis, uint8_t *start,
+> -                               size_t length)
+> -{
+> -    trace_postcopy_ram_discard_range(start, length);
+> -    if (madvise(start, length, MADV_DONTNEED)) {
+> -        error_report("%s MADV_DONTNEED: %s", __func__, strerror(errno));
+> -        return -1;
+> -    }
+> -
+> -    return 0;
+> -}
+> -
+>  /*
+>   * Setup an area of RAM so that it *can* be used for postcopy later; this
+>   * must be done right at the start prior to pre-copy.
+> @@ -239,7 +218,7 @@ static int init_range(const char *block_name, void *host_addr,
+>       * - we're going to get the copy from the source anyway.
+>       * (Precopy will just overwrite this data, so doesn't need the discard)
+>       */
+> -    if (postcopy_ram_discard_range(mis, host_addr, length)) {
+> +    if (ram_discard_range(mis, block_name, 0, length)) {
+>          return -1;
+>      }
+>  
+> @@ -658,13 +637,6 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
+>      return -1;
+>  }
+>  
+> -int postcopy_ram_discard_range(MigrationIncomingState *mis, uint8_t *start,
+> -                               size_t length)
+> -{
+> -    assert(0);
+> -    return -1;
+> -}
+> -
+>  int postcopy_ram_prepare_discard(MigrationIncomingState *mis)
+>  {
+>      assert(0);
+> diff --git a/migration/ram.c b/migration/ram.c
+> index d33bd21..136996a 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -1845,6 +1845,8 @@ int ram_discard_range(MigrationIncomingState *mis,
+>  {
+>      int ret = -1;
+>  
+> +    trace_ram_discard_range(block_name, start, length);
+> +
+>      rcu_read_lock();
 
-In order to keep the pull request next week at least a bit smaller, I
-applied the already reviewed patches 1-11 to the block branch (i.e.
-the preparations before the actual op blocker patches start).
+I think you take the rcu_read_lock() twice: here and in
+ram_block_discard_range().
 
-Kevin
+I think you should merge this patch with PATCH 04/16, as it's just code
+copy.
+
+Laurent
