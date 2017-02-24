@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40134)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1chBHw-0000ov-8V
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 03:31:41 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1chBHw-0000ou-8E
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 03:31:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1chBHt-0000PQ-4s
+	(envelope-from <dgibson@ozlabs.org>) id 1chBHt-0000PZ-JF
 	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 03:31:40 -0500
-Date: Fri, 24 Feb 2017 17:16:12 +1100
+Date: Fri, 24 Feb 2017 16:34:44 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170224061612.GE17615@umbus.fritz.box>
-References: <20170224045531.7026-1-aik@ozlabs.ru>
+Message-ID: <20170224053444.GD17615@umbus.fritz.box>
+References: <20170223020936.29220-1-david@gibson.dropbear.id.au>
+	<20170223020936.29220-6-david@gibson.dropbear.id.au>
+	<1487829179.23895.23.camel@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="UOi+gfmBpEZPw9cU"
+	protocol="application/pgp-signature"; boundary="7HhoQoqNsng1reXT"
 Content-Disposition: inline
-In-Reply-To: <20170224045531.7026-1-aik@ozlabs.ru>
-Subject: Re: [Qemu-devel] [PATCH qemu] sysemu: support up to 1024 vCPUs
+In-Reply-To: <1487829179.23895.23.camel@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 5/6] target/ppc: Eliminate htab_base and
+ htab_mask variables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,55 +26,652 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, Greg Kurz <gkurz@linux.vnet.ibm.com>
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: qemu-ppc@nongnu.org, aik@ozlabs.ru, qemu-devel@nongnu.org, agraf@suse.de, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, paulus@samba.org
 
 
---UOi+gfmBpEZPw9cU
-Content-Type: text/plain; charset=us-ascii
+--7HhoQoqNsng1reXT
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 24, 2017 at 03:55:31PM +1100, Alexey Kardashevskiy wrote:
-> From: Greg Kurz <gkurz@linux.vnet.ibm.com>
+On Thu, Feb 23, 2017 at 04:52:59PM +1100, Suraj Jitindar Singh wrote:
+> On Thu, 2017-02-23 at 13:09 +1100, David Gibson wrote:
+> > CPUPPCState includes fields htab_base and htab_mask which store the
+> > base
+> > address (GPA) and size (as a mask) of the guest's hashed page table
+> > (HPT).
+> > These are set when the SDR1 register is updated.
+> >=20
+> > Keeping these in sync with the SDR1 is actually a little bit fiddly,
+> > and
+> > probably not useful for performance, since keeping them expands the
+> > size of
+> > CPUPPCState.=A0=A0It also makes some upcoming changes harder to
+> > implement.
+> >=20
+> > This patch removes these fields, in favour of calculating them
+> > directly
+> > from the SDR1 contents when necessary.
+> >=20
+> > This does make a change to the behaviour of attempting to write a bad
+> > value
+> > (invalid HPT size) to the SDR1 with an mtspr
+> > instruction.=A0=A0Previously, the
+> > bad value would be stored in SDR1 and could be retrieved with a later
+> > mfspr, but the HPT size as used by the softmmu would be, clamped to
+> > the
+> > allowed values.=A0=A0Now, writing a bad value is treated as a no-op.=A0=
+=A0An
+> > error
+> > message is printed in both new and old versions.
+> >=20
+> > I'm not sure which behaviour, if either, matches real hardware.=A0=A0I
+> > don't
+> > think it matters that much, since it's pretty clear that if an OS
+> > writes
+> > a bad value to SDR1, it's not going to boot.
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 >=20
-> Some systems can already provide more than 255 hardware threads.
+> Comments Below.
 >=20
-> Bumping the QEMU limit to 1024 seems reasonable:
-> - it has no visible overhead in top;
-> - the limit itself has no effect on hot paths.
+> > ---
+> > =A0hw/ppc/spapr_hcall.c=A0=A0=A0=A0|=A0=A04 ++--
+> > =A0target/ppc/cpu.h=A0=A0=A0=A0=A0=A0=A0=A0|=A0=A08 --------
+> > =A0target/ppc/machine.c=A0=A0=A0=A0|=A0=A01 -
+> > =A0target/ppc/mmu-hash32.c | 14 +++++++-------
+> > =A0target/ppc/mmu-hash32.h | 24 ++++++++++++++++++------
+> > =A0target/ppc/mmu-hash64.c | 37 ++++++++++++++++---------------------
+> > =A0target/ppc/mmu-hash64.h | 13 +++++++++++++
+> > =A0target/ppc/mmu_helper.c | 31 ++++++++++++++++---------------
+> > =A08 files changed, 72 insertions(+), 60 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> > index fd961b5..85d96f6 100644
+> > --- a/hw/ppc/spapr_hcall.c
+> > +++ b/hw/ppc/spapr_hcall.c
+> > @@ -50,9 +50,9 @@ static bool has_spr(PowerPCCPU *cpu, int spr)
+> > =A0static inline bool valid_ptex(PowerPCCPU *cpu, target_ulong ptex)
+> > =A0{
+> > =A0=A0=A0=A0=A0/*
+> > -=A0=A0=A0=A0=A0* hash value/pteg group index is normalized by htab_mask
+> > +=A0=A0=A0=A0=A0* hash value/pteg group index is normalized by HPT mask
+> > =A0=A0=A0=A0=A0=A0*/
+> > -=A0=A0=A0=A0if (((ptex & ~7ULL) / HPTES_PER_GROUP) & ~cpu->env.htab_ma=
+sk) {
+> > +=A0=A0=A0=A0if (((ptex & ~7ULL) / HPTES_PER_GROUP) &
+> > ~ppc_hash64_hpt_mask(cpu)) {
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0return false;
+> > =A0=A0=A0=A0=A0}
+> > =A0=A0=A0=A0=A0return true;
+> > diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> > index c89973e..c6cd9ab 100644
+> > --- a/target/ppc/cpu.h
+> > +++ b/target/ppc/cpu.h
+> > @@ -309,11 +309,6 @@ union ppc_tlb_t {
+> > =A0#define SDR_32_HTABORG=A0=A0=A0=A0=A0=A0=A0=A0=A00xFFFF0000UL
+> > =A0#define SDR_32_HTABMASK=A0=A0=A0=A0=A0=A0=A0=A00x000001FFUL
+> > =A0
+> > -#if defined(TARGET_PPC64)
+> > -#define SDR_64_HTABORG=A0=A0=A0=A0=A0=A0=A0=A0=A00xFFFFFFFFFFFC0000ULL
+> > -#define SDR_64_HTABSIZE=A0=A0=A0=A0=A0=A0=A0=A00x000000000000001FULL
+> > -#endif /* defined(TARGET_PPC64 */
+> > -
+> > =A0typedef struct ppc_slb_t ppc_slb_t;
+> > =A0struct ppc_slb_t {
+> > =A0=A0=A0=A0=A0uint64_t esid;
+> > @@ -1006,9 +1001,6 @@ struct CPUPPCState {
+> > =A0=A0=A0=A0=A0/* tcg TLB needs flush (deferred slb inval instruction
+> > typically) */
+> > =A0#endif
+> > =A0=A0=A0=A0=A0/* segment registers */
+> > -=A0=A0=A0=A0hwaddr htab_base;
+> > -=A0=A0=A0=A0/* mask used to normalize hash value to PTEG index */
+> > -=A0=A0=A0=A0hwaddr htab_mask;
+> > =A0=A0=A0=A0=A0target_ulong sr[32];
+> > =A0=A0=A0=A0=A0/* externally stored hash table */
+> > =A0=A0=A0=A0=A0uint8_t *external_htab;
+> > diff --git a/target/ppc/machine.c b/target/ppc/machine.c
+> > index df9f7a4..1ccbc8a 100644
+> > --- a/target/ppc/machine.c
+> > +++ b/target/ppc/machine.c
+> > @@ -229,7 +229,6 @@ static int cpu_post_load(void *opaque, int
+> > version_id)
+> > =A0=A0=A0=A0=A0}
+> > =A0
+> > =A0=A0=A0=A0=A0if (!env->external_htab) {
+> > -=A0=A0=A0=A0=A0=A0=A0=A0/* Restore htab_base and htab_mask variables */
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0ppc_store_sdr1(env, env->spr[SPR_SDR1]);
 >=20
-> Cc: Greg Kurz <gkurz@linux.vnet.ibm.com>
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
+> Do we still need to do this? As far as I can tell it pretty much does:
+> env->spr[SPR_SDR1] =3D=A0env->spr[SPR_SDR1]
+> and checks the htab_size, which would have been done when we set SDR1
+> in the first place anyway?
 >=20
-> With ulimit -u/-n bumped (nproc and nofile), I was able to boot a guest
-> with 1024 CPUs, both with threads=3D1 and threads=3D8.
->=20
-> It takes time though - 3:15 to get to the guest shell but it is probably
-> expected on 160-threads machine.
+> > =A0=A0=A0=A0=A0}
+> > =A0
+> > diff --git a/target/ppc/mmu-hash32.c b/target/ppc/mmu-hash32.c
+> > index 29bace6..03ae3c1 100644
+> > --- a/target/ppc/mmu-hash32.c
+> > +++ b/target/ppc/mmu-hash32.c
+> > @@ -304,9 +304,9 @@ static int ppc_hash32_direct_store(PowerPCCPU
+> > *cpu, target_ulong sr,
+> > =A0
+> > =A0hwaddr get_pteg_offset32(PowerPCCPU *cpu, hwaddr hash)
+> > =A0{
+> > -=A0=A0=A0=A0CPUPPCState *env =3D &cpu->env;
+> > +=A0=A0=A0=A0target_ulong mask =3D ppc_hash32_hpt_mask(cpu);
+> > =A0
+> > -=A0=A0=A0=A0return (hash * HASH_PTEG_SIZE_32) & env->htab_mask;
+> > +=A0=A0=A0=A0return (hash * HASH_PTEG_SIZE_32) & mask;
+> > =A0}
+> > =A0
+> > =A0static hwaddr ppc_hash32_pteg_search(PowerPCCPU *cpu, hwaddr
+> > pteg_off,
+> > @@ -339,7 +339,6 @@ static hwaddr ppc_hash32_htab_lookup(PowerPCCPU
+> > *cpu,
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0target_ulong sr, target_ulong
+> > eaddr,
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0ppc_hash_pte32_t *pte)
+> > =A0{
+> > -=A0=A0=A0=A0CPUPPCState *env =3D &cpu->env;
+> > =A0=A0=A0=A0=A0hwaddr pteg_off, pte_offset;
+> > =A0=A0=A0=A0=A0hwaddr hash;
+> > =A0=A0=A0=A0=A0uint32_t vsid, pgidx, ptem;
+> > @@ -353,21 +352,22 @@ static hwaddr ppc_hash32_htab_lookup(PowerPCCPU
+> > *cpu,
+> > =A0=A0=A0=A0=A0qemu_log_mask(CPU_LOG_MMU, "htab_base " TARGET_FMT_plx
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0" htab_mask " TARGET_FMT_plx
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0" hash " TARGET_FMT_plx "\n",
+> > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0env->htab_base, env->htab_mask, ha=
+sh);
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0ppc_hash32_hpt_base(cpu), ppc_hash=
+32_hpt_mask(cpu),
+> > hash);
+> > =A0
+> > =A0=A0=A0=A0=A0/* Primary PTEG lookup */
+> > =A0=A0=A0=A0=A0qemu_log_mask(CPU_LOG_MMU, "0 htab=3D" TARGET_FMT_plx "/"
+> > TARGET_FMT_plx
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0" vsid=3D%" PRIx32 " ptem=3D%" P=
+RIx32
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0" hash=3D" TARGET_FMT_plx "\n",
+> > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0env->htab_base, env->htab_mask, vs=
+id, ptem, hash);
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0ppc_hash32_hpt_base(cpu), ppc_hash=
+32_hpt_mask(cpu),
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0vsid, ptem, hash);
+> > =A0=A0=A0=A0=A0pteg_off =3D get_pteg_offset32(cpu, hash);
+> > =A0=A0=A0=A0=A0pte_offset =3D ppc_hash32_pteg_search(cpu, pteg_off, 0, =
+ptem,
+> > pte);
+> > =A0=A0=A0=A0=A0if (pte_offset =3D=3D -1) {
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0/* Secondary PTEG lookup */
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0qemu_log_mask(CPU_LOG_MMU, "1 htab=3D" TARGE=
+T_FMT_plx "/"
+> > TARGET_FMT_plx
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0" vsid=3D%" PRIx32 "=
+ api=3D%" PRIx32
+> > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0" hash=3D" TARGET_FMT_=
+plx "\n", env->htab_base,
+> > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0env->htab_mask, vsid, =
+ptem, ~hash);
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0" hash=3D" TARGET_FMT_=
+plx "\n",
+> > ppc_hash32_hpt_base(cpu),
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0ppc_hash32_hpt_mask(cp=
+u), vsid, ptem, ~hash);
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0pteg_off =3D get_pteg_offset32(cpu, ~hash);
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0pte_offset =3D ppc_hash32_pteg_search(cpu, p=
+teg_off, 1, ptem,
+> > pte);
+> > =A0=A0=A0=A0=A0}
+> > diff --git a/target/ppc/mmu-hash32.h b/target/ppc/mmu-hash32.h
+> > index 5b9fb08..054be65 100644
+> > --- a/target/ppc/mmu-hash32.h
+> > +++ b/target/ppc/mmu-hash32.h
+> > @@ -65,42 +65,54 @@ int ppc_hash32_handle_mmu_fault(PowerPCCPU *cpu,
+> > vaddr address, int rw,
+> > =A0#define HPTE32_R_WIMG=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A00x00000078
+> > =A0#define HPTE32_R_PP=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A00x00000003
+> > =A0
+> > +static inline hwaddr ppc_hash32_hpt_base(PowerPCCPU *cpu)
+> > +{
+> > +=A0=A0=A0=A0return cpu->env.spr[SPR_SDR1] & SDR_32_HTABORG;
+> > +}
+> > +
+> > +static inline hwaddr ppc_hash32_hpt_mask(PowerPCCPU *cpu)
+> > +{
+> > +=A0=A0=A0=A0return ((cpu->env.spr[SPR_SDR1] & SDR_32_HTABMASK) << 16) |
+> > 0xFFFF;
+> > +}
+> > +
+> > =A0static inline target_ulong ppc_hash32_load_hpte0(PowerPCCPU *cpu,
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0hwaddr pte_offset)
+> > =A0{
+> > =A0=A0=A0=A0=A0CPUPPCState *env =3D &cpu->env;
+> > +=A0=A0=A0=A0target_ulong base =3D ppc_hash32_hpt_base(cpu);
+> > =A0
+> > =A0=A0=A0=A0=A0assert(!env->external_htab); /* Not supported on 32-bit =
+for now
+> > */
+> > -=A0=A0=A0=A0return ldl_phys(CPU(cpu)->as, env->htab_base + pte_offset);
+> > +=A0=A0=A0=A0return ldl_phys(CPU(cpu)->as, base + pte_offset);
+> > =A0}
+> > =A0
+> > =A0static inline target_ulong ppc_hash32_load_hpte1(PowerPCCPU *cpu,
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0hwaddr pte_offset)
+> > =A0{
+> > +=A0=A0=A0=A0target_ulong base =3D ppc_hash32_hpt_base(cpu);
+> > =A0=A0=A0=A0=A0CPUPPCState *env =3D &cpu->env;
+> > =A0
+> > =A0=A0=A0=A0=A0assert(!env->external_htab); /* Not supported on 32-bit =
+for now
+> > */
+> > -=A0=A0=A0=A0return ldl_phys(CPU(cpu)->as,
+> > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0env->htab_=
+base + pte_offset + HASH_PTE_SIZE_32 /
+> > 2);
+> > +=A0=A0=A0=A0return ldl_phys(CPU(cpu)->as, base + pte_offset +
+> > HASH_PTE_SIZE_32 / 2);
+> > =A0}
+> > =A0
+> > =A0static inline void ppc_hash32_store_hpte0(PowerPCCPU *cpu,
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0hwaddr pte_offs=
+et,
+> > target_ulong pte0)
+> > =A0{
+> > =A0=A0=A0=A0=A0CPUPPCState *env =3D &cpu->env;
+> > +=A0=A0=A0=A0target_ulong base =3D ppc_hash32_hpt_base(cpu);
+> > =A0
+> > =A0=A0=A0=A0=A0assert(!env->external_htab); /* Not supported on 32-bit =
+for now
+> > */
+> > -=A0=A0=A0=A0stl_phys(CPU(cpu)->as, env->htab_base + pte_offset, pte0);
+> > +=A0=A0=A0=A0stl_phys(CPU(cpu)->as, base + pte_offset, pte0);
+> > =A0}
+> > =A0
+> > =A0static inline void ppc_hash32_store_hpte1(PowerPCCPU *cpu,
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0hwaddr pte_offs=
+et,
+> > target_ulong pte1)
+> > =A0{
+> > =A0=A0=A0=A0=A0CPUPPCState *env =3D &cpu->env;
+> > +=A0=A0=A0=A0target_ulong base =3D ppc_hash32_hpt_base(cpu);
+> > =A0
+> > =A0=A0=A0=A0=A0assert(!env->external_htab); /* Not supported on 32-bit =
+for now
+> > */
+> > -=A0=A0=A0=A0stl_phys(CPU(cpu)->as,
+> > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0env->htab_base + pte_offset + H=
+ASH_PTE_SIZE_32 / 2,
+> > pte1);
+> > +=A0=A0=A0=A0stl_phys(CPU(cpu)->as, base + pte_offset + HASH_PTE_SIZE_3=
+2 / 2,
+> > pte1);
+> > =A0}
+> > =A0
+> > =A0typedef struct {
+> > diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+> > index c59db47..bb87777 100644
+> > --- a/target/ppc/mmu-hash64.c
+> > +++ b/target/ppc/mmu-hash64.c
+> > @@ -304,15 +304,13 @@ void ppc_hash64_set_sdr1(PowerPCCPU *cpu,
+> > target_ulong value,
+> > =A0=A0=A0=A0=A0CPUPPCState *env =3D &cpu->env;
+> > =A0=A0=A0=A0=A0target_ulong htabsize =3D value & SDR_64_HTABSIZE;
+> > =A0
+> > -=A0=A0=A0=A0env->spr[SPR_SDR1] =3D value;
+> > =A0=A0=A0=A0=A0if (htabsize > 28) {
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0error_setg(errp,
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0"Invalid HT=
+ABSIZE 0x" TARGET_FMT_lx" stored in
+> > SDR1",
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0htabsize);
+> > -=A0=A0=A0=A0=A0=A0=A0=A0htabsize =3D 28;
+> > +=A0=A0=A0=A0=A0=A0=A0=A0return;
+> > =A0=A0=A0=A0=A0}
+> > -=A0=A0=A0=A0env->htab_mask =3D (1ULL << (htabsize + 18 - 7)) - 1;
+> > -=A0=A0=A0=A0env->htab_base =3D value & SDR_64_HTABORG;
+> > +=A0=A0=A0=A0env->spr[SPR_SDR1] =3D value;
+> > =A0}
+> > =A0
+> > =A0void ppc_hash64_set_external_hpt(PowerPCCPU *cpu, void *hpt, int
+> > shift,
+> > @@ -333,10 +331,6 @@ void ppc_hash64_set_external_hpt(PowerPCCPU
+> > *cpu, void *hpt, int shift,
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0return;
+> > =A0=A0=A0=A0=A0}
+> > =A0
+> > -=A0=A0=A0=A0/* Not strictly necessary, but makes it clearer that an ex=
+ternal
+> > -=A0=A0=A0=A0=A0* htab is in use when debugging */
+> > -=A0=A0=A0=A0env->htab_base =3D -1;
+> > -
+> > =A0=A0=A0=A0=A0if (kvm_enabled()) {
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0if (kvmppc_put_books_sregs(cpu) < 0) {
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0error_setg(errp, "Unable to upda=
+te SDR1 in KVM");
+> > @@ -448,11 +442,12 @@ const ppc_hash_pte64_t
+> > *ppc_hash64_map_hptes(PowerPCCPU *cpu,
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0* HTAB is controlled by QEMU. Just point =
+to the internally
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0* accessible PTEG.
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0*/
+> > -=A0=A0=A0=A0=A0=A0=A0=A0hptes =3D (ppc_hash_pte64_t *)(cpu->env.extern=
+al_htab +
+> > pte_offset);
+> > -=A0=A0=A0=A0} else if (cpu->env.htab_base) {
+> > +=A0=A0=A0=A0=A0=A0=A0=A0hptes =3D (const ppc_hash_pte64_t *)(cpu->env.=
+external_htab +
+> > pte_offset);
+> ^^^ Does this particular line belong in the previous patch?
 
-Applied, thanks.
+Yes, yes it does.  Nice catch.
 
+> > +=A0=A0=A0=A0} else if (ppc_hash64_hpt_base(cpu)) {
+> > +=A0=A0=A0=A0=A0=A0=A0=A0hwaddr base =3D ppc_hash64_hpt_base(cpu);
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0hwaddr plen =3D n * HASH_PTE_SIZE_64;
+> > -=A0=A0=A0=A0=A0=A0=A0=A0hptes =3D address_space_map(CPU(cpu)->as, cpu-=
+>env.htab_base +
+> > pte_offset,
+> > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0&plen, false);
+> > +=A0=A0=A0=A0=A0=A0=A0=A0hptes =3D address_space_map(CPU(cpu)->as, base=
+ + pte_offset,
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0&plen, false);
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0if (plen < (n * HASH_PTE_SIZE_64)) {
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0hw_error("%s: Unable to map all =
+requested HPTEs\n",
+> > __FUNCTION__);
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0}
+> > @@ -513,13 +508,12 @@ static hwaddr ppc_hash64_pteg_search(PowerPCCPU
+> > *cpu, hwaddr hash,
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0target_ulong ptem,
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0ppc_hash_pte64_t *pte, unsigned
+> > *pshift)
+> > =A0{
+> > -=A0=A0=A0=A0CPUPPCState *env =3D &cpu->env;
+> > =A0=A0=A0=A0=A0int i;
+> > =A0=A0=A0=A0=A0const ppc_hash_pte64_t *pteg;
+> > =A0=A0=A0=A0=A0target_ulong pte0, pte1;
+> > =A0=A0=A0=A0=A0target_ulong ptex;
+> > =A0
+> > -=A0=A0=A0=A0ptex =3D (hash & env->htab_mask) * HPTES_PER_GROUP;
+> > +=A0=A0=A0=A0ptex =3D (hash & ppc_hash64_hpt_mask(cpu)) * HPTES_PER_GRO=
+UP;
+> > =A0=A0=A0=A0=A0pteg =3D ppc_hash64_map_hptes(cpu, ptex, HPTES_PER_GROUP=
+);
+> > =A0=A0=A0=A0=A0if (!pteg) {
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0return -1;
+> > @@ -597,14 +591,15 @@ static hwaddr ppc_hash64_htab_lookup(PowerPCCPU
+> > *cpu,
+> > =A0=A0=A0=A0=A0qemu_log_mask(CPU_LOG_MMU,
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0"htab_base " TARGET_FMT_plx " ht=
+ab_mask " TARGET_FMT_plx
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0" hash " TARGET_FMT_plx "\n",
+> > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0env->htab_base, env->htab_mask, ha=
+sh);
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0ppc_hash64_hpt_base(cpu), ppc_hash=
+64_hpt_mask(cpu),
+> > hash);
+> > =A0
+> > =A0=A0=A0=A0=A0/* Primary PTEG lookup */
+> > =A0=A0=A0=A0=A0qemu_log_mask(CPU_LOG_MMU,
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0"0 htab=3D" TARGET_FMT_plx "/" T=
+ARGET_FMT_plx
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0" vsid=3D" TARGET_FMT_lx " ptem=
+=3D" TARGET_FMT_lx
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0" hash=3D" TARGET_FMT_plx "\n",
+> > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0env->htab_base, env->htab_mask, vs=
+id, ptem,=A0=A0hash);
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0ppc_hash64_hpt_base(cpu), ppc_hash=
+64_hpt_mask(cpu),
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0vsid, ptem,=A0=A0hash);
+> > =A0=A0=A0=A0=A0ptex =3D ppc_hash64_pteg_search(cpu, hash, sps, ptem, pt=
+e,
+> > pshift);
+> > =A0
+> > =A0=A0=A0=A0=A0if (ptex =3D=3D -1) {
+> > @@ -613,8 +608,8 @@ static hwaddr ppc_hash64_htab_lookup(PowerPCCPU
+> > *cpu,
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0qemu_log_mask(CPU_LOG_MMU,
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0"1 htab=3D" TARGET_F=
+MT_plx "/" TARGET_FMT_plx
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0" vsid=3D" TARGET_FM=
+T_lx " api=3D" TARGET_FMT_lx
+> > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0" hash=3D" TARGET_FMT_=
+plx "\n", env->htab_base,
+> > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0env->htab_mask, vsid, =
+ptem, ~hash);
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0" hash=3D" TARGET_FMT_=
+plx "\n",
+> > ppc_hash64_hpt_base(cpu),
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0ppc_hash64_hpt_mask(cp=
+u), vsid, ptem, ~hash);
+> > =A0
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0ptex =3D ppc_hash64_pteg_search(cpu, ~hash, =
+sps, ptem, pte,
+> > pshift);
+> > =A0=A0=A0=A0=A0}
+> > @@ -932,9 +927,9 @@ void ppc_hash64_store_hpte(PowerPCCPU *cpu,
+> > hwaddr ptex,
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0stq_p(env->external_htab + offset, pte0);
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0stq_p(env->external_htab + offset + HASH_PTE=
+_SIZE_64 / 2,
+> > pte1);
+> > =A0=A0=A0=A0=A0} else {
+> > -=A0=A0=A0=A0=A0=A0=A0=A0stq_phys(CPU(cpu)->as, env->htab_base + offset=
+, pte0);
+> > -=A0=A0=A0=A0=A0=A0=A0=A0stq_phys(CPU(cpu)->as,
+> > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0env->htab_base + of=
+fset + HASH_PTE_SIZE_64 / 2,
+> > pte1);
+> > +=A0=A0=A0=A0=A0=A0=A0=A0hwaddr base =3D ppc_hash64_hpt_base(cpu);
+> > +=A0=A0=A0=A0=A0=A0=A0=A0stq_phys(CPU(cpu)->as, base + offset, pte0);
+> > +=A0=A0=A0=A0=A0=A0=A0=A0stq_phys(CPU(cpu)->as, base + offset + HASH_PT=
+E_SIZE_64 / 2,
+> > pte1);
+> > =A0=A0=A0=A0=A0}
+> > =A0}
+> > =A0
+> > diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
+> > index 8637fe4..dc0bc99 100644
+> > --- a/target/ppc/mmu-hash64.h
+> > +++ b/target/ppc/mmu-hash64.h
+> > @@ -56,6 +56,9 @@ void ppc_hash64_update_rmls(CPUPPCState *env);
+> > =A0 * Hash page table definitions
+> > =A0 */
+> > =A0
+> > +#define=A0SDR_64_HTABORG=A0=A0=A0=A0=A0=A0=A0=A0=A00xFFFFFFFFFFFC0000U=
+LL
 >=20
-> ---
->  hw/ppc/spapr.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> I think this was just always wrong, but it should be
+> 0x0FFFFFFFFFFC0000ULL
+> =A0 ^
 >=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index e465d7ac98..46b81a625d 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2712,7 +2712,7 @@ static void spapr_machine_class_init(ObjectClass *o=
-c, void *data)
->      mc->init =3D ppc_spapr_init;
->      mc->reset =3D ppc_spapr_reset;
->      mc->block_default_type =3D IF_SCSI;
-> -    mc->max_cpus =3D 255;
-> +    mc->max_cpus =3D 1024;
->      mc->no_parallel =3D 1;
->      mc->default_boot_order =3D "";
->      mc->default_ram_size =3D 512 * M_BYTE;
+> > +#define SDR_64_HTABSIZE=A0=A0=A0=A0=A0=A0=A0=A00x000000000000001FULL
+> > +
+> > =A0#define HPTES_PER_GROUP=A0=A0=A0=A0=A0=A0=A0=A0=A08
+> > =A0#define HASH_PTE_SIZE_64=A0=A0=A0=A0=A0=A0=A0=A016
+> > =A0#define HASH_PTEG_SIZE_64=A0=A0=A0=A0=A0=A0=A0(HASH_PTE_SIZE_64 * HP=
+TES_PER_GROUP)
+> > @@ -91,6 +94,16 @@ void ppc_hash64_update_rmls(CPUPPCState *env);
+> > =A0#define HPTE64_V_1TB_SEG=A0=A0=A0=A0=A0=A0=A0=A00x4000000000000000ULL
+> > =A0#define HPTE64_V_VRMA_MASK=A0=A0=A0=A0=A0=A00x4001ffffff000000ULL
+> > =A0
+> > +static inline hwaddr ppc_hash64_hpt_base(PowerPCCPU *cpu)
+> > +{
+> > +=A0=A0=A0=A0return cpu->env.spr[SPR_SDR1] & SDR_64_HTABORG;
+> > +}
+> > +
+> > +static inline hwaddr ppc_hash64_hpt_mask(PowerPCCPU *cpu)
+> > +{
+> > +=A0=A0=A0=A0return (1ULL << ((cpu->env.spr[SPR_SDR1] & SDR_64_HTABSIZE=
+) + 18
+> > - 7)) - 1;
+> > +}
+> > +
+> > =A0void ppc_hash64_set_sdr1(PowerPCCPU *cpu, target_ulong value,
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0Error **errp);
+> > =A0void ppc_hash64_set_external_hpt(PowerPCCPU *cpu, void *hpt, int
+> > shift,
+> > diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
+> > index eb2d482..1381635 100644
+> > --- a/target/ppc/mmu_helper.c
+> > +++ b/target/ppc/mmu_helper.c
+> > @@ -466,6 +466,7 @@ static int get_bat_6xx_tlb(CPUPPCState *env,
+> > mmu_ctx_t *ctx,
+> > =A0static inline int get_segment_6xx_tlb(CPUPPCState *env, mmu_ctx_t
+> > *ctx,
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0target_ulong eaddr, int rw,
+> > int type)
+> > =A0{
+> > +=A0=A0=A0=A0PowerPCCPU *cpu =3D ppc_env_get_cpu(env);
+> > =A0=A0=A0=A0=A0hwaddr hash;
+> > =A0=A0=A0=A0=A0target_ulong vsid;
+> > =A0=A0=A0=A0=A0int ds, pr, target_page_bits;
+> > @@ -503,7 +504,7 @@ static inline int get_segment_6xx_tlb(CPUPPCState
+> > *env, mmu_ctx_t *ctx,
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0qemu_log_mask(CPU_LOG_MMU, "htab=
+_base " TARGET_FMT_plx
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0" htab_m=
+ask " TARGET_FMT_plx
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0" hash "=
+ TARGET_FMT_plx "\n",
+> > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0env->htab_=
+base, env->htab_mask, hash);
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0ppc_hash32=
+_hpt_base(cpu),
+> > ppc_hash32_hpt_mask(cpu), hash);
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0ctx->hash[0] =3D hash;
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0ctx->hash[1] =3D ~hash;
+> > =A0
+> > @@ -518,9 +519,11 @@ static inline int
+> > get_segment_6xx_tlb(CPUPPCState *env, mmu_ctx_t *ctx,
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0uint32_t a0, a1, a2,=
+ a3;
+> > =A0
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0qemu_log("Page table=
+: " TARGET_FMT_plx " len "
+> > TARGET_FMT_plx
+> > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0"\n", env->htab_base, env->htab_mask +
+> > 0x80);
+> > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0for (curaddr =3D env->=
+htab_base;
+> > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0curaddr=
+ < (env->htab_base + env->htab_mask +
+> > 0x80);
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0"\n", ppc_hash32_hpt_base(cpu),
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0ppc_hash32_hpt_mask(env) + 0x80);
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0for (curaddr =3D ppc_h=
+ash32_hpt_base(cpu);
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0curaddr=
+ < (ppc_hash32_hpt_base(cpu)
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0+ ppc_hash32_hpt_mask(cpu) + 0x80);
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0curad=
+dr +=3D 16) {
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0a0 =3D l=
+dl_phys(cs->as, curaddr);
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0a1 =3D l=
+dl_phys(cs->as, curaddr + 4);
+> > @@ -1205,12 +1208,13 @@ static void mmu6xx_dump_BATs(FILE *f,
+> > fprintf_function cpu_fprintf,
+> > =A0static void mmu6xx_dump_mmu(FILE *f, fprintf_function cpu_fprintf,
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0CPUPPCState *env)
+> > =A0{
+> > +=A0=A0=A0=A0PowerPCCPU *cpu =3D ppc_env_get_cpu(env);
+> > =A0=A0=A0=A0=A0ppc6xx_tlb_t *tlb;
+> > =A0=A0=A0=A0=A0target_ulong sr;
+> > =A0=A0=A0=A0=A0int type, way, entry, i;
+> > =A0
+> > -=A0=A0=A0=A0cpu_fprintf(f, "HTAB base =3D 0x%"HWADDR_PRIx"\n", env-
+> > >htab_base);
+> > -=A0=A0=A0=A0cpu_fprintf(f, "HTAB mask =3D 0x%"HWADDR_PRIx"\n", env-
+> > >htab_mask);
+> > +=A0=A0=A0=A0cpu_fprintf(f, "HTAB base =3D 0x%"HWADDR_PRIx"\n",
+> > ppc_hash32_hpt_base(cpu));
+> > +=A0=A0=A0=A0cpu_fprintf(f, "HTAB mask =3D 0x%"HWADDR_PRIx"\n",
+> > ppc_hash32_hpt_mask(cpu));
+> > =A0
+> > =A0=A0=A0=A0=A0cpu_fprintf(f, "\nSegment registers:\n");
+> > =A0=A0=A0=A0=A0for (i =3D 0; i < 32; i++) {
+> > @@ -1592,9 +1596,9 @@ static int cpu_ppc_handle_mmu_fault(CPUPPCState
+> > *env, target_ulong address,
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0env->spr=
+[SPR_DCMP] =3D 0x80000000 | ctx.ptem;
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0tlb_miss:
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0env->err=
+or_code |=3D ctx.key << 19;
+> > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0env->spr[S=
+PR_HASH1] =3D env->htab_base +
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0env->spr[S=
+PR_HASH1] =3D ppc_hash32_hpt_base(cpu) +
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0get_pteg_offset32(cpu, ctx.hash[0]);
+> > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0env->spr[S=
+PR_HASH2] =3D env->htab_base +
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0env->spr[S=
+PR_HASH2] =3D ppc_hash32_hpt_base(cpu) +
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0get_pteg_offset32(cpu, ctx.hash[1]);
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0break;
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0case POWERPC_MMU_SOF=
+T_74xx:
+> > @@ -1999,7 +2003,6 @@ void ppc_store_sdr1(CPUPPCState *env,
+> > target_ulong value)
+> > =A0{
+> > =A0=A0=A0=A0=A0qemu_log_mask(CPU_LOG_MMU, "%s: " TARGET_FMT_lx "\n", __=
+func__,
+> > value);
+> > =A0=A0=A0=A0=A0assert(!env->external_htab);
+> > -=A0=A0=A0=A0env->spr[SPR_SDR1] =3D value;
+> > =A0#if defined(TARGET_PPC64)
+> > =A0=A0=A0=A0=A0if (env->mmu_model & POWERPC_MMU_64) {
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0PowerPCCPU *cpu =3D ppc_env_get_cpu(env);
+> > @@ -2009,14 +2012,12 @@ void ppc_store_sdr1(CPUPPCState *env,
+> > target_ulong value)
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0if (local_err) {
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0error_report_err(local_err);
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0error_free(local_err);
+> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0return;
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0}
+> > -=A0=A0=A0=A0} else
+> > -#endif /* defined(TARGET_PPC64) */
+> > -=A0=A0=A0=A0{
+> > -=A0=A0=A0=A0=A0=A0=A0=A0/* FIXME: Should check for valid HTABMASK valu=
+es */
+> > -=A0=A0=A0=A0=A0=A0=A0=A0env->htab_mask =3D ((value & SDR_32_HTABMASK) =
+<< 16) | 0xFFFF;
+> > -=A0=A0=A0=A0=A0=A0=A0=A0env->htab_base =3D value & SDR_32_HTABORG;
+> > =A0=A0=A0=A0=A0}
+> > +#endif /* defined(TARGET_PPC64) */
+> > +=A0=A0=A0=A0/* FIXME: Should check for valid HTABMASK values in 32-bit=
+ case
+> > */
+> > +=A0=A0=A0=A0env->spr[SPR_SDR1] =3D value;
+> > =A0}
+> > =A0
+> > =A0/* Segment registers load and store */
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -79,25 +679,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---UOi+gfmBpEZPw9cU
+--7HhoQoqNsng1reXT
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYr8+qAAoJEGw4ysog2bOSQEYQAK0FaCVzIFrpL/YGL/EgvN3p
-uN2/RKu+8rele52LZoJj34JtdZRifKWz6qYA9HeX0QWYEgr79q5hNojWNByxZtNr
-ZhOR+yrpjs11cRbl3AgQXDmDY9sbTUjWMzZ4LFhXRXVTtRe8iJdO5CEZXLjS0zxF
-0STB4A5EMWa5s4qZ19y8axoJHnZ0lYBI5TsyrvL1jn1uNMUN7bYACaqxNnMIbTMA
-QERlnQkSQzNa/5qP/Nu4vD33CP1rFk+KOI5t53QkU8Aeh8HQMhOKV6TuACmSKKZ9
-IgWGEAmaqFqJPSJuilprWimUYJg3AeBS+X4Lato4wMpzkOHqU79er4LF4hfyC1s3
-VrFqLsNXBuPYD9X1QlTFajje/kdyKgX4OBmMrJXWzcYo0uZW4O1qKtBGTK2r8wb+
-ks3jv2zb66csqyADHXt4Ymj4Df4iw6Mj/XR8/+2ROGMrcCZ7tbP/RFtBZJQDlDLs
-J0skKRnrnSTWCtqD6qDWVC0dm68CyvFpJhfFGCI0sCpaLR3UbYGY2Ud93Q1OPAxV
-YcSmkHRRGTNlIgKRprARdpJd1tdsojLHa+kS9CMp1TtArwtalMzyitBbf6+lXRiN
-NddO7UKgX5M4X5NE8p1OUl0+dweHAfKxEHdtrfc6bo5bwZO95o7+az1g6EwF93mz
-Z0qZ6HlRcDirRXmyG0P7
-=hbwY
+iQIcBAEBCAAGBQJYr8X0AAoJEGw4ysog2bOS1ygP/iVdMK8Udf3RjG80D0iaLFl/
+6HeWZ0YpevDv2R52AGYojgGeh5GrywaE9RyikYqhzUzrQvn2g4qAONFSMeCWeYY4
+l27FTJGg9PTCgGLwWxbFzjuKWQ2oOImjQ/wbVo5YNwQHODb9frxvtdzI2CrRu0cb
++VtW52C44A9Ryf/P1iD1bYQDFguU0Ji+ZIotTsZXZlghmRWaUTRIsEA1eYUvkH7i
+hHxRyUu4Q9YsmVGeTD57gfYCqMjlOYi9ya99hQftsaeJYaX7mlb6tkXoykhp6UNR
+ZAibRAB7RZg0MZ9Bf8tS3nAiBN5njfySu15l7TMx6yV3hwcOMs2TfUIJex/vHxnL
+f0ovxcEVZfxDZPYrsQbh0UcMxdkaXPOt0VUuEfSTtnvFgsJgeCIN+cPFV9ROQePg
+4U/XBxEF3j0cVpCJOde4bJ8LwJ7rWIhyvQZrWd0KvKxYptFqbcB5eOpvloQOpaOC
+nZQfMu0OHtSHmm/c3cf2+xZiQy2vgSq154DCOkybLskVQrIl0CoDA9aZSVjjen/5
+H2EUYPTb5MMBU4555JoT8b6T0S+pWXWtHIQ7XfjHwos6SE4o8c2ULDa3juZ7J7Th
+togRbNh5eLJz8uZEChICtpq+4hUuvhtOcWJXyYcd8A0reUS8MsZnxhaXzCe0T8lU
+Jx0w32BoOncUfmZ7YMxk
+=26XT
 -----END PGP SIGNATURE-----
 
---UOi+gfmBpEZPw9cU--
+--7HhoQoqNsng1reXT--
