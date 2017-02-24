@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59476)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1chLi0-0003Dv-M3
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:39:18 -0500
+	(envelope-from <no-reply@patchew.org>) id 1chLsm-0002h8-9r
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:50:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1chLhw-0005j0-Oa
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:39:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36184)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1chLhw-0005hh-HQ
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:39:12 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7F1344E4D8
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 19:39:12 +0000 (UTC)
-References: <1487886317-27400-1-git-send-email-armbru@redhat.com>
-	<1487886317-27400-5-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <bc882971-0828-079b-e0b1-0d50fad215d3@redhat.com>
-Date: Fri, 24 Feb 2017 13:39:10 -0600
+	(envelope-from <no-reply@patchew.org>) id 1chLsj-0005QX-2V
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:50:24 -0500
+Resent-Message-Id: <E1chLsj-0005QX-2V@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21473)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1chLsi-0005NG-Qv
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 14:50:20 -0500
+In-Reply-To: <1487886317-27400-1-git-send-email-armbru@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148796576380.177.7962131506577566263@0e2666bad730>
 MIME-Version: 1.0
-In-Reply-To: <1487886317-27400-5-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="kk5jSDF63sTidB47uQTDt5GOT8fiX5pME"
-Subject: Re: [Qemu-devel] [PATCH 04/21] qmp: Dumb down how we run QMP
- command registration
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 24 Feb 2017 11:49:24 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 00/21] qapi: QMP dispatch and input visitor
+ work
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,124 +29,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: armbru@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kk5jSDF63sTidB47uQTDt5GOT8fiX5pME
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <bc882971-0828-079b-e0b1-0d50fad215d3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 04/21] qmp: Dumb down how we run QMP command
- registration
-References: <1487886317-27400-1-git-send-email-armbru@redhat.com>
- <1487886317-27400-5-git-send-email-armbru@redhat.com>
-In-Reply-To: <1487886317-27400-5-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 02/23/2017 03:45 PM, Markus Armbruster wrote:
-> The way we get QMP commands registered is high tech:
->=20
-> * qapi-commands.py generates qmp_init_marshal() that does the actual wo=
-rk
->=20
-> * it also generates the magic to register it as a MODULE_INIT_QAPI
->   function, so it runs when someone calls
->   module_call_init(MODULE_INIT_QAPI)
->=20
-> * main() calls module_call_init()
->=20
-> QEMU needs to register a few non-qapified commands.  Same high tech
-> works: monitor.c has its own qmp_init_marshal() along with the magic
-> to make it run in module_call_init(MODULE_INIT_QAPI).
-
-Eww. Two static functions with the same name, which really messes with
-gdb debugging.
-
->=20
-> QEMU also needs to unregister commands that are not wanted in this
-> build's configuration (commit 5032a16).  Simple enough:
-> qmp_unregister_commands_hack().  The difficulty is to make it run
-> after the generated qmp_init_marshal().  We can't simply run it in
-> monitor.c's qmp_init_marshal(), because the order in which the
-> registered functions run is indeterminate.  So qmp_init_marshal()
-> registers qmp_init_marshal() separately.  Since registering *appends*
-
-Another case of "A sets up A" when you meant "A sets up B", but this
-time, I'm fairly certain you mean qmp_init_marshal() registers
-qmp_unregister_commands_hack() separately.
-
-> to the list of registered functions, this will make it run after all
-> the functions that have been registered already.
->=20
-> I suspect it takes a long and expensive computer science education to
-> not find this silly.
-
-ROFL
-(does that mean I didn't spend enough on my education? I'm sure you
-could arrange to sell me an online certificate if I wanted more... :)
-
->=20
-> Dumb it down as follows:
->=20
-> * Drop MODULE_INIT_QAPI entirely
->=20
-> * Give the generated qmp_init_marshal() external linkage.
->=20
-> * Call it instead of module_call_init(MODULE_INIT_QAPI)
->=20
-> * Except in QEMU proper, call new monitor_init_qmp_commands() that in
->   turn calls the generated qmp_init_marshal(), registers the
->   additional commands and unregisters the unwanted ones.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
-
-> -static void qmp_init_marshal(void)
-> +void monitor_init_qmp_commands(void)
->  {
-> +    qmp_init_marshal();
-> +
->      qmp_register_command("query-qmp-schema", qmp_query_qmp_schema,
->                           QCO_NO_OPTIONS);
->      qmp_register_command("device_add", qmp_device_add,
-> @@ -1004,12 +1006,9 @@ static void qmp_init_marshal(void)
->      qmp_register_command("netdev_add", qmp_netdev_add,
->                           QCO_NO_OPTIONS);
-> =20
-> -    /* call it after the rest of qapi_init() */
-> -    register_module_init(qmp_unregister_commands_hack, MODULE_INIT_QAP=
-I);
-> +    qmp_unregister_commands_hack();
-
-We could inline this function now, but keeping the _hack() name around
-reminds us to consider conditional-compilation support in the generator
-at a later date, so I'm fine with the approach you took.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---kk5jSDF63sTidB47uQTDt5GOT8fiX5pME
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYsIveAAoJEKeha0olJ0NqgWwIAK2qMpjCzbXxl3hs7i79JeQp
-X8b3OWhoQIwOXsGaoqVvAvI1XJhQ58p+nQg79XF9Fllx1hXLfnctTw0d0jkcl51m
-bdBrfy49dm92Saut+d2nU2BXSHzi1VJuS5TRPw7+P8JH7rlFOPx9R5OMxSH4ZSJa
-qxNIE8PxyzWGowu4pgtELTWISe/JFhpEYwTBoAhv5ZdlvjqC3zIAyel7Pisy/VOp
-swZZRb4dzGW4WX1uQTkT9AcqMPCZem3ZpSU6p1dmAkVE0fF2EyMErTRSA/KQZvnS
-nMKBh441vznb7irVnY7XjoCHKdzgBhPDGP26b/A9+PUdCLHgrBoQAAysFBa9Ix4=
-=Jk5T
------END PGP SIGNATURE-----
-
---kk5jSDF63sTidB47uQTDt5GOT8fiX5pME--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ4
+Nzg4NjMxNy0yNzQwMC0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tClR5cGU6IHNl
+cmllcwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAwLzIxXSBxYXBpOiBRTVAgZGlzcGF0
+Y2ggYW5kIGlucHV0IHZpc2l0b3Igd29yawoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
+aW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4g
+fCB3YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2Nh
+bCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVl
+Cgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3Ig
+YyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChn
+aXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZv
+cm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgog
+ICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoK
+ZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMy
+MWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3Bh
+dGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTQ4Nzg4NjMx
+Ny0yNzQwMC0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMTQ4
+Nzg4NjMxNy0yNzQwMC0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tClN3aXRjaGVk
+IHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNzAwYTJhYyBxYXBpOiBJbXByb3ZlIHFvYmplY3Qgdmlz
+aXRvciBkb2N1bWVudGF0aW9uCjE3NWYyM2YgcWFwaTogTWFrZSBpbnB1dCB2aXNpdG9ycyBkZXRl
+Y3QgdW52aXNpdGVkIGxpc3QgdGFpbHMKZjhjYTBiMSB0ZXN0czogQ292ZXIgcGFydGlhbCBpbnB1
+dCB2aXNpdCBvZiBsaXN0Cjc1NmZkYWEgdGVzdHMtcW9iamVjdC1pbnB1dC1zdHJpY3Q6IE1lcmdl
+IGludG8gdGVzdC1xb2JqZWN0LWlucHV0LXZpc2l0b3IKZWI5NDEwYyBxYXBpOiBEcm9wIHVudXNl
+ZCBub24tc3RyaWN0IHFvYmplY3QgaW5wdXQgdmlzaXRvcgoxNzJmNTkzIHRlc3QtcW9iamVjdC1p
+bnB1dC12aXNpdG9yOiBVc2Ugc3RyaWN0IHZpc2l0b3IKNTY4NWVjZSBxb206IE1ha2Ugb2JqZWN0
+X3Byb3BlcnR5X3NldF9xb2JqZWN0KCkncyBpbnB1dCB2aXNpdG9yIHN0cmljdAo2ZWEwNWRmIHFh
+cGk6IE1ha2Ugc3RyaW5nIGlucHV0IGFuZCBvcHRzIHZpc2l0b3IgcmVxdWlyZSBub24tbnVsbCBp
+bnB1dAo5MTEyZDg5IHFhcGk6IERyb3Agc3RyaW5nIGlucHV0IHZpc2l0b3IgbWV0aG9kIG9wdGlv
+bmFsKCkKZGFlOGI2YSBxYXBpOiBJbXByb3ZlIHFvYmplY3QgaW5wdXQgdmlzaXRvciBlcnJvciBy
+ZXBvcnRpbmcKOTJjNGY3YiBxYXBpOiBNYWtlIFFPYmplY3QgaW5wdXQgdmlzaXRvciBzZXQgKmxp
+c3QgcmVsaWFibHkKMDE1YWUwMiBxYXBpOiBDbGVhbiB1cCBhZnRlciBjb21taXQgM2QzNDRjMgo0
+ODg0OGFmIHFhcGk6IEltcHJvdmUgYSBRT2JqZWN0IGlucHV0IHZpc2l0b3IgZXJyb3IgbWVzc2Fn
+ZQpmNTMxMzUyIHFtcDogSW1wcm92ZSBRTVAgZGlzcGF0Y2ggZXJyb3IgbWVzc2FnZXMKMGZhNGFl
+NCBxbXA6IEVsaW1pbmF0ZSBzaWxseSBRRVJSX1FNUF8qIG1hY3Jvcwo0NThmNzYyIHFtcDogRHJv
+cCBkdXBsaWNhdGVkIFFNUCBjb21tYW5kIG9iamVjdCBjaGVja3MKMGMzMjcwMyBxbXA6IENsZWFu
+IHVwIGhvdyB3ZSBlbmZvcmNlIGNhcGFiaWxpdHkgbmVnb3RpYXRpb24KZTJhMzcyNCBxbXA6IER1
+bWIgZG93biBob3cgd2UgcnVuIFFNUCBjb21tYW5kIHJlZ2lzdHJhdGlvbgoxNmU3YmNmIHFtcC10
+ZXN0OiBOZXcsIGNvdmVyaW5nIGJhc2ljIFFNUCBwcm90b2NvbAoxNzNmZDkxIGxpYnF0ZXN0OiBX
+b3JrIGFyb3VuZCBhICJRTVAgd2FudHMgYSBuZXdsaW5lIiBidWcKN2QxYzgyMiBxZ2E6IEZpeCBj
+cmFzaCBvbiBub24tZGljdGlvbmFyeSBRTVAgYXJndW1lbnQKCj09PSBPVVRQVVQgQkVHSU4gPT09
+CkNoZWNraW5nIFBBVENIIDEvMjE6IHFnYTogRml4IGNyYXNoIG9uIG5vbi1kaWN0aW9uYXJ5IFFN
+UCBhcmd1bWVudC4uLgpDaGVja2luZyBQQVRDSCAyLzIxOiBsaWJxdGVzdDogV29yayBhcm91bmQg
+YSAiUU1QIHdhbnRzIGEgbmV3bGluZSIgYnVnLi4uCkNoZWNraW5nIFBBVENIIDMvMjE6IHFtcC10
+ZXN0OiBOZXcsIGNvdmVyaW5nIGJhc2ljIFFNUCBwcm90b2NvbC4uLgpDaGVja2luZyBQQVRDSCA0
+LzIxOiBxbXA6IER1bWIgZG93biBob3cgd2UgcnVuIFFNUCBjb21tYW5kIHJlZ2lzdHJhdGlvbi4u
+LgpDaGVja2luZyBQQVRDSCA1LzIxOiBxbXA6IENsZWFuIHVwIGhvdyB3ZSBlbmZvcmNlIGNhcGFi
+aWxpdHkgbmVnb3RpYXRpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggNi8yMTogcW1wOiBEcm9wIGR1cGxp
+Y2F0ZWQgUU1QIGNvbW1hbmQgb2JqZWN0IGNoZWNrcy4uLgpDaGVja2luZyBQQVRDSCA3LzIxOiBx
+bXA6IEVsaW1pbmF0ZSBzaWxseSBRRVJSX1FNUF8qIG1hY3Jvcy4uLgpDaGVja2luZyBQQVRDSCA4
+LzIxOiBxbXA6IEltcHJvdmUgUU1QIGRpc3BhdGNoIGVycm9yIG1lc3NhZ2VzLi4uCkNoZWNraW5n
+IFBBVENIIDkvMjE6IHFhcGk6IEltcHJvdmUgYSBRT2JqZWN0IGlucHV0IHZpc2l0b3IgZXJyb3Ig
+bWVzc2FnZS4uLgpDaGVja2luZyBQQVRDSCAxMC8yMTogcWFwaTogQ2xlYW4gdXAgYWZ0ZXIgY29t
+bWl0IDNkMzQ0YzIuLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMjE6IHFhcGk6IE1ha2UgUU9iamVjdCBp
+bnB1dCB2aXNpdG9yIHNldCAqbGlzdCByZWxpYWJseS4uLgpDaGVja2luZyBQQVRDSCAxMi8yMTog
+cWFwaTogSW1wcm92ZSBxb2JqZWN0IGlucHV0IHZpc2l0b3IgZXJyb3IgcmVwb3J0aW5nLi4uCkNo
+ZWNraW5nIFBBVENIIDEzLzIxOiBxYXBpOiBEcm9wIHN0cmluZyBpbnB1dCB2aXNpdG9yIG1ldGhv
+ZCBvcHRpb25hbCgpLi4uCkNoZWNraW5nIFBBVENIIDE0LzIxOiBxYXBpOiBNYWtlIHN0cmluZyBp
+bnB1dCBhbmQgb3B0cyB2aXNpdG9yIHJlcXVpcmUgbm9uLW51bGwgaW5wdXQuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMTUvMjE6IHFvbTogTWFrZSBvYmplY3RfcHJvcGVydHlfc2V0X3FvYmplY3QoKSdzIGlu
+cHV0IHZpc2l0b3Igc3RyaWN0Li4uCkNoZWNraW5nIFBBVENIIDE2LzIxOiB0ZXN0LXFvYmplY3Qt
+aW5wdXQtdmlzaXRvcjogVXNlIHN0cmljdCB2aXNpdG9yLi4uCkNoZWNraW5nIFBBVENIIDE3LzIx
+OiBxYXBpOiBEcm9wIHVudXNlZCBub24tc3RyaWN0IHFvYmplY3QgaW5wdXQgdmlzaXRvci4uLgpD
+aGVja2luZyBQQVRDSCAxOC8yMTogdGVzdHMtcW9iamVjdC1pbnB1dC1zdHJpY3Q6IE1lcmdlIGlu
+dG8gdGVzdC1xb2JqZWN0LWlucHV0LXZpc2l0b3IuLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFy
+YWN0ZXJzCiM0ODQ6IEZJTEU6IHRlc3RzL3Rlc3QtcW9iamVjdC1pbnB1dC12aXNpdG9yLmM6ODQ3
+OgorICAgIHYgPSB2aXNpdG9yX2lucHV0X3Rlc3RfaW5pdChkYXRhLCAieyAnaW50ZWdlcic6IC00
+MiwgJ2Jvb2xlYW4nOiB0cnVlLCAnc3RyaW5nJzogJ2ZvbycsICdleHRyYSc6IDQyIH0iKTsKCkVS
+Uk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNDk4OiBGSUxFOiB0ZXN0cy90ZXN0LXFvYmpl
+Y3QtaW5wdXQtdmlzaXRvci5jOjg2MToKKyAgICB2ID0gdmlzaXRvcl9pbnB1dF90ZXN0X2luaXQo
+ZGF0YSwgInsgJ3N0cmluZzAnOiAnc3RyaW5nMCcsICdkaWN0MSc6IHsgJ3N0cmluZzEnOiAnc3Ry
+aW5nMScsICdkaWN0Mic6IHsgJ3VzZXJkZWYxJzogeyAnaW50ZWdlcic6IDQyLCAnc3RyaW5nJzog
+J3N0cmluZycsICdleHRyYSc6IFs0MiwgMjMsIHsnZm9vJzonYmFyJ31dIH0sICdzdHJpbmcyJzog
+J3N0cmluZzInfX19Iik7CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzUxMjogRklM
+RTogdGVzdHMvdGVzdC1xb2JqZWN0LWlucHV0LXZpc2l0b3IuYzo4NzU6CisgICAgdiA9IHZpc2l0
+b3JfaW5wdXRfdGVzdF9pbml0KGRhdGEsICJbIHsgJ3N0cmluZyc6ICdzdHJpbmcwJywgJ2ludGVn
+ZXInOiA0MiB9LCB7ICdzdHJpbmcnOiAnc3RyaW5nMScsICdpbnRlZ2VyJzogNDMgfSwgeyAnc3Ry
+aW5nJzogJ3N0cmluZzInLCAnaW50ZWdlcic6IDQ0LCAnZXh0cmEnOiAnZ2dnJyB9IF0iKTsKCkVS
+Uk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNTg1OiBGSUxFOiB0ZXN0cy90ZXN0LXFvYmpl
+Y3QtaW5wdXQtdmlzaXRvci5jOjk0ODoKKyAgICB2ID0gdmlzaXRvcl9pbnB1dF90ZXN0X2luaXQo
+ZGF0YSwgInsgJ3N0cmluZyc6ICdjJywgJ2ludGVnZXInOiA0MSwgJ2Jvb2xlYW4nOiB0cnVlIH0i
+KTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM1OTI6IEZJTEU6IHRlc3RzL3Rl
+c3QtcW9iamVjdC1pbnB1dC12aXNpdG9yLmM6OTU1Ogorc3RhdGljIHZvaWQgdGVzdF92aXNpdG9y
+X2luX2ZhaWxfdW5pb25fZmxhdF9ub19kaXNjcmltKFRlc3RJbnB1dFZpc2l0b3JEYXRhICpkYXRh
+LAoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM2MDA6IEZJTEU6IHRlc3RzL3Rlc3Qt
+cW9iamVjdC1pbnB1dC12aXNpdG9yLmM6OTYzOgorICAgIHYgPSB2aXNpdG9yX2lucHV0X3Rlc3Rf
+aW5pdChkYXRhLCAieyAnaW50ZWdlcic6IDQyLCAnc3RyaW5nJzogJ2MnLCAnc3RyaW5nMSc6ICdk
+JywgJ3N0cmluZzInOiAnZScgfSIpOwoKdG90YWw6IDUgZXJyb3JzLCAxIHdhcm5pbmdzLCAyMzMg
+bGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
+ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
+ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hl
+Y2tpbmcgUEFUQ0ggMTkvMjE6IHRlc3RzOiBDb3ZlciBwYXJ0aWFsIGlucHV0IHZpc2l0IG9mIGxp
+c3QuLi4KQ2hlY2tpbmcgUEFUQ0ggMjAvMjE6IHFhcGk6IE1ha2UgaW5wdXQgdmlzaXRvcnMgZGV0
+ZWN0IHVudmlzaXRlZCBsaXN0IHRhaWxzLi4uCkNoZWNraW5nIFBBVENIIDIxLzIxOiBxYXBpOiBJ
+bXByb3ZlIHFvYmplY3QgdmlzaXRvciBkb2N1bWVudGF0aW9uLi4uCj09PSBPVVRQVVQgRU5EID09
+PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVk
+IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBz
+ZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
