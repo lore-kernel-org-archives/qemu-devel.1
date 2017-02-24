@@ -1,24 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48821)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1chKOs-0004Gm-Ik
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:15:27 -0500
+	(envelope-from <kwolf@redhat.com>) id 1chKQj-0006DY-0O
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:17:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1chKOp-0001hX-Rh
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:15:26 -0500
-Received: from mout.kundenserver.de ([212.227.126.130]:50091)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1chKOp-0001gF-Di
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:15:23 -0500
-References: <1487957728-8354-1-git-send-email-peter.maydell@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <619a06f3-1b9a-ba3e-2469-76e57bf838f0@vivier.eu>
-Date: Fri, 24 Feb 2017 19:15:12 +0100
-MIME-Version: 1.0
-In-Reply-To: <1487957728-8354-1-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH risu 0/9] risu: refactor and reduce
- CPU-specific code
+	(envelope-from <kwolf@redhat.com>) id 1chKQi-0002fI-7F
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:17:21 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Fri, 24 Feb 2017 19:16:53 +0100
+Message-Id: <1487960230-18054-3-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1487960230-18054-1-git-send-email-kwolf@redhat.com>
+References: <1487960230-18054-1-git-send-email-kwolf@redhat.com>
+Subject: [Qemu-devel] [PULL 02/19] qemu-iotests: add ability to exclude
+ certain protocols from tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,37 +20,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-Le 24/02/2017 à 18:35, Peter Maydell a écrit :
-> This patchset refactors the risu C code to reduce the significant
-> amount of duplicated and duplicated-but-not-quite-the-same code
-> in the per-CPU files.
-> 
-> I've compile tested this for all architectures, but I'm not in a
-> position to do runtime tests for non-ARM (my attempt to use the
-> ppc64le risu under QEMU gives mismatch errors even without these
-> patches, and the m68k risu makes QEMU crash, presumably because our
-> m68k support isn't complete yet).  So I wasn't quite prepared to just
+From: Jeff Cody <jcody@redhat.com>
 
-Yes, the FPU part is missing.
+Add the ability for shell script tests to exclude specific
+protocols.  This is useful to allow all protocols except ones known to
+not support a feature used in the test (e.g. .bdrv_create).
 
-> push it straight out to master the way I've done with previous
-> changes I've been making.
-> 
-> Nikunj, Laurent: if you have time to test this patchset to confirm
-> that it hasn't broken anything for you that would be great.
+Signed-off-by: Jeff Cody <jcody@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ tests/qemu-iotests/common.rc | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-for m68k
-Tested-by: Laurent Vivier <laurent@vivier.eu>
-
-> 
-> My motivation for all this, incidentally, is that I wanted to have
-> a go at resurrecting the x86 backend as a test case for how we
-> should support variable-length instruction sets.
-
-I think m68k is needing that too.
-
-Thanks,
-Laurent
+diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+index a3d904f..6c0fd4c 100644
+--- a/tests/qemu-iotests/common.rc
++++ b/tests/qemu-iotests/common.rc
+@@ -379,6 +379,18 @@ _supported_proto()
+     _notrun "not suitable for this image protocol: $IMGPROTO"
+ }
+ 
++# tests whether $IMGPROTO is specified as an unsupported image protocol for a test
++#
++_unsupported_proto()
++{
++    for f; do
++        if [ "$f" = "$IMGPROTO" ]; then
++            _notrun "not suitable for this image protocol: $IMGPROTO"
++            return
++        fi
++    done
++}
++
+ # tests whether the host OS is one of the supported OSes for a test
+ #
+ _supported_os()
+-- 
+1.8.3.1
