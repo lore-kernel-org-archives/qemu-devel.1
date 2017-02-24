@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1chGLN-0007aw-Ug
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:55:34 -0500
+	(envelope-from <mreitz@redhat.com>) id 1chGM0-00088e-Hn
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:56:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1chGLN-0005sh-7d
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:55:34 -0500
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:38704)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1chGLN-0005sM-1J
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:55:33 -0500
-Received: by mail-wm0-x233.google.com with SMTP id r141so15115190wmg.1
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 05:55:32 -0800 (PST)
+	(envelope-from <mreitz@redhat.com>) id 1chGLz-00064C-KU
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:56:12 -0500
+References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
+	<1487689130-30373-33-git-send-email-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <0550d32b-dd38-3bd8-074c-a76f5a0a35fc@redhat.com>
+Date: Fri, 24 Feb 2017 14:56:02 +0100
 MIME-Version: 1.0
-In-Reply-To: <1487864414-25485-1-git-send-email-kraxel@redhat.com>
-References: <1487864414-25485-1-git-send-email-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Feb 2017 13:55:11 +0000
-Message-ID: <CAFEAcA_S+XKC6xpSxLxRHi3D-KRZ_E0_5XLQART=ktn9eEAtwQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 0/3] usb patch queue
+In-Reply-To: <1487689130-30373-33-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="oEFp0LGM2KmjrUAUjiuwl0dEIR7GXrojv"
+Subject: Re: [Qemu-devel] [PATCH 32/54] block: Add
+ BdrvChildRole.get_parent_desc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +25,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-On 23 February 2017 at 15:40, Gerd Hoffmann <kraxel@redhat.com> wrote:
->   Hi,
->
-> usb patch queue, with cleanups and a ohci fix.
->
-> please pull,
->   Gerd
->
-> The following changes since commit 796b288f7be875045670f963ce99991b3c8e96=
-ac:
->
->   Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' int=
-o staging (2017-02-21 15:48:22 +0000)
->
-> are available in the git repository at:
->
->
->   git://git.kraxel.org/qemu tags/pull-usb-20170223-1
->
-> for you to fetch changes up to 4f72b8d2a6f5777fa1af2cf5184843e4cb06f182:
->
->   xhci: properties cleanup (2017-02-23 16:18:03 +0100)
->
-> ----------------------------------------------------------------
-> usb: ohci bugfix, switch core to unrealize, xhci property cleanup
->
-> ----------------------------------------------------------------
-> Gerd Hoffmann (1):
->       xhci: properties cleanup
->
-> Li Qiang (1):
->       usb: ohci: fix error return code in servicing td
->
-> Marc-Andr=C3=A9 Lureau (1):
->       usb: replace handle_destroy with unrealize
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--oEFp0LGM2KmjrUAUjiuwl0dEIR7GXrojv
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+Message-ID: <0550d32b-dd38-3bd8-074c-a76f5a0a35fc@redhat.com>
+Subject: Re: [PATCH 32/54] block: Add BdrvChildRole.get_parent_desc()
+References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
+ <1487689130-30373-33-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1487689130-30373-33-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-Applied, thanks.
+On 21.02.2017 15:58, Kevin Wolf wrote:
+> For meaningful error messages in the permission system, we need to get
+> some human-readable description of the parent of a BdrvChild.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block.c                   |  9 +++++++++
+>  block/block-backend.c     | 21 +++++++++++++++++++++
+>  include/block/block_int.h |  6 ++++++
+>  3 files changed, 36 insertions(+)
 
--- PMM
+Once more modulo patchew's nagging (I've complained about asterisk
+placement already so much it's enough for a lifetime):
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--oEFp0LGM2KmjrUAUjiuwl0dEIR7GXrojv
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliwO3ISHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AsagH/3RCDCXYFDzny1I0TRioJcT2faHh45uS
+SE8cp1XasMNoHCxhsutAkfY7IhtWGMV1FCfCrMsbASWQWswri+kUDn5w9FTJ8qx8
+doP/QxJSQZGCxgaBsEn6bHh0J1PHLXp55w1/z5ZIjX4x6XBdP3QApsiIhXMqiCZ0
+5b63qA/qGABE4TMdE5QajfF38Q+QBFDxHOScb1R+Arb2R90GxRqhJgOdSxEdxMIb
+3+DlLJmbAiTYcJQD3S+XI9gvmWajx2swFge1EBFAu7p5wLxhSRA7NF5RR3vc8GS8
+Y+uV6oBMlbxwgZhaFB7Hcixnndg2ELuQ9ut7Riv3/BtDDzkvUIEQS8Y=
+=Grvh
+-----END PGP SIGNATURE-----
+
+--oEFp0LGM2KmjrUAUjiuwl0dEIR7GXrojv--
