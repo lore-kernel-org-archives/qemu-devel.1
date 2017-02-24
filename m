@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gregkh@linuxfoundation.org>) id 1chCmc-0006sX-Bj
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 05:07:27 -0500
+	(envelope-from <thuth@redhat.com>) id 1chCqm-0008Tr-5D
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 05:11:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gregkh@linuxfoundation.org>) id 1chCmX-0008KE-90
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 05:07:26 -0500
-Received: from mail.linuxfoundation.org ([140.211.169.12]:52090)
+	(envelope-from <thuth@redhat.com>) id 1chCqh-0005bH-40
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 05:11:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33166)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <gregkh@linuxfoundation.org>)
-	id 1chCmX-0008Ip-36
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 05:07:21 -0500
-Date: Fri, 24 Feb 2017 11:07:06 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-Message-ID: <20170224100706.GA12001@kroah.com>
-References: <58AA51D6.6020508@huawei.com> <1487565495.3740.27.camel@intel.com>
-	<58AD0094.90304@windriver.com>
-	<4dd92012-626a-2d80-9adb-0be398f73eb1@redhat.com>
-	<58AD92AE.6040502@windriver.com>
-	<6c5567f4-192d-aefd-90e4-89f53479c24e@redhat.com>
-	<58AF9921.6060201@huawei.com> <58AFFE55.20306@huawei.com>
-	<20170224095951.GA11626@kroah.com>
-	<044a553e-83d4-7c1b-fc93-292da7e678a4@redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1chCqg-0005ZY-RZ
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 05:11:39 -0500
+References: <20170220141943.8426-1-cornelia.huck@de.ibm.com>
+	<20170220141943.8426-4-cornelia.huck@de.ibm.com>
+	<d8c1475a-765b-e980-cb48-255c29efdaf6@redhat.com>
+	<4340aa12-3289-9d19-6156-9121a9643749@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <75631dfb-bd96-b905-6720-84980cbd477d@redhat.com>
+Date: Fri, 24 Feb 2017 11:11:35 +0100
 MIME-Version: 1.0
+In-Reply-To: <4340aa12-3289-9d19-6156-9121a9643749@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <044a553e-83d4-7c1b-fc93-292da7e678a4@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] kvm bug in __rmap_clear_dirty during live migration
+Subject: Re: [Qemu-devel] [PATCH 3/5] s390x/ipl: Load network boot image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,69 +29,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Herongguang (Stephen)" <herongguang.he@huawei.com>, Chris Friesen <chris.friesen@windriver.com>, "Han, Huaitong" <huaitong.han@intel.com>, "hangaohuai@huawei.com" <hangaohuai@huawei.com>, stable@vger.kernel.org, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "fangying1@huawei.com" <fangying1@huawei.com>, "xudong.hao@linux.intel.com" <xudong.hao@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "wangxinxin.wang@huawei.com" <wangxinxin.wang@huawei.com>, "kai.huang@linux.intel.com" <kai.huang@linux.intel.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "guangrong.xiao@linux.intel.com" <guangrong.xiao@linux.intel.com>, linux-kernel@vger.kernel.org
+To: Farhan Ali <alifm@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, jfrei@linux.vnet.ibm.com, agraf@suse.de
 
-On Fri, Feb 24, 2017 at 11:00:32AM +0100, Paolo Bonzini wrote:
+On 22.02.2017 16:01, Farhan Ali wrote:
+> Hi Thomas,
 >=20
+> Thanks for the review.
 >=20
-> On 24/02/2017 10:59, Greg KH wrote:
-> > On Fri, Feb 24, 2017 at 05:35:17PM +0800, Herongguang (Stephen) wrote=
-:
-> >>
-> >>
-> >> On 2017/2/24 10:23, Herongguang (Stephen) wrote:
-> >>>
-> >>>
-> >>> On 2017/2/22 22:43, Paolo Bonzini wrote:
-> >>>>
-> >>>>
-> >>>> On 22/02/2017 14:31, Chris Friesen wrote:
-> >>>>>>>
-> >>>>>>
-> >>>>>> Can you reproduce it with kernel 4.8+?  I'm suspecting commmit
-> >>>>>> 4e59516a12a6 ("kvm: vmx: ensure VMCS is current while enabling P=
-ML",
-> >>>>>> 2016-07-14) to be the fix.
-> >>>>>
-> >>>>> I can't easily try with a newer kernel, the software package we'r=
-e using
-> >>>>> has kernel patches that would have to be ported.
-> >>>>>
-> >>>>> I'm at a conference, don't really have time to set up a pair of t=
-est
-> >>>>> machines from scratch with a custom kernel.
-> >>>>
-> >>>> Hopefully Gaohuai and Rongguang can help with this too.
-> >>>>
-> >>>> Paolo
-> >>>>
-> >>>> .
-> >>>>
-> >>> Yes, we are looking into and testing this.
-> >>>
-> >>> I think this can result in any memory corruption, if VM1 writes its
-> >>> PML buffer into VM2=E2=80=99s VMCS (since sched_in/sched_out notifi=
-er of VM1
-> >>> is not registered yet), then VM1 is destroyed (hence its PML buffer
-> >>> is freed back to kernel), after that, VM2 starts migration, so CPU
-> >>> logs VM2=E2=80=99s dirty GFNS into a freed memory, results in any m=
-emory corruption.
-> >>>
-> >>> As its severity, this commit (http://git.kernel.org/cgit/linux/kern=
-el/git/torvalds/linux.git/commit/?id=3D4e59516a12a6ef6dcb660cb3a3f70c64bd=
-60cfec)
-> >>> is eligible to back port to kernel stable.
-> >>
-> >> Hi, Greg, can you cherry pick commit 4e59516a12a6ef6dcb660cb3a3f70c6=
-4bd60cfec to 4.4-y?
-> >=20
-> > If the KVM maintainers say it is ok to do so, yes, I will.
+> On 02/20/2017 10:28 AM, Thomas Huth wrote:
+>> On 20.02.2017 15:19, Cornelia Huck wrote:
+>>> From: Farhan Ali <alifm@linux.vnet.ibm.com>
+[...]
+>>> +    }
+>>> +
+>>> +    ram_ptr =3D memory_region_get_ram_ptr(mr);
+>>> +    if (!ram_ptr) {
+>>> +        error_report("No RAM found");
+>>> +        goto unref_mr;
+>>> +    }
+>>> +
+>>> +    netboot_filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS,
+>>> ipl->netboot_fw);
+>>> +    if (netboot_filename =3D=3D NULL) {
+>>> +        error_report("Could not find network bootloader");
+>>> +        goto unref_mr;
+>>> +    }
+>>
+>> So you're doing error_report() here already ...
+>>
+>>> +    img_size =3D load_elf_ram(netboot_filename, NULL, NULL,
+>>> &ipl->start_addr,
+>>> +                            NULL, NULL, 1, EM_S390, 0, 0, NULL, fals=
+e);
+>>> +
+>>> +    if (img_size < 0) {
+>>> +        img_size =3D load_image_size(netboot_filename, ram_ptr,
+>>> ram_size);
+>>> +        ipl->start_addr =3D KERN_IMAGE_START;
+>>> +    }
+>>> +
+>>> +    g_free(netboot_filename);
+>>> +
+>>> +unref_mr:
+>>> +    memory_region_unref(mr);
+>>> +out:
+>>> +    return img_size;
+>>> +}
+>>> +
+>>> +static bool is_virtio_net_device(IplParameterBlock *iplb)
+>>> +{
+>>> +    uint8_t cssid;
+>>> +    uint8_t ssid;
+>>> +    uint16_t devno;
+>>> +    uint16_t schid;
+>>> +    SubchDev *sch =3D NULL;
+>>> +
+>>> +    if (iplb->pbt !=3D S390_IPL_TYPE_CCW) {
+>>> +        return false;
+>>> +    }
+>>> +
+>>> +    devno =3D be16_to_cpu(iplb->ccw.devno);
+>>> +    ssid =3D iplb->ccw.ssid & 3;
+>>> +
+>>> +    for (schid =3D 0; schid < MAX_SCHID; schid++) {
+>>> +        for (cssid =3D 0; cssid < MAX_CSSID; cssid++) {
+>>> +            sch =3D css_find_subch(1, cssid, ssid, schid);
+>>> +
+>>> +            if (sch && sch->devno =3D=3D devno) {
+>>> +                return sch->id.cu_model =3D=3D VIRTIO_ID_NET;
+>>> +            }
+>>> +        }
+>>> +    }
+>>> +   return false;
+>>> +}
+>>> +
+>>>  void s390_ipl_update_diag308(IplParameterBlock *iplb)
+>>>  {
+>>>      S390IPLState *ipl =3D get_ipl_device();
+>>>
+>>>      ipl->iplb =3D *iplb;
+>>>      ipl->iplb_valid =3D true;
+>>> +    ipl->netboot =3D is_virtio_net_device(iplb);
+>>>  }
+>>>
+>>>  IplParameterBlock *s390_ipl_get_iplb(void)
+>>> @@ -298,6 +377,13 @@ void s390_ipl_prepare_cpu(S390CPU *cpu)
+>>>              ipl->iplb_valid =3D s390_gen_initial_iplb(ipl);
+>>>          }
+>>>      }
+>>> +    if (ipl->netboot) {
+>>> +        if (load_netboot_image() < 0) {
+>>> +            error_report("Failed to load network bootloader");
+>>
+>> ... and then you do another error_report here again ... so one error
+>> gets reported with two error message. Wouldn't it be nicer to rather d=
+o
+>> error_setg(...) in load_netboot_image() and then report only one error
+>> at this level here?
+>>
 >=20
-> Yes, he beat me by minutes. :)
+> What would be the advantage of doing that?
 
-Heh, ok, I'll go add it to the recently-announced 4.4.52-rc1 release.
+It's just good coding style to report an error only once, at the
+outermost calling function. Otherwise the same error gets reported
+multiple times to the user, with different error messages, and that can
+easily get confusing. It's likely not a big problem here yet, since the
+call depths is only 2 functions, but imagine a situation where you've
+got a call depth or 5 or more and an error is reported at every
+depths... that's ugly. So this is why we've got error_setg() and friends
+in QEMU.
 
-thanks,
-
-greg k-h
+ Thomas
