@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1chGFB-0001aW-QN
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:49:10 -0500
+	(envelope-from <mreitz@redhat.com>) id 1chGFy-0002Bq-FL
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:49:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1chGFA-00030e-KT
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:49:09 -0500
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:34538)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1chGFA-00030P-DX
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:49:08 -0500
-Received: by mail-wr0-x22c.google.com with SMTP id o22so7897156wro.1
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 05:49:08 -0800 (PST)
+	(envelope-from <mreitz@redhat.com>) id 1chGFt-0003ZG-K5
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 08:49:58 -0500
+References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
+	<1487689130-30373-31-git-send-email-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <622e561d-0fc3-f310-781e-b1469b4cb288@redhat.com>
+Date: Fri, 24 Feb 2017 14:49:47 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170222183919.11928-1-ehabkost@redhat.com>
-References: <20170222183919.11928-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Feb 2017 13:48:46 +0000
-Message-ID: <CAFEAcA8_SsbdXWFbAt+qKXF-XGBjAt=ZbDgzSaeXYFzYPL1KTQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] i386: Add "max" CPU model to TCG
- and KVM
+In-Reply-To: <1487689130-30373-31-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="VQTAjv3csbd5LuvBCiC2epM2r7Pr8H5Hr"
+Subject: Re: [Qemu-devel] [PATCH 30/54] hw/block: Introduce share-rw qdev
+ property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +25,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Richard W.M. Jones" <rjones@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P. Berrange" <berrange@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>, Christian Borntraeger <borntraeger@de.ibm.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-On 22 February 2017 at 18:39, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> Changes v1 -> v2:
-> * Fix build without CONFIG_KVM at lmce_supported()
-> * Rebased on top of my x86-next branch:
->   https://github.com/ehabkost/qemu x86-next
->
-> Git branch for testing:
->   https://github.com/ehabkost/qemu-hacks work/x86-cpu-max-tcg
->
-> libvirt code to use the new feature already exist, and were
-> submitted to libvir-list, at:
->   https://www.mail-archive.com/libvir-list@redhat.com/msg142168.html
->
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--VQTAjv3csbd5LuvBCiC2epM2r7Pr8H5Hr
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+Message-ID: <622e561d-0fc3-f310-781e-b1469b4cb288@redhat.com>
+Subject: Re: [PATCH 30/54] hw/block: Introduce share-rw qdev property
+References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
+ <1487689130-30373-31-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1487689130-30373-31-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
+
+On 21.02.2017 15:58, Kevin Wolf wrote:
+> By default, don't allow another writer for block devices that are
+> attached to a guest device. For the cases where this setup is intended
+> (e.g. using a cluster filesystem on the disk), the new option can be
+> used to allow it.
+>=20
+> This change affects only devices using DEFINE_BLOCK_PROPERTIES().
+> Devices directly using DEFINE_PROP_DRIVE() still accept writers
+> unconditionally.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->
-> This is a replacement for the previous series that enabled the
-> "host" CPU model on TCG. Now a new "max" CPU is being added,
-> while keeping "host" KVM-specific.
->
-> In addition to simply adding "max" as a copy of the existing
-> "host" CPU model, additional patches change it to not use any
-> host CPUID information when in TCG mode.
+>  hw/block/block.c           |  6 ++++--
+>  include/hw/block/block.h   |  4 +++-
+>  tests/qemu-iotests/172.out | 53 ++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  3 files changed, 60 insertions(+), 3 deletions(-)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
-I had a look at implementing this for ARM, and ran into problems
-because of how we've done '-cpu host'. For us the "host" CPU
-type is registered dynamically when kvm_init() is called,
-because (a) it only exists if -enable-kvm and (b) it probes
-the kernel to find out what's available. So I could easily
-add 'max' in the same place; but then where should I add the
-type definition of 'max' for the non-KVM case?
+--VQTAjv3csbd5LuvBCiC2epM2r7Pr8H5Hr
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Any suggestions?
+-----BEGIN PGP SIGNATURE-----
 
-thanks
--- PMM
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAliwOfsSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AXDwIAIUy3oOvVCrcVTJoUnOtx3pDCcDBf6A4
+t+AVdGME96ud7HVbJ8LZeUCXjqTmjRBSnX9BlaIxR7OH4a23Tm2ohObH6bxsPdFZ
+Og0KcdS/lgcETDl2eIWkeFbNw6xqTzlsolkrIhxjrqg6cCDSardKCOWklpyqU8ay
+3zSsr56CbTugaFCEVa2hvhdz81/76zcVS0FgpPc6qurWSw6vRs3ExuaYzNFTsHgO
+C7Sh4K1hdx3YUFJJewrJq1ANESaNm7VMeFkl5Lsx4oAeyCcl15vnlHSVOH62DJZQ
+872ZRyUJ7GUJifnH5KyCftBi+QDgMieedNBLKzG5VfNLTVLZXsZ7YIc=
+=JWuF
+-----END PGP SIGNATURE-----
+
+--VQTAjv3csbd5LuvBCiC2epM2r7Pr8H5Hr--
