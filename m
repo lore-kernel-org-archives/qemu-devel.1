@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1chKQt-0006RL-AA
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:17:37 -0500
+	(envelope-from <kwolf@redhat.com>) id 1chKR0-0006gt-JO
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:17:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1chKQs-0002oE-Ed
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:17:31 -0500
+	(envelope-from <kwolf@redhat.com>) id 1chKQz-0002v9-Gu
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 13:17:38 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 24 Feb 2017 19:17:01 +0100
-Message-Id: <1487960230-18054-11-git-send-email-kwolf@redhat.com>
+Date: Fri, 24 Feb 2017 19:17:05 +0100
+Message-Id: <1487960230-18054-15-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1487960230-18054-1-git-send-email-kwolf@redhat.com>
 References: <1487960230-18054-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 10/19] qcow2: Use BB for resizing in
- qcow2_amend_options()
+Subject: [Qemu-devel] [PULL 14/19] block: Factor out bdrv_open_child_bs()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,32 +22,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-In order to able to convert bdrv_truncate() to take a BdrvChild and
-later to correctly check the resize permission here, we need to use a
-BlockBackend for resizing the image.
+This is the part of bdrv_open_child() that opens a BDS with option
+inheritance, but doesn't attach it as a child to the parent yet.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ block.c | 61 +++++++++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 37 insertions(+), 24 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 3e274bd..254545a 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -3250,7 +3250,11 @@ static int qcow2_amend_options(BlockDriverState *bs, QemuOpts *opts,
+diff --git a/block.c b/block.c
+index 40c4dee..6987400 100644
+--- a/block.c
++++ b/block.c
+@@ -1546,28 +1546,12 @@ free_exit:
+     return ret;
+ }
+ 
+-/*
+- * Opens a disk image whose options are given as BlockdevRef in another block
+- * device's options.
+- *
+- * If allow_none is true, no image will be opened if filename is false and no
+- * BlockdevRef is given. NULL will be returned, but errp remains unset.
+- *
+- * bdrev_key specifies the key for the image's BlockdevRef in the options QDict.
+- * That QDict has to be flattened; therefore, if the BlockdevRef is a QDict
+- * itself, all options starting with "${bdref_key}." are considered part of the
+- * BlockdevRef.
+- *
+- * The BlockdevRef will be removed from the options QDict.
+- */
+-BdrvChild *bdrv_open_child(const char *filename,
+-                           QDict *options, const char *bdref_key,
+-                           BlockDriverState* parent,
+-                           const BdrvChildRole *child_role,
+-                           bool allow_none, Error **errp)
++static BlockDriverState *
++bdrv_open_child_bs(const char *filename, QDict *options, const char *bdref_key,
++                   BlockDriverState *parent, const BdrvChildRole *child_role,
++                   bool allow_none, Error **errp)
+ {
+-    BdrvChild *c = NULL;
+-    BlockDriverState *bs;
++    BlockDriverState *bs = NULL;
+     QDict *image_options;
+     char *bdref_key_dot;
+     const char *reference;
+@@ -1594,11 +1578,40 @@ BdrvChild *bdrv_open_child(const char *filename,
+         goto done;
      }
  
-     if (new_size) {
--        ret = bdrv_truncate(bs, new_size);
-+        BlockBackend *blk = blk_new();
-+        blk_insert_bs(blk, bs);
-+        ret = blk_truncate(blk, new_size);
-+        blk_unref(blk);
+-    c = bdrv_attach_child(parent, bs, bdref_key, child_role);
+-
+ done:
+     qdict_del(options, bdref_key);
+-    return c;
++    return bs;
++}
 +
-         if (ret < 0) {
-             return ret;
-         }
++/*
++ * Opens a disk image whose options are given as BlockdevRef in another block
++ * device's options.
++ *
++ * If allow_none is true, no image will be opened if filename is false and no
++ * BlockdevRef is given. NULL will be returned, but errp remains unset.
++ *
++ * bdrev_key specifies the key for the image's BlockdevRef in the options QDict.
++ * That QDict has to be flattened; therefore, if the BlockdevRef is a QDict
++ * itself, all options starting with "${bdref_key}." are considered part of the
++ * BlockdevRef.
++ *
++ * The BlockdevRef will be removed from the options QDict.
++ */
++BdrvChild *bdrv_open_child(const char *filename,
++                           QDict *options, const char *bdref_key,
++                           BlockDriverState *parent,
++                           const BdrvChildRole *child_role,
++                           bool allow_none, Error **errp)
++{
++    BlockDriverState *bs;
++
++    bs = bdrv_open_child_bs(filename, options, bdref_key, parent, child_role,
++                            allow_none, errp);
++    if (bs == NULL) {
++        return NULL;
++    }
++
++    return bdrv_attach_child(parent, bs, bdref_key, child_role);
+ }
+ 
+ static BlockDriverState *bdrv_append_temp_snapshot(BlockDriverState *bs,
 -- 
 1.8.3.1
