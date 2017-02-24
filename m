@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1chJl8-0002wG-3y
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:34:23 -0500
+	(envelope-from <no-reply@patchew.org>) id 1chJm9-0003j0-Be
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:35:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1chJl3-0000FM-T4
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:34:22 -0500
-Received: from mo5.mail-out.ovh.net ([178.32.228.5]:36070)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1chJl3-0008JL-Mw
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:34:17 -0500
-Received: from player734.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 68876DC691
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 18:34:10 +0100 (CET)
-References: <1487252865-12064-1-git-send-email-clg@kaod.org>
-	<1487252865-12064-9-git-send-email-clg@kaod.org>
-	<20170223022933.GW12577@umbus.fritz.box>
-	<6deab394-2564-3a43-669c-af4b8a2aa4e3@kaod.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <e12d3243-3da1-b432-a898-f01e89af5807@kaod.org>
-Date: Fri, 24 Feb 2017 18:34:06 +0100
+	(envelope-from <no-reply@patchew.org>) id 1chJm5-0003tc-4b
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:35:25 -0500
+Resent-Message-Id: <E1chJm5-0003tc-4b@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21442)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1chJm4-0003pv-SM
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:35:21 -0500
+In-Reply-To: <20170224172714.26026-1-berrange@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148795758490.177.4813793419465218571@0e2666bad730>
 MIME-Version: 1.0
-In-Reply-To: <6deab394-2564-3a43-669c-af4b8a2aa4e3@kaod.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 08/22] ppc/xics: use the QOM
- interface to resend irqs
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 24 Feb 2017 09:33:05 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] os: don't corrupt pre-existing
+ memory-backend data with prealloc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,52 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: berrange@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, jitendra.kolhe@hpe.com, mprivozn@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
 
->>> @@ -592,10 +593,11 @@ static void ics_simple_reset(DeviceState *dev)
->>>  
->>>  static int ics_simple_post_load(ICSState *ics, int version_id)
->>>  {
->>> +    XICSInterface *xi = XICS_INTERFACE(qdev_get_machine());
->>>      int i;
->>>  
->>>      for (i = 0; i < ics->xics->nr_servers; i++) {
->>> -        icp_resend(&ics->xics->ss[i]);
->>> +        icp_resend(xi, &ics->xics->ss[i]);
->>>      }
->>
->> This resend triggering needs to get moved to the xics interface
->> implementor - i.e. the machine.  It's actually already broken right
->> now, since it incorrectly relies on the ordering of the ics and icp
->> restore during migration.
-> 
-> I'm adding a icp_resend() handler in patch 12 and using it patch 14.
-> Maybe we can move the post_load() handler out of ICS simple now ? 
-
-Could you give me a little more info on what should be done ? I lack 
-context on this problem. 
-
-So should we call : 
-
-    ICPState *ss = opaque;
-    ICPStateClass *info = ICP_GET_CLASS(ss);
-
-    if (info->post_load) {
-        return info->post_load(ss, version_id);
-    }
-
-and then 
-
-    ICSState *ics = opaque;
-    ICSStateClass *info = ICS_BASE_GET_CLASS(ics);
-
-    if (info->post_load) {
-        return info->post_load(ics, version_id);
-    }
-
-from spapr_post_load() ? 
-
-Thanks,
-
-C.
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzAyMjQxNzI3MTQuMjYwMjYtMS1iZXJyYW5nZUByZWRoYXQuY29tClR5cGU6IHNlcmllcwpTdWJq
+ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBvczogZG9uJ3QgY29ycnVwdCBwcmUtZXhpc3Rpbmcg
+bWVtb3J5LWJhY2tlbmQgZGF0YSB3aXRoIHByZWFsbG9jCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
+PT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUg
+JEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
+bWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0Uu
+LikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRv
+dGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93
+ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAt
+OyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEp
+KQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNj
+OGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1
+Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8x
+NDg3MjYyOTYzLTExNTE5LTEtZ2l0LXNlbmQtZW1haWwtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3Jn
+IC0+IHBhdGNoZXcvMTQ4NzI2Mjk2My0xMTUxOS0xLWdpdC1zZW5kLWVtYWlsLXBldGVyLm1heWRl
+bGxAbGluYXJvLm9yZwogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzE0ODc5MjA5NzEtMTY1
+MTktMS1naXQtc2VuZC1lbWFpbC16aGFuZ2NoZW4uZm5zdEBjbi5mdWppdHN1LmNvbSAtPiBwYXRj
+aGV3LzE0ODc5MjA5NzEtMTY1MTktMS1naXQtc2VuZC1lbWFpbC16aGFuZ2NoZW4uZm5zdEBjbi5m
+dWppdHN1LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTcwMjI0MTcyNzE0LjI2
+MDI2LTEtYmVycmFuZ2VAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTcwMjI0MTcyNzE0LjI2MDI2
+LTEtYmVycmFuZ2VAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjEz
+MTA3NGUgb3M6IGRvbid0IGNvcnJ1cHQgcHJlLWV4aXN0aW5nIG1lbW9yeS1iYWNrZW5kIGRhdGEg
+d2l0aCBwcmVhbGxvYwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBv
+czogZG9uJ3QgY29ycnVwdCBwcmUtZXhpc3RpbmcgbWVtb3J5LWJhY2tlbmQgZGF0YSB3aXRoIHBy
+ZWFsbG9jLi4uCkVSUk9SOiBVc2Ugb2Ygdm9sYXRpbGUgaXMgdXN1YWxseSB3cm9uZzogc2VlIERv
+Y3VtZW50YXRpb24vdm9sYXRpbGUtY29uc2lkZXJlZC1oYXJtZnVsLnR4dAojNDI6IEZJTEU6IHV0
+aWwvb3NsaWItcG9zaXguYzozNzA6CisgICAgICAgICAgICB2b2xhdGlsZSBjaGFyIHZhbCA9ICoo
+YXJlYSArIChocGFnZXNpemUgKiBpKSk7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDIx
+IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
+aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
+aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09
+PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0K
+RW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcu
+b3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlz
+dHMub3Jn
