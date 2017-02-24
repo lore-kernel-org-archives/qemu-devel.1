@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1chIHZ-0006AS-UG
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 10:59:46 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1chIIx-0006xn-II
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:01:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1chIHU-0001MI-Ug
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 10:59:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34930)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1chIHU-0001Lv-Ls
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 10:59:40 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AC161C054C3D
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 15:59:39 +0000 (UTC)
-References: <20170206173306.20603-1-dgilbert@redhat.com>
-	<20170206173306.20603-12-dgilbert@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <3c1015ae-7d38-8f27-6a34-50b8cfd6e8cf@redhat.com>
-Date: Fri, 24 Feb 2017 16:59:35 +0100
+	(envelope-from <marcandre.lureau@gmail.com>) id 1chIIw-0001wK-Fh
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:01:11 -0500
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:34381)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1chIIw-0001vA-56
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 11:01:10 -0500
+Received: by mail-lf0-x243.google.com with SMTP id x142so881630lfd.1
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 08:01:09 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20170206173306.20603-12-dgilbert@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 11/16] postcopy: Mask fault addresses to
- huge page boundary
+References: <1486041504-23627-1-git-send-email-den@openvz.org>
+	<CAJ+F1CL06FJvVrSmLE4-p208ocFoP7d-w_7mBkOmvnTrBxA5qQ@mail.gmail.com>
+	<871sunzovz.fsf@dusky.pond.sub.org>
+	<CAJ+F1CJZUW8jTnCYQ7RDsRHK3fmucRVZMr2uDm62Esjdrcn6sw@mail.gmail.com>
+	<06eccfa8-6a4e-a892-576a-ac06e61a0e2f@redhat.com>
+In-Reply-To: <06eccfa8-6a4e-a892-576a-ac06e61a0e2f@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 24 Feb 2017 16:00:57 +0000
+Message-ID: <CAJ+F1C++N2ybCtaCm80_+ZV+TAnJHWnK2Jb_82Y-1_-8hkJLtA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] qemu-char: socket backend:
+ disconnect on write error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,74 +34,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com
-Cc: aarcange@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-On 06/02/2017 18:33, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Currently the fault address received by userfault is rounded to
-> the host page boundary and a host page is requested from the source.
-> Use the current RAMBlock page size instead of the general host page
-> size so that for RAMBlocks backed by huge pages we request the whole
-> huge page.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
-> ---
->  include/exec/memory.h    | 1 -
->  migration/postcopy-ram.c | 7 +++----
->  2 files changed, 3 insertions(+), 5 deletions(-)
-> 
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index 987f925..c428891 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -1614,7 +1614,6 @@ MemTxResult address_space_read_continue(AddressSpace *as, hwaddr addr,
->  MemTxResult address_space_read_full(AddressSpace *as, hwaddr addr,
->                                      MemTxAttrs attrs, uint8_t *buf, int len);
->  void *qemu_map_ram_ptr(RAMBlock *ram_block, ram_addr_t addr);
-> -
->  static inline bool memory_access_is_direct(MemoryRegion *mr, bool is_write)
->  {
->      if (is_write) {
+Hi
 
-This hunk removing one blank line is strange...
+On Fri, Feb 24, 2017 at 7:31 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index 4c736d2..03cbd6e 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -403,7 +403,6 @@ static void *postcopy_ram_fault_thread(void *opaque)
->      MigrationIncomingState *mis = opaque;
->      struct uffd_msg msg;
->      int ret;
-> -    size_t hostpagesize = getpagesize();
->      RAMBlock *rb = NULL;
->      RAMBlock *last_rb = NULL; /* last RAMBlock we sent part of */
->  
-> @@ -470,7 +469,7 @@ static void *postcopy_ram_fault_thread(void *opaque)
->              break;
->          }
->  
-> -        rb_offset &= ~(hostpagesize - 1);
-> +        rb_offset &= ~(qemu_ram_pagesize(rb) - 1);
->          trace_postcopy_ram_fault_thread_request(msg.arg.pagefault.address,
->                                                  qemu_ram_get_idstr(rb),
->                                                  rb_offset);
-> @@ -482,11 +481,11 @@ static void *postcopy_ram_fault_thread(void *opaque)
->          if (rb != last_rb) {
->              last_rb = rb;
->              migrate_send_rp_req_pages(mis, qemu_ram_get_idstr(rb),
-> -                                     rb_offset, hostpagesize);
-> +                                     rb_offset, qemu_ram_pagesize(rb));
->          } else {
->              /* Save some space */
->              migrate_send_rp_req_pages(mis, NULL,
-> -                                     rb_offset, hostpagesize);
-> +                                     rb_offset, qemu_ram_pagesize(rb));
->          }
->      }
->      trace_postcopy_ram_fault_thread_exit();
-> 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+>
+>
+> On 24/02/2017 15:46, Marc-Andr=C3=A9 Lureau wrote:
+> >
+> >>> +        if (ret < 0 && errno !=3D EAGAIN) {
+> >>> +            if (tcp_chr_read_poll(chr) <=3D 0) {
+> >>> +                tcp_chr_disconnect(chr);
+> >>> +                return len;
+> >>>
+> >>
+> >> This change breaks a number of assumption in vhost-user code. Until
+> now, a
+> >> vhost-user function assumed that dev->vhost_ops would remain as long a=
+s
+> the
+> >> function is running, so it may call vhost_ops callbacks several time,
+> which
+> >> may eventually fail to do io, but no crash would occur. The
+> disconnection
+> >> would be handled later with the HUP handler. Now, vhost_ops may be
+> cleared
+> >> during a write (chr_disconnect -> CHR_EVENT_CLOSED in
+> >> net_vhost_user_event). This can be randomly reproduced with
+> >> vhost-user-test -p /x86_64/vhost-user/flags-mismatch/subprocess
+>
+> Would it work to call tcp_chr_disconnect from an idle source (and
+> destroy the source on the next connect)?
+>
+
+Yes, I have a solution in this direction: https://da.gd/NUZf7
+
+Note that vhost code could reach disconnect on read and segv in similar
+ways even if this commit was reverted. Delaying cleanup would solve that
+case too. Otherwise, significant work needs to be done to make vhost more
+robust on disconnect...
+--=20
+Marc-Andr=C3=A9 Lureau
