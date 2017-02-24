@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1chF4c-0007vj-MC
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:34:11 -0500
+	(envelope-from <bounces@canonical.com>) id 1chF5N-0008Ox-Uy
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:34:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1chF4Z-0006JY-JB
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:34:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44330)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1chF4Z-0006Ic-DQ
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:34:07 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 95BD081226
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 12:34:07 +0000 (UTC)
-References: <20170222183919.11928-1-ehabkost@redhat.com>
-	<20170222183919.11928-3-ehabkost@redhat.com>
-	<f3922aa6-75de-b0ca-6e56-150c166c297b@redhat.com>
-	<20170224123228.GR2778@thinpad.lan.raisama.net>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <43b06807-de38-064b-f55a-15bd1c5b0333@redhat.com>
-Date: Fri, 24 Feb 2017 13:34:04 +0100
+	(envelope-from <bounces@canonical.com>) id 1chF5K-0007L6-Sb
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:34:57 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41178)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1chF5K-0007Jr-Ml
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:34:54 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1chF5J-0000zM-BC
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 12:34:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 521052E80CD
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 12:34:53 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170224123228.GR2778@thinpad.lan.raisama.net>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] i386: Make "max" model not use any
- host CPUID info on TCG
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 24 Feb 2017 12:21:52 -0000
+From: Martin Husemann <martin@NetBSD.org>
+Reply-To: Bug 1014099 <1014099@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20120616165038.8986.77631.malonedeb@gac.canonical.com>
+Message-Id: <20170224122152.5013.90483.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1014099] Re: hw/esp.c does not properly deal with
+ TEST_UNIT_READY in NetBSD/sparc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,36 +37,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-Am 24.02.2017 um 13:32 schrieb Eduardo Habkost:
-> On Fri, Feb 24, 2017 at 12:09:32PM +0100, David Hildenbrand wrote:
->> Am 22.02.2017 um 19:39 schrieb Eduardo Habkost:
->>> Instead of reporting host CPUID data on "max", use the qemu64 CPU
->> Two questions:
->>
->> 1. Shouldn't "max" use cpuid of qemu64 with TARGET_X86_64 and qemu32
->> with !TARGET_X86_64?
-> 
-> qemu32 has family=6,model=6,stepping=3 too, and the only
-> difference on TCG's "max" model on !TARGET_X86_64 will be the
-> lack of CPUID_EXT2_SYSCALL and CPUID_EXT2_LM.
+Yes. Just to make sure I tested qemu 2.8 against an old disk image from
+2012 and it boots fine w/o any  complaints during the device probes.
 
-So this is already handled then, correct?
+** Changed in: qemu
+       Status: Incomplete =3D> Fix Released
 
-> 
->>
->> 2. Should we then change linux-user/main.c:main() to use the "max" model?
-> 
-> We could, but I would like this to be done by somebody more
-> experienced with linux-user code, who could test it properly.
-> 
+-- =
 
-Agreed!
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1014099
 
+Title:
+  hw/esp.c does not properly deal with TEST_UNIT_READY in NetBSD/sparc
 
--- 
-Thanks,
+Status in QEMU:
+  Fix Released
 
-David
+Bug description:
+  The NetBSD ncr53c9x.c driver does a TEST_UNIT_READY command with
+  SELATN but dma disabled sometimes (early during bus enumeration). This
+  is fine, as the command will not produce nor consume any data, and
+  works on real hardware.
+
+  However, the qemu emulation does not allow this (for reasons I don't
+  understand).
+
+  The change below fixes the problem.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1014099/+subscriptions
