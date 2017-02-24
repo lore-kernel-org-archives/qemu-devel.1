@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1chDzQ-0002kA-2k
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:24:45 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1chE1S-0004pQ-Rn
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:26:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1chDzM-0004uk-27
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:24:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41744)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1chDzL-0004tN-Ox
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:24:39 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B8AA680467
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 11:24:39 +0000 (UTC)
-References: <20170222190029.17243-1-ehabkost@redhat.com>
-	<20170222190029.17243-2-ehabkost@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <0409eedf-7956-7edd-2ad0-b7a0be377ade@redhat.com>
-Date: Fri, 24 Feb 2017 12:24:36 +0100
+	(envelope-from <alex.bennee@linaro.org>) id 1chE1R-0007Zc-8x
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:26:50 -0500
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:36010)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1chE1Q-0007YQ-VX
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 06:26:49 -0500
+Received: by mail-wm0-x22b.google.com with SMTP id v77so12056775wmv.1
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 03:26:48 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Fri, 24 Feb 2017 11:21:03 +0000
+Message-Id: <20170224112109.3147-19-alex.bennee@linaro.org>
+In-Reply-To: <20170224112109.3147-1-alex.bennee@linaro.org>
+References: <20170224112109.3147-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170222190029.17243-2-ehabkost@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] target-i386: Define static "base"
- CPU model
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 18/24] cputlb: atomically update tlb fields used
+ by tlb_reset_dirty
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,166 +30,240 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-Am 22.02.2017 um 20:00 schrieb Eduardo Habkost:
-> The query-cpu-model-expand QMP command needs at least one static
-> model, to allow the "static" expansion mode to be implemented.
-> Instead of defining static versions of every CPU model, define a
-> "base" CPU model that has absolutely no feature flag enabled.
-> 
-> Despite having no CPUID data set at all, "-cpu base" is even a
-> functional CPU:
-> 
-> * It can boot a Slackware Linux 1.01 image with a Linux 0.99.12
->   kernel[1].
-> * It is even possible to boot[2] a modern Fedora x86_64 guest by
->   manually enabling the following CPU features:
->   -cpu base,+lm,+msr,+pae,+fpu,+cx8,+cmov,+sse,+sse2,+fxsr
-> 
-> [1] http://www.qemu-advent-calendar.org/2014/#day-1
-> [2] This is what can be seen in the guest:
->     [root@localhost ~]# cat /proc/cpuinfo
->     processor       : 0
->     vendor_id       : unknown
->     cpu family      : 0
->     model           : 0
->     model name      : 00/00
->     stepping        : 0
->     physical id     : 0
->     siblings        : 1
->     core id         : 0
->     cpu cores       : 1
->     apicid          : 0
->     initial apicid  : 0
->     fpu             : yes
->     fpu_exception   : yes
->     cpuid level     : 1
->     wp              : yes
->     flags           : fpu msr pae cx8 cmov fxsr sse sse2 lm nopl
->     bugs            :
->     bogomips        : 5832.70
->     clflush size    : 64
->     cache_alignment : 64
->     address sizes   : 36 bits physical, 48 bits virtual
->     power management:
-> 
->     [root@localhost ~]# x86info -v -a
->     x86info v1.30.  Dave Jones 2001-2011
->     Feedback to <davej@redhat.com>.
-> 
->     No TSC, MHz calculation cannot be performed.
->     Unknown vendor (0)
->     MP Table:
-> 
->     Family: 0 Model: 0 Stepping: 0
->     CPU Model (x86info's best guess):
-> 
->     eax in: 0x00000000, eax = 00000001 ebx = 00000000 ecx = 00000000 edx = 00000000
->     eax in: 0x00000001, eax = 00000000 ebx = 00000800 ecx = 00000000 edx = 07008161
-> 
->     eax in: 0x80000000, eax = 80000001 ebx = 00000000 ecx = 00000000 edx = 00000000
->     eax in: 0x80000001, eax = 00000000 ebx = 00000000 ecx = 00000000 edx = 20000000
-> 
->     Feature flags:
->      fpu            Onboard FPU
->      msr            Model-Specific Registers
->      pae            Physical Address Extensions
->      cx8            CMPXCHG8 instruction
->      cmov           CMOV instruction
->      fxsr           FXSAVE and FXRSTOR instructions
->      sse            SSE support
->      sse2           SSE2 support
-> 
->     Long NOPs supported: yes
-> 
->     Address sizes : 0 bits physical, 0 bits virtual
->     0MHz processor (estimate).
-> 
->      running at an estimated 0MHz
->     [root@localhost ~]#
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  target/i386/cpu-qom.h |  2 ++
->  target/i386/cpu.c     | 20 ++++++++++++++++++++
->  2 files changed, 22 insertions(+)
-> 
-> diff --git a/target/i386/cpu-qom.h b/target/i386/cpu-qom.h
-> index f6c704c3a9..c2205e6077 100644
-> --- a/target/i386/cpu-qom.h
-> +++ b/target/i386/cpu-qom.h
-> @@ -50,6 +50,7 @@ typedef struct X86CPUDefinition X86CPUDefinition;
->   * @kvm_required: Whether CPU model requires KVM to be enabled.
->   * @ordering: Ordering on the "-cpu help" CPU model list.
->   * @migration_safe: See CpuDefinitionInfo::migration_safe
-> + * @static_model: See CpuDefinitionInfo::static
->   * @parent_realize: The parent class' realize handler.
->   * @parent_reset: The parent class' reset handler.
->   *
-> @@ -68,6 +69,7 @@ typedef struct X86CPUClass {
->      bool kvm_required;
->      int ordering;
->      bool migration_safe;
-> +    bool static_model;
->  
->      /* Optional description of CPU model.
->       * If unavailable, cpu_def->model_id is used */
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index c6f62367b0..4241f56e8a 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -2230,6 +2230,7 @@ static void x86_cpu_definition_entry(gpointer data, gpointer user_data)
->      info->q_typename = g_strdup(object_class_get_name(oc));
->      info->migration_safe = cc->migration_safe;
->      info->has_migration_safe = true;
-> +    info->q_static = cc->static_model;
->  
->      entry = g_malloc0(sizeof(*entry));
->      entry->value = info;
-> @@ -3836,6 +3837,24 @@ static const TypeInfo x86_cpu_type_info = {
->      .class_init = x86_cpu_common_class_init,
->  };
->  
-> +
-> +/* "base" CPU model, used by query-cpu-model-expansion */
-> +static void x86_cpu_base_class_init(ObjectClass *oc, void *data)
-> +{
-> +    X86CPUClass *xcc = X86_CPU_CLASS(oc);
-> +
-> +    xcc->static_model = true;
-> +    xcc->migration_safe = true;
-> +    xcc->model_description = "base CPU model type with no feature enabled";
+The main use case for tlb_reset_dirty is to set the TLB_NOTDIRTY flags
+in TLB entries to force the slow-path on writes. This is used to mark
+page ranges containing code which has been translated so it can be
+invalidated if written to. To do this safely we need to ensure the TLB
+entries in question for all vCPUs are updated before we attempt to run
+the code otherwise a race could be introduced.
 
-s/feature/features/ ? (no native speaker ;) )
+To achieve this we atomically set the flag in tlb_reset_dirty_range and
+take care when setting it when the TLB entry is filled.
 
-> +    xcc->ordering = 8;
-> +}
-> +
-> +static const TypeInfo x86_base_cpu_type_info = {
-> +        .name = X86_CPU_TYPE_NAME("base"),
-> +        .parent = TYPE_X86_CPU,
-> +        .class_init = x86_cpu_base_class_init,
-> +};
-> +
->  static void x86_cpu_register_types(void)
->  {
->      int i;
-> @@ -3845,6 +3864,7 @@ static void x86_cpu_register_types(void)
->          x86_register_cpudef_type(&builtin_x86_defs[i]);
->      }
->      type_register_static(&max_x86_cpu_type_info);
-> +    type_register_static(&x86_base_cpu_type_info);
->  #ifdef CONFIG_KVM
->      type_register_static(&host_x86_cpu_type_info);
->  #endif
-> 
+On 32 bit systems attempting to emulate 64 bit guests we don't even
+bother as we might not have the atomic primitives available. MTTCG is
+disabled in this case and can't be forced on. The copy_tlb_helper
+function helps keep the atomic semantics in one place to avoid
+confusion.
 
-Looks sane to me!
+The dirty helper function is made static as it isn't used outside of
+cputlb.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+---
+ cputlb.c              | 120 +++++++++++++++++++++++++++++++++++++++-----------
+ include/exec/cputlb.h |   2 -
+ 2 files changed, 95 insertions(+), 27 deletions(-)
 
+diff --git a/cputlb.c b/cputlb.c
+index c50254be26..65003350e3 100644
+--- a/cputlb.c
++++ b/cputlb.c
+@@ -342,32 +342,90 @@ void tlb_unprotect_code(ram_addr_t ram_addr)
+     cpu_physical_memory_set_dirty_flag(ram_addr, DIRTY_MEMORY_CODE);
+ }
+ 
+-static bool tlb_is_dirty_ram(CPUTLBEntry *tlbe)
+-{
+-    return (tlbe->addr_write & (TLB_INVALID_MASK|TLB_MMIO|TLB_NOTDIRTY)) == 0;
+-}
+ 
+-void tlb_reset_dirty_range(CPUTLBEntry *tlb_entry, uintptr_t start,
++/*
++ * Dirty write flag handling
++ *
++ * When the TCG code writes to a location it looks up the address in
++ * the TLB and uses that data to compute the final address. If any of
++ * the lower bits of the address are set then the slow path is forced.
++ * There are a number of reasons to do this but for normal RAM the
++ * most usual is detecting writes to code regions which may invalidate
++ * generated code.
++ *
++ * Because we want other vCPUs to respond to changes straight away we
++ * update the te->addr_write field atomically. If the TLB entry has
++ * been changed by the vCPU in the mean time we skip the update.
++ *
++ * As this function uses atomic accesses we also need to ensure
++ * updates to tlb_entries follow the same access rules. We don't need
++ * to worry about this for oversized guests as MTTCG is disabled for
++ * them.
++ */
++
++static void tlb_reset_dirty_range(CPUTLBEntry *tlb_entry, uintptr_t start,
+                            uintptr_t length)
+ {
+-    uintptr_t addr;
++#if TCG_OVERSIZED_GUEST
++    uintptr_t addr = tlb_entry->addr_write;
+ 
+-    if (tlb_is_dirty_ram(tlb_entry)) {
+-        addr = (tlb_entry->addr_write & TARGET_PAGE_MASK) + tlb_entry->addend;
++    if ((addr & (TLB_INVALID_MASK | TLB_MMIO | TLB_NOTDIRTY)) == 0) {
++        addr &= TARGET_PAGE_MASK;
++        addr += tlb_entry->addend;
+         if ((addr - start) < length) {
+             tlb_entry->addr_write |= TLB_NOTDIRTY;
+         }
+     }
++#else
++    /* paired with atomic_mb_set in tlb_set_page_with_attrs */
++    uintptr_t orig_addr = atomic_mb_read(&tlb_entry->addr_write);
++    uintptr_t addr = orig_addr;
++
++    if ((addr & (TLB_INVALID_MASK | TLB_MMIO | TLB_NOTDIRTY)) == 0) {
++        addr &= TARGET_PAGE_MASK;
++        addr += atomic_read(&tlb_entry->addend);
++        if ((addr - start) < length) {
++            uintptr_t notdirty_addr = orig_addr | TLB_NOTDIRTY;
++            atomic_cmpxchg(&tlb_entry->addr_write, orig_addr, notdirty_addr);
++        }
++    }
++#endif
++}
++
++/* For atomic correctness when running MTTCG we need to use the right
++ * primitives when copying entries */
++static inline void copy_tlb_helper(CPUTLBEntry *d, CPUTLBEntry *s,
++                                   bool atomic_set)
++{
++#if TCG_OVERSIZED_GUEST
++    *d = *s;
++#else
++    if (atomic_set) {
++        d->addr_read = s->addr_read;
++        d->addr_code = s->addr_code;
++        atomic_set(&d->addend, atomic_read(&s->addend));
++        /* Pairs with flag setting in tlb_reset_dirty_range */
++        atomic_mb_set(&d->addr_write, atomic_read(&s->addr_write));
++    } else {
++        d->addr_read = s->addr_read;
++        d->addr_write = atomic_read(&s->addr_write);
++        d->addr_code = s->addr_code;
++        d->addend = atomic_read(&s->addend);
++    }
++#endif
+ }
+ 
++/* This is a cross vCPU call (i.e. another vCPU resetting the flags of
++ * the target vCPU). As such care needs to be taken that we don't
++ * dangerously race with another vCPU update. The only thing actually
++ * updated is the target TLB entry ->addr_write flags.
++ */
+ void tlb_reset_dirty(CPUState *cpu, ram_addr_t start1, ram_addr_t length)
+ {
+     CPUArchState *env;
+ 
+     int mmu_idx;
+ 
+-    assert_cpu_is_self(cpu);
+-
+     env = cpu->env_ptr;
+     for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
+         unsigned int i;
+@@ -455,7 +513,7 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
+     target_ulong address;
+     target_ulong code_address;
+     uintptr_t addend;
+-    CPUTLBEntry *te;
++    CPUTLBEntry *te, *tv, tn;
+     hwaddr iotlb, xlat, sz;
+     unsigned vidx = env->vtlb_index++ % CPU_VTLB_SIZE;
+     int asidx = cpu_asidx_from_attrs(cpu, attrs);
+@@ -490,41 +548,50 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
+ 
+     index = (vaddr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
+     te = &env->tlb_table[mmu_idx][index];
+-
+     /* do not discard the translation in te, evict it into a victim tlb */
+-    env->tlb_v_table[mmu_idx][vidx] = *te;
++    tv = &env->tlb_v_table[mmu_idx][vidx];
++
++    /* addr_write can race with tlb_reset_dirty_range */
++    copy_tlb_helper(tv, te, true);
++
+     env->iotlb_v[mmu_idx][vidx] = env->iotlb[mmu_idx][index];
+ 
+     /* refill the tlb */
+     env->iotlb[mmu_idx][index].addr = iotlb - vaddr;
+     env->iotlb[mmu_idx][index].attrs = attrs;
+-    te->addend = addend - vaddr;
++
++    /* Now calculate the new entry */
++    tn.addend = addend - vaddr;
+     if (prot & PAGE_READ) {
+-        te->addr_read = address;
++        tn.addr_read = address;
+     } else {
+-        te->addr_read = -1;
++        tn.addr_read = -1;
+     }
+ 
+     if (prot & PAGE_EXEC) {
+-        te->addr_code = code_address;
++        tn.addr_code = code_address;
+     } else {
+-        te->addr_code = -1;
++        tn.addr_code = -1;
+     }
++
++    tn.addr_write = -1;
+     if (prot & PAGE_WRITE) {
+         if ((memory_region_is_ram(section->mr) && section->readonly)
+             || memory_region_is_romd(section->mr)) {
+             /* Write access calls the I/O callback.  */
+-            te->addr_write = address | TLB_MMIO;
++            tn.addr_write = address | TLB_MMIO;
+         } else if (memory_region_is_ram(section->mr)
+                    && cpu_physical_memory_is_clean(
+                         memory_region_get_ram_addr(section->mr) + xlat)) {
+-            te->addr_write = address | TLB_NOTDIRTY;
++            tn.addr_write = address | TLB_NOTDIRTY;
+         } else {
+-            te->addr_write = address;
++            tn.addr_write = address;
+         }
+-    } else {
+-        te->addr_write = -1;
+     }
++
++    /* Pairs with flag setting in tlb_reset_dirty_range */
++    copy_tlb_helper(te, &tn, true);
++    /* atomic_mb_set(&te->addr_write, write_address); */
+ }
+ 
+ /* Add a new TLB entry, but without specifying the memory
+@@ -687,10 +754,13 @@ static bool victim_tlb_hit(CPUArchState *env, size_t mmu_idx, size_t index,
+         if (cmp == page) {
+             /* Found entry in victim tlb, swap tlb and iotlb.  */
+             CPUTLBEntry tmptlb, *tlb = &env->tlb_table[mmu_idx][index];
++
++            copy_tlb_helper(&tmptlb, tlb, false);
++            copy_tlb_helper(tlb, vtlb, true);
++            copy_tlb_helper(vtlb, &tmptlb, true);
++
+             CPUIOTLBEntry tmpio, *io = &env->iotlb[mmu_idx][index];
+             CPUIOTLBEntry *vio = &env->iotlb_v[mmu_idx][vidx];
+-
+-            tmptlb = *tlb; *tlb = *vtlb; *vtlb = tmptlb;
+             tmpio = *io; *io = *vio; *vio = tmpio;
+             return true;
+         }
+diff --git a/include/exec/cputlb.h b/include/exec/cputlb.h
+index d454c005b7..3f941783c5 100644
+--- a/include/exec/cputlb.h
++++ b/include/exec/cputlb.h
+@@ -23,8 +23,6 @@
+ /* cputlb.c */
+ void tlb_protect_code(ram_addr_t ram_addr);
+ void tlb_unprotect_code(ram_addr_t ram_addr);
+-void tlb_reset_dirty_range(CPUTLBEntry *tlb_entry, uintptr_t start,
+-                           uintptr_t length);
+ extern int tlb_flush_count;
+ 
+ #endif
 -- 
-Thanks,
-
-David
+2.11.0
