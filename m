@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1chNPB-0000Ba-H5
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 16:28:00 -0500
+	(envelope-from <den@virtuozzo.com>) id 1chNSD-0001PO-Q8
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 16:31:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1chNPA-0001uX-6C
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 16:27:57 -0500
-References: <1487710908-26356-1-git-send-email-armbru@redhat.com>
-	<1487710908-26356-3-git-send-email-armbru@redhat.com>
-	<5f90e39c-e4ea-8638-d057-25eff232ad3d@redhat.com>
-	<878toxmeol.fsf@dusky.pond.sub.org> <877f4g2f6m.fsf@dusky.pond.sub.org>
-	<c00ea08f-f596-6e3e-4084-7f183c92a04d@redhat.com>
-	<87h93j2ytj.fsf@dusky.pond.sub.org>
-	<86ea8b80-f2ae-088f-ae2d-cf529d2db02b@redhat.com>
-	<87r32nxrzm.fsf@dusky.pond.sub.org>
-	<420c2df1-5bb9-29dc-ed0f-707e8985b4f3@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7030cab7-202d-15bc-dcdc-2710c7ebb4eb@redhat.com>
-Date: Fri, 24 Feb 2017 15:27:46 -0600
+	(envelope-from <den@virtuozzo.com>) id 1chNS9-0003dS-Nb
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 16:31:05 -0500
+Received: from mail-ve1eur01on0115.outbound.protection.outlook.com
+	([104.47.1.115]:21856
+	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1chNS9-0003c1-51
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 16:31:01 -0500
+References: <1486041504-23627-1-git-send-email-den@openvz.org>
+	<CAJ+F1CL06FJvVrSmLE4-p208ocFoP7d-w_7mBkOmvnTrBxA5qQ@mail.gmail.com>
+	<871sunzovz.fsf@dusky.pond.sub.org>
+	<CAJ+F1CJZUW8jTnCYQ7RDsRHK3fmucRVZMr2uDm62Esjdrcn6sw@mail.gmail.com>
+	<06eccfa8-6a4e-a892-576a-ac06e61a0e2f@redhat.com>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <119846a6-561b-83a2-59fb-758bf692c967@openvz.org>
+Date: Fri, 24 Feb 2017 16:57:04 +0100
 MIME-Version: 1.0
-In-Reply-To: <420c2df1-5bb9-29dc-ed0f-707e8985b4f3@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ruIdAf8JfnlA0E9mJi8PEF5vP7qTtiHts"
-Subject: Re: [Qemu-devel] [PATCH RFC v3 2/5] keyval: New keyval_parse()
+In-Reply-To: <06eccfa8-6a4e-a892-576a-ac06e61a0e2f@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] qemu-char: socket backend:
+ disconnect on write error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,89 +33,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Anton
+	Nefedov <anton.nefedov@virtuozzo.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ruIdAf8JfnlA0E9mJi8PEF5vP7qTtiHts
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
-Message-ID: <7030cab7-202d-15bc-dcdc-2710c7ebb4eb@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v3 2/5] keyval: New keyval_parse()
-References: <1487710908-26356-1-git-send-email-armbru@redhat.com>
- <1487710908-26356-3-git-send-email-armbru@redhat.com>
- <5f90e39c-e4ea-8638-d057-25eff232ad3d@redhat.com>
- <878toxmeol.fsf@dusky.pond.sub.org> <877f4g2f6m.fsf@dusky.pond.sub.org>
- <c00ea08f-f596-6e3e-4084-7f183c92a04d@redhat.com>
- <87h93j2ytj.fsf@dusky.pond.sub.org>
- <86ea8b80-f2ae-088f-ae2d-cf529d2db02b@redhat.com>
- <87r32nxrzm.fsf@dusky.pond.sub.org>
- <420c2df1-5bb9-29dc-ed0f-707e8985b4f3@redhat.com>
-In-Reply-To: <420c2df1-5bb9-29dc-ed0f-707e8985b4f3@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 02/24/2017 04:31 PM, Paolo Bonzini wrote:
+>
+> On 24/02/2017 15:46, Marc-Andr=C3=A9 Lureau wrote:
+>>>> +        if (ret < 0 && errno !=3D EAGAIN) {
+>>>> +            if (tcp_chr_read_poll(chr) <=3D 0) {
+>>>> +                tcp_chr_disconnect(chr);
+>>>> +                return len;
+>>>>
+>>> This change breaks a number of assumption in vhost-user code. Until now=
+, a
+>>> vhost-user function assumed that dev->vhost_ops would remain as long as=
+ the
+>>> function is running, so it may call vhost_ops callbacks several time, w=
+hich
+>>> may eventually fail to do io, but no crash would occur. The disconnecti=
+on
+>>> would be handled later with the HUP handler. Now, vhost_ops may be clea=
+red
+>>> during a write (chr_disconnect -> CHR_EVENT_CLOSED in
+>>> net_vhost_user_event). This can be randomly reproduced with
+>>> vhost-user-test -p /x86_64/vhost-user/flags-mismatch/subprocess
+> Would it work to call tcp_chr_disconnect from an idle source (and
+> destroy the source on the next connect)?
+>
+> Paolo
+I think no, but will think more on Monday. Unfortunately
+today is official holiday in Russia :(
 
-On 02/24/2017 03:06 PM, Eric Blake wrote:
+Right now the code loops forever. May be we should notify the
+guest that the problem really happens.
 
->=20
-> Also for 2.9: turn on the deprecation warning for QemuOpts negative
-> sugar, but leave positive sugar unchanged (it seems like positive sugar=
-
-> is probably more in use than negative sugar, other than chardev nowait)=
-=2E
-
-Capturing the gist of an IRC conversation:
-
-Right now, it appears that '-chardev nowait' is in heavy use ('git grep
-nowait' shows that qemu itself recommends it in documentation, nodelay
-being another one).  Right now, QemuOpts says that '-chardev
-wait,nowait' results in 'wait=3Doff', and '-chardev nowait,wait' results
-in 'wait=3Don' (that is, last-one-wins semantics) - but in reality, there=
-
-are probably few (if any) clients that rely on this particular semantics.=
-
-
-If we get rid of 'noFOO' magic, we can still teach the chardev QemuOpts
-to recognize optional keys for BOTH 'wait' and 'nowait'; a user that
-specifies neither gets the default behavior as always; a user that
-specifies only 'wait' or 'nowait' gets the requested behavior (although
-now chardev has to check both key spellings rather than one), and a user
-that specifies 'wait,nowait' or 'nowait,wait' causes an error, not at
-QemuOpts parse time, but in the chardev initialization code.  That is,
-for any boolean option where 'noFOO' magic is currently handled by
-QemuOpts, we can still mostly keep back-compat by adding a new 'noFOO'
-key to the object, and teaching that object to check that 'FOO' and
-'noFOO' are not both selected at once.
-
-But whether this change to QemuOpts is the right thing to do is not 2.9
-material, so let's take a breather and revisit it for 2.10 (or whenever
-we try to fix QemuOpts to layer on top of keyval_parse()).
-
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---ruIdAf8JfnlA0E9mJi8PEF5vP7qTtiHts
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYsKVSAAoJEKeha0olJ0NqxKUH/ijatu3Z2xX2npaxl9aQXMW3
-0Fkac96jQAlL9e8x8dYIpmqOmt00tTRLQYmLswCAZSOUm4GuGDmNoJ+l3pXqQU5X
-7REY8ehqojR4dJIxsNB5E8VFoHv3q3L5KOBR9ZxeYiCD4/tfX0dWRg4Dpd+5OxQm
-QaM0NoDJmVkfZfTaH78WPtsjppNMcA7+cwMQMsjfGG33yrxwLgQAhw9Osqmt5lrX
-HuKDeZGlVZuq9nVz1r3R9OwTJnUufahhkMOCYFusb1tljxysOdv2b1vlh/8CL84A
-mArmECi5R5PZviv9WYAfYYoJDW1Mgt9E4Wi6SH4QQbawfFW9iaG/h9VZzvqYvOM=
-=DTcd
------END PGP SIGNATURE-----
-
---ruIdAf8JfnlA0E9mJi8PEF5vP7qTtiHts--
+Den
