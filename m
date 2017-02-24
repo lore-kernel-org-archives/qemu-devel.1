@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1chJc9-0000zP-8i
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:25:06 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1chJcE-00015v-6O
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:25:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1chJc6-0004Z3-KE
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:25:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49888)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1chJc6-0004Yo-E7
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:25:02 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8F2DD3D948
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 17:25:02 +0000 (UTC)
-References: <20170206173306.20603-1-dgilbert@redhat.com>
-	<20170206173306.20603-10-dgilbert@redhat.com>
-	<4c0083ac-7b1d-ace6-d8f0-dfaa1686bd3b@redhat.com>
-	<20170224154606.GJ8830@work-vm>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <6428f5cf-946e-d7d6-de59-4805b3a4e48b@redhat.com>
-Date: Fri, 24 Feb 2017 18:24:59 +0100
+	(envelope-from <alex.bennee@linaro.org>) id 1chJcB-0004dB-Fo
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:25:10 -0500
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:34223)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1chJcB-0004as-A5
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:25:07 -0500
+Received: by mail-wr0-x236.google.com with SMTP id o22so11881327wro.1
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 09:25:07 -0800 (PST)
+References: <1487262963-11519-1-git-send-email-peter.maydell@linaro.org>
+	<1487262963-11519-4-git-send-email-peter.maydell@linaro.org>
+	<CAFEAcA-JoKKkKtL=W0ecVQ=+wHbxe-gxKGho8GDm95YuyD7rWw@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA-JoKKkKtL=W0ecVQ=+wHbxe-gxKGho8GDm95YuyD7rWw@mail.gmail.com>
+Date: Fri, 24 Feb 2017 17:25:04 +0000
+Message-ID: <87innzlcwf.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170224154606.GJ8830@work-vm>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 09/16] postcopy: Use temporary for
- placing zero huge pages
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 03/13] armv7m: Rewrite NVIC to not use
+ any GIC code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,39 +32,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, aarcange@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-On 24/02/2017 16:46, Dr. David Alan Gilbert wrote:
-> * Laurent Vivier (lvivier@redhat.com) wrote:
->> On 06/02/2017 18:32, Dr. David Alan Gilbert (git) wrote:
->>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->>>
->>> The kernel can't do UFFDIO_ZEROPAGE for huge pages, so we have
->>> to allocate a temporary (always zero) page and use UFFDIO_COPYPAGE
->>> on it.
->>>
->>> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->>> Reviewed-by: Juan Quintela <quintela@redhat.com>
->>> ---
-...
->> Are you sure the kernel doesn't support UFFDIO_ZEROPAGE for huge page.
->> It seems __mcopy_atomic() manages HUGETLB vma (it is called by
->> mfill_zeropage(), called by userfaultfd_zeropage())?
-> 
-> That's as I understand it from Andrea; and I think it does fail if you try it.
 
-Found the answer in kernel log:
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-    commit 7a0c4cf85b856430af62a907dd65dfc51438d24f
-    Author: Andrea Arcangeli <aarcange@redhat.com>
-    Date:   Wed Feb 22 15:44:10 2017 -0800
+> On 16 February 2017 at 16:35, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> From: Michael Davidsaver <mdavidsaver@gmail.com>
+>>
+>> Despite some superficial similarities of register layout, the
+>> M-profile NVIC is really very different from the A-profile GIC.
+>> Our current attempt to reuse the GIC code means that we have
+>> significant bugs in our NVIC.
+>>
+>> Implement the NVIC as an entirely separate device, to give
+>> us somewhere we can get the behaviour correct.
+>>
+>> This initial commit does not attempt to implement exception
+>> priority escalation, since the GIC-based code didn't either.
+>> It does fix a few bugs in passing:
+>>  * ICSR.RETTOBASE polarity was wrong and didn't account for
+>>    internal exceptions
+>>  * ICSR.VECTPENDING was 16 too high if the pending exception
+>>    was for an external interrupt
+>>  * UsageFault, BusFault and MemFault were not disabled on reset
+>>    as they are supposed to be
+>>
+>> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+>> [PMM: reworked, various bugs and stylistic cleanups]
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>
+>> +    case 0x400 ... 0x5ef: /* NVIC Priority */
+>> +        startvec = 8 * (offset - 0x400) + NVIC_FIRST_IRQ; /* vector # */
+>> +
+>> +        for (i = 0; i < size; i++) {
+>
+> Just noticed this line should be
+> +        for (i = 0; i < size && startvec + i < s->num_irq; i++) {
+>
+> which brings it into line with the nvic_sysreg_read() code
+> and prevents an assert() in set_prio() if the guest writes to
+> registers beyond the end of the implemented IRQ range.
+>
+>> +            set_prio(s, startvec + i, (value >> (i * 8)) & 0xff);
+>> +        }
+>> +        nvic_irq_update(s);
+>> +        return;
+>
+> Unless there's some other problem that means I need
+> to respin anyway I propose to just squash in that fix.
 
-        userfaultfd: selftest: test UFFDIO_ZEROPAGE on all memory types
+With the squashed fix:
 
-        This will verify -EINVAL is returned with hugetlbfs/shmem and
-        it'll do a functional test of UFFDIO_ZEROPAGE on anonymous
-        memory.
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 
-Thanks,
-Laurent
+>
+> thanks
+> -- PMM
+
+
+--
+Alex Bennée
