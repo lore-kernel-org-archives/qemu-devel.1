@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36201)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1chFHo-0007cg-Ln
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:47:49 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1chFJA-0008GW-Ul
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:49:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1chFHn-0007Dl-Lu
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:47:48 -0500
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:37550)
+	(envelope-from <peter.maydell@linaro.org>) id 1chFJ9-0000hE-Pj
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:49:12 -0500
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:33416)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1chFHn-0007B5-Em
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:47:47 -0500
-Received: by mail-wm0-x231.google.com with SMTP id v77so13667034wmv.0
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 04:47:45 -0800 (PST)
+	id 1chFJ9-0000gj-Jr
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 07:49:11 -0500
+Received: by mail-wm0-x233.google.com with SMTP id t18so8457647wmt.0
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 04:49:11 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20170222063348.32176-1-david@gibson.dropbear.id.au>
-References: <20170222063348.32176-1-david@gibson.dropbear.id.au>
+In-Reply-To: <1487767351-9190-1-git-send-email-kraxel@redhat.com>
+References: <1487767351-9190-1-git-send-email-kraxel@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Feb 2017 12:47:23 +0000
-Message-ID: <CAFEAcA_xXVScYwPiQFORwcOw00Gbq800Ge9V14qK-427CSU6nw@mail.gmail.com>
+Date: Fri, 24 Feb 2017 12:48:49 +0000
+Message-ID: <CAFEAcA-H9ja5OiTOk2y5SOj1J0npHqN8_zQ-6W9TALxTTrB6Ug@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 00/43] ppc-for-2.9 queue 20170222
+Subject: Re: [Qemu-devel] [PULL 0/1] cirrus: add blit_is_unsafe call to
+ cirrus_bitblt_cputovideo (CVE-2017-2620)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Igor Mammedov <imammedo@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 22 February 2017 at 06:33, David Gibson <david@gibson.dropbear.id.au> wrote:
+On 22 February 2017 at 12:42, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>   Hi,
+>
+> Here is the pull request for the cirrus cve
+> fix sent to the list yesterday.
+>
+> please pull,
+>   Gerd
+>
 > The following changes since commit 796b288f7be875045670f963ce99991b3c8e96ac:
 >
 >   Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' into staging (2017-02-21 15:48:22 +0000)
 >
 > are available in the git repository at:
 >
->   git://github.com/dgibson/qemu.git tags/ppc-for-2.9-20170222
 >
-> for you to fetch changes up to fb6971c110387cf597b58c411658e3d15cc6c6fb:
+>   git://git.kraxel.org/qemu tags/pull-cve-2017-2620-20170222-1
 >
->   hw/ppc/ppc405_uc.c: Avoid integer overflows (2017-02-22 14:28:53 +1100)
+> for you to fetch changes up to c4cf7039465b0578035c4ec82f9f2519f7dceaf3:
 >
-> NOTE: This pull request hasn't passed the full set of tests I usually
-> run, because there seem to be problems with those on current master
-> anyway: some of "make check" seems to wedge, and a number of travis
-> builds timed out.  AFAICT this series doesn't cause any failures that
-> aren't already present in upstream.
+>   cirrus: add blit_is_unsafe call to cirrus_bitblt_cputovideo (CVE-2017-2620) (2017-02-22 12:57:08 +0100)
 >
 > ----------------------------------------------------------------
-> ppc patch queue for 2017-02-22
->
-> This pull request has:
->    * Yet more POWER9 instruction implementations
->    * Some extensions to the softfloat code which are necesssary for
->      some of those instructions
->    * Some preliminary patches in preparation for POWER9 softmmu
->      implementation
->    * Igor Mammedov's cleanups to unify hotplug cpu handling across
->      architectures
->    * Assorted bugfixes
->
-> The softfloat and cpu hotplug changes aren't entirely ppc specific (in
-> fact the hotplug stuff contains some pc specific patches).  However
-> they're included here because ppc is one of the main beneficiaries,
-> and the series depend on some ppc specific patches.
+> cirrus: add blit_is_unsafe call to cirrus_bitblt_cputovideo (CVE-2017-2620)
 >
 > ----------------------------------------------------------------
+> Gerd Hoffmann (1):
+>       cirrus: add blit_is_unsafe call to cirrus_bitblt_cputovideo (CVE-2017-2620)
+>
+>  hw/display/cirrus_vga.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>
 
-Applied, thanks.
+Shouldn't the commit have a Cc: qemu-stable@nongnu.org tag?
 
+thanks
 -- PMM
