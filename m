@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ch6Z8-0004jX-QT
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 22:29:08 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ch6ZB-0004ks-LR
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 22:29:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ch6Z7-0000MS-Ml
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 22:29:06 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:45189)
+	(envelope-from <dgibson@ozlabs.org>) id 1ch6Z7-0000MW-Ml
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 22:29:09 -0500
+Received: from ozlabs.org ([103.22.144.67]:60653)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ch6Z6-0000I2-KE
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ch6Z6-0000Hx-KW
 	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 22:29:05 -0500
-Date: Fri, 24 Feb 2017 14:28:29 +1100
+Date: Fri, 24 Feb 2017 14:26:30 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170224032829.GP17615@umbus.fritz.box>
-References: <3d5e7b5e-4501-86b7-093d-47fb09af585e@redhat.com>
-	<CAFEAcA9gcArSqhbRi6-YdR=5eE9dtq66C7N0qTbCuBiY_Zr+tA@mail.gmail.com>
-	<41630a89-e645-7d7e-b7c2-356fd6dcadee@redhat.com>
-	<CAFEAcA_Mh9ZrJeu4f==ko1k2yLkfPe2AwNbUHcxkmS6Lzuvk0Q@mail.gmail.com>
-	<2565ef99-9c16-e836-08c6-0915f5d4b0f8@redhat.com>
-	<CAFEAcA_BgiXrjW9aRNFkXEEjS+kjibJ_UisJtiLgrPh=0re5qA@mail.gmail.com>
-	<c76578aa-ec76-f904-b0fc-72676e4ce515@redhat.com>
-	<CAFEAcA_waGB88XyzGxFbE_OyLAPnY70aEVQYzbS0k3KR+FF9DA@mail.gmail.com>
-	<dac5dcb6-7beb-1c33-0a4e-b7977fce69b6@redhat.com>
-	<df4e14ad-acd9-151e-f4a1-9cab24063b83@linux.vnet.ibm.com>
+Message-ID: <20170224032630.GO17615@umbus.fritz.box>
+References: <1487659615-15820-1-git-send-email-xyjxie@linux.vnet.ibm.com>
+	<5edff645-12e8-d3e0-1849-302b6986c232@ozlabs.ru>
+	<fdcb2b07-aae8-69bf-ee94-a43777009c3a@redhat.com>
+	<CAFEAcA--bSo7PJH0Px9ytQspaYuS55CSsM_EN6zt0djhkqKNPw@mail.gmail.com>
+	<5a0773de-6bc7-474a-82ab-2edd37ce8a93@redhat.com>
+	<CAFEAcA99xi4k57h2XGw2deGO24E95AS5jyGL+4GzjqNgMb9wcg@mail.gmail.com>
+	<92580ca9-47fe-a943-7720-d3cb1fc6d2eb@redhat.com>
+	<CAFEAcA8769a_8xwk57FS6Ko+Lioud20+70JRSafeEic6GB_RAw@mail.gmail.com>
+	<3d5e7b5e-4501-86b7-093d-47fb09af585e@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="WOTjKnJ88wpJKlWH"
+	protocol="application/pgp-signature"; boundary="4ickEXl+ukcSQ/3E"
 Content-Disposition: inline
-In-Reply-To: <df4e14ad-acd9-151e-f4a1-9cab24063b83@linux.vnet.ibm.com>
+In-Reply-To: <3d5e7b5e-4501-86b7-093d-47fb09af585e@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH] memory: make ram device read/write endian
  sensitive
 List-Id: <qemu-devel.nongnu.org>
@@ -37,95 +36,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yongji Xie <xyjxie@linux.vnet.ibm.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, QEMU Developers <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, zhong@linux.vnet.ibm.com, Paul Mackerras <paulus@samba.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Yongji Xie <xyjxie@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, zhong@linux.vnet.ibm.com, Paul Mackerras <paulus@samba.org>
 
 
---WOTjKnJ88wpJKlWH
+--4ickEXl+ukcSQ/3E
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 24, 2017 at 01:14:09AM +0800, Yongji Xie wrote:
-> on 2017/2/24 0:15, Paolo Bonzini wrote:
+On Thu, Feb 23, 2017 at 12:43:37PM +0100, Paolo Bonzini wrote:
 >=20
-> >=20
-> > On 23/02/2017 17:08, Peter Maydell wrote:
-> > > On 23 February 2017 at 15:58, Paolo Bonzini <pbonzini@redhat.com> wro=
+>=20
+> On 23/02/2017 12:34, Peter Maydell wrote:
+> > On 23 February 2017 at 10:33, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >>
+> >>
+> >> On 23/02/2017 11:23, Peter Maydell wrote:
+> >>> On 23 February 2017 at 10:10, Paolo Bonzini <pbonzini@redhat.com> wro=
 te:
-> > > > However, DEVICE_NATIVE_ENDIAN would have to be paired with tswap, w=
-hich
-> > > > the current code does not do, hence the bug.  To have no swap at al=
-l,
-> > > > you'd need DEVICE_HOST_ENDIAN.
-> > > Yes, I agree that the current ramdevice code has this bug (and
-> > > that we can fix it by any of the various options).
-> > Good. :)
+> >>>> On 23/02/2017 11:02, Peter Maydell wrote:
+> >>>>> I'm really not convinced we need DEVICE_HOST_ENDIAN. RAM
+> >>>>> areas should be target-endian (you can probably define
+> >>>>> "target endianness" as "the endianness that RAM areas have".)
+> >>>>
+> >>>> This is not RAM.  This is MMIO, backed by a MMIO area in the host.
+> >>>
+> >>> Hmm, I see...the naming is a bit unfortunate if it's not RAM.
+> >>
+> >> Yeah, it's called like that because it is backed by a RAMBlock but it
+> >> returns false for memory_access_is_direct.
 > >=20
-> > > > > AIUI what we want for this VFIO case is "when the guest does
-> > > > > a 32-bit write of 0x12345678 then the bytes are 0x12 0x34 0x56 0x=
-78
-> > > > > regardless of whether TARGET_BIG_ENDIAN or not".
-> > > > No, I don't think so.  This is not specific to VFIO.  You can do it=
- with
-> > > > any device, albeit VFIO is currently the only one using ramd region=
-s.
-> > > The commit message in the patch that started this thread off
-> > > says specifically that "VFIO PCI device is little endian".
-> > > Is that wrong?
-> > Yes, I think it's a red herring.  Hence my initial confusion, when I
-> > asked "would Yongji's patch just work if it used DEVICE_BIG_ENDIAN and
-> > beNN_to_cpu/cpu_to_beNN".
+> > We should probably update the doc comment to note that the
+> > pointer is to host-endianness memory (and that this is not
+> > like normal RAM which is target-endian)...
+>=20
+> I wouldn't call it host-endianness memory, and I disagree that normal
+> RAM is target-endian---in both cases it's just a bunch of bytes.
+
+Right.  Really, endianness is not a property of the device - even less
+so of RAM.  It's a property of an individual multibyte value and how
+it is interpreted relative to individual byte addresses.
+
+Really the declarations in the MRs are saying: assuming the guest
+(software + hardware) does (big|little|target native) accesses on this
+device, do the right swaps so we get host native multi-byte values
+which match the original multibyte values the guest had in mind.
+
+What we want for memory (both RAM and VFIO MMIO) is: don't even try to
+preserve multi-byte values between host and guest views, just preserve
+byte address order.  Tastes may vary as to whether you call that "host
+endian" or "no endian" or "bag-o'-bytesian" or whatever.
+
+> However, the access done by the MemoryRegionOps callbacks needs to match
+> the endianness declared by the MemoryRegionOps themselves.
+>=20
+> Paolo
+>=20
+> >>>> The
+> >>>> MemoryRegionOps read from the MMIO area (so the data has host
+> >>>> endianness) and do not do any further swap:
+> >>>>
+> >>>>         data =3D *(uint16_t *)(mr->ram_block->host + addr);
+> >>>>
+> >>>> Here, the dereference is basically the same as ldl_he_p.
+> >>>>
+> >>>> If you wanted to make the MemoryRegion use DEVICE_NATIVE_ENDIAN, you=
+'d
+> >>>> need to tswap around the access.  Or you can use ldl_le_p and
+> >>>> DEVICE_LITTLE_ENDIAN (this is what Yongji's patch open codes), or
+> >>>> ldl_be_p and DEVICE_BIG_ENDIAN.  They are all the same in the end.
+> >>>
+> >>> Using stl_p &c in a DEVICE_NATIVE_ENDIAN MR would work too, right?
+> >>> (This is how all the NATIVE_ENDIAN MRs in exec.c work.)
+> >>
+> >> Yes, it should, as long as the memcpy(...) of {ld,st}*_he_p is compiled
+> >> to a single access, which should be the case.
 > >=20
->=20
-> Thank you for the great discussion. I have a better understanding of the
-> endianness now.:-)
->=20
-> And for the commit message, I was wrong to assume the same endianness
-> as vfio. That's my fault. This bug should happen when target and host
-> endianness are different regardless of the device endianness.
->=20
-> To fix it, introducing DEVICE_HOST_ENDIAN for the ram device seems to be
-> more reasonable than other ways. I think I'll update the patch with this
-> way.
-
-I think this is basically the right approach, with the only caveat
-being whether we want to call it "host endian" or something else.
-
-> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-> index bd15853..eef74df 100644
-> --- a/include/exec/cpu-common.h
-> +++ b/include/exec/cpu-common.h
-> @@ -36,6 +36,12 @@ enum device_endian {
->      DEVICE_LITTLE_ENDIAN,
->  };
->=20
-> +#if defined(HOST_WORDS_BIGENDIAN)
-> +#define DEVICE_HOST_ENDIAN DEVICE_BIG_ENDIAN
-> +#else
-> +#define DEVICE_HOST_ENDIAN DEVICE_LITTLE_ENDIAN
-> +#endif
-> +
->  /* address in the RAM (different from a physical address) */
->  #if defined(CONFIG_XEN_BACKEND)
->  typedef uint64_t ram_addr_t;
-> diff --git a/memory.c b/memory.c
-> index ed8b5aa..17cfada 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -1180,7 +1180,7 @@ static void memory_region_ram_device_write(void
-> *opaque, hwaddr addr,
->  static const MemoryRegionOps ram_device_mem_ops =3D {
->      .read =3D memory_region_ram_device_read,
->      .write =3D memory_region_ram_device_write,
-> -    .endianness =3D DEVICE_NATIVE_ENDIAN,
-> +    .endianness =3D DEVICE_HOST_ENDIAN,
->      .valid =3D {
->          .min_access_size =3D 1,
->          .max_access_size =3D 8,
->=20
-> Thanks,
-> Yongji
+> > ...and whichever of these approaches we take, we should have
+> > a comment which notes that we are converting from the host
+> > endianness memory to the endianness specified by the MemoryRegion
+> > endianness attribute.
+> >=20
+> > thanks
+> > -- PMM
+> >=20
 >=20
 
 --=20
@@ -134,25 +129,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---WOTjKnJ88wpJKlWH
+--4ickEXl+ukcSQ/3E
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYr6hdAAoJEGw4ysog2bOSWXcP/jqo8KAuzlQ7taEBgSgblpwJ
-s6xn7W4wrtxvxmBX+YfO5kQUihhIS8EpmVqbF77QLyPQxqnHcy+utViAYzbHOBQl
-rzAbQKGYurku8axmb9Y6BfLIgpVALn4jljrNElc27pNKAYZ/5XpAzLY48PyuCp+B
-h5IDfVcCCMpF3x7712mGJXWzYMho0UuKMblhs29ClP45tsU3nGS6TGpPWzotGTfH
-6odcbd4f2CB9BNR838UOSaZpv7binTMFH8dqUBpu+3pe9s/zt82KK0Z8Y/AmRRXZ
-s+5UEbcjJhTBKdFW+FBiQiJhrdyp2YmpPfVfqNqSbXgk7KyfvvxQAci04NIg2lhk
-CtrpdnPsz2qhHsDo3EFuNhCtkZIYl7onxZsGsV5rmj7CEY80aWqfyu1T86dMkkJi
-nFWAkmwz84Ym1rGtgxBB3ABYqrqMd+qICzBgwvPlxr6y24E+1U5dkfk5NLF3eNJ4
-gJx7NNg3lszTmsFvuMpOY4BgIES9F1cnV1l12r1YYuH/D5GkcRg+MWkRzkfJrhkL
-e3/yXufkrM7khj5g8eFPwWGVaZkDoqjuhJarC4eTNw9VSyRxjym/f5pewt2adfHj
-0zaFyp0wKpmr2SUya+flEQIhphvy9mtLH7vZDJkA5ivw3XQPdTukGiFsIwuUBsXG
-2lb9BAPDI0LewYlJPOQ2
-=KbkD
+iQIcBAEBCAAGBQJYr6fkAAoJEGw4ysog2bOS81kP/A0uOIX4T6Eb7ljKZMQpXN5N
+wW6L7UJKGIUrQ+o1S4Yv/K4mqMSNItx1GdaCM3K9npdWyDEYoxWWqhK3yK1KcopB
+zO5AiHirWt2lMnLdOFLgA2xPyOQVsGNjs9FE7VJwZ45Lp+sSFJs5A32jF/UO+Nvs
+sjidJNcSAWhuPzSIourgYCshSlDz8gnYiH/QHiF4TSLOl40rhcKa8td4l9/Oogz0
+A/JwSpFzhQIHTL4smtUbPq3hx11iJEw9/8nZlzKsybRzsAmF3blVGAPpf0MRF3cn
+elXvGVTr1InU2fdFe1z+eBKlmyTh0HUM2nRxxxMHeiopeugeRRuDjNueQOtOcAhM
+PS9e71L4k84YWE4gFFU+08OKJDmB1CZD/YviJXNpc42Yx5o72AGzvZIS9M3ccBch
+QFu87pkTq8g8LovgnObtCIE0PCxJtdioAGbpfQZLeLD9pltyC4WhCPCWIImQrtHP
+vwaICe4a2iDOZzB9qg1BlIGLgqq55Z6JEJMRNdY7QnZcFQbr/a0G0dQHgDyjxcVl
+MfFL90Ujmq76WTuUPsUvLUWqYwOKOHscMh0DQXvBVIL71JT5MvU7tTC01eDNZhMg
+J473g3jBScljDJearVRLgf7BcYSM/dq0jTLUhsH/2wfBgshgVnGOnyBrQTTr1m86
+EfzSI3DAwWQMgD51S9NK
+=KX+w
 -----END PGP SIGNATURE-----
 
---WOTjKnJ88wpJKlWH--
+--4ickEXl+ukcSQ/3E--
