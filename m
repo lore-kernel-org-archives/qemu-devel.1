@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <herongguang.he@huawei.com>) id 1chCIN-0007MC-Fl
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:36:12 -0500
+	(envelope-from <bounces@canonical.com>) id 1chCMy-0003ni-Bm
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:40:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <herongguang.he@huawei.com>) id 1chCIJ-0008EL-IC
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:36:11 -0500
-Received: from [45.249.212.189] (port=2410 helo=dggrg03-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <herongguang.he@huawei.com>) id 1chCII-0008EF-Ts
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:36:07 -0500
-References: <589C7E96.9060905@huawei.com> <589D83CE.1090803@huawei.com>
-	<589DDC05.9010807@windriver.com> <58AA51D6.6020508@huawei.com>
-	<1487565495.3740.27.camel@intel.com> <58AD0094.90304@windriver.com>
-	<4dd92012-626a-2d80-9adb-0be398f73eb1@redhat.com>
-	<58AD92AE.6040502@windriver.com>
-	<6c5567f4-192d-aefd-90e4-89f53479c24e@redhat.com>
-	<58AF9921.6060201@huawei.com>
-From: "Herongguang (Stephen)" <herongguang.he@huawei.com>
-Message-ID: <58AFFE55.20306@huawei.com>
-Date: Fri, 24 Feb 2017 17:35:17 +0800
+	(envelope-from <bounces@canonical.com>) id 1chCMu-000105-Bg
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:40:56 -0500
+Received: from indium.canonical.com ([91.189.90.7]:34906)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1chCMt-0000zz-SL
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 04:40:52 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1chCMs-0006u8-Rd
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 09:40:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B3AC12E80CA
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 09:40:50 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <58AF9921.6060201@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] kvm bug in __rmap_clear_dirty during live migration
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 24 Feb 2017 09:34:56 -0000
+From: luigiburdo <intermediadc@hotmail.com>
+Reply-To: Bug 1667613 <1667613@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170224093456.30105.18077.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1667613] [NEW] Qemu 2.8 on PPC64 issue with input
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,45 +35,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: gregkh@linuxfoundation.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Chris Friesen <chris.friesen@windriver.com>, "Han, Huaitong" <huaitong.han@intel.com>, "hangaohuai@huawei.com" <hangaohuai@huawei.com>, stable@vger.kernel.org, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "fangying1@huawei.com" <fangying1@huawei.com>, "xudong.hao@linux.intel.com" <xudong.hao@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "wangxinxin.wang@huawei.com" <wangxinxin.wang@huawei.com>, "kai.huang@linux.intel.com" <kai.huang@linux.intel.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "guangrong.xiao@linux.intel.com" <guangrong.xiao@linux.intel.com>, linux-kernel@vger.kernel.org
+To: qemu-devel@nongnu.org
 
+Public bug reported:
 
+Hi devs,
+on my PPC64 machine if i start qemu with gtk,gl=3Don or with sdl,gl=3Don i =
+have issue with pointer and keyboard. pratically not input at all.
+This issue is present in tgc and in kvm
 
-On 2017/2/24 10:23, Herongguang (Stephen) wrote:
->
->
-> On 2017/2/22 22:43, Paolo Bonzini wrote:
->>
->>
->> On 22/02/2017 14:31, Chris Friesen wrote:
->>>>>
->>>>
->>>> Can you reproduce it with kernel 4.8+?  I'm suspecting commmit
->>>> 4e59516a12a6 ("kvm: vmx: ensure VMCS is current while enabling PML",
->>>> 2016-07-14) to be the fix.
->>>
->>> I can't easily try with a newer kernel, the software package we're using
->>> has kernel patches that would have to be ported.
->>>
->>> I'm at a conference, don't really have time to set up a pair of test
->>> machines from scratch with a custom kernel.
->>
->> Hopefully Gaohuai and Rongguang can help with this too.
->>
->> Paolo
->>
->> .
->>
-> Yes, we are looking into and testing this.
->
-> I think this can result in any memory corruption, if VM1 writes its
-> PML buffer into VM2’s VMCS (since sched_in/sched_out notifier of VM1
-> is not registered yet), then VM1 is destroyed (hence its PML buffer
-> is freed back to kernel), after that, VM2 starts migration, so CPU
-> logs VM2’s dirty GFNS into a freed memory, results in any memory corruption.
->
-> As its severity, this commit (http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=4e59516a12a6ef6dcb660cb3a3f70c64bd60cfec)
-> is eligible to back port to kernel stable.
+without gl=3Don option in kvm with mate as guest i have the input device
+work in the beginning but after some time the usb goes "unplugged" (i
+see this message on the serial log of qemu usb unplugged) and the
+keyboard and mouse dont work.
 
-Hi, Greg, can you cherry pick commit 4e59516a12a6ef6dcb660cb3a3f70c64bd60cfec to 4.4-y?
+On Debian jessie kvm i dont have input working at all.
+
+my machine is a G5 quad with Fedora 25 PPC64
+
+thanks
+Luigi
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1667613
+
+Title:
+  Qemu 2.8  on PPC64 issue with input
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi devs,
+  on my PPC64 machine if i start qemu with gtk,gl=3Don or with sdl,gl=3Don =
+i have issue with pointer and keyboard. pratically not input at all.
+  This issue is present in tgc and in kvm
+
+  without gl=3Don option in kvm with mate as guest i have the input device
+  work in the beginning but after some time the usb goes "unplugged" (i
+  see this message on the serial log of qemu usb unplugged) and the
+  keyboard and mouse dont work.
+
+  On Debian jessie kvm i dont have input working at all.
+
+  my machine is a G5 quad with Fedora 25 PPC64
+
+  thanks
+  Luigi
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1667613/+subscriptions
