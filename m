@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1chMMj-0005YR-GB
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 15:21:22 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1chMOj-0008KV-2x
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 15:23:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1chMMf-0002dV-Dd
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 15:21:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46928)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1chMMf-0002d0-4w
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 15:21:17 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 53EEB81229
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 20:21:17 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <1487886317-27400-1-git-send-email-armbru@redhat.com>
-	<1487886317-27400-5-git-send-email-armbru@redhat.com>
-	<bc882971-0828-079b-e0b1-0d50fad215d3@redhat.com>
-Date: Fri, 24 Feb 2017 21:21:14 +0100
-In-Reply-To: <bc882971-0828-079b-e0b1-0d50fad215d3@redhat.com> (Eric Blake's
-	message of "Fri, 24 Feb 2017 13:39:10 -0600")
-Message-ID: <87lgsvxrut.fsf@dusky.pond.sub.org>
+	(envelope-from <balaton@eik.bme.hu>) id 1chMOf-00043T-0r
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 15:23:25 -0500
+Date: Fri, 24 Feb 2017 21:23:18 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <CAFEAcA8YGAyG3_uKwGJhff+ruearUP6eyQ0DROqZhGmdcaq6dw@mail.gmail.com>
+Message-ID: <alpine.BSF.2.20.1702242118560.76443@zero.eik.bme.hu>
+References: <cover.1487522123.git.balaton@eik.bme.hu>
+	<c2915d0d2f3966ddb92005129b680727a69a3bcd.1487522123.git.balaton@eik.bme.hu>
+	<CAFEAcA8YGAyG3_uKwGJhff+ruearUP6eyQ0DROqZhGmdcaq6dw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 04/21] qmp: Dumb down how we run QMP
- command registration
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [PATCH 03/10] sm501: QOMify
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,93 +23,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-Eric Blake <eblake@redhat.com> writes:
-
-> On 02/23/2017 03:45 PM, Markus Armbruster wrote:
->> The way we get QMP commands registered is high tech:
->> 
->> * qapi-commands.py generates qmp_init_marshal() that does the actual work
->> 
->> * it also generates the magic to register it as a MODULE_INIT_QAPI
->>   function, so it runs when someone calls
->>   module_call_init(MODULE_INIT_QAPI)
->> 
->> * main() calls module_call_init()
->> 
->> QEMU needs to register a few non-qapified commands.  Same high tech
->> works: monitor.c has its own qmp_init_marshal() along with the magic
->> to make it run in module_call_init(MODULE_INIT_QAPI).
->
-> Eww. Two static functions with the same name, which really messes with
-> gdb debugging.
->
->> 
->> QEMU also needs to unregister commands that are not wanted in this
->> build's configuration (commit 5032a16).  Simple enough:
->> qmp_unregister_commands_hack().  The difficulty is to make it run
->> after the generated qmp_init_marshal().  We can't simply run it in
->> monitor.c's qmp_init_marshal(), because the order in which the
->> registered functions run is indeterminate.  So qmp_init_marshal()
->> registers qmp_init_marshal() separately.  Since registering *appends*
->
-> Another case of "A sets up A" when you meant "A sets up B", but this
-> time, I'm fairly certain you mean qmp_init_marshal() registers
-> qmp_unregister_commands_hack() separately.
-
-Correct.  I'll fix it.
-
->> to the list of registered functions, this will make it run after all
->> the functions that have been registered already.
->> 
->> I suspect it takes a long and expensive computer science education to
->> not find this silly.
->
-> ROFL
-> (does that mean I didn't spend enough on my education? I'm sure you
-> could arrange to sell me an online certificate if I wanted more... :)
-
-Plenty of peddlers out there!
-
->> Dumb it down as follows:
->> 
->> * Drop MODULE_INIT_QAPI entirely
->> 
->> * Give the generated qmp_init_marshal() external linkage.
->> 
->> * Call it instead of module_call_init(MODULE_INIT_QAPI)
->> 
->> * Except in QEMU proper, call new monitor_init_qmp_commands() that in
->>   turn calls the generated qmp_init_marshal(), registers the
->>   additional commands and unregisters the unwanted ones.
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+On Fri, 24 Feb 2017, Peter Maydell wrote:
+> On 19 February 2017 at 16:35, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 >> ---
->
->> -static void qmp_init_marshal(void)
->> +void monitor_init_qmp_commands(void)
+>>  hw/display/sm501.c   | 133 +++++++++++++++++++++++++++++++++++----------------
+>>  hw/sh4/r2d.c         |  11 ++++-
+>>  include/hw/devices.h |   5 --
+>>  3 files changed, 101 insertions(+), 48 deletions(-)
+>>
+>> diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+>> index 4eb085c..b592022 100644
+>> --- a/hw/display/sm501.c
+>> +++ b/hw/display/sm501.c
+>> @@ -58,8 +58,8 @@
+>>  #define SM501_DPRINTF(fmt, ...) do {} while (0)
+>>  #endif
+>>
+>> -
+>>  #define MMIO_BASE_OFFSET 0x3e00000
+>> +#define MMIO_SIZE 0x200000
+>>
+>>  /* SM501 register definitions taken from "linux/include/linux/sm501-regs.h" */
+>>
+>> @@ -464,6 +464,7 @@ typedef struct SM501State {
+>>      uint32_t local_mem_size_index;
+>>      uint8_t *local_mem;
+>>      MemoryRegion local_mem_region;
+>> +    MemoryRegion mmio_region;
+>>      uint32_t last_width;
+>>      uint32_t last_height;
+>>
+>> @@ -1396,20 +1397,14 @@ static const GraphicHwOps sm501_ops = {
+>>      .gfx_update  = sm501_update_display,
+>>  };
+>>
+>> -void sm501_init(MemoryRegion *address_space_mem, uint32_t base,
+>> -                uint32_t local_mem_bytes, qemu_irq irq, Chardev *chr)
+>> +static void sm501_init(SM501State *s, DeviceState *dev, uint32_t base,
+>> +                       uint32_t local_mem_bytes)
 >>  {
->> +    qmp_init_marshal();
+>> -    SM501State *s;
+>> -    DeviceState *dev;
+>> -    MemoryRegion *sm501_system_config = g_new(MemoryRegion, 1);
+>> -    MemoryRegion *sm501_disp_ctrl = g_new(MemoryRegion, 1);
+>> -    MemoryRegion *sm501_2d_engine = g_new(MemoryRegion, 1);
+>> -
+>> -    /* allocate management data region */
+>> -    s = g_new0(SM501State, 1);
+>> +    MemoryRegion *mr;
 >> +
->>      qmp_register_command("query-qmp-schema", qmp_query_qmp_schema,
->>                           QCO_NO_OPTIONS);
->>      qmp_register_command("device_add", qmp_device_add,
->> @@ -1004,12 +1006,9 @@ static void qmp_init_marshal(void)
->>      qmp_register_command("netdev_add", qmp_netdev_add,
->>                           QCO_NO_OPTIONS);
->>  
->> -    /* call it after the rest of qapi_init() */
->> -    register_module_init(qmp_unregister_commands_hack, MODULE_INIT_QAPI);
->> +    qmp_unregister_commands_hack();
+>>      s->base = base;
+>>      s->local_mem_size_index = get_local_mem_size_index(local_mem_bytes);
+>> -    SM501_DPRINTF("local mem size=%x. index=%d\n", get_local_mem_size(s),
+>> +    SM501_DPRINTF("sm501 local mem size=%x. index=%d\n", get_local_mem_size(s),
+>>                    s->local_mem_size_index);
+>>      s->system_control = 0x00100000; /* 2D engine FIFO empty */
+>>      s->misc_control = SM501_MISC_IRQ_INVERT; /* assumes SH, active=low */
+>> @@ -1417,46 +1412,102 @@ void sm501_init(MemoryRegion *address_space_mem, uint32_t base,
+>>      s->dc_crt_control = 0x00010000;
+>>
+>>      /* allocate local memory */
+>> -    memory_region_init_ram(&s->local_mem_region, NULL, "sm501.local",
+>> +    memory_region_init_ram(&s->local_mem_region, OBJECT(dev), "sm501.local",
+>>                             local_mem_bytes, &error_fatal);
+>>      vmstate_register_ram_global(&s->local_mem_region);
+>>      memory_region_set_log(&s->local_mem_region, true, DIRTY_MEMORY_VGA);
+>>      s->local_mem = memory_region_get_ram_ptr(&s->local_mem_region);
+>> -    memory_region_add_subregion(address_space_mem, base, &s->local_mem_region);
+>> -
+>> -    /* map mmio */
+>> -    memory_region_init_io(sm501_system_config, NULL, &sm501_system_config_ops,
+>> -                          s, "sm501-system-config", 0x6c);
+>> -    memory_region_add_subregion(address_space_mem, base + MMIO_BASE_OFFSET,
+>> -                                sm501_system_config);
+>> -    memory_region_init_io(sm501_disp_ctrl, NULL, &sm501_disp_ctrl_ops, s,
+>> +
+>> +    /* allocate mmio */
+>> +    memory_region_init(&s->mmio_region, OBJECT(dev), "sm501.mmio", MMIO_SIZE);
+>> +    mr = g_new(MemoryRegion, 1);
 >
-> We could inline this function now, but keeping the _hack() name around
-> reminds us to consider conditional-compilation support in the generator
-> at a later date, so I'm fine with the approach you took.
+> There's no need to dynamically allocate any of these memory regions;
+> just make them be MemoryRegion fields inside SM501State.
+>
+>> +    memory_region_init_io(mr, OBJECT(dev), &sm501_system_config_ops, s,
+>> +                          "sm501-system-config", 0x6c);
+>> +    memory_region_add_subregion(&s->mmio_region, SM501_SYS_CONFIG, mr);
+>> +    mr = g_new(MemoryRegion, 1);
+>> +    memory_region_init_io(mr, OBJECT(dev), &sm501_disp_ctrl_ops, s,
+>>                            "sm501-disp-ctrl", 0x1000);
+>> -    memory_region_add_subregion(address_space_mem,
+>> -                                base + MMIO_BASE_OFFSET + SM501_DC,
+>> -                                sm501_disp_ctrl);
+>> -    memory_region_init_io(sm501_2d_engine, NULL, &sm501_2d_engine_ops, s,
+>> +    memory_region_add_subregion(&s->mmio_region, SM501_DC, mr);
+>> +    mr = g_new(MemoryRegion, 1);
+>> +    memory_region_init_io(mr, OBJECT(dev), &sm501_2d_engine_ops, s,
+>>                            "sm501-2d-engine", 0x54);
+>> -    memory_region_add_subregion(address_space_mem,
+>> -                                base + MMIO_BASE_OFFSET + SM501_2D_ENGINE,
+>> -                                sm501_2d_engine);
+>> +    memory_region_add_subregion(&s->mmio_region, SM501_2D_ENGINE, mr);
+>> +
+>> +    /* create qemu graphic console */
+>> +    s->con = graphic_console_init(DEVICE(dev), 0, &sm501_ops, s);
+>> +}
+>> +
+>> +#define TYPE_SYSBUS_SM501 "sysbus-sm501"
+>> +#define SYSBUS_SM501(obj) \
+>> +    OBJECT_CHECK(SM501SysBusState, (obj), TYPE_SYSBUS_SM501)
+>> +
+>> +typedef struct {
+>> +    /*< private >*/
+>> +    SysBusDevice parent_obj;
+>> +    /*< public >*/
+>> +    SM501State state;
+>> +    uint32_t vram_size;
+>> +    uint32_t base;
+>> +    void *chr_state;
+>> +} SM501SysBusState;
+>> +
+>> +static void sm501_realize_sysbus(DeviceState *dev, Error **errp)
+>> +{
+>> +    SM501SysBusState *s = SYSBUS_SM501(dev);
+>> +    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+>> +    DeviceState *usb_dev;
+>> +
+>> +    sm501_init(&s->state, dev, s->base, s->vram_size);
+>> +    sysbus_init_mmio(sbd, &s->state.local_mem_region);
+>> +    sysbus_init_mmio(sbd, &s->state.mmio_region);
+>>
+>>      /* bridge to usb host emulation module */
+>> -    dev = qdev_create(NULL, "sysbus-ohci");
+>> -    qdev_prop_set_uint32(dev, "num-ports", 2);
+>> -    qdev_prop_set_uint64(dev, "dma-offset", base);
+>> -    qdev_init_nofail(dev);
+>> -    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0,
+>> -                    base + MMIO_BASE_OFFSET + SM501_USB_HOST);
+>> -    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, irq);
+>> +    usb_dev = qdev_create(NULL, "sysbus-ohci");
+>> +    qdev_prop_set_uint32(usb_dev, "num-ports", 2);
+>> +    qdev_prop_set_uint64(usb_dev, "dma-offset", s->base);
+>> +    qdev_init_nofail(usb_dev);
+>
+> Why is a display controller device creating a USB controller?
+> This looks like something that should be being done by the board.
+>
+>> +    memory_region_add_subregion(&s->state.mmio_region, SM501_USB_HOST,
+>> +                       sysbus_mmio_get_region(SYS_BUS_DEVICE(usb_dev), 0));
+>> +    sysbus_pass_irq(sbd, SYS_BUS_DEVICE(usb_dev));
+>>
+>>      /* bridge to serial emulation module */
+>> -    if (chr) {
+>> -        serial_mm_init(address_space_mem,
+>> -                       base + MMIO_BASE_OFFSET + SM501_UART0, 2,
+>> +    if (s->chr_state) {
+>> +        serial_mm_init(&s->state.mmio_region, SM501_UART0, 2,
+>>                         NULL, /* TODO : chain irq to IRL */
+>> -                       115200, chr, DEVICE_NATIVE_ENDIAN);
+>> +                       115200, s->chr_state, DEVICE_NATIVE_ENDIAN);
+>>      }
+>> +}
+>
+> Similarly, what's going on here with the serial?
 
-Exactly.
+The SM501/SM502 is a multimedia chip that besides a display controller 
+also contains some other functions (see 
+http://cateee.net/lkddb/web-lkddb/MFD_SM501.html) and this is what is 
+emulated here as these are part of the chip itself.
 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+>
+>>
+>> -    /* create qemu graphic console */
+>> -    s->con = graphic_console_init(DEVICE(dev), 0, &sm501_ops, s);
+>> +static Property sm501_sysbus_properties[] = {
+>> +    DEFINE_PROP_UINT32("vram-size", SM501SysBusState, vram_size, 0),
+>> +    DEFINE_PROP_UINT32("base", SM501SysBusState, base, 0),
+>> +    DEFINE_PROP_PTR("chr-state", SM501SysBusState, chr_state),
+>> +    DEFINE_PROP_END_OF_LIST(),
+>> +};
+>
+>> +static void sm501_sysbus_class_init(ObjectClass *klass, void *data)
+>> +{
+>> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>> +
+>> +    dc->realize = sm501_realize_sysbus;
+>> +    set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
+>> +    dc->desc = "SM501 Multimedia Companion";
+>> +    dc->props = sm501_sysbus_properties;
+>> +/* Note: pointer property "chr-state" may remain null, thus
+>> + * no need for dc->cannot_instantiate_with_device_add_yet = true;
+>> + */
+>> }
+>
+> You also need a VMState struct registered in dc->vmsd and a reset
+> function registered in dc->reset.
 
-Thanks!
+Even if no migration is supported? Is there a simple example I could look 
+at on what should go into these?
