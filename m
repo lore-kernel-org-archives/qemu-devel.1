@@ -1,29 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1chJcE-00015v-6O
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:25:11 -0500
+	(envelope-from <berrange@redhat.com>) id 1chJeZ-0003N6-5k
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:27:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1chJcB-0004dB-Fo
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:25:10 -0500
-Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:34223)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1chJcB-0004as-A5
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:25:07 -0500
-Received: by mail-wr0-x236.google.com with SMTP id o22so11881327wro.1
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 09:25:07 -0800 (PST)
-References: <1487262963-11519-1-git-send-email-peter.maydell@linaro.org>
-	<1487262963-11519-4-git-send-email-peter.maydell@linaro.org>
-	<CAFEAcA-JoKKkKtL=W0ecVQ=+wHbxe-gxKGho8GDm95YuyD7rWw@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA-JoKKkKtL=W0ecVQ=+wHbxe-gxKGho8GDm95YuyD7rWw@mail.gmail.com>
-Date: Fri, 24 Feb 2017 17:25:04 +0000
-Message-ID: <87innzlcwf.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 03/13] armv7m: Rewrite NVIC to not use
- any GIC code
+	(envelope-from <berrange@redhat.com>) id 1chJeY-0005Js-6o
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:27:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49196)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1chJeY-0005Jk-0z
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 12:27:34 -0500
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Fri, 24 Feb 2017 17:27:14 +0000
+Message-Id: <20170224172714.26026-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH] os: don't corrupt pre-existing memory-backend
+ data with prealloc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,65 +22,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: Michal Privoznik <mprivozn@redhat.com>, Jitendra Kolhe <jitendra.kolhe@hpe.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
+When using a memory-backend object with prealloc turned on, QEMU
+will memset() the first byte in every memory page to zero. While
+this might have been acceptable for memory backends associated
+with RAM, this corrupts application data for NVDIMMs.
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Instead of setting every page to zero, read the current byte
+value and then just write that same value back, so we are not
+corrupting the original data. Directly write the value instead
+of memset()ing it, since there's no benefit to memset for a
+single byte write.
 
-> On 16 February 2017 at 16:35, Peter Maydell <peter.maydell@linaro.org> wrote:
->> From: Michael Davidsaver <mdavidsaver@gmail.com>
->>
->> Despite some superficial similarities of register layout, the
->> M-profile NVIC is really very different from the A-profile GIC.
->> Our current attempt to reuse the GIC code means that we have
->> significant bugs in our NVIC.
->>
->> Implement the NVIC as an entirely separate device, to give
->> us somewhere we can get the behaviour correct.
->>
->> This initial commit does not attempt to implement exception
->> priority escalation, since the GIC-based code didn't either.
->> It does fix a few bugs in passing:
->>  * ICSR.RETTOBASE polarity was wrong and didn't account for
->>    internal exceptions
->>  * ICSR.VECTPENDING was 16 too high if the pending exception
->>    was for an external interrupt
->>  * UsageFault, BusFault and MemFault were not disabled on reset
->>    as they are supposed to be
->>
->> Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
->> [PMM: reworked, various bugs and stylistic cleanups]
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->
->> +    case 0x400 ... 0x5ef: /* NVIC Priority */
->> +        startvec = 8 * (offset - 0x400) + NVIC_FIRST_IRQ; /* vector # */
->> +
->> +        for (i = 0; i < size; i++) {
->
-> Just noticed this line should be
-> +        for (i = 0; i < size && startvec + i < s->num_irq; i++) {
->
-> which brings it into line with the nvic_sysreg_read() code
-> and prevents an assert() in set_prio() if the guest writes to
-> registers beyond the end of the implemented IRQ range.
->
->> +            set_prio(s, startvec + i, (value >> (i * 8)) & 0xff);
->> +        }
->> +        nvic_irq_update(s);
->> +        return;
->
-> Unless there's some other problem that means I need
-> to respin anyway I propose to just squash in that fix.
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
 
-With the squashed fix:
+NB, I have not tested performance of this, so no idea if this
+makes it better/worse/no-change. Would appreciate if Jitendra
+could repeat tests to see if it impacts scalability at all.
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+ util/oslib-posix.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
->
-> thanks
-> -- PMM
-
-
---
-Alex Bennée
+diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+index 35012b9..2a5bb93 100644
+--- a/util/oslib-posix.c
++++ b/util/oslib-posix.c
+@@ -355,7 +355,20 @@ void os_mem_prealloc(int fd, char *area, size_t memory, Error **errp)
+ 
+         /* MAP_POPULATE silently ignores failures */
+         for (i = 0; i < numpages; i++) {
+-            memset(area + (hpagesize * i), 0, 1);
++            /*
++             * Read & write back the same value, so we don't
++             * corrupt existinng user/app data that might be
++             * stored.
++             *
++             * 'volatile' to stop compiler optimizing this away
++             * to a no-op
++             *
++             * TODO: get a better solution from kernel so we
++             * don't need to write at all so we don't cause
++             * wear on the storage backing the region...
++             */
++            volatile char val = *(area + (hpagesize * i));
++            *(area + (hpagesize * i)) = val;
+         }
+     }
+ 
+-- 
+2.9.3
