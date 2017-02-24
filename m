@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47789)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1chHCa-00083l-0R
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:50:33 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1chHFF-0002Mi-60
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:53:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1chHCY-0007Bw-Oo
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:50:32 -0500
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:35588)
+	(envelope-from <peter.maydell@linaro.org>) id 1chHFD-0008SO-Ue
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:53:17 -0500
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:34445)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1chHCY-0007BH-IA
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:50:30 -0500
-Received: by mail-wr0-x22d.google.com with SMTP id g10so12787238wrg.2
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 06:50:30 -0800 (PST)
+	id 1chHFD-0008RM-LX
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:53:15 -0500
+Received: by mail-wr0-x22d.google.com with SMTP id o22so9089659wro.1
+	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 06:53:15 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <9c4f503401fa3defa5dff8b938a0bee3aa8d89d5.1487522123.git.balaton@eik.bme.hu>
+In-Reply-To: <e87856482b30803a17c5af8124dad9454c0bed86.1487522123.git.balaton@eik.bme.hu>
 References: <cover.1487522123.git.balaton@eik.bme.hu>
-	<9c4f503401fa3defa5dff8b938a0bee3aa8d89d5.1487522123.git.balaton@eik.bme.hu>
+	<e87856482b30803a17c5af8124dad9454c0bed86.1487522123.git.balaton@eik.bme.hu>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Feb 2017 14:50:08 +0000
-Message-ID: <CAFEAcA9uOtUmPisVgeTDCVR_tuXzB=nb7OYHiVty1iVnk8pXQQ@mail.gmail.com>
+Date: Fri, 24 Feb 2017 14:52:53 +0000
+Message-ID: <CAFEAcA8jd10oqz6R4RDC5pOrsXxOMft9q0sghBUqvVpduJ3K1Q@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 06/10] sm501: Fix device endianness
+Subject: Re: [Qemu-devel] [PATCH 08/10] sm501: Add support for panel layer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,125 +35,172 @@ Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.o
 On 19 February 2017 at 16:35, BALATON Zoltan <balaton@eik.bme.hu> wrote:
 > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 > ---
->  hw/display/sm501.c          |  6 +++---
->  hw/display/sm501_template.h | 31 ++++++++++++++++++-------------
->  2 files changed, 21 insertions(+), 16 deletions(-)
+>  hw/display/sm501.c | 73 +++++++++++++++++++++++++++---------------------------
+>  1 file changed, 37 insertions(+), 36 deletions(-)
 >
 > diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-> index 9091bb5..3d32a3c 100644
+> index 1bd0303..2e1c4b7 100644
 > --- a/hw/display/sm501.c
 > +++ b/hw/display/sm501.c
-> @@ -846,7 +846,7 @@ static const MemoryRegionOps sm501_system_config_ops = {
->          .min_access_size = 4,
->          .max_access_size = 4,
->      },
-> -    .endianness = DEVICE_NATIVE_ENDIAN,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
->  };
+> @@ -2,6 +2,7 @@
+>   * QEMU SM501 Device
+>   *
+>   * Copyright (c) 2008 Shin-ichiro KAWASAKI
+> + * Copyright (c) 2016 BALATON Zoltan
+>   *
+>   * Permission is hereby granted, free of charge, to any person obtaining a copy
+>   * of this software and associated documentation files (the "Software"), to deal
+> @@ -41,8 +42,11 @@
+>   *   - Minimum implementation for Linux console : mmio regs and CRT layer.
+>   *   - 2D graphics acceleration partially supported : only fill rectangle.
+>   *
+> - * TODO:
+> + * Status: 2016/12/04
+> + *   - Misc fixes: endianness, hardware cursor
+>   *   - Panel support
+> + *
+> + * TODO:
+>   *   - Touch panel support
+>   *   - USB support
+>   *   - UART support
+> @@ -1297,53 +1301,62 @@ static inline int get_depth_index(DisplaySurface *surface)
+>      }
+>  }
 >
->  static uint32_t sm501_palette_read(void *opaque, hwaddr addr)
-> @@ -1082,7 +1082,7 @@ static const MemoryRegionOps sm501_disp_ctrl_ops = {
->          .min_access_size = 4,
->          .max_access_size = 4,
->      },
-> -    .endianness = DEVICE_NATIVE_ENDIAN,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
->  };
->
->  static uint64_t sm501_2d_engine_read(void *opaque, hwaddr addr,
-> @@ -1170,7 +1170,7 @@ static const MemoryRegionOps sm501_2d_engine_ops = {
->          .min_access_size = 4,
->          .max_access_size = 4,
->      },
-> -    .endianness = DEVICE_NATIVE_ENDIAN,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
->  };
-
-Does this still all work for the sh4eb (big-endian) sysbus device case?
-
->  /* draw line functions for all console modes */
-> diff --git a/hw/display/sm501_template.h b/hw/display/sm501_template.h
-> index 832ee61..5b516d6 100644
-> --- a/hw/display/sm501_template.h
-> +++ b/hw/display/sm501_template.h
-> @@ -64,10 +64,16 @@ static void glue(draw_line16_, PIXEL_NAME)(
->      uint8_t r, g, b;
->
->      do {
-> -        rgb565 = lduw_p(s);
-> -        r = ((rgb565 >> 11) & 0x1f) << 3;
-> -        g = ((rgb565 >>  5) & 0x3f) << 2;
-> -        b = ((rgb565 >>  0) & 0x1f) << 3;
-> +        rgb565 = lduw_le_p(s);
-> +#if defined(TARGET_WORDS_BIGENDIAN)
-> +        r = (rgb565 >> 8) & 0xf8;
-> +        g = (rgb565 >> 3) & 0xfc;
-> +        b = (rgb565 << 3) & 0xf8;
-> +#else
-> +        b = (rgb565 >> 8) & 0xf8;
-> +        g = (rgb565 >> 3) & 0xfc;
-> +        r = (rgb565 << 3) & 0xf8;
-> +#endif
->          *(PIXEL_TYPE *)d = glue(rgb_to_pixel, PIXEL_NAME)(r, g, b);
->          s += 2;
->          d += BPP;
-> @@ -80,15 +86,14 @@ static void glue(draw_line32_, PIXEL_NAME)(
->      uint8_t r, g, b;
->
->      do {
-> -        ldub_p(s);
->  #if defined(TARGET_WORDS_BIGENDIAN)
-> +        r = s[0];
-> +        g = s[1];
-> +        b = s[2];
-> +#else
->          r = s[1];
->          g = s[2];
->          b = s[3];
-> -#else
-> -        b = s[0];
-> -        g = s[1];
-> -        r = s[2];
->  #endif
-
-This looks really suspicious. Previously we had
- TARGET_WORDS_BIGENDIAN -> bytes are XRGB
- otherwise                 bytes are BGRX
-
-Now we have
- TARGET_WORDS_BIGENDIAN -> bytes are RGBX
- otherwise              -> bytes are XRGB
-
-That doesn't seem very plausible at all.
-
->          *(PIXEL_TYPE *)d = glue(rgb_to_pixel, PIXEL_NAME)(r, g, b);
->          s += 4;
-
-
-> @@ -103,7 +108,7 @@ static void glue(draw_hwc_line_, PIXEL_NAME)(SM501State *s, int crt,
->                   uint8_t *palette, int c_y, uint8_t *d, int width)
+> -static void sm501_draw_crt(SM501State *s)
+> +static void sm501_update_display(void *opaque)
 >  {
->      int x, i;
-> -    uint8_t *pixval, bitset = 0;
-> +    uint8_t *pixval, r, g, b, bitset = 0;
->
->      /* get hardware cursor pattern */
->      uint32_t cursor_addr = get_hwc_address(s, crt);
-> @@ -129,9 +134,9 @@ static void glue(draw_hwc_line_, PIXEL_NAME)(SM501State *s, int crt,
->          /* write pixel */
->          if (v) {
->              v--;
-> -            uint8_t r = palette[v * 3 + 0];
-> -            uint8_t g = palette[v * 3 + 1];
-> -            uint8_t b = palette[v * 3 + 2];
-> +            r = palette[v * 3 + 0];
-> +            g = palette[v * 3 + 1];
-> +            b = palette[v * 3 + 2];
->              *(PIXEL_TYPE *)d = glue(rgb_to_pixel, PIXEL_NAME)(r, g, b);
->          }
->          d += BPP;
+> +    SM501State *s = (SM501State *)opaque;
+>      DisplaySurface *surface = qemu_console_surface(s->con);
+>      int y, c_x, c_y;
+> -    uint8_t *hwc_src, *src = s->local_mem;
+> -    int width = get_width(s, 1);
+> -    int height = get_height(s, 1);
+> -    int src_bpp = get_bpp(s, 1);
+> +    int crt = (s->dc_crt_control & SM501_DC_CRT_CONTROL_SEL) ? 1 : 0;
+> +    int width = get_width(s, crt);
+> +    int height = get_height(s, crt);
+> +    int src_bpp = get_bpp(s, crt);
+>      int dst_bpp = surface_bytes_per_pixel(surface);
+> -    uint32_t *palette = (uint32_t *)&s->dc_palette[SM501_DC_CRT_PALETTE -
+> -                                                   SM501_DC_PANEL_PALETTE];
+> -    uint8_t hwc_palette[3 * 3];
+> -    int ds_depth_index = get_depth_index(surface);
+> +    int dst_depth_index = get_depth_index(surface);
 
-This doesn't seem to be related to the rest of this patch?
+Please don't change variable names in the middle of a patch that's
+adding new functionality, it makes the patch harder to review.
+
+>      draw_line_func *draw_line = NULL;
+>      draw_hwc_line_func *draw_hwc_line = NULL;
+>      int full_update = 0;
+>      int y_start = -1;
+>      ram_addr_t page_min = ~0l;
+>      ram_addr_t page_max = 0l;
+> -    ram_addr_t offset = 0;
+> +    ram_addr_t offset;
+> +    uint32_t *palette;
+> +    uint8_t hwc_palette[3 * 3];
+> +    uint8_t *hwc_src;
+> +
+> +    if (!((crt ? s->dc_crt_control : s->dc_panel_control)
+> +          & SM501_DC_CRT_CONTROL_ENABLE)) {
+> +        return;
+> +    }
+> +
+> +    palette = (uint32_t *)(crt ? &s->dc_palette[SM501_DC_CRT_PALETTE -
+> +                                                SM501_DC_PANEL_PALETTE]
+> +                               : &s->dc_palette[0]);
+>
+>      /* choose draw_line function */
+>      switch (src_bpp) {
+>      case 1:
+> -        draw_line = draw_line8_funcs[ds_depth_index];
+> +        draw_line = draw_line8_funcs[dst_depth_index];
+>          break;
+>      case 2:
+> -        draw_line = draw_line16_funcs[ds_depth_index];
+> +        draw_line = draw_line16_funcs[dst_depth_index];
+>          break;
+>      case 4:
+> -        draw_line = draw_line32_funcs[ds_depth_index];
+> +        draw_line = draw_line32_funcs[dst_depth_index];
+>          break;
+>      default:
+> -        printf("sm501 draw crt : invalid DC_CRT_CONTROL=%x.\n",
+> -               s->dc_crt_control);
+> +        printf("sm501 update display : invalid control register value.\n");
+
+This shouldn't be in the same patch as "add panel" either.
+
+>          abort();
+>          break;
+>      }
+>
+>      /* set up to draw hardware cursor */
+> -    if (is_hwc_enabled(s, 1)) {
+> +    if (is_hwc_enabled(s, crt)) {
+>          /* choose cursor draw line function */
+> -        draw_hwc_line = draw_hwc_line_funcs[ds_depth_index];
+> -        hwc_src = get_hwc_address(s, 1);
+> -        c_x = get_hwc_x(s, 1);
+> -        c_y = get_hwc_y(s, 1);
+> -        get_hwc_palette(s, 1, hwc_palette);
+> +        draw_hwc_line = draw_hwc_line_funcs[dst_depth_index];
+> +        hwc_src = get_hwc_address(s, crt);
+> +        c_x = get_hwc_x(s, crt);
+> +        c_y = get_hwc_y(s, crt);
+> +        get_hwc_palette(s, crt, hwc_palette);
+>      }
+>
+>      /* adjust console size */
+> @@ -1357,7 +1370,7 @@ static void sm501_draw_crt(SM501State *s)
+>
+>      /* draw each line according to conditions */
+>      memory_region_sync_dirty_bitmap(&s->local_mem_region);
+> -    for (y = 0; y < height; y++) {
+> +    for (y = 0, offset = 0; y < height; y++, offset += width * src_bpp) {
+>          int update, update_hwc;
+>          ram_addr_t page0 = offset;
+>          ram_addr_t page1 = offset + width * src_bpp - 1;
+> @@ -1375,7 +1388,7 @@ static void sm501_draw_crt(SM501State *s)
+>              d +=  y * width * dst_bpp;
+>
+>              /* draw graphics layer */
+> -            draw_line(d, src, width, palette);
+> +            draw_line(d, s->local_mem + offset, width, palette);
+>
+>              /* draw hardware cursor */
+>              if (update_hwc) {
+> @@ -1398,9 +1411,6 @@ static void sm501_draw_crt(SM501State *s)
+>                  y_start = -1;
+>              }
+>          }
+> -
+> -        src += width * src_bpp;
+> -        offset += width * src_bpp;
+>      }
+>
+>      /* complete flush to display */
+> @@ -1416,15 +1426,6 @@ static void sm501_draw_crt(SM501State *s)
+>      }
+>  }
+>
+> -static void sm501_update_display(void *opaque)
+> -{
+> -    SM501State *s = (SM501State *)opaque;
+> -
+> -    if (s->dc_crt_control & SM501_DC_CRT_CONTROL_ENABLE) {
+> -        sm501_draw_crt(s);
+> -    }
+> -}
+> -
+>  static const GraphicHwOps sm501_ops = {
+>      .gfx_update  = sm501_update_display,
+>  };
+> --
+> 2.7.4
+>
 
 thanks
 -- PMM
