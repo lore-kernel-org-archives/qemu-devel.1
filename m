@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34895)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ch5tW-0004hM-9Z
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 21:46:07 -0500
+	(envelope-from <herongguang.he@huawei.com>) id 1ch5tq-0004qJ-Vt
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 21:46:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ch5tT-0006lq-6y
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 21:46:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60420)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ch5tS-0006lg-VD
-	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 21:46:03 -0500
-Date: Fri, 24 Feb 2017 10:45:56 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170224024556.GA10022@pxdev.xzpeter.org>
-References: <1487742565-2513-1-git-send-email-peterx@redhat.com>
-	<20170224012000-mutt-send-email-mst@kernel.org>
+	(envelope-from <herongguang.he@huawei.com>) id 1ch5tn-0006oT-Uk
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 21:46:27 -0500
+Received: from [45.249.212.187] (port=2989 helo=dggrg01-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <herongguang.he@huawei.com>) id 1ch5tm-0006oD-5u
+	for qemu-devel@nongnu.org; Thu, 23 Feb 2017 21:46:23 -0500
+References: <589C7E96.9060905@huawei.com> <589D83CE.1090803@huawei.com>
+	<589DDC05.9010807@windriver.com> <58AA51D6.6020508@huawei.com>
+	<1487565495.3740.27.camel@intel.com> <58AD0094.90304@windriver.com>
+	<4dd92012-626a-2d80-9adb-0be398f73eb1@redhat.com>
+	<58AD92AE.6040502@windriver.com>
+	<6c5567f4-192d-aefd-90e4-89f53479c24e@redhat.com>
+From: "Herongguang (Stephen)" <herongguang.he@huawei.com>
+Message-ID: <58AF9921.6060201@huawei.com>
+Date: Fri, 24 Feb 2017 10:23:29 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170224012000-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH] intel_iommu: make sure its init before PCI
- dev
+In-Reply-To: <6c5567f4-192d-aefd-90e4-89f53479c24e@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] kvm bug in __rmap_clear_dirty during live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,84 +31,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, yi.l.liu@intel.com, Jintack Lim <jintack@cs.columbia.edu>
+To: Paolo Bonzini <pbonzini@redhat.com>, Chris Friesen <chris.friesen@windriver.com>, "Han, Huaitong" <huaitong.han@intel.com>, "hangaohuai@huawei.com" <hangaohuai@huawei.com>, stable@vger.kernel.org
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "fangying1@huawei.com" <fangying1@huawei.com>, "xudong.hao@linux.intel.com" <xudong.hao@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "wangxinxin.wang@huawei.com" <wangxinxin.wang@huawei.com>, "kai.huang@linux.intel.com" <kai.huang@linux.intel.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "guangrong.xiao@linux.intel.com" <guangrong.xiao@linux.intel.com>, linux-kernel@vger.kernel.org
 
-On Fri, Feb 24, 2017 at 01:21:52AM +0200, Michael S. Tsirkin wrote:
-> On Wed, Feb 22, 2017 at 01:49:25PM +0800, Peter Xu wrote:
-> > Intel vIOMMU devices are created with "-device" parameter, while here
-> > actually we need to make sure this device will be created before some
-> > other PCI devices (like vfio-pci devices) so that we know iommu_fn will
-> > be setup correctly before realizations of those PCI devices.
-> > Here we do explicit check to make sure intel-iommu device will be inited
-> > before all the rest of the PCI devices. This is done by checking against
-> > the devices dangled under current root PCIe bus and we should see
-> > nothing there besides integrated ICH9 ones.
-> > 
-> > If the user violated this rule, we abort the program.
-> > 
-> > Maybe one day we will be able to manage the ordering of device
-> > initialization, and then we can grant VT-d devices a higher init
-> > priority. But before that, let's have this explicit check to make sure
-> > of it.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  hw/i386/intel_iommu.c | 40 ++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 40 insertions(+)
-> > 
-> > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > index 22d8226..db74124 100644
-> > --- a/hw/i386/intel_iommu.c
-> > +++ b/hw/i386/intel_iommu.c
-> > @@ -31,6 +31,7 @@
-> >  #include "hw/i386/apic-msidef.h"
-> >  #include "hw/boards.h"
-> >  #include "hw/i386/x86-iommu.h"
-> > +#include "hw/i386/ich9.h"
-> >  #include "hw/pci-host/q35.h"
-> >  #include "sysemu/kvm.h"
-> >  #include "hw/i386/apic_internal.h"
-> > @@ -2560,6 +2561,41 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
-> >      return true;
-> >  }
-> >  
-> > +static bool vtd_has_inited_pci_devices(PCIBus *bus, Error **errp)
-> > +{
-> > +    int i;
-> > +    uint8_t func;
-> > +
-> > +    /* We check against root bus */
-> > +    assert(bus && pci_bus_is_root(bus));
-> > +
-> > +    /*
-> > +     * We need to make sure vIOMMU device is created before other PCI
-> > +     * devices other than the integrated ICH9 ones,
-> 
-> 
-> Why wouldn't this apply to integrated ICH9 ones?
 
-Because these integrated devices are created along with q35 in
-pc_q35_init() with:
 
-    pc_vga_init(isa_bus, host_bus);
-    pc_nic_init(isa_bus, host_bus);
+On 2017/2/22 22:43, Paolo Bonzini wrote:
+>
+>
+> On 22/02/2017 14:31, Chris Friesen wrote:
+>>>>
+>>>
+>>> Can you reproduce it with kernel 4.8+?  I'm suspecting commmit
+>>> 4e59516a12a6 ("kvm: vmx: ensure VMCS is current while enabling PML",
+>>> 2016-07-14) to be the fix.
+>>
+>> I can't easily try with a newer kernel, the software package we're using
+>> has kernel patches that would have to be ported.
+>>
+>> I'm at a conference, don't really have time to set up a pair of test
+>> machines from scratch with a custom kernel.
+>
+> Hopefully Gaohuai and Rongguang can help with this too.
+>
+> Paolo
+>
+> .
+>
+Yes, we are looking into and testing this.
 
-which is definitely ahead of the general device init routines,
-including VT-d device.
+I think this can result in any memory corruption, if VM1 writes its
+PML buffer into VM2’s VMCS (since sched_in/sched_out notifier of VM1
+is not registered yet), then VM1 is destroyed (hence its PML buffer
+is freed back to kernel), after that, VM2 starts migration, so CPU
+logs VM2’s dirty GFNS into a freed memory, results in any memory corruption.
 
-> 
-> 
-> > so that they can
-> > +     * get correct iommu_fn setup even during its realize(). Some
-> > +     * devices (e.g., vfio-pci) will need a correct iommu_fn to work.
-> 
-> If there's something special about vfio devices, then just check
-> the device type.
-
-Yeah. I think that's the most feasible way to do this for now. If Alex
-won't disagree, I can prepare a new version.
-
-Thanks,
-
--- peterx
+As its severity, this commit (http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=4e59516a12a6ef6dcb660cb3a3f70c64bd60cfec)
+is eligible to back port to kernel stable.
