@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48774)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1chHFF-0002Mi-60
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:53:18 -0500
+	(envelope-from <no-reply@patchew.org>) id 1chHFU-0002YJ-HE
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:53:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1chHFD-0008SO-Ue
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:53:17 -0500
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:34445)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1chHFD-0008RM-LX
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:53:15 -0500
-Received: by mail-wr0-x22d.google.com with SMTP id o22so9089659wro.1
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 06:53:15 -0800 (PST)
+	(envelope-from <no-reply@patchew.org>) id 1chHFR-0000A8-AN
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:53:32 -0500
+Resent-Message-Id: <E1chHFR-0000A8-AN@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21464)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1chHFR-00008u-1L
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 09:53:29 -0500
+In-Reply-To: <20170224134411.28882-1-mmarek@suse.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148794791903.177.12506775196291811914@0e2666bad730>
 MIME-Version: 1.0
-In-Reply-To: <e87856482b30803a17c5af8124dad9454c0bed86.1487522123.git.balaton@eik.bme.hu>
-References: <cover.1487522123.git.balaton@eik.bme.hu>
-	<e87856482b30803a17c5af8124dad9454c0bed86.1487522123.git.balaton@eik.bme.hu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Feb 2017 14:52:53 +0000
-Message-ID: <CAFEAcA8jd10oqz6R4RDC5pOrsXxOMft9q0sghBUqvVpduJ3K1Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 08/10] sm501: Add support for panel layer
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 24 Feb 2017 06:51:59 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] target-s390x: Implement stfl and stfle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,178 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: mmarek@suse.com
+Cc: famz@redhat.com, rth@twiddle.net, agraf@suse.de, ebischoff@suse.com, mbenes@suse.cz, qemu-devel@nongnu.org
 
-On 19 February 2017 at 16:35, BALATON Zoltan <balaton@eik.bme.hu> wrote:
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> ---
->  hw/display/sm501.c | 73 +++++++++++++++++++++++++++---------------------------
->  1 file changed, 37 insertions(+), 36 deletions(-)
->
-> diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-> index 1bd0303..2e1c4b7 100644
-> --- a/hw/display/sm501.c
-> +++ b/hw/display/sm501.c
-> @@ -2,6 +2,7 @@
->   * QEMU SM501 Device
->   *
->   * Copyright (c) 2008 Shin-ichiro KAWASAKI
-> + * Copyright (c) 2016 BALATON Zoltan
->   *
->   * Permission is hereby granted, free of charge, to any person obtaining a copy
->   * of this software and associated documentation files (the "Software"), to deal
-> @@ -41,8 +42,11 @@
->   *   - Minimum implementation for Linux console : mmio regs and CRT layer.
->   *   - 2D graphics acceleration partially supported : only fill rectangle.
->   *
-> - * TODO:
-> + * Status: 2016/12/04
-> + *   - Misc fixes: endianness, hardware cursor
->   *   - Panel support
-> + *
-> + * TODO:
->   *   - Touch panel support
->   *   - USB support
->   *   - UART support
-> @@ -1297,53 +1301,62 @@ static inline int get_depth_index(DisplaySurface *surface)
->      }
->  }
->
-> -static void sm501_draw_crt(SM501State *s)
-> +static void sm501_update_display(void *opaque)
->  {
-> +    SM501State *s = (SM501State *)opaque;
->      DisplaySurface *surface = qemu_console_surface(s->con);
->      int y, c_x, c_y;
-> -    uint8_t *hwc_src, *src = s->local_mem;
-> -    int width = get_width(s, 1);
-> -    int height = get_height(s, 1);
-> -    int src_bpp = get_bpp(s, 1);
-> +    int crt = (s->dc_crt_control & SM501_DC_CRT_CONTROL_SEL) ? 1 : 0;
-> +    int width = get_width(s, crt);
-> +    int height = get_height(s, crt);
-> +    int src_bpp = get_bpp(s, crt);
->      int dst_bpp = surface_bytes_per_pixel(surface);
-> -    uint32_t *palette = (uint32_t *)&s->dc_palette[SM501_DC_CRT_PALETTE -
-> -                                                   SM501_DC_PANEL_PALETTE];
-> -    uint8_t hwc_palette[3 * 3];
-> -    int ds_depth_index = get_depth_index(surface);
-> +    int dst_depth_index = get_depth_index(surface);
-
-Please don't change variable names in the middle of a patch that's
-adding new functionality, it makes the patch harder to review.
-
->      draw_line_func *draw_line = NULL;
->      draw_hwc_line_func *draw_hwc_line = NULL;
->      int full_update = 0;
->      int y_start = -1;
->      ram_addr_t page_min = ~0l;
->      ram_addr_t page_max = 0l;
-> -    ram_addr_t offset = 0;
-> +    ram_addr_t offset;
-> +    uint32_t *palette;
-> +    uint8_t hwc_palette[3 * 3];
-> +    uint8_t *hwc_src;
-> +
-> +    if (!((crt ? s->dc_crt_control : s->dc_panel_control)
-> +          & SM501_DC_CRT_CONTROL_ENABLE)) {
-> +        return;
-> +    }
-> +
-> +    palette = (uint32_t *)(crt ? &s->dc_palette[SM501_DC_CRT_PALETTE -
-> +                                                SM501_DC_PANEL_PALETTE]
-> +                               : &s->dc_palette[0]);
->
->      /* choose draw_line function */
->      switch (src_bpp) {
->      case 1:
-> -        draw_line = draw_line8_funcs[ds_depth_index];
-> +        draw_line = draw_line8_funcs[dst_depth_index];
->          break;
->      case 2:
-> -        draw_line = draw_line16_funcs[ds_depth_index];
-> +        draw_line = draw_line16_funcs[dst_depth_index];
->          break;
->      case 4:
-> -        draw_line = draw_line32_funcs[ds_depth_index];
-> +        draw_line = draw_line32_funcs[dst_depth_index];
->          break;
->      default:
-> -        printf("sm501 draw crt : invalid DC_CRT_CONTROL=%x.\n",
-> -               s->dc_crt_control);
-> +        printf("sm501 update display : invalid control register value.\n");
-
-This shouldn't be in the same patch as "add panel" either.
-
->          abort();
->          break;
->      }
->
->      /* set up to draw hardware cursor */
-> -    if (is_hwc_enabled(s, 1)) {
-> +    if (is_hwc_enabled(s, crt)) {
->          /* choose cursor draw line function */
-> -        draw_hwc_line = draw_hwc_line_funcs[ds_depth_index];
-> -        hwc_src = get_hwc_address(s, 1);
-> -        c_x = get_hwc_x(s, 1);
-> -        c_y = get_hwc_y(s, 1);
-> -        get_hwc_palette(s, 1, hwc_palette);
-> +        draw_hwc_line = draw_hwc_line_funcs[dst_depth_index];
-> +        hwc_src = get_hwc_address(s, crt);
-> +        c_x = get_hwc_x(s, crt);
-> +        c_y = get_hwc_y(s, crt);
-> +        get_hwc_palette(s, crt, hwc_palette);
->      }
->
->      /* adjust console size */
-> @@ -1357,7 +1370,7 @@ static void sm501_draw_crt(SM501State *s)
->
->      /* draw each line according to conditions */
->      memory_region_sync_dirty_bitmap(&s->local_mem_region);
-> -    for (y = 0; y < height; y++) {
-> +    for (y = 0, offset = 0; y < height; y++, offset += width * src_bpp) {
->          int update, update_hwc;
->          ram_addr_t page0 = offset;
->          ram_addr_t page1 = offset + width * src_bpp - 1;
-> @@ -1375,7 +1388,7 @@ static void sm501_draw_crt(SM501State *s)
->              d +=  y * width * dst_bpp;
->
->              /* draw graphics layer */
-> -            draw_line(d, src, width, palette);
-> +            draw_line(d, s->local_mem + offset, width, palette);
->
->              /* draw hardware cursor */
->              if (update_hwc) {
-> @@ -1398,9 +1411,6 @@ static void sm501_draw_crt(SM501State *s)
->                  y_start = -1;
->              }
->          }
-> -
-> -        src += width * src_bpp;
-> -        offset += width * src_bpp;
->      }
->
->      /* complete flush to display */
-> @@ -1416,15 +1426,6 @@ static void sm501_draw_crt(SM501State *s)
->      }
->  }
->
-> -static void sm501_update_display(void *opaque)
-> -{
-> -    SM501State *s = (SM501State *)opaque;
-> -
-> -    if (s->dc_crt_control & SM501_DC_CRT_CONTROL_ENABLE) {
-> -        sm501_draw_crt(s);
-> -    }
-> -}
-> -
->  static const GraphicHwOps sm501_ops = {
->      .gfx_update  = sm501_update_display,
->  };
-> --
-> 2.7.4
->
-
-thanks
--- PMM
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzAyMjQxMzQ0MTEuMjg4ODItMS1tbWFyZWtAc3VzZS5jb20KVHlwZTogc2VyaWVzClN1YmplY3Q6
+IFtRZW11LWRldmVsXSBbUEFUQ0hdIHRhcmdldC1zMzkweDogSW1wbGVtZW50IHN0ZmwgYW5kIHN0
+ZmxlCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0x
+CnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBV
+c2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAt
+LWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAg
+ZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0l
+cyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRz
+L2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAg
+ICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1Qg
+U0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4
+ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICog
+W25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDE3MDIyNDEzNDQxMS4yODg4Mi0xLW1tYXJla0Bz
+dXNlLmNvbSAtPiBwYXRjaGV3LzIwMTcwMjI0MTM0NDExLjI4ODgyLTEtbW1hcmVrQHN1c2UuY29t
+CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAxNzAyMjQxMzUwNDUuMTA2MTMtMS1tYmVu
+ZXNAc3VzZS5jeiAtPiBwYXRjaGV3LzIwMTcwMjI0MTM1MDQ1LjEwNjEzLTEtbWJlbmVzQHN1c2Uu
+Y3oKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwozZGFiYTliIHRhcmdldC1zMzkweDog
+SW1wbGVtZW50IHN0ZmwgYW5kIHN0ZmxlCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQ
+QVRDSCAxLzE6IHRhcmdldC1zMzkweDogSW1wbGVtZW50IHN0ZmwgYW5kIHN0ZmxlLi4uCkVSUk9S
+OiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQK
+IzEwODogRklMRTogdGFyZ2V0L3MzOTB4L21pc2NfaGVscGVyLmM6NTIyOgorICAgIGlmIChuZWVk
+IDw9IGxlbikKWy4uLl0KKyAgICBlbHNlClsuLi5dCgp0b3RhbDogMSBlcnJvcnMsIDAgd2Fybmlu
+Z3MsIDExMSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
+YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
+ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
+UlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAx
+CgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9w
+YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
+ZnJlZWxpc3RzLm9yZw==
