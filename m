@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1chVfa-0005b0-Tw
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 01:17:28 -0500
+	(envelope-from <thuth@redhat.com>) id 1chVgJ-0006Qc-B2
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 01:18:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1chVfW-0002Zb-JB
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 01:17:26 -0500
-Received: from mail-pg0-x235.google.com ([2607:f8b0:400e:c05::235]:33646)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1chVfW-0002ZQ-9i
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 01:17:22 -0500
-Received: by mail-pg0-x235.google.com with SMTP id z128so20551123pgb.0
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 22:17:18 -0800 (PST)
-Date: Sat, 25 Feb 2017 15:17:14 +0900
-From: Stafford Horne <shorne@gmail.com>
-Message-ID: <20170225061714.GX2449@lianli.shorne-pla.net>
-References: <mailman.51026.1486615955.22738.qemu-devel@nongnu.org>
-	<8C14E9D0-F376-4CDC-BF24-A0609A329977@gmail.com>
-	<20170210003916.GL32144@lianli.shorne-pla.net>
-	<ec491d8c-3fb0-3ce9-5558-ac4ab1455f7f@twiddle.net>
-	<4BE06A79-02EC-48A8-8081-F21CEACE396F@gmail.com>
-	<20170223140944.GK2449@lianli.shorne-pla.net>
-	<C90ADBA7-AAB2-4392-8C64-3BB12545AE2F@gmail.com>
+	(envelope-from <thuth@redhat.com>) id 1chVgE-0002dd-Cl
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 01:18:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34622)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1chVgE-0002dY-3b
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 01:18:06 -0500
+References: <20170223122025.10420-1-cornelia.huck@de.ibm.com>
+	<20170223122025.10420-3-cornelia.huck@de.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <c1bfea11-c4ae-389f-dde1-e893a3019a05@redhat.com>
+Date: Sat, 25 Feb 2017 07:18:02 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <C90ADBA7-AAB2-4392-8C64-3BB12545AE2F@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 00/22] target/openrisc updates
+In-Reply-To: <20170223122025.10420-3-cornelia.huck@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] s390x/ipl: Extend S390IPLState to
+ support network boot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,150 +28,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: G 3 <programmingkidx@gmail.com>
-Cc: Richard Henderson <rth@twiddle.net>, Openrisc <openrisc@lists.librecores.org>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, jfrei@linux.vnet.ibm.com, Farhan Ali <alifm@linux.vnet.ibm.com>, agraf@suse.de
 
-On Thu, Feb 23, 2017 at 10:54:43AM -0500, G 3 wrote:
+On 23.02.2017 13:20, Cornelia Huck wrote:
+> From: Farhan Ali <alifm@linux.vnet.ibm.com>
 > 
-> On Feb 23, 2017, at 9:09 AM, Stafford Horne wrote:
+> Add new field to S390IPLState to store the name of the network boot
+> loader.
 > 
-> > On Mon, Feb 13, 2017 at 10:33:09PM -0500, Programmingkid wrote:
-> > > 
-> > > On Feb 13, 2017, at 10:25 PM, Richard Henderson wrote:
-> > > 
-> > > > On 02/10/2017 11:39 AM, Stafford Horne wrote:
-> > > > > On Thu, Feb 09, 2017 at 09:10:51AM -0500, G 3 wrote:
-> > > > > > 
-> > > > > > On Feb 8, 2017, at 11:52 PM, qemu-devel-request@nongnu.org wrote:
-> > > > > > 
-> > > > > > > Message: 6
-> > > > > > > Date: Wed,  8 Feb 2017 20:51:32 -0800
-> > > > > > > From: Richard Henderson <rth@twiddle.net>
-> > > > > > > To: qemu-devel@nongnu.org
-> > > > > > > Cc: shorne@gmail.com
-> > > > > > > Subject: [Qemu-devel] [PATCH 00/22] target/openrisc updates
-> > > > > > > Message-ID: <20170209045154.16868-1-rth@twiddle.net>
-> > > > > > > 
-> > > > > > > The bulk of this patch set is 2-3 years old, and was mostly
-> > > > > > > reviewed by Bastian Koppelmann.  But it languished because
-> > > > > > > there were reports of it not booting kernel images, and I
-> > > > > > > had problems putting together a set of tools that could even
-> > > > > > > build a kernel.
-> > > > > > > 
-> > > > > > > The OpenRISC community has picked up activity recently,
-> > > > > > > with Stafford Horne upstreaming some of the compiler tools.
-> > > > > > > He has even done some testing for me of this patch set.
-> > > > > > > 
-> > > > > > > 
-> > > > > > > r~
-> > > > > > 
-> > > > > > I see you are working on OpenRISC. Would you be able to help
-> > > > > > me improve its wiki page?
-> > > > > > 
-> > > > > > http://wiki.qemu-project.org/Documentation/Platforms/OpenRISC
-> > > > > > 
-> > > > > > Right now there isn't much information on OpenRISC here. I'm
-> > > > > > hoping to make it a lot useful to anyone who is
-> > > > > > interesting in this
-> > > > > > platform.
-> > > > > > 
-> > > > > > Would you know of any links to software that works in OpenRISC?
-> > > > > > 
-> > > > > > Pictures of the OpenRISC target running anything would
-> > > > > > be great also.
-> > > > > > 
-> > > > > > What is your suggested command-line for using OpenRISC?
-> > > > > > 
-> > > > > > If you have any suggestions on how to improve the page place don't
-> > > > > > hesitate to let me know.
-> > > > > > 
-> > > > > 
-> > > > > Hi Richard, G 3,
-> > > > > 
-> > > > > I am not sure if Richard has the time for this.  But I kind
-> > > > > of got him
-> > > > > started back on the openrisc work, it would be my fault to
-> > > > > burden him
-> > > > > with even more work :).  Also, I was helping to do some
-> > > > > tests so I have
-> > > > > some example commands.
-> > > > 
-> > > > :-)
-> > > > 
-> > > > > I don't have a lot of time, but I think I can help to update
-> > > > > the above.
-> > > > > Probably Richard and I could work together?
-> > > > > 
-> > > > > I was recently working on updating the openrisc page
-> > > > > 
-> > > > >  http://openrisc.io
-> > > > > 
-> > > > > I think I could link between the two for toolchain compile
-> > > > > guides and
-> > > > > software guides (i.e. debugging and linux).
-> > > > > 
-> > > > > Richard what do you think?
-> > > > 
-> > > > Probably the most beneficial thing that we can do is create a
-> > > > kernel+initrd that boots into a busybox root shell.  Similar to
-> > > > the other test images that we have at
-> > > > 
-> > > >  http://wiki.qemu-project.org/Testing/System_Images
-> > > > 
-> > > > 
-> > > > r~
-> > > > 
-> > > 
-> > > We could do both the test image and a wiki page.
-> > 
-> > I posted a test image to the wiki
-> > 
-> >  http://wiki.qemu-project.org/Testing/System_Images
-> > 
-> > However, someone on the #qemu irc room mentioned its not ideal to post
-> > any images on the wiki and existing images should be taken down due to
-> > copyright issues.  I don't quite follow, should we be concerned?
+> Signed-off-by: Farhan Ali <alifm@linux.vnet.ibm.com>
+> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+> Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+> ---
+>  hw/s390x/ipl.c             | 1 +
+>  hw/s390x/ipl.h             | 1 +
+>  hw/s390x/s390-virtio-ccw.c | 3 ++-
+>  hw/s390x/s390-virtio.c     | 2 ++
+>  hw/s390x/s390-virtio.h     | 1 +
+>  5 files changed, 7 insertions(+), 1 deletion(-)
 > 
-> If this is a Linux test image, it should be fine. Could we add a link to the
-> test image to the wiki page?
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index 2e2664f22e..fd656718a7 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -209,6 +209,7 @@ static Property s390_ipl_properties[] = {
+>      DEFINE_PROP_STRING("initrd", S390IPLState, initrd),
+>      DEFINE_PROP_STRING("cmdline", S390IPLState, cmdline),
+>      DEFINE_PROP_STRING("firmware", S390IPLState, firmware),
+> +    DEFINE_PROP_STRING("netboot_fw", S390IPLState, netboot_fw),
+>      DEFINE_PROP_BOOL("enforce_bios", S390IPLState, enforce_bios, false),
+>      DEFINE_PROP_BOOL("iplbext_migration", S390IPLState, iplbext_migration,
+>                       true),
+> diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+> index c89109585a..4ad9a7c05e 100644
+> --- a/hw/s390x/ipl.h
+> +++ b/hw/s390x/ipl.h
+> @@ -106,6 +106,7 @@ struct S390IPLState {
+>      char *initrd;
+>      char *cmdline;
+>      char *firmware;
+> +    char *netboot_fw;
+>      uint8_t cssid;
+>      uint8_t ssid;
+>      uint16_t devno;
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 4f0d62b2d8..40914fde6f 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -116,7 +116,8 @@ static void ccw_init(MachineState *machine)
+>      /* get a BUS */
+>      css_bus = virtual_css_bus_init();
+>      s390_init_ipl_dev(machine->kernel_filename, machine->kernel_cmdline,
+> -                      machine->initrd_filename, "s390-ccw.img", true);
+> +                      machine->initrd_filename, "s390-ccw.img",
+> +                      "s390-netboot.img", true);
+>      s390_flic_init();
+>  
+>      dev = qdev_create(NULL, TYPE_S390_PCI_HOST_BRIDGE);
+> diff --git a/hw/s390x/s390-virtio.c b/hw/s390x/s390-virtio.c
+> index 9cfb09057e..afa4148e6b 100644
+> --- a/hw/s390x/s390-virtio.c
+> +++ b/hw/s390x/s390-virtio.c
+> @@ -65,6 +65,7 @@ void s390_init_ipl_dev(const char *kernel_filename,
+>                         const char *kernel_cmdline,
+>                         const char *initrd_filename,
+>                         const char *firmware,
+> +                       const char *netboot_fw,
+>                         bool enforce_bios)
+>  {
+>      Object *new = object_new(TYPE_S390_IPL);
+> @@ -78,6 +79,7 @@ void s390_init_ipl_dev(const char *kernel_filename,
+>      }
+>      qdev_prop_set_string(dev, "cmdline", kernel_cmdline);
+>      qdev_prop_set_string(dev, "firmware", firmware);
+> +    qdev_prop_set_string(dev, "netboot_fw", netboot_fw);
+>      qdev_prop_set_bit(dev, "enforce_bios", enforce_bios);
+>      object_property_add_child(qdev_get_machine(), TYPE_S390_IPL,
+>                                new, NULL);
+> diff --git a/hw/s390x/s390-virtio.h b/hw/s390x/s390-virtio.h
+> index f588b80a6e..f2377a3e0e 100644
+> --- a/hw/s390x/s390-virtio.h
+> +++ b/hw/s390x/s390-virtio.h
+> @@ -24,6 +24,7 @@ void s390_init_ipl_dev(const char *kernel_filename,
+>                         const char *kernel_cmdline,
+>                         const char *initrd_filename,
+>                         const char *firmware,
+> +                       const char *netboot_fw,
+>                         bool enforce_bios);
+>  void s390_create_virtio_net(BusState *bus, const char *name);
+>  void s390_nmi(NMIState *n, int cpu_index, Error **errp);
 > 
-> > 
-> > Also, I did start adding some commands to the wiki, any feedback
-> > appreciated.
-> > 
-> >   http://wiki.qemu-project.org/Documentation/Platforms/OpenRISC
-> > 
-> > -Stafford
-> 
-> Thank you so much for all your work. The wiki page looks great. For the
-> maintainer, is Jia Liu still maintaining it? I never received a reply from
-> him.  Would you be interested in being a maintainer?
 
-No worries, I just copied the commands from my history, some were sent
-from Richard.  I hope they can help others in the future.
-
-Last time I sent a patch Jia Liu also asked me to be maintainer,  I
-added myself for now.  I am sure there are more qualified people like
-Richard, but Ill try to help where I can.
-
-> This line in the wiki doesn't sound right:
-> "To get good traces you can also add the following, this will output trace
-> info the a file z"
-> 
-> Maybe this:
-> "To get good traces you can also add the following, this will output trace
-> info to the file z"
-> 
-> If z is a file, I really suggest renaming it to something more descriptive.
-
-Done.  If I do any more cool things with qemu I will post them to the
-twiki.  Also, Ill try to link back to any docs I/we put on openrisc.io.
-
-BTW, for now the image at 'Testing/System_Images' is hosted on my
-server.  Would it be possible for someone to move it to the wiki or a qemu
-server?  The link I posted should be up most of the time, but its not
-something I would give any 9's of up time.
-
--Stafford
-
-> Thank you.
+Reviewed-by: Thomas Huth <thuth@redhat.com>
