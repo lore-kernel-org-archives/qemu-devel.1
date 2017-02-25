@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1chPsJ-0002xW-Mv
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 19:06:12 -0500
+	(envelope-from <herongguang.he@huawei.com>) id 1chRQQ-0004Us-74
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 20:45:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1chPsG-0004ZQ-HS
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 19:06:11 -0500
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:34324)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1chPsG-0004Yq-Bf
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 19:06:08 -0500
-Received: by mail-pg0-x241.google.com with SMTP id s67so4761938pgb.1
-	for <qemu-devel@nongnu.org>; Fri, 24 Feb 2017 16:06:08 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170224134411.28882-1-mmarek@suse.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <a634716c-c998-c422-6802-946a283f8837@twiddle.net>
-Date: Sat, 25 Feb 2017 11:05:55 +1100
+	(envelope-from <herongguang.he@huawei.com>) id 1chRQO-0002cn-UM
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 20:45:30 -0500
+Received: from [45.249.212.187] (port=2990 helo=dggrg01-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <herongguang.he@huawei.com>) id 1chRQO-0002aY-9i
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 20:45:28 -0500
+References: <589C7E96.9060905@huawei.com> <589D83CE.1090803@huawei.com>
+	<589DDC05.9010807@windriver.com> <58AA51D6.6020508@huawei.com>
+	<1487565495.3740.27.camel@intel.com> <58AD0094.90304@windriver.com>
+	<4dd92012-626a-2d80-9adb-0be398f73eb1@redhat.com>
+	<58AD92AE.6040502@windriver.com>
+	<6c5567f4-192d-aefd-90e4-89f53479c24e@redhat.com>
+	<58AF9921.6060201@huawei.com> <58B04CD3.7010304@windriver.com>
+	<7fdf2551-3d55-1bd9-2848-720a880cc93e@redhat.com>
+From: "Herongguang (Stephen)" <herongguang.he@huawei.com>
+Message-ID: <58B0E191.6040108@huawei.com>
+Date: Sat, 25 Feb 2017 09:44:49 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170224134411.28882-1-mmarek@suse.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target-s390x: Implement stfl and stfle
+In-Reply-To: <7fdf2551-3d55-1bd9-2848-720a880cc93e@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] kvm bug in __rmap_clear_dirty during live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +33,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michal Marek <mmarek@suse.com>, Alexander Graf <agraf@suse.de>
-Cc: qemu-devel@nongnu.org, Miroslav Benes <mbenes@suse.cz>, Eric Bischoff <ebischoff@suse.com>
-
-On 02/25/2017 12:44 AM, Michal Marek wrote:
-> +DEF_HELPER_1(stfl, void, env)
-
-DEF_HELPER_FLAGS_1(stfl, TCG_CALL_NO_RWG, void, env)
-
-since this touches no registers, and only writes to lomem which afaik cannot 
-fault in kernel mode.
-
-> +DEF_HELPER_3(stfle, i64, env, i64, i64)
-
-Unfortunately, we are writing to cc_op, so we do have a TCG register write, so 
-I guess this is the best we can do here.
-
-> +static int do_stfle(CPUS390XState *env, uint64_t addr, int len)
-> +{
-> +    S390CPU *cpu = s390_env_get_cpu(env);
-> +    uint8_t data[64];
-
-S390FeatBitmap or S390FeatInit?  Or even a sizeof?
-Hard coding 64 certainly doesn't seem right.
-
-> +    memset(data, 0, sizeof(data));
-> +    res = s390_fill_feat_block(cpu->model->features, S390_FEAT_TYPE_STFL, data);
-> +    cpu_physical_memory_write(addr, data, MIN(res, len));
-
-No, not physical memory, you need to write to virtual memory, at least for 
-STFLE.  Which, as you'll recall can be used from user-mode.
+To: Paolo Bonzini <pbonzini@redhat.com>, Chris Friesen <chris.friesen@windriver.com>, "Han, Huaitong" <huaitong.han@intel.com>, "hangaohuai@huawei.com" <hangaohuai@huawei.com>, stable@vger.kernel.org
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "fangying1@huawei.com" <fangying1@huawei.com>, "xudong.hao@linux.intel.com" <xudong.hao@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "wangxinxin.wang@huawei.com" <wangxinxin.wang@huawei.com>, "kai.huang@linux.intel.com" <kai.huang@linux.intel.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "guangrong.xiao@linux.intel.com" <guangrong.xiao@linux.intel.com>, linux-kernel@vger.kernel.org
 
 
-r~
+
+On 2017/2/24 23:14, Paolo Bonzini wrote:
+>
+>
+> On 24/02/2017 16:10, Chris Friesen wrote:
+>> On 02/23/2017 08:23 PM, Herongguang (Stephen) wrote:
+>>
+>>> On 2017/2/22 22:43, Paolo Bonzini wrote:
+>>
+>>>> Hopefully Gaohuai and Rongguang can help with this too.
+>>>>
+>>>> Paolo
+>>>
+>>> Yes, we are looking into and testing this.
+>>>
+>>> I think this can result in any memory corruption, if VM1 writes its
+>>> PML buffer into VM2’s VMCS (since sched_in/sched_out notifier of VM1
+>>> is not registered yet), then VM1 is destroyed (hence its PML buffer
+>>> is freed back to kernel), after that, VM2 starts migration, so CPU
+>>> logs VM2’s dirty GFNS into a freed memory, results in any memory
+>>> corruption.
+>>>
+>>> As its severity, this commit
+>>> (http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=4e59516a12a6ef6dcb660cb3a3f70c64bd60cfec)
+>>>
+>>> is eligible to back port to kernel stable.
+>>
+>> Are we expecting that fix to resolve the original issue, or is it a
+>> separate issue that needs fixing in stable?
+>
+> It should be the original issue.
+>
+> Paolo
+>
+> .
+>
+Yes, I agree, though we are still testing.
