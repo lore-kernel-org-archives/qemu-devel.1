@@ -1,18 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bernat@luffy.cx>) id 1chjwv-00019t-Ag
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 16:32:18 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1chjx6-0001Ej-8X
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 16:32:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bernat@luffy.cx>) id 1chjwq-0001Pl-Tl
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 16:32:16 -0500
-Received: from bart.luffy.cx ([78.47.78.131]:41932)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bernat@luffy.cx>) id 1chjwq-0001Mf-GT
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 16:32:12 -0500
-From: Vincent Bernat <vincent@bernat.im>
-Date: Sat, 25 Feb 2017 22:31:58 +0100
-Message-Id: <20170225213158.32452-1-vincent@bernat.im>
-Subject: [Qemu-devel] [PATCH] slirp: allow host port 0 for hostfwd
+	(envelope-from <peter.maydell@linaro.org>) id 1chjx5-0001cW-I4
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 16:32:28 -0500
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:33003)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1chjx5-0001bx-BG
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 16:32:27 -0500
+Received: by mail-wr0-x22c.google.com with SMTP id m5so11683035wrm.0
+	for <qemu-devel@nongnu.org>; Sat, 25 Feb 2017 13:32:27 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <1487958030-51417-1-git-send-email-pbonzini@redhat.com>
+References: <1487958030-51417-1-git-send-email-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 25 Feb 2017 21:32:05 +0000
+Message-ID: <CAFEAcA_J1P_zU0=T+UEUBfxTtUrRcmM61VXcbB1iPc1ZK1xhEw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 00/17] KVM and cpu-exec patches for 2.9 soft
+ freeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,40 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Vincent Bernat <vincent@bernat.im>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-The OS will allocate automatically a free port. This is useful if you
-want to be sure to not get any port conflict. You still have to figure
-out which port you got, for example with "lsof" (this could be exposed
-in the monitor if needed).
+On 24 February 2017 at 17:40, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> The following changes since commit a1cf5fac2b929ffa2abd1285401f2535ff8c6fea:
+>
+>   Merge remote-tracking branch 'remotes/armbru/tags/pull-block-2017-02-21' into staging (2017-02-21 13:58:50 +0000)
+>
+> are available in the git repository at:
+>
+>
+>   git://github.com/bonzini/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to f9e640f9a1a7185591985e10a557f11fbe783b87:
+>
+>   qmp-events: fix GUEST_PANICKED description formatting (2017-02-24 16:19:44 +0100)
+>
+> ----------------------------------------------------------------
+> * kernel header update (requested by David and Vijay)
+> * GuestPanicInformation fixups (Anton)
+> * record/replay icount fixes (Pavel)
+> * cpu-exec cleanup, unification of icount_decr with tcg_exit_req (me)
+> * KVM_CAP_IMMEDIATE_EXIT support (me)
+> * vmxcap update (me)
 
-Example of use:
+The patchew s390 host build failure looks like a genuine
+problem, so I'm dropping this from my to-merge queue.
 
-     $ qemu-system-x86_64 -net user,hostfwd=127.0.0.1:0-:22 ...
-
-Then, get your port with:
-
-     $ lsof -np 1474 | grep LISTEN
-     qemu-syst 31777 bernat 12u IPv4 [...] TCP 127.0.0.1:35145 (LISTEN)
-
-Signed-off-by: Vincent Bernat <vincent@bernat.im>
----
- net/slirp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/slirp.c b/net/slirp.c
-index f97ec233454e..11b2dd249a79 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -487,7 +487,7 @@ static int slirp_hostfwd(SlirpState *s, const char *redir_str,
-         goto fail_syntax;
-     }
-     host_port = strtol(buf, &end, 0);
--    if (*end != '\0' || host_port < 1 || host_port > 65535) {
-+    if (*end != '\0' || host_port < 0 || host_port > 65535) {
-         goto fail_syntax;
-     }
- 
--- 
-2.11.0
+thanks
+-- PMM
