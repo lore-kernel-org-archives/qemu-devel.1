@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50894)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1chRhZ-0002ks-QZ
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 21:03:15 -0500
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1chSBP-0005Xf-R5
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 21:34:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1chRhW-0002Nd-Mp
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 21:03:13 -0500
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1487879800-12352-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<1487879800-12352-7-git-send-email-nikunj@linux.vnet.ibm.com>
-	<755c77c5-0930-b5ee-0b3b-1e0608301c8d@twiddle.net>
-	<87a89cza5l.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<20170224025841.GN17615@umbus.fritz.box>
-	<4a13acc6-8a7e-f259-fdb7-6c3156b9ac6c@twiddle.net>
-	<87o9xs2hnl.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <34bf17ea-3f3a-3af1-5df6-ebaaed21573a@twiddle.net>
-Date: Sat, 25 Feb 2017 13:03:02 +1100
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1chSBM-0007gR-OE
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 21:34:03 -0500
+Received: from [59.151.112.132] (port=10359 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1chSBM-0007dr-Cf
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 21:34:00 -0500
+References: <1487920971-16519-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1487920971-16519-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1d6cbd92-1699-3d11-7a24-63e888bb0e29@redhat.com>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <2b97f1bf-47d1-4396-b49c-0c26be149757@cn.fujitsu.com>
+Date: Sat, 25 Feb 2017 10:33:18 +0800
 MIME-Version: 1.0
-In-Reply-To: <87o9xs2hnl.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <1d6cbd92-1699-3d11-7a24-63e888bb0e29@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 06/15] target/ppc: remove xer split-out
- flags(so, ov, ca)
+Subject: Re: [Qemu-devel] [PATCH V9 2/2] Add a new qmp command to do
+ checkpoint, query xen replication status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,90 +29,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
+To: Eric Blake <eblake@redhat.com>, qemu devel <qemu-devel@nongnu.org>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Markus Armbruster <armbru@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
+Cc: zhangchen.fnst@cn.fujitsu.com, Jason Wang <jasowang@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Wen Congyang <wencongyang@gmail.com>
 
-On 02/24/2017 06:05 PM, Nikunj A Dadhania wrote:
-> Richard Henderson <rth@twiddle.net> writes:
->
->> On 02/24/2017 01:58 PM, David Gibson wrote:
->>> On Fri, Feb 24, 2017 at 06:18:22AM +0530, Nikunj A Dadhania wrote:
->>>> Richard Henderson <rth@twiddle.net> writes:
->>>>
->>>>> On 02/24/2017 06:56 AM, Nikunj A Dadhania wrote:
->>>>>> Now get rid all the split out variables so, ca, ov. After this patch,
->>>>>> all the bits are stored in CPUPPCState::xer at appropriate places.
->>>>>>
->>>>>> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
->>>>>> ---
->>>>>>  target/ppc/cpu.c        |   8 +---
->>>>>>  target/ppc/cpu.h        |  26 ++++++------
->>>>>>  target/ppc/int_helper.c |  12 +++---
->>>>>>  target/ppc/translate.c  | 106 +++++++++++++++++++++++++-----------------------
->>>>>>  4 files changed, 78 insertions(+), 74 deletions(-)
->>>>>
->>>>> I do not think this is a good direction to take this.
->>>>
->>>> Hmm, any particular reason?
->>>
->>> Right, I suggested this, but based only a suspicion that the split
->>> variables weren't worth the complexity.  I'm happy to be corrected by
->>> someone with better knowledge of TCG, but it'd be nice to know why.
+
+
+On 02/25/2017 01:27 AM, Eric Blake wrote:
+> On 02/24/2017 01:22 AM, Zhang Chen wrote:
+>> We can call this qmp command to do checkpoint outside of qemu.
+>> Xen colo will need this function.
 >>
->> Normally we're interested in minimizing the size of the generated code,
->> delaying computation until we can show it being used.
+>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+>> Signed-off-by: Wen Congyang <wencongyang@gmail.com>
+>> ---
+>>   migration/colo.c | 23 +++++++++++++++++++++++
+>>   qapi-schema.json | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+>>   2 files changed, 72 insertions(+)
 >>
->> Now, ppc is a bit different from other targets (which might compute overflow
->> for any addition insn) in that it only computes overflow when someone asks for
->> it.  Moreover, it's fairly rare for the addo/subo/nego instructions to
->> be used.
+>> +++ b/qapi-schema.json
+>> @@ -5931,6 +5931,55 @@
+>>     'data': { 'enable': 'bool', 'primary': 'bool', '*failover' : 'bool' } }
+>>   
+>>   ##
+>> +# @ReplicationStatus:
+>> +#
+>> +# The result format for 'query-xen-replication-status'.
+>> +#
+>> +# @error: true to error, false to normal.
+> Maybe:
 >
->> Therefore, I'm not 100% sure what the "best" solution is.
+> true if an error happened, false if replication is normal
 >
-> Agreed, with that logic, wont it be more efficient to move the OV/CA
-> updationg to respective callers, and when xer_read/write happens, its
-> just one tcg_ops.
+> Maintainer could touch that up during application, so it doesn't
+> necessarily require a v10.
+
+Maintainer may be very busy, I will do this fix in V10.
+
 >
+>> +##
+>> +# @query-xen-replication-status:
+>> +#
+>> +# Query replication status while the vm is running.
+>> +#
+>> +# Returns: A @ReplicationResult object showing the status.
+>> +#
+>> +# Example:
+>> +#
+>> +# -> { "execute": "query-xen-replication-status" }
+>> +# <- { "return": [ { "error": false },
+>> +#                  { "error": true } ] }
+> This example is bogus.  The command does NOT return an array.  It is
+> sufficient to use:
 >
->> However, I'd be surprised if the least amount of code places all of
->> the bits into their canonical location within XER.
->>
->> Do note that when looking at this, the various methods by which the OV/SO bits
->> are copied to CR flags ought to be taken into account.
+> { "return": { "error": false } }
 >
-> I lost you in the last two para, can you explain in detail?
+> but if you want, you could instead do:
+>
+> { "return": { "error": true, "desc": "..." } }
+>
+> but if you do that, please be sure that desc matches an actual error
+> code that could occur, and not something made up.
+>
+> If all you do is fix the example with the simpler "error":false (and
+> maybe the maintainer is okay doing that), then you can add:
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Reading XER via MFSPR is not the only way to access the CA/OV/SO bits.  One may 
-use the "dot" form of the instruction to copy SO to CR0[3].  One may use the 
-MCRXRX instruction to copy 5 bits from XER to CR[BF].  One may use the add/sub 
-extended instructions to access the CA bit.
+I will fix the example in V10, and which maintainer can pick up this patch?
 
-Therefore it is not a forgone conclusion that a read of XER will *ever* occur, 
-and therefore it is not necessarily most efficient to keep the CA/OV/SO bits in 
-the canonical XER form.
-
-I think it's especially important to keep CA separate in order to facilitate 
-multi-word addition chains.
-
-I suspect that it's most efficient to keep SO in a form that best simplifies 
-"dot" instructions, e.g. since there is no un-dotted "andi" instruction. 
-Naturally, the form in which you store SO is going to influence how you store OV.
-
-The other thing that is desirable is to allow the TCG optimizer to delete 
-computations that are dead.  That cannot be done if you're constantly folding 
-results back into a single XER register.
-
-Consider a sequence like
-
-	li	r0, 0
-	mtspr	xer, r0
-	addo	r3, r4, r5
-	addo.	r6, r7, r8
-
-where we clear XER (and thus SO), perform two computations, and then read SO 
-via the dot.  Obviously the two computations of OV are not dead, because they 
-get ORed into SO.  However, the first computation of OV32 is dead, shadowed by 
-the second, because there is no accumulating SO32 bit.
+Thanks
+Zhang Chen
 
 
-r~
+-- 
+Thanks
+Zhang Chen
