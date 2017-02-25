@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1chf0e-00071K-N2
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 11:15:49 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1chf6d-0004Gz-SK
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 11:22:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1chf0b-00039P-F8
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 11:15:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44488)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1chf0b-00039C-9u
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 11:15:45 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7BDC3C05678D
-	for <qemu-devel@nongnu.org>; Sat, 25 Feb 2017 16:15:45 +0000 (UTC)
-References: <1487886317-27400-1-git-send-email-armbru@redhat.com>
-	<1487886317-27400-16-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <12041f08-197a-e98a-2e13-08bfc79de8f8@redhat.com>
-Date: Sat, 25 Feb 2017 10:15:43 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1chf6c-0004qf-LY
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 11:21:59 -0500
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:34182)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1chf6c-0004qW-Cp
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 11:21:58 -0500
+Received: by mail-wr0-x22e.google.com with SMTP id o22so24460346wro.1
+	for <qemu-devel@nongnu.org>; Sat, 25 Feb 2017 08:21:58 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1487886317-27400-16-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="8XrE3bsq59ggCrSPcXutmVDCglufn47OQ"
-Subject: Re: [Qemu-devel] [PATCH 15/21] qom: Make
- object_property_set_qobject()'s input visitor strict
+In-Reply-To: <alpine.BSF.2.20.1702242125210.76443@zero.eik.bme.hu>
+References: <cover.1487522123.git.balaton@eik.bme.hu>
+	<9c4f503401fa3defa5dff8b938a0bee3aa8d89d5.1487522123.git.balaton@eik.bme.hu>
+	<CAFEAcA9uOtUmPisVgeTDCVR_tuXzB=nb7OYHiVty1iVnk8pXQQ@mail.gmail.com>
+	<alpine.BSF.2.20.1702242125210.76443@zero.eik.bme.hu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 25 Feb 2017 16:21:36 +0000
+Message-ID: <CAFEAcA8JXbOheEjxG--WibsWgL-tEPyyn4djbWURxW5+kHDAbQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH 06/10] sm501: Fix device endianness
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,54 +31,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---8XrE3bsq59ggCrSPcXutmVDCglufn47OQ
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <12041f08-197a-e98a-2e13-08bfc79de8f8@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 15/21] qom: Make
- object_property_set_qobject()'s input visitor strict
-References: <1487886317-27400-1-git-send-email-armbru@redhat.com>
- <1487886317-27400-16-git-send-email-armbru@redhat.com>
-In-Reply-To: <1487886317-27400-16-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 24 February 2017 at 20:35, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+> On Fri, 24 Feb 2017, Peter Maydell wrote:
+>>
+>> On 19 February 2017 at 16:35, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+>>>
+>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>>> ---
+>>>  hw/display/sm501.c          |  6 +++---
+>>>  hw/display/sm501_template.h | 31 ++++++++++++++++++-------------
+>>>  2 files changed, 21 insertions(+), 16 deletions(-)
+>>>
+>>> diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+>>> index 9091bb5..3d32a3c 100644
+>>> --- a/hw/display/sm501.c
+>>> +++ b/hw/display/sm501.c
+>>> @@ -846,7 +846,7 @@ static const MemoryRegionOps sm501_system_config_ops
+>>> = {
+>>>          .min_access_size = 4,
+>>>          .max_access_size = 4,
+>>>      },
+>>> -    .endianness = DEVICE_NATIVE_ENDIAN,
+>>> +    .endianness = DEVICE_LITTLE_ENDIAN,
+>>>  };
+>>>
+>>>  static uint32_t sm501_palette_read(void *opaque, hwaddr addr)
+>>> @@ -1082,7 +1082,7 @@ static const MemoryRegionOps sm501_disp_ctrl_ops =
+>>> {
+>>>          .min_access_size = 4,
+>>>          .max_access_size = 4,
+>>>      },
+>>> -    .endianness = DEVICE_NATIVE_ENDIAN,
+>>> +    .endianness = DEVICE_LITTLE_ENDIAN,
+>>>  };
+>>>
+>>>  static uint64_t sm501_2d_engine_read(void *opaque, hwaddr addr,
+>>> @@ -1170,7 +1170,7 @@ static const MemoryRegionOps sm501_2d_engine_ops =
+>>> {
+>>>          .min_access_size = 4,
+>>>          .max_access_size = 4,
+>>>      },
+>>> -    .endianness = DEVICE_NATIVE_ENDIAN,
+>>> +    .endianness = DEVICE_LITTLE_ENDIAN,
+>>>  };
+>>
+>>
+>> Does this still all work for the sh4eb (big-endian) sysbus device case?
+>
+>
+> Not sure. Is there some image somewhere I can test with?
 
-On 02/23/2017 03:45 PM, Markus Armbruster wrote:
-> Commit 240f64b made all qobject input visitors created outside tests
-> strict, except for the one in object_property_set_qobject().  That one
-> was left behind only because Eric couldn't spare the time to figure
-> out whether making it strict would break anything, with a TODO
-> comment.  Time to resolve it.
+I don't know, I'm afraid; I don't know anything about sh4.
+I'm just going by looking at the code changes and flagging
+up things which are potentially problems.
 
-Yay.
+>>>  /* draw line functions for all console modes */
+>>> diff --git a/hw/display/sm501_template.h b/hw/display/sm501_template.h
+>>> index 832ee61..5b516d6 100644
+>>> --- a/hw/display/sm501_template.h
+>>> +++ b/hw/display/sm501_template.h
+>>> @@ -64,10 +64,16 @@ static void glue(draw_line16_, PIXEL_NAME)(
+>>>      uint8_t r, g, b;
+>>>
+>>>      do {
+>>> -        rgb565 = lduw_p(s);
+>>> -        r = ((rgb565 >> 11) & 0x1f) << 3;
+>>> -        g = ((rgb565 >>  5) & 0x3f) << 2;
+>>> -        b = ((rgb565 >>  0) & 0x1f) << 3;
+>>> +        rgb565 = lduw_le_p(s);
+>>> +#if defined(TARGET_WORDS_BIGENDIAN)
+>>> +        r = (rgb565 >> 8) & 0xf8;
+>>> +        g = (rgb565 >> 3) & 0xfc;
+>>> +        b = (rgb565 << 3) & 0xf8;
+>>> +#else
+>>> +        b = (rgb565 >> 8) & 0xf8;
+>>> +        g = (rgb565 >> 3) & 0xfc;
+>>> +        r = (rgb565 << 3) & 0xf8;
+>>> +#endif
+>>>          *(PIXEL_TYPE *)d = glue(rgb_to_pixel, PIXEL_NAME)(r, g, b);
+>>>          s += 2;
+>>>          d += BPP;
+>>> @@ -80,15 +86,14 @@ static void glue(draw_line32_, PIXEL_NAME)(
+>>>      uint8_t r, g, b;
+>>>
+>>>      do {
+>>> -        ldub_p(s);
+>>>  #if defined(TARGET_WORDS_BIGENDIAN)
+>>> +        r = s[0];
+>>> +        g = s[1];
+>>> +        b = s[2];
+>>> +#else
+>>>          r = s[1];
+>>>          g = s[2];
+>>>          b = s[3];
+>>> -#else
+>>> -        b = s[0];
+>>> -        g = s[1];
+>>> -        r = s[2];
+>>>  #endif
+>>
+>>
+>> This looks really suspicious. Previously we had
+>> TARGET_WORDS_BIGENDIAN -> bytes are XRGB
+>> otherwise                 bytes are BGRX
+>>
+>> Now we have
+>> TARGET_WORDS_BIGENDIAN -> bytes are RGBX
+>> otherwise              -> bytes are XRGB
+>>
+>> That doesn't seem very plausible at all.
+>
+>
+> I've tested it with sh4 and ppc guests running on x86_64 host and these work
+> now while previous code resulted in mixed up colors. Maybe the host
+> endianness could also be a factor and the previous code assumed big endian
+> host or the previous code was already broken and only worked with the
+> default 8 bit depth. I'm not completely sure I understand endian handling in
+> QEMU to know if this is correct besides on what I've tested but at least
+> little endian and big endian guests should work on little endian hosts now
+> with my patch. I can't test on big endian host.
+>
+> I've used this image: https://people.debian.org/~aurel32/qemu/sh4/
+> with video=800x600-16 kernel parameter where changing -16 to different bit
+> depths reproduces the problem.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Again, I don't know sh, and I don't know this particular device.
+I'm just pointing out that the code change here looks really
+implausible. Maybe the data sheet says that this is what the
+pixel format looks like; but it's very odd.
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+>>>          *(PIXEL_TYPE *)d = glue(rgb_to_pixel, PIXEL_NAME)(r, g, b);
+>>>          s += 4;
+>>
+>>
+>>
+>>> @@ -103,7 +108,7 @@ static void glue(draw_hwc_line_,
+>>> PIXEL_NAME)(SM501State *s, int crt,
+>>>                   uint8_t *palette, int c_y, uint8_t *d, int width)
+>>>  {
+>>>      int x, i;
+>>> -    uint8_t *pixval, bitset = 0;
+>>> +    uint8_t *pixval, r, g, b, bitset = 0;
+>>>
+>>>      /* get hardware cursor pattern */
+>>>      uint32_t cursor_addr = get_hwc_address(s, crt);
+>>> @@ -129,9 +134,9 @@ static void glue(draw_hwc_line_,
+>>> PIXEL_NAME)(SM501State *s, int crt,
+>>>          /* write pixel */
+>>>          if (v) {
+>>>              v--;
+>>> -            uint8_t r = palette[v * 3 + 0];
+>>> -            uint8_t g = palette[v * 3 + 1];
+>>> -            uint8_t b = palette[v * 3 + 2];
+>>> +            r = palette[v * 3 + 0];
+>>> +            g = palette[v * 3 + 1];
+>>> +            b = palette[v * 3 + 2];
+>>>              *(PIXEL_TYPE *)d = glue(rgb_to_pixel, PIXEL_NAME)(r, g, b);
+>>>          }
+>>>          d += BPP;
+>>
+>>
+>> This doesn't seem to be related to the rest of this patch?
+>
+>
+> Should I split it off? Making every simple change another patch may double
+> the size of the series but if that's preferred I can make this a separate
+> patch.
 
+The aim is to make it easier to review. Patches which are just
+simple cleanup of code are easy to review because it's
+possible to say "no change of behaviour". Patches which are
+making functional changes require more thought, and it gets
+worse if the same patch is also making no-change-of-behaviour
+code changes.
 
---8XrE3bsq59ggCrSPcXutmVDCglufn47OQ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYsa2vAAoJEKeha0olJ0NqBuYH/3amWEqyruiSZZ758rHrZErv
-v+RvS+pX6ja58a97fBS/AvghLGkTLq4zxze3bN+itgfONAFhR8vuSqHdDTx3PebV
-cJCFfoJe+B0Zg8A828M0U2LfFgO+Y8SzipjeubpwsI+yss1MUK7MpnNDoDJ5OMeJ
-Y5935GxFfGp4ZfjxnX4dVp4sSvwBMvVXX03ujlNPsvdjb97WAcMJwfnfgLYktcqf
-ekMt8A51aA0qKAgsPPEb9bZ3o+1P1rLH977xdftRPnK1DeGR7UNZy/Oe+hK4D6y8
-F8gU/lowIubl0EcZ6etX0KW2Bdesu5oFXx1bXDydfIsbXTlzUlf4f9GTzz2j3g8=
-=rlIy
------END PGP SIGNATURE-----
-
---8XrE3bsq59ggCrSPcXutmVDCglufn47OQ--
+thanks
+-- PMM
