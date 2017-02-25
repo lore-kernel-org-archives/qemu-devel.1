@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1chWlT-0001U5-B4
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 02:27:36 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1chXa0-0001VQ-Ta
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 03:19:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1chWlP-0002sX-CH
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 02:27:35 -0500
-Received: from [45.249.212.188] (port=2938 helo=dggrg02-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1chWlO-0002rB-Im
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 02:27:31 -0500
-References: <1487993530-30875-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1487993530-30875-4-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <58B131BB.5010102@huawei.com>
-Date: Sat, 25 Feb 2017 15:26:51 +0800
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1chXZw-0008Qv-BQ
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 03:19:48 -0500
+Received: from [59.151.112.132] (port=44237 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1chXZv-0008OA-LX
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 03:19:44 -0500
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Date: Sat, 25 Feb 2017 16:26:37 +0800
+Message-ID: <1488011202-32121-4-git-send-email-caoj.fnst@cn.fujitsu.com>
+In-Reply-To: <1488011202-32121-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+References: <1488011202-32121-1-git-send-email-caoj.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <1487993530-30875-4-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] COLO-compare: Optimize
- colo_packet_compare_common
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v10 3/8] hcd-xhci: change behaviour of msix
+ switch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,93 +27,83 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: xuquan8@huawei.com
+Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-On 2017/2/25 11:32, Zhang Chen wrote:
-> Add offset args for colo_packet_compare_common, optimize
-> colo_packet_compare_icmp() and colo_packet_compare_udp()
-> just compare the IP payload.
->
-> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-> ---
->   net/colo-compare.c | 28 +++++++++++++++++++++-------
->   1 file changed, 21 insertions(+), 7 deletions(-)
->
-> diff --git a/net/colo-compare.c b/net/colo-compare.c
-> index e75f0ae..9853232 100644
-> --- a/net/colo-compare.c
-> +++ b/net/colo-compare.c
-> @@ -180,7 +180,7 @@ static int packet_enqueue(CompareState *s, int mode)
->    * return:    0  means packet same
->    *            > 0 || < 0 means packet different
->    */
-> -static int colo_packet_compare_common(Packet *ppkt, Packet *spkt)
-> +static int colo_packet_compare_common(Packet *ppkt, Packet *spkt, int offset)
->   {
->       trace_colo_compare_ip_info(ppkt->size, inet_ntoa(ppkt->ip->ip_src),
->                                  inet_ntoa(ppkt->ip->ip_dst), spkt->size,
-> @@ -188,7 +188,8 @@ static int colo_packet_compare_common(Packet *ppkt, Packet *spkt)
->                                  inet_ntoa(spkt->ip->ip_dst));
->
->       if (ppkt->size == spkt->size) {
+Resolve the TODO, msix=auto means msix on; if user specify msix=on,
+then device creation fail on msix_init failure.
 
-This check is useless, because we have done such checks in every caller.
+CC: Gerd Hoffmann <kraxel@redhat.com>
+CC: Michael S. Tsirkin <mst@redhat.com>
+CC: Markus Armbruster <armbru@redhat.com>
+CC: Marcel Apfelbaum <marcel@redhat.com>
 
-> -        return memcmp(ppkt->data, spkt->data, spkt->size);
-> +        return memcmp(ppkt->data + offset, spkt->data + offset,
-> +                      spkt->size - offset);
->       } else {
->           trace_colo_compare_main("Net packet size are not the same");
->           return -1;
-> @@ -237,8 +238,7 @@ static int colo_packet_compare_tcp(Packet *spkt, Packet *ppkt)
->           spkt->ip->ip_sum = ppkt->ip->ip_sum;
->       }
->
-> -    res = memcmp(ppkt->data + ETH_HLEN, spkt->data + ETH_HLEN,
-> -                (spkt->size - ETH_HLEN));
-> +    res = colo_packet_compare_common(ppkt, spkt, ETH_HLEN);
->
->       if (res != 0 && trace_event_get_state(TRACE_COLO_COMPARE_MISCOMPARE)) {
->           trace_colo_compare_pkt_info_src(inet_ntoa(ppkt->ip->ip_src),
-> @@ -277,7 +277,14 @@ static int colo_packet_compare_udp(Packet *spkt, Packet *ppkt)
->           return -1;
->       }
->
-> -    ret = colo_packet_compare_common(ppkt, spkt);
-> +    /*
-> +     * Because of ppkt and spkt are both in the same connection,
-> +     * The ppkt's src ip, dst ip, src port, dst port, ip_proto all are
-> +     * same with spkt. In addition, IP header's Identification is a random
-> +     * field, we can handle it in IP fragmentation function later.
-> +     * So we just compare the ip payload here.
-> +     */
-> +    ret = colo_packet_compare_common(ppkt, spkt, network_length + ETH_HLEN);
->
->       if (ret) {
->           trace_colo_compare_udp_miscompare("primary pkt size", ppkt->size);
-> @@ -304,7 +311,14 @@ static int colo_packet_compare_icmp(Packet *spkt, Packet *ppkt)
->           return -1;
->       }
->
-> -    if (colo_packet_compare_common(ppkt, spkt)) {
-> +    /*
-> +     * Because of ppkt and spkt are both in the same connection,
-> +     * The ppkt's src ip, dst ip, src port, dst port, ip_proto all are
-> +     * same with spkt. In addition, IP header's Identification is a random
-> +     * field, we can handle it in IP fragmentation function later.
-> +     * So we just compare the ip payload here.
-> +     */
-> +    if (colo_packet_compare_common(ppkt, spkt, network_length + ETH_HLEN)) {
->           trace_colo_compare_icmp_miscompare("primary pkt size",
->                                              ppkt->size);
->           qemu_hexdump((char *)ppkt->data, stderr, "colo-compare",
-> @@ -330,7 +344,7 @@ static int colo_packet_compare_other(Packet *spkt, Packet *ppkt)
->                                  inet_ntoa(ppkt->ip->ip_dst), spkt->size,
->                                  inet_ntoa(spkt->ip->ip_src),
->                                  inet_ntoa(spkt->ip->ip_dst));
-> -    return colo_packet_compare_common(ppkt, spkt);
-> +    return colo_packet_compare_common(ppkt, spkt, 0);
->   }
->
->   static int colo_old_packet_check_one(Packet *pkt, int64_t *check_time)
->
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Acked-by: Marcel Apfelbaum <marcel@redhat.com>
+Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+---
+ hw/usb/hcd-xhci.c | 29 +++++++++++++++++++++--------
+ 1 file changed, 21 insertions(+), 8 deletions(-)
+
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index 28dd2f2c9a97..4551a3758b3e 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -3554,12 +3554,14 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
+     if (xhci->numintrs < 1) {
+         xhci->numintrs = 1;
+     }
++
+     if (xhci->numslots > MAXSLOTS) {
+         xhci->numslots = MAXSLOTS;
+     }
+     if (xhci->numslots < 1) {
+         xhci->numslots = 1;
+     }
++
+     if (xhci_get_flag(xhci, XHCI_FLAG_ENABLE_STREAMS)) {
+         xhci->max_pstreams_mask = 7; /* == 256 primary streams */
+     } else {
+@@ -3587,6 +3589,25 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
+     xhci->mfwrap_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, xhci_mfwrap_timer, xhci);
+ 
+     memory_region_init(&xhci->mem, OBJECT(xhci), "xhci", LEN_REGS);
++    if (xhci->msix != ON_OFF_AUTO_OFF) {
++        ret = msix_init(dev, xhci->numintrs,
++                        &xhci->mem, 0, OFF_MSIX_TABLE,
++                        &xhci->mem, 0, OFF_MSIX_PBA,
++                        0x90, &err);
++        if (ret && xhci->msix == ON_OFF_AUTO_ON) {
++            /* Can't satisfy user's explicit msix=on request, fail */
++            error_append_hint(&err, "You have to use msix=auto (default) or "
++                    "msix=off with this machine type.\n");
++            /* No instance_finalize method, need to free the resource here */
++            object_unref(OBJECT(&xhci->mem));
++            error_propagate(errp, err);
++            return;
++        }
++        assert(!err || xhci->msix == ON_OFF_AUTO_AUTO);
++        /* With msix=auto, we fall back to MSI off silently */
++        error_free(err);
++    }
++
+     memory_region_init_io(&xhci->mem_cap, OBJECT(xhci), &xhci_cap_ops, xhci,
+                           "capabilities", LEN_CAP);
+     memory_region_init_io(&xhci->mem_oper, OBJECT(xhci), &xhci_oper_ops, xhci,
+@@ -3619,14 +3640,6 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
+         ret = pcie_endpoint_cap_init(dev, 0xa0);
+         assert(ret >= 0);
+     }
+-
+-    if (xhci->msix != ON_OFF_AUTO_OFF) {
+-        /* TODO check for errors, and should fail when msix=on */
+-        msix_init(dev, xhci->numintrs,
+-                  &xhci->mem, 0, OFF_MSIX_TABLE,
+-                  &xhci->mem, 0, OFF_MSIX_PBA,
+-                  0x90, NULL);
+-    }
+ }
+ 
+ static void usb_xhci_exit(PCIDevice *dev)
+-- 
+2.1.0
