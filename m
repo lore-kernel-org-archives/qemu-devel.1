@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1chmkY-0001Dy-GF
+	(envelope-from <balaton@eik.bme.hu>) id 1chmkY-0001Dq-CD
 	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 19:31:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1chmkV-0005v5-CE
+	(envelope-from <balaton@eik.bme.hu>) id 1chmkV-0005uz-BM
 	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 19:31:42 -0500
-Message-Id: <7c6e8c071cbd47d6d9065635e97dd88a7197b5be.1488068248.git.balaton@eik.bme.hu>
+Message-Id: <c554a16417ef22dbc29919a2747801be5ed7fede.1488068248.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1488068248.git.balaton@eik.bme.hu>
 References: <cover.1488068248.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
-Date: Sat, 25 Feb 2017 19:23:50 +0100
-Subject: [Qemu-devel] [PATCH v2 04/14] sm501: Get rid of base address in
- draw_hwc_line
+Date: Sat, 25 Feb 2017 19:31:24 +0100
+Subject: [Qemu-devel] [PATCH v2 05/14] sm501: Add emulation of chip
+ connected via PCI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,79 +23,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 Cc: Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-Do not use the base address to access data in local memory. This is in
-preparation to allow chip connected via PCI where base address depends
-on where the BAR is mapped so it will be unknown.
+Only the display controller part is created automatically on PCI
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 ---
- hw/display/sm501.c          | 6 ++----
- hw/display/sm501_template.h | 8 ++++----
- 2 files changed, 6 insertions(+), 8 deletions(-)
+
+v2: Split off removing dependency on base address to separate patch
+
+ hw/display/sm501.c | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 52 insertions(+)
 
 diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index 22cac97..1cda127 100644
+index 1cda127..d9219bd 100644
 --- a/hw/display/sm501.c
 +++ b/hw/display/sm501.c
-@@ -460,7 +460,6 @@ typedef struct SM501State {
-     QemuConsole *con;
- 
-     /* status & internal resources */
--    hwaddr base;
-     uint32_t local_mem_size_index;
-     uint8_t *local_mem;
-     MemoryRegion local_mem_region;
-@@ -1400,10 +1399,9 @@ static const GraphicHwOps sm501_ops = {
-     .gfx_update  = sm501_update_display,
+@@ -31,6 +31,7 @@
+ #include "ui/console.h"
+ #include "hw/devices.h"
+ #include "hw/sysbus.h"
++#include "hw/pci/pci.h"
+ #include "qemu/range.h"
+ #include "ui/pixel_ops.h"
+ #include "exec/address-spaces.h"
+@@ -1507,9 +1508,60 @@ static const TypeInfo sm501_sysbus_info = {
+     .class_init    = sm501_sysbus_class_init,
  };
  
--static void sm501_init(SM501State *s, DeviceState *dev, uint32_t base,
-+static void sm501_init(SM501State *s, DeviceState *dev,
-                        uint32_t local_mem_bytes)
++#define TYPE_PCI_SM501 "sm501"
++#define PCI_SM501(obj) OBJECT_CHECK(SM501PCIState, (obj), TYPE_PCI_SM501)
++
++typedef struct {
++    /*< private >*/
++    PCIDevice parent_obj;
++    /*< public >*/
++    SM501State state;
++    uint32_t vram_size;
++} SM501PCIState;
++
++static void sm501_realize_pci(PCIDevice *dev, Error **errp)
++{
++    SM501PCIState *s = PCI_SM501(dev);
++
++    sm501_init(&s->state, DEVICE(dev), s->vram_size);
++    pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY,
++                     &s->state.local_mem_region);
++    pci_register_bar(dev, 1, PCI_BASE_ADDRESS_SPACE_MEMORY,
++                     &s->state.mmio_region);
++}
++
++static Property sm501_pci_properties[] = {
++    DEFINE_PROP_UINT32("vram-size", SM501PCIState, vram_size,
++                       64 * 1024 * 1024),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void sm501_pci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
++
++    k->realize = sm501_realize_pci;
++    k->vendor_id = 0x126f;
++    k->device_id = 0x0501;
++    k->class_id = PCI_CLASS_DISPLAY_OTHER;
++    set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
++    dc->desc = "SM501 Display Controller";
++    dc->props = sm501_pci_properties;
++    dc->hotpluggable = false;
++}
++
++static const TypeInfo sm501_pci_info = {
++    .name          = TYPE_PCI_SM501,
++    .parent        = TYPE_PCI_DEVICE,
++    .instance_size = sizeof(SM501PCIState),
++    .class_init    = sm501_pci_class_init,
++};
++
+ static void sm501_register_types(void)
  {
--    s->base = base;
-     s->local_mem_size_index = get_local_mem_size_index(local_mem_bytes);
-     SM501_DPRINTF("sm501 local mem size=%x. index=%d\n", get_local_mem_size(s),
-                   s->local_mem_size_index);
-@@ -1461,7 +1459,7 @@ static void sm501_realize_sysbus(DeviceState *dev, Error **errp)
-     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-     DeviceState *usb_dev;
+     type_register_static(&sm501_sysbus_info);
++    type_register_static(&sm501_pci_info);
+ }
  
--    sm501_init(&s->state, dev, s->base, s->vram_size);
-+    sm501_init(&s->state, dev, s->vram_size);
-     sysbus_init_mmio(sbd, &s->state.local_mem_region);
-     sysbus_init_mmio(sbd, &s->state.mmio_region);
- 
-diff --git a/hw/display/sm501_template.h b/hw/display/sm501_template.h
-index 16e500b..832ee61 100644
---- a/hw/display/sm501_template.h
-+++ b/hw/display/sm501_template.h
-@@ -103,13 +103,13 @@ static void glue(draw_hwc_line_, PIXEL_NAME)(SM501State *s, int crt,
-                  uint8_t *palette, int c_y, uint8_t *d, int width)
- {
-     int x, i;
--    uint8_t bitset = 0;
-+    uint8_t *pixval, bitset = 0;
- 
-     /* get hardware cursor pattern */
-     uint32_t cursor_addr = get_hwc_address(s, crt);
-     assert(0 <= c_y && c_y < SM501_HWC_HEIGHT);
-     cursor_addr += SM501_HWC_WIDTH * c_y / 4;  /* 4 pixels per byte */
--    cursor_addr += s->base;
-+    pixval = s->local_mem + cursor_addr;
- 
-     /* get cursor position */
-     x = get_hwc_x(s, crt);
-@@ -120,8 +120,8 @@ static void glue(draw_hwc_line_, PIXEL_NAME)(SM501State *s, int crt,
- 
-         /* get pixel value */
-         if (i % 4 == 0) {
--            bitset = ldub_phys(&address_space_memory, cursor_addr);
--            cursor_addr++;
-+            bitset = ldub_p(pixval);
-+            pixval++;
-         }
-         v = bitset & 3;
-         bitset >>= 2;
+ type_init(sm501_register_types)
 -- 
 2.7.4
