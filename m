@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mmarek@suse.cz>) id 1chlvS-00080Y-CX
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 18:38:55 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1chmkY-0001Dl-Bo
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 19:31:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mmarek@suse.cz>) id 1chlvP-0005V1-8X
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 18:38:54 -0500
-Received: from mx2.suse.de ([195.135.220.15]:59177)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mmarek@suse.cz>) id 1chlvO-0005Td-Vm
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 18:38:51 -0500
-From: Michal Marek <mmarek@suse.com>
-Date: Sun, 26 Feb 2017 00:38:45 +0100
-Message-Id: <20170225233845.25828-1-mmarek@suse.com>
-In-Reply-To: <20170225231653.14942-1-mmarek@suse.com>
-References: <20170225231653.14942-1-mmarek@suse.com>
-Subject: [Qemu-devel] [PATCH v3] target-s390x: Implement stfl and stfle
+	(envelope-from <balaton@eik.bme.hu>) id 1chmkW-0005we-MJ
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 19:31:42 -0500
+Message-Id: <db1b69270ca4d2335e6fb2455ee56552373757fc.1488068248.git.balaton@eik.bme.hu>
+In-Reply-To: <cover.1488068248.git.balaton@eik.bme.hu>
+References: <cover.1488068248.git.balaton@eik.bme.hu>
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Date: Sat, 25 Feb 2017 22:47:26 +0100
+Subject: [Qemu-devel] [PATCH v2 12/14] sm501: Implement reading 2D engine
+ registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,175 +20,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
-Cc: qemu-devel@nongnu.org, Miroslav Benes <mbenes@suse.cz>, Eric Bischoff <ebischoff@suse.com>
+To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-The implementation is partially cargo cult based, but it works for the
-linux kernel use case.
+Clients normally only write to these registers, nothing is known to
+ever read them but they are documented as read/write so allow clients
+to also read the values.
 
-Signed-off-by: Michal Marek <mmarek@suse.com>
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 ---
-v3:
- - Initialize the buffer in do_stfle()
-v2:
- - STFLE is not a privileged instruction, go through the MMU to store the
-   result
- - annotate the stfl helper with TCG_CALL_NO_RWG
- - Use a large enough buffer to hold the feature bitmap
- - Fix coding style of the stfle helper
----
- target/s390x/cpu_features.c |  6 ++++--
- target/s390x/cpu_features.h |  2 +-
- target/s390x/helper.h       |  2 ++
- target/s390x/insn-data.def  |  2 ++
- target/s390x/misc_helper.c  | 36 ++++++++++++++++++++++++++++++++++++
- target/s390x/translate.c    | 17 +++++++++--------
- 6 files changed, 54 insertions(+), 11 deletions(-)
+ hw/display/sm501.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
 
-diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-index 42fd9d792bc8..d77c560380c4 100644
---- a/target/s390x/cpu_features.c
-+++ b/target/s390x/cpu_features.c
-@@ -286,11 +286,11 @@ void s390_init_feat_bitmap(const S390FeatInit init, S390FeatBitmap bitmap)
-     }
- }
+diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+index af5e4db..32223f6 100644
+--- a/hw/display/sm501.c
++++ b/hw/display/sm501.c
+@@ -1149,9 +1149,66 @@ static uint64_t sm501_2d_engine_read(void *opaque, hwaddr addr,
+     SM501_DPRINTF("sm501 2d engine regs : read addr=%x\n", (int)addr);
  
--void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
-+int s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
-                           uint8_t *data)
- {
-     S390Feat feat;
--    int bit_nr;
-+    int bit_nr, res = 0;
- 
-     if (type == S390_FEAT_TYPE_STFL && test_bit(S390_FEAT_ZARCH, features)) {
-         /* z/Architecture is always active if around */
-@@ -303,9 +303,11 @@ void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
-             bit_nr = s390_features[feat].bit;
-             /* big endian on uint8_t array */
-             data[bit_nr / 8] |= 0x80 >> (bit_nr % 8);
-+            res = MAX(res, bit_nr / 8 + 1);
-         }
-         feat = find_next_bit(features, S390_FEAT_MAX, feat + 1);
-     }
-+    return res;
- }
- 
- void s390_add_from_feat_block(S390FeatBitmap features, S390FeatType type,
-diff --git a/target/s390x/cpu_features.h b/target/s390x/cpu_features.h
-index d66912178680..e3c41be08060 100644
---- a/target/s390x/cpu_features.h
-+++ b/target/s390x/cpu_features.h
-@@ -56,7 +56,7 @@ typedef uint64_t S390FeatInit[S390_FEAT_MAX / 64 + 1];
- const S390FeatDef *s390_feat_def(S390Feat feat);
- S390Feat s390_feat_by_type_and_bit(S390FeatType type, int bit);
- void s390_init_feat_bitmap(const S390FeatInit init, S390FeatBitmap bitmap);
--void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
-+int s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
-                           uint8_t *data);
- void s390_add_from_feat_block(S390FeatBitmap features, S390FeatType type,
-                           uint8_t *data);
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 9102071d0aa4..fa4a617cd1ab 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -95,6 +95,8 @@ DEF_HELPER_FLAGS_1(stckc, TCG_CALL_NO_RWG, i64, env)
- DEF_HELPER_FLAGS_2(spt, TCG_CALL_NO_RWG, void, env, i64)
- DEF_HELPER_FLAGS_1(stpt, TCG_CALL_NO_RWG, i64, env)
- DEF_HELPER_4(stsi, i32, env, i64, i64, i64)
-+DEF_HELPER_FLAGS_1(stfl, TCG_CALL_NO_RWG, void, env)
-+DEF_HELPER_3(stfle, i64, env, i64, i64)
- DEF_HELPER_FLAGS_4(lctl, TCG_CALL_NO_WG, void, env, i32, i64, i32)
- DEF_HELPER_FLAGS_4(lctlg, TCG_CALL_NO_WG, void, env, i32, i64, i32)
- DEF_HELPER_FLAGS_4(stctl, TCG_CALL_NO_WG, void, env, i32, i64, i32)
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 075ff597c3de..be830a42ed8d 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -899,6 +899,8 @@
-     C(0xb202, STIDP,   S,     Z,   la2, 0, new, m1_64, stidp, 0)
- /* STORE CPU TIMER */
-     C(0xb209, STPT,    S,     Z,   la2, 0, new, m1_64, stpt, 0)
-+/* STORE FACILITY LIST EXTENDED */
-+    C(0xb2b0, STFLE,   S,  SFLE,   0, a2, 0, 0, stfle, 0)
- /* STORE FACILITY LIST */
-     C(0xb2b1, STFL,    S,     Z,   0, 0, 0, 0, stfl, 0)
- /* STORE PREFIX */
-diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-index c9604ea9c728..b51454ea7861 100644
---- a/target/s390x/misc_helper.c
-+++ b/target/s390x/misc_helper.c
-@@ -500,6 +500,42 @@ uint32_t HELPER(stsi)(CPUS390XState *env, uint64_t a0,
-     return cc;
- }
- 
-+static int do_stfle(CPUS390XState *env, uint64_t addr, int len)
-+{
-+    S390CPU *cpu = s390_env_get_cpu(env);
-+    /* 256 doublewords as per STFLE documentation */
-+    uint8_t data[256 * 8] = { 0 };
-+    int i, res;
-+
-+    memset(data, 0, sizeof(data));
-+    res = s390_fill_feat_block(cpu->model->features, S390_FEAT_TYPE_STFL, data);
-+    for (i = 0; i < MIN(res, len); i++) {
-+        cpu_stb_data(env, addr + i, data[i]);
-+    }
-+
-+    return res;
-+}
-+
-+uint64_t HELPER(stfle)(CPUS390XState *env, uint64_t a0, uint64_t r0)
-+{
-+    int need, len = r0 & 0xff;
-+
-+    need = do_stfle(env, a0, len * 8);
-+    need = DIV_ROUND_UP(need, 8);
-+    if (need <= len) {
-+        env->cc_op = 0;
-+    } else {
-+        env->cc_op = 3;
-+    }
-+
-+    return (r0 & ~0xffLL) | (need - 1);
-+}
-+
-+void HELPER(stfl)(CPUS390XState *env)
-+{
-+    do_stfle(env, 200, 4);
-+}
-+
- uint32_t HELPER(sigp)(CPUS390XState *env, uint64_t order_code, uint32_t r1,
-                       uint64_t cpu_addr)
- {
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 01c62176bf70..3a569d3cc0ad 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -3628,15 +3628,16 @@ static ExitStatus op_spt(DisasContext *s, DisasOps *o)
- 
- static ExitStatus op_stfl(DisasContext *s, DisasOps *o)
- {
--    TCGv_i64 f, a;
--    /* We really ought to have more complete indication of facilities
--       that we implement.  Address this when STFLE is implemented.  */
-     check_privileged(s);
--    f = tcg_const_i64(0xc0000000);
--    a = tcg_const_i64(200);
--    tcg_gen_qemu_st32(f, a, get_mem_index(s));
--    tcg_temp_free_i64(f);
--    tcg_temp_free_i64(a);
-+    gen_helper_stfl(cpu_env);
-+    return NO_EXIT;
-+}
-+
-+static ExitStatus op_stfle(DisasContext *s, DisasOps *o)
-+{
-+    potential_page_fault(s);
-+    gen_helper_stfle(regs[0], cpu_env, o->in2, regs[0]);
-+    set_cc_static(s);
-     return NO_EXIT;
- }
- 
+     switch (addr) {
++    case SM501_2D_SOURCE:
++        ret = s->twoD_source;
++        break;
++    case SM501_2D_DESTINATION:
++        ret = s->twoD_destination;
++        break;
++    case SM501_2D_DIMENSION:
++        ret = s->twoD_dimension;
++        break;
++    case SM501_2D_CONTROL:
++        ret = s->twoD_control;
++        break;
++    case SM501_2D_PITCH:
++        ret = s->twoD_pitch;
++        break;
++    case SM501_2D_FOREGROUND:
++        ret = s->twoD_foreground;
++        break;
++    case SM501_2D_BACKGROUND:
++        ret = s->twoD_background;
++        break;
++    case SM501_2D_STRETCH:
++        ret = s->twoD_stretch;
++        break;
++    case SM501_2D_COLOR_COMPARE:
++        ret = s->twoD_color_compare;
++        break;
++    case SM501_2D_COLOR_COMPARE_MASK:
++        ret = s->twoD_color_compare_mask;
++        break;
++    case SM501_2D_MASK:
++        ret = s->twoD_mask;
++        break;
++    case SM501_2D_CLIP_TL:
++        ret = s->twoD_clip_tl;
++        break;
++    case SM501_2D_CLIP_BR:
++        ret = s->twoD_clip_br;
++        break;
++    case SM501_2D_MONO_PATTERN_LOW:
++        ret = s->twoD_mono_pattern_low;
++        break;
++    case SM501_2D_MONO_PATTERN_HIGH:
++        ret = s->twoD_mono_pattern_high;
++        break;
++    case SM501_2D_WINDOW_WIDTH:
++        ret = s->twoD_window_width;
++        break;
+     case SM501_2D_SOURCE_BASE:
+         ret = s->twoD_source_base;
+         break;
++    case SM501_2D_DESTINATION_BASE:
++        ret = s->twoD_destination_base;
++        break;
++    case SM501_2D_ALPHA:
++        ret = s->twoD_alpha;
++        break;
++    case SM501_2D_WRAP:
++        ret = s->twoD_wrap;
++        break;
+     case SM501_2D_STATUS:
+         ret = 0; /* Should return interrupt status */
+         break;
 -- 
-2.10.2
+2.7.4
