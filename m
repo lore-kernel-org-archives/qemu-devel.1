@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1chfpJ-0006ZH-N3
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 12:08:12 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1chfpL-0006Zx-VT
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 12:08:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1chfpF-0001UI-SV
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 12:08:09 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:36751 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1chfpF-0001Up-Uu
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 12:08:11 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:23089 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1chfpF-0001RI-GN
+	id 1chfpF-0001RM-Ib
 	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 12:08:05 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Sat, 25 Feb 2017 20:07:53 +0300
-Message-Id: <20170225170758.427066-18-vsementsov@virtuozzo.com>
+Date: Sat, 25 Feb 2017 20:07:55 +0300
+Message-Id: <20170225170758.427066-20-vsementsov@virtuozzo.com>
 In-Reply-To: <20170225170758.427066-1-vsementsov@virtuozzo.com>
 References: <20170225170758.427066-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v16 17/22] qmp: add autoload parameter to
- block-dirty-bitmap-add
+Subject: [Qemu-devel] [PATCH v16 19/22] iotests: test qcow2 persistent dirty
+ bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,89 +28,134 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-Optional. Default is false.
-
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Denis V. Lunev <den@openvz.org>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- blockdev.c           | 18 ++++++++++++++++--
- qapi/block-core.json |  6 +++++-
- 2 files changed, 21 insertions(+), 3 deletions(-)
+ tests/qemu-iotests/165     | 89 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/165.out |  5 +++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 95 insertions(+)
+ create mode 100755 tests/qemu-iotests/165
+ create mode 100644 tests/qemu-iotests/165.out
 
-diff --git a/blockdev.c b/blockdev.c
-index 40605faccc..e32ac69e4b 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1968,6 +1968,7 @@ static void block_dirty_bitmap_add_prepare(BlkActionState *common,
-     qmp_block_dirty_bitmap_add(action->node, action->name,
-                                action->has_granularity, action->granularity,
-                                action->has_persistent, action->persistent,
-+                               action->has_autoload, action->autoload,
-                                &local_err);
- 
-     if (!local_err) {
-@@ -2698,6 +2699,7 @@ out:
- void qmp_block_dirty_bitmap_add(const char *node, const char *name,
-                                 bool has_granularity, uint32_t granularity,
-                                 bool has_persistent, bool persistent,
-+                                bool has_autoload, bool autoload,
-                                 Error **errp)
- {
-     AioContext *aio_context;
-@@ -2731,6 +2733,15 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
-     if (!has_persistent) {
-         persistent = false;
-     }
-+    if (!has_autoload) {
-+        autoload = false;
-+    }
-+
-+    if (has_autoload && !persistent) {
-+        error_setg(errp, "Autoload flag must be used only for persistent "
-+                         "bitmaps");
-+        goto out;
-+    }
- 
-     if (persistent &&
-         !bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp))
-@@ -2739,10 +2750,13 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
-     }
- 
-     bitmap = bdrv_create_dirty_bitmap(bs, granularity, name, errp);
--    if (bitmap != NULL) {
--        bdrv_dirty_bitmap_set_persistance(bitmap, persistent);
-+    if (bitmap == NULL) {
-+        goto out;
-     }
- 
-+    bdrv_dirty_bitmap_set_persistance(bitmap, persistent);
-+    bdrv_dirty_bitmap_set_autoload(bitmap, autoload);
-+
-  out:
-     aio_context_release(aio_context);
- }
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 535df20212..09dcf4e6ae 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1564,11 +1564,15 @@
- #              Qcow2 disks support persistent bitmaps. Default is false.
- #              (Since 2.9)
- #
-+# @autoload: #optional the bitmap will be automatically loaded when the image
-+#            it is stored in is opened. This flag may only be specified for
-+#            persistent bitmaps. Default is false. (Since 2.9)
+diff --git a/tests/qemu-iotests/165 b/tests/qemu-iotests/165
+new file mode 100755
+index 0000000000..d583b33733
+--- /dev/null
++++ b/tests/qemu-iotests/165
+@@ -0,0 +1,89 @@
++#!/usr/bin/env python
 +#
- # Since: 2.4
- ##
- { 'struct': 'BlockDirtyBitmapAdd',
-   'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32',
--            '*persistent': 'bool' } }
-+            '*persistent': 'bool', '*autoload': 'bool' } }
- 
- ##
- # @block-dirty-bitmap-add:
++# Tests for persistent dirty bitmaps.
++#
++# Copyright: Vladimir Sementsov-Ogievskiy 2015-2017
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++import os
++import iotests
++from iotests import qemu_img
++
++disk = os.path.join(iotests.test_dir, 'disk')
++disk_size = 0x40000000 # 1G
++
++# regions for qemu_io: (start, count) in bytes
++regions1 = ((0,        0x100000),
++            (0x200000, 0x100000))
++
++regions2 = ((0x10000000, 0x20000),
++            (0x3fff0000, 0x10000))
++
++class TestPersistentDirtyBitmap(iotests.QMPTestCase):
++
++    def setUp(self):
++        qemu_img('create', '-f', iotests.imgfmt, disk, str(disk_size))
++
++    def tearDown(self):
++        os.remove(disk)
++
++    def mkVm(self):
++        return iotests.VM().add_drive(disk)
++
++    def getSha256(self):
++        result = self.vm.qmp('x-debug-block-dirty-bitmap-sha256',
++                             node='drive0', name='bitmap0')
++        return result['return']['sha256']
++
++    def checkBitmap(self, sha256):
++        result = self.vm.qmp('x-debug-block-dirty-bitmap-sha256',
++                             node='drive0', name='bitmap0')
++        self.assert_qmp(result, 'return/sha256', sha256);
++
++    def writeRegions(self, regions):
++        for r in regions:
++            self.vm.hmp_qemu_io('drive0',
++                                'write %d %d' % r)
++
++    def qmpAddBitmap(self):
++        self.vm.qmp('block-dirty-bitmap-add', node='drive0',
++                    name='bitmap0', persistent=True, autoload=True)
++
++    def test_persistent(self):
++        self.vm = self.mkVm()
++        self.vm.launch()
++        self.qmpAddBitmap()
++
++        self.writeRegions(regions1)
++        sha256 = self.getSha256()
++
++        self.vm.shutdown()
++        self.vm = self.mkVm()
++        self.vm.launch()
++
++        self.checkBitmap(sha256)
++        self.writeRegions(regions2)
++        sha256 = self.getSha256()
++
++        self.vm.shutdown()
++        self.vm.launch()
++
++        self.checkBitmap(sha256)
++
++        self.vm.shutdown()
++
++if __name__ == '__main__':
++    iotests.main(supported_fmts=['qcow2'])
+diff --git a/tests/qemu-iotests/165.out b/tests/qemu-iotests/165.out
+new file mode 100644
+index 0000000000..ae1213e6f8
+--- /dev/null
++++ b/tests/qemu-iotests/165.out
+@@ -0,0 +1,5 @@
++.
++----------------------------------------------------------------------
++Ran 1 tests
++
++OK
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 866c1a032d..8bd7a84f5a 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -162,6 +162,7 @@
+ 159 rw auto quick
+ 160 rw auto quick
+ 162 auto quick
++165 rw auto quick
+ 170 rw auto quick
+ 171 rw auto quick
+ 172 auto
 -- 
 2.11.1
