@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1chVgk-0006ek-1Z
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 01:18:39 -0500
+	(envelope-from <armbru@redhat.com>) id 1chVqr-0003Lb-33
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 01:29:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1chVgf-0002gY-39
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 01:18:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56530)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1chVge-0002gK-Qn
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 01:18:33 -0500
-References: <20170223122025.10420-1-cornelia.huck@de.ibm.com>
-	<20170223122025.10420-4-cornelia.huck@de.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <4fe97bb7-d6f0-7b58-916f-94dc0ae81616@redhat.com>
-Date: Sat, 25 Feb 2017 07:18:29 +0100
+	(envelope-from <armbru@redhat.com>) id 1chVqq-0004Xw-0S
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 01:29:05 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1487710908-26356-1-git-send-email-armbru@redhat.com>
+	<1487710908-26356-3-git-send-email-armbru@redhat.com>
+	<5f90e39c-e4ea-8638-d057-25eff232ad3d@redhat.com>
+	<878toxmeol.fsf@dusky.pond.sub.org>
+	<877f4g2f6m.fsf@dusky.pond.sub.org>
+	<c00ea08f-f596-6e3e-4084-7f183c92a04d@redhat.com>
+	<87h93j2ytj.fsf@dusky.pond.sub.org>
+	<86ea8b80-f2ae-088f-ae2d-cf529d2db02b@redhat.com>
+	<87r32nxrzm.fsf@dusky.pond.sub.org>
+	<420c2df1-5bb9-29dc-ed0f-707e8985b4f3@redhat.com>
+	<7030cab7-202d-15bc-dcdc-2710c7ebb4eb@redhat.com>
+Date: Sat, 25 Feb 2017 07:28:54 +0100
+In-Reply-To: <7030cab7-202d-15bc-dcdc-2710c7ebb4eb@redhat.com> (Eric Blake's
+	message of "Fri, 24 Feb 2017 15:27:46 -0600")
+Message-ID: <87d1e6vl5l.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170223122025.10420-4-cornelia.huck@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] s390x/ipl: Load network boot image
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH RFC v3 2/5] keyval: New keyval_parse()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,196 +32,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, jfrei@linux.vnet.ibm.com, Farhan Ali <alifm@linux.vnet.ibm.com>, agraf@suse.de
+To: Eric Blake <eblake@redhat.com>
+Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On 23.02.2017 13:20, Cornelia Huck wrote:
-> From: Farhan Ali <alifm@linux.vnet.ibm.com>
-> 
-> Load the network boot image into guest RAM when the boot
-> device selected is a network device. Use some of the reserved
-> space in IplBlockCcw to store the start address of the netboot
-> image.
-> 
-> A user could also use 'chreipl'(diag 308/5) to change the boot device.
-> So every time we update the IPLB, we need to verify if the selected
-> boot device is a network device so we can appropriately load the
-> network boot image.
-> 
-> Signed-off-by: Farhan Ali <alifm@linux.vnet.ibm.com>
-> Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
-> ---
->  hw/s390x/ipl.c | 89 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  hw/s390x/ipl.h |  4 ++-
->  2 files changed, 92 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index fd656718a7..195cac559f 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -20,6 +20,7 @@
->  #include "hw/s390x/virtio-ccw.h"
->  #include "hw/s390x/css.h"
->  #include "ipl.h"
-> +#include "qemu/error-report.h"
->  
->  #define KERN_IMAGE_START                0x010000UL
->  #define KERN_PARM_AREA                  0x010480UL
-> @@ -227,6 +228,12 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl)
->                  TYPE_VIRTIO_CCW_DEVICE);
->          SCSIDevice *sd = (SCSIDevice *) object_dynamic_cast(OBJECT(dev_st),
->                                                              TYPE_SCSI_DEVICE);
-> +        VirtIONet *vn = (VirtIONet *) object_dynamic_cast(OBJECT(dev_st),
-> +                                                          TYPE_VIRTIO_NET);
-> +
-> +        if (vn) {
-> +            ipl->netboot = true;
-> +        }
->          if (virtio_ccw_dev) {
->              CcwDevice *ccw_dev = CCW_DEVICE(virtio_ccw_dev);
->  
-> @@ -259,12 +266,86 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl)
->      return false;
->  }
->  
-> +static int load_netboot_image(Error **errp)
-> +{
-> +    S390IPLState *ipl = get_ipl_device();
-> +    char *netboot_filename;
-> +    MemoryRegion *sysmem =  get_system_memory();
-> +    MemoryRegion *mr = NULL;
-> +    void *ram_ptr = NULL;
-> +    int img_size = -1;
-> +
-> +    mr = memory_region_find(sysmem, 0, 1).mr;
-> +    if (!mr) {
-> +        error_setg(errp, "Failed to find memory region at address 0");
-> +        return -1;
-> +    }
-> +
-> +    ram_ptr = memory_region_get_ram_ptr(mr);
-> +    if (!ram_ptr) {
-> +        error_setg(errp, "No RAM found");
-> +        goto unref_mr;
-> +    }
-> +
-> +    netboot_filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, ipl->netboot_fw);
-> +    if (netboot_filename == NULL) {
-> +        error_setg(errp, "Could not find network bootloader");
-> +        goto unref_mr;
-> +    }
-> +
-> +    img_size = load_elf_ram(netboot_filename, NULL, NULL, &ipl->start_addr,
-> +                            NULL, NULL, 1, EM_S390, 0, 0, NULL, false);
-> +
-> +    if (img_size < 0) {
-> +        img_size = load_image_size(netboot_filename, ram_ptr, ram_size);
-> +        ipl->start_addr = KERN_IMAGE_START;
-> +    }
-> +
-> +    if (img_size < 0) {
-> +        error_setg(errp, "Failed to load network bootloader");
-> +    }
-> +
-> +    g_free(netboot_filename);
-> +
-> +unref_mr:
-> +    memory_region_unref(mr);
-> +    return img_size;
-> +}
-> +
-> +static bool is_virtio_net_device(IplParameterBlock *iplb)
-> +{
-> +    uint8_t cssid;
-> +    uint8_t ssid;
-> +    uint16_t devno;
-> +    uint16_t schid;
-> +    SubchDev *sch = NULL;
-> +
-> +    if (iplb->pbt != S390_IPL_TYPE_CCW) {
-> +        return false;
-> +    }
-> +
-> +    devno = be16_to_cpu(iplb->ccw.devno);
-> +    ssid = iplb->ccw.ssid & 3;
-> +
-> +    for (schid = 0; schid < MAX_SCHID; schid++) {
-> +        for (cssid = 0; cssid < MAX_CSSID; cssid++) {
-> +            sch = css_find_subch(1, cssid, ssid, schid);
-> +
-> +            if (sch && sch->devno == devno) {
-> +                return sch->id.cu_model == VIRTIO_ID_NET;
-> +            }
-> +        }
-> +    }
-> +   return false;
+Eric Blake <eblake@redhat.com> writes:
 
-The above line has only 3 instead of 4 spaces. I wonder why checkpatch
-does not complain here...?
+> On 02/24/2017 03:06 PM, Eric Blake wrote:
+>
+>> On 02/24/2017 02:18 PM, Markus Armbruster wrote:
+>>>> I have a preference for option 1 in the long run, but as it seems to be
+>>>> upwards compatible from option 2 for -blockdev in 2.9, I'm leaning
+>>>> towards option 2 for this release.
+>>> 
+>>> Let me rename the options:
+>>> 
+>>> * "no sugar -blockdev": both "FOO" and "noFOO" are rejected.
+>>> 
+>>> * "positive sugar blockdev": "FOO" is desugared to "FOO=on", "noFOO" to
+>>>   "noFOO=on".
+>>> 
+>>> Which one do you prefer for 2.9?
+>>
+>> My current leanings:
+>>
+>> For 2.9: keyval_parse() should have no sugar.  Both "FOO" and "noFOO"
+>> are rejected; an '=' must be present except for an implicit key -
+>> although if -blockdev is the only client of keyval_parse(), then it's a
+>> tossup whether we want to use it with an implicit key.
 
-> +}
-> +
->  void s390_ipl_update_diag308(IplParameterBlock *iplb)
->  {
->      S390IPLState *ipl = get_ipl_device();
->  
->      ipl->iplb = *iplb;
->      ipl->iplb_valid = true;
-> +    ipl->netboot = is_virtio_net_device(iplb);
->  }
->  
->  IplParameterBlock *s390_ipl_get_iplb(void)
-> @@ -288,6 +369,7 @@ void s390_reipl_request(void)
->  void s390_ipl_prepare_cpu(S390CPU *cpu)
->  {
->      S390IPLState *ipl = get_ipl_device();
-> +    Error *err = NULL;
->  
->      cpu->env.psw.addr = ipl->start_addr;
->      cpu->env.psw.mask = IPL_PSW_MASK;
-> @@ -298,6 +380,13 @@ void s390_ipl_prepare_cpu(S390CPU *cpu)
->              ipl->iplb_valid = s390_gen_initial_iplb(ipl);
->          }
->      }
-> +    if (ipl->netboot) {
-> +        if (load_netboot_image(&err) < 0) {
-> +            error_report_err(err);
-> +            vm_stop(RUN_STATE_INTERNAL_ERROR);
-> +        }
-> +        ipl->iplb.ccw.netboot_start_addr = ipl->start_addr;
+I agree on not doing implicit values for 2.9.  We have some thinking to
+do on "noFOO", and having keyval_parse() support just "FOO" now could
+backfire, as explained upthread.
 
-Not sure whether it matters, but in case of early errors during
-load_netboot_image(), ipl->start_addr could be used uninitialized here.
-Maybe you should move the "ipl->start_addr = KERN_IMAGE_START;" there at
-the beginning of the function, to make it also the default value for the
-other error cases?
+Regarding implicit keys: I think we can just as well have them.  We're
+not going to get rid of existing implicit keys.  Since keyval_parse()
+has the code for supporting them already, we can just as well keep it.
 
-> +    }
->  }
->  
->  static void s390_ipl_reset(DeviceState *dev)
-> diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
-> index 4ad9a7c05e..46930e4c64 100644
-> --- a/hw/s390x/ipl.h
-> +++ b/hw/s390x/ipl.h
-> @@ -16,7 +16,8 @@
->  #include "cpu.h"
->  
->  struct IplBlockCcw {
-> -    uint8_t  reserved0[85];
-> +    uint64_t netboot_start_addr;
-> +    uint8_t  reserved0[77];
->      uint8_t  ssid;
->      uint16_t devno;
->      uint8_t  vm_flags;
-> @@ -100,6 +101,7 @@ struct S390IPLState {
->      IplParameterBlock iplb;
->      bool iplb_valid;
->      bool reipl_requested;
-> +    bool netboot;
->  
->      /*< public >*/
->      char *kernel;
-> 
+>> Also for 2.9: turn on the deprecation warning for QemuOpts negative
+>> sugar, but leave positive sugar unchanged (it seems like positive sugar
+>> is probably more in use than negative sugar, other than chardev nowait).
+>
+> Capturing the gist of an IRC conversation:
+>
+> Right now, it appears that '-chardev nowait' is in heavy use ('git grep
+> nowait' shows that qemu itself recommends it in documentation, nodelay
+> being another one).  Right now, QemuOpts says that '-chardev
+> wait,nowait' results in 'wait=off', and '-chardev nowait,wait' results
+> in 'wait=on' (that is, last-one-wins semantics) - but in reality, there
+> are probably few (if any) clients that rely on this particular semantics.
+>
+> If we get rid of 'noFOO' magic, we can still teach the chardev QemuOpts
+> to recognize optional keys for BOTH 'wait' and 'nowait'; a user that
+> specifies neither gets the default behavior as always; a user that
+> specifies only 'wait' or 'nowait' gets the requested behavior (although
+> now chardev has to check both key spellings rather than one), and a user
+> that specifies 'wait,nowait' or 'nowait,wait' causes an error, not at
+> QemuOpts parse time, but in the chardev initialization code.  That is,
+> for any boolean option where 'noFOO' magic is currently handled by
+> QemuOpts, we can still mostly keep back-compat by adding a new 'noFOO'
+> key to the object, and teaching that object to check that 'FOO' and
+> 'noFOO' are not both selected at once.
 
- Thomas
+Another possibility is to start with deprecating "noFOO" only when we
+don't have description for "FOO".
+
+Hmm, could just as well also deprecate it when we do have one, but it
+isn't QEMU_OPT_BOOL.
+
+> But whether this change to QemuOpts is the right thing to do is not 2.9
+> material, so let's take a breather and revisit it for 2.10 (or whenever
+> we try to fix QemuOpts to layer on top of keyval_parse()).
+
+Makes sense.
+
+>> That way, we still have the option of enabling positive sugar blockdev
+>> in a later version, if we decide its useful (and after dealing with any
+>> QemuOpts fallout), but are not locked into having to use it.
+
+Exactly.
