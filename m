@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56816)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cheOj-0002D0-9k
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 10:36:38 -0500
+	(envelope-from <eblake@redhat.com>) id 1cheWR-0005Rt-Vf
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 10:44:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cheOi-0000uu-Dw
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 10:36:37 -0500
-References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
-	<1487689130-30373-54-git-send-email-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <650b3bd8-7e89-82ce-5985-624abf1160ed@redhat.com>
-Date: Sat, 25 Feb 2017 16:36:27 +0100
+	(envelope-from <eblake@redhat.com>) id 1cheWN-0002p5-50
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 10:44:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45356)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cheWM-0002p0-Sq
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 10:44:31 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B55B66371F
+	for <qemu-devel@nongnu.org>; Sat, 25 Feb 2017 15:44:30 +0000 (UTC)
+References: <1487886317-27400-1-git-send-email-armbru@redhat.com>
+	<1487886317-27400-10-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4623eb6a-5cac-2a25-1173-9e94dd90ae5b@redhat.com>
+Date: Sat, 25 Feb 2017 09:44:28 -0600
 MIME-Version: 1.0
-In-Reply-To: <1487689130-30373-54-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1487886317-27400-10-git-send-email-armbru@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="BHdRjVV2Wd8a6gOWj5FPqMuAFx2j16Klc"
-Subject: Re: [Qemu-devel] [PATCH 53/54] block: Add Error parameter to
- bdrv_set_backing_hd()
+	boundary="oKpFhpMTOjfrcou2xgHaktNg5wC4MrOLl"
+Subject: Re: [Qemu-devel] [PATCH 09/21] qapi: Improve a QObject input
+ visitor error message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,59 +35,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---BHdRjVV2Wd8a6gOWj5FPqMuAFx2j16Klc
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
-Message-ID: <650b3bd8-7e89-82ce-5985-624abf1160ed@redhat.com>
-Subject: Re: [PATCH 53/54] block: Add Error parameter to bdrv_set_backing_hd()
-References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
- <1487689130-30373-54-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1487689130-30373-54-git-send-email-kwolf@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
+--oKpFhpMTOjfrcou2xgHaktNg5wC4MrOLl
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <4623eb6a-5cac-2a25-1173-9e94dd90ae5b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 09/21] qapi: Improve a QObject input visitor
+ error message
+References: <1487886317-27400-1-git-send-email-armbru@redhat.com>
+ <1487886317-27400-10-git-send-email-armbru@redhat.com>
+In-Reply-To: <1487886317-27400-10-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 21.02.2017 15:58, Kevin Wolf wrote:
-> Not all callers of bdrv_set_backing_hd() know for sure that attaching
-> the backing file will be allowed by the permission system. Return the
-> error from the function rather than aborting.
+On 02/23/2017 03:45 PM, Markus Armbruster wrote:
+> The QObject input visitor has three error message formats:
 >=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> * Parameter '%s' is missing
+> * "Invalid parameter type for '%s', expected: %s"
+> * "QMP input object member '%s' is unexpected"
+>=20
+> The '%s' are member names (or "null", but I'll fix that later).
+>=20
+> The last error message calls the thing "QMP input object member"
+> instead of "parameter".  Misleading when the visitor is used on
+> QObjects that don't come from QMP.  Change it to "Parameter '%s' is
+> unexpected".
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  block.c               | 27 ++++++++++++++++++++-------
->  block/commit.c        | 14 +++++++-------
->  block/mirror.c        | 16 +++++++++++++++-
->  block/stream.c        |  9 ++++++++-
->  block/vvfat.c         |  2 +-
->  include/block/block.h |  3 ++-
->  6 files changed, 53 insertions(+), 18 deletions(-)
+>  qapi/qobject-input-visitor.c | 3 +--
+>  tests/test-qga.c             | 2 +-
+>  2 files changed, 2 insertions(+), 3 deletions(-)
+>=20
 
-It's a bit unfortunate that bdrv_set_backing_hd() is not atomic, that
-is, that the node will no longer have a backing file if the command
-fails. Oh well.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
---BHdRjVV2Wd8a6gOWj5FPqMuAFx2j16Klc
+--oKpFhpMTOjfrcou2xgHaktNg5wC4MrOLl
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlixpHsSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ANPUH/0MZpDL6ChIbuAjYvhDzxCU+sQ54sGgv
-HL6etQKU0iOcIgfWm9dnqUsVxRuEfG3aGKT5/STi9+KUMOrk+aVK85vHfML2wtnn
-mfBrSvk8tCor69P/zV0Q/b2IzVFOhw7jXqznPc9R+Aq/emR3SLpGDHVt5N+ChuKw
-NXCS+W+0kQp+SXTC8kX0zpBst3oeLSwFDkFcB+l5oYbObKmbTxXaIJX6SnGCP8gx
-3u0FXUPHyJV1ldKx6cKhfmh7Q4q+E+Mt/WElcq3RJw4/04y0Sj4Ez4cQxvBnLWxM
-lPpHJRMgP8to5RDN7Y4Cuvse1YewK4i6XMCiALTwiyVe+b8PqocOkAg=
-=144u
+iQEcBAEBCAAGBQJYsaZcAAoJEKeha0olJ0NqjkgH/0cYxDvC0deraZ55hTyoo9Iu
+hHf9pDTvDIgGvH7EQhqrA3R4GV4HAO9SxEg8JhKA7fXdy4Dcr9DevUpMFodD4Rch
+Dz85Gxt/QOeEwvMypF3Zu/xnF77Ci04wZQy1HRV51o4g0GTIbO2KR0RorELMBVE+
+cfNXEa/gh7uuYhcsKnkw+niCo1/9TzxwrJX13yB1uzcfAiPTJQHkt/Wuv1XMwMhM
+wIrOwH//hdiqQkGI0P+rzUiJkk8BEs/ImUuma6W5NPOf5Jr59yLwJLK3DoV+apjM
+M7q0xGAs9byW3XBuw5x/cT4UyTs/oS4dK1j0s02CJDgkh/tujEEyLil2aNRLGp8=
+=2hUl
 -----END PGP SIGNATURE-----
 
---BHdRjVV2Wd8a6gOWj5FPqMuAFx2j16Klc--
+--oKpFhpMTOjfrcou2xgHaktNg5wC4MrOLl--
