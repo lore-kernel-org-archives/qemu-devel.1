@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mmarek@suse.com>) id 1chj8K-0003zR-Ld
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 15:40:01 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1chjgG-0000gU-J5
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 16:15:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mmarek@suse.com>) id 1chj8H-00018N-Iy
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 15:40:00 -0500
-Received: from mx2.suse.de ([195.135.220.15]:51605)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mmarek@suse.com>) id 1chj8H-00017n-Cj
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 15:39:57 -0500
-References: <20170224134411.28882-1-mmarek@suse.com>
-	<a634716c-c998-c422-6802-946a283f8837@twiddle.net>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <a76250b9-ec10-1444-03aa-00ffb8c17fda@suse.com>
-Date: Sat, 25 Feb 2017 21:39:51 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1chjgF-0002vp-K8
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 16:15:04 -0500
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:37442)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1chjgF-0002vD-DE
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 16:15:03 -0500
+Received: by mail-wm0-x230.google.com with SMTP id v77so37217725wmv.0
+	for <qemu-devel@nongnu.org>; Sat, 25 Feb 2017 13:15:03 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <a634716c-c998-c422-6802-946a283f8837@twiddle.net>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target-s390x: Implement stfl and stfle
+In-Reply-To: <20170224112109.3147-1-alex.bennee@linaro.org>
+References: <20170224112109.3147-1-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 25 Feb 2017 21:14:41 +0000
+Message-ID: <CAFEAcA8E6L7Ad1+P_YRJo4YMyQn=jGQRS6ybGMKjLS=vEHq0ZA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/24] MTTCG Base enabling patches with ARM
+ enablement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
-Cc: qemu-devel@nongnu.org, Miroslav Benes <mbenes@suse.cz>, Eric Bischoff <ebischoff@suse.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Dne 25.2.2017 v 01:05 Richard Henderson napsal(a):
-> On 02/25/2017 12:44 AM, Michal Marek wrote:
->> +DEF_HELPER_1(stfl, void, env)
-> 
-> DEF_HELPER_FLAGS_1(stfl, TCG_CALL_NO_RWG, void, env)
-> 
-> since this touches no registers, and only writes to lomem which afaik
-> cannot fault in kernel mode.
+On 24 February 2017 at 11:20, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+> The following changes since commit 2d896b454a0e19ec4c1ddbb0e0b65b7e54fced=
+f3:
+>
+>   Revert "hw/mips: MIPS Boston board support" (2017-02-23 18:04:45 +0000)
+>
+> are available in the git repository at:
+>
+>   https://github.com/stsquad/qemu.git tags/pull-mttcg-240217-1
+>
+> for you to fetch changes up to ca759f9e387db87e1719911f019bc60c74be9ed8:
+>
+>   tcg: enable MTTCG by default for ARM on x86 hosts (2017-02-24 10:32:46 =
++0000)
+>
+> ----------------------------------------------------------------
+> This is the MTTCG pull-request as posted yesterday.
+>
+> ----------------------------------------------------------------
 
-OK.
+Applied, thanks.
 
-
->> +static int do_stfle(CPUS390XState *env, uint64_t addr, int len)
->> +{
->> +    S390CPU *cpu = s390_env_get_cpu(env);
->> +    uint8_t data[64];
-> 
-> S390FeatBitmap or S390FeatInit?  Or even a sizeof?
-> Hard coding 64 certainly doesn't seem right.
-
-I will change it to something more sensible.
-
-
->> +    memset(data, 0, sizeof(data));
->> +    res = s390_fill_feat_block(cpu->model->features,
->> S390_FEAT_TYPE_STFL, data);
->> +    cpu_physical_memory_write(addr, data, MIN(res, len));
-> 
-> No, not physical memory, you need to write to virtual memory, at least
-> for STFLE.  Which, as you'll recall can be used from user-mode.
-
-Oh, I did not realize that STFLE is not a privileged instruction.
-
-Thanks for the review!
-
-Michal
+-- PMM
