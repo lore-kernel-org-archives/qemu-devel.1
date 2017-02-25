@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1chV8U-0001AP-TM
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 00:43:15 -0500
+	(envelope-from <thuth@redhat.com>) id 1chVEx-000401-Us
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 00:49:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1chV8R-0000w4-Sn
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 00:43:14 -0500
-References: <cover.1487522123.git.balaton@eik.bme.hu>
-	<5077e2a9732e1b9afcb0754e93624b787589ac61.1487522123.git.balaton@eik.bme.hu>
-	<CAFEAcA8gde7GfWhyRLyOB5yL_5zrm4b7tj4pH=GTj=RwZO_4wg@mail.gmail.com>
-	<alpine.BSF.2.20.1702242148080.76443@zero.eik.bme.hu>
+	(envelope-from <thuth@redhat.com>) id 1chVEu-0004MC-SI
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 00:49:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44924)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1chVEu-0004M6-Mn
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 00:49:52 -0500
+References: <20170224135045.10613-1-mbenes@suse.cz>
+	<d9d4d2c5-bede-6ea6-81cf-c2eaa2fccbd5@twiddle.net>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <2a70e96a-3f61-473a-519a-af867a050fad@redhat.com>
-Date: Sat, 25 Feb 2017 06:43:07 +0100
+Message-ID: <e52f6865-22c7-5e72-ced2-39544e8a95d9@redhat.com>
+Date: Sat, 25 Feb 2017 06:49:48 +0100
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.20.1702242148080.76443@zero.eik.bme.hu>
+In-Reply-To: <d9d4d2c5-bede-6ea6-81cf-c2eaa2fccbd5@twiddle.net>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 10/10] ppc: Add SM501 device in config for
- ppc and ppcemb targets
+Subject: Re: [Qemu-devel] [PATCH] target-s390x: Implement lpp instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,28 +27,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>, Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: Richard Henderson <rth@twiddle.net>, Miroslav Benes <mbenes@suse.cz>, agraf@suse.de
+Cc: ebischoff@suse.com, mmarek@suse.com, qemu-devel@nongnu.org
 
-On 24.02.2017 21:51, BALATON Zoltan wrote:
-> On Fri, 24 Feb 2017, Peter Maydell wrote:
->> On 19 February 2017 at 16:35, BALATON Zoltan <balaton@eik.bme.hu> wrote:
->>> This is not used by default on any emulated machine yet but it is
->>> still useful to have it compiled so it can be added from the command
->>> line for clients that can use it (e.g. MorphOS has no driver for any
->>> other emulated video cards but can output via SM501)
->>>
->>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+On 25.02.2017 00:51, Richard Henderson wrote:
+> On 02/25/2017 12:50 AM, Miroslav Benes wrote:
+>> Linux arch/s390/kernel/head(64).S uses lpp instruction if it is
+>> available in facilities list provided by stfl/stfle instruction. This is
+>> the case of newer z/System generations and their qemu definition.
 >>
->> If this is a generic PCI device then shouldn't it go into
->> default-configs/pci.mak ?
+>> Signed-off-by: Miroslav Benes <mbenes@suse.cz>
+>> ---
 > 
-> This is a multimedia chip usually found on sh4 systems and some ppc
-> boards that's why I've only added it to these but I can move it to
-> pci.mak if you think it's a better place for it.
+> I can't find LPP in my PoO 11th edition...
 
-If it is not really usable for other boards, then I think it should also
-not go into pci.mak. No need to confuse the users of the other boards
-with unusable PCI cards here.
+LPP is one of the instructions that is documented separately.
+You can find its spec here, for example:
+
+http://www-01.ibm.com/support/docview.wss?uid=isg26fcd1cc32246f4c8852574ce0044734a
 
  Thomas
