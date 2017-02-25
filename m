@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33944)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1chevb-000246-OH
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 11:10:36 -0500
+	(envelope-from <eblake@redhat.com>) id 1chexT-0004Rj-0i
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 11:12:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1chevY-0001dx-Kl
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 11:10:35 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:40941 helo=relay.sw.ru)
+	(envelope-from <eblake@redhat.com>) id 1chexP-00025W-So
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 11:12:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49732)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1chevY-0001dD-8P
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 11:10:32 -0500
-References: <1487153430-17260-1-git-send-email-vsementsov@virtuozzo.com>
-	<1487153430-17260-22-git-send-email-vsementsov@virtuozzo.com>
-	<20170216142713.GH4869@noname.redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <f1e6cc27-28f7-d26a-84f4-838fac8b520d@virtuozzo.com>
-Date: Sat, 25 Feb 2017 19:10:11 +0300
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1chexP-00025S-Nk
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 11:12:27 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D3FEF61B9C
+	for <qemu-devel@nongnu.org>; Sat, 25 Feb 2017 16:12:27 +0000 (UTC)
+References: <1487886317-27400-1-git-send-email-armbru@redhat.com>
+	<1487886317-27400-14-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f8c77ea3-c5d2-5d47-ccc1-5f0ab54e73d5@redhat.com>
+Date: Sat, 25 Feb 2017 10:12:25 -0600
 MIME-Version: 1.0
-In-Reply-To: <20170216142713.GH4869@noname.redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v15 21/25] qcow2-bitmap: refcounts
+In-Reply-To: <1487886317-27400-14-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="7e0dnO94Eb7qkGsUS6uEUmFkH9XE2gmOM"
+Subject: Re: [Qemu-devel] [PATCH 13/21] qapi: Drop string input visitor
+ method optional()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +35,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
-16.02.2017 17:27, Kevin Wolf wrote:
-> Am 15.02.2017 um 11:10 hat Vladimir Sementsov-Ogievskiy geschrieben:
->> Calculate refcounts for qcow2 bitmaps. It is needed for qcow2's qemu-img
->> check implementation.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> Reviewed-by: Max Reitz <mreitz@redhat.com>
->> Reviewed-by: John Snow <jsnow@redhat.com>
-> Maybe this should come earlier in the series so that qemu-img check
-> doesn't corrupt them. Basically it's needed as soon as we add the
-> autoclear flag as supported.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--7e0dnO94Eb7qkGsUS6uEUmFkH9XE2gmOM
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <f8c77ea3-c5d2-5d47-ccc1-5f0ab54e73d5@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 13/21] qapi: Drop string input visitor method
+ optional()
+References: <1487886317-27400-1-git-send-email-armbru@redhat.com>
+ <1487886317-27400-14-git-send-email-armbru@redhat.com>
+In-Reply-To: <1487886317-27400-14-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-so, it should be merged into 07
+On 02/23/2017 03:45 PM, Markus Armbruster wrote:
+> visit_optional() is to be called only between visit_start_struct() and
+> visit_end_struct().  Visitors that don't support struct visits,
+> i.e. don't implement start_struct(), end_struct(), have no use for it.
+> Clarify documentation.
+>=20
+> The string input visitor doesn't support struct visits.  Its
+> parse_optional() is therefore useless.  Drop it.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  include/qapi/visitor-impl.h |  4 ++--
+>  qapi/string-input-visitor.c | 13 -------------
+>  2 files changed, 2 insertions(+), 15 deletions(-)
+>=20
 
->
-> Anyway, the actual point I was going to make is that it would be good to
-> have a qemu-iotests case which actually invokes qemu-img check on an
-> image with dirty bitmaps. In general, the test case side of the series
-> seems to be rather weak so far. Just keep in mind that I won't feel bad
-> for breaking anything that isn't tested by a test case. So if you like
-> to keep persistent bitmaps working in the long run, you'd better write
-> tests and give me no chance to break anything without them failing.
->
-> Kevin
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
--- 
-Best regards,
-Vladimir
+--7e0dnO94Eb7qkGsUS6uEUmFkH9XE2gmOM
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYsazpAAoJEKeha0olJ0NqjvUH/16xBYswcTLE3pqd9QI+7DT8
+x1Kft7+QqpB/AWmSLO6fRLhUdN3lJmQCrEyOtby3YhTycEgb8yMlGLiDQloa0tpm
+fEG24fJB5zpvxiMlPMBu0dVuq4EYkijroOq4LtlXY8yo+NeAExm2wxSAgGHUQNLv
+qPu/+zRgjCDah18A7AvJ0gCa105LnARHCqEP/A7jqzexVWbxV4wpiqLryYu+9WsU
+ajzRaX+B+P5fFxnY1Iu5/14LRw0C2bUlJ8Hpej6hf2YKywFlwT7e1XPLP0QJ1dYK
+CyzYmxEo0k6PSpbcjRPcKATwa1k86wOSpCpiJ36RdHw1n1zwu3c4NP0JneQHp0Q=
+=OyG9
+-----END PGP SIGNATURE-----
+
+--7e0dnO94Eb7qkGsUS6uEUmFkH9XE2gmOM--
