@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1chT7C-0003Zi-FH
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 22:33:47 -0500
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1chT7D-0003a4-VX
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 22:33:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1chT7A-0006n7-GT
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 22:33:46 -0500
-Received: from [59.151.112.132] (port=47327 helo=heian.cn.fujitsu.com)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1chT7C-0006on-Hf
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 22:33:48 -0500
+Received: from [59.151.112.132] (port=5268 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1chT7A-0006iV-3w
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 22:33:44 -0500
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1chT7B-0006mR-1I
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 22:33:46 -0500
 From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Date: Sat, 25 Feb 2017 11:32:08 +0800
-Message-ID: <1487993530-30875-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Date: Sat, 25 Feb 2017 11:32:07 +0800
+Message-ID: <1487993530-30875-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 In-Reply-To: <1487993530-30875-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 References: <1487993530-30875-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 1/3] COLO-compare: Add packet size check and
- some fix
+Subject: [Qemu-devel] [PATCH 1/3] COLO-compare: Add minimum packet size
+ check and some fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,9 +29,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu devel <qemu-devel@nongnu.org>
 Cc: Jason Wang <jasowang@redhat.com>, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>
 
-Add packet size check in colo_packet_compare_udp()
-and colo_packet_compare_udp(), rename function colo_packet_compare()
-to colo_packet_compare_common() that we will reuse it later.
+Add packet minimum size check in colo_packet_compare_udp()
+and colo_packet_compare_udp() like colo_packet_compare_icmp(),
+rename function colo_packet_compare() to colo_packet_compare_common()
+that we will reuse it later.
 
 Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 ---
