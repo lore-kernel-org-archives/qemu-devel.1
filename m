@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1chXa1-0001VU-BK
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 03:19:50 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1chXa2-0001Vr-TN
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 03:19:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1chXZz-0008TF-Ok
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 03:19:49 -0500
-Received: from [59.151.112.132] (port=44237 helo=heian.cn.fujitsu.com)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1chXa1-0008Ul-UL
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 03:19:50 -0500
+Received: from [59.151.112.132] (port=8113 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1chXZz-0008OA-26
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 03:19:47 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1chXa1-0008SS-IN
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 03:19:49 -0500
 From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Date: Sat, 25 Feb 2017 16:26:36 +0800
-Message-ID: <1488011202-32121-3-git-send-email-caoj.fnst@cn.fujitsu.com>
+Date: Sat, 25 Feb 2017 16:26:42 +0800
+Message-ID: <1488011202-32121-9-git-send-email-caoj.fnst@cn.fujitsu.com>
 In-Reply-To: <1488011202-32121-1-git-send-email-caoj.fnst@cn.fujitsu.com>
 References: <1488011202-32121-1-git-send-email-caoj.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v10 2/8] megasas: change behaviour of msix
- switch
+Subject: [Qemu-devel] [PATCH v10 8/8] megasas: remove unnecessary
+ megasas_use_msix()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,65 +27,80 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Hannes Reinecke <hare@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Resolve the TODO, msix=auto means msix on; if user specify msix=on,
-then device creation fail on msix_init failure.
-Also undo the overwrites of user configuration of msix.
+Also move certain hunk above, to place msix init related code together.
 
-CC: Michael S. Tsirkin <mst@redhat.com>
 CC: Hannes Reinecke <hare@suse.de>
 CC: Paolo Bonzini <pbonzini@redhat.com>
 CC: Markus Armbruster <armbru@redhat.com>
 CC: Marcel Apfelbaum <marcel@redhat.com>
+CC: Michael S. Tsirkin <mst@redhat.com>
 
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Acked-by: Marcel Apfelbaum <marcel@redhat.com>
 Reviewed-by: Hannes Reinecke <hare@suse.com>
 Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
 ---
- hw/scsi/megasas.c | 24 +++++++++++++++++-------
- 1 file changed, 17 insertions(+), 7 deletions(-)
+ hw/scsi/megasas.c | 19 ++++++-------------
+ 1 file changed, 6 insertions(+), 13 deletions(-)
 
 diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
-index e3d59b7c83c7..eab480da354e 100644
+index ca98ae7cc329..49f38002448e 100644
 --- a/hw/scsi/megasas.c
 +++ b/hw/scsi/megasas.c
-@@ -2359,18 +2359,28 @@ static void megasas_scsi_realize(PCIDevice *dev, Error **errp)
+@@ -155,11 +155,6 @@ static bool megasas_use_queue64(MegasasState *s)
+     return s->flags & MEGASAS_MASK_USE_QUEUE64;
+ }
+ 
+-static bool megasas_use_msix(MegasasState *s)
+-{
+-    return s->msix != ON_OFF_AUTO_OFF;
+-}
+-
+ static bool megasas_is_jbod(MegasasState *s)
+ {
+     return s->flags & MEGASAS_MASK_USE_JBOD;
+@@ -2306,9 +2301,7 @@ static void megasas_scsi_uninit(PCIDevice *d)
+ {
+     MegasasState *s = MEGASAS(d);
+ 
+-    if (megasas_use_msix(s)) {
+-        msix_uninit(d, &s->mmio_io, &s->mmio_io);
+-    }
++    msix_uninit(d, &s->mmio_io, &s->mmio_io);
+     msi_uninit(d);
+ }
+ 
+@@ -2358,7 +2351,7 @@ static void megasas_scsi_realize(PCIDevice *dev, Error **errp)
  
      memory_region_init_io(&s->mmio_io, OBJECT(s), &megasas_mmio_ops, s,
                            "megasas-mmio", 0x4000);
-+    if (megasas_use_msix(s)) {
-+        ret = msix_init(dev, 15, &s->mmio_io, b->mmio_bar, 0x2000,
-+                        &s->mmio_io, b->mmio_bar, 0x3800, 0x68, &err);
-+        if (ret && s->msix == ON_OFF_AUTO_ON) {
-+            /* Can't satisfy user's explicit msix=on request, fail */
-+            error_append_hint(&err, "You have to use msix=auto (default) or "
-+                    "msix=off with this machine type.\n");
-+            /* No instance_finalize method, need to free the resource here */
-+            object_unref(OBJECT(&s->mmio_io));
-+            error_propagate(errp, err);
-+            return;
-+        }
-+        assert(!err || s->msix == ON_OFF_AUTO_AUTO);
-+        /* With msix=auto, we fall back to MSI off silently */
-+        error_free(err);
+-    if (megasas_use_msix(s)) {
++    if (s->msix != ON_OFF_AUTO_OFF) {
+         ret = msix_init(dev, 15, &s->mmio_io, b->mmio_bar, 0x2000,
+                         &s->mmio_io, b->mmio_bar, 0x3800, 0x68, &err);
+         if (ret && s->msix == ON_OFF_AUTO_ON) {
+@@ -2375,6 +2368,10 @@ static void megasas_scsi_realize(PCIDevice *dev, Error **errp)
+         error_free(err);
+     }
+ 
++    if (s->msix != ON_OFF_AUTO_OFF) {
++        msix_vector_use(dev, 0);
 +    }
 +
      memory_region_init_io(&s->port_io, OBJECT(s), &megasas_port_ops, s,
                            "megasas-io", 256);
      memory_region_init_io(&s->queue_io, OBJECT(s), &megasas_queue_ops, s,
-                           "megasas-queue", 0x40000);
+@@ -2390,10 +2387,6 @@ static void megasas_scsi_realize(PCIDevice *dev, Error **errp)
+     pci_register_bar(dev, b->mmio_bar, bar_type, &s->mmio_io);
+     pci_register_bar(dev, 3, bar_type, &s->queue_io);
  
--    if (megasas_use_msix(s) &&
--        msix_init(dev, 15, &s->mmio_io, b->mmio_bar, 0x2000,
--                  &s->mmio_io, b->mmio_bar, 0x3800, 0x68, NULL)) {
--        /* TODO: check msix_init's error, and should fail on msix=on */
--        s->msix = ON_OFF_AUTO_OFF;
+-    if (megasas_use_msix(s)) {
+-        msix_vector_use(dev, 0);
 -    }
 -
-     if (pci_is_express(dev)) {
-         pcie_endpoint_cap_init(dev, 0xa0);
-     }
+     s->fw_state = MFI_FWSTATE_READY;
+     if (!s->sas_addr) {
+         s->sas_addr = ((NAA_LOCALLY_ASSIGNED_ID << 24) |
 -- 
 2.1.0
