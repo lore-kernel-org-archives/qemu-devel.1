@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1chVgJ-0006Qc-B2
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 01:18:12 -0500
+	(envelope-from <thuth@redhat.com>) id 1chVgk-0006ek-1Z
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 01:18:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1chVgE-0002dd-Cl
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 01:18:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34622)
+	(envelope-from <thuth@redhat.com>) id 1chVgf-0002gY-39
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 01:18:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56530)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1chVgE-0002dY-3b
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 01:18:06 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1chVge-0002gK-Qn
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 01:18:33 -0500
 References: <20170223122025.10420-1-cornelia.huck@de.ibm.com>
-	<20170223122025.10420-3-cornelia.huck@de.ibm.com>
+	<20170223122025.10420-4-cornelia.huck@de.ibm.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <c1bfea11-c4ae-389f-dde1-e893a3019a05@redhat.com>
-Date: Sat, 25 Feb 2017 07:18:02 +0100
+Message-ID: <4fe97bb7-d6f0-7b58-916f-94dc0ae81616@redhat.com>
+Date: Sat, 25 Feb 2017 07:18:29 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170223122025.10420-3-cornelia.huck@de.ibm.com>
+In-Reply-To: <20170223122025.10420-4-cornelia.huck@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] s390x/ipl: Extend S390IPLState to
- support network boot
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] s390x/ipl: Load network boot image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,91 +33,190 @@ Cc: borntraeger@de.ibm.com, jfrei@linux.vnet.ibm.com, Farhan Ali <alifm@linux.vn
 On 23.02.2017 13:20, Cornelia Huck wrote:
 > From: Farhan Ali <alifm@linux.vnet.ibm.com>
 > 
-> Add new field to S390IPLState to store the name of the network boot
-> loader.
+> Load the network boot image into guest RAM when the boot
+> device selected is a network device. Use some of the reserved
+> space in IplBlockCcw to store the start address of the netboot
+> image.
+> 
+> A user could also use 'chreipl'(diag 308/5) to change the boot device.
+> So every time we update the IPLB, we need to verify if the selected
+> boot device is a network device so we can appropriately load the
+> network boot image.
 > 
 > Signed-off-by: Farhan Ali <alifm@linux.vnet.ibm.com>
-> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
 > Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
 > ---
->  hw/s390x/ipl.c             | 1 +
->  hw/s390x/ipl.h             | 1 +
->  hw/s390x/s390-virtio-ccw.c | 3 ++-
->  hw/s390x/s390-virtio.c     | 2 ++
->  hw/s390x/s390-virtio.h     | 1 +
->  5 files changed, 7 insertions(+), 1 deletion(-)
+>  hw/s390x/ipl.c | 89 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/s390x/ipl.h |  4 ++-
+>  2 files changed, 92 insertions(+), 1 deletion(-)
 > 
 > diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index 2e2664f22e..fd656718a7 100644
+> index fd656718a7..195cac559f 100644
 > --- a/hw/s390x/ipl.c
 > +++ b/hw/s390x/ipl.c
-> @@ -209,6 +209,7 @@ static Property s390_ipl_properties[] = {
->      DEFINE_PROP_STRING("initrd", S390IPLState, initrd),
->      DEFINE_PROP_STRING("cmdline", S390IPLState, cmdline),
->      DEFINE_PROP_STRING("firmware", S390IPLState, firmware),
-> +    DEFINE_PROP_STRING("netboot_fw", S390IPLState, netboot_fw),
->      DEFINE_PROP_BOOL("enforce_bios", S390IPLState, enforce_bios, false),
->      DEFINE_PROP_BOOL("iplbext_migration", S390IPLState, iplbext_migration,
->                       true),
+> @@ -20,6 +20,7 @@
+>  #include "hw/s390x/virtio-ccw.h"
+>  #include "hw/s390x/css.h"
+>  #include "ipl.h"
+> +#include "qemu/error-report.h"
+>  
+>  #define KERN_IMAGE_START                0x010000UL
+>  #define KERN_PARM_AREA                  0x010480UL
+> @@ -227,6 +228,12 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl)
+>                  TYPE_VIRTIO_CCW_DEVICE);
+>          SCSIDevice *sd = (SCSIDevice *) object_dynamic_cast(OBJECT(dev_st),
+>                                                              TYPE_SCSI_DEVICE);
+> +        VirtIONet *vn = (VirtIONet *) object_dynamic_cast(OBJECT(dev_st),
+> +                                                          TYPE_VIRTIO_NET);
+> +
+> +        if (vn) {
+> +            ipl->netboot = true;
+> +        }
+>          if (virtio_ccw_dev) {
+>              CcwDevice *ccw_dev = CCW_DEVICE(virtio_ccw_dev);
+>  
+> @@ -259,12 +266,86 @@ static bool s390_gen_initial_iplb(S390IPLState *ipl)
+>      return false;
+>  }
+>  
+> +static int load_netboot_image(Error **errp)
+> +{
+> +    S390IPLState *ipl = get_ipl_device();
+> +    char *netboot_filename;
+> +    MemoryRegion *sysmem =  get_system_memory();
+> +    MemoryRegion *mr = NULL;
+> +    void *ram_ptr = NULL;
+> +    int img_size = -1;
+> +
+> +    mr = memory_region_find(sysmem, 0, 1).mr;
+> +    if (!mr) {
+> +        error_setg(errp, "Failed to find memory region at address 0");
+> +        return -1;
+> +    }
+> +
+> +    ram_ptr = memory_region_get_ram_ptr(mr);
+> +    if (!ram_ptr) {
+> +        error_setg(errp, "No RAM found");
+> +        goto unref_mr;
+> +    }
+> +
+> +    netboot_filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, ipl->netboot_fw);
+> +    if (netboot_filename == NULL) {
+> +        error_setg(errp, "Could not find network bootloader");
+> +        goto unref_mr;
+> +    }
+> +
+> +    img_size = load_elf_ram(netboot_filename, NULL, NULL, &ipl->start_addr,
+> +                            NULL, NULL, 1, EM_S390, 0, 0, NULL, false);
+> +
+> +    if (img_size < 0) {
+> +        img_size = load_image_size(netboot_filename, ram_ptr, ram_size);
+> +        ipl->start_addr = KERN_IMAGE_START;
+> +    }
+> +
+> +    if (img_size < 0) {
+> +        error_setg(errp, "Failed to load network bootloader");
+> +    }
+> +
+> +    g_free(netboot_filename);
+> +
+> +unref_mr:
+> +    memory_region_unref(mr);
+> +    return img_size;
+> +}
+> +
+> +static bool is_virtio_net_device(IplParameterBlock *iplb)
+> +{
+> +    uint8_t cssid;
+> +    uint8_t ssid;
+> +    uint16_t devno;
+> +    uint16_t schid;
+> +    SubchDev *sch = NULL;
+> +
+> +    if (iplb->pbt != S390_IPL_TYPE_CCW) {
+> +        return false;
+> +    }
+> +
+> +    devno = be16_to_cpu(iplb->ccw.devno);
+> +    ssid = iplb->ccw.ssid & 3;
+> +
+> +    for (schid = 0; schid < MAX_SCHID; schid++) {
+> +        for (cssid = 0; cssid < MAX_CSSID; cssid++) {
+> +            sch = css_find_subch(1, cssid, ssid, schid);
+> +
+> +            if (sch && sch->devno == devno) {
+> +                return sch->id.cu_model == VIRTIO_ID_NET;
+> +            }
+> +        }
+> +    }
+> +   return false;
+
+The above line has only 3 instead of 4 spaces. I wonder why checkpatch
+does not complain here...?
+
+> +}
+> +
+>  void s390_ipl_update_diag308(IplParameterBlock *iplb)
+>  {
+>      S390IPLState *ipl = get_ipl_device();
+>  
+>      ipl->iplb = *iplb;
+>      ipl->iplb_valid = true;
+> +    ipl->netboot = is_virtio_net_device(iplb);
+>  }
+>  
+>  IplParameterBlock *s390_ipl_get_iplb(void)
+> @@ -288,6 +369,7 @@ void s390_reipl_request(void)
+>  void s390_ipl_prepare_cpu(S390CPU *cpu)
+>  {
+>      S390IPLState *ipl = get_ipl_device();
+> +    Error *err = NULL;
+>  
+>      cpu->env.psw.addr = ipl->start_addr;
+>      cpu->env.psw.mask = IPL_PSW_MASK;
+> @@ -298,6 +380,13 @@ void s390_ipl_prepare_cpu(S390CPU *cpu)
+>              ipl->iplb_valid = s390_gen_initial_iplb(ipl);
+>          }
+>      }
+> +    if (ipl->netboot) {
+> +        if (load_netboot_image(&err) < 0) {
+> +            error_report_err(err);
+> +            vm_stop(RUN_STATE_INTERNAL_ERROR);
+> +        }
+> +        ipl->iplb.ccw.netboot_start_addr = ipl->start_addr;
+
+Not sure whether it matters, but in case of early errors during
+load_netboot_image(), ipl->start_addr could be used uninitialized here.
+Maybe you should move the "ipl->start_addr = KERN_IMAGE_START;" there at
+the beginning of the function, to make it also the default value for the
+other error cases?
+
+> +    }
+>  }
+>  
+>  static void s390_ipl_reset(DeviceState *dev)
 > diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
-> index c89109585a..4ad9a7c05e 100644
+> index 4ad9a7c05e..46930e4c64 100644
 > --- a/hw/s390x/ipl.h
 > +++ b/hw/s390x/ipl.h
-> @@ -106,6 +106,7 @@ struct S390IPLState {
->      char *initrd;
->      char *cmdline;
->      char *firmware;
-> +    char *netboot_fw;
->      uint8_t cssid;
->      uint8_t ssid;
->      uint16_t devno;
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 4f0d62b2d8..40914fde6f 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -116,7 +116,8 @@ static void ccw_init(MachineState *machine)
->      /* get a BUS */
->      css_bus = virtual_css_bus_init();
->      s390_init_ipl_dev(machine->kernel_filename, machine->kernel_cmdline,
-> -                      machine->initrd_filename, "s390-ccw.img", true);
-> +                      machine->initrd_filename, "s390-ccw.img",
-> +                      "s390-netboot.img", true);
->      s390_flic_init();
+> @@ -16,7 +16,8 @@
+>  #include "cpu.h"
 >  
->      dev = qdev_create(NULL, TYPE_S390_PCI_HOST_BRIDGE);
-> diff --git a/hw/s390x/s390-virtio.c b/hw/s390x/s390-virtio.c
-> index 9cfb09057e..afa4148e6b 100644
-> --- a/hw/s390x/s390-virtio.c
-> +++ b/hw/s390x/s390-virtio.c
-> @@ -65,6 +65,7 @@ void s390_init_ipl_dev(const char *kernel_filename,
->                         const char *kernel_cmdline,
->                         const char *initrd_filename,
->                         const char *firmware,
-> +                       const char *netboot_fw,
->                         bool enforce_bios)
->  {
->      Object *new = object_new(TYPE_S390_IPL);
-> @@ -78,6 +79,7 @@ void s390_init_ipl_dev(const char *kernel_filename,
->      }
->      qdev_prop_set_string(dev, "cmdline", kernel_cmdline);
->      qdev_prop_set_string(dev, "firmware", firmware);
-> +    qdev_prop_set_string(dev, "netboot_fw", netboot_fw);
->      qdev_prop_set_bit(dev, "enforce_bios", enforce_bios);
->      object_property_add_child(qdev_get_machine(), TYPE_S390_IPL,
->                                new, NULL);
-> diff --git a/hw/s390x/s390-virtio.h b/hw/s390x/s390-virtio.h
-> index f588b80a6e..f2377a3e0e 100644
-> --- a/hw/s390x/s390-virtio.h
-> +++ b/hw/s390x/s390-virtio.h
-> @@ -24,6 +24,7 @@ void s390_init_ipl_dev(const char *kernel_filename,
->                         const char *kernel_cmdline,
->                         const char *initrd_filename,
->                         const char *firmware,
-> +                       const char *netboot_fw,
->                         bool enforce_bios);
->  void s390_create_virtio_net(BusState *bus, const char *name);
->  void s390_nmi(NMIState *n, int cpu_index, Error **errp);
+>  struct IplBlockCcw {
+> -    uint8_t  reserved0[85];
+> +    uint64_t netboot_start_addr;
+> +    uint8_t  reserved0[77];
+>      uint8_t  ssid;
+>      uint16_t devno;
+>      uint8_t  vm_flags;
+> @@ -100,6 +101,7 @@ struct S390IPLState {
+>      IplParameterBlock iplb;
+>      bool iplb_valid;
+>      bool reipl_requested;
+> +    bool netboot;
+>  
+>      /*< public >*/
+>      char *kernel;
 > 
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+ Thomas
