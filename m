@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1chmkY-0001Du-FP
+	(envelope-from <balaton@eik.bme.hu>) id 1chmkY-0001Do-C6
 	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 19:31:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1chmkV-0005um-8b
+	(envelope-from <balaton@eik.bme.hu>) id 1chmkW-0005wl-Nh
 	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 19:31:42 -0500
-Message-Id: <e160b509a76bcf00d1af4665e26c6870eb363cab.1488068248.git.balaton@eik.bme.hu>
+Message-Id: <869a8c5b526be9eb1316c9e7c7442bdd1c88c4b2.1488068248.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1488068248.git.balaton@eik.bme.hu>
 References: <cover.1488068248.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [Qemu-devel] [PATCH v2 06/14] sm501: Add missing arbitration
- control register
+Date: Sun, 26 Feb 2017 00:53:39 +0100
+Subject: [Qemu-devel] [PATCH v2 13/14] sm501: Add reset function and vmstate
+ descriptor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,46 +20,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Date: Sun, 26 Feb 2017 00:31:44 -0000
 To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 Cc: Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 ---
- hw/display/sm501.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ hw/display/sm501.c | 110 ++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 105 insertions(+), 5 deletions(-)
 
 diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index d9219bd..b977094 100644
+index 32223f6..b682a95 100644
 --- a/hw/display/sm501.c
 +++ b/hw/display/sm501.c
-@@ -477,6 +477,7 @@ typedef struct SM501State {
-     uint32_t gpio_31_0_control;
-     uint32_t gpio_63_32_control;
-     uint32_t dram_control;
-+    uint32_t arbitration_control;
-     uint32_t irq_mask;
-     uint32_t misc_timing;
-     uint32_t power_mode_control;
-@@ -760,6 +761,9 @@ static uint64_t sm501_system_config_read(void *opaque, hwaddr addr,
-     case SM501_DRAM_CONTROL:
-         ret = (s->dram_control & 0x07F107C0) | s->local_mem_size_index << 13;
-         break;
-+    case SM501_ARBTRTN_CONTROL:
-+        ret = s->arbitration_control;
-+        break;
-     case SM501_IRQ_MASK:
-         ret = s->irq_mask;
-         break;
-@@ -812,6 +816,9 @@ static void sm501_system_config_write(void *opaque, hwaddr addr,
-         /* TODO : check validity of size change */
-         s->dram_control |=  value & 0x7FFFFFC3;
-         break;
-+    case SM501_ARBTRTN_CONTROL:
-+        s->arbitration_control =  value & 0x37777777;
-+        break;
-     case SM501_IRQ_MASK:
-         s->irq_mask = value;
-         break;
+@@ -65,6 +65,7 @@
+ 
+ #define MMIO_BASE_OFFSET 0x3e00000
+ #define MMIO_SIZE 0x200000
++#define DC_PALETTE_ENTRIES (0x400 * 3)
+ 
+ /* SM501 register definitions taken from "linux/include/linux/sm501-regs.h" */
+ 
+@@ -491,7 +492,7 @@ typedef struct SM501State {
+     uint32_t uart0_mcr;
+     uint32_t uart0_scr;
+ 
+-    uint8_t dc_palette[0x400 * 3];
++    uint8_t dc_palette[DC_PALETTE_ENTRIES];
+ 
+     uint32_t dc_panel_control;
+     uint32_t dc_panel_panning_control;
+@@ -1537,16 +1538,32 @@ static const GraphicHwOps sm501_ops = {
+     .gfx_update  = sm501_update_display,
+ };
+ 
++static void sm501_reset(void *p)
++{
++    SM501State *s = p;
++
++    s->system_control = 0x00100000; /* 2D engine FIFO empty */
++    s->misc_control = SM501_MISC_IRQ_INVERT; /* assumes SH, active=low */
++    s->gpio_31_0_control = 0;
++    s->gpio_63_32_control = 0;
++    s->dram_control = 0;
++    s->arbitration_control = 0x05146732;
++    s->irq_mask = 0;
++    s->misc_timing = 0;
++    s->power_mode_control = 0;
++    s->dc_panel_control = 0x00010000; /* FIFO level 3 */
++    s->dc_video_control = 0;
++    s->dc_crt_control = 0x00010000;
++    s->twoD_control = 0;
++}
++
+ static void sm501_init(SM501State *s, DeviceState *dev,
+                        uint32_t local_mem_bytes)
+ {
+     s->local_mem_size_index = get_local_mem_size_index(local_mem_bytes);
+     SM501_DPRINTF("sm501 local mem size=%x. index=%d\n", get_local_mem_size(s),
+                   s->local_mem_size_index);
+-    s->system_control = 0x00100000; /* 2D engine FIFO empty */
+-    s->misc_control = SM501_MISC_IRQ_INVERT; /* assumes SH, active=low */
+-    s->dc_panel_control = 0x00010000; /* FIFO level 3 */
+-    s->dc_crt_control = 0x00010000;
++    qemu_register_reset(sm501_reset, s);
+ 
+     /* local memory */
+     memory_region_init_ram(&s->local_mem_region, OBJECT(dev), "sm501.local",
+@@ -1577,6 +1594,77 @@ static void sm501_init(SM501State *s, DeviceState *dev,
+     s->con = graphic_console_init(DEVICE(dev), 0, &sm501_ops, s);
+ }
+ 
++static const VMStateDescription vmstate_sm501_regs = {
++    .name = "sm501-regs",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32(system_control, SM501State),
++        VMSTATE_UINT32(misc_control, SM501State),
++        VMSTATE_UINT32(gpio_31_0_control, SM501State),
++        VMSTATE_UINT32(gpio_63_32_control, SM501State),
++        VMSTATE_UINT32(dram_control, SM501State),
++        VMSTATE_UINT32(arbitration_control, SM501State),
++        VMSTATE_UINT32(irq_mask, SM501State),
++        VMSTATE_UINT32(misc_timing, SM501State),
++        VMSTATE_UINT32(power_mode_control, SM501State),
++        VMSTATE_UINT32(uart0_ier, SM501State),
++        VMSTATE_UINT32(uart0_lcr, SM501State),
++        VMSTATE_UINT32(uart0_mcr, SM501State),
++        VMSTATE_UINT32(uart0_scr, SM501State),
++        VMSTATE_UINT8_ARRAY(dc_palette, SM501State, DC_PALETTE_ENTRIES),
++        VMSTATE_UINT32(dc_panel_control, SM501State),
++        VMSTATE_UINT32(dc_panel_panning_control, SM501State),
++        VMSTATE_UINT32(dc_panel_fb_addr, SM501State),
++        VMSTATE_UINT32(dc_panel_fb_offset, SM501State),
++        VMSTATE_UINT32(dc_panel_fb_width, SM501State),
++        VMSTATE_UINT32(dc_panel_fb_height, SM501State),
++        VMSTATE_UINT32(dc_panel_tl_location, SM501State),
++        VMSTATE_UINT32(dc_panel_br_location, SM501State),
++        VMSTATE_UINT32(dc_panel_h_total, SM501State),
++        VMSTATE_UINT32(dc_panel_h_sync, SM501State),
++        VMSTATE_UINT32(dc_panel_v_total, SM501State),
++        VMSTATE_UINT32(dc_panel_v_sync, SM501State),
++        VMSTATE_UINT32(dc_panel_hwc_addr, SM501State),
++        VMSTATE_UINT32(dc_panel_hwc_location, SM501State),
++        VMSTATE_UINT32(dc_panel_hwc_color_1_2, SM501State),
++        VMSTATE_UINT32(dc_panel_hwc_color_3, SM501State),
++        VMSTATE_UINT32(dc_video_control, SM501State),
++        VMSTATE_UINT32(dc_crt_control, SM501State),
++        VMSTATE_UINT32(dc_crt_fb_addr, SM501State),
++        VMSTATE_UINT32(dc_crt_fb_offset, SM501State),
++        VMSTATE_UINT32(dc_crt_h_total, SM501State),
++        VMSTATE_UINT32(dc_crt_h_sync, SM501State),
++        VMSTATE_UINT32(dc_crt_v_total, SM501State),
++        VMSTATE_UINT32(dc_crt_v_sync, SM501State),
++        VMSTATE_UINT32(dc_crt_hwc_addr, SM501State),
++        VMSTATE_UINT32(dc_crt_hwc_location, SM501State),
++        VMSTATE_UINT32(dc_crt_hwc_color_1_2, SM501State),
++        VMSTATE_UINT32(dc_crt_hwc_color_3, SM501State),
++        VMSTATE_UINT32(twoD_source, SM501State),
++        VMSTATE_UINT32(twoD_destination, SM501State),
++        VMSTATE_UINT32(twoD_dimension, SM501State),
++        VMSTATE_UINT32(twoD_control, SM501State),
++        VMSTATE_UINT32(twoD_pitch, SM501State),
++        VMSTATE_UINT32(twoD_foreground, SM501State),
++        VMSTATE_UINT32(twoD_background, SM501State),
++        VMSTATE_UINT32(twoD_stretch, SM501State),
++        VMSTATE_UINT32(twoD_color_compare, SM501State),
++        VMSTATE_UINT32(twoD_color_compare_mask, SM501State),
++        VMSTATE_UINT32(twoD_mask, SM501State),
++        VMSTATE_UINT32(twoD_clip_tl, SM501State),
++        VMSTATE_UINT32(twoD_clip_br, SM501State),
++        VMSTATE_UINT32(twoD_mono_pattern_low, SM501State),
++        VMSTATE_UINT32(twoD_mono_pattern_high, SM501State),
++        VMSTATE_UINT32(twoD_window_width, SM501State),
++        VMSTATE_UINT32(twoD_source_base, SM501State),
++        VMSTATE_UINT32(twoD_destination_base, SM501State),
++        VMSTATE_UINT32(twoD_alpha, SM501State),
++        VMSTATE_UINT32(twoD_wrap, SM501State),
++        VMSTATE_END_OF_LIST()
++     }
++};
++
+ #define TYPE_SYSBUS_SM501 "sysbus-sm501"
+ #define SYSBUS_SM501(obj) \
+     OBJECT_CHECK(SM501SysBusState, (obj), TYPE_SYSBUS_SM501)
+@@ -1673,6 +1761,17 @@ static Property sm501_pci_properties[] = {
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
++static const VMStateDescription vmstate_sm501 = {
++    .name = "sm501",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_PCI_DEVICE(parent_obj, SM501PCIState),
++        VMSTATE_STRUCT(state, SM501PCIState, 1, vmstate_sm501_regs, SM501State),
++        VMSTATE_END_OF_LIST()
++     }
++};
++
+ static void sm501_pci_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -1686,6 +1785,7 @@ static void sm501_pci_class_init(ObjectClass *klass, void *data)
+     dc->desc = "SM501 Display Controller";
+     dc->props = sm501_pci_properties;
+     dc->hotpluggable = false;
++    dc->vmsd = &vmstate_sm501;
+ }
+ 
+ static const TypeInfo sm501_pci_info = {
 -- 
 2.7.4
