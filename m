@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1chfEt-0002eS-3e
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 11:30:32 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1chfGb-00040D-FH
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 11:32:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1chfEq-0007NA-1t
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 11:30:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43710)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1chfEp-0007Ly-Ou
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 11:30:27 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A85C9811D8
-	for <qemu-devel@nongnu.org>; Sat, 25 Feb 2017 16:30:27 +0000 (UTC)
-References: <1487886317-27400-1-git-send-email-armbru@redhat.com>
-	<1487886317-27400-17-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <79895263-30d6-ed80-7d47-d2f22dbd6c47@redhat.com>
-Date: Sat, 25 Feb 2017 10:30:25 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1chfGZ-00081P-4p
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 11:32:16 -0500
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:37896)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1chfGY-00080m-U9
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 11:32:15 -0500
+Received: by mail-wm0-x232.google.com with SMTP id r141so34672453wmg.1
+	for <qemu-devel@nongnu.org>; Sat, 25 Feb 2017 08:32:14 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1487886317-27400-17-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="BUd7rN52O0uuJMgHSD0wtkspnCjDRoncp"
-Subject: Re: [Qemu-devel] [PATCH 16/21] test-qobject-input-visitor: Use
- strict visitor
+In-Reply-To: <alpine.BSF.2.20.1702242239330.76443@zero.eik.bme.hu>
+References: <cover.1487522123.git.balaton@eik.bme.hu>
+	<8936f97ffdf6fe9a71a300113019bfdba0ecef23.1487522123.git.balaton@eik.bme.hu>
+	<CAFEAcA9m8Yjwjn_B5aBZmWVwXXVj7-BQ1_d76ED4bg3cAWw=bw@mail.gmail.com>
+	<alpine.BSF.2.20.1702242138290.76443@zero.eik.bme.hu>
+	<alpine.BSF.2.20.1702242239330.76443@zero.eik.bme.hu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 25 Feb 2017 16:31:53 +0000
+Message-ID: <CAFEAcA9MWpWtsS_G-sXt92kRSmteyCVfbTfR4zytnaqOKV6W=g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH 09/10] sm501: Add some more missing
+ registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,67 +33,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---BUd7rN52O0uuJMgHSD0wtkspnCjDRoncp
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <79895263-30d6-ed80-7d47-d2f22dbd6c47@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 16/21] test-qobject-input-visitor: Use strict
- visitor
-References: <1487886317-27400-1-git-send-email-armbru@redhat.com>
- <1487886317-27400-17-git-send-email-armbru@redhat.com>
-In-Reply-To: <1487886317-27400-17-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 24 February 2017 at 21:49, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+> On Fri, 24 Feb 2017, BALATON Zoltan wrote:
+>>
+>> On Fri, 24 Feb 2017, Peter Maydell wrote:
+>>>
+>>> On 19 February 2017 at 16:35, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+>>>>
+>>>> Write only to allow clients to initialise these without failing
+>>>>
+>>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>>>
+>>>
+>>> What's the point in write-only register values?
 
-On 02/23/2017 03:45 PM, Markus Armbruster wrote:
-> The qobject input visitor comes in a strict and a non-strict variant.
-> This test is the non-strict variant's last user.
+>>> If the registers are writes-ignored, there's no need to store
+>>> the data written into the state struct; if the registers are
+>>> reads-as-written then implement them that way.
+>
+>
+> Still not sure what do you mean by read-as-written because I think that's
+> exactly what is done here, value stored and read back as is, except for
+> video_control where there are reserved bits that are always 0.
 
-Well, depending on Paolo's proposed addition.
+There are several ways we can make a register behave:
 
->  Turns out it relies
-> on non-strict only in test_visitor_in_null(), and just out of
-> laziness.  We don't actually test the non-strict behavior.
->=20
-> Clean up test_visitor_in_null(), and switch to the strict variant.
-> The next commit will drop the non-strict variant.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  tests/test-qobject-input-visitor.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
+"Read only" -> the guest can only read, it cannot write
+"Writes ignored" -> the guest can write but it has no effect
+"Reads as written" -> the guest can write, and we store the
+data so that when the guest reads it gets back the
+value it wrote, but it doesn't have any effect on device behaviour
+"Reads as zero" -> the guest can read but it always gets zero
+"Write only" -> the guest can write values and we store them
+but don't let the guest read them back. This is pointless.
 
-I'm in favor of unifying the two tests into one and reducing the
-duplication (this and the next patch), whether or not we decide that
-Paolo's patch means we don't want to eliminate non-strict mode.
+For cases where we don't actually implement some bit of hardware
+behaviour yet, it can be a reasonable choice to do either
+"read-as-zero/writes-ignored", or "reads as written",
+depending on what the guest is expecting. (writes-ignored
+is the easiest behaviour to implement, but sometimes guests
+won't work if you do that.)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+If you're implementing "reads as written" then the commit
+message shouldn't say "write only"... But the patch seems
+to only add code to the register-write function, not to
+the register-read function. That means we're storing
+values the guest writes but never doing anything with them.
+Either throw away the values immediately ("writes ignored")
+or let the guest read them back ("reads as written").
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+(Optionally, we can also log the access via LOG_UNIMP
+to let the user know the guest is trying to use some
+bit of the device that doesn't work yet.)
 
-
---BUd7rN52O0uuJMgHSD0wtkspnCjDRoncp
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYsbEhAAoJEKeha0olJ0NqpW4H/iKBtyKlhZGmGbwDH19nXa1H
-fzMY/rjmx1BEsdMgnYoP+GCfgobCK0aVlPoCsoEn8nqOodF2fpYe85YWa2Cz7809
-E/BIrtuH/ZecTXG17Ad7F6lM6BBMo92gOOHwwDfEauAzpk4c4YUmjTifmtlb9kN4
-wSKmj5rP8x194DRIowYnGta+foo5Kzg7SZW1aauwJ22/Rn7RY3iPHn4Jld7OSRuC
-jg5krz6ao4rWG4Ojlw/yeTmZjftOLt7MagZcFbzyyZTe9VbPfiIDgXUI4wNic8iy
-JQ/v3aljA6FizN+eKO+ze3LJiLEptvx+hqLZnKHBRBdQ5dxI3AQLKqzr52HV9xA=
-=BgLq
------END PGP SIGNATURE-----
-
---BUd7rN52O0uuJMgHSD0wtkspnCjDRoncp--
+thanks
+-- PMM
