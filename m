@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1chfLX-0007ps-Ng
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 11:37:24 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1chfpJ-0006Z4-Jt
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 12:08:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1chfLW-0001Cv-RT
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 11:37:23 -0500
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:35236)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1chfLW-0001Ca-KD
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 11:37:22 -0500
-Received: by mail-wm0-x231.google.com with SMTP id v186so34571298wmd.0
-	for <qemu-devel@nongnu.org>; Sat, 25 Feb 2017 08:37:22 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <1487879642-16139-1-git-send-email-armbru@redhat.com>
-References: <1487879642-16139-1-git-send-email-armbru@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 25 Feb 2017 16:37:00 +0000
-Message-ID: <CAFEAcA_YQS_EDJ5dZkiQ5KcMjZhN-U0opTeJh8r8O_SSMG8Cvg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 00/24] option cutils: Fix and clean up
- number conversions
+	(envelope-from <vsementsov@virtuozzo.com>) id 1chfpF-0001UD-Rs
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 12:08:09 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:33072 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1chfpF-0001RG-FF
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 12:08:05 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Sat, 25 Feb 2017 20:07:52 +0300
+Message-Id: <20170225170758.427066-17-vsementsov@virtuozzo.com>
+In-Reply-To: <20170225170758.427066-1-vsementsov@virtuozzo.com>
+References: <20170225170758.427066-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v16 16/22] qmp: add persistent flag to
+ block-dirty-bitmap-add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +25,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-On 23 February 2017 at 19:53, Markus Armbruster <armbru@redhat.com> wrote:
-> QemuOpts has its own code to convert strings to numbers, and being
-> QemuOpts, it gets it wrong.  util/cutils is less wrong.  Fix it up
-> some, and reuse it for QemuOpts.
->
-> The following changes since commit 10f25e4844cb9b3f02fb032f88051dd5b65b4206:
->
->   Merge remote-tracking branch 'remotes/yongbok/tags/mips-20170222' into staging (2017-02-23 09:59:40 +0000)
->
-> are available in the git repository at:
->
->   git://repo.or.cz/qemu/armbru.git tags/pull-util-2017-02-23
->
-> for you to fetch changes up to 75cdcd1553e74b5edc58aed23e3b2da8dabb1876:
->
->   option: Fix checking of sizes for overflow and trailing crap (2017-02-23 20:35:36 +0100)
->
-> ----------------------------------------------------------------
-> option cutils: Fix and clean up number conversions
->
+Add optional 'persistent' flag to qmp command block-dirty-bitmap-add.
+Default is false.
 
-Applied, thanks.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Denis V. Lunev <den@openvz.org>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+---
+ blockdev.c           | 18 +++++++++++++++++-
+ qapi/block-core.json |  8 +++++++-
+ 2 files changed, 24 insertions(+), 2 deletions(-)
 
--- PMM
+diff --git a/blockdev.c b/blockdev.c
+index 245e1e1d17..40605faccc 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -1967,6 +1967,7 @@ static void block_dirty_bitmap_add_prepare(BlkActionState *common,
+     /* AIO context taken and released within qmp_block_dirty_bitmap_add */
+     qmp_block_dirty_bitmap_add(action->node, action->name,
+                                action->has_granularity, action->granularity,
++                               action->has_persistent, action->persistent,
+                                &local_err);
+ 
+     if (!local_err) {
+@@ -2696,10 +2697,12 @@ out:
+ 
+ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
+                                 bool has_granularity, uint32_t granularity,
++                                bool has_persistent, bool persistent,
+                                 Error **errp)
+ {
+     AioContext *aio_context;
+     BlockDriverState *bs;
++    BdrvDirtyBitmap *bitmap;
+ 
+     if (!name || name[0] == '\0') {
+         error_setg(errp, "Bitmap name cannot be empty");
+@@ -2725,7 +2728,20 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
+         granularity = bdrv_get_default_bitmap_granularity(bs);
+     }
+ 
+-    bdrv_create_dirty_bitmap(bs, granularity, name, errp);
++    if (!has_persistent) {
++        persistent = false;
++    }
++
++    if (persistent &&
++        !bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp))
++    {
++        goto out;
++    }
++
++    bitmap = bdrv_create_dirty_bitmap(bs, granularity, name, errp);
++    if (bitmap != NULL) {
++        bdrv_dirty_bitmap_set_persistance(bitmap, persistent);
++    }
+ 
+  out:
+     aio_context_release(aio_context);
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 932f5bb3b4..535df20212 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -1559,10 +1559,16 @@
+ # @granularity: #optional the bitmap granularity, default is 64k for
+ #               block-dirty-bitmap-add
+ #
++# @persistent: #optional the bitmap is persistent, i.e. it will be saved to the
++#              corresponding block device image file on its close. For now only
++#              Qcow2 disks support persistent bitmaps. Default is false.
++#              (Since 2.9)
++#
+ # Since: 2.4
+ ##
+ { 'struct': 'BlockDirtyBitmapAdd',
+-  'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32' } }
++  'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32',
++            '*persistent': 'bool' } }
+ 
+ ##
+ # @block-dirty-bitmap-add:
+-- 
+2.11.1
