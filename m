@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1chfpJ-0006ZG-Lo
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 12:08:13 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1chfpK-0006ZK-4t
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 12:08:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1chfpE-0001Sm-On
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 12:08:09 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:19694 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1chfpF-0001UR-SH
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 12:08:10 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:1662 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1chfpE-0001QH-7o
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 12:08:04 -0500
+	id 1chfpF-0001RK-8p
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 12:08:05 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Sat, 25 Feb 2017 20:07:36 +0300
-Message-Id: <20170225170758.427066-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v16 00/22] qcow2: persistent dirty bitmaps
+Date: Sat, 25 Feb 2017 20:07:49 +0300
+Message-Id: <20170225170758.427066-14-vsementsov@virtuozzo.com>
+In-Reply-To: <20170225170758.427066-1-vsementsov@virtuozzo.com>
+References: <20170225170758.427066-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v16 13/22] qcow2: add persistent dirty bitmaps
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,374 +28,614 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-Hi all!
+Store persistent dirty bitmaps in qcow2 image.
 
-There is a new update of qcow2-bitmap series - v16.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block.c              |   6 +-
+ block/qcow2-bitmap.c | 473 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ block/qcow2.c        |   9 +
+ block/qcow2.h        |   1 +
+ 4 files changed, 486 insertions(+), 3 deletions(-)
 
-web: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=qcow2-bitmap-v16
-git: https://src.openvz.org/scm/~vsementsov/qemu.git (tag qcow2-bitmap-v16)
-
-v16:
-
-mostly by Kevin's comments:
-07: just moved here, as preparation for merging refcounts to 08
-08: move "qcow2-bitmap: refcounts" staff to this patch, to not break qcow2-img check
-    drop r-b's
-    move necessary supporting static functions to this patch too (to not break compilation)
-    fprintf -> error_report
-    other small changes with error messages and comments
-    code style
-    for qcow2-bitmap.c:
-      'include "exec/log.h"' was dropped
-      s/1/(1U << 0) for BME_FLAG_IN_USE
-      add BME_TABLE_ENTRY_FLAG_ALL_ONES to replace magic 1
-      don't check 'cluster_size <= 0' in check_table_entry
-old "[PATCH v15 08/25] block: introduce auto-loading bitmaps" was dropped
-09: was "[PATCH v15 09/25] qcow2: add .bdrv_load_autoloading_dirty_bitmaps"
-    drop r-b's
-    some staff was moved to 08
-    update_header_sync - error on bdrv_flush fail
-    rename disk_sectors_in_bitmap_cluster to sectors_covered_by_bitmap_cluster
-     and adjust comment.
-     so, variable for storing this function result: s/dsc/sbc/
-    s/1/BME_TABLE_ENTRY_FLAG_ALL_ONES/
-    also, as Qcow2BitmapTable already introduced in 08,
-       s/table_offset/table.offset/ and s/table_size/table.size, etc..
-    update_ext_header_and_dir_in_place: add comments, add additional
-      update_header_sync, to reduce indeterminacy in case of error.
-    call qcow2_load_autoloading_dirty_bitmaps directly from qcow2_open
-    no .bdrv_load_autoloading_dirty_bitmaps
-11: drop bdrv_store_persistent_dirty_bitmaps at all.
-    drop r-b's
-13: rename patch, rewrite commit msg
-    drop r-b's
-    move bdrv_release_named_dirty_bitmaps in bdrv_close() after drv->bdrv_close()
-    Qcow2BitmapTable is already introduced, so no
-      s/table_offset/table.offset/ and s/table_size/table.size, etc.. here
-    old 25 with check_constraints_on_bitmap() improvements merged here (Eric)
-    like in 09, s/dsc/sbc/ and s/disk_sectors_in_bitmap_cluster/sectors_covered_by_bitmap_cluster/
-    no .bdrv_store_persistent_dirty_bitmaps
-    call qcow2_store_persistent_dirty_bitmaps directly from qcow2_inactivate
-15: corresponding part of 25 merged here. Add John's r-b, as 25 was also reviewed by John.
-16: add John's r-b
-
-
-v15:
-13,14: add John's r-b
-15: qcow2_can_store_new_dirty_bitmap:
-      - check max dirty bitmaps and bitmap directory overhead
-      - switch to error_prepend
-    rm Max's r-b
-    not add John's r-b
-17-24: add John's r-b
-25: changed because 15 changed,
-    not add John's r-b
-
-
-v14:
-
-07: use '|=' to update need_update_header
-    add John's r-b
-    add Max's r-b
-09: remove unused bitmap_table_to_cpu()
-    left Max's r-b, hope it's ok
-    add John's r-b
-10: remove extra new line
-    add John's r-b
-11: add John's r-b
-12: add John's r-b
-13: small fixes by John's review:
-       - remove weird g_free of NULL pointer from
-           if (tb == NULL) {
-               g_free(tb);
-               return -EINVAL;
-           }
-       - remove extra comment "/* errp is already set */"
-       - s/"Too large bitmap directory"/"Bitmap directory is too large"/
-    left Max's r-b, hope you don't mind 
-22: add Max's r-b
-23: add Max's r-b
-24: add Max's r-b
-25: new patch to improve error message on check_constraints_on_bitmap fail
-    
-
-v13: Just a fix for style checker.
-13: line over 80
-14: line over 80
-22: s/if () \n{/if () {/
-
-v12:
-07: do not update header in qcow2_read_extensions, instead do it in the
-    end of qcow2_open, where it is updated also to clear unknown
-    autoclear features.
-    Wrong bdrv_is_root_node used instead of bdrv_is_read_only is fixed
-    automatically.
-08: add Max's r-b
-09: contextual: s/raw_bsd/raw-format/
-    qcow2-bitmap.c: copyright s/2016/2017/
-    fix compilation: move update_header_sync() to this patch
-    add Max's r-b
-13: update_header_sync() is moved to 09
-    add Max's r-b
-15: add Max's r-b
-16: As qmp-commands.txt is removed from master, remove it here too.
-    Sentence "For now only Qcow2 disks support persistent bitmaps.
-     Default is false." moved to qapi/block-core.json.
-    Hope that is OK, Max's r-b is not dropped.
-17: qmp-commands.txt deleted, r-b is not dropped too.
-18: s/is failed/has failed/, add Max's r-b
-19: copyright: s/2016/2017/
-21: drop "res->corruptions > 0 => ret = -EINVAL", add Max's r-b
-22: actually, patch is replaced with a new one, however some parts are the same.
-    instead of changing bdrv_release_dirty_bitmap behaviour, create new
-    bdrv_remove_persistent_dirty_bitmap
-23: improve comment, about not-exists is not an error
-24: new patch
-
-Old 24 (qcow2-bitmap: cache bitmap list in BDRVQcow2State) will be sent
-separately, to be applied after these series.
-
-Also: about bdrv_dirty_bitmap_set_persistance: I've decided not change its behaviour
-for now and just call bdrv_remove_persistent_dirty_bitmap from
-qmp_block_dirty_bitmap_remove. Reasons:
-1. Do not change reviewed part.
-2. I'm not sure, that this complication of BdrvDirtyBitmap.persistent semantics
-   is good (current semantics are just: .persistent means that bitmap should be
-   saved on disk close). .persistent actually is not very related to "is there 
-   stored version of the bitmap in the image".
-3. It may be done later.
-4. It is not actually needed for now, as the only usage is dropping bitmap in
-   bdrv_remove_persistent_dirty_bitmap. May be in future it will be needed,
-   when we will have qmp interfaces for finer control of persistent dirty bitmaps.
-
-
-v11:
-
-Fix automatic build test fail.
-
-18: wording - "ASCII representation of SHA256 ..."
-24: fix redeclaration error. (This is still RFC, may be not needed patch,
-    see description in v10 below).
-
-v10:
-
-07: rm John's r-b
-    not add Max's r-b
-    fix subject s/dirty bitmaps/bitmaps
-    improve WARNING message
-    remove header ext if autoclear bit is unset, through qcow2_updata_header() - r-b blocking change
-08: move bdrv_load_autoloading_dirty_bitmaps under asserts block (Max)
-    fix typo in commit message
-    move bdrv_load_autoloading_dirty_bitmaps after asserts
-    John's r-b
-09: rewrite check_dir_entry
-    remove extra feature cluster_size=0 from check_table_entry
-    which clears autoclear bit before trying to update bitmap directory
-    bitmap_list_store - do not free old clusters if in_place=true
-    changes in comments, fix indents
-    add functions
-      bitmap_list_count
-      update_ext_header_and_dir_in_place (unset autoclear bit before trying to
-                                          modify bitmap directory)
-       (for usage in qcow2_load_autoloading_dirty_bitmaps)
-11: add node name to error report
-    Max's r-b
-13: add type Qcow2BitmapTable
-    move from bm.table_* to bm.table.*
-    rewrite check_constraints_on_bitmap
-    flush(bs->file) instead of flush(bs) in update_ext_header_and_dir
-    assert(DIV_ROUND_UP(bm_size, dsc) == tb_size);
-      and assert(write_size <= s->cluster_size); in store_bitmap_data
-    fix: s/tb_size/tb_size * sizeof(tb[0]) in store_bitmap
-    in qcow2_store_persistent_dirty_bitmaps:
-      fail if !can_write 
-      fix counting of new_nb_bitmaps and new_dir_size
-      free old clusters _after_ successful directory update (aggregate old bitmap
-        tables into drop_tables)
-2 14: rename to can_store_new_dirty_bitmap
-    Max's r-b
-15: rename to can_store_new_dirty_bitmap
-    rm extra !!
-16: Max's r-b
-    rename to can_store_new_dirty_bitmap
-    indenting
-    Since s/2.8/2.9
-17: Max's r-b
-    Since s/2.8/2.9
-18: hashing can fail in comment for qapi
-    Since s/2.8/2.9
-    remove dead comment
-19: indentation
-    Max's r-b
-20: Max's r-b
-21: fix error handling
-    return 0 if nb_bitmaps == 0
-new patches:
-22-23: remove bitmap from file on bdrv_release_dirty_bitmap
-24: experimental, RFC: cache bitmap list to bs, to not reload it from file.
-    I'm not sure that is needed now, but if you want I can merge it to earlier
-    patches.
-
-v9:
-
-rebase on master!
-
-01-04,06,07: John's r-b
-03: rewording in comment ("The concurrent resetting ..."), John's r-b
-07: reword error messages
-    commit message: dirty bitmap -> bitmap
-09: fix uninitialized ret in bitmap_list_store() (fix compilation warning)
-18: fix compilation of tests/test-hbitmap
-
-also, change constants names for qcow2: DIRTY_BITMAP -> BITMAP (as it is not
-dirty bitmaps extension, but just bitmaps extension), QCOW -> QCOW2 (bitmaps
-are only for qcow2)
-
-v8:
-
-Patches 01-06 are mostly unchanged, except for spelling and wording.
-02 - add Eric's r-b
-03,04 - add Max's r-b
-
-07-09 is refactored "bitmap-read" part of the feature. Main changes:
-- introduce bitmap list - normal list, which represents bitmap directory.
-  Function bitmap_list_load loads bitmap directory, checks everything and
-  creates normal list.
-- introduce .bdrv_load_autoloading_dirty_bitmaps : instead of loading bitmaps
-  in qcow2_open, lets load them only in bdrv_open, to avoid reloading in 
-  bdrv_snapshot_goto
-- do not delete bitmaps after read, but mark them IN_USE
-
-10 has contextual changes and rewording of comment. I've added Max's r-b, hope it's ok.
-
-11: add error_report("Persistent bitmaps are lost") in case of failed bitmap store
-
-12: add Max's r-b
-
-13 is refactored "bitmap-store" part of the feature. see 07-09 description
-- for now I just free old clusters and allocate new. This will be improved
-  with a separate patch.
-
-patch about "delete bitmaps on truncate" is removed. This case will be handled later.
-IN_USE, autoclear, check-constraints things are merged into other patches.
-
-14-15 are mew patches, to early check possibility of creating persistent bitmap with
-  specified name and granularity in specified BDS
-
-16-17: spelling, rewording, indenting, tiny code simplifying, check can_store (by 14-15),
-    s/if (autoload && !persistent)/if (has_autoload && !persistent)/,
-    rebase (deleted qmp-commands.hx)
-
-18: alternative to md5 in query-block:
-  - separated qmp command -x-debug-block-dirty-bitmap-sha256
-  - as adviced by Daniel P. Berrange in my parallel thread:
-    - sha256 instead of md5
-    - use qcrypto_hash_* instead of GChecksum
-  - fix bug =) (size was wrong in hbitmap_md5)
-
-19: s/3999/3fff/, use x-debug-block-dirty-bitmap-sha256
-
-20: new patch to rename and publish inc_refcounts
-
-21: some fixes and refactoring mostyly by Max's comments.
-
-Max, Eric, great tanks for your review!
-I hope, I've covered most of your comments by this update.
-
-TODO:
-- handle reopening image RO->RW and incoming migration, set IN_USE for existing loaded bitmaps
-  in these cases.
-- reuse old, already allocated data clusters for bitmaps storing
-- truncate bitmaps in the image on truncate
-
-
-v7:
-
-https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=refs%2Ftags%2Fqcow2-bitmap-v7
-based on block-next (https://github.com/XanClic/qemu/commits/block-next)
-
-- a lot of refactoring and reordering of patches.
-- dead code removed (bdrv_dirty_bitmap_load, etc.)
-- do not maintain extra data for now
-- do not store dirty bitmap directory in memory
-  (as we use it seldom, we can just reread if needed)
-
-By Kevin's review:
-01 - commit message changed: fix->improvement (as it was not a bug)
-03 - r-b
-04 - r-b
-05 - add 21 patch to fix spec, also, removed all (I hope) mentions of
-     "Bitmap Header", switch to one unified name for it - "Bitmap
-     Directory Entry", to avoid misunderstanding with Qcow2 header.
-     (also, add patch 22, to fix it in spec)
-v6.06 - improve for_each_dir_entry loop, reorder patches, other small fixes
-v6.07 ~> v7.09 - dead code removed, I've moved to one function 
-        .bdrv_store_persistent_bitmaps and have wrapper and callback in one
-        patch (with also some other staff. If it not ok, I can split them)
-v6.08 - about keeping bitmap directory instead of bitmap list: no I don't keep
-        it at all.
-v6.16 - old bdrv_ bitmap-storing related functions are removed. The new one is
-        bdrv_store_persistent_bitmaps.
-
-
-v6:
-https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=refs%2Ftags%2Fqcow2-bitmap-v6
-based on block-next (https://github.com/XanClic/qemu/commits/block-next)
-
-There are a lot of changes, reorderings and additions in comparement with v5.
-One principal thing: now bitmaps are removed from image after loading instead
-of marking them in_use. It is simpler and we do not need to store superfluous data.
-Also, we are no more interested in command line interface to dirty bitmaps.
-So it is dropped.  If someone needs it I can add it later.
-
-Vladimir Sementsov-Ogievskiy (22):
-  specs/qcow2: fix bitmap granularity qemu-specific note
-  specs/qcow2: do not use wording 'bitmap header'
-  hbitmap: improve dirty iter
-  tests: add hbitmap iter test
-  block: fix bdrv_dirty_bitmap_granularity signature
-  block/dirty-bitmap: add deserialize_ones func
-  qcow2-refcount: rename inc_refcounts() and make it public
-  qcow2: add bitmaps extension
-  qcow2: autoloading dirty bitmaps
-  block/dirty-bitmap: add autoload field to BdrvDirtyBitmap
-  block: introduce persistent dirty bitmaps
-  block/dirty-bitmap: add bdrv_dirty_bitmap_next()
-  qcow2: add persistent dirty bitmaps support
-  block: add bdrv_can_store_new_dirty_bitmap
-  qcow2: add .bdrv_can_store_new_dirty_bitmap
-  qmp: add persistent flag to block-dirty-bitmap-add
-  qmp: add autoload parameter to block-dirty-bitmap-add
-  qmp: add x-debug-block-dirty-bitmap-sha256
-  iotests: test qcow2 persistent dirty bitmap
-  block/dirty-bitmap: add bdrv_remove_persistent_dirty_bitmap
-  qcow2: add .bdrv_remove_persistent_dirty_bitmap
-  qmp: block-dirty-bitmap-remove: remove persistent
-
- block.c                      |   28 +-
- block/Makefile.objs          |    2 +-
- block/dirty-bitmap.c         |   80 ++-
- block/qcow2-bitmap.c         | 1374 ++++++++++++++++++++++++++++++++++++++++++
- block/qcow2-refcount.c       |   59 +-
- block/qcow2.c                |  143 ++++-
- block/qcow2.h                |   41 ++
- blockdev.c                   |   71 ++-
- docs/specs/qcow2.txt         |    8 +-
- include/block/block.h        |    3 +
- include/block/block_int.h    |    8 +
- include/block/dirty-bitmap.h |   21 +-
- include/qemu/hbitmap.h       |   49 +-
- qapi/block-core.json         |   39 +-
- tests/Makefile.include       |    2 +-
- tests/qemu-iotests/165       |   89 +++
- tests/qemu-iotests/165.out   |    5 +
- tests/qemu-iotests/group     |    1 +
- tests/test-hbitmap.c         |   19 +
- util/hbitmap.c               |   51 +-
- 20 files changed, 2026 insertions(+), 67 deletions(-)
- create mode 100644 block/qcow2-bitmap.c
- create mode 100755 tests/qemu-iotests/165
- create mode 100644 tests/qemu-iotests/165.out
-
+diff --git a/block.c b/block.c
+index a0346c80c6..16cf522219 100644
+--- a/block.c
++++ b/block.c
+@@ -2322,9 +2322,6 @@ static void bdrv_close(BlockDriverState *bs)
+     bdrv_flush(bs);
+     bdrv_drain(bs); /* in case flush left pending I/O */
+ 
+-    bdrv_release_named_dirty_bitmaps(bs);
+-    assert(QLIST_EMPTY(&bs->dirty_bitmaps));
+-
+     if (bs->drv) {
+         BdrvChild *child, *next;
+ 
+@@ -2363,6 +2360,9 @@ static void bdrv_close(BlockDriverState *bs)
+         bs->full_open_options = NULL;
+     }
+ 
++    bdrv_release_named_dirty_bitmaps(bs);
++    assert(QLIST_EMPTY(&bs->dirty_bitmaps));
++
+     QLIST_FOREACH_SAFE(ban, &bs->aio_notifiers, list, ban_next) {
+         g_free(ban);
+     }
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index ba72b7d2ac..e377215d5c 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -27,6 +27,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
++#include "qemu/cutils.h"
+ 
+ #include "block/block_int.h"
+ #include "block/qcow2.h"
+@@ -42,6 +43,10 @@
+ #define BME_MIN_GRANULARITY_BITS 9
+ #define BME_MAX_NAME_SIZE 1023
+ 
++#if BME_MAX_TABLE_SIZE * 8ULL > INT_MAX
++#error In the code bitmap table physical size assumed to fit into int
++#endif
++
+ /* Bitmap directory entry flags */
+ #define BME_RESERVED_FLAGS 0xfffffffcU
+ #define BME_FLAG_IN_USE (1U << 0)
+@@ -72,6 +77,8 @@ typedef struct Qcow2BitmapTable {
+     uint32_t size; /* number of 64bit entries */
+     QSIMPLEQ_ENTRY(Qcow2BitmapTable) entry;
+ } Qcow2BitmapTable;
++typedef QSIMPLEQ_HEAD(Qcow2BitmapTableList, Qcow2BitmapTable)
++    Qcow2BitmapTableList;
+ 
+ typedef struct Qcow2Bitmap {
+     Qcow2BitmapTable table;
+@@ -79,6 +86,8 @@ typedef struct Qcow2Bitmap {
+     uint8_t granularity_bits;
+     char *name;
+ 
++    BdrvDirtyBitmap *dirty_bitmap;
++
+     QSIMPLEQ_ENTRY(Qcow2Bitmap) entry;
+ } Qcow2Bitmap;
+ typedef QSIMPLEQ_HEAD(Qcow2BitmapList, Qcow2Bitmap) Qcow2BitmapList;
+@@ -104,6 +113,15 @@ static int update_header_sync(BlockDriverState *bs)
+     return bdrv_flush(bs);
+ }
+ 
++static inline void bitmap_table_to_be(uint64_t *bitmap_table, size_t size)
++{
++    size_t i;
++
++    for (i = 0; i < size; ++i) {
++        cpu_to_be64s(&bitmap_table[i]);
++    }
++}
++
+ static int check_table_entry(uint64_t entry, int cluster_size)
+ {
+     uint64_t offset;
+@@ -127,6 +145,70 @@ static int check_table_entry(uint64_t entry, int cluster_size)
+     return 0;
+ }
+ 
++static int check_constraints_on_bitmap(BlockDriverState *bs,
++                                       const char *name,
++                                       uint32_t granularity,
++                                       Error **errp)
++{
++    BDRVQcow2State *s = bs->opaque;
++    int granularity_bits = ctz32(granularity);
++    int64_t len = bdrv_getlength(bs);
++
++    assert(granularity > 0);
++    assert((granularity & (granularity - 1)) == 0);
++
++    if (len < 0) {
++        error_setg_errno(errp, -len, "Failed to get size of '%s'",
++                         bdrv_get_device_or_node_name(bs));
++        return len;
++    }
++
++    if (granularity_bits > BME_MAX_GRANULARITY_BITS) {
++        error_setg(errp, "Granularity exceeds maximum (%u bytes)",
++                   1 << BME_MAX_GRANULARITY_BITS);
++        return -EINVAL;
++    }
++    if (granularity_bits < BME_MIN_GRANULARITY_BITS) {
++        error_setg(errp, "Granularity is under minimum (%u bytes)",
++                   1 << BME_MIN_GRANULARITY_BITS);
++        return -EINVAL;
++    }
++
++    if ((len > (uint64_t)BME_MAX_PHYS_SIZE << granularity_bits) ||
++        (len > (uint64_t)BME_MAX_TABLE_SIZE * s->cluster_size <<
++               granularity_bits))
++    {
++        error_setg(errp, "Too much space will be occupied by the bitmap. "
++                   "Use larger granularity");
++        return -EINVAL;
++    }
++
++    if (strlen(name) > BME_MAX_NAME_SIZE) {
++        error_setg(errp, "Name length exceeds maximum (%u characters)",
++                   BME_MAX_NAME_SIZE);
++        return -EINVAL;
++    }
++
++    return 0;
++}
++
++static void clear_bitmap_table(BlockDriverState *bs, uint64_t *bitmap_table,
++                               uint32_t bitmap_table_size)
++{
++    BDRVQcow2State *s = bs->opaque;
++    int i;
++
++    for (i = 0; i < bitmap_table_size; ++i) {
++        uint64_t addr = bitmap_table[i] & BME_TABLE_ENTRY_OFFSET_MASK;
++        if (!addr) {
++            continue;
++        }
++
++        qcow2_free_clusters(bs, addr, s->cluster_size, QCOW2_DISCARD_OTHER);
++        bitmap_table[i] = 0;
++    }
++}
++
+ static int bitmap_table_load(BlockDriverState *bs, Qcow2BitmapTable *tb,
+                              uint64_t **bitmap_table)
+ {
+@@ -165,6 +247,28 @@ fail:
+     return ret;
+ }
+ 
++static int free_bitmap_clusters(BlockDriverState *bs, Qcow2BitmapTable *tb)
++{
++    int ret;
++    uint64_t *bitmap_table;
++
++    ret = bitmap_table_load(bs, tb, &bitmap_table);
++    if (ret < 0) {
++        assert(bitmap_table == NULL);
++        return ret;
++    }
++
++    clear_bitmap_table(bs, bitmap_table, tb->size);
++    qcow2_free_clusters(bs, tb->offset, tb->size * sizeof(uint64_t),
++                        QCOW2_DISCARD_OTHER);
++    g_free(bitmap_table);
++
++    tb->offset = 0;
++    tb->size = 0;
++
++    return 0;
++}
++
+ /* This function returns the number of disk sectors covered by a single qcow2
+  * cluster of bitmap data. */
+ static uint64_t sectors_covered_by_bitmap_cluster(const BDRVQcow2State *s,
+@@ -748,6 +852,69 @@ static int update_ext_header_and_dir_in_place(BlockDriverState *bs,
+      */
+ }
+ 
++static int update_ext_header_and_dir(BlockDriverState *bs,
++                                     Qcow2BitmapList *bm_list)
++{
++    BDRVQcow2State *s = bs->opaque;
++    int ret;
++    uint64_t new_offset = 0;
++    uint64_t new_size = 0;
++    uint32_t new_nb_bitmaps = 0;
++    uint64_t old_offset = s->bitmap_directory_offset;
++    uint64_t old_size = s->bitmap_directory_size;
++    uint32_t old_nb_bitmaps = s->nb_bitmaps;
++    uint64_t old_autocl = s->autoclear_features;
++
++    if (bm_list != NULL && !QSIMPLEQ_EMPTY(bm_list)) {
++        new_nb_bitmaps = bitmap_list_count(bm_list);
++
++        if (new_nb_bitmaps > QCOW2_MAX_BITMAPS) {
++            return -EINVAL;
++        }
++
++        ret = bitmap_list_store(bs, bm_list, &new_offset, &new_size, false);
++        if (ret < 0) {
++            return ret;
++        }
++
++        ret = bdrv_flush(bs->file->bs);
++        if (ret < 0) {
++            goto fail;
++        }
++
++        s->autoclear_features |= QCOW2_AUTOCLEAR_BITMAPS;
++    } else {
++        s->autoclear_features &= ~(uint64_t)QCOW2_AUTOCLEAR_BITMAPS;
++    }
++
++    s->bitmap_directory_offset = new_offset;
++    s->bitmap_directory_size = new_size;
++    s->nb_bitmaps = new_nb_bitmaps;
++
++    ret = update_header_sync(bs);
++    if (ret < 0) {
++        goto fail;
++    }
++
++    if (old_size > 0) {
++        qcow2_free_clusters(bs, old_offset, old_size, QCOW2_DISCARD_OTHER);
++    }
++
++    return 0;
++
++fail:
++    if (new_offset > 0) {
++        qcow2_free_clusters(bs, new_offset, new_size, QCOW2_DISCARD_OTHER);
++    }
++
++    s->bitmap_directory_offset = old_offset;
++    s->bitmap_directory_size = old_size;
++    s->nb_bitmaps = old_nb_bitmaps;
++    s->autoclear_features = old_autocl;
++
++    return ret;
++}
++
+ /* for g_slist_foreach for GSList of BdrvDirtyBitmap* elements */
+ static void release_dirty_bitmap_helper(gpointer bitmap,
+                                         gpointer bs)
+@@ -807,3 +974,309 @@ fail:
+     g_slist_free(created_dirty_bitmaps);
+     bitmap_list_free(bm_list);
+ }
++
++/* store_bitmap_data()
++ * Store bitmap to image, filling bitmap table accordingly.
++ */
++static uint64_t *store_bitmap_data(BlockDriverState *bs,
++                                   BdrvDirtyBitmap *bitmap,
++                                   uint32_t *bitmap_table_size, Error **errp)
++{
++    int ret;
++    BDRVQcow2State *s = bs->opaque;
++    int64_t sector;
++    uint64_t sbc;
++    uint64_t bm_size = bdrv_dirty_bitmap_size(bitmap);
++    const char *bm_name = bdrv_dirty_bitmap_name(bitmap);
++    uint8_t *buf = NULL;
++    BdrvDirtyBitmapIter *dbi;
++    uint64_t *tb;
++    uint64_t tb_size =
++            size_to_clusters(s,
++                bdrv_dirty_bitmap_serialization_size(bitmap, 0, bm_size));
++
++    if (tb_size > BME_MAX_TABLE_SIZE ||
++        tb_size * s->cluster_size > BME_MAX_PHYS_SIZE)
++    {
++        error_setg(errp, "Bitmap '%s' is too big", bm_name);
++        return NULL;
++    }
++
++    tb = g_try_new0(uint64_t, tb_size);
++    if (tb == NULL) {
++        error_setg(errp, "No memory");
++        return NULL;
++    }
++
++    dbi = bdrv_dirty_iter_new(bitmap, 0);
++    buf = g_malloc(s->cluster_size);
++    sbc = sectors_covered_by_bitmap_cluster(s, bitmap);
++    assert(DIV_ROUND_UP(bm_size, sbc) == tb_size);
++
++    while ((sector = bdrv_dirty_iter_next(dbi)) != -1) {
++        uint64_t cluster = sector / sbc;
++        uint64_t end, write_size;
++        int64_t off;
++
++        sector = cluster * sbc;
++        end = MIN(bm_size, sector + sbc);
++        write_size =
++            bdrv_dirty_bitmap_serialization_size(bitmap, sector, end - sector);
++        assert(write_size <= s->cluster_size);
++
++        off = qcow2_alloc_clusters(bs, s->cluster_size);
++        if (off < 0) {
++            error_setg_errno(errp, -off,
++                             "Failed to allocate clusters for bitmap '%s'",
++                             bm_name);
++            goto fail;
++        }
++        tb[cluster] = off;
++
++        bdrv_dirty_bitmap_serialize_part(bitmap, buf, sector, end - sector);
++        if (write_size < s->cluster_size) {
++            memset(buf + write_size, 0, s->cluster_size - write_size);
++        }
++
++        ret = qcow2_pre_write_overlap_check(bs, 0, off, s->cluster_size);
++        if (ret < 0) {
++            error_setg_errno(errp, -ret, "Qcow2 overlap check failed");
++            goto fail;
++        }
++
++        ret = bdrv_pwrite(bs->file, off, buf, s->cluster_size);
++        if (ret < 0) {
++            error_setg_errno(errp, -ret, "Failed to write bitmap '%s' to file",
++                             bm_name);
++            goto fail;
++        }
++
++        if (end >= bm_size) {
++            break;
++        }
++
++        bdrv_set_dirty_iter(dbi, end);
++    }
++
++    *bitmap_table_size = tb_size;
++    g_free(buf);
++    bdrv_dirty_iter_free(dbi);
++
++    return tb;
++
++fail:
++    clear_bitmap_table(bs, tb, tb_size);
++    g_free(buf);
++    bdrv_dirty_iter_free(dbi);
++    g_free(tb);
++
++    return NULL;
++}
++
++/* store_bitmap()
++ * Store bm->dirty_bitmap to qcow2.
++ * Set bm->table_offset and bm->table_size accordingly.
++ */
++static int store_bitmap(BlockDriverState *bs, Qcow2Bitmap *bm, Error **errp)
++{
++    int ret;
++    uint64_t *tb;
++    int64_t tb_offset;
++    uint32_t tb_size;
++    BdrvDirtyBitmap *bitmap = bm->dirty_bitmap;
++    const char *bm_name;
++
++    assert(bitmap != NULL);
++
++    bm_name = bdrv_dirty_bitmap_name(bitmap);
++
++    tb = store_bitmap_data(bs, bitmap, &tb_size, errp);
++    if (tb == NULL) {
++        return -EINVAL;
++    }
++
++    assert(tb_size <= BME_MAX_TABLE_SIZE);
++    tb_offset = qcow2_alloc_clusters(bs, tb_size * sizeof(tb[0]));
++    if (tb_offset < 0) {
++        error_setg_errno(errp, -tb_offset,
++                         "Failed to allocate clusters for bitmap '%s'",
++                         bm_name);
++        goto fail;
++    }
++
++    ret = qcow2_pre_write_overlap_check(bs, 0, tb_offset,
++                                        tb_size * sizeof(tb[0]));
++    if (ret < 0) {
++        error_setg_errno(errp, -ret, "Qcow2 overlap check failed");
++        goto fail;
++    }
++
++    bitmap_table_to_be(tb, tb_size);
++    ret = bdrv_pwrite(bs->file, tb_offset, tb, tb_size * sizeof(tb[0]));
++    if (ret < 0) {
++        error_setg_errno(errp, -ret, "Failed to write bitmap '%s' to file",
++                         bm_name);
++        goto fail;
++    }
++
++    g_free(tb);
++
++    bm->table.offset = tb_offset;
++    bm->table.size = tb_size;
++
++    return 0;
++
++fail:
++    clear_bitmap_table(bs, tb, tb_size);
++
++    if (tb_offset > 0) {
++        qcow2_free_clusters(bs, tb_offset, tb_size * sizeof(tb[0]),
++                            QCOW2_DISCARD_OTHER);
++    }
++
++    g_free(tb);
++
++    return ret;
++}
++
++static Qcow2Bitmap *find_bitmap_by_name(Qcow2BitmapList *bm_list,
++                                        const char *name)
++{
++    Qcow2Bitmap *bm;
++
++    QSIMPLEQ_FOREACH(bm, bm_list, entry) {
++        if (strcmp(name, bm->name) == 0) {
++            return bm;
++        }
++    }
++
++    return NULL;
++}
++
++void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
++{
++    BdrvDirtyBitmap *bitmap;
++    BDRVQcow2State *s = bs->opaque;
++    uint32_t new_nb_bitmaps = s->nb_bitmaps;
++    uint64_t new_dir_size = s->bitmap_directory_size;
++    int ret;
++    Qcow2BitmapList *bm_list;
++    Qcow2Bitmap *bm;
++    Qcow2BitmapTableList drop_tables;
++    Qcow2BitmapTable *tb, *tb_next;
++
++    QSIMPLEQ_INIT(&drop_tables);
++
++    if (!can_write(bs)) {
++        error_setg(errp, "No write access");
++        return;
++    }
++
++    if (!bdrv_has_persistent_bitmaps(bs)) {
++        /* nothing to do */
++        return;
++    }
++
++    if (s->nb_bitmaps == 0) {
++        bm_list = bitmap_list_new();
++    } else {
++        bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
++                                   s->bitmap_directory_size, errp);
++        if (bm_list == NULL) {
++            return;
++        }
++    }
++
++    /* check constraints and names */
++    for (bitmap = bdrv_dirty_bitmap_next(bs, NULL); bitmap != NULL;
++         bitmap = bdrv_dirty_bitmap_next(bs, bitmap))
++    {
++        const char *name = bdrv_dirty_bitmap_name(bitmap);
++        uint32_t granularity = bdrv_dirty_bitmap_granularity(bitmap);
++        Qcow2Bitmap *bm;
++
++        if (!bdrv_dirty_bitmap_get_persistance(bitmap)) {
++            continue;
++        }
++
++        if (check_constraints_on_bitmap(bs, name, granularity, errp) < 0) {
++            error_prepend(errp, "Bitmap '%s' doesn't satisfy the constraints: ",
++                          name);
++            goto fail;
++        }
++
++        bm = find_bitmap_by_name(bm_list, name);
++        if (bm == NULL) {
++            if (++new_nb_bitmaps > QCOW2_MAX_BITMAPS) {
++                error_setg(errp, "Too many persistent bitmaps");
++                goto fail;
++            }
++
++            new_dir_size += calc_dir_entry_size(strlen(name), 0);
++            if (new_dir_size > QCOW2_MAX_BITMAP_DIRECTORY_SIZE) {
++                error_setg(errp, "Bitmap directory is too large");
++                goto fail;
++            }
++
++            bm = g_new0(Qcow2Bitmap, 1);
++            bm->name = g_strdup(name);
++            QSIMPLEQ_INSERT_TAIL(bm_list, bm, entry);
++        } else {
++            if (!(bm->flags & BME_FLAG_IN_USE)) {
++                error_setg(errp, "Bitmap '%s' already exists in the image",
++                           name);
++                goto fail;
++            }
++            tb = g_memdup(&bm->table, sizeof(bm->table));
++            bm->table.offset = 0;
++            bm->table.size = 0;
++            QSIMPLEQ_INSERT_TAIL(&drop_tables, tb, entry);
++        }
++        bm->flags = bdrv_dirty_bitmap_get_autoload(bitmap) ? BME_FLAG_AUTO : 0;
++        bm->granularity_bits = ctz32(bdrv_dirty_bitmap_granularity(bitmap));
++        bm->dirty_bitmap = bitmap;
++    }
++
++    /* allocate clusters and store bitmaps */
++    QSIMPLEQ_FOREACH(bm, bm_list, entry) {
++        if (bm->dirty_bitmap == NULL) {
++            continue;
++        }
++
++        ret = store_bitmap(bs, bm, errp);
++        if (ret < 0) {
++            goto fail;
++        }
++    }
++
++    ret = update_ext_header_and_dir(bs, bm_list);
++    if (ret < 0) {
++        error_setg_errno(errp, -ret, "Failed to update bitmap extension");
++        goto fail;
++    }
++
++    /* Bitmap directory was successfully updated, so, old data can be dropped.
++     * TODO it is better to reuse these clusters */
++    QSIMPLEQ_FOREACH_SAFE(tb, &drop_tables, entry, tb_next) {
++        free_bitmap_clusters(bs, tb);
++        g_free(tb);
++    }
++
++    bitmap_list_free(bm_list);
++    return;
++
++fail:
++    QSIMPLEQ_FOREACH(bm, bm_list, entry) {
++        if (bm->dirty_bitmap == NULL || bm->table.offset == 0) {
++            continue;
++        }
++
++        free_bitmap_clusters(bs, &bm->table);
++    }
++
++    QSIMPLEQ_FOREACH_SAFE(tb, &drop_tables, entry, tb_next) {
++        g_free(tb);
++    }
++
++    bitmap_list_free(bm_list);
++}
+diff --git a/block/qcow2.c b/block/qcow2.c
+index f4bb9d46de..201e7186f0 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1805,6 +1805,7 @@ static int qcow2_inactivate(BlockDriverState *bs)
+ {
+     BDRVQcow2State *s = bs->opaque;
+     int ret, result = 0;
++    Error *local_err = NULL;
+ 
+     ret = qcow2_cache_flush(bs, s->l2_table_cache);
+     if (ret) {
+@@ -1820,6 +1821,14 @@ static int qcow2_inactivate(BlockDriverState *bs)
+                      strerror(-ret));
+     }
+ 
++    qcow2_store_persistent_dirty_bitmaps(bs, &local_err);
++    if (local_err != NULL) {
++        result = -EINVAL;
++        error_report_err(local_err);
++        error_report("Persistent bitmaps are lost for node '%s'",
++                     bdrv_get_device_or_node_name(bs));
++    }
++
+     if (result == 0) {
+         qcow2_mark_clean(bs);
+     }
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 50b9cf6541..e2ef5698cd 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -621,5 +621,6 @@ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
+                                   void **refcount_table,
+                                   int64_t *refcount_table_size);
+ void qcow2_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp);
++void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
+ 
+ #endif
 -- 
 2.11.1
