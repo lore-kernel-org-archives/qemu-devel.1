@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1chb7B-0006Tw-Hf
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 07:06:20 -0500
+	(envelope-from <mreitz@redhat.com>) id 1chbGO-0003d3-DG
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 07:15:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1chb7A-0000hw-Pz
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 07:06:17 -0500
+	(envelope-from <mreitz@redhat.com>) id 1chbGN-0003RC-MU
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 07:15:48 -0500
 References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
-	<1487689130-30373-39-git-send-email-kwolf@redhat.com>
+	<1487689130-30373-40-git-send-email-kwolf@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <1549e73b-eec1-312b-648d-747547840f8d@redhat.com>
-Date: Sat, 25 Feb 2017 13:06:07 +0100
+Message-ID: <510620c0-687a-5965-fea6-213134eb06b3@redhat.com>
+Date: Sat, 25 Feb 2017 13:15:38 +0100
 MIME-Version: 1.0
-In-Reply-To: <1487689130-30373-39-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1487689130-30373-40-git-send-email-kwolf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="wm1PxThnw4mDKcoLOELl6jM4tIGmJm0Rq"
-Subject: Re: [Qemu-devel] [PATCH 38/54] backup: Use real permissions in
- backup block job
+	boundary="7aI498919RadrhXk11pM1hfTxreEjvxAn"
+Subject: Re: [Qemu-devel] [PATCH 39/54] block: Fix pending requests check in
+ bdrv_append()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +29,47 @@ To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wm1PxThnw4mDKcoLOELl6jM4tIGmJm0Rq
+--7aI498919RadrhXk11pM1hfTxreEjvxAn
 From: Max Reitz <mreitz@redhat.com>
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
-Message-ID: <1549e73b-eec1-312b-648d-747547840f8d@redhat.com>
-Subject: Re: [PATCH 38/54] backup: Use real permissions in backup block job
+Message-ID: <510620c0-687a-5965-fea6-213134eb06b3@redhat.com>
+Subject: Re: [PATCH 39/54] block: Fix pending requests check in bdrv_append()
 References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
- <1487689130-30373-39-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1487689130-30373-39-git-send-email-kwolf@redhat.com>
+ <1487689130-30373-40-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1487689130-30373-40-git-send-email-kwolf@redhat.com>
 Content-Type: text/plain; charset=iso-8859-15
 Content-Transfer-Encoding: quoted-printable
 
 On 21.02.2017 15:58, Kevin Wolf wrote:
-> The backup block job doesn't have very complicated requirements: It
-> needs to read from the source and write to the target, but it's fine
-> with either side being changed. The only restriction is that we can't
-> resize the image because the job uses a cached value.
->=20
-> qemu-iotests 055 needs to be changed because it used a target which was=
-
-> already attached to a virtio-blk device. The permission system correctl=
-y
-> forbids this (virtio-blk can't accept another writer with its default
-> share-rw=3Doff).
+> bdrv_append() cares about isolation of the node that it modifies, but
+> not about activity in some subtree below it. Instead of using the
+> recursive bdrv_requests_pending(), directly check bs->in_flight, which
+> considers only the node in question.
 >=20
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  block/backup.c         | 15 ++++++++++-----
->  tests/qemu-iotests/055 | 11 +++++++----
->  2 files changed, 17 insertions(+), 9 deletions(-)
-
-Not sure how much sense it makes to allow other writers on the target
-node, but it's not as if the backup block job itself would care:
+>  block.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---wm1PxThnw4mDKcoLOELl6jM4tIGmJm0Rq
+--7aI498919RadrhXk11pM1hfTxreEjvxAn
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlixcy8SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AP5IIALywYdSV01DBmL6nI8GYlMDTYanPXlTJ
-uaBJuxWFd6XlB6DaPAJ9+R0bJ0eUh6m6PBOWRiDxlHhFQtQLu0B6DUCT7cRIfeRT
-/TXpmloO45ED8Pn76FZcWaG3SjCbnEB3SDv/4uNy1NBD1J+BVaOhNe1Ia87c0KMc
-e2IR/3lfLxKQtYMsGe0onCE3aCuLIpPOWCSMxkiaea2ugDaSs0bESs42pXVkswXy
-AikCnKNXA4F8tVu2dZ8r367nm+yNEb13fNwPt9jbBaEGfSkXOPEHly45J45O2bRd
-G9LndpSB6SxlznXmQw//z8HiAhiG01WE8suGmazXhJuRGYuk3+/AKJ8=
-=TmWB
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlixdWoSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AIsIH/1IsbHJhloKSRLicqPggdu+6j7We50HN
+tzCAhOcmMDVh2fOBjb6/ZwH1aBBjlFA9hpml6PyTudIIlfHRJG9zj0DiOZ8hNnCi
+Jy5tFlT+S6ZZzNpVRlr2+nrX4YylIi+C9R1J+oJ4LMzJFmHwKyMQ2lkwQPwXHuwb
+dDk6pZQYUEGsJn18q/Baza6gZUFgTTdVbieRXxQz/fgUYWnNsCsCSni3P221vjd9
+XJMhuzPVbZIQVKIgBQKCNhT+1sDLM8FIf5bw4Oa74wtkH3GnlbZQ8VfKMvFNUaP3
+6hi+y3cB4wWljYAwWRzrVyZhpDr296xRWJ+/n+aIkzpellJckjoVnUE=
+=l5B2
 -----END PGP SIGNATURE-----
 
---wm1PxThnw4mDKcoLOELl6jM4tIGmJm0Rq--
+--7aI498919RadrhXk11pM1hfTxreEjvxAn--
