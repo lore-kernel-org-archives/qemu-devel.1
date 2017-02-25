@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1chSBP-0005Xf-R5
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 21:34:04 -0500
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1chSC1-0005n0-Af
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 21:34:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1chSBM-0007gR-OE
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 21:34:03 -0500
-Received: from [59.151.112.132] (port=10359 helo=heian.cn.fujitsu.com)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1chSBy-000863-9E
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 21:34:41 -0500
+Received: from [59.151.112.132] (port=48224 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1chSBM-0007dr-Cf
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 21:34:00 -0500
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1chSBx-000856-TM
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 21:34:38 -0500
 References: <1487920971-16519-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1487920971-16519-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1d6cbd92-1699-3d11-7a24-63e888bb0e29@redhat.com>
+	<ce3cc3a0-1bde-fa6b-9b1d-517f8eb8a4d1@redhat.com>
 From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <2b97f1bf-47d1-4396-b49c-0c26be149757@cn.fujitsu.com>
-Date: Sat, 25 Feb 2017 10:33:18 +0800
+Message-ID: <152e6e84-ac4b-dba5-bd64-cd689e35f2f0@cn.fujitsu.com>
+Date: Sat, 25 Feb 2017 10:34:04 +0800
 MIME-Version: 1.0
-In-Reply-To: <1d6cbd92-1699-3d11-7a24-63e888bb0e29@redhat.com>
+In-Reply-To: <ce3cc3a0-1bde-fa6b-9b1d-517f8eb8a4d1@redhat.com>
 Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V9 2/2] Add a new qmp command to do
- checkpoint, query xen replication status
+Subject: Re: [Qemu-devel] [PATCH V9 0/2] Add new qmp commands to suppurt Xen
+ COLO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,75 +29,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eric Blake <eblake@redhat.com>, qemu devel <qemu-devel@nongnu.org>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Markus Armbruster <armbru@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
-Cc: zhangchen.fnst@cn.fujitsu.com, Jason Wang <jasowang@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Wen Congyang <wencongyang@gmail.com>
+Cc: zhangchen.fnst@cn.fujitsu.com, Jason Wang <jasowang@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>
 
 
 
-On 02/25/2017 01:27 AM, Eric Blake wrote:
+On 02/25/2017 01:24 AM, Eric Blake wrote:
 > On 02/24/2017 01:22 AM, Zhang Chen wrote:
->> We can call this qmp command to do checkpoint outside of qemu.
->> Xen colo will need this function.
+>> Xen COLO depend on qemu COLO replication function.
+>> So, We need new qmp commands for Xen to use qemu replication.
 >>
->> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
->> Signed-off-by: Wen Congyang <wencongyang@gmail.com>
->> ---
->>   migration/colo.c | 23 +++++++++++++++++++++++
->>   qapi-schema.json | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
->>   2 files changed, 72 insertions(+)
+>> Corresponding libxl patches already in xen.git.
+>> Commit ID:
 >>
->> +++ b/qapi-schema.json
->> @@ -5931,6 +5931,55 @@
->>     'data': { 'enable': 'bool', 'primary': 'bool', '*failover' : 'bool' } }
->>   
->>   ##
->> +# @ReplicationStatus:
->> +#
->> +# The result format for 'query-xen-replication-status'.
->> +#
->> +# @error: true to error, false to normal.
-> Maybe:
->
-> true if an error happened, false if replication is normal
->
-> Maintainer could touch that up during application, so it doesn't
-> necessarily require a v10.
+>> ed37ef1f91c20f0ab162ce60f8c38400b917fa64
+>> COLO: introduce new API to prepare/start/do/get_error/stop replication
+>>
+>> a0ddc0b359375b2418213966dfbdbfab593ecc6f
+>> tools/libxl: introduction of libxl__qmp_restore to load qemu state
+>>
+> It's nice to call out what changed between v8 and v9 to focus reviewer's
+> attention on those aspects.
 
-Maintainer may be very busy, I will do this fix in V10.
-
->
->> +##
->> +# @query-xen-replication-status:
->> +#
->> +# Query replication status while the vm is running.
->> +#
->> +# Returns: A @ReplicationResult object showing the status.
->> +#
->> +# Example:
->> +#
->> +# -> { "execute": "query-xen-replication-status" }
->> +# <- { "return": [ { "error": false },
->> +#                  { "error": true } ] }
-> This example is bogus.  The command does NOT return an array.  It is
-> sufficient to use:
->
-> { "return": { "error": false } }
->
-> but if you want, you could instead do:
->
-> { "return": { "error": true, "desc": "..." } }
->
-> but if you do that, please be sure that desc matches an actual error
-> code that could occur, and not something made up.
->
-> If all you do is fix the example with the simpler "error":false (and
-> maybe the maintainer is okay doing that), then you can add:
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-I will fix the example in V10, and which maintainer can pick up this patch?
+OK, I will add the note in next version.
 
 Thanks
 Zhang Chen
 
+>
+>> Zhang Chen (2):
+>>    Add a new qmp command to start/stop replication
+>>    Add a new qmp command to do checkpoint, query xen replication status
+>>
+>>   migration/colo.c | 49 +++++++++++++++++++++++++++++++++++++
+>>   qapi-schema.json | 74 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>   2 files changed, 123 insertions(+)
+>>
 
 -- 
 Thanks
