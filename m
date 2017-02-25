@@ -1,17 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33995)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1chi4b-0000Wy-W9
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 14:32:06 -0500
+	(envelope-from <mmarek@suse.com>) id 1chj8K-0003zR-Ld
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 15:40:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1chi4Z-0007oW-BX
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 14:32:05 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Sat, 25 Feb 2017 22:31:55 +0300
-Message-Id: <20170225193155.447462-5-vsementsov@virtuozzo.com>
-In-Reply-To: <20170225193155.447462-1-vsementsov@virtuozzo.com>
-References: <20170225193155.447462-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 4/4] migration: fix use-after-free of
- to_dst_file
+	(envelope-from <mmarek@suse.com>) id 1chj8H-00018N-Iy
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 15:40:00 -0500
+Received: from mx2.suse.de ([195.135.220.15]:51605)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mmarek@suse.com>) id 1chj8H-00017n-Cj
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 15:39:57 -0500
+References: <20170224134411.28882-1-mmarek@suse.com>
+	<a634716c-c998-c422-6802-946a283f8837@twiddle.net>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <a76250b9-ec10-1444-03aa-00ffb8c17fda@suse.com>
+Date: Sat, 25 Feb 2017 21:39:51 +0100
+MIME-Version: 1.0
+In-Reply-To: <a634716c-c998-c422-6802-946a283f8837@twiddle.net>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target-s390x: Implement stfl and stfle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,35 +27,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, vsementsov@virtuozzo.com, lirans@il.ibm.com
+To: Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
+Cc: qemu-devel@nongnu.org, Miroslav Benes <mbenes@suse.cz>, Eric Bischoff <ebischoff@suse.com>
 
-hmp_savevm calls qemu_savevm_state(f), which sets to_dst_file=f in
-global migration state. Then hmp_savevm closes f (g_free called).
+Dne 25.2.2017 v 01:05 Richard Henderson napsal(a):
+> On 02/25/2017 12:44 AM, Michal Marek wrote:
+>> +DEF_HELPER_1(stfl, void, env)
+> 
+> DEF_HELPER_FLAGS_1(stfl, TCG_CALL_NO_RWG, void, env)
+> 
+> since this touches no registers, and only writes to lomem which afaik
+> cannot fault in kernel mode.
 
-Next access to to_dst_file in migration state (for example,
-qmp_migrate_set_speed) will use it after it was freed.
+OK.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- migration/savevm.c | 5 +++++
- 1 file changed, 5 insertions(+)
 
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 75e56d2d07..fcb8fd8acd 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1276,6 +1276,11 @@ done:
-         status = MIGRATION_STATUS_COMPLETED;
-     }
-     migrate_set_state(&ms->state, MIGRATION_STATUS_SETUP, status);
-+
-+    /* f is outer parameter, it should not stay in global migration state after
-+     * this function finished */
-+    ms->to_dst_file = NULL;
-+
-     return ret;
- }
- 
--- 
-2.11.1
+>> +static int do_stfle(CPUS390XState *env, uint64_t addr, int len)
+>> +{
+>> +    S390CPU *cpu = s390_env_get_cpu(env);
+>> +    uint8_t data[64];
+> 
+> S390FeatBitmap or S390FeatInit?  Or even a sizeof?
+> Hard coding 64 certainly doesn't seem right.
+
+I will change it to something more sensible.
+
+
+>> +    memset(data, 0, sizeof(data));
+>> +    res = s390_fill_feat_block(cpu->model->features,
+>> S390_FEAT_TYPE_STFL, data);
+>> +    cpu_physical_memory_write(addr, data, MIN(res, len));
+> 
+> No, not physical memory, you need to write to virtual memory, at least
+> for STFLE.  Which, as you'll recall can be used from user-mode.
+
+Oh, I did not realize that STFLE is not a privileged instruction.
+
+Thanks for the review!
+
+Michal
