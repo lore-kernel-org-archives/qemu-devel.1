@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39629)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <herongguang.he@huawei.com>) id 1chRQQ-0004Us-74
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 20:45:31 -0500
+	(envelope-from <rth7680@gmail.com>) id 1chRhZ-0002ks-QZ
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 21:03:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <herongguang.he@huawei.com>) id 1chRQO-0002cn-UM
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 20:45:30 -0500
-Received: from [45.249.212.187] (port=2990 helo=dggrg01-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <herongguang.he@huawei.com>) id 1chRQO-0002aY-9i
-	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 20:45:28 -0500
-References: <589C7E96.9060905@huawei.com> <589D83CE.1090803@huawei.com>
-	<589DDC05.9010807@windriver.com> <58AA51D6.6020508@huawei.com>
-	<1487565495.3740.27.camel@intel.com> <58AD0094.90304@windriver.com>
-	<4dd92012-626a-2d80-9adb-0be398f73eb1@redhat.com>
-	<58AD92AE.6040502@windriver.com>
-	<6c5567f4-192d-aefd-90e4-89f53479c24e@redhat.com>
-	<58AF9921.6060201@huawei.com> <58B04CD3.7010304@windriver.com>
-	<7fdf2551-3d55-1bd9-2848-720a880cc93e@redhat.com>
-From: "Herongguang (Stephen)" <herongguang.he@huawei.com>
-Message-ID: <58B0E191.6040108@huawei.com>
-Date: Sat, 25 Feb 2017 09:44:49 +0800
+	(envelope-from <rth7680@gmail.com>) id 1chRhW-0002Nd-Mp
+	for qemu-devel@nongnu.org; Fri, 24 Feb 2017 21:03:13 -0500
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1487879800-12352-1-git-send-email-nikunj@linux.vnet.ibm.com>
+	<1487879800-12352-7-git-send-email-nikunj@linux.vnet.ibm.com>
+	<755c77c5-0930-b5ee-0b3b-1e0608301c8d@twiddle.net>
+	<87a89cza5l.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170224025841.GN17615@umbus.fritz.box>
+	<4a13acc6-8a7e-f259-fdb7-6c3156b9ac6c@twiddle.net>
+	<87o9xs2hnl.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <34bf17ea-3f3a-3af1-5df6-ebaaed21573a@twiddle.net>
+Date: Sat, 25 Feb 2017 13:03:02 +1100
 MIME-Version: 1.0
-In-Reply-To: <7fdf2551-3d55-1bd9-2848-720a880cc93e@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] kvm bug in __rmap_clear_dirty during live migration
+In-Reply-To: <87o9xs2hnl.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 06/15] target/ppc: remove xer split-out
+ flags(so, ov, ca)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,44 +30,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Chris Friesen <chris.friesen@windriver.com>, "Han, Huaitong" <huaitong.han@intel.com>, "hangaohuai@huawei.com" <hangaohuai@huawei.com>, stable@vger.kernel.org
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "fangying1@huawei.com" <fangying1@huawei.com>, "xudong.hao@linux.intel.com" <xudong.hao@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "wangxinxin.wang@huawei.com" <wangxinxin.wang@huawei.com>, "kai.huang@linux.intel.com" <kai.huang@linux.intel.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "guangrong.xiao@linux.intel.com" <guangrong.xiao@linux.intel.com>, linux-kernel@vger.kernel.org
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
-
-
-On 2017/2/24 23:14, Paolo Bonzini wrote:
+On 02/24/2017 06:05 PM, Nikunj A Dadhania wrote:
+> Richard Henderson <rth@twiddle.net> writes:
 >
->
-> On 24/02/2017 16:10, Chris Friesen wrote:
->> On 02/23/2017 08:23 PM, Herongguang (Stephen) wrote:
->>
->>> On 2017/2/22 22:43, Paolo Bonzini wrote:
->>
->>>> Hopefully Gaohuai and Rongguang can help with this too.
+>> On 02/24/2017 01:58 PM, David Gibson wrote:
+>>> On Fri, Feb 24, 2017 at 06:18:22AM +0530, Nikunj A Dadhania wrote:
+>>>> Richard Henderson <rth@twiddle.net> writes:
 >>>>
->>>> Paolo
+>>>>> On 02/24/2017 06:56 AM, Nikunj A Dadhania wrote:
+>>>>>> Now get rid all the split out variables so, ca, ov. After this patch,
+>>>>>> all the bits are stored in CPUPPCState::xer at appropriate places.
+>>>>>>
+>>>>>> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+>>>>>> ---
+>>>>>>  target/ppc/cpu.c        |   8 +---
+>>>>>>  target/ppc/cpu.h        |  26 ++++++------
+>>>>>>  target/ppc/int_helper.c |  12 +++---
+>>>>>>  target/ppc/translate.c  | 106 +++++++++++++++++++++++++-----------------------
+>>>>>>  4 files changed, 78 insertions(+), 74 deletions(-)
+>>>>>
+>>>>> I do not think this is a good direction to take this.
+>>>>
+>>>> Hmm, any particular reason?
 >>>
->>> Yes, we are looking into and testing this.
->>>
->>> I think this can result in any memory corruption, if VM1 writes its
->>> PML buffer into VM2’s VMCS (since sched_in/sched_out notifier of VM1
->>> is not registered yet), then VM1 is destroyed (hence its PML buffer
->>> is freed back to kernel), after that, VM2 starts migration, so CPU
->>> logs VM2’s dirty GFNS into a freed memory, results in any memory
->>> corruption.
->>>
->>> As its severity, this commit
->>> (http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=4e59516a12a6ef6dcb660cb3a3f70c64bd60cfec)
->>>
->>> is eligible to back port to kernel stable.
+>>> Right, I suggested this, but based only a suspicion that the split
+>>> variables weren't worth the complexity.  I'm happy to be corrected by
+>>> someone with better knowledge of TCG, but it'd be nice to know why.
 >>
->> Are we expecting that fix to resolve the original issue, or is it a
->> separate issue that needs fixing in stable?
+>> Normally we're interested in minimizing the size of the generated code,
+>> delaying computation until we can show it being used.
+>>
+>> Now, ppc is a bit different from other targets (which might compute overflow
+>> for any addition insn) in that it only computes overflow when someone asks for
+>> it.  Moreover, it's fairly rare for the addo/subo/nego instructions to
+>> be used.
 >
-> It should be the original issue.
+>> Therefore, I'm not 100% sure what the "best" solution is.
 >
-> Paolo
+> Agreed, with that logic, wont it be more efficient to move the OV/CA
+> updationg to respective callers, and when xer_read/write happens, its
+> just one tcg_ops.
 >
-> .
 >
-Yes, I agree, though we are still testing.
+>> However, I'd be surprised if the least amount of code places all of
+>> the bits into their canonical location within XER.
+>>
+>> Do note that when looking at this, the various methods by which the OV/SO bits
+>> are copied to CR flags ought to be taken into account.
+>
+> I lost you in the last two para, can you explain in detail?
+
+Reading XER via MFSPR is not the only way to access the CA/OV/SO bits.  One may 
+use the "dot" form of the instruction to copy SO to CR0[3].  One may use the 
+MCRXRX instruction to copy 5 bits from XER to CR[BF].  One may use the add/sub 
+extended instructions to access the CA bit.
+
+Therefore it is not a forgone conclusion that a read of XER will *ever* occur, 
+and therefore it is not necessarily most efficient to keep the CA/OV/SO bits in 
+the canonical XER form.
+
+I think it's especially important to keep CA separate in order to facilitate 
+multi-word addition chains.
+
+I suspect that it's most efficient to keep SO in a form that best simplifies 
+"dot" instructions, e.g. since there is no un-dotted "andi" instruction. 
+Naturally, the form in which you store SO is going to influence how you store OV.
+
+The other thing that is desirable is to allow the TCG optimizer to delete 
+computations that are dead.  That cannot be done if you're constantly folding 
+results back into a single XER register.
+
+Consider a sequence like
+
+	li	r0, 0
+	mtspr	xer, r0
+	addo	r3, r4, r5
+	addo.	r6, r7, r8
+
+where we clear XER (and thus SO), perform two computations, and then read SO 
+via the dot.  Obviously the two computations of OV are not dead, because they 
+get ORed into SO.  However, the first computation of OV32 is dead, shadowed by 
+the second, because there is no accumulating SO32 bit.
+
+
+r~
