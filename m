@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57436)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57490)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cheWR-0005Rt-Vf
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 10:44:37 -0500
+	(envelope-from <eblake@redhat.com>) id 1cheX3-0005q4-UR
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 10:45:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cheWN-0002p5-50
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 10:44:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45356)
+	(envelope-from <eblake@redhat.com>) id 1cheWz-0002x2-4B
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 10:45:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59918)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cheWM-0002p0-Sq
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 10:44:31 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cheWy-0002wX-UU
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 10:45:09 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B55B66371F
-	for <qemu-devel@nongnu.org>; Sat, 25 Feb 2017 15:44:30 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 12C7A83F38
+	for <qemu-devel@nongnu.org>; Sat, 25 Feb 2017 15:45:09 +0000 (UTC)
 References: <1487886317-27400-1-git-send-email-armbru@redhat.com>
-	<1487886317-27400-10-git-send-email-armbru@redhat.com>
+	<1487886317-27400-11-git-send-email-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <4623eb6a-5cac-2a25-1173-9e94dd90ae5b@redhat.com>
-Date: Sat, 25 Feb 2017 09:44:28 -0600
+Message-ID: <605ccef6-5863-9509-dd03-2dd51d5c6685@redhat.com>
+Date: Sat, 25 Feb 2017 09:45:06 -0600
 MIME-Version: 1.0
-In-Reply-To: <1487886317-27400-10-git-send-email-armbru@redhat.com>
+In-Reply-To: <1487886317-27400-11-git-send-email-armbru@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="oKpFhpMTOjfrcou2xgHaktNg5wC4MrOLl"
-Subject: Re: [Qemu-devel] [PATCH 09/21] qapi: Improve a QObject input
- visitor error message
+	boundary="eU6vhTSCuwtMoO5n6lMk4eaXbO82lCfsP"
+Subject: Re: [Qemu-devel] [PATCH 10/21] qapi: Clean up after commit 3d344c2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,38 +37,25 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---oKpFhpMTOjfrcou2xgHaktNg5wC4MrOLl
+--eU6vhTSCuwtMoO5n6lMk4eaXbO82lCfsP
 From: Eric Blake <eblake@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <4623eb6a-5cac-2a25-1173-9e94dd90ae5b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 09/21] qapi: Improve a QObject input visitor
- error message
+Message-ID: <605ccef6-5863-9509-dd03-2dd51d5c6685@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 10/21] qapi: Clean up after commit 3d344c2
 References: <1487886317-27400-1-git-send-email-armbru@redhat.com>
- <1487886317-27400-10-git-send-email-armbru@redhat.com>
-In-Reply-To: <1487886317-27400-10-git-send-email-armbru@redhat.com>
+ <1487886317-27400-11-git-send-email-armbru@redhat.com>
+In-Reply-To: <1487886317-27400-11-git-send-email-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 02/23/2017 03:45 PM, Markus Armbruster wrote:
-> The QObject input visitor has three error message formats:
->=20
-> * Parameter '%s' is missing
-> * "Invalid parameter type for '%s', expected: %s"
-> * "QMP input object member '%s' is unexpected"
->=20
-> The '%s' are member names (or "null", but I'll fix that later).
->=20
-> The last error message calls the thing "QMP input object member"
-> instead of "parameter".  Misleading when the visitor is used on
-> QObjects that don't come from QMP.  Change it to "Parameter '%s' is
-> unexpected".
+> Drop unused QIV_STACK_SIZE and unused qobject_input_start_struct()
+> parameter errp.
 >=20
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  qapi/qobject-input-visitor.c | 3 +--
->  tests/test-qga.c             | 2 +-
->  2 files changed, 2 insertions(+), 3 deletions(-)
->=20
+>  qapi/qobject-input-visitor.c | 14 +++-----------
+>  1 file changed, 3 insertions(+), 11 deletions(-)
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -78,7 +64,7 @@ Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---oKpFhpMTOjfrcou2xgHaktNg5wC4MrOLl
+--eU6vhTSCuwtMoO5n6lMk4eaXbO82lCfsP
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -88,13 +74,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYsaZcAAoJEKeha0olJ0NqjkgH/0cYxDvC0deraZ55hTyoo9Iu
-hHf9pDTvDIgGvH7EQhqrA3R4GV4HAO9SxEg8JhKA7fXdy4Dcr9DevUpMFodD4Rch
-Dz85Gxt/QOeEwvMypF3Zu/xnF77Ci04wZQy1HRV51o4g0GTIbO2KR0RorELMBVE+
-cfNXEa/gh7uuYhcsKnkw+niCo1/9TzxwrJX13yB1uzcfAiPTJQHkt/Wuv1XMwMhM
-wIrOwH//hdiqQkGI0P+rzUiJkk8BEs/ImUuma6W5NPOf5Jr59yLwJLK3DoV+apjM
-M7q0xGAs9byW3XBuw5x/cT4UyTs/oS4dK1j0s02CJDgkh/tujEEyLil2aNRLGp8=
-=2hUl
+iQEcBAEBCAAGBQJYsaaCAAoJEKeha0olJ0NqSPEH/0agVZSAWFGYNs30//fI8/jt
+6ataDDFbT1QlqbS0fRMkHJlCpoU7d2aJXGjuPcwT5lZzt6Ge03wxuluUvuV586AC
+jK19PLqCnVmPg2R4xjz9zOmDxCFIbFffOVxKJUoQj+zpzWZvF1CGpJFmZbMZEKIM
+lFhwCJlOKILDkuDntgiX8qs+GjQsTUeeNkDRFD146QJ3DXgISkyhklnmbc3FOAW3
+FvyfF/5uwbczxwQXzgnlJH2d5b1reznDCXbYfFagYtCdfmTF70zDsbx4Ji/WcLFs
+de1jVjUFU4KXOjBTh+b6jvieCzRnGgpT/5+5gl2bfba4nrcWFnkdk+3xs16NO6k=
+=b47X
 -----END PGP SIGNATURE-----
 
---oKpFhpMTOjfrcou2xgHaktNg5wC4MrOLl--
+--eU6vhTSCuwtMoO5n6lMk4eaXbO82lCfsP--
