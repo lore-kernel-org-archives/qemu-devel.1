@@ -1,15 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43670)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1chmka-0001M8-RQ
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 19:31:46 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1chmsS-0001ns-QU
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 19:39:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1chmkX-0005xD-0g
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 19:31:44 -0500
-Message-Id: <6a3ecc27a153a5e79ba19542760c3037fe5c75f4.1488068248.git.balaton@eik.bme.hu>
-In-Reply-To: <cover.1488068248.git.balaton@eik.bme.hu>
-References: <cover.1488068248.git.balaton@eik.bme.hu>
+	(envelope-from <balaton@eik.bme.hu>) id 1chmsP-00086i-M6
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 19:39:52 -0500
+Date: Sun, 26 Feb 2017 01:39:47 +0100 (CET)
 From: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [Qemu-devel] [PATCH v2 03/14] sm501: QOMify
+In-Reply-To: <CAFEAcA-CA9Zw8fHjO707g_RW2TJcR50GS16xLX-Gi7OCi06P_A@mail.gmail.com>
+Message-ID: <alpine.BSF.2.20.1702260133190.45393@zero.eik.bme.hu>
+References: <cover.1487522123.git.balaton@eik.bme.hu>
+	<c2915d0d2f3966ddb92005129b680727a69a3bcd.1487522123.git.balaton@eik.bme.hu>
+	<CAFEAcA8YGAyG3_uKwGJhff+ruearUP6eyQ0DROqZhGmdcaq6dw@mail.gmail.com>
+	<alpine.BSF.2.20.1702242118560.76443@zero.eik.bme.hu>
+	<CAFEAcA-CA9Zw8fHjO707g_RW2TJcR50GS16xLX-Gi7OCi06P_A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [PATCH 03/10] sm501: QOMify
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,240 +25,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Date: Sun, 26 Feb 2017 00:31:47 -0000
-To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
----
+On Sat, 25 Feb 2017, Peter Maydell wrote:
+> On 24 February 2017 at 20:23, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+>> The SM501/SM502 is a multimedia chip that besides a display controller also
+>> contains some other functions (see
+>> http://cateee.net/lkddb/web-lkddb/MFD_SM501.html) and this is what is
+>> emulated here as these are part of the chip itself.
+>
+> Hmm; that's pretty ugly but I guess it's sort of like a container
+> device that needs to contain various things inside it.
+>
+>>>>
+>>>> -    /* create qemu graphic console */
+>>>> -    s->con = graphic_console_init(DEVICE(dev), 0, &sm501_ops, s);
+>>>> +static Property sm501_sysbus_properties[] = {
+>>>> +    DEFINE_PROP_UINT32("vram-size", SM501SysBusState, vram_size, 0),
+>>>> +    DEFINE_PROP_UINT32("base", SM501SysBusState, base, 0),
+>>>> +    DEFINE_PROP_PTR("chr-state", SM501SysBusState, chr_state),
+>
+> Pointer properties and properties which tell the device what
+> address it's at are both signs that something's not quite
+> modelled right. There may be no better way to do things right
+> now, or then again there may be.
 
-v2: Add memory regions to device state instead of allocating them
+Maybe but I think that would not be part of this series but some other 
+clean up separately. This series makes it a bit cleaner but does not aim 
+to fix everything.
 
- hw/display/sm501.c   | 139 +++++++++++++++++++++++++++++++++++----------------
- hw/sh4/r2d.c         |  11 +++-
- include/hw/devices.h |   5 --
- 3 files changed, 106 insertions(+), 49 deletions(-)
+>>>> +    DEFINE_PROP_END_OF_LIST(),
+>>>> +};
+>>>
+>>>
+>>>> +static void sm501_sysbus_class_init(ObjectClass *klass, void *data)
+>>>> +{
+>>>> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>>>> +
+>>>> +    dc->realize = sm501_realize_sysbus;
+>>>> +    set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
+>>>> +    dc->desc = "SM501 Multimedia Companion";
+>>>> +    dc->props = sm501_sysbus_properties;
+>>>> +/* Note: pointer property "chr-state" may remain null, thus
+>>>> + * no need for dc->cannot_instantiate_with_device_add_yet = true;
+>>>> + */
+>>>> }
+>>>
+>>>
+>>> You also need a VMState struct registered in dc->vmsd and a reset
+>>> function registered in dc->reset.
+>>
+>>
+>> Even if no migration is supported? Is there a simple example I could look at
+>> on what should go into these?
+>
+> The idea is to support migration. There are examples of doing
+> VMState structures all over the tree. You just need a structure
+> that lists all the bits of your state data structure that
+> contain guest-modifiable state.
+>
+> Reset is straightforward: it's just a function that resets
+> the state of the device as if the system had been hard
+> powercycled.
 
-diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index 4eb085c..22cac97 100644
---- a/hw/display/sm501.c
-+++ b/hw/display/sm501.c
-@@ -58,8 +58,8 @@
- #define SM501_DPRINTF(fmt, ...) do {} while (0)
- #endif
- 
--
- #define MMIO_BASE_OFFSET 0x3e00000
-+#define MMIO_SIZE 0x200000
- 
- /* SM501 register definitions taken from "linux/include/linux/sm501-regs.h" */
- 
-@@ -464,6 +464,10 @@ typedef struct SM501State {
-     uint32_t local_mem_size_index;
-     uint8_t *local_mem;
-     MemoryRegion local_mem_region;
-+    MemoryRegion mmio_region;
-+    MemoryRegion system_config_region;
-+    MemoryRegion disp_ctrl_region;
-+    MemoryRegion twoD_engine_region;
-     uint32_t last_width;
-     uint32_t last_height;
- 
-@@ -1396,67 +1400,118 @@ static const GraphicHwOps sm501_ops = {
-     .gfx_update  = sm501_update_display,
- };
- 
--void sm501_init(MemoryRegion *address_space_mem, uint32_t base,
--                uint32_t local_mem_bytes, qemu_irq irq, Chardev *chr)
-+static void sm501_init(SM501State *s, DeviceState *dev, uint32_t base,
-+                       uint32_t local_mem_bytes)
- {
--    SM501State *s;
--    DeviceState *dev;
--    MemoryRegion *sm501_system_config = g_new(MemoryRegion, 1);
--    MemoryRegion *sm501_disp_ctrl = g_new(MemoryRegion, 1);
--    MemoryRegion *sm501_2d_engine = g_new(MemoryRegion, 1);
--
--    /* allocate management data region */
--    s = g_new0(SM501State, 1);
-     s->base = base;
-     s->local_mem_size_index = get_local_mem_size_index(local_mem_bytes);
--    SM501_DPRINTF("local mem size=%x. index=%d\n", get_local_mem_size(s),
-+    SM501_DPRINTF("sm501 local mem size=%x. index=%d\n", get_local_mem_size(s),
-                   s->local_mem_size_index);
-     s->system_control = 0x00100000; /* 2D engine FIFO empty */
-     s->misc_control = SM501_MISC_IRQ_INVERT; /* assumes SH, active=low */
-     s->dc_panel_control = 0x00010000; /* FIFO level 3 */
-     s->dc_crt_control = 0x00010000;
- 
--    /* allocate local memory */
--    memory_region_init_ram(&s->local_mem_region, NULL, "sm501.local",
-+    /* local memory */
-+    memory_region_init_ram(&s->local_mem_region, OBJECT(dev), "sm501.local",
-                            local_mem_bytes, &error_fatal);
-     vmstate_register_ram_global(&s->local_mem_region);
-     memory_region_set_log(&s->local_mem_region, true, DIRTY_MEMORY_VGA);
-     s->local_mem = memory_region_get_ram_ptr(&s->local_mem_region);
--    memory_region_add_subregion(address_space_mem, base, &s->local_mem_region);
--
--    /* map mmio */
--    memory_region_init_io(sm501_system_config, NULL, &sm501_system_config_ops,
--                          s, "sm501-system-config", 0x6c);
--    memory_region_add_subregion(address_space_mem, base + MMIO_BASE_OFFSET,
--                                sm501_system_config);
--    memory_region_init_io(sm501_disp_ctrl, NULL, &sm501_disp_ctrl_ops, s,
-+
-+    /* mmio */
-+    memory_region_init(&s->mmio_region, OBJECT(dev), "sm501.mmio", MMIO_SIZE);
-+    memory_region_init_io(&s->system_config_region, OBJECT(dev),
-+                          &sm501_system_config_ops, s,
-+                          "sm501-system-config", 0x6c);
-+    memory_region_add_subregion(&s->mmio_region, SM501_SYS_CONFIG,
-+                                &s->system_config_region);
-+    memory_region_init_io(&s->disp_ctrl_region, OBJECT(dev),
-+                          &sm501_disp_ctrl_ops, s,
-                           "sm501-disp-ctrl", 0x1000);
--    memory_region_add_subregion(address_space_mem,
--                                base + MMIO_BASE_OFFSET + SM501_DC,
--                                sm501_disp_ctrl);
--    memory_region_init_io(sm501_2d_engine, NULL, &sm501_2d_engine_ops, s,
-+    memory_region_add_subregion(&s->mmio_region, SM501_DC,
-+                                &s->disp_ctrl_region);
-+    memory_region_init_io(&s->twoD_engine_region, OBJECT(dev),
-+                          &sm501_2d_engine_ops, s,
-                           "sm501-2d-engine", 0x54);
--    memory_region_add_subregion(address_space_mem,
--                                base + MMIO_BASE_OFFSET + SM501_2D_ENGINE,
--                                sm501_2d_engine);
-+    memory_region_add_subregion(&s->mmio_region, SM501_2D_ENGINE,
-+                                &s->twoD_engine_region);
-+
-+    /* create qemu graphic console */
-+    s->con = graphic_console_init(DEVICE(dev), 0, &sm501_ops, s);
-+}
-+
-+#define TYPE_SYSBUS_SM501 "sysbus-sm501"
-+#define SYSBUS_SM501(obj) \
-+    OBJECT_CHECK(SM501SysBusState, (obj), TYPE_SYSBUS_SM501)
-+
-+typedef struct {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+    /*< public >*/
-+    SM501State state;
-+    uint32_t vram_size;
-+    uint32_t base;
-+    void *chr_state;
-+} SM501SysBusState;
-+
-+static void sm501_realize_sysbus(DeviceState *dev, Error **errp)
-+{
-+    SM501SysBusState *s = SYSBUS_SM501(dev);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-+    DeviceState *usb_dev;
-+
-+    sm501_init(&s->state, dev, s->base, s->vram_size);
-+    sysbus_init_mmio(sbd, &s->state.local_mem_region);
-+    sysbus_init_mmio(sbd, &s->state.mmio_region);
- 
-     /* bridge to usb host emulation module */
--    dev = qdev_create(NULL, "sysbus-ohci");
--    qdev_prop_set_uint32(dev, "num-ports", 2);
--    qdev_prop_set_uint64(dev, "dma-offset", base);
--    qdev_init_nofail(dev);
--    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0,
--                    base + MMIO_BASE_OFFSET + SM501_USB_HOST);
--    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, irq);
-+    usb_dev = qdev_create(NULL, "sysbus-ohci");
-+    qdev_prop_set_uint32(usb_dev, "num-ports", 2);
-+    qdev_prop_set_uint64(usb_dev, "dma-offset", s->base);
-+    qdev_init_nofail(usb_dev);
-+    memory_region_add_subregion(&s->state.mmio_region, SM501_USB_HOST,
-+                       sysbus_mmio_get_region(SYS_BUS_DEVICE(usb_dev), 0));
-+    sysbus_pass_irq(sbd, SYS_BUS_DEVICE(usb_dev));
- 
-     /* bridge to serial emulation module */
--    if (chr) {
--        serial_mm_init(address_space_mem,
--                       base + MMIO_BASE_OFFSET + SM501_UART0, 2,
-+    if (s->chr_state) {
-+        serial_mm_init(&s->state.mmio_region, SM501_UART0, 2,
-                        NULL, /* TODO : chain irq to IRL */
--                       115200, chr, DEVICE_NATIVE_ENDIAN);
-+                       115200, s->chr_state, DEVICE_NATIVE_ENDIAN);
-     }
-+}
- 
--    /* create qemu graphic console */
--    s->con = graphic_console_init(DEVICE(dev), 0, &sm501_ops, s);
-+static Property sm501_sysbus_properties[] = {
-+    DEFINE_PROP_UINT32("vram-size", SM501SysBusState, vram_size, 0),
-+    DEFINE_PROP_UINT32("base", SM501SysBusState, base, 0),
-+    DEFINE_PROP_PTR("chr-state", SM501SysBusState, chr_state),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void sm501_sysbus_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = sm501_realize_sysbus;
-+    set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
-+    dc->desc = "SM501 Multimedia Companion";
-+    dc->props = sm501_sysbus_properties;
-+/* Note: pointer property "chr-state" may remain null, thus
-+ * no need for dc->cannot_instantiate_with_device_add_yet = true;
-+ */
- }
-+
-+static const TypeInfo sm501_sysbus_info = {
-+    .name          = TYPE_SYSBUS_SM501,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(SM501SysBusState),
-+    .class_init    = sm501_sysbus_class_init,
-+};
-+
-+static void sm501_register_types(void)
-+{
-+    type_register_static(&sm501_sysbus_info);
-+}
-+
-+type_init(sm501_register_types)
-diff --git a/hw/sh4/r2d.c b/hw/sh4/r2d.c
-index 6d06968..8f520ce 100644
---- a/hw/sh4/r2d.c
-+++ b/hw/sh4/r2d.c
-@@ -277,8 +277,15 @@ static void r2d_init(MachineState *machine)
-     sysbus_connect_irq(busdev, 2, irq[PCI_INTC]);
-     sysbus_connect_irq(busdev, 3, irq[PCI_INTD]);
- 
--    sm501_init(address_space_mem, 0x10000000, SM501_VRAM_SIZE,
--               irq[SM501], serial_hds[2]);
-+    dev = qdev_create(NULL, "sysbus-sm501");
-+    busdev = SYS_BUS_DEVICE(dev);
-+    qdev_prop_set_uint32(dev, "vram-size", SM501_VRAM_SIZE);
-+    qdev_prop_set_uint32(dev, "base", 0x10000000);
-+    qdev_prop_set_ptr(dev, "chr-state", serial_hds[2]);
-+    qdev_init_nofail(dev);
-+    sysbus_mmio_map(busdev, 0, 0x10000000);
-+    sysbus_mmio_map(busdev, 1, 0x13e00000);
-+    sysbus_connect_irq(busdev, 0, irq[SM501]);
- 
-     /* onboard CF (True IDE mode, Master only). */
-     dinfo = drive_get(IF_IDE, 0, 0);
-diff --git a/include/hw/devices.h b/include/hw/devices.h
-index 7475b71..861ddea 100644
---- a/include/hw/devices.h
-+++ b/include/hw/devices.h
-@@ -62,9 +62,4 @@ void tc6393xb_gpio_out_set(TC6393xbState *s, int line,
- qemu_irq *tc6393xb_gpio_in_get(TC6393xbState *s);
- qemu_irq tc6393xb_l3v_get(TC6393xbState *s);
- 
--/* sm501.c */
--void sm501_init(struct MemoryRegion *address_space_mem, uint32_t base,
--                uint32_t local_mem_bytes, qemu_irq irq,
--                Chardev *chr);
--
- #endif
--- 
-2.7.4
+I've tried to add these but vmstate is only added to the PCI version 
+because the OHCI device I've looked at also does the same, which is likely 
+beacuse the sysbus version is only used on SH4 which does not support 
+migration anyway. The PCI verison can be instantiated on machines that 
+have migration support so it makes sense to do it there. I hope this is 
+acceptable.
