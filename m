@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ci9ZM-00064H-6c
+	(envelope-from <dgibson@ozlabs.org>) id 1ci9ZM-00064I-7M
 	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 19:53:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ci9ZL-0000Dv-5E
+	(envelope-from <dgibson@ozlabs.org>) id 1ci9ZL-0000E0-5O
 	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 19:53:40 -0500
-Date: Mon, 27 Feb 2017 11:37:06 +1100
+Date: Mon, 27 Feb 2017 10:43:54 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170227003706.GJ17615@umbus.fritz.box>
+Message-ID: <20170226234354.GH17615@umbus.fritz.box>
 References: <1487252865-12064-1-git-send-email-clg@kaod.org>
-	<1487252865-12064-9-git-send-email-clg@kaod.org>
-	<20170223022933.GW12577@umbus.fritz.box>
-	<6deab394-2564-3a43-669c-af4b8a2aa4e3@kaod.org>
-	<e12d3243-3da1-b432-a898-f01e89af5807@kaod.org>
+	<1487252865-12064-5-git-send-email-clg@kaod.org>
+	<20170223021531.GS12577@umbus.fritz.box>
+	<eeec3567-d024-a09a-8a58-304a27c0bb95@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="3gNIKMlg37D5iFb5"
+	protocol="application/pgp-signature"; boundary="OdQvBiqfLsaeimeB"
 Content-Disposition: inline
-In-Reply-To: <e12d3243-3da1-b432-a898-f01e89af5807@kaod.org>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 08/22] ppc/xics: use the QOM
- interface to resend irqs
+In-Reply-To: <eeec3567-d024-a09a-8a58-304a27c0bb95@kaod.org>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 04/22] ppc/xics: add an
+ InterruptStatsProvider interface to ICS and ICP objects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,67 +31,95 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---3gNIKMlg37D5iFb5
+--OdQvBiqfLsaeimeB
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 24, 2017 at 06:34:06PM +0100, C=E9dric Le Goater wrote:
-> >>> @@ -592,10 +593,11 @@ static void ics_simple_reset(DeviceState *dev)
-> >>> =20
-> >>>  static int ics_simple_post_load(ICSState *ics, int version_id)
-> >>>  {
-> >>> +    XICSInterface *xi =3D XICS_INTERFACE(qdev_get_machine());
-> >>>      int i;
-> >>> =20
-> >>>      for (i =3D 0; i < ics->xics->nr_servers; i++) {
-> >>> -        icp_resend(&ics->xics->ss[i]);
-> >>> +        icp_resend(xi, &ics->xics->ss[i]);
-> >>>      }
+On Fri, Feb 24, 2017 at 11:52:01AM +0100, C=E9dric Le Goater wrote:
+> On 02/23/2017 03:15 AM, David Gibson wrote:
+> > On Thu, Feb 16, 2017 at 02:47:27PM +0100, C=E9dric Le Goater wrote:
+> >> This is, again, to reduce the use of the list of ICS objects. Let's
+> >> make each individual ICS and ICP object an InterruptStatsProvider and
+> >> remove this same interface from XICSState.
 > >>
-> >> This resend triggering needs to get moved to the xics interface
-> >> implementor - i.e. the machine.  It's actually already broken right
-> >> now, since it incorrectly relies on the ordering of the ics and icp
-> >> restore during migration.
+> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 > >=20
-> > I'm adding a icp_resend() handler in patch 12 and using it patch 14.
-> > Maybe we can move the post_load() handler out of ICS simple now ?=20
+> > I'm a little hesitant about this, because it means that getting the
+> > interrupt stats information is now spread out over the qom tree,
+> > whereas previously there was a single location to get a good summary
+> > of the systems overall interrupt status.  The previous behaviour seems
+> > like it would be more convenient for debugging.
+> >=20
+> > That said, I see the structural advantages of this split.  Hmm.. still
+> > thinking..
 >=20
-> Could you give me a little more info on what should be done ? I lack=20
-> context on this problem.=20
+> This is true. Another argument in favour of what you are saying=20
+> is the order in which these are printed. See below. =20
 >=20
-> So should we call :=20
->=20
->     ICPState *ss =3D opaque;
->     ICPStateClass *info =3D ICP_GET_CLASS(ss);
->=20
->     if (info->post_load) {
->         return info->post_load(ss, version_id);
->     }
->=20
-> and then=20
->=20
->     ICSState *ics =3D opaque;
->     ICSStateClass *info =3D ICS_BASE_GET_CLASS(ics);
->=20
->     if (info->post_load) {
->         return info->post_load(ics, version_id);
->     }
->=20
-> from spapr_post_load() ?=20
+> What we could do after the cleanup is to make the machine an=20
+> InterruptStatsProvider to clarify things.
 
-Uh.. now I'm trying to remember what the correct order is.  Any part
-of the post_load which is entirely local to the ics or icp, and
-doesn't communicate with the other part should remain in a local
-post-load handler.
+Right.  So "info pic" does at least iterate through all the providers,
+but the semi-random order is pretty icky.  I think putting the stats
+provider on the machine would be a better idea - I guess it should be
+easy enough if the xics code provides a helper.
 
-The part of the resend which involves interaction between ics and icp
-should move to the mahine.  Because the ics and icp are both
-descendents of the machine, the migration core does guarantee their
-local post_lodas will run before the machine's post-load.  At the
-moment however, we require either the ics post_loads to run before the
-icp or the other way around - I forget which.  Because these are
-"cousin" objects, that order is not guaranteed by the migration core.
+>=20
+> Thanks,
+>=20
+> C.=20
+>=20
+>=20
+> (qemu) info pic=20
+> CPU 18 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 0 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 21 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 2 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 23 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 4 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 11 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 25 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 6 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 13 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 27 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 8 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 15 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 29 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 30 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 17 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 20 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 19 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 1 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> ICS 1000..13ff 0x10018f1ea40
+>   1000 MSI ff 00
+>   1001 MSI ff 00
+>   1002 MSI ff 00
+>   1003 MSI ff 00
+>   1004 LSI ff 00
+>   1005 LSI ff 00
+>   1006 LSI ff 00
+>   1007 LSI ff 00
+>   1008 MSI ff 00
+>   1009 MSI ff 00
+>   100a MSI ff 00
+>   100b MSI ff 00
+>   100c MSI ff 00
+> CPU 22 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 3 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 10 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 24 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 5 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 12 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 26 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 7 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 14 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 28 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 9 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 16 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+> CPU 31 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
+>=20
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -100,25 +127,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---3gNIKMlg37D5iFb5
+--OdQvBiqfLsaeimeB
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYs3SyAAoJEGw4ysog2bOSDpYQAK4aWqxcAcibrzYLzr1V+4tP
-mxLsPAtiniyQ7qzt0z6dCu+xC9XWL6UM0uY/+ffEc28uT3HTr80h24a6t7JlWy0w
-sX0LEmJSN0nc5ENcRDkkJoNMBCXg2C+piUC6i6YFggK/DqmvK9yFeoUgrEcT7BN+
-0NdYoAJ8cIKfHnFkGNPQLR/HE2zqd70Lv94IzPIdt4BH+dN24XLzVw7h0mW35TMA
-w9eaX9E9Y4AibLw3dh8wZGuV7Lr2w5T3guHcycJ1Pee6QhWiV5K/1sZo+DjCUIyQ
-xNyk9bq+d74h+XjJfIJNdW4iND62IweA+soSLJcWwpG2kcX6UaiKtqUdvyV8vMOU
-hvN8YHLpkZuZHtwGawEQuReAerre260ojlcJAtoh44OhnYfuBZRlukLTv3TgxOnh
-Ub4aed4jmIDDekffUtJs3wGu+v0or5xC1gIVLS8ILzWBJMsXVX2JS6KC4EWbDcUp
-4qpnEckprJip1IPx2rMmFlF6Aq1LoTS4IJ6mQramMVHBaeBNe6KndiDXvVh/jjmx
-iNpUy44hO1au8KuJDBhtRqfPuWkP08XdNjpXOpabD1gMEI/09Dh+TCP7/UOOIQRz
-bJEZouaLJ5lXhiEw4+fTqhtA9hF7B9HLpvCqIxnvT83iCiD5V3kiTGh7PlI5w69D
-EB8Q725RiF26Dd1eJ7NP
-=Bf+a
+iQIcBAEBCAAGBQJYs2g3AAoJEGw4ysog2bOSdGsP/il36xl0AIhm7zmQiyNt64VI
+ln0QhOToegcSQT0niXuAHRpSoMld/hIbuHhJiE3V2KUMaob1XiIygIE4e/OYsrEA
+vz96AZqNCW5cMjqdFqthHqAQ+9+izJVvOX8zQAS5MuXHgzeHmKQzzaUb8YM2Nwom
+Rw4d8FGjPyZV9OwSq+ZoZOA3wvRmPRae/hYIW5aakwSZwtfvJow5KcQHaMWsRyA2
++xgIFdq4/e6lAtX+j0QD01yTGMZOg4nAO/IVcVcRu69XSZM5sQ7PQe6ux3iKlMfm
+x8X8GPRZUv4h5yaCJElFmmrLgf5rW22ZjnTm50QoZyR8/jSisqlin2CmtpZ8TJSv
+l1qYL+xLyKEakUuQ23Fwp4fl5SDAU0HxIoH6P5NQSvNFb+Z+FwoqbGNd4hFwjxc+
+j3KxxIo3oDSqb+sLSLhvl1IrKAwicVcsBsGdoYf3naGFUDve+Z72VYF+D77mD6HU
+LqKt9Ra8VKHxbVXkcQ9hhoa6w3rgbKPNa6qKbCaNF/w0l5h3soqb2KHq+AA8g2of
+prwY2mJCiyuSAZsw8s/bARdxNcA7KgoVTzU7aDaVruimjFDGgI6AE2pGSyTQSdk/
+pvMN7G+DrZI6XzrC697I9fgaVKvX7QjcnhQE1uOEnAr8evPsIqcygPx/rTQi7jqJ
+ieB8qJ3CzuQRO8VBEAQo
+=HRPS
 -----END PGP SIGNATURE-----
 
---3gNIKMlg37D5iFb5--
+--OdQvBiqfLsaeimeB--
