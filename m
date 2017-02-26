@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1ci7me-0002xN-5g
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:59:16 -0500
+	(envelope-from <groug@kaod.org>) id 1ci8Vg-00086n-2E
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 18:45:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1ci7mb-0007CI-53
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:59:16 -0500
-Received: from hera.aquilenet.fr ([141.255.128.1]:52601)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1ci7ma-0007Bu-VF
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:59:13 -0500
-Date: Sun, 26 Feb 2017 23:59:10 +0100
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20170226225910.n54cp32odmj6jb45@var.youpi.perso.aquilenet.fr>
-References: <20170220185020.774-1-dgilbert@redhat.com>
-	<20170220185020.774-5-dgilbert@redhat.com>
-	<8760k3od2r.fsf@emacs.mitica> <20170223105155.GA2383@work-vm>
-	<20170223110433.GL10047@redhat.com> <20170223114045.GB2383@work-vm>
-	<20170226203427.6xjmuvt6okc356e5@var.youpi.perso.aquilenet.fr>
+	(envelope-from <groug@kaod.org>) id 1ci8Vc-0006Iy-5I
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 18:45:48 -0500
+Received: from 17.mo6.mail-out.ovh.net ([46.105.36.150]:43763)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ci8Vb-0006IW-SL
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 18:45:44 -0500
+Received: from player761.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id E6517B0AA2
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 00:45:41 +0100 (CET)
+Date: Mon, 27 Feb 2017 00:45:33 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170227004533.3fb25129@bahia.lan>
+In-Reply-To: <148814889214.28146.16915712763478774662.stgit@bahia>
+References: <148814889214.28146.16915712763478774662.stgit@bahia>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20170226203427.6xjmuvt6okc356e5@var.youpi.perso.aquilenet.fr>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 4/5] slirp: VMStatify socket level
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/M8qeOHXML=_cHy03bGrJiU6";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v2 00/28] 9pfs: local: fix vulnerability to
+ symlink attacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,15 +31,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, jan.kiszka@siemens.com, maethor@subiron.org
+To: qemu-devel@nongnu.org
+Cc: Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>
 
-Samuel Thibault, on dim. 26 f=E9vr. 2017 21:34:27 +0100, wrote:
-> since we'll want to change the size of the field
+--Sig_/M8qeOHXML=_cHy03bGrJiU6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Ah, no, sorry, it was forced to be 16bit, so at least the size is fine.
+On Sun, 26 Feb 2017 23:41:32 +0100
+Greg Kurz <groug@kaod.org> wrote:
 
-But I guess we don't want to change the values to have cross-OS
-compatibility without changing the version.
+> This series tries to fix CVE-2016-9602 reported by Jann Horn of Google
+> Project Zero:
+>=20
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1413929
+>=20
+> This vulnerability affects all accesses to the underlying filesystem in
+> the "local" backend code.
+>=20
+> If QEMU is started with:
+>=20
+> -fsdev local,security_model=3D<passthrough|none>,path=3D/foo/bar
+>=20
+> then the guest can cause QEMU to create symlinks in /foo/bar.
+>=20
+> This causes accesses to any path /foo/bar/some/path to be unsafe, since
+> untrusted code within the guest (or in another guest sharing the same
+> virtfs folder) could change some/path to point to a random path of the
+> host filesystem.
+>=20
+> The core problem is that the "local" backend relies on path-based syscalls
+> to access the underlying filesystem. All path-based syscalls are vulnerab=
+le
+> to this issue, even open(O_NOFOLLOW) or syscalls that explicitly don't
+> dereference symlinks, since the kernel only checks the rightmost element =
+of
+> the path. Depending on the privilege level of the QEMU process, a guest c=
+an
+> end up opening, renaming, changing ACLs, unlinking... files on the host
+> filesystem.
+>=20
+> The right way to address this is to use "at" variants of all syscalls in
+> the "local" backend code. This requires to open directories without
+> traversing any symlink in the intermediate path elements. There was a
+> tentative to introduce an O_BENEATH flag for openat() that would address
+> this:
+>=20
+> https://patchwork.kernel.org/patch/7007181/
+>=20
+> Unfortunately this never got merged.  An alternative is to walk through a=
+ll
+> path elements manually with openat(O_NOFOLLOW).
+>=20
+> v2:
+> 	- /proc based implementation for xattr code (fixes metadata perf drop
+>           observed with v1)
+>         - some code refactoring
+>=20
+> Stefan.
+>=20
+> I had to rework some patches you had already reviewed, please consider
+> giving your Reviewed-by again if the changes are ok.
+>=20
+> Thanks.
+>=20
+> --
+> Greg
+>=20
+> ---
+>=20
+> Greg Kurz (28):
+>       9pfs: local: move xattr security ops to 9p-xattr.c
+>       9pfs: remove side-effects in local_init()
+>       9pfs: remove side-effects in local_open() and local_opendir()
+>       9pfs: introduce openat_nofollow() helper
+>       9pfs: local: keep a file descriptor on the shared folder
+>       9pfs: local: open/opendir: don't follow symlinks
+>       9pfs: local: lgetxattr: don't follow symlinks
+>       9pfs: local: llistxattr: don't follow symlinks
+>       9pfs: local: lsetxattr: don't follow symlinks
+>       9pfs: local: lremovexattr: don't follow symlinks
+>       9pfs: local: unlinkat: don't follow symlinks
+>       9pfs: local: remove: don't follow symlinks
+>       9pfs: local: utimensat: don't follow symlinks
+>       9pfs: local: statfs: don't follow symlinks
+>       9pfs: local: truncate: don't follow symlinks
+>       9pfs: local: readlink: don't follow symlinks
+>       9pfs: local: lstat: don't follow symlinks
+>       9pfs: local: renameat: don't follow symlinks
+>       9pfs: local: rename: use renameat
+>       9pfs: local: improve error handling in link op
+>       9pfs: local: link: don't follow symlinks
+>       9pfs: local: chmod: don't follow symlinks
+>       9pfs: local: chown: don't follow symlinks
+>       9pfs: local: symlink: don't follow symlinks
+>       9pfs: local: mknod: don't follow symlinks
+>       9pfs: local: mkdir: don't follow symlinks
+>       9pfs: local: open2: don't follow symlinks
+>       9pfs: local: drop unused code
+>=20
+>=20
+>  hw/9pfs/9p-local.c      | 1023 ++++++++++++++++++++++++++---------------=
+------
+>  hw/9pfs/9p-local.h      |   20 +
+>  hw/9pfs/9p-posix-acl.c  |   44 --
+>  hw/9pfs/9p-util.c       |   65 +++
+>  hw/9pfs/9p-util.h       |   52 ++
+>  hw/9pfs/9p-xattr-user.c |   24 -
+>  hw/9pfs/9p-xattr.c      |  166 +++++++-
+>  hw/9pfs/9p-xattr.h      |   87 +---
+>  hw/9pfs/Makefile.objs   |    2=20
+>  9 files changed, 887 insertions(+), 596 deletions(-)
+>  create mode 100644 hw/9pfs/9p-local.h
+>  create mode 100644 hw/9pfs/9p-util.c
+>  create mode 100644 hw/9pfs/9p-util.h
+>=20
 
-Samuel
+
+--Sig_/M8qeOHXML=_cHy03bGrJiU6
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAlizaJ0ACgkQAvw66wEB28KPnwCfWgXLWGsM5xylreQcmXvoR0tD
+1+sAn1jAOMnqdPuvxSxfofasqs0FLFA5
+=dW6f
+-----END PGP SIGNATURE-----
+
+--Sig_/M8qeOHXML=_cHy03bGrJiU6--
