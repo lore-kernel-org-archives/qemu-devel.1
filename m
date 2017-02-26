@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1ci5WZ-0000Rm-GC
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 15:34:32 -0500
+	(envelope-from <no-reply@patchew.org>) id 1ci5am-0002kA-2i
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 15:38:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1ci5WY-0001bT-58
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 15:34:31 -0500
-Received: from hera.aquilenet.fr ([2a01:474::1]:56851)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1ci5WX-0001bI-Ue
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 15:34:30 -0500
-Date: Sun, 26 Feb 2017 21:34:27 +0100
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20170226203427.6xjmuvt6okc356e5@var.youpi.perso.aquilenet.fr>
-References: <20170220185020.774-1-dgilbert@redhat.com>
-	<20170220185020.774-5-dgilbert@redhat.com>
-	<8760k3od2r.fsf@emacs.mitica> <20170223105155.GA2383@work-vm>
-	<20170223110433.GL10047@redhat.com> <20170223114045.GB2383@work-vm>
+	(envelope-from <no-reply@patchew.org>) id 1ci5ah-0003Vb-B4
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 15:38:52 -0500
+Resent-Message-Id: <E1ci5ah-0003Vb-B4@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21482)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1ci5ah-0003VN-3Y
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 15:38:47 -0500
+In-Reply-To: <20170226202709.2114-1-samuel.thibault@ens-lyon.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148814145914.177.15326500327484761974@0e2666bad730>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20170223114045.GB2383@work-vm>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 4/5] slirp: VMStatify socket level
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 26 Feb 2017 12:37:39 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 0/5] slirp updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +28,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, jan.kiszka@siemens.com, maethor@subiron.org
+To: samuel.thibault@ens-lyon.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, stefanha@redhat.com, jan.kiszka@siemens.com
 
-Hello,
-
-Dr. David Alan Gilbert, on jeu. 23 f=E9vr. 2017 11:40:45 +0000, wrote:
-> * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > IOW if we transmit this data on the wire, we've effectively said that
-> > our migration data format is *not* portable across different host OS
-> > platforms. At that point, sending different sized types on BSD vs
-> > Linux is no big deal since we're already incompatible semantically.
->=20
-> This is a relatively recent error; it comes from eae303ff which added
-> ss_family to allow IPv6.
->=20
-> I suspect the right fix here is to populate a temporary for ss_family
-> on the wire; if we make it conveniently match Linux's AF_INET6 values
-> it might work.
-
-So this issue is actually not new, so I asked to pull your patch series,
-thanks!
-
-Now we should indeed fix the issue. Making the values match Linux'
-AF_INET6, why not (better have some known values than arbitrary values),
-but I don't think we'd want to rely on this: we'll have to introduce a
-versioned difference, since we'll want to change the size of the field
-as well as its value on other OSes (and I don't think we want to manage
-different versioning on different OSes).
-
-Samuel
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzAyMjYyMDI3MDkuMjExNC0xLXNhbXVlbC50aGliYXVsdEBlbnMtbHlvbi5vcmcKVHlwZTogc2Vy
+aWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwLzVdIHNsaXJwIHVwZGF0ZXMKCj09PSBU
+RVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChn
+aXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQg
+b3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
+LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVI
+IC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVj
+a2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIK
+ICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRj
+aC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAg
+IGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5E
+ID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApG
+cm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0
+ZV0gICAgICBwYXRjaGV3LzIwMTcwMjI0MTgyODQ0LjMyNDUyLTEtZGdpbGJlcnRAcmVkaGF0LmNv
+bSAtPiBwYXRjaGV3LzIwMTcwMjI0MTgyODQ0LjMyNDUyLTEtZGdpbGJlcnRAcmVkaGF0LmNvbQog
+LSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMTcwMjI2MTY1MzQ1Ljg3NTctMS1ib2JieS5w
+cmFuaUBnbWFpbC5jb20gLT4gcGF0Y2hldy8yMDE3MDIyNjE2NTM0NS44NzU3LTEtYm9iYnkucHJh
+bmlAZ21haWwuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAxNzAyMjYyMDI3MDku
+MjExNC0xLXNhbXVlbC50aGliYXVsdEBlbnMtbHlvbi5vcmcgLT4gcGF0Y2hldy8yMDE3MDIyNjIw
+MjcwOS4yMTE0LTEtc2FtdWVsLnRoaWJhdWx0QGVucy1seW9uLm9yZwpTd2l0Y2hlZCB0byBhIG5l
+dyBicmFuY2ggJ3Rlc3QnCjE1MGRjNTEgc2xpcnA6IFZNU3RhdGlmeSByZW1haW5pbmcgZXhjZXB0
+IGZvciBsb29wCjBmMzU5NWYgc2xpcnA6IFZNU3RhdGlmeSBzb2NrZXQgbGV2ZWwKYjU4NGY3YSBz
+bGlycDogQ29tbW9uIGxob3N0L2Zob3N0IHVuaW9uCjM4NjU3ZjQgc2xpcnA6IFZNU3RhdGlmeSBz
+YnVmCmQwNjRmYjkgc2xpcnA6IFZNU3RhdGUgY29udmVyc2lvbjsgdGNwY2IKCj09PSBPVVRQVVQg
+QkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNTogc2xpcnA6IFZNU3RhdGUgY29udmVyc2lvbjsg
+dGNwY2IuLi4KRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjEyOiBG
+SUxFOiBzbGlycC90Y3BfdmFyLmg6NTE6CiteSXVpbnQ4X3QgdF9mb3JjZTteSV5JLyogMSBpZiBm
+b3JjaW5nIG91dCBhIGJ5dGUgKi8kCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVz
+ZSB0YWJzCiMyMjI6IEZJTEU6IHNsaXJwL3RjcF92YXIuaDoxMTI6CiteSXVpbnQ4X3ReSXRfb29i
+ZmxhZ3M7XkleSS8qIGhhdmUgc29tZSAqLyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2
+ZXIgdXNlIHRhYnMKIzIyMzogRklMRTogc2xpcnAvdGNwX3Zhci5oOjExMzoKK15JdWludDhfdF5J
+dF9pb2JjO15JXkleSS8qIGlucHV0IGNoYXJhY3RlciAqLyQKCnRvdGFsOiAzIGVycm9ycywgMCB3
+YXJuaW5ncywgMTk1IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1z
+LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
+dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
+VEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIvNTogc2xpcnA6IFZNU3RhdGlmeSBzYnVmLi4uCkVS
+Uk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzI2OiBGSUxFOiBzbGlycC9z
+YnVmLmg6MTU6CiteSXVpbnQzMl90IHNiX2NjO15JXkkvKiBhY3R1YWwgY2hhcnMgaW4gYnVmZmVy
+ICovJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjc6IEZJTEU6
+IHNsaXJwL3NidWYuaDoxNjoKK15JdWludDMyX3Qgc2JfZGF0YWxlbjteSS8qIExlbmd0aCBvZiBk
+YXRhICAqLyQKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMTU1IGxpbmVzIGNoZWNrZWQK
+CllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
+IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
+dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDMv
+NTogc2xpcnA6IENvbW1vbiBsaG9zdC9maG9zdCB1bmlvbi4uLgpDaGVja2luZyBQQVRDSCA0LzU6
+IHNsaXJwOiBWTVN0YXRpZnkgc29ja2V0IGxldmVsLi4uCkVSUk9SOiBpZiB0aGlzIGNvZGUgaXMg
+cmVkdW5kYW50IGNvbnNpZGVyIHJlbW92aW5nIGl0CiM5ODogRklMRTogc2xpcnAvc2xpcnAuYzox
+Mjk3OgorI2lmIDAKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMjE3IGxpbmVzIGNoZWNr
+ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENI
+IDUvNTogc2xpcnA6IFZNU3RhdGlmeSByZW1haW5pbmcgZXhjZXB0IGZvciBsb29wLi4uCj09PSBP
+VVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1h
+aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3Jn
+L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMu
+b3Jn
