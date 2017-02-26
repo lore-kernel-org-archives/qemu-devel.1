@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1ci4r5-00055B-Uf
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 14:51:41 -0500
+	(envelope-from <no-reply@patchew.org>) id 1ci7Ev-0005tK-J7
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:24:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1ci4r4-0003gb-El
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 14:51:40 -0500
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Date: Sun, 26 Feb 2017 21:51:14 +0200
-Message-Id: <20170226195115.26564-1-krzk@kernel.org>
-Subject: [Qemu-devel] [PATCH 1/2] hw/arm/exynos: Fix Linux kernel division
- by zero for PLLs
+	(envelope-from <no-reply@patchew.org>) id 1ci7Es-00075n-DZ
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:24:25 -0500
+Resent-Message-Id: <E1ci7Es-00075n-DZ@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21328)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1ci7Es-00075K-5Y
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:24:22 -0500
+In-Reply-To: <1488145424-14974-1-git-send-email-armbru@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148814780348.177.16056736293608962194@0e2666bad730>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 26 Feb 2017 14:23:23 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 00/26] qapi: QMP dispatch and input
+ visitor work
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,246 +29,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mitsyanko <i.mitsyanko@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: Krzysztof Kozlowski <krzk@kernel.org>
+To: armbru@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-Without any clock controller, the Linux kernel was hitting division by
-zero during boot or with clk_summary:
-[    0.000000] [<c031054c>] (unwind_backtrace) from [<c030ba6c>] (show_stack+0x10/0x14)
-[    0.000000] [<c030ba6c>] (show_stack) from [<c05b2660>] (dump_stack+0x88/0x9c)
-[    0.000000] [<c05b2660>] (dump_stack) from [<c05b11a4>] (Ldiv0+0x8/0x10)
-[    0.000000] [<c05b11a4>] (Ldiv0) from [<c06ad1e0>] (samsung_pll45xx_recalc_rate+0x58/0x74)
-[    0.000000] [<c06ad1e0>] (samsung_pll45xx_recalc_rate) from [<c0692ec0>] (clk_register+0x39c/0x63c)
-[    0.000000] [<c0692ec0>] (clk_register) from [<c125d360>] (samsung_clk_register_pll+0x2e0/0x3d4)
-[    0.000000] [<c125d360>] (samsung_clk_register_pll) from [<c125d7e8>] (exynos4_clk_init+0x1b0/0x5e4)
-[    0.000000] [<c125d7e8>] (exynos4_clk_init) from [<c12335f4>] (of_clk_init+0x17c/0x210)
-[    0.000000] [<c12335f4>] (of_clk_init) from [<c1204700>] (time_init+0x24/0x2c)
-[    0.000000] [<c1204700>] (time_init) from [<c1200b2c>] (start_kernel+0x24c/0x38c)
-[    0.000000] [<c1200b2c>] (start_kernel) from [<4020807c>] (0x4020807c)
-
-Provide stub for clock controller returning reset values for PLLs.
-
-Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
----
- hw/arm/exynos4210.c      |   6 ++
- hw/misc/Makefile.objs    |   2 +-
- hw/misc/exynos4210_clk.c | 164 +++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 171 insertions(+), 1 deletion(-)
- create mode 100644 hw/misc/exynos4210_clk.c
-
-diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
-index be3c96d21ea3..a0ecbe8c1ffc 100644
---- a/hw/arm/exynos4210.c
-+++ b/hw/arm/exynos4210.c
-@@ -24,6 +24,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
-+#include "qemu/log.h"
- #include "cpu.h"
- #include "hw/boards.h"
- #include "sysemu/sysemu.h"
-@@ -74,6 +75,9 @@
- /* PMU SFR base address */
- #define EXYNOS4210_PMU_BASE_ADDR            0x10020000
- 
-+/* Clock controller SFR base address */
-+#define EXYNOS4210_CLK_BASE_ADDR            0x10030000
-+
- /* Display controllers (FIMD) */
- #define EXYNOS4210_FIMD0_BASE_ADDR          0x11C00000
- 
-@@ -297,6 +301,8 @@ Exynos4210State *exynos4210_init(MemoryRegion *system_mem,
-     */
-     sysbus_create_simple("exynos4210.pmu", EXYNOS4210_PMU_BASE_ADDR, NULL);
- 
-+    sysbus_create_simple("exynos4210.clk", EXYNOS4210_CLK_BASE_ADDR, NULL);
-+
-     /* PWM */
-     sysbus_create_varargs("exynos4210.pwm", EXYNOS4210_PWM_BASE_ADDR,
-                           s->irq_table[exynos4210_get_irq(22, 0)],
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 898e4ccfb1ee..8e080def33ae 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -26,7 +26,7 @@ obj-$(CONFIG_IVSHMEM) += ivshmem.o
- obj-$(CONFIG_REALVIEW) += arm_sysctl.o
- obj-$(CONFIG_NSERIES) += cbus.o
- obj-$(CONFIG_ECCMEMCTL) += eccmemctl.o
--obj-$(CONFIG_EXYNOS4) += exynos4210_pmu.o
-+obj-$(CONFIG_EXYNOS4) += exynos4210_pmu.o exynos4210_clk.o
- obj-$(CONFIG_IMX) += imx_ccm.o
- obj-$(CONFIG_IMX) += imx31_ccm.o
- obj-$(CONFIG_IMX) += imx25_ccm.o
-diff --git a/hw/misc/exynos4210_clk.c b/hw/misc/exynos4210_clk.c
-new file mode 100644
-index 000000000000..0ad89bb7d39b
---- /dev/null
-+++ b/hw/misc/exynos4210_clk.c
-@@ -0,0 +1,164 @@
-+/*
-+ *  Exynos4210 Clock Controller Emulation
-+ *
-+ *  Copyright (c) 2017 Krzysztof Kozlowski <krzk@kernel.org>
-+ *
-+ *  This program is free software; you can redistribute it and/or modify it
-+ *  under the terms of the GNU General Public License as published by the
-+ *  Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful, but WITHOUT
-+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ *  FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-+ *  for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License along
-+ *  with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/sysbus.h"
-+#include "qemu/log.h"
-+
-+#define TYPE_EXYNOS4210_CLK             "exynos4210.clk"
-+#define EXYNOS4210_CLK(obj) \
-+    OBJECT_CHECK(Exynos4210ClkState, (obj), TYPE_EXYNOS4210_CLK)
-+
-+#define CLK_PLL_LOCKED                  BIT(29)
-+
-+#define EXYNOS4210_CLK_REGS_MEM_SIZE    0x15104
-+
-+typedef struct Exynos4210Reg {
-+    const char   *name; /* for debug only */
-+    uint32_t     offset;
-+    uint32_t     reset_value;
-+} Exynos4210Reg;
-+
-+/* Clock controller register base: 0x10030000 */
-+static const Exynos4210Reg exynos4210_clk_regs[] = {
-+    {"EPLL_LOCK",                     0xc010, 0x00000fff},
-+    {"VPLL_LOCK",                     0xc020, 0x00000fff},
-+    {"EPLL_CON0",                     0xc110, 0x00300301 + CLK_PLL_LOCKED},
-+    {"EPLL_CON1",                     0xc114, 0x00000000},
-+    {"VPLL_CON0",                     0xc120, 0x00240201 + CLK_PLL_LOCKED},
-+    {"VPLL_CON1",                     0xc124, 0x66010464},
-+    {"APLL_LOCK",                    0x14000, 0x00000fff},
-+    {"MPLL_LOCK",                    0x14004, 0x00000fff},
-+    {"APLL_CON0",                    0x14100, 0x00c80601 + CLK_PLL_LOCKED},
-+    {"APLL_CON1",                    0x14104, 0x0000001c},
-+    {"MPLL_CON0",                    0x14108, 0x00c80601 + CLK_PLL_LOCKED},
-+    {"MPLL_CON1",                    0x1410c, 0x0000001c},
-+};
-+
-+#define EXYNOS4210_REGS_NUM       ARRAY_SIZE(exynos4210_clk_regs)
-+
-+typedef struct Exynos4210ClkState {
-+    SysBusDevice parent_obj;
-+
-+    MemoryRegion iomem;
-+    uint32_t reg[EXYNOS4210_REGS_NUM];
-+} Exynos4210ClkState;
-+
-+static uint64_t exynos4210_clk_read(void *opaque, hwaddr offset,
-+                                    unsigned size)
-+{
-+    const Exynos4210ClkState *s = (Exynos4210ClkState *)opaque;
-+    const Exynos4210Reg *regs = exynos4210_clk_regs;
-+    unsigned int i;
-+
-+    for (i = 0; i < EXYNOS4210_REGS_NUM; i++) {
-+        if (regs->offset == offset) {
-+            return s->reg[i];
-+        }
-+        regs++;
-+    }
-+    qemu_log_mask(LOG_GUEST_ERROR, "%s: bad read offset 0x%04x\n",
-+                  __func__, (uint32_t)offset);
-+    return 0;
-+}
-+
-+static void exynos4210_clk_write(void *opaque, hwaddr offset,
-+                                 uint64_t val, unsigned size)
-+{
-+    Exynos4210ClkState *s = (Exynos4210ClkState *)opaque;
-+    const Exynos4210Reg *regs = exynos4210_clk_regs;
-+    unsigned int i;
-+
-+    for (i = 0; i < EXYNOS4210_REGS_NUM; i++) {
-+        if (regs->offset == offset) {
-+            s->reg[i] = val;
-+            return;
-+        }
-+        regs++;
-+    }
-+    qemu_log_mask(LOG_GUEST_ERROR, "%s: bad write offset 0x%04x\n",
-+                  __func__, (uint32_t)offset);
-+}
-+
-+static const MemoryRegionOps exynos4210_clk_ops = {
-+    .read = exynos4210_clk_read,
-+    .write = exynos4210_clk_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+        .unaligned = false
-+    }
-+};
-+
-+static void exynos4210_clk_reset(DeviceState *dev)
-+{
-+    Exynos4210ClkState *s = EXYNOS4210_CLK(dev);
-+    unsigned int i;
-+
-+    /* Set default values for registers */
-+    for (i = 0; i < EXYNOS4210_REGS_NUM; i++) {
-+        s->reg[i] = exynos4210_clk_regs[i].reset_value;
-+    }
-+}
-+
-+static void exynos4210_clk_init(Object *obj)
-+{
-+    Exynos4210ClkState *s = EXYNOS4210_CLK(obj);
-+    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
-+
-+    /* memory mapping */
-+    memory_region_init_io(&s->iomem, obj, &exynos4210_clk_ops, s,
-+                          TYPE_EXYNOS4210_CLK, EXYNOS4210_CLK_REGS_MEM_SIZE);
-+    sysbus_init_mmio(dev, &s->iomem);
-+}
-+
-+static const VMStateDescription exynos4210_clk_vmstate = {
-+    .name = TYPE_EXYNOS4210_CLK,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(reg, Exynos4210ClkState, EXYNOS4210_REGS_NUM),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void exynos4210_clk_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->reset = exynos4210_clk_reset;
-+    dc->vmsd = &exynos4210_clk_vmstate;
-+}
-+
-+static const TypeInfo exynos4210_clk_info = {
-+    .name          = TYPE_EXYNOS4210_CLK,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(Exynos4210ClkState),
-+    .instance_init = exynos4210_clk_init,
-+    .class_init    = exynos4210_clk_class_init,
-+};
-+
-+static void exynos4210_clk_register(void)
-+{
-+    qemu_log_mask(LOG_GUEST_ERROR, "Clock init\n");
-+    type_register_static(&exynos4210_clk_info);
-+}
-+
-+type_init(exynos4210_clk_register)
--- 
-2.9.3
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ4
+ODE0NTQyNC0xNDk3NC0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tClR5cGU6IHNl
+cmllcwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyIDAwLzI2XSBxYXBpOiBRTVAgZGlz
+cGF0Y2ggYW5kIGlucHV0IHZpc2l0b3Igd29yawoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
+IS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNF
+Li4gfCB3YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1s
+b2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBU
+cnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpm
+b3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDog
+JChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAt
+LWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhl
+bgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9u
+ZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVh
+OWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29t
+L3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTQ4ODE0
+NTQyNC0xNDk3NC0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tIC0+IHBhdGNoZXcv
+MTQ4ODE0NTQyNC0xNDk3NC0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tClN3aXRj
+aGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNzQ3ZDU2NSBxYXBpOiBJbXByb3ZlIHFvYmplY3Qg
+dmlzaXRvciBkb2N1bWVudGF0aW9uCjE4YTliNTEgcWFwaTogRml4IG9iamVjdCBpbnB1dCB2aXNp
+dCBiZXlvbmQgZW5kIG9mIGxpc3QKZTI5ZTg3MCB0ZXN0czogQ292ZXIgaW5wdXQgdmlzaXQgYmV5
+b25kIGVuZCBvZiBsaXN0CjI1YzJiOGYgcWFwaTogTWFrZSBpbnB1dCB2aXNpdG9ycyBkZXRlY3Qg
+dW52aXNpdGVkIGxpc3QgdGFpbHMKNjU4MGZkOCB0ZXN0LXFvYmplY3QtaW5wdXQtdmlzaXRvcjog
+Q292ZXIgbWlzc2luZyBuZXN0ZWQgc3RydWN0IG1lbWJlcgoxMzIzZTBmIHRlc3RzOiBDb3ZlciBw
+YXJ0aWFsIGlucHV0IHZpc2l0IG9mIGxpc3QKMTUwYjExYSB0ZXN0LXN0cmluZy1pbnB1dC12aXNp
+dG9yOiBJbXByb3ZlIGxpc3QgY292ZXJhZ2UKOWM0N2RjYiB0ZXN0LXN0cmluZy1pbnB1dC12aXNp
+dG9yOiBUZWFyIGRvd24gZXhpc3RpbmcgdGVzdCBhdXRvbWF0aWNhbGx5Cjk4NzA1YmMgdGVzdHMt
+cW9iamVjdC1pbnB1dC1zdHJpY3Q6IE1lcmdlIGludG8gdGVzdC1xb2JqZWN0LWlucHV0LXZpc2l0
+b3IKMTkyZDZiMSBxYXBpOiBEcm9wIHVudXNlZCBub24tc3RyaWN0IHFvYmplY3QgaW5wdXQgdmlz
+aXRvcgoyYzJkZWQ5IHRlc3QtcW9iamVjdC1pbnB1dC12aXNpdG9yOiBVc2Ugc3RyaWN0IHZpc2l0
+b3IKNTFiYmRlOSBxb206IE1ha2Ugb2JqZWN0X3Byb3BlcnR5X3NldF9xb2JqZWN0KCkncyBpbnB1
+dCB2aXNpdG9yIHN0cmljdAoxMzI5ZWIzIHFhcGk6IE1ha2Ugc3RyaW5nIGlucHV0IGFuZCBvcHRz
+IHZpc2l0b3IgcmVxdWlyZSBub24tbnVsbCBpbnB1dApjNzRhNzdmIHFhcGk6IERyb3Agc3RyaW5n
+IGlucHV0IHZpc2l0b3IgbWV0aG9kIG9wdGlvbmFsKCkKOTJlOTUzMiBxYXBpOiBJbXByb3ZlIHFv
+YmplY3QgaW5wdXQgdmlzaXRvciBlcnJvciByZXBvcnRpbmcKNjVmNTk2NyBxYXBpOiBNYWtlIFFP
+YmplY3QgaW5wdXQgdmlzaXRvciBzZXQgKmxpc3QgcmVsaWFibHkKMmNkZjViMCBxYXBpOiBDbGVh
+biB1cCBhZnRlciBjb21taXQgM2QzNDRjMgpkZDFkZmRhIHFhcGk6IEltcHJvdmUgYSBRT2JqZWN0
+IGlucHV0IHZpc2l0b3IgZXJyb3IgbWVzc2FnZQo0ZjU1OTU5IHFtcDogSW1wcm92ZSBRTVAgZGlz
+cGF0Y2ggZXJyb3IgbWVzc2FnZXMKNDU3ZWMzYyBxbXA6IEVsaW1pbmF0ZSBzaWxseSBRRVJSX1FN
+UF8qIG1hY3JvcwpmYzVlNmRhIHFtcDogRHJvcCBkdXBsaWNhdGVkIFFNUCBjb21tYW5kIG9iamVj
+dCBjaGVja3MKMzQ5OGY3YiBxbXA6IENsZWFuIHVwIGhvdyB3ZSBlbmZvcmNlIGNhcGFiaWxpdHkg
+bmVnb3RpYXRpb24KOTNhNGNkOCBxbXA6IER1bWIgZG93biBob3cgd2UgcnVuIFFNUCBjb21tYW5k
+IHJlZ2lzdHJhdGlvbgpmN2NlYzliIHFtcC10ZXN0OiBOZXcsIGNvdmVyaW5nIGJhc2ljIFFNUCBw
+cm90b2NvbAozN2NjZDc2IGxpYnF0ZXN0OiBXb3JrIGFyb3VuZCBhICJRTVAgd2FudHMgYSBuZXds
+aW5lIiBidWcKMTgxZjkyNiBxZ2E6IEZpeCBjcmFzaCBvbiBub24tZGljdGlvbmFyeSBRTVAgYXJn
+dW1lbnQKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMjY6IHFnYTogRml4
+IGNyYXNoIG9uIG5vbi1kaWN0aW9uYXJ5IFFNUCBhcmd1bWVudC4uLgpDaGVja2luZyBQQVRDSCAy
+LzI2OiBsaWJxdGVzdDogV29yayBhcm91bmQgYSAiUU1QIHdhbnRzIGEgbmV3bGluZSIgYnVnLi4u
+CkNoZWNraW5nIFBBVENIIDMvMjY6IHFtcC10ZXN0OiBOZXcsIGNvdmVyaW5nIGJhc2ljIFFNUCBw
+cm90b2NvbC4uLgpDaGVja2luZyBQQVRDSCA0LzI2OiBxbXA6IER1bWIgZG93biBob3cgd2UgcnVu
+IFFNUCBjb21tYW5kIHJlZ2lzdHJhdGlvbi4uLgpDaGVja2luZyBQQVRDSCA1LzI2OiBxbXA6IENs
+ZWFuIHVwIGhvdyB3ZSBlbmZvcmNlIGNhcGFiaWxpdHkgbmVnb3RpYXRpb24uLi4KQ2hlY2tpbmcg
+UEFUQ0ggNi8yNjogcW1wOiBEcm9wIGR1cGxpY2F0ZWQgUU1QIGNvbW1hbmQgb2JqZWN0IGNoZWNr
+cy4uLgpDaGVja2luZyBQQVRDSCA3LzI2OiBxbXA6IEVsaW1pbmF0ZSBzaWxseSBRRVJSX1FNUF8q
+IG1hY3Jvcy4uLgpDaGVja2luZyBQQVRDSCA4LzI2OiBxbXA6IEltcHJvdmUgUU1QIGRpc3BhdGNo
+IGVycm9yIG1lc3NhZ2VzLi4uCkNoZWNraW5nIFBBVENIIDkvMjY6IHFhcGk6IEltcHJvdmUgYSBR
+T2JqZWN0IGlucHV0IHZpc2l0b3IgZXJyb3IgbWVzc2FnZS4uLgpDaGVja2luZyBQQVRDSCAxMC8y
+NjogcWFwaTogQ2xlYW4gdXAgYWZ0ZXIgY29tbWl0IDNkMzQ0YzIuLi4KQ2hlY2tpbmcgUEFUQ0gg
+MTEvMjY6IHFhcGk6IE1ha2UgUU9iamVjdCBpbnB1dCB2aXNpdG9yIHNldCAqbGlzdCByZWxpYWJs
+eS4uLgpDaGVja2luZyBQQVRDSCAxMi8yNjogcWFwaTogSW1wcm92ZSBxb2JqZWN0IGlucHV0IHZp
+c2l0b3IgZXJyb3IgcmVwb3J0aW5nLi4uCkNoZWNraW5nIFBBVENIIDEzLzI2OiBxYXBpOiBEcm9w
+IHN0cmluZyBpbnB1dCB2aXNpdG9yIG1ldGhvZCBvcHRpb25hbCgpLi4uCkNoZWNraW5nIFBBVENI
+IDE0LzI2OiBxYXBpOiBNYWtlIHN0cmluZyBpbnB1dCBhbmQgb3B0cyB2aXNpdG9yIHJlcXVpcmUg
+bm9uLW51bGwgaW5wdXQuLi4KQ2hlY2tpbmcgUEFUQ0ggMTUvMjY6IHFvbTogTWFrZSBvYmplY3Rf
+cHJvcGVydHlfc2V0X3FvYmplY3QoKSdzIGlucHV0IHZpc2l0b3Igc3RyaWN0Li4uCkNoZWNraW5n
+IFBBVENIIDE2LzI2OiB0ZXN0LXFvYmplY3QtaW5wdXQtdmlzaXRvcjogVXNlIHN0cmljdCB2aXNp
+dG9yLi4uCkNoZWNraW5nIFBBVENIIDE3LzI2OiBxYXBpOiBEcm9wIHVudXNlZCBub24tc3RyaWN0
+IHFvYmplY3QgaW5wdXQgdmlzaXRvci4uLgpDaGVja2luZyBQQVRDSCAxOC8yNjogdGVzdHMtcW9i
+amVjdC1pbnB1dC1zdHJpY3Q6IE1lcmdlIGludG8gdGVzdC1xb2JqZWN0LWlucHV0LXZpc2l0b3Iu
+Li4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM0ODQ6IEZJTEU6IHRlc3RzL3Rlc3Qt
+cW9iamVjdC1pbnB1dC12aXNpdG9yLmM6ODQ3OgorICAgIHYgPSB2aXNpdG9yX2lucHV0X3Rlc3Rf
+aW5pdChkYXRhLCAieyAnaW50ZWdlcic6IC00MiwgJ2Jvb2xlYW4nOiB0cnVlLCAnc3RyaW5nJzog
+J2ZvbycsICdleHRyYSc6IDQyIH0iKTsKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwoj
+NDk4OiBGSUxFOiB0ZXN0cy90ZXN0LXFvYmplY3QtaW5wdXQtdmlzaXRvci5jOjg2MToKKyAgICB2
+ID0gdmlzaXRvcl9pbnB1dF90ZXN0X2luaXQoZGF0YSwgInsgJ3N0cmluZzAnOiAnc3RyaW5nMCcs
+ICdkaWN0MSc6IHsgJ3N0cmluZzEnOiAnc3RyaW5nMScsICdkaWN0Mic6IHsgJ3VzZXJkZWYxJzog
+eyAnaW50ZWdlcic6IDQyLCAnc3RyaW5nJzogJ3N0cmluZycsICdleHRyYSc6IFs0MiwgMjMsIHsn
+Zm9vJzonYmFyJ31dIH0sICdzdHJpbmcyJzogJ3N0cmluZzInfX19Iik7CgpFUlJPUjogbGluZSBv
+dmVyIDkwIGNoYXJhY3RlcnMKIzUxMjogRklMRTogdGVzdHMvdGVzdC1xb2JqZWN0LWlucHV0LXZp
+c2l0b3IuYzo4NzU6CisgICAgdiA9IHZpc2l0b3JfaW5wdXRfdGVzdF9pbml0KGRhdGEsICJbIHsg
+J3N0cmluZyc6ICdzdHJpbmcwJywgJ2ludGVnZXInOiA0MiB9LCB7ICdzdHJpbmcnOiAnc3RyaW5n
+MScsICdpbnRlZ2VyJzogNDMgfSwgeyAnc3RyaW5nJzogJ3N0cmluZzInLCAnaW50ZWdlcic6IDQ0
+LCAnZXh0cmEnOiAnZ2dnJyB9IF0iKTsKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwoj
+NTg1OiBGSUxFOiB0ZXN0cy90ZXN0LXFvYmplY3QtaW5wdXQtdmlzaXRvci5jOjk0ODoKKyAgICB2
+ID0gdmlzaXRvcl9pbnB1dF90ZXN0X2luaXQoZGF0YSwgInsgJ3N0cmluZyc6ICdjJywgJ2ludGVn
+ZXInOiA0MSwgJ2Jvb2xlYW4nOiB0cnVlIH0iKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
+YWN0ZXJzCiM1OTI6IEZJTEU6IHRlc3RzL3Rlc3QtcW9iamVjdC1pbnB1dC12aXNpdG9yLmM6OTU1
+Ogorc3RhdGljIHZvaWQgdGVzdF92aXNpdG9yX2luX2ZhaWxfdW5pb25fZmxhdF9ub19kaXNjcmlt
+KFRlc3RJbnB1dFZpc2l0b3JEYXRhICpkYXRhLAoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0
+ZXJzCiM2MDA6IEZJTEU6IHRlc3RzL3Rlc3QtcW9iamVjdC1pbnB1dC12aXNpdG9yLmM6OTYzOgor
+ICAgIHYgPSB2aXNpdG9yX2lucHV0X3Rlc3RfaW5pdChkYXRhLCAieyAnaW50ZWdlcic6IDQyLCAn
+c3RyaW5nJzogJ2MnLCAnc3RyaW5nMSc6ICdkJywgJ3N0cmluZzInOiAnZScgfSIpOwoKdG90YWw6
+IDUgZXJyb3JzLCAxIHdhcm5pbmdzLCAyMzMgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMg
+c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
+ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
+S1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTkvMjY6IHRlc3Qtc3RyaW5n
+LWlucHV0LXZpc2l0b3I6IFRlYXIgZG93biBleGlzdGluZyB0ZXN0IGF1dG9tYXRpY2FsbHkuLi4K
+Q2hlY2tpbmcgUEFUQ0ggMjAvMjY6IHRlc3Qtc3RyaW5nLWlucHV0LXZpc2l0b3I6IEltcHJvdmUg
+bGlzdCBjb3ZlcmFnZS4uLgpDaGVja2luZyBQQVRDSCAyMS8yNjogdGVzdHM6IENvdmVyIHBhcnRp
+YWwgaW5wdXQgdmlzaXQgb2YgbGlzdC4uLgpDaGVja2luZyBQQVRDSCAyMi8yNjogdGVzdC1xb2Jq
+ZWN0LWlucHV0LXZpc2l0b3I6IENvdmVyIG1pc3NpbmcgbmVzdGVkIHN0cnVjdCBtZW1iZXIuLi4K
+Q2hlY2tpbmcgUEFUQ0ggMjMvMjY6IHFhcGk6IE1ha2UgaW5wdXQgdmlzaXRvcnMgZGV0ZWN0IHVu
+dmlzaXRlZCBsaXN0IHRhaWxzLi4uCkNoZWNraW5nIFBBVENIIDI0LzI2OiB0ZXN0czogQ292ZXIg
+aW5wdXQgdmlzaXQgYmV5b25kIGVuZCBvZiBsaXN0Li4uCkVSUk9SOiBpZiB0aGlzIGNvZGUgaXMg
+cmVkdW5kYW50IGNvbnNpZGVyIHJlbW92aW5nIGl0CiM4NDogRklMRTogdGVzdHMvdGVzdC1xb2Jq
+ZWN0LWlucHV0LXZpc2l0b3IuYzo5NTU6CisjaWYgMCAvKiBGSVhNRSBjcmFzaCAqLwoKdG90YWw6
+IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA5NSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBz
+dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
+IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
+UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyNS8yNjogcWFwaTogRml4IG9i
+amVjdCBpbnB1dCB2aXNpdCBiZXlvbmQgZW5kIG9mIGxpc3QuLi4KQ2hlY2tpbmcgUEFUQ0ggMjYv
+MjY6IHFhcGk6IEltcHJvdmUgcW9iamVjdCB2aXNpdG9yIGRvY3VtZW50YXRpb24uLi4KPT09IE9V
+VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
+XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5v
+cmc=
