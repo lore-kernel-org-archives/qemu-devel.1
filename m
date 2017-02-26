@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1chmkY-0001Dl-Bo
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 19:31:43 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1chmkY-0001Du-FP
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 19:31:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1chmkW-0005we-MJ
+	(envelope-from <balaton@eik.bme.hu>) id 1chmkV-0005um-8b
 	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 19:31:42 -0500
-Message-Id: <db1b69270ca4d2335e6fb2455ee56552373757fc.1488068248.git.balaton@eik.bme.hu>
+Message-Id: <e160b509a76bcf00d1af4665e26c6870eb363cab.1488068248.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1488068248.git.balaton@eik.bme.hu>
 References: <cover.1488068248.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
-Date: Sat, 25 Feb 2017 22:47:26 +0100
-Subject: [Qemu-devel] [PATCH v2 12/14] sm501: Implement reading 2D engine
- registers
+Subject: [Qemu-devel] [PATCH v2 06/14] sm501: Add missing arbitration
+ control register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,88 +19,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Date: Sun, 26 Feb 2017 00:31:44 -0000
 To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 Cc: Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-Clients normally only write to these registers, nothing is known to
-ever read them but they are documented as read/write so allow clients
-to also read the values.
-
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 ---
- hw/display/sm501.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 57 insertions(+)
+ hw/display/sm501.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index af5e4db..32223f6 100644
+index d9219bd..b977094 100644
 --- a/hw/display/sm501.c
 +++ b/hw/display/sm501.c
-@@ -1149,9 +1149,66 @@ static uint64_t sm501_2d_engine_read(void *opaque, hwaddr addr,
-     SM501_DPRINTF("sm501 2d engine regs : read addr=%x\n", (int)addr);
- 
-     switch (addr) {
-+    case SM501_2D_SOURCE:
-+        ret = s->twoD_source;
-+        break;
-+    case SM501_2D_DESTINATION:
-+        ret = s->twoD_destination;
-+        break;
-+    case SM501_2D_DIMENSION:
-+        ret = s->twoD_dimension;
-+        break;
-+    case SM501_2D_CONTROL:
-+        ret = s->twoD_control;
-+        break;
-+    case SM501_2D_PITCH:
-+        ret = s->twoD_pitch;
-+        break;
-+    case SM501_2D_FOREGROUND:
-+        ret = s->twoD_foreground;
-+        break;
-+    case SM501_2D_BACKGROUND:
-+        ret = s->twoD_background;
-+        break;
-+    case SM501_2D_STRETCH:
-+        ret = s->twoD_stretch;
-+        break;
-+    case SM501_2D_COLOR_COMPARE:
-+        ret = s->twoD_color_compare;
-+        break;
-+    case SM501_2D_COLOR_COMPARE_MASK:
-+        ret = s->twoD_color_compare_mask;
-+        break;
-+    case SM501_2D_MASK:
-+        ret = s->twoD_mask;
-+        break;
-+    case SM501_2D_CLIP_TL:
-+        ret = s->twoD_clip_tl;
-+        break;
-+    case SM501_2D_CLIP_BR:
-+        ret = s->twoD_clip_br;
-+        break;
-+    case SM501_2D_MONO_PATTERN_LOW:
-+        ret = s->twoD_mono_pattern_low;
-+        break;
-+    case SM501_2D_MONO_PATTERN_HIGH:
-+        ret = s->twoD_mono_pattern_high;
-+        break;
-+    case SM501_2D_WINDOW_WIDTH:
-+        ret = s->twoD_window_width;
-+        break;
-     case SM501_2D_SOURCE_BASE:
-         ret = s->twoD_source_base;
+@@ -477,6 +477,7 @@ typedef struct SM501State {
+     uint32_t gpio_31_0_control;
+     uint32_t gpio_63_32_control;
+     uint32_t dram_control;
++    uint32_t arbitration_control;
+     uint32_t irq_mask;
+     uint32_t misc_timing;
+     uint32_t power_mode_control;
+@@ -760,6 +761,9 @@ static uint64_t sm501_system_config_read(void *opaque, hwaddr addr,
+     case SM501_DRAM_CONTROL:
+         ret = (s->dram_control & 0x07F107C0) | s->local_mem_size_index << 13;
          break;
-+    case SM501_2D_DESTINATION_BASE:
-+        ret = s->twoD_destination_base;
++    case SM501_ARBTRTN_CONTROL:
++        ret = s->arbitration_control;
 +        break;
-+    case SM501_2D_ALPHA:
-+        ret = s->twoD_alpha;
+     case SM501_IRQ_MASK:
+         ret = s->irq_mask;
+         break;
+@@ -812,6 +816,9 @@ static void sm501_system_config_write(void *opaque, hwaddr addr,
+         /* TODO : check validity of size change */
+         s->dram_control |=  value & 0x7FFFFFC3;
+         break;
++    case SM501_ARBTRTN_CONTROL:
++        s->arbitration_control =  value & 0x37777777;
 +        break;
-+    case SM501_2D_WRAP:
-+        ret = s->twoD_wrap;
-+        break;
-     case SM501_2D_STATUS:
-         ret = 0; /* Should return interrupt status */
+     case SM501_IRQ_MASK:
+         s->irq_mask = value;
          break;
 -- 
 2.7.4
