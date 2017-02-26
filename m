@@ -1,37 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ci7Wp-0005BM-TZ
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:42:59 -0500
+	(envelope-from <groug@kaod.org>) id 1ci7Wx-0005Mx-NW
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:43:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ci7Wm-0002qx-O6
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:42:55 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58393)
+	(envelope-from <groug@kaod.org>) id 1ci7Wu-0002s1-If
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:43:03 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50679
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ci7Wm-0002qo-Er
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:42:52 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ci7Wu-0002rv-BD
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:43:00 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1QMcTMg023305
-	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 17:42:51 -0500
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28u88qa2qw-1
+	v1QMcRkP086543
+	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 17:42:59 -0500
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28u862td31-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 17:42:51 -0500
+	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 17:42:59 -0500
 Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Sun, 26 Feb 2017 15:42:50 -0700
+	Sun, 26 Feb 2017 15:42:58 -0700
 From: Greg Kurz <groug@kaod.org>
-Date: Sun, 26 Feb 2017 23:42:43 +0100
+Date: Sun, 26 Feb 2017 23:42:51 +0100
 In-Reply-To: <148814889214.28146.16915712763478774662.stgit@bahia>
 References: <148814889214.28146.16915712763478774662.stgit@bahia>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <148814896326.28146.5441448723230448401.stgit@bahia>
-Subject: [Qemu-devel] [PATCH v2 09/28] 9pfs: local: lsetxattr: don't follow
- symlinks
+Message-Id: <148814897182.28146.16499801111559710291.stgit@bahia>
+Subject: [Qemu-devel] [PATCH v2 10/28] 9pfs: local: lremovexattr: don't
+ follow symlinks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,84 +44,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>, Greg Kurz <groug@kaod.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>
 
-The local_lsetxattr() callback is vulnerable to symlink attacks because
-it calls lsetxattr() which follows symbolic links in all path elements but
-the rightmost one.
+The local_lremovexattr() callback is vulnerable to symlink attacks because
+it calls lremovexattr() which follows symbolic links in all path elements
+but the rightmost one.
 
-This patch introduces a helper to emulate the non-existing fsetxattrat()
+This patch introduces a helper to emulate the non-existing fremovexattrat()
 function: it is implemented with /proc/self/fd which provides a trusted
-path that can be safely passed to lsetxattr().
+path that can be safely passed to lremovexattr().
 
-local_lsetxattr() is converted to use this helper and opendir_nofollow().
+local_lremovexattr() is converted to use this helper and opendir_nofollow().
 
 This partly fixes CVE-2016-9602.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
-v2: - introduce /proc based fsetxattrat_nofollow()
+v2: - introduce /proc based fremovexattrat_nofollow()
+    - fix arguments passed to local_removexattr_nofollow()
 ---
- hw/9pfs/9p-posix-acl.c  |   18 ++++--------------
- hw/9pfs/9p-util.h       |    2 ++
+ hw/9pfs/9p-posix-acl.c  |   10 ++--------
  hw/9pfs/9p-xattr-user.c |    8 +-------
- hw/9pfs/9p-xattr.c      |   39 +++++++++++++++++++++++++++++++++------
- hw/9pfs/9p-xattr.h      |    3 +++
- 5 files changed, 43 insertions(+), 27 deletions(-)
+ hw/9pfs/9p-xattr.c      |   36 +++++++++++++++++++++++++++++++-----
+ hw/9pfs/9p-xattr.h      |    2 ++
+ 4 files changed, 36 insertions(+), 20 deletions(-)
 
 diff --git a/hw/9pfs/9p-posix-acl.c b/hw/9pfs/9p-posix-acl.c
-index 9435e27a368c..0154e2a7605f 100644
+index 0154e2a7605f..bbf89064f7ae 100644
 --- a/hw/9pfs/9p-posix-acl.c
 +++ b/hw/9pfs/9p-posix-acl.c
-@@ -50,13 +50,8 @@ static ssize_t mp_pacl_listxattr(FsContext *ctx, const char *path,
- static int mp_pacl_setxattr(FsContext *ctx, const char *path, const char *name,
-                             void *value, size_t size, int flags)
+@@ -58,10 +58,8 @@ static int mp_pacl_removexattr(FsContext *ctx,
+                                const char *path, const char *name)
  {
+     int ret;
 -    char *buffer;
--    int ret;
--
+ 
 -    buffer = rpath(ctx, path);
--    ret = lsetxattr(buffer, MAP_ACL_ACCESS, value, size, flags);
+-    ret  = lremovexattr(buffer, MAP_ACL_ACCESS);
++    ret = local_removexattr_nofollow(ctx, path, MAP_ACL_ACCESS);
+     if (ret == -1 && errno == ENODATA) {
+         /*
+          * We don't get ENODATA error when trying to remove a
+@@ -71,7 +69,6 @@ static int mp_pacl_removexattr(FsContext *ctx,
+         errno = 0;
+         ret = 0;
+     }
 -    g_free(buffer);
--    return ret;
-+    return local_setxattr_nofollow(ctx, path, MAP_ACL_ACCESS, value, size,
-+                                   flags);
+     return ret;
  }
  
- static int mp_pacl_removexattr(FsContext *ctx,
-@@ -108,13 +103,8 @@ static ssize_t mp_dacl_listxattr(FsContext *ctx, const char *path,
- static int mp_dacl_setxattr(FsContext *ctx, const char *path, const char *name,
-                             void *value, size_t size, int flags)
+@@ -111,10 +108,8 @@ static int mp_dacl_removexattr(FsContext *ctx,
+                                const char *path, const char *name)
  {
+     int ret;
 -    char *buffer;
--    int ret;
--
+ 
 -    buffer = rpath(ctx, path);
--    ret = lsetxattr(buffer, MAP_ACL_DEFAULT, value, size, flags);
+-    ret  = lremovexattr(buffer, MAP_ACL_DEFAULT);
++    ret = local_removexattr_nofollow(ctx, path, MAP_ACL_DEFAULT);
+     if (ret == -1 && errno == ENODATA) {
+         /*
+          * We don't get ENODATA error when trying to remove a
+@@ -124,7 +119,6 @@ static int mp_dacl_removexattr(FsContext *ctx,
+         errno = 0;
+         ret = 0;
+     }
 -    g_free(buffer);
--    return ret;
-+    return local_setxattr_nofollow(ctx, path, MAP_ACL_DEFAULT, value, size,
-+                                   flags);
+     return ret;
  }
  
- static int mp_dacl_removexattr(FsContext *ctx,
-diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
-index 5a1be712130e..d4adac62956d 100644
---- a/hw/9pfs/9p-util.h
-+++ b/hw/9pfs/9p-util.h
-@@ -46,5 +46,7 @@ static inline int openat_file(int dirfd, const char *name, int flags,
- int openat_nofollow(int dirfd, const char *path, int flags, mode_t mode);
- ssize_t fgetxattrat_nofollow(int dirfd, const char *path, const char *name,
-                              void *value, size_t size);
-+int fsetxattrat_nofollow(int dirfd, const char *path, const char *name,
-+                         void *value, size_t size, int flags);
- 
- #endif
 diff --git a/hw/9pfs/9p-xattr-user.c b/hw/9pfs/9p-xattr-user.c
-index 4071fbc4c086..1840a5db66f3 100644
+index 1840a5db66f3..2c90817b75a6 100644
 --- a/hw/9pfs/9p-xattr-user.c
 +++ b/hw/9pfs/9p-xattr-user.c
-@@ -67,9 +67,6 @@ static ssize_t mp_user_listxattr(FsContext *ctx, const char *path,
- static int mp_user_setxattr(FsContext *ctx, const char *path, const char *name,
-                             void *value, size_t size, int flags)
+@@ -81,9 +81,6 @@ static int mp_user_setxattr(FsContext *ctx, const char *path, const char *name,
+ static int mp_user_removexattr(FsContext *ctx,
+                                const char *path, const char *name)
  {
 -    char *buffer;
 -    int ret;
@@ -128,46 +125,44 @@ index 4071fbc4c086..1840a5db66f3 100644
      if (strncmp(name, "user.virtfs.", 12) == 0) {
          /*
           * Don't allow fetch of user.virtfs namesapce
-@@ -78,10 +75,7 @@ static int mp_user_setxattr(FsContext *ctx, const char *path, const char *name,
+@@ -92,10 +89,7 @@ static int mp_user_removexattr(FsContext *ctx,
          errno = EACCES;
          return -1;
      }
 -    buffer = rpath(ctx, path);
--    ret = lsetxattr(buffer, name, value, size, flags);
+-    ret = lremovexattr(buffer, name);
 -    g_free(buffer);
 -    return ret;
-+    return local_setxattr_nofollow(ctx, path, name, value, size, flags);
++    return local_removexattr_nofollow(ctx, path, name);
  }
  
- static int mp_user_removexattr(FsContext *ctx,
+ XattrOperations mapped_user_xattr = {
 diff --git a/hw/9pfs/9p-xattr.c b/hw/9pfs/9p-xattr.c
-index 54193c630c9d..a0167dd4d898 100644
+index a0167dd4d898..eec160b3c2ac 100644
 --- a/hw/9pfs/9p-xattr.c
 +++ b/hw/9pfs/9p-xattr.c
-@@ -195,18 +195,45 @@ ssize_t pt_getxattr(FsContext *ctx, const char *path, const char *name,
-     return local_getxattr_nofollow(ctx, path, name, value, size);
+@@ -234,17 +234,43 @@ int pt_setxattr(FsContext *ctx, const char *path, const char *name, void *value,
+     return local_setxattr_nofollow(ctx, path, name, value, size, flags);
  }
  
--int pt_setxattr(FsContext *ctx, const char *path, const char *name, void *value,
--                size_t size, int flags)
-+int fsetxattrat_nofollow(int dirfd, const char *filename, const char *name,
-+                         void *value, size_t size, int flags)
+-int pt_removexattr(FsContext *ctx, const char *path, const char *name)
++static ssize_t fremovexattrat_nofollow(int dirfd, const char *filename,
++                                       const char *name)
  {
 -    char *buffer;
 +    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
      int ret;
  
 -    buffer = rpath(ctx, path);
--    ret = lsetxattr(buffer, name, value, size, flags);
+-    ret = lremovexattr(path, name);
 -    g_free(buffer);
-+    ret = lsetxattr(proc_path, name, value, size, flags);
++    ret = lremovexattr(proc_path, name);
 +    g_free(proc_path);
-+    return ret;
-+}
-+
-+ssize_t local_setxattr_nofollow(FsContext *ctx, const char *path,
-+                                const char *name, void *value, size_t size,
-+                                int flags)
+     return ret;
+ }
+ 
++ssize_t local_removexattr_nofollow(FsContext *ctx, const char *path,
++                                   const char *name)
 +{
 +    char *dirpath = g_path_get_dirname(path);
 +    char *filename = g_path_get_basename(path);
@@ -179,34 +174,32 @@ index 54193c630c9d..a0167dd4d898 100644
 +        goto out;
 +    }
 +
-+    ret = fsetxattrat_nofollow(dirfd, filename, name, value, size, flags);
++    ret = fremovexattrat_nofollow(dirfd, filename, name);
 +    close_preserve_errno(dirfd);
 +out:
 +    g_free(dirpath);
 +    g_free(filename);
-     return ret;
- }
- 
-+int pt_setxattr(FsContext *ctx, const char *path, const char *name, void *value,
-+                size_t size, int flags)
-+{
-+    return local_setxattr_nofollow(ctx, path, name, value, size, flags);
++    return ret;
 +}
 +
- int pt_removexattr(FsContext *ctx, const char *path, const char *name)
++int pt_removexattr(FsContext *ctx, const char *path, const char *name)
++{
++    return local_removexattr_nofollow(ctx, path, name);
++}
++
+ ssize_t notsup_getxattr(FsContext *ctx, const char *path, const char *name,
+                         void *value, size_t size)
  {
-     char *buffer;
 diff --git a/hw/9pfs/9p-xattr.h b/hw/9pfs/9p-xattr.h
-index 69a8b6b62e3c..7558970d8511 100644
+index 7558970d8511..0d83996575e1 100644
 --- a/hw/9pfs/9p-xattr.h
 +++ b/hw/9pfs/9p-xattr.h
-@@ -31,6 +31,9 @@ typedef struct xattr_operations
- 
- ssize_t local_getxattr_nofollow(FsContext *ctx, const char *path,
-                                 const char *name, void *value, size_t size);
-+ssize_t local_setxattr_nofollow(FsContext *ctx, const char *path,
-+                                const char *name, void *value, size_t size,
-+                                int flags);
+@@ -34,6 +34,8 @@ ssize_t local_getxattr_nofollow(FsContext *ctx, const char *path,
+ ssize_t local_setxattr_nofollow(FsContext *ctx, const char *path,
+                                 const char *name, void *value, size_t size,
+                                 int flags);
++ssize_t local_removexattr_nofollow(FsContext *ctx, const char *path,
++                                   const char *name);
  
  extern XattrOperations mapped_user_xattr;
  extern XattrOperations passthrough_user_xattr;
