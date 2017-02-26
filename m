@@ -1,37 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ci7YH-0006lY-3G
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:44:26 -0500
+	(envelope-from <groug@kaod.org>) id 1ci7YN-0006qy-LA
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:44:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ci7YD-00034h-Uc
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:44:25 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36277)
+	(envelope-from <groug@kaod.org>) id 1ci7YK-00035I-Ge
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:44:31 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57229
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ci7YD-00034b-LK
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:44:21 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1QMi2WU027245
-	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 17:44:20 -0500
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28u6y5kxbb-1
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ci7YK-000358-9x
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:44:28 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1QMi7hx121064
+	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 17:44:27 -0500
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28u7bakhnd-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 17:44:20 -0500
+	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 17:44:27 -0500
 Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Sun, 26 Feb 2017 15:44:19 -0700
+	Sun, 26 Feb 2017 15:44:26 -0700
 From: Greg Kurz <groug@kaod.org>
-Date: Sun, 26 Feb 2017 23:44:11 +0100
+Date: Sun, 26 Feb 2017 23:44:20 +0100
 In-Reply-To: <148814889214.28146.16915712763478774662.stgit@bahia>
 References: <148814889214.28146.16915712763478774662.stgit@bahia>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <148814905168.28146.6937613688176042132.stgit@bahia>
-Subject: [Qemu-devel] [PATCH v2 20/28] 9pfs: local: improve error handling
- in link op
+Message-Id: <148814906043.28146.11144440534535454849.stgit@bahia>
+Subject: [Qemu-devel] [PATCH v2 21/28] 9pfs: local: link: don't follow
+ symlinks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,89 +44,139 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>, Greg Kurz <groug@kaod.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>
 
-When using the mapped-file security model, we also have to create a link
-for the metadata file if it exists. In case of failure, we should rollback.
+The local_link() callback is vulnerable to symlink attacks because it calls:
 
-That's what this patch does.
+(1) link() which follows symbolic links for all path elements but the
+    rightmost one
+(2) local_create_mapped_attr_dir()->mkdir() which follows symbolic links
+    for all path elements but the rightmost one
+
+This patch converts local_link() to rely on opendir_nofollow() and linkat()
+to fix (1), mkdirat() to fix (2).
+
+This partly fixes CVE-2016-9602.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
 v2: - use openat_dir()
 ---
- hw/9pfs/9p-local.c |   32 +++++++++++++++++++++-----------
- 1 file changed, 21 insertions(+), 11 deletions(-)
+ hw/9pfs/9p-local.c |   84 ++++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 55 insertions(+), 29 deletions(-)
 
 diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 442d0475c7cd..03f4f5e913c6 100644
+index 03f4f5e913c6..27781a8afed7 100644
 --- a/hw/9pfs/9p-local.c
 +++ b/hw/9pfs/9p-local.c
-@@ -920,6 +920,7 @@ static int local_link(FsContext *ctx, V9fsPath *oldpath,
-     int ret;
-     V9fsString newpath;
-     char *buffer, *buffer1;
-+    int serrno;
+@@ -75,6 +75,13 @@ static void renameat_preserve_errno(int odirfd, const char *opath, int ndirfd,
+     errno = serrno;
+ }
  
-     v9fs_string_init(&newpath);
-     v9fs_string_sprintf(&newpath, "%s/%s", dirpath->data, name);
-@@ -928,25 +929,36 @@ static int local_link(FsContext *ctx, V9fsPath *oldpath,
-     buffer1 = rpath(ctx, newpath.data);
-     ret = link(buffer, buffer1);
-     g_free(buffer);
--    g_free(buffer1);
-+    if (ret < 0) {
++static void unlinkat_preserve_errno(int dirfd, const char *path, int flags)
++{
++    int serrno = errno;
++    unlinkat(dirfd, path, flags);
++    errno = serrno;
++}
++
+ #define VIRTFS_META_DIR ".virtfs_metadata"
+ 
+ static char *local_mapped_attr_path(FsContext *ctx, const char *path)
+@@ -917,49 +924,68 @@ out:
+ static int local_link(FsContext *ctx, V9fsPath *oldpath,
+                       V9fsPath *dirpath, const char *name)
+ {
+-    int ret;
+-    V9fsString newpath;
+-    char *buffer, *buffer1;
+-    int serrno;
++    char *odirpath = g_path_get_dirname(oldpath->data);
++    char *oname = g_path_get_basename(oldpath->data);
++    int ret = -1;
++    int odirfd, ndirfd;
+ 
+-    v9fs_string_init(&newpath);
+-    v9fs_string_sprintf(&newpath, "%s/%s", dirpath->data, name);
++    odirfd = local_opendir_nofollow(ctx, odirpath);
++    if (odirfd == -1) {
 +        goto out;
 +    }
  
-     /* now link the virtfs_metadata files */
--    if (!ret && (ctx->export_flags & V9FS_SM_MAPPED_FILE)) {
-+    if (ctx->export_flags & V9FS_SM_MAPPED_FILE) {
-+        char *vbuffer, *vbuffer1;
-+
-         /* Link the .virtfs_metadata files. Create the metada directory */
-         ret = local_create_mapped_attr_dir(ctx, newpath.data);
-         if (ret < 0) {
-             goto err_out;
-         }
--        buffer = local_mapped_attr_path(ctx, oldpath->data);
--        buffer1 = local_mapped_attr_path(ctx, newpath.data);
--        ret = link(buffer, buffer1);
--        g_free(buffer);
--        g_free(buffer1);
-+        vbuffer = local_mapped_attr_path(ctx, oldpath->data);
-+        vbuffer1 = local_mapped_attr_path(ctx, newpath.data);
-+        ret = link(vbuffer, vbuffer1);
-+        g_free(vbuffer);
-+        g_free(vbuffer1);
-         if (ret < 0 && errno != ENOENT) {
-             goto err_out;
-         }
+-    buffer = rpath(ctx, oldpath->data);
+-    buffer1 = rpath(ctx, newpath.data);
+-    ret = link(buffer, buffer1);
+-    g_free(buffer);
+-    if (ret < 0) {
++    ndirfd = local_opendir_nofollow(ctx, dirpath->data);
++    if (ndirfd == -1) {
++        close_preserve_errno(odirfd);
+         goto out;
      }
-+    goto out;
+ 
++    ret = linkat(odirfd, oname, ndirfd, name, 0);
++    if (ret < 0) {
++        goto out_close;
++    }
 +
- err_out:
-+    serrno = errno;
-+    remove(buffer1);
-+    errno = serrno;
-+out:
-+    g_free(buffer1);
-     v9fs_string_free(&newpath);
+     /* now link the virtfs_metadata files */
+     if (ctx->export_flags & V9FS_SM_MAPPED_FILE) {
+-        char *vbuffer, *vbuffer1;
++        int omap_dirfd, nmap_dirfd;
+ 
+-        /* Link the .virtfs_metadata files. Create the metada directory */
+-        ret = local_create_mapped_attr_dir(ctx, newpath.data);
+-        if (ret < 0) {
+-            goto err_out;
++        ret = mkdirat(ndirfd, VIRTFS_META_DIR, 0700);
++        if (ret < 0 && errno != EEXIST) {
++            goto err_undo_link;
+         }
+-        vbuffer = local_mapped_attr_path(ctx, oldpath->data);
+-        vbuffer1 = local_mapped_attr_path(ctx, newpath.data);
+-        ret = link(vbuffer, vbuffer1);
+-        g_free(vbuffer);
+-        g_free(vbuffer1);
++
++        omap_dirfd = openat_dir(odirfd, VIRTFS_META_DIR);
++        if (omap_dirfd == -1) {
++            goto err;
++        }
++
++        nmap_dirfd = openat_dir(ndirfd, VIRTFS_META_DIR);
++        if (nmap_dirfd == -1) {
++            close_preserve_errno(omap_dirfd);
++            goto err;
++        }
++
++        ret = linkat(omap_dirfd, oname, nmap_dirfd, name, 0);
++        close_preserve_errno(nmap_dirfd);
++        close_preserve_errno(omap_dirfd);
+         if (ret < 0 && errno != ENOENT) {
+-            goto err_out;
++            goto err_undo_link;
+         }
++
++        ret = 0;
+     }
+-    goto out;
++    goto out_close;
+ 
+-err_out:
+-    serrno = errno;
+-    remove(buffer1);
+-    errno = serrno;
++err:
++    ret = -1;
++err_undo_link:
++    unlinkat_preserve_errno(ndirfd, name, 0);
++out_close:
++    close_preserve_errno(ndirfd);
++    close_preserve_errno(odirfd);
+ out:
+-    g_free(buffer1);
+-    v9fs_string_free(&newpath);
++    g_free(oname);
++    g_free(odirpath);
      return ret;
  }
-@@ -1189,14 +1201,12 @@ static int local_renameat(FsContext *ctx, V9fsPath *olddir,
-             goto err_undo_rename;
-         }
  
--        omap_dirfd = openat(odirfd, VIRTFS_META_DIR,
--                            O_RDONLY | O_DIRECTORY | O_NOFOLLOW);
-+        omap_dirfd = openat_dir(odirfd, VIRTFS_META_DIR);
-         if (omap_dirfd == -1) {
-             goto err;
-         }
- 
--        nmap_dirfd = openat(ndirfd, VIRTFS_META_DIR,
--                            O_RDONLY | O_DIRECTORY | O_NOFOLLOW);
-+        nmap_dirfd = openat_dir(ndirfd, VIRTFS_META_DIR);
-         if (nmap_dirfd == -1) {
-             close_preserve_errno(omap_dirfd);
-             goto err;
