@@ -1,37 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50390)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ci7WJ-0004gD-63
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:42:24 -0500
+	(envelope-from <groug@kaod.org>) id 1ci7WR-0004ng-66
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:42:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ci7WG-0002kt-3C
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:42:23 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39241)
+	(envelope-from <groug@kaod.org>) id 1ci7WO-0002mq-0y
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:42:31 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44394)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ci7WF-0002kb-P9
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:42:20 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ci7WN-0002mb-NG
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:42:27 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1QMcOmf128845
-	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 17:42:18 -0500
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28u7b4k87n-1
+	v1QMcPda120614
+	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 17:42:26 -0500
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28u6wa42ur-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 17:42:18 -0500
+	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 17:42:26 -0500
 Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Sun, 26 Feb 2017 17:42:17 -0500
+	Sun, 26 Feb 2017 17:42:25 -0500
 From: Greg Kurz <groug@kaod.org>
-Date: Sun, 26 Feb 2017 23:42:10 +0100
+Date: Sun, 26 Feb 2017 23:42:18 +0100
 In-Reply-To: <148814889214.28146.16915712763478774662.stgit@bahia>
 References: <148814889214.28146.16915712763478774662.stgit@bahia>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <148814893081.28146.17287179588940562406.stgit@bahia>
-Subject: [Qemu-devel] [PATCH v2 05/28] 9pfs: local: keep a file descriptor
- on the shared folder
+Message-Id: <148814893846.28146.10539730675852394601.stgit@bahia>
+Subject: [Qemu-devel] [PATCH v2 06/28] 9pfs: local: open/opendir: don't
+ follow symlinks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,89 +43,126 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>, Greg Kurz <groug@kaod.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>
 
-This patch opens the shared folder and caches the file descriptor, so that
-it can be used to do symlink-safe path walk.
+The local_open() and local_opendir() callbacks are vulnerable to symlink
+attacks because they call:
+
+(1) open(O_NOFOLLOW) which follows symbolic links in all path elements but
+    the rightmost one
+(2) opendir() which follows symbolic links in all path elements
+
+This patch converts both callbacks to use new helpers based on
+openat_nofollow() to only open files and directories if they are
+below the virtfs shared folder
+
+This partly fixes CVE-2016-9602.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
-v2: - introduce LocalData type
+v2: - use LocalData type
+    - strip leading '/' characters in local_open_nofollow()
 ---
- hw/9pfs/9p-local.c |   30 ++++++++++++++++++++++++++++--
- 1 file changed, 28 insertions(+), 2 deletions(-)
+ hw/9pfs/9p-local.c |   37 +++++++++++++++++++++++++++----------
+ hw/9pfs/9p-local.h |   20 ++++++++++++++++++++
+ 2 files changed, 47 insertions(+), 10 deletions(-)
+ create mode 100644 hw/9pfs/9p-local.h
 
 diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 607cd2aeceea..be6be615149b 100644
+index be6be615149b..74b921e65316 100644
 --- a/hw/9pfs/9p-local.c
 +++ b/hw/9pfs/9p-local.c
-@@ -14,6 +14,7 @@
+@@ -13,6 +13,7 @@
+ 
  #include "qemu/osdep.h"
  #include "9p.h"
++#include "9p-local.h"
  #include "9p-xattr.h"
-+#include "9p-util.h"
+ #include "9p-util.h"
  #include "fsdev/qemu-fsdev.h"   /* local_ops */
- #include <arpa/inet.h>
- #include <pwd.h>
-@@ -43,6 +44,10 @@
- #define BTRFS_SUPER_MAGIC 0x9123683E
- #endif
+@@ -48,6 +49,24 @@ typedef struct {
+     int mountfd;
+ } LocalData;
  
-+typedef struct {
-+    int mountfd;
-+} LocalData;
++int local_open_nofollow(FsContext *fs_ctx, const char *path, int flags,
++                        mode_t mode)
++{
++    LocalData *data = fs_ctx->private;
++
++    /* All paths are relative to the path data->mountfd points to */
++    while (*path == '/') {
++        path++;
++    }
++
++    return openat_nofollow(data->mountfd, path, flags, mode);
++}
++
++int local_opendir_nofollow(FsContext *fs_ctx, const char *path)
++{
++    return local_open_nofollow(fs_ctx, path, O_DIRECTORY | O_RDONLY, 0);
++}
 +
  #define VIRTFS_META_DIR ".virtfs_metadata"
  
  static char *local_mapped_attr_path(FsContext *ctx, const char *path)
-@@ -1176,13 +1181,20 @@ static int local_ioc_getversion(FsContext *ctx, V9fsPath *path,
- static int local_init(FsContext *ctx)
+@@ -359,13 +378,9 @@ static int local_closedir(FsContext *ctx, V9fsFidOpenState *fs)
+ static int local_open(FsContext *ctx, V9fsPath *fs_path,
+                       int flags, V9fsFidOpenState *fs)
  {
-     struct statfs stbuf;
-+    LocalData *data = g_malloc(sizeof(*data));
-+
-+    data->mountfd = open(ctx->fs_root, O_DIRECTORY | O_RDONLY);
-+    if (data->mountfd == -1) {
-+        goto err;
+-    char *buffer;
+-    char *path = fs_path->data;
+     int fd;
+ 
+-    buffer = rpath(ctx, path);
+-    fd = open(buffer, flags | O_NOFOLLOW);
+-    g_free(buffer);
++    fd = local_open_nofollow(ctx, fs_path->data, flags, 0);
+     if (fd == -1) {
+         return -1;
+     }
+@@ -376,13 +391,15 @@ static int local_open(FsContext *ctx, V9fsPath *fs_path,
+ static int local_opendir(FsContext *ctx,
+                          V9fsPath *fs_path, V9fsFidOpenState *fs)
+ {
+-    char *buffer;
+-    char *path = fs_path->data;
++    int dirfd;
+     DIR *stream;
+ 
+-    buffer = rpath(ctx, path);
+-    stream = opendir(buffer);
+-    g_free(buffer);
++    dirfd = local_opendir_nofollow(ctx, fs_path->data);
++    if (dirfd == -1) {
++        return -1;
 +    }
- 
- #ifdef FS_IOC_GETVERSION
-     /*
-      * use ioc_getversion only if the ioctl is definied
-      */
--    if (statfs(ctx->fs_root, &stbuf) < 0) {
--        return -1;
-+    if (fstatfs(data->mountfd, &stbuf) < 0) {
-+        close_preserve_errno(data->mountfd);
-+        goto err;
++
++    stream = fdopendir(dirfd);
+     if (!stream) {
+         return -1;
      }
-     switch (stbuf.f_type) {
-     case EXT2_SUPER_MAGIC:
-@@ -1209,7 +1221,20 @@ static int local_init(FsContext *ctx)
-     }
-     ctx->export_flags |= V9FS_PATHNAME_FSCONTEXT;
- 
-+    ctx->private = data;
-     return 0;
+diff --git a/hw/9pfs/9p-local.h b/hw/9pfs/9p-local.h
+new file mode 100644
+index 000000000000..32c72749d9df
+--- /dev/null
++++ b/hw/9pfs/9p-local.h
+@@ -0,0 +1,20 @@
++/*
++ * 9p local backend utilities
++ *
++ * Copyright IBM, Corp. 2017
++ *
++ * Authors:
++ *  Greg Kurz <groug@kaod.org>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
 +
-+err:
-+    g_free(data);
-+    return -1;
-+}
++#ifndef QEMU_9P_LOCAL_H
++#define QEMU_9P_LOCAL_H
 +
-+static void local_cleanup(FsContext *ctx)
-+{
-+    LocalData *data = ctx->private;
++int local_open_nofollow(FsContext *fs_ctx, const char *path, int flags,
++                        mode_t mode);
++int local_opendir_nofollow(FsContext *fs_ctx, const char *path);
 +
-+    close(data->mountfd);
-+    g_free(data);
- }
- 
- static int local_parse_opts(QemuOpts *opts, struct FsDriverEntry *fse)
-@@ -1252,6 +1277,7 @@ static int local_parse_opts(QemuOpts *opts, struct FsDriverEntry *fse)
- FileOperations local_ops = {
-     .parse_opts = local_parse_opts,
-     .init  = local_init,
-+    .cleanup = local_cleanup,
-     .lstat = local_lstat,
-     .readlink = local_readlink,
-     .close = local_close,
++#endif
