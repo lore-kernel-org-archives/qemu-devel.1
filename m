@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43670)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1chmsS-0001ns-QU
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 19:39:53 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1chn1Y-0003nD-Hi
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 19:49:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1chmsP-00086i-M6
-	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 19:39:52 -0500
-Date: Sun, 26 Feb 2017 01:39:47 +0100 (CET)
+	(envelope-from <balaton@eik.bme.hu>) id 1chn1X-00035q-9e
+	for qemu-devel@nongnu.org; Sat, 25 Feb 2017 19:49:16 -0500
+Date: Sun, 26 Feb 2017 01:49:13 +0100 (CET)
 From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <CAFEAcA-CA9Zw8fHjO707g_RW2TJcR50GS16xLX-Gi7OCi06P_A@mail.gmail.com>
-Message-ID: <alpine.BSF.2.20.1702260133190.45393@zero.eik.bme.hu>
+In-Reply-To: <CAFEAcA8JXbOheEjxG--WibsWgL-tEPyyn4djbWURxW5+kHDAbQ@mail.gmail.com>
+Message-ID: <alpine.BSF.2.20.1702260140080.45393@zero.eik.bme.hu>
 References: <cover.1487522123.git.balaton@eik.bme.hu>
-	<c2915d0d2f3966ddb92005129b680727a69a3bcd.1487522123.git.balaton@eik.bme.hu>
-	<CAFEAcA8YGAyG3_uKwGJhff+ruearUP6eyQ0DROqZhGmdcaq6dw@mail.gmail.com>
-	<alpine.BSF.2.20.1702242118560.76443@zero.eik.bme.hu>
-	<CAFEAcA-CA9Zw8fHjO707g_RW2TJcR50GS16xLX-Gi7OCi06P_A@mail.gmail.com>
+	<9c4f503401fa3defa5dff8b938a0bee3aa8d89d5.1487522123.git.balaton@eik.bme.hu>
+	<CAFEAcA9uOtUmPisVgeTDCVR_tuXzB=nb7OYHiVty1iVnk8pXQQ@mail.gmail.com>
+	<alpine.BSF.2.20.1702242125210.76443@zero.eik.bme.hu>
+	<CAFEAcA8JXbOheEjxG--WibsWgL-tEPyyn4djbWURxW5+kHDAbQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH 03/10] sm501: QOMify
+Subject: Re: [Qemu-devel] [PATCH 06/10] sm501: Fix device endianness
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,69 +29,142 @@ To: Peter Maydell <peter.maydell@linaro.org>
 Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
 On Sat, 25 Feb 2017, Peter Maydell wrote:
-> On 24 February 2017 at 20:23, BALATON Zoltan <balaton@eik.bme.hu> wrote:
->> The SM501/SM502 is a multimedia chip that besides a display controller also
->> contains some other functions (see
->> http://cateee.net/lkddb/web-lkddb/MFD_SM501.html) and this is what is
->> emulated here as these are part of the chip itself.
->
-> Hmm; that's pretty ugly but I guess it's sort of like a container
-> device that needs to contain various things inside it.
->
+> On 24 February 2017 at 20:35, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+>> On Fri, 24 Feb 2017, Peter Maydell wrote:
+>>> On 19 February 2017 at 16:35, BALATON Zoltan <balaton@eik.bme.hu> wrote:
 >>>>
->>>> -    /* create qemu graphic console */
->>>> -    s->con = graphic_console_init(DEVICE(dev), 0, &sm501_ops, s);
->>>> +static Property sm501_sysbus_properties[] = {
->>>> +    DEFINE_PROP_UINT32("vram-size", SM501SysBusState, vram_size, 0),
->>>> +    DEFINE_PROP_UINT32("base", SM501SysBusState, base, 0),
->>>> +    DEFINE_PROP_PTR("chr-state", SM501SysBusState, chr_state),
->
-> Pointer properties and properties which tell the device what
-> address it's at are both signs that something's not quite
-> modelled right. There may be no better way to do things right
-> now, or then again there may be.
-
-Maybe but I think that would not be part of this series but some other 
-clean up separately. This series makes it a bit cleaner but does not aim 
-to fix everything.
-
->>>> +    DEFINE_PROP_END_OF_LIST(),
->>>> +};
+>>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>>>> ---
+>>>>  hw/display/sm501.c          |  6 +++---
+>>>>  hw/display/sm501_template.h | 31 ++++++++++++++++++-------------
+>>>>  2 files changed, 21 insertions(+), 16 deletions(-)
+>>>>
+>>>> diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+>>>> index 9091bb5..3d32a3c 100644
+>>>> --- a/hw/display/sm501.c
+>>>> +++ b/hw/display/sm501.c
+>>>> @@ -846,7 +846,7 @@ static const MemoryRegionOps sm501_system_config_ops
+>>>> = {
+>>>>          .min_access_size = 4,
+>>>>          .max_access_size = 4,
+>>>>      },
+>>>> -    .endianness = DEVICE_NATIVE_ENDIAN,
+>>>> +    .endianness = DEVICE_LITTLE_ENDIAN,
+>>>>  };
+>>>>
+>>>>  static uint32_t sm501_palette_read(void *opaque, hwaddr addr)
+>>>> @@ -1082,7 +1082,7 @@ static const MemoryRegionOps sm501_disp_ctrl_ops =
+>>>> {
+>>>>          .min_access_size = 4,
+>>>>          .max_access_size = 4,
+>>>>      },
+>>>> -    .endianness = DEVICE_NATIVE_ENDIAN,
+>>>> +    .endianness = DEVICE_LITTLE_ENDIAN,
+>>>>  };
+>>>>
+>>>>  static uint64_t sm501_2d_engine_read(void *opaque, hwaddr addr,
+>>>> @@ -1170,7 +1170,7 @@ static const MemoryRegionOps sm501_2d_engine_ops =
+>>>> {
+>>>>          .min_access_size = 4,
+>>>>          .max_access_size = 4,
+>>>>      },
+>>>> -    .endianness = DEVICE_NATIVE_ENDIAN,
+>>>> +    .endianness = DEVICE_LITTLE_ENDIAN,
+>>>>  };
 >>>
 >>>
->>>> +static void sm501_sysbus_class_init(ObjectClass *klass, void *data)
->>>> +{
->>>> +    DeviceClass *dc = DEVICE_CLASS(klass);
->>>> +
->>>> +    dc->realize = sm501_realize_sysbus;
->>>> +    set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
->>>> +    dc->desc = "SM501 Multimedia Companion";
->>>> +    dc->props = sm501_sysbus_properties;
->>>> +/* Note: pointer property "chr-state" may remain null, thus
->>>> + * no need for dc->cannot_instantiate_with_device_add_yet = true;
->>>> + */
->>>> }
->>>
->>>
->>> You also need a VMState struct registered in dc->vmsd and a reset
->>> function registered in dc->reset.
+>>> Does this still all work for the sh4eb (big-endian) sysbus device case?
 >>
 >>
->> Even if no migration is supported? Is there a simple example I could look at
->> on what should go into these?
+>> Not sure. Is there some image somewhere I can test with?
 >
-> The idea is to support migration. There are examples of doing
-> VMState structures all over the tree. You just need a structure
-> that lists all the bits of your state data structure that
-> contain guest-modifiable state.
+> I don't know, I'm afraid; I don't know anything about sh4.
+> I'm just going by looking at the code changes and flagging
+> up things which are potentially problems.
 >
-> Reset is straightforward: it's just a function that resets
-> the state of the device as if the system had been hard
-> powercycled.
+>>>>  /* draw line functions for all console modes */
+>>>> diff --git a/hw/display/sm501_template.h b/hw/display/sm501_template.h
+>>>> index 832ee61..5b516d6 100644
+>>>> --- a/hw/display/sm501_template.h
+>>>> +++ b/hw/display/sm501_template.h
+>>>> @@ -64,10 +64,16 @@ static void glue(draw_line16_, PIXEL_NAME)(
+>>>>      uint8_t r, g, b;
+>>>>
+>>>>      do {
+>>>> -        rgb565 = lduw_p(s);
+>>>> -        r = ((rgb565 >> 11) & 0x1f) << 3;
+>>>> -        g = ((rgb565 >>  5) & 0x3f) << 2;
+>>>> -        b = ((rgb565 >>  0) & 0x1f) << 3;
+>>>> +        rgb565 = lduw_le_p(s);
+>>>> +#if defined(TARGET_WORDS_BIGENDIAN)
+>>>> +        r = (rgb565 >> 8) & 0xf8;
+>>>> +        g = (rgb565 >> 3) & 0xfc;
+>>>> +        b = (rgb565 << 3) & 0xf8;
+>>>> +#else
+>>>> +        b = (rgb565 >> 8) & 0xf8;
+>>>> +        g = (rgb565 >> 3) & 0xfc;
+>>>> +        r = (rgb565 << 3) & 0xf8;
+>>>> +#endif
+>>>>          *(PIXEL_TYPE *)d = glue(rgb_to_pixel, PIXEL_NAME)(r, g, b);
+>>>>          s += 2;
+>>>>          d += BPP;
+>>>> @@ -80,15 +86,14 @@ static void glue(draw_line32_, PIXEL_NAME)(
+>>>>      uint8_t r, g, b;
+>>>>
+>>>>      do {
+>>>> -        ldub_p(s);
+>>>>  #if defined(TARGET_WORDS_BIGENDIAN)
+>>>> +        r = s[0];
+>>>> +        g = s[1];
+>>>> +        b = s[2];
+>>>> +#else
+>>>>          r = s[1];
+>>>>          g = s[2];
+>>>>          b = s[3];
+>>>> -#else
+>>>> -        b = s[0];
+>>>> -        g = s[1];
+>>>> -        r = s[2];
+>>>>  #endif
+>>>
+>>>
+>>> This looks really suspicious. Previously we had
+>>> TARGET_WORDS_BIGENDIAN -> bytes are XRGB
+>>> otherwise                 bytes are BGRX
+>>>
+>>> Now we have
+>>> TARGET_WORDS_BIGENDIAN -> bytes are RGBX
+>>> otherwise              -> bytes are XRGB
+>>>
+>>> That doesn't seem very plausible at all.
+>>
+>>
+>> I've tested it with sh4 and ppc guests running on x86_64 host and these work
+>> now while previous code resulted in mixed up colors. Maybe the host
+>> endianness could also be a factor and the previous code assumed big endian
+>> host or the previous code was already broken and only worked with the
+>> default 8 bit depth. I'm not completely sure I understand endian handling in
+>> QEMU to know if this is correct besides on what I've tested but at least
+>> little endian and big endian guests should work on little endian hosts now
+>> with my patch. I can't test on big endian host.
+>>
+>> I've used this image: https://people.debian.org/~aurel32/qemu/sh4/
+>> with video=800x600-16 kernel parameter where changing -16 to different bit
+>> depths reproduces the problem.
+>
+> Again, I don't know sh, and I don't know this particular device.
+> I'm just pointing out that the code change here looks really
+> implausible. Maybe the data sheet says that this is what the
+> pixel format looks like; but it's very odd.
 
-I've tried to add these but vmstate is only added to the PCI version 
-because the OHCI device I've looked at also does the same, which is likely 
-beacuse the sysbus version is only used on SH4 which does not support 
-migration anyway. The PCI verison can be instantiated on machines that 
-have migration support so it makes sense to do it there. I hope this is 
-acceptable.
+I don't know much about it either. I could not find docs about framebuffer 
+endianness of this device but all clients I've seen treat it as little 
+endian, both on little endian SH4 and big endian PPC. Maybe the previous 
+code was already broken, because on a black & white text console (like the 
+SH4 test image listed on qemu.org) the problem is not obvious, it still 
+looks like white text on black with mixed up color components. It can only 
+be seen when some graphics is displayed like the Tux logo on framebuffer 
+in the above Debian image. If it ever worked it could have been easily 
+broken by some qemu console changes. Or maybe it worked on big endian host 
+only but I could not verify that. All I can say it works for me now on LE 
+host with both LE and BE guests that I could test.
