@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ci6bi-0004UI-GY
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:43:57 -0500
+	(envelope-from <armbru@redhat.com>) id 1ci6bj-0004UQ-4z
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:43:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ci6bd-0004Mv-PG
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:43:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38082)
+	(envelope-from <armbru@redhat.com>) id 1ci6bf-0004OU-HH
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:43:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51862)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ci6bd-0004LS-Ea
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:43:49 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ci6bf-0004Nh-8W
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:43:51 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 93E74C04B93B
-	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 21:43:49 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 65C6B7E9C0
+	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 21:43:51 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
-	by int-mx13.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v1QLhm1v008756
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=NO)
-	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 16:43:49 -0500
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 07C59306A1
+	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 21:43:51 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Sun, 26 Feb 2017 22:43:24 +0100
-Message-Id: <1488145424-14974-7-git-send-email-armbru@redhat.com>
+Date: Sun, 26 Feb 2017 22:43:44 +0100
+Message-Id: <1488145424-14974-27-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488145424-14974-1-git-send-email-armbru@redhat.com>
 References: <1488145424-14974-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 06/26] qmp: Drop duplicated QMP command
- object checks
+Subject: [Qemu-devel] [PATCH v2 26/26] qapi: Improve qobject visitor
+ documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,151 +36,113 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-qmp_check_input_obj() duplicates qmp_dispatch_check_obj(), except the
-latter screws up an error message.  handle_qmp_command() runs first
-the former, then the latter via qmp_dispatch(), masking the screwup.
-
-qemu-ga also masks the screwup, because it also duplicates checks,
-just differently.
-
-qmp_check_input_obj() exists because handle_qmp_command() needs to
-examine the command before dispatching it.  The previous commit got
-rid of this need, except for a tracepoint, and a bit of "id" code that
-relies on qdict not being null.
-
-Fix up the error message in qmp_dispatch_check_obj(), drop
-qmp_check_input_obj() and the tracepoint.  Protect the "id" code with
-a conditional.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- monitor.c           | 74 +++++------------------------------------------------
- qapi/qmp-dispatch.c |  3 +--
- trace-events        |  1 -
- 3 files changed, 7 insertions(+), 71 deletions(-)
+ include/qapi/qobject-input-visitor.h  | 37 ++++++++++++++++++++++++++++++++++-
+ include/qapi/qobject-output-visitor.h | 35 +++++++++++++++++++++++++++++----
+ 2 files changed, 67 insertions(+), 5 deletions(-)
 
-diff --git a/monitor.c b/monitor.c
-index e522b6f..97b73ab 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -3697,67 +3697,10 @@ static int monitor_can_read(void *opaque)
-     return (mon->suspend_cnt == 0) ? 1 : 0;
- }
+diff --git a/include/qapi/qobject-input-visitor.h b/include/qapi/qobject-input-visitor.h
+index 21db9c4..0b7633a 100644
+--- a/include/qapi/qobject-input-visitor.h
++++ b/include/qapi/qobject-input-visitor.h
+@@ -1,6 +1,7 @@
+ /*
+  * Input Visitor
+  *
++ * Copyright (C) 2017 Red Hat, Inc.
+  * Copyright IBM, Corp. 2011
+  *
+  * Authors:
+@@ -20,7 +21,41 @@
+ typedef struct QObjectInputVisitor QObjectInputVisitor;
+ 
+ /*
+- * Return a new input visitor that converts a QObject to a QAPI object.
++ * Create a QObject input visitor for @obj
++ *
++ * A QObject input visitor visit builds a QAPI object from a QObject.
++ * This simultaneously walks the QAPI object being built and the
++ * QObject.  The latter walk starts at @obj.
++ *
++ * visit_type_FOO() creates an instance of QAPI type FOO.  The visited
++ * QObject must match FOO.  QDict matches struct/union types, QList
++ * matches list types, QString matches type 'str' and enumeration
++ * types, QInt matches integer types, QFloat matches type 'number',
++ * QBool matches type 'bool'.  Type 'any' is matched by QObject.  A
++ * QAPI alternate type is matched when one of its member types is.
++ *
++ * visit_start_struct() ... visit_end_struct() visits a QDict and
++ * creates a QAPI struct/union.  Visits in between visit the
++ * dictionary members.  visit_optional() is true when the QDict has
++ * this member.  visit_check_struct() fails if unvisited members
++ * remain.
++ *
++ * visit_start_list() ... visit_end_list() visits a QList and creates
++ * a QAPI list.  Visits in between visit list members, one after the
++ * other.  visit_next_list() returns NULL when all QList members have
++ * been visited.  visit_check_list() fails if unvisited members
++ * remain.
++ *
++ * visit_start_alternate() ... visit_end_alternate() visits a QObject
++ * and creates a QAPI alternate.  The visit in between visits the same
++ * QObject and initializes the alternate member that is in use.
++ *
++ * Error messages refer to parts of @obj in JavaScript/Python syntax.
++ * For example, 'a.b[2]' refers to the second member of the QList
++ * member 'b' of the QDict member 'a' of QDict @obj.
++ *
++ * The caller is responsible for freeing the visitor with
++ * visit_free().
+  */
+ Visitor *qobject_input_visitor_new(QObject *obj);
+ 
+diff --git a/include/qapi/qobject-output-visitor.h b/include/qapi/qobject-output-visitor.h
+index 8241877..9b990c3 100644
+--- a/include/qapi/qobject-output-visitor.h
++++ b/include/qapi/qobject-output-visitor.h
+@@ -19,11 +19,38 @@
+ 
+ typedef struct QObjectOutputVisitor QObjectOutputVisitor;
  
 -/*
-- * Input object checking rules
-- *
-- * 1. Input object must be a dict
-- * 2. The "execute" key must exist
-- * 3. The "execute" key must be a string
-- * 4. If the "arguments" key exists, it must be a dict
-- * 5. If the "id" key exists, it can be anything (ie. json-value)
-- * 6. Any argument not listed above is considered invalid
-- */
--static QDict *qmp_check_input_obj(QObject *input_obj, Error **errp)
--{
--    const QDictEntry *ent;
--    int has_exec_key = 0;
--    QDict *input_dict;
--
--    input_dict = qobject_to_qdict(input_obj);
--    if (!input_dict) {
--        error_setg(errp, QERR_QMP_BAD_INPUT_OBJECT, "object");
--        return NULL;
--    }
--
--
--    for (ent = qdict_first(input_dict); ent; ent = qdict_next(input_dict, ent)){
--        const char *arg_name = qdict_entry_key(ent);
--        const QObject *arg_obj = qdict_entry_value(ent);
--
--        if (!strcmp(arg_name, "execute")) {
--            if (qobject_type(arg_obj) != QTYPE_QSTRING) {
--                error_setg(errp, QERR_QMP_BAD_INPUT_OBJECT_MEMBER,
--                           "execute", "string");
--                return NULL;
--            }
--            has_exec_key = 1;
--        } else if (!strcmp(arg_name, "arguments")) {
--            if (qobject_type(arg_obj) != QTYPE_QDICT) {
--                error_setg(errp, QERR_QMP_BAD_INPUT_OBJECT_MEMBER,
--                           "arguments", "object");
--                return NULL;
--            }
--        } else if (!strcmp(arg_name, "id")) {
--            /* Any string is acceptable as "id", so nothing to check */
--        } else {
--            error_setg(errp, QERR_QMP_EXTRA_MEMBER, arg_name);
--            return NULL;
--        }
--    }
--
--    if (!has_exec_key) {
--        error_setg(errp, QERR_QMP_BAD_INPUT_OBJECT, "execute");
--        return NULL;
--    }
--
--    return input_dict;
--}
--
- static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
- {
-     QObject *req, *rsp = NULL, *id = NULL;
-     QDict *qdict = NULL;
--    const char *cmd_name;
-     Monitor *mon = cur_mon;
-     Error *err = NULL;
+- * Create a new QObject output visitor.
++/**
++ * Create a QObject output visitor for @obj
+  *
+- * If everything else succeeds, pass @result to visit_complete() to
+- * collect the result of the visit.
++ * A QObject output visitor visit builds a QObject from QAPI Object.
++ * This simultaneously walks the QAPI object and the QObject being
++ * built.  The latter walk starts at @obj.
++ *
++ * visit_type_FOO() creates a QObject for QAPI type FOO.  It creates a
++ * QDict for struct/union types, a QList for list types, QString for
++ * type 'str' and enumeration types, QInt for integer types, QFloat
++ * for type 'number', QBool for type 'bool'.  For type 'any', it
++ * increments the QObject's reference count.  For QAPI alternate
++ * types, it creates the QObject for the member that is in use.
++ *
++ * visit_start_struct() ... visit_end_struct() visits a QAPI
++ * struct/union and creates a QDict.  Visits in between visit the
++ * members.  visit_optional() is true when the struct/union has this
++ * member.  visit_check_struct() does nothing.
++ *
++ * visit_start_list() ... visit_end_list() visits a QAPI list and
++ * creates a QList.  Visits in between visit list members, one after
++ * the other.  visit_next_list() returns NULL when all QAPI list
++ * members have been visited.  visit_check_list() does nothing.
++ *
++ * visit_start_alternate() ... visit_end_alternate() visits a QAPI
++ * alternate.  The visit in between creates the QObject for the
++ * alternate member that is in use.
++ *
++ * Errors are not expected to happen.
++ *
++ * The caller is responsible for freeing the visitor with
++ * visit_free().
+  */
+ Visitor *qobject_output_visitor_new(QObject **result);
  
-@@ -3770,17 +3713,12 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
-         goto err_out;
-     }
- 
--    qdict = qmp_check_input_obj(req, &err);
--    if (!qdict) {
--        goto err_out;
--    }
--
--    id = qdict_get(qdict, "id");
--    qobject_incref(id);
--    qdict_del(qdict, "id");
--
--    cmd_name = qdict_get_str(qdict, "execute");
--    trace_handle_qmp_command(mon, cmd_name);
-+    qdict = qobject_to_qdict(req);
-+    if (qdict) {
-+        id = qdict_get(qdict, "id");
-+        qobject_incref(id);
-+        qdict_del(qdict, "id");
-+    } /* else will fail qmp_dispatch() */
- 
-     rsp = qmp_dispatch(req);
- 
-diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-index 621922f..4fc1122 100644
---- a/qapi/qmp-dispatch.c
-+++ b/qapi/qmp-dispatch.c
-@@ -30,8 +30,7 @@ static QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
- 
-     dict = qobject_to_qdict(request);
-     if (!dict) {
--        error_setg(errp, QERR_QMP_BAD_INPUT_OBJECT,
--                   "request is not a dictionary");
-+        error_setg(errp, QERR_QMP_BAD_INPUT_OBJECT, "object");
-         return NULL;
-     }
- 
-diff --git a/trace-events b/trace-events
-index 7288557..b07a09b 100644
---- a/trace-events
-+++ b/trace-events
-@@ -65,7 +65,6 @@ xen_remap_bucket(uint64_t index) "index %#"PRIx64
- xen_map_cache_return(void* ptr) "%p"
- 
- # monitor.c
--handle_qmp_command(void *mon, const char *cmd_name) "mon %p cmd_name \"%s\""
- monitor_protocol_event_handler(uint32_t event, void *qdict) "event=%d data=%p"
- monitor_protocol_event_emit(uint32_t event, void *data) "event=%d data=%p"
- monitor_protocol_event_queue(uint32_t event, void *qdict, uint64_t rate) "event=%d data=%p rate=%" PRId64
 -- 
 2.7.4
