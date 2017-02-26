@@ -1,38 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51052)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ci7Z3-0007YD-VE
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:45:17 -0500
+	(envelope-from <bounces@canonical.com>) id 1ci7eJ-0003iR-VD
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:50:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ci7Z0-0003DM-Rp
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:45:14 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60056
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <bounces@canonical.com>) id 1ci7eG-0004VW-TQ
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:50:40 -0500
+Received: from indium.canonical.com ([91.189.90.7]:60767)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ci7Z0-0003DF-LP
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:45:10 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1QMi31v131897
-	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 17:45:10 -0500
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28uqvkssjv-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 17:45:09 -0500
-Received: from localhost
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Sun, 26 Feb 2017 15:45:09 -0700
-From: Greg Kurz <groug@kaod.org>
-Date: Sun, 26 Feb 2017 23:45:02 +0100
-In-Reply-To: <148814889214.28146.16915712763478774662.stgit@bahia>
-References: <148814889214.28146.16915712763478774662.stgit@bahia>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ci7eG-0004Uk-NF
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:50:36 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1ci7eE-0005qv-Gr
+	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 22:50:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7A6EA2E80C6
+	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 22:50:34 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <148814910201.28146.7217483545833853712.stgit@bahia>
-Subject: [Qemu-devel] [PATCH v2 26/28] 9pfs: local: mkdir: don't follow
- symlinks
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 26 Feb 2017 22:41:43 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1668103 <1668103@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170226205013.23267.77116.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170226224143.23033.97730.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1668103] Re: Possible off-by-one error in
+ priority handling of hw/PL190.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,122 +38,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>, Greg Kurz <groug@kaod.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>
 
-The local_mkdir() callback is vulnerable to symlink attacks because it
-calls:
+"Fix committed" doesn't seem right -- that's only when a patch is
+actually committed to QEMU's git tree...
 
-(1) mkdir() which follows symbolic links for all path elements but the
-    rightmost one
-(2) local_set_xattr()->setxattr() which follows symbolic links for all
-    path elements
-(3) local_set_mapped_file_attr() which calls in turn local_fopen() and
-    mkdir(), both functions following symbolic links for all path
-    elements but the rightmost one
-(4) local_post_create_passthrough() which calls in turn lchown() and
-    chmod(), both functions also following symbolic links
+-- =
 
-This patch converts local_mkdir() to rely on opendir_nofollow() and
-mkdirat() to fix (1), as well as local_set_xattrat(),
-local_set_mapped_file_attrat() and local_set_cred_passthrough() to
-fix (2), (3) and (4) respectively.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1668103
 
-The mapped and mapped-file security modes are supposed to be identical,
-except for the place where credentials and file modes are stored. While
-here, we also make that explicit by sharing the call to mkdirat().
+Title:
+  Possible off-by-one error in priority handling of hw/PL190.c
 
-This partly fixes CVE-2016-9602.
+Status in QEMU:
+  Fix Committed
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- hw/9pfs/9p-local.c |   55 +++++++++++++++++++---------------------------------
- 1 file changed, 20 insertions(+), 35 deletions(-)
+Bug description:
+  I have a problem when reading back VECTADDR in my proprietary OS's
+  interrupt handler.
 
-diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 4766175dda72..9b28bb530ae9 100644
---- a/hw/9pfs/9p-local.c
-+++ b/hw/9pfs/9p-local.c
-@@ -799,62 +799,47 @@ out:
- static int local_mkdir(FsContext *fs_ctx, V9fsPath *dir_path,
-                        const char *name, FsCred *credp)
- {
--    char *path;
-     int err = -1;
--    int serrno = 0;
--    V9fsString fullname;
--    char *buffer = NULL;
-+    int dirfd;
- 
--    v9fs_string_init(&fullname);
--    v9fs_string_sprintf(&fullname, "%s/%s", dir_path->data, name);
--    path = fullname.data;
-+    dirfd = local_opendir_nofollow(fs_ctx, dir_path->data);
-+    if (dirfd == -1) {
-+        return -1;
-+    }
- 
--    /* Determine the security model */
--    if (fs_ctx->export_flags & V9FS_SM_MAPPED) {
--        buffer = rpath(fs_ctx, path);
--        err = mkdir(buffer, SM_LOCAL_DIR_MODE_BITS);
-+    if (fs_ctx->export_flags & V9FS_SM_MAPPED ||
-+        fs_ctx->export_flags & V9FS_SM_MAPPED_FILE) {
-+        err = mkdirat(dirfd, name, SM_LOCAL_DIR_MODE_BITS);
-         if (err == -1) {
-             goto out;
-         }
--        credp->fc_mode = credp->fc_mode|S_IFDIR;
--        err = local_set_xattr(buffer, credp);
--        if (err == -1) {
--            serrno = errno;
--            goto err_end;
--        }
--    } else if (fs_ctx->export_flags & V9FS_SM_MAPPED_FILE) {
--        buffer = rpath(fs_ctx, path);
--        err = mkdir(buffer, SM_LOCAL_DIR_MODE_BITS);
--        if (err == -1) {
--            goto out;
-+        credp->fc_mode = credp->fc_mode | S_IFDIR;
-+
-+        if (fs_ctx->export_flags & V9FS_SM_MAPPED) {
-+            err = local_set_xattrat(dirfd, name, credp);
-+        } else {
-+            err = local_set_mapped_file_attrat(dirfd, name, credp);
-         }
--        credp->fc_mode = credp->fc_mode|S_IFDIR;
--        err = local_set_mapped_file_attr(fs_ctx, path, credp);
-         if (err == -1) {
--            serrno = errno;
-             goto err_end;
-         }
--    } else if ((fs_ctx->export_flags & V9FS_SM_PASSTHROUGH) ||
--               (fs_ctx->export_flags & V9FS_SM_NONE)) {
--        buffer = rpath(fs_ctx, path);
--        err = mkdir(buffer, credp->fc_mode);
-+    } else if (fs_ctx->export_flags & V9FS_SM_PASSTHROUGH ||
-+               fs_ctx->export_flags & V9FS_SM_NONE) {
-+        err = mkdirat(dirfd, name, credp->fc_mode);
-         if (err == -1) {
-             goto out;
-         }
--        err = local_post_create_passthrough(fs_ctx, path, credp);
-+        err = local_set_cred_passthrough(fs_ctx, dirfd, name, credp);
-         if (err == -1) {
--            serrno = errno;
-             goto err_end;
-         }
-     }
-     goto out;
- 
- err_end:
--    remove(buffer);
--    errno = serrno;
-+    unlinkat_preserve_errno(dirfd, name, AT_REMOVEDIR);
- out:
--    g_free(buffer);
--    v9fs_string_free(&fullname);
-+    close_preserve_errno(dirfd);
-     return err;
- }
- 
+  Example client code:
+
+   1) Write INTENCLEAR to clear all interrupt enable bits
+   2) Set all 16 vector control registers to zero
+   3) Set vector address #2 to value 2
+   4) Set vector control #2 to 0x21 (vector_interrupt_enable(0x20) | vector=
+_interrupt_source(0x1) )
+   5) Enable interrupt 1 by writing 0x2 to INTENABLE
+   6) In interrupt handler: read VECTADDR [should read 0x2 (active IRQs vec=
+tor address as set in step 3), reads 0x0 (active vector address index 3 ins=
+tead of index 2)]
+
+  Problem:
+
+  So, for me, the block commented with /* Read vector address at the
+  start of an ISR...  */ in hw/pl190.c has an off by-one error and does
+  not return the vector address of the pending interrupt, but of the
+  next one in the list of priorities (i.e. vector address 3).
+
+  Solution:
+
+  In pl190_update_vectors(), also set the priority bit for the current
+  priority (1<<i) interrupt (if enabled) in s->prio_mask[i] in addition
+  to those of higher priority enabled interrupts. This will cause the
+  loop in the read handling of VECTADDR to terminate an iteration
+  earlier and will deliver the correct interrupt priority as iteration
+  variable i subsequently used for addressing.
+
+  I'll try to provide a patch for this.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1668103/+subscriptions
