@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1ci51A-0006pw-Cb
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 15:02:05 -0500
+	(envelope-from <krzk@kernel.org>) id 1ci4r4-00054V-Oc
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 14:51:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1ci519-0005ym-5p
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 15:02:04 -0500
+	(envelope-from <krzk@kernel.org>) id 1ci4r3-0003gV-VL
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 14:51:38 -0500
 From: Krzysztof Kozlowski <krzk@kernel.org>
-Date: Sun, 26 Feb 2017 22:01:42 +0200
-Message-Id: <20170226200142.31169-2-krzk@kernel.org>
-In-Reply-To: <20170226200142.31169-1-krzk@kernel.org>
-References: <20170226200142.31169-1-krzk@kernel.org>
-Subject: [Qemu-devel] [PATCH v2 2/2] hw/arm/exynos: Fix proper mapping of
- CPUs by providing real cluster ID
+Date: Sun, 26 Feb 2017 21:51:15 +0200
+Message-Id: <20170226195115.26564-2-krzk@kernel.org>
+In-Reply-To: <20170226195115.26564-1-krzk@kernel.org>
+References: <20170226195115.26564-1-krzk@kernel.org>
+Subject: [Qemu-devel] [PATCH 2/2] hw/arm/exynos: Fix proper mapping of CPUs
+ by providing real cluster ID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,11 +38,6 @@ Provide a cluster ID so Linux will see proper MPIDR and will try to
 bring the secondary CPU online.
 
 Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
-
----
-
-Changes since v1:
-None
 ---
  hw/arm/exynos4210.c | 12 ++++++++++++
  1 file changed, 12 insertions(+)
