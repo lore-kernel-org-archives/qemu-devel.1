@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37525)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ci6bi-0004UN-Nk
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:43:58 -0500
+	(envelope-from <armbru@redhat.com>) id 1ci6bk-0004Ui-Am
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:43:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ci6bf-0004OM-Gj
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:43:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54934)
+	(envelope-from <armbru@redhat.com>) id 1ci6be-0004NI-3k
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:43:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51762)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ci6bf-0004NZ-88
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:43:51 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ci6bd-0004Lo-Sa
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:43:50 -0500
 Received: from int-mx09.intmail.prod.int.phx2.redhat.com
 	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5B0E7C05678C
-	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 21:43:51 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 058743B712
+	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 21:43:50 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
 	by int-mx09.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v1QLhn0d019796
+	id v1QLhmbo019792
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
 	verify=NO)
-	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 16:43:50 -0500
+	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 16:43:49 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Sun, 26 Feb 2017 22:43:37 +0100
-Message-Id: <1488145424-14974-20-git-send-email-armbru@redhat.com>
+Date: Sun, 26 Feb 2017 22:43:30 +0100
+Message-Id: <1488145424-14974-13-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488145424-14974-1-git-send-email-armbru@redhat.com>
 References: <1488145424-14974-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 19/26] test-string-input-visitor: Tear down
- existing test automatically
+Subject: [Qemu-devel] [PATCH v2 12/26] qapi: Improve qobject input visitor
+ error reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,119 +39,379 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Call visitor_input_teardown() from visitor_input_test_init(), so you
-don't have to call it from the actial tests.
+Error messages refer to nodes of the QObject being visited by name.
+Trouble is the names are sometimes less than helpful:
+
+* The name of the root QObject is whatever @name argument got passed
+  to the visitor, except NULL gets mapped to "null".  We commonly pass
+  NULL.  Not good.
+
+  Avoiding errors "at the root" mitigates.  For instance,
+  visit_start_struct() can only fail when the visited object is not a
+  dictionary, and we commonly ensure it is beforehand.
+
+* The name of a QDict's member is the member key.  Good enough only
+  when this happens to be unique.
+
+* The name of a QList's member is "null".  Not good.
+
+Improve error messages by referring to nodes by path instead, as
+follows:
+
+* The path of the root QObject is whatever @name argument got passed
+  to the visitor, except NULL gets mapped to "<anonymous>".
+
+* The path of a root QDict's member is the member key.
+
+* The path of a root QList's member is "[%zu]", where %zu is the list
+  index, starting at zero.
+
+* The path of a non-root QDict's member is the path of the QDict
+  concatenated with "." and the member key.
+
+* The path of a non-root QList's member is the path of the QList
+  concatenated with "[%zu]", where %zu is the list index.
+
+For example, the incorrect QMP command
+
+    { "execute": "blockdev-add", "arguments": { "node-name": "foo", "driver": "raw", "file": {"driver": "file" } } }
+
+now fails with
+
+    {"error": {"class": "GenericError", "desc": "Parameter 'file.filename' is missing"}}
+
+instead of
+
+    {"error": {"class": "GenericError", "desc": "Parameter 'filename' is missing"}}
+
+and
+
+    { "execute": "input-send-event", "arguments": { "device": "bar", "events": [ [] ] } }
+
+now fails with
+
+    {"error": {"class": "GenericError", "desc": "Invalid parameter type for 'events[0]', expected: object"}}
+
+instead of
+
+    {"error": {"class": "GenericError", "desc": "Invalid parameter type for 'null', expected: QDict"}}
+
+Aside: calling the thing "parameter" is suboptimal for QMP, because
+the root object is "arguments" there.
+
+The qobject output visitor doesn't have this problem because it should
+not fail.  Same for dealloc and clone visitors.
+
+The string visitors don't have this problem because they visit just
+one value, whose name needs to be passed to the visitor as @name.  The
+string output visitor shouldn't fail anyway.
+
+The options visitor uses QemuOpts names.  Their name space is flat, so
+the use of QDict member keys as names is fine.  NULL names used with
+roots and lists could conceivably result in bad error messages.  Left
+for another day.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/test-string-input-visitor.c | 19 ++-----------------
- 1 file changed, 2 insertions(+), 17 deletions(-)
+ include/qapi/visitor.h       |   6 ---
+ qapi/qobject-input-visitor.c | 121 +++++++++++++++++++++++++++++++------------
+ 2 files changed, 87 insertions(+), 40 deletions(-)
 
-diff --git a/tests/test-string-input-visitor.c b/tests/test-string-input-visitor.c
-index 7f10e25..a32828c 100644
---- a/tests/test-string-input-visitor.c
-+++ b/tests/test-string-input-visitor.c
-@@ -39,6 +39,8 @@ static
- Visitor *visitor_input_test_init(TestInputVisitorData *data,
-                                  const char *string)
- {
-+    visitor_input_teardown(data, NULL);
+diff --git a/include/qapi/visitor.h b/include/qapi/visitor.h
+index 9bb6cba..7c91a50 100644
+--- a/include/qapi/visitor.h
++++ b/include/qapi/visitor.h
+@@ -66,12 +66,6 @@
+  * object, @name is the key associated with the value; and when
+  * visiting a member of a list, @name is NULL.
+  *
+- * FIXME: Clients must pass NULL for @name when visiting a member of a
+- * list, but this leads to poor error messages; it might be nicer to
+- * require a non-NULL name such as "key.0" for '{ "key": [ "value" ]
+- * }' if an error is encountered on "value" (or to have the visitor
+- * core auto-generate the nicer name).
+- *
+  * The visit_type_FOO() functions expect a non-null @obj argument;
+  * they allocate *@obj during input visits, leave it unchanged on
+  * output visits, and recursively free any resources during a dealloc
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index d58696c..8015a98 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -21,19 +21,19 @@
+ #include "qapi/qmp/types.h"
+ #include "qapi/qmp/qerror.h"
+ 
+-typedef struct StackObject
+-{
+-    QObject *obj; /* Object being visited */
++typedef struct StackObject {
++    const char *name;            /* Name of @obj in its parent, if any */
++    QObject *obj;                /* QDict or QList being visited */
+     void *qapi; /* sanity check that caller uses same pointer */
+ 
+-    GHashTable *h;           /* If obj is dict: unvisited keys */
+-    const QListEntry *entry; /* If obj is list: unvisited tail */
++    GHashTable *h;              /* If @obj is QDict: unvisited keys */
++    const QListEntry *entry;    /* If @obj is QList: unvisited tail */
++    unsigned index;             /* If @obj is QList: list index of @entry */
+ 
+-    QSLIST_ENTRY(StackObject) node;
++    QSLIST_ENTRY(StackObject) node; /* parent */
+ } StackObject;
+ 
+-struct QObjectInputVisitor
+-{
++struct QObjectInputVisitor {
+     Visitor visitor;
+ 
+     /* Root of visit at visitor creation. */
+@@ -45,6 +45,8 @@ struct QObjectInputVisitor
+ 
+     /* True to reject parse in visit_end_struct() if unvisited keys remain. */
+     bool strict;
 +
-     data->v = string_input_visitor_new(string);
-     g_assert(data->v);
-     return data->v;
-@@ -57,8 +59,6 @@ static void test_visitor_in_int(TestInputVisitorData *data,
-     g_assert(!err);
-     g_assert_cmpint(res, ==, value);
++    GString *errname;           /* Accumulator for full_name() */
+ };
  
--    visitor_input_teardown(data, unused);
--
-     v = visitor_input_test_init(data, "not an int");
+ static QObjectInputVisitor *to_qiv(Visitor *v)
+@@ -52,9 +54,42 @@ static QObjectInputVisitor *to_qiv(Visitor *v)
+     return container_of(v, QObjectInputVisitor, visitor);
+ }
  
-     visit_type_int(v, NULL, &res, &err);
-@@ -87,8 +87,6 @@ static void test_visitor_in_intList(TestInputVisitorData *data,
+-static QObject *qobject_input_get_object(QObjectInputVisitor *qiv,
+-                                         const char *name,
+-                                         bool consume, Error **errp)
++static const char *full_name(QObjectInputVisitor *qiv, const char *name)
++{
++    StackObject *so;
++    char buf[32];
++
++    if (qiv->errname) {
++        g_string_truncate(qiv->errname, 0);
++    } else {
++        qiv->errname = g_string_new("");
++    }
++
++    QSLIST_FOREACH(so , &qiv->stack, node) {
++        if (qobject_type(so->obj) == QTYPE_QDICT) {
++            g_string_prepend(qiv->errname, name);
++            g_string_prepend_c(qiv->errname, '.');
++        } else {
++            snprintf(buf, sizeof(buf), "[%u]", so->index);
++            g_string_prepend(qiv->errname, buf);
++        }
++        name = so->name;
++    }
++
++    if (name) {
++        g_string_prepend(qiv->errname, name);
++    } else if (qiv->errname->str[0] == '.') {
++        g_string_erase(qiv->errname, 0, 1);
++    } else {
++        return "<anonymous>";
++    }
++
++    return qiv->errname->str;
++}
++
++static QObject *qobject_input_try_get_object(QObjectInputVisitor *qiv,
++                                             const char *name,
++                                             bool consume)
+ {
+     StackObject *tos;
+     QObject *qobj;
+@@ -78,9 +113,6 @@ static QObject *qobject_input_get_object(QObjectInputVisitor *qiv,
+             bool removed = g_hash_table_remove(tos->h, name);
+             assert(removed);
+         }
+-        if (!ret) {
+-            error_setg(errp, QERR_MISSING_PARAMETER, name);
+-        }
+     } else {
+         assert(qobject_type(qobj) == QTYPE_QLIST);
+         assert(!name);
+@@ -88,12 +120,25 @@ static QObject *qobject_input_get_object(QObjectInputVisitor *qiv,
+         assert(ret);
+         if (consume) {
+             tos->entry = qlist_next(tos->entry);
++            tos->index++;
+         }
+     }
  
-     qapi_free_int16List(res);
+     return ret;
+ }
  
--    visitor_input_teardown(data, unused);
--
-     v = visitor_input_test_init(data, "not an int list");
++static QObject *qobject_input_get_object(QObjectInputVisitor *qiv,
++                                         const char *name,
++                                         bool consume, Error **errp)
++{
++    QObject *obj = qobject_input_try_get_object(qiv, name, consume);
++
++    if (!obj) {
++        error_setg(errp, QERR_MISSING_PARAMETER, full_name(qiv, name));
++    }
++    return obj;
++}
++
+ static void qdict_add_key(const char *key, QObject *obj, void *opaque)
+ {
+     GHashTable *h = opaque;
+@@ -101,12 +146,14 @@ static void qdict_add_key(const char *key, QObject *obj, void *opaque)
+ }
  
-     visit_type_int16List(v, NULL, &res, &err);
-@@ -108,35 +106,30 @@ static void test_visitor_in_bool(TestInputVisitorData *data,
-     visit_type_bool(v, NULL, &res, &err);
-     g_assert(!err);
-     g_assert_cmpint(res, ==, true);
--    visitor_input_teardown(data, unused);
+ static const QListEntry *qobject_input_push(QObjectInputVisitor *qiv,
++                                            const char *name,
+                                             QObject *obj, void *qapi)
+ {
+     GHashTable *h;
+     StackObject *tos = g_new0(StackObject, 1);
  
-     v = visitor_input_test_init(data, "yes");
+     assert(obj);
++    tos->name = name;
+     tos->obj = obj;
+     tos->qapi = qapi;
  
-     visit_type_bool(v, NULL, &res, &err);
-     g_assert(!err);
-     g_assert_cmpint(res, ==, true);
--    visitor_input_teardown(data, unused);
+@@ -116,6 +163,7 @@ static const QListEntry *qobject_input_push(QObjectInputVisitor *qiv,
+         tos->h = h;
+     } else if (qobject_type(obj) == QTYPE_QLIST) {
+         tos->entry = qlist_first(qobject_to_qlist(obj));
++        tos->index = -1;
+     }
  
-     v = visitor_input_test_init(data, "on");
+     QSLIST_INSERT_HEAD(&qiv->stack, tos, node);
+@@ -137,7 +185,8 @@ static void qobject_input_check_struct(Visitor *v, Error **errp)
  
-     visit_type_bool(v, NULL, &res, &err);
-     g_assert(!err);
-     g_assert_cmpint(res, ==, true);
--    visitor_input_teardown(data, unused);
+             g_hash_table_iter_init(&iter, top_ht);
+             if (g_hash_table_iter_next(&iter, (void **)&key, NULL)) {
+-                error_setg(errp, "Parameter '%s' is unexpected", key);
++                error_setg(errp, "Parameter '%s' is unexpected",
++                           full_name(qiv, key));
+             }
+         }
+     }
+@@ -175,12 +224,12 @@ static void qobject_input_start_struct(Visitor *v, const char *name, void **obj,
+         return;
+     }
+     if (qobject_type(qobj) != QTYPE_QDICT) {
+-        error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
+-                   "QDict");
++        error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
++                   full_name(qiv, name), "object");
+         return;
+     }
  
-     v = visitor_input_test_init(data, "false");
+-    qobject_input_push(qiv, qobj, obj);
++    qobject_input_push(qiv, name, qobj, obj);
  
-     visit_type_bool(v, NULL, &res, &err);
-     g_assert(!err);
-     g_assert_cmpint(res, ==, false);
--    visitor_input_teardown(data, unused);
+     if (obj) {
+         *obj = g_malloc0(size);
+@@ -203,12 +252,12 @@ static void qobject_input_start_list(Visitor *v, const char *name,
+         return;
+     }
+     if (qobject_type(qobj) != QTYPE_QLIST) {
+-        error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
+-                   "list");
++        error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
++                   full_name(qiv, name), "array");
+         return;
+     }
  
-     v = visitor_input_test_init(data, "no");
+-    entry = qobject_input_push(qiv, qobj, list);
++    entry = qobject_input_push(qiv, name, qobj, list);
+     if (entry && list) {
+         *list = g_malloc0(size);
+     }
+@@ -258,8 +307,8 @@ static void qobject_input_type_int64(Visitor *v, const char *name, int64_t *obj,
+     }
+     qint = qobject_to_qint(qobj);
+     if (!qint) {
+-        error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
+-                   "integer");
++        error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
++                   full_name(qiv, name), "integer");
+         return;
+     }
  
-     visit_type_bool(v, NULL, &res, &err);
-     g_assert(!err);
-     g_assert_cmpint(res, ==, false);
--    visitor_input_teardown(data, unused);
+@@ -279,8 +328,8 @@ static void qobject_input_type_uint64(Visitor *v, const char *name,
+     }
+     qint = qobject_to_qint(qobj);
+     if (!qint) {
+-        error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
+-                   "integer");
++        error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
++                   full_name(qiv, name), "integer");
+         return;
+     }
  
-     v = visitor_input_test_init(data, "off");
+@@ -299,8 +348,8 @@ static void qobject_input_type_bool(Visitor *v, const char *name, bool *obj,
+     }
+     qbool = qobject_to_qbool(qobj);
+     if (!qbool) {
+-        error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
+-                   "boolean");
++        error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
++                   full_name(qiv, name), "boolean");
+         return;
+     }
  
-@@ -190,8 +183,6 @@ static void test_visitor_in_enum(TestInputVisitorData *data,
-         visit_type_EnumOne(v, NULL, &res, &err);
-         g_assert(!err);
-         g_assert_cmpint(i, ==, res);
--
--        visitor_input_teardown(data, NULL);
+@@ -320,8 +369,8 @@ static void qobject_input_type_str(Visitor *v, const char *name, char **obj,
+     }
+     qstr = qobject_to_qstring(qobj);
+     if (!qstr) {
+-        error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
+-                   "string");
++        error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
++                   full_name(qiv, name), "string");
+         return;
+     }
+ 
+@@ -351,8 +400,8 @@ static void qobject_input_type_number(Visitor *v, const char *name, double *obj,
+         return;
+     }
+ 
+-    error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
+-               "number");
++    error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
++               full_name(qiv, name), "number");
+ }
+ 
+ static void qobject_input_type_any(Visitor *v, const char *name, QObject **obj,
+@@ -380,15 +429,15 @@ static void qobject_input_type_null(Visitor *v, const char *name, Error **errp)
+     }
+ 
+     if (qobject_type(qobj) != QTYPE_QNULL) {
+-        error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
+-                   "null");
++        error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
++                   full_name(qiv, name), "null");
      }
  }
  
-@@ -224,30 +215,24 @@ static void test_visitor_in_fuzz(TestInputVisitorData *data,
+ static void qobject_input_optional(Visitor *v, const char *name, bool *present)
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+-    QObject *qobj = qobject_input_get_object(qiv, name, false, NULL);
++    QObject *qobj = qobject_input_try_get_object(qiv, name, false);
  
-         v = visitor_input_test_init(data, buf);
-         visit_type_int(v, NULL, &ires, NULL);
--        visitor_input_teardown(data, NULL);
+     if (!qobj) {
+         *present = false;
+@@ -401,6 +450,7 @@ static void qobject_input_optional(Visitor *v, const char *name, bool *present)
+ static void qobject_input_free(Visitor *v)
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
++
+     while (!QSLIST_EMPTY(&qiv->stack)) {
+         StackObject *tos = QSLIST_FIRST(&qiv->stack);
  
-         v = visitor_input_test_init(data, buf);
-         visit_type_intList(v, NULL, &ilres, NULL);
-         qapi_free_intList(ilres);
--        visitor_input_teardown(data, NULL);
- 
-         v = visitor_input_test_init(data, buf);
-         visit_type_bool(v, NULL, &bres, NULL);
--        visitor_input_teardown(data, NULL);
- 
-         v = visitor_input_test_init(data, buf);
-         visit_type_number(v, NULL, &nres, NULL);
--        visitor_input_teardown(data, NULL);
- 
-         v = visitor_input_test_init(data, buf);
-         sres = NULL;
-         visit_type_str(v, NULL, &sres, NULL);
-         g_free(sres);
--        visitor_input_teardown(data, NULL);
- 
-         v = visitor_input_test_init(data, buf);
-         visit_type_EnumOne(v, NULL, &eres, NULL);
--        visitor_input_teardown(data, NULL);
+@@ -409,6 +459,9 @@ static void qobject_input_free(Visitor *v)
      }
+ 
+     qobject_decref(qiv->root);
++    if (qiv->errname) {
++        g_string_free(qiv->errname, TRUE);
++    }
+     g_free(qiv);
  }
  
 -- 
