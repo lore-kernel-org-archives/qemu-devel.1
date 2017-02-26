@@ -1,18 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marex@denx.de>) id 1ci1zt-0000vn-Ai
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 11:48:34 -0500
+	(envelope-from <marex@denx.de>) id 1ci20G-00016H-Ty
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 11:48:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marex@denx.de>) id 1ci1zq-000679-6b
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 11:48:33 -0500
-Received: from mail-out.m-online.net ([212.18.0.10]:50025)
+	(envelope-from <marex@denx.de>) id 1ci20D-0006CA-Pb
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 11:48:56 -0500
+Received: from mail-out.m-online.net ([212.18.0.9]:41347)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marex@denx.de>) id 1ci1zq-00065K-0T
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 11:48:30 -0500
+	(Exim 4.71) (envelope-from <marex@denx.de>) id 1ci20D-0006Bz-JY
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 11:48:53 -0500
+References: <20170118220146.489-1-marex@denx.de>
+	<20170118220146.489-5-marex@denx.de>
+	<87wpciohxy.fsf@dusky.pond.sub.org>
+	<cdfa9353-eb52-997e-a534-db744d9f6a60@denx.de>
+	<87vas2gjre.fsf@dusky.pond.sub.org>
 From: Marek Vasut <marex@denx.de>
-Date: Sun, 26 Feb 2017 17:48:15 +0100
-Message-Id: <20170226164815.26799-1-marex@denx.de>
-Subject: [Qemu-devel] [PATCH] nios2: iic: Convert CPU prop to qom link
+Message-ID: <39fc436e-1f1c-b0d2-7b9d-220453b6139b@denx.de>
+Date: Sun, 26 Feb 2017 17:46:56 +0100
+MIME-Version: 1.0
+In-Reply-To: <87vas2gjre.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V5 4/7] nios2: Add IIC interrupt controller
+ emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,75 +31,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Marek Vasut <marex@denx.de>, Alexander Graf <agraf@suse.de>, Chris Wulff <crwulff@gmail.com>, Jeff Da Silva <jdasilva@altera.com>, Ley Foon Tan <lftan@altera.com>, Markus Armbruster <armbru@redhat.com>, Richard Henderson <rth@twiddle.net>, Sandra Loosemore <sandra@codesourcery.com>, Yves Vandervennet <yvanderv@altera.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Jeff Da Silva <jdasilva@altera.com>, Chris Wulff <crwulff@gmail.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Sandra Loosemore <sandra@codesourcery.com>, Yves Vandervennet <yvanderv@altera.com>, Ley Foon Tan <lftan@altera.com>, Richard Henderson <rth@twiddle.net>
 
-Add a const qom link between the CPU and the IIC instead
-of passing the CPU link through a qom property.
+On 02/22/2017 07:31 PM, Markus Armbruster wrote:
+> Marek Vasut <marex@denx.de> writes:
+> 
+>> On 02/22/2017 07:31 AM, Markus Armbruster wrote:
+>>> I know this has been committed already, but here goes anyway:
+>>>
+>>> Marek Vasut <marex@denx.de> writes:
+>>>
+>>>> From: Chris Wulff <crwulff@gmail.com>
+>>>>
+>>>> Add the Altera Nios2 internal interrupt controller model.
+>>>>
+>>>> Signed-off-by: Marek Vasut <marex@denx.de>
+>>>> Cc: Chris Wulff <crwulff@gmail.com>
+>>>> Cc: Jeff Da Silva <jdasilva@altera.com>
+>>>> Cc: Ley Foon Tan <lftan@altera.com>
+>>>> Cc: Sandra Loosemore <sandra@codesourcery.com>
+>>>> Cc: Yves Vandervennet <yvanderv@altera.com>
+>>>> Cc: Alexander Graf <agraf@suse.de>
+>>>> Cc: Richard Henderson <rth@twiddle.net>
+>>>> Reviewed-by: Alexander Graf <agraf@suse.de>
+>>>> ---
+>>>> V3: Checkpatch cleanup
+>>>> V4: Rebase on top of qemu/master
+>>>> V5: Rebase on top of qemu/master
+>>>> ---
+>>>>  hw/intc/Makefile.objs |   1 +
+>>>>  hw/intc/nios2_iic.c   | 103 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>>>>  2 files changed, 104 insertions(+)
+>>>>  create mode 100644 hw/intc/nios2_iic.c
+>>>>
+>>>> diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
+>>>> index 2f44a2da26..8948106ac4 100644
+>>>> --- a/hw/intc/Makefile.objs
+>>>> +++ b/hw/intc/Makefile.objs
+> [...]
+>>>> +static Property altera_iic_properties[] = {
+>>>> +    DEFINE_PROP_PTR("cpu", AlteraIIC, cpu),
+>>>
+>>> Could this be a QOM link instead?
+>>>
+>>> We want to get rid of pointer properties.  Commit d2fe4ec converts one
+>>> to a link.
+>>
+>> By all means, yes. Can you send a patch ? I can help testing it.
+>> Otherwise I can cook one up, but it might take a few days.
+> 
+> I'm in a bit of a time squeeze right now, and I'd be grateful if you
+> could do it.  A few days sounds great to me.
 
-Signed-off-by: Marek Vasut <marex@denx.de>
-Cc: Alexander Graf <agraf@suse.de>
-Cc: Chris Wulff <crwulff@gmail.com>
-Cc: Jeff Da Silva <jdasilva@altera.com>
-Cc: Ley Foon Tan <lftan@altera.com>
-Cc: Markus Armbruster <armbru@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Sandra Loosemore <sandra@codesourcery.com>
-Cc: Yves Vandervennet <yvanderv@altera.com>
----
- hw/intc/nios2_iic.c       | 13 ++++---------
- hw/nios2/10m50_devboard.c |  3 ++-
- 2 files changed, 6 insertions(+), 10 deletions(-)
+Heh, tell me about this time squeeze ...
 
-diff --git a/hw/intc/nios2_iic.c b/hw/intc/nios2_iic.c
-index 818ab1b315..70550ef8c1 100644
---- a/hw/intc/nios2_iic.c
-+++ b/hw/intc/nios2_iic.c
-@@ -62,17 +62,15 @@ static void altera_iic_init(Object *obj)
-     sysbus_init_irq(SYS_BUS_DEVICE(obj), &pv->parent_irq);
- }
- 
--static Property altera_iic_properties[] = {
--    DEFINE_PROP_PTR("cpu", AlteraIIC, cpu),
--    DEFINE_PROP_END_OF_LIST(),
--};
--
- static void altera_iic_realize(DeviceState *dev, Error **errp)
- {
-     struct AlteraIIC *pv = ALTERA_IIC(dev);
-+    Error *err = NULL;
- 
-+    pv->cpu = object_property_get_link(OBJECT(dev), "cpu", &err);
-     if (!pv->cpu) {
--        error_setg(errp, "altera,iic: CPU not connected");
-+        error_setg(errp, "altera,iic: CPU link not found: %s",
-+                   error_get_pretty(err));
-         return;
-     }
- }
-@@ -81,9 +79,6 @@ static void altera_iic_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
--    dc->props = altera_iic_properties;
--    /* Reason: pointer property "cpu" */
--    dc->cannot_instantiate_with_device_add_yet = true;
-     dc->realize = altera_iic_realize;
- }
- 
-diff --git a/hw/nios2/10m50_devboard.c b/hw/nios2/10m50_devboard.c
-index 0d8b9aa58f..c18e0b2a17 100644
---- a/hw/nios2/10m50_devboard.c
-+++ b/hw/nios2/10m50_devboard.c
-@@ -83,7 +83,8 @@ static void nios2_10m50_ghrd_init(MachineState *machine)
- 
-     /* Register: Internal Interrupt Controller (IIC) */
-     dev = qdev_create(NULL, "altera,iic");
--    qdev_prop_set_ptr(dev, "cpu", cpu);
-+    object_property_add_const_link(OBJECT(dev), "cpu", OBJECT(cpu),
-+                                   &error_abort);
-     qdev_init_nofail(dev);
-     sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, cpu_irq[0]);
-     for (i = 0; i < 32; i++) {
 -- 
-2.11.0
+Best regards,
+Marek Vasut
