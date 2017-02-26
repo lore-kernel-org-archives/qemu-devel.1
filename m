@@ -1,37 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ci7YN-0006qy-LA
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:44:34 -0500
+	(envelope-from <groug@kaod.org>) id 1ci7YX-0006zq-HM
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:44:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ci7YK-00035I-Ge
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:44:31 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57229
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <groug@kaod.org>) id 1ci7YU-00036B-DK
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:44:41 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45698)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ci7YK-000358-9x
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:44:28 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1QMi7hx121064
-	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 17:44:27 -0500
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ci7YU-000360-3c
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 17:44:38 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1QMi3pk128302
+	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 17:44:37 -0500
 Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28u7bakhnd-1
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28u6wa4473-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 17:44:27 -0500
+	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 17:44:36 -0500
 Received: from localhost
 	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Sun, 26 Feb 2017 15:44:26 -0700
+	Sun, 26 Feb 2017 15:44:36 -0700
 From: Greg Kurz <groug@kaod.org>
-Date: Sun, 26 Feb 2017 23:44:20 +0100
+Date: Sun, 26 Feb 2017 23:44:28 +0100
 In-Reply-To: <148814889214.28146.16915712763478774662.stgit@bahia>
 References: <148814889214.28146.16915712763478774662.stgit@bahia>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <148814906043.28146.11144440534535454849.stgit@bahia>
-Subject: [Qemu-devel] [PATCH v2 21/28] 9pfs: local: link: don't follow
+Message-Id: <148814906880.28146.13942320633418827458.stgit@bahia>
+Subject: [Qemu-devel] [PATCH v2 22/28] 9pfs: local: chmod: don't follow
  symlinks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -44,139 +43,239 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>, Greg Kurz <groug@kaod.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>
 
-The local_link() callback is vulnerable to symlink attacks because it calls:
+The local_chmod() callback is vulnerable to symlink attacks because it
+calls:
 
-(1) link() which follows symbolic links for all path elements but the
-    rightmost one
-(2) local_create_mapped_attr_dir()->mkdir() which follows symbolic links
-    for all path elements but the rightmost one
+(1) chmod() which follows symbolic links for all path elements
+(2) local_set_xattr()->setxattr() which follows symbolic links for all
+    path elements
+(3) local_set_mapped_file_attr() which calls in turn local_fopen() and
+    mkdir(), both functions following symbolic links for all path
+    elements but the rightmost one
 
-This patch converts local_link() to rely on opendir_nofollow() and linkat()
-to fix (1), mkdirat() to fix (2).
+We would need fchmodat() to implement AT_SYMLINK_NOFOLLOW to fix (1). This
+isn't the case on linux unfortunately: the kernel doesn't even have a flags
+argument to the syscall :-\ It is impossible to fix it in userspace in
+a race-free manner. This patch hence converts local_chmod() to rely on
+open_nofollow() and fchmod(). This fixes the vulnerability but introduces
+a limitation: the target file must readable and/or writable for the call
+to openat() to succeed.
+
+It introduces a local_set_xattrat() replacement to local_set_xattr()
+based on fsetxattrat() to fix (2), and a local_set_mapped_file_attrat()
+replacement to local_set_mapped_file_attr() based on local_fopenat()
+and mkdirat() to fix (3). No effort is made to factor out code because
+both local_set_xattr() and local_set_mapped_file_attr() will be dropped
+when all users have been converted to use the "at" versions.
 
 This partly fixes CVE-2016-9602.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
 v2: - use openat_dir()
+    - updated the changelog and added a comment for fchmod()
 ---
- hw/9pfs/9p-local.c |   84 ++++++++++++++++++++++++++++++++++------------------
- 1 file changed, 55 insertions(+), 29 deletions(-)
+ hw/9pfs/9p-local.c |  178 +++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 167 insertions(+), 11 deletions(-)
 
 diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 03f4f5e913c6..27781a8afed7 100644
+index 27781a8afed7..72d219ec3d2b 100644
 --- a/hw/9pfs/9p-local.c
 +++ b/hw/9pfs/9p-local.c
-@@ -75,6 +75,13 @@ static void renameat_preserve_errno(int odirfd, const char *opath, int ndirfd,
-     errno = serrno;
+@@ -367,6 +367,155 @@ static int local_set_xattr(const char *path, FsCred *credp)
+     return 0;
  }
  
-+static void unlinkat_preserve_errno(int dirfd, const char *path, int flags)
++static int local_set_mapped_file_attrat(int dirfd, const char *name,
++                                        FsCred *credp)
 +{
-+    int serrno = errno;
-+    unlinkat(dirfd, path, flags);
-+    errno = serrno;
++    FILE *fp;
++    int ret;
++    char buf[ATTR_MAX];
++    int uid = -1, gid = -1, mode = -1, rdev = -1;
++    int map_dirfd;
++
++    ret = mkdirat(dirfd, VIRTFS_META_DIR, 0700);
++    if (ret < 0 && errno != EEXIST) {
++        return -1;
++    }
++
++    map_dirfd = openat_dir(dirfd, VIRTFS_META_DIR);
++    if (map_dirfd == -1) {
++        return -1;
++    }
++
++    fp = local_fopenat(map_dirfd, name, "r");
++    if (!fp) {
++        if (errno == ENOENT) {
++            goto update_map_file;
++        } else {
++            close_preserve_errno(map_dirfd);
++            return -1;
++        }
++    }
++    memset(buf, 0, ATTR_MAX);
++    while (fgets(buf, ATTR_MAX, fp)) {
++        if (!strncmp(buf, "virtfs.uid", 10)) {
++            uid = atoi(buf + 11);
++        } else if (!strncmp(buf, "virtfs.gid", 10)) {
++            gid = atoi(buf + 11);
++        } else if (!strncmp(buf, "virtfs.mode", 11)) {
++            mode = atoi(buf + 12);
++        } else if (!strncmp(buf, "virtfs.rdev", 11)) {
++            rdev = atoi(buf + 12);
++        }
++        memset(buf, 0, ATTR_MAX);
++    }
++    fclose(fp);
++
++update_map_file:
++    fp = local_fopenat(map_dirfd, name, "w");
++    close_preserve_errno(map_dirfd);
++    if (!fp) {
++        return -1;
++    }
++
++    if (credp->fc_uid != -1) {
++        uid = credp->fc_uid;
++    }
++    if (credp->fc_gid != -1) {
++        gid = credp->fc_gid;
++    }
++    if (credp->fc_mode != -1) {
++        mode = credp->fc_mode;
++    }
++    if (credp->fc_rdev != -1) {
++        rdev = credp->fc_rdev;
++    }
++
++    if (uid != -1) {
++        fprintf(fp, "virtfs.uid=%d\n", uid);
++    }
++    if (gid != -1) {
++        fprintf(fp, "virtfs.gid=%d\n", gid);
++    }
++    if (mode != -1) {
++        fprintf(fp, "virtfs.mode=%d\n", mode);
++    }
++    if (rdev != -1) {
++        fprintf(fp, "virtfs.rdev=%d\n", rdev);
++    }
++    fclose(fp);
++
++    return 0;
 +}
 +
- #define VIRTFS_META_DIR ".virtfs_metadata"
- 
- static char *local_mapped_attr_path(FsContext *ctx, const char *path)
-@@ -917,49 +924,68 @@ out:
- static int local_link(FsContext *ctx, V9fsPath *oldpath,
-                       V9fsPath *dirpath, const char *name)
++static int fchmodat_nofollow(int dirfd, const char *name, mode_t mode)
++{
++    int fd, ret;
++
++    /* FIXME: this should be handled with fchmodat(AT_SYMLINK_NOFOLLOW).
++     * Unfortunately, the linux kernel doesn't implement it yet. As an
++     * alternative, let's open the file and use fchmod() instead. This
++     * may fail depending on the permissions of the file, but it is the
++     * best we can do to avoid TOCTTOU. We first try to open read-only
++     * in case name points to a directory. If that fails, we try write-only
++     * in case name doesn't point to a directory.
++     */
++    fd = openat_file(dirfd, name, O_RDONLY, 0);
++    if (fd == -1) {
++        /* In case the file is writable-only and isn't a directory. */
++        if (errno == EACCES) {
++            fd = openat_file(dirfd, name, O_WRONLY, 0);
++        }
++        if (fd == -1 && errno == EISDIR) {
++            errno = EACCES;
++        }
++    }
++    if (fd == -1) {
++        return -1;
++    }
++    ret = fchmod(fd, mode);
++    close_preserve_errno(fd);
++    return ret;
++}
++
++static int local_set_xattrat(int dirfd, const char *path, FsCred *credp)
++{
++    int err;
++
++    if (credp->fc_uid != -1) {
++        uint32_t tmp_uid = cpu_to_le32(credp->fc_uid);
++        err = fsetxattrat_nofollow(dirfd, path, "user.virtfs.uid", &tmp_uid,
++                                   sizeof(uid_t), 0);
++        if (err) {
++            return err;
++        }
++    }
++    if (credp->fc_gid != -1) {
++        uint32_t tmp_gid = cpu_to_le32(credp->fc_gid);
++        err = fsetxattrat_nofollow(dirfd, path, "user.virtfs.gid", &tmp_gid,
++                                   sizeof(gid_t), 0);
++        if (err) {
++            return err;
++        }
++    }
++    if (credp->fc_mode != -1) {
++        uint32_t tmp_mode = cpu_to_le32(credp->fc_mode);
++        err = fsetxattrat_nofollow(dirfd, path, "user.virtfs.mode", &tmp_mode,
++                                   sizeof(mode_t), 0);
++        if (err) {
++            return err;
++        }
++    }
++    if (credp->fc_rdev != -1) {
++        uint64_t tmp_rdev = cpu_to_le64(credp->fc_rdev);
++        err = fsetxattrat_nofollow(dirfd, path, "user.virtfs.rdev", &tmp_rdev,
++                                   sizeof(dev_t), 0);
++        if (err) {
++            return err;
++        }
++    }
++    return 0;
++}
++
+ static int local_post_create_passthrough(FsContext *fs_ctx, const char *path,
+                                          FsCred *credp)
  {
--    int ret;
--    V9fsString newpath;
--    char *buffer, *buffer1;
--    int serrno;
-+    char *odirpath = g_path_get_dirname(oldpath->data);
-+    char *oname = g_path_get_basename(oldpath->data);
-+    int ret = -1;
-+    int odirfd, ndirfd;
+@@ -558,22 +707,29 @@ static ssize_t local_pwritev(FsContext *ctx, V9fsFidOpenState *fs,
  
--    v9fs_string_init(&newpath);
--    v9fs_string_sprintf(&newpath, "%s/%s", dirpath->data, name);
-+    odirfd = local_opendir_nofollow(ctx, odirpath);
-+    if (odirfd == -1) {
+ static int local_chmod(FsContext *fs_ctx, V9fsPath *fs_path, FsCred *credp)
+ {
+-    char *buffer;
++    char *dirpath = g_path_get_dirname(fs_path->data);
++    char *name = g_path_get_basename(fs_path->data);
+     int ret = -1;
+-    char *path = fs_path->data;
++    int dirfd;
++
++    dirfd = local_opendir_nofollow(fs_ctx, dirpath);
++    if (dirfd == -1) {
 +        goto out;
 +    }
  
--    buffer = rpath(ctx, oldpath->data);
--    buffer1 = rpath(ctx, newpath.data);
--    ret = link(buffer, buffer1);
--    g_free(buffer);
--    if (ret < 0) {
-+    ndirfd = local_opendir_nofollow(ctx, dirpath->data);
-+    if (ndirfd == -1) {
-+        close_preserve_errno(odirfd);
-         goto out;
+     if (fs_ctx->export_flags & V9FS_SM_MAPPED) {
+-        buffer = rpath(fs_ctx, path);
+-        ret = local_set_xattr(buffer, credp);
+-        g_free(buffer);
++        ret = local_set_xattrat(dirfd, name, credp);
+     } else if (fs_ctx->export_flags & V9FS_SM_MAPPED_FILE) {
+-        return local_set_mapped_file_attr(fs_ctx, path, credp);
+-    } else if ((fs_ctx->export_flags & V9FS_SM_PASSTHROUGH) ||
+-               (fs_ctx->export_flags & V9FS_SM_NONE)) {
+-        buffer = rpath(fs_ctx, path);
+-        ret = chmod(buffer, credp->fc_mode);
+-        g_free(buffer);
++        ret = local_set_mapped_file_attrat(dirfd, name, credp);
++    } else if (fs_ctx->export_flags & V9FS_SM_PASSTHROUGH ||
++               fs_ctx->export_flags & V9FS_SM_NONE) {
++        ret = fchmodat_nofollow(dirfd, name, credp->fc_mode);
      }
- 
-+    ret = linkat(odirfd, oname, ndirfd, name, 0);
-+    if (ret < 0) {
-+        goto out_close;
-+    }
++    close_preserve_errno(dirfd);
 +
-     /* now link the virtfs_metadata files */
-     if (ctx->export_flags & V9FS_SM_MAPPED_FILE) {
--        char *vbuffer, *vbuffer1;
-+        int omap_dirfd, nmap_dirfd;
- 
--        /* Link the .virtfs_metadata files. Create the metada directory */
--        ret = local_create_mapped_attr_dir(ctx, newpath.data);
--        if (ret < 0) {
--            goto err_out;
-+        ret = mkdirat(ndirfd, VIRTFS_META_DIR, 0700);
-+        if (ret < 0 && errno != EEXIST) {
-+            goto err_undo_link;
-         }
--        vbuffer = local_mapped_attr_path(ctx, oldpath->data);
--        vbuffer1 = local_mapped_attr_path(ctx, newpath.data);
--        ret = link(vbuffer, vbuffer1);
--        g_free(vbuffer);
--        g_free(vbuffer1);
-+
-+        omap_dirfd = openat_dir(odirfd, VIRTFS_META_DIR);
-+        if (omap_dirfd == -1) {
-+            goto err;
-+        }
-+
-+        nmap_dirfd = openat_dir(ndirfd, VIRTFS_META_DIR);
-+        if (nmap_dirfd == -1) {
-+            close_preserve_errno(omap_dirfd);
-+            goto err;
-+        }
-+
-+        ret = linkat(omap_dirfd, oname, nmap_dirfd, name, 0);
-+        close_preserve_errno(nmap_dirfd);
-+        close_preserve_errno(omap_dirfd);
-         if (ret < 0 && errno != ENOENT) {
--            goto err_out;
-+            goto err_undo_link;
-         }
-+
-+        ret = 0;
-     }
--    goto out;
-+    goto out_close;
- 
--err_out:
--    serrno = errno;
--    remove(buffer1);
--    errno = serrno;
-+err:
-+    ret = -1;
-+err_undo_link:
-+    unlinkat_preserve_errno(ndirfd, name, 0);
-+out_close:
-+    close_preserve_errno(ndirfd);
-+    close_preserve_errno(odirfd);
- out:
--    g_free(buffer1);
--    v9fs_string_free(&newpath);
-+    g_free(oname);
-+    g_free(odirpath);
++out:
++    g_free(dirpath);
++    g_free(name);
      return ret;
  }
  
