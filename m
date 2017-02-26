@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37538)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ci6bj-0004UR-4o
+	(envelope-from <armbru@redhat.com>) id 1ci6bi-0004UO-Th
 	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:43:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ci6bf-0004Oc-HN
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:43:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49786)
+	(envelope-from <armbru@redhat.com>) id 1ci6bf-0004Om-JY
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:43:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47718)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ci6bf-0004Ne-9F
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ci6bf-0004Nk-AB
 	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:43:51 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6018B37EE7
+	by mx1.redhat.com (Postfix) with ESMTPS id 6E6FF80F7C
 	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 21:43:51 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 00A6B306A0
-	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 21:43:50 +0000 (UTC)
+	by int-mx09.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v1QLhnYX019798
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=NO)
+	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 16:43:51 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Sun, 26 Feb 2017 22:43:39 +0100
-Message-Id: <1488145424-14974-22-git-send-email-armbru@redhat.com>
+Date: Sun, 26 Feb 2017 22:43:42 +0100
+Message-Id: <1488145424-14974-25-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488145424-14974-1-git-send-email-armbru@redhat.com>
 References: <1488145424-14974-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 21/26] tests: Cover partial input visit of
- list
+Subject: [Qemu-devel] [PATCH v2 24/26] tests: Cover input visit beyond end
+ of list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,34 +39,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Demonstrates a design flaw: there is no way to for input visitors to
-report that a list visit didn't visit the complete input list.  The
-generated list visits always do, but manual visits needn't.
+When you try to visit beyond the end of a list, the qobject input
+visitor crashes, and the string visitor screws returns garbage.  The
+generated list visits never go beyond the list end, but manual visits
+could.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/test-opts-visitor.c          | 41 +++++++++++++++++++++++++++++++++++
- tests/test-qobject-input-visitor.c | 44 ++++++++++++++++++++++++++++++++++++++
- tests/test-string-input-visitor.c  | 22 +++++++++++++++++++
- 3 files changed, 107 insertions(+)
+ tests/test-opts-visitor.c          | 39 ++++++++++++++++++++++++++++++++++++++
+ tests/test-qobject-input-visitor.c | 10 ++++++++++
+ tests/test-string-input-visitor.c  | 16 ++++++++++++++++
+ 3 files changed, 65 insertions(+)
 
 diff --git a/tests/test-opts-visitor.c b/tests/test-opts-visitor.c
-index 0a9e75f..d0f7646 100644
+index b93fd33..2238f8e 100644
 --- a/tests/test-opts-visitor.c
 +++ b/tests/test-opts-visitor.c
-@@ -172,6 +172,44 @@ expect_u64_max(OptsVisitorFixture *f, gconstpointer test_data)
- 
- /* test cases */
+@@ -210,6 +210,43 @@ test_opts_range_unvisited(void)
+     qemu_opts_del(opts);
+ }
  
 +static void
-+test_opts_range_unvisited(void)
++test_opts_range_beyond(void)
 +{
++    Error *err = NULL;
 +    intList *list = NULL;
 +    intList *tail;
 +    QemuOpts *opts;
 +    Visitor *v;
++    int64_t val;
 +
-+    opts = qemu_opts_parse(qemu_find_opts("userdef"), "ilist=0-2", false,
++    opts = qemu_opts_parse(qemu_find_opts("userdef"), "ilist=0", false,
 +                           &error_abort);
 +
 +    v = opts_visitor_new(opts);
@@ -76,14 +82,11 @@ index 0a9e75f..d0f7646 100644
 +    tail = list;
 +    visit_type_int(v, NULL, &tail->value, &error_abort);
 +    g_assert_cmpint(tail->value, ==, 0);
-+    tail = (intList *)visit_next_list(v, (GenericList *)tail, sizeof(*list));
-+    g_assert(tail);
-+    visit_type_int(v, NULL, &tail->value, &error_abort);
-+    g_assert_cmpint(tail->value, ==, 1);
-+    tail = (intList *)visit_next_list(v, (GenericList *)tail, sizeof(*list));
-+    g_assert(tail);
++    tail = (intList *)visit_next_list(v, (GenericList *)tail, sizeof(*tail));
++    g_assert(!tail);
++    visit_type_int(v, NULL, &val, &err);
++    error_free_or_abort(&err);
 +    visit_end_list(v, (void **)&list);
-+    /* BUG: unvisited tail not reported; actually not reportable by design */
 +
 +    visit_check_struct(v, &error_abort);
 +    visit_end_struct(v, NULL);
@@ -96,113 +99,65 @@ index 0a9e75f..d0f7646 100644
  int
  main(int argc, char **argv)
  {
-@@ -263,6 +301,9 @@ main(int argc, char **argv)
-     add_test("/visitor/opts/i64/range/2big/full", &expect_fail,
-              "i64=-0x8000000000000000-0x7fffffffffffffff");
+@@ -303,6 +340,8 @@ main(int argc, char **argv)
  
-+    g_test_add_func("/visitor/opts/range/unvisited",
-+                    test_opts_range_unvisited);
-+
+     g_test_add_func("/visitor/opts/range/unvisited",
+                     test_opts_range_unvisited);
++    g_test_add_func("/visitor/opts/range/beyond",
++                    test_opts_range_beyond);
+ 
      g_test_run();
      return 0;
- }
 diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
-index 32c6b3d..10c15c4 100644
+index b631773..4b82707 100644
 --- a/tests/test-qobject-input-visitor.c
 +++ b/tests/test-qobject-input-visitor.c
-@@ -923,6 +923,46 @@ static void test_visitor_in_fail_struct_missing(TestInputVisitorData *data,
-     visit_end_struct(v, NULL);
+@@ -947,6 +947,16 @@ static void test_visitor_in_fail_list(TestInputVisitorData *data,
+     visit_check_list(v, &err);
+     error_free_or_abort(&err);
+     visit_end_list(v, NULL);
++
++    /* Visit beyond end of list */
++    v = visitor_input_test_init(data, "[]");
++
++    visit_start_list(v, NULL, NULL, 0, &error_abort);
++#if 0 /* FIXME crash */
++    visit_type_int(v, NULL, &i64, &err);
++    error_free_or_abort(&err);
++#endif
++    visit_end_list(v, NULL);
  }
  
-+static void test_visitor_in_fail_list(TestInputVisitorData *data,
-+                                      const void *unused)
-+{
-+    int64_t i64 = -1;
-+    Visitor *v;
-+
-+    /* Unvisited list tail */
-+
-+    v = visitor_input_test_init(data, "[ 1, 2, 3 ]");
-+
-+    visit_start_list(v, NULL, NULL, 0, &error_abort);
-+    visit_type_int(v, NULL, &i64, &error_abort);
-+    g_assert_cmpint(i64, ==, 1);
-+    visit_type_int(v, NULL, &i64, &error_abort);
-+    g_assert_cmpint(i64, ==, 2);
-+    visit_end_list(v, NULL);
-+    /* BUG: unvisited tail not reported; actually not reportable by design */
-+}
-+
-+static void test_visitor_in_fail_list_nested(TestInputVisitorData *data,
-+                                             const void *unused)
-+{
-+    int64_t i64 = -1;
-+    Visitor *v;
-+
-+    /* Unvisited nested list tail */
-+
-+    v = visitor_input_test_init(data, "[ 0, [ 1, 2, 3 ] ]");
-+
-+    visit_start_list(v, NULL, NULL, 0, &error_abort);
-+    visit_type_int(v, NULL, &i64, &error_abort);
-+    g_assert_cmpint(i64, ==, 0);
-+    visit_start_list(v, NULL, NULL, 0, &error_abort);
-+    visit_type_int(v, NULL, &i64, &error_abort);
-+    g_assert_cmpint(i64, ==, 1);
-+    visit_end_list(v, NULL);
-+    /* BUG: unvisited tail not reported; actually not reportable by design */
-+    visit_end_list(v, NULL);
-+}
-+
- static void test_visitor_in_fail_union_native_list(TestInputVisitorData *data,
-                                                    const void *unused)
- {
-@@ -1070,6 +1110,10 @@ int main(int argc, char **argv)
-                            NULL, test_visitor_in_fail_struct_in_list);
-     input_visitor_test_add("/visitor/input/fail/struct-missing",
-                            NULL, test_visitor_in_fail_struct_missing);
-+    input_visitor_test_add("/visitor/input/fail/list",
-+                           NULL, test_visitor_in_fail_list);
-+    input_visitor_test_add("/visitor/input/fail/list-nested",
-+                           NULL, test_visitor_in_fail_list_nested);
-     input_visitor_test_add("/visitor/input/fail/union-flat",
-                            NULL, test_visitor_in_fail_union_flat);
-     input_visitor_test_add("/visitor/input/fail/union-flat-no-discriminator",
+ static void test_visitor_in_fail_list_nested(TestInputVisitorData *data,
 diff --git a/tests/test-string-input-visitor.c b/tests/test-string-input-visitor.c
-index 72f8732..70cee65 100644
+index c93cfeb..3ce5469 100644
 --- a/tests/test-string-input-visitor.c
 +++ b/tests/test-string-input-visitor.c
-@@ -121,6 +121,7 @@ static void test_visitor_in_intList(TestInputVisitorData *data,
-     uint64_t expect4[] = { UINT64_MAX };
-     Error *err = NULL;
+@@ -123,6 +123,7 @@ static void test_visitor_in_intList(TestInputVisitorData *data,
      int64List *res = NULL;
-+    int64List *tail;
+     int64List *tail;
      Visitor *v;
++    int64_t val;
  
      /* Valid lists */
-@@ -151,6 +152,27 @@ static void test_visitor_in_intList(TestInputVisitorData *data,
-     visit_type_int64List(v, NULL, &res, &err);
-     error_free_or_abort(&err);
-     g_assert(!res);
+ 
+@@ -165,6 +166,21 @@ static void test_visitor_in_intList(TestInputVisitorData *data,
+     visit_end_list(v, (void **)&res);
+ 
+     qapi_free_int64List(res);
 +
-+    /* Unvisited list tail */
++    /* Visit beyond end of list */
++    v = visitor_input_test_init(data, "0");
 +
-+    v = visitor_input_test_init(data, "0,2-3");
-+
-+    /* Would be simpler if the visitor genuinely supported virtual walks */
 +    visit_start_list(v, NULL, (GenericList **)&res, sizeof(*res),
 +                     &error_abort);
 +    tail = res;
-+    visit_type_int64(v, NULL, &tail->value, &error_abort);
++    visit_type_int64(v, NULL, &tail->value, &err);
 +    g_assert_cmpint(tail->value, ==, 0);
-+    tail = (int64List *)visit_next_list(v, (GenericList *)tail, sizeof(*res));
-+    g_assert(tail);
-+    visit_type_int64(v, NULL, &tail->value, &error_abort);
-+    g_assert_cmpint(tail->value, ==, 2);
-+    tail = (int64List *)visit_next_list(v, (GenericList *)tail, sizeof(*res));
-+    g_assert(tail);
++    visit_type_int64(v, NULL, &val, &err);
++    g_assert_cmpint(val, ==, 1); /* BUG */
++    visit_check_list(v, &error_abort);
 +    visit_end_list(v, (void **)&res);
-+    /* BUG: unvisited tail not reported; actually not reportable by design */
 +
 +    qapi_free_int64List(res);
  }
