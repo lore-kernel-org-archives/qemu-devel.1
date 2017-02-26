@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1chyVC-0001iS-To
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 08:04:39 -0500
+	(envelope-from <laurent@vivier.eu>) id 1chydM-0003ZK-7w
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 08:13:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1chyV7-0003NV-QW
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 08:04:38 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:65321)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1chyV7-0003Mh-Hq
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 08:04:33 -0500
-References: <20170225230416.9775-1-bobby.prani@gmail.com>
-	<50cd1e34-deda-dc9b-2ce9-5c0cf09223cc@vivier.eu>
-	<CAFEAcA-UCMkEREVQKFALDu==Y5z9wPkS2YOEkzOcD-xsv29BUg@mail.gmail.com>
+	(envelope-from <laurent@vivier.eu>) id 1chydH-0006iS-L2
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 08:13:04 -0500
+References: <20170216085857.23501-1-snaipe@diacritic.io>
+	<20170217085800.28873-1-snaipe@diacritic.io>
+	<20170217085800.28873-2-snaipe@diacritic.io>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <99e997e4-c147-6e38-863b-4138d68a2fbd@vivier.eu>
-Date: Sun, 26 Feb 2017 14:04:07 +0100
+Message-ID: <00cd6802-c213-3212-5f29-ebef0a4dfa5e@vivier.eu>
+Date: Sun, 26 Feb 2017 14:12:39 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-UCMkEREVQKFALDu==Y5z9wPkS2YOEkzOcD-xsv29BUg@mail.gmail.com>
+In-Reply-To: <20170217085800.28873-2-snaipe@diacritic.io>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] linux-user: Add signal handling support
- for x86_64
+Subject: Re: [Qemu-devel] [PATCH v2] syscall: fixed mincore(2) not failing
+ with ENOMEM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +25,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Pranith Kumar <bobby.prani@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>, "Wirth, Allan" <awirth@akamai.com>
+To: Franklin Snaipe Mathieu <snaipe@diacritic.io>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, snaipe@arista.com, Riku Voipio <riku.voipio@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-Le 26/02/2017 à 13:39, Peter Maydell a écrit :
-> On 26 February 2017 at 12:29, Laurent Vivier <laurent@vivier.eu> wrote:
->> Le 26/02/2017 à 00:04, Pranith Kumar a écrit :
->>> Note that x86_64 has only _rt signal handlers. This implementation
->>> attempts to share code with the x86_32 implementation.
+Le 17/02/2017 à 09:58, Franklin Snaipe Mathieu a écrit :
+> From: "Franklin \"Snaipe\" Mathieu" <snaipe@diacritic.io>
 > 
->>> +    struct target_fpreg st[8];
->>
->> Why don't you keep the original name "_st"?
+> The current implementation of the mincore(2) syscall sets errno to
+> EFAULT when the region identified by the first two parameters is
+> invalid.
 > 
-> I suspect I asked for that in an earlier round of review
-> on the basis that names with underscores are reserved
-> namespace. Looking more closely at the rules though that's
-> a bit over-conservative for a struct field name because
-> _ followed by lowercase is only reserved in the global
-> name space (unlike __ or _ followed by uppercase, which
-> could be a macro). So using _st here isn't wrong, but
-> on the other hand there's not much reason to use the
-> underscore I think.
+> This goes against the man page specification, where mincore(2) should
+> only fail with EFAULT when the third parameter is an invalid address;
+> and fail with ENOMEM when the checked region does not point to mapped
+> memory.
+> 
+> Signed-off-by: Franklin "Snaipe" Mathieu <snaipe@diacritic.io>
+> Cc: Riku Voipio <riku.voipio@linaro.org>
+> Cc: Aurelien Jarno <aurelien@aurel32.net>
+> ---
+>  linux-user/syscall.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
+> 
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 9be8e9530e..733e0009e1 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -11061,11 +11061,16 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>      case TARGET_NR_mincore:
+>          {
+>              void *a;
+> +            ret = -TARGET_ENOMEM;
+> +            a = lock_user(VERIFY_READ, arg1, arg2, 0);
+> +            if (!a) {
+> +                goto fail;
+> +            }
+>              ret = -TARGET_EFAULT;
+> -            if (!(a = lock_user(VERIFY_READ, arg1,arg2, 0)))
+> -                goto efault;
+> -            if (!(p = lock_user_string(arg3)))
+> +            p = lock_user_string(arg3);
+> +            if (!p) {
+>                  goto mincore_fail;
+> +            }
+>              ret = get_errno(mincore(a, arg2, p));
+>              unlock_user(p, arg3, ret);
+>              mincore_fail:
+> 
 
-OK, thanks for the explanation.
-
-Laurent
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
