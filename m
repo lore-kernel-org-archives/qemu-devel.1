@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55298)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ci5am-0002kA-2i
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 15:38:53 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55869)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1ci5dF-00043I-Lb
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 15:41:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ci5ah-0003Vb-B4
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 15:38:52 -0500
-Resent-Message-Id: <E1ci5ah-0003Vb-B4@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21482)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1ci5ah-0003VN-3Y
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 15:38:47 -0500
-In-Reply-To: <20170226202709.2114-1-samuel.thibault@ens-lyon.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148814145914.177.15326500327484761974@0e2666bad730>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 26 Feb 2017 12:37:39 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 0/5] slirp updates
+	(envelope-from <pl@kamp.de>) id 1ci5dB-0004Ak-OS
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 15:41:25 -0500
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:51264 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1ci5dB-00049P-FY
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 15:41:21 -0500
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 10.1 \(3251\))
+From: Peter Lieven <pl@kamp.de>
+In-Reply-To: <589533ff-2e7d-0ffb-e0b9-5b2e055813b6@redhat.com>
+Date: Sun, 26 Feb 2017 21:41:17 +0100
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <5E0A3205-E866-44C3-86C5-7B3B4F9923B4@kamp.de>
+References: <9533ba99-b143-b577-0115-742119d089a4@kamp.de>
+	<9292fef8-929a-e89e-eca5-cd247ca9334b@redhat.com>
+	<f0eb7ff1-47d7-42d0-c7b5-946d2224e986@kamp.de>
+	<c207e00d-25a6-45bb-a849-235d0cd2be0d@redhat.com>
+	<2b0840d7-7540-d732-36ac-af7a512d2c8f@kamp.de>
+	<b59eb68b-5dac-b18b-c2f7-1ea820f4d747@redhat.com>
+	<589533ff-2e7d-0ffb-e0b9-5b2e055813b6@redhat.com>
+Subject: Re: [Qemu-devel] Qemu and Changed Block Tracking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,64 +32,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: samuel.thibault@ens-lyon.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, stefanha@redhat.com, jan.kiszka@siemens.com
+To: Eric Blake <eblake@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Christian Theune <ct@flyingcircus.io>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzAyMjYyMDI3MDkuMjExNC0xLXNhbXVlbC50aGliYXVsdEBlbnMtbHlvbi5vcmcKVHlwZTogc2Vy
-aWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwLzVdIHNsaXJwIHVwZGF0ZXMKCj09PSBU
-RVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChn
-aXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQg
-b3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVI
-IC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVj
-a2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIK
-ICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRj
-aC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAg
-IGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5E
-ID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApG
-cm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0
-ZV0gICAgICBwYXRjaGV3LzIwMTcwMjI0MTgyODQ0LjMyNDUyLTEtZGdpbGJlcnRAcmVkaGF0LmNv
-bSAtPiBwYXRjaGV3LzIwMTcwMjI0MTgyODQ0LjMyNDUyLTEtZGdpbGJlcnRAcmVkaGF0LmNvbQog
-LSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMTcwMjI2MTY1MzQ1Ljg3NTctMS1ib2JieS5w
-cmFuaUBnbWFpbC5jb20gLT4gcGF0Y2hldy8yMDE3MDIyNjE2NTM0NS44NzU3LTEtYm9iYnkucHJh
-bmlAZ21haWwuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAxNzAyMjYyMDI3MDku
-MjExNC0xLXNhbXVlbC50aGliYXVsdEBlbnMtbHlvbi5vcmcgLT4gcGF0Y2hldy8yMDE3MDIyNjIw
-MjcwOS4yMTE0LTEtc2FtdWVsLnRoaWJhdWx0QGVucy1seW9uLm9yZwpTd2l0Y2hlZCB0byBhIG5l
-dyBicmFuY2ggJ3Rlc3QnCjE1MGRjNTEgc2xpcnA6IFZNU3RhdGlmeSByZW1haW5pbmcgZXhjZXB0
-IGZvciBsb29wCjBmMzU5NWYgc2xpcnA6IFZNU3RhdGlmeSBzb2NrZXQgbGV2ZWwKYjU4NGY3YSBz
-bGlycDogQ29tbW9uIGxob3N0L2Zob3N0IHVuaW9uCjM4NjU3ZjQgc2xpcnA6IFZNU3RhdGlmeSBz
-YnVmCmQwNjRmYjkgc2xpcnA6IFZNU3RhdGUgY29udmVyc2lvbjsgdGNwY2IKCj09PSBPVVRQVVQg
-QkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNTogc2xpcnA6IFZNU3RhdGUgY29udmVyc2lvbjsg
-dGNwY2IuLi4KRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjEyOiBG
-SUxFOiBzbGlycC90Y3BfdmFyLmg6NTE6CiteSXVpbnQ4X3QgdF9mb3JjZTteSV5JLyogMSBpZiBm
-b3JjaW5nIG91dCBhIGJ5dGUgKi8kCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVz
-ZSB0YWJzCiMyMjI6IEZJTEU6IHNsaXJwL3RjcF92YXIuaDoxMTI6CiteSXVpbnQ4X3ReSXRfb29i
-ZmxhZ3M7XkleSS8qIGhhdmUgc29tZSAqLyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2
-ZXIgdXNlIHRhYnMKIzIyMzogRklMRTogc2xpcnAvdGNwX3Zhci5oOjExMzoKK15JdWludDhfdF5J
-dF9pb2JjO15JXkleSS8qIGlucHV0IGNoYXJhY3RlciAqLyQKCnRvdGFsOiAzIGVycm9ycywgMCB3
-YXJuaW5ncywgMTk1IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIvNTogc2xpcnA6IFZNU3RhdGlmeSBzYnVmLi4uCkVS
-Uk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzI2OiBGSUxFOiBzbGlycC9z
-YnVmLmg6MTU6CiteSXVpbnQzMl90IHNiX2NjO15JXkkvKiBhY3R1YWwgY2hhcnMgaW4gYnVmZmVy
-ICovJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjc6IEZJTEU6
-IHNsaXJwL3NidWYuaDoxNjoKK15JdWludDMyX3Qgc2JfZGF0YWxlbjteSS8qIExlbmd0aCBvZiBk
-YXRhICAqLyQKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMTU1IGxpbmVzIGNoZWNrZWQK
-CllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDMv
-NTogc2xpcnA6IENvbW1vbiBsaG9zdC9maG9zdCB1bmlvbi4uLgpDaGVja2luZyBQQVRDSCA0LzU6
-IHNsaXJwOiBWTVN0YXRpZnkgc29ja2V0IGxldmVsLi4uCkVSUk9SOiBpZiB0aGlzIGNvZGUgaXMg
-cmVkdW5kYW50IGNvbnNpZGVyIHJlbW92aW5nIGl0CiM5ODogRklMRTogc2xpcnAvc2xpcnAuYzox
-Mjk3OgorI2lmIDAKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMjE3IGxpbmVzIGNoZWNr
-ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENI
-IDUvNTogc2xpcnA6IFZNU3RhdGlmeSByZW1haW5pbmcgZXhjZXB0IGZvciBsb29wLi4uCj09PSBP
-VVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1h
-aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3Jn
-L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMu
-b3Jn
+
+> Am 24.02.2017 um 22:44 schrieb Eric Blake <eblake@redhat.com>:
+>=20
+> On 02/24/2017 03:31 PM, John Snow wrote:
+>>>=20
+>>> But the Backup Server could instead connect to the NAS directly =
+avoiding
+>>> load on the frontent LAN
+>>> and the Qemu Node.
+>>>=20
+>>=20
+>> In a live backup I don't see how you will be removing QEMU from the =
+data
+>> transfer loop. QEMU is the only process that knows what the correct =
+view
+>> of the image is, and needs to facilitate.
+>>=20
+>> It's not safe to copy the blocks directly without QEMU's mediation.
+>=20
+> Although we may already have enough tools in place to help achieve =
+that:
+> create a temporary qcow2 wrapper around the primary image via external
+> snapshot, so that the primary image is now read-only in qemu; then use
+> whatever block-status mechanism (whether the NBD block status =
+extension,
+> or directly reading from a persistent bitmap) to facilitate whatever
+> more efficient offline transfer of just the relevant portions of that
+> main file, then live block-commit to get qemu to start writing to the
+> file again.
+>=20
+> In other words, any time your algorithm wants to cause an I/O freeze =
+to
+> a particular file, the solution is to add a qcow2 external snapshot
+> followed by a live commit.
+>=20
+> So tweaking the proposal a few mails ago:
+>=20
+> fsfreeze (optional)
+> create qcow2 snapshot wrapper as a write lock (via QMP)
+> fsthaw - now with no risk of violating guest timing constraints
+> dirtymap =3D find all blocks that are dirty since last backup (via =
+named
+> bitmap/NBD block status)
+> foreach block in dirtymap {
+>               copy to backup via external software
+> }
+> live commit image (via QMP)
+>=20
+> The window where guest I/O is frozen is small (the freeze/snapshot
+> create/thaw steps can be done in less than a second), while the window
+> where you are extracting incremental backup data is longer (during =
+that
+> time, guest I/O is happening into a wrapper qcow2 file).
+
+The live-snapshot/live-commit stuff could indeed help in my scenario. If =
+I understand correctly this is
+something that already works today, correct? If I have taken a =
+live-snapshot, is live-migration and
+stop/start of the VM still possible? What about live-migration and =
+start/stop during live-commit?
+I don=E2=80=99t talk about the dirty bitmap tracking I understand that =
+persistence and live-migration support
+is still in the works, I=E2=80=99m just interested in the =
+snapshot/commit part.
+
+Thanks
+Peter=
