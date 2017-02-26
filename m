@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ci6bi-0004UH-73
+	(envelope-from <armbru@redhat.com>) id 1ci6bi-0004UK-JN
 	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:43:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ci6bd-0004N1-QF
+	(envelope-from <armbru@redhat.com>) id 1ci6bf-0004Nw-3w
 	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:43:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38080)
+Received: from mx1.redhat.com ([209.132.183.28]:54932)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ci6bd-0004LQ-Eq
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:43:49 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ci6be-0004NQ-VD
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:43:51 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8FE4CC04B924
-	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 21:43:49 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 21510C0567A3
+	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 21:43:51 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
-	by int-mx14.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v1QLhmZc018516
+	by int-mx11.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v1QLhn3u001825
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
 	verify=NO)
-	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 16:43:49 -0500
+	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 16:43:50 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Sun, 26 Feb 2017 22:43:23 +0100
-Message-Id: <1488145424-14974-6-git-send-email-armbru@redhat.com>
+Date: Sun, 26 Feb 2017 22:43:33 +0100
+Message-Id: <1488145424-14974-16-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488145424-14974-1-git-send-email-armbru@redhat.com>
 References: <1488145424-14974-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 05/26] qmp: Clean up how we enforce
- capability negotiation
+Subject: [Qemu-devel] [PATCH v2 15/26] qom: Make
+ object_property_set_qobject()'s input visitor strict
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,146 +39,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-To enforce capability negotiation before normal operation,
-handle_qmp_command() inspects every command before it's handed off to
-qmp_dispatch().  This is a bit of a layering violation, and results in
-duplicated code.
+Commit 240f64b made all qobject input visitors created outside tests
+strict, except for the one in object_property_set_qobject().  That one
+was left behind only because Eric couldn't spare the time to figure
+out whether making it strict would break anything, with a TODO
+comment.  Time to resolve it.
 
-Before capability negotiation (!cur_mon->in_command_mode), we fail
-commands other than "qmp_capabilities".  This is what enforces
-capability negotiation.
+Strict makes a difference only for otherwise successful visits of QAPI
+structs or unions.  Let's examine what the callers of
+object_property_set_qobject() visit:
 
-Afterwards, we fail command "qmp_capabilities".
+* object_property_set_str(), object_property_set_bool(),
+  object_property_set_int() visit a QString, QBool, QInt,
+  respectively.  Strictness can't matter.
 
-Clean this up as follows.
+* qmp_qom_set visits its @value argument.  Comes straight from QMP and
+  can be anything ('any' in the QAPI schema).  Strictness matters when
+  the property's set() method visits a struct or union QAPI type.
 
-The obvious place to fail a command is the command itself, so move the
-"afterwards" check to qmp_qmp_capabilities().
+  No such methods exist, thus switching to strict can't break
+  anything.
 
-We do the "before" check in every other command, but that would be
-bothersome.  Instead, start without all the other commands, by
-registering only qmp_qmp_capabilities().  Register the others in
-qmp_qmp_capabilities().
+  If we acquire such methods in the future, we'll *want* the visitor
+  to be strict, so that unexpected members get rejected as they should
+  be.
 
-Additionally, replace the generic human-readable error message for
-CommandNotFound by one that reminds the user to run qmp_capabilities.
-Without that, we'd regress commit 2d5a834.
+Switch to strict.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- monitor.c | 70 ++++++++++++++++++++++++++++++++++++---------------------------
- 1 file changed, 40 insertions(+), 30 deletions(-)
+ qom/qom-qobject.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/monitor.c b/monitor.c
-index 1cc2274..e522b6f 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -563,11 +563,6 @@ static void monitor_qapi_event_init(void)
-     qmp_event_set_func_emit(monitor_qapi_event_queue);
- }
- 
--void qmp_qmp_capabilities(Error **errp)
--{
--    cur_mon->qmp.in_command_mode = true;
--}
--
- static void handle_hmp_command(Monitor *mon, const char *cmdline);
- 
- static void monitor_data_init(Monitor *mon)
-@@ -995,7 +990,7 @@ static void qmp_unregister_commands_hack(void)
- #endif
- }
- 
--void monitor_init_qmp_commands(void)
-+static void monitor_init_real_qmp_commands(void)
+diff --git a/qom/qom-qobject.c b/qom/qom-qobject.c
+index 447e4a0..bbdedda 100644
+--- a/qom/qom-qobject.c
++++ b/qom/qom-qobject.c
+@@ -22,8 +22,8 @@ void object_property_set_qobject(Object *obj, QObject *value,
+                                  const char *name, Error **errp)
  {
-     qmp_init_marshal();
- 
-@@ -1009,6 +1004,32 @@ void monitor_init_qmp_commands(void)
-     qmp_unregister_commands_hack();
+     Visitor *v;
+-    /* TODO: Should we reject, rather than ignore, excess input? */
+-    v = qobject_input_visitor_new(value, false);
++
++    v = qobject_input_visitor_new(value, true);
+     object_property_set(obj, v, name, errp);
+     visit_free(v);
  }
- 
-+void monitor_init_qmp_commands(void)
-+{
-+    /*
-+     * Start with just qmp_capabilities, to enforce capability
-+     * negotiation.  qmp_capabilities will register the other
-+     * commands.  See also the error message replacement hack in
-+     * handle_qmp_command().
-+     */
-+    qmp_register_command("qmp_capabilities",
-+                         qmp_marshal_qmp_capabilities, QCO_NO_OPTIONS);
-+}
-+
-+void qmp_qmp_capabilities(Error **errp)
-+{
-+    if (cur_mon->qmp.in_command_mode) {
-+        error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
-+                  "Capabilities negotiation is already complete, command "
-+                  "ignored");
-+        return;
-+    }
-+
-+    cur_mon->qmp.in_command_mode = true;
-+    qmp_unregister_command("qmp_capabilities");
-+    monitor_init_real_qmp_commands();
-+}
-+
- /* set the current CPU defined by the user */
- int monitor_set_cpu(int cpu_index)
- {
-@@ -3676,26 +3697,6 @@ static int monitor_can_read(void *opaque)
-     return (mon->suspend_cnt == 0) ? 1 : 0;
- }
- 
--static bool invalid_qmp_mode(const Monitor *mon, const char *cmd,
--                             Error **errp)
--{
--    bool is_cap = g_str_equal(cmd, "qmp_capabilities");
--
--    if (is_cap && mon->qmp.in_command_mode) {
--        error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
--                  "Capabilities negotiation is already complete, command "
--                  "'%s' ignored", cmd);
--        return true;
--    }
--    if (!is_cap && !mon->qmp.in_command_mode) {
--        error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
--                  "Expecting capabilities negotiation with "
--                  "'qmp_capabilities' before command '%s'", cmd);
--        return true;
--    }
--    return false;
--}
--
- /*
-  * Input object checking rules
-  *
-@@ -3781,12 +3782,21 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
-     cmd_name = qdict_get_str(qdict, "execute");
-     trace_handle_qmp_command(mon, cmd_name);
- 
--    if (invalid_qmp_mode(mon, cmd_name, &err)) {
--        goto err_out;
--    }
--
-     rsp = qmp_dispatch(req);
- 
-+    qdict = qdict_get_qdict(qobject_to_qdict(rsp), "error");
-+    if (qdict) {
-+        if (!mon->qmp.in_command_mode
-+            && !g_strcmp0(qdict_get_try_str(qdict, "class"),
-+                    QapiErrorClass_lookup[ERROR_CLASS_COMMAND_NOT_FOUND])) {
-+            /* Provide a more useful error message */
-+            qdict_del(qdict, "desc");
-+            qdict_put(qdict, "desc",
-+                      qstring_from_str("Expecting capabilities negotiation"
-+                                       " with 'qmp_capabilities'"));
-+        }
-+    }
-+
- err_out:
-     if (err) {
-         qdict = qdict_new();
 -- 
 2.7.4
