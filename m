@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58882)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ci5v0-0000Vs-7E
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 15:59:48 -0500
+	(envelope-from <bounces@canonical.com>) id 1ci60l-0002F5-92
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:05:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ci5ux-0000Wc-6L
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 15:59:46 -0500
-Received: from indium.canonical.com ([91.189.90.7]:49423)
+	(envelope-from <bounces@canonical.com>) id 1ci60g-00023p-NG
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:05:43 -0500
+Received: from indium.canonical.com ([91.189.90.7]:52542)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ci5uw-0000WW-Vs
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 15:59:43 -0500
+	id 1ci60g-00023j-Gz
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:05:38 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ci5uv-0000Y0-P1
-	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 20:59:41 +0000
+	id 1ci60f-0002ZL-B9
+	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 21:05:37 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BB8AF2E80C6
-	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 20:59:41 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 526252E80C4
+	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 21:05:37 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 26 Feb 2017 20:45:29 -0000
-From: Mathew Hodson <mathew.hodson@gmail.com>
-Reply-To: Bug 1455475 <1455475@bugs.launchpad.net>
+Date: Sun, 26 Feb 2017 20:59:44 -0000
+From: Marc Bommert <1668103@bugs.launchpad.net>
+Reply-To: Bug 1668103 <1668103@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20150515121048.26278.39911.malonedeb@gac.canonical.com>
-Message-Id: <20170226204529.23329.76264.launchpad@chaenomeles.canonical.com>
+References: <20170226205013.23267.77116.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170226205945.23033.77107.launchpad@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1455475] Re: Block Commit: [100 %]error: failed
- to pivot job for disk vda
+Subject: [Qemu-devel] [Bug 1668103] Re: Possible off-by-one error in
+ priority handling of hw/PL190.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,152 +39,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-*** This bug is a duplicate of bug 1317491 ***
-    https://bugs.launchpad.net/bugs/1317491
-
-** Bug watch removed: Red Hat Bugzilla #1197592
-   https://bugzilla.redhat.com/show_bug.cgi?id=3D1197592
-
-** Bug watch removed: Red Hat Bugzilla #1210903
-   https://bugzilla.redhat.com/show_bug.cgi?id=3D1210903
+** Changed in: qemu
+     Assignee: (unassigned) =3D> Marc Bommert (brightwise)
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1455475
+https://bugs.launchpad.net/bugs/1668103
 
 Title:
-  Block Commit: [100 %]error: failed to pivot job for disk vda
+  Possible off-by-one error in priority handling of hw/PL190.c
 
 Status in QEMU:
   New
-Status in Ubuntu:
-  Confirmed
 
 Bug description:
-  Hi,
+  I have a problem when reading back VECTADDR in my proprietary OS's
+  interrupt handler.
 
-  i=C2=B4ve a Problem with committing a snapshot. The problem was discussed
-  on the libvirt mailing list earlier this year.
+  Example client code:
 
-  https://www.redhat.com/archives/libvirt-
-  users/2015-January/msg00029.html
+   1) Write INTENCLEAR to clear all interrupt enable bits
+   2) Set all 16 vector control registers to zero
+   3) Set vector address #2 to value 2
+   4) Set vector control #2 to 0x21 (vector_interrupt_enable(0x20) | vector=
+_interrupt_source(0x1) )
+   5) Enable interrupt 1 by writing 0x2 to INTENABLE
+   6) In interrupt handler: read VECTADDR [should read 0x2 (active IRQs vec=
+tor address as set in step 3), reads 0x0 (active vector address index 3 ins=
+tead of index 2)]
 
-  =
+  Problem:
 
-  Iam running gentoo and:
+  So, for me, the block commented with /* Read vector address at the
+  start of an ISR...  */ in hw/pl190.c has an off by-one error and does
+  not return the vector address of the pending interrupt, but of the
+  next one in the list of priorities (i.e. vector address 3).
 
-  Compiled against library: libvirt 1.2.14
-  Using library: libvirt 1.2.14
-  Using API: QEMU 1.2.14
-  Running hypervisor: QEMU 2.3.0
+  Solution:
 
-  I=C2=B4am running a Windows Server 2012 R2 VM with the latest quest driver
-  (0.1.96) and  QEMU quest Agent 0.12.1 installed.
+  In pl190_update_vectors(), also set the priority bit for the current
+  priority (1<<i) interrupt (if enabled) in s->prio_mask[i] in addition
+  to those of higher priority enabled interrupts. This will cause the
+  loop in the read handling of VECTADDR to terminate an iteration
+  earlier and will deliver the correct interrupt priority as iteration
+  variable i subsequently used for addressing.
 
-  The domain is started with following command line:
-
-  /usr/bin/qemu-system-x86_64 -name $DOMAIN -S -machine pc-i440fx-1.6,accel=
-=3Dkvm,usb=3Doff -m 8192 -realtime mlock=3Doff -smp 8,sockets=3D8,cores=3D1=
-,threads=3D1 -uuid c96ef576-dbfc-49aa-9dd0-068886c4ef0e -no-user-config -no=
-defaults -chardev socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/$DOM=
-AIN.monitor,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dco=
-ntrol -rtc base=3Dlocaltime -no-shutdown -boot strict=3Don -device piix3-us=
-b-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -device virtio-serial-pci,id=3Dv=
-irtio-serial0,bus=3Dpci.0,addr=3D0x6 -drive file=3D/var/lib/libvirt/images/=
-$DOMAIN.qcow2,if=3Dnone,id=3Ddrive-virtio-disk0,format=3Dqcow2 -device virt=
-io-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x2,drive=3Ddrive-virtio-disk0,id=
-=3Dvirtio-disk0,bootindex=3D1 -netdev tap,fd=3D25,id=3Dhostnet0,vhost=3Don,=
-vhostfd=3D26 -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54=
-:00:07:b4:0a,bus=3Dpci.0,addr=3D0x3 -chardev pty,id=3Dcharserial0 -device i=
-sa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev socket,id=3Dcharchann=
-el0,path=3D/var/lib/libvirt/qemu/f16x86_64.agent,server,nowait -device virt=
-serialport,bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchanne=
-l0,name=3Dorg.qemu.guest_agent.0 -device usb-tablet,id=3Dinput0 -vnc 127.0.=
-0.1:6 -k de -device VGA,id=3Dvideo0,vgamem_mb=3D16,bus=3Dpci.0,addr=3D0x5 -=
-device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x4 -msg timesta=
-mp=3Don
-  char device redirected to /dev/pts/2 (label charserial0)
-
-  =
-
-  I=C2=B4ve created the snapshot with:
-
-  virsh # snapshot-create-as --domain $DOMAIN snap1 --diskspec vda,file=3D/=
-var/lib/libvirt/images/snap1.qcow2 --quiesce --disk-only --atomic --no-meta=
-data
-  Domain snapshot snap1 created
-
-  If i try to commit the snapshot i get this error:
-
-  virsh # blockcommit $DOMAIN vda --active --verbose --pivot
-  error: internal error: unable to execute QEMU command 'block-commit': Dev=
-ice 'drive-virtio-disk0' is busy: block device is in use by block job: comm=
-it
-
-  =
-
-  virsh # blockjob $DOMAIN /var/lib/libvirt/images/snap1.qcow2
-  Block Commit: [100 %]
-
-  virsh # $DOMAIN var/lib/libvirt/images/snap1.qcow2 --abort
-
-  virsh # blockjob $DOMAIN /var/lib/libvirt/images/snap1.qcow2
-  No current block job for /var/lib/libvirt/images/snap1.qcow2
-
-  =
-
-  I=C2=B4ve test this with qemu 2.1 and the problem does`nt exist.
-
-  /usr/bin/qemu-system-x86_64 -name $DOMAIN -S -machine pc-
-  i440fx-1.6,accel=3Dkvm,usb=3Doff -m 8192 -realtime mlock=3Doff -smp
-  8,sockets=3D8,cores=3D1,threads=3D1 -uuid 30c49f37-6e62-49f6-a9df-
-  ad2fef1fa312 -no-user-config -nodefaults -chardev
-  socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/$DOMAIN.monitor,serv=
-er,nowait
-  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dlocalt=
-ime
-  -no-shutdown -boot strict=3Don -device piix3-usb-
-  uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -device virtio-serial-pci,id
-  =3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x6 -drive
-  file=3D/var/lib/libvirt/images/$DOMAIN.qcow2,if=3Dnone,id=3Ddrive-virtio-
-  disk0,format=3Dqcow2 -device virtio-blk-
-  pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x2,drive=3Ddrive-virtio-disk0,id=3Dvir=
-tio-
-  disk0,bootindex=3D1 -chardev pty,id=3Dcharserial0 -device isa-
-  serial,chardev=3Dcharserial0,id=3Dserial0 -chardev
-  socket,id=3Dcharchannel0,path=3D/var/lib/libvirt/qemu/f16x86_64.agent,ser=
-ver,nowait
-  -device virtserialport,bus=3Dvirtio-
-  serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu.gue=
-st_agent.0
-  -device usb-tablet,id=3Dinput0 -vnc 127.0.0.1:0 -k de -device
-  VGA,id=3Dvideo0,vgamem_mb=3D16,bus=3Dpci.0,addr=3D0x5 -device virtio-ball=
-oon-
-  pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x4 -msg timestamp=3Don
-
-
-  Compiled against library: libvirt 1.2.11
-  Using library: libvirt 1.2.11
-  Using API: QEMU 1.2.11
-  Running hypervisor: QEMU 2.1.2
-
-  =
-
-  virsh # snapshot-create-as --domain windows.trohde-snapshot-test windows.=
-trohde-snapshot-test_snap1 --diskspec vda,file=3D/var/lib/libvirt/images/wi=
-ndows.trohde-snapshot-test_snap1.qcow2 --quiesce --disk-only --atomic --no-=
-metadata
-  Domain snapshot windows.trohde-snapshot-test_snap1 created
-
-  virsh # blockcommit $DOMAIN vda --active --verbose --pivot
-  Block Commit: [100 %]
-  Successfully pivoted
-
-  Cheers
-
-  Tim
+  I'll try to provide a patch for this.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1455475/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1668103/+subscriptions
