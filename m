@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37439)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ci6bg-0004U9-N8
+	(envelope-from <armbru@redhat.com>) id 1ci6bh-0004UE-A4
 	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:43:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ci6bd-0004Lu-EM
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:43:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47704)
+	(envelope-from <armbru@redhat.com>) id 1ci6bd-0004Mq-Px
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:43:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49784)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ci6bd-0004L7-9B
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ci6bd-0004LY-HW
 	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 16:43:49 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A820037EEB
+	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 21:43:49 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
+	[10.36.116.55])
+	by int-mx14.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v1QLhmlt018519
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=NO)
+	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 16:43:49 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Sun, 26 Feb 2017 22:43:19 +0100
-Message-Id: <1488145424-14974-2-git-send-email-armbru@redhat.com>
+Date: Sun, 26 Feb 2017 22:43:29 +0100
+Message-Id: <1488145424-14974-12-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488145424-14974-1-git-send-email-armbru@redhat.com>
 References: <1488145424-14974-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 01/26] qga: Fix crash on non-dictionary QMP
- argument
+Subject: [Qemu-devel] [PATCH v2 11/26] qapi: Make QObject input visitor set
+ *list reliably
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,53 +38,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
 
-The value of key 'arguments' must be a JSON object.  qemu-ga neglects
-to check, and crashes.  To reproduce, send
+qobject_input_start_struct() sets *list, except when it fails because
+qobject_input_get_object() fails, i.e. the input object doesn't exist.
 
-    { 'execute': 'guest-sync', 'arguments': [] }
+All the other input visitor start_struct(), start_list(),
+start_alternate() always set *obj / *list.
 
-to qemu-ga.
-
-do_qmp_dispatch() uses qdict_get_qdict() to get the arguments.  When
-not a JSON object, this gets a null pointer, which flows through the
-generated marshalling function to qobject_input_visitor_new(), where
-it fails the assertion.  qmp_dispatch_check_obj() needs to catch this
-error.
-
-QEMU isn't affected, because it runs qmp_check_input_obj() first,
-which basically duplicates qmp_dispatch_check_obj()'s checks, plus the
-missing one.
-
-Fix by copying the missing one from qmp_check_input_obj() to
-qmp_dispatch_check_obj().
+Change qobject_input_start_struct() to match.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qapi/qmp-dispatch.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ qapi/qobject-input-visitor.c | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
 
-diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-index 48bec20..621922f 100644
---- a/qapi/qmp-dispatch.c
-+++ b/qapi/qmp-dispatch.c
-@@ -47,7 +47,13 @@ static QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
-                 return NULL;
-             }
-             has_exec_key = true;
--        } else if (strcmp(arg_name, "arguments")) {
-+        } else if (!strcmp(arg_name, "arguments")) {
-+            if (qobject_type(arg_obj) != QTYPE_QDICT) {
-+                error_setg(errp, QERR_QMP_BAD_INPUT_OBJECT_MEMBER,
-+                           "arguments", "object");
-+                return NULL;
-+            }
-+        } else {
-             error_setg(errp, QERR_QMP_EXTRA_MEMBER, arg_name);
-             return NULL;
-         }
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index 2c2f883..d58696c 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -196,25 +196,21 @@ static void qobject_input_start_list(Visitor *v, const char *name,
+     QObject *qobj = qobject_input_get_object(qiv, name, true, errp);
+     const QListEntry *entry;
+ 
++    if (list) {
++        *list = NULL;
++    }
+     if (!qobj) {
+         return;
+     }
+     if (qobject_type(qobj) != QTYPE_QLIST) {
+-        if (list) {
+-            *list = NULL;
+-        }
+         error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
+                    "list");
+         return;
+     }
+ 
+     entry = qobject_input_push(qiv, qobj, list);
+-    if (list) {
+-        if (entry) {
+-            *list = g_malloc0(size);
+-        } else {
+-            *list = NULL;
+-        }
++    if (entry && list) {
++        *list = g_malloc0(size);
+     }
+ }
+ 
 -- 
 2.7.4
