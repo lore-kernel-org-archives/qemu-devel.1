@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1ci5Pb-0003Zf-R4
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 15:27:20 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1ci5Pb-0003Zg-RL
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 15:27:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1ci5PZ-0007cd-Ce
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1ci5PZ-0007cn-R4
 	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 15:27:19 -0500
-Received: from hera.aquilenet.fr ([141.255.128.1]:52279)
+Received: from hera.aquilenet.fr ([141.255.128.1]:52284)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1ci5PZ-0007cR-5B
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1ci5PZ-0007cg-K8
 	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 15:27:17 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Sun, 26 Feb 2017 21:27:09 +0100
-Message-Id: <20170226202709.2114-6-samuel.thibault@ens-lyon.org>
+Date: Sun, 26 Feb 2017 21:27:07 +0100
+Message-Id: <20170226202709.2114-4-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20170226202709.2114-1-samuel.thibault@ens-lyon.org>
 References: <20170226202709.2114-1-samuel.thibault@ens-lyon.org>
-Subject: [Qemu-devel] [PULL 5/5] slirp: VMStatify remaining except for loop
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 3/5] slirp: Common lhost/fhost union
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,91 +31,60 @@ Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, stefanha@redhat.com, jan.kis
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-This converts the remaining components, except for the top level
-loop, to VMState.
+The socket structure has a pair of unions for lhost and fhost
+addresses; the unions are identical so split them out into
+a separate union declaration.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/slirp.c | 48 +++++++++++++++++++-----------------------------
- 1 file changed, 19 insertions(+), 29 deletions(-)
+ slirp/socket.h | 18 ++++++++----------
+ 1 file changed, 8 insertions(+), 10 deletions(-)
 
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 6583de8769..f8ee7f9d95 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -1343,15 +1343,25 @@ static const VMStateDescription vmstate_slirp_socket = {
-     }
- };
- 
--static void slirp_bootp_save(QEMUFile *f, Slirp *slirp)
--{
--    int i;
-+static const VMStateDescription vmstate_slirp_bootp_client = {
-+    .name = "slirp_bootpclient",
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT16(allocated, BOOTPClient),
-+        VMSTATE_BUFFER(macaddr, BOOTPClient),
-+        VMSTATE_END_OF_LIST()
-+    }
+diff --git a/slirp/socket.h b/slirp/socket.h
+index 8feed2aea4..c1be77eaf3 100644
+--- a/slirp/socket.h
++++ b/slirp/socket.h
+@@ -15,6 +15,12 @@
+  * Our socket structure
+  */
+=20
++union slirp_sockaddr {
++    struct sockaddr_storage ss;
++    struct sockaddr_in sin;
++    struct sockaddr_in6 sin6;
 +};
- 
--    for (i = 0; i < NB_BOOTP_CLIENTS; i++) {
--        qemu_put_be16(f, slirp->bootp_clients[i].allocated);
--        qemu_put_buffer(f, slirp->bootp_clients[i].macaddr, 6);
-+static const VMStateDescription vmstate_slirp = {
-+    .name = "slirp",
-+    .version_id = 4,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT16_V(ip_id, Slirp, 2),
-+        VMSTATE_STRUCT_ARRAY(bootp_clients, Slirp, NB_BOOTP_CLIENTS, 3,
-+                             vmstate_slirp_bootp_client, BOOTPClient),
-+        VMSTATE_END_OF_LIST()
-     }
--}
-+};
- 
- static void slirp_state_save(QEMUFile *f, void *opaque)
- {
-@@ -1371,22 +1381,10 @@ static void slirp_state_save(QEMUFile *f, void *opaque)
-         }
-     qemu_put_byte(f, 0);
- 
--    qemu_put_be16(f, slirp->ip_id);
--
--    slirp_bootp_save(f, slirp);
-+    vmstate_save_state(f, &vmstate_slirp, slirp, NULL);
- }
- 
- 
--static void slirp_bootp_load(QEMUFile *f, Slirp *slirp)
--{
--    int i;
--
--    for (i = 0; i < NB_BOOTP_CLIENTS; i++) {
--        slirp->bootp_clients[i].allocated = qemu_get_be16(f);
--        qemu_get_buffer(f, slirp->bootp_clients[i].macaddr, 6);
--    }
--}
--
- static int slirp_state_load(QEMUFile *f, void *opaque, int version_id)
- {
-     Slirp *slirp = opaque;
-@@ -1421,13 +1419,5 @@ static int slirp_state_load(QEMUFile *f, void *opaque, int version_id)
-         so->extra = (void *)ex_ptr->ex_exec;
-     }
- 
--    if (version_id >= 2) {
--        slirp->ip_id = qemu_get_be16(f);
--    }
--
--    if (version_id >= 3) {
--        slirp_bootp_load(f, slirp);
--    }
--
--    return 0;
-+    return vmstate_load_state(f, &vmstate_slirp, slirp, version_id);
- }
--- 
++
+ struct socket {
+   struct socket *so_next,*so_prev;      /* For a linked list of sockets =
+*/
+=20
+@@ -31,22 +37,14 @@ struct socket {
+   struct tcpiphdr *so_ti;	   /* Pointer to the original ti within
+ 				    * so_mconn, for non-blocking connections */
+   int so_urgc;
+-  union {   /* foreign host */
+-      struct sockaddr_storage ss;
+-      struct sockaddr_in sin;
+-      struct sockaddr_in6 sin6;
+-  } fhost;
++  union slirp_sockaddr fhost;      /* Foreign host */
+ #define so_faddr fhost.sin.sin_addr
+ #define so_fport fhost.sin.sin_port
+ #define so_faddr6 fhost.sin6.sin6_addr
+ #define so_fport6 fhost.sin6.sin6_port
+ #define so_ffamily fhost.ss.ss_family
+=20
+-  union {   /* local host */
+-      struct sockaddr_storage ss;
+-      struct sockaddr_in sin;
+-      struct sockaddr_in6 sin6;
+-  } lhost;
++  union slirp_sockaddr lhost;      /* Local host */
+ #define so_laddr lhost.sin.sin_addr
+ #define so_lport lhost.sin.sin_port
+ #define so_laddr6 lhost.sin6.sin6_addr
+--=20
 2.11.0
