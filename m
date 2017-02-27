@@ -1,32 +1,50 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ciDuT-0003vO-IO
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 00:31:47 -0500
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1ciDwP-0004si-Ix
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 00:33:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ciDuQ-0002cq-F8
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 00:31:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57004)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ciDuQ-0002cV-6d
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 00:31:42 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9374A7EBB8
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 05:31:41 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <1487886317-27400-1-git-send-email-armbru@redhat.com>
-	<1487886317-27400-13-git-send-email-armbru@redhat.com>
-	<d05878a3-d77a-627d-9f94-a0fdf175e280@redhat.com>
-Date: Mon, 27 Feb 2017 06:31:38 +0100
-In-Reply-To: <d05878a3-d77a-627d-9f94-a0fdf175e280@redhat.com> (Eric Blake's
-	message of "Sat, 25 Feb 2017 10:08:59 -0600")
-Message-ID: <87varwnqrp.fsf@dusky.pond.sub.org>
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1ciDwM-0002lv-F9
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 00:33:45 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58658)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1ciDwM-0002lk-5a
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 00:33:42 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1R5SVx3036910
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 00:33:40 -0500
+Received: from e28smtp02.in.ibm.com (e28smtp02.in.ibm.com [125.16.236.2])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28u6xn6aw2-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 00:33:40 -0500
+Received: from localhost
+	by e28smtp02.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Mon, 27 Feb 2017 11:03:37 +0530
+Received: from d28relay09.in.ibm.com (d28relay09.in.ibm.com [9.184.220.160])
+	by d28dlp02.in.ibm.com (Postfix) with ESMTP id 7B0523940033
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 11:03:27 +0530 (IST)
+Received: from d28av04.in.ibm.com (d28av04.in.ibm.com [9.184.220.66])
+	by d28relay09.in.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v1R5XRqJ10748150
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 11:03:27 +0530
+Received: from d28av04.in.ibm.com (localhost [127.0.0.1])
+	by d28av04.in.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+	v1R5XQMC013867
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 11:03:27 +0530
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+In-Reply-To: <CAFEAcA8X873FLQxF_n_KZ-jc0hrKcqAj_tjNm6SO0hpPxbF75w@mail.gmail.com>
+References: <1486976352-549-1-git-send-email-nikunj@linux.vnet.ibm.com>
+	<1486976352-549-2-git-send-email-nikunj@linux.vnet.ibm.com>
+	<CAFEAcA8X873FLQxF_n_KZ-jc0hrKcqAj_tjNm6SO0hpPxbF75w@mail.gmail.com>
+Date: Mon, 27 Feb 2017 11:03:19 +0530
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 12/21] qapi: Improve qobject input visitor
- error reporting
+Message-Id: <87d1e4p59c.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH 2/2] risu_ppc64le: distinguish real illegal
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,120 +53,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, "bharata@linux.vnet.ibm.com" <bharata@linux.vnet.ibm.com>
 
-Eric Blake <eblake@redhat.com> writes:
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-> On 02/23/2017 03:45 PM, Markus Armbruster wrote:
->> Error messages refer to nodes of the QObject being visited by name.
->> Trouble is the names are sometimes less than helpful:
->> 
+> On 13 February 2017 at 08:59, Nikunj A Dadhania
+> <nikunj@linux.vnet.ibm.com> wrote:
+>> While executing qemu_ppc64le, found an issue that the real illegal
+>> instructions are handled as risu_op which results in wrong info at the
+>> master end. Even the master needs to distinguish real illegal
+>> instructions versus risu_op.
+>>
+>> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 >
->> Improve error messages by referring to nodes by path instead, as
->> follows:
->> 
->> * The path of the root QObject is whatever @name argument got passed
->>   to the visitor, except NULL gets mapped to "<anonymous>".
->> 
->> * The path of a root QDict's member is the member key.
->> 
->> * The path of a root QList's member is "[%zu]", where %zu is the list
->>   index, starting at zero.
->> 
->> * The path of a non-root QDict's member is the path of the QDict
->>   concatenated with "." and the member key.
->> 
->> * The path of a non-root QList's member is the path of the QList
->>   concatenated with "[%zu]", where %zu is the list index.
->> 
->
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  include/qapi/visitor.h       |   6 ---
->>  qapi/qobject-input-visitor.c | 121 +++++++++++++++++++++++++++++++------------
->>  2 files changed, 87 insertions(+), 40 deletions(-)
->> 
->
->> +typedef struct StackObject {
->> +    const char *name;            /* Name of @obj in its parent, if any */
->> +    QObject *obj;                /* QDict or QList being visited */
->>      void *qapi; /* sanity check that caller uses same pointer */
->>  
->> -    GHashTable *h;           /* If obj is dict: unvisited keys */
->> -    const QListEntry *entry; /* If obj is list: unvisited tail */
->> +    GHashTable *h;              /* If @obj is QDict: unvisited keys */
->> +    const QListEntry *entry;    /* If @obj is QList: unvisited tail */
->> +    unsigned index;             /* If @obj is QList: list index of @entry */
->
-> Could perhaps make the QDict vs. QList fields shared through a union if
-> we were tight on storage space or cache line pressure. I don't think
-> that's the case, though, so no need to change it.
->
->> +static const char *full_name(QObjectInputVisitor *qiv, const char *name)
->> +{
->> +    StackObject *so;
->> +    char buf[32];
->> +
->> +    if (qiv->errname) {
->> +        g_string_truncate(qiv->errname, 0);
->> +    } else {
->> +        qiv->errname = g_string_new("");
->> +    }
->> +
->> +    QSLIST_FOREACH(so , &qiv->stack, node) {
->> +        if (qobject_type(so->obj) == QTYPE_QDICT) {
->> +            g_string_prepend(qiv->errname, name);
->> +            g_string_prepend_c(qiv->errname, '.');
->> +        } else {
->> +            snprintf(buf, sizeof(buf), "[%u]", so->index);
->> +            g_string_prepend(qiv->errname, buf);
->> +        }
->> +        name = so->name;
->> +    }
->
-> Building the string from back to front requires quite a bit of memory
-> reshuffling, as well as the temporary buffer for integer formatting. Is
-> there any way to build it from front to back? But this code is only
-> triggered on error paths, so I don't care if it is slow.  I'm fine with
-> what you have.
+> No, this is deliberate. Otherwise you can't test illegal
+> instructions. What should happen is that both master and
+> apprentice ends end up in the default case, which does
+> a register info compare and continues having stepped the
+> PC past the illegal insn.
 
-I opted for simplicity over speed here.
+One of the issue that I had was some of the instruction are implemented
+in the master and not in apprentice. I think we could then disable them
+in the ppc64.risu. And enable them only when we have that implemented it
+in qemu tcg.
 
-The easiest way to support forward iteration would be making the stack
-doubly linked.  Fairly cheap, but it's doubtful whether it would be an
-amortized win.
+> (If only one end thinks the insn is illegal then there will
+> be a register mismatch on the PC.)
 
-An obvious alternative: measure the stack depth, allocate a char *[],
-fill it with names back to front, format front to back.  Not too
-complicated, but is it worth on an error path?
+Yeah, the issue here was it does not come out obviously that there was a
+real illegal instruction. Maybe a error print at both the ends would
+help in debugging.
 
-However, users exist that try one visit, and if it fails, another one.
-For instance, set_pci_devfn() tries visit_type_str() first, then
-visit_type_int32.  It should arguably use a suitable
-visit_start_alternate() instead.
-
-I think we should hunt down such visitor misuses before we complicate
-error paths for speed.
-
-In general,
-
-    foo(..., &err);
-    if (err) {
-        error_free(err);
-        ...
-    }
-
-is a performance anti-pattern, because it allocates and frees an Error
-object, a message string and whatever it takes to build that just to
-transmit one bit of information.
-
-It's better to have foo() return something:
-
-    if (foo(..., NULL)) {
-        ...
-    }
-
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Thanks!
+Regards
+Nikunj
