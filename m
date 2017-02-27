@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ciO75-00086J-4E
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:25:28 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ciO76-00087t-Pm
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:25:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ciO70-0005G5-2C
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:25:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60186)
+	(envelope-from <ehabkost@redhat.com>) id 1ciO75-0005JM-Nx
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:25:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60288)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ciO6z-0005Fo-PL
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:25:21 -0500
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ciO75-0005J3-Hk
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:25:27 -0500
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 27 Feb 2017 13:24:58 -0300
-Message-Id: <20170227162501.29280-9-ehabkost@redhat.com>
+Date: Mon, 27 Feb 2017 13:25:01 -0300
+Message-Id: <20170227162501.29280-12-ehabkost@redhat.com>
 In-Reply-To: <20170227162501.29280-1-ehabkost@redhat.com>
 References: <20170227162501.29280-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 08/11] i386: Don't set CPUClass::cpu_def on
- "max" model
+Subject: [Qemu-devel] [PULL 11/11] i386: Improve query-cpu-model-expansion
+ full mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,131 +25,84 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Jiri Denemark <jdenemar@redhat.com>
 
-Host CPUID info is used by the "max" CPU model only in KVM mode.
-Move the initialization of CPUID data for "max" from class_init
-to instance_init, and don't set CPUClass::cpu_def for "max".
+This keeps the same results on type=static expansion, but make
+type=full expansion return every single QOM property on the CPU
+object that have a different value from the "base' CPU model,
+plus all the CPU feature flag properties.
 
-Message-Id: <20170222183919.11928-4-ehabkost@redhat.com>
-Tested-by: Richard W.M. Jones <rjones@redhat.com>
+Cc: Jiri Denemark <jdenemar@redhat.com>
+Message-Id: <20170222190029.17243-4-ehabkost@redhat.com>
 Tested-by: Jiri Denemark <jdenemar@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/i386/cpu-qom.h |  4 +++-
- target/i386/cpu.c     | 45 +++++++++++++++++++++------------------------
- 2 files changed, 24 insertions(+), 25 deletions(-)
+ target/i386/cpu.c | 34 +++++++++++++++++++++++++++++++---
+ 1 file changed, 31 insertions(+), 3 deletions(-)
 
-diff --git a/target/i386/cpu-qom.h b/target/i386/cpu-qom.h
-index 14abd0a8c1..f6c704c3a9 100644
---- a/target/i386/cpu-qom.h
-+++ b/target/i386/cpu-qom.h
-@@ -60,7 +60,9 @@ typedef struct X86CPUClass {
-     CPUClass parent_class;
-     /*< public >*/
- 
--    /* Should be eventually replaced by subclass-specific property defaults. */
-+    /* CPU definition, automatically loaded by instance_init if not NULL.
-+     * Should be eventually replaced by subclass-specific property defaults.
-+     */
-     X86CPUDefinition *cpu_def;
- 
-     bool kvm_required;
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index ec22ed41b2..366253cd4c 100644
+index 139b7ea12e..89421c893b 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -1531,47 +1531,27 @@ static int cpu_x86_fill_model_id(char *str)
-     return 0;
+@@ -2419,6 +2419,34 @@ static void x86_cpu_to_dict(X86CPU *cpu, QDict *props)
+     }
  }
  
--static X86CPUDefinition host_cpudef;
--
- static Property max_x86_cpu_properties[] = {
-     DEFINE_PROP_BOOL("migratable", X86CPU, migratable, true),
-     DEFINE_PROP_BOOL("host-cache-info", X86CPU, cache_info_passthrough, false),
-     DEFINE_PROP_END_OF_LIST()
- };
- 
--/* class_init for the "max" CPU model
-- *
-- * This function may be called before KVM is initialized.
-- */
- static void max_x86_cpu_class_init(ObjectClass *oc, void *data)
++/* Convert CPU model data from X86CPU object to a property dictionary
++ * that can recreate exactly the same CPU model, including every
++ * writeable QOM property.
++ */
++static void x86_cpu_to_dict_full(X86CPU *cpu, QDict *props)
++{
++    ObjectPropertyIterator iter;
++    ObjectProperty *prop;
++
++    object_property_iter_init(&iter, OBJECT(cpu));
++    while ((prop = object_property_iter_next(&iter))) {
++        /* skip read-only or write-only properties */
++        if (!prop->get || !prop->set) {
++            continue;
++        }
++
++        /* "hotplugged" is the only property that is configurable
++         * on the command-line but will be set differently on CPUs
++         * created using "-cpu ... -smp ..." and by CPUs created
++         * on the fly by x86_cpu_from_model() for querying. Skip it.
++         */
++        if (!strcmp(prop->name, "hotplugged")) {
++            continue;
++        }
++        x86_cpu_expand_prop(cpu, props, prop->name);
++    }
++}
++
+ static void object_apply_props(Object *obj, QDict *props, Error **errp)
  {
-     DeviceClass *dc = DEVICE_CLASS(oc);
-     X86CPUClass *xcc = X86_CPU_CLASS(oc);
--    uint32_t eax = 0, ebx = 0, ecx = 0, edx = 0;
- 
-     xcc->ordering = 9;
- 
--    host_cpuid(0x0, 0, &eax, &ebx, &ecx, &edx);
--    x86_cpu_vendor_words2str(host_cpudef.vendor, ebx, edx, ecx);
--
--    host_cpuid(0x1, 0, &eax, &ebx, &ecx, &edx);
--    host_cpudef.family = ((eax >> 8) & 0x0F) + ((eax >> 20) & 0xFF);
--    host_cpudef.model = ((eax >> 4) & 0x0F) | ((eax & 0xF0000) >> 12);
--    host_cpudef.stepping = eax & 0x0F;
--
--    cpu_x86_fill_model_id(host_cpudef.model_id);
--
--    xcc->cpu_def = &host_cpudef;
-     xcc->model_description =
-         "Enables all features supported by the accelerator in the current host";
- 
--    /* level, xlevel, xlevel2, and the feature words are initialized on
--     * instance_init, because they require KVM to be initialized.
--     */
--
-     dc->props = max_x86_cpu_properties;
- }
- 
-+static void x86_cpu_load_def(X86CPU *cpu, X86CPUDefinition *def, Error **errp);
-+
- static void max_x86_cpu_initfn(Object *obj)
- {
-     X86CPU *cpu = X86_CPU(obj);
-@@ -1584,6 +1564,21 @@ static void max_x86_cpu_initfn(Object *obj)
-     cpu->max_features = true;
- 
-     if (kvm_enabled()) {
-+        X86CPUDefinition host_cpudef = { };
-+        uint32_t eax = 0, ebx = 0, ecx = 0, edx = 0;
-+
-+        host_cpuid(0x0, 0, &eax, &ebx, &ecx, &edx);
-+        x86_cpu_vendor_words2str(host_cpudef.vendor, ebx, edx, ecx);
-+
-+        host_cpuid(0x1, 0, &eax, &ebx, &ecx, &edx);
-+        host_cpudef.family = ((eax >> 8) & 0x0F) + ((eax >> 20) & 0xFF);
-+        host_cpudef.model = ((eax >> 4) & 0x0F) | ((eax & 0xF0000) >> 12);
-+        host_cpudef.stepping = eax & 0x0F;
-+
-+        cpu_x86_fill_model_id(host_cpudef.model_id);
-+
-+        x86_cpu_load_def(cpu, &host_cpudef, &error_abort);
-+
-         env->cpuid_min_level =
-             kvm_arch_get_supported_cpuid(s, 0x0, 0, R_EAX);
-         env->cpuid_min_xlevel =
-@@ -2185,7 +2180,7 @@ static void x86_cpu_list_entry(gpointer data, gpointer user_data)
-     CPUListState *s = user_data;
-     char *name = x86_cpu_class_get_model_name(cc);
-     const char *desc = cc->model_description;
--    if (!desc) {
-+    if (!desc && cc->cpu_def) {
-         desc = cc->cpu_def->model_id;
+     const QDictEntry *prop;
+@@ -2489,11 +2517,13 @@ arch_query_cpu_model_expansion(CpuModelExpansionType type,
+         goto out;
      }
  
-@@ -3683,7 +3678,9 @@ static void x86_cpu_initfn(Object *obj)
-     object_property_add_alias(obj, "sse4_1", obj, "sse4.1", &error_abort);
-     object_property_add_alias(obj, "sse4_2", obj, "sse4.2", &error_abort);
++    props = qdict_new();
  
--    x86_cpu_load_def(cpu, xcc->cpu_def, &error_abort);
-+    if (xcc->cpu_def) {
-+        x86_cpu_load_def(cpu, xcc->cpu_def, &error_abort);
-+    }
- }
- 
- static int64_t x86_cpu_get_arch_id(CPUState *cs)
+     switch (type) {
+     case CPU_MODEL_EXPANSION_TYPE_STATIC:
+         /* Static expansion will be based on "base" only */
+         base_name = "base";
++        x86_cpu_to_dict(xc, props);
+     break;
+     case CPU_MODEL_EXPANSION_TYPE_FULL:
+         /* As we don't return every single property, full expansion needs
+@@ -2501,9 +2531,7 @@ arch_query_cpu_model_expansion(CpuModelExpansionType type,
+          * properties on top of that.
+          */
+         base_name = model->name;
+-        if (model->has_props && model->props) {
+-            props = qdict_clone_shallow(qobject_to_qdict(model->props));
+-        }
++        x86_cpu_to_dict_full(xc, props);
+     break;
+     default:
+         error_setg(&err, "Unsupportted expansion type");
 -- 
 2.11.0.259.g40922b1
