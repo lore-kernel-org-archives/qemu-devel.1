@@ -1,20 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ciFr5-0002gI-Jy
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:36:24 -0500
+	(envelope-from <kai.huang@linux.intel.com>) id 1ciFtM-0004rb-KB
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:38:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ciFr4-0000wN-Np
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:36:23 -0500
-Date: Mon, 27 Feb 2017 02:36:13 -0500
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170227073613.GB25637@localhost.localdomain>
-References: <cover.1488180142.git.jcody@redhat.com>
-	<08786526aec147544588ab3e885a984e7d0d1c69.1488180142.git.jcody@redhat.com>
+	(envelope-from <kai.huang@linux.intel.com>) id 1ciFtI-0001Lz-OO
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:38:44 -0500
+Received: from mga02.intel.com ([134.134.136.20]:18973)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kai.huang@linux.intel.com>)
+	id 1ciFtI-0001Lm-DR
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:38:40 -0500
+References: <589C7E96.9060905@huawei.com> <589D83CE.1090803@huawei.com>
+	<589DDC05.9010807@windriver.com> <58AA51D6.6020508@huawei.com>
+	<1487565495.3740.27.camel@intel.com> <58AD0094.90304@windriver.com>
+	<4dd92012-626a-2d80-9adb-0be398f73eb1@redhat.com>
+	<58AD92AE.6040502@windriver.com>
+	<6c5567f4-192d-aefd-90e4-89f53479c24e@redhat.com>
+	<58AF9921.6060201@huawei.com> <58B04CD3.7010304@windriver.com>
+	<7fdf2551-3d55-1bd9-2848-720a880cc93e@redhat.com>
+	<58B0E191.6040108@huawei.com>
+From: "Huang, Kai" <kai.huang@linux.intel.com>
+Message-ID: <50916996-297e-a794-38e8-5c7ca9389419@linux.intel.com>
+Date: Mon, 27 Feb 2017 20:38:27 +1300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <08786526aec147544588ab3e885a984e7d0d1c69.1488180142.git.jcody@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/4] block/rbd: Add blockdev-add support
+In-Reply-To: <58B0E191.6040108@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] kvm bug in __rmap_clear_dirty during live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,111 +35,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, armbru@redhat.com, berrange@redhat.com, eblake@redhat.com
-
-On Mon, Feb 27, 2017 at 02:30:41AM -0500, Jeff Cody wrote:
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
-> ---
->  qapi/block-core.json | 47 ++++++++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 44 insertions(+), 3 deletions(-)
-> 
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 5f82d35..08a1419 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -2111,6 +2111,7 @@
->  # @replication: Since 2.8
->  # @ssh: Since 2.8
->  # @iscsi: Since 2.9
-> +# @rbd: Since 2.9
->  #
->  # Since: 2.0
->  ##
-> @@ -2120,7 +2121,7 @@
->              'host_device', 'http', 'https', 'iscsi', 'luks', 'nbd', 'nfs',
->              'null-aio', 'null-co', 'parallels', 'qcow', 'qcow2', 'qed',
->              'quorum', 'raw', 'replication', 'ssh', 'vdi', 'vhdx', 'vmdk',
-> -            'vpc', 'vvfat' ] }
-> +            'vpc', 'vvfat', 'rbd' ] }
->  
->  ##
->  # @BlockdevOptionsFile:
-> @@ -2376,7 +2377,6 @@
->              'path': 'str',
->              '*user': 'str' } }
->  
-> -
->  ##
->  # @BlkdebugEvent:
->  #
-> @@ -2666,6 +2666,47 @@
->              '*timeout': 'int' } }
->  
->  ##
-> +# @BlockdevOptionsRbd:
-> +#
-> +# @pool:               Ceph pool name
-> +#
-> +# @image:              Image name in the Ceph pool
-> +#
-> +# @conf:               # optional path to Ceph configuration file.  Values
-> +#                      in the configuration file will be overridden by
-> +#                      options specified via QAPI.
-> +#
-> +# @snapshot:           #optional Ceph snapshot name
-> +#
-> +# @rbd-id:             #optional Ceph id name
-> +#
-> +# @password-secret:    #optional The ID of a QCryptoSecret object providing
-> +#                       the password for the login.
-> +#
-> +# @keyvalue-pairs:     #optional  string containing key/value pairs for
-> +#                      additional Ceph configuration, not including "id" or "conf"
-> +#                      options. This can be used to specify any of the options
-> +#                      that Ceph supports.  The format is of the form:
-> +#                           key1=value1:key2=value2:[...]
-> +#
-> +#                      Special characters such as ":" and "=" can be escaped
-> +#                      with a '\' character, which means the QAPI needs an
-> +#                      extra '\' character to pass the needed escape character.
-> +#                      For example:
-> +#                            "keyvalue-pairs": "mon_host=127.0.0.1\\:6321"
-> +#
-
-This is the key / value pair issue mentioned in the cover letter.  Encoding
-all the options as a string like this is ugly.  What is the preference on
-how to handle these via QAPI, when the actual key and value pairs could be
-anything?   Talking with Markus on IRC, one option he mentioned was an array
-of a generic struct of 'key' and 'value' pairs.
-
-Do the libvirt folks have any interface preferences here?
+To: "Herongguang (Stephen)" <herongguang.he@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Chris Friesen <chris.friesen@windriver.com>, "Han, Huaitong" <huaitong.han@intel.com>, "hangaohuai@huawei.com" <hangaohuai@huawei.com>, stable@vger.kernel.org
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "fangying1@huawei.com" <fangying1@huawei.com>, "xudong.hao@linux.intel.com" <xudong.hao@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "wangxinxin.wang@huawei.com" <wangxinxin.wang@huawei.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "guangrong.xiao@linux.intel.com" <guangrong.xiao@linux.intel.com>, linux-kernel@vger.kernel.org
 
 
-> +# Since: 2.9
-> +##
-> +{ 'struct': 'BlockdevOptionsRbd',
-> +  'data': { 'pool': 'str',
-> +            'image': 'str',
-> +            '*conf': 'str',
-> +            '*snapshot': 'str',
-> +            '*rbd-id': 'str',
-> +            '*password-secret': 'str',
-> +            '*keyvalue-pairs': 'str' } }
-> +
-> +##
->  # @ReplicationMode:
->  #
->  # An enumeration of replication modes.
-> @@ -2863,7 +2904,7 @@
->        'qed':        'BlockdevOptionsGenericCOWFormat',
->        'quorum':     'BlockdevOptionsQuorum',
->        'raw':        'BlockdevOptionsRaw',
-> -# TODO rbd: Wait for structured options
-> +      'rbd':        'BlockdevOptionsRbd',
->        'replication':'BlockdevOptionsReplication',
->  # TODO sheepdog: Wait for structured options
->        'ssh':        'BlockdevOptionsSsh',
-> -- 
-> 2.9.3
-> 
+
+On 2/25/2017 2:44 PM, Herongguang (Stephen) wrote:
+>
+>
+> On 2017/2/24 23:14, Paolo Bonzini wrote:
+>>
+>>
+>> On 24/02/2017 16:10, Chris Friesen wrote:
+>>> On 02/23/2017 08:23 PM, Herongguang (Stephen) wrote:
+>>>
+>>>> On 2017/2/22 22:43, Paolo Bonzini wrote:
+>>>
+>>>>> Hopefully Gaohuai and Rongguang can help with this too.
+>>>>>
+>>>>> Paolo
+>>>>
+>>>> Yes, we are looking into and testing this.
+>>>>
+>>>> I think this can result in any memory corruption, if VM1 writes its
+>>>> PML buffer into VM2’s VMCS (since sched_in/sched_out notifier of VM1
+>>>> is not registered yet), then VM1 is destroyed (hence its PML buffer
+>>>> is freed back to kernel), after that, VM2 starts migration, so CPU
+>>>> logs VM2’s dirty GFNS into a freed memory, results in any memory
+>>>> corruption.
+>>>>
+>>>> As its severity, this commit
+>>>> (http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=4e59516a12a6ef6dcb660cb3a3f70c64bd60cfec)
+>>>>
+>>>>
+>>>> is eligible to back port to kernel stable.
+>>>
+>>> Are we expecting that fix to resolve the original issue, or is it a
+>>> separate issue that needs fixing in stable?
+>>
+>> It should be the original issue.
+>>
+>> Paolo
+>>
+>> .
+>>
+> Yes, I agree, though we are still testing.
+>
+>
+Hi Stephen,
+
+Sorry for late reply. I was taking the whole week off last week. How's 
+the test going?
+
+Thanks,
+-Kai
