@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ciRcL-0007Tw-B3
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:09:58 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ciRcS-0007aM-Uz
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:10:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ciRcJ-0002ro-S1
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:09:57 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ciRcR-0002tE-Ss
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:10:04 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 27 Feb 2017 21:09:01 +0100
-Message-Id: <1488226184-9044-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 00/43] New op blocker system, part 1
+Date: Mon, 27 Feb 2017 21:09:04 +0100
+Message-Id: <1488226184-9044-4-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1488226184-9044-1-git-send-email-kwolf@redhat.com>
+References: <1488226184-9044-1-git-send-email-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 03/43] block: Let callers request
+ permissions when attaching a child node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,147 +23,180 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-This series is the first part of implementing the new op blocker system
-whose design was agreed on quite a while ago, but proved a bit tricky to
-implement in places. There is more work to do to fully replace the old op
-blocker system, but realistically we don't have that much time until the 2.9
-freeze. So let's merge this series to complement the traditional op blockers
-and plan with a second part for the 2.10 timeframe.
+When attaching a node as a child to a new parent, the required and
+shared permissions for this parent are checked against all other parents
+of the node now, and an error is returned if there is a conflict.
 
-The basic idea is that every user of a block node (including things outside the
-block layer that go through a BlockBackend, and also other block nodes that
-hold references to it) has to declare which low-level operations/permissions it
-needs and which operation it allows other users to perform on the same node.
-Depending on these declarations, conflicts are avoided by returning an error
-for attempts to attach a conflicting user to the same node.
+This allows error returns to a function that previously always
+succeeded, and the same is true for quite a few callers and their
+callers. Converting all of them within the same patch would be too much,
+so for now everyone tells that they don't need any permissions and allow
+everyone else to do anything. This way we can use &error_abort initially
+and convert caller by caller to pass actual permission requirements and
+implement error handling.
 
-After this series, all users request permissions, and hopefully all of the
-permissions they need. For writes and resize, getting the permission first is
-actually enforced with assertions. Asserting it for consistent reads is in
-theory doable, but would mean introducing a request flag that tell us that
-inconsistent reads are okay - and that in all block drivers to recursively
-propagate this flag through the backing chain. It might not be worth it.
+All these places are marked with FIXME comments and it will be the job
+of the next patches to clean them up again.
 
-As stated above, the series doesn't remove the old op blockers yet, though in
-theory the new op blockers should block everything that needs to be blocked.
-In practice, the read/write/resize blockers should be okay, but
-BLK_PERM_GRAPH_MOD isn't to be taken too seriously at the moment. It isn't
-really applied consistently and doesn't do much useful yet. Making proper use
-of it is left for the part 2 series.
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+---
+ block.c                   | 66 +++++++++++++++++++++++++++++++++++++++++------
+ block/block-backend.c     |  8 ++++--
+ include/block/block_int.h | 15 ++++++++++-
+ 3 files changed, 78 insertions(+), 11 deletions(-)
 
-Kevin Wolf (43):
-  block: Add op blocker permission constants
-  block: Add Error argument to bdrv_attach_child()
-  block: Let callers request permissions when attaching a child node
-  block: Involve block drivers in permission granting
-  block: Default .bdrv_child_perm() for filter drivers
-  block: Request child permissions in filter drivers
-  block: Default .bdrv_child_perm() for format drivers
-  block: Request child permissions in format drivers
-  vvfat: Implement .bdrv_child_perm()
-  block: Require .bdrv_child_perm() with child nodes
-  block: Request real permissions in bdrv_attach_child()
-  block: Add permissions to BlockBackend
-  block: Add permissions to blk_new()
-  block: Add error parameter to blk_insert_bs()
-  block: Add BDRV_O_RESIZE for blk_new_open()
-  block: Request real permissions in blk_new_open()
-  block: Allow error return in BlockDevOps.change_media_cb()
-  hw/block: Request permissions
-  hw/block: Introduce share-rw qdev property
-  blockjob: Add permissions to block_job_create()
-  block: Add BdrvChildRole.get_parent_desc()
-  block: Include details on permission errors in message
-  block: Add BdrvChildRole.stay_at_node
-  blockjob: Add permissions to block_job_add_bdrv()
-  commit: Use real permissions in commit block job
-  commit: Use real permissions for HMP 'commit'
-  backup: Use real permissions in backup block job
-  block: Fix pending requests check in bdrv_append()
-  block: BdrvChildRole.attach/detach() callbacks
-  block: Allow backing file links in change_parent_backing_link()
-  mirror: Use real permissions in mirror/active commit block job
-  stream: Use real permissions in streaming block job
-  mirror: Add filter-node-name to blockdev-mirror
-  commit: Add filter-node-name to block-commit
-  hmp: Request permissions in qemu-io
-  migration/block: Use real permissions
-  nbd/server: Use real permissions for NBD exports
-  tests: Remove FIXME comments
-  block: Pass BdrvChild to bdrv_aligned_preadv/pwritev and copy-on-read
-  block: Assertions for write permissions
-  block: Assertions for resize permission
-  block: Add Error parameter to bdrv_set_backing_hd()
-  block: Add Error parameter to bdrv_append()
-
- block.c                          | 563 ++++++++++++++++++++++++++++++++++-----
- block/backup.c                   |  22 +-
- block/blkdebug.c                 |   2 +
- block/blkreplay.c                |   1 +
- block/blkverify.c                |   1 +
- block/block-backend.c            | 116 +++++++-
- block/bochs.c                    |   1 +
- block/cloop.c                    |   1 +
- block/commit.c                   | 176 ++++++++++--
- block/crypto.c                   |   1 +
- block/dmg.c                      |   1 +
- block/io.c                       |  41 +--
- block/mirror.c                   | 233 ++++++++++++++--
- block/parallels.c                |   4 +-
- block/qcow.c                     |   4 +-
- block/qcow2.c                    |  19 +-
- block/qed.c                      |   4 +-
- block/quorum.c                   |  11 +-
- block/raw-format.c               |   1 +
- block/replication.c              |   3 +-
- block/sheepdog.c                 |   2 +-
- block/stream.c                   |  45 +++-
- block/vdi.c                      |   4 +-
- block/vhdx.c                     |   4 +-
- block/vmdk.c                     |   7 +-
- block/vpc.c                      |   4 +-
- block/vvfat.c                    |  24 +-
- blockdev.c                       |  74 +++--
- blockjob.c                       |  48 +++-
- hmp.c                            |  33 ++-
- hw/block/block.c                 |  24 +-
- hw/block/fdc.c                   |  28 +-
- hw/block/m25p80.c                |   8 +
- hw/block/nand.c                  |   7 +
- hw/block/nvme.c                  |   8 +-
- hw/block/onenand.c               |   7 +
- hw/block/pflash_cfi01.c          |  18 +-
- hw/block/pflash_cfi02.c          |  19 +-
- hw/block/virtio-blk.c            |   8 +-
- hw/core/qdev-properties-system.c |   9 +-
- hw/ide/core.c                    |   2 +-
- hw/ide/qdev.c                    |   9 +-
- hw/nvram/spapr_nvram.c           |   8 +
- hw/scsi/scsi-disk.c              |  12 +-
- hw/sd/sd.c                       |   8 +-
- hw/usb/dev-storage.c             |   6 +-
- include/block/block.h            |  46 +++-
- include/block/block_int.h        | 126 ++++++++-
- include/block/blockjob.h         |   5 +-
- include/block/blockjob_int.h     |   4 +-
- include/hw/block/block.h         |   8 +-
- include/qemu-io.h                |   1 +
- include/sysemu/block-backend.h   |   9 +-
- migration/block.c                |  21 +-
- nbd/server.c                     |  16 +-
- qapi/block-core.json             |  16 +-
- qemu-img.c                       |  12 +-
- qemu-io-cmds.c                   |  28 ++
- tests/qemu-iotests/051.pc.out    |   6 +-
- tests/qemu-iotests/055           |  11 +-
- tests/qemu-iotests/085.out       |   2 +-
- tests/qemu-iotests/141           |   2 +-
- tests/qemu-iotests/141.out       |   4 +-
- tests/qemu-iotests/172.out       |  53 ++++
- tests/test-blockjob-txn.c        |   6 +-
- tests/test-blockjob.c            |  10 +-
- tests/test-throttle.c            |   7 +-
- 67 files changed, 1745 insertions(+), 279 deletions(-)
-
+diff --git a/block.c b/block.c
+index 65240fa..9628c7a 100644
+--- a/block.c
++++ b/block.c
+@@ -1326,6 +1326,38 @@ static int bdrv_fill_options(QDict **options, const char *filename,
+     return 0;
+ }
+ 
++static int bdrv_check_update_perm(BlockDriverState *bs, uint64_t new_used_perm,
++                                  uint64_t new_shared_perm,
++                                  BdrvChild *ignore_child, Error **errp)
++{
++    BdrvChild *c;
++
++    /* There is no reason why anyone couldn't tolerate write_unchanged */
++    assert(new_shared_perm & BLK_PERM_WRITE_UNCHANGED);
++
++    QLIST_FOREACH(c, &bs->parents, next_parent) {
++        if (c == ignore_child) {
++            continue;
++        }
++
++        if ((new_used_perm & c->shared_perm) != new_used_perm ||
++            (c->perm & new_shared_perm) != c->perm)
++        {
++            const char *user = NULL;
++            if (c->role->get_name) {
++                user = c->role->get_name(c);
++                if (user && !*user) {
++                    user = NULL;
++                }
++            }
++            error_setg(errp, "Conflicts with %s", user ?: "another operation");
++            return -EPERM;
++        }
++    }
++
++    return 0;
++}
++
+ static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs)
+ {
+     BlockDriverState *old_bs = child->bs;
+@@ -1350,14 +1382,25 @@ static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs)
+ BdrvChild *bdrv_root_attach_child(BlockDriverState *child_bs,
+                                   const char *child_name,
+                                   const BdrvChildRole *child_role,
+-                                  void *opaque)
++                                  uint64_t perm, uint64_t shared_perm,
++                                  void *opaque, Error **errp)
+ {
+-    BdrvChild *child = g_new(BdrvChild, 1);
++    BdrvChild *child;
++    int ret;
++
++    ret = bdrv_check_update_perm(child_bs, perm, shared_perm, NULL, errp);
++    if (ret < 0) {
++        return NULL;
++    }
++
++    child = g_new(BdrvChild, 1);
+     *child = (BdrvChild) {
+-        .bs     = NULL,
+-        .name   = g_strdup(child_name),
+-        .role   = child_role,
+-        .opaque = opaque,
++        .bs             = NULL,
++        .name           = g_strdup(child_name),
++        .role           = child_role,
++        .perm           = perm,
++        .shared_perm    = shared_perm,
++        .opaque         = opaque,
+     };
+ 
+     bdrv_replace_child(child, child_bs);
+@@ -1371,8 +1414,15 @@ BdrvChild *bdrv_attach_child(BlockDriverState *parent_bs,
+                              const BdrvChildRole *child_role,
+                              Error **errp)
+ {
+-    BdrvChild *child = bdrv_root_attach_child(child_bs, child_name, child_role,
+-                                              parent_bs);
++    BdrvChild *child;
++
++    /* FIXME Use real permissions */
++    child = bdrv_root_attach_child(child_bs, child_name, child_role,
++                                   0, BLK_PERM_ALL, parent_bs, errp);
++    if (child == NULL) {
++        return NULL;
++    }
++
+     QLIST_INSERT_HEAD(&parent_bs->children, child, next);
+     return child;
+ }
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 492e71e..9bb4528 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -163,7 +163,9 @@ BlockBackend *blk_new_open(const char *filename, const char *reference,
+         return NULL;
+     }
+ 
+-    blk->root = bdrv_root_attach_child(bs, "root", &child_root, blk);
++    /* FIXME Use real permissions */
++    blk->root = bdrv_root_attach_child(bs, "root", &child_root,
++                                       0, BLK_PERM_ALL, blk, &error_abort);
+ 
+     return blk;
+ }
+@@ -498,7 +500,9 @@ void blk_remove_bs(BlockBackend *blk)
+ void blk_insert_bs(BlockBackend *blk, BlockDriverState *bs)
+ {
+     bdrv_ref(bs);
+-    blk->root = bdrv_root_attach_child(bs, "root", &child_root, blk);
++    /* FIXME Use real permissions */
++    blk->root = bdrv_root_attach_child(bs, "root", &child_root,
++                                       0, BLK_PERM_ALL, blk, &error_abort);
+ 
+     notifier_list_notify(&blk->insert_bs_notifiers, blk);
+     if (blk->public.throttle_state) {
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 1670941..ed63bad 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -419,6 +419,18 @@ struct BdrvChild {
+     char *name;
+     const BdrvChildRole *role;
+     void *opaque;
++
++    /**
++     * Granted permissions for operating on this BdrvChild (BLK_PERM_* bitmask)
++     */
++    uint64_t perm;
++
++    /**
++     * Permissions that can still be granted to other users of @bs while this
++     * BdrvChild is still attached to it. (BLK_PERM_* bitmask)
++     */
++    uint64_t shared_perm;
++
+     QLIST_ENTRY(BdrvChild) next;
+     QLIST_ENTRY(BdrvChild) next_parent;
+ };
+@@ -796,7 +808,8 @@ void hmp_drive_add_node(Monitor *mon, const char *optstr);
+ BdrvChild *bdrv_root_attach_child(BlockDriverState *child_bs,
+                                   const char *child_name,
+                                   const BdrvChildRole *child_role,
+-                                  void *opaque);
++                                  uint64_t perm, uint64_t shared_perm,
++                                  void *opaque, Error **errp);
+ void bdrv_root_unref_child(BdrvChild *child);
+ 
+ const char *bdrv_get_parent_name(const BlockDriverState *bs);
 -- 
 1.8.3.1
