@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50584)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ciPaY-000781-17
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:59:59 -0500
+	(envelope-from <armbru@redhat.com>) id 1ciPbO-0007uQ-6w
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:00:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ciPaU-0000Is-WD
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:59:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56780)
+	(envelope-from <armbru@redhat.com>) id 1ciPbL-0000iI-4J
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:00:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:12258)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ciPaU-0000IZ-NV
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:59:54 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ciPbK-0000hv-Vm
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:00:47 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C85B14E4D6
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 17:59:54 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0A566C0092CD
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 18:00:47 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
 References: <20170118135624.17368-1-ehabkost@redhat.com>
-	<20170118135624.17368-2-ehabkost@redhat.com>
-Date: Mon, 27 Feb 2017 18:59:51 +0100
-In-Reply-To: <20170118135624.17368-2-ehabkost@redhat.com> (Eduardo Habkost's
-	message of "Wed, 18 Jan 2017 11:56:23 -0200")
-Message-ID: <87bmtna50o.fsf@dusky.pond.sub.org>
+	<20170118135624.17368-3-ehabkost@redhat.com>
+	<87mveos6aq.fsf@dusky.pond.sub.org>
+	<20170118162409.GA3491@thinpad.lan.raisama.net>
+Date: Mon, 27 Feb 2017 19:00:44 +0100
+In-Reply-To: <20170118162409.GA3491@thinpad.lan.raisama.net> (Eduardo
+	Habkost's message of "Wed, 18 Jan 2017 14:24:09 -0200")
+Message-ID: <877f4ba4z7.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/2] config: qemu_config_parse() return
- number of config groups
+Subject: Re: [Qemu-devel] [PATCH 2/2] vl: Print warning when a default
+ config file is loaded
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,126 +37,22 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
-
-Uh, I totally forgot about this series.  My apologies...
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
 Eduardo Habkost <ehabkost@redhat.com> writes:
 
-> Change qemu_config_parse() to return the number of config groups
-> in success and -EINVAL on error. This will allow callers of
-> qemu_config_parse() to check if something was really loaded from
-> the config file.
+> On Wed, Jan 18, 2017 at 05:04:45PM +0100, Markus Armbruster wrote:
+>> Eduardo Habkost <ehabkost@redhat.com> writes:
+>> 
+>> > In case there were options set in the default config file, print
+>> > a warning so users can update their scripts.
+>> 
+>> Can you explain why you don't warn on an empty qemu.conf?
 >
-> All existing callers of qemu_config_parse() and
-> qemu_read_config_file() only check if the return value was
-> negative, so the change shouldn't affect them.
+> I didnt't want to show the warning to users that won't be
+> affected by the change. I assume that users with empty qemu.conf
+> files won't care when we stop loading it.
 
-Two of them:
+Makes some sense.
 
-* read_config() maps negative value to -EINVAL.  Callers:
-
-  - blkdebug_open() passes it on.  As a .bdrv_file_open() method, it's
-    supposed to return -errno on failure.  Good.
-
-* qemu_read_config_file() maps non-zero value to -EINVAL.  Callers:
-
-  - qemu_read_default_config_file() maps -EINVAL to zero.  WTF?
-
-  - main() passes sterror(EINVAL) to error_report().  Good.
-
-Also: qemu_config_parse() reports errors with error_report().  Let's
-have another look at its callers:
-
-* read_config() has an Error ** parameter.  Bad.  Care to convert the
-  sucker to Error?
-
-* qemu_read_config_file() doesn't report errors.  Callers:
-
-  - qemu_read_default_config_file() doesn't report errors.  Its called
-    by main(), and ...
-
-  - main() reports with error_report().  Good.
-
->
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  util/qemu-config.c | 15 +++++++--------
->  1 file changed, 7 insertions(+), 8 deletions(-)
->
-> diff --git a/util/qemu-config.c b/util/qemu-config.c
-> index 5527100a01..560c201bd3 100644
-> --- a/util/qemu-config.c
-> +++ b/util/qemu-config.c
-> @@ -379,6 +379,7 @@ void qemu_config_write(FILE *fp)
->      }
->  }
->  
-> +/* Returns number of config groups on success, -errno on error */
->  int qemu_config_parse(FILE *fp, QemuOptsList **lists, const char *fname)
->  {
->      char line[1024], group[64], id[64], arg[64], value[1024];
-> @@ -386,7 +387,8 @@ int qemu_config_parse(FILE *fp, QemuOptsList **lists, const char *fname)
->      QemuOptsList *list = NULL;
->      Error *local_err = NULL;
->      QemuOpts *opts = NULL;
-> -    int res = -1, lno = 0;
-> +    int res = -EINVAL, lno = 0;
-> +    int count = 0;
->  
->      loc_push_none(&loc);
->      while (fgets(line, sizeof(line), fp) != NULL) {
-> @@ -407,6 +409,7 @@ int qemu_config_parse(FILE *fp, QemuOptsList **lists, const char *fname)
->                  goto out;
->              }
->              opts = qemu_opts_create(list, id, 1, NULL);
-> +            count++;
->              continue;
->          }
->          if (sscanf(line, "[%63[^]]]", group) == 1) {
-> @@ -417,6 +420,7 @@ int qemu_config_parse(FILE *fp, QemuOptsList **lists, const char *fname)
->                  goto out;
->              }
->              opts = qemu_opts_create(list, NULL, 0, &error_abort);
-> +            count++;
->              continue;
->          }
->          value[0] = '\0';
-> @@ -441,7 +445,7 @@ int qemu_config_parse(FILE *fp, QemuOptsList **lists, const char *fname)
->          error_report("error reading file");
->          goto out;
->      }
-> -    res = 0;
-> +    res = count;
->  out:
->      loc_pop(&loc);
->      return res;
-> @@ -458,12 +462,7 @@ int qemu_read_config_file(const char *filename)
->  
->      ret = qemu_config_parse(f, vm_config_groups, filename);
->      fclose(f);
-> -
-> -    if (ret == 0) {
-> -        return 0;
-> -    } else {
-> -        return -EINVAL;
-> -    }
-> +    return ret;
->  }
->  
->  static void config_parse_qdict_section(QDict *options, QemuOptsList *opts,
-
-I think this mapping to -EINVAL is also superfluous now:
-
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index 6117ce5..fbefa9e 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -252,7 +252,6 @@ static int read_config(BDRVBlkdebugState *s, const char *filename,
-         ret = qemu_config_parse(f, config_groups, filename);
-         if (ret < 0) {
-             error_setg(errp, "Could not parse blkdebug config file");
--            ret = -EINVAL;
-             goto fail;
-         }
-     }
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
