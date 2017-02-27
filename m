@@ -1,22 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ciOpC-0005rH-DX
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:11:03 -0500
+	(envelope-from <jsnow@redhat.com>) id 1ciOrS-00083p-Tl
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:13:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ciOpB-0006Q0-Dk
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:11:02 -0500
-Date: Mon, 27 Feb 2017 17:10:52 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170227171052.GI10201@stefanha-x1.localdomain>
-References: <1484884080-28836-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1484884080-28836-3-git-send-email-zhang.zhanghailiang@huawei.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="uJWb33pM2TcUAXIl"
-Content-Disposition: inline
-In-Reply-To: <1484884080-28836-3-git-send-email-zhang.zhanghailiang@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/6] replication: add shared-disk and
- shared-disk-id options
+	(envelope-from <jsnow@redhat.com>) id 1ciOrR-00079v-TW
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:13:22 -0500
+From: John Snow <jsnow@redhat.com>
+Date: Mon, 27 Feb 2017 12:13:14 -0500
+Message-Id: <20170227171314.9518-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH] block/mirror: fix broken sparseness detection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,56 +17,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, xiecl.fnst@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, xuquan8@huawei.com, Eric Blake <eblake@redhat.com>, Wen Congyang <wency@cn.fujitsu.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, John Snow <jsnow@redhat.com>
 
+int64_t is in all likelihood the actual scalar type we want.
+Yep, really.
 
---uJWb33pM2TcUAXIl
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1219541
 
-On Fri, Jan 20, 2017 at 11:47:56AM +0800, zhanghailiang wrote:
-> @@ -119,12 +136,31 @@ static int replication_open(BlockDriverState *bs, QDict *options,
->                     "The option mode's value should be primary or secondary");
->          goto fail;
->      }
-> +    s->is_shared_disk = qemu_opt_get_bool(opts, REPLICATION_SHARED_DISK,
-> +                                          false);
-> +    if (s->is_shared_disk && (s->mode == REPLICATION_MODE_PRIMARY)) {
-> +        shared_disk_id = qemu_opt_get(opts, REPLICATION_SHARED_DISK_ID);
-> +        if (!shared_disk_id) {
-> +            error_setg(&local_err, "Missing shared disk blk option");
-> +            goto fail;
-> +        }
-> +        s->shared_disk_id = g_strdup(shared_disk_id);
-> +        blk = blk_by_name(s->shared_disk_id);
-> +        if (!blk) {
-> +            error_setg(&local_err, "There is no %s block", s->shared_disk_id);
-> +            goto fail;
-> +        }
-> +        /* We can't access root member of BlockBackend directly */
-> +        tmp_bs = blk_bs(blk);
-> +        s->primary_disk = QLIST_FIRST(&tmp_bs->parents);
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ block/mirror.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Why is this necessary?
-
-We already have the BlockBackend for the primary disk.  I'm not sure why
-the BdrvChild is needed.
-
-Stefan
-
---uJWb33pM2TcUAXIl
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYtF2cAAoJEJykq7OBq3PIgbgH/2Ach1D3USwRWIgWaInOHjUO
-AlTqq60O7dEYZSDguLQG0BJ8S//VsmyZCjy8jxuCRCx24XEuUJWxbd5Z5T1a9KYY
-nuK2ibJZ0WhYwU3RuaApqRPeUDzt3oxPN2MgHs9ZMHVOHiY8H+2vN3zn0VGMyg1v
-DoFqYygD8MOqIRPYUWn+Oz+yNG7120JsfKKaDSolKMdtlP4DySB+IV9Rt8PhJFeG
-aH/9FqYUmqWYheQgzJ5ehavqnOo6jva+lmFmFhN8WfCmPKzGW8Kul/Egx3U6K8ee
-SzjkZ68LHaRZIgSx6mzeoV67NJtOAK84pgP9Q5s+p/g5PGf+uSLPCC7+guFuKFs=
-=OKTl
------END PGP SIGNATURE-----
-
---uJWb33pM2TcUAXIl--
+diff --git a/block/mirror.c b/block/mirror.c
+index ca8547b..7b4cfbd 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -386,7 +386,7 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+                             nb_chunks * sectors_per_chunk);
+     bitmap_set(s->in_flight_bitmap, sector_num / sectors_per_chunk, nb_chunks);
+     while (nb_chunks > 0 && sector_num < end) {
+-        int ret;
++        int64_t ret;
+         int io_sectors, io_sectors_acct;
+         BlockDriverState *file;
+         enum MirrorMethod {
+-- 
+2.9.3
