@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44634)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ciJMW-00066Q-0W
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:21:09 -0500
+	(envelope-from <armbru@redhat.com>) id 1ciJMY-00069S-Ef
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:21:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ciJMT-00011R-Rh
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:21:03 -0500
+	(envelope-from <armbru@redhat.com>) id 1ciJMU-00012n-PE
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:21:06 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 27 Feb 2017 12:20:41 +0100
-Message-Id: <1488194450-28056-16-git-send-email-armbru@redhat.com>
+Date: Mon, 27 Feb 2017 12:20:38 +0100
+Message-Id: <1488194450-28056-13-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488194450-28056-1-git-send-email-armbru@redhat.com>
 References: <1488194450-28056-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 15/24] test-visitor-serialization: Pass
- &error_abort to qobject_from_json()
+Subject: [Qemu-devel] [PATCH 12/24] qobject: Propagate parse errors through
+ qobject_from_json()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,26 +23,337 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com, eblake@redhat.com, "mdroth@linux.vnet.ibm.commdroth"@linux.vnet.ibm.com
 
-qmp_deserialize() calls qobject_from_json() ignoring errors.  It
-passes the result to qobject_input_visitor_new(), which asserts it's
-not null.  Therefore, we can just as well pass &error_abort to
-qobject_from_json().
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/test-visitor-serialization.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block.c                            |  2 +-
+ include/qapi/qmp/qjson.h           |  5 +--
+ monitor.c                          |  2 +-
+ qobject/qjson.c                    |  4 +--
+ tests/check-qjson.c                | 62 +++++++++++++++++++-------------------
+ tests/test-visitor-serialization.c |  2 +-
+ 6 files changed, 39 insertions(+), 38 deletions(-)
 
+diff --git a/block.c b/block.c
+index 3c36af5..aa6790c 100644
+--- a/block.c
++++ b/block.c
+@@ -1163,7 +1163,7 @@ static QDict *parse_json_filename(const char *filename, Error **errp)
+     ret = strstart(filename, "json:", &filename);
+     assert(ret);
+ 
+-    options_obj = qobject_from_json(filename);
++    options_obj = qobject_from_json(filename, NULL);
+     if (!options_obj) {
+         error_setg(errp, "Could not parse the JSON options");
+         return NULL;
+diff --git a/include/qapi/qmp/qjson.h b/include/qapi/qmp/qjson.h
+index 6fe42d0..8568f2d 100644
+--- a/include/qapi/qmp/qjson.h
++++ b/include/qapi/qmp/qjson.h
+@@ -17,8 +17,9 @@
+ #include "qapi/qmp/qobject.h"
+ #include "qapi/qmp/qstring.h"
+ 
+-QObject *qobject_from_json(const char *string);
+-QObject *qobject_from_jsonf(const char *string, ...) GCC_FMT_ATTR(1, 2);
++QObject *qobject_from_json(const char *string, Error **errp);
++QObject *qobject_from_jsonf(const char *string, ...)
++    GCC_FMT_ATTR(1, 2);
+ QObject *qobject_from_jsonv(const char *string, va_list *ap, Error **errp)
+     GCC_FMT_ATTR(1, 0);
+ 
+diff --git a/monitor.c b/monitor.c
+index 97b73ab..858bcda 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -950,7 +950,7 @@ EventInfoList *qmp_query_events(Error **errp)
+ static void qmp_query_qmp_schema(QDict *qdict, QObject **ret_data,
+                                  Error **errp)
+ {
+-    *ret_data = qobject_from_json(qmp_schema_json);
++    *ret_data = qobject_from_json(qmp_schema_json, NULL);
+ }
+ 
+ /*
+diff --git a/qobject/qjson.c b/qobject/qjson.c
+index c98d6a7..b2f3bfe 100644
+--- a/qobject/qjson.c
++++ b/qobject/qjson.c
+@@ -50,9 +50,9 @@ QObject *qobject_from_jsonv(const char *string, va_list *ap, Error **errp)
+     return state.result;
+ }
+ 
+-QObject *qobject_from_json(const char *string)
++QObject *qobject_from_json(const char *string, Error **errp)
+ {
+-    return qobject_from_jsonv(string, NULL, NULL);
++    return qobject_from_jsonv(string, NULL, errp);
+ }
+ 
+ /*
+diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+index e6d6935..aa63758 100644
+--- a/tests/check-qjson.c
++++ b/tests/check-qjson.c
+@@ -53,7 +53,7 @@ static void escaped_string(void)
+         QObject *obj;
+         QString *str;
+ 
+-        obj = qobject_from_json(test_cases[i].encoded);
++        obj = qobject_from_json(test_cases[i].encoded, NULL);
+         str = qobject_to_qstring(obj);
+         g_assert(str);
+         g_assert_cmpstr(qstring_get_str(str), ==, test_cases[i].decoded);
+@@ -85,7 +85,7 @@ static void simple_string(void)
+         QObject *obj;
+         QString *str;
+ 
+-        obj = qobject_from_json(test_cases[i].encoded);
++        obj = qobject_from_json(test_cases[i].encoded, NULL);
+         str = qobject_to_qstring(obj);
+         g_assert(str);
+         g_assert(strcmp(qstring_get_str(str), test_cases[i].decoded) == 0);
+@@ -116,7 +116,7 @@ static void single_quote_string(void)
+         QObject *obj;
+         QString *str;
+ 
+-        obj = qobject_from_json(test_cases[i].encoded);
++        obj = qobject_from_json(test_cases[i].encoded, NULL);
+         str = qobject_to_qstring(obj);
+         g_assert(str);
+         g_assert(strcmp(qstring_get_str(str), test_cases[i].decoded) == 0);
+@@ -809,7 +809,7 @@ static void utf8_string(void)
+         utf8_in = test_cases[i].utf8_in ?: test_cases[i].utf8_out;
+         json_out = test_cases[i].json_out ?: test_cases[i].json_in;
+ 
+-        obj = qobject_from_json(json_in);
++        obj = qobject_from_json(json_in, NULL);
+         if (utf8_out) {
+             str = qobject_to_qstring(obj);
+             g_assert(str);
+@@ -836,7 +836,7 @@ static void utf8_string(void)
+          * FIXME Enable once these bugs have been fixed.
+          */
+         if (0 && json_out != json_in) {
+-            obj = qobject_from_json(json_out);
++            obj = qobject_from_json(json_out, NULL);
+             str = qobject_to_qstring(obj);
+             g_assert(str);
+             g_assert_cmpstr(qstring_get_str(str), ==, utf8_out);
+@@ -886,7 +886,7 @@ static void simple_number(void)
+     for (i = 0; test_cases[i].encoded; i++) {
+         QInt *qint;
+ 
+-        qint = qobject_to_qint(qobject_from_json(test_cases[i].encoded));
++        qint = qobject_to_qint(qobject_from_json(test_cases[i].encoded, NULL));
+         g_assert(qint);
+         g_assert(qint_get_int(qint) == test_cases[i].decoded);
+         if (test_cases[i].skip == 0) {
+@@ -920,7 +920,7 @@ static void float_number(void)
+         QObject *obj;
+         QFloat *qfloat;
+ 
+-        obj = qobject_from_json(test_cases[i].encoded);
++        obj = qobject_from_json(test_cases[i].encoded, NULL);
+         qfloat = qobject_to_qfloat(obj);
+         g_assert(qfloat);
+         g_assert(qfloat_get_double(qfloat) == test_cases[i].decoded);
+@@ -965,7 +965,7 @@ static void keyword_literal(void)
+     QObject *null;
+     QString *str;
+ 
+-    obj = qobject_from_json("true");
++    obj = qobject_from_json("true", NULL);
+     qbool = qobject_to_qbool(obj);
+     g_assert(qbool);
+     g_assert(qbool_get_bool(qbool) == true);
+@@ -976,7 +976,7 @@ static void keyword_literal(void)
+ 
+     QDECREF(qbool);
+ 
+-    obj = qobject_from_json("false");
++    obj = qobject_from_json("false", NULL);
+     qbool = qobject_to_qbool(obj);
+     g_assert(qbool);
+     g_assert(qbool_get_bool(qbool) == false);
+@@ -998,7 +998,7 @@ static void keyword_literal(void)
+     g_assert(qbool_get_bool(qbool) == true);
+     QDECREF(qbool);
+ 
+-    obj = qobject_from_json("null");
++    obj = qobject_from_json("null", NULL);
+     g_assert(obj != NULL);
+     g_assert(qobject_type(obj) == QTYPE_QNULL);
+ 
+@@ -1134,13 +1134,13 @@ static void simple_dict(void)
+         QObject *obj;
+         QString *str;
+ 
+-        obj = qobject_from_json(test_cases[i].encoded);
++        obj = qobject_from_json(test_cases[i].encoded, NULL);
+         g_assert(compare_litqobj_to_qobj(&test_cases[i].decoded, obj) == 1);
+ 
+         str = qobject_to_json(obj);
+         qobject_decref(obj);
+ 
+-        obj = qobject_from_json(qstring_get_str(str));
++        obj = qobject_from_json(qstring_get_str(str), NULL);
+         g_assert(compare_litqobj_to_qobj(&test_cases[i].decoded, obj) == 1);
+         qobject_decref(obj);
+         QDECREF(str);
+@@ -1192,7 +1192,7 @@ static void large_dict(void)
+     QObject *obj;
+ 
+     gen_test_json(gstr, 10, 100);
+-    obj = qobject_from_json(gstr->str);
++    obj = qobject_from_json(gstr->str, NULL);
+     g_assert(obj != NULL);
+ 
+     qobject_decref(obj);
+@@ -1243,13 +1243,13 @@ static void simple_list(void)
+         QObject *obj;
+         QString *str;
+ 
+-        obj = qobject_from_json(test_cases[i].encoded);
++        obj = qobject_from_json(test_cases[i].encoded, NULL);
+         g_assert(compare_litqobj_to_qobj(&test_cases[i].decoded, obj) == 1);
+ 
+         str = qobject_to_json(obj);
+         qobject_decref(obj);
+ 
+-        obj = qobject_from_json(qstring_get_str(str));
++        obj = qobject_from_json(qstring_get_str(str), NULL);
+         g_assert(compare_litqobj_to_qobj(&test_cases[i].decoded, obj) == 1);
+         qobject_decref(obj);
+         QDECREF(str);
+@@ -1305,13 +1305,13 @@ static void simple_whitespace(void)
+         QObject *obj;
+         QString *str;
+ 
+-        obj = qobject_from_json(test_cases[i].encoded);
++        obj = qobject_from_json(test_cases[i].encoded, NULL);
+         g_assert(compare_litqobj_to_qobj(&test_cases[i].decoded, obj) == 1);
+ 
+         str = qobject_to_json(obj);
+         qobject_decref(obj);
+ 
+-        obj = qobject_from_json(qstring_get_str(str));
++        obj = qobject_from_json(qstring_get_str(str), NULL);
+         g_assert(compare_litqobj_to_qobj(&test_cases[i].decoded, obj) == 1);
+ 
+         qobject_decref(obj);
+@@ -1332,7 +1332,7 @@ static void simple_varargs(void)
+                         {}})),
+             {}}));
+ 
+-    embedded_obj = qobject_from_json("[32, 42]");
++    embedded_obj = qobject_from_json("[32, 42]", NULL);
+     g_assert(embedded_obj != NULL);
+ 
+     obj = qobject_from_jsonf("[%d, 2, %p]", 1, embedded_obj);
+@@ -1345,67 +1345,67 @@ static void empty_input(void)
+ {
+     const char *empty = "";
+ 
+-    QObject *obj = qobject_from_json(empty);
++    QObject *obj = qobject_from_json(empty, NULL);
+     g_assert(obj == NULL);
+ }
+ 
+ static void unterminated_string(void)
+ {
+-    QObject *obj = qobject_from_json("\"abc");
++    QObject *obj = qobject_from_json("\"abc", NULL);
+     g_assert(obj == NULL);
+ }
+ 
+ static void unterminated_sq_string(void)
+ {
+-    QObject *obj = qobject_from_json("'abc");
++    QObject *obj = qobject_from_json("'abc", NULL);
+     g_assert(obj == NULL);
+ }
+ 
+ static void unterminated_escape(void)
+ {
+-    QObject *obj = qobject_from_json("\"abc\\\"");
++    QObject *obj = qobject_from_json("\"abc\\\"", NULL);
+     g_assert(obj == NULL);
+ }
+ 
+ static void unterminated_array(void)
+ {
+-    QObject *obj = qobject_from_json("[32");
++    QObject *obj = qobject_from_json("[32", NULL);
+     g_assert(obj == NULL);
+ }
+ 
+ static void unterminated_array_comma(void)
+ {
+-    QObject *obj = qobject_from_json("[32,");
++    QObject *obj = qobject_from_json("[32,", NULL);
+     g_assert(obj == NULL);
+ }
+ 
+ static void invalid_array_comma(void)
+ {
+-    QObject *obj = qobject_from_json("[32,}");
++    QObject *obj = qobject_from_json("[32,}", NULL);
+     g_assert(obj == NULL);
+ }
+ 
+ static void unterminated_dict(void)
+ {
+-    QObject *obj = qobject_from_json("{'abc':32");
++    QObject *obj = qobject_from_json("{'abc':32", NULL);
+     g_assert(obj == NULL);
+ }
+ 
+ static void unterminated_dict_comma(void)
+ {
+-    QObject *obj = qobject_from_json("{'abc':32,");
++    QObject *obj = qobject_from_json("{'abc':32,", NULL);
+     g_assert(obj == NULL);
+ }
+ 
+ static void invalid_dict_comma(void)
+ {
+-    QObject *obj = qobject_from_json("{'abc':32,}");
++    QObject *obj = qobject_from_json("{'abc':32,}", NULL);
+     g_assert(obj == NULL);
+ }
+ 
+ static void unterminated_literal(void)
+ {
+-    QObject *obj = qobject_from_json("nul");
++    QObject *obj = qobject_from_json("nul", NULL);
+     g_assert(obj == NULL);
+ }
+ 
+@@ -1425,11 +1425,11 @@ static void limits_nesting(void)
+     char buf[2 * (max_nesting + 1) + 1];
+     QObject *obj;
+ 
+-    obj = qobject_from_json(make_nest(buf, max_nesting));
++    obj = qobject_from_json(make_nest(buf, max_nesting), NULL);
+     g_assert(obj != NULL);
+     qobject_decref(obj);
+ 
+-    obj = qobject_from_json(make_nest(buf, max_nesting + 1));
++    obj = qobject_from_json(make_nest(buf, max_nesting + 1), NULL);
+     g_assert(obj == NULL);
+ }
+ 
 diff --git a/tests/test-visitor-serialization.c b/tests/test-visitor-serialization.c
-index 37dff41..4d47cee 100644
+index c7e64f0..37dff41 100644
 --- a/tests/test-visitor-serialization.c
 +++ b/tests/test-visitor-serialization.c
 @@ -1037,7 +1037,7 @@ static void qmp_deserialize(void **native_out, void *datap,
      visit_complete(d->qov, &d->obj);
      obj_orig = d->obj;
      output_json = qobject_to_json(obj_orig);
--    obj = qobject_from_json(qstring_get_str(output_json), NULL);
-+    obj = qobject_from_json(qstring_get_str(output_json), &error_abort);
+-    obj = qobject_from_json(qstring_get_str(output_json));
++    obj = qobject_from_json(qstring_get_str(output_json), NULL);
  
      QDECREF(output_json);
      d->qiv = qobject_input_visitor_new(obj);
