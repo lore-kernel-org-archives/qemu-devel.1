@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39746)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ciSMC-00077X-DK
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:57:21 -0500
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1ciSNu-0000D3-4C
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:59:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ciSMB-0008BY-8t
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:57:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46704)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ciSMB-0008BL-0Y
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:57:19 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ED384C0096D9
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 20:57:18 +0000 (UTC)
-Date: Mon, 27 Feb 2017 22:57:17 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170227223512-mutt-send-email-mst@kernel.org>
-References: <1488201146-19580-1-git-send-email-marcel@redhat.com>
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1ciSNt-00004x-16
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:59:06 -0500
+Received: from mail-it0-x231.google.com ([2607:f8b0:4001:c0b::231]:35012)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sergio.g.delreal@gmail.com>)
+	id 1ciSNs-0008WJ-Sh
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:59:04 -0500
+Received: by mail-it0-x231.google.com with SMTP id 203so67405605ith.0
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 12:59:03 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1488201146-19580-1-git-send-email-marcel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V3] hw/pxb-pcie: fix PCI Express hotplug
- support
+From: =?UTF-8?Q?Sergio_Andr=C3=A9s_G=C3=B3mez_del_Real?=
+	<sergio.g.delreal@gmail.com>
+Date: Mon, 27 Feb 2017 15:59:01 -0500
+Message-ID: <CAMzKsXuWgyGhZ90SvC8wzQEYsQJvQafJrUmvJMHuSt=SwF8ZqA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] Interested in GSoC 2017: Add a Hypervisor.framework
+ accelerator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,195 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com
+To: qemu-devel <qemu-devel@nongnu.org>
 
-On Mon, Feb 27, 2017 at 03:12:26PM +0200, Marcel Apfelbaum wrote:
-> Add the missing osc method for pxb-pcie devices as APCI spec recommends,
-> see 6.2.10.3 OSC Implementation Example for PCI Host Bridge Devices, ACPI 5.0:
-> 
->     It is recommended that a machine with multiple host bridge devices
->     should report the same capabilities for all host bridges, and also
->     negotiate control of the features described in the Control Field in
->     the same way for all host bridges.
-> 
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
-> ---
-> 
-> Note to maintainer:
->  Please update ACPI test files.
-> 
-> V2 -> V3:
->       - Modified comment (Igor)
-> 
-> V1 -> V2:
->     Addressed Michael S. Tsirkin's comments:
->       - Added documentation to q35 osc function
->       - Made _osc serialized. I did not add compat property
->         since it seems guest OSs do not care anyway about the OSC
->         being serialized.
->       - Kept the SUPP field even if is not used and also
->         left both SUPP and CTRL out of the _osc because all
->         systems I checked and the ACPI spec keep them that way,
->         maybe is some kind of documentation contract.
-> 
-> Thanks,
-> Marcel
-> 
-> 
->  hw/i386/acpi-build.c | 41 +++++++++++++++++++++++++++++++++++------
->  1 file changed, 35 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 1c928ab..ad3f233 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -1796,7 +1796,7 @@ static void build_piix4_pci_hotplug(Aml *table)
->      aml_append(table, scope);
->  }
->  
-> -static Aml *build_q35_osc_method(void)
-> +static void build_q35_osc_method(Aml *dev)
+Hello, my name is Sergio G=C3=B3mez.
+It seems that QEMU has been accepted into GSoC 2017. I'm interested in
+working with QEMU due to my interest in virtual machines in general.
+Particularly, taking into account that I have experience developing a
+(simple) emulator, and a (very simple) operating system, and done lots
+of C and Assembly Language programming, I find the project proposal
+"Add a Hypervisor.framework accelerator", mentored by Mr. Alexander
+Graf an ideal and stimulating task for me to tackle.
 
-This does more than just build _OSC so please
-give it a better name.
+Besides considering having the technical knowledge to accomplish what
+is proposed, I think that my communication skills would also be very
+valuable not only for this project, but to continue involved with QEMU
+(which is what I'd like).
 
->  {
->      Aml *if_ctx;
->      Aml *if_ctx2;
-> @@ -1805,7 +1805,35 @@ static Aml *build_q35_osc_method(void)
->      Aml *a_cwd1 = aml_name("CDW1");
->      Aml *a_ctrl = aml_name("CTRL");
->  
-> -    method = aml_method("_OSC", 4, AML_NOTSERIALIZED);
-> +    /*
-> +     * Bits defined in the Support Field provide information
-> +     * regarding OS supported features.
-> +     *
-> +     * This field is not actually used and can be removed,
-> +     * however it appears even if unused on most DSDTs.
+I wrote to Mr. Stefan Hajnoczi a while ago showing my interest in QEMU
+and GSoC 2017. I've been studying some of the project's code, for
+example, the C routines that are 'hooked' into the C runtime before
+main() which does some work for initializing the QEMU Object Model
+(QOM), which I've also been studying a little bit.
 
-What does this mean? Our _OSC method uses these,
-that's why we have them. How can you just remove them?
+I feel very comfortable writing and debugging low-level code, with all
+its intricacies. I would like and opportunity to show these skills.
 
-I think you mean we could remove the code writing to it.
-I don't think keeping it around is justified.
-Same applies to CTRL btw. We could use a local variable
-instead.
+I am looking forward to his opportunity and full of motivation to get
+involved with the QEMU project.
 
-
-> +     *
-> +     * See:
-> +     *     Table 6-148 Interpretation of _OSC Support Field,
-> +     *     Passed in via the 2nd dword in Arg3, APCI 5.0
-
-Why 5.0? This is not how we do it. Pls find the earliest spec version
-that has this. 3.0?
-
-> +     */
-> +    aml_append(dev, aml_name_decl("SUPP", aml_int(0)));
-> +
-> +    /*
-> +     * Bits defined in the Control Field are used to submit
-> +     * request by the OS for control/handling of the associated feature
-> +     *
-> +     * See: Table 6-149 Interpretation of _OSC Control Field,
-> +     *      Passed in via Arg3, ACPI 5.0
-> +     *      Table 6-150 Interpretation of _OSC Control Field,
-> +     *      Returned Value, APCI 5.0
-> +     */
-> +    aml_append(dev, aml_name_decl("CTRL", aml_int(0)));
-> +
-> +
-> +   /*
-> +    * 6.2.10 _OSC (Operating System Capabilities), APCI 5.0
-> +    */
-
-Same here.
-
-> +    method = aml_method("_OSC", 4, AML_SERIALIZED);
->      aml_append(method, aml_create_dword_field(aml_arg(3), aml_int(0), "CDW1"));
->  
->      if_ctx = aml_if(aml_equal(
-> @@ -1842,7 +1870,7 @@ static Aml *build_q35_osc_method(void)
->      aml_append(method, else_ctx);
->  
->      aml_append(method, aml_return(aml_arg(3)));
-> -    return method;
-> +    aml_append(dev, method);
-
-If you drop SUPP and CTRL then you can keep it simple, right?
-
->  }
->  
->  static void
-> @@ -1898,9 +1926,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
->          aml_append(dev, aml_name_decl("_CID", aml_eisaid("PNP0A03")));
->          aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
->          aml_append(dev, aml_name_decl("_UID", aml_int(1)));
-> -        aml_append(dev, aml_name_decl("SUPP", aml_int(0)));
-> -        aml_append(dev, aml_name_decl("CTRL", aml_int(0)));
-> -        aml_append(dev, build_q35_osc_method());
-> +        build_q35_osc_method(dev);
->          aml_append(sb_scope, dev);
->          aml_append(dsdt, sb_scope);
->  
-> @@ -1964,6 +1990,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
->              aml_append(dev, aml_name_decl("_UID", aml_int(bus_num)));
->              aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A03")));
->              aml_append(dev, aml_name_decl("_BBN", aml_int(bus_num)));
-> +            if (pci_bus_is_express(bus)) {
-> +                build_q35_osc_method(dev);
-> +            }
->  
->              if (numa_node != NUMA_NODE_UNASSIGNED) {
->                  aml_append(dev, aml_name_decl("_PXM", aml_int(numa_node)));
-> -- 
-> 2.5.5
-
-
-so how about
-
---->
-
-acpi: simplify _OSC
-
-Our _OSC method has a bunch of unused code loading data
-into external CTRL and SUPP fields which are then never
-used. Drop this in favor of a single local variable.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
----
-
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index db04cf5..efbbfcb 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -1804,7 +1804,7 @@ static Aml *build_q35_osc_method(void)
-     Aml *else_ctx;
-     Aml *method;
-     Aml *a_cwd1 = aml_name("CDW1");
--    Aml *a_ctrl = aml_name("CTRL");
-+    Aml *a_ctrl = aml_local(0);
- 
-     method = aml_method("_OSC", 4, AML_NOTSERIALIZED);
-     aml_append(method, aml_create_dword_field(aml_arg(3), aml_int(0), "CDW1"));
-@@ -1814,7 +1814,6 @@ static Aml *build_q35_osc_method(void)
-     aml_append(if_ctx, aml_create_dword_field(aml_arg(3), aml_int(4), "CDW2"));
-     aml_append(if_ctx, aml_create_dword_field(aml_arg(3), aml_int(8), "CDW3"));
- 
--    aml_append(if_ctx, aml_store(aml_name("CDW2"), aml_name("SUPP")));
-     aml_append(if_ctx, aml_store(aml_name("CDW3"), a_ctrl));
- 
-     /*
-@@ -1899,8 +1898,6 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-         aml_append(dev, aml_name_decl("_CID", aml_eisaid("PNP0A03")));
-         aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
-         aml_append(dev, aml_name_decl("_UID", aml_int(1)));
--        aml_append(dev, aml_name_decl("SUPP", aml_int(0)));
--        aml_append(dev, aml_name_decl("CTRL", aml_int(0)));
-         aml_append(dev, build_q35_osc_method());
-         aml_append(sb_scope, dev);
-         aml_append(dsdt, sb_scope);
+Thank you for your attention, and feedback on how to proceed would be great=
+.
