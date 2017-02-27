@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ciLQB-0001bZ-1g
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:32:59 -0500
+	(envelope-from <berrange@redhat.com>) id 1ciLSt-0003ts-Ll
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:35:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ciLQ9-0006px-RG
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:32:59 -0500
-Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:33028)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ciLQ9-0006pV-KQ
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:32:57 -0500
-Received: by mail-wr0-x22a.google.com with SMTP id u48so2522116wrc.0
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 05:32:57 -0800 (PST)
+	(envelope-from <berrange@redhat.com>) id 1ciLSt-0007gf-0E
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:35:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47584)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ciLSs-0007gV-R1
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:35:46 -0500
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Mon, 27 Feb 2017 13:35:28 +0000
+Message-Id: <20170227133531.31874-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170226200142.31169-1-krzk@kernel.org>
-References: <20170226200142.31169-1-krzk@kernel.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 27 Feb 2017 13:32:35 +0000
-Message-ID: <CAFEAcA8FGe3-yeDQDDqK89KDBBNzwVTGzxaEdNzE+yjBg8SbjQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] hw/arm/exynos: Fix Linux kernel
- division by zero for PLLs
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v1 0/3] Merge qio 2017/02/27
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +24,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On 26 February 2017 at 20:01, Krzysztof Kozlowski <krzk@kernel.org> wrote:
-> Without any clock controller, the Linux kernel was hitting division by
-> zero during boot or with clk_summary:
-> [    0.000000] [<c031054c>] (unwind_backtrace) from [<c030ba6c>] (show_stack+0x10/0x14)
-> [    0.000000] [<c030ba6c>] (show_stack) from [<c05b2660>] (dump_stack+0x88/0x9c)
-> [    0.000000] [<c05b2660>] (dump_stack) from [<c05b11a4>] (Ldiv0+0x8/0x10)
-> [    0.000000] [<c05b11a4>] (Ldiv0) from [<c06ad1e0>] (samsung_pll45xx_recalc_rate+0x58/0x74)
-> [    0.000000] [<c06ad1e0>] (samsung_pll45xx_recalc_rate) from [<c0692ec0>] (clk_register+0x39c/0x63c)
-> [    0.000000] [<c0692ec0>] (clk_register) from [<c125d360>] (samsung_clk_register_pll+0x2e0/0x3d4)
-> [    0.000000] [<c125d360>] (samsung_clk_register_pll) from [<c125d7e8>] (exynos4_clk_init+0x1b0/0x5e4)
-> [    0.000000] [<c125d7e8>] (exynos4_clk_init) from [<c12335f4>] (of_clk_init+0x17c/0x210)
-> [    0.000000] [<c12335f4>] (of_clk_init) from [<c1204700>] (time_init+0x24/0x2c)
-> [    0.000000] [<c1204700>] (time_init) from [<c1200b2c>] (start_kernel+0x24c/0x38c)
-> [    0.000000] [<c1200b2c>] (start_kernel) from [<4020807c>] (0x4020807c)
->
-> Provide stub for clock controller returning reset values for PLLs.
->
-> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
->
-> ---
+The following changes since commit d992f2f1368ceb92e6bfd8efece174110f4236=
+ff:
 
+  Merge remote-tracking branch 'remotes/artyom/tags/pull-sun4v-20170226' =
+into staging (2017-02-26 22:40:23 +0000)
 
+are available in the git repository at:
 
-Applied both to target-arm.next, thanks.
+  git://github.com/berrange/qemu tags/pull-qio-2017-02-27-1
 
--- PMM
+for you to fetch changes up to acd22400d1dce27bffc94be7663e1ff1c716abe8:
+
+  tests: fix leaks in test-io-channel-command (2017-02-27 12:42:21 +0000)
+
+----------------------------------------------------------------
+Merge qio 2017/02/27 v1
+
+----------------------------------------------------------------
+
+Anton Nefedov (1):
+  io: ignore case in WebSocket HTTP header
+
+Daniel P. Berrange (1):
+  io: fix decoding when multiple websockets frames arrive at once
+
+Marc-Andr=C3=A9 Lureau (1):
+  tests: fix leaks in test-io-channel-command
+
+ io/channel-websock.c            | 53 ++++++++++++++++++++++-------------=
+------
+ tests/test-io-channel-command.c |  6 ++---
+ 2 files changed, 30 insertions(+), 29 deletions(-)
+
+--=20
+2.9.3
