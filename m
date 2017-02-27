@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ciMxg-00038B-5T
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:11:45 -0500
+	(envelope-from <jcody@redhat.com>) id 1ciNCt-0000R4-Bz
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:27:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ciMxd-0005BV-1A
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:11:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54866)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ciMxc-0005BE-Qw
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:11:36 -0500
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 27 Feb 2017 16:11:30 +0100
-Message-Id: <1488208291-14775-3-git-send-email-kraxel@redhat.com>
-In-Reply-To: <1488208291-14775-1-git-send-email-kraxel@redhat.com>
-References: <1488208291-14775-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 2/3] audio: make audio poll timer deterministic
+	(envelope-from <jcody@redhat.com>) id 1ciNCs-0002Br-Ax
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:27:23 -0500
+Date: Mon, 27 Feb 2017 10:27:15 -0500
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170227152715.GF25637@localhost.localdomain>
+References: <cover.1488180142.git.jcody@redhat.com>
+	<08786526aec147544588ab3e885a984e7d0d1c69.1488180142.git.jcody@redhat.com>
+	<20170227134547.GM18219@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170227134547.GM18219@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 4/4] block/rbd: Add blockdev-add support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,43 +24,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Gerd Hoffmann <kraxel@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, eblake@redhat.com
 
-From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+On Mon, Feb 27, 2017 at 01:45:47PM +0000, Daniel P. Berrange wrote:
+> On Mon, Feb 27, 2017 at 02:30:41AM -0500, Jeff Cody wrote:
+> > Signed-off-by: Jeff Cody <jcody@redhat.com>
+> > ---
+> >  qapi/block-core.json | 47 ++++++++++++++++++++++++++++++++++++++++++++---
+> >  1 file changed, 44 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/qapi/block-core.json b/qapi/block-core.json
+> > index 5f82d35..08a1419 100644
+> > --- a/qapi/block-core.json
+> > +++ b/qapi/block-core.json
+> > @@ -2111,6 +2111,7 @@
+> >  # @replication: Since 2.8
+> >  # @ssh: Since 2.8
+> >  # @iscsi: Since 2.9
+> > +# @rbd: Since 2.9
+> >  #
+> >  # Since: 2.0
+> >  ##
+> > @@ -2120,7 +2121,7 @@
+> >              'host_device', 'http', 'https', 'iscsi', 'luks', 'nbd', 'nfs',
+> >              'null-aio', 'null-co', 'parallels', 'qcow', 'qcow2', 'qed',
+> >              'quorum', 'raw', 'replication', 'ssh', 'vdi', 'vhdx', 'vmdk',
+> > -            'vpc', 'vvfat' ] }
+> > +            'vpc', 'vvfat', 'rbd' ] }
+> >  
+> >  ##
+> >  # @BlockdevOptionsFile:
+> > @@ -2376,7 +2377,6 @@
+> >              'path': 'str',
+> >              '*user': 'str' } }
+> >  
+> > -
+> >  ##
+> >  # @BlkdebugEvent:
+> >  #
+> > @@ -2666,6 +2666,47 @@
+> >              '*timeout': 'int' } }
+> >  
+> >  ##
+> > +# @BlockdevOptionsRbd:
+> > +#
+> > +# @pool:               Ceph pool name
+> > +#
+> > +# @image:              Image name in the Ceph pool
+> > +#
+> > +# @conf:               # optional path to Ceph configuration file.  Values
+> > +#                      in the configuration file will be overridden by
+> > +#                      options specified via QAPI.
+> > +#
+> > +# @snapshot:           #optional Ceph snapshot name
+> > +#
+> > +# @rbd-id:             #optional Ceph id name
+> 
+> BTW, I think I'd suggest 'user' or 'username' for this, since that is the more
+> common terminology we seem to use for other block drivers
+>
 
-This patch changes resetting strategy of the audio polling timer.
-It does not change expiration time if the timer is already set.
-This patch is needed to make this timer deterministic and to use execution
-record/replay for audio devices.
+OK, I will go with 'user' instead of 'rbd-id'.
 
-audio_reset_timer is used in the function audio_vm_change_state_handler.
-Therefore every time VM is stopped or restarted the timer will be reset
-to new timeout. Virtual clock does not proceed while VM is stopped.
-Therefore there is no need in resetting the timeout when VM restarts.
+I think that fits with the usage terminology in rados_create()
+documentation as well:
 
-v2: updated commit message
-v3: now using timer_mod_anticipate function (as suggested by Yurii Zubrytskyi)
+    int rados_create(rados_t * cluster, const char *const id)
 
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Message-id: 20170214071510.6112.76764.stgit@PASHA-ISP
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- audio/audio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+    [...]
 
-diff --git a/audio/audio.c b/audio/audio.c
-index 21f7b0b..c8898d8 100644
---- a/audio/audio.c
-+++ b/audio/audio.c
-@@ -1113,7 +1113,7 @@ static int audio_is_timer_needed (void)
- static void audio_reset_timer (AudioState *s)
- {
-     if (audio_is_timer_needed ()) {
--        timer_mod (s->ts,
-+        timer_mod_anticipate_ns(s->ts,
-             qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + conf.period.ticks);
-     }
-     else {
--- 
-1.8.3.1
+    Parameters
+       * cluster: where to store the handle
+       * id: the user to connect as (i.e. admin, not client.admin)
+
+-Jeff
