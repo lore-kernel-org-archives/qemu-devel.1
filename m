@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ciOkT-0001TA-Fw
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:06:10 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ciOnZ-0004Oc-3v
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:09:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ciOkO-0004Fv-DD
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:06:09 -0500
-Received: from indium.canonical.com ([91.189.90.7]:36428)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ciOkO-0004FZ-6e
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:06:04 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ciOkM-0003sg-7G
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 17:06:02 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id ECD7E2E80D7
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 17:06:01 +0000 (UTC)
+	(envelope-from <peter.maydell@linaro.org>) id 1ciOnT-0005fW-BS
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:09:21 -0500
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:34227)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ciOnT-0005f4-4p
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:09:15 -0500
+Received: by mail-wr0-x22c.google.com with SMTP id l37so12693391wrc.1
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 09:09:15 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 27 Feb 2017 16:58:51 -0000
+In-Reply-To: <1488208291-14775-1-git-send-email-kraxel@redhat.com>
+References: <1488208291-14775-1-git-send-email-kraxel@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1668103 <1668103@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170226205013.23267.77116.malonedeb@chaenomeles.canonical.com>
-Message-Id: <20170227165851.21024.56537.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1668103] Re: Possible off-by-one error in
- priority handling of hw/PL190.c
+Date: Mon, 27 Feb 2017 17:08:53 +0000
+Message-ID: <CAFEAcA_-F8WaJOz6zwj9Rr7T6UA0t91EOGoc9DdCZN=Vs5QO=Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 0/3] audio patch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,63 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-This turns out to be because Marc had a very out-of-date copy of pl190.c wh=
-ich was missing the fix for this bug in commit 14c126baf1c38607c5b. (Furthe=
-r discussion in list thread =
+On 27 February 2017 at 15:11, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>   Hi,
+>
+> Three little audio patches, adding replay support
+> and fixing audio with SDL2.
+>
+> please pull,
+>   Gerd
+>
+> The following changes since commit 3b1d8169844fafee184366b0e0d7080534758b4d:
+>
+>   tests-aio-multithread: use atomic_read properly (2017-02-27 12:54:08 +0000)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/pull-audio-20170227-1
+>
+> for you to fetch changes up to 516452fe6accef3f94b4bcf060b2518038f50c08:
+>
+>   audio/sdlaudio: Allow audio playback with SDL2 (2017-02-27 14:37:59 +0100)
+>
+> ----------------------------------------------------------------
+> audio: replay support, sdl2 fix.
 
-https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg06580.html).
+I'm afraid this fails to build on OSX:
 
+/Users/pm215/src/qemu-for-merges/audio/mixeng.c:277:5: error: implicit
+declaration of function 'error_report' is invalid in C99
+[-Werror,-Wimplicit-function-declaration]
+    error_report(
+    ^
 
-** Changed in: qemu
-       Status: In Progress =3D> Invalid
+Forgotten include of "qapi/error.h" (it's probably being pulled in
+implicitly by some other header on other platforms).
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1668103
-
-Title:
-  Possible off-by-one error in priority handling of hw/PL190.c
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  I have a problem when reading back VECTADDR in my proprietary OS's
-  interrupt handler.
-
-  Example client code:
-
-   1) Write INTENCLEAR to clear all interrupt enable bits
-   2) Set all 16 vector control registers to zero
-   3) Set vector address #2 to value 2
-   4) Set vector control #2 to 0x21 (vector_interrupt_enable(0x20) | vector=
-_interrupt_source(0x1) )
-   5) Enable interrupt 1 by writing 0x2 to INTENABLE
-   6) In interrupt handler: read VECTADDR [should read 0x2 (active IRQs vec=
-tor address as set in step 3), reads 0x0 (active vector address index 3 ins=
-tead of index 2)]
-
-  Problem:
-
-  So, for me, the block commented with /* Read vector address at the
-  start of an ISR...  */ in hw/pl190.c has an off by-one error and does
-  not return the vector address of the pending interrupt, but of the
-  next one in the list of priorities (i.e. vector address 3).
-
-  Solution:
-
-  In pl190_update_vectors(), also set the priority bit for the current
-  priority (1<<i) interrupt (if enabled) in s->prio_mask[i] in addition
-  to those of higher priority enabled interrupts. This will cause the
-  loop in the read handling of VECTADDR to terminate an iteration
-  earlier and will deliver the correct interrupt priority as iteration
-  variable i subsequently used for addressing.
-
-  I'll try to provide a patch for this.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1668103/+subscriptions
+thanks
+-- PMM
