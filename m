@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ciNze-0001cO-QW
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:17:47 -0500
+	(envelope-from <kraxel@redhat.com>) id 1ciO0i-0002R4-3j
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:18:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ciNzb-00023r-Jp
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:17:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50664)
+	(envelope-from <kraxel@redhat.com>) id 1ciO0f-0002lM-6n
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:18:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56606)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ciNzb-00023k-Cq
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:17:43 -0500
-References: <20170224112109.3147-1-alex.bennee@linaro.org>
-	<05abc81a-febc-11e6-601f-8d9ee30922eb@redhat.com>
-	<87varv8wjh.fsf@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5907368e-1945-2109-93c3-a587654e430c@redhat.com>
-Date: Mon, 27 Feb 2017 17:17:40 +0100
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ciO0f-0002l0-0j
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:18:49 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 39D1F7FB62
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 16:18:49 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 27 Feb 2017 17:18:36 +0100
+Message-Id: <1488212323-26882-3-git-send-email-kraxel@redhat.com>
+In-Reply-To: <1488212323-26882-1-git-send-email-kraxel@redhat.com>
+References: <1488212323-26882-1-git-send-email-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87varv8wjh.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/24] MTTCG Base enabling patches with ARM
- enablement
+Subject: [Qemu-devel] [PULL 2/9] console: add dpy_gl_scanout_disable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,59 +32,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
+Helper function (and DisplayChangeListenerOps ptr) to disable scanouts.
+Replaces using dpy_gl_scanout_texture with 0x0 size and no texture
+specified.
 
+Allows cleanups to make the io and gfx emulation code more readable.
 
-On 27/02/2017 16:48, Alex Benn=C3=A9e wrote:
-> Currently the code does:
->=20
->   static bool default_mttcg_enabled(void)
->   {
->       QemuOpts *icount_opts =3D qemu_find_opts_singleton("icount");
->       const char *rr =3D qemu_opt_get(icount_opts, "rr");
->=20
->       if (rr || TCG_OVERSIZED_GUEST) {
->           return false;
->=20
-> I suspect I should just fail if any icount options are set.
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-id: 1487669841-13668-3-git-send-email-kraxel@redhat.com
+---
+ include/ui/console.h |  2 ++
+ ui/console.c         | 11 +++++++++++
+ 2 files changed, 13 insertions(+)
 
-Yes.
-
-> However
-> qemu_find_opts_singleton always returns the structure. How do I test
-> for any icount options?
-
-use_icount !=3D 0 if configure_icount has been called already.
-
->> 2) "-icount auto -accel tcg,thread=3Dsingle" hangs fairly early, print=
-ing
->> this on the serial console.  It's okay if it hangs at
->>
->> [Bds]=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3DEnd Load Options Dumping=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->> [Bds]BdsWait ...Zzzzzzzzzzzz...
->> [Bds]BdsWait(3)..Zzzz...
->>
->> (pressing Enter a few times then seems to unhang it), but it now hangs
->> much earlier than that.
->=20
-> Hmm I can see a hang on linux booting like that. It looks like a vCPU
-> get stuck in waitio and never schedules the others.
-
-I don't know if it's the same. For OVMF it fails in many different ways
-and it complains about unexpected expensions too.
-
->> Also, x86 "-accel tcg,thread=3Dmulti" prints the scary message on memo=
-ry
->> ordering.
->
-> That is expected until x86 is properly tested and we submit the default
-> enabling patch for x86 on x86. To be honest we could submit the MO patc=
-h
-> now to make that warning go away.
-
-Yeah, this is just the message being unnecessarily specific.
-
-Paolo
+diff --git a/include/ui/console.h b/include/ui/console.h
+index e6ae637..ac2895c 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -215,6 +215,7 @@ typedef struct DisplayChangeListenerOps {
+                                    QEMUGLContext ctx);
+     QEMUGLContext (*dpy_gl_ctx_get_current)(DisplayChangeListener *dcl);
+=20
++    void (*dpy_gl_scanout_disable)(DisplayChangeListener *dcl);
+     void (*dpy_gl_scanout_texture)(DisplayChangeListener *dcl,
+                                    uint32_t backing_id,
+                                    bool backing_y_0_top,
+@@ -287,6 +288,7 @@ bool dpy_cursor_define_supported(QemuConsole *con);
+ bool dpy_gfx_check_format(QemuConsole *con,
+                           pixman_format_code_t format);
+=20
++void dpy_gl_scanout_disable(QemuConsole *con);
+ void dpy_gl_scanout_texture(QemuConsole *con,
+                             uint32_t backing_id, bool backing_y_0_top,
+                             uint32_t backing_width, uint32_t backing_hei=
+ght,
+diff --git a/ui/console.c b/ui/console.c
+index 22c3c7d..d1ff750 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -1735,6 +1735,17 @@ QEMUGLContext dpy_gl_ctx_get_current(QemuConsole *=
+con)
+     return con->gl->ops->dpy_gl_ctx_get_current(con->gl);
+ }
+=20
++void dpy_gl_scanout_disable(QemuConsole *con)
++{
++    assert(con->gl);
++    if (con->gl->ops->dpy_gl_scanout_disable) {
++        con->gl->ops->dpy_gl_scanout_disable(con->gl);
++    } else {
++        con->gl->ops->dpy_gl_scanout_texture(con->gl, 0, false, 0, 0,
++                                             0, 0, 0, 0);
++    }
++}
++
+ void dpy_gl_scanout_texture(QemuConsole *con,
+                             uint32_t backing_id,
+                             bool backing_y_0_top,
+--=20
+1.8.3.1
