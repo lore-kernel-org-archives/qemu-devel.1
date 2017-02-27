@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ciS5L-0000SL-8K
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:39:56 -0500
+	(envelope-from <mst@redhat.com>) id 1ciSMC-00077X-DK
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:57:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1ciS5H-00037b-Ac
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:39:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60750)
+	(envelope-from <mst@redhat.com>) id 1ciSMB-0008BY-8t
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:57:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46704)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1ciS5H-00037X-1t
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:39:51 -0500
-References: <9533ba99-b143-b577-0115-742119d089a4@kamp.de>
-	<9292fef8-929a-e89e-eca5-cd247ca9334b@redhat.com>
-	<f0eb7ff1-47d7-42d0-c7b5-946d2224e986@kamp.de>
-	<c207e00d-25a6-45bb-a849-235d0cd2be0d@redhat.com>
-	<2b0840d7-7540-d732-36ac-af7a512d2c8f@kamp.de>
-	<b59eb68b-5dac-b18b-c2f7-1ea820f4d747@redhat.com>
-	<589533ff-2e7d-0ffb-e0b9-5b2e055813b6@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <e3e6c37b-26b9-e02f-fd67-9fe5cf1b1d6c@redhat.com>
-Date: Mon, 27 Feb 2017 15:39:50 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ciSMB-0008BL-0Y
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:57:19 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id ED384C0096D9
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 20:57:18 +0000 (UTC)
+Date: Mon, 27 Feb 2017 22:57:17 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170227223512-mutt-send-email-mst@kernel.org>
+References: <1488201146-19580-1-git-send-email-marcel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <589533ff-2e7d-0ffb-e0b9-5b2e055813b6@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Qemu and Changed Block Tracking
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1488201146-19580-1-git-send-email-marcel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V3] hw/pxb-pcie: fix PCI Express hotplug
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,69 +33,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Peter Lieven <pl@kamp.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Christian Theune <ct@flyingcircus.io>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: qemu-devel@nongnu.org, imammedo@redhat.com
 
-
-
-On 02/24/2017 04:44 PM, Eric Blake wrote:
-> On 02/24/2017 03:31 PM, John Snow wrote:
->>>
->>> But the Backup Server could instead connect to the NAS directly avoiding
->>> load on the frontent LAN
->>> and the Qemu Node.
->>>
->>
->> In a live backup I don't see how you will be removing QEMU from the data
->> transfer loop. QEMU is the only process that knows what the correct view
->> of the image is, and needs to facilitate.
->>
->> It's not safe to copy the blocks directly without QEMU's mediation.
+On Mon, Feb 27, 2017 at 03:12:26PM +0200, Marcel Apfelbaum wrote:
+> Add the missing osc method for pxb-pcie devices as APCI spec recommends,
+> see 6.2.10.3 OSC Implementation Example for PCI Host Bridge Devices, ACPI 5.0:
 > 
-> Although we may already have enough tools in place to help achieve that:
-> create a temporary qcow2 wrapper around the primary image via external
-> snapshot, so that the primary image is now read-only in qemu; then use
-> whatever block-status mechanism (whether the NBD block status extension,
-> or directly reading from a persistent bitmap) to facilitate whatever
-> more efficient offline transfer of just the relevant portions of that
-> main file, then live block-commit to get qemu to start writing to the
-> file again.
+>     It is recommended that a machine with multiple host bridge devices
+>     should report the same capabilities for all host bridges, and also
+>     negotiate control of the features described in the Control Field in
+>     the same way for all host bridges.
 > 
-
-Right, really good point. We can just turn the "live" backup into a
-not-live one (kind of!) to work around the constraint.
-
-In this case, creating the external snapshot should probably create a
-"new" bitmap on the root, leaving the old one behind on the backing
-file. This avoids spurious copies of data that hasn't changed in the
-backing file, and makes clearing the bitmap on success easier for us.
-Once the snapshots are re-merged, we can merge their respective bitmaps
-again.
-
-This can work in some scenarios, sure! We may have to be careful about
-how exactly bitmaps fork when you create new external snapshots, but
-that does seem workable and (possibly) the most performant, if that's a
-concern.
-
---js
-
-> In other words, any time your algorithm wants to cause an I/O freeze to
-> a particular file, the solution is to add a qcow2 external snapshot
-> followed by a live commit.
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+> ---
 > 
-> So tweaking the proposal a few mails ago:
+> Note to maintainer:
+>  Please update ACPI test files.
 > 
-> fsfreeze (optional)
-> create qcow2 snapshot wrapper as a write lock (via QMP)
-> fsthaw - now with no risk of violating guest timing constraints
-> dirtymap = find all blocks that are dirty since last backup (via named
-> bitmap/NBD block status)
-> foreach block in dirtymap {
->                copy to backup via external software
-> }
-> live commit image (via QMP)
+> V2 -> V3:
+>       - Modified comment (Igor)
 > 
-> The window where guest I/O is frozen is small (the freeze/snapshot
-> create/thaw steps can be done in less than a second), while the window
-> where you are extracting incremental backup data is longer (during that
-> time, guest I/O is happening into a wrapper qcow2 file).
+> V1 -> V2:
+>     Addressed Michael S. Tsirkin's comments:
+>       - Added documentation to q35 osc function
+>       - Made _osc serialized. I did not add compat property
+>         since it seems guest OSs do not care anyway about the OSC
+>         being serialized.
+>       - Kept the SUPP field even if is not used and also
+>         left both SUPP and CTRL out of the _osc because all
+>         systems I checked and the ACPI spec keep them that way,
+>         maybe is some kind of documentation contract.
 > 
+> Thanks,
+> Marcel
+> 
+> 
+>  hw/i386/acpi-build.c | 41 +++++++++++++++++++++++++++++++++++------
+>  1 file changed, 35 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 1c928ab..ad3f233 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -1796,7 +1796,7 @@ static void build_piix4_pci_hotplug(Aml *table)
+>      aml_append(table, scope);
+>  }
+>  
+> -static Aml *build_q35_osc_method(void)
+> +static void build_q35_osc_method(Aml *dev)
+
+This does more than just build _OSC so please
+give it a better name.
+
+>  {
+>      Aml *if_ctx;
+>      Aml *if_ctx2;
+> @@ -1805,7 +1805,35 @@ static Aml *build_q35_osc_method(void)
+>      Aml *a_cwd1 = aml_name("CDW1");
+>      Aml *a_ctrl = aml_name("CTRL");
+>  
+> -    method = aml_method("_OSC", 4, AML_NOTSERIALIZED);
+> +    /*
+> +     * Bits defined in the Support Field provide information
+> +     * regarding OS supported features.
+> +     *
+> +     * This field is not actually used and can be removed,
+> +     * however it appears even if unused on most DSDTs.
+
+What does this mean? Our _OSC method uses these,
+that's why we have them. How can you just remove them?
+
+I think you mean we could remove the code writing to it.
+I don't think keeping it around is justified.
+Same applies to CTRL btw. We could use a local variable
+instead.
+
+
+> +     *
+> +     * See:
+> +     *     Table 6-148 Interpretation of _OSC Support Field,
+> +     *     Passed in via the 2nd dword in Arg3, APCI 5.0
+
+Why 5.0? This is not how we do it. Pls find the earliest spec version
+that has this. 3.0?
+
+> +     */
+> +    aml_append(dev, aml_name_decl("SUPP", aml_int(0)));
+> +
+> +    /*
+> +     * Bits defined in the Control Field are used to submit
+> +     * request by the OS for control/handling of the associated feature
+> +     *
+> +     * See: Table 6-149 Interpretation of _OSC Control Field,
+> +     *      Passed in via Arg3, ACPI 5.0
+> +     *      Table 6-150 Interpretation of _OSC Control Field,
+> +     *      Returned Value, APCI 5.0
+> +     */
+> +    aml_append(dev, aml_name_decl("CTRL", aml_int(0)));
+> +
+> +
+> +   /*
+> +    * 6.2.10 _OSC (Operating System Capabilities), APCI 5.0
+> +    */
+
+Same here.
+
+> +    method = aml_method("_OSC", 4, AML_SERIALIZED);
+>      aml_append(method, aml_create_dword_field(aml_arg(3), aml_int(0), "CDW1"));
+>  
+>      if_ctx = aml_if(aml_equal(
+> @@ -1842,7 +1870,7 @@ static Aml *build_q35_osc_method(void)
+>      aml_append(method, else_ctx);
+>  
+>      aml_append(method, aml_return(aml_arg(3)));
+> -    return method;
+> +    aml_append(dev, method);
+
+If you drop SUPP and CTRL then you can keep it simple, right?
+
+>  }
+>  
+>  static void
+> @@ -1898,9 +1926,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>          aml_append(dev, aml_name_decl("_CID", aml_eisaid("PNP0A03")));
+>          aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
+>          aml_append(dev, aml_name_decl("_UID", aml_int(1)));
+> -        aml_append(dev, aml_name_decl("SUPP", aml_int(0)));
+> -        aml_append(dev, aml_name_decl("CTRL", aml_int(0)));
+> -        aml_append(dev, build_q35_osc_method());
+> +        build_q35_osc_method(dev);
+>          aml_append(sb_scope, dev);
+>          aml_append(dsdt, sb_scope);
+>  
+> @@ -1964,6 +1990,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>              aml_append(dev, aml_name_decl("_UID", aml_int(bus_num)));
+>              aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A03")));
+>              aml_append(dev, aml_name_decl("_BBN", aml_int(bus_num)));
+> +            if (pci_bus_is_express(bus)) {
+> +                build_q35_osc_method(dev);
+> +            }
+>  
+>              if (numa_node != NUMA_NODE_UNASSIGNED) {
+>                  aml_append(dev, aml_name_decl("_PXM", aml_int(numa_node)));
+> -- 
+> 2.5.5
+
+
+so how about
+
+--->
+
+acpi: simplify _OSC
+
+Our _OSC method has a bunch of unused code loading data
+into external CTRL and SUPP fields which are then never
+used. Drop this in favor of a single local variable.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+---
+
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index db04cf5..efbbfcb 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -1804,7 +1804,7 @@ static Aml *build_q35_osc_method(void)
+     Aml *else_ctx;
+     Aml *method;
+     Aml *a_cwd1 = aml_name("CDW1");
+-    Aml *a_ctrl = aml_name("CTRL");
++    Aml *a_ctrl = aml_local(0);
+ 
+     method = aml_method("_OSC", 4, AML_NOTSERIALIZED);
+     aml_append(method, aml_create_dword_field(aml_arg(3), aml_int(0), "CDW1"));
+@@ -1814,7 +1814,6 @@ static Aml *build_q35_osc_method(void)
+     aml_append(if_ctx, aml_create_dword_field(aml_arg(3), aml_int(4), "CDW2"));
+     aml_append(if_ctx, aml_create_dword_field(aml_arg(3), aml_int(8), "CDW3"));
+ 
+-    aml_append(if_ctx, aml_store(aml_name("CDW2"), aml_name("SUPP")));
+     aml_append(if_ctx, aml_store(aml_name("CDW3"), a_ctrl));
+ 
+     /*
+@@ -1899,8 +1898,6 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+         aml_append(dev, aml_name_decl("_CID", aml_eisaid("PNP0A03")));
+         aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
+         aml_append(dev, aml_name_decl("_UID", aml_int(1)));
+-        aml_append(dev, aml_name_decl("SUPP", aml_int(0)));
+-        aml_append(dev, aml_name_decl("CTRL", aml_int(0)));
+         aml_append(dev, build_q35_osc_method());
+         aml_append(sb_scope, dev);
+         aml_append(dsdt, sb_scope);
