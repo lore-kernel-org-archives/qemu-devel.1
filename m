@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1ciFLX-0005gt-1Q
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:03:50 -0500
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1ciFOR-0006iJ-Hb
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:06:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1ciFLT-0008Fb-UE
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:03:47 -0500
-Received: from [59.151.112.132] (port=44059 helo=heian.cn.fujitsu.com)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1ciFOO-0000fy-9c
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:06:47 -0500
+Received: from [59.151.112.132] (port=52357 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1ciFLT-0008FQ-13
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:03:43 -0500
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1ciFON-0000fm-Ce
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:06:44 -0500
 References: <1487993530-30875-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 	<1487993530-30875-4-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<58B12B02.2000202@huawei.com>
+	<58B131BB.5010102@huawei.com>
 From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <31f0e89c-13c0-247a-1026-9fc28ee2d6f4@cn.fujitsu.com>
-Date: Mon, 27 Feb 2017 15:03:11 +0800
+Message-ID: <ba6405af-f29d-c4ce-9893-c4ddc9b66d6f@cn.fujitsu.com>
+Date: Mon, 27 Feb 2017 15:06:13 +0800
 MIME-Version: 1.0
-In-Reply-To: <58B12B02.2000202@huawei.com>
+In-Reply-To: <58B131BB.5010102@huawei.com>
 Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH 2/3] COLO-compare: Optimize
@@ -34,7 +34,7 @@ Cc: zhangchen.fnst@cn.fujitsu.com, xuquan8@huawei.com
 
 
 
-On 02/25/2017 02:58 PM, Hailiang Zhang wrote:
+On 02/25/2017 03:26 PM, Hailiang Zhang wrote:
 > On 2017/2/25 11:32, Zhang Chen wrote:
 >> Add offset args for colo_packet_compare_common, optimize
 >> colo_packet_compare_icmp() and colo_packet_compare_udp()
@@ -65,6 +65,17 @@ On 02/25/2017 02:58 PM, Hailiang Zhang wrote:
 >> inet_ntoa(spkt->ip->ip_dst));
 >>
 >>       if (ppkt->size == spkt->size) {
+>
+> This check is useless, because we have done such checks in every caller.
+
+Oh, I forgot it, not in good condition.
+I will remove it in next version.
+
+Thanks
+Zhang Chen
+
+
+>
 >> -        return memcmp(ppkt->data, spkt->data, spkt->size);
 >> +        return memcmp(ppkt->data + offset, spkt->data + offset,
 >> +                      spkt->size - offset);
@@ -80,32 +91,6 @@ On 02/25/2017 02:58 PM, Hailiang Zhang wrote:
 >> -                (spkt->size - ETH_HLEN));
 >> +    res = colo_packet_compare_common(ppkt, spkt, ETH_HLEN);
 >>
->
-> For tcp packets check, why not ignore the ip headers, just like udp 
-> packets check ?
-> Besides, here, can we compare the checksum stored in headers of tcp 
-> and udp
-> before call colo_packet_compare_common(), which i think will improve 
-> the comparing
-> performance.
-
-That's another way to compare the packet suggested by Dr. David Alan 
-Gilbert,
-It makes two packets IP header be same firstly, then compare all IP packet.
-This way can tell people why we ignore IP header explicitly in other 
-packets check like udp.
-For performance, If we ignore the IP header that will reduce at least 20 
-byte not to be compared.
-So, ignore ip header have better comparing performance.
-
-Thanks
-Zhang Chen
-
-
->
-> Thanks.
-> Hailiang
->
 >>       if (res != 0 && 
 >> trace_event_get_state(TRACE_COLO_COMPARE_MISCOMPARE)) {
 >> trace_colo_compare_pkt_info_src(inet_ntoa(ppkt->ip->ip_src),
