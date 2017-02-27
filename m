@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ciIQV-0006AY-NI
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:21:08 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ciIUR-0000Wt-Oc
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:25:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ciIQQ-0007xs-LQ
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:21:07 -0500
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:33321)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ciIQQ-0007wg-EV
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:21:02 -0500
-Received: by mail-wr0-x242.google.com with SMTP id g10so9512877wrg.0
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 02:21:02 -0800 (PST)
-Date: Mon, 27 Feb 2017 10:20:58 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170227102058.GC28403@stefanha-x1.localdomain>
-References: <148760155821.31154.13876757160410915057.stgit@bahia.lan>
-	<148760159100.31154.15503472827834963062.stgit@bahia.lan>
-	<20170223111644.GD30636@stefanha-x1.localdomain>
-	<20170223125621.1d03281c@bahia.lan>
-	<20170224171730.GE27402@stefanha-x1.localdomain>
-	<20170224231744.0f629a65@bahia.lan>
+	(envelope-from <pbonzini@redhat.com>) id 1ciIUN-0000qC-MC
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:25:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54828)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ciIUN-0000nI-E9
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:25:07 -0500
+References: <20170227101811.22722-1-marcandre.lureau@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e2c103ee-39df-ad55-d74e-25235b132f21@redhat.com>
+Date: Mon, 27 Feb 2017 11:25:03 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="O3RTKUHj+75w1tg5"
-Content-Disposition: inline
-In-Reply-To: <20170224231744.0f629a65@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 04/29] 9pfs: introduce openat_nofollow()
- helper
+In-Reply-To: <20170227101811.22722-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] vhost-user: delay vhost_user_stop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,53 +26,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Prasad J Pandit <prasad@redhat.com>, qemu-devel@nongnu.org, Jann Horn <jannh@google.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, den@openvz.org, dgilbert@redhat.com
 
 
---O3RTKUHj+75w1tg5
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 24, 2017 at 11:17:44PM +0100, Greg Kurz wrote:
-> On Fri, 24 Feb 2017 17:17:30 +0000
-> Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> [...]
-> > > > This function doesn't handle absolute paths?  It ignores leading '/=
-' and
-> > > > therefore treats all paths as relative paths.
-> > > >  =20
-> > >=20
-> > > Yes because any path coming from the client is supposed (*) to be rel=
-ative to the
-> > > shared directory and openat(2) says: =20
-> >=20
-> > Please change the function name since this isn't openat with nofollow
-> > behavior, it's a subset of openat that only takes relative paths with
-> > nofollow behavior.
+On 27/02/2017 11:18, Marc-Andr=C3=A9 Lureau wrote:
+> Since commit b0a335e351103bf92f3f9d0bd5759311be8156ac, a socket write
+> may trigger a disconnect events, calling vhost_user_stop() and clearing
+> all the vhost_dev strutures holding data that vhost.c functions expect
+> to remain valid. Delay the cleanup to keep the vhost_dev structure
+> valid during the vhost.c functions.
 >=20
-> In the v2, this function is only called by local_open_nofollow() actually.
-> Maybe I should move the stripping of leading '/' characters there ?
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  net/vhost-user.c | 56 ++++++++++++++++++++++++++++++++++++++++++++++++=
+++------
+>  1 file changed, 50 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/net/vhost-user.c b/net/vhost-user.c
+> index 77b8110f8c..028bf0cf5d 100644
+> --- a/net/vhost-user.c
+> +++ b/net/vhost-user.c
+> @@ -25,6 +25,7 @@ typedef struct VhostUserState {
+>      guint watch;
+>      uint64_t acked_features;
+>      bool started;
+> +    QEMUBH *chr_closed_bh;
+>  } VhostUserState;
+> =20
+>  VHostNetState *vhost_user_get_vhost_net(NetClientState *nc)
+> @@ -190,9 +191,45 @@ static gboolean net_vhost_user_watch(GIOChannel *c=
+han, GIOCondition cond,
+> =20
+>      qemu_chr_fe_disconnect(&s->chr);
+> =20
+> +    s->watch =3D 0;
+>      return FALSE;
+>  }
+> =20
+> +static void net_vhost_user_event(void *opaque, int event);
+> +
+> +static void chr_closed_bh(void *opaque)
+> +{
+> +    const char *name =3D opaque;
+> +    NetClientState *ncs[MAX_QUEUE_NUM];
+> +    VhostUserState *s;
+> +    Error *err =3D NULL;
+> +    int queues;
+> +
+> +    queues =3D qemu_find_net_clients_except(name, ncs,
+> +                                          NET_CLIENT_DRIVER_NIC,
+> +                                          MAX_QUEUE_NUM);
+> +    assert(queues < MAX_QUEUE_NUM);
+> +
+> +    s =3D DO_UPCAST(VhostUserState, nc, ncs[0]);
+> +
+> +    qmp_set_link(name, false, &err);
+> +    vhost_user_stop(queues, ncs);
+> +    if (s->watch) {
+> +        g_source_remove(s->watch);
+> +    }
+> +    s->watch =3D 0;
+> +
+> +    qemu_bh_delete(s->chr_closed_bh);
+> +    s->chr_closed_bh =3D NULL;
+> +
+> +    qemu_chr_fe_set_handlers(&s->chr, NULL, NULL, net_vhost_user_event=
+,
+> +                             opaque, NULL, true);
+> +
+> +    if (err) {
+> +        error_report_err(err);
+> +    }
+> +}
+> +
+>  static void net_vhost_user_event(void *opaque, int event)
+>  {
+>      const char *name =3D opaque;
+> @@ -212,20 +249,27 @@ static void net_vhost_user_event(void *opaque, in=
+t event)
+>      trace_vhost_user_event(chr->label, event);
+>      switch (event) {
+>      case CHR_EVENT_OPENED:
+> -        s->watch =3D qemu_chr_fe_add_watch(&s->chr, G_IO_HUP,
+> -                                         net_vhost_user_watch, s);
+>          if (vhost_user_start(queues, ncs, &s->chr) < 0) {
+>              qemu_chr_fe_disconnect(&s->chr);
+>              return;
+>          }
+> +        s->watch =3D qemu_chr_fe_add_watch(&s->chr, G_IO_HUP,
+> +                                         net_vhost_user_watch, s);
+>          qmp_set_link(name, true, &err);
+> +        s->chr_closed_bh =3D qemu_bh_new(chr_closed_bh, opaque);
+>          s->started =3D true;
+>          break;
+>      case CHR_EVENT_CLOSED:
+> -        qmp_set_link(name, false, &err);
+> -        vhost_user_stop(queues, ncs);
+> -        g_source_remove(s->watch);
+> -        s->watch =3D 0;
+> +        /* a close event may happen during a read/write, but vhost
+> +         * code assumes the vhost_dev remains setup, so delay the
+> +         * stop & clear to idle.
+> +         * FIXME: better handle failure in vhost code, remove bh
+> +         */
+> +        if (s->chr_closed_bh) {
+> +            qemu_chr_fe_set_handlers(&s->chr, NULL, NULL, NULL,
+> +                                     NULL, NULL, false);
+> +            qemu_bh_schedule(s->chr_closed_bh);
+> +        }
 
-As long as the function name is clear then I'm happy.  If it has
-different semantics from openat() then it should have a different name
-(e.g. relative_openat_nofollow()).
+The bottom half adds a small overhead to the event loop all the time,
+even if it is not scheduled.  Would it be possible to create it here
+instead?  You can have a s->state enum (OPENED, CLOSING, CLOSED for
+example).  You can even use aio_bh_schedule_oneshot to avoid having to
+store the QEMUBH pointer.
 
-Stefan
+Paolo
 
---O3RTKUHj+75w1tg5
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYs/2KAAoJEJykq7OBq3PINQkIAIDeJMPYyDrsHVirSWecySqe
-vkz5X/DG0kgDQrbSHFSknyU8o/4B9EVn18NNBYHz9PVYp95UQ/UYe9FlylbIHSnT
-ay1pkRo6giq07afS8ksOGvogTZUP9T82dx2VvN3iPl2oP2gcv/o07sEemm2C6uk8
-eKwGplEV+82tCXjboxGo92EM6oPgxd2eqf+8G0lwcQHHaaL61Y2rFSB7QPjzq0IU
-ZaLx/pUUFjlWw7mBPl4QSbxSQ0xqZ/RbiHN/lw8vW7BGitQ0w3qSAlZZn5CNp/4H
-pYijZ1U6PWKLpG+lS8PpMjJAqdN5Umn2aRrrtV/8XSKlHMbXL63j+M5TR+xEoVg=
-=PR0g
------END PGP SIGNATURE-----
-
---O3RTKUHj+75w1tg5--
+>          break;
+>      }
+> =20
+>=20
