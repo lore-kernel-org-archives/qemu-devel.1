@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ciOL5-0003pv-Go
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:39:56 -0500
+	(envelope-from <marc@brightwise.de>) id 1ciOQD-0000Lj-4Q
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:45:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ciOL4-0001oN-3N
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:39:55 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <cover.1488180142.git.jcody@redhat.com>
-	<cover.1488180142.git.jcody@redhat.com>
-	<25ccaa9f42f7efdac608cb6f779b144a87529138.1488180142.git.jcody@redhat.com>
-Date: Mon, 27 Feb 2017 17:39:45 +0100
-In-Reply-To: <25ccaa9f42f7efdac608cb6f779b144a87529138.1488180142.git.jcody@redhat.com>
-	(Jeff Cody's message of "Mon, 27 Feb 2017 02:30:38 -0500")
-Message-ID: <87fuiza8q6.fsf@dusky.pond.sub.org>
+	(envelope-from <marc@brightwise.de>) id 1ciOQA-0004Zy-0Q
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:45:13 -0500
+Received: from mo6-p00-ob.smtp.rzone.de ([2a01:238:20a:202:5300::12]:10619)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marc@brightwise.de>) id 1ciOQ9-0004YM-Iq
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:45:09 -0500
+Date: Mon, 27 Feb 2017 17:42:05 +0100 (CET)
+From: Marc Bommert <marc@brightwise.de>
+Message-ID: <479997200.107486.1488213725522@communicator.strato.de>
+In-Reply-To: <CAFEAcA_O2ue4wkGgcJCAXwPSZy=OajBz0nREet5Kr+h0t4o8Dw@mail.gmail.com>
+References: <492427237.68231.1488183356160@communicator.strato.de>
+	<CAFEAcA-hHnOvoWZYZgBt2sWjv60fyTFv4mmGkaBbnVDwEqg31w@mail.gmail.com>
+	<1634823730.89363.1488206109043@communicator.strato.de>
+	<CAFEAcA_O2ue4wkGgcJCAXwPSZy=OajBz0nREet5Kr+h0t4o8Dw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/4] block/rbd: don't copy strings in
- qemu_rbd_next_tok()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] pl190: Fix off-by-one error in priority
+ handling when reading VECTADDR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,321 +30,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Jeff Cody <jcody@redhat.com> writes:
 
-> This patch is prep work for parsing options for .bdrv_parse_filename,
-> and using QDict options.
+> Peter Maydell <peter.maydell@linaro.org> hat am 27. Februar 2017 um 16:27 geschrieben:
+> 
+> 
+> On 27 February 2017 at 14:35, Marc Bommert <marc@brightwise.de> wrote:
+> >> Peter Maydell <peter.maydell@linaro.org> hat am 27. Februar 2017 um 15:07 geschrieben:
+> >> Suppose that only the interrupt programmed into VECTCNTL[0]
+> >> and VECTADDR[0] is active. We will initially set the IRQ line
+> >> (since s->priority is 17 and s->prio_mask[17] is 0xffffffff).
+> >> However when the guest reads the VICVectAddr register we want
+> >> to cause the IRQ line to no longer be asserted. (The PL190 TRM
+> >> states this in the "Interrupt priority logic" section:
+> >> "The highest priority request generates an IRQ interrupt if
+> >> the interrupt is not currently being serviced.") In the current
+> >> code this works because we will set s->priority to 0, and
+> >> s->prio_mask[0] is 0 and so the "level & s->prio_mask[s->priority]"
+> >> masking in pl190_update() clears the bit and we won't assert
+> >> the IRQ line. With your change, s->prio_mask[0] would have the
+> >> bit set for the interrupt number, and so the masking would
+> >> leave that bit set and leave IRQ asserted.
+> >
+> > Where did you get the information that "when the guest reads
+> > the VICVectAddr register we want  to cause the IRQ line to
+> > no longer be asserted." Imho, the _write_ to vectaddr clears
+> > the interrupt request.
+> 
+> See my quote from the PL190 TRM above. Also I think it's
+> clear from the TRM's suggested vectored interrupt flow sequence
+> which is:
+>  1  interrupt occurs
+>  2  CPU takes IRQ
+>  3  interrupt handler reads VICVectAddr
+>  4  interrupt handler stacks CPU registers
+>  5  interrupt handler reenables IRQ interrupts
+>  6  do the ISR work
+>  7  clear peripheral interrupt signal
+>  8  disable ISR, restore regs
+>  9  write VICVectAddr to clear interrupt in the PL190
+>  10 return from interrupt (reenabling IRQ)
+> 
+> If the PL190 continues to signal IRQ for an interrupt
+> that has had VICVectAddr read, then this sequence will
+> recurse infinitely because as the CPU reenables IRQ in
+> step 5 we'll take the IRQ interrupt again. The logic relies
+> on the PL190 not signalling IRQ once it's been acknowledged
+> via the VICVectAddr read (unless a higher priority interrupt
+> arrives, which should cause IRQ to be asserted so the guest
+> can recursively handle it).
+> 
+> There's also this text in the "About the VIC" section 2.1:
+> "Reading from the Vector Interrupt Address Register, VICVECTADDR,
+> provides the address of the ISR, and updates the interrupt
+> priority hardware that masks out the current, and any lower
+> priority interrupt requests."
+>  -- which definitely says that the read causes the current
+> interrupt to be masked out.
+> 
+> >> It also looks to me like this change breaks the logic for
+> >> reading VECTADDR, because instead of the loop stopping
+> >> with i as the priority of the highest set not-being-serviced
+> >> interrupt it will stop with i being one less than that.
+> >> (For instance if the interrupt for priority 2 is the highest
+> >> set not-being-serviced interrupt then with your change
+> >> we'll now set s->prio_mask[2] to have the relevant bit set,
+> >> which means the loop will terminate with i == 1, and we return
+> >> the vector address for interrupt priority 1, not 2 as we should.
+> >
+> > You're right that it changes the logic here, this is the actual
+> > fix. I don't understand why you want to deliver the "highest set
+> > not-being serviced interrupt vector". In fact, you have to
+> > deliver the currently active IRQ vector address. The PL190 TRM
+> > states for the VECTADDR register:
+> >
+> > "The read/write VICVECTADDR Register, with address offset of
+> > 0x030, contains the Interrupt Service Routine (ISR) address
+> > of the currently active interrupt"
+> 
+> At the point where the ISR reads VECTADDR, the currently active
+> interrupt *is* the highest set not being serviced interrupt vector.
+> (If your ISR reads it twice then that's a bad idea because
+> the Note in the TRM says "reading [...] at other times can
+> cause incorrect operation", but QEMU's implementation will
+> return the same value again until a higher priority interrupt
+> comes in or the interrupt is dismissed by writing to VECTADDR,
+> since the 2nd read won't change s->priority and we'll just
+> return s->vect_addr[s->priority] again.)
+> 
+> >> Perhaps I'm missing something -- what's the wrong behaviour
+> >> that you're seeing that you're trying to fix ?
+> >
+> > I have a RTOS running which up to now only ran on real hardware.
+> > It performs a sequence of accesses to the PL190 as stated in
+> > the bug ticket. When reading back VECTADDR of the currently
+> > handled interrupt (interrupt source 1 mapped to vector 2),
+> > the PL190 emulation delivers VECTADDR3 instead and my OS fails
+> > to dispatch the interrupt to the proper handler, but counts
+> > a spurious interrupt.
+> 
+> Ah, I missed that the bug ticket had a sequence of actions:
+> 
+>  1) Write INTENCLEAR to clear all interrupt enable bits
+>  2) Set all 16 vector control registers to zero
+>  3) Set vector address #2 to value 2
+>  4) Set vector control #2 to 0x21 (vector_interrupt_enable(0x20) |
+> vector_interrupt_source(0x1) )
+>  5) Enable interrupt 1 by writing 0x2 to INTENABLE
+>  6) In interrupt handler: read VECTADDR [should read 0x2
+>    (active IRQs vector address as set in step 3), reads 0x0
+>    (active vector address index 3 instead of index 2)]
+> 
+> I don't see why step 6 gives you index 3, though. At that
+> point s->priority should be 17, s->prio_mask[0] = 0,
+> s->prio_mask[1] = 0, s->prio_mask[2] = 0, s->prio_mask[3] = 1 << 1,
+> etc. s->level is 1 << 1.
+> The loop
+>         for (i = 0; i < s->priority; i++) {
+>             if ((s->level | s->soft_level) & s->prio_mask[i + 1]) {
+>                 break;
+>             }
+>         }
+> will terminate with i == 2 (since s->prio_mask[3] is
+> the first one with a set bit matching level). We then
+> set s->priority to 2 and return the vect_addr[2] entry.
+> 
+> > To be more precise, the "current priority" s->priority is not
+> > raised to the priority of the currently handled interrupt, but
+> > to the subsequent priority in the priority range.
+> 
+> I don't see how this happens in the code: we stop the
+> loop with i one less than the s->prio_mask[] array
+> entry we check, because of the i+1 in the array index.
+> 
+> If you have some guest code I could reproduce this with
+> that would be helpful.
+> 
+> thanks
+> -- PMM
 >
-> The function qemu_rbd_next_tok() searched for various key/value pairs,
-> and copied them into buffers.  This will soon be an unnecessary extra
-> step, so we will now return found strings by reference only, and
-> offload the responsibility for safely handling/coping these strings to
-> the caller.
->
-> This also cleans up error handling some, as the callers now rely on
-> the Error object to determine if there is a parse error.
->
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
-> ---
->  block/rbd.c | 99 +++++++++++++++++++++++++++++++++++++++----------------------
->  1 file changed, 64 insertions(+), 35 deletions(-)
->
-> diff --git a/block/rbd.c b/block/rbd.c
-> index 22e8e69..3f1a9de 100644
-> --- a/block/rbd.c
-> +++ b/block/rbd.c
-> @@ -102,10 +102,10 @@ typedef struct BDRVRBDState {
->      char *snap;
->  } BDRVRBDState;
->  
-> -static int qemu_rbd_next_tok(char *dst, int dst_len,
-> -                             char *src, char delim,
-> -                             const char *name,
-> -                             char **p, Error **errp)
-> +static char *qemu_rbd_next_tok(int max_len,
-> +                               char *src, char delim,
-> +                               const char *name,
-> +                               char **p, Error **errp)
->  {
->      int l;
->      char *end;
 
-       *p = NULL;
+Hello Peter, you are completely right. The bug isn't in master and my patch is to be rejected.
+There was once a version of pl190.c (like uhhm, around 2011) which didn't have the [i+1] in the array index and somehow (please don't ask) it made it into my qemu build. That's why the returned vector was broken. Of course, the fix was just to index the array with [i+1] instead of changing the prio_mask[i]. Regarding my confusion with the long mailing list delay, that's a triple fault. Shame on me.
 
-       if (delim != '\0') {
-           for (end = src; *end; ++end) {
-               if (*end == delim) {
-                   break;
-               }
-               if (*end == '\\' && end[1] != '\0') {
-                   end++;
-               }
-           }
-           if (*end == delim) {
-               *p = end + 1;
-               *end = '\0';
->          }
->      }
->      l = strlen(src);
-
-Not this patch's problem: this is a rather thoughtless way to say
-
-       l = end - src;
-
-> -    if (l >= dst_len) {
-> +    if (l >= max_len) {
->          error_setg(errp, "%s too long", name);
-> -        return -EINVAL;
-> +        return NULL;
->      } else if (l == 0) {
->          error_setg(errp, "%s too short", name);
-> -        return -EINVAL;
-> +        return NULL;
->      }
->  
-> -    pstrcpy(dst, dst_len, src);
-> -
-> -    return 0;
-> +    return src;
->  }
-
-Note for later:
-
-1. This function always dereferences @src.
-2. If @delim, it sets *@p to point behind @src plus the delimiter,
-   else to NULL
-3. It returns NULL exactly when it sets an error.
-4. It returns NULL and sets an error when @src is empty.
-
-Not this patch's problem, but I have to say it: whoever wrote this code
-should either write simpler functions or get into the habit of writing
-function contract comments.  Because having to document your
-embarrassingly complicated shit is great motivation to simplify (pardon
-my french).
-
->  
->  static void qemu_rbd_unescape(char *src)
-> @@ -162,7 +160,9 @@ static int qemu_rbd_parsename(const char *filename,
-
-This is a parser.  As so often, it is a parser without any hint on what
-it's supposed to parse, let alone a grammar.  Experience tells that
-these are wrong more often than not, and exposing me to yet another one
-is a surefire way to make me grumpy.  Not your fault, of course.
-
->  {
->      const char *start;
->      char *p, *buf;
-> -    int ret;
-> +    int ret = 0;
-> +    char *found_str;
-> +    Error *local_err = NULL;
->  
->      if (!strstart(filename, "rbd:", &start)) {
->          error_setg(errp, "File name must start with 'rbd:'");
-           return -EINVAL;
-       }
-
-       buf = g_strdup(start);
-       p = buf;
-
-This assignment to @p ...
-
->      *snap = '\0';
->      *conf = '\0';
->  
-> -    ret = qemu_rbd_next_tok(pool, pool_len, p,
-> -                            '/', "pool name", &p, errp);
-> -    if (ret < 0 || !p) {
-> +    found_str = qemu_rbd_next_tok(pool_len, p,
-> +                                 '/', "pool name", &p, &local_err);
-
-... is dead, because qemu_rbd_next_tok() assigns to it unconditionally.
-
-The call extracts the part up to the first unescaped '/' or the end of
-the string.
-
-> +    if (local_err) {
-> +        goto done;
-> +    }
-> +    if (!p) {
-
-We extracted to end of string, i.e. we didn't find '/'.
-
->          ret = -EINVAL;
-> +        error_setg(errp, "Pool name is required");
->          goto done;
->      }
-> -    qemu_rbd_unescape(pool);
-> +    qemu_rbd_unescape(found_str);
-> +    g_strlcpy(pool, found_str, pool_len);
-
-Before, we copy, then unescape the copy.
-
-After, we unescape in place, then copy.
-
-Unescaping can't lengthen the string.  Therefore, this is safe as long
-as nothing else uses this part of @buf.
-
->  
->      if (strchr(p, '@')) {
-> -        ret = qemu_rbd_next_tok(name, name_len, p,
-> -                                '@', "object name", &p, errp);
-> -        if (ret < 0) {
-> +        found_str = qemu_rbd_next_tok(name_len, p,
-> +                                     '@', "object name", &p, &local_err);
-
-Extracts from first unescaped '/' to next unescaped '@' or end of string.
-
-@p can't be null.
-
-> +        if (local_err) {
->              goto done;
->          }
-> -        ret = qemu_rbd_next_tok(snap, snap_len, p,
-> -                                ':', "snap name", &p, errp);
-> -        qemu_rbd_unescape(snap);
-> +        qemu_rbd_unescape(found_str);
-> +        g_strlcpy(name, found_str, name_len);
-> +
-> +        found_str = qemu_rbd_next_tok(snap_len, p,
-> +                                      ':', "snap name", &p, &local_err);
-
->From that '@' to next ':' or end of string.
-
-> +        if (local_err) {
-> +            goto done;
-> +        }
-> +        qemu_rbd_unescape(found_str);
-> +        g_strlcpy(snap, found_str, snap_len);
-
-This confused me, but I figured it out: you're moving the @name unescape
-from after the conditional into both its arms.  This is the first copy.
-
->      } else {
-> -        ret = qemu_rbd_next_tok(name, name_len, p,
-> -                                ':', "object name", &p, errp);
-> +        found_str = qemu_rbd_next_tok(name_len, p,
-> +                                     ':', "object name", &p, &local_err);
-
->From first '/' to next ':' or end of string.
-
-Indentation off by one.
-
-> +        if (local_err) {
-> +            goto done;
-> +        }
-> +        qemu_rbd_unescape(found_str);
-
-This is the second copy of the moved unescape.
-
-> +        g_strlcpy(name, found_str, name_len);
->      }
-> -    qemu_rbd_unescape(name);
-
-This is where the copies come from.
-
-> -    if (ret < 0 || !p) {
-> +    if (!p) {
-
-We didn't find ':'.
-
->          goto done;
->      }
->  
-> -    ret = qemu_rbd_next_tok(conf, conf_len, p,
-> -                            '\0', "configuration", &p, errp);
-> +    found_str = qemu_rbd_next_tok(conf_len, p,
-> +                                 '\0', "configuration", &p, &local_err);
-
->From that ':' to end of string.
-
-> +    if (local_err) {
-> +        goto done;
-> +    }
-> +    g_strlcpy(conf, found_str, conf_len);
-
-No unescape?  Strange... but your patch doesn't change anything.
-
->  
->  done:
-> +    if (local_err) {
-> +        ret = -EINVAL;
-> +        error_propagate(errp, local_err);
-> +    }
->      g_free(buf);
->      return ret;
->  }
-
-Okay, now someone tell me what it's supposed to parse, and I tell you
-whether it works.
-
-Unescaping in place looks safe.
-
-> @@ -262,17 +286,18 @@ static int qemu_rbd_set_conf(rados_t cluster, const char *conf,
-
-Great, another parser for an unknown language.  I'll pass.
-
->                               Error **errp)
->  {
->      char *p, *buf;
-> -    char name[RBD_MAX_CONF_NAME_SIZE];
-> -    char value[RBD_MAX_CONF_VAL_SIZE];
-> +    char *name;
-> +    char *value;
-> +    Error *local_err = NULL;
->      int ret = 0;
->  
->      buf = g_strdup(conf);
->      p = buf;
-
-Again, dead assignment to @p.
-
->  
->      while (p) {
-> -        ret = qemu_rbd_next_tok(name, sizeof(name), p,
-> -                                '=', "conf option name", &p, errp);
-> -        if (ret < 0) {
-> +        name = qemu_rbd_next_tok(RBD_MAX_CONF_NAME_SIZE, p,
-> +                                 '=', "conf option name", &p, &local_err);
-> +        if (local_err) {
->              break;
->          }
->          qemu_rbd_unescape(name);
-
-Again, you change to unescape in place.
-
-> @@ -283,9 +308,9 @@ static int qemu_rbd_set_conf(rados_t cluster, const char *conf,
->              break;
->          }
->  
-> -        ret = qemu_rbd_next_tok(value, sizeof(value), p,
-> -                                ':', "conf option value", &p, errp);
-> -        if (ret < 0) {
-> +        value = qemu_rbd_next_tok(RBD_MAX_CONF_VAL_SIZE, p,
-> +                                  ':', "conf option value", &p, &local_err);
-> +        if (local_err) {
->              break;
->          }
->          qemu_rbd_unescape(value);
-
-Likewise.
-
-> @@ -313,6 +338,10 @@ static int qemu_rbd_set_conf(rados_t cluster, const char *conf,
->          }
->      }
->  
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        ret = -EINVAL;
-> +    }
->      g_free(buf);
->      return ret;
->  }
-
-Again, unescaping in place looks safe.
-
-Preferably with the two dead assignments dropped:
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Thank you for pointing this out.
+Marc
