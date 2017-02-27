@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1ciLAp-0005Wv-TO
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:17:09 -0500
+	(envelope-from <stefanha@gmail.com>) id 1ciLBh-0006CC-Gc
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:18:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1ciLAk-00023s-Vl
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:17:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45684)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1ciLAk-00023k-N6
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:17:02 -0500
-References: <1485333658-23035-1-git-send-email-thuth@redhat.com>
-	<0eca8185-8e94-46f8-6b7a-36c4a21bc28d@redhat.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <d40da5e8-c48f-a35b-6c3c-b6164ae38040@redhat.com>
-Date: Mon, 27 Feb 2017 15:16:53 +0200
+	(envelope-from <stefanha@gmail.com>) id 1ciLBc-0002Hs-Jx
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:18:01 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:32935)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ciLBc-0002Hb-DU
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:17:56 -0500
+Received: by mail-wm0-x243.google.com with SMTP id v77so13407511wmv.0
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 05:17:56 -0800 (PST)
+Date: Mon, 27 Feb 2017 13:17:53 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170227131753.GN28403@stefanha-x1.localdomain>
+References: <148814889214.28146.16915712763478774662.stgit@bahia>
+	<148814906880.28146.13942320633418827458.stgit@bahia>
 MIME-Version: 1.0
-In-Reply-To: <0eca8185-8e94-46f8-6b7a-36c4a21bc28d@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] null-machine: Add support for the
- "-kernel" parameter
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="K4LMwn8CgX2KMboP"
+Content-Disposition: inline
+In-Reply-To: <148814906880.28146.13942320633418827458.stgit@bahia>
+Subject: Re: [Qemu-devel] [PATCH v2 22/28] 9pfs: local: chmod: don't follow
+ symlinks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,77 +31,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
-Cc: Max Filippov <jcmvbkbc@gmail.com>, Laurent Vivier <laurent@vivier.eu>, Alistair Francis <alistair.francis@xilinx.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 02/27/2017 01:43 PM, Thomas Huth wrote:
-> On 25.01.2017 09:40, Thomas Huth wrote:
->> We can have basic support for the "-kernel" parameter quite easily
->> by using the generic loader device. This should be enough for most
->> boards which do not need special machine-specific magic for loading
->> a kernel (and for those that need special magic, the generic "none"
->> machine is likely not suitable for using it as an instruction set
->> simulator board anyway).
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  PS: If we can't agree on using the generic loader here, I can also
->>      prepare a patch instead that simply prints out an error message
->>      if the user tried to use the "-kernel" parameter.
->>
->>  hw/core/null-machine.c | 14 ++++++++++++++
->>  1 file changed, 14 insertions(+)
->>
->> diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
->> index 27c8369..866e699 100644
->> --- a/hw/core/null-machine.c
->> +++ b/hw/core/null-machine.c
->> @@ -5,6 +5,7 @@
->>   *
->>   * Authors:
->>   *  Anthony Liguori   <aliguori@us.ibm.com>
->> + *  Thomas Huth       <thuth@redhat.com>
->>   *
->>   * This work is licensed under the terms of the GNU GPL, version 2 or later.
->>   * See the COPYING file in the top-level directory.
->> @@ -16,6 +17,7 @@
->>  #include "qemu/error-report.h"
->>  #include "hw/hw.h"
->>  #include "hw/boards.h"
->> +#include "hw/core/generic-loader.h"
->>  #include "sysemu/sysemu.h"
->>  #include "exec/address-spaces.h"
->>  #include "cpu.h"
->> @@ -40,6 +42,18 @@ static void machine_none_init(MachineState *mch)
->>          memory_region_allocate_system_memory(ram, NULL, "ram", mch->ram_size);
->>          memory_region_add_subregion(get_system_memory(), 0, ram);
->>      }
->> +
->> +    /* Load kernel */
->> +    if (mch->kernel_filename) {
->> +        DeviceState *loader;
->> +
->> +        loader = qdev_create(sysbus_get_default(), TYPE_GENERIC_LOADER);
->> +        qdev_prop_set_string(loader, "file", mch->kernel_filename);
->> +        if (cpu) {
->> +            qdev_prop_set_uint32(loader, "cpu-num", cpu->cpu_index);
->> +        }
->> +        qdev_init_nofail(loader);
->> +    }
->>  }
->>
->>  static void machine_none_machine_init(MachineClass *mc)
->
-> *ping*
->
-> Apparently the discussion has ceased ... can we get a consensus whether
-> we want to support the "-kernel" parameter for the "none" machine or not?
->
 
-Why do we need the "-kernel" parameter for the null-machine? I mean - what are the use cases?
+--K4LMwn8CgX2KMboP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
-Marcel
+On Sun, Feb 26, 2017 at 11:44:28PM +0100, Greg Kurz wrote:
+> The local_chmod() callback is vulnerable to symlink attacks because it
+> calls:
+>=20
+> (1) chmod() which follows symbolic links for all path elements
+> (2) local_set_xattr()->setxattr() which follows symbolic links for all
+>     path elements
+> (3) local_set_mapped_file_attr() which calls in turn local_fopen() and
+>     mkdir(), both functions following symbolic links for all path
+>     elements but the rightmost one
+>=20
+> We would need fchmodat() to implement AT_SYMLINK_NOFOLLOW to fix (1). This
+> isn't the case on linux unfortunately: the kernel doesn't even have a fla=
+gs
+> argument to the syscall :-\ It is impossible to fix it in userspace in
+> a race-free manner. This patch hence converts local_chmod() to rely on
+> open_nofollow() and fchmod(). This fixes the vulnerability but introduces
+> a limitation: the target file must readable and/or writable for the call
+> to openat() to succeed.
+>=20
+> It introduces a local_set_xattrat() replacement to local_set_xattr()
+> based on fsetxattrat() to fix (2), and a local_set_mapped_file_attrat()
+> replacement to local_set_mapped_file_attr() based on local_fopenat()
+> and mkdirat() to fix (3). No effort is made to factor out code because
+> both local_set_xattr() and local_set_mapped_file_attr() will be dropped
+> when all users have been converted to use the "at" versions.
+>=20
+> This partly fixes CVE-2016-9602.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+> v2: - use openat_dir()
+>     - updated the changelog and added a comment for fchmod()
+> ---
+>  hw/9pfs/9p-local.c |  178 ++++++++++++++++++++++++++++++++++++++++++++++=
++++---
+>  1 file changed, 167 insertions(+), 11 deletions(-)
 
->  Thomas
->
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--K4LMwn8CgX2KMboP
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYtCcBAAoJEJykq7OBq3PIGoUIAKGgAoxb1jZoyOW+8m4/5bvP
+wp3QVqrjLgitE/aBE8FQ/F3axidgnxF6yKj/8X+ODM5+Z4WVSxOW0gPp0Od5Shwz
+jLJWvHvYxZvlvQpVoCpWULaIyJYM+SHYAxcygiaF8okfiD+tjccip702AhJD1clw
+QNyLJerbrUbIZKFFJhrix3SKd3gss2FKp6RbYz/4ObNU+dX7eKbbBFxv9iFScCSd
+nFm1RQdnr9p/NtJQjBhvyzn0ve564Vets0jflJ4g+CLmDUoc5BftTn7b4LhvInP1
+Z1aq7VYGO7Q2bbUCUO+Uf6LTEttB7gamccBiiM8/lzgjHyYL2VhOqwJSj9828WE=
+=HEBZ
+-----END PGP SIGNATURE-----
+
+--K4LMwn8CgX2KMboP--
