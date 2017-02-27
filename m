@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ciGtb-0002O6-1z
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 03:43:04 -0500
+	(envelope-from <clg@kaod.org>) id 1ciGwU-0003SB-4c
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 03:46:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ciGtX-0006s4-O6
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 03:43:03 -0500
-Received: from [45.249.212.187] (port=2993 helo=dggrg01-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ciGtW-0006qp-QS
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 03:42:59 -0500
-References: <1487993530-30875-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1487993530-30875-4-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<58B12B02.2000202@huawei.com>
-	<31f0e89c-13c0-247a-1026-9fc28ee2d6f4@cn.fujitsu.com>
-	<58B3D525.6080104@huawei.com>
-	<a675b8e4-99ca-492a-921c-7e510a23b94c@cn.fujitsu.com>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <58B3E69B.2050905@huawei.com>
-Date: Mon, 27 Feb 2017 16:43:07 +0800
+	(envelope-from <clg@kaod.org>) id 1ciGwQ-0007cD-SB
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 03:46:02 -0500
+Received: from 10.mo6.mail-out.ovh.net ([87.98.157.236]:56019)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ciGwQ-0007a9-Ha
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 03:45:58 -0500
+Received: from player761.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 1B269B0123
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 09:45:52 +0100 (CET)
+References: <1487252865-12064-1-git-send-email-clg@kaod.org>
+	<1487252865-12064-9-git-send-email-clg@kaod.org>
+	<20170223022933.GW12577@umbus.fritz.box>
+	<6deab394-2564-3a43-669c-af4b8a2aa4e3@kaod.org>
+	<20170227003050.GI17615@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <2fc29a7a-ae6f-63a4-354b-4f4d9176d048@kaod.org>
+Date: Mon, 27 Feb 2017 09:45:44 +0100
 MIME-Version: 1.0
-In-Reply-To: <a675b8e4-99ca-492a-921c-7e510a23b94c@cn.fujitsu.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] COLO-compare: Optimize
- colo_packet_compare_common
+In-Reply-To: <20170227003050.GI17615@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 08/22] ppc/xics: use the QOM
+ interface to resend irqs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,178 +34,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
-Cc: xuquan8@huawei.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On 2017/2/27 15:34, Zhang Chen wrote:
->
->
-> On 02/27/2017 03:28 PM, Hailiang Zhang wrote:
->> On 2017/2/27 15:03, Zhang Chen wrote:
+>>>>  void icp_set_cppr(ICPState *ss, uint8_t cppr)
+>>>> @@ -262,7 +261,7 @@ void icp_set_cppr(ICPState *ss, uint8_t cppr)
+>>>>          }
+>>>>      } else {
+>>>>          if (!XISR(ss)) {
+>>>> -            icp_resend(ss);
+>>>> +            icp_resend(XICS_INTERFACE(qdev_get_machine()), ss);
 >>>
->>>
->>> On 02/25/2017 02:58 PM, Hailiang Zhang wrote:
->>>> On 2017/2/25 11:32, Zhang Chen wrote:
->>>>> Add offset args for colo_packet_compare_common, optimize
->>>>> colo_packet_compare_icmp() and colo_packet_compare_udp()
->>>>> just compare the IP payload.
->>>>>
->>>>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
->>>>> ---
->>>>>     net/colo-compare.c | 28 +++++++++++++++++++++-------
->>>>>     1 file changed, 21 insertions(+), 7 deletions(-)
->>>>>
->>>>> diff --git a/net/colo-compare.c b/net/colo-compare.c
->>>>> index e75f0ae..9853232 100644
->>>>> --- a/net/colo-compare.c
->>>>> +++ b/net/colo-compare.c
->>>>> @@ -180,7 +180,7 @@ static int packet_enqueue(CompareState *s, int
->>>>> mode)
->>>>>      * return:    0  means packet same
->>>>>      *            > 0 || < 0 means packet different
->>>>>      */
->>>>> -static int colo_packet_compare_common(Packet *ppkt, Packet *spkt)
->>>>> +static int colo_packet_compare_common(Packet *ppkt, Packet *spkt,
->>>>> int offset)
->>>>>     {
->>>>>         trace_colo_compare_ip_info(ppkt->size,
->>>>> inet_ntoa(ppkt->ip->ip_src),
->>>>> inet_ntoa(ppkt->ip->ip_dst), spkt->size,
->>>>> @@ -188,7 +188,8 @@ static int colo_packet_compare_common(Packet
->>>>> *ppkt, Packet *spkt)
->>>>> inet_ntoa(spkt->ip->ip_dst));
->>>>>
->>>>>         if (ppkt->size == spkt->size) {
->>>>> -        return memcmp(ppkt->data, spkt->data, spkt->size);
->>>>> +        return memcmp(ppkt->data + offset, spkt->data + offset,
->>>>> +                      spkt->size - offset);
->>>>>         } else {
->>>>>             trace_colo_compare_main("Net packet size are not the
->>>>> same");
->>>>>             return -1;
->>>>> @@ -237,8 +238,7 @@ static int colo_packet_compare_tcp(Packet *spkt,
->>>>> Packet *ppkt)
->>>>>             spkt->ip->ip_sum = ppkt->ip->ip_sum;
->>>>>         }
->>>>>
->>>>> -    res = memcmp(ppkt->data + ETH_HLEN, spkt->data + ETH_HLEN,
->>>>> -                (spkt->size - ETH_HLEN));
->>>>> +    res = colo_packet_compare_common(ppkt, spkt, ETH_HLEN);
->>>>>
->>>>
->>>> For tcp packets check, why not ignore the ip headers, just like udp
->>>> packets check ?
->>>> Besides, here, can we compare the checksum stored in headers of tcp
->>>> and udp
->>>> before call colo_packet_compare_common(), which i think will improve
->>>> the comparing
->>>> performance.
->>>
->>> That's another way to compare the packet suggested by Dr. David Alan
->>> Gilbert,
->>> It makes two packets IP header be same firstly, then compare all IP
->>> packet.
->>> This way can tell people why we ignore IP header explicitly in other
->>> packets check like udp.
->>> For performance, If we ignore the IP header that will reduce at least 20
->>> byte not to be compared.
->>> So, ignore ip header have better comparing performance.
->>>
+>>> Here you're assuming that the machine is the implementor of the xics
+>>> interface, which is kinda ugly.  The ICP should have a pointer to the
+>>> xics interface, which will eventually replace the pointer to the
+>>> overall xics object it has now.
 >>
->> OK, here, i think we can re-use the checksum value stored in headers
->> of tcp
->> or udp, comparing it first before comparing the complete payload of
->> tcp or udp
->> packets is another way to improve the performance, it is only 2 bytes.
->
-> No, The IP header's checksum are always different, Because the IP
-> header's ID field
-> are always different.
->
+>> yes. I will try improve that. I don't like those calls to 
+>> qdev_get_machine()either. 
+>>
+>> There are done in a couple of places though, under spapr_cpu_core
+>> to get XICS for instance.
+> 
+> Right, but I'm happier with it there, in code that's definitely
+> associated with a particular machine, rather than in the xics code
+> which is at least somewhat reusable.
 
-Not checksum in ip header， i mean checksum in tcp header or udp header.
+I fixed that with the backlink on the XICSFabric. 
 
-
-> Thanks
-> Zhang Chen
->
->>
->> Thanks.
->>
->>> Thanks
->>> Zhang Chen
->>>
->>>
->>>>
->>>> Thanks.
->>>> Hailiang
->>>>
->>>>>         if (res != 0 &&
->>>>> trace_event_get_state(TRACE_COLO_COMPARE_MISCOMPARE)) {
->>>>> trace_colo_compare_pkt_info_src(inet_ntoa(ppkt->ip->ip_src),
->>>>> @@ -277,7 +277,14 @@ static int colo_packet_compare_udp(Packet *spkt,
->>>>> Packet *ppkt)
->>>>>             return -1;
->>>>>         }
->>>>>
->>>>> -    ret = colo_packet_compare_common(ppkt, spkt);
->>>>> +    /*
->>>>> +     * Because of ppkt and spkt are both in the same connection,
->>>>> +     * The ppkt's src ip, dst ip, src port, dst port, ip_proto all
->>>>> are
->>>>> +     * same with spkt. In addition, IP header's Identification is a
->>>>> random
->>>>> +     * field, we can handle it in IP fragmentation function later.
->>>>> +     * So we just compare the ip payload here.
->>>>> +     */
->>>>> +    ret = colo_packet_compare_common(ppkt, spkt, network_length +
->>>>> ETH_HLEN);
->>>>>
->>>>>         if (ret) {
->>>>>             trace_colo_compare_udp_miscompare("primary pkt size",
->>>>> ppkt->size);
->>>>> @@ -304,7 +311,14 @@ static int colo_packet_compare_icmp(Packet
->>>>> *spkt, Packet *ppkt)
->>>>>             return -1;
->>>>>         }
->>>>>
->>>>> -    if (colo_packet_compare_common(ppkt, spkt)) {
->>>>> +    /*
->>>>> +     * Because of ppkt and spkt are both in the same connection,
->>>>> +     * The ppkt's src ip, dst ip, src port, dst port, ip_proto all
->>>>> are
->>>>> +     * same with spkt. In addition, IP header's Identification is a
->>>>> random
->>>>> +     * field, we can handle it in IP fragmentation function later.
->>>>> +     * So we just compare the ip payload here.
->>>>> +     */
->>>>> +    if (colo_packet_compare_common(ppkt, spkt, network_length +
->>>>> ETH_HLEN)) {
->>>>>             trace_colo_compare_icmp_miscompare("primary pkt size",
->>>>> ppkt->size);
->>>>>             qemu_hexdump((char *)ppkt->data, stderr, "colo-compare",
->>>>> @@ -330,7 +344,7 @@ static int colo_packet_compare_other(Packet
->>>>> *spkt, Packet *ppkt)
->>>>> inet_ntoa(ppkt->ip->ip_dst), spkt->size,
->>>>> inet_ntoa(spkt->ip->ip_src),
->>>>> inet_ntoa(spkt->ip->ip_dst));
->>>>> -    return colo_packet_compare_common(ppkt, spkt);
->>>>> +    return colo_packet_compare_common(ppkt, spkt, 0);
->>>>>     }
->>>>>
->>>>>     static int colo_old_packet_check_one(Packet *pkt, int64_t
->>>>> *check_time)
->>>>>
->>>>
->>>>
->>>>
->>>>
->>>> .
->>>>
->>>
->>
->>
->>
->> .
->>
->
+C.
