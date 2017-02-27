@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41476)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1ciPEa-0001Rw-Ab
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:37:17 -0500
+	(envelope-from <drjones@redhat.com>) id 1ciPEb-0001Sz-Br
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:37:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1ciPEZ-0000d7-I4
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:37:16 -0500
+	(envelope-from <drjones@redhat.com>) id 1ciPEa-0000dY-LT
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:37:17 -0500
 From: Andrew Jones <drjones@redhat.com>
-Date: Mon, 27 Feb 2017 18:37:04 +0100
-Message-Id: <20170227173706.15210-1-drjones@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/2] Enable QEMU to control MPIDR values
+Date: Mon, 27 Feb 2017 18:37:05 +0100
+Message-Id: <20170227173706.15210-2-drjones@redhat.com>
+In-Reply-To: <20170227173706.15210-1-drjones@redhat.com>
+References: <20170227173706.15210-1-drjones@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/2] HACK: update linux/kvm header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,20 +22,21 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 Cc: peter.maydell@linaro.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, imammedo@redhat.com
 
-Igor needs to know/select vcpu MPIDR values early in order to map vcpus
-to vnodes. Waiting until after vcpu init, when KVM sets them, is too
-late. With this patch, and its KVM counterpart, QEMU can control the
-values, allowing it to know/select them whenever it likes.
+---
+ linux-headers/linux/kvm.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-Andrew Jones (2):
-  HACK: update linux/kvm header
-  arm: kvm: set MPIDR when we can
-
- linux-headers/linux/kvm.h |  1 +
- target/arm/cpu.c          |  3 +--
- target/arm/kvm32.c        | 22 ++++++++++++++--------
- target/arm/kvm64.c        | 22 ++++++++++++++--------
- 4 files changed, 30 insertions(+), 18 deletions(-)
-
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index bb0ed712232d..38e636c85886 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -870,6 +870,7 @@ struct kvm_ppc_smmu_info {
+ #define KVM_CAP_S390_USER_INSTR0 130
+ #define KVM_CAP_MSI_DEVID 131
+ #define KVM_CAP_PPC_HTM 132
++#define KVM_CAP_ARM_USER_MPIDR 137
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
 -- 
 2.9.3
