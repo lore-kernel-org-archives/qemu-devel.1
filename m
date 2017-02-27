@@ -1,38 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1ciMsa-0006ok-N6
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:06:26 -0500
+	(envelope-from <bounces@canonical.com>) id 1ciMxJ-0002nQ-5M
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:11:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1ciMsX-0003Rg-Gs
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:06:24 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35043)
+	(envelope-from <bounces@canonical.com>) id 1ciMxF-00052r-VV
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:11:17 -0500
+Received: from indium.canonical.com ([91.189.90.7]:59625)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1ciMsX-0003RN-7E
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:06:21 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1RF0Sbw030285
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 10:06:19 -0500
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28vjd440p2-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 10:06:19 -0500
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Mon, 27 Feb 2017 15:06:15 -0000
-Date: Mon, 27 Feb 2017 16:06:09 +0100
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <baa954b4-53fc-2b4e-b79c-917ba9171a60@de.ibm.com>
-References: <baa954b4-53fc-2b4e-b79c-917ba9171a60@de.ibm.com>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ciMxF-00052f-MS
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:11:13 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1ciMxE-0005xJ-BL
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 15:11:12 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9645B2E80DB
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 15:11:09 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170227160609.0d49a87d.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] segfault use VRingMemoryRegionCaches for avail and
- used ring vs num-queues
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 27 Feb 2017 15:03:03 -0000
+From: Nehal J Wani <nehaljw.kkd1@gmail.com>
+Reply-To: Bug 1668273 <1668273@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170227140328.20639.14786.malonedeb@soybean.canonical.com>
+Message-Id: <20170227150303.21364.16092.launchpad@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1668273] Re: DoS possible on - a QEMU process
+ using userspace SLIRP?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,84 +37,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
 
-On Mon, 27 Feb 2017 15:09:30 +0100
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+** Description changed:
 
-> Paolo,
-> 
-> commit 97cd965c070152bc626c7507df9fb356bbe1cd81
-> "virtio: use VRingMemoryRegionCaches for avail and used rings"
-> does cause a segfault on my s390 system when I use num-queues.
-> 
-> gdb --args qemu-system-s390x -nographic -enable-kvm -m 1G -drive file=/var/lib/libvirt/qemu/image.zhyp137,if=none,id=d1 -device virtio-blk-ccw,drive=d1,iothread=io1,num-queues=2 -object iothread,id=io1
+  Steps to reproduce:
+  =
 
-(...)
+  - Launch a VM using QEMU (2.8.0):
+  =
 
-> (gdb) bt
-> #0  0x0000000001024a26 in address_space_translate_cached (cache=0x38, addr=2, xlat=0x3ffe587bff8, plen=0x3ffe587bff0, is_write=false) at /home/cborntra/REPOS/qemu/exec.c:3187
-> #1  0x0000000001025596 in address_space_lduw_internal_cached (cache=0x38, addr=2, attrs=..., result=0x0, endian=DEVICE_BIG_ENDIAN) at /home/cborntra/REPOS/qemu/memory_ldst.inc.c:264
-> #2  0x0000000001025846 in address_space_lduw_be_cached (cache=0x38, addr=2, attrs=..., result=0x0) at /home/cborntra/REPOS/qemu/memory_ldst.inc.c:322
-> #3  0x000000000102597e in lduw_be_phys_cached (cache=0x38, addr=2) at /home/cborntra/REPOS/qemu/memory_ldst.inc.c:340
-> #4  0x0000000001114856 in virtio_lduw_phys_cached (vdev=0x1c57cd0, cache=0x38, pa=2) at /home/cborntra/REPOS/qemu/include/hw/virtio/virtio-access.h:164
-> #5  0x000000000111523c in vring_avail_idx (vq=0x3fffde1e090) at /home/cborntra/REPOS/qemu/hw/virtio/virtio.c:201
-> #6  0x0000000001115bba in virtio_queue_empty (vq=0x3fffde1e090) at /home/cborntra/REPOS/qemu/hw/virtio/virtio.c:332
-> #7  0x000000000111c312 in virtio_queue_host_notifier_aio_poll (opaque=0x3fffde1e0f8) at /home/cborntra/REPOS/qemu/hw/virtio/virtio.c:2294
-> #8  0x000000000147a036 in run_poll_handlers_once (ctx=0x1bb8bb0) at /home/cborntra/REPOS/qemu/util/aio-posix.c:490
-> #9  0x000000000147a2fe in try_poll_mode (ctx=0x1bb8bb0, blocking=true) at /home/cborntra/REPOS/qemu/util/aio-posix.c:566
-> #10 0x000000000147a3ca in aio_poll (ctx=0x1bb8bb0, blocking=true) at /home/cborntra/REPOS/qemu/util/aio-posix.c:595
-> #11 0x00000000011a0176 in iothread_run (opaque=0x1bb86c0) at /home/cborntra/REPOS/qemu/iothread.c:59
-> #12 0x000003ffe9087bc4 in start_thread () at /lib64/libpthread.so.0
-> #13 0x000003ffe8f8a9f2 in thread_start () at /lib64/libc.so.6
-> 
-> It seems to make a difference if its the boot disk or not. Maybe the reset of the
-> devices that the bootloader does before handling over control to Linux creates
-> some trouble here.
+  $ qemu-system-x86_64 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-machine accel=3Dkvm \
+  =C2=A0=C2=A0=C2=A0=C2=A0-hda Fedora-Cloud-Base-25-1.3.x86_64.qcow2 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-m 2G \
+  =C2=A0=C2=A0=C2=A0=C2=A0-smp 2 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-vnc :8 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-boot dc \
+  =C2=A0=C2=A0=C2=A0=C2=A0-vga std \
+  =C2=A0=C2=A0=C2=A0=C2=A0-cpu host \
+  =C2=A0=C2=A0=C2=A0=C2=A0-net nic,vlan=3D0 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-net user,vlan=3D0,hostfwd=3Dtcp::10024-:22,hostf=
+wd=3Dtcp::8082-:80
+  =
 
-I can reproduce this (the root cause seems to be that the bootloader
-only sets up the first queue but the dataplane code wants to handle
-both queues); this particular problem is fixed by 
-https://patchwork.ozlabs.org/patch/731445/ but then I hit a similar
-problem later:
+  - SSH into the VM, install httpd, start httpd
+  =
 
-0x0000000010019b46 in address_space_translate_cached (cache=0x60, addr=0, 
-    xlat=0x3fffcb7e420, plen=0x3fffcb7e418, is_write=false)
-    at /root/git/qemu/exec.c:3187
-3187	    assert(addr < cache->len && *plen <= cache->len - addr);
+  $ ssh -p 10024 root@localhost 'dnf install -y httpd && systemctl start
+  httpd'
+  =
 
-(...)
+  - Compile and run the following Java program (on the host):
+  =
 
-(gdb) bt
-#0  0x0000000010019b46 in address_space_translate_cached (cache=0x60, addr=0, 
-    xlat=0x3fffcb7e420, plen=0x3fffcb7e418, is_write=false)
-    at /root/git/qemu/exec.c:3187
-#1  0x000000001001a5fe in address_space_lduw_internal_cached (cache=0x60, 
-    addr=0, attrs=..., result=0x0, endian=DEVICE_BIG_ENDIAN)
-    at /root/git/qemu/memory_ldst.inc.c:264
-#2  0x000000001001a88e in address_space_lduw_be_cached (cache=0x60, addr=0, 
-    attrs=..., result=0x0) at /root/git/qemu/memory_ldst.inc.c:322
-#3  0x000000001001a9c6 in lduw_be_phys_cached (cache=0x60, addr=0)
-    at /root/git/qemu/memory_ldst.inc.c:340
-#4  0x00000000100fa876 in virtio_lduw_phys_cached (vdev=0x10bc2ce0, cache=0x60, 
-    pa=0) at /root/git/qemu/include/hw/virtio/virtio-access.h:164
-#5  0x00000000100fb536 in vring_used_flags_set_bit (vq=0x3fffdebc090, mask=1)
-    at /root/git/qemu/hw/virtio/virtio.c:255
-#6  0x00000000100fb7fa in virtio_queue_set_notification (vq=0x3fffdebc090, 
-    enable=0) at /root/git/qemu/hw/virtio/virtio.c:297
-#7  0x0000000010101d22 in virtio_queue_host_notifier_aio_poll_begin (
-    n=0x3fffdebc0f8) at /root/git/qemu/hw/virtio/virtio.c:2285
-#8  0x00000000103f4164 in poll_set_started (ctx=0x10ae8230, started=true)
-    at /root/git/qemu/util/aio-posix.c:338
-#9  0x00000000103f4d5a in try_poll_mode (ctx=0x10ae8230, blocking=true)
-    at /root/git/qemu/util/aio-posix.c:553
-#10 0x00000000103f4e56 in aio_poll (ctx=0x10ae8230, blocking=true)
-    at /root/git/qemu/util/aio-posix.c:595
-#11 0x000000001017ea36 in iothread_run (opaque=0x10ae7d40)
-    at /root/git/qemu/iothread.c:59
-#12 0x000003fffd6084c6 in start_thread () from /lib64/libpthread.so.0
-#13 0x000003fffd502ec2 in thread_start () from /lib64/libc.so.6
+  $ cat <<EOF > URLConnectionReader.java
+  import java.net.*;
+  import java.io.*;
+  =
 
-I think we may be missing guards for not-yet-setup queues in other
-places; maybe we can centralize this instead of playing whack-a-mole?
+  public class URLConnectionReader {
+  =C2=A0=C2=A0=C2=A0=C2=A0public static void main(String[] args) throws Exc=
+eption {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int i =3D 0;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0while (i < 1024) {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0U=
+RL this_is_404 =3D new URL("http://localhost:8082/blah");
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0U=
+RLConnection yc =3D this_is_404.openConnection();
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0t=
+ry {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0BufferedReader in =3D new BufferedReader(new InputS=
+treamReader(
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0yc.getInputStream()));
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0String inputLine;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0while ((inputLine =3D in.readLine()) !=3D null)
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0System.out.println(inputLin=
+e);
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0in.close();
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}=
+ catch (Exception e) {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0//HttpURLConnection urlConnection =3D (HttpURLConne=
+ction) yc;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0//urlConnection.disconnect();
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0i=
+++;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Thread.sleep(1000000000);
+  =C2=A0=C2=A0=C2=A0=C2=A0}
+  }
+  =
+
+  $ javac URLConnectionReader.java
+  =
+
+  $ java URLConnectionReader &
+  =
+
+  The java program tries to open a lot of HTTP connections, but never
+  calls disconnect() on any.
+  =
+
+  - Take a look at the list of open FDs of the qemu process:
+  =
+
+  $ ls -tl /proc/${qemu-pid}/fd
+  =
+
+  $ lsof -p ${qemu-pid}
+  All of the TCP connections will be stuck at FIN_WAIT2
+  =
+
+- The VM becomes unresponsive. Neither SSH or VNC works after this.
++ The VM becomes unresponsive. Neither SSH or VNC works after this; even
++ after tcp_fin_timeout expires.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1668273
+
+Title:
+  DoS possible on - a QEMU process using userspace SLIRP?
+
+Status in QEMU:
+  New
+
+Bug description:
+  Steps to reproduce:
+
+  - Launch a VM using QEMU (2.8.0):
+
+  $ qemu-system-x86_64 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-machine accel=3Dkvm \
+  =C2=A0=C2=A0=C2=A0=C2=A0-hda Fedora-Cloud-Base-25-1.3.x86_64.qcow2 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-m 2G \
+  =C2=A0=C2=A0=C2=A0=C2=A0-smp 2 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-vnc :8 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-boot dc \
+  =C2=A0=C2=A0=C2=A0=C2=A0-vga std \
+  =C2=A0=C2=A0=C2=A0=C2=A0-cpu host \
+  =C2=A0=C2=A0=C2=A0=C2=A0-net nic,vlan=3D0 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-net user,vlan=3D0,hostfwd=3Dtcp::10024-:22,hostf=
+wd=3Dtcp::8082-:80
+
+  - SSH into the VM, install httpd, start httpd
+
+  $ ssh -p 10024 root@localhost 'dnf install -y httpd && systemctl start
+  httpd'
+
+  - Compile and run the following Java program (on the host):
+
+  $ cat <<EOF > URLConnectionReader.java
+  import java.net.*;
+  import java.io.*;
+
+  public class URLConnectionReader {
+  =C2=A0=C2=A0=C2=A0=C2=A0public static void main(String[] args) throws Exc=
+eption {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int i =3D 0;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0while (i < 1024) {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0U=
+RL this_is_404 =3D new URL("http://localhost:8082/blah");
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0U=
+RLConnection yc =3D this_is_404.openConnection();
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0t=
+ry {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0BufferedReader in =3D new BufferedReader(new InputS=
+treamReader(
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0yc.getInputStream()));
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0String inputLine;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0while ((inputLine =3D in.readLine()) !=3D null)
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0System.out.println(inputLin=
+e);
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0in.close();
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}=
+ catch (Exception e) {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0//HttpURLConnection urlConnection =3D (HttpURLConne=
+ction) yc;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0//urlConnection.disconnect();
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0i=
+++;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Thread.sleep(1000000000);
+  =C2=A0=C2=A0=C2=A0=C2=A0}
+  }
+
+  $ javac URLConnectionReader.java
+
+  $ java URLConnectionReader &
+
+  The java program tries to open a lot of HTTP connections, but never
+  calls disconnect() on any.
+
+  - Take a look at the list of open FDs of the qemu process:
+
+  $ ls -tl /proc/${qemu-pid}/fd
+
+  $ lsof -p ${qemu-pid}
+  All of the TCP connections will be stuck at FIN_WAIT2
+
+  The VM becomes unresponsive. Neither SSH or VNC works after this; even
+  after tcp_fin_timeout expires.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1668273/+subscriptions
