@@ -1,19 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ciIWj-00021Y-N6
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:27:34 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ciIZG-0003Fh-IA
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:30:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ciIWi-0001Yf-Oj
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:27:33 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <87bmukmlau.fsf@dusky.pond.sub.org>
-Date: Mon, 27 Feb 2017 11:27:18 +0100
-In-Reply-To: <87bmukmlau.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-	of "Thu, 02 Feb 2017 20:42:33 +0100")
-Message-ID: <87poi4c4jd.fsf@dusky.pond.sub.org>
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ciIZC-000276-IG
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:30:10 -0500
+Received: from [45.249.212.188] (port=2941 helo=dggrg02-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ciIZB-00024t-PG
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:30:06 -0500
+References: <1487735198-127300-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1487735198-127300-3-git-send-email-zhang.zhanghailiang@huawei.com>
+	<b0b04c02-7c97-ea04-1e38-99fd9344edae@redhat.com>
+	<58AD4F8F.5030703@huawei.com> <58AD5125.4010306@huawei.com>
+	<b792c68e-d67a-ac24-26ea-aaf24f1f9437@redhat.com>
+	<58B398F8.1020205@huawei.com>
+	<c7883f1d-99ed-d082-3eee-7e0c641257e6@redhat.com>
+	<58B3A688.5040707@huawei.com>
+	<3196d413-e99a-561a-310d-4d2fa93559d9@redhat.com>
+	<58B3CCFE.5070909@huawei.com>
+	<562f8a27-63dc-6be8-ca2d-cf91c1ce4fe8@redhat.com>
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <58B3FFA7.2040205@huawei.com>
+Date: Mon, 27 Feb 2017 18:29:59 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] Non-flat command line option argument syntax
+In-Reply-To: <562f8a27-63dc-6be8-ca2d-cf91c1ce4fe8@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] filter-rewriter: fix memory leak
+ for connection in connection_track_table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,69 +37,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Jason Wang <jasowang@redhat.com>, zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com
+Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, pss.wulizhen@huawei.com
 
-Markus Armbruster <armbru@redhat.com> writes:
-
-[...]
-> === Dotted keys ===
+On 2017/2/27 17:05, Jason Wang wrote:
 >
-> One sufficiently powerful syntax extension already exists: the dotted
-> key convention.  It's syntactically unambiguous only when none of the
-> KEYs involved contains '.'  To adopt it across the board, we'd have to
-> outlaw '.' in KEYs.  QAPI outlaws '.' already, but we have a bunch of
-> QOM properties names with '.'.  We'd have to rename at least the ones
-> that need to be accessible in -object.
 >
-> Dotted keys can't express member names that look like integers.  We'd
-> have to outlaw them at least for the objects that are accessible on the
-> command line.  Once again, QAPI outlaws such names already.  QOM is
-> anarchy when it comes to names, however.
+> On 2017年02月27日 14:53, Hailiang Zhang wrote:
+>>> I think the issue is that your code can not differ A from B.
+>>>
+>>
+>> We have a parameter 'fin_ack_seq' recording the sequence of
+>> 'FIN=1,ACK=1,seq=w,ack=u+1' and if the ack value from the opposite
+>> side is is 'w+1', we can consider this connection is closed, no ?
 >
-> The way dotted keys do arrays is inconsistent with how QOM's automatic
-> arrayification (commit 3396590) do them: foo.0 vs. foo[0].  Backward
-> compatibility makes changing the dotted key convention awkward.  Perhaps
-> we can still change QOM.
 
-Design flaw: there is no good way to denote an empty array or object
-other than the root object.
+Hi Jason,
 
-Empty KEY=VALUE,... is valid and results in an empty root object.
+Thanks very much for your patience.
 
-Presence of a KEY that contains periods results in additional non-root
-objects or arrays.  For instance, KEY a.b.c results in root object
-member "a" that has member "b" that has (scalar) member "c".
+> Let's see what happens, consider VM is doing active close (reuse the
+> figure above):
+>
 
-These additional objects and arrays all have at least one member, by
-construction.
+(We didn't support tracking the connection start
+by the VM in current rewriter codes.
+I mean the Client side is VM).
 
-Begs the question how to denote an empty object or array other than the
-root.
+Your figure is not quite correct, the process should be:
+                                           (VM)
+Client:                                    Server:
 
-A natural idea is to interpret "absent in KEY=VALUE,..." as empty.
-After all, removing one key from it removes one member when there are
-more, so why not when there aren't.
+ESTABLISHED|                               |
+            | -> FIN=1,seq=u   ->           |
+FIN_WAIT_1 |                               |
+            | <- ACK=1,seq=v,ack=u+1 <-     |
+FINA_WAIT_2|                               |CLOSE_WAIT
+            | <- FIN=1,ACK=1,seq=w,ack=u+1<-|
+handle_secondary():
+fin_ack_seq = w
+tcp_state = TCPS_LAST_ACK
 
-Sadly, it doesn't work: "absent in KEY=VALUE,..." already means
-"optional object/array absent", which isn't the same as "empty
-object/array present".
+            |                               |LAST+ACK
+            |   -> ACK=1,seq=u+1,ack=w+1    |
+TIME_WAIT  |                               |CLOSED
+CLOSED     |                               |
 
-Without additional syntax, all we can do is choose what exactly to make
-impossible:
+handle_primary():
+if (ack = fin_ack_seq + 1)
+    g_hash_table_remove()
 
-* Absent key means absent, period.  No way to do empty array or object.
-  This is what I implemented.
+> (VM)
+> Client:                                    Server:
+>
+> ESTABLISHED|                               |
+>              | -> FIN=1,seq=u   ->           |
+>
+> handle_secondary():
+> fin_ack_seq = u
+> tcp_state = TCPS_LAST_ACK
+>
+> FIN_WAIT_1 |                               |
+>              | <- ACK=1,seq=v,ack=u+1 <-     |
+>
+> handle_primary():
+> fin_ack_seq = ack + 1
+> g_hash_table_remove()
+>
+> But we probably want it to be removed in TIME_WAIT_CLOSED.
+>
 
-* Absent key means absent, except when the member is visited it means
-  empty.  No way to do absent optional array or object.
+Yes, we should removed it after 2MSL, because the last
+the sever side may not get the 'ACK=1,seq=v,ack=u+1' packet,
+and it will resend the 'FIN=1,ACK=1,seq=w,ack=u+1'.
 
-* Likewise, but if the visit is preceeded by a test for presence with
-  visit_optional(), it means absent again.  No way to do present
-  optional empty array or object.  This requires keeping additional
-  state.
-
-Any bright ideas on how to avoid making things impossible?
+Thanks.
 
 
-[...]
+> Thanks
+>
+> .
+>
