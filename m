@@ -1,27 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ciQag-0001Mm-V4
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:04:11 -0500
+	(envelope-from <a.perevalov@samsung.com>) id 1ciQbP-0001rk-PY
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:04:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ciQad-0005n4-AO
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:04:10 -0500
-Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:35039)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ciQad-0005mp-3E
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:04:07 -0500
-Received: by mail-wr0-x235.google.com with SMTP id g10so58805091wrg.2
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 11:04:06 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <7df56441-6efd-e178-a31d-e77d6d594319@msgid.tls.msk.ru>
-References: <cover.1488068248.git.balaton@eik.bme.hu>
-	<7df56441-6efd-e178-a31d-e77d6d594319@msgid.tls.msk.ru>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 27 Feb 2017 19:03:45 +0000
-Message-ID: <CAFEAcA_yGs=TA6f6AbwbsjQRW0xH8m6URQuM_6vUg5B9WUGt-w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2 00/14] Improvements for SM501 display
- controller emulation
+	(envelope-from <a.perevalov@samsung.com>) id 1ciQbL-0005q9-O7
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:04:55 -0500
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:39944)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1ciQbL-0005pC-BM
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:04:51 -0500
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout2.w1.samsung.com
+	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
+	2014)) with ESMTP id <0OM100CN7RNZ3P30@mailout2.w1.samsung.com> for
+	qemu-devel@nongnu.org; Mon, 27 Feb 2017 19:04:47 +0000 (GMT)
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Message-id: <87431463-dc4e-ba73-8801-32650f27b1e7@samsung.com>
+Date: Mon, 27 Feb 2017 22:04:43 +0300
+MIME-version: 1.0
+In-reply-to: <20170227112657.GE2350@work-vm>
+Content-type: text/plain; charset=windows-1252; format=flowed
+Content-transfer-encoding: 7bit
+References: <20170206173306.20603-1-dgilbert@redhat.com>
+	<20170206174529.GI2524@work-vm>
+	<CGME20170213171108eucas1p147999fc8b6980ff89a67626b78b12e44@eucas1p1.samsung.com>
+	<20170213171058.GA4246@aperevalov-ubuntu>
+	<20170213181601.GG3086@work-vm>
+	<20170214162155.GB6645@aperevalov-ubuntu>
+	<20170214193425.GF11561@work-vm>
+	<20170221073115.GA5046@aperevalov-ubuntu>
+	<20170221100313.GB2377@work-vm>
+	<20170227110520.GA27506@aperevalov-R560>
+	<20170227112657.GE2350@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v2 00/16] Postcopy: Hugepage support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +42,368 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Tokarev <mjt@tls.msk.ru>
-Cc: BALATON Zoltan <balaton@eik.bme.hu>, QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Andrea Arcangeli <aarcange@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com
 
-On 27 February 2017 at 18:11, Michael Tokarev <mjt@tls.msk.ru> wrote:
-> 26.02.2017 03:17, BALATON Zoltan wrote:
->> Second try, addressing review comments.
+On 02/27/2017 02:26 PM, Dr. David Alan Gilbert wrote:
+> * Alexey Perevalov (a.perevalov@samsung.com) wrote:
+>> Hi David,
+>>
+>>
+>> On Tue, Feb 21, 2017 at 10:03:14AM +0000, Dr. David Alan Gilbert wrote:
+>>> * Alexey Perevalov (a.perevalov@samsung.com) wrote:
+>>>> Hello David,
+>>> Hi Alexey,
+>>>
+>>>> On Tue, Feb 14, 2017 at 07:34:26PM +0000, Dr. David Alan Gilbert wrote:
+>>>>> * Alexey Perevalov (a.perevalov@samsung.com) wrote:
+>>>>>> Hi David,
+>>>>>>
+>>>>>> Thank your, now it's clear.
+>>>>>>
+>>>>>> On Mon, Feb 13, 2017 at 06:16:02PM +0000, Dr. David Alan Gilbert wrote:
+>>>>>>> * Alexey Perevalov (a.perevalov@samsung.com) wrote:
+>>>>>>>>   Hello David!
+>>>>>>> Hi Alexey,
+>>>>>>>
+>>>>>>>> I have checked you series with 1G hugepage, but only in 1 Gbit/sec network
+>>>>>>>> environment.
+>>>>>>> Can you show the qemu command line you're using?  I'm just trying
+>>>>>>> to make sure I understand where your hugepages are; running 1G hostpages
+>>>>>>> across a 1Gbit/sec network for postcopy would be pretty poor - it would take
+>>>>>>> ~10 seconds to transfer the page.
+>>>>>> sure
+>>>>>> -hda ./Ubuntu.img -name PAU,debug-threads=on -boot d -net nic -net user
+>>>>>> -m 1024 -localtime -nographic -enable-kvm -incoming tcp:0:4444 -object
+>>>>>> memory-backend-file,id=mem,size=1G,mem-path=/dev/hugepages -mem-prealloc
+>>>>>> -numa node,memdev=mem -trace events=/tmp/events -chardev
+>>>>>> socket,id=charmonitor,path=/var/lib/migrate-vm-monitor.sock,server,nowait
+>>>>>> -mon chardev=charmonitor,id=monitor,mode=control
+>>>>> OK, it's a pretty unusual setup - a 1G page guest with 1G of guest RAM.
+>>>>>
+>>>>>>>> I started Ubuntu just with console interface and gave to it only 1G of
+>>>>>>>> RAM, inside Ubuntu I started stress command
+>>>>>>>> (stress --cpu 4 --io 4 --vm 4 --vm-bytes 256000000 &)
+>>>>>>>> in such environment precopy live migration was impossible, it never
+>>>>>>>> being finished, in this case it infinitely sends pages (it looks like
+>>>>>>>> dpkg scenario).
+>>>>>>>>
+>>>>>>>> Also I modified stress utility
+>>>>>>>> http://people.seas.harvard.edu/~apw/stress/stress-1.0.4.tar.gz
+>>>>>>>> due to it wrote into memory every time the same value `Z`. My
+>>>>>>>> modified version writes every allocation new incremented value.
+>>>>>>> I use google's stressapptest normally; although remember to turn
+>>>>>>> off the bit where it pauses.
+>>>>>> I decided to use it too
+>>>>>> stressapptest -s 300 -M 256 -m 8 -W
+>>>>>>
+>>>>>>>> I'm using Arcangeli's kernel only at the destination.
+>>>>>>>>
+>>>>>>>> I got controversial results. Downtime for 1G hugepage is close to 2Mb
+>>>>>>>> hugepage and it took around 7 ms (in 2Mb hugepage scenario downtime was
+>>>>>>>> around 8 ms).
+>>>>>>>> I made that opinion by query-migrate.
+>>>>>>>> {"return": {"status": "completed", "setup-time": 6, "downtime": 6, "total-time": 9668, "ram": {"total": 1091379200, "postcopy-requests": 1, "dirty-sync-count": 2, "remaining": 0, "mbps": 879.786851, "transferred": 1063007296, "duplicate": 7449, "dirty-pages-rate": 0, "skipped": 0, "normal-bytes": 1060868096, "normal": 259001}}}
+>>>>>>>>
+>>>>>>>> Documentation says about downtime field - measurement unit is ms.
+>>>>>>> The downtime measurement field is pretty meaningless for postcopy; it's only
+>>>>>>> the time from stopping the VM until the point where we tell the destination it
+>>>>>>> can start running.  Meaningful measurements are only from inside the guest
+>>>>>>> really, or the place latencys.
+>>>>>>>
+>>>>>> Maybe improve it by receiving such information from destination?
+>>>>>> I wish to do that.
+>>>>>>>> So I traced it (I added additional trace into postcopy_place_page
+>>>>>>>> trace_postcopy_place_page_start(host, from, pagesize); )
+>>>>>>>>
+>>>>>>>> postcopy_ram_fault_thread_request Request for HVA=7f6dc0000000 rb=/objects/mem offset=0
+>>>>>>>> postcopy_place_page_start host=0x7f6dc0000000 from=0x7f6d70000000, pagesize=40000000
+>>>>>>>> postcopy_place_page_start host=0x7f6e0e800000 from=0x55b665969619, pagesize=1000
+>>>>>>>> postcopy_place_page_start host=0x7f6e0e801000 from=0x55b6659684e8, pagesize=1000
+>>>>>>>> several pages with 4Kb step ...
+>>>>>>>> postcopy_place_page_start host=0x7f6e0e817000 from=0x55b6659694f0, pagesize=1000
+>>>>>>>>
+>>>>>>>> 4K pages, started from 0x7f6e0e800000 address it's
+>>>>>>>> vga.ram, /rom@etc/acpi/tables etc.
+>>>>>>>>
+>>>>>>>> Frankly saying, right now, I don't have any ideas why hugepage wasn't
+>>>>>>>> resent. Maybe my expectation of it is wrong as well as understanding )
+>>>>>>> That's pretty much what I expect to see - before you get into postcopy
+>>>>>>> mode everything is sent as individual 4k pages (in order); once we're
+>>>>>>> in postcopy mode we send each page no more than once.  So you're
+>>>>>>> huge page comes across once - and there it is.
+>>>>>>>
+>>>>>>>> stress utility also duplicated for me value into appropriate file:
+>>>>>>>> sec_since_epoch.microsec:value
+>>>>>>>> 1487003192.728493:22
+>>>>>>>> 1487003197.335362:23
+>>>>>>>> *1487003213.367260:24*
+>>>>>>>> *1487003238.480379:25*
+>>>>>>>> 1487003243.315299:26
+>>>>>>>> 1487003250.775721:27
+>>>>>>>> 1487003255.473792:28
+>>>>>>>>
+>>>>>>>> It mean rewriting 256Mb of memory per byte took around 5 sec, but at
+>>>>>>>> the moment of migration it took 25 sec.
+>>>>>>> right, now this is the thing that's more useful to measure.
+>>>>>>> That's not too surprising; when it migrates that data is changing rapidly
+>>>>>>> so it's going to have to pause and wait for that whole 1GB to be transferred.
+>>>>>>> Your 1Gbps network is going to take about 10 seconds to transfer that
+>>>>>>> 1GB page - and that's if you're lucky and it saturates the network.
+>>>>>>> SO it's going to take at least 10 seconds longer than it normally
+>>>>>>> would, plus any other overheads - so at least 15 seconds.
+>>>>>>> This is why I say it's a bad idea to use 1GB host pages with postcopy.
+>>>>>>> Of course it would be fun to find where the other 10 seconds went!
+>>>>>>>
+>>>>>>> You might like to add timing to the tracing so you can see the time between the
+>>>>>>> fault thread requesting the page and it arriving.
+>>>>>>>
+>>>>>> yes, sorry I forgot about timing
+>>>>>> 20806@1487084818.270993:postcopy_ram_fault_thread_request Request for HVA=7f0280000000 rb=/objects/mem offset=0
+>>>>>> 20806@1487084818.271038:qemu_loadvm_state_section 8
+>>>>>> 20806@1487084818.271056:loadvm_process_command com=0x2 len=4
+>>>>>> 20806@1487084818.271089:qemu_loadvm_state_section 2
+>>>>>> 20806@1487084823.315919:postcopy_place_page_start host=0x7f0280000000 from=0x7f0240000000, pagesize=40000000
+>>>>>>
+>>>>>> 1487084823.315919 - 1487084818.270993 = 5.044926 sec.
+>>>>>> Machines connected w/o any routers, directly by cable.
+>>>>> OK, the fact it's only 5 seconds not 10 I think suggests a lot of the memory was all zero
+>>>>> so didn't take up the whole bandwidth.
+>>>> I decided to measure downtime as a sum of intervals since fault happened
+>>>> and till page was load. I didn't relay on order, so I associated that
+>>>> interval with fault address.
+>>> Don't forget the source will still be sending unrequested pages at the
+>>> same time as fault responses; so that simplification might be wrong.
+>>> My experience with 4k pages is you'll often get pages that arrive
+>>> at about the same time as you ask for them because of the background transmission.
+>>>
+>>>> For 2G ram vm - using 1G huge page, downtime measured on dst is around 12 sec,
+>>>> but for the same 2G ram vm with 2Mb huge page, downtime measured on dst
+>>>> is around 20 sec, and 320 page faults happened, 640 Mb was transmitted.
+>>> OK, so 20/320 * 1000=62.5msec/ page.   That's a bit high.
+>>> I think it takes about 16ms to transmit a 2MB page on your 1Gbps network,
+>> Yes, you right, transfer of the first page doesn't wait for prefetched page
+>> transmission, and downtime for first page was 25 ms.
+>>
+>> Next requested pages are queued (FIFO) so dst is waiting all prefetched pages,
+>> it's around 5-7 pages transmission.
+>> So I have a question why not to put requested page into the head of
+>> queue in that case, and dst qemu will wait only lesser, only page which
+>> was already in transmission.
+> The problem is it's already in the source's network queue.
 >
-> So.. I'm not sure what to do with this :)
+>> Also if I'm not wrong, commands and pages are transferred over the same
+>> socket. Why not to use OOB TCP in this case for commands?
+> My understanding was that OOB was limited to quite small transfers
+> I think the right way is to use a separate FD for the requests, so I'll
+> do it after Juan's multifd series.
+> Although even then I'm not sure how it will behave; the other thing
+> might be to throttle the background page transfer so the FIFO isn't
+> as full.
 >
-> I can apply it to -trivial, but this smells a bit unfair
-> on my side, while on the other hand, is there any more
-> appropriate tree?
+>>> you're probably also suffering from the requests being queued behind
+>>> background requests; if you try reducing your tcp_wmem setting on the
+>>> source it might get a bit better.  Once Juan Quintela's multi-fd work
+>>> goes in my hope is to combine it with postcopy and then be able to
+>>> avoid that type of request blocking.
+>>> Generally I'd not recommend 10Gbps for postcopy since it does pull
+>>> down the latency quite a bit.
+>>>
+>>>> My current method doesn't take into account multi core vcpu. I checked
+>>>> only with 1 CPU, but it's not proper case. So I think it's worth to
+>>>> count downtime per CPU, or calculate overlap of CPU downtimes.
+>>>> How do your think?
+>>> Yes; one of the nice things about postcopy is that if one vCPU is blocked
+>>> waiting for a page, the other vCPUs will just be able to carry on.
+>>> Even with 1 vCPU if you've got multiple tasks that can run the guest can
+>>> switch to a task that isn't blocked (See KVM asynchronous page faults).
+>>> Now, what the numbers mean when you calculate the total like that might be a bit
+>>> odd - for example if you have 8 vCPUs and they're each blocked do you
+>>> add the times together even though they're blocked at the same time? What
+>>> about if they're blocked on the same page?
+>> I implemented downtime calculation for all cpu's, the approach is
+>> following:
+>>
+>> Initially intervals are represented in tree where key is
+>> pagefault address, and values:
+>>      begin - page fault time
+>>      end   - page load time
+>>      cpus  - bit mask shows affected cpus
+>>
+>> To calculate overlap on all cpus, intervals converted into
+>> array of points in time (downtime_intervals), the size of
+>> array is 2 * number of nodes in tree of intervals (2 array
+>> elements per one in element of interval).
+>> Each element is marked as end (E) or not the end (S) of
+>> interval.
+>> The overlap downtime will be calculated for SE, only in
+>> case of sequence S(0..N)E(M) for every vCPU.
+>>
+>> As example we have 3 CPU
+>>       S1        E1           S1               E1
+>> -----***********------------xxx***************------------------------> CPU1
+>>
+>>              S2                E2
+>> ------------****************xxx---------------------------------------> CPU2
+>>
+>>                          S3            E3
+>> ------------------------****xxx********-------------------------------> CPU3
+>> 	
+>> We have sequence S1,S2,E1,S3,S1,E2,E3,E1
+>> S2,E1 - doesn't match condition due to
+>> sequence S1,S2,E1 doesn't include CPU3,
+>> S3,S1,E2 - sequenece includes all CPUs, in
+>> this case overlap will be S1,E2
+>>
+>>
+>> But I don't send RFC now,
+>> due to I faced an issue. Kernel doesn't inform user space about page's
+>> owner in handle_userfault. So it's the question to Andrea. Is it worth
+>> to add such information.
+>> Frankly saying, I don't know is current (task_struct) in
+>> handle_userfault equal to mm_struct's owner.
+> Is this so you can find which thread is waiting for it? I'm not sure it's
+> worth it; we dont normally need that, and anyway if doesn't help if multiple
+> CPUs need it, where the 2nd CPU hits it just after the 1st one.
+I think in case of multiple CPUs, e.g 2 CPUs,
+first page fault will come from CPU0 for page
+ADDR and we store it with proper CPU index, and second page fault from 
+just started CPU1
+for the same page ADDR and we also track it. And finally we will 
+calculate downtime as overlap,
+and the sum of it will be the final downtime.
 
-I think it's a bit of a stretch to argue that
-"1089 insertions(+), 741 deletions" is "trivial", but
-the difficulty is that sh4 isn't really very maintained.
-Since the purpose seems to be to improve ppc emulation
-somehow it could perhaps go via the ppc tree, but I dunno.
+>
+> Dave
+>
+>>>> Also I didn't yet finish IPC to provide such information to src host, where
+>>>> info_migrate is being called.
+>>> Dave
+>>>
+>>>>
+>>>>>>>> Another one request.
+>>>>>>>> QEMU could use mem_path in hugefs with share key simultaneously
+>>>>>>>> (-object memory-backend-file,id=mem,size=${mem_size},mem-path=${mem_path},share=on) and vm
+>>>>>>>> in this case will start and will properly work (it will allocate memory
+>>>>>>>> with mmap), but in case of destination for postcopy live migration
+>>>>>>>> UFFDIO_COPY ioctl will fail for
+>>>>>>>> such region, in Arcangeli's git tree there is such prevent check
+>>>>>>>> (if (!vma_is_shmem(dst_vma) && dst_vma->vm_flags & VM_SHARED).
+>>>>>>>> Is it possible to handle such situation at qemu?
+>>>>>>> Imagine that you had shared memory; what semantics would you like
+>>>>>>> to see ?  What happens to the other process?
+>>>>>> Honestly, initially, I thought to handle such error, but I quit forgot
+>>>>>> about vhost-user in ovs-dpdk.
+>>>>> Yes, I don't know much about vhost-user; but we'll have to think carefully
+>>>>> about the way things behave when they're accessing memory that's shared
+>>>>> with qemu during migration.  Writing to the source after we've started
+>>>>> the postcopy phase is not allowed.  Accessing the destination memory
+>>>>> during postcopy will produce pauses in the other processes accessing it
+>>>>> (I think) and they mustn't do various types of madvise etc - so
+>>>>> I'm sure there will be things we find out the hard way!
+>>>>>
+>>>>> Dave
+>>>>>
+>>>>>>> Dave
+>>>>>>>
+>>>>>>>> On Mon, Feb 06, 2017 at 05:45:30PM +0000, Dr. David Alan Gilbert wrote:
+>>>>>>>>> * Dr. David Alan Gilbert (git) (dgilbert@redhat.com) wrote:
+>>>>>>>>>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>>>>>>>>>>
+>>>>>>>>>> Hi,
+>>>>>>>>>>    The existing postcopy code, and the userfault kernel
+>>>>>>>>>> code that supports it, only works for normal anonymous memory.
+>>>>>>>>>> Kernel support for userfault on hugetlbfs is working
+>>>>>>>>>> it's way upstream; it's in the linux-mm tree,
+>>>>>>>>>> You can get a version at:
+>>>>>>>>>>     git://git.kernel.org/pub/scm/linux/kernel/git/andrea/aa.git
+>>>>>>>>>> on the origin/userfault branch.
+>>>>>>>>>>
+>>>>>>>>>> Note that while this code supports arbitrary sized hugepages,
+>>>>>>>>>> it doesn't make sense with pages above the few-MB region,
+>>>>>>>>>> so while 2MB is fine, 1GB is probably a bad idea;
+>>>>>>>>>> this code waits for and transmits whole huge pages, and a
+>>>>>>>>>> 1GB page would take about 1 second to transfer over a 10Gbps
+>>>>>>>>>> link - which is way too long to pause the destination for.
+>>>>>>>>>>
+>>>>>>>>>> Dave
+>>>>>>>>> Oops I missed the v2 changes from the message:
+>>>>>>>>>
+>>>>>>>>> v2
+>>>>>>>>>    Flip ram-size summary word/compare individual page size patches around
+>>>>>>>>>    Individual page size comparison is done in ram_load if 'advise' has been
+>>>>>>>>>      received rather than checking migrate_postcopy_ram()
+>>>>>>>>>    Moved discard code into exec.c, reworked ram_discard_range
+>>>>>>>>>
+>>>>>>>>> Dave
+>>>>>>>> Thank your, right now it's not necessary to set
+>>>>>>>> postcopy-ram capability on destination machine.
+>>>>>>>>
+>>>>>>>>
+>>>>>>>>>> Dr. David Alan Gilbert (16):
+>>>>>>>>>>    postcopy: Transmit ram size summary word
+>>>>>>>>>>    postcopy: Transmit and compare individual page sizes
+>>>>>>>>>>    postcopy: Chunk discards for hugepages
+>>>>>>>>>>    exec: ram_block_discard_range
+>>>>>>>>>>    postcopy: enhance ram_block_discard_range for hugepages
+>>>>>>>>>>    Fold postcopy_ram_discard_range into ram_discard_range
+>>>>>>>>>>    postcopy: Record largest page size
+>>>>>>>>>>    postcopy: Plumb pagesize down into place helpers
+>>>>>>>>>>    postcopy: Use temporary for placing zero huge pages
+>>>>>>>>>>    postcopy: Load huge pages in one go
+>>>>>>>>>>    postcopy: Mask fault addresses to huge page boundary
+>>>>>>>>>>    postcopy: Send whole huge pages
+>>>>>>>>>>    postcopy: Allow hugepages
+>>>>>>>>>>    postcopy: Update userfaultfd.h header
+>>>>>>>>>>    postcopy: Check for userfault+hugepage feature
+>>>>>>>>>>    postcopy: Add doc about hugepages and postcopy
+>>>>>>>>>>
+>>>>>>>>>>   docs/migration.txt                |  13 ++++
+>>>>>>>>>>   exec.c                            |  83 +++++++++++++++++++++++
+>>>>>>>>>>   include/exec/cpu-common.h         |   2 +
+>>>>>>>>>>   include/exec/memory.h             |   1 -
+>>>>>>>>>>   include/migration/migration.h     |   3 +
+>>>>>>>>>>   include/migration/postcopy-ram.h  |  13 ++--
+>>>>>>>>>>   linux-headers/linux/userfaultfd.h |  81 +++++++++++++++++++---
+>>>>>>>>>>   migration/migration.c             |   1 +
+>>>>>>>>>>   migration/postcopy-ram.c          | 138 +++++++++++++++++---------------------
+>>>>>>>>>>   migration/ram.c                   | 109 ++++++++++++++++++------------
+>>>>>>>>>>   migration/savevm.c                |  32 ++++++---
+>>>>>>>>>>   migration/trace-events            |   2 +-
+>>>>>>>>>>   12 files changed, 328 insertions(+), 150 deletions(-)
+>>>>>>>>>>
+>>>>>>>>>> -- 
+>>>>>>>>>> 2.9.3
+>>>>>>>>>>
+>>>>>>>>>>
+>>>>>>>>> --
+>>>>>>>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>>>>>>>>
+>>>>>>> --
+>>>>>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>>>>>>
+>>>>>> -- 
+>>>>>>
+>>>>>> BR
+>>>>>> Alexey
+>>>>> --
+>>>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>>>>
+>>>> -- 
+>>>>
+>>>> BR
+>>>> Alexey
+>>> --
+>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>>
+>> BR
+>> Alexey
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+>
 
-I have said I'll try to review this (since I looked at
-v1), but I don't think I'm going to get to this before the
-softfreeze deadline, I'm afraid. If you want to go through
-and review it all feel free -- you probably have as much
-knowledge about sh4 and this device as I do :-)
 
-thanks
--- PMM
+-- 
+Best regards,
+Alexey Perevalov
