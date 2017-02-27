@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39822)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ciTrn-0001WK-5W
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 17:34:07 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ciTrw-0001cv-9Q
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 17:34:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ciTrj-0004fo-1r
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 17:34:03 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:64160)
+	(envelope-from <laurent@vivier.eu>) id 1ciTrs-0005Jg-GD
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 17:34:12 -0500
+Received: from mout.kundenserver.de ([217.72.192.75]:58676)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ciTri-0004Y8-NU
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 17:33:58 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ciTrs-0005Bp-5i
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 17:34:08 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon, 27 Feb 2017 23:33:36 +0100
-Message-Id: <20170227223337.17434-6-laurent@vivier.eu>
+Date: Mon, 27 Feb 2017 23:33:37 +0100
+Message-Id: <20170227223337.17434-7-laurent@vivier.eu>
 In-Reply-To: <20170227223337.17434-1-laurent@vivier.eu>
 References: <20170227223337.17434-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 5/6] linux-user: fix do_rt_sigreturn on m68k
- linux userspace emulation
+Subject: [Qemu-devel] [PULL 6/6] syscall: fixed mincore(2) not failing with
+ ENOMEM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,45 +25,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Michael Karcher <karcher@physik.fu-berlin.de>, Laurent Vivier <laurent@vivier.eu>
+Cc: Riku Voipio <riku.voipio@iki.fi>, "Franklin \\\"Snaipe\\\" Mathieu" <snaipe@diacritic.io>, Riku Voipio <riku.voipio@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Laurent Vivier <laurent@vivier.eu>
 
-From: Michael Karcher <karcher@physik.fu-berlin.de>
+From: "Franklin \\\"Snaipe\\\" Mathieu" <snaipe@diacritic.io>
 
-do_rt_sigreturn uses an uninitialised local variable instead of fetching
-the old signal mask directly from the signal frame when restoring the mask,
-so the signal mask is undefined after do_rt_sigreturn. As the signal
-frame data is in target-endian order, target_to_host_sigset instead of
-target_to_host_sigset_internal is required.
+The current implementation of the mincore(2) syscall sets errno to
+EFAULT when the region identified by the first two parameters is
+invalid.
 
-do_sigreturn is correct in using target_to_host_sigset_internal, because
-get_user already did the endianness conversion.
+This goes against the man page specification, where mincore(2) should
+only fail with EFAULT when the third parameter is an invalid address;
+and fail with ENOMEM when the checked region does not point to mapped
+memory.
 
-Signed-off-by: Michael Karcher <karcher@physik.fu-berlin.de>
+Signed-off-by: Franklin "Snaipe" Mathieu <snaipe@diacritic.io>
+Cc: Riku Voipio <riku.voipio@linaro.org>
+Cc: Aurelien Jarno <aurelien@aurel32.net>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20170217085800.28873-2-snaipe@diacritic.io>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20170225110517.2832-3-laurent@vivier.eu>
 ---
- linux-user/signal.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ linux-user/syscall.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/linux-user/signal.c b/linux-user/signal.c
-index 99adfc2..a67db04 100644
---- a/linux-user/signal.c
-+++ b/linux-user/signal.c
-@@ -5851,14 +5851,13 @@ long do_rt_sigreturn(CPUM68KState *env)
- {
-     struct target_rt_sigframe *frame;
-     abi_ulong frame_addr = env->aregs[7] - 4;
--    target_sigset_t target_set;
-     sigset_t set;
- 
-     trace_user_do_rt_sigreturn(env, frame_addr);
-     if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1))
-         goto badframe;
- 
--    target_to_host_sigset_internal(&set, &target_set);
-+    target_to_host_sigset(&set, &frame->uc.tuc_sigmask);
-     set_sigmask(&set);
- 
-     /* restore registers */
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 2bba500..cec8428 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -11194,11 +11194,16 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+     case TARGET_NR_mincore:
+         {
+             void *a;
++            ret = -TARGET_ENOMEM;
++            a = lock_user(VERIFY_READ, arg1, arg2, 0);
++            if (!a) {
++                goto fail;
++            }
+             ret = -TARGET_EFAULT;
+-            if (!(a = lock_user(VERIFY_READ, arg1,arg2, 0)))
+-                goto efault;
+-            if (!(p = lock_user_string(arg3)))
++            p = lock_user_string(arg3);
++            if (!p) {
+                 goto mincore_fail;
++            }
+             ret = get_errno(mincore(a, arg2, p));
+             unlock_user(p, arg3, ret);
+             mincore_fail:
 -- 
 2.9.3
