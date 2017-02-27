@@ -1,24 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ciJiF-0001ed-BO
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:43:32 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1ciJqJ-0000gu-DC
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:51:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ciJiC-0007Tk-7n
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:43:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57788)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ciJiC-0007T7-1U
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:43:28 -0500
-References: <1485333658-23035-1-git-send-email-thuth@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <0eca8185-8e94-46f8-6b7a-36c4a21bc28d@redhat.com>
-Date: Mon, 27 Feb 2017 12:43:23 +0100
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1ciJqG-0001NS-9V
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:51:51 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43323
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1ciJqG-0001NA-3i
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:51:48 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1RBiLSW115368
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 06:51:46 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28u703v2k1-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 06:51:46 -0500
+Received: from localhost
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Mon, 27 Feb 2017 11:51:43 -0000
+Date: Mon, 27 Feb 2017 12:51:38 +0100
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <4fe97bb7-d6f0-7b58-916f-94dc0ae81616@redhat.com>
+References: <20170223122025.10420-1-cornelia.huck@de.ibm.com>
+	<20170223122025.10420-4-cornelia.huck@de.ibm.com>
+	<4fe97bb7-d6f0-7b58-916f-94dc0ae81616@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1485333658-23035-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] null-machine: Add support for the
- "-kernel" parameter
+Message-Id: <20170227125138.18c3f43c.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] s390x/ipl: Load network boot image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,69 +43,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
-Cc: Max Filippov <jcmvbkbc@gmail.com>, Laurent Vivier <laurent@vivier.eu>, Alistair Francis <alistair.francis@xilinx.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, jfrei@linux.vnet.ibm.com, Farhan Ali <alifm@linux.vnet.ibm.com>, agraf@suse.de
 
-On 25.01.2017 09:40, Thomas Huth wrote:
-> We can have basic support for the "-kernel" parameter quite easily
-> by using the generic loader device. This should be enough for most
-> boards which do not need special machine-specific magic for loading
-> a kernel (and for those that need special magic, the generic "none"
-> machine is likely not suitable for using it as an instruction set
-> simulator board anyway).
+On Sat, 25 Feb 2017 07:18:29 +0100
+Thomas Huth <thuth@redhat.com> wrote:
+
+> On 23.02.2017 13:20, Cornelia Huck wrote:
+> > From: Farhan Ali <alifm@linux.vnet.ibm.com>
+> > 
+> > Load the network boot image into guest RAM when the boot
+> > device selected is a network device. Use some of the reserved
+> > space in IplBlockCcw to store the start address of the netboot
+> > image.
+> > 
+> > A user could also use 'chreipl'(diag 308/5) to change the boot device.
+> > So every time we update the IPLB, we need to verify if the selected
+> > boot device is a network device so we can appropriately load the
+> > network boot image.
+> > 
+> > Signed-off-by: Farhan Ali <alifm@linux.vnet.ibm.com>
+> > Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+> > ---
+> >  hw/s390x/ipl.c | 89 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  hw/s390x/ipl.h |  4 ++-
+> >  2 files changed, 92 insertions(+), 1 deletion(-)
+
+> > +static bool is_virtio_net_device(IplParameterBlock *iplb)
+> > +{
+> > +    uint8_t cssid;
+> > +    uint8_t ssid;
+> > +    uint16_t devno;
+> > +    uint16_t schid;
+> > +    SubchDev *sch = NULL;
+> > +
+> > +    if (iplb->pbt != S390_IPL_TYPE_CCW) {
+> > +        return false;
+> > +    }
+> > +
+> > +    devno = be16_to_cpu(iplb->ccw.devno);
+> > +    ssid = iplb->ccw.ssid & 3;
+> > +
+> > +    for (schid = 0; schid < MAX_SCHID; schid++) {
+> > +        for (cssid = 0; cssid < MAX_CSSID; cssid++) {
+> > +            sch = css_find_subch(1, cssid, ssid, schid);
+> > +
+> > +            if (sch && sch->devno == devno) {
+> > +                return sch->id.cu_model == VIRTIO_ID_NET;
+> > +            }
+> > +        }
+> > +    }
+> > +   return false;
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  PS: If we can't agree on using the generic loader here, I can also
->      prepare a patch instead that simply prints out an error message
->      if the user tried to use the "-kernel" parameter.
+> The above line has only 3 instead of 4 spaces. I wonder why checkpatch
+> does not complain here...?
+
+Odd. Will fixup.
+
 > 
->  hw/core/null-machine.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
+> > +}
+
+> > +    if (ipl->netboot) {
+> > +        if (load_netboot_image(&err) < 0) {
+> > +            error_report_err(err);
+> > +            vm_stop(RUN_STATE_INTERNAL_ERROR);
+> > +        }
+> > +        ipl->iplb.ccw.netboot_start_addr = ipl->start_addr;
 > 
-> diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
-> index 27c8369..866e699 100644
-> --- a/hw/core/null-machine.c
-> +++ b/hw/core/null-machine.c
-> @@ -5,6 +5,7 @@
->   *
->   * Authors:
->   *  Anthony Liguori   <aliguori@us.ibm.com>
-> + *  Thomas Huth       <thuth@redhat.com>
->   *
->   * This work is licensed under the terms of the GNU GPL, version 2 or later.
->   * See the COPYING file in the top-level directory.
-> @@ -16,6 +17,7 @@
->  #include "qemu/error-report.h"
->  #include "hw/hw.h"
->  #include "hw/boards.h"
-> +#include "hw/core/generic-loader.h"
->  #include "sysemu/sysemu.h"
->  #include "exec/address-spaces.h"
->  #include "cpu.h"
-> @@ -40,6 +42,18 @@ static void machine_none_init(MachineState *mch)
->          memory_region_allocate_system_memory(ram, NULL, "ram", mch->ram_size);
->          memory_region_add_subregion(get_system_memory(), 0, ram);
->      }
-> +
-> +    /* Load kernel */
-> +    if (mch->kernel_filename) {
-> +        DeviceState *loader;
-> +
-> +        loader = qdev_create(sysbus_get_default(), TYPE_GENERIC_LOADER);
-> +        qdev_prop_set_string(loader, "file", mch->kernel_filename);
-> +        if (cpu) {
-> +            qdev_prop_set_uint32(loader, "cpu-num", cpu->cpu_index);
-> +        }
-> +        qdev_init_nofail(loader);
-> +    }
->  }
->  
->  static void machine_none_machine_init(MachineClass *mc)
+> Not sure whether it matters, but in case of early errors during
+> load_netboot_image(), ipl->start_addr could be used uninitialized here.
+> Maybe you should move the "ipl->start_addr = KERN_IMAGE_START;" there at
+> the beginning of the function, to make it also the default value for the
+> other error cases?
 
-*ping*
+ipl->start_addr has already been set to some value in the realize
+function (either the kernel entry address, or the bios address).
 
-Apparently the discussion has ceased ... can we get a consensus whether
-we want to support the "-kernel" parameter for the "none" machine or not?
-
- Thomas
+But that should not matter with the vm_stop() on error anyway, no?
