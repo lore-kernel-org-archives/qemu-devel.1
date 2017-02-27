@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ciLM2-0006ck-Ns
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:28:43 -0500
+	(envelope-from <berrange@redhat.com>) id 1ciLOG-0008Q5-Ma
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:31:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ciLLy-0005Gl-R3
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:28:42 -0500
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:33671)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ciLLy-0005GV-Jw
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:28:38 -0500
-Received: by mail-wr0-x244.google.com with SMTP id g10so10132186wrg.0
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 05:28:38 -0800 (PST)
-Date: Mon, 27 Feb 2017 13:28:35 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170227132835.GR28403@stefanha-x1.localdomain>
-References: <20170224172714.26026-1-berrange@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1ciLOF-00063X-7P
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:31:00 -0500
+Date: Mon, 27 Feb 2017 13:30:46 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170227133046.GK18219@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <cover.1488180142.git.jcody@redhat.com>
+	<08786526aec147544588ab3e885a984e7d0d1c69.1488180142.git.jcody@redhat.com>
+	<20170227073613.GB25637@localhost.localdomain>
+	<20170227093121.GD18219@redhat.com>
+	<20170227131859.GD25637@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="qOEfHYdX8LquYLAx"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170224172714.26026-1-berrange@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] os: don't corrupt pre-existing
- memory-backend data with prealloc
+In-Reply-To: <20170227131859.GD25637@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH 4/4] block/rbd: Add blockdev-add support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +27,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Jitendra Kolhe <jitendra.kolhe@hpe.com>, Michal Privoznik <mprivozn@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, eblake@redhat.com
+
+On Mon, Feb 27, 2017 at 08:18:59AM -0500, Jeff Cody wrote:
+> On Mon, Feb 27, 2017 at 09:31:21AM +0000, Daniel P. Berrange wrote:
+> > On Mon, Feb 27, 2017 at 02:36:13AM -0500, Jeff Cody wrote:
+> > > On Mon, Feb 27, 2017 at 02:30:41AM -0500, Jeff Cody wrote:
+> > > > Signed-off-by: Jeff Cody <jcody@redhat.com>
+> > > > ---
+> > > >  qapi/block-core.json | 47 ++++++++++++++++++++++++++++++++++++++++++++---
+> > > >  1 file changed, 44 insertions(+), 3 deletions(-)
+> > > > 
+> > > > diff --git a/qapi/block-core.json b/qapi/block-core.json
+> > > > index 5f82d35..08a1419 100644
+> > > > --- a/qapi/block-core.json
+> > > > +++ b/qapi/block-core.json
+> > > > @@ -2111,6 +2111,7 @@
+> > > >  # @replication: Since 2.8
+> > > >  # @ssh: Since 2.8
+> > > >  # @iscsi: Since 2.9
+> > > > +# @rbd: Since 2.9
+> > > >  #
+> > > >  # Since: 2.0
+> > > >  ##
+> > > > @@ -2120,7 +2121,7 @@
+> > > >              'host_device', 'http', 'https', 'iscsi', 'luks', 'nbd', 'nfs',
+> > > >              'null-aio', 'null-co', 'parallels', 'qcow', 'qcow2', 'qed',
+> > > >              'quorum', 'raw', 'replication', 'ssh', 'vdi', 'vhdx', 'vmdk',
+> > > > -            'vpc', 'vvfat' ] }
+> > > > +            'vpc', 'vvfat', 'rbd' ] }
+> > > >  
+> > > >  ##
+> > > >  # @BlockdevOptionsFile:
+> > > > @@ -2376,7 +2377,6 @@
+> > > >              'path': 'str',
+> > > >              '*user': 'str' } }
+> > > >  
+> > > > -
+> > > >  ##
+> > > >  # @BlkdebugEvent:
+> > > >  #
+> > > > @@ -2666,6 +2666,47 @@
+> > > >              '*timeout': 'int' } }
+> > > >  
+> > > >  ##
+> > > > +# @BlockdevOptionsRbd:
+> > > > +#
+> > > > +# @pool:               Ceph pool name
+> > > > +#
+> > > > +# @image:              Image name in the Ceph pool
+> > > > +#
+> > > > +# @conf:               # optional path to Ceph configuration file.  Values
+> > > > +#                      in the configuration file will be overridden by
+> > > > +#                      options specified via QAPI.
+> > > > +#
+> > > > +# @snapshot:           #optional Ceph snapshot name
+> > > > +#
+> > > > +# @rbd-id:             #optional Ceph id name
+> > > > +#
+> > > > +# @password-secret:    #optional The ID of a QCryptoSecret object providing
+> > > > +#                       the password for the login.
+> > > > +#
+> > > > +# @keyvalue-pairs:     #optional  string containing key/value pairs for
+> > > > +#                      additional Ceph configuration, not including "id" or "conf"
+> > > > +#                      options. This can be used to specify any of the options
+> > > > +#                      that Ceph supports.  The format is of the form:
+> > > > +#                           key1=value1:key2=value2:[...]
+> > > > +#
+> > > > +#                      Special characters such as ":" and "=" can be escaped
+> > > > +#                      with a '\' character, which means the QAPI needs an
+> > > > +#                      extra '\' character to pass the needed escape character.
+> > > > +#                      For example:
+> > > > +#                            "keyvalue-pairs": "mon_host=127.0.0.1\\:6321"
+> > > > +#
+> > > 
+> > > This is the key / value pair issue mentioned in the cover letter.  Encoding
+> > > all the options as a string like this is ugly.  What is the preference on
+> > > how to handle these via QAPI, when the actual key and value pairs could be
+> > > anything?   Talking with Markus on IRC, one option he mentioned was an array
+> > > of a generic struct of 'key' and 'value' pairs.
+> > > 
+> > > Do the libvirt folks have any interface preferences here?
+> > 
+> > IMHO, we should formally model each option that we need to be able to provide
+> > and *not* provide any generic passthrough feature in QAPI.
+> > 
+> > Particularly for the server hostname/port, we should have the same QAPI
+> > modelling approach that we did for other network protocols.
+> > 
+> >
+> 
+> That is a sane position to take, but the problem is I really have no idea
+> all the options to include or not include here.
+
+Libvirt relies on the following
+
+ - id             - to provide the username
+ - mon_host       - to provide the list of host+ports
+ - auth_supported - to provide the list of authentication schemes to try
+ - conf           - to proide the ceph config file
 
 
---qOEfHYdX8LquYLAx
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> However, maybe it doesn't matter, at least for 2.9 - for the QAPI command,
+> we could drop the extra arguments completely (i.e., just drop the
+> keyvalue-pairs argument, above).  The extra options could still be set via a
+> config file passed in via 'conf', and in release > 2.9 we can gradually (or
+> not-so-gradually) add in additional options directly supported via QAPI.
+> 
+> The filename parsing would remain the same, for backwards compatibility, of
+> course.
+> 
+> Does this sound reasonable to you?
 
-On Fri, Feb 24, 2017 at 05:27:14PM +0000, Daniel P. Berrange wrote:
-> When using a memory-backend object with prealloc turned on, QEMU
-> will memset() the first byte in every memory page to zero. While
-> this might have been acceptable for memory backends associated
-> with RAM, this corrupts application data for NVDIMMs.
->=20
-> Instead of setting every page to zero, read the current byte
-> value and then just write that same value back, so we are not
-> corrupting the original data. Directly write the value instead
-> of memset()ing it, since there's no benefit to memset for a
-> single byte write.
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->=20
-> NB, I have not tested performance of this, so no idea if this
-> makes it better/worse/no-change. Would appreciate if Jitendra
-> could repeat tests to see if it impacts scalability at all.
->=20
->  util/oslib-posix.c | 15 ++++++++++++++-
->  1 file changed, 14 insertions(+), 1 deletion(-)
+If we support the pieces libvirt needs, then I've no objection to dropping
+the rest.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---qOEfHYdX8LquYLAx
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYtCmDAAoJEJykq7OBq3PIJhQH/jzKnqh8tsIRGk0p/nzokIpa
-HV6yADLrM+rS6j4l/XF3P/HzYHkVcMP/zesAbmcArnWRZFqXE4oQ+AFnYNnu5fw0
-2m7LU+5L/D86bsV/GDbzhIlStf8rmIBuKDfBZHtpkyGnnL69hbBcIuvFj5pZS5Ho
-NL+hotAMxor9lyEROQnuCbiuai/7uxHvATWDUwubK4eQZIWJVm1BeqMzlBkqZlMJ
-Ut0p4+gM5Xi47RrknE+44HPS0pTg1EzgUFgX59z5i8usdH6ddfrLwZmn7u5gQue4
-+Lw0OgpRiX4QgIJlqmWns65wrlmVYRPfLL4exbzXq+kbabRdhtQrekuiv8DUxLM=
-=kJbw
------END PGP SIGNATURE-----
-
---qOEfHYdX8LquYLAx--
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
