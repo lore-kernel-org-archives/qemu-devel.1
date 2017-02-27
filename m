@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ciFlj-0006hZ-Il
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:30:52 -0500
+	(envelope-from <jcody@redhat.com>) id 1ciFlk-0006iJ-3a
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:30:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ciFli-0006vc-Jz
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:30:51 -0500
+	(envelope-from <jcody@redhat.com>) id 1ciFli-0006vw-Rd
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:30:52 -0500
 From: Jeff Cody <jcody@redhat.com>
-Date: Mon, 27 Feb 2017 02:30:41 -0500
-Message-Id: <08786526aec147544588ab3e885a984e7d0d1c69.1488180142.git.jcody@redhat.com>
+Date: Mon, 27 Feb 2017 02:30:38 -0500
+Message-Id: <25ccaa9f42f7efdac608cb6f779b144a87529138.1488180142.git.jcody@redhat.com>
 In-Reply-To: <cover.1488180142.git.jcody@redhat.com>
 References: <cover.1488180142.git.jcody@redhat.com>
 In-Reply-To: <cover.1488180142.git.jcody@redhat.com>
 References: <cover.1488180142.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/4] block/rbd: Add blockdev-add support
+Subject: [Qemu-devel] [PATCH 1/4] block/rbd: don't copy strings in
+ qemu_rbd_next_tok()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,96 +25,199 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, armbru@redhat.com, berrange@redhat.com, eblake@redhat.com
 
+This patch is prep work for parsing options for .bdrv_parse_filename,
+and using QDict options.
+
+The function qemu_rbd_next_tok() searched for various key/value pairs,
+and copied them into buffers.  This will soon be an unnecessary extra
+step, so we will now return found strings by reference only, and
+offload the responsibility for safely handling/coping these strings to
+the caller.
+
+This also cleans up error handling some, as the callers now rely on
+the Error object to determine if there is a parse error.
+
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- qapi/block-core.json | 47 ++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 44 insertions(+), 3 deletions(-)
+ block/rbd.c | 99 +++++++++++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 64 insertions(+), 35 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 5f82d35..08a1419 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2111,6 +2111,7 @@
- # @replication: Since 2.8
- # @ssh: Since 2.8
- # @iscsi: Since 2.9
-+# @rbd: Since 2.9
- #
- # Since: 2.0
- ##
-@@ -2120,7 +2121,7 @@
-             'host_device', 'http', 'https', 'iscsi', 'luks', 'nbd', 'nfs',
-             'null-aio', 'null-co', 'parallels', 'qcow', 'qcow2', 'qed',
-             'quorum', 'raw', 'replication', 'ssh', 'vdi', 'vhdx', 'vmdk',
--            'vpc', 'vvfat' ] }
-+            'vpc', 'vvfat', 'rbd' ] }
+diff --git a/block/rbd.c b/block/rbd.c
+index 22e8e69..3f1a9de 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -102,10 +102,10 @@ typedef struct BDRVRBDState {
+     char *snap;
+ } BDRVRBDState;
  
- ##
- # @BlockdevOptionsFile:
-@@ -2376,7 +2377,6 @@
-             'path': 'str',
-             '*user': 'str' } }
+-static int qemu_rbd_next_tok(char *dst, int dst_len,
+-                             char *src, char delim,
+-                             const char *name,
+-                             char **p, Error **errp)
++static char *qemu_rbd_next_tok(int max_len,
++                               char *src, char delim,
++                               const char *name,
++                               char **p, Error **errp)
+ {
+     int l;
+     char *end;
+@@ -127,17 +127,15 @@ static int qemu_rbd_next_tok(char *dst, int dst_len,
+         }
+     }
+     l = strlen(src);
+-    if (l >= dst_len) {
++    if (l >= max_len) {
+         error_setg(errp, "%s too long", name);
+-        return -EINVAL;
++        return NULL;
+     } else if (l == 0) {
+         error_setg(errp, "%s too short", name);
+-        return -EINVAL;
++        return NULL;
+     }
  
+-    pstrcpy(dst, dst_len, src);
 -
- ##
- # @BlkdebugEvent:
- #
-@@ -2666,6 +2666,47 @@
-             '*timeout': 'int' } }
+-    return 0;
++    return src;
+ }
  
- ##
-+# @BlockdevOptionsRbd:
-+#
-+# @pool:               Ceph pool name
-+#
-+# @image:              Image name in the Ceph pool
-+#
-+# @conf:               # optional path to Ceph configuration file.  Values
-+#                      in the configuration file will be overridden by
-+#                      options specified via QAPI.
-+#
-+# @snapshot:           #optional Ceph snapshot name
-+#
-+# @rbd-id:             #optional Ceph id name
-+#
-+# @password-secret:    #optional The ID of a QCryptoSecret object providing
-+#                       the password for the login.
-+#
-+# @keyvalue-pairs:     #optional  string containing key/value pairs for
-+#                      additional Ceph configuration, not including "id" or "conf"
-+#                      options. This can be used to specify any of the options
-+#                      that Ceph supports.  The format is of the form:
-+#                           key1=value1:key2=value2:[...]
-+#
-+#                      Special characters such as ":" and "=" can be escaped
-+#                      with a '\' character, which means the QAPI needs an
-+#                      extra '\' character to pass the needed escape character.
-+#                      For example:
-+#                            "keyvalue-pairs": "mon_host=127.0.0.1\\:6321"
-+#
-+# Since: 2.9
-+##
-+{ 'struct': 'BlockdevOptionsRbd',
-+  'data': { 'pool': 'str',
-+            'image': 'str',
-+            '*conf': 'str',
-+            '*snapshot': 'str',
-+            '*rbd-id': 'str',
-+            '*password-secret': 'str',
-+            '*keyvalue-pairs': 'str' } }
+ static void qemu_rbd_unescape(char *src)
+@@ -162,7 +160,9 @@ static int qemu_rbd_parsename(const char *filename,
+ {
+     const char *start;
+     char *p, *buf;
+-    int ret;
++    int ret = 0;
++    char *found_str;
++    Error *local_err = NULL;
+ 
+     if (!strstart(filename, "rbd:", &start)) {
+         error_setg(errp, "File name must start with 'rbd:'");
+@@ -174,36 +174,60 @@ static int qemu_rbd_parsename(const char *filename,
+     *snap = '\0';
+     *conf = '\0';
+ 
+-    ret = qemu_rbd_next_tok(pool, pool_len, p,
+-                            '/', "pool name", &p, errp);
+-    if (ret < 0 || !p) {
++    found_str = qemu_rbd_next_tok(pool_len, p,
++                                 '/', "pool name", &p, &local_err);
++    if (local_err) {
++        goto done;
++    }
++    if (!p) {
+         ret = -EINVAL;
++        error_setg(errp, "Pool name is required");
+         goto done;
+     }
+-    qemu_rbd_unescape(pool);
++    qemu_rbd_unescape(found_str);
++    g_strlcpy(pool, found_str, pool_len);
+ 
+     if (strchr(p, '@')) {
+-        ret = qemu_rbd_next_tok(name, name_len, p,
+-                                '@', "object name", &p, errp);
+-        if (ret < 0) {
++        found_str = qemu_rbd_next_tok(name_len, p,
++                                     '@', "object name", &p, &local_err);
++        if (local_err) {
+             goto done;
+         }
+-        ret = qemu_rbd_next_tok(snap, snap_len, p,
+-                                ':', "snap name", &p, errp);
+-        qemu_rbd_unescape(snap);
++        qemu_rbd_unescape(found_str);
++        g_strlcpy(name, found_str, name_len);
 +
-+##
- # @ReplicationMode:
- #
- # An enumeration of replication modes.
-@@ -2863,7 +2904,7 @@
-       'qed':        'BlockdevOptionsGenericCOWFormat',
-       'quorum':     'BlockdevOptionsQuorum',
-       'raw':        'BlockdevOptionsRaw',
--# TODO rbd: Wait for structured options
-+      'rbd':        'BlockdevOptionsRbd',
-       'replication':'BlockdevOptionsReplication',
- # TODO sheepdog: Wait for structured options
-       'ssh':        'BlockdevOptionsSsh',
++        found_str = qemu_rbd_next_tok(snap_len, p,
++                                      ':', "snap name", &p, &local_err);
++        if (local_err) {
++            goto done;
++        }
++        qemu_rbd_unescape(found_str);
++        g_strlcpy(snap, found_str, snap_len);
+     } else {
+-        ret = qemu_rbd_next_tok(name, name_len, p,
+-                                ':', "object name", &p, errp);
++        found_str = qemu_rbd_next_tok(name_len, p,
++                                     ':', "object name", &p, &local_err);
++        if (local_err) {
++            goto done;
++        }
++        qemu_rbd_unescape(found_str);
++        g_strlcpy(name, found_str, name_len);
+     }
+-    qemu_rbd_unescape(name);
+-    if (ret < 0 || !p) {
++    if (!p) {
+         goto done;
+     }
+ 
+-    ret = qemu_rbd_next_tok(conf, conf_len, p,
+-                            '\0', "configuration", &p, errp);
++    found_str = qemu_rbd_next_tok(conf_len, p,
++                                 '\0', "configuration", &p, &local_err);
++    if (local_err) {
++        goto done;
++    }
++    g_strlcpy(conf, found_str, conf_len);
+ 
+ done:
++    if (local_err) {
++        ret = -EINVAL;
++        error_propagate(errp, local_err);
++    }
+     g_free(buf);
+     return ret;
+ }
+@@ -262,17 +286,18 @@ static int qemu_rbd_set_conf(rados_t cluster, const char *conf,
+                              Error **errp)
+ {
+     char *p, *buf;
+-    char name[RBD_MAX_CONF_NAME_SIZE];
+-    char value[RBD_MAX_CONF_VAL_SIZE];
++    char *name;
++    char *value;
++    Error *local_err = NULL;
+     int ret = 0;
+ 
+     buf = g_strdup(conf);
+     p = buf;
+ 
+     while (p) {
+-        ret = qemu_rbd_next_tok(name, sizeof(name), p,
+-                                '=', "conf option name", &p, errp);
+-        if (ret < 0) {
++        name = qemu_rbd_next_tok(RBD_MAX_CONF_NAME_SIZE, p,
++                                 '=', "conf option name", &p, &local_err);
++        if (local_err) {
+             break;
+         }
+         qemu_rbd_unescape(name);
+@@ -283,9 +308,9 @@ static int qemu_rbd_set_conf(rados_t cluster, const char *conf,
+             break;
+         }
+ 
+-        ret = qemu_rbd_next_tok(value, sizeof(value), p,
+-                                ':', "conf option value", &p, errp);
+-        if (ret < 0) {
++        value = qemu_rbd_next_tok(RBD_MAX_CONF_VAL_SIZE, p,
++                                  ':', "conf option value", &p, &local_err);
++        if (local_err) {
+             break;
+         }
+         qemu_rbd_unescape(value);
+@@ -313,6 +338,10 @@ static int qemu_rbd_set_conf(rados_t cluster, const char *conf,
+         }
+     }
+ 
++    if (local_err) {
++        error_propagate(errp, local_err);
++        ret = -EINVAL;
++    }
+     g_free(buf);
+     return ret;
+ }
 -- 
 2.9.3
