@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39976)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ciMOj-0005BE-2e
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:35:34 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ciMRK-0007OJ-8k
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:38:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ciMOf-0000g6-3X
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:35:33 -0500
-Received: from 9.mo6.mail-out.ovh.net ([87.98.171.146]:51849)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ciMOe-0000fY-Sq
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:35:29 -0500
-Received: from player761.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id C21DDB3EEA
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 15:35:27 +0100 (CET)
-Date: Mon, 27 Feb 2017 15:35:19 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170227153519.0e6ce641@bahia.lan>
-In-Reply-To: <20170227124901.GH28403@stefanha-x1.localdomain>
-References: <148814889214.28146.16915712763478774662.stgit@bahia>
-	<148814893846.28146.10539730675852394601.stgit@bahia>
-	<20170227124901.GH28403@stefanha-x1.localdomain>
+	(envelope-from <peter.maydell@linaro.org>) id 1ciMRJ-0001Pl-Cf
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:38:14 -0500
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:35262)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ciMRJ-0001PU-4D
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:38:13 -0500
+Received: by mail-wr0-x233.google.com with SMTP id g10so53543887wrg.2
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 06:38:12 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/d=dtXVa30/_L6jZl2OOVtXn";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v2 06/28] 9pfs: local: open/opendir: don't
- follow symlinks
+In-Reply-To: <20170227124551.8673-1-pbonzini@redhat.com>
+References: <20170227124551.8673-1-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 27 Feb 2017 14:37:51 +0000
+Message-ID: <CAFEAcA8HOjCv1FniO6Zs_s75wHCru+c-PkAfbODcjYSqJZwX0Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v2 00/17] KVM and cpu-exec patches for 2.9
+ soft freeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,67 +30,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
---Sig_/d=dtXVa30/_L6jZl2OOVtXn
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 27 February 2017 at 12:45, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> The following changes since commit d992f2f1368ceb92e6bfd8efece174110f4236=
+ff:
+>
+>   Merge remote-tracking branch 'remotes/artyom/tags/pull-sun4v-20170226' =
+into staging (2017-02-26 22:40:23 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/bonzini/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to f601681feff62113b526d4ad491af4a03aca825a:
+>
+>   qmp-events: fix GUEST_PANICKED description formatting (2017-02-27 13:31=
+:25 +0100)
+>
+> v1->v2: add missing #ifdef KVM_HAVE_MCE_INJECTION
+>
+>         rebase over MTTCG pull request.  -icount is currently broken but
+>         I'd like to preserve bisectability, so this pull request brings
+>         in the icount patches through a merge commit.
+>
+> ----------------------------------------------------------------
+> * kernel header update (requested by David and Vijay)
+> * GuestPanicInformation fixups (Anton)
+> * record/replay icount fixes (Pavel)
+> * cpu-exec cleanup, unification of icount_decr with tcg_exit_req (me)
+> * KVM_CAP_IMMEDIATE_EXIT support (me)
+> * vmxcap update (me)
 
-On Mon, 27 Feb 2017 12:49:01 +0000
-Stefan Hajnoczi <stefanha@gmail.com> wrote:
+Build failures :-(
 
-> On Sun, Feb 26, 2017 at 11:42:18PM +0100, Greg Kurz wrote:
-> > @@ -48,6 +49,24 @@ typedef struct {
-> >      int mountfd;
-> >  } LocalData;
-> > =20
-> > +int local_open_nofollow(FsContext *fs_ctx, const char *path, int flags,
-> > +                        mode_t mode)
-> > +{
-> > +    LocalData *data =3D fs_ctx->private;
-> > +
-> > +    /* All paths are relative to the path data->mountfd points to */
-> > +    while (*path =3D=3D '/') {
-> > +        path++;
-> > +    }
-> > +
-> > +    return openat_nofollow(data->mountfd, path, flags, mode); =20
->=20
-> What about all the other openat_nofollow() users?  They don't explicitly
+OSX:
+/Users/pm215/src/qemu-for-merges/util/oslib-posix.c:634:35: error: use
+of undeclared identifier 'SIGPOLL'
+    } else if (info->ssi_signo =3D=3D SIGPOLL) {
+                                  ^
 
-$ git grep openat_nofollow
-hw/9pfs/9p-local.c:    return openat_nofollow(data->mountfd, path, flags, m=
-ode);
-hw/9pfs/9p-util.c:int openat_nofollow(int dirfd, const char *path, int flag=
-s, mode_t mode)
-hw/9pfs/9p-util.h:int openat_nofollow(int dirfd, const char *path, int flag=
-s, mode_t mode);
+There's no SIGPOLL on OSX, apparently (it is marked as obsolescent
+in the POSIX spec). The sys/signal.h header only defines a SIGPOLL if
+(defined(_POSIX_C_SOURCE) && !defined(_DARWIN_C_SOURCE)) (ie you
+asked for the POSIX, the whole POSIX and nothing but the POSIX).
+There is a SIGIO (which is defined if the exact opposite condition
+is true).
 
-> strip leading slashes.  Perhaps this should be part of a renamed
-> relative_openat_nofollow() function.
->=20
-> > +}
-> > +
-> > +int local_opendir_nofollow(FsContext *fs_ctx, const char *path)
-> > +{
-> > +    return local_open_nofollow(fs_ctx, path, O_DIRECTORY | O_RDONLY, 0=
-); =20
->=20
-> Why not strip slashes here?
+PPC64, AArch64, ARM:
 
-Because this one calls the other one above.
+/home/pm215/qemu/kvm-all.c:1898:23: error: =E2=80=98pending_sigbus_addr=E2=
+=80=99
+defined but not used [-Werror=3Dunuse
+d-variable]
+ static __thread void *pending_sigbus_addr;
+                       ^
+/home/pm215/qemu/kvm-all.c:1899:21: error: =E2=80=98pending_sigbus_code=E2=
+=80=99
+defined but not used [-Werror=3Dunuse
+d-variable]
+ static __thread int pending_sigbus_code;
+                     ^
 
---Sig_/d=dtXVa30/_L6jZl2OOVtXn
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+Incidentally, trying to figure out which fields in a siginfo_t
+should be valid is a losing game (though one we play elsewhere,
+see host_to_target_siginfo_noswap() in linux-user), because
+the si_code/signal doesn't actually tell you which fields are valid
+given the existence of rt_sigqueueinfo(). (The kernel internally
+is OK because it has the high 16 bits of si_code, but at least
+for a real signal handler it doesn't tell userspace those high
+bits, so userspace can't distinguish a spoofed si_code (which
+has si_pid/si_uid) from a real one (has addr/band/timer/etc
+depending on the code). Maybe signalfd() gives you the full
+si_code; I haven't checked...
 
-iEYEARECAAYFAli0OSgACgkQAvw66wEB28I7GwCfQv9EC4MOyZMjEBkwZGRkxTXE
-SYcAoJGAm7k1UbmquIpBaGY26Qf13ZcZ
-=W29c
------END PGP SIGNATURE-----
-
---Sig_/d=dtXVa30/_L6jZl2OOVtXn--
+thanks
+-- PMM
