@@ -1,39 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1ciNfM-0000qN-BD
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:56:49 -0500
+	(envelope-from <shah.suramya@gmail.com>) id 1ciNoX-0000Jy-ID
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:06:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1ciNfI-0002v3-EL
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:56:48 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43236)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1ciNfI-0002uk-4k
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:56:44 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1RFtTfP020328
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 10:56:42 -0500
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28vpwe8vf9-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 10:56:42 -0500
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Mon, 27 Feb 2017 15:56:40 -0000
-Date: Mon, 27 Feb 2017 16:56:34 +0100
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <20170223122025.10420-2-cornelia.huck@de.ibm.com>
-References: <20170223122025.10420-1-cornelia.huck@de.ibm.com>
-	<20170223122025.10420-2-cornelia.huck@de.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170227165634.0c1a9eb6.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/5] elf-loader: Allow late loading of
- elf
+	(envelope-from <shah.suramya@gmail.com>) id 1ciNoT-0006Ys-Ka
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:06:17 -0500
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:36633)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <shah.suramya@gmail.com>)
+	id 1ciNoT-0006Yf-Ek
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:06:13 -0500
+Received: by mail-pg0-x241.google.com with SMTP id 25so1490462pgy.3
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 08:06:13 -0800 (PST)
+From: Suramya Shah <shah.suramya@gmail.com>
+Date: Mon, 27 Feb 2017 21:31:18 +0530
+Message-Id: <20170227160118.3557-1-shah.suramya@gmail.com>
+Subject: [Qemu-devel] [[PATCH-2]] Removed support for DEPTH!=32 in sm501.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,142 +25,40 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, Farhan Ali <alifm@linux.vnet.ibm.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: shah.suramya@gmail.com, peter.maydell@linaro.org, kraxel@redhat.com
 
-On Thu, 23 Feb 2017 13:20:21 +0100
-Cornelia Huck <cornelia.huck@de.ibm.com> wrote:
+Signed-off-by: Suramya Shah <shah.suramya@gmail.com>
+---
+ hw/display/sm501.c | 17 -----------------
+ 1 file changed, 17 deletions(-)
 
-> From: Farhan Ali <alifm@linux.vnet.ibm.com>
-> 
-> The current QEMU ROM infrastructure rejects late loading of ROMs.
-> And ELFs are currently loaded as ROM, this prevents delayed loading
-> of ELFs. So when loading ELF, allow the user to specify if ELF should
-> be loaded as ROM or not.
-> 
-> If an ELF is not loaded as ROM, then they are not restored on a
-> guest reboot/reset and so its upto the user to handle the reloading.
-> 
-> Signed-off-by: Farhan Ali <alifm@linux.vnet.ibm.com>
-> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
-> ---
->  hw/core/loader.c     | 17 +++++++++++++++--
->  include/hw/elf_ops.h | 13 +++++++++----
->  include/hw/loader.h  | 13 ++++++++++++-
->  3 files changed, 36 insertions(+), 7 deletions(-)
-> 
-
-Any further acks for this?
-
-Or, put differently, any objections to me sending this in a pullreq for
-2.9?
-
-> diff --git a/hw/core/loader.c b/hw/core/loader.c
-> index ee5abd6eb7..9d1af1f6f3 100644
-> --- a/hw/core/loader.c
-> +++ b/hw/core/loader.c
-> @@ -435,6 +435,19 @@ int load_elf_as(const char *filename,
->                  uint64_t *highaddr, int big_endian, int elf_machine,
->                  int clear_lsb, int data_swab, AddressSpace *as)
->  {
-> +    return load_elf_ram(filename, translate_fn, translate_opaque,
-> +                        pentry, lowaddr, highaddr, big_endian, elf_machine,
-> +                        clear_lsb, data_swab, as, true);
-> +}
-> +
-> +/* return < 0 if error, otherwise the number of bytes loaded in memory */
-> +int load_elf_ram(const char *filename,
-> +                 uint64_t (*translate_fn)(void *, uint64_t),
-> +                 void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
-> +                 uint64_t *highaddr, int big_endian, int elf_machine,
-> +                 int clear_lsb, int data_swab, AddressSpace *as,
-> +                 bool load_rom)
-> +{
->      int fd, data_order, target_data_order, must_swab, ret = ELF_LOAD_FAILED;
->      uint8_t e_ident[EI_NIDENT];
-> 
-> @@ -473,11 +486,11 @@ int load_elf_as(const char *filename,
->      if (e_ident[EI_CLASS] == ELFCLASS64) {
->          ret = load_elf64(filename, fd, translate_fn, translate_opaque, must_swab,
->                           pentry, lowaddr, highaddr, elf_machine, clear_lsb,
-> -                         data_swab, as);
-> +                         data_swab, as, load_rom);
->      } else {
->          ret = load_elf32(filename, fd, translate_fn, translate_opaque, must_swab,
->                           pentry, lowaddr, highaddr, elf_machine, clear_lsb,
-> -                         data_swab, as);
-> +                         data_swab, as, load_rom);
->      }
-> 
->   fail:
-> diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
-> index 25659b93be..a172a6068a 100644
-> --- a/include/hw/elf_ops.h
-> +++ b/include/hw/elf_ops.h
-> @@ -264,7 +264,7 @@ static int glue(load_elf, SZ)(const char *name, int fd,
->                                int must_swab, uint64_t *pentry,
->                                uint64_t *lowaddr, uint64_t *highaddr,
->                                int elf_machine, int clear_lsb, int data_swab,
-> -                              AddressSpace *as)
-> +                              AddressSpace *as, bool load_rom)
->  {
->      struct elfhdr ehdr;
->      struct elf_phdr *phdr = NULL, *ph;
-> @@ -403,10 +403,15 @@ static int glue(load_elf, SZ)(const char *name, int fd,
->                  *pentry = ehdr.e_entry - ph->p_vaddr + ph->p_paddr;
->              }
-> 
-> -            snprintf(label, sizeof(label), "phdr #%d: %s", i, name);
-> +            if (load_rom) {
-> +                snprintf(label, sizeof(label), "phdr #%d: %s", i, name);
-> 
-> -            /* rom_add_elf_program() seize the ownership of 'data' */
-> -            rom_add_elf_program(label, data, file_size, mem_size, addr, as);
-> +                /* rom_add_elf_program() seize the ownership of 'data' */
-> +                rom_add_elf_program(label, data, file_size, mem_size, addr, as);
-> +            } else {
-> +                cpu_physical_memory_write(addr, data, file_size);
-> +                g_free(data);
-> +            }
-> 
->              total_size += mem_size;
->              if (addr < low)
-> diff --git a/include/hw/loader.h b/include/hw/loader.h
-> index 0dbd8d6bf3..3df4d73398 100644
-> --- a/include/hw/loader.h
-> +++ b/include/hw/loader.h
-> @@ -65,7 +65,7 @@ int load_image_gzipped(const char *filename, hwaddr addr, uint64_t max_sz);
->  #define ELF_LOAD_WRONG_ENDIAN -4
->  const char *load_elf_strerror(int error);
-> 
-> -/** load_elf_as:
-> +/** load_elf_ram:
->   * @filename: Path of ELF file
->   * @translate_fn: optional function to translate load addresses
->   * @translate_opaque: opaque data passed to @translate_fn
-> @@ -81,6 +81,7 @@ const char *load_elf_strerror(int error);
->   *             words and 3 for within doublewords.
->   * @as: The AddressSpace to load the ELF to. The value of address_space_memory
->   *      is used if nothing is supplied here.
-> + * @load_rom : Load ELF binary as ROM
->   *
->   * Load an ELF file's contents to the emulated system's address space.
->   * Clients may optionally specify a callback to perform address
-> @@ -93,6 +94,16 @@ const char *load_elf_strerror(int error);
->   * If @elf_machine is EM_NONE then the machine type will be read from the
->   * ELF header and no checks will be carried out against the machine type.
->   */
-> +int load_elf_ram(const char *filename,
-> +                 uint64_t (*translate_fn)(void *, uint64_t),
-> +                 void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
-> +                 uint64_t *highaddr, int big_endian, int elf_machine,
-> +                 int clear_lsb, int data_swab, AddressSpace *as,
-> +                 bool load_rom);
-> +
-> +/** load_elf_as:
-> + * Same as load_elf_ram(), but always loads the elf as ROM
-> + */
->  int load_elf_as(const char *filename,
->                  uint64_t (*translate_fn)(void *, uint64_t),
->                  void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
+diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+index 040a0b9..faca906 100644
+--- a/hw/display/sm501.c
++++ b/hw/display/sm501.c
+@@ -1173,23 +1173,6 @@ typedef void draw_line_func(uint8_t *d, const uint8_t *s,
+ typedef void draw_hwc_line_func(SM501State * s, int crt, uint8_t * palette,
+                                 int c_y, uint8_t *d, int width);
+ 
+-#define DEPTH 8
+-#include "sm501_template.h"
+-
+-#define DEPTH 15
+-#include "sm501_template.h"
+-
+-#define BGR_FORMAT
+-#define DEPTH 15
+-#include "sm501_template.h"
+-
+-#define DEPTH 16
+-#include "sm501_template.h"
+-
+-#define BGR_FORMAT
+-#define DEPTH 16
+-#include "sm501_template.h"
+-
+ #define DEPTH 32
+ #include "sm501_template.h"
+ 
+-- 
+2.9.3
