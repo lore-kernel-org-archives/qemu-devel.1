@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52283)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ciLWa-00075P-TU
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:39:37 -0500
+	(envelope-from <berrange@redhat.com>) id 1ciLWc-00077D-N0
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:39:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ciLWZ-0000S9-RW
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:39:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56238)
+	(envelope-from <berrange@redhat.com>) id 1ciLWb-0000Sj-Nz
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:39:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48118)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ciLWZ-0000S4-LX
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:39:35 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ciLWb-0000SW-HU
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:39:37 -0500
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Mon, 27 Feb 2017 13:39:26 +0000
-Message-Id: <20170227133927.759-2-berrange@redhat.com>
+Date: Mon, 27 Feb 2017 13:39:27 +0000
+Message-Id: <20170227133927.759-3-berrange@redhat.com>
 In-Reply-To: <20170227133927.759-1-berrange@redhat.com>
 References: <20170227133927.759-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PULL v1 1/2] crypto: fix leak in ivgen essiv init
+Subject: [Qemu-devel] [PULL v1 2/2] crypto: assert cipher algorithm is
+ always valid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,30 +25,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Li Qiang <liqiang6-s@360.cn>, "Daniel P . Berrange" <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Prasad J Pandit <pjp@fedoraproject.org>, "Daniel P . Berrange" <berrange@redhat.com>
 
-From: Li Qiang <liqiang6-s@360.cn>
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-On error path, the 'salt' doesn't been freed thus leading
-a memory leak. This patch avoid this.
+Crypto routines 'qcrypto_cipher_get_block_len' and
+'qcrypto_cipher_get_key_len' return non-zero cipher block and key
+lengths from static arrays 'alg_block_len[]' and 'alg_key_len[]'
+respectively. Returning 'zero(0)' value from either of them would
+likely lead to an error condition.
 
-Signed-off-by: Li Qiang <liqiang6-s@360.cn>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- crypto/ivgen-essiv.c | 1 +
- 1 file changed, 1 insertion(+)
+ crypto/cipher.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/crypto/ivgen-essiv.c b/crypto/ivgen-essiv.c
-index 634de63..cba20bd 100644
---- a/crypto/ivgen-essiv.c
-+++ b/crypto/ivgen-essiv.c
-@@ -48,6 +48,7 @@ static int qcrypto_ivgen_essiv_init(QCryptoIVGen *ivgen,
-                            &salt, &nhash,
-                            errp) < 0) {
-         g_free(essiv);
-+        g_free(salt);
-         return -1;
-     }
+diff --git a/crypto/cipher.c b/crypto/cipher.c
+index 9ecaff7..5a96489 100644
+--- a/crypto/cipher.c
++++ b/crypto/cipher.c
+@@ -63,18 +63,14 @@ static bool mode_need_iv[QCRYPTO_CIPHER_MODE__MAX] = {
+ 
+ size_t qcrypto_cipher_get_block_len(QCryptoCipherAlgorithm alg)
+ {
+-    if (alg >= G_N_ELEMENTS(alg_key_len)) {
+-        return 0;
+-    }
++    assert(alg < G_N_ELEMENTS(alg_key_len));
+     return alg_block_len[alg];
+ }
+ 
+ 
+ size_t qcrypto_cipher_get_key_len(QCryptoCipherAlgorithm alg)
+ {
+-    if (alg >= G_N_ELEMENTS(alg_key_len)) {
+-        return 0;
+-    }
++    assert(alg < G_N_ELEMENTS(alg_key_len));
+     return alg_key_len[alg];
+ }
  
 -- 
 2.9.3
