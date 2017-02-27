@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ciHc5-0003xj-I0
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 04:29:02 -0500
+	(envelope-from <berrange@redhat.com>) id 1ciHcE-00041U-1K
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 04:29:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1ciHc0-0005ns-Lk
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 04:29:01 -0500
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:34355)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1ciHc0-0005nd-Dr
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 04:28:56 -0500
-Received: by mail-wr0-x244.google.com with SMTP id m5so3705697wrm.1
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 01:28:54 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <1e54cf74-2ad1-7f26-27ba-fb662be92573@ozlabs.ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3c047f5b-eeb3-54ab-179e-8d981a81182a@redhat.com>
-Date: Mon, 27 Feb 2017 10:28:51 +0100
+	(envelope-from <berrange@redhat.com>) id 1ciHcD-0005qJ-2O
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 04:29:10 -0500
+Date: Mon, 27 Feb 2017 09:28:56 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170227092856.GC18219@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <cover.1488180142.git.jcody@redhat.com>
+	<6f1d60bdbbb4e82991c699d4aa6666c4317a1c5d.1488180142.git.jcody@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1e54cf74-2ad1-7f26-27ba-fb662be92573@ozlabs.ru>
-Content-Type: text/plain; charset=koi8-r
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] exec: Respect as_tranlsate_internal length clamp
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <6f1d60bdbbb4e82991c699d4aa6666c4317a1c5d.1488180142.git.jcody@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/4] block/rbd: code movement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +24,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Crosthwaite <peter.crosthwaite@xilinx.com>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, eblake@redhat.com
 
 
+Describing this as "code movement" when the added & removed chunks are not
+identical is a bit misleading.
 
-On 27/02/2017 06:53, Alexey Kardashevskiy wrote:
-> There is a link to this one [1]:
-> http://git.qemu-project.org/?p=qemu.git;a=commitdiff;h=c3c1bb99d1c11978d9ce94d1bdcf0705378c1459
+Can you expand the commit message to explain why the extra options are
+being added
+
+On Mon, Feb 27, 2017 at 02:30:39AM -0500, Jeff Cody wrote:
+> Signed-off-by: Jeff Cody <jcody@redhat.com>
+> ---
+>  block/rbd.c | 64 +++++++++++++++++++++++++++++++++++++++++++------------------
+>  1 file changed, 45 insertions(+), 19 deletions(-)
 > 
-> Which was reverted with a sensible explanation [2]:
-> http://git.qemu-project.org/?p=qemu.git;a=commitdiff;h=4025446f0ac6213335c22ec43f3c3d8362ce7286
+> diff --git a/block/rbd.c b/block/rbd.c
+> index 3f1a9de..c8d4eb1 100644
+> --- a/block/rbd.c
+> +++ b/block/rbd.c
+> @@ -357,6 +357,51 @@ static void qemu_rbd_memset(RADOSCB *rcb, int64_t offs)
+>      }
+>  }
+>  
+> +static QemuOptsList runtime_opts = {
+> +    .name = "rbd",
+> +    .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
+> +    .desc = {
+> +        {
+> +            .name = "filename",
+> +            .type = QEMU_OPT_STRING,
+> +            .help = "Specification of the rbd image",
+> +        },
+> +        {
+> +            .name = "password-secret",
+> +            .type = QEMU_OPT_STRING,
+> +            .help = "ID of secret providing the password",
+> +        },
+> +        {
+> +            .name = "conf",
+> +            .type = QEMU_OPT_STRING,
+> +        },
+> +        {
+> +            .name = "pool",
+> +            .type = QEMU_OPT_STRING,
+> +        },
+> +        {
+> +            .name = "image",
+> +            .type = QEMU_OPT_STRING,
+> +        },
+> +        {
+> +            .name = "snapshot",
+> +            .type = QEMU_OPT_STRING,
+> +        },
+> +        {
+> +            /* you might be tempted to call this 'id' to match
+> +             * the ceph documentation, but then it'll get gobbled
+> +             * up in the block layer before it gets to the image driver */
+> +            .name = "rbd-id",
+> +            .type = QEMU_OPT_STRING,
+> +        },
+> +        {
+> +            .name = "keyvalue-pairs",
+> +            .type = QEMU_OPT_STRING,
+> +        },
+> +        { /* end of list */ }
+> +    },
+> +};
+> +
+>  static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
+>  {
+>      Error *local_err = NULL;
+> @@ -500,25 +545,6 @@ static void qemu_rbd_complete_aio(RADOSCB *rcb)
+>      qemu_aio_unref(acb);
+>  }
+>  
+> -/* TODO Convert to fine grained options */
+> -static QemuOptsList runtime_opts = {
+> -    .name = "rbd",
+> -    .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
+> -    .desc = {
+> -        {
+> -            .name = "filename",
+> -            .type = QEMU_OPT_STRING,
+> -            .help = "Specification of the rbd image",
+> -        },
+> -        {
+> -            .name = "password-secret",
+> -            .type = QEMU_OPT_STRING,
+> -            .help = "ID of secret providing the password",
+> -        },
+> -        { /* end of list */ }
+> -    },
+> -};
+> -
+>  static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+>                           Error **errp)
+>  {
+> -- 
+> 2.9.3
 > 
-> However it is still in the tree as [3]:
-> http://git.qemu-project.org/?p=qemu.git;a=commitdiff;h=23820dbfc79d1c9dce090b4c555994f2bb6a69b3
-> 
-> The only difference between [1] and [3] is a fixed typo in the subject,
-> other than that they are identical.
-> 
-> Is not the explanation from [2] correct any more and [3] is a correct final
-> fix? Or [3] should not be in the tree at all?
 
-The explanation from [2] is correct, it caused "problems with boards
-that declare memory regions shorter than the registers they contain" and
-those were fixed.  Unfortunately I remember that the fixes were complex,
-IIRC covering mostly ioport.c and Xen.  It might be fine for pSeries though.
-
-Paolo
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
