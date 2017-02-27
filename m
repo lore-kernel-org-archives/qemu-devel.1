@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48843)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ciR8Q-0001Rp-CK
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:39:03 -0500
+	(envelope-from <marex@denx.de>) id 1ciR8Z-0001Xx-Fb
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:39:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ciR8P-0002RO-Bd
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:39:02 -0500
-References: <1488200143-2140-1-git-send-email-armbru@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <34f8e049-4425-5d61-6f7a-914c7d13b38e@redhat.com>
-Date: Mon, 27 Feb 2017 20:38:51 +0100
-MIME-Version: 1.0
-In-Reply-To: <1488200143-2140-1-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] option: Tweak invalid size error message
- and unbreak iotest 049
+	(envelope-from <marex@denx.de>) id 1ciR8V-0002Tf-1g
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:39:11 -0500
+Received: from mail-out.m-online.net ([212.18.0.9]:43599)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marex@denx.de>) id 1ciR8U-0002SE-Qo
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:39:06 -0500
+From: Marek Vasut <marex@denx.de>
+Date: Mon, 27 Feb 2017 20:38:57 +0100
+Message-Id: <20170227193857.9368-1-marex@denx.de>
+Subject: [Qemu-devel] [PATCH V2] nios2: iic: Convert CPU prop to qom link
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,76 +21,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Marek Vasut <marex@denx.de>, Alexander Graf <agraf@suse.de>, Chris Wulff <crwulff@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Jeff Da Silva <jdasilva@altera.com>, Ley Foon Tan <lftan@altera.com>, Markus Armbruster <armbru@redhat.com>, Richard Henderson <rth@twiddle.net>, Sandra Loosemore <sandra@codesourcery.com>, Yves Vandervennet <yvanderv@altera.com>
 
-On 27.02.2017 13:55, Markus Armbruster wrote:
-> Commit 75cdcd1 neglected to update tests/qemu-iotests/049.out, and
-> made the error message for negative size worse.  Fix that.
-> 
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  tests/qemu-iotests/049.out | 14 +++++++++-----
->  util/qemu-option.c         |  2 +-
->  2 files changed, 10 insertions(+), 6 deletions(-)
-> 
-> diff --git a/tests/qemu-iotests/049.out b/tests/qemu-iotests/049.out
-> index 4673b67..34e66db 100644
-> --- a/tests/qemu-iotests/049.out
-> +++ b/tests/qemu-iotests/049.out
-> @@ -95,14 +95,14 @@ qemu-img create -f qcow2 TEST_DIR/t.qcow2 -- -1024
->  qemu-img: Image size must be less than 8 EiB!
->  
->  qemu-img create -f qcow2 -o size=-1024 TEST_DIR/t.qcow2
-> -qemu-img: Parameter 'size' expects a non-negative number below 2^64
-> +qemu-img: Value '-1024' is out of range for parameter 'size'
->  qemu-img: TEST_DIR/t.qcow2: Invalid options for file format 'qcow2'
->  
->  qemu-img create -f qcow2 TEST_DIR/t.qcow2 -- -1k
->  qemu-img: Image size must be less than 8 EiB!
->  
->  qemu-img create -f qcow2 -o size=-1k TEST_DIR/t.qcow2
-> -qemu-img: Parameter 'size' expects a non-negative number below 2^64
-> +qemu-img: Value '-1k' is out of range for parameter 'size'
->  qemu-img: TEST_DIR/t.qcow2: Invalid options for file format 'qcow2'
->  
->  qemu-img create -f qcow2 TEST_DIR/t.qcow2 -- 1kilobyte
-> @@ -110,15 +110,19 @@ qemu-img: Invalid image size specified! You may use k, M, G, T, P or E suffixes
->  qemu-img: kilobytes, megabytes, gigabytes, terabytes, petabytes and exabytes.
->  
->  qemu-img create -f qcow2 -o size=1kilobyte TEST_DIR/t.qcow2
-> -Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-> +qemu-img: Parameter 'size' expects a non-negative number below 2^64
-> +Optional suffix k, M, G, T, P or E means kilo-, mega-, giga-, tera-, peta-
-> +and exabytes, respectively.
-> +qemu-img: TEST_DIR/t.qcow2: Invalid options for file format 'qcow2'
->  
->  qemu-img create -f qcow2 TEST_DIR/t.qcow2 -- foobar
->  qemu-img: Invalid image size specified! You may use k, M, G, T, P or E suffixes for
->  qemu-img: kilobytes, megabytes, gigabytes, terabytes, petabytes and exabytes.
->  
->  qemu-img create -f qcow2 -o size=foobar TEST_DIR/t.qcow2
-> -qemu-img: Parameter 'size' expects a size
-> -You may use k, M, G or T suffixes for kilobytes, megabytes, gigabytes and terabytes.
-> +qemu-img: Parameter 'size' expects a non-negative number below 2^64
-> +Optional suffix k, M, G, T, P or E means kilo-, mega-, giga-, tera-, peta-
-> +and exabytes, respectively.
->  qemu-img: TEST_DIR/t.qcow2: Invalid options for file format 'qcow2'
->  
->  == Check correct interpretation of suffixes for cluster size ==
-> diff --git a/util/qemu-option.c b/util/qemu-option.c
-> index 419f252..5ce1b5c 100644
-> --- a/util/qemu-option.c
-> +++ b/util/qemu-option.c
-> @@ -179,7 +179,7 @@ void parse_option_size(const char *name, const char *value,
->  
->      err = qemu_strtosz(value, NULL, &size);
->      if (err == -ERANGE) {
-> -        error_setg(errp, "Value '%s' is too large for parameter '%s'",
-> +        error_setg(errp, "Value '%s' is out of range for parameter '%s'",
->                     value, name);
->          return;
->      }
+Add a const qom link between the CPU and the IIC instead
+of passing the CPU link through a qom property.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Marek Vasut <marex@denx.de>
+Cc: Alexander Graf <agraf@suse.de>
+Cc: Chris Wulff <crwulff@gmail.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Jeff Da Silva <jdasilva@altera.com>
+Cc: Ley Foon Tan <lftan@altera.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Sandra Loosemore <sandra@codesourcery.com>
+Cc: Yves Vandervennet <yvanderv@altera.com>
+---
+V2: Retain dc->cannot_instantiate_with_device_add_yet = true
+    in altera_iic_class_init() since the device is still not
+    device_add() creatable.
+---
+ hw/intc/nios2_iic.c       | 12 ++++--------
+ hw/nios2/10m50_devboard.c |  3 ++-
+ 2 files changed, 6 insertions(+), 9 deletions(-)
+
+diff --git a/hw/intc/nios2_iic.c b/hw/intc/nios2_iic.c
+index 818ab1b315..fe15621202 100644
+--- a/hw/intc/nios2_iic.c
++++ b/hw/intc/nios2_iic.c
+@@ -62,17 +62,15 @@ static void altera_iic_init(Object *obj)
+     sysbus_init_irq(SYS_BUS_DEVICE(obj), &pv->parent_irq);
+ }
+ 
+-static Property altera_iic_properties[] = {
+-    DEFINE_PROP_PTR("cpu", AlteraIIC, cpu),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
+-
+ static void altera_iic_realize(DeviceState *dev, Error **errp)
+ {
+     struct AlteraIIC *pv = ALTERA_IIC(dev);
++    Error *err = NULL;
+ 
++    pv->cpu = object_property_get_link(OBJECT(dev), "cpu", &err);
+     if (!pv->cpu) {
+-        error_setg(errp, "altera,iic: CPU not connected");
++        error_setg(errp, "altera,iic: CPU link not found: %s",
++                   error_get_pretty(err));
+         return;
+     }
+ }
+@@ -81,8 +79,6 @@ static void altera_iic_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+-    dc->props = altera_iic_properties;
+-    /* Reason: pointer property "cpu" */
+     dc->cannot_instantiate_with_device_add_yet = true;
+     dc->realize = altera_iic_realize;
+ }
+diff --git a/hw/nios2/10m50_devboard.c b/hw/nios2/10m50_devboard.c
+index 0d8b9aa58f..c18e0b2a17 100644
+--- a/hw/nios2/10m50_devboard.c
++++ b/hw/nios2/10m50_devboard.c
+@@ -83,7 +83,8 @@ static void nios2_10m50_ghrd_init(MachineState *machine)
+ 
+     /* Register: Internal Interrupt Controller (IIC) */
+     dev = qdev_create(NULL, "altera,iic");
+-    qdev_prop_set_ptr(dev, "cpu", cpu);
++    object_property_add_const_link(OBJECT(dev), "cpu", OBJECT(cpu),
++                                   &error_abort);
+     qdev_init_nofail(dev);
+     sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, cpu_irq[0]);
+     for (i = 0; i < 32; i++) {
+-- 
+2.11.0
