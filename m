@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ciO76-00087t-Pm
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:25:29 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ciO75-0005JM-Nx
+	(envelope-from <ehabkost@redhat.com>) id 1ciO75-00086H-3Q
 	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:25:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60288)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ciO75-0005J3-Hk
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <ehabkost@redhat.com>) id 1ciO71-0005Gv-UZ
 	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:25:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51898)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ciO71-0005GS-Le
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:25:23 -0500
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 27 Feb 2017 13:25:01 -0300
-Message-Id: <20170227162501.29280-12-ehabkost@redhat.com>
+Date: Mon, 27 Feb 2017 13:24:59 -0300
+Message-Id: <20170227162501.29280-10-ehabkost@redhat.com>
 In-Reply-To: <20170227162501.29280-1-ehabkost@redhat.com>
 References: <20170227162501.29280-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 11/11] i386: Improve query-cpu-model-expansion
- full mode
+Subject: [Qemu-devel] [PULL 09/11] i386: Define static "base" CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,84 +24,157 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Jiri Denemark <jdenemar@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
 
-This keeps the same results on type=static expansion, but make
-type=full expansion return every single QOM property on the CPU
-object that have a different value from the "base' CPU model,
-plus all the CPU feature flag properties.
+The query-cpu-model-expand QMP command needs at least one static
+model, to allow the "static" expansion mode to be implemented.
+Instead of defining static versions of every CPU model, define a
+"base" CPU model that has absolutely no feature flag enabled.
 
-Cc: Jiri Denemark <jdenemar@redhat.com>
-Message-Id: <20170222190029.17243-4-ehabkost@redhat.com>
+Despite having no CPUID data set at all, "-cpu base" is even a
+functional CPU:
+
+* It can boot a Slackware Linux 1.01 image with a Linux 0.99.12
+  kernel[1].
+* It is even possible to boot[2] a modern Fedora x86_64 guest by
+  manually enabling the following CPU features:
+  -cpu base,+lm,+msr,+pae,+fpu,+cx8,+cmov,+sse,+sse2,+fxsr
+
+[1] http://www.qemu-advent-calendar.org/2014/#day-1
+[2] This is what can be seen in the guest:
+    [root@localhost ~]# cat /proc/cpuinfo
+    processor       : 0
+    vendor_id       : unknown
+    cpu family      : 0
+    model           : 0
+    model name      : 00/00
+    stepping        : 0
+    physical id     : 0
+    siblings        : 1
+    core id         : 0
+    cpu cores       : 1
+    apicid          : 0
+    initial apicid  : 0
+    fpu             : yes
+    fpu_exception   : yes
+    cpuid level     : 1
+    wp              : yes
+    flags           : fpu msr pae cx8 cmov fxsr sse sse2 lm nopl
+    bugs            :
+    bogomips        : 5832.70
+    clflush size    : 64
+    cache_alignment : 64
+    address sizes   : 36 bits physical, 48 bits virtual
+    power management:
+
+    [root@localhost ~]# x86info -v -a
+    x86info v1.30.  Dave Jones 2001-2011
+    Feedback to <davej@redhat.com>.
+
+    No TSC, MHz calculation cannot be performed.
+    Unknown vendor (0)
+    MP Table:
+
+    Family: 0 Model: 0 Stepping: 0
+    CPU Model (x86info's best guess):
+
+    eax in: 0x00000000, eax = 00000001 ebx = 00000000 ecx = 00000000 edx = 00000000
+    eax in: 0x00000001, eax = 00000000 ebx = 00000800 ecx = 00000000 edx = 07008161
+
+    eax in: 0x80000000, eax = 80000001 ebx = 00000000 ecx = 00000000 edx = 00000000
+    eax in: 0x80000001, eax = 00000000 ebx = 00000000 ecx = 00000000 edx = 20000000
+
+    Feature flags:
+     fpu            Onboard FPU
+     msr            Model-Specific Registers
+     pae            Physical Address Extensions
+     cx8            CMPXCHG8 instruction
+     cmov           CMOV instruction
+     fxsr           FXSAVE and FXRSTOR instructions
+     sse            SSE support
+     sse2           SSE2 support
+
+    Long NOPs supported: yes
+
+    Address sizes : 0 bits physical, 0 bits virtual
+    0MHz processor (estimate).
+
+     running at an estimated 0MHz
+    [root@localhost ~]#
+
+Message-Id: <20170222190029.17243-2-ehabkost@redhat.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
 Tested-by: Jiri Denemark <jdenemar@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/i386/cpu.c | 34 +++++++++++++++++++++++++++++++---
- 1 file changed, 31 insertions(+), 3 deletions(-)
+ target/i386/cpu-qom.h |  2 ++
+ target/i386/cpu.c     | 20 ++++++++++++++++++++
+ 2 files changed, 22 insertions(+)
 
+diff --git a/target/i386/cpu-qom.h b/target/i386/cpu-qom.h
+index f6c704c3a9..c2205e6077 100644
+--- a/target/i386/cpu-qom.h
++++ b/target/i386/cpu-qom.h
+@@ -50,6 +50,7 @@ typedef struct X86CPUDefinition X86CPUDefinition;
+  * @kvm_required: Whether CPU model requires KVM to be enabled.
+  * @ordering: Ordering on the "-cpu help" CPU model list.
+  * @migration_safe: See CpuDefinitionInfo::migration_safe
++ * @static_model: See CpuDefinitionInfo::static
+  * @parent_realize: The parent class' realize handler.
+  * @parent_reset: The parent class' reset handler.
+  *
+@@ -68,6 +69,7 @@ typedef struct X86CPUClass {
+     bool kvm_required;
+     int ordering;
+     bool migration_safe;
++    bool static_model;
+ 
+     /* Optional description of CPU model.
+      * If unavailable, cpu_def->model_id is used */
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 139b7ea12e..89421c893b 100644
+index 366253cd4c..0a71594445 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -2419,6 +2419,34 @@ static void x86_cpu_to_dict(X86CPU *cpu, QDict *props)
-     }
- }
+@@ -2229,6 +2229,7 @@ static void x86_cpu_definition_entry(gpointer data, gpointer user_data)
+     info->q_typename = g_strdup(object_class_get_name(oc));
+     info->migration_safe = cc->migration_safe;
+     info->has_migration_safe = true;
++    info->q_static = cc->static_model;
  
-+/* Convert CPU model data from X86CPU object to a property dictionary
-+ * that can recreate exactly the same CPU model, including every
-+ * writeable QOM property.
-+ */
-+static void x86_cpu_to_dict_full(X86CPU *cpu, QDict *props)
+     entry = g_malloc0(sizeof(*entry));
+     entry->value = info;
+@@ -3835,6 +3836,24 @@ static const TypeInfo x86_cpu_type_info = {
+     .class_init = x86_cpu_common_class_init,
+ };
+ 
++
++/* "base" CPU model, used by query-cpu-model-expansion */
++static void x86_cpu_base_class_init(ObjectClass *oc, void *data)
 +{
-+    ObjectPropertyIterator iter;
-+    ObjectProperty *prop;
++    X86CPUClass *xcc = X86_CPU_CLASS(oc);
 +
-+    object_property_iter_init(&iter, OBJECT(cpu));
-+    while ((prop = object_property_iter_next(&iter))) {
-+        /* skip read-only or write-only properties */
-+        if (!prop->get || !prop->set) {
-+            continue;
-+        }
-+
-+        /* "hotplugged" is the only property that is configurable
-+         * on the command-line but will be set differently on CPUs
-+         * created using "-cpu ... -smp ..." and by CPUs created
-+         * on the fly by x86_cpu_from_model() for querying. Skip it.
-+         */
-+        if (!strcmp(prop->name, "hotplugged")) {
-+            continue;
-+        }
-+        x86_cpu_expand_prop(cpu, props, prop->name);
-+    }
++    xcc->static_model = true;
++    xcc->migration_safe = true;
++    xcc->model_description = "base CPU model type with no features enabled";
++    xcc->ordering = 8;
 +}
 +
- static void object_apply_props(Object *obj, QDict *props, Error **errp)
++static const TypeInfo x86_base_cpu_type_info = {
++        .name = X86_CPU_TYPE_NAME("base"),
++        .parent = TYPE_X86_CPU,
++        .class_init = x86_cpu_base_class_init,
++};
++
+ static void x86_cpu_register_types(void)
  {
-     const QDictEntry *prop;
-@@ -2489,11 +2517,13 @@ arch_query_cpu_model_expansion(CpuModelExpansionType type,
-         goto out;
+     int i;
+@@ -3844,6 +3863,7 @@ static void x86_cpu_register_types(void)
+         x86_register_cpudef_type(&builtin_x86_defs[i]);
      }
- 
-+    props = qdict_new();
- 
-     switch (type) {
-     case CPU_MODEL_EXPANSION_TYPE_STATIC:
-         /* Static expansion will be based on "base" only */
-         base_name = "base";
-+        x86_cpu_to_dict(xc, props);
-     break;
-     case CPU_MODEL_EXPANSION_TYPE_FULL:
-         /* As we don't return every single property, full expansion needs
-@@ -2501,9 +2531,7 @@ arch_query_cpu_model_expansion(CpuModelExpansionType type,
-          * properties on top of that.
-          */
-         base_name = model->name;
--        if (model->has_props && model->props) {
--            props = qdict_clone_shallow(qobject_to_qdict(model->props));
--        }
-+        x86_cpu_to_dict_full(xc, props);
-     break;
-     default:
-         error_setg(&err, "Unsupportted expansion type");
+     type_register_static(&max_x86_cpu_type_info);
++    type_register_static(&x86_base_cpu_type_info);
+ #ifdef CONFIG_KVM
+     type_register_static(&host_x86_cpu_type_info);
+ #endif
 -- 
 2.11.0.259.g40922b1
