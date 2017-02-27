@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46832)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ciUHk-0000Wt-2o
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:00:53 -0500
+	(envelope-from <groug@kaod.org>) id 1ciUHi-0000Ua-1A
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:00:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ciUHh-0003uy-3g
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:00:52 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32871
+	(envelope-from <groug@kaod.org>) id 1ciUHg-0003tt-EA
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:00:50 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33062
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ciUHg-0003na-TQ
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:00:49 -0500
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ciUHg-0003t7-8c
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:00:48 -0500
 Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1RMra7K121509
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 18:00:42 -0500
-Received: from e06smtp08.uk.ibm.com (e06smtp08.uk.ibm.com [195.75.94.104])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28vn69xxk8-1
+	v1RMraUp121446
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 18:00:47 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28vn69xxq9-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 18:00:41 -0500
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 18:00:47 -0500
 Received: from localhost
-	by e06smtp08.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Mon, 27 Feb 2017 23:00:40 -0000
+	Mon, 27 Feb 2017 23:00:45 -0000
 From: Greg Kurz <groug@kaod.org>
-Date: Mon, 27 Feb 2017 23:59:54 +0100
+Date: Tue, 28 Feb 2017 00:00:03 +0100
 In-Reply-To: <1488236421-30983-1-git-send-email-groug@kaod.org>
 References: <1488236421-30983-1-git-send-email-groug@kaod.org>
-Message-Id: <1488236421-30983-5-git-send-email-groug@kaod.org>
-Subject: [Qemu-devel] [PULL 04/31] 9pfs: local: move xattr security ops to
- 9p-xattr.c
+Message-Id: <1488236421-30983-14-git-send-email-groug@kaod.org>
+Subject: [Qemu-devel] [PULL 13/31] 9pfs: local: lremovexattr: don't follow
+ symlinks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,179 +41,162 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
 
-These functions are always called indirectly. It really doesn't make sense
-for them to sit in a header file.
+The local_lremovexattr() callback is vulnerable to symlink attacks because
+it calls lremovexattr() which follows symbolic links in all path elements
+but the rightmost one.
+
+This patch introduces a helper to emulate the non-existing fremovexattrat()
+function: it is implemented with /proc/self/fd which provides a trusted
+path that can be safely passed to lremovexattr().
+
+local_lremovexattr() is converted to use this helper and opendir_nofollow().
+
+This partly fixes CVE-2016-9602.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- hw/9pfs/9p-xattr.c | 61 +++++++++++++++++++++++++++++++++++++++++
- hw/9pfs/9p-xattr.h | 80 ++++++++++--------------------------------------------
- 2 files changed, 75 insertions(+), 66 deletions(-)
+ hw/9pfs/9p-posix-acl.c  | 10 ++--------
+ hw/9pfs/9p-xattr-user.c |  8 +-------
+ hw/9pfs/9p-xattr.c      | 36 +++++++++++++++++++++++++++++++-----
+ hw/9pfs/9p-xattr.h      |  2 ++
+ 4 files changed, 36 insertions(+), 20 deletions(-)
 
-diff --git a/hw/9pfs/9p-xattr.c b/hw/9pfs/9p-xattr.c
-index 5d8595ed932a..19a2daf02f5c 100644
---- a/hw/9pfs/9p-xattr.c
-+++ b/hw/9pfs/9p-xattr.c
-@@ -143,6 +143,67 @@ int v9fs_remove_xattr(FsContext *ctx,
+diff --git a/hw/9pfs/9p-posix-acl.c b/hw/9pfs/9p-posix-acl.c
+index 0154e2a7605f..bbf89064f7ae 100644
+--- a/hw/9pfs/9p-posix-acl.c
++++ b/hw/9pfs/9p-posix-acl.c
+@@ -58,10 +58,8 @@ static int mp_pacl_removexattr(FsContext *ctx,
+                                const char *path, const char *name)
+ {
+     int ret;
+-    char *buffer;
  
+-    buffer = rpath(ctx, path);
+-    ret  = lremovexattr(buffer, MAP_ACL_ACCESS);
++    ret = local_removexattr_nofollow(ctx, path, MAP_ACL_ACCESS);
+     if (ret == -1 && errno == ENODATA) {
+         /*
+          * We don't get ENODATA error when trying to remove a
+@@ -71,7 +69,6 @@ static int mp_pacl_removexattr(FsContext *ctx,
+         errno = 0;
+         ret = 0;
+     }
+-    g_free(buffer);
+     return ret;
  }
  
-+ssize_t pt_getxattr(FsContext *ctx, const char *path, const char *name,
-+                    void *value, size_t size)
+@@ -111,10 +108,8 @@ static int mp_dacl_removexattr(FsContext *ctx,
+                                const char *path, const char *name)
+ {
+     int ret;
+-    char *buffer;
+ 
+-    buffer = rpath(ctx, path);
+-    ret  = lremovexattr(buffer, MAP_ACL_DEFAULT);
++    ret = local_removexattr_nofollow(ctx, path, MAP_ACL_DEFAULT);
+     if (ret == -1 && errno == ENODATA) {
+         /*
+          * We don't get ENODATA error when trying to remove a
+@@ -124,7 +119,6 @@ static int mp_dacl_removexattr(FsContext *ctx,
+         errno = 0;
+         ret = 0;
+     }
+-    g_free(buffer);
+     return ret;
+ }
+ 
+diff --git a/hw/9pfs/9p-xattr-user.c b/hw/9pfs/9p-xattr-user.c
+index 1840a5db66f3..2c90817b75a6 100644
+--- a/hw/9pfs/9p-xattr-user.c
++++ b/hw/9pfs/9p-xattr-user.c
+@@ -81,9 +81,6 @@ static int mp_user_setxattr(FsContext *ctx, const char *path, const char *name,
+ static int mp_user_removexattr(FsContext *ctx,
+                                const char *path, const char *name)
+ {
+-    char *buffer;
+-    int ret;
+-
+     if (strncmp(name, "user.virtfs.", 12) == 0) {
+         /*
+          * Don't allow fetch of user.virtfs namesapce
+@@ -92,10 +89,7 @@ static int mp_user_removexattr(FsContext *ctx,
+         errno = EACCES;
+         return -1;
+     }
+-    buffer = rpath(ctx, path);
+-    ret = lremovexattr(buffer, name);
+-    g_free(buffer);
+-    return ret;
++    return local_removexattr_nofollow(ctx, path, name);
+ }
+ 
+ XattrOperations mapped_user_xattr = {
+diff --git a/hw/9pfs/9p-xattr.c b/hw/9pfs/9p-xattr.c
+index a0167dd4d898..eec160b3c2ac 100644
+--- a/hw/9pfs/9p-xattr.c
++++ b/hw/9pfs/9p-xattr.c
+@@ -234,17 +234,43 @@ int pt_setxattr(FsContext *ctx, const char *path, const char *name, void *value,
+     return local_setxattr_nofollow(ctx, path, name, value, size, flags);
+ }
+ 
+-int pt_removexattr(FsContext *ctx, const char *path, const char *name)
++static ssize_t fremovexattrat_nofollow(int dirfd, const char *filename,
++                                       const char *name)
+ {
+-    char *buffer;
++    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
+     int ret;
+ 
+-    buffer = rpath(ctx, path);
+-    ret = lremovexattr(path, name);
+-    g_free(buffer);
++    ret = lremovexattr(proc_path, name);
++    g_free(proc_path);
+     return ret;
+ }
+ 
++ssize_t local_removexattr_nofollow(FsContext *ctx, const char *path,
++                                   const char *name)
 +{
-+    char *buffer;
-+    ssize_t ret;
++    char *dirpath = g_path_get_dirname(path);
++    char *filename = g_path_get_basename(path);
++    int dirfd;
++    ssize_t ret = -1;
 +
-+    buffer = rpath(ctx, path);
-+    ret = lgetxattr(buffer, name, value, size);
-+    g_free(buffer);
-+    return ret;
-+}
++    dirfd = local_opendir_nofollow(ctx, dirpath);
++    if (dirfd == -1) {
++        goto out;
++    }
 +
-+int pt_setxattr(FsContext *ctx, const char *path, const char *name, void *value,
-+                size_t size, int flags)
-+{
-+    char *buffer;
-+    int ret;
-+
-+    buffer = rpath(ctx, path);
-+    ret = lsetxattr(buffer, name, value, size, flags);
-+    g_free(buffer);
++    ret = fremovexattrat_nofollow(dirfd, filename, name);
++    close_preserve_errno(dirfd);
++out:
++    g_free(dirpath);
++    g_free(filename);
 +    return ret;
 +}
 +
 +int pt_removexattr(FsContext *ctx, const char *path, const char *name)
 +{
-+    char *buffer;
-+    int ret;
-+
-+    buffer = rpath(ctx, path);
-+    ret = lremovexattr(path, name);
-+    g_free(buffer);
-+    return ret;
++    return local_removexattr_nofollow(ctx, path, name);
 +}
 +
-+ssize_t notsup_getxattr(FsContext *ctx, const char *path, const char *name,
-+                        void *value, size_t size)
-+{
-+    errno = ENOTSUP;
-+    return -1;
-+}
-+
-+int notsup_setxattr(FsContext *ctx, const char *path, const char *name,
-+                    void *value, size_t size, int flags)
-+{
-+    errno = ENOTSUP;
-+    return -1;
-+}
-+
-+ssize_t notsup_listxattr(FsContext *ctx, const char *path, char *name,
-+                         void *value, size_t size)
-+{
-+    return 0;
-+}
-+
-+int notsup_removexattr(FsContext *ctx, const char *path, const char *name)
-+{
-+    errno = ENOTSUP;
-+    return -1;
-+}
-+
- XattrOperations *mapped_xattr_ops[] = {
-     &mapped_user_xattr,
-     &mapped_pacl_xattr,
+ ssize_t notsup_getxattr(FsContext *ctx, const char *path, const char *name,
+                         void *value, size_t size)
+ {
 diff --git a/hw/9pfs/9p-xattr.h b/hw/9pfs/9p-xattr.h
-index a853ea641c0b..3f43f5153f3c 100644
+index 7558970d8511..0d83996575e1 100644
 --- a/hw/9pfs/9p-xattr.h
 +++ b/hw/9pfs/9p-xattr.h
-@@ -49,73 +49,21 @@ ssize_t v9fs_list_xattr(FsContext *ctx, const char *path, void *value,
- int v9fs_set_xattr(FsContext *ctx, const char *path, const char *name,
-                           void *value, size_t size, int flags);
- int v9fs_remove_xattr(FsContext *ctx, const char *path, const char *name);
-+
- ssize_t pt_listxattr(FsContext *ctx, const char *path, char *name, void *value,
-                      size_t size);
--
--static inline ssize_t pt_getxattr(FsContext *ctx, const char *path,
--                                  const char *name, void *value, size_t size)
--{
--    char *buffer;
--    ssize_t ret;
--
--    buffer = rpath(ctx, path);
--    ret = lgetxattr(buffer, name, value, size);
--    g_free(buffer);
--    return ret;
--}
--
--static inline int pt_setxattr(FsContext *ctx, const char *path,
--                              const char *name, void *value,
--                              size_t size, int flags)
--{
--    char *buffer;
--    int ret;
--
--    buffer = rpath(ctx, path);
--    ret = lsetxattr(buffer, name, value, size, flags);
--    g_free(buffer);
--    return ret;
--}
--
--static inline int pt_removexattr(FsContext *ctx,
--                                 const char *path, const char *name)
--{
--    char *buffer;
--    int ret;
--
--    buffer = rpath(ctx, path);
--    ret = lremovexattr(path, name);
--    g_free(buffer);
--    return ret;
--}
--
--static inline ssize_t notsup_getxattr(FsContext *ctx, const char *path,
--                                      const char *name, void *value,
--                                      size_t size)
--{
--    errno = ENOTSUP;
--    return -1;
--}
--
--static inline int notsup_setxattr(FsContext *ctx, const char *path,
--                                  const char *name, void *value,
--                                  size_t size, int flags)
--{
--    errno = ENOTSUP;
--    return -1;
--}
--
--static inline ssize_t notsup_listxattr(FsContext *ctx, const char *path,
--                                       char *name, void *value, size_t size)
--{
--    return 0;
--}
--
--static inline int notsup_removexattr(FsContext *ctx,
--                                     const char *path, const char *name)
--{
--    errno = ENOTSUP;
--    return -1;
--}
-+ssize_t pt_getxattr(FsContext *ctx, const char *path, const char *name,
-+                    void *value, size_t size);
-+int pt_setxattr(FsContext *ctx, const char *path, const char *name, void *value,
-+                size_t size, int flags);
-+int pt_removexattr(FsContext *ctx, const char *path, const char *name);
-+
-+ssize_t notsup_getxattr(FsContext *ctx, const char *path, const char *name,
-+                        void *value, size_t size);
-+int notsup_setxattr(FsContext *ctx, const char *path, const char *name,
-+                    void *value, size_t size, int flags);
-+ssize_t notsup_listxattr(FsContext *ctx, const char *path, char *name,
-+                         void *value, size_t size);
-+int notsup_removexattr(FsContext *ctx, const char *path, const char *name);
+@@ -34,6 +34,8 @@ ssize_t local_getxattr_nofollow(FsContext *ctx, const char *path,
+ ssize_t local_setxattr_nofollow(FsContext *ctx, const char *path,
+                                 const char *name, void *value, size_t size,
+                                 int flags);
++ssize_t local_removexattr_nofollow(FsContext *ctx, const char *path,
++                                   const char *name);
  
- #endif
+ extern XattrOperations mapped_user_xattr;
+ extern XattrOperations passthrough_user_xattr;
 -- 
 2.7.4
