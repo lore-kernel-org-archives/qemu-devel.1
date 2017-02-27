@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ciMRK-0007OJ-8k
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:38:15 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ciMRY-0007bB-LS
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:38:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ciMRJ-0001Pl-Cf
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:38:14 -0500
-Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:35262)
+	(envelope-from <alex.bennee@linaro.org>) id 1ciMRU-0001Xu-M7
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:38:28 -0500
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:34546)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ciMRJ-0001PU-4D
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:38:13 -0500
-Received: by mail-wr0-x233.google.com with SMTP id g10so53543887wrg.2
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 06:38:12 -0800 (PST)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ciMRU-0001X7-El
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:38:24 -0500
+Received: by mail-wr0-x22c.google.com with SMTP id l37so9544642wrc.1
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 06:38:24 -0800 (PST)
+References: <20170224112109.3147-1-alex.bennee@linaro.org>
+	<20170224112109.3147-12-alex.bennee@linaro.org>
+	<f7a4cba9-12da-fbb3-684f-68b4a11fbe97@vivier.eu>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <f7a4cba9-12da-fbb3-684f-68b4a11fbe97@vivier.eu>
+Date: Mon, 27 Feb 2017 14:38:21 +0000
+Message-ID: <87y3wr8zs2.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170227124551.8673-1-pbonzini@redhat.com>
-References: <20170227124551.8673-1-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 27 Feb 2017 14:37:51 +0000
-Message-ID: <CAFEAcA8HOjCv1FniO6Zs_s75wHCru+c-PkAfbODcjYSqJZwX0Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v2 00/17] KVM and cpu-exec patches for 2.9
- soft freeze
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 11/24] tcg: enable thread-per-vCPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,81 +31,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: peter.maydell@linaro.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, KONRAD Frederic <fred.konrad@greensocs.com>, Richard Henderson <rth@twiddle.net>
 
-On 27 February 2017 at 12:45, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> The following changes since commit d992f2f1368ceb92e6bfd8efece174110f4236=
-ff:
+
+Laurent Vivier <laurent@vivier.eu> writes:
+
+> Le 24/02/2017 à 12:20, Alex Bennée a écrit :
+>> There are a couple of changes that occur at the same time here:
+>>
+>>   - introduce a single vCPU qemu_tcg_cpu_thread_fn
+>>
+>>   One of these is spawned per vCPU with its own Thread and Condition
+>>   variables. qemu_tcg_rr_cpu_thread_fn is the new name for the old
+>>   single threaded function.
+>>
+>>   - the TLS current_cpu variable is now live for the lifetime of MTTCG
+>>     vCPU threads. This is for future work where async jobs need to know
+>>     the vCPU context they are operating in.
+>>
+>> The user to switch on multi-thread behaviour and spawn a thread
+>> per-vCPU. For a simple test kvm-unit-test like:
+>>
+>>   ./arm/run ./arm/locking-test.flat -smp 4 -accel tcg,thread=multi
+>>
+>> Will now use 4 vCPU threads and have an expected FAIL (instead of the
+>> unexpected PASS) as the default mode of the test has no protection when
+>> incrementing a shared variable.
+>>
+>> We enable the parallel_cpus flag to ensure we generate correct barrier
+>> and atomic code if supported by the front and backends. This doesn't
+>> automatically enable MTTCG until default_mttcg_enabled() is updated to
+>> check the configuration is supported.
 >
->   Merge remote-tracking branch 'remotes/artyom/tags/pull-sun4v-20170226' =
-into staging (2017-02-26 22:40:23 +0000)
+> This commit breaks linux-user mode:
 >
-> are available in the git repository at:
+> debian-8 with qemu-ppc on x86_64 with ltp-full-20170116
 >
->   git://github.com/bonzini/qemu.git tags/for-upstream
+> cd /opt/ltp
+> ./runltp -p -l "qemu-$(date +%FT%T).log" -f /opt/ltp/runtest/syscalls -s
+> setgroups03
 >
-> for you to fetch changes up to f601681feff62113b526d4ad491af4a03aca825a:
->
->   qmp-events: fix GUEST_PANICKED description formatting (2017-02-27 13:31=
-:25 +0100)
->
-> v1->v2: add missing #ifdef KVM_HAVE_MCE_INJECTION
->
->         rebase over MTTCG pull request.  -icount is currently broken but
->         I'd like to preserve bisectability, so this pull request brings
->         in the icount patches through a merge commit.
->
-> ----------------------------------------------------------------
-> * kernel header update (requested by David and Vijay)
-> * GuestPanicInformation fixups (Anton)
-> * record/replay icount fixes (Pavel)
-> * cpu-exec cleanup, unification of icount_decr with tcg_exit_req (me)
-> * KVM_CAP_IMMEDIATE_EXIT support (me)
-> * vmxcap update (me)
+> setgroups03    1  TPASS  :  setgroups(65537) fails, Size is >
+> sysconf(_SC_NGROUPS_MAX), errno=22
+> qemu-ppc: /home/laurent/Projects/qemu/include/qemu/rcu.h:89:
+> rcu_read_unlock: Assertion `p_rcu_reader->depth != 0' failed.
+> qemu-ppc: /home/laurent/Projects/qemu/include/qemu/rcu.h:89:
+> rcu_read_unlock: Assertion `p_rcu_reader->depth != 0' failed.
+> qemu-ppc: /home/laurent/Projects/qemu/include/qemu/rcu.h:89:
+> rcu_read_unlock: Assertion `p_rcu_reader->depth != 0' failed.
+> ...
 
-Build failures :-(
+Interesting. I can only think the current_cpu change has broken it
+because most of the changes in this commit affect softmmu targets only
+(linux-user has its own run loop).
 
-OSX:
-/Users/pm215/src/qemu-for-merges/util/oslib-posix.c:634:35: error: use
-of undeclared identifier 'SIGPOLL'
-    } else if (info->ssi_signo =3D=3D SIGPOLL) {
-                                  ^
-
-There's no SIGPOLL on OSX, apparently (it is marked as obsolescent
-in the POSIX spec). The sys/signal.h header only defines a SIGPOLL if
-(defined(_POSIX_C_SOURCE) && !defined(_DARWIN_C_SOURCE)) (ie you
-asked for the POSIX, the whole POSIX and nothing but the POSIX).
-There is a SIGIO (which is defined if the exact opposite condition
-is true).
-
-PPC64, AArch64, ARM:
-
-/home/pm215/qemu/kvm-all.c:1898:23: error: =E2=80=98pending_sigbus_addr=E2=
-=80=99
-defined but not used [-Werror=3Dunuse
-d-variable]
- static __thread void *pending_sigbus_addr;
-                       ^
-/home/pm215/qemu/kvm-all.c:1899:21: error: =E2=80=98pending_sigbus_code=E2=
-=80=99
-defined but not used [-Werror=3Dunuse
-d-variable]
- static __thread int pending_sigbus_code;
-                     ^
+Thanks for the report - I'll look into it.
 
 
-Incidentally, trying to figure out which fields in a siginfo_t
-should be valid is a losing game (though one we play elsewhere,
-see host_to_target_siginfo_noswap() in linux-user), because
-the si_code/signal doesn't actually tell you which fields are valid
-given the existence of rt_sigqueueinfo(). (The kernel internally
-is OK because it has the high 16 bits of si_code, but at least
-for a real signal handler it doesn't tell userspace those high
-bits, so userspace can't distinguish a spoofed si_code (which
-has si_pid/si_uid) from a real one (has addr/band/timer/etc
-depending on the code). Maybe signalfd() gives you the full
-si_code; I haven't checked...
-
-thanks
--- PMM
+--
+Alex Bennée
