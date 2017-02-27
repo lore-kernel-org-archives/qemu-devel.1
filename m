@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ciMxJ-0002nQ-5M
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:11:18 -0500
+	(envelope-from <kraxel@redhat.com>) id 1ciMxg-00038E-5f
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:11:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ciMxF-00052r-VV
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:11:17 -0500
-Received: from indium.canonical.com ([91.189.90.7]:59625)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ciMxF-00052f-MS
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:11:13 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ciMxE-0005xJ-BL
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 15:11:12 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9645B2E80DB
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 15:11:09 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 27 Feb 2017 15:03:03 -0000
-From: Nehal J Wani <nehaljw.kkd1@gmail.com>
-Reply-To: Bug 1668273 <1668273@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170227140328.20639.14786.malonedeb@soybean.canonical.com>
-Message-Id: <20170227150303.21364.16092.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1668273] Re: DoS possible on - a QEMU process
- using userspace SLIRP?
+	(envelope-from <kraxel@redhat.com>) id 1ciMxd-0005BQ-1B
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:11:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57890)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ciMxc-0005BD-R4
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:11:36 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BE602C0567B2
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 15:11:36 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 27 Feb 2017 16:11:28 +0100
+Message-Id: <1488208291-14775-1-git-send-email-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 0/3] audio patch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,208 +28,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-** Description changed:
+  Hi,
 
-  Steps to reproduce:
-  =
+Three little audio patches, adding replay support
+and fixing audio with SDL2.
 
-  - Launch a VM using QEMU (2.8.0):
-  =
+please pull,
+  Gerd
 
-  $ qemu-system-x86_64 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-machine accel=3Dkvm \
-  =C2=A0=C2=A0=C2=A0=C2=A0-hda Fedora-Cloud-Base-25-1.3.x86_64.qcow2 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-m 2G \
-  =C2=A0=C2=A0=C2=A0=C2=A0-smp 2 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-vnc :8 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-boot dc \
-  =C2=A0=C2=A0=C2=A0=C2=A0-vga std \
-  =C2=A0=C2=A0=C2=A0=C2=A0-cpu host \
-  =C2=A0=C2=A0=C2=A0=C2=A0-net nic,vlan=3D0 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-net user,vlan=3D0,hostfwd=3Dtcp::10024-:22,hostf=
-wd=3Dtcp::8082-:80
-  =
+The following changes since commit 3b1d8169844fafee184366b0e0d7080534758b4d:
 
-  - SSH into the VM, install httpd, start httpd
-  =
+  tests-aio-multithread: use atomic_read properly (2017-02-27 12:54:08 +0000)
 
-  $ ssh -p 10024 root@localhost 'dnf install -y httpd && systemctl start
-  httpd'
-  =
+are available in the git repository at:
 
-  - Compile and run the following Java program (on the host):
-  =
+  git://git.kraxel.org/qemu tags/pull-audio-20170227-1
 
-  $ cat <<EOF > URLConnectionReader.java
-  import java.net.*;
-  import java.io.*;
-  =
+for you to fetch changes up to 516452fe6accef3f94b4bcf060b2518038f50c08:
 
-  public class URLConnectionReader {
-  =C2=A0=C2=A0=C2=A0=C2=A0public static void main(String[] args) throws Exc=
-eption {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int i =3D 0;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0while (i < 1024) {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0U=
-RL this_is_404 =3D new URL("http://localhost:8082/blah");
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0U=
-RLConnection yc =3D this_is_404.openConnection();
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0t=
-ry {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0BufferedReader in =3D new BufferedReader(new InputS=
-treamReader(
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0yc.getInputStream()));
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0String inputLine;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0while ((inputLine =3D in.readLine()) !=3D null)
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0System.out.println(inputLin=
-e);
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0in.close();
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}=
- catch (Exception e) {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0//HttpURLConnection urlConnection =3D (HttpURLConne=
-ction) yc;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0//urlConnection.disconnect();
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0i=
-++;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Thread.sleep(1000000000);
-  =C2=A0=C2=A0=C2=A0=C2=A0}
-  }
-  =
+  audio/sdlaudio: Allow audio playback with SDL2 (2017-02-27 14:37:59 +0100)
 
-  $ javac URLConnectionReader.java
-  =
+----------------------------------------------------------------
+audio: replay support, sdl2 fix.
 
-  $ java URLConnectionReader &
-  =
+----------------------------------------------------------------
+Pavel Dovgalyuk (2):
+      replay: add record/replay for audio passthrough
+      audio: make audio poll timer deterministic
 
-  The java program tries to open a lot of HTTP connections, but never
-  calls disconnect() on any.
-  =
+Thomas Huth (1):
+      audio/sdlaudio: Allow audio playback with SDL2
 
-  - Take a look at the list of open FDs of the qemu process:
-  =
-
-  $ ls -tl /proc/${qemu-pid}/fd
-  =
-
-  $ lsof -p ${qemu-pid}
-  All of the TCP connections will be stuck at FIN_WAIT2
-  =
-
-- The VM becomes unresponsive. Neither SSH or VNC works after this.
-+ The VM becomes unresponsive. Neither SSH or VNC works after this; even
-+ after tcp_fin_timeout expires.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1668273
-
-Title:
-  DoS possible on - a QEMU process using userspace SLIRP?
-
-Status in QEMU:
-  New
-
-Bug description:
-  Steps to reproduce:
-
-  - Launch a VM using QEMU (2.8.0):
-
-  $ qemu-system-x86_64 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-machine accel=3Dkvm \
-  =C2=A0=C2=A0=C2=A0=C2=A0-hda Fedora-Cloud-Base-25-1.3.x86_64.qcow2 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-m 2G \
-  =C2=A0=C2=A0=C2=A0=C2=A0-smp 2 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-vnc :8 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-boot dc \
-  =C2=A0=C2=A0=C2=A0=C2=A0-vga std \
-  =C2=A0=C2=A0=C2=A0=C2=A0-cpu host \
-  =C2=A0=C2=A0=C2=A0=C2=A0-net nic,vlan=3D0 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-net user,vlan=3D0,hostfwd=3Dtcp::10024-:22,hostf=
-wd=3Dtcp::8082-:80
-
-  - SSH into the VM, install httpd, start httpd
-
-  $ ssh -p 10024 root@localhost 'dnf install -y httpd && systemctl start
-  httpd'
-
-  - Compile and run the following Java program (on the host):
-
-  $ cat <<EOF > URLConnectionReader.java
-  import java.net.*;
-  import java.io.*;
-
-  public class URLConnectionReader {
-  =C2=A0=C2=A0=C2=A0=C2=A0public static void main(String[] args) throws Exc=
-eption {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int i =3D 0;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0while (i < 1024) {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0U=
-RL this_is_404 =3D new URL("http://localhost:8082/blah");
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0U=
-RLConnection yc =3D this_is_404.openConnection();
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0t=
-ry {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0BufferedReader in =3D new BufferedReader(new InputS=
-treamReader(
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0yc.getInputStream()));
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0String inputLine;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0while ((inputLine =3D in.readLine()) !=3D null)
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0System.out.println(inputLin=
-e);
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0in.close();
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}=
- catch (Exception e) {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0//HttpURLConnection urlConnection =3D (HttpURLConne=
-ction) yc;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0//urlConnection.disconnect();
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0i=
-++;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Thread.sleep(1000000000);
-  =C2=A0=C2=A0=C2=A0=C2=A0}
-  }
-
-  $ javac URLConnectionReader.java
-
-  $ java URLConnectionReader &
-
-  The java program tries to open a lot of HTTP connections, but never
-  calls disconnect() on any.
-
-  - Take a look at the list of open FDs of the qemu process:
-
-  $ ls -tl /proc/${qemu-pid}/fd
-
-  $ lsof -p ${qemu-pid}
-  All of the TCP connections will be stuck at FIN_WAIT2
-
-  The VM becomes unresponsive. Neither SSH or VNC works after this; even
-  after tcp_fin_timeout expires.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1668273/+subscriptions
+ audio/audio.c            | 11 +++++--
+ audio/audio.h            |  5 +++
+ audio/mixeng.c           | 31 +++++++++++++++++++
+ audio/sdlaudio.c         | 48 +++++++++++++++++++++++++++++
+ docs/replay.txt          |  7 +++++
+ include/sysemu/replay.h  |  7 +++++
+ replay/Makefile.objs     |  1 +
+ replay/replay-audio.c    | 79 ++++++++++++++++++++++++++++++++++++++++++++++++
+ replay/replay-internal.h |  4 +++
+ 9 files changed, 190 insertions(+), 3 deletions(-)
+ create mode 100644 replay/replay-audio.c
