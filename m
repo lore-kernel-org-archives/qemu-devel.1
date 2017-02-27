@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53427)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1ciLZn-0001uI-Nw
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:42:56 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ciLZv-000214-1z
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:43:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1ciLZm-0001eJ-SC
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:42:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38808)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ciLZu-0001hA-AR
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:43:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51802)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1ciLZm-0001dy-Lj
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:42:54 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	id 1ciLZu-0001gu-4S
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:43:02 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BF69F4E4D4
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 13:42:54 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 423F561E4C
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 13:43:02 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 27 Feb 2017 17:41:50 +0400
-Message-Id: <20170227134202.2991-10-marcandre.lureau@redhat.com>
+Date: Mon, 27 Feb 2017 17:41:52 +0400
+Message-Id: <20170227134202.2991-12-marcandre.lureau@redhat.com>
 In-Reply-To: <20170227134202.2991-1-marcandre.lureau@redhat.com>
 References: <20170227134202.2991-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 09/21] char: remove chardevs list
+Subject: [Qemu-devel] [PATCH v2 11/21] char-socket: introduce
+ update_disconnected_filename()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,50 +37,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, eblake@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-The list is now empty, the chardev cleanup is taken care of by the unref
-of the root container.
+This helper will be used in yet another place in the following patch.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/sysemu/char.h | 1 -
- chardev/char.c        | 6 ------
- 2 files changed, 7 deletions(-)
+ chardev/char-socket.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/include/sysemu/char.h b/include/sysemu/char.h
-index 98903f31e4..729d186d01 100644
---- a/include/sysemu/char.h
-+++ b/include/sysemu/char.h
-@@ -95,7 +95,6 @@ struct Chardev {
-     int be_open;
-     guint fd_in_tag;
-     DECLARE_BITMAP(features, QEMU_CHAR_FEATURE_LAST);
--    QTAILQ_ENTRY(Chardev) next;
- };
-=20
- /**
-diff --git a/chardev/char.c b/chardev/char.c
-index b3622be3f4..558fd8b31c 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -42,9 +42,6 @@
- /***********************************************************/
- /* character device */
-=20
--static QTAILQ_HEAD(ChardevHead, Chardev) chardevs =3D
--    QTAILQ_HEAD_INITIALIZER(chardevs);
--
- static Object *get_chardevs_root(void)
- {
-     return container_get(object_get_root(), "/chardevs");
-@@ -418,9 +415,6 @@ static void char_finalize(Object *obj)
- {
-     Chardev *chr =3D CHARDEV(obj);
-=20
--    if (QTAILQ_IN_USE(chr, next)) {
--        QTAILQ_REMOVE(&chardevs, chr, next);
--    }
-     if (chr->be) {
-         chr->be->chr =3D NULL;
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index d201f869f8..636a6ea5fa 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -363,6 +363,15 @@ static char *SocketAddress_to_str(const char *prefix=
+, SocketAddress *addr,
      }
+ }
+=20
++static void update_disconnected_filename(SocketChardev *s)
++{
++    Chardev *chr =3D CHARDEV(s);
++
++    g_free(chr->filename);
++    chr->filename =3D SocketAddress_to_str("disconnected:", s->addr,
++                                         s->is_listen, s->is_telnet);
++}
++
+ static void tcp_chr_disconnect(Chardev *chr)
+ {
+     SocketChardev *s =3D SOCKET_CHARDEV(chr);
+@@ -377,8 +386,7 @@ static void tcp_chr_disconnect(Chardev *chr)
+         s->listen_tag =3D qio_channel_add_watch(
+             QIO_CHANNEL(s->listen_ioc), G_IO_IN, tcp_chr_accept, chr, NU=
+LL);
+     }
+-    chr->filename =3D SocketAddress_to_str("disconnected:", s->addr,
+-                                         s->is_listen, s->is_telnet);
++    update_disconnected_filename(s);
+     qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
+     if (s->reconnect_time) {
+         qemu_chr_socket_restart_timer(chr);
+@@ -872,8 +880,7 @@ static void qmp_chardev_open_socket(Chardev *chr,
+     /* be isn't opened until we get a connection */
+     *be_opened =3D false;
+=20
+-    chr->filename =3D SocketAddress_to_str("disconnected:",
+-                                         addr, is_listen, is_telnet);
++    update_disconnected_filename(s);
+=20
+     if (is_listen) {
+         if (is_telnet) {
 --=20
 2.12.0.rc2.3.gc93709801
