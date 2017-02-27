@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ciKgr-0004lC-T6
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:46:11 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ciKge-0004a3-39
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:45:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ciKgq-0000e9-Hm
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:46:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38918)
+	(envelope-from <pbonzini@redhat.com>) id 1ciKgc-0000Rk-Ae
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:45:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47092)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ciKgq-0000dN-8F
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:46:08 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ciKgb-0000RU-Td
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:45:54 -0500
 Received: from int-mx13.intmail.prod.int.phx2.redhat.com
 	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4169A4E8AB
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 12:46:08 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 078A6624C9
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 12:45:54 +0000 (UTC)
 Received: from donizetti.redhat.com (ovpn-117-118.ams2.redhat.com
 	[10.36.117.118])
 	by int-mx13.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v1RCjpe8028718
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 07:46:07 -0500
+	id v1RCjpdu028718
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 07:45:53 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 27 Feb 2017 13:45:47 +0100
-Message-Id: <20170227124551.8673-14-pbonzini@redhat.com>
+Date: Mon, 27 Feb 2017 13:45:35 +0100
+Message-Id: <20170227124551.8673-2-pbonzini@redhat.com>
 In-Reply-To: <20170227124551.8673-1-pbonzini@redhat.com>
 References: <20170227124551.8673-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 13/17] KVM: use KVM_CAP_IMMEDIATE_EXIT
+Subject: [Qemu-devel] [PATCH 01/17] cpu-exec: unify icount_decr and
+ tcg_exit_req
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,158 +37,326 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The purpose of the KVM_SET_SIGNAL_MASK API is to let userspace "kick"
-a VCPU out of KVM_RUN through a POSIX signal.  A signal is attached
-to a dummy signal handler; by blocking the signal outside KVM_RUN and
-unblocking it inside, this possible race is closed:
+The icount interrupt flag and tcg_exit_req serve almost the same
+purpose, let's make them completely the same.
 
-          VCPU thread                     service thread
-   --------------------------------------------------------------
-        check flag
-                                          set flag
-                                          raise signal
-        (signal handler does nothing)
-        KVM_RUN
-
-However, one issue with KVM_SET_SIGNAL_MASK is that it has to take
-tsk->sighand->siglock on every KVM_RUN.  This lock is often on a
-remote NUMA node, because it is on the node of a thread's creator.
-Taking this lock can be very expensive if there are many userspace
-exits (as is the case for SMP Windows VMs without Hyper-V reference
-time counter).
-
-KVM_CAP_IMMEDIATE_EXIT provides an alternative, where the flag is
-placed directly in kvm_run so that KVM can see it:
-
-          VCPU thread                     service thread
-   --------------------------------------------------------------
-                                          raise signal
-        signal handler
-          set run->immediate_exit
-        KVM_RUN
-          check run->immediate_exit
-
-The previous patches changed QEMU so that the only blocked signal is
-SIG_IPI, so we can now stop using KVM_SET_SIGNAL_MASK and sigtimedwait
-if KVM_CAP_IMMEDIATE_EXIT is available.
-
-On a 14-VCPU guest, an "inl" operation goes down from 30k to 6k on
-an unlocked (no BQL) MemoryRegion, or from 30k to 15k if the BQL
-is involved.
+The former TB_EXIT_REQUESTED and TB_EXIT_ICOUNT_EXPIRED cases are
+unified, since we can distinguish them from the value of the
+interrupt flag.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- kvm-all.c | 46 ++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 42 insertions(+), 4 deletions(-)
+ cpu-exec.c                | 80 ++++++++++++++++++++++-------------------------
+ include/exec/gen-icount.h | 53 +++++++++++++++----------------
+ include/qom/cpu.h         | 15 +++++----
+ qom/cpu.c                 |  2 +-
+ tcg/tcg.h                 |  1 -
+ translate-all.c           |  2 +-
+ translate-common.c        | 13 +++-----
+ 7 files changed, 76 insertions(+), 90 deletions(-)
 
-diff --git a/kvm-all.c b/kvm-all.c
-index 1c6f117..084309b 100644
---- a/kvm-all.c
-+++ b/kvm-all.c
-@@ -120,6 +120,7 @@ bool kvm_vm_attributes_allowed;
- bool kvm_direct_msi_allowed;
- bool kvm_ioeventfd_any_length_allowed;
- bool kvm_msi_use_devid;
-+static bool kvm_immediate_exit;
- 
- static const KVMCapabilityInfo kvm_required_capabilites[] = {
-     KVM_CAP_INFO(USER_MEMORY),
-@@ -1619,6 +1620,7 @@ static int kvm_init(MachineState *ms)
-         goto err;
+diff --git a/cpu-exec.c b/cpu-exec.c
+index 1a5ad48..6fd3f47 100644
+--- a/cpu-exec.c
++++ b/cpu-exec.c
+@@ -186,12 +186,6 @@ static inline tcg_target_ulong cpu_tb_exec(CPUState *cpu, TranslationBlock *itb)
+             cc->set_pc(cpu, last_tb->pc);
+         }
      }
+-    if (tb_exit == TB_EXIT_REQUESTED) {
+-        /* We were asked to stop executing TBs (probably a pending
+-         * interrupt. We've now stopped, so clear the flag.
+-         */
+-        atomic_set(&cpu->tcg_exit_req, 0);
+-    }
+     return ret;
+ }
  
-+    kvm_immediate_exit = kvm_check_extension(s, KVM_CAP_IMMEDIATE_EXIT);
-     s->nr_slots = kvm_check_extension(s, KVM_CAP_NR_MEMSLOTS);
- 
-     /* If unspecified, use the default value */
-@@ -1897,6 +1899,20 @@ static __thread void *pending_sigbus_addr;
- static __thread int pending_sigbus_code;
- static __thread bool have_sigbus_pending;
- 
-+static void kvm_cpu_kick(CPUState *cpu)
-+{
-+    atomic_set(&cpu->kvm_run->immediate_exit, 1);
-+}
-+
-+static void kvm_cpu_kick_self(void)
-+{
-+    if (kvm_immediate_exit) {
-+        kvm_cpu_kick(current_cpu);
-+    } else {
-+        qemu_cpu_kick_self();
-+    }
-+}
-+
- static void kvm_eat_signals(CPUState *cpu)
+@@ -575,6 +569,7 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
+                                     SyncClocks *sc)
  {
-     struct timespec ts = { 0, 0 };
-@@ -1905,6 +1921,15 @@ static void kvm_eat_signals(CPUState *cpu)
-     sigset_t chkset;
-     int r;
+     uintptr_t ret;
++    int32_t insns_left;
  
-+    if (kvm_immediate_exit) {
-+        atomic_set(&cpu->kvm_run->immediate_exit, 0);
-+        /* Write kvm_run->immediate_exit before the cpu->exit_request
-+         * write in kvm_cpu_exec.
-+         */
-+        smp_wmb();
+     if (unlikely(atomic_read(&cpu->exit_request))) {
+         return;
+@@ -584,49 +579,48 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
+     ret = cpu_tb_exec(cpu, tb);
+     tb = (TranslationBlock *)(ret & ~TB_EXIT_MASK);
+     *tb_exit = ret & TB_EXIT_MASK;
+-    switch (*tb_exit) {
+-    case TB_EXIT_REQUESTED:
++    if (*tb_exit != TB_EXIT_REQUESTED) {
++        *last_tb = tb;
 +        return;
 +    }
 +
-     sigemptyset(&waitset);
-     sigaddset(&waitset, SIG_IPI);
- 
-@@ -1953,9 +1978,14 @@ int kvm_cpu_exec(CPUState *cpu)
-              * instruction emulation. This self-signal will ensure that we
-              * leave ASAP again.
-              */
--            qemu_cpu_kick_self();
-+            kvm_cpu_kick_self();
-         }
- 
-+        /* Read cpu->exit_request before KVM_RUN reads run->immediate_exit.
-+         * Matching barrier in kvm_eat_signals.
-+         */
-+        smp_rmb();
++    *last_tb = NULL;
++    insns_left = atomic_read(&cpu->icount_decr.u32);
++    atomic_set(&cpu->icount_decr.u16.high, 0);
++    if (insns_left < 0) {
+         /* Something asked us to stop executing chained TBs; just
+          * continue round the main loop. Whatever requested the exit
+-         * will also have set something else (eg interrupt_request)
+-         * which we will handle next time around the loop.  But we
+-         * need to ensure the tcg_exit_req read in generated code
+-         * comes before the next read of cpu->exit_request or
+-         * cpu->interrupt_request.
++         * will also have set something else (eg exit_request or
++         * interrupt_request) which we will handle next time around
++         * the loop.  But we need to ensure the zeroing of icount_decr
++         * comes before the next read of cpu->exit_request
++         * or cpu->interrupt_request.
+          */
+         smp_mb();
+-        *last_tb = NULL;
+-        break;
+-    case TB_EXIT_ICOUNT_EXPIRED:
+-    {
+-        /* Instruction counter expired.  */
+-#ifdef CONFIG_USER_ONLY
+-        abort();
+-#else
+-        int insns_left = cpu->icount_decr.u32;
+-        *last_tb = NULL;
+-        if (cpu->icount_extra && insns_left >= 0) {
+-            /* Refill decrementer and continue execution.  */
+-            cpu->icount_extra += insns_left;
+-            insns_left = MIN(0xffff, cpu->icount_extra);
+-            cpu->icount_extra -= insns_left;
+-            cpu->icount_decr.u16.low = insns_left;
+-        } else {
+-            if (insns_left > 0) {
+-                /* Execute remaining instructions.  */
+-                cpu_exec_nocache(cpu, insns_left, tb, false);
+-                align_clocks(sc, cpu);
+-            }
+-            cpu->exception_index = EXCP_INTERRUPT;
+-            cpu_loop_exit(cpu);
+-        }
+-        break;
+-#endif
++        return;
+     }
+-    default:
+-        *last_tb = tb;
+-        break;
 +
-         run_ret = kvm_vcpu_ioctl(cpu, KVM_RUN, 0);
- 
-         attrs = kvm_arch_post_run(cpu, run);
-@@ -2431,8 +2461,12 @@ static int kvm_set_signal_mask(CPUState *cpu, const sigset_t *sigset)
-     return r;
- }
- 
--static void dummy_signal(int sig)
-+static void kvm_ipi_signal(int sig)
- {
-+    if (current_cpu) {
-+        assert(kvm_immediate_exit);
-+        kvm_cpu_kick(current_cpu);
-+    }
- }
- 
- void kvm_init_cpu_signals(CPUState *cpu)
-@@ -2442,7 +2476,7 @@ void kvm_init_cpu_signals(CPUState *cpu)
-     struct sigaction sigact;
- 
-     memset(&sigact, 0, sizeof(sigact));
--    sigact.sa_handler = dummy_signal;
-+    sigact.sa_handler = kvm_ipi_signal;
-     sigaction(SIG_IPI, &sigact, NULL);
- 
-     pthread_sigmask(SIG_BLOCK, NULL, &set);
-@@ -2451,7 +2485,11 @@ void kvm_init_cpu_signals(CPUState *cpu)
-     pthread_sigmask(SIG_SETMASK, &set, NULL);
- #endif
-     sigdelset(&set, SIG_IPI);
--    r = kvm_set_signal_mask(cpu, &set);
-+    if (kvm_immediate_exit) {
-+        r = pthread_sigmask(SIG_SETMASK, &set, NULL);
++    /* Instruction counter expired.  */
++    assert(use_icount);
++#ifndef CONFIG_USER_ONLY
++    if (cpu->icount_extra) {
++        /* Refill decrementer and continue execution.  */
++        cpu->icount_extra += insns_left;
++        insns_left = MIN(0xffff, cpu->icount_extra);
++        cpu->icount_extra -= insns_left;
++        cpu->icount_decr.u16.low = insns_left;
 +    } else {
-+        r = kvm_set_signal_mask(cpu, &set);
++        /* Execute any remaining instructions, then let the main loop
++         * handle the next event.
++         */
++        if (insns_left > 0) {
++            cpu_exec_nocache(cpu, insns_left, tb, false);
++            align_clocks(sc, cpu);
++        }
++        cpu->exception_index = EXCP_INTERRUPT;
++        cpu_loop_exit(cpu);
+     }
++#endif
+ }
+ 
+ /* main execution loop */
+diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
+index 050de59..62d462e 100644
+--- a/include/exec/gen-icount.h
++++ b/include/exec/gen-icount.h
+@@ -6,58 +6,55 @@
+ /* Helpers for instruction counting code generation.  */
+ 
+ static int icount_start_insn_idx;
+-static TCGLabel *icount_label;
+ static TCGLabel *exitreq_label;
+ 
+ static inline void gen_tb_start(TranslationBlock *tb)
+ {
+-    TCGv_i32 count, flag, imm;
++    TCGv_i32 count, imm;
+ 
+     exitreq_label = gen_new_label();
+-    flag = tcg_temp_new_i32();
+-    tcg_gen_ld_i32(flag, cpu_env,
+-                   offsetof(CPUState, tcg_exit_req) - ENV_OFFSET);
+-    tcg_gen_brcondi_i32(TCG_COND_NE, flag, 0, exitreq_label);
+-    tcg_temp_free_i32(flag);
+-
+-    if (!(tb->cflags & CF_USE_ICOUNT)) {
+-        return;
++    if (tb->cflags & CF_USE_ICOUNT) {
++        count = tcg_temp_local_new_i32();
++    } else {
++        count = tcg_temp_new_i32();
+     }
+ 
+-    icount_label = gen_new_label();
+-    count = tcg_temp_local_new_i32();
+     tcg_gen_ld_i32(count, cpu_env,
+                    -ENV_OFFSET + offsetof(CPUState, icount_decr.u32));
+ 
+-    imm = tcg_temp_new_i32();
+-    /* We emit a movi with a dummy immediate argument. Keep the insn index
+-     * of the movi so that we later (when we know the actual insn count)
+-     * can update the immediate argument with the actual insn count.  */
+-    icount_start_insn_idx = tcg_op_buf_count();
+-    tcg_gen_movi_i32(imm, 0xdeadbeef);
++    if (tb->cflags & CF_USE_ICOUNT) {
++        imm = tcg_temp_new_i32();
++        /* We emit a movi with a dummy immediate argument. Keep the insn index
++         * of the movi so that we later (when we know the actual insn count)
++         * can update the immediate argument with the actual insn count.  */
++        icount_start_insn_idx = tcg_op_buf_count();
++        tcg_gen_movi_i32(imm, 0xdeadbeef);
++
++        tcg_gen_sub_i32(count, count, imm);
++        tcg_temp_free_i32(imm);
 +    }
-     if (r) {
-         fprintf(stderr, "kvm_set_signal_mask: %s\n", strerror(-r));
-         exit(1);
++
++    tcg_gen_brcondi_i32(TCG_COND_LT, count, 0, exitreq_label);
+ 
+-    tcg_gen_sub_i32(count, count, imm);
+-    tcg_temp_free_i32(imm);
++    if (tb->cflags & CF_USE_ICOUNT) {
++        tcg_gen_st16_i32(count, cpu_env,
++                         -ENV_OFFSET + offsetof(CPUState, icount_decr.u16.low));
++    }
+ 
+-    tcg_gen_brcondi_i32(TCG_COND_LT, count, 0, icount_label);
+-    tcg_gen_st16_i32(count, cpu_env,
+-                     -ENV_OFFSET + offsetof(CPUState, icount_decr.u16.low));
+     tcg_temp_free_i32(count);
+ }
+ 
+ static void gen_tb_end(TranslationBlock *tb, int num_insns)
+ {
+-    gen_set_label(exitreq_label);
+-    tcg_gen_exit_tb((uintptr_t)tb + TB_EXIT_REQUESTED);
+-
+     if (tb->cflags & CF_USE_ICOUNT) {
+         /* Update the num_insn immediate parameter now that we know
+          * the actual insn count.  */
+         tcg_set_insn_param(icount_start_insn_idx, 1, num_insns);
+-        gen_set_label(icount_label);
+-        tcg_gen_exit_tb((uintptr_t)tb + TB_EXIT_ICOUNT_EXPIRED);
+     }
+ 
++    gen_set_label(exitreq_label);
++    tcg_gen_exit_tb((uintptr_t)tb + TB_EXIT_REQUESTED);
++
+     /* Terminate the linked list.  */
+     tcg_ctx.gen_op_buf[tcg_ctx.gen_op_buf[0].prev].next = 0;
+ }
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 3e61c88..c3292ef 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -275,11 +275,11 @@ struct qemu_work_item;
+  * @stopped: Indicates the CPU has been artificially stopped.
+  * @unplug: Indicates a pending CPU unplug request.
+  * @crash_occurred: Indicates the OS reported a crash (panic) for this CPU
+- * @tcg_exit_req: Set to force TCG to stop executing linked TBs for this
+- *           CPU and return to its top level loop.
+  * @singlestep_enabled: Flags for single-stepping.
+  * @icount_extra: Instructions until next timer event.
+- * @icount_decr: Number of cycles left, with interrupt flag in high bit.
++ * @icount_decr: Low 16 bits: number of cycles left, only used in icount mode.
++ * High 16 bits: Set to -1 to force TCG to stop executing linked TBs for this
++ * CPU and return to its top level loop (even in non-icount mode).
+  * This allows a single read-compare-cbranch-write sequence to test
+  * for both decrementer underflow and exceptions.
+  * @can_do_io: Nonzero if memory-mapped IO is safe. Deterministic execution
+@@ -382,10 +382,6 @@ struct CPUState {
+     /* TODO Move common fields from CPUArchState here. */
+     int cpu_index; /* used by alpha TCG */
+     uint32_t halted; /* used by alpha, cris, ppc TCG */
+-    union {
+-        uint32_t u32;
+-        icount_decr_u16 u16;
+-    } icount_decr;
+     uint32_t can_do_io;
+     int32_t exception_index; /* used by m68k TCG */
+ 
+@@ -398,7 +394,10 @@ struct CPUState {
+        offset from AREG0.  Leave this field at the end so as to make the
+        (absolute value) offset as small as possible.  This reduces code
+        size, especially for hosts without large memory offsets.  */
+-    uint32_t tcg_exit_req;
++    union {
++        uint32_t u32;
++        icount_decr_u16 u16;
++    } icount_decr;
+ 
+     bool hax_vcpu_dirty;
+     struct hax_vcpu_state *hax_vcpu;
+diff --git a/qom/cpu.c b/qom/cpu.c
+index 58784bc..f02e9c0 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -133,7 +133,7 @@ void cpu_exit(CPUState *cpu)
+     atomic_set(&cpu->exit_request, 1);
+     /* Ensure cpu_exec will see the exit request after TCG has exited.  */
+     smp_wmb();
+-    atomic_set(&cpu->tcg_exit_req, 1);
++    atomic_set(&cpu->icount_decr.u16.high, -1);
+ }
+ 
+ int cpu_write_elf32_qemunote(WriteCoreDumpFunction f, CPUState *cpu,
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 4c7f258..6c216bb 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -1101,7 +1101,6 @@ static inline unsigned get_mmuidx(TCGMemOpIdx oi)
+ #define TB_EXIT_MASK 3
+ #define TB_EXIT_IDX0 0
+ #define TB_EXIT_IDX1 1
+-#define TB_EXIT_ICOUNT_EXPIRED 2
+ #define TB_EXIT_REQUESTED 3
+ 
+ #ifdef HAVE_TCG_QEMU_TB_EXEC
+diff --git a/translate-all.c b/translate-all.c
+index 9bac061..d42d003 100644
+--- a/translate-all.c
++++ b/translate-all.c
+@@ -1930,7 +1930,7 @@ void cpu_interrupt(CPUState *cpu, int mask)
+ {
+     g_assert(qemu_mutex_iothread_locked());
+     cpu->interrupt_request |= mask;
+-    cpu->tcg_exit_req = 1;
++    cpu->icount_decr.u16.high = -1;
+ }
+ 
+ /*
+diff --git a/translate-common.c b/translate-common.c
+index d504dd0..40fe5a1 100644
+--- a/translate-common.c
++++ b/translate-common.c
+@@ -43,14 +43,11 @@ static void tcg_handle_interrupt(CPUState *cpu, int mask)
+     if (!qemu_cpu_is_self(cpu)) {
+         qemu_cpu_kick(cpu);
+     } else {
+-        if (use_icount) {
+-            cpu->icount_decr.u16.high = 0xffff;
+-            if (!cpu->can_do_io
+-                && (mask & ~old_mask) != 0) {
+-                cpu_abort(cpu, "Raised interrupt while not in I/O function");
+-            }
+-        } else {
+-            cpu->tcg_exit_req = 1;
++        cpu->icount_decr.u16.high = -1;
++        if (use_icount &&
++            !cpu->can_do_io
++            && (mask & ~old_mask) != 0) {
++            cpu_abort(cpu, "Raised interrupt while not in I/O function");
+         }
+     }
+ }
 -- 
 2.9.3
