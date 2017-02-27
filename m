@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ciTir-0006XU-Lv
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 17:24:50 -0500
+	(envelope-from <sstabellini@kernel.org>) id 1ciTp7-00008z-5t
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 17:31:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ciTiq-0008DA-Ly
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 17:24:49 -0500
-Date: Mon, 27 Feb 2017 17:24:41 -0500
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170227222441.GL25637@localhost.localdomain>
-References: <cover.1488220970.git.jcody@redhat.com>
-	<871655967d4f29e1357abe088df38270e95f5f19.1488220970.git.jcody@redhat.com>
-	<9452f3c1-1f9f-f508-1711-1e8eb5a5c2f1@redhat.com>
+	(envelope-from <sstabellini@kernel.org>) id 1ciTp2-0005DD-9k
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 17:31:17 -0500
+Received: from mail.kernel.org ([198.145.29.136]:58864)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1ciTp2-000599-2o
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 17:31:12 -0500
+Date: Mon, 27 Feb 2017 14:31:06 -0800 (PST)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <1487990764-27397-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <alpine.DEB.2.10.1702271429350.7315@sstabellini-ThinkPad-X260>
+References: <1487990764-27397-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9452f3c1-1f9f-f508-1711-1e8eb5a5c2f1@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] block/rbd: add all the currently
- supported runtime_opts
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH V10 0/2] Add new qmp commands to suppurt
+ Xen COLO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,76 +27,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, berrange@redhat.com
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Cc: qemu devel <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Markus Armbruster <armbru@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Jason Wang <jasowang@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>
 
-On Mon, Feb 27, 2017 at 04:18:57PM -0600, Eric Blake wrote:
-> On 02/27/2017 12:58 PM, Jeff Cody wrote:
-> > This adds all the currently supported runtime opts, which
-> > are the options as parsed from the filename.  All of these
-> > options are explicitly checked for during during runtime,
-> > with an exception to the "keyvalue-pairs" option.
-> > 
-> > This option contains all the key/value pairs that the QEMU rbd
-> > driver merely unescapes, and passes along blindly to rados.
+Eric, are you OK with this series going upstream? If so, do you want me
+to send the pull request for it or are you going to handle it?
+
+On Sat, 25 Feb 2017, Zhang Chen wrote:
+> Xen COLO depend on qemu COLO replication function.
+> So, We need new qmp commands for Xen to use qemu replication.
 > 
-> Maybe worth adding a comment that keyvalue-pairs will NOT be exposed in
-> QAPI in the later patches, making it command-line only and
-> non-introspectible.
->
-
-Yes, I will do that.
-
-
-> > 
-> > Signed-off-by: Jeff Cody <jcody@redhat.com>
-> > ---
-> >  block/rbd.c | 62 ++++++++++++++++++++++++++++++++++++++++++-------------------
-> >  1 file changed, 43 insertions(+), 19 deletions(-)
-> > 
+> Corresponding libxl patches already in xen.git.
+> Commit ID:
 > 
-> > +static QemuOptsList runtime_opts = {
-> > +    .name = "rbd",
-> > +    .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
-> > +    .desc = {
-> > +        {
-> > +            .name = "filename",
-> > +            .type = QEMU_OPT_STRING,
-> > +            .help = "Specification of the rbd image",
-> > +        },
-> > +        {
-> > +            .name = "password-secret",
-> > +            .type = QEMU_OPT_STRING,
-> > +            .help = "ID of secret providing the password",
-> > +        },
-> > +        {
-> > +            .name = "conf",
+> ed37ef1f91c20f0ab162ce60f8c38400b917fa64
+> COLO: introduce new API to prepare/start/do/get_error/stop replication
 > 
-> Is "conf" the best name, or do we want "configuration"?
+> a0ddc0b359375b2418213966dfbdbfab593ecc6f
+> tools/libxl: introduction of libxl__qmp_restore to load qemu state
 > 
-
-I chose "conf" because it matches the rados option name (and the command
-line option name; it is of the form "conf=filename").
-
-> > +            .type = QEMU_OPT_STRING,
-> > +        },
+> V10:
+>    - Fix ReplicationStatus error comments.
+>    - Fix query-xen-replication-status example.
 > 
-> Worth documenting all the options?
+> Zhang Chen (2):
+>   Add a new qmp command to start/stop replication
+>   Add a new qmp command to do checkpoint, query xen replication status
 > 
-
-Yes, probably so - and especially to map them up with what rados/ceph
-options they correspond to.
-
-> I'm not seeing where "keyvalue-pairs" is used yet, but assume it is in a
-> later patch. But assuming the QAPI version in a later patch matches,
-> other than keyvalue-pairs, I think you're okay.
+>  migration/colo.c | 49 +++++++++++++++++++++++++++++++++++++
+>  qapi-schema.json | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 122 insertions(+)
 > 
-
-Yep, the next patch (where we switch over to .bdrv_parse_filename()).
-
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->
-
-Thanks!
-
--Jeff
+> -- 
+> 2.7.4
+> 
+> 
+> 
