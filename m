@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45523)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ciUDg-0007RE-E5
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 17:56:41 -0500
+	(envelope-from <groug@kaod.org>) id 1ciUHf-0000SQ-9b
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:00:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ciUDf-0002IF-AJ
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 17:56:40 -0500
-Date: Mon, 27 Feb 2017 17:56:31 -0500
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170227225631.GM25637@localhost.localdomain>
-References: <cover.1488220970.git.jcody@redhat.com>
-	<fa6a26e1642ad7e593f3a0776a4a021997493f24.1488220970.git.jcody@redhat.com>
-	<4b9a328b-5537-d06d-3510-d2d4038347a3@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4b9a328b-5537-d06d-3510-d2d4038347a3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] block/rbd: parse all options via
- bdrv_parse_filename
+	(envelope-from <groug@kaod.org>) id 1ciUHb-0003oU-TC
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:00:47 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45680
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ciUHb-0003nn-Np
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:00:43 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1RMrbme126122
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 18:00:42 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28vs23tfyn-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 18:00:42 -0500
+Received: from localhost
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Mon, 27 Feb 2017 23:00:40 -0000
+From: Greg Kurz <groug@kaod.org>
+Date: Mon, 27 Feb 2017 23:59:55 +0100
+In-Reply-To: <1488236421-30983-1-git-send-email-groug@kaod.org>
+References: <1488236421-30983-1-git-send-email-groug@kaod.org>
+Message-Id: <1488236421-30983-6-git-send-email-groug@kaod.org>
+Subject: [Qemu-devel] [PULL 05/31] 9pfs: remove side-effects in local_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,140 +37,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, berrange@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
 
-On Mon, Feb 27, 2017 at 04:35:58PM -0600, Eric Blake wrote:
-> On 02/27/2017 12:58 PM, Jeff Cody wrote:
-> > Get rid of qemu_rbd_parsename in favor of bdrv_parse_filename.
-> > This simplifies a lot of the parsing as well, as we can treat everything
-> > a bit simpler since nonexistent options are simply NULL pointers instead
-> > of empy strings.
-> 
-> s/empy/empty/
->
+If this function fails, it should not modify *ctx.
 
-Thanks
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ hw/9pfs/9p-local.c | 37 +++++++++++++++++++------------------
+ 1 file changed, 19 insertions(+), 18 deletions(-)
 
-> > 
-> > An important item to note:
-> > 
-> > Ceph has many extra option values that can be specified as key/value
-> > pairs.  This was handled previously in the driver by extracting the
-> > values that the QEMU driver cared about, and then blindly passing all
-> > extra options to rbd after splitting them into key/value pairs, and
-> > cleaning up any special character escaping.
-> > 
-> > The practice is continued in this patch; there is an option
-> > "keyvalue-pairs" that is populated with all the key/value pairs that the
-> > QEMU driver does not care about.  These key/value pairs will override
-> > any settings in the 'conf' configuration file, just as they did before.
-> > 
-> > Signed-off-by: Jeff Cody <jcody@redhat.com>
-> > ---
-> >  block/rbd.c | 298 ++++++++++++++++++++++++++++++------------------------------
-> >  1 file changed, 148 insertions(+), 150 deletions(-)
-> > 
-> 
-> > +
-> > +    /* The following are essentially all key/value pairs, and we treat
-> > +     * 'id' and 'conf' a bit special.  Key/value pairs may be in any order. */
-> > +    while (p) {
-> 
-> > +        if (!strcmp(name, "conf")) {
-> > +            qdict_put(options, "conf", qstring_from_str(value));
-> > +        } else if (!strcmp(name, "id")) {
-> > +            qdict_put(options, "user" , qstring_from_str(value));
-> > +        } else {
-> > +            char *tmp = g_malloc0(max_keypair_size);
-> > +            /* only use a delimiter if it is not the first keypair found */
-> > +            /* These are sets of unknown key/value pairs we'll pass along
-> > +             * to ceph */
-> > +            if (keypairs[0]) {
-> > +                snprintf(tmp, max_keypair_size, ":%s=%s", name, value);
-> > +                pstrcat(keypairs, max_keypair_size, tmp);
-> > +            } else {
-> > +                snprintf(keypairs, max_keypair_size, "%s=%s", name, value);
-> > +            }
-> > +            g_free(tmp);
-> > +        }
-> > +    }
-> > +
-> > +    if (keypairs[0]) {
-> > +        qdict_put(options, "keyvalue-pairs", qstring_from_str(keypairs));
-> 
-> Uggh.  Why are we compressing this into a single string, instead of
-> using a GList?  True, we aren't exposing it through QAPI, but I still
-> wonder if a smarter representation than a flat string is warranted.
-> 
-
-Yes, a bit gross.  I wouldn't mind cleaning it up (and maybe some other rbd
-cleanup as well), but for this series I wanted to keep the "other" parsing
-the same as before, and just try to (as much as possible) layer the
-blockdev-add QAPI on top.
-
-As you suggest below, I'll add a 'FIXME' here detailing that this is left in
-place as legacy code, and should be cleaned up into something more palatable
-like a GList (or at least _some_ sort of structured data).
-
-> > @@ -434,35 +421,55 @@ static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
-> >      if (objsize) {
-> >          if ((objsize - 1) & objsize) {    /* not a power of 2? */
-> 
-> Drive-by comment (if you fix it, do it as a separate followup patch): we
-> have is_power_of_2() to make code like this more legible.
->
-
-I'll add that to my post 2.9 rbd cleanup queue, thanks.
-
-> >  
-> >  static BlockDriver bdrv_rbd = {
-
-> > -    .instance_size      = sizeof(BDRVRBDState),
-> > -    .bdrv_needs_filename = true,
-> > -    .bdrv_file_open     = qemu_rbd_open,
-> > -    .bdrv_close         = qemu_rbd_close,
-> > -    .bdrv_create        = qemu_rbd_create,
-> > -    .bdrv_has_zero_init = bdrv_has_zero_init_1,
-> > -    .bdrv_get_info      = qemu_rbd_getinfo,
-> > -    .create_opts        = &qemu_rbd_create_opts,
-> > -    .bdrv_getlength     = qemu_rbd_getlength,
-> > -    .bdrv_truncate      = qemu_rbd_truncate,
-> > -    .protocol_name      = "rbd",
-> > +    .format_name            = "rbd",
-> > +    .instance_size          = sizeof(BDRVRBDState),
-> > +    .bdrv_parse_filename    = qemu_rbd_parse_filename,
-> > +    .bdrv_file_open         = qemu_rbd_open,
-> > +    .bdrv_close             = qemu_rbd_close,
-> > +    .bdrv_create            = qemu_rbd_create,
-> > +    .bdrv_has_zero_init     = bdrv_has_zero_init_1,
-> > +    .bdrv_get_info          = qemu_rbd_getinfo,
-> > +    .create_opts            = &qemu_rbd_create_opts,
-> 
-> Pointless &; might as well remove it for consistency while touching it.
-> 
-
-I'm not sure I understand - we need the '&' here for the .create_opts
-initializer, unless I am overlooking something.
-
-> > +    .bdrv_getlength         = qemu_rbd_getlength,
-> > +    .bdrv_truncate          = qemu_rbd_truncate,
-> > +    .protocol_name          = "rbd",
-> >  
-> 
-> I don't know if it is worth respinning to change keyvalue-pairs into a
-> more appropriate data type; given our desire to make blockdev-add stable
-> for 2.9 and the fact that keyvalue-pairs is not exposed to QAPI, I can
-> live with passing around a flat string.  You may want to add FIXME
-> comments to call attention to the fact that we know it is gross but why
-> we do it anyways.
->
-> But since adding comments, and fixing minor things like &, doesn't
-> change the real meat of this patch, I can live with:
-> 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> 
-
-Thanks!
-
--Jeff
+diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+index 2369b918aa3f..1ede63f57772 100644
+--- a/hw/9pfs/9p-local.c
++++ b/hw/9pfs/9p-local.c
+@@ -1168,9 +1168,25 @@ static int local_ioc_getversion(FsContext *ctx, V9fsPath *path,
+ 
+ static int local_init(FsContext *ctx)
+ {
+-    int err = 0;
+     struct statfs stbuf;
+ 
++#ifdef FS_IOC_GETVERSION
++    /*
++     * use ioc_getversion only if the ioctl is definied
++     */
++    if (statfs(ctx->fs_root, &stbuf) < 0) {
++        return -1;
++    }
++    switch (stbuf.f_type) {
++    case EXT2_SUPER_MAGIC:
++    case BTRFS_SUPER_MAGIC:
++    case REISERFS_SUPER_MAGIC:
++    case XFS_SUPER_MAGIC:
++        ctx->exops.get_st_gen = local_ioc_getversion;
++        break;
++    }
++#endif
++
+     if (ctx->export_flags & V9FS_SM_PASSTHROUGH) {
+         ctx->xops = passthrough_xattr_ops;
+     } else if (ctx->export_flags & V9FS_SM_MAPPED) {
+@@ -1185,23 +1201,8 @@ static int local_init(FsContext *ctx)
+         ctx->xops = passthrough_xattr_ops;
+     }
+     ctx->export_flags |= V9FS_PATHNAME_FSCONTEXT;
+-#ifdef FS_IOC_GETVERSION
+-    /*
+-     * use ioc_getversion only if the iocl is definied
+-     */
+-    err = statfs(ctx->fs_root, &stbuf);
+-    if (!err) {
+-        switch (stbuf.f_type) {
+-        case EXT2_SUPER_MAGIC:
+-        case BTRFS_SUPER_MAGIC:
+-        case REISERFS_SUPER_MAGIC:
+-        case XFS_SUPER_MAGIC:
+-            ctx->exops.get_st_gen = local_ioc_getversion;
+-            break;
+-        }
+-    }
+-#endif
+-    return err;
++
++    return 0;
+ }
+ 
+ static int local_parse_opts(QemuOpts *opts, struct FsDriverEntry *fse)
+-- 
+2.7.4
