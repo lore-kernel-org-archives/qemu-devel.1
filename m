@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ciR7I-0000i4-EX
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:37:53 -0500
+	(envelope-from <thuth@redhat.com>) id 1ciR8Q-0001Rp-CK
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:39:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ciR7D-000201-I9
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:37:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36964)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ciR7D-0001zE-9N
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:37:47 -0500
-References: <CAFrogKUMUSYF4a7gfO3ruO5hSm6qG6oVjp0vxAO-UNRMLxB54A@mail.gmail.com>
-	<20170227110106.GE28403@stefanha-x1.localdomain>
-	<20170227123356.tgmtbiwcoswdb256@eukaryote>
-	<20170227131757.vkf6twqdkzbwnsqc@eukaryote>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3e3033ab-9cc9-8673-f13c-2dd658677fc9@redhat.com>
-Date: Mon, 27 Feb 2017 13:37:44 -0600
+	(envelope-from <thuth@redhat.com>) id 1ciR8P-0002RO-Bd
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:39:02 -0500
+References: <1488200143-2140-1-git-send-email-armbru@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <34f8e049-4425-5d61-6f7a-914c7d13b38e@redhat.com>
+Date: Mon, 27 Feb 2017 20:38:51 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170227131757.vkf6twqdkzbwnsqc@eukaryote>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="s7QSddNjm1g1HUb2VdmVUQEnKB3Crbiql"
-Subject: Re: [Qemu-devel] [libvirt] Question regarding Snapshots
+In-Reply-To: <1488200143-2140-1-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] option: Tweak invalid size error message
+ and unbreak iotest 049
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,82 +23,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kashyap Chamarthy <kchamart@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: libvir-list@redhat.com, Tim Cusack <thagrasshoppa@gmail.com>, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---s7QSddNjm1g1HUb2VdmVUQEnKB3Crbiql
-From: Eric Blake <eblake@redhat.com>
-To: Kashyap Chamarthy <kchamart@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>
-Cc: libvir-list@redhat.com, Tim Cusack <thagrasshoppa@gmail.com>,
- qemu-devel@nongnu.org
-Message-ID: <3e3033ab-9cc9-8673-f13c-2dd658677fc9@redhat.com>
-Subject: Re: [Qemu-devel] [libvirt] Question regarding Snapshots
-References: <CAFrogKUMUSYF4a7gfO3ruO5hSm6qG6oVjp0vxAO-UNRMLxB54A@mail.gmail.com>
- <20170227110106.GE28403@stefanha-x1.localdomain>
- <20170227123356.tgmtbiwcoswdb256@eukaryote>
- <20170227131757.vkf6twqdkzbwnsqc@eukaryote>
-In-Reply-To: <20170227131757.vkf6twqdkzbwnsqc@eukaryote>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 27.02.2017 13:55, Markus Armbruster wrote:
+> Commit 75cdcd1 neglected to update tests/qemu-iotests/049.out, and
+> made the error message for negative size worse.  Fix that.
+> 
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  tests/qemu-iotests/049.out | 14 +++++++++-----
+>  util/qemu-option.c         |  2 +-
+>  2 files changed, 10 insertions(+), 6 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/049.out b/tests/qemu-iotests/049.out
+> index 4673b67..34e66db 100644
+> --- a/tests/qemu-iotests/049.out
+> +++ b/tests/qemu-iotests/049.out
+> @@ -95,14 +95,14 @@ qemu-img create -f qcow2 TEST_DIR/t.qcow2 -- -1024
+>  qemu-img: Image size must be less than 8 EiB!
+>  
+>  qemu-img create -f qcow2 -o size=-1024 TEST_DIR/t.qcow2
+> -qemu-img: Parameter 'size' expects a non-negative number below 2^64
+> +qemu-img: Value '-1024' is out of range for parameter 'size'
+>  qemu-img: TEST_DIR/t.qcow2: Invalid options for file format 'qcow2'
+>  
+>  qemu-img create -f qcow2 TEST_DIR/t.qcow2 -- -1k
+>  qemu-img: Image size must be less than 8 EiB!
+>  
+>  qemu-img create -f qcow2 -o size=-1k TEST_DIR/t.qcow2
+> -qemu-img: Parameter 'size' expects a non-negative number below 2^64
+> +qemu-img: Value '-1k' is out of range for parameter 'size'
+>  qemu-img: TEST_DIR/t.qcow2: Invalid options for file format 'qcow2'
+>  
+>  qemu-img create -f qcow2 TEST_DIR/t.qcow2 -- 1kilobyte
+> @@ -110,15 +110,19 @@ qemu-img: Invalid image size specified! You may use k, M, G, T, P or E suffixes
+>  qemu-img: kilobytes, megabytes, gigabytes, terabytes, petabytes and exabytes.
+>  
+>  qemu-img create -f qcow2 -o size=1kilobyte TEST_DIR/t.qcow2
+> -Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
+> +qemu-img: Parameter 'size' expects a non-negative number below 2^64
+> +Optional suffix k, M, G, T, P or E means kilo-, mega-, giga-, tera-, peta-
+> +and exabytes, respectively.
+> +qemu-img: TEST_DIR/t.qcow2: Invalid options for file format 'qcow2'
+>  
+>  qemu-img create -f qcow2 TEST_DIR/t.qcow2 -- foobar
+>  qemu-img: Invalid image size specified! You may use k, M, G, T, P or E suffixes for
+>  qemu-img: kilobytes, megabytes, gigabytes, terabytes, petabytes and exabytes.
+>  
+>  qemu-img create -f qcow2 -o size=foobar TEST_DIR/t.qcow2
+> -qemu-img: Parameter 'size' expects a size
+> -You may use k, M, G or T suffixes for kilobytes, megabytes, gigabytes and terabytes.
+> +qemu-img: Parameter 'size' expects a non-negative number below 2^64
+> +Optional suffix k, M, G, T, P or E means kilo-, mega-, giga-, tera-, peta-
+> +and exabytes, respectively.
+>  qemu-img: TEST_DIR/t.qcow2: Invalid options for file format 'qcow2'
+>  
+>  == Check correct interpretation of suffixes for cluster size ==
+> diff --git a/util/qemu-option.c b/util/qemu-option.c
+> index 419f252..5ce1b5c 100644
+> --- a/util/qemu-option.c
+> +++ b/util/qemu-option.c
+> @@ -179,7 +179,7 @@ void parse_option_size(const char *name, const char *value,
+>  
+>      err = qemu_strtosz(value, NULL, &size);
+>      if (err == -ERANGE) {
+> -        error_setg(errp, "Value '%s' is too large for parameter '%s'",
+> +        error_setg(errp, "Value '%s' is out of range for parameter '%s'",
+>                     value, name);
+>          return;
+>      }
 
-On 02/27/2017 07:17 AM, Kashyap Chamarthy wrote:
-> On Mon, Feb 27, 2017 at 01:33:56PM +0100, Kashyap Chamarthy wrote:
->=20
-> [...]
->=20
->>>> Can you make a snapshot, then go back to the base and ignore that sn=
-apshot
->>>> like a closed branch, make another snapshot, and then go back and fo=
-rth
->>>> from each to each?
-
-Yes.  Or graphically, you can have:
-
-       -- A ... B ... C
-      /
-base <
-      \
-       -- D ... E ... F
-
-and toggle between any of the named snapshots at will.  As Kashyap and
-others pointed out, libvirt support for reverting to a particular
-external snapshot is not fully present, so there are some manual steps
-involved, but the task is still doable.
-
->=20
->> For the long answer to the complications involved in reverting to
->> external snapshots, refer this (long read):
->>
->> https://wiki.libvirt.org/page/I_created_an_external_snapshot,_but_libv=
-irt_will_not_let_me_delete_or_revert_to_it
->=20
-> [...]
->=20
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---s7QSddNjm1g1HUb2VdmVUQEnKB3Crbiql
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYtIAIAAoJEKeha0olJ0NqeQMH/ipSiDDC1/qtrtN0R25MJq3l
-TF01SALetmZ2RbInyJNQWbC+q8dMmeboxbZLNeHHQ/nIgfw2N4KOZbhOjLCwj2q4
-JkJA0A20DYMzA3fC73f0NMVpqNkB6trxyTXaNaUWCDAXHp1lPUco8ExqhbRMxuER
-FM7dE2RCpZfs2z/8TfN3DyNcFi6jRsjL2YUhIa9SrfqMEQdTAEIcgoBdjSBeLPxB
-xq7Kvz+eWn5XzKbWfngcOuQUE4teoo4l/FSqJgh2K7weKmiaZ1Ycq5TvglKQqOCj
-Uz5hRlwphi7XzHe2OaAawscaIrWOpE7ODwX0bbzeTYr+pFLY1FhQWdU7yefo36k=
-=eR6/
------END PGP SIGNATURE-----
-
---s7QSddNjm1g1HUb2VdmVUQEnKB3Crbiql--
+Reviewed-by: Thomas Huth <thuth@redhat.com>
