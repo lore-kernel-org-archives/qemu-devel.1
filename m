@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ciKfM-0003ms-SJ
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:44:37 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ciKge-0004aU-R8
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:45:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ciKfJ-0008Sq-OY
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:44:36 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:33165)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ciKfJ-0008Sk-Iq
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:44:33 -0500
-Received: by mail-wm0-x242.google.com with SMTP id v77so13264910wmv.0
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 04:44:33 -0800 (PST)
-Date: Mon, 27 Feb 2017 12:44:30 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170227124430.GG28403@stefanha-x1.localdomain>
-References: <148814889214.28146.16915712763478774662.stgit@bahia>
-	<148814892313.28146.906456388544163572.stgit@bahia>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="gm5TwAJMO0F2iVRz"
-Content-Disposition: inline
-In-Reply-To: <148814892313.28146.906456388544163572.stgit@bahia>
-Subject: Re: [Qemu-devel] [PATCH v2 04/28] 9pfs: introduce openat_nofollow()
- helper
+	(envelope-from <pbonzini@redhat.com>) id 1ciKgd-0000SB-K1
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:45:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39492)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ciKgd-0000Rw-8z
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:45:55 -0500
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 27 Feb 2017 13:45:36 +0100
+Message-Id: <20170227124551.8673-3-pbonzini@redhat.com>
+In-Reply-To: <20170227124551.8673-1-pbonzini@redhat.com>
+References: <20170227124551.8673-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 02/17] replay: check icount in cpu exec loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,79 +23,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Pavel Dovgalyuk <dovgaluk@ispras.ru>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
+From: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 
---gm5TwAJMO0F2iVRz
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This patch adds check to break cpu loop when icount expires without
+setting the TB_EXIT_ICOUNT_EXPIRED flag. It happens when there is no
+available translated blocks and all instructions were executed.
+In icount replay mode unnecessary tb_find will be called (which may
+cause an exception) and execution will be non-deterministic.
+Because cpu_loop_exec_tb cannot longjmp anymore, we can remove
+the anticipated call to align_clocks in cpu_loop_exec_tb, as
+well as the SyncClocks *sc argument.
 
-On Sun, Feb 26, 2017 at 11:42:03PM +0100, Greg Kurz wrote:
-> +int openat_nofollow(int dirfd, const char *path, int flags, mode_t mode)
-> +{
-> +    int fd;
-> +
-> +    fd = dup(dirfd);
-> +    if (fd == -1) {
-> +        return -1;
-> +    }
-> +
-> +    while (*path) {
-> +        const char *c;
-> +        int next_fd;
-> +        char *head;
-> +
-> +        head = g_strdup(path);
-> +        c = strchr(path, '/');
-> +        if (c) {
-> +            head[c - path] = 0;
-> +            next_fd = openat_dir(fd, head);
-> +        } else {
-> +            next_fd = openat_file(fd, head, flags, mode);
-> +        }
-> +        g_free(head);
-> +        if (next_fd == -1) {
-> +            close_preserve_errno(fd);
-> +            return -1;
-> +        }
-> +        close(fd);
-> +        fd = next_fd;
-> +
-> +        if (!c) {
-> +            break;
-> +        }
-> +        path = c + 1;
-> +    }
-> +
-> +    return fd;
-> +}
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Message-Id: <002801d2810f$18809c20$4981d460$@ru>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ cpu-exec.c | 13 +++++--------
+ 1 file changed, 5 insertions(+), 8 deletions(-)
 
-If I understand the Linux openat(2) implementation correctly this
-function fails with ENOENT if:
-
-1. An absolute path is given
-2. A path contains consecutive slashes ("a///b")
-
-Both of these behaviors are problematic.  If the function doesn't
-support absolute paths it should be called relative_openat_nofollow()
-and have an error if path[0] == '/'.
-
-I believe guests can pass in paths with consecutive slashes, so the
-function must cope with them.
-
---gm5TwAJMO0F2iVRz
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYtB8uAAoJEJykq7OBq3PI+BEIAMOxUKcusSnOqOyxeESOML5v
-l4cOCZfOCyaSRXy1qCWwHrQbLaiwQBVmRC/Z4glwUpz3HY4gvxCV3SzSOukmkxMH
-8se3gjKyLA+5JXEHrsYv4TwhcaemjQbrEyiobXOsHcgAEF/tJoY+etRHoFW3xZqd
-DCX8SxpTP+IK7LLNDe39d/wLlLX7blSK8wwAsehkvQBPwkAvQEMxyASJmh/pma3R
-+5cW/qU3yuRhJCGnv5JCO34hPvH1nzXr7hat3xP7lSVgXeFQnkX01tClOxzNwKi0
-kI5M73EQr+JgB3WhiZGAsdXMLOvBuSJvPERWmuKSpqx74e1YhBz+r96M1BbOQ5U=
-=+aE/
------END PGP SIGNATURE-----
-
---gm5TwAJMO0F2iVRz--
+diff --git a/cpu-exec.c b/cpu-exec.c
+index 6fd3f47..2a0dfb0 100644
+--- a/cpu-exec.c
++++ b/cpu-exec.c
+@@ -554,8 +554,9 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+         qemu_mutex_unlock_iothread();
+     }
+ 
+-
+-    if (unlikely(atomic_read(&cpu->exit_request) || replay_has_interrupt())) {
++    /* Finally, check if we need to exit to the main loop.  */
++    if (unlikely(atomic_read(&cpu->exit_request)
++        || (use_icount && cpu->icount_decr.u16.low + cpu->icount_extra == 0))) {
+         atomic_set(&cpu->exit_request, 0);
+         cpu->exception_index = EXCP_INTERRUPT;
+         return true;
+@@ -565,8 +566,7 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+ }
+ 
+ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
+-                                    TranslationBlock **last_tb, int *tb_exit,
+-                                    SyncClocks *sc)
++                                    TranslationBlock **last_tb, int *tb_exit)
+ {
+     uintptr_t ret;
+     int32_t insns_left;
+@@ -615,10 +615,7 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
+          */
+         if (insns_left > 0) {
+             cpu_exec_nocache(cpu, insns_left, tb, false);
+-            align_clocks(sc, cpu);
+         }
+-        cpu->exception_index = EXCP_INTERRUPT;
+-        cpu_loop_exit(cpu);
+     }
+ #endif
+ }
+@@ -593,7 +592,7 @@ int cpu_exec(CPUState *cpu)
+ {
+     CPUClass *cc = CPU_GET_CLASS(cpu);
+     int ret;
+-    SyncClocks sc;
++    SyncClocks sc = { 0 };
+ 
+     /* replay_interrupt may need current_cpu */
+     current_cpu = cpu;
+@@ -677,7 +674,7 @@ int cpu_exec(CPUState *cpu)
+ 
+         while (!cpu_handle_interrupt(cpu, &last_tb)) {
+             TranslationBlock *tb = tb_find(cpu, last_tb, tb_exit);
+-            cpu_loop_exec_tb(cpu, tb, &last_tb, &tb_exit, &sc);
++            cpu_loop_exec_tb(cpu, tb, &last_tb, &tb_exit);
+             /* Try to align the host and virtual clocks
+                if the guest is in advance */
+             align_clocks(&sc, cpu);
+-- 
+2.9.3
