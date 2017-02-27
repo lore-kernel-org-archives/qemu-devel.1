@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mmarek@suse.cz>) id 1ciIO6-0004SQ-Cj
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:18:42 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ciINs-0004IT-HK
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:18:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mmarek@suse.cz>) id 1ciIO1-0006hJ-9x
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:18:38 -0500
-Received: from mx2.suse.de ([195.135.220.15]:33496)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ciINn-0006O4-Gp
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:18:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55726)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mmarek@suse.cz>) id 1ciIO1-0006f6-0U
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:18:33 -0500
-From: Michal Marek <mmarek@suse.com>
-Date: Mon, 27 Feb 2017 11:18:17 +0100
-Message-Id: <20170227101817.11748-1-mmarek@suse.com>
-In-Reply-To: <41cc9d11-2e28-5b5e-4772-81a118d79111@redhat.com>
-References: <41cc9d11-2e28-5b5e-4772-81a118d79111@redhat.com>
-Subject: [Qemu-devel] [PATCH v4] target-s390x: Implement stfl and stfle
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1ciINn-0006N1-86
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:18:19 -0500
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Mon, 27 Feb 2017 14:18:11 +0400
+Message-Id: <20170227101811.22722-1-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2] vhost-user: delay vhost_user_stop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,184 +25,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Miroslav Benes <mbenes@suse.cz>, Eric Bischoff <ebischoff@suse.com>
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, pbonzini@redhat.com, den@openvz.org, dgilbert@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Indicate the actual features in the STFL implementation and implement
-STFLE.
+Since commit b0a335e351103bf92f3f9d0bd5759311be8156ac, a socket write
+may trigger a disconnect events, calling vhost_user_stop() and clearing
+all the vhost_dev strutures holding data that vhost.c functions expect
+to remain valid. Delay the cleanup to keep the vhost_dev structure
+valid during the vhost.c functions.
 
-Signed-off-by: Michal Marek <mmarek@suse.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
-v4:
- - Remove redundant buffer clearing in do_stfle()
- - Always store whole doublewords in STFLE
- - Use s390_cpu_virt_mem_write() to store the result
- - Raise a specification exception if the STFLE address is not aligned
- - Use the LowCore offset instead of hardcoding the STFL store address
-v3:
- - Initialize the buffer in do_stfle()
-v2:
- - STFLE is not a privileged instruction, go through the MMU to store the
-   result
- - annotate the stfl helper with TCG_CALL_NO_RWG
- - Use a large enough buffer to hold the feature bitmap
- - Fix coding style of the stfle helper
----
- target/s390x/cpu_features.c |  6 ++++--
- target/s390x/cpu_features.h |  2 +-
- target/s390x/helper.h       |  2 ++
- target/s390x/insn-data.def  |  2 ++
- target/s390x/misc_helper.c  | 38 ++++++++++++++++++++++++++++++++++++++
- target/s390x/translate.c    | 18 ++++++++++--------
- 6 files changed, 57 insertions(+), 11 deletions(-)
+ net/vhost-user.c | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++=
+------
+ 1 file changed, 50 insertions(+), 6 deletions(-)
 
-diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-index 42fd9d792bc8..d77c560380c4 100644
---- a/target/s390x/cpu_features.c
-+++ b/target/s390x/cpu_features.c
-@@ -286,11 +286,11 @@ void s390_init_feat_bitmap(const S390FeatInit init, S390FeatBitmap bitmap)
-     }
+diff --git a/net/vhost-user.c b/net/vhost-user.c
+index 77b8110f8c..028bf0cf5d 100644
+--- a/net/vhost-user.c
++++ b/net/vhost-user.c
+@@ -25,6 +25,7 @@ typedef struct VhostUserState {
+     guint watch;
+     uint64_t acked_features;
+     bool started;
++    QEMUBH *chr_closed_bh;
+ } VhostUserState;
+=20
+ VHostNetState *vhost_user_get_vhost_net(NetClientState *nc)
+@@ -190,9 +191,45 @@ static gboolean net_vhost_user_watch(GIOChannel *cha=
+n, GIOCondition cond,
+=20
+     qemu_chr_fe_disconnect(&s->chr);
+=20
++    s->watch =3D 0;
+     return FALSE;
  }
- 
--void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
-+int s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
-                           uint8_t *data)
+=20
++static void net_vhost_user_event(void *opaque, int event);
++
++static void chr_closed_bh(void *opaque)
++{
++    const char *name =3D opaque;
++    NetClientState *ncs[MAX_QUEUE_NUM];
++    VhostUserState *s;
++    Error *err =3D NULL;
++    int queues;
++
++    queues =3D qemu_find_net_clients_except(name, ncs,
++                                          NET_CLIENT_DRIVER_NIC,
++                                          MAX_QUEUE_NUM);
++    assert(queues < MAX_QUEUE_NUM);
++
++    s =3D DO_UPCAST(VhostUserState, nc, ncs[0]);
++
++    qmp_set_link(name, false, &err);
++    vhost_user_stop(queues, ncs);
++    if (s->watch) {
++        g_source_remove(s->watch);
++    }
++    s->watch =3D 0;
++
++    qemu_bh_delete(s->chr_closed_bh);
++    s->chr_closed_bh =3D NULL;
++
++    qemu_chr_fe_set_handlers(&s->chr, NULL, NULL, net_vhost_user_event,
++                             opaque, NULL, true);
++
++    if (err) {
++        error_report_err(err);
++    }
++}
++
+ static void net_vhost_user_event(void *opaque, int event)
  {
-     S390Feat feat;
--    int bit_nr;
-+    int bit_nr, res = 0;
- 
-     if (type == S390_FEAT_TYPE_STFL && test_bit(S390_FEAT_ZARCH, features)) {
-         /* z/Architecture is always active if around */
-@@ -303,9 +303,11 @@ void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
-             bit_nr = s390_features[feat].bit;
-             /* big endian on uint8_t array */
-             data[bit_nr / 8] |= 0x80 >> (bit_nr % 8);
-+            res = MAX(res, bit_nr / 8 + 1);
+     const char *name =3D opaque;
+@@ -212,20 +249,27 @@ static void net_vhost_user_event(void *opaque, int =
+event)
+     trace_vhost_user_event(chr->label, event);
+     switch (event) {
+     case CHR_EVENT_OPENED:
+-        s->watch =3D qemu_chr_fe_add_watch(&s->chr, G_IO_HUP,
+-                                         net_vhost_user_watch, s);
+         if (vhost_user_start(queues, ncs, &s->chr) < 0) {
+             qemu_chr_fe_disconnect(&s->chr);
+             return;
          }
-         feat = find_next_bit(features, S390_FEAT_MAX, feat + 1);
++        s->watch =3D qemu_chr_fe_add_watch(&s->chr, G_IO_HUP,
++                                         net_vhost_user_watch, s);
+         qmp_set_link(name, true, &err);
++        s->chr_closed_bh =3D qemu_bh_new(chr_closed_bh, opaque);
+         s->started =3D true;
+         break;
+     case CHR_EVENT_CLOSED:
+-        qmp_set_link(name, false, &err);
+-        vhost_user_stop(queues, ncs);
+-        g_source_remove(s->watch);
+-        s->watch =3D 0;
++        /* a close event may happen during a read/write, but vhost
++         * code assumes the vhost_dev remains setup, so delay the
++         * stop & clear to idle.
++         * FIXME: better handle failure in vhost code, remove bh
++         */
++        if (s->chr_closed_bh) {
++            qemu_chr_fe_set_handlers(&s->chr, NULL, NULL, NULL,
++                                     NULL, NULL, false);
++            qemu_bh_schedule(s->chr_closed_bh);
++        }
+         break;
      }
-+    return res;
- }
- 
- void s390_add_from_feat_block(S390FeatBitmap features, S390FeatType type,
-diff --git a/target/s390x/cpu_features.h b/target/s390x/cpu_features.h
-index d66912178680..e3c41be08060 100644
---- a/target/s390x/cpu_features.h
-+++ b/target/s390x/cpu_features.h
-@@ -56,7 +56,7 @@ typedef uint64_t S390FeatInit[S390_FEAT_MAX / 64 + 1];
- const S390FeatDef *s390_feat_def(S390Feat feat);
- S390Feat s390_feat_by_type_and_bit(S390FeatType type, int bit);
- void s390_init_feat_bitmap(const S390FeatInit init, S390FeatBitmap bitmap);
--void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
-+int s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
-                           uint8_t *data);
- void s390_add_from_feat_block(S390FeatBitmap features, S390FeatType type,
-                           uint8_t *data);
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 9102071d0aa4..f24b50ea48ab 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -95,6 +95,8 @@ DEF_HELPER_FLAGS_1(stckc, TCG_CALL_NO_RWG, i64, env)
- DEF_HELPER_FLAGS_2(spt, TCG_CALL_NO_RWG, void, env, i64)
- DEF_HELPER_FLAGS_1(stpt, TCG_CALL_NO_RWG, i64, env)
- DEF_HELPER_4(stsi, i32, env, i64, i64, i64)
-+DEF_HELPER_FLAGS_1(stfl, TCG_CALL_NO_RWG, void, env)
-+DEF_HELPER_4(stfle, i64, env, i64, i32, i64)
- DEF_HELPER_FLAGS_4(lctl, TCG_CALL_NO_WG, void, env, i32, i64, i32)
- DEF_HELPER_FLAGS_4(lctlg, TCG_CALL_NO_WG, void, env, i32, i64, i32)
- DEF_HELPER_FLAGS_4(stctl, TCG_CALL_NO_WG, void, env, i32, i64, i32)
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 075ff597c3de..be830a42ed8d 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -899,6 +899,8 @@
-     C(0xb202, STIDP,   S,     Z,   la2, 0, new, m1_64, stidp, 0)
- /* STORE CPU TIMER */
-     C(0xb209, STPT,    S,     Z,   la2, 0, new, m1_64, stpt, 0)
-+/* STORE FACILITY LIST EXTENDED */
-+    C(0xb2b0, STFLE,   S,  SFLE,   0, a2, 0, 0, stfle, 0)
- /* STORE FACILITY LIST */
-     C(0xb2b1, STFL,    S,     Z,   0, 0, 0, 0, stfl, 0)
- /* STORE PREFIX */
-diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-index c9604ea9c728..2645ff8b1840 100644
---- a/target/s390x/misc_helper.c
-+++ b/target/s390x/misc_helper.c
-@@ -500,6 +500,44 @@ uint32_t HELPER(stsi)(CPUS390XState *env, uint64_t a0,
-     return cc;
- }
- 
-+static int do_stfle(CPUS390XState *env, uint64_t addr, uint32_t ar, int len)
-+{
-+    S390CPU *cpu = s390_env_get_cpu(env);
-+    /* 256 doublewords as per STFLE documentation */
-+    uint8_t data[256 * 8] = { 0 };
-+    int res;
-+
-+    res = s390_fill_feat_block(cpu->model->features, S390_FEAT_TYPE_STFL, data);
-+    res = ROUND_UP(res, 8);
-+    s390_cpu_virt_mem_write(cpu, addr, ar, data, MIN(res, len));
-+
-+    return res;
-+}
-+
-+uint64_t HELPER(stfle)(CPUS390XState *env, uint64_t addr, uint32_t ar,
-+                       uint64_t r0)
-+{
-+    int need, len = r0 & 0xff;
-+
-+    if (addr % 8) {
-+        program_interrupt(env, PGM_SPECIFICATION, 4);
-+        return r0;
-+    }
-+    need = do_stfle(env, addr, ar, len * 8) / 8;
-+    if (need <= len) {
-+        env->cc_op = 0;
-+    } else {
-+        env->cc_op = 3;
-+    }
-+
-+    return (r0 & ~0xffLL) | (need - 1);
-+}
-+
-+void HELPER(stfl)(CPUS390XState *env)
-+{
-+    do_stfle(env, offsetof(LowCore, stfl_fac_list), 0, 4);
-+}
-+
- uint32_t HELPER(sigp)(CPUS390XState *env, uint64_t order_code, uint32_t r1,
-                       uint64_t cpu_addr)
- {
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 01c62176bf70..d18a2ffb447c 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -3628,15 +3628,17 @@ static ExitStatus op_spt(DisasContext *s, DisasOps *o)
- 
- static ExitStatus op_stfl(DisasContext *s, DisasOps *o)
- {
--    TCGv_i64 f, a;
--    /* We really ought to have more complete indication of facilities
--       that we implement.  Address this when STFLE is implemented.  */
-     check_privileged(s);
--    f = tcg_const_i64(0xc0000000);
--    a = tcg_const_i64(200);
--    tcg_gen_qemu_st32(f, a, get_mem_index(s));
--    tcg_temp_free_i64(f);
--    tcg_temp_free_i64(a);
-+    gen_helper_stfl(cpu_env);
-+    return NO_EXIT;
-+}
-+
-+static ExitStatus op_stfle(DisasContext *s, DisasOps *o)
-+{
-+    TCGv_i32 b2 = tcg_const_i32(get_field(s->fields, b2));
-+    potential_page_fault(s);
-+    gen_helper_stfle(regs[0], cpu_env, o->in2, b2, regs[0]);
-+    set_cc_static(s);
-     return NO_EXIT;
- }
- 
--- 
-2.10.2
+=20
+--=20
+2.12.0.rc2.3.gc93709801
