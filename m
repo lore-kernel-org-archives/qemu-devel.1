@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44943)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ciOCR-0004lL-DC
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:31:00 -0500
+	(envelope-from <bounces@canonical.com>) id 1ciOCp-00054s-IZ
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:31:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ciOCQ-0007Un-G6
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:30:59 -0500
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:35756)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ciOCQ-0007UX-9q
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:30:58 -0500
-Received: by mail-wm0-x22d.google.com with SMTP id v186so65544134wmd.0
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 08:30:58 -0800 (PST)
+	(envelope-from <bounces@canonical.com>) id 1ciOCk-0007aq-Gu
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:31:23 -0500
+Received: from indium.canonical.com ([91.189.90.7]:34165)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ciOCk-0007aS-BM
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:31:18 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1ciOCj-0005kx-29
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 16:31:17 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C475B2E80CE
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 16:31:16 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170227133927.759-1-berrange@redhat.com>
-References: <20170227133927.759-1-berrange@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 27 Feb 2017 16:30:36 +0000
-Message-ID: <CAFEAcA_L6O7K3w5FZMYoP19vxpmSRvY=_L1dsiP0inCUV2t28Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL v1 0/2] Merge qcrypto 2017/02/27
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 27 Feb 2017 16:21:36 -0000
+From: Daniel Berrange <1668273@bugs.launchpad.net>
+Reply-To: Bug 1668273 <1668273@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170227140328.20639.14786.malonedeb@soybean.canonical.com>
+Message-Id: <20170227162136.21253.41417.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1668273] Re: DoS possible on - a QEMU process
+ using userspace SLIRP?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +37,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 27 February 2017 at 13:39, Daniel P. Berrange <berrange@redhat.com> wrote:
-> The following changes since commit d992f2f1368ceb92e6bfd8efece174110f4236ff:
->
->   Merge remote-tracking branch 'remotes/artyom/tags/pull-sun4v-20170226' into staging (2017-02-26 22:40:23 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/berrange/qemu tags/pull-qcrypto-2017-02-27-1
->
-> for you to fetch changes up to 32c813e6c2a857b93b897901b7e20281397528a3:
->
->   crypto: assert cipher algorithm is always valid (2017-02-27 13:37:14 +0000)
->
-> ----------------------------------------------------------------
-> Merge qcrypto 2017/02/27 v1
->
+IIUC, a socket staying around in FIN_WAIT2 state means that a socket has
+been closed in one direction, but not the other direction. Assuming
+SLIRP is just mirroring what the guest OS has done with the socket
+shutdown process, this would be expected.
 
-Applied, thanks.
+-- =
 
--- PMM
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1668273
+
+Title:
+  DoS possible on - a QEMU process using userspace SLIRP?
+
+Status in QEMU:
+  New
+
+Bug description:
+  Steps to reproduce:
+
+  - Launch a VM using QEMU (2.8.0):
+
+  $ qemu-system-x86_64 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-machine accel=3Dkvm \
+  =C2=A0=C2=A0=C2=A0=C2=A0-hda Fedora-Cloud-Base-25-1.3.x86_64.qcow2 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-m 2G \
+  =C2=A0=C2=A0=C2=A0=C2=A0-smp 2 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-vnc :8 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-boot dc \
+  =C2=A0=C2=A0=C2=A0=C2=A0-vga std \
+  =C2=A0=C2=A0=C2=A0=C2=A0-cpu host \
+  =C2=A0=C2=A0=C2=A0=C2=A0-net nic,vlan=3D0 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-net user,vlan=3D0,hostfwd=3Dtcp::10024-:22,hostf=
+wd=3Dtcp::8082-:80
+
+  - SSH into the VM, install httpd, start httpd
+
+  $ ssh -p 10024 root@localhost 'dnf install -y httpd && systemctl start
+  httpd'
+
+  - Compile and run the following Java program (on the host):
+
+  $ cat <<EOF > URLConnectionReader.java
+  import java.net.*;
+  import java.io.*;
+
+  public class URLConnectionReader {
+  =C2=A0=C2=A0=C2=A0=C2=A0public static void main(String[] args) throws Exc=
+eption {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int i =3D 0;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0while (i < 1024) {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0U=
+RL this_is_404 =3D new URL("http://localhost:8082/blah");
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0U=
+RLConnection yc =3D this_is_404.openConnection();
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0t=
+ry {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0BufferedReader in =3D new BufferedReader(new InputS=
+treamReader(
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0yc.getInputStream()));
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0String inputLine;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0while ((inputLine =3D in.readLine()) !=3D null)
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0System.out.println(inputLin=
+e);
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0in.close();
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}=
+ catch (Exception e) {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0//HttpURLConnection urlConnection =3D (HttpURLConne=
+ction) yc;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0//urlConnection.disconnect();
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0i=
+++;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Thread.sleep(1000000000);
+  =C2=A0=C2=A0=C2=A0=C2=A0}
+  }
+
+  $ javac URLConnectionReader.java
+
+  $ java URLConnectionReader &
+
+  The java program tries to open a lot of HTTP connections, but never
+  calls disconnect() on any.
+
+  - Take a look at the list of open FDs of the qemu process:
+
+  $ ls -tl /proc/${qemu-pid}/fd
+
+  $ lsof -p ${qemu-pid}
+  All of the TCP connections will be stuck at FIN_WAIT2
+
+  The VM becomes unresponsive. Neither SSH or VNC works after this; even
+  after tcp_fin_timeout expires.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1668273/+subscriptions
