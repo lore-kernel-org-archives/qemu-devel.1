@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57586)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ciRdh-0000Tb-Fx
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:11:24 -0500
+	(envelope-from <berrange@redhat.com>) id 1ciRdm-0000YJ-Cb
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:11:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ciRdg-0003iA-Hg
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:11:21 -0500
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 27 Feb 2017 21:09:33 +0100
-Message-Id: <1488226184-9044-33-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1488226184-9044-1-git-send-email-kwolf@redhat.com>
-References: <1488226184-9044-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 32/43] stream: Use real permissions in
- streaming block job
+	(envelope-from <berrange@redhat.com>) id 1ciRdl-0003jj-4v
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:11:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45922)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ciRdk-0003jZ-VK
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:11:25 -0500
+Date: Mon, 27 Feb 2017 20:11:19 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170227201119.GA25346@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1485782396-22341-1-git-send-email-den@openvz.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1485782396-22341-1-git-send-email-den@openvz.org>
+Subject: Re: [Qemu-devel] [PATCH 1/1] io: ignore case in WebSocket HTTP
+ header #PSBM-57554
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,83 +28,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+To: "Denis V. Lunev" <den@openvz.org>
+Cc: qemu-devel@nongnu.org, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-The correct permissions are relatively obvious here (and explained in
-code comments). For intermediate streaming, we need to reopen the top
-node read-write before creating the job now because the permissions
-system catches attempts to get the BLK_PERM_WRITE_UNCHANGED permission
-on a read-only node.
+On Mon, Jan 30, 2017 at 04:19:56PM +0300, Denis V. Lunev wrote:
+> From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> 
+> According to RFC7230 Section 3.2, header field name is case-insensitive.
+> 
+> The haystack string length is limited by 4096 bytes by
+> qio_channel_websock_handshake_read().
+> 
+> Further, handshake_process() dups and NULL-terminates the string
+> so it is safe to call non length-limited functions like strcasestr().
+> 
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> Signed-off-by: Denis V. Lunev <den@openvz.org>
+> CC: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  io/channel-websock.c | 25 ++++++++++++++-----------
+>  1 file changed, 14 insertions(+), 11 deletions(-)
+> 
+> diff --git a/io/channel-websock.c b/io/channel-websock.c
+> index d5a4ed3..991925a 100644
+> --- a/io/channel-websock.c
+> +++ b/io/channel-websock.c
+> @@ -108,18 +108,16 @@ enum {
+>  };
+>  
+>  static char *qio_channel_websock_handshake_entry(const char *handshake,
+> -                                                 size_t handshake_len,
+>                                                   const char *name)
+>  {
+>      char *begin, *end, *ret = NULL;
+>      char *line = g_strdup_printf("%s%s: ",
+>                                   QIO_CHANNEL_WEBSOCK_HANDSHAKE_DELIM,
+>                                   name);
+> -    begin = g_strstr_len(handshake, handshake_len, line);
+> +    begin = strcasestr(handshake, line);
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- block/stream.c | 37 +++++++++++++++++++++++++------------
- 1 file changed, 25 insertions(+), 12 deletions(-)
+So this turns out to break Windows builds since there's no strcasestr
+on Mingw. There's no alternative that I know of in glib and I don't
+fancy implementing a custom strcasestr() function. So I'm going to
+drop this patch entirely, and copy you on an alternative fix that
+simply converts the input data to lowercase before comparison. Would
+appreciate if you can test my alternate patch with whatever client
+you had problems with.
 
-diff --git a/block/stream.c b/block/stream.c
-index ba8650f..0c30d41 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -229,28 +229,35 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-     BlockDriverState *iter;
-     int orig_bs_flags;
- 
--    /* FIXME Use real permissions */
--    s = block_job_create(job_id, &stream_job_driver, bs, 0, BLK_PERM_ALL,
--                         speed, BLOCK_JOB_DEFAULT, NULL, NULL, errp);
--    if (!s) {
--        return;
--    }
--
-     /* Make sure that the image is opened in read-write mode */
-     orig_bs_flags = bdrv_get_flags(bs);
-     if (!(orig_bs_flags & BDRV_O_RDWR)) {
-         if (bdrv_reopen(bs, orig_bs_flags | BDRV_O_RDWR, errp) != 0) {
--            block_job_unref(&s->common);
-             return;
-         }
-     }
- 
--    /* Block all intermediate nodes between bs and base, because they
--     * will disappear from the chain after this operation */
-+    /* Prevent concurrent jobs trying to modify the graph structure here, we
-+     * already have our own plans. Also don't allow resize as the image size is
-+     * queried only at the job start and then cached. */
-+    s = block_job_create(job_id, &stream_job_driver, bs,
-+                         BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
-+                         BLK_PERM_GRAPH_MOD,
-+                         BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
-+                         BLK_PERM_WRITE,
-+                         speed, BLOCK_JOB_DEFAULT, NULL, NULL, errp);
-+    if (!s) {
-+        goto fail;
-+    }
-+
-+    /* Block all intermediate nodes between bs and base, because they will
-+     * disappear from the chain after this operation. The streaming job reads
-+     * every block only once, assuming that it doesn't change, so block writes
-+     * and resizes. */
-     for (iter = backing_bs(bs); iter && iter != base; iter = backing_bs(iter)) {
--        /* FIXME Use real permissions */
-         block_job_add_bdrv(&s->common, "intermediate node", iter, 0,
--                           BLK_PERM_ALL, &error_abort);
-+                           BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED,
-+                           &error_abort);
-     }
- 
-     s->base = base;
-@@ -260,4 +267,10 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-     s->on_error = on_error;
-     trace_stream_start(bs, base, s);
-     block_job_start(&s->common);
-+    return;
-+
-+fail:
-+    if (orig_bs_flags != bdrv_get_flags(bs)) {
-+        bdrv_reopen(bs, s->bs_flags, NULL);
-+    }
- }
+Regards,
+Daniel
 -- 
-1.8.3.1
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
