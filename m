@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49369)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ciPXn-00055D-Hd
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:57:08 -0500
+	(envelope-from <armbru@redhat.com>) id 1ciPaY-000781-17
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:59:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ciPXk-0007qr-EJ
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:57:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44516)
+	(envelope-from <armbru@redhat.com>) id 1ciPaU-0000Is-WD
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:59:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56780)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ciPXk-0007qN-6J
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:57:04 -0500
-References: <1485333658-23035-1-git-send-email-thuth@redhat.com>
-	<0eca8185-8e94-46f8-6b7a-36c4a21bc28d@redhat.com>
-	<20170227140001.GV2778@thinpad.lan.raisama.net>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <6e297b78-dab8-93c5-2a86-1ec267d65eb3@redhat.com>
-Date: Mon, 27 Feb 2017 18:57:00 +0100
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ciPaU-0000IZ-NV
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:59:54 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C85B14E4D6
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 17:59:54 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170118135624.17368-1-ehabkost@redhat.com>
+	<20170118135624.17368-2-ehabkost@redhat.com>
+Date: Mon, 27 Feb 2017 18:59:51 +0100
+In-Reply-To: <20170118135624.17368-2-ehabkost@redhat.com> (Eduardo Habkost's
+	message of "Wed, 18 Jan 2017 11:56:23 -0200")
+Message-ID: <87bmtna50o.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170227140001.GV2778@thinpad.lan.raisama.net>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] null-machine: Add support for the
- "-kernel" parameter
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/2] config: qemu_config_parse() return
+ number of config groups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,107 +35,126 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, Laurent Vivier <laurent@vivier.eu>, Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-On 27.02.2017 15:00, Eduardo Habkost wrote:
-> On Mon, Feb 27, 2017 at 12:43:23PM +0100, Thomas Huth wrote:
->> On 25.01.2017 09:40, Thomas Huth wrote:
->>> We can have basic support for the "-kernel" parameter quite easily
->>> by using the generic loader device. This should be enough for most
->>> boards which do not need special machine-specific magic for loading
->>> a kernel (and for those that need special magic, the generic "none"
->>> machine is likely not suitable for using it as an instruction set
->>> simulator board anyway).
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  PS: If we can't agree on using the generic loader here, I can also
->>>      prepare a patch instead that simply prints out an error message
->>>      if the user tried to use the "-kernel" parameter.
->>>
->>>  hw/core/null-machine.c | 14 ++++++++++++++
->>>  1 file changed, 14 insertions(+)
->>>
->>> diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
->>> index 27c8369..866e699 100644
->>> --- a/hw/core/null-machine.c
->>> +++ b/hw/core/null-machine.c
->>> @@ -5,6 +5,7 @@
->>>   *
->>>   * Authors:
->>>   *  Anthony Liguori   <aliguori@us.ibm.com>
->>> + *  Thomas Huth       <thuth@redhat.com>
->>>   *
->>>   * This work is licensed under the terms of the GNU GPL, version 2 o=
-r later.
->>>   * See the COPYING file in the top-level directory.
->>> @@ -16,6 +17,7 @@
->>>  #include "qemu/error-report.h"
->>>  #include "hw/hw.h"
->>>  #include "hw/boards.h"
->>> +#include "hw/core/generic-loader.h"
->>>  #include "sysemu/sysemu.h"
->>>  #include "exec/address-spaces.h"
->>>  #include "cpu.h"
->>> @@ -40,6 +42,18 @@ static void machine_none_init(MachineState *mch)
->>>          memory_region_allocate_system_memory(ram, NULL, "ram", mch->=
-ram_size);
->>>          memory_region_add_subregion(get_system_memory(), 0, ram);
->>>      }
->>> +
->>> +    /* Load kernel */
->>> +    if (mch->kernel_filename) {
->>> +        DeviceState *loader;
->>> +
->>> +        loader =3D qdev_create(sysbus_get_default(), TYPE_GENERIC_LO=
-ADER);
->>> +        qdev_prop_set_string(loader, "file", mch->kernel_filename);
->>> +        if (cpu) {
->>> +            qdev_prop_set_uint32(loader, "cpu-num", cpu->cpu_index);
->>> +        }
->>> +        qdev_init_nofail(loader);
->>> +    }
->>>  }
->>> =20
->>>  static void machine_none_machine_init(MachineClass *mc)
->>
->> *ping*
->>
->> Apparently the discussion has ceased ... can we get a consensus whethe=
-r
->> we want to support the "-kernel" parameter for the "none" machine or n=
-ot?
->=20
-> I think Peter's point is still valid:
->=20
-> ] If you just want "load a blob and start it" then we already
-> ] have -device loader. Making -kernel have yet another set of
-> ] semantics that this time depends on the machine being selected
-> ] seems like a bad idea. If -kernel doesn't do what it does
-> ] for the other machines of the same architecture then we should
-> ] just not accept it.
->=20
-> If you add a mechanism to ensure "-machine none -kernel" has the
-> same behavior as the other machines in the same QEMU binary, then
-> I believe it will be OK.
->=20
-> I believe we don't need to make this work on all architectures at
-> the same time, though. We can do this using an optional
-> per-architecture kernel-loading hook.
+Uh, I totally forgot about this series.  My apologies...
 
-And I still think it does not really make sense to introduce a
-per-architecture hook here - let me cite my reply to Peter's mail a
-couple of mails later in that e-mail thread:
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-'The -kernel parameter is not just only dependent on the target
-architecture, it is even dependent on the machine type, e.g. on ppc it
-is quite different between embedded (e500.c) and server (spapr.c)
-variants. So an arch-specific hook might not make too much sense and
-using the generic loader is likely the best we can do - if that does not
-work, you likely can't use the "none" machine anyway.'
+> Change qemu_config_parse() to return the number of config groups
+> in success and -EINVAL on error. This will allow callers of
+> qemu_config_parse() to check if something was really loaded from
+> the config file.
+>
+> All existing callers of qemu_config_parse() and
+> qemu_read_config_file() only check if the return value was
+> negative, so the change shouldn't affect them.
 
-So as far as I can see, we should either go with the generic loader
-here, or print out an error message if the user tries to run QEMU with
-the "-kernel" parameter.
+Two of them:
 
- Thomas
+* read_config() maps negative value to -EINVAL.  Callers:
+
+  - blkdebug_open() passes it on.  As a .bdrv_file_open() method, it's
+    supposed to return -errno on failure.  Good.
+
+* qemu_read_config_file() maps non-zero value to -EINVAL.  Callers:
+
+  - qemu_read_default_config_file() maps -EINVAL to zero.  WTF?
+
+  - main() passes sterror(EINVAL) to error_report().  Good.
+
+Also: qemu_config_parse() reports errors with error_report().  Let's
+have another look at its callers:
+
+* read_config() has an Error ** parameter.  Bad.  Care to convert the
+  sucker to Error?
+
+* qemu_read_config_file() doesn't report errors.  Callers:
+
+  - qemu_read_default_config_file() doesn't report errors.  Its called
+    by main(), and ...
+
+  - main() reports with error_report().  Good.
+
+>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  util/qemu-config.c | 15 +++++++--------
+>  1 file changed, 7 insertions(+), 8 deletions(-)
+>
+> diff --git a/util/qemu-config.c b/util/qemu-config.c
+> index 5527100a01..560c201bd3 100644
+> --- a/util/qemu-config.c
+> +++ b/util/qemu-config.c
+> @@ -379,6 +379,7 @@ void qemu_config_write(FILE *fp)
+>      }
+>  }
+>  
+> +/* Returns number of config groups on success, -errno on error */
+>  int qemu_config_parse(FILE *fp, QemuOptsList **lists, const char *fname)
+>  {
+>      char line[1024], group[64], id[64], arg[64], value[1024];
+> @@ -386,7 +387,8 @@ int qemu_config_parse(FILE *fp, QemuOptsList **lists, const char *fname)
+>      QemuOptsList *list = NULL;
+>      Error *local_err = NULL;
+>      QemuOpts *opts = NULL;
+> -    int res = -1, lno = 0;
+> +    int res = -EINVAL, lno = 0;
+> +    int count = 0;
+>  
+>      loc_push_none(&loc);
+>      while (fgets(line, sizeof(line), fp) != NULL) {
+> @@ -407,6 +409,7 @@ int qemu_config_parse(FILE *fp, QemuOptsList **lists, const char *fname)
+>                  goto out;
+>              }
+>              opts = qemu_opts_create(list, id, 1, NULL);
+> +            count++;
+>              continue;
+>          }
+>          if (sscanf(line, "[%63[^]]]", group) == 1) {
+> @@ -417,6 +420,7 @@ int qemu_config_parse(FILE *fp, QemuOptsList **lists, const char *fname)
+>                  goto out;
+>              }
+>              opts = qemu_opts_create(list, NULL, 0, &error_abort);
+> +            count++;
+>              continue;
+>          }
+>          value[0] = '\0';
+> @@ -441,7 +445,7 @@ int qemu_config_parse(FILE *fp, QemuOptsList **lists, const char *fname)
+>          error_report("error reading file");
+>          goto out;
+>      }
+> -    res = 0;
+> +    res = count;
+>  out:
+>      loc_pop(&loc);
+>      return res;
+> @@ -458,12 +462,7 @@ int qemu_read_config_file(const char *filename)
+>  
+>      ret = qemu_config_parse(f, vm_config_groups, filename);
+>      fclose(f);
+> -
+> -    if (ret == 0) {
+> -        return 0;
+> -    } else {
+> -        return -EINVAL;
+> -    }
+> +    return ret;
+>  }
+>  
+>  static void config_parse_qdict_section(QDict *options, QemuOptsList *opts,
+
+I think this mapping to -EINVAL is also superfluous now:
+
+diff --git a/block/blkdebug.c b/block/blkdebug.c
+index 6117ce5..fbefa9e 100644
+--- a/block/blkdebug.c
++++ b/block/blkdebug.c
+@@ -252,7 +252,6 @@ static int read_config(BDRVBlkdebugState *s, const char *filename,
+         ret = qemu_config_parse(f, config_groups, filename);
+         if (ret < 0) {
+             error_setg(errp, "Could not parse blkdebug config file");
+-            ret = -EINVAL;
+             goto fail;
+         }
+     }
