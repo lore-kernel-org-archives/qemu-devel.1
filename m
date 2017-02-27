@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ciOUl-0004Cr-AD
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:49:56 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ciOUl-0004DC-J0
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:49:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ciOUj-0006Wi-9r
+	(envelope-from <pbonzini@redhat.com>) id 1ciOUk-0006Wu-6d
 	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:49:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58238)
+Received: from mx1.redhat.com ([209.132.183.28]:48020)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ciOUj-0006WH-0p
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:49:53 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ciOUj-0006Wm-Tr
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:49:54 -0500
 Received: from int-mx11.intmail.prod.int.phx2.redhat.com
 	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0B91B624B0
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 16:49:53 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 09B0D4E4D2
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 16:49:54 +0000 (UTC)
 Received: from donizetti.redhat.com (ovpn-117-118.ams2.redhat.com
 	[10.36.117.118])
 	by int-mx11.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v1RGno4T030602
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 11:49:52 -0500
+	id v1RGno4U030602
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 11:49:53 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 27 Feb 2017 17:49:49 +0100
-Message-Id: <20170227164950.15062-2-pbonzini@redhat.com>
+Date: Mon, 27 Feb 2017 17:49:50 +0100
+Message-Id: <20170227164950.15062-3-pbonzini@redhat.com>
 In-Reply-To: <20170227164950.15062-1-pbonzini@redhat.com>
 References: <20170227164950.15062-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 06/17] cpus: remove ugly cast on sigbus_handler
+Subject: [Qemu-devel] [PULL 10/17] KVM: do not use sigtimedwait to catch
+ SIGBUS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,224 +37,276 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The cast is there because sigbus_handler is invoked via sigfd_handler.
-But it feels just wrong to use struct qemu_signalfd_siginfo in the
-prototype of a function that is passed to sigaction.
-
-Instead, do a simple-minded conversion of qemu_signalfd_siginfo to
-siginfo_t.
+Call kvm_on_sigbus_vcpu asynchronously from the VCPU thread.
+Information for the SIGBUS can be stored in thread-local variables
+and processed later in kvm_cpu_exec.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- cpus.c                  | 12 +++---------
- include/qemu/compatfd.h | 42 ------------------------------------------
- include/qemu/osdep.h    | 28 ++++++++++++++++++++++++++++
- util/compatfd.c         |  1 -
- util/main-loop.c        |  5 +----
- util/oslib-posix.c      | 33 +++++++++++++++++++++++++++++++++
- 6 files changed, 65 insertions(+), 56 deletions(-)
- delete mode 100644 include/qemu/compatfd.h
+ cpus.c               | 31 +++++++++++++------------------
+ include/sysemu/kvm.h |  5 ++++-
+ kvm-all.c            | 37 ++++++++++++++++++++++++++++++++++++-
+ target/arm/kvm.c     |  5 -----
+ target/i386/kvm.c    |  5 ++---
+ target/mips/kvm.c    |  6 ------
+ target/ppc/kvm.c     |  5 -----
+ target/s390x/kvm.c   |  5 -----
+ 8 files changed, 55 insertions(+), 44 deletions(-)
 
 diff --git a/cpus.c b/cpus.c
-index 8200ac6..a628cde 100644
+index 399e271..56b1338 100644
 --- a/cpus.c
 +++ b/cpus.c
-@@ -51,10 +51,6 @@
- #include "hw/nmi.h"
- #include "sysemu/replay.h"
- 
--#ifndef _WIN32
--#include "qemu/compatfd.h"
--#endif
--
- #ifdef CONFIG_LINUX
- 
- #include <sys/prctl.h>
-@@ -924,11 +920,9 @@ static void sigbus_reraise(void)
-     abort();
- }
- 
--static void sigbus_handler(int n, struct qemu_signalfd_siginfo *siginfo,
--                           void *ctx)
-+static void sigbus_handler(int n, siginfo_t *siginfo, void *ctx)
- {
--    if (kvm_on_sigbus(siginfo->ssi_code,
--                      (void *)(intptr_t)siginfo->ssi_addr)) {
-+    if (kvm_on_sigbus(siginfo->si_code, siginfo->si_addr)) {
+@@ -926,8 +926,16 @@ static void sigbus_handler(int n, siginfo_t *siginfo, void *ctx)
          sigbus_reraise();
      }
+ 
+-    if (kvm_on_sigbus(siginfo->si_code, siginfo->si_addr)) {
+-        sigbus_reraise();
++    if (current_cpu) {
++        /* Called asynchronously in VCPU thread.  */
++        if (kvm_on_sigbus_vcpu(current_cpu, siginfo->si_code, siginfo->si_addr)) {
++            sigbus_reraise();
++        }
++    } else {
++        /* Called synchronously (via signalfd) in main thread.  */
++        if (kvm_on_sigbus(siginfo->si_code, siginfo->si_addr)) {
++            sigbus_reraise();
++        }
+     }
  }
-@@ -939,7 +933,7 @@ static void qemu_init_sigbus(void)
  
-     memset(&action, 0, sizeof(action));
-     action.sa_flags = SA_SIGINFO;
--    action.sa_sigaction = (void (*)(int, siginfo_t*, void*))sigbus_handler;
-+    action.sa_sigaction = sigbus_handler;
-     sigaction(SIGBUS, &action, NULL);
+@@ -958,8 +966,9 @@ static void qemu_kvm_init_cpu_signals(CPUState *cpu)
+     sigaction(SIG_IPI, &sigact, NULL);
  
-     prctl(PR_MCE_KILL, PR_MCE_KILL_SET, PR_MCE_KILL_EARLY, 0, 0);
-diff --git a/include/qemu/compatfd.h b/include/qemu/compatfd.h
-deleted file mode 100644
-index aa12ee9..0000000
---- a/include/qemu/compatfd.h
-+++ /dev/null
-@@ -1,42 +0,0 @@
--/*
-- * signalfd/eventfd compatibility
-- *
-- * Copyright IBM, Corp. 2008
-- *
-- * Authors:
-- *  Anthony Liguori   <aliguori@us.ibm.com>
-- *
-- * This work is licensed under the terms of the GNU GPL, version 2.  See
-- * the COPYING file in the top-level directory.
-- *
-- */
--
--#ifndef QEMU_COMPATFD_H
--#define QEMU_COMPATFD_H
--
--
--struct qemu_signalfd_siginfo {
--    uint32_t ssi_signo;   /* Signal number */
--    int32_t  ssi_errno;   /* Error number (unused) */
--    int32_t  ssi_code;    /* Signal code */
--    uint32_t ssi_pid;     /* PID of sender */
--    uint32_t ssi_uid;     /* Real UID of sender */
--    int32_t  ssi_fd;      /* File descriptor (SIGIO) */
--    uint32_t ssi_tid;     /* Kernel timer ID (POSIX timers) */
--    uint32_t ssi_band;    /* Band event (SIGIO) */
--    uint32_t ssi_overrun; /* POSIX timer overrun count */
--    uint32_t ssi_trapno;  /* Trap number that caused signal */
--    int32_t  ssi_status;  /* Exit status or signal (SIGCHLD) */
--    int32_t  ssi_int;     /* Integer sent by sigqueue(2) */
--    uint64_t ssi_ptr;     /* Pointer sent by sigqueue(2) */
--    uint64_t ssi_utime;   /* User CPU time consumed (SIGCHLD) */
--    uint64_t ssi_stime;   /* System CPU time consumed (SIGCHLD) */
--    uint64_t ssi_addr;    /* Address that generated signal
--                             (for hardware-generated signals) */
--    uint8_t  pad[48];     /* Pad size to 128 bytes (allow for
--                             additional fields in the future) */
--};
--
--int qemu_signalfd(const sigset_t *mask);
--
--#endif
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index 56c9e22..6932709 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -297,6 +297,34 @@ void qemu_anon_ram_free(void *ptr, size_t size);
- #  define QEMU_VMALLOC_ALIGN getpagesize()
- #endif
+     pthread_sigmask(SIG_BLOCK, NULL, &set);
+-    sigdelset(&set, SIG_IPI);
+     sigdelset(&set, SIGBUS);
++    pthread_sigmask(SIG_SETMASK, &set, NULL);
++    sigdelset(&set, SIG_IPI);
+     r = kvm_set_signal_mask(cpu, &set);
+     if (r) {
+         fprintf(stderr, "kvm_set_signal_mask: %s\n", strerror(-r));
+@@ -977,7 +986,6 @@ static void qemu_kvm_eat_signals(CPUState *cpu)
  
-+#ifdef CONFIG_POSIX
-+struct qemu_signalfd_siginfo {
-+    uint32_t ssi_signo;   /* Signal number */
-+    int32_t  ssi_errno;   /* Error number (unused) */
-+    int32_t  ssi_code;    /* Signal code */
-+    uint32_t ssi_pid;     /* PID of sender */
-+    uint32_t ssi_uid;     /* Real UID of sender */
-+    int32_t  ssi_fd;      /* File descriptor (SIGIO) */
-+    uint32_t ssi_tid;     /* Kernel timer ID (POSIX timers) */
-+    uint32_t ssi_band;    /* Band event (SIGIO) */
-+    uint32_t ssi_overrun; /* POSIX timer overrun count */
-+    uint32_t ssi_trapno;  /* Trap number that caused signal */
-+    int32_t  ssi_status;  /* Exit status or signal (SIGCHLD) */
-+    int32_t  ssi_int;     /* Integer sent by sigqueue(2) */
-+    uint64_t ssi_ptr;     /* Pointer sent by sigqueue(2) */
-+    uint64_t ssi_utime;   /* User CPU time consumed (SIGCHLD) */
-+    uint64_t ssi_stime;   /* System CPU time consumed (SIGCHLD) */
-+    uint64_t ssi_addr;    /* Address that generated signal
-+                             (for hardware-generated signals) */
-+    uint8_t  pad[48];     /* Pad size to 128 bytes (allow for
-+                             additional fields in the future) */
-+};
-+
-+int qemu_signalfd(const sigset_t *mask);
-+void sigaction_invoke(struct sigaction *action,
-+                      struct qemu_signalfd_siginfo *info);
+     sigemptyset(&waitset);
+     sigaddset(&waitset, SIG_IPI);
+-    sigaddset(&waitset, SIGBUS);
+ 
+     do {
+         r = sigtimedwait(&waitset, &siginfo, &ts);
+@@ -986,25 +994,12 @@ static void qemu_kvm_eat_signals(CPUState *cpu)
+             exit(1);
+         }
+ 
+-        switch (r) {
+-        case SIGBUS:
+-            if (siginfo.si_code != BUS_MCEERR_AO && siginfo.si_code != BUS_MCEERR_AR) {
+-                sigbus_reraise();
+-            }
+-            if (kvm_on_sigbus_vcpu(cpu, siginfo.si_code, siginfo.si_addr)) {
+-                sigbus_reraise();
+-            }
+-            break;
+-        default:
+-            break;
+-        }
+-
+         r = sigpending(&chkset);
+         if (r == -1) {
+             perror("sigpending");
+             exit(1);
+         }
+-    } while (sigismember(&chkset, SIG_IPI) || sigismember(&chkset, SIGBUS));
++    } while (sigismember(&chkset, SIG_IPI));
+ }
+ #else /* !CONFIG_LINUX */
+ static void qemu_init_sigbus(void)
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 6ecb61c..a1b019d 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -357,7 +357,10 @@ bool kvm_vcpu_id_is_valid(int vcpu_id);
+ /* Returns VCPU ID to be used on KVM_CREATE_VCPU ioctl() */
+ unsigned long kvm_arch_vcpu_id(CPUState *cpu);
+ 
+-int kvm_arch_on_sigbus_vcpu(CPUState *cpu, int code, void *addr);
++#ifdef TARGET_I386
++#define KVM_HAVE_MCE_INJECTION 1
++void kvm_arch_on_sigbus_vcpu(CPUState *cpu, int code, void *addr);
++#endif
+ 
+ void kvm_arch_init_irq_routing(KVMState *s);
+ 
+diff --git a/kvm-all.c b/kvm-all.c
+index a433ad3..9e7c09f 100644
+--- a/kvm-all.c
++++ b/kvm-all.c
+@@ -1893,6 +1893,12 @@ void kvm_cpu_synchronize_post_init(CPUState *cpu)
+     run_on_cpu(cpu, do_kvm_cpu_synchronize_post_init, RUN_ON_CPU_NULL);
+ }
+ 
++#ifdef KVM_HAVE_MCE_INJECTION
++static __thread void *pending_sigbus_addr;
++static __thread int pending_sigbus_code;
++static __thread bool have_sigbus_pending;
 +#endif
 +
- int qemu_madvise(void *addr, size_t len, int advice);
+ int kvm_cpu_exec(CPUState *cpu)
+ {
+     struct kvm_run *run = cpu->kvm_run;
+@@ -1930,6 +1936,18 @@ int kvm_cpu_exec(CPUState *cpu)
  
- int qemu_open(const char *name, int flags, ...);
-diff --git a/util/compatfd.c b/util/compatfd.c
-index 9a43042..980bd33 100644
---- a/util/compatfd.c
-+++ b/util/compatfd.c
-@@ -15,7 +15,6 @@
+         attrs = kvm_arch_post_run(cpu, run);
  
- #include "qemu/osdep.h"
- #include "qemu-common.h"
--#include "qemu/compatfd.h"
- #include "qemu/thread.h"
- 
- #include <sys/syscall.h>
-diff --git a/util/main-loop.c b/util/main-loop.c
-index ad10bca..ca7bb07 100644
---- a/util/main-loop.c
-+++ b/util/main-loop.c
-@@ -34,8 +34,6 @@
- 
- #ifndef _WIN32
- 
--#include "qemu/compatfd.h"
--
- /* If we have signalfd, we mask out the signals we want to handle and then
-  * use signalfd to listen for them.  We rely on whatever the current signal
-  * handler is to dispatch the signals when we receive them.
-@@ -63,8 +61,7 @@ static void sigfd_handler(void *opaque)
- 
-         sigaction(info.ssi_signo, NULL, &action);
-         if ((action.sa_flags & SA_SIGINFO) && action.sa_sigaction) {
--            action.sa_sigaction(info.ssi_signo,
--                                (siginfo_t *)&info, NULL);
-+            sigaction_invoke(&action, &info);
-         } else if (action.sa_handler) {
-             action.sa_handler(info.ssi_signo);
-         }
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index f631464..cd686aa 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -603,3 +603,36 @@ void qemu_free_stack(void *stack, size_t sz)
- 
-     munmap(stack, sz);
++        if (unlikely(have_sigbus_pending)) {
++#ifdef KVM_HAVE_MCE_INJECTION
++            qemu_mutex_lock_iothread();
++            kvm_arch_on_sigbus_vcpu(cpu, pending_sigbus_code,
++                                    pending_sigbus_addr);
++            have_sigbus_pending = false;
++            qemu_mutex_unlock_iothread();
++#else
++            abort();
++#endif
++        }
++
+         if (run_ret < 0) {
+             if (run_ret == -EINTR || run_ret == -EAGAIN) {
+                 DPRINTF("io window exit\n");
+@@ -2392,13 +2410,27 @@ int kvm_set_signal_mask(CPUState *cpu, const sigset_t *sigset)
+     return r;
  }
-+
-+void sigaction_invoke(struct sigaction *action,
-+                      struct qemu_signalfd_siginfo *info)
-+{
-+    siginfo_t si = { 0 };
-+    si.si_signo = info->ssi_signo;
-+    si.si_errno = info->ssi_errno;
-+    si.si_code = info->ssi_code;
-+
-+    /* Convert the minimal set of fields defined by POSIX.
-+     * Positive si_code values are reserved for kernel-generated
-+     * signals, where the valid siginfo fields are determined by
-+     * the signal number.  But according to POSIX, it is unspecified
-+     * whether SI_USER and SI_QUEUE have values less than or equal to
-+     * zero.
-+     */
-+    if (info->ssi_code == SI_USER || info->ssi_code == SI_QUEUE ||
-+        info->ssi_code <= 0) {
-+        /* SIGTERM, etc.  */
-+        si.si_pid = info->ssi_pid;
-+        si.si_uid = info->ssi_uid;
-+    } else if (info->ssi_signo == SIGILL || info->ssi_signo == SIGFPE ||
-+               info->ssi_signo == SIGSEGV || info->ssi_signo == SIGBUS) {
-+        si.si_addr = (void *)(uintptr_t)info->ssi_addr;
-+    } else if (info->ssi_signo == SIGCHLD) {
-+        si.si_pid = info->ssi_pid;
-+        si.si_status = info->ssi_status;
-+        si.si_uid = info->ssi_uid;
-+    } else if (info->ssi_signo == SIGIO) {
-+        si.si_band = info->ssi_band;
+ 
++/* Called asynchronously in VCPU thread.  */
+ int kvm_on_sigbus_vcpu(CPUState *cpu, int code, void *addr)
+ {
+-    return kvm_arch_on_sigbus_vcpu(cpu, code, addr);
++#ifdef KVM_HAVE_MCE_INJECTION
++    if (have_sigbus_pending) {
++        return 1;
 +    }
-+    action->sa_sigaction(info->ssi_signo, &si, NULL);
-+}
++    have_sigbus_pending = true;
++    pending_sigbus_addr = addr;
++    pending_sigbus_code = code;
++    atomic_set(&cpu->exit_request, 1);
++    return 0;
++#else
++    return 1;
++#endif
+ }
+ 
++/* Called synchronously (via signalfd) in main thread.  */
+ int kvm_on_sigbus(int code, void *addr)
+ {
++#ifdef KVM_HAVE_MCE_INJECTION
+     /* Action required MCE kills the process if SIGBUS is blocked.  Because
+      * that's what happens in the I/O thread, where we handle MCE via signalfd,
+      * we can only get action optional here.
+@@ -2406,6 +2438,9 @@ int kvm_on_sigbus(int code, void *addr)
+     assert(code != BUS_MCEERR_AR);
+     kvm_arch_on_sigbus_vcpu(first_cpu, code, addr);
+     return 0;
++#else
++    return 1;
++#endif
+ }
+ 
+ int kvm_create_device(KVMState *s, uint64_t type, bool test)
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index e5218f6..4555468 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -560,11 +560,6 @@ int kvm_arch_process_async_events(CPUState *cs)
+     return 0;
+ }
+ 
+-int kvm_arch_on_sigbus_vcpu(CPUState *cs, int code, void *addr)
+-{
+-    return 1;
+-}
+-
+ /* The #ifdef protections are until 32bit headers are imported and can
+  * be removed once both 32 and 64 bit reach feature parity.
+  */
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 2adf992..7698421 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -455,7 +455,7 @@ static void hardware_memory_error(void)
+     exit(1);
+ }
+ 
+-int kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
++void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
+ {
+     X86CPU *cpu = X86_CPU(c);
+     CPUX86State *env = &cpu->env;
+@@ -475,7 +475,7 @@ int kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
+             kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
+             kvm_hwpoison_page_add(ram_addr);
+             kvm_mce_inject(cpu, paddr, code);
+-            return 0;
++            return;
+         }
+ 
+         fprintf(stderr, "Hardware memory error for memory used by "
+@@ -487,7 +487,6 @@ int kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
+     }
+ 
+     /* Hope we are lucky for AO MCE */
+-    return 0;
+ }
+ 
+ static int kvm_inject_mce_oldstyle(X86CPU *cpu)
+diff --git a/target/mips/kvm.c b/target/mips/kvm.c
+index 3e686e7..0982e87 100644
+--- a/target/mips/kvm.c
++++ b/target/mips/kvm.c
+@@ -180,12 +180,6 @@ bool kvm_arch_stop_on_emulation_error(CPUState *cs)
+     return true;
+ }
+ 
+-int kvm_arch_on_sigbus_vcpu(CPUState *cs, int code, void *addr)
+-{
+-    DPRINTF("%s\n", __func__);
+-    return 1;
+-}
+-
+ void kvm_arch_init_irq_routing(KVMState *s)
+ {
+ }
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index bc011c6..f22ecab 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -2582,11 +2582,6 @@ bool kvm_arch_stop_on_emulation_error(CPUState *cpu)
+     return true;
+ }
+ 
+-int kvm_arch_on_sigbus_vcpu(CPUState *cpu, int code, void *addr)
+-{
+-    return 1;
+-}
+-
+ void kvm_arch_init_irq_routing(KVMState *s)
+ {
+ }
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index e7eea6d..ac47154 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -2140,11 +2140,6 @@ bool kvm_arch_stop_on_emulation_error(CPUState *cpu)
+     return true;
+ }
+ 
+-int kvm_arch_on_sigbus_vcpu(CPUState *cpu, int code, void *addr)
+-{
+-    return 1;
+-}
+-
+ void kvm_s390_io_interrupt(uint16_t subchannel_id,
+                            uint16_t subchannel_nr, uint32_t io_int_parm,
+                            uint32_t io_int_word)
 -- 
 2.9.3
