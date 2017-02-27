@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47791)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ciUJh-0002Ec-9g
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:02:54 -0500
+	(envelope-from <jsnow@redhat.com>) id 1ciUQ3-0007er-Q5
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:09:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ciUJg-0005ea-1v
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:02:53 -0500
-Date: Mon, 27 Feb 2017 18:02:44 -0500
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170227230244.GN25637@localhost.localdomain>
-References: <cover.1488220970.git.jcody@redhat.com>
-	<12a16b28300f871052a49897ec7875a082fc63e3.1488220970.git.jcody@redhat.com>
-	<c5869fe5-fa51-3f2f-26d6-26a733c15493@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1ciUQ2-0000yH-Qu
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:09:27 -0500
+References: <20170225170758.427066-1-vsementsov@virtuozzo.com>
+	<20170225170758.427066-9-vsementsov@virtuozzo.com>
+	<fec4aa12-6aaa-5e4e-3439-01578db31327@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <6ea27ac5-4a4e-80f7-397b-5bf45753bd21@redhat.com>
+Date: Mon, 27 Feb 2017 18:09:20 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c5869fe5-fa51-3f2f-26d6-26a733c15493@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 5/5] block/rbd: add support for
- 'mon_host', 'auth_supported' via QAPI
+In-Reply-To: <fec4aa12-6aaa-5e4e-3439-01578db31327@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v16 08/22] qcow2: add bitmaps extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,132 +24,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, berrange@redhat.com
-
-On Mon, Feb 27, 2017 at 04:47:54PM -0600, Eric Blake wrote:
-> On 02/27/2017 12:58 PM, Jeff Cody wrote:
-> > This adds support for two additional options that may be specified
-> > by QAPI in blockdev-add:
-> > 
-> >     mon_host: servername and port
-> >     auth_supported: either 'cephx' or 'none'
-> 
-> Please spell new options with '-'
-> 
-
-OK, thanks.
-
-> > 
-> > Signed-off-by: Jeff Cody <jcody@redhat.com>
-> > ---
-> >  block/rbd.c          | 39 +++++++++++++++++++++++++++++++++++++++
-> >  qapi/block-core.json |  8 ++++++++
-> >  2 files changed, 47 insertions(+)
-> > 
-> > diff --git a/block/rbd.c b/block/rbd.c
-> > index e04a5e1..51e971e 100644
-> > --- a/block/rbd.c
-> > +++ b/block/rbd.c
-> > @@ -394,6 +394,18 @@ static QemuOptsList runtime_opts = {
-> >              .name = "keyvalue-pairs",
-> >              .type = QEMU_OPT_STRING,
-> >          },
-> > +        {
-> > +            .name = "server.host",
-> > +            .type = QEMU_OPT_STRING,
-> > +        },
-> > +        {
-> > +            .name = "server.port",
-> > +            .type = QEMU_OPT_STRING,
-> > +        },
-> 
-> See Dan's comment about supporting more than one server via an array in
-> QAPI.
-> 
-> > +        {
-> > +            .name = "auth_supported",
-> 
-> Should be auth-supported in QAPI.
-> 
-> 
-
-OK
-
-> > @@ -604,6 +620,29 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-> >          goto failed_shutdown;
-> >      }
-> >  
-> > +    /* if mon_host was specified */
-> > +    if (host) {
-> > +        const char *hostname = host;
-> > +        char *mon_host = NULL;
-> > +
-> > +        if (port) {
-> > +            mon_host = g_strdup_printf("%s:%s", host, port);
-> 
-> Does Ceph care about IPv6 (in which case you may need [host]:port when
-> host itself includes ':')?
-> 
-
-Good question - it looks like it can be enabled in the conf file at least,
-from this: 
-
-http://docs.ceph.com/docs/master/install/manual-deployment/
+To: Max Reitz <mreitz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
 
 
-> > +            hostname = mon_host;
-> > +        }
-> > +        r = rados_conf_set(s->cluster, "mon_host", hostname);
-> > +        g_free(mon_host);
-> > +        if (r < 0) {
-> > +            goto failed_shutdown;
-> > +        }
-> > +    }
-> > +
-> > +    if (auth_supported) {
-> > +        r = rados_conf_set(s->cluster, "auth_supported", auth_supported);
-> 
-> Translating QAPI auth-supported to rados auth_supported is fine.
-> 
-> 
-> > +++ b/qapi/block-core.json
-> > @@ -2680,6 +2680,12 @@
-> >  #
-> >  # @user:               #optional Ceph id name.
-> >  #
-> > +# @server:             #optional Monitor host address and port.  This maps
-> > +#                      to the "mon_host" Ceph option.
-> > +#
-> > +# @auth_supported:     #optional Authentication supported.
-> > +#                      Either "cephx" or"none".
-> 
-> Missing a space.
-> 
-> If you're going to support only a finite set of strings, this should be
-> a QAPI enum type, not 'str'.
->
 
-OK, I'll make it an enum (and fix the space, of course).
-
-> > +#
-> >  # @password-secret:    #optional The ID of a QCryptoSecret object providing
-> >  #                       the password for the login.
-> >  #
-> > @@ -2691,6 +2697,8 @@
-> >              '*conf': 'str',
-> >              '*snapshot': 'str',
-> >              '*user': 'str',
-> > +            '*server': 'InetSocketAddress',
-> > +            '*auth_supported': 'str',
-> >              '*password-secret': 'str' } }
-> >  
-> >  ##
-> > 
+On 02/27/2017 07:27 AM, Max Reitz wrote:
+> On 25.02.2017 18:07, Vladimir Sementsov-Ogievskiy wrote:
+>> Add bitmap extension as specified in docs/specs/qcow2.txt.
+>> For now, just mirror extension header into Qcow2 state and check
+>> constraints. Also, calculate refcounts for qcow2 bitmaps, to not break
+>> qemu-img check.
+>>
+>> For now, disable image resize if it has bitmaps. It will be fixed later.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>  block/Makefile.objs    |   2 +-
+>>  block/qcow2-bitmap.c   | 439 +++++++++++++++++++++++++++++++++++++++++++++++++
+>>  block/qcow2-refcount.c |   6 +
+>>  block/qcow2.c          | 124 +++++++++++++-
+>>  block/qcow2.h          |  27 +++
+>>  5 files changed, 592 insertions(+), 6 deletions(-)
+>>  create mode 100644 block/qcow2-bitmap.c
 > 
-> Looks like we'll need a v3 to tweak this one.
->
+> Somehow I have the feeling Kevin will find bad things in this patch, but
+> since I have already approved of all of the previous patches this one is
+> composed of and the changes on top of that look OK to me:
+> 
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> 
 
-Yep - working on that now.  Thanks!
+Pretty much the same sentiment as Max.
 
--Jeff
+The patchset is now organized a bit strangely, but I did R-B all the
+component pieces before, and the changes look fine.
+
+
+Reviewed-by: John Snow <jsnow@redhat.com>
