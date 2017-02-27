@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ciUVj-0004RN-I1
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:15:20 -0500
+	(envelope-from <eblake@redhat.com>) id 1ciUid-0007wI-FS
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:28:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ciUVi-0003C7-K0
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:15:19 -0500
-References: <cover.1488220970.git.jcody@redhat.com>
-	<fa6a26e1642ad7e593f3a0776a4a021997493f24.1488220970.git.jcody@redhat.com>
-	<4b9a328b-5537-d06d-3510-d2d4038347a3@redhat.com>
-	<20170227225631.GM25637@localhost.localdomain>
+	(envelope-from <eblake@redhat.com>) id 1ciUia-0000RV-Be
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:28:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41696)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ciUia-0000R9-3F
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:28:36 -0500
+References: <148814889214.28146.16915712763478774662.stgit@bahia>
+	<148814892313.28146.906456388544163572.stgit@bahia>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <d7f7e312-0f58-d7b2-8756-249bc66361f8@redhat.com>
-Date: Mon, 27 Feb 2017 17:15:08 -0600
+Message-ID: <851bab51-f448-e21a-32df-c2b2e3b8dd8d@redhat.com>
+Date: Mon, 27 Feb 2017 17:28:33 -0600
 MIME-Version: 1.0
-In-Reply-To: <20170227225631.GM25637@localhost.localdomain>
+In-Reply-To: <148814892313.28146.906456388544163572.stgit@bahia>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="Ol83qVguirae7fLRbbKh6IgDjxKlfoVs3"
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] block/rbd: parse all options via
- bdrv_parse_filename
+	boundary="pCqpM6GPPK6AhCuAwmGVXKwfgi3vSC5Rw"
+Subject: Re: [Qemu-devel] [PATCH v2 04/28] 9pfs: introduce openat_nofollow()
+ helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,69 +29,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, berrange@redhat.com
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Ol83qVguirae7fLRbbKh6IgDjxKlfoVs3
+--pCqpM6GPPK6AhCuAwmGVXKwfgi3vSC5Rw
 From: Eric Blake <eblake@redhat.com>
-To: Jeff Cody <jcody@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com,
- berrange@redhat.com
-Message-ID: <d7f7e312-0f58-d7b2-8756-249bc66361f8@redhat.com>
-Subject: Re: [PATCH v2 3/5] block/rbd: parse all options via
- bdrv_parse_filename
-References: <cover.1488220970.git.jcody@redhat.com>
- <fa6a26e1642ad7e593f3a0776a4a021997493f24.1488220970.git.jcody@redhat.com>
- <4b9a328b-5537-d06d-3510-d2d4038347a3@redhat.com>
- <20170227225631.GM25637@localhost.localdomain>
-In-Reply-To: <20170227225631.GM25637@localhost.localdomain>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>,
+ "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <851bab51-f448-e21a-32df-c2b2e3b8dd8d@redhat.com>
+Subject: Re: [PATCH v2 04/28] 9pfs: introduce openat_nofollow() helper
+References: <148814889214.28146.16915712763478774662.stgit@bahia>
+ <148814892313.28146.906456388544163572.stgit@bahia>
+In-Reply-To: <148814892313.28146.906456388544163572.stgit@bahia>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 02/27/2017 04:56 PM, Jeff Cody wrote:
+On 02/26/2017 04:42 PM, Greg Kurz wrote:
+> When using the passthrough security mode, symbolic links created by the=
 
->>>  static BlockDriver bdrv_rbd =3D {
+> guest are actual symbolic links on the host file system.
 >=20
->>> -    .instance_size      =3D sizeof(BDRVRBDState),
->>> -    .bdrv_needs_filename =3D true,
->>> -    .bdrv_file_open     =3D qemu_rbd_open,
->>> -    .bdrv_close         =3D qemu_rbd_close,
->>> -    .bdrv_create        =3D qemu_rbd_create,
->>> -    .bdrv_has_zero_init =3D bdrv_has_zero_init_1,
->>> -    .bdrv_get_info      =3D qemu_rbd_getinfo,
->>> -    .create_opts        =3D &qemu_rbd_create_opts,
->>> -    .bdrv_getlength     =3D qemu_rbd_getlength,
->>> -    .bdrv_truncate      =3D qemu_rbd_truncate,
->>> -    .protocol_name      =3D "rbd",
->>> +    .format_name            =3D "rbd",
->>> +    .instance_size          =3D sizeof(BDRVRBDState),
->>> +    .bdrv_parse_filename    =3D qemu_rbd_parse_filename,
->>> +    .bdrv_file_open         =3D qemu_rbd_open,
->>> +    .bdrv_close             =3D qemu_rbd_close,
->>> +    .bdrv_create            =3D qemu_rbd_create,
->>> +    .bdrv_has_zero_init     =3D bdrv_has_zero_init_1,
->>> +    .bdrv_get_info          =3D qemu_rbd_getinfo,
->>> +    .create_opts            =3D &qemu_rbd_create_opts,
->>
->> Pointless &; might as well remove it for consistency while touching it=
-=2E
->>
->=20
-> I'm not sure I understand - we need the '&' here for the .create_opts
-> initializer, unless I am overlooking something.
 
-Nope, I'm overlooking. I assumed that everything here was a function
-pointer, but you are right that .create_opts takes an object (not a
-function) pointer, so the & is necessary.  Maybe I need to take a short
-break from reviewing...
+>=20
+> diff --git a/hw/9pfs/9p-util.c b/hw/9pfs/9p-util.c
+> new file mode 100644
+> index 000000000000..62fd7a76212a
+> --- /dev/null
+
+> +int openat_nofollow(int dirfd, const char *path, int flags, mode_t mod=
+e)
+> +{
+> +    int fd;
+> +
+> +    fd =3D dup(dirfd);
+> +    if (fd =3D=3D -1) {
+> +        return -1;
+> +    }
+> +
+
+Do you want to assert that the caller's path does not start with '/'?
+This function ignores dirfd in that case, which may not be what you want.=
+
+
+> +    while (*path) {
+> +        const char *c;
+> +        int next_fd;
+> +        char *head;
+> +
+> +        head =3D g_strdup(path);
+> +        c =3D strchr(path, '/');
+
+So if the caller passes path=3D"a//b", then the first iteration sets
+head=3D"a", but the second iteration sets head=3D"".
+
+
+> +        if (c) {
+> +            head[c - path] =3D 0;
+> +            next_fd =3D openat_dir(fd, head);
+
+The second iteration will then fail (openat_dir on "" should fail with
+ENOENT, right?).  Oops.
+
+> +        } else {
+> +            next_fd =3D openat_file(fd, head, flags, mode);
+> +        }
+> +        g_free(head);
+> +        if (next_fd =3D=3D -1) {
+> +            close_preserve_errno(fd);
+> +            return -1;
+> +        }
+> +        close(fd);
+> +        fd =3D next_fd;
+> +
+> +        if (!c) {
+> +            break;
+> +        }
+> +        path =3D c + 1;
+
+I think the fix is that you should skip past all consecutive '/' here,
+rather than assuming there is just one.  Or can you assert that all
+callers are well-behaved, and that *path is not '/' at this point?
+
+> +    }
+
+> +static inline int openat_file(int dirfd, const char *name, int flags,
+> +                              mode_t mode)
+> +{
+> +    int fd, serrno;
+> +
+> +    fd =3D openat(dirfd, name, flags | O_NOFOLLOW | O_NOCTTY | O_NONBL=
+OCK,
+> +                mode);
+> +    if (fd =3D=3D -1) {
+> +        return -1;
+> +    }
+> +
+> +    serrno =3D errno;
+> +    /* O_NONBLOCK was only needed to open the file. Let's drop it. */
+> +    assert(!fcntl(fd, F_SETFL, flags));
+
+Ouch - side effect inside an assertion.  We don't support use of NDEBUG,
+but this is poor practice.
 
 --=20
 Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---Ol83qVguirae7fLRbbKh6IgDjxKlfoVs3
+--pCqpM6GPPK6AhCuAwmGVXKwfgi3vSC5Rw
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -99,13 +149,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYtLL8AAoJEKeha0olJ0NqXnwH/jjOnFDNiwVpgw7DW9reVCH+
-u6OZVWC7WJD/pPtFi3Xp9yLEnXi3wEjWPrhfq8bKSAaH2rucDxn/v//Ihuhhywp8
-/iPrgaZ4uK6Kt0vrxy6I5nppDJxExucSuEWU/y9pAjmSEGm6wUCIdFOwz0Kt9EA6
-OShUcnAtsnX0xhQur0jrUuR/KGBMA+AGTSlDan6AtKzlpdyT5Zxdg0m5d35YWCC4
-JGkqbaOzHlSgOOs1YFwOnZEBYMayKPjofjwhzkH0NtoZ5Ct7flwBSLxUxU5+GK6p
-bw2L+y+W4nm8YI2LuNAQ1+21DT6o91GB/YIsgxFFeykFV9afUyw01xUG4g3arQc=
-=OEUN
+iQEcBAEBCAAGBQJYtLYhAAoJEKeha0olJ0NqSMgH/1F0Y7KIEIHAv/3sjtTkNi5S
+8M6wv1Ww8pcJa/pld17Om3bFW403ZZ4hda42D78qABBDfJbebcE/mzf1G43yKtNF
+M1SgA23UNdPsWMt4gGpiiZNJmP6dKaBpk59oQmAGfClxAjQ4FJEVb5Iy75tLa6p0
+ngJDRcn7wjOgW2voENi//8rW66M+o3JmNKdGJXZBsVHbN/tV8tk7rSfRfbA786ps
+xi/NA6PyQHH8URynZ9mdXvuOMzwvkv8Am2h8WWt7b4sTs/89C7r089TfMf6O4ooh
+y5hMculgBjh3JqxhFdRzBMscLQGmf5vXW0bFfLsOHGQb7Qd0XLi2SIbOrknKH2Y=
+=gh0x
 -----END PGP SIGNATURE-----
 
---Ol83qVguirae7fLRbbKh6IgDjxKlfoVs3--
+--pCqpM6GPPK6AhCuAwmGVXKwfgi3vSC5Rw--
