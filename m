@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ciLpf-0007lt-Sy
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:59:21 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ciLqT-0008Un-HX
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:00:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ciLpc-0006DV-UM
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:59:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34370)
+	(envelope-from <ehabkost@redhat.com>) id 1ciLqQ-0006Qh-Pn
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:00:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34880)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ciLpc-0006DN-O3
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:59:16 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C90DB61D11
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 13:59:16 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170221141451.28305-1-marcandre.lureau@redhat.com>
-	<20170221141451.28305-12-marcandre.lureau@redhat.com>
-Date: Mon, 27 Feb 2017 14:59:13 +0100
-In-Reply-To: <20170221141451.28305-12-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 21 Feb 2017
-	18:14:32 +0400")
-Message-ID: <871sujg2fi.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ciLqQ-0006PJ-Hv
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:00:06 -0500
+Date: Mon, 27 Feb 2017 11:00:01 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170227140001.GV2778@thinpad.lan.raisama.net>
+References: <1485333658-23035-1-git-send-email-thuth@redhat.com>
+	<0eca8185-8e94-46f8-6b7a-36c4a21bc28d@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 11/30] tests: fix hd-geo-test leaks
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0eca8185-8e94-46f8-6b7a-36c4a21bc28d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] null-machine: Add support for the
+ "-kernel" parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,72 +28,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, Laurent Vivier <laurent@vivier.eu>, Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+On Mon, Feb 27, 2017 at 12:43:23PM +0100, Thomas Huth wrote:
+> On 25.01.2017 09:40, Thomas Huth wrote:
+> > We can have basic support for the "-kernel" parameter quite easily
+> > by using the generic loader device. This should be enough for most
+> > boards which do not need special machine-specific magic for loading
+> > a kernel (and for those that need special magic, the generic "none"
+> > machine is likely not suitable for using it as an instruction set
+> > simulator board anyway).
+> > 
+> > Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > ---
+> >  PS: If we can't agree on using the generic loader here, I can also
+> >      prepare a patch instead that simply prints out an error message
+> >      if the user tried to use the "-kernel" parameter.
+> > 
+> >  hw/core/null-machine.c | 14 ++++++++++++++
+> >  1 file changed, 14 insertions(+)
+> > 
+> > diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
+> > index 27c8369..866e699 100644
+> > --- a/hw/core/null-machine.c
+> > +++ b/hw/core/null-machine.c
+> > @@ -5,6 +5,7 @@
+> >   *
+> >   * Authors:
+> >   *  Anthony Liguori   <aliguori@us.ibm.com>
+> > + *  Thomas Huth       <thuth@redhat.com>
+> >   *
+> >   * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> >   * See the COPYING file in the top-level directory.
+> > @@ -16,6 +17,7 @@
+> >  #include "qemu/error-report.h"
+> >  #include "hw/hw.h"
+> >  #include "hw/boards.h"
+> > +#include "hw/core/generic-loader.h"
+> >  #include "sysemu/sysemu.h"
+> >  #include "exec/address-spaces.h"
+> >  #include "cpu.h"
+> > @@ -40,6 +42,18 @@ static void machine_none_init(MachineState *mch)
+> >          memory_region_allocate_system_memory(ram, NULL, "ram", mch->ram_size);
+> >          memory_region_add_subregion(get_system_memory(), 0, ram);
+> >      }
+> > +
+> > +    /* Load kernel */
+> > +    if (mch->kernel_filename) {
+> > +        DeviceState *loader;
+> > +
+> > +        loader = qdev_create(sysbus_get_default(), TYPE_GENERIC_LOADER);
+> > +        qdev_prop_set_string(loader, "file", mch->kernel_filename);
+> > +        if (cpu) {
+> > +            qdev_prop_set_uint32(loader, "cpu-num", cpu->cpu_index);
+> > +        }
+> > +        qdev_init_nofail(loader);
+> > +    }
+> >  }
+> >  
+> >  static void machine_none_machine_init(MachineClass *mc)
+> 
+> *ping*
+> 
+> Apparently the discussion has ceased ... can we get a consensus whether
+> we want to support the "-kernel" parameter for the "none" machine or not?
 
-> Spotted by ASAN.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  tests/hd-geo-test.c | 47 +++++++++++++++++++++++++++++++----------------
->  1 file changed, 31 insertions(+), 16 deletions(-)
->
-> diff --git a/tests/hd-geo-test.c b/tests/hd-geo-test.c
-> index 6176e81ab2..88f8d76d32 100644
-> --- a/tests/hd-geo-test.c
-> +++ b/tests/hd-geo-test.c
-> @@ -19,6 +19,8 @@
->  #include "qemu-common.h"
->  #include "libqtest.h"
->=20=20
-> +#define ARGV_SIZE 256
-> +
->  static char *create_test_img(int secs)
->  {
->      char *template =3D strdup("/tmp/qtest.XXXXXX");
-> @@ -66,7 +68,7 @@ static const CHST hd_chst[backend_last][mbr_last] =3D {
->      },
->  };
->=20=20
-> -static const char *img_file_name[backend_last];
-> +static char *img_file_name[backend_last];
->=20=20
->  static const CHST *cur_ide[4];
->=20=20
-> @@ -234,28 +236,34 @@ static int setup_ide(int argc, char *argv[], int ar=
-gv_sz,
->   */
->  static void test_ide_none(void)
->  {
-> -    char *argv[256];
-> +    char **argv =3D g_new0(char *, ARGV_SIZE);
-> +    char *tmp;
->=20=20
-> -    setup_common(argv, ARRAY_SIZE(argv));
-> -    qtest_start(g_strjoinv(" ", argv));
-> +    setup_common(argv, ARGV_SIZE);
-> +    qtest_start(tmp =3D g_strjoinv(" ", argv));
+I think Peter's point is still valid:
 
-While I'm totally fine with things like while ((tmp =3D ...)) when the
-result is more concise, I don't like this.  Please do
+] If you just want "load a blob and start it" then we already
+] have -device loader. Making -kernel have yet another set of
+] semantics that this time depends on the machine being selected
+] seems like a bad idea. If -kernel doesn't do what it does
+] for the other machines of the same architecture then we should
+] just not accept it.
 
-       tmp =3D g_strjoinv(" ", argv);
-       qtest_start(tmp);
+If you add a mechanism to ensure "-machine none -kernel" has the
+same behavior as the other machines in the same QEMU binary, then
+I believe it will be OK.
 
-Also, please rename tmp to extra_args, argstr, or maybe args.
+I believe we don't need to make this work on all architectures at
+the same time, though. We can do this using an optional
+per-architecture kernel-loading hook.
 
-> +    g_strfreev(argv);
-> +    g_free(tmp);
->      test_cmos();
->      qtest_end();
->  }
-
-I think we should have a qtest_startv() that takes an argv[] and doesn't
-use the shell to split arguments.  Outside this patch's scope.
-
-[More of the same snipped...]
-
-With the stylistic changes outlined above:
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+-- 
+Eduardo
