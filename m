@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51970)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ciPfe-0002LG-8s
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:17 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ciPfg-0002NG-JM
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ciPfc-0001s8-Fm
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:14 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48678)
+	(envelope-from <pm215@archaic.org.uk>) id 1ciPfe-0001ub-UQ
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:16 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48679)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ciPfc-0001qs-7x
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:12 -0500
+	id 1ciPfe-0001rj-L7
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:14 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1ciPfb-0002QA-Ew
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:05:11 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1ciPfd-0002Rk-Hb
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:05:13 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 27 Feb 2017 18:04:51 +0000
-Message-Id: <1488218699-31035-23-git-send-email-peter.maydell@linaro.org>
+Date: Mon, 27 Feb 2017 18:04:55 +0000
+Message-Id: <1488218699-31035-27-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1488218699-31035-1-git-send-email-peter.maydell@linaro.org>
 References: <1488218699-31035-1-git-send-email-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 22/30] armv7m: Check exception return consistency
+Subject: [Qemu-devel] [PULL 26/30] hw/sd: add card-reparenting function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,231 +29,86 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Implement the exception return consistency checks
-described in the v7M pseudocode ExceptionReturn().
+From: Clement Deschamps <clement.deschamps@antfield.fr>
 
-Inspired by a patch from Michael Davidsaver's series, but
-this is a reimplementation from scratch based on the
-ARM ARM pseudocode.
+Provide a new function sdbus_reparent_card() in sd core for reparenting
+a card from a SDBus to another one.
 
+This function is required by the raspi platform, where the two SD
+controllers can be dynamically switched.
+
+Signed-off-by: Clement Deschamps <clement.deschamps@antfield.fr>
+Message-id: 20170224164021.9066-3-clement.deschamps@antfield.fr
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+[PMM: added a doc comment to the header file]
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- target/arm/cpu.h      |  12 +++++-
- hw/intc/armv7m_nvic.c |  12 +++++-
- target/arm/helper.c   | 112 +++++++++++++++++++++++++++++++++++++++++++++-----
- 3 files changed, 123 insertions(+), 13 deletions(-)
+ include/hw/sd/sd.h | 11 +++++++++++
+ hw/sd/core.c       | 30 ++++++++++++++++++++++++++++++
+ 2 files changed, 41 insertions(+)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 68ad00c..045830a 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1366,7 +1366,17 @@ static inline bool armv7m_nvic_can_take_pending_exception(void *opaque)
- #endif
- void armv7m_nvic_set_pending(void *opaque, int irq);
- void armv7m_nvic_acknowledge_irq(void *opaque);
--void armv7m_nvic_complete_irq(void *opaque, int irq);
+diff --git a/include/hw/sd/sd.h b/include/hw/sd/sd.h
+index 79909b2..96caefe 100644
+--- a/include/hw/sd/sd.h
++++ b/include/hw/sd/sd.h
+@@ -140,6 +140,17 @@ uint8_t sdbus_read_data(SDBus *sd);
+ bool sdbus_data_ready(SDBus *sd);
+ bool sdbus_get_inserted(SDBus *sd);
+ bool sdbus_get_readonly(SDBus *sd);
 +/**
-+ * armv7m_nvic_complete_irq: complete specified interrupt or exception
-+ * @opaque: the NVIC
-+ * @irq: the exception number to complete
++ * sdbus_reparent_card: Reparent an SD card from one controller to another
++ * @from: controller bus to remove card from
++ * @to: controller bus to move card to
 + *
-+ * Returns: -1 if the irq was not active
-+ *           1 if completing this irq brought us back to base (no active irqs)
-+ *           0 if there is still an irq active after this one was completed
-+ * (Ignoring -1, this is the same as the RETTOBASE value before completion.)
++ * Reparent an SD card, effectively unplugging it from one controller
++ * and inserting it into another. This is useful for SoCs like the
++ * bcm2835 which have two SD controllers and connect a single SD card
++ * to them, selected by the guest reprogramming GPIO line routing.
 + */
-+int armv7m_nvic_complete_irq(void *opaque, int irq);
++void sdbus_reparent_card(SDBus *from, SDBus *to);
  
- /* Interface for defining coprocessor registers.
-  * Registers are defined in tables of arm_cp_reginfo structs
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index 456480a..718b1a1 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -441,10 +441,11 @@ void armv7m_nvic_acknowledge_irq(void *opaque)
-     nvic_irq_update(s);
+ /* Functions to be used by SD devices to report back to qdevified controllers */
+ void sdbus_set_inserted(SDBus *sd, bool inserted);
+diff --git a/hw/sd/core.c b/hw/sd/core.c
+index 14c2bdf..a8f24f5 100644
+--- a/hw/sd/core.c
++++ b/hw/sd/core.c
+@@ -131,6 +131,36 @@ void sdbus_set_readonly(SDBus *sdbus, bool readonly)
+     }
  }
  
--void armv7m_nvic_complete_irq(void *opaque, int irq)
-+int armv7m_nvic_complete_irq(void *opaque, int irq)
- {
-     NVICState *s = (NVICState *)opaque;
-     VecInfo *vec;
-+    int ret;
- 
-     assert(irq > ARMV7M_EXCP_RESET && irq < s->num_irq);
- 
-@@ -452,6 +453,13 @@ void armv7m_nvic_complete_irq(void *opaque, int irq)
- 
-     trace_nvic_complete_irq(irq);
- 
-+    if (!vec->active) {
-+        /* Tell the caller this was an illegal exception return */
-+        return -1;
-+    }
++void sdbus_reparent_card(SDBus *from, SDBus *to)
++{
++    BusChild *kid = QTAILQ_FIRST(&from->qbus.children);
++    SDState *card;
++    SDCardClass *sc;
++    bool readonly;
 +
-+    ret = nvic_rettobase(s);
-+
-     vec->active = 0;
-     if (vec->level) {
-         /* Re-pend the exception if it's still held high; only
-@@ -462,6 +470,8 @@ void armv7m_nvic_complete_irq(void *opaque, int irq)
-     }
- 
-     nvic_irq_update(s);
-+
-+    return ret;
- }
- 
- /* callback when external interrupt line is changed */
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index be731dc..9081771 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -6068,22 +6068,99 @@ static void v7m_push_stack(ARMCPU *cpu)
-     v7m_push(env, env->regs[0]);
- }
- 
--static void do_v7m_exception_exit(CPUARMState *env)
-+static void do_v7m_exception_exit(ARMCPU *cpu)
- {
-+    CPUARMState *env = &cpu->env;
-     uint32_t type;
-     uint32_t xpsr;
--
-+    bool ufault = false;
-+    bool return_to_sp_process = false;
-+    bool return_to_handler = false;
-+    bool rettobase = false;
-+
-+    /* We can only get here from an EXCP_EXCEPTION_EXIT, and
-+     * arm_v7m_do_unassigned_access() enforces the architectural rule
-+     * that jumps to magic addresses don't have magic behaviour unless
-+     * we're in Handler mode (compare pseudocode BXWritePC()).
++    /* We directly reparent the card object rather than implementing this
++     * as a hotpluggable connection because we don't want to expose SD cards
++     * to users as being hotpluggable, and we can get away with it in this
++     * limited use case. This could perhaps be implemented more cleanly in
++     * future by adding support to the hotplug infrastructure for "device
++     * can be hotplugged only via code, not by user".
 +     */
-+    assert(env->v7m.exception != 0);
 +
-+    /* In the spec pseudocode ExceptionReturn() is called directly
-+     * from BXWritePC() and gets the full target PC value including
-+     * bit zero. In QEMU's implementation we treat it as a normal
-+     * jump-to-register (which is then caught later on), and so split
-+     * the target value up between env->regs[15] and env->thumb in
-+     * gen_bx(). Reconstitute it.
-+     */
-     type = env->regs[15];
-+    if (env->thumb) {
-+        type |= 1;
-+    }
-+
-+    qemu_log_mask(CPU_LOG_INT, "Exception return: magic PC %" PRIx32
-+                  " previous exception %d\n",
-+                  type, env->v7m.exception);
-+
-+    if (extract32(type, 5, 23) != extract32(-1, 5, 23)) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "M profile: zero high bits in exception "
-+                      "exit PC value 0x%" PRIx32 " are UNPREDICTABLE\n", type);
-+    }
-+
-     if (env->v7m.exception != ARMV7M_EXCP_NMI) {
-         /* Auto-clear FAULTMASK on return from other than NMI */
-         env->daif &= ~PSTATE_F;
-     }
--    if (env->v7m.exception != 0) {
--        armv7m_nvic_complete_irq(env->nvic, env->v7m.exception);
-+
-+    switch (armv7m_nvic_complete_irq(env->nvic, env->v7m.exception)) {
-+    case -1:
-+        /* attempt to exit an exception that isn't active */
-+        ufault = true;
-+        break;
-+    case 0:
-+        /* still an irq active now */
-+        break;
-+    case 1:
-+        /* we returned to base exception level, no nesting.
-+         * (In the pseudocode this is written using "NestedActivation != 1"
-+         * where we have 'rettobase == false'.)
-+         */
-+        rettobase = true;
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    switch (type & 0xf) {
-+    case 1: /* Return to Handler */
-+        return_to_handler = true;
-+        break;
-+    case 13: /* Return to Thread using Process stack */
-+        return_to_sp_process = true;
-+        /* fall through */
-+    case 9: /* Return to Thread using Main stack */
-+        if (!rettobase &&
-+            !(env->v7m.ccr & R_V7M_CCR_NONBASETHRDENA_MASK)) {
-+            ufault = true;
-+        }
-+        break;
-+    default:
-+        ufault = true;
-+    }
-+
-+    if (ufault) {
-+        /* Bad exception return: instead of popping the exception
-+         * stack, directly take a usage fault on the current stack.
-+         */
-+        env->v7m.cfsr |= R_V7M_CFSR_INVPC_MASK;
-+        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE);
-+        v7m_exception_taken(cpu, type | 0xf0000000);
-+        qemu_log_mask(CPU_LOG_INT, "...taking UsageFault on existing "
-+                      "stackframe: failed exception return integrity check\n");
-+        return;
-     }
- 
-     /* Switch to the target stack.  */
--    switch_v7m_sp(env, (type & 4) != 0);
-+    switch_v7m_sp(env, return_to_sp_process);
-     /* Pop registers.  */
-     env->regs[0] = v7m_pop(env);
-     env->regs[1] = v7m_pop(env);
-@@ -6107,11 +6184,24 @@ static void do_v7m_exception_exit(CPUARMState *env)
-     /* Undo stack alignment.  */
-     if (xpsr & 0x200)
-         env->regs[13] |= 4;
--    /* ??? The exception return type specifies Thread/Handler mode.  However
--       this is also implied by the xPSR value. Not sure what to do
--       if there is a mismatch.  */
--    /* ??? Likewise for mismatches between the CONTROL register and the stack
--       pointer.  */
-+
-+    /* The restored xPSR exception field will be zero if we're
-+     * resuming in Thread mode. If that doesn't match what the
-+     * exception return type specified then this is a UsageFault.
-+     */
-+    if (return_to_handler == (env->v7m.exception == 0)) {
-+        /* Take an INVPC UsageFault by pushing the stack again. */
-+        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE);
-+        env->v7m.cfsr |= R_V7M_CFSR_INVPC_MASK;
-+        v7m_push_stack(cpu);
-+        v7m_exception_taken(cpu, type | 0xf0000000);
-+        qemu_log_mask(CPU_LOG_INT, "...taking UsageFault on new stackframe: "
-+                      "failed exception return integrity check\n");
++    if (!kid) {
 +        return;
 +    }
 +
-+    /* Otherwise, we have a successful exception exit. */
-+    qemu_log_mask(CPU_LOG_INT, "...successful exception return\n");
- }
- 
- static void arm_log_exception(int idx)
-@@ -6184,7 +6274,7 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
-     case EXCP_IRQ:
-         break;
-     case EXCP_EXCEPTION_EXIT:
--        do_v7m_exception_exit(env);
-+        do_v7m_exception_exit(cpu);
-         return;
-     default:
-         cpu_abort(cs, "Unhandled exception 0x%x\n", cs->exception_index);
++    card = SD_CARD(kid->child);
++    sc = SD_CARD_GET_CLASS(card);
++    readonly = sc->get_readonly(card);
++
++    sdbus_set_inserted(from, false);
++    object_unparent(OBJECT(kid));
++    qdev_set_parent_bus(DEVICE(card), &to->qbus);
++    sdbus_set_inserted(to, true);
++    sdbus_set_readonly(to, readonly);
++}
++
+ static const TypeInfo sd_bus_info = {
+     .name = TYPE_SD_BUS,
+     .parent = TYPE_BUS,
 -- 
 2.7.4
