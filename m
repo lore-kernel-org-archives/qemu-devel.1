@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ciO6u-0007wE-O2
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:25:18 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ciO6x-0007zR-L2
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:25:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ciO6s-0005Cs-Iv
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:25:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53350)
+	(envelope-from <ehabkost@redhat.com>) id 1ciO6w-0005Dy-9w
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:25:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34162)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ciO6s-0005Cf-AF
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:25:14 -0500
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ciO6w-0005Da-1K
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:25:18 -0500
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 27 Feb 2017 13:24:54 -0300
-Message-Id: <20170227162501.29280-5-ehabkost@redhat.com>
+Date: Mon, 27 Feb 2017 13:24:56 -0300
+Message-Id: <20170227162501.29280-7-ehabkost@redhat.com>
 In-Reply-To: <20170227162501.29280-1-ehabkost@redhat.com>
 References: <20170227162501.29280-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 04/11] i386: Reorganize and document CPUID
- initialization steps
+Subject: [Qemu-devel] [PULL 06/11] i386: Create "max" CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,170 +26,143 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
 
-CPU runnability checks and CPU model expansion have slightly
-different requirements. Document the steps involved in loading a
-CPU model and realizing a CPU, so their requirements and purpose
-are clearly defined.
+Rename the existing "host" CPU model to "max, and set it to
+kvm_enabled=false. The new "max" CPU model will be able to enable
+all features supported by TCG out of the box, because its logic
+is based on x86_cpu_get_supported_feature_word(), which already
+works with TCG.
 
-This patch doesn't change any implementation. It just add
-comments, rename the x86_cpu_load_features() function for clarity
-(so it won't be confused with x86_cpu_load_def()), and move
-x86_cpu_filter_features() closer to it.
+A new KVM-specific "host" class was added, that simply inherits
+everything from "max" except the 'ordering' and 'description'
+fields.
 
-Message-Id: <20170116211124.29245-2-ehabkost@redhat.com>
+Message-Id: <20170222183919.11928-2-ehabkost@redhat.com>
+Tested-by: Richard W.M. Jones <rjones@redhat.com>
+Tested-by: Jiri Denemark <jdenemar@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/i386/cpu.c | 102 +++++++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 71 insertions(+), 31 deletions(-)
+ target/i386/cpu.c | 46 ++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 32 insertions(+), 14 deletions(-)
 
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 87affbfcd6..b614887a61 100644
+index b614887a61..a53fafa205 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -2059,7 +2059,7 @@ static void x86_cpu_parse_featurestr(const char *typename, char *features,
+@@ -1503,15 +1503,15 @@ void x86_cpu_change_kvm_default(const char *prop, const char *value)
+ static uint32_t x86_cpu_get_supported_feature_word(FeatureWord w,
+                                                    bool migratable_only);
+ 
+-#ifdef CONFIG_KVM
+-
+ static bool lmce_supported(void)
+ {
+-    uint64_t mce_cap;
++    uint64_t mce_cap = 0;
+ 
++#ifdef CONFIG_KVM
+     if (kvm_ioctl(kvm_state, KVM_X86_GET_MCE_CAP_SUPPORTED, &mce_cap) < 0) {
+         return false;
      }
++#endif
+ 
+     return !!(mce_cap & MCG_LMCE_P);
  }
+@@ -1533,23 +1533,22 @@ static int cpu_x86_fill_model_id(char *str)
  
--static void x86_cpu_load_features(X86CPU *cpu, Error **errp);
-+static void x86_cpu_expand_features(X86CPU *cpu, Error **errp);
- static int x86_cpu_filter_features(X86CPU *cpu);
+ static X86CPUDefinition host_cpudef;
  
- /* Check for missing features that may prevent the CPU class from
-@@ -2082,9 +2082,9 @@ static void x86_cpu_class_check_missing_features(X86CPUClass *xcc,
+-static Property host_x86_cpu_properties[] = {
++static Property max_x86_cpu_properties[] = {
+     DEFINE_PROP_BOOL("migratable", X86CPU, migratable, true),
+     DEFINE_PROP_BOOL("host-cache-info", X86CPU, cache_info_passthrough, false),
+     DEFINE_PROP_END_OF_LIST()
+ };
  
-     xc = X86_CPU(object_new(object_class_get_name(OBJECT_CLASS(xcc))));
- 
--    x86_cpu_load_features(xc, &err);
-+    x86_cpu_expand_features(xc, &err);
-     if (err) {
--        /* Errors at x86_cpu_load_features should never happen,
-+        /* Errors at x86_cpu_expand_features should never happen,
-          * but in case it does, just report the model as not
-          * runnable at all using the "type" property.
-          */
-@@ -2245,31 +2245,6 @@ static uint32_t x86_cpu_get_supported_feature_word(FeatureWord w,
-     return r;
- }
- 
--/*
-- * Filters CPU feature words based on host availability of each feature.
-- *
-- * Returns: 0 if all flags are supported by the host, non-zero otherwise.
-- */
--static int x86_cpu_filter_features(X86CPU *cpu)
--{
--    CPUX86State *env = &cpu->env;
--    FeatureWord w;
--    int rv = 0;
--
--    for (w = 0; w < FEATURE_WORDS; w++) {
--        uint32_t host_feat =
--            x86_cpu_get_supported_feature_word(w, false);
--        uint32_t requested_features = env->features[w];
--        env->features[w] &= host_feat;
--        cpu->filtered_features[w] = requested_features & ~env->features[w];
--        if (cpu->filtered_features[w]) {
--            rv = 1;
--        }
--    }
--
--    return rv;
--}
--
- static void x86_cpu_report_filtered_features(X86CPU *cpu)
+-/* class_init for the "host" CPU model
++/* class_init for the "max" CPU model
+  *
+  * This function may be called before KVM is initialized.
+  */
+-static void host_x86_cpu_class_init(ObjectClass *oc, void *data)
++static void max_x86_cpu_class_init(ObjectClass *oc, void *data)
  {
-     FeatureWord w;
-@@ -3093,8 +3068,47 @@ static void x86_cpu_enable_xsave_components(X86CPU *cpu)
-     env->features[FEAT_XSAVE_COMP_HI] = mask >> 32;
+     DeviceClass *dc = DEVICE_CLASS(oc);
+     X86CPUClass *xcc = X86_CPU_CLASS(oc);
+     uint32_t eax = 0, ebx = 0, ecx = 0, edx = 0;
+ 
+-    xcc->kvm_required = true;
+     xcc->ordering = 9;
+ 
+     host_cpuid(0x0, 0, &eax, &ebx, &ecx, &edx);
+@@ -1564,17 +1563,16 @@ static void host_x86_cpu_class_init(ObjectClass *oc, void *data)
+ 
+     xcc->cpu_def = &host_cpudef;
+     xcc->model_description =
+-        "KVM processor with all supported host features "
+-        "(only available in KVM mode)";
++        "Enables all features supported by the accelerator in the current host";
+ 
+     /* level, xlevel, xlevel2, and the feature words are initialized on
+      * instance_init, because they require KVM to be initialized.
+      */
+ 
+-    dc->props = host_x86_cpu_properties;
++    dc->props = max_x86_cpu_properties;
  }
  
--/* Load CPUID data based on configured features */
--static void x86_cpu_load_features(X86CPU *cpu, Error **errp)
-+/***** Steps involved on loading and filtering CPUID data
-+ *
-+ * When initializing and realizing a CPU object, the steps
-+ * involved in setting up CPUID data are:
-+ *
-+ * 1) Loading CPU model definition (X86CPUDefinition). This is
-+ *    implemented by x86_cpu_load_def() and should be completely
-+ *    transparent, as it is done automatically by instance_init.
-+ *    No code should need to look at X86CPUDefinition structs
-+ *    outside instance_init.
-+ *
-+ * 2) CPU expansion. This is done by realize before CPUID
-+ *    filtering, and will make sure host/accelerator data is
-+ *    loaded for CPU models that depend on host capabilities
-+ *    (e.g. "host"). Done by x86_cpu_expand_features().
-+ *
-+ * 3) CPUID filtering. This initializes extra data related to
-+ *    CPUID, and checks if the host supports all capabilities
-+ *    required by the CPU. Runnability of a CPU model is
-+ *    determined at this step. Done by x86_cpu_filter_features().
-+ *
-+ * Some operations don't require all steps to be performed.
-+ * More precisely:
-+ *
-+ * - CPU instance creation (instance_init) will run only CPU
-+ *   model loading. CPU expansion can't run at instance_init-time
-+ *   because host/accelerator data may be not available yet.
-+ * - CPU realization will perform both CPU model expansion and CPUID
-+ *   filtering, and return an error in case one of them fails.
-+ * - query-cpu-definitions needs to run all 3 steps. It needs
-+ *   to run CPUID filtering, as the 'unavailable-features'
-+ *   field is set based on the filtering results.
-+ * - The query-cpu-model-expansion QMP command only needs to run
-+ *   CPU model loading and CPU expansion. It should not filter
-+ *   any CPUID data based on host capabilities.
-+ */
-+
-+/* Expand CPU configuration data, based on configured features
-+ * and host/accelerator capabilities when appropriate.
-+ */
-+static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+-static void host_x86_cpu_initfn(Object *obj)
++static void max_x86_cpu_initfn(Object *obj)
  {
+     X86CPU *cpu = X86_CPU(obj);
      CPUX86State *env = &cpu->env;
-     FeatureWord w;
-@@ -3171,6 +3185,32 @@ out:
-     }
+@@ -1585,7 +1583,6 @@ static void host_x86_cpu_initfn(Object *obj)
+      */
+     cpu->max_features = true;
+ 
+-    /* If KVM is disabled, x86_cpu_realizefn() will report an error later */
+     if (kvm_enabled()) {
+         env->cpuid_min_level =
+             kvm_arch_get_supported_cpuid(s, 0x0, 0, R_EAX);
+@@ -1602,10 +1599,30 @@ static void host_x86_cpu_initfn(Object *obj)
+     object_property_set_bool(OBJECT(cpu), true, "pmu", &error_abort);
  }
  
-+/*
-+ * Finishes initialization of CPUID data, filters CPU feature
-+ * words based on host availability of each feature.
-+ *
-+ * Returns: 0 if all flags are supported by the host, non-zero otherwise.
-+ */
-+static int x86_cpu_filter_features(X86CPU *cpu)
++static const TypeInfo max_x86_cpu_type_info = {
++    .name = X86_CPU_TYPE_NAME("max"),
++    .parent = TYPE_X86_CPU,
++    .instance_init = max_x86_cpu_initfn,
++    .class_init = max_x86_cpu_class_init,
++};
++
++#ifdef CONFIG_KVM
++
++static void host_x86_cpu_class_init(ObjectClass *oc, void *data)
 +{
-+    CPUX86State *env = &cpu->env;
-+    FeatureWord w;
-+    int rv = 0;
++    X86CPUClass *xcc = X86_CPU_CLASS(oc);
 +
-+    for (w = 0; w < FEATURE_WORDS; w++) {
-+        uint32_t host_feat =
-+            x86_cpu_get_supported_feature_word(w, false);
-+        uint32_t requested_features = env->features[w];
-+        env->features[w] &= host_feat;
-+        cpu->filtered_features[w] = requested_features & ~env->features[w];
-+        if (cpu->filtered_features[w]) {
-+            rv = 1;
-+        }
-+    }
++    xcc->kvm_required = true;
++    xcc->ordering = 8;
 +
-+    return rv;
++    xcc->model_description =
++        "KVM processor with all supported host features "
++        "(only available in KVM mode)";
 +}
 +
- #define IS_INTEL_CPU(env) ((env)->cpuid_vendor1 == CPUID_VENDOR_INTEL_1 && \
-                            (env)->cpuid_vendor2 == CPUID_VENDOR_INTEL_2 && \
-                            (env)->cpuid_vendor3 == CPUID_VENDOR_INTEL_3)
-@@ -3198,7 +3238,7 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-         return;
-     }
+ static const TypeInfo host_x86_cpu_type_info = {
+     .name = X86_CPU_TYPE_NAME("host"),
+-    .parent = TYPE_X86_CPU,
+-    .instance_init = host_x86_cpu_initfn,
++    .parent = X86_CPU_TYPE_NAME("max"),
+     .class_init = host_x86_cpu_class_init,
+ };
  
--    x86_cpu_load_features(cpu, &local_err);
-+    x86_cpu_expand_features(cpu, &local_err);
-     if (local_err) {
-         goto out;
+@@ -3820,6 +3837,7 @@ static void x86_cpu_register_types(void)
+     for (i = 0; i < ARRAY_SIZE(builtin_x86_defs); i++) {
+         x86_register_cpudef_type(&builtin_x86_defs[i]);
      }
++    type_register_static(&max_x86_cpu_type_info);
+ #ifdef CONFIG_KVM
+     type_register_static(&host_x86_cpu_type_info);
+ #endif
 -- 
 2.11.0.259.g40922b1
