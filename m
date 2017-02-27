@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ciReB-000100-OP
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:11:53 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ciReD-000143-Du
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:11:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ciRe8-0003w2-KS
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:11:51 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ciReB-0003wj-TK
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:11:53 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 27 Feb 2017 21:09:43 +0100
-Message-Id: <1488226184-9044-43-git-send-email-kwolf@redhat.com>
+Date: Mon, 27 Feb 2017 21:09:44 +0100
+Message-Id: <1488226184-9044-44-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488226184-9044-1-git-send-email-kwolf@redhat.com>
 References: <1488226184-9044-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 42/43] block: Add Error parameter to
- bdrv_set_backing_hd()
+Subject: [Qemu-devel] [PATCH v2 43/43] block: Add Error parameter to
+ bdrv_append()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,238 +23,186 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-Not all callers of bdrv_set_backing_hd() know for sure that attaching
-the backing file will be allowed by the permission system. Return the
-error from the function rather than aborting.
+Aborting on error in bdrv_append() isn't correct. This patch fixes it
+and lets the callers handle failures.
+
+Test case 085 needs a reference output update. This is caused by the
+reversed order of bdrv_set_backing_hd() and change_parent_backing_link()
+in bdrv_append(): When the backing file of the new node is set, the
+parent nodes are still pointing to the old top, so the backing blocker
+is now initialised with the node name rather than the BlockBackend name.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block.c               | 30 +++++++++++++++++++++++-------
- block/commit.c        | 14 +++++++-------
- block/mirror.c        |  7 ++++++-
- block/stream.c        |  9 ++++++++-
- block/vvfat.c         |  2 +-
- include/block/block.h |  3 ++-
- 6 files changed, 47 insertions(+), 18 deletions(-)
+ block.c                    | 23 +++++++++++++++++------
+ block/mirror.c             |  9 ++++++++-
+ blockdev.c                 | 18 +++++++++++++++---
+ include/block/block.h      |  3 ++-
+ tests/qemu-iotests/085.out |  2 +-
+ 5 files changed, 43 insertions(+), 12 deletions(-)
 
 diff --git a/block.c b/block.c
-index 5118828..1a6e033 100644
+index 1a6e033..1581335 100644
 --- a/block.c
 +++ b/block.c
-@@ -1873,7 +1873,8 @@ static void bdrv_parent_cb_resize(BlockDriverState *bs)
-  * Sets the backing file link of a BDS. A new reference is created; callers
-  * which don't need their own reference any more must call bdrv_unref().
-  */
--void bdrv_set_backing_hd(BlockDriverState *bs, BlockDriverState *backing_hd)
-+void bdrv_set_backing_hd(BlockDriverState *bs, BlockDriverState *backing_hd,
-+                         Error **errp)
- {
-     if (backing_hd) {
-         bdrv_ref(backing_hd);
-@@ -1887,9 +1888,12 @@ void bdrv_set_backing_hd(BlockDriverState *bs, BlockDriverState *backing_hd)
-         bs->backing = NULL;
-         goto out;
-     }
--    /* FIXME Error handling */
-+
-     bs->backing = bdrv_attach_child(bs, backing_hd, "backing", &child_backing,
--                                    &error_abort);
-+                                    errp);
-+    if (!bs->backing) {
-+        bdrv_unref(backing_hd);
-+    }
+@@ -2077,6 +2077,7 @@ static BlockDriverState *bdrv_append_temp_snapshot(BlockDriverState *bs,
+     int64_t total_size;
+     QemuOpts *opts = NULL;
+     BlockDriverState *bs_snapshot;
++    Error *local_err = NULL;
+     int ret;
  
- out:
-     bdrv_refresh_limits(bs, NULL);
-@@ -1973,8 +1977,12 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
- 
-     /* Hook up the backing file link; drop our reference, bs owns the
-      * backing_hd reference now */
--    bdrv_set_backing_hd(bs, backing_hd);
-+    bdrv_set_backing_hd(bs, backing_hd, &local_err);
-     bdrv_unref(backing_hd);
+     /* if snapshot, we create a temporary backing file and open it
+@@ -2126,7 +2127,12 @@ static BlockDriverState *bdrv_append_temp_snapshot(BlockDriverState *bs,
+      * call bdrv_unref() on it), so in order to be able to return one, we have
+      * to increase bs_snapshot's refcount here */
+     bdrv_ref(bs_snapshot);
+-    bdrv_append(bs_snapshot, bs);
++    bdrv_append(bs_snapshot, bs, &local_err);
 +    if (local_err) {
++        error_propagate(errp, local_err);
 +        ret = -EINVAL;
-+        goto free_exit;
++        goto out;
 +    }
  
-     qdict_del(parent_options, bdref_key);
+     g_free(tmp_filename);
+     return bs_snapshot;
+@@ -2915,20 +2921,25 @@ static void change_parent_backing_link(BlockDriverState *from,
+  * parents of bs_top after bdrv_append() returns. If the caller needs to keep a
+  * reference of its own, it must call bdrv_ref().
+  */
+-void bdrv_append(BlockDriverState *bs_new, BlockDriverState *bs_top)
++void bdrv_append(BlockDriverState *bs_new, BlockDriverState *bs_top,
++                 Error **errp)
+ {
++    Error *local_err = NULL;
++
+     assert(!atomic_read(&bs_top->in_flight));
+     assert(!atomic_read(&bs_new->in_flight));
  
-@@ -2808,7 +2816,7 @@ static void bdrv_close(BlockDriverState *bs)
-         bs->drv->bdrv_close(bs);
-         bs->drv = NULL;
- 
--        bdrv_set_backing_hd(bs, NULL);
-+        bdrv_set_backing_hd(bs, NULL, &error_abort);
- 
-         if (bs->file != NULL) {
-             bdrv_unref_child(bs, bs->file);
-@@ -2915,7 +2923,8 @@ void bdrv_append(BlockDriverState *bs_new, BlockDriverState *bs_top)
-     bdrv_ref(bs_top);
+-    bdrv_ref(bs_top);
++    bdrv_set_backing_hd(bs_new, bs_top, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        goto out;
++    }
  
      change_parent_backing_link(bs_top, bs_new);
--    bdrv_set_backing_hd(bs_new, bs_top);
-+    /* FIXME Error handling */
-+    bdrv_set_backing_hd(bs_new, bs_top, &error_abort);
-     bdrv_unref(bs_top);
+-    /* FIXME Error handling */
+-    bdrv_set_backing_hd(bs_new, bs_top, &error_abort);
+-    bdrv_unref(bs_top);
  
      /* bs_new is now referenced by its new parents, we don't need the
-@@ -3063,6 +3072,7 @@ int bdrv_drop_intermediate(BlockDriverState *active, BlockDriverState *top,
-                            BlockDriverState *base, const char *backing_file_str)
- {
-     BlockDriverState *new_top_bs = NULL;
-+    Error *local_err = NULL;
-     int ret = -EIO;
- 
-     if (!top->drv || !base->drv) {
-@@ -3095,7 +3105,13 @@ int bdrv_drop_intermediate(BlockDriverState *active, BlockDriverState *top,
-     if (ret) {
-         goto exit;
-     }
--    bdrv_set_backing_hd(new_top_bs, base);
-+
-+    bdrv_set_backing_hd(new_top_bs, base, &local_err);
-+    if (local_err) {
-+        ret = -EPERM;
-+        error_report_err(local_err);
-+        goto exit;
-+    }
- 
-     ret = 0;
- exit:
-diff --git a/block/commit.c b/block/commit.c
-index 1e0f531..22a0a4d 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -121,7 +121,7 @@ static void commit_complete(BlockJob *job, void *opaque)
-      * filter driver from the backing chain. Do this as the final step so that
-      * the 'consistent read' permission can be granted.  */
-     if (remove_commit_top_bs) {
--        bdrv_set_backing_hd(overlay_bs, top);
-+        bdrv_set_backing_hd(overlay_bs, top, &error_abort);
-     }
+      * additional reference any more. */
++out:
+     bdrv_unref(bs_new);
  }
  
-@@ -316,8 +316,8 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-         goto fail;
-     }
- 
--    bdrv_set_backing_hd(commit_top_bs, top);
--    bdrv_set_backing_hd(overlay_bs, commit_top_bs);
-+    bdrv_set_backing_hd(commit_top_bs, top, &error_abort);
-+    bdrv_set_backing_hd(overlay_bs, commit_top_bs, &error_abort);
- 
-     s->commit_top_bs = commit_top_bs;
-     bdrv_unref(commit_top_bs);
-@@ -390,7 +390,7 @@ fail:
-         blk_unref(s->top);
-     }
-     if (commit_top_bs) {
--        bdrv_set_backing_hd(overlay_bs, top);
-+        bdrv_set_backing_hd(overlay_bs, top, &error_abort);
-     }
-     block_job_unref(&s->common);
- }
-@@ -451,8 +451,8 @@ int bdrv_commit(BlockDriverState *bs)
-         goto ro_cleanup;
-     }
- 
--    bdrv_set_backing_hd(commit_top_bs, backing_file_bs);
--    bdrv_set_backing_hd(bs, commit_top_bs);
-+    bdrv_set_backing_hd(commit_top_bs, backing_file_bs, &error_abort);
-+    bdrv_set_backing_hd(bs, commit_top_bs, &error_abort);
- 
-     ret = blk_insert_bs(backing, backing_file_bs, &local_err);
-     if (ret < 0) {
-@@ -532,7 +532,7 @@ ro_cleanup:
- 
-     blk_unref(backing);
-     if (backing_file_bs) {
--        bdrv_set_backing_hd(bs, backing_file_bs);
-+        bdrv_set_backing_hd(bs, backing_file_bs, &error_abort);
-     }
-     bdrv_unref(commit_top_bs);
-     blk_unref(src);
 diff --git a/block/mirror.c b/block/mirror.c
-index eea2d76..f94f3f8 100644
+index f94f3f8..321f7c2 100644
 --- a/block/mirror.c
 +++ b/block/mirror.c
-@@ -503,6 +503,7 @@ static void mirror_exit(BlockJob *job, void *opaque)
-     BlockDriverState *src = s->source;
-     BlockDriverState *target_bs = blk_bs(s->target);
-     BlockDriverState *mirror_top_bs = s->mirror_top_bs;
+@@ -1095,6 +1095,7 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
+     BlockDriverState *mirror_top_bs;
+     bool target_graph_mod;
+     bool target_is_backing;
 +    Error *local_err = NULL;
+     int ret;
  
-     /* Make sure that the source BDS doesn't go away before we called
-      * block_job_completed(). */
-@@ -515,7 +516,11 @@ static void mirror_exit(BlockJob *job, void *opaque)
-     if (s->backing_mode == MIRROR_SOURCE_BACKING_CHAIN) {
-         BlockDriverState *backing = s->is_none_mode ? src : s->base;
-         if (backing_bs(target_bs) != backing) {
--            bdrv_set_backing_hd(target_bs, backing);
-+            bdrv_set_backing_hd(target_bs, backing, &local_err);
-+            if (local_err) {
-+                error_report_err(local_err);
-+                data->ret = -EPERM;
-+            }
-         }
+     if (granularity == 0) {
+@@ -1126,9 +1127,15 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
+      * it alive until block_job_create() even if bs has no parent. */
+     bdrv_ref(mirror_top_bs);
+     bdrv_drained_begin(bs);
+-    bdrv_append(mirror_top_bs, bs);
++    bdrv_append(mirror_top_bs, bs, &local_err);
+     bdrv_drained_end(bs);
+ 
++    if (local_err) {
++        bdrv_unref(mirror_top_bs);
++        error_propagate(errp, local_err);
++        return;
++    }
++
+     /* Make sure that the source is not resized while the job is running */
+     s = block_job_create(job_id, driver, mirror_top_bs,
+                          BLK_PERM_CONSISTENT_READ,
+diff --git a/blockdev.c b/blockdev.c
+index 34b522b..97fbc7e 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -1767,6 +1767,17 @@ static void external_snapshot_prepare(BlkActionState *common,
+ 
+     if (!state->new_bs->drv->supports_backing) {
+         error_setg(errp, "The snapshot does not support backing images");
++        return;
++    }
++
++    /* This removes our old bs and adds the new bs. This is an operation that
++     * can fail, so we need to do it in .prepare; undoing it for abort is
++     * always possible. */
++    bdrv_ref(state->new_bs);
++    bdrv_append(state->new_bs, state->old_bs, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
      }
+ }
  
-diff --git a/block/stream.c b/block/stream.c
-index 0c30d41..bd3d2ce 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -68,6 +68,7 @@ static void stream_complete(BlockJob *job, void *opaque)
-     StreamCompleteData *data = opaque;
-     BlockDriverState *bs = blk_bs(job->blk);
-     BlockDriverState *base = s->base;
-+    Error *local_err = NULL;
+@@ -1777,8 +1788,6 @@ static void external_snapshot_commit(BlkActionState *common)
  
-     if (!block_job_is_cancelled(&s->common) && data->reached_end &&
-         data->ret == 0) {
-@@ -79,9 +80,15 @@ static void stream_complete(BlockJob *job, void *opaque)
-             }
-         }
-         data->ret = bdrv_change_backing_file(bs, base_id, base_fmt);
--        bdrv_set_backing_hd(bs, base);
-+        bdrv_set_backing_hd(bs, base, &local_err);
-+        if (local_err) {
-+            error_report_err(local_err);
-+            data->ret = -EPERM;
-+            goto out;
+     bdrv_set_aio_context(state->new_bs, state->aio_context);
+ 
+-    /* This removes our old bs and adds the new bs */
+-    bdrv_append(state->new_bs, state->old_bs);
+     /* We don't need (or want) to use the transactional
+      * bdrv_reopen_multiple() across all the entries at once, because we
+      * don't want to abort all of them if one of them fails the reopen */
+@@ -1793,7 +1802,9 @@ static void external_snapshot_abort(BlkActionState *common)
+     ExternalSnapshotState *state =
+                              DO_UPCAST(ExternalSnapshotState, common, common);
+     if (state->new_bs) {
+-        bdrv_unref(state->new_bs);
++        if (state->new_bs->backing) {
++            bdrv_replace_in_backing_chain(state->new_bs, state->old_bs);
 +        }
      }
+ }
  
-+out:
-     /* Reopen the image back in read-only mode if necessary */
-     if (s->bs_flags != bdrv_get_flags(bs)) {
-         bdrv_reopen(bs, s->bs_flags, NULL);
-diff --git a/block/vvfat.c b/block/vvfat.c
-index 72b482c..aa61c32 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -3041,7 +3041,7 @@ static int enable_write_target(BlockDriverState *bs, Error **errp)
-                                    &error_abort);
-     *(void**) backing->opaque = s;
+@@ -1804,6 +1815,7 @@ static void external_snapshot_clean(BlkActionState *common)
+     if (state->aio_context) {
+         bdrv_drained_end(state->old_bs);
+         aio_context_release(state->aio_context);
++        bdrv_unref(state->new_bs);
+     }
+ }
  
--    bdrv_set_backing_hd(s->bs, backing);
-+    bdrv_set_backing_hd(s->bs, backing, &error_abort);
-     bdrv_unref(backing);
- 
-     return 0;
 diff --git a/include/block/block.h b/include/block/block.h
-index 07f7561..eac2861 100644
+index eac2861..c7c4a3a 100644
 --- a/include/block/block.h
 +++ b/include/block/block.h
-@@ -247,7 +247,8 @@ BdrvChild *bdrv_open_child(const char *filename,
-                            BlockDriverState* parent,
-                            const BdrvChildRole *child_role,
-                            bool allow_none, Error **errp);
--void bdrv_set_backing_hd(BlockDriverState *bs, BlockDriverState *backing_hd);
-+void bdrv_set_backing_hd(BlockDriverState *bs, BlockDriverState *backing_hd,
-+                         Error **errp);
- int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
-                            const char *bdref_key, Error **errp);
- BlockDriverState *bdrv_open(const char *filename, const char *reference,
+@@ -236,7 +236,8 @@ int bdrv_create(BlockDriver *drv, const char* filename,
+                 QemuOpts *opts, Error **errp);
+ int bdrv_create_file(const char *filename, QemuOpts *opts, Error **errp);
+ BlockDriverState *bdrv_new(void);
+-void bdrv_append(BlockDriverState *bs_new, BlockDriverState *bs_top);
++void bdrv_append(BlockDriverState *bs_new, BlockDriverState *bs_top,
++                 Error **errp);
+ void bdrv_replace_in_backing_chain(BlockDriverState *old,
+                                    BlockDriverState *new);
+ 
+diff --git a/tests/qemu-iotests/085.out b/tests/qemu-iotests/085.out
+index 08e4bb7..182acb4 100644
+--- a/tests/qemu-iotests/085.out
++++ b/tests/qemu-iotests/085.out
+@@ -74,7 +74,7 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/
+ 
+ === Invalid command - snapshot node used as backing hd ===
+ 
+-{"error": {"class": "GenericError", "desc": "Node 'snap_11' is busy: node is used as backing hd of 'virtio0'"}}
++{"error": {"class": "GenericError", "desc": "Node 'snap_11' is busy: node is used as backing hd of 'snap_12'"}}
+ 
+ === Invalid command - snapshot node has a backing image ===
+ 
 -- 
 1.8.3.1
