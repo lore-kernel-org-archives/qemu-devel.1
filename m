@@ -1,47 +1,46 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1ciRB7-0003fL-H6
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:41:50 -0500
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1ciRBG-0003t7-Lq
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:41:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1ciRB3-0003Xb-IQ
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:41:49 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60407
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1ciRBC-0003cW-Jx
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:41:58 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49461)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
-	id 1ciRB3-0003WL-Au
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:41:45 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1RJdEX7085112
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 14:41:44 -0500
-Received: from e24smtp04.br.ibm.com (e24smtp04.br.ibm.com [32.104.18.25])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28vqj0gda3-1
+	id 1ciRBC-0003cJ-AA
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:41:54 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1RJdJqN138738
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 14:41:53 -0500
+Received: from e24smtp01.br.ibm.com (e24smtp01.br.ibm.com [32.104.18.85])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28vknj4p82-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 14:41:44 -0500
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 14:41:52 -0500
 Received: from localhost
-	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e24smtp01.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
-	Mon, 27 Feb 2017 16:41:42 -0300
-Received: from d24relay04.br.ibm.com (d24relay04.br.ibm.com [9.18.232.146])
-	by d24dlp01.br.ibm.com (Postfix) with ESMTP id 25C52352006C
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 14:41:07 -0500 (EST)
+	Mon, 27 Feb 2017 16:41:49 -0300
+Received: from d24relay02.br.ibm.com (d24relay02.br.ibm.com [9.18.232.42])
+	by d24dlp01.br.ibm.com (Postfix) with ESMTP id 1CBB8352005F
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 14:41:12 -0500 (EST)
 Received: from d24av01.br.ibm.com (d24av01.br.ibm.com [9.8.31.91])
-	by d24relay04.br.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	v1RJffK432047180
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 16:41:41 -0300
+	by d24relay02.br.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v1RJfjbL28246210
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 16:41:45 -0300
 Received: from d24av01.br.ibm.com (localhost [127.0.0.1])
 	by d24av01.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
-	v1RJfe9a006377
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 16:41:40 -0300
+	v1RJfjNL006426
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 16:41:45 -0300
 From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Date: Mon, 27 Feb 2017 16:41:28 -0300
+Date: Mon, 27 Feb 2017 16:41:30 -0300
 In-Reply-To: <1488224492-20316-1-git-send-email-joserz@linux.vnet.ibm.com>
 References: <1488224492-20316-1-git-send-email-joserz@linux.vnet.ibm.com>
-Message-Id: <1488224492-20316-2-git-send-email-joserz@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH Risu 1/5] risugen_ppc64: Load random 128-bit
- data to VSX registers
+Message-Id: <1488224492-20316-4-git-send-email-joserz@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH Risu 3/5] configure: Add initial support to
+ PPC64 (big endian)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -53,80 +52,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, nikunj@linux.vnet.ibm.com
 
+This commit set Makefile to point to ppc64le source for both archs
+(ppc64 and ppc64le) because they do the exact same thing. The
+difference is in risugen and how the binary is build.
+
 Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
 ---
- risugen_ppc64.pm | 40 +++++++++++++++++++++++++++++-----------
- 1 file changed, 29 insertions(+), 11 deletions(-)
+ configure | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/risugen_ppc64.pm b/risugen_ppc64.pm
-index cb75300..28b6792 100644
---- a/risugen_ppc64.pm
-+++ b/risugen_ppc64.pm
-@@ -99,6 +99,29 @@ sub write_mov_ri64($$)
-     insn32((0x3e << 26) | (20 << 21) | (1 << 16) | 0x10);
- }
+diff --git a/configure b/configure
+index 1fbc27c..5a91f57 100755
+--- a/configure
++++ b/configure
+@@ -38,11 +38,7 @@ guess_arch() {
+     elif check_define __aarch64__ ; then
+         ARCH="aarch64"
+     elif check_define __powerpc64__ ; then
+-        if check_define __BIG_ENDIAN__; then
+-            ARCH="ppc64"
+-        else
+-            ARCH="ppc64le"
+-        fi
++        ARCH="ppc64le"
+     else
+         echo "This cpu is not supported by risu. Try -h. " >&2
+         exit 1
+@@ -114,6 +110,9 @@ OBJDUMP="${OBJDUMP-${CROSS_PREFIX}objdump}"
  
-+sub write_mov_ri128($$$$)
-+{
-+    my ($imhh, $imh, $iml, $imll) = @_;
-+
-+    # store the lowest 32 bits
-+    write_mov_ri32(20, $imll);
-+    # stw r20, 16(r1)
-+    insn32((0x24 << 26) | (20 << 21) | (1 << 16) | 0x10);
-+    # store the lower 32 bits
-+    write_mov_ri32(20, $iml);
-+    # stw r20, 20(r1)
-+    insn32((0x24 << 26) | (20 << 21) | (1 << 16) | 0x14);
-+    # store the higher 32 bits
-+    write_mov_ri32(20, $imh);
-+    # stw r20, 24(r1)
-+    insn32((0x24 << 26) | (20 << 21) | (1 << 16) | 0x18);
-+    # store the highest 32 bits
-+    write_mov_ri32(20, $imhh);
-+    # stw r20, 28(r1)
-+    insn32((0x24 << 26) | (20 << 21) | (1 << 16) | 0x1c);
-+
-+}
-+
- sub write_random_ppc64_fpdata()
- {
-     for (my $i = 0; $i < 32; $i++) {
-@@ -106,22 +129,16 @@ sub write_random_ppc64_fpdata()
-         write_mov_ri64(rand(0xfffff), rand(0xfffff));
-         # since the EA is r1+16, load such value in FP reg
-         insn32((0x32 << 26) | ($i << 21) | (0x1 << 16) | 0x10);
--        insn32((0x39 << 26) | ($i << 21) | (0x1 << 16) | 0x12);
--
-     }
- }
+ if test "x${ARCH}" = "x"; then
+     guess_arch
++elif test "x${ARCH}" = "xppc64"; then
++    # ppc64 and ppc64le uses the same C source code
++    ARCH="ppc64le"
+ fi
  
--sub write_random_ppc64_fpdata_i()
-+sub write_random_ppc64_vsxdata()
- {
--    # get an space from the stack
--    insn32(0x3ac10020); # addi r22, r1, 32
--    insn32(0x3ee03ff0); # lis r23, 0x3ff0
--    insn32(0x3af70000); # addi r23, r23, 0
--    insn32(0xfaf60000); # std r23, 0(r22)
--
-     for (my $i = 0; $i < 32; $i++) {
--        # lfd f$i, 0(r22)
--        insn32((0x32 << 26 | $i << 21 | 0x16 << 16));
-+        # load a random doubleword value at r0
-+        write_mov_ri128(rand(0xffff), rand(0xffff), rand(0xfffff), rand(0xfffff));
-+        # load the 128-bit data in a vector register
-+        insn32((0x39 << 26) | ($i << 21) | (0x1 << 16) | 0x12);
-     }
- }
- 
-@@ -172,6 +189,7 @@ sub write_random_register_data($)
- 
-     clear_vr_registers();
- 
-+    write_random_ppc64_vsxdata();
-     if ($fp_enabled) {
-         # load floating point / SIMD registers
-         write_random_ppc64_fpdata();
+ generate_makefilein
 -- 
 2.7.4
