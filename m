@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ciPff-0002MP-LG
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:18 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ciPfe-0002LG-8s
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ciPfe-0001te-1A
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:15 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48677)
+	(envelope-from <pm215@archaic.org.uk>) id 1ciPfc-0001s8-Fm
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:14 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48678)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ciPfd-0001lG-NV
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:13 -0500
+	id 1ciPfc-0001qs-7x
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:12 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1ciPfX-0002Nk-Se
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:05:07 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1ciPfb-0002QA-Ew
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:05:11 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 27 Feb 2017 18:04:44 +0000
-Message-Id: <1488218699-31035-16-git-send-email-peter.maydell@linaro.org>
+Date: Mon, 27 Feb 2017 18:04:51 +0000
+Message-Id: <1488218699-31035-23-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1488218699-31035-1-git-send-email-peter.maydell@linaro.org>
 References: <1488218699-31035-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 15/30] armv7m: Fix condition check for taking
- exceptions
+Subject: [Qemu-devel] [PULL 22/30] armv7m: Check exception return consistency
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,98 +32,231 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The M profile condition for when we can take a pending exception or
-interrupt is not the same as that for A/R profile.  The code
-originally copied from the A/R profile version of the
-cpu_exec_interrupt function only worked by chance for the
-very simple case of exceptions being masked by PRIMASK.
-Replace it with a call to a function in the NVIC code that
-correctly compares the priority of the pending exception
-against the current execution priority of the CPU.
+Implement the exception return consistency checks
+described in the v7M pseudocode ExceptionReturn().
 
-[Michael Davidsaver's patchset had a patch to do something
-similar but the implementation ended up being a rewrite.]
+Inspired by a patch from Michael Davidsaver's series, but
+this is a reimplementation from scratch based on the
+ARM ARM pseudocode.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- target/arm/cpu.h      |  8 ++++++++
- hw/intc/armv7m_nvic.c |  7 +++++++
- target/arm/cpu.c      | 16 ++++++++--------
- 3 files changed, 23 insertions(+), 8 deletions(-)
+ target/arm/cpu.h      |  12 +++++-
+ hw/intc/armv7m_nvic.c |  12 +++++-
+ target/arm/helper.c   | 112 +++++++++++++++++++++++++++++++++++++++++++++-----
+ 3 files changed, 123 insertions(+), 13 deletions(-)
 
 diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 38a8e00..649f237 100644
+index 68ad00c..045830a 100644
 --- a/target/arm/cpu.h
 +++ b/target/arm/cpu.h
-@@ -1356,6 +1356,14 @@ uint32_t arm_phys_excp_target_el(CPUState *cs, uint32_t excp_idx,
-                                  uint32_t cur_el, bool secure);
- 
- /* Interface between CPU and Interrupt controller.  */
-+#ifndef CONFIG_USER_ONLY
-+bool armv7m_nvic_can_take_pending_exception(void *opaque);
-+#else
-+static inline bool armv7m_nvic_can_take_pending_exception(void *opaque)
-+{
-+    return true;
-+}
-+#endif
+@@ -1366,7 +1366,17 @@ static inline bool armv7m_nvic_can_take_pending_exception(void *opaque)
+ #endif
  void armv7m_nvic_set_pending(void *opaque, int irq);
- int armv7m_nvic_acknowledge_irq(void *opaque);
- void armv7m_nvic_complete_irq(void *opaque, int irq);
+ void armv7m_nvic_acknowledge_irq(void *opaque);
+-void armv7m_nvic_complete_irq(void *opaque, int irq);
++/**
++ * armv7m_nvic_complete_irq: complete specified interrupt or exception
++ * @opaque: the NVIC
++ * @irq: the exception number to complete
++ *
++ * Returns: -1 if the irq was not active
++ *           1 if completing this irq brought us back to base (no active irqs)
++ *           0 if there is still an irq active after this one was completed
++ * (Ignoring -1, this is the same as the RETTOBASE value before completion.)
++ */
++int armv7m_nvic_complete_irq(void *opaque, int irq);
+ 
+ /* Interface for defining coprocessor registers.
+  * Registers are defined in tables of arm_cp_reginfo structs
 diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index fb4c985..6a03e2c 100644
+index 456480a..718b1a1 100644
 --- a/hw/intc/armv7m_nvic.c
 +++ b/hw/intc/armv7m_nvic.c
-@@ -286,6 +286,13 @@ static inline int nvic_exec_prio(NVICState *s)
-     return MIN(running, s->exception_prio);
+@@ -441,10 +441,11 @@ void armv7m_nvic_acknowledge_irq(void *opaque)
+     nvic_irq_update(s);
  }
  
-+bool armv7m_nvic_can_take_pending_exception(void *opaque)
-+{
-+    NVICState *s = opaque;
-+
-+    return nvic_exec_prio(s) > nvic_pending_prio(s);
-+}
-+
- /* caller must call nvic_irq_update() after this */
- static void set_prio(NVICState *s, unsigned irq, uint8_t prio)
+-void armv7m_nvic_complete_irq(void *opaque, int irq)
++int armv7m_nvic_complete_irq(void *opaque, int irq)
  {
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index f7157dc..04b062c 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -338,13 +338,6 @@ static bool arm_v7m_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-     CPUARMState *env = &cpu->env;
-     bool ret = false;
+     NVICState *s = (NVICState *)opaque;
+     VecInfo *vec;
++    int ret;
  
+     assert(irq > ARMV7M_EXCP_RESET && irq < s->num_irq);
+ 
+@@ -452,6 +453,13 @@ void armv7m_nvic_complete_irq(void *opaque, int irq)
+ 
+     trace_nvic_complete_irq(irq);
+ 
++    if (!vec->active) {
++        /* Tell the caller this was an illegal exception return */
++        return -1;
++    }
++
++    ret = nvic_rettobase(s);
++
+     vec->active = 0;
+     if (vec->level) {
+         /* Re-pend the exception if it's still held high; only
+@@ -462,6 +470,8 @@ void armv7m_nvic_complete_irq(void *opaque, int irq)
+     }
+ 
+     nvic_irq_update(s);
++
++    return ret;
+ }
+ 
+ /* callback when external interrupt line is changed */
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index be731dc..9081771 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -6068,22 +6068,99 @@ static void v7m_push_stack(ARMCPU *cpu)
+     v7m_push(env, env->regs[0]);
+ }
+ 
+-static void do_v7m_exception_exit(CPUARMState *env)
++static void do_v7m_exception_exit(ARMCPU *cpu)
+ {
++    CPUARMState *env = &cpu->env;
+     uint32_t type;
+     uint32_t xpsr;
 -
--    if (interrupt_request & CPU_INTERRUPT_FIQ
--        && !(env->daif & PSTATE_F)) {
--        cs->exception_index = EXCP_FIQ;
--        cc->do_interrupt(cs);
--        ret = true;
--    }
-     /* ARMv7-M interrupt return works by loading a magic value
-      * into the PC.  On real hardware the load causes the
-      * return to occur.  The qemu implementation performs the
-@@ -354,9 +347,16 @@ static bool arm_v7m_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-      * the stack if an interrupt occurred at the wrong time.
-      * We avoid this by disabling interrupts when
-      * pc contains a magic address.
-+     *
-+     * ARMv7-M interrupt masking works differently than -A or -R.
-+     * There is no FIQ/IRQ distinction. Instead of I and F bits
-+     * masking FIQ and IRQ interrupts, an exception is taken only
-+     * if it is higher priority than the current execution priority
-+     * (which depends on state like BASEPRI, FAULTMASK and the
-+     * currently active exception).
-      */
-     if (interrupt_request & CPU_INTERRUPT_HARD
--        && !(env->daif & PSTATE_I)
-+        && (armv7m_nvic_can_take_pending_exception(env->nvic))
-         && (env->regs[15] < 0xfffffff0)) {
-         cs->exception_index = EXCP_IRQ;
-         cc->do_interrupt(cs);
++    bool ufault = false;
++    bool return_to_sp_process = false;
++    bool return_to_handler = false;
++    bool rettobase = false;
++
++    /* We can only get here from an EXCP_EXCEPTION_EXIT, and
++     * arm_v7m_do_unassigned_access() enforces the architectural rule
++     * that jumps to magic addresses don't have magic behaviour unless
++     * we're in Handler mode (compare pseudocode BXWritePC()).
++     */
++    assert(env->v7m.exception != 0);
++
++    /* In the spec pseudocode ExceptionReturn() is called directly
++     * from BXWritePC() and gets the full target PC value including
++     * bit zero. In QEMU's implementation we treat it as a normal
++     * jump-to-register (which is then caught later on), and so split
++     * the target value up between env->regs[15] and env->thumb in
++     * gen_bx(). Reconstitute it.
++     */
+     type = env->regs[15];
++    if (env->thumb) {
++        type |= 1;
++    }
++
++    qemu_log_mask(CPU_LOG_INT, "Exception return: magic PC %" PRIx32
++                  " previous exception %d\n",
++                  type, env->v7m.exception);
++
++    if (extract32(type, 5, 23) != extract32(-1, 5, 23)) {
++        qemu_log_mask(LOG_GUEST_ERROR, "M profile: zero high bits in exception "
++                      "exit PC value 0x%" PRIx32 " are UNPREDICTABLE\n", type);
++    }
++
+     if (env->v7m.exception != ARMV7M_EXCP_NMI) {
+         /* Auto-clear FAULTMASK on return from other than NMI */
+         env->daif &= ~PSTATE_F;
+     }
+-    if (env->v7m.exception != 0) {
+-        armv7m_nvic_complete_irq(env->nvic, env->v7m.exception);
++
++    switch (armv7m_nvic_complete_irq(env->nvic, env->v7m.exception)) {
++    case -1:
++        /* attempt to exit an exception that isn't active */
++        ufault = true;
++        break;
++    case 0:
++        /* still an irq active now */
++        break;
++    case 1:
++        /* we returned to base exception level, no nesting.
++         * (In the pseudocode this is written using "NestedActivation != 1"
++         * where we have 'rettobase == false'.)
++         */
++        rettobase = true;
++        break;
++    default:
++        g_assert_not_reached();
++    }
++
++    switch (type & 0xf) {
++    case 1: /* Return to Handler */
++        return_to_handler = true;
++        break;
++    case 13: /* Return to Thread using Process stack */
++        return_to_sp_process = true;
++        /* fall through */
++    case 9: /* Return to Thread using Main stack */
++        if (!rettobase &&
++            !(env->v7m.ccr & R_V7M_CCR_NONBASETHRDENA_MASK)) {
++            ufault = true;
++        }
++        break;
++    default:
++        ufault = true;
++    }
++
++    if (ufault) {
++        /* Bad exception return: instead of popping the exception
++         * stack, directly take a usage fault on the current stack.
++         */
++        env->v7m.cfsr |= R_V7M_CFSR_INVPC_MASK;
++        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE);
++        v7m_exception_taken(cpu, type | 0xf0000000);
++        qemu_log_mask(CPU_LOG_INT, "...taking UsageFault on existing "
++                      "stackframe: failed exception return integrity check\n");
++        return;
+     }
+ 
+     /* Switch to the target stack.  */
+-    switch_v7m_sp(env, (type & 4) != 0);
++    switch_v7m_sp(env, return_to_sp_process);
+     /* Pop registers.  */
+     env->regs[0] = v7m_pop(env);
+     env->regs[1] = v7m_pop(env);
+@@ -6107,11 +6184,24 @@ static void do_v7m_exception_exit(CPUARMState *env)
+     /* Undo stack alignment.  */
+     if (xpsr & 0x200)
+         env->regs[13] |= 4;
+-    /* ??? The exception return type specifies Thread/Handler mode.  However
+-       this is also implied by the xPSR value. Not sure what to do
+-       if there is a mismatch.  */
+-    /* ??? Likewise for mismatches between the CONTROL register and the stack
+-       pointer.  */
++
++    /* The restored xPSR exception field will be zero if we're
++     * resuming in Thread mode. If that doesn't match what the
++     * exception return type specified then this is a UsageFault.
++     */
++    if (return_to_handler == (env->v7m.exception == 0)) {
++        /* Take an INVPC UsageFault by pushing the stack again. */
++        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE);
++        env->v7m.cfsr |= R_V7M_CFSR_INVPC_MASK;
++        v7m_push_stack(cpu);
++        v7m_exception_taken(cpu, type | 0xf0000000);
++        qemu_log_mask(CPU_LOG_INT, "...taking UsageFault on new stackframe: "
++                      "failed exception return integrity check\n");
++        return;
++    }
++
++    /* Otherwise, we have a successful exception exit. */
++    qemu_log_mask(CPU_LOG_INT, "...successful exception return\n");
+ }
+ 
+ static void arm_log_exception(int idx)
+@@ -6184,7 +6274,7 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
+     case EXCP_IRQ:
+         break;
+     case EXCP_EXCEPTION_EXIT:
+-        do_v7m_exception_exit(env);
++        do_v7m_exception_exit(cpu);
+         return;
+     default:
+         cpu_abort(cs, "Unhandled exception 0x%x\n", cs->exception_index);
 -- 
 2.7.4
