@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41544)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ciPEn-0001do-Go
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:37:30 -0500
+	(envelope-from <thuth@redhat.com>) id 1ciPQj-0001HO-52
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:49:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ciPEm-0000gC-NC
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:37:29 -0500
-Date: Mon, 27 Feb 2017 17:37:20 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170227173720.GJ10201@stefanha-x1.localdomain>
-References: <1484884080-28836-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1484884080-28836-6-git-send-email-zhang.zhanghailiang@huawei.com>
+	(envelope-from <thuth@redhat.com>) id 1ciPQg-0005XR-1h
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:49:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51916)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ciPQf-0005X4-Os
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:49:45 -0500
+References: <1485333658-23035-1-git-send-email-thuth@redhat.com>
+	<0eca8185-8e94-46f8-6b7a-36c4a21bc28d@redhat.com>
+	<d40da5e8-c48f-a35b-6c3c-b6164ae38040@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <76dcc6f2-f888-ad42-eb72-56940b5a7f87@redhat.com>
+Date: Mon, 27 Feb 2017 18:49:42 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="I/5syFLg1Ed7r+1G"
-Content-Disposition: inline
-In-Reply-To: <1484884080-28836-6-git-send-email-zhang.zhanghailiang@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v3 5/6] replication: Implement block
- replication for shared disk case
+In-Reply-To: <d40da5e8-c48f-a35b-6c3c-b6164ae38040@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] null-machine: Add support for the
+ "-kernel" parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,87 +29,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, xiecl.fnst@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, xuquan8@huawei.com, Wen Congyang <wency@cn.fujitsu.com>
+To: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Max Filippov <jcmvbkbc@gmail.com>, Laurent Vivier <laurent@vivier.eu>, Alistair Francis <alistair.francis@xilinx.com>
 
-
---I/5syFLg1Ed7r+1G
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Jan 20, 2017 at 11:47:59AM +0800, zhanghailiang wrote:
-> Just as the scenario of non-shared disk block replication,
-> we are going to implement block replication from many basic
-> blocks that are already in QEMU.
-> The architecture is:
+On 27.02.2017 14:16, Marcel Apfelbaum wrote:
+> On 02/27/2017 01:43 PM, Thomas Huth wrote:
+>> On 25.01.2017 09:40, Thomas Huth wrote:
+>>> We can have basic support for the "-kernel" parameter quite easily
+>>> by using the generic loader device. This should be enough for most
+>>> boards which do not need special machine-specific magic for loading
+>>> a kernel (and for those that need special magic, the generic "none"
+>>> machine is likely not suitable for using it as an instruction set
+>>> simulator board anyway).
+>>>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>>  PS: If we can't agree on using the generic loader here, I can also
+>>>      prepare a patch instead that simply prints out an error message
+>>>      if the user tried to use the "-kernel" parameter.
+>>>
+>>>  hw/core/null-machine.c | 14 ++++++++++++++
+>>>  1 file changed, 14 insertions(+)
+>>>
+>>> diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
+>>> index 27c8369..866e699 100644
+>>> --- a/hw/core/null-machine.c
+>>> +++ b/hw/core/null-machine.c
+>>> @@ -5,6 +5,7 @@
+>>>   *
+>>>   * Authors:
+>>>   *  Anthony Liguori   <aliguori@us.ibm.com>
+>>> + *  Thomas Huth       <thuth@redhat.com>
+>>>   *
+>>>   * This work is licensed under the terms of the GNU GPL, version 2
+>>> or later.
+>>>   * See the COPYING file in the top-level directory.
+>>> @@ -16,6 +17,7 @@
+>>>  #include "qemu/error-report.h"
+>>>  #include "hw/hw.h"
+>>>  #include "hw/boards.h"
+>>> +#include "hw/core/generic-loader.h"
+>>>  #include "sysemu/sysemu.h"
+>>>  #include "exec/address-spaces.h"
+>>>  #include "cpu.h"
+>>> @@ -40,6 +42,18 @@ static void machine_none_init(MachineState *mch)
+>>>          memory_region_allocate_system_memory(ram, NULL, "ram",
+>>> mch->ram_size);
+>>>          memory_region_add_subregion(get_system_memory(), 0, ram);
+>>>      }
+>>> +
+>>> +    /* Load kernel */
+>>> +    if (mch->kernel_filename) {
+>>> +        DeviceState *loader;
+>>> +
+>>> +        loader =3D qdev_create(sysbus_get_default(),
+>>> TYPE_GENERIC_LOADER);
+>>> +        qdev_prop_set_string(loader, "file", mch->kernel_filename);
+>>> +        if (cpu) {
+>>> +            qdev_prop_set_uint32(loader, "cpu-num", cpu->cpu_index);
+>>> +        }
+>>> +        qdev_init_nofail(loader);
+>>> +    }
+>>>  }
+>>>
+>>>  static void machine_none_machine_init(MachineClass *mc)
+>>
+>> *ping*
+>>
+>> Apparently the discussion has ceased ... can we get a consensus whethe=
+r
+>> we want to support the "-kernel" parameter for the "none" machine or n=
+ot?
+>>
 >=20
->          virtio-blk                     ||                               =
-=2E----------
->              /                          ||                               =
-| Secondary
->             /                           ||                               =
-'----------
->            /                            ||                               =
-  virtio-blk
->           /                             ||                               =
-       |
->           |                             ||                               =
-replication(5)
->           |                    NBD  -------->   NBD   (2)                =
-       |
->           |                  client     ||    server ---> hidden disk <--=
- active disk(4)
->           |                     ^       ||                      |
->           |              replication(1) ||                      |
->           |                     |       ||                      |
->           |   +-----------------'       ||                      |
->          (3)  |drive-backup sync=3Dnone   ||                      |
-> --------. |   +-----------------+       ||                      |
-> Primary | |                     |       ||           backing    |
-> --------' |                     |       ||                      |
->           V                     |                               |
->        +-------------------------------------------+            |
->        |               shared disk                 | <----------+
->        +-------------------------------------------+
->=20
->     1) Primary writes will read original data and forward it to Secondary
->        QEMU.
->     2) The hidden-disk is created automatically. It buffers the original =
-content
->        that is modified by the primary VM. It should also be an empty dis=
-k, and
->        the driver supports bdrv_make_empty() and backing file.
->     3) Primary write requests will be written to Shared disk.
->     4) Secondary write requests will be buffered in the active disk and it
->        will overwrite the existing sector content in the buffer.
->=20
-> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> Signed-off-by: Wen Congyang <wency@cn.fujitsu.com>
-> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+> Why do we need the "-kernel" parameter for the null-machine? I mean -
+> what are the use cases?
 
-Are there any restrictions on the shared disk?  For example the -drive
-cache=3D mode must be 'none'.  If the cache mode isn't 'none' the
-secondary host might have old data in the host page cache.  The
-Secondary QEMU would have an inconsistent view of the shared disk.
+Since it is now possible to instantiate a CPU and memory with the
+null-machine, you can use it as a simple instruction set simulator board
+now. Start QEMU with something like "-M none -cpu xxx -m 1G -S -s" and
+then connect a remote GDB to interact with the emulated CPU. This is
+e.g. useful for CPU models that do not have a matching emulated machine
+yet. Adding the possibility to use the "-kernel" parameter for this,
+too, would make things a little bit more comfortable on certain targets,
+since you then don't have to fiddle with the generic-loader device.
 
-Are image file formats like qcow2 supported for the shared disk?  Extra
-steps are required to achieve consistency, see bdrv_invalidate_cache().
-
-Stefan
-
---I/5syFLg1Ed7r+1G
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYtGPQAAoJEJykq7OBq3PIElUH/jq83ZFJjK+tBfAm7Asrqz8h
-CZUeewqqWYQ5RUfFqODcL+k7S1bBIV7rvSZUyKvVQ2Zi5e8hXogG9Ugjj3iLSv4y
-eYpHrPObIxjBhyrd1K2pA7qFmzlaYWneLhNYpBTvNq8zNs9MGQPNWjOBoe7viXpQ
-t8yltNdDvOeREmRjD+cKXgYqPE3wgetSIEJEIj/zVEcWrTYa5tNdLHIIK8vN0slw
-RIX523ZRbBfDxr+OdVKDSAPz8oWeYYlynFh9rwpb9vWh50eCmVbPvMQTmiC7d5yc
-EoXN3ZLADdqhSE7Uo+HCnOd0yR/jCjF3uxYvdswqrFkxOrM0hjP2iCJtSDvMRUs=
-=ao8W
------END PGP SIGNATURE-----
-
---I/5syFLg1Ed7r+1G--
+ Thomas
