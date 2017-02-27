@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54710)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ciJzf-0000TK-PC
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:01:32 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1ciK5q-0004GM-1l
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:07:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ciJza-0004XF-Rw
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:01:31 -0500
-Received: from 2.mo6.mail-out.ovh.net ([46.105.76.65]:39458)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ciJza-0004WR-ML
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:01:26 -0500
-Received: from player761.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id ED3F8B1CAF
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 13:01:24 +0100 (CET)
-Date: Mon, 27 Feb 2017 13:01:20 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170227130120.6ec54cc2@bahia.lan>
-In-Reply-To: <20170227111726.9237-1-pbonzini@redhat.com>
-References: <20170227111726.9237-1-pbonzini@redhat.com>
+	(envelope-from <dovgaluk@ispras.ru>) id 1ciK5k-0006B0-WC
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:07:53 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20170131115728.5244.21690.stgit@PASHA-ISP>
+	<20170131115734.5244.64846.stgit@PASHA-ISP>
+	<20170222100543.GC4112@noname.str.redhat.com>
+In-Reply-To: <20170222100543.GC4112@noname.str.redhat.com>
+Date: Mon, 27 Feb 2017 15:07:35 +0300
+Message-ID: <002701d290f2$1541b9c0$3fc52d40$@ru>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/ypDOBS=pfuLUkhC7c.3E8._";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH] tests-aio-multithread: use atomic_read
- properly
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH 1/3] block: implement bdrv_snapshot_goto
+ for blkreplay
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,65 +27,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com
+To: 'Kevin Wolf' <kwolf@redhat.com>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
---Sig_/ypDOBS=pfuLUkhC7c.3E8._
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+> From: Kevin Wolf [mailto:kwolf@redhat.com]
+> Am 31.01.2017 um 12:57 hat Pavel Dovgalyuk geschrieben:
+> > This patch enables making snapshots with blkreplay used in
+> > block devices.
+> >
+> > Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+> 
+> Specifically, I think it avoids the blkreplay_open/close sequence. Is
+> this what is needed to make it work?
 
-On Mon, 27 Feb 2017 12:17:26 +0100
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+Then I'll need to implement bdrv_open, because there is only bdrv_file_open
+for blkreplay now.
 
-> nodes[id].next is written by other threads.  If atomic_read is not used
-> (matching atomic_set in mcs_mutex_lock!) the compiler can optimize the
-> whole "if" away!
->=20
-> Reported-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
+Which way is better?
 
-Cool ! I can use travis again :)
+> We should probably mention in the commit message the exact reason why
+> implementing .bdrv_snapshot_goto, but not the other snapshot related
+> callbacks, fixes things. If you confirm my assumption, I can add that
+> while applying.
 
-Tested-by: Greg Kurz <groug@kaod.org>
-
->  tests/test-aio-multithread.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/tests/test-aio-multithread.c b/tests/test-aio-multithread.c
-> index f11e990..8b0b40e 100644
-> --- a/tests/test-aio-multithread.c
-> +++ b/tests/test-aio-multithread.c
-> @@ -309,7 +309,7 @@ static void mcs_mutex_lock(void)
->  static void mcs_mutex_unlock(void)
->  {
->      int next;
-> -    if (nodes[id].next =3D=3D -1) {
-> +    if (atomic_read(&nodes[id].next) =3D=3D -1) {
->          if (atomic_read(&mutex_head) =3D=3D id &&
->              atomic_cmpxchg(&mutex_head, id, -1) =3D=3D id) {
->              /* Last item in the list, exit.  */
-> @@ -323,7 +323,7 @@ static void mcs_mutex_unlock(void)
->      }
-> =20
->      /* Wake up the next in line.  */
-> -    next =3D nodes[id].next;
-> +    next =3D atomic_read(&nodes[id].next);
->      nodes[next].locked =3D 0;
->      qemu_futex_wake(&nodes[next].locked, 1);
->  }
-
-
---Sig_/ypDOBS=pfuLUkhC7c.3E8._
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAli0FRAACgkQAvw66wEB28IksQCfYG5+ippacIDjzbs+FkjNNYN2
-LU4AoJLp8iIbK2/lm6yKnCum43LHvMwW
-=1LQe
------END PGP SIGNATURE-----
-
---Sig_/ypDOBS=pfuLUkhC7c.3E8._--
+Pavel Dovgalyuk
