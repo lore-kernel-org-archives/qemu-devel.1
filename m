@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ciRQr-0000YH-QD
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:58:07 -0500
+	(envelope-from <eblake@redhat.com>) id 1ciRba-00075j-Oh
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:09:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ciRQo-0008Cu-Lt
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:58:05 -0500
-Received: from 2.mo6.mail-out.ovh.net ([46.105.76.65]:56061)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ciRQo-0008CR-F0
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:58:02 -0500
-Received: from player761.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 03047B37B5
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 20:58:00 +0100 (CET)
-Date: Mon, 27 Feb 2017 20:57:53 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170227205753.60b8a225@bahia.lan>
-In-Reply-To: <20170227194134.GH2778@thinpad.lan.raisama.net>
-References: <20170227162501.29280-1-ehabkost@redhat.com>
-	<CAFEAcA8b_tdQAP6YVDRaZKzHLed5xKbfABtJUV0U43HpkTiBdg@mail.gmail.com>
-	<20170227194134.GH2778@thinpad.lan.raisama.net>
+	(envelope-from <eblake@redhat.com>) id 1ciRbZ-0002l7-Mk
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:09:10 -0500
+References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
+	<1487689130-30373-49-git-send-email-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2162d5ff-baa1-3c5a-5180-23ac21d83b85@redhat.com>
+Date: Mon, 27 Feb 2017 14:09:02 -0600
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/B4EHs+vVyRVf7.lk_I5POe3";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] travis-ci 'make check' timeouts (was Re: [PULL
- 00/11] x86 queue, 2017-02-27)
+In-Reply-To: <1487689130-30373-49-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="1qMLfmT6Eovgm2JhUThxKKgceAGnt0VDs"
+Subject: Re: [Qemu-devel] [PATCH 48/54] nbd/server: Use real permissions for
+ NBD exports
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,47 +25,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
---Sig_/B4EHs+vVyRVf7.lk_I5POe3
-Content-Type: text/plain; charset=US-ASCII
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--1qMLfmT6Eovgm2JhUThxKKgceAGnt0VDs
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com
+Message-ID: <2162d5ff-baa1-3c5a-5180-23ac21d83b85@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 48/54] nbd/server: Use real permissions for
+ NBD exports
+References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
+ <1487689130-30373-49-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1487689130-30373-49-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 27 Feb 2017 16:41:34 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+On 02/21/2017 08:58 AM, Kevin Wolf wrote:
+> NBD can't cope with device size changes, so resize must be forbidden,
+> but otherwise we can tolerate anything. Depending on whether the export=
 
-> On Mon, Feb 27, 2017 at 07:16:03PM +0000, Peter Maydell wrote:
-> [...]
-> > This seemed to hang in 'make check' on x86. I didn't have time to
-> > investigate, so I'll have another go with it later. =20
+> is writable or not, we only require consistent reads and writes.
+
+Well, there is a proposal for NBD to grow an extension to support
+resizes, but nothing that will land in time for qemu 2.9 :)
+
 >=20
-> I have been seeing lots of travis-ci failures recently because of
-> 'make check' taking too long. The jobs seem to timeout while
-> running tests/test-aio-multithread.
->=20
-> I see similar failures on recent qemu.git master jobs, too:
-> https://travis-ci.org/qemu/qemu/builds
->=20
-> Are they similar to the hang you have seen?
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  nbd/server.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
 >=20
 
-The problem with tests/test-aio-multithread got fixed today with the
-following commit:
 
-http://git.qemu-project.org/?p=3Dqemu.git;a=3Dcommit;h=3D3b1d8169844fafee18=
-4366b0e0d7080534758b4d
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
---Sig_/B4EHs+vVyRVf7.lk_I5POe3
-Content-Type: application/pgp-signature
+
+--1qMLfmT6Eovgm2JhUThxKKgceAGnt0VDs
+Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iEYEARECAAYFAli0hMEACgkQAvw66wEB28JTIgCfUImnu5w42BW6NXn514oLbPGz
-caUAn0u9h6pkdB1qtdFe0UU/cec/3RL7
-=efdr
+iQEcBAEBCAAGBQJYtIdeAAoJEKeha0olJ0NqbsQH/0MNrgqw4UTWw03/P4M6Gxri
+YodEG9hPOBgFApZ0XIQRy+NdYFkdhqCE8CNkBLzB2+VwwoJ0Y5FChexQbeFc7MZh
+QgnlrW3/nuALqDZ42KOBi5jiLYvT1wdPH46KVr9XAK0zEBk/8WnMVJQcYT0kQDE2
+jZjJHR27umS0rtOfO5dwrBhvFeJEIMcbZ5GgnPM54Ddc0fkJj4CY6BM7jT8PR1xL
+YvqwHk3mq/fKVfL87c5E+wHohSYF41/7W+q14IYOIr3JTxRn/kc0cC6MP93Mw2oJ
+vIdolFmzf65pt3gaVDlAbyTtb3RbfOyQA2g0Gl/sL17w8m8lWkqQ+jFqmpJwhyk=
+=Z7BK
 -----END PGP SIGNATURE-----
 
---Sig_/B4EHs+vVyRVf7.lk_I5POe3--
+--1qMLfmT6Eovgm2JhUThxKKgceAGnt0VDs--
