@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ciRdF-0008Rq-4a
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:10:54 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ciRdL-00007D-JP
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:11:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ciRdD-0003VX-S2
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:10:53 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ciRdK-0003Xy-J7
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:10:59 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 27 Feb 2017 21:09:22 +0100
-Message-Id: <1488226184-9044-22-git-send-email-kwolf@redhat.com>
+Date: Mon, 27 Feb 2017 21:09:24 +0100
+Message-Id: <1488226184-9044-24-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488226184-9044-1-git-send-email-kwolf@redhat.com>
 References: <1488226184-9044-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 21/43] block: Add
- BdrvChildRole.get_parent_desc()
+Subject: [Qemu-devel] [PATCH v2 23/43] block: Add BdrvChildRole.stay_at_node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,120 +22,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-For meaningful error messages in the permission system, we need to get
-some human-readable description of the parent of a BdrvChild.
+When the parents' child links are updated in bdrv_append() or
+bdrv_replace_in_backing_chain(), this should affect all child links of
+BlockBackends or other nodes, but not on child links held for other
+purposes (like for setting permissions). This patch allows to control
+the behaviour per BdrvChildRole.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c                   |  9 +++++++++
- block/block-backend.c     | 21 +++++++++++++++++++++
- include/block/block_int.h |  6 ++++++
- 3 files changed, 36 insertions(+)
+ block.c                   | 3 +++
+ include/block/block_int.h | 4 ++++
+ 2 files changed, 7 insertions(+)
 
 diff --git a/block.c b/block.c
-index 189351e..c4696f1 100644
+index a0c1886..6456917 100644
 --- a/block.c
 +++ b/block.c
-@@ -707,6 +707,12 @@ int bdrv_parse_cache_mode(const char *mode, int *flags, bool *writethrough)
-     return 0;
- }
+@@ -2844,6 +2844,9 @@ static void change_parent_backing_link(BlockDriverState *from,
+     BdrvChild *c, *next, *to_c;
  
-+static char *bdrv_child_get_parent_desc(BdrvChild *c)
-+{
-+    BlockDriverState *parent = c->opaque;
-+    return g_strdup(bdrv_get_device_or_node_name(parent));
-+}
-+
- static void bdrv_child_cb_drained_begin(BdrvChild *child)
- {
-     BlockDriverState *bs = child->opaque;
-@@ -774,6 +780,7 @@ static void bdrv_inherited_options(int *child_flags, QDict *child_options,
- }
- 
- const BdrvChildRole child_file = {
-+    .get_parent_desc = bdrv_child_get_parent_desc,
-     .inherit_options = bdrv_inherited_options,
-     .drained_begin   = bdrv_child_cb_drained_begin,
-     .drained_end     = bdrv_child_cb_drained_end,
-@@ -794,6 +801,7 @@ static void bdrv_inherited_fmt_options(int *child_flags, QDict *child_options,
- }
- 
- const BdrvChildRole child_format = {
-+    .get_parent_desc = bdrv_child_get_parent_desc,
-     .inherit_options = bdrv_inherited_fmt_options,
-     .drained_begin   = bdrv_child_cb_drained_begin,
-     .drained_end     = bdrv_child_cb_drained_end,
-@@ -824,6 +832,7 @@ static void bdrv_backing_options(int *child_flags, QDict *child_options,
- }
- 
- const BdrvChildRole child_backing = {
-+    .get_parent_desc = bdrv_child_get_parent_desc,
-     .inherit_options = bdrv_backing_options,
-     .drained_begin   = bdrv_child_cb_drained_begin,
-     .drained_end     = bdrv_child_cb_drained_end,
-diff --git a/block/block-backend.c b/block/block-backend.c
-index fcc42b5..38a3858 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -80,6 +80,7 @@ static const AIOCBInfo block_backend_aiocb_info = {
- 
- static void drive_info_del(DriveInfo *dinfo);
- static BlockBackend *bdrv_first_blk(BlockDriverState *bs);
-+static char *blk_get_attached_dev_id(BlockBackend *blk);
- 
- /* All BlockBackends */
- static QTAILQ_HEAD(, BlockBackend) block_backends =
-@@ -102,6 +103,25 @@ static void blk_root_drained_end(BdrvChild *child);
- static void blk_root_change_media(BdrvChild *child, bool load);
- static void blk_root_resize(BdrvChild *child);
- 
-+static char *blk_root_get_parent_desc(BdrvChild *child)
-+{
-+    BlockBackend *blk = child->opaque;
-+    char *dev_id;
-+
-+    if (blk->name) {
-+        return g_strdup(blk->name);
-+    }
-+
-+    dev_id = blk_get_attached_dev_id(blk);
-+    if (*dev_id) {
-+        return dev_id;
-+    } else {
-+        /* TODO Callback into the BB owner for something more detailed */
-+        g_free(dev_id);
-+        return g_strdup("a block device");
-+    }
-+}
-+
- static const char *blk_root_get_name(BdrvChild *child)
- {
-     return blk_name(child->opaque);
-@@ -113,6 +133,7 @@ static const BdrvChildRole child_root = {
-     .change_media       = blk_root_change_media,
-     .resize             = blk_root_resize,
-     .get_name           = blk_root_get_name,
-+    .get_parent_desc    = blk_root_get_parent_desc,
- 
-     .drained_begin      = blk_root_drained_begin,
-     .drained_end        = blk_root_drained_end,
+     QLIST_FOREACH_SAFE(c, &from->parents, next_parent, next) {
++        if (c->role->stay_at_node) {
++            continue;
++        }
+         if (c->role == &child_backing) {
+             /* @from is generally not allowed to be a backing file, except for
+              * when @to is the overlay. In that case, @from may not be replaced
 diff --git a/include/block/block_int.h b/include/block/block_int.h
-index e00d0f4..3177b9f 100644
+index 3177b9f..a0d9328 100644
 --- a/include/block/block_int.h
 +++ b/include/block/block_int.h
-@@ -452,6 +452,12 @@ struct BdrvChildRole {
-      * name), or NULL if the parent can't provide a better name. */
-     const char* (*get_name)(BdrvChild *child);
+@@ -441,6 +441,10 @@ typedef struct BdrvAioNotifier {
+ } BdrvAioNotifier;
  
-+    /* Returns a malloced string that describes the parent of the child for a
-+     * human reader. This could be a node-name, BlockBackend name, qdev ID or
-+     * QOM path of the device owning the BlockBackend, job type and ID etc. The
-+     * caller is responsible for freeing the memory. */
-+    char* (*get_parent_desc)(BdrvChild *child);
+ struct BdrvChildRole {
++    /* If true, bdrv_replace_in_backing_chain() doesn't change the node this
++     * BdrvChild points to. */
++    bool stay_at_node;
 +
-     /*
-      * If this pair of functions is implemented, the parent doesn't issue new
-      * requests after returning from .drained_begin() until .drained_end() is
+     void (*inherit_options)(int *child_flags, QDict *child_options,
+                             int parent_flags, QDict *parent_options);
+ 
 -- 
 1.8.3.1
