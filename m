@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38870)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ciNt1-0004B9-Da
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:10:56 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ciNv1-0005os-1N
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:13:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ciNsx-0007zZ-VJ
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:10:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:49660)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ciNsx-0007yt-OD
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:10:51 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ciNsv-00016R-L7
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 16:10:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 98ADC2E80C6
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 16:10:49 +0000 (UTC)
+	(envelope-from <mreitz@redhat.com>) id 1ciNuz-0000Dz-HV
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:12:59 -0500
+References: <20170227004545.hzpr266jzturlxdh@var.youpi.perso.aquilenet.fr>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <4bbc4d50-3c87-bd83-b74d-6aa8b020f2c1@redhat.com>
+Date: Mon, 27 Feb 2017 17:12:47 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 27 Feb 2017 15:58:11 -0000
-From: Nehal J Wani <nehaljw.kkd1@gmail.com>
-Reply-To: Bug 1668273 <1668273@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170227140328.20639.14786.malonedeb@soybean.canonical.com>
-Message-Id: <20170227155811.5587.81925.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1668273] Re: DoS possible on - a QEMU process
- using userspace SLIRP?
+In-Reply-To: <20170227004545.hzpr266jzturlxdh@var.youpi.perso.aquilenet.fr>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="xs7gA6T9X5O576G7xsu1qaRHuObI0ei6d"
+Subject: Re: [Qemu-devel] [PATCH] blk: Add discard=sparse mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,109 +23,238 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Samuel Thibault <samuel.thibault@gnu.org>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-But lsof shows that all connections are stuck at FIN_WAIT2 for an
-indefinite amount of time. Is that expected?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--xs7gA6T9X5O576G7xsu1qaRHuObI0ei6d
+From: Max Reitz <mreitz@redhat.com>
+To: Samuel Thibault <samuel.thibault@gnu.org>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Message-ID: <4bbc4d50-3c87-bd83-b74d-6aa8b020f2c1@redhat.com>
+Subject: Re: [PATCH] blk: Add discard=sparse mode
+References: <20170227004545.hzpr266jzturlxdh@var.youpi.perso.aquilenet.fr>
+In-Reply-To: <20170227004545.hzpr266jzturlxdh@var.youpi.perso.aquilenet.fr>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
--- =
+Hi,
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1668273
+On 27.02.2017 01:45, Samuel Thibault wrote:
+> By default, on discard requests, the posix block backend punches holes =
+but
+> re-fallocates them to keep the allocated size intact. In some situation=
+s
+> it is however convenient, when using sparse disk images, to see disk im=
+age
+> sizes shrink on discard requests.
+>=20
+> This commit adds a discard=3Dsparse mode which does this, by disabling =
+the
+> fallocate call.
+>=20
+> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+>=20
+> diff --git a/block.c b/block.c
+> index b663204f3f..e9cd83210a 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -665,12 +665,14 @@ static void bdrv_join_options(BlockDriverState *b=
+s, QDict *options,
+>   */
+>  int bdrv_parse_discard_flags(const char *mode, int *flags)
+>  {
+> -    *flags &=3D ~BDRV_O_UNMAP;
+> +    *flags &=3D ~(BDRV_O_UNMAP | BDRV_O_SPARSE);
+> =20
+>      if (!strcmp(mode, "off") || !strcmp(mode, "ignore")) {
+>          /* do nothing */
+>      } else if (!strcmp(mode, "on") || !strcmp(mode, "unmap")) {
+>          *flags |=3D BDRV_O_UNMAP;
+> +    } else if (!strcmp(mode, "sparse")) {
+> +        *flags |=3D BDRV_O_UNMAP | BDRV_O_SPARSE;
+>      } else {
+>          return -1;
+>      }
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 4de1abd023..f9efadc5be 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -1057,6 +1057,10 @@ static ssize_t handle_aiocb_write_zeroes(RawPosi=
+xAIOData *aiocb)
+>      BDRVRawState *s =3D aiocb->bs->opaque;
+>  #endif
+> =20
+> +#if defined(CONFIG_FALLOCATE_PUNCH_HOLE) || defined(CONFIG_FALLOCATE)
+> +    int open_flags =3D aiocb->bs->open_flags;
+> +#endif
+> +
+>      if (aiocb->aio_type & QEMU_AIO_BLKDEV) {
+>          return handle_aiocb_write_zeroes_block(aiocb);
+>      }
+> @@ -1079,7 +1083,7 @@ static ssize_t handle_aiocb_write_zeroes(RawPosix=
+AIOData *aiocb)
+>  #endif
+> =20
+>  #ifdef CONFIG_FALLOCATE_PUNCH_HOLE
+> -    if (s->has_discard && s->has_fallocate) {
+> +    if (s->has_discard && (s->has_fallocate || open_flags & BDRV_O_SPA=
+RSE)) {
 
-Title:
-  DoS possible on - a QEMU process using userspace SLIRP?
+s->has_fallocate has a meaning. I wouldn't try to call do_fallocate() if
+s->has_fallocate is false. Therefore, I consider this to effectively be
+a no-op.
 
-Status in QEMU:
-  New
+>          int ret =3D do_fallocate(s->fd,
+>                                 FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_S=
+IZE,
+>                                 aiocb->aio_offset, aiocb->aio_nbytes);
+> @@ -1098,7 +1102,8 @@ static ssize_t handle_aiocb_write_zeroes(RawPosix=
+AIOData *aiocb)
+>  #endif
+> =20
+>  #ifdef CONFIG_FALLOCATE
+> -    if (s->has_fallocate && aiocb->aio_offset >=3D bdrv_getlength(aioc=
+b->bs)) {
+> +    if (s->has_fallocate && !(open_flags & BDRV_O_SPARSE)
+> +            && aiocb->aio_offset >=3D bdrv_getlength(aiocb->bs)) {
 
-Bug description:
-  Steps to reproduce:
+First, this part is only invoked if everything before it has failed.
+Second, this condition will only be true if we try to write zeroes
+beyond the end of the file. This is a pretty unusual request that
+normally doesn't happen (it may happen during qcow2 image creation with
+preallocation or something like that).
 
-  - Launch a VM using QEMU (2.8.0):
+This part here is just a final fallback for growing files on systems
+which do not have any advanced fallocate() modes. It seems very unlikely
+to me that anyone would hit this in normal operation.
 
-  $ qemu-system-x86_64 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-machine accel=3Dkvm \
-  =C2=A0=C2=A0=C2=A0=C2=A0-hda Fedora-Cloud-Base-25-1.3.x86_64.qcow2 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-m 2G \
-  =C2=A0=C2=A0=C2=A0=C2=A0-smp 2 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-vnc :8 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-boot dc \
-  =C2=A0=C2=A0=C2=A0=C2=A0-vga std \
-  =C2=A0=C2=A0=C2=A0=C2=A0-cpu host \
-  =C2=A0=C2=A0=C2=A0=C2=A0-net nic,vlan=3D0 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-net user,vlan=3D0,hostfwd=3Dtcp::10024-:22,hostf=
-wd=3Dtcp::8082-:80
+So all in all I don't know how this patch changes anything.
 
-  - SSH into the VM, install httpd, start httpd
 
-  $ ssh -p 10024 root@localhost 'dnf install -y httpd && systemctl start
-  httpd'
+Also, this function is for writing zeroes, not for handling discards.
+That is done in handle_aiocb_discard().
 
-  - Compile and run the following Java program (on the host):
+And as far as I can tell, handle_aiocb_discard() does exactly what you
+want it to do. It's invoked by raw_aio_pdiscard() and also by
+raw_co_pwrite_zeroes() if BDRV_REQ_MAY_UNMAP is set. If that flag is not
+set, raw_co_pwrite_zeroes() will use the above zero-writing function.
 
-  $ cat <<EOF > URLConnectionReader.java
-  import java.net.*;
-  import java.io.*;
+Unless I'm mistaken, unmap/trim requests from the guest should result in
+a discard request in the block layer. This should always trigger
+handle_aiocb_discard() here and that should do what you want it to.
 
-  public class URLConnectionReader {
-  =C2=A0=C2=A0=C2=A0=C2=A0public static void main(String[] args) throws Exc=
-eption {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int i =3D 0;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0while (i < 1024) {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0U=
-RL this_is_404 =3D new URL("http://localhost:8082/blah");
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0U=
-RLConnection yc =3D this_is_404.openConnection();
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0t=
-ry {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0BufferedReader in =3D new BufferedReader(new InputS=
-treamReader(
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0yc.getInputStream()));
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0String inputLine;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0while ((inputLine =3D in.readLine()) !=3D null)
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0System.out.println(inputLin=
-e);
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0in.close();
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}=
- catch (Exception e) {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0//HttpURLConnection urlConnection =3D (HttpURLConne=
-ction) yc;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0//urlConnection.disconnect();
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0i=
-++;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Thread.sleep(1000000000);
-  =C2=A0=C2=A0=C2=A0=C2=A0}
-  }
+I don't know exactly what you are doing so maybe for some reason the
+request doesn't arrive as a discard but as a write-zeroes. As I said,
+even if that is so, I don't see how this patch then changes the behavior
+when compared to discard=3Dunmap.
 
-  $ javac URLConnectionReader.java
+What might make sense is to make BDRV_O_SPARSE always set
+BDRV_REQ_MAY_UNMAP for any zero-write request. But I don't know why that
+would be necessary. With virtio-scsi, discard requests from the guest
+should result in discard requests in the block layer anyway. And
+detect-zeroes=3Dunmap does set BDRV_REQ_MAY_UNMAP for the write-zeroes
+requests it generates.
 
-  $ java URLConnectionReader &
 
-  The java program tries to open a lot of HTTP connections, but never
-  calls disconnect() on any.
+Could you maybe give me the configuration that results in the issue
+you're describing in the commit message?
 
-  - Take a look at the list of open FDs of the qemu process:
+Max
 
-  $ ls -tl /proc/${qemu-pid}/fd
+>          int ret =3D do_fallocate(s->fd, 0, aiocb->aio_offset, aiocb->a=
+io_nbytes);
+>          if (ret =3D=3D 0 || ret !=3D -ENOTSUP) {
+>              return ret;
+> diff --git a/include/block/block.h b/include/block/block.h
+> index bde5ebda18..103313bee0 100644
+> --- a/include/block/block.h
+> +++ b/include/block/block.h
+> @@ -97,6 +97,8 @@ typedef struct HDGeometry {
+>                                        select an appropriate protocol d=
+river,
+>                                        ignoring the format layer */
+>  #define BDRV_O_NO_IO       0x10000 /* don't initialize for I/O */
+> +#define BDRV_O_SPARSE      0x20000 /* make guest UNMAP/TRIM operations=
+ make image
+> +                                      possibly sparse */
+> =20
+>  #define BDRV_O_CACHE_MASK  (BDRV_O_NOCACHE | BDRV_O_NO_FLUSH)
+> =20
+> diff --git a/qemu-nbd.texi b/qemu-nbd.texi
+> index 9a84e81eed..8df4f58ddc 100644
+> --- a/qemu-nbd.texi
+> +++ b/qemu-nbd.texi
+> @@ -63,8 +63,8 @@ and @samp{native} (Linux only).
+>  @item --discard=3D@var{discard}
+>  Control whether @dfn{discard} (also known as @dfn{trim} or @dfn{unmap}=
+)
+>  requests are ignored or passed to the filesystem.  @var{discard} is on=
+e of
+> -@samp{ignore} (or @samp{off}), @samp{unmap} (or @samp{on}).  The defau=
+lt is
+> -@samp{ignore}.
+> +@samp{ignore} (or @samp{off}), @samp{unmap} (or @samp{on}), or @samp{s=
+parse}.
+> +The default is @samp{ignore}.
+>  @item --detect-zeroes=3D@var{detect-zeroes}
+>  Control the automatic conversion of plain zero writes by the OS to
+>  driver-specific optimized zero write commands.  @var{detect-zeroes} is=
+ one of
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index bf458f83c3..f5c7455fd1 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -539,7 +539,7 @@ DEF("drive", HAS_ARG, QEMU_OPTION_drive,
+>      "       [,serial=3Ds][,addr=3DA][,rerror=3Dignore|stop|report]\n"
+>      "       [,werror=3Dignore|stop|report|enospc][,id=3Dname][,aio=3Dt=
+hreads|native]\n"
+>      "       [,readonly=3Don|off][,copy-on-read=3Don|off]\n"
+> -    "       [,discard=3Dignore|unmap][,detect-zeroes=3Don|off|unmap]\n=
+"
+> +    "       [,discard=3Dignore|unmap|sparse][,detect-zeroes=3Don|off|u=
+nmap]\n"
+>      "       [[,bps=3Db]|[[,bps_rd=3Dr][,bps_wr=3Dw]]]\n"
+>      "       [[,iops=3Di]|[[,iops_rd=3Dr][,iops_wr=3Dw]]]\n"
+>      "       [[,bps_max=3Dbm]|[[,bps_rd_max=3Drm][,bps_wr_max=3Dwm]]]\n=
+"
+> @@ -582,7 +582,7 @@ These options have the same definition as they have=
+ in @option{-hdachs}.
+>  @item aio=3D@var{aio}
+>  @var{aio} is "threads", or "native" and selects between pthread based =
+disk I/O and native Linux AIO.
+>  @item discard=3D@var{discard}
+> -@var{discard} is one of "ignore" (or "off") or "unmap" (or "on") and c=
+ontrols whether @dfn{discard} (also known as @dfn{trim} or @dfn{unmap}) r=
+equests are ignored or passed to the filesystem.  Some machine types may =
+not support discard requests.
+> +@var{discard} is one of "ignore" (or "off") or "unmap" (or "on") or "s=
+parse" and controls whether @dfn{discard} (also known as @dfn{trim} or @d=
+fn{unmap}) requests are ignored or passed to the filesystem.  Some machin=
+e types may not support discard requests.
+>  @item format=3D@var{format}
+>  Specify which disk @var{format} will be used rather than detecting
+>  the format.  Can be used to specify format=3Draw to avoid interpreting=
 
-  $ lsof -p ${qemu-pid}
-  All of the TCP connections will be stuck at FIN_WAIT2
+>=20
 
-  The VM becomes unresponsive. Neither SSH or VNC works after this; even
-  after tcp_fin_timeout expires.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1668273/+subscriptions
+
+--xs7gA6T9X5O576G7xsu1qaRHuObI0ei6d
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAli0UAASHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AmaYIAJuFs8WpSZwZGxhuv/N3nhxOo41eJ8yv
+VOapW2xlxd/O2J7+dLLj9Oqj5sPMdvO1EwxjfBnUI4Ekv8T7r+B9h6lkbayaWaN7
+p9opeX9nJghKCxELkLKn+lFjFYHqItoNPq6wGU9mZZyuNjOEoEwwZ9aa+XS7HBsv
+QzAxAivb6f/n0CyAROX+VFM+GG5jXg6sqkYR8XOL359jW8D3KGsJAInk86EgxGrX
+mjWtQlYsAW1kpKvNXT1JyW/XRChpbtnWEOFcxxVzIAm3KzY771TeQTZ0cuN2ConG
+eR3pqNte/7fYmuXcyQ/jIuCOz1JmLo+C73F7Knwi4DipbPbz/Gz342M=
+=JnWI
+-----END PGP SIGNATURE-----
+
+--xs7gA6T9X5O576G7xsu1qaRHuObI0ei6d--
