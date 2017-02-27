@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49524)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50033)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ciLOr-0000QI-DM
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:31:38 -0500
+	(envelope-from <stefanha@gmail.com>) id 1ciLQ1-0001Uf-IF
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:32:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ciLOn-0006CW-Gp
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:31:37 -0500
-Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:35236)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ciLOn-0006CK-9i
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:31:33 -0500
-Received: by mail-wr0-x236.google.com with SMTP id g10so52208081wrg.2
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 05:31:33 -0800 (PST)
-Date: Mon, 27 Feb 2017 13:31:30 +0000
+	(envelope-from <stefanha@gmail.com>) id 1ciLQ0-0006o1-De
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:32:49 -0500
+Date: Mon, 27 Feb 2017 13:32:45 +0000
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170227133130.GS28403@stefanha-x1.localdomain>
-References: <20170227094050.ia6nrkvtvzmg7b2q@XZHOUW.usersys.redhat.com>
-	<20170227101104.GB28403@stefanha-x1.localdomain>
-	<20170227125003.fegyd7gbrfdvrwjv@XZHOUW.usersys.redhat.com>
+Message-ID: <20170227133245.GT28403@stefanha-x1.localdomain>
+References: <1488193394-28453-1-git-send-email-pl@kamp.de>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="yBTw3iMQSKDA2CaE"
+	protocol="application/pgp-signature"; boundary="Lh1tzOZp3jg2TtWy"
 Content-Disposition: inline
-In-Reply-To: <20170227125003.fegyd7gbrfdvrwjv@XZHOUW.usersys.redhat.com>
-Subject: Re: [Qemu-devel] Fail to start 2nd guest
+In-Reply-To: <1488193394-28453-1-git-send-email-pl@kamp.de>
+Subject: Re: [Qemu-devel] [PATCH V2] qemu-img: make convert async
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,94 +23,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiong Zhou <xzhou@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, libvir-list@redhat.com
+To: Peter Lieven <pl@kamp.de>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, ct@flyingcircus.io, mreitz@redhat.com, famz@redhat.com, eblake@redhat.com
 
 
---yBTw3iMQSKDA2CaE
+--Lh1tzOZp3jg2TtWy
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 27, 2017 at 08:50:03PM +0800, Xiong Zhou wrote:
-> On Mon, Feb 27, 2017 at 10:11:04AM +0000, Stefan Hajnoczi wrote:
-> > On Mon, Feb 27, 2017 at 05:40:50PM +0800, Xiong Zhou wrote:
-> > > It worked fine on Linus tree commit:
-> > >   7bb0338 Merge tag 'rodata-v4.11-rc1' of git://git.kernel.org/pub/sc=
-m/..
-> > >=20
-> > > failed to start 2nd domain on this commit:
-> > > 37c8596 Merge tag 'tty-4.11-rc1' of git://git.kernel.org/pub/scm/..
-> > > (this commit probably is not the first bad, i didn't do the bisecting)
-> > >=20
-> > >=20
-> > > sh-4.2# uname -r
-> > > 4.10.0-master-37c8596+
-> > > sh-4.2# rpm -qv qemu
-> > > qemu-2.0.0-1.el7.6.x86_64
-> > > sh-4.2# ps ajxf | grep qemu
-> > > ...
-> > > sh-4.2# virsh list
-> > >  Id    Name                           State
-> > > ----------------------------------------------------
-> > >  1     73h                            running
-> > >=20
-> > > sh-4.2# virsh start 73us
-> > > error: Failed to start domain 73us
-> > > error: internal error: qemu unexpectedly closed the monitor: ((null):=
-11497): Spice-Warning **: reds.c:2499:reds_init_socket: listen: Address alr=
-eady in use
-> > > 2017-02-27T09:33:42.335708Z qemu-kvm: failed to initialize spice serv=
-er
-> >=20
-> > The error message says that the spice remote desktop cannot listen on
-> > -spice port=3D5900,addr=3D127.0.0.1.
-> >=20
-> > Did you hardcode port 5900 in the domain XML?  That could explain why
-> No.
-> > the second guest fails to launch - you need to use unique port numbers
-> > or let libvirt automatically assign them.  Check the domain XML:
-> >=20
-> >   <graphics type=3D'spice' port=3D'-1' tlsPort=3D'-1' autoport=3D'yes'>
+On Mon, Feb 27, 2017 at 12:03:14PM +0100, Peter Lieven wrote:
+> the convert process is currently completely implemented with sync operati=
+ons.
+> That means it reads one buffer and then writes it. No parallelism and eac=
+h sync
+> request takes as long as it takes until it is completed.
 >=20
-> It looks like:
+> This can be a big performance hit when the convert process reads and writ=
+es
+> to devices which do not benefit from kernel readahead or pagecache.
+> In our environment we heavily have the following two use cases when using
+> qemu-img convert.
 >=20
->     <graphics type=3D'spice' autoport=3D'yes'>
->       <listen type=3D'address'/>
->       <image compression=3D'off'/>
->     </graphics>
+> a) reading from NFS and writing to iSCSI for deploying templates
+> b) reading from iSCSI and writing to NFS for backups
 >=20
+> In both processes we use libiscsi and libnfs so we have no kernel cache.
 >=20
-> >=20
-> > Another possibility is that a process running on the host is already
-> > using port 5900.  Perhaps a guest or VNC server that was launched
-> > outside of libvirt?  You can check this with:
-> >=20
-> >   netstat -alpn | grep 5900
-> # netstat -alpn | grep 5900
-> tcp        0      0 127.0.0.1:5900          0.0.0.0:*               LISTE=
-N      11065/qemu-kvm     =20
+> This patch changes the convert process to work with parallel running coro=
+utines
+> which can significantly improve performance for network storage devices:
+>=20
+> qemu-img (master)
+>  nfs -> iscsi 22.8 secs
+>  nfs -> ram   11.7 secs
+>  ram -> iscsi 12.3 secs
+>=20
+> qemu-img-async (8 coroutines, in-order write disabled)
+>  nfs -> iscsi 11.0 secs
+>  nfs -> ram   10.4 secs
+>  ram -> iscsi  9.0 secs
+>=20
+> This patches introduces 2 new cmdline parameters. The -m parameter to spe=
+cify
+> the number of coroutines running in parallel (defaults to 8). And the -W =
+paremeter to
+> allow qemu-img to write to the target out of order rather than sequential=
+=2E This improves
+> performance as the writes do not have to wait for each other to complete.
+>=20
+> Signed-off-by: Peter Lieven <pl@kamp.de>
+> ---
+>     V1->V2: - do not calculate source partition globally [Kevin]
+>             - don't use s->status outside the global lock [Kevin]
+>             - remove accidently left bracket in qemu-img.texi [Kevin]
+>             - reworkd -W parageaph in documentation [Stefan]
+>=20
+>    RFC->V1: - add documentation
+>             - add missing coroutine_fn annotation [Stefan]
+>             - add a comment why it is safe to call coroutine_enter [Stefa=
+n]
+>             - check -m paramater for values < 1 [Stefan]
+>             - disallow -W parameter with compression [Stefan]
+>=20
+> RFC V3->V4: - avoid to prepare a request queue upfront [Kevin]
+>             - do not ignore the BLK_BACKING_FILE status [Kevin]
+>             - redesign the interface to the read and write routines [Kevi=
+n]
+>=20
+> RFC V2->V3: - updated stats in the commit msg from a host with a better n=
+etwork card
+>             - only wake up the coroutine that is acutally waiting for a w=
+rite to complete.
+>               this was not only overhead, but also breaking at least linu=
+x AIO.
+>             - fix coding style complaints
+>             - rename some variables and structs
+>=20
+> RFC V1->V2: - using coroutine as worker "threads". [Max]
+>             - keeping the request queue as otherwise it happens
+>               that we wait on BLK_ZERO chunks while keeping the write ord=
+er.
+>               it also avoids redundant calls to get_block_status and helps
+>               to skip some conditions for fully allocated imaged (!s->min=
+_sparse)
+>=20
+> ---
+>  qemu-img-cmds.hx |   4 +-
+>  qemu-img.c       | 322 ++++++++++++++++++++++++++++++++++++++-----------=
+------
+>  qemu-img.texi    |  16 ++-
+>  3 files changed, 243 insertions(+), 99 deletions(-)
 
-Please check that 11065/qemu-kvm was launched by the same libvirtd and
-its domain XML also uses autoport=3D'yes'.
+I haven't checked the locking issues that Kevin pointed out, but I'm
+happy on the other aspects:
 
-I have CCed the libvirt mailing list because they may be able to explain
-why there is a collision on TCP port 5900.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Stefan
-
---yBTw3iMQSKDA2CaE
+--Lh1tzOZp3jg2TtWy
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJYtCoyAAoJEJykq7OBq3PIgAwIALHkaMSglM/AqSbiYC6fyr6a
-Z9/jQrF308fic5fCWUuZKVY0nxHNQiRw1P2ob74nGxy+06YM0B8/V3xX2xQ1HmGg
-RVczF2nnxBiamYP0r4EVpajKkQjm6dTavoFtdPI8wLzMsQtdQt8Pocko+cWw5EXs
-4/LF3iqBMyFn/Cw5HT3Bhbbcrlmlg3ql02SDPknTq32fChEzT7C1/mpLMkvMo/kE
-kPsDjJ5QbR2sO2kXVeY31Fll+qZXPt2MZRN8dKAgEed22hh2sF1i7+RTmzVafvRM
-s22RJwWnArKMI6c+/Wg+40DC+YHXPpgOfn1AZPc0hEcrh/ySS+mWzvzb7OjFFZc=
-=p7L1
+iQEcBAEBAgAGBQJYtCp9AAoJEJykq7OBq3PIeGAH/RJMEX/k7kYIIMJE4ONn71hc
+QpHRNLUft0wHeRzc+VcM55WUxKNwWWfT8odAL0d2SpU+vhPiwV8lUqaCV1o/5eIL
+BcBk3/5HNUlceGSEpuTDkOgVT7upZwtPQnc9QQyc4+ifj1+IbpIhEaWC7KxmTFVI
+eK/ZLcXvVx4/BMLRK/hGpZCVcjLZjK82qBk0vXB2rqvUnpIOE3Tb33gCzIpO3mwk
+e6A8hJ1lcag8egqOd0yyZrm7HnD9wbFlGHOk+dfs28NGtB9RWLIGiJNFNOX7rp30
++g5Sc1URvqL7+OtLUGX9pjEm2/UQ+DlZmyvqjgwEgZ4GnzL+0bvokcY8mht/w/U=
+=dXFd
 -----END PGP SIGNATURE-----
 
---yBTw3iMQSKDA2CaE--
+--Lh1tzOZp3jg2TtWy--
