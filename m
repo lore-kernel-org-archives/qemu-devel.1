@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57725)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ciRdq-0000cx-Ok
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:11:33 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ciRdu-0000gG-AF
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:11:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ciRdp-0003kj-Af
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:11:30 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ciRdt-0003rP-DE
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:11:34 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 27 Feb 2017 21:09:36 +0100
-Message-Id: <1488226184-9044-36-git-send-email-kwolf@redhat.com>
+Date: Mon, 27 Feb 2017 21:09:37 +0100
+Message-Id: <1488226184-9044-37-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488226184-9044-1-git-send-email-kwolf@redhat.com>
 References: <1488226184-9044-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 35/43] hmp: Request permissions in qemu-io
+Subject: [Qemu-devel] [PATCH v2 36/43] migration/block: Use real permissions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,179 +22,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-The HMP command 'qemu-io' is a bit tricky because it wants to work on
-the original BlockBackend, but additional permissions could be required.
-The details are explained in a comment in the code, but in summary, just
-request whatever permissions the current qemu-io command needs.
+Request BLK_PERM_CONSISTENT_READ for the source of block migration, and
+handle potential permission errors as good as we can in this place
+(which is not very good, but it matches the other failure cases).
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/block-backend.c          |  6 ++++++
- hmp.c                          | 26 +++++++++++++++++++++++++-
- include/qemu-io.h              |  1 +
- include/sysemu/block-backend.h |  1 +
- qemu-io-cmds.c                 | 28 ++++++++++++++++++++++++++++
- 5 files changed, 61 insertions(+), 1 deletion(-)
+ migration/block.c | 22 +++++++++++++++++-----
+ 1 file changed, 17 insertions(+), 5 deletions(-)
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 38a3858..daa7908 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -584,6 +584,12 @@ int blk_set_perm(BlockBackend *blk, uint64_t perm, uint64_t shared_perm,
-     return 0;
+diff --git a/migration/block.c b/migration/block.c
+index d259936..1941bc2 100644
+--- a/migration/block.c
++++ b/migration/block.c
+@@ -379,7 +379,7 @@ static void unset_dirty_tracking(void)
+     }
  }
  
-+void blk_get_perm(BlockBackend *blk, uint64_t *perm, uint64_t *shared_perm)
-+{
-+    *perm = blk->perm;
-+    *shared_perm = blk->shared_perm;
-+}
-+
- static int blk_do_attach_dev(BlockBackend *blk, void *dev)
+-static void init_blk_migration(QEMUFile *f)
++static int init_blk_migration(QEMUFile *f)
  {
-     if (blk->dev) {
-diff --git a/hmp.c b/hmp.c
-index e219f97..7b44e64 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -2051,7 +2051,6 @@ void hmp_qemu_io(Monitor *mon, const QDict *qdict)
-     if (!blk) {
-         BlockDriverState *bs = bdrv_lookup_bs(NULL, device, &err);
-         if (bs) {
--            /* FIXME Use real permissions */
-             blk = local_blk = blk_new(0, BLK_PERM_ALL);
-             ret = blk_insert_bs(blk, bs, &err);
-             if (ret < 0) {
-@@ -2065,6 +2064,31 @@ void hmp_qemu_io(Monitor *mon, const QDict *qdict)
-     aio_context = blk_get_aio_context(blk);
-     aio_context_acquire(aio_context);
+     BlockDriverState *bs;
+     BlkMigDevState *bmds;
+@@ -390,6 +390,8 @@ static void init_blk_migration(QEMUFile *f)
+         BlkMigDevState *bmds;
+         BlockDriverState *bs;
+     } *bmds_bs;
++    Error *local_err = NULL;
++    int ret;
  
-+    /*
-+     * Notably absent: Proper permission management. This is sad, but it seems
-+     * almost impossible to achieve without changing the semantics and thereby
-+     * limiting the use cases of the qemu-io HMP command.
-+     *
-+     * In an ideal world we would unconditionally create a new BlockBackend for
-+     * qemuio_command(), but we have commands like 'reopen' and want them to
-+     * take effect on the exact BlockBackend whose name the user passed instead
-+     * of just on a temporary copy of it.
-+     *
-+     * Another problem is that deleting the temporary BlockBackend involves
-+     * draining all requests on it first, but some qemu-iotests cases want to
-+     * issue multiple aio_read/write requests and expect them to complete in
-+     * the background while the monitor has already returned.
-+     *
-+     * This is also what prevents us from saving the original permissions and
-+     * restoring them later: We can't revoke permissions until all requests
-+     * have completed, and we don't know when that is nor can we really let
-+     * anything else run before we have revoken them to avoid race conditions.
-+     *
-+     * What happens now is that command() in qemu-io-cmds.c can extend the
-+     * permissions if necessary for the qemu-io command. And they simply stay
-+     * extended, possibly resulting in a read-only guest device keeping write
-+     * permissions. Ugly, but it appears to be the lesser evil.
-+     */
-     qemuio_command(blk, command);
+     block_mig_state.submitted = 0;
+     block_mig_state.read_done = 0;
+@@ -411,12 +413,12 @@ static void init_blk_migration(QEMUFile *f)
  
-     aio_context_release(aio_context);
-diff --git a/include/qemu-io.h b/include/qemu-io.h
-index 4d402b9..196fde0 100644
---- a/include/qemu-io.h
-+++ b/include/qemu-io.h
-@@ -36,6 +36,7 @@ typedef struct cmdinfo {
-     const char  *args;
-     const char  *oneline;
-     helpfunc_t  help;
-+    uint64_t    perm;
- } cmdinfo_t;
- 
- extern bool qemuio_misalign;
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
-index b23f683..096c17f 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -107,6 +107,7 @@ bool bdrv_has_blk(BlockDriverState *bs);
- bool bdrv_is_root_node(BlockDriverState *bs);
- int blk_set_perm(BlockBackend *blk, uint64_t perm, uint64_t shared_perm,
-                  Error **errp);
-+void blk_get_perm(BlockBackend *blk, uint64_t *perm, uint64_t *shared_perm);
- 
- void blk_set_allow_write_beyond_eof(BlockBackend *blk, bool allow);
- void blk_iostatus_enable(BlockBackend *blk);
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index 7ac1576..2c48f9c 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -83,6 +83,29 @@ static int command(BlockBackend *blk, const cmdinfo_t *ct, int argc,
+         sectors = bdrv_nb_sectors(bs);
+         if (sectors <= 0) {
++            ret = sectors;
+             goto out;
          }
-         return 0;
-     }
-+
-+    /* Request additional permissions if necessary for this command. The caller
-+     * is responsible for restoring the original permissions afterwards if this
-+     * is what it wants. */
-+    if (ct->perm && blk_is_available(blk)) {
-+        uint64_t orig_perm, orig_shared_perm;
-+        blk_get_perm(blk, &orig_perm, &orig_shared_perm);
-+
-+        if (ct->perm & ~orig_perm) {
-+            uint64_t new_perm;
-+            Error *local_err = NULL;
-+            int ret;
-+
-+            new_perm = orig_perm | ct->perm;
-+
-+            ret = blk_set_perm(blk, new_perm, orig_shared_perm, &local_err);
+ 
+         bmds = g_new0(BlkMigDevState, 1);
+-        /* FIXME Use real permissions */
+-        bmds->blk = blk_new(0, BLK_PERM_ALL);
++        bmds->blk = blk_new(BLK_PERM_CONSISTENT_READ, BLK_PERM_ALL);
+         bmds->blk_name = g_strdup(bdrv_get_device_name(bs));
+         bmds->bulk_completed = 0;
+         bmds->total_sectors = sectors;
+@@ -446,7 +448,11 @@ static void init_blk_migration(QEMUFile *f)
+         BlockDriverState *bs = bmds_bs[i].bs;
+ 
+         if (bmds) {
+-            blk_insert_bs(bmds->blk, bs, &error_abort);
++            ret = blk_insert_bs(bmds->blk, bs, &local_err);
 +            if (ret < 0) {
 +                error_report_err(local_err);
-+                return 0;
++                goto out;
 +            }
-+        }
-+    }
-+
-     optind = 0;
-     return ct->cfunc(blk, argc, argv);
+ 
+             alloc_aio_bitmap(bmds);
+             error_setg(&bmds->blocker, "block device is in use by migration");
+@@ -454,8 +460,10 @@ static void init_blk_migration(QEMUFile *f)
+         }
+     }
+ 
++    ret = 0;
+ out:
+     g_free(bmds_bs);
++    return ret;
  }
-@@ -918,6 +941,7 @@ static const cmdinfo_t write_cmd = {
-     .name       = "write",
-     .altname    = "w",
-     .cfunc      = write_f,
-+    .perm       = BLK_PERM_WRITE,
-     .argmin     = 2,
-     .argmax     = -1,
-     .args       = "[-bcCfquz] [-P pattern] off len",
-@@ -1093,6 +1117,7 @@ static int writev_f(BlockBackend *blk, int argc, char **argv);
- static const cmdinfo_t writev_cmd = {
-     .name       = "writev",
-     .cfunc      = writev_f,
-+    .perm       = BLK_PERM_WRITE,
-     .argmin     = 2,
-     .argmax     = -1,
-     .args       = "[-Cfq] [-P pattern] off len [len..]",
-@@ -1392,6 +1417,7 @@ static int aio_write_f(BlockBackend *blk, int argc, char **argv);
- static const cmdinfo_t aio_write_cmd = {
-     .name       = "aio_write",
-     .cfunc      = aio_write_f,
-+    .perm       = BLK_PERM_WRITE,
-     .argmin     = 2,
-     .argmax     = -1,
-     .args       = "[-Cfiquz] [-P pattern] off len [len..]",
-@@ -1556,6 +1582,7 @@ static const cmdinfo_t truncate_cmd = {
-     .name       = "truncate",
-     .altname    = "t",
-     .cfunc      = truncate_f,
-+    .perm       = BLK_PERM_WRITE | BLK_PERM_RESIZE,
-     .argmin     = 1,
-     .argmax     = 1,
-     .args       = "off",
-@@ -1653,6 +1680,7 @@ static const cmdinfo_t discard_cmd = {
-     .name       = "discard",
-     .altname    = "d",
-     .cfunc      = discard_f,
-+    .perm       = BLK_PERM_WRITE,
-     .argmin     = 2,
-     .argmax     = -1,
-     .args       = "[-Cq] off len",
+ 
+ /* Called with no lock taken.  */
+@@ -706,7 +714,11 @@ static int block_save_setup(QEMUFile *f, void *opaque)
+             block_mig_state.submitted, block_mig_state.transferred);
+ 
+     qemu_mutex_lock_iothread();
+-    init_blk_migration(f);
++    ret = init_blk_migration(f);
++    if (ret < 0) {
++        qemu_mutex_unlock_iothread();
++        return ret;
++    }
+ 
+     /* start track dirty blocks */
+     ret = set_dirty_tracking();
 -- 
 1.8.3.1
