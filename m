@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ciIzq-0003gS-87
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:57:39 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ciJ1K-0004Qj-Bx
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:59:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ciIzn-000304-3I
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:57:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42178)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ciIzm-000300-QX
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:57:35 -0500
-References: <20170227104956.24729-1-marcandre.lureau@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8c039185-5531-83a6-179a-f2147ea7bdc2@redhat.com>
-Date: Mon, 27 Feb 2017 11:57:31 +0100
+	(envelope-from <kwolf@redhat.com>) id 1ciJ1J-0003BU-EW
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:59:10 -0500
+Date: Mon, 27 Feb 2017 11:59:00 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170227105704.GB6356@noname.redhat.com>
+References: <87bmukmlau.fsf@dusky.pond.sub.org>
+	<87poi4c4jd.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170227104956.24729-1-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] vhost-user: delay vhost_user_stop
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87poi4c4jd.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] Non-flat command line option argument syntax
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,113 +23,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com, den@openvz.org, dgilbert@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Peter Krempa <pkrempa@redhat.com>, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
+Am 27.02.2017 um 11:27 hat Markus Armbruster geschrieben:
+> Markus Armbruster <armbru@redhat.com> writes:
+> 
+> [...]
+> > === Dotted keys ===
+> >
+> > One sufficiently powerful syntax extension already exists: the dotted
+> > key convention.  It's syntactically unambiguous only when none of the
+> > KEYs involved contains '.'  To adopt it across the board, we'd have to
+> > outlaw '.' in KEYs.  QAPI outlaws '.' already, but we have a bunch of
+> > QOM properties names with '.'.  We'd have to rename at least the ones
+> > that need to be accessible in -object.
+> >
+> > Dotted keys can't express member names that look like integers.  We'd
+> > have to outlaw them at least for the objects that are accessible on the
+> > command line.  Once again, QAPI outlaws such names already.  QOM is
+> > anarchy when it comes to names, however.
+> >
+> > The way dotted keys do arrays is inconsistent with how QOM's automatic
+> > arrayification (commit 3396590) do them: foo.0 vs. foo[0].  Backward
+> > compatibility makes changing the dotted key convention awkward.  Perhaps
+> > we can still change QOM.
+> 
+> Design flaw: there is no good way to denote an empty array or object
+> other than the root object.
+> 
+> Empty KEY=VALUE,... is valid and results in an empty root object.
+> 
+> Presence of a KEY that contains periods results in additional non-root
+> objects or arrays.  For instance, KEY a.b.c results in root object
+> member "a" that has member "b" that has (scalar) member "c".
+> 
+> These additional objects and arrays all have at least one member, by
+> construction.
+> 
+> Begs the question how to denote an empty object or array other than the
+> root.
+> 
+> A natural idea is to interpret "absent in KEY=VALUE,..." as empty.
+> After all, removing one key from it removes one member when there are
+> more, so why not when there aren't.
+> 
+> Sadly, it doesn't work: "absent in KEY=VALUE,..." already means
+> "optional object/array absent", which isn't the same as "empty
+> object/array present".
+> 
+> Without additional syntax, all we can do is choose what exactly to make
+> impossible:
+> 
+> * Absent key means absent, period.  No way to do empty array or object.
+>   This is what I implemented.
 
+I'm not currently aware of any places where the difference between a
+present, but empty array and an absent array is actually significant, so
+this is probably the most consistent and useful way to interpret things.
 
-On 27/02/2017 11:49, Marc-Andr=C3=A9 Lureau wrote:
-> Since commit b0a335e351103bf92f3f9d0bd5759311be8156ac, a socket write
-> may trigger a disconnect events, calling vhost_user_stop() and clearing
-> all the vhost_dev strutures holding data that vhost.c functions expect
-> to remain valid. Delay the cleanup to keep the vhost_dev structure
-> valid during the vhost.c functions.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
-> v3:
->  - use aio_bh_schedule_oneshot(), as suggest by Paolo
-> v2:
->  - fix reconnect race
->=20
-> net/vhost-user.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++---=
-----
->  1 file changed, 46 insertions(+), 7 deletions(-)
->=20
-> diff --git a/net/vhost-user.c b/net/vhost-user.c
-> index 77b8110f8c..e7e63408a1 100644
-> --- a/net/vhost-user.c
-> +++ b/net/vhost-user.c
-> @@ -190,7 +190,35 @@ static gboolean net_vhost_user_watch(GIOChannel *c=
-han, GIOCondition cond,
-> =20
->      qemu_chr_fe_disconnect(&s->chr);
-> =20
-> -    return FALSE;
-> +    return TRUE;
-> +}
-> +
-> +static void net_vhost_user_event(void *opaque, int event);
-> +
-> +static void chr_closed_bh(void *opaque)
-> +{
-> +    const char *name =3D opaque;
-> +    NetClientState *ncs[MAX_QUEUE_NUM];
-> +    VhostUserState *s;
-> +    Error *err =3D NULL;
-> +    int queues;
-> +
-> +    queues =3D qemu_find_net_clients_except(name, ncs,
-> +                                          NET_CLIENT_DRIVER_NIC,
-> +                                          MAX_QUEUE_NUM);
-> +    assert(queues < MAX_QUEUE_NUM);
-> +
-> +    s =3D DO_UPCAST(VhostUserState, nc, ncs[0]);
-> +
-> +    qmp_set_link(name, false, &err);
-> +    vhost_user_stop(queues, ncs);
-> +
-> +    qemu_chr_fe_set_handlers(&s->chr, NULL, NULL, net_vhost_user_event=
-,
-> +                             opaque, NULL, true);
-> +
-> +    if (err) {
-> +        error_report_err(err);
-> +    }
->  }
-> =20
->  static void net_vhost_user_event(void *opaque, int event)
-> @@ -212,20 +240,31 @@ static void net_vhost_user_event(void *opaque, in=
-t event)
->      trace_vhost_user_event(chr->label, event);
->      switch (event) {
->      case CHR_EVENT_OPENED:
-> -        s->watch =3D qemu_chr_fe_add_watch(&s->chr, G_IO_HUP,
-> -                                         net_vhost_user_watch, s);
->          if (vhost_user_start(queues, ncs, &s->chr) < 0) {
->              qemu_chr_fe_disconnect(&s->chr);
->              return;
->          }
-> +        s->watch =3D qemu_chr_fe_add_watch(&s->chr, G_IO_HUP,
-> +                                         net_vhost_user_watch, s);
->          qmp_set_link(name, true, &err);
->          s->started =3D true;
->          break;
->      case CHR_EVENT_CLOSED:
-> -        qmp_set_link(name, false, &err);
-> -        vhost_user_stop(queues, ncs);
-> -        g_source_remove(s->watch);
-> -        s->watch =3D 0;
-> +        /* a close event may happen during a read/write, but vhost
-> +         * code assumes the vhost_dev remains setup, so delay the
-> +         * stop & clear to idle.
-> +         * FIXME: better handle failure in vhost code, remove bh
-> +         */
-> +        if (s->watch) {
-> +            AioContext *ctx =3D qemu_get_current_aio_context();
-> +
-> +            g_source_remove(s->watch);
-> +            s->watch =3D 0;
+In other words, I agree with your implementation.
 
-Removing the watch here makes sense too!  Thanks,
+> * Absent key means absent, except when the member is visited it means
+>   empty.  No way to do absent optional array or object.
+> 
+> * Likewise, but if the visit is preceeded by a test for presence with
+>   visit_optional(), it means absent again.  No way to do present
+>   optional empty array or object.  This requires keeping additional
+>   state.
+> 
+> Any bright ideas on how to avoid making things impossible?
 
-Paolo
-> +            qemu_chr_fe_set_handlers(&s->chr, NULL, NULL, NULL,
-> +                                     NULL, NULL, false);
-> +
-> +            aio_bh_schedule_oneshot(ctx, chr_closed_bh, opaque);
-> +        }
->          break;
->      }
-> =20
->=20
+I can't see any other option than extending the syntax if we need this.
+We can't tell the difference between a string and any other object
+description after =, so we would need to make use of reserved characters
+in the key name. Maybe just 'foo.array[]' (without any =) for an empty
+array or something like that.
+
+Before we introduce anything like this, do we actually need it?
+
+Kevin
