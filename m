@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52445)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ciOYG-0007PS-LU
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:53:33 -0500
+	(envelope-from <eblake@redhat.com>) id 1ciObV-0001uH-Di
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:56:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ciOYF-0007jy-S0
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:53:32 -0500
-Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:36615)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ciOYF-0007jg-LL
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:53:31 -0500
-Received: by mail-wr0-x236.google.com with SMTP id u108so26502365wrb.3
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 08:53:31 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1ciObS-0000N5-GD
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:56:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45998)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ciObS-0000MY-7M
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:56:50 -0500
+References: <9533ba99-b143-b577-0115-742119d089a4@kamp.de>
+	<9292fef8-929a-e89e-eca5-cd247ca9334b@redhat.com>
+	<f0eb7ff1-47d7-42d0-c7b5-946d2224e986@kamp.de>
+	<c207e00d-25a6-45bb-a849-235d0cd2be0d@redhat.com>
+	<2b0840d7-7540-d732-36ac-af7a512d2c8f@kamp.de>
+	<b59eb68b-5dac-b18b-c2f7-1ea820f4d747@redhat.com>
+	<589533ff-2e7d-0ffb-e0b9-5b2e055813b6@redhat.com>
+	<5E0A3205-E866-44C3-86C5-7B3B4F9923B4@kamp.de>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a7a65cf5-5c06-b4a8-5130-d79130af60a6@redhat.com>
+Date: Mon, 27 Feb 2017 10:56:46 -0600
 MIME-Version: 1.0
-In-Reply-To: <479997200.107486.1488213725522@communicator.strato.de>
-References: <492427237.68231.1488183356160@communicator.strato.de>
-	<CAFEAcA-hHnOvoWZYZgBt2sWjv60fyTFv4mmGkaBbnVDwEqg31w@mail.gmail.com>
-	<1634823730.89363.1488206109043@communicator.strato.de>
-	<CAFEAcA_O2ue4wkGgcJCAXwPSZy=OajBz0nREet5Kr+h0t4o8Dw@mail.gmail.com>
-	<479997200.107486.1488213725522@communicator.strato.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 27 Feb 2017 16:53:09 +0000
-Message-ID: <CAFEAcA9rBELg1DwyGzGUjMGECdhsa=2HrMtwhny6=bbnq-vnpw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] pl190: Fix off-by-one error in priority
- handling when reading VECTADDR
+In-Reply-To: <5E0A3205-E866-44C3-86C5-7B3B4F9923B4@kamp.de>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="MevR373b4G08LGrupAOkknKqu8fNqDC84"
+Subject: Re: [Qemu-devel] Qemu and Changed Block Tracking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,22 +34,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marc Bommert <marc@brightwise.de>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Lieven <pl@kamp.de>
+Cc: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Christian Theune <ct@flyingcircus.io>
 
-On 27 February 2017 at 16:42, Marc Bommert <marc@brightwise.de> wrote:
-> Hello Peter, you are completely right. The bug isn't in master
-> and my patch is to be rejected. There was once a version of pl190.c
-> (like uhhm, around 2011) which didn't have the [i+1] in the array
-> index and somehow (please don't ask) it made it into my qemu build.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--MevR373b4G08LGrupAOkknKqu8fNqDC84
+From: Eric Blake <eblake@redhat.com>
+To: Peter Lieven <pl@kamp.de>
+Cc: John Snow <jsnow@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Christian Theune <ct@flyingcircus.io>
+Message-ID: <a7a65cf5-5c06-b4a8-5130-d79130af60a6@redhat.com>
+Subject: Re: [Qemu-devel] Qemu and Changed Block Tracking
+References: <9533ba99-b143-b577-0115-742119d089a4@kamp.de>
+ <9292fef8-929a-e89e-eca5-cd247ca9334b@redhat.com>
+ <f0eb7ff1-47d7-42d0-c7b5-946d2224e986@kamp.de>
+ <c207e00d-25a6-45bb-a849-235d0cd2be0d@redhat.com>
+ <2b0840d7-7540-d732-36ac-af7a512d2c8f@kamp.de>
+ <b59eb68b-5dac-b18b-c2f7-1ea820f4d747@redhat.com>
+ <589533ff-2e7d-0ffb-e0b9-5b2e055813b6@redhat.com>
+ <5E0A3205-E866-44C3-86C5-7B3B4F9923B4@kamp.de>
+In-Reply-To: <5E0A3205-E866-44C3-86C5-7B3B4F9923B4@kamp.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Ah, yes -- commit 14c126baf1c was that bugfix.
+On 02/26/2017 02:41 PM, Peter Lieven wrote:
+> The live-snapshot/live-commit stuff could indeed help in my scenario. I=
+f I understand correctly this is
+> something that already works today, correct? If I have taken a live-sna=
+pshot, is live-migration and
+> stop/start of the VM still possible? What about live-migration and star=
+t/stop during live-commit?
 
-> Thank you for pointing this out.
+Yes, a guest can be started or stopped while migration and/or
+live-commit are underway.  You probably have to keep the qemu process
+around (stopping the guest but keeping qemu alive is different than
+stopping qemu altogether), which is where the persistence factors into
+it (once we have persistent bitmaps, then stopping qemu altogether
+becomes possible).
 
-No problem -- glad we've figured out what's going on.
-(You should probably check you don't have any other ancient
-wrong copies of source files lying around :-))
+> I don=E2=80=99t talk about the dirty bitmap tracking I understand that =
+persistence and live-migration support
+> is still in the works, I=E2=80=99m just interested in the snapshot/comm=
+it part.
+>=20
+> Thanks
+> Peter
+>=20
 
-thanks
--- PMM
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--MevR373b4G08LGrupAOkknKqu8fNqDC84
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYtFpOAAoJEKeha0olJ0NqzaQH+wYj9T5Gzv+WaULruRvTMetk
+C6PYt35meZI80CS/Rj90vZAQe1WtLhfTi/+ohiVHunbM/zGWoXW/hqlz8AZYLkeJ
+1i0qiAmf2fTZ8FsGFgelp0xG0jI6VCNUlSxcCw6I8fzBFZxS8Ln7afBT7mwcBbAq
+5yeBlGUnV+L3mDaY2w4p2Yq6MT8OYOISICrgjvUT7CBshhoa/gSYKhUhYy2gAS3G
+fmfr+KT1KvOKFDEh4VcSKIAwfyH2pn48Zij/6KUsf08/IgjUCuQGQTyH6F5MZyn4
+h/w7E1VtKfIzeuXEQpmn17WMzg+PDViPrYJXpOqzW9qqQAVlbojBzTQxcKrWlh0=
+=uuLz
+-----END PGP SIGNATURE-----
+
+--MevR373b4G08LGrupAOkknKqu8fNqDC84--
