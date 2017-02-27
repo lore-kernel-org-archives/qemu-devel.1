@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38891)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ciMLt-0002xd-56
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:32:40 -0500
+	(envelope-from <clg@kaod.org>) id 1ciMLv-0002y5-D9
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:32:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ciMLp-0008GZ-5p
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:32:37 -0500
-Received: from 1.mo6.mail-out.ovh.net ([46.105.56.136]:35072)
+	(envelope-from <clg@kaod.org>) id 1ciMLr-0008HW-ES
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:32:39 -0500
+Received: from 2.mo6.mail-out.ovh.net ([46.105.76.65]:41934)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ciMLo-0008GP-W7
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:32:33 -0500
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ciMLr-0008H7-7P
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:32:35 -0500
 Received: from player761.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id D3313B34FD
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 15:32:31 +0100 (CET)
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 32A82B35F2
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 15:32:34 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Mon, 27 Feb 2017 15:29:28 +0100
-Message-Id: <1488205773-30436-22-git-send-email-clg@kaod.org>
+Date: Mon, 27 Feb 2017 15:29:29 +0100
+Message-Id: <1488205773-30436-23-git-send-email-clg@kaod.org>
 In-Reply-To: <1488205773-30436-1-git-send-email-clg@kaod.org>
 References: <1488205773-30436-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 21/26] ppc/xics: move the ICP array under
- the sPAPR machine
+Subject: [Qemu-devel] [PATCH v4 22/26] ppc/xics: export the XICS init
+ routines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,103 +33,142 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-This is the last step to remove the XICSState abstraction and have the
-machine hold all the objects related to interrupts : ICSs and ICPs.
+There is nothing left related to the XICS object in the realize
+functions of the KVMXICSState and XICSState class. So adapt the
+interfaces to call these routines directly from the sPAPR machine init
+sequence.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/ppc/spapr.c         | 17 ++++++++---------
- include/hw/ppc/spapr.h |  3 +++
- include/hw/ppc/xics.h  |  2 --
- 3 files changed, 11 insertions(+), 11 deletions(-)
+ hw/intc/xics_kvm.c    | 13 +++----------
+ hw/intc/xics_spapr.c  | 11 ++---------
+ hw/ppc/spapr.c        |  4 +++-
+ include/hw/ppc/xics.h |  5 +++++
+ 4 files changed, 13 insertions(+), 20 deletions(-)
 
+diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+index 07298b09712d..99836112cd12 100644
+--- a/hw/intc/xics_kvm.c
++++ b/hw/intc/xics_kvm.c
+@@ -363,7 +363,7 @@ static void rtas_dummy(PowerPCCPU *cpu, sPAPRMachineS=
+tate *spapr,
+                  __func__);
+ }
+=20
+-static void xics_kvm_realize(DeviceState *dev, Error **errp)
++int xics_kvm_init(sPAPRMachineState *spapr, Error **errp)
+ {
+     int rc;
+     struct kvm_create_device xics_create_device =3D {
+@@ -419,27 +419,20 @@ static void xics_kvm_realize(DeviceState *dev, Erro=
+r **errp)
+     kvm_msi_via_irqfd_allowed =3D true;
+     kvm_gsi_direct_mapping =3D true;
+=20
+-    return;
++    return rc;
+=20
+ fail:
+     kvmppc_define_rtas_kernel_token(0, "ibm,set-xive");
+     kvmppc_define_rtas_kernel_token(0, "ibm,get-xive");
+     kvmppc_define_rtas_kernel_token(0, "ibm,int-on");
+     kvmppc_define_rtas_kernel_token(0, "ibm,int-off");
+-}
+-
+-static void xics_kvm_class_init(ObjectClass *oc, void *data)
+-{
+-    DeviceClass *dc =3D DEVICE_CLASS(oc);
+-
+-    dc->realize =3D xics_kvm_realize;
++    return -1;
+ }
+=20
+ static const TypeInfo xics_spapr_kvm_info =3D {
+     .name          =3D TYPE_XICS_SPAPR_KVM,
+     .parent        =3D TYPE_XICS_COMMON,
+     .instance_size =3D sizeof(KVMXICSState),
+-    .class_init    =3D xics_kvm_class_init,
+ };
+=20
+ static void xics_kvm_register_types(void)
+diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+index 35045a20b860..aaf6808cd220 100644
+--- a/hw/intc/xics_spapr.c
++++ b/hw/intc/xics_spapr.c
+@@ -240,7 +240,7 @@ static void rtas_int_on(PowerPCCPU *cpu, sPAPRMachine=
+State *spapr,
+     rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+ }
+=20
+-static void xics_spapr_realize(DeviceState *dev, Error **errp)
++int xics_spapr_init(sPAPRMachineState *spapr, Error **errp)
+ {
+     /* Registration of global state belongs into realize */
+     spapr_rtas_register(RTAS_IBM_SET_XIVE, "ibm,set-xive", rtas_set_xive=
+);
+@@ -254,13 +254,7 @@ static void xics_spapr_realize(DeviceState *dev, Err=
+or **errp)
+     spapr_register_hypercall(H_XIRR_X, h_xirr_x);
+     spapr_register_hypercall(H_EOI, h_eoi);
+     spapr_register_hypercall(H_IPOLL, h_ipoll);
+-}
+-
+-static void xics_spapr_class_init(ObjectClass *oc, void *data)
+-{
+-    DeviceClass *dc =3D DEVICE_CLASS(oc);
+-
+-    dc->realize =3D xics_spapr_realize;
++    return 0;
+ }
+=20
+ static const TypeInfo xics_spapr_info =3D {
+@@ -268,7 +262,6 @@ static const TypeInfo xics_spapr_info =3D {
+     .parent        =3D TYPE_XICS_COMMON,
+     .instance_size =3D sizeof(XICSState),
+     .class_size =3D sizeof(XICSStateClass),
+-    .class_init    =3D xics_spapr_class_init,
+ };
+=20
+ #define ICS_IRQ_FREE(ics, srcno)   \
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 88539557abd3..358bdec7d2ad 100644
+index 358bdec7d2ad..3caef0c7e683 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -124,15 +124,15 @@ static XICSState *try_create_xics(sPAPRMachineState=
- *spapr,
-         goto error;
+@@ -161,7 +161,8 @@ static XICSState *xics_system_init(MachineState *mach=
+ine,
+     if (kvm_enabled()) {
+         Error *err =3D NULL;
+=20
+-        if (machine_kernel_irqchip_allowed(machine)) {
++        if (machine_kernel_irqchip_allowed(machine) &&
++            !xics_kvm_init(SPAPR_MACHINE(machine), errp)) {
+             xics =3D try_create_xics(SPAPR_MACHINE(machine),
+                                    TYPE_XICS_SPAPR_KVM, TYPE_ICS_KVM,
+                                    TYPE_KVM_ICP, nr_servers, nr_irqs, &e=
+rr);
+@@ -175,6 +176,7 @@ static XICSState *xics_system_init(MachineState *mach=
+ine,
      }
 =20
--    xics->ss =3D g_malloc0(nr_servers * sizeof(ICPState));
--    xics->nr_servers =3D nr_servers;
-+    spapr->icps =3D g_malloc0(nr_servers * sizeof(ICPState));
-+    spapr->nr_servers =3D nr_servers;
-=20
-     for (i =3D 0; i < nr_servers; i++) {
--        ICPState *icp =3D &xics->ss[i];
-+        ICPState *icp =3D &spapr->icps[i];
-=20
-         object_initialize(icp, sizeof(*icp), type_icp);
-         qdev_set_parent_bus(DEVICE(icp), sysbus_get_default());
--        object_property_add_child(OBJECT(xics), "icp[*]", OBJECT(icp), N=
-ULL);
-+        object_property_add_child(OBJECT(spapr), "icp[*]", OBJECT(icp), =
-NULL);
-         object_property_add_const_link(OBJECT(icp), "xics", OBJECT(xi), =
-NULL);
-         object_property_set_bool(OBJECT(icp), true, "realized", &err);
-         if (err) {
-@@ -967,7 +967,7 @@ static void *spapr_build_fdt(sPAPRMachineState *spapr=
-,
-     _FDT(fdt_setprop_cell(fdt, 0, "#size-cells", 2));
-=20
-     /* /interrupt controller */
--    spapr_dt_xics(spapr->xics->nr_servers, fdt, PHANDLE_XICP);
-+    spapr_dt_xics(spapr->nr_servers, fdt, PHANDLE_XICP);
-=20
-     ret =3D spapr_populate_memory(spapr, fdt);
-     if (ret < 0) {
-@@ -2933,8 +2933,7 @@ static ICPState *spapr_icp_get(XICSFabric *xi, int =
-server)
- {
-     sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
-=20
--    return (server < spapr->xics->nr_servers) ? &spapr->xics->ss[server]=
- :
--        NULL;
-+    return (server < spapr->nr_servers) ? &spapr->icps[server] : NULL;
- }
-=20
- static void spapr_icp_resend(XICSFabric *xi)
-@@ -2942,8 +2941,8 @@ static void spapr_icp_resend(XICSFabric *xi)
-     sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
-     int i;
-=20
--    for (i =3D 0; i < spapr->xics->nr_servers; i++) {
--        icp_resend(&spapr->xics->ss[i]);
-+    for (i =3D 0; i < spapr->nr_servers; i++) {
-+        icp_resend(&spapr->icps[i]);
-     }
- }
-=20
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 21e506b13cfa..f5bbb040f941 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -95,6 +95,9 @@ struct sPAPRMachineState {
-     /*< public >*/
-     char *kvm_type;
-     MemoryHotplugState hotplug_memory;
-+
-+    uint32_t nr_servers;
-+    ICPState *icps;
- };
-=20
- #define H_SUCCESS         0
+     if (!xics) {
++        xics_spapr_init(SPAPR_MACHINE(machine), errp);
+         xics =3D try_create_xics(SPAPR_MACHINE(machine),
+                                TYPE_XICS_SPAPR, TYPE_ICS_SIMPLE,
+                                TYPE_ICP, nr_servers, nr_irqs, errp);
 diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index f618848009cf..50a5933df535 100644
+index 50a5933df535..b0b01e2975df 100644
 --- a/include/hw/ppc/xics.h
 +++ b/include/hw/ppc/xics.h
-@@ -79,8 +79,6 @@ struct XICSState {
-     /*< private >*/
-     DeviceState parent_obj;
-     /*< public >*/
--    uint32_t nr_servers;
--    ICPState *ss;
- };
+@@ -224,4 +224,9 @@ void ics_set_irq_type(ICSState *ics, int srcno, bool =
+lsi);
+ void ics_resend(ICSState *ics);
+ void icp_resend(ICPState *ss);
 =20
- #define TYPE_ICP "icp"
++typedef struct sPAPRMachineState sPAPRMachineState;
++
++int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
++int xics_spapr_init(sPAPRMachineState *spapr, Error **errp);
++
+ #endif /* XICS_H */
 --=20
 2.7.4
