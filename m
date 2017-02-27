@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51884)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51896)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ciLVW-00064T-Bl
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:38:31 -0500
+	(envelope-from <jcody@redhat.com>) id 1ciLVW-00065u-Sr
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:38:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ciLVV-00008Z-Fo
+	(envelope-from <jcody@redhat.com>) id 1ciLVV-00008k-Ko
 	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:38:30 -0500
-References: <20170225170758.427066-1-vsementsov@virtuozzo.com>
-	<20170225170758.427066-12-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <3e19d516-0763-1e41-effa-d14d05f417b9@redhat.com>
-Date: Mon, 27 Feb 2017 14:38:18 +0100
+Date: Mon, 27 Feb 2017 08:38:24 -0500
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170227133824.GE25637@localhost.localdomain>
+References: <cover.1488180142.git.jcody@redhat.com>
+	<08786526aec147544588ab3e885a984e7d0d1c69.1488180142.git.jcody@redhat.com>
+	<20170227073613.GB25637@localhost.localdomain>
+	<20170227093121.GD18219@redhat.com>
+	<20170227131859.GD25637@localhost.localdomain>
+	<20170227133046.GK18219@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170225170758.427066-12-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="OEHD90IqpDuOJjbqEBQmWs3aNoB1wJvI3"
-Subject: Re: [Qemu-devel] [PATCH v16 11/22] block: introduce persistent
- dirty bitmaps
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170227133046.GK18219@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 4/4] block/rbd: Add blockdev-add support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,160 +27,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, eblake@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---OEHD90IqpDuOJjbqEBQmWs3aNoB1wJvI3
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
- famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
-Message-ID: <3e19d516-0763-1e41-effa-d14d05f417b9@redhat.com>
-Subject: Re: [PATCH v16 11/22] block: introduce persistent dirty bitmaps
-References: <20170225170758.427066-1-vsementsov@virtuozzo.com>
- <20170225170758.427066-12-vsementsov@virtuozzo.com>
-In-Reply-To: <20170225170758.427066-12-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
+On Mon, Feb 27, 2017 at 01:30:46PM +0000, Daniel P. Berrange wrote:
+> On Mon, Feb 27, 2017 at 08:18:59AM -0500, Jeff Cody wrote:
+> > On Mon, Feb 27, 2017 at 09:31:21AM +0000, Daniel P. Berrange wrote:
+> > > On Mon, Feb 27, 2017 at 02:36:13AM -0500, Jeff Cody wrote:
+> > > > On Mon, Feb 27, 2017 at 02:30:41AM -0500, Jeff Cody wrote:
+> > > > > Signed-off-by: Jeff Cody <jcody@redhat.com>
+> > > > > ---
+> > > > >  qapi/block-core.json | 47 ++++++++++++++++++++++++++++++++++++++++++++---
+> > > > >  1 file changed, 44 insertions(+), 3 deletions(-)
+> > > > > 
+> > > > > diff --git a/qapi/block-core.json b/qapi/block-core.json
+> > > > > index 5f82d35..08a1419 100644
+> > > > > --- a/qapi/block-core.json
+> > > > > +++ b/qapi/block-core.json
+> > > > > @@ -2111,6 +2111,7 @@
+> > > > >  # @replication: Since 2.8
+> > > > >  # @ssh: Since 2.8
+> > > > >  # @iscsi: Since 2.9
+> > > > > +# @rbd: Since 2.9
+> > > > >  #
+> > > > >  # Since: 2.0
+> > > > >  ##
+> > > > > @@ -2120,7 +2121,7 @@
+> > > > >              'host_device', 'http', 'https', 'iscsi', 'luks', 'nbd', 'nfs',
+> > > > >              'null-aio', 'null-co', 'parallels', 'qcow', 'qcow2', 'qed',
+> > > > >              'quorum', 'raw', 'replication', 'ssh', 'vdi', 'vhdx', 'vmdk',
+> > > > > -            'vpc', 'vvfat' ] }
+> > > > > +            'vpc', 'vvfat', 'rbd' ] }
+> > > > >  
+> > > > >  ##
+> > > > >  # @BlockdevOptionsFile:
+> > > > > @@ -2376,7 +2377,6 @@
+> > > > >              'path': 'str',
+> > > > >              '*user': 'str' } }
+> > > > >  
+> > > > > -
+> > > > >  ##
+> > > > >  # @BlkdebugEvent:
+> > > > >  #
+> > > > > @@ -2666,6 +2666,47 @@
+> > > > >              '*timeout': 'int' } }
+> > > > >  
+> > > > >  ##
+> > > > > +# @BlockdevOptionsRbd:
+> > > > > +#
+> > > > > +# @pool:               Ceph pool name
+> > > > > +#
+> > > > > +# @image:              Image name in the Ceph pool
+> > > > > +#
+> > > > > +# @conf:               # optional path to Ceph configuration file.  Values
+> > > > > +#                      in the configuration file will be overridden by
+> > > > > +#                      options specified via QAPI.
+> > > > > +#
+> > > > > +# @snapshot:           #optional Ceph snapshot name
+> > > > > +#
+> > > > > +# @rbd-id:             #optional Ceph id name
+> > > > > +#
+> > > > > +# @password-secret:    #optional The ID of a QCryptoSecret object providing
+> > > > > +#                       the password for the login.
+> > > > > +#
+> > > > > +# @keyvalue-pairs:     #optional  string containing key/value pairs for
+> > > > > +#                      additional Ceph configuration, not including "id" or "conf"
+> > > > > +#                      options. This can be used to specify any of the options
+> > > > > +#                      that Ceph supports.  The format is of the form:
+> > > > > +#                           key1=value1:key2=value2:[...]
+> > > > > +#
+> > > > > +#                      Special characters such as ":" and "=" can be escaped
+> > > > > +#                      with a '\' character, which means the QAPI needs an
+> > > > > +#                      extra '\' character to pass the needed escape character.
+> > > > > +#                      For example:
+> > > > > +#                            "keyvalue-pairs": "mon_host=127.0.0.1\\:6321"
+> > > > > +#
+> > > > 
+> > > > This is the key / value pair issue mentioned in the cover letter.  Encoding
+> > > > all the options as a string like this is ugly.  What is the preference on
+> > > > how to handle these via QAPI, when the actual key and value pairs could be
+> > > > anything?   Talking with Markus on IRC, one option he mentioned was an array
+> > > > of a generic struct of 'key' and 'value' pairs.
+> > > > 
+> > > > Do the libvirt folks have any interface preferences here?
+> > > 
+> > > IMHO, we should formally model each option that we need to be able to provide
+> > > and *not* provide any generic passthrough feature in QAPI.
+> > > 
+> > > Particularly for the server hostname/port, we should have the same QAPI
+> > > modelling approach that we did for other network protocols.
+> > > 
+> > >
+> > 
+> > That is a sane position to take, but the problem is I really have no idea
+> > all the options to include or not include here.
+> 
+> Libvirt relies on the following
+> 
+>  - id             - to provide the username
+>  - mon_host       - to provide the list of host+ports
+>  - auth_supported - to provide the list of authentication schemes to try
+>  - conf           - to proide the ceph config file
+> 
+> 
+> > However, maybe it doesn't matter, at least for 2.9 - for the QAPI command,
+> > we could drop the extra arguments completely (i.e., just drop the
+> > keyvalue-pairs argument, above).  The extra options could still be set via a
+> > config file passed in via 'conf', and in release > 2.9 we can gradually (or
+> > not-so-gradually) add in additional options directly supported via QAPI.
+> > 
+> > The filename parsing would remain the same, for backwards compatibility, of
+> > course.
+> > 
+> > Does this sound reasonable to you?
+> 
+> If we support the pieces libvirt needs, then I've no objection to dropping
+> the rest.
+> 
 
-On 25.02.2017 18:07, Vladimir Sementsov-Ogievskiy wrote:
-> New field BdrvDirtyBitmap.persistent means, that bitmap should be saved=
+I'll add in mon_host and auth_supported, then.  Then we'll rely on the
+config file for unlisted options, and revisit new options in later releases.
 
-> on bdrv_close, using format driver.
-
-Somehow this sentence stays valid, but it has a much different meaning
-now. bdrv_close() no longer directly takes care of saving bitmaps but
-its completely up to the format driver. In any case, this patch has no
-longer anything to do with that, so I think this statement should be
-changed.
-
-Max
-
->                                     Format driver should maintain bitma=
-p
-> storing.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/dirty-bitmap.c         | 26 ++++++++++++++++++++++++++
->  block/qcow2-bitmap.c         |  1 +
->  include/block/dirty-bitmap.h |  6 ++++++
->  3 files changed, 33 insertions(+)
->=20
-> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-> index a9dfce8d00..d2fbf55964 100644
-> --- a/block/dirty-bitmap.c
-> +++ b/block/dirty-bitmap.c
-> @@ -44,6 +44,7 @@ struct BdrvDirtyBitmap {
->      int64_t size;               /* Size of the bitmap (Number of secto=
-rs) */
->      bool disabled;              /* Bitmap is read-only */
->      int active_iterators;       /* How many iterators are active */
-> +    bool persistent;            /* bitmap must be saved to owner disk =
-image */
->      bool autoload;              /* For persistent bitmaps: bitmap must=
- be
->                                     autoloaded on image opening */
->      QLIST_ENTRY(BdrvDirtyBitmap) list;
-> @@ -72,6 +73,7 @@ void bdrv_dirty_bitmap_make_anon(BdrvDirtyBitmap *bit=
-map)
->      assert(!bdrv_dirty_bitmap_frozen(bitmap));
->      g_free(bitmap->name);
->      bitmap->name =3D NULL;
-> +    bitmap->persistent =3D false;
->      bitmap->autoload =3D false;
->  }
-> =20
-> @@ -241,6 +243,8 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDr=
-iverState *bs,
->      bitmap->name =3D NULL;
->      successor->name =3D name;
->      bitmap->successor =3D NULL;
-> +    successor->persistent =3D bitmap->persistent;
-> +    bitmap->persistent =3D false;
->      successor->autoload =3D bitmap->autoload;
->      bitmap->autoload =3D false;
->      bdrv_release_dirty_bitmap(bs, bitmap);
-> @@ -555,3 +559,25 @@ bool bdrv_dirty_bitmap_get_autoload(const BdrvDirt=
-yBitmap *bitmap)
->  {
->      return bitmap->autoload;
->  }
-> +
-> +void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap, bool p=
-ersistent)
-> +{
-> +    bitmap->persistent =3D persistent;
-> +}
-> +
-> +bool bdrv_dirty_bitmap_get_persistance(BdrvDirtyBitmap *bitmap)
-> +{
-> +    return bitmap->persistent;
-> +}
-> +
-> +bool bdrv_has_persistent_bitmaps(BlockDriverState *bs)
-> +{
-> +    BdrvDirtyBitmap *bm;
-> +    QLIST_FOREACH(bm, &bs->dirty_bitmaps, list) {
-> +        if (bm->persistent) {
-> +            return true;
-> +        }
-> +    }
-> +
-> +    return false;
-> +}
-> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-> index 6b1a2c9c67..ba72b7d2ac 100644
-> --- a/block/qcow2-bitmap.c
-> +++ b/block/qcow2-bitmap.c
-> @@ -780,6 +780,7 @@ void qcow2_load_autoloading_dirty_bitmaps(BlockDriv=
-erState *bs, Error **errp)
->                  goto fail;
->              }
-> =20
-> +            bdrv_dirty_bitmap_set_persistance(bitmap, true);
->              bdrv_dirty_bitmap_set_autoload(bitmap, true);
->              bm->flags |=3D BME_FLAG_IN_USE;
->              created_dirty_bitmaps =3D
-> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.=
-h
-> index 45a389a20a..8dbd16b040 100644
-> --- a/include/block/dirty-bitmap.h
-> +++ b/include/block/dirty-bitmap.h
-> @@ -77,4 +77,10 @@ void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyB=
-itmap *bitmap);
-> =20
->  void bdrv_dirty_bitmap_set_autoload(BdrvDirtyBitmap *bitmap, bool auto=
-load);
->  bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap);
-> +void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap,
-> +                                                bool persistent);
-> +bool bdrv_dirty_bitmap_get_persistance(BdrvDirtyBitmap *bitmap);
-> +
-> +bool bdrv_has_persistent_bitmaps(BlockDriverState *bs);
-> +
->  #endif
->=20
-
-
-
---OEHD90IqpDuOJjbqEBQmWs3aNoB1wJvI3
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAli0K8oSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A+4AIAI7yCPaOIBvCVYOKC0qRCpNSGjXPIGgR
-TTQ/yDmmq17/TP8+gUe8oGt1TZ1C0AXVVIWa+czmqdhlbHBGibqoDCvfHE4wtyvI
-NzSTiyNTpLpJQFGfGDmvwVnCAMUnapA3XXAbqJIUsR2zOlat9C98K3BBtxJ1lRCq
-FE8E/CwjTWGmURY/rT326Mml6Rutlbk1kmBhvOiFh/OKntXgoTu3Q5199SYxVFVz
-1npI8QUm+Z9qdO57z6hurvKoepulbz0UI/tk1u7O7OxYD/zP3CU5IrrlH6pggoxz
-ABWWSkXn2oXwnzScVYikK8hrWuML2h56f3EBY7u8Op5nOnxibzix6mg=
-=o6kL
------END PGP SIGNATURE-----
-
---OEHD90IqpDuOJjbqEBQmWs3aNoB1wJvI3--
+Thanks,
+Jeff
