@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kai.huang@linux.intel.com>) id 1ciFtM-0004rb-KB
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:38:45 -0500
+	(envelope-from <bounces@canonical.com>) id 1ciG5D-0000qz-4h
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:51:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kai.huang@linux.intel.com>) id 1ciFtI-0001Lz-OO
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:38:44 -0500
-Received: from mga02.intel.com ([134.134.136.20]:18973)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kai.huang@linux.intel.com>)
-	id 1ciFtI-0001Lm-DR
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:38:40 -0500
-References: <589C7E96.9060905@huawei.com> <589D83CE.1090803@huawei.com>
-	<589DDC05.9010807@windriver.com> <58AA51D6.6020508@huawei.com>
-	<1487565495.3740.27.camel@intel.com> <58AD0094.90304@windriver.com>
-	<4dd92012-626a-2d80-9adb-0be398f73eb1@redhat.com>
-	<58AD92AE.6040502@windriver.com>
-	<6c5567f4-192d-aefd-90e4-89f53479c24e@redhat.com>
-	<58AF9921.6060201@huawei.com> <58B04CD3.7010304@windriver.com>
-	<7fdf2551-3d55-1bd9-2848-720a880cc93e@redhat.com>
-	<58B0E191.6040108@huawei.com>
-From: "Huang, Kai" <kai.huang@linux.intel.com>
-Message-ID: <50916996-297e-a794-38e8-5c7ca9389419@linux.intel.com>
-Date: Mon, 27 Feb 2017 20:38:27 +1300
+	(envelope-from <bounces@canonical.com>) id 1ciG54-0005nm-QJ
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:50:59 -0500
+Received: from indium.canonical.com ([91.189.90.7]:49127)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ciG54-0005lE-Hk
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:50:50 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1ciG51-0001q6-Db
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 07:50:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id DE0342E80CF
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 07:50:46 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <58B0E191.6040108@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] kvm bug in __rmap_clear_dirty during live migration
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 27 Feb 2017 07:38:47 -0000
+From: Thomas Huth <1668103@bugs.launchpad.net>
+Reply-To: Bug 1668103 <1668103@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170226205013.23267.77116.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170227073847.22854.65522.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1668103] Re: Possible off-by-one error in
+ priority handling of hw/PL190.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,57 +37,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Herongguang (Stephen)" <herongguang.he@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Chris Friesen <chris.friesen@windriver.com>, "Han, Huaitong" <huaitong.han@intel.com>, "hangaohuai@huawei.com" <hangaohuai@huawei.com>, stable@vger.kernel.org
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "fangying1@huawei.com" <fangying1@huawei.com>, "xudong.hao@linux.intel.com" <xudong.hao@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "wangxinxin.wang@huawei.com" <wangxinxin.wang@huawei.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "guangrong.xiao@linux.intel.com" <guangrong.xiao@linux.intel.com>, linux-kernel@vger.kernel.org
+To: qemu-devel@nongnu.org
 
+We do not take patches from the bug tracker, please send it to the qemu-
+devel mailing list instead. See http://wiki.qemu-
+project.org/Contribute/SubmitAPatch for details.
 
+** Changed in: qemu
+       Status: Fix Committed =3D> In Progress
 
-On 2/25/2017 2:44 PM, Herongguang (Stephen) wrote:
->
->
-> On 2017/2/24 23:14, Paolo Bonzini wrote:
->>
->>
->> On 24/02/2017 16:10, Chris Friesen wrote:
->>> On 02/23/2017 08:23 PM, Herongguang (Stephen) wrote:
->>>
->>>> On 2017/2/22 22:43, Paolo Bonzini wrote:
->>>
->>>>> Hopefully Gaohuai and Rongguang can help with this too.
->>>>>
->>>>> Paolo
->>>>
->>>> Yes, we are looking into and testing this.
->>>>
->>>> I think this can result in any memory corruption, if VM1 writes its
->>>> PML buffer into VM2’s VMCS (since sched_in/sched_out notifier of VM1
->>>> is not registered yet), then VM1 is destroyed (hence its PML buffer
->>>> is freed back to kernel), after that, VM2 starts migration, so CPU
->>>> logs VM2’s dirty GFNS into a freed memory, results in any memory
->>>> corruption.
->>>>
->>>> As its severity, this commit
->>>> (http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=4e59516a12a6ef6dcb660cb3a3f70c64bd60cfec)
->>>>
->>>>
->>>> is eligible to back port to kernel stable.
->>>
->>> Are we expecting that fix to resolve the original issue, or is it a
->>> separate issue that needs fixing in stable?
->>
->> It should be the original issue.
->>
->> Paolo
->>
->> .
->>
-> Yes, I agree, though we are still testing.
->
->
-Hi Stephen,
+-- =
 
-Sorry for late reply. I was taking the whole week off last week. How's 
-the test going?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1668103
 
-Thanks,
--Kai
+Title:
+  Possible off-by-one error in priority handling of hw/PL190.c
+
+Status in QEMU:
+  In Progress
+
+Bug description:
+  I have a problem when reading back VECTADDR in my proprietary OS's
+  interrupt handler.
+
+  Example client code:
+
+   1) Write INTENCLEAR to clear all interrupt enable bits
+   2) Set all 16 vector control registers to zero
+   3) Set vector address #2 to value 2
+   4) Set vector control #2 to 0x21 (vector_interrupt_enable(0x20) | vector=
+_interrupt_source(0x1) )
+   5) Enable interrupt 1 by writing 0x2 to INTENABLE
+   6) In interrupt handler: read VECTADDR [should read 0x2 (active IRQs vec=
+tor address as set in step 3), reads 0x0 (active vector address index 3 ins=
+tead of index 2)]
+
+  Problem:
+
+  So, for me, the block commented with /* Read vector address at the
+  start of an ISR...  */ in hw/pl190.c has an off by-one error and does
+  not return the vector address of the pending interrupt, but of the
+  next one in the list of priorities (i.e. vector address 3).
+
+  Solution:
+
+  In pl190_update_vectors(), also set the priority bit for the current
+  priority (1<<i) interrupt (if enabled) in s->prio_mask[i] in addition
+  to those of higher priority enabled interrupts. This will cause the
+  loop in the read handling of VECTADDR to terminate an iteration
+  earlier and will deliver the correct interrupt priority as iteration
+  variable i subsequently used for addressing.
+
+  I'll try to provide a patch for this.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1668103/+subscriptions
