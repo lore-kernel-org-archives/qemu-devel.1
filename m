@@ -1,32 +1,48 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ciDxm-0005gA-Ky
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 00:35:11 -0500
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1ciDy3-0005vb-23
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 00:35:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ciDxj-0002xW-Jg
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 00:35:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57942)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ciDxj-0002ww-EU
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 00:35:07 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9F15583F38
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 05:35:07 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <1487886317-27400-1-git-send-email-armbru@redhat.com>
-	<1487886317-27400-17-git-send-email-armbru@redhat.com>
-	<79895263-30d6-ed80-7d47-d2f22dbd6c47@redhat.com>
-Date: Mon, 27 Feb 2017 06:35:04 +0100
-In-Reply-To: <79895263-30d6-ed80-7d47-d2f22dbd6c47@redhat.com> (Eric Blake's
-	message of "Sat, 25 Feb 2017 10:30:25 -0600")
-Message-ID: <87o9xonqlz.fsf@dusky.pond.sub.org>
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1ciDxz-00034q-Nm
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 00:35:27 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37159)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1ciDxz-00033l-Eu
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 00:35:23 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1R5SWjI029847
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 00:35:22 -0500
+Received: from e28smtp05.in.ibm.com (e28smtp05.in.ibm.com [125.16.236.5])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28u6at75gw-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 00:35:21 -0500
+Received: from localhost
+	by e28smtp05.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Mon, 27 Feb 2017 11:05:19 +0530
+Received: from d28relay10.in.ibm.com (d28relay10.in.ibm.com [9.184.220.161])
+	by d28dlp02.in.ibm.com (Postfix) with ESMTP id 03F683940033
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 11:05:17 +0530 (IST)
+Received: from d28av06.in.ibm.com (d28av06.in.ibm.com [9.184.220.48])
+	by d28relay10.in.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v1R5YBif13172852
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 11:04:11 +0530
+Received: from d28av06.in.ibm.com (localhost [127.0.0.1])
+	by d28av06.in.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+	v1R5ZG0u017144
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 11:05:16 +0530
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+In-Reply-To: <CAFEAcA_TaQf7H=qc6wCHrT88XFTo21i7L9=PHTNFpySA0YCOSw@mail.gmail.com>
+References: <1486976352-549-1-git-send-email-nikunj@linux.vnet.ibm.com>
+	<CAFEAcA_TaQf7H=qc6wCHrT88XFTo21i7L9=PHTNFpySA0YCOSw@mail.gmail.com>
+Date: Mon, 27 Feb 2017 11:05:14 +0530
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 16/21] test-qobject-input-visitor: Use
- strict visitor
+Message-Id: <878tosp565.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH 1/2] risu_ppc64le: fix the typo nb => rb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,38 +51,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, "bharata@linux.vnet.ibm.com" <bharata@linux.vnet.ibm.com>
 
-Eric Blake <eblake@redhat.com> writes:
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-> On 02/23/2017 03:45 PM, Markus Armbruster wrote:
->> The qobject input visitor comes in a strict and a non-strict variant.
->> This test is the non-strict variant's last user.
->
-> Well, depending on Paolo's proposed addition.
-
-Needs a commit message tweak if Paolo's goes in first.
-
->>  Turns out it relies
->> on non-strict only in test_visitor_in_null(), and just out of
->> laziness.  We don't actually test the non-strict behavior.
->> 
->> Clean up test_visitor_in_null(), and switch to the strict variant.
->> The next commit will drop the non-strict variant.
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> On 13 February 2017 at 08:59, Nikunj A Dadhania
+> <nikunj@linux.vnet.ibm.com> wrote:
+>> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 >> ---
->>  tests/test-qobject-input-visitor.c | 10 +++++-----
->>  1 file changed, 5 insertions(+), 5 deletions(-)
+>>  ppc64.risu | 6 +++---
+>>  1 file changed, 3 insertions(+), 3 deletions(-)
 >
-> I'm in favor of unifying the two tests into one and reducing the
-> duplication (this and the next patch), whether or not we decide that
+> Thanks, applied to risu master.
 
-Patch after next, actually.
+Thanks.
 
-> Paolo's patch means we don't want to eliminate non-strict mode.
->
-> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Thanks!
+> PS: I nearly missed this patchset entirely, because it doesn't have
+> a cover letter. If you could provide cover letters for multi-patch
+> series in future that would be really helpful.
+
+Sure, will keep that in mind.
+
+Regards
+Nikunj
