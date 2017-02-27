@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1ciL6T-0002DJ-KT
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:12:38 -0500
+	(envelope-from <stefanha@gmail.com>) id 1ciL6a-0002Jq-AE
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:12:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1ciL6O-00009T-NO
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:12:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48648)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1ciL6O-00008c-Ez
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:12:32 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E89948124D
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 13:12:31 +0000 (UTC)
-From: Marcel Apfelbaum <marcel@redhat.com>
-Date: Mon, 27 Feb 2017 15:12:26 +0200
-Message-Id: <1488201146-19580-1-git-send-email-marcel@redhat.com>
-Subject: [Qemu-devel] [PATCH V3] hw/pxb-pcie: fix PCI Express hotplug support
+	(envelope-from <stefanha@gmail.com>) id 1ciL6Z-0000BN-Dk
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:12:44 -0500
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:33065)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ciL6Z-0000B3-8T
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:12:43 -0500
+Received: by mail-wr0-x241.google.com with SMTP id g10so10077070wrg.0
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 05:12:43 -0800 (PST)
+Date: Mon, 27 Feb 2017 13:12:40 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170227131240.GL28403@stefanha-x1.localdomain>
+References: <148814889214.28146.16915712763478774662.stgit@bahia>
+	<148814897182.28146.16499801111559710291.stgit@bahia>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="jtcAeju3WzRmRF+o"
+Content-Disposition: inline
+In-Reply-To: <148814897182.28146.16499801111559710291.stgit@bahia>
+Subject: Re: [Qemu-devel] [PATCH v2 10/28] 9pfs: local: lremovexattr: don't
+ follow symlinks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,124 +31,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, marcel@redhat.com, imammedo@redhat.com
-
-Add the missing osc method for pxb-pcie devices as APCI spec recommends,
-see 6.2.10.3 OSC Implementation Example for PCI Host Bridge Devices, ACPI 5.0:
-
-    It is recommended that a machine with multiple host bridge devices
-    should report the same capabilities for all host bridges, and also
-    negotiate control of the features described in the Control Field in
-    the same way for all host bridges.
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
----
-
-Note to maintainer:
- Please update ACPI test files.
-
-V2 -> V3:
-      - Modified comment (Igor)
-
-V1 -> V2:
-    Addressed Michael S. Tsirkin's comments:
-      - Added documentation to q35 osc function
-      - Made _osc serialized. I did not add compat property
-        since it seems guest OSs do not care anyway about the OSC
-        being serialized.
-      - Kept the SUPP field even if is not used and also
-        left both SUPP and CTRL out of the _osc because all
-        systems I checked and the ACPI spec keep them that way,
-        maybe is some kind of documentation contract.
-
-Thanks,
-Marcel
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
 
- hw/i386/acpi-build.c | 41 +++++++++++++++++++++++++++++++++++------
- 1 file changed, 35 insertions(+), 6 deletions(-)
+--jtcAeju3WzRmRF+o
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 1c928ab..ad3f233 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -1796,7 +1796,7 @@ static void build_piix4_pci_hotplug(Aml *table)
-     aml_append(table, scope);
- }
- 
--static Aml *build_q35_osc_method(void)
-+static void build_q35_osc_method(Aml *dev)
- {
-     Aml *if_ctx;
-     Aml *if_ctx2;
-@@ -1805,7 +1805,35 @@ static Aml *build_q35_osc_method(void)
-     Aml *a_cwd1 = aml_name("CDW1");
-     Aml *a_ctrl = aml_name("CTRL");
- 
--    method = aml_method("_OSC", 4, AML_NOTSERIALIZED);
-+    /*
-+     * Bits defined in the Support Field provide information
-+     * regarding OS supported features.
-+     *
-+     * This field is not actually used and can be removed,
-+     * however it appears even if unused on most DSDTs.
-+     *
-+     * See:
-+     *     Table 6-148 Interpretation of _OSC Support Field,
-+     *     Passed in via the 2nd dword in Arg3, APCI 5.0
-+     */
-+    aml_append(dev, aml_name_decl("SUPP", aml_int(0)));
-+
-+    /*
-+     * Bits defined in the Control Field are used to submit
-+     * request by the OS for control/handling of the associated feature
-+     *
-+     * See: Table 6-149 Interpretation of _OSC Control Field,
-+     *      Passed in via Arg3, ACPI 5.0
-+     *      Table 6-150 Interpretation of _OSC Control Field,
-+     *      Returned Value, APCI 5.0
-+     */
-+    aml_append(dev, aml_name_decl("CTRL", aml_int(0)));
-+
-+
-+   /*
-+    * 6.2.10 _OSC (Operating System Capabilities), APCI 5.0
-+    */
-+    method = aml_method("_OSC", 4, AML_SERIALIZED);
-     aml_append(method, aml_create_dword_field(aml_arg(3), aml_int(0), "CDW1"));
- 
-     if_ctx = aml_if(aml_equal(
-@@ -1842,7 +1870,7 @@ static Aml *build_q35_osc_method(void)
-     aml_append(method, else_ctx);
- 
-     aml_append(method, aml_return(aml_arg(3)));
--    return method;
-+    aml_append(dev, method);
- }
- 
- static void
-@@ -1898,9 +1926,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-         aml_append(dev, aml_name_decl("_CID", aml_eisaid("PNP0A03")));
-         aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
-         aml_append(dev, aml_name_decl("_UID", aml_int(1)));
--        aml_append(dev, aml_name_decl("SUPP", aml_int(0)));
--        aml_append(dev, aml_name_decl("CTRL", aml_int(0)));
--        aml_append(dev, build_q35_osc_method());
-+        build_q35_osc_method(dev);
-         aml_append(sb_scope, dev);
-         aml_append(dsdt, sb_scope);
- 
-@@ -1964,6 +1990,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-             aml_append(dev, aml_name_decl("_UID", aml_int(bus_num)));
-             aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A03")));
-             aml_append(dev, aml_name_decl("_BBN", aml_int(bus_num)));
-+            if (pci_bus_is_express(bus)) {
-+                build_q35_osc_method(dev);
-+            }
- 
-             if (numa_node != NUMA_NODE_UNASSIGNED) {
-                 aml_append(dev, aml_name_decl("_PXM", aml_int(numa_node)));
--- 
-2.5.5
+On Sun, Feb 26, 2017 at 11:42:51PM +0100, Greg Kurz wrote:
+> The local_lremovexattr() callback is vulnerable to symlink attacks because
+> it calls lremovexattr() which follows symbolic links in all path elements
+> but the rightmost one.
+>=20
+> This patch introduces a helper to emulate the non-existing fremovexattrat=
+()
+> function: it is implemented with /proc/self/fd which provides a trusted
+> path that can be safely passed to lremovexattr().
+>=20
+> local_lremovexattr() is converted to use this helper and opendir_nofollow=
+().
+>=20
+> This partly fixes CVE-2016-9602.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+> v2: - introduce /proc based fremovexattrat_nofollow()
+>     - fix arguments passed to local_removexattr_nofollow()
+> ---
+>  hw/9pfs/9p-posix-acl.c  |   10 ++--------
+>  hw/9pfs/9p-xattr-user.c |    8 +-------
+>  hw/9pfs/9p-xattr.c      |   36 +++++++++++++++++++++++++++++++-----
+>  hw/9pfs/9p-xattr.h      |    2 ++
+>  4 files changed, 36 insertions(+), 20 deletions(-)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--jtcAeju3WzRmRF+o
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYtCXIAAoJEJykq7OBq3PI/mQH/0yaN6oVrky5PecXjWlPb7Kf
+Sgmu5WikdKt6UiDupu2nZtVwImYjT6C0JHMxXffH0Q9IFwuljlDJyzrQhQj0AEyL
+JvSknvH9kQXQ/4ttawjpisFaNtJwUFYXqYco1JgCCAJ2b+yW4X3sWMHS0kiZf3sl
+M83a/FecmN5N7slyR97Uuq0f8y5SthR6Ml+tyDFtfwTT2UnGT9PM0805jJMYJh06
+spc/Rwhyna0a2nZJVS25N7MIUw1XU2Y5JLzyOt2swmbQHK5b3Gfh1KKDocKRgtJp
+uDvKtDQWGKxaxQ11b1DznVesAWmmGrbl6hTJzPTWZsbOvB16ZQYwuKuDAFU4S1I=
+=9O1P
+-----END PGP SIGNATURE-----
+
+--jtcAeju3WzRmRF+o--
