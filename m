@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ci9ZM-00064I-7M
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 19:53:41 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ci9ZN-00064R-PV
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 19:53:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ci9ZL-0000E0-5O
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 19:53:40 -0500
-Date: Mon, 27 Feb 2017 10:43:54 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1ci9ZK-0000Dk-KW
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 19:53:41 -0500
+Date: Mon, 27 Feb 2017 11:30:50 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170226234354.GH17615@umbus.fritz.box>
+Message-ID: <20170227003050.GI17615@umbus.fritz.box>
 References: <1487252865-12064-1-git-send-email-clg@kaod.org>
-	<1487252865-12064-5-git-send-email-clg@kaod.org>
-	<20170223021531.GS12577@umbus.fritz.box>
-	<eeec3567-d024-a09a-8a58-304a27c0bb95@kaod.org>
+	<1487252865-12064-9-git-send-email-clg@kaod.org>
+	<20170223022933.GW12577@umbus.fritz.box>
+	<6deab394-2564-3a43-669c-af4b8a2aa4e3@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="OdQvBiqfLsaeimeB"
+	protocol="application/pgp-signature"; boundary="GFRhMCFsFD5VPY3r"
 Content-Disposition: inline
-In-Reply-To: <eeec3567-d024-a09a-8a58-304a27c0bb95@kaod.org>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 04/22] ppc/xics: add an
- InterruptStatsProvider interface to ICS and ICP objects
+In-Reply-To: <6deab394-2564-3a43-669c-af4b8a2aa4e3@kaod.org>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 08/22] ppc/xics: use the QOM
+ interface to resend irqs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,94 +31,127 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---OdQvBiqfLsaeimeB
+--GFRhMCFsFD5VPY3r
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 24, 2017 at 11:52:01AM +0100, C=E9dric Le Goater wrote:
-> On 02/23/2017 03:15 AM, David Gibson wrote:
-> > On Thu, Feb 16, 2017 at 02:47:27PM +0100, C=E9dric Le Goater wrote:
-> >> This is, again, to reduce the use of the list of ICS objects. Let's
-> >> make each individual ICS and ICP object an InterruptStatsProvider and
-> >> remove this same interface from XICSState.
-> >>
+On Fri, Feb 24, 2017 at 12:12:54PM +0100, C=E9dric Le Goater wrote:
+> On 02/23/2017 03:29 AM, David Gibson wrote:
+> > On Thu, Feb 16, 2017 at 02:47:31PM +0100, C=E9dric Le Goater wrote:
 > >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> >> ---
+> >>  hw/intc/xics.c | 26 ++++++++++++++------------
+> >>  1 file changed, 14 insertions(+), 12 deletions(-)
+> >>
+> >> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+> >> index 0ffdf09c5304..2decb921e4e3 100644
+> >> --- a/hw/intc/xics.c
+> >> +++ b/hw/intc/xics.c
+> >> @@ -229,16 +229,15 @@ static void icp_check_ipi(ICPState *ss)
+> >>      qemu_irq_raise(ss->output);
+> >>  }
+> >> =20
+> >> -static void icp_resend(ICPState *ss)
+> >> +static void icp_resend(XICSInterface *xi, ICPState *ss)
+> >>  {
+> >> -    ICSState *ics;
+> >> +    XICSInterfaceClass *xic =3D XICS_INTERFACE_GET_CLASS(xi);
+> >> =20
+> >>      if (ss->mfrr < CPPR(ss)) {
+> >>          icp_check_ipi(ss);
+> >>      }
+> >> -    QLIST_FOREACH(ics, &ss->xics->ics, list) {
+> >> -        ics_resend(ics);
+> >> -    }
+> >> +
+> >> +    xic->ics_resend(xi);
+> >>  }
+> >> =20
+> >>  void icp_set_cppr(ICPState *ss, uint8_t cppr)
+> >> @@ -262,7 +261,7 @@ void icp_set_cppr(ICPState *ss, uint8_t cppr)
+> >>          }
+> >>      } else {
+> >>          if (!XISR(ss)) {
+> >> -            icp_resend(ss);
+> >> +            icp_resend(XICS_INTERFACE(qdev_get_machine()), ss);
 > >=20
-> > I'm a little hesitant about this, because it means that getting the
-> > interrupt stats information is now spread out over the qom tree,
-> > whereas previously there was a single location to get a good summary
-> > of the systems overall interrupt status.  The previous behaviour seems
-> > like it would be more convenient for debugging.
+> > Here you're assuming that the machine is the implementor of the xics
+> > interface, which is kinda ugly.  The ICP should have a pointer to the
+> > xics interface, which will eventually replace the pointer to the
+> > overall xics object it has now.
+>=20
+> yes. I will try improve that. I don't like those calls to=20
+> qdev_get_machine()either.=20
+>=20
+> There are done in a couple of places though, under spapr_cpu_core
+> to get XICS for instance.
+
+Right, but I'm happier with it there, in code that's definitely
+associated with a particular machine, rather than in the xics code
+which is at least somewhat reusable.
+
+> > But I haven't read the rest of the series yet, maybe this is just
+> > transitional.
 > >=20
-> > That said, I see the structural advantages of this split.  Hmm.. still
-> > thinking..
+> >>          }
+> >>      }
+> >>  }
+> >> @@ -299,6 +298,8 @@ uint32_t icp_ipoll(ICPState *ss, uint32_t *mfrr)
+> >> =20
+> >>  void icp_eoi(ICPState *ss, uint32_t xirr)
+> >>  {
+> >> +    XICSInterface *xi =3D XICS_INTERFACE(qdev_get_machine());
+> >> +    XICSInterfaceClass *xic =3D XICS_INTERFACE_GET_CLASS(xi);
+> >>      ICSState *ics;
+> >>      uint32_t irq;
+> >> =20
+> >> @@ -306,13 +307,13 @@ void icp_eoi(ICPState *ss, uint32_t xirr)
+> >>      ss->xirr =3D (ss->xirr & ~CPPR_MASK) | (xirr & CPPR_MASK);
+> >>      trace_xics_icp_eoi(ss->cs->cpu_index, xirr, ss->xirr);
+> >>      irq =3D xirr & XISR_MASK;
+> >> -    QLIST_FOREACH(ics, &ss->xics->ics, list) {
+> >> -        if (ics_valid_irq(ics, irq)) {
+> >> -            ics_eoi(ics, irq);
+> >> -        }
+> >> +
+> >> +    ics =3D xic->ics_get(xi, irq);
+> >> +    if (ics) {
+> >> +        ics_eoi(ics, irq);
+> >>      }
+> >>      if (!XISR(ss)) {
+> >> -        icp_resend(ss);
+> >> +        icp_resend(xi, ss);
+> >>      }
+> >>  }
+> >> =20
+> >> @@ -592,10 +593,11 @@ static void ics_simple_reset(DeviceState *dev)
+> >> =20
+> >>  static int ics_simple_post_load(ICSState *ics, int version_id)
+> >>  {
+> >> +    XICSInterface *xi =3D XICS_INTERFACE(qdev_get_machine());
+> >>      int i;
+> >> =20
+> >>      for (i =3D 0; i < ics->xics->nr_servers; i++) {
+> >> -        icp_resend(&ics->xics->ss[i]);
+> >> +        icp_resend(xi, &ics->xics->ss[i]);
+> >>      }
+> >=20
+> > This resend triggering needs to get moved to the xics interface
+> > implementor - i.e. the machine.  It's actually already broken right
+> > now, since it incorrectly relies on the ordering of the ics and icp
+> > restore during migration.
 >=20
-> This is true. Another argument in favour of what you are saying=20
-> is the order in which these are printed. See below. =20
->=20
-> What we could do after the cleanup is to make the machine an=20
-> InterruptStatsProvider to clarify things.
-
-Right.  So "info pic" does at least iterate through all the providers,
-but the semi-random order is pretty icky.  I think putting the stats
-provider on the machine would be a better idea - I guess it should be
-easy enough if the xics code provides a helper.
-
+> I'm adding a icp_resend() handler in patch 12 and using it patch 14.
+> Maybe we can move the post_load() handler out of ICS simple now ?=20
 >=20
 > Thanks,
 >=20
 > C.=20
 >=20
->=20
-> (qemu) info pic=20
-> CPU 18 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 0 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 21 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 2 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 23 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 4 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 11 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 25 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 6 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 13 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 27 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 8 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 15 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 29 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 30 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 17 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 20 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 19 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 1 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> ICS 1000..13ff 0x10018f1ea40
->   1000 MSI ff 00
->   1001 MSI ff 00
->   1002 MSI ff 00
->   1003 MSI ff 00
->   1004 LSI ff 00
->   1005 LSI ff 00
->   1006 LSI ff 00
->   1007 LSI ff 00
->   1008 MSI ff 00
->   1009 MSI ff 00
->   100a MSI ff 00
->   100b MSI ff 00
->   100c MSI ff 00
-> CPU 22 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 3 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 10 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 24 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 5 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 12 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 26 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 7 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 14 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 28 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 9 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 16 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
-> CPU 31 XIRR=3D00000000 ((nil)) PP=3Dff MFRR=3Dff
->=20
+> =20
+> >>      return 0;
+> >=20
 >=20
 
 --=20
@@ -127,25 +160,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---OdQvBiqfLsaeimeB
+--GFRhMCFsFD5VPY3r
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYs2g3AAoJEGw4ysog2bOSdGsP/il36xl0AIhm7zmQiyNt64VI
-ln0QhOToegcSQT0niXuAHRpSoMld/hIbuHhJiE3V2KUMaob1XiIygIE4e/OYsrEA
-vz96AZqNCW5cMjqdFqthHqAQ+9+izJVvOX8zQAS5MuXHgzeHmKQzzaUb8YM2Nwom
-Rw4d8FGjPyZV9OwSq+ZoZOA3wvRmPRae/hYIW5aakwSZwtfvJow5KcQHaMWsRyA2
-+xgIFdq4/e6lAtX+j0QD01yTGMZOg4nAO/IVcVcRu69XSZM5sQ7PQe6ux3iKlMfm
-x8X8GPRZUv4h5yaCJElFmmrLgf5rW22ZjnTm50QoZyR8/jSisqlin2CmtpZ8TJSv
-l1qYL+xLyKEakUuQ23Fwp4fl5SDAU0HxIoH6P5NQSvNFb+Z+FwoqbGNd4hFwjxc+
-j3KxxIo3oDSqb+sLSLhvl1IrKAwicVcsBsGdoYf3naGFUDve+Z72VYF+D77mD6HU
-LqKt9Ra8VKHxbVXkcQ9hhoa6w3rgbKPNa6qKbCaNF/w0l5h3soqb2KHq+AA8g2of
-prwY2mJCiyuSAZsw8s/bARdxNcA7KgoVTzU7aDaVruimjFDGgI6AE2pGSyTQSdk/
-pvMN7G+DrZI6XzrC697I9fgaVKvX7QjcnhQE1uOEnAr8evPsIqcygPx/rTQi7jqJ
-ieB8qJ3CzuQRO8VBEAQo
-=HRPS
+iQIcBAEBCAAGBQJYs3M3AAoJEGw4ysog2bOSb98P/AiFHkZGWfUfs4Dgu7aqn9nU
+i1l00O6DKQB21LUo2NxKu8Iin5oAvCoBkPgvV7qcolF/ywMKnlW4/+9VYJpUPyjF
+dpurvzJKyCepC9GIzP1lhVh35yj1HVAju9Y6LQMwBl9uSy3KF6P/se9YptpDaLOK
+yV/OMZfedIqenXcqcnQVsVI9wKb2KgqfkqTyKwlyMeB7FE5Q+4kr+x3I5IiRa8s6
+nz953hZI8RQYC8X16gwu4fHH3MCo3+DAVOiQmPUqpiQgKJVUnrgJ5xTFDL55994w
+wAuaZGjb4TImtLyPOwQ9PSzgevD66y7R+Uj+TsVIgQ6QmzlWntP66+bgPhaSX+AU
+kdMO7rqPkHBWXTxKBhJgZSaF4QFzJ/4Xbj2rulEfPQRfD+aqj41ecs1CaX2EiiSP
+40VzXUn7kMFwMFZ8X//FPIGJzbsf1+PrC9jUFCzs/lstHS19U/zeFuZkz3q7IOe9
+15gro9EkWZtYjKiVHYSMIhy2gK9eOugivFM2Q6gQ2LLN5Z2erjh70Tla7v32miAb
+vxc/9KFiF1+FJe+o7pTG7g6JwS1Dl8I/LoETtxeETL1VbI8lQbYD4BjW5SBGL+mO
+yWFvo6Kg7TcYd6T6hb6zK6KllM8xH5eICU/ZvhnT8gkIAP0IoWXefFij+42fwXFN
+TV1uVzGQzCy/aup+1xI8
+=WgIb
 -----END PGP SIGNATURE-----
 
---OdQvBiqfLsaeimeB--
+--GFRhMCFsFD5VPY3r--
