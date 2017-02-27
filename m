@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51033)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ciLT3-00042p-TZ
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:35:58 -0500
+	(envelope-from <armbru@redhat.com>) id 1ciLTv-0004ih-Ci
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:36:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ciLT3-0007jy-4v
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:35:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51342)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ciLT2-0007jf-Li
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:35:56 -0500
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Mon, 27 Feb 2017 13:35:31 +0000
-Message-Id: <20170227133531.31874-4-berrange@redhat.com>
-In-Reply-To: <20170227133531.31874-1-berrange@redhat.com>
-References: <20170227133531.31874-1-berrange@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1ciLTr-00082S-FT
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:36:51 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <87bmukmlau.fsf@dusky.pond.sub.org>
+	<87poi4c4jd.fsf@dusky.pond.sub.org>
+	<20170227105704.GB6356@noname.redhat.com>
+Date: Mon, 27 Feb 2017 14:36:40 +0100
+In-Reply-To: <20170227105704.GB6356@noname.redhat.com> (Kevin Wolf's message
+	of "Mon, 27 Feb 2017 11:59:00 +0100")
+Message-ID: <87innvhi1j.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v1 3/3] tests: fix leaks in
- test-io-channel-command
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] Non-flat command line option argument syntax
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +24,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Peter Krempa <pkrempa@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Kevin Wolf <kwolf@redhat.com> writes:
 
-No need for strdup, fix leaks when socat is missing.
+> Am 27.02.2017 um 11:27 hat Markus Armbruster geschrieben:
+>> Markus Armbruster <armbru@redhat.com> writes:
+>> 
+>> [...]
+>> > === Dotted keys ===
+>> >
+>> > One sufficiently powerful syntax extension already exists: the dotted
+>> > key convention.  It's syntactically unambiguous only when none of the
+>> > KEYs involved contains '.'  To adopt it across the board, we'd have to
+>> > outlaw '.' in KEYs.  QAPI outlaws '.' already, but we have a bunch of
+>> > QOM properties names with '.'.  We'd have to rename at least the ones
+>> > that need to be accessible in -object.
+>> >
+>> > Dotted keys can't express member names that look like integers.  We'd
+>> > have to outlaw them at least for the objects that are accessible on the
+>> > command line.  Once again, QAPI outlaws such names already.  QOM is
+>> > anarchy when it comes to names, however.
+>> >
+>> > The way dotted keys do arrays is inconsistent with how QOM's automatic
+>> > arrayification (commit 3396590) do them: foo.0 vs. foo[0].  Backward
+>> > compatibility makes changing the dotted key convention awkward.  Perhaps
+>> > we can still change QOM.
+>> 
+>> Design flaw: there is no good way to denote an empty array or object
+>> other than the root object.
+>> 
+>> Empty KEY=VALUE,... is valid and results in an empty root object.
+>> 
+>> Presence of a KEY that contains periods results in additional non-root
+>> objects or arrays.  For instance, KEY a.b.c results in root object
+>> member "a" that has member "b" that has (scalar) member "c".
+>> 
+>> These additional objects and arrays all have at least one member, by
+>> construction.
+>> 
+>> Begs the question how to denote an empty object or array other than the
+>> root.
+>> 
+>> A natural idea is to interpret "absent in KEY=VALUE,..." as empty.
+>> After all, removing one key from it removes one member when there are
+>> more, so why not when there aren't.
+>> 
+>> Sadly, it doesn't work: "absent in KEY=VALUE,..." already means
+>> "optional object/array absent", which isn't the same as "empty
+>> object/array present".
+>> 
+>> Without additional syntax, all we can do is choose what exactly to make
+>> impossible:
+>> 
+>> * Absent key means absent, period.  No way to do empty array or object.
+>>   This is what I implemented.
+>
+> I'm not currently aware of any places where the difference between a
+> present, but empty array and an absent array is actually significant, so
+> this is probably the most consistent and useful way to interpret things.
+>
+> In other words, I agree with your implementation.
+>
+>> * Absent key means absent, except when the member is visited it means
+>>   empty.  No way to do absent optional array or object.
+>> 
+>> * Likewise, but if the visit is preceeded by a test for presence with
+>>   visit_optional(), it means absent again.  No way to do present
+>>   optional empty array or object.  This requires keeping additional
+>>   state.
+>> 
+>> Any bright ideas on how to avoid making things impossible?
+>
+> I can't see any other option than extending the syntax if we need this.
+> We can't tell the difference between a string and any other object
+> description after =, so we would need to make use of reserved characters
+> in the key name.
 
-Spotted by ASAN.
+Think so, too.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- tests/test-io-channel-command.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+>                  Maybe just 'foo.array[]' (without any =) for an empty
+> array or something like that.
 
-diff --git a/tests/test-io-channel-command.c b/tests/test-io-channel-comm=
-and.c
-index 1d1f461..46ce1ff 100644
---- a/tests/test-io-channel-command.c
-+++ b/tests/test-io-channel-command.c
-@@ -29,8 +29,8 @@ static void test_io_channel_command_fifo(bool async)
- #define TEST_FIFO "tests/test-io-channel-command.fifo"
-     QIOChannel *src, *dst;
-     QIOChannelTest *test;
--    char *srcfifo =3D g_strdup_printf("PIPE:%s,wronly", TEST_FIFO);
--    char *dstfifo =3D g_strdup_printf("PIPE:%s,rdonly", TEST_FIFO);
-+    const char *srcfifo =3D "PIPE:" TEST_FIFO ",wronly";
-+    const char *dstfifo =3D "PIPE:" TEST_FIFO ",rdonly";
-     const char *srcargv[] =3D {
-         "/bin/socat", "-", srcfifo, NULL,
-     };
-@@ -59,8 +59,6 @@ static void test_io_channel_command_fifo(bool async)
-     object_unref(OBJECT(src));
-     object_unref(OBJECT(dst));
-=20
--    g_free(srcfifo);
--    g_free(dstfifo);
-     unlink(TEST_FIFO);
- }
-=20
---=20
-2.9.3
+Yes, that should do.  Likewise foo.object{} for empty object.
+
+{} doesn't even need quoting.  [] may.
+
+A trailing period without '=' makes some sense, but looks a bit
+error-prone, and can't distinguish between array and object.
+
+> Before we introduce anything like this, do we actually need it?
+
+I don't know whether anything needs optional, present and empty.  But
+even if the answer is "no" today, it need not remain "no".
+
+Anyone running into a case of "yes", will have to fall back to the JSON
+form of -blockdev.  Strengthens my belief that providing JSON there is a
+good idea.
+
+The insufficient generality of dotted keys bugs me a bit.  Not sure
+whether it justifies more syntax now.  But we should document it.
