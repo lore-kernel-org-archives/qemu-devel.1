@@ -1,34 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xyjxie@linux.vnet.ibm.com>) id 1ciDJ0-0005Dp-6F
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 23:53:03 -0500
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1ciDOD-0006b0-4P
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 23:58:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xyjxie@linux.vnet.ibm.com>) id 1ciDIw-0000kM-9b
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 23:53:02 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51418
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1ciDO9-0002Lh-73
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 23:58:25 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39044)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <xyjxie@linux.vnet.ibm.com>)
-	id 1ciDIw-0000kC-47
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 23:52:58 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1R4o8ls015688
-	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 23:52:56 -0500
-Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28urfuj508-1
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1ciDO8-0002LD-Vm
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 23:58:21 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1R4suia065723
+	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 23:58:19 -0500
+Received: from e28smtp05.in.ibm.com (e28smtp05.in.ibm.com [125.16.236.5])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28u88qke0n-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 23:52:56 -0500
+	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 23:58:19 -0500
 Received: from localhost
-	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <xyjxie@linux.vnet.ibm.com>;
-	Sun, 26 Feb 2017 23:52:56 -0500
-From: Yongji Xie <xyjxie@linux.vnet.ibm.com>
-Date: Mon, 27 Feb 2017 12:52:44 +0800
-Message-Id: <1488171164-28319-1-git-send-email-xyjxie@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2] memory: Introduce DEVICE_HOST_ENDIAN for
- ram device
+	by e28smtp05.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Mon, 27 Feb 2017 10:28:16 +0530
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Date: Mon, 27 Feb 2017 10:27:55 +0530
+In-Reply-To: <1488171481-21699-1-git-send-email-nikunj@linux.vnet.ibm.com>
+References: <1488171481-21699-1-git-send-email-nikunj@linux.vnet.ibm.com>
+Message-Id: <1488171481-21699-3-git-send-email-nikunj@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v6 2/8] target/ppc: update ca32 in arithmetic
+ add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,55 +38,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net
-Cc: qemu-devel@nongnu.org, xyjxie@linux.vnet.ibm.com, alex.williamson@redhat.com, aik@ozlabs.ru, peter.maydell@linaro.org, paulus@samba.org, david@gibson.dropbear.id.au, mdroth@linux.vnet.ibm.com, zhong@linux.vnet.ibm.com
+To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
+Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
 
-At the moment ram device's memory regions are DEVICE_NATIVE_ENDIAN. It's
-incorrect. This memory region is backed by a MMIO area in host, so the
-uint64_t data that MemoryRegionOps read from/write to this area should be
-host-endian rather than target-endian. Hence, current code does not work
-when target and host endianness are different which is the most common case
-on PPC64. To fix it, this introduces DEVICE_HOST_ENDIAN for the ram device.
+Adds routine to compute ca32 - gen_op_arith_compute_ca32
 
-This has been tested on PPC64 BE/LE host/guest in all possible combinations
-including TCG.
+For 64-bit mode use the compute ca32 routine. While for 32-bit mode, CA
+and CA32 will have same value.
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Yongji Xie <xyjxie@linux.vnet.ibm.com>
+Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
- include/exec/cpu-common.h |    6 ++++++
- memory.c                  |    2 +-
- 2 files changed, 7 insertions(+), 1 deletions(-)
+ target/ppc/translate.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-index bd15853..eef74df 100644
---- a/include/exec/cpu-common.h
-+++ b/include/exec/cpu-common.h
-@@ -36,6 +36,12 @@ enum device_endian {
-     DEVICE_LITTLE_ENDIAN,
- };
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index be7378b..eba83ef 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -816,6 +816,23 @@ static inline void gen_op_arith_compute_ov(DisasContext *ctx, TCGv arg0,
+     tcg_gen_or_tl(cpu_so, cpu_so, cpu_ov);
+ }
  
-+#if defined(HOST_WORDS_BIGENDIAN)
-+#define DEVICE_HOST_ENDIAN DEVICE_BIG_ENDIAN
-+#else
-+#define DEVICE_HOST_ENDIAN DEVICE_LITTLE_ENDIAN
-+#endif
++static inline void gen_op_arith_compute_ca32(DisasContext *ctx,
++                                             TCGv res, TCGv arg0, TCGv arg1,
++                                             int sub)
++{
++    TCGv t0;
 +
- /* address in the RAM (different from a physical address) */
- #if defined(CONFIG_XEN_BACKEND)
- typedef uint64_t ram_addr_t;
-diff --git a/memory.c b/memory.c
-index ed8b5aa..17cfada 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1180,7 +1180,7 @@ static void memory_region_ram_device_write(void *opaque, hwaddr addr,
- static const MemoryRegionOps ram_device_mem_ops = {
-     .read = memory_region_ram_device_read,
-     .write = memory_region_ram_device_write,
--    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .endianness = DEVICE_HOST_ENDIAN,
-     .valid = {
-         .min_access_size = 1,
-         .max_access_size = 8,
++    if (!is_isa300(ctx)) {
++        return;
++    }
++
++    t0 = tcg_temp_new();
++    tcg_gen_xor_tl(t0, arg0, arg1);
++    tcg_gen_xor_tl(t0, t0, res);
++    tcg_gen_extract_tl(cpu_ca32, t0, 32, 1);
++    tcg_temp_free(t0);
++}
++
+ /* Common add function */
+ static inline void gen_op_arith_add(DisasContext *ctx, TCGv ret, TCGv arg1,
+                                     TCGv arg2, bool add_ca, bool compute_ca,
+@@ -842,6 +859,9 @@ static inline void gen_op_arith_add(DisasContext *ctx, TCGv ret, TCGv arg1,
+             tcg_temp_free(t1);
+             tcg_gen_shri_tl(cpu_ca, cpu_ca, 32);   /* extract bit 32 */
+             tcg_gen_andi_tl(cpu_ca, cpu_ca, 1);
++            if (is_isa300(ctx)) {
++                tcg_gen_mov_tl(cpu_ca32, cpu_ca);
++            }
+         } else {
+             TCGv zero = tcg_const_tl(0);
+             if (add_ca) {
+@@ -850,6 +870,7 @@ static inline void gen_op_arith_add(DisasContext *ctx, TCGv ret, TCGv arg1,
+             } else {
+                 tcg_gen_add2_tl(t0, cpu_ca, arg1, zero, arg2, zero);
+             }
++            gen_op_arith_compute_ca32(ctx, t0, arg1, arg2, 0);
+             tcg_temp_free(zero);
+         }
+     } else {
 -- 
-1.7.1
+2.7.4
