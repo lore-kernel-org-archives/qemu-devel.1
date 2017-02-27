@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ciUHi-0000Ur-An
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:00:51 -0500
+	(envelope-from <groug@kaod.org>) id 1ciUHk-0000Wp-1d
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:00:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ciUHf-0003s5-6D
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:00:50 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44676)
+	(envelope-from <groug@kaod.org>) id 1ciUHg-0003uF-N1
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:00:52 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55013)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ciUHe-0003mB-Tj
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:00:47 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ciUHg-0003sR-Cx
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:00:48 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1RMtfeY142288
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 18:00:38 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28vjd4py93-1
+	v1RMraiH055656
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 18:00:47 -0500
+Received: from e06smtp08.uk.ibm.com (e06smtp08.uk.ibm.com [195.75.94.104])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28vq9ag95a-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 18:00:38 -0500
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 18:00:47 -0500
 Received: from localhost
-	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp08.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Mon, 27 Feb 2017 23:00:36 -0000
+	Mon, 27 Feb 2017 23:00:44 -0000
 From: Greg Kurz <groug@kaod.org>
-Date: Mon, 27 Feb 2017 23:59:50 +0100
-Message-Id: <1488236421-30983-1-git-send-email-groug@kaod.org>
-Subject: [Qemu-devel] [PULL 00/31] 9p patches 2017-02-27 for 2.9 soft freeze
+Date: Tue, 28 Feb 2017 00:00:00 +0100
+In-Reply-To: <1488236421-30983-1-git-send-email-groug@kaod.org>
+References: <1488236421-30983-1-git-send-email-groug@kaod.org>
+Message-Id: <1488236421-30983-11-git-send-email-groug@kaod.org>
+Subject: [Qemu-devel] [PULL 10/31] 9pfs: local: lgetxattr: don't follow
+ symlinks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,87 +40,194 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
 
-The following changes since commit 8f2d7c341184a95d05476ea3c45dbae2b9ddbe51:
+The local_lgetxattr() callback is vulnerable to symlink attacks because
+it calls lgetxattr() which follows symbolic links in all path elements but
+the rightmost one.
 
-  Merge remote-tracking branch 'remotes/berrange/tags/pull-qcrypto-2017-02-27-1' into staging (2017-02-27 15:33:21 +0000)
+This patch introduces a helper to emulate the non-existing fgetxattrat()
+function: it is implemented with /proc/self/fd which provides a trusted
+path that can be safely passed to lgetxattr().
 
-are available in the git repository at:
+local_lgetxattr() is converted to use this helper and opendir_nofollow().
 
-  https://github.com/gkurz/qemu.git tags/for-upstream
+This partly fixes CVE-2016-9602.
 
-for you to fetch changes up to a07ef65e3aeac852188331708716792930d819ef:
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ hw/9pfs/9p-posix-acl.c  | 16 ++--------------
+ hw/9pfs/9p-util.c       | 12 ++++++++++++
+ hw/9pfs/9p-util.h       |  2 ++
+ hw/9pfs/9p-xattr-user.c |  8 +-------
+ hw/9pfs/9p-xattr.c      | 31 ++++++++++++++++++++++++-------
+ hw/9pfs/9p-xattr.h      |  2 ++
+ 6 files changed, 43 insertions(+), 28 deletions(-)
 
-  9pfs: local: drop unused code (2017-02-27 22:45:17 +0100)
-
-----------------------------------------------------------------
-This pull request brings:
-- a fix to a minor bug reported by Coverity
-- throttling support in the local backend (command line only)
-- a huge fix for CVE-2016-9602 (symlink attack vulnerability)
-
-----------------------------------------------------------------
-Greg Kurz (29):
-      fsdev: add IO throttle support to fsdev devices
-      9pfs: local: move xattr security ops to 9p-xattr.c
-      9pfs: remove side-effects in local_init()
-      9pfs: remove side-effects in local_open() and local_opendir()
-      9pfs: introduce relative_openat_nofollow() helper
-      9pfs: local: keep a file descriptor on the shared folder
-      9pfs: local: open/opendir: don't follow symlinks
-      9pfs: local: lgetxattr: don't follow symlinks
-      9pfs: local: llistxattr: don't follow symlinks
-      9pfs: local: lsetxattr: don't follow symlinks
-      9pfs: local: lremovexattr: don't follow symlinks
-      9pfs: local: unlinkat: don't follow symlinks
-      9pfs: local: remove: don't follow symlinks
-      9pfs: local: utimensat: don't follow symlinks
-      9pfs: local: statfs: don't follow symlinks
-      9pfs: local: truncate: don't follow symlinks
-      9pfs: local: readlink: don't follow symlinks
-      9pfs: local: lstat: don't follow symlinks
-      9pfs: local: renameat: don't follow symlinks
-      9pfs: local: rename: use renameat
-      9pfs: local: improve error handling in link op
-      9pfs: local: link: don't follow symlinks
-      9pfs: local: chmod: don't follow symlinks
-      9pfs: local: chown: don't follow symlinks
-      9pfs: local: symlink: don't follow symlinks
-      9pfs: local: mknod: don't follow symlinks
-      9pfs: local: mkdir: don't follow symlinks
-      9pfs: local: open2: don't follow symlinks
-      9pfs: local: drop unused code
-
-Paolo Bonzini (1):
-      9pfs: fix v9fs_lock error case
-
-Pradeep (1):
-      throttle: factor out duplicate code
-
- blockdev.c                      |   83 +---
- fsdev/Makefile.objs             |    2 +-
- fsdev/file-op-9p.h              |    3 +
- fsdev/qemu-fsdev-opts.c         |    3 +
- fsdev/qemu-fsdev-throttle.c     |  118 +++++
- fsdev/qemu-fsdev-throttle.h     |   39 ++
- hw/9pfs/9p-local.c              | 1031 +++++++++++++++++++++------------------
- hw/9pfs/9p-local.h              |   20 +
- hw/9pfs/9p-posix-acl.c          |   44 +-
- hw/9pfs/9p-util.c               |   68 +++
- hw/9pfs/9p-util.h               |   53 ++
- hw/9pfs/9p-xattr-user.c         |   24 +-
- hw/9pfs/9p-xattr.c              |  166 ++++++-
- hw/9pfs/9p-xattr.h              |   87 +---
- hw/9pfs/9p.c                    |   19 +-
- hw/9pfs/Makefile.objs           |    2 +-
- hw/9pfs/cofile.c                |    2 +
- include/qemu/throttle-options.h |   92 ++++
- qemu-options.hx                 |    7 +-
- 19 files changed, 1180 insertions(+), 683 deletions(-)
- create mode 100644 fsdev/qemu-fsdev-throttle.c
- create mode 100644 fsdev/qemu-fsdev-throttle.h
- create mode 100644 hw/9pfs/9p-local.h
- create mode 100644 hw/9pfs/9p-util.c
- create mode 100644 hw/9pfs/9p-util.h
- create mode 100644 include/qemu/throttle-options.h
+diff --git a/hw/9pfs/9p-posix-acl.c b/hw/9pfs/9p-posix-acl.c
+index ec003181cd33..9435e27a368c 100644
+--- a/hw/9pfs/9p-posix-acl.c
++++ b/hw/9pfs/9p-posix-acl.c
+@@ -25,13 +25,7 @@
+ static ssize_t mp_pacl_getxattr(FsContext *ctx, const char *path,
+                                 const char *name, void *value, size_t size)
+ {
+-    char *buffer;
+-    ssize_t ret;
+-
+-    buffer = rpath(ctx, path);
+-    ret = lgetxattr(buffer, MAP_ACL_ACCESS, value, size);
+-    g_free(buffer);
+-    return ret;
++    return local_getxattr_nofollow(ctx, path, MAP_ACL_ACCESS, value, size);
+ }
+ 
+ static ssize_t mp_pacl_listxattr(FsContext *ctx, const char *path,
+@@ -89,13 +83,7 @@ static int mp_pacl_removexattr(FsContext *ctx,
+ static ssize_t mp_dacl_getxattr(FsContext *ctx, const char *path,
+                                 const char *name, void *value, size_t size)
+ {
+-    char *buffer;
+-    ssize_t ret;
+-
+-    buffer = rpath(ctx, path);
+-    ret = lgetxattr(buffer, MAP_ACL_DEFAULT, value, size);
+-    g_free(buffer);
+-    return ret;
++    return local_getxattr_nofollow(ctx, path, MAP_ACL_DEFAULT, value, size);
+ }
+ 
+ static ssize_t mp_dacl_listxattr(FsContext *ctx, const char *path,
+diff --git a/hw/9pfs/9p-util.c b/hw/9pfs/9p-util.c
+index 4329a638cded..845b89439de7 100644
+--- a/hw/9pfs/9p-util.c
++++ b/hw/9pfs/9p-util.c
+@@ -11,6 +11,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/xattr.h"
+ #include "9p-util.h"
+ 
+ int relative_openat_nofollow(int dirfd, const char *path, int flags,
+@@ -54,3 +55,14 @@ int relative_openat_nofollow(int dirfd, const char *path, int flags,
+ 
+     return fd;
+ }
++
++ssize_t fgetxattrat_nofollow(int dirfd, const char *filename, const char *name,
++                             void *value, size_t size)
++{
++    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
++    int ret;
++
++    ret = lgetxattr(proc_path, name, value, size);
++    g_free(proc_path);
++    return ret;
++}
+diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
+index e3d5b66a15bc..806af82dcdbb 100644
+--- a/hw/9pfs/9p-util.h
++++ b/hw/9pfs/9p-util.h
+@@ -45,5 +45,7 @@ static inline int openat_file(int dirfd, const char *name, int flags,
+ 
+ int relative_openat_nofollow(int dirfd, const char *path, int flags,
+                              mode_t mode);
++ssize_t fgetxattrat_nofollow(int dirfd, const char *path, const char *name,
++                             void *value, size_t size);
+ 
+ #endif
+diff --git a/hw/9pfs/9p-xattr-user.c b/hw/9pfs/9p-xattr-user.c
+index f87530c8b526..4071fbc4c086 100644
+--- a/hw/9pfs/9p-xattr-user.c
++++ b/hw/9pfs/9p-xattr-user.c
+@@ -20,9 +20,6 @@
+ static ssize_t mp_user_getxattr(FsContext *ctx, const char *path,
+                                 const char *name, void *value, size_t size)
+ {
+-    char *buffer;
+-    ssize_t ret;
+-
+     if (strncmp(name, "user.virtfs.", 12) == 0) {
+         /*
+          * Don't allow fetch of user.virtfs namesapce
+@@ -31,10 +28,7 @@ static ssize_t mp_user_getxattr(FsContext *ctx, const char *path,
+         errno = ENOATTR;
+         return -1;
+     }
+-    buffer = rpath(ctx, path);
+-    ret = lgetxattr(buffer, name, value, size);
+-    g_free(buffer);
+-    return ret;
++    return local_getxattr_nofollow(ctx, path, name, value, size);
+ }
+ 
+ static ssize_t mp_user_listxattr(FsContext *ctx, const char *path,
+diff --git a/hw/9pfs/9p-xattr.c b/hw/9pfs/9p-xattr.c
+index 19a2daf02f5c..aa4391e6b317 100644
+--- a/hw/9pfs/9p-xattr.c
++++ b/hw/9pfs/9p-xattr.c
+@@ -15,6 +15,8 @@
+ #include "9p.h"
+ #include "fsdev/file-op-9p.h"
+ #include "9p-xattr.h"
++#include "9p-util.h"
++#include "9p-local.h"
+ 
+ 
+ static XattrOperations *get_xattr_operations(XattrOperations **h,
+@@ -143,18 +145,33 @@ int v9fs_remove_xattr(FsContext *ctx,
+ 
+ }
+ 
+-ssize_t pt_getxattr(FsContext *ctx, const char *path, const char *name,
+-                    void *value, size_t size)
++ssize_t local_getxattr_nofollow(FsContext *ctx, const char *path,
++                                const char *name, void *value, size_t size)
+ {
+-    char *buffer;
+-    ssize_t ret;
++    char *dirpath = g_path_get_dirname(path);
++    char *filename = g_path_get_basename(path);
++    int dirfd;
++    ssize_t ret = -1;
++
++    dirfd = local_opendir_nofollow(ctx, dirpath);
++    if (dirfd == -1) {
++        goto out;
++    }
+ 
+-    buffer = rpath(ctx, path);
+-    ret = lgetxattr(buffer, name, value, size);
+-    g_free(buffer);
++    ret = fgetxattrat_nofollow(dirfd, filename, name, value, size);
++    close_preserve_errno(dirfd);
++out:
++    g_free(dirpath);
++    g_free(filename);
+     return ret;
+ }
+ 
++ssize_t pt_getxattr(FsContext *ctx, const char *path, const char *name,
++                    void *value, size_t size)
++{
++    return local_getxattr_nofollow(ctx, path, name, value, size);
++}
++
+ int pt_setxattr(FsContext *ctx, const char *path, const char *name, void *value,
+                 size_t size, int flags)
+ {
+diff --git a/hw/9pfs/9p-xattr.h b/hw/9pfs/9p-xattr.h
+index 3f43f5153f3c..69a8b6b62e3c 100644
+--- a/hw/9pfs/9p-xattr.h
++++ b/hw/9pfs/9p-xattr.h
+@@ -29,6 +29,8 @@ typedef struct xattr_operations
+                        const char *path, const char *name);
+ } XattrOperations;
+ 
++ssize_t local_getxattr_nofollow(FsContext *ctx, const char *path,
++                                const char *name, void *value, size_t size);
+ 
+ extern XattrOperations mapped_user_xattr;
+ extern XattrOperations passthrough_user_xattr;
 -- 
 2.7.4
