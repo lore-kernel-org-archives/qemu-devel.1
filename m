@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ciPfh-0002Oe-UR
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:20 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ciPfj-0002Qk-RK
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ciPff-0001vB-Hn
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:17 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48678)
+	(envelope-from <pm215@archaic.org.uk>) id 1ciPff-0001ve-Sg
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:19 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48681)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ciPff-0001qs-A1
+	id 1ciPff-0001uO-B2
 	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:15 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1ciPfV-0002MF-R2
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:05:05 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1ciPfe-0002SF-Fe
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:05:14 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 27 Feb 2017 18:04:40 +0000
-Message-Id: <1488218699-31035-12-git-send-email-peter.maydell@linaro.org>
+Date: Mon, 27 Feb 2017 18:04:56 +0000
+Message-Id: <1488218699-31035-28-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1488218699-31035-1-git-send-email-peter.maydell@linaro.org>
 References: <1488218699-31035-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 11/30] ARM i.MX timers: fix reset handling
+Subject: [Qemu-devel] [PULL 27/30] bcm2835_gpio: add bcm2835 gpio controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,94 +29,438 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Kurban Mallachiev <mallachiev@ispras.ru>
+From: Clement Deschamps <clement.deschamps@antfield.fr>
 
-The i.MX timer device can be reset by writing to the SWR bit
-of the CR register. This has to behave differently from hard
-(power-on) reset because it does not reset all of the bits
-in the CR register.
+This adds the BCM2835 GPIO controller.
 
-We were incorrectly implementing soft reset and hard reset
-the same way, and in addition had a logic error which meant
-that we were clearing the bits that soft-reset is supposed
-to preserve and not touching the bits that soft-reset clears.
-This was not correct behaviour for either kind of reset.
+It currently implements:
+- The 54 GPIOs as outputs (qemu_irq)
+- The SD controller selection via alternate function of GPIOs 48-53
 
-Separate out the soft reset and hard reset code paths, and
-correct the handling of reset of the CR register so that it
-is correct in both cases.
-
-Signed-off-by: Kurban Mallachiev <mallachiev@ispras.ru>
-[PMM: rephrased commit message, spacing on operators;
- use bool rather than int for is_soft_reset]
+Signed-off-by: Clement Deschamps <clement.deschamps@antfield.fr>
+Message-id: 20170224164021.9066-4-clement.deschamps@antfield.fr
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/timer/imx_gpt.c | 33 +++++++++++++++++++++++++--------
- 1 file changed, 25 insertions(+), 8 deletions(-)
+ hw/gpio/Makefile.objs          |   1 +
+ include/hw/gpio/bcm2835_gpio.h |  39 +++++
+ hw/gpio/bcm2835_gpio.c         | 353 +++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 393 insertions(+)
+ create mode 100644 include/hw/gpio/bcm2835_gpio.h
+ create mode 100644 hw/gpio/bcm2835_gpio.c
 
-diff --git a/hw/timer/imx_gpt.c b/hw/timer/imx_gpt.c
-index 010ccbf..4b9b54b 100644
---- a/hw/timer/imx_gpt.c
-+++ b/hw/timer/imx_gpt.c
-@@ -296,18 +296,23 @@ static uint64_t imx_gpt_read(void *opaque, hwaddr offset, unsigned size)
-     return reg_value;
- }
+diff --git a/hw/gpio/Makefile.objs b/hw/gpio/Makefile.objs
+index a43c7cf..fa0a72e 100644
+--- a/hw/gpio/Makefile.objs
++++ b/hw/gpio/Makefile.objs
+@@ -7,3 +7,4 @@ common-obj-$(CONFIG_GPIO_KEY) += gpio_key.o
  
--static void imx_gpt_reset(DeviceState *dev)
--{
--    IMXGPTState *s = IMX_GPT(dev);
- 
-+static void imx_gpt_reset_common(IMXGPTState *s, bool is_soft_reset)
+ obj-$(CONFIG_OMAP) += omap_gpio.o
+ obj-$(CONFIG_IMX) += imx_gpio.o
++obj-$(CONFIG_RASPI) += bcm2835_gpio.o
+diff --git a/include/hw/gpio/bcm2835_gpio.h b/include/hw/gpio/bcm2835_gpio.h
+new file mode 100644
+index 0000000..9f8e0c7
+--- /dev/null
++++ b/include/hw/gpio/bcm2835_gpio.h
+@@ -0,0 +1,39 @@
++/*
++ * Raspberry Pi (BCM2835) GPIO Controller
++ *
++ * Copyright (c) 2017 Antfield SAS
++ *
++ * Authors:
++ *  Clement Deschamps <clement.deschamps@antfield.fr>
++ *  Luc Michel <luc.michel@antfield.fr>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef BCM2835_GPIO_H
++#define BCM2835_GPIO_H
++
++#include "hw/sd/sd.h"
++
++typedef struct BCM2835GpioState {
++    SysBusDevice parent_obj;
++
++    MemoryRegion iomem;
++
++    /* SDBus selector */
++    SDBus sdbus;
++    SDBus *sdbus_sdhci;
++    SDBus *sdbus_sdhost;
++
++    uint8_t fsel[54];
++    uint32_t lev0, lev1;
++    uint8_t sd_fsel;
++    qemu_irq out[54];
++} BCM2835GpioState;
++
++#define TYPE_BCM2835_GPIO "bcm2835_gpio"
++#define BCM2835_GPIO(obj) \
++    OBJECT_CHECK(BCM2835GpioState, (obj), TYPE_BCM2835_GPIO)
++
++#endif
+diff --git a/hw/gpio/bcm2835_gpio.c b/hw/gpio/bcm2835_gpio.c
+new file mode 100644
+index 0000000..acc2e3c
+--- /dev/null
++++ b/hw/gpio/bcm2835_gpio.c
+@@ -0,0 +1,353 @@
++/*
++ * Raspberry Pi (BCM2835) GPIO Controller
++ *
++ * Copyright (c) 2017 Antfield SAS
++ *
++ * Authors:
++ *  Clement Deschamps <clement.deschamps@antfield.fr>
++ *  Luc Michel <luc.michel@antfield.fr>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "qemu/timer.h"
++#include "qapi/error.h"
++#include "hw/sysbus.h"
++#include "hw/sd/sd.h"
++#include "hw/gpio/bcm2835_gpio.h"
++
++#define GPFSEL0   0x00
++#define GPFSEL1   0x04
++#define GPFSEL2   0x08
++#define GPFSEL3   0x0C
++#define GPFSEL4   0x10
++#define GPFSEL5   0x14
++#define GPSET0    0x1C
++#define GPSET1    0x20
++#define GPCLR0    0x28
++#define GPCLR1    0x2C
++#define GPLEV0    0x34
++#define GPLEV1    0x38
++#define GPEDS0    0x40
++#define GPEDS1    0x44
++#define GPREN0    0x4C
++#define GPREN1    0x50
++#define GPFEN0    0x58
++#define GPFEN1    0x5C
++#define GPHEN0    0x64
++#define GPHEN1    0x68
++#define GPLEN0    0x70
++#define GPLEN1    0x74
++#define GPAREN0   0x7C
++#define GPAREN1   0x80
++#define GPAFEN0   0x88
++#define GPAFEN1   0x8C
++#define GPPUD     0x94
++#define GPPUDCLK0 0x98
++#define GPPUDCLK1 0x9C
++
++static uint32_t gpfsel_get(BCM2835GpioState *s, uint8_t reg)
 +{
-     /* stop timer */
-     ptimer_stop(s->timer);
- 
--    /*
--     * Soft reset doesn't touch some bits; hard reset clears them
-+    /* Soft reset and hard reset differ only in their handling of the CR
-+     * register -- soft reset preserves the values of some bits there.
-      */
--    s->cr &= ~(GPT_CR_EN|GPT_CR_ENMOD|GPT_CR_STOPEN|GPT_CR_DOZEN|
--               GPT_CR_WAITEN|GPT_CR_DBGEN);
-+    if (is_soft_reset) {
-+        /* Clear all CR bits except those that are preserved by soft reset. */
-+        s->cr &= GPT_CR_EN | GPT_CR_ENMOD | GPT_CR_STOPEN | GPT_CR_DOZEN |
-+            GPT_CR_WAITEN | GPT_CR_DBGEN |
-+            (GPT_CR_CLKSRC_MASK << GPT_CR_CLKSRC_SHIFT);
-+    } else {
-+        s->cr = 0;
++    int i;
++    uint32_t value = 0;
++    for (i = 0; i < 10; i++) {
++        uint32_t index = 10 * reg + i;
++        if (index < sizeof(s->fsel)) {
++            value |= (s->fsel[index] & 0x7) << (3 * i);
++        }
 +    }
-     s->sr = 0;
-     s->pr = 0;
-     s->ir = 0;
-@@ -333,6 +338,18 @@ static void imx_gpt_reset(DeviceState *dev)
-     }
- }
- 
-+static void imx_gpt_soft_reset(DeviceState *dev)
-+{
-+    IMXGPTState *s = IMX_GPT(dev);
-+    imx_gpt_reset_common(s, true);
++    return value;
 +}
 +
-+static void imx_gpt_reset(DeviceState *dev)
++static void gpfsel_set(BCM2835GpioState *s, uint8_t reg, uint32_t value)
 +{
-+    IMXGPTState *s = IMX_GPT(dev);
-+    imx_gpt_reset_common(s, false);
++    int i;
++    for (i = 0; i < 10; i++) {
++        uint32_t index = 10 * reg + i;
++        if (index < sizeof(s->fsel)) {
++            int fsel = (value >> (3 * i)) & 0x7;
++            s->fsel[index] = fsel;
++        }
++    }
++
++    /* SD controller selection (48-53) */
++    if (s->sd_fsel != 0
++            && (s->fsel[48] == 0) /* SD_CLK_R */
++            && (s->fsel[49] == 0) /* SD_CMD_R */
++            && (s->fsel[50] == 0) /* SD_DATA0_R */
++            && (s->fsel[51] == 0) /* SD_DATA1_R */
++            && (s->fsel[52] == 0) /* SD_DATA2_R */
++            && (s->fsel[53] == 0) /* SD_DATA3_R */
++            ) {
++        /* SDHCI controller selected */
++        sdbus_reparent_card(s->sdbus_sdhost, s->sdbus_sdhci);
++        s->sd_fsel = 0;
++    } else if (s->sd_fsel != 4
++            && (s->fsel[48] == 4) /* SD_CLK_R */
++            && (s->fsel[49] == 4) /* SD_CMD_R */
++            && (s->fsel[50] == 4) /* SD_DATA0_R */
++            && (s->fsel[51] == 4) /* SD_DATA1_R */
++            && (s->fsel[52] == 4) /* SD_DATA2_R */
++            && (s->fsel[53] == 4) /* SD_DATA3_R */
++            ) {
++        /* SDHost controller selected */
++        sdbus_reparent_card(s->sdbus_sdhci, s->sdbus_sdhost);
++        s->sd_fsel = 4;
++    }
 +}
 +
- static void imx_gpt_write(void *opaque, hwaddr offset, uint64_t value,
-                           unsigned size)
- {
-@@ -348,7 +365,7 @@ static void imx_gpt_write(void *opaque, hwaddr offset, uint64_t value,
-         s->cr = value & ~0x7c14;
-         if (s->cr & GPT_CR_SWR) { /* force reset */
-             /* handle the reset */
--            imx_gpt_reset(DEVICE(s));
-+            imx_gpt_soft_reset(DEVICE(s));
-         } else {
-             /* set our freq, as the source might have changed */
-             imx_gpt_set_freq(s);
++static int gpfsel_is_out(BCM2835GpioState *s, int index)
++{
++    if (index >= 0 && index < 54) {
++        return s->fsel[index] == 1;
++    }
++    return 0;
++}
++
++static void gpset(BCM2835GpioState *s,
++        uint32_t val, uint8_t start, uint8_t count, uint32_t *lev)
++{
++    uint32_t changes = val & ~*lev;
++    uint32_t cur = 1;
++
++    int i;
++    for (i = 0; i < count; i++) {
++        if ((changes & cur) && (gpfsel_is_out(s, start + i))) {
++            qemu_set_irq(s->out[start + i], 1);
++        }
++        cur <<= 1;
++    }
++
++    *lev |= val;
++}
++
++static void gpclr(BCM2835GpioState *s,
++        uint32_t val, uint8_t start, uint8_t count, uint32_t *lev)
++{
++    uint32_t changes = val & *lev;
++    uint32_t cur = 1;
++
++    int i;
++    for (i = 0; i < count; i++) {
++        if ((changes & cur) && (gpfsel_is_out(s, start + i))) {
++            qemu_set_irq(s->out[start + i], 0);
++        }
++        cur <<= 1;
++    }
++
++    *lev &= ~val;
++}
++
++static uint64_t bcm2835_gpio_read(void *opaque, hwaddr offset,
++        unsigned size)
++{
++    BCM2835GpioState *s = (BCM2835GpioState *)opaque;
++
++    switch (offset) {
++    case GPFSEL0:
++    case GPFSEL1:
++    case GPFSEL2:
++    case GPFSEL3:
++    case GPFSEL4:
++    case GPFSEL5:
++        return gpfsel_get(s, offset / 4);
++    case GPSET0:
++    case GPSET1:
++        /* Write Only */
++        return 0;
++    case GPCLR0:
++    case GPCLR1:
++        /* Write Only */
++        return 0;
++    case GPLEV0:
++        return s->lev0;
++    case GPLEV1:
++        return s->lev1;
++    case GPEDS0:
++    case GPEDS1:
++    case GPREN0:
++    case GPREN1:
++    case GPFEN0:
++    case GPFEN1:
++    case GPHEN0:
++    case GPHEN1:
++    case GPLEN0:
++    case GPLEN1:
++    case GPAREN0:
++    case GPAREN1:
++    case GPAFEN0:
++    case GPAFEN1:
++    case GPPUD:
++    case GPPUDCLK0:
++    case GPPUDCLK1:
++        /* Not implemented */
++        return 0;
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n",
++                __func__, offset);
++        break;
++    }
++
++    return 0;
++}
++
++static void bcm2835_gpio_write(void *opaque, hwaddr offset,
++        uint64_t value, unsigned size)
++{
++    BCM2835GpioState *s = (BCM2835GpioState *)opaque;
++
++    switch (offset) {
++    case GPFSEL0:
++    case GPFSEL1:
++    case GPFSEL2:
++    case GPFSEL3:
++    case GPFSEL4:
++    case GPFSEL5:
++        gpfsel_set(s, offset / 4, value);
++        break;
++    case GPSET0:
++        gpset(s, value, 0, 32, &s->lev0);
++        break;
++    case GPSET1:
++        gpset(s, value, 32, 22, &s->lev1);
++        break;
++    case GPCLR0:
++        gpclr(s, value, 0, 32, &s->lev0);
++        break;
++    case GPCLR1:
++        gpclr(s, value, 32, 22, &s->lev1);
++        break;
++    case GPLEV0:
++    case GPLEV1:
++        /* Read Only */
++        break;
++    case GPEDS0:
++    case GPEDS1:
++    case GPREN0:
++    case GPREN1:
++    case GPFEN0:
++    case GPFEN1:
++    case GPHEN0:
++    case GPHEN1:
++    case GPLEN0:
++    case GPLEN1:
++    case GPAREN0:
++    case GPAREN1:
++    case GPAFEN0:
++    case GPAFEN1:
++    case GPPUD:
++    case GPPUDCLK0:
++    case GPPUDCLK1:
++        /* Not implemented */
++        break;
++    default:
++        goto err_out;
++    }
++    return;
++
++err_out:
++    qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n",
++            __func__, offset);
++}
++
++static void bcm2835_gpio_reset(DeviceState *dev)
++{
++    BCM2835GpioState *s = BCM2835_GPIO(dev);
++
++    int i;
++    for (i = 0; i < 6; i++) {
++        gpfsel_set(s, i, 0);
++    }
++
++    s->sd_fsel = 0;
++
++    /* SDHCI is selected by default */
++    sdbus_reparent_card(&s->sdbus, s->sdbus_sdhci);
++
++    s->lev0 = 0;
++    s->lev1 = 0;
++}
++
++static const MemoryRegionOps bcm2835_gpio_ops = {
++    .read = bcm2835_gpio_read,
++    .write = bcm2835_gpio_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++};
++
++static const VMStateDescription vmstate_bcm2835_gpio = {
++    .name = "bcm2835_gpio",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT8_ARRAY(fsel, BCM2835GpioState, 54),
++        VMSTATE_UINT32(lev0, BCM2835GpioState),
++        VMSTATE_UINT32(lev1, BCM2835GpioState),
++        VMSTATE_UINT8(sd_fsel, BCM2835GpioState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void bcm2835_gpio_init(Object *obj)
++{
++    BCM2835GpioState *s = BCM2835_GPIO(obj);
++    DeviceState *dev = DEVICE(obj);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++
++    qbus_create_inplace(&s->sdbus, sizeof(s->sdbus),
++                        TYPE_SD_BUS, DEVICE(s), "sd-bus");
++
++    memory_region_init_io(&s->iomem, obj,
++            &bcm2835_gpio_ops, s, "bcm2835_gpio", 0x1000);
++    sysbus_init_mmio(sbd, &s->iomem);
++    qdev_init_gpio_out(dev, s->out, 54);
++}
++
++static void bcm2835_gpio_realize(DeviceState *dev, Error **errp)
++{
++    BCM2835GpioState *s = BCM2835_GPIO(dev);
++    Object *obj;
++    Error *err = NULL;
++
++    obj = object_property_get_link(OBJECT(dev), "sdbus-sdhci", &err);
++    if (obj == NULL) {
++        error_setg(errp, "%s: required sdhci link not found: %s",
++                __func__, error_get_pretty(err));
++        return;
++    }
++    s->sdbus_sdhci = SD_BUS(obj);
++
++    obj = object_property_get_link(OBJECT(dev), "sdbus-sdhost", &err);
++    if (obj == NULL) {
++        error_setg(errp, "%s: required sdhost link not found: %s",
++                __func__, error_get_pretty(err));
++        return;
++    }
++    s->sdbus_sdhost = SD_BUS(obj);
++}
++
++static void bcm2835_gpio_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->vmsd = &vmstate_bcm2835_gpio;
++    dc->realize = &bcm2835_gpio_realize;
++    dc->reset = &bcm2835_gpio_reset;
++}
++
++static const TypeInfo bcm2835_gpio_info = {
++    .name          = TYPE_BCM2835_GPIO,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(BCM2835GpioState),
++    .instance_init = bcm2835_gpio_init,
++    .class_init    = bcm2835_gpio_class_init,
++};
++
++static void bcm2835_gpio_register_types(void)
++{
++    type_register_static(&bcm2835_gpio_info);
++}
++
++type_init(bcm2835_gpio_register_types)
 -- 
 2.7.4
