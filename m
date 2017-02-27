@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ciM2P-0002LI-5e
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:12:30 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ciM5P-00053C-Re
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:15:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ciM2K-00018N-7D
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:12:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56868)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ciM2K-00017n-29
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:12:24 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 40F58D59A8
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 14:12:24 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170221141451.28305-1-marcandre.lureau@redhat.com>
-	<20170221141451.28305-21-marcandre.lureau@redhat.com>
-Date: Mon, 27 Feb 2017 15:12:21 +0100
-In-Reply-To: <20170221141451.28305-21-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 21 Feb 2017
-	18:14:41 +0400")
-Message-ID: <87k28ben96.fsf@dusky.pond.sub.org>
+	(envelope-from <mreitz@redhat.com>) id 1ciM5O-0002bR-BT
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:15:35 -0500
+References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
+	<1487689130-30373-19-git-send-email-kwolf@redhat.com>
+	<3a201ea1-81fe-e4f3-7474-364b7cc8f091@redhat.com>
+	<20170227123302.GD6356@noname.redhat.com>
+	<b735ce93-e4a3-5f25-f641-108d8f9cccc7@redhat.com>
+	<20170227140521.GE6356@noname.redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <d9bbc446-bfd8-22ca-9f85-653be66e1b75@redhat.com>
+Date: Mon, 27 Feb 2017 15:15:22 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 20/30] tests: fix e1000e leaks
+In-Reply-To: <20170227140521.GE6356@noname.redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="12x3tKseL6U9mS2gkjXS3uvViruu02qW5"
+Subject: Re: [Qemu-devel] [PATCH 18/54] block: Default .bdrv_child_perm()
+ for format drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,57 +29,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--12x3tKseL6U9mS2gkjXS3uvViruu02qW5
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, jcody@redhat.com, famz@redhat.com,
+ qemu-devel@nongnu.org
+Message-ID: <d9bbc446-bfd8-22ca-9f85-653be66e1b75@redhat.com>
+Subject: Re: [PATCH 18/54] block: Default .bdrv_child_perm() for format
+ drivers
+References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
+ <1487689130-30373-19-git-send-email-kwolf@redhat.com>
+ <3a201ea1-81fe-e4f3-7474-364b7cc8f091@redhat.com>
+ <20170227123302.GD6356@noname.redhat.com>
+ <b735ce93-e4a3-5f25-f641-108d8f9cccc7@redhat.com>
+ <20170227140521.GE6356@noname.redhat.com>
+In-Reply-To: <20170227140521.GE6356@noname.redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-> Spotted by ASAN.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  tests/e1000e-test.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/tests/e1000e-test.c b/tests/e1000e-test.c
-> index 8c42ca919f..c612dc64ec 100644
-> --- a/tests/e1000e-test.c
-> +++ b/tests/e1000e-test.c
-> @@ -99,7 +99,10 @@ static QPCIBus *test_bus;
->=20=20
->  static void e1000e_pci_foreach_callback(QPCIDevice *dev, int devfn, void=
- *data)
->  {
-> -    *(QPCIDevice **) data =3D dev;
-> +    QPCIDevice **res =3D data;
-> +
-> +    g_assert_null(*res);
-> +    *res =3D dev;
->  }
->=20=20
->  static QPCIDevice *e1000e_device_find(QPCIBus *bus)
-   {
-       static const int e1000e_vendor_id =3D 0x8086;
-       static const int e1000e_dev_id =3D 0x10D3;
+On 27.02.2017 15:05, Kevin Wolf wrote:
+> Am 27.02.2017 um 13:34 hat Max Reitz geschrieben:
+>> On 27.02.2017 13:33, Kevin Wolf wrote:
+>>> Am 25.02.2017 um 12:57 hat Max Reitz geschrieben:
+>>>> On 21.02.2017 15:58, Kevin Wolf wrote:
+>>>>> Almost all format drivers have the same characteristics as far as
+>>>>> permissions are concerned: They have one or more children for stori=
+ng
+>>>>> their own data and, more importantly, metadata (can be written to a=
+nd
+>>>>> grow even without external write requests, must be protected agains=
+t
+>>>>> other writers and present consistent data) and optionally a backing=
+ file
+>>>>> (this is just data, so like for a filter, it only depends on what t=
+he
+>>>>> parent nodes need).
+>>>>>
+>>>>> This provides a default implementation that can be shared by most o=
+f
+>>>>> our format drivers.
+>>>>>
+>>>>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>>>>> ---
+>>>>>  block.c                   | 42 +++++++++++++++++++++++++++++++++++=
++++++++
+>>>>>  include/block/block_int.h |  8 ++++++++
+>>>>>  2 files changed, 50 insertions(+)
+>>>>>
+>>>>> diff --git a/block.c b/block.c
+>>>>> index 523cbd3..f2e7178 100644
+>>>>> --- a/block.c
+>>>>> +++ b/block.c
+>>>>> @@ -1554,6 +1554,48 @@ void bdrv_filter_default_perms(BlockDriverSt=
+ate *bs, BdrvChild *c,
+>>>>>                 (c->shared_perm & DEFAULT_PERM_UNCHANGED);
+>>>>>  }
+>>>>> =20
+>>>>> +void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,=
 
-       QPCIDevice *e1000e_dev =3D NULL;
+>>>>> +                               const BdrvChildRole *role,
+>>>>> +                               uint64_t perm, uint64_t shared,
+>>>>> +                               uint64_t *nperm, uint64_t *nshared)=
 
-       qpci_device_foreach(bus, e1000e_vendor_id, e1000e_dev_id,
-           e1000e_pci_foreach_callback, &e1000e_dev);
+>>>>> +{
+>>>>> +    bool backing =3D (role =3D=3D &child_backing);
+>>>>> +    assert(role =3D=3D &child_backing || role =3D=3D &child_file);=
 
-This hunk adds an assertion.  I guess it checks that we're finding no
-more than one e1000e device.  The connection to the stated purpose of
-this patch isn't obvious, but I think I got it: each hit allocates, but
-you have only one g_free(), below.  Okay, but explaining this briefly
-the commit message wouldn't hurt.
+>>>>> +
+>>>>> +    if (!backing) {
+>>>>> +        /* Apart from the modifications below, the same permission=
+s are
+>>>>> +         * forwarded and left alone as for filters */
+>>>>> +        bdrv_filter_default_perms(bs, c, role, perm, shared, &perm=
+, &shared);
+>>>>> +
+>>>>> +        /* Format drivers may touch metadata even if the guest doe=
+sn't write */
+>>>>> +        if (!bdrv_is_read_only(bs)) {
+>>>>> +            perm |=3D BLK_PERM_WRITE | BLK_PERM_RESIZE;
+>>>>> +        }
+>>>>> +
+>>>>> +        /* bs->file always needs to be consistent because of the m=
+etadata. We
+>>>>> +         * can never allow other users to resize or write to it. *=
+/
+>>>>> +        perm |=3D BLK_PERM_CONSISTENT_READ;
+>>>>> +        shared &=3D ~(BLK_PERM_WRITE | BLK_PERM_RESIZE);
+>>>>> +    } else {
+>>>>> +        /* We want consistent read from backing files if the paren=
+t needs it.
+>>>>> +         * No other operations are performed on backing files. */
+>>>>> +        perm &=3D BLK_PERM_CONSISTENT_READ;
+>>>>> +
+>>>>> +        /* If the parent can deal with changing data, we're okay w=
+ith a
+>>>>> +         * writable and resizable backing file. */
+>>>>> +        if (shared & BLK_PERM_WRITE) {
+>>>>> +            shared =3D BLK_PERM_WRITE | BLK_PERM_RESIZE;
+>>>>
+>>>> Wouldn't this break CONSISTENT_READ?
+>>>
+>>> WRITE (even for multiple users) and CONSISTENT_READ aren't mutually
+>>> exclusive. I was afraid that I didn't define CONSISTENT_READ right, b=
+ut
+>>> it appears that the definition is fine:
+>>>
+>>>  * A user that has the "permission" of consistent reads is guaranteed=
+ that
+>>>  * their view of the contents of the block device is complete and
+>>>  * self-consistent, representing the contents of a disk at a specific=
 
-> @@ -403,6 +406,7 @@ static void data_test_clear(e1000e_device *d)
->      e1000e_device_clear(test_bus, d);
->      close(test_sockets[0]);
->      pc_alloc_uninit(test_alloc);
-> +    g_free(d->pci_dev);
->      qpci_free_pc(test_bus);
->      qtest_end();
->  }
+>>>  * point.
+>>
+>> Right, but writes to the backing file at least to me appear to be a
+>> different matter. If those don't break CONSISTENT_READ, then I don't s=
+ee
+>> how commit breaks CONSISTENT_READ for the intermediate nodes.
+>=20
+> There's probably multiple ways to interpret such actions. You could
+> understand a commit job as writing the desired image to the base node
+> and at the same time it's a shared writer for the intermediate nodes
+> that happens to write garbage.
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Agreed.
+
+>                                The question is if this is a useful way
+> of seeing it when the job is to prevent accidental data corruption.
+
+Agreed. But then I would infer that any write to a backing file breaks
+CONSISTENT_READ on the overlay.
+
+> Note that we need writable backing files for commit, so taking away
+> BLK_PERM_WRITE from shared wouldn't work. We could probably make it
+> dependent on cleared CONSISTENT_READ (commit jobs don't require this
+> anyway), if you think that the current version is too permissive.
+
+I agree that we need to be able to share WRITE for a backing file. But I
+think this should only be set if the overlay's parents do not require
+CONSISTENT_READ from the overlay.
+
+Max
+
+
+--12x3tKseL6U9mS2gkjXS3uvViruu02qW5
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAli0NHoSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A/R4H/2fwAsLWOmSbjDTYhzoMWEhpwgrlNJOS
+1bshp+HDRpug7s50WL+nHbhPlLrxmBf83vCXxSVa9b4ht62l+EMKanT6BsOJNOx1
+tnKK5HPtzUw7bn430bcsxfrI5710QoLMqy3/ZiIwkA2x3vQaFM4JsRJw4EN9CilN
+7ZNg4MIu4qd6r8tGaCQYnwhciVGJAcd5YelOWr1Q4VLZMebsW8igHm1p5jw3aqIG
+MqXwEFCzBtjAKvyDKWB79B+Pl0DagzZN6JOtPHE9IylAJIV+ua2Wd5fQbkpGEuzf
+IUzPSFY790VDLd1vLpHRKknYcW72YWJJHxypD6qHp5VZCQeZb+d2lPg=
+=r9dM
+-----END PGP SIGNATURE-----
+
+--12x3tKseL6U9mS2gkjXS3uvViruu02qW5--
